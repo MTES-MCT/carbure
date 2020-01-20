@@ -1,0 +1,8 @@
+---
+- name: Copy unattended upgrades settings
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    with_items:
+    - { src: './10periodic', dest: '/etc/apt/apt.conf.d/'}
+    - { src: './50unattended-upgrades', dest: '/etc/apt/apt.conf.d/'}

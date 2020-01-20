@@ -1,0 +1,19 @@
+- hosts: dev
+  remote_user: root
+  gather_facts: no
+  pre_tasks:
+    - raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+    - setup: # gather_facts
+  vars:
+    username: deploy
+    password: $6$g7u1OVAIIn$OXUg68fKHEBAR2uHMcbAfOrmu1efGAm4A8YARjWucSvi7iTLaRmT2ZzXX3aFg1KCmPSp/rzWZYYmxF/7Swyeq.
+    public_key: ~/.ssh/id_rsa.pub
+  roles:
+   - sudo
+   - user
+   - common
+   - ufw
+   - docker
+   - ssh
+   - reboot
+   
