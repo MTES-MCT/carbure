@@ -1,3 +1,6 @@
 from django.shortcuts import render
 
-# Create your views here.
+def operators_index(request):
+  context = {}
+  return render(request, 'operators/index.html', context)
+
