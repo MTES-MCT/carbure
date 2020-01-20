@@ -1,3 +1,6 @@
 from django.shortcuts import render
 
-# Create your views here.
+def administrators_index(request):
+  context = {}
+  return render(request, 'administrators/index.html', context)
+
