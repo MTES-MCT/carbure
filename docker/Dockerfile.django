@@ -1,0 +1,23 @@
+FROM ubuntu:19.10
+
+# base
+RUN apt-get update
+RUN apt-get install mariadb-client libmariadbclient-dev -y
+RUN apt-get install python3.7 python3-pip python3-dev -y
+
+ENV PYTHONUNBUFFERED 1
+
+RUN mkdir /app
+WORKDIR /app
+
+COPY requirements.txt /app/
+
+RUN python3 -m pip install uwsgi
+RUN python3 -m pip install -r requirements.txt
+
+RUN mkdir /app/web
+
+COPY web/manage.py /app/web
+COPY web/carbure_uwsgi.ini /app/web
+COPY web/carbure /app/web/carbure
+
