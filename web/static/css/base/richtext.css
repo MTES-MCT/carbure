@@ -1,0 +1,51 @@
+.richtext img {
+  /* Prevent larger images to break layout */
+  max-width: 100%;
+
+  /* Center images smaller than width */
+  margin: auto;
+  display: block;
+}
+
+/* Allow images legends with the following syntax:
+  ![](path_to_image)
+  *image_caption* */
+.richtext img + em {
+  display: block;
+  text-align: center;
+  margin: 0.3em 0.1em;
+}
+
+/* Disable lists default indentation */
+.richtext ol,
+.richtext ul {
+  margin: 0;
+  padding: 0 0 0 1em;
+}
+
+.richtext li {
+  padding-left: 0.5em;
+}
+
+/* Lighter inline code element */
+.richtext code {
+  padding: 0 0.1em;
+  border-radius: 0.2em;
+}
+
+/* But <pre> block should be spaced */
+.richtext pre {
+  padding: 1em;
+  margin: 0.5em 0;
+  border-radius: var(--theme-border-radius);
+  background-color: var(--lightest-grey);
+  border: 1px solid var(--theme-border-lighter);
+}
+
+.richtext a,
+.richtext a:hover,
+.richtext a:focus,
+.richtext a:visited,
+.richtext a:active {
+  color: var(--theme-primary);
+}

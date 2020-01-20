@@ -1,0 +1,37 @@
+.hero {
+  width: 100%;
+  background: var(--theme-background-white);
+}
+
+.hero-color {
+  background: var(--theme-background-color);
+}
+
+.hero__container {
+  min-height: 25em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-l);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  margin-bottom: 0;
+}
+
+.hero-color h1 {
+  color: var(--theme-light-text);
+}
+
+.hero p {
+  margin: var(--space-s) auto;
+  color: var(--theme-dark-text);
+  font-size: 1.5em;
+}
+
+.hero-color p {
+  color: var(--theme-light-text);
+}

@@ -1,5 +1,9 @@
 from django.shortcuts import render
-from django.http import HttpResponse
 
 def index(request):
-    return HttpResponse("Hello, world.")
+  context = {}
+  return render(request, 'public/index.html', context)
+
+def htmlreference(request):
+  context = {}
+  return render(request, 'common/reference.html', context)
