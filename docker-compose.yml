@@ -1,0 +1,81 @@
+version: '3.5'
+services:
+  carbure-mariadb:
+    image: mariadb:latest
+    restart: always
+    container_name: carbure_mariadb
+    ports:
+      - 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DJANGO_DATABASE}
+      MYSQL_USER: ${DJANGO_DB_USER}
+      MYSQL_PASSWORD: ${DJANGO_DB_PASSWORD}
+    volumes:
+      - carburedb:/var/lib/mysql
+    networks:
+    - carbure
+
+  carbure-django-migration:
+    image: carbure_app:latest
+    command: python3 manage.py migrate --noinput
+    environment:
+      DJANGO_DATABASE: ${DJANGO_DATABASE}
+      DJANGO_DB_USER: ${DJANGO_DB_USER}
+      DJANGO_DB_PASSWORD: ${DJANGO_DB_PASSWORD}
+      DJANGO_DB_HOST: carbure-mariadb
+      DJANGO_DB_PORT: 3306
+    depends_on:
+    - carbure-mariadb
+    networks:
+    - carbure
+
+  carbure-django-uwsgi:
+    build:
+      context: ${CARBURE_HOME}
+      dockerfile: docker/Dockerfile.django
+    command: uwsgi --ini /app/web/carbure_uwsgi.ini --touch-reload=/app/web/carbure_uwsgi.ini
+    restart: always
+    container_name: carbure_app
+    image: carbure_app:latest
+    environment:
+      DJANGO_DATABASE: ${DJANGO_DATABASE}
+      DJANGO_DB_USER: ${DJANGO_DB_USER}
+      DJANGO_DB_PASSWORD: ${DJANGO_DB_PASSWORD}
+      DJANGO_DB_HOST: carbure-mariadb
+      DJANGO_DB_PORT: 3306
+    volumes:
+    - ${CARBURE_HOME}:/app #for dev only, allows for auto-refresh of files
+    depends_on:
+    - carbure-mariadb
+    - carbure-django-migration
+    ports:
+      - 8001
+    networks:
+    - carbure
+
+  carbure-web-proxy:
+    build:
+      context: ${CARBURE_HOME}
+      dockerfile: docker/Dockerfile.web
+    restart: always
+    container_name: carbure_web
+    image: carbure_web:latest
+    depends_on:
+    - carbure-django-uwsgi
+    volumes:
+    # dev: mount static directory
+    - ${CARBURE_HOME}/web/static:/var/www/html
+    ports:
+    - 8082:80
+    networks:
+    - carbure
+
+volumes:
+  carburedb:
+    name: carbure_carburedb
+
+networks:
+  carbure:
+    name: carbure_default
+
