@@ -1,0 +1,72 @@
+body {
+  font-family: "Source Sans Pro", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Evolventa", "Trebuchet MS", sans-serif;
+}
+
+h1:first-child,
+h2:first-child,
+h3:first-child,
+h4:first-child,
+h5:first-child,
+h6:first-child {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 2em;
+  line-height: 1.125em;
+}
+
+h2 {
+  font-size: 1.75em;
+  line-height: 1.25em;
+}
+
+h3 {
+  font-size: 1.5em;
+  line-height: 1.5em;
+}
+
+h4 {
+  font-size: 1.25em;
+}
+
+h5 {
+  font-size: 1.125em;
+}
+
+h6 {
+  font-size: 1em;
+}
+
+.subtitle {
+  font-weight: 400;
+  font-family: "Source Sans Pro", Arial, sans-serif;
+  color: var(--darker-grey);
+}
+
+.lead-text {
+  font-size: 1.25em;
+}
+
+.subtitle {
+  color: var(--dark-grey);
+}
+
+.text-quote {
+  background-color: var(--theme-background-grey);
+  border-left: 8px solid var(--theme-border-lighter);
+  padding: 4px 0 4px 25px;
+}

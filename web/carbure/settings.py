@@ -57,7 +57,7 @@ ROOT_URLCONF = 'carbure.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.environ['CARBURE_HOME'] + '/web/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

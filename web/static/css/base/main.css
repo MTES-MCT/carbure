@@ -1,0 +1,59 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  position: relative;
+}
+
+body {
+  color: var(--theme-dark-text);
+  padding: 0;
+  margin: 0;
+  overflow: auto;
+}
+
+a,
+button {
+  cursor: pointer;
+}
+
+a,
+a:focus,
+a:visited,
+a:active {
+  text-decoration: underline;
+  color: var(--theme-primary);
+}
+
+a:hover {
+  border-radius: var(--theme-border-radius);
+  color: var(--dark-blue);
+  background-color: var(--lighter-grey);
+  text-decoration: none;
+}
+
+small {
+  font-size: 0.875em;
+}
+
+hr {
+  border-top: 0;
+  border-bottom: var(--theme-border-lighter);
+  margin: var(--space-l) 0;
+}
+
+dt {
+  display: block;
+  color: var(--darker-grey);
+}
+
+dd {
+  margin: 0;
+}
+
+dd + dt {
+  margin-top: var(--space-xs);
+}
