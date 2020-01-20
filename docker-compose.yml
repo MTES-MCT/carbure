@@ -26,6 +26,7 @@ services:
       DJANGO_DB_HOST: carbure-mariadb
       DJANGO_DB_PORT: 3306
       SECRET_KEY: ${SECRET_KEY}
+      SENTRY_DSN: ${SENTRY_DSN}      
     depends_on:
     - carbure-mariadb
     networks:
@@ -49,6 +50,7 @@ services:
       ALLOWED_HOSTS: ${ALLOWED_HOSTS}
       DEBUG: ${DEBUG}
       CARBURE_HOME: /app
+      SENTRY_DSN: ${SENTRY_DSN}
     volumes:
     - ${CARBURE_HOME}:/app #for dev only, allows for auto-refresh of files
     depends_on:
