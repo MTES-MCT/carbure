@@ -54,8 +54,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'carbure.urls'
 
-
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
