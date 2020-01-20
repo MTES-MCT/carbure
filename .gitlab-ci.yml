@@ -1,0 +1,24 @@
+image: docker:latest
+
+stages:
+- build
+- test
+- deploy
+
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+
+build_django:
+  stage: build
+  script:
+    - echo "Building django app"
+    docker build -t registry.gitlab.com/la-fabrique-numerique/biocarburants .
+    - docker build -t registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA -f docker/Dockerfile.django .
+    - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA
+
+build_web:
+  stage: build
+  script:
+    - echo "Building reverse proxy"
+    - docker build -t registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA -f docker/Dockerfile.web .
+    - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA
