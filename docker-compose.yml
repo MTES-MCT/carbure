@@ -25,6 +25,7 @@ services:
       DJANGO_DB_PASSWORD: ${DJANGO_DB_PASSWORD}
       DJANGO_DB_HOST: carbure-mariadb
       DJANGO_DB_PORT: 3306
+      SECRET_KEY: ${SECRET_KEY}
     depends_on:
     - carbure-mariadb
     networks:
@@ -44,6 +45,9 @@ services:
       DJANGO_DB_PASSWORD: ${DJANGO_DB_PASSWORD}
       DJANGO_DB_HOST: carbure-mariadb
       DJANGO_DB_PORT: 3306
+      SECRET_KEY: ${SECRET_KEY}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      DEBUG: ${DEBUG}
     volumes:
     - ${CARBURE_HOME}:/app #for dev only, allows for auto-refresh of files
     depends_on:
@@ -67,7 +71,7 @@ services:
     # dev: mount static directory
     - ${CARBURE_HOME}/web/static:/var/www/html
     ports:
-    - 8082:80
+    - 8090:80
     networks:
     - carbure
 
