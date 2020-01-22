@@ -1,0 +1,79 @@
+version: '3.5'
+services:
+  carbure-mariadb:
+    image: mariadb:latest
+    restart: always
+    container_name: carbure_mariadb
+    ports:
+      - 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DJANGO_DATABASE}
+      MYSQL_USER: ${DJANGO_DB_USER}
+      MYSQL_PASSWORD: ${DJANGO_DB_PASSWORD}
+    volumes:
+      - carburedb:/var/lib/mysql
+    networks:
+    - carbure
+
+  carbure-django-migration:
+    image: carbure_app:dev
+    command: python3 manage.py migrate --noinput
+    environment:
+      DJANGO_DATABASE: ${DJANGO_DATABASE}
+      DJANGO_DB_USER: ${DJANGO_DB_USER}
+      DJANGO_DB_PASSWORD: ${DJANGO_DB_PASSWORD}
+      DJANGO_DB_HOST: carbure-mariadb
+      DJANGO_DB_PORT: 3306
+      SECRET_KEY: ${SECRET_KEY}
+      SENTRY_DSN: ${SENTRY_DSN}      
+    depends_on:
+    - carbure-mariadb
+    networks:
+    - carbure
+
+  carbure-django-uwsgi:
+    command: uwsgi --ini /app/web/carbure_uwsgi.ini --touch-reload=/app/web/carbure_uwsgi.ini
+    restart: always
+    container_name: carbure_app
+    image: carbure_app:dev
+    environment:
+      DJANGO_DATABASE: ${DJANGO_DATABASE}
+      DJANGO_DB_USER: ${DJANGO_DB_USER}
+      DJANGO_DB_PASSWORD: ${DJANGO_DB_PASSWORD}
+      DJANGO_DB_HOST: carbure-mariadb
+      DJANGO_DB_PORT: 3306
+      SECRET_KEY: ${SECRET_KEY}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      DEBUG: ${DEBUG}
+      CARBURE_HOME: /app
+      SENTRY_DSN: ${SENTRY_DSN}
+    depends_on:
+    - carbure-mariadb
+    - carbure-django-migration
+    ports:
+      - 8001
+    networks:
+    - carbure
+
+  carbure-web-proxy:
+    restart: always
+    container_name: carbure_web
+    image: carbure_web:dev
+    depends_on:
+    - carbure-django-uwsgi
+    volumes:
+    - ${CARBURE_HOME}/web/static:/var/www/html
+    ports:
+    - 8090:80
+    networks:
+    - carbure
+
+volumes:
+  carburedb:
+    name: carbure_carburedb
+
+networks:
+  carbure:
+    name: carbure_default
+
