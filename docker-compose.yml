@@ -5,7 +5,7 @@ services:
     restart: always
     container_name: carbure_mariadb
     ports:
-      - 3306
+      - ${DJANGO_DB_PORT}:3306
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DJANGO_DATABASE}
@@ -23,8 +23,8 @@ services:
       DJANGO_DATABASE: ${DJANGO_DATABASE}
       DJANGO_DB_USER: ${DJANGO_DB_USER}
       DJANGO_DB_PASSWORD: ${DJANGO_DB_PASSWORD}
-      DJANGO_DB_HOST: carbure-mariadb
-      DJANGO_DB_PORT: 3306
+      DJANGO_DB_HOST: ${DJANGO_DB_HOST}
+      DJANGO_DB_PORT: ${DJANGO_DB_PORT}
       SECRET_KEY: ${SECRET_KEY}
       SENTRY_DSN: ${SENTRY_DSN}      
     depends_on:
@@ -44,8 +44,8 @@ services:
       DJANGO_DATABASE: ${DJANGO_DATABASE}
       DJANGO_DB_USER: ${DJANGO_DB_USER}
       DJANGO_DB_PASSWORD: ${DJANGO_DB_PASSWORD}
-      DJANGO_DB_HOST: carbure-mariadb
-      DJANGO_DB_PORT: 3306
+      DJANGO_DB_HOST: ${DJANGO_DB_HOST}
+      DJANGO_DB_PORT: ${DJANGO_DB_PORT}
       SECRET_KEY: ${SECRET_KEY}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS}
       DEBUG: ${DEBUG}
