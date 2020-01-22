@@ -1,27 +1,43 @@
 - name: Add docker repository key
+  become: yes
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
+  tags:
+    - docker
 
 - name: get lsb_release
   command: lsb_release -cs
   register: release
-
-- name: debug arch
-  debug:
-    msg: "Remote arch is {{ ansible_architecture }}"
+  tags:
+    - docker
 
 - name: Add x86 docker repository
+  become: yes
   apt_repository:
     repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{release.stdout}} stable
     state: present
-  when: ansible_architecture == "x86_64"
+  tags:
+    - docker
 
 - name: "apt-get update"
+  become: yes
   apt:
     update_cache: yes
+  tags:
+    - docker
 
 - name: Install docker packages
+  become: yes
   apt:
     name: ['docker-ce', 'docker-ce-cli', 'containerd.io']
+  tags:
+    - docker
 
+- name: Install docker-compose
+  become: yes
+  pip:
+    name: docker-compose
+  tags:
+    - docker
+  

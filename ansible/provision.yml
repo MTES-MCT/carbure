@@ -1,5 +1,5 @@
 - hosts: dev
-  remote_user: root
+  remote_user: deploy
   gather_facts: no
   pre_tasks:
     - raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
