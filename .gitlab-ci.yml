@@ -6,7 +6,7 @@ stages:
 - deploy
 
 before_script:
-  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+  - docker login -u $REGISTRY_LOGIN -p $REGISTRY_PASSWORD registry.gitlab.com
 
 build_django:
   stage: build
