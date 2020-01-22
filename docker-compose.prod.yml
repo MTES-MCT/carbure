@@ -1,23 +1,7 @@
 version: '3.5'
 services:
-  carbure-mariadb:
-    image: mariadb:latest
-    restart: always
-    container_name: carbure_mariadb
-    ports:
-      - 3306
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DJANGO_DATABASE}
-      MYSQL_USER: ${DJANGO_DB_USER}
-      MYSQL_PASSWORD: ${DJANGO_DB_PASSWORD}
-    volumes:
-      - carburedb:/var/lib/mysql
-    networks:
-    - carbure
-
   carbure-django-migration:
-    image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:dev
+    image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:prod
     command: python3 manage.py migrate --noinput
     environment:
       DJANGO_DATABASE: ${DJANGO_DATABASE}
@@ -26,9 +10,7 @@ services:
       DJANGO_DB_HOST: ${DJANGO_DB_HOST}
       DJANGO_DB_PORT: ${DJANGO_DB_PORT}
       SECRET_KEY: ${SECRET_KEY}
-      SENTRY_DSN: ${SENTRY_DSN}      
-    depends_on:
-    - carbure-mariadb
+      SENTRY_DSN: ${SENTRY_DSN}
     networks:
     - carbure
 
@@ -36,7 +18,7 @@ services:
     command: uwsgi --ini /app/web/carbure_uwsgi.ini --touch-reload=/app/web/carbure_uwsgi.ini
     restart: always
     container_name: carbure_app
-    image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:dev
+    image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:prod
     environment:
       DJANGO_DATABASE: ${DJANGO_DATABASE}
       DJANGO_DB_USER: ${DJANGO_DB_USER}
@@ -49,7 +31,6 @@ services:
       CARBURE_HOME: /app
       SENTRY_DSN: ${SENTRY_DSN}
     depends_on:
-    - carbure-mariadb
     - carbure-django-migration
     ports:
       - 8001
@@ -59,17 +40,13 @@ services:
   carbure-web-proxy:
     restart: always
     container_name: carbure_web
-    image: registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:dev
+    image: registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:prod
     depends_on:
     - carbure-django-uwsgi
     ports:
     - 8090:80
     networks:
     - carbure
-
-volumes:
-  carburedb:
-    name: carbure_carburedb
 
 networks:
   carbure:

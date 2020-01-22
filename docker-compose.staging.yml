@@ -17,7 +17,7 @@ services:
     - carbure
 
   carbure-django-migration:
-    image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:dev
+    image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:staging
     command: python3 manage.py migrate --noinput
     environment:
       DJANGO_DATABASE: ${DJANGO_DATABASE}
@@ -36,7 +36,7 @@ services:
     command: uwsgi --ini /app/web/carbure_uwsgi.ini --touch-reload=/app/web/carbure_uwsgi.ini
     restart: always
     container_name: carbure_app
-    image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:dev
+    image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:staging
     environment:
       DJANGO_DATABASE: ${DJANGO_DATABASE}
       DJANGO_DB_USER: ${DJANGO_DB_USER}
@@ -59,7 +59,7 @@ services:
   carbure-web-proxy:
     restart: always
     container_name: carbure_web
-    image: registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:dev
+    image: registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:staging
     depends_on:
     - carbure-django-uwsgi
     ports:
