@@ -5,13 +5,11 @@ stages:
 - test
 - deploy
 
-before_script:
-  - docker info
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - docker info
 
 build_django:
   stage: build
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - echo "Building django app"
     - docker build -t registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA -f docker/Dockerfile.django .
@@ -19,6 +17,8 @@ build_django:
 
 build_web:
   stage: build
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - echo "Building reverse proxy"
     - docker build -t registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA -f docker/Dockerfile.web .
@@ -29,7 +29,8 @@ test:
   stage: test
   script:
     - echo "Code quality checks..."
-    - flake8 web  
+    - flake8 web
+    - echo "Loading test data"
     - echo "Testing..."
     
 dev:
