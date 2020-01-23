@@ -22,12 +22,18 @@ build_web:
     - docker build -t registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA -f docker/Dockerfile.web .
     - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA
 
+quality:
+  image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA
+  stage: test
+  allow_failure: true
+  script:
+    - echo "Code quality checks..."
+    - flake8 web
+
 test:
   image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA
   stage: test
   script:
-    - echo "Code quality checks..."
-    - flake8 web
     - echo "Loading test data"
     - echo "Testing..."
     
