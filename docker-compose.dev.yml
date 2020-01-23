@@ -59,7 +59,7 @@ services:
     image: registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:dev
     environment:
       NGINX_HOSTS: ${NGINX_HOSTS}
-      NGINX_PORT: ${NGINX_PORT}
+      NGINX_SSL_FOLDER: ${NGINX_SSL_FOLDER}
     command: /bin/bash -c "envsubst < /etc/nginx/conf.d/web.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
     depends_on:
     - carbure-django-uwsgi
@@ -68,12 +68,21 @@ services:
     - 443:443
     networks:
     - carbure
+    volumes:
+    - ./data/certbot/conf:/etc/letsencrypt
+    - ./data/certbot/www:/var/www/certbot
 
   watchtower:
     image: containrrr/watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: carbure_web carbure_app carbure_app_migration --interval 30
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+    - ./data/certbot/conf:/etc/letsencrypt
+    - ./data/certbot/www:/var/www/certbot
 
 volumes:
   carburedb:
