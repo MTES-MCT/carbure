@@ -21,6 +21,8 @@ COPY web/manage.py /app/web
 COPY web/carbure_uwsgi.ini /app/web
 COPY web/carbure /app/web/carbure
 
+COPY web/templates /app/web/templates
+COPY web/public /app/web/public
 COPY web/core /app/web/core
 COPY web/producers /app/web/producers
 COPY web/operators /app/web/operators
