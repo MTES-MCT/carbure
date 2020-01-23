@@ -68,6 +68,9 @@ services:
     restart: always
     container_name: carbure_web
     image: carbure_web:latest
+    environment:
+      NGINX_HOSTS: ${NGINX_HOSTS}
+      NGINX_PORT: ${NGINX_PORT}
     depends_on:
     - carbure-django-uwsgi
     volumes:
