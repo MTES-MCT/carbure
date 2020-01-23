@@ -1,6 +1,6 @@
 FROM nginx:latest
 
-COPY ./docker/nginx/web.conf /etc/nginx/conf.d/web.conf
+COPY ./docker/nginx/web.template /etc/nginx/conf.d/web.template
 COPY ./docker/nginx/uwsgi_params /etc/nginx/conf.d/uwsgi_params
 COPY ./web/static /var/www/html
 
