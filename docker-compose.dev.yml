@@ -4,8 +4,6 @@ services:
     image: mariadb:latest
     restart: always
     container_name: carbure_mariadb
-    ports:
-      - 3306
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DJANGO_DATABASE}
@@ -52,8 +50,6 @@ services:
     depends_on:
     - carbure-mariadb
     - carbure-django-migration
-    ports:
-      - 8001
     networks:
     - carbure
 
@@ -68,11 +64,12 @@ services:
     depends_on:
     - carbure-django-uwsgi
     ports:
-    - 8090:80
+    - 80:80
+    - 443:443
     networks:
     - carbure
 
- watchtower:
+  watchtower:
     image: containrrr/watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
