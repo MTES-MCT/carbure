@@ -71,6 +71,7 @@ services:
     environment:
       NGINX_HOSTS: ${NGINX_HOSTS}
       NGINX_PORT: ${NGINX_PORT}
+    command: /bin/bash -c "envsubst < /etc/nginx/conf.d/web.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
     depends_on:
     - carbure-django-uwsgi
     volumes:
