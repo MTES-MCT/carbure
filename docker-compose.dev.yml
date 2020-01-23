@@ -18,6 +18,7 @@ services:
 
   carbure-django-migration:
     image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:dev
+    container_name: carbure_app_migration
     command: python3 manage.py migrate --noinput
     environment:
       DJANGO_DATABASE: ${DJANGO_DATABASE}
@@ -70,6 +71,12 @@ services:
     - 8090:80
     networks:
     - carbure
+
+ watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: carbure_web carbure_app carbure_app_migration --interval 30
 
 volumes:
   carburedb:
