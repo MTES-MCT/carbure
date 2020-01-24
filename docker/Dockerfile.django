@@ -3,7 +3,7 @@ FROM ubuntu:19.10
 # base
 RUN apt-get update
 RUN apt-get install mariadb-client libmariadbclient-dev -y
-RUN apt-get install python3.7 python3-pip python3-dev -y
+RUN apt-get install python3.7 python3-pip python3-dev git -y
 
 ENV PYTHONUNBUFFERED 1
 
@@ -14,6 +14,8 @@ COPY requirements.txt /app/
 
 RUN python3 -m pip install uwsgi
 RUN python3 -m pip install -r requirements.txt
+
+RUN pip3 install git+git://github.com/mplanes/django-authtools --upgrade
 
 RUN mkdir /app/web
 
