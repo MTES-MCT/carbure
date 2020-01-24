@@ -10,7 +10,7 @@ services:
       MYSQL_USER: ${DJANGO_DB_USER}
       MYSQL_PASSWORD: ${DJANGO_DB_PASSWORD}
     volumes:
-      - carburedb:/var/lib/mysql
+    - carburedb:/var/lib/mysql
     networks:
     - carbure
 
