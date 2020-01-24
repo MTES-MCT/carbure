@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
+
 
 class Entity(models.Model):
   ENTITY_TYPES = (('Producteur', 'Producteur'), ('Opérateur', 'Opérateur'), ('Administration', 'Administration'), ('Unknown', 'Unknown'))
@@ -18,10 +19,11 @@ class Entity(models.Model):
     verbose_name_plural = 'Entities'
 
 class PlatformUser(models.Model):
-  user = models.ForeignKey(User, on_delete=models.CASCADE)
+  USER_TYPES = (('Producteur', 'Producteur'), ('Opérateur', 'Opérateur'), ('Administrateur', 'Administrateur'))
+  user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
   date_added = models.DateTimeField(auto_now_add=True)
-  entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
-      
+  user_type = models.CharField(max_length=64, choices=USER_TYPES, default='Producteur')
+
   def __str__(self):
     return self.user.email
 
@@ -29,3 +31,17 @@ class PlatformUser(models.Model):
     db_table = 'users'
     verbose_name = 'User'
     verbose_name_plural = 'Users'
+
+
+class PlatformUserRights(models.Model):
+  entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
+  user = models.ForeignKey(PlatformUser, on_delete=models.CASCADE)
+  date_added = models.DateTimeField(auto_now_add=True)
+
+  def __str__(self):
+    return '%s - %s' % (self.user.user.email, self.entity.name)
+
+  class Meta:
+    db_table = 'users_rights'
+    verbose_name = 'User Right'
+    verbose_name_plural = 'Users Rights'
