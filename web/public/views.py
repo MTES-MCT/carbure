@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 
-from core.models import PlatformUser
+from core.models import UserDetails
 
 def index(request):
   context = {}
@@ -14,7 +14,7 @@ def index(request):
 @login_required
 def home(request):
   try:
-    user = PlatformUser.objects.get(user=request.user)
+    user = UserDetails.objects.get(user=request.user)
   except:
     # todo: raise an error? add notification to administrator?
     return render(request, 'public/blank_user.html', {})

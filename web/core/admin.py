@@ -11,12 +11,12 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ('user', 'user_type')
     search_fields = ('user', 'user_type')
     list_filter = ('user_type',)
-admin.site.register(PlatformUser, UserAdmin)
+admin.site.register(UserDetails, UserAdmin)
 
 class UserRightsAdmin(admin.ModelAdmin):
     list_display = ('user', 'entity')
     search_fields = ('user', 'entity')
-admin.site.register(PlatformUserRights, UserRightsAdmin)
+admin.site.register(UserRights, UserRightsAdmin)
 
 
 # https://django-authtools.readthedocs.io/en/latest/how-to/invitation-email.html
