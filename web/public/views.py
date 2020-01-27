@@ -7,6 +7,8 @@ from core.models import PlatformUser
 
 def index(request):
   context = {}
+  if request.user.is_authenticated:
+    return redirect('home')
   return render(request, 'public/index.html', context)
 
 @login_required
