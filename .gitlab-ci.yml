@@ -28,7 +28,7 @@ quality:
   allow_failure: true
   script:
     - echo "Code quality checks..."
-    - flake8 web
+    - flake8 --config .flake8 web
 
 test:
   image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA
