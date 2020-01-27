@@ -18,7 +18,7 @@ class Entity(models.Model):
     verbose_name = 'Entity'
     verbose_name_plural = 'Entities'
 
-class PlatformUser(models.Model):
+class UserDetails(models.Model):
   USER_TYPES = (('Producteur', 'Producteur'), ('Opérateur', 'Opérateur'), ('Administrateur', 'Administrateur'))
   user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
   date_added = models.DateTimeField(auto_now_add=True)
@@ -33,9 +33,9 @@ class PlatformUser(models.Model):
     verbose_name_plural = 'Users'
 
 
-class PlatformUserRights(models.Model):
+class UserRights(models.Model):
   entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
-  user = models.ForeignKey(PlatformUser, on_delete=models.CASCADE)
+  user = models.ForeignKey(UserDetails, on_delete=models.CASCADE)
   date_added = models.DateTimeField(auto_now_add=True)
 
   def __str__(self):
