@@ -74,7 +74,28 @@
       <nav>
         <ul class="nav__links">
           {% if user.is_authenticated %}
-          <li class="nav__item"><a href="{% url 'logout' %}">Se Déconnecter</a></li>
+          <li class="nav__item">
+            <div class="dropdown">
+              {{user_name}}
+              <div class="dropdown-content">
+                <a href="#">Mon Compte</a>
+                <a href="{% url 'logout' %}">Se Déconnecter</a>
+              </div>
+            </div>
+          </li>
+          -
+          <li class="nav__item">
+            <div class="dropdown">
+              {{user_entity}}
+              {% if nb_entities > 1 %}
+                {% for entity in entities %}
+                <div class="dropdown-content">
+                  <a href="#">{{entity.name}}</a>
+                </div>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </li>          
           {% else %}
           <li class="nav__item"><a href="{% url 'login' %}">Connexion</a></li>
           {% endif %}
