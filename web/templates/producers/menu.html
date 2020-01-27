@@ -1,7 +1,7 @@
 	<aside class="side-menu" role="navigation">
 		<ul>
-			<li><a {% if current_url_name == 'producers-index' %}class="active"{% endif %} href="{% url 'producers-index' %}">Attestations</a></li>
-			<li><a {% if current_url_name == 'producers-inbox' %}class="active"{% endif %} href="{% url 'producers-inbox' %}">Inbox</a></li>
+			<li><a {% if current_url_name == 'producers-index' or current_url_name == 'producers-attestation' %}class="active"{% endif %} href="{% url 'producers-index' %}">Attestations</a></li>
+			<li><a {% if current_url_name == 'producers-inbox' %}class="active"{% endif %} href="{% url 'producers-inbox' %}">Inbox <span class="info-number badge badge-green">2</span></a></li>
 			<li><a {% if current_url_name == 'producers-settings' %}class="active"{% endif %} href="{% url 'producers-settings' %}">Paramètres</a></li>
 		</ul>
 	</aside>
