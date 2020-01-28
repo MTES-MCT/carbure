@@ -36,3 +36,14 @@
 	line-height: 13px;
 	padding: 2px 6px;
 }
+
+.side-menu-submenu {
+	padding-left: var(--space-s);
+	font-size: 14px;
+}
+
+.dashboard .side-menu .active-submenu {
+	text-decoration: underline;
+    color: #0053b3;
+    color: var(--theme-primary);
+}
