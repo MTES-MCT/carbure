@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from core.decorators import enrich_with_user_details
-
+from django.shortcuts import render
 
 @login_required
 @enrich_with_user_details
