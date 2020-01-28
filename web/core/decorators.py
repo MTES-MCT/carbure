@@ -1,5 +1,5 @@
-from django.core.exceptions import PermissionDenied
-from core.models import Entity, UserDetails, UserRights
+from core.models import UserDetails, UserRights
+
 
 def enrich_with_user_details(function):
     def wrap(request, *args, **kwargs):

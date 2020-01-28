@@ -1,24 +1,3 @@
-from django.contrib import admin
-from core.models import *
-
-class EntityAdmin(admin.ModelAdmin):
-    list_display = ('entity_type', 'name', 'parent_entity')
-    search_fields = ('entity_type', 'name')
-    list_filter = ('entity_type',)
-admin.site.register(Entity, EntityAdmin)
-
-class UserAdmin(admin.ModelAdmin):
-    list_display = ('user', 'user_type')
-    search_fields = ('user', 'user_type')
-    list_filter = ('user_type',)
-admin.site.register(UserDetails, UserAdmin)
-
-class UserRightsAdmin(admin.ModelAdmin):
-    list_display = ('user', 'entity')
-    search_fields = ('user', 'entity')
-admin.site.register(UserRights, UserRightsAdmin)
-
-
 # https://django-authtools.readthedocs.io/en/latest/how-to/invitation-email.html
 # allows a manual user creation by an admin, without setting a password
 
@@ -27,11 +6,36 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
 from django.utils.crypto import get_random_string
-
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
+from core.models import Entity, UserDetails, UserRights
 
+
+class EntityAdmin(admin.ModelAdmin):
+    list_display = ('entity_type', 'name', 'parent_entity')
+    search_fields = ('entity_type', 'name')
+    list_filter = ('entity_type',)
+
+
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('user', 'user_type')
+    search_fields = ('user', 'user_type')
+    list_filter = ('user_type',)
+
+
+class UserRightsAdmin(admin.ModelAdmin):
+    list_display = ('user', 'entity')
+    search_fields = ('user', 'entity')
+
+
+admin.site.register(Entity, EntityAdmin)
+admin.site.register(UserDetails, UserAdmin)
+admin.site.register(UserRights, UserRightsAdmin)
+
+
+# authtool custom user model
 User = get_user_model()
+
 
 class UserCreationForm(UserCreationForm):
     """
@@ -95,6 +99,7 @@ class UserAdmin(NamedUserAdmin):
                 subject_template_name='registration/account_creation_subject.txt',
                 email_template_name='registration/account_creation_email.html',
             )
+
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
