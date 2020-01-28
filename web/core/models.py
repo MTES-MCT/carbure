@@ -3,7 +3,7 @@ from django.conf import settings
 
 
 class Entity(models.Model):
-    ENTITY_TYPES = (('Producteur', 'Producteur'), ('Opérateur', 'Opérateur'), 
+    ENTITY_TYPES = (('Producteur', 'Producteur'), ('Opérateur', 'Opérateur'),
                     ('Administration', 'Administration'), ('Unknown', 'Unknown'))
 
     name = models.CharField(max_length=64)
@@ -19,6 +19,7 @@ class Entity(models.Model):
         verbose_name = 'Entity'
         verbose_name_plural = 'Entities'
 
+
 class UserDetails(models.Model):
     USER_TYPES = (('Producteur', 'Producteur'), ('Opérateur', 'Opérateur'), ('Administrateur', 'Administrateur'))
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -32,6 +33,7 @@ class UserDetails(models.Model):
         db_table = 'users'
         verbose_name = 'User'
         verbose_name_plural = 'Users'
+
 
 class UserRights(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
