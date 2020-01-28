@@ -46,6 +46,9 @@
   <link rel="icon" type="image/png" sizes="32x32" href="images/favicons/favicon-32x32.png">
   <link rel="manifest" href="images/favicons/manifest.json">
   <link rel="mask-icon" href="images/favicons/safari-pinned-tab.svg" color="#5bbad5">
+
+  {% block extra_css %}
+  {% endblock %}
 </head>
 
 <body class="site">
@@ -95,7 +98,7 @@
                 {% endfor %}
               {% endif %}
             </div>
-          </li>          
+          </li>
           {% else %}
           <li class="nav__item"><a href="{% url 'login' %}">Connexion</a></li>
           {% endif %}
@@ -113,7 +116,7 @@
   </header>
 
   {% block content %}
-  
+
   {% endblock %}
 
   <footer class="footer" role="contentinfo">
@@ -135,4 +138,6 @@
     </div>
   </footer>
 </body>
+  {% block extra_js %}
+  {% endblock %}
 </html>

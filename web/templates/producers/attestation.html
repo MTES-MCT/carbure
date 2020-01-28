@@ -1,13 +1,94 @@
 {% extends "producers/index.html" %}
 
- 	 	 					 	 	 	 		 		
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+{% endblock %}
 
 
 {% block producer  %}
 <div class="main">
 	<div class="panel">
 		<h3>Attestation de Durabilité 2019-12</h3>
-		<table class="table table-striped">
+		<a class="button" href="#modal">Column filter</a>
+		<div class="modal__backdrop" id="modal">
+			<div class="modal">
+				<table>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox0" class="toggle-vis" data-column="0"></td>
+						<td><label for="checkbox0" class="label-inline">Dépôt</label></td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox1" class="toggle-vis" data-column="1"></td>
+						<td><label for="checkbox1" class="label-inline">N°DAE ou DAA</label></td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox2" class="toggle-vis" data-column="2"></td>
+						<td><label for="checkbox2" class="label-inline">Date d'entrée</label></td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox3" class="toggle-vis" data-column="3"></td>
+						<td><label for="checkbox3" class="label-inline">Volume</label></td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox4" class="toggle-vis" data-column="4"></td>
+						<td><label for="checkbox4" class="label-inline">Types</label></td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox5" class="toggle-vis" data-column="5"></td>
+						<td><label for="checkbox5" class="label-inline">Filière de production</label></td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox6" class="toggle-vis" data-column="6"></td>
+						<td><label for="checkbox6" class="label-inline">Catégorie</label></td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox7" class="toggle-vis" data-column="7"></td>
+						<td><label for="checkbox7" class="label-inline">Système fournisseur</label></td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox8" class="toggle-vis" data-column="8"></td>
+						<td><label for="checkbox8" class="label-inline">Pays d'origine</label></td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox9" class="toggle-vis" data-column="9"></td>
+						<td><label for="checkbox9" class="label-inline">Respect des critères de durabilité</label></td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox10" class="toggle-vis" data-column="10"></td>
+						<td><label for="checkbox10" class="label-inline">GES transport et distribution</label></td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox11" class="toggle-vis" data-column="11"></td>
+						<td><label for="checkbox11" class="label-inline">Total émissions GES</label></td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox12" class="toggle-vis" data-column="12"></td>
+						<td><label for="checkbox12" class="label-inline">GES carburant fossile</label></td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox13" class="toggle-vis" data-column="13"></td>
+						<td><label for="checkbox13" class="label-inline">% de réduction totale</label></td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox14" class="toggle-vis" data-column="14"></td>
+						<td><label for="checkbox14" class="label-inline">Numéro d'enregistrement double-comptage</label></td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox15" class="toggle-vis" data-column="15"></td>
+						<td><label for="checkbox15" class="label-inline">Pays d'implantation</label></td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" name="checkbox" id="checkbox16" class="toggle-vis" data-column="16"></td>
+						<td><label for="checkbox16" class="label-inline">Date de mise en service</label></td>
+					</tr>
+				</table>
+
+				<div class="form__group button__group">
+					<a class="button secondary" href="#modal-section">Ok</a>
+				</div>
+			</div>
+		</div>
+		<table class="table table-striped" id="datatable">
 			<thead>
 				<tr>
 					<th>Dépôt</th>
@@ -48,7 +129,7 @@
 					<td>N/A</td>
 					<td>FR</td>
 					<td>1/7/2007</td>
-				</tr>				
+				</tr>
 				<tr>
 					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
@@ -67,7 +148,7 @@
 					<td>N/A</td>
 					<td>FR</td>
 					<td>1/7/2007</td>
-				</tr>	
+				</tr>
 				<tr>
 					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
@@ -86,44 +167,64 @@
 					<td>N/A</td>
 					<td>FR</td>
 					<td>1/7/2007</td>
-				</tr>	
+				</tr>
 			</tbody>
 		</table>
-		<nav class="pagination">
-			<div class="pagination__display-group">
-				<label for="pagination__display" class="pagination__display-label">Rows per page</label>
-				<select class="pagination__display" id="pagination__display">
-					<option>25</option>
-					<option>50</option>
-					<option>100</option>
-				</select>
-			</div>
-			<div class="pagination__count"><strong>3</strong> sur <strong>112</strong></div>
-			<ul class="pagination__pages">
-				<li class="disabled">
-					<a>❮&nbsp;Précédent</a>
-				</li>
-				<li class="active">
-					<a>1</a>
-				</li>
-				<li>
-					<a>2</a>
-				</li>
-				<li>
-					<a>3</a>
-				</li>
-				<li>
-					<a>4</a>
-				</li>
-				<li class="disabled">
-					<a>5</a>
-				</li>
-				<li>
-					<a>Suivant&nbsp;❯</a>
-				</li>
-			</ul>
-		</nav>
 	</div>
 </div>
-</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		var table = $('#datatable').DataTable();
+
+		function loadTableSettings() {
+			var tableSettings = localStorage.getItem('tableSettings');
+			if (tableSettings === undefined || tableSettings === null) {
+				columns = [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+				saveTableSettings(columns)
+			} else {
+				columns = JSON.parse(tableSettings)
+			}
+			return columns
+		}
+
+
+		function saveTableSettings(settings) {
+			localStorage.setItem("tableSettings", JSON.stringify(settings));
+		}
+
+		function hideTableColumns(columns) {
+			/* display table columns depending on config */
+			for (let i = 0, len = columns.length; i < len; i++) {
+				let isChecked = columns[i]
+				let boxid = '#checkbox' + i
+				if (isChecked) {
+					$(boxid).prop("checked", true);
+					var column = table.column(i);
+					column.visible(!column.visible());
+				}
+			}
+		}
+
+		var columnsSettings = loadTableSettings()
+		hideTableColumns(columnsSettings)
+
+		$('.toggle-vis').on('click', function(e) {
+	        // Get the column API object
+	        let colid = $(this).attr('data-column')
+	        let column = table.column(colid);
+
+	        // Toggle the visibility
+	        column.visible(!column.visible());
+	        columnsSettings[colid] = columnsSettings[colid] == 1 ? 0 : 1
+	        saveTableSettings(columnsSettings)
+    	});
+	});
+</script>
+
 {% endblock %}
