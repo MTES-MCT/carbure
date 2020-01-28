@@ -9,8 +9,8 @@
 <div class="main">
 	<div class="panel">
 		<h3>Attestation de Durabilité 2019-12</h3>
-		<a class="button" href="#modal">Column filter</a>
-		<div class="modal__backdrop" id="modal">
+		<a class="button" href="#modal_columns">Column filter</a>
+		<div class="modal__backdrop" id="modal_columns">
 			<div class="modal">
 				<table>
 					<tr>
@@ -88,7 +88,7 @@
 				</div>
 			</div>
 		</div>
-		<table class="table table-striped" id="datatable">
+		<table class="display nowrap" id="datatable">
 			<thead>
 				<tr>
 					<th>Dépôt</th>
@@ -107,6 +107,8 @@
 					<th>% de réduction totale</th>
 					<th>Numéro d'enregistrement double-comptage</th>
 					<th>Pays d'implantation</th>
+					<th>Date de mise en service</th>
+					<th>Date de mise en service</th>
 					<th>Date de mise en service</th>
 				</tr>
 			</thead>
@@ -129,24 +131,7 @@
 					<td>N/A</td>
 					<td>FR</td>
 					<td>1/7/2007</td>
-				</tr>
-				<tr>
-					<td>GRANDPUITS</td>
-					<td>19FRG0432000482724020</td>
-					<td>1/10/2019</td>
-					<td>28,687</td>
-					<td>EMHV</td>
-					<td>Colza</td>
-					<td>CONV</td>
-					<td>SV-2BS010010</td>
-					<td>FR</td>
-					<td>Oui</td>
-					<td>1.00</td>
-					<td>34.12</td>
-					<td>83.80</td>
-					<td>59.28%</td>
-					<td>N/A</td>
-					<td>FR</td>
+					<td>1/7/2007</td>
 					<td>1/7/2007</td>
 				</tr>
 				<tr>
@@ -166,12 +151,108 @@
 					<td>59.28%</td>
 					<td>N/A</td>
 					<td>FR</td>
+					<td>1/7/2007</td>
+					<td>1/7/2007</td>
+					<td>1/7/2007</td>
+				</tr>
+				<tr>
+					<td>GRANDPUITS</td>
+					<td>19FRG0432000482724020</td>
+					<td>1/10/2019</td>
+					<td>28,687</td>
+					<td>EMHV</td>
+					<td>Colza</td>
+					<td>CONV</td>
+					<td>SV-2BS010010</td>
+					<td>FR</td>
+					<td>Oui</td>
+					<td>1.00</td>
+					<td>34.12</td>
+					<td>83.80</td>
+					<td>59.28%</td>
+					<td>N/A</td>
+					<td>FR</td>
+					<td>1/7/2007</td>
+					<td>1/7/2007</td>
 					<td>1/7/2007</td>
 				</tr>
 			</tbody>
 		</table>
 	</div>
 </div>
+
+<div class="modal__backdrop" id="modal_lot">
+	<div class="modal">
+		<section class="section section-white" id="form">
+	      <div class="container">
+	        <form action="#" method="post" name="form" target="_blank" novalidate>
+	          <h1>Form</h1>
+	          <div class="form__group">
+	            <label for="email">Pour être informé des nouveautés, inscrivez-vous à notre newsletter :</label>
+	            <input type="email" value="" name="email" id="email">
+	          </div>
+
+	          <div class="form__group">
+	            <label class="required" for="textarea">Renseignez votre meilleure recette de lasagnes :</label>
+	            <textarea name="textarea" id="textarea"></textarea>
+	          </div>
+
+	          <div class="form__group">
+	            <label for="search">Tapez un mot-clef :</label>
+	            <div class="search__group">
+	              <input type="text" class="" value="" name="search" id="search">
+	              <button class="overlay-button" aria-label="Recherche">
+	                <svg class="icon icon-search"><use xlink:href="#magnifier"></use></svg>
+	              </button>
+	            </div>
+	          </div>
+
+	          <div class="form__group">
+	            <fieldset>
+	              <legend>Radio</legend>
+	              <input type="radio" name="radio" id="radio-pup" value="1" /><label for="radio-pup" class="label-inline">Chiots</label>
+	              <input type="radio" name="radio" id="radio-kitten" value="0" /><label for="radio-kitten" class="label-inline">Chatons</label>
+	            </fieldset>
+	          </div>
+
+	          <div class="form__group">
+	            <fieldset>
+	              <legend>Checkbox</legend>
+	              <input type="checkbox" name="checkbox" id="checkbox-fraises" value="fraise"><label for="checkbox-fraises" class="label-inline">Fraises</label>
+	              <input type="checkbox" name="checkbox" id="checkbox-bananes" value="bananes"><label for="checkbox-bananes" class="label-inline">Bananes</label>
+	              <input type="checkbox" name="checkbox" id="checkbox-ananas" value="fraise"><label for="checkbox-ananas" class="label-inline">Ananas</label>
+	            </fieldset>
+	          </div>
+
+	          <div class="form__group">
+	            <fieldset>
+	              <legend>Switch</legend>
+	              <label for="show-chat" class="label-inline">Afficher les chats mignons</label>
+	              <input type="checkbox" class="switch" name="show-chat" id="show-chat" value="show-chat">
+	              <label for="disabled-switch" class="label-inline">Switch désactivé</label>
+	              <input type="checkbox" class="switch" name="disabled-switch" id="disabled-switch" value="disabled-switch" disabled>
+	            </fieldset>
+	          </div>
+
+	          <div class="form__group">
+	            <label for="select">Select</label>
+	            <select id="select">
+	              <option>Choisissez...</option>
+	              <option>Frites</option>
+	              <option>Salade</option>
+	            </select>
+	          </div>
+
+	          <button class="button" type="submit" name="subscribe" id="submit">Valider</button>
+	        </form>
+	      </div>
+	    </section>
+		<div class="form__group button__group">
+			<a class="button secondary" href="#modal-section">Ok</a>
+		</div>
+	</div>
+</div>
+
 {% endblock %}
 
 
@@ -180,12 +261,12 @@
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
-		var table = $('#datatable').DataTable();
+		var table = $('#datatable').DataTable({"scrollX": true});
 
 		function loadTableSettings() {
 			var tableSettings = localStorage.getItem('tableSettings');
 			if (tableSettings === undefined || tableSettings === null) {
-				columns = [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+				columns = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 				saveTableSettings(columns)
 			} else {
 				columns = JSON.parse(tableSettings)
@@ -214,6 +295,7 @@
 		var columnsSettings = loadTableSettings()
 		hideTableColumns(columnsSettings)
 
+		/* column filter modal event management */
 		$('.toggle-vis').on('click', function(e) {
 	        // Get the column API object
 	        let colid = $(this).attr('data-column')
@@ -224,6 +306,7 @@
 	        columnsSettings[colid] = columnsSettings[colid] == 1 ? 0 : 1
 	        saveTableSettings(columnsSettings)
     	});
+
 	});
 </script>
 
