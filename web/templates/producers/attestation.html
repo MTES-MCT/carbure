@@ -118,8 +118,6 @@
 					<th>Numéro d'enregistrement double-comptage</th>
 					<th>Pays d'implantation</th>
 					<th>Date de mise en service</th>
-					<th>Valider</th>
-					<th>Assigner</th>
 					<th></th>
 				</tr>
 			</thead>
@@ -142,17 +140,6 @@
 					<td>N/A</td>
 					<td>FR</td>
 					<td>1/7/2007</td>
-					<td><a class="button">Valider</a></td>
-					<td>
-						<select>
-						 	<option value="none">--</option>
-						  	<option value="saab">Saab</option>
-						  	<option value="fiat">Fiat</option>
-						  	<option value="audi">Audi</option>
-						  	<option value="audi">Audi</option>
-						  	<option value="export">Export</option>
-						</select>
-					</td>
 					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
@@ -173,17 +160,6 @@
 					<td>N/A</td>
 					<td>FR</td>
 					<td>1/7/2007</td>
-					<td><a class="button">Valider</a></td>
-					<td>
-						<select>
-						 	<option value="none">--</option>
-						  	<option value="saab">Saab</option>
-						  	<option value="fiat">Fiat</option>
-						  	<option value="audi">Audi</option>
-						  	<option value="audi">Audi</option>
-						  	<option value="export">Export</option>
-						</select>
-					</td>
 					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
@@ -204,21 +180,25 @@
 					<td>N/A</td>
 					<td>FR</td>
 					<td>1/7/2007</td>
-					<td><a class="button">Valider</a></td>
-					<td>
-						<select>
-						 	<option value="none">--</option>
-						  	<option value="saab">Saab</option>
-						  	<option value="fiat">Fiat</option>
-						  	<option value="audi">Audi</option>
-						  	<option value="audi">Audi</option>
-						  	<option value="export">Export</option>
-						</select>
-					</td>
 					<td><input type="checkbox" /></td>
 				</tr>
 			</tbody>
 		</table>
+		<div class="flex-container-left">
+			<a class="button primary" href="#">Ajouter Lot</a>
+		</div>
+		<div class="flex-container-right">
+			<select>
+			 	<option value="none">--</option>
+			  	<option value="saab">Saab</option>
+			  	<option value="fiat">Fiat</option>
+			  	<option value="audi">Audi</option>
+			  	<option value="audi">Audi</option>
+			  	<option value="export">Export</option>
+			</select>
+			<a class="button primary" href="#">Affilier Lots</a>
+			<a class="button warning-light" href="#">Valider Lots</a>
+		</div>
 	</div>
 </div>
 
@@ -307,6 +287,9 @@
 			paging: false,
 			searching: false,
 			autoWidth: false,
+			columnDefs: [
+        		{"className": "dt-center", "targets": "_all"}
+      		],
 			initComplete: function() {
             	this.api().columns().every(function () {
 	                var column = this;
