@@ -9,7 +9,7 @@
 <div class="main" style="overflow-x: auto;">
 	<div class="panel">
 		<h3>Attestation de Durabilité 2019-12</h3>
-		<a class="button" href="#modal_columns">Column filter</a>
+		<a class="button" href="#modal_columns">Colonnes</a>
 		<div class="modal__backdrop" id="modal_columns">
 			<div class="modal">
 				<table>
@@ -82,9 +82,19 @@
 						<td><label for="checkbox16" class="label-inline">Date de mise en service</label></td>
 					</tr>
 				</table>
-
 				<div class="form__group button__group">
 					<a class="button secondary" href="#modal-section">Ok</a>
+				</div>
+			</div>
+		</div>
+		<a class="button" href="#modal_import">Import</a>
+		<div class="modal__backdrop" id="modal_import">
+			<div class="modal">
+				<a href="/static/files/template.csv">Template</a>
+				<input type="file" name="fileToUpload" id="fileToUpload">
+				<div class="form__group button__group">
+					<a class="button secondary" href="#modal-section">Cancel</a>
+					<a class="button primary" href="#modal-section">Ok</a>
 				</div>
 			</div>
 		</div>
@@ -108,8 +118,9 @@
 					<th>Numéro d'enregistrement double-comptage</th>
 					<th>Pays d'implantation</th>
 					<th>Date de mise en service</th>
-					<th>Date de mise en service</th>
-					<th>Date de mise en service</th>
+					<th>Valider</th>
+					<th>Assigner</th>
+					<th></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -131,8 +142,18 @@
 					<td>N/A</td>
 					<td>FR</td>
 					<td>1/7/2007</td>
-					<td>1/7/2007</td>
-					<td>1/7/2007</td>
+					<td><a class="button">Valider</a></td>
+					<td>
+						<select>
+						 	<option value="none">--</option>
+						  	<option value="saab">Saab</option>
+						  	<option value="fiat">Fiat</option>
+						  	<option value="audi">Audi</option>
+						  	<option value="audi">Audi</option>
+						  	<option value="export">Export</option>
+						</select>
+					</td>
+					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
 					<td>GRANDPUITS</td>
@@ -152,8 +173,18 @@
 					<td>N/A</td>
 					<td>FR</td>
 					<td>1/7/2007</td>
-					<td>1/7/2007</td>
-					<td>1/7/2007</td>
+					<td><a class="button">Valider</a></td>
+					<td>
+						<select>
+						 	<option value="none">--</option>
+						  	<option value="saab">Saab</option>
+						  	<option value="fiat">Fiat</option>
+						  	<option value="audi">Audi</option>
+						  	<option value="audi">Audi</option>
+						  	<option value="export">Export</option>
+						</select>
+					</td>
+					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
 					<td>GRANDPUITS</td>
@@ -173,8 +204,18 @@
 					<td>N/A</td>
 					<td>FR</td>
 					<td>1/7/2007</td>
-					<td>1/7/2007</td>
-					<td>1/7/2007</td>
+					<td><a class="button">Valider</a></td>
+					<td>
+						<select>
+						 	<option value="none">--</option>
+						  	<option value="saab">Saab</option>
+						  	<option value="fiat">Fiat</option>
+						  	<option value="audi">Audi</option>
+						  	<option value="audi">Audi</option>
+						  	<option value="export">Export</option>
+						</select>
+					</td>
+					<td><input type="checkbox" /></td>
 				</tr>
 			</tbody>
 		</table>
@@ -261,7 +302,25 @@
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
-		var table = $('#datatable').DataTable({"scrollX": true});
+		var table = $('#datatable').DataTable({
+			scrollX: true,
+			paging: false,
+			searching: false,
+			initComplete: function() {
+            	this.api().columns().every(function () {
+	                var column = this;
+	                var select = $('<select><option value=""></option></select>')
+	                    .appendTo($(column.footer()).empty())
+	                    .on('change', function() {
+	                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
+	                        column.search(val ? '^'+val+'$' : '', true, false).draw();
+	                    });
+	                column.data().unique().sort().each(function(d, j) {
+	                    select.append('<option value="'+d+'">'+d+'</option>')
+	                });
+            	});
+        	}
+		});
 
 		function loadTableSettings() {
 			var tableSettings = localStorage.getItem('tableSettings');
@@ -306,6 +365,13 @@
 	        columnsSettings[colid] = columnsSettings[colid] == 1 ? 0 : 1
 	        saveTableSettings(columnsSettings)
     	});
+
+		/* close open modal by clicking outside */
+		/*$('body').click(function (event) {
+		   if(!$(event.target).closest('#modal_columns').length && !$(event.target).is('#modal_columns')) {
+		     $(".modal__backdrop").hide();
+		   }
+		});*/
 
 	});
 </script>
