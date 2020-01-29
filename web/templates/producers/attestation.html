@@ -9,7 +9,7 @@
 <div class="main" style="overflow-x: auto;">
 	<div class="panel">
 		<h3>Attestation de Durabilité 2019-12</h3>
-		<a class="button modal-button" href="#modal_columns">Colonnes</a>
+		<a class="button modal-button" id="btn_modal_columns">Colonnes</a>
 		<div class="modal__backdrop" id="modal_columns">
 			<div class="modal">
 				<table>
@@ -83,18 +83,18 @@
 					</tr>
 				</table>
 				<div class="form__group button__group">
-					<a class="button secondary" href="#">Ok</a>
+					<a class="button secondary close">Ok</a>
 				</div>
 			</div>
 		</div>
-		<a class="button modal-button" href="#modal_import">Import</a>
+		<a class="button modal-button" id="btn_modal_import">Import</a>
 		<div class="modal__backdrop" id="modal_import">
 			<div class="modal">
 				<a href="/static/files/template.csv">Template</a>
 				<input type="file" name="fileToUpload" id="fileToUpload">
 				<div class="form__group button__group">
-					<a class="button secondary" href="#">Cancel</a>
-					<a class="button primary" href="#">Ok</a>
+					<a class="button secondary close" href="#">Cancel</a>
+					<a class="button primary close" href="#">Ok</a>
 				</div>
 			</div>
 		</div>
@@ -206,70 +206,68 @@
 	<div class="modal">
 		<section class="section section-white" id="form">
 	      <div class="container">
-	        <form action="#" method="post" name="form" target="_blank" novalidate>
-	          <h1>Form</h1>
+	          <h1>Lot</h1>
 	          <div class="form__group">
-	            <label for="email">Pour être informé des nouveautés, inscrivez-vous à notre newsletter :</label>
-	            <input type="email" value="" name="email" id="email">
+	          	<h2>Informations Générales</h2>
+	            <label for="ml_depot">Dépôt</label>
+	            <input type="text" value="" id="ml_depot">
+	           	<label for="ml_dae">N°DAE ou DAA</label>
+	            <input type="text" value="" id="ml_dae">
+	            <label for="ml_volume">Volume</label>
+	            <input type="text" value="" id="ml_volume">
+	            <label for="ml_date_entree">Date d'entrée en EFS ou UER</label>
+	            <input type="text" value="" id="ml_date_entree">
+	            <label for="ml_pays">Pays d'implantation</label>
+	            <input type="text" value="" id="ml_pays">
+	            <label for="ml_date_mise_en_service">Date de mise en service</label>
+	            <input type="text" value="" id="ml_date_mise_en_service">
 	          </div>
 
 	          <div class="form__group">
-	            <label class="required" for="textarea">Renseignez votre meilleure recette de lasagnes :</label>
-	            <textarea name="textarea" id="textarea"></textarea>
-	          </div>
-
-	          <div class="form__group">
-	            <label for="search">Tapez un mot-clef :</label>
-	            <div class="search__group">
-	              <input type="text" class="" value="" name="search" id="search">
-	              <button class="overlay-button" aria-label="Recherche">
-	                <svg class="icon icon-search"><use xlink:href="#magnifier"></use></svg>
-	              </button>
-	            </div>
-	          </div>
-
-	          <div class="form__group">
-	            <fieldset>
-	              <legend>Radio</legend>
-	              <input type="radio" name="radio" id="radio-pup" value="1" /><label for="radio-pup" class="label-inline">Chiots</label>
-	              <input type="radio" name="radio" id="radio-kitten" value="0" /><label for="radio-kitten" class="label-inline">Chatons</label>
-	            </fieldset>
-	          </div>
-
-	          <div class="form__group">
-	            <fieldset>
-	              <legend>Checkbox</legend>
-	              <input type="checkbox" name="checkbox" id="checkbox-fraises" value="fraise"><label for="checkbox-fraises" class="label-inline">Fraises</label>
-	              <input type="checkbox" name="checkbox" id="checkbox-bananes" value="bananes"><label for="checkbox-bananes" class="label-inline">Bananes</label>
-	              <input type="checkbox" name="checkbox" id="checkbox-ananas" value="fraise"><label for="checkbox-ananas" class="label-inline">Ananas</label>
-	            </fieldset>
-	          </div>
-
-	          <div class="form__group">
-	            <fieldset>
-	              <legend>Switch</legend>
-	              <label for="show-chat" class="label-inline">Afficher les chats mignons</label>
-	              <input type="checkbox" class="switch" name="show-chat" id="show-chat" value="show-chat">
-	              <label for="disabled-switch" class="label-inline">Switch désactivé</label>
-	              <input type="checkbox" class="switch" name="disabled-switch" id="disabled-switch" value="disabled-switch" disabled>
-	            </fieldset>
-	          </div>
-
-	          <div class="form__group">
-	            <label for="select">Select</label>
-	            <select id="select">
+	          	<h2>Durabilité</h2>
+	            <label for="ml_filiere">Filière de production</label>
+	            <select id="ml_filiere">
 	              <option>Choisissez...</option>
-	              <option>Frites</option>
-	              <option>Salade</option>
+	              <option>Colza</option>
+	              <option>Maïs</option>
+	              <option>Navet</option>
+	              <option>Fenouil</option>
 	            </select>
+	            <label for="ml_type">Types</label>
+	            <input type="text" value="" id="ml_type">
+	            <label for="ml_cat">Catégorie</label>
+	            <input type="text" value="" id="ml_cat">
+	            <label for="ml_systeme_fournisseur">Système fournisseur</label>
+	            <input type="text" value="" id="ml_systeme_fournisseur">
+	            <label for="ml_pays_origine">Pays d'origine</label>
+	            <input type="text" value="" id="ml_pays_origine">
+	            <label for="ml_respect_crit_durabilite">Respect des critères de durabilité</label>
+	            <input type="text" value="" id="ml_respect_crit_durabilite">
+	            <label for="ml_num_double_comptage">Numéro d'enregistrement double-comptage</label>
+	            <input type="text" value="" id="ml_num_double_comptage">
 	          </div>
 
-	          <button class="button" type="submit" name="subscribe" id="submit">Valider</button>
-	        </form>
+	          <div class="form__group">
+	          	<h2>Émissions GES</h2>
+	          	<table>
+	          		<thead>
+						<th>GES transport et distribution</th>
+						<th>Total émissions de GES</th>
+						<th>GES du carburant fossile</th>
+						<th>% de réduction totale</th>
+	          		</thead>
+	          		<tbody>
+	          			<td id="ml_ges_transport_distribution"></td>
+	          			<td id="ml_ges_total"></td>
+	          			<td id="ml_ges_fossile"></td>
+	          			<td id="ml_ges_reduction"></td>
+	          		</tbody>
+	          	</table>
+	          </div>
 	      </div>
 	    </section>
 		<div class="form__group button__group">
-			<a class="button secondary" href="#">Ok</a>
+			<a class="button secondary close" href="#">Ok</a>
 		</div>
 	</div>
 </div>
@@ -281,82 +279,140 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
 <script type="text/javascript">
-	$(document).ready(function() {
-		var table = $('#datatable').DataTable({
-			scrollX: true,
-			paging: false,
-			searching: false,
-			autoWidth: false,
-			columnDefs: [
-        		{"className": "dt-center", "targets": "_all"}
-      		],
-			initComplete: function() {
-            	this.api().columns().every(function () {
-	                var column = this;
-	                var select = $('<select><option value=""></option></select>')
-	                    .appendTo($(column.footer()).empty())
-	                    .on('change', function() {
-	                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
-	                        column.search(val ? '^'+val+'$' : '', true, false).draw();
-	                    });
-	                column.data().unique().sort().each(function(d, j) {
-	                    select.append('<option value="'+d+'">'+d+'</option>')
-	                });
-            	});
-        	}
-		});
+var col2field = {0: 'ml_depot', 1: 'ml_dae', 2: 'ml_date_entree', 3: 'ml_volume', 4: 'ml_type', 5:'ml_filiere', 6:'ml_cat',
+7: 'ml_systeme_fournisseur', 8:'ml_pays_origine', 9:'ml_respect_crit_durabilite', 10:'ml_ges_transport_distribution',
+11: 'ml_ges_total', 12:'ml_ges_fossile', 13:'ml_ges_reduction', 14:'ml_num_double_comptage', 15:'ml_pays', 16:'ml_date_mise_en_service'}
 
-		function loadTableSettings() {
-			var tableSettings = localStorage.getItem('tableSettings');
-			if (tableSettings === undefined || tableSettings === null) {
-				columns = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-				saveTableSettings(columns)
-			} else {
-				columns = JSON.parse(tableSettings)
-			}
-			return columns
-		}
-
-
-		function saveTableSettings(settings) {
-			localStorage.setItem("tableSettings", JSON.stringify(settings));
-		}
-
-		function hideTableColumns(columns) {
-			/* display table columns depending on config */
-			for (let i = 0, len = columns.length; i < len; i++) {
-				let isChecked = columns[i]
-				let boxid = '#checkbox' + i
-				if (isChecked) {
-					$(boxid).prop("checked", true);
-					var column = table.column(i);
-					column.visible(!column.visible());
-				}
-			}
-		}
-
-		var columnsSettings = loadTableSettings()
-		hideTableColumns(columnsSettings)
-
-		/* column filter modal event management */
-		$('.toggle-vis').on('click', function(e) {
-	        // Get the column API object
-	        let colid = $(this).attr('data-column')
-	        let column = table.column(colid);
-
-	        // Toggle the visibility
-	        column.visible(!column.visible());
-	        columnsSettings[colid] = columnsSettings[colid] == 1 ? 0 : 1
-	        saveTableSettings(columnsSettings)
-    	});
-
-    	/* add lot */
-    	$("#add_lot").on('click', function(e) {
-    		// take the last row of the table and duplicate it
-            let last_row = table.row(':last').data()
-            table.row.add(last_row).draw()
-    	})
+$(document).ready(function() {
+	var table = $('#datatable').DataTable({
+		scrollX: true,
+		paging: false,
+		searching: false,
+		autoWidth: false,
+		columnDefs: [
+    		{"className": "dt-center", "targets": "_all"}
+  		],
+		initComplete: function() {
+        	this.api().columns().every(function () {
+                var column = this;
+                var select = $('<select><option value=""></option></select>')
+                    .appendTo($(column.footer()).empty())
+                    .on('change', function() {
+                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                        column.search(val ? '^'+val+'$' : '', true, false).draw();
+                    });
+                column.data().unique().sort().each(function(d, j) {
+                    select.append('<option value="'+d+'">'+d+'</option>')
+                });
+        	});
+    	}
 	});
+
+	function loadTableSettings() {
+		var tableSettings = localStorage.getItem('tableSettings');
+		if (tableSettings === undefined || tableSettings === null) {
+			columns = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+			saveTableSettings(columns)
+		} else {
+			columns = JSON.parse(tableSettings)
+		}
+		return columns
+	}
+
+
+	function saveTableSettings(settings) {
+		localStorage.setItem("tableSettings", JSON.stringify(settings));
+	}
+
+	function hideTableColumns(columns) {
+		/* display table columns depending on config */
+		for (let i = 0, len = columns.length; i < len; i++) {
+			let isChecked = columns[i]
+			let boxid = '#checkbox' + i
+			if (isChecked) {
+				$(boxid).prop("checked", true);
+				var column = table.column(i);
+				column.visible(!column.visible());
+			}
+		}
+	}
+
+	var columnsSettings = loadTableSettings()
+	hideTableColumns(columnsSettings)
+
+	/* column filter modal event management */
+	$('.toggle-vis').on('click', function(e) {
+        // Get the column API object
+        let colid = $(this).attr('data-column')
+        let column = table.column(colid);
+
+        // Toggle the visibility
+        column.visible(!column.visible());
+        columnsSettings[colid] = columnsSettings[colid] == 1 ? 0 : 1
+        saveTableSettings(columnsSettings)
+	});
+
+	/* add lot */
+	$("#add_lot").on('click', function(e) {
+		// take the last row of the table and duplicate it
+        let last_row = table.row(':last').data()
+        table.row.add(last_row).draw()
+	})
+
+	/* click on datatable row */
+	var modal_lot = document.getElementById("modal_lot")
+	$('#datatable tbody').on('click', 'tr', function() {
+        var data = table.row(this).data();
+        // add data to modal
+        for (let i = 0, len = data.length; i < len; i++) {
+        	let col_data = data[i]
+        	let destination_element = col2field[i]
+        	$(`#${destination_element}`).val(col_data)
+        }
+		// show modal
+		modal_lot.style.display = "flex";
+
+	});
+
+	/* modals */
+	// modal for column filters
+	var modal_columns = document.getElementById("modal_columns")
+	var btn_open = document.getElementById("btn_modal_columns")
+	btn_open.onclick = function() {
+	  modal_columns.style.display = "flex"
+	}
+
+	// modal import
+	var modal_import = document.getElementById("modal_import")
+	var btn_import_open = document.getElementById("btn_modal_import")
+	btn_import_open.onclick = function() {
+	  modal_import.style.display = "flex";
+	}
+
+	var btns_close = document.getElementsByClassName("close")
+	for (let i = 0, len = btns_close.length; i < len; i++) {
+		let btn_close = btns_close[i]
+		console.log(`${btn_close}`)
+		btn_close.onclick = function() {
+		  console.log(`btn close clicked`)
+		  modal_columns.style.display = "none"
+		  modal_import.style.display = "none"
+		  modal_lot.style.display = "none"
+		}
+	}
+
+	window.onclick = function(event) {
+	  if (event.target == modal_columns) {
+	    modal_columns.style.display = "none"
+	  }
+	  if (event.target == modal_import) {
+	    modal_import.style.display = "none"
+	  }
+	  if (event.target == modal_lot) {
+	    modal_lot.style.display = "none"
+	  }
+	}
+});
 </script>
 
 {% endblock %}
