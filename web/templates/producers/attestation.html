@@ -9,7 +9,7 @@
 <div class="main" style="overflow-x: auto;">
 	<div class="panel">
 		<h3>Attestation de Durabilité 2019-12</h3>
-		<a class="button" href="#modal_columns">Colonnes</a>
+		<a class="button modal-button" href="#modal_columns">Colonnes</a>
 		<div class="modal__backdrop" id="modal_columns">
 			<div class="modal">
 				<table>
@@ -83,18 +83,18 @@
 					</tr>
 				</table>
 				<div class="form__group button__group">
-					<a class="button secondary" href="#modal-section">Ok</a>
+					<a class="button secondary" href="#">Ok</a>
 				</div>
 			</div>
 		</div>
-		<a class="button" href="#modal_import">Import</a>
+		<a class="button modal-button" href="#modal_import">Import</a>
 		<div class="modal__backdrop" id="modal_import">
 			<div class="modal">
 				<a href="/static/files/template.csv">Template</a>
 				<input type="file" name="fileToUpload" id="fileToUpload">
 				<div class="form__group button__group">
-					<a class="button secondary" href="#modal-section">Cancel</a>
-					<a class="button primary" href="#modal-section">Ok</a>
+					<a class="button secondary" href="#">Cancel</a>
+					<a class="button primary" href="#">Ok</a>
 				</div>
 			</div>
 		</div>
@@ -269,7 +269,7 @@
 	      </div>
 	    </section>
 		<div class="form__group button__group">
-			<a class="button secondary" href="#modal-section">Ok</a>
+			<a class="button secondary" href="#">Ok</a>
 		</div>
 	</div>
 </div>
@@ -349,14 +349,6 @@
 	        columnsSettings[colid] = columnsSettings[colid] == 1 ? 0 : 1
 	        saveTableSettings(columnsSettings)
     	});
-
-		/* close open modal by clicking outside */
-		/*$('body').click(function (event) {
-		   if(!$(event.target).closest('#modal_columns').length && !$(event.target).is('#modal_columns')) {
-		     $(".modal__backdrop").hide();
-		   }
-		});*/
-
 	});
 </script>
 
