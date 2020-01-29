@@ -185,7 +185,7 @@
 			</tbody>
 		</table>
 		<div class="flex-container-left">
-			<a class="button primary" href="#">Ajouter Lot</a>
+			<a class="button primary" href="#" id="add_lot">Ajouter Lot</a>
 		</div>
 		<div class="flex-container-right">
 			<select>
@@ -349,6 +349,13 @@
 	        columnsSettings[colid] = columnsSettings[colid] == 1 ? 0 : 1
 	        saveTableSettings(columnsSettings)
     	});
+
+    	/* add lot */
+    	$("#add_lot").on('click', function(e) {
+    		// take the last row of the table and duplicate it
+            let last_row = table.row(':last').data()
+            table.row.add(last_row).draw()
+    	})
 	});
 </script>
 
