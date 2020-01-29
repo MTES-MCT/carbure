@@ -91,11 +91,11 @@
             <div class="dropdown">
               {{user_entity}}
               {% if nb_entities > 1 %}
-                {% for entity in entities %}
                 <div class="dropdown-content">
-                  <a href="#">{{entity.name}}</a>
+                  {% for entity in entities %}
+                    <a href="#">{{entity.name}}</a>
+                  {% endfor %}
                 </div>
-                {% endfor %}
               {% endif %}
             </div>
           </li>
@@ -106,7 +106,7 @@
             <div class="dropdown">
               Français
               <div class="dropdown-content">
-                <a href="#">Anglais 🇬🇧</a>
+                <a href="#">English</a>
               </div>
             </div>
           </li>
