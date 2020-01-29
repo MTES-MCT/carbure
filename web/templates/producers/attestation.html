@@ -389,6 +389,8 @@ $(document).ready(function() {
 	  modal_import.style.display = "flex";
 	}
 
+	/* modal close events */
+	// button
 	var btns_close = document.getElementsByClassName("close")
 	for (let i = 0, len = btns_close.length; i < len; i++) {
 		let btn_close = btns_close[i]
@@ -400,7 +402,7 @@ $(document).ready(function() {
 		  modal_lot.style.display = "none"
 		}
 	}
-
+	// click outside of the modal window
 	window.onclick = function(event) {
 	  if (event.target == modal_columns) {
 	    modal_columns.style.display = "none"
@@ -412,6 +414,14 @@ $(document).ready(function() {
 	    modal_lot.style.display = "none"
 	  }
 	}
+	// escape key
+	$(document).keydown(function(event) {
+	  if (event.keyCode == 27) {
+	    modal_columns.style.display = "none"
+	    modal_import.style.display = "none"
+	    modal_lot.style.display = "none"
+	  }
+	});
 });
 </script>
 
