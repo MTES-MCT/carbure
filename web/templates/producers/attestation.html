@@ -203,9 +203,9 @@
 </div>
 
 <div class="modal__backdrop" id="modal_lot">
-	<div class="modal">
-		<section class="section section-white" id="form">
-			<div class="container flex-container-left">
+	<div class="modal modal-big">
+		<section class="flex-container">
+			<div class="flex-container-left">
 				<div class="form__group">
 					<h2>Informations Générales</h2>
 					<label for="ml_depot">Dépôt</label>
@@ -221,7 +221,8 @@
 					<label for="ml_date_mise_en_service">Date de mise en service</label>
 					<input type="text" value="" id="ml_date_mise_en_service">
 				</div>
-
+			</div>
+			<div class="flex-container-left">
 				<div class="form__group">
 					<h2>Durabilité</h2>
 					<label for="ml_filiere">Filière de production</label>
@@ -246,7 +247,9 @@
 					<input type="text" value="" id="ml_num_double_comptage">
 				</div>
 			</div>
-			<div class="container flex-container-left">
+		</section>
+		<section class="flex-container">
+			<div class="flex-container-left">
 				<div class="form__group">
 					<h2>Émissions GES</h2>
 					<table>
@@ -265,10 +268,10 @@
 					</table>
 				</div>
 			</div>
-			<div class="container flex-container-right">
-				<div class="form__group button__group">
-					<a class="button secondary close" href="#">Ok</a>
-				</div>
+		</section>
+		<section class="flex-container-right">
+			<div class="form__group button__group">
+				<a class="button secondary close" href="#">Ok</a>
 			</div>
 		</section>
 	</div>
