@@ -45,6 +45,11 @@
     color: var(--theme-primary);
 }
 
+.flex-container {
+	display: flex;
+	justify-content: space-evenly;	
+}
+
 .flex-container-right {
 	display: flex;
 	flex-direction: row-reverse;
@@ -54,4 +59,8 @@
 .flex-container-left {
 	display: flex;
 	flex-direction: row;
+}
+
+.modal-big {
+	max-width: 64em;
 }
