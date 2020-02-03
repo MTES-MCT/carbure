@@ -3,45 +3,34 @@
 {% block producer  %}
 	<div class="main">
 		<div class="panel">
-			<h3>Inbox Corrections</h3>
+			<h3>Demandes de corrections</h3>
 			<table class="table table-striped">
 				<thead>
-					<tr><th class="descending">Période</th>
-						<th>Lots</th>
-						<th>Brouillons</th>
-						<th>À Assigner</th>
-						<th>Deadline</th>
+					<tr><th>Période</th>
+						<th>Lot</th>
+						<th>Expéditeur</th>
+						<th>Status</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
 						<td>2020-01</td>
-						<td>121</td>
-						<td>47</td>
-						<td>74</td>
-						<td>29 Jours</td>
+						<td>19FRG0432000482724020</td>
+						<td>SAIPOL</td>
+						<td>En attente</td>
 					</tr>
 					<tr>
 						<td>2019-12</td>
-						<td>253</td>
-						<td>250</td>
-						<td>3</td>
-						<td>3 Jours</td>
+						<td>19FRG043200048277777</td>
+						<td>SAIPOL</td>
+						<td>Corrigé</td>
 					</tr>
 					<tr>
-						<td>2019-11</td>
-						<td>187</td>
-						<td>187</td>
-						<td>0</td>
-						<td>Terminé</td>
+						<td>2019-12</td>
+						<td>19FRG043200048276666</td>
+						<td>SAIPOL</td>
+						<td>Corrigé</td>
 					</tr>
-					<tr>
-						<td>2019-10</td>
-						<td>212</td>
-						<td>212</td>
-						<td>0</td>
-						<td>Terminé</td>
-					</tr>						
 				</tbody>
 			</table>
 			<nav class="pagination">
@@ -81,44 +70,45 @@
 			</nav>
 		</div>
 		<div class="panel">
-			<h3>Inbox Enquêtes</h3>
+			<h3>Contrôles</h3>
 			<table class="table table-striped">
 				<thead>
 					<tr><th class="descending">Période</th>
-						<th>Lots</th>
-						<th>Brouillons</th>
-						<th>À Assigner</th>
+						<th>Lot</th>
+						<th>Status</th>
 						<th>Deadline</th>
 					</tr></thead>
 					<tbody>
 						<tr>
 							<td>2020-01</td>
-							<td>121</td>
-							<td>47</td>
-							<td>74</td>
-							<td>29 Jours</td>
+							<td>19FRG0432000482724020</td>
+							<td>En cours</td>
+							<td>19 Jours</td>
 						</tr>
 						<tr>
 							<td>2019-12</td>
-							<td>253</td>
-							<td>250</td>
-							<td>3</td>
-							<td>3 Jours</td>
-						</tr>
-						<tr>
-							<td>2019-11</td>
-							<td>187</td>
-							<td>187</td>
-							<td>0</td>
+							<td>19FRG043200048272798743</td>
+							<td>Terminé</td>
 							<td>Terminé</td>
 						</tr>
 						<tr>
-							<td>2019-10</td>
-							<td>212</td>
-							<td>212</td>
-							<td>0</td>
+							<td>2019-12</td>
+							<td>19FRG043200048272798743</td>
 							<td>Terminé</td>
-						</tr>						
+							<td>Terminé</td>
+						</tr>
+						<tr>
+							<td>2019-12</td>
+							<td>19FRG043200048272798743</td>
+							<td>Terminé</td>
+							<td>Terminé</td>
+						</tr>
+						<tr>
+							<td>2019-12</td>
+							<td>19FRG043200048272798743</td>
+							<td>Terminé</td>
+							<td>Terminé</td>
+						</tr>																		
 					</tbody>
 				</table>
 				<nav class="pagination">
@@ -159,4 +149,192 @@
 			</div>
 		</div>		
 	</div>
+
+<div class="modal__backdrop" id="modal_correction">
+	<div class="modal modal-big">
+		<section class="flex-container">
+			<div class="flex-container-left">
+				<div class="form__group">
+					<h2>Informations Générales</h2>
+					<label for="ml_depot">Dépôt</label>
+					<input type="text" value="" id="ml_depot">
+					<label for="ml_dae">N°DAE ou DAA</label>
+					<input type="text" value="" id="ml_dae">
+					<label for="ml_volume">Volume</label>
+					<input type="text" value="" id="ml_volume">
+					<label for="ml_date_entree">Date d'entrée en EFS ou UER</label>
+					<input type="text" value="" id="ml_date_entree">
+					<label for="ml_pays">Pays d'implantation</label>
+					<input type="text" value="" id="ml_pays">
+					<label for="ml_date_mise_en_service">Date de mise en service</label>
+					<input type="text" value="" id="ml_date_mise_en_service">
+				</div>
+			</div>
+			<div class="flex-container-left">
+				<div class="form__group">
+					<h2>Durabilité</h2>
+					<label for="ml_filiere">Filière de production</label>
+					<select id="ml_filiere">
+						<option>Choisissez...</option>
+						<option>Colza</option>
+						<option>Maïs</option>
+						<option>Navet</option>
+						<option>Fenouil</option>
+					</select>
+					<label for="ml_type">Types</label>
+					<input type="text" value="" id="ml_type">
+					<label for="ml_cat">Catégorie</label>
+					<input type="text" value="" id="ml_cat">
+					<label for="ml_systeme_fournisseur">Système fournisseur</label>
+					<input type="text" value="" id="ml_systeme_fournisseur">
+					<label for="ml_pays_origine">Pays d'origine</label>
+					<input type="text" value="" id="ml_pays_origine">
+					<label for="ml_respect_crit_durabilite">Respect des critères de durabilité</label>
+					<input type="text" value="" id="ml_respect_crit_durabilite">
+					<label for="ml_num_double_comptage">Numéro d'enregistrement double-comptage</label>
+					<input type="text" value="" id="ml_num_double_comptage">
+				</div>
+			</div>
+		</section>
+		<section class="flex-container">
+			<div class="flex-container-left">
+				<div class="form__group">
+					<h2>Émissions GES</h2>
+					<table>
+						<thead>
+							<th>GES transport et distribution</th>
+							<th>Total émissions de GES</th>
+							<th>GES du carburant fossile</th>
+							<th>% de réduction totale</th>
+						</thead>
+						<tbody>
+							<td><input type="text" id="ml_ges_transport_distribution" /></td>
+							<td><input type="text" id="ml_ges_total" /></td>
+							<td><input type="text" id="ml_ges_fossile" /></td>
+							<td><input type="text" id="ml_ges_reduction" /></td>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+		<section class="flex-container">
+			<div class="flex-container-left">
+				<div class="form__group">
+					<h2>Affiliation</h2>
+					<table>
+						<thead>
+							<th>Date</th>
+							<th>Vendeur</th>
+							<th>Acheteur</th>
+						</thead>
+						<tbody>
+							<td><input type="text" id="ml_date_affiliation" value="27/01/2020"/></td>
+							<td><input type="text" id="ml_vendeur" value="BioRaffinerie Lambda"/></td>
+							<td><input type="text" id="ml_acheteur" value="SAIPOL"/></td>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>		
+		<section class="flex-container-right">
+			<div class="form__group button__group">
+				<a class="button secondary close" href="#">Ok</a>
+			</div>
+		</section>
+	</div>
+</div>
+
+<div class="modal__backdrop" id="modal_enquete">
+	<div class="modal modal-big">
+		<section class="flex-container">
+			<div class="flex-container-left">
+				<div class="form__group">
+					<h2>Informations Générales</h2>
+					<label for="ml_depot">Dépôt</label>
+					<input type="text" value="" id="ml_depot">
+					<label for="ml_dae">N°DAE ou DAA</label>
+					<input type="text" value="" id="ml_dae">
+					<label for="ml_volume">Volume</label>
+					<input type="text" value="" id="ml_volume">
+					<label for="ml_date_entree">Date d'entrée en EFS ou UER</label>
+					<input type="text" value="" id="ml_date_entree">
+					<label for="ml_pays">Pays d'implantation</label>
+					<input type="text" value="" id="ml_pays">
+					<label for="ml_date_mise_en_service">Date de mise en service</label>
+					<input type="text" value="" id="ml_date_mise_en_service">
+				</div>
+			</div>
+			<div class="flex-container-left">
+				<div class="form__group">
+					<h2>Durabilité</h2>
+					<label for="ml_filiere">Filière de production</label>
+					<select id="ml_filiere">
+						<option>Choisissez...</option>
+						<option>Colza</option>
+						<option>Maïs</option>
+						<option>Navet</option>
+						<option>Fenouil</option>
+					</select>
+					<label for="ml_type">Types</label>
+					<input type="text" value="" id="ml_type">
+					<label for="ml_cat">Catégorie</label>
+					<input type="text" value="" id="ml_cat">
+					<label for="ml_systeme_fournisseur">Système fournisseur</label>
+					<input type="text" value="" id="ml_systeme_fournisseur">
+					<label for="ml_pays_origine">Pays d'origine</label>
+					<input type="text" value="" id="ml_pays_origine">
+					<label for="ml_respect_crit_durabilite">Respect des critères de durabilité</label>
+					<input type="text" value="" id="ml_respect_crit_durabilite">
+					<label for="ml_num_double_comptage">Numéro d'enregistrement double-comptage</label>
+					<input type="text" value="" id="ml_num_double_comptage">
+				</div>
+			</div>
+		</section>
+		<section class="flex-container">
+			<div class="flex-container-left">
+				<div class="form__group">
+					<h2>Émissions GES</h2>
+					<table>
+						<thead>
+							<th>GES transport et distribution</th>
+							<th>Total émissions de GES</th>
+							<th>GES du carburant fossile</th>
+							<th>% de réduction totale</th>
+						</thead>
+						<tbody>
+							<td><input type="text" id="ml_ges_transport_distribution" /></td>
+							<td><input type="text" id="ml_ges_total" /></td>
+							<td><input type="text" id="ml_ges_fossile" /></td>
+							<td><input type="text" id="ml_ges_reduction" /></td>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+		<section class="flex-container">
+			<div class="flex-container-left">
+				<div class="form__group">
+					<h2>Affiliation</h2>
+					<table>
+						<thead>
+							<th>Date</th>
+							<th>Vendeur</th>
+							<th>Acheteur</th>
+						</thead>
+						<tbody>
+							<td><input type="text" id="ml_date_affiliation" value="27/01/2020"/></td>
+							<td><input type="text" id="ml_vendeur" value="BioRaffinerie Lambda"/></td>
+							<td><input type="text" id="ml_acheteur" value="SAIPOL"/></td>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>		
+		<section class="flex-container-right">
+			<div class="form__group button__group">
+				<a class="button secondary close" href="#">Ok</a>
+			</div>
+		</section>
+	</div>
+</div>	
 {% endblock %}
