@@ -1,7 +1,7 @@
 {% extends "producers/index.html" %}
 
 {% block extra_css %}
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.css"/>
 {% endblock %}
 
 
@@ -118,7 +118,9 @@
 					<th>Numéro d'enregistrement double-comptage</th>
 					<th>Pays d'implantation</th>
 					<th>Date de mise en service</th>
-					<th></th>
+					<th>Status du Lot</th>
+					<th>Affiliation</th>
+					<th>Sélectionner</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -140,6 +142,8 @@
 					<td>N/A</td>
 					<td>FR</td>
 					<td>1/7/2007</td>
+					<td>Validé</td>
+					<td>SAIPOL</td>
 					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
@@ -160,6 +164,52 @@
 					<td>N/A</td>
 					<td>FR</td>
 					<td>1/7/2007</td>
+					<td>Validé</td>
+					<td>--</td>
+					<td><input type="checkbox" /></td>
+				</tr>	
+				<tr>
+					<td>GRANDPUITS</td>
+					<td>19FRG0432000482724020</td>
+					<td>1/10/2019</td>
+					<td>28,687</td>
+					<td>EMHV</td>
+					<td>Colza</td>
+					<td>CONV</td>
+					<td>SV-2BS010010</td>
+					<td>FR</td>
+					<td>Oui</td>
+					<td>1.00</td>
+					<td>34.12</td>
+					<td>83.80</td>
+					<td>59.28%</td>
+					<td>N/A</td>
+					<td>FR</td>
+					<td>1/7/2007</td>
+					<td>Validé</td>
+					<td>--</td>
+					<td><input type="checkbox" /></td>
+				</tr>							
+				<tr>
+					<td>GRANDPUITS</td>
+					<td>19FRG0432000482724020</td>
+					<td>1/10/2019</td>
+					<td>28,687</td>
+					<td>EMHV</td>
+					<td>Colza</td>
+					<td>CONV</td>
+					<td>SV-2BS010010</td>
+					<td>FR</td>
+					<td>Oui</td>
+					<td>1.00</td>
+					<td>34.12</td>
+					<td>83.80</td>
+					<td>59.28%</td>
+					<td>N/A</td>
+					<td>FR</td>
+					<td>1/7/2007</td>
+					<td>Brouillon</td>
+					<td>--</td>					
 					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
@@ -180,6 +230,8 @@
 					<td>N/A</td>
 					<td>FR</td>
 					<td>1/7/2007</td>
+					<td>Validé</td>
+					<td>Export</td>					
 					<td><input type="checkbox" /></td>
 				</tr>
 			</tbody>
@@ -190,10 +242,11 @@
 		<div class="flex-container-right">
 			<select>
 			 	<option value="none">--</option>
-			  	<option value="saab">Saab</option>
-			  	<option value="fiat">Fiat</option>
-			  	<option value="audi">Audi</option>
-			  	<option value="audi">Audi</option>
+			  	<option value="total">Total</option>
+			  	<option value="saipol">Saipol</option>
+			  	<option value="petrobras">Petrobras</option>
+			  	<option value="bp">BP</option>
+			  	<option value="repsol">Repsol</option>
 			  	<option value="export">Export</option>
 			</select>
 			<a class="button primary" href="#">Affilier Lots</a>
@@ -269,6 +322,25 @@
 				</div>
 			</div>
 		</section>
+		<section class="flex-container">
+			<div class="flex-container-left">
+				<div class="form__group">
+					<h2>Affiliation</h2>
+					<table>
+						<thead>
+							<th>Date</th>
+							<th>Vendeur</th>
+							<th>Acheteur</th>
+						</thead>
+						<tbody>
+							<td><input type="text" id="ml_date_affiliation" value="27/01/2020"/></td>
+							<td><input type="text" id="ml_vendeur" value="BioRaffinerie Lambda"/></td>
+							<td><input type="text" id="ml_acheteur" value="SAIPOL"/></td>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>		
 		<section class="flex-container-right">
 			<div class="form__group button__group">
 				<a class="button secondary close" href="#">Ok</a>
@@ -282,18 +354,23 @@
 
 {% block extra_js %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.js"></script>
 <script type="text/javascript">
 var col2field = {0: 'ml_depot', 1: 'ml_dae', 2: 'ml_date_entree', 3: 'ml_volume', 4: 'ml_type', 5:'ml_filiere', 6:'ml_cat',
 7: 'ml_systeme_fournisseur', 8:'ml_pays_origine', 9:'ml_respect_crit_durabilite', 10:'ml_ges_transport_distribution',
-11: 'ml_ges_total', 12:'ml_ges_fossile', 13:'ml_ges_reduction', 14:'ml_num_double_comptage', 15:'ml_pays', 16:'ml_date_mise_en_service'}
+11: 'ml_ges_total', 12:'ml_ges_fossile', 13:'ml_ges_reduction', 14:'ml_num_double_comptage', 15:'ml_pays', 16:'ml_date_mise_en_service', 17: 'ml_status', 18: 'ml_affiliation', 19:'ml_select'}
 
 $(document).ready(function() {
 	var table = $('#datatable').DataTable({
-		scrollX: true,
 		paging: false,
+		scrollX: true,
 		searching: false,
 		autoWidth: false,
+		scrollCollapse: true,
+		fixedColumns: {
+			leftColumns: 1,
+			rightColumns: 3,
+		},
 		columnDefs: [
     		{"className": "dt-center", "targets": "_all"}
   		],
@@ -316,11 +393,13 @@ $(document).ready(function() {
 	function loadTableSettings() {
 		var tableSettings = localStorage.getItem('tableSettings');
 		if (tableSettings === undefined || tableSettings === null) {
-			columns = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+			let nb_columns = table.columns().data().length
+			columns = Array(nb_columns).fill(1);
 			saveTableSettings(columns)
 		} else {
 			columns = JSON.parse(tableSettings)
 		}
+		console.log(`table settings ${columns}`)
 		return columns
 	}
 
@@ -329,21 +408,32 @@ $(document).ready(function() {
 		localStorage.setItem("tableSettings", JSON.stringify(settings));
 	}
 
-	function hideTableColumns(columns) {
+	function showHideTableColumns(columns) {
 		/* display table columns depending on config */
-		for (let i = 0, len = columns.length; i < len; i++) {
+		let frozen_columns = [0, 17, 18, 19] // first column (depot) and last (selection) cannot be hidden
+		let nb_columns = table.columns().data().length
+
+		for (let i = 0, len = nb_columns; i < len; i++) {
 			let isChecked = columns[i]
 			let boxid = '#checkbox' + i
-			if (isChecked) {
+			var column = table.column(i)
+			if (isChecked || frozen_columns.includes(i)) {
 				$(boxid).prop("checked", true);
-				var column = table.column(i);
-				column.visible(!column.visible());
+				if (!column.visible()) {
+					column.visible(!column.visible()) 
+				}
+			} else {
+				$(boxid).prop("checked", false);
+				if (column.visible()) {
+					column.visible(!column.visible()) 
+				}				
 			}
 		}
 	}
 
 	var columnsSettings = loadTableSettings()
-	hideTableColumns(columnsSettings)
+	console.log(`col settings: ${columnsSettings}`)
+	showHideTableColumns(columnsSettings)
 
 	/* column filter modal event management */
 	$('.toggle-vis').on('click', function(e) {
@@ -368,6 +458,9 @@ $(document).ready(function() {
 	var modal_lot = document.getElementById("modal_lot")
 	$('#datatable tbody').on('click', 'tr', function() {
         var data = table.row(this).data();
+        // check column clicked. if it's the selection checkbox or any interactive column, ignore it
+        // TODO
+
         // add data to modal
         for (let i = 0, len = data.length; i < len; i++) {
         	let col_data = data[i]
