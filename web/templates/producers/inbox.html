@@ -1,10 +1,15 @@
 {% extends "producers/index.html" %}
 
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.css"/>
+{% endblock %}
+
 {% block producer  %}
 	<div class="main">
 		<div class="panel">
 			<h3>Demandes de corrections</h3>
-			<table class="table table-striped">
+			<table class="display nowrap" id="table_corrections">
 				<thead>
 					<tr><th>Période</th>
 						<th>Lot</th>
@@ -220,17 +225,24 @@
 		<section class="flex-container">
 			<div class="flex-container-left">
 				<div class="form__group">
-					<h2>Affiliation</h2>
+					<h2>Correction</h2>
 					<table>
 						<thead>
 							<th>Date</th>
-							<th>Vendeur</th>
-							<th>Acheteur</th>
+							<th>Source</th>
+							<th>Message</th>
 						</thead>
 						<tbody>
-							<td><input type="text" id="ml_date_affiliation" value="27/01/2020"/></td>
-							<td><input type="text" id="ml_vendeur" value="BioRaffinerie Lambda"/></td>
-							<td><input type="text" id="ml_acheteur" value="SAIPOL"/></td>
+							<tr>
+								<td>27/01/2020</td>
+								<td>Total</td>
+								<td>Bonjour, pouvez-vous vérifier les valeurs transport GES? Elles me paraissent trop élevées pour du Colza</td>
+							</tr>
+							<tr>
+								<td><input type="text" id="ml_date_correction" value="03/02/2020"/></td>
+								<td><input type="text" id="ml_source_correction" value="BioRaffinerie Lambda"/></td>
+								<td><input type="text" id="ml_message_correction" value="Corrigé! Merci"/></td>
+							</tr>							
 						</tbody>
 					</table>
 				</div>
@@ -238,6 +250,7 @@
 		</section>		
 		<section class="flex-container-right">
 			<div class="form__group button__group">
+				<a class="button secondary close" href="#">Corriger</a>
 				<a class="button secondary close" href="#">Ok</a>
 			</div>
 		</section>
@@ -248,87 +261,17 @@
 	<div class="modal modal-big">
 		<section class="flex-container">
 			<div class="flex-container-left">
-				<div class="form__group">
-					<h2>Informations Générales</h2>
-					<label for="ml_depot">Dépôt</label>
-					<input type="text" value="" id="ml_depot">
-					<label for="ml_dae">N°DAE ou DAA</label>
-					<input type="text" value="" id="ml_dae">
-					<label for="ml_volume">Volume</label>
-					<input type="text" value="" id="ml_volume">
-					<label for="ml_date_entree">Date d'entrée en EFS ou UER</label>
-					<input type="text" value="" id="ml_date_entree">
-					<label for="ml_pays">Pays d'implantation</label>
-					<input type="text" value="" id="ml_pays">
-					<label for="ml_date_mise_en_service">Date de mise en service</label>
-					<input type="text" value="" id="ml_date_mise_en_service">
-				</div>
 			</div>
 			<div class="flex-container-left">
-				<div class="form__group">
-					<h2>Durabilité</h2>
-					<label for="ml_filiere">Filière de production</label>
-					<select id="ml_filiere">
-						<option>Choisissez...</option>
-						<option>Colza</option>
-						<option>Maïs</option>
-						<option>Navet</option>
-						<option>Fenouil</option>
-					</select>
-					<label for="ml_type">Types</label>
-					<input type="text" value="" id="ml_type">
-					<label for="ml_cat">Catégorie</label>
-					<input type="text" value="" id="ml_cat">
-					<label for="ml_systeme_fournisseur">Système fournisseur</label>
-					<input type="text" value="" id="ml_systeme_fournisseur">
-					<label for="ml_pays_origine">Pays d'origine</label>
-					<input type="text" value="" id="ml_pays_origine">
-					<label for="ml_respect_crit_durabilite">Respect des critères de durabilité</label>
-					<input type="text" value="" id="ml_respect_crit_durabilite">
-					<label for="ml_num_double_comptage">Numéro d'enregistrement double-comptage</label>
-					<input type="text" value="" id="ml_num_double_comptage">
-				</div>
 			</div>
 		</section>
 		<section class="flex-container">
 			<div class="flex-container-left">
-				<div class="form__group">
-					<h2>Émissions GES</h2>
-					<table>
-						<thead>
-							<th>GES transport et distribution</th>
-							<th>Total émissions de GES</th>
-							<th>GES du carburant fossile</th>
-							<th>% de réduction totale</th>
-						</thead>
-						<tbody>
-							<td><input type="text" id="ml_ges_transport_distribution" /></td>
-							<td><input type="text" id="ml_ges_total" /></td>
-							<td><input type="text" id="ml_ges_fossile" /></td>
-							<td><input type="text" id="ml_ges_reduction" /></td>
-						</tbody>
-					</table>
-				</div>
 			</div>
 		</section>
 		<section class="flex-container">
 			<div class="flex-container-left">
-				<div class="form__group">
-					<h2>Affiliation</h2>
-					<table>
-						<thead>
-							<th>Date</th>
-							<th>Vendeur</th>
-							<th>Acheteur</th>
-						</thead>
-						<tbody>
-							<td><input type="text" id="ml_date_affiliation" value="27/01/2020"/></td>
-							<td><input type="text" id="ml_vendeur" value="BioRaffinerie Lambda"/></td>
-							<td><input type="text" id="ml_acheteur" value="SAIPOL"/></td>
-						</tbody>
-					</table>
-				</div>
-			</div>
+			</div>	
 		</section>		
 		<section class="flex-container-right">
 			<div class="form__group button__group">
@@ -337,4 +280,68 @@
 		</section>
 	</div>
 </div>	
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	var table_corrections = $('#table_corrections').DataTable({
+		paging: false,
+		searching: false,
+	});
+
+	var table_enquetes = $('#table_enquetes').DataTable({
+		paging: false,
+		scrollX: true,
+		searching: false,
+		autoWidth: false,
+	});	
+
+	/* click on datatable row */
+	var modal_correction = document.getElementById("modal_correction")
+	var modal_enquete = document.getElementById("modal_enquete")
+	$('#table_corrections tbody').on('click', 'tr', function() {
+        var data = table_corrections.row(this).data();
+        // add data to modal
+        for (let i = 0, len = data.length; i < len; i++) {
+        	let col_data = data[i]
+        	//let destination_element = col2field[i]
+        	//$(`#${destination_element}`).val(col_data)
+        }
+		// show modal
+		modal_correction.style.display = "flex";
+	});
+
+	$('#table_enquete tbody').on('click', 'tr', function() {
+        var data = table_enquetes.row(this).data();
+        // add data to modal
+        for (let i = 0, len = data.length; i < len; i++) {
+        	let col_data = data[i]
+        	let destination_element = col2field[i]
+        	$(`#${destination_element}`).val(col_data)
+        }
+		// show modal
+		modal_enquete.style.display = "flex";
+	});
+
+	/* modal close events */
+	window.onclick = function(event) {
+	  if (event.target == modal_correction) {
+	    modal_correction.style.display = "none"
+	  }
+	  if (event.target == modal_enquete) {
+	    modal_enquete.style.display = "none"
+	  }
+	}
+	// escape key
+	$(document).keydown(function(event) {
+	  if (event.keyCode == 27) {
+	    modal_correction.style.display = "none"
+	    modal_enquete.style.display = "none"
+	  }
+	});
+});
+</script>
 {% endblock %}
