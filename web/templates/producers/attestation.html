@@ -371,9 +371,6 @@ $(document).ready(function() {
 			leftColumns: 1,
 			rightColumns: 3,
 		},
-		columnDefs: [
-    		{"className": "dt-center", "targets": "_all"}
-  		],
 		initComplete: function() {
         	this.api().columns().every(function () {
                 var column = this;
@@ -458,9 +455,6 @@ $(document).ready(function() {
 	var modal_lot = document.getElementById("modal_lot")
 	$('#datatable tbody').on('click', 'tr', function() {
         var data = table.row(this).data();
-        // check column clicked. if it's the selection checkbox or any interactive column, ignore it
-        // TODO
-
         // add data to modal
         for (let i = 0, len = data.length; i < len; i++) {
         	let col_data = data[i]
