@@ -71,6 +71,12 @@
 	max-width: 64em;
 }
 
-#datatable_attestations tbody tr {
-	cursor: pointer;
+#datatable_attestations tbody tr:hover {
+    background: var(--lighter-blue);;
+    cursor: pointer;
+}
+
+#datatable_attestations tbody tr:hover td.sorting_1 {
+    background: var(--lighter-blue);;
+    cursor: pointer;
 }
