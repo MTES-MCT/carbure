@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 
-from core.models import UserDetails
+from core.models import UserRights
 
 def index(request):
   context = {}
@@ -14,19 +14,24 @@ def index(request):
 @login_required
 def home(request):
   try:
-    user = UserDetails.objects.get(user=request.user)
+    rights = UserRights.objects.filter(user=request.user)
+    default_entity = rights[0] 
   except:
     # todo: raise an error? add notification to administrator?
     return render(request, 'public/blank_user.html', {})
 
-  if user.user_type == 'Administrateur':
+  if default_entity.entity.entity_type == 'Administrateur':
     return redirect('administrators-index')
-  elif user.user_type == 'Producteur':
+  elif default_entity.entity.entity_type == 'Producteur':
     return redirect('producers-index')
-  elif user.user_type == 'Opérateur':
+  elif default_entity.entity.entity_type == 'Opérateur':
     return redirect('operators-index')
   else:
     raise Http404("Unknown User Type")
+
+@login_required
+def annuaire(request):
+  return render(request, 'public/annuaire.html', context)
 
 def htmlreference(request):
   context = {}

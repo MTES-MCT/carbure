@@ -1,0 +1,28 @@
+{% extends "common/base.html" %}
+
+
+{% block content %}
+<div class="hero" role="banner">
+	<div class="hero__container">
+		<h1>CarbuRe</h1>
+		<p>Gestion centralisée des flux de biocarburants</p>
+	</div>
+</div>
+
+<main role="main">
+	<section class="section section-grey">
+		<div class="container">
+			<form action="#" method="post" name="form" target="_blank" novalidate>
+				<h1>Inscription</h1>
+				<div class="form__group">
+					<label for="form-email">Afin d'utiliser la plateforme, veuillez entrer votre adresse email. Un agent prendra contact avec vous afin de finaliser votre inscription.</label>
+					<div class="input__group">
+						<input type="email" value="" name="email" id="form-email">
+						<button class="button" type="submit" name="subscribe" id="form-submit">Envoyer</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</section>
+</main>
+{% endblock %}

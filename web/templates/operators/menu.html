@@ -1,0 +1,19 @@
+	<aside class="side-menu" role="navigation" style="max-width: 170px;">
+		<ul>
+			<li>
+				<a {% if current_url_name == 'producers-index' or current_url_name == 'producers-attestation' %}class="active"{% endif %} href="{% url 'producers-index' %}">
+					Attestations
+				</a>
+				{% if current_url_name == 'producers-attestation' %}
+				<ul>
+					<li class="side-menu-submenu"><a href="#" class="active-submenu">2019-12</a></li>
+					<li class="side-menu-submenu"><a href="#">2019-11</a></li>
+					<li class="side-menu-submenu"><a href="#">2019-10</a></li>
+				</ul>
+				{% endif %}
+			</li>
+			<li><a {% if current_url_name == 'producers-inbox' %}class="active"{% endif %} href="{% url 'producers-inbox' %}">Messages<span class="badge badge-green">2</span></a></li>
+			<li><a href="#">Annuaire</a></li>
+			<li><a {% if current_url_name == 'producers-settings' %}class="active"{% endif %} href="{% url 'producers-settings' %}">Paramètres</a></li>
+		</ul>
+	</aside>
