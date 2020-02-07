@@ -19,7 +19,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr onclick="window.location='{% url 'producers-attestation' %}'">
+				<tr class="clickable" onclick="window.location='{% url 'producers-attestation' %}'">
 					<td>2020-01</td>
 					<td>121</td>
 					<td>47</td>
@@ -66,6 +66,10 @@
 			autoWidth: false,
 			scrollCollapse: true,
 			order: [[ 0, "desc" ]],
+			data: null,
+			render: function(data, type, row) {
+                return '<a href="#">Link</a>'
+            },
 		});
 	})
 </script>
