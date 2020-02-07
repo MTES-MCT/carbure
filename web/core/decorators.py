@@ -1,12 +1,11 @@
-from core.models import UserDetails, UserRights
+from core.models import UserRights
 
 
 def enrich_with_user_details(function):
     def wrap(request, *args, **kwargs):
-        user_details = UserDetails.objects.get(user=request.user)
-        user_rights = UserRights.objects.filter(user=user_details)
+        user_rights = UserRights.objects.filter(user=request.user)
         context = {}
-        context['user_name'] = user_details.user.name
+        context['user_name'] = request.user.name
         context['nb_entities'] = len(user_rights)
         context['entities'] = [u.entity for u in user_rights]
         context['user_entity'] = user_rights[0].entity.name
