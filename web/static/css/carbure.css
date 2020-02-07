@@ -34,6 +34,12 @@
 	color: #fff;
 }
 
+.badge-red {
+	background: #d63626!important;
+	border: 1px solid #d63626!important;
+	color: #fff;
+}
+
 .side-menu-submenu {
 	padding-left: var(--space-s);
 	font-size: 14px;
