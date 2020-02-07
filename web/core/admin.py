@@ -8,7 +8,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.utils.crypto import get_random_string
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
-from core.models import Entity, UserDetails, UserRights
+from core.models import Entity, UserRights
 
 
 class EntityAdmin(admin.ModelAdmin):
@@ -17,19 +17,12 @@ class EntityAdmin(admin.ModelAdmin):
     list_filter = ('entity_type',)
 
 
-class UserAdmin(admin.ModelAdmin):
-    list_display = ('user', 'user_type')
-    search_fields = ('user', 'user_type')
-    list_filter = ('user_type',)
-
-
 class UserRightsAdmin(admin.ModelAdmin):
     list_display = ('user', 'entity')
     search_fields = ('user', 'entity')
 
 
 admin.site.register(Entity, EntityAdmin)
-admin.site.register(UserDetails, UserAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
 
 
