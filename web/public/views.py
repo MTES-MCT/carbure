@@ -31,6 +31,7 @@ def home(request):
 
 @login_required
 def annuaire(request):
+  context = {}
   return render(request, 'public/annuaire.html', context)
 
 def htmlreference(request):
