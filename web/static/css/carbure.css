@@ -80,3 +80,13 @@
     background: var(--lighter-blue);;
     cursor: pointer;
 }
+
+#datatable_attestation tbody tr:hover {
+    background: var(--lighter-blue);;
+    cursor: pointer;
+}
+
+#datatable_attestation tbody tr:hover td.sorting_1 {
+    background: var(--lighter-blue);;
+    cursor: pointer;
+}
