@@ -70,3 +70,7 @@
 .modal-big {
 	max-width: 64em;
 }
+
+#datatable_attestations tbody tr {
+	cursor: pointer;
+}
