@@ -9,7 +9,7 @@
 <div class="main" style="overflow-x: auto;">
 	<div class="panel">
 		<h3>Attestation de Durabilité 2019-12</h3>
-		<a class="button modal-button" id="btn_modal_columns">Colonnes</a>
+		<a class="button modal-button" id="btn_modal_columns">Filtrer</a>
 		<div class="modal__backdrop" id="modal_columns">
 			<div class="modal">
 				<table>
@@ -87,13 +87,13 @@
 				</div>
 			</div>
 		</div>
-		<a class="button modal-button" id="btn_modal_import">Import</a>
+		<a class="button modal-button" id="btn_modal_import">Importer</a>
 		<div class="modal__backdrop" id="modal_import">
 			<div class="modal">
-				<a href="/static/files/template.csv">Template</a>
+				<a href="/static/files/template.csv">Modèle</a>
 				<input type="file" name="fileToUpload" id="fileToUpload">
 				<div class="form__group button__group">
-					<a class="button secondary close" href="#">Cancel</a>
+					<a class="button secondary close" href="#">Annuler</a>
 					<a class="button primary close" href="#">Ok</a>
 				</div>
 			</div>
@@ -236,11 +236,8 @@
 				</tr>
 			</tbody>
 		</table>
-		<div class="flex-container-left">
-			<a class="button primary" href="#" id="add_lot">Ajouter Lot</a>
-		</div>
 		<div class="flex-container-right">
-			<select>
+			<select disabled>
 			 	<option value="none">--</option>
 			  	<option value="total">Total</option>
 			  	<option value="saipol">Saipol</option>
@@ -249,9 +246,12 @@
 			  	<option value="repsol">Repsol</option>
 			  	<option value="export">Export</option>
 			</select>
-			<a class="button primary" href="#">Affilier Lots</a>
-			<a class="button warning-light" href="#">Valider Lots</a>
+			<a class="button" style="background: var(--light-grey);" href="#">Affilier Lots</a>
+			<a class="button" style="background: var(--light-grey);" href="#">Valider Lots</a>
 		</div>
+		<div class="flex-container-left">
+			<a class="button primary" href="#" id="add_lot">Ajouter Lot</a>
+		</div>		
 	</div>
 </div>
 
@@ -367,24 +367,10 @@ $(document).ready(function() {
 		searching: false,
 		autoWidth: false,
 		scrollCollapse: true,
-		fixedColumns: {
-			leftColumns: 1,
-			rightColumns: 3,
-		},
-		initComplete: function() {
-        	this.api().columns().every(function () {
-                var column = this;
-                var select = $('<select><option value=""></option></select>')
-                    .appendTo($(column.footer()).empty())
-                    .on('change', function() {
-                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
-                        column.search(val ? '^'+val+'$' : '', true, false).draw();
-                    });
-                column.data().unique().sort().each(function(d, j) {
-                    select.append('<option value="'+d+'">'+d+'</option>')
-                });
-        	});
-    	}
+        fixedColumns: {
+        	leftColumns: 1,
+            rightColumns: 3,
+        },
 	});
 
 	function loadTableSettings() {

@@ -11,10 +11,17 @@ def producers_index(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
-def producers_inbox(request, *args, **kwargs):
+def producers_corrections(request, *args, **kwargs):
   context = kwargs['context']
-  context['current_url_name'] = 'producers-inbox'
-  return render(request, 'producers/inbox.html', context)
+  context['current_url_name'] = 'producers-corrections'
+  return render(request, 'producers/corrections.html', context)
+
+@login_required
+@enrich_with_user_details
+def producers_controles(request, *args, **kwargs):
+  context = kwargs['context']
+  context['current_url_name'] = 'producers-controles'
+  return render(request, 'producers/controles.html', context)
 
 @login_required
 @enrich_with_user_details
