@@ -98,7 +98,7 @@
 				</div>
 			</div>
 		</div>
-		<table class="display nowrap" id="datatable">
+		<table class="display nowrap" id="datatable_attestation">
 			<thead>
 				<tr>
 					<th>Dépôt</th>
@@ -361,7 +361,7 @@ var col2field = {0: 'ml_depot', 1: 'ml_dae', 2: 'ml_date_entree', 3: 'ml_volume'
 11: 'ml_ges_total', 12:'ml_ges_fossile', 13:'ml_ges_reduction', 14:'ml_num_double_comptage', 15:'ml_pays', 16:'ml_date_mise_en_service', 17: 'ml_status', 18: 'ml_affiliation', 19:'ml_select'}
 
 $(document).ready(function() {
-	var table = $('#datatable').DataTable({
+	var table = $('#datatable_attestation').DataTable({
 		paging: false,
 		scrollX: true,
 		searching: false,
@@ -439,7 +439,7 @@ $(document).ready(function() {
 
 	/* click on datatable row */
 	var modal_lot = document.getElementById("modal_lot")
-	$('#datatable tbody').on('click', 'tr', function() {
+	$('#datatable_attestation tbody').on('click', 'tr', function() {
         var data = table.row(this).data();
         // add data to modal
         for (let i = 0, len = data.length; i < len; i++) {
@@ -474,7 +474,6 @@ $(document).ready(function() {
 		let btn_close = btns_close[i]
 		console.log(`${btn_close}`)
 		btn_close.onclick = function() {
-		  console.log(`btn close clicked`)
 		  modal_columns.style.display = "none"
 		  modal_import.style.display = "none"
 		  modal_lot.style.display = "none"
