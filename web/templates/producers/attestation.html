@@ -237,7 +237,7 @@
 			</tbody>
 		</table>
 		<div class="flex-container-right">
-			<select disabled>
+			<select id="select_affiliate">
 			 	<option value="none">--</option>
 			  	<option value="total">Total</option>
 			  	<option value="saipol">Saipol</option>
@@ -246,8 +246,8 @@
 			  	<option value="repsol">Repsol</option>
 			  	<option value="export">Export</option>
 			</select>
-			<a class="button" style="background: var(--light-grey);" href="#">Affilier Lots</a>
-			<a class="button" style="background: var(--light-grey);" href="#">Valider Lots</a>
+			<a id="btn_affiliate" class="button primary" href="#">Affilier Lots</a>
+			<a id="btn_validate" class="button primary" href="#">Valider Lots</a>
 		</div>
 		<div class="flex-container-left">
 			<a class="button primary" href="#" id="add_lot">Ajouter Lot</a>
@@ -356,9 +356,30 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.js"></script>
 <script type="text/javascript">
-var col2field = {0: 'ml_depot', 1: 'ml_dae', 2: 'ml_date_entree', 3: 'ml_volume', 4: 'ml_type', 5:'ml_filiere', 6:'ml_cat',
-7: 'ml_systeme_fournisseur', 8:'ml_pays_origine', 9:'ml_respect_crit_durabilite', 10:'ml_ges_transport_distribution',
-11: 'ml_ges_total', 12:'ml_ges_fossile', 13:'ml_ges_reduction', 14:'ml_num_double_comptage', 15:'ml_pays', 16:'ml_date_mise_en_service', 17: 'ml_status', 18: 'ml_affiliation', 19:'ml_select'}
+DAE_COLID = 0
+DEPOT_COLID = 1
+DATE_ENTREE_COLID = 2
+VOLUME_COLID = 3
+TYPE_COLID = 4
+FILIERE_COLID = 5
+CATEGORY_COLID = 6
+SYSTEME_FOURNISSEUR_COLID = 7
+PAYS_ORIGINE_COLID = 8
+RESPECT_CRIT_DURABILITE_COLID = 9
+GES_TRANSPORT_COLID = 10
+GES_TOTAL_COLID = 11
+GES_FOSSILE_COLID = 12
+GES_REDUCTION_COLID = 13
+NUM_DOUBLE_COMPTAGE_COLID = 14
+PAYS_COLID = 15
+DATE_MISE_EN_SERVICE_COLID = 16
+LOT_STATUS_COLID = 17
+AFFILIATION_COLID = 18
+SELECT_CHECKBOX_COLID = 19
+
+var col2field = {DEPOT_COLID: 'ml_depot', DAE_COLID: 'ml_dae', DATE_ENTREE_COLID: 'ml_date_entree', VOLUME_COLID: 'ml_volume', TYPE_COLID: 'ml_type', FILIERE_COLID:'ml_filiere', CATEGORY_COLID:'ml_cat', SYSTEME_FOURNISSEUR_COLID: 'ml_systeme_fournisseur', PAYS_ORIGINE_COLID:'ml_pays_origine', RESPECT_CRIT_DURABILITE_COLID:'ml_respect_crit_durabilite', GES_TRANSPORT_COLID:'ml_ges_transport_distribution', GES_TOTAL_COLID: 'ml_ges_total', GES_FOSSILE_COLID:'ml_ges_fossile', GES_REDUCTION_COLID:'ml_ges_reduction', NUM_DOUBLE_COMPTAGE_COLID:'ml_num_double_comptage', PAYS_COLID:'ml_pays', DATE_MISE_EN_SERVICE_COLID:'ml_date_mise_en_service', LOT_STATUS_COLID: 'ml_status', AFFILIATION_COLID: 'ml_affiliation', SELECT_CHECKBOX_COLID:'ml_select'}
+
+var selected_rows = {}
 
 $(document).ready(function() {
 	var table = $('#datatable_attestation').DataTable({
@@ -393,7 +414,7 @@ $(document).ready(function() {
 
 	function showHideTableColumns(columns) {
 		/* display table columns depending on config */
-		let frozen_columns = [0, 17, 18, 19] // first column (depot) and last (selection) cannot be hidden
+		let frozen_columns = [DAE_COLID, LOT_STATUS_COLID, AFFILIATION_COLID, SELECT_CHECKBOX_COLID] // first column (depot) and last (selection) cannot be hidden
 		let nb_columns = table.columns().data().length
 
 		for (let i = 0, len = nb_columns; i < len; i++) {
@@ -448,19 +469,68 @@ $(document).ready(function() {
 		modal_lot.style.display = "flex";		
 	}
 
+	function show_hide_action_buttons() {
+		// buttons Valider & Affilier
+		// pseudo code: if all rows are valid, button Affilier is active
+		// if one of the rows is a draft, button Valider is active
+		let draft_present = false
+		let keys = Object.keys(selected_rows)
+		for (let i = 0, len = keys.length; i < len; i++) {
+			let key = keys[i]
+			let rowdata = selected_rows[key]
+			let status = rowdata[LOT_STATUS_COLID]
+			if (status.toLowerCase() === "brouillon") {
+				draft_present = true
+			}
+		}
+		var btn_affiliate = document.getElementById("btn_affiliate")
+		var select_affiliate = document.getElementById("select_affiliate")
+		var btn_validate = document.getElementById("btn_validate")
+		if (keys.length > 0 && draft_present === false) {
+			// at least one row selected, all valid: set affiliate button to active
+			btn_affiliate.style.display = "flex";
+			select_affiliate.style.display = "flex";
+		} else {
+			btn_affiliate.style.display = "none";
+			select_affiliate.style.display = "none";
+		}
+
+		if (draft_present === true) {
+			btn_validate.style.display = "flex";
+		} else {
+			btn_validate.style.display = "none";
+		}
+
+	}
+	show_hide_action_buttons()
 	/* click on datatable row */
 	var modal_lot = document.getElementById("modal_lot")
-	// fixed columns left
+	$('#datatable_attestation_wrapper tbody').on('click', 'input', function() {
+		let hrow = $(this).closest("tr")
+		let row = table.row(hrow)
+		let data = table.row(row).data();	
+		let rowid = table.row(row).index();
+		// add to selection if checked, otherwise remove
+		if (rowid in selected_rows) {
+			delete selected_rows[rowid]
+		} else {
+			selected_rows[rowid] = data
+		}
+		show_hide_action_buttons()
+	})
+
 	$('#datatable_attestation_wrapper tbody').on('click', 'td', function() {
 		// check if we clicked on the checkbox
 		let cell = table.cell(this)
-		if (cell.index()['column'] == 19) {
-			// checkbox
+		let colid = cell.index()['column']
+		let row = $(this).closest('tr');
+		let data = table.row(row).data();	
+   		if (colid == SELECT_CHECKBOX_COLID) {
+			// ignore clicks on checkbox column
 			return
+		} else {	
+			display_lot_modal(data)
 		}
-    	let row_clicked = $(this).closest('tr');
-    	let data = table.row(row_clicked).data();		
-		display_lot_modal(data)
 	});
 
 	/* modals */
