@@ -12,6 +12,7 @@
 				</ul>
 				{% endif %}
 			</li>
+			<li><a {% if current_url_name == 'producers-export' %}class="active"{% endif %} href="{% url 'producers-export' %}">Export</a></li>
 			<li><a {% if current_url_name == 'producers-corrections' %}class="active"{% endif %} href="{% url 'producers-corrections' %}">Corrections<span class="badge badge-green">2</span></a></li>
 			<li><a {% if current_url_name == 'producers-controles' %}class="active"{% endif %} href="{% url 'producers-controles' %}">Contrôles<span class="badge badge-red">2</span></a></li>
 			<li><a href="{% url 'annuaire' %}">Annuaire</a></li>

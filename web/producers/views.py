@@ -37,3 +37,9 @@ def producers_attestation(request, *args, **kwargs):
   context['current_url_name'] = 'producers-attestation'
   return render(request, 'producers/attestation.html', context)
 
+@login_required
+@enrich_with_user_details
+def producers_export(request, *args, **kwargs):
+  context = kwargs['context']
+  context['current_url_name'] = 'producers-export'
+  return render(request, 'producers/export.html', context)
