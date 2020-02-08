@@ -26,7 +26,7 @@ class UserRights(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return '%s - %s' % (self.user.user.email, self.entity.name)
+        return '%s - %s' % (self.user.email, self.entity.name)
 
     class Meta:
         db_table = 'users_rights'
