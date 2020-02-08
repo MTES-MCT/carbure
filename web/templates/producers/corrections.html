@@ -13,7 +13,7 @@
 				<thead>
 					<tr><th>Période</th>
 						<th>Lot</th>
-						<th>Expéditeur</th>
+						<th>Client</th>
 						<th>Status</th>
 					</tr>
 				</thead>
@@ -22,19 +22,19 @@
 						<td>2020-01</td>
 						<td>19FRG0432000482724020</td>
 						<td>SAIPOL</td>
-						<td>En attente</td>
+						<td><span title="Un opérateur vous a demandé une correction. Le lot est en attente de vos modifications.">En attente</span></td>
 					</tr>
 					<tr>
 						<td>2019-12</td>
 						<td>19FRG043200048277777</td>
 						<td>SAIPOL</td>
-						<td>Corrigé</td>
+						<td><span title="Vos modifications ont été envoyées à l'opérateur. Le lot est en attente de leur validation.">Corrigé</span></td>
 					</tr>
 					<tr>
 						<td>2019-12</td>
 						<td>19FRG043200048276666</td>
 						<td>SAIPOL</td>
-						<td>Corrigé</td>
+						<td><span title="Vos modifications ont été approuvées par l'opérateur.">Accepté</span></td>
 					</tr>
 				</tbody>
 			</table>
@@ -152,6 +152,7 @@ $(document).ready(function() {
 	var table_corrections = $('#table_corrections').DataTable({
 		paging: false,
 		searching: false,
+		info: false,
 	});
 
 	/* click on datatable row */
