@@ -437,10 +437,7 @@ $(document).ready(function() {
         table.row.add(last_row).draw()
 	})
 
-	/* click on datatable row */
-	var modal_lot = document.getElementById("modal_lot")
-	$('#datatable_attestation tbody').on('click', 'tr', function() {
-        var data = table.row(this).data();
+	function display_lot_modal(data) {
         // add data to modal
         for (let i = 0, len = data.length; i < len; i++) {
         	let col_data = data[i]
@@ -448,8 +445,22 @@ $(document).ready(function() {
         	$(`#${destination_element}`).val(col_data)
         }
 		// show modal
-		modal_lot.style.display = "flex";
+		modal_lot.style.display = "flex";		
+	}
 
+	/* click on datatable row */
+	var modal_lot = document.getElementById("modal_lot")
+	// fixed columns left
+	$('#datatable_attestation_wrapper tbody').on('click', 'td', function() {
+		// check if we clicked on the checkbox
+		let cell = table.cell(this)
+		if (cell.index()['column'] == 19) {
+			// checkbox
+			return
+		}
+    	let row_clicked = $(this).closest('tr');
+    	let data = table.row(row_clicked).data();		
+		display_lot_modal(data)
 	});
 
 	/* modals */
@@ -472,14 +483,13 @@ $(document).ready(function() {
 	var btns_close = document.getElementsByClassName("close")
 	for (let i = 0, len = btns_close.length; i < len; i++) {
 		let btn_close = btns_close[i]
-		console.log(`${btn_close}`)
 		btn_close.onclick = function() {
 		  modal_columns.style.display = "none"
 		  modal_import.style.display = "none"
 		  modal_lot.style.display = "none"
 		}
 	}
-	// click outside of the modal window
+	// clicking outside of the modal window will close it
 	window.onclick = function(event) {
 	  if (event.target == modal_columns) {
 	    modal_columns.style.display = "none"
