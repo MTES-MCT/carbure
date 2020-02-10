@@ -1,5 +1,5 @@
-- hosts: dev
-  remote_user: deploy
+- hosts: new
+  remote_user: root
   gather_facts: no
   pre_tasks:
     - raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
@@ -11,9 +11,3 @@
   roles:
    - sudo
    - user
-   - common
-   - ufw
-   - docker
-   - ssh
-   - reboot
-   

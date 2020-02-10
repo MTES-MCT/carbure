@@ -1,0 +1,11 @@
+- hosts: new
+  remote_user: deploy
+  gather_facts: no
+  become: true
+  roles:
+   - common
+   - ufw
+   - docker
+   - ssh
+   - reboot
+   
