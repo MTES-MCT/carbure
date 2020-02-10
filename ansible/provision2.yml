@@ -2,6 +2,8 @@
   remote_user: deploy
   gather_facts: no
   become: true
+  vars:
+    username: deploy
   roles:
    - common
    - ufw
