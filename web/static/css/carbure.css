@@ -69,6 +69,8 @@
 
 .modal-big {
 	max-width: 64em;
+	height: 100%;
+	overflow-y: auto;
 }
 
 #datatable_attestations tbody tr:hover {
