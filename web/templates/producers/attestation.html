@@ -356,26 +356,13 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.js"></script>
 <script type="text/javascript">
-DAE_COLID = 0
-DEPOT_COLID = 1
-DATE_ENTREE_COLID = 2
-VOLUME_COLID = 3
-TYPE_COLID = 4
-FILIERE_COLID = 5
-CATEGORY_COLID = 6
-SYSTEME_FOURNISSEUR_COLID = 7
-PAYS_ORIGINE_COLID = 8
-RESPECT_CRIT_DURABILITE_COLID = 9
-GES_TRANSPORT_COLID = 10
-GES_TOTAL_COLID = 11
-GES_FOSSILE_COLID = 12
-GES_REDUCTION_COLID = 13
-NUM_DOUBLE_COMPTAGE_COLID = 14
-PAYS_COLID = 15
-DATE_MISE_EN_SERVICE_COLID = 16
-LOT_STATUS_COLID = 17
-AFFILIATION_COLID = 18
-SELECT_CHECKBOX_COLID = 19
+var colname2colid = {'DAE_COLID': 0, 'DEPOT_COLID': 1, 'DATE_ENTREE_COLID': 2, 'VOLUME_COLID': 3, 'TYPE_COLID': 4, 'FILIERE_COLID': 5, 'CATEGORY_COLID': 6,
+'SYSTEME_FOURNISSEUR_COLID': 7, 'PAYS_ORIGINE_COLID': 8, 'RESPECT_CRIT_DURABILITE_COLID': 9, 'GES_TRANSPORT_COLID': 10, 'GES_TOTAL_COLID': 11,
+'GES_FOSSILE_COLID': 12, 'GES_REDUCTION_COLID': 13, 'NUM_DOUBLE_COMPTAGE_COLID': 14, 'PAYS_COLID': 15, 'DATE_MISE_EN_SERVICE_COLID': 16, 'LOT_STATUS_COLID': 17,
+'AFFILIATION_COLID': 18, 'SELECT_CHECKBOX_COLID': 19}
+
+var colid2colname = {}
+Object.keys(colname2colid).forEach(key => { colid2colname[colname2colid[key]] = key });
 
 var col2field = {DEPOT_COLID: 'ml_depot', DAE_COLID: 'ml_dae', DATE_ENTREE_COLID: 'ml_date_entree', VOLUME_COLID: 'ml_volume', TYPE_COLID: 'ml_type', FILIERE_COLID:'ml_filiere', CATEGORY_COLID:'ml_cat', SYSTEME_FOURNISSEUR_COLID: 'ml_systeme_fournisseur', PAYS_ORIGINE_COLID:'ml_pays_origine', RESPECT_CRIT_DURABILITE_COLID:'ml_respect_crit_durabilite', GES_TRANSPORT_COLID:'ml_ges_transport_distribution', GES_TOTAL_COLID: 'ml_ges_total', GES_FOSSILE_COLID:'ml_ges_fossile', GES_REDUCTION_COLID:'ml_ges_reduction', NUM_DOUBLE_COMPTAGE_COLID:'ml_num_double_comptage', PAYS_COLID:'ml_pays', DATE_MISE_EN_SERVICE_COLID:'ml_date_mise_en_service', LOT_STATUS_COLID: 'ml_status', AFFILIATION_COLID: 'ml_affiliation', SELECT_CHECKBOX_COLID:'ml_select'}
 
@@ -414,7 +401,7 @@ $(document).ready(function() {
 
 	function showHideTableColumns(columns) {
 		/* display table columns depending on config */
-		let frozen_columns = [DAE_COLID, LOT_STATUS_COLID, AFFILIATION_COLID, SELECT_CHECKBOX_COLID] // first column (depot) and last (selection) cannot be hidden
+		let frozen_columns = [colname2colid['DAE_COLID'], colname2colid['LOT_STATUS_COLID'], colname2colid['AFFILIATION_COLID'], colname2colid['SELECT_CHECKBOX_COLID']] // first column (depot) and last (selection) cannot be hidden
 		let nb_columns = table.columns().data().length
 
 		for (let i = 0, len = nb_columns; i < len; i++) {
@@ -460,9 +447,11 @@ $(document).ready(function() {
 
 	function display_lot_modal(data) {
         // add data to modal
+        console.log(`display modal with data ${data}`)
         for (let i = 0, len = data.length; i < len; i++) {
         	let col_data = data[i]
-        	let destination_element = col2field[i]
+        	let col_name = colid2colname[i]
+        	let destination_element = col2field[col_name]
         	$(`#${destination_element}`).val(col_data)
         }
 		// show modal
@@ -478,7 +467,7 @@ $(document).ready(function() {
 		for (let i = 0, len = keys.length; i < len; i++) {
 			let key = keys[i]
 			let rowdata = selected_rows[key]
-			let status = rowdata[LOT_STATUS_COLID]
+			let status = rowdata[colname2colid['LOT_STATUS_COLID']]
 			if (status.toLowerCase() === "brouillon") {
 				draft_present = true
 			}
@@ -525,7 +514,7 @@ $(document).ready(function() {
 		let colid = cell.index()['column']
 		let row = $(this).closest('tr');
 		let data = table.row(row).data();	
-   		if (colid == SELECT_CHECKBOX_COLID) {
+   		if (colid == colname2colid['SELECT_CHECKBOX_COLID']) {
 			// ignore clicks on checkbox column
 			return
 		} else {	
