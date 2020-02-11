@@ -60,7 +60,7 @@
 					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
-					<td>Colza</td>
+					<td>Betterave</td>
 					<td>CONV</td>
 					<td>SV-2BS010010</td>
 					<td>FR</td>
@@ -102,7 +102,7 @@
 					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
-					<td>Colza</td>
+					<td>Blé</td>
 					<td>CONV</td>
 					<td>SV-2BS010010</td>
 					<td>FR</td>
@@ -118,6 +118,29 @@
 					<td>Export</td>					
 				</tr>
 			</tbody>
+			<tfoot>
+				<tr>
+					<th>Dépôt</th>
+					<th>N°DAE ou DAA</th>
+					<th>Date d'entrée</th>
+					<th>Volume</th>
+					<th>Types</th>
+					<th>Filière de production</th>
+					<th>Catégorie</th>
+					<th>Système fournisseur</th>
+					<th>Pays d'origine</th>
+					<th>Respect des critères de durabilité</th>
+					<th>GES transport et distribution</th>
+					<th>Total émissions de GES</th>
+					<th>GES du carburant fossile</th>
+					<th>% de réduction totale</th>
+					<th>Éligible double-comptage</th>
+					<th>Pays d'implantation</th>
+					<th>Date de mise en service</th>
+					<th>Status du Lot</th>
+					<th>Affiliation</th>
+				</tr>				
+			</tfoot>
 		</table>
 	</div>
 </div>
@@ -136,7 +159,28 @@ $(document).ready(function() {
         fixedColumns: {
         	leftColumns: 1,
             rightColumns: 3,
-        },
+        },		
+		initComplete: function () {
+			console.log('init complete')
+            this.api().columns().every( function () {
+                var column = this;
+                console.log('adding select to column')
+                console.log(column)
+                var select = $('<select><option value=""></option></select>')
+                    .appendTo( $(column.footer()).empty() )
+                    .on( 'change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                        column.search(val ? '^'+val+'$' : '', true, false).draw();
+                    } );
+ 
+                column.data().unique().sort().each(function (d, j) {
+                	console.log(`adding option ${d} to column select`)
+                    select.append('<option value="'+d+'">'+d+'</option>')
+                    console.log(select)
+                } );
+            } );
+        }
+
 	})
 })
 </script>
