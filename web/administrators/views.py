@@ -26,6 +26,13 @@ def administrators_controles(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+def administrators_suivi_corrections(request, *args, **kwargs):
+  context = kwargs['context']
+  context['current_url_name'] = 'administrators-suivi-corrections'
+  return render(request, 'administrators/suivi_corrections.html', context)
+
+@login_required
+@enrich_with_user_details
 def administrators_notifications(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'administrators-notifications'
