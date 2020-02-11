@@ -20,7 +20,7 @@ def home(request):
     # todo: raise an error? add notification to administrator?
     return render(request, 'public/blank_user.html', {})
 
-  if default_entity.entity.entity_type == 'Administrateur':
+  if default_entity.entity.entity_type == 'Administration':
     return redirect('administrators-index')
   elif default_entity.entity.entity_type == 'Producteur':
     return redirect('producers-index')
