@@ -8,7 +8,7 @@
 <div class="main" style="overflow-x: auto;">
 	<div class="panel">
 		<h3>Lots</h3>
-		<table class="display nowrap" id="datatable_lots">
+		<table class="display nowrap" id="datatable">
 			<thead>
 				<tr>
 					<th>Dépôt</th>
@@ -128,7 +128,7 @@
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-	var table = $('#datatable_lots').DataTable({
+	var table = $('#datatable').DataTable({
 		paging: false,
 		scrollX: true,
 		autoWidth: false,

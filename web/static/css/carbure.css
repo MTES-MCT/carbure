@@ -73,42 +73,32 @@
 	overflow-y: auto;
 }
 
-#datatable_attestations tbody tr:hover {
+#datatable_wrapper tbody tr:hover {
     background: var(--lighter-blue);
     cursor: pointer;
 }
 
-#datatable_attestations tbody tr:hover td.sorting_1 {
-    background: var(--lighter-blue);
-    cursor: pointer;
-}
-
-#datatable_attestation tbody tr:hover {
-    background: var(--lighter-blue);
-    cursor: pointer;
-}
-
-#datatable_attestation tbody tr:hover td.sorting_1 {
-    background: var(--lighter-blue);
-    cursor: pointer;
-}
-
-#datatable_attestation_wrapper tbody tr:hover {
-    background: var(--lighter-blue);
-    cursor: pointer;
-}
-
-#datatable_attestation_wrapper tbody tr:hover td.sorting_1 {
+#datatable_wrapper tbody tr:hover td.sorting_1 {
 	background: var(--lighter-blue);
     cursor: pointer;
 }
 
-#datatable_attestation_wrapper tbody tr.hover {
+#datatable_wrapper tbody tr.hover {
     background: var(--lighter-blue);
     cursor: pointer;
 }
 
-#datatable_attestation_wrapper tbody tr.hover td.sorting_1 {
+#datatable_wrapper tbody tr.hover td.sorting_1 {
+	background: var(--lighter-blue);
+    cursor: pointer;
+}
+
+#datatable > tbody > tr:hover {
+	background: var(--lighter-blue);
+    cursor: pointer;
+}
+
+#datatable > tbody > tr:hover td.sorting_1 {
 	background: var(--lighter-blue);
     cursor: pointer;
 }

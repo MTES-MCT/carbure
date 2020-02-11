@@ -98,7 +98,7 @@
 				</div>
 			</div>
 		</div>
-		<table class="display nowrap" id="datatable_attestation">
+		<table class="display nowrap" id="datatable">
 			<thead>
 				<tr>
 					<th>Dépôt</th>
@@ -356,7 +356,7 @@ var col2field = {DEPOT_COLID: 'ml_depot', DAE_COLID: 'ml_dae', DATE_ENTREE_COLID
 var selected_rows = {}
 
 $(document).ready(function() {
-	var table = $('#datatable_attestation').DataTable({
+	var table = $('#datatable').DataTable({
 		paging: false,
 		scrollX: true,
 		searching: false,
@@ -481,7 +481,7 @@ $(document).ready(function() {
 	show_hide_action_buttons()
 	/* click on datatable row */
 	var modal_lot = document.getElementById("modal_lot")
-	$('#datatable_attestation_wrapper tbody').on('click', 'input', function() {
+	$('#datatable_wrapper tbody').on('click', 'input', function() {
 		let hrow = $(this).closest("tr")
 		let row = table.row(hrow)
 		let data = table.row(row).data();	
@@ -495,7 +495,7 @@ $(document).ready(function() {
 		show_hide_action_buttons()
 	})
 
-	$('#datatable_attestation_wrapper tbody').on('click', 'td', function() {
+	$('#datatable_wrapper tbody').on('click', 'td', function() {
 		// check if we clicked on the checkbox
 		let cell = table.cell(this)
 		let colid = cell.index()['column']

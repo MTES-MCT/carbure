@@ -9,7 +9,7 @@
 	<div class="main">
 		<div class="panel">
 			<h3>Contrôles</h3>
-			<table class="display nowrap" id="table_controles">
+			<table class="display nowrap" id="datatable">
 				<thead>
 					<tr><th>Période</th>
 						<th>Lot</th>
@@ -145,7 +145,7 @@
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-	var table_controles = $('#table_controles').DataTable({
+	var table_controles = $('#datatable').DataTable({
 		paging: false,
 		searching: false,
 		info: false,
@@ -153,7 +153,7 @@ $(document).ready(function() {
 
 	/* click on datatable row */
 	var modal_controle = document.getElementById("modal_controle")
-	$('#table_controles tbody').on('click', 'tr', function() {
+	$('#datatable tbody').on('click', 'tr', function() {
         var data = table_controles.row(this).data();
         // add data to modal
         for (let i = 0, len = data.length; i < len; i++) {

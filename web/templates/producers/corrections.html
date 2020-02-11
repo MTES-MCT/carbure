@@ -9,7 +9,7 @@
 	<div class="main">
 		<div class="panel">
 			<h3>Demandes de corrections</h3>
-			<table class="display nowrap" id="table_corrections">
+			<table class="display nowrap" id="datatable">
 				<thead>
 					<tr><th>Période</th>
 						<th>Lot</th>
@@ -149,7 +149,7 @@
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-	var table_corrections = $('#table_corrections').DataTable({
+	var table_corrections = $('#datatable').DataTable({
 		paging: false,
 		searching: false,
 		info: false,
@@ -157,7 +157,7 @@ $(document).ready(function() {
 
 	/* click on datatable row */
 	var modal_correction = document.getElementById("modal_correction")
-	$('#table_corrections tbody').on('click', 'tr', function() {
+	$('#datatable tbody').on('click', 'tr', function() {
         var data = table_corrections.row(this).data();
         // add data to modal
         for (let i = 0, len = data.length; i < len; i++) {

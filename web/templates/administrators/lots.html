@@ -8,7 +8,7 @@
 <div class="main" style="overflow-x: auto;">
 	<div class="panel">
 		<h3>Lots</h3>
-		<table class="display nowrap" id="datatable_lots">
+		<table class="display nowrap bluehover" id="datatable">
 			<thead>
 				<tr>
 					<th>Dépôt</th>
@@ -151,21 +151,14 @@
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-	var table = $('#datatable_lots').DataTable({
+	var table = $('#datatable').DataTable({
 		paging: false,
 		scrollX: true,
 		autoWidth: false,
 		scrollCollapse: true,
-        fixedColumns: {
-        	leftColumns: 1,
-            rightColumns: 3,
-        },		
 		initComplete: function () {
-			console.log('init complete')
             this.api().columns().every( function () {
                 var column = this;
-                console.log('adding select to column')
-                console.log(column)
                 var select = $('<select><option value=""></option></select>')
                     .appendTo( $(column.footer()).empty() )
                     .on( 'change', function () {
@@ -174,9 +167,7 @@ $(document).ready(function() {
                     } );
  
                 column.data().unique().sort().each(function (d, j) {
-                	console.log(`adding option ${d} to column select`)
                     select.append('<option value="'+d+'">'+d+'</option>')
-                    console.log(select)
                 } );
             } );
         }
