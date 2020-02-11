@@ -24,6 +24,13 @@ def administrators_controles(request, *args, **kwargs):
   context['current_url_name'] = 'administrators-controles'
   return render(request, 'administrators/controles.html', context)
 
+@login_required
+@enrich_with_user_details
+def administrators_notifications(request, *args, **kwargs):
+  context = kwargs['context']
+  context['current_url_name'] = 'administrators-notifications'
+  return render(request, 'administrators/notifications.html', context)
+
 
 @login_required
 @enrich_with_user_details
