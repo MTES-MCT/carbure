@@ -102,3 +102,23 @@
 	background: var(--lighter-blue);
     cursor: pointer;
 }
+
+.flex-container-a {
+  display: flex;
+  
+  flex-flow: row wrap;
+  
+  /* Then we define how is distributed the remaining space */
+  justify-content: space-around;
+  
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.flex-item-a {
+  padding: 5px;
+  margin-top: 5px;
+  color: white;
+  text-align: center;
+}

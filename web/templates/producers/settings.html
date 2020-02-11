@@ -1,29 +1,94 @@
 {% extends "producers/index.html" %}
 
 {% block producer  %}
-	<div class="main">
-		<div class="panel">
-			<div class="panel__header">
-            <h3>Settings</h3>
-            <small class="panel__header-extra">Créé le 31 février</small>
-          </div>
-          <div class="form__group">
-            <label>Token rights</label>
-            <ul class="label-list">
-              <li class="label"><a>zombies</a></li>
-              <li class="label"><a>undeads</a></li>
-              <li class="label"><a>creep swarms</a></li>
-            </ul>
-          </div>
-          <div class="form__group">
-            <label for="token">Token</label>
-            <div class="input__group">
-              <input type="text" name="token" id="token" />
-              <button class="button icon-button">
-                <svg class="icon icon-copy" viewBox="0 0 32 32"><use xlink:href="#copy" aria-label="Copier"></use></svg>
-              </button>
-            </div>
-          </div>			
-		</div>
-	</div>
+<div class="main">
+  <div class="panel">
+   <div class="panel__header">
+    <h3>Paramètres</h3>
+    <small class="panel__header-extra">Vos préférences</small>
+  </div>
+  <div class="form__group">
+    <fieldset>
+      <legend>Annuaire</legend>
+      <input type="checkbox" checked="checked" name="checkbox" id="checkbox-annuaire-societe" value="1"><label for="checkbox-annuaire-societe" class="label-inline">Je souhaite faire apparaître ma société dans l'annuaire</label>
+      <input type="checkbox" name="checkbox" id="checkbox-annuaire-contact" value="1"><label for="checkbox-annuaire-contact" class="label-inline">Je souhaite faire apparaître mes coordonnées de contact dans l'annuaire</label>
+    </fieldset>
+  </div>
+  <div class="form__group">
+    <fieldset>
+      <legend>Ajout manuel de lot <br /><small>Choix des valeurs du lot précédent qui seront dupliquées lors de l'ajout manuel d'un lot de biocarburant</small></legend>
+      <ul class="flex-container-a">
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox0" class="toggle-vis" data-column="0">
+          <label for="checkbox0" class="label-inline">Dépôt</label>
+        </li>
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox1" class="toggle-vis" data-column="1">
+          <label for="checkbox1" class="label-inline">N°DAE ou DAA</label>          
+        </li>
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox2" class="toggle-vis" data-column="2">
+          <label for="checkbox2" class="label-inline">Date d'entrée</label>          
+        </li>
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox3" class="toggle-vis" data-column="3">
+          <label for="checkbox3" class="label-inline">Volume</label>          
+        </li>
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox4" class="toggle-vis" data-column="4">
+          <label for="checkbox4" class="label-inline">Types</label>
+        </li>          
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox5" class="toggle-vis" data-column="5">
+          <label for="checkbox5" class="label-inline">Filière de production</label>
+        </li>          
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox6" class="toggle-vis" data-column="6">
+          <label for="checkbox6" class="label-inline">Catégorie</label>
+        </li>          
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox7" class="toggle-vis" data-column="7">
+          <label for="checkbox7" class="label-inline">Système fournisseur</label>
+        </li>          
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox8" class="toggle-vis" data-column="8">
+          <label for="checkbox8" class="label-inline">Pays d'origine</label>
+        </li>          
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox9" class="toggle-vis" data-column="9">
+          <label for="checkbox9" class="label-inline">Respect des critères de durabilité</label>
+        </li>          
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox10" class="toggle-vis" data-column="10">
+          <label for="checkbox10" class="label-inline">GES transport et distribution</label>
+        </li>          
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox11" class="toggle-vis" data-column="11">
+          <label for="checkbox11" class="label-inline">Total émissions GES</label>
+        </li>          
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox12" class="toggle-vis" data-column="12">
+          <label for="checkbox12" class="label-inline">GES carburant fossile</label>
+        </li>          
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox13" class="toggle-vis" data-column="13">
+          <label for="checkbox13" class="label-inline">% de réduction totale</label>
+        </li>          
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox14" class="toggle-vis" data-column="14">
+          <label for="checkbox14" class="label-inline">Éligible double-comptage</label>
+        </li>          
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox15" class="toggle-vis" data-column="15">
+          <label for="checkbox15" class="label-inline">Pays d'implantation</label>
+        </li>          
+        <li class="flex-item-a">
+          <input type="checkbox" name="checkbox" id="checkbox16" class="toggle-vis" data-column="16">
+          <label for="checkbox16" class="label-inline">Date de mise en service</label>
+        </li>
+      </ul>
+    </fieldset>
+  </div>          
+</div>
+</div>
 {% endblock %}
