@@ -912,6 +912,9 @@ $(document).ready(function() {
 		scrollX: true,
 		autoWidth: false,
 		scrollCollapse: true,
+		columnDefs: [
+      		{"className": "dt-center", "targets": "_all"}
+   		],				
 		initComplete: function () {
             this.api().columns().every( function () {
                 var column = this;
