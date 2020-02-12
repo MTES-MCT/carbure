@@ -67,6 +67,9 @@
 			scrollCollapse: true,
 			order: [[ 0, "desc" ]],
 			data: null,
+			columnDefs: [
+        		{"className": "dt-center", "targets": "_all"}
+      		],
 			render: function(data, type, row) {
                 return '<a href="#">Link</a>'
             },

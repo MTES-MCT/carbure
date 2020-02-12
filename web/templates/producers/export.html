@@ -257,6 +257,9 @@ $(document).ready(function() {
 		searching: false,
 		autoWidth: false,
 		scrollCollapse: true,
+		columnDefs: [
+      		{"className": "dt-center", "targets": "_all"}
+   		],				
 	});
 
 	function loadTableSettings() {
