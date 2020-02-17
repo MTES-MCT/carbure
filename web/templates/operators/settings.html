@@ -1,29 +1,19 @@
-{% extends "producers/index.html" %}
+{% extends "operators/index.html" %}
 
-{% block producer  %}
-	<div class="main">
-		<div class="panel">
-			<div class="panel__header">
-            <h3>Settings</h3>
-            <small class="panel__header-extra">Créé le 31 février</small>
-          </div>
-          <div class="form__group">
-            <label>Token rights</label>
-            <ul class="label-list">
-              <li class="label"><a>zombies</a></li>
-              <li class="label"><a>undeads</a></li>
-              <li class="label"><a>creep swarms</a></li>
-            </ul>
-          </div>
-          <div class="form__group">
-            <label for="token">Token</label>
-            <div class="input__group">
-              <input type="text" name="token" id="token" />
-              <button class="button icon-button">
-                <svg class="icon icon-copy" viewBox="0 0 32 32"><use xlink:href="#copy" aria-label="Copier"></use></svg>
-              </button>
-            </div>
-          </div>			
-		</div>
-	</div>
+{% block operator  %}
+<div class="main">
+  <div class="panel">
+    <div class="panel__header">
+    <h3>Paramètres</h3>
+    <small class="panel__header-extra">Vos préférences</small>
+    </div>
+    <div class="form__group">
+      <fieldset>
+        <legend>Annuaire</legend>
+        <input type="checkbox" checked="checked" name="checkbox" id="checkbox-annuaire-societe" value="1"><label for="checkbox-annuaire-societe" class="label-inline">Je souhaite faire apparaître ma société dans l'annuaire</label>
+        <input type="checkbox" name="checkbox" id="checkbox-annuaire-contact" value="1"><label for="checkbox-annuaire-contact" class="label-inline">Je souhaite faire apparaître mes coordonnées de contact dans l'annuaire</label>
+      </fieldset>
+    </div>   
+  </div>
+</div>
 {% endblock %}
