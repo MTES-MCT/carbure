@@ -15,11 +15,11 @@
 				<table>
 					<tr>
 						<td><input type="checkbox" name="checkbox" id="checkbox0" class="toggle-vis" data-column="0"></td>
-						<td><label for="checkbox0" class="label-inline">Dépôt</label></td>
+						<td><label for="checkbox0" class="label-inline">N°DAE ou DAA</label></td>
 					</tr>
 					<tr>
 						<td><input type="checkbox" name="checkbox" id="checkbox1" class="toggle-vis" data-column="1"></td>
-						<td><label for="checkbox1" class="label-inline">N°DAE ou DAA</label></td>
+						<td><label for="checkbox1" class="label-inline">Dépôt</label></td>
 					</tr>
 					<tr>
 						<td><input type="checkbox" name="checkbox" id="checkbox2" class="toggle-vis" data-column="2"></td>
@@ -101,8 +101,8 @@
 		<table class="display nowrap" id="datatable">
 			<thead>
 				<tr>
-					<th>Dépôt</th>
 					<th>N°DAE ou DAA</th>
+					<th>Dépôt</th>
 					<th>Date d'entrée</th>
 					<th>Volume</th>
 					<th>Types</th>
@@ -125,8 +125,8 @@
 			</thead>
 			<tbody>
 				<tr>
-					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
+					<td>GRANDPUITS</td>
 					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
@@ -147,8 +147,8 @@
 					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
-					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
+					<td>GRANDPUITS</td>
 					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
@@ -169,8 +169,8 @@
 					<td><input type="checkbox" /></td>
 				</tr>	
 				<tr>
-					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
+					<td>GRANDPUITS</td>
 					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
@@ -191,8 +191,8 @@
 					<td><input type="checkbox" /></td>
 				</tr>							
 				<tr>
-					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
+					<td>GRANDPUITS</td>
 					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
@@ -213,8 +213,8 @@
 					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
-					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
+					<td>GRANDPUITS</td>
 					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
@@ -251,7 +251,83 @@
 		</div>
 		<div class="flex-container-left">
 			<a class="button primary" href="#" id="add_lot">Ajouter Lot</a>
+			<a id="add_lot_params" style="margin-top: auto;"><small>Paramètres</small></a>
 		</div>		
+	    <div class="form__group" id="add_lot_params_toggle" style="display: none;">
+	      <fieldset>
+	      <legend><small>Sélectionnez les valeurs à dupliquer lors de l'ajout de lot</small></legend>
+	      <ul class="flex-container-a">
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox0" class="toggle-lot-param" data-column="0">
+	          <label for="add_checkbox0" class="label-inline">Dépôt</label>
+	        </li>
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox1" class="toggle-lot-param" data-column="1">
+	          <label for="add_checkbox1" class="label-inline">N°DAE ou DAA</label>          
+	        </li>
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox2" class="toggle-vis" data-column="2">
+	          <label for="add_checkbox2" class="label-inline">Date d'entrée</label>          
+	        </li>
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox3" class="toggle-lot-param" data-column="3">
+	          <label for="add_checkbox3" class="label-inline">Volume</label>          
+	        </li>
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox4" class="toggle-lot-param" data-column="4">
+	          <label for="add_checkbox4" class="label-inline">Types</label>
+	        </li>          
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox5" class="toggle-lot-param" data-column="5">
+	          <label for="add_checkbox5" class="label-inline">Filière de production</label>
+	        </li>          
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox6" class="toggle-lot-param" data-column="6">
+	          <label for="add_checkbox6" class="label-inline">Catégorie</label>
+	        </li>          
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox7" class="toggle-lot-param" data-column="7">
+	          <label for="add_checkbox7" class="label-inline">Système fournisseur</label>
+	        </li>          
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox8" class="toggle-lot-param" data-column="8">
+	          <label for="add_checkbox8" class="label-inline">Pays d'origine</label>
+	        </li>          
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox9" class="toggle-lot-param" data-column="9">
+	          <label for="add_checkbox9" class="label-inline">Respect des critères de durabilité</label>
+	        </li>          
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox10" class="toggle-lot-param" data-column="10">
+	          <label for="add_checkbox10" class="label-inline">GES transport et distribution</label>
+	        </li>          
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox11" class="toggle-lot-param" data-column="11">
+	          <label for="add_checkbox11" class="label-inline">Total émissions GES</label>
+	        </li>          
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox12" class="toggle-lot-param" data-column="12">
+	          <label for="add_checkbox12" class="label-inline">GES carburant fossile</label>
+	        </li>          
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox13" class="toggle-lot-param" data-column="13">
+	          <label for="add_checkbox13" class="label-inline">% de réduction totale</label>
+	        </li>          
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox14" class="toggle-lot-param" data-column="14">
+	          <label for="add_checkbox14" class="label-inline">Éligible double-comptage</label>
+	        </li>          
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox15" class="toggle-lot-param" data-column="15">
+	          <label for="add_checkbox15" class="label-inline">Pays d'implantation</label>
+	        </li>          
+	        <li class="flex-item-a">
+	          <input type="checkbox" name="checkbox" id="add_checkbox16" class="toggle-lot-param" data-column="16">
+	          <label for="add_checkbox16" class="label-inline">Date de mise en service</label>
+	        </li>
+	      </ul>
+	      </fieldset>
+  		</div>       		
 	</div>
 </div>
 
@@ -371,6 +447,7 @@ var selected_rows = {}
 $(document).ready(function() {
 	var table = $('#datatable').DataTable({
 		paging: false,
+		info: false,
 		scrollX: true,
 		searching: false,
 		autoWidth: false,
@@ -393,7 +470,19 @@ $(document).ready(function() {
 		} else {
 			columns = JSON.parse(tableSettings)
 		}
-		console.log(`table settings ${columns}`)
+		return columns
+	}
+	
+	function loadAddLotSettings() {
+		var addLotSettings = localStorage.getItem('addLotSettings');
+		if (addLotSettings === undefined || addLotSettings === null) {
+			let nb_columns = table.columns().data().length
+			columns = Array(nb_columns).fill(1);
+			saveAddLotSettings(columns)
+		} else {
+			columns = JSON.parse(addLotSettings)
+		}
+		console.log(`Loaded ${columns}`)
 		return columns
 	}
 
@@ -401,6 +490,11 @@ $(document).ready(function() {
 	function saveTableSettings(settings) {
 		localStorage.setItem("tableSettings", JSON.stringify(settings));
 	}
+
+	function saveAddLotSettings(settings) {
+		console.log(`Saving ${settings}`)
+		localStorage.setItem("addLotSettings", JSON.stringify(settings));
+	}	
 
 	function showHideTableColumns(columns) {
 		/* display table columns depending on config */
@@ -425,9 +519,25 @@ $(document).ready(function() {
 		}
 	}
 
+	function preCheckAddLotSettings(columns) {
+		/* checks checkboxes according to config */
+		let nb_columns = table.columns().data().length
+		for (let i = 0, len = nb_columns; i < len; i++) {
+			let isChecked = columns[i]
+			let boxid = '#add_checkbox' + i
+			if (isChecked) {
+				$(boxid).prop("checked", true);
+			} else {
+				$(boxid).prop("checked", false);
+			}
+		}
+	}
+
 	var columnsSettings = loadTableSettings()
-	console.log(`col settings: ${columnsSettings}`)
 	showHideTableColumns(columnsSettings)
+
+	var addLotSettings = loadAddLotSettings()
+	preCheckAddLotSettings(addLotSettings)
 
 	/* column filter modal event management */
 	$('.toggle-vis').on('click', function(e) {
@@ -440,6 +550,14 @@ $(document).ready(function() {
         columnsSettings[colid] = columnsSettings[colid] == 1 ? 0 : 1
         saveTableSettings(columnsSettings)
 	});
+
+	/* add lot settings */
+	$('.toggle-lot-param').on('click', function(e) {
+      	let colid = $(this).attr('data-column')
+        let column = table.column(colid);		
+        addLotSettings[colid] = addLotSettings[colid] == 1 ? 0 : 1
+        saveAddLotSettings(addLotSettings)
+	});	
 
 	/* add lot */
 	$("#add_lot").on('click', function(e) {
@@ -527,6 +645,10 @@ $(document).ready(function() {
 		} else {	
 			display_lot_modal(data)
 		}
+	});
+
+	$("#add_lot_params").on('click', function() {
+	    $("#add_lot_params_toggle").toggle();
 	});
 
 	/* modals */
