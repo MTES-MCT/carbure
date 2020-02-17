@@ -16,7 +16,7 @@
 - name: Install packages
   become: yes
   apt:
-    name: ['fail2ban', 'ufw', 'unattended-upgrades', 'apt-transport-https', 'ca-certificates', 'curl', 'gnupg-agent', 'software-properties-common', 'python-pip']
+    name: ['fail2ban', 'ufw', 'unattended-upgrades', 'apt-transport-https', 'ca-certificates', 'curl', 'gnupg-agent', 'software-properties-common', 'python3-pip']
     state: present
     update_cache: yes
   tags:
