@@ -480,17 +480,21 @@ $(document).ready(function() {
 		var btn_validate = document.getElementById("btn_validate")
 		if (keys.length > 0 && draft_present === false) {
 			// at least one row selected, all valid: set affiliate button to active
-			btn_affiliate.style.display = "flex";
-			select_affiliate.style.display = "flex";
+			$("#btn_affiliate").addClass('primary')
+			$("#btn_affiliate").removeClass('secondary')
+			$("#select_affiliate").prop("disabled", false)
 		} else {
-			btn_affiliate.style.display = "none";
-			select_affiliate.style.display = "none";
+			$("#btn_affiliate").addClass('secondary')
+			$("#btn_affiliate").removeClass('primary')
+			$("#select_affiliate").prop("disabled", "disabled")
 		}
 
 		if (draft_present === true) {
-			btn_validate.style.display = "flex";
+			$("#btn_validate").addClass('primary')
+			$("#btn_validate").removeClass('secondary')			
 		} else {
-			btn_validate.style.display = "none";
+			$("#btn_validate").addClass('secondary')
+			$("#btn_validate").removeClass('primary')		
 		}
 
 	}
