@@ -4,7 +4,6 @@ certifi==2019.11.28
 cffi==1.13.2
 cryptography==2.8
 Django==3.0.3
-django-authtools==1.8.0.dev0
 django-environ==0.4.5
 entrypoints==0.3
 flake8==3.7.9
