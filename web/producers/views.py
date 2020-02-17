@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from core.decorators import enrich_with_user_details
+from core.decorators import enrich_with_user_details, restrict_to_producers
 from django.shortcuts import render
 
 @login_required
 @enrich_with_user_details
+@restrict_to_producers
 def producers_index(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'producers-index'
@@ -11,6 +12,7 @@ def producers_index(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+@restrict_to_producers
 def producers_corrections(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'producers-corrections'
@@ -18,6 +20,7 @@ def producers_corrections(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+@restrict_to_producers
 def producers_controles(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'producers-controles'
@@ -25,6 +28,7 @@ def producers_controles(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+@restrict_to_producers
 def producers_settings(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'producers-settings'
@@ -32,6 +36,7 @@ def producers_settings(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+@restrict_to_producers
 def producers_attestation(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'producers-attestation'
@@ -39,6 +44,7 @@ def producers_attestation(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+@restrict_to_producers
 def producers_export(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'producers-export'
@@ -46,6 +52,7 @@ def producers_export(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+@restrict_to_producers
 def producers_annuaire(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'producers-annuaire'

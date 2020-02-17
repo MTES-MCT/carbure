@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from core.decorators import enrich_with_user_details
+from core.decorators import enrich_with_user_details, restrict_to_administrators
 from django.shortcuts import render
 
 @login_required
 @enrich_with_user_details
+@restrict_to_administrators
 def administrators_index(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'administrators-index'
@@ -11,6 +12,7 @@ def administrators_index(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+@restrict_to_administrators
 def administrators_annuaire(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'administrators-annuaire'
@@ -18,6 +20,7 @@ def administrators_annuaire(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+@restrict_to_administrators
 def administrators_export(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'administrators-export'
@@ -25,6 +28,7 @@ def administrators_export(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+@restrict_to_administrators
 def administrators_controles(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'administrators-controles'
@@ -32,6 +36,7 @@ def administrators_controles(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+@restrict_to_administrators
 def administrators_suivi_corrections(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'administrators-suivi-corrections'
@@ -39,14 +44,15 @@ def administrators_suivi_corrections(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+@restrict_to_administrators
 def administrators_notifications(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'administrators-notifications'
   return render(request, 'administrators/notifications.html', context)
 
-
 @login_required
 @enrich_with_user_details
+@restrict_to_administrators
 def administrators_settings(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'administrators-settings'

@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from core.decorators import enrich_with_user_details
+from core.decorators import enrich_with_user_details, restrict_to_operators
 
 @login_required
 @enrich_with_user_details
+@restrict_to_operators
 def operators_index(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'operators-index'
@@ -11,6 +12,7 @@ def operators_index(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+@restrict_to_operators
 def operators_annuaire(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'operators-annuaire'
@@ -18,6 +20,7 @@ def operators_annuaire(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+@restrict_to_operators
 def operators_new_lots(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'operators-new-lots'
@@ -25,6 +28,7 @@ def operators_new_lots(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+@restrict_to_operators
 def operators_pending_lots(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'operators-pending-lots'
@@ -32,6 +36,7 @@ def operators_pending_lots(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+@restrict_to_operators
 def operators_settings(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'operators-settings'
