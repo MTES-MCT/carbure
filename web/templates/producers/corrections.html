@@ -15,6 +15,7 @@
 						<th>Lot</th>
 						<th>Client</th>
 						<th>Status</th>
+						<th>Commentaire</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -22,21 +23,33 @@
 						<td>2020-01</td>
 						<td>19FRG0432000482724020</td>
 						<td>SAIPOL</td>
-						<td><span title="Un opérateur vous a demandé une correction. Le lot est en attente de vos modifications.">En attente</span></td>
+						<td title="Un opérateur vous a demandé une correction. Le lot est en attente de vos modifications">En attente</td>
+						<td>Bonjour, pouvez vous vérifier la valeur GES Total ?</td>
 					</tr>
 					<tr>
 						<td>2019-12</td>
 						<td>19FRG043200048277777</td>
 						<td>SAIPOL</td>
-						<td><span title="Vos modifications ont été envoyées à l'opérateur. Le lot est en attente de leur validation.">Corrigé</span></td>
+						<td title="Vos modifications ont été envoyées à l'opérateur. Le lot est en attente de leur validation.">Corrigé</td>
+						<td>Pays origine correct ?</td>
 					</tr>
 					<tr>
 						<td>2019-12</td>
 						<td>19FRG043200048276666</td>
 						<td>SAIPOL</td>
-						<td><span title="Vos modifications ont été approuvées par l'opérateur.">Accepté</span></td>
+						<td title="Vos modifications ont été approuvées par l'opérateur.">Accepté</td>
+						<td title="Bonjour, je vous adresse une correction un peu plus longue que la moyenne pour voir à quoi ressemble l'interface quand on affiche une ligne dont la taille est très différente des autres. Bien cordialement, merci et bonne journée.">Bonjour, je vous adresse une correction un peu plus longue ...</td>
 					</tr>
 				</tbody>
+				<tfoot>
+					<tr>
+						<th>Période</th>
+						<th>Lot</th>
+						<th>Client</th>
+						<th>Status</th>
+						<th>Commentaire</th>
+					</tr>				
+				</tfoot>				
 			</table>
 		</div>
 	</div>
@@ -149,6 +162,8 @@
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
+	COLUMN_FILTER = [0, 2, 3]
+
 	var table_corrections = $('#datatable').DataTable({
 		paging: false,
 		searching: false,
@@ -156,6 +171,23 @@ $(document).ready(function() {
 		columnDefs: [
       		{"className": "dt-center", "targets": "_all"}
    		],		
+		initComplete: function () {
+            this.api().columns().every( function () {
+                var column = this;
+                if (COLUMN_FILTER.includes(column.index())) {
+	                var select = $('<select><option value=""></option></select>')
+	                    .appendTo( $(column.footer()).empty() )
+	                    .on( 'change', function () {
+	                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
+	                        column.search(val ? '^'+val+'$' : '', true, false).draw();
+	                    } );
+	 
+	                column.data().unique().sort().each(function (d, j) {
+	                    select.append('<option value="'+d+'">'+d+'</option>')
+	                } );
+                }
+            } );
+        }   	   		
 	});
 
 	/* click on datatable row */

@@ -29,11 +29,6 @@ def home(request):
   else:
     raise Http404("Unknown User Type")
 
-@login_required
-def annuaire(request):
-  context = {}
-  return render(request, 'public/annuaire.html', context)
-
 def htmlreference(request):
   context = {}
   return render(request, 'common/reference.html', context)
