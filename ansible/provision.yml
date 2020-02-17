@@ -2,7 +2,7 @@
   remote_user: root
   gather_facts: no
   pre_tasks:
-    - raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+    - raw: test -e /usr/bin/python || (apt -y update && apt install -y python3-minimal)
     - setup: # gather_facts
   vars:
     username: deploy
@@ -11,3 +11,5 @@
   roles:
    - sudo
    - user
+   - reboot
+   
