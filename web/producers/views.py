@@ -43,3 +43,10 @@ def producers_export(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'producers-export'
   return render(request, 'producers/export.html', context)
+
+@login_required
+@enrich_with_user_details
+def producers_annuaire(request, *args, **kwargs):
+  context = kwargs['context']
+  context['current_url_name'] = 'producers-annuaire'
+  return render(request, 'producers/annuaire.html', context)

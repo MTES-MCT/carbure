@@ -9,6 +9,12 @@ def administrators_index(request, *args, **kwargs):
   context['current_url_name'] = 'administrators-index'
   return render(request, 'administrators/lots.html', context)
 
+@login_required
+@enrich_with_user_details
+def administrators_annuaire(request, *args, **kwargs):
+  context = kwargs['context']
+  context['current_url_name'] = 'administrators-annuaire'
+  return render(request, 'administrators/annuaire.html', context)
 
 @login_required
 @enrich_with_user_details

@@ -11,6 +11,13 @@ def operators_index(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
+def operators_annuaire(request, *args, **kwargs):
+  context = kwargs['context']
+  context['current_url_name'] = 'operators-annuaire'
+  return render(request, 'operators/annuaire.html', context)
+
+@login_required
+@enrich_with_user_details
 def operators_new_lots(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'operators-new-lots'
