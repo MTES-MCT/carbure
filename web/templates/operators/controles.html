@@ -8,19 +8,18 @@
 {% block operator  %}
 <div class="main" style="overflow-x: auto;">
 	<div class="panel">
-		<h3>Mes Corrections</h3>
+		<h3>Lots Contrôlés</h3>
 		<table class="display nowrap" id="datatable">
 			<thead>
 				<tr>
 					<th>Dépôt</th>
 					<th>N°DAE ou DAA</th>
-					<th>Date d'entrée</th>
 					<th>Volume</th>
 					<th>Types</th>
 					<th>Filière de production</th>
 					<th>Pays d'origine</th>
-					<th>Statut du Lot</th>
-					<th>Affiliation</th>
+					<th>Vendeur</th>
+					<th>Statut</th>
 					<th>Sélectionner</th>
 				</tr>
 			</thead>
@@ -28,57 +27,60 @@
 				<tr>
 					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
-					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
 					<td>Colza</td>
 					<td>FR</td>
-					<td>En attente</td>
 					<td>SAIPOL</td>
+					<td>Nouveau</td>
 					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
 					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
-					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
 					<td>Colza</td>
 					<td>FR</td>
-					<td>En attente</td>
 					<td>SAIPOL</td>
+					<td>En Attente</td>
 					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
 					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
-					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
 					<td>Colza</td>
 					<td>FR</td>
-					<td>Corrigé</td>
 					<td>SAIPOL</td>
+					<td>En Attente</td>
 					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
 					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
-					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
 					<td>Colza</td>
 					<td>FR</td>
-					<td>Correction Validée</td>
 					<td>SAIPOL</td>
+					<td>En Attente</td>
 					<td><input type="checkbox" /></td>
 				</tr>
-
+				<tr>
+					<td>GRANDPUITS</td>
+					<td>19FRG0432000482724020</td>
+					<td>28,687</td>
+					<td>EMHV</td>
+					<td>Colza</td>
+					<td>FR</td>
+					<td>SAIPOL</td>
+					<td>Terminé</td>
+					<td><input type="checkbox" /></td>
+				</tr>												
 			</tbody>
 		</table>
-		<div class="flex-container-left">
-			<a class="button primary" href="#" id="add_lot">Ajouter Lot</a>
-		</div>		
 	</div>
 </div>
 
@@ -209,7 +211,7 @@ $(document).ready(function() {
         },
 		columnDefs: [
       		{"className": "dt-center", "targets": "_all"}
-   		],		
+   		],		        
 	});
 
 	function loadTableSettings() {
