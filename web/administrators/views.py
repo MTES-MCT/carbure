@@ -21,14 +21,6 @@ def administrators_annuaire(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
-def administrators_export(request, *args, **kwargs):
-  context = kwargs['context']
-  context['current_url_name'] = 'administrators-export'
-  return render(request, 'administrators/export.html', context)
-
-@login_required
-@enrich_with_user_details
-@restrict_to_administrators
 def administrators_controles(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'administrators-controles'
