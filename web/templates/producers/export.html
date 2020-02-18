@@ -218,6 +218,29 @@
 					<td>Export</td>					
 				</tr>
 			</tbody>
+			<tfoot>
+				<tr>
+					<th>Dépôt</th>
+					<th>N°DAE ou DAA</th>
+					<th>Date d'entrée</th>
+					<th>Volume</th>
+					<th>Types</th>
+					<th>Filière de production</th>
+					<th>Catégorie</th>
+					<th>Système fournisseur</th>
+					<th>Pays d'origine</th>
+					<th>Respect des critères de durabilité</th>
+					<th>GES transport et distribution</th>
+					<th>Total émissions de GES</th>
+					<th>GES du carburant fossile</th>
+					<th>% de réduction totale</th>
+					<th>Numéro d'enregistrement double-comptage</th>
+					<th>Pays d'implantation</th>
+					<th>Date de mise en service</th>
+					<th>Statut du Lot</th>
+					<th>Affiliation</th>
+				</tr>
+			</tfoot>			
 		</table>
 	</div>
 </div>
@@ -251,15 +274,34 @@ AFFILIATION_COLID = 18
 PERIODE_COLID = 19
 
 $(document).ready(function() {
+	COLUMN_FILTER = [0, 4, 5,]
 	var table = $('#datatable').DataTable({
 		paging: false,
+		info: false,
 		scrollX: true,
 		searching: false,
 		autoWidth: false,
 		scrollCollapse: true,
 		columnDefs: [
       		{"className": "dt-center", "targets": "_all"}
-   		],				
+   		],		
+		initComplete: function () {
+            this.api().columns().every( function () {
+                var column = this;
+                if (COLUMN_FILTER.includes(column.index())) {
+	                var select = $('<select><option value=""></option></select>')
+	                    .appendTo( $(column.footer()).empty() )
+	                    .on( 'change', function () {
+	                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
+	                        column.search(val ? '^'+val+'$' : '', true, false).draw();
+	                    } );
+	 
+	                column.data().unique().sort().each(function (d, j) {
+	                    select.append('<option value="'+d+'">'+d+'</option>')
+	                } );
+	            }
+            } );
+        }   				
 	});
 
 	function loadTableSettings() {
