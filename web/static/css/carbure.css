@@ -73,6 +73,26 @@
 	overflow-y: auto;
 }
 
+#datatable > tbody > tr.status_ok {
+	background: var(--light-green);
+    cursor: pointer;
+}
+
+#datatable > tbody > tr.status_ok td.sorting_1 {
+	background: var(--light-green);
+    cursor: pointer;
+}
+
+#datatable > tbody > tr.status_warning {
+	background: var(--light-orange);
+    cursor: pointer;
+}
+
+#datatable > tbody > tr.status_warning td.sorting_1 {
+	background: var(--light-orange);
+    cursor: pointer;
+}
+
 #datatable_wrapper tbody tr:hover {
     background: var(--lighter-blue);
     cursor: pointer;
@@ -122,3 +142,4 @@
   color: white;
   text-align: center;
 }
+
