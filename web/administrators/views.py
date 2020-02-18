@@ -45,14 +45,6 @@ def administrators_suivi_corrections(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
-def administrators_notifications(request, *args, **kwargs):
-  context = kwargs['context']
-  context['current_url_name'] = 'administrators-notifications'
-  return render(request, 'administrators/notifications.html', context)
-
-@login_required
-@enrich_with_user_details
-@restrict_to_administrators
 def administrators_settings(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'administrators-settings'

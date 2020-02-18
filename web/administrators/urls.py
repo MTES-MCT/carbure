@@ -8,6 +8,5 @@ urlpatterns = [
     path('export', views.administrators_export, name='administrators-export'),
     path('controles', views.administrators_controles, name='administrators-controles'),
     path('suivi-corrections', views.administrators_suivi_corrections, name='administrators-suivi-corrections'),
-    path('notifications', views.administrators_notifications, name='administrators-notifications'),
     path('settings', views.administrators_settings, name='administrators-settings'),
 ]
