@@ -11,7 +11,8 @@
 			<h3>Suivi Corrections</h3>
 			<table class="display nowrap" id="datatable">
 				<thead>
-					<tr><th>Période</th>
+					<tr>
+						<th>Période</th>
 						<th>Lot</th>
 						<th>Producteur</th>
 						<th>Date affiliation</th>
@@ -51,10 +52,10 @@
 						<td>Bioraffinerie Lambda</td>
 						<td>2020/01/15</td>
 						<td>SAIPOL</td>
-						<td>2020/02/08</td>
+						<td>--</td>
 						<td>2020/02/12</td>
-						<td>Bonjour, GES Total correct?</td>
-						<td>Corrigé. La valeur totale n'était pas...</td>
+						<td></td>
+						<td></td>
 					</tr>
 					<tr>
 						<td>2020-01</td>
@@ -62,10 +63,10 @@
 						<td>Bioraffinerie Lambda</td>
 						<td>2020/01/15</td>
 						<td>SAIPOL</td>
-						<td>2020/02/08</td>
+						<td>--</td>
 						<td>2020/02/12</td>
-						<td>Bonjour, GES Total correct?</td>
-						<td>Corrigé. La valeur totale n'était pas...</td>
+						<td></td>
+						<td></td>
 					</tr>
 					<tr>
 						<td>2020-01</td>
@@ -73,12 +74,25 @@
 						<td>Bioraffinerie Lambda</td>
 						<td>2020/01/15</td>
 						<td>SAIPOL</td>
-						<td>2020/02/08</td>
+						<td>--</td>
 						<td>2020/02/12</td>
-						<td>Bonjour, GES Total correct?</td>
-						<td>Corrigé. La valeur totale n'était pas...</td>
+						<td></td>
+						<td></td>
 					</tr>																				
 				</tbody>
+				<tfoot>
+					<tr>
+						<th>Période</th>
+						<th>Lot</th>
+						<th>Producteur</th>
+						<th>Date affiliation</th>
+						<th>Opérateur</th>
+						<th>Date demande correction</th>
+						<th>Date modification</th>
+						<th>Message opérateur</th>
+						<th>Réponse producteur</th>
+					</tr>					
+				</tfoot>
 			</table>
 		</div>
 	</div>
@@ -191,6 +205,7 @@
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
+	COLUMN_FILTER = [0, 2]
 	var table_controles = $('#datatable').DataTable({
 		paging: false,
 		searching: false,
@@ -198,6 +213,23 @@ $(document).ready(function() {
 		columnDefs: [
       		{"className": "dt-center", "targets": "_all"}
    		],				
+		initComplete: function () {
+            this.api().columns().every( function () {
+                var column = this;
+                if (COLUMN_FILTER.includes(column.index())) {
+	                var select = $('<select><option value=""></option></select>')
+	                    .appendTo( $(column.footer()).empty() )
+	                    .on( 'change', function () {
+	                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
+	                        column.search(val ? '^'+val+'$' : '', true, false).draw();
+	                    } );
+	 
+	                column.data().unique().sort().each(function (d, j) {
+	                    select.append('<option value="'+d+'">'+d+'</option>')
+	                } );
+	            }
+            } );
+        }      		
 	});
 
 	/* click on datatable row */
