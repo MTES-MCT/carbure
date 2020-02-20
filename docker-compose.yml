@@ -24,7 +24,10 @@ services:
       DJANGO_DB_PASSWORD: ${DJANGO_DB_PASSWORD}
       DJANGO_DB_HOST: ${DJANGO_DB_HOST}
       DJANGO_DB_PORT: ${DJANGO_DB_PORT}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}      
       SECRET_KEY: ${SECRET_KEY}
+      DEBUG: ${DEBUG}
+      CARBURE_HOME: /app      
       SENTRY_DSN: ${SENTRY_DSN}      
     depends_on:
     - carbure-mariadb
