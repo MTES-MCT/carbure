@@ -23,23 +23,23 @@ class UserRightsAdmin(admin.ModelAdmin):
 
 
 class TypeBiocarburantAdmin(admin.ModelAdmin):
-    list_display = ('name')
-    search_fields = ('name')
+    list_display = ('name', )
+    search_fields = ('name', )
 
 
 class FiliereProductionAdmin(admin.ModelAdmin):
-    list_display = ('name')
-    search_fields = ('name')
+    list_display = ('name', )
+    search_fields = ('name', )
 
 
 class PaysAdmin(admin.ModelAdmin):
-    list_display = ('name')
-    search_fields = ('name') 
+    list_display = ('name', )
+    search_fields = ('name', ) 
 
 
 class LotAdmin(admin.ModelAdmin):
-    list_display = ('depot', 'type', 'filiere', 'status')
-    search_fields = ('depot', 'type', 'filiere', 'status')
+    list_display = ('depot', 'type_biocarburant', 'filiere_production', 'status')
+    search_fields = ('depot', 'type_biocarburant', 'filiere_production', 'status')
 
 
 admin.site.register(Entity, EntityAdmin)
