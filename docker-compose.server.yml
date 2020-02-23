@@ -28,7 +28,8 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       DEBUG: ${DEBUG}
       CARBURE_HOME: /app            
-      SENTRY_DSN: ${SENTRY_DSN}      
+      SENTRY_DSN: ${SENTRY_DSN}
+      IMAGE_TAG: ${IMAGE_TAG}
     depends_on:
     - carbure-mariadb
     networks:
