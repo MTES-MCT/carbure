@@ -29,6 +29,7 @@ COPY web/core /app/web/core
 COPY web/producers /app/web/producers
 COPY web/operators /app/web/operators
 COPY web/administrators /app/web/administrators
+COPY web/fixtures /app/web/fixtures
 
 
 
