@@ -21,7 +21,7 @@ class Entity(models.Model):
 
 class UserPreferences(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    current_entity = models.ForeignKey(Entity, blank=True, null=True, on_delete=models.SET_NULL)
+    default_entity = models.ForeignKey(Entity, blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.user.email

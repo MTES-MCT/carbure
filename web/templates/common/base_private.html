@@ -90,7 +90,7 @@
               {% if nb_entities > 1 %}
                 <div class="dropdown-content">
                   {% for entity in entities %}
-                    <a href="#">{{entity.name}}</a>
+                    <a href="{% url 'core-set-default-entity' entity_id=entity.id %}">{{entity.name}}</a>
                   {% endfor %}
                 </div>
               {% endif %}

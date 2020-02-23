@@ -1,17 +1,22 @@
-from core.models import UserRights
+from core.models import UserRights, UserPreferences
 from django.core.exceptions import PermissionDenied
 
 def enrich_with_user_details(function):
     def wrap(request, *args, **kwargs):
         user_rights = UserRights.objects.filter(user=request.user)
+        user_preferences, created = UserPreferences.objects.get_or_create(user=request.user)
+        if user_preferences.default_entity == None:
+            if len(user_rights) == 0:
+                return render(request, 'public/blank_user.html', {})            
+            default_right = user_rights[0]
+            user_preferences.default_entity = default_right.entity
+            user_preferences.save()
         context = {}
         context['user_name'] = request.user.name
         context['nb_entities'] = len(user_rights)
         context['entities'] = [u.entity for u in user_rights]
-        if len(user_rights) == 0:
-            raise PermissionDenied
-        context['user_entity'] = user_rights[0].entity
-        context['user_entity_name'] = user_rights[0].entity.name
+        context['user_entity'] = user_preferences.default_entity
+        context['user_entity_name'] = user_preferences.default_entity.name
         kwargs['context'] = context
         return function(request, *args, **kwargs)
     wrap.__doc__ = function.__doc__
