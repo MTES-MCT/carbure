@@ -166,7 +166,8 @@ $(document).ready(function() {
 
 	var table_corrections = $('#datatable').DataTable({
 		paging: false,
-		searching: false,
+		searching: true,
+		dom: "lrtip",
 		info: false,
 		columnDefs: [
       		{"className": "dt-center", "targets": "_all"}
