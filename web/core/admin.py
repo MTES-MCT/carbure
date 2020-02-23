@@ -8,7 +8,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.utils.crypto import get_random_string
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
-from core.models import Entity, UserRights, TypeBiocarburant, FiliereProduction, Pays, Lot
+from core.models import Entity, UserRights, UserPreferences, TypeBiocarburant, FiliereProduction, Pays, Lot
 
 
 class EntityAdmin(admin.ModelAdmin):
@@ -20,6 +20,11 @@ class EntityAdmin(admin.ModelAdmin):
 class UserRightsAdmin(admin.ModelAdmin):
     list_display = ('user', 'entity')
     search_fields = ('user', 'entity')
+
+
+class UserPreferencesAdmin(admin.ModelAdmin):
+    list_display = ('user',)
+    search_fields = ('user',)
 
 
 class TypeBiocarburantAdmin(admin.ModelAdmin):
@@ -44,6 +49,7 @@ class LotAdmin(admin.ModelAdmin):
 
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
+admin.site.register(UserPreferences, UserPreferencesAdmin)
 admin.site.register(TypeBiocarburant, TypeBiocarburantAdmin)
 admin.site.register(FiliereProduction, FiliereProductionAdmin)
 admin.site.register(Pays, PaysAdmin)

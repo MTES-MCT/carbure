@@ -19,10 +19,21 @@ class Entity(models.Model):
         verbose_name = 'Entity'
         verbose_name_plural = 'Entities'
 
+class UserPreferences(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    current_entity = models.ForeignKey(Entity, blank=True, null=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return self.user.email
+
+    class Meta:
+        db_table = 'users_preferences'
+        verbose_name = 'User Preference'
+        verbose_name_plural = 'User Preferences'
 
 class UserRights(models.Model):
-    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
