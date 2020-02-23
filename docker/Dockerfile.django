@@ -30,6 +30,7 @@ COPY web/producers /app/web/producers
 COPY web/operators /app/web/operators
 COPY web/administrators /app/web/administrators
 COPY web/fixtures /app/web/fixtures
+COPY web/migration.sh /app/web/migration.sh
 
 
 
