@@ -3,7 +3,8 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 
-from core.models import UserRights
+from core.models import UserRights, UserPreferences
+from core.decorators import enrich_with_user_details
 
 def index(request):
   context = {}
@@ -12,19 +13,14 @@ def index(request):
   return render(request, 'public/index.html', context)
 
 @login_required
-def home(request):
-  try:
-    rights = UserRights.objects.filter(user=request.user)
-    default_entity = rights[0] 
-  except:
-    # todo: raise an error? add notification to administrator?
-    return render(request, 'public/blank_user.html', {})
-
-  if default_entity.entity.entity_type == 'Administration':
+@enrich_with_user_details
+def home(request, *args, **kwargs):
+  context = kwargs['context']
+  if context['user_entity'].entity_type == 'Administration':
     return redirect('administrators-index')
-  elif default_entity.entity.entity_type == 'Producteur':
+  elif context['user_entity'].entity_type == 'Producteur':
     return redirect('producers-index')
-  elif default_entity.entity.entity_type == 'Opérateur':
+  elif context['user_entity'].entity_type == 'Opérateur':
     return redirect('operators-index')
   else:
     raise Http404("Unknown User Type")

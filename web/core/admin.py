@@ -23,8 +23,8 @@ class UserRightsAdmin(admin.ModelAdmin):
 
 
 class UserPreferencesAdmin(admin.ModelAdmin):
-    list_display = ('user',)
-    search_fields = ('user',)
+    list_display = ('user', 'default_entity')
+    search_fields = ('user', 'default_entity')
 
 
 class TypeBiocarburantAdmin(admin.ModelAdmin):
