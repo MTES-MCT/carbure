@@ -17,7 +17,7 @@ services:
   carbure-django-migration:
     image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:${IMAGE_TAG}
     container_name: carbure_app_migration
-    command: python3 /app/web/manage.py migrate --noinput
+    command: python3 /app/web/manage.py migrate --noinput && python3 /app/web/manage.py loaddata /app/web/fixtures/countries.json
     environment:
       DJANGO_DATABASE: ${DJANGO_DATABASE}
       DJANGO_DB_USER: ${DJANGO_DB_USER}
