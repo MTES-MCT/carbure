@@ -33,7 +33,7 @@ class UserRights(models.Model):
         verbose_name = 'User Right'
         verbose_name_plural = 'Users Rights'
 
-class TypeBioCarburant(models.Model):
+class TypeBiocarburant(models.Model):
     name = models.CharField(max_length=64)
     description = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
@@ -79,16 +79,16 @@ class Lot(models.Model):
     num_dae = models.CharField(max_length=64, blank=True)
     date_entree = models.DateField(blank=True)
     volume = models.IntegerField(default=0)
-    type_biocarburant = models.ForeignKey(TypeBioCarburant, null=True), 
-    filiere_production = models.ForeignKey(FiliereBiocarburant, null=True)
+    type_biocarburant = models.ForeignKey(TypeBiocarburant, null=True, on_delete=models.SET_NULL), 
+    filiere_production = models.ForeignKey(FiliereProduction, null=True, on_delete=models.SET_NULL)
     categorie = models.CharField(max_length=64)
     systeme_fournisseur = models.CharField(max_length=64)
-    pays_origine = models.ForeignKey(Pays, null=True)
+    pays_origine = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='pays_origine')
     respect_crit_durabilite = models.BooleanField(default=False)
     ges_transport = models.FloatField(blank=True)
     ges_distribution = models.FloatField(blank=True)
     ges_fossile = models.FloatField(blank=True)
-    pays_production = models.ForeignKey(PaysOrigine)
+    pays_production = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='pays_production')
     date_mise_en_service = models.DateField(blank=True)
     status = models.CharField(max_length=64, choices=LOT_STATUS, default='Draft')
 
