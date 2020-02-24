@@ -81,10 +81,18 @@ def producers_attestation(request, *args, **kwargs):
   next_attestations = attestations.filter(deadline__gt=current_attestation.deadline).order_by('deadline')
   previous_attestations = attestations.filter(deadline__lt=current_attestation.deadline).order_by('-deadline')
   context['current_attestation'] = current_attestation
-  next_attestation = next_attestations[0] if len(next_attestations) > 0 else None
-  context['next_attestation'] = next_attestation
-  # only one if we have a next_attestation, otherwise 2
-  context['previous_attestations'] = [previous_attestations[0]] if next_attestation != None else previous_attestations[0:2]
+  if len(next_attestations) == 0:
+    # this is the latest attestation. no next, two previous
+    context['next_attestations'] = None
+    context['previous_attestations'] = previous_attestations[0:2]
+  elif len(previous_attestations) == 0:
+    # this is the first attestation. no previous, two next
+    context['next_attestations'] = [next_attestations[1], next_attestations[0]]
+    context['previous_attestations'] = None
+  else:
+    # middle, one of each
+    context['next_attestations'] = [next_attestations[0]]
+    context['previous_attestations'] = [previous_attestations[0]]
 
   lots = Lot.objects.filter(attestation=current_attestation)
   context['lots'] = lots
