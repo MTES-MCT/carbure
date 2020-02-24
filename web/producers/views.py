@@ -85,6 +85,9 @@ def producers_attestation(request, *args, **kwargs):
   context['next_attestation'] = next_attestation
   # only one if we have a next_attestation, otherwise 2
   context['previous_attestations'] = [previous_attestations[0]] if next_attestation != None else previous_attestations[0:2]
+
+  lots = Lot.objects.filter(attestation=current_attestation)
+  context['lots'] = lots
   return render(request, 'producers/attestation.html', context)
 
 @login_required
