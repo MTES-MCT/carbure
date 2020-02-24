@@ -1,5 +1,7 @@
 from core.models import UserRights, UserPreferences
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import render
+
 
 def enrich_with_user_details(function):
     def wrap(request, *args, **kwargs):
