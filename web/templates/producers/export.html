@@ -87,11 +87,13 @@
 				</div>
 			</div>
 		</div>
+		<a class="button" id="btn_export_csv">Export CSV</a>
+
 		<table class="display nowrap" id="datatable">
 			<thead>
 				<tr>
-					<th>Dépôt</th>
 					<th>N°DAE ou DAA</th>
+					<th>Dépôt</th>
 					<th>Date d'entrée</th>
 					<th>Volume</th>
 					<th>Types</th>
@@ -113,8 +115,8 @@
 			</thead>
 			<tbody>
 				<tr>
-					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
+					<td>GRANDPUITS</td>
 					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
@@ -134,8 +136,8 @@
 					<td>SAIPOL</td>
 				</tr>
 				<tr>
-					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
+					<td>GRANDPUITS</td>
 					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
@@ -155,8 +157,8 @@
 					<td>--</td>
 				</tr>	
 				<tr>
-					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
+					<td>GRANDPUITS</td>
 					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
@@ -176,8 +178,8 @@
 					<td>--</td>
 				</tr>							
 				<tr>
-					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
+					<td>GRANDPUITS</td>
 					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
@@ -197,8 +199,8 @@
 					<td>--</td>					
 				</tr>
 				<tr>
-					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
+					<td>GRANDPUITS</td>
 					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
@@ -220,8 +222,8 @@
 			</tbody>
 			<tfoot>
 				<tr>
-					<th>Dépôt</th>
 					<th>N°DAE ou DAA</th>
+					<th>Dépôt</th>
 					<th>Date d'entrée</th>
 					<th>Volume</th>
 					<th>Types</th>
@@ -252,26 +254,11 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.js"></script>
 <script type="text/javascript">
-DAE_COLID = 0
-DEPOT_COLID = 1
-DATE_ENTREE_COLID = 2
-VOLUME_COLID = 3
-TYPE_COLID = 4
-FILIERE_COLID = 5
-CATEGORY_COLID = 6
-SYSTEME_FOURNISSEUR_COLID = 7
-PAYS_ORIGINE_COLID = 8
-RESPECT_CRIT_DURABILITE_COLID = 9
-GES_TRANSPORT_COLID = 10
-GES_TOTAL_COLID = 11
-GES_FOSSILE_COLID = 12
-GES_REDUCTION_COLID = 13
-NUM_DOUBLE_COMPTAGE_COLID = 14
-PAYS_COLID = 15
-DATE_MISE_EN_SERVICE_COLID = 16
-LOT_STATUT_COLID = 17
-AFFILIATION_COLID = 18
-PERIODE_COLID = 19
+var colname2colid = {'DAE_COLID': 0, 'DEPOT_COLID': 1, 'DATE_ENTREE_COLID': 2, 'VOLUME_COLID': 3, 'TYPE_COLID': 4, 'FILIERE_COLID': 5, 'CATEGORY_COLID': 6,
+'SYSTEME_FOURNISSEUR_COLID': 7, 'PAYS_ORIGINE_COLID': 8, 'RESPECT_CRIT_DURABILITE_COLID': 9, 'GES_TRANSPORT_COLID': 10, 'GES_TOTAL_COLID': 11,
+'GES_FOSSILE_COLID': 12, 'GES_REDUCTION_COLID': 13, 'NUM_DOUBLE_COMPTAGE_COLID': 14, 'PAYS_COLID': 15, 'DATE_MISE_EN_SERVICE_COLID': 16, 'LOT_STATUT_COLID': 17,
+'AFFILIATION_COLID': 18}
+
 
 $(document).ready(function() {
 	COLUMN_FILTER = [0, 4, 5,]
@@ -359,6 +346,31 @@ $(document).ready(function() {
         columnsSettings[colid] = columnsSettings[colid] == 1 ? 0 : 1
         saveTableSettings(columnsSettings)
 	});
+
+	/* export button */
+	var btn_export = document.getElementById("btn_export_csv")
+	btn_export.onclick = function() {
+		let header = []
+		for (let key in colname2colid) {
+			let colname = key.replace('_COLID', '').toLowerCase()
+			header.push(colname)
+		}
+		const rows = []
+		rows.push(header)
+		let data = table.rows().data()
+		for (let i = 0, len = data.length; i < len; i++) {
+			rows.push(data[i])
+		}
+		let csvContent = "data:text/csv;charset=utf-8," 
+    		+ rows.map(e => e.join(",")).join("\n");
+		var encodedUri = encodeURI(csvContent);
+		var link = document.createElement("a");
+		link.setAttribute("href", encodedUri);
+		link.setAttribute("download", "my_data.csv");
+		document.body.appendChild(link); // Required for FF
+		link.click();
+	}
+
 
 	/* modals */
 	// modal for column filters
