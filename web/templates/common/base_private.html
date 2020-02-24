@@ -75,9 +75,9 @@
         <ul class="nav__links">
           {% if user.is_authenticated %}
           <li class="nav__item">
-            <div class="dropdown">
+            <div class="dropdown" style="align-content: right;">
               {{user_name}}
-              <div class="dropdown-content">
+              <div class="dropdown-content" style="width: 160px;">
                 <a href="#">Mon Compte</a>
                 <a href="{% url 'logout' %}">Se Déconnecter</a>
               </div>
