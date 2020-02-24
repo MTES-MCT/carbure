@@ -19,35 +19,23 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr class="clickable" onclick="window.location='{% url 'producers-attestation' %}'">
-					<td>2020-01</td>
-					<td>121</td>
-					<td>47</td>
-					<td>74</td>
-					<td>29 Jours</td>
-				</tr>
-				<tr class="status_warning" onclick="window.location='{% url 'producers-attestation' %}'">
-
-					<td>2019-12</td>
-					<td>253</td>
-					<td>250</td>
-					<td>3</td>
-					<td>3 Jours</td>
-				</tr>
-				<tr class="status_ok" onclick="window.location='{% url 'producers-attestation' %}'">
-					<td>2019-11</td>
-					<td>187</td>
-					<td>187</td>
-					<td>0</td>
-					<td>Terminé</td>
-				</tr>
-				<tr class="status_ok" onclick="window.location='{% url 'producers-attestation' %}'">
-					<td>2019-10</td>
-					<td>212</td>
-					<td>212</td>
-					<td>0</td>
-					<td>Terminé</td>
-				</tr>
+				{% for a in attestations %}
+				<tr 
+					{% if a.deadline > today and a.deadline < twoweeks %} 
+					class="status_warning" 
+					{% elif a.deadline > today %}
+					class="clickable"
+					{% else %}
+					class="status_ok" 
+					{% endif %}
+					onclick="window.location='{% url 'producers-attestation' %}'">
+					<td>{{a.period}}</td>
+					<td>{{a.lots}}</td>
+					<td>{{a.drafts}}</td>
+					<td>{{a.to_affiliate}}</td>
+					<td>{{a.deadline}}</td>
+				</tr>				
+				{% endfor %}
 			</tbody>
 		</table>
 	</div>
