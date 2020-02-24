@@ -6,9 +6,13 @@
 				</a>
 				{% if current_url_name == 'producers-attestation' %}
 				<ul>
-					<li class="side-menu-submenu"><a href="#" class="active-submenu">2019-12</a></li>
-					<li class="side-menu-submenu"><a href="#">2019-11</a></li>
-					<li class="side-menu-submenu"><a href="#">2019-10</a></li>
+					{% if next_attestation %}
+					<li class="side-menu-submenu"><a href="{% url 'producers-attestation' attestation_id=next_attestation.id %}">{{next_attestation.period}}</a></li>
+					{% endif %}
+					<li class="side-menu-submenu"><a href="{% url 'producers-attestation' attestation_id=current_attestation.id %}" class="active-submenu">{{current_attestation.period}}</a></li>
+					{% for pa in previous_attestations %}
+					<li class="side-menu-submenu"><a href="{% url 'producers-attestation' attestation_id=pa.id %}">{{pa.period}}</a></li>
+					{% endfor %}
 				</ul>
 				{% endif %}
 			</li>

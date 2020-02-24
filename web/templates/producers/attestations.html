@@ -28,7 +28,7 @@
 					{% else %}
 					class="status_ok" 
 					{% endif %}
-					onclick="window.location='{% url 'producers-attestation' %}'">
+					onclick="window.location='{% url 'producers-attestation' attestation_id=a.id %}'">
 					<td>{{a.period}}</td>
 					<td>{{a.lots}}</td>
 					<td>{{a.drafts}}</td>

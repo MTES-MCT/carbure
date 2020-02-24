@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from core.decorators import enrich_with_user_details, restrict_to_producers
 from django.shortcuts import render
+from django.core.exceptions import PermissionDenied
 
 from producers.models import AttestationProducer
 from core.models import Lot
@@ -69,7 +70,21 @@ def producers_settings(request, *args, **kwargs):
 @restrict_to_producers
 def producers_attestation(request, *args, **kwargs):
   context = kwargs['context']
+  attestation_id = kwargs['attestation_id']
   context['current_url_name'] = 'producers-attestation'
+  
+  attestations = AttestationProducer.objects.filter(producer=context['user_entity'])
+  current_attestation_qs = attestations.filter(id=attestation_id)
+  if len(current_attestation_qs) == 0:
+    raise PermissionDenied
+  current_attestation = current_attestation_qs[0]
+  next_attestations = attestations.filter(deadline__gt=current_attestation.deadline).order_by('deadline')
+  previous_attestations = attestations.filter(deadline__lt=current_attestation.deadline).order_by('-deadline')
+  context['current_attestation'] = current_attestation
+  next_attestation = next_attestations[0] if len(next_attestations) > 0 else None
+  context['next_attestation'] = next_attestation
+  # only one if we have a next_attestation, otherwise 2
+  context['previous_attestations'] = [previous_attestations[0]] if next_attestation != None else previous_attestations[0:2]
   return render(request, 'producers/attestation.html', context)
 
 @login_required
