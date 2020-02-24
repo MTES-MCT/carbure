@@ -83,9 +83,14 @@ class Pays(models.Model):
         verbose_name = 'Pays'
         verbose_name_plural = 'Pays'
 
+
+from producers.models import AttestationProducer
+
 class Lot(models.Model):
     LOT_STATUS = (('Draft', 'Draft'), ('Validated', 'Validated'), ('Declared', 'Declared'))
 
+    producer = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='producer')
+    attestation = models.ForeignKey(AttestationProducer, null=True, blank=True, on_delete=models.SET_NULL)
     depot = models.CharField(max_length=64, blank=True)
     num_dae = models.CharField(max_length=64, blank=True)
     date_entree = models.DateField(blank=True)
@@ -102,6 +107,7 @@ class Lot(models.Model):
     pays_production = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='pays_production')
     date_mise_en_service = models.DateField(blank=True)
     status = models.CharField(max_length=64, choices=LOT_STATUS, default='Draft')
+    affiliate = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='affiliated')
 
     def __str__(self):
         return self.id
