@@ -248,6 +248,7 @@
 			</select>
 			<a id="btn_affiliate" class="button primary" href="#">Affilier Lots</a>
 			<a id="btn_validate" class="button primary" href="#">Valider Lots</a>
+			<a id="btn_delete" class="button primary" href="#">Supprimer Lots</a>
 		</div>
 		<div class="flex-container-left">
 			<a class="button primary" href="#" id="add_lot">Ajouter Lot</a>
@@ -598,6 +599,7 @@ $(document).ready(function() {
 		var btn_affiliate = document.getElementById("btn_affiliate")
 		var select_affiliate = document.getElementById("select_affiliate")
 		var btn_validate = document.getElementById("btn_validate")
+		var btn_delete = document.getElementById("btn_delete")
 		if (keys.length > 0 && draft_present === false) {
 			// at least one row selected, all valid: set affiliate button to active
 			$("#btn_affiliate").addClass('primary')
@@ -611,10 +613,14 @@ $(document).ready(function() {
 
 		if (draft_present === true) {
 			$("#btn_validate").addClass('primary')
-			$("#btn_validate").removeClass('secondary')			
+			$("#btn_validate").removeClass('secondary')		
+			$("#btn_delete").addClass('primary')
+			$("#btn_delete").removeClass('secondary')		
 		} else {
 			$("#btn_validate").addClass('secondary')
 			$("#btn_validate").removeClass('primary')		
+			$("#btn_delete").addClass('secondary')
+			$("#btn_delete").removeClass('primary')			
 		}
 
 	}
