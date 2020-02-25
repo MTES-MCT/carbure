@@ -120,7 +120,7 @@
 					<th>Date de mise en service</th>
 					<th>Statut</th>
 					<th>Affiliation</th>
-					<th></th>
+					<th><input type="checkbox" id="checkbox_header"/></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -144,7 +144,7 @@
 					<td>1/7/2007</td>
 					<td>Validé</td>
 					<td>SAIPOL</td>
-					<td><input type="checkbox" /></td>
+					<td><input id="checkboxrow0" type="checkbox" /></td>
 				</tr>
 				<tr>
 					<td>19FRG0432000482724020</td>
@@ -166,7 +166,7 @@
 					<td>1/7/2007</td>
 					<td>Validé</td>
 					<td>--</td>
-					<td><input type="checkbox" /></td>
+					<td><input id="checkboxrow1" type="checkbox" /></td>
 				</tr>	
 				<tr>
 					<td>19FRG0432000482724020</td>
@@ -188,7 +188,7 @@
 					<td>1/7/2007</td>
 					<td>Validé</td>
 					<td>--</td>
-					<td><input type="checkbox" /></td>
+					<td><input id="checkboxrow2" type="checkbox" /></td>
 				</tr>							
 				<tr>
 					<td>19FRG0432000482724020</td>
@@ -652,6 +652,25 @@ $(document).ready(function() {
 	$("#add_lot_params").on('click', function() {
 	    $("#add_lot_params_toggle").toggle();
 	});
+
+	$(document).on('change', '#checkbox_header', function() {
+    	if (this.checked) {
+    		let rows = table.rows()
+    		for (let i = 0, len = table.rows().count(); i < len; i++) {
+    			$(rows[i]).find('input').prop('checked', true)
+    			let row = table.row(i)
+				selected_rows[i] = row.data()
+			}
+      	} else {
+    		let rows = table.rows()
+    		for (let i = 0, len = table.rows().count(); i < len; i++) {
+    			$(rows[i]).find('input').prop('checked', false)
+				delete selected_rows[i]
+			}      		
+		}
+		console.log(selected_rows)
+		show_hide_action_buttons()
+    })
 
 	/* modals */
 	// modal for column filters
