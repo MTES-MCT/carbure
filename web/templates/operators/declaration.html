@@ -250,107 +250,12 @@
 				<a class="button primary" href="#" id="add_lot">Ajouter Lot</a>
 			</div>
 			<div class="button-item button-push">
-				<a class="button secondary" href="#" id="">Valider Lots</a>
-				<a class="button secondary" href="#" id="">Déclarer Lots</a>
+				<a class="button secondary" href="#" id="btn_validate">Valider Lots</a>
+				<a class="button secondary" href="#" id="btn_declare">Déclarer Lots</a>
 			</div>
 		</div>				
 	</div>
 </div>
-
-<div class="modal__backdrop" id="modal_lot">
-	<div class="modal modal-big">
-		<section class="flex-container">
-			<div class="flex-container-left">
-				<div class="form__group">
-					<h2>Informations Générales</h2>
-					<label for="ml_depot">Dépôt</label>
-					<input type="text" value="" id="ml_depot">
-					<label for="ml_dae">N°DAE ou DAA</label>
-					<input type="text" value="" id="ml_dae">
-					<label for="ml_volume">Volume</label>
-					<input type="text" value="" id="ml_volume">
-					<label for="ml_date_entree">Date d'entrée en EFS ou UER</label>
-					<input type="text" value="" id="ml_date_entree">
-					<label for="ml_pays">Pays d'implantation</label>
-					<input type="text" value="" id="ml_pays">
-					<label for="ml_date_mise_en_service">Date de mise en service</label>
-					<input type="text" value="" id="ml_date_mise_en_service">
-				</div>
-			</div>
-			<div class="flex-container-left">
-				<div class="form__group">
-					<h2>Durabilité</h2>
-					<label for="ml_filiere">Filière de production</label>
-					<select id="ml_filiere">
-						<option>Choisissez...</option>
-						<option>Colza</option>
-						<option>Maïs</option>
-						<option>Navet</option>
-						<option>Fenouil</option>
-					</select>
-					<label for="ml_type">Types</label>
-					<input type="text" value="" id="ml_type">
-					<label for="ml_cat">Catégorie</label>
-					<input type="text" value="" id="ml_cat">
-					<label for="ml_systeme_fournisseur">Système fournisseur</label>
-					<input type="text" value="" id="ml_systeme_fournisseur">
-					<label for="ml_pays_origine">Pays d'origine</label>
-					<input type="text" value="" id="ml_pays_origine">
-					<label for="ml_respect_crit_durabilite">Respect des critères de durabilité</label>
-					<input type="text" value="" id="ml_respect_crit_durabilite">
-					<label for="ml_num_double_comptage">Numéro d'enregistrement double-comptage</label>
-					<input type="text" value="" id="ml_num_double_comptage">
-				</div>
-			</div>
-		</section>
-		<section class="flex-container">
-			<div class="flex-container-left">
-				<div class="form__group">
-					<h2>Émissions GES</h2>
-					<table>
-						<thead>
-							<th>GES transport et distribution</th>
-							<th>Total émissions de GES</th>
-							<th>GES du carburant fossile</th>
-							<th>% de réduction totale</th>
-						</thead>
-						<tbody>
-							<td><input type="text" id="ml_ges_transport_distribution" /></td>
-							<td><input type="text" id="ml_ges_total" /></td>
-							<td><input type="text" id="ml_ges_fossile" /></td>
-							<td><input type="text" id="ml_ges_reduction" /></td>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</section>
-		<section class="flex-container">
-			<div class="flex-container-left">
-				<div class="form__group">
-					<h2>Affiliation</h2>
-					<table>
-						<thead>
-							<th>Date</th>
-							<th>Vendeur</th>
-							<th>Acheteur</th>
-						</thead>
-						<tbody>
-							<td><input type="text" id="ml_date_affiliation" value="27/01/2020"/></td>
-							<td><input type="text" id="ml_vendeur" value="BioRaffinerie Lambda"/></td>
-							<td><input type="text" id="ml_acheteur" value="SAIPOL"/></td>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</section>		
-		<section class="flex-container-right">
-			<div class="form__group button__group">
-				<a class="button secondary close" href="#">Ok</a>
-			</div>
-		</section>
-	</div>
-</div>
-
 {% endblock %}
 
 
@@ -478,24 +383,25 @@ $(document).ready(function() {
 				draft_present = true
 			}
 		}
-		var btn_affiliate = document.getElementById("btn_affiliate")
-		var select_affiliate = document.getElementById("select_affiliate")
 		var btn_validate = document.getElementById("btn_validate")
+		var btn_declare = document.getElementById("btn_declare")
 		if (keys.length > 0 && draft_present === false) {
-			// at least one row selected, all valid: set affiliate button to active
-			btn_affiliate.style.display = "flex";
-			select_affiliate.style.display = "flex";
+			// at least one row selected and no draft
+			$("#btn_declare").addClass('primary')
+			$("#btn_declare").removeClass('secondary')			
+			$("#btn_validate").addClass('secondary')
+			$("#btn_validate").removeClass('primary')				
+		} else if (keys.length > 0 && draft_present === true) {
+			$("#btn_validate").addClass('primary')
+			$("#btn_validate").removeClass('secondary')		
+			$("#btn_declare").addClass('secondary')
+			$("#btn_declare").removeClass('primary')					
 		} else {
-			btn_affiliate.style.display = "none";
-			select_affiliate.style.display = "none";
+			$("#btn_validate").addClass('secondary')
+			$("#btn_validate").removeClass('primary')		
+			$("#btn_declare").addClass('secondary')
+			$("#btn_declare").removeClass('primary')				
 		}
-
-		if (draft_present === true) {
-			btn_validate.style.display = "flex";
-		} else {
-			btn_validate.style.display = "none";
-		}
-
 	}
 	show_hide_action_buttons()
 	/* click on datatable row */
