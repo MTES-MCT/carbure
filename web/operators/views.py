@@ -53,7 +53,7 @@ def operators_annuaire(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_operators
-def operators_new_lots(request, *args, **kwargs):
+def operators_affiliations(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'operators-affiliations'
   return render(request, 'operators/affiliations.html', context)
@@ -61,10 +61,10 @@ def operators_new_lots(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_operators
-def operators_pending_lots(request, *args, **kwargs):
+def operators_corrections(request, *args, **kwargs):
   context = kwargs['context']
-  context['current_url_name'] = 'operators-pending-lots'
-  return render(request, 'operators/pending_lots.html', context)
+  context['current_url_name'] = 'operators-corrections'
+  return render(request, 'operators/corrections.html', context)
 
 @login_required
 @enrich_with_user_details
