@@ -156,8 +156,8 @@ $(document).ready(function() {
 
 		let cell = table.cell(this)
 		let colid = cell.index()['column']
-   		if (colid == colname2colid['SELECT_CHECKBOX_COLID']) {
-			// ignore clicks on checkbox column
+   		if (colid == colname2colid['SELECT_CHECKBOX_COLID'] || colid == colname2colid['DAE_COLID']) {
+			// ignore clicks on checkbox column and DAE 
 			return
 		}
         if (row.child.isShown()) {
