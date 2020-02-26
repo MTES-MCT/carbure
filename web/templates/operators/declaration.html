@@ -334,7 +334,6 @@ $(document).ready(function() {
 	}
 
 	var columnsSettings = loadTableSettings()
-	console.log(`col settings: ${columnsSettings}`)
 	showHideTableColumns(columnsSettings)
 
 	/* column filter modal event management */
@@ -355,19 +354,6 @@ $(document).ready(function() {
         let last_row = table.row(':last').data()
         table.row.add(last_row).draw()
 	})
-
-	function display_lot_modal(data) {
-        // add data to modal
-        console.log(`display modal with data ${data}`)
-        for (let i = 0, len = data.length; i < len; i++) {
-        	let col_data = data[i]
-        	let col_name = colid2colname[i]
-        	let destination_element = col2field[col_name]
-        	$(`#${destination_element}`).val(col_data)
-        }
-		// show modal
-		modal_lot.style.display = "flex";		
-	}
 
 	function show_hide_action_buttons() {
 		// buttons Valider & Affilier
@@ -405,7 +391,6 @@ $(document).ready(function() {
 	}
 	show_hide_action_buttons()
 	/* click on datatable row */
-	var modal_lot = document.getElementById("modal_lot")
 	$('#datatable_wrapper tbody').on('click', 'input', function() {
 		let hrow = $(this).closest("tr")
 		let row = table.row(hrow)
@@ -430,7 +415,7 @@ $(document).ready(function() {
 			// ignore clicks on checkbox column
 			return
 		} else {	
-			display_lot_modal(data)
+			window.location = "{% url 'operators-lot' %}"
 		}
 	});
 
@@ -457,7 +442,6 @@ $(document).ready(function() {
 		btn_close.onclick = function() {
 		  modal_columns.style.display = "none"
 		  modal_import.style.display = "none"
-		  modal_lot.style.display = "none"
 		}
 	}
 	// clicking outside of the modal window will close it
@@ -468,16 +452,12 @@ $(document).ready(function() {
 	  if (event.target == modal_import) {
 	    modal_import.style.display = "none"
 	  }
-	  if (event.target == modal_lot) {
-	    modal_lot.style.display = "none"
-	  }
 	}
 	// escape key
 	$(document).keydown(function(event) {
 	  if (event.keyCode == 27) {
 	    modal_columns.style.display = "none"
 	    modal_import.style.display = "none"
-	    modal_lot.style.display = "none"
 	  }
 	});
 });
