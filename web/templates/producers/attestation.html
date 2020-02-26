@@ -123,6 +123,30 @@
 				</tr>
 			</thead>
 			<tbody>
+				{% for lot in lots %}
+				<tr>
+					<td>{{lot.num_dae}}</td>
+					<td>{{lot.depot}}</td>
+					<td>{{lot.date_entree}}</td>
+					<td>{{lot.volume}}</td>
+					<td>{{lot.type_biocarburant}}</td>
+					<td>{{lot.filiere_production}}</td>
+					<td>{{lot.categorie}}</td>
+					<td>{{lot.systeme_fournisseur}}</td>
+					<td>{{lot.pays_origine}}</td>
+					<td>{{lot.respect_crit_durabilite}}</td>
+					<td>{{lot.ges_transport_distrib}}</td>
+					<td>{{lot.ges_fossile}}</td>
+					<td>{{lot.ges_transport_distrib + lot.ges_fossile}}</td>
+					<td>{{(lot.ges_fossile - lot.ges_transport_distrib) / (lot.ges_fossile) * 100}}</td>
+					<td>{{lot.eligible_double_comptage}}</td>
+					<td>{{lot.pays_production}}</td>
+					<td>{{lot.date_mise_en_service}}</td>
+					<td>{{lot.status}}</td>
+					<td>{{lot.affiliate}}</td>
+					<td><input type="checkbox" /></td>
+				</tr>				 
+				{% endfor %}
 				<tr>
 					<td>19FRG0432000482724020</td>
 					<td>GRANDPUITS</td>
@@ -143,7 +167,7 @@
 					<td>1/7/2007</td>
 					<td>Validé</td>
 					<td>SAIPOL</td>
-					<td><input id="checkboxrow0" type="checkbox" /></td>
+					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
 					<td>19FRG0432000482724020</td>
@@ -165,7 +189,7 @@
 					<td>1/7/2007</td>
 					<td>Validé</td>
 					<td>--</td>
-					<td><input id="checkboxrow1" type="checkbox" /></td>
+					<td><input type="checkbox" /></td>
 				</tr>	
 				<tr>
 					<td>19FRG0432000482724020</td>
@@ -187,7 +211,7 @@
 					<td>1/7/2007</td>
 					<td>Validé</td>
 					<td>--</td>
-					<td><input id="checkboxrow2" type="checkbox" /></td>
+					<td><input type="checkbox" /></td>
 				</tr>							
 				<tr>
 					<td>19FRG0432000482724020</td>
