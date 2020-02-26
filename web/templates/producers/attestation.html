@@ -91,10 +91,9 @@
 		<div class="modal__backdrop" id="modal_import">
 			<div class="modal">
 				<a href="/static/files/template.csv">Modèle</a>
-				<input type="file" name="fileToUpload" id="fileToUpload">
+				<input type="file" id="file_to_upload">
 				<div class="form__group button__group">
 					<a class="button secondary close" href="#">Annuler</a>
-					<a class="button primary close" href="#">Ok</a>
 				</div>
 			</div>
 		</div>
@@ -568,6 +567,35 @@ $(document).ready(function() {
         let last_row = table.row(':last').data()
         table.row.add(last_row).draw()
 	})
+
+	/* import file */
+	$("#file_to_upload").on('change', function(e) {
+		let reader = new FileReader();
+		reader.onload = function(e) {
+		    var data = reader.result;
+		    var lines = data.split("\n")
+		    var line_end = `;Brouillon;--;<input type="checkbox" />`
+		    for (let i = 0, len = lines.length; i < len; i++) {
+		    	if (i === 0) {
+		    		continue
+		    	}
+		    	if (lines[i].length < 19) {
+		    		continue
+		    	}
+		    	let full_line = lines[i].concat(line_end)
+        		table.row.add(full_line.split(";")).draw()
+		    }
+	    	modal_import.style.display = "none"
+		};
+		reader.onerror = function(event) {
+		    console.error("File could not be read! Code " + event.target.error.code);
+		};
+		reader.readAsText(e.target.files[0]);
+	})
+
+
+
+
 
 	function display_lot_modal(data) {
         // add data to modal
