@@ -1,6 +1,13 @@
 	<aside class="side-menu" role="navigation" style="max-width: 170px;">
 		<ul>
-			<li><a {% if current_url_name == 'operators-index' %}class="active"{% endif %} href="{% url 'operators-index' %}">Mes Lots</a></li>
+			<li><a {% if current_url_name == 'operators-index' or current_url_name == 'operators-declaration' %}class="active"{% endif %} href="{% url 'operators-index' %}">Mes Lots</a></li>
+				{% if current_url_name == 'operators-declaration' %}
+				<ul>
+					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' %}">2020-02</a></li>
+					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' %}" class="active-submenu">2020-01</a></li>
+					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' %}">2019-12</a></li>
+				</ul>
+				{% endif %}
 			<li><a {% if current_url_name == 'operators-new-lots' %}class="active"{% endif %} href="{% url 'operators-new-lots' %}">Mes Affiliations<span class="badge badge-green">2</span></a></li>
 			<li><a {% if current_url_name == 'operators-pending-lots' %}class="active"{% endif %} href="{% url 'operators-pending-lots' %}">Mes Corrections<span class="badge badge-red">1</span></a></li>
 			<li><a {% if current_url_name == 'operators-controles' %}class="active"{% endif %} href="{% url 'operators-controles' %}">Mes Contrôles<span class="badge badge-red">2</span></a></li>			
