@@ -20,11 +20,10 @@
 					<th>Pays d'origine</th>
 					<th>Vendeur</th>
 					<th>Statut</th>
-					<th>Sélectionner</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
+				<tr class="status_warning">
 					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
 					<td>28,687</td>
@@ -33,7 +32,6 @@
 					<td>FR</td>
 					<td>SAIPOL</td>
 					<td>Nouveau</td>
-					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
 					<td>GRANDPUITS</td>
@@ -44,7 +42,6 @@
 					<td>FR</td>
 					<td>SAIPOL</td>
 					<td>En Attente</td>
-					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
 					<td>GRANDPUITS</td>
@@ -55,7 +52,6 @@
 					<td>FR</td>
 					<td>SAIPOL</td>
 					<td>En Attente</td>
-					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
 					<td>GRANDPUITS</td>
@@ -66,9 +62,8 @@
 					<td>FR</td>
 					<td>SAIPOL</td>
 					<td>En Attente</td>
-					<td><input type="checkbox" /></td>
 				</tr>
-				<tr>
+				<tr class="status_ok">
 					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
 					<td>28,687</td>
@@ -77,7 +72,6 @@
 					<td>FR</td>
 					<td>SAIPOL</td>
 					<td>Terminé</td>
-					<td><input type="checkbox" /></td>
 				</tr>												
 			</tbody>
 		</table>
@@ -203,6 +197,7 @@ $(document).ready(function() {
 		info: false,
 		scrollX: true,
 		searching: false,
+		ordering: false,
 		autoWidth: false,
 		scrollCollapse: true,
         fixedColumns: {
@@ -214,193 +209,10 @@ $(document).ready(function() {
    		],		        
 	});
 
-	function loadTableSettings() {
-		var tableSettings = localStorage.getItem('tableSettings');
-		if (tableSettings === undefined || tableSettings === null) {
-			let nb_columns = table.columns().data().length
-			columns = Array(nb_columns).fill(1);
-			saveTableSettings(columns)
-		} else {
-			columns = JSON.parse(tableSettings)
-		}
-		console.log(`table settings ${columns}`)
-		return columns
-	}
-
-
-	function saveTableSettings(settings) {
-		localStorage.setItem("tableSettings", JSON.stringify(settings));
-	}
-
-	function showHideTableColumns(columns) {
-		/* display table columns depending on config */
-		let frozen_columns = [colname2colid['DAE_COLID'], colname2colid['LOT_STATUT_COLID'], colname2colid['AFFILIATION_COLID'], colname2colid['SELECT_CHECKBOX_COLID']] // first column (depot) and last (selection) cannot be hidden
-		let nb_columns = table.columns().data().length
-
-		for (let i = 0, len = nb_columns; i < len; i++) {
-			let isChecked = columns[i]
-			let boxid = '#checkbox' + i
-			var column = table.column(i)
-			if (isChecked || frozen_columns.includes(i)) {
-				$(boxid).prop("checked", true);
-				if (!column.visible()) {
-					column.visible(!column.visible()) 
-				}
-			} else {
-				$(boxid).prop("checked", false);
-				if (column.visible()) {
-					column.visible(!column.visible()) 
-				}				
-			}
-		}
-	}
-
-	var columnsSettings = loadTableSettings()
-	console.log(`col settings: ${columnsSettings}`)
-	showHideTableColumns(columnsSettings)
-
-	/* column filter modal event management */
-	$('.toggle-vis').on('click', function(e) {
-        // Get the column API object
-        let colid = $(this).attr('data-column')
-        let column = table.column(colid);
-
-        // Toggle the visibility
-        column.visible(!column.visible());
-        columnsSettings[colid] = columnsSettings[colid] == 1 ? 0 : 1
-        saveTableSettings(columnsSettings)
-	});
-
-	/* add lot */
-	$("#add_lot").on('click', function(e) {
-		// take the last row of the table and duplicate it
-        let last_row = table.row(':last').data()
-        table.row.add(last_row).draw()
-	})
-
-	function display_lot_modal(data) {
-        // add data to modal
-        console.log(`display modal with data ${data}`)
-        for (let i = 0, len = data.length; i < len; i++) {
-        	let col_data = data[i]
-        	let col_name = colid2colname[i]
-        	let destination_element = col2field[col_name]
-        	$(`#${destination_element}`).val(col_data)
-        }
-		// show modal
-		modal_lot.style.display = "flex";		
-	}
-
-	function show_hide_action_buttons() {
-		// buttons Valider & Affilier
-		// pseudo code: if all rows are valid, button Affilier is active
-		// if one of the rows is a draft, button Valider is active
-		let draft_present = false
-		let keys = Object.keys(selected_rows)
-		for (let i = 0, len = keys.length; i < len; i++) {
-			let key = keys[i]
-			let rowdata = selected_rows[key]
-			let statut = rowdata[colname2colid['LOT_STATUT_COLID']]
-			if (statut.toLowerCase() === "brouillon") {
-				draft_present = true
-			}
-		}
-		var btn_affiliate = document.getElementById("btn_affiliate")
-		var select_affiliate = document.getElementById("select_affiliate")
-		var btn_validate = document.getElementById("btn_validate")
-		if (keys.length > 0 && draft_present === false) {
-			// at least one row selected, all valid: set affiliate button to active
-			btn_affiliate.style.display = "flex";
-			select_affiliate.style.display = "flex";
-		} else {
-			btn_affiliate.style.display = "none";
-			select_affiliate.style.display = "none";
-		}
-
-		if (draft_present === true) {
-			btn_validate.style.display = "flex";
-		} else {
-			btn_validate.style.display = "none";
-		}
-
-	}
-	show_hide_action_buttons()
-	/* click on datatable row */
-	var modal_lot = document.getElementById("modal_lot")
-	$('#datatable_wrapper tbody').on('click', 'input', function() {
-		let hrow = $(this).closest("tr")
-		let row = table.row(hrow)
-		let data = table.row(row).data();	
-		let rowid = table.row(row).index();
-		// add to selection if checked, otherwise remove
-		if (rowid in selected_rows) {
-			delete selected_rows[rowid]
-		} else {
-			selected_rows[rowid] = data
-		}
-		show_hide_action_buttons()
-	})
-
 	$('#datatable_wrapper tbody').on('click', 'td', function() {
-		// check if we clicked on the checkbox
-		let cell = table.cell(this)
-		let colid = cell.index()['column']
-		let row = $(this).closest('tr');
-		let data = table.row(row).data();	
-   		if (colid == colname2colid['SELECT_CHECKBOX_COLID']) {
-			// ignore clicks on checkbox column
-			return
-		} else {	
-			display_lot_modal(data)
-		}
-	});
+		window.location = "{% url 'operators-lot' %}"
+	})
 
-	/* modals */
-	// modal for column filters
-	var modal_columns = document.getElementById("modal_columns")
-	var btn_open = document.getElementById("btn_modal_columns")
-	btn_open.onclick = function() {
-	  modal_columns.style.display = "flex"
-	}
-
-	// modal import
-	var modal_import = document.getElementById("modal_import")
-	var btn_import_open = document.getElementById("btn_modal_import")
-	btn_import_open.onclick = function() {
-	  modal_import.style.display = "flex";
-	}
-
-	/* modal close events */
-	// button
-	var btns_close = document.getElementsByClassName("close")
-	for (let i = 0, len = btns_close.length; i < len; i++) {
-		let btn_close = btns_close[i]
-		btn_close.onclick = function() {
-		  modal_columns.style.display = "none"
-		  modal_import.style.display = "none"
-		  modal_lot.style.display = "none"
-		}
-	}
-	// clicking outside of the modal window will close it
-	window.onclick = function(event) {
-	  if (event.target == modal_columns) {
-	    modal_columns.style.display = "none"
-	  }
-	  if (event.target == modal_import) {
-	    modal_import.style.display = "none"
-	  }
-	  if (event.target == modal_lot) {
-	    modal_lot.style.display = "none"
-	  }
-	}
-	// escape key
-	$(document).keydown(function(event) {
-	  if (event.keyCode == 27) {
-	    modal_columns.style.display = "none"
-	    modal_import.style.display = "none"
-	    modal_lot.style.display = "none"
-	  }
-	});
 });
 
 // fixed column styling on row hover

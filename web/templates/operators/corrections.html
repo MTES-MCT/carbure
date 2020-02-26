@@ -20,12 +20,11 @@
 					<th>Filière de production</th>
 					<th>Pays d'origine</th>
 					<th>Statut</th>
-					<th>Affiliation</th>
-					<th><input type="checkbox"></th>
+					<th>Provenance</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
+				<tr class="status_warning">
 					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
 					<td>1/10/2019</td>
@@ -35,9 +34,8 @@
 					<td>FR</td>
 					<td>En attente</td>
 					<td>SAIPOL</td>
-					<td><input type="checkbox" /></td>
 				</tr>
-				<tr>
+				<tr class="status_warning">
 					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
 					<td>1/10/2019</td>
@@ -47,7 +45,6 @@
 					<td>FR</td>
 					<td>En attente</td>
 					<td>SAIPOL</td>
-					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
 					<td>GRANDPUITS</td>
@@ -59,9 +56,8 @@
 					<td>FR</td>
 					<td>Corrigé</td>
 					<td>SAIPOL</td>
-					<td><input type="checkbox" /></td>
 				</tr>
-				<tr>
+				<tr class="status_ok">
 					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
 					<td>1/10/2019</td>
@@ -71,9 +67,7 @@
 					<td>FR</td>
 					<td>Correction Validée</td>
 					<td>SAIPOL</td>
-					<td><input type="checkbox" /></td>
 				</tr>
-
 			</tbody>
 		</table>
 	</div>
@@ -103,6 +97,7 @@ $(document).ready(function() {
 		info: false,
 		scrollX: true,
 		searching: false,
+		ordering: false,
 		autoWidth: false,
 		scrollCollapse: true,
         fixedColumns: {
@@ -114,68 +109,11 @@ $(document).ready(function() {
    		],		
 	});
 
-	function show_hide_action_buttons() {
-		// buttons Valider & Affilier
-		// pseudo code: if all rows are valid, button Affilier is active
-		// if one of the rows is a draft, button Valider is active
-		let draft_present = false
-		let keys = Object.keys(selected_rows)
-		for (let i = 0, len = keys.length; i < len; i++) {
-			let key = keys[i]
-			let rowdata = selected_rows[key]
-			let statut = rowdata[colname2colid['LOT_STATUT_COLID']]
-			if (statut.toLowerCase() === "brouillon") {
-				draft_present = true
-			}
-		}
-		var btn_affiliate = document.getElementById("btn_affiliate")
-		var select_affiliate = document.getElementById("select_affiliate")
-		var btn_validate = document.getElementById("btn_validate")
-		if (keys.length > 0 && draft_present === false) {
-			// at least one row selected, all valid: set affiliate button to active
-			btn_affiliate.style.display = "flex";
-			select_affiliate.style.display = "flex";
-		} else {
-			btn_affiliate.style.display = "none";
-			select_affiliate.style.display = "none";
-		}
-
-		if (draft_present === true) {
-			btn_validate.style.display = "flex";
-		} else {
-			btn_validate.style.display = "none";
-		}
-
-	}
-	show_hide_action_buttons()
-	/* click on datatable row */
-	$('#datatable_wrapper tbody').on('click', 'input', function() {
-		let hrow = $(this).closest("tr")
-		let row = table.row(hrow)
-		let data = table.row(row).data();	
-		let rowid = table.row(row).index();
-		// add to selection if checked, otherwise remove
-		if (rowid in selected_rows) {
-			delete selected_rows[rowid]
-		} else {
-			selected_rows[rowid] = data
-		}
-		show_hide_action_buttons()
-	})
-
 	$('#datatable_wrapper tbody').on('click', 'td', function() {
-		// check if we clicked on the checkbox
 		let cell = table.cell(this)
-		let colid = cell.index()['column']
 		let row = $(this).closest('tr');
 		let data = table.row(row).data();	
-   		if (colid == colname2colid['SELECT_CHECKBOX_COLID']) {
-			// ignore clicks on checkbox column
-			return
-		} else {	
-			// display lot
-			window.location = "{% url 'operators-lot' %}"
-		}
+		window.location = "{% url 'operators-lot' %}"
 	});
 });
 
