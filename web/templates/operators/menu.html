@@ -4,6 +4,7 @@
 			<li><a {% if current_url_name == 'operators-new-lots' %}class="active"{% endif %} href="{% url 'operators-new-lots' %}">Mes Affiliations<span class="badge badge-green">2</span></a></li>
 			<li><a {% if current_url_name == 'operators-pending-lots' %}class="active"{% endif %} href="{% url 'operators-pending-lots' %}">Mes Corrections<span class="badge badge-red">1</span></a></li>
 			<li><a {% if current_url_name == 'operators-controles' %}class="active"{% endif %} href="{% url 'operators-controles' %}">Mes Contrôles<span class="badge badge-red">2</span></a></li>			
+			<li><a {% if current_url_name == 'operators-export' %}class="active"{% endif %} href="{% url 'operators-export' %}">Export</a></li>
 			<li><a {% if current_url_name == 'operators-annuaire' %}class="active"{% endif %} href="{% url 'operators-annuaire' %}">Annuaire</a></li>
 			<li><a {% if current_url_name == 'operators-settings' %}class="active"{% endif %} href="{% url 'operators-settings' %}">Paramètres</a></li>
 		</ul>
