@@ -19,7 +19,7 @@
 					<th>Filière de production</th>
 					<th>Pays d'origine</th>
 					<th>Vendeur</th>
-					<th><input type="checkbox" /></th>
+					<th><input type="checkbox" id="checkbox_select_all" /></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -163,6 +163,27 @@ $(document).ready(function() {
 			window.location = "{% url 'operators-lot' %}"
 		}
 	});
+
+	$(document).on('change', '#checkbox_select_all', function() {
+    	if (this.checked) {
+    		let rows = table.rows()
+    		for (let i = 0, len = table.rows().count(); i < len; i++) {
+    			$(rows[i]).find('input').prop('checked', true)
+    			let row = table.row(i)
+				selected_rows[i] = row.data()
+			}
+      	} else {
+    		let rows = table.rows()
+    		for (let i = 0, len = table.rows().count(); i < len; i++) {
+    			$(rows[i]).find('input').prop('checked', false)
+				delete selected_rows[i]
+			}      		
+		}
+		console.log(selected_rows)
+		show_hide_action_buttons()
+    })
+
+
 });
 
 // fixed column styling on row hover for fixed columns

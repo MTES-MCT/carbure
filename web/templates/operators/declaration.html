@@ -129,7 +129,7 @@
 					<th>Date de mise en service</th>
 					<th>Statut</th>
 					<th>Provenance</th>
-					<th><input type="checkbox" /></th>
+					<th><input type="checkbox" id="checkbox_select_all" /></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -418,6 +418,26 @@ $(document).ready(function() {
 			window.location = "{% url 'operators-lot' %}"
 		}
 	});
+
+	$(document).on('change', '#checkbox_select_all', function() {
+    	if (this.checked) {
+    		let rows = table.rows()
+    		for (let i = 0, len = table.rows().count(); i < len; i++) {
+    			$(rows[i]).find('input').prop('checked', true)
+    			let row = table.row(i)
+				selected_rows[i] = row.data()
+			}
+      	} else {
+    		let rows = table.rows()
+    		for (let i = 0, len = table.rows().count(); i < len; i++) {
+    			$(rows[i]).find('input').prop('checked', false)
+				delete selected_rows[i]
+			}      		
+		}
+		console.log(selected_rows)
+		show_hide_action_buttons()
+    })
+
 
 	/* modals */
 	// modal for column filters
