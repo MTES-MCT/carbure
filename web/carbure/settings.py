@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'core',
     'producers',
     'operators',
-    'administrators'
+    'administrators',
+    'api'
 ]
 
 AUTH_USER_MODEL = 'authtools.User'
