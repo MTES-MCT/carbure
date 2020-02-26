@@ -55,8 +55,8 @@ def operators_annuaire(request, *args, **kwargs):
 @restrict_to_operators
 def operators_new_lots(request, *args, **kwargs):
   context = kwargs['context']
-  context['current_url_name'] = 'operators-new-lots'
-  return render(request, 'operators/new_lots.html', context)
+  context['current_url_name'] = 'operators-affiliations'
+  return render(request, 'operators/affiliations.html', context)
 
 @login_required
 @enrich_with_user_details

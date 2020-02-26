@@ -19,9 +19,9 @@
 					<th>Types</th>
 					<th>Filière de production</th>
 					<th>Pays d'origine</th>
-					<th>Statut du Lot</th>
+					<th>Statut</th>
 					<th>Affiliation</th>
-					<th>Sélectionner</th>
+					<th><input type="checkbox"></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -149,7 +149,6 @@ $(document).ready(function() {
 	}
 	show_hide_action_buttons()
 	/* click on datatable row */
-	var modal_lot = document.getElementById("modal_lot")
 	$('#datatable_wrapper tbody').on('click', 'input', function() {
 		let hrow = $(this).closest("tr")
 		let row = table.row(hrow)
@@ -174,55 +173,9 @@ $(document).ready(function() {
 			// ignore clicks on checkbox column
 			return
 		} else {	
-			display_lot_modal(data)
+			// display lot
+			window.location = "{% url 'operators-lot' %}"
 		}
-	});
-
-	/* modals */
-	// modal for column filters
-	var modal_columns = document.getElementById("modal_columns")
-	var btn_open = document.getElementById("btn_modal_columns")
-	btn_open.onclick = function() {
-	  modal_columns.style.display = "flex"
-	}
-
-	// modal import
-	var modal_import = document.getElementById("modal_import")
-	var btn_import_open = document.getElementById("btn_modal_import")
-	btn_import_open.onclick = function() {
-	  modal_import.style.display = "flex";
-	}
-
-	/* modal close events */
-	// button
-	var btns_close = document.getElementsByClassName("close")
-	for (let i = 0, len = btns_close.length; i < len; i++) {
-		let btn_close = btns_close[i]
-		btn_close.onclick = function() {
-		  modal_columns.style.display = "none"
-		  modal_import.style.display = "none"
-		  modal_lot.style.display = "none"
-		}
-	}
-	// clicking outside of the modal window will close it
-	window.onclick = function(event) {
-	  if (event.target == modal_columns) {
-	    modal_columns.style.display = "none"
-	  }
-	  if (event.target == modal_import) {
-	    modal_import.style.display = "none"
-	  }
-	  if (event.target == modal_lot) {
-	    modal_lot.style.display = "none"
-	  }
-	}
-	// escape key
-	$(document).keydown(function(event) {
-	  if (event.keyCode == 27) {
-	    modal_columns.style.display = "none"
-	    modal_import.style.display = "none"
-	    modal_lot.style.display = "none"
-	  }
 	});
 });
 
