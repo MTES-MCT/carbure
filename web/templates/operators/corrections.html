@@ -20,13 +20,14 @@
 					<th>Filière de production</th>
 					<th>Pays d'origine</th>
 					<th>Statut</th>
-					<th>Commentaire</th>
+					<th>Commentaire initial</th>
+					<th>Sélectionner</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr class="status_warning">
 					<td>SAIPOL</td>
-					<td>19FRG0432000482724020</td>
+					<td><a href="{% url 'operators-lot' %}">19FRG0432000482724020</a></td>
 					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
@@ -34,10 +35,11 @@
 					<td>FR</td>
 					<td>En attente</td>
 					<td>Bonjour, GES Total correct ?</td>
+					<td><input type="checkbox" /></td>
 				</tr>
 				<tr class="status_warning">
 					<td>SAIPOL</td>
-					<td>19FRG0432000482724020</td>
+					<td><a href="{% url 'operators-lot' %}">19FRG0432000482724020</a></td>
 					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
@@ -45,31 +47,37 @@
 					<td>MY</td>
 					<td>En attente</td>
 					<td>Colza de Malaysie???</td>
+					<td><input type="checkbox" /></td>
 				</tr>
 				<tr>
 					<td>SAIPOL</td>
-					<td>19FRG0432000482724020</td>
+					<td><a href="{% url 'operators-lot' %}">19FRG0432000482724020</a></td>
 					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
 					<td>Colza</td>
 					<td>FR</td>
 					<td>Corrigé</td>
-					<td>Corrigé</td>
+					<td>Volume incorrect</td>
+					<td><input type="checkbox" /></td>
 				</tr>
 				<tr class="status_ok">
 					<td>SAIPOL</td>
-					<td>19FRG0432000482724020</td>
+					<td><a href="{% url 'operators-lot' %}">19FRG0432000482724020</a></td>
 					<td>1/10/2019</td>
 					<td>28,687</td>
 					<td>EMHV</td>
 					<td>Colza</td>
 					<td>FR</td>
 					<td>Correction Validée</td>
-					<td>Correction Validée</td>
+					<td>Pays origine incorrect</td>
+					<td><input type="checkbox" disabled="disabled" /></td>
 				</tr>
-			</tbody>
+			</tbody>			
 		</table>
+		<div class="flex-container-right">
+			<a class="button secondary" href="#" id="btn_accept">Valider Correction & Accepter Lots</a>
+		</div>					
 	</div>
 </div>
 {% endblock %}
@@ -79,15 +87,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.js"></script>
 <script type="text/javascript">
-var colname2colid = {'DAE_COLID': 0, 'DEPOT_COLID': 1, 'DATE_ENTREE_COLID': 2, 'VOLUME_COLID': 3, 'TYPE_COLID': 4, 'FILIERE_COLID': 5, 'CATEGORY_COLID': 6,
-'SYSTEME_FOURNISSEUR_COLID': 7, 'PAYS_ORIGINE_COLID': 8, 'RESPECT_CRIT_DURABILITE_COLID': 9, 'GES_TRANSPORT_COLID': 10, 'GES_TOTAL_COLID': 11,
-'GES_FOSSILE_COLID': 12, 'GES_REDUCTION_COLID': 13, 'NUM_DOUBLE_COMPTAGE_COLID': 14, 'PAYS_COLID': 15, 'DATE_MISE_EN_SERVICE_COLID': 16, 'LOT_STATUT_COLID': 17,
-'AFFILIATION_COLID': 18, 'SELECT_CHECKBOX_COLID': 19}
-
-var colid2colname = {}
-Object.keys(colname2colid).forEach(key => { colid2colname[colname2colid[key]] = key });
-
-var col2field = {DEPOT_COLID: 'ml_depot', DAE_COLID: 'ml_dae', DATE_ENTREE_COLID: 'ml_date_entree', VOLUME_COLID: 'ml_volume', TYPE_COLID: 'ml_type', FILIERE_COLID:'ml_filiere', CATEGORY_COLID:'ml_cat', SYSTEME_FOURNISSEUR_COLID: 'ml_systeme_fournisseur', PAYS_ORIGINE_COLID:'ml_pays_origine', RESPECT_CRIT_DURABILITE_COLID:'ml_respect_crit_durabilite', GES_TRANSPORT_COLID:'ml_ges_transport_distribution', GES_TOTAL_COLID: 'ml_ges_total', GES_FOSSILE_COLID:'ml_ges_fossile', GES_REDUCTION_COLID:'ml_ges_reduction', NUM_DOUBLE_COMPTAGE_COLID:'ml_num_double_comptage', PAYS_COLID:'ml_pays', DATE_MISE_EN_SERVICE_COLID:'ml_date_mise_en_service', LOT_STATUT_COLID: 'ml_statut', AFFILIATION_COLID: 'ml_affiliation', SELECT_CHECKBOX_COLID:'ml_select'}
+var colname2colid = {'VENDEUR_COLID': 0, 'DAE_COLID': 1, 'DATE_ENTREE_COLID': 2, 'VOLUME_COLID': 3, 'TYPE_COLID': 4, 'FILIERE_COLID': 5, 'PAYS_ORIGINE_COLID': 6, 'STATUT_COLID': 7, 'COMMENTAIRE_COLID': 8, 'SELECT_CHECKBOX_COLID': 9}
 
 var selected_rows = {}
 
@@ -100,20 +100,76 @@ $(document).ready(function() {
 		ordering: false,
 		autoWidth: false,
 		scrollCollapse: true,
-        fixedColumns: {
-        	leftColumns: 1,
-            rightColumns: 3,
-        },
 		columnDefs: [
       		{"className": "dt-center", "targets": "_all"}
    		],		
 	});
 
-	$('#datatable_wrapper tbody').on('click', 'td', function() {
-		let cell = table.cell(this)
-		let row = $(this).closest('tr');
+	function correction_details(d) {
+	    // `d` is the original data object for the row
+	    return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
+	        '<tr>'+
+	            '<td>Message Opérateur:</td>'+
+	            '<td>'+d.message_operateur+'</td>'+
+	        '</tr>'+
+	        '<tr>'+
+	            '<td>Message Producteur:</td>'+
+	            '<td>'+d.message_producteur+'</td>'+
+	        '</tr>'+
+	    '</table>';
+	}
+ 
+	function show_hide_action_buttons() {
+		// buttons Accepter & Refuser
+		let keys = Object.keys(selected_rows)
+		var btn_accept = document.getElementById("btn_accept")
+		if (keys.length > 0) {
+			// at least one row selected, activate buttons
+			$("#btn_accept").addClass('primary')
+			$("#btn_accept").removeClass('secondary')		
+		} else {
+			$("#btn_accept").removeClass('primary')
+			$("#btn_accept").addClass('secondary')
+		}
+	}
+
+	/* click on datatable row */
+	// click the checkbox
+	$('#datatable_wrapper tbody').on('click', 'input', function() {
+		let hrow = $(this).closest("tr")
+		let row = table.row(hrow)
 		let data = table.row(row).data();	
-		window.location = "{% url 'operators-lot' %}"
+		let rowid = table.row(row).index();
+		// add to selection if checked, otherwise remove
+		if (rowid in selected_rows) {
+			delete selected_rows[rowid]
+		} else {
+			selected_rows[rowid] = data
+		}
+		show_hide_action_buttons()
+	})
+
+
+	$('#datatable_wrapper tbody').on('click', 'td', function() {
+		let tr = $(this).closest('tr');
+        var row = table.row(tr); 
+
+		let cell = table.cell(this)
+		let colid = cell.index()['column']
+   		if (colid == colname2colid['SELECT_CHECKBOX_COLID']) {
+			// ignore clicks on checkbox column
+			return
+		}
+        if (row.child.isShown()) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        }
+        else {
+            // Open this row
+            row.child(correction_details({message_operateur: 'Message operateur question?', message_producteur: 'Message producteur reponse'})).show();
+            tr.addClass('shown');
+        }
 	});
 });
 
