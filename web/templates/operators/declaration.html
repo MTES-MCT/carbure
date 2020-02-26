@@ -9,7 +9,7 @@
 <div class="main" style="overflow-x: auto;">
 	<div class="panel">
 		<h3>Lots</h3>
-<div class="button-container" id="container">
+<div class="button-container">
   <div class="button-item">		
   	<a class="button modal-button" id="btn_modal_columns">Filtrer</a>
 	<div class="modal__backdrop" id="modal_columns">
@@ -107,9 +107,6 @@
   	<a class="button" id="btn_export" style="margin-left: auto;">Export CSV</a>
   </div>
 </div>		
-
-
-		
 		<table class="display nowrap" id="datatable">
 			<thead>
 				<tr>
@@ -130,9 +127,9 @@
 					<th>Numéro d'enregistrement double-comptage</th>
 					<th>Pays d'implantation</th>
 					<th>Date de mise en service</th>
-					<th>Statut du Lot</th>
+					<th>Statut</th>
 					<th>Provenance</th>
-					<th>Sélectionner</th>
+					<th><input type="checkbox" /></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -248,9 +245,15 @@
 				</tr>
 			</tbody>
 		</table>
-		<div class="flex-container-left">
-			<a class="button primary" href="#" id="add_lot">Ajouter Lot</a>
-		</div>		
+		<div class="button-container">
+			<div class="button-item">
+				<a class="button primary" href="#" id="add_lot">Ajouter Lot</a>
+			</div>
+			<div class="button-item button-push">
+				<a class="button secondary" href="#" id="">Valider Lots</a>
+				<a class="button secondary" href="#" id="">Déclarer Lots</a>
+			</div>
+		</div>				
 	</div>
 </div>
 
