@@ -1,0 +1,120 @@
+{% extends "operators/index.html" %}
+
+{% block operator %}
+<div class="main">
+  <div class="panel">
+    <div class="panel__header">
+      <h3>Lot</h3>
+      <small class="panel__header-extra">19FRG0432000482724020</small>
+    </div>
+		<section class="flex-container">
+			<div class="flex-container-left">
+				<div class="form__group">
+					<h2>Informations Générales</h2>
+					<table>
+						<thead>
+							<th>Dépôt</th>
+							<th>N°DAE ou DAA</th>
+							<th>Volume</th>
+							<th>Date d'entrée en EFS ou UER</th>
+							<th>Pays d'implantation</th>
+							<th>Date de mise en service</th>
+						</thead>
+						<tbody>
+							<td><input type="text" value="" id="ml_depot"></td>
+							<td><input type="text" value="" id="ml_dae"></td>
+							<td><input type="text" value="" id="ml_volume"></td>
+							<td><input type="text" value="" id="ml_date_entree"></td>
+							<td><input type="text" value="" id="ml_pays"></td>
+							<td><input type="text" value="" id="ml_date_mise_en_service"></td>							
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+		<section class="flex-container">
+			<div class="flex-container-left">
+				<div class="form__group">
+					<h2>Durabilité</h2>
+					<table>
+						<thead>
+							<th>Filière de Production</th>
+							<th>Type</th>
+							<th>Catégorie</th>
+							<th>Système Fournisseur</th>
+							<th>Pays d'origine</th>
+							<th>Respect des critères de durabilité</th>
+							<th>Éligible double-comptage</th>
+						</thead>
+						<tbody>
+							<td>
+								<select id="ml_filiere">
+									<option>Choisissez...</option>
+									<option>Colza</option>
+									<option>Maïs</option>
+									<option>Navet</option>
+									<option>Fenouil</option>
+								</select>								
+							</td>
+							<td><input type="text" id="ml_type" /></td>
+							<td><input type="text" id="ml_category" /></td>
+							<td><input type="text" id="ml_systeme_fournisseur" /></td>
+							<td><input type="text" id="ml_pays_origine" /></td>
+							<td><input type="text" id="ml_respect_crit_durabilite" /></td>
+							<td><input type="text" id="ml_num_double_comptage" /></td>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+		<section class="flex-container">
+			<div class="flex-container-left">
+				<div class="form__group">
+					<h2>Émissions GES</h2>
+					<table>
+						<thead>
+							<th>GES transport et distribution</th>
+							<th>Total émissions de GES</th>
+							<th>GES du carburant fossile</th>
+							<th>% de réduction totale</th>
+						</thead>
+						<tbody>
+							<td><input type="text" id="ml_ges_transport_distribution" /></td>
+							<td><input type="text" id="ml_ges_total" /></td>
+							<td><input type="text" id="ml_ges_fossile" /></td>
+							<td><input type="text" id="ml_ges_reduction" /></td>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+		<section class="flex-container">
+			<div class="flex-container-left">
+				<div class="form__group">
+					<h2>Affiliation</h2>
+					<table>
+						<thead>
+							<th>Date</th>
+							<th>Vendeur</th>
+							<th>Acheteur</th>
+						</thead>
+						<tbody>
+							<td><input type="text" id="ml_date_affiliation" value="27/01/2020"/></td>
+							<td><input type="text" id="ml_vendeur" value="BioRaffinerie Lambda"/></td>
+							<td><input type="text" id="ml_acheteur" value="SAIPOL"/></td>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>		
+		<section class="flex-container-right">
+			<div class="form__group button__group">
+				<a class="button primary close" href="#">Accepter</a>
+				<a class="button primary close" href="#">Refuser</a>
+				<a class="button secondary close" href="#">Accepter sous réserve</a>
+			</div>
+		</section>
+
+  </div>
+</div>
+{% endblock %}

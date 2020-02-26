@@ -21,6 +21,14 @@ def operators_declaration(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_operators
+def operators_lot(request, *args, **kwargs):
+  context = kwargs['context']
+  context['current_url_name'] = 'operators-lot'
+  return render(request, 'operators/lot.html', context)
+
+@login_required
+@enrich_with_user_details
+@restrict_to_operators
 def operators_export(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'operators-export'
