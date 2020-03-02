@@ -32,6 +32,8 @@
 		</div>
 		<table class="display nowrap" id="datatable">
 			<!-- dynamically generated in js -->
+			<thead></thead>
+			<tbody></tbody>
 		</table>
 		<div class="flex-container-right">
 			<select id="select_affiliate">
@@ -165,7 +167,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.js"></script>
 <script type="text/javascript">
-var table_columns = [{title:'N°DAE', can_hide: true, can_duplicate: false}, {title: 'Volume', can_hide: true, can_duplicate: true}, {title:'Type', can_hide: true, can_duplicate: true}, {title:'Matière Première', can_hide: true, can_duplicate: true}, {title:'Catégorie', can_hide: true, can_duplicate: true}, {title:`Pays d'origine`, can_hide: true, can_duplicate: true}, {title:'GES Tranport et Distribution', can_hide: true, can_duplicate: true}, {title:'GES Fossile', can_hide: true, can_duplicate: true}, {title:'% de réduction', can_hide: true, can_duplicate: true, read_only: true}, {title:`Pays d'implantation`, can_hide: true, can_duplicate: true}, {title:'Date de mise en service', can_hide: true, can_duplicate: true}, {title:'Statut', can_hide: true, can_duplicate: true, read_only: true}, {title:'Client', can_hide: true, can_duplicate: true}, {title:`<input type="checkbox" id="checkbox_header"/>`, can_hide: false, can_duplicate: false, read_only: true}]
+var table_columns = [{title:'N°DAE', can_hide: true, can_duplicate: false, data:'num_dae'}, {title: 'Volume', can_hide: true, can_duplicate: true, data: 'volume'}, {title:'Type', can_hide: true, can_duplicate: true, can_filter: true, data: 'type'}, {title:'Matière Première', can_hide: true, can_duplicate: true, can_filter: true, data: 'matiere_premiere'}, {title:`Pays d'origine`, can_hide: true, can_duplicate: true, can_filter: true, data: 'pays_origine'}, {title:'GES Tranport et Distribution', can_hide: true, can_duplicate: true, data: 'ges_transport_distribution'}, {title:'GES Fossile', can_hide: true, can_duplicate: true, data: 'ges_fossile'}, {title:'% de réduction', can_hide: true, can_duplicate: true, read_only: true, data: 'ges_reductions'}, {title:`Pays d'implantation`, can_hide: true, can_duplicate: true, can_filter: true, data:'pays_implantation'}, {title:'Date de mise en service', can_hide: true, can_duplicate: true, can_filter: true, data: 'date_mise_en_service'}, {title:'Statut', can_hide: true, can_duplicate: true, read_only: true, can_filter: true, data: 'statut'}, {title:'Client', can_hide: true, can_duplicate: true, can_filter: true, data:'client'}, {title:`<input type="checkbox" id="checkbox_header"/>`, can_hide: false, can_duplicate: false, read_only: true, data:'checkbox'}]
 
 var selected_rows = {}
 
@@ -193,19 +195,37 @@ $(document).ready(function() {
 		paging: false,
 		info: false,
 		scrollX: true,
-		searching: false,
-		autoWidth: false,
-		scrollCollapse: true,
+		//autoWidth: false,
+		//scrollCollapse: true,
         fixedColumns: {
         	leftColumns: 1,
             rightColumns: 3,
         },
+		dom: "lrtip",
 		columnDefs: [
        		{"className": "dt-center", "targets": "_all"}
    		],
    		columns: table_columns,
-   		ajax: '{% url 'api-producers-sample-lots' %}'
-	});
+   		ajax: '{% url 'api-producers-sample-lots' %}',
+		initComplete: function() {
+            this.api().columns().every(function () {
+                var column = this;
+                let table_column = table_columns[column.index()]
+                if (table_column.can_filter === true) {
+                	console.log(`Adding filter for column ${table_column.title}`)
+	                var select = $('<select><option value=""></option></select>')
+	                    .appendTo( $(column.footer()).empty() )
+	                    .on('change', function() {
+	                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
+	                        column.search(val ? '^'+val+'$' : '', true, false).draw();
+	                    });
+	                column.data().unique().sort().each(function (d, j) {
+	                    select.append('<option value="'+d+'">'+d+'</option>')
+	                });
+	            }
+            });
+         },   		
+	}).draw();
 
 	function loadTableSettings() {
 		var tableSettings = localStorage.getItem('tableSettings');
