@@ -14,29 +14,8 @@ services:
     networks:
     - carbure
 
-  carbure-django-migration:
-    image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:${IMAGE_TAG}
-    container_name: carbure_app_migration
-    command: bash /app/web/migration.sh
-    environment:
-      DJANGO_DATABASE: ${DJANGO_DATABASE}
-      DJANGO_DB_USER: ${DJANGO_DB_USER}
-      DJANGO_DB_PASSWORD: ${DJANGO_DB_PASSWORD}
-      DJANGO_DB_HOST: ${DJANGO_DB_HOST}
-      DJANGO_DB_PORT: ${DJANGO_DB_PORT}
-      ALLOWED_HOSTS: ${ALLOWED_HOSTS}      
-      SECRET_KEY: ${SECRET_KEY}
-      DEBUG: ${DEBUG}
-      CARBURE_HOME: /app            
-      SENTRY_DSN: ${SENTRY_DSN}
-      IMAGE_TAG: ${IMAGE_TAG}
-    depends_on:
-    - carbure-mariadb
-    networks:
-    - carbure
-
   carbure-django-uwsgi:
-    command: uwsgi --ini /app/web/carbure_uwsgi.ini --touch-reload=/app/web/carbure_uwsgi.ini
+    command: bash /app/web/run.sh
     restart: always
     container_name: carbure_app
     image: registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:${IMAGE_TAG}
@@ -58,7 +37,6 @@ services:
       EMAIL_USE_TLS = ${EMAIL_USE_TLS}
     depends_on:
     - carbure-mariadb
-    - carbure-django-migration
     networks:
     - carbure
 
@@ -85,7 +63,7 @@ services:
     image: containrrr/watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: carbure_web carbure_app carbure_app_migration --interval 30
+    command: carbure_web carbure_app --interval 30
 
   certbot:
     image: certbot/certbot
