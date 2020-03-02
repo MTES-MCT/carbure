@@ -35,11 +35,11 @@ services:
       SENTRY_DSN: ${SENTRY_DSN}
       AWS_ACCESS_KEY_ID: ${SCALEWAY_API_KEY}
       AWS_SECRET_ACCESS_KEY: ${SCALEWAY_API_SECRET}
-      EMAIL_HOST = ${EMAIL_HOST}
-      EMAIL_PORT = ${EMAIL_PORT}
-      EMAIL_HOST_USER = ${EMAIL_HOST_USER}
-      EMAIL_HOST_PASSWORD = ${EMAIL_HOST_PASSWORD}
-      EMAIL_USE_TLS = ${EMAIL_USE_TLS}
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
+      EMAIL_USE_TLS: ${EMAIL_USE_TLS}
     volumes:
     - ${CARBURE_HOME}:/app #for dev only, allows for auto-refresh of files
     depends_on:
