@@ -32,9 +32,9 @@
 		</div>
 		<table class="display nowrap" id="datatable">
 			<!-- dynamically generated in js -->
-			<tbody></tbody>
 			<thead></thead>
 			<tfoot></tfoot>
+			<tbody></tbody>
 		</table>
 		<div class="flex-container-right">
 			<select id="select_affiliate">
@@ -200,12 +200,10 @@ $(document).ready(function() {
 		paging: false,
 		info: false,
 		scrollX: true,
-		autowidth: true,
-		scrollCollapse: true,
-        /*fixedColumns: {
+        fixedColumns: {
         	leftColumns: 1,
-            rightColumns: 3,
-        },*/
+        	rightColumns: 3,
+        },
 		dom: "lrtip",
 		columnDefs: [
        		{"className": "dt-center", "targets": "_all"}
@@ -522,19 +520,25 @@ $(document).ready(function() {
 
 // fixed column styling on row hover
 $(document).on({
-	/*mouseenter: function () {
-		trIndex = $(this).index()+1;
-		$("table.dataTable").each(function(index) {
+	mouseenter: function () {
+		trIndex = $(this).index();
+		$("#datatable tbody").each(function(index) {
+			$(this).find("tr:eq("+trIndex+")").addClass("hover")
+		});
+		$("table.dataTable.DTFC_Cloned tbody").each(function(index) {
 			$(this).find("tr:eq("+trIndex+")").addClass("hover")
 		});
 	},
 	mouseleave: function () {
-		trIndex = $(this).index()+1;
-		$("table.dataTable").each(function(index) {
+		trIndex = $(this).index();
+		$("#datatable tbody").each(function(index) {
 			$(this).find("tr:eq("+trIndex+")").removeClass("hover");
 		});
-	}*/
-}, ".dataTables_wrapper tr");
+		$("table.dataTable.DTFC_Cloned tbody").each(function(index) {
+			$(this).find("tr:eq("+trIndex+")").removeClass("hover");
+		});		
+	}
+}, ".dataTables_wrapper tbody tr");
 
 </script>
 
