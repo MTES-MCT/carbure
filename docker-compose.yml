@@ -18,7 +18,7 @@ services:
     build:
       context: ${CARBURE_HOME}
       dockerfile: docker/Dockerfile.django
-    command: uwsgi --ini /app/web/carbure_uwsgi.ini --touch-reload=/app/web/carbure_uwsgi.ini
+    command: /app/web/run.sh
     restart: always
     container_name: carbure_app
     image: carbure_app:latest
@@ -39,7 +39,6 @@ services:
     - ${CARBURE_HOME}:/app #for dev only, allows for auto-refresh of files
     depends_on:
     - carbure-mariadb
-    - carbure-django-migration
     networks:
     - carbure
 
