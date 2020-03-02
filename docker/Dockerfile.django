@@ -33,5 +33,7 @@ COPY web/fixtures /app/web/fixtures
 COPY web/api /app/web/api
 COPY web/migration.sh /app/web/migration.sh
 
+COPY scripts /app/scripts
+
 
 
