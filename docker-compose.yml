@@ -14,26 +14,6 @@ services:
     networks:
     - carbure
 
-  carbure-django-migration:
-    image: carbure_app:latest
-    container_name: carbure_app_migration
-    command: python3 /app/web/manage.py migrate --noinput
-    environment:
-      DJANGO_DATABASE: ${DJANGO_DATABASE}
-      DJANGO_DB_USER: ${DJANGO_DB_USER}
-      DJANGO_DB_PASSWORD: ${DJANGO_DB_PASSWORD}
-      DJANGO_DB_HOST: ${DJANGO_DB_HOST}
-      DJANGO_DB_PORT: ${DJANGO_DB_PORT}
-      ALLOWED_HOSTS: ${ALLOWED_HOSTS}      
-      SECRET_KEY: ${SECRET_KEY}
-      DEBUG: ${DEBUG}
-      CARBURE_HOME: /app      
-      SENTRY_DSN: ${SENTRY_DSN}      
-    depends_on:
-    - carbure-mariadb
-    networks:
-    - carbure
-
   carbure-django-uwsgi:
     build:
       context: ${CARBURE_HOME}
