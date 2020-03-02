@@ -34,6 +34,15 @@ def administrators_suivi_corrections(request, *args, **kwargs):
   context['current_url_name'] = 'administrators-suivi-corrections'
   return render(request, 'administrators/suivi_corrections.html', context)
 
+
+@login_required
+@enrich_with_user_details
+@restrict_to_administrators
+def administrators_gestion_utilisateurs(request, *args, **kwargs):
+  context = kwargs['context']
+  context['current_url_name'] = 'administrators-gestion-utilisateurs'
+  return render(request, 'administrators/gestion_utilisateurs.html', context)
+
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
