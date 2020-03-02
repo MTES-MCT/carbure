@@ -53,6 +53,8 @@ services:
       DEBUG: ${DEBUG}
       CARBURE_HOME: /app
       SENTRY_DSN: ${SENTRY_DSN}
+      AWS_ACCESS_KEY_ID: ${SCALEWAY_API_KEY}
+      AWS_SECRET_ACCESS_KEY: ${SCALEWAY_API_SECRET}
     volumes:
     - ${CARBURE_HOME}:/app #for dev only, allows for auto-refresh of files
     depends_on:
