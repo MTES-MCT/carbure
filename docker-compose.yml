@@ -18,7 +18,7 @@ services:
     build:
       context: ${CARBURE_HOME}
       dockerfile: docker/Dockerfile.django
-    command: /app/web/run.sh
+    command: bash /app/web/run.sh
     restart: always
     container_name: carbure_app
     image: carbure_app:latest
