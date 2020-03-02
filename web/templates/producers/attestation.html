@@ -12,75 +12,8 @@
 		<a class="button modal-button" id="btn_modal_columns">Filtrer</a>
 		<div class="modal__backdrop" id="modal_columns">
 			<div class="modal">
-				<table>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox0" class="toggle-vis" data-column="0"></td>
-						<td><label for="checkbox0" class="label-inline">N°DAE ou DAA</label></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox1" class="toggle-vis" data-column="1"></td>
-						<td><label for="checkbox1" class="label-inline">Dépôt</label></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox2" class="toggle-vis" data-column="2"></td>
-						<td><label for="checkbox2" class="label-inline">Date d'entrée</label></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox3" class="toggle-vis" data-column="3"></td>
-						<td><label for="checkbox3" class="label-inline">Volume</label></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox4" class="toggle-vis" data-column="4"></td>
-						<td><label for="checkbox4" class="label-inline">Types</label></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox5" class="toggle-vis" data-column="5"></td>
-						<td><label for="checkbox5" class="label-inline">Filière de production</label></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox6" class="toggle-vis" data-column="6"></td>
-						<td><label for="checkbox6" class="label-inline">Catégorie</label></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox7" class="toggle-vis" data-column="7"></td>
-						<td><label for="checkbox7" class="label-inline">Système fournisseur</label></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox8" class="toggle-vis" data-column="8"></td>
-						<td><label for="checkbox8" class="label-inline">Pays d'origine</label></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox9" class="toggle-vis" data-column="9"></td>
-						<td><label for="checkbox9" class="label-inline">Respect des critères de durabilité</label></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox10" class="toggle-vis" data-column="10"></td>
-						<td><label for="checkbox10" class="label-inline">GES transport et distribution</label></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox11" class="toggle-vis" data-column="11"></td>
-						<td><label for="checkbox11" class="label-inline">Total émissions GES</label></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox12" class="toggle-vis" data-column="12"></td>
-						<td><label for="checkbox12" class="label-inline">GES carburant fossile</label></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox13" class="toggle-vis" data-column="13"></td>
-						<td><label for="checkbox13" class="label-inline">% de réduction totale</label></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox14" class="toggle-vis" data-column="14"></td>
-						<td><label for="checkbox14" class="label-inline">Éligible double-comptage</label></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox15" class="toggle-vis" data-column="15"></td>
-						<td><label for="checkbox15" class="label-inline">Pays d'implantation</label></td>
-					</tr>
-					<tr>
-						<td><input type="checkbox" name="checkbox" id="checkbox16" class="toggle-vis" data-column="16"></td>
-						<td><label for="checkbox16" class="label-inline">Date de mise en service</label></td>
-					</tr>
+				<table id="table_columns_filter">
+					<!-- dynamically generated in js -->
 				</table>
 				<div class="form__group button__group">
 					<a class="button secondary close">Ok</a>
@@ -98,166 +31,7 @@
 			</div>
 		</div>
 		<table class="display nowrap" id="datatable">
-			<thead>
-				<tr>
-					<th>N°DAE ou DAA</th>
-					<th>Dépôt</th>
-					<th>Date d'entrée</th>
-					<th>Volume</th>
-					<th>Types</th>
-					<th>Filière de production</th>
-					<th>Catégorie</th>
-					<th>Système fournisseur</th>
-					<th>Pays d'origine</th>
-					<th>Respect des critères de durabilité</th>
-					<th>GES transport et distribution</th>
-					<th>Total émissions de GES</th>
-					<th>GES du carburant fossile</th>
-					<th>% de réduction totale</th>
-					<th>Éligible double-comptage</th>
-					<th>Pays d'implantation</th>
-					<th>Date de mise en service</th>
-					<th>Statut</th>
-					<th>Affiliation</th>
-					<th><input type="checkbox" id="checkbox_header"/></th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for lot in lots %}
-				<tr>
-					<td>{{lot.num_dae}}</td>
-					<td>{{lot.depot}}</td>
-					<td>{{lot.date_entree}}</td>
-					<td>{{lot.volume}}</td>
-					<td>{{lot.type_biocarburant}}</td>
-					<td>{{lot.filiere_production}}</td>
-					<td>{{lot.categorie}}</td>
-					<td>{{lot.systeme_fournisseur}}</td>
-					<td>{{lot.pays_origine}}</td>
-					<td>{{lot.respect_crit_durabilite}}</td>
-					<td>{{lot.ges_transport_distrib}}</td>
-					<td>{{lot.ges_fossile}}</td>
-					<td></td>
-					<td></td>
-					<td>{{lot.eligible_double_comptage}}</td>
-					<td>{{lot.pays_production}}</td>
-					<td>{{lot.date_mise_en_service}}</td>
-					<td>{{lot.status}}</td>
-					<td>{{lot.affiliate}}</td>
-					<td><input type="checkbox" /></td>
-				</tr>				 
-				{% endfor %}
-				<tr>
-					<td>19FRG0432000482724020</td>
-					<td>GRANDPUITS</td>
-					<td>1/10/2019</td>
-					<td>28,687</td>
-					<td>EMHV</td>
-					<td>Colza</td>
-					<td>CONV</td>
-					<td>SV-2BS010010</td>
-					<td>FR</td>
-					<td>Oui</td>
-					<td>1.00</td>
-					<td>34.12</td>
-					<td>83.80</td>
-					<td>59.28%</td>
-					<td>N/A</td>
-					<td>FR</td>
-					<td>1/7/2007</td>
-					<td>Validé</td>
-					<td>OperateurGamma</td>
-					<td><input type="checkbox" /></td>
-				</tr>
-				<tr>
-					<td>19FRG0432000482724020</td>
-					<td>GRANDPUITS</td>
-					<td>1/10/2019</td>
-					<td>28,687</td>
-					<td>EMHV</td>
-					<td>Colza</td>
-					<td>CONV</td>
-					<td>SV-2BS010010</td>
-					<td>FR</td>
-					<td>Oui</td>
-					<td>1.00</td>
-					<td>34.12</td>
-					<td>83.80</td>
-					<td>59.28%</td>
-					<td>N/A</td>
-					<td>FR</td>
-					<td>1/7/2007</td>
-					<td>Validé</td>
-					<td>--</td>
-					<td><input type="checkbox" /></td>
-				</tr>	
-				<tr>
-					<td>19FRG0432000482724020</td>
-					<td>GRANDPUITS</td>
-					<td>1/10/2019</td>
-					<td>28,687</td>
-					<td>EMHV</td>
-					<td>Colza</td>
-					<td>CONV</td>
-					<td>SV-2BS010010</td>
-					<td>FR</td>
-					<td>Oui</td>
-					<td>1.00</td>
-					<td>34.12</td>
-					<td>83.80</td>
-					<td>59.28%</td>
-					<td>N/A</td>
-					<td>FR</td>
-					<td>1/7/2007</td>
-					<td>Validé</td>
-					<td>--</td>
-					<td><input type="checkbox" /></td>
-				</tr>							
-				<tr>
-					<td>19FRG0432000482724020</td>
-					<td>GRANDPUITS</td>
-					<td>1/10/2019</td>
-					<td>28,687</td>
-					<td>EMHV</td>
-					<td>Colza</td>
-					<td>CONV</td>
-					<td>SV-2BS010010</td>
-					<td>FR</td>
-					<td>Oui</td>
-					<td>1.00</td>
-					<td>34.12</td>
-					<td>83.80</td>
-					<td>59.28%</td>
-					<td>N/A</td>
-					<td>FR</td>
-					<td>1/7/2007</td>
-					<td>Brouillon</td>
-					<td>--</td>					
-					<td><input type="checkbox" /></td>
-				</tr>
-				<tr>
-					<td>19FRG0432000482724020</td>
-					<td>GRANDPUITS</td>
-					<td>1/10/2019</td>
-					<td>28,687</td>
-					<td>EMHV</td>
-					<td>Colza</td>
-					<td>CONV</td>
-					<td>SV-2BS010010</td>
-					<td>FR</td>
-					<td>Oui</td>
-					<td>1.00</td>
-					<td>34.12</td>
-					<td>83.80</td>
-					<td>59.28%</td>
-					<td>N/A</td>
-					<td>FR</td>
-					<td>1/7/2007</td>
-					<td>Validé</td>
-					<td>Export</td>					
-					<td><input type="checkbox" /></td>
-				</tr>
-			</tbody>
+			<!-- dynamically generated in js -->
 		</table>
 		<div class="flex-container-right">
 			<select id="select_affiliate">
@@ -274,81 +48,14 @@
 			<a id="btn_delete" class="button primary" href="#">Supprimer Lots</a>
 		</div>
 		<div class="flex-container-left">
-			<a class="button primary" id="add_lot">Ajouter Lot</a>
+			<a class="button primary "id="add_lot">Ajouter Lot</a>
 			<a id="add_lot_params" style="margin-top: auto;"><small>Paramètres</small></a>
 		</div>		
 	    <div class="form__group" id="add_lot_params_toggle" style="display: none;">
 	      <fieldset>
 	      <legend><small>Sélectionnez les valeurs à dupliquer lors de l'ajout de lot</small></legend>
-	      <ul class="flex-container-a">
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox0" class="toggle-lot-param" data-column="0">
-	          <label for="add_checkbox0" class="label-inline">Dépôt</label>
-	        </li>
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox1" class="toggle-lot-param" data-column="1">
-	          <label for="add_checkbox1" class="label-inline">N°DAE ou DAA</label>          
-	        </li>
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox2" class="toggle-lot-param" data-column="2">
-	          <label for="add_checkbox2" class="label-inline">Date d'entrée</label>          
-	        </li>
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox3" class="toggle-lot-param" data-column="3">
-	          <label for="add_checkbox3" class="label-inline">Volume</label>          
-	        </li>
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox4" class="toggle-lot-param" data-column="4">
-	          <label for="add_checkbox4" class="label-inline">Types</label>
-	        </li>          
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox5" class="toggle-lot-param" data-column="5">
-	          <label for="add_checkbox5" class="label-inline">Filière de production</label>
-	        </li>          
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox6" class="toggle-lot-param" data-column="6">
-	          <label for="add_checkbox6" class="label-inline">Catégorie</label>
-	        </li>          
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox7" class="toggle-lot-param" data-column="7">
-	          <label for="add_checkbox7" class="label-inline">Système fournisseur</label>
-	        </li>          
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox8" class="toggle-lot-param" data-column="8">
-	          <label for="add_checkbox8" class="label-inline">Pays d'origine</label>
-	        </li>          
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox9" class="toggle-lot-param" data-column="9">
-	          <label for="add_checkbox9" class="label-inline">Respect des critères de durabilité</label>
-	        </li>          
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox10" class="toggle-lot-param" data-column="10">
-	          <label for="add_checkbox10" class="label-inline">GES transport et distribution</label>
-	        </li>          
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox11" class="toggle-lot-param" data-column="11">
-	          <label for="add_checkbox11" class="label-inline">Total émissions GES</label>
-	        </li>          
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox12" class="toggle-lot-param" data-column="12">
-	          <label for="add_checkbox12" class="label-inline">GES carburant fossile</label>
-	        </li>          
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox13" class="toggle-lot-param" data-column="13">
-	          <label for="add_checkbox13" class="label-inline">% de réduction totale</label>
-	        </li>          
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox14" class="toggle-lot-param" data-column="14">
-	          <label for="add_checkbox14" class="label-inline">Éligible double-comptage</label>
-	        </li>          
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox15" class="toggle-lot-param" data-column="15">
-	          <label for="add_checkbox15" class="label-inline">Pays d'implantation</label>
-	        </li>          
-	        <li class="flex-item-a">
-	          <input type="checkbox" name="checkbox" id="add_checkbox16" class="toggle-lot-param" data-column="16">
-	          <label for="add_checkbox16" class="label-inline">Date de mise en service</label>
-	        </li>
+	      <ul class="flex-container-a" id="list_columns_filter">
+	      	<!-- dynamically generated in js -->
 	      </ul>
 	      </fieldset>
   		</div>       		
@@ -458,19 +165,30 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.js"></script>
 <script type="text/javascript">
-var colname2colid = {'DAE_COLID': 0, 'DEPOT_COLID': 1, 'DATE_ENTREE_COLID': 2, 'VOLUME_COLID': 3, 'TYPE_COLID': 4, 'FILIERE_COLID': 5, 'CATEGORY_COLID': 6,
-'SYSTEME_FOURNISSEUR_COLID': 7, 'PAYS_ORIGINE_COLID': 8, 'RESPECT_CRIT_DURABILITE_COLID': 9, 'GES_TRANSPORT_COLID': 10, 'GES_TOTAL_COLID': 11,
-'GES_FOSSILE_COLID': 12, 'GES_REDUCTION_COLID': 13, 'NUM_DOUBLE_COMPTAGE_COLID': 14, 'PAYS_COLID': 15, 'DATE_MISE_EN_SERVICE_COLID': 16, 'LOT_STATUT_COLID': 17,
-'AFFILIATION_COLID': 18, 'SELECT_CHECKBOX_COLID': 19}
-
-var colid2colname = {}
-Object.keys(colname2colid).forEach(key => { colid2colname[colname2colid[key]] = key });
-
-var col2field = {DEPOT_COLID: 'ml_depot', DAE_COLID: 'ml_dae', DATE_ENTREE_COLID: 'ml_date_entree', VOLUME_COLID: 'ml_volume', TYPE_COLID: 'ml_type', FILIERE_COLID:'ml_filiere', CATEGORY_COLID:'ml_cat', SYSTEME_FOURNISSEUR_COLID: 'ml_systeme_fournisseur', PAYS_ORIGINE_COLID:'ml_pays_origine', RESPECT_CRIT_DURABILITE_COLID:'ml_respect_crit_durabilite', GES_TRANSPORT_COLID:'ml_ges_transport_distribution', GES_TOTAL_COLID: 'ml_ges_total', GES_FOSSILE_COLID:'ml_ges_fossile', GES_REDUCTION_COLID:'ml_ges_reduction', NUM_DOUBLE_COMPTAGE_COLID:'ml_num_double_comptage', PAYS_COLID:'ml_pays', DATE_MISE_EN_SERVICE_COLID:'ml_date_mise_en_service', LOT_STATUT_COLID: 'ml_statut', AFFILIATION_COLID: 'ml_affiliation', SELECT_CHECKBOX_COLID:'ml_select'}
+var table_columns = [{title:'N°DAE', can_hide: true, can_duplicate: false}, {title: 'Volume', can_hide: true, can_duplicate: true}, {title:'Type', can_hide: true, can_duplicate: true}, {title:'Matière Première', can_hide: true, can_duplicate: true}, {title:'Catégorie', can_hide: true, can_duplicate: true}, {title:`Pays d'origine`, can_hide: true, can_duplicate: true}, {title:'GES Tranport et Distribution', can_hide: true, can_duplicate: true}, {title:'GES Fossile', can_hide: true, can_duplicate: true}, {title:'% de réduction', can_hide: true, can_duplicate: true, read_only: true}, {title:`Pays d'implantation`, can_hide: true, can_duplicate: true}, {title:'Date de mise en service', can_hide: true, can_duplicate: true}, {title:'Statut', can_hide: true, can_duplicate: true, read_only: true}, {title:'Client', can_hide: true, can_duplicate: true}, {title:`<input type="checkbox" id="checkbox_header"/>`, can_hide: false, can_duplicate: false, read_only: true}]
 
 var selected_rows = {}
 
 $(document).ready(function() {
+	function initFilters() {
+		var table_columns_filter = $("#table_columns_filter")
+		var list_columns_filter = $("#list_columns_filter")
+		var columns_filter_html = ""
+		var list_columns_filter_html = ""
+		for (let i = 0, len = table_columns.length; i < len; i++) {
+			let column = table_columns[i]
+			if (column.can_hide === true) {
+				columns_filter_html += `<tr><td><input type="checkbox" id="checkbox${i}" class="toggle-vis" data-column="${i}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
+			}
+			if (column.can_duplicate === true) { 
+				list_columns_filter_html += `<li class="flex-item-a"><input type="checkbox" id="add_checkbox${i}" class="toggle-lot-param" data-column="${i}"><label for="add_checkbox${i}" class="label-inline">${column.title}</label></li>`
+			}
+		}
+		table_columns_filter.append(columns_filter_html)
+		list_columns_filter.append(list_columns_filter_html)		
+	}
+	initFilters()
+
 	var table = $('#datatable').DataTable({
 		paging: false,
 		info: false,
@@ -484,7 +202,9 @@ $(document).ready(function() {
         },
 		columnDefs: [
        		{"className": "dt-center", "targets": "_all"}
-   		],        
+   		],
+   		columns: table_columns,
+   		ajax: '{% url 'api-producers-sample-lots' %}'
 	});
 
 	function loadTableSettings() {
@@ -524,14 +244,13 @@ $(document).ready(function() {
 
 	function showHideTableColumns(columns) {
 		/* display table columns depending on config */
-		let frozen_columns = [colname2colid['DAE_COLID'], colname2colid['LOT_STATUT_COLID'], colname2colid['AFFILIATION_COLID'], colname2colid['SELECT_CHECKBOX_COLID']] // first column (depot) and last (selection) cannot be hidden
 		let nb_columns = table.columns().data().length
 
 		for (let i = 0, len = nb_columns; i < len; i++) {
 			let isChecked = columns[i]
 			let boxid = '#checkbox' + i
 			var column = table.column(i)
-			if (isChecked || frozen_columns.includes(i)) {
+			if (isChecked) {
 				$(boxid).prop("checked", true);
 				if (!column.visible()) {
 					column.visible(!column.visible()) 
@@ -616,10 +335,6 @@ $(document).ready(function() {
 		};
 		reader.readAsText(e.target.files[0]);
 	})
-
-
-
-
 
 	function display_lot_modal(data) {
         // add data to modal
