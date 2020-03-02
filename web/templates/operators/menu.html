@@ -8,10 +8,8 @@
 					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' %}">2019-12</a></li>
 				</ul>
 				{% endif %}
-			<li><a {% if current_url_name == 'operators-affiliations' %}class="active"{% endif %} href="{% url 'operators-affiliations' %}">Mes Affiliations<span class="badge badge-green">2</span></a></li>
-			<li><a {% if current_url_name == 'operators-corrections' %}class="active"{% endif %} href="{% url 'operators-corrections' %}">Mes Corrections<span class="badge badge-red">1</span></a></li>
-			<li><a {% if current_url_name == 'operators-controles' %}class="active"{% endif %} href="{% url 'operators-controles' %}">Mes Contrôles<span class="badge badge-red">2</span></a></li>			
-			<li><a {% if current_url_name == 'operators-export' %}class="active"{% endif %} href="{% url 'operators-export' %}">Export</a></li>
+			<li><a {% if current_url_name == 'operators-affiliations' %}class="active"{% endif %} href="{% url 'operators-affiliations' %}">Lots en Attente<span class="badge badge-green">2</span></a></li>
+			<li><a {% if current_url_name == 'operators-controles' %}class="active"{% endif %} href="{% url 'operators-controles' %}">Contrôles DGEC<span class="badge badge-red">2</span></a></li>			
 			<li><a {% if current_url_name == 'operators-annuaire' %}class="active"{% endif %} href="{% url 'operators-annuaire' %}">Annuaire</a></li>
 			<li><a {% if current_url_name == 'operators-settings' %}class="active"{% endif %} href="{% url 'operators-settings' %}">Paramètres</a></li>
 		</ul>
