@@ -32,8 +32,9 @@
 		</div>
 		<table class="display nowrap" id="datatable">
 			<!-- dynamically generated in js -->
-			<thead></thead>
 			<tbody></tbody>
+			<thead></thead>
+			<tfoot></tfoot>
 		</table>
 		<div class="flex-container-right">
 			<select id="select_affiliate">
@@ -191,16 +192,20 @@ $(document).ready(function() {
 	}
 	initFilters()
 
+	// create empty footer
+	let empty_footer = `<tr>${Array(table_columns.length).fill("<th></th>").join('')}</tr>`
+	$("#datatable tfoot").append(empty_footer)
+
 	var table = $('#datatable').DataTable({
 		paging: false,
 		info: false,
 		scrollX: true,
-		//autoWidth: false,
-		//scrollCollapse: true,
-        fixedColumns: {
+		autowidth: true,
+		scrollCollapse: true,
+        /*fixedColumns: {
         	leftColumns: 1,
             rightColumns: 3,
-        },
+        },*/
 		dom: "lrtip",
 		columnDefs: [
        		{"className": "dt-center", "targets": "_all"}
@@ -208,13 +213,14 @@ $(document).ready(function() {
    		columns: table_columns,
    		ajax: '{% url 'api-producers-sample-lots' %}',
 		initComplete: function() {
+			// create filter
             this.api().columns().every(function () {
                 var column = this;
                 let table_column = table_columns[column.index()]
                 if (table_column.can_filter === true) {
                 	console.log(`Adding filter for column ${table_column.title}`)
 	                var select = $('<select><option value=""></option></select>')
-	                    .appendTo( $(column.footer()).empty() )
+	                    .appendTo($(column.footer()).empty())
 	                    .on('change', function() {
 	                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
 	                        column.search(val ? '^'+val+'$' : '', true, false).draw();
@@ -225,7 +231,7 @@ $(document).ready(function() {
 	            }
             });
          },   		
-	}).draw();
+	});
 
 	function loadTableSettings() {
 		var tableSettings = localStorage.getItem('tableSettings');
@@ -515,22 +521,18 @@ $(document).ready(function() {
 
 // fixed column styling on row hover
 $(document).on({
-	mouseenter: function () {
+	/*mouseenter: function () {
 		trIndex = $(this).index()+1;
 		$("table.dataTable").each(function(index) {
-			$(this).find("tr:eq("+trIndex+")").each(function(index) {
-				$(this).addClass("hover");
-			});
+			$(this).find("tr:eq("+trIndex+")").addClass("hover")
 		});
 	},
 	mouseleave: function () {
 		trIndex = $(this).index()+1;
 		$("table.dataTable").each(function(index) {
-			$(this).find("tr:eq("+trIndex+")").each(function(index) {
-				$(this).removeClass("hover");
-			});
+			$(this).find("tr:eq("+trIndex+")").removeClass("hover");
 		});
-	}
+	}*/
 }, ".dataTables_wrapper tr");
 
 </script>
