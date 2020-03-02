@@ -218,7 +218,6 @@ $(document).ready(function() {
                 var column = this;
                 let table_column = table_columns[column.index()]
                 if (table_column.can_filter === true) {
-                	console.log(`Adding filter for column ${table_column.title}`)
 	                var select = $('<select><option value=""></option></select>')
 	                    .appendTo($(column.footer()).empty())
 	                    .on('change', function() {
@@ -228,10 +227,12 @@ $(document).ready(function() {
 	                column.data().unique().sort().each(function (d, j) {
 	                    select.append('<option value="'+d+'">'+d+'</option>')
 	                });
+	            } else {
+	            	$(column.footer()).append(table_column.title)
 	            }
-            });
-         },   		
-	});
+            }).draw()
+         }
+	})
 
 	function loadTableSettings() {
 		var tableSettings = localStorage.getItem('tableSettings');
