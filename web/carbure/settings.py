@@ -26,8 +26,9 @@ SECRET_KEY = env('SECRET_KEY')
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sentry_sdk.init(
-    dsn="%s" % (env('SENTRY_DSN')),
+    dsn=env('SENTRY_DSN'),
     integrations=[DjangoIntegration()],
+
     # If you wish to associate users to errors (assuming you are using
     # django.contrib.auth) you may enable sending PII data.
     send_default_pii=True
