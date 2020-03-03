@@ -57,7 +57,7 @@ class TypeBiocarburant(models.Model):
         verbose_name = 'Type de Biocarburant'
         verbose_name_plural = 'Types de Biocarburants'
 
-class FiliereProduction(models.Model):
+class MatierePremiere(models.Model):
     name = models.CharField(max_length=64)
     description = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
@@ -66,9 +66,9 @@ class FiliereProduction(models.Model):
         return self.name
 
     class Meta:
-        db_table = 'filieres_production'
-        verbose_name = 'Filiere de Production'
-        verbose_name_plural = 'Filieres de Production'
+        db_table = 'matieres_premieres'
+        verbose_name = 'Matiere Premiere'
+        verbose_name_plural = 'Matieres Premieres'
 
 class Pays(models.Model):
     code_pays = models.CharField(max_length=64)
@@ -96,7 +96,7 @@ class Lot(models.Model):
     date_entree = models.DateField(blank=True)
     volume = models.IntegerField(default=0)
     type_biocarburant = models.ForeignKey(TypeBiocarburant, null=True, on_delete=models.SET_NULL), 
-    filiere_production = models.ForeignKey(FiliereProduction, null=True, on_delete=models.SET_NULL)
+    matiere_premiere = models.ForeignKey(MatierePremiere, null=True, on_delete=models.SET_NULL)
     categorie = models.CharField(max_length=64)
     systeme_fournisseur = models.CharField(max_length=64)
     pays_origine = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='pays_origine')
