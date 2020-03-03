@@ -8,7 +8,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.utils.crypto import get_random_string
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
-from core.models import Entity, UserRights, UserPreferences, TypeBiocarburant, FiliereProduction, Pays, Lot
+from core.models import Entity, UserRights, UserPreferences, TypeBiocarburant, MatierePremiere, Pays, Lot
 
 
 class EntityAdmin(admin.ModelAdmin):
@@ -32,7 +32,7 @@ class TypeBiocarburantAdmin(admin.ModelAdmin):
     search_fields = ('name', )
 
 
-class FiliereProductionAdmin(admin.ModelAdmin):
+class MatierePremiereAdmin(admin.ModelAdmin):
     list_display = ('name', )
     search_fields = ('name', )
 
@@ -43,15 +43,15 @@ class PaysAdmin(admin.ModelAdmin):
 
 
 class LotAdmin(admin.ModelAdmin):
-    list_display = ('depot', 'type_biocarburant', 'filiere_production', 'status')
-    search_fields = ('depot', 'type_biocarburant', 'filiere_production', 'status')
+    list_display = ('depot', 'type_biocarburant', 'matiere_premiere', 'status')
+    search_fields = ('depot', 'type_biocarburant', 'matiere_premiere', 'status')
 
 
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
 admin.site.register(UserPreferences, UserPreferencesAdmin)
 admin.site.register(TypeBiocarburant, TypeBiocarburantAdmin)
-admin.site.register(FiliereProduction, FiliereProductionAdmin)
+admin.site.register(MatierePremiere, MatierePremiereAdmin)
 admin.site.register(Pays, PaysAdmin)
 admin.site.register(Lot, LotAdmin)
 
