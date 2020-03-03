@@ -31,7 +31,7 @@ COPY web/operators /app/web/operators
 COPY web/administrators /app/web/administrators
 COPY web/fixtures /app/web/fixtures
 COPY web/api /app/web/api
-COPY web/migration.sh /app/web/migration.sh
+COPY web/run.sh /app/web/run.sh
 
 COPY scripts /app/scripts
 
