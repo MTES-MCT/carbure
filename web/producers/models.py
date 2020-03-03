@@ -1,6 +1,6 @@
 from django.db import models
 
-from core.models import Entity
+from core.models import Entity, MatierePremiere
 
 class AttestationProducer(models.Model):
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE)
@@ -28,3 +28,19 @@ class ProductionSite(models.Model):
         db_table = 'producer_sites'
         verbose_name = 'Site de Production'
         verbose_name_plural = 'Sites de Production'	
+
+
+class ProducerCertificate(models.Model):
+    producer = models.ForeignKey(Entity, on_delete=models.CASCADE)
+    matiere_premiere = models.ForeignKey(MatierePremiere, null=True, blank=True, on_delete=models.SET_NULL)
+    expiration = models.DateField()
+    certificate = models.FileField()
+
+    def __str__(self):
+        return self.matiere_premiere.name
+
+    class Meta:
+        db_table = 'producer_certificates'
+        verbose_name = 'Certificat'
+        verbose_name_plural = 'Certificats'	
+

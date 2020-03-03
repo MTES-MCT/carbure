@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from producers.models import AttestationProducer, ProductionSite
+from producers.models import AttestationProducer, ProductionSite, ProducerCertificate
 
 
 class AttestationProducerAdmin(admin.ModelAdmin):
@@ -17,3 +17,11 @@ class ProductionSiteAdmin(admin.ModelAdmin):
     list_filter = ('producer',)
 
 admin.site.register(ProductionSite, ProductionSiteAdmin)
+
+
+class ProducerCertificateAdmin(admin.ModelAdmin):
+    list_display = ('producer', 'matiere_premiere', 'certificate', 'expiration')
+    search_fields = ('producer', 'matiere_premiere', 'expiration')
+    list_filter = ('producer',)
+
+admin.site.register(ProducerCertificate, ProducerCertificateAdmin)
