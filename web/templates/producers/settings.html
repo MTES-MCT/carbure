@@ -9,11 +9,167 @@
     </div>
     <div class="form__group">
       <fieldset>
-        <legend>Annuaire</legend>
+        <h3>Annuaire</h3>
         <input type="checkbox" checked="checked" name="checkbox" id="checkbox-annuaire-societe" value="1"><label for="checkbox-annuaire-societe" class="label-inline">Je souhaite faire apparaître ma société dans l'annuaire</label>
         <input type="checkbox" name="checkbox" id="checkbox-annuaire-contact" value="1"><label for="checkbox-annuaire-contact" class="label-inline">Je souhaite faire apparaître mes coordonnées de contact dans l'annuaire</label>
       </fieldset>
-    </div>   
+    </div>  
+    <div class="form__group">
+      <fieldset>
+        <h3>Mes Certificats</h3>
+        <table class="table">
+          <thead>
+            <tr>
+            <th>Filière</th>
+            <th>Certificat</th>
+            <th>Expiration</th>
+            <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Colza</td>
+              <td><a href="#">certif_colza.pdf</a></td>
+              <td>29/11/2020</td>
+              <td>Validé</td>
+            </tr>
+            <tr>
+              <td>Betterave</td>
+              <td><a href="#">certif_betterave.pdf</a></td>
+              <td>29/11/2021</td>
+              <td>En attente de validation</td>
+            </tr>            
+              {% for crt in certificats %}
+              <tr>
+                <td>{{crt.matiere_premiere}}</td>
+                <td>{{crt.file}}</td>
+                <td>{{crt.expiration}}</td>
+                <td>{{crt.statut}}</td>
+              </tr>                
+              {% endfor %}              
+          </tbody>
+        </table>
+        <div class="flex-container-right">
+          <a class="button primary" id="btn_modal_certif">Ajouter Certificat</a>
+        </div>          
+      </fieldset>
+    </div> 
+
+    <section class="form__group"> 
+      <h3>Sites de production</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Date de mise en service</th>
+                <th>Éligible double-comptage</th>
+                <th>Identifiant</th>
+                <th>Numéro ACCISE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Grandpuits</td>
+                <td>10/2007</td>
+                <td>Non</td>
+                <td>FR00000123</td>
+                <td>W000X</td>
+              </tr>
+              <tr>
+                <td>Petitpuits</td>
+                <td>01/1994</td>
+                <td>Non</td>
+                <td>FR00000123</td>
+                <td>W000Y</td>
+              </tr>         
+              {% for site in production_sites %}
+              <tr>
+                <td>{{site.name}}</td>
+                <td>{{site.date_mise_en_service}}</td>
+                <td>{{site.eligible_double_comptage}}</td>
+                <td>{{site.identifiant}}</td>
+                <td>{{side.accise}}</td>
+              </tr>                
+              {% endfor %}   
+            </tbody>
+          </table>
+          <div class="flex-container-right">
+            <a class="button primary" id="btn_modal_site">Ajouter Site</a>
+          </div>   
+    </section>
   </div>
 </div>
+
+
+<div class="modal__backdrop" id="modal_certif">
+  <div class="modal">
+    <label for="modal_certif_matiere_premiere">Matière Première</label>
+    <input type="text" id="modal_certif_matiere_premiere">
+    <label for="modal_certif_expiration">Date d'expiration</label>
+    <input type="text" id="modal_certif_expiration">
+    <label for="file_to_upload">Certificat</label>
+    <input type="file" id="file_to_upload">
+    <div class="form__group button__group">
+      <a class="button secondary close" href="#">Annuler</a>
+      <a class="button primary" id="btn_modal_certif_valider" href="#">Valider</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_site">
+  <div class="modal">
+    <a href="/static/files/template.csv">Modèle</a>
+    <input type="file" id="file_to_upload">
+    <div class="form__group button__group">
+      <a class="button secondary close" href="#">Annuler</a>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+var modal_certif = document.getElementById("modal_certif")
+var btn_certif_open = document.getElementById("btn_modal_certif")
+btn_certif_open.onclick = function() {
+  modal_certif.style.display = "flex";
+}
+
+var modal_site = document.getElementById("modal_site")
+var btn_site_open = document.getElementById("btn_modal_site")
+btn_site_open.onclick = function() {
+  modal_site.style.display = "flex";
+}
+
+var btns_close = document.getElementsByClassName("close")
+for (let i = 0, len = btns_close.length; i < len; i++) {
+  let btn_close = btns_close[i]
+  btn_close.onclick = function() {
+    modal_certif.style.display = "none"
+    modal_site.style.display = "none"
+  }
+}
+
+// clicking outside of the modal window will close it
+window.onclick = function(event) {
+  if (event.target == modal_certif) {
+    modal_certif.style.display = "none"
+  }
+  if (event.target == modal_site) {
+    modal_site.style.display = "none"
+  }
+}
+
+// escape key
+$(document).keydown(function(event) {
+  if (event.keyCode == 27) {
+    modal_certif.style.display = "none"
+    modal_site.style.display = "none"
+  }
+});
+
+</script>
 {% endblock %}

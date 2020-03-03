@@ -15,13 +15,15 @@ import calendar
 def producers_index(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'producers-index'
-  # create the last 6 attestations
+  # create the last few attestations
   attestations = AttestationProducer.objects.filter(producer=context['user_entity'])
-  if len(attestations) < 6:
-    # create the last 6 attestations
+  threemonthsago = datetime.date.today() - datetime.timedelta(days=90)
+  last_attestations = attestations.filter(deadline__gte=threemonthsago)
+  if len(last_attestations) <= 4:
+    # create the missing 4 attestations
     current_period = datetime.date.today()
     current_period = current_period.replace(day=15)
-    for i in range(7):
+    for i in range(5):
       period = current_period.strftime('%Y-%m')
       nextmonth = current_period + datetime.timedelta(days=30)
       monthrange = calendar.monthrange(nextmonth.year, nextmonth.month)
