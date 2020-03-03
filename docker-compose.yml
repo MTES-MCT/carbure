@@ -40,6 +40,7 @@ services:
       EMAIL_HOST_USER: ${EMAIL_HOST_USER}
       EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD}
       EMAIL_USE_TLS: ${EMAIL_USE_TLS}
+      PYTHONPATH: /app:/app/web
     volumes:
     - ${CARBURE_HOME}:/app #for dev only, allows for auto-refresh of files
     depends_on:
