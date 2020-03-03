@@ -1,8 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from core.decorators import enrich_with_user_details, restrict_to_producers
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 import json
-from core.models import TypeBiocarburant, MatierePremiere
+from core.models import TypeBiocarburant, MatierePremiere, Pays
 
 def type_biocarburant_autocomplete(request):
   q = request.GET.get('q', '')
