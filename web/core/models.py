@@ -58,7 +58,7 @@ class TypeBiocarburant(models.Model):
         verbose_name_plural = 'Types de Biocarburants'
 
 class MatierePremiere(models.Model):
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=128)
     description = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
 
