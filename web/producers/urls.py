@@ -9,5 +9,8 @@ urlpatterns = [
     path('attestation/<int:attestation_id>', views.producers_attestation, name='producers-attestation'),
     path('corrections', views.producers_corrections, name='producers-corrections'),
     path('controles', views.producers_controles, name='producers-controles'),
+
+    # settings
     path('settings', views.producers_settings, name='producers-settings'),
+    path('settings/add-certif', views.producers_settings_add_certif, name='producers-settings-add-certif'),
 ]

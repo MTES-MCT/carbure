@@ -27,26 +27,18 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Colza</td>
-              <td><a href="#">certif_colza.pdf</a></td>
-              <td>29/11/2020</td>
-              <td>Validé</td>
-            </tr>
-            <tr>
-              <td>Betterave</td>
-              <td><a href="#">certif_betterave.pdf</a></td>
-              <td>29/11/2021</td>
-              <td>En attente de validation</td>
-            </tr>            
-              {% for crt in certificats %}
+            {% for crt in certificates %}
               <tr>
-                <td>{{crt.matiere_premiere}}</td>
-                <td>{{crt.file}}</td>
-                <td>{{crt.expiration}}</td>
-                <td>{{crt.statut}}</td>
-              </tr>                
-              {% endfor %}              
+                <td>{{ crt.matiere_premiere }}</td>
+                <td><a href="{{ crt.certificate.url }}" target="_blank">{{ crt.certificate.name }}</a></td>
+                <td>{{ crt.expiration }}</td>
+                <td>{{ crt.get_status_display }}</td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="4">Aucun certificat enregistré à ce jour.</td>
+              </tr>
+            {% endfor %}
           </tbody>
         </table>
         <div class="flex-container-right">
@@ -100,22 +92,24 @@
   </div>
 </div>
 
-
 <div class="modal__backdrop" id="modal_certif">
   <div class="modal">
-    <div class="autocomplete" style="width: 300px;">
-      <label for="matiere_premiere_autocomplete">Matière Première</label>
-      <input type="text" id="matiere_premiere_autocomplete" placeholder="Colza" />
-    </div>
-
-    <label for="modal_certif_expiration">Date d'expiration</label>
-    <input type="text" id="modal_certif_expiration" placeholder="24/12/2021">
-    <label for="file_to_upload">Certificat</label>
-    <input type="file" id="file_to_upload">
-    <div class="form__group button__group">
-      <a class="button secondary close">Annuler</a>
-      <a class="button primary" id="btn_modal_certif_valider">Valider</a>
-    </div>
+    <span id="modal_certif_err_message" style="color: red;"></span>
+    <form id="modal_certif_form" method="POST">
+      {% csrf_token %}
+      <div class="autocomplete" style="width: 300px;">
+        <label for="matiere_premiere_autocomplete">Matière Première</label>
+        <input type="text" id="matiere_premiere_autocomplete" name="matiere_premiere" placeholder="Colza" />
+      </div>
+      <label for="modal_certif_expiration">Date d'expiration</label>
+      <input type="text" id="modal_certif_expiration" name="expiration" placeholder="24/12/2021">
+      <label for="modal_certif_file_to_upload">Certificat</label>
+      <input type="file" id="modal_certif_file_to_upload" name="file">
+      <div class="form__group button__group">
+        <a class="button secondary close">Annuler</a>
+        <button type="submit" class="button" id="btn_modal_certif_valider">Valider</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -130,9 +124,6 @@
     </div>
   </div>
 </div>
-
-
-
 {% endblock %}
 
 {% block extra_js %}
@@ -282,7 +273,40 @@ function autocomplete(inp, arr) {
     closeAllLists(e.target);
   })
 }
-autocomplete(document.getElementById("country_autocomplete"), countries);
-autocomplete(document.getElementById("matiere_premiere_autocomplete"), matieres_premieres);
+autocomplete(document.getElementById("country_autocomplete"), countries)
+autocomplete(document.getElementById("matiere_premiere_autocomplete"), matieres_premieres)
+
+$(document).ready(function() {
+  $('#modal_certif_form').submit(function(event) {
+      var form = $(this);
+      var formdata = false;
+      if (window.FormData){
+          formdata = new FormData(form[0]);
+      }
+      $.ajax({
+          url         : "{% url 'producers-settings-add-certif' %}",
+          data        : formdata ? formdata : form.serialize(),
+          cache       : false,
+          contentType : false,
+          processData : false,
+          type        : 'POST',
+          success     : function(data, textStatus, jqXHR){
+              // Callback code
+              $("#modal_certif_err_message").text("")
+              window.location.reload()
+          },
+          error       : function(e) {
+            if (e.status === 400) {
+              $("#modal_certif_err_message").text(e.responseJSON.message)
+              console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+            } else {
+              $("#modal_certif_err_message").text("Server error. Please contact an administrator")
+              console.log(`server error ${JSON.stringify(e)}`)
+            }
+          }
+      });
+      event.preventDefault()
+  });
+}) 
 </script>
 {% endblock %}
