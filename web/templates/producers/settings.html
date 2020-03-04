@@ -43,7 +43,7 @@
           </div>   
     </section>
 
-    <div class="form__group">
+    <section class="form__group">
       <fieldset>
         <h3>Mes Certificats</h3>
         <table class="table">
@@ -59,7 +59,7 @@
           <tbody>
             {% for crt in certificates %}
               <tr>
-                <td>{{ crt.site }}</td>
+                <td>{{ crt.production_site }}</td>
                 <td>{{ crt.certificate_id }}</td>
                 <td><a href="{{ crt.certificate.url }}" target="_blank">{{ crt.certificate.name }}</a></td>
                 <td>{{ crt.expiration }}</td>
@@ -76,7 +76,7 @@
           <a class="button primary" id="btn_modal_certif">Ajouter Certificat</a>
         </div>          
       </fieldset>
-    </div> 
+    </section> 
 
     <section class="form__group"> 
       <h3>Matières Premières</h3>
@@ -89,22 +89,16 @@
               </tr>
             </thead>
             <tbody>
+              {% for input in mps %}
               <tr>
-                <td>Grandpuits</td>
-                <td>Colza</td>
-                <td>Non</td>
-              </tr>
-              <tr>
-                <td>Grandpuits</td>
-                <td>Tournesol</td>
-                <td>Non</td>
-              </tr>         
-              {% for input in production_input %}
-              <tr>
-                <td>{{input.site}}</td>
+                <td>{{input.production_site}}</td>
                 <td>{{input.matiere_premiere}}</td>
                 <td>{{input.eligible_double_comptage}}</td>
-              </tr>                
+              </tr>      
+              {% empty %}
+              <tr>
+                <td colspan="3">Aucune matière première enregistrée à ce jour.</td>
+              </tr>                        
               {% endfor %}   
             </tbody>
           </table>
@@ -124,27 +118,16 @@
               </tr>
             </thead>
             <tbody>
+              {% for output in outputs %}
               <tr>
-                <td>Grandpuits</td>
-                <td>Colza</td>
-                <td>Valeurs par défaut</td>
-              </tr>
-              <tr>
-                <td>Grandpuits</td>
-                <td>Tournesol</td>
-                <td>Valeurs réelles</td>                
-              </tr>         
-              <tr>
-                <td>Petitpuits</td>
-                <td>Tournesol</td>
-                <td>NUTS2</td>                
-              </tr>         
-              {% for output in production_output %}
-              <tr>
-                <td>{{output.site}}</td>
+                <td>{{output.production_site}}</td>
                 <td>{{output.biocarburant}}</td>
                 <td>{{output.ges_option}}</td>
-              </tr>                
+              </tr>       
+              {% empty %}
+              <tr>
+                <td colspan="3">Aucun biocarburant enregistré à ce jour.</td>
+              </tr>                           
               {% endfor %}   
             </tbody>
           </table>
@@ -161,8 +144,11 @@
     <form id="modal_certif_form" method="POST">
       {% csrf_token %}
       <label for="modal_certif_site">Identifiant du site de production</label>
-      <input type="text" id="modal_certif_site" name="site" placeholder="">
-
+      <select id="modal_certif_site" name="site">
+        {% for site in sites %}
+        <option value="{{site.id}}">{{site.name}}</option>
+        {% endfor %}
+      </select>
       <label for="modal_certif_id">Identifiant du certificat</label>
       <input type="text" id="modal_certif_id" name="certif_id" placeholder="EU-ISCC-Cert-PLXXX-XXXXXXXXX">
       <label for="modal_certif_expiration">Date d'expiration</label>
@@ -200,16 +186,24 @@
 
 <div class="modal__backdrop" id="modal_mp">
   <div class="modal">
-    <span id="modal_certif_err_message" style="color: red;"></span>
-    <form id="modal_certif_form" method="POST">
+    <span id="modal_mp_err_message" style="color: red;"></span>
+    <form id="modal_mp_form" method="POST">
       {% csrf_token %}
+      <label for="modal_mp_site">Identifiant du site de production</label>
+      <select id="modal_mp_site" name="site">
+        {% for site in sites %}
+        <option value="{{site.id}}">{{site.name}}</option>
+        {% endfor %}
+      </select>
+      <label for="modal_mp_mp">Matière Première</label>
       <div class="autocomplete" style="width: 300px;">
-        <label for="matiere_premiere_autocomplete">Matière Première</label>
-        <input type="text" id="matiere_premiere_autocomplete" name="matiere_premiere" placeholder="Colza" />
+        <input type="text" id="modal_mp_mp" name="matiere_premiere" placeholder="Colza" />
       </div>
+      <label for="modal_mp_eligible_double_comptage">Éligible double comptage ?</label>
+      <input type="checkbox" id="modal_mp_eligible_double_comptage" name="double_comptage" />
       <div class="form__group button__group">
         <a class="button secondary close">Annuler</a>
-        <button type="submit" class="button" id="btn_modal_certif_valider">Valider</button>
+        <button type="submit" class="button" id="btn_modal_mp_valider">Valider</button>
       </div>
     </form>
   </div>
@@ -217,16 +211,30 @@
 
 <div class="modal__backdrop" id="modal_biocarburant">
   <div class="modal">
-    <span id="modal_certif_err_message" style="color: red;"></span>
-    <form id="modal_certif_form" method="POST">
+    <span id="modal_biocarburant_err_message" style="color: red;"></span>
+    <form id="modal_biocarburant_form" method="POST">
       {% csrf_token %}
-      <div class="autocomplete" style="width: 300px;">
-        <label for="biocarburant_autocomplete">Matière Première</label>
-        <input type="text" id="biocarburant_autocomplete" name="biocarburant" placeholder="Biogaz" />
+      <div class="form__group">
+      <label for="modal_biocarburant_site">Identifiant du site de production</label>
+      <select id="modal_biocarburant_site" name="site">
+        {% for site in sites %}
+        <option value="{{site.id}}">{{site.name}}</option>
+        {% endfor %}
+      </select>
       </div>
+      <div class="autocomplete" style="width: 300px;">
+        <label for="modal_biocarburant_biocarburant">Type de Biocarburant</label>
+        <input type="text" id="modal_biocarburant_biocarburant" name="biocarburant" placeholder="Biogaz" />
+      </div>
+      <label for="modal_biocarburant_ges">Valeurs d'émissions de Gaz à Effet de Serre</label>
+      <select id="modal_biocarburant_ges" name="ges_option">
+        <option value="Default">Valeurs par défaut</option>
+        <option value="Actual">Valeurs réelles</option>
+        <option value="NUTS2">NUTS2</option>
+      </select>      
       <div class="form__group button__group">
         <a class="button secondary close">Annuler</a>
-        <button type="submit" class="button" id="btn_modal_certif_valider">Valider</button>
+        <button type="submit" class="button" id="btn_modal_biocarburant_valider">Valider</button>
       </div>
     </form>
   </div>
@@ -299,6 +307,7 @@ document.addEventListener('keydown', function(event) {
 
 var matieres_premieres = ["Betterave","Blé","Canne à sucre","Colza","Déchets organiques ménagers","Fumier humide","Fumier sec","Huiles ou graisses animales  (catégorie I et/ou II )","Huiles ou graisses animales  (catégorie III)","Huile de palme","Huile alimentaire usagée","Maïs","Résidus viniques","Soja ","Tournesol ","Glycérine brute","Déchets de bois","Déchets industriels","Algues","Paille","Boues d’épuration","Effluents d’huileries de palme et rafles","Brai de tallol.","Bagasse.","Coques","Balles (enveloppes).","Râpes","Déchets municipaux en mélange (Hors déchets ménagers triés)","Matières cellulosiques d’origine non alimentaire","Matières ligno-cellulosiques (Hors grumes de sciage & de placage)"]
 
+var biocarburants = ["Biogaz","Biogazole de synthèse (Hors HVO)","EMHA","EMHU","EMHV","ETBE","Ethanol","HVO","MTBE","TAEE"]
 
 var countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua &amp; Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia &amp; Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central Arfrican Republic","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica","Cote D Ivoire","Croatia","Cuba","Curacao","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","French West Indies","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guernsey","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Jamaica","Japan","Jersey","Jordan","Kazakhstan","Kenya","Kiribati","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauro","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","North Korea","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Puerto Rico","Qatar","Reunion","Romania","Russia","Rwanda","Saint Pierre &amp; Miquelon","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","St Kitts &amp; Nevis","St Lucia","St Vincent","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor L'Este","Togo","Tonga","Trinidad &amp; Tobago","Tunisia","Turkey","Turkmenistan","Turks &amp; Caicos","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States of America","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Virgin Islands (US)","Yemen","Zambia","Zimbabwe"];
 
@@ -404,7 +413,8 @@ function autocomplete(inp, arr) {
   })
 }
 autocomplete(document.getElementById("modal_site_country_autocomplete"), countries)
-autocomplete(document.getElementById("matiere_premiere_autocomplete"), matieres_premieres)
+autocomplete(document.getElementById("modal_mp_mp"), matieres_premieres)
+autocomplete(document.getElementById("modal_biocarburant_biocarburant"), biocarburants)
 
 $(document).ready(function() {
 
@@ -469,7 +479,70 @@ $(document).ready(function() {
           }
       });
       event.preventDefault()
-  });
+  })
+
+  $("#modal_mp_form").submit(function(event) {
+      var form = $(this);
+      var formdata = false;
+      if (window.FormData){
+          formdata = new FormData(form[0]);
+      }
+      $.ajax({
+          url         : "{% url 'producers-settings-add-mp' %}",
+          data        : formdata ? formdata : form.serialize(),
+          cache       : false,
+          contentType : false,
+          processData : false,
+          type        : 'POST',
+          success     : function(data, textStatus, jqXHR){
+              // Callback code
+              $("#modal_mp_err_message").text("")
+              window.location.reload()
+          },
+          error       : function(e) {
+            if (e.status === 400) {
+              $("#modal_mp_err_message").text(e.responseJSON.message)
+              console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+            } else {
+              $("#modal_mp_err_message").text("Server error. Please contact an administrator")
+              console.log(`server error ${JSON.stringify(e)}`)
+            }
+          }
+      });
+      event.preventDefault()
+  })
+
+  $("#modal_biocarburant_form").submit(function(event) {
+      var form = $(this);
+      var formdata = false;
+      if (window.FormData){
+          formdata = new FormData(form[0]);
+      }
+      $.ajax({
+          url         : "{% url 'producers-settings-add-biocarburant' %}",
+          data        : formdata ? formdata : form.serialize(),
+          cache       : false,
+          contentType : false,
+          processData : false,
+          type        : 'POST',
+          success     : function(data, textStatus, jqXHR){
+              // Callback code
+              $("#modal_biocarburant_err_message").text("")
+              window.location.reload()
+          },
+          error       : function(e) {
+            if (e.status === 400) {
+              $("#modal_biocarburant_err_message").text(e.responseJSON.message)
+              console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+            } else {
+              $("#modal_biocarburant_err_message").text("Server error. Please contact an administrator")
+              console.log(`server error ${JSON.stringify(e)}`)
+            }
+          }
+      });
+      event.preventDefault()
+  })
+
 }) 
 </script>
 {% endblock %}

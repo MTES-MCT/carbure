@@ -5,7 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 from producers.models import AttestationProducer, ProducerCertificate, ProductionSite, ProductionSiteInput, ProductionSiteOutput
-from core.models import Lot, MatierePremiere, Pays
+from core.models import Lot, MatierePremiere, Pays, TypeBiocarburant
 from django.views.generic.edit import CreateView
 
 import datetime
@@ -68,6 +68,8 @@ def producers_settings(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'producers-settings'
   context['sites'] = ProductionSite.objects.filter(producer=context['user_entity'])
+  context['mps'] = ProductionSiteInput.objects.filter(production_site__in=context['sites'])
+  context['outputs'] = ProductionSiteOutput.objects.filter(production_site__in=context['sites'])
   context['certificates'] = ProducerCertificate.objects.filter(producer=context['user_entity'])
   return render(request, 'producers/settings.html', context)
 
@@ -138,12 +140,20 @@ def producers_settings_add_certif(request, *args, **kwargs):
   except Exception as e:
     return JsonResponse({'status':'error', 'message':"Please provide a valid Expiration Date DD/MM/YYYY"}, status=400)
 
+  site = request.POST.get('site')
+  if site == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Site"}, status=400)
+  try:
+    site = ProductionSite.objects.get(producer=context['user_entity'], id=site)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Could not find production site in database"}, status=400)
+
   form_file = request.FILES.get('file', None)  
   if form_file == None:
     return JsonResponse({'status':'error', 'message':"Please provide a certificate file"}, status=400)
 
   try:
-    obj, created = ProducerCertificate.objects.update_or_create(producer=context['user_entity'], matiere_premiere=matiere_premiere, defaults={'expiration':exp_date, 'certificate': form_file})
+    obj, created = ProducerCertificate.objects.update_or_create(producer=context['user_entity'], production_site=site, certificate_id=certif_id, defaults={'expiration':exp_date, 'certificate': form_file})
   except Exception as e:
     return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
   return JsonResponse({'status':'success', 'message':'Certificate added'})
@@ -180,3 +190,69 @@ def producers_settings_add_site(request, *args, **kwargs):
   except Exception as e:
     return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
   return JsonResponse({'status':'success', 'message':'Site added'})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_settings_add_mp(request, *args, **kwargs):
+  context = kwargs['context']
+  
+  site = request.POST.get('site')
+  mp = request.POST.get('matiere_premiere')
+  eligible_double_comptage = request.POST.get('double_comptage', False)
+
+  if eligible_double_comptage != False:
+    eligible_double_comptage = True
+
+  if site == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Site"}, status=400)
+  if mp == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Matiere Premiere"}, status=400)
+
+  try:
+    mp = MatierePremiere.objects.get(name__icontains=mp)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Please provide a valid Matiere Premiere from the list", 'extra':str(e)}, status=400)
+
+  try:
+    site = ProductionSite.objects.get(producer=context['user_entity'], id=site)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Could not find production site in database"}, status=400)
+
+  try:
+    obj, created = ProductionSiteInput.objects.update_or_create(production_site=site, matiere_premiere=mp, defaults={'eligible_double_comptage':eligible_double_comptage})
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'MP added'})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_settings_add_biocarburant(request, *args, **kwargs):
+  context = kwargs['context']
+  site = request.POST.get('site')
+  biocarburant = request.POST.get('biocarburant')
+  ges_option = request.POST.get('ges_option', False)
+
+  if site == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Site"}, status=400)
+  if biocarburant == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Biocarburant"}, status=400)
+  if ges_option == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field GES Option"}, status=400)
+
+  try:
+    biocarburant = TypeBiocarburant.objects.get(name__icontains=biocarburant)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Please provide a valid Biocarburant from the list", 'extra':str(e)}, status=400)
+
+  try:
+    site = ProductionSite.objects.get(producer=context['user_entity'], id=site)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Could not find production site in database"}, status=400)
+
+  try:
+    obj, created = ProductionSiteOutput.objects.update_or_create(production_site=site, biocarburant=biocarburant, defaults={'ges_option':ges_option})
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'Biocarburant added'})
