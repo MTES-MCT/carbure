@@ -14,14 +14,44 @@
         <input type="checkbox" name="checkbox" id="checkbox-annuaire-contact" value="1"><label for="checkbox-annuaire-contact" class="label-inline">Je souhaite faire apparaître mes coordonnées de contact dans l'annuaire</label>
       </fieldset>
     </div>  
+    <section class="form__group"> 
+      <h3>Sites de production</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Pays</th>
+                <th>Date de mise en service</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for site in sites %}
+              <tr>
+                <td>{{site.name}}</td>
+                <td>{{site.country}}</td>
+                <td>{{site.date_mise_en_service}}</td>
+              </tr>          
+              {% empty %}
+              <tr>
+                <td colspan="3">Aucun site de production enregistré à ce jour.</td>
+              </tr>                    
+              {% endfor %}   
+            </tbody>
+          </table>
+          <div class="flex-container-right">
+            <a class="button primary" id="btn_modal_site">Ajouter Site</a>
+          </div>   
+    </section>
+
     <div class="form__group">
       <fieldset>
         <h3>Mes Certificats</h3>
         <table class="table">
           <thead>
             <tr>
-            <th>Filière</th>
+            <th>Site</th>
             <th>Certificat</th>
+            <th>PDF</th>
             <th>Expiration</th>
             <th>Statut</th>
             </tr>
@@ -29,14 +59,15 @@
           <tbody>
             {% for crt in certificates %}
               <tr>
-                <td>{{ crt.matiere_premiere }}</td>
+                <td>{{ crt.site }}</td>
+                <td>{{ crt.certificate_id }}</td>
                 <td><a href="{{ crt.certificate.url }}" target="_blank">{{ crt.certificate.name }}</a></td>
                 <td>{{ crt.expiration }}</td>
                 <td>{{ crt.get_status_display }}</td>
               </tr>
             {% empty %}
               <tr>
-                <td colspan="4">Aucun certificat enregistré à ce jour.</td>
+                <td colspan="5">Aucun certificat enregistré à ce jour.</td>
               </tr>
             {% endfor %}
           </tbody>
@@ -48,47 +79,79 @@
     </div> 
 
     <section class="form__group"> 
-      <h3>Sites de production</h3>
+      <h3>Matières Premières</h3>
           <table class="table">
             <thead>
               <tr>
-                <th>Nom</th>
-                <th>Date de mise en service</th>
+                <th>Site</th>
+                <th>Matières Première</th>
                 <th>Éligible double-comptage</th>
-                <th>Identifiant</th>
-                <th>Numéro ACCISE</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>Grandpuits</td>
-                <td>10/2007</td>
+                <td>Colza</td>
                 <td>Non</td>
-                <td>FR00000123</td>
-                <td>W000X</td>
               </tr>
               <tr>
-                <td>Petitpuits</td>
-                <td>01/1994</td>
+                <td>Grandpuits</td>
+                <td>Tournesol</td>
                 <td>Non</td>
-                <td>FR00000123</td>
-                <td>W000Y</td>
               </tr>         
-              {% for site in production_sites %}
+              {% for input in production_input %}
               <tr>
-                <td>{{site.name}}</td>
-                <td>{{site.date_mise_en_service}}</td>
-                <td>{{site.eligible_double_comptage}}</td>
-                <td>{{site.identifiant}}</td>
-                <td>{{side.accise}}</td>
+                <td>{{input.site}}</td>
+                <td>{{input.matiere_premiere}}</td>
+                <td>{{input.eligible_double_comptage}}</td>
               </tr>                
               {% endfor %}   
             </tbody>
           </table>
           <div class="flex-container-right">
-            <a class="button primary" id="btn_modal_site">Ajouter Site</a>
+            <a class="button primary" id="btn_modal_mp">Ajouter Matière Première</a>
           </div>   
     </section>
+
+    <section class="form__group"> 
+      <h3>Biocarburants</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Site</th>
+                <th>Biocarburant</th>
+                <th>Option GES</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Grandpuits</td>
+                <td>Colza</td>
+                <td>Valeurs par défaut</td>
+              </tr>
+              <tr>
+                <td>Grandpuits</td>
+                <td>Tournesol</td>
+                <td>Valeurs réelles</td>                
+              </tr>         
+              <tr>
+                <td>Petitpuits</td>
+                <td>Tournesol</td>
+                <td>NUTS2</td>                
+              </tr>         
+              {% for output in production_output %}
+              <tr>
+                <td>{{output.site}}</td>
+                <td>{{output.biocarburant}}</td>
+                <td>{{output.ges_option}}</td>
+              </tr>                
+              {% endfor %}   
+            </tbody>
+          </table>
+          <div class="flex-container-right">
+            <a class="button primary" id="btn_modal_biocarburant">Ajouter Biocarburant</a>
+          </div>   
+    </section> 
   </div>
 </div>
 
@@ -97,10 +160,11 @@
     <span id="modal_certif_err_message" style="color: red;"></span>
     <form id="modal_certif_form" method="POST">
       {% csrf_token %}
-      <div class="autocomplete" style="width: 300px;">
-        <label for="matiere_premiere_autocomplete">Matière Première</label>
-        <input type="text" id="matiere_premiere_autocomplete" name="matiere_premiere" placeholder="Colza" />
-      </div>
+      <label for="modal_certif_site">Identifiant du site de production</label>
+      <input type="text" id="modal_certif_site" name="site" placeholder="">
+
+      <label for="modal_certif_id">Identifiant du certificat</label>
+      <input type="text" id="modal_certif_id" name="certif_id" placeholder="EU-ISCC-Cert-PLXXX-XXXXXXXXX">
       <label for="modal_certif_expiration">Date d'expiration</label>
       <input type="text" id="modal_certif_expiration" name="expiration" placeholder="24/12/2021">
       <label for="modal_certif_file_to_upload">Certificat</label>
@@ -115,15 +179,59 @@
 
 <div class="modal__backdrop" id="modal_site">
   <div class="modal">
+    <span id="modal_site_err_message" style="color: red;"></span>
+    <form id="modal_site_form" method="POST">
+      {% csrf_token %}
+    <label for="modal_site_country_autocomplete">Pays</label>
     <div class="autocomplete" style="width:300px;">
-      <input type="text" id="country_autocomplete" />
+      <input type="text" id="modal_site_country_autocomplete" name="country" />
     </div>    
+    <label for="modal_site_date_mee">Date de mise en service approximative</label>
+    <input type="text" id="modal_site_date_mee" name="date_mise_en_service" placeholder="24/12/2001">    
+    <label for="modal_site_nom">Nom du site de production</label>
+    <input type="text" id="modal_site_nom" name="name" placeholder="Grandpuits">
     <div class="form__group button__group">
       <a class="button secondary close">Annuler</a>
-      <a class="button primary" id="btn_modal_site_valider">Valider</a>
+      <button type="submit" class="button" id="btn_modal_site_valider">Valider</button>
     </div>
+  </form>
   </div>
 </div>
+
+<div class="modal__backdrop" id="modal_mp">
+  <div class="modal">
+    <span id="modal_certif_err_message" style="color: red;"></span>
+    <form id="modal_certif_form" method="POST">
+      {% csrf_token %}
+      <div class="autocomplete" style="width: 300px;">
+        <label for="matiere_premiere_autocomplete">Matière Première</label>
+        <input type="text" id="matiere_premiere_autocomplete" name="matiere_premiere" placeholder="Colza" />
+      </div>
+      <div class="form__group button__group">
+        <a class="button secondary close">Annuler</a>
+        <button type="submit" class="button" id="btn_modal_certif_valider">Valider</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_biocarburant">
+  <div class="modal">
+    <span id="modal_certif_err_message" style="color: red;"></span>
+    <form id="modal_certif_form" method="POST">
+      {% csrf_token %}
+      <div class="autocomplete" style="width: 300px;">
+        <label for="biocarburant_autocomplete">Matière Première</label>
+        <input type="text" id="biocarburant_autocomplete" name="biocarburant" placeholder="Biogaz" />
+      </div>
+      <div class="form__group button__group">
+        <a class="button secondary close">Annuler</a>
+        <button type="submit" class="button" id="btn_modal_certif_valider">Valider</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -140,12 +248,26 @@ btn_site_open.onclick = function() {
   modal_site.style.display = "flex";
 }
 
+var modal_mp = document.getElementById("modal_mp")
+var btn_mp_open = document.getElementById("btn_modal_mp")
+btn_mp_open.onclick = function() {
+  modal_mp.style.display = "flex";
+}
+
+var modal_biocarburant = document.getElementById("modal_biocarburant")
+var btn_biocarburant_open = document.getElementById("btn_modal_biocarburant")
+btn_biocarburant_open.onclick = function() {
+  modal_biocarburant.style.display = "flex";
+}
+
 var btns_close = document.getElementsByClassName("close")
 for (let i = 0, len = btns_close.length; i < len; i++) {
   let btn_close = btns_close[i]
   btn_close.onclick = function() {
     modal_certif.style.display = "none"
     modal_site.style.display = "none"
+    modal_mp.style.display = "none"
+    modal_biocarburant.style.display = "none"
   }
 }
 
@@ -157,6 +279,12 @@ window.onclick = function(event) {
   if (event.target == modal_site) {
     modal_site.style.display = "none"
   }
+  if (event.target == modal_mp) {
+    modal_mp.style.display = "none"
+  }  
+  if (event.target == modal_biocarburant) {
+    modal_biocarburant.style.display = "none"
+  }  
 }
 
 // escape key
@@ -164,6 +292,8 @@ document.addEventListener('keydown', function(event) {
     if (event.keyCode === 27) {
       modal_certif.style.display = "none"
       modal_site.style.display = "none"
+      modal_mp.style.display = "none"
+      modal_biocarburant.style.display = "none"
     }
 });
 
@@ -273,10 +403,42 @@ function autocomplete(inp, arr) {
     closeAllLists(e.target);
   })
 }
-autocomplete(document.getElementById("country_autocomplete"), countries)
+autocomplete(document.getElementById("modal_site_country_autocomplete"), countries)
 autocomplete(document.getElementById("matiere_premiere_autocomplete"), matieres_premieres)
 
 $(document).ready(function() {
+
+  $("#modal_site_form").submit(function(event) {
+      var form = $(this);
+      var formdata = false;
+      if (window.FormData){
+          formdata = new FormData(form[0]);
+      }
+      $.ajax({
+          url         : "{% url 'producers-settings-add-site' %}",
+          data        : formdata ? formdata : form.serialize(),
+          cache       : false,
+          contentType : false,
+          processData : false,
+          type        : 'POST',
+          success     : function(data, textStatus, jqXHR){
+              // Callback code
+              $("#modal_site_err_message").text("")
+              window.location.reload()
+          },
+          error       : function(e) {
+            if (e.status === 400) {
+              $("#modal_site_err_message").text(e.responseJSON.message)
+              console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+            } else {
+              $("#modal_site_err_message").text("Server error. Please contact an administrator")
+              console.log(`server error ${JSON.stringify(e)}`)
+            }
+          }
+      });
+      event.preventDefault()
+  })
+
   $('#modal_certif_form').submit(function(event) {
       var form = $(this);
       var formdata = false;
@@ -302,6 +464,7 @@ $(document).ready(function() {
             } else {
               $("#modal_certif_err_message").text("Server error. Please contact an administrator")
               console.log(`server error ${JSON.stringify(e)}`)
+              console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
             }
           }
       });

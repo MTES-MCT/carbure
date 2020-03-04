@@ -15,6 +15,7 @@
 						<th>Producteur</th>
 						<th>Matière première</th>
 						<th>Certificat</th>
+						<th>PDF</th>
 						<th>Date création</th>
 						<th>Date expiration</th>
 						<th>Statut</th>
@@ -26,11 +27,12 @@
 		              <tr>
 		                <td>{{ crt.producer }}</td>
 		                <td>{{ crt.matiere_premiere }}</td>
+		                <td>{{ crt.certificate_id }}</td>
 		                <td><a href="{{ crt.certificate.url }}" target="_blank">{{ crt.certificate.name }}</a></td>
 		                <td>{{ crt.date_added }}</td>
 		                <td>{{ crt.expiration }}</td>
 		                <td>{{ crt.get_status_display }}</td>
-		                <td><a class="button primary">Valider</a></td>
+		                <td><a class="button primary" href="{% url 'administrators-validate-certificate' id=crt.id %}">Valider</a></td>
 		              </tr>
 		            {% empty %}
 		              <tr>
@@ -42,6 +44,7 @@
 						<th>Producteur</th>
 						<th>Matière première</th>
 						<th>Certificat</th>
+						<th>PDF</th>
 						<th>Date création</th>
 						<th>Date expiration</th>
 						<th>Statut</th>

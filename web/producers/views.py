@@ -4,8 +4,8 @@ from django.shortcuts import render
 from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 from django.urls import reverse_lazy
-from producers.models import AttestationProducer, ProducerCertificate
-from core.models import Lot, MatierePremiere
+from producers.models import AttestationProducer, ProducerCertificate, ProductionSite, ProductionSiteInput, ProductionSiteOutput
+from core.models import Lot, MatierePremiere, Pays
 from django.views.generic.edit import CreateView
 
 import datetime
@@ -67,6 +67,7 @@ def producers_controles(request, *args, **kwargs):
 def producers_settings(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'producers-settings'
+  context['sites'] = ProductionSite.objects.filter(producer=context['user_entity'])
   context['certificates'] = ProducerCertificate.objects.filter(producer=context['user_entity'])
   return render(request, 'producers/settings.html', context)
 
@@ -124,14 +125,10 @@ def producers_annuaire(request, *args, **kwargs):
 @restrict_to_producers
 def producers_settings_add_certif(request, *args, **kwargs):
   context = kwargs['context']
-  # do something
-  form_matiere_premiere = request.POST.get('matiere_premiere')
-  if form_matiere_premiere == None:
-    return JsonResponse({'status':'error', 'message':"Please provide a value in field Matiere Premiere"}, status=400)
-  try:
-    matiere_premiere = MatierePremiere.objects.get(name=form_matiere_premiere)
-  except Exception as e:
-    return JsonResponse({'status':'error', 'message':"Could not find Matiere Premiere"}, status=400)
+  
+  certif_id = request.POST.get('certif_id')
+  if certif_id == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Identifiant"}, status=400)
 
   form_exp_date = request.POST.get('expiration')
   if form_exp_date == None:
@@ -150,3 +147,36 @@ def producers_settings_add_certif(request, *args, **kwargs):
   except Exception as e:
     return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
   return JsonResponse({'status':'success', 'message':'Certificate added'})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_settings_add_site(request, *args, **kwargs):
+  context = kwargs['context']
+  
+  country = request.POST.get('country')
+  name = request.POST.get('name')
+  date_mise_en_service = request.POST.get('date_mise_en_service')
+
+  if country == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Country"}, status=400)
+  if name == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Name"}, status=400)
+  if date_mise_en_service == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Date de mise en service"}, status=400)
+
+  try:
+    date_mise_en_service = datetime.datetime.strptime(date_mise_en_service, '%d/%m/%Y')
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Please provide a valid Date DD/MM/YYYY"}, status=400)
+
+  try:
+    country = Pays.objects.get(name__icontains=country)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Please provide a valid Country from the list", 'extra':str(e)}, status=400)
+
+  try:
+    obj, created = ProductionSite.objects.update_or_create(producer=context['user_entity'], country=country, name=name, defaults={'date_mise_en_service':date_mise_en_service})
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'Site added'})

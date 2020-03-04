@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from core.decorators import enrich_with_user_details, restrict_to_administrators
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from producers.models import ProducerCertificate
 
@@ -60,3 +60,17 @@ def administrators_settings(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'administrators-settings'
   return render(request, 'administrators/settings.html', context)
+
+@login_required
+@enrich_with_user_details
+@restrict_to_administrators
+def administrators_validate_certificate(request, *args, **kwargs):
+  context = kwargs['context']
+  certificate_id = kwargs['id']
+  try:
+    certificate = ProducerCertificate.objects.get(id=certificate_id)
+    certificate.status = 'Valid'
+    certificate.save()
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':'Could not find certificate'}, status=400)
+  return redirect('administrators-suivi-certificats')
