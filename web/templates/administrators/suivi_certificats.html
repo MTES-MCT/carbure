@@ -1,0 +1,87 @@
+{% extends "administrators/index.html" %}
+
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.css"/>
+{% endblock %}
+
+{% block administrator  %}
+	<div class="main">
+		<div class="panel">
+			<h3>Certificats Producteurs</h3>
+			<table class="display nowrap" id="datatable">
+				<thead>
+					<tr>
+						<th>Producteur</th>
+						<th>Matière première</th>
+						<th>Certificat</th>
+						<th>Date création</th>
+						<th>Date expiration</th>
+						<th>Statut</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+		            {% for crt in certificates %}
+		              <tr>
+		                <td>{{ crt.producer }}</td>
+		                <td>{{ crt.matiere_premiere }}</td>
+		                <td><a href="{{ crt.certificate.url }}" target="_blank">{{ crt.certificate.name }}</a></td>
+		                <td>{{ crt.date_added }}</td>
+		                <td>{{ crt.expiration }}</td>
+		                <td>{{ crt.get_status_display }}</td>
+		                <td><a class="button primary">Valider</a></td>
+		              </tr>
+		            {% empty %}
+		              <tr>
+		                <td colspan="7">Aucun certificat enregistré à ce jour.</td>
+		              </tr>
+		            {% endfor %}					
+		        <tfoot>
+					<tr>
+						<th>Producteur</th>
+						<th>Matière première</th>
+						<th>Certificat</th>
+						<th>Date création</th>
+						<th>Date expiration</th>
+						<th>Statut</th>
+						<th></th>						
+					</tr>					
+				</tfoot>
+			</table>
+		</div>
+	</div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+$(document).ready(function() {
+	COLUMN_FILTER = [0, 1, 5]
+	var table_controles = $('#datatable').DataTable({
+		paging: false,
+		searching: false,
+		info: false,
+		columnDefs: [
+      		{"className": "dt-center", "targets": "_all"}
+   		],				
+		initComplete: function () {
+            this.api().columns().every( function () {
+                var column = this;
+                if (COLUMN_FILTER.includes(column.index())) {
+	                var select = $('<select><option value=""></option></select>')
+	                    .appendTo( $(column.footer()).empty() )
+	                    .on( 'change', function () {
+	                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
+	                        column.search(val ? '^'+val+'$' : '', true, false).draw();
+	                    } );
+	 
+	                column.data().unique().sort().each(function (d, j) {
+	                    select.append('<option value="'+d+'">'+d+'</option>')
+	                } );
+	            }
+            } );
+        }      		
+	});
+});
+</script>
+{% endblock %}

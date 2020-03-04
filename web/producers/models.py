@@ -35,6 +35,7 @@ class ProducerCertificate(models.Model):
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE)
     matiere_premiere = models.ForeignKey(MatierePremiere, null=True, blank=True, on_delete=models.SET_NULL)
     expiration = models.DateField()
+    date_added = models.DateField(auto_now_add=True)
     certificate = models.FileField()
     status = models.CharField(max_length=32, choices=CERTIF_STATUS_CHOICES, default="Pending")
 
