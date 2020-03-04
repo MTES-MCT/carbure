@@ -10,4 +10,9 @@ urlpatterns = [
     path('suivi-certificats', views.administrators_suivi_certificats, name='administrators-suivi-certificats'),
     path('gestion-utilisateurs', views.administrators_gestion_utilisateurs, name='administrators-gestion-utilisateurs'),
     path('settings', views.administrators_settings, name='administrators-settings'),
+
+
+    # api-style urls
+    path('suivi-certificats/validate/<int:id>', views.administrators_validate_certificate, name='administrators-validate-certificate'),
+
 ]

@@ -12,5 +12,6 @@ urlpatterns = [
 
     # settings
     path('settings', views.producers_settings, name='producers-settings'),
+    path('settings/add-site', views.producers_settings_add_site, name='producers-settings-add-site'),
     path('settings/add-certif', views.producers_settings_add_certif, name='producers-settings-add-certif'),
 ]
