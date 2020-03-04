@@ -31,10 +31,12 @@ class ProductionSite(models.Model):
 
 
 class ProducerCertificate(models.Model):
+    CERTIF_STATUS_CHOICES = [("Pending", "En Attente de validation"), ("Valid", "Validé"), ("Expired", "Expiré"), ("Invalid", "Invalide")]
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE)
     matiere_premiere = models.ForeignKey(MatierePremiere, null=True, blank=True, on_delete=models.SET_NULL)
     expiration = models.DateField()
     certificate = models.FileField()
+    status = models.CharField(max_length=32, choices=CERTIF_STATUS_CHOICES, default="Pending")
 
     def __str__(self):
         return self.matiere_premiere.name

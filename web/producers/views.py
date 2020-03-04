@@ -2,9 +2,11 @@ from django.contrib.auth.decorators import login_required
 from core.decorators import enrich_with_user_details, restrict_to_producers
 from django.shortcuts import render
 from django.core.exceptions import PermissionDenied
-
-from producers.models import AttestationProducer
-from core.models import Lot
+from django.http import JsonResponse
+from django.urls import reverse_lazy
+from producers.models import AttestationProducer, ProducerCertificate
+from core.models import Lot, MatierePremiere
+from django.views.generic.edit import CreateView
 
 import datetime
 import calendar
@@ -65,6 +67,7 @@ def producers_controles(request, *args, **kwargs):
 def producers_settings(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'producers-settings'
+  context['certificates'] = ProducerCertificate.objects.filter(producer=context['user_entity'])
   return render(request, 'producers/settings.html', context)
 
 @login_required
@@ -115,3 +118,35 @@ def producers_annuaire(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'producers-annuaire'
   return render(request, 'producers/annuaire.html', context)
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_settings_add_certif(request, *args, **kwargs):
+  context = kwargs['context']
+  # do something
+  form_matiere_premiere = request.POST.get('matiere_premiere')
+  if form_matiere_premiere == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Matiere Premiere"}, status=400)
+  try:
+    matiere_premiere = MatierePremiere.objects.get(name=form_matiere_premiere)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Could not find Matiere Premiere"}, status=400)
+
+  form_exp_date = request.POST.get('expiration')
+  if form_exp_date == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Expiration"}, status=400)
+  try:
+    exp_date = datetime.datetime.strptime(form_exp_date, '%d/%m/%Y')
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Please provide a valid Expiration Date DD/MM/YYYY"}, status=400)
+
+  form_file = request.FILES.get('file', None)  
+  if form_file == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a certificate file"}, status=400)
+
+  try:
+    obj, created = ProducerCertificate.objects.update_or_create(producer=context['user_entity'], matiere_premiere=matiere_premiere, defaults={'expiration':exp_date, 'certificate': form_file})
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'Certificate added'})
