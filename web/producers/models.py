@@ -30,11 +30,9 @@ class ProductionSite(models.Model):
         verbose_name_plural = 'Sites de Production'	
 
 class ProductionSiteInput(models.Model):
-    ELIGIBLE_DOUBLE_COMPTAGE = [('Yes', 'Oui'), ('No', 'Non')]
-
     production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE)
     matiere_premiere = models.ForeignKey(MatierePremiere, on_delete=models.CASCADE)
-    eligible_double_comptage = models.CharField(max_length=3, choices=ELIGIBLE_DOUBLE_COMPTAGE, default='No')
+    eligible_double_comptage = models.BooleanField(default=False)
 
     def __str__(self):
         return self.matiere_premiere
