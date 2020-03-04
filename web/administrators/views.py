@@ -2,6 +2,8 @@ from django.contrib.auth.decorators import login_required
 from core.decorators import enrich_with_user_details, restrict_to_administrators
 from django.shortcuts import render
 
+from producers.models import ProducerCertificate
+
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
@@ -34,6 +36,14 @@ def administrators_suivi_corrections(request, *args, **kwargs):
   context['current_url_name'] = 'administrators-suivi-corrections'
   return render(request, 'administrators/suivi_corrections.html', context)
 
+@login_required
+@enrich_with_user_details
+@restrict_to_administrators
+def administrators_suivi_certificats(request, *args, **kwargs):
+  context = kwargs['context']
+  context['certificates'] = ProducerCertificate.objects.all()
+  context['current_url_name'] = 'administrators-suivi-certificats'
+  return render(request, 'administrators/suivi_certificats.html', context)
 
 @login_required
 @enrich_with_user_details
