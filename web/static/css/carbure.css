@@ -76,8 +76,8 @@
 table > thead > tr > th,
 table > tfoot > tr > th,
 table > tbody > tr > td {
-  font-size: 12px;
-  line-height: 1.2em;
+  font-size: 14px;
+  line-height: 1em;
 }
 
 #datatable > tbody > tr.status_ok,
