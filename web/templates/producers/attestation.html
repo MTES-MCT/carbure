@@ -470,18 +470,19 @@ $(document).ready(function() {
     		// select everything
     		$("#datatable_wrapper").find('input').prop('checked', true)
     		let rows = table.rows()
-    		for (let i = 0, len = table.rows().count(); i < len; i++) {
-    			let row = table.row(i)
-				selected_rows[i] = row.data()
+    		for (let i = 0, len = rows.count(); i < len; i++) {
+				let rowid = table.row(i).index();
+    			let rowdata = table.row(i).data()
+				selected_rows[rowid] = rowdata
 			}
       	} else {
       		// unselect everything
     		$("#datatable_wrapper").find('input').prop('checked', false)
-    		for (let i = 0, len = selected_rows.length; i < len; i++) {
-				delete selected_rows[i]
+    		for (const key in selected_rows) {
+				delete selected_rows[key]
 			}      		
 		}
-		console.log(selected_rows)
+		console.log(`${Object.keys(selected_rows).length} rows selected`)
 		show_hide_action_buttons()
     })
 
