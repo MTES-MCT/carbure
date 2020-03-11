@@ -4,32 +4,237 @@
 	<div class="main">
 		<div class="panel">
 			<div class="panel__header">
-            <h3>Gestion Utilisateurs</h3>
+            <h3>Settings</h3>
+            <small class="panel__header-extra">Créé le 31 février</small>
           </div>
-          <div class="form__group">
-            <label>Création de Société</label>
-            <div class="input__group">
-              <label>Nom</label>
-              <input type="text" name="entity_name" id="entity_name" />
-            </div>
-          </div>          
-          <div class="form__group">
-            <label>Création de Compte</label>
-            <ul class="label-list">
-              <li class="label"><a>zombies</a></li>
-              <li class="label"><a>undeads</a></li>
-              <li class="label"><a>creep swarms</a></li>
-            </ul>
-          </div>
-          <div class="form__group">
-            <label for="token">Gestion de droits</label>
-            <div class="input__group">
-              <input type="text" name="token" id="token" />
-              <button class="button icon-button">
-                <svg class="icon icon-copy" viewBox="0 0 32 32"><use xlink:href="#copy" aria-label="Copier"></use></svg>
-              </button>
-            </div>
-          </div>			
+    <section class="form__group"> 
+      <h3>Sociétés</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Classification</th>
+                <th>Date de création</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for entity in entites %}
+              <tr>
+                <td>{{entity.name}}</td>
+                <td>{{entity.entity_type}}</td>
+                <td>{{entity.date_added}}</td>
+              </tr>          
+              {% empty %}
+              <tr>
+                <td colspan="3">Aucune société enregistrée à ce jour.</td>
+              </tr>                    
+              {% endfor %}   
+            </tbody>
+          </table>
+          <div class="flex-container-right">
+            <a class="button primary" id="btn_open_modal_entity">Ajouter Société</a>
+          </div>   
+    </section>
+
+    <section class="form__group"> 
+      <h3>Utilisateurs</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Réinitialisation de mot de passe</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in users %}
+              <tr>
+                <td>{{user.name}}</td>
+                <td>{{user.email}}</td>
+                <td><a class="button primary">Reset</a></td>
+              </tr>          
+              {% empty %}
+              <tr>
+                <td colspan="3">Aucun compte utilisateur enregistré à ce jour.</td>
+              </tr>                    
+              {% endfor %}   
+            </tbody>
+          </table>
+          <div class="flex-container-right">
+            <a class="button primary" id="btn_open_modal_user">Ajouter Utilisateur</a>
+          </div>   
+    </section>
+
+    <section class="form__group"> 
+      <h3>Droits</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Utilisateur</th>
+                <th>Société</th>
+                <th>Supprimer</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for right in user_rights %}
+              <tr>
+                <td>{{user.name}}</td>
+                <td>{{user.email}}</td>
+                <td><a class="button primary">Supprimer</a></td>
+              </tr>          
+              {% empty %}
+              <tr>
+                <td colspan="3">Aucun droit enregistré à ce jour.</td>
+              </tr>                    
+              {% endfor %}   
+            </tbody>
+          </table>
+          <div class="flex-container-right">
+            <a class="button primary" id="btn_open_modal_right">Ajouter Droit</a>
+          </div>   
+    </section>
 		</div>
 	</div>
+
+
+<div class="modal__backdrop" id="modal_entity">
+  <div class="modal">
+    <span id="modal_entity_err_message" style="color: red;"></span>
+    <form id="modal_entity_form" method="POST">
+      {% csrf_token %}
+      <label for="modal_entity_name">Nom</label>
+      <input type="text" id="modal_entity_name" name="name" placeholder="BioRaffinage SA">
+      <label for="modal_entity_cat">Catégorie</label>
+      <select id="modal_entity_cat" name="category">
+        {% for cat in categories %}
+        <option value="{{cat.id}}">{{cat.name}}</option>
+        {% endfor %}
+      </select>
+      <div class="form__group button__group">
+        <a class="button secondary close" id="btn_close_modal_entity">Annuler</a>
+        <button type="submit" class="button">Valider</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_user">
+  <div class="modal">
+    <span id="modal_user_err_message" style="color: red;"></span>
+    <form id="modal_user_form" method="POST">
+      {% csrf_token %}
+      <label for="modal_user_name">Nom</label>
+      <input type="text" id="modal_entity_name" name="name" placeholder="BioRaffinage SA">
+      <label for="modal_entity_cat">Catégorie</label>
+      <select id="modal_entity_cat" name="category">
+        {% for cat in categories %}
+        <option value="{{cat.id}}">{{cat.name}}</option>
+        {% endfor %}
+      </select>
+      <div class="form__group button__group">
+        <a class="button secondary close" id="btn_close_modal_user">Annuler</a>
+        <button type="submit" class="button">Valider</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_right">
+  <div class="modal">
+    <span id="modal_right_err_message" style="color: red;"></span>
+    <form id="modal_right_form" method="POST">
+      {% csrf_token %}
+      <label for="modal_entity_name">Nom</label>
+      <input type="text" id="modal_entity_name" name="name" placeholder="BioRaffinage SA">
+      <label for="modal_entity_cat">Catégorie</label>
+      <select id="modal_entity_cat" name="category">
+        {% for cat in categories %}
+        <option value="{{cat.id}}">{{cat.name}}</option>
+        {% endfor %}
+      </select>
+      <div class="form__group button__group">
+        <a class="button secondary close" id="btn_close_modal_right">Annuler</a>
+        <button type="submit" class="button">Valider</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+var modals = ["modal_entity", "modal_user", "modal_right"]
+
+for (let i = 0, len = modals.length; i < len; i++) {
+  let modalid = modals[i]
+  let modal = document.getElementById(modalid)
+  let btn_open_modal = document.getElementById("btn_open_" + modalid)
+  let btn_close_modal = document.getElementById("btn_close_" + modalid)
+  btn_open_modal.onclick = function() {
+    modal.style.display = "flex";
+  }
+  btn_close_modal.onclick = function() {
+    modal.style.display = "none"
+  }
+}
+
+// clicking outside of the modal window will close it
+window.onclick = function(event) {
+  for (let i = 0, len = modals.length; i < len; i++) {
+    let modalid = modals[i]
+    let modal = document.getElementById(modalid)
+    if (event.target == modal) {
+      modal.style.display = "none"
+    }
+  }
+}
+
+// escape key
+document.addEventListener('keydown', function(event) {
+    if (event.keyCode === 27) {
+      for (let i = 0, len = modals.length; i < len; i++) {
+        let modalid = modals[i]
+        let modal = document.getElementById(modalid)
+        modal.style.display = "none"
+      }
+    }
+});
+
+
+$(document).ready(function() {
+
+  $("#modal_entity_form").submit(function(event) {
+      var form = $(this);
+      var formdata = false;
+      if (window.FormData){
+          formdata = new FormData(form[0]);
+      }
+      $.ajax({
+          url         : "{% url 'producers-settings-add-site' %}",
+          data        : formdata ? formdata : form.serialize(),
+          cache       : false,
+          contentType : false,
+          processData : false,
+          type        : 'POST',
+          success     : function(data, textStatus, jqXHR){
+              // Callback code
+              $("#modal_entity_err_message").text("")
+              window.location.reload()
+          },
+          error       : function(e) {
+            if (e.status === 400) {
+              $("#modal_entity_err_message").text(e.responseJSON.message)
+              console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+            } else {
+              $("#modal_entity_err_message").text("Server error. Please contact an administrator")
+              console.log(`server error ${JSON.stringify(e)}`)
+            }
+          }
+      });
+      event.preventDefault()
+  })
+})
+</script>
 {% endblock %}
