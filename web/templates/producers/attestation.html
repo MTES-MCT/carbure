@@ -263,7 +263,6 @@ $(document).ready(function() {
 		return columns
 	}
 
-
 	function saveTableSettings(settings) {
 		localStorage.setItem("tableSettings", JSON.stringify(settings));
 	}
@@ -385,6 +384,7 @@ $(document).ready(function() {
 		// pseudo code: if all rows are valid, button Affilier is active
 		// if one of the rows is a draft, button Valider is active
 		let draft_present = false
+		let only_drafts_present = true
 		let keys = Object.keys(selected_rows)
 		for (let i = 0, len = keys.length; i < len; i++) {
 			let key = keys[i]
@@ -392,6 +392,8 @@ $(document).ready(function() {
 			let statut = rowdata['statut']
 			if (statut.toLowerCase() === "brouillon") {
 				draft_present = true
+			} else {
+				only_drafts_present = false
 			}
 		}
 		var btn_affiliate = document.getElementById("btn_affiliate")
@@ -412,13 +414,17 @@ $(document).ready(function() {
 		if (draft_present === true) {
 			$("#btn_validate").addClass('primary')
 			$("#btn_validate").removeClass('secondary')		
-			$("#btn_delete").addClass('primary')
-			$("#btn_delete").removeClass('secondary')		
 		} else {
 			$("#btn_validate").addClass('secondary')
 			$("#btn_validate").removeClass('primary')		
+		}
+
+		if (keys.length > 0 && only_drafts_present === true) {
+			$("#btn_delete").addClass('primary')
+			$("#btn_delete").removeClass('secondary')					
+		} else {
 			$("#btn_delete").addClass('secondary')
-			$("#btn_delete").removeClass('primary')			
+			$("#btn_delete").removeClass('primary')					
 		}
 
 		if (keys.length === 1) {
