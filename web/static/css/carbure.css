@@ -73,6 +73,13 @@
 	overflow-y: auto;
 }
 
+table > thead > tr > th,
+table > tfoot > tr > th,
+table > tbody > tr > td {
+  font-size: 12px;
+  line-height: 1.2em;
+}
+
 #datatable > tbody > tr.status_ok,
 #datatable > tbody > tr.status_ok td.sorting_1,
 #datatable_wrapper > div > div.DTFC_LeftWrapper > div.DTFC_LeftBodyWrapper > div > table > tbody > tr.status_ok,
@@ -80,7 +87,7 @@
 #datatable_wrapper > div > div.DTFC_RightWrapper > div.DTFC_RightBodyWrapper > div > table > tbody > tr.status_ok,
 #datatable_wrapper > div > div.DTFC_RightWrapper > div.DTFC_RightBodyWrapper > div > table > tbody > tr.status_ok td.sorting_1 {
 	background: var(--light-green);
-    cursor: pointer;
+  cursor: pointer;  
 }
 
 #datatable > tbody > tr.status_warning,
@@ -90,7 +97,7 @@
 #datatable_wrapper > div > div.DTFC_RightWrapper > div.DTFC_RightBodyWrapper > div > table > tbody > tr.status_warning,
 #datatable_wrapper > div > div.DTFC_RightWrapper > div.DTFC_RightBodyWrapper > div > table > tbody > tr.status_warning td.sorting_1 {
 	background: var(--light-orange);
-    cursor: pointer;
+  cursor: pointer;
 }
 
 #datatable_wrapper tbody tr.hover,
@@ -98,7 +105,7 @@
 #datatable > tbody > tr:hover,
 #datatable > tbody > tr:hover td.sorting_1 {
 	background: var(--lighter-blue) !important;
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .flex-container-a {
