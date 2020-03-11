@@ -467,16 +467,17 @@ $(document).ready(function() {
 
 	$(document).on('change', '#checkbox_header', function() {
     	if (this.checked) {
+    		// select everything
+    		$("#datatable_wrapper").find('input').prop('checked', true)
     		let rows = table.rows()
     		for (let i = 0, len = table.rows().count(); i < len; i++) {
-    			$(rows[i]).find('input').prop('checked', true)
     			let row = table.row(i)
 				selected_rows[i] = row.data()
 			}
       	} else {
-    		let rows = table.rows()
-    		for (let i = 0, len = table.rows().count(); i < len; i++) {
-    			$(rows[i]).find('input').prop('checked', false)
+      		// unselect everything
+    		$("#datatable_wrapper").find('input').prop('checked', false)
+    		for (let i = 0, len = selected_rows.length; i < len; i++) {
 				delete selected_rows[i]
 			}      		
 		}
