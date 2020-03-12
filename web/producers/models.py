@@ -1,6 +1,6 @@
 from django.db import models
 
-from core.models import Entity, MatierePremiere, TypeBiocarburant, Pays
+from core.models import Entity, MatierePremiere, Biocarburant, Pays
 
 class AttestationProducer(models.Model):
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE)
@@ -24,6 +24,9 @@ class ProductionSite(models.Model):
     def __str__(self):
         return self.name
 
+    def natural_key(self):
+        return self.name
+
     class Meta:
         db_table = 'producer_sites'
         verbose_name = 'Site de Production'
@@ -35,7 +38,7 @@ class ProductionSiteInput(models.Model):
     eligible_double_comptage = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.matiere_premiere
+        return self.matiere_premiere   
 
     class Meta:
         db_table = 'production_sites_input'
@@ -46,7 +49,7 @@ class ProductionSiteOutput(models.Model):
     GES_OPTIONS = [('Default', 'Valeurs par défaut'), ('Actual', 'Valeurs réelles'), ('NUTS2', 'NUTS2')]
 
     production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE)
-    biocarburant = models.ForeignKey(TypeBiocarburant, on_delete=models.CASCADE)
+    biocarburant = models.ForeignKey(Biocarburant, on_delete=models.CASCADE)
     ges_option = models.CharField(max_length=12, choices=GES_OPTIONS, default='Default')
 
     def __str__(self):
