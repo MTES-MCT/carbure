@@ -173,11 +173,11 @@
 {% block extra_js %}
 <script type="text/javascript">
 var table_columns = [
-{title:'Producer', can_hide: true, can_duplicate: true, data:'producer'}, 
+{title:'Producteur', can_hide: true, can_duplicate: true, data:'producer'}, 
 {title:'Site de<br />Production', can_hide: true, can_duplicate: true, data:'production_site'}, 
 
 {title: 'Volume<br /> à 20°C<br />en Litres', can_hide: true, can_duplicate: true, data: 'volume'}, 
-{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, data: 'type_biocarburant'}, 
+{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, data: 'biocarburant'}, 
 {title:'Matière<br /> Première', can_hide: true, can_duplicate: true, can_filter: true, data: 'matiere_premiere'}, 
 {title:`Pays<br /> d'origine`, can_hide: true, can_duplicate: true, can_filter: true, data: 'pays_origine'}, 
 
@@ -190,16 +190,16 @@ var table_columns = [
 {title:'ECCS', can_hide: true, can_duplicate: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'}, 
 {title:'ECCR', can_hide: true, can_duplicate: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'}, 
 {title:'EEE', can_hide: true, can_duplicate: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'}, 
-{title:'E', can_hide: true, can_duplicate: true, is_read_only: true, data: 'e' tooltip: 'Total des émissions résultant de l\'utilisation du carburant'}, 
-{title:'Émissions de référence', can_hide: true, can_duplicate: true, is_read_only: true, data: 'ghg_reference' tooltip: 'Total des émissions du carburant fossile de référence'}, 
+{title:'E', can_hide: true, can_duplicate: true, is_read_only: true, data: 'e', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'}, 
+{title:'Émissions de référence', can_hide: true, can_duplicate: true, is_read_only: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'}, 
 {title:'% de réduction', can_hide: true, can_duplicate: true, is_read_only: true, data: 'ghg_reduction'}, 
 
 {title:'N°DAE', can_hide: true, can_duplicate: false, data:'dae'}, 
+{title:'Référence', can_hide: true, can_duplicate: true, data:'client_id', tooltip: 'Champ libre - Référence client'}, 
 {title:'Date d\'entrée<br />en EA', can_hide: true, can_duplicate: true, data:'ea_delivery_date'}, 
 {title:'Client', can_hide: true, can_duplicate: true, can_filter: true, data: 'ea'}, 
 {title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, data: 'ea_delivery_site'}, 
-{title:'Référence', can_hide: true, can_duplicate: true, data:'client_id', tooltip: 'Champ libre - Référence client'}, 
-{title:'Statut', can_hide: true, can_duplicate: true, read_only: true, can_filter: true, data: 'statut'}, 
+{title:'Statut', can_hide: true, can_duplicate: true, read_only: true, can_filter: true, data: 'status'}, 
 {title:`<input type="checkbox" id="checkbox_header"/>`, can_hide: false, can_duplicate: false, read_only: true, data:'checkbox'},
 ]
 
@@ -234,16 +234,25 @@ $(document).ready(function() {
 		info: false,
 		scrollX: true,
         fixedColumns: {
-        	leftColumns: 1,
-        	rightColumns: 3,
+        	rightColumns: 2,
         },
 		dom: "lrtip",
 		columnDefs: [
        		{"className": "dt-center", "targets": "_all"}
    		],
    		columns: table_columns,
-   		ajax: '{% url 'api-producers-sample-lots' %}',
-		initComplete: function() {
+   		ajax: {
+   			url: `{% url 'api-producers-sample-lots' %}`,
+	    	dataSrc: function(json) {
+	      		for (let i = 0, len = json.length; i < len; i++) {
+	        		json[i] = json[i]["fields"]
+	        		// add checkbox on the fly
+	        		json[i]["checkbox"] = `<input type="checkbox" />`
+	      		}
+	      		return json
+	    	}
+	    },
+    	initComplete: function() {
 			// create filter
             this.api().columns().every(function () {
                 var column = this;
@@ -273,6 +282,11 @@ $(document).ready(function() {
 			saveTableSettings(columns)
 		} else {
 			columns = JSON.parse(tableSettings)
+			let nb_columns = table.columns().data().length
+			if (columns.length !== nb_columns) {
+				columns = Array(nb_columns).fill(1);
+				saveTableSettings(columns)
+			}
 		}
 		return columns
 	}

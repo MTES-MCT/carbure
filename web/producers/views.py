@@ -5,7 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 from producers.models import AttestationProducer, ProducerCertificate, ProductionSite, ProductionSiteInput, ProductionSiteOutput
-from core.models import Lot, MatierePremiere, Pays, TypeBiocarburant
+from core.models import Lot, MatierePremiere, Pays, Biocarburant
 from django.views.generic.edit import CreateView
 
 import datetime
@@ -242,7 +242,7 @@ def producers_settings_add_biocarburant(request, *args, **kwargs):
     return JsonResponse({'status':'error', 'message':"Please provide a value in field GES Option"}, status=400)
 
   try:
-    biocarburant = TypeBiocarburant.objects.get(name__icontains=biocarburant)
+    biocarburant = Biocarburant.objects.get(name__icontains=biocarburant)
   except Exception as e:
     return JsonResponse({'status':'error', 'message':"Please provide a valid Biocarburant from the list", 'extra':str(e)}, status=400)
 

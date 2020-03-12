@@ -15,6 +15,9 @@ class Entity(models.Model):
     def __str__(self):
         return self.name
 
+    def natural_key(self):
+        return self.name
+
     class Meta:
         db_table = 'entities'
         verbose_name = 'Entity'
@@ -45,7 +48,7 @@ class UserRights(models.Model):
         verbose_name = 'User Right'
         verbose_name_plural = 'Users Rights'
 
-class TypeBiocarburant(models.Model):
+class Biocarburant(models.Model):
     name = models.CharField(max_length=64)
     description = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
@@ -53,10 +56,13 @@ class TypeBiocarburant(models.Model):
     def __str__(self):
         return self.name
 
+    def natural_key(self):
+        return self.name
+
     class Meta:
-        db_table = 'type_biocarburants'
-        verbose_name = 'Type de Biocarburant'
-        verbose_name_plural = 'Types de Biocarburants'
+        db_table = 'biocarburants'
+        verbose_name = 'Biocarburant'
+        verbose_name_plural = 'Biocarburants'
 
 class MatierePremiere(models.Model):
     name = models.CharField(max_length=128)
@@ -64,6 +70,9 @@ class MatierePremiere(models.Model):
     date_added = models.DateField(default=timezone.now)
 
     def __str__(self):
+        return self.name
+
+    def natural_key(self):
         return self.name
 
     class Meta:
@@ -77,6 +86,9 @@ class Pays(models.Model):
     date_added = models.DateField(default=timezone.now)
 
     def __str__(self):
+        return self.name
+
+    def natural_key(self):
         return self.name
 
     class Meta:
@@ -104,8 +116,8 @@ class Lot(models.Model):
 
     # lot details
     volume = models.IntegerField(default=0)
-    type_biocarburant = models.ForeignKey(TypeBiocarburant, null=True, on_delete=models.SET_NULL), 
     matiere_premiere = models.ForeignKey(MatierePremiere, null=True, on_delete=models.SET_NULL)
+    biocarburant = models.ForeignKey(Biocarburant, null=True, on_delete=models.SET_NULL)
     pays_origine = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='pays_origine')
 
 
@@ -129,7 +141,7 @@ class Lot(models.Model):
     status = models.CharField(max_length=64, choices=LOT_STATUS, default='Draft')
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
     class Meta:
         db_table = 'lots'

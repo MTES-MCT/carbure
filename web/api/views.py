@@ -1,12 +1,13 @@
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
 from core.decorators import enrich_with_user_details, restrict_to_producers
 from django.http import JsonResponse, HttpResponse
 import json
-from core.models import TypeBiocarburant, MatierePremiere, Pays, Lot
+from core.models import Biocarburant, MatierePremiere, Pays, Lot
 
-def type_biocarburant_autocomplete(request):
+def biocarburant_autocomplete(request):
   q = request.GET.get('q', '')
-  types = TypeBiocarburant.objects.filter(name__icontains=q)
+  types = Biocarburant.objects.filter(name__icontains=q)
   results = [{'name':i.name, 'description':i.description} for i in types]
   data = json.dumps(results)
   mimetype = 'application/json'
@@ -45,5 +46,7 @@ def lot_validate(request, *args, **kwargs):
 @restrict_to_producers
 def producers_sample_lots(request, *args, **kwargs):
   context = kwargs['context']
-  sample_lots = Lot.objects.all()
-  return JsonResponse({'data':sample_lots})
+  data = serializers.serialize('json', Lot.objects.all(), fields=('producer', 'production_site', 'dae', 'ea_delivery_date', 'ea_delivery_site', 'ea', 'volume',
+    'matiere_premiere', 'biocarburant', 'pays_origine', 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'e', 'ghg_reference', 'ghg_reduction',
+    'client_id', 'status'), use_natural_foreign_keys=True)
+  return HttpResponse(data, content_type='application/json')
