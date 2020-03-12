@@ -171,10 +171,37 @@
 
 
 {% block extra_js %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.js"></script>
 <script type="text/javascript">
-var table_columns = [{title:'N°DAE', can_hide: true, can_duplicate: false, data:'num_dae'}, {title: 'Volume<br /> à 20°C', can_hide: true, can_duplicate: true, data: 'volume'}, {title:'Type', can_hide: true, can_duplicate: true, can_filter: true, data: 'type'}, {title:'Matière<br /> Première', can_hide: true, can_duplicate: true, can_filter: true, data: 'matiere_premiere'}, {title:`Pays<br /> d'origine`, can_hide: true, can_duplicate: true, can_filter: true, data: 'pays_origine'}, {title:'GES Tranport<br /> et Distribution', can_hide: true, can_duplicate: true, data: 'ges_transport_distribution'}, {title:'GES Fossile', can_hide: true, can_duplicate: true, data: 'ges_fossile'}, {title:'% de réduction', can_hide: true, can_duplicate: true, read_only: true, data: 'ges_reductions'}, {title:`Pays<br /> d'implantation`, can_hide: true, can_duplicate: true, can_filter: true, data:'pays_implantation'}, {title:'Date de <br />mise en service', can_hide: true, can_duplicate: true, can_filter: true, data: 'date_mise_en_service'}, {title:'Statut', can_hide: true, can_duplicate: true, read_only: true, can_filter: true, data: 'statut'}, {title:'Client', can_hide: true, can_duplicate: true, can_filter: true, data:'client'}, {title:`<input type="checkbox" id="checkbox_header"/>`, can_hide: false, can_duplicate: false, read_only: true, data:'checkbox'}]
+var table_columns = [
+{title:'Producer', can_hide: true, can_duplicate: true, data:'producer'}, 
+{title:'Site de<br />Production', can_hide: true, can_duplicate: true, data:'production_site'}, 
+
+{title: 'Volume<br /> à 20°C<br />en Litres', can_hide: true, can_duplicate: true, data: 'volume'}, 
+{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, data: 'type_biocarburant'}, 
+{title:'Matière<br /> Première', can_hide: true, can_duplicate: true, can_filter: true, data: 'matiere_premiere'}, 
+{title:`Pays<br /> d'origine`, can_hide: true, can_duplicate: true, can_filter: true, data: 'pays_origine'}, 
+
+{title:'EEC', can_hide: true, can_duplicate: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'}, 
+{title:'EL', can_hide: true, can_duplicate: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'}, 
+{title:'EP', can_hide: true, can_duplicate: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'}, 
+{title:'ETD', can_hide: true, can_duplicate: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'}, 
+{title:'EU', can_hide: true, can_duplicate: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'}, 
+{title:'ESCA', can_hide: true, can_duplicate: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'}, 
+{title:'ECCS', can_hide: true, can_duplicate: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'}, 
+{title:'ECCR', can_hide: true, can_duplicate: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'}, 
+{title:'EEE', can_hide: true, can_duplicate: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'}, 
+{title:'E', can_hide: true, can_duplicate: true, is_read_only: true, data: 'e' tooltip: 'Total des émissions résultant de l\'utilisation du carburant'}, 
+{title:'Émissions de référence', can_hide: true, can_duplicate: true, is_read_only: true, data: 'ghg_reference' tooltip: 'Total des émissions du carburant fossile de référence'}, 
+{title:'% de réduction', can_hide: true, can_duplicate: true, is_read_only: true, data: 'ghg_reduction'}, 
+
+{title:'N°DAE', can_hide: true, can_duplicate: false, data:'dae'}, 
+{title:'Date d\'entrée<br />en EA', can_hide: true, can_duplicate: true, data:'ea_delivery_date'}, 
+{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, data: 'ea'}, 
+{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, data: 'ea_delivery_site'}, 
+{title:'Référence', can_hide: true, can_duplicate: true, data:'client_id', tooltip: 'Champ libre - Référence client'}, 
+{title:'Statut', can_hide: true, can_duplicate: true, read_only: true, can_filter: true, data: 'statut'}, 
+{title:`<input type="checkbox" id="checkbox_header"/>`, can_hide: false, can_duplicate: false, read_only: true, data:'checkbox'},
+]
 
 var selected_rows = {}
 

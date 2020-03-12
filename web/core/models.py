@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 
+
 class Entity(models.Model):
     ENTITY_TYPES = (('Producteur', 'Producteur'), ('Opérateur', 'Opérateur'),
                     ('Administration', 'Administration'), ('Unknown', 'Unknown'))
@@ -85,28 +86,47 @@ class Pays(models.Model):
 
 
 from producers.models import AttestationProducer
+from producers.models import ProductionSite
 
 class Lot(models.Model):
-    LOT_STATUS = (('Draft', 'Draft'), ('Validated', 'Validated'), ('Declared', 'Declared'))
+    LOT_STATUS = (('Draft', 'Draft'), ('Validated', 'Validated'))
 
-    producer = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='producer')
+    # producer
     attestation = models.ForeignKey(AttestationProducer, null=True, blank=True, on_delete=models.SET_NULL)
-    depot = models.CharField(max_length=64, blank=True)
-    num_dae = models.CharField(max_length=64, blank=True)
-    date_entree = models.DateField(blank=True)
+    producer = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='producer')
+    production_site = models.ForeignKey(ProductionSite, null=True, blank=True, on_delete=models.SET_NULL)
+
+    # client / delivery
+    dae = models.CharField(max_length=64, blank=True)
+    ea_delivery_date = models.DateField(blank=True)
+    ea_delivery_site = models.CharField(max_length=64, blank=True, default='')
+    ea = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='ea')
+
+    # lot details
     volume = models.IntegerField(default=0)
     type_biocarburant = models.ForeignKey(TypeBiocarburant, null=True, on_delete=models.SET_NULL), 
     matiere_premiere = models.ForeignKey(MatierePremiere, null=True, on_delete=models.SET_NULL)
-    categorie = models.CharField(max_length=64)
-    systeme_fournisseur = models.CharField(max_length=64)
     pays_origine = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='pays_origine')
-    respect_crit_durabilite = models.BooleanField(default=False)
-    ges_transport_distrib = models.FloatField(blank=True)
-    ges_fossile = models.FloatField(blank=True)
-    pays_production = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='pays_production')
-    date_mise_en_service = models.DateField(blank=True)
+
+
+    # GHG values
+    eec = models.FloatField(default=0.0)
+    el = models.FloatField(default=0.0)
+    ep = models.FloatField(default=0.0)
+    etd = models.FloatField(default=0.0)
+    eu = models.FloatField(default=0.0)
+    esca = models.FloatField(default=0.0)
+    eccs = models.FloatField(default=0.0)
+    eccr = models.FloatField(default=0.0)
+    eee = models.FloatField(default=0.0)
+    e = models.FloatField(default=0.0)
+    ghg_reference = models.FloatField(default=0.0)
+    ghg_reduction = models.FloatField(default=0.0)
+
+
+    # other
+    client_id = models.CharField(max_length=64, blank=True, default='')
     status = models.CharField(max_length=64, choices=LOT_STATUS, default='Draft')
-    affiliate = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='affiliated')
 
     def __str__(self):
         return self.id

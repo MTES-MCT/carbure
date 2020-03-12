@@ -41,11 +41,11 @@ class PaysAdmin(admin.ModelAdmin):
     list_display = ('name', )
     search_fields = ('name', ) 
 
-
 class LotAdmin(admin.ModelAdmin):
-    list_display = ('depot', 'type_biocarburant', 'matiere_premiere', 'status')
-    search_fields = ('depot', 'type_biocarburant', 'matiere_premiere', 'status')
-
+    list_display = ('producer', 'production_site', 'ea_delivery_site', 'ea_delivery_date', 'ea', 'type_biocarburant', 
+        'matiere_premiere', 'client_id', 'status')
+    search_fields = ('producer', 'production_site', 'dae', 'ea', 'type_biocarburant', 'matiere_premiere', 'pays_origine', 'client_id')
+    list_filter = ('status', )
 
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)

@@ -38,7 +38,7 @@ def producers_index(request, *args, **kwargs):
   for attestation in attestations:
     attestation.lots = len(Lot.objects.filter(attestation=attestation))
     attestation.drafts = len(Lot.objects.filter(attestation=attestation, status='Draft'))
-    attestation.to_affiliate = len(Lot.objects.filter(attestation=attestation, status='Validated', affiliate=None))
+    attestation.to_affiliate = len(Lot.objects.filter(attestation=attestation, status='Validated', ea=None))
 
   context['attestations'] = attestations
   context['today'] = datetime.date.today()
