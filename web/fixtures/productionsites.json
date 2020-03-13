@@ -1,0 +1,1 @@
+[{"model": "producers.productionsite", "pk": 1, "fields": {"producer": 1, "name": "totopouet", "country": 77, "date_mise_en_service": "2002-12-24"}}, {"model": "producers.productionsite", "pk": 2, "fields": {"producer": 1, "name": "Grandpuits", "country": 93, "date_mise_en_service": "1888-12-21"}}]
