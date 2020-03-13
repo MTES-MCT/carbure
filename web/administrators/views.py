@@ -1,7 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from core.decorators import enrich_with_user_details, restrict_to_administrators
 from django.shortcuts import render, redirect
+from django.conf import settings
+from django.contrib.auth import get_user_model
 
+from core.models import Entity, UserRights
 from producers.models import ProducerCertificate
 
 @login_required
@@ -51,6 +54,10 @@ def administrators_suivi_certificats(request, *args, **kwargs):
 def administrators_gestion_utilisateurs(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'administrators-gestion-utilisateurs'
+  context['entities'] = Entity.objects.all()
+  user_model = get_user_model()
+  context['users'] = user_model.objects.all()
+  context['user_rights'] = UserRights.objects.all()
   return render(request, 'administrators/gestion_utilisateurs.html', context)
 
 @login_required
