@@ -22,6 +22,7 @@ class ProductionSite(models.Model):
     country = models.ForeignKey(Pays, null=False, on_delete=models.CASCADE)
     date_mise_en_service = models.DateField(null=False, blank=False)
     ges_option = models.CharField(max_length=12, choices=GES_OPTIONS, default='Default')
+    eligible_dc = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -39,7 +40,6 @@ class ProductionSiteInput(models.Model):
 
     production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE)
     matiere_premiere = models.ForeignKey(MatierePremiere, on_delete=models.CASCADE)
-    eligible_double_comptage = models.BooleanField(default=False)
     status = models.CharField(max_length=16, choices=INPUT_STATUS, default="Pending")
 
     def __str__(self):

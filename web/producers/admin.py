@@ -14,7 +14,7 @@ admin.site.register(AttestationProducer, AttestationProducerAdmin)
 class ProductionSiteAdmin(admin.ModelAdmin):
     list_display = ('name', 'producer', 'country', 'date_mise_en_service', 'ges_option')
     search_fields = ('name', 'producer', 'country', 'ges_option')
-    list_filter = ('producer', 'country', 'ges_option')
+    list_filter = ('producer', 'country', 'ges_option', 'eligible_dc')
 
 admin.site.register(ProductionSite, ProductionSiteAdmin)
 
@@ -28,9 +28,9 @@ admin.site.register(ProducerCertificate, ProducerCertificateAdmin)
 
 
 class ProductionSiteInputAdmin(admin.ModelAdmin):
-    list_display = ('production_site', 'matiere_premiere', 'eligible_double_comptage',)
-    search_fields = ('production_site', 'matiere_premiere', 'eligible_double_comptage')
-    list_filter = ('matiere_premiere', 'eligible_double_comptage')
+    list_display = ('production_site', 'matiere_premiere')
+    search_fields = ('production_site', 'matiere_premiere')
+    list_filter = ('matiere_premiere',)
 
 admin.site.register(ProductionSiteInput, ProductionSiteInputAdmin)
 
