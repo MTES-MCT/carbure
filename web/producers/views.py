@@ -68,9 +68,16 @@ def producers_settings(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'producers-settings'
   context['sites'] = ProductionSite.objects.filter(producer=context['user_entity'])
-  context['mps'] = ProductionSiteInput.objects.filter(production_site__in=context['sites'])
-  context['outputs'] = ProductionSiteOutput.objects.filter(production_site__in=context['sites'])
-  context['certificates'] = ProducerCertificate.objects.filter(producer=context['user_entity'])
+  mps = ProductionSiteInput.objects.filter(production_site__in=context['sites'])
+  outputs = ProductionSiteOutput.objects.filter(production_site__in=context['sites'])
+  certificates = ProducerCertificate.objects.filter(producer=context['user_entity'])
+  for site in context['sites']:
+    site.inputs = mps.filter(production_site=site)
+    try:
+      site.certificate = certificates.get(production_site=site)
+    except:
+      site.certificate = None
+    site.outputs = outputs.filter(production_site=site)
   return render(request, 'producers/settings.html', context)
 
 @login_required
