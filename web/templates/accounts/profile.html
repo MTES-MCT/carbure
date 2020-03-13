@@ -1,3 +1,22 @@
 {% extends "common/base_private.html" %}
 
-
+{% block content %}
+<div class="main">
+  <div class="panel">
+    <div class="panel__header">
+      <h3>Mon Compte</h3>
+    </div>
+    <div class="form-group">
+        <dl>
+          <dt>Nom</dt>
+          <dd>{{user.name}}</dd>
+          <dt>Adresse e-mail</dt>
+          <dd>{{user.email}}</dd>
+        </dl>          
+    </div>
+    <div class="text-center">
+      <a class="small" href="{% url 'password_reset' %}">Réinitialiser mon mot de passe</a>
+    </div>        
+  </div>
+</div>
+{% endblock %}
