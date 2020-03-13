@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'authtools',
     'core',
+    'accounts',
     'producers',
     'operators',
     'administrators',
