@@ -28,6 +28,7 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       ALLOWED_HOSTS: ${ALLOWED_HOSTS}
       DEBUG: ${DEBUG}
+      IMAGE_TAG: ${IMAGE_TAG}
       CARBURE_HOME: /app
       SENTRY_DSN: ${SENTRY_DSN}
       EMAIL_HOST: ${EMAIL_HOST}
