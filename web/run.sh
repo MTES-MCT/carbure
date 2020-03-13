@@ -16,6 +16,12 @@ then
     python3 /app/web/manage.py loaddata /app/web/fixtures/entities.json
     python3 /app/web/manage.py loaddata /app/web/fixtures/userrights.json
     python3 /app/web/manage.py loaddata /app/web/fixtures/userpreferences.json
+
+    python3 /app/web/manage.py loaddata /app/web/fixtures/attestations_producers.json
+    python3 /app/web/manage.py loaddata /app/web/fixtures/productionsites.json
+    python3 /app/web/manage.py loaddata /app/web/fixtures/productionsiteinputs.json
+    python3 /app/web/manage.py loaddata /app/web/fixtures/productionsiteoutputs.json
+    python3 /app/web/manage.py loaddata /app/web/fixtures/producercertificates.json
 fi
 
 uwsgi --ini /app/web/carbure_uwsgi.ini --touch-reload=/app/web/carbure_uwsgi.ini
