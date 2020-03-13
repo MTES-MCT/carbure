@@ -60,7 +60,7 @@
             </ul>
             <label for="token">Ajout matière première</label>
             <div class="input__group">
-              <input type="text" name="token" id="token" />
+              <input type="text" name="mp" class="autocomplete_mp" data-siteid="{{site.id}}" />
             </div>
           </div>
           <div class="form__group">
@@ -72,13 +72,13 @@
             </ul>
             <label for="token">Ajout biocarburant</label>
             <div class="input__group">
-              <input type="text" name="token" id="token" />
+              <input type="text" name="biocarburant" class="autocomplete_biocarburant" data-siteid="{{site.id}}" />
             </div>
           </div>      
         </div>
         <div class="row">
           <div class="form__group flex-container-right">
-            <button type="submit" class="button" id="">Modifier</button>
+            <button type="submit" class="button btn_open_modal_site_edit" data-siteid="{{site.id}}">Modifier</button>
           </div>             
         </div>
       </div>
@@ -86,345 +86,108 @@
     {% endfor %}   
         <div class="row">
           <div class="form__group flex-container-right">
-            <button type="submit" class="button" id="">Ajouter un site de production</button>
+            <button type="submit" class="button" id="btn_open_modal_site">Ajouter un site de production</button>
           </div>             
         </div>
   </div>
 </div>
 
-
-
-
-<div class="modal__backdrop" id="modal_certif">
+<div class="modal__backdrop" id="modal_site">
   <div class="modal">
-    <span id="modal_certif_err_message" style="color: red;"></span>
-    <form id="modal_certif_form" method="POST">
+    <span id="modal_site_form_err_message" style="color: red;"></span>
+    <form id="modal_site_form" method="POST" data-url="{% url 'producers-settings-add-site' %}">
       {% csrf_token %}
-      <label for="modal_certif_site">Identifiant du site de production</label>
-      <select id="modal_certif_site" name="site">
-        {% for site in sites %}
-        <option value="{{site.id}}">{{site.name}}</option>
-        {% endfor %}
-      </select>
-      <label for="modal_certif_id">Identifiant du certificat</label>
-      <input type="text" id="modal_certif_id" name="certif_id" placeholder="EU-ISCC-Cert-PLXXX-XXXXXXXXX">
-      <label for="modal_certif_expiration">Date d'expiration</label>
-      <input type="text" id="modal_certif_expiration" name="expiration" placeholder="24/12/2021">
-      <label for="modal_certif_file_to_upload">Certificat</label>
-      <input type="file" id="modal_certif_file_to_upload" name="file">
+      <label for="modal_site_name">Nom du site de production</label>
+      <input type="text" id="modal_site_name" name="name" placeholder="Grandpuits">
+      <label for="modal_site_date">Date de mise en service approximative</label>
+      <input type="text" id="modal_site_date" name="date_mise_en_service" placeholder="DD/MM/YYYY">
+      <label for="modal_site_country">Pays</label>
+      <input type="text" id="modal_site_country" name="country" placeholder="FR - France">
+      <label for="modal_site_ges_option">Option GES</label>
+      <input type="text" id="modal_site_ges_option" name="ges_option" placeholder="">
       <div class="form__group button__group">
-        <a class="button secondary close">Annuler</a>
-        <button type="submit" class="button" id="btn_modal_certif_valider">Valider</button>
+        <a class="button secondary close" id="btn_close_modal_site">Annuler</a>
+        <button type="submit" class="button">Valider</button>
       </div>
     </form>
   </div>
 </div>
 
-
+<div class="modal__backdrop" id="modal_site_edit">
+  <div class="modal">
+    <span id="modal_site_edit_form_err_message" style="color: red;"></span>
+    <form id="modal_site_edit_form" method="POST" data-url="{% url 'producers-settings-add-certif' %}">
+      {% csrf_token %}
+      <input type="hidden" id="modal_site_edit_site" name="site">
+      <label for="modal_site_edit_certif_id">Identifiant du certificat</label>
+      <input type="text" id="modal_site_edit_certif_id" name="certif_id" placeholder="EU-ISCC-Cert-PLXXX-XXXXXXXXX">
+      <label for="modal_site_edit_certif_expiration">Date d'expiration</label>
+      <input type="text" id="modal_site_edit_certif_expiration" name="expiration" placeholder="24/12/2021">
+      <label for="modal_site_edit_certif_file_to_upload">Certificat</label>
+      <input type="file" id="modal_site_edit_certif_file_to_upload" name="file">
+      <div class="form__group button__group">
+        <a class="button secondary close" id="btn_close_modal_site_edit">Annuler</a>
+        <button type="submit" class="button">Valider</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 {% endblock %}
 
 {% block extra_js %}
 <script type="text/javascript">
-  var modal_certif = document.getElementById("modal_certif")
-  var btn_certif_open = document.getElementById("btn_modal_certif")
-  btn_certif_open.onclick = function() {
-    modal_certif.style.display = "flex";
-  }
 
-  var modal_site = document.getElementById("modal_site")
-  var btn_site_open = document.getElementById("btn_modal_site")
-  btn_site_open.onclick = function() {
-    modal_site.style.display = "flex";
-  }
 
-  var modal_mp = document.getElementById("modal_mp")
-  var btn_mp_open = document.getElementById("btn_modal_mp")
-  btn_mp_open.onclick = function() {
-    modal_mp.style.display = "flex";
-  }
-
-  var modal_biocarburant = document.getElementById("modal_biocarburant")
-  var btn_biocarburant_open = document.getElementById("btn_modal_biocarburant")
-  btn_biocarburant_open.onclick = function() {
-    modal_biocarburant.style.display = "flex";
-  }
-
-  var btns_close = document.getElementsByClassName("close")
-  for (let i = 0, len = btns_close.length; i < len; i++) {
-    let btn_close = btns_close[i]
-    btn_close.onclick = function() {
-      modal_certif.style.display = "none"
-      modal_site.style.display = "none"
-      modal_mp.style.display = "none"
-      modal_biocarburant.style.display = "none"
-    }
-  }
-
-// clicking outside of the modal window will close it
-window.onclick = function(event) {
-  if (event.target == modal_certif) {
-    modal_certif.style.display = "none"
-  }
-  if (event.target == modal_site) {
-    modal_site.style.display = "none"
-  }
-  if (event.target == modal_mp) {
-    modal_mp.style.display = "none"
-  }  
-  if (event.target == modal_biocarburant) {
-    modal_biocarburant.style.display = "none"
-  }  
-}
-
-// escape key
-document.addEventListener('keydown', function(event) {
-  if (event.keyCode === 27) {
-    modal_certif.style.display = "none"
-    modal_site.style.display = "none"
-    modal_mp.style.display = "none"
-    modal_biocarburant.style.display = "none"
-  }
-});
-
-var matieres_premieres = ["Betterave","Blé","Canne à sucre","Colza","Déchets organiques ménagers","Fumier humide","Fumier sec","Huiles ou graisses animales  (catégorie I et/ou II )","Huiles ou graisses animales  (catégorie III)","Huile de palme","Huile alimentaire usagée","Maïs","Résidus viniques","Soja ","Tournesol ","Glycérine brute","Déchets de bois","Déchets industriels","Algues","Paille","Boues d’épuration","Effluents d’huileries de palme et rafles","Brai de tallol.","Bagasse.","Coques","Balles (enveloppes).","Râpes","Déchets municipaux en mélange (Hors déchets ménagers triés)","Matières cellulosiques d’origine non alimentaire","Matières ligno-cellulosiques (Hors grumes de sciage & de placage)"]
-
-var biocarburants = ["Biogaz","Biogazole de synthèse (Hors HVO)","EMHA","EMHU","EMHV","ETBE","Ethanol","HVO","MTBE","TAEE"]
-
-var countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua &amp; Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia &amp; Herzegovina","Botswana","Brazil","British Virgin Islands","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Cayman Islands","Central Arfrican Republic","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica","Cote D Ivoire","Croatia","Cuba","Curacao","Cyprus","Czech Republic","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Ethiopia","Falkland Islands","Faroe Islands","Fiji","Finland","France","French Polynesia","French West Indies","Gabon","Gambia","Georgia","Germany","Ghana","Gibraltar","Greece","Greenland","Grenada","Guam","Guatemala","Guernsey","Guinea","Guinea Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Isle of Man","Israel","Italy","Jamaica","Japan","Jersey","Jordan","Kazakhstan","Kenya","Kiribati","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Macau","Macedonia","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Montserrat","Morocco","Mozambique","Myanmar","Namibia","Nauro","Nepal","Netherlands","Netherlands Antilles","New Caledonia","New Zealand","Nicaragua","Niger","Nigeria","North Korea","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Puerto Rico","Qatar","Reunion","Romania","Russia","Rwanda","Saint Pierre &amp; Miquelon","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","St Kitts &amp; Nevis","St Lucia","St Vincent","Sudan","Suriname","Swaziland","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor L'Este","Togo","Tonga","Trinidad &amp; Tobago","Tunisia","Turkey","Turkmenistan","Turks &amp; Caicos","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States of America","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Virgin Islands (US)","Yemen","Zambia","Zimbabwe"];
-
-function autocomplete(inp, arr) {
-  /*the autocomplete function takes two arguments,
-  the text field element and an array of possible autocompleted values:*/
-  var currentFocus;
-  /*execute a function when someone writes in the text field:*/
-  inp.addEventListener("input", function(e) {
-    var a, b, i, val = this.value;
-    /*close any already open lists of autocompleted values*/
-    closeAllLists();
-    if (!val) { return false;}
-    currentFocus = -1;
-    /*create a DIV element that will contain the items (values):*/
-    a = document.createElement("DIV");
-    a.setAttribute("id", this.id + "autocomplete-list");
-    a.setAttribute("class", "autocomplete-items");
-    /*append the DIV element as a child of the autocomplete container:*/
-    this.parentNode.appendChild(a);
-    /*for each item in the array...*/
-    for (i = 0; i < arr.length; i++) {
-      /*check if the item starts with the same letters as the text field value:*/
-      if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
-        /*create a DIV element for each matching element:*/
-        b = document.createElement("DIV");
-        /*make the matching letters bold:*/
-        b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
-        b.innerHTML += arr[i].substr(val.length);
-        /*insert a input field that will hold the current array item's value:*/
-        b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
-        /*execute a function when someone clicks on the item value (DIV element):*/
-        b.addEventListener("click", function(e) {
-          /*insert the value for the autocomplete text field:*/
-          inp.value = this.getElementsByTagName("input")[0].value;
-              /*close the list of autocompleted values,
-              (or any other open lists of autocompleted values:*/
-              closeAllLists();
-            });
-        a.appendChild(b);
-      }
-    }
-  });
-
-  /*execute a function presses a key on the keyboard:*/
-  inp.addEventListener("keydown", function(e) {
-    var x = document.getElementById(this.id + "autocomplete-list");
-    if (x) x = x.getElementsByTagName("div");
-    if (e.keyCode == 40) {
-        /*If the arrow DOWN key is pressed,
-        increase the currentFocus variable:*/
-        currentFocus++;
-        /*and and make the current item more visible:*/
-        addActive(x);
-      } else if (e.keyCode == 38) { //up
-        /*If the arrow UP key is pressed,
-        decrease the currentFocus variable:*/
-        currentFocus--;
-        /*and and make the current item more visible:*/
-        addActive(x);
-      } else if (e.keyCode == 13) {
-        /*If the ENTER key is pressed, prevent the form from being submitted,*/
-        e.preventDefault();
-        if (currentFocus > -1) {
-          /*and simulate a click on the "active" item:*/
-          if (x) x[currentFocus].click();
-        }
-      }
-    });
-
-  function addActive(x) {
-    /*a function to classify an item as "active":*/
-    if (!x) return false;
-    /*start by removing the "active" class on all items:*/
-    removeActive(x);
-    if (currentFocus >= x.length) currentFocus = 0;
-    if (currentFocus < 0) currentFocus = (x.length - 1);
-    /*add class "autocomplete-active":*/
-    x[currentFocus].classList.add("autocomplete-active");
-  }
-
-  function removeActive(x) {
-    /*a function to remove the "active" class from all autocomplete items:*/
-    for (var i = 0; i < x.length; i++) {
-      x[i].classList.remove("autocomplete-active");
-    }
-  }
-
-  function closeAllLists(elmnt) {
-    /*close all autocomplete lists in the document,
-    except the one passed as an argument:*/
-    var x = document.getElementsByClassName("autocomplete-items");
-    for (var i = 0; i < x.length; i++) {
-      if (elmnt != x[i] && elmnt != inp) {
-        x[i].parentNode.removeChild(x[i]);
-      }
-    }
-  }
-
-  /*execute a function when someone clicks in the document:*/
-  document.addEventListener("click", function (e) {
-    closeAllLists(e.target);
-  })
-}
-autocomplete(document.getElementById("modal_site_country_autocomplete"), countries)
-autocomplete(document.getElementById("modal_mp_mp"), matieres_premieres)
-autocomplete(document.getElementById("modal_biocarburant_biocarburant"), biocarburants)
-
-$(document).ready(function() {
-
-  $("#modal_site_form").submit(function(event) {
-    var form = $(this);
-    var formdata = false;
-    if (window.FormData){
-      formdata = new FormData(form[0]);
-    }
-    $.ajax({
-      url         : "{% url 'producers-settings-add-site' %}",
-      data        : formdata ? formdata : form.serialize(),
-      cache       : false,
-      contentType : false,
-      processData : false,
-      type        : 'POST',
-      success     : function(data, textStatus, jqXHR){
-              // Callback code
-              $("#modal_site_err_message").text("")
-              window.location.reload()
-            },
-            error       : function(e) {
-              if (e.status === 400) {
-                $("#modal_site_err_message").text(e.responseJSON.message)
-                console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-              } else {
-                $("#modal_site_err_message").text("Server error. Please contact an administrator")
-                console.log(`server error ${JSON.stringify(e)}`)
-              }
-            }
-          });
-    event.preventDefault()
-  })
-
-  $('#modal_certif_form').submit(function(event) {
-    var form = $(this);
-    var formdata = false;
-    if (window.FormData){
-      formdata = new FormData(form[0]);
-    }
-    $.ajax({
-      url         : "{% url 'producers-settings-add-certif' %}",
-      data        : formdata ? formdata : form.serialize(),
-      cache       : false,
-      contentType : false,
-      processData : false,
-      type        : 'POST',
-      success     : function(data, textStatus, jqXHR){
-              // Callback code
-              $("#modal_certif_err_message").text("")
-              window.location.reload()
-            },
-            error       : function(e) {
-              if (e.status === 400) {
-                $("#modal_certif_err_message").text(e.responseJSON.message)
-                console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-              } else {
-                $("#modal_certif_err_message").text("Server error. Please contact an administrator")
-                console.log(`server error ${JSON.stringify(e)}`)
-                console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-              }
-            }
-          });
-    event.preventDefault()
-  })
-
-  $("#modal_mp_form").submit(function(event) {
-    var form = $(this);
-    var formdata = false;
-    if (window.FormData){
-      formdata = new FormData(form[0]);
-    }
-    $.ajax({
-      url         : "{% url 'producers-settings-add-mp' %}",
-      data        : formdata ? formdata : form.serialize(),
-      cache       : false,
-      contentType : false,
-      processData : false,
-      type        : 'POST',
-      success     : function(data, textStatus, jqXHR){
-              // Callback code
-              $("#modal_mp_err_message").text("")
-              window.location.reload()
-            },
-            error       : function(e) {
-              if (e.status === 400) {
-                $("#modal_mp_err_message").text(e.responseJSON.message)
-                console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-              } else {
-                $("#modal_mp_err_message").text("Server error. Please contact an administrator")
-                console.log(`server error ${JSON.stringify(e)}`)
-              }
-            }
-          });
-    event.preventDefault()
-  })
-
-  $("#modal_biocarburant_form").submit(function(event) {
-    var form = $(this);
-    var formdata = false;
-    if (window.FormData){
-      formdata = new FormData(form[0]);
-    }
+$("#modal_site_country").autocomplete({lookup: countries});
+$(".autocomplete_biocarburant").autocomplete({
+  lookup: biocarburants,
+  onSelect: function (suggestion) {
     $.ajax({
       url         : "{% url 'producers-settings-add-biocarburant' %}",
-      data        : formdata ? formdata : form.serialize(),
-      cache       : false,
-      contentType : false,
-      processData : false,
+      data        : {'site': $(this).attr('data-siteid'), 'biocarburant': suggestion.value, 
+                      'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
       type        : 'POST',
       success     : function(data, textStatus, jqXHR){
-              // Callback code
-              $("#modal_biocarburant_err_message").text("")
-              window.location.reload()
-            },
-            error       : function(e) {
-              if (e.status === 400) {
-                $("#modal_biocarburant_err_message").text(e.responseJSON.message)
-                console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-              } else {
-                $("#modal_biocarburant_err_message").text("Server error. Please contact an administrator")
-                console.log(`server error ${JSON.stringify(e)}`)
-              }
-            }
-          });
-    event.preventDefault()
-  })
+        // Callback code
+        window.location.reload()
+      },
+      error       : function(e) {
+        if (e.status === 400) {
+          alert(e.responseJSON.message)
+          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+        } else {
+          alert("Server error. Please contact an administrator")
+          console.log(`server error ${JSON.stringify(e)}`)
+        }
+      }
+    })
+  }
+})
+$(".autocomplete_mp").autocomplete({
+  lookup: matieres_premieres,
+  onSelect: function (suggestion) {
+    $.ajax({
+      url         : "{% url 'producers-settings-add-mp' %}",
+      data        : {'site': $(this).attr('data-siteid'), 'matiere_premiere': suggestion.value, 
+                      'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+      type        : 'POST',
+      success     : function(data, textStatus, jqXHR){
+        // Callback code
+        window.location.reload()
+      },
+      error       : function(e) {
+        if (e.status === 400) {
+          alert(e.responseJSON.message)
+          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+        } else {
+          alert("Server error. Please contact an administrator")
+          console.log(`server error ${JSON.stringify(e)}`)
+        }
+      }
+    })
+  }  
+});
 
-}) 
 </script>
 {% endblock %}

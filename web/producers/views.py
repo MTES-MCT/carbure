@@ -206,10 +206,6 @@ def producers_settings_add_mp(request, *args, **kwargs):
   
   site = request.POST.get('site')
   mp = request.POST.get('matiere_premiere')
-  eligible_double_comptage = request.POST.get('double_comptage', False)
-
-  if eligible_double_comptage != False:
-    eligible_double_comptage = True
 
   if site == None:
     return JsonResponse({'status':'error', 'message':"Please provide a value in field Site"}, status=400)
@@ -227,7 +223,7 @@ def producers_settings_add_mp(request, *args, **kwargs):
     return JsonResponse({'status':'error', 'message':"Could not find production site in database"}, status=400)
 
   try:
-    obj, created = ProductionSiteInput.objects.update_or_create(production_site=site, matiere_premiere=mp, defaults={'eligible_double_comptage':eligible_double_comptage})
+    obj, created = ProductionSiteInput.objects.update_or_create(production_site=site, matiere_premiere=mp)
   except Exception as e:
     return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
   return JsonResponse({'status':'success', 'message':'MP added'})
@@ -239,14 +235,11 @@ def producers_settings_add_biocarburant(request, *args, **kwargs):
   context = kwargs['context']
   site = request.POST.get('site')
   biocarburant = request.POST.get('biocarburant')
-  ges_option = request.POST.get('ges_option', False)
 
   if site == None:
     return JsonResponse({'status':'error', 'message':"Please provide a value in field Site"}, status=400)
   if biocarburant == None:
     return JsonResponse({'status':'error', 'message':"Please provide a value in field Biocarburant"}, status=400)
-  if ges_option == None:
-    return JsonResponse({'status':'error', 'message':"Please provide a value in field GES Option"}, status=400)
 
   try:
     biocarburant = Biocarburant.objects.get(name__icontains=biocarburant)
@@ -259,7 +252,7 @@ def producers_settings_add_biocarburant(request, *args, **kwargs):
     return JsonResponse({'status':'error', 'message':"Could not find production site in database"}, status=400)
 
   try:
-    obj, created = ProductionSiteOutput.objects.update_or_create(production_site=site, biocarburant=biocarburant, defaults={'ges_option':ges_option})
+    obj, created = ProductionSiteOutput.objects.update_or_create(production_site=site, biocarburant=biocarburant)
   except Exception as e:
     return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
   return JsonResponse({'status':'success', 'message':'Biocarburant added'})

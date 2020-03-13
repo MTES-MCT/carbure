@@ -16,10 +16,12 @@ class AttestationProducer(models.Model):
         verbose_name_plural = 'Attestations de Durabilité'	
 
 class ProductionSite(models.Model):
+    GES_OPTIONS = [('Default', 'Valeurs par défaut'), ('Actual', 'Valeurs réelles')]
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE)
     name = models.CharField(max_length=64, blank=False, null=False)
     country = models.ForeignKey(Pays, null=False, on_delete=models.CASCADE)
     date_mise_en_service = models.DateField(null=False, blank=False)
+    ges_option = models.CharField(max_length=12, choices=GES_OPTIONS, default='Default')
 
     def __str__(self):
         return self.name
@@ -33,9 +35,12 @@ class ProductionSite(models.Model):
         verbose_name_plural = 'Sites de Production'	
 
 class ProductionSiteInput(models.Model):
+    INPUT_STATUS = (('Pending', 'En attente de validation'), ('Valid', 'Validé'))
+
     production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE)
     matiere_premiere = models.ForeignKey(MatierePremiere, on_delete=models.CASCADE)
     eligible_double_comptage = models.BooleanField(default=False)
+    status = models.CharField(max_length=16, choices=INPUT_STATUS, default="Pending")
 
     def __str__(self):
         return self.matiere_premiere   
@@ -46,11 +51,11 @@ class ProductionSiteInput(models.Model):
         verbose_name_plural = 'Sites de Production - Filieres' 
 
 class ProductionSiteOutput(models.Model):
-    GES_OPTIONS = [('Default', 'Valeurs par défaut'), ('Actual', 'Valeurs réelles'), ('NUTS2', 'NUTS2')]
+    OUTPUT_STATUS = (('Pending', 'En attente de validation'), ('Valid', 'Validé'))
 
     production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE)
     biocarburant = models.ForeignKey(Biocarburant, on_delete=models.CASCADE)
-    ges_option = models.CharField(max_length=12, choices=GES_OPTIONS, default='Default')
+    status = models.CharField(max_length=16, choices=OUTPUT_STATUS, default="Pending")
 
     def __str__(self):
         return self.biocarburant

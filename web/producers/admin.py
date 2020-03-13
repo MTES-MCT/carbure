@@ -12,9 +12,9 @@ admin.site.register(AttestationProducer, AttestationProducerAdmin)
 
 
 class ProductionSiteAdmin(admin.ModelAdmin):
-    list_display = ('name', 'producer', 'country', 'date_mise_en_service')
-    search_fields = ('name', 'producer', 'country')
-    list_filter = ('producer', 'country')
+    list_display = ('name', 'producer', 'country', 'date_mise_en_service', 'ges_option')
+    search_fields = ('name', 'producer', 'country', 'ges_option')
+    list_filter = ('producer', 'country', 'ges_option')
 
 admin.site.register(ProductionSite, ProductionSiteAdmin)
 
@@ -36,9 +36,9 @@ admin.site.register(ProductionSiteInput, ProductionSiteInputAdmin)
 
 
 class ProductionSiteOutputAdmin(admin.ModelAdmin):
-    list_display = ('production_site', 'biocarburant', 'ges_option',)
-    search_fields = ('production_site', 'biocarburant', 'ges_option',)
-    list_filter = ('biocarburant', 'ges_option')
+    list_display = ('production_site', 'biocarburant',)
+    search_fields = ('production_site', 'biocarburant',)
+    list_filter = ('biocarburant',)
 
 admin.site.register(ProductionSiteOutput, ProductionSiteOutputAdmin)
 
