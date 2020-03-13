@@ -137,27 +137,27 @@ def producers_settings_add_certif(request, *args, **kwargs):
   
   certif_id = request.POST.get('certif_id')
   if certif_id == None:
-    return JsonResponse({'status':'error', 'message':"Please provide a value in field Identifiant"}, status=400)
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ Identifiant"}, status=400)
 
   form_exp_date = request.POST.get('expiration')
   if form_exp_date == None:
-    return JsonResponse({'status':'error', 'message':"Please provide a value in field Expiration"}, status=400)
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ Expiration"}, status=400)
   try:
     exp_date = datetime.datetime.strptime(form_exp_date, '%d/%m/%Y')
   except Exception as e:
-    return JsonResponse({'status':'error', 'message':"Please provide a valid Expiration Date DD/MM/YYYY"}, status=400)
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une date valide au format DD/MM/YYYY"}, status=400)
 
   site = request.POST.get('site')
   if site == None:
-    return JsonResponse({'status':'error', 'message':"Please provide a value in field Site"}, status=400)
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ  Site"}, status=400)
   try:
     site = ProductionSite.objects.get(producer=context['user_entity'], id=site)
   except Exception as e:
-    return JsonResponse({'status':'error', 'message':"Could not find production site in database"}, status=400)
+    return JsonResponse({'status':'error', 'message':"Site de production inconnu"}, status=400)
 
   form_file = request.FILES.get('file', None)  
   if form_file == None:
-    return JsonResponse({'status':'error', 'message':"Please provide a certificate file"}, status=400)
+    return JsonResponse({'status':'error', 'message':"Veuillez sélectionner un certificat (fichier PDF)"}, status=400)
 
   try:
     obj, created = ProducerCertificate.objects.update_or_create(producer=context['user_entity'], production_site=site, certificate_id=certif_id, defaults={'expiration':exp_date, 'certificate': form_file})
@@ -176,21 +176,21 @@ def producers_settings_add_site(request, *args, **kwargs):
   date_mise_en_service = request.POST.get('date_mise_en_service')
 
   if country == None:
-    return JsonResponse({'status':'error', 'message':"Please provide a value in field Country"}, status=400)
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ Pays"}, status=400)
   if name == None:
-    return JsonResponse({'status':'error', 'message':"Please provide a value in field Name"}, status=400)
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ Nom"}, status=400)
   if date_mise_en_service == None:
-    return JsonResponse({'status':'error', 'message':"Please provide a value in field Date de mise en service"}, status=400)
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une date dans le champ Date de mise en service"}, status=400)
 
   try:
     date_mise_en_service = datetime.datetime.strptime(date_mise_en_service, '%d/%m/%Y')
   except Exception as e:
-    return JsonResponse({'status':'error', 'message':"Please provide a valid Date DD/MM/YYYY"}, status=400)
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une date valide au format DD/MM/YYYY"}, status=400)
 
   try:
     country = Pays.objects.get(name__icontains=country)
   except Exception as e:
-    return JsonResponse({'status':'error', 'message':"Please provide a valid Country from the list", 'extra':str(e)}, status=400)
+    return JsonResponse({'status':'error', 'message':"Veuillez choisir un Pays dans la liste", 'extra':str(e)}, status=400)
 
   try:
     obj, created = ProductionSite.objects.update_or_create(producer=context['user_entity'], country=country, name=name, defaults={'date_mise_en_service':date_mise_en_service})
