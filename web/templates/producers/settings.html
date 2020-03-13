@@ -14,259 +14,81 @@
         <input type="checkbox" name="checkbox" id="checkbox-annuaire-contact" value="1"><label for="checkbox-annuaire-contact" class="label-inline">Je souhaite faire apparaître mes coordonnées de contact dans l'annuaire</label>
       </fieldset>
     </div>  
+    <h3>Sites de production</h3>
+
+    {% for site in sites %}
     <section class="form__group"> 
-      <h3>Sites de production</h3>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Pays</th>
-                <th>Date de mise en service</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for site in sites %}
-              <tr>
-                <td>{{site.name}}</td>
-                <td>{{site.country}}</td>
-                <td>{{site.date_mise_en_service}}</td>
-              </tr>          
-              {% empty %}
-              <tr>
-                <td colspan="3">Aucun site de production enregistré à ce jour.</td>
-              </tr>                    
-              {% endfor %}   
-            </tbody>
-          </table>
-          <div class="flex-container-right">
-            <a class="button primary" id="btn_modal_site">Ajouter Site</a>
-          </div>   
-    </section>
-
-    <section class="form__group">
-      <fieldset>
-        <h3>Mes Certificats</h3>
-        <table class="table">
-          <thead>
-            <tr>
-            <th>Site</th>
-            <th>Certificat</th>
-            <th>PDF</th>
-            <th>Expiration</th>
-            <th>Statut</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for crt in certificates %}
-              <tr>
-                <td>{{ crt.production_site }}</td>
-                <td>{{ crt.certificate_id }}</td>
-                <td><a href="{{ crt.certificate.url }}" target="_blank">{{ crt.certificate.name }}</a></td>
-                <td>{{ crt.expiration }}</td>
-                <td>{{ crt.get_status_display }}</td>
-              </tr>
-            {% empty %}
-              <tr>
-                <td colspan="5">Aucun certificat enregistré à ce jour.</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        <div class="flex-container-right">
-          <a class="button primary" id="btn_modal_certif">Ajouter Certificat</a>
-        </div>          
-      </fieldset>
-    </section> 
-
-    <section class="form__group"> 
-      <h3>Matières Premières</h3>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Site</th>
-                <th>Matières Première</th>
-                <th>Éligible double-comptage</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for input in mps %}
-              <tr>
-                <td>{{input.production_site}}</td>
-                <td>{{input.matiere_premiere}}</td>
-                <td>{{input.eligible_double_comptage}}</td>
-              </tr>      
-              {% empty %}
-              <tr>
-                <td colspan="3">Aucune matière première enregistrée à ce jour.</td>
-              </tr>                        
-              {% endfor %}   
-            </tbody>
-          </table>
-          <div class="flex-container-right">
-            <a class="button primary" id="btn_modal_mp">Ajouter Matière Première</a>
-          </div>   
-    </section>
-
-    <section class="form__group"> 
-      <h3>Biocarburants</h3>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Site</th>
-                <th>Biocarburant</th>
-                <th>Option GES</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for output in outputs %}
-              <tr>
-                <td>{{output.production_site}}</td>
-                <td>{{output.biocarburant}}</td>
-                <td>{{output.ges_option}}</td>
-              </tr>       
-              {% empty %}
-              <tr>
-                <td colspan="3">Aucun biocarburant enregistré à ce jour.</td>
-              </tr>                           
-              {% endfor %}   
-            </tbody>
-          </table>
-          <div class="flex-container-right">
-            <a class="button primary" id="btn_modal_biocarburant">Ajouter Biocarburant</a>
-          </div>   
-    </section>
-
-
-    <section class="form__group"> 
-        <div class="panel">
-          <div class="panel__header">
-            <h3>Site de production 1</h3>
-            <small class="panel__header-extra">Créé le 31 février</small>
-          </div>
-
-          <div class="flex-container">
-            <div class="form__group">
-              <dl>
-                <dt>Numéro de Certificat</dt>
-                <dd>EU-ISCC-Cert-PL214-69190419</dd>
-                <dt>Certificat PDF</dt>
-                <dd><a href="#">PL214-69190419.pdf</a></dd>
-                <dt>Expiration</dt>
-                <dd>24/12/2021</dd>
-                <dt>Statut</dt>
-                <dd>Validé</dd>
-              </dl>
-            </div>        
-            <div class="form__group">
-              <dl>
-                <dt>Pays</dt>
-                <dd>France</dd>                
-                <dt>Date de Mise en Service</dt>
-                <dd>12/04/2001</dd>
-                <dt>Éligible double-comptage</dt>
-                <dd>Non</dd>
-              </dl>
-            </div>            
-            <div class="form__group">
-            <label>Matières premières</label>
-            <ul class="label-list">
-              <li class="label"><a>Colza</a></li>
-              <li class="label"><a>Betterave</a></li>
-              <li class="label"><a>Brocolis</a></li>
-            </ul>
-            <label for="token">Ajout matière première</label>
-            <div class="input__group">
-              <input type="text" name="token" id="token" />
-              <button class="button icon-button">
-                <svg class="icon icon-copy" viewBox="0 0 32 32"><use xlink:href="#copy" aria-label="Copier"></use></svg>
-              </button>
-            </div>
-          </div>
-          <div class="form__group">
-            <label>Biocarburants</label>
-            <ul class="label-list">
-              <li class="label"><a>ETBE</a></li>
-              <li class="label"><a>EHMV</a></li>
-            </ul>
-            <label for="token">Ajout biocarburant</label>
-            <div class="input__group">
-              <input type="text" name="token" id="token" />
-              <button class="button icon-button">
-                <svg class="icon icon-copy" viewBox="0 0 32 32"><use xlink:href="#copy" aria-label="Copier"></use></svg>
-              </button>
-            </div>
-          </div>                   
-          </div>
+      <div class="panel">
+        <div class="panel__header">
+          <h3>{{site.name}}</h3>
         </div>
-      </section>
 
-    <section class="form__group"> 
-        <div class="panel">
-          <div class="panel__header">
-            <h3>Site de production 1</h3>
-            <small class="panel__header-extra">Créé le 31 février</small>
-          </div>
+        <div class="flex-container">
           <div class="form__group">
-            <table class="table">
-            <thead>
-              <tr>
-                <th>Pays</th>
-                <th>Numéro de Certificat</th>
-                <th>PDF</th>
-                <th>Date de mise en service</th>
-                <th>Expiration</th>
-                <th>Statut</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>FR - France</td>
-                <td>EU-ISCC-Cert-PL214-69190419</td>
-                <td><a href="#">EU-ISCC-Cert-PL214-69190419.pdf</a></td>
-                <td>24/12/2001</td>
-                <td>12/04/2020</td>
-                <td>Validé</td>
-              </tr>
-            </tbody>
-          </table>
-          </div>          
+            <dl>
+              {% if site.certificate %}
+              <dt>Numéro de Certificat</dt>
+              <dd>{{site.certificate.certificate_id}}</dd>
+              <dt>Certificat PDF</dt>
+              <dd><a href="{{ site.certificate.certificate.url }}" target="_blank">{{ site.certificate.certificate.name }}</a></dd>
+              <dt>Expiration</dt>
+              <dd>{{site.certificate.expiration}}</dd>
+              <dt>Statut</dt>
+              <dd>{{site.certificate.get_status_display}}</dd>
+              {% else %}
+              <dd>Certificat manquant</dd>
+              {% endif %}
+            </dl>
+
+          </div>        
+          <div class="form__group">
+            <dl>
+              <dt>Pays</dt>
+              <dd>{{site.country}}</dd>                
+              <dt>Date de Mise en Service</dt>
+              <dd>{{site.date_mise_en_service}}</dd>
+              <dt>Éligible double-comptage</dt>
+              <dd>Non</dd>
+            </dl>
+          </div>            
           <div class="form__group">
             <label>Matières premières</label>
             <ul class="label-list">
-              <li class="label"><a>Colza</a></li>
-              <li class="label"><a>Betterave</a></li>
-              <li class="label"><a>Brocolis</a></li>
+              {% for input in site.inputs %}
+              <li class="label"><a>{{input.matiere_premiere}}</a></li>
+              {% endfor %}     
             </ul>
-          </div>
-          <div class="form__group">
             <label for="token">Ajout matière première</label>
             <div class="input__group">
               <input type="text" name="token" id="token" />
-              <button class="button icon-button">
-                <svg class="icon icon-copy" viewBox="0 0 32 32"><use xlink:href="#copy" aria-label="Copier"></use></svg>
-              </button>
             </div>
           </div>
           <div class="form__group">
             <label>Biocarburants</label>
             <ul class="label-list">
-              <li class="label"><a>ETBE</a></li>
-              <li class="label"><a>EHMV</a></li>
+              {% for output in site.outputs %}
+              <li class="label"><a>{{output.biocarburant}}</a></li>
+              {% endfor %}                
             </ul>
-          </div>
-          <div class="form__group">
             <label for="token">Ajout biocarburant</label>
             <div class="input__group">
               <input type="text" name="token" id="token" />
-              <button class="button icon-button">
-                <svg class="icon icon-copy" viewBox="0 0 32 32"><use xlink:href="#copy" aria-label="Copier"></use></svg>
-              </button>
             </div>
-          </div>
-        </div> 
-    </section> 
-
-
+          </div>      
+        </div>
+        <div class="row">
+          <div class="form__group flex-container-right">
+            <button type="submit" class="button" id="">Modifier</button>
+          </div>             
+        </div>
+      </div>
+    </section>     
+    {% endfor %}   
+        <div class="row">
+          <div class="form__group flex-container-right">
+            <button type="submit" class="button" id="">Ajouter un site de production</button>
+          </div>             
+        </div>
   </div>
 </div>
 
@@ -298,121 +120,46 @@
   </div>
 </div>
 
-<div class="modal__backdrop" id="modal_site">
-  <div class="modal">
-    <span id="modal_site_err_message" style="color: red;"></span>
-    <form id="modal_site_form" method="POST">
-      {% csrf_token %}
-    <label for="modal_site_country_autocomplete">Pays</label>
-    <div class="autocomplete" style="width:300px;">
-      <input type="text" id="modal_site_country_autocomplete" name="country" />
-    </div>    
-    <label for="modal_site_date_mee">Date de mise en service approximative</label>
-    <input type="text" id="modal_site_date_mee" name="date_mise_en_service" placeholder="24/12/2001">    
-    <label for="modal_site_nom">Nom du site de production</label>
-    <input type="text" id="modal_site_nom" name="name" placeholder="Grandpuits">
-    <div class="form__group button__group">
-      <a class="button secondary close">Annuler</a>
-      <button type="submit" class="button" id="btn_modal_site_valider">Valider</button>
-    </div>
-  </form>
-  </div>
-</div>
 
-<div class="modal__backdrop" id="modal_mp">
-  <div class="modal">
-    <span id="modal_mp_err_message" style="color: red;"></span>
-    <form id="modal_mp_form" method="POST">
-      {% csrf_token %}
-      <label for="modal_mp_site">Identifiant du site de production</label>
-      <select id="modal_mp_site" name="site">
-        {% for site in sites %}
-        <option value="{{site.id}}">{{site.name}}</option>
-        {% endfor %}
-      </select>
-      <label for="modal_mp_mp">Matière Première</label>
-      <div class="autocomplete" style="width: 300px;">
-        <input type="text" id="modal_mp_mp" name="matiere_premiere" placeholder="Colza" />
-      </div>
-      <label for="modal_mp_eligible_double_comptage">Éligible double comptage ?</label>
-      <input type="checkbox" id="modal_mp_eligible_double_comptage" name="double_comptage" />
-      <div class="form__group button__group">
-        <a class="button secondary close">Annuler</a>
-        <button type="submit" class="button" id="btn_modal_mp_valider">Valider</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<div class="modal__backdrop" id="modal_biocarburant">
-  <div class="modal">
-    <span id="modal_biocarburant_err_message" style="color: red;"></span>
-    <form id="modal_biocarburant_form" method="POST">
-      {% csrf_token %}
-      <div class="form__group">
-      <label for="modal_biocarburant_site">Identifiant du site de production</label>
-      <select id="modal_biocarburant_site" name="site">
-        {% for site in sites %}
-        <option value="{{site.id}}">{{site.name}}</option>
-        {% endfor %}
-      </select>
-      </div>
-      <div class="autocomplete" style="width: 300px;">
-        <label for="modal_biocarburant_biocarburant">Type de Biocarburant</label>
-        <input type="text" id="modal_biocarburant_biocarburant" name="biocarburant" placeholder="Biogaz" />
-      </div>
-      <label for="modal_biocarburant_ges">Valeurs d'émissions de Gaz à Effet de Serre</label>
-      <select id="modal_biocarburant_ges" name="ges_option">
-        <option value="Default">Valeurs par défaut</option>
-        <option value="Actual">Valeurs réelles</option>
-        <option value="NUTS2">NUTS2</option>
-      </select>      
-      <div class="form__group button__group">
-        <a class="button secondary close">Annuler</a>
-        <button type="submit" class="button" id="btn_modal_biocarburant_valider">Valider</button>
-      </div>
-    </form>
-  </div>
-</div>
 
 {% endblock %}
 
 {% block extra_js %}
 <script type="text/javascript">
-var modal_certif = document.getElementById("modal_certif")
-var btn_certif_open = document.getElementById("btn_modal_certif")
-btn_certif_open.onclick = function() {
-  modal_certif.style.display = "flex";
-}
-
-var modal_site = document.getElementById("modal_site")
-var btn_site_open = document.getElementById("btn_modal_site")
-btn_site_open.onclick = function() {
-  modal_site.style.display = "flex";
-}
-
-var modal_mp = document.getElementById("modal_mp")
-var btn_mp_open = document.getElementById("btn_modal_mp")
-btn_mp_open.onclick = function() {
-  modal_mp.style.display = "flex";
-}
-
-var modal_biocarburant = document.getElementById("modal_biocarburant")
-var btn_biocarburant_open = document.getElementById("btn_modal_biocarburant")
-btn_biocarburant_open.onclick = function() {
-  modal_biocarburant.style.display = "flex";
-}
-
-var btns_close = document.getElementsByClassName("close")
-for (let i = 0, len = btns_close.length; i < len; i++) {
-  let btn_close = btns_close[i]
-  btn_close.onclick = function() {
-    modal_certif.style.display = "none"
-    modal_site.style.display = "none"
-    modal_mp.style.display = "none"
-    modal_biocarburant.style.display = "none"
+  var modal_certif = document.getElementById("modal_certif")
+  var btn_certif_open = document.getElementById("btn_modal_certif")
+  btn_certif_open.onclick = function() {
+    modal_certif.style.display = "flex";
   }
-}
+
+  var modal_site = document.getElementById("modal_site")
+  var btn_site_open = document.getElementById("btn_modal_site")
+  btn_site_open.onclick = function() {
+    modal_site.style.display = "flex";
+  }
+
+  var modal_mp = document.getElementById("modal_mp")
+  var btn_mp_open = document.getElementById("btn_modal_mp")
+  btn_mp_open.onclick = function() {
+    modal_mp.style.display = "flex";
+  }
+
+  var modal_biocarburant = document.getElementById("modal_biocarburant")
+  var btn_biocarburant_open = document.getElementById("btn_modal_biocarburant")
+  btn_biocarburant_open.onclick = function() {
+    modal_biocarburant.style.display = "flex";
+  }
+
+  var btns_close = document.getElementsByClassName("close")
+  for (let i = 0, len = btns_close.length; i < len; i++) {
+    let btn_close = btns_close[i]
+    btn_close.onclick = function() {
+      modal_certif.style.display = "none"
+      modal_site.style.display = "none"
+      modal_mp.style.display = "none"
+      modal_biocarburant.style.display = "none"
+    }
+  }
 
 // clicking outside of the modal window will close it
 window.onclick = function(event) {
@@ -432,12 +179,12 @@ window.onclick = function(event) {
 
 // escape key
 document.addEventListener('keydown', function(event) {
-    if (event.keyCode === 27) {
-      modal_certif.style.display = "none"
-      modal_site.style.display = "none"
-      modal_mp.style.display = "none"
-      modal_biocarburant.style.display = "none"
-    }
+  if (event.keyCode === 27) {
+    modal_certif.style.display = "none"
+    modal_site.style.display = "none"
+    modal_mp.style.display = "none"
+    modal_biocarburant.style.display = "none"
+  }
 });
 
 var matieres_premieres = ["Betterave","Blé","Canne à sucre","Colza","Déchets organiques ménagers","Fumier humide","Fumier sec","Huiles ou graisses animales  (catégorie I et/ou II )","Huiles ou graisses animales  (catégorie III)","Huile de palme","Huile alimentaire usagée","Maïs","Résidus viniques","Soja ","Tournesol ","Glycérine brute","Déchets de bois","Déchets industriels","Algues","Paille","Boues d’épuration","Effluents d’huileries de palme et rafles","Brai de tallol.","Bagasse.","Coques","Balles (enveloppes).","Râpes","Déchets municipaux en mélange (Hors déchets ménagers triés)","Matières cellulosiques d’origine non alimentaire","Matières ligno-cellulosiques (Hors grumes de sciage & de placage)"]
@@ -452,46 +199,46 @@ function autocomplete(inp, arr) {
   var currentFocus;
   /*execute a function when someone writes in the text field:*/
   inp.addEventListener("input", function(e) {
-      var a, b, i, val = this.value;
-      /*close any already open lists of autocompleted values*/
-      closeAllLists();
-      if (!val) { return false;}
-      currentFocus = -1;
-      /*create a DIV element that will contain the items (values):*/
-      a = document.createElement("DIV");
-      a.setAttribute("id", this.id + "autocomplete-list");
-      a.setAttribute("class", "autocomplete-items");
-      /*append the DIV element as a child of the autocomplete container:*/
-      this.parentNode.appendChild(a);
-      /*for each item in the array...*/
-      for (i = 0; i < arr.length; i++) {
-        /*check if the item starts with the same letters as the text field value:*/
-        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
-          /*create a DIV element for each matching element:*/
-          b = document.createElement("DIV");
-          /*make the matching letters bold:*/
-          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
-          b.innerHTML += arr[i].substr(val.length);
-          /*insert a input field that will hold the current array item's value:*/
-          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
-          /*execute a function when someone clicks on the item value (DIV element):*/
-              b.addEventListener("click", function(e) {
-              /*insert the value for the autocomplete text field:*/
-              inp.value = this.getElementsByTagName("input")[0].value;
+    var a, b, i, val = this.value;
+    /*close any already open lists of autocompleted values*/
+    closeAllLists();
+    if (!val) { return false;}
+    currentFocus = -1;
+    /*create a DIV element that will contain the items (values):*/
+    a = document.createElement("DIV");
+    a.setAttribute("id", this.id + "autocomplete-list");
+    a.setAttribute("class", "autocomplete-items");
+    /*append the DIV element as a child of the autocomplete container:*/
+    this.parentNode.appendChild(a);
+    /*for each item in the array...*/
+    for (i = 0; i < arr.length; i++) {
+      /*check if the item starts with the same letters as the text field value:*/
+      if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+        /*create a DIV element for each matching element:*/
+        b = document.createElement("DIV");
+        /*make the matching letters bold:*/
+        b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+        b.innerHTML += arr[i].substr(val.length);
+        /*insert a input field that will hold the current array item's value:*/
+        b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+        /*execute a function when someone clicks on the item value (DIV element):*/
+        b.addEventListener("click", function(e) {
+          /*insert the value for the autocomplete text field:*/
+          inp.value = this.getElementsByTagName("input")[0].value;
               /*close the list of autocompleted values,
               (or any other open lists of autocompleted values:*/
               closeAllLists();
-          });
-          a.appendChild(b);
-        }
+            });
+        a.appendChild(b);
       }
+    }
   });
 
   /*execute a function presses a key on the keyboard:*/
   inp.addEventListener("keydown", function(e) {
-      var x = document.getElementById(this.id + "autocomplete-list");
-      if (x) x = x.getElementsByTagName("div");
-      if (e.keyCode == 40) {
+    var x = document.getElementById(this.id + "autocomplete-list");
+    if (x) x = x.getElementsByTagName("div");
+    if (e.keyCode == 40) {
         /*If the arrow DOWN key is pressed,
         increase the currentFocus variable:*/
         currentFocus++;
@@ -511,7 +258,7 @@ function autocomplete(inp, arr) {
           if (x) x[currentFocus].click();
         }
       }
-  });
+    });
 
   function addActive(x) {
     /*a function to classify an item as "active":*/
@@ -530,7 +277,7 @@ function autocomplete(inp, arr) {
       x[i].classList.remove("autocomplete-active");
     }
   }
- 
+
   function closeAllLists(elmnt) {
     /*close all autocomplete lists in the document,
     except the one passed as an argument:*/
@@ -554,128 +301,128 @@ autocomplete(document.getElementById("modal_biocarburant_biocarburant"), biocarb
 $(document).ready(function() {
 
   $("#modal_site_form").submit(function(event) {
-      var form = $(this);
-      var formdata = false;
-      if (window.FormData){
-          formdata = new FormData(form[0]);
-      }
-      $.ajax({
-          url         : "{% url 'producers-settings-add-site' %}",
-          data        : formdata ? formdata : form.serialize(),
-          cache       : false,
-          contentType : false,
-          processData : false,
-          type        : 'POST',
-          success     : function(data, textStatus, jqXHR){
+    var form = $(this);
+    var formdata = false;
+    if (window.FormData){
+      formdata = new FormData(form[0]);
+    }
+    $.ajax({
+      url         : "{% url 'producers-settings-add-site' %}",
+      data        : formdata ? formdata : form.serialize(),
+      cache       : false,
+      contentType : false,
+      processData : false,
+      type        : 'POST',
+      success     : function(data, textStatus, jqXHR){
               // Callback code
               $("#modal_site_err_message").text("")
               window.location.reload()
-          },
-          error       : function(e) {
-            if (e.status === 400) {
-              $("#modal_site_err_message").text(e.responseJSON.message)
-              console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-            } else {
-              $("#modal_site_err_message").text("Server error. Please contact an administrator")
-              console.log(`server error ${JSON.stringify(e)}`)
+            },
+            error       : function(e) {
+              if (e.status === 400) {
+                $("#modal_site_err_message").text(e.responseJSON.message)
+                console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+              } else {
+                $("#modal_site_err_message").text("Server error. Please contact an administrator")
+                console.log(`server error ${JSON.stringify(e)}`)
+              }
             }
-          }
-      });
-      event.preventDefault()
+          });
+    event.preventDefault()
   })
 
   $('#modal_certif_form').submit(function(event) {
-      var form = $(this);
-      var formdata = false;
-      if (window.FormData){
-          formdata = new FormData(form[0]);
-      }
-      $.ajax({
-          url         : "{% url 'producers-settings-add-certif' %}",
-          data        : formdata ? formdata : form.serialize(),
-          cache       : false,
-          contentType : false,
-          processData : false,
-          type        : 'POST',
-          success     : function(data, textStatus, jqXHR){
+    var form = $(this);
+    var formdata = false;
+    if (window.FormData){
+      formdata = new FormData(form[0]);
+    }
+    $.ajax({
+      url         : "{% url 'producers-settings-add-certif' %}",
+      data        : formdata ? formdata : form.serialize(),
+      cache       : false,
+      contentType : false,
+      processData : false,
+      type        : 'POST',
+      success     : function(data, textStatus, jqXHR){
               // Callback code
               $("#modal_certif_err_message").text("")
               window.location.reload()
-          },
-          error       : function(e) {
-            if (e.status === 400) {
-              $("#modal_certif_err_message").text(e.responseJSON.message)
-              console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-            } else {
-              $("#modal_certif_err_message").text("Server error. Please contact an administrator")
-              console.log(`server error ${JSON.stringify(e)}`)
-              console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+            },
+            error       : function(e) {
+              if (e.status === 400) {
+                $("#modal_certif_err_message").text(e.responseJSON.message)
+                console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+              } else {
+                $("#modal_certif_err_message").text("Server error. Please contact an administrator")
+                console.log(`server error ${JSON.stringify(e)}`)
+                console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+              }
             }
-          }
-      });
-      event.preventDefault()
+          });
+    event.preventDefault()
   })
 
   $("#modal_mp_form").submit(function(event) {
-      var form = $(this);
-      var formdata = false;
-      if (window.FormData){
-          formdata = new FormData(form[0]);
-      }
-      $.ajax({
-          url         : "{% url 'producers-settings-add-mp' %}",
-          data        : formdata ? formdata : form.serialize(),
-          cache       : false,
-          contentType : false,
-          processData : false,
-          type        : 'POST',
-          success     : function(data, textStatus, jqXHR){
+    var form = $(this);
+    var formdata = false;
+    if (window.FormData){
+      formdata = new FormData(form[0]);
+    }
+    $.ajax({
+      url         : "{% url 'producers-settings-add-mp' %}",
+      data        : formdata ? formdata : form.serialize(),
+      cache       : false,
+      contentType : false,
+      processData : false,
+      type        : 'POST',
+      success     : function(data, textStatus, jqXHR){
               // Callback code
               $("#modal_mp_err_message").text("")
               window.location.reload()
-          },
-          error       : function(e) {
-            if (e.status === 400) {
-              $("#modal_mp_err_message").text(e.responseJSON.message)
-              console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-            } else {
-              $("#modal_mp_err_message").text("Server error. Please contact an administrator")
-              console.log(`server error ${JSON.stringify(e)}`)
+            },
+            error       : function(e) {
+              if (e.status === 400) {
+                $("#modal_mp_err_message").text(e.responseJSON.message)
+                console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+              } else {
+                $("#modal_mp_err_message").text("Server error. Please contact an administrator")
+                console.log(`server error ${JSON.stringify(e)}`)
+              }
             }
-          }
-      });
-      event.preventDefault()
+          });
+    event.preventDefault()
   })
 
   $("#modal_biocarburant_form").submit(function(event) {
-      var form = $(this);
-      var formdata = false;
-      if (window.FormData){
-          formdata = new FormData(form[0]);
-      }
-      $.ajax({
-          url         : "{% url 'producers-settings-add-biocarburant' %}",
-          data        : formdata ? formdata : form.serialize(),
-          cache       : false,
-          contentType : false,
-          processData : false,
-          type        : 'POST',
-          success     : function(data, textStatus, jqXHR){
+    var form = $(this);
+    var formdata = false;
+    if (window.FormData){
+      formdata = new FormData(form[0]);
+    }
+    $.ajax({
+      url         : "{% url 'producers-settings-add-biocarburant' %}",
+      data        : formdata ? formdata : form.serialize(),
+      cache       : false,
+      contentType : false,
+      processData : false,
+      type        : 'POST',
+      success     : function(data, textStatus, jqXHR){
               // Callback code
               $("#modal_biocarburant_err_message").text("")
               window.location.reload()
-          },
-          error       : function(e) {
-            if (e.status === 400) {
-              $("#modal_biocarburant_err_message").text(e.responseJSON.message)
-              console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-            } else {
-              $("#modal_biocarburant_err_message").text("Server error. Please contact an administrator")
-              console.log(`server error ${JSON.stringify(e)}`)
+            },
+            error       : function(e) {
+              if (e.status === 400) {
+                $("#modal_biocarburant_err_message").text(e.responseJSON.message)
+                console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+              } else {
+                $("#modal_biocarburant_err_message").text("Server error. Please contact an administrator")
+                console.log(`server error ${JSON.stringify(e)}`)
+              }
             }
-          }
-      });
-      event.preventDefault()
+          });
+    event.preventDefault()
   })
 
 }) 
