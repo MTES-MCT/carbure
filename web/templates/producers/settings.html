@@ -48,7 +48,9 @@
               <dt>Date de Mise en Service</dt>
               <dd>{{site.date_mise_en_service}}</dd>
               <dt>Éligible double-comptage</dt>
-              <dd>Non</dd>
+              <dd>{{site.eligible_dc}}</dd>
+              <dt>Option GES</dt>
+              <dd>{{site.ges_option}}</dd>              
             </dl>
           </div>            
           <div class="form__group">
@@ -104,7 +106,10 @@
       <label for="modal_site_country">Pays</label>
       <input type="text" id="modal_site_country" name="country" placeholder="FR - France">
       <label for="modal_site_ges_option">Option GES</label>
-      <input type="text" id="modal_site_ges_option" name="ges_option" placeholder="">
+      <select id="modal_site_ges_option">
+        <option value="Default">Valeurs par défaut</option>
+        <option value="Actual">Valeurs réelles</option>
+      </select>
       <div class="form__group button__group">
         <a class="button secondary close" id="btn_close_modal_site">Annuler</a>
         <button type="submit" class="button">Valider</button>
