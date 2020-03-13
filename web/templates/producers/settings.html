@@ -57,7 +57,11 @@
             <label>Matières premières</label>
             <ul class="label-list">
               {% for input in site.inputs %}
-              <li class="label"><a>{{input.matiere_premiere}}</a></li>
+                {% if input.status == "Pending" %}
+                <li class="label" style="background: var(--light-orange);" title="{{input.get_status_display}}"><a>{{input.matiere_premiere}}</a></li>
+                {% else %}
+                <li class="label" style="background: var(--light-green);"title="{{input.get_status_display}}"><a>{{input.matiere_premiere}}</a></li>
+                {% endif %}
               {% endfor %}     
             </ul>
             <label for="token">Ajout matière première</label>
@@ -69,7 +73,11 @@
             <label>Biocarburants</label>
             <ul class="label-list">
               {% for output in site.outputs %}
-              <li class="label"><a>{{output.biocarburant}}</a></li>
+                {% if output.status == "Pending" %}
+                <li class="label" style="background: var(--light-orange);" title="{{output.get_status_display}}"><a>{{output.biocarburant}}</a></li>
+                {% else %}
+                <li class="label" style="background: var(--light-green);"title="{{input.get_status_display}}"><a>{{output.biocarburant}}</a></li>
+                {% endif %}              
               {% endfor %}                
             </ul>
             <label for="token">Ajout biocarburant</label>
