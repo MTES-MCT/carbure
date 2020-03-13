@@ -37,14 +37,6 @@ def operators_controles(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_operators
-def operators_annuaire(request, *args, **kwargs):
-  context = kwargs['context']
-  context['current_url_name'] = 'operators-annuaire'
-  return render(request, 'operators/annuaire.html', context)
-
-@login_required
-@enrich_with_user_details
-@restrict_to_operators
 def operators_affiliations(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'operators-affiliations'

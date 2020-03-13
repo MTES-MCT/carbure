@@ -28,3 +28,10 @@ def home(request, *args, **kwargs):
 def htmlreference(request):
   context = {}
   return render(request, 'common/reference.html', context)
+
+@login_required
+@enrich_with_user_details
+def annuaire(request, *args, **kwargs):
+  context = kwargs['context']
+  context['current_url_name'] = 'annuaire'
+  return render(request, 'common/annuaire.html', context)

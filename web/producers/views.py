@@ -124,14 +124,6 @@ def producers_export(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
-def producers_annuaire(request, *args, **kwargs):
-  context = kwargs['context']
-  context['current_url_name'] = 'producers-annuaire'
-  return render(request, 'producers/annuaire.html', context)
-
-@login_required
-@enrich_with_user_details
-@restrict_to_producers
 def producers_settings_add_certif(request, *args, **kwargs):
   context = kwargs['context']
   
