@@ -99,8 +99,8 @@
 
 <div class="modal__backdrop" id="modal_entity">
   <div class="modal">
-    <span id="modal_entity_err_message" style="color: red;"></span>
-    <form id="modal_entity_form" method="POST">
+    <span id="modal_entity_form_err_message" style="color: red;"></span>
+    <form id="modal_entity_form" method="POST" data-url="{% url 'administrators-add-entity' %}">
       {% csrf_token %}
       <label for="modal_entity_name">Nom</label>
       <input type="text" id="modal_entity_name" name="name" placeholder="BioRaffinage SA">
@@ -120,8 +120,8 @@
 
 <div class="modal__backdrop" id="modal_user">
   <div class="modal">
-    <span id="modal_user_err_message" style="color: red;"></span>
-    <form id="modal_user_form" method="POST">
+    <span id="modal_user_form_err_message" style="color: red;"></span>
+    <form id="modal_user_form" method="POST" data-url="{% url 'administrators-add-user' %}">
       {% csrf_token %}
       <label for="modal_user_name">Nom</label>
       <input type="text" id="modal_user_name" name="name" placeholder="Jean-Claure Bertelot">
@@ -142,9 +142,13 @@
     <form id="modal_right_form" method="POST">
       {% csrf_token %}
       <label for="modal_right_user">Utilisateur</label>
-      <input type="text" id="modal_right_user" name="user">
-      <label for="modal_entity_cat">Société</label>
-      <input type="text" id="modal_right_entity" name="entity">
+      <div class="input__group">
+        <input type="text" id="modal_right_user" class="autocomplete_users" name="user">
+      </div>       
+      <label for="modal_right_entity">Société</label>
+      <div class="input__group">
+        <input type="text" id="modal_right_entity" class="autocomplete_entities" name="entity">
+      </div>      
       <div class="form__group button__group">
         <a class="button secondary close" id="btn_close_modal_right">Annuler</a>
         <button type="submit" class="button">Ajouter</button>
@@ -195,39 +199,16 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-
-$(document).ready(function() {
-
-  $("#modal_entity_form").submit(function(event) {
-      var form = $(this);
-      var formdata = false;
-      if (window.FormData){
-          formdata = new FormData(form[0]);
-      }
-      $.ajax({
-          url         : "{% url 'producers-settings-add-site' %}",
-          data        : formdata ? formdata : form.serialize(),
-          cache       : false,
-          contentType : false,
-          processData : false,
-          type        : 'POST',
-          success     : function(data, textStatus, jqXHR){
-              // Callback code
-              $("#modal_entity_err_message").text("")
-              window.location.reload()
-          },
-          error       : function(e) {
-            if (e.status === 400) {
-              $("#modal_entity_err_message").text(e.responseJSON.message)
-              console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-            } else {
-              $("#modal_entity_err_message").text("Server error. Please contact an administrator")
-              console.log(`server error ${JSON.stringify(e)}`)
-            }
-          }
-      });
-      event.preventDefault()
-  })
+$(".autocomplete_entities").autocomplete({
+  serviceUrl: "{% url 'admin-api-entities-autocomplete' %}",
+  dataType: 'json'
 })
+
+$(".autocomplete_users").autocomplete({
+  serviceUrl: "{% url 'admin-api-users-autocomplete' %}",
+  dataType: 'json'
+})
+
+
 </script>
 {% endblock %}
