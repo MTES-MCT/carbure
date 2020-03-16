@@ -4,6 +4,6 @@ from . import views
 
 urlpatterns = [
     path('profile', views.profile, name='profile'),
-    path('password_reset', views.custom_password_reset, name='custom_password_reset'),
-    path('password_reset_success', views.custom_password_reset_success, name='custom_password_reset_success'),            
+    path('password_change', views.custom_password_change, name='custom_password_change'),
+    path('password_change_success', views.custom_password_change_success, name='custom_password_change_success'),            
 ]

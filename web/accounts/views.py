@@ -12,17 +12,17 @@ def profile(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
-def custom_password_reset(request, *args, **kwargs):
+def custom_password_change(request, *args, **kwargs):
     context = kwargs['context']
     if request.method == 'POST':
         request.user.set_password(request.POST['new_password1'])
         request.user.save()
-        redirect('custom_password_reset_success')
-    return render(request, "accounts/password_reset.html", context)
+        redirect('custom_password_change_success')
+    return render(request, "accounts/password_change.html", context)
 
 @login_required
 @enrich_with_user_details
-def custom_password_reset_success(request, *args, **kwargs):
+def custom_password_change_success(request, *args, **kwargs):
     context = kwargs['context']
-    return render(request, "accounts/password_reset_done.html", context)
+    return render(request, "accounts/password_change_done.html", context)
 
