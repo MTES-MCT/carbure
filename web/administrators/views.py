@@ -1,8 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from core.decorators import enrich_with_user_details, restrict_to_administrators
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import PasswordResetForm
 
 from core.models import Entity, UserRights
 from producers.models import ProducerCertificate
@@ -74,3 +76,69 @@ def administrators_validate_certificate(request, *args, **kwargs):
   except Exception as e:
     return JsonResponse({'status':'error', 'message':'Could not find certificate'}, status=400)
   return redirect('administrators-suivi-certificats')
+
+@login_required
+@enrich_with_user_details
+@restrict_to_administrators
+def administrators_add_entity(request, *args, **kwargs):
+  context = kwargs['context']
+  name = request.POST.get('name')
+  entity_type = request.POST.get('category')
+
+  if name == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field name"}, status=400)
+  if entity_type == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Category"}, status=400)
+
+  try:
+    obj, created = Entity.objects.update_or_create(name=name, entity_type=entity_type)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'Entity created'})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_administrators
+def administrators_add_user(request, *args, **kwargs):
+  context = kwargs['context']
+  name = request.POST.get('name')
+  email = request.POST.get('email')
+
+  if name == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field name"}, status=400)
+  if email == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Email"}, status=400)
+
+  try:
+    user_model = get_user_model()
+    obj, created = user_model.objects.update_or_create(name=name, email=email)
+
+    reset_password_form = PasswordResetForm(data={'email': email})
+    if reset_password_form.is_valid():
+      reset_password_form.save(request=request)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'User created'})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_administrators
+def administrators_add_right(request, *args, **kwargs):
+  context = kwargs['context']
+  name = request.POST.get('name')
+  entity = request.POST.get('entity')
+
+  if name == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field name"}, status=400)
+  if entity == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field entity"}, status=400)
+  try:
+    entity = Entity.objects.get(name=entity)
+  except:
+    return JsonResponse({'status':'error', 'message':"Could not find entity"}, status=400)
+
+  try:
+    obj, created = UserRights.objects.update_or_create(name=name, entity=entity)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'User Right created'})
