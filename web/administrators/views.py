@@ -45,6 +45,17 @@ def administrators_suivi_certificats(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
+def administrators_certificate_details(request, *args, **kwargs):
+  context = kwargs['context']
+  certificate_id = kwargs['id']
+
+  context['certificate'] = ProducerCertificate.objects.get(id=certificate_id)
+  context['current_url_name'] = 'administrators-certificate-details'
+  return render(request, 'administrators/details_certificate.html', context)
+
+@login_required
+@enrich_with_user_details
+@restrict_to_administrators
 def administrators_gestion_utilisateurs(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'administrators-gestion-utilisateurs'
