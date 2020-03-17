@@ -12,18 +12,22 @@
 						<th>PDF</th>
 						<th>Date création</th>
 						<th>Date expiration</th>
+						<th>MP (à valider)</th>
+						<th>Biocarburants (à valider)</th>
 						<th>Statut</th>
 						<th></th>
 					</tr>
 				</thead>
 				<tbody>
 		            {% for crt in certificates %}
-		              <tr>
+		              <tr onclick="window.location='{% url 'administrators-certificate-details' id=crt.id %}'">
 		                <td>{{ crt.producer }}</td>
 		                <td>{{ crt.certificate_id }}</td>
 		                <td><a href="{{ crt.certificate.url }}" target="_blank">{{ crt.certificate.name }}</a></td>
 		                <td>{{ crt.date_added }}</td>
 		                <td>{{ crt.expiration }}</td>
+		                <td>4 (1)</td>
+		                <td>1 (0)</td>
 		                <td>{{ crt.get_status_display }}</td>
 		                <td><a class="button primary" href="{% url 'administrators-validate-certificate' id=crt.id %}">Valider</a></td>
 		              </tr>
@@ -39,6 +43,8 @@
 						<th>PDF</th>
 						<th>Date création</th>
 						<th>Date expiration</th>
+						<th>MP (à valider)</th>
+						<th>Biocarburants (à valider)</th>						
 						<th>Statut</th>
 						<th></th>						
 					</tr>					

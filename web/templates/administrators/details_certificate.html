@@ -1,0 +1,84 @@
+{% extends "common/base_private.html" %}
+
+{% block content  %}
+	<div class="main">
+		<div class="panel">
+		    <div class="panel__header">
+		      <h3>{{certificate.producer.name}} - {{certificate.production_site.name}} - Certificat</h3>
+		      <small class="panel__header-extra"><a href="{{ certificate.certificate.url }}" target="_blank">{{ certificate.certificate.name }}</a></small>
+		    </div>					
+			<h3>Matières Premières</h3>
+			<table class="display nowrap" id="datatable_mp">
+				<thead>
+					<tr>
+						<th>Matiere Premiere</th>
+						<th>Valider</th>
+						<th>Supprimer</th>
+						<th>Statut</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for mp in mps %}
+					<tr>
+						<td>{{mp.name}}</td>
+						<td><a href="" class="button primary">Valider</a></td>
+						<td><a href="" class="button secondary">Supprimer</a></td>
+						<td>{{mp.status}}</td>
+					</tr>					
+		            {% empty %}
+		              <tr>
+		                <td colspan="4">Aucune matière première enregistrée à ce jour.</td>
+		              </tr>
+		            {% endfor %}					
+			</table>
+		</div>
+		<div class="panel">
+			<h3>Biocarburants</h3>
+			<table class="display nowrap" id="datatable_c">
+				<thead>
+					<tr>
+						<th>Biocarburant</th>
+						<th>Valider</th>
+						<th>Supprimer</th>
+						<th>Statut</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for c in biocarburants %}
+						<td>{{c.name}}</td>
+						<td><a href="" class="button primary">Valider</a></td>
+						<td><a href="" class="button secondary">Supprimer</a></td>
+						<td>{{c.status}}</td>					
+		            {% empty %}
+		              <tr>
+		                <td colspan="7">Aucun biocarburant enregistré à ce jour.</td>
+		              </tr>
+		            {% endfor %}					
+			</table>
+		</div>		
+	</div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+$(document).ready(function() {
+	var table = $('#datatable_mp').DataTable({
+		paging: false,
+		searching: false,
+		info: false,
+		columnDefs: [
+      		{"className": "dt-center", "targets": "_all"}
+   		],				
+	});
+
+	var table_c = $('#datatable_c').DataTable({
+		paging: false,
+		searching: false,
+		info: false,
+		columnDefs: [
+      		{"className": "dt-center", "targets": "_all"}
+   		],				
+	});	
+});
+</script>
+{% endblock %}
