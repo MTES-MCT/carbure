@@ -12,18 +12,18 @@
 				<thead>
 					<tr>
 						<th>Matiere Premiere</th>
+						<th>Statut</th>
 						<th>Valider</th>
 						<th>Supprimer</th>
-						<th>Statut</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for input in mps %}
 					<tr>
 						<td>{{input.matiere_premiere.name}}</td>
-						<td><a href="" class="button primary">Valider</a></td>
-						<td><a href="" class="button secondary">Supprimer</a></td>
-						<td>{{input.status}}</td>
+						<td>{{input.get_status_display}}</td>
+						<td><a href="{% url 'administrators-validate-input' crtid=certificate.id inputid=input.id %}" class="button primary">Valider</a></td>
+						<td><a href="{% url 'administrators-delete-input' crtid=certificate.id inputid=input.id %}" class="button secondary">Supprimer</a></td>
 					</tr>					
 		            {% empty %}
 		              <tr>
@@ -38,18 +38,18 @@
 				<thead>
 					<tr>
 						<th>Biocarburant</th>
+						<th>Statut</th>
 						<th>Valider</th>
 						<th>Supprimer</th>
-						<th>Statut</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for output in biocarburants %}
 					<tr>
 						<td>{{output.biocarburant.name}}</td>
-						<td><a href="" class="button primary">Valider</a></td>
-						<td><a href="" class="button secondary">Supprimer</a></td>
-						<td>{{output.status}}</td>
+						<td>{{output.get_status_display}}</td>
+						<td><a href="{% url 'administrators-validate-output' crtid=certificate.id outputid=output.id %}" class="button primary">Valider</a></td>
+						<td><a href="{% url 'administrators-delete-output' crtid=certificate.id outputid=output.id %}" class="button secondary">Supprimer</a></td>
 					</tr>
 		            {% empty %}
 		              <tr>
