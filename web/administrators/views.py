@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
 
 from core.models import Entity, UserRights
-from producers.models import ProducerCertificate
+from producers.models import ProducerCertificate, ProductionSiteInput, ProductionSiteOutput
 
 @login_required
 @enrich_with_user_details
@@ -50,6 +50,8 @@ def administrators_certificate_details(request, *args, **kwargs):
   certificate_id = kwargs['id']
 
   context['certificate'] = ProducerCertificate.objects.get(id=certificate_id)
+  context['mps'] = ProductionSiteInput.objects.filter(production_site=context['certificate'].production_site)
+  context['biocarburants'] = ProductionSiteOutput.objects.filter(production_site=context['certificate'].production_site)
   context['current_url_name'] = 'administrators-certificate-details'
   return render(request, 'administrators/details_certificate.html', context)
 
