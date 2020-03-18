@@ -8,6 +8,7 @@
 				<thead>
 					<tr>
 						<th>Producteur</th>
+						<th>Site de production</th>
 						<th>Certificat</th>
 						<th>PDF</th>
 						<th>Date création</th>
@@ -22,6 +23,7 @@
 		            {% for crt in certificates %}
 		              <tr onclick="window.location='{% url 'administrators-certificate-details' id=crt.id %}'">
 		                <td>{{ crt.producer }}</td>
+		                <td>{{ crt.production_site }}</td>
 		                <td>{{ crt.certificate_id }}</td>
 		                <td><a href="{{ crt.certificate.url }}" target="_blank">{{ crt.certificate.name }}</a></td>
 		                <td>{{ crt.date_added }}</td>
@@ -39,6 +41,7 @@
 		        <tfoot>
 					<tr>
 						<th>Producteur</th>
+						<th>Site de production</th>
 						<th>Certificat</th>
 						<th>PDF</th>
 						<th>Date création</th>
