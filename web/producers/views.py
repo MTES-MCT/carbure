@@ -74,7 +74,7 @@ def producers_settings(request, *args, **kwargs):
   for site in context['sites']:
     site.inputs = mps.filter(production_site=site)
     try:
-      site.certificate = certificates.get(production_site=site)
+      site.certificate = certificates.filter(production_site=site).order_by('-date_added')[0]
     except:
       site.certificate = None
     site.outputs = outputs.filter(production_site=site)
