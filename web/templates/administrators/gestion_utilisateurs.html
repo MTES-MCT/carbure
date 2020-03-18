@@ -51,7 +51,7 @@
               <tr>
                 <td>{{user.name}}</td>
                 <td>{{user.email}}</td>
-                <td><a class="button primary">Reset</a></td>
+                <td><a class="button primary" href="{% url 'administrators-reset-user-password' uid=user.id %}">Reset</a></td>
               </tr>          
               {% empty %}
               <tr>

@@ -194,6 +194,24 @@ def administrators_add_user(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
+def administrators_reset_user_password(request, *args, **kwargs):
+  context = kwargs['context']
+  uid = kwargs['uid']
+
+  try:
+    user_model = get_user_model()
+    obj, created = user_model.objects.get(id=uid)
+    reset_password_form = PasswordResetForm(data={'email': obj.email})
+    if reset_password_form.is_valid():
+      reset_password_form.save(request=request)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return redirect('administrators-gestion-utilisateurs')
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_administrators
 def administrators_add_right(request, *args, **kwargs):
   context = kwargs['context']
   name = request.POST.get('name')
