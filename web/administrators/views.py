@@ -93,6 +93,64 @@ def administrators_validate_certificate(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
+def administrators_validate_input(request, *args, **kwargs):
+  context = kwargs['context']
+  crtid = kwargs['crtid']
+  input_id = kwargs['inputid']
+  try:
+    mp = ProductionSiteInput.objects.get(id=input_id)
+    mp.status = 'Valid'
+    mp.save()
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':'Could not find input in database'}, status=400)
+  return redirect('administrators-certificate-details', id=crtid)
+
+@login_required
+@enrich_with_user_details
+@restrict_to_administrators
+def administrators_validate_output(request, *args, **kwargs):
+  context = kwargs['context']
+  crtid = kwargs['crtid']
+  output_id = kwargs['outputid']
+  try:
+    bc = ProductionSiteOutput.objects.get(id=output_id)
+    bc.status = 'Valid'
+    bc.save()
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':'Could not find output in database'}, status=400)
+  return redirect('administrators-certificate-details', id=crtid)
+
+@login_required
+@enrich_with_user_details
+@restrict_to_administrators
+def administrators_delete_input(request, *args, **kwargs):
+  context = kwargs['context']
+  crtid = kwargs['crtid']
+  input_id = kwargs['inputid']
+  try:
+    mp = ProductionSiteInput.objects.get(id=input_id)
+    mp.delete()
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':'Could not find input in database'}, status=400)
+  return redirect('administrators-certificate-details', id=crtid)
+
+@login_required
+@enrich_with_user_details
+@restrict_to_administrators
+def administrators_delete_output(request, *args, **kwargs):
+  context = kwargs['context']
+  crtid = kwargs['crtid']
+  output_id = kwargs['outputid']
+  try:
+    bc = ProductionSiteOutput.objects.get(id=output_id)
+    bc.delete()
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':'Could not find output in database'}, status=400)
+  return redirect('administrators-certificate-details', id=crtid)
+
+@login_required
+@enrich_with_user_details
+@restrict_to_administrators
 def administrators_add_entity(request, *args, **kwargs):
   context = kwargs['context']
   name = request.POST.get('name')

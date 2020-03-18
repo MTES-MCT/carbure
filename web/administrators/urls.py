@@ -15,6 +15,10 @@ urlpatterns = [
 
     # api-style urls
     path('suivi-certificats/validate/<int:id>', views.administrators_validate_certificate, name='administrators-validate-certificate'),
+    path('suivi-certificats/validate-input/<int:crtid>/<int:inputid>', views.administrators_validate_input, name='administrators-validate-input'),
+    path('suivi-certificats/validate-output/<int:crtid>/<int:outputid>', views.administrators_validate_output, name='administrators-validate-output'),
+    path('suivi-certificats/delete-input/<int:crtid>/<int:inputid>', views.administrators_delete_input, name='administrators-delete-input'),
+    path('suivi-certificats/delete-output/<int:crtid>/<int:outputid>', views.administrators_delete_output, name='administrators-delete-output'),
 
 
     path('users/add-entity', views.administrators_add_entity, name='administrators-add-entity'),
