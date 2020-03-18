@@ -17,7 +17,6 @@ then
     python3 /app/web/manage.py loaddata /app/web/fixtures/userrights.json
     python3 /app/web/manage.py loaddata /app/web/fixtures/userpreferences.json
 
-    python3 /app/web/manage.py loaddata /app/web/fixtures/attestations_producers.json
     python3 /app/web/manage.py loaddata /app/web/fixtures/productionsites.json
     python3 /app/web/manage.py loaddata /app/web/fixtures/productionsiteinputs.json
     python3 /app/web/manage.py loaddata /app/web/fixtures/productionsiteoutputs.json

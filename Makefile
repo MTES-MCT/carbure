@@ -12,7 +12,6 @@ fixtures:
 	python3 /app/web/manage.py dumpdata core.userpreferences > /app/web/fixtures/userpreferences.json
 	python3 /app/web/manage.py dumpdata core.userrights > /app/web/fixtures/userrights.json
 
-	python3 /app/web/manage.py dumpdata producers.attestationproducer > /app/web/fixtures/attestations_producers.json
 	python3 /app/web/manage.py dumpdata producers.productionsite > /app/web/fixtures/productionsites.json
 	python3 /app/web/manage.py dumpdata producers.productionsiteinput > /app/web/fixtures/productionsiteinputs.json
 	python3 /app/web/manage.py dumpdata producers.productionsiteoutput > /app/web/fixtures/productionsiteoutputs.json
