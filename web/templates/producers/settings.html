@@ -185,6 +185,9 @@ $(".autocomplete_biocarburant").autocomplete({
 $(".autocomplete_mp").autocomplete({
   serviceUrl: "{% url 'api-matiere-premiere-autocomplete' %}",
   dataType: 'json',
+  formatResult: function(suggestion, currentValue) {
+    return `<span title="${suggestion.description}">${suggestion.value}</span>`
+  },  
   onSelect: function (suggestion) {
     $.ajax({
       url         : "{% url 'producers-settings-add-mp' %}",
