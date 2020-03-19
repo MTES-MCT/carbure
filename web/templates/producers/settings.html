@@ -163,7 +163,7 @@ $(".autocomplete_biocarburant").autocomplete({
   onSelect: function (suggestion) {
     $.ajax({
       url         : "{% url 'producers-settings-add-biocarburant' %}",
-      data        : {'site': $(this).attr('data-siteid'), 'biocarburant': suggestion.value, 
+      data        : {'site': $(this).attr('data-siteid'), 'biocarburant': suggestion.data, 
                       'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
       type        : 'POST',
       success     : function(data, textStatus, jqXHR){
@@ -188,7 +188,7 @@ $(".autocomplete_mp").autocomplete({
   onSelect: function (suggestion) {
     $.ajax({
       url         : "{% url 'producers-settings-add-mp' %}",
-      data        : {'site': $(this).attr('data-siteid'), 'matiere_premiere': suggestion.value, 
+      data        : {'site': $(this).attr('data-siteid'), 'matiere_premiere': suggestion.data, 
                       'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
       type        : 'POST',
       success     : function(data, textStatus, jqXHR){
