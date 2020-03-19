@@ -1,1 +1,1 @@
-[{"model": "producers.productionsiteoutput", "pk": 1, "fields": {"production_site": 1, "biocarburant": 7, "status": "Pending"}}, {"model": "producers.productionsiteoutput", "pk": 2, "fields": {"production_site": 1, "biocarburant": 6, "status": "Pending"}}, {"model": "producers.productionsiteoutput", "pk": 3, "fields": {"production_site": 1, "biocarburant": 3, "status": "Pending"}}, {"model": "producers.productionsiteoutput", "pk": 4, "fields": {"production_site": 3, "biocarburant": 7, "status": "Pending"}}]
+[]
