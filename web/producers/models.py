@@ -43,7 +43,7 @@ class ProductionSiteInput(models.Model):
     status = models.CharField(max_length=16, choices=INPUT_STATUS, default="Pending")
 
     def __str__(self):
-        return self.matiere_premiere   
+        return self.matiere_premiere.name   
 
     class Meta:
         db_table = 'production_sites_input'
@@ -58,7 +58,7 @@ class ProductionSiteOutput(models.Model):
     status = models.CharField(max_length=16, choices=OUTPUT_STATUS, default="Pending")
 
     def __str__(self):
-        return self.biocarburant
+        return self.biocarburant.name
 
     class Meta:
         db_table = 'production_sites_output'

@@ -7,31 +7,26 @@ from core.models import Biocarburant, MatierePremiere, Pays, Lot
 from core.models import Entity
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-
+import logging
 
 def biocarburant_autocomplete(request):
-  q = request.GET.get('q', '')
+  q = request.GET['query']
+  logging.info('[autocomplete] biocarburant: query [%s]' % (q))
   types = Biocarburant.objects.filter(name__icontains=q)
-  results = [{'name':i.name, 'description':i.description} for i in types]
-  data = json.dumps(results)
-  mimetype = 'application/json'
-  return HttpResponse(data, mimetype)
+  results = [{'value':i.name, 'description':i.description, 'data':i.code} for i in types]
+  return JsonResponse({'suggestions': results})
 
 def matiere_premiere_autocomplete(request):
-  q = request.GET.get('q', '')
+  q = request.GET['query']
   mps = MatierePremiere.objects.filter(name__icontains=q)
-  results = [{'name':i.name, 'description':i.description} for i in mps]
-  data = json.dumps(results)
-  mimetype = 'application/json'
-  return HttpResponse(data, mimetype)
+  results = [{'value':i.name, 'description':i.description, 'data':i.code} for i in mps]
+  return JsonResponse({'suggestions': results})
 
-def pays_autocomplete(request):
-  q = request.GET.get('q', '')
+def country_autocomplete(request):
+  q = request.GET['query']
   countries = Pays.objects.filter(name__icontains=q)
-  results = [{'name':i.name, 'code_pays':i.code_pays} for i in countries]
-  data = json.dumps(results)
-  mimetype = 'application/json'
-  return HttpResponse(data, mimetype)
+  results = [{'value':i.name, 'data':i.code_pays} for i in countries]
+  return JsonResponse({'suggestions': results})
 
 @login_required
 @enrich_with_user_details

@@ -205,7 +205,7 @@ def producers_settings_add_mp(request, *args, **kwargs):
     return JsonResponse({'status':'error', 'message':"Please provide a value in field Matiere Premiere"}, status=400)
 
   try:
-    mp = MatierePremiere.objects.get(name__icontains=mp)
+    mp = MatierePremiere.objects.get(code=mp)
   except Exception as e:
     return JsonResponse({'status':'error', 'message':"Please provide a valid Matiere Premiere from the list", 'extra':str(e)}, status=400)
 
@@ -234,7 +234,7 @@ def producers_settings_add_biocarburant(request, *args, **kwargs):
     return JsonResponse({'status':'error', 'message':"Please provide a value in field Biocarburant"}, status=400)
 
   try:
-    biocarburant = Biocarburant.objects.get(name__icontains=biocarburant)
+    biocarburant = Biocarburant.objects.get(code=biocarburant)
   except Exception as e:
     return JsonResponse({'status':'error', 'message':"Please provide a valid Biocarburant from the list", 'extra':str(e)}, status=400)
 
