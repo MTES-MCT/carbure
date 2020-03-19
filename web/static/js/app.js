@@ -56,7 +56,6 @@ $(document).ready(function() {
   $("form").submit(function(event) {
     let form = $(this);
     let form_id = form.attr('id')
-    console.log(`form submitted: ${form_id} err_msg id: #${form_id}_err_message`)
     let form_url = form.attr('data-url')
     let err_msg_dom = $(`#${form_id}_err_message`)
     err_msg_dom.text("Uploading... please wait")
@@ -71,21 +70,21 @@ $(document).ready(function() {
       contentType : false,
       processData : false,
       type        : 'POST',
-      success     : function(data, textStatus, jqXHR){
+      success     : function(data, textStatus, jqXHR) {
               // Callback code
               err_msg_dom.text("")
               window.location.reload()
-            },
-            error       : function(e) {
-              if (e.status === 400) {
-                err_msg_dom.text(e.responseJSON.message)
-                console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-              } else {
-                err_msg_dom.text("Server error. Please contact an administrator")
-                console.log(`server error ${JSON.stringify(e)}`)
-              }
-            }
-          });
+      },
+      error       : function(e) {
+        if (e.status === 400) {
+          err_msg_dom.text(e.responseJSON.message)
+          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+        } else {
+          err_msg_dom.text("Server error. Please contact an administrator")
+          console.log(`server error ${JSON.stringify(e)}`)
+        }
+      }
+    });
     event.preventDefault()
   })  
 })

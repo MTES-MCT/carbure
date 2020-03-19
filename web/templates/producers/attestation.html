@@ -57,7 +57,7 @@
 			<a id="btn_delete" class="button primary" href="#">Supprimer Lots</a>
 		</div>
 		<div class="flex-container-left">
-			<a class="button primary" id="add_lot">Ajouter Lot</a>
+			<a class="button primary" id="add_lot" href="{% url 'producers-attestation-new-lot' attestation_id=current_attestation.id %}">Ajouter Lot</a>
 			<a id="add_lot_params" style="margin-top: auto;"><small>Paramètres</small></a>
 		</div>		
 	    <div class="form__group" id="add_lot_params_toggle" style="display: none;">
@@ -378,6 +378,7 @@ $(document).ready(function() {
 	/* add lot */
 	$("#add_lot").on('click', function(e) {
 		// take the last row of the table and duplicate it
+		// only if one lot is selected
         let last_row = table.row(':last').data()
         table.row.add(last_row).draw()
 	})
@@ -471,8 +472,12 @@ $(document).ready(function() {
 		if (keys.length === 1) {
 			// 1 lot selected
 			$("#add_lot").text("Dupliquer Lot")
+			// remove href
+			$("#add_lot").attr("href", "")
 		} else {
 			$("#add_lot").text("Ajouter Lot")
+			// add href
+			$("#add_lot").attr("href", "{% url 'producers-attestation-new-lot' attestation_id=current_attestation.id %}")
 		}
 
 	}

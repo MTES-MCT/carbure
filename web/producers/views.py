@@ -124,6 +124,23 @@ def producers_export(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
+def producers_new_lot(request, *args, **kwargs):
+  context = kwargs['context']
+  context['attestation_id'] = kwargs['attestation_id']
+  context['current_url_name'] = 'producers-attestation-new-lot'
+  return render(request, 'producers/lot.html', context)
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_save_lot(request, *args, **kwargs):
+  context = kwargs['context']
+  attestation_id = kwargs['attestation_id']
+  return JsonResponse({'status':'error', 'message':"KO %s" % (attestation_id)}, status=400)
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
 def producers_settings_add_certif(request, *args, **kwargs):
   context = kwargs['context']
   
