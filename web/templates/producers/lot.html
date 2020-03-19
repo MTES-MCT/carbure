@@ -1,0 +1,107 @@
+{% extends "common/base_private.html" %}
+
+{% block content %}
+<div class="main">
+  <div class="panel">
+    <div class="panel__header">
+      <h3>Nouveau Lot</h3>
+      <small id="err_msg_dom"></small>
+    </div>
+    <div class="flex-container">
+      <div class="form__group">
+        <dl>
+          <h3>Informations</h3>
+          <dt>Site de Production</dt>
+          <dd><input type="text" /></dd>
+          <dt>Volume</dt>
+          <dd><input type="text" /></dd>
+          <dt>Biocarburant</dt>
+          <dd><input type="text" /></dd>
+          <dt>Matiere Premiere</dt>
+          <dd><input type="text" /></dd>
+          <dt>Pays d'origine</dt>
+          <dd><input type="text" /></dd>
+        </dl>
+      </div>        
+      <div class="form__group">
+        <dl>
+          <h3>Émissions de CO2</h3>
+          <dt>EEC</dt>
+          <dd><input type="text" /></dd>
+          <dt>EL</dt>
+          <dd><input type="text" /></dd>
+          <dt>EP</dt>
+          <dd><input type="text" /></dd>
+          <dt>ETD</dt>
+          <dd><input type="text" /></dd>
+          <dt>EU</dt>
+          <dd><input type="text" /></dd>
+        </dl>
+      </div>            
+      <div class="form__group">
+        <dl>
+          <h3>Réductions de CO2</h3>
+          <dt>ESCA</dt>
+          <dd><input type="text" /></dd>
+          <dt>ECCS</dt>
+          <dd><input type="text" /></dd>
+          <dt>ECCR</dt>
+          <dd><input type="text" /></dd>
+          <dt>EEE</dt>
+          <dd><input type="text" /></dd>
+        </dl>           
+      </div>
+      <div class="form__group">
+        <dl>
+          <h3>Bilan CO2</h3>
+          <dt>Total émissions GES</dt>
+          <dd><input type="text" /></dd>
+          <dt>Émissions de référence</dt>
+          <dd><input type="text" /></dd>
+          <dt>% réduction</dt>
+          <dd><input type="text" /></dd>
+        </dl>           
+      </div>
+    </div>
+    <div class="row">
+      {% csrf_token %}
+      <div class="form__group flex-container-right button-push">
+        <a class="button secondary" href="#">Annuler</a>            
+        <a id="btn_lot_save" class="button primary">Sauvegarder</a>
+      </div>             
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script type="text/javascript">
+  $("#btn_lot_save").on('click', function() {
+    var err_msg_dom = $("#err_msg_dom")
+    var data = {'attestation_id': '{{attestation_id}}', 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value}
+    //$("input").each(function() {
+    //  data[$(this).attr('id')] = $(this).val()
+    //})
+    $.ajax({
+      url         : "{% url 'producers-attestation-save-lot' attestation_id=attestation_id  %}",
+      data        : JSON.stringify(data),
+      cache       : false,
+      contentType : false,
+      processData : false,
+      type        : 'POST',
+      success     : function(data, textStatus, jqXHR) {
+        // Callback code
+        alert('OK')
+      },
+      error       : function(e) {
+        if (e.status === 400) {
+          alert(e.responseJSON.message)
+        } else {
+          alert("Server error. Please contact an administrator")
+        }
+      }
+    })
+}); 
+</script>
+{% endblock %}
