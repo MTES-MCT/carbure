@@ -152,9 +152,14 @@
 <script type="text/javascript">
 
 
-$("#modal_site_country").autocomplete({lookup: countries});
+$("#modal_site_country").autocomplete({
+  serviceUrl: "{% url 'api-country-autocomplete' %}",
+  dataType: 'json',
+});
+
 $(".autocomplete_biocarburant").autocomplete({
-  lookup: biocarburants,
+  serviceUrl: "{% url 'api-biocarburant-autocomplete' %}",
+  dataType: 'json',
   onSelect: function (suggestion) {
     $.ajax({
       url         : "{% url 'producers-settings-add-biocarburant' %}",
@@ -178,7 +183,8 @@ $(".autocomplete_biocarburant").autocomplete({
   }
 })
 $(".autocomplete_mp").autocomplete({
-  lookup: matieres_premieres,
+  serviceUrl: "{% url 'api-matiere-premiere-autocomplete' %}",
+  dataType: 'json',
   onSelect: function (suggestion) {
     $.ajax({
       url         : "{% url 'producers-settings-add-mp' %}",

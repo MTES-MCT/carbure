@@ -28,14 +28,14 @@ class UserPreferencesAdmin(admin.ModelAdmin):
 
 
 class BiocarburantAdmin(admin.ModelAdmin):
-    list_display = ('name', )
+    list_display = ('name', 'description')
     search_fields = ('name', )
-
+    readonly_fields = ('code', )
 
 class MatierePremiereAdmin(admin.ModelAdmin):
-    list_display = ('name', )
+    list_display = ('name', 'description')
     search_fields = ('name', )
-
+    readonly_fields = ('code', )
 
 class PaysAdmin(admin.ModelAdmin):
     list_display = ('name', )

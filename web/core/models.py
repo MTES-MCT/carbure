@@ -52,6 +52,7 @@ class Biocarburant(models.Model):
     name = models.CharField(max_length=64)
     description = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
+    code = models.CharField(max_length=16, unique=True)
 
     def __str__(self):
         return self.name
@@ -68,6 +69,7 @@ class MatierePremiere(models.Model):
     name = models.CharField(max_length=128)
     description = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
+    code = models.CharField(max_length=64, unique=True)
 
     def __str__(self):
         return self.name
