@@ -96,6 +96,22 @@ def producers_ges(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
+def producers_duplicate_lot(request, *args, **kwargs):
+  context = kwargs['context']
+  lot_id = request.POST.get('lot_id', None)
+  if not lot_id:
+    return JsonResponse({'status':'error', 'message':'Missing lot id'}, status=400)
+  else:
+    lot = Lot.objects.get(id=lot_id)
+    lot.pk = None
+    lot.dae = ''
+    lot.save()
+    return JsonResponse({'status':'success', 'message':'OK'})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
 def producers_settings_add_certif(request, *args, **kwargs):
   context = kwargs['context']
   

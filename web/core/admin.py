@@ -28,7 +28,7 @@ class UserPreferencesAdmin(admin.ModelAdmin):
 
 
 class BiocarburantAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description')
+    list_display = ('code', 'name', 'description')
     search_fields = ('name', )
     readonly_fields = ('code', )
 

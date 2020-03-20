@@ -20,6 +20,7 @@ urlpatterns = [
     path('producers/settings/add-mp', views.producers_settings_add_mp, name='producers-api-settings-add-mp'),
     path('producers/settings/add-biocarburant', views.producers_settings_add_biocarburant, name='producers-api-settings-add-biocarburant'),
     path('producers/attestation/<int:attestation_id>/lot/save', views.producers_save_lot, name='producers-api-attestation-save-lot'),
+    path('producers/lot/duplicate', views.producers_duplicate_lot, name='producers-api-duplicate-lot'),
 
 
     # private, administrators
