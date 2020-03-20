@@ -53,9 +53,9 @@
           <option value="repsol">Repsol</option>
           <option value="export">Export</option>
       </select>
-      <a id="btn_affiliate" class="button primary" href="#">Affilier Lots</a>
-      <a id="btn_validate" class="button primary" href="#">Valider Lots</a>
-      <a id="btn_delete" class="button primary" href="#">Supprimer Lots</a>
+      <a id="btn_affiliate" class="button primary">Affilier Lots</a>
+      <a id="btn_validate" class="button primary">Valider Lots</a>
+      <a id="btn_delete" class="button primary">Supprimer Lots</a>
     </div>
     <div class="flex-container-left">
       <a class="button primary" id="add_lot">Ajouter Lot</a>
@@ -147,7 +147,7 @@ function show_hide_action_buttons() {
     let key = keys[i]
     let rowdata = selected_rows[key]
     let statut = rowdata['status']
-    if (statut.toLowerCase() === "brouillon") {
+    if (statut.toLowerCase() === "draft") {
       draft_present = true
     } else {
       only_drafts_present = false
