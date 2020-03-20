@@ -160,6 +160,7 @@ $("#modal_site_country").autocomplete({
 $(".autocomplete_biocarburant").autocomplete({
   serviceUrl: "{% url 'api-biocarburant-autocomplete' %}",
   dataType: 'json',
+  minChars: 0,
   formatResult: function(suggestion, currentValue) {
     return `<span title="${suggestion.description}">${suggestion.value}</span>`
   },    
@@ -188,6 +189,7 @@ $(".autocomplete_biocarburant").autocomplete({
 $(".autocomplete_mp").autocomplete({
   serviceUrl: "{% url 'api-matiere-premiere-autocomplete' %}",
   dataType: 'json',
+  minChars: 0,
   formatResult: function(suggestion, currentValue) {
     return `<span title="${suggestion.description}">${suggestion.value}</span>`
   },  
