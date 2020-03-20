@@ -200,7 +200,7 @@ def administrators_reset_user_password(request, *args, **kwargs):
 
   try:
     user_model = get_user_model()
-    obj, created = user_model.objects.get(id=uid)
+    obj = user_model.objects.get(id=uid)
     reset_password_form = PasswordResetForm(data={'email': obj.email})
     if reset_password_form.is_valid():
       reset_password_form.save(request=request)
