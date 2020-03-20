@@ -70,103 +70,6 @@
   		</div>       		
 	</div>
 </div>
-
-<div class="modal__backdrop" id="modal_lot">
-	<div class="modal modal-big">
-		<section class="flex-container">
-			<div class="flex-container-left">
-				<div class="form__group">
-					<h2>Informations Générales</h2>
-					<label for="ml_depot">Dépôt</label>
-					<input type="text" value="" id="ml_depot">
-					<label for="ml_dae">N°DAE ou DAA</label>
-					<input type="text" value="" id="ml_dae">
-					<label for="ml_volume">Volume</label>
-					<input type="text" value="" id="ml_volume">
-					<label for="ml_date_entree">Date d'entrée en EFS ou UER</label>
-					<input type="text" value="" id="ml_date_entree">
-					<label for="ml_pays">Pays d'implantation</label>
-					<input type="text" value="" id="ml_pays">
-					<label for="ml_date_mise_en_service">Date de mise en service</label>
-					<input type="text" value="" id="ml_date_mise_en_service">
-				</div>
-			</div>
-			<div class="flex-container-left">
-				<div class="form__group">
-					<h2>Durabilité</h2>
-					<label for="ml_filiere">Filière de production</label>
-					<select id="ml_filiere">
-						<option>Choisissez...</option>
-						<option>Colza</option>
-						<option>Maïs</option>
-						<option>Navet</option>
-						<option>Fenouil</option>
-					</select>
-					<label for="ml_type">Types</label>
-					<input type="text" value="" id="ml_type">
-					<label for="ml_cat">Catégorie</label>
-					<input type="text" value="" id="ml_cat">
-					<label for="ml_systeme_fournisseur">Système fournisseur</label>
-					<input type="text" value="" id="ml_systeme_fournisseur">
-					<label for="ml_pays_origine">Pays d'origine</label>
-					<input type="text" value="" id="ml_pays_origine">
-					<label for="ml_respect_crit_durabilite">Respect des critères de durabilité</label>
-					<input type="text" value="" id="ml_respect_crit_durabilite">
-					<label for="ml_num_double_comptage">Éligible double-comptage</label>
-					<input type="text" value="" id="ml_num_double_comptage">
-				</div>
-			</div>
-		</section>
-		<section class="flex-container">
-			<div class="flex-container-left">
-				<div class="form__group">
-					<h2>Émissions GES</h2>
-					<table>
-						<thead>
-							<th>GES transport et distribution</th>
-							<th>Total émissions de GES</th>
-							<th>GES du carburant fossile</th>
-							<th>% de réduction totale</th>
-						</thead>
-						<tbody>
-							<td><input type="text" id="ml_ges_transport_distribution" /></td>
-							<td><input type="text" id="ml_ges_total" /></td>
-							<td><input type="text" id="ml_ges_fossile" /></td>
-							<td><input type="text" id="ml_ges_reduction" /></td>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</section>
-		<section class="flex-container">
-			<div class="flex-container-left">
-				<div class="form__group">
-					<h2>Affiliation</h2>
-					<table>
-						<thead>
-							<th>Date</th>
-							<th>Vendeur</th>
-							<th>Client</th>
-						</thead>
-						<tbody>
-							<td><input type="text" id="ml_date_affiliation" value="27/01/2020"/></td>
-							<td><input type="text" id="ml_vendeur" value="BioRaffinerie Lambda"/></td>
-							<td><input type="text" id="ml_client" value="OperateurGamma"/></td>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</section>		
-		<section class="flex-container-right">
-			<div class="form__group button__group">
-				<a class="button primary close" href="#">Valider</a>
-				<a class="button primary close" href="#">Sauvegarder</a>
-				<a class="button secondary close" href="#">Annuler</a>
-			</div>
-		</section>
-	</div>
-</div>
-
 {% endblock %}
 
 
@@ -245,7 +148,9 @@ $(document).ready(function() {
    			url: `{% url 'api-producers-sample-lots' %}`,
 	    	dataSrc: function(json) {
 	      		for (let i = 0, len = json.length; i < len; i++) {
+	      			let lot_id = json[i]['pk']
 	        		json[i] = json[i]["fields"]
+	        		json[i]['id'] = lot_id
 	        		// add checkbox on the fly
 	        		json[i]["checkbox"] = `<input type="checkbox" />`
 	      		}
@@ -408,19 +313,6 @@ $(document).ready(function() {
 		reader.readAsText(e.target.files[0]);
 	})
 
-	function display_lot_modal(data) {
-        // add data to modal
-        console.log(`display modal with data ${data}`)
-        for (let i = 0, len = data.length; i < len; i++) {
-        	let col_data = data[i]
-        	let col_name = colid2colname[i]
-        	let destination_element = col2field[col_name]
-        	$(`#${destination_element}`).val(col_data)
-        }
-		// show modal
-		modal_lot.style.display = "flex";		
-	}
-
 	function show_hide_action_buttons() {
 		// buttons Valider & Affilier
 		// pseudo code: if all rows are valid, button Affilier is active
@@ -483,7 +375,6 @@ $(document).ready(function() {
 	}
 	show_hide_action_buttons()
 	/* click on datatable row */
-	var modal_lot = document.getElementById("modal_lot")
 	$('#datatable_wrapper tbody').on('click', 'input', function() {
 		let hrow = $(this).closest("tr")
 		let row = table.row(hrow)
@@ -505,11 +396,13 @@ $(document).ready(function() {
 		let row = $(this).closest('tr');
 		let data = table.row(row).data()
 		let table_column = table_columns[colid]	
+		let attestation_id = "{{attestation_id}}"
+		let lot_id = data['id']
    		if (table_column['data'] === 'checkbox') {
 			// ignore clicks on checkbox column
 			return
 		} else {	
-			display_lot_modal(data)
+			window.location = "{% url 'producers-attestation-edit-lot' attestation_id=current_attestation.id lot_id=22222  %}".replace('22222', lot_id)
 		}
 	});
 
@@ -561,7 +454,6 @@ $(document).ready(function() {
 		btn_close.onclick = function() {
 		  modal_columns.style.display = "none"
 		  modal_import.style.display = "none"
-		  modal_lot.style.display = "none"
 		}
 	}
 	// clicking outside of the modal window will close it
@@ -572,16 +464,12 @@ $(document).ready(function() {
 	  if (event.target == modal_import) {
 	    modal_import.style.display = "none"
 	  }
-	  if (event.target == modal_lot) {
-	    modal_lot.style.display = "none"
-	  }
 	}
 	// escape key
 	$(document).keydown(function(event) {
 	  if (event.keyCode == 27) {
 	    modal_columns.style.display = "none"
 	    modal_import.style.display = "none"
-	    modal_lot.style.display = "none"
 	  }
 	});
 });

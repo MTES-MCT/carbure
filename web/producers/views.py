@@ -127,6 +127,29 @@ def producers_export(request, *args, **kwargs):
 def producers_new_lot(request, *args, **kwargs):
   context = kwargs['context']
   context['attestation_id'] = kwargs['attestation_id']
+  attestation_id = context['attestation_id']
+
+  attestations = AttestationProducer.objects.filter(producer=context['user_entity'])
+  current_attestation_qs = attestations.filter(id=attestation_id)
+  if len(current_attestation_qs) == 0:
+    raise PermissionDenied
+  current_attestation = current_attestation_qs[0]
+  next_attestations = attestations.filter(deadline__gt=current_attestation.deadline).order_by('deadline')
+  previous_attestations = attestations.filter(deadline__lt=current_attestation.deadline).order_by('-deadline')
+  context['current_attestation'] = current_attestation
+  if len(next_attestations) == 0:
+    # this is the latest attestation. no next, two previous
+    context['next_attestations'] = None
+    context['previous_attestations'] = previous_attestations[0:2]
+  elif len(previous_attestations) == 0:
+    # this is the first attestation. no previous, two next
+    context['next_attestations'] = [next_attestations[1], next_attestations[0]]
+    context['previous_attestations'] = None
+  else:
+    # middle, one of each
+    context['next_attestations'] = [next_attestations[0]]
+    context['previous_attestations'] = [previous_attestations[0]]
+
   context['current_url_name'] = 'producers-attestation-new-lot'
   return render(request, 'producers/lot.html', context)
 
@@ -136,6 +159,33 @@ def producers_new_lot(request, *args, **kwargs):
 def producers_edit_lot(request, *args, **kwargs):
   context = kwargs['context']
   context['attestation_id'] = kwargs['attestation_id']
+  attestation_id = context['attestation_id']
+
+  attestations = AttestationProducer.objects.filter(producer=context['user_entity'])
+  current_attestation_qs = attestations.filter(id=attestation_id)
+  if len(current_attestation_qs) == 0:
+    raise PermissionDenied
+  current_attestation = current_attestation_qs[0]
+  next_attestations = attestations.filter(deadline__gt=current_attestation.deadline).order_by('deadline')
+  previous_attestations = attestations.filter(deadline__lt=current_attestation.deadline).order_by('-deadline')
+  context['current_attestation'] = current_attestation
+  if len(next_attestations) == 0:
+    # this is the latest attestation. no next, two previous
+    context['next_attestations'] = None
+    context['previous_attestations'] = previous_attestations[0:2]
+  elif len(previous_attestations) == 0:
+    # this is the first attestation. no previous, two next
+    context['next_attestations'] = [next_attestations[1], next_attestations[0]]
+    context['previous_attestations'] = None
+  else:
+    # middle, one of each
+    context['next_attestations'] = [next_attestations[0]]
+    context['previous_attestations'] = [previous_attestations[0]]
+
   context['lot'] = Lot.objects.get(id=kwargs['lot_id'])
+  if request.GET.get('created', None):
+    context['message'] = "Création du lot réussie"
+  if request.GET.get('saved', None):
+    context['message'] = "Sauvegarde du lot réussie"    
   context['current_url_name'] = 'producers-attestation-edit-lot'
   return render(request, 'producers/lot.html', context)
