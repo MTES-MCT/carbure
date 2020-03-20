@@ -27,39 +27,39 @@
         <dl>
           <h3>Émissions de CO2</h3>
           <dt>EEC</dt>
-          <dd><input type="text" id="eec" /></dd>
+          <dd><input type="text" id="eec" class="ges_field ges_incr" /></dd>
           <dt>EL</dt>
-          <dd><input type="text" id="el" /></dd>
+          <dd><input type="text" id="el" class="ges_field ges_incr" /></dd>
           <dt>EP</dt>
-          <dd><input type="text" id="ep" /></dd>
+          <dd><input type="text" id="ep" class="ges_field ges_incr" /></dd>
           <dt>ETD</dt>
-          <dd><input type="text" id="etd" /></dd>
+          <dd><input type="text" id="etd" class="ges_field ges_incr" /></dd>
           <dt>EU</dt>
-          <dd><input type="text" id="eu" /></dd>
+          <dd><input type="text" id="eu" class="ges_field ges_incr" /></dd>
         </dl>
       </div>            
       <div class="form__group">
         <dl>
           <h3>Réductions de CO2</h3>
           <dt>ESCA</dt>
-          <dd><input type="text" id="esca" /></dd>
+          <dd><input type="text" id="esca" class="ges_field ges_decr" /></dd>
           <dt>ECCS</dt>
-          <dd><input type="text" id="eccs" /></dd>
+          <dd><input type="text" id="eccs" class="ges_field ges_decr" /></dd>
           <dt>ECCR</dt>
-          <dd><input type="text" id="eccr" /></dd>
+          <dd><input type="text" id="eccr" class="ges_field ges_decr" /></dd>
           <dt>EEE</dt>
-          <dd><input type="text" id="eee" /></dd>
+          <dd><input type="text" id="eee" class="ges_field ges_decr" /></dd>
         </dl>           
       </div>
       <div class="form__group">
         <dl>
           <h3>Bilan CO2</h3>
           <dt>Total émissions GES</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="ges_total" /></dd>
           <dt>Émissions de référence</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="ref" /></dd>
           <dt>% réduction</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="pct_reduction" /></dd>
         </dl>           
       </div>
     </div>
@@ -87,7 +87,7 @@
       formdata.set($(this).attr('id'), $(this).val())
     })
     $.ajax({
-      url         : "{% url 'producers-attestation-save-lot' attestation_id=attestation_id  %}",
+      url         : "{% url 'producers-api-attestation-save-lot' attestation_id=attestation_id  %}",
       data        : formdata,
       cache       : false,
       contentType : false,
@@ -121,8 +121,9 @@ function load_ges(mp, bc) {
     success     : function(data, textStatus, jqXHR) {
       // Callback code
       $.each(data, function(key, value) {
-        console.log(key, value)
+        $(`#${key}`).val(value)
       })
+      $("#eec").change()
     },
     error       : function(e) {
       if (e.status === 400) {
@@ -133,6 +134,24 @@ function load_ges(mp, bc) {
     }
   })
 }
+
+$(".ges_field").on('change', function() {
+  console.log('ges_field change')
+  var sum_incr = 0
+  var sum_decr = 0
+  var ref = parseFloat($("#ref").val())
+  $(".ges_incr").each(function(index, elem) {
+    sum_incr += parseFloat(elem.value)
+  })
+  $(".ges_decr").each(function(index, elem) {
+    sum_decr += parseFloat(elem.value)
+  })
+  var sum = sum_incr - sum_decr
+  $("#ges_total").val(sum)
+  var pct_reduction = 1.0 - (sum / ref) * 100
+  console.log(`pct reduc ${sum} ${ref} ${pct_reduction}`)
+  $("#pct_reduction").val(pct_reduction)
+})
 
 $(".autocomplete_mps").autocomplete({
   serviceUrl: "{% url 'producers-api-mps-autocomplete' %}",
@@ -154,8 +173,7 @@ $(".autocomplete_biocarburants").autocomplete({
   minChars: 0,
   onSelect: function(suggestion) {
     let selected_mp = $("#matiere_premiere").val()
-    console.log(`selected mp: ${selected_mp}`)
-    if (selected_mp !== undefined) {
+    if (selected_mp !== '') {
       load_ges(selected_mp.data, suggestion.data)
     }
   }
