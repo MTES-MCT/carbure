@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 import logging
 
+# public 
 def biocarburant_autocomplete(request):
   q = request.GET['query']
   logging.info('[autocomplete] biocarburant: query [%s]' % (q))
@@ -28,19 +29,7 @@ def country_autocomplete(request):
   results = [{'value':i.name, 'data':i.code_pays} for i in countries]
   return JsonResponse({'suggestions': results})
 
-@login_required
-@enrich_with_user_details
-def lot_save(request, *args, **kwargs):
-  context = kwargs['context']
-  return JsonResponse({'status':'success'})
-
-@login_required
-@enrich_with_user_details
-def lot_validate(request, *args, **kwargs):
-  context = kwargs['context']
-  return JsonResponse({'status':'success'})
-
-# producers autocomplete
+# producers
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
@@ -97,6 +86,190 @@ def producers_mp_autocomplete(request, *args, **kwargs):
 def producers_ges(request, *args, **kwargs):
   context = kwargs['context']
   return JsonResponse({'eec':12, 'el':4, 'ep':2, 'etd':0, 'eu':3.3, 'esca':0, 'eccs':0, 'eccr':0, 'eee':0, 'ref':45})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_settings_add_certif(request, *args, **kwargs):
+  context = kwargs['context']
+  
+  certif_id = request.POST.get('certif_id')
+  if certif_id == None:
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ Identifiant"}, status=400)
+
+  form_exp_date = request.POST.get('expiration')
+  if form_exp_date == None:
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ Expiration"}, status=400)
+  try:
+    exp_date = datetime.datetime.strptime(form_exp_date, '%d/%m/%Y')
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une date valide au format DD/MM/YYYY"}, status=400)
+
+  site = request.POST.get('site')
+  if site == None:
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ  Site"}, status=400)
+  try:
+    site = ProductionSite.objects.get(producer=context['user_entity'], id=site)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Site de production inconnu"}, status=400)
+
+  form_file = request.FILES.get('file', None)  
+  if form_file == None:
+    return JsonResponse({'status':'error', 'message':"Veuillez sélectionner un certificat (fichier PDF)"}, status=400)
+
+  try:
+    obj, created = ProducerCertificate.objects.update_or_create(producer=context['user_entity'], production_site=site, certificate_id=certif_id, defaults={'expiration':exp_date, 'certificate': form_file})
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'Certificate added'})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_settings_add_site(request, *args, **kwargs):
+  context = kwargs['context']
+  
+  country = request.POST.get('country')
+  name = request.POST.get('name')
+  date_mise_en_service = request.POST.get('date_mise_en_service')
+
+  if country == None:
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ Pays"}, status=400)
+  if name == None:
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ Nom"}, status=400)
+  if date_mise_en_service == None:
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une date dans le champ Date de mise en service"}, status=400)
+
+  try:
+    date_mise_en_service = datetime.datetime.strptime(date_mise_en_service, '%d/%m/%Y')
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une date valide au format DD/MM/YYYY"}, status=400)
+
+  try:
+    country = Pays.objects.get(name__icontains=country)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Veuillez choisir un Pays dans la liste", 'extra':str(e)}, status=400)
+
+  try:
+    obj, created = ProductionSite.objects.update_or_create(producer=context['user_entity'], country=country, name=name, defaults={'date_mise_en_service':date_mise_en_service})
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'Site added'})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_settings_add_mp(request, *args, **kwargs):
+  context = kwargs['context']
+  
+  site = request.POST.get('site')
+  mp = request.POST.get('matiere_premiere')
+
+  if site == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Site"}, status=400)
+  if mp == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Matiere Premiere"}, status=400)
+
+  try:
+    mp = MatierePremiere.objects.get(code=mp)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Please provide a valid Matiere Premiere from the list", 'extra':str(e)}, status=400)
+
+  try:
+    site = ProductionSite.objects.get(producer=context['user_entity'], id=site)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Could not find production site in database"}, status=400)
+
+  try:
+    obj, created = ProductionSiteInput.objects.update_or_create(production_site=site, matiere_premiere=mp)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'MP added'})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_settings_add_biocarburant(request, *args, **kwargs):
+  context = kwargs['context']
+  site = request.POST.get('site')
+  biocarburant = request.POST.get('biocarburant')
+
+  if site == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Site"}, status=400)
+  if biocarburant == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field Biocarburant"}, status=400)
+
+  try:
+    biocarburant = Biocarburant.objects.get(code=biocarburant)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Please provide a valid Biocarburant from the list", 'extra':str(e)}, status=400)
+
+  try:
+    site = ProductionSite.objects.get(producer=context['user_entity'], id=site)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Could not find production site in database"}, status=400)
+
+  try:
+    obj, created = ProductionSiteOutput.objects.update_or_create(production_site=site, biocarburant=biocarburant)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'Biocarburant added'})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_save_lot(request, *args, **kwargs):
+  context = kwargs['context']
+  attestation_id = kwargs['attestation_id']
+
+  # mandatory fields
+  production_site = request.POST.get('production_site', None)
+  biocarburant = request.POST.get('biocarburant', None)
+  matiere_premiere = request.POST.get('matiere_premiere', None)
+  if not production_site or not biocarburant or not matiere_premiere:
+    return JsonResponse({'status':'error', 'message':"Veuillez remplir au minimum les champs suivants: Site de Production, Biocarburant, Matière Première"}, status=400)
+
+  # all other fields
+  volume = request.POST.get('volume', None)
+  pays_origine = request.POST.get('pays_origine', None)
+  eec = request.POST.get('eec', None)
+  el = request.POST.get('el', None)
+  ep = request.POST.get('ep', None)
+  etd = request.POST.get('etd', None)
+  eu = request.POST.get('eu', None)
+  esca = request.POST.get('esca', None)
+  eccs = request.POST.get('eccs', None)
+  eccr = request.POST.get('eccr', None)
+  eee = request.POST.get('eee', None)
+
+  lot = Lot()
+  lot.attestation = attestation_id
+  lot.producer = context['user_entity']
+  lot.production_site = production_site
+
+  lot.volume = float(volume)
+  lot.matiere_premiere = matiere_premiere
+  lot.biocarburant = biocarburant
+  lot.pays_origine = pays_origine
+
+  # ghg
+  lot.eec = eec
+  lot.el = el
+  lot.ep = ep
+  lot.etd = etd
+  lot.eu = eu
+  lot.esca = esca
+  lot.eccs = eccs
+  lot.eccr = eccr
+  lot.eee = eee
+  lot.save()
+
+    # client / delivery
+    #dae = models.CharField(max_length=64, blank=True)
+    #ea_delivery_date = models.DateField(blank=True)
+    #ea_delivery_site = models.CharField(max_length=64, blank=True, default='')
+    #ea = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='ea')
+    #client_id = models.CharField(max_length=64, blank=True, default='')
 
 # admin autocomplete helpers
 

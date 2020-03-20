@@ -105,7 +105,7 @@
 <div class="modal__backdrop" id="modal_site">
   <div class="modal">
     <span id="modal_site_form_err_message" style="color: red;"></span>
-    <form id="modal_site_form" method="POST" data-url="{% url 'producers-settings-add-site' %}">
+    <form id="modal_site_form" method="POST" data-url="{% url 'producers-api-settings-add-site' %}">
       {% csrf_token %}
       <label for="modal_site_name">Nom du site de production</label>
       <input type="text" id="modal_site_name" name="name" placeholder="Grandpuits">
@@ -129,7 +129,7 @@
 <div class="modal__backdrop" id="modal_site_edit">
   <div class="modal">
     <span id="modal_site_edit_form_err_message" style="color: red;"></span>
-    <form id="modal_site_edit_form" method="POST" data-url="{% url 'producers-settings-add-certif' %}">
+    <form id="modal_site_edit_form" method="POST" data-url="{% url 'producers-api-settings-add-certif' %}">
       {% csrf_token %}
       <input type="hidden" id="modal_site_edit_site" name="site">
       <label for="modal_site_edit_certif_id">Identifiant du certificat</label>
@@ -165,7 +165,7 @@ $(".autocomplete_biocarburant").autocomplete({
   },    
   onSelect: function (suggestion) {
     $.ajax({
-      url         : "{% url 'producers-settings-add-biocarburant' %}",
+      url         : "{% url 'producers-api-settings-add-biocarburant' %}",
       data        : {'site': $(this).attr('data-siteid'), 'biocarburant': suggestion.data, 
                       'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
       type        : 'POST',
@@ -193,7 +193,7 @@ $(".autocomplete_mp").autocomplete({
   },  
   onSelect: function (suggestion) {
     $.ajax({
-      url         : "{% url 'producers-settings-add-mp' %}",
+      url         : "{% url 'producers-api-settings-add-mp' %}",
       data        : {'site': $(this).attr('data-siteid'), 'matiere_premiere': suggestion.data, 
                       'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
       type        : 'POST',
