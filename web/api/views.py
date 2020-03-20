@@ -228,6 +228,9 @@ def producers_save_lot(request, *args, **kwargs):
   context = kwargs['context']
   attestation_id = kwargs['attestation_id']
 
+  # new lot or edit?
+  lot_id = request.POST.get('lot_id', None)
+
   # mandatory fields
   production_site = request.POST.get('production_site', None)
   biocarburant = request.POST.get('biocarburant', None)
@@ -254,7 +257,11 @@ def producers_save_lot(request, *args, **kwargs):
   ea_delivery_site = request.POST.get('site_livraison', None)
   client_id = request.POST.get('client_id', None)
 
-  lot = Lot()
+  if lot_id:
+    lot = Lot.objects.get(id=lot_id)
+  else:
+    lot = Lot()
+    
   lot.attestation = AttestationProducer.objects.get(id=attestation_id)
   lot.producer = context['user_entity']
   lot.production_site = ProductionSite.objects.get(id=production_site)

@@ -4,7 +4,7 @@
 				<a {% if current_url_name == 'producers-index' or current_url_name == 'producers-attestation' %}class="active"{% endif %} href="{% url 'producers-index' %}">
 					Attestations
 				</a>
-				{% if current_url_name == 'producers-attestation' %}
+				{% if current_url_name == 'producers-attestation' or current_url_name == 'producers-attestation-edit-lot' or current_url_name == 'producers-attestation-new-lot' %}
 				<ul>
 					{% for na in next_attestations %}
 					<li class="side-menu-submenu"><a href="{% url 'producers-attestation' attestation_id=na.id %}">{{na.period}}</a></li>

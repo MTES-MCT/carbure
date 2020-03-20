@@ -4,51 +4,57 @@
 <div class="main">
   <div class="panel">
     <div class="panel__header">
+      {% if lot %}
+      <h3>Modifier Lot</h3>
+      <input type="hidden" id="lot_id" value="{{lot.id}}">      
+      {% else %}
       <h3>Nouveau Lot</h3>
+      {% endif %}
       <small id="err_msg_dom"></small>
     </div>
+    <h4 style="color: red">{{message}}</h4>
     <div class="flex-container">
       <div class="form__group" style="margin-top: var(--space-l);">
         <h3>Informations</h3>
         <dl>
           <dt>Site de Production</dt>
-          <dd><input type="text" id="production_site_display" class="autocomplete_production_sites" /><input type="hidden" id="production_site" /></dd>
+          <dd><input type="text" id="production_site_display" class="autocomplete_production_sites" value="{{lot.production_site.name}}"/><input type="hidden" id="production_site" value="{{lot.production_site.id}}" /></dd>
           <dt>Volume</dt>
-          <dd><input type="text" id="volume" /></dd>
+          <dd><input type="text" id="volume" value="{{lot.volume}}" /></dd>
           <dt>Biocarburant</dt>
-          <dd><input type="text" id="biocarburant_display" class="autocomplete_biocarburants" /><input type="hidden" id="biocarburant" /></dd>
+          <dd><input type="text" id="biocarburant_display" class="autocomplete_biocarburants" value="{{lot.biocarburant.name}}" /><input type="hidden" id="biocarburant" value="{{lot.biocarburant.code}}" /></dd>
           <dt>Matiere Premiere</dt>
-          <dd><input type="text" id="matiere_premiere_display" class="autocomplete_mps" /><input type="hidden" id="matiere_premiere" /></dd>
+          <dd><input type="text" id="matiere_premiere_display" class="autocomplete_mps" value="{{lot.matiere_premiere.name}}" /><input type="hidden" id="matiere_premiere" value="{{lot.matiere_premiere.code}}" /></dd>
           <dt>Pays d'origine</dt>
-          <dd><input type="text" id="pays_origine_display" class="autocomplete_countries" /><input type="hidden" id="pays_origine" /></dd>
+          <dd><input type="text" id="pays_origine_display" class="autocomplete_countries" value="{{lot.pays_origine.name}}" /><input type="hidden" id="pays_origine" value="{{lot.pays_origine.code_pays}}" /></dd>
         </dl>
       </div>
       <div class="form__group">
         <h3>Émissions de CO2</h3>
         <dl>
           <dt>EEC</dt>
-          <dd><input type="text" id="eec" class="ges_field ges_incr" /></dd>
+          <dd><input type="text" id="eec" class="ges_field ges_incr" value="{{lot.eec|stringformat:'.1f'}}" /></dd>
           <dt>EL</dt>
-          <dd><input type="text" id="el" class="ges_field ges_incr" /></dd>
+          <dd><input type="text" id="el" class="ges_field ges_incr" value="{{lot.el|stringformat:'.1f'}}" /></dd>
           <dt>EP</dt>
-          <dd><input type="text" id="ep" class="ges_field ges_incr" /></dd>
+          <dd><input type="text" id="ep" class="ges_field ges_incr" value="{{lot.ep|stringformat:'.1f'}}" /></dd>
           <dt>ETD</dt>
-          <dd><input type="text" id="etd" class="ges_field ges_incr" /></dd>
+          <dd><input type="text" id="etd" class="ges_field ges_incr" value="{{lot.etd|stringformat:'.1f'}}" /></dd>
           <dt>EU</dt>
-          <dd><input type="text" id="eu" class="ges_field ges_incr" /></dd>
+          <dd><input type="text" id="eu" class="ges_field ges_incr" value="{{lot.eu|stringformat:'.1f'}}" /></dd>
         </dl>
       </div>            
       <div class="form__group">
         <h3>Réductions de CO2</h3>
         <dl>
           <dt>ESCA</dt>
-          <dd><input type="text" id="esca" class="ges_field ges_decr" /></dd>
+          <dd><input type="text" id="esca" class="ges_field ges_decr" value="{{lot.esca|stringformat:'.1f'}}" /></dd>
           <dt>ECCS</dt>
-          <dd><input type="text" id="eccs" class="ges_field ges_decr" /></dd>
+          <dd><input type="text" id="eccs" class="ges_field ges_decr" value="{{lot.eccs|stringformat:'.1f'}}" /></dd>
           <dt>ECCR</dt>
-          <dd><input type="text" id="eccr" class="ges_field ges_decr" /></dd>
+          <dd><input type="text" id="eccr" class="ges_field ges_decr" value="{{lot.eccr|stringformat:'.1f'}}" /></dd>
           <dt>EEE</dt>
-          <dd><input type="text" id="eee" class="ges_field ges_decr" /></dd>
+          <dd><input type="text" id="eee" class="ges_field ges_decr" value="{{lot.eee|stringformat:'.1f'}}" /></dd>
         </dl>           
       </div>
       <div class="form__group">
@@ -66,21 +72,21 @@
         <h3>Destination</h3>
         <dl>
         <dt><label for="num_dae">Numéro de DAE</label></dt>
-        <dd><input id="num_dae" type="text" /></dd>
+        <dd><input id="num_dae" type="text" value="{{lot.dae}}"/></dd>
         <dt><label for="client">Client</label></dt>
-        <dd><input id="client_display" type="text" class="autocomplete_operators" /><input type="hidden" id="client" /></dd>
+        <dd><input id="client_display" type="text" class="autocomplete_operators" value="{{lot.client.name}}" /><input type="hidden" id="client" value="{{lot.client.id}}" /></dd>
         <dt><label for="site_livraison">Site de livraison</label></dt>
-        <dd><input id="site_livraison" type="text" /></dd>
+        <dd><input id="site_livraison" type="text" value="{{lot.ea_delivery_site}}" /></dd>
         <dt><label for="date_livraison">Date de livraison</label></dt>
-        <dd><input id="date_livraison" type="text" /></dd>
+        <dd><input id="date_livraison" type="text" value="{{lot.ea_delivery_date|date:'Y-m-d'}}" /></dd>
         <dt><label for="client_id">Champ libre</label></dt>
-        <dd><input id="client_id" type="text" /></dd>        
+        <dd><input id="client_id" type="text" value="{{lot.client_id}}" /></dd>        
         </dl>                        
       </div>                
     </div>
     <div class="row">
       <div class="form__group flex-container-right button-push">
-        <a class="button secondary" href="#">Annuler</a>            
+        <a class="button secondary" href="{% url 'producers-attestation' attestation_id=attestation_id %}">Annuler</a>            
         <a id="btn_lot_save" class="button primary">Sauvegarder</a>
       </div>
     </div>
@@ -97,6 +103,9 @@
     var err_msg_dom = $("#err_msg_dom")
     var formdata = new FormData();
     formdata.set('attestation_id', '{{attestation_id}}')
+    {% if lot %} 
+    formdata.set('lot_id', '{{lot.id}}')
+    {% endif %}
     formdata.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
     $("input").each(function() {
       formdata.set($(this).attr('id'), $(this).val())
@@ -110,7 +119,13 @@
       type        : 'POST',
       success     : function(data, textStatus, jqXHR) {
         // Callback code
-        alert('OK')
+        let lot_id = data.lot_id
+        let redirect_url = "{% url 'producers-attestation-edit-lot' attestation_id=attestation_id lot_id=22222  %}".replace('22222', lot_id)
+        {% if lot %} 
+        window.location = redirect_url + "?saved=True"
+        {% else %}
+        window.location = redirect_url + "?created=True"
+        {% endif %}
       },
       error       : function(e) {
         if (e.status === 400) {
