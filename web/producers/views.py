@@ -130,3 +130,12 @@ def producers_new_lot(request, *args, **kwargs):
   context['current_url_name'] = 'producers-attestation-new-lot'
   return render(request, 'producers/lot.html', context)
 
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_edit_lot(request, *args, **kwargs):
+  context = kwargs['context']
+  context['attestation_id'] = kwargs['attestation_id']
+  context['lot'] = Lot.objects.get(id=kwargs['lot_id'])
+  context['current_url_name'] = 'producers-attestation-edit-lot'
+  return render(request, 'producers/lot.html', context)

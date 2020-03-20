@@ -7,7 +7,7 @@ urlpatterns = [
     path('export', views.producers_export, name='producers-export'),
     path('attestation/<int:attestation_id>', views.producers_attestation, name='producers-attestation'),
     path('attestation/<int:attestation_id>/lot/new', views.producers_new_lot, name='producers-attestation-new-lot'),
-    #path('attestation/<int:attestation_id>/lot/<int:lot_id>/edit', views.producers_edit_lot, name='producers-attestation-edit-lot'),
+    path('attestation/<int:attestation_id>/lot/<int:lot_id>/edit', views.producers_edit_lot, name='producers-attestation-edit-lot'),
 
 
     path('corrections', views.producers_corrections, name='producers-corrections'),

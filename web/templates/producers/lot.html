@@ -8,24 +8,24 @@
       <small id="err_msg_dom"></small>
     </div>
     <div class="flex-container">
-      <div class="form__group">
+      <div class="form__group" style="margin-top: var(--space-l);">
+        <h3>Informations</h3>
         <dl>
-          <h3>Informations</h3>
           <dt>Site de Production</dt>
-          <dd><input type="text" id="production_site" class="autocomplete_production_sites" /></dd>
+          <dd><input type="text" id="production_site_display" class="autocomplete_production_sites" /><input type="hidden" id="production_site" /></dd>
           <dt>Volume</dt>
           <dd><input type="text" id="volume" /></dd>
           <dt>Biocarburant</dt>
-          <dd><input type="text" id="biocarburant" class="autocomplete_biocarburants" /></dd>
+          <dd><input type="text" id="biocarburant_display" class="autocomplete_biocarburants" /><input type="hidden" id="biocarburant" /></dd>
           <dt>Matiere Premiere</dt>
-          <dd><input type="text" id="matiere_premiere" class="autocomplete_mps" /></dd>
+          <dd><input type="text" id="matiere_premiere_display" class="autocomplete_mps" /><input type="hidden" id="matiere_premiere" /></dd>
           <dt>Pays d'origine</dt>
-          <dd><input type="text" id="pays_origine" class="autocomplete_countries" /></dd>
+          <dd><input type="text" id="pays_origine_display" class="autocomplete_countries" /><input type="hidden" id="pays_origine" /></dd>
         </dl>
-      </div>        
+      </div>
       <div class="form__group">
+        <h3>Émissions de CO2</h3>
         <dl>
-          <h3>Émissions de CO2</h3>
           <dt>EEC</dt>
           <dd><input type="text" id="eec" class="ges_field ges_incr" /></dd>
           <dt>EL</dt>
@@ -39,8 +39,8 @@
         </dl>
       </div>            
       <div class="form__group">
+        <h3>Réductions de CO2</h3>
         <dl>
-          <h3>Réductions de CO2</h3>
           <dt>ESCA</dt>
           <dd><input type="text" id="esca" class="ges_field ges_decr" /></dd>
           <dt>ECCS</dt>
@@ -52,8 +52,8 @@
         </dl>           
       </div>
       <div class="form__group">
+        <h3>Bilan CO2</h3>
         <dl>
-          <h3>Bilan CO2</h3>
           <dt>Total émissions GES</dt>
           <dd><input type="text" id="ges_total" /></dd>
           <dt>Émissions de référence</dt>
@@ -61,13 +61,28 @@
           <dt>% réduction</dt>
           <dd><input type="text" id="pct_reduction" /></dd>
         </dl>           
-      </div>
+      </div>       
+      <div class="form__group">
+        <h3>Destination</h3>
+        <dl>
+        <dt><label for="num_dae">Numéro de DAE</label></dt>
+        <dd><input id="num_dae" type="text" /></dd>
+        <dt><label for="client">Client</label></dt>
+        <dd><input id="client_display" type="text" class="autocomplete_operators" /><input type="hidden" id="client" /></dd>
+        <dt><label for="site_livraison">Site de livraison</label></dt>
+        <dd><input id="site_livraison" type="text" /></dd>
+        <dt><label for="date_livraison">Date de livraison</label></dt>
+        <dd><input id="date_livraison" type="text" /></dd>
+        <dt><label for="client_id">Champ libre</label></dt>
+        <dd><input id="client_id" type="text" /></dd>        
+        </dl>                        
+      </div>                
     </div>
     <div class="row">
       <div class="form__group flex-container-right button-push">
         <a class="button secondary" href="#">Annuler</a>            
         <a id="btn_lot_save" class="button primary">Sauvegarder</a>
-      </div>             
+      </div>
     </div>
     <form method="POST">
       {% csrf_token %}
@@ -159,6 +174,7 @@ $(".autocomplete_mps").autocomplete({
   params: {'producer_id': '{{user_entity.id}}' },
   minChars: 0,
   onSelect: function(suggestion) {
+    $("#matiere_premiere").val(suggestion.data)
     let selected_bc = $("#biocarburant").val()
     if (selected_bc !== '') {
       load_ges(suggestion.data, selected_bc.data)
@@ -172,6 +188,7 @@ $(".autocomplete_biocarburants").autocomplete({
   params: {'producer_id': '{{user_entity.id}}' },
   minChars: 0,
   onSelect: function(suggestion) {
+    $("#biocarburant").val(suggestion.data)
     let selected_mp = $("#matiere_premiere").val()
     if (selected_mp !== '') {
       load_ges(selected_mp.data, suggestion.data)
@@ -184,11 +201,25 @@ $(".autocomplete_production_sites").autocomplete({
   dataType: 'json',
   params: {'producer_id': '{{user_entity.id}}' },
   minChars: 0,
+  onSelect: function(suggestion) {
+    $("#production_site").val(suggestion.data)
+  },
 })
 
 $(".autocomplete_countries").autocomplete({
   serviceUrl: "{% url 'api-country-autocomplete' %}",
   dataType: 'json',
+  onSelect: function(suggestion) {
+    $("#pays_origine").val(suggestion.data)
+  },  
+})
+
+$(".autocomplete_operators").autocomplete({
+  serviceUrl: "{% url 'api-operators-autocomplete' %}",
+  dataType: 'json',
+  onSelect: function(suggestion) {
+    $("#client").val(suggestion.data)
+  },  
 })
 
 </script>

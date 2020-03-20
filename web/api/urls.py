@@ -6,7 +6,8 @@ urlpatterns = [
 	# public, autocomplete api
 	path('biocarburant-autocomplete/', views.biocarburant_autocomplete, name='api-biocarburant-autocomplete'),
 	path('matiere-premiere-autocomplete/', views.matiere_premiere_autocomplete, name='api-matiere-premiere-autocomplete'),
-	path('country-autocomplete/', views.country_autocomplete, name='api-country-autocomplete'),
+    path('country-autocomplete/', views.country_autocomplete, name='api-country-autocomplete'),
+	path('operators-autocomplete/', views.operators_autocomplete, name='api-operators-autocomplete'),
 
     # private, producers
     path('producers/sample-lots', views.producers_sample_lots, name='api-producers-sample-lots'),
