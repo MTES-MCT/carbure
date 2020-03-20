@@ -280,14 +280,6 @@ $(document).ready(function() {
         saveAddLotSettings(addLotSettings)
 	});	
 
-	/* add lot */
-	$("#add_lot").on('click', function(e) {
-		// take the last row of the table and duplicate it
-		// only if one lot is selected
-        let last_row = table.row(':last').data()
-        table.row.add(last_row).draw()
-	})
-
 	/* import file */
 	$("#file_to_upload").on('change', function(e) {
 		let reader = new FileReader();
