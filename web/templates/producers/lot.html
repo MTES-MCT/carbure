@@ -12,43 +12,43 @@
         <dl>
           <h3>Informations</h3>
           <dt>Site de Production</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="production_site" class="autocomplete_production_sites" /></dd>
           <dt>Volume</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="volume" /></dd>
           <dt>Biocarburant</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="biocarburant" class="autocomplete_biocarburants" /></dd>
           <dt>Matiere Premiere</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="matiere_premiere" class="autocomplete_mps" /></dd>
           <dt>Pays d'origine</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="pays_origine" class="autocomplete_countries" /></dd>
         </dl>
       </div>        
       <div class="form__group">
         <dl>
           <h3>Émissions de CO2</h3>
           <dt>EEC</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="eec" /></dd>
           <dt>EL</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="el" /></dd>
           <dt>EP</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="ep" /></dd>
           <dt>ETD</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="etd" /></dd>
           <dt>EU</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="eu" /></dd>
         </dl>
       </div>            
       <div class="form__group">
         <dl>
           <h3>Réductions de CO2</h3>
           <dt>ESCA</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="esca" /></dd>
           <dt>ECCS</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="eccs" /></dd>
           <dt>ECCR</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="eccr" /></dd>
           <dt>EEE</dt>
-          <dd><input type="text" /></dd>
+          <dd><input type="text" id="eee" /></dd>
         </dl>           
       </div>
       <div class="form__group">
@@ -64,28 +64,31 @@
       </div>
     </div>
     <div class="row">
-      {% csrf_token %}
       <div class="form__group flex-container-right button-push">
         <a class="button secondary" href="#">Annuler</a>            
         <a id="btn_lot_save" class="button primary">Sauvegarder</a>
       </div>             
     </div>
+    <form method="POST">
+      {% csrf_token %}
+    </form>
   </div>
 </div>
 {% endblock %}
-
 
 {% block extra_js %}
 <script type="text/javascript">
   $("#btn_lot_save").on('click', function() {
     var err_msg_dom = $("#err_msg_dom")
-    var data = {'attestation_id': '{{attestation_id}}', 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value}
-    //$("input").each(function() {
-    //  data[$(this).attr('id')] = $(this).val()
-    //})
+    var formdata = new FormData();
+    formdata.set('attestation_id', '{{attestation_id}}')
+    formdata.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
+    $("input").each(function() {
+      formdata.set($(this).attr('id'), $(this).val())
+    })
     $.ajax({
       url         : "{% url 'producers-attestation-save-lot' attestation_id=attestation_id  %}",
-      data        : JSON.stringify(data),
+      data        : formdata,
       cache       : false,
       contentType : false,
       processData : false,
@@ -103,5 +106,72 @@
       }
     })
 }); 
+
+function load_ges(mp, bc) {
+  var formdata = new FormData();
+  formdata.set('mp', mp)
+  formdata.set('bc', bc)
+  $.ajax({
+    url         : "{% url 'producers-api-ges' %}",
+    data        : formdata,
+    cache       : false,
+    contentType : false,
+    processData : false,
+    type        : 'GET',
+    success     : function(data, textStatus, jqXHR) {
+      // Callback code
+      $.each(data, function(key, value) {
+        console.log(key, value)
+      })
+    },
+    error       : function(e) {
+      if (e.status === 400) {
+        alert(e.responseJSON.message)
+      } else {
+        alert("Server error. Please contact an administrator")
+      }
+    }
+  })
+}
+
+$(".autocomplete_mps").autocomplete({
+  serviceUrl: "{% url 'producers-api-mps-autocomplete' %}",
+  dataType: 'json',
+  params: {'producer_id': '{{user_entity.id}}' },
+  minChars: 0,
+  onSelect: function(suggestion) {
+    let selected_bc = $("#biocarburant").val()
+    if (selected_bc !== '') {
+      load_ges(suggestion.data, selected_bc.data)
+    }
+  }  
+})
+
+$(".autocomplete_biocarburants").autocomplete({
+  serviceUrl: "{% url 'producers-api-biocarburants-autocomplete' %}",
+  dataType: 'json',
+  params: {'producer_id': '{{user_entity.id}}' },
+  minChars: 0,
+  onSelect: function(suggestion) {
+    let selected_mp = $("#matiere_premiere").val()
+    console.log(`selected mp: ${selected_mp}`)
+    if (selected_mp !== undefined) {
+      load_ges(selected_mp.data, suggestion.data)
+    }
+  }
+})
+
+$(".autocomplete_production_sites").autocomplete({
+  serviceUrl: "{% url 'producers-api-production-sites-autocomplete' %}",
+  dataType: 'json',
+  params: {'producer_id': '{{user_entity.id}}' },
+  minChars: 0,
+})
+
+$(".autocomplete_countries").autocomplete({
+  serviceUrl: "{% url 'api-country-autocomplete' %}",
+  dataType: 'json',
+})
+
 </script>
 {% endblock %}

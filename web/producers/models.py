@@ -83,3 +83,4 @@ class ProducerCertificate(models.Model):
         verbose_name = 'Certificat'
         verbose_name_plural = 'Certificats'	
 
+

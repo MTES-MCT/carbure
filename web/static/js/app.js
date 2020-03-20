@@ -58,7 +58,7 @@ $(document).ready(function() {
     let form_id = form.attr('id')
     let form_url = form.attr('data-url')
     let err_msg_dom = $(`#${form_id}_err_message`)
-    err_msg_dom.text("Uploading... please wait")
+    err_msg_dom.text("Envoi en cours, veuillez patienter...")
     var formdata = false;
     if (window.FormData){
       formdata = new FormData(form[0]);
@@ -71,9 +71,9 @@ $(document).ready(function() {
       processData : false,
       type        : 'POST',
       success     : function(data, textStatus, jqXHR) {
-              // Callback code
-              err_msg_dom.text("")
-              window.location.reload()
+        // Callback code
+        err_msg_dom.text("")
+        window.location.reload()
       },
       error       : function(e) {
         if (e.status === 400) {
