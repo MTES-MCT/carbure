@@ -3,8 +3,8 @@ from django.core import serializers
 from core.decorators import enrich_with_user_details, restrict_to_producers, restrict_to_administrators
 from django.http import JsonResponse, HttpResponse
 import json
-from core.models import Biocarburant, MatierePremiere, Pays, Lot, Entity
-from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
+from core.models import *
+from producers.models import *
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 import logging
@@ -27,6 +27,12 @@ def country_autocomplete(request):
   q = request.GET['query']
   countries = Pays.objects.filter(name__icontains=q)
   results = [{'value':i.name, 'data':i.code_pays} for i in countries]
+  return JsonResponse({'suggestions': results})
+
+def operators_autocomplete(request):
+  q = request.GET['query']
+  operators = Entity.objects.filter(entity_type='Operator', name__icontains=q)
+  results = [{'value':i.name, 'data':i.id} for i in operators]
   return JsonResponse({'suggestions': results})
 
 # producers
@@ -63,7 +69,7 @@ def producers_biocarburant_autocomplete(request, *args, **kwargs):
     outputs = ProductionSiteOutput.objects.filter(production_site__in=production_sites, biocarburant__name__icontains=q)
   else:
     outputs = ProductionSiteOutput.objects.filter(production_site=production_site, biocarburant__name__icontains=q)
-  return JsonResponse({'suggestions': [{'value':s.biocarburant.name, 'data':s.biocarburant.id} for s in outputs]})
+  return JsonResponse({'suggestions': [{'value':s.biocarburant.name, 'data':s.biocarburant.code} for s in outputs]})
 
 @login_required
 @enrich_with_user_details
@@ -78,7 +84,7 @@ def producers_mp_autocomplete(request, *args, **kwargs):
     inputs = ProductionSiteInput.objects.filter(production_site__in=production_sites, matiere_premiere__name__icontains=q)
   else:
     inputs = ProductionSiteInput.objects.filter(production_site=production_site, matiere_premiere__name__icontains=q)  
-  return JsonResponse({'suggestions': [{'value':s.matiere_premiere.name, 'data':s.matiere_premiere.id} for s in inputs]})
+  return JsonResponse({'suggestions': [{'value':s.matiere_premiere.name, 'data':s.matiere_premiere.code} for s in inputs]})
 
 @login_required
 @enrich_with_user_details
@@ -242,15 +248,21 @@ def producers_save_lot(request, *args, **kwargs):
   eccr = request.POST.get('eccr', None)
   eee = request.POST.get('eee', None)
 
+  num_dae = request.POST.get('num_dae', None)
+  ea_delivery_date = request.POST.get('date_livraison', None)
+  ea = request.POST.get('client', None)
+  ea_delivery_site = request.POST.get('site_livraison', None)
+  client_id = request.POST.get('client_id', None)
+
   lot = Lot()
-  lot.attestation = attestation_id
+  lot.attestation = AttestationProducer.objects.get(id=attestation_id)
   lot.producer = context['user_entity']
-  lot.production_site = production_site
+  lot.production_site = ProductionSite.objects.get(id=production_site)
 
   lot.volume = float(volume)
-  lot.matiere_premiere = matiere_premiere
-  lot.biocarburant = biocarburant
-  lot.pays_origine = pays_origine
+  lot.matiere_premiere = MatierePremiere.objects.get(code=matiere_premiere)
+  lot.biocarburant = Biocarburant.objects.get(code=biocarburant)
+  lot.pays_origine = Pays.objects.get(code_pays=pays_origine)
 
   # ghg
   lot.eec = eec
@@ -262,17 +274,23 @@ def producers_save_lot(request, *args, **kwargs):
   lot.eccs = eccs
   lot.eccr = eccr
   lot.eee = eee
-  lot.save()
 
-    # client / delivery
-    #dae = models.CharField(max_length=64, blank=True)
-    #ea_delivery_date = models.DateField(blank=True)
-    #ea_delivery_site = models.CharField(max_length=64, blank=True, default='')
-    #ea = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='ea')
-    #client_id = models.CharField(max_length=64, blank=True, default='')
+  # client / delivery
+  lot.dae = num_dae
+  if not ea_delivery_date or ea_delivery_date == '':
+    lot.ea_delivery_date = None
+  else:
+    lot.ea_delivery_date = ea_delivery_date
+  lot.ea_delivery_site = ea_delivery_site
+  if not ea or ea == '':
+    lot.ea = None
+  else:
+    lot.ea = ea
+  lot.client_id = client_id
+  lot.save()
+  return JsonResponse({'status':'success', 'lot_id': lot.id})
 
 # admin autocomplete helpers
-
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
