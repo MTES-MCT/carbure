@@ -3,8 +3,8 @@ from django.core import serializers
 from core.decorators import enrich_with_user_details, restrict_to_producers, restrict_to_administrators
 from django.http import JsonResponse, HttpResponse
 import json
-from core.models import Biocarburant, MatierePremiere, Pays, Lot
-from core.models import Entity
+from core.models import Biocarburant, MatierePremiere, Pays, Lot, Entity
+from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 import logging
@@ -40,6 +40,7 @@ def lot_validate(request, *args, **kwargs):
   context = kwargs['context']
   return JsonResponse({'status':'success'})
 
+# producers autocomplete
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
@@ -50,6 +51,52 @@ def producers_sample_lots(request, *args, **kwargs):
     'client_id', 'status'), use_natural_foreign_keys=True)
   return HttpResponse(data, content_type='application/json')
 
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_prod_site_autocomplete(request, *args, **kwargs):
+  context = kwargs['context']
+  q = request.GET['query']
+  producer_id = request.GET['producer_id']
+  production_sites = ProductionSite.objects.filter(producer=producer_id, name__icontains=q)
+  return JsonResponse({'suggestions': [{'value':s.name, 'data':s.id} for s in production_sites]})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_biocarburant_autocomplete(request, *args, **kwargs):
+  context = kwargs['context']
+  q = request.GET['query']
+  producer_id = request.GET['producer_id']
+  production_site = request.GET.get('production_site', None)
+  if production_site == None:
+    production_sites = ProductionSite.objects.filter(producer=producer_id)
+    outputs = ProductionSiteOutput.objects.filter(production_site__in=production_sites, biocarburant__name__icontains=q)
+  else:
+    outputs = ProductionSiteOutput.objects.filter(production_site=production_site, biocarburant__name__icontains=q)
+  return JsonResponse({'suggestions': [{'value':s.biocarburant.name, 'data':s.biocarburant.id} for s in outputs]})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_mp_autocomplete(request, *args, **kwargs):
+  context = kwargs['context']
+  q = request.GET['query']
+  producer_id = request.GET['producer_id']
+  production_site = request.GET.get('production_site', None)
+  if production_site == None:
+    production_sites = ProductionSite.objects.filter(producer=producer_id)
+    inputs = ProductionSiteInput.objects.filter(production_site__in=production_sites, matiere_premiere__name__icontains=q)
+  else:
+    inputs = ProductionSiteInput.objects.filter(production_site=production_site, matiere_premiere__name__icontains=q)  
+  return JsonResponse({'suggestions': [{'value':s.matiere_premiere.name, 'data':s.matiere_premiere.id} for s in inputs]})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_ges(request, *args, **kwargs):
+  context = kwargs['context']
+  return JsonResponse({'eec':12, 'el':4, 'ep':2, 'etd':0, 'eu':3.3, 'esca':0, 'eccs':0, 'eccr':0, 'eee':0, 'ref':45})
 
 # admin autocomplete helpers
 

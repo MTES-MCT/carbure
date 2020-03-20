@@ -136,6 +136,14 @@ def producers_new_lot(request, *args, **kwargs):
 def producers_save_lot(request, *args, **kwargs):
   context = kwargs['context']
   attestation_id = kwargs['attestation_id']
+
+  # mandatory fields
+  site_production = request.POST['production_site']
+  volume = request.POST['volume']
+  biocarburant = request.POST['biocarburant']
+  matiere_premiere = request.POST['matiere_premiere']
+  pays_origine = request.POST['pays_origine']
+
   return JsonResponse({'status':'error', 'message':"KO %s" % (attestation_id)}, status=400)
 
 @login_required
