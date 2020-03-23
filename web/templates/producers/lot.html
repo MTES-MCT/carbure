@@ -12,7 +12,7 @@
       {% endif %}
       <small id="err_msg_dom"></small>
     </div>
-    <h4 style="color: red">{{message}}</h4>
+    <h4 style="color: green">{{message}}</h4>
     <div class="flex-container">
       <div class="form__group" style="margin-top: var(--space-l);">
         <h3>Informations</h3>
@@ -87,7 +87,12 @@
     <div class="row">
       <div class="form__group flex-container-right button-push">
         <a class="button secondary" href="{% url 'producers-attestation' attestation_id=attestation_id %}">Annuler</a>            
-        <a id="btn_lot_save" class="button primary">Sauvegarder</a>
+        {% if lot %}
+        <a id="btn_lot_save" class="button primary">Enregistrer modifications</a>
+        {% else %}
+        <a id="btn_lot_save_and_add" class="button primary">Créer et ajouter un nouveau lot</a>
+        <a id="btn_lot_save" class="button primary">Créer</a>
+        {% endif %}
       </div>
     </div>
     <form method="POST">
