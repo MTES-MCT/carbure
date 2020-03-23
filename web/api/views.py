@@ -8,6 +8,7 @@ from producers.models import *
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 import logging
+import datetime
 
 # public 
 def biocarburant_autocomplete(request):
@@ -31,7 +32,7 @@ def country_autocomplete(request):
 
 def operators_autocomplete(request):
   q = request.GET['query']
-  operators = Entity.objects.filter(entity_type='Operator', name__icontains=q)
+  operators = Entity.objects.filter(entity_type='Opérateur', name__icontains=q)
   results = [{'value':i.name, 'data':i.id} for i in operators]
   return JsonResponse({'suggestions': results})
 
@@ -130,17 +131,26 @@ def producers_delete_lots(request, *args, **kwargs):
 @restrict_to_producers
 def producers_validate_lots(request, *args, **kwargs):
   context = kwargs['context']
-  lot_id = request.POST.get('lot_id', None)
-  if not lot_id:
-    return JsonResponse({'status':'error', 'message':'Missing lot id'}, status=400)
-  else:
-    try:
-      lot = Lot.objects.get(id=lot_id)
-      lot.status = "Validated"
-      lot.save()
-      return JsonResponse({'status':'success', 'message':'OK'})
-    except Exception as e:
-      return JsonResponse({'status':'error', 'message':'Could not delete lot', 'extra':str(e)}, status=400)
+  lot_ids = request.POST.get('lots', None)
+  if not lot_ids:
+    return JsonResponse({'status':'error', 'message':'Missing lot ids'}, status=400)
+  
+  ids = lot_ids.split(',')
+  for lotid in ids:
+    lot = Lot.objects.get(id=lotid, producer=context['user_entity'])  
+    # make sure all mandatory fields are set
+    if lot.dae != '' and lot.ea_delivery_date and lot.ea_delivery_site and lot.ea and lot.volume and lot.pays_origine:
+      try:
+        today = datetime.date.today()
+        lot = Lot.objects.get(id=lotid)
+        lot.carbure_id = "FR%s%d%d%d" % (today.strftime('%y%m%d'), lot.producer.id, lot.production_site.id, lot.id)
+        lot.status = "Validated"
+        lot.save()
+      except Exception as e:
+        return JsonResponse({'status':'error', 'message':'Could not validate lot', 'extra':str(e)}, status=400)
+    else:
+      return JsonResponse({'status':'error', 'message':'Could not validate lot. Some fields are not set'}, status=400)
+  return JsonResponse({'status':'success', 'message':'lots validated'})
 
 @login_required
 @enrich_with_user_details
@@ -358,7 +368,7 @@ def producers_save_lot(request, *args, **kwargs):
   if not ea or ea == '':
     lot.ea = None
   else:
-    lot.ea = ea
+    lot.ea = Entity.objects.get(id=ea)
   lot.client_id = client_id
   lot.save()
   return JsonResponse({'status':'success', 'lot_id': lot.id})

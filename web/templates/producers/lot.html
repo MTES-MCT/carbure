@@ -74,7 +74,7 @@
         <dt><label for="num_dae">Numéro de DAE</label></dt>
         <dd><input id="num_dae" type="text" value="{{lot.dae}}"/></dd>
         <dt><label for="client">Client</label></dt>
-        <dd><input id="client_display" type="text" class="autocomplete_operators" value="{{lot.client.name}}" /><input type="hidden" id="client" value="{{lot.client.id}}" /></dd>
+        <dd><input type="text" id="client_display" class="autocomplete_operators" value="{{lot.client.name}}" /><input type="hidden" id="client" value="{{lot.client.id}}" /></dd>
         <dt><label for="site_livraison">Site de livraison</label></dt>
         <dd><input id="site_livraison" type="text" value="{{lot.ea_delivery_site}}" /></dd>
         <dt><label for="date_livraison">Date de livraison</label></dt>
@@ -237,6 +237,7 @@ $(".autocomplete_countries").autocomplete({
 $(".autocomplete_operators").autocomplete({
   serviceUrl: "{% url 'api-operators-autocomplete' %}",
   dataType: 'json',
+  minChars: 0,
   onSelect: function(suggestion) {
     $("#client").val(suggestion.data)
   },  
