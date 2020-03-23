@@ -103,7 +103,7 @@ from producers.models import AttestationProducer
 from producers.models import ProductionSite
 
 class Lot(models.Model):
-    LOT_STATUS = (('Draft', 'Draft'), ('Validated', 'Validated'))
+    LOT_STATUS = (('Draft', 'Brouillon'), ('Validated', 'Validé'))
 
     # producer
     attestation = models.ForeignKey(AttestationProducer, null=True, blank=True, on_delete=models.SET_NULL)

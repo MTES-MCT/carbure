@@ -108,6 +108,39 @@ def producers_duplicate_lot(request, *args, **kwargs):
     lot.save()
     return JsonResponse({'status':'success', 'message':'OK'})
 
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_delete_lots(request, *args, **kwargs):
+  context = kwargs['context']
+  lot_ids = request.POST.get('lots', None)
+  if not lot_ids:
+    return JsonResponse({'status':'error', 'message':'Missing lot ids'}, status=400)
+  try:
+    ids = lot_ids.split(',')
+    for lotid in ids:
+      lot = Lot.objects.get(id=lotid, producer=context['user_entity'])
+      lot.delete()
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':'Could not delete lot', 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'lots deleted'})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_validate_lots(request, *args, **kwargs):
+  context = kwargs['context']
+  lot_id = request.POST.get('lot_id', None)
+  if not lot_id:
+    return JsonResponse({'status':'error', 'message':'Missing lot id'}, status=400)
+  else:
+    try:
+      lot = Lot.objects.get(id=lot_id)
+      lot.status = "Validated"
+      lot.save()
+      return JsonResponse({'status':'success', 'message':'OK'})
+    except Exception as e:
+      return JsonResponse({'status':'error', 'message':'Could not delete lot', 'extra':str(e)}, status=400)
 
 @login_required
 @enrich_with_user_details

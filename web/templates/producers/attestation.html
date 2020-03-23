@@ -1,9 +1,5 @@
 {% extends "common/base_private.html" %}
 
-{% block extra_css %}
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.css"/>
-{% endblock %}
-
 
 {% block content  %}
 <div class="main" style="overflow-x: auto;">
@@ -12,7 +8,7 @@
     {% csrf_token %}
     <div class="button-container">
       <div class="button-item">
-        <a class="button modal-button" id="btn_modal_import">Importer</a>
+        <a class="button modal-button" id="btn_open_modal_import">Importer</a>
         <a href="/static/files/template.csv" style="margin-left: -10px;"><small>Télécharger le modèle</small></a>
         <div class="modal__backdrop" id="modal_import">
           <div class="modal">
@@ -24,7 +20,7 @@
         </div>
       </div>
       <div class="button-item button-push" style="margin-top: 30px;">
-        <a id="btn_modal_columns"><small>Colonnes</small></a>
+        <a id="btn_open_modal_columns"><small>Colonnes</small></a>
         <div class="modal__backdrop" id="modal_columns">
           <div class="modal">
             <table id="table_columns_filter">
@@ -46,70 +42,102 @@
     <div class="flex-container-right">
       <select id="select_affiliate">
         <option value="none">--</option>
-          <option value="total">Total</option>
-          <option value="OperateurGamma">OperateurGamma</option>
-          <option value="petrobras">Petrobras</option>
-          <option value="bp">BP</option>
-          <option value="repsol">Repsol</option>
-          <option value="export">Export</option>
+        <option value="total">Total</option>
+        <option value="OperateurGamma">OperateurGamma</option>
+        <option value="petrobras">Petrobras</option>
+        <option value="bp">BP</option>
+        <option value="repsol">Repsol</option>
+        <option value="export">Export</option>
       </select>
       <a id="btn_affiliate" class="button primary">Affilier Lots</a>
-      <a id="btn_validate" class="button primary">Valider Lots</a>
-      <a id="btn_delete" class="button primary">Supprimer Lots</a>
+      <a id="btn_open_modal_validate_lots" class="button primary">Valider Lots</a>
+      <a id="btn_open_modal_delete_lots" class="button primary">Supprimer Lots</a>
     </div>
     <div class="flex-container-left">
       <a class="button primary" id="add_lot">Ajouter Lot</a>
       <a id="add_lot_params" style="margin-top: auto;"><small>Paramètres</small></a>
     </div>    
-      <div class="form__group" id="add_lot_params_toggle" style="display: none;">
-        <fieldset>
+    <div class="form__group" id="add_lot_params_toggle" style="display: none;">
+      <fieldset>
         <legend><small>Sélectionnez les valeurs à dupliquer lors de l'ajout de lot</small></legend>
         <ul class="flex-container-a" id="list_columns_filter">
           <!-- dynamically generated in js -->
         </ul>
-        </fieldset>
-      </div>          
+      </fieldset>
+    </div>          
   </div>
 </div>
+
+<div class="modal__backdrop" id="modal_delete_lots">
+  <div class="modal">
+    <span id="modal_delete_lots_form_err_message" style="color: red;"></span>
+    <form id="modal_delete_lots_form" method="POST" data-url="{% url 'producers-api-delete-lots' %}">
+      {% csrf_token %}
+      <p>Êtes vous sûr de vouloir supprimer ce(s) lot(s) ?</p>   
+      <ul id="modal_delete_lots_list">
+      </ul>
+      <input type="hidden" id="modal_delete_lots_lots" name="lots">
+      <div class="form__group button__group">
+        <a class="button secondary" id="btn_close_modal_delete_lots">Annuler</a>
+        <button type="submit" class="button">Valider</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_validate_lots">
+  <div class="modal">
+    <span id="modal_validate_lots_form_err_message" style="color: red;"></span>
+    <form id="modal_validate_lots_form" method="POST" data-url="{% url 'producers-api-validate-lots' %}">
+      {% csrf_token %}
+      <p>Êtes vous sûr de vouloir valider ce(s) lot(s) ?</p>
+      <div class="form__group button__group">
+        <a class="button secondary" id="btn_close_modal_validate_lots">Annuler</a>
+        <button type="submit" class="button">Valider</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 {% endblock %}
 
 
 {% block extra_js %}
 <script type="text/javascript">
-var table_columns = [
-{title:'Producteur', can_hide: true, can_duplicate: true, data:'producer'}, 
-{title:'Site de<br />Production', can_hide: true, can_duplicate: true, data:'production_site'}, 
+  var table_columns = [
+  {title:'Producteur', can_hide: true, can_duplicate: true, data:'producer'}, 
+  {title:'Site de<br />Production', can_hide: true, can_duplicate: true, data:'production_site'}, 
 
-{title: 'Volume<br /> à 20°C<br />en Litres', can_hide: true, can_duplicate: true, data: 'volume'}, 
-{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, data: 'biocarburant'}, 
-{title:'Matière<br /> Première', can_hide: true, can_duplicate: true, can_filter: true, data: 'matiere_premiere'}, 
-{title:`Pays<br /> d'origine`, can_hide: true, can_duplicate: true, can_filter: true, data: 'pays_origine'}, 
+  {title: 'Volume<br /> à 20°C<br />en Litres', can_hide: true, can_duplicate: true, data: 'volume'}, 
+  {title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, data: 'biocarburant'}, 
+  {title:'Matière<br /> Première', can_hide: true, can_duplicate: true, can_filter: true, data: 'matiere_premiere'}, 
+  {title:`Pays<br /> d'origine`, can_hide: true, can_duplicate: true, can_filter: true, data: 'pays_origine'}, 
 
-{title:'EEC', can_hide: true, can_duplicate: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'}, 
-{title:'EL', can_hide: true, can_duplicate: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'}, 
-{title:'EP', can_hide: true, can_duplicate: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'}, 
-{title:'ETD', can_hide: true, can_duplicate: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'}, 
-{title:'EU', can_hide: true, can_duplicate: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'}, 
-{title:'ESCA', can_hide: true, can_duplicate: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'}, 
-{title:'ECCS', can_hide: true, can_duplicate: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'}, 
-{title:'ECCR', can_hide: true, can_duplicate: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'}, 
-{title:'EEE', can_hide: true, can_duplicate: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'}, 
-{title:'E', can_hide: true, can_duplicate: true, is_read_only: true, data: 'e', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'}, 
-{title:'Émissions de référence', can_hide: true, can_duplicate: true, is_read_only: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'}, 
-{title:'% de réduction', can_hide: true, can_duplicate: true, is_read_only: true, data: 'ghg_reduction'}, 
+  {title:'EEC', can_hide: true, can_duplicate: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'}, 
+  {title:'EL', can_hide: true, can_duplicate: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'}, 
+  {title:'EP', can_hide: true, can_duplicate: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'}, 
+  {title:'ETD', can_hide: true, can_duplicate: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'}, 
+  {title:'EU', can_hide: true, can_duplicate: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'}, 
+  {title:'ESCA', can_hide: true, can_duplicate: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'}, 
+  {title:'ECCS', can_hide: true, can_duplicate: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'}, 
+  {title:'ECCR', can_hide: true, can_duplicate: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'}, 
+  {title:'EEE', can_hide: true, can_duplicate: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'}, 
+  {title:'E', can_hide: true, can_duplicate: true, is_read_only: true, data: 'e', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'}, 
+  {title:'Émissions de référence', can_hide: true, can_duplicate: true, is_read_only: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'}, 
+  {title:'% de réduction', can_hide: true, can_duplicate: true, is_read_only: true, data: 'ghg_reduction'}, 
 
-{title:'N°DAE', can_hide: true, can_duplicate: false, data:'dae'}, 
-{title:'Référence', can_hide: true, can_duplicate: true, data:'client_id', tooltip: 'Champ libre - Référence client'}, 
-{title:'Date d\'entrée<br />en EA', can_hide: true, can_duplicate: true, data:'ea_delivery_date'}, 
-{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, data: 'ea'}, 
-{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, data: 'ea_delivery_site'}, 
-{title:'Statut', can_hide: true, can_duplicate: true, read_only: true, can_filter: true, data: 'status'}, 
-{title:`<input type="checkbox" id="checkbox_header"/>`, can_hide: false, can_duplicate: false, read_only: true, data:'checkbox'},
-]
+  {title:'N°DAE', can_hide: true, can_duplicate: false, data:'dae'}, 
+  {title:'Référence', can_hide: true, can_duplicate: true, data:'client_id', tooltip: 'Champ libre - Référence client'}, 
+  {title:'Date d\'entrée<br />en EA', can_hide: true, can_duplicate: true, data:'ea_delivery_date'}, 
+  {title:'Client', can_hide: true, can_duplicate: true, can_filter: true, data: 'ea'}, 
+  {title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, data: 'ea_delivery_site'}, 
+  {title:'Statut', can_hide: true, can_duplicate: true, read_only: true, can_filter: true, data: 'status'}, 
+  {title:`<input type="checkbox" id="checkbox_header"/>`, can_hide: false, can_duplicate: false, read_only: true, data:'checkbox'},
+  ]
 
-var selected_rows = {}
+  var selected_rows = {}
 
-function duplicate_lot(lot_id) {
+  function duplicate_lot(lot_id) {
   // unselect
   for (const key in selected_rows) {
     delete selected_rows[key]
@@ -120,9 +148,8 @@ function duplicate_lot(lot_id) {
     type        : 'POST',
     success     : function(data, textStatus, jqXHR){
       // Callback code
-      console.log('lot duplicated, should appear in table now')
       window.table.ajax.reload()
-      show_hide_action_buttons()      
+      manage_actions()      
     },
     error       : function(e) {
       if (e.status === 400) {
@@ -136,7 +163,76 @@ function duplicate_lot(lot_id) {
   })
 }
 
-function show_hide_action_buttons() {
+function manage_affiliate_button(draft_present) {
+  let keys = Object.keys(selected_rows)
+  var btn_affiliate = document.getElementById("btn_affiliate")
+  var select_affiliate = document.getElementById("select_affiliate")
+  if (keys.length > 0 && draft_present === false) {
+    // at least one row selected, all valid: set affiliate button to active
+    $("#btn_affiliate").addClass('primary')
+    $("#btn_affiliate").removeClass('secondary')
+    $("#select_affiliate").prop("disabled", false)
+  } else {
+    $("#btn_affiliate").addClass('secondary')
+    $("#btn_affiliate").removeClass('primary')
+    $("#select_affiliate").prop("disabled", "disabled")
+  }  
+}
+
+function manage_validate_button(draft_present) {
+ if (draft_present === true) {
+    $("#btn_open_modal_validate_lots").addClass('primary')
+    $("#btn_open_modal_validate_lots").removeClass('secondary')
+    // add drafts to validate modal
+  
+  } else {
+    $("#btn_open_modal_validate_lots").addClass('secondary')
+    $("#btn_open_modal_validate_lots").removeClass('primary')   
+    // cleanup validate modal
+  }  
+}
+
+function manage_delete_button(only_drafts_present) {
+  let keys = Object.keys(selected_rows)
+  if (keys.length > 0 && only_drafts_present === true) {
+    $("#btn_open_modal_delete_lots").addClass('primary')
+    $("#btn_open_modal_delete_lots").removeClass('secondary')
+    $("#modal_delete_lots_list").empty() 
+    let to_delete = []       
+    let keys = Object.keys(selected_rows)
+    for (let i = 0, len = keys.length; i < len; i++) {
+      let key = keys[i]
+      let rowdata = selected_rows[key]
+      let statut = rowdata['status']
+      if (statut.toLowerCase() === "draft") {
+        $("#modal_delete_lots_list").append(`<li>${rowdata['production_site']} - ${rowdata['volume']} - ${rowdata['biocarburant']} - ${rowdata['matiere_premiere']}</li>`)
+        to_delete.push(selected_rows[key]['id'])
+      }
+      console.log(`lots to delete: ${to_delete} ${to_delete.join(',')}`)
+      $("#modal_delete_lots_lots").val(to_delete.join(","))
+    }  
+  } else {
+    $("#btn_open_modal_delete_lots").addClass('secondary')
+    $("#btn_open_modal_delete_lots").removeClass('primary')
+    $("#modal_delete_lots_list").empty()
+  }
+}
+
+function manage_add_button() {
+  let keys = Object.keys(selected_rows)
+  if (keys.length === 1) {
+    $("#add_lot").text("Dupliquer Lot")
+    $("#add_lot").removeAttr("href")
+    let lot_id = selected_rows[keys[0]]['id']
+    $("#add_lot").attr("onclick", `duplicate_lot(${lot_id})`)
+  } else {
+    $("#add_lot").text("Ajouter Lot")
+    $("#add_lot").removeAttr("onclick")
+    $("#add_lot").attr("href", "{% url 'producers-attestation-new-lot' attestation_id=current_attestation.id %}")
+  }  
+}
+
+function manage_actions() {
   // buttons Valider & Affilier
   // pseudo code: if all rows are valid, button Affilier is active
   // if one of the rows is a draft, button Valider is active
@@ -153,47 +249,10 @@ function show_hide_action_buttons() {
       only_drafts_present = false
     }
   }
-  var btn_affiliate = document.getElementById("btn_affiliate")
-  var select_affiliate = document.getElementById("select_affiliate")
-  var btn_validate = document.getElementById("btn_validate")
-  var btn_delete = document.getElementById("btn_delete")
-  if (keys.length > 0 && draft_present === false) {
-    // at least one row selected, all valid: set affiliate button to active
-    $("#btn_affiliate").addClass('primary')
-    $("#btn_affiliate").removeClass('secondary')
-    $("#select_affiliate").prop("disabled", false)
-  } else {
-    $("#btn_affiliate").addClass('secondary')
-    $("#btn_affiliate").removeClass('primary')
-    $("#select_affiliate").prop("disabled", "disabled")
-  }
-
-  if (draft_present === true) {
-    $("#btn_validate").addClass('primary')
-    $("#btn_validate").removeClass('secondary')   
-  } else {
-    $("#btn_validate").addClass('secondary')
-    $("#btn_validate").removeClass('primary')   
-  }
-
-  if (keys.length > 0 && only_drafts_present === true) {
-    $("#btn_delete").addClass('primary')
-    $("#btn_delete").removeClass('secondary')         
-  } else {
-    $("#btn_delete").addClass('secondary')
-    $("#btn_delete").removeClass('primary')         
-  }
-
-  if (keys.length === 1) {
-    $("#add_lot").text("Dupliquer Lot")
-    $("#add_lot").removeAttr("href")
-    let lot_id = selected_rows[keys[0]]['id']
-    $("#add_lot").attr("onclick", `duplicate_lot(${lot_id})`)
-  } else {
-    $("#add_lot").text("Ajouter Lot")
-    $("#add_lot").removeAttr("onclick")
-    $("#add_lot").attr("href", "{% url 'producers-attestation-new-lot' attestation_id=current_attestation.id %}")
-  }
+  manage_affiliate_button(draft_present)
+  manage_validate_button(draft_present)
+  manage_delete_button(only_drafts_present)
+  manage_add_button()
 }
 
 $(document).ready(function() {
@@ -224,47 +283,47 @@ $(document).ready(function() {
     paging: false,
     info: false,
     scrollX: true,
-        fixedColumns: {
-          rightColumns: 2,
-        },
+    fixedColumns: {
+      rightColumns: 2,
+    },
     dom: "lrtip",
     columnDefs: [
-          {"className": "dt-center", "targets": "_all"}
-      ],
-      columns: table_columns,
-      ajax: {
-        url: `{% url 'api-producers-sample-lots' %}`,
-        dataSrc: function(json) {
-            for (let i = 0, len = json.length; i < len; i++) {
-              let lot_id = json[i]['pk']
-              json[i] = json[i]["fields"]
-              json[i]['id'] = lot_id
+    {"className": "dt-center", "targets": "_all"}
+    ],
+    columns: table_columns,
+    ajax: {
+      url: `{% url 'api-producers-sample-lots' %}`,
+      dataSrc: function(json) {
+        for (let i = 0, len = json.length; i < len; i++) {
+          let lot_id = json[i]['pk']
+          json[i] = json[i]["fields"]
+          json[i]['id'] = lot_id
               // add checkbox on the fly
               json[i]["checkbox"] = `<input type="checkbox" />`
             }
             return json
-        }
-      },
-      initComplete: function() {
+          }
+        },
+        initComplete: function() {
       // create filter
-            this.api().columns().every(function () {
-                var column = this;
-                let table_column = table_columns[column.index()]
-                if (table_column.can_filter === true) {
-                  var select = $('<select><option value=""></option></select>')
-                      .appendTo($(column.footer()).empty())
-                      .on('change', function() {
-                          var val = $.fn.dataTable.util.escapeRegex($(this).val());
-                          column.search(val ? '^'+val+'$' : '', true, false).draw();
-                      });
-                  column.data().unique().sort().each(function (d, j) {
-                      select.append('<option value="'+d+'">'+d+'</option>')
-                  });
-              } else {
-                $(column.footer()).append(table_column.title)
-              }
-            }).draw()
-         }
+      this.api().columns().every(function () {
+        var column = this;
+        let table_column = table_columns[column.index()]
+        if (table_column.can_filter === true) {
+          var select = $('<select><option value=""></option></select>')
+          .appendTo($(column.footer()).empty())
+          .on('change', function() {
+            var val = $.fn.dataTable.util.escapeRegex($(this).val());
+            column.search(val ? '^'+val+'$' : '', true, false).draw();
+          });
+          column.data().unique().sort().each(function (d, j) {
+            select.append('<option value="'+d+'">'+d+'</option>')
+          });
+        } else {
+          $(column.footer()).append(table_column.title)
+        }
+      }).draw()
+    }
   })
   window.table = table
 
@@ -359,42 +418,42 @@ $(document).ready(function() {
         column.visible(!column.visible());
         columnsSettings[colid] = columnsSettings[colid] == 1 ? 0 : 1
         saveTableSettings(columnsSettings)
-  });
+      });
 
   /* add lot settings */
   $('.toggle-lot-param').on('click', function(e) {
-        let colid = $(this).attr('data-column')
-        let column = table.column(colid);   
-        addLotSettings[colid] = addLotSettings[colid] == 1 ? 0 : 1
-        saveAddLotSettings(addLotSettings)
+    let colid = $(this).attr('data-column')
+    let column = table.column(colid);   
+    addLotSettings[colid] = addLotSettings[colid] == 1 ? 0 : 1
+    saveAddLotSettings(addLotSettings)
   }); 
 
   /* import file */
   $("#file_to_upload").on('change', function(e) {
     let reader = new FileReader();
     reader.onload = function(e) {
-        var data = reader.result;
-        var lines = data.split("\n")
-        var line_end = `;Brouillon;--;<input type="checkbox" />`
-        for (let i = 0, len = lines.length; i < len; i++) {
-          if (i === 0) {
-            continue
-          }
-          if (lines[i].length < 19) {
-            continue
-          }
-          let full_line = lines[i].concat(line_end)
-            table.row.add(full_line.split(";")).draw()
+      var data = reader.result;
+      var lines = data.split("\n")
+      var line_end = `;Brouillon;--;<input type="checkbox" />`
+      for (let i = 0, len = lines.length; i < len; i++) {
+        if (i === 0) {
+          continue
         }
-        modal_import.style.display = "none"
+        if (lines[i].length < 19) {
+          continue
+        }
+        let full_line = lines[i].concat(line_end)
+        table.row.add(full_line.split(";")).draw()
+      }
+      modal_import.style.display = "none"
     };
     reader.onerror = function(event) {
-        console.error("File could not be read! Code " + event.target.error.code);
+      console.error("File could not be read! Code " + event.target.error.code);
     };
     reader.readAsText(e.target.files[0]);
   })
 
-  show_hide_action_buttons()
+  manage_actions()
   /* click on datatable row */
   $('#datatable_wrapper tbody').on('click', 'input', function() {
     let hrow = $(this).closest("tr")
@@ -407,7 +466,7 @@ $(document).ready(function() {
     } else {
       selected_rows[rowid] = data
     }
-    show_hide_action_buttons()
+    manage_actions()
   })
 
   $('#datatable_wrapper tbody').on('click', 'td', function() {
@@ -419,7 +478,7 @@ $(document).ready(function() {
     let table_column = table_columns[colid] 
     let attestation_id = "{{attestation_id}}"
     let lot_id = data['id']
-      if (table_column['data'] === 'checkbox') {
+    if (table_column['data'] === 'checkbox') {
       // ignore clicks on checkbox column
       return
     } else {  
@@ -428,7 +487,7 @@ $(document).ready(function() {
   });
 
   $("#add_lot_params").on('click', function() {
-      $("#add_lot_params_toggle").toggle();
+    $("#add_lot_params_toggle").toggle();
   });
 
   $(document).on('change', '#checkbox_header', function() {
@@ -440,59 +499,18 @@ $(document).ready(function() {
         let rowid = table.row(i).index();
         let rowdata = table.row(i).data()
         selected_rows[rowid] = rowdata
-        }
+      }
     } else {
         // unselect everything
-      $("#datatable_wrapper").find('input').prop('checked', false)
-      for (const key in selected_rows) {
-        delete selected_rows[key]
-      }         
-    }
-    console.log(`${Object.keys(selected_rows).length} rows selected`)
-    show_hide_action_buttons()
-  })
+        $("#datatable_wrapper").find('input').prop('checked', false)
+        for (const key in selected_rows) {
+          delete selected_rows[key]
+        }         
+      }
+      console.log(`${Object.keys(selected_rows).length} rows selected`)
+      manage_actions()
+    })
 
-  /* modals */
-  // modal for column filters
-  var modal_columns = document.getElementById("modal_columns")
-  var btn_open = document.getElementById("btn_modal_columns")
-  btn_open.onclick = function() {
-    modal_columns.style.display = "flex"
-  }
-
-  // modal import
-  var modal_import = document.getElementById("modal_import")
-  var btn_import_open = document.getElementById("btn_modal_import")
-  btn_import_open.onclick = function() {
-    modal_import.style.display = "flex";
-  }
-
-  /* modal close events */
-  // button
-  var btns_close = document.getElementsByClassName("close")
-  for (let i = 0, len = btns_close.length; i < len; i++) {
-    let btn_close = btns_close[i]
-    btn_close.onclick = function() {
-      modal_columns.style.display = "none"
-      modal_import.style.display = "none"
-    }
-  }
-  // clicking outside of the modal window will close it
-  window.onclick = function(event) {
-    if (event.target == modal_columns) {
-      modal_columns.style.display = "none"
-    }
-    if (event.target == modal_import) {
-      modal_import.style.display = "none"
-    }
-  }
-  // escape key
-  $(document).keydown(function(event) {
-    if (event.keyCode == 27) {
-      modal_columns.style.display = "none"
-      modal_import.style.display = "none"
-    }
-  });
 });
 
 // fixed column styling on row hover
