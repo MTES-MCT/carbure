@@ -52,6 +52,20 @@ for (let i = 0, len = btns_edit_site.length; i < len; i++) {
   }
 }
 
+var btns_delete_certif = document.getElementsByClassName("btn_open_modal_delete_certif")
+for (let i = 0, len = btns_delete_certif.length; i < len; i++) {
+  let btn = btns_delete_certif[i]
+  let crtid = btn.dataset.crtid
+  btn.onclick = function() {
+    let modal = document.getElementById("modal_certif_delete")
+    modal.style.display = "flex"    
+    $("#modal_certif_crtid").val(crtid)
+    $("#modal_certif_delete_site").text(btn.dataset.site)
+    $("#modal_certif_delete_num").text(btn.dataset.num)
+    $("#modal_certif_delete_expi").text(btn.dataset.expi)
+  }
+}
+
 $(document).ready(function() {
   $("form").submit(function(event) {
     let form = $(this);

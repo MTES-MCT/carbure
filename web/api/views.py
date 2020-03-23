@@ -148,6 +148,23 @@ def producers_settings_add_certif(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
+def producers_settings_delete_certif(request, *args, **kwargs):
+  context = kwargs['context']
+  
+  certif_id = request.POST.get('certif_id')
+  if certif_id == None:
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ Identifiant"}, status=400)
+
+  try:
+    crt = ProducerCertificate.objects.get(id=certif_id, producer=context['user_entity'])
+    crt.delete()    
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'Certificate deleted'})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
 def producers_settings_add_site(request, *args, **kwargs):
   context = kwargs['context']
   

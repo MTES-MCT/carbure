@@ -30,7 +30,10 @@
               <dt>Numéro de Certificat</dt>
               <dd>{{site.certificate.certificate_id}}</dd>
               <dt>Certificat PDF</dt>
-              <dd><a href="{{ site.certificate.certificate.url }}" target="_blank">{{ site.certificate.certificate.name }}</a></dd>
+              <dd>
+                <a href="{{ site.certificate.certificate.url }}" target="_blank">{{ site.certificate.certificate.name }}</a>
+                <li class="label" style="background: var(--light-blue); padding: 2px;" title="Supprimer"><a class="btn_open_modal_delete_certif" data-crtid="{{site.certificate.id}}" data-site="{{site.name}}" data-num="{{site.certificate.certificate.name}}" data-expi="{{site.certificate.expiration}}">x</a>
+              </dd>
               <dt>Expiration</dt>
               <dd>{{site.certificate.expiration}}</dd>
               <dt>Statut</dt>
@@ -146,12 +149,33 @@
   </div>
 </div>
 
+<div class="modal__backdrop" id="modal_certif_delete">
+  <div class="modal">
+    <span id="modal_certif_delete_form_err_message" style="color: red;"></span>
+    <form id="modal_certif_delete_form" method="POST" data-url="{% url 'producers-api-settings-delete-certif' %}">
+      {% csrf_token %}
+      <p>Êtes vous sûr de vouloir supprimer ce certificat ?</p>
+      <dl>
+        <dt>Site de Production</dt>
+        <dd id="modal_certif_delete_site"></dd>      
+        <dt>Numéro</dt>
+        <dd id="modal_certif_delete_num"></dd>                
+        <dt>Date d'expiration</dt>
+        <dd id="modal_certif_delete_expi"></dd>
+      </dl>      
+      <input type="hidden" id="modal_certif_crtid" name="certif_id">
+      <div class="form__group button__group">
+        <a class="button secondary close" id="btn_close_modal_certif_delete">Annuler</a>
+        <button type="submit" class="button">Valider</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script type="text/javascript">
-
-
 $("#modal_site_country").autocomplete({
   serviceUrl: "{% url 'api-country-autocomplete' %}",
   dataType: 'json',
