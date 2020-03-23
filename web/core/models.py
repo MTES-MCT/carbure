@@ -105,6 +105,7 @@ from producers.models import ProductionSite
 class Lot(models.Model):
     LOT_STATUS = (('Draft', 'Brouillon'), ('Validated', 'Validé'))
 
+    carbure_id = models.CharField(max_length=64, blank=True, default='')
     # producer
     attestation = models.ForeignKey(AttestationProducer, null=True, blank=True, on_delete=models.SET_NULL)
     producer = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='producer')

@@ -91,6 +91,8 @@
     <form id="modal_validate_lots_form" method="POST" data-url="{% url 'producers-api-validate-lots' %}">
       {% csrf_token %}
       <p>Êtes vous sûr de vouloir valider ce(s) lot(s) ?</p>
+      <ul id="modal_validate_lots_list">
+      </ul>
       <div class="form__group button__group">
         <a class="button secondary" id="btn_close_modal_validate_lots">Annuler</a>
         <button type="submit" class="button">Valider</button>
@@ -98,13 +100,13 @@
     </form>
   </div>
 </div>
-
 {% endblock %}
 
 
 {% block extra_js %}
 <script type="text/javascript">
   var table_columns = [
+  {title:'Numéro de lot', can_hide: true, can_duplicate: false, data:'carbure_id'}, 
   {title:'Producteur', can_hide: true, can_duplicate: true, data:'producer'}, 
   {title:'Site de<br />Production', can_hide: true, can_duplicate: true, data:'production_site'}, 
 
