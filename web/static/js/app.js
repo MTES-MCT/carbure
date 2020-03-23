@@ -4,13 +4,17 @@ var modals = document.getElementsByClassName("modal__backdrop");
 for (let i = 0, len = modals.length; i < len; i++) {
   let modalid = modals[i].id
   let modal = document.getElementById(modalid)
-  let btn_open_modal = document.getElementById("btn_open_" + modalid)
-  let btn_close_modal = document.getElementById("btn_close_" + modalid)
+  let btn_open_id = "btn_open_" + modalid
+  let btn_close_id = "btn_close_" + modalid
+  var btn_open_modal = document.getElementById(btn_open_id)
+  var btn_close_modal = document.getElementById(btn_close_id)
+
   if (btn_open_modal !== null) {
     btn_open_modal.onclick = function() {
-      modal.style.display = "flex";
+      modal.style.display = "flex"
     }
   }
+
   if (btn_close_modal !== null) {
     btn_close_modal.onclick = function() {
       modal.style.display = "none"
@@ -30,13 +34,13 @@ window.onclick = function(event) {
 
 // escape key
 document.addEventListener('keydown', function(event) {
-    if (event.keyCode === 27) {
-      for (let i = 0, len = modals.length; i < len; i++) {
-        let modalid = modals[i].id
-        let modal = document.getElementById(modalid)
-        modal.style.display = "none"
-      }
+  if (event.keyCode === 27) {
+    for (let i = 0, len = modals.length; i < len; i++) {
+      let modalid = modals[i].id
+      let modal = document.getElementById(modalid)
+      modal.style.display = "none"
     }
+  }
 })
 
 /* Producers */
