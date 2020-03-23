@@ -93,6 +93,7 @@
       <p>Êtes vous sûr de vouloir valider ce(s) lot(s) ?</p>
       <ul id="modal_validate_lots_list">
       </ul>
+      <input type="hidden" id="modal_validate_lots_lots" name="lots">
       <div class="form__group button__group">
         <a class="button secondary" id="btn_close_modal_validate_lots">Annuler</a>
         <button type="submit" class="button">Valider</button>
@@ -186,11 +187,25 @@ function manage_validate_button(draft_present) {
     $("#btn_open_modal_validate_lots").addClass('primary')
     $("#btn_open_modal_validate_lots").removeClass('secondary')
     // add drafts to validate modal
+    $("#modal_validate_lots_list").empty() 
+    let to_validate = []       
+    let keys = Object.keys(selected_rows)
+    for (let i = 0, len = keys.length; i < len; i++) {
+      let key = keys[i]
+      let rowdata = selected_rows[key]
+      let statut = rowdata['status']
+      if (statut.toLowerCase() === "draft") {
+        $("#modal_validate_lots_list").append(`<li>${rowdata['production_site']} - ${rowdata['volume']} - ${rowdata['biocarburant']} - ${rowdata['matiere_premiere']}</li>`)
+        to_validate.push(selected_rows[key]['id'])
+      }
+      $("#modal_validate_lots_lots").val(to_validate.join(","))
+    }      
   
   } else {
     $("#btn_open_modal_validate_lots").addClass('secondary')
     $("#btn_open_modal_validate_lots").removeClass('primary')   
     // cleanup validate modal
+    $("#modal_validate_lots_list").empty()
   }  
 }
 
@@ -210,7 +225,6 @@ function manage_delete_button(only_drafts_present) {
         $("#modal_delete_lots_list").append(`<li>${rowdata['production_site']} - ${rowdata['volume']} - ${rowdata['biocarburant']} - ${rowdata['matiere_premiere']}</li>`)
         to_delete.push(selected_rows[key]['id'])
       }
-      console.log(`lots to delete: ${to_delete} ${to_delete.join(',')}`)
       $("#modal_delete_lots_lots").val(to_delete.join(","))
     }  
   } else {
