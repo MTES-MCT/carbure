@@ -22,6 +22,7 @@ urlpatterns = [
     path('users/add-entity', views.administrators_add_entity, name='administrators-add-entity'),
     path('users/add-user', views.administrators_add_user, name='administrators-add-user'),
     path('users/add-right', views.administrators_add_right, name='administrators-add-right'),
+    path('users/delete-right', views.administrators_delete_right, name='administrators-delete-right'),
     path('users/reset-password/<int:uid>', views.administrators_reset_user_password, name='administrators-reset-user-password'),  
 ]
 
