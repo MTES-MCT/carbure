@@ -214,20 +214,27 @@ def administrators_reset_user_password(request, *args, **kwargs):
 @restrict_to_administrators
 def administrators_add_right(request, *args, **kwargs):
   context = kwargs['context']
-  name = request.POST.get('name')
-  entity = request.POST.get('entity')
+  user_id = request.POST.get('user')
+  entity_id = request.POST.get('entity')
 
-  if name == None:
-    return JsonResponse({'status':'error', 'message':"Please provide a value in field name"}, status=400)
-  if entity == None:
+  if user_id == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field user"}, status=400)
+  if entity_id == None:
     return JsonResponse({'status':'error', 'message':"Please provide a value in field entity"}, status=400)
+
+  user_model = get_user_model()
   try:
-    entity = Entity.objects.get(name=entity)
+    user = user_model.objects.get(id=user_id)    
   except:
     return JsonResponse({'status':'error', 'message':"Could not find entity"}, status=400)
 
   try:
-    obj, created = UserRights.objects.update_or_create(name=name, entity=entity)
+    entity = Entity.objects.get(id=entity_id)
+  except:
+    return JsonResponse({'status':'error', 'message':"Could not find entity"}, status=400)
+
+  try:
+    obj, created = UserRights.objects.update_or_create(user=user, entity=entity)
   except Exception as e:
     return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
   return JsonResponse({'status':'success', 'message':'User Right created'})

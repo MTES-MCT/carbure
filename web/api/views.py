@@ -372,7 +372,7 @@ def admin_users_autocomplete(request, *args, **kwargs):
   q = request.GET.get('q', '')
   user_model = get_user_model()
   matches = user_model.objects.filter(Q(name__icontains=q) | Q(email__icontains=q))
-  return JsonResponse({'suggestions': ['%s - %s' % (u.name, u.email) for u in matches]})
+  return JsonResponse({'suggestions': [{'value':'%s - %s' % (m.name, m.email), 'data':m.id} for m in matches]})
 
 @login_required
 @enrich_with_user_details
@@ -381,6 +381,4 @@ def admin_entities_autocomplete(request, *args, **kwargs):
   context = kwargs['context']
   q = request.GET.get('q', '')
   matches = Entity.objects.filter(name__icontains=q)
-  data = json.dumps({'suggestions': [m.name for m in matches]})
-  mimetype = 'application/json'
-  return HttpResponse(data, mimetype)
+  return JsonResponse({'suggestions': [{'value':m.name, 'data':m.id} for m in matches]})

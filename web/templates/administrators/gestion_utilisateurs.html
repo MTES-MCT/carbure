@@ -5,7 +5,6 @@
 		<div class="panel">
 			<div class="panel__header">
             <h3>Settings</h3>
-            <small class="panel__header-extra">Créé le 31 février</small>
           </div>
     <section class="form__group"> 
       <h3>Sociétés</h3>
@@ -139,15 +138,17 @@
 <div class="modal__backdrop" id="modal_right">
   <div class="modal">
     <span id="modal_right_err_message" style="color: red;"></span>
-    <form id="modal_right_form" method="POST">
+    <form id="modal_right_form" method="POST" data-url="{% url 'administrators-add-right' %}">
       {% csrf_token %}
       <label for="modal_right_user">Utilisateur</label>
       <div class="input__group">
-        <input type="text" id="modal_right_user" class="autocomplete_users" name="user">
+        <input type="text" id="modal_right_user" class="autocomplete_users">
+        <input type="hidden" id="modal_right_user_id" name="user">
       </div>       
       <label for="modal_right_entity">Société</label>
       <div class="input__group">
-        <input type="text" id="modal_right_entity" class="autocomplete_entities" name="entity">
+        <input type="text" id="modal_right_entity" class="autocomplete_entities">
+        <input type="hidden" id="modal_right_entity_id" name="entity">
       </div>      
       <div class="form__group button__group">
         <a class="button secondary close" id="btn_close_modal_right">Annuler</a>
@@ -162,52 +163,23 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-var modals = ["modal_entity", "modal_user", "modal_right"]
-
-for (let i = 0, len = modals.length; i < len; i++) {
-  let modalid = modals[i]
-  let modal = document.getElementById(modalid)
-  let btn_open_modal = document.getElementById("btn_open_" + modalid)
-  let btn_close_modal = document.getElementById("btn_close_" + modalid)
-  btn_open_modal.onclick = function() {
-    modal.style.display = "flex";
-  }
-  btn_close_modal.onclick = function() {
-    modal.style.display = "none"
-  }
-}
-
-// clicking outside of the modal window will close it
-window.onclick = function(event) {
-  for (let i = 0, len = modals.length; i < len; i++) {
-    let modalid = modals[i]
-    let modal = document.getElementById(modalid)
-    if (event.target == modal) {
-      modal.style.display = "none"
-    }
-  }
-}
-
-// escape key
-document.addEventListener('keydown', function(event) {
-    if (event.keyCode === 27) {
-      for (let i = 0, len = modals.length; i < len; i++) {
-        let modalid = modals[i]
-        let modal = document.getElementById(modalid)
-        modal.style.display = "none"
-      }
-    }
-});
 
 $(".autocomplete_entities").autocomplete({
   serviceUrl: "{% url 'admin-api-entities-autocomplete' %}",
-  dataType: 'json'
+  dataType: 'json',
+  onSelect: function(suggestion) {
+    $("#modal_right_entity_id").val(suggestion.data)
+  }   
 })
 
 $(".autocomplete_users").autocomplete({
   serviceUrl: "{% url 'admin-api-users-autocomplete' %}",
-  dataType: 'json'
+  dataType: 'json',
+  onSelect: function(suggestion) {
+    $("#modal_right_user_id").val(suggestion.data)
+  } 
 })
+
 
 
 </script>
