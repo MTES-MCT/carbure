@@ -41,7 +41,7 @@ def operators_autocomplete(request):
 @restrict_to_producers
 def producers_sample_lots(request, *args, **kwargs):
   context = kwargs['context']
-  data = serializers.serialize('json', Lot.objects.all(), fields=('producer', 'production_site', 'dae', 'ea_delivery_date', 'ea_delivery_site', 'ea', 'volume',
+  data = serializers.serialize('json', Lot.objects.all(), fields=('carbure_id', 'producer', 'production_site', 'dae', 'ea_delivery_date', 'ea_delivery_site', 'ea', 'volume',
     'matiere_premiere', 'biocarburant', 'pays_origine', 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'e', 'ghg_reference', 'ghg_reduction',
     'client_id', 'status'), use_natural_foreign_keys=True)
   return HttpResponse(data, content_type='application/json')
