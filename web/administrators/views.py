@@ -238,3 +238,19 @@ def administrators_add_right(request, *args, **kwargs):
   except Exception as e:
     return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
   return JsonResponse({'status':'success', 'message':'User Right created'})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_administrators
+def administrators_delete_right(request, *args, **kwargs):
+  context = kwargs['context']
+  right_id = request.POST.get('right_id')
+
+  if right_id == None:
+    return JsonResponse({'status':'error', 'message':"Please provide a value in field UserRight"}, status=400)
+  try:
+    obj = UserRights.objects.get(id=right_id)
+    obj.delete()
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'User Right deleted'})

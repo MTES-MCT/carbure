@@ -70,6 +70,18 @@ for (let i = 0, len = btns_delete_certif.length; i < len; i++) {
   }
 }
 
+var btns_delete_right = document.getElementsByClassName("btn_open_modal_right_delete")
+for (let i = 0, len = btns_delete_right.length; i < len; i++) {
+  let btn = btns_delete_right[i]
+  btn.onclick = function() {
+    let modal = document.getElementById("modal_right_delete")
+    modal.style.display = "flex"    
+    $("#modal_right_delete_id").val(btn.dataset.rightid)
+    $("#modal_right_delete_user").text(btn.dataset.user)
+    $("#modal_right_delete_entity").text(btn.dataset.entity)
+  }
+}
+
 $(document).ready(function() {
   $("form").submit(function(event) {
     let form = $(this);

@@ -79,7 +79,7 @@
               <tr>
                 <td>{{right.user.name}} - {{right.user.email}}</td>
                 <td>{{right.entity.name}}</td>
-                <td><a class="button primary">Supprimer</a></td>
+                <td><a class="button primary btn_open_modal_right_delete" data-rightid="{{right.id}}" data-user="{{right.user.name}}" data-entity="{{right.entity.name}}">Supprimer</a></td>
               </tr>          
               {% empty %}
               <tr>
@@ -158,7 +158,26 @@
   </div>
 </div>
 
-
+<div class="modal__backdrop" id="modal_right_delete">
+  <div class="modal">
+    <span id="modal_right_delete_form_err_message" style="color: red;"></span>
+    <form id="modal_right_delete_form" method="POST" data-url="{% url 'administrators-delete-right' %}">
+      {% csrf_token %}
+      <p>Êtes vous sûr de vouloir supprimer ce droit ?</p>
+      <dl>
+        <dt>Utilisateur</dt>
+        <dd id="modal_right_delete_user"></dd>      
+        <dt>Société</dt>
+        <dd id="modal_right_delete_entity"></dd>   
+      </dl>      
+      <input type="hidden" id="modal_right_delete_id" name="right_id">
+      <div class="form__group button__group">
+        <a class="button secondary close" id="btn_close_modal_right_delete">Annuler</a>
+        <button type="submit" class="button">Valider</button>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
