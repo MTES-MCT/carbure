@@ -18,69 +18,69 @@
         <h3>Informations</h3>
         <dl>
           <dt>Site de Production</dt>
-          <dd><input type="text" id="production_site_display" class="autocomplete_production_sites" value="{{lot.production_site.name}}"/><input type="hidden" id="production_site" value="{{lot.production_site.id}}" /></dd>
+          <dd><input type="text" id="production_site_display" class="autocomplete_production_sites" value="{{lot.production_site.name}}" style="width: 200px" /><input type="hidden" id="production_site" value="{{lot.production_site.id}}" /></dd>
           <dt>Volume à 20°C en Litres</dt>
-          <dd><input type="text" id="volume" value="{{lot.volume}}" /></dd>
+          <dd><input type="text" id="volume" value="{{lot.volume}}" style="width: 200px" /></dd>
           <dt>Biocarburant</dt>
-          <dd><input type="text" id="biocarburant_display" class="autocomplete_biocarburants" value="{{lot.biocarburant.name}}" /><input type="hidden" id="biocarburant" value="{{lot.biocarburant.code}}" /></dd>
+          <dd><input type="text" id="biocarburant_display" class="autocomplete_biocarburants" value="{{lot.biocarburant.name}}" style="width: 200px" /><input type="hidden" id="biocarburant" value="{{lot.biocarburant.code}}" /></dd>
           <dt>Matiere Premiere</dt>
-          <dd><input type="text" id="matiere_premiere_display" class="autocomplete_mps" value="{{lot.matiere_premiere.name}}" /><input type="hidden" id="matiere_premiere" value="{{lot.matiere_premiere.code}}" /></dd>
+          <dd><input type="text" id="matiere_premiere_display" class="autocomplete_mps" value="{{lot.matiere_premiere.name}}" style="width: 200px" /><input type="hidden" id="matiere_premiere" value="{{lot.matiere_premiere.code}}" /></dd>
           <dt>Pays d'origine</dt>
-          <dd><input type="text" id="pays_origine_display" class="autocomplete_countries" value="{{lot.pays_origine.name}}" /><input type="hidden" id="pays_origine" value="{{lot.pays_origine.code_pays}}" /></dd>
+          <dd><input type="text" id="pays_origine_display" class="autocomplete_countries" value="{{lot.pays_origine.name}}" style="width: 200px" /><input type="hidden" id="pays_origine" value="{{lot.pays_origine.code_pays}}" /></dd>
         </dl>
       </div>
       <div class="form__group">
         <h3>Émissions de CO2</h3>
         <dl>
           <dt>EEC</dt>
-          <dd><input type="text" id="eec" class="ges_field ges_incr" value="{{lot.eec|stringformat:'.1f'}}" /></dd>
+          <dd><input type="text" id="eec" class="ges_field ges_incr" value="{{lot.eec|stringformat:'.1f'}}" style="width: 120px" /></dd>
           <dt>EL</dt>
-          <dd><input type="text" id="el" class="ges_field ges_incr" value="{{lot.el|stringformat:'.1f'}}" /></dd>
+          <dd><input type="text" id="el" class="ges_field ges_incr" value="{{lot.el|stringformat:'.1f'}}" style="width: 120px"/></dd>
           <dt>EP</dt>
-          <dd><input type="text" id="ep" class="ges_field ges_incr" value="{{lot.ep|stringformat:'.1f'}}" /></dd>
+          <dd><input type="text" id="ep" class="ges_field ges_incr" value="{{lot.ep|stringformat:'.1f'}}" style="width: 120px" /></dd>
           <dt>ETD</dt>
-          <dd><input type="text" id="etd" class="ges_field ges_incr" value="{{lot.etd|stringformat:'.1f'}}" /></dd>
+          <dd><input type="text" id="etd" class="ges_field ges_incr" value="{{lot.etd|stringformat:'.1f'}}" style="width: 120px" /></dd>
           <dt>EU</dt>
-          <dd><input type="text" id="eu" class="ges_field ges_incr" value="{{lot.eu|stringformat:'.1f'}}" /></dd>
+          <dd><input type="text" id="eu" class="ges_field ges_incr" value="{{lot.eu|stringformat:'.1f'}}" style="width: 120px" /></dd>
         </dl>
       </div>            
       <div class="form__group">
         <h3>Réductions de CO2</h3>
         <dl>
           <dt>ESCA</dt>
-          <dd><input type="text" id="esca" class="ges_field ges_decr" value="{{lot.esca|stringformat:'.1f'}}" /></dd>
+          <dd><input type="text" id="esca" class="ges_field ges_decr" value="{{lot.esca|stringformat:'.1f'}}" style="width: 120px" /></dd>
           <dt>ECCS</dt>
-          <dd><input type="text" id="eccs" class="ges_field ges_decr" value="{{lot.eccs|stringformat:'.1f'}}" /></dd>
+          <dd><input type="text" id="eccs" class="ges_field ges_decr" value="{{lot.eccs|stringformat:'.1f'}}" style="width: 120px" /></dd>
           <dt>ECCR</dt>
-          <dd><input type="text" id="eccr" class="ges_field ges_decr" value="{{lot.eccr|stringformat:'.1f'}}" /></dd>
+          <dd><input type="text" id="eccr" class="ges_field ges_decr" value="{{lot.eccr|stringformat:'.1f'}}" style="width: 120px" /></dd>
           <dt>EEE</dt>
-          <dd><input type="text" id="eee" class="ges_field ges_decr" value="{{lot.eee|stringformat:'.1f'}}" /></dd>
+          <dd><input type="text" id="eee" class="ges_field ges_decr" value="{{lot.eee|stringformat:'.1f'}}" style="width: 120px" /></dd>
         </dl>           
       </div>
       <div class="form__group">
         <h3>Bilan CO2</h3>
         <dl>
           <dt>Total émissions GES</dt>
-          <dd><input type="text" id="ges_total" value="{{lot.ghg_total|stringformat:'.1f'}}" /></dd>
+          <dd><input type="text" id="ges_total" value="{{lot.ghg_total|stringformat:'.1f'}}" style="width: 120px" /></dd>
           <dt>Émissions de référence</dt>
-          <dd><input type="text" id="ref" value="{{lot.ghg_reference|stringformat:'.1f'}}" /></dd>
+          <dd><input type="text" id="ref" value="{{lot.ghg_reference|stringformat:'.1f'}}" style="width: 120px" /></dd>
           <dt>% réduction</dt>
-          <dd><input type="text" id="pct_reduction" value="{{lot.ghg_reduction|stringformat:'.1f'}}" /></dd>
+          <dd><input type="text" id="pct_reduction" value="{{lot.ghg_reduction|stringformat:'.1f'}}" style="width: 120px" /></dd>
         </dl>           
       </div>       
       <div class="form__group">
         <h3>Destination</h3>
         <dl>
         <dt><label for="num_dae">Numéro de DAE</label></dt>
-        <dd><input id="num_dae" type="text" value="{{lot.dae}}"/></dd>
+        <dd><input id="num_dae" type="text" value="{{lot.dae}}" style="width: 200px" /></dd>
         <dt><label for="client">Client</label></dt>
-        <dd><input type="text" id="client_display" class="autocomplete_operators" value="{{lot.ea.name}}" /><input type="hidden" id="client" value="{{lot.ea.id}}" /></dd>
+        <dd><input type="text" id="client_display" class="autocomplete_operators" value="{{lot.ea.name}}" style="width: 200px" /><input type="hidden" id="client" value="{{lot.ea.id}}" /></dd>
         <dt><label for="site_livraison">Site de livraison</label></dt>
-        <dd><input id="site_livraison" type="text" value="{{lot.ea_delivery_site}}" /></dd>
+        <dd><input id="site_livraison" type="text" value="{{lot.ea_delivery_site}}" style="width: 200px" /></dd>
         <dt><label for="date_livraison">Date de livraison</label></dt>
-        <dd><input id="date_livraison" type="text" value="{{lot.ea_delivery_date|date:'Y-m-d'}}" placeholder="AAAA-MM-DD" /></dd>
+        <dd><input id="date_livraison" type="text" value="{{lot.ea_delivery_date|date:'Y-m-d'}}" placeholder="AAAA-MM-DD" style="width: 200px" /></dd>
         <dt><label for="client_id" title="Champ optionnel, entrez ce que vous voulez">Référence</label></dt>
-        <dd><input id="client_id" type="text" value="{{lot.client_id}}" /></dd>        
+        <dd><input id="client_id" type="text" value="{{lot.client_id}}" style="width: 200px" /></dd>        
         </dl>                        
       </div>                
     </div>
