@@ -105,6 +105,8 @@ def producers_duplicate_lot(request, *args, **kwargs):
   else:
     lot = Lot.objects.get(id=lot_id)
     lot.pk = None
+    lot.status = 'Draft'
+    lot.carbure_id = ''
     lot.dae = ''
     lot.save()
     return JsonResponse({'status':'success', 'message':'OK'})
