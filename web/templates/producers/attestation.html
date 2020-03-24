@@ -116,7 +116,7 @@
   var table_columns = [
   {title:'Numéro de lot', can_hide: true, can_duplicate: false, data:'carbure_id'}, 
   {title:'Producteur', can_hide: true, can_duplicate: true, data:'producer'}, 
-  {title:'Site de<br />Production', can_hide: true, can_duplicate: true, data:'production_site'}, 
+  {title:'Site de<br />Production', can_hide: true, can_duplicate: true, can_filter: true, data:'production_site'}, 
 
   {title: 'Volume<br /> à 20°C<br />en Litres', can_hide: true, can_duplicate: true, data: 'volume'}, 
   {title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, data: 'biocarburant'}, 
@@ -137,7 +137,7 @@
   {title:'% de réduction', can_hide: true, can_duplicate: true, is_read_only: true, data: 'ghg_reduction'}, 
 
   {title:'N°DAE', can_hide: true, can_duplicate: false, data:'dae'}, 
-  {title:'Référence', can_hide: true, can_duplicate: true, data:'client_id', tooltip: 'Champ libre - Référence client'}, 
+  {title:'Référence', can_hide: true, can_duplicate: true, can_filter: true, data:'client_id', tooltip: 'Champ libre - Référence client'}, 
   {title:'Date d\'entrée<br />en EA', can_hide: true, can_duplicate: true, data:'ea_delivery_date'}, 
   {title:'Client', can_hide: true, can_duplicate: true, can_filter: true, data: 'ea'}, 
   {title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, data: 'ea_delivery_site'}, 
@@ -279,6 +279,9 @@ function manage_actions() {
 }
 
 $(document).ready(function() {
+
+ {% if message %}alert("{{message}}"){% endif %} 
+
   function initFilters() {
     var table_columns_filter = $("#table_columns_filter")
     var table_columns_filter2 = $("#table_columns_filter2")
