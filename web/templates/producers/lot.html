@@ -19,7 +19,7 @@
         <dl>
           <dt>Site de Production</dt>
           <dd><input type="text" id="production_site_display" class="autocomplete_production_sites" value="{{lot.production_site.name}}"/><input type="hidden" id="production_site" value="{{lot.production_site.id}}" /></dd>
-          <dt>Volume</dt>
+          <dt>Volume à 20°C en Litres</dt>
           <dd><input type="text" id="volume" value="{{lot.volume}}" /></dd>
           <dt>Biocarburant</dt>
           <dd><input type="text" id="biocarburant_display" class="autocomplete_biocarburants" value="{{lot.biocarburant.name}}" /><input type="hidden" id="biocarburant" value="{{lot.biocarburant.code}}" /></dd>
@@ -79,7 +79,7 @@
         <dd><input id="site_livraison" type="text" value="{{lot.ea_delivery_site}}" /></dd>
         <dt><label for="date_livraison">Date de livraison</label></dt>
         <dd><input id="date_livraison" type="text" value="{{lot.ea_delivery_date|date:'Y-m-d'}}" placeholder="AAAA-MM-DD" /></dd>
-        <dt><label for="client_id">Champ libre</label></dt>
+        <dt><label for="client_id" title="Champ optionnel, entrez ce que vous voulez">Référence</label></dt>
         <dd><input id="client_id" type="text" value="{{lot.client_id}}" /></dd>        
         </dl>                        
       </div>                
