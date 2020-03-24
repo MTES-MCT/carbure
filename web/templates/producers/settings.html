@@ -20,43 +20,47 @@
     <section class="form__group"> 
       <div class="panel">
         <div class="panel__header">
-          <h3>{{site.name}}</h3>
-        </div>
-
-        <div class="flex-container">
-          <div class="form__group">
-            <dl>
-              {% if site.certificate %}
-              <dt>Numéro de Certificat</dt>
-              <dd>{{site.certificate.certificate_id}}</dd>
-              <dt>Certificat PDF</dt>
-              <dd>
-                <a href="{{ site.certificate.certificate.url }}" target="_blank">{{ site.certificate.certificate.name }}</a>
-                <li class="label" style="background: var(--light-blue); padding: 2px;" title="Supprimer"><a class="btn_open_modal_delete_certif" data-crtid="{{site.certificate.id}}" data-site="{{site.name}}" data-num="{{site.certificate.certificate.name}}" data-expi="{{site.certificate.expiration}}">x</a>
-              </dd>
-              <dt>Expiration</dt>
-              <dd>{{site.certificate.expiration}}</dd>
-              <dt>Statut</dt>
-              <dd>{{site.certificate.get_status_display}}</dd>
-              {% else %}
-              <dd>Certificat manquant</dd>
-              {% endif %}
-            </dl>
-
-          </div>        
-          <div class="form__group">
-            <dl>
-              <dt>Pays</dt>
+          <div class="flex-container" style="justify-content: space-between;">
+            <div class="form__group" style="margin-top: 0px;">
+              <dl>
+              <dd><h3>{{site.name}}</h3></dd>
               <dd>{{site.country}}</dd>                
-              <dt>Date de Mise en Service</dt>
               <dd>{{site.date_mise_en_service}}</dd>
-              <dt>Éligible double-comptage</dt>
-              <dd>{{site.eligible_dc}}</dd>
-              <dt>Option GES</dt>
-              <dd>{{site.ges_option}}</dd>              
-            </dl>
-          </div>            
-          <div class="form__group">
+              </dl>
+            </div>
+            <div class="form__group" style="margin-top: 0px;">
+              <dl>
+                <dt>Éligible double-comptage</dt>
+                <dd>{{site.eligible_dc}}</dd>
+              </dl>
+            </div>
+            <div class="form__group" style="margin-top: 0px;">
+              <dl>
+                <dt>Option GES</dt>
+                <dd>{{site.ges_option}}</dd>  
+              </dl>
+            </div> 
+            <div class="form__group" style="margin-top: 0px;">
+              <dl>
+                {% if site.certificate %}
+                <dd>
+                  <a href="{{ site.certificate.certificate.url }}" target="_blank">{{site.certificate.certificate_id}}</a>
+                  <li class="label" style="background: var(--light-blue); padding: 2px;" title="Supprimer"><a class="btn_open_modal_delete_certif" data-crtid="{{site.certificate.id}}" data-site="{{site.name}}" data-num="{{site.certificate.certificate.name}}" data-expi="{{site.certificate.expiration}}">x</a>
+                </dd>
+                <dd>Expiration: {{site.certificate.expiration}}</dd>
+                <dd>{{site.certificate.get_status_display}}</dd>
+                {% else %}
+                <dd>Certificat manquant</dd>
+                {% endif %}
+              </dl>
+            </div>     
+            <div class="form__group" style="margin-top: 0px;">
+              <button type="submit" class="button btn_open_modal_site_edit" data-siteid="{{site.id}}">Modifier</button>
+            </div>                                      
+          </div>
+        </div>
+        <div class="flex-container">         
+          <div class="form__group" style="margin-top: 0px;">
             <label>Matières premières</label>
             <ul class="label-list">
               {% for input in site.inputs %}
@@ -72,7 +76,7 @@
               <input type="text" name="mp" class="autocomplete_mp" data-siteid="{{site.id}}" />
             </div>
           </div>
-          <div class="form__group">
+          <div class="form__group" style="margin-top: 0px;">
             <label>Biocarburants</label>
             <ul class="label-list">
               {% for output in site.outputs %}
@@ -88,11 +92,6 @@
               <input type="text" name="biocarburant" class="autocomplete_biocarburant" data-siteid="{{site.id}}" />
             </div>
           </div>      
-        </div>
-        <div class="row">
-          <div class="form__group flex-container-right">
-            <button type="submit" class="button btn_open_modal_site_edit" data-siteid="{{site.id}}">Modifier</button>
-          </div>             
         </div>
       </div>
     </section>     
