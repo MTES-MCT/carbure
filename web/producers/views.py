@@ -87,6 +87,7 @@ def producers_attestation(request, *args, **kwargs):
   context = kwargs['context']
   attestation_id = kwargs['attestation_id']
   context['current_url_name'] = 'producers-attestation'
+  created = kwargs['attestation_id']
   
   attestations = AttestationProducer.objects.filter(producer=context['user_entity'])
   current_attestation_qs = attestations.filter(id=attestation_id)
@@ -111,6 +112,8 @@ def producers_attestation(request, *args, **kwargs):
 
   lots = Lot.objects.filter(attestation=current_attestation)
   context['lots'] = lots
+  if created:
+    context['message'] = "Création du lot réussie"
   return render(request, 'producers/attestation.html', context)
 
 @login_required
@@ -150,6 +153,8 @@ def producers_new_lot(request, *args, **kwargs):
     context['next_attestations'] = [next_attestations[0]]
     context['previous_attestations'] = [previous_attestations[0]]
 
+  if request.GET.get('created', None):
+    context['message'] = "Création du lot réussie"
   context['current_url_name'] = 'producers-attestation-new-lot'
   return render(request, 'producers/lot.html', context)
 
@@ -183,8 +188,6 @@ def producers_edit_lot(request, *args, **kwargs):
     context['previous_attestations'] = [previous_attestations[0]]
 
   context['lot'] = Lot.objects.get(id=kwargs['lot_id'])
-  if request.GET.get('created', None):
-    context['message'] = "Création du lot réussie"
   if request.GET.get('saved', None):
     context['message'] = "Sauvegarde du lot réussie"    
   context['current_url_name'] = 'producers-attestation-edit-lot'

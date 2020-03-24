@@ -61,11 +61,11 @@
         <h3>Bilan CO2</h3>
         <dl>
           <dt>Total émissions GES</dt>
-          <dd><input type="text" id="ges_total" /></dd>
+          <dd><input type="text" id="ges_total" value="{{lot.ghg_total|stringformat:'.1f'}}" /></dd>
           <dt>Émissions de référence</dt>
-          <dd><input type="text" id="ref" /></dd>
+          <dd><input type="text" id="ref" value="{{lot.ghg_reference|stringformat:'.1f'}}" /></dd>
           <dt>% réduction</dt>
-          <dd><input type="text" id="pct_reduction" /></dd>
+          <dd><input type="text" id="pct_reduction" value="{{lot.ghg_reduction|stringformat:'.1f'}}" /></dd>
         </dl>           
       </div>       
       <div class="form__group">
@@ -74,7 +74,7 @@
         <dt><label for="num_dae">Numéro de DAE</label></dt>
         <dd><input id="num_dae" type="text" value="{{lot.dae}}"/></dd>
         <dt><label for="client">Client</label></dt>
-        <dd><input type="text" id="client_display" class="autocomplete_operators" value="{{lot.client.name}}" /><input type="hidden" id="client" value="{{lot.client.id}}" /></dd>
+        <dd><input type="text" id="client_display" class="autocomplete_operators" value="{{lot.ea.name}}" /><input type="hidden" id="client" value="{{lot.ea.id}}" /></dd>
         <dt><label for="site_livraison">Site de livraison</label></dt>
         <dd><input id="site_livraison" type="text" value="{{lot.ea_delivery_site}}" /></dd>
         <dt><label for="date_livraison">Date de livraison</label></dt>
@@ -88,7 +88,7 @@
       <div class="form__group flex-container-right button-push">
         <a class="button secondary" href="{% url 'producers-attestation' attestation_id=attestation_id %}">Annuler</a>            
         {% if lot %}
-        <a id="btn_lot_save" class="button primary">Enregistrer modifications</a>
+        <a id="btn_lot_save_edit" class="button primary">Enregistrer modifications</a>
         {% else %}
         <a id="btn_lot_save_and_add" class="button primary">Créer et ajouter un nouveau lot</a>
         <a id="btn_lot_save" class="button primary">Créer</a>
@@ -104,19 +104,44 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-  $("#btn_lot_save").on('click', function() {
+  var SAVE_AND_REDIRECT = 0
+  var SAVE_AND_ADD_NEW = 1
+  var EDIT = 2
+
+  $("#btn_lot_save_and_add").on('click', handleSaveAndAddNew)
+  $("#btn_lot_save").on('click', handleSaveAndRedirect)
+  $("#btn_lot_save_edit").on('click', handleSaveEdit)
+
+  function handleSaveAndAddNew() {
+    handleSave(SAVE_AND_ADD_NEW)
+  }
+
+  function handleSaveAndRedirect() {
+    handleSave(SAVE_AND_REDIRECT) 
+  }
+
+  function handleSaveEdit() {
+    handleSave(EDIT)
+  }
+
+  function handleSave(action) {
     var err_msg_dom = $("#err_msg_dom")
     var formdata = new FormData();
+
+    // fill formdata
     formdata.set('attestation_id', '{{attestation_id}}')
     {% if lot %} 
     formdata.set('lot_id', '{{lot.id}}')
     {% endif %}
     formdata.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
     $("input").each(function() {
+      console.log($(this).attr('id'), $(this).val())
       formdata.set($(this).attr('id'), $(this).val())
     })
+
+    // post form
     $.ajax({
-      url         : "{% url 'producers-api-attestation-save-lot' attestation_id=attestation_id  %}",
+      url         : "{% url 'producers-api-attestation-save-lot' attestation_id=attestation_id %}",
       data        : formdata,
       cache       : false,
       contentType : false,
@@ -125,12 +150,15 @@
       success     : function(data, textStatus, jqXHR) {
         // Callback code
         let lot_id = data.lot_id
-        let redirect_url = "{% url 'producers-attestation-edit-lot' attestation_id=attestation_id lot_id=22222  %}".replace('22222', lot_id)
-        {% if lot %} 
-        window.location = redirect_url + "?saved=True"
-        {% else %}
-        window.location = redirect_url + "?created=True"
-        {% endif %}
+        if (action == SAVE_AND_REDIRECT) {
+          window.location = "{% url 'producers-attestation' attestation_id=attestation_id %}" + `?created=True`
+        } else if (action == SAVE_AND_ADD_NEW) {
+          window.location = "{% url 'producers-attestation-new-lot' attestation_id=attestation_id %}" + `?created=True`
+        } else {
+          // edit
+          let redirect_url = "{% url 'producers-attestation-edit-lot' attestation_id=attestation_id lot_id=22222  %}".replace('22222', lot_id)
+          window.location = redirect_url + "?saved=True"
+        }
       },
       error       : function(e) {
         if (e.status === 400) {
@@ -140,7 +168,7 @@
         }
       }
     })
-}); 
+  }
 
 function load_ges(mp, bc) {
   var formdata = new FormData();

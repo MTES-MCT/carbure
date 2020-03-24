@@ -344,21 +344,36 @@ def producers_save_lot(request, *args, **kwargs):
   lot.producer = context['user_entity']
   lot.production_site = ProductionSite.objects.get(id=production_site)
 
-  lot.volume = float(volume)
+  if volume:
+    lot.volume = float(volume)
   lot.matiere_premiere = MatierePremiere.objects.get(code=matiere_premiere)
   lot.biocarburant = Biocarburant.objects.get(code=biocarburant)
-  lot.pays_origine = Pays.objects.get(code_pays=pays_origine)
+  if pays_origine:
+    lot.pays_origine = Pays.objects.get(code_pays=pays_origine)
 
   # ghg
-  lot.eec = eec
-  lot.el = el
-  lot.ep = ep
-  lot.etd = etd
-  lot.eu = eu
-  lot.esca = esca
-  lot.eccs = eccs
-  lot.eccr = eccr
-  lot.eee = eee
+  if eec:
+    lot.eec = float(eec)
+  if el:
+    lot.el = float(el)
+  if ep:
+    lot.ep = float(ep)
+  if etd:
+    lot.etd = float(etd)
+  if eu:
+    lot.eu = float(eu)
+  if esca:
+    lot.esca = float(esca)
+  if eccs:
+    lot.eccs = float(eccs)
+  if eccr:
+    lot.eccr = float(eccr)
+  if eee:
+    lot.eee = float(eee)
+
+  lot.ghg_total = lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee 
+  lot.ghg_reference = 0
+  lot.ghg_reduction = 0
 
   # client / delivery
   lot.dae = num_dae
