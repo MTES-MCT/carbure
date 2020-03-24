@@ -10,27 +10,9 @@
       <div class="button-item">
         <a class="button modal-button" id="btn_open_modal_import">Importer</a>
         <a href="/static/files/template.csv" style="margin-left: -10px;"><small>Télécharger le modèle</small></a>
-        <div class="modal__backdrop" id="modal_import">
-          <div class="modal">
-            <input type="file" id="file_to_upload">
-            <div class="form__group button__group">
-              <a class="button secondary close" href="#">Annuler</a>
-            </div>
-          </div>
-        </div>
       </div>
       <div class="button-item button-push" style="margin-top: 30px;">
         <a id="btn_open_modal_columns"><small>Affichage Colonnes</small></a>
-        <div class="modal__backdrop" id="modal_columns">
-          <div class="modal">
-            <table id="table_columns_filter">
-              <!-- dynamically generated in js -->
-            </table>
-            <div class="form__group button__group">
-              <a class="button secondary close">Ok</a>
-            </div>
-          </div>
-        </div>
       </div>
     </div>  
     <table class="display nowrap" id="datatable">
@@ -99,6 +81,31 @@
         <button type="submit" class="button">Valider</button>
       </div>
     </form>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_import">
+  <div class="modal">
+    <input type="file" id="file_to_upload">
+    <div class="form__group button__group">
+      <a class="button secondary close" href="#">Annuler</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_columns">
+  <div class="modal">
+    <div class="flex-container">
+      <table id="table_columns_filter">
+        <!-- dynamically generated in js -->
+      </table>  
+      <table id="table_columns_filter2">
+        <!-- dynamically generated in js -->
+      </table>      
+    </div>
+    <div class="form__group button__group">
+      <a class="button secondary close">Ok</a>
+    </div>
   </div>
 </div>
 {% endblock %}
@@ -274,19 +281,27 @@ function manage_actions() {
 $(document).ready(function() {
   function initFilters() {
     var table_columns_filter = $("#table_columns_filter")
+    var table_columns_filter2 = $("#table_columns_filter2")
     var list_columns_filter = $("#list_columns_filter")
     var columns_filter_html = ""
+    var columns_filter_html2 = ""
     var list_columns_filter_html = ""
     for (let i = 0, len = table_columns.length; i < len; i++) {
       let column = table_columns[i]
       if (column.can_hide === true) {
-        columns_filter_html += `<tr><td><input type="checkbox" id="checkbox${i}" class="toggle-vis" data-column="${i}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
+        // use two columns
+        if (i <= (len / 2)) {
+          columns_filter_html += `<tr><td><input type="checkbox" id="checkbox${i}" class="toggle-vis" data-column="${i}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
+        } else {
+          columns_filter_html2 += `<tr><td><input type="checkbox" id="checkbox${i}" class="toggle-vis" data-column="${i}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
+        }
       }
       if (column.can_duplicate === true) { 
         list_columns_filter_html += `<li class="flex-item-a"><input type="checkbox" id="add_checkbox${i}" class="toggle-lot-param" data-column="${i}"><label for="add_checkbox${i}" class="label-inline">${column.title}</label></li>`
       }
     }
     table_columns_filter.append(columns_filter_html)
+    table_columns_filter2.append(columns_filter_html2)
     list_columns_filter.append(list_columns_filter_html)    
   }
   initFilters()
