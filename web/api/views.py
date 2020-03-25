@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 import logging
 import datetime
+import csv
 
 # public 
 def biocarburant_autocomplete(request):
@@ -35,6 +36,47 @@ def operators_autocomplete(request):
   operators = Entity.objects.filter(entity_type='Opérateur', name__icontains=q)
   results = [{'value':i.name, 'data':i.id} for i in operators]
   return JsonResponse({'suggestions': results})
+
+def biocarburant_csv(request):
+  types = Biocarburant.objects.all()
+  response = HttpResponse(content_type='text/csv')
+  response['Content-Disposition'] = 'attachment; filename="biocarburants.csv"'
+  writer = csv.writer(response)
+  writer.writerow(['biocarburant_code', 'biocarburant'])
+  for t in types:
+    writer.writerow([t.code, t.name])
+  return response
+
+def matiere_premiere_csv(request):
+  types = MatierePremiere.objects.all()
+  response = HttpResponse(content_type='text/csv')
+  response['Content-Disposition'] = 'attachment; filename="matieres_premieres.csv"'
+  writer = csv.writer(response)
+  writer.writerow(['matiere_premiere_code', 'matiere_premiere'])
+  for t in types:
+    writer.writerow([t.code, t.name])
+  return response
+
+def country_csv(request):
+  types = Pays.objects.all()
+  response = HttpResponse(content_type='text/csv')
+  response['Content-Disposition'] = 'attachment; filename="pays.csv"'
+  writer = csv.writer(response)
+  writer.writerow(['code_pays', 'pays'])
+  for t in types:
+    writer.writerow([t.code_pays, t.name])
+  return response
+
+def operators_csv(request):
+  types = Entity.objects.filter(entity_type='Opérateur')
+  response = HttpResponse(content_type='text/csv')
+  response['Content-Disposition'] = 'attachment; filename="operateurs.csv"'
+  writer = csv.writer(response)
+  writer.writerow(['ea'])
+  for t in types:
+    writer.writerow([t.name])
+  return response
+
 
 # producers
 @login_required
@@ -318,7 +360,7 @@ def producers_save_lot(request, *args, **kwargs):
 
   # all other fields
   volume = request.POST.get('volume', None)
-  pays_origine = request.POST.get('pays_origine', None)
+  pays_origine = request.POST.get('code_pays', None)
   eec = request.POST.get('eec', None)
   el = request.POST.get('el', None)
   ep = request.POST.get('ep', None)
@@ -329,10 +371,10 @@ def producers_save_lot(request, *args, **kwargs):
   eccr = request.POST.get('eccr', None)
   eee = request.POST.get('eee', None)
 
-  num_dae = request.POST.get('num_dae', None)
-  ea_delivery_date = request.POST.get('date_livraison', None)
-  ea = request.POST.get('client', None)
-  ea_delivery_site = request.POST.get('site_livraison', None)
+  num_dae = request.POST.get('dae', None)
+  ea_delivery_date = request.POST.get('ea_delivery_date', None)
+  ea = request.POST.get('ea', None)
+  ea_delivery_site = request.POST.get('ea_delivery_site', '')
   client_id = request.POST.get('client_id', None)
 
   if lot_id:
@@ -342,14 +384,37 @@ def producers_save_lot(request, *args, **kwargs):
     
   lot.attestation = AttestationProducer.objects.get(id=attestation_id)
   lot.producer = context['user_entity']
-  lot.production_site = ProductionSite.objects.get(id=production_site)
+
+  # production site can be either ID or name
+  try:
+    production_site_id = int(production_site)
+  except ValueError:
+    production_site_id = None
+  try:
+    if production_site_id:
+      lot.production_site = ProductionSite.objects.get(id=production_site_id)
+    else:
+      lot.production_site = ProductionSite.objects.get(name__iexact=production_site)
+  except:
+    return JsonResponse({'status':'error', 'message':"Site de Production inconnu."}, status=400)
 
   if volume:
     lot.volume = float(volume)
-  lot.matiere_premiere = MatierePremiere.objects.get(code=matiere_premiere)
-  lot.biocarburant = Biocarburant.objects.get(code=biocarburant)
+  try:
+    lot.matiere_premiere = MatierePremiere.objects.get(code=matiere_premiere)
+  except:
+    return JsonResponse({'status':'error', 'message':"Matiere premiere inconnue."}, status=400)
+  
+  try:  
+    lot.biocarburant = Biocarburant.objects.get(code=biocarburant)
+  except:
+    return JsonResponse({'status':'error', 'message':"Type de biocarburant inconnu."}, status=400)
+
   if pays_origine:
-    lot.pays_origine = Pays.objects.get(code_pays=pays_origine)
+    try:
+      lot.pays_origine = Pays.objects.get(code_pays=pays_origine)
+    except:
+      return JsonResponse({'status':'error', 'message':"Pays inconnu."}, status=400)
 
   # ghg
   if eec:
@@ -382,10 +447,21 @@ def producers_save_lot(request, *args, **kwargs):
   else:
     lot.ea_delivery_date = ea_delivery_date
   lot.ea_delivery_site = ea_delivery_site
-  if not ea or ea == '':
-    lot.ea = None
-  else:
-    lot.ea = Entity.objects.get(id=ea)
+
+
+  # production site can be either ID or name
+  try:
+    ea_id = int(ea)
+  except ValueError:
+    ea_id = None
+  try:
+    if ea_id:
+      lot.ea = Entity.objects.get(id=ea_id)
+    else:
+      lot.ea = Entity.objects.get(name__iexact=ea)
+  except:
+    return JsonResponse({'status':'error', 'message':"Site de Production %s inconnu" % (ea)}, status=400)
+
   lot.client_id = client_id
   lot.save()
   return JsonResponse({'status':'success', 'lot_id': lot.id})
