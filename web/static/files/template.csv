@@ -1,6 +1,6 @@
-production_site,volume,biocarburant,matiere_premiere,code_pays,eec,el,ep,etd,eu,esca,eccs,eccr,eee,e,dae,client_id,ea_delivery_date,ea,ea_delivery_site
-totopouet,12000,HVO,COLZA,TH,12,4,2,0,3.3,0,0,0,0,0,FR000W123,import_batch_1,2020-03-23,PetroMax France,Grandpuits
-totopouet,34,ET,BRAI_TALLOL,FR,12,4,2,0,3.3,0,0,0,0,0,222,import_batch_1,2020-02-22,PetroMax France,fe
-fezpk,23,ETBE,MAIS,LU,12,4,2,0,3.3,0,0,0,0,0,ee,import_batch_1,2020-03-12,PetroMax France,qew
-toto,222,EMHV,SOJA,DE,12,4,2,0,3.3,0,0,0,0,0,aewwe,import_batch_1,2020-03-12,PetroMax France,grandpuits
-toto,0,HVO,RAPES,GR,12,4,2,0,3.3,0,0,0,0,0,,import_batch_1,,,
+production_site;volume;biocarburant;matiere_premiere;code_pays;eec;el;ep;etd;eu;esca;eccs;eccr;eee;e;dae;client_id;ea_delivery_date;ea;ea_delivery_site
+totopouet;12000;HVO;COLZA;TH;12;4;2;0;3.3;0;0;0;0;0;FR000W123;import_batch_1;2020-03-23;PetroMax France;Grandpuits
+totopouet;34;ET;BRAI_TALLOL;FR;12;4;2;0;3.3;0;0;0;0;0;222;import_batch_1;2020-02-22;PetroMax France;fe
+fezpk;23;ETBE;MAIS;LU;12;4;2;0;3.3;0;0;0;0;0;ee;import_batch_1;2020-03-12;PetroMax France;qew
+toto;222;EMHV;SOJA;DE;12;4;2;0;3.3;0;0;0;0;0;aewwe;import_batch_1;2020-03-12;PetroMax France;grandpuits
+toto;0;HVO;RAPES;GR;12;4;2;0;3.3;0;0;0;0;0;;import_batch_1;;;
