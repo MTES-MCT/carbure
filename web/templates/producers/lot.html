@@ -30,9 +30,9 @@
         </dl>
       </div>
       <div class="form__group">
-        <h3>Émissions de CO2</h3>
+        <h3 title="en gCO2eq/MJ">Émissions de CO2</h3>
         <dl>
-          <dt>EEC</dt>
+          <dt>EEC <small>en gCO2eq/MJ</small></dt>
           <dd><input type="text" id="eec" class="ges_field ges_incr" value="{{lot.eec|stringformat:'.1f'}}" style="width: 120px" /></dd>
           <dt>EL</dt>
           <dd><input type="text" id="el" class="ges_field ges_incr" value="{{lot.el|stringformat:'.1f'}}" style="width: 120px"/></dd>
@@ -45,7 +45,7 @@
         </dl>
       </div>            
       <div class="form__group">
-        <h3>Réductions de CO2</h3>
+        <h3 title="en gCO2eq/MJ">Réductions de CO2</h3>
         <dl>
           <dt>ESCA</dt>
           <dd><input type="text" id="esca" class="ges_field ges_decr" value="{{lot.esca|stringformat:'.1f'}}" style="width: 120px" /></dd>
@@ -58,7 +58,7 @@
         </dl>           
       </div>
       <div class="form__group">
-        <h3>Bilan CO2</h3>
+        <h3 title="en gCO2eq/MJ">Bilan CO2</h3>
         <dl>
           <dt>Total émissions GES</dt>
           <dd><input type="text" id="ges_total" value="{{lot.ghg_total|stringformat:'.1f'}}" style="width: 120px" /></dd>
