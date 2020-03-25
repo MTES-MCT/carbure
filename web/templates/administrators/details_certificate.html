@@ -57,7 +57,12 @@
 		              </tr>
 		            {% endfor %}					
 			</table>
-		</div>		
+		</div>
+		<div class="panel">
+			<h3>Certificat</h3>
+			<iframe title="Embedded Certificate" width="100%" min-height="800px" src="{{ certificate.certificate.url }}">
+			</iframe>
+		</div>					
 	</div>
 {% endblock %}
 
