@@ -61,7 +61,7 @@ def administrators_certificate_details(request, *args, **kwargs):
 def administrators_gestion_utilisateurs(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'administrators-gestion-utilisateurs'
-  context['entities'] = Entity.objects.all()
+  context['all_entities'] = Entity.objects.all()
   context['entity_categories'] = Entity.ENTITY_TYPES
   user_model = get_user_model()
   context['users'] = user_model.objects.all()
