@@ -26,7 +26,7 @@
           <dt>Matiere Premiere</dt>
           <dd><input type="text" id="matiere_premiere_display" class="autocomplete_mps" value="{{lot.matiere_premiere.name}}" /><input type="hidden" id="matiere_premiere" value="{{lot.matiere_premiere.code}}" /></dd>
           <dt>Pays d'origine</dt>
-          <dd><input type="text" id="pays_origine_display" class="autocomplete_countries" value="{{lot.pays_origine.name}}" /><input type="hidden" id="pays_origine" value="{{lot.pays_origine.code_pays}}" /></dd>
+          <dd><input type="text" id="pays_origine_display" class="autocomplete_countries" value="{{lot.pays_origine.name}}" /><input type="hidden" id="code_pays" value="{{lot.pays_origine.code_pays}}" /></dd>
         </dl>
       </div>
       <div class="form__group" style="margin-left: var(--space-l);">
@@ -77,14 +77,14 @@
       <div class="form__group" style="margin-left: var(--space-l);">
         <h3>Destination</h3>
         <dl>
-        <dt><label for="num_dae">Numéro de DAE</label></dt>
-        <dd><input id="num_dae" type="text" value="{{lot.dae}}" /></dd>
-        <dt><label for="client">Client</label></dt>
-        <dd><input type="text" id="client_display" class="autocomplete_operators" value="{{lot.ea.name}}" /><input type="hidden" id="client" value="{{lot.ea.id}}" /></dd>
-        <dt><label for="site_livraison">Site de livraison</label></dt>
-        <dd><input id="site_livraison" type="text" value="{{lot.ea_delivery_site}}" /></dd>
-        <dt><label for="date_livraison">Date de livraison</label></dt>
-        <dd><input id="date_livraison" type="text" value="{{lot.ea_delivery_date|date:'Y-m-d'}}" placeholder="AAAA-MM-DD" /></dd>
+        <dt><label for="dae">Numéro de DAE</label></dt>
+        <dd><input id="dae" type="text" value="{{lot.dae}}" /></dd>
+        <dt><label for="client_display">Client</label></dt>
+        <dd><input type="text" id="client_display" class="autocomplete_operators" value="{{lot.ea.name}}" /><input type="hidden" id="ea" value="{{lot.ea.id}}" /></dd>
+        <dt><label for="ea_delivery_site">Site de livraison</label></dt>
+        <dd><input id="ea_delivery_site" type="text" value="{{lot.ea_delivery_site}}" /></dd>
+        <dt><label for="ea_delivery_date">Date de livraison</label></dt>
+        <dd><input id="ea_delivery_date" type="text" value="{{lot.ea_delivery_date|date:'Y-m-d'}}" placeholder="AAAA-MM-DD" /></dd>
         <dt><label for="client_id" title="Champ optionnel, entrez ce que vous voulez">Référence</label></dt>
         <dd><input id="client_id" type="text" value="{{lot.client_id}}" /></dd>        
         </dl>                        
@@ -264,7 +264,7 @@ $(".autocomplete_countries").autocomplete({
   serviceUrl: "{% url 'api-country-autocomplete' %}",
   dataType: 'json',
   onSelect: function(suggestion) {
-    $("#pays_origine").val(suggestion.data)
+    $("#code_pays").val(suggestion.data)
   },  
 })
 
