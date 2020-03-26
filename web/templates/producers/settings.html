@@ -13,18 +13,18 @@
         <input type="checkbox" checked="checked" name="checkbox" id="checkbox-annuaire-societe" value="1"><label for="checkbox-annuaire-societe" class="label-inline">Je souhaite faire apparaître ma société dans l'annuaire</label>
         <input type="checkbox" name="checkbox" id="checkbox-annuaire-contact" value="1"><label for="checkbox-annuaire-contact" class="label-inline">Je souhaite faire apparaître mes coordonnées de contact dans l'annuaire</label>
       </fieldset>
-    </div>  
+    </div>
     <h3>Sites de production</h3>
 
     {% for site in sites %}
-    <section class="form__group"> 
-      <div class="panel">
+    <section class="form__group">
+      <div class="panel" style="padding-top: 0px;">
         <div class="panel__header">
-          <div class="flex-container" style="justify-content: space-between;">
+          <div class="flex-container" style="justify-content: space-between; margin-bottom: -1em;">
             <div class="form__group" style="margin-top: 0px;">
               <dl>
               <dd><h3>{{site.name}}</h3></dd>
-              <dd>{{site.country}}</dd>                
+              <dd>{{site.country}}</dd>
               <dd>{{site.date_mise_en_service}}</dd>
               </dl>
             </div>
@@ -37,9 +37,9 @@
             <div class="form__group" style="margin-top: 0px;">
               <dl>
                 <dt>Option GES</dt>
-                <dd>{{site.ges_option}}</dd>  
+                <dd>{{site.ges_option}}</dd>
               </dl>
-            </div> 
+            </div>
             <div class="form__group" style="margin-top: 0px;">
               <dl>
                 {% if site.certificate %}
@@ -53,13 +53,19 @@
                 <dd>Certificat manquant</dd>
                 {% endif %}
               </dl>
-            </div>     
+            </div>
             <div class="form__group" style="margin-top: 0px;">
-              <button type="submit" class="button btn_open_modal_site_edit" data-siteid="{{site.id}}">Modifier</button>
-            </div>                                      
+              <button type="submit" class="button btn_open_modal_site_edit" data-siteid="{{site.id}}">
+                {% if site.certificate %}
+              Modifier
+              {% else %}
+              Ajouter Certificat
+              {% endif %}
+              </button>
+            </div>
           </div>
         </div>
-        <div class="flex-container">         
+        <div class="flex-container">
           <div class="form__group" style="margin-top: 0px;">
             <label>Matières premières</label>
             <ul class="label-list">
@@ -69,7 +75,7 @@
                 {% else %}
                 <li class="label" style="background: var(--light-green);"title="{{input.get_status_display}}"><a>{{input.matiere_premiere}}</a></li>
                 {% endif %}
-              {% endfor %}     
+              {% endfor %}
             </ul>
             <label for="token">Ajout matière première</label>
             <div class="input__group">
@@ -84,22 +90,22 @@
                 <li class="label" style="background: var(--light-orange);" title="{{output.get_status_display}}"><a>{{output.biocarburant}}</a></li>
                 {% else %}
                 <li class="label" style="background: var(--light-green);"title="{{input.get_status_display}}"><a>{{output.biocarburant}}</a></li>
-                {% endif %}              
-              {% endfor %}                
+                {% endif %}
+              {% endfor %}
             </ul>
             <label for="token">Ajout biocarburant</label>
             <div class="input__group">
               <input type="text" name="biocarburant" class="autocomplete_biocarburant" data-siteid="{{site.id}}" />
             </div>
-          </div>      
+          </div>
         </div>
       </div>
-    </section>     
-    {% endfor %}   
+    </section>
+    {% endfor %}
         <div class="row">
           <div class="form__group flex-container-right">
             <button type="submit" class="button" id="btn_open_modal_site">Ajouter un site de production</button>
-          </div>             
+          </div>
         </div>
   </div>
 </div>
@@ -110,7 +116,7 @@
     <form id="modal_site_form" method="POST" data-url="{% url 'producers-api-settings-add-site' %}">
       {% csrf_token %}
       <label for="modal_site_name">Nom du site de production</label>
-      <input type="text" id="modal_site_name" name="name" placeholder="Grandpuits">
+      <input type="text" id="modal_site_name" name="name" placeholder="Grange 4">
       <label for="modal_site_date">Date de mise en service approximative</label>
       <input type="text" id="modal_site_date" name="date_mise_en_service" placeholder="DD/MM/YYYY">
       <label for="modal_site_country">Pays</label>
@@ -156,12 +162,12 @@
       <p>Êtes vous sûr de vouloir supprimer ce certificat ?</p>
       <dl>
         <dt>Site de Production</dt>
-        <dd id="modal_certif_delete_site"></dd>      
+        <dd id="modal_certif_delete_site"></dd>
         <dt>Numéro</dt>
-        <dd id="modal_certif_delete_num"></dd>                
+        <dd id="modal_certif_delete_num"></dd>
         <dt>Date d'expiration</dt>
         <dd id="modal_certif_delete_expi"></dd>
-      </dl>      
+      </dl>
       <input type="hidden" id="modal_certif_crtid" name="certif_id">
       <div class="form__group button__group">
         <a class="button secondary close" id="btn_close_modal_certif_delete">Annuler</a>
@@ -185,11 +191,11 @@ $(".autocomplete_biocarburant").autocomplete({
   minChars: 0,
   formatResult: function(suggestion, currentValue) {
     return `<span title="${suggestion.description}">${suggestion.value}</span>`
-  },    
+  },
   onSelect: function (suggestion) {
     $.ajax({
       url         : "{% url 'producers-api-settings-add-biocarburant' %}",
-      data        : {'site': $(this).attr('data-siteid'), 'biocarburant': suggestion.data, 
+      data        : {'site': $(this).attr('data-siteid'), 'biocarburant': suggestion.data,
                       'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
       type        : 'POST',
       success     : function(data, textStatus, jqXHR){
@@ -214,11 +220,11 @@ $(".autocomplete_mp").autocomplete({
   minChars: 0,
   formatResult: function(suggestion, currentValue) {
     return `<span title="${suggestion.description}">${suggestion.value}</span>`
-  },  
+  },
   onSelect: function (suggestion) {
     $.ajax({
       url         : "{% url 'producers-api-settings-add-mp' %}",
-      data        : {'site': $(this).attr('data-siteid'), 'matiere_premiere': suggestion.data, 
+      data        : {'site': $(this).attr('data-siteid'), 'matiere_premiere': suggestion.data,
                       'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
       type        : 'POST',
       success     : function(data, textStatus, jqXHR){
@@ -235,7 +241,7 @@ $(".autocomplete_mp").autocomplete({
         }
       }
     })
-  }  
+  }
 });
 
 </script>
