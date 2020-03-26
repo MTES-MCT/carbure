@@ -4,8 +4,6 @@
 <div class="main" style="overflow-x: auto;">
   <div class="panel">
     <h3>Export</h3>
-    <a class="button" id="btn_export_csv">Export CSV</a>
-
       <table class="display nowrap" id="datatable">
         <!-- dynamically generated in js -->
         <thead></thead>
@@ -32,7 +30,8 @@ $(document).ready(function() {
     fixedColumns: {
       rightColumns: 2,
     },
-    dom: "lrtip",
+    //dom: "lrtip",
+    dom: 'f<"toolbar">rtip',
     columnDefs: [
     {"className": "dt-center", "targets": "_all"}
     ],
@@ -71,6 +70,7 @@ $(document).ready(function() {
         }).draw()
       }
   })
+  $("div.toolbar").html('<a class="button" id="btn_export_csv">Export CSV</a>');
   window.table = table
 
   /* export button */

@@ -6,14 +6,13 @@
   <div class="panel">
     <h3>Attestation de Durabilité {{current_attestation.period}}</h3>
     {% csrf_token %}
-    <div class="button-container">
-      <div class="button-item">
-        <a class="button modal-button" id="btn_open_modal_import">Importer</a>
-        <a href="/static/files/template.csv" style="margin-left: -10px;"><small>Télécharger le modèle</small></a>
-      </div>
-      <div class="button-item button-push" style="margin-top: 30px;">
-        <a id="btn_open_modal_columns"><small>Affichage Colonnes</small></a>
-      </div>
+    <div class="flex-container">
+      <a class="button modal-button" id="btn_open_modal_import" style="margin-top: 0px;">Importer</a>
+      <a href="/static/files/template.csv" style="margin-left: -10px; margin-top: auto;"><small>Télécharger le modèle</small></a>
+      <label for="input_search_datatable" style="margin: auto 5px auto auto;">Rechercher:</label>
+      <input type="text" id="input_search_datatable" style="width: 200px; height: 2em;" />
+      <a id="btn_open_modal_columns" style="margin-left: auto; margin-top: auto;" ><small>Affichage Colonnes</small></a>
+      <a id="btn_export_csv" class="button primary" style="margin-top: 0px; margin-left: 5px;">Exporter</a>
     </div>
     <table class="display nowrap" id="datatable">
       <!-- dynamically generated in js -->
@@ -306,7 +305,7 @@ $(document).ready(function() {
     language: {
         search: "Rechercher:"
     },
-    //dom: "lrtip",
+    dom: 'rtip',
     columnDefs: [
     {"className": "dt-center", "targets": "_all"}
     ],
@@ -346,6 +345,10 @@ $(document).ready(function() {
     }
   })
   window.table = table
+
+  $('#input_search_datatable').on('keyup', function() {
+      table.search(this.value).draw();
+  });
 
   function loadTableSettings() {
     var tableSettings = localStorage.getItem('tableSettings');
@@ -515,6 +518,48 @@ $(document).ready(function() {
     };
     reader.readAsText(e.target.files[0]);
   })
+
+  /* export button */
+  var btn_export = document.getElementById("btn_export_csv")
+
+  btn_export.onclick = function() {
+    let header = []
+    const rows = []
+    for (let i = 0, len = table_columns.length; i < len; i++) {
+      if (table_columns[i].can_export !== false)
+        header.push(table_columns[i].data)
+    }
+    rows.push(header)
+
+    let data = table.rows().data()
+    console.log(`nb rows: ${data.length}`)
+    for (let i = 0, len = data.length; i < len; i++) {
+      // columns with commas will be wrapper in double quotes
+      let data_copy = []
+      for (let j = 0, ll = table_columns.length; j < ll; j++) {
+        let table_col = table_columns[j]
+        let coldata = data[i][table_col.data]
+        console.log(`line ${i} col ${j} data ${coldata}`)
+        if (typeof coldata == 'string' && coldata.includes(',')) {
+          coldata = `"${coldata}"`
+        }
+        if (table_col.can_export === true) {
+          data_copy.push(coldata)
+        }
+      }
+      rows.push(data_copy)
+    }
+    let csvContent = "data:text/csv;charset=utf-8,"
+      + rows.map(e => e.join(";")).join("\n");
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    let dt = new Date()
+    let dt_string = `${dt.getFullYear()}${dt.getMonth().toString().padStart(2, '0')}${dt.getDate().toString().padStart(2, '0')}_${dt.getHours().toString().padStart(2, '0')}${dt.getMinutes().toString().padStart(2, '0')}${dt.getSeconds()}`
+    link.setAttribute("download", `export_${dt_string}.csv`);
+    document.body.appendChild(link); // Required for FF
+    link.click();
+  }
 
   $("#modal_import_btn_finished").on('click', function() {
     // refresh page
