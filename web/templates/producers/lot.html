@@ -6,7 +6,7 @@
     <div class="panel__header">
       {% if lot %}
       <h3>Modifier Lot</h3>
-      <input type="hidden" id="lot_id" value="{{lot.id}}">      
+      <input type="hidden" id="lot_id" value="{{lot.id}}">
       {% else %}
       <h3>Nouveau Lot</h3>
       {% endif %}
@@ -46,7 +46,7 @@
           <dt>EU</dt>
           <dd><input type="text" id="eu" class="ges_field ges_incr" value="{{lot.eu|stringformat:'.1f'}}" style="width: 120px" /></dd>
         </dl>
-      </div>            
+      </div>
       <div class="form__group" style="margin-left: var(--space-l);">
         <div>
           <h3>Réductions de GES</h3>
@@ -61,7 +61,7 @@
           <dd><input type="text" id="eccr" class="ges_field ges_decr" value="{{lot.eccr|stringformat:'.1f'}}" style="width: 120px" /></dd>
           <dt>EEE</dt>
           <dd><input type="text" id="eee" class="ges_field ges_decr" value="{{lot.eee|stringformat:'.1f'}}" style="width: 120px" /></dd>
-        </dl>           
+        </dl>
       </div>
       <div class="form__group" style="margin-left: var(--space-l);">
         <h3 title="en gCO2eq/MJ">Bilan GES</h3>
@@ -72,8 +72,8 @@
           <dd><input type="text" id="ref" value="{{lot.ghg_reference|stringformat:'.1f'}}" style="width: 120px" /></dd>
           <dt>% réduction</dt>
           <dd><input type="text" id="pct_reduction" value="{{lot.ghg_reduction|stringformat:'.1f'}}" style="width: 120px" /></dd>
-        </dl>           
-      </div>       
+        </dl>
+      </div>
       <div class="form__group" style="margin-left: var(--space-l);">
         <h3>Destination</h3>
         <dl>
@@ -86,13 +86,13 @@
         <dt><label for="ea_delivery_date">Date de livraison</label></dt>
         <dd><input id="ea_delivery_date" type="text" value="{{lot.ea_delivery_date|date:'Y-m-d'}}" placeholder="AAAA-MM-DD" /></dd>
         <dt><label for="client_id" title="Champ optionnel, entrez ce que vous voulez">Référence</label></dt>
-        <dd><input id="client_id" type="text" value="{{lot.client_id}}" /></dd>        
-        </dl>                        
-      </div>                
+        <dd><input id="client_id" type="text" value="{{lot.client_id}}" /></dd>
+        </dl>
+      </div>
     </div>
     <div class="row">
       <div class="form__group flex-container-right button-push">
-        <a class="button secondary" href="{% url 'producers-attestation' attestation_id=attestation_id %}">Annuler</a>            
+        <a class="button secondary" href="{% url 'producers-attestation' attestation_id=attestation_id %}">Annuler</a>
         {% if lot %}
         <a id="btn_lot_save_edit" class="button primary">Enregistrer modifications</a>
         {% else %}
@@ -123,7 +123,7 @@
   }
 
   function handleSaveAndRedirect() {
-    handleSave(SAVE_AND_REDIRECT) 
+    handleSave(SAVE_AND_REDIRECT)
   }
 
   function handleSaveEdit() {
@@ -136,7 +136,7 @@
 
     // fill formdata
     formdata.set('attestation_id', '{{attestation_id}}')
-    {% if lot %} 
+    {% if lot %}
     formdata.set('lot_id', '{{lot.id}}')
     {% endif %}
     formdata.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
@@ -233,7 +233,7 @@ $(".autocomplete_mps").autocomplete({
     if (selected_bc !== '') {
       load_ges(suggestion.data, selected_bc.data)
     }
-  }  
+  }
 })
 
 $(".autocomplete_biocarburants").autocomplete({
@@ -265,7 +265,7 @@ $(".autocomplete_countries").autocomplete({
   dataType: 'json',
   onSelect: function(suggestion) {
     $("#code_pays").val(suggestion.data)
-  },  
+  },
 })
 
 $(".autocomplete_operators").autocomplete({
@@ -274,7 +274,7 @@ $(".autocomplete_operators").autocomplete({
   minChars: 0,
   onSelect: function(suggestion) {
     $("#client").val(suggestion.data)
-  },  
+  },
 })
 
 </script>
