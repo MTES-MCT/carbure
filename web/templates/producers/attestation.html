@@ -14,7 +14,7 @@
       <div class="button-item button-push" style="margin-top: 30px;">
         <a id="btn_open_modal_columns"><small>Affichage Colonnes</small></a>
       </div>
-    </div>  
+    </div>
     <table class="display nowrap" id="datatable">
       <!-- dynamically generated in js -->
       <thead></thead>
@@ -38,7 +38,7 @@
     <div class="flex-container-left">
       <a class="button primary" id="add_lot">Ajouter Lot</a>
       <a id="add_lot_params" style="margin-top: auto;"><small>Paramètres</small></a>
-    </div>    
+    </div>
     <div class="form__group" id="add_lot_params_toggle" style="display: none;">
       <fieldset>
         <legend><small>Sélectionnez les valeurs à dupliquer lors de l'ajout de lot</small></legend>
@@ -46,7 +46,7 @@
           <!-- dynamically generated in js -->
         </ul>
       </fieldset>
-    </div>          
+    </div>
   </div>
 </div>
 
@@ -55,7 +55,7 @@
     <span id="modal_delete_lots_form_err_message" style="color: red;"></span>
     <form id="modal_delete_lots_form" method="POST" data-url="{% url 'producers-api-delete-lots' %}">
       {% csrf_token %}
-      <p>Êtes vous sûr de vouloir supprimer ce(s) lot(s) ?</p>   
+      <p>Êtes vous sûr de vouloir supprimer ce(s) lot(s) ?</p>
       <ul id="modal_delete_lots_list">
       </ul>
       <input type="hidden" id="modal_delete_lots_lots" name="lots">
@@ -111,10 +111,10 @@
     <div class="flex-container">
       <table id="table_columns_filter">
         <!-- dynamically generated in js -->
-      </table>  
+      </table>
       <table id="table_columns_filter2">
         <!-- dynamically generated in js -->
-      </table>      
+      </table>
     </div>
     <div class="form__group button__group">
       <a class="button secondary close">Ok</a>
@@ -142,7 +142,7 @@
     success     : function(data, textStatus, jqXHR){
       // Callback code
       window.table.ajax.reload()
-      manage_actions()      
+      manage_actions()
     },
     error       : function(e) {
       if (e.status === 400) {
@@ -152,7 +152,7 @@
         alert("Server error. Please contact an administrator")
         console.log(`server error ${JSON.stringify(e)}`)
       }
-    }   
+    }
   })
 }
 
@@ -169,7 +169,7 @@ function manage_affiliate_button(draft_present) {
     $("#btn_affiliate").addClass('secondary')
     $("#btn_affiliate").removeClass('primary')
     $("#select_affiliate").prop("disabled", "disabled")
-  }  
+  }
 }
 
 function manage_validate_button(draft_present) {
@@ -177,8 +177,8 @@ function manage_validate_button(draft_present) {
     $("#btn_open_modal_validate_lots").addClass('primary')
     $("#btn_open_modal_validate_lots").removeClass('secondary')
     // add drafts to validate modal
-    $("#modal_validate_lots_list").empty() 
-    let to_validate = []       
+    $("#modal_validate_lots_list").empty()
+    let to_validate = []
     let keys = Object.keys(selected_rows)
     for (let i = 0, len = keys.length; i < len; i++) {
       let key = keys[i]
@@ -189,14 +189,14 @@ function manage_validate_button(draft_present) {
         to_validate.push(selected_rows[key]['id'])
       }
       $("#modal_validate_lots_lots").val(to_validate.join(","))
-    }      
-  
+    }
+
   } else {
     $("#btn_open_modal_validate_lots").addClass('secondary')
-    $("#btn_open_modal_validate_lots").removeClass('primary')   
+    $("#btn_open_modal_validate_lots").removeClass('primary')
     // cleanup validate modal
     $("#modal_validate_lots_list").empty()
-  }  
+  }
 }
 
 function manage_delete_button(only_drafts_present) {
@@ -204,8 +204,8 @@ function manage_delete_button(only_drafts_present) {
   if (keys.length > 0 && only_drafts_present === true) {
     $("#btn_open_modal_delete_lots").addClass('primary')
     $("#btn_open_modal_delete_lots").removeClass('secondary')
-    $("#modal_delete_lots_list").empty() 
-    let to_delete = []       
+    $("#modal_delete_lots_list").empty()
+    let to_delete = []
     let keys = Object.keys(selected_rows)
     for (let i = 0, len = keys.length; i < len; i++) {
       let key = keys[i]
@@ -216,7 +216,7 @@ function manage_delete_button(only_drafts_present) {
         to_delete.push(selected_rows[key]['id'])
       }
       $("#modal_delete_lots_lots").val(to_delete.join(","))
-    }  
+    }
   } else {
     $("#btn_open_modal_delete_lots").addClass('secondary')
     $("#btn_open_modal_delete_lots").removeClass('primary')
@@ -235,7 +235,7 @@ function manage_add_button() {
     $("#add_lot").text("Ajouter Lot")
     $("#add_lot").removeAttr("onclick")
     $("#add_lot").attr("href", "{% url 'producers-attestation-new-lot' attestation_id=current_attestation.id %}")
-  }  
+  }
 }
 
 function manage_actions() {
@@ -263,7 +263,7 @@ function manage_actions() {
 
 $(document).ready(function() {
 
- {% if message %}alert("{{message}}"){% endif %} 
+ {% if message %}alert("{{message}}"){% endif %}
 
   function initFilters() {
     var table_columns_filter = $("#table_columns_filter")
@@ -282,13 +282,13 @@ $(document).ready(function() {
           columns_filter_html2 += `<tr><td><input type="checkbox" id="checkbox${i}" class="toggle-vis" data-column="${i}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
         }
       }
-      if (column.can_duplicate === true) { 
+      if (column.can_duplicate === true) {
         list_columns_filter_html += `<li class="flex-item-a"><input type="checkbox" id="add_checkbox${i}" class="toggle-lot-param" data-column="${i}"><label for="add_checkbox${i}" class="label-inline">${column.title}</label></li>`
       }
     }
     table_columns_filter.append(columns_filter_html)
     table_columns_filter2.append(columns_filter_html2)
-    list_columns_filter.append(list_columns_filter_html)    
+    list_columns_filter.append(list_columns_filter_html)
   }
   initFilters()
 
@@ -303,7 +303,10 @@ $(document).ready(function() {
     fixedColumns: {
       rightColumns: 2,
     },
-    dom: "lrtip",
+    language: {
+        search: "Rechercher:"
+    },
+    //dom: "lrtip",
     columnDefs: [
     {"className": "dt-center", "targets": "_all"}
     ],
@@ -360,7 +363,7 @@ $(document).ready(function() {
     }
     return columns
   }
-  
+
   function loadAddLotSettings() {
     var addLotSettings = localStorage.getItem('addLotSettings');
     if (addLotSettings === undefined || addLotSettings === null) {
@@ -381,7 +384,7 @@ $(document).ready(function() {
   function saveAddLotSettings(settings) {
     console.log(`Saving ${settings}`)
     localStorage.setItem("addLotSettings", JSON.stringify(settings));
-  } 
+  }
 
   function showHideTableColumns(columns) {
     /* display table columns depending on config */
@@ -394,13 +397,13 @@ $(document).ready(function() {
       if (isChecked) {
         $(boxid).prop("checked", true);
         if (!column.visible()) {
-          column.visible(!column.visible()) 
+          column.visible(!column.visible())
         }
       } else {
         $(boxid).prop("checked", false);
         if (column.visible()) {
-          column.visible(!column.visible()) 
-        }       
+          column.visible(!column.visible())
+        }
       }
     }
   }
@@ -440,10 +443,10 @@ $(document).ready(function() {
   /* add lot settings */
   $('.toggle-lot-param').on('click', function(e) {
     let colid = $(this).attr('data-column')
-    let column = table.column(colid);   
+    let column = table.column(colid);
     addLotSettings[colid] = addLotSettings[colid] == 1 ? 0 : 1
     saveAddLotSettings(addLotSettings)
-  }); 
+  });
 
   /* import file */
   $("#file_to_upload").on('change', function(e) {
@@ -523,7 +526,7 @@ $(document).ready(function() {
   $('#datatable_wrapper tbody').on('click', 'input', function() {
     let hrow = $(this).closest("tr")
     let row = table.row(hrow)
-    let data = table.row(row).data(); 
+    let data = table.row(row).data();
     let rowid = table.row(row).index();
     // add to selection if checked, otherwise remove
     if (rowid in selected_rows) {
@@ -540,13 +543,13 @@ $(document).ready(function() {
     let colid = cell.index()['column']
     let row = $(this).closest('tr');
     let data = table.row(row).data()
-    let table_column = table_columns[colid] 
+    let table_column = table_columns[colid]
     let attestation_id = "{{attestation_id}}"
     let lot_id = data['id']
     if (table_column['data'] === 'checkbox') {
       // ignore clicks on checkbox column
       return
-    } else {  
+    } else {
       window.location = "{% url 'producers-attestation-edit-lot' attestation_id=current_attestation.id lot_id=22222  %}".replace('22222', lot_id)
     }
   });
@@ -570,7 +573,7 @@ $(document).ready(function() {
         $("#datatable_wrapper").find('input').prop('checked', false)
         for (const key in selected_rows) {
           delete selected_rows[key]
-        }         
+        }
       }
       console.log(`${Object.keys(selected_rows).length} rows selected`)
       manage_actions()
@@ -596,7 +599,7 @@ $(document).on({
     });
     $("table.dataTable.DTFC_Cloned tbody").each(function(index) {
       $(this).find("tr:eq("+trIndex+")").removeClass("hover");
-    });   
+    });
   }
 }, ".dataTables_wrapper tbody tr");
 
