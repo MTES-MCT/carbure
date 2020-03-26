@@ -120,10 +120,11 @@ def producers_biocarburant_autocomplete(request, *args, **kwargs):
   production_site = request.GET.get('production_site', None)
   if production_site == None:
     production_sites = ProductionSite.objects.filter(producer=producer_id)
-    outputs = ProductionSiteOutput.objects.filter(production_site__in=production_sites, biocarburant__name__icontains=q)
+    outputs = ProductionSiteOutput.objects.filter(production_site__in=production_sites, biocarburant__name__icontains=q).values('biocarburant').distinct()
   else:
-    outputs = ProductionSiteOutput.objects.filter(production_site=production_site, biocarburant__name__icontains=q)
-  return JsonResponse({'suggestions': [{'value':s.biocarburant.name, 'data':s.biocarburant.code} for s in outputs]})
+    outputs = ProductionSiteOutput.objects.filter(production_site=production_site, biocarburant__name__icontains=q).values('biocarburant').distinct()
+  bcs = Biocarburant.objects.filter(id__in=outputs)
+  return JsonResponse({'suggestions': [{'value':s.name, 'data':s.code} for s in bcs]})
 
 @login_required
 @enrich_with_user_details
@@ -135,10 +136,11 @@ def producers_mp_autocomplete(request, *args, **kwargs):
   production_site = request.GET.get('production_site', None)
   if production_site == None:
     production_sites = ProductionSite.objects.filter(producer=producer_id)
-    inputs = ProductionSiteInput.objects.filter(production_site__in=production_sites, matiere_premiere__name__icontains=q)
+    inputs = ProductionSiteInput.objects.filter(production_site__in=production_sites, matiere_premiere__name__icontains=q).values('matiere_premiere').distinct()
   else:
-    inputs = ProductionSiteInput.objects.filter(production_site=production_site, matiere_premiere__name__icontains=q)
-  return JsonResponse({'suggestions': [{'value':s.matiere_premiere.name, 'data':s.matiere_premiere.code} for s in inputs]})
+    inputs = ProductionSiteInput.objects.filter(production_site=production_site, matiere_premiere__name__icontains=q).values('matiere_premiere').distinct()
+  mps = MatierePremiere.objects.filter(id__in=inputs)
+  return JsonResponse({'suggestions': [{'value':s.name, 'data':s.code} for s in mps]})
 
 @login_required
 @enrich_with_user_details
