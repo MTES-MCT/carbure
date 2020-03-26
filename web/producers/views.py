@@ -87,7 +87,7 @@ def producers_attestation(request, *args, **kwargs):
   context = kwargs['context']
   attestation_id = kwargs['attestation_id']
   context['current_url_name'] = 'producers-attestation'
-  
+
   attestations = AttestationProducer.objects.filter(producer=context['user_entity'])
   current_attestation_qs = attestations.filter(id=attestation_id)
   if len(current_attestation_qs) == 0:
@@ -115,13 +115,6 @@ def producers_attestation(request, *args, **kwargs):
     context['message'] = "Création du lot réussie"
   return render(request, 'producers/attestation.html', context)
 
-@login_required
-@enrich_with_user_details
-@restrict_to_producers
-def producers_export(request, *args, **kwargs):
-  context = kwargs['context']
-  context['current_url_name'] = 'producers-export'
-  return render(request, 'producers/export.html', context)
 
 @login_required
 @enrich_with_user_details
@@ -188,6 +181,6 @@ def producers_edit_lot(request, *args, **kwargs):
 
   context['lot'] = Lot.objects.get(id=kwargs['lot_id'])
   if request.GET.get('saved', None):
-    context['message'] = "Sauvegarde du lot réussie"    
+    context['message'] = "Sauvegarde du lot réussie"
   context['current_url_name'] = 'producers-attestation-edit-lot'
   return render(request, 'producers/lot.html', context)
