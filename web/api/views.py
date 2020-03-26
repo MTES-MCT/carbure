@@ -82,10 +82,21 @@ def operators_csv(request):
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
-def producers_sample_lots(request, *args, **kwargs):
+def producers_lots(request, *args, **kwargs):
   context = kwargs['context']
-  data = serializers.serialize('json', Lot.objects.all(), fields=('carbure_id', 'producer', 'production_site', 'dae', 'ea_delivery_date', 'ea_delivery_site', 'ea', 'volume',
-    'matiere_premiere', 'biocarburant', 'pays_origine', 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'e', 'ghg_reference', 'ghg_reduction',
+  attestation_id = kwargs['attestation_id']
+  data = serializers.serialize('json', Lot.objects.filter(attestation_id=attestation_id), fields=('carbure_id', 'producer', 'production_site', 'dae', 'ea_delivery_date', 'ea_delivery_site', 'ea', 'volume',
+    'matiere_premiere', 'biocarburant', 'pays_origine', 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'e', 'ghg_reference', 'ghg_reduction', 'ea_overriden', 'ea_override',
+    'client_id', 'status'), use_natural_foreign_keys=True)
+  return HttpResponse(data, content_type='application/json')
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_all_lots(request, *args, **kwargs):
+  context = kwargs['context']
+  data = serializers.serialize('json', Lot.objects.filter(producer=context['user_entity']), fields=('carbure_id', 'producer', 'production_site', 'dae', 'ea_delivery_date', 'ea_delivery_site', 'ea', 'volume',
+    'matiere_premiere', 'biocarburant', 'pays_origine', 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'e', 'ghg_reference', 'ghg_reduction', 'ea_overriden', 'ea_override',
     'client_id', 'status'), use_natural_foreign_keys=True)
   return HttpResponse(data, content_type='application/json')
 
@@ -374,6 +385,8 @@ def producers_save_lot(request, *args, **kwargs):
   num_dae = request.POST.get('dae', None)
   ea_delivery_date = request.POST.get('ea_delivery_date', None)
   ea = request.POST.get('ea', None)
+  ea_display = request.POST.get('ea_display', None)
+
   ea_delivery_site = request.POST.get('ea_delivery_site', '')
   client_id = request.POST.get('client_id', None)
 
@@ -453,20 +466,19 @@ def producers_save_lot(request, *args, **kwargs):
 
 
   # production site can be either ID or name or nothing
-  try:
-    ea_id = int(ea)
-  except ValueError:
-    ea_id = None
-
-  try:
-    if ea_id:
+  if ea:
+    try:
+      ea_id = int(ea)
       lot.ea = Entity.objects.get(id=ea_id)
-    elif ea:
-      lot.ea = Entity.objects.get(name__iexact=ea)
-    else:
-      pass
-  except:
-    return JsonResponse({'status':'error', 'message':"Client %s inconnu" % (ea)}, status=400)
+    except ValueError:
+      return JsonResponse({'status':'error', 'message':"ID Client inconnu"}, status=400)
+  elif ea_display:
+    lot.ea_overriden = True
+    lot.ea_override = ea_display
+  else:
+    lot.ea_overriden = False
+    lot.ea_override = ''
+    lot.ea = None
 
   lot.client_id = client_id
   lot.save()

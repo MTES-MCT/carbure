@@ -13,10 +13,11 @@ urlpatterns = [
     path('biocarburant-csv/', views.biocarburant_csv, name='api-biocarburant-csv'),
     path('matiere-premiere-csv/', views.matiere_premiere_csv, name='api-matiere-premiere-csv'),
     path('country-csv/', views.country_csv, name='api-country-csv'),
-    path('operators-csv/', views.operators_csv, name='api-operators-csv'),    
+    path('operators-csv/', views.operators_csv, name='api-operators-csv'),
 
     # private, producers
-    path('producers/sample-lots', views.producers_sample_lots, name='api-producers-sample-lots'),
+    path('producers/lots/<int:attestation_id>', views.producers_lots, name='api-producers-lots'),
+    path('producers/lots', views.producers_all_lots, name='api-producers-all-lots'),
     path('producers/production-sites-autocomplete/', views.producers_prod_site_autocomplete, name='producers-api-production-sites-autocomplete'),
     path('producers/biocarburant-autocomplete/', views.producers_biocarburant_autocomplete, name='producers-api-biocarburants-autocomplete'),
     path('producers/mp-autocomplete/', views.producers_mp_autocomplete, name='producers-api-mps-autocomplete'),

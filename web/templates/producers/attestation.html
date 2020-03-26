@@ -312,7 +312,7 @@ $(document).ready(function() {
     ],
     columns: table_columns,
     ajax: {
-      url: `{% url 'api-producers-sample-lots' %}`,
+      url: `{% url 'api-producers-lots' attestation_id=current_attestation.id %}`,
       dataSrc: function(json) {
         for (let i = 0, len = json.length; i < len; i++) {
           let lot_id = json[i]['pk']
