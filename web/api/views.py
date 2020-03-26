@@ -11,7 +11,7 @@ import logging
 import datetime
 import csv
 
-# public 
+# public
 def biocarburant_autocomplete(request):
   q = request.GET['query']
   logging.info('[autocomplete] biocarburant: query [%s]' % (q))
@@ -126,7 +126,7 @@ def producers_mp_autocomplete(request, *args, **kwargs):
     production_sites = ProductionSite.objects.filter(producer=producer_id)
     inputs = ProductionSiteInput.objects.filter(production_site__in=production_sites, matiere_premiere__name__icontains=q)
   else:
-    inputs = ProductionSiteInput.objects.filter(production_site=production_site, matiere_premiere__name__icontains=q)  
+    inputs = ProductionSiteInput.objects.filter(production_site=production_site, matiere_premiere__name__icontains=q)
   return JsonResponse({'suggestions': [{'value':s.matiere_premiere.name, 'data':s.matiere_premiere.code} for s in inputs]})
 
 @login_required
@@ -178,10 +178,10 @@ def producers_validate_lots(request, *args, **kwargs):
   lot_ids = request.POST.get('lots', None)
   if not lot_ids:
     return JsonResponse({'status':'error', 'message':'Missing lot ids'}, status=400)
-  
+
   ids = lot_ids.split(',')
   for lotid in ids:
-    lot = Lot.objects.get(id=lotid, producer=context['user_entity'])  
+    lot = Lot.objects.get(id=lotid, producer=context['user_entity'])
     # make sure all mandatory fields are set
     if lot.dae != '' and lot.ea_delivery_date and lot.ea_delivery_site and lot.ea and lot.volume and lot.pays_origine:
       try:
@@ -201,7 +201,7 @@ def producers_validate_lots(request, *args, **kwargs):
 @restrict_to_producers
 def producers_settings_add_certif(request, *args, **kwargs):
   context = kwargs['context']
-  
+
   certif_id = request.POST.get('certif_id')
   if certif_id == None:
     return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ Identifiant"}, status=400)
@@ -222,7 +222,7 @@ def producers_settings_add_certif(request, *args, **kwargs):
   except Exception as e:
     return JsonResponse({'status':'error', 'message':"Site de production inconnu"}, status=400)
 
-  form_file = request.FILES.get('file', None)  
+  form_file = request.FILES.get('file', None)
   if form_file == None:
     return JsonResponse({'status':'error', 'message':"Veuillez sélectionner un certificat (fichier PDF)"}, status=400)
 
@@ -237,14 +237,14 @@ def producers_settings_add_certif(request, *args, **kwargs):
 @restrict_to_producers
 def producers_settings_delete_certif(request, *args, **kwargs):
   context = kwargs['context']
-  
+
   certif_id = request.POST.get('certif_id')
   if certif_id == None:
     return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ Identifiant"}, status=400)
 
   try:
     crt = ProducerCertificate.objects.get(id=certif_id, producer=context['user_entity'])
-    crt.delete()    
+    crt.delete()
   except Exception as e:
     return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
   return JsonResponse({'status':'success', 'message':'Certificate deleted'})
@@ -254,7 +254,7 @@ def producers_settings_delete_certif(request, *args, **kwargs):
 @restrict_to_producers
 def producers_settings_add_site(request, *args, **kwargs):
   context = kwargs['context']
-  
+
   country = request.POST.get('country')
   name = request.POST.get('name')
   date_mise_en_service = request.POST.get('date_mise_en_service')
@@ -287,7 +287,7 @@ def producers_settings_add_site(request, *args, **kwargs):
 @restrict_to_producers
 def producers_settings_add_mp(request, *args, **kwargs):
   context = kwargs['context']
-  
+
   site = request.POST.get('site')
   mp = request.POST.get('matiere_premiere')
 
@@ -381,7 +381,7 @@ def producers_save_lot(request, *args, **kwargs):
     lot = Lot.objects.get(id=lot_id)
   else:
     lot = Lot()
-    
+
   lot.attestation = AttestationProducer.objects.get(id=attestation_id)
   lot.producer = context['user_entity']
 
@@ -390,13 +390,16 @@ def producers_save_lot(request, *args, **kwargs):
     production_site_id = int(production_site)
   except ValueError:
     production_site_id = None
-  try:
-    if production_site_id:
+  if production_site_id:
+    try:
       lot.production_site = ProductionSite.objects.get(id=production_site_id)
-    else:
+    except Exception as e:
+      return JsonResponse({'status':'error', 'message':"ID site de production [%d] inconnu" % (production_site_id), 'extra': str(e)}, status=400)
+  else:
+    try:
       lot.production_site = ProductionSite.objects.get(name__iexact=production_site)
-  except:
-    return JsonResponse({'status':'error', 'message':"Site de Production inconnu."}, status=400)
+    except Exception as e:
+      return JsonResponse({'status':'error', 'message':"Site de Production [%s] inconnu." % (production_site), 'extra': str(e)}, status=400)
 
   if volume:
     lot.volume = float(volume)
@@ -404,8 +407,8 @@ def producers_save_lot(request, *args, **kwargs):
     lot.matiere_premiere = MatierePremiere.objects.get(code=matiere_premiere)
   except:
     return JsonResponse({'status':'error', 'message':"Matiere premiere inconnue."}, status=400)
-  
-  try:  
+
+  try:
     lot.biocarburant = Biocarburant.objects.get(code=biocarburant)
   except:
     return JsonResponse({'status':'error', 'message':"Type de biocarburant inconnu."}, status=400)
@@ -436,7 +439,7 @@ def producers_save_lot(request, *args, **kwargs):
   if eee:
     lot.eee = float(eee)
 
-  lot.ghg_total = lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee 
+  lot.ghg_total = lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee
   lot.ghg_reference = 0
   lot.ghg_reduction = 0
 
@@ -449,18 +452,21 @@ def producers_save_lot(request, *args, **kwargs):
   lot.ea_delivery_site = ea_delivery_site
 
 
-  # production site can be either ID or name
+  # production site can be either ID or name or nothing
   try:
     ea_id = int(ea)
   except ValueError:
     ea_id = None
+
   try:
     if ea_id:
       lot.ea = Entity.objects.get(id=ea_id)
-    else:
+    elif ea:
       lot.ea = Entity.objects.get(name__iexact=ea)
+    else:
+      pass
   except:
-    return JsonResponse({'status':'error', 'message':"Site de Production %s inconnu" % (ea)}, status=400)
+    return JsonResponse({'status':'error', 'message':"Client %s inconnu" % (ea)}, status=400)
 
   lot.client_id = client_id
   lot.save()
