@@ -14,19 +14,19 @@
 					<th>Période</th>
 					<th>Lots</th>
 					<th>Brouillons</th>
-					<th>À Assigner</th>
+					<th>À Affilier</th>
 					<th>Échéance</th>
 				</tr>
 			</thead>
 			<tbody>
 				{% for a in attestations %}
-				<tr 
-					{% if a.deadline > today and a.deadline < twoweeks %} 
-					class="status_warning" 
+				<tr
+					{% if a.deadline > today and a.deadline < twoweeks %}
+					class="status_warning"
 					{% elif a.deadline > today %}
 					class="clickable"
 					{% else %}
-					class="status_ok" 
+					class="status_ok"
 					{% endif %}
 					onclick="window.location='{% url 'producers-attestation' attestation_id=a.id %}'">
 					<td>{{a.period}}</td>
@@ -34,7 +34,7 @@
 					<td>{{a.drafts}}</td>
 					<td>{{a.to_affiliate}}</td>
 					<td>{{a.deadline}}</td>
-				</tr>				
+				</tr>
 				{% endfor %}
 			</tbody>
 		</table>
