@@ -136,7 +136,6 @@ class Lot(models.Model):
     eccs = models.FloatField(default=0.0)
     eccr = models.FloatField(default=0.0)
     eee = models.FloatField(default=0.0)
-    e = models.FloatField(default=0.0)
     ghg_total = models.FloatField(default=0.0)
     ghg_reference = models.FloatField(default=0.0)
     ghg_reduction = models.FloatField(default=0.0)
