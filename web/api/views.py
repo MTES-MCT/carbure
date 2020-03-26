@@ -159,12 +159,14 @@ def producers_duplicate_lot(request, *args, **kwargs):
     return JsonResponse({'status':'error', 'message':'Missing lot id'}, status=400)
   else:
     lot = Lot.objects.get(id=lot_id)
-    lot.pk = None
-    lot.status = 'Draft'
-    lot.carbure_id = ''
-    lot.dae = ''
-    lot.save()
-    return JsonResponse({'status':'success', 'message':'OK'})
+    new = Lot()
+    new.attestation = lot.attestation
+    fields = request.POST.getlist('fields[]')
+    for f in fields:
+      value = getattr(lot, f)
+      setattr(new, f, value)
+    new.save()
+    return JsonResponse({'status':'success', 'message':'OK, lot %d created: %d %s' % (new.id, new.volume, new.status)})
 
 @login_required
 @enrich_with_user_details

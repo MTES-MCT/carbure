@@ -26,7 +26,7 @@ var table_columns = [
 {title:'Date d\'entrée<br />en EA', can_hide: true, can_duplicate: true, can_export: true, data:'ea_delivery_date'},
 {title:'Client', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data: 'ea'},
 {title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data: 'ea_delivery_site'},
-{title:'Statut', can_hide: true, can_duplicate: true, read_only: true, can_filter: true, can_export: false, data: 'status'},
+{title:'Statut', can_hide: true, can_duplicate: false, read_only: true, can_filter: true, can_export: false, data: 'status'},
 {title:`<input type="checkbox" id="checkbox_header"/>`, can_hide: false, can_duplicate: false, read_only: true, can_export: false, data:'checkbox'},
 ]
 
@@ -152,4 +152,75 @@ $(document).ready(function() {
 
 
 
+function loadTableSettings() {
+  var tableSettings = localStorage.getItem('tableSettings');
+  if (tableSettings === undefined || tableSettings === null) {
+    let nb_columns = table.columns().data().length
+    columns = Array(nb_columns).fill(1);
+    saveTableSettings(columns)
+  } else {
+    columns = JSON.parse(tableSettings)
+    let nb_columns = table.columns().data().length
+    if (columns.length !== nb_columns) {
+      columns = Array(nb_columns).fill(1);
+      saveTableSettings(columns)
+    }
+  }
+  return columns
+}
 
+function loadAddLotSettings() {
+  var addLotSettings = localStorage.getItem('addLotSettings');
+  if (addLotSettings === undefined || addLotSettings === null) {
+    let nb_columns = table.columns().data().length
+    columns = Array(nb_columns).fill(1);
+    saveAddLotSettings(columns)
+  } else {
+    columns = JSON.parse(addLotSettings)
+  }
+  return columns
+}
+
+function saveTableSettings(settings) {
+  localStorage.setItem("tableSettings", JSON.stringify(settings));
+}
+
+function saveAddLotSettings(settings) {
+  localStorage.setItem("addLotSettings", JSON.stringify(settings));
+}
+
+function showHideTableColumns(columns) {
+  /* display table columns depending on config */
+  let nb_columns = table.columns().data().length
+
+  for (let i = 0, len = nb_columns; i < len; i++) {
+    let isChecked = columns[i]
+    let boxid = '#checkbox' + i
+    var column = table.column(i)
+    if (isChecked) {
+      $(boxid).prop("checked", true);
+      if (!column.visible()) {
+        column.visible(!column.visible())
+      }
+    } else {
+      $(boxid).prop("checked", false);
+      if (column.visible()) {
+        column.visible(!column.visible())
+      }
+    }
+  }
+}
+
+function preCheckAddLotSettings(columns) {
+  /* checks checkboxes according to config */
+  let nb_columns = table.columns().data().length
+  for (let i = 0, len = nb_columns; i < len; i++) {
+    let isChecked = columns[i]
+    let boxid = '#add_checkbox' + i
+    if (isChecked) {
+      $(boxid).prop("checked", true);
+    } else {
+      $(boxid).prop("checked", false);
+    }
+  }
+}
