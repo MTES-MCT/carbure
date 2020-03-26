@@ -79,8 +79,8 @@
         <dl>
         <dt><label for="dae">Numéro de DAE</label></dt>
         <dd><input id="dae" type="text" value="{{lot.dae}}" /></dd>
-        <dt><label for="client_display">Client</label></dt>
-        <dd><input type="text" id="client_display" class="autocomplete_operators" value="{{lot.ea.name}}" /><input type="hidden" id="ea" value="{{lot.ea.id}}" /></dd>
+        <dt><label for="ea_display">Client</label></dt>
+        <dd><input type="text" id="ea_display" class="autocomplete_operators" value="{% if lot.ea_overriden %}{{lot.ea_override}}{% else %}{{lot.ea.name}}{% endif%}" /><input type="hidden" id="ea" value="{{lot.ea.id}}" /></dd>
         <dt><label for="ea_delivery_site">Site de livraison</label></dt>
         <dd><input id="ea_delivery_site" type="text" value="{{lot.ea_delivery_site}}" /></dd>
         <dt><label for="ea_delivery_date">Date de livraison</label></dt>
@@ -275,6 +275,9 @@ $(".autocomplete_operators").autocomplete({
   onSelect: function(suggestion) {
     $("#client").val(suggestion.data)
   },
+  onInvalidateSelection: function() {
+    $("#client").val('')
+  }
 })
 
 </script>

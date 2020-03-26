@@ -116,6 +116,8 @@ class Lot(models.Model):
     ea_delivery_date = models.DateField(blank=True, null=True)
     ea_delivery_site = models.CharField(max_length=64, blank=True, default='')
     ea = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='ea')
+    ea_override = models.CharField(max_length=64, null=True, blank=True)
+    ea_overriden = models.BooleanField(default=False)
 
     # lot details
     volume = models.IntegerField(default=0)
