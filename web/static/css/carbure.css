@@ -53,7 +53,7 @@
 
 .flex-container {
 	display: flex;
-	justify-content: space-evenly;	
+	justify-content: space-evenly;
 }
 
 .flex-container-right {
@@ -87,7 +87,7 @@ table > tbody > tr > td {
 #datatable_wrapper > div > div.DTFC_RightWrapper > div.DTFC_RightBodyWrapper > div > table > tbody > tr.status_ok,
 #datatable_wrapper > div > div.DTFC_RightWrapper > div.DTFC_RightBodyWrapper > div > table > tbody > tr.status_ok td.sorting_1 {
 	background: var(--light-green);
-  cursor: pointer;  
+  cursor: pointer;
 }
 
 #datatable > tbody > tr.status_warning,
@@ -110,12 +110,12 @@ table > tbody > tr > td {
 
 .flex-container-a {
   display: flex;
-  
+
   flex-flow: row wrap;
-  
+
   /* Then we define how is distributed the remaining space */
   justify-content: space-around;
-  
+
   padding: 0;
   margin: 0;
   list-style: none;
@@ -128,7 +128,7 @@ table > tbody > tr > td {
   text-align: center;
 }
 
-.button-container {  
+.button-container {
   display: flex;
 }
 
@@ -147,3 +147,6 @@ table > tbody > tr > td {
 .autocomplete-group { padding: 2px 5px; }
 .autocomplete-group strong { display: block; border-bottom: 1px solid #000; }
 
+#table_lot_ges tbody td input {
+	width: 100px;
+}

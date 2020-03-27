@@ -15,7 +15,7 @@
     <h4 style="color: green">{{message}}</h4>
     <div class="flex-container">
       <div class="form__group" style="margin-top: var(--space-l);">
-        <h3>Informations</h3>
+        <h3 style="text-align: center;">Informations</h3>
         <dl>
           <dt>Site de Production</dt>
           <dd><input type="text" id="production_site_display" class="autocomplete_production_sites" value="{{lot.production_site.name}}" /><input type="hidden" id="production_site" value="{{lot.production_site.id}}" /></dd>
@@ -30,52 +30,7 @@
         </dl>
       </div>
       <div class="form__group" style="margin-left: var(--space-l);">
-        <div>
-          <h3>Émissions de GES</h3>
-          <span style="margin-top: -2.5em; display: block; text-align: right;"><small>en gCO2eq/MJ</small></span>
-        </div>
-        <dl>
-          <dt>EEC</dt>
-          <dd><input type="text" id="eec" class="ges_field ges_incr" value="{{lot.eec|stringformat:'.1f'}}" style="width: 120px" /></dd>
-          <dt>EL</dt>
-          <dd><input type="text" id="el" class="ges_field ges_incr" value="{{lot.el|stringformat:'.1f'}}" style="width: 120px"/></dd>
-          <dt>EP</dt>
-          <dd><input type="text" id="ep" class="ges_field ges_incr" value="{{lot.ep|stringformat:'.1f'}}" style="width: 120px" /></dd>
-          <dt>ETD</dt>
-          <dd><input type="text" id="etd" class="ges_field ges_incr" value="{{lot.etd|stringformat:'.1f'}}" style="width: 120px" /></dd>
-          <dt>EU</dt>
-          <dd><input type="text" id="eu" class="ges_field ges_incr" value="{{lot.eu|stringformat:'.1f'}}" style="width: 120px" /></dd>
-        </dl>
-      </div>
-      <div class="form__group" style="margin-left: var(--space-l);">
-        <div>
-          <h3>Réductions de GES</h3>
-          <span style="margin-top: -2.5em; display: block; text-align: right;"><small>en gCO2eq/MJ</small></span>
-        </div>
-        <dl>
-          <dt>ESCA</dt>
-          <dd><input type="text" id="esca" class="ges_field ges_decr" value="{{lot.esca|stringformat:'.1f'}}" style="width: 120px" /></dd>
-          <dt>ECCS</dt>
-          <dd><input type="text" id="eccs" class="ges_field ges_decr" value="{{lot.eccs|stringformat:'.1f'}}" style="width: 120px" /></dd>
-          <dt>ECCR</dt>
-          <dd><input type="text" id="eccr" class="ges_field ges_decr" value="{{lot.eccr|stringformat:'.1f'}}" style="width: 120px" /></dd>
-          <dt>EEE</dt>
-          <dd><input type="text" id="eee" class="ges_field ges_decr" value="{{lot.eee|stringformat:'.1f'}}" style="width: 120px" /></dd>
-        </dl>
-      </div>
-      <div class="form__group" style="margin-left: var(--space-l);">
-        <h3 title="en gCO2eq/MJ">Bilan GES</h3>
-        <dl>
-          <dt>Total émissions GES</dt>
-          <dd><input type="text" id="ges_total" value="{{lot.ghg_total|stringformat:'.1f'}}" style="width: 120px" /></dd>
-          <dt>Émissions de référence</dt>
-          <dd><input type="text" id="ref" value="{{lot.ghg_reference|stringformat:'.1f'}}" style="width: 120px" /></dd>
-          <dt>% réduction</dt>
-          <dd><input type="text" id="pct_reduction" value="{{lot.ghg_reduction|stringformat:'.1f'}}" style="width: 120px" /></dd>
-        </dl>
-      </div>
-      <div class="form__group" style="margin-left: var(--space-l);">
-        <h3>Destination</h3>
+        <h3 style="text-align: center;">Destination</h3>
         <dl>
         <dt><label for="dae">Numéro de DAE</label></dt>
         <dd><input id="dae" type="text" value="{{lot.dae}}" /></dd>
@@ -88,6 +43,73 @@
         <dt><label for="client_id" title="Champ optionnel, entrez ce que vous voulez">Référence</label></dt>
         <dd><input id="client_id" type="text" value="{{lot.client_id}}" /></dd>
         </dl>
+      </div>
+      <div class="form__group" style="margin-left: var(--space-l);">
+        <h3>Gaz à Effet de Serre</h3>
+        <span style="margin-top: -2.5em; display: block; text-align: left;"><small>en gCO2eq/MJ</small></span>
+        <table id="table_lot_ges">
+          <thead>
+            <th>Émissions</th>
+            <th>Réductions</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <label for="eec">EEC </label><input type="text" id="eec" class="ges_field ges_incr" value="{{lot.eec|stringformat:'.1f'}}" />
+              </td>
+              <td>
+                <label for="esca">ESCA </label><input type="text" id="esca" class="ges_field ges_decr" value="{{lot.esca|stringformat:'.1f'}}" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label>EL </label><input type="text" id="el" class="ges_field ges_incr" value="{{lot.el|stringformat:'.1f'}}" />
+              </td>
+              <td>
+                <label>ECCS </label><input type="text" id="eccs" class="ges_field ges_decr" value="{{lot.eccs|stringformat:'.1f'}}" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label>EP </label><input type="text" id="ep" class="ges_field ges_incr" value="{{lot.ep|stringformat:'.1f'}}" />
+              </td>
+              <td>
+                <label>ECCR </label><input type="text" id="eccr" class="ges_field ges_decr" value="{{lot.eccr|stringformat:'.1f'}}" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label>ETD </label><input type="text" id="etd" class="ges_field ges_incr" value="{{lot.etd|stringformat:'.1f'}}" />
+              </td>
+              <td>
+                <label>EEE </label><input type="text" id="eee" class="ges_field ges_decr" value="{{lot.eee|stringformat:'.1f'}}" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label>EU </label><input type="text" id="eu" class="ges_field ges_incr" value="{{lot.eu|stringformat:'.1f'}}" />
+              </td>
+              <td>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th>Valeur de reference</th>
+              <th>Lot</th>
+              <th>Pourcentage de reduction</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th id="ref">{{lot.ghg_reference|stringformat:'.1f'}}</th>
+              <th id="ges_total">{{lot.ghg_total|stringformat:'.1f'}}</th>
+              <th id="pct_reduction">{{lot.ghg_reduction|stringformat:'.1f'}}%</th>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     <div class="row">
@@ -190,7 +212,11 @@ function load_ges(mp, bc) {
     success     : function(data, textStatus, jqXHR) {
       // Callback code
       $.each(data, function(key, value) {
-        $(`#${key}`).val(value)
+        if (key !== "ref") {
+         $(`#${key}`).val(value)
+        } else {
+         $(`#${key}`).text(value)
+        }
       })
       $("#eec").change()
     },
@@ -205,10 +231,9 @@ function load_ges(mp, bc) {
 }
 
 $(".ges_field").on('change', function() {
-  console.log('ges_field change')
   var sum_incr = 0
   var sum_decr = 0
-  var ref = parseFloat($("#ref").val())
+  var ref = parseFloat($("#ref").html())
   $(".ges_incr").each(function(index, elem) {
     sum_incr += parseFloat(elem.value)
   })
@@ -216,10 +241,10 @@ $(".ges_field").on('change', function() {
     sum_decr += parseFloat(elem.value)
   })
   var sum = sum_incr - sum_decr
-  $("#ges_total").val(sum)
-  var pct_reduction = 1.0 - (sum / ref) * 100
+  $("#ges_total").text(sum)
+  var pct_reduction = (1.0 - (sum / ref)) * 100
   console.log(`pct reduc ${sum} ${ref} ${pct_reduction}`)
-  $("#pct_reduction").val(pct_reduction)
+  $("#pct_reduction").text(`${pct_reduction.toFixed(2)}%`)
 })
 
 $(".autocomplete_mps").autocomplete({
