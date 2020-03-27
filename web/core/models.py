@@ -152,3 +152,22 @@ class Lot(models.Model):
         db_table = 'lots'
         verbose_name = 'Lot'
         verbose_name_plural = 'Lots'
+
+class GHGValues(models.Model):
+    GHG_FIELDS = (('eec', 'eec'), ('ep', 'ep'), ('etd', 'etd'), ('xxx', 'xxx'))
+
+    matiere_premiere = models.ForeignKey(MatierePremiere, blank=True, null=True, on_delete=models.CASCADE)
+    biocarburant = models.ForeignKey(Biocarburant, on_delete=models.CASCADE)
+    condition = models.CharField(max_length=256, null=True, blank=True)
+    field = models.CharField(max_length=8, choices=GHG_FIELDS, default='xxx')
+    is_default_value = models.BooleanField(default=False)
+    is_typical_value = models.BooleanField(default=False)
+    value = models.FloatField(default=0.0)
+
+    def __str__(self):
+        return '%s - %s - %s -  %f' % (self.biocarburant.name, self.matiere_premiere.name, self.field, self.value)
+
+    class Meta:
+        db_table = 'ghg_values'
+        verbose_name = 'Valeur GES de référence'
+        verbose_name_plural = 'Valeurs GES de référence'
