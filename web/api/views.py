@@ -457,8 +457,8 @@ def producers_save_lot(request, *args, **kwargs):
     lot.eee = float(eee)
 
   lot.ghg_total = lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee
-  lot.ghg_reference = 0
-  lot.ghg_reduction = 0
+  lot.ghg_reference = 83.8
+  lot.ghg_reduction = (1.0 - (lot.ghg_total / lot.ghg_reference)) * 100.0
 
   # client / delivery
   lot.dae = num_dae
