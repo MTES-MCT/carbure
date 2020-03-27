@@ -8,7 +8,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.utils.crypto import get_random_string
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
-from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, Lot
+from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, Lot, GHGValues
 
 
 class EntityAdmin(admin.ModelAdmin):
@@ -39,12 +39,17 @@ class MatierePremiereAdmin(admin.ModelAdmin):
 
 class PaysAdmin(admin.ModelAdmin):
     list_display = ('name', )
-    search_fields = ('name', ) 
+    search_fields = ('name', )
 
 class LotAdmin(admin.ModelAdmin):
     list_display = ('producer', 'production_site', 'ea_delivery_site', 'ea_delivery_date', 'ea', 'biocarburant', 'matiere_premiere', 'client_id', 'status')
     search_fields = ('producer', 'production_site', 'dae', 'ea', 'biocarburant', 'matiere_premiere', 'pays_origine', 'client_id')
     list_filter = ('status', )
+
+class GHGValuesAdmin(admin.ModelAdmin):
+    list_display = ('matiere_premiere', 'biocarburant', 'field', 'is_default_value', 'is_typical_value')
+    search_fields = ('matiere_premiere', 'biocarburant')
+    list_filter = ('is_default_value', 'is_typical_value')
 
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
@@ -53,6 +58,7 @@ admin.site.register(Biocarburant, BiocarburantAdmin)
 admin.site.register(MatierePremiere, MatierePremiereAdmin)
 admin.site.register(Pays, PaysAdmin)
 admin.site.register(Lot, LotAdmin)
+admin.site.register(GHGValues, GHGValuesAdmin)
 
 
 # authtool custom user model
