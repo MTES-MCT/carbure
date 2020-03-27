@@ -1,0 +1,11 @@
+
+# 1) create dir ~/gitlab-runner/config
+
+# 2) register
+# runner: docker
+# image: docker:dind
+docker run --rm -t -i -v /home/deploy/gitlab-runner/config:/etc/gitlab-runner gitlab/gitlab-runner register
+
+
+# 3) run
+docker run -d --name gitlab-runner --restart always   -v /home/deploy/gitlab-runner/config:/etc/gitlab-runner   -v /var/run/docker.sock:/var/run/docker.sock gitlab/gitlab-runner:latest
