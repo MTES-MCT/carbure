@@ -147,7 +147,7 @@ def producers_mp_autocomplete(request, *args, **kwargs):
 @restrict_to_producers
 def producers_ges(request, *args, **kwargs):
   context = kwargs['context']
-  return JsonResponse({'eec':12, 'el':4, 'ep':2, 'etd':0, 'eu':3.3, 'esca':0, 'eccs':0, 'eccr':0, 'eee':0, 'ref':45})
+  return JsonResponse({'eec':0, 'el':0, 'ep':0, 'etd':0, 'eu':0.0, 'esca':0, 'eccs':0, 'eccr':0, 'eee':0, 'ref':83.9})
 
 @login_required
 @enrich_with_user_details
