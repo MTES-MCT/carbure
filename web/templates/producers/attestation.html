@@ -25,16 +25,6 @@
       <tbody></tbody>
     </table>
     <div class="flex-container-right">
-      <select id="select_affiliate">
-        <option value="none">--</option>
-        <option value="total">Total</option>
-        <option value="OperateurGamma">OperateurGamma</option>
-        <option value="petrobras">Petrobras</option>
-        <option value="bp">BP</option>
-        <option value="repsol">Repsol</option>
-        <option value="export">Export</option>
-      </select>
-      <a id="btn_affiliate" class="button primary">Affilier Lots</a>
       <a id="btn_open_modal_validate_lots" class="button primary">Valider Lots</a>
       <a id="btn_open_modal_delete_lots" class="button primary">Supprimer Lots</a>
     </div>
@@ -174,22 +164,6 @@
   })
 }
 
-function manage_affiliate_button(draft_present) {
-  let keys = Object.keys(selected_rows)
-  var btn_affiliate = document.getElementById("btn_affiliate")
-  var select_affiliate = document.getElementById("select_affiliate")
-  if (keys.length > 0 && draft_present === false) {
-    // at least one row selected, all valid: set affiliate button to active
-    $("#btn_affiliate").addClass('primary')
-    $("#btn_affiliate").removeClass('secondary')
-    $("#select_affiliate").prop("disabled", false)
-  } else {
-    $("#btn_affiliate").addClass('secondary')
-    $("#btn_affiliate").removeClass('primary')
-    $("#select_affiliate").prop("disabled", "disabled")
-  }
-}
-
 function manage_validate_button(draft_present) {
  if (draft_present === true) {
     $("#btn_open_modal_validate_lots").addClass('primary')
@@ -257,8 +231,7 @@ function manage_add_button() {
 }
 
 function manage_actions() {
-  // buttons Valider & Affilier
-  // pseudo code: if all rows are valid, button Affilier is active
+  // buttons Valider, Supprimer et Ajouter
   // if one of the rows is a draft, button Valider is active
   let draft_present = false
   let only_drafts_present = true
@@ -273,7 +246,6 @@ function manage_actions() {
       only_drafts_present = false
     }
   }
-  manage_affiliate_button(draft_present)
   manage_validate_button(draft_present)
   manage_delete_button(only_drafts_present)
   manage_add_button()
