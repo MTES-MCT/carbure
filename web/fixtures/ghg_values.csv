@@ -9,16 +9,16 @@ ET,Éthanol,MAIS,maïs,gaz naturel utilisé comme combustible de transformation 
 ET,Éthanol,MAIS,maïs,gaz naturel utilisé comme combustible de transformation dans les centrales de cogénération,25.5,25.5,14.8,20.8,2.2,2.2
 ET,Éthanol,MAIS,maïs,lignite utilisé comme combustible de transformation dans les centrales de cogénération,25.5,25.5,28.6,40.1,2.2,2.2
 ET,Éthanol,MAIS,maïs,résidus de la sylviculture utilisés comme combustible de transformation dans les centrales de cogénération,25.5,25.5,1.8,2.6,2.2,2.2
-ET,Éthanol,,autres céréales à l'exclusion du MAIS,maïs,gaz naturel utilisé comme combustible de transformation dans les chaudières classiques,27,27,21,29.3,2.2,2.2
-ET,Éthanol,,autres céréales à l'exclusion du MAIS,maïs,gaz naturel utilisé comme combustible de transformation dans les centrales de cogénération,27,27,15.1,21.1,2.2,2.2
-ET,Éthanol,,autres céréales à l'exclusion du MAIS,maïs,lignite utilisé comme combustible de transformation dans les centrales de cogénération,27,27,30.3,42.5,2.2,2.2
-ET,Éthanol,,autres céréales à l'exclusion du MAIS,maïs,résidus de la sylviculture utilisés comme combustible de transformation dans les centrales de cogénération,27,27,1.5,2.2,2.2,2.2
+ET,Éthanol,,autres céréales à l'exclusion du maïs,gaz naturel utilisé comme combustible de transformation dans les chaudières classiques,27,27,21,29.3,2.2,2.2
+ET,Éthanol,,autres céréales à l'exclusion du maïs,gaz naturel utilisé comme combustible de transformation dans les centrales de cogénération,27,27,15.1,21.1,2.2,2.2
+ET,Éthanol,,autres céréales à l'exclusion du maïs,lignite utilisé comme combustible de transformation dans les centrales de cogénération,27,27,30.3,42.5,2.2,2.2
+ET,Éthanol,,autres céréales à l'exclusion du maïs,résidus de la sylviculture utilisés comme combustible de transformation dans les centrales de cogénération,27,27,1.5,2.2,2.2,2.2
 ET,Éthanol,CANNE_A_SUCRE,canne à sucre,,17.1,17.1,1.3,1.8,9.7,9.7
-EMVH,EMHV,COLZA,colza,,32,32,11.7,16.3,1.8,1.8
-EMVH,EMHV,TOURNESOL,tournesol,,26.1,26.1,11.8,16.5,2.1,2.1
-EMVH,EMHV,SOJA,soja,,21.2,21.2,12.1,16.9,8.9,8.9
-EMVH,EMHV,HUILE_PALME,huile de palme,bassin ouvert pour effluents,26.2,26.2,30.4,42.6,6.9,6.9
-EMVH,EMHV,HUILE_PALME,huile de palme,piégeage du méthane provenant de l'huilerie,26.2,26.2,13.2,18.5,6.9,6.9
+EMHV,EMHV,COLZA,colza,,32,32,11.7,16.3,1.8,1.8
+EMHV,EMHV,TOURNESOL,tournesol,,26.1,26.1,11.8,16.5,2.1,2.1
+EMHV,EMHV,SOJA,soja,,21.2,21.2,12.1,16.9,8.9,8.9
+EMHV,EMHV,HUILE_PALME,huile de palme,bassin ouvert pour effluents,26.2,26.2,30.4,42.6,6.9,6.9
+EMHV,EMHV,HUILE_PALME,huile de palme,piégeage du méthane provenant de l'huilerie,26.2,26.2,13.2,18.5,6.9,6.9
 EMHU,EMHU,HUILE_ALIMENTAIRE_USAGEE,huiles de cuisson,,0,0,9.3,13,1.9,1.9
 EMHA,EMHA,HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2,graisses animales fondues,,0,0,13.6,19.1,1.7,1.7
 EMHA,EMHA,HUILES_OU_GRAISSES_ANIMALES_CAT3,graisses animales fondues,,0,0,13.6,19.1,1.7,1.7
