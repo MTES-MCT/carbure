@@ -13,13 +13,9 @@
 	<section class="section section-grey">
 		<div class="container">
 			<form action="#" method="post" name="form" target="_blank" novalidate>
-				<h1>Inscription</h1>
+				<h1>Connexion</h1>
 				<div class="form__group">
-					<label for="form-email">Afin d'utiliser la plateforme, veuillez entrer votre adresse email. Un agent prendra contact avec vous afin de finaliser votre inscription.</label>
-					<div class="input__group">
-						<input type="email" value="" name="email" id="form-email">
-						<button class="button" type="submit" name="subscribe" id="form-submit">Envoyer</button>
-					</div>
+					<span>Pour vous connecter, veuillez vous rendre sur la page suivante: <a href="{% url 'login' %}">Connexion</a></span>
 				</div>
 			</form>
 		</div>
