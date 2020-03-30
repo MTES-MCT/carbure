@@ -6,6 +6,8 @@ fixtures:
 	python3 /app/web/manage.py dumpdata core.biocarburant > /app/web/fixtures/biocarburants.json
 	python3 /app/web/manage.py dumpdata core.matierepremiere > /app/web/fixtures/matierespremieres.json
 	python3 /app/web/manage.py dumpdata core.pays > /app/web/fixtures/countries.json
+	python3 /app/web/manage.py dumpdata core.ghgvalues > /app/web/fixtures/ghgvalues.json
+
 	# test data
 	python3 /app/web/manage.py dumpdata authtools.user > /app/web/fixtures/authtools_user.json
 	python3 /app/web/manage.py dumpdata core.entity > /app/web/fixtures/entities.json
