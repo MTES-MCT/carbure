@@ -12,6 +12,12 @@
       {% endif %}
       <small id="err_msg_dom"></small>
     </div>
+    {% if lot.status == 'Validated' %}
+    <p>
+      <h5 style="color: tomato">Attention, ce lot a déjà été déclaré à la DGEC et affilié à un client.</h5>
+      <span>Toute modification leur sera automatiquement notifiée.</span>
+    </p>
+    {% endif %}
     <h4 style="color: green">{{message}}</h4>
     <div class="flex-container">
       <div class="form__group" style="margin-top: var(--space-l);">
