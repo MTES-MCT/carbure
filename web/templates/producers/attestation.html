@@ -7,11 +7,11 @@
     <h3>Attestation de Durabilité {{current_attestation.period}}</h3>
     {% csrf_token %}
     <div class="flex-container">
-      <a class="button modal-button" id="btn_open_modal_import" style="margin-top: 0px; margin-right: 0px; padding: var(--space-xs) var(--space-xs)">Importer</a>
-      <a id="btn_open_modal_columns" class="button" style="margin-top: auto; margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs)" >
-        <img src="/static/images/icons/internal/funnel.svg" height="24" width="24" />
+      <a class="button modal-button" id="btn_open_modal_import" style="margin-top: 0px; margin-right: 0px; margin-bottom: 5px; padding: var(--space-xs) var(--space-xs)">Importer</a>
+      <a id="btn_open_modal_columns" class="button" style="margin-top: auto; margin-left: 5px; margin-right: 0px; margin-bottom: 5px; padding: var(--space-xs) var(--space-xs)" >
+        <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24" />
       </a>
-      <a class="button modal-button" href="{% url 'producers-api-attestation-export' attestation_id=current_attestation.id %}" style="margin-top: 0px; margin-left: 5px; padding: var(--space-xs) var(--space-xs)">
+      <a class="button modal-button" href="{% url 'producers-api-attestation-export' attestation_id=current_attestation.id %}" style="margin-top: 0px; margin-left: 5px; margin-bottom: 5px; padding: var(--space-xs) var(--space-xs)">
         <img src="/static/images/icons/internal/csv3.svg" height="24" width="24" />
       </a>
       <label for="input_search_datatable" style="margin: auto 5px auto auto;">Rechercher:</label>
