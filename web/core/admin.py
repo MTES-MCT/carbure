@@ -47,9 +47,9 @@ class LotAdmin(admin.ModelAdmin):
     list_filter = ('status', )
 
 class GHGValuesAdmin(admin.ModelAdmin):
-    list_display = ('matiere_premiere', 'biocarburant', 'field', 'is_default_value', 'is_typical_value')
+    list_display = ('matiere_premiere', 'biocarburant', 'condition', 'eec_default', 'ep_default', 'etd_default')
     search_fields = ('matiere_premiere', 'biocarburant')
-    list_filter = ('is_default_value', 'is_typical_value')
+    list_filter = ('biocarburant',)
 
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
