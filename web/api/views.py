@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from core.decorators import enrich_with_user_details, restrict_to_producers, restrict_to_administrators
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, StreamingHttpResponse
 import json
 from core.models import *
 from producers.models import *
@@ -11,6 +11,7 @@ import logging
 import datetime
 import csv
 from django.template import loader
+import io
 
 # public
 def biocarburant_autocomplete(request):
@@ -489,6 +490,10 @@ def producers_save_lot(request, *args, **kwargs):
   lot.save()
   return JsonResponse({'status':'success', 'lot_id': lot.id})
 
+class Echo:
+    def write(self, value):
+        return value
+
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
@@ -499,13 +504,19 @@ def producers_attestation_export(request, *args, **kwargs):
   filename = 'export_%s.csv' % (today.strftime('%Y%m%d_%H%M%S'))
   attestation = AttestationProducer.objects.get(producer=context['user_entity'], id=attestation_id)
   lots = Lot.objects.filter(attestation=attestation)
-
-  response = HttpResponse(content_type='text/csv')
+  buffer = io.BytesIO()
+  buffer.write("carbure_id;producer;production_site;volume;code_biocarburant;biocarburant;code_matiere_premiere;matiere_premiere;code_pays_origine;pays_origine;eec;el;ep;etd;eu;esca;eccs;eccr;eee;ghg_total;ghg_reference;ghg_reduction;dae;client_id;ea_delivery_date;ea;ea_delivery_site\n".encode())
+  for lot in lots:
+    line = [lot.carbure_id,lot.producer.name,lot.production_site.name,lot.volume,lot.biocarburant.code,lot.biocarburant.name,lot.matiere_premiere.code,lot.matiere_premiere.name,lot.pays_origine.code_pays,lot.pays_origine.name,lot.eec,lot.el,lot.ep,lot.etd,lot.eu,lot.esca,lot.eccs,lot.eccr,lot.eee,lot.ghg_total,lot.ghg_reference,lot.ghg_reduction,lot.dae,lot.client_id,lot.ea_delivery_date,lot.ea,lot.ea_delivery_site]
+    csvline = '%s\n' % (';'.join([str(l) for l in line]))
+    buffer.write(csvline.encode('iso-8859-1'))
+  csvfile = buffer.getvalue()
+  buffer.close()
+  response = HttpResponse(content_type="text/csv")
   response['Content-Disposition'] = 'attachment; filename="%s"' % (filename)
-  t = loader.get_template('api/export.csv')
-  c = {'lots':lots}
-  response.write(t.render(c))
+  response.write(csvfile)
   return response
+
 
 # admin autocomplete helpers
 @login_required
