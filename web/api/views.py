@@ -194,23 +194,34 @@ def producers_validate_lots(request, *args, **kwargs):
   context = kwargs['context']
   lot_ids = request.POST.get('lots', None)
   if not lot_ids:
-    return JsonResponse({'status':'error', 'message':'Missing lot ids'}, status=400)
+    return JsonResponse({'status':'error', 'message':'Aucun lot sélectionné'}, status=400)
 
   ids = lot_ids.split(',')
   for lotid in ids:
     lot = Lot.objects.get(id=lotid, producer=context['user_entity'])
     # make sure all mandatory fields are set
-    if lot.dae != '' and lot.ea_delivery_date and lot.ea_delivery_site and lot.ea and lot.volume and lot.pays_origine:
-      try:
-        today = datetime.date.today()
-        lot = Lot.objects.get(id=lotid)
-        lot.carbure_id = "FR%s%d%d%d" % (today.strftime('%y%m%d'), lot.producer.id, lot.production_site.id, lot.id)
-        lot.status = "Validated"
-        lot.save()
-      except Exception as e:
-        return JsonResponse({'status':'error', 'message':'Could not validate lot', 'extra':str(e)}, status=400)
-    else:
-      return JsonResponse({'status':'error', 'message':'Could not validate lot. Some fields are not set'}, status=400)
+    if not lot.dae:
+      return JsonResponse({'status':'error', 'message':'Validation impossible. DAE manquant'}, status=400)
+    if not lot.ea_delivery_site:
+      return JsonResponse({'status':'error', 'message':'Validation impossible. Site de livraison manquant'}, status=400)
+    if not lot.ea_delivery_date:
+      return JsonResponse({'status':'error', 'message':'Validation impossible. Date de livraison manquante'}, status=400)
+    if lot.ea_overriden and not lot.ea_override:
+      return JsonResponse({'status':'error', 'message':'Validation impossible. Veuillez renseigner un client'}, status=400)
+    if not lot.ea_overriden and not lot.ea:
+      return JsonResponse({'status':'error', 'message':'Validation impossible. Veuillez renseigner un client'}, status=400)
+    if not lot.volume:
+      return JsonResponse({'status':'error', 'message':'Validation impossible. Veuillez renseigner le volume du lot'}, status=400)
+    if not lot.pays_origine:
+      return JsonResponse({'status':'error', 'message':'Validation impossible. Veuillez renseigner le pays d\'origine de la matière première'}, status=400)
+    try:
+      today = datetime.date.today()
+      lot = Lot.objects.get(id=lotid)
+      lot.carbure_id = "FR%s%d%d%d" % (today.strftime('%y%m%d'), lot.producer.id, lot.production_site.id, lot.id)
+      lot.status = "Validated"
+      lot.save()
+    except Exception as e:
+      return JsonResponse({'status':'error', 'message':'Erreur lors de la validation du lot', 'extra':str(e)}, status=400)
   return JsonResponse({'status':'success', 'message':'lots validated'})
 
 @login_required
