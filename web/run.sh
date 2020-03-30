@@ -8,5 +8,6 @@ python3 /app/web/manage.py migrate --noinput
 python3 /app/web/manage.py loaddata /app/web/fixtures/countries.json
 python3 /app/web/manage.py loaddata /app/web/fixtures/biocarburants.json
 python3 /app/web/manage.py loaddata /app/web/fixtures/matierespremieres.json
+python3 /app/web/manage.py loaddata /app/web/fixtures/ghgvalues.json
 
 uwsgi --ini /app/web/carbure_uwsgi.ini --touch-reload=/app/web/carbure_uwsgi.ini
