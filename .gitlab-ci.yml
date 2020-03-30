@@ -1,8 +1,15 @@
 stages:
+- prune
 - build
 - test
 - deploy
 
+prune_images:
+  stage: prune
+  script:
+    - CONTAINERS=$(docker ps -a -q --filter=status=exited --filter=status=dead)
+    - docker rm -v ${CONTAINERS}
+    - docker image prune -a --force --filter "until=240h"
 
 build_django:
   stage: build
