@@ -10,6 +10,7 @@ from django.db.models import Q
 import logging
 import datetime
 import csv
+from django.template import loader
 
 # public
 def biocarburant_autocomplete(request):
@@ -487,6 +488,24 @@ def producers_save_lot(request, *args, **kwargs):
   lot.client_id = client_id
   lot.save()
   return JsonResponse({'status':'success', 'lot_id': lot.id})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_attestation_export(request, *args, **kwargs):
+  context = kwargs['context']
+  attestation_id = kwargs['attestation_id']
+  today = datetime.datetime.now()
+  filename = 'export_%s.csv' % (today.strftime('%Y%m%d_%H%M%S'))
+  attestation = AttestationProducer.objects.get(producer=context['user_entity'], id=attestation_id)
+  lots = Lot.objects.filter(attestation=attestation)
+
+  response = HttpResponse(content_type='text/csv')
+  response['Content-Disposition'] = 'attachment; filename="%s"' % (filename)
+  t = loader.get_template('api/export.csv')
+  c = {'lots':lots}
+  response.write(t.render(c))
+  return response
 
 # admin autocomplete helpers
 @login_required

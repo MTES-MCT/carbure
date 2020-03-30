@@ -115,7 +115,6 @@ def producers_attestation(request, *args, **kwargs):
     context['message'] = "Création du lot réussie"
   return render(request, 'producers/attestation.html', context)
 
-
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
