@@ -37,24 +37,39 @@ test:
     - echo "Loading test data"
     - echo "Testing..."
     
-dev:
+dev_push_django:
   stage: deploy
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - docker tag registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:dev
-    - docker tag registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:dev
     - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:dev
+
+dev_push_web:
+  stage: deploy
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker tag registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:dev
     - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:dev
 
-staging:
+
+staging_push_django:
   stage: deploy
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - docker tag registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:$CI_COMMIT_SHORT_SHA registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:staging
-    - docker tag registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:staging    
     - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/django_app:staging
+  only:
+  - master
+
+staging_push_web:
+  stage: deploy
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker tag registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:staging    
     - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:staging
   only:
   - master
