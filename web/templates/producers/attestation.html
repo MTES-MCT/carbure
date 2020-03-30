@@ -8,12 +8,12 @@
     {% csrf_token %}
     <div class="flex-container">
       <a class="button modal-button" id="btn_open_modal_import" style="margin-top: 0px; margin-right: 0px; padding: var(--space-xs) var(--space-xs)">Importer</a>
-      <button id="btn_open_modal_columns" class="button" style="margin-top: auto; margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs)" >
+      <a id="btn_open_modal_columns" class="button" style="margin-top: auto; margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs)" >
         <img src="/static/images/icons/internal/funnel.svg" height="24" width="24" />
-      </button>
-      <button id="btn_export_csv" class="button icon-button" style="margin-top: 0px; margin-left: 5px; padding: var(--space-xs) var(--space-xs)">
+      </a>
+      <a class="button modal-button" href="{% url 'producers-api-attestation-export' attestation_id=current_attestation.id %}" style="margin-top: 0px; margin-left: 5px; padding: var(--space-xs) var(--space-xs)">
         <img src="/static/images/icons/internal/csv3.svg" height="24" width="24" />
-      </button>
+      </a>
       <label for="input_search_datatable" style="margin: auto 5px auto auto;">Rechercher:</label>
       <input type="text" id="input_search_datatable" style="width: 200px; height: 2em;" />
 
@@ -463,48 +463,6 @@ $(document).ready(function() {
     };
     reader.readAsText(e.target.files[0]);
   })
-
-  /* export button */
-  var btn_export = document.getElementById("btn_export_csv")
-
-  btn_export.onclick = function() {
-    let header = []
-    const rows = []
-    for (let i = 0, len = table_columns.length; i < len; i++) {
-      if (table_columns[i].can_export !== false)
-        header.push(table_columns[i].data)
-    }
-    rows.push(header)
-
-    let data = table.rows().data()
-    console.log(`nb rows: ${data.length}`)
-    for (let i = 0, len = data.length; i < len; i++) {
-      // columns with commas will be wrapper in double quotes
-      let data_copy = []
-      for (let j = 0, ll = table_columns.length; j < ll; j++) {
-        let table_col = table_columns[j]
-        let coldata = data[i][table_col.data]
-        console.log(`line ${i} col ${j} data ${coldata}`)
-        if (typeof coldata == 'string' && coldata.includes(',')) {
-          coldata = `"${coldata}"`
-        }
-        if (table_col.can_export === true) {
-          data_copy.push(coldata)
-        }
-      }
-      rows.push(data_copy)
-    }
-    let csvContent = "data:text/csv;charset=utf-8,"
-      + rows.map(e => e.join(";")).join("\n");
-    var encodedUri = encodeURI(csvContent);
-    var link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    let dt = new Date()
-    let dt_string = `${dt.getFullYear()}${dt.getMonth().toString().padStart(2, '0')}${dt.getDate().toString().padStart(2, '0')}_${dt.getHours().toString().padStart(2, '0')}${dt.getMinutes().toString().padStart(2, '0')}${dt.getSeconds()}`
-    link.setAttribute("download", `export_${dt_string}.csv`);
-    document.body.appendChild(link); // Required for FF
-    link.click();
-  }
 
   $("#modal_import_btn_finished").on('click', function() {
     // refresh page
