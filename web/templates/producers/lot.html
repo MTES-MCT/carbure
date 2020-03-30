@@ -199,12 +199,8 @@
   }
 
 function load_ges(mp, bc) {
-  var formdata = new FormData();
-  formdata.set('mp', mp)
-  formdata.set('bc', bc)
   $.ajax({
-    url         : "{% url 'producers-api-ges' %}",
-    data        : formdata,
+    url         : "{% url 'producers-api-ges' %}" + `?mp=${mp}&bc=${bc}`,
     cache       : false,
     contentType : false,
     processData : false,
@@ -256,7 +252,7 @@ $(".autocomplete_mps").autocomplete({
     $("#matiere_premiere").val(suggestion.data)
     let selected_bc = $("#biocarburant").val()
     if (selected_bc !== '') {
-      load_ges(suggestion.data, selected_bc.data)
+      load_ges(suggestion.data, selected_bc)
     }
   }
 })
@@ -270,7 +266,7 @@ $(".autocomplete_biocarburants").autocomplete({
     $("#biocarburant").val(suggestion.data)
     let selected_mp = $("#matiere_premiere").val()
     if (selected_mp !== '') {
-      load_ges(selected_mp.data, suggestion.data)
+      load_ges(selected_mp, suggestion.data)
     }
   }
 })
