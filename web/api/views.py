@@ -149,7 +149,21 @@ def producers_mp_autocomplete(request, *args, **kwargs):
 @restrict_to_producers
 def producers_ges(request, *args, **kwargs):
   context = kwargs['context']
-  return JsonResponse({'eec':0, 'el':0, 'ep':0, 'etd':0, 'eu':0.0, 'esca':0, 'eccs':0, 'eccr':0, 'eee':0, 'ref':83.8})
+  mp = request.GET.get('mp', None)
+  bc = request.GET.get('bc', None)
+  if not mp or not bc:
+    return JsonResponse({'status':'error', 'message':'Missing matiere premiere or biocarburant'}, status=400)
+  mp = MatierePremiere.objects.get(code=mp)
+  bc = Biocarburant.objects.get(code=bc)
+  default_values = {'eec':0, 'el':0, 'ep':0, 'etd':0, 'eu':0.0, 'esca':0, 'eccs':0, 'eccr':0, 'eee':0, 'ref':83.8}
+  try:
+    ges = GHGValues.objects.filter(matiere_premiere=mp, biocarburant=bc).order_by('-ep_default')[0]
+    default_values['eec'] = ges.eec_default
+    default_values['ep'] = ges.ep_default
+    default_values['etd'] = ges.etd_default
+  except:
+    pass
+  return JsonResponse(default_values)
 
 @login_required
 @enrich_with_user_details
