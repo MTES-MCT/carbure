@@ -5,6 +5,7 @@ services:
     restart: always
     container_name: carbure_mariadb
     environment:
+      ENV: ${IMAGE_TAG}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DJANGO_DATABASE}
       MYSQL_USER: ${DJANGO_DB_USER}
