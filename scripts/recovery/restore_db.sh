@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# crontab to run on the server
+# crontab to run on the server (dev and staging ONLY)
 # 45 1 * * * docker cp carbure_app:/app/scripts/recovery/restore_db.sh /tmp/ && bash /tmp/restore_db.sh
 
 set -x
