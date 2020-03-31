@@ -4,7 +4,13 @@
 # 45 1 * * * docker cp carbure_app:/app/scripts/recovery/restore_db.sh /tmp/ && bash /tmp/restore_db.sh
 
 set -x
-DATE=$(date -d yesterday +"%Y/%m/%d")
+if [ -z "$1" ]
+  then
+      DATE=$(date -d yesterday +"%Y/%m/%d")
+else
+    DATE=$1
+fi
+
 
 # delete staging and dev database
 echo "Deleting database from staging/dev"
@@ -18,8 +24,8 @@ docker exec carbure_app python3 /app/scripts/recovery/s3recovery.py -b carbure.d
 
 # copy downloaded backup into database container
 echo "Copy backup to database container"
-docker cp carbure_app:/tmp/backup-$DATE.sql /tmp
-docker cp /tmp/backup-$DATE.sql carbure_mariadb:/tmp/backup.sql
+docker cp carbure_app:/tmp/backup.sql /tmp
+docker cp /tmp/backup.sql carbure_mariadb:/tmp/backup.sql
 
 # load backup
 echo "Loading database backup"
@@ -28,5 +34,5 @@ docker cp /tmp/load_backup.sh carbure_mariadb:/tmp
 docker exec carbure_mariadb bash /tmp/load_backup.sh
 
 # cleanup
-rm /tmp/backup-$DATE.sql
-docker rm carbure_app:/tmp/backup-$DATE.sql
+rm /tmp/backup.sql
+docker rm carbure_app:/tmp/backup.sql
