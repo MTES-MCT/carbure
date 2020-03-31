@@ -7,12 +7,14 @@
     <h3>Attestation de Durabilité {{current_attestation.period}}</h3>
     {% csrf_token %}
     <div class="flex-container">
-      <a class="button modal-button" id="btn_open_modal_import" style="margin-top: 1em; margin-right: 0px; padding: var(--space-xs)">Importer</a>
+      <a class="button modal-button" id="btn_open_modal_import" style="margin-top: 1em; margin-right: 0px; padding: var(--space-xs)">
+        <img src="/static/images/icons/upload.png" height="24" width="24" />
+      </a>
       <a id="btn_open_modal_columns" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
         <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24" />
       </a>
       <a class="button modal-button" href="{% url 'producers-api-attestation-export' attestation_id=current_attestation.id %}" style="margin-left: 5px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
-        <img src="/static/images/icons/internal/csv3.svg" height="24" width="24" />
+        <img src="/static/images/icons/download.png" height="24" width="24" />
       </a>
       <label for="input_search_datatable" style="margin: auto 5px auto auto;">Rechercher:</label>
       <input type="text" id="input_search_datatable" style="width: 200px; height: 2em; margin-top: auto; margin-bottom: auto;" />
@@ -80,6 +82,7 @@
 <div class="modal__backdrop" id="modal_import">
   <div class="modal">
     <div class="form__group">
+      <h4>Importer</h4>
       <dl>
         <dt><a href="/static/files/template.csv" >Télécharger le modèle</dt>
         <dt><a href="{% url 'api-matiere-premiere-csv' %}" ><small>Table des matières premières</small></a></dt>
