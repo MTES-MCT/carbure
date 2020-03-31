@@ -5,7 +5,7 @@ import datetime
 import argparse
 
 def upload_db_dump(bucket_name, filename):
-    s3 = boto3.resource('s3')
+    s3 = boto3.resource('s3', aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'], aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'], region_name=os.environ['AWS_S3_REGION_NAME'], endpoint_url=os.environ['AWS_S3_ENDPOINT_URL'], use_ssl=os.environ['AWS_S3_USE_SSL'])
     bucket = s3.Bucket(bucket_name)
     today = datetime.date.today().strftime('%Y/%m/%d')
     object = s3.Object(bucket.name, today)
