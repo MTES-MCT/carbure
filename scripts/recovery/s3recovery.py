@@ -10,7 +10,7 @@ def dl_backup(bucket, date):
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         date = yesterday.strftime('%Y/%m/%d')
     print(date)
-    filename = '/tmp/backup-%s.sql' % (date.replace('/', '-'))
+    filename = '/tmp/backup.sql'
     s3 = boto3.client('s3', aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'], aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'], region_name=os.environ['AWS_S3_REGION_NAME'], endpoint_url=os.environ['AWS_S3_ENDPOINT_URL'], use_ssl=os.environ['AWS_S3_USE_SSL'])
     print('will download %s from %s' % (date, bucket))
     with open(filename, 'wb') as f:
