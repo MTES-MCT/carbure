@@ -4,13 +4,8 @@ import boto3
 import datetime
 import argparse
 
-from common import logger
-logger.setupLogger('s3dbcheck')
-import logging
-logger = logging.getLogger('s3dbcheck')
-
 def check_backup(args):
-    s3 = boto3.resource('s3')
+    s3 = boto3.resource('s3', aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'], aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'], region_name=os.environ['AWS_S3_REGION_NAME'], endpoint_url=os.environ['AWS_S3_ENDPOINT_URL'], use_ssl=os.environ['AWS_S3_USE_SSL'])
     bucket = s3.Bucket(args.bucket)
 
     if args.date:
@@ -24,10 +19,10 @@ def check_backup(args):
         found = True
 
     if not found:
-        logger.info('Database backup missing for date %s' % (date))
+        print('Database backup missing for date %s' % (date))
         return 1
     else:
-        logger.info('OK. Last backup: %s' % (date))
+        print('OK. Last backup: %s' % (date))
         return 0
 
 def main():
@@ -39,7 +34,7 @@ def main():
     
     env = os.environ['TRADIVARI_ENV']
     if env != 'prod' and not args.force:
-        logger.info('Passed')
+        print('Passed')
         return 0
     else:
         return check_backup(args)
