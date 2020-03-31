@@ -43,7 +43,7 @@ def biocarburant_csv(request):
   types = Biocarburant.objects.all()
   response = HttpResponse(content_type='text/csv')
   response['Content-Disposition'] = 'attachment; filename="biocarburants.csv"'
-  writer = csv.writer(response)
+  writer = csv.writer(response, delimiter=';')
   writer.writerow(['biocarburant_code', 'biocarburant'])
   for t in types:
     writer.writerow([t.code, t.name])
@@ -53,7 +53,7 @@ def matiere_premiere_csv(request):
   types = MatierePremiere.objects.all()
   response = HttpResponse(content_type='text/csv')
   response['Content-Disposition'] = 'attachment; filename="matieres_premieres.csv"'
-  writer = csv.writer(response)
+  writer = csv.writer(response, delimiter=';')
   writer.writerow(['matiere_premiere_code', 'matiere_premiere'])
   for t in types:
     writer.writerow([t.code, t.name])
@@ -63,7 +63,7 @@ def country_csv(request):
   types = Pays.objects.all()
   response = HttpResponse(content_type='text/csv')
   response['Content-Disposition'] = 'attachment; filename="pays.csv"'
-  writer = csv.writer(response)
+  writer = csv.writer(response, delimiter=';')
   writer.writerow(['code_pays', 'pays'])
   for t in types:
     writer.writerow([t.code_pays, t.name])
@@ -73,7 +73,7 @@ def operators_csv(request):
   types = Entity.objects.filter(entity_type='Opérateur')
   response = HttpResponse(content_type='text/csv')
   response['Content-Disposition'] = 'attachment; filename="operateurs.csv"'
-  writer = csv.writer(response)
+  writer = csv.writer(response, delimiter=';')
   writer.writerow(['ea'])
   for t in types:
     writer.writerow([t.name])
