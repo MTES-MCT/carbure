@@ -29,15 +29,15 @@
               </dl>
             </div>
             <div class="form__group" style="margin-top: 0px;">
-              <dl>
-                <dt>Éligible double-comptage</dt>
-                <dd>{{site.eligible_dc}}</dd>
-              </dl>
+            </div>
+            <div class="form__group" style="margin-top: 0px;">
             </div>
             <div class="form__group" style="margin-top: 0px;">
               <dl>
                 <dt>Option GES</dt>
                 <dd>{{site.ges_option}}</dd>
+                <dt>Éligible double-comptage</dt>
+                <dd>{{site.eligible_dc}}</dd>
               </dl>
             </div>
             <div class="form__group" style="margin-top: 0px;">
@@ -55,7 +55,7 @@
               </dl>
             </div>
             <div class="form__group" style="margin-top: 0px;">
-              <button type="submit" class="button btn_open_modal_site_edit" data-siteid="{{site.id}}">
+              <button type="submit" class="button btn_open_modal_site_edit" data-siteid="{{site.id}}" style="margin-right: 0px; padding-right: 1em; padding-left: 1em;">
                 {% if site.certificate %}
               Modifier
               {% else %}
