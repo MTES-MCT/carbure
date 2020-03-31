@@ -8,7 +8,8 @@ DATE=$(date -d yesterday +"%Y/%m/%d")
 
 # delete staging and dev database
 echo "Deleting database from staging/dev"
-docker cp carbure_app:/app/scripts/recovery/delete_db.sh carbure_mariadb:/tmp
+docker cp carbure_app:/app/scripts/recovery/delete_db.sh /tmp
+docker cp /tmp/delete_db.sh carbure_mariadb:/tmp
 docker exec carbure_mariadb bash /tmp/delete_db.sh
 
 # download yesterday's database
@@ -17,9 +18,15 @@ docker exec carbure_app python3 /app/scripts/recovery/s3recovery.py -b carbure.d
 
 # copy downloaded backup into database container
 echo "Copy backup to database container"
-docker cp carbure_app:/tmp/backup-$DATE.sql carbure_mariadb:/tmp/backup.sql
+docker cp carbure_app:/tmp/backup-$DATE.sql /tmp
+docker cp /tmp/backup-$DATE.sql carbure_mariadb:/tmp/backup.sql
 
 # load backup
 echo "Loading database backup"
-docker cp carbure_app:/app/scripts/recovery/load_backup.sh carbure_mariadb:/tmp
+docker cp carbure_app:/app/scripts/recovery/load_backup.sh /tmp
+docker cp /tmp/load_backup.sh carbure_mariadb:/tmp
 docker exec carbure_mariadb bash /tmp/load_backup.sh
+
+# cleanup
+rm /tmp/backup-$DATE.sql
+docker rm carbure_app:/tmp/backup-$DATE.sql
