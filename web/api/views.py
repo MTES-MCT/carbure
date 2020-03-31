@@ -429,7 +429,7 @@ def producers_save_lot(request, *args, **kwargs):
   lot.attestation = AttestationProducer.objects.get(id=attestation_id)
   lot.producer = context['user_entity']
 
-  # production site can be either ID or name
+  # production site
   try:
     production_site_id = int(production_site)
   except ValueError:
@@ -439,14 +439,10 @@ def producers_save_lot(request, *args, **kwargs):
       lot.production_site = ProductionSite.objects.get(id=production_site_id)
     except Exception as e:
       return JsonResponse({'status':'error', 'message':"ID site de production [%d] inconnu" % (production_site_id), 'extra': str(e)}, status=400)
-  else:
-    try:
-      lot.production_site = ProductionSite.objects.get(name__iexact=production_site)
-    except Exception as e:
-      return JsonResponse({'status':'error', 'message':"Site de Production [%s] inconnu." % (production_site), 'extra': str(e)}, status=400)
 
   if volume:
     lot.volume = float(volume)
+
   try:
     lot.matiere_premiere = MatierePremiere.objects.get(code=matiere_premiere)
   except:
@@ -514,10 +510,6 @@ def producers_save_lot(request, *args, **kwargs):
   lot.client_id = client_id
   lot.save()
   return JsonResponse({'status':'success', 'lot_id': lot.id})
-
-class Echo:
-    def write(self, value):
-        return value
 
 @login_required
 @enrich_with_user_details
