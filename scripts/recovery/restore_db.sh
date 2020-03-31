@@ -11,6 +11,7 @@ else
     DATE=$1
 fi
 
+echo "Loading $DATE database backup"
 
 # delete staging and dev database
 echo "Deleting database from staging/dev"
@@ -35,4 +36,4 @@ docker exec carbure_mariadb bash /tmp/load_backup.sh
 
 # cleanup
 rm /tmp/backup.sql
-docker rm carbure_app:/tmp/backup.sql
+docker exec carbure_app rm /tmp/backup.sql
