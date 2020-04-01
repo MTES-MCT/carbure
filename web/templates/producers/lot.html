@@ -23,8 +23,6 @@
       <div class="form__group" style="margin-top: var(--space-l);">
         <h3 style="text-align: center;">Informations</h3>
         <dl>
-          <dt>Producteur</dt>
-          <dd><input type="text" id="producer_display" value="{% if lot %}{{lot.producer.name}}{% else %}{{user_entity.name}}{% endif %}" readonly="readonly" /></dd>
           <dt>Site de Production</dt>
           <dd><input type="text" id="production_site_display" class="autocomplete_production_sites" value="{{lot.production_site.name}}" /><input type="hidden" id="production_site" value="{{lot.production_site.id}}" /></dd>
           <dt>Volume à 20°C en Litres</dt>
