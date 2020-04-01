@@ -145,6 +145,9 @@ class Lot(models.Model):
     client_id = models.CharField(max_length=64, blank=True, default='')
     status = models.CharField(max_length=64, choices=LOT_STATUS, default='Draft')
 
+    # ea delivery confirmation
+    ea_delivery_accepted = models.BooleanField(default=False)
+
     def __str__(self):
         return str(self.id)
 

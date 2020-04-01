@@ -302,10 +302,10 @@ $(".autocomplete_operators").autocomplete({
   dataType: 'json',
   minChars: 0,
   onSelect: function(suggestion) {
-    $("#client").val(suggestion.data)
+    $("#ea").val(suggestion.data)
   },
   onInvalidateSelection: function() {
-    $("#client").val('')
+    $("#ea").val('')
   }
 })
 
