@@ -595,6 +595,20 @@ def operators_lot_reject(request, *args, **kwargs):
     lot.save()
   return JsonResponse({'status':'success', 'message':'lots rejected'})
 
+
+@login_required
+@enrich_with_user_details
+@restrict_to_operators
+def operators_lots(request, *args, **kwargs):
+  context = kwargs['context']
+  declaration_id = kwargs['declaration_id']
+  lots = [a.lot for a in AcceptedLot.objects.filter(declaration_id=declaration_id)]
+  data = serializers.serialize('json', lots, fields=('carbure_id', 'producer', 'production_site', 'dae', 'ea_delivery_date', 'ea_delivery_site', 'ea', 'volume',
+    'matiere_premiere', 'biocarburant', 'pays_origine', 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ea_overriden', 'ea_override',
+    'client_id', 'status'), use_natural_foreign_keys=True)
+  return HttpResponse(data, content_type='application/json')
+
+
 # admin autocomplete helpers
 @login_required
 @enrich_with_user_details
