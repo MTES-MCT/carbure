@@ -548,7 +548,7 @@ def producers_attestation_export(request, *args, **kwargs):
 @restrict_to_operators
 def operators_lots_affilies(request, *args, **kwargs):
   context = kwargs['context']
-  lots = Lot.objects.filter(ea=context['user_entity'], ea_delivery_accepted=False)
+  lots = Lot.objects.filter(ea=context['user_entity'], ea_delivery_accepted=False, status='Validated')
   data = serializers.serialize('json', lots, fields=('carbure_id', 'producer', 'production_site', 'dae', 'ea_delivery_date', 'ea_delivery_site', 'ea', 'volume',
     'matiere_premiere', 'biocarburant', 'pays_origine', 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ea_overriden', 'ea_override',
     'client_id', 'status'), use_natural_foreign_keys=True)
