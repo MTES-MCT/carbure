@@ -4,104 +4,7 @@
 <div class="main" style="overflow-x: auto;">
 	<div class="panel">
 		<h3>Lots</h3>
-<div class="button-container">
-  <div class="button-item">		
-  	<a class="button modal-button" id="btn_modal_columns">Filtrer</a>
-	<div class="modal__backdrop" id="modal_columns">
-		<div class="modal">
-			<table>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox0" class="toggle-vis" data-column="0"></td>
-					<td><label for="checkbox0" class="label-inline">Dépôt</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox1" class="toggle-vis" data-column="1"></td>
-					<td><label for="checkbox1" class="label-inline">N°DAE ou DAA</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox2" class="toggle-vis" data-column="2"></td>
-					<td><label for="checkbox2" class="label-inline">Date d'entrée</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox3" class="toggle-vis" data-column="3"></td>
-					<td><label for="checkbox3" class="label-inline">Volume</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox4" class="toggle-vis" data-column="4"></td>
-					<td><label for="checkbox4" class="label-inline">Types</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox5" class="toggle-vis" data-column="5"></td>
-					<td><label for="checkbox5" class="label-inline">Filière de production</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox6" class="toggle-vis" data-column="6"></td>
-					<td><label for="checkbox6" class="label-inline">Catégorie</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox7" class="toggle-vis" data-column="7"></td>
-					<td><label for="checkbox7" class="label-inline">Système fournisseur</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox8" class="toggle-vis" data-column="8"></td>
-					<td><label for="checkbox8" class="label-inline">Pays d'origine</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox9" class="toggle-vis" data-column="9"></td>
-					<td><label for="checkbox9" class="label-inline">Respect des critères de durabilité</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox10" class="toggle-vis" data-column="10"></td>
-					<td><label for="checkbox10" class="label-inline">GES transport et distribution</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox11" class="toggle-vis" data-column="11"></td>
-					<td><label for="checkbox11" class="label-inline">Total émissions GES</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox12" class="toggle-vis" data-column="12"></td>
-					<td><label for="checkbox12" class="label-inline">GES carburant fossile</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox13" class="toggle-vis" data-column="13"></td>
-					<td><label for="checkbox13" class="label-inline">% de réduction totale</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox14" class="toggle-vis" data-column="14"></td>
-					<td><label for="checkbox14" class="label-inline">Numéro d'enregistrement double-comptage</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox15" class="toggle-vis" data-column="15"></td>
-					<td><label for="checkbox15" class="label-inline">Pays d'implantation</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="checkbox" id="checkbox16" class="toggle-vis" data-column="16"></td>
-					<td><label for="checkbox16" class="label-inline">Date de mise en service</label></td>
-				</tr>
-			</table>
-			<div class="form__group button__group">
-				<a class="button secondary close">Ok</a>
-			</div>
-		</div>
-	</div>
-  </div>
-  <div class="button-item">
-	<a class="button modal-button" id="btn_modal_import">Importer</a>
-	<div class="modal__backdrop" id="modal_import">
-		<div class="modal">
-			<a href="/static/files/template.csv">Modèle</a>
-			<input type="file" name="fileToUpload" id="fileToUpload">
-			<div class="form__group button__group">
-				<a class="button secondary close" href="#">Annuler</a>
-				<a class="button primary close" href="#">Ok</a>
-			</div>
-		</div>
-	</div>  	
-  </div>
-  <div class="button-item button-push">
-  	<a class="button" id="btn_export" style="margin-left: auto;">Export CSV</a>
-  </div>
-</div>		
+
 		<table class="display nowrap" id="datatable">
 			<thead>
 				<tr>
@@ -171,7 +74,7 @@
 					<td>Déclaré</td>
 					<td>OperateurGamma</td>
 					<td><input type="checkbox" /></td>
-				</tr>	
+				</tr>
 				<tr>
 					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
@@ -193,7 +96,7 @@
 					<td>Déclaré</td>
 					<td>Import</td>
 					<td><input type="checkbox" /></td>
-				</tr>							
+				</tr>
 				<tr>
 					<td>GRANDPUITS</td>
 					<td>19FRG0432000482724020</td>
@@ -213,7 +116,7 @@
 					<td>FR</td>
 					<td>1/7/2007</td>
 					<td>Déclaré</td>
-					<td>Import</td>					
+					<td>Import</td>
 					<td><input type="checkbox" /></td>
 				</tr>
 				<tr class="status_warning">
@@ -235,7 +138,7 @@
 					<td>FR</td>
 					<td>1/7/2007</td>
 					<td>Brouillon</td>
-					<td>Import</td>					
+					<td>Import</td>
 					<td><input type="checkbox" /></td>
 				</tr>
 			</tbody>
@@ -248,7 +151,7 @@
 				<a class="button secondary" href="#" id="btn_validate">Valider Lots</a>
 				<a class="button secondary" href="#" id="btn_declare">Déclarer Lots</a>
 			</div>
-		</div>				
+		</div>
 	</div>
 </div>
 {% endblock %}
@@ -284,7 +187,7 @@ $(document).ready(function() {
         },
 		columnDefs: [
       		{"className": "dt-center", "targets": "_all"}
-   		],		        
+   		],
 	});
 
 	function loadTableSettings() {
@@ -317,13 +220,13 @@ $(document).ready(function() {
 			if (isChecked || frozen_columns.includes(i)) {
 				$(boxid).prop("checked", true);
 				if (!column.visible()) {
-					column.visible(!column.visible()) 
+					column.visible(!column.visible())
 				}
 			} else {
 				$(boxid).prop("checked", false);
 				if (column.visible()) {
-					column.visible(!column.visible()) 
-				}				
+					column.visible(!column.visible())
+				}
 			}
 		}
 	}
@@ -369,19 +272,19 @@ $(document).ready(function() {
 		if (keys.length > 0 && draft_present === false) {
 			// at least one row selected and no draft
 			$("#btn_declare").addClass('primary')
-			$("#btn_declare").removeClass('secondary')			
+			$("#btn_declare").removeClass('secondary')
 			$("#btn_validate").addClass('secondary')
-			$("#btn_validate").removeClass('primary')				
+			$("#btn_validate").removeClass('primary')
 		} else if (keys.length > 0 && draft_present === true) {
 			$("#btn_validate").addClass('primary')
-			$("#btn_validate").removeClass('secondary')		
+			$("#btn_validate").removeClass('secondary')
 			$("#btn_declare").addClass('secondary')
-			$("#btn_declare").removeClass('primary')					
+			$("#btn_declare").removeClass('primary')
 		} else {
 			$("#btn_validate").addClass('secondary')
-			$("#btn_validate").removeClass('primary')		
+			$("#btn_validate").removeClass('primary')
 			$("#btn_declare").addClass('secondary')
-			$("#btn_declare").removeClass('primary')				
+			$("#btn_declare").removeClass('primary')
 		}
 	}
 	show_hide_action_buttons()
@@ -389,7 +292,7 @@ $(document).ready(function() {
 	$('#datatable_wrapper tbody').on('click', 'input', function() {
 		let hrow = $(this).closest("tr")
 		let row = table.row(hrow)
-		let data = table.row(row).data();	
+		let data = table.row(row).data();
 		let rowid = table.row(row).index();
 		// add to selection if checked, otherwise remove
 		if (rowid in selected_rows) {
@@ -405,11 +308,11 @@ $(document).ready(function() {
 		let cell = table.cell(this)
 		let colid = cell.index()['column']
 		let row = $(this).closest('tr');
-		let data = table.row(row).data();	
+		let data = table.row(row).data();
    		if (colid == colname2colid['SELECT_CHECKBOX_COLID']) {
 			// ignore clicks on checkbox column
 			return
-		} else {	
+		} else {
 			window.location = "{% url 'operators-lot' %}"
 		}
 	});
@@ -427,7 +330,7 @@ $(document).ready(function() {
     		for (let i = 0, len = table.rows().count(); i < len; i++) {
     			$(rows[i]).find('input').prop('checked', false)
 				delete selected_rows[i]
-			}      		
+			}
 		}
 		console.log(selected_rows)
 		show_hide_action_buttons()
