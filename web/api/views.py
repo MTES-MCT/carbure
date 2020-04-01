@@ -231,7 +231,9 @@ def producers_validate_lots(request, *args, **kwargs):
     try:
       today = datetime.date.today()
       lot = Lot.objects.get(id=lotid)
-      lot.carbure_id = "FR%s%d%d%d" % (today.strftime('%y%m%d'), lot.producer.id, lot.production_site.id, lot.id)
+      # [PAYS][YYMM]P[IDProd]-[1....]-([S123])
+      # FR2002P001-1
+      lot.carbure_id = "%s%sP%d-%d" % (today.strftime('%y%m'), lot.producer.id, lot.id)
       lot.status = "Validated"
       lot.save()
     except Exception as e:
