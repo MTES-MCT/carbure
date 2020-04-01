@@ -3,6 +3,9 @@ from django.contrib.auth.decorators import login_required
 from core.decorators import enrich_with_user_details, restrict_to_operators
 from operators.models import OperatorDeclaration
 
+import datetime
+import calendar
+
 @login_required
 @enrich_with_user_details
 @restrict_to_operators
@@ -10,7 +13,7 @@ def operators_index(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'operators-index'
 
-  declarations = OperatorDeclaration.objects.filter(producer=context['user_entity'])
+  declarations = OperatorDeclaration.objects.filter(operator=context['user_entity'])
   threemonthsago = datetime.date.today() - datetime.timedelta(days=90)
   last_declarations = declarations.filter(deadline__gte=threemonthsago)
   if len(last_declarations) <= 4:
@@ -23,9 +26,9 @@ def operators_index(request, *args, **kwargs):
       monthrange = calendar.monthrange(nextmonth.year, nextmonth.month)
       nextmonth = nextmonth.replace(day=monthrange[1])
       # create attestation
-      OperatorDeclaration.objects.update_or_create(period=period, producer=context['user_entity'], defaults={'deadline':nextmonth})
+      OperatorDeclaration.objects.update_or_create(period=period, operator=context['user_entity'], defaults={'deadline':nextmonth})
       current_period -= datetime.timedelta(days=30)
-    declarations = declarations.objects.filter(producer=context['user_entity'])
+    declarations = OperatorDeclaration.objects.filter(operator=context['user_entity'])
 
   context['declarations'] = declarations
   context['today'] = datetime.date.today()
