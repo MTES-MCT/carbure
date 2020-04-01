@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
-from core.decorators import enrich_with_user_details, restrict_to_producers, restrict_to_administrators
+from core.decorators import enrich_with_user_details, restrict_to_producers, restrict_to_administrators, restrict_to_operators
 from django.http import JsonResponse, HttpResponse, StreamingHttpResponse
 import json
 from core.models import *
@@ -497,6 +497,8 @@ def producers_save_lot(request, *args, **kwargs):
     try:
       ea_id = int(ea)
       lot.ea = Entity.objects.get(id=ea_id)
+      lot.ea_overriden = False
+      lot.ea_override = ''
     except ValueError:
       return JsonResponse({'status':'error', 'message':"ID Client inconnu"}, status=400)
   elif ea_display:
@@ -537,6 +539,17 @@ def producers_attestation_export(request, *args, **kwargs):
   response.write(csvfile)
   return response
 
+# operators api
+@login_required
+@enrich_with_user_details
+@restrict_to_operators
+def operators_lots_affilies(request, *args, **kwargs):
+  context = kwargs['context']
+  lots = Lot.objects.filter(ea=context['user_entity'])
+  data = serializers.serialize('json', lots, fields=('carbure_id', 'producer', 'production_site', 'dae', 'ea_delivery_date', 'ea_delivery_site', 'ea', 'volume',
+    'matiere_premiere', 'biocarburant', 'pays_origine', 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ea_overriden', 'ea_override',
+    'client_id', 'status'), use_natural_foreign_keys=True)
+  return HttpResponse(data, content_type='application/json')
 
 # admin autocomplete helpers
 @login_required

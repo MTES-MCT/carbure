@@ -33,6 +33,10 @@ urlpatterns = [
     path('producers/lot/validate', views.producers_validate_lots, name='producers-api-validate-lots'),
     path('producers/attestation/<int:attestation_id>/export', views.producers_attestation_export, name='producers-api-attestation-export'),
 
+    # private, operators
+    path('operators/lots-affilies', views.operators_lots_affilies, name='operators-api-affiliated-lots'),
+
+
     # private, administrators
     path('administrators/users-autocomplete/', views.admin_users_autocomplete, name='admin-api-users-autocomplete'),
     path('administrators/entities-autocomplete/', views.admin_entities_autocomplete, name='admin-api-entities-autocomplete'),
