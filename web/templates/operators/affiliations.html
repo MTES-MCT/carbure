@@ -12,11 +12,46 @@
       <tbody></tbody>
     </table>
     <div class="flex-container-right">
-      <a class="button secondary" id="btn_accept">Accepter Lots</a>
-      <a class="button secondary" id="btn_reject">Refuser Lots</a>
+      <a class="button secondary" id="btn_open_modal_accept_lots">Accepter Lots</a>
+      <a class="button secondary" id="btn_open_modal_reject_lots">Refuser Lots</a>
     </div>
   </div>
 </div>
+
+<div class="modal__backdrop" id="modal_accept_lots">
+  <div class="modal">
+    <span id="modal_accept_lots_form_err_message" style="color: red;"></span>
+    <form id="modal_accept_lots_form" method="POST" data-url="{% url 'operators-api-accept-lots' %}">
+      {% csrf_token %}
+      <p>Êtes vous sûr de vouloir accepter ce(s) lot(s) ?</p>
+      <ul id="modal_accept_lots_list">
+      </ul>
+      <input type="hidden" id="modal_accept_lots_lots" name="lots">
+      <div class="form__group button__group">
+        <a class="button secondary" id="btn_close_modal_accept_lots">Annuler</a>
+        <button type="submit" class="button">Valider</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_reject_lots">
+  <div class="modal">
+    <span id="modal_reject_lots_form_err_message" style="color: red;"></span>
+    <form id="modal_reject_lots_form" method="POST" data-url="{% url 'operators-api-reject-lots' %}">
+      {% csrf_token %}
+      <p>Êtes vous sûr de vouloir refuser ce(s) lot(s) ?</p>
+      <ul id="modal_reject_lots_list">
+      </ul>
+      <input type="hidden" id="modal_reject_lots_lots" name="lots">
+      <div class="form__group button__group">
+        <a class="button secondary" id="btn_close_modal_reject_lots">Annuler</a>
+        <button type="submit" class="button">Valider</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -80,6 +115,79 @@ $(document).ready(function() {
   $('#input_search_datatable').on('keyup', function() {
       table.search(this.value).draw();
   });
+
+  var selected_rows = {}
+
+
+  function manage_accept_button() {
+    let keys = Object.keys(selected_rows)
+    console.log(`${keys.length} lines selected`)
+    if (keys.length >= 1) {
+      $("#btn_open_modal_accept_lots").addClass('primary')
+      $("#btn_open_modal_accept_lots").removeClass('secondary')
+      $("#modal_accept_lots_list").empty()
+      let to_accept = []
+      for (let i = 0, len = keys.length; i < len; i++) {
+        let key = keys[i]
+        let rowdata = selected_rows[key]
+        let statut = rowdata['status']
+        $("#modal_accept_lots_list").append(`<li>${rowdata['producer']} - ${rowdata['volume']} - ${rowdata['biocarburant']} - ${rowdata['matiere_premiere']}</li>`)
+        to_accept.push(selected_rows[key]['id'])
+      }
+      $("#modal_accept_lots_lots").val(to_accept.join(","))
+    } else {
+      $("#btn_open_modal_accept_lots").addClass('secondary')
+      $("#btn_open_modal_accept_lots").removeClass('primary')
+      // cleanup accept modal
+      $("#modal_accept_lots_list").empty()
+    }
+  }
+
+  function manage_reject_button(only_drafts_present) {
+    let keys = Object.keys(selected_rows)
+
+    if (keys.length >= 1) {
+      $("#btn_open_modal_reject_lots").addClass('primary')
+      $("#btn_open_modal_reject_lots").removeClass('secondary')
+      // add drafts to validate modal
+      $("#modal_reject_lots_list").empty()
+      let to_accept = []
+      for (let i = 0, len = keys.length; i < len; i++) {
+        let key = keys[i]
+        let rowdata = selected_rows[key]
+        let statut = rowdata['status']
+        $("#modal_reject_lots_list").append(`<li>${rowdata['producer']} - ${rowdata['volume']} - ${rowdata['biocarburant']} - ${rowdata['matiere_premiere']}</li>`)
+        to_accept.push(selected_rows[key]['id'])
+      }
+      $("#modal_reject_lots_lots").val(to_accept.join(","))
+    } else {
+      $("#btn_open_modal_reject_lots").addClass('secondary')
+      $("#btn_open_modal_reject_lots").removeClass('primary')
+      // cleanup accept modal
+      $("#modal_reject_lots_list").empty()
+    }
+  }
+
+  /* accept/reject buttons */
+  function manage_actions() {
+    manage_accept_button()
+    manage_reject_button()
+  }
+
+  $('#datatable_wrapper tbody').on('click', 'input', function() {
+    let hrow = $(this).closest("tr")
+    let row = table.row(hrow)
+    let data = table.row(row).data();
+    let rowid = table.row(row).index();
+    // add to selection if checked, otherwise remove
+    if (rowid in selected_rows) {
+      delete selected_rows[rowid]
+    } else {
+      selected_rows[rowid] = data
+    }
+    manage_actions()
+  })
+
 })
 </script>
 

@@ -35,8 +35,8 @@ urlpatterns = [
 
     # private, operators
     path('operators/lots-affilies', views.operators_lots_affilies, name='operators-api-affiliated-lots'),
-    path('operators/lots/accept', views.operators_lot_accept, name='operators-api-accept-lot'),
-    path('operators/lots/reject', views.operators_lot_reject, name='operators-api-reject-lot'),
+    path('operators/lots/accept', views.operators_lot_accept, name='operators-api-accept-lots'),
+    path('operators/lots/reject', views.operators_lot_reject, name='operators-api-reject-lots'),
 
 
     # private, administrators
