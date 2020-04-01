@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from core.decorators import enrich_with_user_details, restrict_to_operators
-from operators.models import OperatorDeclaration
+from operators.models import OperatorDeclaration, AcceptedLot
 
 import datetime
 import calendar
@@ -29,6 +29,9 @@ def operators_index(request, *args, **kwargs):
       OperatorDeclaration.objects.update_or_create(period=period, operator=context['user_entity'], defaults={'deadline':nextmonth})
       current_period -= datetime.timedelta(days=30)
     declarations = OperatorDeclaration.objects.filter(operator=context['user_entity'])
+
+  for declaration in declarations:
+    declaration.lots = len(AcceptedLot.objects.filter(declaration=declaration))
 
   context['declarations'] = declarations
   context['today'] = datetime.date.today()
