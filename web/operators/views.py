@@ -40,7 +40,30 @@ def operators_index(request, *args, **kwargs):
 @restrict_to_operators
 def operators_declaration(request, *args, **kwargs):
   context = kwargs['context']
+  declaration_id = kwargs['declaration_id']
   context['current_url_name'] = 'operators-declaration'
+
+  declarations = OperatorDeclaration.objects.filter(operator=context['user_entity'])
+  current_declaration_qs = declarations.filter(id=declaration_id)
+  if len(current_declaration_qs) == 0:
+    raise PermissionDenied
+  current_declaration = current_declaration_qs[0]
+  next_declarations = declarations.filter(deadline__gt=current_declaration.deadline).order_by('deadline')
+  previous_declarations = declarations.filter(deadline__lt=current_declaration.deadline).order_by('-deadline')
+  context['current_declaration'] = current_declaration
+  if len(next_declarations) == 0:
+    # this is the latest attestation. no next, two previous
+    context['next_declarations'] = None
+    context['previous_declarations'] = previous_declarations[0:2]
+  elif len(previous_declarations) == 0:
+    # this is the first attestation. no previous, two next
+    context['next_declarations'] = [next_declarations[1], next_declarations[0]]
+    context['previous_declarations'] = None
+  else:
+    # middle, one of each
+    context['next_declarations'] = [next_declarations[0]]
+    context['previous_declarations'] = [previous_declarations[0]]
+
   return render(request, 'operators/declaration.html', context)
 
 @login_required

@@ -1,11 +1,15 @@
 	<aside class="side-menu" role="navigation" style="max-width: 170px;">
 		<ul>
-			<li><a {% if current_url_name == 'operators-index' or current_url_name == 'operators-declaration' %}class="active"{% endif %} href="{% url 'operators-index' %}">Mes Lots</a></li>
+			<li><a {% if current_url_name == 'operators-index' or current_url_name == 'operators-declaration' %}class="active"{% endif %} href="{% url 'operators-index' %}">Déclarations</a></li>
 				{% if current_url_name == 'operators-declaration' %}
 				<ul>
-					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' %}">2020-02</a></li>
-					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' %}" class="active-submenu">2020-01</a></li>
-					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' %}">2019-12</a></li>
+					{% for nd in next_declarations %}
+					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' declaration_id=nd.id %}">{{nd.period}}</a></li>
+					{% endfor %}
+					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' declaration_id=current_declaration.id %}" class="active-submenu">{{current_declaration.period}}</a></li>
+					{% for pd in previous_declarations %}
+					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' declaration_id=pd.id %}">{{pd.period}}</a></li>
+					{% endfor %}
 				</ul>
 				{% endif %}
 			<li><a {% if current_url_name == 'operators-affiliations' %}class="active"{% endif %} href="{% url 'operators-affiliations' %}">Lots en Attente<span class="badge badge-green">{{nb_affiliated_lots}}</span></a></li>

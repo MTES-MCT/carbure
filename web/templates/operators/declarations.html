@@ -3,47 +3,31 @@
 {% block content  %}
 <div class="main" style="overflow-x: auto;">
 	<div class="panel">
-		<h3>Déclarations</h3>
+		<h3>Déclarations de durabilité</h3>
 		<table class="display nowrap" id="datatable">
 			<thead>
 				<tr>
 					<th>Période</th>
 					<th>Lots</th>
-					<th>Corrections</th>
-					<th>Brouillons</th>
-					<th>Deadline</th>
+					<th>Échéance</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr class="clickable" onclick="window.location='{% url 'operators-declaration' %}'">
-					<td>2020-01</td>
-					<td>121</td>
-					<td>14</td>
-					<td>2</td>
-					<td>29 Jours</td>
+				{% for d in declarations %}
+				<tr
+					{% if d.deadline > today and d.deadline < twoweeks %}
+					class="status_warning"
+					{% elif d.deadline > today %}
+					class="clickable"
+					{% else %}
+					class="status_ok"
+					{% endif %}
+					onclick="window.location='{% url 'operators-declaration' declaration_id=d.id %}'">
+					<td>{{d.period}}</td>
+					<td>{{d.lots}}</td>
+					<td>{{d.deadline}}</td>
 				</tr>
-				<tr class="status_warning" onclick="window.location='{% url 'operators-declaration' %}'">
-
-					<td>2019-12</td>
-					<td>253</td>
-					<td>3</td>
-					<td>1</td>
-					<td>3 Jours</td>
-				</tr>
-				<tr class="status_ok" onclick="window.location='{% url 'operators-declaration' %}'">
-					<td>2019-11</td>
-					<td>187</td>
-					<td>0</td>
-					<td>0</td>
-					<td>Terminé</td>
-				</tr>
-				<tr class="status_ok" onclick="window.location='{% url 'operators-declaration' %}'">
-					<td>2019-10</td>
-					<td>212</td>
-					<td>0</td>
-					<td>0</td>
-					<td>Terminé</td>
-				</tr>
+				{% endfor %}
 			</tbody>
 		</table>
 	</div>
@@ -52,8 +36,6 @@
 
 
 {% block extra_js %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/fc-3.3.0/datatables.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
 	var table = $('#datatable').DataTable({
@@ -69,9 +51,6 @@ $(document).ready(function() {
 		columnDefs: [
     		{"className": "dt-center", "targets": "_all"}
   		],
-		render: function(data, type, row) {
-            return '<a href="#">Link</a>'
-        },
 	});
 })
 
