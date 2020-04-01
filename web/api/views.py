@@ -5,6 +5,7 @@ from django.http import JsonResponse, HttpResponse, StreamingHttpResponse
 import json
 from core.models import *
 from producers.models import *
+from operators.models import *
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 import logging
@@ -233,7 +234,7 @@ def producers_validate_lots(request, *args, **kwargs):
       lot = Lot.objects.get(id=lotid)
       # [PAYS][YYMM]P[IDProd]-[1....]-([S123])
       # FR2002P001-1
-      lot.carbure_id = "%s%sP%d-%d" % (today.strftime('%y%m'), lot.producer.id, lot.id)
+      lot.carbure_id = "%s%sP%d-%d" % ('FR', today.strftime('%y%m'), lot.producer.id, lot.id)
       lot.status = "Validated"
       lot.save()
     except Exception as e:
@@ -547,7 +548,7 @@ def producers_attestation_export(request, *args, **kwargs):
 @restrict_to_operators
 def operators_lots_affilies(request, *args, **kwargs):
   context = kwargs['context']
-  lots = Lot.objects.filter(ea=context['user_entity'])
+  lots = Lot.objects.filter(ea=context['user_entity'], ea_delivery_accepted=False)
   data = serializers.serialize('json', lots, fields=('carbure_id', 'producer', 'production_site', 'dae', 'ea_delivery_date', 'ea_delivery_site', 'ea', 'volume',
     'matiere_premiere', 'biocarburant', 'pays_origine', 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ea_overriden', 'ea_override',
     'client_id', 'status'), use_natural_foreign_keys=True)
@@ -569,6 +570,8 @@ def operators_lot_accept(request, *args, **kwargs):
     try:
       declaration = OperatorDeclaration.objects.get(operator=context['user_entity'], period=lot.attestation.period)
       accepted, created = AcceptedLot.objects.update_or_create(operator=context['user_entity'], declaration=declaration, lot=lot)
+      lot.ea_delivery_accepted = True
+      lot.save()
     except Exception as e:
       return JsonResponse({'status':'error', 'message':'Erreur lors de l\'acceptation du lot', 'extra':str(e)}, status=400)
   return JsonResponse({'status':'success', 'message':'lots accepted'})
@@ -588,6 +591,7 @@ def operators_lot_reject(request, *args, **kwargs):
     lot = Lot.objects.get(id=lotid, ea=context['user_entity'])
     lot.ea = None
     lot.ea_delivery_site = ''
+    lot.status = 'Draft'
     lot.save()
   return JsonResponse({'status':'success', 'message':'lots rejected'})
 
