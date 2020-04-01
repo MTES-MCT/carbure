@@ -553,6 +553,44 @@ def operators_lots_affilies(request, *args, **kwargs):
     'client_id', 'status'), use_natural_foreign_keys=True)
   return HttpResponse(data, content_type='application/json')
 
+# operators api
+@login_required
+@enrich_with_user_details
+@restrict_to_operators
+def operators_lot_accept(request, *args, **kwargs):
+  context = kwargs['context']
+  lot_ids = request.POST.get('lots', None)
+  if not lot_ids:
+    return JsonResponse({'status':'error', 'message':'Aucun lot sélectionné'}, status=400)
+
+  ids = lot_ids.split(',')
+  for lotid in ids:
+    lot = Lot.objects.get(id=lotid, ea=context['user_entity'])
+    try:
+      declaration = OperatorDeclaration.objects.get(operator=context['user_entity'], period=lot.attestation.period)
+      accepted, created = AcceptedLot.objects.update_or_create(operator=context['user_entity'], declaration=declaration, lot=lot)
+    except Exception as e:
+      return JsonResponse({'status':'error', 'message':'Erreur lors de l\'acceptation du lot', 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'lots accepted'})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_operators
+def operators_lot_reject(request, *args, **kwargs):
+  context = kwargs['context']
+  lot_ids = request.POST.get('lots', None)
+  if not lot_ids:
+    return JsonResponse({'status':'error', 'message':'Aucun lot sélectionné'}, status=400)
+
+  ids = lot_ids.split(',')
+  for lotid in ids:
+    lot = Lot.objects.get(id=lotid, ea=context['user_entity'])
+    lot.ea = None
+    lot.ea_delivery_site = ''
+    lot.save()
+  return JsonResponse({'status':'success', 'message':'lots rejected'})
+
 # admin autocomplete helpers
 @login_required
 @enrich_with_user_details
