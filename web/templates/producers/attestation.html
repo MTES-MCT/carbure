@@ -120,9 +120,11 @@
 
 <div class="modal__backdrop" id="modal_edit_lot">
   <div class="modal" style="max-width: none;">
-    <div class="flex-container">
+    <h4 id="err_msg_dom"></h4>
+    <div class="flex-container modal-edit">
       <div class="form__group" style="margin-top: var(--space-l);">
         <h3 style="text-align: center;">Informations</h3>
+        <input type="hidden" id="lot_id" />
         <dl>
           <dt>Site de Production</dt>
           <dd><input type="text" id="production_site_name" class="autocomplete_production_sites" /><input type="hidden" id="production_site_id" /></dd>
@@ -141,7 +143,7 @@
         <dl>
         <dt><label for="dae">Numéro de DAE</label></dt>
         <dd><input id="dae" type="text" /></dd>
-        <dt><label for="ea_display">Client</label></dt>
+        <dt><label for="ea_name">Client</label></dt>
         <dd><input type="text" id="ea_name" class="autocomplete_operators" /><input type="hidden" id="ea_id" /></dd>
         <dt><label for="ea_delivery_site">Site de livraison</label></dt>
         <dd><input id="ea_delivery_site" type="text" /></dd>
@@ -220,7 +222,7 @@
       </div>
     </div>
     <div class="form__group button__group">
-      <a class="button primary" id="btn_modal_edit_lot_save">Sauvegarder</a>
+      <a class="button primary" id="btn_edit_lot_save">Sauvegarder</a>
       <a class="button secondary close" id="btn_close_modal_edit_lot">Annuler</a>
     </div>
   </div>
@@ -289,8 +291,8 @@ function manage_validate_button(draft_present) {
       let rowdata = selected_rows[key]
       let statut = rowdata['status']
       if (statut.toLowerCase() === "draft") {
-        $("#modal_validate_lots_list").append(`<li>${rowdata['production_site']} - ${rowdata['volume']} - ${rowdata['biocarburant']} - ${rowdata['matiere_premiere']}</li>`)
-        to_validate.push(selected_rows[key]['id'])
+        $("#modal_validate_lots_list").append(`<li>${rowdata['production_site_name']} - ${rowdata['volume']} - ${rowdata['biocarburant_name']} - ${rowdata['matiere_premiere_name']}</li>`)
+        to_validate.push(selected_rows[key]['lot_id'])
       }
       $("#modal_validate_lots_lots").val(to_validate.join(","))
     }
@@ -316,8 +318,8 @@ function manage_delete_button(only_drafts_present) {
       let rowdata = selected_rows[key]
       let statut = rowdata['status']
       if (statut.toLowerCase() === "draft") {
-        $("#modal_delete_lots_list").append(`<li>${rowdata['production_site']} - ${rowdata['volume']} - ${rowdata['biocarburant']} - ${rowdata['matiere_premiere']}</li>`)
-        to_delete.push(selected_rows[key]['id'])
+        $("#modal_delete_lots_list").append(`<li>${rowdata['production_site_name']} - ${rowdata['volume']} - ${rowdata['biocarburant_name']} - ${rowdata['matiere_premiere_name']}</li>`)
+        to_delete.push(selected_rows[key]['lot_id'])
       }
       $("#modal_delete_lots_lots").val(to_delete.join(","))
     }
@@ -333,7 +335,7 @@ function manage_add_button() {
   if (keys.length === 1) {
     $("#add_lot").text("Dupliquer Lot")
     $("#add_lot").removeAttr("href")
-    let lot_id = selected_rows[keys[0]]['id']
+    let lot_id = selected_rows[keys[0]]['lot_id']
     $("#add_lot").attr("onclick", `duplicate_lot(${lot_id})`)
   } else {
     $("#add_lot").text("Ajouter Lot")
@@ -573,8 +575,6 @@ $(document).ready(function() {
     let row = $(this).closest('tr');
     let data = table.row(row).data()
     let table_column = table_columns[colid]
-    let attestation_id = "{{attestation_id}}"
-    let lot_id = data['id']
     if (table_column['data'] === 'checkbox') {
       // ignore clicks on checkbox column
       return
@@ -585,9 +585,22 @@ $(document).ready(function() {
       }
       // non-input keys
       ['ghg_total', 'ghg_reduction', 'ghg_reference'].forEach(function(item, index) {
-        console.log(`${item} ${data[item]}`)
         $(`#${item}`).html(data[item])
       })
+
+      /* special cases for override */
+      let overrideable_fields = ['ea']
+      for (let i = 0, len = overrideable_fields.length; i < len; i++) {
+        let field = overrideable_fields[i]
+        let name_field = `${field}_name`
+        let override_field = `${field}_override`
+        let is_overriden_field = `${field}_overriden`
+
+        if (data[is_overriden_field] == true) {
+          let override = data[override_field]
+          $(`#${name_field}`).val(override)
+        }
+      }
       modal.style.display = "flex"
     }
   });
@@ -640,6 +653,153 @@ $(document).on({
     });
   }
 }, ".dataTables_wrapper tbody tr");
+
+  var SAVE_AND_REDIRECT = 0
+  var SAVE_AND_ADD_NEW = 1
+  var EDIT = 2
+
+  $("#btn_edit_lot_save").on('click', handleSaveEdit)
+
+  function handleSaveEdit() {
+    handleSave(EDIT)
+  }
+
+  function handleSave(action) {
+    var err_msg_dom = $("#err_msg_dom")
+    var formdata = new FormData();
+    formdata.set('attestation_id', '{{current_attestation.id}}')
+    formdata.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
+    $(".modal-edit input").each(function() {
+      console.log($(this).attr('id'), $(this).val())
+      formdata.set($(this).attr('id'), $(this).val())
+    })
+
+    // post form
+    $.ajax({
+      url         : "{% url 'producers-api-attestation-save-lot-new' attestation_id=current_attestation.id %}",
+      data        : formdata,
+      cache       : false,
+      contentType : false,
+      processData : false,
+      type        : 'POST',
+      success     : function(data, textStatus, jqXHR) {
+        // Callback code
+        alert(JSON.stringify(data))
+        window.location.reload()
+      },
+      error       : function(e) {
+        if (e.status === 400) {
+          err_msg_dom.html(`Erreur lors de la sauvegarde du lot: ${e.responseJSON.message}`)
+          //alert(e.responseJSON.message)
+        } else {
+          alert("Server error. Please contact an administrator")
+        }
+      }
+    })
+  }
+
+function load_ges(mp, bc) {
+  $.ajax({
+    url         : "{% url 'producers-api-ges' %}" + `?mp=${mp}&bc=${bc}`,
+    cache       : false,
+    contentType : false,
+    processData : false,
+    type        : 'GET',
+    success     : function(data, textStatus, jqXHR) {
+      // Callback code
+      $.each(data, function(key, value) {
+        if (key !== "ref") {
+         $(`#${key}`).val(value)
+        } else {
+         $(`#${key}`).text(value)
+        }
+      })
+      $("#eec").change()
+    },
+    error       : function(e) {
+      if (e.status === 400) {
+        alert(e.responseJSON.message)
+      } else {
+        alert("Server error. Please contact an administrator")
+      }
+    }
+  })
+}
+
+$(".ges_field").on('change', function() {
+  var sum_incr = 0
+  var sum_decr = 0
+  var ref = parseFloat($("#ref").html())
+  $(".ges_incr").each(function(index, elem) {
+    sum_incr += parseFloat(elem.value)
+  })
+  $(".ges_decr").each(function(index, elem) {
+    sum_decr += parseFloat(elem.value)
+  })
+  var sum = sum_incr - sum_decr
+  $("#ges_total").text(sum.toFixed(2))
+  var pct_reduction = (1.0 - (sum / ref)) * 100
+  console.log(`pct reduc ${sum} ${ref} ${pct_reduction}`)
+  $("#pct_reduction").text(`${pct_reduction.toFixed(2)}%`)
+})
+
+$(".autocomplete_mps").autocomplete({
+  serviceUrl: "{% url 'producers-api-mps-autocomplete' %}",
+  dataType: 'json',
+  params: {'producer_id': '{{user_entity.id}}' },
+  minChars: 0,
+  onSelect: function(suggestion) {
+    $("#matiere_premiere_code").val(suggestion.data)
+    let selected_bc = $("#biocarburant_code").val()
+    if (selected_bc !== '') {
+      load_ges(suggestion.data, selected_bc)
+    }
+  }
+})
+
+$(".autocomplete_biocarburants").autocomplete({
+  serviceUrl: "{% url 'producers-api-biocarburants-autocomplete' %}",
+  dataType: 'json',
+  params: {'producer_id': '{{user_entity.id}}' },
+  minChars: 0,
+  onSelect: function(suggestion) {
+    $("#biocarburant_code").val(suggestion.data)
+    let selected_mp = $("#matiere_premiere_code").val()
+    if (selected_mp !== '') {
+      load_ges(selected_mp, suggestion.data)
+    }
+  }
+})
+
+$(".autocomplete_production_sites").autocomplete({
+  serviceUrl: "{% url 'producers-api-production-sites-autocomplete' %}",
+  dataType: 'json',
+  params: {'producer_id': '{{user_entity.id}}' },
+  minChars: 0,
+  onSelect: function(suggestion) {
+    $("#production_site_id").val(suggestion.data)
+  },
+})
+
+$(".autocomplete_countries").autocomplete({
+  serviceUrl: "{% url 'api-country-autocomplete' %}",
+  dataType: 'json',
+  onSelect: function(suggestion) {
+    $("#pays_origine_code").val(suggestion.data)
+  },
+})
+
+$(".autocomplete_operators").autocomplete({
+  serviceUrl: "{% url 'api-operators-autocomplete' %}",
+  dataType: 'json',
+  minChars: 0,
+  onSelect: function(suggestion) {
+    $("#ea_id").val(suggestion.data)
+  },
+  onInvalidateSelection: function() {
+    $("#ea_id").val('')
+  }
+})
 
 </script>
 
