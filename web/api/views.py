@@ -103,12 +103,12 @@ def producers_lots_new(request, *args, **kwargs):
   return JsonResponse([{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id,
   'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
   'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date, 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
-  'volume':l.volume, 'matiere_premiere_code':l.matiere_premiere.code if l.matiere_premiere else '', 'matiere_premiere_name':l.matiere_premiere.name if l.matiere_premiere else '',
-  'biocarburant_code':l.biocarburant.code if l.biocarburant else '', 'biocarburant_name':l.biocarburant.name if l.biocarburant else '',
-  'pays_origine_code':l.pays_origine.code_pays if l.pays_origine else '', 'pays_origine_name':l.pays_origine.name if l.pays_origine else '',
-  'eec':l.eec, 'el':l.el, 'ep':l.ep, 'etd':l.etd, 'eu':l.eu, 'esca':l.esca, 'eccs':l.eccs, 'eccr':l.eccr, 'eee':l.eee, 'ghg_total':l.ghg_total,
-  'ghg_reference':l.ghg_reference, 'ghg_reduction':'%.2f%%' % (l.ghg_reduction), 'client_id':l.client_id, 'status':l.status, 'ea_delivery_accepted':l.ea_delivery_accepted,
-  'id':l.id} for l in lots], safe=False)
+  'ea_overriden':l.ea_overriden, 'ea_override':l.ea_override, 'volume':l.volume, 'matiere_premiere_code':l.matiere_premiere.code if l.matiere_premiere else '',
+  'matiere_premiere_name':l.matiere_premiere.name if l.matiere_premiere else '', 'biocarburant_code':l.biocarburant.code if l.biocarburant else '',
+  'biocarburant_name':l.biocarburant.name if l.biocarburant else '', 'pays_origine_code':l.pays_origine.code_pays if l.pays_origine else '',
+  'pays_origine_name':l.pays_origine.name if l.pays_origine else '', 'eec':l.eec, 'el':l.el, 'ep':l.ep, 'etd':l.etd, 'eu':l.eu, 'esca':l.esca, 'eccs':l.eccs,
+  'eccr':l.eccr, 'eee':l.eee, 'ghg_total':l.ghg_total, 'ghg_reference':l.ghg_reference, 'ghg_reduction':'%.2f%%' % (l.ghg_reduction), 'client_id':l.client_id,
+  'status':l.status, 'ea_delivery_accepted':l.ea_delivery_accepted, 'lot_id':l.id} for l in lots], safe=False)
 
 @login_required
 @enrich_with_user_details
@@ -532,6 +532,137 @@ def producers_save_lot(request, *args, **kwargs):
   lot.client_id = client_id
   lot.save()
   return JsonResponse({'status':'success', 'lot_id': lot.id})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_save_lot_new(request, *args, **kwargs):
+  context = kwargs['context']
+  attestation_id = kwargs['attestation_id']
+
+  # new lot or edit?
+  lot_id = request.POST.get('lot_id', None)
+
+  # mandatory fields
+  production_site = request.POST.get('production_site_id', None)
+  biocarburant = request.POST.get('biocarburant_code', None)
+  matiere_premiere = request.POST.get('matiere_premiere_code', None)
+  if not production_site or not biocarburant or not matiere_premiere:
+    return JsonResponse({'status':'error', 'message':"Veuillez remplir au minimum les champs suivants: Site de Production, Biocarburant, Matière Première"}, status=400)
+
+  # all other fields
+  volume = request.POST.get('volume', None)
+  pays_origine = request.POST.get('pays_origine_code', None)
+  eec = request.POST.get('eec', None)
+  el = request.POST.get('el', None)
+  ep = request.POST.get('ep', None)
+  etd = request.POST.get('etd', None)
+  eu = request.POST.get('eu', None)
+  esca = request.POST.get('esca', None)
+  eccs = request.POST.get('eccs', None)
+  eccr = request.POST.get('eccr', None)
+  eee = request.POST.get('eee', None)
+
+  num_dae = request.POST.get('dae', None)
+  ea_delivery_date = request.POST.get('ea_delivery_date', None)
+  ea = request.POST.get('ea_id', None)
+  ea_name = request.POST.get('ea_name', None)
+
+  ea_delivery_site = request.POST.get('ea_delivery_site', '')
+  client_id = request.POST.get('client_id', None)
+
+  if lot_id:
+    lot = Lot.objects.get(id=lot_id)
+  else:
+    lot = Lot()
+
+  lot.attestation = AttestationProducer.objects.get(id=attestation_id)
+  lot.producer = context['user_entity']
+
+  # production site
+  try:
+    production_site_id = int(production_site)
+  except ValueError:
+    production_site_id = None
+  if production_site_id:
+    try:
+      lot.production_site = ProductionSite.objects.get(id=production_site_id)
+    except Exception as e:
+      return JsonResponse({'status':'error', 'message':"ID site de production [%d] inconnu" % (production_site_id), 'extra': str(e)}, status=400)
+
+  if volume:
+    lot.volume = float(volume)
+
+  try:
+    lot.matiere_premiere = MatierePremiere.objects.get(code=matiere_premiere)
+  except:
+    return JsonResponse({'status':'error', 'message':"Matiere premiere inconnue."}, status=400)
+
+  try:
+    lot.biocarburant = Biocarburant.objects.get(code=biocarburant)
+  except:
+    return JsonResponse({'status':'error', 'message':"Type de biocarburant inconnu."}, status=400)
+
+  if pays_origine:
+    try:
+      lot.pays_origine = Pays.objects.get(code_pays=pays_origine)
+    except:
+      return JsonResponse({'status':'error', 'message':"Pays inconnu."}, status=400)
+
+  # ghg
+  if eec:
+    lot.eec = float(eec)
+  if el:
+    lot.el = float(el)
+  if ep:
+    lot.ep = float(ep)
+  if etd:
+    lot.etd = float(etd)
+  if eu:
+    lot.eu = float(eu)
+  if esca:
+    lot.esca = float(esca)
+  if eccs:
+    lot.eccs = float(eccs)
+  if eccr:
+    lot.eccr = float(eccr)
+  if eee:
+    lot.eee = float(eee)
+
+  lot.ghg_total = round(lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee, 2)
+  lot.ghg_reference = 83.8
+  lot.ghg_reduction = round((1.0 - (lot.ghg_total / lot.ghg_reference)) * 100.0, 2)
+
+  # client / delivery
+  lot.dae = num_dae
+  if not ea_delivery_date or ea_delivery_date == '':
+    lot.ea_delivery_date = None
+  else:
+    lot.ea_delivery_date = ea_delivery_date
+  lot.ea_delivery_site = ea_delivery_site
+
+
+  # production site can be either ID or name or nothing
+  if ea:
+    try:
+      ea_id = int(ea)
+      lot.ea = Entity.objects.get(id=ea_id)
+      lot.ea_overriden = False
+      lot.ea_override = ''
+    except ValueError:
+      return JsonResponse({'status':'error', 'message':"ID Client inconnu"}, status=400)
+  elif ea_name:
+    lot.ea_overriden = True
+    lot.ea_override = ea_name
+  else:
+    lot.ea_overriden = False
+    lot.ea_override = ''
+    lot.ea = None
+
+  lot.client_id = client_id
+  lot.save()
+  return JsonResponse({'status':'success', 'lot_id': lot.id})
+
 
 @login_required
 @enrich_with_user_details
