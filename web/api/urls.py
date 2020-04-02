@@ -17,6 +17,7 @@ urlpatterns = [
 
     # private, producers
     path('producers/lots/<int:attestation_id>', views.producers_lots, name='api-producers-lots'),
+    path('producers/lots-new/<int:attestation_id>', views.producers_lots_new, name='api-producers-lots-new'),
     path('producers/lots', views.producers_all_lots, name='api-producers-all-lots'),
     path('producers/production-sites-autocomplete/', views.producers_prod_site_autocomplete, name='producers-api-production-sites-autocomplete'),
     path('producers/biocarburant-autocomplete/', views.producers_biocarburant_autocomplete, name='producers-api-biocarburants-autocomplete'),

@@ -1,12 +1,12 @@
 /* modals management */
 var table_columns = [
 {title:'Numéro de lot', can_hide: true, can_duplicate: false, can_export: true, data:'carbure_id'},
-{title:'Producteur', can_hide: true, can_duplicate: true, can_export: true, data:'producer'},
-{title:'Site de<br />Production', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data:'production_site'},
+{title:'Producteur', can_hide: true, can_duplicate: true, can_export: true, data:'producer_name'},
+{title:'Site de<br />Production', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data:'production_site_name'},
 {title: 'Volume<br /> à 20°C<br />en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
-{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data: 'biocarburant'},
-{title:'Matière<br /> Première', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data: 'matiere_premiere'},
-{title:`Pays<br /> d'origine`, can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data: 'pays_origine'},
+{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data: 'biocarburant_name'},
+{title:'Matière<br /> Première', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data: 'matiere_premiere_name'},
+{title:`Pays<br /> d'origine`, can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data: 'pays_origine_name'},
 
 {title:'EEC', can_hide: true, can_duplicate: true, can_export: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
 {title:'EL', can_hide: true, can_duplicate: true, can_export: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
@@ -24,7 +24,7 @@ var table_columns = [
 {title:'N°DAE', can_hide: true, can_duplicate: false, can_export: true, data:'dae'},
 {title:'Référence', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data:'client_id', tooltip: 'Champ libre - Référence client'},
 {title:'Date d\'entrée<br />en EA', can_hide: true, can_duplicate: true, can_export: true, data:'ea_delivery_date'},
-{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data: 'ea'},
+{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data: 'ea_name'},
 {title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data: 'ea_delivery_site'},
 {title:'Statut', can_hide: true, can_duplicate: false, read_only: true, can_filter: true, can_export: false, data: 'status'},
 {title:`<input type="checkbox" id="checkbox_header"/>`, can_hide: false, can_duplicate: false, read_only: true, can_export: false, data:'checkbox'},
