@@ -417,8 +417,12 @@ def producers_save_lot(request, *args, **kwargs):
   production_site = request.POST.get('production_site', None)
   biocarburant = request.POST.get('biocarburant', None)
   matiere_premiere = request.POST.get('matiere_premiere', None)
-  if not production_site or not biocarburant or not matiere_premiere:
-    return JsonResponse({'status':'error', 'message':"Veuillez remplir au minimum les champs suivants: Site de Production, Biocarburant, Matière Première"}, status=400)
+  if not production_site:
+    return JsonResponse({'status':'error', 'message':"Site de Production manquant ou inconnu"}, status=400)
+  if not biocarburant:
+    return JsonResponse({'status':'error', 'message':"Biocarburant manquant ou inconnu"}, status=400)
+  if not matiere_premiere:
+    return JsonResponse({'status':'error', 'message':"Matière Première manquante ou inconnue"}, status=400)
 
   # all other fields
   volume = request.POST.get('volume', None)
@@ -547,8 +551,12 @@ def producers_save_lot_new(request, *args, **kwargs):
   production_site = request.POST.get('production_site_id', None)
   biocarburant = request.POST.get('biocarburant_code', None)
   matiere_premiere = request.POST.get('matiere_premiere_code', None)
-  if not production_site or not biocarburant or not matiere_premiere:
-    return JsonResponse({'status':'error', 'message':"Veuillez remplir au minimum les champs suivants: Site de Production, Biocarburant, Matière Première"}, status=400)
+  if not production_site:
+    return JsonResponse({'status':'error', 'message':"Site de Production manquant ou inconnu"}, status=400)
+  if not biocarburant:
+    return JsonResponse({'status':'error', 'message':"Biocarburant manquant ou inconnu"}, status=400)
+  if not matiere_premiere:
+    return JsonResponse({'status':'error', 'message':"Matière Première manquante ou inconnue"}, status=400)
 
   # all other fields
   volume = request.POST.get('volume', None)
