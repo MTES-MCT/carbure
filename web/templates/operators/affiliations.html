@@ -129,7 +129,7 @@ $(document).ready(function() {
         let rowdata = selected_rows[key]
         let statut = rowdata['status']
         $("#modal_accept_lots_list").append(`<li>${rowdata['producer_name']} - ${rowdata['volume']} - ${rowdata['biocarburant_name']} - ${rowdata['matiere_premiere_name']}</li>`)
-        to_accept.push(selected_rows[key]['id'])
+        to_accept.push(selected_rows[key]['lot_id'])
       }
       $("#modal_accept_lots_lots").val(to_accept.join(","))
     } else {
@@ -154,7 +154,7 @@ $(document).ready(function() {
         let rowdata = selected_rows[key]
         let statut = rowdata['status']
         $("#modal_reject_lots_list").append(`<li>${rowdata['producer_name']} - ${rowdata['volume']} - ${rowdata['biocarburant_name']} - ${rowdata['matiere_premiere_name']}</li>`)
-        to_accept.push(selected_rows[key]['id'])
+        to_accept.push(selected_rows[key]['lot_id'])
       }
       $("#modal_reject_lots_lots").val(to_accept.join(","))
     } else {
