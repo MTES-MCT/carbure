@@ -7,7 +7,7 @@ django.setup()
 
 from core.models import GHGValues, MatierePremiere, Biocarburant
 
-filename = '%s/web/fixtures/ghg_values.csv' % (os.environ['CARBURE_HOME'])
+filename = '%s/web/fixtures/csv/ghg_values.csv' % (os.environ['CARBURE_HOME'])
 
 with open(filename) as csvfile:
     reader = csv.reader(csvfile, delimiter=';', quotechar='"')
