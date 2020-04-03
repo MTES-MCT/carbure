@@ -22,14 +22,22 @@ EMHV;EMHV;HUILE_PALME;huile de palme;piégeage du méthane provenant de l'huiler
 EMHU;EMHU;HUILE_ALIMENTAIRE_USAGEE;huiles de cuisson;;0;0;9.3;13;1.9;1.9
 EMHA;EMHA;HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2;graisses animales fondues;;0;0;13.6;19.1;1.7;1.7
 EMHA;EMHA;HUILES_OU_GRAISSES_ANIMALES_CAT3;graisses animales fondues;;0;0;13.6;19.1;1.7;1.7
-HVO;HVO;COLZA;colza;;33.4;33.4;10.7;15;1.7;1.7
-HVO;HVO;TOURNESOL;tournesol;;26.9;26.9;10.5;14.7;2;2
-HVO;HVO;SOJA;soja;;22.1;22.1;10.9;15.2;9.2;9.2
-HVO;HVO;HUILE_PALME;huile de palme;bassin ouvert pour effluents;27.4;27.4;27.8;38.9;7;7
-HVO;HVO;HUILE_PALME;huile de palme;piégeage du méthane provenant de l'huilerie;27.4;27.4;9.7;13.6;7;7
-HO;HO;HUILE_ALIMENTAIRE_USAGEE;huiles de cuisson usagées;;0;0;10.2;14.3;1.7;1.7
-HO;HO;HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2;graisses animales fondues;;0;0;14.5;20.3;1.5;1.5
-HO;HO;HUILES_OU_GRAISSES_ANIMALES_CAT3;graisses animales fondues;;0;0;14.5;20.3;1.5;1.5
+HVOE;HVOE;COLZA;colza;;33.4;33.4;10.7;15;1.7;1.7
+HVOE;HVOE;TOURNESOL;tournesol;;26.9;26.9;10.5;14.7;2;2
+HVOE;HVOE;SOJA;soja;;22.1;22.1;10.9;15.2;9.2;9.2
+HVOE;HVOE;HUILE_PALME;huile de palme;bassin ouvert pour effluents;27.4;27.4;27.8;38.9;7;7
+HVOE;HVOE;HUILE_PALME;huile de palme;piégeage du méthane provenant de l'huilerie;27.4;27.4;9.7;13.6;7;7
+HVOG;HVOG;COLZA;colza;;33.4;33.4;10.7;15;1.7;1.7
+HVOG;HVOG;TOURNESOL;tournesol;;26.9;26.9;10.5;14.7;2;2
+HVOG;HVOG;SOJA;soja;;22.1;22.1;10.9;15.2;9.2;9.2
+HVOG;HVOG;HUILE_PALME;huile de palme;bassin ouvert pour effluents;27.4;27.4;27.8;38.9;7;7
+HVOG;HVOG;HUILE_PALME;huile de palme;piégeage du méthane provenant de l'huilerie;27.4;27.4;9.7;13.6;7;7
+HOE;HOE;HUILE_ALIMENTAIRE_USAGEE;huiles de cuisson usagées;;0;0;10.2;14.3;1.7;1.7
+HOE;HOE;HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2;graisses animales fondues;;0;0;14.5;20.3;1.5;1.5
+HOE;HOE;HUILES_OU_GRAISSES_ANIMALES_CAT3;graisses animales fondues;;0;0;14.5;20.3;1.5;1.5
+HOG;HOG;HUILE_ALIMENTAIRE_USAGEE;huiles de cuisson usagées;;0;0;10.2;14.3;1.7;1.7
+HOG;HOG;HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2;graisses animales fondues;;0;0;14.5;20.3;1.5;1.5
+HOG;HOG;HUILES_OU_GRAISSES_ANIMALES_CAT3;graisses animales fondues;;0;0;14.5;20.3;1.5;1.5
 HVP;Huile végétale pure;COLZA;colza;;33.4;33.4;3.7;5.2;1.4;1.4
 HVP;Huile végétale pure;TOURNESOL;tournesol;;27.2;27.2;3.8;5.4;1.7;1.7
 HVP;Huile végétale pure;SOJA;soja;;22.2;22.2;4.2;5.9;8.8;8.8
