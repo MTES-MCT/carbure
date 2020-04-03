@@ -14,6 +14,7 @@ import datetime
 import csv
 from django.template import loader
 import io
+import random
 
 # public
 def biocarburant_autocomplete(request):
@@ -80,6 +81,43 @@ def operators_csv(request):
   for t in types:
     writer.writerow([t.name])
   return response
+
+def get_random(model):
+  max_id = model.objects.all().aggregate(max_id=Max("id"))['max_id']
+  while True:
+    pk = random.randint(1, max_id)
+    element = model.objects.filter(pk=pk).first()
+    if element:
+      return element
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_import_csv_template(request, *args, **kwargs):
+  context = kwargs['context']
+  response = HttpResponse(content_type='text/csv')
+  response['Content-Disposition'] = 'attachment; filename="template.csv"'
+  writer = csv.writer(response, delimiter=';')
+  writer.writerow(['production_site','volume','biocarburant_code','matiere_premiere_code','pays_origine_code','eec','el','ep','etd','eu','esca','eccs','eccr','eee','e','dae','client_id','ea_delivery_date','ea_name','ea_delivery_site'])
+  psites = ProductionSite.objects.filter(producer=context['user_entity'])
+  eas = Entity.objects.filter(entity_type='Opérateur')
+  mps = MatierePremiere.objects.all()
+  bcs = Biocarburant.objects.all()
+  countries = Pays.objects.all()
+  delivery_sites = ['Grandpuits', 'Le Havre', 'Tournefeuille', 'Guangzhou']
+  volumes = [1200, 2800, 8000, 4500, 13000]
+  clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
+  today = datetime.date.today().strftime('%d/%m/%Y')
+  for p in psites:
+    mp = random.choice(mps)
+    ea = random.choice(eas)
+    bc = random.choice(bcs)
+    country = random.choice(countries)
+    site = random.choice(delivery_sites)
+    volume = random.choice(volumes)
+    writer.writerow([p.name,volume,bc.code,mp.code,country.code_pays,12,4,2,0,3.3,0,0,0,0,0,'DAE0000001',clientid,today,ea.name,site])
+  return response
+
 
 
 # producers
@@ -558,6 +596,7 @@ def producers_save_lot_new(request, *args, **kwargs):
   lot_id = request.POST.get('lot_id', None)
   # mandatory fields
   production_site = request.POST.get('production_site_id', None)
+  production_site_name = request.POST.get('production_site', None)
   biocarburant = request.POST.get('biocarburant_code', None)
   matiere_premiere = request.POST.get('matiere_premiere_code', None)
   # all other fields
@@ -580,7 +619,7 @@ def producers_save_lot_new(request, *args, **kwargs):
   client_id = request.POST.get('client_id', None)
 
 
-  if not production_site:
+  if not production_site and not production_site_name:
     return JsonResponse({'status':'error', 'message':"Site de Production manquant ou inconnu"}, status=400)
   if not biocarburant:
     return JsonResponse({'status':'error', 'message':"Biocarburant manquant ou inconnu"}, status=400)
@@ -598,15 +637,20 @@ def producers_save_lot_new(request, *args, **kwargs):
   lot.producer = context['user_entity']
 
   # production site
-  try:
-    production_site_id = int(production_site)
-  except ValueError:
-    production_site_id = None
-  if production_site_id:
+  if production_site:
     try:
+      production_site_id = int(production_site)
       lot.production_site = ProductionSite.objects.get(id=production_site_id)
     except Exception as e:
+      production_site_id = None
       return JsonResponse({'status':'error', 'message':"ID site de production [%d] inconnu" % (production_site_id), 'extra': str(e)}, status=400)
+  elif production_site_name:
+    try:
+      lot.production_site = ProductionSite.objects.get(name=production_site_name, producer=context['user_entity'])
+    except Exception as e:
+      return JsonResponse({'status':'error', 'message':"Site de production [%s] inconnu" % (production_site_name), 'extra': str(e)}, status=400)
+  else:
+    return JsonResponse({'status':'error', 'message':"Site de production manquant", 'extra': str(e)}, status=400)
 
   lot.volume = float(volume) if volume else 0.0
 
@@ -648,10 +692,12 @@ def producers_save_lot_new(request, *args, **kwargs):
     lot.ea_delivery_date = None
   else:
     try:
-      edd = datetime.strptime(ea_delivery_date, '%d/%m/%Y')
+      edd = datetime.datetime.strptime(ea_delivery_date, '%d/%m/%Y')
       lot.ea_delivery_date = edd
+    except Exception as e:
+      return JsonResponse({'status':'error', 'message':e}, status=400)
     except:
-      return JsonResponse({'status':'error', 'message':"Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA."}, status=400)
+      return JsonResponse({'status':'error', 'message':"[%s] Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA" % (ea_delivery_date)}, status=400)
   lot.ea_delivery_site = ea_delivery_site
 
   # production site can be either ID or name or nothing

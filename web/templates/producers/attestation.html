@@ -86,7 +86,7 @@
     <div class="form__group">
       <h4>Importer</h4>
       <dl>
-        <dt><a href="/static/files/template.csv" >Télécharger le modèle</dt>
+        <dt><a href="{% url 'api-producers-template-csv' %}" >Télécharger le modèle</dt>
         <dt><a href="{% url 'api-matiere-premiere-csv' %}" ><small>Table des matières premières</small></a></dt>
         <dt><a href="{% url 'api-biocarburant-csv' %}" ><small>Table des biocarburants</small></a></dt>
         <dt><a href="{% url 'api-country-csv' %}" ><small>Table des pays</small></a></dt>
@@ -528,7 +528,7 @@ $(document).ready(function() {
           }
           // save lot
           $.ajax({
-            url         : "{% url 'producers-api-attestation-save-lot' attestation_id=current_attestation.id %}",
+            url         : "{% url 'producers-api-attestation-save-lot-new' attestation_id=current_attestation.id %}",
             data        : formdata,
             cache       : false,
             contentType : false,
