@@ -10,7 +10,7 @@ from core.models import Pays
 filename = '%s/web/fixtures/countries.csv' % (os.environ['CARBURE_HOME'])
 
 with open(filename) as csvfile:
-    reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+    reader = csv.reader(csvfile, delimiter=';', quotechar='"')
     for row in reader:
         code_pays = row[0]
         full_name = row[1]

@@ -10,7 +10,7 @@ from core.models import GHGValues, MatierePremiere, Biocarburant
 filename = '%s/web/fixtures/ghg_values.csv' % (os.environ['CARBURE_HOME'])
 
 with open(filename) as csvfile:
-    reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+    reader = csv.reader(csvfile, delimiter=';', quotechar='"')
     next(reader)
     for row in reader:
         # header code_biocarburant,biocarburant,code_matiere_premiere,matiere_premiere,condition,eec_typical,eec_default,ep_typical,ep_default,etd_typical,etd_default
