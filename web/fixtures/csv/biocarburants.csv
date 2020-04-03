@@ -5,9 +5,12 @@ EMHU;EMHU
 EMHV;EMHV
 ETBE;ETBE
 ET;Ethanol
-HVO;Huile Végétale Hydrotraitée
+HOG;Huile Hydrotraitée - Gazole
+HOE;Huile Hydrotraitée - Essence
+HVOG;Huile Végétale Hydrotraitée - Gazole
+HVOE;Huile Végétale Hydrotraitée - Essence
 MTBE;MTBE
+MT;Méthanol
 TAEE;TAEE
-HO;Huile Hydrotraitée
 HVP;Huile végétale pure
 HCU;Huile provenant d'huiles de cuisson usagées
