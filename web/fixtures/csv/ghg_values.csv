@@ -1,0 +1,38 @@
+code_biocarburant;biocarburant;code_matiere_premiere;matiere_premiere;condition;eec_typical;eec_default;ep_typical;ep_default;etd_typical;etd_default
+ET;Éthanol;BETTERAVE;betterave;"pas de biogaz provenant des égouts, gaz naturel utilisé comme combustible de transformation dans les chaudières classiques";9.6;9.6;18.8;26.3;2.3;2.3
+ET;Éthanol;BETTERAVE;betterave;"avec du biogaz provenant des égouts, gaz naturel utilisé comme combustible de transformation dans les chaudières classiques";9.6;9.6;9.7;13.6;2.3;2.3
+ET;Éthanol;BETTERAVE;betterave;"pas de biogaz provenant des égouts, gaz naturel utilisé comme combustible de transformation dans les centrales de cogénération";9.6;9.6;13.2;18.5;2.3;2.3
+ET;Éthanol;BETTERAVE;betterave;"avec du biogaz provenant des égouts, gaz naturel utilisé comme combustible de transformation dans les centrales de cogénération";9.6;9.6;7.6;10.6;2.3;2.3
+ET;Éthanol;BETTERAVE;betterave;"pas de biogaz provenant des égouts, lignite utilisé comme combustible de transformation dans les centrales de cogénération";9.6;9.6;27.4;38.3;2.3;2.3
+ET;Éthanol;BETTERAVE;betterave;"avec du biogaz provenant des égouts, lignite utilisé comme combustible de transformation dans les centrales de cogénération";9.6;9.6;15.7;22;2.3;2.3
+ET;Éthanol;MAIS;maïs;gaz naturel utilisé comme combustible de transformation dans les chaudières classiques;25.5;25.5;20.8;29.1;2.2;2.2
+ET;Éthanol;MAIS;maïs;gaz naturel utilisé comme combustible de transformation dans les centrales de cogénération;25.5;25.5;14.8;20.8;2.2;2.2
+ET;Éthanol;MAIS;maïs;lignite utilisé comme combustible de transformation dans les centrales de cogénération;25.5;25.5;28.6;40.1;2.2;2.2
+ET;Éthanol;MAIS;maïs;résidus de la sylviculture utilisés comme combustible de transformation dans les centrales de cogénération;25.5;25.5;1.8;2.6;2.2;2.2
+ET;Éthanol;;autres céréales à l'exclusion du maïs;gaz naturel utilisé comme combustible de transformation dans les chaudières classiques;27;27;21;29.3;2.2;2.2
+ET;Éthanol;;autres céréales à l'exclusion du maïs;gaz naturel utilisé comme combustible de transformation dans les centrales de cogénération;27;27;15.1;21.1;2.2;2.2
+ET;Éthanol;;autres céréales à l'exclusion du maïs;lignite utilisé comme combustible de transformation dans les centrales de cogénération;27;27;30.3;42.5;2.2;2.2
+ET;Éthanol;;autres céréales à l'exclusion du maïs;résidus de la sylviculture utilisés comme combustible de transformation dans les centrales de cogénération;27;27;1.5;2.2;2.2;2.2
+ET;Éthanol;CANNE_A_SUCRE;canne à sucre;;17.1;17.1;1.3;1.8;9.7;9.7
+EMHV;EMHV;COLZA;colza;;32;32;11.7;16.3;1.8;1.8
+EMHV;EMHV;TOURNESOL;tournesol;;26.1;26.1;11.8;16.5;2.1;2.1
+EMHV;EMHV;SOJA;soja;;21.2;21.2;12.1;16.9;8.9;8.9
+EMHV;EMHV;HUILE_PALME;huile de palme;bassin ouvert pour effluents;26.2;26.2;30.4;42.6;6.9;6.9
+EMHV;EMHV;HUILE_PALME;huile de palme;piégeage du méthane provenant de l'huilerie;26.2;26.2;13.2;18.5;6.9;6.9
+EMHU;EMHU;HUILE_ALIMENTAIRE_USAGEE;huiles de cuisson;;0;0;9.3;13;1.9;1.9
+EMHA;EMHA;HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2;graisses animales fondues;;0;0;13.6;19.1;1.7;1.7
+EMHA;EMHA;HUILES_OU_GRAISSES_ANIMALES_CAT3;graisses animales fondues;;0;0;13.6;19.1;1.7;1.7
+HVO;HVO;COLZA;colza;;33.4;33.4;10.7;15;1.7;1.7
+HVO;HVO;TOURNESOL;tournesol;;26.9;26.9;10.5;14.7;2;2
+HVO;HVO;SOJA;soja;;22.1;22.1;10.9;15.2;9.2;9.2
+HVO;HVO;HUILE_PALME;huile de palme;bassin ouvert pour effluents;27.4;27.4;27.8;38.9;7;7
+HVO;HVO;HUILE_PALME;huile de palme;piégeage du méthane provenant de l'huilerie;27.4;27.4;9.7;13.6;7;7
+HO;HO;HUILE_ALIMENTAIRE_USAGEE;huiles de cuisson usagées;;0;0;10.2;14.3;1.7;1.7
+HO;HO;HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2;graisses animales fondues;;0;0;14.5;20.3;1.5;1.5
+HO;HO;HUILES_OU_GRAISSES_ANIMALES_CAT3;graisses animales fondues;;0;0;14.5;20.3;1.5;1.5
+HVP;Huile végétale pure;COLZA;colza;;33.4;33.4;3.7;5.2;1.4;1.4
+HVP;Huile végétale pure;TOURNESOL;tournesol;;27.2;27.2;3.8;5.4;1.7;1.7
+HVP;Huile végétale pure;SOJA;soja;;22.2;22.2;4.2;5.9;8.8;8.8
+HVP;Huile végétale pure;HUILE_PALME;huile de palme;bassin ouvert pour effluents;27.1;27.1;22.6;31.7;6.7;6.7
+HVP;Huile végétale pure;HUILE_PALME;huile de palme;piégeage du méthane provenant de l'huilerie;27.1;27.1;4.7;6.5;6.7;6.7
+HCU;Huile provenant d'huiles de cuisson usagées;HUILE_ALIMENTAIRE_USAGEE;huiles de cuisson usagées;;0;0;0.6;0.8;1.4;1.4

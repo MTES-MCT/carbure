@@ -10,7 +10,7 @@ from core.models import MatierePremiere
 filename = '%s/web/fixtures/matierespremieres.csv' % (os.environ['CARBURE_HOME'])
 
 with open(filename) as csvfile:
-    reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+    reader = csv.reader(csvfile, delimiter=';', quotechar='"')
     for row in reader:
         code = row[0]
         name = row[1]
