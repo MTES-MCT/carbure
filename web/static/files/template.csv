@@ -1,2 +1,2 @@
-production_site;volume;biocarburant;matiere_premiere;code_pays;eec;el;ep;etd;eu;esca;eccs;eccr;eee;e;dae;client_id;ea_delivery_date;ea;ea_delivery_site
+production_site;volume;biocarburant;matiere_premiere;code_pays;eec;el;ep;etd;eu;esca;eccs;eccr;eee;e;dae;client_id;ea_delivery_date;ea_name;ea_delivery_site
 Site Production 1;12000;HVO;COLZA;TH;12;4;2;0;3.3;0;0;0;0;0;FR000W123;import_batch_1;23/03/2020;Total Marketing France;Grandpuits
