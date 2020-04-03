@@ -15,6 +15,9 @@ urlpatterns = [
     path('country-csv/', views.country_csv, name='api-country-csv'),
     path('operators-csv/', views.operators_csv, name='api-operators-csv'),
 
+    # private template
+    path('producers-template-csv/', views.producers_import_csv_template, name='api-producers-template-csv'),
+
     # private, producers
     path('producers/lots/<int:attestation_id>', views.producers_lots, name='api-producers-lots'),
     path('producers/lots-new/<int:attestation_id>', views.producers_lots_new, name='api-producers-lots-new'),
