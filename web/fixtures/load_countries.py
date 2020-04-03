@@ -7,7 +7,7 @@ django.setup()
 
 from core.models import Pays
 
-filename = '%s/web/fixtures/countries.csv' % (os.environ['CARBURE_HOME'])
+filename = '%s/web/fixtures/csv/countries.csv' % (os.environ['CARBURE_HOME'])
 
 with open(filename) as csvfile:
     reader = csv.reader(csvfile, delimiter=';', quotechar='"')

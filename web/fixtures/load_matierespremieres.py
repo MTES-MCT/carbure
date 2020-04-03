@@ -7,7 +7,7 @@ django.setup()
 
 from core.models import MatierePremiere
 
-filename = '%s/web/fixtures/matierespremieres.csv' % (os.environ['CARBURE_HOME'])
+filename = '%s/web/fixtures/csv/matierespremieres.csv' % (os.environ['CARBURE_HOME'])
 
 with open(filename) as csvfile:
     reader = csv.reader(csvfile, delimiter=';', quotechar='"')
