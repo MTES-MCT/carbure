@@ -702,6 +702,22 @@ def operators_lots_affilies(request, *args, **kwargs):
     'client_id', 'status'), use_natural_foreign_keys=True)
   return HttpResponse(data, content_type='application/json')
 
+@login_required
+@enrich_with_user_details
+@restrict_to_operators
+def operators_lots_affilies_new(request, *args, **kwargs):
+  context = kwargs['context']
+  lots = Lot.objects.filter(ea=context['user_entity'], ea_delivery_accepted=False, status='Validated')
+  return JsonResponse([{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id,
+  'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
+  'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date, 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
+  'ea_overriden':l.ea_overriden, 'ea_override':l.ea_override, 'volume':l.volume, 'matiere_premiere_code':l.matiere_premiere.code if l.matiere_premiere else '',
+  'matiere_premiere_name':l.matiere_premiere.name if l.matiere_premiere else '', 'biocarburant_code':l.biocarburant.code if l.biocarburant else '',
+  'biocarburant_name':l.biocarburant.name if l.biocarburant else '', 'pays_origine_code':l.pays_origine.code_pays if l.pays_origine else '',
+  'pays_origine_name':l.pays_origine.name if l.pays_origine else '', 'eec':l.eec, 'el':l.el, 'ep':l.ep, 'etd':l.etd, 'eu':l.eu, 'esca':l.esca, 'eccs':l.eccs,
+  'eccr':l.eccr, 'eee':l.eee, 'ghg_total':l.ghg_total, 'ghg_reference':l.ghg_reference, 'ghg_reduction':'%.2f%%' % (l.ghg_reduction), 'client_id':l.client_id,
+  'status':l.status, 'ea_delivery_accepted':l.ea_delivery_accepted, 'lot_id':l.id} for l in lots], safe=False)
+
 # operators api
 @login_required
 @enrich_with_user_details
@@ -756,6 +772,23 @@ def operators_lots(request, *args, **kwargs):
     'client_id', 'status'), use_natural_foreign_keys=True)
   return HttpResponse(data, content_type='application/json')
 
+@login_required
+@enrich_with_user_details
+@restrict_to_operators
+def operators_lots_new(request, *args, **kwargs):
+  context = kwargs['context']
+  declaration_id = kwargs['declaration_id']
+  acceptedlots = AcceptedLot.objects.filter(declaration_id=declaration_id)
+  lots = [l.lot for l in acceptedlots]
+  return JsonResponse([{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id,
+  'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
+  'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date, 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
+  'ea_overriden':l.ea_overriden, 'ea_override':l.ea_override, 'volume':l.volume, 'matiere_premiere_code':l.matiere_premiere.code if l.matiere_premiere else '',
+  'matiere_premiere_name':l.matiere_premiere.name if l.matiere_premiere else '', 'biocarburant_code':l.biocarburant.code if l.biocarburant else '',
+  'biocarburant_name':l.biocarburant.name if l.biocarburant else '', 'pays_origine_code':l.pays_origine.code_pays if l.pays_origine else '',
+  'pays_origine_name':l.pays_origine.name if l.pays_origine else '', 'eec':l.eec, 'el':l.el, 'ep':l.ep, 'etd':l.etd, 'eu':l.eu, 'esca':l.esca, 'eccs':l.eccs,
+  'eccr':l.eccr, 'eee':l.eee, 'ghg_total':l.ghg_total, 'ghg_reference':l.ghg_reference, 'ghg_reduction':'%.2f%%' % (l.ghg_reduction), 'client_id':l.client_id,
+  'status':l.status, 'ea_delivery_accepted':l.ea_delivery_accepted, 'lot_id':l.id} for l in lots], safe=False)
 
 # admin autocomplete helpers
 @login_required

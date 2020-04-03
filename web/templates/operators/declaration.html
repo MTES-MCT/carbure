@@ -29,7 +29,7 @@
 <script type="text/javascript">
 $(document).ready(function() {
   // create table footer
-  let empty_footer = `<tr>${Array(table_columns.length).fill("<th></th>").join('')}</tr>`
+  let empty_footer = `<tr>${Array(table_columns_operators.length).fill("<th></th>").join('')}</tr>`
   $("#datatable tfoot").append(empty_footer)
 
   var table = $('#datatable').DataTable({
@@ -37,6 +37,7 @@ $(document).ready(function() {
     info: false,
     scrollX: true,
     fixedColumns: {
+      leftColumns: 1,
       rightColumns: 2,
     },
     language: {
@@ -46,14 +47,11 @@ $(document).ready(function() {
     columnDefs: [
     {"className": "dt-center", "targets": "_all"}
     ],
-    columns: table_columns,
+    columns: table_columns_operators,
     ajax: {
-      url: `{% url 'operators-api-lots' declaration_id=current_declaration.id %}`,
+      url: `{% url 'operators-api-lots-new' declaration_id=current_declaration.id %}`,
       dataSrc: function(json) {
         for (let i = 0, len = json.length; i < len; i++) {
-          let lot_id = json[i]['pk']
-          json[i] = json[i]["fields"]
-          json[i]['id'] = lot_id
           // add checkbox on the fly
           json[i]["checkbox"] = `<input type="checkbox" />`
         }
@@ -64,7 +62,7 @@ $(document).ready(function() {
       // create filter
       this.api().columns().every(function () {
         var column = this;
-        let table_column = table_columns[column.index()]
+        let table_column = table_columns_operators[column.index()]
         if (table_column.can_filter === true) {
           var select = $('<select><option value=""></option></select>')
           .appendTo($(column.footer()).empty())
