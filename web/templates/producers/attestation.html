@@ -225,7 +225,7 @@
       </div>
     </div>
     <div class="form__group button__group">
-      <a class="button primary" id="btn_edit_lot_save">Sauvegarder</a>
+      <a class="button primary" id="btn_lot_save">Sauvegarder</a>
       <a class="button secondary close" id="btn_close_modal_edit_lot">Annuler</a>
     </div>
   </div>
@@ -343,7 +343,20 @@ function manage_add_button() {
   } else {
     $("#add_lot").text("Ajouter Lot")
     $("#add_lot").removeAttr("onclick")
-    $("#add_lot").attr("href", "{% url 'producers-attestation-new-lot' attestation_id=current_attestation.id %}")
+    //$("#add_lot").attr("href", "{% url 'producers-attestation-new-lot' attestation_id=current_attestation.id %}")
+    $("#add_lot").on("click", function() {
+      let modal = document.getElementById("modal_edit_lot")
+      /* empty all input fields */
+      $("#modal_edit_lot input").each(function() {
+        $(this).val('')
+      })
+      let non_input_fields = ['ghg_total', 'ghg_reduction', 'ghg_reference']
+      for (let i = 0, len = non_input_fields.length; i < len; i++) {
+        let field = non_input_fields[i]
+        $(`#${field}`).html('')
+      }
+      modal.style.display = "flex"
+    })
   }
 }
 
@@ -610,8 +623,9 @@ $(document).ready(function() {
         let message = `<h5 style="color: tomato">Attention, ce lot a déjà été déclaré à la DGEC et affilié à un client.</h5>
                        <span>Toute modification leur sera automatiquement notifiée et devra être acceptée par le client.</span>`
         $("#err_msg_dom").html(message)
+      } else {
+        $("#err_msg_dom").html('')
       }
-
       modal.style.display = "flex"
     }
   });
@@ -665,15 +679,7 @@ $(document).on({
   }
 }, ".dataTables_wrapper tbody tr");
 
-  var SAVE_AND_REDIRECT = 0
-  var SAVE_AND_ADD_NEW = 1
-  var EDIT = 2
-
-  $("#btn_edit_lot_save").on('click', handleSaveEdit)
-
-  function handleSaveEdit() {
-    handleSave(EDIT)
-  }
+  $("#btn_lot_save").on('click', handleSave)
 
   function handleSave(action) {
     var err_msg_dom = $("#err_msg_dom")
@@ -695,13 +701,11 @@ $(document).on({
       type        : 'POST',
       success     : function(data, textStatus, jqXHR) {
         // Callback code
-        alert(JSON.stringify(data))
         window.location.reload()
       },
       error       : function(e) {
         if (e.status === 400) {
           err_msg_dom.html(`Erreur lors de la sauvegarde du lot: ${e.responseJSON.message}`)
-          //alert(e.responseJSON.message)
         } else {
           alert("Server error. Please contact an administrator")
         }
@@ -719,7 +723,7 @@ function load_ges(mp, bc) {
     success     : function(data, textStatus, jqXHR) {
       // Callback code
       $.each(data, function(key, value) {
-        if (key !== "ref") {
+        if (key !== "ghg_reference") {
          $(`#${key}`).val(value)
         } else {
          $(`#${key}`).text(value)
@@ -740,7 +744,7 @@ function load_ges(mp, bc) {
 $(".ges_field").on('change', function() {
   var sum_incr = 0
   var sum_decr = 0
-  var ref = parseFloat($("#ref").html())
+  var ref = parseFloat($("#ghg_reference").html())
   $(".ges_incr").each(function(index, elem) {
     sum_incr += parseFloat(elem.value)
   })
@@ -748,10 +752,9 @@ $(".ges_field").on('change', function() {
     sum_decr += parseFloat(elem.value)
   })
   var sum = sum_incr - sum_decr
-  $("#ges_total").text(sum.toFixed(2))
+  $("#ghg_total").text(sum.toFixed(2))
   var pct_reduction = (1.0 - (sum / ref)) * 100
-  console.log(`pct reduc ${sum} ${ref} ${pct_reduction}`)
-  $("#pct_reduction").text(`${pct_reduction.toFixed(2)}%`)
+  $("#ghg_reduction").text(`${pct_reduction.toFixed(2)}%`)
 })
 
 $(".autocomplete_mps").autocomplete({
