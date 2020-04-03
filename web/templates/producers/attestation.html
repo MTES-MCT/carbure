@@ -122,7 +122,7 @@
 
 <div class="modal__backdrop" id="modal_edit_lot">
   <div class="modal" style="max-width: none;">
-    <p id="err_msg_dom">
+    <p id="err_msg_dom" style="color: tomato">
     </p>
     <div class="flex-container modal-edit">
       <div class="form__group" style="margin-top: var(--space-l);">
@@ -151,7 +151,7 @@
         <dt><label for="ea_delivery_site">Site de livraison</label></dt>
         <dd><input id="ea_delivery_site" type="text" /></dd>
         <dt><label for="ea_delivery_date">Date de livraison</label></dt>
-        <dd><input id="ea_delivery_date" type="text" placeholder="AAAA-MM-DD" /></dd>
+        <dd><input id="ea_delivery_date" type="text" placeholder="JJ/MM/AAAA" /></dd>
         <dt><label for="client_id" title="Champ optionnel, entrez ce que vous voulez">Référence</label></dt>
         <dd><input id="client_id" type="text" /></dd>
         </dl>
@@ -238,31 +238,27 @@
 <script type="text/javascript">
 
 
-  var selected_rows = {}
+var selected_rows = {}
 
-  function duplicate_lot(lot_id) {
+function duplicate_lot(lot_id) {
   // unselect
   for (const key in selected_rows) {
     delete selected_rows[key]
   }
   // get columns to duplicate
   var addLotSettings = loadAddLotSettings()
-  var fields_to_duplicate = []
+  var fields_to_ignore = []
   for (let i = 0, len = addLotSettings.length; i < len; i++) {
-    if (addLotSettings[i] == 0) {
-      continue
-    }
-    // field
-    if (table_columns[i].can_duplicate !== true) {
+    if (addLotSettings[i] == 1) {
       continue
     }
     let field_name = table_columns[i].data
-    fields_to_duplicate.push(field_name)
+    fields_to_ignore.push(field_name)
   }
 
   $.ajax({
     url         : "{% url 'producers-api-duplicate-lot' %}",
-    data        : {'lot_id': lot_id, 'fields':fields_to_duplicate, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+    data        : {'lot_id': lot_id, 'fields':fields_to_ignore, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
     type        : 'POST',
     success     : function(data, textStatus, jqXHR){
       // Callback code
@@ -339,6 +335,7 @@ function manage_add_button() {
     $("#add_lot").text("Dupliquer Lot")
     $("#add_lot").removeAttr("href")
     let lot_id = selected_rows[keys[0]]['lot_id']
+    $("#add_lot").unbind('click')
     $("#add_lot").attr("onclick", `duplicate_lot(${lot_id})`)
   } else {
     $("#add_lot").text("Ajouter Lot")
@@ -768,6 +765,9 @@ $(".autocomplete_mps").autocomplete({
     if (selected_bc !== '') {
       load_ges(suggestion.data, selected_bc)
     }
+  },
+  onInvalidateSelection: function() {
+    $("#matiere_premiere_code").val('')
   }
 })
 
@@ -782,6 +782,9 @@ $(".autocomplete_biocarburants").autocomplete({
     if (selected_mp !== '') {
       load_ges(selected_mp, suggestion.data)
     }
+  },
+  onInvalidateSelection: function() {
+    $("#biocarburant_code").val('')
   }
 })
 
@@ -793,6 +796,9 @@ $(".autocomplete_production_sites").autocomplete({
   onSelect: function(suggestion) {
     $("#production_site_id").val(suggestion.data)
   },
+  onInvalidateSelection: function() {
+    $("#production_site_id").val('')
+  }
 })
 
 $(".autocomplete_countries").autocomplete({
@@ -801,6 +807,10 @@ $(".autocomplete_countries").autocomplete({
   onSelect: function(suggestion) {
     $("#pays_origine_code").val(suggestion.data)
   },
+  onInvalidateSelection: function() {
+    console.log('Country invalidated')
+    $("#pays_origine_code").val('')
+  }
 })
 
 $(".autocomplete_operators").autocomplete({

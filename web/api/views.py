@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from core.decorators import enrich_with_user_details, restrict_to_producers, restrict_to_administrators, restrict_to_operators
 from django.http import JsonResponse, HttpResponse, StreamingHttpResponse
+from django.db.models.fields import NOT_PROVIDED
 import json
 from core.models import *
 from producers.models import *
@@ -100,7 +101,7 @@ def producers_lots_new(request, *args, **kwargs):
   context = kwargs['context']
   attestation_id = kwargs['attestation_id']
   lots = Lot.objects.filter(attestation_id=attestation_id)
-  return JsonResponse([{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id,
+  return JsonResponse([{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id if l.producer else '',
   'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
   'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date, 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
   'ea_overriden':l.ea_overriden, 'ea_override':l.ea_override, 'volume':l.volume, 'matiere_premiere_code':l.matiere_premiere.code if l.matiere_premiere else '',
@@ -192,15 +193,24 @@ def producers_duplicate_lot(request, *args, **kwargs):
   if not lot_id:
     return JsonResponse({'status':'error', 'message':'Missing lot id'}, status=400)
   else:
+    meta_fields = {f.name:f for f in Lot._meta.get_fields()}
     lot = Lot.objects.get(id=lot_id)
-    new = Lot()
-    new.attestation = lot.attestation
-    fields = request.POST.getlist('fields[]')
-    for f in fields:
-      value = getattr(lot, f)
-      setattr(new, f, value)
-    new.save()
-    return JsonResponse({'status':'success', 'message':'OK, lot %d created: %d %s' % (new.id, new.volume, new.status)})
+    lot.pk = None
+    # hardcoded fields to remove
+    fields_to_remove = ['carbure_id', 'dae', 'status']
+    # optional fields to remove (user configuration)
+    fields_to_ignore = request.POST.getlist('fields[]')
+    for f in fields_to_ignore:
+      fields_to_remove.append(f)
+    for f in fields_to_remove:
+      if f in meta_fields:
+        meta_field = meta_fields[f]
+        if meta_field.default != NOT_PROVIDED:
+          setattr(lot, f, meta_field.default)
+        else:
+          setattr(lot, f, '')
+    lot.save()
+    return JsonResponse({'status':'success', 'message':'OK, lot %d created' % (lot.id)})
 
 @login_required
 @enrich_with_user_details
@@ -546,18 +556,10 @@ def producers_save_lot_new(request, *args, **kwargs):
 
   # new lot or edit?
   lot_id = request.POST.get('lot_id', None)
-
   # mandatory fields
   production_site = request.POST.get('production_site_id', None)
   biocarburant = request.POST.get('biocarburant_code', None)
   matiere_premiere = request.POST.get('matiere_premiere_code', None)
-  if not production_site:
-    return JsonResponse({'status':'error', 'message':"Site de Production manquant ou inconnu"}, status=400)
-  if not biocarburant:
-    return JsonResponse({'status':'error', 'message':"Biocarburant manquant ou inconnu"}, status=400)
-  if not matiere_premiere:
-    return JsonResponse({'status':'error', 'message':"Matière Première manquante ou inconnue"}, status=400)
-
   # all other fields
   volume = request.POST.get('volume', None)
   pays_origine = request.POST.get('pays_origine_code', None)
@@ -570,14 +572,22 @@ def producers_save_lot_new(request, *args, **kwargs):
   eccs = request.POST.get('eccs', None)
   eccr = request.POST.get('eccr', None)
   eee = request.POST.get('eee', None)
-
   num_dae = request.POST.get('dae', None)
   ea_delivery_date = request.POST.get('ea_delivery_date', None)
   ea = request.POST.get('ea_id', None)
   ea_name = request.POST.get('ea_name', None)
-
   ea_delivery_site = request.POST.get('ea_delivery_site', '')
   client_id = request.POST.get('client_id', None)
+
+
+  if not production_site:
+    return JsonResponse({'status':'error', 'message':"Site de Production manquant ou inconnu"}, status=400)
+  if not biocarburant:
+    return JsonResponse({'status':'error', 'message':"Biocarburant manquant ou inconnu"}, status=400)
+  if not matiere_premiere:
+    return JsonResponse({'status':'error', 'message':"Matière Première manquante ou inconnue"}, status=400)
+
+
 
   if lot_id:
     lot = Lot.objects.get(id=lot_id)
@@ -598,8 +608,7 @@ def producers_save_lot_new(request, *args, **kwargs):
     except Exception as e:
       return JsonResponse({'status':'error', 'message':"ID site de production [%d] inconnu" % (production_site_id), 'extra': str(e)}, status=400)
 
-  if volume:
-    lot.volume = float(volume)
+  lot.volume = float(volume) if volume else 0.0
 
   try:
     lot.matiere_premiere = MatierePremiere.objects.get(code=matiere_premiere)
@@ -616,27 +625,19 @@ def producers_save_lot_new(request, *args, **kwargs):
       lot.pays_origine = Pays.objects.get(code_pays=pays_origine)
     except:
       return JsonResponse({'status':'error', 'message':"Pays inconnu."}, status=400)
+  else:
+    lot.pays_origine = None
 
   # ghg
-  if eec:
-    lot.eec = float(eec)
-  if el:
-    lot.el = float(el)
-  if ep:
-    lot.ep = float(ep)
-  if etd:
-    lot.etd = float(etd)
-  if eu:
-    lot.eu = float(eu)
-  if esca:
-    lot.esca = float(esca)
-  if eccs:
-    lot.eccs = float(eccs)
-  if eccr:
-    lot.eccr = float(eccr)
-  if eee:
-    lot.eee = float(eee)
-
+  lot.eec = float(eec) if eec else 0.0
+  lot.el = float(el) if el else 0.0
+  lot.ep = float(ep) if ep else 0.0
+  lot.etd = float(etd) if etd else 0.0
+  lot.eu = float(eu) if eu else 0.0
+  lot.esca = float(esca) if esca else 0.0
+  lot.eccs = float(eccs) if eccs else 0.0
+  lot.eccr = float(eccr) if eccr else 0.0
+  lot.eee = float(eee) if eee else 0.0
   lot.ghg_total = round(lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee, 2)
   lot.ghg_reference = 83.8
   lot.ghg_reduction = round((1.0 - (lot.ghg_total / lot.ghg_reference)) * 100.0, 2)
@@ -646,9 +647,12 @@ def producers_save_lot_new(request, *args, **kwargs):
   if not ea_delivery_date or ea_delivery_date == '':
     lot.ea_delivery_date = None
   else:
-    lot.ea_delivery_date = ea_delivery_date
+    try:
+      edd = datetime.strptime(ea_delivery_date, '%d/%m/%Y')
+      lot.ea_delivery_date = edd
+    except:
+      return JsonResponse({'status':'error', 'message':"Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA."}, status=400)
   lot.ea_delivery_site = ea_delivery_site
-
 
   # production site can be either ID or name or nothing
   if ea:

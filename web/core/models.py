@@ -112,7 +112,7 @@ class Lot(models.Model):
     production_site = models.ForeignKey(ProductionSite, null=True, blank=True, on_delete=models.SET_NULL)
 
     # client / delivery
-    dae = models.CharField(max_length=64, blank=True)
+    dae = models.CharField(max_length=64, blank=True, default='')
     ea_delivery_date = models.DateField(blank=True, null=True)
     ea_delivery_site = models.CharField(max_length=64, blank=True, default='')
     ea = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='ea')
