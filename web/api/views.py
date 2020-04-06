@@ -141,7 +141,7 @@ def producers_lots_new(request, *args, **kwargs):
   lots = Lot.objects.filter(attestation_id=attestation_id)
   return JsonResponse([{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id if l.producer else '',
   'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
-  'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date.strftime('%d/%m/%Y') if l:ea_delivery_date else '', 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
+  'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date.strftime('%d/%m/%Y') if l.ea_delivery_date else '', 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
   'ea_overriden':l.ea_overriden, 'ea_override':l.ea_override, 'volume':l.volume, 'matiere_premiere_code':l.matiere_premiere.code if l.matiere_premiere else '',
   'matiere_premiere_name':l.matiere_premiere.name if l.matiere_premiere else '', 'biocarburant_code':l.biocarburant.code if l.biocarburant else '',
   'biocarburant_name':l.biocarburant.name if l.biocarburant else '', 'pays_origine_code':l.pays_origine.code_pays if l.pays_origine else '',
