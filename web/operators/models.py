@@ -1,6 +1,6 @@
 from django.db import models
 
-from core.models import Entity, Lot
+from core.models import Entity, Lot, Pays
 
 class OperatorDeclaration(models.Model):
     operator = models.ForeignKey(Entity, on_delete=models.CASCADE)
@@ -27,3 +27,19 @@ class AcceptedLot(models.Model):
         db_table = 'operator_lots'
         verbose_name = 'Lot'
         verbose_name_plural = 'Lots'
+
+class OperatorDepot(models.Model):
+    operator = models.ForeignKey(Entity, on_delete=models.CASCADE)
+    name = models.CharField(max_length=64, blank=False, null=False)
+    country = models.ForeignKey(Pays, null=False, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+    def natural_key(self):
+        return self.name
+
+    class Meta:
+        db_table = 'operators_depots'
+        verbose_name = 'Dépôt'
+        verbose_name_plural = 'Dépôts'

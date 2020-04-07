@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from core.decorators import enrich_with_user_details, restrict_to_operators
-from operators.models import OperatorDeclaration, AcceptedLot
+from operators.models import OperatorDeclaration, AcceptedLot, OperatorDepot
 
 import datetime
 import calendar
@@ -91,4 +91,5 @@ def operators_affiliations(request, *args, **kwargs):
 def operators_settings(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'operators-settings'
+  context['depots'] = OperatorDepot.objects.filter(operator=context['user_entity'])
   return render(request, 'operators/settings.html', context)

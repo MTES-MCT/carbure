@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from operators.models import OperatorDeclaration, AcceptedLot
+from operators.models import OperatorDeclaration, AcceptedLot, OperatorDepot
 
 
 class OperatorDeclarationAdmin(admin.ModelAdmin):
@@ -17,3 +17,10 @@ class AcceptedLotAdmin(admin.ModelAdmin):
 
 admin.site.register(AcceptedLot, AcceptedLotAdmin)
 
+
+class OperatorDepotAdmin(admin.ModelAdmin):
+    list_display = ('operator', 'name', 'country')
+    search_fields = ('operator', 'name', 'country')
+    list_filter = ('operator',)
+
+admin.site.register(OperatorDepot, OperatorDepotAdmin)

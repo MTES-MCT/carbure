@@ -848,6 +848,31 @@ def operators_lots_new(request, *args, **kwargs):
   'eccr':l.eccr, 'eee':l.eee, 'ghg_total':l.ghg_total, 'ghg_reference':l.ghg_reference, 'ghg_reduction':'%.2f%%' % (l.ghg_reduction), 'client_id':l.client_id,
   'status':l.status, 'ea_delivery_accepted':l.ea_delivery_accepted, 'lot_id':l.id} for l in lots], safe=False)
 
+@login_required
+@enrich_with_user_details
+@restrict_to_operators
+def operators_settings_add_depot(request, *args, **kwargs):
+  context = kwargs['context']
+
+  country = request.POST.get('country')
+  name = request.POST.get('name')
+
+  if country == None:
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ Pays"}, status=400)
+  if name == None:
+    return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ Nom"}, status=400)
+
+  try:
+    country = Pays.objects.get(name__icontains=country)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Veuillez choisir un Pays dans la liste", 'extra':str(e)}, status=400)
+
+  try:
+    obj, created = OperatorDepot.objects.update_or_create(operator=context['user_entity'], country=country, name=name)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'Depot added'})
+
 # admin autocomplete helpers
 @login_required
 @enrich_with_user_details
