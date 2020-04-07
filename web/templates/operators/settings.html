@@ -13,7 +13,98 @@
         <input type="checkbox" checked="checked" name="checkbox" id="checkbox-annuaire-societe" value="1"><label for="checkbox-annuaire-societe" class="label-inline">Je souhaite faire apparaître ma société dans l'annuaire</label>
         <input type="checkbox" name="checkbox" id="checkbox-annuaire-contact" value="1"><label for="checkbox-annuaire-contact" class="label-inline">Je souhaite faire apparaître mes coordonnées de contact dans l'annuaire</label>
       </fieldset>
-    </div>   
+    </div>
+    <h3>Dépôts</h3>
+
+    {% for depot in depots %}
+    <section class="form__group">
+      <div class="panel" style="padding-top: 0px;">
+        <div class="panel__header">
+          <div class="flex-container" style="justify-content: space-between; margin-bottom: -1em;">
+            <div class="form__group" style="margin-top: 0px;">
+              <dl>
+              <dd><h3>{{depot.name}}</h3></dd>
+              <dd>{{depot.country}}</dd>
+              </dl>
+            </div>
+            <div class="form__group" style="margin-top: 0px;">
+              <dl>
+                <dt>Numero ACCISE</dt>
+                <dd>FR00000123W</dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+        <div class="flex-container">
+          <div class="form__group" style="margin-top: 0px;">
+            <label>Matières premières</label>
+            <ul class="label-list">
+              {% for input in site.inputs %}
+                {% if input.status == "Pending" %}
+                <li class="label" style="background: var(--light-orange);" title="{{input.get_status_display}}"><a>{{input.matiere_premiere}}</a></li>
+                {% else %}
+                <li class="label" style="background: var(--light-green);"title="{{input.get_status_display}}"><a>{{input.matiere_premiere}}</a></li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+            <label for="token">Ajout matière première</label>
+            <div class="input__group">
+              <input type="text" name="mp" class="autocomplete_mp" data-siteid="{{site.id}}" />
+            </div>
+          </div>
+          <div class="form__group" style="margin-top: 0px;">
+            <label>Biocarburants</label>
+            <ul class="label-list">
+              {% for output in site.outputs %}
+                {% if output.status == "Pending" %}
+                <li class="label" style="background: var(--light-orange);" title="{{output.get_status_display}}"><a>{{output.biocarburant}}</a></li>
+                {% else %}
+                <li class="label" style="background: var(--light-green);"title="{{input.get_status_display}}"><a>{{output.biocarburant}}</a></li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+            <label for="token">Ajout biocarburant</label>
+            <div class="input__group">
+              <input type="text" name="biocarburant" class="autocomplete_biocarburant" data-siteid="{{site.id}}" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    {% endfor %}
+    <div class="row">
+      <div class="form__group flex-container-right">
+        <button type="submit" class="button" id="btn_open_modal_depot">Ajouter un dépôt</button>
+      </div>
+    </div>
   </div>
 </div>
+
+<div class="modal__backdrop" id="modal_depot">
+  <div class="modal">
+    <span id="modal_depot_form_err_message" style="color: red;"></span>
+    <form id="modal_depot_form" method="POST" data-url="{% url 'operators-api-settings-add-depot' %}">
+      {% csrf_token %}
+      <label for="modal_depot_name">Nom du Dépôt</label>
+      <input type="text" id="modal_depot_name" name="name" placeholder="Grandpuits">
+      <label for="modal_depot_country">Pays</label>
+      <input type="text" id="modal_depot_country" name="country" placeholder="FR - France">
+      <div class="form__group button__group">
+        <a class="button secondary close" id="btn_close_modal_depot">Annuler</a>
+        <button type="submit" class="button">Valider</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script type="text/javascript">
+$("#modal_depot_country").autocomplete({
+  serviceUrl: "{% url 'api-country-autocomplete' %}",
+  dataType: 'json',
+});
+</script>
 {% endblock %}
