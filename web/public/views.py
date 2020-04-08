@@ -19,7 +19,7 @@ def home(request, *args, **kwargs):
   if context['user_entity'].entity_type == 'Administration':
     return redirect('administrators-index')
   elif context['user_entity'].entity_type == 'Producteur':
-    return redirect('producers-index')
+    return redirect('producers-index', producer_name=context['url_friendly_name'])
   elif context['user_entity'].entity_type == 'Opérateur':
     return redirect('operators-index')
   else:
