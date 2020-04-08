@@ -207,18 +207,17 @@
           </tbody>
         </table>
         <table>
+          <input type="hidden" id="ghg_reference" />
           <thead>
             <tr>
-              <th>Référence fossile</th>
               <th>Total</th>
-              <th>Réduction</th>
+              <th id="reduction_title" title="">Réduction<small>*</small></th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <th id="ghg_reference"></th>
-              <th id="ghg_total"></th>
-              <th id="ghg_reduction"></th>
+              <td id="ghg_total"></td>
+              <td id="ghg_reduction"></td>
             </tr>
           </tbody>
         </table>
@@ -347,11 +346,12 @@ function manage_add_button() {
       $("#modal_edit_lot input").each(function() {
         $(this).val('')
       })
-      let non_input_fields = ['ghg_total', 'ghg_reduction', 'ghg_reference']
+      let non_input_fields = ['ghg_total', 'ghg_reduction']
       for (let i = 0, len = non_input_fields.length; i < len; i++) {
         let field = non_input_fields[i]
         $(`#${field}`).html('')
       }
+      $("#reduction_title").attr('title', '')
       modal.style.display = "flex"
     })
   }
@@ -597,9 +597,10 @@ $(document).ready(function() {
         $(`#${key}`).val(data[key])
       }
       // non-input keys
-      ['ghg_total', 'ghg_reduction', 'ghg_reference'].forEach(function(item, index) {
+      ['ghg_total', 'ghg_reduction'].forEach(function(item, index) {
         $(`#${item}`).html(data[item])
       })
+      $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data['ghg_reference']} gCO2eq/MJ`)
 
       /* special cases for override */
       let overrideable_fields = ['ea']
@@ -720,11 +721,7 @@ function load_ges(mp, bc) {
     success     : function(data, textStatus, jqXHR) {
       // Callback code
       $.each(data, function(key, value) {
-        if (key !== "ghg_reference") {
-         $(`#${key}`).val(value)
-        } else {
-         $(`#${key}`).text(value)
-        }
+        $(`#${key}`).val(value)
       })
       $("#eec").change()
     },
@@ -741,7 +738,7 @@ function load_ges(mp, bc) {
 $(".ges_field").on('change', function() {
   var sum_incr = 0
   var sum_decr = 0
-  var ref = parseFloat($("#ghg_reference").html())
+  var ref = parseFloat($("#ghg_reference").val())
   $(".ges_incr").each(function(index, elem) {
     sum_incr += parseFloat(elem.value)
   })
@@ -752,6 +749,7 @@ $(".ges_field").on('change', function() {
   $("#ghg_total").text(sum.toFixed(2))
   var pct_reduction = (1.0 - (sum / ref)) * 100
   $("#ghg_reduction").text(`${pct_reduction.toFixed(2)}%`)
+  $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${ref} gCO2eq/MJ`)
 })
 
 $(".autocomplete_mps").autocomplete({
