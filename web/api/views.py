@@ -694,8 +694,6 @@ def producers_save_lot_new(request, *args, **kwargs):
     try:
       edd = datetime.datetime.strptime(ea_delivery_date, '%d/%m/%Y')
       lot.ea_delivery_date = edd
-    except Exception as e:
-      return JsonResponse({'status':'error', 'message':e}, status=400)
     except:
       return JsonResponse({'status':'error', 'message':"[%s] Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA" % (ea_delivery_date)}, status=400)
   lot.ea_delivery_site = ea_delivery_site
