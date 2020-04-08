@@ -4,7 +4,19 @@
 <div class="main" style="overflow-x: auto;">
 	<div class="panel">
 		<h3>Déclaration de durabilité {{current_declaration.period}}</h3>
-
+    <div class="flex-container">
+      <a class="button modal-button" id="btn_open_modal_import" style="margin-top: 1em; margin-right: 0px; padding: 7px 10px 0px 10px;">
+        <img src="/static/images/icons/upload2.png" height="24" width="24" style="margin-bottom: 5px;" />
+      </a>
+      <a id="btn_open_modal_columns" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
+        <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
+      </a>
+      <a class="button modal-button" href="{% url 'operators-api-declaration-export' declaration_id=current_declaration.id %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
+        <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
+      </a>
+      <label for="input_search_datatable" style="margin: auto 5px auto auto;">Rechercher:</label>
+      <input type="text" id="input_search_datatable" style="width: 200px; height: 2em; margin-top: auto; margin-bottom: auto;" />
+    </div>
     <table class="display nowrap" id="datatable">
       <!-- dynamically generated in js -->
       <thead></thead>
@@ -13,12 +25,58 @@
     </table>
 	</div>
 </div>
+
+<div class="modal__backdrop" id="modal_columns">
+  <div class="modal">
+    <div class="flex-container">
+      <table id="table_columns_filter">
+        <!-- dynamically generated in js -->
+      </table>
+      <table id="table_columns_filter2">
+        <!-- dynamically generated in js -->
+      </table>
+    </div>
+    <div class="form__group button__group">
+      <a class="button secondary close" id="btn_close_modal_columns">Fermer</a>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 
 {% block extra_js %}
 <script type="text/javascript">
 $(document).ready(function() {
+  function initFilters() {
+    var table_columns_filter = $("#table_columns_filter")
+    var table_columns_filter2 = $("#table_columns_filter2")
+    var list_columns_filter = $("#list_columns_filter")
+    var columns_filter_html = ""
+    var columns_filter_html2 = ""
+    var list_columns_filter_html = ""
+    for (let i = 0, len = table_columns_operators.length; i < len; i++) {
+      let column = table_columns[i]
+      if (column.can_hide === true) {
+        // use two columns
+        if (i <= (len / 2)) {
+          columns_filter_html += `<tr><td><input type="checkbox" id="checkbox${i}" class="toggle-vis" data-column="${i}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
+        } else {
+          columns_filter_html2 += `<tr><td><input type="checkbox" id="checkbox${i}" class="toggle-vis" data-column="${i}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
+        }
+      }
+      if (column.can_duplicate === true) {
+        list_columns_filter_html += `<li class="flex-item-a"><input type="checkbox" id="add_checkbox${i}" class="toggle-lot-param" data-column="${i}"><label for="add_checkbox${i}" class="label-inline">${column.title}</label></li>`
+      }
+    }
+    table_columns_filter.append(columns_filter_html)
+    table_columns_filter2.append(columns_filter_html2)
+    list_columns_filter.append(list_columns_filter_html)
+  }
+  initFilters()
+
+
+
+
   // create table footer
   let empty_footer = `<tr>${Array(table_columns_operators.length).fill("<th></th>").join('')}</tr>`
   $("#datatable tfoot").append(empty_footer)
