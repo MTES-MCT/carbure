@@ -84,11 +84,11 @@ def producers_settings(request, *args, **kwargs):
 @restrict_to_producers
 def producers_attestation(request, *args, **kwargs):
   context = kwargs['context']
-  attestation_id = kwargs['attestation_id']
+  attestation_period = kwargs['attestation_period']
   context['current_url_name'] = 'producers-attestation'
 
   attestations = AttestationProducer.objects.filter(producer=context['user_entity'])
-  current_attestation_qs = attestations.filter(id=attestation_id)
+  current_attestation_qs = attestations.filter(period=attestation_period)
   if len(current_attestation_qs) == 0:
     raise PermissionDenied
   current_attestation = current_attestation_qs[0]

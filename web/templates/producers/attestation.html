@@ -339,7 +339,6 @@ function manage_add_button() {
   } else {
     $("#add_lot").text("Ajouter Lot")
     $("#add_lot").removeAttr("onclick")
-    //$("#add_lot").attr("href", "{% url 'producers-attestation-new-lot' attestation_id=current_attestation.id %}")
     $("#add_lot").on("click", function() {
       let modal = document.getElementById("modal_edit_lot")
       /* empty all input fields */
