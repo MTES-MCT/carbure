@@ -38,7 +38,7 @@
       <div class="form__group" style="margin-left: var(--space-l);">
         <h3 style="text-align: center;">Destination</h3>
         <dl>
-        <dt><label for="dae">Numéro de DAE</label></dt>
+        <dt><label for="dae">Numéro de DAE / DAU</label></dt>
         <dd><input id="dae" type="text" value="{{lot.dae}}" /></dd>
         <dt><label for="ea_display">Client</label></dt>
         <dd><input type="text" id="ea_display" class="autocomplete_operators" value="{% if lot.ea_overriden %}{{lot.ea_override}}{% else %}{{lot.ea.name}}{% endif%}" /><input type="hidden" id="ea" value="{{lot.ea.id}}" /></dd>

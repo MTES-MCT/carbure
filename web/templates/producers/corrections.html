@@ -53,8 +53,8 @@
 						<th>Statut</th>
 						<th>Commentaire</th>
 						<th>Deadline</th>
-					</tr>				
-				</tfoot>				
+					</tr>
+				</tfoot>
 			</table>
 		</div>
 	</div>
@@ -67,7 +67,7 @@
 					<h2>Informations Générales</h2>
 					<label for="ml_depot">Dépôt</label>
 					<input type="text" value="" id="ml_depot">
-					<label for="ml_dae">N°DAE ou DAA</label>
+					<label for="ml_dae">N°DAE / DAU</label>
 					<input type="text" value="" id="ml_dae">
 					<label for="ml_volume">Volume</label>
 					<input type="text" value="" id="ml_volume">
@@ -146,12 +146,12 @@
 								<td><input type="text" id="ml_date_correction" value="03/02/2020"/></td>
 								<td><input type="text" id="ml_source_correction" value="BioRaffinerie Lambda"/></td>
 								<td><input type="text" id="ml_message_correction" value="Corrigé! Merci"/></td>
-							</tr>							
+							</tr>
 						</tbody>
 					</table>
 				</div>
 			</div>
-		</section>		
+		</section>
 		<section class="flex-container-right">
 			<div class="form__group button__group">
 				<a class="button secondary close" href="#">Corriger</a>
@@ -175,10 +175,10 @@ $(document).ready(function() {
 		dom: "lrtip",
 		info: false,
 		scrollX: true,
-		autoWidth: false,		
+		autoWidth: false,
 		columnDefs: [
       		{"className": "dt-center", "targets": "_all"}
-   		],		
+   		],
 		initComplete: function () {
             this.api().columns().every( function () {
                 var column = this;
@@ -189,13 +189,13 @@ $(document).ready(function() {
 	                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
 	                        column.search(val ? '^'+val+'$' : '', true, false).draw();
 	                    } );
-	 
+
 	                column.data().unique().sort().each(function (d, j) {
 	                    select.append('<option value="'+d+'">'+d+'</option>')
 	                } );
                 }
             } );
-        }   	   		
+        }
 	}).draw()
 
 	/* click on datatable row */
