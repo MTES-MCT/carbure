@@ -21,7 +21,7 @@ def home(request, *args, **kwargs):
   elif context['user_entity'].entity_type == 'Producteur':
     return redirect('producers-index', producer_name=context['url_friendly_name'])
   elif context['user_entity'].entity_type == 'Opérateur':
-    return redirect('operators-index')
+    return redirect('operators-index', operator_name=context['url_friendly_name'])
   else:
     raise Http404("Unknown User Type")
 

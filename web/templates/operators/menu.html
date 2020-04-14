@@ -1,6 +1,6 @@
 	<aside class="side-menu" role="navigation" style="max-width: 170px;">
 		<ul>
-			<li><a {% if current_url_name == 'operators-index' or current_url_name == 'operators-declaration' %}class="active"{% endif %} href="{% url 'operators-index' %}">Déclarations</a></li>
+			<li><a {% if current_url_name == 'operators-index' or current_url_name == 'operators-declaration' %}class="active"{% endif %} href="{% url 'operators-index' operator_name=url_friendly_name %}">Déclarations</a></li>
 				{% if current_url_name == 'operators-declaration' %}
 				<ul>
 					{% for nd in next_declarations %}
