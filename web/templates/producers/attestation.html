@@ -536,7 +536,6 @@ $(document).ready(function() {
             success     : function(data, textStatus, jqXHR) {
               nb_lots_imported += 1
               $("#modal_import_success_msg").text(`${nb_lots_imported} lots importé(s)`)
-
             },
             error       : function(e) {
               nb_lots_failed += 1
@@ -702,7 +701,7 @@ $(document).on({
       },
       error       : function(e) {
         if (e.status === 400) {
-          err_msg_dom.html(`Erreur lors de la sauvegarde du lot: ${e.responseJSON.message}`)
+          err_msg_dom.html(`${e.responseJSON.message}`)
         } else {
           alert("Server error. Please contact an administrator")
         }
