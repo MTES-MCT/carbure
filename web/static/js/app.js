@@ -31,7 +31,7 @@ var table_columns = [
 ]
 
 var table_columns_operators = [
-{title:'Producteur', can_hide: true, can_duplicate: true, can_export: true, data:'producer_name'},
+{title:'Fournisseur', can_hide: true, can_duplicate: true, can_export: true, data:'producer_name'},
 {title:'Site de<br />Production', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data:'production_site_name'},
 {title:'Numéro de lot', can_hide: true, can_duplicate: false, can_export: true, data:'carbure_id'},
 {title:'Volume<br /> à 20°C<br />en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
