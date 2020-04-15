@@ -4,8 +4,8 @@ from . import views
 
 urlpatterns = [
     path('<slug:operator_name>/', views.operators_index, name='operators-index'),
-    path('declaration/<int:declaration_id>', views.operators_declaration, name='operators-declaration'),
-    path('affiliations', views.operators_affiliations, name='operators-affiliations'),
-    path('controles', views.operators_controles, name='operators-controles'),
-    path('settings', views.operators_settings, name='operators-settings'),
+    path('<slug:operator_name>/declaration/<int:declaration_id>', views.operators_declaration, name='operators-declaration'),
+    path('<slug:operator_name>/affiliations', views.operators_affiliations, name='operators-affiliations'),
+    path('<slug:operator_name>/controles', views.operators_controles, name='operators-controles'),
+    path('<slug:operator_name>/settings', views.operators_settings, name='operators-settings'),
 ]

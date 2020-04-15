@@ -22,7 +22,7 @@
 					{% else %}
 					class="status_ok"
 					{% endif %}
-					onclick="window.location='{% url 'operators-declaration' declaration_id=d.id %}'">
+					onclick="window.location='{% url 'operators-declaration' declaration_id=d.id operator_name=url_friendly_name %}'">
 					<td>{{d.period}}</td>
 					<td>{{d.lots}}</td>
 					<td>{{d.deadline}}</td>
