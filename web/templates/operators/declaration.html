@@ -5,9 +5,6 @@
 	<div class="panel">
 		<h3>Déclaration de durabilité {{current_declaration.period}}</h3>
     <div class="flex-container">
-      <a class="button modal-button" id="btn_open_modal_import" style="margin-top: 1em; margin-right: 0px; padding: 7px 10px 0px 10px;">
-        <img src="/static/images/icons/upload2.png" height="24" width="24" style="margin-bottom: 5px;" />
-      </a>
       <a id="btn_open_modal_columns" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
         <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
       </a>
@@ -55,7 +52,7 @@ $(document).ready(function() {
     var columns_filter_html2 = ""
     var list_columns_filter_html = ""
     for (let i = 0, len = table_columns_operators.length; i < len; i++) {
-      let column = table_columns[i]
+      let column = table_columns_operators[i]
       if (column.can_hide === true) {
         // use two columns
         if (i <= (len / 2)) {
@@ -133,6 +130,21 @@ $(document).ready(function() {
   $('#input_search_datatable').on('keyup', function() {
       table.search(this.value).draw();
   });
+
+  var columnsSettings = loadOperatorsTableSettings()
+  showHideTableColumns(columnsSettings)
+
+  /* column filter modal event management */
+  $('.toggle-vis').on('click', function(e) {
+        // Get the column API object
+        let colid = $(this).attr('data-column')
+        let column = table.column(colid);
+
+        // Toggle the visibility
+        column.visible(!column.visible());
+        columnsSettings[colid] = columnsSettings[colid] == 1 ? 0 : 1
+        saveOperatorsTableSettings(columnsSettings)
+      });
 
 })
 

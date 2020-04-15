@@ -198,6 +198,23 @@ function loadTableSettings() {
   return columns
 }
 
+function loadOperatorsTableSettings() {
+  var tableSettings = localStorage.getItem('operatorsTableSettings');
+  if (tableSettings === undefined || tableSettings === null) {
+    let nb_columns = table.columns().data().length
+    columns = Array(nb_columns).fill(1);
+    saveOperatorsTableSettings(columns)
+  } else {
+    columns = JSON.parse(tableSettings)
+    let nb_columns = table.columns().data().length
+    if (columns.length !== nb_columns) {
+      columns = Array(nb_columns).fill(1);
+      saveOperatorsTableSettings(columns)
+    }
+  }
+  return columns
+}
+
 function loadAddLotSettings() {
   var addLotSettings = localStorage.getItem('addLotSettings');
   if (addLotSettings === undefined || addLotSettings === null) {
@@ -212,6 +229,10 @@ function loadAddLotSettings() {
 
 function saveTableSettings(settings) {
   localStorage.setItem("tableSettings", JSON.stringify(settings));
+}
+
+function saveOperatorsTableSettings(settings) {
+  localStorage.setItem("operatorsTableSettings", JSON.stringify(settings));
 }
 
 function saveAddLotSettings(settings) {
