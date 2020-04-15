@@ -18,6 +18,9 @@ class Entity(models.Model):
     def natural_key(self):
         return self.name
 
+    def url_friendly_name(self):
+        return self.name.replace(' ', '').upper()
+
     class Meta:
         db_table = 'entities'
         verbose_name = 'Entity'
