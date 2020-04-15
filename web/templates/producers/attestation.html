@@ -345,16 +345,67 @@ function manage_add_button() {
       $("#modal_edit_lot input").each(function() {
         $(this).val('')
       })
+      $("#err_msg_dom").html('')
       let non_input_fields = ['ghg_total', 'ghg_reduction']
       for (let i = 0, len = non_input_fields.length; i < len; i++) {
         let field = non_input_fields[i]
         $(`#${field}`).html('')
       }
+      /* check if we have production sites, mps and bcs in parameters */
+      check_production_sites()
+      check_mps()
+      check_biocarburants()
       $("#reduction_title").attr('title', '')
       modal.style.display = "flex"
     })
   }
 }
+
+function check_production_sites() {
+  $.ajax({
+    url         : "{% url 'producers-api-production-sites-autocomplete' %}" + "?producer_id={{user_entity.id}}&query=",
+    type        : 'GET',
+    success     : function(data, textStatus, jqXHR) {
+      if (data['suggestions'].length == 0) {
+        $("#err_msg_dom").html('Aucun site de production enregistré')
+      }
+    },
+    error       : function(e) {
+      console.log(`error fetching existing production sites`)
+    }
+  })
+}
+
+function check_mps() {
+  $.ajax({
+    url         : "{% url 'producers-api-mps-autocomplete' %}" + "?producer_id={{user_entity.id}}&query=",
+    type        : 'GET',
+    success     : function(data, textStatus, jqXHR) {
+      if (data['suggestions'].length == 0) {
+        $("#err_msg_dom").html('Aucune matière première enregistrée dans votre profil')
+      }
+    },
+    error       : function(e) {
+      console.log(`error fetching mps`)
+    }
+  })
+}
+
+function check_biocarburants() {
+  $.ajax({
+    url         : "{% url 'producers-api-biocarburants-autocomplete' %}" + "?producer_id={{user_entity.id}}&query=",
+    type        : 'GET',
+    success     : function(data, textStatus, jqXHR) {
+      if (data['suggestions'].length == 0) {
+        $("#err_msg_dom").html('Aucun biocarburant enregistré dans votre profil')
+      }
+    },
+    error       : function(e) {
+      console.log(`error fetching biocarburants`)
+    }
+  })
+}
+
 
 function manage_actions() {
   // buttons Valider, Supprimer et Ajouter
@@ -764,7 +815,8 @@ $(".autocomplete_mps").autocomplete({
   },
   onInvalidateSelection: function() {
     $("#matiere_premiere_code").val('')
-  }
+  },
+  showNoSuggestionNotice: true,
 })
 
 $(".autocomplete_biocarburants").autocomplete({
@@ -781,7 +833,7 @@ $(".autocomplete_biocarburants").autocomplete({
   },
   onInvalidateSelection: function() {
     $("#biocarburant_code").val('')
-  }
+  },
 })
 
 $(".autocomplete_production_sites").autocomplete({
