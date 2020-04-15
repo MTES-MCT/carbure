@@ -19,7 +19,7 @@ def enrich_with_user_details(function):
         context['entities'] = [u.entity for u in user_rights]
         context['user_entity'] = user_preferences.default_entity
         context['user_entity_name'] = user_preferences.default_entity.name
-        context['url_friendly_name'] = context['user_entity_name'].replace(' ', '').upper()
+        context['url_friendly_name'] = context['user_entity'].url_friendly_name()
         kwargs['context'] = context
         return function(request, *args, **kwargs)
     wrap.__doc__ = function.__doc__
