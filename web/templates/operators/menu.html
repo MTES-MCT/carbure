@@ -4,19 +4,19 @@
 				{% if current_url_name == 'operators-declaration' %}
 				<ul>
 					{% for nd in next_declarations %}
-					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' declaration_id=nd.id %}">{{nd.period}}</a></li>
+					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' declaration_id=nd.id operator_name=url_friendly_name %}">{{nd.period}}</a></li>
 					{% endfor %}
-					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' declaration_id=current_declaration.id %}" class="active-submenu">{{current_declaration.period}}</a></li>
+					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' declaration_id=current_declaration.id operator_name=url_friendly_name %}" class="active-submenu">{{current_declaration.period}}</a></li>
 					{% for pd in previous_declarations %}
-					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' declaration_id=pd.id %}">{{pd.period}}</a></li>
+					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' declaration_id=pd.id operator_name=url_friendly_name %}">{{pd.period}}</a></li>
 					{% endfor %}
 				</ul>
 				{% endif %}
-			<li><a {% if current_url_name == 'operators-affiliations' %}class="active"{% endif %} href="{% url 'operators-affiliations' %}">Lots en Attente<span class="badge badge-green">{{nb_affiliated_lots}}</span></a></li>
-			<li><a {% if current_url_name == 'operators-controles' %}class="active"{% endif %} href="{% url 'operators-controles' %}">Contrôles DGEC<span class="badge badge-red">
+			<li><a {% if current_url_name == 'operators-affiliations' %}class="active"{% endif %} href="{% url 'operators-affiliations' operator_name=url_friendly_name %}">Lots en Attente<span class="badge badge-green">{{nb_affiliated_lots}}</span></a></li>
+			<li><a {% if current_url_name == 'operators-controles' %}class="active"{% endif %} href="{% url 'operators-controles' operator_name=url_friendly_name %}">Contrôles DGEC<span class="badge badge-red">
 				{{nb_controles_dgec}}
 			</span></a></li>
 			<li><a {% if current_url_name == 'annuaire' %}class="active"{% endif %} href="{% url 'annuaire' %}">Annuaire</a></li>
-			<li><a {% if current_url_name == 'operators-settings' %}class="active"{% endif %} href="{% url 'operators-settings' %}">Paramètres</a></li>
+			<li><a {% if current_url_name == 'operators-settings' %}class="active"{% endif %} href="{% url 'operators-settings' operator_name=url_friendly_name %}">Paramètres</a></li>
 		</ul>
 	</aside>
