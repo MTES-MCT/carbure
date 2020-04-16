@@ -263,7 +263,7 @@ $(document).ready(function() {
     let colid = cell.index()['column']
     let row = $(this).closest('tr');
     let data = table.row(row).data()
-    let table_column = table_columns[colid]
+    let table_column = table_columns_operators[colid]
     if (table_column['data'] === 'checkbox') {
       // ignore clicks on checkbox column
       return
