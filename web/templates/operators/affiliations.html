@@ -357,6 +357,28 @@ $(document).ready(function() {
     })
   })
 
+  $("#btn_reject_single_lot").on('click', function() {
+    let lot_id = $("#lot_id").val()
+    $.ajax({
+      url:"{% url 'operators-api-reject-lots' %}",
+      data: {'lots': lot_id,'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+      type        : 'POST',
+      success     : function(data, textStatus, jqXHR){
+        // Callback code
+        window.location.reload()
+      },
+      error       : function(e) {
+        if (e.status === 400) {
+          alert(e.responseJSON.message)
+          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+        } else {
+          alert("Server error. Please contact an administrator")
+          console.log(`server error ${JSON.stringify(e)}`)
+        }
+      }
+    })
+  })
+
 })
 </script>
 
