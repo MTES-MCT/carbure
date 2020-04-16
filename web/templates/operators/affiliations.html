@@ -156,8 +156,8 @@
       </div>
     </div>
     <div class="form__group button__group">
-      <a class="button primary">Accepter</a>
-      <a class="button warning">Refuser</a>
+      <a class="button primary" id="btn_accept_single_lot">Accepter</a>
+      <a class="button warning" id="btn_reject_single_lot">Refuser</a>
       <a class="button secondary close" id="btn_close_modal_edit_lot">Annuler</a>
     </div>
   </div>
@@ -335,6 +335,27 @@ $(document).ready(function() {
     }
   });
 
+  $("#btn_accept_single_lot").on('click', function() {
+    let lot_id = $("#lot_id").val()
+    $.ajax({
+      url:"{% url 'operators-api-accept-lots' %}",
+      data: {'lots': lot_id,'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+      type        : 'POST',
+      success     : function(data, textStatus, jqXHR){
+        // Callback code
+        window.location.reload()
+      },
+      error       : function(e) {
+        if (e.status === 400) {
+          alert(e.responseJSON.message)
+          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+        } else {
+          alert("Server error. Please contact an administrator")
+          console.log(`server error ${JSON.stringify(e)}`)
+        }
+      }
+    })
+  })
 
 })
 </script>
