@@ -235,7 +235,7 @@ def producers_duplicate_lot(request, *args, **kwargs):
     lot = Lot.objects.get(id=lot_id)
     lot.pk = None
     # hardcoded fields to remove
-    fields_to_remove = ['carbure_id', 'dae', 'status']
+    fields_to_remove = ['carbure_id', 'dae', 'status', 'ea_delivery_accepted']
     # optional fields to remove (user configuration)
     fields_to_ignore = request.POST.getlist('fields[]')
     for f in fields_to_ignore:
