@@ -43,7 +43,7 @@ test:
   script:
     - export SECRET_KEY="uzt47-l*!0z77s1(15x7ic&-xzz14y)0v9dd5f2(vr)wi%ue4j"
     - export ALLOWED_HOSTS="carbure.local"
-    - export CARBURE_HOME=/app   
+    - export CARBURE_HOME=/builds/la-fabrique-numerique/biocarburants/
     - export TEST=1
     - echo "Testing..."
     - python3 /app/web/manage.py test --keepdb /app/web/tests/public
