@@ -53,5 +53,7 @@ urlpatterns = [
     # private, administrators
     path('administrators/users-autocomplete/', views.admin_users_autocomplete, name='admin-api-users-autocomplete'),
     path('administrators/entities-autocomplete/', views.admin_entities_autocomplete, name='admin-api-entities-autocomplete'),
+    path('administrators/lots', views.admin_lots, name='admin-api-lots'),
+    path('administrators/export', views.admin_lots_export, name='admin-api-lots-export'),
 
 ]
