@@ -147,7 +147,7 @@ def producers_lots_new(request, *args, **kwargs):
   'biocarburant_name':l.biocarburant.name if l.biocarburant else '', 'pays_origine_code':l.pays_origine.code_pays if l.pays_origine else '',
   'pays_origine_name':l.pays_origine.name if l.pays_origine else '', 'eec':l.eec, 'el':l.el, 'ep':l.ep, 'etd':l.etd, 'eu':l.eu, 'esca':l.esca, 'eccs':l.eccs,
   'eccr':l.eccr, 'eee':l.eee, 'ghg_total':l.ghg_total, 'ghg_reference':l.ghg_reference, 'ghg_reduction':'%.2f%%' % (l.ghg_reduction), 'client_id':l.client_id,
-  'status':l.status, 'ea_delivery_accepted':l.ea_delivery_accepted, 'lot_id':l.id} for l in lots], safe=False)
+  'status':l.status, 'status_display':l.get_status_display(), 'ea_delivery_accepted':l.ea_delivery_accepted, 'lot_id':l.id} for l in lots], safe=False)
 
 @login_required
 @enrich_with_user_details
@@ -870,7 +870,7 @@ def operators_lots_new(request, *args, **kwargs):
   'biocarburant_name':l.biocarburant.name if l.biocarburant else '', 'pays_origine_code':l.pays_origine.code_pays if l.pays_origine else '',
   'pays_origine_name':l.pays_origine.name if l.pays_origine else '', 'eec':l.eec, 'el':l.el, 'ep':l.ep, 'etd':l.etd, 'eu':l.eu, 'esca':l.esca, 'eccs':l.eccs,
   'eccr':l.eccr, 'eee':l.eee, 'ghg_total':l.ghg_total, 'ghg_reference':l.ghg_reference, 'ghg_reduction':'%.2f%%' % (l.ghg_reduction), 'client_id':l.client_id,
-  'status':l.status, 'ea_delivery_accepted':l.ea_delivery_accepted, 'lot_id':l.id} for l in lots], safe=False)
+  'status':l.status, 'status_display':l.get_status_display(), 'ea_delivery_accepted':l.ea_delivery_accepted, 'lot_id':l.id} for l in lots], safe=False)
 
 @login_required
 @enrich_with_user_details

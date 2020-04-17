@@ -26,7 +26,7 @@ var table_columns = [
 {title:'Date d\'entrée<br />en EA', can_hide: true, can_duplicate: true, can_export: true, data:'ea_delivery_date'},
 {title:'Client', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data: 'ea_name'},
 {title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data: 'ea_delivery_site'},
-{title:'Statut', can_hide: true, can_duplicate: false, read_only: true, can_filter: true, can_export: false, data: 'status'},
+{title:'Statut', can_hide: true, can_duplicate: false, read_only: true, can_filter: true, can_export: false, data: 'status_display'},
 {title:`<input type="checkbox" id="checkbox_header"/>`, can_hide: false, can_duplicate: false, read_only: true, can_export: false, data:'checkbox'},
 ]
 
