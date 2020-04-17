@@ -25,14 +25,17 @@ DEBUG = env('DEBUG')
 SECRET_KEY = env('SECRET_KEY')
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sentry_sdk.init(
-    dsn=env('SENTRY_DSN'),
-    integrations=[DjangoIntegration()],
 
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True
-)
+
+if env('TEST') == False:
+    sentry_sdk.init(
+        dsn=env('SENTRY_DSN'),
+        integrations=[DjangoIntegration()],
+
+        # If you wish to associate users to errors (assuming you are using
+        # django.contrib.auth) you may enable sending PII data.
+        send_default_pii=True
+    )
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
@@ -85,7 +88,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'carbure.wsgi.application'
 
-DATABASES = {
+if env('TEST') == False:
+    DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': env('DJANGO_DATABASE'),
@@ -93,9 +97,10 @@ DATABASES = {
         'PASSWORD': env('DJANGO_DB_PASSWORD'),
         'HOST': env('DJANGO_DB_HOST'),
         'PORT': env('DJANGO_DB_PORT'),
+        }
     }
-}
-
+else:
+    DATABASES = {'default': {'ENGINE':'django.db.backends.sqlite3'}}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
