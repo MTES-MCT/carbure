@@ -396,9 +396,11 @@ $(document).ready(function() {
 
   $("#btn_accept_with_comment").on('click', function() {
     let lot_id = $("#lot_id").val()
+    let comment = $("#textarea").val()
     $.ajax({
       url:"{% url 'operators-api-accept-lot-with-comment' %}",
-      data: {'lot': lot_id,'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+      data: {'lot': lot_id,'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value,
+             'comment': comment},
       type        : 'POST',
       success     : function(data, textStatus, jqXHR){
         // Callback code

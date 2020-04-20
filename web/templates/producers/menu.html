@@ -16,8 +16,8 @@
 				</ul>
 				{% endif %}
 			</li>
-			<li><a {% if current_url_name == 'producers-corrections' %}class="active"{% endif %} href="{% url 'producers-corrections' producer_name=url_friendly_name %}">Corrections<span class="badge badge-green">2</span></a></li>
-			<li><a {% if current_url_name == 'producers-controles' %}class="active"{% endif %} href="{% url 'producers-controles' producer_name=url_friendly_name %}">Contrôles<span class="badge badge-red">2</span></a></li>
+			<li><a {% if current_url_name == 'producers-corrections' %}class="active"{% endif %} href="{% url 'producers-corrections' producer_name=url_friendly_name %}">Corrections<span class="badge badge-green">{{corrections}}</span></a></li>
+			<li><a {% if current_url_name == 'producers-controles' %}class="active"{% endif %} href="{% url 'producers-controles' producer_name=url_friendly_name %}">Contrôles<span class="badge badge-red">{{nb_controles_dgec}}</span></a></li>
 			<li><a {% if current_url_name == 'annuaire' %}class="active"{% endif %} href="{% url 'annuaire' %}">Annuaire</a></li>
 			<li><a {% if current_url_name == 'producers-settings' %}class="active"{% endif %} href="{% url 'producers-settings' producer_name=url_friendly_name %}">Paramètres</a></li>
 		</ul>

@@ -21,6 +21,7 @@ urlpatterns = [
     # private, producers
     path('producers/lots/<int:attestation_id>', views.producers_lots, name='api-producers-lots'),
     path('producers/lots', views.producers_all_lots, name='api-producers-all-lots'),
+    path('producers/corrections', views.producers_corrections, name='api-producers-corrections'),
     path('producers/production-sites-autocomplete/', views.producers_prod_site_autocomplete, name='producers-api-production-sites-autocomplete'),
     path('producers/biocarburant-autocomplete/', views.producers_biocarburant_autocomplete, name='producers-api-biocarburants-autocomplete'),
     path('producers/mp-autocomplete/', views.producers_mp_autocomplete, name='producers-api-mps-autocomplete'),
@@ -30,7 +31,7 @@ urlpatterns = [
     path('producers/settings/delete-certif', views.producers_settings_delete_certif, name='producers-api-settings-delete-certif'),
     path('producers/settings/add-mp', views.producers_settings_add_mp, name='producers-api-settings-add-mp'),
     path('producers/settings/add-biocarburant', views.producers_settings_add_biocarburant, name='producers-api-settings-add-biocarburant'),
-    path('producers/attestation/<int:attestation_id>/lot/save', views.producers_save_lot, name='producers-api-attestation-save-lot'),
+    path('producers/lot/save', views.producers_save_lot, name='producers-api-attestation-save-lot'),
     path('producers/lot/duplicate', views.producers_duplicate_lot, name='producers-api-duplicate-lot'),
     path('producers/lot/delete', views.producers_delete_lots, name='producers-api-delete-lots'),
     path('producers/lot/validate', views.producers_validate_lots, name='producers-api-validate-lots'),

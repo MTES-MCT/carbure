@@ -578,7 +578,7 @@ $(document).ready(function() {
           }
           // save lot
           $.ajax({
-            url         : "{% url 'producers-api-attestation-save-lot' attestation_id=current_attestation.id %}",
+            url         : "{% url 'producers-api-attestation-save-lot' %}",
             data        : formdata,
             cache       : false,
             contentType : false,
@@ -740,7 +740,7 @@ $(document).on({
 
     // post form
     $.ajax({
-      url         : "{% url 'producers-api-attestation-save-lot' attestation_id=current_attestation.id %}",
+      url         : "{% url 'producers-api-attestation-save-lot' %}",
       data        : formdata,
       cache       : false,
       contentType : false,
