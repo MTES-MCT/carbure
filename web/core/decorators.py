@@ -42,7 +42,7 @@ def restrict_to_operators(function):
         context = kwargs['context']
         if context['user_entity'].entity_type != 'Opérateur':
             raise PermissionDenied
-        context['affiliated_lots'] = Lot.objects.filter(ea=context['user_entity'], ea_delivery_accepted=False, status='Validated')
+        context['affiliated_lots'] = Lot.objects.filter(ea=context['user_entity'], ea_delivery_status='N', status='Validated')
         context['nb_affiliated_lots'] = len(context['affiliated_lots'])
         context['nb_controles_dgec'] = 0
         return function(request, *args, **kwargs)
