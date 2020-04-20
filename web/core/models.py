@@ -107,6 +107,7 @@ from producers.models import ProductionSite
 
 class Lot(models.Model):
     LOT_STATUS = (('Draft', 'Brouillon'), ('Validated', 'Validé'))
+    DELIVERY_STATUS = (('N', 'N/A'), ('A', 'Accepté'), ('AS', 'Accepté sous réserve'), ('R', 'Refusé'))
 
     carbure_id = models.CharField(max_length=64, blank=True, default='')
     # producer
@@ -149,7 +150,7 @@ class Lot(models.Model):
     status = models.CharField(max_length=64, choices=LOT_STATUS, default='Draft')
 
     # ea delivery confirmation
-    ea_delivery_accepted = models.BooleanField(default=False)
+    ea_delivery_status = models.CharField(max_length=64, choices=DELIVERY_STATUS, default='N/A')
 
     def __str__(self):
         return str(self.id)

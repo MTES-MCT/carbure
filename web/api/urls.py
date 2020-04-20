@@ -20,7 +20,6 @@ urlpatterns = [
 
     # private, producers
     path('producers/lots/<int:attestation_id>', views.producers_lots, name='api-producers-lots'),
-    path('producers/lots-new/<int:attestation_id>', views.producers_lots_new, name='api-producers-lots-new'),
     path('producers/lots', views.producers_all_lots, name='api-producers-all-lots'),
     path('producers/production-sites-autocomplete/', views.producers_prod_site_autocomplete, name='producers-api-production-sites-autocomplete'),
     path('producers/biocarburant-autocomplete/', views.producers_biocarburant_autocomplete, name='producers-api-biocarburants-autocomplete'),
@@ -32,7 +31,6 @@ urlpatterns = [
     path('producers/settings/add-mp', views.producers_settings_add_mp, name='producers-api-settings-add-mp'),
     path('producers/settings/add-biocarburant', views.producers_settings_add_biocarburant, name='producers-api-settings-add-biocarburant'),
     path('producers/attestation/<int:attestation_id>/lot/save', views.producers_save_lot, name='producers-api-attestation-save-lot'),
-    path('producers/attestation/<int:attestation_id>/lot/save-new', views.producers_save_lot_new, name='producers-api-attestation-save-lot-new'),
     path('producers/lot/duplicate', views.producers_duplicate_lot, name='producers-api-duplicate-lot'),
     path('producers/lot/delete', views.producers_delete_lots, name='producers-api-delete-lots'),
     path('producers/lot/validate', views.producers_validate_lots, name='producers-api-validate-lots'),
@@ -40,11 +38,10 @@ urlpatterns = [
 
     # private, operators
     path('operators/lots-affilies', views.operators_lots_affilies, name='operators-api-affiliated-lots'),
-    path('operators/lots-affilies-new', views.operators_lots_affilies_new, name='operators-api-affiliated-lots-new'),
     path('operators/lots/accept', views.operators_lot_accept, name='operators-api-accept-lots'),
+    path('operators/lots/accept-with-comment', views.operators_lot_accept_with_comment, name='operators-api-accept-lot-with-comment'),
     path('operators/lots/reject', views.operators_lot_reject, name='operators-api-reject-lots'),
     path('operators/lots/<int:declaration_id>', views.operators_lots, name='operators-api-lots'),
-    path('operators/lots-new/<int:declaration_id>', views.operators_lots_new, name='operators-api-lots-new'),
     path('operators/settings/add-depot', views.operators_settings_add_depot, name='operators-api-settings-add-depot'),
     path('operators/declaration/<int:declaration_id>/export', views.operators_declaration_export, name='operators-api-declaration-export'),
 
