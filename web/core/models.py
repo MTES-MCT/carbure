@@ -160,6 +160,18 @@ class Lot(models.Model):
         verbose_name = 'Lot'
         verbose_name_plural = 'Lots'
 
+class LotComment(models.Model):
+    lot = models.ForeignKey(Lot, on_delete=models.CASCADE)
+    comment = models.TextField()
+
+    def __str__(self):
+        return str(self.comment)
+
+    class Meta:
+        db_table = 'lots_comments'
+        verbose_name = 'LotComment'
+        verbose_name_plural = 'LotComments'
+
 class GHGValues(models.Model):
     matiere_premiere = models.ForeignKey(MatierePremiere, blank=True, null=True, on_delete=models.CASCADE)
     biocarburant = models.ForeignKey(Biocarburant, on_delete=models.CASCADE)
