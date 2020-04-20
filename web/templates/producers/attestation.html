@@ -479,7 +479,7 @@ $(document).ready(function() {
     ],
     columns: table_columns,
     ajax: {
-      url: `{% url 'api-producers-lots-new' attestation_id=current_attestation.id %}`,
+      url: `{% url 'api-producers-lots' attestation_id=current_attestation.id %}`,
       dataSrc: function(json) {
         for (let i = 0, len = json.length; i < len; i++) {
           // add checkbox on the fly
@@ -578,7 +578,7 @@ $(document).ready(function() {
           }
           // save lot
           $.ajax({
-            url         : "{% url 'producers-api-attestation-save-lot-new' attestation_id=current_attestation.id %}",
+            url         : "{% url 'producers-api-attestation-save-lot' attestation_id=current_attestation.id %}",
             data        : formdata,
             cache       : false,
             contentType : false,
@@ -740,7 +740,7 @@ $(document).on({
 
     // post form
     $.ajax({
-      url         : "{% url 'producers-api-attestation-save-lot-new' attestation_id=current_attestation.id %}",
+      url         : "{% url 'producers-api-attestation-save-lot' attestation_id=current_attestation.id %}",
       data        : formdata,
       cache       : false,
       contentType : false,
