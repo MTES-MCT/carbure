@@ -206,7 +206,7 @@ $(document).ready(function() {
     ],
     columns: table_columns_operators,
     ajax: {
-      url: `{% url 'operators-api-lots-new' declaration_id=current_declaration.id %}`,
+      url: `{% url 'operators-api-lots' declaration_id=current_declaration.id %}`,
       dataSrc: function(json) {
         for (let i = 0, len = json.length; i < len; i++) {
           // add checkbox on the fly
