@@ -16,7 +16,8 @@ from sentry_sdk.integrations.django import DjangoIntegration
 import environ
 env = environ.Env(
     # set casting, default value
-    DEBUG=(bool, False)
+    DEBUG=(bool, False),
+    TEST=(bool, False)
 )
 
 # False if not in os.environ
@@ -25,7 +26,6 @@ DEBUG = env('DEBUG')
 SECRET_KEY = env('SECRET_KEY')
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 if env('TEST') == False:
     sentry_sdk.init(
@@ -100,6 +100,7 @@ if env('TEST') == False:
         }
     }
 else:
+    print('TESTING MODE')
     DATABASES = {'default': {'ENGINE':'django.db.backends.sqlite3'}}
 
 # Password validation
