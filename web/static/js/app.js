@@ -56,6 +56,7 @@ var table_columns_operators = [
 {title:'Référence', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data:'client_id', tooltip: 'Champ libre - Référence client'},
 {title:'Date d\'entrée<br />en EA', can_hide: true, can_duplicate: true, can_export: true, data:'ea_delivery_date'},
 {title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, can_export: true, data: 'ea_delivery_site'},
+{title:'Statut', can_hide: true, can_filter: true, can_export: true, data: 'ea_delivery_status'},
 {title:`<input type="checkbox" id="checkbox_header"/>`, can_hide: false, can_duplicate: false, read_only: true, can_export: false, data:'checkbox'},
 ]
 

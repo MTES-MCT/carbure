@@ -35,14 +35,18 @@ urlpatterns = [
     path('producers/lot/duplicate', views.producers_duplicate_lot, name='producers-api-duplicate-lot'),
     path('producers/lot/delete', views.producers_delete_lots, name='producers-api-delete-lots'),
     path('producers/lot/validate', views.producers_validate_lots, name='producers-api-validate-lots'),
+    path('producers/lot/comments', views.producers_lot_comments, name='producers-api-lot-comments'),
     path('producers/attestation/<int:attestation_id>/export', views.producers_attestation_export, name='producers-api-attestation-export'),
+    path('producers/lot/save-comment', views.producers_lot_save_comment, name='producers-api-save-comment'),
 
     # private, operators
     path('operators/lots-affilies', views.operators_lots_affilies, name='operators-api-affiliated-lots'),
     path('operators/lots/accept', views.operators_lot_accept, name='operators-api-accept-lots'),
+    path('operators/lots/accept-correction', views.operators_lot_accept_correction, name='operators-api-accept-lot-correction'),
     path('operators/lots/accept-with-comment', views.operators_lot_accept_with_comment, name='operators-api-accept-lot-with-comment'),
     path('operators/lots/reject', views.operators_lot_reject, name='operators-api-reject-lots'),
     path('operators/lots/<int:declaration_id>', views.operators_lots, name='operators-api-lots'),
+    path('operators/lot/comments', views.operators_lot_comments, name='operators-api-lot-comments'),
     path('operators/settings/add-depot', views.operators_settings_add_depot, name='operators-api-settings-add-depot'),
     path('operators/declaration/<int:declaration_id>/export', views.operators_declaration_export, name='operators-api-declaration-export'),
 

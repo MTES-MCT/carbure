@@ -27,6 +27,7 @@
       <div class="form__group" style="margin-top: var(--space-l);">
         <h3 style="text-align: center;">Informations</h3>
         <input type="hidden" id="lot_id" />
+        <input type="hidden" id="attestation_id" />
         <dl>
           <dt>Site de Production</dt>
           <dd><input type="text" id="production_site_name" class="autocomplete_production_sites" /><input type="hidden" id="production_site_id" /></dd>
@@ -122,9 +123,8 @@
         </table>
       </div>
     </div>
-    <div class="form__group">
-      <label style="margin-bottom: 1em; margin-top: 2em;" for="textarea">Commentaire client:</label>
-      <textarea name="textarea" id="textarea"></textarea>
+    <div class="form__group" id="comment_section">
+
     </div>
     <div class="form__group button__group">
       <a class="button primary" id="btn_lot_save">Sauvegarder</a>
@@ -205,6 +205,8 @@ $(document).ready(function() {
 	    let row = $(this).closest('tr');
 	    let data = table.row(row).data()
 	    let table_column = table_columns[colid]
+	    let comment_section = $("#comment_section")
+	    comment_section.empty()
 	    if (table_column['data'] === 'checkbox') {
 	      // ignore clicks on checkbox column
 	      return
@@ -230,14 +232,34 @@ $(document).ready(function() {
 				}
 			}
 
-			/* warning if the lot is validated */
-			if (data['status'] == 'Validated') {
-				let message = `<h5 style="color: tomato">Attention, ce lot a déjà été déclaré à la DGEC et affilié à un client.</h5>
-				<span>Toute modification leur sera automatiquement notifiée et devra être acceptée par le client.</span>`
-				$("#err_msg_dom").html(message)
-			} else {
-				$("#err_msg_dom").html('')
-			}
+			$.ajax({
+				url         : "{% url 'producers-api-lot-comments' %}",
+				data        : {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+				type        : 'POST',
+				success     : function(data, textStatus, jqXHR){
+				  // Callback code
+				  // load existing comments into the form
+				  for (let i = 0, len = data.length; i < len; i++) {
+				    let c = data[i]
+				    let html = `<label style="margin-bottom: 1em; margin-top: 2em;">${c.from}:</label>
+				    <textarea name="textarea" readonly>${c.comment}</textarea>`
+				    comment_section.append(html)
+				  }
+				  // add textarea to respond
+				  let html = `<label style="margin-bottom: 1em; margin-top: 2em;" for="textarea">Répondre:</label>
+				  			  <textarea name="textarea" id="textarea"></textarea>`
+				  comment_section.append(html)
+				},
+				error       : function(e) {
+				  if (e.status === 400) {
+				    alert(e.responseJSON.message)
+				    console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+				  } else {
+				    alert("Server error. Please contact an administrator")
+				    console.log(`server error ${JSON.stringify(e)}`)
+				  }
+				}
+			})
 			modal.style.display = "flex"
 	  	}
 	})
@@ -269,7 +291,6 @@ $("#btn_lot_save").on('click', handleSave)
 function handleSave(action) {
 	var err_msg_dom = $("#err_msg_dom")
 	var formdata = new FormData();
-	formdata.set('attestation_id', '{{current_attestation.id}}')
 	formdata.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
 	$(".modal-edit input").each(function() {
 		console.log($(this).attr('id'), $(this).val())
@@ -286,7 +307,28 @@ function handleSave(action) {
     	type        : 'POST',
     	success     : function(data, textStatus, jqXHR) {
         	// Callback code
-        	window.location.reload()
+		    // post new comment if any
+		    let comment = $("#textarea").val()
+		    if (comment) {
+		    	$.ajax({
+			    	url         : "{% url 'producers-api-save-comment' %}",
+			    	data        : {'lot_id': $("#lot_id").val(), 'comment':comment, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+			    	type        : 'POST',
+			    	success     : function(data, textStatus, jqXHR) {
+			        	// Callback code
+			        	window.location.reload()
+			        },
+			        error       : function(e) {
+			        	if (e.status === 400) {
+			        		err_msg_dom.html(`${e.responseJSON.message}`)
+			        	} else {
+			        		alert("Server error. Please contact an administrator")
+			        	}
+			        }
+			    })
+		    } else {
+			    window.location.reload()
+		    }
         },
         error       : function(e) {
         	if (e.status === 400) {

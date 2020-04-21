@@ -142,13 +142,20 @@
         </table>
       </div>
     </div>
+    <div class="form__group" id="comment_section">
+
+    </div>
     <div class="form__group button__group">
-      <a class="button secondary close" id="btn_close_modal_edit_lot">Annuler</a>
+      <div class="button-item">
+        <a class="button primary" id="btn_lot_accept_final" style="display: none;">Accepter définitivement</a>
+      </div>
+      <div class="button-item button-push">
+        <a class="button secondary close" id="btn_close_modal_edit_lot">Annuler</a>
+      </div>
     </div>
   </div>
 </div>
-
-
+{% csrf_token %}
 {% endblock %}
 
 
@@ -264,6 +271,8 @@ $(document).ready(function() {
     let row = $(this).closest('tr');
     let data = table.row(row).data()
     let table_column = table_columns_operators[colid]
+    let comment_section = $("#comment_section")
+    comment_section.empty()
     if (table_column['data'] === 'checkbox') {
       // ignore clicks on checkbox column
       return
@@ -291,9 +300,67 @@ $(document).ready(function() {
           $(`#${name_field}`).val(override)
         }
       }
+
+      // request lot comments if any
+      $.ajax({
+        url         : "{% url 'operators-api-lot-comments' %}",
+        data        : {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+        type        : 'POST',
+        success     : function(data, textStatus, jqXHR){
+          // Callback code
+          for (let i = 0, len = data.length; i < len; i++) {
+            let c = data[i]
+            let html = `<label style="margin-bottom: 1em; margin-top: 2em;" for="textarea">${c.from}:</label>
+            <textarea name="textarea" id="textarea" readonly>${c.comment}</textarea>`
+            comment_section.append(html)
+          }
+        },
+        error       : function(e) {
+          if (e.status === 400) {
+            alert(e.responseJSON.message)
+            console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+          } else {
+            alert("Server error. Please contact an administrator")
+            console.log(`server error ${JSON.stringify(e)}`)
+          }
+        }
+      })
+
+      if (data['ea_delivery_status'] == 'Accepté') {
+        let message = `<h5 style="color: tomato">Lot déclaré à la DGEC</h5>`
+        $("#btn_lot_accept_final").hide()
+        $("#err_msg_dom").html(message)
+      } else {
+        $("#err_msg_dom").html('')
+        $("#btn_lot_accept_final").show()
+      }
+
+
       modal.style.display = "flex"
     }
   });
+
+  $("#btn_lot_accept_final").on('click', function() {
+    let lot_id = $("#lot_id").val()
+    $.ajax({
+      url:"{% url 'operators-api-accept-lot-correction' %}",
+      data: {'lot': lot_id,'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+      type        : 'POST',
+      success     : function(data, textStatus, jqXHR){
+        // Callback code
+        window.location.reload()
+      },
+      error       : function(e) {
+        if (e.status === 400) {
+          alert(e.responseJSON.message)
+          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+        } else {
+          alert("Server error. Please contact an administrator")
+          console.log(`server error ${JSON.stringify(e)}`)
+        }
+      }
+    })
+  })
 
 })
 

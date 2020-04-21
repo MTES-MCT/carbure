@@ -32,6 +32,7 @@ def operators_index(request, *args, **kwargs):
 
   for declaration in declarations:
     declaration.lots = len(AcceptedLot.objects.filter(declaration=declaration))
+    declaration.lots_en_attente = len(AcceptedLot.objects.filter(declaration=declaration, lot__ea_delivery_status='AS'))
 
   context['declarations'] = declarations
   context['today'] = datetime.date.today()
