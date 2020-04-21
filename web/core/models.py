@@ -161,6 +161,7 @@ class Lot(models.Model):
         verbose_name_plural = 'Lots'
 
 class LotComment(models.Model):
+    entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
     lot = models.ForeignKey(Lot, on_delete=models.CASCADE)
     comment = models.TextField()
 

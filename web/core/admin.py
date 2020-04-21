@@ -45,14 +45,14 @@ class PaysAdmin(admin.ModelAdmin):
 
 
 class LotAdmin(admin.ModelAdmin):
-    list_display = ('producer', 'production_site', 'ea_delivery_site', 'ea_delivery_date', 'ea', 'biocarburant', 'matiere_premiere', 'client_id', 'status')
-    search_fields = ('producer', 'production_site', 'dae', 'ea', 'biocarburant', 'matiere_premiere', 'pays_origine', 'client_id')
-    list_filter = ('status', )
+    list_display = ('producer', 'production_site', 'ea_delivery_site', 'ea_delivery_date', 'ea', 'biocarburant', 'matiere_premiere', 'client_id', 'status', 'ea_delivery_status')
+    search_fields = ('producer', 'production_site', 'dae', 'ea', 'biocarburant', 'matiere_premiere', 'pays_origine', 'client_id', 'ea_delivery_status')
+    list_filter = ('status', 'ea_delivery_status')
 
 
 class LotCommentAdmin(admin.ModelAdmin):
-    list_display = ('lot', 'comment')
-    search_fields = ('lot', 'comment')
+    list_display = ('entity', 'lot', 'comment')
+    search_fields = ('entity', 'lot', 'comment')
 
 
 class GHGValuesAdmin(admin.ModelAdmin):
