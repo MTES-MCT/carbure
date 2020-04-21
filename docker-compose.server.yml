@@ -44,7 +44,6 @@ services:
       AWS_S3_REGION_NAME:  ${SCALEWAY_REGION_NAME}
       AWS_S3_ENDPOINT_URL: ${SCALEWAY_S3_ENDPOINT}
       AWS_S3_USE_SSL: 1
-      TEST: 0
     depends_on:
     - carbure-mariadb
     networks:
