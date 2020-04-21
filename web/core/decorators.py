@@ -31,7 +31,7 @@ def restrict_to_producers(function):
         context = kwargs['context']
         if context['user_entity'].entity_type != 'Producteur':
             raise PermissionDenied
-        corrections = Lot.objects.filter(producer=context['user_entity'], ea_delivery_status='R')
+        corrections = Lot.objects.filter(producer=context['user_entity'], ea_delivery_status='AS')
         context['corrections'] = len(corrections)
         context['nb_controles_dgec'] = 0
         return function(request, *args, **kwargs)
