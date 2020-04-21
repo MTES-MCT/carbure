@@ -195,7 +195,33 @@ $(document).ready(function() {
         	//let destination_element = col2field[i]
         	//$(`#${destination_element}`).val(col_data)
         }
-		// show modal
+		// request lot comments if any
+		$.ajax({
+			url         : "{% url 'producers-api-lot-comments' %}",
+			data        : {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+			type        : 'POST',
+			success     : function(data, textStatus, jqXHR){
+			  // Callback code
+			  for (let i = 0, len = data.length; i < len; i++) {
+			    let c = data[i]
+			    let html = `<label style="margin-bottom: 1em; margin-top: 2em;" for="textarea">${c.from}</label>
+			    <textarea name="textarea" id="textarea" readonly>${c.comment}</textarea>`
+			    comment_section.append(html)
+			  }
+			},
+			error       : function(e) {
+			  if (e.status === 400) {
+			    alert(e.responseJSON.message)
+			    console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+			  } else {
+			    alert("Server error. Please contact an administrator")
+			    console.log(`server error ${JSON.stringify(e)}`)
+			  }
+			}
+		})
+
+
+
 		modal_controle.style.display = "flex";
 	});
 

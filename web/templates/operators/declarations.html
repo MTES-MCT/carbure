@@ -9,6 +9,7 @@
 				<tr>
 					<th>Période</th>
 					<th>Lots</th>
+					<th>Lots en attente</th>
 					<th>Échéance</th>
 				</tr>
 			</thead>
@@ -25,6 +26,7 @@
 					onclick="window.location='{% url 'operators-declaration' declaration_id=d.id operator_name=url_friendly_name %}'">
 					<td>{{d.period}}</td>
 					<td>{{d.lots}}</td>
+					<td>{{d.lots_en_attente}}</td>
 					<td>{{d.deadline}}</td>
 				</tr>
 				{% endfor %}
