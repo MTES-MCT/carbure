@@ -150,7 +150,7 @@ class Lot(models.Model):
     status = models.CharField(max_length=64, choices=LOT_STATUS, default='Draft')
 
     # ea delivery confirmation
-    ea_delivery_status = models.CharField(max_length=64, choices=DELIVERY_STATUS, default='N/A')
+    ea_delivery_status = models.CharField(max_length=64, choices=DELIVERY_STATUS, default='N')
 
     def __str__(self):
         return str(self.id)
