@@ -153,7 +153,7 @@ def producers_all_lots(request, *args, **kwargs):
 @restrict_to_producers
 def producers_corrections(request, *args, **kwargs):
   context = kwargs['context']
-  lots = Lot.objects.filter(ea_delivery_status__in=['AC', 'AA'])
+  lots = Lot.objects.filter(ea_delivery_status__in=['AC', 'AA', 'R'])
   return JsonResponse([{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id if l.producer else '',
   'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
   'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date.strftime('%d/%m/%Y') if l.ea_delivery_date else '', 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
@@ -767,16 +767,22 @@ def operators_lot_accept_with_comment(request, *args, **kwargs):
 def operators_lot_reject(request, *args, **kwargs):
   context = kwargs['context']
   lot_ids = request.POST.get('lots', None)
+  comment = request.POST.get('comment', None)
   if not lot_ids:
     return JsonResponse({'status':'error', 'message':'Aucun lot sélectionné'}, status=400)
-
+  if not comment:
+    return JsonResponse({'status':'error', 'message':'Veuillez entrer un commentaire'}, status=400)
   ids = lot_ids.split(',')
   for lotid in ids:
     lot = Lot.objects.get(id=lotid, ea=context['user_entity'])
     lot.ea = None
     lot.ea_delivery_status = 'R'
-    lot.status = 'Draft'
     lot.save()
+    lc = LotComment()
+    lc.lot = lot
+    lc.entity = context['user_entity']
+    lc.comment = comment
+    lc.save()
   return JsonResponse({'status':'success', 'message':'lots rejected'})
 
 

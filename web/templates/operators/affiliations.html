@@ -43,6 +43,8 @@
       <p>Êtes vous sûr de vouloir refuser ce(s) lot(s) ?</p>
       <ul id="modal_reject_lots_list">
       </ul>
+      <label for="comment">Motif:</label>
+      <input type="textarea" id="comment" name="comment" />
       <input type="hidden" id="modal_reject_lots_lots" name="lots">
       <div class="form__group button__group">
         <a class="button secondary" id="btn_close_modal_reject_lots">Annuler</a>
@@ -159,7 +161,7 @@
       <div class="button-item">
         <a class="button primary" id="btn_accept_single_lot">Accepter</a>
         <a class="button primary" id="show_comment_section">Accepter sous réserve</a>
-        <a class="button warning" id="btn_reject_single_lot">Refuser</a>
+        <a class="button warning" id="show_reject_section">Refuser</a>
       </div>
       <div class="button-item button-push">
         <a class="button secondary close" id="btn_close_modal_edit_lot">Annuler</a>
@@ -169,6 +171,11 @@
       <label style="margin-bottom: 1em; margin-top: 2em;" for="textarea">Veuillez entrer un commentaire qui sera envoyé à votre fournisseur</label>
       <textarea name="textarea" id="textarea"></textarea>
       <a class="button primary" id="btn_accept_with_comment">Accepter sous réserve</a>
+    </div>
+    <div class="form__group" style="display: none;" id="reject_section">
+      <label style="margin-bottom: 1em; margin-top: 2em;" for="textarea_reject">Veuillez entrer un motif de refus qui sera envoyé au fournisseur</label>
+      <textarea name="textarea" id="textarea_reject"></textarea>
+      <a class="button warning" id="btn_reject_with_comment">Refuser le lot</a>
     </div>
   </div>
 </div>
@@ -403,11 +410,12 @@ $(document).ready(function() {
     })
   })
 
-  $("#btn_reject_single_lot").on('click', function() {
+  $("#btn_reject_with_comment").on('click', function() {
     let lot_id = $("#lot_id").val()
+    let comment = $("#textarea_reject").val()
     $.ajax({
       url:"{% url 'operators-api-reject-lots' %}",
-      data: {'lots': lot_id,'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+      data: {'lots': lot_id, comment:comment, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
       type        : 'POST',
       success     : function(data, textStatus, jqXHR){
         // Callback code
@@ -428,6 +436,11 @@ $(document).ready(function() {
   $("#show_comment_section").on('click', function() {
     $("#show_comment_section").hide()
     $("#comment_section").show()
+  })
+
+  $("#show_reject_section").on('click', function() {
+    $("#show_reject_section").hide()
+    $("#reject_section").show()
   })
 
   $("#btn_accept_with_comment").on('click', function() {
