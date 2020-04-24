@@ -54,7 +54,7 @@
   </div>
 </div>
 
-<div class="modal__backdrop" id="modal_edit_lot">
+<div class="modal__backdrop" id="modal_edit_lot" style="overflow-y:scroll;">
   <div class="modal" style="max-width: none;">
     <p id="err_msg_dom" style="color: tomato">
     </p>
@@ -160,20 +160,22 @@
     <div class="button-container">
       <div class="button-item">
         <a class="button primary" id="btn_accept_single_lot">Accepter</a>
-        <a class="button primary" id="show_comment_section">Accepter sous réserve</a>
+        <a class="button primary" id="show_add_comment_section">Accepter sous réserve</a>
         <a class="button warning" id="show_reject_section">Refuser</a>
       </div>
       <div class="button-item button-push">
         <a class="button secondary close" id="btn_close_modal_edit_lot">Annuler</a>
       </div>
     </div>
-    <div class="form__group" style="display: none;" id="comment_section">
-      <label style="margin-bottom: 1em; margin-top: 2em;" for="textarea">Veuillez entrer un commentaire qui sera envoyé à votre fournisseur</label>
+    <div class="form__group" style="display: none;" id="comments_section">
+    </div>
+    <div class="form__group" style="display: none;" id="add_comment_section">
+      <label style="margin-bottom: 1em; margin-top: 2em;" for="textarea">Ajouter un commentaire pour votre fournisseur</label>
       <textarea name="textarea" id="textarea"></textarea>
       <a class="button primary" id="btn_accept_with_comment">Accepter sous réserve</a>
     </div>
     <div class="form__group" style="display: none;" id="reject_section">
-      <label style="margin-bottom: 1em; margin-top: 2em;" for="textarea_reject">Veuillez entrer un motif de refus qui sera envoyé au fournisseur</label>
+      <label style="margin-bottom: 1em; margin-top: 2em;" for="textarea_reject">Ajouter un motif de refus pour le fournisseur</label>
       <textarea name="textarea" id="textarea_reject"></textarea>
       <a class="button warning" id="btn_reject_with_comment">Refuser le lot</a>
     </div>
@@ -321,8 +323,17 @@ $(document).ready(function() {
     let row = $(this).closest('tr');
     let data = table.row(row).data()
     let table_column = table_columns_operators[colid]
-    let comment_section = $("#comment_section")
-    comment_section.empty()
+    let comments_section = $("#comments_section")
+    let show_add_comment_section = $("#show_add_comment_section")
+    let add_comment_section = $("#add_comment_section")
+    let show_reject_section = $("#show_reject_section")
+    let reject_section = $("#reject_section")
+    show_reject_section.show()
+    show_add_comment_section.show()
+    add_comment_section.hide()
+    comments_section.empty()
+    comments_section.hide()
+    reject_section.hide()
 
     if (table_column['data'] === 'checkbox') {
       // ignore clicks on checkbox column
@@ -352,7 +363,7 @@ $(document).ready(function() {
         }
       }
 
-
+      // handle bottom part of the modal: existing comments, reject section and comment section
       // request lot comments if any
       $.ajax({
         url         : "{% url 'operators-api-lot-comments' %}",
@@ -360,17 +371,17 @@ $(document).ready(function() {
         type        : 'POST',
         success     : function(data, textStatus, jqXHR){
           // Callback code
-          console.log(`received lot comments, will add them to modal`)
           if (data.length > 0) {
-            $("#comment_section").show()
-            $("#show_comment_section").hide()
+            comments_section.show()
+            add_comment_section.show()
+            show_add_comment_section.hide()
+            btn_accept_with_comment.text = "Ajouter un commentaire"
           }
           for (let i = 0, len = data.length; i < len; i++) {
             let c = data[i]
             let html = `<label style="margin-bottom: 1em; margin-top: 2em;" for="textarea">${c.from}:</label>
             <textarea name="textarea" id="textarea" readonly>${c.comment}</textarea>`
-            comment_section.append(html)
-            console.log(`added ${c.comment}`)
+            comments_section.append(html)
           }
         },
         error       : function(e) {
@@ -387,6 +398,17 @@ $(document).ready(function() {
       modal.style.display = "flex"
     }
   });
+
+  $("#show_add_comment_section").on('click', function() {
+    $("#add_comment_section").show()
+    $("#show_add_comment_section").hide()
+  })
+
+  $("#show_reject_section").on('click', function() {
+    $("#reject_section").show()
+    $("#show_reject_section").hide()
+  })
+
 
   $("#btn_accept_single_lot").on('click', function() {
     let lot_id = $("#lot_id").val()
@@ -431,16 +453,6 @@ $(document).ready(function() {
         }
       }
     })
-  })
-
-  $("#show_comment_section").on('click', function() {
-    $("#show_comment_section").hide()
-    $("#comment_section").show()
-  })
-
-  $("#show_reject_section").on('click', function() {
-    $("#show_reject_section").hide()
-    $("#reject_section").show()
   })
 
   $("#btn_accept_with_comment").on('click', function() {
