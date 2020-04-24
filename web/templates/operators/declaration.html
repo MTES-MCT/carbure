@@ -49,30 +49,30 @@
         <input type="hidden" id="lot_id" />
         <dl>
           <dt>Site de Production</dt>
-          <dd><input type="text" id="production_site_name" class="autocomplete_production_sites" /><input type="hidden" id="production_site_id" /></dd>
+          <dd><input type="text" id="production_site_name" class="autocomplete_production_sites" readonly/><input type="hidden" id="production_site_id" /></dd>
           <dt>Volume à 20°C en Litres</dt>
-          <dd><input type="text" id="volume" /></dd>
+          <dd><input type="text" id="volume" readonly/></dd>
           <dt>Biocarburant</dt>
-          <dd><input type="text" id="biocarburant_name" class="autocomplete_biocarburants" /><input type="hidden" id="biocarburant_code" /></dd>
+          <dd><input type="text" id="biocarburant_name" class="autocomplete_biocarburants" readonly/><input type="hidden" id="biocarburant_code" /></dd>
           <dt>Matiere Premiere</dt>
-          <dd><input type="text" id="matiere_premiere_name" class="autocomplete_mps" /><input type="hidden" id="matiere_premiere_code" /></dd>
+          <dd><input type="text" id="matiere_premiere_name" class="autocomplete_mps" readonly/><input type="hidden" id="matiere_premiere_code" /></dd>
           <dt>Pays d'origine</dt>
-          <dd><input type="text" id="pays_origine_name" class="autocomplete_countries" /><input type="hidden" id="pays_origine_code" /></dd>
+          <dd><input type="text" id="pays_origine_name" class="autocomplete_countries" readonly/><input type="hidden" id="pays_origine_code" /></dd>
         </dl>
       </div>
       <div class="form__group" style="margin-left: var(--space-l);">
         <h3 style="text-align: center;">Destination</h3>
         <dl>
         <dt><label for="dae">Numéro de DAE / DAU</label></dt>
-        <dd><input id="dae" type="text" /></dd>
+        <dd><input id="dae" type="text" readonly/></dd>
         <dt><label for="ea_name">Client</label></dt>
-        <dd><input type="text" id="ea_name" class="autocomplete_operators" /><input type="hidden" id="ea_id" /></dd>
+        <dd><input type="text" id="ea_name" class="autocomplete_operators" readonly/><input type="hidden" id="ea_id" /></dd>
         <dt><label for="ea_delivery_site">Site de livraison</label></dt>
-        <dd><input id="ea_delivery_site" type="text" /></dd>
+        <dd><input id="ea_delivery_site" type="text" readonly/></dd>
         <dt><label for="ea_delivery_date">Date de livraison</label></dt>
-        <dd><input id="ea_delivery_date" type="text" placeholder="JJ/MM/AAAA" /></dd>
+        <dd><input id="ea_delivery_date" type="text" placeholder="JJ/MM/AAAA" readonly/></dd>
         <dt><label for="client_id" title="Champ optionnel, entrez ce que vous voulez">Référence</label></dt>
-        <dd><input id="client_id" type="text" /></dd>
+        <dd><input id="client_id" type="text" readonly/></dd>
         </dl>
       </div>
       <div class="form__group" style="margin-left: var(--space-l);">
@@ -86,39 +86,39 @@
           <tbody>
             <tr>
               <td>
-                <label for="eec">EEC </label><input type="text" id="eec" class="ges_field ges_incr" />
+                <label for="eec">EEC </label><input type="text" id="eec" class="ges_field ges_incr" readonly/>
               </td>
               <td>
-                <label for="esca">ESCA </label><input type="text" id="esca" class="ges_field ges_decr" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label>EL </label><input type="text" id="el" class="ges_field ges_incr" />
-              </td>
-              <td>
-                <label>ECCS </label><input type="text" id="eccs" class="ges_field ges_decr" />
+                <label for="esca">ESCA </label><input type="text" id="esca" class="ges_field ges_decr" readonly/>
               </td>
             </tr>
             <tr>
               <td>
-                <label>EP </label><input type="text" id="ep" class="ges_field ges_incr" />
+                <label>EL </label><input type="text" id="el" class="ges_field ges_incr" readonly />
               </td>
               <td>
-                <label>ECCR </label><input type="text" id="eccr" class="ges_field ges_decr" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label>ETD </label><input type="text" id="etd" class="ges_field ges_incr" />
-              </td>
-              <td>
-                <label>EEE </label><input type="text" id="eee" class="ges_field ges_decr" />
+                <label>ECCS </label><input type="text" id="eccs" class="ges_field ges_decr" readonly/>
               </td>
             </tr>
             <tr>
               <td>
-                <label>EU </label><input type="text" id="eu" class="ges_field ges_incr" />
+                <label>EP </label><input type="text" id="ep" class="ges_field ges_incr" readonly/>
+              </td>
+              <td>
+                <label>ECCR </label><input type="text" id="eccr" class="ges_field ges_decr" readonly/>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label>ETD </label><input type="text" id="etd" class="ges_field ges_incr" readonly/>
+              </td>
+              <td>
+                <label>EEE </label><input type="text" id="eee" class="ges_field ges_decr" readonly/>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label>EU </label><input type="text" id="eu" class="ges_field ges_incr" readonly/>
               </td>
               <td>
               </td>
