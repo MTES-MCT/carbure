@@ -123,7 +123,7 @@
 
 <div class="modal__backdrop" id="modal_edit_lot">
   <div class="modal" style="max-width: none;">
-    <p id="err_msg_dom" style="color: tomato">
+    <p id="err_msg_dom">
     </p>
     <div class="flex-container modal-edit">
       <div class="form__group" style="margin-top: var(--space-l);">
@@ -682,7 +682,8 @@ $(document).ready(function() {
 
       /* warning if the lot is validated */
       if (data['status'] == 'Validated') {
-        let message = `<h5 style="color: tomato">Attention, ce lot a déjà été déclaré à la DGEC et affilié à un client.</h5>
+        let message = `<h3>Lot ${data['carbure_id']}</h3>
+                       <h5 style="color: tomato">Attention, ce lot a déjà été déclaré à la DGEC et affilié à un client.</h5>
                        <span>Toute modification leur sera automatiquement notifiée et devra être acceptée par le client.</span>`
         $("#err_msg_dom").html(message)
       } else {
