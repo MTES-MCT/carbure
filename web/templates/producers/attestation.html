@@ -69,7 +69,8 @@
     <span id="modal_validate_lots_form_err_message" style="color: red;"></span>
     <form id="modal_validate_lots_form" method="POST" data-url="{% url 'producers-api-validate-lots' %}">
       {% csrf_token %}
-      <p>Êtes vous sûr de vouloir valider ce(s) lot(s) ?</p>
+      <p>En validant ces lots, je certifie que les informations renseignées sont réelles et valides.<br />
+         Êtes vous sûr de vouloir valider ce(s) lot(s) ?</p>
       <ul id="modal_validate_lots_list">
       </ul>
       <input type="hidden" id="modal_validate_lots_lots" name="lots">
