@@ -141,7 +141,7 @@
 $(document).ready(function() {
 
 	// create empty footer
-	let empty_footer = `<tr>${Array(table_columns.length).fill("<th></th>").join('')}</tr>`
+	let empty_footer = `<tr>${Array(table_columns_producers_corrections.length).fill("<th></th>").join('')}</tr>`
 	$("#datatable tfoot").append(empty_footer)
 
 	var table = $('#datatable').DataTable({
@@ -158,7 +158,7 @@ $(document).ready(function() {
 		columnDefs: [
 		{"className": "dt-center", "targets": "_all"}
 		],
-		columns: table_columns,
+		columns: table_columns_producers_corrections,
 		ajax: {
 			url: `{% url 'api-producers-corrections' %}`,
 			dataSrc: function(json) {
@@ -173,7 +173,7 @@ $(document).ready(function() {
 		  // create filter
 		  this.api().columns().every(function () {
 		  	var column = this;
-		  	let table_column = table_columns[column.index()]
+		  	let table_column = table_columns_producers_corrections[column.index()]
 		  	if (table_column.can_filter === true) {
 		  		var select = $('<select><option value=""></option></select>')
 		  		.appendTo($(column.footer()).empty())
@@ -204,7 +204,7 @@ $(document).ready(function() {
 	    let colid = cell.index()['column']
 	    let row = $(this).closest('tr');
 	    let data = table.row(row).data()
-	    let table_column = table_columns[colid]
+	    let table_column = table_columns_producers_corrections[colid]
 	    let comment_section = $("#comment_section")
 	    comment_section.empty()
 	    if (table_column['data'] === 'checkbox') {
