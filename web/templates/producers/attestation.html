@@ -464,14 +464,28 @@ $(document).ready(function() {
   $("#datatable tfoot").append(empty_footer)
 
   var table = $('#datatable').DataTable({
-    paging: false,
+    paging: true,
     info: false,
     scrollX: true,
     fixedColumns: {
       rightColumns: 2,
     },
     language: {
-        search: "Rechercher:"
+        search: "Rechercher:",
+        paginate: {
+            first:    '«',
+            previous: '‹',
+            next:     '›',
+            last:     '»'
+        },
+        aria: {
+            paginate: {
+                first:    'Première',
+                previous: 'Précédente',
+                next:     'Suivante',
+                last:     'Dernière'
+            }
+        }
     },
     dom: 'rtip',
     columnDefs: [
