@@ -153,7 +153,7 @@ def producers_all_lots(request, *args, **kwargs):
 @restrict_to_producers
 def producers_corrections(request, *args, **kwargs):
   context = kwargs['context']
-  lots = Lot.objects.filter(ea_delivery_status='AS')
+  lots = Lot.objects.filter(ea_delivery_status__in=['AC', 'AA'])
   return JsonResponse([{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id if l.producer else '',
   'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
   'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date.strftime('%d/%m/%Y') if l.ea_delivery_date else '', 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
@@ -178,6 +178,8 @@ def producers_lot_save_comment(request, *args, **kwargs):
     return JsonResponse({'status':'error', 'message':'Veuillez entrer un commentaire'}, status=400)
   try:
     lot = Lot.objects.get(id=lot_id)
+    lot.ea_delivery_status = 'AA'
+    lot.save()
     lc = LotComment()
     lc.lot = lot
     lc.entity = context['user_entity']
@@ -329,6 +331,7 @@ def producers_validate_lots(request, *args, **kwargs):
       # FR2002P001-1
       lot.carbure_id = "%s%sP%d-%d" % ('FR', today.strftime('%y%m'), lot.producer.id, lot.id)
       lot.status = "Validated"
+      lot.ea_delivery_status = 'AA'
       lot.save()
     except Exception as e:
       return JsonResponse({'status':'error', 'message':'Erreur lors de la validation du lot', 'extra':str(e)}, status=400)
@@ -683,7 +686,7 @@ def operators_declaration_export(request, *args, **kwargs):
 @restrict_to_operators
 def operators_lots_affilies(request, *args, **kwargs):
   context = kwargs['context']
-  lots = Lot.objects.filter(ea=context['user_entity'], status='Validated').exclude(ea_delivery_status__in=['A', 'AS'])
+  lots = Lot.objects.filter(ea=context['user_entity'], status='Validated').exclude(ea_delivery_status__in=['A'])
   return JsonResponse([{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id,
   'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
   'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date, 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
@@ -747,7 +750,7 @@ def operators_lot_accept_with_comment(request, *args, **kwargs):
   try:
     declaration = OperatorDeclaration.objects.get(operator=context['user_entity'], period=lot.attestation.period)
     accepted, created = AcceptedLot.objects.update_or_create(operator=context['user_entity'], declaration=declaration, lot=lot)
-    lot.ea_delivery_status = 'AS'
+    lot.ea_delivery_status = 'AC'
     lot.save()
     lc = LotComment()
     lc.lot = lot

@@ -314,6 +314,9 @@ $(document).ready(function() {
     let row = $(this).closest('tr');
     let data = table.row(row).data()
     let table_column = table_columns_operators[colid]
+    let comment_section = $("#comment_section")
+    comment_section.empty()
+
     if (table_column['data'] === 'checkbox') {
       // ignore clicks on checkbox column
       return
@@ -341,6 +344,39 @@ $(document).ready(function() {
           $(`#${name_field}`).val(override)
         }
       }
+
+
+      // request lot comments if any
+      $.ajax({
+        url         : "{% url 'operators-api-lot-comments' %}",
+        data        : {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+        type        : 'POST',
+        success     : function(data, textStatus, jqXHR){
+          // Callback code
+          console.log(`received lot comments, will add them to modal`)
+          if (data.length > 0) {
+            $("#comment_section").show()
+            $("#show_comment_section").hide()
+          }
+          for (let i = 0, len = data.length; i < len; i++) {
+            let c = data[i]
+            let html = `<label style="margin-bottom: 1em; margin-top: 2em;" for="textarea">${c.from}:</label>
+            <textarea name="textarea" id="textarea" readonly>${c.comment}</textarea>`
+            comment_section.append(html)
+            console.log(`added ${c.comment}`)
+          }
+        },
+        error       : function(e) {
+          if (e.status === 400) {
+            alert(e.responseJSON.message)
+            console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+          } else {
+            alert("Server error. Please contact an administrator")
+            console.log(`server error ${JSON.stringify(e)}`)
+          }
+        }
+      })
+
       modal.style.display = "flex"
     }
   });
