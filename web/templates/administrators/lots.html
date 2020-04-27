@@ -275,19 +275,6 @@ $(document).ready(function() {
       })
       $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data['ghg_reference']} gCO2eq/MJ`)
 
-      /* special cases for override */
-      let overrideable_fields = ['ea']
-      for (let i = 0, len = overrideable_fields.length; i < len; i++) {
-        let field = overrideable_fields[i]
-        let name_field = `${field}_name`
-        let override_field = `${field}_override`
-        let is_overriden_field = `${field}_overriden`
-
-        if (data[is_overriden_field] == true) {
-          let override = data[override_field]
-          $(`#${name_field}`).val(override)
-        }
-      }
       modal.style.display = "flex"
     }
   });
