@@ -69,8 +69,7 @@
     <span id="modal_validate_lots_form_err_message" style="color: red;"></span>
     <form id="modal_validate_lots_form" method="POST" data-url="{% url 'producers-api-validate-lots' %}">
       {% csrf_token %}
-      <p>En validant ces lots, je certifie que les informations renseignées sont réelles et valides.<br />
-         Êtes vous sûr de vouloir valider ce(s) lot(s) ?</p>
+      <p><b>En validant le(s) lot(s) suivant(s), je certifie que les informations renseignées sont réelles et valides.</b></p>
       <ul id="modal_validate_lots_list">
       </ul>
       <input type="hidden" id="modal_validate_lots_lots" name="lots">
@@ -122,7 +121,7 @@
 </div>
 
 <div class="modal__backdrop" id="modal_edit_lot">
-  <div class="modal" style="max-width: none; margin: auto; height: 100%; overflow-y: auto;">
+  <div class="modal" style="max-width: none; margin: auto; max-height: 100%; overflow-y: auto;">
     <p id="err_msg_dom">
     </p>
     <div class="flex-container modal-edit">
