@@ -120,8 +120,6 @@ class Lot(models.Model):
     ea_delivery_date = models.DateField(blank=True, null=True)
     ea_delivery_site = models.CharField(max_length=64, blank=True, default='')
     ea = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='ea')
-    ea_override = models.CharField(max_length=64, null=True, blank=True)
-    ea_overriden = models.BooleanField(default=False)
 
     # lot details
     volume = models.IntegerField(default=0)
@@ -172,6 +170,20 @@ class LotComment(models.Model):
         db_table = 'lots_comments'
         verbose_name = 'LotComment'
         verbose_name_plural = 'LotComments'
+
+class LotError(models.Model):
+    lot = models.ForeignKey(Lot, null=False, blank=False, on_delete=models.CASCADE)
+    field = models.CharField(max_length=32, null=False, blank=False)
+    value = models.CharField(max_length=128, null=True, blank=True)
+    error = models.CharField(max_length=256, null=False, blank=False)
+
+    def __str__(self):
+        return self.error
+
+    class Meta:
+        db_table = 'lots_errors'
+        verbose_name = 'LotError'
+        verbose_name_plural = 'LotErrors'
 
 class GHGValues(models.Model):
     matiere_premiere = models.ForeignKey(MatierePremiere, blank=True, null=True, on_delete=models.CASCADE)
