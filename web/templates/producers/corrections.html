@@ -228,12 +228,11 @@ $(document).ready(function() {
 				  // load existing comments into the form
 				  for (let i = 0, len = data.length; i < len; i++) {
 				    let c = data[i]
-				    let html = `<p><b>${c.from}</b>:${c.comment}</p>`
+				    let html = `<p><b>${c.from}</b>: ${c.comment}</p>`
 				    comment_section.append(html)
 				  }
-				  // add textarea to respond
-				  let html = `<label style="margin-bottom: 1em; margin-top: 2em;" for="textarea">Répondre:</label>
-				  			  <textarea name="textarea" id="textarea"></textarea>`
+				  // add area to respond
+				  let html = `<div style="display: flex;"><p>Répondre:</p><input type="text" name="textarea" id="textarea" style="max-width: 80%; height: 2em; margin-left: 10px; margin-top: auto; margin-bottom: auto;" /></div>`
 				  comment_section.append(html)
 				},
 				error       : function(e) {
