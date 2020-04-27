@@ -167,11 +167,13 @@
         <a class="button secondary close" id="btn_close_modal_edit_lot">Annuler</a>
       </div>
     </div>
+    <br />
     <div class="form__group" style="display: none;" id="comments_section">
     </div>
     <div class="form__group" style="display: none;" id="add_comment_section">
-      <label style="margin-bottom: 1em; margin-top: 2em;" for="textarea">Ajouter un commentaire pour votre fournisseur</label>
-      <textarea name="textarea" id="textarea"></textarea>
+      <div style="display: flex;">
+        <p>{{user_entity_name}}:</p><input type="text" name="textarea" id="textarea" style="max-width: 80%; height: 2em; margin-left: 10px; margin-top: auto; margin-bottom: auto;" />
+      </div>
       <a class="button primary" id="btn_accept_with_comment">Accepter sous réserve</a>
     </div>
     <div class="form__group" style="display: none;" id="reject_section">
@@ -365,7 +367,7 @@ $(document).ready(function() {
           }
           for (let i = 0, len = data.length; i < len; i++) {
             let c = data[i]
-            let html = `<p><b>${c.from}</b>:${c.comment}</p>`
+            let html = `<p><b>${c.from}</b>:    ${c.comment}</p>`
             comments_section.append(html)
           }
         },
