@@ -365,8 +365,7 @@ $(document).ready(function() {
           }
           for (let i = 0, len = data.length; i < len; i++) {
             let c = data[i]
-            let html = `<label style="margin-bottom: 1em; margin-top: 2em;" for="textarea">${c.from}:</label>
-            <textarea name="textarea" id="textarea" readonly>${c.comment}</textarea>`
+            let html = `<p><b>${c.from}</b>:${c.comment}</p>`
             comments_section.append(html)
           }
         },
