@@ -520,9 +520,6 @@ def producers_save_lot(request, *args, **kwargs):
     return JsonResponse({'status':'error', 'message':"Biocarburant manquant ou inconnu"}, status=400)
   if not matiere_premiere:
     return JsonResponse({'status':'error', 'message':"Matière Première manquante ou inconnue"}, status=400)
-
-
-
   if lot_id:
     lot = Lot.objects.get(id=lot_id)
   else:
@@ -532,6 +529,8 @@ def producers_save_lot(request, *args, **kwargs):
   lot.producer = context['user_entity']
 
   # production site
+  # excel import will contain the production_site name
+  # manual lot creation will contain the ID
   if production_site:
     try:
       production_site_id = int(production_site)
@@ -547,6 +546,8 @@ def producers_save_lot(request, *args, **kwargs):
   else:
     return JsonResponse({'status':'error', 'message':"Site de production manquant", 'extra': str(e)}, status=400)
 
+  if not '.' in volume:
+    volume = volume.replace(',', '.')
   lot.volume = float(volume) if volume else 0.0
 
   try:
