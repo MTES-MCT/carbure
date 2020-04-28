@@ -1,9 +1,0 @@
-- hosts: kubernetes
-  remote_user: deploy
-  gather_facts: no
-  tasks:
-  - name: push thinkpad ssh key
-    authorized_key:
-      user: deploy
-      state: present
-      key: "{{ lookup('file', '/home/martin/.ssh/id_rsa_thinkpad.pub') }}"
