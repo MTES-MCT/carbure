@@ -38,6 +38,7 @@ urlpatterns = [
     path('producers/lot/comments', views.producers_lot_comments, name='producers-api-lot-comments'),
     path('producers/attestation/<int:attestation_id>/export', views.producers_attestation_export, name='producers-api-attestation-export'),
     path('producers/lot/save-comment', views.producers_lot_save_comment, name='producers-api-save-comment'),
+    path('producers/lot/errors', views.producers_lot_errors, name='producers-api-lot-errors'),
 
     # private, operators
     path('operators/lots-affilies', views.operators_lots_affilies, name='operators-api-affiliated-lots'),

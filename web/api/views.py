@@ -509,24 +509,36 @@ def producers_save_lot(request, *args, **kwargs):
   lot.producer = context['user_entity']
   production_site_name = request.POST.get('production_site_name', None)
   try:
-    lot.production_site = ProductionSite.objects.get(name=production_site_name)
-    LotError.objects.filter(lot=lot, field='production_site').delete()
+    lot.production_site = ProductionSite.objects.get(producer=context['user_entity'], name=production_site_name)
+    LotError.objects.filter(lot=lot, field='production_site_name').delete()
   except:
-    error, created = LotError.objects.update_or_create(lot=lot, field='production_site', error='Site de production inconnu', defaults={'value': production_site_name})
+    lot.production_site = None
+    error, created = LotError.objects.update_or_create(lot=lot, field='production_site_name', error='Site de production inconnu', defaults={'value': production_site_name})
 
   biocarburant = request.POST.get('biocarburant_code', None)
+  biocarburant_name = request.POST.get('biocarburant_name', None)
   try:
     lot.biocarburant = Biocarburant.objects.get(code=biocarburant)
-    LotError.objects.filter(lot=lot, field='biocarburant').delete()
+    LotError.objects.filter(lot=lot, field='biocarburant_name').delete()
   except:
-    error, created = LotError.objects.update_or_create(lot=lot, field='biocarburant', error='Biocarburant inconnu', defaults={'value': biocarburant})
+    lot.biocarburant = None
+    if biocarburant_name:
+      error, created = LotError.objects.update_or_create(lot=lot, field='biocarburant_name', error='Biocarburant inconnu', defaults={'value': biocarburant_name})
+    else:
+      error, created = LotError.objects.update_or_create(lot=lot, field='biocarburant_name', error='Merci de préciser un biocarburant', defaults={'value': biocarburant})
+
 
   matiere_premiere = request.POST.get('matiere_premiere_code', None)
+  matiere_premiere_name = request.POST.get('matiere_premiere_name', None)
   try:
     lot.matiere_premiere = MatierePremiere.objects.get(code=matiere_premiere)
-    LotError.objects.filter(lot=lot, field='matiere_premiere').delete()
+    LotError.objects.filter(lot=lot, field='matiere_premiere_name').delete()
   except:
-    error, created = LotError.objects.update_or_create(lot=lot, field='matiere_premiere', error='Matière Première inconnue', defaults={'value': matiere_premiere})
+    lot.matiere_premiere = None
+    if matiere_premiere_name:
+      error, created = LotError.objects.update_or_create(lot=lot, field='matiere_premiere_name', error='Matière Première inconnue', defaults={'value': matiere_premiere_name})
+    else:
+      error, created = LotError.objects.update_or_create(lot=lot, field='matiere_premiere_name', error='Merci de préciser la matière première ', defaults={'value': matiere_premiere})
 
   volume = request.POST.get('volume', None)
   if volume:
@@ -542,11 +554,16 @@ def producers_save_lot(request, *args, **kwargs):
     error, created = LotError.objects.update_or_create(lot=lot, field='volume', error='Merci de préciser un volume', defaults={'value': volume})
 
   pays_origine = request.POST.get('pays_origine_code', None)
+  pays_origine_name = request.POST.get('pays_origine_name', None)
   try:
     lot.pays_origine = Pays.objects.get(code_pays=pays_origine)
-    LotError.objects.filter(lot=lot, field='pays_origine').delete()
+    LotError.objects.filter(lot=lot, field='pays_origine_name').delete()
   except:
-    error, created = LotError.objects.update_or_create(lot=lot, field='pays_origine', error="Pays d'origine inconnu", defaults={'value': pays_origine})
+    lot.pays_origine = None
+    if pays_origine_name:
+      error, created = LotError.objects.update_or_create(lot=lot, field='pays_origine_name', error="Pays d'origine inconnu", defaults={'value': pays_origine_name})
+    else:
+      error, created = LotError.objects.update_or_create(lot=lot, field='pays_origine_name', error="Merci de choisir un pays d'origine", defaults={'value': pays_origine})
 
   eec = request.POST.get('eec', None)
   lot.eec = float(eec) if eec else 0.0
@@ -596,11 +613,13 @@ def producers_save_lot(request, *args, **kwargs):
   if ea_name:
     try:
       lot.ea = Entity.objects.get(name=ea_name)
-      LotError.objects.filter(lot=lot, field='ea').delete()
+      LotError.objects.filter(lot=lot, field='ea_name').delete()
     except:
-      error, created = LotError.objects.update_or_create(lot=lot, field='ea', defaults={'value': ea_name, 'error':"Client inconnu"})
+      lot.ea = None
+      error, created = LotError.objects.update_or_create(lot=lot, field='ea_name', defaults={'value': ea_name, 'error':"Client inconnu"})
   else:
-    error, created = LotError.objects.update_or_create(lot=lot, field='ea', defaults={'value': None, 'error':"Merci de préciser un client"})
+    lot.ea = None
+    error, created = LotError.objects.update_or_create(lot=lot, field='ea_name', defaults={'value': None, 'error':"Merci de préciser un client"})
 
   ea_delivery_site = request.POST.get('ea_delivery_site', None)
   if ea_delivery_site:
@@ -654,6 +673,18 @@ def producers_lot_comments(request, *args, **kwargs):
   else:
     comments = LotComment.objects.filter(lot_id=lot_id)
     return JsonResponse([{'comment':c.comment, 'from':c.entity.name if c.entity else ''} for c in comments], safe=False)
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_lot_errors(request, *args, **kwargs):
+  lot_id = request.POST.get('lot_id', None)
+  if not lot_id:
+    return JsonResponse({'status':'error', 'message':'Aucun lot sélectionné'}, status=400)
+  else:
+    errors = LotError.objects.filter(lot_id=lot_id)
+    return JsonResponse([{'field':e.field, 'value':e.value, 'error':e.error} for e in errors], safe=False)
+
 
 @login_required
 @enrich_with_user_details

@@ -463,6 +463,8 @@ $(document).ready(function() {
   let empty_footer = `<tr>${Array(table_columns.length).fill("<th></th>").join('')}</tr>`
   $("#datatable tfoot").append(empty_footer)
 
+  var lot_errors = {}
+
   var table = $('#datatable').DataTable({
     paging: true,
     info: false,
@@ -489,7 +491,20 @@ $(document).ready(function() {
     },
     dom: 'rtip',
     columnDefs: [
-    {"className": "dt-center", "targets": "_all"}
+      {"className": "dt-center",
+       "targets": "_all",
+       "render": function(data, type, row, meta) {
+          let col_name = table_columns[meta.col].data
+          let lot_id = row['lot_id']
+          if (lot_id in lot_errors) {
+            if (col_name in lot_errors[lot_id]) {
+              let error = lot_errors[lot_id][col_name]
+              return `<span style="color:tomato;">${error}</span>`
+            }
+          }
+          return data
+        }
+      }
     ],
     columns: table_columns,
     ajax: {
@@ -499,6 +514,15 @@ $(document).ready(function() {
         for (let i = 0, len = lots.length; i < len; i++) {
           // add checkbox on the fly
           lots[i]["checkbox"] = `<input type="checkbox" />`
+        }
+        errors = res['errors']
+        for (let i = 0, len = errors.length; i < len; i++) {
+          let error = errors[i]
+          let lot_id = error.lot_id
+          if (!(lot_id in lot_errors)) {
+            lot_errors[lot_id] = {}
+          }
+          lot_errors[lot_id][error.field] = error.value
         }
         return lots
       }
@@ -522,7 +546,7 @@ $(document).ready(function() {
           $(column.footer()).append(table_column.title)
         }
       }).draw()
-    }
+    },
   })
   window.table = table
 
@@ -660,11 +684,45 @@ $(document).ready(function() {
       for (key in data) {
         $(`#${key}`).val(data[key])
       }
+
+      let lot_id = data['lot_id']
+      if (lot_id in lot_errors) {
+        let errors = lot_errors[lot_id]
+        for (key in errors) {
+          $(`#${key}`).val(errors[key])
+        }
+      }
+
       // non-input keys
       ['ghg_total', 'ghg_reduction'].forEach(function(item, index) {
         $(`#${item}`).html(data[item])
       })
       $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data['ghg_reference']} gCO2eq/MJ`)
+
+      /* load errors */
+      $.ajax({url: "{% url 'producers-api-lot-errors' %}",
+        data: {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+        type        : 'POST',
+        success     : function(data, textStatus, jqXHR){
+          // Callback code
+          // load existing errors into the form
+          let err_msg_dom = $("#err_msg_dom")
+          err_msg_dom.append('<ul style="color: tomato;" id="errors_list"></ul>')
+          let err_list = $("#errors_list")
+          for (let i = 0, len = data.length; i < len; i++) {
+            err_list.append(`<li>${data[i].error}</li>`)
+          }
+        },
+        error       : function(e) {
+          if (e.status === 400) {
+            alert(e.responseJSON.message)
+            console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+          } else {
+            alert("Server error. Please contact an administrator")
+            console.log(`server error ${JSON.stringify(e)}`)
+          }
+        }
+      })
 
       /* warning if the lot is validated */
       if (data['status'] == 'Validated') {
