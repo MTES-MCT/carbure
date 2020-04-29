@@ -98,7 +98,7 @@ def producers_import_csv_template(request, *args, **kwargs):
   response = HttpResponse(content_type='text/csv')
   response['Content-Disposition'] = 'attachment; filename="template.csv"'
   writer = csv.writer(response, delimiter=';')
-  writer.writerow(['production_site','volume','biocarburant_code','matiere_premiere_code','pays_origine_code','eec','el','ep','etd','eu','esca','eccs','eccr','eee','e','dae','client_id','ea_delivery_date','ea_name','ea_delivery_site'])
+  writer.writerow(['production_site_name','volume','biocarburant_code','matiere_premiere_code','pays_origine_code','eec','el','ep','etd','eu','esca','eccs','eccr','eee','e','dae','client_id','ea_delivery_date','ea_name','ea_delivery_site'])
   psites = ProductionSite.objects.filter(producer=context['user_entity'])
   eas = Entity.objects.filter(entity_type='Opérateur')
   mps = MatierePremiere.objects.all()
@@ -498,7 +498,9 @@ def producers_save_lot(request, *args, **kwargs):
     except Exception as e:
       return JsonResponse({'status':'error', 'message':"Lot inconnu", 'extra': str(e)}, status=400)
   else:
+    # create empty lot
     lot = Lot()
+    lot.save()
 
   attestation_id = request.POST.get('attestation_id', None)
   try:
@@ -524,6 +526,8 @@ def producers_save_lot(request, *args, **kwargs):
     lot.biocarburant = None
     if biocarburant_name:
       error, created = LotError.objects.update_or_create(lot=lot, field='biocarburant_name', error='Biocarburant inconnu', defaults={'value': biocarburant_name})
+    elif biocarburant:
+      error, created = LotError.objects.update_or_create(lot=lot, field='biocarburant_name', error='Biocarburant inconnu', defaults={'value': biocarburant})
     else:
       error, created = LotError.objects.update_or_create(lot=lot, field='biocarburant_name', error='Merci de préciser un biocarburant', defaults={'value': biocarburant})
 
@@ -537,6 +541,8 @@ def producers_save_lot(request, *args, **kwargs):
     lot.matiere_premiere = None
     if matiere_premiere_name:
       error, created = LotError.objects.update_or_create(lot=lot, field='matiere_premiere_name', error='Matière Première inconnue', defaults={'value': matiere_premiere_name})
+    elif matiere_premiere:
+      error, created = LotError.objects.update_or_create(lot=lot, field='matiere_premiere_name', error='Matière Première inconnue', defaults={'value': matiere_premiere})
     else:
       error, created = LotError.objects.update_or_create(lot=lot, field='matiere_premiere_name', error='Merci de préciser la matière première ', defaults={'value': matiere_premiere})
 
@@ -562,6 +568,8 @@ def producers_save_lot(request, *args, **kwargs):
     lot.pays_origine = None
     if pays_origine_name:
       error, created = LotError.objects.update_or_create(lot=lot, field='pays_origine_name', error="Pays d'origine inconnu", defaults={'value': pays_origine_name})
+    elif pays_origine:
+      error, created = LotError.objects.update_or_create(lot=lot, field='pays_origine_name', error="Pays d'origine inconnu", defaults={'value': pays_origine})
     else:
       error, created = LotError.objects.update_or_create(lot=lot, field='pays_origine_name', error="Merci de choisir un pays d'origine", defaults={'value': pays_origine})
 
