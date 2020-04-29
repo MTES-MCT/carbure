@@ -130,7 +130,7 @@
         <input type="hidden" id="lot_id" />
         <dl>
           <dt>Site de Production</dt>
-          <dd><input type="text" id="production_site_name" class="autocomplete_production_sites" /><input type="hidden" id="production_site_id" /></dd>
+          <dd><input type="text" id="production_site_name" class="autocomplete_production_sites" /></dd>
           <dt>Volume à 20°C en Litres</dt>
           <dd><input type="text" id="volume" /></dd>
           <dt>Biocarburant</dt>
@@ -147,7 +147,7 @@
         <dt><label for="dae">Numéro de DAE / DAU</label></dt>
         <dd><input id="dae" type="text" /></dd>
         <dt><label for="ea_name">Client</label></dt>
-        <dd><input type="text" id="ea_name" class="autocomplete_operators" /><input type="hidden" id="ea_id" /></dd>
+        <dd><input type="text" id="ea_name" class="autocomplete_operators" /></dd>
         <dt><label for="ea_delivery_site">Site de livraison</label></dt>
         <dd><input id="ea_delivery_site" type="text" /></dd>
         <dt><label for="ea_delivery_date">Date de livraison</label></dt>
@@ -494,12 +494,13 @@ $(document).ready(function() {
     columns: table_columns,
     ajax: {
       url: `{% url 'api-producers-lots' attestation_id=current_attestation.id %}`,
-      dataSrc: function(json) {
-        for (let i = 0, len = json.length; i < len; i++) {
+      dataSrc: function(res) {
+        lots = res['lots']
+        for (let i = 0, len = lots.length; i < len; i++) {
           // add checkbox on the fly
-          json[i]["checkbox"] = `<input type="checkbox" />`
+          lots[i]["checkbox"] = `<input type="checkbox" />`
         }
-        return json
+        return lots
       }
     },
     initComplete: function() {
@@ -727,39 +728,49 @@ $(document).on({
   }
 }, ".dataTables_wrapper tbody tr");
 
-  $("#btn_lot_save").on('click', handleSave)
+$("#btn_lot_save").on('click', handleSave)
 
-  function handleSave(action) {
-    var err_msg_dom = $("#err_msg_dom")
-    var formdata = new FormData();
-    formdata.set('attestation_id', '{{current_attestation.id}}')
-    formdata.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
-    $(".modal-edit input").each(function() {
-      console.log($(this).attr('id'), $(this).val())
-      formdata.set($(this).attr('id'), $(this).val())
-    })
+function handleSave(action) {
+  var err_msg_dom = $("#err_msg_dom")
+  err_msg_dom.empty()
+  var formdata = new FormData();
+  formdata.set('attestation_id', '{{current_attestation.id}}')
+  formdata.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
+  $(".modal-edit input").each(function() {
+    formdata.set($(this).attr('id'), $(this).val())
+  })
 
-    // post form
-    $.ajax({
-      url         : "{% url 'producers-api-attestation-save-lot' %}",
-      data        : formdata,
-      cache       : false,
-      contentType : false,
-      processData : false,
-      type        : 'POST',
-      success     : function(data, textStatus, jqXHR) {
-        // Callback code
-        window.location.reload()
-      },
-      error       : function(e) {
-        if (e.status === 400) {
-          err_msg_dom.html(`${e.responseJSON.message}`)
-        } else {
-          alert("Server error. Please contact an administrator")
+  // post form
+  $.ajax({
+    url         : "{% url 'producers-api-attestation-save-lot' %}",
+    data        : formdata,
+    cache       : false,
+    contentType : false,
+    processData : false,
+    type        : 'POST',
+    success     : function(data, textStatus, jqXHR) {
+      // Callback code
+      /* if errors, display them and stay on page */
+      if (data.errors.length > 0) {
+        err_msg_dom.append('<ul style="color: tomato;" id="errors_list"></ul>')
+        let err_list = $("#errors_list")
+        for (let i = 0, len = data.errors.length; i < len; i++) {
+          err_list.append(`<li>${data.errors[i].error}</li>`)
         }
+      } else {
+        /* otherwise reload page */
+        window.location.reload()
       }
-    })
-  }
+    },
+    error       : function(e) {
+      if (e.status === 400) {
+        err_msg_dom.html(`${e.responseJSON.message}`)
+      } else {
+        alert("Server error. Please contact an administrator")
+      }
+    }
+  })
+}
 
 function load_ges(mp, bc) {
   $.ajax({
@@ -842,12 +853,6 @@ $(".autocomplete_production_sites").autocomplete({
   dataType: 'json',
   params: {'producer_id': '{{user_entity.id}}' },
   minChars: 0,
-  onSelect: function(suggestion) {
-    $("#production_site_id").val(suggestion.data)
-  },
-  onInvalidateSelection: function() {
-    $("#production_site_id").val('')
-  }
 })
 
 $(".autocomplete_countries").autocomplete({
@@ -866,12 +871,6 @@ $(".autocomplete_operators").autocomplete({
   serviceUrl: "{% url 'api-operators-autocomplete' %}",
   dataType: 'json',
   minChars: 0,
-  onSelect: function(suggestion) {
-    $("#ea_id").val(suggestion.data)
-  },
-  onInvalidateSelection: function() {
-    $("#ea_id").val('')
-  }
 })
 
 </script>

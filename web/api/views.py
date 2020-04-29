@@ -128,7 +128,7 @@ def producers_lots(request, *args, **kwargs):
   context = kwargs['context']
   attestation_id = kwargs['attestation_id']
   lots = Lot.objects.filter(attestation_id=attestation_id)
-  return JsonResponse([{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id if l.producer else '',
+  lots_json = [{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id if l.producer else '',
   'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
   'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date.strftime('%d/%m/%Y') if l.ea_delivery_date else '', 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
   'volume':l.volume, 'matiere_premiere_code':l.matiere_premiere.code if l.matiere_premiere else '',
@@ -136,7 +136,12 @@ def producers_lots(request, *args, **kwargs):
   'biocarburant_name':l.biocarburant.name if l.biocarburant else '', 'pays_origine_code':l.pays_origine.code_pays if l.pays_origine else '',
   'pays_origine_name':l.pays_origine.name if l.pays_origine else '', 'eec':l.eec, 'el':l.el, 'ep':l.ep, 'etd':l.etd, 'eu':l.eu, 'esca':l.esca, 'eccs':l.eccs,
   'eccr':l.eccr, 'eee':l.eee, 'ghg_total':l.ghg_total, 'ghg_reference':l.ghg_reference, 'ghg_reduction':'%.2f%%' % (l.ghg_reduction), 'client_id':l.client_id,
-  'status':l.status, 'status_display':l.get_status_display(), 'ea_delivery_status':l.get_ea_delivery_status_display(), 'lot_id':l.id} for l in lots], safe=False)
+  'status':l.status, 'status_display':l.get_status_display(), 'ea_delivery_status':l.get_ea_delivery_status_display(), 'lot_id':l.id} for l in lots]
+
+  errors = LotError.objects.filter(lot__in=lots)
+  errors_json = [{'lot_id':e.lot.id, 'field':e.field, 'value':e.value, 'error':e.error} for e in errors]
+  response =  {'lots': lots_json, 'errors': errors_json}
+  return JsonResponse(response)
 
 @login_required
 @enrich_with_user_details
@@ -485,128 +490,132 @@ def producers_settings_add_biocarburant(request, *args, **kwargs):
 @restrict_to_producers
 def producers_save_lot(request, *args, **kwargs):
   context = kwargs['context']
-  attestation_id = request.POST.get('attestation_id', None)
-
   # new lot or edit?
   lot_id = request.POST.get('lot_id', None)
-  # mandatory fields
-  production_site = request.POST.get('production_site_id', None)
-  production_site_name = request.POST.get('production_site', None)
-  biocarburant = request.POST.get('biocarburant_code', None)
-  matiere_premiere = request.POST.get('matiere_premiere_code', None)
-  # all other fields
-  volume = request.POST.get('volume', None)
-  pays_origine = request.POST.get('pays_origine_code', None)
-  eec = request.POST.get('eec', None)
-  el = request.POST.get('el', None)
-  ep = request.POST.get('ep', None)
-  etd = request.POST.get('etd', None)
-  eu = request.POST.get('eu', None)
-  esca = request.POST.get('esca', None)
-  eccs = request.POST.get('eccs', None)
-  eccr = request.POST.get('eccr', None)
-  eee = request.POST.get('eee', None)
-  num_dae = request.POST.get('dae', None)
-  ea_delivery_date = request.POST.get('ea_delivery_date', None)
-  ea = request.POST.get('ea_id', None)
-  ea_name = request.POST.get('ea_name', None)
-  ea_delivery_site = request.POST.get('ea_delivery_site', '')
-  client_id = request.POST.get('client_id', None)
-
-
-  if not production_site and not production_site_name:
-    return JsonResponse({'status':'error', 'message':"Site de Production manquant ou inconnu"}, status=400)
-  if not biocarburant:
-    return JsonResponse({'status':'error', 'message':"Biocarburant manquant ou inconnu"}, status=400)
-  if not matiere_premiere:
-    return JsonResponse({'status':'error', 'message':"Matière Première manquante ou inconnue"}, status=400)
   if lot_id:
-    lot = Lot.objects.get(id=lot_id)
+    try:
+      lot = Lot.objects.get(id=lot_id)
+    except Exception as e:
+      return JsonResponse({'status':'error', 'message':"Lot inconnu", 'extra': str(e)}, status=400)
   else:
     lot = Lot()
 
-  lot.attestation = AttestationProducer.objects.get(id=attestation_id)
-  lot.producer = context['user_entity']
-
-  # production site
-  # excel import will contain the production_site name
-  # manual lot creation will contain the ID
-  if production_site:
-    try:
-      production_site_id = int(production_site)
-      lot.production_site = ProductionSite.objects.get(id=production_site_id)
-    except Exception as e:
-      production_site_id = None
-      return JsonResponse({'status':'error', 'message':"ID site de production [%d] inconnu" % (production_site_id), 'extra': str(e)}, status=400)
-  elif production_site_name:
-    try:
-      lot.production_site = ProductionSite.objects.get(name=production_site_name, producer=context['user_entity'])
-    except Exception as e:
-      return JsonResponse({'status':'error', 'message':"Site de production [%s] inconnu" % (production_site_name), 'extra': str(e)}, status=400)
-  else:
-    return JsonResponse({'status':'error', 'message':"Site de production manquant", 'extra': str(e)}, status=400)
-
-  if not '.' in volume:
-    volume = volume.replace(',', '.')
-  lot.volume = float(volume) if volume else 0.0
-
+  attestation_id = request.POST.get('attestation_id', None)
   try:
-    lot.matiere_premiere = MatierePremiere.objects.get(code=matiere_premiere)
-  except:
-    return JsonResponse({'status':'error', 'message':"Matiere premiere inconnue."}, status=400)
+    lot.attestation = AttestationProducer.objects.get(id=attestation_id)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Attestation inconnue", 'extra': str(e)}, status=400)
 
+  lot.producer = context['user_entity']
+  production_site_name = request.POST.get('production_site_name', None)
+  try:
+    lot.production_site = ProductionSite.objects.get(name=production_site_name)
+    LotError.objects.filter(lot=lot, field='production_site').delete()
+  except:
+    error, created = LotError.objects.update_or_create(lot=lot, field='production_site', error='Site de production inconnu', defaults={'value': production_site_name})
+
+  biocarburant = request.POST.get('biocarburant_code', None)
   try:
     lot.biocarburant = Biocarburant.objects.get(code=biocarburant)
+    LotError.objects.filter(lot=lot, field='biocarburant').delete()
   except:
-    return JsonResponse({'status':'error', 'message':"Type de biocarburant inconnu."}, status=400)
+    error, created = LotError.objects.update_or_create(lot=lot, field='biocarburant', error='Biocarburant inconnu', defaults={'value': biocarburant})
 
-  if pays_origine:
-    try:
-      lot.pays_origine = Pays.objects.get(code_pays=pays_origine)
-    except:
-      return JsonResponse({'status':'error', 'message':"Pays inconnu."}, status=400)
+  matiere_premiere = request.POST.get('matiere_premiere_code', None)
+  try:
+    lot.matiere_premiere = MatierePremiere.objects.get(code=matiere_premiere)
+    LotError.objects.filter(lot=lot, field='matiere_premiere').delete()
+  except:
+    error, created = LotError.objects.update_or_create(lot=lot, field='matiere_premiere', error='Matière Première inconnue', defaults={'value': matiere_premiere})
+
+  volume = request.POST.get('volume', None)
+  if volume:
+    # no dots but commas, assume comma == dot
+    if '.' not in volume:
+      volume = volume.replace(',', '.')
+    # dots and commas, assume commas are thousand separators
+    if '.' in volume and ',' in volume:
+      volume = volume.replace(',', '')
+    lot.volume = float(volume)
+    LotError.objects.filter(lot=lot, field='volume').delete()
   else:
-    lot.pays_origine = None
+    error, created = LotError.objects.update_or_create(lot=lot, field='volume', error='Merci de préciser un volume', defaults={'value': volume})
 
-  # ghg
+  pays_origine = request.POST.get('pays_origine_code', None)
+  try:
+    lot.pays_origine = Pays.objects.get(code_pays=pays_origine)
+    LotError.objects.filter(lot=lot, field='pays_origine').delete()
+  except:
+    error, created = LotError.objects.update_or_create(lot=lot, field='pays_origine', error="Pays d'origine inconnu", defaults={'value': pays_origine})
+
+  eec = request.POST.get('eec', None)
   lot.eec = float(eec) if eec else 0.0
+  el = request.POST.get('el', None)
   lot.el = float(el) if el else 0.0
+  ep = request.POST.get('ep', None)
   lot.ep = float(ep) if ep else 0.0
+  etd = request.POST.get('etd', None)
   lot.etd = float(etd) if etd else 0.0
+  eu = request.POST.get('eu', None)
   lot.eu = float(eu) if eu else 0.0
+  esca = request.POST.get('esca', None)
   lot.esca = float(esca) if esca else 0.0
+  eccs = request.POST.get('eccs', None)
   lot.eccs = float(eccs) if eccs else 0.0
+  eccr = request.POST.get('eccr', None)
   lot.eccr = float(eccr) if eccr else 0.0
+  eee = request.POST.get('eee', None)
   lot.eee = float(eee) if eee else 0.0
+
+  # calculs ghg
   lot.ghg_total = round(lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee, 2)
   lot.ghg_reference = 83.8
   lot.ghg_reduction = round((1.0 - (lot.ghg_total / lot.ghg_reference)) * 100.0, 2)
 
-  # client / delivery
-  lot.dae = num_dae
+
+  num_dae = request.POST.get('dae', None)
+  if num_dae:
+    lot.dae = num_dae
+    LotError.objects.filter(lot=lot, field='dae').delete()
+  else:
+    error, created = LotError.objects.update_or_create(lot=lot, field='dae', error="Merci de préciser le numéro de DAE/DAU", defaults={'value': num_dae})
+
+  ea_delivery_date = request.POST.get('ea_delivery_date', None)
   if not ea_delivery_date or ea_delivery_date == '':
     lot.ea_delivery_date = None
+    error, created = LotError.objects.update_or_create(lot=lot, field='ea_delivery_date', error="Merci de préciser la date de livraison", defaults={'value': None})
   else:
     try:
       edd = datetime.datetime.strptime(ea_delivery_date, '%d/%m/%Y')
       lot.ea_delivery_date = edd
+      LotError.objects.filter(lot=lot, field='ea_delivery_date').delete()
     except:
-      return JsonResponse({'status':'error', 'message':"Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA"}, status=400)
-  lot.ea_delivery_site = ea_delivery_site
+      error, created = LotError.objects.update_or_create(lot=lot, field='ea_delivery_date', error="Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA", defaults={'value': ea_delivery_date})
 
-  # production site can be either ID or name or nothing
-  if ea:
+  ea_name = request.POST.get('ea_name', None)
+  if ea_name:
     try:
-      ea_id = int(ea)
-      lot.ea = Entity.objects.get(id=ea_id)
-    except ValueError:
-      return JsonResponse({'status':'error', 'message':"Client inconnu"}, status=400)
+      lot.ea = Entity.objects.get(name=ea_name)
+      LotError.objects.filter(lot=lot, field='ea').delete()
+    except:
+      error, created = LotError.objects.update_or_create(lot=lot, field='ea', defaults={'value': ea_name, 'error':"Client inconnu"})
   else:
-    lot.ea = None
+    error, created = LotError.objects.update_or_create(lot=lot, field='ea', defaults={'value': None, 'error':"Merci de préciser un client"})
 
+  ea_delivery_site = request.POST.get('ea_delivery_site', None)
+  if ea_delivery_site:
+    lot.ea_delivery_site = ea_delivery_site
+    LotError.objects.filter(lot=lot, field='ea_delivery_site').delete()
+  else:
+    error, created = LotError.objects.update_or_create(lot=lot, field='ea_delivery_site', error="Merci d'entrer un site de livraison", defaults={'value': None})
+
+  client_id = request.POST.get('client_id', None)
   lot.client_id = client_id
   lot.save()
-  return JsonResponse({'status':'success', 'lot_id': lot.id})
+
+  errors = LotError.objects.filter(lot=lot)
+  errors_json = [{'field':e.field, 'value':e.value, 'error':e.error} for e in errors]
+  return JsonResponse({'status':'success', 'lot_id': lot.id, 'errors':errors_json})
 
 
 @login_required
