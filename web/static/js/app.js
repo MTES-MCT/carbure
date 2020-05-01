@@ -241,7 +241,10 @@ $(document).ready(function() {
   })
 })
 
-
+$("#pagelength").on('change', function() {
+  let pagelength = $("#pagelength").val()
+  table.page.len(pagelength).draw()
+})
 
 function loadTableSettings() {
   var tableSettings = localStorage.getItem('tableSettings');
