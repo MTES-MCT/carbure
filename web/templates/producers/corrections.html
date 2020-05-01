@@ -21,7 +21,7 @@
 
 <div class="modal__backdrop" id="modal_edit_lot">
   <div class="modal" style="max-width: none; margin: auto; max-height: 100%; overflow-y: auto;">
-    <p id="err_msg_dom" style="color: tomato">
+    <p id="err_msg_dom">
     </p>
     <div class="flex-container modal-edit">
       <div class="form__group" style="margin-top: var(--space-l);">
@@ -245,6 +245,8 @@ $(document).ready(function() {
 				  }
 				}
 			})
+	        let message = `<h3>Lot ${data['carbure_id']}</h3>`
+	        $("#err_msg_dom").html(message)
 			modal.style.display = "flex"
 	  	}
 	})
