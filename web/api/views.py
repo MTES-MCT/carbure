@@ -885,7 +885,7 @@ def operators_settings_add_depot(request, *args, **kwargs):
 @restrict_to_administrators
 def admin_users_autocomplete(request, *args, **kwargs):
   context = kwargs['context']
-  q = request.GET.get('q', '')
+  q = request.GET.get('query', '')
   user_model = get_user_model()
   matches = user_model.objects.filter(Q(name__icontains=q) | Q(email__icontains=q))
   return JsonResponse({'suggestions': [{'value':'%s - %s' % (m.name, m.email), 'data':m.id} for m in matches]})
@@ -895,7 +895,7 @@ def admin_users_autocomplete(request, *args, **kwargs):
 @restrict_to_administrators
 def admin_entities_autocomplete(request, *args, **kwargs):
   context = kwargs['context']
-  q = request.GET.get('q', '')
+  q = request.GET.get('query', '')
   matches = Entity.objects.filter(name__icontains=q)
   return JsonResponse({'suggestions': [{'value':m.name, 'data':m.id} for m in matches]})
 
