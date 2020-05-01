@@ -48,7 +48,6 @@ def administrators_suivi_certificats(request, *args, **kwargs):
 def administrators_certificate_details(request, *args, **kwargs):
   context = kwargs['context']
   certificate_id = kwargs['id']
-
   context['certificate'] = ProducerCertificate.objects.get(id=certificate_id)
   context['mps'] = ProductionSiteInput.objects.filter(production_site=context['certificate'].production_site)
   context['biocarburants'] = ProductionSiteOutput.objects.filter(production_site=context['certificate'].production_site)
@@ -224,7 +223,7 @@ def administrators_add_right(request, *args, **kwargs):
 
   user_model = get_user_model()
   try:
-    user = user_model.objects.get(id=user_id)    
+    user = user_model.objects.get(id=user_id)
   except:
     return JsonResponse({'status':'error', 'message':"Could not find entity"}, status=400)
 

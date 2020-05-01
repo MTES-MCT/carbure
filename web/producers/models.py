@@ -13,7 +13,7 @@ class AttestationProducer(models.Model):
     class Meta:
         db_table = 'producer_attestations'
         verbose_name = 'Attestation de Durabilité'
-        verbose_name_plural = 'Attestations de Durabilité'	
+        verbose_name_plural = 'Attestations de Durabilité'
 
 class ProductionSite(models.Model):
     GES_OPTIONS = [('Default', 'Valeurs par défaut'), ('Actual', 'Valeurs réelles')]
@@ -33,7 +33,7 @@ class ProductionSite(models.Model):
     class Meta:
         db_table = 'producer_sites'
         verbose_name = 'Site de Production'
-        verbose_name_plural = 'Sites de Production'	
+        verbose_name_plural = 'Sites de Production'
 
 class ProductionSiteInput(models.Model):
     INPUT_STATUS = (('Pending', 'En attente de validation'), ('Valid', 'Validé'))
@@ -43,12 +43,12 @@ class ProductionSiteInput(models.Model):
     status = models.CharField(max_length=16, choices=INPUT_STATUS, default="Pending")
 
     def __str__(self):
-        return self.matiere_premiere.name   
+        return self.matiere_premiere.name
 
     class Meta:
         db_table = 'production_sites_input'
         verbose_name = 'Site de Production - Filiere'
-        verbose_name_plural = 'Sites de Production - Filieres' 
+        verbose_name_plural = 'Sites de Production - Filieres'
 
 class ProductionSiteOutput(models.Model):
     OUTPUT_STATUS = (('Pending', 'En attente de validation'), ('Valid', 'Validé'))
@@ -63,7 +63,7 @@ class ProductionSiteOutput(models.Model):
     class Meta:
         db_table = 'production_sites_output'
         verbose_name = 'Site de Production - Biocarburant'
-        verbose_name_plural = 'Sites de Production - Biocarburants' 
+        verbose_name_plural = 'Sites de Production - Biocarburants'
 
 class ProducerCertificate(models.Model):
     CERTIF_STATUS_CHOICES = [("Pending", "En Attente de validation"), ("Valid", "Validé"), ("Expired", "Expiré")]
@@ -71,7 +71,7 @@ class ProducerCertificate(models.Model):
     production_site = models.ForeignKey(ProductionSite, null=True, on_delete=models.CASCADE)
     expiration = models.DateField()
     date_added = models.DateField(auto_now_add=True)
-    certificate = models.FileField()
+    certificate = models.FileField(null=True, blank=True)
     status = models.CharField(max_length=32, choices=CERTIF_STATUS_CHOICES, default="Pending")
     certificate_id = models.CharField(max_length=64, null=False, blank=False)
 
@@ -81,6 +81,6 @@ class ProducerCertificate(models.Model):
     class Meta:
         db_table = 'producer_certificates'
         verbose_name = 'Certificat'
-        verbose_name_plural = 'Certificats'	
+        verbose_name_plural = 'Certificats'
 
 
