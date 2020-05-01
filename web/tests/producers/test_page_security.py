@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from core.models import Entity, UserRights
 from producers.models import *
 from operators.models import OperatorDeclaration
+from django.core.files.base import ContentFile
 
 import datetime
 
