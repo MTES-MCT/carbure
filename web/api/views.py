@@ -905,7 +905,7 @@ def admin_entities_autocomplete(request, *args, **kwargs):
 @restrict_to_administrators
 def admin_lots(request, *args, **kwargs):
   context = kwargs['context']
-  lots = Lot.objects.filter(ea_delivery_status='A')
+  lots = Lot.objects.all()
   return JsonResponse([{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id if l.producer else '',
   'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
   'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date.strftime('%d/%m/%Y') if l.ea_delivery_date else '', 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,

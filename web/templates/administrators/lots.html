@@ -11,6 +11,15 @@
 	      <a class="button modal-button" href="{% url 'admin-api-lots-export' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
 	        <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
 	      </a>
+        <select id="pagelength" style="margin-top: auto;">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+
+
+
 	      <label for="input_search_datatable" style="margin: auto 5px auto auto;">Rechercher:</label>
 	      <input type="text" id="input_search_datatable" style="width: 200px; height: 2em; margin-top: auto; margin-bottom: auto;" />
 
@@ -187,7 +196,7 @@ $(document).ready(function() {
   $("#datatable tfoot").append(empty_footer)
 
   var table = $('#datatable').DataTable({
-    paging: false,
+    paging: true,
     info: false,
     scrollX: true,
     fixedColumns: {
