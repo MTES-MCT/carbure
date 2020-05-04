@@ -135,30 +135,30 @@
         <input type="hidden" id="lot_id" />
         <dl>
           <dt>Site de Production</dt>
-          <dd><input type="text" id="production_site_name" class="autocomplete_production_sites" /></dd>
+          <dd><input type="text" id="production_site_name" class="autocomplete_production_sites" /><span id="production_site_name_error" style="color:tomato;"></span></dd>
           <dt>Volume à 20°C en Litres</dt>
-          <dd><input type="text" id="volume" /></dd>
+          <dd><input type="text" id="volume" /><span id="volume_error" style="color:tomato;"></span></dd>
           <dt>Biocarburant</dt>
-          <dd><input type="text" id="biocarburant_name" class="autocomplete_biocarburants" /><input type="hidden" id="biocarburant_code" /></dd>
+          <dd><input type="text" id="biocarburant_name" class="autocomplete_biocarburants" /><span id="biocarburant_name_error" style="color:tomato;"></span><input type="hidden" id="biocarburant_code" /></dd>
           <dt>Matiere Premiere</dt>
-          <dd><input type="text" id="matiere_premiere_name" class="autocomplete_mps" /><input type="hidden" id="matiere_premiere_code" /></dd>
+          <dd><input type="text" id="matiere_premiere_name" class="autocomplete_mps" /><span id="matiere_premiere_name_error" style="color:tomato;"></span><input type="hidden" id="matiere_premiere_code" /></dd>
           <dt>Pays d'origine</dt>
-          <dd><input type="text" id="pays_origine_name" class="autocomplete_countries" /><input type="hidden" id="pays_origine_code" /></dd>
+          <dd><input type="text" id="pays_origine_name" class="autocomplete_countries" /><span id="pays_origine_name_error" style="color:tomato;"></span><input type="hidden" id="pays_origine_code" /></dd>
         </dl>
       </div>
       <div class="form__group" style="margin-left: var(--space-l);">
         <h3 style="text-align: center;">Destination</h3>
         <dl>
         <dt><label for="dae">Numéro de DAE / DAU</label></dt>
-        <dd><input id="dae" type="text" /></dd>
+        <dd><input id="dae" type="text" /><span id="dae_error" style="color:tomato;"></span></dd>
         <dt><label for="ea_name">Client</label></dt>
-        <dd><input type="text" id="ea_name" class="autocomplete_operators" /></dd>
+        <dd><input type="text" id="ea_name" class="autocomplete_operators" /><span id="ea_name_error" style="color:tomato;"></span></dd>
         <dt><label for="ea_delivery_site">Site de livraison</label></dt>
-        <dd><input id="ea_delivery_site" type="text" /></dd>
+        <dd><input id="ea_delivery_site" type="text" /><span id="ea_delivery_site_error" style="color:tomato;"></span></dd>
         <dt><label for="ea_delivery_date">Date de livraison</label></dt>
-        <dd><input id="ea_delivery_date" type="text" placeholder="JJ/MM/AAAA" /></dd>
+        <dd><input id="ea_delivery_date" type="text" placeholder="JJ/MM/AAAA" /><span id="ea_delivery_date_error" style="color:tomato;"></span></dd>
         <dt><label for="client_id" title="Champ optionnel, entrez ce que vous voulez">Référence</label></dt>
-        <dd><input id="client_id" type="text" /></dd>
+        <dd><input id="client_id" type="text" /><span id="client_id_error" style="color:tomato;"></span></dd>
         </dl>
       </div>
       <div class="form__group" style="margin-left: var(--space-l);">
@@ -687,9 +687,13 @@ $(document).ready(function() {
     } else {
       let modal = document.getElementById("modal_edit_lot")
       for (key in data) {
+        // set the value in the field
         $(`#${key}`).val(data[key])
+        // reset error field to none
+        $(`#${key}_error`).html('')
       }
 
+      // override errors into the field
       let lot_id = data['lot_id']
       if (lot_id in lot_errors) {
         let errors = lot_errors[lot_id]
@@ -711,11 +715,9 @@ $(document).ready(function() {
         success     : function(data, textStatus, jqXHR){
           // Callback code
           // load existing errors into the form
-          let err_msg_dom = $("#err_msg_dom")
-          err_msg_dom.append('<ul style="color: tomato;" id="errors_list"></ul>')
-          let err_list = $("#errors_list")
           for (let i = 0, len = data.length; i < len; i++) {
-            err_list.append(`<li>${data[i].error}</li>`)
+            let dom = $(`#${data[i].field}_error`)
+            dom.html(`${data[i].error}`)
           }
         },
         error       : function(e) {
