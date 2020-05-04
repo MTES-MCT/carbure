@@ -488,6 +488,69 @@ def producers_settings_add_biocarburant(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
+def producers_settings_delete_mp(request, *args, **kwargs):
+  context = kwargs['context']
+  site = request.POST.get('site')
+  mp = request.POST.get('matiere_premiere')
+
+  if site == None:
+    return JsonResponse({'status':'error', 'message':"Missing Site"}, status=400)
+  if mp == None:
+    return JsonResponse({'status':'error', 'message':"Missing MP"}, status=400)
+
+  try:
+    mp = MatierePremiere.objects.get(code=mp)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown MP", 'extra':str(e)}, status=400)
+
+  try:
+    ps = ProductionSite.objects.get(id=site, producer=context['user_entity'])
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown Production Site", 'extra':str(e)}, status=400)
+
+  try:
+    obj = ProductionSiteInput.objects.get(production_site=ps, matiere_premiere=mp)
+    obj.delete()
+
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'MP deleted'})
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_settings_delete_biocarburant(request, *args, **kwargs):
+  context = kwargs['context']
+  site = request.POST.get('site')
+  biocarburant = request.POST.get('biocarburant')
+
+  if site == None:
+    return JsonResponse({'status':'error', 'message':"Missing Site"}, status=400)
+  if biocarburant == None:
+    return JsonResponse({'status':'error', 'message':"Missing BC"}, status=400)
+
+  try:
+    biocarburant = Biocarburant.objects.get(code=biocarburant)
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown BC", 'extra':str(e)}, status=400)
+
+  try:
+    ps = ProductionSite.objects.get(id=site, producer=context['user_entity'])
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown Production Site", 'extra':str(e)}, status=400)
+
+  try:
+    obj = ProductionSiteOutput.objects.get(production_site=ps, biocarburant=biocarburant)
+    obj.delete()
+  except Exception as e:
+    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
+  return JsonResponse({'status':'success', 'message':'BC deleted'})
+
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
 def producers_save_lot(request, *args, **kwargs):
   context = kwargs['context']
   # new lot or edit?
