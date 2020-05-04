@@ -284,6 +284,7 @@ function duplicate_lot(lot_id) {
 function manage_validate_button(draft_present) {
  if (draft_present === true) {
     $("#btn_open_modal_validate_lots").addClass('primary')
+    $("#btn_open_modal_validate_lots").css("pointer-events", "auto")
     $("#btn_open_modal_validate_lots").removeClass('secondary')
     // add drafts to validate modal
     $("#modal_validate_lots_list").empty()
@@ -302,6 +303,7 @@ function manage_validate_button(draft_present) {
 
   } else {
     $("#btn_open_modal_validate_lots").addClass('secondary')
+    $("#btn_open_modal_validate_lots").css("pointer-events", "none")
     $("#btn_open_modal_validate_lots").removeClass('primary')
     // cleanup validate modal
     $("#modal_validate_lots_list").empty()
@@ -312,6 +314,7 @@ function manage_delete_button(only_drafts_present) {
   let keys = Object.keys(selected_rows)
   if (keys.length > 0 && only_drafts_present === true) {
     $("#btn_open_modal_delete_lots").addClass('primary')
+    $("#btn_open_modal_delete_lots").css("pointer-events", "auto")
     $("#btn_open_modal_delete_lots").removeClass('secondary')
     $("#modal_delete_lots_list").empty()
     let to_delete = []
@@ -329,6 +332,7 @@ function manage_delete_button(only_drafts_present) {
   } else {
     $("#btn_open_modal_delete_lots").addClass('secondary')
     $("#btn_open_modal_delete_lots").removeClass('primary')
+    $("#btn_open_modal_delete_lots").css("pointer-events", "none")
     $("#modal_delete_lots_list").empty()
   }
 }
