@@ -71,9 +71,23 @@
             <ul class="label-list">
               {% for input in site.inputs %}
                 {% if input.status == "Pending" %}
-                <li class="label" style="background: var(--light-orange);" title="{{input.get_status_display}}"><a>{{input.matiere_premiere}}</a></li>
+                <li class="label" style="background: var(--light-orange);" title="{{input.get_status_display}}">
+                  {{input.matiere_premiere}}
+                  <a onclick="delete_mp('{{site.id}}', '{{input.matiere_premiere.code}}')">
+                    <div class="icon">
+                      <svg fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </div>
+                  </a>
+                </li>
                 {% else %}
-                <li class="label" style="background: var(--light-green);"title="{{input.get_status_display}}"><a>{{input.matiere_premiere}}</a></li>
+                <li class="label" style="background: var(--light-green);"title="{{input.get_status_display}}">
+                  {{input.matiere_premiere}}
+                  <a onclick="delete_mp('{{site.id}}', '{{input.matiere_premiere.code}}')">
+                    <div class="icon">
+                      <svg fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </div>
+                  </a>
+                </li>
                 {% endif %}
               {% endfor %}
             </ul>
@@ -87,9 +101,23 @@
             <ul class="label-list">
               {% for output in site.outputs %}
                 {% if output.status == "Pending" %}
-                <li class="label" style="background: var(--light-orange);" title="{{output.get_status_display}}"><a>{{output.biocarburant}}</a></li>
+                <li class="label" style="background: var(--light-orange);" title="{{output.get_status_display}}">
+                  {{output.biocarburant}}
+                  <a onclick="delete_bc('{{site.id}}', '{{output.biocarburant.code}}')">
+                    <div class="icon">
+                      <svg fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </div>
+                  </a>
+                 </li>
                 {% else %}
-                <li class="label" style="background: var(--light-green);"title="{{input.get_status_display}}"><a>{{output.biocarburant}}</a></li>
+                <li class="label" style="background: var(--light-green);"title="{{input.get_status_display}}">
+                  {{output.biocarburant}}
+                  <a onclick="delete_bc('{{site.id}}', '{{output.biocarburant.code}}')">
+                    <div class="icon">
+                      <svg fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </div>
+                  </a>
+                </li>
                 {% endif %}
               {% endfor %}
             </ul>
@@ -180,6 +208,52 @@
 
 {% block extra_js %}
 <script type="text/javascript">
+
+function delete_mp(site, mp) {
+  $.ajax({
+    url         : "{% url 'producers-api-settings-delete-mp' %}",
+    data        : {'site': site, 'matiere_premiere': mp,
+                    'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+    type        : 'POST',
+    success     : function(data, textStatus, jqXHR){
+      // Callback code
+      window.location.reload()
+    },
+    error       : function(e) {
+      if (e.status === 400) {
+        alert(e.responseJSON.message)
+        console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+      } else {
+        alert("Server error. Please contact an administrator")
+        console.log(`server error ${JSON.stringify(e)}`)
+      }
+    }
+  })
+}
+
+function delete_bc(site, bc) {
+  $.ajax({
+    url         : "{% url 'producers-api-settings-delete-bc' %}",
+    data        : {'site': site, 'biocarburant': bc,
+                    'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+    type        : 'POST',
+    success     : function(data, textStatus, jqXHR){
+      // Callback code
+      window.location.reload()
+    },
+    error       : function(e) {
+      if (e.status === 400) {
+        alert(e.responseJSON.message)
+        console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+      } else {
+        alert("Server error. Please contact an administrator")
+        console.log(`server error ${JSON.stringify(e)}`)
+      }
+    }
+  })
+}
+
+
 $("#modal_site_country").autocomplete({
   serviceUrl: "{% url 'api-country-autocomplete' %}",
   dataType: 'json',

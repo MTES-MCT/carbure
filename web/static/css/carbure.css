@@ -150,3 +150,10 @@ table > tbody > tr > td {
 #table_lot_ges tbody td input {
 	width: 100px;
 }
+
+
+.icon {
+  width: 0.5em;
+  height: 0.5em;
+  font-size: 16px;
+}
