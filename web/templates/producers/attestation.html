@@ -36,7 +36,7 @@
     </div>
 
     <ul class="tabs__tab-list">
-      <li class="tabs__tab tabs__tab--selected" data-dst="tab_drafts">Mes brouillons (2)</li>
+      <li class="tabs__tab tabs__tab--selected" data-dst="tab_drafts">Brouillons (2)</li>
       <li class="tabs__tab" data-dst="tab_errors">Lots à corriger (0)</li>
       <li class="tabs__tab" data-dst="tab_valid">Lots validés (450)</li>
     </ul>
@@ -280,6 +280,8 @@ $(document).ready(function() {
     paging: true,
     info: false,
     scrollX: true,
+    scrollY: 1000,
+    scrollCollapse: true,
     language: {
         search: "Rechercher:",
         paginate: {
@@ -351,7 +353,7 @@ $(document).ready(function() {
         var column = this;
         let table_column = table_columns_drafts[column.index()]
         if (table_column.can_filter === true) {
-          var select = $('<select id="' + table_column.data + '" class="select2" ></select>')
+          var select = $('<select id="select_' + table_column.data + '" class="select2" ></select>')
               .appendTo($(column.footer()).empty())
               .on('change', function () {
                 //Get the "text" property from each selected data
@@ -375,7 +377,7 @@ $(document).ready(function() {
             select.append('<option value="'+d+'">'+d+'</option>');
           })
           //use column title as selector and placeholder
-          $('#' + table_column.data).select2({
+          $('#select_' + table_column.data).select2({
             multiple: true,
             closeOnSelect: true,
             placeholder: "Filtrer " + (table_column.filter_title  ? table_column.filter_title : table_column.title),

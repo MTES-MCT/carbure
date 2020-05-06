@@ -235,3 +235,7 @@ table > tbody > tr > td {
 .tabcontent {
   display: none;
 }
+
+.dataTables_scrollBody {
+  overflow-y: hidden !important;
+}

@@ -393,7 +393,7 @@ function duplicate_lot(lot_id) {
     if (addLotSettings[i] == 1) {
       continue
     }
-    let field_name = table_columns[i].data
+    let field_name = table_columns_drafts[i].data
     fields_to_ignore.push(field_name)
   }
 
