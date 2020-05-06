@@ -15,62 +15,62 @@
 }
 
 .badge {
-	text-align: center;
-	white-space: nowrap;
-	vertical-align: middle;
-	border-radius: 10px;
-	font-size: 10px;
-	font-weight: 400;
-	line-height: 13px;
-	padding: 2px 6px;
-	display: inline-block;
-	min-width: 10px;
-	position: absolute;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 13px;
+  padding: 2px 6px;
+  display: inline-block;
+  min-width: 10px;
+  position: absolute;
 }
 
 .badge-green {
-	background: #1ABB9C!important;
-	border: 1px solid #1ABB9C!important;
-	color: #fff;
+  background: #1ABB9C!important;
+  border: 1px solid #1ABB9C!important;
+  color: #fff;
 }
 
 .badge-red {
-	background: #d63626!important;
-	border: 1px solid #d63626!important;
-	color: #fff;
+  background: #d63626!important;
+  border: 1px solid #d63626!important;
+  color: #fff;
 }
 
 .side-menu-submenu {
-	padding-left: var(--space-s);
-	font-size: 14px;
+  padding-left: var(--space-s);
+  font-size: 14px;
 }
 
 .dashboard .side-menu .active-submenu {
-	text-decoration: underline;
+  text-decoration: underline;
     color: #0053b3;
     color: var(--theme-primary);
 }
 
 .flex-container {
-	display: flex;
-	justify-content: space-evenly;
+  display: flex;
+  justify-content: space-evenly;
 }
 
 .flex-container-right {
-	display: flex;
-	flex-direction: row-reverse;
-	align-items: baseline;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: baseline;
 }
 
 .flex-container-left {
-	display: flex;
-	flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 
 .modal-big {
-	max-width: 64em;
-	height: 100%;
-	overflow-y: auto;
+  max-width: 64em;
+  height: 100%;
+  overflow-y: auto;
 }
 
 table > thead > tr > th,
@@ -86,7 +86,7 @@ table > tbody > tr > td {
 #datatable_wrapper > div > div.DTFC_LeftWrapper > div.DTFC_LeftBodyWrapper > div > table > tbody > tr.status_ok td.sorting_1,
 #datatable_wrapper > div > div.DTFC_RightWrapper > div.DTFC_RightBodyWrapper > div > table > tbody > tr.status_ok,
 #datatable_wrapper > div > div.DTFC_RightWrapper > div.DTFC_RightBodyWrapper > div > table > tbody > tr.status_ok td.sorting_1 {
-	background: var(--light-green);
+  background: var(--light-green);
   cursor: pointer;
 }
 
@@ -96,7 +96,7 @@ table > tbody > tr > td {
 #datatable_wrapper > div > div.DTFC_LeftWrapper > div.DTFC_LeftBodyWrapper > div > table > tbody > tr.status_warning td.sorting_1,
 #datatable_wrapper > div > div.DTFC_RightWrapper > div.DTFC_RightBodyWrapper > div > table > tbody > tr.status_warning,
 #datatable_wrapper > div > div.DTFC_RightWrapper > div.DTFC_RightBodyWrapper > div > table > tbody > tr.status_warning td.sorting_1 {
-	background: var(--light-orange);
+  background: var(--light-orange);
   cursor: pointer;
 }
 
@@ -104,7 +104,7 @@ table > tbody > tr > td {
 #datatable_wrapper tbody tr.hover td.sorting_1,
 #datatable > tbody > tr:hover,
 #datatable > tbody > tr:hover td.sorting_1 {
-	background: var(--lighter-blue) !important;
+  background: var(--lighter-blue) !important;
   cursor: pointer;
 }
 
@@ -148,7 +148,7 @@ table > tbody > tr > td {
 .autocomplete-group strong { display: block; border-bottom: 1px solid #000; }
 
 #table_lot_ges tbody td input {
-	width: 100px;
+  width: 100px;
 }
 
 
@@ -156,4 +156,86 @@ table > tbody > tr > td {
   width: 0.5em;
   height: 0.5em;
   font-size: 16px;
+}
+
+.flex-container {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+
+  -ms-box-orient: horizontal;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -moz-flex;
+  display: -webkit-flex;
+  display: flex;
+}
+
+.column {
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  float: left;
+}
+
+.tabs {
+  -webkit-tap-highlight-color: transparent;
+  margin-bottom: 50px;
+}
+
+.tabs__tab-list {
+  border-bottom: 1px solid #8393a7;
+  margin: 0 0 10px;
+  padding: 0;
+}
+
+.tabs__tab {
+  display: inline-block;
+  border-bottom: 5px solid transparent;
+  bottom: -1px;
+  position: relative;
+  list-style: none;
+  padding: 6px 20px;
+  cursor: pointer;
+  color: #8393a7;
+}
+
+.tabs__tab--selected {
+  background: #fff;
+  border-color: #0053b3;
+  color: #0053b3;
+}
+
+
+.tabs__tab:focus {
+  box-shadow: 0 0 5px hsl(208, 99%, 50%);
+  border-color: hsl(208, 99%, 50%);
+  outline: none;
+}
+
+.tabs__tab:focus:after {
+  content: "";
+  position: absolute;
+  height: 5px;
+  left: -4px;
+  right: -4px;
+  bottom: -5px;
+  background: #fff;
+}
+
+.tabs__tab-panel {
+  display: none;
+}
+
+.tabs__tab-panel--selected {
+  display: block;
+  overflow-y: auto;
+}
+
+.tabcontent {
+  display: none;
+}
+
+.dataTables_scrollBody {
+  overflow-y: hidden !important;
 }
