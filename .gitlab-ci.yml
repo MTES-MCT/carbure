@@ -46,10 +46,7 @@ test:
     - export CARBURE_HOME=/builds/la-fabrique-numerique/biocarburants/
     - export TEST=1
     - echo "Testing..."
-    - python3 /app/web/manage.py test --keepdb /app/web/tests/public
-    - python3 /app/web/manage.py test --keepdb /app/web/tests/producers
-    - python3 /app/web/manage.py test --keepdb /app/web/tests/operators
-    - python3 /app/web/manage.py test --keepdb /app/web/tests/administrators
+    - python3 /app/web/manage.py test tests --keepdb
     
 dev_push_django:
   stage: deploy
