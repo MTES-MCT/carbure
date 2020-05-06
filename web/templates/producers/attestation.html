@@ -280,7 +280,6 @@ $(document).ready(function() {
     paging: true,
     info: false,
     scrollX: true,
-    scrollY: false,
     language: {
         search: "Rechercher:",
         paginate: {
@@ -298,7 +297,7 @@ $(document).ready(function() {
             }
         }
     },
-    dom: 'rtip',
+    dom: 'rtp',
     columnDefs: [
       {"className": "dt-center",
        "targets": "_all",
@@ -370,16 +369,20 @@ $(document).ready(function() {
                 column.search(val ? val : '', true, false).draw()
               })
           column.data().unique().sort().each(function (d, j) {
-              select.append('<option value="'+d+'">'+d+'</option>');
+            if (d === "") {
+              return
+            }
+            select.append('<option value="'+d+'">'+d+'</option>');
           })
           //use column title as selector and placeholder
           $('#' + table_column.data).select2({
             multiple: true,
-            closeOnSelect: false,
-            placeholder: "Filtrer " + (table_column.filter_title  ? table_column.filter_title : table_column.title)
+            closeOnSelect: true,
+            placeholder: "Filtrer " + (table_column.filter_title  ? table_column.filter_title : table_column.title),
+            placeholderOption: function () { return undefined; }
           });
           //initially clear select otherwise first option is selected
-          $('.select2').val(null).trigger('change');
+          $('.select2').val(null).trigger('change')
         } else {
           $(column.footer()).append(table_column.title)
         }
