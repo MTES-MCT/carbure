@@ -2,6 +2,15 @@
 
 
 {% block content  %}
+<svg aria-hidden="true" focusable="false" style="display:none">
+  <defs>
+    <symbol id="filter" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24">
+      <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+    </symbol>
+  </defs>
+</svg>
+
+
 <div class="main" style="overflow-x: auto;">
   <div class="panel">
     <h3>Attestation de Durabilité {{current_attestation.period}}</h3>
@@ -25,29 +34,46 @@
       <label for="input_search_datatable" style="margin: auto 5px auto auto;">Rechercher:</label>
       <input type="text" id="input_search_datatable" style="width: 200px; margin-top: auto;" />
     </div>
-    <table class="display nowrap" id="datatable">
-      <!-- dynamically generated in js -->
-      <thead></thead>
-      <tfoot></tfoot>
-      <tbody></tbody>
-    </table>
-    <div class="button-container">
-      <div class="button-item">
-        <a class="button primary" id="add_lot">Ajouter Lot</a>
-        <a id="add_lot_params" style="margin-top: auto;"><small>Paramètres</small></a>
+
+    <ul class="tabs__tab-list">
+      <li class="tabs__tab tabs__tab--selected" data-dst="tab_drafts">Brouillons (2)</li>
+      <li class="tabs__tab" data-dst="tab_errors">Lots à corriger (0)</li>
+      <li class="tabs__tab" data-dst="tab_valid">Lots validés (450)</li>
+    </ul>
+
+    <div id="tab_drafts" class="tabcontent">
+      <table class="display nowrap" id="datatable">
+        <!-- dynamically generated in js -->
+        <thead></thead>
+        <tfoot></tfoot>
+        <tbody></tbody>
+      </table>
+      <div class="button-container">
+        <div class="button-item">
+          <a class="button primary" id="add_lot">Ajouter Lot</a>
+          <a id="add_lot_params" style="margin-top: auto;"><small>Paramètres</small></a>
+        </div>
+        <div class="button-item button-push">
+          <a id="btn_open_modal_validate_lots" class="button primary">Valider Lots</a>
+          <a id="btn_open_modal_delete_lots" class="button primary">Supprimer Lots</a>
+        </div>
       </div>
-      <div class="button-item button-push">
-        <a id="btn_open_modal_validate_lots" class="button primary">Valider Lots</a>
-        <a id="btn_open_modal_delete_lots" class="button primary">Supprimer Lots</a>
+      <div class="form__group" id="add_lot_params_toggle" style="display: none;">
+        <fieldset>
+          <legend><small>Sélectionnez les valeurs à dupliquer lors de l'ajout de lot</small></legend>
+          <ul class="flex-container-a" id="list_columns_filter">
+            <!-- dynamically generated in js -->
+          </ul>
+        </fieldset>
       </div>
     </div>
-    <div class="form__group" id="add_lot_params_toggle" style="display: none;">
-      <fieldset>
-        <legend><small>Sélectionnez les valeurs à dupliquer lors de l'ajout de lot</small></legend>
-        <ul class="flex-container-a" id="list_columns_filter">
-          <!-- dynamically generated in js -->
-        </ul>
-      </fieldset>
+
+    <div id="tab_errors" class="tabcontent">
+      <p>Tab errors</p>
+    </div>
+
+    <div id="tab_valid" class="tabcontent">
+        <p>Tab valid</p>
     </div>
   </div>
 </div>
@@ -240,247 +266,22 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-
-
 var selected_rows = {}
-
-function duplicate_lot(lot_id) {
-  // unselect
-  for (const key in selected_rows) {
-    delete selected_rows[key]
-  }
-  // get columns to duplicate
-  var addLotSettings = loadAddLotSettings()
-  var fields_to_ignore = []
-  for (let i = 0, len = addLotSettings.length; i < len; i++) {
-    if (addLotSettings[i] == 1) {
-      continue
-    }
-    let field_name = table_columns[i].data
-    fields_to_ignore.push(field_name)
-  }
-
-  $.ajax({
-    url         : "{% url 'producers-api-duplicate-lot' %}",
-    data        : {'lot_id': lot_id, 'fields':fields_to_ignore, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
-    type        : 'POST',
-    success     : function(data, textStatus, jqXHR){
-      // Callback code
-      window.table.ajax.reload()
-      manage_actions()
-    },
-    error       : function(e) {
-      if (e.status === 400) {
-        alert(e.responseJSON.message)
-        console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-      } else {
-        alert("Server error. Please contact an administrator")
-        console.log(`server error ${JSON.stringify(e)}`)
-      }
-    }
-  })
-}
-
-function manage_validate_button(draft_present) {
- if (draft_present === true) {
-    $("#btn_open_modal_validate_lots").addClass('primary')
-    $("#btn_open_modal_validate_lots").css("pointer-events", "auto")
-    $("#btn_open_modal_validate_lots").removeClass('secondary')
-    // add drafts to validate modal
-    $("#modal_validate_lots_list").empty()
-    let to_validate = []
-    let keys = Object.keys(selected_rows)
-    for (let i = 0, len = keys.length; i < len; i++) {
-      let key = keys[i]
-      let rowdata = selected_rows[key]
-      let statut = rowdata['status']
-      if (statut.toLowerCase() === "draft") {
-        $("#modal_validate_lots_list").append(`<li>${rowdata['production_site_name']} - ${rowdata['volume']} - ${rowdata['biocarburant_name']} - ${rowdata['matiere_premiere_name']}</li>`)
-        to_validate.push(selected_rows[key]['lot_id'])
-      }
-      $("#modal_validate_lots_lots").val(to_validate.join(","))
-    }
-
-  } else {
-    $("#btn_open_modal_validate_lots").addClass('secondary')
-    $("#btn_open_modal_validate_lots").css("pointer-events", "none")
-    $("#btn_open_modal_validate_lots").removeClass('primary')
-    // cleanup validate modal
-    $("#modal_validate_lots_list").empty()
-  }
-}
-
-function manage_delete_button(only_drafts_present) {
-  let keys = Object.keys(selected_rows)
-  if (keys.length > 0 && only_drafts_present === true) {
-    $("#btn_open_modal_delete_lots").addClass('primary')
-    $("#btn_open_modal_delete_lots").css("pointer-events", "auto")
-    $("#btn_open_modal_delete_lots").removeClass('secondary')
-    $("#modal_delete_lots_list").empty()
-    let to_delete = []
-    let keys = Object.keys(selected_rows)
-    for (let i = 0, len = keys.length; i < len; i++) {
-      let key = keys[i]
-      let rowdata = selected_rows[key]
-      let statut = rowdata['status']
-      if (statut.toLowerCase() === "draft") {
-        $("#modal_delete_lots_list").append(`<li>${rowdata['production_site_name']} - ${rowdata['volume']} - ${rowdata['biocarburant_name']} - ${rowdata['matiere_premiere_name']}</li>`)
-        to_delete.push(selected_rows[key]['lot_id'])
-      }
-      $("#modal_delete_lots_lots").val(to_delete.join(","))
-    }
-  } else {
-    $("#btn_open_modal_delete_lots").addClass('secondary')
-    $("#btn_open_modal_delete_lots").removeClass('primary')
-    $("#btn_open_modal_delete_lots").css("pointer-events", "none")
-    $("#modal_delete_lots_list").empty()
-  }
-}
-
-function manage_add_button() {
-  let keys = Object.keys(selected_rows)
-  if (keys.length === 1) {
-    $("#add_lot").text("Dupliquer Lot")
-    $("#add_lot").removeAttr("href")
-    let lot_id = selected_rows[keys[0]]['lot_id']
-    $("#add_lot").unbind('click')
-    $("#add_lot").attr("onclick", `duplicate_lot(${lot_id})`)
-  } else {
-    $("#add_lot").text("Ajouter Lot")
-    $("#add_lot").removeAttr("onclick")
-    $("#add_lot").on("click", function() {
-      let modal = document.getElementById("modal_edit_lot")
-      /* empty all input fields */
-      $("#modal_edit_lot input").each(function() {
-        $(this).val('')
-      })
-      $("#err_msg_dom").html('')
-      let non_input_fields = ['ghg_total', 'ghg_reduction']
-      for (let i = 0, len = non_input_fields.length; i < len; i++) {
-        let field = non_input_fields[i]
-        $(`#${field}`).html('')
-      }
-      /* check if we have production sites, mps and bcs in parameters */
-      check_production_sites()
-      check_mps()
-      check_biocarburants()
-      $("#reduction_title").attr('title', '')
-      modal.style.display = "flex"
-    })
-  }
-}
-
-function check_production_sites() {
-  $.ajax({
-    url         : "{% url 'producers-api-production-sites-autocomplete' %}" + "?producer_id={{user_entity.id}}&query=",
-    type        : 'GET',
-    success     : function(data, textStatus, jqXHR) {
-      if (data['suggestions'].length == 0) {
-        $("#err_msg_dom").html('Aucun site de production enregistré')
-      }
-    },
-    error       : function(e) {
-      console.log(`error fetching existing production sites`)
-    }
-  })
-}
-
-function check_mps() {
-  $.ajax({
-    url         : "{% url 'producers-api-mps-autocomplete' %}" + "?producer_id={{user_entity.id}}&query=",
-    type        : 'GET',
-    success     : function(data, textStatus, jqXHR) {
-      if (data['suggestions'].length == 0) {
-        $("#err_msg_dom").html('Aucune matière première enregistrée dans votre profil')
-      }
-    },
-    error       : function(e) {
-      console.log(`error fetching mps`)
-    }
-  })
-}
-
-function check_biocarburants() {
-  $.ajax({
-    url         : "{% url 'producers-api-biocarburants-autocomplete' %}" + "?producer_id={{user_entity.id}}&query=",
-    type        : 'GET',
-    success     : function(data, textStatus, jqXHR) {
-      if (data['suggestions'].length == 0) {
-        $("#err_msg_dom").html('Aucun biocarburant enregistré dans votre profil')
-      }
-    },
-    error       : function(e) {
-      console.log(`error fetching biocarburants`)
-    }
-  })
-}
-
-
-function manage_actions() {
-  // buttons Valider, Supprimer et Ajouter
-  // if one of the rows is a draft, button Valider is active
-  let draft_present = false
-  let only_drafts_present = true
-  let keys = Object.keys(selected_rows)
-  for (let i = 0, len = keys.length; i < len; i++) {
-    let key = keys[i]
-    let rowdata = selected_rows[key]
-    let statut = rowdata['status']
-    if (statut.toLowerCase() === "draft") {
-      draft_present = true
-    } else {
-      only_drafts_present = false
-    }
-  }
-  manage_validate_button(draft_present)
-  manage_delete_button(only_drafts_present)
-  manage_add_button()
-}
-
 $(document).ready(function() {
-
- {% if message %}alert("{{message}}"){% endif %}
-
-  function initFilters() {
-    var table_columns_filter = $("#table_columns_filter")
-    var table_columns_filter2 = $("#table_columns_filter2")
-    var list_columns_filter = $("#list_columns_filter")
-    var columns_filter_html = ""
-    var columns_filter_html2 = ""
-    var list_columns_filter_html = ""
-    for (let i = 0, len = table_columns.length; i < len; i++) {
-      let column = table_columns[i]
-      if (column.can_hide === true) {
-        // use two columns
-        if (i <= (len / 2)) {
-          columns_filter_html += `<tr><td><input type="checkbox" id="checkbox${i}" class="toggle-vis" data-column="${i}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
-        } else {
-          columns_filter_html2 += `<tr><td><input type="checkbox" id="checkbox${i}" class="toggle-vis" data-column="${i}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
-        }
-      }
-      if (column.can_duplicate === true) {
-        list_columns_filter_html += `<li class="flex-item-a"><input type="checkbox" id="add_checkbox${i}" class="toggle-lot-param" data-column="${i}"><label for="add_checkbox${i}" class="label-inline">${column.title}</label></li>`
-      }
-    }
-    table_columns_filter.append(columns_filter_html)
-    table_columns_filter2.append(columns_filter_html2)
-    list_columns_filter.append(list_columns_filter_html)
-  }
-  initFilters()
+  initFilters(table_columns_drafts)
+  document.getElementById("tab_drafts").style.display = "block";
+  var lot_errors = {}
 
   // create empty footer
-  let empty_footer = `<tr>${Array(table_columns.length).fill("<th></th>").join('')}</tr>`
+  let empty_footer = `<tr>${Array(table_columns_drafts.length).fill("<th></th>").join('')}</tr>`
   $("#datatable tfoot").append(empty_footer)
-
-  var lot_errors = {}
 
   var table = $('#datatable').DataTable({
     paging: true,
     info: false,
     scrollX: true,
-    fixedColumns: {
-      rightColumns: 2,
-    },
+    scrollY: 1000,
+    scrollCollapse: true,
     language: {
         search: "Rechercher:",
         paginate: {
@@ -498,12 +299,12 @@ $(document).ready(function() {
             }
         }
     },
-    dom: 'rtip',
+    dom: 'rtp',
     columnDefs: [
       {"className": "dt-center",
        "targets": "_all",
        "render": function(data, type, row, meta) {
-          let col_name = table_columns[meta.col].data
+          let col_name = table_columns_drafts[meta.col].data
           let lot_id = row['lot_id']
           if (lot_id in lot_errors) {
             if (col_name in lot_errors[lot_id]) {
@@ -513,9 +314,19 @@ $(document).ready(function() {
           }
           return data
         }
+      },
+      {
+        orderable: false,
+        className: 'select-checkbox',
+        targets:   0
       }
     ],
-    columns: table_columns,
+    select: {
+      style:    'os',
+      selector: 'td:first-child'
+    },
+    order: [[ 1, 'asc' ]],
+    columns: table_columns_drafts,
     ajax: {
       url: `{% url 'api-producers-lots' attestation_id=current_attestation.id %}`,
       dataSrc: function(res) {
@@ -536,26 +347,49 @@ $(document).ready(function() {
         return lots
       }
     },
-    initComplete: function() {
-      // create filter
+    initComplete: function () {
+      count = 0;
       this.api().columns().every(function () {
         var column = this;
-        let table_column = table_columns[column.index()]
+        let table_column = table_columns_drafts[column.index()]
         if (table_column.can_filter === true) {
-          var select = $('<select><option value=""></option></select>')
-          .appendTo($(column.footer()).empty())
-          .on('change', function() {
-            var val = $.fn.dataTable.util.escapeRegex($(this).val());
-            column.search(val ? '^'+val+'$' : '', true, false).draw();
-          });
+          var select = $('<select id="select_' + table_column.data + '" class="select2" ></select>')
+              .appendTo($(column.footer()).empty())
+              .on('change', function () {
+                //Get the "text" property from each selected data
+                //regex escape the value and store in array
+                var data = $.map($(this).select2('data'), function(value, key) {
+                  return value.text ? '^' + $.fn.dataTable.util.escapeRegex(value.text) + '$' : null
+                })
+                //if no data selected use ""
+                if (data.length === 0) {
+                  data = [""]
+                }
+                //join array into string with regex or (|)
+                var val = data.join('|')
+                //search for the option(s) selected
+                column.search(val ? val : '', true, false).draw()
+              })
           column.data().unique().sort().each(function (d, j) {
-            select.append('<option value="'+d+'">'+d+'</option>')
+            if (d === "") {
+              return
+            }
+            select.append('<option value="'+d+'">'+d+'</option>');
+          })
+          //use column title as selector and placeholder
+          $('#select_' + table_column.data).select2({
+            multiple: true,
+            closeOnSelect: true,
+            placeholder: "Filtrer " + (table_column.filter_title  ? table_column.filter_title : table_column.title),
+            placeholderOption: function () { return undefined; }
           });
+          //initially clear select otherwise first option is selected
+          $('.select2').val(null).trigger('change')
         } else {
           $(column.footer()).append(table_column.title)
         }
       }).draw()
-    },
+    }
   })
   window.table = table
 
@@ -684,7 +518,7 @@ $(document).ready(function() {
     let colid = cell.index()['column']
     let row = $(this).closest('tr');
     let data = table.row(row).data()
-    let table_column = table_columns[colid]
+    let table_column = table_columns_drafts[colid]
     if (table_column['data'] === 'checkbox') {
       // ignore clicks on checkbox column
       return
