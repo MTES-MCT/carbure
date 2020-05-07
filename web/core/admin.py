@@ -45,9 +45,9 @@ class PaysAdmin(admin.ModelAdmin):
 
 
 class LotAdmin(admin.ModelAdmin):
-    list_display = ('carbure_id', 'producer', 'production_site', 'ea_delivery_site', 'ea_delivery_date', 'ea', 'biocarburant', 'matiere_premiere', 'client_id', 'status', 'ea_delivery_status')
+    list_display = ('period', 'carbure_id', 'producer', 'production_site', 'ea_delivery_site', 'ea_delivery_date', 'ea', 'biocarburant', 'matiere_premiere', 'client_id', 'status', 'ea_delivery_status')
     search_fields = ('dae', 'client_id', 'ea_delivery_status', 'carbure_id')
-    list_filter = ('producer', 'ea', 'status', 'ea_delivery_status')
+    list_filter = ('producer', 'ea', 'status', 'ea_delivery_status', 'period')
 
 
 class LotCommentAdmin(admin.ModelAdmin):
