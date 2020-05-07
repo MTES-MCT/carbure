@@ -72,7 +72,7 @@
 
     <div id="tab_errors" class="tabcontent">
       <div class="flex-container">
-        <a id="btn_open_modal_columns" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
+        <a id="btn_open_modal_columns" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
       </div>
@@ -99,8 +99,8 @@
           <option value="50">50</option>
           <option value="100">100</option>
         </select>
-        <label for="input_search_datatable" style="margin: auto 5px auto auto;">Rechercher:</label>
-        <input type="text" id="input_search_datatable" style="width: 200px; margin-top: auto;" />
+        <label for="input_search_datatable_valid" style="margin: auto 5px auto auto;">Rechercher:</label>
+        <input type="text" id="input_search_datatable_valid" style="width: 200px; margin-top: auto;" />
       </div>
 
 
@@ -305,9 +305,12 @@
 var selected_rows = {}
 $(document).ready(function() {
   initFilters(table_columns_drafts)
+
+
   document.getElementById("tab_drafts").style.display = "block";
   var lot_errors = {}
 
+  // tab Drafts
   // create empty footer
   let empty_footer = `<tr>${Array(table_columns_drafts.length).fill("<th></th>").join('')}</tr>`
   $("#datatable tfoot").append(empty_footer)
@@ -428,11 +431,9 @@ $(document).ready(function() {
     }
   })
   window.table = table
-
   $('#input_search_datatable').on('keyup', function() {
       table.search(this.value).draw();
   });
-
 
   var columnsSettings = loadTableSettings()
   showHideTableColumns(columnsSettings)
@@ -442,15 +443,15 @@ $(document).ready(function() {
 
   /* column filter modal event management */
   $('.toggle-vis').on('click', function(e) {
-        // Get the column API object
-        let colid = $(this).attr('data-column')
-        let column = table.column(colid);
+    // Get the column API object
+    let colid = $(this).attr('data-column')
+    let column = table.column(colid);
 
-        // Toggle the visibility
-        column.visible(!column.visible());
-        columnsSettings[colid] = columnsSettings[colid] == 1 ? 0 : 1
-        saveTableSettings(columnsSettings)
-      });
+    // Toggle the visibility
+    column.visible(!column.visible());
+    columnsSettings[colid] = columnsSettings[colid] == 1 ? 0 : 1
+    saveTableSettings(columnsSettings)
+  });
 
   /* add lot settings */
   $('.toggle-lot-param').on('click', function(e) {
@@ -808,6 +809,20 @@ $(".autocomplete_operators").autocomplete({
   dataType: 'json',
   minChars: 0,
 })
+
+$(document).ready(function() {
+  var datatable_corrections = document.getElementById("datatable_corrections")
+  if (datatable_corrections) {
+    init_datatables_corrections(`{% url 'api-producers-lots-corrections' %}`)
+  }
+
+  var datatable_valid = document.getElementById("datatable_valid")
+  if (datatable_valid) {
+    init_datatables_validated(`{% url 'api-producers-lots-valid' %}`)
+  }
+
+})
+
 
 </script>
 

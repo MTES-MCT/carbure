@@ -108,6 +108,7 @@ class Lot(models.Model):
     LOT_STATUS = (('Draft', 'Brouillon'), ('Validated', 'Validé'))
     DELIVERY_STATUS = (('N', 'N/A'), ('A', 'Accepté'), ('R', 'Refusé'), ('AC', 'À corriger'), ('AA', 'Corrigé'))
 
+    period = models.CharField(max_length=64, blank=True, default='')
     carbure_id = models.CharField(max_length=64, blank=True, default='')
     # producer
     producer = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='producer')

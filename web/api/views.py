@@ -146,7 +146,7 @@ def producers_lots_drafts(request, *args, **kwargs):
 def producers_lots_corrections(request, *args, **kwargs):
   context = kwargs['context']
   lots = Lot.objects.filter(producer=context['user_entity'], ea_delivery_status__in=['AA', 'AC', 'R'])
-  lots_json = [{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id if l.producer else '',
+  lots_json = [{'period':l.period, 'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id if l.producer else '',
   'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
   'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date.strftime('%d/%m/%Y') if l.ea_delivery_date else '', 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
   'volume':l.volume, 'matiere_premiere_code':l.matiere_premiere.code if l.matiere_premiere else '',
@@ -156,9 +156,7 @@ def producers_lots_corrections(request, *args, **kwargs):
   'eccr':l.eccr, 'eee':l.eee, 'ghg_total':l.ghg_total, 'ghg_reference':l.ghg_reference, 'ghg_reduction':'%.2f%%' % (l.ghg_reduction), 'client_id':l.client_id,
   'status':l.status, 'status_display':l.get_status_display(), 'ea_delivery_status':l.get_ea_delivery_status_display(), 'lot_id':l.id} for l in lots]
 
-  errors = LotError.objects.filter(lot__in=lots)
-  errors_json = [{'lot_id':e.lot.id, 'field':e.field, 'value':e.value, 'error':e.error} for e in errors]
-  response =  {'lots': lots_json, 'errors': errors_json}
+  response =  {'lots': lots_json}
   return JsonResponse(response)
 
 @login_required
@@ -167,7 +165,7 @@ def producers_lots_corrections(request, *args, **kwargs):
 def producers_lots_valid(request, *args, **kwargs):
   context = kwargs['context']
   lots = Lot.objects.filter(producer=context['user_entity'], status='Validated')
-  lots_json = [{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id if l.producer else '',
+  lots_json = [{'period':l.period, 'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id if l.producer else '',
   'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
   'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date.strftime('%d/%m/%Y') if l.ea_delivery_date else '', 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
   'volume':l.volume, 'matiere_premiere_code':l.matiere_premiere.code if l.matiere_premiere else '',
@@ -715,11 +713,13 @@ def producers_save_lot(request, *args, **kwargs):
   ea_delivery_date = request.POST.get('ea_delivery_date', None)
   if not ea_delivery_date or ea_delivery_date == '':
     lot.ea_delivery_date = None
+    lot.period = ''
     error, created = LotError.objects.update_or_create(lot=lot, field='ea_delivery_date', error="Merci de préciser la date de livraison", defaults={'value': None})
   else:
     try:
       edd = datetime.datetime.strptime(ea_delivery_date, '%d/%m/%Y')
       lot.ea_delivery_date = edd
+      lot.period = edd.strftime('%Y-%M')
       LotError.objects.filter(lot=lot, field='ea_delivery_date').delete()
     except:
       error, created = LotError.objects.update_or_create(lot=lot, field='ea_delivery_date', error="Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA", defaults={'value': ea_delivery_date})
