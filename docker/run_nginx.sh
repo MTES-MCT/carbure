@@ -1,7 +1,11 @@
 #!/bin/sh
 
 # create config file from template
-envsubst '$$NGINX_HOSTS $$NGINX_SSL_FOLDER' < /etc/nginx/conf.d/web.template > /etc/nginx/conf.d/default.conf
+if [ "$IMAGE_TAG" = "dev" ]; then
+   envsubst '$$NGINX_HOSTS' < /etc/nginx/conf.d/web.dev.template > /etc/nginx/conf.d/default.conf
+else
+   envsubst '$$NGINX_HOSTS $$NGINX_SSL_FOLDER' < /etc/nginx/conf.d/web.template > /etc/nginx/conf.d/default.conf
+fi    
 
 while :;
 do sleep 6h & wait ${!}; nginx -s reload;

@@ -15,7 +15,7 @@ services:
     networks:
     - carbure
 
-  carbure-django-uwsgi:
+  carbure-django:
     build:
       context: ${CARBURE_HOME}
       dockerfile: docker/Dockerfile.django
@@ -24,6 +24,7 @@ services:
     container_name: carbure_app
     image: carbure_app:latest
     environment:
+      IMAGE_TAG: ${IMAGE_TAG}
       DJANGO_DATABASE: ${DJANGO_DATABASE}
       DJANGO_DB_USER: ${DJANGO_DB_USER}
       DJANGO_DB_PASSWORD: ${DJANGO_DB_PASSWORD}
@@ -64,7 +65,7 @@ services:
       NGINX_HOSTS: ${NGINX_HOSTS}
     command: /bin/bash -c "envsubst < /etc/nginx/conf.d/web.dev.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
     depends_on:
-    - carbure-django-uwsgi
+    - carbure-django
     volumes:
     # dev: mount static directory
     - ${CARBURE_HOME}/web/static:/var/www/html
