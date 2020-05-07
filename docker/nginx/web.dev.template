@@ -1,7 +1,3 @@
-upstream django {
-    server carbure-django-uwsgi:8001;
-}
-
 server {
     listen 80;
     server_name ${NGINX_HOSTS};
@@ -17,8 +13,6 @@ server {
 
     # uwsgi
     location / {
-        uwsgi_pass  django;
-        include     /etc/nginx/conf.d/uwsgi_params;
+        proxy_pass  http://carbure-django:8001;
     }
-    
 }
