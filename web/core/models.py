@@ -102,7 +102,6 @@ class Pays(models.Model):
         verbose_name_plural = 'Pays'
 
 
-from producers.models import AttestationProducer
 from producers.models import ProductionSite
 
 class Lot(models.Model):
@@ -111,7 +110,6 @@ class Lot(models.Model):
 
     carbure_id = models.CharField(max_length=64, blank=True, default='')
     # producer
-    attestation = models.ForeignKey(AttestationProducer, null=True, blank=True, on_delete=models.SET_NULL)
     producer = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='producer')
     production_site = models.ForeignKey(ProductionSite, null=True, blank=True, on_delete=models.SET_NULL)
 

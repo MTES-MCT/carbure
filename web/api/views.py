@@ -118,16 +118,13 @@ def producers_import_csv_template(request, *args, **kwargs):
     writer.writerow([p.name,volume,bc.code,mp.code,country.code_pays,12,4,2,0,3.3,0,0,0,0,0,'DAE0000001',clientid,today,ea.name,site])
   return response
 
-
-
 # producers
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
-def producers_lots(request, *args, **kwargs):
+def producers_lots_drafts(request, *args, **kwargs):
   context = kwargs['context']
-  attestation_id = kwargs['attestation_id']
-  lots = Lot.objects.filter(attestation_id=attestation_id)
+  lots = Lot.objects.filter(producer=context['user_entity'], status='Draft')
   lots_json = [{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id if l.producer else '',
   'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
   'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date.strftime('%d/%m/%Y') if l.ea_delivery_date else '', 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
@@ -146,12 +143,65 @@ def producers_lots(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
-def producers_all_lots(request, *args, **kwargs):
+def producers_lots_corrections(request, *args, **kwargs):
   context = kwargs['context']
-  data = serializers.serialize('json', Lot.objects.filter(producer=context['user_entity']), fields=('carbure_id', 'producer', 'production_site', 'dae', 'ea_delivery_date', 'ea_delivery_site', 'ea', 'volume',
-    'matiere_premiere', 'biocarburant', 'pays_origine', 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction',
-    'client_id', 'status'), use_natural_foreign_keys=True)
-  return HttpResponse(data, content_type='application/json')
+  lots = Lot.objects.filter(producer=context['user_entity'], ea_delivery_status__in=['AA', 'AC', 'R'])
+  lots_json = [{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id if l.producer else '',
+  'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
+  'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date.strftime('%d/%m/%Y') if l.ea_delivery_date else '', 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
+  'volume':l.volume, 'matiere_premiere_code':l.matiere_premiere.code if l.matiere_premiere else '',
+  'matiere_premiere_name':l.matiere_premiere.name if l.matiere_premiere else '', 'biocarburant_code':l.biocarburant.code if l.biocarburant else '',
+  'biocarburant_name':l.biocarburant.name if l.biocarburant else '', 'pays_origine_code':l.pays_origine.code_pays if l.pays_origine else '',
+  'pays_origine_name':l.pays_origine.name if l.pays_origine else '', 'eec':l.eec, 'el':l.el, 'ep':l.ep, 'etd':l.etd, 'eu':l.eu, 'esca':l.esca, 'eccs':l.eccs,
+  'eccr':l.eccr, 'eee':l.eee, 'ghg_total':l.ghg_total, 'ghg_reference':l.ghg_reference, 'ghg_reduction':'%.2f%%' % (l.ghg_reduction), 'client_id':l.client_id,
+  'status':l.status, 'status_display':l.get_status_display(), 'ea_delivery_status':l.get_ea_delivery_status_display(), 'lot_id':l.id} for l in lots]
+
+  errors = LotError.objects.filter(lot__in=lots)
+  errors_json = [{'lot_id':e.lot.id, 'field':e.field, 'value':e.value, 'error':e.error} for e in errors]
+  response =  {'lots': lots_json, 'errors': errors_json}
+  return JsonResponse(response)
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_lots_valid(request, *args, **kwargs):
+  context = kwargs['context']
+  lots = Lot.objects.filter(producer=context['user_entity'], status='Validated')
+  lots_json = [{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id if l.producer else '',
+  'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
+  'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date.strftime('%d/%m/%Y') if l.ea_delivery_date else '', 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
+  'volume':l.volume, 'matiere_premiere_code':l.matiere_premiere.code if l.matiere_premiere else '',
+  'matiere_premiere_name':l.matiere_premiere.name if l.matiere_premiere else '', 'biocarburant_code':l.biocarburant.code if l.biocarburant else '',
+  'biocarburant_name':l.biocarburant.name if l.biocarburant else '', 'pays_origine_code':l.pays_origine.code_pays if l.pays_origine else '',
+  'pays_origine_name':l.pays_origine.name if l.pays_origine else '', 'eec':l.eec, 'el':l.el, 'ep':l.ep, 'etd':l.etd, 'eu':l.eu, 'esca':l.esca, 'eccs':l.eccs,
+  'eccr':l.eccr, 'eee':l.eee, 'ghg_total':l.ghg_total, 'ghg_reference':l.ghg_reference, 'ghg_reduction':'%.2f%%' % (l.ghg_reduction), 'client_id':l.client_id,
+  'status':l.status, 'status_display':l.get_status_display(), 'ea_delivery_status':l.get_ea_delivery_status_display(), 'lot_id':l.id} for l in lots]
+
+  errors = LotError.objects.filter(lot__in=lots)
+  errors_json = [{'lot_id':e.lot.id, 'field':e.field, 'value':e.value, 'error':e.error} for e in errors]
+  response =  {'lots': lots_json, 'errors': errors_json}
+  return JsonResponse(response)
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_lots_all(request, *args, **kwargs):
+  context = kwargs['context']
+  lots = Lot.objects.all(producer=context['user_entity'])
+  lots_json = [{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id if l.producer else '',
+  'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
+  'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date.strftime('%d/%m/%Y') if l.ea_delivery_date else '', 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
+  'volume':l.volume, 'matiere_premiere_code':l.matiere_premiere.code if l.matiere_premiere else '',
+  'matiere_premiere_name':l.matiere_premiere.name if l.matiere_premiere else '', 'biocarburant_code':l.biocarburant.code if l.biocarburant else '',
+  'biocarburant_name':l.biocarburant.name if l.biocarburant else '', 'pays_origine_code':l.pays_origine.code_pays if l.pays_origine else '',
+  'pays_origine_name':l.pays_origine.name if l.pays_origine else '', 'eec':l.eec, 'el':l.el, 'ep':l.ep, 'etd':l.etd, 'eu':l.eu, 'esca':l.esca, 'eccs':l.eccs,
+  'eccr':l.eccr, 'eee':l.eee, 'ghg_total':l.ghg_total, 'ghg_reference':l.ghg_reference, 'ghg_reduction':'%.2f%%' % (l.ghg_reduction), 'client_id':l.client_id,
+  'status':l.status, 'status_display':l.get_status_display(), 'ea_delivery_status':l.get_ea_delivery_status_display(), 'lot_id':l.id} for l in lots]
+
+  errors = LotError.objects.filter(lot__in=lots)
+  errors_json = [{'lot_id':e.lot.id, 'field':e.field, 'value':e.value, 'error':e.error} for e in errors]
+  response =  {'lots': lots_json, 'errors': errors_json}
+  return JsonResponse(response)
 
 @login_required
 @enrich_with_user_details
@@ -167,7 +217,7 @@ def producers_corrections(request, *args, **kwargs):
   'biocarburant_name':l.biocarburant.name if l.biocarburant else '', 'pays_origine_code':l.pays_origine.code_pays if l.pays_origine else '',
   'pays_origine_name':l.pays_origine.name if l.pays_origine else '', 'eec':l.eec, 'el':l.el, 'ep':l.ep, 'etd':l.etd, 'eu':l.eu, 'esca':l.esca, 'eccs':l.eccs,
   'eccr':l.eccr, 'eee':l.eee, 'ghg_total':l.ghg_total, 'ghg_reference':l.ghg_reference, 'ghg_reduction':'%.2f%%' % (l.ghg_reduction), 'client_id':l.client_id,
-  'status':l.status, 'status_display':l.get_status_display(), 'ea_delivery_status':l.get_ea_delivery_status_display(), 'lot_id':l.id, 'attestation_id':l.attestation.id} for l in lots], safe=False)
+  'status':l.status, 'status_display':l.get_status_display(), 'ea_delivery_status':l.get_ea_delivery_status_display(), 'lot_id':l.id} for l in lots], safe=False)
 
 
 @login_required
@@ -565,12 +615,6 @@ def producers_save_lot(request, *args, **kwargs):
     lot = Lot()
     lot.save()
 
-  attestation_id = request.POST.get('attestation_id', None)
-  try:
-    lot.attestation = AttestationProducer.objects.get(id=attestation_id)
-  except Exception as e:
-    return JsonResponse({'status':'error', 'message':"Attestation inconnue", 'extra': str(e)}, status=400)
-
   lot.producer = context['user_entity']
   production_site_name = request.POST.get('production_site_name', None)
   try:
@@ -713,11 +757,9 @@ def producers_save_lot(request, *args, **kwargs):
 @restrict_to_producers
 def producers_attestation_export(request, *args, **kwargs):
   context = kwargs['context']
-  attestation_id = kwargs['attestation_id']
   today = datetime.datetime.now()
   filename = 'export_%s.csv' % (today.strftime('%Y%m%d_%H%M%S'))
-  attestation = AttestationProducer.objects.get(producer=context['user_entity'], id=attestation_id)
-  lots = Lot.objects.filter(attestation=attestation)
+  lots = Lot.objects.all()
   buffer = io.BytesIO()
   buffer.write("carbure_id;producer;production_site;volume;code_biocarburant;biocarburant;code_matiere_premiere;matiere_premiere;code_pays_origine;pays_origine;eec;el;ep;etd;eu;esca;eccs;eccr;eee;ghg_total;ghg_reference;ghg_reduction;dae;client_id;ea_delivery_date;ea;ea_delivery_site\n".encode())
   for lot in lots:

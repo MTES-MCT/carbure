@@ -4,20 +4,7 @@
 				<a {% if current_url_name == 'producers-index' or current_url_name == 'producers-attestation' %}class="active"{% endif %} href="{% url 'producers-index' producer_name=url_friendly_name %}">
 					Attestations
 				</a>
-				{% if current_url_name == 'producers-attestation' or current_url_name == 'producers-attestation-edit-lot' or current_url_name == 'producers-attestation-new-lot' %}
-				<ul>
-					{% for na in next_attestations %}
-					<li class="side-menu-submenu"><a href="{% url 'producers-attestation' producer_name=url_friendly_name attestation_period=na.period %}">{{na.period}}</a></li>
-					{% endfor %}
-					<li class="side-menu-submenu"><a href="{% url 'producers-attestation' producer_name=url_friendly_name attestation_period=current_attestation.period %}" class="active-submenu">{{current_attestation.period}}</a></li>
-					{% for pa in previous_attestations %}
-					<li class="side-menu-submenu"><a href="{% url 'producers-attestation' producer_name=url_friendly_name attestation_period=pa.period %}">{{pa.period}}</a></li>
-					{% endfor %}
-				</ul>
-				{% endif %}
 			</li>
-			<li><a {% if current_url_name == 'producers-corrections' %}class="active"{% endif %} href="{% url 'producers-corrections' producer_name=url_friendly_name %}">Corrections
-				{% if corrections > 0 %}<span class="badge badge-green">{{corrections}}</span>{% endif %}</a></li>
 			<li><a {% if current_url_name == 'producers-controles' %}class="active"{% endif %} href="{% url 'producers-controles' producer_name=url_friendly_name %}">Contrôles
 				{% if nb_controles_dgec > 0 %}<span class="badge badge-red">{{nb_controles_dgec}}</span>{% endif %}</a></li>
 			<li><a {% if current_url_name == 'annuaire' %}class="active"{% endif %} href="{% url 'annuaire' %}">Annuaire</a></li>

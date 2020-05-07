@@ -19,8 +19,12 @@ urlpatterns = [
     path('producers-template-csv/', views.producers_import_csv_template, name='api-producers-template-csv'),
 
     # private, producers
-    path('producers/lots/<int:attestation_id>', views.producers_lots, name='api-producers-lots'),
-    path('producers/lots', views.producers_all_lots, name='api-producers-all-lots'),
+    path('producers/lots/drafts', views.producers_lots_drafts, name='api-producers-lots-drafts'),
+    path('producers/lots/corrections', views.producers_lots_corrections, name='api-producers-lots-corrections'),
+    path('producers/lots/valid', views.producers_lots_valid, name='api-producers-lots-valid'),
+    path('producers/lots/all', views.producers_lots_all, name='api-producers-lots-all'),
+
+
     path('producers/corrections', views.producers_corrections, name='api-producers-corrections'),
     path('producers/production-sites-autocomplete/', views.producers_prod_site_autocomplete, name='producers-api-production-sites-autocomplete'),
     path('producers/biocarburant-autocomplete/', views.producers_biocarburant_autocomplete, name='producers-api-biocarburants-autocomplete'),
@@ -38,7 +42,7 @@ urlpatterns = [
     path('producers/lot/delete', views.producers_delete_lots, name='producers-api-delete-lots'),
     path('producers/lot/validate', views.producers_validate_lots, name='producers-api-validate-lots'),
     path('producers/lot/comments', views.producers_lot_comments, name='producers-api-lot-comments'),
-    path('producers/attestation/<int:attestation_id>/export', views.producers_attestation_export, name='producers-api-attestation-export'),
+    path('producers/attestation/export', views.producers_attestation_export, name='producers-api-attestation-export'),
     path('producers/lot/save-comment', views.producers_lot_save_comment, name='producers-api-save-comment'),
     path('producers/lot/errors', views.producers_lot_errors, name='producers-api-lot-errors'),
 

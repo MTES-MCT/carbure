@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 from django.urls import reverse_lazy
-from producers.models import AttestationProducer, ProducerCertificate, ProductionSite, ProductionSiteInput, ProductionSiteOutput
+from producers.models import ProducerCertificate, ProductionSite, ProductionSiteInput, ProductionSiteOutput
 from core.models import Lot, MatierePremiere, Pays, Biocarburant
 from django.views.generic.edit import CreateView
 
@@ -17,40 +17,7 @@ import calendar
 def producers_index(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'producers-index'
-  # create the last few attestations
-  attestations = AttestationProducer.objects.filter(producer=context['user_entity'])
-  threemonthsago = datetime.date.today() - datetime.timedelta(days=90)
-  last_attestations = attestations.filter(deadline__gte=threemonthsago)
-  if len(last_attestations) <= 4:
-    # create the missing 4 attestations
-    current_period = datetime.date.today()
-    current_period = current_period.replace(day=15)
-    for i in range(5):
-      period = current_period.strftime('%Y-%m')
-      nextmonth = current_period + datetime.timedelta(days=30)
-      monthrange = calendar.monthrange(nextmonth.year, nextmonth.month)
-      nextmonth = nextmonth.replace(day=monthrange[1])
-      # create attestation
-      AttestationProducer.objects.update_or_create(period=period, producer=context['user_entity'], defaults={'deadline':nextmonth})
-      current_period -= datetime.timedelta(days=30)
-    attestations = AttestationProducer.objects.filter(producer=context['user_entity'])
-
-  for attestation in attestations:
-    attestation.lots = len(Lot.objects.filter(attestation=attestation))
-    attestation.drafts = len(Lot.objects.filter(attestation=attestation, status='Draft'))
-    attestation.to_affiliate = len(Lot.objects.filter(attestation=attestation, status='Validated', ea=None))
-  context['attestations'] = attestations
-  context['today'] = datetime.date.today()
-  context['twoweeks'] = datetime.date.today() + datetime.timedelta(days=15)
-  return render(request, 'producers/attestations.html', context)
-
-@login_required
-@enrich_with_user_details
-@restrict_to_producers
-def producers_corrections(request, *args, **kwargs):
-  context = kwargs['context']
-  context['current_url_name'] = 'producers-corrections'
-  return render(request, 'producers/corrections.html', context)
+  return render(request, 'producers/attestation.html', context)
 
 @login_required
 @enrich_with_user_details
@@ -78,107 +45,3 @@ def producers_settings(request, *args, **kwargs):
       site.certificate = None
     site.outputs = outputs.filter(production_site=site)
   return render(request, 'producers/settings.html', context)
-
-@login_required
-@enrich_with_user_details
-@restrict_to_producers
-def producers_attestation(request, *args, **kwargs):
-  context = kwargs['context']
-  attestation_period = kwargs['attestation_period']
-  context['current_url_name'] = 'producers-attestation'
-
-  attestations = AttestationProducer.objects.filter(producer=context['user_entity'])
-  current_attestation_qs = attestations.filter(period=attestation_period)
-  if len(current_attestation_qs) == 0:
-    raise PermissionDenied
-  current_attestation = current_attestation_qs[0]
-  next_attestations = attestations.filter(deadline__gt=current_attestation.deadline).order_by('deadline')
-  previous_attestations = attestations.filter(deadline__lt=current_attestation.deadline).order_by('-deadline')
-  context['current_attestation'] = current_attestation
-  if len(next_attestations) == 0:
-    # this is the latest attestation. no next, two previous
-    context['next_attestations'] = None
-    context['previous_attestations'] = previous_attestations[0:2]
-  elif len(previous_attestations) == 0:
-    # this is the first attestation. no previous, two next
-    context['next_attestations'] = [next_attestations[1], next_attestations[0]]
-    context['previous_attestations'] = None
-  else:
-    # middle, one of each
-    context['next_attestations'] = [next_attestations[0]]
-    context['previous_attestations'] = [previous_attestations[0]]
-
-  lots = Lot.objects.filter(attestation=current_attestation)
-  context['lots'] = lots
-  if 'created' in kwargs:
-    context['message'] = "Création du lot réussie"
-  return render(request, 'producers/attestation.html', context)
-
-@login_required
-@enrich_with_user_details
-@restrict_to_producers
-def producers_new_lot(request, *args, **kwargs):
-  context = kwargs['context']
-  context['attestation_id'] = kwargs['attestation_id']
-  attestation_id = context['attestation_id']
-
-  attestations = AttestationProducer.objects.filter(producer=context['user_entity'])
-  current_attestation_qs = attestations.filter(id=attestation_id)
-  if len(current_attestation_qs) == 0:
-    raise PermissionDenied
-  current_attestation = current_attestation_qs[0]
-  next_attestations = attestations.filter(deadline__gt=current_attestation.deadline).order_by('deadline')
-  previous_attestations = attestations.filter(deadline__lt=current_attestation.deadline).order_by('-deadline')
-  context['current_attestation'] = current_attestation
-  if len(next_attestations) == 0:
-    # this is the latest attestation. no next, two previous
-    context['next_attestations'] = None
-    context['previous_attestations'] = previous_attestations[0:2]
-  elif len(previous_attestations) == 0:
-    # this is the first attestation. no previous, two next
-    context['next_attestations'] = [next_attestations[1], next_attestations[0]]
-    context['previous_attestations'] = None
-  else:
-    # middle, one of each
-    context['next_attestations'] = [next_attestations[0]]
-    context['previous_attestations'] = [previous_attestations[0]]
-
-  if request.GET.get('created', None):
-    context['message'] = "Création du lot réussie"
-  context['current_url_name'] = 'producers-attestation-new-lot'
-  return render(request, 'producers/lot.html', context)
-
-@login_required
-@enrich_with_user_details
-@restrict_to_producers
-def producers_edit_lot(request, *args, **kwargs):
-  context = kwargs['context']
-  context['attestation_id'] = kwargs['attestation_id']
-  attestation_id = context['attestation_id']
-
-  attestations = AttestationProducer.objects.filter(producer=context['user_entity'])
-  current_attestation_qs = attestations.filter(id=attestation_id)
-  if len(current_attestation_qs) == 0:
-    raise PermissionDenied
-  current_attestation = current_attestation_qs[0]
-  next_attestations = attestations.filter(deadline__gt=current_attestation.deadline).order_by('deadline')
-  previous_attestations = attestations.filter(deadline__lt=current_attestation.deadline).order_by('-deadline')
-  context['current_attestation'] = current_attestation
-  if len(next_attestations) == 0:
-    # this is the latest attestation. no next, two previous
-    context['next_attestations'] = None
-    context['previous_attestations'] = previous_attestations[0:2]
-  elif len(previous_attestations) == 0:
-    # this is the first attestation. no previous, two next
-    context['next_attestations'] = [next_attestations[1], next_attestations[0]]
-    context['previous_attestations'] = None
-  else:
-    # middle, one of each
-    context['next_attestations'] = [next_attestations[0]]
-    context['previous_attestations'] = [previous_attestations[0]]
-
-  context['lot'] = Lot.objects.get(id=kwargs['lot_id'])
-  if request.GET.get('saved', None):
-    context['message'] = "Sauvegarde du lot réussie"
-  context['current_url_name'] = 'producers-attestation-edit-lot'
-  return render(request, 'producers/lot.html', context)

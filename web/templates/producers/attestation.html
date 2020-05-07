@@ -13,35 +13,37 @@
 
 <div class="main" style="overflow-x: auto;">
   <div class="panel">
-    <h3>Attestation de Durabilité {{current_attestation.period}}</h3>
+    <h3>Attestation de Durabilité</h3>
     {% csrf_token %}
-    <div class="flex-container">
-      <a class="button modal-button" id="btn_open_modal_import" style="margin-right: 0px; padding: 7px 10px 0px 10px;">
-        <img src="/static/images/icons/upload2.png" height="24" width="24" style="margin-bottom: 5px;" />
-      </a>
-      <a id="btn_open_modal_columns" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
-        <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
-      </a>
-      <a class="button modal-button" href="{% url 'producers-api-attestation-export' attestation_id=current_attestation.id %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
-        <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
-      </a>
-      <select id="pagelength" style="margin-top: auto;">
-        <option value="10">10</option>
-        <option value="25">25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-      </select>
-      <label for="input_search_datatable" style="margin: auto 5px auto auto;">Rechercher:</label>
-      <input type="text" id="input_search_datatable" style="width: 200px; margin-top: auto;" />
-    </div>
 
     <ul class="tabs__tab-list">
-      <li class="tabs__tab tabs__tab--selected" data-dst="tab_drafts">Brouillons (2)</li>
-      <li class="tabs__tab" data-dst="tab_errors">Lots à corriger (0)</li>
-      <li class="tabs__tab" data-dst="tab_valid">Lots validés (450)</li>
+      <li class="tabs__tab tabs__tab--selected" data-dst="tab_drafts">Brouillons ({{nb_drafts}})</li>
+      <li class="tabs__tab" data-dst="tab_errors">Lots à corriger ({{nb_corrections}})</li>
+      <li class="tabs__tab" data-dst="tab_valid">Lots validés ({{nb_valid}})</li>
     </ul>
 
     <div id="tab_drafts" class="tabcontent">
+      <div class="flex-container">
+        <a class="button modal-button" id="btn_open_modal_import" style="margin-right: 0px; padding: 7px 10px 0px 10px;">
+          <img src="/static/images/icons/upload2.png" height="24" width="24" style="margin-bottom: 5px;" />
+        </a>
+        <a id="btn_open_modal_columns" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
+          <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
+        </a>
+        <a class="button modal-button" href="{% url 'producers-api-attestation-export' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
+          <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
+        </a>
+        <select id="pagelength" style="margin-top: auto;">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        <label for="input_search_datatable" style="margin: auto 5px auto auto;">Rechercher:</label>
+        <input type="text" id="input_search_datatable" style="width: 200px; margin-top: auto;" />
+      </div>
+
+
       <table class="display nowrap" id="datatable">
         <!-- dynamically generated in js -->
         <thead></thead>
@@ -69,11 +71,45 @@
     </div>
 
     <div id="tab_errors" class="tabcontent">
-      <p>Tab errors</p>
+      <div class="flex-container">
+        <a id="btn_open_modal_columns" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
+          <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
+        </a>
+      </div>
+
+      <table class="display nowrap" id="datatable_corrections">
+        <!-- dynamically generated in js -->
+        <thead></thead>
+        <tfoot></tfoot>
+        <tbody></tbody>
+      </table>
     </div>
 
     <div id="tab_valid" class="tabcontent">
-        <p>Tab valid</p>
+      <div class="flex-container">
+        <a id="btn_open_modal_columns" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
+          <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
+        </a>
+        <a class="button modal-button" href="{% url 'producers-api-attestation-export' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
+          <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
+        </a>
+        <select id="pagelength" style="margin-top: auto;">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        <label for="input_search_datatable" style="margin: auto 5px auto auto;">Rechercher:</label>
+        <input type="text" id="input_search_datatable" style="width: 200px; margin-top: auto;" />
+      </div>
+
+
+      <table class="display nowrap" id="datatable_valid">
+        <!-- dynamically generated in js -->
+        <thead></thead>
+        <tfoot></tfoot>
+        <tbody></tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -328,7 +364,7 @@ $(document).ready(function() {
     order: [[ 1, 'asc' ]],
     columns: table_columns_drafts,
     ajax: {
-      url: `{% url 'api-producers-lots' attestation_id=current_attestation.id %}`,
+      url: `{% url 'api-producers-lots-drafts' %}`,
       dataSrc: function(res) {
         lots = res['lots']
         for (let i = 0, len = lots.length; i < len; i++) {
@@ -453,7 +489,6 @@ $(document).ready(function() {
           header = full_line
         } else {
           var formdata = new FormData();
-          formdata.set('attestation_id', '{{current_attestation.id}}')
           formdata.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
           for (let j = 0, llen = full_line.length; j < llen; j++) {
             formdata.set(header[j],full_line[j])
@@ -637,7 +672,6 @@ function handleSave(action) {
   var err_msg_dom = $("#err_msg_dom")
   err_msg_dom.empty()
   var formdata = new FormData();
-  formdata.set('attestation_id', '{{current_attestation.id}}')
   formdata.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
   $(".modal-edit input").each(function() {
     formdata.set($(this).attr('id'), $(this).val())
