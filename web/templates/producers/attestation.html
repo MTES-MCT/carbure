@@ -17,9 +17,9 @@
     {% csrf_token %}
 
     <ul class="tabs__tab-list">
-      <li class="tabs__tab tabs__tab--selected" data-dst="tab_drafts">Brouillons ({{nb_drafts}})</li>
-      <li class="tabs__tab" data-dst="tab_errors">Lots à corriger ({{nb_corrections}})</li>
-      <li class="tabs__tab" data-dst="tab_valid">Lots validés ({{nb_valid}})</li>
+      <li id="tab_drafts_title" class="tabs__tab tabs__tab--selected" data-dst="tab_drafts">Brouillons ({{nb_drafts}})</li>
+      <li id="tab_errors_title" class="tabs__tab" data-dst="tab_errors">Lots à corriger ({{nb_corrections}})</li>
+      <li id="tab_valid_title" class="tabs__tab" data-dst="tab_valid">Lots validés ({{nb_valid}})</li>
     </ul>
 
     <div id="tab_drafts" class="tabcontent">
@@ -44,7 +44,7 @@
       </div>
 
 
-      <table class="display nowrap" id="datatable">
+      <table class="display nowrap" id="datatable_drafts">
         <!-- dynamically generated in js -->
         <thead></thead>
         <tfoot></tfoot>
@@ -302,155 +302,75 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-var selected_rows = {}
 $(document).ready(function() {
   initFilters(table_columns_drafts)
 
+  function hideTab(tab_name) {
+    // hide content
+    tabcontent = document.getElementById(tab_name)
+    tabcontent.style.display = "none";
+    // change title class
+    tabtitle = document.getElementById(`${tab_name}_title`)
+    tabtitle.className = tabtitle.className.replace(" tabs__tab--selected", "")
+  }
 
-  document.getElementById("tab_drafts").style.display = "block";
-  var lot_errors = {}
+  function showTab(tab_name) {
+    // change title class
+    tabtitle = document.getElementById(`${tab_name}_title`)
+    tabtitle.className += " tabs__tab--selected"
+    // show content
+    tabcontent = document.getElementById(tab_name)
+    tabcontent.style.display = "block";
+  }
 
-  // tab Drafts
-  // create empty footer
-  let empty_footer = `<tr>${Array(table_columns_drafts.length).fill("<th></th>").join('')}</tr>`
-  $("#datatable tfoot").append(empty_footer)
+  $("#tab_drafts_title").on('click', function() {
+    // hide tabs valid & corrections
+    hideTab("tab_valid")
+    hideTab("tab_errors")
+    // show drafts
+    showTab("tab_drafts")
+    init_datatables_drafts(`{% url 'api-producers-lots-drafts' %}`)
 
-  var table = $('#datatable').DataTable({
-    paging: true,
-    info: false,
-    scrollX: true,
-    scrollY: 1000,
-    scrollCollapse: true,
-    language: {
-        search: "Rechercher:",
-        paginate: {
-            first:    '«',
-            previous: '‹',
-            next:     '›',
-            last:     '»'
-        },
-        aria: {
-            paginate: {
-                first:    'Première',
-                previous: 'Précédente',
-                next:     'Suivante',
-                last:     'Dernière'
-            }
-        }
-    },
-    dom: 'rtp',
-    columnDefs: [
-      {"className": "dt-center",
-       "targets": "_all",
-       "render": function(data, type, row, meta) {
-          let col_name = table_columns_drafts[meta.col].data
-          let lot_id = row['lot_id']
-          if (lot_id in lot_errors) {
-            if (col_name in lot_errors[lot_id]) {
-              let error = lot_errors[lot_id][col_name]
-              return `<span style="color:tomato;">${error}</span>`
-            }
-          }
-          return data
-        }
-      },
-      {
-        orderable: false,
-        className: 'select-checkbox',
-        targets:   0
-      }
-    ],
-    select: {
-      style:    'os',
-      selector: 'td:first-child'
-    },
-    order: [[ 1, 'asc' ]],
-    columns: table_columns_drafts,
-    ajax: {
-      url: `{% url 'api-producers-lots-drafts' %}`,
-      dataSrc: function(res) {
-        lots = res['lots']
-        for (let i = 0, len = lots.length; i < len; i++) {
-          // add checkbox on the fly
-          lots[i]["checkbox"] = `<input type="checkbox" />`
-        }
-        errors = res['errors']
-        for (let i = 0, len = errors.length; i < len; i++) {
-          let error = errors[i]
-          let lot_id = error.lot_id
-          if (!(lot_id in lot_errors)) {
-            lot_errors[lot_id] = {}
-          }
-          lot_errors[lot_id][error.field] = error.value
-        }
-        return lots
-      }
-    },
-    initComplete: function () {
-      count = 0;
-      this.api().columns().every(function () {
-        var column = this;
-        let table_column = table_columns_drafts[column.index()]
-        if (table_column.can_filter === true) {
-          var select = $('<select id="select_' + table_column.data + '" class="select2" ></select>')
-              .appendTo($(column.footer()).empty())
-              .on('change', function () {
-                //Get the "text" property from each selected data
-                //regex escape the value and store in array
-                var data = $.map($(this).select2('data'), function(value, key) {
-                  return value.text ? '^' + $.fn.dataTable.util.escapeRegex(value.text) + '$' : null
-                })
-                //if no data selected use ""
-                if (data.length === 0) {
-                  data = [""]
-                }
-                //join array into string with regex or (|)
-                var val = data.join('|')
-                //search for the option(s) selected
-                column.search(val ? val : '', true, false).draw()
-              })
-          column.data().unique().sort().each(function (d, j) {
-            if (d === "") {
-              return
-            }
-            select.append('<option value="'+d+'">'+d+'</option>');
-          })
-          //use column title as selector and placeholder
-          $('#select_' + table_column.data).select2({
-            multiple: true,
-            closeOnSelect: true,
-            placeholder: "Filtrer " + (table_column.filter_title  ? table_column.filter_title : table_column.title),
-            placeholderOption: function () { return undefined; }
-          });
-          //initially clear select otherwise first option is selected
-          $('.select2').val(null).trigger('change')
-        } else {
-          $(column.footer()).append(table_column.title)
-        }
-      }).draw()
-    }
+    var producerDraftsTableSettings = loadTableSettings(table_columns_drafts, 'producerDraftsTableSettings')
+    showHideTableColumns(producerDraftsTableSettings)
+
+    var addLotSettings = loadAddLotSettings()
+    preCheckAddLotSettings(addLotSettings)
   })
-  window.table = table
-  $('#input_search_datatable').on('keyup', function() {
-      table.search(this.value).draw();
-  });
 
-  var columnsSettings = loadTableSettings()
-  showHideTableColumns(columnsSettings)
+  $("#tab_errors_title").on('click', function() {
+    // hide tabs valid & corrections
+    hideTab("tab_valid")
+    hideTab("tab_drafts")
+    // show drafts
+    showTab("tab_errors")
+    init_datatables_corrections(`{% url 'api-producers-lots-corrections' %}`)
+  })
 
-  var addLotSettings = loadAddLotSettings()
-  preCheckAddLotSettings(addLotSettings)
+
+  $("#tab_valid_title").on('click', function() {
+    // hide tabs valid & corrections
+    hideTab("tab_drafts")
+    hideTab("tab_errors")
+    // show drafts
+    showTab("tab_valid")
+    init_datatables_validated(`{% url 'api-producers-lots-valid' %}`)
+  })
+
+  // by default, show drafts
+  document.getElementById("tab_drafts").style.display = "block";
+  init_datatables_drafts(`{% url 'api-producers-lots-drafts' %}`)
 
   /* column filter modal event management */
   $('.toggle-vis').on('click', function(e) {
     // Get the column API object
     let colid = $(this).attr('data-column')
-    let column = table.column(colid);
+    let column = table_drafts.column(colid);
 
     // Toggle the visibility
     column.visible(!column.visible());
-    columnsSettings[colid] = columnsSettings[colid] == 1 ? 0 : 1
-    saveTableSettings(columnsSettings)
+    producerDraftsTableSettings[colid] = producerDraftsTableSettings[colid] == 1 ? 0 : 1
+    saveTableSettings(producerDraftsTableSettings, 'producerDraftsTableSettings')
   });
 
   /* add lot settings */
@@ -533,27 +453,13 @@ $(document).ready(function() {
   })
 
   manage_actions()
-  /* click on datatable row */
-  $('#datatable_wrapper tbody').on('click', 'input', function() {
-    let hrow = $(this).closest("tr")
-    let row = table.row(hrow)
-    let data = table.row(row).data();
-    let rowid = table.row(row).index();
-    // add to selection if checked, otherwise remove
-    if (rowid in selected_rows) {
-      delete selected_rows[rowid]
-    } else {
-      selected_rows[rowid] = data
-    }
-    manage_actions()
-  })
 
-  $('#datatable_wrapper tbody').on('click', 'td', function() {
+  $('#datatable_drafts_wrapper tbody').on('click', 'td', function() {
     // check if we clicked on the checkbox
-    let cell = table.cell(this)
+    let cell = table_drafts.cell(this)
     let colid = cell.index()['column']
     let row = $(this).closest('tr');
-    let data = table.row(row).data()
+    let data = table_drafts.row(row).data()
     let table_column = table_columns_drafts[colid]
     if (table_column['data'] === 'checkbox') {
       // ignore clicks on checkbox column
@@ -621,30 +527,7 @@ $(document).ready(function() {
   $("#add_lot_params").on('click', function() {
     $("#add_lot_params_toggle").toggle();
   });
-
-  $(document).on('change', '#checkbox_header', function() {
-    if (this.checked) {
-      // select everything visible
-      $("#datatable_wrapper").find('input').prop('checked', true)
-      let rows = table.rows({search:'applied'})
-      for (let i = 0, len = rows.count(); i < len; i++) {
-        let rowid = table.row(i).index();
-        let rowdata = table.row(i).data()
-        selected_rows[rowid] = rowdata
-      }
-    } else {
-        // unselect everything visible
-        $("#datatable_wrapper").find('input').prop('checked', false)
-        for (const key in selected_rows) {
-          delete selected_rows[key]
-        }
-      }
-      console.log(`${Object.keys(selected_rows).length} rows selected`)
-      manage_actions()
-    })
-
-});
-
+})
 // fixed column styling on row hover
 $(document).on({
   mouseenter: function () {
@@ -809,20 +692,6 @@ $(".autocomplete_operators").autocomplete({
   dataType: 'json',
   minChars: 0,
 })
-
-$(document).ready(function() {
-  var datatable_corrections = document.getElementById("datatable_corrections")
-  if (datatable_corrections) {
-    init_datatables_corrections(`{% url 'api-producers-lots-corrections' %}`)
-  }
-
-  var datatable_valid = document.getElementById("datatable_valid")
-  if (datatable_valid) {
-    init_datatables_validated(`{% url 'api-producers-lots-valid' %}`)
-  }
-
-})
-
 
 </script>
 

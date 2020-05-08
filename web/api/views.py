@@ -382,7 +382,6 @@ def producers_validate_lots(request, *args, **kwargs):
       # FR2002P001-1
       lot.carbure_id = "%s%sP%d-%d" % ('FR', today.strftime('%y%m'), lot.producer.id, lot.id)
       lot.status = "Validated"
-      lot.ea_delivery_status = 'AA'
       lot.save()
     except Exception as e:
       return JsonResponse({'status':'error', 'message':'Erreur lors de la validation du lot', 'extra':str(e)}, status=400)
@@ -719,7 +718,7 @@ def producers_save_lot(request, *args, **kwargs):
     try:
       edd = datetime.datetime.strptime(ea_delivery_date, '%d/%m/%Y')
       lot.ea_delivery_date = edd
-      lot.period = edd.strftime('%Y-%M')
+      lot.period = edd.strftime('%Y-%m')
       LotError.objects.filter(lot=lot, field='ea_delivery_date').delete()
     except:
       error, created = LotError.objects.update_or_create(lot=lot, field='ea_delivery_date', error="Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA", defaults={'value': ea_delivery_date})
