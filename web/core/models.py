@@ -106,7 +106,7 @@ from producers.models import ProductionSite
 
 class Lot(models.Model):
     LOT_STATUS = (('Draft', 'Brouillon'), ('Validated', 'Validé'))
-    DELIVERY_STATUS = (('N', 'N/A'), ('A', 'Accepté'), ('R', 'Refusé'), ('AC', 'À corriger'), ('AA', 'Corrigé'))
+    DELIVERY_STATUS = (('N', 'En Attente'), ('A', 'Accepté'), ('R', 'Refusé'), ('AC', 'À corriger'), ('AA', 'Corrigé'))
 
     period = models.CharField(max_length=64, blank=True, default='')
     carbure_id = models.CharField(max_length=64, blank=True, default='')

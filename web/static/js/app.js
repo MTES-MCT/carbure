@@ -1,6 +1,7 @@
-/* modals management */
+var lot_errors = {}
+const selected_rows = []
 var table_columns_drafts = [
-{title:'<input type="checkbox" id="checkbox_header"/>', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
+{title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
 {title:'Producteur', can_hide: true, can_duplicate: true, can_export: true, data:'producer_name'},
 {title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data:'production_site_name'},
 {title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
@@ -83,7 +84,7 @@ var table_columns_producers_validated = [
 {title:'Référence', can_hide: true,  can_filter: true, orderable: false, data:'client_id', tooltip: 'Champ libre - Référence client'},
 {title:'Date d\'entrée<br />en EA', can_hide: true, can_export: true, data:'ea_delivery_date'},
 {title:'Site de livraison', can_hide: true, can_filter: true, orderable: false, data: 'ea_delivery_site'},
-{title:'Statut', can_hide: true, can_filter: true, orderable: false, data: 'ea_delivery_status'},
+{title:'Statut Livraison', can_hide: true, can_filter: true, orderable: false, data: 'ea_delivery_status'},
 ]
 
 
@@ -146,7 +147,7 @@ var table_columns_administrators = [
 {title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'ea_delivery_site'},
 ]
 
-
+/* modals management */
 var modals = document.getElementsByClassName("modal__backdrop");
 
 for (let i = 0, len = modals.length; i < len; i++) {
@@ -230,61 +231,40 @@ for (let i = 0, len = btns_delete_right.length; i < len; i++) {
   }
 }
 
-$(document).ready(function() {
-  $(".tabs__tab").on('click', function(event) {
-    // hide all tabs
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
-      tabcontent[i].style.display = "none";
-    }
 
-    // remove all tablinks class "selected"
-    tablinks = document.getElementsByClassName("tabs__tab");
-    for (i = 0; i < tablinks.length; i++) {
-      tablinks[i].className = tablinks[i].className.replace(" tabs__tab--selected", "");
-    }
-
-    // add selected class to clicked tablink
-    event.currentTarget.className += " tabs__tab--selected";
-    // show destination
-    document.getElementById(event.currentTarget.dataset.dst).style.display = "block";
-  })
-
-
-  $("form").submit(function(event) {
-    let form = $(this);
-    let form_id = form.attr('id')
-    let form_url = form.attr('data-url')
-    let err_msg_dom = $(`#${form_id}_err_message`)
-    err_msg_dom.text("Envoi en cours, veuillez patienter...")
-    var formdata = false;
-    if (window.FormData){
-      formdata = new FormData(form[0]);
-    }
-    $.ajax({
-      url         : form_url,
-      data        : formdata ? formdata : form.serialize(),
-      cache       : false,
-      contentType : false,
-      processData : false,
-      type        : 'POST',
-      success     : function(data, textStatus, jqXHR) {
-        // Callback code
-        err_msg_dom.text("")
-        window.location.reload()
-      },
-      error       : function(e) {
-        if (e.status === 400) {
-          err_msg_dom.text(e.responseJSON.message)
-          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-        } else {
-          err_msg_dom.text("Server error. Please contact an administrator")
-          console.log(`server error ${JSON.stringify(e)}`)
-        }
+$("form").submit(function(event) {
+  let form = $(this);
+  let form_id = form.attr('id')
+  let form_url = form.attr('data-url')
+  let err_msg_dom = $(`#${form_id}_err_message`)
+  err_msg_dom.text("Envoi en cours, veuillez patienter...")
+  var formdata = false;
+  if (window.FormData){
+    formdata = new FormData(form[0]);
+  }
+  $.ajax({
+    url         : form_url,
+    data        : formdata ? formdata : form.serialize(),
+    cache       : false,
+    contentType : false,
+    processData : false,
+    type        : 'POST',
+    success     : function(data, textStatus, jqXHR) {
+      // Callback code
+      err_msg_dom.text("")
+      window.location.reload()
+    },
+    error       : function(e) {
+      if (e.status === 400) {
+        err_msg_dom.text(e.responseJSON.message)
+        console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+      } else {
+        err_msg_dom.text("Server error. Please contact an administrator")
+        console.log(`server error ${JSON.stringify(e)}`)
       }
-    });
-    event.preventDefault()
-  })
+    }
+  });
+  event.preventDefault()
 })
 
 $("#pagelength").on('change', function() {
@@ -292,57 +272,22 @@ $("#pagelength").on('change', function() {
   table.page.len(pagelength).draw()
 })
 
-function loadTableSettings() {
-  var tableSettings = localStorage.getItem('tableSettings');
+function loadTableSettings(table_columns, table_name) {
+  var tableSettings = localStorage.getItem(table_name);
   if (tableSettings === undefined || tableSettings === null) {
-    let nb_columns = table.columns().data().length
+    let nb_columns = table_columns.length
     columns = Array(nb_columns).fill(1);
-    saveTableSettings(columns)
+    saveTableSettings(columns, table_name)
   } else {
     columns = JSON.parse(tableSettings)
-    let nb_columns = table.columns().data().length
+    let nb_columns = table_columns.length
     if (columns.length !== nb_columns) {
       columns = Array(nb_columns).fill(1);
-      saveTableSettings(columns)
+      saveTableSettings(columns, table_name)
     }
   }
   return columns
 }
-
-function loadOperatorsTableSettings() {
-  var tableSettings = localStorage.getItem('operatorsTableSettings');
-  if (tableSettings === undefined || tableSettings === null) {
-    let nb_columns = table.columns().data().length
-    columns = Array(nb_columns).fill(1);
-    saveOperatorsTableSettings(columns)
-  } else {
-    columns = JSON.parse(tableSettings)
-    let nb_columns = table.columns().data().length
-    if (columns.length !== nb_columns) {
-      columns = Array(nb_columns).fill(1);
-      saveOperatorsTableSettings(columns)
-    }
-  }
-  return columns
-}
-
-function loadAdministratorsTableSettings() {
-  var tableSettings = localStorage.getItem('administratorsTableSettings');
-  if (tableSettings === undefined || tableSettings === null) {
-    let nb_columns = table.columns().data().length
-    columns = Array(nb_columns).fill(1);
-    saveAdministratorsTableSettings(columns)
-  } else {
-    columns = JSON.parse(tableSettings)
-    let nb_columns = table.columns().data().length
-    if (columns.length !== nb_columns) {
-      columns = Array(nb_columns).fill(1);
-      saveAdministratorsTableSettings(columns)
-    }
-  }
-  return columns
-}
-
 
 function loadAddLotSettings() {
   var addLotSettings = localStorage.getItem('addLotSettings');
@@ -356,16 +301,8 @@ function loadAddLotSettings() {
   return columns
 }
 
-function saveTableSettings(settings) {
-  localStorage.setItem("tableSettings", JSON.stringify(settings));
-}
-
-function saveOperatorsTableSettings(settings) {
-  localStorage.setItem("operatorsTableSettings", JSON.stringify(settings));
-}
-
-function saveAdministratorsTableSettings(settings) {
-  localStorage.setItem("administratorsTableSettings", JSON.stringify(settings));
+function saveTableSettings(settings, table_name) {
+  localStorage.setItem(table_name, JSON.stringify(settings));
 }
 
 function saveAddLotSettings(settings) {
@@ -374,12 +311,12 @@ function saveAddLotSettings(settings) {
 
 function showHideTableColumns(columns) {
   /* display table columns depending on config */
-  let nb_columns = table.columns().data().length
+  let nb_columns = table_drafts.columns().data().length
 
   for (let i = 0, len = nb_columns; i < len; i++) {
     let isChecked = columns[i]
     let boxid = '#checkbox' + i
-    var column = table.column(i)
+    var column = table_drafts.column(i)
     if (isChecked) {
       $(boxid).prop("checked", true);
       if (!column.visible()) {
@@ -396,7 +333,7 @@ function showHideTableColumns(columns) {
 
 function preCheckAddLotSettings(columns) {
   /* checks checkboxes according to config */
-  let nb_columns = table.columns().data().length
+  let nb_columns = table_drafts.columns().data().length
   for (let i = 0, len = nb_columns; i < len; i++) {
     let isChecked = columns[i]
     let boxid = '#add_checkbox' + i
@@ -410,10 +347,6 @@ function preCheckAddLotSettings(columns) {
 
 
 function duplicate_lot(lot_id) {
-  // unselect
-  for (const key in selected_rows) {
-    delete selected_rows[key]
-  }
   // get columns to duplicate
   var addLotSettings = loadAddLotSettings()
   var fields_to_ignore = []
@@ -424,14 +357,14 @@ function duplicate_lot(lot_id) {
     let field_name = table_columns_drafts[i].data
     fields_to_ignore.push(field_name)
   }
-
+  let url = $("#duplicate_url").attr('data-url')
   $.ajax({
-    url         : "{% url 'producers-api-duplicate-lot' %}",
+    url         : url,
     data        : {'lot_id': lot_id, 'fields':fields_to_ignore, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
     type        : 'POST',
     success     : function(data, textStatus, jqXHR){
       // Callback code
-      window.table.ajax.reload()
+      window.table_drafts.ajax.reload()
       manage_actions()
     },
     error       : function(e) {
@@ -454,14 +387,12 @@ function manage_validate_button(draft_present) {
     // add drafts to validate modal
     $("#modal_validate_lots_list").empty()
     let to_validate = []
-    let keys = Object.keys(selected_rows)
-    for (let i = 0, len = keys.length; i < len; i++) {
-      let key = keys[i]
-      let rowdata = selected_rows[key]
+    for (let i = 0, len = selected_rows.length; i < len; i++) {
+      let rowdata = table_drafts.row(selected_rows[i]).data()
       let statut = rowdata['status']
       if (statut.toLowerCase() === "draft") {
         $("#modal_validate_lots_list").append(`<li>${rowdata['production_site_name']} - ${rowdata['volume']} - ${rowdata['biocarburant_name']} - ${rowdata['matiere_premiere_name']}</li>`)
-        to_validate.push(selected_rows[key]['lot_id'])
+        to_validate.push(rowdata['lot_id'])
       }
       $("#modal_validate_lots_lots").val(to_validate.join(","))
     }
@@ -483,14 +414,12 @@ function manage_delete_button(only_drafts_present) {
     $("#btn_open_modal_delete_lots").removeClass('secondary')
     $("#modal_delete_lots_list").empty()
     let to_delete = []
-    let keys = Object.keys(selected_rows)
-    for (let i = 0, len = keys.length; i < len; i++) {
-      let key = keys[i]
-      let rowdata = selected_rows[key]
+    for (let i = 0, len = selected_rows.length; i < len; i++) {
+      let rowdata = table_drafts.row(selected_rows[i]).data()
       let statut = rowdata['status']
       if (statut.toLowerCase() === "draft") {
         $("#modal_delete_lots_list").append(`<li>${rowdata['production_site_name']} - ${rowdata['volume']} - ${rowdata['biocarburant_name']} - ${rowdata['matiere_premiere_name']}</li>`)
-        to_delete.push(selected_rows[key]['lot_id'])
+        to_delete.push(rowdata['lot_id'])
       }
       $("#modal_delete_lots_lots").val(to_delete.join(","))
     }
@@ -503,11 +432,10 @@ function manage_delete_button(only_drafts_present) {
 }
 
 function manage_add_button() {
-  let keys = Object.keys(selected_rows)
-  if (keys.length === 1) {
+  if (selected_rows.length === 1) {
     $("#add_lot").text("Dupliquer Lot")
     $("#add_lot").removeAttr("href")
-    let lot_id = selected_rows[keys[0]]['lot_id']
+    let lot_id = table_drafts.row(selected_rows[0]).data()['lot_id']
     $("#add_lot").unbind('click')
     $("#add_lot").attr("onclick", `duplicate_lot(${lot_id})`)
   } else {
@@ -580,16 +508,15 @@ function check_biocarburants() {
   })
 }
 
-
 function manage_actions() {
   // buttons Valider, Supprimer et Ajouter
   // if one of the rows is a draft, button Valider is active
   let draft_present = false
   let only_drafts_present = true
-  let keys = Object.keys(selected_rows)
-  for (let i = 0, len = keys.length; i < len; i++) {
-    let key = keys[i]
-    let rowdata = selected_rows[key]
+  console.log(`${selected_rows.length} selected rows: ${selected_rows}`)
+  for (let i = 0, len = selected_rows.length; i < len; i++) {
+    let rowdata = table_drafts.row(selected_rows[i]).data()
+    console.log(`selected row ${selected_rows[i]}: ${JSON.stringify(rowdata)}`)
     let statut = rowdata['status']
     if (statut.toLowerCase() === "draft") {
       draft_present = true
@@ -628,129 +555,338 @@ function initFilters(table) {
   list_columns_filter.append(list_columns_filter_html)
 }
 
+function updateDataTableSelectAllCtrl(table){
+   var $table             = table_drafts.table().node();
+   var $chkbox_all        = $('tbody input[type="checkbox"]', $table);
+   var $chkbox_checked    = $('tbody input[type="checkbox"]:checked', $table);
+   var chkbox_select_all  = $('thead input[name="select_all"]', $table).get(0);
 
+   // If none of the checkboxes are checked
+   if($chkbox_checked.length === 0){
+      chkbox_select_all.checked = false;
+      if('indeterminate' in chkbox_select_all){
+         chkbox_select_all.indeterminate = false;
+      }
+
+   // If all of the checkboxes are checked
+   } else if ($chkbox_checked.length === $chkbox_all.length){
+      chkbox_select_all.checked = true;
+      if('indeterminate' in chkbox_select_all){
+         chkbox_select_all.indeterminate = false;
+      }
+
+   // If some of the checkboxes are checked
+   } else {
+      chkbox_select_all.checked = true;
+      if('indeterminate' in chkbox_select_all){
+         chkbox_select_all.indeterminate = true;
+      }
+   }
+}
+
+function init_datatables_drafts(url) {
+  // tab Drafts
+  if (!$.fn.DataTable.isDataTable('#datatable_drafts')) {
+      // create empty footer
+    let empty_footer = `<tr>${Array(table_columns_drafts.length).fill("<th></th>").join('')}</tr>`
+    $("#datatable_drafts tfoot").append(empty_footer)
+
+    var table_drafts = $('#datatable_drafts').DataTable({
+      paging: true,
+      info: true,
+      scrollX: true,
+      scrollY: 1000,
+      scrollCollapse: true,
+      language: {
+          search: "Rechercher:",
+          paginate: {
+              first:    '«',
+              previous: '‹',
+              next:     '›',
+              last:     '»'
+          },
+          aria: {
+              paginate: {
+                  first:    'Première',
+                  previous: 'Précédente',
+                  next:     'Suivante',
+                  last:     'Dernière'
+              }
+          }
+      },
+      dom: 'rtp',
+      columnDefs: [
+        {
+          className: "dt-center",
+          targets: "_all",
+          render: function(data, type, row, meta) {
+            let col_name = table_columns_drafts[meta.col].data
+            let lot_id = row['lot_id']
+            if (lot_id in lot_errors) {
+              if (col_name in lot_errors[lot_id]) {
+                let error = lot_errors[lot_id][col_name]
+                return `<span style="color:tomato;">${error}</span>`
+              }
+            }
+            return data
+          }
+        },
+        {
+          targets: 0,
+          searchable:false,
+          orderable:false,
+          width:'1%',
+          className: 'dt-body-center',
+          render: function (data, type, full, meta) {
+             return '<input type="checkbox">';
+          }
+        }
+      ],
+      order: [[ 1, 'asc' ]],
+      columns: table_columns_drafts,
+      ajax: {
+        url: url,
+        dataSrc: function(res) {
+          lots = res['lots']
+          for (let i = 0, len = lots.length; i < len; i++) {
+            // add checkbox on the fly
+            lots[i]["checkbox"] = `<input type="checkbox" />`
+          }
+          errors = res['errors']
+          for (let i = 0, len = errors.length; i < len; i++) {
+            let error = errors[i]
+            let lot_id = error.lot_id
+            if (!(lot_id in lot_errors)) {
+              lot_errors[lot_id] = {}
+            }
+            lot_errors[lot_id][error.field] = error.value
+          }
+          return lots
+        }
+      },
+      initComplete: function () {
+        count = 0;
+        this.api().columns().every(function () {
+          var column = this;
+          let table_column = table_columns_drafts[column.index()]
+          if (table_column.can_filter === true) {
+            var select = $('<select id="select_' + table_column.data + '" class="select2" ></select>')
+                .appendTo($(column.footer()).empty())
+                .on('change', function () {
+                  //Get the "text" property from each selected data
+                  //regex escape the value and store in array
+                  var data = $.map($(this).select2('data'), function(value, key) {
+                    return value.text ? '^' + $.fn.dataTable.util.escapeRegex(value.text) + '$' : null
+                  })
+                  //if no data selected use ""
+                  if (data.length === 0) {
+                    data = [""]
+                  }
+                  //join array into string with regex or (|)
+                  var val = data.join('|')
+                  //search for the option(s) selected
+                  column.search(val ? val : '', true, false).draw()
+                })
+            column.data().unique().sort().each(function (d, j) {
+              if (d === "") {
+                return
+              }
+              select.append('<option value="'+d+'">'+d+'</option>');
+            })
+            //use column title as selector and placeholder
+            $('#select_' + table_column.data).select2({
+              multiple: true,
+              closeOnSelect: true,
+              placeholder: "Filtrer " + (table_column.filter_title  ? table_column.filter_title : table_column.title),
+              placeholderOption: function () { return undefined; }
+            });
+            //initially clear select otherwise first option is selected
+            $('.select2').val(null).trigger('change')
+          } else {
+            $(column.footer()).append(table_column.title)
+          }
+        }).draw()
+      }
+    })
+
+    window.table_drafts = table_drafts
+    $('#input_search_datatable').on('keyup', function() {
+        table_drafts.search(this.value).draw();
+    })
+
+   // Handle click on checkbox
+   $('#datatable_drafts tbody').on('click', 'input[type="checkbox"]', function(e) {
+      var $row = $(this).closest('tr');
+      // Get row data
+      var rowId = table_drafts.row($row).index();
+      // Determine whether row ID is in the list of selected row IDs
+      var index = $.inArray(rowId, selected_rows);
+      // If checkbox is checked and row ID is not in list of selected row IDs
+      if(this.checked && index === -1) {
+        selected_rows.push(rowId);
+      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+      } else if (!this.checked && index !== -1) {
+        selected_rows.splice(index, 1);
+      }
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table_drafts);
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+      // Show/Hide buttons depending on selected_rows content
+      manage_actions()
+   })
+
+   // Handle click on table cells with checkboxes
+   $('#datatable_drafts').on('click', 'tbody td, thead th:first-child', function(e){
+      $(this).parent().find('input[type="checkbox"]').trigger('click');
+   })
+
+   // Handle click on "Select all" control
+   $('thead input[name="select_all"]', table_drafts.table().container()).on('click', function(e){
+      if(this.checked){
+         $('#datatable_drafts tbody input[type="checkbox"]:not(:checked)').trigger('click');
+      } else {
+         $('#datatable_drafts tbody input[type="checkbox"]:checked').trigger('click');
+      }
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+   });
+
+   // Handle table draw event
+   table_drafts.on('draw', function(){
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table_drafts);
+   });
+  }
+}
 
 function init_datatables_corrections(url) {
-  var table_corrections = $("#datatable_corrections").DataTable({
-    paging: false,
-    info: false,
-    scrollX: true,
-    scrollY: 1000,
-    scrollCollapse: true,
-    dom: 't',
-    columns: table_columns_producers_corrections,
-    ajax: {
-      url: url,
-      dataSrc: function(data) {
-        return data.lots
+  if (!$.fn.DataTable.isDataTable('#datatable_corrections')) {
+    var table_corrections = $("#datatable_corrections").DataTable({
+      paging: false,
+      info: false,
+      scrollX: true,
+      scrollY: 1000,
+      scrollCollapse: true,
+      dom: 't',
+      columns: table_columns_producers_corrections,
+      ajax: {
+        url: url,
+        dataSrc: function(data) {
+          return data.lots
+        },
       },
-    },
-    initComplete: function () {
-      count = 0;
-      this.api().columns().every(function () {
-        var column = this;
-        let table_column = table_columns_producers_corrections[column.index()]
-        if (table_column.can_filter === true) {
-          var select = $('<select id="select_' + table_column.data + '_correction" class="select2" ></select>')
-              .appendTo($(column.footer()).empty())
-              .on('change', function () {
-                //Get the "text" property from each selected data
-                //regex escape the value and store in array
-                var data = $.map($(this).select2('data'), function(value, key) {
-                  return value.text ? '^' + $.fn.dataTable.util.escapeRegex(value.text) + '$' : null
+      initComplete: function () {
+        count = 0;
+        this.api().columns().every(function () {
+          var column = this;
+          let table_column = table_columns_producers_corrections[column.index()]
+          if (table_column.can_filter === true) {
+            var select = $('<select id="select_' + table_column.data + '_correction" class="select2" ></select>')
+                .appendTo($(column.footer()).empty())
+                .on('change', function () {
+                  //Get the "text" property from each selected data
+                  //regex escape the value and store in array
+                  var data = $.map($(this).select2('data'), function(value, key) {
+                    return value.text ? '^' + $.fn.dataTable.util.escapeRegex(value.text) + '$' : null
+                  })
+                  //if no data selected use ""
+                  if (data.length === 0) {
+                    data = [""]
+                  }
+                  //join array into string with regex or (|)
+                  var val = data.join('|')
+                  //search for the option(s) selected
+                  column.search(val ? val : '', true, false).draw()
                 })
-                //if no data selected use ""
-                if (data.length === 0) {
-                  data = [""]
-                }
-                //join array into string with regex or (|)
-                var val = data.join('|')
-                //search for the option(s) selected
-                column.search(val ? val : '', true, false).draw()
-              })
-          column.data().unique().sort().each(function (d, j) {
-            if (d === "") {
-              return
-            }
-            select.append('<option value="'+d+'">'+d+'</option>');
-          })
-          //use column title as selector and placeholder
-          $('#select_' + table_column.data + '_correction').select2({
-            multiple: true,
-            closeOnSelect: true,
-            placeholder: "Filtrer " + (table_column.filter_title  ? table_column.filter_title : table_column.title),
-            placeholderOption: function () { return undefined; }
-          });
-          //initially clear select otherwise first option is selected
-          $('.select2').val(null).trigger('change')
-        } else {
-          $(column.footer()).append(table_column.title)
-        }
-      }).draw()
-    }
-  })
+            column.data().unique().sort().each(function (d, j) {
+              if (d === "") {
+                return
+              }
+              select.append('<option value="'+d+'">'+d+'</option>');
+            })
+            //use column title as selector and placeholder
+            $('#select_' + table_column.data + '_correction').select2({
+              multiple: true,
+              closeOnSelect: true,
+              placeholder: "Filtrer " + (table_column.filter_title  ? table_column.filter_title : table_column.title),
+              placeholderOption: function () { return undefined; }
+            });
+            //initially clear select otherwise first option is selected
+            $('.select2').val(null).trigger('change')
+          } else {
+            $(column.footer()).append(table_column.title)
+          }
+        }).draw()
+      }
+    })
+    window.table_corrections = table_corrections
+  }
 }
 
 function init_datatables_validated(url) {
-  let empty_footer = `<tr>${Array(table_columns_producers_validated.length).fill("<th></th>").join('')}</tr>`
-  $("#datatable_valid tfoot").append(empty_footer)
+  if (!$.fn.DataTable.isDataTable('#datatable_valid')) {
+    let empty_footer = `<tr>${Array(table_columns_producers_validated.length).fill("<th></th>").join('')}</tr>`
+    $("#datatable_valid tfoot").append(empty_footer)
 
-  var table_valid = $("#datatable_valid").DataTable({
-    paging: false,
-    info: false,
-    scrollX: true,
-    scrollY: 1000,
-    scrollCollapse: true,
-    dom: 't',
-    columns: table_columns_producers_validated,
-    ajax: {
-      url: url,
-      dataSrc: function(data) {
-        return data.lots
+    var table_valid = $("#datatable_valid").DataTable({
+      paging: false,
+      info: false,
+      scrollX: true,
+      scrollY: 1000,
+      scrollCollapse: true,
+      dom: 't',
+      columns: table_columns_producers_validated,
+      ajax: {
+        url: url,
+        dataSrc: function(data) {
+          return data.lots
+        },
       },
-    },
-    initComplete: function () {
-      count = 0;
-      this.api().columns().every(function () {
-        var column = this;
-        let table_column = table_columns_producers_validated[column.index()]
-        if (table_column.can_filter === true) {
-          var select = $('<select id="select_' + table_column.data + '_valid" class="select2" ></select>')
-              .appendTo($(column.footer()).empty())
-              .on('change', function () {
-                //Get the "text" property from each selected data
-                //regex escape the value and store in array
-                var data = $.map($(this).select2('data'), function(value, key) {
-                  return value.text ? '^' + $.fn.dataTable.util.escapeRegex(value.text) + '$' : null
+      initComplete: function () {
+        count = 0;
+        this.api().columns().every(function () {
+          var column = this;
+          let table_column = table_columns_producers_validated[column.index()]
+          if (table_column.can_filter === true) {
+            var select = $('<select id="select_' + table_column.data + '_valid" class="select2" ></select>')
+                .appendTo($(column.footer()).empty())
+                .on('change', function () {
+                  //Get the "text" property from each selected data
+                  //regex escape the value and store in array
+                  var data = $.map($(this).select2('data'), function(value, key) {
+                    return value.text ? '^' + $.fn.dataTable.util.escapeRegex(value.text) + '$' : null
+                  })
+                  //if no data selected use ""
+                  if (data.length === 0) {
+                    data = [""]
+                  }
+                  //join array into string with regex or (|)
+                  var val = data.join('|')
+                  //search for the option(s) selected
+                  column.search(val ? val : '', true, false).draw()
                 })
-                //if no data selected use ""
-                if (data.length === 0) {
-                  data = [""]
-                }
-                //join array into string with regex or (|)
-                var val = data.join('|')
-                //search for the option(s) selected
-                column.search(val ? val : '', true, false).draw()
-              })
-          column.data().unique().sort().each(function (d, j) {
-            if (d === "") {
-              return
-            }
-            select.append('<option value="'+d+'">'+d+'</option>');
-          })
-          //use column title as selector and placeholder
-          $('#select_' + table_column.data + '_valid').select2({
-            multiple: true,
-            closeOnSelect: true,
-            placeholder: "Filtrer " + (table_column.filter_title  ? table_column.filter_title : table_column.title),
-            placeholderOption: function () { return undefined; }
-          });
-          //initially clear select otherwise first option is selected
-          $('.select2').val(null).trigger('change')
-        } else {
-          $(column.footer()).append(table_column.title)
-        }
-      }).draw()
-    }
-  })
+            column.data().unique().sort().each(function (d, j) {
+              if (d === "") {
+                return
+              }
+              select.append('<option value="'+d+'">'+d+'</option>');
+            })
+            //use column title as selector and placeholder
+            $('#select_' + table_column.data + '_valid').select2({
+              multiple: true,
+              closeOnSelect: true,
+              placeholder: "Filtrer " + (table_column.filter_title  ? table_column.filter_title : table_column.title),
+              placeholderOption: function () { return undefined; }
+            });
+            //initially clear select otherwise first option is selected
+            $('.select2').val(null).trigger('change')
+          } else {
+            $(column.footer()).append(table_column.title)
+          }
+        }).draw()
+      }
+    })
+    window.table_valid = table_valid
+  }
 }
