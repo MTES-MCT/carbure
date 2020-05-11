@@ -63,10 +63,6 @@ class TestOperatorsUrlsAsProducer(TestCase):
         response = self.client.get(reverse('operators-controles', kwargs={'operator_name':self.operator_entity.url_friendly_name()}))
         self.assertEqual(response.status_code, 403)
 
-    def test_access_operators_settings(self):
-        response = self.client.get(reverse('operators-settings', kwargs={'operator_name':self.operator_entity.url_friendly_name()}))
-        self.assertEqual(response.status_code, 403)
-
 
 class TestAdminUrlsAsProducer(TestCase):
     def setUp(self):
