@@ -160,3 +160,4 @@ if env('TEST') == False:
     AWS_S3_ENDPOINT_URL = env("AWS_S3_ENDPOINT_URL")
     AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME")
     AWS_S3_USE_SSL = 1
+    AWS_DEFAULT_ACL = None
