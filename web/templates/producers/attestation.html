@@ -27,7 +27,7 @@
         <a class="button modal-button" id="btn_open_modal_import" style="margin-right: 0px; padding: 7px 10px 0px 10px;">
           <img src="/static/images/icons/upload2.png" height="24" width="24" style="margin-bottom: 5px;" />
         </a>
-        <a id="btn_open_modal_columns" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
+        <a id="btn_open_modal_columns_drafts" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
         <a class="button modal-button" href="{% url 'producers-api-attestation-export' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
@@ -72,7 +72,7 @@
 
     <div id="tab_errors" class="tabcontent">
       <div class="flex-container">
-        <a id="btn_open_modal_columns" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+        <a id="btn_open_modal_columns_errors" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
       </div>
@@ -87,7 +87,7 @@
 
     <div id="tab_valid" class="tabcontent">
       <div class="flex-container">
-        <a id="btn_open_modal_columns" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
+        <a id="btn_open_modal_columns_valid" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
         <a class="button modal-button" href="{% url 'producers-api-attestation-export' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
@@ -171,21 +171,54 @@
   </div>
 </div>
 
-<div class="modal__backdrop" id="modal_columns">
+<div class="modal__backdrop" id="modal_columns_drafts">
   <div class="modal">
     <div class="flex-container">
-      <table id="table_columns_filter">
+      <table id="table_columns_drafts_filter">
         <!-- dynamically generated in js -->
       </table>
-      <table id="table_columns_filter2">
+      <table id="table_columns_drafts_filter2">
         <!-- dynamically generated in js -->
       </table>
     </div>
     <div class="form__group button__group">
-      <a class="button secondary close" id="btn_close_modal_columns">Fermer</a>
+      <a class="button secondary close" id="btn_close_modal_columns_drafts">Fermer</a>
     </div>
   </div>
 </div>
+
+<div class="modal__backdrop" id="modal_columns_errors">
+  <div class="modal">
+    <div class="flex-container">
+      <table id="table_columns_errors_filter">
+        <!-- dynamically generated in js -->
+      </table>
+      <table id="table_columns_errors_filter2">
+        <!-- dynamically generated in js -->
+      </table>
+    </div>
+    <div class="form__group button__group">
+      <a class="button secondary close" id="btn_close_modal_columns_errors">Fermer</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_columns_valid">
+  <div class="modal">
+    <div class="flex-container">
+      <table id="table_columns_valid_filter">
+        <!-- dynamically generated in js -->
+      </table>
+      <table id="table_columns_valid_filter2">
+        <!-- dynamically generated in js -->
+      </table>
+    </div>
+    <div class="form__group button__group">
+      <a class="button secondary close" id="btn_close_modal_columns_valid">Fermer</a>
+    </div>
+  </div>
+</div>
+
 
 <div class="modal__backdrop" id="modal_edit_lot">
   <div class="modal" style="max-width: none; margin: auto; max-height: 100%; overflow-y: auto;">
@@ -303,7 +336,10 @@
 {% block extra_js %}
 <script type="text/javascript">
 $(document).ready(function() {
-  initFilters(table_columns_drafts)
+  initDuplicateParams(table_columns_drafts)
+  initFilters(table_columns_drafts, 'drafts')
+  initFilters(table_columns_producers_corrections, 'errors')
+  initFilters(table_columns_producers_validated, 'valid')
 
   function hideTab(tab_name) {
     // hide content
@@ -330,12 +366,6 @@ $(document).ready(function() {
     // show drafts
     showTab("tab_drafts")
     init_datatables_drafts(`{% url 'api-producers-lots-drafts' %}`)
-
-    var producerDraftsTableSettings = loadTableSettings(table_columns_drafts, 'producerDraftsTableSettings')
-    showHideTableColumns(producerDraftsTableSettings)
-
-    var addLotSettings = loadAddLotSettings()
-    preCheckAddLotSettings(addLotSettings)
   })
 
   $("#tab_errors_title").on('click', function() {
@@ -360,18 +390,43 @@ $(document).ready(function() {
   // by default, show drafts
   document.getElementById("tab_drafts").style.display = "block";
   init_datatables_drafts(`{% url 'api-producers-lots-drafts' %}`)
+  var addLotSettings = loadAddLotSettings()
+  preCheckAddLotSettings(addLotSettings)
+
+
+
+
 
   /* column filter modal event management */
   $('.toggle-vis').on('click', function(e) {
     // Get the column API object
     let colid = $(this).attr('data-column')
-    let column = table_drafts.column(colid);
+    let dst_table = $(this).attr('data-table')
+
 
     // Toggle the visibility
+    let column = ''
+    if (dst_table === "errors") {
+      column = table_corrections.column(colid);
+      var producerErrorsTableSettings = loadTableSettings(table_columns_producers_corrections, 'producerErrorsTableSettings')
+      producerErrorsTableSettings[colid] = producerErrorsTableSettings[colid] == 1 ? 0 : 1
+      saveTableSettings(producerErrorsTableSettings, 'producerErrorsTableSettings')
+    } else if (dst_table === "drafts") {
+      column = table_drafts.column(colid);
+      var producerDraftsTableSettings = loadTableSettings(table_columns_drafts, 'producerDraftsTableSettings')
+      producerDraftsTableSettings[colid] = producerDraftsTableSettings[colid] == 1 ? 0 : 1
+      saveTableSettings(producerDraftsTableSettings, 'producerDraftsTableSettings')
+    } else if (dst_table === "valid") {
+      column = table_valid.column(colid);
+      var producerValidTableSettings = loadTableSettings(table_columns_producers_validated, 'producerValidTableSettings')
+      producerValidTableSettings[colid] = producerValidTableSettings[colid] == 1 ? 0 : 1
+      saveTableSettings(producerValidTableSettings, 'producerValidTableSettings')
+    } else {
+      console.log(`unknown table. cant save column display settings`)
+      return
+    }
     column.visible(!column.visible());
-    producerDraftsTableSettings[colid] = producerDraftsTableSettings[colid] == 1 ? 0 : 1
-    saveTableSettings(producerDraftsTableSettings, 'producerDraftsTableSettings')
-  });
+  })
 
   /* add lot settings */
   $('.toggle-lot-param').on('click', function(e) {
