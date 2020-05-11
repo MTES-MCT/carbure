@@ -31,8 +31,5 @@ class OperatorsUrlsTest(TestCase):
         response = self.client.get(reverse('operators-controles', kwargs={'operator_name':'PETRO1'}))
         self.assertEqual(response.status_code, 200)
 
-    def test_settings(self):
-        response = self.client.get(reverse('operators-settings', kwargs={'operator_name':'PETRO1'}))
-        self.assertEqual(response.status_code, 200)
 
 
