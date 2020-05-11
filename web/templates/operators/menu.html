@@ -17,6 +17,5 @@
 			<li><a {% if current_url_name == 'operators-controles' %}class="active"{% endif %} href="{% url 'operators-controles' operator_name=url_friendly_name %}">Contrôles DGEC
 				{% if nb_controles_dgec > 0 %}<span class="badge badge-red">{{nb_controles_dgec}}</span>{% endif %}</a></li>
 			<li><a {% if current_url_name == 'annuaire' %}class="active"{% endif %} href="{% url 'annuaire' %}">Annuaire</a></li>
-			<li><a {% if current_url_name == 'operators-settings' %}class="active"{% endif %} href="{% url 'operators-settings' operator_name=url_friendly_name %}">Paramètres</a></li>
 		</ul>
 	</aside>

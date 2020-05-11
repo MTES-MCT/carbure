@@ -85,12 +85,3 @@ def operators_affiliations(request, *args, **kwargs):
   context = kwargs['context']
   context['current_url_name'] = 'operators-affiliations'
   return render(request, 'operators/affiliations.html', context)
-
-@login_required
-@enrich_with_user_details
-@restrict_to_operators
-def operators_settings(request, *args, **kwargs):
-  context = kwargs['context']
-  context['current_url_name'] = 'operators-settings'
-  context['depots'] = OperatorDepot.objects.filter(operator=context['user_entity'])
-  return render(request, 'operators/settings.html', context)
