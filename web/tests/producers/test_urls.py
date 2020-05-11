@@ -20,18 +20,8 @@ class ProducersUrlsTest(TestCase):
         response = self.client.get(reverse('producers-index', kwargs={'producer_name':self.entity.url_friendly_name()}))
         self.assertEqual(response.status_code, 200)
 
-        # then fetch the latest attestation
-        today = datetime.date.today()
-        period = today.strftime('%Y-%m')
-        response = self.client.get(reverse('producers-attestation', kwargs={'producer_name':self.entity.url_friendly_name(), 'attestation_period':period}))
-        self.assertEqual(response.status_code, 200)
-
     def test_settings(self):
         response = self.client.get(reverse('producers-settings', kwargs={'producer_name':self.entity.url_friendly_name()}))
-        self.assertEqual(response.status_code, 200)
-
-    def test_corrections(self):
-        response = self.client.get(reverse('producers-corrections', kwargs={'producer_name':self.entity.url_friendly_name()}))
         self.assertEqual(response.status_code, 200)
 
     def test_controles(self):
