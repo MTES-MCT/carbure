@@ -309,14 +309,15 @@ function saveAddLotSettings(settings) {
   localStorage.setItem("addLotSettings", JSON.stringify(settings));
 }
 
-function showHideTableColumns(columns) {
+function showHideTableColumns(table, columns, dom) {
   /* display table columns depending on config */
-  let nb_columns = table_drafts.columns().data().length
-
+  console.log(`showHideTableColumns for table ${columns} ${dom}`)
+  let nb_columns = table.columns().data().length
+  console.log(`${nb_columns} columns`)
   for (let i = 0, len = nb_columns; i < len; i++) {
     let isChecked = columns[i]
-    let boxid = '#checkbox' + i
-    var column = table_drafts.column(i)
+    let boxid = `#checkbox_${dom}${i}`
+    var column = table.column(i)
     if (isChecked) {
       $(boxid).prop("checked", true);
       if (!column.visible()) {
@@ -529,30 +530,37 @@ function manage_actions() {
   manage_add_button()
 }
 
-function initFilters(table) {
-  var table_columns_filter = $("#table_columns_filter")
-  var table_columns_filter2 = $("#table_columns_filter2")
+function initDuplicateParams(table) {
   var list_columns_filter = $("#list_columns_filter")
+  var list_columns_filter_html = ""
+  for (let i = 0, len = table.length; i < len; i++) {
+    let column = table[i]
+    if (column.can_duplicate === true) {
+      list_columns_filter_html += `<li class="flex-item-a"><input type="checkbox" id="add_checkbox${i}" class="toggle-lot-param" data-column="${i}"><label for="add_checkbox${i}" class="label-inline">${column.title}</label></li>`
+    }
+  }
+  list_columns_filter.append(list_columns_filter_html)
+}
+
+function initFilters(table, dom) {
+  console.log(`initializing filters for table ${dom}`)
+  var table_columns_filter = $(`#table_columns_${dom}_filter`)
+  var table_columns_filter2 = $(`#table_columns_${dom}_filter2`)
   var columns_filter_html = ""
   var columns_filter_html2 = ""
-  var list_columns_filter_html = ""
   for (let i = 0, len = table.length; i < len; i++) {
     let column = table[i]
     if (column.can_hide === true) {
       // use two columns
       if (i <= (len / 2)) {
-        columns_filter_html += `<tr><td><input type="checkbox" id="checkbox${i}" class="toggle-vis" data-column="${i}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
+        columns_filter_html += `<tr><td><input type="checkbox" id="checkbox_${dom}${i}" class="toggle-vis" data-column="${i}" data-table="${dom}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
       } else {
-        columns_filter_html2 += `<tr><td><input type="checkbox" id="checkbox${i}" class="toggle-vis" data-column="${i}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
+        columns_filter_html2 += `<tr><td><input type="checkbox" id="checkbox_${dom}${i}" class="toggle-vis" data-column="${i}" data-table="${dom}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
       }
-    }
-    if (column.can_duplicate === true) {
-      list_columns_filter_html += `<li class="flex-item-a"><input type="checkbox" id="add_checkbox${i}" class="toggle-lot-param" data-column="${i}"><label for="add_checkbox${i}" class="label-inline">${column.title}</label></li>`
     }
   }
   table_columns_filter.append(columns_filter_html)
   table_columns_filter2.append(columns_filter_html2)
-  list_columns_filter.append(list_columns_filter_html)
 }
 
 function updateDataTableSelectAllCtrl(table){
@@ -714,8 +722,8 @@ function init_datatables_drafts(url) {
         table_drafts.search(this.value).draw();
     })
 
-   // Handle click on checkbox
-   $('#datatable_drafts tbody').on('click', 'input[type="checkbox"]', function(e) {
+    // Handle click on checkbox
+    $('#datatable_drafts tbody').on('click', 'input[type="checkbox"]', function(e) {
       var $row = $(this).closest('tr');
       // Get row data
       var rowId = table_drafts.row($row).index();
@@ -734,15 +742,15 @@ function init_datatables_drafts(url) {
       e.stopPropagation();
       // Show/Hide buttons depending on selected_rows content
       manage_actions()
-   })
+    })
 
-   // Handle click on table cells with checkboxes
-   $('#datatable_drafts').on('click', 'tbody td, thead th:first-child', function(e){
+    // Handle click on table cells with checkboxes
+    $('#datatable_drafts').on('click', 'tbody td, thead th:first-child', function(e){
       $(this).parent().find('input[type="checkbox"]').trigger('click');
-   })
+    })
 
-   // Handle click on "Select all" control
-   $('thead input[name="select_all"]', table_drafts.table().container()).on('click', function(e){
+    // Handle click on "Select all" control
+    $('thead input[name="select_all"]', table_drafts.table().container()).on('click', function(e){
       if(this.checked){
          $('#datatable_drafts tbody input[type="checkbox"]:not(:checked)').trigger('click');
       } else {
@@ -750,13 +758,16 @@ function init_datatables_drafts(url) {
       }
       // Prevent click event from propagating to parent
       e.stopPropagation();
-   });
+    });
 
-   // Handle table draw event
-   table_drafts.on('draw', function(){
+    // Handle table draw event
+    table_drafts.on('draw', function(){
       // Update state of "Select all" control
       updateDataTableSelectAllCtrl(table_drafts);
-   });
+    });
+
+    var producerDraftsTableSettings = loadTableSettings(table_columns_drafts, 'producerDraftsTableSettings')
+    showHideTableColumns(table_drafts, producerDraftsTableSettings, 'drafts')
   }
 }
 
@@ -821,6 +832,8 @@ function init_datatables_corrections(url) {
       }
     })
     window.table_corrections = table_corrections
+    var producerErrorsTableSettings = loadTableSettings(table_columns_producers_corrections, 'producerErrorsTableSettings')
+    showHideTableColumns(table_corrections, producerErrorsTableSettings, 'errors')
   }
 }
 
@@ -888,5 +901,7 @@ function init_datatables_validated(url) {
       }
     })
     window.table_valid = table_valid
+    var producerValidTableSettings = loadTableSettings(table_columns_producers_validated, 'producerValidTableSettings')
+    showHideTableColumns(table_valid, producerValidTableSettings, 'valid')
   }
 }
