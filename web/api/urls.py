@@ -42,7 +42,9 @@ urlpatterns = [
     path('producers/lot/delete', views.producers_delete_lots, name='producers-api-delete-lots'),
     path('producers/lot/validate', views.producers_validate_lots, name='producers-api-validate-lots'),
     path('producers/lot/comments', views.producers_lot_comments, name='producers-api-lot-comments'),
-    path('producers/attestation/export', views.producers_attestation_export, name='producers-api-attestation-export'),
+    path('producers/export/drafts', views.producers_attestation_export_drafts, name='producers-api-attestation-export-drafts'),
+    path('producers/export/valid', views.producers_attestation_export_valid, name='producers-api-attestation-export-valid'),
+
     path('producers/lot/save-comment', views.producers_lot_save_comment, name='producers-api-save-comment'),
     path('producers/lot/errors', views.producers_lot_errors, name='producers-api-lot-errors'),
 
