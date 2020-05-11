@@ -62,12 +62,12 @@ var table_columns_producers_validated = [
 {title:'Période', can_hide: true, data:'period'},
 {title:'Numéro de lot', can_hide: true, data:'carbure_id'},
 {title:'Producteur', can_hide: true, data:'producer_name'},
-{title:'Site de<br />Production', can_hide: true, can_filter: true, orderable: false, data:'production_site_name'},
+{title:'Site de<br />Production', filter_title: 'Site', can_hide: true, can_filter: true, orderable: false, data:'production_site_name'},
 {title:'Client', can_hide: true, can_filter: true, orderable: false, data: 'ea_name'},
 {title:'Volume<br /> à 20°C<br />en Litres', can_hide: true, data: 'volume'},
 {title:'Biocarburant', can_hide: true, can_filter: true, orderable: false, data: 'biocarburant_name'},
-{title:'Matière<br /> Première', can_hide: true, can_filter: true, orderable: false, can_export: true, data: 'matiere_premiere_name'},
-{title:`Pays<br /> d'origine`, can_hide: true, can_filter: true, orderable: false, can_export: true, data: 'pays_origine_name'},
+{title:'Matière<br /> Première', filter_title: 'MP', can_hide: true, can_filter: true, orderable: false, can_export: true, data: 'matiere_premiere_name'},
+{title:`Pays<br /> d'origine`, filter_title: 'Pays', can_hide: true, can_filter: true, orderable: false, can_export: true, data: 'pays_origine_name'},
 {title:'EEC', can_hide: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
 {title:'EL', can_hide: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
 {title:'EP', can_hide: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'},
@@ -610,9 +610,6 @@ function init_datatables_drafts(url) {
       scrollX: true,
       scrollY: 1000,
       scrollCollapse: true,
-      fixedColumns: {
-      	leftColumns: 1,
-      },
       language: {
           search: "Rechercher:",
           paginate: {
