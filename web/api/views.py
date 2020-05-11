@@ -958,31 +958,6 @@ def operators_lot_comments(request, *args, **kwargs):
     comments = LotComment.objects.filter(lot_id=lot_id)
     return JsonResponse([{'comment':c.comment, 'from':c.entity.name if c.entity else ''} for c in comments], safe=False)
 
-@login_required
-@enrich_with_user_details
-@restrict_to_operators
-def operators_settings_add_depot(request, *args, **kwargs):
-  context = kwargs['context']
-
-  country = request.POST.get('country')
-  name = request.POST.get('name')
-
-  if country == None:
-    return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ Pays"}, status=400)
-  if name == None:
-    return JsonResponse({'status':'error', 'message':"Veuillez entrer une valeur dans le champ Nom"}, status=400)
-
-  try:
-    country = Pays.objects.get(name__icontains=country)
-  except Exception as e:
-    return JsonResponse({'status':'error', 'message':"Veuillez choisir un Pays dans la liste", 'extra':str(e)}, status=400)
-
-  try:
-    obj, created = OperatorDepot.objects.update_or_create(operator=context['user_entity'], country=country, name=name)
-  except Exception as e:
-    return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
-  return JsonResponse({'status':'success', 'message':'Depot added'})
-
 # admin autocomplete helpers
 @login_required
 @enrich_with_user_details

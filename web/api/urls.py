@@ -54,7 +54,6 @@ urlpatterns = [
     path('operators/lots/reject', views.operators_lot_reject, name='operators-api-reject-lots'),
     path('operators/lots/<int:declaration_id>', views.operators_lots, name='operators-api-lots'),
     path('operators/lot/comments', views.operators_lot_comments, name='operators-api-lot-comments'),
-    path('operators/settings/add-depot', views.operators_settings_add_depot, name='operators-api-settings-add-depot'),
     path('operators/declaration/<int:declaration_id>/export', views.operators_declaration_export, name='operators-api-declaration-export'),
 
 
