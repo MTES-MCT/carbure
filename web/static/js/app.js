@@ -267,9 +267,14 @@ $("form").submit(function(event) {
   event.preventDefault()
 })
 
-$("#pagelength").on('change', function() {
-  let pagelength = $("#pagelength").val()
-  table.page.len(pagelength).draw()
+$("#pagelength_drafts").on('change', function() {
+  let pagelength = $("#pagelength_drafts").val()
+  table_drafts.page.len(pagelength).draw()
+})
+
+$("#pagelength_valid").on('change', function() {
+  let pagelength = $("#pagelength_valid").val()
+  table_valid.page.len(pagelength).draw()
 })
 
 function loadTableSettings(table_columns, table_name) {
@@ -605,6 +610,9 @@ function init_datatables_drafts(url) {
       scrollX: true,
       scrollY: 1000,
       scrollCollapse: true,
+      fixedColumns: {
+      	leftColumns: 1,
+      },
       language: {
           search: "Rechercher:",
           paginate: {
@@ -780,6 +788,10 @@ function init_datatables_corrections(url) {
       scrollY: 1000,
       scrollCollapse: true,
       dom: 't',
+      fixedColumns: {
+      	leftColumns: 0,
+      	rightColumns: 1,
+      },
       columns: table_columns_producers_corrections,
       ajax: {
         url: url,
@@ -849,6 +861,10 @@ function init_datatables_validated(url) {
       scrollY: 1000,
       scrollCollapse: true,
       dom: 't',
+      fixedColumns: {
+      	leftColumns: 0,
+      	rightColumns: 1,
+      },
       columns: table_columns_producers_validated,
       ajax: {
         url: url,
