@@ -49,14 +49,14 @@ urlpatterns = [
     path('producers/lot/errors', views.producers_lot_errors, name='producers-api-lot-errors'),
 
     # private, operators
+    path('operators/lots', views.operators_lots, name='operators-api-lots'),
     path('operators/lots-affilies', views.operators_lots_affilies, name='operators-api-affiliated-lots'),
     path('operators/lots/accept', views.operators_lot_accept, name='operators-api-accept-lots'),
     path('operators/lots/accept-correction', views.operators_lot_accept_correction, name='operators-api-accept-lot-correction'),
     path('operators/lots/accept-with-comment', views.operators_lot_accept_with_comment, name='operators-api-accept-lot-with-comment'),
     path('operators/lots/reject', views.operators_lot_reject, name='operators-api-reject-lots'),
-    path('operators/lots/<int:declaration_id>', views.operators_lots, name='operators-api-lots'),
-    path('operators/lot/comments', views.operators_lot_comments, name='operators-api-lot-comments'),
-    path('operators/declaration/<int:declaration_id>/export', views.operators_declaration_export, name='operators-api-declaration-export'),
+    path('operators/lots/comments', views.operators_lot_comments, name='operators-api-lot-comments'),
+    path('operators/lots/export', views.operators_export_lots, name='operators-api-declaration-export'),
 
 
 
