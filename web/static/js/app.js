@@ -519,10 +519,8 @@ function manage_actions() {
   // if one of the rows is a draft, button Valider is active
   let draft_present = false
   let only_drafts_present = true
-  console.log(`${selected_rows.length} selected rows: ${selected_rows}`)
   for (let i = 0, len = selected_rows.length; i < len; i++) {
     let rowdata = table_drafts.row(selected_rows[i]).data()
-    console.log(`selected row ${selected_rows[i]}: ${JSON.stringify(rowdata)}`)
     let statut = rowdata['status']
     if (statut.toLowerCase() === "draft") {
       draft_present = true
@@ -1120,11 +1118,10 @@ $(".ges_field").on('change', function() {
   $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${ref} gCO2eq/MJ`)
 })
 
-
+$(document).ready(function() {
 $(".autocomplete_mps").autocomplete({
   serviceUrl: window.producers_api_mps_autocomplete,
   dataType: 'json',
-  params: {'producer_id': '{{user_entity.id}}' },
   minChars: 0,
   onSelect: function(suggestion) {
     $("#matiere_premiere_code").val(suggestion.data)
@@ -1142,7 +1139,6 @@ $(".autocomplete_mps").autocomplete({
 $(".autocomplete_biocarburants").autocomplete({
   serviceUrl: window.producers_api_biocarburants_autocomplete,
   dataType: 'json',
-  params: {'producer_id': '{{user_entity.id}}' },
   minChars: 0,
   onSelect: function(suggestion) {
     $("#biocarburant_code").val(suggestion.data)
@@ -1159,7 +1155,6 @@ $(".autocomplete_biocarburants").autocomplete({
 $(".autocomplete_production_sites").autocomplete({
   serviceUrl: window.producers_api_production_sites_autocomplete,
   dataType: 'json',
-  params: {'producer_id': '{{user_entity.id}}' },
   minChars: 0,
 })
 
@@ -1179,6 +1174,10 @@ $(".autocomplete_operators").autocomplete({
   dataType: 'json',
   minChars: 0,
 })
+
+
+})
+
 
 function hideTab(tab_name) {
   // hide content

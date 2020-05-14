@@ -248,8 +248,8 @@ def producers_lot_save_comment(request, *args, **kwargs):
 def producers_prod_site_autocomplete(request, *args, **kwargs):
   context = kwargs['context']
   q = request.GET['query']
-  producer_id = request.GET['producer_id']
-  production_sites = ProductionSite.objects.filter(producer=producer_id, name__icontains=q)
+  producer = context['user_entity']
+  production_sites = ProductionSite.objects.filter(producer=producer, name__icontains=q)
   return JsonResponse({'suggestions': [{'value':s.name, 'data':s.id} for s in production_sites]})
 
 @login_required
@@ -258,10 +258,10 @@ def producers_prod_site_autocomplete(request, *args, **kwargs):
 def producers_biocarburant_autocomplete(request, *args, **kwargs):
   context = kwargs['context']
   q = request.GET['query']
-  producer_id = request.GET['producer_id']
+  producer = context['user_entity']
   production_site = request.GET.get('production_site', None)
   if production_site == None:
-    production_sites = ProductionSite.objects.filter(producer=producer_id)
+    production_sites = ProductionSite.objects.filter(producer=producer)
     outputs = ProductionSiteOutput.objects.filter(production_site__in=production_sites, biocarburant__name__icontains=q).values('biocarburant').distinct()
   else:
     outputs = ProductionSiteOutput.objects.filter(production_site=production_site, biocarburant__name__icontains=q).values('biocarburant').distinct()
@@ -274,10 +274,10 @@ def producers_biocarburant_autocomplete(request, *args, **kwargs):
 def producers_mp_autocomplete(request, *args, **kwargs):
   context = kwargs['context']
   q = request.GET['query']
-  producer_id = request.GET['producer_id']
+  producer = context['user_entity']
   production_site = request.GET.get('production_site', None)
   if production_site == None:
-    production_sites = ProductionSite.objects.filter(producer=producer_id)
+    production_sites = ProductionSite.objects.filter(producer=producer)
     inputs = ProductionSiteInput.objects.filter(production_site__in=production_sites, matiere_premiere__name__icontains=q).values('matiere_premiere').distinct()
   else:
     inputs = ProductionSiteInput.objects.filter(production_site=production_site, matiere_premiere__name__icontains=q).values('matiere_premiere').distinct()
