@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from core.decorators import enrich_with_user_details, restrict_to_operators
-from operators.models import OperatorDeclaration, AcceptedLot, OperatorDepot
 
 import datetime
 import calendar
