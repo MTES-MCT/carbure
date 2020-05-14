@@ -5,7 +5,6 @@ from django.contrib.auth import get_user_model
 
 from core.models import Entity, UserRights
 from producers.models import *
-from operators.models import OperatorDeclaration
 from django.core.files.base import ContentFile
 
 import datetime
@@ -34,25 +33,6 @@ class TestOperatorsUrlsAsProducer(TestCase):
 
     def test_access_operators_index(self):
         response = self.client.get(reverse('operators-index', kwargs={'operator_name':self.operator_entity.url_friendly_name()}))
-        self.assertEqual(response.status_code, 403)
-
-    def test_access_operators_declaration(self):
-        # ensure some declarations exist
-
-        # logout producer
-        self.client.logout()
-
-        # login as an operator and go to index (forces creation of declarations)
-        self.client.login(username='testoperator@almalexia.org', password='totopouet42')
-        response = self.client.get(reverse('operators-index', kwargs={'operator_name':self.operator_entity.url_friendly_name()}))
-        self.assertEqual(response.status_code, 200)
-        self.client.logout()
-
-        # now we can logback as a producer
-        self.client.login(username='testproducer@almalexia.org', password='totopouet42')
-
-        declarations = OperatorDeclaration.objects.filter(operator=self.operator_entity)
-        response = self.client.get(reverse('operators-declaration', kwargs={'operator_name':self.operator_entity.url_friendly_name(), 'declaration_id':declarations[0].id}))
         self.assertEqual(response.status_code, 403)
 
     def test_access_operators_affiliations(self):

@@ -19,9 +19,6 @@ class OperatorsUrlsTest(TestCase):
     def test_index(self):
         response = self.client.get(reverse('operators-index', kwargs={'operator_name':'PETRO1'}))
         self.assertEqual(response.status_code, 200)
-        declarations = OperatorDeclaration.objects.filter(operator=self.entity)
-        response = self.client.get(reverse('operators-declaration', kwargs={'operator_name':'PETRO1', 'declaration_id':declarations[0].id}))
-        self.assertEqual(response.status_code, 200)
 
     def test_affiliations(self):
         response = self.client.get(reverse('operators-affiliations', kwargs={'operator_name':'PETRO1'}))
