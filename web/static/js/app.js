@@ -777,7 +777,7 @@ function init_datatables_drafts(url) {
     var producerDraftsTableSettings = loadTableSettings(table_columns_drafts, 'producerDraftsTableSettings')
     showHideTableColumns(table_drafts, producerDraftsTableSettings, 'drafts')
   } else {
-  	$('#datatable_drafts').table().draw()
+  	window.table_drafts.draw()
   }
 }
 
@@ -852,7 +852,7 @@ function init_datatables_corrections(url) {
     var producerErrorsTableSettings = loadTableSettings(table_columns_producers_corrections, 'producerErrorsTableSettings')
     showHideTableColumns(table_corrections, producerErrorsTableSettings, 'errors')
   } else {
-  	$('#datatable_corrections').table().draw()
+  	window.table_corrections.draw()
   }
 }
 
@@ -930,7 +930,7 @@ function init_datatables_validated(url) {
     var producerValidTableSettings = loadTableSettings(table_columns_producers_validated, 'producerValidTableSettings')
     showHideTableColumns(table_valid, producerValidTableSettings, 'valid')
   } else {
-  	$('#datatable_valid').table().draw()
+  	window.table_valid.draw()
   }
 }
 
