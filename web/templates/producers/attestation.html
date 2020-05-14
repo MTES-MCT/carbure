@@ -323,6 +323,9 @@
         </table>
       </div>
     </div>
+    <div class="form__group" id="comment_section">
+
+    </div>
     <div class="form__group button__group">
       <a class="button primary" id="btn_lot_save">Sauvegarder</a>
       <a class="button secondary close" id="btn_close_modal_edit_lot">Annuler</a>
@@ -335,67 +338,31 @@
 
 {% block extra_js %}
 <script type="text/javascript">
+window.producers_api_lot_errors = "{% url 'producers-api-lot-errors' %}"
+window.producers_api_lot_comments = "{% url 'producers-api-lot-comments' %}"
+window.producers_api_biocarburants_autocomplete = "{% url 'producers-api-biocarburants-autocomplete' %}"
+window.producers_api_attestation_save_lot = "{% url 'producers-api-attestation-save-lot' %}"
+window.producers_api_lots_drafts = "{% url 'api-producers-lots-drafts' %}"
+window.producers_api_lots_corrections = "{% url 'api-producers-lots-corrections' %}"
+window.producers_api_lots_valid = "{% url 'api-producers-lots-valid' %}"
+window.producers_api_ges = "{% url 'producers-api-ges' %}"
+window.producers_api_mps_autocomplete = "{% url 'producers-api-mps-autocomplete' %}"
+window.producers_api_production_sites_autocomplete = "{% url 'producers-api-production-sites-autocomplete' %}"
+window.api_country_autocomplete = "{% url 'api-country-autocomplete' %}"
+window.api_operators_autocomplete = "{% url 'api-operators-autocomplete' %}"
+
+
 $(document).ready(function() {
   initDuplicateParams(table_columns_drafts)
   initFilters(table_columns_drafts, 'drafts')
   initFilters(table_columns_producers_corrections, 'errors')
   initFilters(table_columns_producers_validated, 'valid')
 
-  function hideTab(tab_name) {
-    // hide content
-    tabcontent = document.getElementById(tab_name)
-    tabcontent.style.display = "none";
-    // change title class
-    tabtitle = document.getElementById(`${tab_name}_title`)
-    tabtitle.className = tabtitle.className.replace(" tabs__tab--selected", "")
-  }
-
-  function showTab(tab_name) {
-    // change title class
-    tabtitle = document.getElementById(`${tab_name}_title`)
-    tabtitle.className += " tabs__tab--selected"
-    // show content
-    tabcontent = document.getElementById(tab_name)
-    tabcontent.style.display = "block";
-  }
-
-  $("#tab_drafts_title").on('click', function() {
-    // hide tabs valid & corrections
-    hideTab("tab_valid")
-    hideTab("tab_errors")
-    // show drafts
-    showTab("tab_drafts")
-    init_datatables_drafts(`{% url 'api-producers-lots-drafts' %}`)
-  })
-
-  $("#tab_errors_title").on('click', function() {
-    // hide tabs valid & corrections
-    hideTab("tab_valid")
-    hideTab("tab_drafts")
-    // show drafts
-    showTab("tab_errors")
-    init_datatables_corrections(`{% url 'api-producers-lots-corrections' %}`)
-  })
-
-
-  $("#tab_valid_title").on('click', function() {
-    // hide tabs valid & corrections
-    hideTab("tab_drafts")
-    hideTab("tab_errors")
-    // show drafts
-    showTab("tab_valid")
-    init_datatables_validated(`{% url 'api-producers-lots-valid' %}`)
-  })
-
   // by default, show drafts
   document.getElementById("tab_drafts").style.display = "block";
-  init_datatables_drafts(`{% url 'api-producers-lots-drafts' %}`)
+  init_datatables_drafts(window.producers_api_lots_drafts)
   var addLotSettings = loadAddLotSettings()
   preCheckAddLotSettings(addLotSettings)
-
-
-
-
 
   /* column filter modal event management */
   $('.toggle-vis').on('click', function(e) {
@@ -509,244 +476,12 @@ $(document).ready(function() {
 
   manage_actions()
 
-  $('#datatable_drafts_wrapper tbody').on('click', 'td', function() {
-    // check if we clicked on the checkbox
-    let cell = table_drafts.cell(this)
-    let colid = cell.index()['column']
-    let row = $(this).closest('tr');
-    let data = table_drafts.row(row).data()
-    let table_column = table_columns_drafts[colid]
-    if (table_column['data'] === 'checkbox') {
-      // ignore clicks on checkbox column
-      return
-    } else {
-      let modal = document.getElementById("modal_edit_lot")
-      for (key in data) {
-        // set the value in the field
-        $(`#${key}`).val(data[key])
-        // reset error field to none
-        $(`#${key}_error`).html('')
-      }
-
-      // override errors into the field
-      let lot_id = data['lot_id']
-      if (lot_id in lot_errors) {
-        let errors = lot_errors[lot_id]
-        for (key in errors) {
-          $(`#${key}`).val(errors[key])
-        }
-      }
-
-      // non-input keys
-      ['ghg_total', 'ghg_reduction'].forEach(function(item, index) {
-        $(`#${item}`).html(data[item])
-      })
-      $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data['ghg_reference']} gCO2eq/MJ`)
-
-      /* load errors */
-      $.ajax({url: "{% url 'producers-api-lot-errors' %}",
-        data: {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
-        type        : 'POST',
-        success     : function(data, textStatus, jqXHR){
-          // Callback code
-          // load existing errors into the form
-          for (let i = 0, len = data.length; i < len; i++) {
-            let dom = $(`#${data[i].field}_error`)
-            dom.html(`${data[i].error}`)
-          }
-        },
-        error       : function(e) {
-          if (e.status === 400) {
-            alert(e.responseJSON.message)
-            console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-          } else {
-            alert("Server error. Please contact an administrator")
-            console.log(`server error ${JSON.stringify(e)}`)
-          }
-        }
-      })
-
-      /* warning if the lot is validated */
-      if (data['status'] == 'Validated') {
-        let message = `<h3>Lot ${data['carbure_id']}</h3>
-                       <h5 style="color: tomato">Attention, ce lot a déjà été déclaré à la DGEC et affilié à un client.</h5>
-                       <span>Toute modification leur sera automatiquement notifiée et devra être acceptée par le client.</span>`
-        $("#err_msg_dom").html(message)
-      } else {
-        $("#err_msg_dom").html('')
-      }
-      modal.style.display = "flex"
-    }
-  });
-
   $("#add_lot_params").on('click', function() {
     $("#add_lot_params_toggle").toggle();
   });
 })
-// fixed column styling on row hover
-$(document).on({
-  mouseenter: function () {
-    trIndex = $(this).index();
-    $("#datatable tbody").each(function(index) {
-      $(this).find("tr:eq("+trIndex+")").addClass("hover")
-    });
-    $("table.dataTable.DTFC_Cloned tbody").each(function(index) {
-      $(this).find("tr:eq("+trIndex+")").addClass("hover")
-    });
-  },
-  mouseleave: function () {
-    trIndex = $(this).index();
-    $("#datatable tbody").each(function(index) {
-      $(this).find("tr:eq("+trIndex+")").removeClass("hover");
-    });
-    $("table.dataTable.DTFC_Cloned tbody").each(function(index) {
-      $(this).find("tr:eq("+trIndex+")").removeClass("hover");
-    });
-  }
-}, ".dataTables_wrapper tbody tr");
 
 $("#btn_lot_save").on('click', handleSave)
-
-function handleSave(action) {
-  var err_msg_dom = $("#err_msg_dom")
-  err_msg_dom.empty()
-  var formdata = new FormData();
-  formdata.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
-  $(".modal-edit input").each(function() {
-    formdata.set($(this).attr('id'), $(this).val())
-  })
-
-  // post form
-  $.ajax({
-    url         : "{% url 'producers-api-attestation-save-lot' %}",
-    data        : formdata,
-    cache       : false,
-    contentType : false,
-    processData : false,
-    type        : 'POST',
-    success     : function(data, textStatus, jqXHR) {
-      // Callback code
-      /* if errors, display them and stay on page */
-      if (data.errors.length > 0) {
-        err_msg_dom.append('<ul style="color: tomato;" id="errors_list"></ul>')
-        let err_list = $("#errors_list")
-        for (let i = 0, len = data.errors.length; i < len; i++) {
-          err_list.append(`<li>${data.errors[i].error}</li>`)
-        }
-      } else {
-        /* otherwise reload page */
-        window.location.reload()
-      }
-    },
-    error       : function(e) {
-      if (e.status === 400) {
-        err_msg_dom.html(`${e.responseJSON.message}`)
-      } else {
-        alert("Server error. Please contact an administrator")
-      }
-    }
-  })
-}
-
-function load_ges(mp, bc) {
-  $.ajax({
-    url         : "{% url 'producers-api-ges' %}" + `?mp=${mp}&bc=${bc}`,
-    cache       : false,
-    contentType : false,
-    processData : false,
-    type        : 'GET',
-    success     : function(data, textStatus, jqXHR) {
-      // Callback code
-      $.each(data, function(key, value) {
-        $(`#${key}`).val(value)
-      })
-      $("#eec").change()
-    },
-    error       : function(e) {
-      if (e.status === 400) {
-        alert(e.responseJSON.message)
-      } else {
-        alert("Server error. Please contact an administrator")
-      }
-    }
-  })
-}
-
-$(".ges_field").on('change', function() {
-  var sum_incr = 0
-  var sum_decr = 0
-  var ref = parseFloat($("#ghg_reference").val())
-  $(".ges_incr").each(function(index, elem) {
-    sum_incr += parseFloat(elem.value)
-  })
-  $(".ges_decr").each(function(index, elem) {
-    sum_decr += parseFloat(elem.value)
-  })
-  var sum = sum_incr - sum_decr
-  $("#ghg_total").text(sum.toFixed(2))
-  var pct_reduction = (1.0 - (sum / ref)) * 100
-  $("#ghg_reduction").text(`${pct_reduction.toFixed(2)}%`)
-  $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${ref} gCO2eq/MJ`)
-})
-
-$(".autocomplete_mps").autocomplete({
-  serviceUrl: "{% url 'producers-api-mps-autocomplete' %}",
-  dataType: 'json',
-  params: {'producer_id': '{{user_entity.id}}' },
-  minChars: 0,
-  onSelect: function(suggestion) {
-    $("#matiere_premiere_code").val(suggestion.data)
-    let selected_bc = $("#biocarburant_code").val()
-    if (selected_bc !== '') {
-      load_ges(suggestion.data, selected_bc)
-    }
-  },
-  onInvalidateSelection: function() {
-    $("#matiere_premiere_code").val('')
-  },
-  showNoSuggestionNotice: true,
-})
-
-$(".autocomplete_biocarburants").autocomplete({
-  serviceUrl: "{% url 'producers-api-biocarburants-autocomplete' %}",
-  dataType: 'json',
-  params: {'producer_id': '{{user_entity.id}}' },
-  minChars: 0,
-  onSelect: function(suggestion) {
-    $("#biocarburant_code").val(suggestion.data)
-    let selected_mp = $("#matiere_premiere_code").val()
-    if (selected_mp !== '') {
-      load_ges(selected_mp, suggestion.data)
-    }
-  },
-  onInvalidateSelection: function() {
-    $("#biocarburant_code").val('')
-  },
-})
-
-$(".autocomplete_production_sites").autocomplete({
-  serviceUrl: "{% url 'producers-api-production-sites-autocomplete' %}",
-  dataType: 'json',
-  params: {'producer_id': '{{user_entity.id}}' },
-  minChars: 0,
-})
-
-$(".autocomplete_countries").autocomplete({
-  serviceUrl: "{% url 'api-country-autocomplete' %}",
-  dataType: 'json',
-  onSelect: function(suggestion) {
-    $("#pays_origine_code").val(suggestion.data)
-  },
-  onInvalidateSelection: function() {
-    $("#pays_origine_code").val('')
-  }
-})
-
-$(".autocomplete_operators").autocomplete({
-  serviceUrl: "{% url 'api-operators-autocomplete' %}",
-  dataType: 'json',
-  minChars: 0,
-})
 
 </script>
 

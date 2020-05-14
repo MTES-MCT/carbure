@@ -715,13 +715,16 @@ function init_datatables_drafts(url) {
             });
             //initially clear select otherwise first option is selected
             $('.select2').val(null).trigger('change')
-          } else {
+ 		      } else {
             $(column.footer()).append(table_column.title)
           }
         }).draw()
       }
     })
 
+    $("#datatable_drafts tbody").on('click', 'td',  (e) => {
+      display_lot_modal(table_drafts, table_columns_drafts, e)
+    })
     window.table_drafts = table_drafts
     $('#input_search_datatable').on('keyup', function() {
         table_drafts.search(this.value).draw();
@@ -842,6 +845,9 @@ function init_datatables_corrections(url) {
         }).draw()
       }
     })
+    $("#datatable_corrections tbody").on('click', 'td',  (e) => {
+      display_lot_modal(table_corrections, table_columns_producers_corrections, e)
+    })
     window.table_corrections = table_corrections
     var producerErrorsTableSettings = loadTableSettings(table_columns_producers_corrections, 'producerErrorsTableSettings')
     showHideTableColumns(table_corrections, producerErrorsTableSettings, 'errors')
@@ -917,6 +923,9 @@ function init_datatables_validated(url) {
         }).draw()
       }
     })
+    $("#datatable_valid tbody").on('click', 'td', (e) => {
+      display_lot_modal(table_valid, table_columns_producers_validated, e)
+    })
     window.table_valid = table_valid
     var producerValidTableSettings = loadTableSettings(table_columns_producers_validated, 'producerValidTableSettings')
     showHideTableColumns(table_valid, producerValidTableSettings, 'valid')
@@ -924,3 +933,294 @@ function init_datatables_validated(url) {
   	$('#datatable_valid').table().draw()
   }
 }
+
+function display_lot_modal(table, columns, event) {
+  // check if we clicked on the checkbox
+  let colid = event.target._DT_CellIndex.column
+  let rowid = event.target._DT_CellIndex.row
+  let data = table.row(rowid).data()
+  let table_column = columns[colid]
+  let comment_section = $("#comment_section")
+  comment_section.empty()
+  if (table_column['data'] === 'checkbox') {
+    // ignore clicks on checkbox column
+    return
+  } else {
+    let modal = document.getElementById("modal_edit_lot")
+    for (key in data) {
+      // set the value in the field
+      $(`#${key}`).val(data[key])
+      // reset error field to none
+      $(`#${key}_error`).html('')
+    }
+
+    // override errors into the field
+    let lot_id = data['lot_id']
+    if (lot_id in lot_errors) {
+      let errors = lot_errors[lot_id]
+      for (key in errors) {
+        $(`#${key}`).val(errors[key])
+      }
+    }
+
+    // non-input keys
+    ['ghg_total', 'ghg_reduction'].forEach(function(item, index) {
+      $(`#${item}`).html(data[item])
+    })
+    $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data['ghg_reference']} gCO2eq/MJ`)
+
+    /* load errors */
+    $.ajax({url: window.producers_api_lot_errors,
+      data: {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+      type        : 'POST',
+      success     : function(data, textStatus, jqXHR){
+        // Callback code
+        // load existing errors into the form
+        for (let i = 0, len = data.length; i < len; i++) {
+          let dom = $(`#${data[i].field}_error`)
+          dom.html(`${data[i].error}`)
+        }
+      },
+      error       : function(e) {
+        if (e.status === 400) {
+          alert(e.responseJSON.message)
+          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+        } else {
+          alert("Server error. Please contact an administrator")
+          console.log(`server error ${JSON.stringify(e)}`)
+        }
+      }
+    })
+
+    /* load comments */
+    $.ajax({
+      url         : window.producers_api_lot_comments,
+      data        : {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+      type        : 'POST',
+      success     : function(d, textStatus, jqXHR){
+        // Callback code
+        // load existing comments into the form
+        for (let i = 0, len = d.length; i < len; i++) {
+          let c = d[i]
+          let html = `<p><b>${c.from}</b>: ${c.comment}</p>`
+          comment_section.append(html)
+        }
+        // add area to respond
+        if (data['status'] === "Draft" || data['ea_delivery_status'] === "Accepté") {
+          // do nothing
+        } else {
+          // add the ability to add a comment
+          let html = `<div style="display: flex;"><p>Ajouter un commentaire:</p><input type="text" name="textarea" id="textarea" style="max-width: 80%; height: 2em; margin-left: 10px; margin-top: auto; margin-bottom: auto;" /></div>`
+          comment_section.append(html)
+        }
+      },
+      error       : function(e) {
+        if (e.status === 400) {
+          alert(e.responseJSON.message)
+          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+        } else {
+          alert("Server error. Please contact an administrator")
+          console.log(`server error ${JSON.stringify(e)}`)
+        }
+      }
+    })
+
+    /* warning if the lot is validated */
+    if (data['status'] == 'Validated') {
+      let message = `<h3>Lot ${data['carbure_id']}</h3>
+      <h5 style="color: tomato">Attention, ce lot a déjà été déclaré à la DGEC et affilié à un client.</h5>
+      <span>Toute modification leur sera automatiquement notifiée et devra être acceptée par le client.</span>`
+      $("#err_msg_dom").html(message)
+    } else {
+      $("#err_msg_dom").html('')
+    }
+    modal.style.display = "flex"
+  }
+}
+
+function handleSave(action) {
+  var err_msg_dom = $("#err_msg_dom")
+  err_msg_dom.empty()
+  var formdata = new FormData();
+  formdata.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
+  $(".modal-edit input").each(function() {
+    formdata.set($(this).attr('id'), $(this).val())
+  })
+
+  // post form
+  $.ajax({
+    url         : window.producers_api_attestation_save_lot,
+    data        : formdata,
+    cache       : false,
+    contentType : false,
+    processData : false,
+    type        : 'POST',
+    success     : function(data, textStatus, jqXHR) {
+      // Callback code
+      /* if errors, display them and stay on page */
+      if (data.errors.length > 0) {
+        err_msg_dom.append('<ul style="color: tomato;" id="errors_list"></ul>')
+        let err_list = $("#errors_list")
+        for (let i = 0, len = data.errors.length; i < len; i++) {
+          err_list.append(`<li>${data.errors[i].error}</li>`)
+        }
+      } else {
+        /* otherwise reload page */
+        window.location.reload()
+      }
+    },
+    error       : function(e) {
+      if (e.status === 400) {
+        err_msg_dom.html(`${e.responseJSON.message}`)
+      } else {
+        alert("Server error. Please contact an administrator")
+      }
+    }
+  })
+}
+
+function load_ges(mp, bc) {
+  $.ajax({
+    url         : window.producers_api_ges + `?mp=${mp}&bc=${bc}`,
+    cache       : false,
+    contentType : false,
+    processData : false,
+    type        : 'GET',
+    success     : function(data, textStatus, jqXHR) {
+      // Callback code
+      $.each(data, function(key, value) {
+        $(`#${key}`).val(value)
+      })
+      $("#eec").change()
+    },
+    error       : function(e) {
+      if (e.status === 400) {
+        alert(e.responseJSON.message)
+      } else {
+        alert("Server error. Please contact an administrator")
+      }
+    }
+  })
+}
+
+$(".ges_field").on('change', function() {
+  var sum_incr = 0
+  var sum_decr = 0
+  var ref = parseFloat($("#ghg_reference").val())
+  $(".ges_incr").each(function(index, elem) {
+    sum_incr += parseFloat(elem.value)
+  })
+  $(".ges_decr").each(function(index, elem) {
+    sum_decr += parseFloat(elem.value)
+  })
+  var sum = sum_incr - sum_decr
+  $("#ghg_total").text(sum.toFixed(2))
+  var pct_reduction = (1.0 - (sum / ref)) * 100
+  $("#ghg_reduction").text(`${pct_reduction.toFixed(2)}%`)
+  $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${ref} gCO2eq/MJ`)
+})
+
+
+$(".autocomplete_mps").autocomplete({
+  serviceUrl: window.producers_api_mps_autocomplete,
+  dataType: 'json',
+  params: {'producer_id': '{{user_entity.id}}' },
+  minChars: 0,
+  onSelect: function(suggestion) {
+    $("#matiere_premiere_code").val(suggestion.data)
+    let selected_bc = $("#biocarburant_code").val()
+    if (selected_bc !== '') {
+      load_ges(suggestion.data, selected_bc)
+    }
+  },
+  onInvalidateSelection: function() {
+    $("#matiere_premiere_code").val('')
+  },
+  showNoSuggestionNotice: true,
+})
+
+$(".autocomplete_biocarburants").autocomplete({
+  serviceUrl: window.producers_api_biocarburants_autocomplete,
+  dataType: 'json',
+  params: {'producer_id': '{{user_entity.id}}' },
+  minChars: 0,
+  onSelect: function(suggestion) {
+    $("#biocarburant_code").val(suggestion.data)
+    let selected_mp = $("#matiere_premiere_code").val()
+    if (selected_mp !== '') {
+      load_ges(selected_mp, suggestion.data)
+    }
+  },
+  onInvalidateSelection: function() {
+    $("#biocarburant_code").val('')
+  },
+})
+
+$(".autocomplete_production_sites").autocomplete({
+  serviceUrl: window.producers_api_production_sites_autocomplete,
+  dataType: 'json',
+  params: {'producer_id': '{{user_entity.id}}' },
+  minChars: 0,
+})
+
+$(".autocomplete_countries").autocomplete({
+  serviceUrl: window.api_country_autocomplete,
+  dataType: 'json',
+  onSelect: function(suggestion) {
+    $("#pays_origine_code").val(suggestion.data)
+  },
+  onInvalidateSelection: function() {
+    $("#pays_origine_code").val('')
+  }
+})
+
+$(".autocomplete_operators").autocomplete({
+  serviceUrl: window.api_operators_autocomplete,
+  dataType: 'json',
+  minChars: 0,
+})
+
+function hideTab(tab_name) {
+  // hide content
+  tabcontent = document.getElementById(tab_name)
+  tabcontent.style.display = "none";
+  // change title class
+  tabtitle = document.getElementById(`${tab_name}_title`)
+  tabtitle.className = tabtitle.className.replace(" tabs__tab--selected", "")
+}
+
+function showTab(tab_name) {
+  // change title class
+  tabtitle = document.getElementById(`${tab_name}_title`)
+  tabtitle.className += " tabs__tab--selected"
+  // show content
+  tabcontent = document.getElementById(tab_name)
+  tabcontent.style.display = "block";
+}
+
+$("#tab_drafts_title").on('click', function() {
+  // hide tabs valid & corrections
+  hideTab("tab_valid")
+  hideTab("tab_errors")
+  // show drafts
+  showTab("tab_drafts")
+  init_datatables_drafts(window.producers_api_lots_drafts)
+})
+
+$("#tab_errors_title").on('click', function() {
+  // hide tabs valid & corrections
+  hideTab("tab_valid")
+  hideTab("tab_drafts")
+  // show drafts
+  showTab("tab_errors")
+  init_datatables_corrections(window.producers_api_lots_corrections)
+})
+
+$("#tab_valid_title").on('click', function() {
+  // hide tabs valid & corrections
+  hideTab("tab_drafts")
+  hideTab("tab_errors")
+  // show drafts
+  showTab("tab_valid")
+  init_datatables_validated(window.producers_api_lots_valid)
+})
