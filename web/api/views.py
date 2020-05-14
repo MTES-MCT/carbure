@@ -825,13 +825,11 @@ def producers_lot_errors(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_operators
-def operators_declaration_export(request, *args, **kwargs):
+def operators_export_lots(request, *args, **kwargs):
   context = kwargs['context']
-  declaration_id = kwargs['declaration_id']
   today = datetime.datetime.now()
   filename = 'export_%s.csv' % (today.strftime('%Y%m%d_%H%M%S'))
-  declaration = OperatorDeclaration.objects.get(operator=context['user_entity'], id=declaration_id)
-  lots = [l.lot for l in AcceptedLot.objects.filter(declaration=declaration)]
+  lots = Lot.objects.filter(ea=context['user_entity'], ea_delivery_status='A')
   buffer = io.BytesIO()
   buffer.write("carbure_id;producer;production_site;volume;code_biocarburant;biocarburant;code_matiere_premiere;matiere_premiere;code_pays_origine;pays_origine;eec;el;ep;etd;eu;esca;eccs;eccr;eee;ghg_total;ghg_reference;ghg_reduction;dae;client_id;ea_delivery_date;ea;ea_delivery_site\n".encode())
   for lot in lots:
@@ -879,8 +877,6 @@ def operators_lot_accept(request, *args, **kwargs):
   for lotid in ids:
     lot = Lot.objects.get(id=lotid, ea=context['user_entity'])
     try:
-      declaration = OperatorDeclaration.objects.get(operator=context['user_entity'], period=lot.attestation.period)
-      accepted, created = AcceptedLot.objects.update_or_create(operator=context['user_entity'], declaration=declaration, lot=lot)
       lot.ea_delivery_status = 'A'
       lot.save()
     except Exception as e:
@@ -916,8 +912,6 @@ def operators_lot_accept_with_comment(request, *args, **kwargs):
     return JsonResponse({'status':'error', 'message':'Veuillez entrer un commentaire'}, status=400)
   lot = Lot.objects.get(id=lot_id, ea=context['user_entity'])
   try:
-    declaration = OperatorDeclaration.objects.get(operator=context['user_entity'], period=lot.attestation.period)
-    accepted, created = AcceptedLot.objects.update_or_create(operator=context['user_entity'], declaration=declaration, lot=lot)
     lot.ea_delivery_status = 'AC'
     lot.save()
     lc = LotComment()
@@ -958,9 +952,7 @@ def operators_lot_reject(request, *args, **kwargs):
 @restrict_to_operators
 def operators_lots(request, *args, **kwargs):
   context = kwargs['context']
-  declaration_id = kwargs['declaration_id']
-  acceptedlots = AcceptedLot.objects.filter(declaration_id=declaration_id)
-  lots = [l.lot for l in acceptedlots]
+  lots = Lot.objects.filter(ea=context['user_entity'], ea_delivery_status='A')
   return JsonResponse([{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id,
   'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
   'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date, 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
