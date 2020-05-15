@@ -20,10 +20,6 @@ class OperatorsUrlsTest(TestCase):
         response = self.client.get(reverse('operators-index', kwargs={'operator_name':'PETRO1'}))
         self.assertEqual(response.status_code, 200)
 
-    def test_affiliations(self):
-        response = self.client.get(reverse('operators-affiliations', kwargs={'operator_name':'PETRO1'}))
-        self.assertEqual(response.status_code, 200)
-
     def test_controles(self):
         response = self.client.get(reverse('operators-controles', kwargs={'operator_name':'PETRO1'}))
         self.assertEqual(response.status_code, 200)
