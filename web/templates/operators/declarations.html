@@ -2,60 +2,63 @@
 
 {% block content  %}
 <div class="main" style="overflow-x: auto;">
-	<div class="panel">
-		<h3>Déclarations de durabilité</h3>
-		<table class="display nowrap" id="datatable">
-			<thead>
-				<tr>
-					<th>Période</th>
-					<th>Lots</th>
-					<th>Lots en attente</th>
-					<th>Échéance</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for d in declarations %}
-				<tr
-					{% if d.deadline > today and d.deadline < twoweeks %}
-					class="status_warning"
-					{% elif d.deadline > today %}
-					class="clickable"
-					{% else %}
-					class="status_ok"
-					{% endif %}
-					onclick="window.location='{% url 'operators-declaration' declaration_id=d.id operator_name=url_friendly_name %}'">
-					<td>{{d.period}}</td>
-					<td>{{d.lots}}</td>
-					<td>{{d.lots_en_attente}}</td>
-					<td>{{d.deadline}}</td>
-				</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-	</div>
+  <div class="panel">
+    <h3>Déclaration de durabilité</h3>
+    {% csrf_token %}
+
+    <ul class="tabs__tab-list">
+      <li id="tab_operators_affiliations_title" class="tabs__tab tabs__tab--selected" data-dst="tab_operators_affiliations">Lots en Attente ({{nb_affiliated_lots}})</li>
+      <li id="tab_operators_declared_title" class="tabs__tab" data-dst="tab_operators_declared">Lots déclarés ({{nb_declared}})</li>
+    </ul>
+
+    <div id="tab_operators_affiliations" class="tabcontent">
+      <table class="display nowrap" id="datatable_affiliations">
+        <!-- dynamically generated in js -->
+        <thead></thead>
+        <tfoot></tfoot>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="tab_operators_declared" class="tabcontent">
+      <div class="flex-container">
+        <a id="btn_open_modal_columns_valid" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
+          <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
+        </a>
+        <a class="button modal-button" href="{% url 'operators-api-declaration-export' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
+          <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
+        </a>
+        <select id="pagelength_valid" style="margin-top: auto;">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        <label for="input_search_datatable_valid" style="margin: auto 5px auto auto;">Rechercher:</label>
+        <input type="text" id="input_search_datatable_valid" style="width: 200px; margin-top: auto;" />
+      </div>
+
+
+      <table class="display nowrap" id="datatable_declared">
+        <!-- dynamically generated in js -->
+        <thead></thead>
+        <tfoot></tfoot>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 
 {% block extra_js %}
 <script type="text/javascript">
+window.operators_api_affiliated_lots = "{% url 'operators-api-affiliated-lots' %}"
+window.operators_api_declared_lots = "{% url 'operators-api-declared-lots' %}"
+
 $(document).ready(function() {
-	var table = $('#datatable').DataTable({
-		paging: false,
-		info: false,
-		scrollX: true,
-		searching: false,
-		ordering: false,
-		autoWidth: false,
-		scrollCollapse: true,
-		order: [[ 0, "desc" ]],
-		data: null,
-		columnDefs: [
-    		{"className": "dt-center", "targets": "_all"}
-  		],
-	});
+  document.getElementById("tab_operators_affiliations").style.display = "block";
+  init_datatables_operators_affiliations()
 })
-
 </script>
-
 {% endblock %}

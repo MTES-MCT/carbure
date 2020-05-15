@@ -853,7 +853,7 @@ def operators_export_lots(request, *args, **kwargs):
 def operators_lots_affilies(request, *args, **kwargs):
   context = kwargs['context']
   lots = Lot.objects.filter(ea=context['user_entity'], status='Validated').exclude(ea_delivery_status__in=['A', 'R'])
-  return JsonResponse([{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id,
+  return JsonResponse([{'period':l.period, 'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id,
   'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
   'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date, 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
   'volume':l.volume, 'matiere_premiere_code':l.matiere_premiere.code if l.matiere_premiere else '',
@@ -953,7 +953,7 @@ def operators_lot_reject(request, *args, **kwargs):
 def operators_lots(request, *args, **kwargs):
   context = kwargs['context']
   lots = Lot.objects.filter(ea=context['user_entity'], ea_delivery_status='A')
-  return JsonResponse([{'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id,
+  return JsonResponse([{'period':l.period, 'carbure_id': l.carbure_id, 'producer_name':l.producer.name if l.producer else '', 'producer_id':l.producer.id,
   'production_site_name':l.production_site.name if l.production_site else '', 'production_site_id':l.production_site.id if l.production_site else None,
   'dae':l.dae, 'ea_delivery_date':l.ea_delivery_date, 'ea_delivery_site':l.ea_delivery_site, 'ea_name':l.ea.name if l.ea else '', 'ea_id':l.ea.id if l.ea else None,
   'volume':l.volume, 'matiere_premiere_code':l.matiere_premiere.code if l.matiere_premiere else '',
