@@ -80,30 +80,17 @@ table > tbody > tr > td {
   line-height: 1em;
 }
 
-# > tbody > tr.status_ok,
-#datatable_drafts > tbody > tr.status_ok td.sorting_1,
-#datatable_drafts_wrapper > div > div.DTFC_LeftWrapper > div.DTFC_LeftBodyWrapper > div > table > tbody > tr.status_ok,
-#datatable_drafts_wrapper > div > div.DTFC_LeftWrapper > div.DTFC_LeftBodyWrapper > div > table > tbody > tr.status_ok td.sorting_1,
-#datatable_drafts_wrapper > div > div.DTFC_RightWrapper > div.DTFC_RightBodyWrapper > div > table > tbody > tr.status_ok,
-#datatable_drafts_wrapper > div > div.DTFC_RightWrapper > div.DTFC_RightBodyWrapper > div > table > tbody > tr.status_ok td.sorting_1 {
+tr.status_ok,
+tr.status_ok td.sorting_1 {
   background: var(--light-green);
-  cursor: pointer;
 }
-
-#datatable_drafts > tbody > tr.status_warning,
-#datatable_drafts > tbody > tr.status_warning td.sorting_1,
-#datatable_drafts_wrapper > div > div.DTFC_LeftWrapper > div.DTFC_LeftBodyWrapper > div > table > tbody > tr.status_warning,
-#datatable_drafts_wrapper > div > div.DTFC_LeftWrapper > div.DTFC_LeftBodyWrapper > div > table > tbody > tr.status_warning td.sorting_1,
-#datatable_drafts_wrapper > div > div.DTFC_RightWrapper > div.DTFC_RightBodyWrapper > div > table > tbody > tr.status_warning,
-#datatable_drafts_wrapper > div > div.DTFC_RightWrapper > div.DTFC_RightBodyWrapper > div > table > tbody > tr.status_warning td.sorting_1 {
+tr.status_warning,
+tr.status_warning td.sorting_1 {
   background: var(--light-orange);
-  cursor: pointer;
 }
 
-#datatable_drafts_wrapper tbody tr.hover,
-#datatable_drafts_wrapper tbody tr.hover td.sorting_1,
-#datatable_drafts > tbody > tr:hover,
-#datatable_drafts > tbody > tr:hover td.sorting_1 {
+table.dataTable.display tbody tr.hover,
+table.dataTable.display tbody tr.hover td.sorting_1 {
   background: var(--lighter-blue) !important;
   cursor: pointer;
 }

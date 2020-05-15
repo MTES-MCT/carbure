@@ -1,19 +1,6 @@
 	<aside class="side-menu" role="navigation" style="max-width: 170px;">
 		<ul>
 			<li><a {% if current_url_name == 'operators-index' or current_url_name == 'operators-declaration' %}class="active"{% endif %} href="{% url 'operators-index' operator_name=url_friendly_name %}">Déclarations</a></li>
-				{% if current_url_name == 'operators-declaration' %}
-				<ul>
-					{% for nd in next_declarations %}
-					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' declaration_id=nd.id operator_name=url_friendly_name %}">{{nd.period}}</a></li>
-					{% endfor %}
-					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' declaration_id=current_declaration.id operator_name=url_friendly_name %}" class="active-submenu">{{current_declaration.period}}</a></li>
-					{% for pd in previous_declarations %}
-					<li class="side-menu-submenu"><a href="{% url 'operators-declaration' declaration_id=pd.id operator_name=url_friendly_name %}">{{pd.period}}</a></li>
-					{% endfor %}
-				</ul>
-				{% endif %}
-			<li><a {% if current_url_name == 'operators-affiliations' %}class="active"{% endif %} href="{% url 'operators-affiliations' operator_name=url_friendly_name %}">Lots en Attente
-				{% if nb_affiliated_lots > 0 %}<span class="badge badge-green">{{nb_affiliated_lots}}</span>{% endif %}</a></li>
 			<li><a {% if current_url_name == 'operators-controles' %}class="active"{% endif %} href="{% url 'operators-controles' operator_name=url_friendly_name %}">Contrôles DGEC
 				{% if nb_controles_dgec > 0 %}<span class="badge badge-red">{{nb_controles_dgec}}</span>{% endif %}</a></li>
 			<li><a {% if current_url_name == 'annuaire' %}class="active"{% endif %} href="{% url 'annuaire' %}">Annuaire</a></li>

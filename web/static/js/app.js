@@ -88,63 +88,94 @@ var table_columns_producers_validated = [
 ]
 
 
-var table_columns_operators = [
-{title:'Fournisseur', can_hide: true, can_duplicate: true, can_export: true, data:'producer_name'},
-{title:'Site de<br />Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data:'production_site_name'},
+var table_columns_operators_affiliated = [
+{title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_export: false, read_only: true, data:'checkbox'},
+{title:'Période', can_hide: true, can_export: true, data:'period'},
+{title:'Fournisseur', can_hide: true,  can_export: true, data:'producer_name'},
+{title:'Site de<br />Production', can_hide: true,  can_filter: true, orderable: false, can_export: true, data:'production_site_name'},
 {title:'Numéro de lot', can_hide: true, can_duplicate: false, can_export: true, data:'carbure_id'},
-{title:'Volume<br /> à 20°C<br />en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
-{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'biocarburant_name'},
-{title:'Matière<br /> Première', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'matiere_premiere_name'},
-{title:`Pays<br /> d'origine`, can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'pays_origine_name'},
+{title:'Volume<br /> à 20°C<br />en Litres', can_hide: true,  can_export: true, data: 'volume'},
+{title:'Biocarburant', can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'biocarburant_name'},
+{title:'Matière<br /> Première', can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'matiere_premiere_name'},
+{title:`Pays<br /> d'origine`, can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'pays_origine_name'},
 
-{title:'EEC', can_hide: true, can_duplicate: true, can_export: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
-{title:'EL', can_hide: true, can_duplicate: true, can_export: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
-{title:'EP', can_hide: true, can_duplicate: true, can_export: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'},
-{title:'ETD', can_hide: true, can_duplicate: true, can_export: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'},
-{title:'EU', can_hide: true, can_duplicate: true, can_export: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'},
-{title:'ESCA', can_hide: true, can_duplicate: true, can_export: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'},
-{title:'ECCS', can_hide: true, can_duplicate: true, can_export: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'},
-{title:'ECCR', can_hide: true, can_duplicate: true, can_export: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'},
-{title:'EEE', can_hide: true, can_duplicate: true, can_export: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'},
-{title:'E', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_total', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'},
-{title:'Émissions de référence', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'},
-{title:'% de réduction', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reduction'},
+{title:'EEC', can_hide: true,  can_export: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
+{title:'EL', can_hide: true,  can_export: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
+{title:'EP', can_hide: true,  can_export: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'},
+{title:'ETD', can_hide: true,  can_export: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'},
+{title:'EU', can_hide: true,  can_export: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'},
+{title:'ESCA', can_hide: true,  can_export: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'},
+{title:'ECCS', can_hide: true,  can_export: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'},
+{title:'ECCR', can_hide: true,  can_export: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'},
+{title:'EEE', can_hide: true,  can_export: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'},
+{title:'E', can_hide: true,  is_read_only: true, can_export: true, data: 'ghg_total', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'},
+{title:'Émissions de référence', can_hide: true,  is_read_only: true, can_export: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'},
+{title:'% de réduction', can_hide: true,  is_read_only: true, can_export: true, data: 'ghg_reduction'},
 
 {title:'N°DAE/DAU', can_hide: true, can_duplicate: false, can_export: true, data:'dae'},
-{title:'Référence', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data:'client_id', tooltip: 'Champ libre - Référence client'},
-{title:'Date d\'entrée<br />en EA', can_hide: true, can_duplicate: true, can_export: true, data:'ea_delivery_date'},
-{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'ea_delivery_site'},
+{title:'Référence', can_hide: true,  can_filter: true, orderable: false, can_export: true, data:'client_id', tooltip: 'Champ libre - Référence client'},
+{title:'Date d\'entrée<br />en EA', can_hide: true,  can_export: true, data:'ea_delivery_date'},
+{title:'Site de livraison', can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'ea_delivery_site'},
 {title:'Statut', can_hide: true, can_filter: true, orderable: false, can_export: true, data: 'ea_delivery_status'},
-{title:`<input type="checkbox" id="checkbox_header"/>`, can_hide: false, can_duplicate: false, read_only: true, can_export: false, data:'checkbox'},
 ]
 
-var table_columns_administrators = [
-{title:'Producteur', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data:'producer_name'},
-{title:'Site de<br />Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data:'production_site_name'},
+var table_columns_operators_declared = [
+{title:'Période', can_hide: true, can_export: true, data:'period'},
 {title:'Numéro de lot', can_hide: true, can_duplicate: false, can_export: true, data:'carbure_id'},
-{title:'Volume<br /> à 20°C<br />en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
-{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'biocarburant_name'},
-{title:'Matière<br /> Première', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'matiere_premiere_name'},
-{title:`Pays<br /> d'origine`, can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'pays_origine_name'},
+{title:'Fournisseur', can_hide: true,  can_export: true, data:'producer_name'},
+{title:'Site de<br />Production', can_hide: true,  can_filter: true, orderable: false, can_export: true, data:'production_site_name'},
+{title:'Volume<br /> à 20°C<br />en Litres', can_hide: true,  can_export: true, data: 'volume'},
+{title:'Biocarburant', can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'biocarburant_name'},
+{title:'Matière<br /> Première', can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'matiere_premiere_name'},
+{title:`Pays<br /> d'origine`, can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'pays_origine_name'},
 
-{title:'EEC', can_hide: true, can_duplicate: true, can_export: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
-{title:'EL', can_hide: true, can_duplicate: true, can_export: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
-{title:'EP', can_hide: true, can_duplicate: true, can_export: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'},
-{title:'ETD', can_hide: true, can_duplicate: true, can_export: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'},
-{title:'EU', can_hide: true, can_duplicate: true, can_export: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'},
-{title:'ESCA', can_hide: true, can_duplicate: true, can_export: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'},
-{title:'ECCS', can_hide: true, can_duplicate: true, can_export: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'},
-{title:'ECCR', can_hide: true, can_duplicate: true, can_export: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'},
-{title:'EEE', can_hide: true, can_duplicate: true, can_export: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'},
-{title:'E', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_total', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'},
-{title:'Émissions de référence', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'},
-{title:'% de réduction', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reduction'},
+{title:'EEC', can_hide: true,  can_export: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
+{title:'EL', can_hide: true,  can_export: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
+{title:'EP', can_hide: true,  can_export: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'},
+{title:'ETD', can_hide: true,  can_export: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'},
+{title:'EU', can_hide: true,  can_export: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'},
+{title:'ESCA', can_hide: true,  can_export: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'},
+{title:'ECCS', can_hide: true,  can_export: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'},
+{title:'ECCR', can_hide: true,  can_export: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'},
+{title:'EEE', can_hide: true,  can_export: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'},
+{title:'E', can_hide: true,  is_read_only: true, can_export: true, data: 'ghg_total', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'},
+{title:'Émissions de référence', can_hide: true,  is_read_only: true, can_export: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'},
+{title:'% de réduction', can_hide: true,  is_read_only: true, can_export: true, data: 'ghg_reduction'},
 
 {title:'N°DAE/DAU', can_hide: true, can_duplicate: false, can_export: true, data:'dae'},
-{title:'Référence', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data:'client_id', tooltip: 'Champ libre - Référence client'},
-{title:'Date d\'entrée<br />en EA', can_hide: true, can_duplicate: true, can_export: true, data:'ea_delivery_date'},
-{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'ea_name'},
-{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'ea_delivery_site'},
+{title:'Référence', can_hide: true,  can_filter: true, orderable: false, can_export: true, data:'client_id', tooltip: 'Champ libre - Référence client'},
+{title:'Date d\'entrée<br />en EA', can_hide: true,  can_export: true, data:'ea_delivery_date'},
+{title:'Site de livraison', can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'ea_delivery_site'},
+]
+
+
+var table_columns_administrators = [
+{title:'Producteur', can_hide: true,  can_filter: true, orderable: false, can_export: true, data:'producer_name'},
+{title:'Site de<br />Production', can_hide: true,  can_filter: true, orderable: false, can_export: true, data:'production_site_name'},
+{title:'Numéro de lot', can_hide: true, can_duplicate: false, can_export: true, data:'carbure_id'},
+{title:'Volume<br /> à 20°C<br />en Litres', can_hide: true,  can_export: true, data: 'volume'},
+{title:'Biocarburant', can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'biocarburant_name'},
+{title:'Matière<br /> Première', can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'matiere_premiere_name'},
+{title:`Pays<br /> d'origine`, can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'pays_origine_name'},
+
+{title:'EEC', can_hide: true,  can_export: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
+{title:'EL', can_hide: true,  can_export: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
+{title:'EP', can_hide: true,  can_export: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'},
+{title:'ETD', can_hide: true,  can_export: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'},
+{title:'EU', can_hide: true,  can_export: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'},
+{title:'ESCA', can_hide: true,  can_export: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'},
+{title:'ECCS', can_hide: true,  can_export: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'},
+{title:'ECCR', can_hide: true,  can_export: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'},
+{title:'EEE', can_hide: true,  can_export: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'},
+{title:'E', can_hide: true,  is_read_only: true, can_export: true, data: 'ghg_total', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'},
+{title:'Émissions de référence', can_hide: true,  is_read_only: true, can_export: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'},
+{title:'% de réduction', can_hide: true,  is_read_only: true, can_export: true, data: 'ghg_reduction'},
+
+{title:'N°DAE/DAU', can_hide: true, can_duplicate: false, can_export: true, data:'dae'},
+{title:'Référence', can_hide: true,  can_filter: true, orderable: false, can_export: true, data:'client_id', tooltip: 'Champ libre - Référence client'},
+{title:'Date d\'entrée<br />en EA', can_hide: true,  can_export: true, data:'ea_delivery_date'},
+{title:'Client', can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'ea_name'},
+{title:'Site de livraison', can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'ea_delivery_site'},
 ]
 
 /* modals management */
@@ -713,8 +744,8 @@ function init_datatables_drafts(url) {
             });
             //initially clear select otherwise first option is selected
             $('.select2').val(null).trigger('change')
- 		      } else {
-            $(column.footer()).append(table_column.title)
+          } else {
+            $(column.footer()).append()
           }
         }).draw()
       }
@@ -775,7 +806,7 @@ function init_datatables_drafts(url) {
     var producerDraftsTableSettings = loadTableSettings(table_columns_drafts, 'producerDraftsTableSettings')
     showHideTableColumns(table_drafts, producerDraftsTableSettings, 'drafts')
   } else {
-  	window.table_drafts.draw()
+    window.table_drafts.draw()
   }
 }
 
@@ -789,8 +820,8 @@ function init_datatables_corrections(url) {
       scrollCollapse: true,
       dom: 't',
       fixedColumns: {
-      	leftColumns: 0,
-      	rightColumns: 1,
+        leftColumns: 0,
+        rightColumns: 1,
       },
       columns: table_columns_producers_corrections,
       ajax: {
@@ -838,7 +869,7 @@ function init_datatables_corrections(url) {
             //initially clear select otherwise first option is selected
             $('.select2').val(null).trigger('change')
           } else {
-            $(column.footer()).append(table_column.title)
+            $(column.footer()).append()
           }
         }).draw()
       }
@@ -850,7 +881,7 @@ function init_datatables_corrections(url) {
     var producerErrorsTableSettings = loadTableSettings(table_columns_producers_corrections, 'producerErrorsTableSettings')
     showHideTableColumns(table_corrections, producerErrorsTableSettings, 'errors')
   } else {
-  	window.table_corrections.draw()
+    window.table_corrections.draw()
   }
 }
 
@@ -867,8 +898,8 @@ function init_datatables_validated(url) {
       scrollCollapse: true,
       dom: 't',
       fixedColumns: {
-      	leftColumns: 0,
-      	rightColumns: 1,
+        leftColumns: 0,
+        rightColumns: 1,
       },
       columns: table_columns_producers_validated,
       ajax: {
@@ -916,7 +947,7 @@ function init_datatables_validated(url) {
             //initially clear select otherwise first option is selected
             $('.select2').val(null).trigger('change')
           } else {
-            $(column.footer()).append(table_column.title)
+            $(column.footer()).append()
           }
         }).draw()
       }
@@ -928,7 +959,121 @@ function init_datatables_validated(url) {
     var producerValidTableSettings = loadTableSettings(table_columns_producers_validated, 'producerValidTableSettings')
     showHideTableColumns(table_valid, producerValidTableSettings, 'valid')
   } else {
-  	window.table_valid.draw()
+    window.table_valid.draw()
+  }
+}
+
+function init_datatables_operators_affiliations() {
+  if (!$.fn.DataTable.isDataTable('#datatable_affiliations')) {
+
+    let empty_footer = `<tr>${Array(table_columns_operators_affiliated.length).fill("<th></th>").join('')}</tr>`
+    $("#datatable_affiliations tfoot").append(empty_footer)
+
+    let table = $('#datatable_affiliations').DataTable({
+      paging: false,
+      info: false,
+      scrollX: true,
+      fixedColumns: {
+        leftColumns: 1,
+        rightColumns: 1,
+      },
+      language: {
+          search: "Rechercher:"
+      },
+      dom: 'rtip',
+      columnDefs: [
+      {"className": "dt-center", "targets": "_all"}
+      ],
+      columns: table_columns_operators_affiliated,
+      ajax: {
+        url: window.operators_api_affiliated_lots,
+        dataSrc: function(json) {
+          for (let i = 0, len = json.length; i < len; i++) {
+            // add checkbox on the fly
+            json[i]["checkbox"] = `<input type="checkbox" />`
+          }
+          return json
+        }
+      },
+      initComplete: function() {
+        // create filter
+        this.api().columns().every(function () {
+          var column = this;
+          let table_column = table_columns_operators_affiliated[column.index()]
+          if (table_column.can_filter === true) {
+            var select = $('<select><option value=""></option></select>')
+            .appendTo($(column.footer()).empty())
+            .on('change', function() {
+              var val = $.fn.dataTable.util.escapeRegex($(this).val());
+              column.search(val ? '^'+val+'$' : '', true, false).draw();
+            });
+            column.data().unique().sort().each(function (d, j) {
+              select.append('<option value="'+d+'">'+d+'</option>')
+            });
+          } else {
+            $(column.footer()).append()
+          }
+        }).draw()
+      }
+    })
+    window.table_operators_affiliations = table
+  } else {
+    window.table_operators_affiliations.draw()
+  }
+}
+
+function init_datatables_operators_declared() {
+  if (!$.fn.DataTable.isDataTable('#datatable_declared')) {
+
+    let empty_footer = `<tr>${Array(table_columns_operators_declared.length).fill("<th></th>").join('')}</tr>`
+    $("#datatable_declared tfoot").append(empty_footer)
+
+    let table = $('#datatable_declared').DataTable({
+      paging: false,
+      info: false,
+      scrollX: true,
+      language: {
+          search: "Rechercher:"
+      },
+      dom: 'rtip',
+      columnDefs: [
+      {"className": "dt-center", "targets": "_all"}
+      ],
+      columns: table_columns_operators_declared,
+      ajax: {
+        url: window.operators_api_declared_lots,
+        dataSrc: function(json) {
+          for (let i = 0, len = json.length; i < len; i++) {
+            // add checkbox on the fly
+            json[i]["checkbox"] = `<input type="checkbox" />`
+          }
+          return json
+        }
+      },
+      initComplete: function() {
+        // create filter
+        this.api().columns().every(function () {
+          var column = this;
+          let table_column = table_columns_operators_declared[column.index()]
+          if (table_column.can_filter === true) {
+            var select = $('<select><option value=""></option></select>')
+            .appendTo($(column.footer()).empty())
+            .on('change', function() {
+              var val = $.fn.dataTable.util.escapeRegex($(this).val());
+              column.search(val ? '^'+val+'$' : '', true, false).draw();
+            });
+            column.data().unique().sort().each(function (d, j) {
+              select.append('<option value="'+d+'">'+d+'</option>')
+            });
+          } else {
+            $(column.footer()).append()
+          }
+        }).draw()
+      }
+    })
+    window.table_operators_declared = table
+  } else {
+    window.table_operators_declared.draw()
   }
 }
 
@@ -1222,4 +1367,17 @@ $("#tab_valid_title").on('click', function() {
   // show drafts
   showTab("tab_valid")
   init_datatables_validated(window.producers_api_lots_valid)
+})
+
+
+$("#tab_operators_affiliations_title").on('click', function() {
+  hideTab("tab_operators_declared")
+  showTab("tab_operators_affiliations")
+  init_datatables_operators_affiliations()
+})
+
+$("#tab_operators_declared_title").on('click', function() {
+  hideTab("tab_operators_affiliations")
+  showTab("tab_operators_declared")
+  init_datatables_operators_declared()
 })
