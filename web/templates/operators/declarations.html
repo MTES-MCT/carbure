@@ -18,6 +18,12 @@
         <tfoot></tfoot>
         <tbody></tbody>
       </table>
+
+      <div class="button-container">
+        <div class="button-item button-push">
+          <a id="btn_open_modal_accept_lots" class="button primary">Accepter Lots</a>
+        </div>
+      </div>
     </div>
 
     <div id="tab_operators_declared" class="tabcontent">
@@ -198,6 +204,23 @@
   </div>
 </div>
 
+<div class="modal__backdrop" id="modal_accept_lots">
+  <div class="modal">
+    <span id="modal_accept_lots_form_err_message" style="color: red;"></span>
+    <form id="modal_accept_lots_form" method="POST" data-url="{% url 'operators-api-accept-lots' %}">
+      {% csrf_token %}
+      <p><b>Êtes vous certain de vouloir accepter le(s) lot(s) suivant(s)?</b></p>
+      <ul id="modal_accept_lots_list">
+      </ul>
+      <input type="hidden" id="modal_accept_lots_lots" name="lots">
+      <div class="form__group button__group">
+        <a class="button secondary" id="btn_close_modal_accept_lots">Annuler</a>
+        <button type="submit" class="button">Valider</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 {% endblock %}
 
 
@@ -210,6 +233,8 @@ window.operators_api_lot_comments = "{% url 'operators-api-lot-comments' %}"
 $(document).ready(function() {
   document.getElementById("tab_operators_affiliations").style.display = "block";
   init_datatables_operators_affiliations()
+
+  manage_actions_operators_affiliation()
 
   $("#btn_lot_accept_final").on('click', function() {
     let lot_id = $("#lot_id").val()

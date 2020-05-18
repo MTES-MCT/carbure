@@ -89,7 +89,7 @@ var table_columns_producers_validated = [
 
 
 var table_columns_operators_affiliated = [
-{title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_export: false, read_only: true, data:'checkbox'},
+{title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
 {title:'Période', can_hide: true, can_export: true, data:'period'},
 {title:'Fournisseur', can_hide: true,  can_export: true, data:'producer_name'},
 {title:'Site de<br />Production', can_hide: true,  can_filter: true, orderable: false, can_export: true, data:'production_site_name'},
@@ -565,9 +565,28 @@ function manage_actions() {
 }
 
 function manage_actions_operators_affiliation() {
-  // buttons Accepter et Refuser
-  //manage_operators_reject_button()
-  //manage_operators_approve_button()
+  // bouton Accepter Lots
+  $("#modal_accept_lots_list").empty()
+  if (selected_rows.length > 0) {
+    $("#btn_open_modal_accept_lots").addClass('primary')
+    $("#btn_open_modal_accept_lots").css("pointer-events", "auto")
+    $("#btn_open_modal_accept_lots").removeClass('secondary')
+
+		let to_accept = []
+    for (let i = 0, len = selected_rows.length; i < len; i++) {
+      let rowdata = table_operators_affiliations.row(selected_rows[i]).data()
+      $("#modal_accept_lots_list").append(`<li>${rowdata['producer_name']} - ${rowdata['volume']} - ${rowdata['biocarburant_name']} - ${rowdata['matiere_premiere_name']}</li>`)
+      to_accept.push(rowdata['lot_id'])
+      $("#modal_accept_lots_lots").val(to_accept.join(","))
+    }
+  } else {
+    $("#btn_open_modal_accept_lots").addClass('secondary')
+    $("#btn_open_modal_accept_lots").css("pointer-events", "none")
+    $("#btn_open_modal_accept_lots").removeClass('primary')
+    // cleanup validate modal
+    $("#modal_accept_lots_list").empty()
+  }
+
 }
 
 
@@ -788,10 +807,6 @@ function init_datatables_drafts(url) {
       manage_actions()
     })
 
-    // Handle click on table cells with checkboxes
-    $('#datatable_drafts').on('click', 'tbody td, thead th:first-child', function(e){
-      $(this).parent().find('input[type="checkbox"]').trigger('click');
-    })
 
     // Handle click on "Select all" control
     $('thead input[name="select_all"]', table_drafts.table().container()).on('click', function(e){
@@ -981,11 +996,8 @@ function init_datatables_operators_affiliations() {
       info: false,
       scrollX: true,
       fixedColumns: {
-        leftColumns: 1,
+      	leftColumns: 0,
         rightColumns: 1,
-      },
-      language: {
-          search: "Rechercher:"
       },
       dom: 'rtip',
       columns: table_columns_operators_affiliated,
@@ -1066,17 +1078,15 @@ function init_datatables_operators_affiliations() {
       manage_actions_operators_affiliation()
     })
 
-    // Handle click on table cells with checkboxes
-    $('#datatable_affiliations').on('click', 'tbody td, thead th:first-child', function(e){
-      $(this).parent().find('input[type="checkbox"]').trigger('click');
-    })
-
     // Handle click on "Select all" control
-    $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
-      if(this.checked){
-         $('#datatable_affiliations tbody input[type="checkbox"]:not(:checked)').trigger('click');
+    $('thead input[name="select_all"]', table.table().container()).on('click', function(e) {
+    	console.log(`thead checkbox click`)
+      if (this.checked) {
+      	console.log(`header checkbox checked`)
+        $('#datatable_affiliations tbody input[type="checkbox"]:not(:checked)').trigger('click');
       } else {
-         $('#datatable_affiliations tbody input[type="checkbox"]:checked').trigger('click');
+      	console.log(`header checkbox unchecked`)
+        $('#datatable_affiliations tbody input[type="checkbox"]:checked').trigger('click');
       }
       // Prevent click event from propagating to parent
       e.stopPropagation();
@@ -1254,6 +1264,9 @@ function display_producers_lot_modal(table, columns, event) {
 
 function display_operators_lot_modal(table, columns, event) {
   // check if we clicked on the checkbox
+  if (event.target._DT_CellIndex === undefined) {
+  	return
+  }
   let colid = event.target._DT_CellIndex.column
   let rowid = event.target._DT_CellIndex.row
   let data = table.row(rowid).data()
