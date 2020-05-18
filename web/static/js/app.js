@@ -59,7 +59,7 @@ var table_columns_producers_corrections = [
 ]
 
 var table_columns_producers_validated = [
-{title:'Période', can_hide: true, data:'period'},
+{title:'Période', can_hide: true, can_filter: true, data:'period'},
 {title:'Numéro de lot', can_hide: true, data:'carbure_id'},
 {title:'Producteur', can_hide: true, data:'producer_name'},
 {title:'Site de<br />Production', filter_title: 'Site', can_hide: true, can_filter: true, orderable: false, data:'production_site_name'},
