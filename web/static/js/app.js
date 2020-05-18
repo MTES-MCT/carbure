@@ -1152,6 +1152,10 @@ function init_datatables_operators_declared() {
     var operatorsValidTableSettings = loadTableSettings(table_columns_operators_declared, 'operatorsValidTableSettings')
     showHideTableColumns(table, operatorsValidTableSettings, 'declared')
 
+    $('#input_search_datatable_valid').on('keyup', function() {
+      table.search(this.value).draw();
+    })
+
   } else {
     window.table_operators_declared.draw()
   }
