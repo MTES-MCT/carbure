@@ -566,8 +566,8 @@ function manage_actions() {
 
 function manage_actions_operators_affiliation() {
   // buttons Accepter et Refuser
-  manage_operators_reject_button()
-  manage_operators_approve_button()
+  //manage_operators_reject_button()
+  //manage_operators_approve_button()
 }
 
 
@@ -1320,16 +1320,21 @@ function display_operators_lot_modal(table, columns, event) {
       }
     })
 
-	if (data['ea_delivery_status'] == 'Accepté') {
-		let message = `<h3>Lot ${data['carbure_id']}</h3>`
-		$("#btn_lot_accept_final").hide()
-		$("#err_msg_dom").html(message)
-	} else {
-		$("#err_msg_dom").html('')
-		$("#btn_lot_accept_final").show()
-	}
+		if (data['ea_delivery_status'] == 'Accepté') {
+			let message = `<h3>Lot ${data['carbure_id']}</h3>`
+			$("#btn_lot_accept_final").hide()
+			$("#err_msg_dom").html(message)
+		} else {
+			$("#err_msg_dom").html('')
 
-    modal.style.display = "flex"
+	  	if (data['ea_delivery_status'] == 'Corrigé') {
+				$("#btn_lot_accept_final").text("Accepter Définitivement")
+			} else {
+				$("#btn_lot_accept_final").text("Accepter Lot")
+			}
+			$("#btn_lot_accept_final").show()
+		}
+	  modal.style.display = "flex"
   }
 }
 
