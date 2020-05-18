@@ -564,6 +564,13 @@ function manage_actions() {
   manage_add_button()
 }
 
+function manage_actions_operators_affiliation() {
+  // buttons Accepter et Refuser
+  manage_operators_reject_button()
+  manage_operators_approve_button()
+}
+
+
 function initDuplicateParams(table) {
   var list_columns_filter = $("#list_columns_filter")
   var list_columns_filter_html = ""
@@ -598,7 +605,7 @@ function initFilters(table, dom) {
 }
 
 function updateDataTableSelectAllCtrl(table){
-   var $table             = table_drafts.table().node();
+   var $table             = table.table().node();
    var $chkbox_all        = $('tbody input[type="checkbox"]', $table);
    var $chkbox_checked    = $('tbody input[type="checkbox"]:checked', $table);
    var chkbox_select_all  = $('thead input[name="select_all"]', $table).get(0);
@@ -752,7 +759,7 @@ function init_datatables_drafts(url) {
     })
 
     $("#datatable_drafts tbody").on('click', 'td',  (e) => {
-      display_lot_modal(table_drafts, table_columns_drafts, e)
+      display_producers_lot_modal(table_drafts, table_columns_drafts, e)
     })
     window.table_drafts = table_drafts
     $('#input_search_datatable').on('keyup', function() {
@@ -875,7 +882,7 @@ function init_datatables_corrections(url) {
       }
     })
     $("#datatable_corrections tbody").on('click', 'td',  (e) => {
-      display_lot_modal(table_corrections, table_columns_producers_corrections, e)
+      display_producers_lot_modal(table_corrections, table_columns_producers_corrections, e)
     })
     window.table_corrections = table_corrections
     var producerErrorsTableSettings = loadTableSettings(table_columns_producers_corrections, 'producerErrorsTableSettings')
@@ -953,7 +960,7 @@ function init_datatables_validated(url) {
       }
     })
     $("#datatable_valid tbody").on('click', 'td', (e) => {
-      display_lot_modal(table_valid, table_columns_producers_validated, e)
+      display_producers_lot_modal(table_valid, table_columns_producers_validated, e)
     })
     window.table_valid = table_valid
     var producerValidTableSettings = loadTableSettings(table_columns_producers_validated, 'producerValidTableSettings')
@@ -981,10 +988,24 @@ function init_datatables_operators_affiliations() {
           search: "Rechercher:"
       },
       dom: 'rtip',
-      columnDefs: [
-      {"className": "dt-center", "targets": "_all"}
-      ],
       columns: table_columns_operators_affiliated,
+      columnDefs: [
+        {
+          className: "dt-center",
+          targets: "_all",
+        },
+        {
+          targets: 0,
+          searchable:false,
+          orderable:false,
+          width:'1%',
+          className: 'dt-body-center',
+          render: function (data, type, full, meta) {
+             return '<input type="checkbox">';
+          }
+        }
+      ],
+      order: [[ 1, 'asc' ]],
       ajax: {
         url: window.operators_api_affiliated_lots,
         dataSrc: function(json) {
@@ -1017,6 +1038,50 @@ function init_datatables_operators_affiliations() {
       }
     })
     window.table_operators_affiliations = table
+    $("#datatable_affiliations tbody").on('click', 'td', (e) => {
+      display_operators_lot_modal(table, table_columns_operators_affiliated, e)
+    })
+    var operatorsAffiliationsTableSettings = loadTableSettings(table_columns_operators_affiliated, 'operatorsAffiliationsTableSettings')
+    showHideTableColumns(table, operatorsAffiliationsTableSettings, 'affiliations')
+
+    // Handle click on checkbox
+    $('#datatable_affiliations tbody').on('click', 'input[type="checkbox"]', function(e) {
+      var $row = $(this).closest('tr');
+      // Get row data
+      var rowId = table.row($row).index();
+      // Determine whether row ID is in the list of selected row IDs
+      var index = $.inArray(rowId, selected_rows);
+      // If checkbox is checked and row ID is not in list of selected row IDs
+      if(this.checked && index === -1) {
+        selected_rows.push(rowId);
+      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+      } else if (!this.checked && index !== -1) {
+        selected_rows.splice(index, 1);
+      }
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+      // Show/Hide buttons depending on selected_rows content
+      manage_actions_operators_affiliation()
+    })
+
+    // Handle click on table cells with checkboxes
+    $('#datatable_affiliations').on('click', 'tbody td, thead th:first-child', function(e){
+      $(this).parent().find('input[type="checkbox"]').trigger('click');
+    })
+
+    // Handle click on "Select all" control
+    $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
+      if(this.checked){
+         $('#datatable_affiliations tbody input[type="checkbox"]:not(:checked)').trigger('click');
+      } else {
+         $('#datatable_affiliations tbody input[type="checkbox"]:checked').trigger('click');
+      }
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+    });
+
   } else {
     window.table_operators_affiliations.draw()
   }
@@ -1072,12 +1137,18 @@ function init_datatables_operators_declared() {
       }
     })
     window.table_operators_declared = table
+    $("#datatable_affiliations tbody").on('click', 'td', (e) => {
+      display_operators_lot_modal(table, table_columns_operators_declared, e)
+    })
+    var operatorsValidTableSettings = loadTableSettings(table_columns_operators_declared, 'operatorsValidTableSettings')
+    showHideTableColumns(table, operatorsValidTableSettings, 'affiliations')
+
   } else {
     window.table_operators_declared.draw()
   }
 }
 
-function display_lot_modal(table, columns, event) {
+function display_producers_lot_modal(table, columns, event) {
   // check if we clicked on the checkbox
   let colid = event.target._DT_CellIndex.column
   let rowid = event.target._DT_CellIndex.row
@@ -1181,6 +1252,87 @@ function display_lot_modal(table, columns, event) {
   }
 }
 
+function display_operators_lot_modal(table, columns, event) {
+  // check if we clicked on the checkbox
+  let colid = event.target._DT_CellIndex.column
+  let rowid = event.target._DT_CellIndex.row
+  let data = table.row(rowid).data()
+  let table_column = columns[colid]
+  let comment_section = $("#comment_section")
+  comment_section.empty()
+  if (table_column['data'] === 'checkbox') {
+    // ignore clicks on checkbox column
+    return
+  } else {
+    let modal = document.getElementById("modal_edit_lot")
+    for (key in data) {
+      // set the value in the field
+      $(`#${key}`).val(data[key])
+      // reset error field to none
+      $(`#${key}_error`).html('')
+    }
+
+    // override errors into the field
+    let lot_id = data['lot_id']
+    if (lot_id in lot_errors) {
+      let errors = lot_errors[lot_id]
+      for (key in errors) {
+        $(`#${key}`).val(errors[key])
+      }
+    }
+
+    // non-input keys
+    ['ghg_total', 'ghg_reduction'].forEach(function(item, index) {
+      $(`#${item}`).html(data[item])
+    })
+    $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data['ghg_reference']} gCO2eq/MJ`)
+
+    /* load comments */
+    $.ajax({
+      url         : window.operators_api_lot_comments,
+      data        : {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+      type        : 'POST',
+      success     : function(d, textStatus, jqXHR){
+        // Callback code
+        // load existing comments into the form
+        for (let i = 0, len = d.length; i < len; i++) {
+          let c = d[i]
+          let html = `<p><b>${c.from}</b>: ${c.comment}</p>`
+          comment_section.append(html)
+        }
+        // add area to respond
+        if (data['status'] === "Draft" || data['ea_delivery_status'] === "Accepté") {
+          // do nothing
+        } else {
+          // add the ability to add a comment
+          let html = `<div style="display: flex;"><p>Ajouter un commentaire:</p><input type="text" name="textarea" id="textarea" style="max-width: 80%; height: 2em; margin-left: 10px; margin-top: auto; margin-bottom: auto;" /></div>`
+          comment_section.append(html)
+        }
+      },
+      error       : function(e) {
+        if (e.status === 400) {
+          alert(e.responseJSON.message)
+          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+        } else {
+          alert("Server error. Please contact an administrator")
+          console.log(`server error ${JSON.stringify(e)}`)
+        }
+      }
+    })
+
+	if (data['ea_delivery_status'] == 'Accepté') {
+		let message = `<h3>Lot ${data['carbure_id']}</h3>`
+		$("#btn_lot_accept_final").hide()
+		$("#err_msg_dom").html(message)
+	} else {
+		$("#err_msg_dom").html('')
+		$("#btn_lot_accept_final").show()
+	}
+
+    modal.style.display = "flex"
+  }
+}
+
 function handleSave(action) {
   var err_msg_dom = $("#err_msg_dom")
   err_msg_dom.empty()
@@ -1200,17 +1352,45 @@ function handleSave(action) {
     type        : 'POST',
     success     : function(data, textStatus, jqXHR) {
       // Callback code
-      /* if errors, display them and stay on page */
-      if (data.errors.length > 0) {
-        err_msg_dom.append('<ul style="color: tomato;" id="errors_list"></ul>')
-        let err_list = $("#errors_list")
-        for (let i = 0, len = data.errors.length; i < len; i++) {
-          err_list.append(`<li>${data.errors[i].error}</li>`)
-        }
-      } else {
-        /* otherwise reload page */
-        window.location.reload()
-      }
+      // if there's an additional comment, save it as well
+		  let comment = $("#textarea").val()
+		  if (comment) {
+		  	var formcomment = new FormData();
+		  	formcomment.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
+		  	formcomment.set('lot_id', document.getElementById('lot_id').value)
+		  	formcomment.set('comment', comment)
+			  $.ajax({
+			    url         : window.producers_api_attestation_save_lot_comment,
+			    data        : formcomment,
+			    cache       : false,
+			    contentType : false,
+			    processData : false,
+			    type        : 'POST',
+			    success     : function(data, textStatus, jqXHR) {
+			      // Callback code
+			        window.location.reload()
+			    },
+			    error       : function(e) {
+			      if (e.status === 400) {
+			        err_msg_dom.html(`${e.responseJSON.message}`)
+			      } else {
+			        alert("Server error. Please contact an administrator")
+			      }
+			    }
+			  })
+			} else {
+				/* if errors, display them and stay on page */
+	      if (data.errors.length > 0) {
+	        err_msg_dom.append('<ul style="color: tomato;" id="errors_list"></ul>')
+	        let err_list = $("#errors_list")
+	        for (let i = 0, len = data.errors.length; i < len; i++) {
+	          err_list.append(`<li>${data.errors[i].error}</li>`)
+	        }
+	      } else {
+	        /* otherwise reload page */
+	        window.location.reload()
+	      }
+			}
     },
     error       : function(e) {
       if (e.status === 400) {
@@ -1221,6 +1401,7 @@ function handleSave(action) {
     }
   })
 }
+
 
 function load_ges(mp, bc) {
   $.ajax({

@@ -48,6 +48,156 @@
     </div>
   </div>
 </div>
+
+
+<div class="modal__backdrop" id="modal_columns_affiliated">
+  <div class="modal">
+    <div class="flex-container">
+      <table id="table_columns_affiliated_filter">
+        <!-- dynamically generated in js -->
+      </table>
+      <table id="table_columns_affiliated_filter2">
+        <!-- dynamically generated in js -->
+      </table>
+    </div>
+    <div class="form__group button__group">
+      <a class="button secondary close" id="btn_close_modal_columns_affiliated">Fermer</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_columns_valid">
+  <div class="modal">
+    <div class="flex-container">
+      <table id="table_columns_valid_filter">
+        <!-- dynamically generated in js -->
+      </table>
+      <table id="table_columns_valid_filter2">
+        <!-- dynamically generated in js -->
+      </table>
+    </div>
+    <div class="form__group button__group">
+      <a class="button secondary close" id="btn_close_modal_columns_valid">Fermer</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_edit_lot">
+  <div class="modal" style="max-width: none; margin: auto; max-height: 100%; overflow-y: auto;">
+    <p id="err_msg_dom">
+    </p>
+    <div class="flex-container modal-edit">
+      <div class="form__group" style="margin-top: var(--space-l);">
+        <h3 style="text-align: center;">Informations</h3>
+        <input type="hidden" id="lot_id" />
+        <dl>
+          <dt>Site de Production</dt>
+          <dd><input type="text" id="production_site_name" class="autocomplete_production_sites" readonly/></dd>
+          <dt>Volume à 20°C en Litres</dt>
+          <dd><input type="text" id="volume" readonly/></dd>
+          <dt>Biocarburant</dt>
+          <dd><input type="text" id="biocarburant_name" class="autocomplete_biocarburants" readonly/></dd>
+          <dt>Matiere Premiere</dt>
+          <dd><input type="text" id="matiere_premiere_name" class="autocomplete_mps" readonly/></dd>
+          <dt>Pays d'origine</dt>
+          <dd><input type="text" id="pays_origine_name" class="autocomplete_countries" readonly/></dd>
+        </dl>
+      </div>
+      <div class="form__group" style="margin-left: var(--space-l);">
+        <h3 style="text-align: center;">Destination</h3>
+        <dl>
+        <dt><label for="dae">Numéro de DAE / DAU</label></dt>
+        <dd><input id="dae" type="text" readonly/></dd>
+        <dt><label for="ea_name">Client</label></dt>
+        <dd><input type="text" id="ea_name" class="autocomplete_operators" readonly/></dd>
+        <dt><label for="ea_delivery_site">Site de livraison</label></dt>
+        <dd><input id="ea_delivery_site" type="text" readonly/></dd>
+        <dt><label for="ea_delivery_date">Date de livraison</label></dt>
+        <dd><input id="ea_delivery_date" type="text" placeholder="JJ/MM/AAAA" readonly/></dd>
+        <dt><label for="client_id">Référence</label></dt>
+        <dd><input id="client_id" type="text" readonly/></dd>
+        </dl>
+      </div>
+      <div class="form__group" style="margin-left: var(--space-l);">
+        <h3>Gaz à Effet de Serre</h3>
+        <span style="margin-top: -2em; display: block; text-align: left;"><small>en gCO2eq/MJ</small></span>
+        <table id="table_lot_ges">
+          <thead>
+            <th>Émissions</th>
+            <th>Réductions</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <label for="eec">EEC </label><input type="text" id="eec" class="ges_field ges_incr" readonly/>
+              </td>
+              <td>
+                <label for="esca">ESCA </label><input type="text" id="esca" class="ges_field ges_decr" readonly/>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label>EL </label><input type="text" id="el" class="ges_field ges_incr" readonly />
+              </td>
+              <td>
+                <label>ECCS </label><input type="text" id="eccs" class="ges_field ges_decr" readonly/>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label>EP </label><input type="text" id="ep" class="ges_field ges_incr" readonly/>
+              </td>
+              <td>
+                <label>ECCR </label><input type="text" id="eccr" class="ges_field ges_decr" readonly/>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label>ETD </label><input type="text" id="etd" class="ges_field ges_incr" readonly/>
+              </td>
+              <td>
+                <label>EEE </label><input type="text" id="eee" class="ges_field ges_decr" readonly/>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label>EU </label><input type="text" id="eu" class="ges_field ges_incr" readonly/>
+              </td>
+              <td>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table>
+          <input type="hidden" id="ghg_reference" />
+          <thead>
+            <tr>
+              <th>Total gCO2eq/MJ</th>
+              <th id="reduction_title" title="">Réduction<small>*</small></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="ghg_total"></td>
+              <td id="ghg_reduction"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="form__group" id="comment_section">
+    </div>
+    <div class="form__group button__group">
+      <div class="button-item">
+        <a class="button primary" id="btn_lot_accept_final" style="display: none;">Accepter définitivement</a>
+      </div>
+      <div class="button-item button-push">
+        <a class="button secondary close" id="btn_close_modal_edit_lot">Annuler</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 
@@ -55,10 +205,34 @@
 <script type="text/javascript">
 window.operators_api_affiliated_lots = "{% url 'operators-api-affiliated-lots' %}"
 window.operators_api_declared_lots = "{% url 'operators-api-declared-lots' %}"
+window.operators_api_lot_comments = "{% url 'operators-api-lot-comments' %}"
 
 $(document).ready(function() {
   document.getElementById("tab_operators_affiliations").style.display = "block";
   init_datatables_operators_affiliations()
+
+  $("#btn_lot_accept_final").on('click', function() {
+    let lot_id = $("#lot_id").val()
+    $.ajax({
+      url:"{% url 'operators-api-accept-lot-correction' %}",
+      data: {'lot': lot_id,'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+      type        : 'POST',
+      success     : function(data, textStatus, jqXHR){
+        // Callback code
+        window.location.reload()
+      },
+      error       : function(e) {
+        if (e.status === 400) {
+          alert(e.responseJSON.message)
+          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+        } else {
+          alert("Server error. Please contact an administrator")
+          console.log(`server error ${JSON.stringify(e)}`)
+        }
+      }
+    })
+  })
+
 })
 </script>
 {% endblock %}
