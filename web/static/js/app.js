@@ -349,7 +349,6 @@ function showHideTableColumns(table, columns, dom) {
   /* display table columns depending on config */
   console.log(`showHideTableColumns for table ${columns} ${dom}`)
   let nb_columns = table.columns().data().length
-  console.log(`${nb_columns} columns`)
   for (let i = 0, len = nb_columns; i < len; i++) {
     let isChecked = columns[i]
     let boxid = `#checkbox_${dom}${i}`
@@ -1147,11 +1146,11 @@ function init_datatables_operators_declared() {
       }
     })
     window.table_operators_declared = table
-    $("#datatable_affiliations tbody").on('click', 'td', (e) => {
+    $("#datatable_declared tbody").on('click', 'td', (e) => {
       display_operators_lot_modal(table, table_columns_operators_declared, e)
     })
     var operatorsValidTableSettings = loadTableSettings(table_columns_operators_declared, 'operatorsValidTableSettings')
-    showHideTableColumns(table, operatorsValidTableSettings, 'affiliations')
+    showHideTableColumns(table, operatorsValidTableSettings, 'declared')
 
   } else {
     window.table_operators_declared.draw()

@@ -12,6 +12,12 @@
     </ul>
 
     <div id="tab_operators_affiliations" class="tabcontent">
+      <div class="flex-container">
+        <a id="btn_open_modal_columns_affiliations" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+          <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
+        </a>
+      </div>
+
       <table class="display nowrap" id="datatable_affiliations">
         <!-- dynamically generated in js -->
         <thead></thead>
@@ -28,7 +34,7 @@
 
     <div id="tab_operators_declared" class="tabcontent">
       <div class="flex-container">
-        <a id="btn_open_modal_columns_valid" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
+        <a id="btn_open_modal_columns_declared" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
         <a class="button modal-button" href="{% url 'operators-api-declaration-export' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
@@ -56,34 +62,34 @@
 </div>
 
 
-<div class="modal__backdrop" id="modal_columns_affiliated">
+<div class="modal__backdrop" id="modal_columns_affiliations">
   <div class="modal">
     <div class="flex-container">
-      <table id="table_columns_affiliated_filter">
+      <table id="table_columns_affiliations_filter">
         <!-- dynamically generated in js -->
       </table>
-      <table id="table_columns_affiliated_filter2">
+      <table id="table_columns_affiliations_filter2">
         <!-- dynamically generated in js -->
       </table>
     </div>
     <div class="form__group button__group">
-      <a class="button secondary close" id="btn_close_modal_columns_affiliated">Fermer</a>
+      <a class="button secondary close" id="btn_close_modal_columns_affiliations">Fermer</a>
     </div>
   </div>
 </div>
 
-<div class="modal__backdrop" id="modal_columns_valid">
+<div class="modal__backdrop" id="modal_columns_declared">
   <div class="modal">
     <div class="flex-container">
-      <table id="table_columns_valid_filter">
+      <table id="table_columns_declared_filter">
         <!-- dynamically generated in js -->
       </table>
-      <table id="table_columns_valid_filter2">
+      <table id="table_columns_declared_filter2">
         <!-- dynamically generated in js -->
       </table>
     </div>
     <div class="form__group button__group">
-      <a class="button secondary close" id="btn_close_modal_columns_valid">Fermer</a>
+      <a class="button secondary close" id="btn_close_modal_columns_declared">Fermer</a>
     </div>
   </div>
 </div>
@@ -231,6 +237,9 @@ window.operators_api_declared_lots = "{% url 'operators-api-declared-lots' %}"
 window.operators_api_lot_comments = "{% url 'operators-api-lot-comments' %}"
 
 $(document).ready(function() {
+  initFilters(table_columns_operators_affiliated, 'affiliations')
+  initFilters(table_columns_operators_declared, 'declared')
+
   document.getElementById("tab_operators_affiliations").style.display = "block";
   init_datatables_operators_affiliations()
 
@@ -256,6 +265,35 @@ $(document).ready(function() {
         }
       }
     })
+  })
+
+
+  /* column filter modal event management */
+  $('.toggle-vis').on('click', function(e) {
+    // Get the column API object
+    let colid = $(this).attr('data-column')
+    let dst_table = $(this).attr('data-table')
+
+
+    // Toggle the visibility
+    let column = ''
+    if (dst_table === "declared") {
+      column = window.table_operators_declared.column(colid);
+
+      var operatorsValidTableSettings = loadTableSettings(table_columns_operators_declared, 'operatorsValidTableSettings')
+      operatorsValidTableSettings[colid] = operatorsValidTableSettings[colid] == 1 ? 0 : 1
+      saveTableSettings(operatorsValidTableSettings, 'operatorsValidTableSettings')
+    } else if (dst_table === "affiliations") {
+      column = window.table_operators_affiliations.column(colid);
+
+      var operatorsAffiliationsTableSettings = loadTableSettings(table_columns_operators_affiliated, 'operatorsAffiliationsTableSettings')
+      operatorsAffiliationsTableSettings[colid] = operatorsAffiliationsTableSettings[colid] == 1 ? 0 : 1
+      saveTableSettings(operatorsAffiliationsTableSettings, 'operatorsAffiliationsTableSettings')
+    } else {
+      console.log(`unknown table. cant save column display settings`)
+      return
+    }
+    column.visible(!column.visible());
   })
 
 })
