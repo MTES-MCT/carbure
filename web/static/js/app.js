@@ -1526,6 +1526,9 @@ $(".autocomplete_depots").autocomplete({
   serviceUrl: window.api_depots_autocomplete,
   dataType: 'json',
   minChars: 1,
+  onSelect: function(suggestion) {
+    $("#ea_delivery_site").val(suggestion.name)
+  },
 })
 
 })

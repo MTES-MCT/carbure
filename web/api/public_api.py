@@ -36,7 +36,7 @@ def operators_autocomplete(request):
 def depots_autocomplete(request):
     q = request.GET['query']
     depots = Depot.objects.filter(Q(name__icontains=q) | Q(city__icontains=q) | Q(depot_id__icontains=q))
-    results = [{'name': i.name, 'depot_id': i.depot_id, 'city':i.city} for i in depots]
+    results = [{'value': '%s - %s - %s' % (i.name, i.depot_id, i.city), 'name': i.name, 'depot_id': i.depot_id, 'city':i.city} for i in depots]
     return JsonResponse({'suggestions': results})
 
 
