@@ -4,11 +4,6 @@ from django.urls import reverse
 from core.models import Biocarburant, MatierePremiere, Pays, Entity
 import json
 
-#path('biocarburant-csv/', public_api.biocarburant_csv, name='api-biocarburant-csv'),
-#path('matiere-premiere-csv/', public_api.matiere_premiere_csv, name='api-matiere-premiere-csv'),
-#path('country-csv/', public_api.country_csv, name='api-country-csv'),
-#path('operators-csv/', public_api.operators_csv, name='api-operators-csv'),
-
 
 class PublicApiTest(TestCase):
     def setUp(self):
