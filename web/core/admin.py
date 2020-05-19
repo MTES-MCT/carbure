@@ -8,7 +8,8 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.utils.crypto import get_random_string
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
-from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, Lot, LotComment, LotError, GHGValues
+from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, Lot, LotComment
+from core.models import LotError, GHGValues, Depot
 
 
 class EntityAdmin(admin.ModelAdmin):
@@ -60,10 +61,16 @@ class LotErrorAdmin(admin.ModelAdmin):
     search_fields = ('lot', 'field', 'value', 'error')
     list_filter = ('field', )
 
+
 class GHGValuesAdmin(admin.ModelAdmin):
     list_display = ('matiere_premiere', 'biocarburant', 'condition', 'eec_default', 'ep_default', 'etd_default')
     search_fields = ('matiere_premiere', 'biocarburant')
     list_filter = ('biocarburant',)
+
+
+class DepotAdmin(admin.ModelAdmin):
+    list_display = ('name', 'depot_id', 'city')
+    search_fields = ('name', 'city', 'depot_id')
 
 
 admin.site.register(Entity, EntityAdmin)
@@ -76,6 +83,7 @@ admin.site.register(Lot, LotAdmin)
 admin.site.register(LotComment, LotCommentAdmin)
 admin.site.register(LotError, LotErrorAdmin)
 admin.site.register(GHGValues, GHGValuesAdmin)
+admin.site.register(Depot, DepotAdmin)
 
 
 # authtool custom user model
