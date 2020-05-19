@@ -26,6 +26,7 @@ class Entity(models.Model):
         verbose_name = 'Entity'
         verbose_name_plural = 'Entities'
 
+
 class UserPreferences(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     default_entity = models.ForeignKey(Entity, blank=True, null=True, on_delete=models.SET_NULL)
@@ -37,6 +38,7 @@ class UserPreferences(models.Model):
         db_table = 'users_preferences'
         verbose_name = 'User Preference'
         verbose_name_plural = 'User Preferences'
+
 
 class UserRights(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -50,6 +52,7 @@ class UserRights(models.Model):
         db_table = 'users_rights'
         verbose_name = 'User Right'
         verbose_name_plural = 'Users Rights'
+
 
 class Biocarburant(models.Model):
     name = models.CharField(max_length=64)
@@ -68,6 +71,7 @@ class Biocarburant(models.Model):
         verbose_name = 'Biocarburant'
         verbose_name_plural = 'Biocarburants'
 
+
 class MatierePremiere(models.Model):
     name = models.CharField(max_length=128)
     description = models.CharField(max_length=128)
@@ -84,6 +88,7 @@ class MatierePremiere(models.Model):
         db_table = 'matieres_premieres'
         verbose_name = 'Matiere Premiere'
         verbose_name_plural = 'Matieres Premieres'
+
 
 class Pays(models.Model):
     code_pays = models.CharField(max_length=64)
@@ -103,6 +108,7 @@ class Pays(models.Model):
 
 
 from producers.models import ProductionSite
+
 
 class Lot(models.Model):
     LOT_STATUS = (('Draft', 'Brouillon'), ('Validated', 'Validé'))
@@ -126,7 +132,6 @@ class Lot(models.Model):
     biocarburant = models.ForeignKey(Biocarburant, null=True, on_delete=models.SET_NULL)
     pays_origine = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='pays_origine')
 
-
     # GHG values
     eec = models.FloatField(default=0.0)
     el = models.FloatField(default=0.0)
@@ -140,7 +145,6 @@ class Lot(models.Model):
     ghg_total = models.FloatField(default=0.0)
     ghg_reference = models.FloatField(default=0.0)
     ghg_reduction = models.FloatField(default=0.0)
-
 
     # other
     client_id = models.CharField(max_length=64, blank=True, default='')
@@ -157,6 +161,7 @@ class Lot(models.Model):
         verbose_name = 'Lot'
         verbose_name_plural = 'Lots'
 
+
 class LotComment(models.Model):
     entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
     lot = models.ForeignKey(Lot, on_delete=models.CASCADE)
@@ -169,6 +174,7 @@ class LotComment(models.Model):
         db_table = 'lots_comments'
         verbose_name = 'LotComment'
         verbose_name_plural = 'LotComments'
+
 
 class LotError(models.Model):
     lot = models.ForeignKey(Lot, null=False, blank=False, on_delete=models.CASCADE)
@@ -184,6 +190,7 @@ class LotError(models.Model):
         verbose_name = 'LotError'
         verbose_name_plural = 'LotErrors'
 
+
 class GHGValues(models.Model):
     matiere_premiere = models.ForeignKey(MatierePremiere, blank=True, null=True, on_delete=models.CASCADE)
     biocarburant = models.ForeignKey(Biocarburant, on_delete=models.CASCADE)
@@ -196,7 +203,8 @@ class GHGValues(models.Model):
     etd_typical = models.FloatField(default=0.0)
 
     def __str__(self):
-        return '%s - %s - %f -  %f - %f' % (self.biocarburant, self.matiere_premiere, self.eec_default, self.ep_default, self.etd_default)
+        return '%s - %s - %f -  %f - %f' % (self.biocarburant, self.matiere_premiere,
+                                            self.eec_default, self.ep_default, self.etd_default)
 
     class Meta:
         db_table = 'ghg_values'
