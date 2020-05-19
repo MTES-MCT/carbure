@@ -1,6 +1,7 @@
-from core.models import Biocarburant, MatierePremiere, Pays, Entity
+from core.models import Biocarburant, MatierePremiere, Pays, Entity, Depot
 from django.http import JsonResponse, HttpResponse
 import csv
+from django.db.models import Q
 
 
 # public
@@ -29,6 +30,13 @@ def operators_autocomplete(request):
     q = request.GET['query']
     operators = Entity.objects.filter(entity_type='Opérateur', name__icontains=q)
     results = [{'value': i.name, 'data': i.id} for i in operators]
+    return JsonResponse({'suggestions': results})
+
+
+def depots_autocomplete(request):
+    q = request.GET['query']
+    depots = Depot.objects.filter(Q(name__icontains=q) | Q(city__icontains=q) | Q(depot_id__icontains=q))
+    results = [{'name': i.name, 'depot_id': i.depot_id, 'city':i.city} for i in depots]
     return JsonResponse({'suggestions': results})
 
 
@@ -73,4 +81,15 @@ def operators_csv(request):
     writer.writerow(['ea'])
     for t in types:
         writer.writerow([t.name])
+    return response
+
+
+def depots_csv(request):
+    types = Depot.objects.all()
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="depots.csv"'
+    writer = csv.writer(response, delimiter=';')
+    writer.writerow(['name', 'depot_id', 'city'])
+    for t in types:
+        writer.writerow([t.name, t.depot_id, t.city])
     return response

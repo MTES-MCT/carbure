@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from core.models import Biocarburant, MatierePremiere, Pays, Entity
+from core.models import Biocarburant, MatierePremiere, Pays, Entity, Depot
 import json
 
 
@@ -27,6 +27,8 @@ class PublicApiTest(TestCase):
 
         Entity.objects.update_or_create(name="DGEC", entity_type="Administration")
         Entity.objects.update_or_create(name="Douane", entity_type="Administration")
+
+        Depot.objects.update_or_create(name="DEPOTTEST", depot_id="111", city="Paris")
 
     def test_bc_autocomplete(self):
         base_url = reverse('api-biocarburant-autocomplete')
@@ -98,6 +100,22 @@ class PublicApiTest(TestCase):
         data = json.loads(response.content)
         self.assertEqual(len(data['suggestions']), 0)
 
+    def test_depots_autocomplete(self):
+        base_url = reverse('api-depots-autocomplete')
+        # test with no results
+        url = base_url + "?query=W"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(data, {'suggestions': []})
+
+        # test with a results
+        url = base_url + "?query=DEP"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(len(data['suggestions']), 1)
+
     def test_bc_csv(self):
         url = reverse('api-biocarburant-csv')
         response = self.client.get(url)
@@ -122,3 +140,9 @@ Ma\xc3\xafs\r\nHVD;Huiles v\xc3\xa9g\xc3\xa9tales diverses\r\n')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'ea\r\nOP1\r\nOP2\r\nOP3\r\n')
+
+    def test_depots_csv(self):
+        url = reverse('api-depots-csv')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b'name;depot_id;city\r\nDEPOTTEST;111;Paris\r\n')
