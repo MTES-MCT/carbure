@@ -210,3 +210,17 @@ class GHGValues(models.Model):
         db_table = 'ghg_values'
         verbose_name = 'Valeur GES de référence'
         verbose_name_plural = 'Valeurs GES de référence'
+
+
+class Depot(models.Model):
+    name = models.CharField(max_length=128, null=False, blank=False)
+    city = models.CharField(max_length=128, null=True, blank=True)
+    depot_id = models.CharField(max_length=32, null=False, blank=False)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'depots'
+        verbose_name = 'Dépôt'
+        verbose_name_plural = 'Dépôts'
