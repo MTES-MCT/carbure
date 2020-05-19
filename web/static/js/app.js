@@ -1522,6 +1522,11 @@ $(".autocomplete_operators").autocomplete({
   minChars: 0,
 })
 
+$(".autocomplete_depots").autocomplete({
+  serviceUrl: window.api_depots_autocomplete,
+  dataType: 'json',
+  minChars: 1,
+})
 
 })
 
