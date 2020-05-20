@@ -13,6 +13,9 @@
     <symbol id="duplicate" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24">
       <path d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
     </symbol>
+    <symbol id="plus" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24">
+      <path d="M12 4v16m8-8H4"></path>
+    </svg>
   </defs>
 </svg>
 
@@ -36,7 +39,9 @@
 
       <div class="flex-container">
         <a title="Importer Lots" class="button modal-button" id="btn_open_modal_import" style="margin-right: 0px; padding: 7px 10px 0px 10px;">
-          <img src="/static/images/icons/upload2.png" height="24" width="24" style="margin-bottom: 5px;" />
+          <svg class="icon" style="height:24px; width:24px">
+            <use xlink:href="#plus" aria-label="Ajouter/Importer Lots"></use>
+          </svg>
         </a>
         <a title="Afficher/Cacher des colonnes" id="btn_open_modal_columns_drafts" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
@@ -73,9 +78,6 @@
         <tbody></tbody>
       </table>
       <div class="button-container">
-        <div class="button-item">
-          <a class="button primary" id="add_lot">Ajouter Lot</a>
-        </div>
         <div class="button-item button-push">
           <a id="btn_open_modal_validate_lots" class="button primary">Valider Lots</a>
         </div>
@@ -168,7 +170,7 @@
 <div class="modal__backdrop" id="modal_import">
   <div class="modal">
     <div class="form__group">
-      <h4>Importer</h4>
+      <h4>Importer Fichier</h4>
       <dl>
         <dt><a href="{% url 'api-producers-template-csv' %}" >Télécharger le modèle</dt>
         <dt><a href="{% url 'api-matiere-premiere-csv' %}" ><small>Table des matières premières</small></a></dt>
@@ -182,9 +184,10 @@
     <span id="modal_import_err_msg" style="color: red;"></span>
     <ul id="modal_import_err_list"></ul>
     <input type="file" id="file_to_upload">
+    <h4>Ajout Manuel</h4>
     <div class="form__group button__group">
-      <a class="button secondary close" id="btn_close_modal_import">Annuler</a>
-      <a class="button secondary close" id="modal_import_btn_finished" style="display: none">Terminé</a>
+      <a class="button primary" id="add_lot">Ajouter Lot</a>
+      <a class="button secondary close" id="btn_close_modal_import">Fermer</a>
     </div>
   </div>
 </div>

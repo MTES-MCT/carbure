@@ -287,8 +287,16 @@ $("form").submit(function(event) {
     },
     error       : function(e) {
       if (e.status === 400) {
-        err_msg_dom.text(e.responseJSON.message)
-        console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+      	if (Array.isArray(e.responseJSON.results)) {
+      		let text = ""
+      		for (let i = 0, len = e.responseJSON.results.length; i < len; i++) {
+      			text += `Lot ${e.responseJSON.results[i].lot_id}: ${e.responseJSON.results[i].message}\n`
+      		}
+	   	    err_msg_dom.text(text)
+      	} else {
+    	    err_msg_dom.text(e.responseJSON.message)
+	   	    console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+      	}
       } else {
         err_msg_dom.text("Server error. Please contact an administrator")
         console.log(`server error ${JSON.stringify(e)}`)
@@ -1573,4 +1581,24 @@ $("#tab_operators_declared_title").on('click', function() {
   hideTab("tab_operators_affiliations")
   showTab("tab_operators_declared")
   init_datatables_operators_declared()
+})
+
+$("#add_lot").on('click', function() {
+  let modal = document.getElementById("modal_edit_lot")
+  /* empty all input fields */
+  $("#modal_edit_lot input").each(function() {
+    $(this).val('')
+  })
+  $("#err_msg_dom").html('')
+  let non_input_fields = ['ghg_total', 'ghg_reduction']
+  for (let i = 0, len = non_input_fields.length; i < len; i++) {
+    let field = non_input_fields[i]
+   $(`#${field}`).html('')
+  }
+  /* check if we have production sites, mps and bcs in parameters */
+  check_production_sites()
+  check_mps()
+  check_biocarburants()
+  $("#reduction_title").attr('title', '')
+  modal.style.display = "flex"
 })
