@@ -2,6 +2,7 @@ var lot_errors = {}
 const selected_rows = []
 var table_columns_drafts = [
 {title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
+{title:'ID', can_hide: true, can_duplicate: false, can_export: false, data:'lot_id'},
 {title:'Producteur', can_hide: true, can_duplicate: true, can_export: true, data:'producer_name'},
 {title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data:'production_site_name'},
 {title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
@@ -290,9 +291,9 @@ $("form").submit(function(event) {
       	if (Array.isArray(e.responseJSON.results)) {
       		let text = ""
       		for (let i = 0, len = e.responseJSON.results.length; i < len; i++) {
-      			text += `Lot ${e.responseJSON.results[i].lot_id}: ${e.responseJSON.results[i].message}\n`
+      			text += `Lot ${e.responseJSON.results[i].lot_id}: ${e.responseJSON.results[i].message}<br />`
       		}
-	   	    err_msg_dom.text(text)
+	   	    err_msg_dom.html(text)
       	} else {
     	    err_msg_dom.text(e.responseJSON.message)
 	   	    console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
@@ -700,7 +701,7 @@ function init_datatables_drafts(url) {
           }
         }
       ],
-      order: [[ 1, 'asc' ]],
+      order: [[ 1, 'desc' ]],
       columns: table_columns_drafts,
       ajax: {
         url: url,
@@ -1380,9 +1381,10 @@ function handleSave(action) {
 			    type        : 'POST',
 			    success     : function(data, textStatus, jqXHR) {
 			      // Callback code
-			        window.location.reload()
+			      window.location.reload()
 			    },
 			    error       : function(e) {
+			      window.location.reload()
 			      if (e.status === 400) {
 			        err_msg_dom.html(`${e.responseJSON.message}`)
 			      } else {
@@ -1391,17 +1393,7 @@ function handleSave(action) {
 			    }
 			  })
 			} else {
-				/* if errors, display them and stay on page */
-	      if (data.errors.length > 0) {
-	        err_msg_dom.append('<ul style="color: tomato;" id="errors_list"></ul>')
-	        let err_list = $("#errors_list")
-	        for (let i = 0, len = data.errors.length; i < len; i++) {
-	          err_list.append(`<li>${data.errors[i].error}</li>`)
-	        }
-	      } else {
-	        /* otherwise reload page */
-	        window.location.reload()
-	      }
+		        window.location.reload()
 			}
     },
     error       : function(e) {
