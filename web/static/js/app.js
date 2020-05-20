@@ -401,6 +401,7 @@ function duplicate_lot(lot_id) {
     success     : function(data, textStatus, jqXHR){
       // Callback code
       window.table_drafts.ajax.reload()
+      selected_rows.pop()
       manage_actions()
     },
     error       : function(e) {
@@ -467,35 +468,17 @@ function manage_delete_button(only_drafts_present) {
   }
 }
 
-function manage_add_button() {
+function manage_duplicate_button() {
   if (selected_rows.length === 1) {
-    $("#add_lot").text("Dupliquer Lot")
-    $("#add_lot").removeAttr("href")
     let lot_id = table_drafts.row(selected_rows[0]).data()['lot_id']
-    $("#add_lot").unbind('click')
-    $("#add_lot").attr("onclick", `duplicate_lot(${lot_id})`)
+    $("#duplicate_lot").attr("onclick", `duplicate_lot(${lot_id})`)
+    $("#duplicate_lot").addClass('primary')
+    $("#duplicate_lot").css("pointer-events", "auto")
+    $("#duplicate_lot").removeClass('secondary')
   } else {
-    $("#add_lot").text("Ajouter Lot")
-    $("#add_lot").removeAttr("onclick")
-    $("#add_lot").on("click", function() {
-      let modal = document.getElementById("modal_edit_lot")
-      /* empty all input fields */
-      $("#modal_edit_lot input").each(function() {
-        $(this).val('')
-      })
-      $("#err_msg_dom").html('')
-      let non_input_fields = ['ghg_total', 'ghg_reduction']
-      for (let i = 0, len = non_input_fields.length; i < len; i++) {
-        let field = non_input_fields[i]
-        $(`#${field}`).html('')
-      }
-      /* check if we have production sites, mps and bcs in parameters */
-      check_production_sites()
-      check_mps()
-      check_biocarburants()
-      $("#reduction_title").attr('title', '')
-      modal.style.display = "flex"
-    })
+  	$("#duplicate_lot").addClass('secondary')
+    $("#duplicate_lot").css("pointer-events", "none")
+    $("#duplicate_lot").removeClass('primary')
   }
 }
 
@@ -560,7 +543,7 @@ function manage_actions() {
   }
   manage_validate_button(draft_present)
   manage_delete_button(only_drafts_present)
-  manage_add_button()
+  manage_duplicate_button()
 }
 
 function manage_actions_operators_affiliation() {

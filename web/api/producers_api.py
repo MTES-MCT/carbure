@@ -60,7 +60,7 @@ def producers_import_csv_template(request, *args, **kwargs):
 @restrict_to_producers
 def producers_lots_drafts(request, *args, **kwargs):
     context = kwargs['context']
-    lots = Lot.objects.filter(producer=context['user_entity'], status='Draft')
+    lots = Lot.objects.filter(producer=context['user_entity'], status='Draft').order_by('-id')
     lots_json = [{'carbure_id': k.carbure_id, 'producer_name': k.producer.name if k.producer else '',
                   'producer_id': k.producer.id if k.producer else '',
                   'production_site_name': k.production_site.name if k.production_site else '',
@@ -91,7 +91,7 @@ def producers_lots_drafts(request, *args, **kwargs):
 @restrict_to_producers
 def producers_lots_corrections(request, *args, **kwargs):
     context = kwargs['context']
-    lots = Lot.objects.filter(producer=context['user_entity'], ea_delivery_status__in=['AA', 'AC', 'R'])
+    lots = Lot.objects.filter(producer=context['user_entity'], ea_delivery_status__in=['AA', 'AC', 'R']).order_by('-id')
     lots_json = [{'period': k.period, 'carbure_id': k.carbure_id,
                   'producer_name': k.producer.name if k.producer else '',
                   'producer_id': k.producer.id if k.producer else '',
@@ -122,7 +122,7 @@ def producers_lots_corrections(request, *args, **kwargs):
 @restrict_to_producers
 def producers_lots_valid(request, *args, **kwargs):
     context = kwargs['context']
-    lots = Lot.objects.filter(producer=context['user_entity'], status='Validated')
+    lots = Lot.objects.filter(producer=context['user_entity'], status='Validated').order_by('-id')
     lots_json = [{'period': k.period, 'carbure_id': k.carbure_id,
                   'producer_name': k.producer.name if k.producer else '',
                   'producer_id': k.producer.id if k.producer else '',
@@ -153,7 +153,7 @@ def producers_lots_valid(request, *args, **kwargs):
 @restrict_to_producers
 def producers_lots_all(request, *args, **kwargs):
     context = kwargs['context']
-    lots = Lot.objects.all(producer=context['user_entity'])
+    lots = Lot.objects.all(producer=context['user_entity']).order_by('-id')
     lots_json = [{'carbure_id': k.carbure_id, 'producer_name': k.producer.name if k.producer else '',
                   'producer_id': k.producer.id if k.producer else '',
                   'production_site_name': k.production_site.name if k.production_site else '',
@@ -183,7 +183,7 @@ def producers_lots_all(request, *args, **kwargs):
 @enrich_with_user_details
 @restrict_to_producers
 def producers_corrections(request, *args, **kwargs):
-    lots = Lot.objects.filter(ea_delivery_status__in=['AC', 'AA', 'R'])
+    lots = Lot.objects.filter(ea_delivery_status__in=['AC', 'AA', 'R']).order_by('-id')
     lots_json = [{'carbure_id': k.carbure_id, 'producer_name': k.producer.name if k.producer else '',
                   'producer_id': k.producer.id if k.producer else '',
                   'production_site_name': k.production_site.name if k.production_site else '',
