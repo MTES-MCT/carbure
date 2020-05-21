@@ -32,7 +32,7 @@ def main():
     parser.add_argument('--force', action='store_true', default=False, help='Force check even if not in production environment')    
     args = parser.parse_args()
     
-    env = os.environ['TRADIVARI_ENV']
+    env = os.environ['IMAGE_TAG']
     if env != 'prod' and not args.force:
         print('Passed')
         return 0
