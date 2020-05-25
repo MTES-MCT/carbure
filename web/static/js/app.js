@@ -2,6 +2,7 @@ var lot_errors = {}
 const selected_rows = []
 var table_columns_drafts = [
 {title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
+{title:'ID', can_hide: true, can_duplicate: false, can_export: false, data:'lot_id'},
 {title:'Producteur', can_hide: true, can_duplicate: true, can_export: true, data:'producer_name'},
 {title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data:'production_site_name'},
 {title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
@@ -287,8 +288,16 @@ $("form").submit(function(event) {
     },
     error       : function(e) {
       if (e.status === 400) {
-        err_msg_dom.text(e.responseJSON.message)
-        console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+      	if (Array.isArray(e.responseJSON.results)) {
+      		let text = ""
+      		for (let i = 0, len = e.responseJSON.results.length; i < len; i++) {
+      			text += `Lot ${e.responseJSON.results[i].lot_id}: ${e.responseJSON.results[i].message}<br />`
+      		}
+	   	    err_msg_dom.html(text)
+      	} else {
+    	    err_msg_dom.text(e.responseJSON.message)
+	   	    console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+      	}
       } else {
         err_msg_dom.text("Server error. Please contact an administrator")
         console.log(`server error ${JSON.stringify(e)}`)
@@ -401,6 +410,7 @@ function duplicate_lot(lot_id) {
     success     : function(data, textStatus, jqXHR){
       // Callback code
       window.table_drafts.ajax.reload()
+      selected_rows.pop()
       manage_actions()
     },
     error       : function(e) {
@@ -467,35 +477,17 @@ function manage_delete_button(only_drafts_present) {
   }
 }
 
-function manage_add_button() {
+function manage_duplicate_button() {
   if (selected_rows.length === 1) {
-    $("#add_lot").text("Dupliquer Lot")
-    $("#add_lot").removeAttr("href")
     let lot_id = table_drafts.row(selected_rows[0]).data()['lot_id']
-    $("#add_lot").unbind('click')
-    $("#add_lot").attr("onclick", `duplicate_lot(${lot_id})`)
+    $("#duplicate_lot").attr("onclick", `duplicate_lot(${lot_id})`)
+    $("#duplicate_lot").addClass('primary')
+    $("#duplicate_lot").css("pointer-events", "auto")
+    $("#duplicate_lot").removeClass('secondary')
   } else {
-    $("#add_lot").text("Ajouter Lot")
-    $("#add_lot").removeAttr("onclick")
-    $("#add_lot").on("click", function() {
-      let modal = document.getElementById("modal_edit_lot")
-      /* empty all input fields */
-      $("#modal_edit_lot input").each(function() {
-        $(this).val('')
-      })
-      $("#err_msg_dom").html('')
-      let non_input_fields = ['ghg_total', 'ghg_reduction']
-      for (let i = 0, len = non_input_fields.length; i < len; i++) {
-        let field = non_input_fields[i]
-        $(`#${field}`).html('')
-      }
-      /* check if we have production sites, mps and bcs in parameters */
-      check_production_sites()
-      check_mps()
-      check_biocarburants()
-      $("#reduction_title").attr('title', '')
-      modal.style.display = "flex"
-    })
+  	$("#duplicate_lot").addClass('secondary')
+    $("#duplicate_lot").css("pointer-events", "none")
+    $("#duplicate_lot").removeClass('primary')
   }
 }
 
@@ -560,7 +552,7 @@ function manage_actions() {
   }
   manage_validate_button(draft_present)
   manage_delete_button(only_drafts_present)
-  manage_add_button()
+  manage_duplicate_button()
 }
 
 function manage_actions_operators_affiliation() {
@@ -709,7 +701,7 @@ function init_datatables_drafts(url) {
           }
         }
       ],
-      order: [[ 1, 'asc' ]],
+      order: [[ 1, 'desc' ]],
       columns: table_columns_drafts,
       ajax: {
         url: url,
@@ -1400,9 +1392,10 @@ function handleSave(action) {
 			    type        : 'POST',
 			    success     : function(data, textStatus, jqXHR) {
 			      // Callback code
-			        window.location.reload()
+			      window.location.reload()
 			    },
 			    error       : function(e) {
+			      window.location.reload()
 			      if (e.status === 400) {
 			        err_msg_dom.html(`${e.responseJSON.message}`)
 			      } else {
@@ -1411,17 +1404,7 @@ function handleSave(action) {
 			    }
 			  })
 			} else {
-				/* if errors, display them and stay on page */
-	      if (data.errors.length > 0) {
-	        err_msg_dom.append('<ul style="color: tomato;" id="errors_list"></ul>')
-	        let err_list = $("#errors_list")
-	        for (let i = 0, len = data.errors.length; i < len; i++) {
-	          err_list.append(`<li>${data.errors[i].error}</li>`)
-	        }
-	      } else {
-	        /* otherwise reload page */
-	        window.location.reload()
-	      }
+		        window.location.reload()
 			}
     },
     error       : function(e) {
@@ -1533,6 +1516,14 @@ $(".autocomplete_operators").autocomplete({
   minChars: 0,
 })
 
+$(".autocomplete_depots").autocomplete({
+  serviceUrl: window.api_depots_autocomplete,
+  dataType: 'json',
+  minChars: 1,
+  onSelect: function(suggestion) {
+    $("#ea_delivery_site").val(suggestion.name)
+  },
+})
 
 })
 
@@ -1652,4 +1643,23 @@ $("#show_add_comment_section").on('click', function() {
 $("#show_reject_section").on('click', function() {
   $("#reject_section").show()
   $("#show_reject_section").hide()
+=======
+$("#add_lot").on('click', function() {
+  let modal = document.getElementById("modal_edit_lot")
+  /* empty all input fields */
+  $("#modal_edit_lot input").each(function() {
+    $(this).val('')
+  })
+  $("#err_msg_dom").html('')
+  let non_input_fields = ['ghg_total', 'ghg_reduction']
+  for (let i = 0, len = non_input_fields.length; i < len; i++) {
+    let field = non_input_fields[i]
+   $(`#${field}`).html('')
+  }
+  /* check if we have production sites, mps and bcs in parameters */
+  check_production_sites()
+  check_mps()
+  check_biocarburants()
+  $("#reduction_title").attr('title', '')
+  modal.style.display = "flex"
 })

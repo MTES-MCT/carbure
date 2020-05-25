@@ -60,7 +60,7 @@ def producers_import_csv_template(request, *args, **kwargs):
 @restrict_to_producers
 def producers_lots_drafts(request, *args, **kwargs):
     context = kwargs['context']
-    lots = Lot.objects.filter(producer=context['user_entity'], status='Draft')
+    lots = Lot.objects.filter(producer=context['user_entity'], status='Draft').order_by('-id')
     lots_json = [{'carbure_id': k.carbure_id, 'producer_name': k.producer.name if k.producer else '',
                   'producer_id': k.producer.id if k.producer else '',
                   'production_site_name': k.production_site.name if k.production_site else '',
@@ -91,7 +91,7 @@ def producers_lots_drafts(request, *args, **kwargs):
 @restrict_to_producers
 def producers_lots_corrections(request, *args, **kwargs):
     context = kwargs['context']
-    lots = Lot.objects.filter(producer=context['user_entity'], ea_delivery_status__in=['AA', 'AC', 'R'])
+    lots = Lot.objects.filter(producer=context['user_entity'], ea_delivery_status__in=['AA', 'AC', 'R']).order_by('-id')
     lots_json = [{'period': k.period, 'carbure_id': k.carbure_id,
                   'producer_name': k.producer.name if k.producer else '',
                   'producer_id': k.producer.id if k.producer else '',
@@ -122,7 +122,7 @@ def producers_lots_corrections(request, *args, **kwargs):
 @restrict_to_producers
 def producers_lots_valid(request, *args, **kwargs):
     context = kwargs['context']
-    lots = Lot.objects.filter(producer=context['user_entity'], status='Validated')
+    lots = Lot.objects.filter(producer=context['user_entity'], status='Validated').order_by('-id')
     lots_json = [{'period': k.period, 'carbure_id': k.carbure_id,
                   'producer_name': k.producer.name if k.producer else '',
                   'producer_id': k.producer.id if k.producer else '',
@@ -153,7 +153,7 @@ def producers_lots_valid(request, *args, **kwargs):
 @restrict_to_producers
 def producers_lots_all(request, *args, **kwargs):
     context = kwargs['context']
-    lots = Lot.objects.all(producer=context['user_entity'])
+    lots = Lot.objects.all(producer=context['user_entity']).order_by('-id')
     lots_json = [{'carbure_id': k.carbure_id, 'producer_name': k.producer.name if k.producer else '',
                   'producer_id': k.producer.id if k.producer else '',
                   'production_site_name': k.production_site.name if k.production_site else '',
@@ -183,7 +183,7 @@ def producers_lots_all(request, *args, **kwargs):
 @enrich_with_user_details
 @restrict_to_producers
 def producers_corrections(request, *args, **kwargs):
-    lots = Lot.objects.filter(ea_delivery_status__in=['AC', 'AA', 'R'])
+    lots = Lot.objects.filter(ea_delivery_status__in=['AC', 'AA', 'R']).order_by('-id')
     lots_json = [{'carbure_id': k.carbure_id, 'producer_name': k.producer.name if k.producer else '',
                   'producer_id': k.producer.id if k.producer else '',
                   'production_site_name': k.production_site.name if k.production_site else '',
@@ -355,6 +355,8 @@ def producers_delete_lots(request, *args, **kwargs):
 def producers_validate_lots(request, *args, **kwargs):
     context = kwargs['context']
     lot_ids = request.POST.get('lots', None)
+    results = []
+    passed = 0
     if not lot_ids:
         return JsonResponse({'status': 'error', 'message': 'Aucun lot sélectionné'}, status=400)
 
@@ -363,23 +365,24 @@ def producers_validate_lots(request, *args, **kwargs):
         lot = Lot.objects.get(id=lotid, producer=context['user_entity'])
         # make sure all mandatory fields are set
         if not lot.dae:
-            return JsonResponse({'status': 'error', 'message': 'Validation impossible. DAE manquant'}, status=400)
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. DAE manquant'})
+            continue
         if not lot.ea_delivery_site:
-            return JsonResponse({'status': 'error', 'message': 'Validation impossible. Site de livraison manquant'},
-                                status=400)
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Site de livraison manquant'})
+            continue
         if not lot.ea_delivery_date:
-            return JsonResponse({'status': 'error', 'message': 'Validation impossible. Date de livraison manquante'},
-                                status=400)
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Date de livraison manquante'})
+            continue
         if not lot.ea:
-            return JsonResponse({'status': 'error', 'message': 'Validation impossible. Veuillez renseigner un client'},
-                                status=400)
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Veuillez renseigner un client'})
+            continue
         if not lot.volume:
-            return JsonResponse({'status': 'error', 'message': 'Validation impossible. Veuillez renseigner le volume'},
-                                status=400)
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Veuillez renseigner le volume'})
+            continue
         if not lot.pays_origine:
             msg = 'Validation impossible. Veuillez renseigner le pays d\'origine de la matière première'
-            return JsonResponse({'status': 'error', 'message': msg}, status=400)
-
+            results.append({'lot_id': lotid, 'status': 'error', 'message': msg})
+            continue
         try:
             today = datetime.date.today()
             lot = Lot.objects.get(id=lotid)
@@ -388,10 +391,15 @@ def producers_validate_lots(request, *args, **kwargs):
             lot.carbure_id = "%s%sP%d-%d" % ('FR', today.strftime('%y%m'), lot.producer.id, lot.id)
             lot.status = "Validated"
             lot.save()
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': 'Erreur lors de la validation du lot', 'extra': str(e)},
-                                status=400)
-    return JsonResponse({'status': 'success', 'message': 'lots validated'})
+        except Exception:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Erreur lors de la validation du lot'})
+            continue
+        passed += 1
+        results.append({'lot_id': lotid, 'status': 'sucess'})
+    if passed == len(ids):
+        return JsonResponse({'status': 'success', 'results': results})
+    else:
+        return JsonResponse({'status': 'error', 'results': results}, status=400)
 
 
 @login_required

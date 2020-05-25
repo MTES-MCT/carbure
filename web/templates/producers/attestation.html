@@ -7,8 +7,18 @@
     <symbol id="filter" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24">
       <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
     </symbol>
+    <symbol id="trash" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24">
+      <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+    </symbol>
+    <symbol id="duplicate" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24">
+      <path d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
+    </symbol>
+    <symbol id="plus" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24">
+      <path d="M12 4v16m8-8H4"></path>
+    </svg>
   </defs>
 </svg>
+
 
 
 <div class="main" style="overflow-x: auto;">
@@ -23,16 +33,33 @@
     </ul>
 
     <div id="tab_drafts" class="tabcontent">
+
+      <p>Cet espace vous permet de créer manuellement ou d'importer vos lots de biocarburants sous forme de brouillons. <br />
+      Une fois créés, n'oubliez pas de les valider pour les transmettre à vos clients.</p>
+
       <div class="flex-container">
-        <a class="button modal-button" id="btn_open_modal_import" style="margin-right: 0px; padding: 7px 10px 0px 10px;">
-          <img src="/static/images/icons/upload2.png" height="24" width="24" style="margin-bottom: 5px;" />
+        <a title="Importer Lots" class="button modal-button" id="btn_open_modal_import" style="margin-right: 0px; padding: 7px 10px 0px 10px;">
+          <svg class="icon" style="height:24px; width:24px">
+            <use xlink:href="#plus" aria-label="Ajouter/Importer Lots"></use>
+          </svg>
         </a>
-        <a id="btn_open_modal_columns_drafts" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
+        <a title="Afficher/Cacher des colonnes" id="btn_open_modal_columns_drafts" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
-        <a class="button modal-button" href="{% url 'producers-api-attestation-export-drafts' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
+        <a title="Exporter vers Excel" class="button modal-button" href="{% url 'producers-api-attestation-export-drafts' %}" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
           <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
         </a>
+        <a title="Dupliquer un lot" id="duplicate_lot" class="button modal-button secondary" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+          <svg class="icon" style="height:24px; width:24px">
+            <use xlink:href="#duplicate" aria-label="Dupliquer"></use>
+          </svg>
+        </a>
+        <a id="btn_open_modal_delete_lots" title="Supprimer Lot(s)" class="button modal-button primary" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
+          <svg class="icon" style="height:24px; width:24px">
+            <use xlink:href="#trash" aria-label="Supprimer"></use>
+          </svg>
+        </a>
+
         <select id="pagelength_drafts" style="margin-top: auto;">
           <option value="10">10</option>
           <option value="25">25</option>
@@ -52,25 +79,15 @@
       </table>
       <div class="button-container">
         <div class="button-item">
-          <a class="button primary" id="add_lot">Ajouter Lot</a>
-          <a id="add_lot_params" style="margin-top: auto;"><small>Paramètres</small></a>
-        </div>
-        <div class="button-item button-push">
           <a id="btn_open_modal_validate_lots" class="button primary">Valider Lots</a>
-          <a id="btn_open_modal_delete_lots" class="button primary">Supprimer Lots</a>
         </div>
-      </div>
-      <div class="form__group" id="add_lot_params_toggle" style="display: none;">
-        <fieldset>
-          <legend><small>Sélectionnez les valeurs à dupliquer lors de l'ajout de lot</small></legend>
-          <ul class="flex-container-a" id="list_columns_filter">
-            <!-- dynamically generated in js -->
-          </ul>
-        </fieldset>
       </div>
     </div>
 
     <div id="tab_errors" class="tabcontent">
+      <p>Vous trouverez ici les lots qui n'ont pas été acceptés par vos clients.<br />
+         Vous pouvez effectuer des corrections si nécessaire ou simplement communiquer avec le client en cliquant sur un lot.</p>
+
       <div class="flex-container">
         <a id="btn_open_modal_columns_errors" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
@@ -86,6 +103,8 @@
     </div>
 
     <div id="tab_valid" class="tabcontent">
+      <p>Ces lots ont été validés et acceptés par vos clients.</p>
+
       <div class="flex-container">
         <a id="btn_open_modal_columns_valid" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
@@ -151,22 +170,24 @@
 <div class="modal__backdrop" id="modal_import">
   <div class="modal">
     <div class="form__group">
-      <h4>Importer</h4>
+      <h4>Importer Fichier</h4>
       <dl>
         <dt><a href="{% url 'api-producers-template-csv' %}" >Télécharger le modèle</dt>
         <dt><a href="{% url 'api-matiere-premiere-csv' %}" ><small>Table des matières premières</small></a></dt>
         <dt><a href="{% url 'api-biocarburant-csv' %}" ><small>Table des biocarburants</small></a></dt>
         <dt><a href="{% url 'api-country-csv' %}" ><small>Table des pays</small></a></dt>
-        <dt><a href="{% url 'api-operators-csv' %}" ><small>Table des opérateurs pétroliers et dépôts</small></a></dt>
+        <dt><a href="{% url 'api-operators-csv' %}" ><small>Table des opérateurs pétroliers</small></a></dt>
+        <dt><a href="{% url 'api-depots-csv' %}" ><small>Table des dépôts pétroliers/sites de livraison</small></a></dt>
       </dl>
     </div>
     <span id="modal_import_success_msg" style="color: green;"></span>
     <span id="modal_import_err_msg" style="color: red;"></span>
     <ul id="modal_import_err_list"></ul>
     <input type="file" id="file_to_upload">
+    <h4>Ajout Manuel</h4>
     <div class="form__group button__group">
-      <a class="button secondary close" id="btn_close_modal_import">Annuler</a>
-      <a class="button secondary close" id="modal_import_btn_finished" style="display: none">Terminé</a>
+      <a class="button primary" id="add_lot">Ajouter Lot</a>
+      <a class="button secondary close" id="btn_close_modal_import">Fermer</a>
     </div>
   </div>
 </div>
@@ -249,10 +270,10 @@
         <dt><label for="ea_name">Client</label></dt>
         <dd><input type="text" id="ea_name" class="autocomplete_operators" /><span id="ea_name_error" style="color:tomato;"></span></dd>
         <dt><label for="ea_delivery_site">Site de livraison</label></dt>
-        <dd><input id="ea_delivery_site" type="text" /><span id="ea_delivery_site_error" style="color:tomato;"></span></dd>
+        <dd><input id="ea_delivery_site" type="text" class="autocomplete_depots" /><span id="ea_delivery_site_error" style="color:tomato;"></span></dd>
         <dt><label for="ea_delivery_date">Date de livraison</label></dt>
         <dd><input id="ea_delivery_date" type="text" placeholder="JJ/MM/AAAA" /><span id="ea_delivery_date_error" style="color:tomato;"></span></dd>
-        <dt><label for="client_id" title="Champ optionnel, entrez ce que vous voulez">Référence</label></dt>
+        <dt><label for="client_id" title="Champ libre">Référence client (facultatif) </label></dt>
         <dd><input id="client_id" type="text" /><span id="client_id_error" style="color:tomato;"></span></dd>
         </dl>
       </div>
@@ -267,39 +288,39 @@
           <tbody>
             <tr>
               <td>
-                <label for="eec">EEC </label><input type="text" id="eec" class="ges_field ges_incr" />
+                <label for="eec" title="Émissions résultant de l'extraction ou de la culture des matières premières">EEC* </label><input type="text" id="eec" class="ges_field ges_incr" />
               </td>
               <td>
-                <label for="esca">ESCA </label><input type="text" id="esca" class="ges_field ges_decr" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label>EL </label><input type="text" id="el" class="ges_field ges_incr" />
-              </td>
-              <td>
-                <label>ECCS </label><input type="text" id="eccs" class="ges_field ges_decr" />
+                <label for="esca" title="Réductions d'émissions dues à l'accumulation du carbone dans les sols grâce à une meilleure gestion agricole">ESCA* </label><input type="text" id="esca" class="ges_field ges_decr" />
               </td>
             </tr>
             <tr>
               <td>
-                <label>EP </label><input type="text" id="ep" class="ges_field ges_incr" />
+                <label title="Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols">EL* </label><input type="text" id="el" class="ges_field ges_incr" />
               </td>
               <td>
-                <label>ECCR </label><input type="text" id="eccr" class="ges_field ges_decr" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <label>ETD </label><input type="text" id="etd" class="ges_field ges_incr" />
-              </td>
-              <td>
-                <label>EEE </label><input type="text" id="eee" class="ges_field ges_decr" />
+                <label title="Réductions d'émissions dues au piégeage et au stockage géologique du carbone">ECCS* </label><input type="text" id="eccs" class="ges_field ges_decr" />
               </td>
             </tr>
             <tr>
               <td>
-                <label>EU </label><input type="text" id="eu" class="ges_field ges_incr" />
+                <label title="Émissions résultant de la transformation">EP* </label><input type="text" id="ep" class="ges_field ges_incr" />
+              </td>
+              <td>
+                <label title="Réductions d'émissions dues au piégeage et à la substitution du carbone">ECCR* </label><input type="text" id="eccr" class="ges_field ges_decr" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label title="Émissions résultant du transport et de la distribution">ETD* </label><input type="text" id="etd" class="ges_field ges_incr" />
+              </td>
+              <td>
+                <label title="Réductions d'émissions dues à la production excédentaire d'électricité dans le cadre de la cogénération">EEE* </label><input type="text" id="eee" class="ges_field ges_decr" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label title="Émissions résultant du carburant à l'usage">EU* </label><input type="text" id="eu" class="ges_field ges_incr" />
               </td>
               <td>
               </td>
@@ -351,6 +372,7 @@ window.producers_api_mps_autocomplete = "{% url 'producers-api-mps-autocomplete'
 window.producers_api_production_sites_autocomplete = "{% url 'producers-api-production-sites-autocomplete' %}"
 window.api_country_autocomplete = "{% url 'api-country-autocomplete' %}"
 window.api_operators_autocomplete = "{% url 'api-operators-autocomplete' %}"
+window.api_depots_autocomplete = "{% url 'api-depots-autocomplete' %}"
 
 
 $(document).ready(function() {
@@ -476,10 +498,6 @@ $(document).ready(function() {
   })
 
   manage_actions()
-
-  $("#add_lot_params").on('click', function() {
-    $("#add_lot_params_toggle").toggle();
-  });
 })
 
 $("#btn_lot_save").on('click', handleSave)
