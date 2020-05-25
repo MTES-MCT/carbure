@@ -1167,8 +1167,8 @@ function display_producers_lot_modal(table, columns, event) {
   let rowid = event.target._DT_CellIndex.row
   let data = table.row(rowid).data()
   let table_column = columns[colid]
-  let comment_section = $("#comment_section")
-  comment_section.empty()
+  let comments_section = $("#comments_section")
+  comments_section.empty()
   if (table_column['data'] === 'checkbox') {
     // ignore clicks on checkbox column
     return
@@ -1230,7 +1230,7 @@ function display_producers_lot_modal(table, columns, event) {
         for (let i = 0, len = d.length; i < len; i++) {
           let c = d[i]
           let html = `<p><b>${c.from}</b>: ${c.comment}</p>`
-          comment_section.append(html)
+          comments_section.append(html)
         }
         // add area to respond
         if (data['status'] === "Draft" || data['ea_delivery_status'] === "Accepté") {
@@ -1238,7 +1238,7 @@ function display_producers_lot_modal(table, columns, event) {
         } else {
           // add the ability to add a comment
           let html = `<div style="display: flex;"><p>Ajouter un commentaire:</p><input type="text" name="textarea" id="textarea" style="max-width: 80%; height: 2em; margin-left: 10px; margin-top: auto; margin-bottom: auto;" /></div>`
-          comment_section.append(html)
+          comments_section.append(html)
         }
       },
       error       : function(e) {
@@ -1274,8 +1274,19 @@ function display_operators_lot_modal(table, columns, event) {
   let rowid = event.target._DT_CellIndex.row
   let data = table.row(rowid).data()
   let table_column = columns[colid]
-  let comment_section = $("#comment_section")
-  comment_section.empty()
+
+	let comments_section = $("#comments_section")
+	let show_add_comment_section = $("#show_add_comment_section")
+	let add_comment_section = $("#add_comment_section")
+	let show_reject_section = $("#show_reject_section")
+	let reject_section = $("#reject_section")
+	show_reject_section.show()
+	show_add_comment_section.show()
+	add_comment_section.hide()
+	comments_section.empty()
+	comments_section.hide()
+	reject_section.hide()
+
   if (table_column['data'] === 'checkbox') {
     // ignore clicks on checkbox column
     return
@@ -1314,7 +1325,7 @@ function display_operators_lot_modal(table, columns, event) {
         for (let i = 0, len = d.length; i < len; i++) {
           let c = d[i]
           let html = `<p><b>${c.from}</b>: ${c.comment}</p>`
-          comment_section.append(html)
+          comments_section.append(html)
         }
         // add area to respond
         if (data['status'] === "Draft" || data['ea_delivery_status'] === "Accepté") {
@@ -1322,7 +1333,7 @@ function display_operators_lot_modal(table, columns, event) {
         } else {
           // add the ability to add a comment
           let html = `<div style="display: flex;"><p>Ajouter un commentaire:</p><input type="text" name="textarea" id="textarea" style="max-width: 80%; height: 2em; margin-left: 10px; margin-top: auto; margin-bottom: auto;" /></div>`
-          comment_section.append(html)
+          comments_section.append(html)
         }
       },
       error       : function(e) {
@@ -1582,4 +1593,63 @@ $("#tab_operators_declared_title").on('click', function() {
   hideTab("tab_operators_affiliations")
   showTab("tab_operators_declared")
   init_datatables_operators_declared()
+})
+
+
+$("#btn_reject_with_comment").on('click', function() {
+  let lot_id = $("#lot_id").val()
+  let comment = $("#textarea_reject").val()
+  $.ajax({
+    url: window.operators_api_reject_with_comments,
+    data: {'lots': lot_id, comment:comment, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+    type        : 'POST',
+    success     : function(data, textStatus, jqXHR){
+      // Callback code
+      window.location.reload()
+    },
+    error       : function(e) {
+      if (e.status === 400) {
+        alert(e.responseJSON.message)
+        console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+      } else {
+        alert("Server error. Please contact an administrator")
+        console.log(`server error ${JSON.stringify(e)}`)
+      }
+    }
+  })
+})
+
+$("#btn_accept_with_comment").on('click', function() {
+  let lot_id = $("#lot_id").val()
+  let comment = $("#textarea").val()
+  $.ajax({
+    url: window.operators_api_accept_with_comments,
+    data: {'lot': lot_id,'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value,
+           'comment': comment},
+    type        : 'POST',
+    success     : function(data, textStatus, jqXHR){
+      // Callback code
+      window.location.reload()
+    },
+    error       : function(e) {
+      if (e.status === 400) {
+        alert(e.responseJSON.message)
+        console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+      } else {
+        alert("Server error. Please contact an administrator")
+        console.log(`server error ${JSON.stringify(e)}`)
+      }
+    }
+  })
+})
+
+
+$("#show_add_comment_section").on('click', function() {
+  $("#add_comment_section").show()
+  $("#show_add_comment_section").hide()
+})
+
+$("#show_reject_section").on('click', function() {
+  $("#reject_section").show()
+  $("#show_reject_section").hide()
 })
