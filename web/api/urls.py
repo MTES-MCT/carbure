@@ -11,10 +11,13 @@ urlpatterns = [
     path('matiere-premiere-autocomplete/', public_api.matiere_premiere_autocomplete, name='api-matiere-premiere-autocomplete'),
     path('country-autocomplete/', public_api.country_autocomplete, name='api-country-autocomplete'),
     path('operators-autocomplete/', public_api.operators_autocomplete, name='api-operators-autocomplete'),
+    path('depots-autocomplete/', public_api.depots_autocomplete, name='api-depots-autocomplete'),
+
     path('biocarburant-csv/', public_api.biocarburant_csv, name='api-biocarburant-csv'),
     path('matiere-premiere-csv/', public_api.matiere_premiere_csv, name='api-matiere-premiere-csv'),
     path('country-csv/', public_api.country_csv, name='api-country-csv'),
     path('operators-csv/', public_api.operators_csv, name='api-operators-csv'),
+    path('depots-csv/', public_api.depots_csv, name='api-depots-csv'),
 
     # private template
     path('producers/csv-template', producers_api.producers_import_csv_template, name='api-producers-template-csv'),
