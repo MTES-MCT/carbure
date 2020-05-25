@@ -197,11 +197,25 @@
         </table>
       </div>
     </div>
-    <div class="form__group" id="comment_section">
+    <div class="form__group" style="display: none;" id="comments_section">
     </div>
+    <div class="form__group" style="display: none;" id="add_comment_section">
+      <div style="display: flex;">
+        <p>{{user_entity_name}}:</p><input type="text" name="textarea" id="textarea" style="max-width: 80%; height: 2em; margin-left: 10px; margin-top: auto; margin-bottom: auto;" />
+      </div>
+      <a class="button primary" id="btn_accept_with_comment">Accepter sous réserve</a>
+    </div>
+    <div class="form__group" style="display: none;" id="reject_section">
+      <label style="margin-bottom: 1em; margin-top: 2em;" for="textarea_reject">Ajouter un motif de refus pour le fournisseur</label>
+      <textarea name="textarea" id="textarea_reject"></textarea>
+      <a class="button warning" id="btn_reject_with_comment">Refuser le lot</a>
+    </div>
+
     <div class="form__group button__group">
       <div class="button-item">
         <a class="button primary" id="btn_lot_accept_final" style="display: none;">Accepter Lot</a>
+        <a class="button primary" id="show_add_comment_section">Accepter sous réserve</a>
+        <a class="button warning" id="show_reject_section">Refuser</a>
       </div>
       <div class="button-item button-push">
         <a class="button secondary close" id="btn_close_modal_edit_lot">Annuler</a>
@@ -235,6 +249,8 @@
 window.operators_api_affiliated_lots = "{% url 'operators-api-affiliated-lots' %}"
 window.operators_api_declared_lots = "{% url 'operators-api-declared-lots' %}"
 window.operators_api_lot_comments = "{% url 'operators-api-lot-comments' %}"
+window.operators_api_accept_with_comments = "{% url 'operators-api-accept-lot-with-comment' %}"
+window.operators_api_reject_with_comments = "{% url 'operators-api-reject-lots' %}"
 
 $(document).ready(function() {
   initFilters(table_columns_operators_affiliated, 'affiliations')
