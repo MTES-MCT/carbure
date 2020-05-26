@@ -54,6 +54,20 @@ def producers_import_csv_template(request, *args, **kwargs):
     return response
 
 
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_import_excel_template(request, *args, **kwargs):
+    return JsonResponse({'status': "error", 'message':"Method not implemented"})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_upload_csv(request, *args, **kwargs):
+    return JsonResponse({'status': "error", 'message': "Method not implemented"})
+
+
 # producers
 @login_required
 @enrich_with_user_details
