@@ -1319,13 +1319,8 @@ function display_operators_lot_modal(table, columns, event) {
           let html = `<p><b>${c.from}</b>: ${c.comment}</p>`
           comments_section.append(html)
         }
-        // add area to respond
-        if (data['status'] === "Draft" || data['ea_delivery_status'] === "Accepté") {
-          // do nothing
-        } else {
-          // add the ability to add a comment
-          let html = `<div style="display: flex;"><p>Ajouter un commentaire:</p><input type="text" name="textarea" id="textarea" style="max-width: 80%; height: 2em; margin-left: 10px; margin-top: auto; margin-bottom: auto;" /></div>`
-          comments_section.append(html)
+        if (d.length > 0) {
+			comments_section.show()
         }
       },
       error       : function(e) {
