@@ -37,6 +37,37 @@ def operators_export_lots(request, *args, **kwargs):
     return response
 
 
+@login_required
+@enrich_with_user_details
+@restrict_to_operators
+def operators_export_affiliated(request, *args, **kwargs):
+    context = kwargs['context']
+    today = datetime.datetime.now()
+    filename = 'export_affiliations_%s.csv' % (today.strftime('%Y%m%d_%H%M%S'))
+    lots = Lot.objects.filter(ea=context['user_entity'], status='Validated').exclude(ea_delivery_status__in=['A', 'R'])
+    buffer = io.BytesIO()
+    buffer.write("carbure_id;producer;production_site;volume;code_biocarburant;biocarburant;code_matiere_premiere;\
+                 matiere_premiere;code_pays_origine;pays_origine;eec;el;ep;etd;eu;esca;eccs;eccr;eee;ghg_total;\
+                 ghg_reference;ghg_reduction;dae;client_id;ea_delivery_date;ea;ea_delivery_site\n".encode())
+    for k in lots:
+        line = [k.carbure_id, k.producer.name if k.producer else '',
+                k.production_site.name if k.production_site else '', k.volume,
+                k.biocarburant.code if k.biocarburant else '', k.biocarburant.name if k.biocarburant else '',
+                k.matiere_premiere.code if k.matiere_premiere else '',
+                k.matiere_premiere.name if k.matiere_premiere else '',
+                k.pays_origine.code_pays if k.pays_origine else '', k.pays_origine.name if k.pays_origine else '',
+                k.eec, k.el, k.ep, k.etd, k.eu, k.esca, k.eccs, k.eccr, k.eee, k.ghg_total, k.ghg_reference,
+                k.ghg_reduction, k.dae, k.client_id, k.ea_delivery_date, k.ea, k.ea_delivery_site]
+        csvline = '%s\n' % (';'.join([str(li) for li in line]))
+        buffer.write(csvline.encode('iso-8859-1'))
+    csvfile = buffer.getvalue()
+    buffer.close()
+    response = HttpResponse(content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename="%s"' % (filename)
+    response.write(csvfile)
+    return response
+
+
 # operators api
 @login_required
 @enrich_with_user_details
