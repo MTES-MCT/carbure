@@ -1612,7 +1612,7 @@ $("#btn_reject_with_comment").on('click', function() {
 
 $("#btn_accept_with_comment").on('click', function() {
   let lot_id = $("#lot_id").val()
-  let comment = $("#textarea").val()
+  let comment = $("#producer_comment").val()
   $.ajax({
     url: window.operators_api_accept_with_comments,
     data: {'lot': lot_id,'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value,
@@ -1643,7 +1643,8 @@ $("#show_add_comment_section").on('click', function() {
 $("#show_reject_section").on('click', function() {
   $("#reject_section").show()
   $("#show_reject_section").hide()
-=======
+})
+
 $("#add_lot").on('click', function() {
   let modal = document.getElementById("modal_edit_lot")
   /* empty all input fields */
