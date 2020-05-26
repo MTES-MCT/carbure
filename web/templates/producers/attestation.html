@@ -187,7 +187,7 @@
         <span id="modal_import_form_err_message" style="color: red;"></span>
         <span id="modal_import_form_success_message" style="color: green;"></span>
         <dl>
-          <dt><a href="{% url 'api-producers-template-csv' %}" >Télécharger le modèle</a></dt>
+          <dt><a href="{% url 'api-producers-template-excel' %}" >Télécharger le modèle</a></dt>
         </dl>
         <form method="POST" id="modal_import_form" data-url="{% url 'producers-api-upload-csv' %}" data-reload="0">
           {% csrf_token %}
@@ -439,79 +439,6 @@ $(document).ready(function() {
     addLotSettings[colid] = addLotSettings[colid] == 1 ? 0 : 1
     saveAddLotSettings(addLotSettings)
   });
-
-  /* import file */
-  /*
-  $("#file_to_upload").on('change', function(e) {
-    let reader = new FileReader();
-    reader.onload = function(e) {
-      var data = reader.result;
-      var lines = data.split("\n")
-      var header = []
-      var nb_lots_imported = 0
-      var nb_lots_failed = 0
-      var err_list = $("#modal_import_err_list")
-      err_list.empty()
-
-      for (let i = 0, len = lines.length; i < len; i++) {
-        // semicolons or commas?
-        // try semicolons first (excel style)
-        let full_line = lines[i].split(';')
-        if (full_line.length < 3) {
-          // 3 is completely random but heh
-          // try commas (open office style)
-          full_line = lines[i].split(',')
-        }
-        if (full_line.length < 10) {
-          // ignore line
-          continue
-        }
-        if (i === 0) {
-          header = full_line
-        } else {
-          var formdata = new FormData();
-          formdata.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
-          for (let j = 0, llen = full_line.length; j < llen; j++) {
-            formdata.set(header[j],full_line[j])
-          }
-          // save lot
-          $.ajax({
-            url         : "{% url 'producers-api-attestation-save-lot' %}",
-            data        : formdata,
-            cache       : false,
-            contentType : false,
-            processData : false,
-            type        : 'POST',
-            success     : function(data, textStatus, jqXHR) {
-              nb_lots_imported += 1
-              $("#modal_import_success_msg").text(`${nb_lots_imported} lots importé(s)`)
-            },
-            error       : function(e) {
-              nb_lots_failed += 1
-              $("#modal_import_err_msg").text(`${nb_lots_failed} lots n'ont pas pu être importés:`)
-              if (e.status === 400) {
-                err_list.append(`<li>${full_line}</li><li>${e.responseJSON.message}</li>`)
-              } else {
-                err_list.append(`<li>${full_line}</li><li>Unknown error</li>`)
-              }
-            }
-          })
-        }
-      }
-      window.getElementById('modal_import_btn_finished').style.display = "block"
-      window.getElementById('btn_close_modal_import').style.display = "none"
-    };
-    reader.onerror = function(event) {
-      console.error("File could not be read! Code " + event.target.error.code);
-    };
-    reader.readAsText(e.target.files[0]);
-  })
-  */
-
-  /*$("#modal_import_btn_finished").on('click', function() {
-    // refresh page
-    window.location.reload()
-  })*/
 
   manage_actions()
 })
