@@ -11,6 +11,7 @@ from django.db.models.fields import NOT_PROVIDED
 from core.decorators import enrich_with_user_details, restrict_to_producers
 from core.models import Biocarburant, MatierePremiere, Pays, Entity, Lot, LotError, LotComment, GHGValues
 from producers.models import ProductionSite, ProductionSiteOutput, ProductionSiteInput, ProducerCertificate
+from core.xlsx_template import create_template_xlsx
 
 
 def get_random(model):
@@ -58,7 +59,17 @@ def producers_import_csv_template(request, *args, **kwargs):
 @enrich_with_user_details
 @restrict_to_producers
 def producers_import_excel_template(request, *args, **kwargs):
-    return JsonResponse({'status': "error", 'message':"Method not implemented"})
+    context = kwargs['context']
+    file_location = create_template_xlsx(context['user_entity'])
+    try:
+        with open(file_location, 'r') as f:
+            file_data = f.read()
+            # sending response
+            response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment; filename="carbure_template.xlsx"'
+            return response
+    except Exception:
+        return JsonResponse({'status': "error", 'message':"Error creating template file"}, status=500)
 
 
 @login_required
