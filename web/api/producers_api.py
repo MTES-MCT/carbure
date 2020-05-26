@@ -62,14 +62,14 @@ def producers_import_excel_template(request, *args, **kwargs):
     context = kwargs['context']
     file_location = create_template_xlsx(context['user_entity'])
     try:
-        with open(file_location, 'r') as f:
+        with open(file_location, 'rb') as f:
             file_data = f.read()
             # sending response
             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename="carbure_template.xlsx"'
             return response
-    except Exception:
-        return JsonResponse({'status': "error", 'message':"Error creating template file"}, status=500)
+    except Exception as e:
+        return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
 
 
 @login_required
