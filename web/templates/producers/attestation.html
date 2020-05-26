@@ -144,7 +144,11 @@
       <input type="hidden" id="modal_delete_lots_lots" name="lots">
       <div class="form__group button__group">
         <a class="button secondary" id="btn_close_modal_delete_lots">Annuler</a>
-        <button type="submit" class="button">Valider</button>
+        <div class="button-container">
+          <div class="button-item">
+            <button type="submit" class="button">Valider</button>
+          </div>
+        </div>
       </div>
     </form>
   </div>
@@ -169,27 +173,28 @@
 
 <div class="modal__backdrop" id="modal_import">
   <div class="modal">
-    <div class="form__group">
-      <h4>Importer Fichier</h4>
-      <dl>
-        <dt><a href="{% url 'api-producers-template-csv' %}" >Télécharger le modèle</dt>
-        <dt><a href="{% url 'api-matiere-premiere-csv' %}" ><small>Table des matières premières</small></a></dt>
-        <dt><a href="{% url 'api-biocarburant-csv' %}" ><small>Table des biocarburants</small></a></dt>
-        <dt><a href="{% url 'api-country-csv' %}" ><small>Table des pays</small></a></dt>
-        <dt><a href="{% url 'api-operators-csv' %}" ><small>Table des opérateurs pétroliers</small></a></dt>
-        <dt><a href="{% url 'api-depots-csv' %}" ><small>Table des dépôts pétroliers/sites de livraison</small></a></dt>
-      </dl>
-    </div>
-    <span id="modal_import_success_msg" style="color: green;"></span>
-    <span id="modal_import_err_msg" style="color: red;"></span>
-    <ul id="modal_import_err_list"></ul>
-    <input type="file" id="file_to_upload">
-    <h4>Ajout Manuel</h4>
-    <div class="form__group button__group">
-      <a class="button primary" id="add_lot">Ajouter Lot</a>
-      <a class="button secondary close" id="btn_close_modal_import">Fermer</a>
-    </div>
-  </div>
+    <div class="flex-container">
+      <div class="form__group" style="width: 50%; margin-right: 30px;">
+        <h4>Importer Fichier</h4>
+        <dl>
+          <dt><a href="{% url 'api-producers-template-excel' %}" >Télécharger le modèle</a></dt>
+        </dl>
+        <form method="POST" data-url="{% url 'producers-api-upload-csv' %}">
+          {% csrf_token %}
+          <div class="form__group button__group">
+            <input type="file" id="file_to_upload">
+          </div>
+          <button type="submit" class="button">Envoyer</button>
+        </form>
+      </div>
+      <div style="border-left: 1px solid;"></div>
+      <div class="form__group" style="width: 50%; margin-left: 30px;">
+        <h4>Ajout Manuel</h4>
+        <p>Créer un lot et remplir ses caractéristiques manuellement</p>
+        <a class="button primary" id="add_lot">Ajouter Lot</a>
+      </div>
+   </div>
+ </div>
 </div>
 
 <div class="modal__backdrop" id="modal_columns_drafts">
@@ -373,7 +378,7 @@ window.producers_api_production_sites_autocomplete = "{% url 'producers-api-prod
 window.api_country_autocomplete = "{% url 'api-country-autocomplete' %}"
 window.api_operators_autocomplete = "{% url 'api-operators-autocomplete' %}"
 window.api_depots_autocomplete = "{% url 'api-depots-autocomplete' %}"
-
+window.producer_id = "{{user_entity.id}}"
 
 $(document).ready(function() {
   initDuplicateParams(table_columns_drafts)
