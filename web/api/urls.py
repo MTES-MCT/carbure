@@ -58,6 +58,7 @@ urlpatterns = [
     path('operators/lots/reject', operators_api.operators_lot_reject, name='operators-api-reject-lots'),
     path('operators/lots/comments', operators_api.operators_lot_comments, name='operators-api-lot-comments'),
     path('operators/lots/export', operators_api.operators_export_lots, name='operators-api-declaration-export'),
+    path('operators/lots/affiliated/export', operators_api.operators_export_affiliated, name='operators-api-export-affiliated'),
 
     # private, administrators
     path('administrators/users-autocomplete/', administrators_api.admin_users_autocomplete, name='admin-api-users-autocomplete'),
