@@ -268,11 +268,13 @@ $("form").submit(function(event) {
   let form = $(this);
   let form_id = form.attr('id')
   let form_url = form.attr('data-url')
+  let auto_reload = form.attr('data-reload')
   let err_msg_dom = $(`#${form_id}_err_message`)
+  let success_msg_dom = $(`#${form_id}_success_message`)
   err_msg_dom.text("Envoi en cours, veuillez patienter...")
   var formdata = false;
   if (window.FormData){
-    formdata = new FormData(form[0]);
+    formdata = new FormData(form[0])
   }
   $.ajax({
     url         : form_url,
@@ -284,7 +286,11 @@ $("form").submit(function(event) {
     success     : function(data, textStatus, jqXHR) {
       // Callback code
       err_msg_dom.text("")
-      window.location.reload()
+      if (auto_reload === "0") {
+      	  success_msg_dom.html(data.message)
+      } else {
+	      window.location.reload()
+      }
     },
     error       : function(e) {
       if (e.status === 400) {
@@ -296,7 +302,7 @@ $("form").submit(function(event) {
 	   	    err_msg_dom.html(text)
       	} else {
     	    err_msg_dom.text(e.responseJSON.message)
-	   	    console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+	   	    console.log(`error ${JSON.stringify(e.responseJSON.extra)}`)
       	}
       } else {
         err_msg_dom.text("Server error. Please contact an administrator")

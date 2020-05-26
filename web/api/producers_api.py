@@ -65,7 +65,13 @@ def producers_import_excel_template(request, *args, **kwargs):
 @enrich_with_user_details
 @restrict_to_producers
 def producers_upload_csv(request, *args, **kwargs):
-    return JsonResponse({'status': "error", 'message': "Method not implemented"})
+    context = kwargs['context']
+    file = request.FILES.get('file')
+    if file is None:
+        return JsonResponse({'status': "error", 'message': "Merci d'ajouter un fichier"}, status=400)
+    if not file.name.endswith(".csv"):
+        return JsonResponse({'status': "error", 'message': "Seuls les fichiers .csv sont supportés pour le moment"}, status=400)
+    return JsonResponse({'status': "success", 'message': "Bravo, fichier chargé"})
 
 
 # producers

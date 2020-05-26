@@ -15,7 +15,10 @@
     </symbol>
     <symbol id="plus" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24">
       <path d="M12 4v16m8-8H4"></path>
-    </svg>
+    </symbol>
+    <symbol id="cross" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24">
+      <path d="M6 18L18 6M6 6l12 12"></path>
+    </symbol>
   </defs>
 </svg>
 
@@ -173,16 +176,23 @@
 
 <div class="modal__backdrop" id="modal_import">
   <div class="modal">
+    <a id="btn_close_modal_import" style="opacity: 0.5; margin: -1rem -1rem -1rem auto; float: right;">
+      <svg class="icon" style="height:24px; width:24px">
+        <use xlink:href="#cross"></use>
+      </svg>
+    </a>
     <div class="flex-container">
       <div class="form__group" style="width: 50%; margin-right: 30px;">
         <h4>Importer Fichier</h4>
+        <span id="modal_import_form_err_message" style="color: red;"></span>
+        <span id="modal_import_form_success_message" style="color: green;"></span>
         <dl>
-          <dt><a href="{% url 'api-producers-template-excel' %}" >Télécharger le modèle</a></dt>
+          <dt><a href="{% url 'api-producers-template-csv' %}" >Télécharger le modèle</a></dt>
         </dl>
-        <form method="POST" data-url="{% url 'producers-api-upload-csv' %}">
+        <form method="POST" id="modal_import_form" data-url="{% url 'producers-api-upload-csv' %}" data-reload="0">
           {% csrf_token %}
           <div class="form__group button__group">
-            <input type="file" id="file_to_upload">
+            <input type="file" name="file" id="file_to_upload">
           </div>
           <button type="submit" class="button">Envoyer</button>
         </form>
@@ -431,6 +441,7 @@ $(document).ready(function() {
   });
 
   /* import file */
+  /*
   $("#file_to_upload").on('change', function(e) {
     let reader = new FileReader();
     reader.onload = function(e) {
@@ -495,11 +506,12 @@ $(document).ready(function() {
     };
     reader.readAsText(e.target.files[0]);
   })
+  */
 
-  $("#modal_import_btn_finished").on('click', function() {
+  /*$("#modal_import_btn_finished").on('click', function() {
     // refresh page
     window.location.reload()
-  })
+  })*/
 
   manage_actions()
 })
