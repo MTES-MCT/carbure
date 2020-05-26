@@ -493,7 +493,7 @@ function manage_duplicate_button() {
 
 function check_production_sites() {
   $.ajax({
-    url         : "{% url 'producers-api-production-sites-autocomplete' %}" + "?producer_id={{user_entity.id}}&query=",
+    url         : window.producers_api_production_sites_autocomplete + `?producer_id=${window.producer_id}&query=`,
     type        : 'GET',
     success     : function(data, textStatus, jqXHR) {
       if (data['suggestions'].length == 0) {
@@ -508,7 +508,7 @@ function check_production_sites() {
 
 function check_mps() {
   $.ajax({
-    url         : "{% url 'producers-api-mps-autocomplete' %}" + "?producer_id={{user_entity.id}}&query=",
+    url         : window.producers_api_mps_autocomplete + `?producer_id=${window.producer_id}&query=`,
     type        : 'GET',
     success     : function(data, textStatus, jqXHR) {
       if (data['suggestions'].length == 0) {
@@ -523,7 +523,7 @@ function check_mps() {
 
 function check_biocarburants() {
   $.ajax({
-    url         : "{% url 'producers-api-biocarburants-autocomplete' %}" + "?producer_id={{user_entity.id}}&query=",
+    url         : window.producers_api_biocarburants_autocomplete + `?producer_id=${window.producer_id}&query=`,
     type        : 'GET',
     success     : function(data, textStatus, jqXHR) {
       if (data['suggestions'].length == 0) {

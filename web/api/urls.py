@@ -21,6 +21,8 @@ urlpatterns = [
 
     # private template
     path('producers/csv-template', producers_api.producers_import_csv_template, name='api-producers-template-csv'),
+    path('producers/csv/upload', producers_api.producers_upload_csv, name='producers-api-upload-csv'),
+    path('producers/xlsx-template', producers_api.producers_import_excel_template, name='api-producers-template-excel'),
     path('producers/lots/drafts', producers_api.producers_lots_drafts, name='api-producers-lots-drafts'),
     path('producers/lots/corrections', producers_api.producers_lots_corrections, name='api-producers-lots-corrections'),
     path('producers/lots/valid', producers_api.producers_lots_valid, name='api-producers-lots-valid'),
