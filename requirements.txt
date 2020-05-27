@@ -21,11 +21,13 @@ django-environ==0.4.5
 django-storages==1.9.1
 docutils==0.15.2
 entrypoints==0.3
+et-xmlfile==1.0.1
 flake8==3.7.9
 html5lib==1.0.1
 idna==2.9
 idna-ssl==1.1.0
 ipaddr==2.2.0
+jdcal==1.4.1
 Jinja2==2.10.3
 jmespath==0.9.5
 lockfile==0.12.2
@@ -34,6 +36,7 @@ mccabe==0.6.1
 msgpack==0.6.2
 multidict==4.7.5
 mysqlclient==1.4.6
+openpyxl==3.0.3
 packaging==20.3
 pep517==0.8.2
 progress==1.5
