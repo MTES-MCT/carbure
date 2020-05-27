@@ -175,7 +175,7 @@
 </div>
 
 <div class="modal__backdrop" id="modal_import">
-  <div class="modal">
+  <div class="modal" style="max-width: none; margin: auto; max-height: 100%; overflow-y: auto;">
     <a id="btn_close_modal_import" style="opacity: 0.5; margin: -1rem -1rem -1rem auto; float: right;">
       <svg class="icon" style="height:24px; width:24px">
         <use xlink:href="#cross"></use>
@@ -184,24 +184,23 @@
     <div class="flex-container">
       <div class="form__group" style="width: 50%; margin-right: 30px;">
         <h4>Importer Fichier</h4>
-        <span id="modal_import_form_err_message" style="color: red;"></span>
-        <span id="modal_import_form_success_message" style="color: green;"></span>
-        <dl>
-          <dt><a href="{% url 'api-producers-template-excel' %}" >Télécharger le modèle</a></dt>
-        </dl>
         <form method="POST" id="modal_import_form" data-url="{% url 'producers-api-upload-csv' %}" data-reload="0">
+          <span id="modal_import_form_err_message" style="color: red;"></span>
+          <span id="modal_import_form_success_message" style="color: green;"></span>
+          <dl>
+            <dt><a href="{% url 'api-producers-template-excel' %}" >Télécharger le modèle</a></dt>
+          </dl>
           {% csrf_token %}
-          <div class="form__group button__group">
-            <input type="file" name="file" id="file_to_upload">
-          </div>
-          <button type="submit" class="button">Envoyer</button>
+          <input type="file" name="file" id="file_to_upload">
+          <a class="button primary" id="btn_submit_upload_form">Envoyer</a>
         </form>
       </div>
       <div style="border-left: 1px solid;"></div>
+
       <div class="form__group" style="width: 50%; margin-left: 30px;">
         <h4>Ajout Manuel</h4>
         <p>Créer un lot et remplir ses caractéristiques manuellement</p>
-        <a class="button primary" id="add_lot">Ajouter Lot</a>
+        <a class="button primary" id="add_lot" style="position: absolute; left: 0; bottom: 0; top: auto;">Ajouter Lot</a>
       </div>
    </div>
  </div>
@@ -447,6 +446,10 @@ $("#btn_lot_save").on('click', handleSave)
 
 $("#btn_close_modal_import").on('click', () => {
   window.location.reload()
+})
+
+$("#btn_submit_upload_form").on('click', () => {
+  $("#modal_import_form").submit()
 })
 
 </script>

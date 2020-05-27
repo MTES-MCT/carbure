@@ -322,7 +322,6 @@ def producers_upload_csv(request, *args, **kwargs):
     lots_loaded = 0
     for lot in lots:
         try:
-            print('Loading lot %s' % (lot))
             load_excel_lot(context['user_entity'], lot)
             lots_loaded += 1
         except Exception as e:
