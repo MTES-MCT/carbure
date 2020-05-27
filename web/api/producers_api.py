@@ -2,6 +2,7 @@ import random
 import csv
 import datetime
 import io
+import openpyxl
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max
@@ -72,6 +73,227 @@ def producers_import_excel_template(request, *args, **kwargs):
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
 
 
+# not an API call. helper function
+def load_excel_lot(entity, lot_row):
+    lot = Lot()
+    lot.producer = entity
+
+    if 'production_site_name' in lot_row:
+        production_site_name = lot_row['production_site_name']
+        try:
+            lot.production_site = ProductionSite.objects.get(producer=entity, name=production_site_name)
+            LotError.objects.filter(lot=lot, field='production_site_name').delete()
+        except Exception:
+            lot.production_site = None
+            error, c = LotError.objects.update_or_create(lot=lot, field='production_site_name',
+                                                         error='Site de production inconnu',
+                                                         defaults={'value': production_site_name})
+    else:
+        production_site_name = None
+        lot.production_site = None
+        error, c = LotError.objects.update_or_create(lot=lot, field='production_site_name',
+                                                     error='Site de production manquant',
+                                                     defaults={'value': production_site_name})
+
+    if 'biocarburant_code' in lot_row:
+        biocarburant = lot_row['biocarburant_code']
+        try:
+            lot.biocarburant = Biocarburant.objects.get(code=biocarburant)
+            LotError.objects.filter(lot=lot, field='biocarburant_name').delete()
+        except Exception:
+            lot.biocarburant = None
+            error, c = LotError.objects.update_or_create(lot=lot, field='biocarburant_name',
+                                                         error='Biocarburant inconnu',
+                                                         defaults={'value': biocarburant})
+    else:
+        biocarburant = None
+        lot.biocarburant = None
+        error, c = LotError.objects.update_or_create(lot=lot, field='biocarburant_name',
+                                                     error='Merci de préciser le Biocarburant',
+                                                     defaults={'value': biocarburant})
+
+    if 'matiere_premiere_code' in lot_row:
+        matiere_premiere = lot_row['matiere_premiere_code']
+        try:
+            lot.matiere_premiere = MatierePremiere.objects.get(code=matiere_premiere)
+            LotError.objects.filter(lot=lot, field='matiere_premiere_name').delete()
+        except Exception:
+            lot.matiere_premiere = None
+            error, c = LotError.objects.update_or_create(lot=lot, field='matiere_premiere_name',
+                                                         error='Matière Première inconnue',
+                                                         defaults={'value': matiere_premiere})
+    else:
+        matiere_premiere = None
+        lot.matiere_premiere = None
+        error, c = LotError.objects.update_or_create(lot=lot, field='matiere_premiere_name',
+                                                     error='Merci de préciser la matière première',
+                                                     defaults={'value': matiere_premiere})
+
+    if 'volume' in lot_row:
+        volume = lot_row['volume']
+        try:
+            lot.volume = float(volume)
+            LotError.objects.filter(lot=lot, field='volume').delete()
+        except Exception:
+            lot.volume = 0
+            e, c = LotError.objects.update_or_create(lot=lot, field='volume',
+                                                     error='Format du volume incorrect', defaults={'value': volume})
+    else:
+        e, c = LotError.objects.update_or_create(lot=lot, field='volume',
+                                                 error='Merci de préciser un volume', defaults={'value': volume})
+
+    if 'pays_origine_code' in lot_row:
+        pays_origine = lot_row['pays_origine_code']
+        try:
+            lot.pays_origine = Pays.objects.get(code_pays=pays_origine)
+            LotError.objects.filter(lot=lot, field='matiere_premiere_name').delete()
+        except Exception:
+            lot.pays_origine = None
+            error, c = LotError.objects.update_or_create(lot=lot, field='pays_origine_name',
+                                                         error='Pays inconnu',
+                                                         defaults={'value': pays_origine})
+    else:
+        pays_origine = None
+        lot.pays_origine = None
+        error, c = LotError.objects.update_or_create(lot=lot, field='pays_origine_name',
+                                                     error='Merci de préciser le pays',
+                                                     defaults={'value': pays_origine})
+    lot.eec = 0
+    if 'eec' in lot_row:
+        eec = lot_row['eec']
+        try:
+            lot.eec = float(eec)
+        except:
+            pass
+    lot.el = 0
+    if 'el' in lot_row:
+        el = lot_row['el']
+        try:
+            lot.el = float(el)
+        except:
+            pass
+    lot.ep = 0
+    if 'ep' in lot_row:
+        ep = lot_row['ep']
+        try:
+            lot.ep = float(ep)
+        except:
+            pass
+    lot.etd = 0
+    if 'etd' in lot_row:
+        etd = lot_row['etd']
+        try:
+            lot.etd = float(etd)
+        except:
+            pass
+    lot.eu = 0
+    if 'eu' in lot_row:
+        eu = lot_row['eu']
+        try:
+            lot.eu = float(eu)
+        except:
+            pass
+    lot.esca = 0
+    if 'esca' in lot_row:
+        esca = lot_row['esca']
+        try:
+            lot.esca = float(esca)
+        except:
+            pass
+    lot.eccs = 0
+    if 'eccs' in lot_row:
+        eccs = lot_row['eccs']
+        try:
+            lot.eccs = float(eccs)
+        except:
+            pass
+    lot.eccr = 0
+    if 'eccr' in lot_row:
+        eccr = lot_row['eccr']
+        try:
+            lot.eccr = float(eccr)
+        except:
+            pass
+    lot.eee = 0
+    if 'eee' in lot_row:
+        eee = lot_row['eee']
+        try:
+            lot.eee = float(eee)
+        except:
+            pass
+    # calculs ghg
+    lot.ghg_total = round(lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee, 2)
+    lot.ghg_reference = 83.8
+    lot.ghg_reduction = round((1.0 - (lot.ghg_total / lot.ghg_reference)) * 100.0, 2)
+
+    if 'dae' in lot_row:
+        dae = lot_row['dae']
+        if dae != None:
+            lot.dae = dae
+            LotError.objects.filter(lot=lot, field='dae').delete()
+        else:
+            e, c = LotError.objects.update_or_create(lot=lot, field='dae', error="Merci de préciser le numéro de DAE/DAU",
+                                                     defaults={'value': dae})
+    else:
+        e, c = LotError.objects.update_or_create(lot=lot, field='dae', error="Merci de préciser le numéro de DAE/DAU",
+                                                 defaults={'value': None})
+
+    if 'ea_delivery_date' not in lot_row or lot_row['ea_delivery_date'] == '':
+        lot.ea_delivery_date = None
+        lot.period = ''
+        e, c = LotError.objects.update_or_create(lot=lot, field='ea_delivery_date',
+                                                 error="Merci de préciser la date de livraison",
+                                                 defaults={'value': None})
+    else:
+        try:
+            ea_delivery_date = lot_row['ea_delivery_date']
+            edd = datetime.datetime.strptime(ea_delivery_date, '%d/%m/%Y')
+            lot.ea_delivery_date = edd
+            lot.period = edd.strftime('%Y-%m')
+            LotError.objects.filter(lot=lot, field='ea_delivery_date').delete()
+        except Exception:
+            msg = "Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA"
+            e, c = LotError.objects.update_or_create(lot=lot, field='ea_delivery_date',
+                                                     error=msg,
+                                                     defaults={'value': ea_delivery_date})
+
+    if 'ea_name' in lot_row:
+        ea_name = lot_row['ea_name']
+        if ea_name:
+            try:
+                lot.ea = Entity.objects.get(name=ea_name)
+                LotError.objects.filter(lot=lot, field='ea_name').delete()
+            except Exception:
+                lot.ea = None
+                c, c = LotError.objects.update_or_create(lot=lot, field='ea_name',
+                                                         defaults={'value': ea_name, 'error': "Client inconnu"})
+    else:
+        lot.ea = None
+        e, c = LotError.objects.update_or_create(lot=lot, field='ea_name',
+                                                 defaults={'value': None, 'error': "Merci de préciser un client"})
+
+    if 'ea_delivery_site' in lot_row:
+        ea_delivery_site = lot_row['ea_delivery_site']
+        if ea_delivery_site:
+            try:
+                lot.ea_delivery_site = ea_delivery_site
+                LotError.objects.filter(lot=lot, field='ea_delivery_site').delete()
+            except Exception:
+                lot.ea_delivery_site = None
+                e, c = LotError.objects.update_or_create(lot=lot, field='ea_delivery_site',
+                                                         error="Site de livraison inconnu", defaults={'value': ea_delivery_site})
+        else:
+            e, c = LotError.objects.update_or_create(lot=lot, field='ea_delivery_site',
+                                                     error="Merci d'entrer un site de livraison", defaults={'value': None})
+    else:
+        lot.ea_delivery_site = None
+        e, c = LotError.objects.update_or_create(lot=lot, field='ea_delivery_site',
+                                                 defaults={'value': None, 'error': "Merci de préciser un site de livraison"})
+    if 'client_id' in lot_row:
+        lot.client_id = lot_row['client_id']
+    lot.save()
+
+
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
@@ -80,9 +302,32 @@ def producers_upload_csv(request, *args, **kwargs):
     file = request.FILES.get('file')
     if file is None:
         return JsonResponse({'status': "error", 'message': "Merci d'ajouter un fichier"}, status=400)
-    if not file.name.endswith(".csv"):
-        return JsonResponse({'status': "error", 'message': "Seuls les fichiers .csv sont supportés pour le moment"}, status=400)
-    return JsonResponse({'status': "success", 'message': "Bravo, fichier chargé"})
+    # we can load the file
+    wb = openpyxl.load_workbook(file)
+    lots_sheet = wb['lots']
+    colid2field = {}
+    lots = []
+    for i, row in enumerate(lots_sheet):
+        if i == 0:
+            # header
+            for i, col in enumerate(row):
+                colid2field[i] = col.value
+        else:
+            lot = {}
+            for i, col in enumerate(row):
+                field = colid2field[i]
+                lot[field] = col.value
+            lots.append(lot)
+    total_lots = len(lots)
+    lots_loaded = 0
+    for lot in lots:
+        try:
+            print('Loading lot %s' % (lot))
+            load_excel_lot(context['user_entity'], lot)
+            lots_loaded += 1
+        except Exception as e:
+            print(e)
+    return JsonResponse({'status': "success", 'message': "%d/%d lots chargés correctement" % (lots_loaded,total_lots)})
 
 
 # producers

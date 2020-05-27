@@ -300,12 +300,15 @@ $("form").submit(function(event) {
       			text += `Lot ${e.responseJSON.results[i].lot_id}: ${e.responseJSON.results[i].message}<br />`
       		}
 	   	    err_msg_dom.html(text)
+      	  	success_msg_dom.html("")
       	} else {
     	    err_msg_dom.text(e.responseJSON.message)
+      	  	success_msg_dom.html("")
 	   	    console.log(`error ${JSON.stringify(e.responseJSON.extra)}`)
       	}
       } else {
         err_msg_dom.text("Server error. Please contact an administrator")
+      	success_msg_dom.html("")
         console.log(`server error ${JSON.stringify(e)}`)
       }
     }
