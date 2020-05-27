@@ -751,6 +751,7 @@ def producers_settings_add_site(request, *args, **kwargs):
     country = request.POST.get('country')
     name = request.POST.get('name')
     date_mise_en_service = request.POST.get('date_mise_en_service')
+    ges_option = request.POST.get('ges_option')
 
     if country is None:
         return JsonResponse({'status': 'error', 'message': "Veuillez entrer une valeur dans le champ Pays"}, status=400)
@@ -775,7 +776,7 @@ def producers_settings_add_site(request, *args, **kwargs):
     try:
         obj, created = ProductionSite.objects.update_or_create(producer=context['user_entity'], country=country,
                                                                name=name,
-                                                               defaults={'date_mise_en_service': date_mise_en_service})
+                                                               defaults={'date_mise_en_service': date_mise_en_service, 'ges_option': ges_option})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
                             'extra': str(e)}, status=400)

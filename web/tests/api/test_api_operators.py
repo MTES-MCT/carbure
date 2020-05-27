@@ -6,8 +6,6 @@ from django.contrib.auth import get_user_model
 from core.models import Entity, UserRights
 from api.urls import urlpatterns
 
-#path('operators/lots/declared', operators_api.operators_lots, name='operators-api-declared-lots'),
-#path('operators/lots/affiliated', operators_api.operators_lots_affilies, name='operators-api-affiliated-lots'),
 #path('operators/lots/accept', operators_api.operators_lot_accept, name='operators-api-accept-lots'),
 #path('operators/lots/accept-correction', operators_api.operators_lot_accept_correction, name='operators-api-accept-lot-correction'),
 #path('operators/lots/accept-with-comment', operators_api.operators_lot_accept_with_comment, name='operators-api-accept-lot-with-comment'),
@@ -24,8 +22,6 @@ class OperatorsApiSecurityTests(TestCase):
                                                        password='totopouet42')
         self.entity, created = Entity.objects.update_or_create(name='BioRaf1', entity_type='Producteur')
         right, created = UserRights.objects.update_or_create(user=self.producer, entity=self.entity)
-
-
 
         # create an administrator
         self.admin = user_model.objects.create_user(email='testadmin@almalexia.org', name='DGEC TEST',
@@ -67,6 +63,13 @@ class OperatorsApiTest(TestCase):
         data = json.loads(response.content)
 
     def test_get_affiliated_lots(self):
+        url = reverse('operators-api-affiliated-lots')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        # make sure we can json load the response
+        data = json.loads(response.content)
+
+    def test_accept_affiliated_lot(self):
         url = reverse('operators-api-affiliated-lots')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
