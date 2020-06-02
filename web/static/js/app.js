@@ -1550,6 +1550,7 @@ function showTab(tab_name) {
   tabcontent.style.display = "block";
 }
 
+// producers page tabs
 $("#tab_drafts_title").on('click', function() {
   // hide tabs valid & corrections
   hideTab("tab_valid")
@@ -1577,7 +1578,7 @@ $("#tab_valid_title").on('click', function() {
   init_datatables_validated(window.producers_api_lots_valid)
 })
 
-
+// operators page tabs
 $("#tab_operators_affiliations_title").on('click', function() {
   hideTab("tab_operators_declared")
   showTab("tab_operators_affiliations")
@@ -1588,6 +1589,25 @@ $("#tab_operators_declared_title").on('click', function() {
   hideTab("tab_operators_affiliations")
   showTab("tab_operators_declared")
   init_datatables_operators_declared()
+})
+
+// admin page tabs
+$("#tab_entities_title").on('click', function() {
+  hideTab("tab_users")
+  hideTab("tab_rights")
+  showTab("tab_entities")
+})
+
+$("#tab_users_title").on('click', function() {
+  hideTab("tab_entities")
+  hideTab("tab_rights")
+  showTab("tab_users")
+})
+
+$("#tab_rights_title").on('click', function() {
+  hideTab("tab_users")
+  hideTab("tab_entities")
+  showTab("tab_rights")
 })
 
 
