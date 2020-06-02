@@ -326,6 +326,12 @@ $("#pagelength_valid").on('change', function() {
   table_valid.page.len(pagelength).draw()
 })
 
+$("#pagelength_lots_admin").on('change', function() {
+  let pagelength = $("#pagelength_lots_admin").val()
+  table.page.len(pagelength).draw()
+})
+
+
 function loadTableSettings(table_columns, table_name) {
   var tableSettings = localStorage.getItem(table_name);
   if (tableSettings === undefined || tableSettings === null) {
