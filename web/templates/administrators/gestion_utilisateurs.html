@@ -4,38 +4,45 @@
 	<div class="main">
 		<div class="panel">
 			<div class="panel__header">
-            <h3>Settings</h3>
-          </div>
-    <section class="form__group"> 
-      <h3>Sociétés</h3>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Classification</th>
-                <th>Date de création</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for entity in all_entities %}
-              <tr>
-                <td>{{entity.name}}</td>
-                <td>{{entity.entity_type}}</td>
-                <td>{{entity.date_added}}</td>
-              </tr>          
-              {% empty %}
-              <tr>
-                <td colspan="3">Aucune société enregistrée à ce jour.</td>
-              </tr>                    
-              {% endfor %}   
-            </tbody>
-          </table>
-          <div class="flex-container-right">
-            <a class="button primary" id="btn_open_modal_entity">Ajouter Société</a>
-          </div>   
-    </section>
+        <h3>Settings</h3>
+      </div>
+      <ul class="tabs__tab-list">
+        <li id="tab_entities_title" class="tabs__tab" data-dst="tab_entities">Sociétés</li>
+        <li id="tab_users_title" class="tabs__tab" data-dst="tab_users">Utilisateurs</li>
+        <li id="tab_rights_title" class="tabs__tab" data-dst="tab_rights">Droits</li>
+      </ul>
 
-    <section class="form__group"> 
+
+    <div id="tab_entities" class="tabcontent">
+      <h3>Sociétés</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Classification</th>
+            <th>Date de création</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entity in all_entities %}
+          <tr>
+            <td>{{entity.name}}</td>
+            <td>{{entity.entity_type}}</td>
+            <td>{{entity.date_added}}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3">Aucune société enregistrée à ce jour.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="flex-container-right">
+        <a class="button primary" id="btn_open_modal_entity">Ajouter Société</a>
+      </div>
+    </div>
+
+    <div id="tab_users" class="tabcontent">
       <h3>Utilisateurs</h3>
           <table class="table">
             <thead>
@@ -51,20 +58,20 @@
                 <td>{{user.name}}</td>
                 <td>{{user.email}}</td>
                 <td><a class="button primary" href="{% url 'administrators-reset-user-password' uid=user.id %}">Reset</a></td>
-              </tr>          
+              </tr>
               {% empty %}
               <tr>
                 <td colspan="3">Aucun compte utilisateur enregistré à ce jour.</td>
-              </tr>                    
-              {% endfor %}   
+              </tr>
+              {% endfor %}
             </tbody>
           </table>
           <div class="flex-container-right">
             <a class="button primary" id="btn_open_modal_user">Ajouter Utilisateur</a>
-          </div>   
-    </section>
+          </div>
+    </div>
 
-    <section class="form__group"> 
+    <div id="tab_rights" class="tabcontent">
       <h3>Droits</h3>
           <table class="table">
             <thead>
@@ -80,18 +87,18 @@
                 <td>{{right.user.name}} - {{right.user.email}}</td>
                 <td>{{right.entity.name}}</td>
                 <td><a class="button primary btn_open_modal_right_delete" data-rightid="{{right.id}}" data-user="{{right.user.name}}" data-entity="{{right.entity.name}}">Supprimer</a></td>
-              </tr>          
+              </tr>
               {% empty %}
               <tr>
                 <td colspan="3">Aucun droit enregistré à ce jour.</td>
-              </tr>                    
-              {% endfor %}   
+              </tr>
+              {% endfor %}
             </tbody>
           </table>
           <div class="flex-container-right">
             <a class="button primary" id="btn_open_modal_right">Ajouter Droit</a>
-          </div>   
-    </section>
+          </div>
+    </div>
 		</div>
 	</div>
 
@@ -144,12 +151,12 @@
       <div class="input__group">
         <input type="text" id="modal_right_user" class="autocomplete_users">
         <input type="hidden" id="modal_right_user_id" name="user">
-      </div>       
+      </div>
       <label for="modal_right_entity">Société</label>
       <div class="input__group">
         <input type="text" id="modal_right_entity" class="autocomplete_entities">
         <input type="hidden" id="modal_right_entity_id" name="entity">
-      </div>      
+      </div>
       <div class="form__group button__group">
         <a class="button secondary close" id="btn_close_modal_right">Annuler</a>
         <button type="submit" class="button">Ajouter</button>
@@ -166,10 +173,10 @@
       <p>Êtes vous sûr de vouloir supprimer ce droit ?</p>
       <dl>
         <dt>Utilisateur</dt>
-        <dd id="modal_right_delete_user"></dd>      
+        <dd id="modal_right_delete_user"></dd>
         <dt>Société</dt>
-        <dd id="modal_right_delete_entity"></dd>   
-      </dl>      
+        <dd id="modal_right_delete_entity"></dd>
+      </dl>
       <input type="hidden" id="modal_right_delete_id" name="right_id">
       <div class="form__group button__group">
         <a class="button secondary close" id="btn_close_modal_right_delete">Annuler</a>
@@ -188,7 +195,7 @@ $(".autocomplete_entities").autocomplete({
   dataType: 'json',
   onSelect: function(suggestion) {
     $("#modal_right_entity_id").val(suggestion.data)
-  }   
+  }
 })
 
 $(".autocomplete_users").autocomplete({
@@ -196,10 +203,10 @@ $(".autocomplete_users").autocomplete({
   dataType: 'json',
   onSelect: function(suggestion) {
     $("#modal_right_user_id").val(suggestion.data)
-  } 
+  }
 })
 
-
+showTab("tab_entities")
 
 </script>
 {% endblock %}
