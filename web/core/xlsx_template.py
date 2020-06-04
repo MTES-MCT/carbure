@@ -56,12 +56,33 @@ def make_lots_sheet_v2(workbook, entity):
     delivery_sites = Depot.objects.all()
     countries = Pays.objects.all()
 
+    # 3/10 chances of having an imported lot
+    imported_lots = [1, 1, 1, 0, 0, 0, 0, 0, 0, 0]
+    exported_lots = [1, 1, 1, 0, 0, 0, 0, 0, 0, 0]
+    foreign_producers = [{'name': 'ITANOL', 'country': 'IT', 'production_site': 'BERGAMO'},
+                         {'name': 'ITANOL', 'country': 'IT', 'production_site': 'FIRENZE'},
+                         {'name': 'PORTUGASOIL', 'country': 'PT', 'production_site': 'LISBOA'},
+                         {'name': 'PORTUGASOIL', 'country': 'PT', 'production_site': 'PORTO'},
+                         {'name': 'BIOCATALAN', 'country': 'ES', 'production_site': 'EL MASNOU'},
+                         {'name': 'BIOCATALAN', 'country': 'ES', 'production_site': 'EL MASNOU'},
+                         {'name': 'BIOBAO', 'country': 'ES', 'production_site': 'HONDARRIBIA'},
+                         ]
+
+    foreign_clients = [{'name': 'BP', 'country': 'UK', 'delivery_site': 'DOVER'},
+                       {'name': 'BP', 'country': 'UK', 'delivery_site': 'LIVERPOOL'},
+                       {'name': 'BP', 'country': 'UK', 'delivery_site': 'MANCHESTER'},
+                       {'name': 'EXXON', 'country': 'US', 'delivery_site': 'BOSTON'},
+                       {'name': 'EXXON', 'country': 'US', 'delivery_site': 'HOBOKEN'},
+                       {'name': 'IBERDROLA', 'country': 'ES', 'delivery_site': 'BCN'},
+                       {'name': 'IBERDROLA', 'country': 'ES', 'delivery_site': 'BILBAO'},
+                       ]
+
     # header
     bold = workbook.add_format({'bold': True})
     columns = ['producer', 'production_site', 'production_site_country',
                'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
                'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'e',
-               'dae', 'champ_libre', 'delivery_date', 'client', 'delivery_site']
+               'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
 
@@ -69,16 +90,29 @@ def make_lots_sheet_v2(workbook, entity):
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
     today = datetime.date.today().strftime('%d/%m/%Y')
     for i in range(10):
-        p = random.choice(psites)
         mp = random.choice(mps)
         ea = random.choice(eas)
         bc = random.choice(bcs)
         country = random.choice(countries)
         site = random.choice(delivery_sites)
         volume = random.choice(volumes)
+        imported = random.choice(imported_lots)
+        exported = random.choice(exported_lots)
 
-        row = [p.name, volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 0,
-               'FR000000123', clientid, today, ea.name, site.depot_id]
+        row = []
+        if imported:
+            p = random.choice(foreign_producers)
+            row += [p['name'], p['production_site'], p['country']]
+        else:
+            p = random.choice(psites)
+            row += ['', p.name, p.country.code_pays]
+        row += [volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 0, 'FR000000123', clientid]
+        if exported:
+            c = random.choice(foreign_clients)
+            row += [c['name'], today, c['delivery_site'], c['country']]
+        else:
+            row += [ea.name, today, site.depot_id, 'FR']
+
         colid = 0
         for elem in row:
             worksheet_lots.write(i+1, colid, elem)

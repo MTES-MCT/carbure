@@ -30,6 +30,36 @@ var table_columns_drafts = [
 {title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'ea_delivery_site_name'},
 ]
 
+const table_columns_drafts_v2 = [
+{title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
+{title:'ID', hidden: true, can_hide: true, can_duplicate: false, can_export: false, data:'lot_id'},
+{title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data:'producer_name'},
+{title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data:'production_site_name'},
+{title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
+{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'biocarburant_name'},
+{title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'matiere_premiere_name'},
+{title:`Pays<br /> d'origine`, filter_title: 'Pays', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'pays_origine_name'},
+
+{title:'EEC', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
+{title:'EL', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
+{title:'EP', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'},
+{title:'ETD', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'},
+{title:'EU', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'},
+{title:'ESCA', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'},
+{title:'ECCS', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'},
+{title:'ECCR', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'},
+{title:'EEE', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'},
+{title:'E', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_total', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'},
+{title:'Émissions de référence', hidden: true, can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'},
+{title:'% de réduction', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reduction'},
+
+{title:'N°DAE/DAU', can_hide: true, can_duplicate: false, can_export: true, data:'dae'},
+{title:'Référence', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data:'client_id', tooltip: 'Champ libre - Référence client'},
+{title:'Date d\'entrée<br /> en EA', can_hide: true, can_duplicate: true, can_export: true, data:'ea_delivery_date'},
+{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'ea_name'},
+{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'ea_delivery_site_name'},
+]
+
 var table_columns_producers_corrections = [
 {title:'Période', can_hide: true, data:'period'},
 {title:'Numéro de lot', can_hide: true, data:'carbure_id'},
@@ -1694,3 +1724,191 @@ $("#add_lot").on('click', function() {
   $("#reduction_title").attr('title', '')
   modal.style.display = "flex"
 })
+
+
+
+
+
+
+
+function init_datatables_drafts_v2(url) {
+  const col_definition = table_columns_drafts_v2
+
+  // tab Drafts
+  if (!$.fn.DataTable.isDataTable('#datatable_drafts')) {
+      // create empty footer
+    let empty_footer = `<tr>${Array(col_definition.length).fill("<th></th>").join('')}</tr>`
+    $("#datatable_drafts tfoot").append(empty_footer)
+
+    var table_drafts = $('#datatable_drafts').DataTable({
+      paging: true,
+      info: true,
+      scrollX: true,
+      scrollY: 1000,
+      scrollCollapse: true,
+      language: {
+          search: "Rechercher:",
+          paginate: {
+              first:    '«',
+              previous: '‹',
+              next:     '›',
+              last:     '»'
+          },
+          aria: {
+              paginate: {
+                  first:    'Première',
+                  previous: 'Précédente',
+                  next:     'Suivante',
+                  last:     'Dernière'
+              }
+          }
+      },
+      dom: 'rtp',
+      columnDefs: [
+        {
+          className: "dt-center",
+          targets: "_all",
+          render: function(data, type, row, meta) {
+            let col_name = col_definition[meta.col].data
+            let lot_id = row['lot_id']
+            if (lot_id in lot_errors) {
+              if (col_name in lot_errors[lot_id]) {
+                let error = lot_errors[lot_id][col_name]
+                return `<span style="color:tomato;">${error}</span>`
+              }
+            }
+            return data
+          }
+        },
+        {
+          targets: 0,
+          searchable:false,
+          orderable:false,
+          width:'1%',
+          className: 'dt-body-center',
+          render: function (data, type, full, meta) {
+             return '<input type="checkbox">';
+          }
+        }
+      ],
+      order: [[ 1, 'desc' ]],
+      columns: col_definition,
+      ajax: {
+        url: url,
+        dataSrc: function(res) {
+          lots = res['lots']
+          for (let i = 0, len = lots.length; i < len; i++) {
+            // add checkbox on the fly
+            lots[i]["checkbox"] = `<input type="checkbox" />`
+          }
+          errors = res['errors']
+          for (let i = 0, len = errors.length; i < len; i++) {
+            let error = errors[i]
+            let lot_id = error.lot_id
+            if (!(lot_id in lot_errors)) {
+              lot_errors[lot_id] = {}
+            }
+            lot_errors[lot_id][error.field] = error.value
+          }
+          return lots
+        }
+      },
+      initComplete: function () {
+        count = 0;
+        this.api().columns().every(function () {
+          var column = this;
+          let table_column = col_definition[column.index()]
+          if (table_column.can_filter === true) {
+            var select = $('<select id="select_' + table_column.data + '" class="select2" ></select>')
+                .appendTo($(column.footer()).empty())
+                .on('change', function () {
+                  //Get the "text" property from each selected data
+                  //regex escape the value and store in array
+                  var data = $.map($(this).select2('data'), function(value, key) {
+                    return value.text ? '^' + $.fn.dataTable.util.escapeRegex(value.text) + '$' : null
+                  })
+                  //if no data selected use ""
+                  if (data.length === 0) {
+                    data = [""]
+                  }
+                  //join array into string with regex or (|)
+                  var val = data.join('|')
+                  //search for the option(s) selected
+                  column.search(val ? val : '', true, false).draw()
+                })
+            column.data().unique().sort().each(function (d, j) {
+              if (d === "") {
+                return
+              }
+              select.append('<option value="'+d+'">'+d+'</option>');
+            })
+            //use column title as selector and placeholder
+            $('#select_' + table_column.data).select2({
+              multiple: true,
+              closeOnSelect: true,
+              placeholder: "Filtrer " + (table_column.filter_title  ? table_column.filter_title : table_column.title),
+              placeholderOption: function () { return undefined; }
+            });
+            //initially clear select otherwise first option is selected
+            $('.select2').val(null).trigger('change')
+          } else {
+            $(column.footer()).append()
+          }
+        }).draw()
+      }
+    })
+
+    $("#datatable_drafts tbody").on('click', 'td',  (e) => {
+      display_producers_lot_modal(table_drafts, col_definition, e)
+    })
+    window.table_drafts = table_drafts
+    $('#input_search_datatable').on('keyup', function() {
+        table_drafts.search(this.value).draw();
+    })
+
+    // Handle click on checkbox
+    $('#datatable_drafts tbody').on('click', 'input[type="checkbox"]', function(e) {
+      var $row = $(this).closest('tr');
+      // Get row data
+      var rowId = table_drafts.row($row).index();
+      // Determine whether row ID is in the list of selected row IDs
+      var index = $.inArray(rowId, selected_rows);
+      // If checkbox is checked and row ID is not in list of selected row IDs
+      if(this.checked && index === -1) {
+        selected_rows.push(rowId);
+      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+      } else if (!this.checked && index !== -1) {
+        selected_rows.splice(index, 1);
+      }
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table_drafts);
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+      // Show/Hide buttons depending on selected_rows content
+      manage_actions()
+    })
+
+
+    // Handle click on "Select all" control
+    $('thead input[name="select_all"]', table_drafts.table().container()).on('click', function(e){
+      if(this.checked){
+         $('#datatable_drafts tbody input[type="checkbox"]:not(:checked)').trigger('click');
+      } else {
+         $('#datatable_drafts tbody input[type="checkbox"]:checked').trigger('click');
+      }
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+    });
+
+    // Handle table draw event
+    table_drafts.on('draw', function(){
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table_drafts);
+    });
+
+    var producerDraftsTableSettingsV2 = loadTableSettings(col_definition, 'producerDraftsTableSettingsV2')
+    showHideTableColumns(table_drafts, producerDraftsTableSettingsV2, 'drafts')
+  } else {
+    window.table_drafts.draw()
+  }
+}

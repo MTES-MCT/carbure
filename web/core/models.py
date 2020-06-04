@@ -7,7 +7,7 @@ class Entity(models.Model):
     ENTITY_TYPES = (('Producteur', 'Producteur'), ('Opérateur', 'Opérateur'),
                     ('Administration', 'Administration'), ('Unknown', 'Unknown'))
 
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=64, unique=True)
     date_added = models.DateTimeField(auto_now_add=True)
     entity_type = models.CharField(max_length=64, choices=ENTITY_TYPES, default='Unknown')
     parent_entity = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
@@ -190,6 +190,7 @@ class LotV2(models.Model):
     production_site_is_in_carbure = models.BooleanField(default=True)
     carbure_production_site = models.ForeignKey(ProductionSite, null=True, blank=True, on_delete=models.SET_NULL)
     unknown_production_site = models.CharField(max_length=64, blank=True, default='')
+    unknown_production_country = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='unknown_production_site_country')
 
     # lot details
     volume = models.IntegerField(default=0)
@@ -212,7 +213,6 @@ class LotV2(models.Model):
     ghg_reduction = models.FloatField(default=0.0)
 
     # other
-    client_id = models.CharField(max_length=64, blank=True, default='')
     status = models.CharField(max_length=64, choices=LOT_STATUS, default='Draft')
     source = models.CharField(max_length=32, choices=SOURCE_CHOICES, default='Manual')
 
@@ -247,8 +247,7 @@ class LotTransaction(models.Model):
     delivery_site_is_in_carbure = models.BooleanField(default=True)
     carbure_delivery_site = models.ForeignKey(Depot, null=True, blank=True, on_delete=models.SET_NULL)
     unknown_delivery_site = models.CharField(max_length=64, blank=True, default='')
-    export_ue = models.BooleanField(default=False)
-    export_hors_ue = models.BooleanField(default=False)
+    unknown_delivery_site_country = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='unknown_delivery_site_country')
     delivery_status = models.CharField(max_length=64, choices=DELIVERY_STATUS, default='N')
 
     # ghg impact
@@ -256,6 +255,7 @@ class LotTransaction(models.Model):
     ghg_total = models.FloatField(default=0.0)
     ghg_reduction = models.FloatField(default=0.0)
 
+    # other
     champ_libre = models.CharField(max_length=64, blank=True, default='')
 
     def __str__(self):
@@ -294,6 +294,36 @@ class LotError(models.Model):
         db_table = 'lots_errors'
         verbose_name = 'LotError'
         verbose_name_plural = 'LotErrors'
+
+
+class LotV2Error(models.Model):
+    lot = models.ForeignKey(LotV2, null=False, blank=False, on_delete=models.CASCADE)
+    field = models.CharField(max_length=32, null=False, blank=False)
+    value = models.CharField(max_length=128, null=True, blank=True)
+    error = models.CharField(max_length=256, null=False, blank=False)
+
+    def __str__(self):
+        return self.error
+
+    class Meta:
+        db_table = 'lotsv2_errors'
+        verbose_name = 'LotV2Error'
+        verbose_name_plural = 'LotV2Errors'
+
+
+class TransactionError(models.Model):
+    tx = models.ForeignKey(LotTransaction, null=False, blank=False, on_delete=models.CASCADE)
+    field = models.CharField(max_length=32, null=False, blank=False)
+    value = models.CharField(max_length=128, null=True, blank=True)
+    error = models.CharField(max_length=256, null=False, blank=False)
+
+    def __str__(self):
+        return self.error
+
+    class Meta:
+        db_table = 'tx_errors'
+        verbose_name = 'TransactionError'
+        verbose_name_plural = 'TransactionsErrors'
 
 
 class GHGValues(models.Model):
