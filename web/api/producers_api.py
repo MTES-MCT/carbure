@@ -278,11 +278,6 @@ def load_excel_lot(entity, lot_row):
             try:
                 lot.ea_delivery_site = ea_delivery_site
                 LotError.objects.filter(lot=lot, field='ea_delivery_site').delete()
-                try:
-                    # if it's a known depot, link it
-                    lot.ea_delivery_site_fk = Depot.objects.get(depot_id=ea_delivery_site)
-                except Exception:
-                    pass
             except Exception:
                 lot.ea_delivery_site = None
                 e, c = LotError.objects.update_or_create(lot=lot, field='ea_delivery_site',
@@ -348,7 +343,6 @@ def producers_lots_drafts(request, *args, **kwargs):
                   'production_site_id': k.production_site.id if k.production_site else None, 'dae': k.dae,
                   'ea_delivery_date': k.ea_delivery_date.strftime('%d/%m/%Y') if k.ea_delivery_date else '',
                   'ea_delivery_site': k.ea_delivery_site,
-                  'ea_delivery_site_name': k.ea_delivery_site_fk.name if k.ea_delivery_site_fk else k.ea_delivery_site,
                   'ea_name': k.ea.name if k.ea else '',
                   'ea_id': k.ea.id if k.ea else None, 'volume': k.volume,
                   'matiere_premiere_code': k.matiere_premiere.code if k.matiere_premiere else '',
@@ -383,7 +377,6 @@ def producers_lots_corrections(request, *args, **kwargs):
                   'dae': k.dae,
                   'ea_delivery_date': k.ea_delivery_date.strftime('%d/%m/%Y') if k.ea_delivery_date else '',
                   'ea_delivery_site': k.ea_delivery_site, 'ea_name': k.ea.name if k.ea else '',
-                  'ea_delivery_site_name': k.ea_delivery_site_fk.name if k.ea_delivery_site_fk else k.ea_delivery_site,
                   'ea_id': k.ea.id if k.ea else None, 'volume': k.volume,
                   'matiere_premiere_code': k.matiere_premiere.code if k.matiere_premiere else '',
                   'matiere_premiere_name': k.matiere_premiere.name if k.matiere_premiere else '',
@@ -414,7 +407,6 @@ def producers_lots_valid(request, *args, **kwargs):
                   'production_site_id': k.production_site.id if k.production_site else None, 'dae': k.dae,
                   'ea_delivery_date': k.ea_delivery_date.strftime('%d/%m/%Y') if k.ea_delivery_date else '',
                   'ea_delivery_site': k.ea_delivery_site, 'ea_name': k.ea.name if k.ea else '',
-                  'ea_delivery_site_name': k.ea_delivery_site_fk.name if k.ea_delivery_site_fk else k.ea_delivery_site,
                   'ea_id': k.ea.id if k.ea else None, 'volume': k.volume,
                   'matiere_premiere_code': k.matiere_premiere.code if k.matiere_premiere else '',
                   'matiere_premiere_name': k.matiere_premiere.name if k.matiere_premiere else '',
@@ -445,7 +437,6 @@ def producers_lots_all(request, *args, **kwargs):
                   'production_site_id': k.production_site.id if k.production_site else None, 'dae': k.dae,
                   'ea_delivery_date': k.ea_delivery_date.strftime('%d/%m/%Y') if k.ea_delivery_date else '',
                   'ea_delivery_site': k.ea_delivery_site, 'ea_name': k.ea.name if k.ea else '',
-                  'ea_delivery_site_name': k.ea_delivery_site_fk.name if k.ea_delivery_site_fk else k.ea_delivery_site,
                   'ea_id': k.ea.id if k.ea else None, 'volume': k.volume,
                   'matiere_premiere_code': k.matiere_premiere.code if k.matiere_premiere else '',
                   'matiere_premiere_name': k.matiere_premiere.name if k.matiere_premiere else '',
@@ -476,7 +467,6 @@ def producers_corrections(request, *args, **kwargs):
                   'production_site_id': k.production_site.id if k.production_site else None, 'dae': k.dae,
                   'ea_delivery_date': k.ea_delivery_date.strftime('%d/%m/%Y') if k.ea_delivery_date else '',
                   'ea_delivery_site': k.ea_delivery_site, 'ea_name': k.ea.name if k.ea else '',
-                  'ea_delivery_site_name': k.ea_delivery_site_fk.name if k.ea_delivery_site_fk else k.ea_delivery_site,
                   'ea_id': k.ea.id if k.ea else None, 'volume': k.volume,
                   'matiere_premiere_code': k.matiere_premiere.code if k.matiere_premiere else '',
                   'matiere_premiere_name': k.matiere_premiere.name if k.matiere_premiere else '',
