@@ -185,11 +185,11 @@ class LotV2(models.Model):
     # producer
     producer_is_in_carbure = models.BooleanField(default=True)
     carbure_producer = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='producer_lotv2')
-    unknown_producer = models.CharField(max_length=64, blank=True, default='')
+    unknown_producer = models.CharField(max_length=64, blank=True, null=True, default='')
 
     production_site_is_in_carbure = models.BooleanField(default=True)
     carbure_production_site = models.ForeignKey(ProductionSite, null=True, blank=True, on_delete=models.SET_NULL)
-    unknown_production_site = models.CharField(max_length=64, blank=True, default='')
+    unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default='')
     unknown_production_country = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='unknown_production_site_country')
 
     # lot details
