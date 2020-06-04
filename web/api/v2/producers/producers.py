@@ -255,6 +255,7 @@ def load_excel_lot(entity, lot_row):
 
     transaction = LotTransaction()
     transaction.lot = lot
+    transaction.save()
     if lot.producer_is_in_carbure:
         transaction.vendor_is_in_carbure = True
         transaction.carbure_vendor = lot.carbure_producer
@@ -266,12 +267,12 @@ def load_excel_lot(entity, lot_row):
         dae = lot_row['dae']
         if dae is not None:
             transaction.dae = dae
-            TransactionError.objects.filter(lot=lot, field='dae').delete()
+            TransactionError.objects.filter(tx=transaction, field='dae').delete()
         else:
-            e, c = TransactionError.objects.update_or_create(tx=lot, field='dae', error="Merci de préciser le numéro de DAE/DAU",
+            e, c = TransactionError.objects.update_or_create(tx=transaction, field='dae', error="Merci de préciser le numéro de DAE/DAU",
                                                              defaults={'value': dae})
     else:
-        e, c = TransactionError.objects.update_or_create(tx=lot, field='dae', error="Merci de préciser le numéro de DAE/DAU",
+        e, c = TransactionError.objects.update_or_create(tx=transaction, field='dae', error="Merci de préciser le numéro de DAE/DAU",
                                                          defaults={'value': None})
 
     if 'delivery_date' not in lot_row or lot_row['delivery_date'] == '':
@@ -286,10 +287,10 @@ def load_excel_lot(entity, lot_row):
             dd = datetime.datetime.strptime(delivery_date, '%d/%m/%Y')
             transaction.delivery_date = dd
             lot.period = dd.strftime('%Y-%m')
-            TransactionError.objects.filter(lot=lot, field='delivery_date').delete()
+            TransactionError.objects.filter(tx=transaction, field='delivery_date').delete()
         except Exception:
             msg = "Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA"
-            e, c = TransactionError.objects.update_or_create(tx=lot, field='delivery_date',
+            e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_date',
                                                              error=msg,
                                                              defaults={'value': delivery_date})
     if 'client' in lot_row and lot_row['client'] != '':
@@ -303,12 +304,12 @@ def load_excel_lot(entity, lot_row):
             transaction.client_is_in_carbure = False
             transaction.carbure_client = None
             transaction.unknown_client = client
-        TransactionError.objects.filter(lot=lot, field='client').delete()
+        TransactionError.objects.filter(tx=transaction, field='client').delete()
     else:
         transaction.client_is_in_carbure = False
         transaction.carbure_client = None
         transaction.unknown_client = ''
-        e, c = TransactionError.objects.update_or_create(tx=lot, field='client',
+        e, c = TransactionError.objects.update_or_create(tx=transaction, field='client',
                                                          defaults={'value': None, 'error': "Merci de préciser un client"})
 
     if 'delivery_site' in lot_row and lot_row['delivery_site'] != '':
@@ -322,12 +323,12 @@ def load_excel_lot(entity, lot_row):
             transaction.delivery_site_is_in_carbure = False
             transaction.carbure_delivery_site = None
             transaction.unknown_delivery_site = delivery_site
-        TransactionError.objects.filter(lot=lot, field='delivery_site').delete()
+        TransactionError.objects.filter(tx=transaction, field='delivery_site').delete()
     else:
         transaction.delivery_site_is_in_carbure = False
         transaction.carbure_delivery_site = None
         transaction.unknown_delivery_site = ''
-        e, c = TransactionError.objects.update_or_create(tx=lot, field='delivery_site',
+        e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site',
                                                          defaults={'value': None, 'error': "Merci de préciser un site de livraison"})
 
     if transaction.delivery_site_is_in_carbure is False:
@@ -336,11 +337,11 @@ def load_excel_lot(entity, lot_row):
                 country = Pays.objects.get(code_pays=lot_row['delivery_site_country'])
                 transaction.unknown_delivery_site_country = country
             except Exception:
-                error, c = TransactionError.objects.update_or_create(tx=lot, field='delivery_site_country',
+                error, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site_country',
                                                                      error='Champ production_site_country incorrect',
                                                                      defaults={'value': lot_row['delivery_site_country']})
         else:
-            error, c = TransactionError.objects.update_or_create(tx=lot, field='delivery_site_country',
+            error, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site_country',
                                                                  error='Merci de préciser une valeur dans le champ production_site_country',
                                                                  defaults={'value': None})
 
