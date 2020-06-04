@@ -9,7 +9,7 @@ from django.db.models import Max
 from core.decorators import enrich_with_user_details, restrict_to_producers
 from core.xlsx_template import create_template_xlsx_v2
 
-from core.models import Entity, LotError, ProductionSite, Pays, Biocarburant, MatierePremiere, Depot
+from core.models import Entity, ProductionSite, Pays, Biocarburant, MatierePremiere, Depot
 from core.models import LotV2, LotTransaction, TransactionError, LotV2Error
 
 
@@ -25,7 +25,8 @@ def get_random(model):
 # not an API call. helper function
 def load_excel_lot(entity, lot_row):
     lot = LotV2()
-    if 'producer' in lot_row and lot_row['producer'] != '':
+    print(entity.name, lot_row)
+    if 'producer' in lot_row and lot_row['producer'] is not None:
         # this should be a bought or imported lot
         # check if we know the producer
         # producer_is_in_carbure = models.BooleanField(default=True)
@@ -50,6 +51,7 @@ def load_excel_lot(entity, lot_row):
                 lot.carbure_producer = None
                 lot.unknown_producer = lot_row['producer']
     else:
+        print('No producer in excel sheet. using default')
         # default, current entity is the producer
         lot.producer_is_in_carbure = True
         lot.carbure_producer = entity
@@ -66,7 +68,7 @@ def load_excel_lot(entity, lot_row):
                 lot.carbure_production_site = ProductionSite.objects.get(producer=lot.carbure_producer, name=production_site)
                 lot.production_site_is_in_carbure = True
                 lot.unknown_production_site = ''
-                LotError.objects.filter(lot=lot, field='production_site').delete()
+                LotV2Error.objects.filter(lot=lot, field='production_site').delete()
             except Exception:
                 # do not allow the use of an unknown production site if the producer is registered in Carbure
                 lot.carbure_production_site = None
@@ -106,8 +108,9 @@ def load_excel_lot(entity, lot_row):
         biocarburant = lot_row['biocarburant_code']
         try:
             lot.biocarburant = Biocarburant.objects.get(code=biocarburant)
-            LotError.objects.filter(lot=lot, field='biocarburant_code').delete()
-        except Exception:
+            LotV2Error.objects.filter(lot=lot, field='biocarburant_code').delete()
+        except Exception as e:
+            print('Exception fetching biocarburant named %s: %s' % (biocarburant, e))
             lot.biocarburant = None
             error, c = LotV2Error.objects.update_or_create(lot=lot, field='biocarburant_code',
                                                            error='Biocarburant inconnu',
@@ -293,7 +296,7 @@ def load_excel_lot(entity, lot_row):
             e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_date',
                                                              error=msg,
                                                              defaults={'value': delivery_date})
-    if 'client' in lot_row and lot_row['client'] != '':
+    if 'client' in lot_row and lot_row['client'] is not None:
         client = lot_row['client']
         matches = Entity.objects.filter(name=client).count()
         if matches:
@@ -312,7 +315,7 @@ def load_excel_lot(entity, lot_row):
         e, c = TransactionError.objects.update_or_create(tx=transaction, field='client',
                                                          defaults={'value': None, 'error': "Merci de préciser un client"})
 
-    if 'delivery_site' in lot_row and lot_row['delivery_site'] != '':
+    if 'delivery_site' in lot_row and lot_row['delivery_site'] is not None:
         delivery_site = lot_row['delivery_site']
         matches = Depot.objects.filter(depot_id=delivery_site).count()
         if matches:

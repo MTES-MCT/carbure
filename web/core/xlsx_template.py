@@ -68,9 +68,9 @@ def make_lots_sheet_v2(workbook, entity):
                          {'name': 'BIOBAO', 'country': 'ES', 'production_site': 'HONDARRIBIA'},
                          ]
 
-    foreign_clients = [{'name': 'BP', 'country': 'UK', 'delivery_site': 'DOVER'},
-                       {'name': 'BP', 'country': 'UK', 'delivery_site': 'LIVERPOOL'},
-                       {'name': 'BP', 'country': 'UK', 'delivery_site': 'MANCHESTER'},
+    foreign_clients = [{'name': 'BP', 'country': 'GB', 'delivery_site': 'DOVER'},
+                       {'name': 'BP', 'country': 'GB', 'delivery_site': 'LIVERPOOL'},
+                       {'name': 'BP', 'country': 'GB', 'delivery_site': 'MANCHESTER'},
                        {'name': 'EXXON', 'country': 'US', 'delivery_site': 'BOSTON'},
                        {'name': 'EXXON', 'country': 'US', 'delivery_site': 'HOBOKEN'},
                        {'name': 'IBERDROLA', 'country': 'ES', 'delivery_site': 'BCN'},
