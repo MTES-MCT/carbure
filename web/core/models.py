@@ -184,7 +184,7 @@ class LotV2(models.Model):
     carbure_id = models.CharField(max_length=64, blank=True, default='')
     # producer
     producer_is_in_carbure = models.BooleanField(default=True)
-    carbure_producer = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='producer')
+    carbure_producer = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='producer_lotv2')
     unknown_producer = models.CharField(max_length=64, blank=True, default='')
 
     production_site_is_in_carbure = models.BooleanField(default=True)
@@ -217,7 +217,7 @@ class LotV2(models.Model):
     source = models.CharField(max_length=32, choices=SOURCE_CHOICES, default='Manual')
 
     # lot has been split into many sublots ?
-    parent_lot = models.ForeignKey('self', null=True, blank=True)
+    parent_lot = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
     is_split = models.BooleanField(default=False)
 
     def __str__(self):
@@ -235,18 +235,18 @@ class LotTransaction(models.Model):
 
     # vendor / producer
     vendor_is_in_carbure = models.BooleanField(default=True)
-    carbure_vendor = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
+    carbure_vendor = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='vendor_transaction')
     unknown_vendor = models.CharField(max_length=64, blank=True, default='')
 
     # client / delivery
     dae = models.CharField(max_length=64, blank=True, default='')
     client_is_in_carbure = models.BooleanField(default=True)
-    carbure_client = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
+    carbure_client = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='client_transaction')
     unknown_client = models.CharField(max_length=64, blank=True, default='')
     delivery_date = models.DateField(blank=True, null=True)
     delivery_site_is_in_carbure = models.BooleanField(default=True)
     carbure_delivery_site = models.ForeignKey(Depot, null=True, blank=True, on_delete=models.SET_NULL)
-    undelivery_site = models.CharField(max_length=64, blank=True, default='')
+    unknown_delivery_site = models.CharField(max_length=64, blank=True, default='')
     export_ue = models.BooleanField(default=False)
     export_hors_ue = models.BooleanField(default=False)
     delivery_status = models.CharField(max_length=64, choices=DELIVERY_STATUS, default='N')

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 
 from . import public_api
 from . import producers_api
@@ -6,6 +6,8 @@ from . import operators_api
 from . import administrators_api
 
 urlpatterns = [
+    path('v2/producers/', include('api.v2.producers.urls')),
+
     # public, autocomplete api
     path('biocarburant-autocomplete/', public_api.biocarburant_autocomplete, name='api-biocarburant-autocomplete'),
     path('matiere-premiere-autocomplete/', public_api.matiere_premiere_autocomplete, name='api-matiere-premiere-autocomplete'),
@@ -19,7 +21,7 @@ urlpatterns = [
     path('operators-csv/', public_api.operators_csv, name='api-operators-csv'),
     path('depots-csv/', public_api.depots_csv, name='api-depots-csv'),
 
-    # private template
+    # private, producers
     path('producers/csv-template', producers_api.producers_import_csv_template, name='api-producers-template-csv'),
     path('producers/csv/upload', producers_api.producers_upload_csv, name='producers-api-upload-csv'),
     path('producers/xlsx-template', producers_api.producers_import_excel_template, name='api-producers-template-excel'),
