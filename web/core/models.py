@@ -126,24 +126,25 @@ from producers.models import ProductionSite
 
 class Lot(models.Model):
     LOT_STATUS = (('Draft', 'Brouillon'), ('Validated', 'Validé'))
-    SOURCE_CHOICES = (('EXCEL', 'Excel'), ('MANUAL', 'Manual'))
+    DELIVERY_STATUS = (('N', 'En Attente'), ('A', 'Accepté'), ('R', 'Refusé'), ('AC', 'À corriger'), ('AA', 'Corrigé'))
 
     period = models.CharField(max_length=64, blank=True, default='')
     carbure_id = models.CharField(max_length=64, blank=True, default='')
     # producer
-    producer_is_in_carbure = models.BooleanField(default=True)
-    carbure_producer = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='producer')
-    unknown_producer = models.CharField(max_length=64, blank=True, default='')
+    producer = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='producer')
+    production_site = models.ForeignKey(ProductionSite, null=True, blank=True, on_delete=models.SET_NULL)
 
-    production_site_is_in_carbure = models.BooleanField(default=True)
-    carbure_production_site = models.ForeignKey(ProductionSite, null=True, blank=True, on_delete=models.SET_NULL)
-    unknown_production_site = models.CharField(max_length=64, blank=True, default='')
+    # client / delivery
+    dae = models.CharField(max_length=64, blank=True, default='')
+    ea_delivery_date = models.DateField(blank=True, null=True)
+    ea_delivery_site = models.CharField(max_length=64, blank=True, default='')
+    ea = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='ea')
 
     # lot details
     volume = models.IntegerField(default=0)
     matiere_premiere = models.ForeignKey(MatierePremiere, null=True, on_delete=models.SET_NULL)
     biocarburant = models.ForeignKey(Biocarburant, null=True, on_delete=models.SET_NULL)
-    pays_origine = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL)
+    pays_origine = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='pays_origine')
 
     # GHG values
     eec = models.FloatField(default=0.0)
@@ -162,11 +163,9 @@ class Lot(models.Model):
     # other
     client_id = models.CharField(max_length=64, blank=True, default='')
     status = models.CharField(max_length=64, choices=LOT_STATUS, default='Draft')
-    source = models.CharField(max_length=32, choices=SOURCE_CHOICES, default='Manual')
 
-    # lot has been split into many sublots ?
-    parent_lot = models.ForeignKey('self', null=True, blank=True)
-    is_split = models.BooleanField(default=False)
+    # ea delivery confirmation
+    ea_delivery_status = models.CharField(max_length=64, choices=DELIVERY_STATUS, default='N')
 
     def __str__(self):
         return str(self.id)
@@ -176,7 +175,8 @@ class Lot(models.Model):
         verbose_name = 'Lot'
         verbose_name_plural = 'Lots'
 
-class NewLot(models.Model):
+
+class LotV2(models.Model):
     LOT_STATUS = (('Draft', 'Brouillon'), ('Validated', 'Validé'))
     SOURCE_CHOICES = (('EXCEL', 'Excel'), ('MANUAL', 'Manual'))
 
@@ -224,14 +224,14 @@ class NewLot(models.Model):
         return str(self.id)
 
     class Meta:
-        db_table = 'lots'
-        verbose_name = 'Lot'
-        verbose_name_plural = 'Lots'
+        db_table = 'lots_v2'
+        verbose_name = 'LotV2'
+        verbose_name_plural = 'LotsV2'
 
 
 class LotTransaction(models.Model):
     DELIVERY_STATUS = (('N', 'En Attente'), ('A', 'Accepté'), ('R', 'Refusé'), ('AC', 'À corriger'), ('AA', 'Corrigé'))
-    lot = models.ForeignKey(Lot, null=False, blank=False, on_delete=models.CASCADE)
+    lot = models.ForeignKey(LotV2, null=False, blank=False, on_delete=models.CASCADE)
 
     # vendor / producer
     vendor_is_in_carbure = models.BooleanField(default=True)
