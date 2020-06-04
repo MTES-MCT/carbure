@@ -45,12 +45,3 @@ def producers_settings(request, *args, **kwargs):
       site.certificate = None
     site.outputs = outputs.filter(production_site=site)
   return render(request, 'producers/settings.html', context)
-
-
-@login_required
-@enrich_with_user_details
-@restrict_to_producers
-def producers_index_v2(request, *args, **kwargs):
-    context = kwargs['context']
-    context['current_url_name'] = 'producers-index'
-    return render(request, 'producers/attestation.html', context)
