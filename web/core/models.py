@@ -64,7 +64,7 @@ class Biocarburant(models.Model):
         return self.name
 
     def natural_key(self):
-        return self.name
+        return {'code': self.code, 'name': self.name}
 
     class Meta:
         db_table = 'biocarburants'
@@ -82,7 +82,7 @@ class MatierePremiere(models.Model):
         return self.name
 
     def natural_key(self):
-        return self.name
+        return {'code': self.code, 'name': self.name}
 
     class Meta:
         db_table = 'matieres_premieres'
@@ -99,7 +99,7 @@ class Pays(models.Model):
         return self.name
 
     def natural_key(self):
-        return self.name
+        return {'code_pays': self.code_pays, 'name': self.name}
 
     class Meta:
         db_table = 'pays'
@@ -114,6 +114,9 @@ class Depot(models.Model):
 
     def __str__(self):
         return self.name
+
+    def natural_key(self):
+        return {'depot_id': self.depot_id, 'name': self.name, 'city': self.city}
 
     class Meta:
         db_table = 'depots'
