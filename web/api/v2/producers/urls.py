@@ -5,7 +5,8 @@ from . import producers
 urlpatterns = [
     # private, producers
     path('upload-xlsx-template', producers.excel_template_upload, name='api-v2-producers-excel-template-upload'),
-    path('download-xlsx-template', producers.excel_template_download, name='api-v2-producers-excel-template-download'),
+    path('download-xlsx-template-simple', producers.excel_template_download_simple, name='api-v2-producers-excel-template-download-simple'),
+    path('download-xlsx-template-advanced', producers.excel_template_download_advanced, name='api-v2-producers-excel-template-download-advanced'),
     path('lots/drafts', producers.get_drafts, name='api-v2-producers-get-drafts'),
 ]
 
