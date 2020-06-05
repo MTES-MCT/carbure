@@ -105,9 +105,34 @@ def administrators_stats(request, *args, **kwargs):
                 vol_fr = 0
             if vol_nfr is None:
                 vol_nfr = 0
-            stats.append({'title': '%s de %s' % (bc.name, mp.name), 'vol_fr': vol_fr, 'vol_nfr': vol_nfr})
+            co2 = (vol_fr + vol_nfr) * 23.4 * 83.8 * 0.5
+            stats.append({'title': '%s de %s' % (bc.name, mp.name), 'vol_fr': vol_fr, 'vol_nfr': vol_nfr, 'bc_code': bc.code, 'mp_code': mp.code, 'eco_co2': '%.2f' % (co2 / 1000000.0)})
     context['stats'] = stats
     return render(request, 'administrators/stats.html', context)
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_administrators
+def administrators_stats_details(request, *args, **kwargs):
+    context = kwargs['context']
+    context['current_url_name'] = 'administrators-stats'
+
+    mp_code = kwargs['mp_code']
+    bc_code = kwargs['bc_code']
+    mp = MatierePremiere.objects.get(code=mp_code)
+    bc = Biocarburant.objects.get(code=bc_code)
+
+    context['biocarburant'] = '%s de %s' % (bc.name, mp.name)
+
+    today = datetime.date.today()
+    since = datetime.date(year=today.year, month=1, day=1)
+
+    summary = Lot.objects.filter(status=Lot.VALID, matiere_premiere=mp, biocarburant=bc, ea_delivery_date__gte=since).values('producer').order_by('producer').annotate(sum=Sum('volume'))
+    print(summary)
+    #stats.append({'title': '%s de %s' % (bc.name, mp.name), 'vol_fr': vol_fr, 'vol_nfr': vol_nfr})
+    #context['stats'] = stats
+    return render(request, 'administrators/stats_details.html', context)
 
 
 @login_required
