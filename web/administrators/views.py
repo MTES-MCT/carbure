@@ -1,151 +1,213 @@
+import datetime
+
 from django.contrib.auth.decorators import login_required
 from core.decorators import enrich_with_user_details, restrict_to_administrators
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
+from django.db.models import Sum
 
-from core.models import Entity, UserRights
+from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Lot, Pays
 from producers.models import ProducerCertificate, ProductionSiteInput, ProductionSiteOutput
+
 
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
 def administrators_index(request, *args, **kwargs):
-  context = kwargs['context']
-  context['current_url_name'] = 'administrators-index'
-  return render(request, 'administrators/lots.html', context)
+    context = kwargs['context']
+    context['current_url_name'] = 'administrators-index'
+    return render(request, 'administrators/lots.html', context)
+
 
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
 def administrators_controles(request, *args, **kwargs):
-  context = kwargs['context']
-  context['current_url_name'] = 'administrators-controles'
-  return render(request, 'administrators/controles.html', context)
+    context = kwargs['context']
+    context['current_url_name'] = 'administrators-controles'
+    return render(request, 'administrators/controles.html', context)
+
 
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
 def administrators_suivi_corrections(request, *args, **kwargs):
-  context = kwargs['context']
-  context['current_url_name'] = 'administrators-suivi-corrections'
-  return render(request, 'administrators/suivi_corrections.html', context)
+    context = kwargs['context']
+    context['current_url_name'] = 'administrators-suivi-corrections'
+    return render(request, 'administrators/suivi_corrections.html', context)
+
 
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
 def administrators_suivi_certificats(request, *args, **kwargs):
-  context = kwargs['context']
-  context['certificates'] = ProducerCertificate.objects.all()
-  context['current_url_name'] = 'administrators-suivi-certificats'
-  return render(request, 'administrators/suivi_certificats.html', context)
+    context = kwargs['context']
+    context['certificates'] = ProducerCertificate.objects.all()
+    context['current_url_name'] = 'administrators-suivi-certificats'
+    return render(request, 'administrators/suivi_certificats.html', context)
+
 
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
 def administrators_certificate_details(request, *args, **kwargs):
-  context = kwargs['context']
-  certificate_id = kwargs['id']
-  context['certificate'] = ProducerCertificate.objects.get(id=certificate_id)
-  context['mps'] = ProductionSiteInput.objects.filter(production_site=context['certificate'].production_site)
-  context['biocarburants'] = ProductionSiteOutput.objects.filter(production_site=context['certificate'].production_site)
-  context['current_url_name'] = 'administrators-certificate-details'
-  return render(request, 'administrators/details_certificate.html', context)
+    context = kwargs['context']
+    certificate_id = kwargs['id']
+    context['certificate'] = ProducerCertificate.objects.get(id=certificate_id)
+    context['mps'] = ProductionSiteInput.objects.filter(production_site=context['certificate'].production_site)
+    context['biocarburants'] = ProductionSiteOutput.objects.filter(production_site=context['certificate'].production_site)
+    context['current_url_name'] = 'administrators-certificate-details'
+    return render(request, 'administrators/details_certificate.html', context)
+
 
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
 def administrators_gestion_utilisateurs(request, *args, **kwargs):
-  context = kwargs['context']
-  context['current_url_name'] = 'administrators-gestion-utilisateurs'
-  context['all_entities'] = Entity.objects.all()
-  context['entity_categories'] = Entity.ENTITY_TYPES
-  user_model = get_user_model()
-  context['users'] = user_model.objects.all()
-  context['user_rights'] = UserRights.objects.all()
-  return render(request, 'administrators/gestion_utilisateurs.html', context)
+    context = kwargs['context']
+    context['current_url_name'] = 'administrators-gestion-utilisateurs'
+    context['all_entities'] = Entity.objects.all()
+    context['entity_categories'] = Entity.ENTITY_TYPES
+    user_model = get_user_model()
+    context['users'] = user_model.objects.all()
+    context['user_rights'] = UserRights.objects.all()
+    return render(request, 'administrators/gestion_utilisateurs.html', context)
+
 
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
-def administrators_settings(request, *args, **kwargs):
-  context = kwargs['context']
-  context['current_url_name'] = 'administrators-settings'
-  return render(request, 'administrators/settings.html', context)
+def administrators_stats(request, *args, **kwargs):
+    context = kwargs['context']
+    context['current_url_name'] = 'administrators-stats'
+    stats = []
+    mps = {mp.code: mp for mp in MatierePremiere.objects.all()}
+    carburants = {bc.code: bc for bc in Biocarburant.objects.all()}
+    france = Pays.objects.get(code_pays='FR')
+    today = datetime.date.today()
+    since = datetime.date(year=today.year, month=1, day=1)
+    stats_wanted = {'EMHV': ['COLZA', 'TOURNESOL', 'SOJA'],
+                    'EMHU': ['HUILE_ALIMENTAIRE_USAGEE'],
+                    'EMHA': ['HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2'],
+                    'ET': ['BETTERAVE', 'BLE', 'MAIS', 'RESIDUS_VINIQUES']
+                    }
+
+    for c, mplist in stats_wanted.items():
+        bc = carburants[c]
+        for m in mplist:
+            mp = mps[m]
+            lots = Lot.objects.filter(status=Lot.VALID, matiere_premiere=mp, biocarburant=bc, ea_delivery_date__gte=since)
+            vol_fr = lots.filter(pays_origine=france).aggregate(Sum('volume'))['volume__sum']
+            vol_nfr = lots.exclude(pays_origine=france).aggregate(Sum('volume'))['volume__sum']
+            if vol_fr is None:
+                vol_fr = 0
+            if vol_nfr is None:
+                vol_nfr = 0
+            co2 = (vol_fr + vol_nfr) * 23.4 * 83.8 * 0.5
+            stats.append({'title': '%s de %s' % (bc.name, mp.name), 'vol_fr': vol_fr, 'vol_nfr': vol_nfr, 'bc_code': bc.code, 'mp_code': mp.code, 'eco_co2': '%.2f' % (co2 / 1000000.0)})
+    context['stats'] = stats
+    return render(request, 'administrators/stats.html', context)
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_administrators
+def administrators_stats_details(request, *args, **kwargs):
+    context = kwargs['context']
+    context['current_url_name'] = 'administrators-stats'
+    mp_code = kwargs['mp_code']
+    bc_code = kwargs['bc_code']
+    mp = MatierePremiere.objects.get(code=mp_code)
+    bc = Biocarburant.objects.get(code=bc_code)
+    context['biocarburant'] = '%s de %s' % (bc.name, mp.name)
+    today = datetime.date.today()
+    since = datetime.date(year=today.year, month=1, day=1)
+    producers = {e.id: e for e in Entity.objects.filter(entity_type='Producteur')}
+    summary = Lot.objects.filter(status=Lot.VALID, matiere_premiere=mp, biocarburant=bc, ea_delivery_date__gte=since).values('producer').order_by('producer').annotate(sum=Sum('volume'))
+    stats = []
+    for s in summary:
+        stats.append({'producer': producers[s['producer']].name, 'vol': s['sum']})
+    context['stats'] = stats
+    return render(request, 'administrators/stats_details.html', context)
+
 
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
 def administrators_validate_certificate(request, *args, **kwargs):
-  context = kwargs['context']
-  certificate_id = kwargs['id']
-  try:
-    certificate = ProducerCertificate.objects.get(id=certificate_id)
-    certificate.status = 'Valid'
-    certificate.save()
-  except Exception as e:
-    return JsonResponse({'status':'error', 'message':'Could not find certificate'}, status=400)
-  return redirect('administrators-suivi-certificats')
+    context = kwargs['context']
+    certificate_id = kwargs['id']
+    try:
+        certificate = ProducerCertificate.objects.get(id=certificate_id)
+        certificate.status = 'Valid'
+        certificate.save()
+    except Exception as e:
+        return JsonResponse({'status':'error', 'message':'Could not find certificate'}, status=400)
+    return redirect('administrators-suivi-certificats')
+
 
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
 def administrators_validate_input(request, *args, **kwargs):
-  context = kwargs['context']
-  crtid = kwargs['crtid']
-  input_id = kwargs['inputid']
-  try:
-    mp = ProductionSiteInput.objects.get(id=input_id)
-    mp.status = 'Valid'
-    mp.save()
-  except Exception as e:
-    return JsonResponse({'status':'error', 'message':'Could not find input in database'}, status=400)
-  return redirect('administrators-certificate-details', id=crtid)
+    context = kwargs['context']
+    crtid = kwargs['crtid']
+    input_id = kwargs['inputid']
+    try:
+        mp = ProductionSiteInput.objects.get(id=input_id)
+        mp.status = 'Valid'
+        mp.save()
+    except Exception as e:
+        return JsonResponse({'status':'error', 'message':'Could not find input in database'}, status=400)
+    return redirect('administrators-certificate-details', id=crtid)
+
 
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
 def administrators_validate_output(request, *args, **kwargs):
-  context = kwargs['context']
-  crtid = kwargs['crtid']
-  output_id = kwargs['outputid']
-  try:
-    bc = ProductionSiteOutput.objects.get(id=output_id)
-    bc.status = 'Valid'
-    bc.save()
-  except Exception as e:
-    return JsonResponse({'status':'error', 'message':'Could not find output in database'}, status=400)
-  return redirect('administrators-certificate-details', id=crtid)
+    context = kwargs['context']
+    crtid = kwargs['crtid']
+    output_id = kwargs['outputid']
+    try:
+        bc = ProductionSiteOutput.objects.get(id=output_id)
+        bc.status = 'Valid'
+        bc.save()
+    except Exception as e:
+        return JsonResponse({'status':'error', 'message':'Could not find output in database'}, status=400)
+    return redirect('administrators-certificate-details', id=crtid)
 
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
 def administrators_delete_input(request, *args, **kwargs):
-  context = kwargs['context']
-  crtid = kwargs['crtid']
-  input_id = kwargs['inputid']
-  try:
-    mp = ProductionSiteInput.objects.get(id=input_id)
-    mp.delete()
-  except Exception as e:
-    return JsonResponse({'status':'error', 'message':'Could not find input in database'}, status=400)
-  return redirect('administrators-certificate-details', id=crtid)
+    context = kwargs['context']
+    crtid = kwargs['crtid']
+    input_id = kwargs['inputid']
+    try:
+        mp = ProductionSiteInput.objects.get(id=input_id)
+        mp.delete()
+    except Exception as e:
+        return JsonResponse({'status':'error', 'message':'Could not find input in database'}, status=400)
+    return redirect('administrators-certificate-details', id=crtid)
+
 
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
 def administrators_delete_output(request, *args, **kwargs):
-  context = kwargs['context']
-  crtid = kwargs['crtid']
-  output_id = kwargs['outputid']
-  try:
-    bc = ProductionSiteOutput.objects.get(id=output_id)
-    bc.delete()
-  except Exception as e:
-    return JsonResponse({'status':'error', 'message':'Could not find output in database'}, status=400)
-  return redirect('administrators-certificate-details', id=crtid)
+    context = kwargs['context']
+    crtid = kwargs['crtid']
+    output_id = kwargs['outputid']
+    try:
+        bc = ProductionSiteOutput.objects.get(id=output_id)
+        bc.delete()
+    except Exception as e:
+        return JsonResponse({'status':'error', 'message':'Could not find output in database'}, status=400)
+    return redirect('administrators-certificate-details', id=crtid)
+
 
 @login_required
 @enrich_with_user_details
