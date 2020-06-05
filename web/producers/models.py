@@ -2,6 +2,7 @@ from django.db import models
 
 from core.models import Entity, MatierePremiere, Biocarburant, Pays
 
+
 class ProductionSite(models.Model):
     GES_OPTIONS = [('Default', 'Valeurs par défaut'), ('Actual', 'Valeurs réelles')]
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE)
@@ -10,17 +11,19 @@ class ProductionSite(models.Model):
     date_mise_en_service = models.DateField(null=False, blank=False)
     ges_option = models.CharField(max_length=12, choices=GES_OPTIONS, default='Default')
     eligible_dc = models.BooleanField(default=False)
+    dc_reference = models.CharField(max_length=64, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
     def natural_key(self):
-        return self.name
+        return {'name': self.name, 'country': self.country.natural_key()}
 
     class Meta:
         db_table = 'producer_sites'
         verbose_name = 'Site de Production'
         verbose_name_plural = 'Sites de Production'
+
 
 class ProductionSiteInput(models.Model):
     INPUT_STATUS = (('Pending', 'En attente de validation'), ('Valid', 'Validé'))
@@ -37,6 +40,7 @@ class ProductionSiteInput(models.Model):
         verbose_name = 'Site de Production - Filiere'
         verbose_name_plural = 'Sites de Production - Filieres'
 
+
 class ProductionSiteOutput(models.Model):
     OUTPUT_STATUS = (('Pending', 'En attente de validation'), ('Valid', 'Validé'))
 
@@ -51,6 +55,7 @@ class ProductionSiteOutput(models.Model):
         db_table = 'production_sites_output'
         verbose_name = 'Site de Production - Biocarburant'
         verbose_name_plural = 'Sites de Production - Biocarburants'
+
 
 class ProducerCertificate(models.Model):
     CERTIF_STATUS_CHOICES = [("Pending", "En Attente de validation"), ("Valid", "Validé"), ("Expired", "Expiré")]
