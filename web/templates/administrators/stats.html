@@ -1,0 +1,30 @@
+{% extends "common/base_private.html" %}
+
+{% block content  %}
+<div class="main" style="overflow-x: auto;">
+	<div class="panel">
+		<h3>Statistiques 2020</h3>
+	    <div class="flex-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Type de Biocarburant</th>
+              <th>Volume produit en France</th>
+              <th>Volume Importé</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in stats %}
+            <tr>
+              <td>{{s.title}}</td>
+              <td>{{s.vol_fr}}</td>
+              <td>{{s.vol_nfr}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+	    </div>
+	</div>
+</div>
+{% endblock %}
+
