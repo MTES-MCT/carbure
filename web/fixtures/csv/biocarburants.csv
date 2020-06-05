@@ -1,17 +1,18 @@
-code;description_fr
-BG;Biogaz
-BGS;Biogazole de synthèse (Hors HVO)
-EMHA;EMHA
-EMHU;EMHU
-EMHV;EMHV
-ETBE;ETBE
-ET;Ethanol
-HOG;Huile Hydrotraitée - Gazole
-HOE;Huile Hydrotraitée - Essence
-HVOG;Huile Végétale Hydrotraitée - Gazole
-HVOE;Huile Végétale Hydrotraitée - Essence
-MTBE;MTBE
-MT;Méthanol
-TAEE;TAEE
-HVP;Huile végétale pure
-HCU;Huile provenant d'huiles de cuisson usagées
+code;description_fr;PCI_kg;PCI_Litre;Masse_volumique
+BG;Biogaz;50;0;0
+BGS;Biogazole de synthèse (Hors HVO);44;34;0.773
+BT;Butanol;33;27;0.818
+EMHA;EMHA;37;33;0.892
+EMHU;EMHU;37;33;0.892
+EMHV;EMHV;37;33;0.892
+ETBE;ETBE;36;27;0.75
+ET;Ethanol;27;21;0.778
+HOG;Huile Hydrotraitée - Gazole;;44;34
+HOE;Huile Hydrotraitée - Essence;;45;30
+HVOG;Huile Végétale Hydrotraitée - Gazole;;44;34
+HVOE;Huile Végétale Hydrotraitée - Essence;;45;30
+MTBE;MTBE;35;26;0.743
+MT;Méthanol;20;16;0.8
+TAEE;TAEE;38;29;0.763
+HVP;Huile végétale pure;37;34;0.919
+HCU;Huile provenant d'huiles de cuisson usagées;0;0;0
