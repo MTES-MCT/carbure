@@ -117,21 +117,19 @@ def administrators_stats(request, *args, **kwargs):
 def administrators_stats_details(request, *args, **kwargs):
     context = kwargs['context']
     context['current_url_name'] = 'administrators-stats'
-
     mp_code = kwargs['mp_code']
     bc_code = kwargs['bc_code']
     mp = MatierePremiere.objects.get(code=mp_code)
     bc = Biocarburant.objects.get(code=bc_code)
-
     context['biocarburant'] = '%s de %s' % (bc.name, mp.name)
-
     today = datetime.date.today()
     since = datetime.date(year=today.year, month=1, day=1)
-
+    producers = {e.id: e for e in Entity.objects.filter(entity_type='Producteur')}
     summary = Lot.objects.filter(status=Lot.VALID, matiere_premiere=mp, biocarburant=bc, ea_delivery_date__gte=since).values('producer').order_by('producer').annotate(sum=Sum('volume'))
-    print(summary)
-    #stats.append({'title': '%s de %s' % (bc.name, mp.name), 'vol_fr': vol_fr, 'vol_nfr': vol_nfr})
-    #context['stats'] = stats
+    stats = []
+    for s in summary:
+        stats.append({'producer': producers[s['producer']].name, 'vol': s['sum']})
+    context['stats'] = stats
     return render(request, 'administrators/stats_details.html', context)
 
 
