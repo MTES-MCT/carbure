@@ -4,7 +4,7 @@ import datetime
 
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.db.models import Max
+from django.db.models import Max, Min
 from django.core import serializers
 
 from core.decorators import enrich_with_user_details, restrict_to_producers
@@ -432,5 +432,8 @@ def excel_template_upload(request, *args, **kwargs):
 @restrict_to_producers
 def get_drafts(request, *args, **kwargs):
     lots = LotV2.objects.filter(status='Draft')
+    transactions_ids = set([tx['id__min'] for tx in LotTransaction.objects.filter(lot__in=lots).values('lot_id', 'id').annotate(Min('id'))])
+    first_transactions = LotTransaction.objects.filter(id__in=transactions_ids)
     sez = serializers.serialize('json', lots, use_natural_foreign_keys=True)
-    return JsonResponse({'lots': sez, 'errors': []})
+    txsez = serializers.serialize('json', first_transactions, use_natural_foreign_keys=True)
+    return JsonResponse({'lots': sez, 'errors': [], 'transactions': txsez})
