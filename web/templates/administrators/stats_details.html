@@ -10,15 +10,13 @@
             <tr>
               <th>Producteur</th>
               <th>Volume produit</th>
-              <th>Pays</th>
             </tr>
           </thead>
           <tbody>
             {% for s in stats %}
             <tr>
               <td>{{s.producer}}</td>
-              <td>{{s.volume}}</td>
-              <td>{{s.country}}</td>
+              <td>{{s.vol}}</td>
             </tr>
             {% endfor %}
           </tbody>
