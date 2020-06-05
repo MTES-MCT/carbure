@@ -7,10 +7,10 @@ EMHU;EMHU;37;33;0.892
 EMHV;EMHV;37;33;0.892
 ETBE;ETBE;36;27;0.75
 ET;Ethanol;27;21;0.778
-HOG;Huile Hydrotraitée - Gazole;;44;34
-HOE;Huile Hydrotraitée - Essence;;45;30
-HVOG;Huile Végétale Hydrotraitée - Gazole;;44;34
-HVOE;Huile Végétale Hydrotraitée - Essence;;45;30
+HOG;Huile Hydrotraitée - Gazole;0;44;34
+HOE;Huile Hydrotraitée - Essence;0;45;30
+HVOG;Huile Végétale Hydrotraitée - Gazole;0;44;34
+HVOE;Huile Végétale Hydrotraitée - Essence;0;45;30
 MTBE;MTBE;35;26;0.743
 MT;Méthanol;20;16;0.8
 TAEE;TAEE;38;29;0.763
