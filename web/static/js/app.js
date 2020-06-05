@@ -27,7 +27,7 @@ var table_columns_drafts = [
 {title:'Référence', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data:'client_id', tooltip: 'Champ libre - Référence client'},
 {title:'Date d\'entrée<br /> en EA', can_hide: true, can_duplicate: true, can_export: true, data:'ea_delivery_date'},
 {title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'ea_name'},
-{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'ea_delivery_site_name'},
+{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'ea_delivery_site'},
 ]
 
 const table_columns_drafts_v2 = [
