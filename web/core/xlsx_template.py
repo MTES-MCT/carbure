@@ -110,7 +110,7 @@ def make_lots_sheet_v2_advanced(workbook, entity):
             row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc']]
         else:
             p = random.choice(psites)
-            row += ['', p.name, p.country.code_pays, '', '', '']
+            row += [p.producer.name, p.name, p.country.code_pays, '', '', '']
         row += [volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 0, 'FR000000123', clientid]
         if exported:
             c = random.choice(foreign_clients)

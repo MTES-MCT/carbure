@@ -11,5 +11,5 @@ urlpatterns = [
 
 
     path('v2/<slug:producer_name>/', v2.producers_index_v2, name='producers-index-v2'),
-
+    path('v2/import-documentation', v2.producers_import_doc, name='producers-import-documentation'),
 ]
