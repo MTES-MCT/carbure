@@ -70,10 +70,10 @@ def administrators_gestion_utilisateurs(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_administrators
-def administrators_settings(request, *args, **kwargs):
-  context = kwargs['context']
-  context['current_url_name'] = 'administrators-settings'
-  return render(request, 'administrators/settings.html', context)
+def administrators_stats(request, *args, **kwargs):
+    context = kwargs['context']
+    context['current_url_name'] = 'administrators-stats'
+    return render(request, 'administrators/stats.html', context)
 
 @login_required
 @enrich_with_user_details
