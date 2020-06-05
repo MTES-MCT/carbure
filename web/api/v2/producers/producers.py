@@ -26,7 +26,6 @@ def get_random(model):
 # not an API call. helper function
 def load_excel_lot(entity, lot_row):
     lot = LotV2()
-    print(entity.name, lot_row)
     if 'producer' in lot_row and lot_row['producer'] is not None:
         # this should be a bought or imported lot
         # check if we know the producer
@@ -433,5 +432,5 @@ def excel_template_upload(request, *args, **kwargs):
 @restrict_to_producers
 def get_drafts(request, *args, **kwargs):
     lots = LotV2.objects.filter(status='Draft')
-    serialized = serializers.serialize('json', lots)
-    return JsonResponse({'lots': serialized, 'errors': []})
+    sez = serializers.serialize('json', lots, use_natural_foreign_keys=True)
+    return JsonResponse({'lots': sez, 'errors': []})

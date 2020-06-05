@@ -32,13 +32,13 @@ var table_columns_drafts = [
 
 const table_columns_drafts_v2 = [
 {title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
-{title:'ID', hidden: true, can_hide: true, can_duplicate: false, can_export: false, data:'lot_id'},
-{title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data:'producer_name'},
-{title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data:'production_site_name'},
+{title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer : `<i>${full.fields.unknown_producer}</i>` }},
+{title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
+{title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.country.code_pays : full.fields.unknown_production_country.code_pays }},
 {title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
-{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'biocarburant_name'},
-{title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'matiere_premiere_name'},
-{title:`Pays<br /> d'origine`, filter_title: 'Pays', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'pays_origine_name'},
+{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.biocarburant.name }},
+{title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.matiere_premiere.name }},
+{title:`Pays<br /> d'origine`, filter_title: 'Pays', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.pays_origine.code_pays }},
 
 {title:'EEC', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
 {title:'EL', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
@@ -1743,119 +1743,40 @@ function init_datatables_drafts_v2(url) {
     var table_drafts = $('#datatable_drafts').DataTable({
       paging: true,
       info: true,
-      scrollX: true,
-      scrollY: 1000,
-      scrollCollapse: true,
-      language: {
-          search: "Rechercher:",
-          paginate: {
-              first:    '«',
-              previous: '‹',
-              next:     '›',
-              last:     '»'
-          },
-          aria: {
-              paginate: {
-                  first:    'Première',
-                  previous: 'Précédente',
-                  next:     'Suivante',
-                  last:     'Dernière'
-              }
-          }
-      },
       dom: 'rtp',
+      scrollX: true,
       columnDefs: [
         {
-          className: "dt-center",
-          targets: "_all",
-          render: function(data, type, row, meta) {
-            let col_name = col_definition[meta.col].data
-            let lot_id = row['lot_id']
-            if (lot_id in lot_errors) {
-              if (col_name in lot_errors[lot_id]) {
-                let error = lot_errors[lot_id][col_name]
-                return `<span style="color:tomato;">${error}</span>`
-              }
-            }
-            return data
-          }
-        },
-        {
-          targets: 0,
+          targets: [0],
           searchable:false,
           orderable:false,
           width:'1%',
           className: 'dt-body-center',
           render: function (data, type, full, meta) {
-             return '<input type="checkbox">';
+            return '<input type="checkbox">';
           }
-        }
+        },
+        {
+          className: "dt-center",
+          targets: "_all",
+          render: function (data, type, full, meta) {
+          	let col_name = col_definition[meta.col].data
+          	if (col_definition[meta.col]['render'] != undefined) {
+				return col_definition[meta.col]['render'](full)
+          	}
+          	return full['fields'][col_name]
+          }
+        },
       ],
       order: [[ 1, 'desc' ]],
       columns: col_definition,
       ajax: {
         url: url,
         dataSrc: function(res) {
-          lots = res['lots']
-          for (let i = 0, len = lots.length; i < len; i++) {
-            // add checkbox on the fly
-            lots[i]["checkbox"] = `<input type="checkbox" />`
-          }
-          errors = res['errors']
-          for (let i = 0, len = errors.length; i < len; i++) {
-            let error = errors[i]
-            let lot_id = error.lot_id
-            if (!(lot_id in lot_errors)) {
-              lot_errors[lot_id] = {}
-            }
-            lot_errors[lot_id][error.field] = error.value
-          }
+          lots = JSON.parse(res['lots'])
           return lots
         }
       },
-      initComplete: function () {
-        count = 0;
-        this.api().columns().every(function () {
-          var column = this;
-          let table_column = col_definition[column.index()]
-          if (table_column.can_filter === true) {
-            var select = $('<select id="select_' + table_column.data + '" class="select2" ></select>')
-                .appendTo($(column.footer()).empty())
-                .on('change', function () {
-                  //Get the "text" property from each selected data
-                  //regex escape the value and store in array
-                  var data = $.map($(this).select2('data'), function(value, key) {
-                    return value.text ? '^' + $.fn.dataTable.util.escapeRegex(value.text) + '$' : null
-                  })
-                  //if no data selected use ""
-                  if (data.length === 0) {
-                    data = [""]
-                  }
-                  //join array into string with regex or (|)
-                  var val = data.join('|')
-                  //search for the option(s) selected
-                  column.search(val ? val : '', true, false).draw()
-                })
-            column.data().unique().sort().each(function (d, j) {
-              if (d === "") {
-                return
-              }
-              select.append('<option value="'+d+'">'+d+'</option>');
-            })
-            //use column title as selector and placeholder
-            $('#select_' + table_column.data).select2({
-              multiple: true,
-              closeOnSelect: true,
-              placeholder: "Filtrer " + (table_column.filter_title  ? table_column.filter_title : table_column.title),
-              placeholderOption: function () { return undefined; }
-            });
-            //initially clear select otherwise first option is selected
-            $('.select2').val(null).trigger('change')
-          } else {
-            $(column.footer()).append()
-          }
-        }).draw()
-      }
     })
 
     $("#datatable_drafts tbody").on('click', 'td',  (e) => {
