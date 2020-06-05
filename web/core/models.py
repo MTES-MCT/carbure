@@ -59,6 +59,9 @@ class Biocarburant(models.Model):
     description = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
     code = models.CharField(max_length=16, unique=True)
+    pci_kg = models.FloatField(default=0)
+    pci_litre = models.FloatField(default=0)
+    masse_volumique = models.FloatField(default=0)
 
     def __str__(self):
         return self.name
