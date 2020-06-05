@@ -26,7 +26,7 @@ class OperatorsApiSecurityTests(TestCase):
     def test_access_producer(self):
         self.client.login(username='testproducer@almalexia.org', password='totopouet42')
         for p in urlpatterns:
-            if p.name.startswith('operator'):
+            if hasattr(p, 'name') and p.name.startswith('operator'):
                 response = self.client.get(reverse(p.name))
                 self.assertEqual(response.status_code, 403)
         self.client.logout()
@@ -34,7 +34,7 @@ class OperatorsApiSecurityTests(TestCase):
     def test_access_admin(self):
         self.client.login(username='testadmin@almalexia.org', password='totopouet42')
         for p in urlpatterns:
-            if p.name.startswith('operator'):
+            if hasattr(p, 'name') and p.name.startswith('operator'):
                 response = self.client.get(reverse(p.name))
                 self.assertEqual(response.status_code, 403)
         self.client.logout()

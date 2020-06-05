@@ -9,7 +9,7 @@ from django.utils.crypto import get_random_string
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
 from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, Lot, LotComment
-from core.models import LotError, GHGValues, Depot
+from core.models import LotError, GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error
 
 
 class EntityAdmin(admin.ModelAdmin):
@@ -62,6 +62,12 @@ class LotErrorAdmin(admin.ModelAdmin):
     list_filter = ('field', )
 
 
+class LotV2ErrorAdmin(admin.ModelAdmin):
+    list_display = ('lot', 'field', 'value', 'error')
+    search_fields = ('lot', 'field', 'value', 'error')
+    list_filter = ('field', )
+
+
 class GHGValuesAdmin(admin.ModelAdmin):
     list_display = ('matiere_premiere', 'biocarburant', 'condition', 'eec_default', 'ep_default', 'etd_default')
     search_fields = ('matiere_premiere', 'biocarburant')
@@ -71,6 +77,24 @@ class GHGValuesAdmin(admin.ModelAdmin):
 class DepotAdmin(admin.ModelAdmin):
     list_display = ('name', 'depot_id', 'city')
     search_fields = ('name', 'city', 'depot_id')
+
+
+class LotV2Admin(admin.ModelAdmin):
+    list_display = ('period', 'carbure_id', 'carbure_producer', 'carbure_production_site', 'biocarburant', 'matiere_premiere', 'status')
+    search_fields = ('carbure_producer', 'biocarburant', 'matiere_premiere', 'carbure_id', 'period')
+    list_filter = ('period', 'carbure_producer', 'is_split', 'status', 'source', 'biocarburant')
+
+
+class TransactionAdmin(admin.ModelAdmin):
+    list_display = ('carbure_vendor', 'carbure_client', 'dae', 'carbure_delivery_site', 'delivery_date', 'delivery_status')
+    search_fields = ('carbure_vendor', 'carbure_client', 'dae', 'carbure_delivery_site', 'champ_libre')
+    list_filter = ('carbure_vendor', 'carbure_client', 'delivery_status')
+
+
+class TransactionErrorAdmin(admin.ModelAdmin):
+    list_display = ('tx', 'field', 'error', 'value')
+    search_fields = ('field', 'error', 'value')
+    list_filter = ('field',)
 
 
 admin.site.register(Entity, EntityAdmin)
@@ -84,6 +108,11 @@ admin.site.register(LotComment, LotCommentAdmin)
 admin.site.register(LotError, LotErrorAdmin)
 admin.site.register(GHGValues, GHGValuesAdmin)
 admin.site.register(Depot, DepotAdmin)
+
+admin.site.register(LotV2, LotV2Admin)
+admin.site.register(LotTransaction, TransactionAdmin)
+admin.site.register(TransactionError, TransactionErrorAdmin)
+admin.site.register(LotV2Error, LotV2ErrorAdmin)
 
 
 # authtool custom user model
