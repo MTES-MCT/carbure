@@ -5,6 +5,7 @@ import datetime
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max
+from django.core import serializers
 
 from core.decorators import enrich_with_user_details, restrict_to_producers
 from core.xlsx_template import create_template_xlsx_v2_simple, create_template_xlsx_v2_advanced
@@ -431,4 +432,6 @@ def excel_template_upload(request, *args, **kwargs):
 @enrich_with_user_details
 @restrict_to_producers
 def get_drafts(request, *args, **kwargs):
-    return JsonResponse({'lots': [], 'errors': []})
+    lots = LotV2.objects.filter(status='Draft')
+    serialized = serializers.serialize('json', lots)
+    return JsonResponse({'lots': serialized, 'errors': []})
