@@ -32,7 +32,7 @@ var table_columns_drafts = [
 
 const table_columns_drafts_v2 = [
 {title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
-{title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer : `<i>${full.fields.unknown_producer}</i>` }},
+{title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { console.log(full); return full.fields.producer_is_in_carbure ? full.fields.carbure_producer : `<i>${full.fields.unknown_producer}</i>` }},
 {title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
 {title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.country.code_pays : full.fields.unknown_production_country.code_pays }},
 {title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
@@ -53,11 +53,11 @@ const table_columns_drafts_v2 = [
 {title:'Émissions de référence', hidden: true, can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'},
 {title:'% de réduction', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reduction'},
 
-{title:'N°DAE/DAU', can_hide: true, can_duplicate: false, can_export: true, data:'dae'},
-{title:'Référence', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data:'client_id', tooltip: 'Champ libre - Référence client'},
-{title:'Date d\'entrée<br /> en EA', can_hide: true, can_duplicate: true, can_export: true, data:'ea_delivery_date'},
-{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'ea_name'},
-{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, data: 'ea_delivery_site_name'},
+{title:'N°DAE/DAU', can_hide: true, can_duplicate: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.dae}},
+{title:'Référence', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, tooltip: 'Champ libre - Référence client', render: (data, type, full, meta) => {return full.tx.fields.champ_libre}},
+{title:'Date d\'entrée<br /> en EA', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_date}},
+{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.client_is_in_carbure ? full.tx.fields.carbure_client : full.tx.fields.unknown_client}},
+{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site : full.tx.fields.unknown_delivery_site }},
 ]
 
 var table_columns_producers_corrections = [
@@ -1726,11 +1726,6 @@ $("#add_lot").on('click', function() {
 })
 
 
-
-
-
-
-
 function init_datatables_drafts_v2(url) {
   const col_definition = table_columns_drafts_v2
 
@@ -1773,8 +1768,18 @@ function init_datatables_drafts_v2(url) {
       ajax: {
         url: url,
         dataSrc: function(res) {
+          data = {}
           lots = JSON.parse(res['lots'])
-          return lots
+          for (let i = 0, len = lots.length; i < len; i++) {
+          	let lot = lots[i]
+          	data[lot.id] = lot
+          }
+          txs = JSON.parse(res['transactions'])
+          for (let i = 0, len = txs.length; i < len; i++) {
+          	let tx = txs[i]
+          	data[tx.lot].tx = tx
+          }
+          return Object.values(data)
         }
       },
     })
