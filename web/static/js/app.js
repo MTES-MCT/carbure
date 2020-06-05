@@ -56,8 +56,8 @@ const table_columns_drafts_v2 = [
 {title:'N°DAE/DAU', can_hide: true, can_duplicate: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.dae}},
 {title:'Référence', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, tooltip: 'Champ libre - Référence client', render: (data, type, full, meta) => {return full.tx.fields.champ_libre}},
 {title:'Date d\'entrée<br /> en EA', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_date}},
-{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.client_is_in_carbure ? full.tx.fields.carbure_client : full.tx.fields.unknown_client}},
-{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site : full.tx.fields.unknown_delivery_site }},
+{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.client_is_in_carbure ? full.tx.fields.carbure_client : `<i>${full.tx.fields.unknown_client}</i>`}},
+{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site.name : `<i>${full.tx.fields.unknown_delivery_site}</i>` }},
 ]
 
 var table_columns_producers_corrections = [
@@ -1772,15 +1772,16 @@ function init_datatables_drafts_v2(url) {
           lots = JSON.parse(res['lots'])
           for (let i = 0, len = lots.length; i < len; i++) {
           	let lot = lots[i]
-          	data[lot.id] = lot
+          	data[lot.pk] = lot
           }
           txs = JSON.parse(res['transactions'])
           for (let i = 0, len = txs.length; i < len; i++) {
           	let tx = txs[i]
-          	data[tx.lot].tx = tx
+          	data[tx.fields.lot].tx = tx
           }
-          return Object.values(data)
-        }
+          list = Object.values(data)
+          return list
+	    }
       },
     })
 
