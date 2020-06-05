@@ -188,7 +188,8 @@
           <span id="modal_import_form_err_message" style="color: red;"></span>
           <span id="modal_import_form_success_message" style="color: green;"></span>
           <dl>
-            <dt><a href="{% url 'api-v2-producers-excel-template-download' %}" >Télécharger le modèle</a></dt>
+            <dt><a href="{% url 'api-v2-producers-excel-template-download-simple' %}" >Télécharger le modèle simplifié</a></dt>
+            <dt><a href="{% url 'api-v2-producers-excel-template-download-advanced' %}" >Télécharger le modèle avancé</a></dt>
           </dl>
           {% csrf_token %}
           <input type="file" name="file" id="file_to_upload">
