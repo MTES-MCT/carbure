@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 
-from core.models import UserRights, UserPreferences, MatierePremiere, Biocarburant, Lot, Entity
+from core.models import UserRights, UserPreferences, MatierePremiere, Biocarburant, Lot, Entity, Pays
 from core.decorators import enrich_with_user_details
 
 def index(request):
