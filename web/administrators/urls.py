@@ -9,8 +9,6 @@ urlpatterns = [
     path('suivi-certificats', views.administrators_suivi_certificats, name='administrators-suivi-certificats'),
     path('suivi-certificats/<int:id>', views.administrators_certificate_details, name='administrators-certificate-details'),
     path('gestion-utilisateurs', views.administrators_gestion_utilisateurs, name='administrators-gestion-utilisateurs'),
-    path('stats', views.administrators_stats, name='administrators-stats'),
-    path('stats/<str:bc_code>/<str:mp_code>', views.administrators_stats_details, name='administrators-stats-details'),
 
 
     # TODO: move to API
