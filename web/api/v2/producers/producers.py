@@ -24,8 +24,10 @@ def get_random(model):
 
 
 # not an API call. helper function
-def load_excel_lot(entity, lot_row):
+def load_excel_lot(context, lot_row):
+    entity = context['user_entity']
     lot = LotV2()
+    lot.added_by = context['user']
     if 'producer' in lot_row and lot_row['producer'] is not None:
         # this should be a bought or imported lot
         # check if we know the producer
@@ -420,7 +422,7 @@ def excel_template_upload(request, *args, **kwargs):
     lots_loaded = 0
     for lot in lots:
         try:
-            load_excel_lot(context['user_entity'], lot)
+            load_excel_lot(context, lot)
             lots_loaded += 1
         except Exception as e:
             print(e)

@@ -15,6 +15,7 @@ def enrich_with_user_details(function):
             user_preferences.save()
         context = {}
         context['user_name'] = request.user.name
+        context['user'] = request.user
         context['nb_entities'] = len(user_rights)
         context['entities'] = [u.entity for u in user_rights]
         context['user_entity'] = user_preferences.default_entity
