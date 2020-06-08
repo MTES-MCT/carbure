@@ -40,7 +40,7 @@ def annuaire(request, *args, **kwargs):
 
 
 def stats(request, *args, **kwargs):
-    context = kwargs['context']
+    context = {}
     context['current_url_name'] = 'public-stats'
     stats = []
     mps = {mp.code: mp for mp in MatierePremiere.objects.all()}
@@ -72,7 +72,7 @@ def stats(request, *args, **kwargs):
 
 
 def stats_details(request, *args, **kwargs):
-    context = kwargs['context']
+    context = {}
     context['current_url_name'] = 'public-stats'
     mp_code = kwargs['mp_code']
     bc_code = kwargs['bc_code']
