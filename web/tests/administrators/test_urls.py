@@ -68,7 +68,3 @@ class AdministratorsUrlsTest(TestCase):
     def test_gestion_utilisateurs(self):
         response = self.client.get(reverse('administrators-gestion-utilisateurs'))
         self.assertEqual(response.status_code, 200)
-
-    def test_stats(self):
-        response = self.client.get(reverse('administrators-stats'))
-        self.assertEqual(response.status_code, 200)
