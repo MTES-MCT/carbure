@@ -8,7 +8,7 @@ from django.shortcuts import render
 @restrict_to_producers
 def producers_index_v2(request, *args, **kwargs):
     context = kwargs['context']
-    context['current_url_name'] = 'producers-index-v2'
+    context['current_url_name'] = 'producers-index'
     return render(request, 'producers/attestation_v2.html', context)
 
 

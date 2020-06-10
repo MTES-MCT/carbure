@@ -50,7 +50,7 @@ def make_lots_sheet(workbook, entity):
 def make_lots_sheet_v2_advanced(workbook, entity):
     worksheet_lots = workbook.add_worksheet("lots")
     psites = ProductionSite.objects.filter(producer=entity)
-    eas = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur'])
+    eas = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur']).exclude(id=entity.id)
     mps = MatierePremiere.objects.all()
     bcs = Biocarburant.objects.all()
     delivery_sites = Depot.objects.all()

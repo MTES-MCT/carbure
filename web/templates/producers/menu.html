@@ -1,16 +1,10 @@
 	<aside class="side-menu" role="navigation" style="max-width: 170px;">
 		<ul>
 			<li>
-				<a {% if current_url_name == 'producers-index' or current_url_name == 'producers-attestation' %}class="active"{% endif %} href="{% url 'producers-index' producer_name=url_friendly_name %}">
+				<a {% if current_url_name == 'producers-index' %}class="active"{% endif %} href="{% url 'producers-index' producer_name=url_friendly_name %}">
 					Attestations
 				</a>
 			</li>
-			<li>
-				<a {% if current_url_name == 'producers-index-v2' %}class="active"{% endif %} href="{% url 'producers-index-v2' producer_name=url_friendly_name %}">
-					Attestations (V2)
-				</a>
-			</li>
-
 			<li><a {% if current_url_name == 'producers-controles' %}class="active"{% endif %} href="{% url 'producers-controles' producer_name=url_friendly_name %}">Contrôles
 				{% if nb_controles_dgec > 0 %}<span class="badge badge-red">{{nb_controles_dgec}}</span>{% endif %}</a></li>
 			<li><a {% if current_url_name == 'annuaire' %}class="active"{% endif %} href="{% url 'annuaire' %}">Annuaire</a></li>

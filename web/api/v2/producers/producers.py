@@ -27,7 +27,7 @@ def get_random(model):
 def load_excel_lot(context, lot_row):
     entity = context['user_entity']
     lot = LotV2()
-    lot.added_by = context['user']
+    lot.added_by = entity
     if 'producer' in lot_row and lot_row['producer'] is not None:
         # this should be a bought or imported lot
         # check if we know the producer
@@ -53,10 +53,10 @@ def load_excel_lot(context, lot_row):
                 lot.carbure_producer = None
                 lot.unknown_producer = lot_row['producer']
     else:
-        print('No producer in excel sheet. using default')
+        print('No producer in excel sheet. ')
         # default, current entity is the producer
-        lot.producer_is_in_carbure = True
-        lot.carbure_producer = entity
+        lot.producer_is_in_carbure = False
+        lot.carbure_producer = None
         lot.unknown_producer = ''
     lot.save()
 
@@ -84,7 +84,10 @@ def load_excel_lot(context, lot_row):
             # accept any value
             lot.production_site_is_in_carbure = False
             lot.carbure_production_site = None
-            lot.unknown_production_site = production_site
+            if production_site is not None:
+                lot.unknown_production_site = production_site
+            else:
+                lot.unknown_production_site = ''
     else:
         lot.production_site_is_in_carbure = False
         lot.carbure_production_site = None
@@ -261,12 +264,8 @@ def load_excel_lot(context, lot_row):
     transaction = LotTransaction()
     transaction.lot = lot
     transaction.save()
-    if lot.producer_is_in_carbure:
-        transaction.vendor_is_in_carbure = True
-        transaction.carbure_vendor = lot.carbure_producer
-    else:
-        transaction.vendor_is_in_carbure = False
-        transaction.unknown_vendor = lot.unknown_producer
+    transaction.vendor_is_in_carbure = True
+    transaction.carbure_vendor = entity
 
     if 'dae' in lot_row:
         dae = lot_row['dae']
@@ -283,7 +282,7 @@ def load_excel_lot(context, lot_row):
     if 'delivery_date' not in lot_row or lot_row['delivery_date'] == '':
         transaction.ea_delivery_date = None
         lot.period = ''
-        e, c = TransactionError.objects.update_or_create(xt=lot, field='ea_delivery_date',
+        e, c = TransactionError.objects.update_or_create(tx=transaction, field='ea_delivery_date',
                                                          error="Merci de préciser la date de livraison",
                                                          defaults={'value': None})
     else:
@@ -433,9 +432,108 @@ def excel_template_upload(request, *args, **kwargs):
 @enrich_with_user_details
 @restrict_to_producers
 def get_drafts(request, *args, **kwargs):
-    lots = LotV2.objects.filter(status='Draft')
+    context = kwargs['context']
+    lots = LotV2.objects.filter(added_by=context['user_entity'], status='Draft')
     transactions_ids = set([tx['id__min'] for tx in LotTransaction.objects.filter(lot__in=lots).values('lot_id', 'id').annotate(Min('id'))])
+    errors = LotV2Error.objects.filter(lot__in=lots)
     first_transactions = LotTransaction.objects.filter(id__in=transactions_ids)
     sez = serializers.serialize('json', lots, use_natural_foreign_keys=True)
     txsez = serializers.serialize('json', first_transactions, use_natural_foreign_keys=True)
-    return JsonResponse({'lots': sez, 'errors': [], 'transactions': txsez})
+    errsez = serializers.serialize('json', errors, use_natural_foreign_keys=True)
+    return JsonResponse({'lots': sez, 'errors': errsez, 'transactions': txsez})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def get_received(request, *args, **kwargs):
+    context = kwargs['context']
+    transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='N', lot__status="Validated")
+    lot_ids = [t.lot.id for t in transactions]
+    lots = LotV2.objects.filter(id__in=lot_ids)
+    errors = LotV2Error.objects.filter(lot__in=lots)
+    sez = serializers.serialize('json', lots, use_natural_foreign_keys=True)
+    txsez = serializers.serialize('json', transactions, use_natural_foreign_keys=True)
+    errsez = serializers.serialize('json', errors, use_natural_foreign_keys=True)
+    return JsonResponse({'lots': sez, 'errors': errsez, 'transactions': txsez})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def delete_lots(request, *args, **kwargs):
+    context = kwargs['context']
+    lot_ids = request.POST.get('lots', None)
+    errors = []
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot ids'}, status=400)
+    ids = lot_ids.split(',')
+    for lotid in ids:
+        lot = LotV2.objects.get(id=lotid, added_by=context['user_entity'], status='Draft')
+        try:
+            lot.delete()
+        except Exception as e:
+            errors.append({'message': 'Impossible de supprimer le lot %s: introuvable ou déjà validé' % (), 'extra': str(e)})
+    return JsonResponse({'status': 'success', 'message': '%d lots supprimés' % (len(ids) - len(errors)), 'errors': errors})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def validate_lots(request, *args, **kwargs):
+    context = kwargs['context']
+    lot_ids = request.POST.get('lots', None)
+    results = []
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Aucun lot sélectionné'}, status=400)
+
+    ids = lot_ids.split(',')
+    for lotid in ids:
+        try:
+            lot = LotV2.objects.get(id=lotid, added_by=context['user_entity'], status='Draft')
+            # we use .get() below because we should have a single transaction for this lot
+            tx = LotTransaction.objects.get(lot=lot)
+        except Exception as e:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Impossible de valider le lot %s: introuvable ou déjà validé' % (), 'extra': str(e)})
+            continue
+        # make sure all mandatory fields are set
+        if not tx.dae:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. DAE manquant'})
+            continue
+        if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Site de livraison manquant'})
+            continue
+        if tx.delivery_site_is_in_carbure and not tx.carbure_delivery_site:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Site de livraison manquant'})
+            continue
+        if not tx.delivery_date:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Date de livraison manquante'})
+            continue
+        if tx.client_is_in_carbure and not tx.carbure_client:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Veuillez renseigner un client'})
+            continue
+        if not tx.client_is_in_carbure and not tx.unknown_client:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Veuillez renseigner un client'})
+            continue
+        if not lot.volume:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Veuillez renseigner le volume'})
+            continue
+        if not lot.pays_origine:
+            msg = 'Validation impossible. Veuillez renseigner le pays d\'origine de la matière première'
+            results.append({'lot_id': lotid, 'status': 'error', 'message': msg})
+            continue
+        try:
+            today = datetime.date.today()
+            # [PAYS][YYMM]P[IDProd]-[1....]-([S123])
+            # FR2002P001-1
+            if lot.producer_is_in_carbure:
+                lot.carbure_id = "%s%sP%d-%d" % ('FR', today.strftime('%y%m'), lot.carbure_producer.id, lot.id)
+            else:
+                lot.carbure_id = "%s%sP%s-%d" % ('FR', today.strftime('%y%m'), 'XXX', lot.id)
+            lot.status = "Validated"
+            lot.save()
+        except Exception:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Erreur lors de la validation du lot'})
+            continue
+        results.append({'lot_id': lotid, 'status': 'sucess'})
+    return JsonResponse({'status': 'success', 'message': results})
