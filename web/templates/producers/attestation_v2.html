@@ -32,6 +32,7 @@
     <ul class="tabs__tab-list">
       <li id="tab_drafts_title" class="tabs__tab tabs__tab--selected" data-dst="tab_drafts">Brouillons ({{nb_drafts}})</li>
       <li id="tab_errors_title" class="tabs__tab" data-dst="tab_errors">Lots à corriger ({{nb_corrections}})</li>
+      <li id="tab_received_title" class="tabs__tab" data-dst="tab_received">Lots reçus ({{nb_received}})</li>
       <li id="tab_valid_title" class="tabs__tab" data-dst="tab_valid">Lots validés ({{nb_valid}})</li>
     </ul>
 
@@ -63,7 +64,7 @@
           </svg>
         </a>
 
-        <select id="pagelength_drafts" style="margin-top: auto;">
+        <select id="pagelength" style="margin-top: auto;">
           <option value="10">10</option>
           <option value="25">25</option>
           <option value="50">50</option>
@@ -105,6 +106,24 @@
       </table>
     </div>
 
+    <div id="tab_received" class="tabcontent">
+      <p>Si vous avez une activité de négoce et que vos fournisseurs sont inscrits sur Carbure, les lots qu'ils vous envoient apparaîtront directement sur cette page.<br />
+         Si vos fournisseurs ne sont pas sur Carbure, vous devez importer les lots dans l'onglet Brouillon en utilisant le <a href="{% url 'api-v2-producers-excel-template-download-advanced' %}" >modèle avancé</a></p>
+
+      <div class="flex-container">
+        <a id="btn_open_modal_columns_errors" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+          <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
+        </a>
+      </div>
+
+      <table class="display nowrap" id="datatable_received">
+        <!-- dynamically generated in js -->
+        <thead></thead>
+        <tfoot></tfoot>
+        <tbody></tbody>
+      </table>
+    </div>
+
     <div id="tab_valid" class="tabcontent">
       <p>Ces lots ont été validés et acceptés par vos clients.</p>
 
@@ -139,7 +158,7 @@
 <div class="modal__backdrop" id="modal_delete_lots">
   <div class="modal">
     <span id="modal_delete_lots_form_err_message" style="color: red;"></span>
-    <form id="modal_delete_lots_form" method="POST" data-url="{% url 'producers-api-delete-lots' %}">
+    <form id="modal_delete_lots_form" method="POST" data-url="{% url 'api-v2-producers-delete-lots' %}">
       {% csrf_token %}
       <p>Êtes vous sûr de vouloir supprimer ce(s) lot(s) ?</p>
       <ul id="modal_delete_lots_list">
@@ -159,8 +178,14 @@
 
 <div class="modal__backdrop" id="modal_validate_lots">
   <div class="modal">
+    <a id="btn_close_modal_validate_lots" style="opacity: 0.5; margin: -1rem -1rem -1rem auto; float: right;">
+      <svg class="icon" style="height:24px; width:24px">
+        <use xlink:href="#cross"></use>
+      </svg>
+    </a>
     <span id="modal_validate_lots_form_err_message" style="color: red;"></span>
-    <form id="modal_validate_lots_form" method="POST" data-url="{% url 'producers-api-validate-lots' %}">
+    <span id="modal_validate_lots_form_success_message" style="color: green;"></span>
+    <form id="modal_validate_lots_form" method="POST" data-url="{% url 'api-v2-producers-validate-lots' %}">
       {% csrf_token %}
       <p><b>En validant le(s) lot(s) suivant(s), je certifie que les informations renseignées sont réelles et valides.</b></p>
       <ul id="modal_validate_lots_list">
@@ -395,6 +420,7 @@ window.producers_api_lots_valid = "{% url 'api-producers-lots-valid' %}"
 
 
 window.producers_api_lots_drafts_v2 = "{% url 'api-v2-producers-get-drafts' %}"
+window.producers_api_lots_received_v2 = "{% url 'api-v2-producers-get-received' %}"
 
 
 
@@ -408,58 +434,12 @@ window.api_depots_autocomplete = "{% url 'api-depots-autocomplete' %}"
 window.producer_id = "{{user_entity.id}}"
 
 $(document).ready(function() {
-
-  initFilters(table_columns_drafts_v2, 'drafts')
-  initFilters(table_columns_producers_corrections, 'errors')
-  initFilters(table_columns_producers_validated, 'valid')
-
-  // by default, show drafts
-  showTab("tab_drafts")
-  init_datatables_drafts_v2(window.producers_api_lots_drafts_v2)
-
-  /* column filter modal event management */
-  $('.toggle-vis').on('click', function(e) {
-    // Get the column API object
-    let colid = $(this).attr('data-column')
-    let dst_table = $(this).attr('data-table')
-
-
-    // Toggle the visibility
-    let column = ''
-    if (dst_table === "errors") {
-      column = table_corrections.column(colid);
-      var producerErrorsTableSettingsV2 = loadTableSettings(table_columns_producers_corrections, 'producerErrorsTableSettingsV2')
-      producerErrorsTableSettingsV2[colid] = producerErrorsTableSettingsV2[colid] == 1 ? 0 : 1
-      saveTableSettings(producerErrorsTableSettingsV2, 'producerErrorsTableSettingsV2')
-    } else if (dst_table === "drafts") {
-      column = table_drafts.column(colid);
-      var producerDraftsTableSettingsV2 = loadTableSettings(table_columns_drafts_v2, 'producerDraftsTableSettingsV2')
-      producerDraftsTableSettingsV2[colid] = producerDraftsTableSettingsV2[colid] == 1 ? 0 : 1
-      saveTableSettings(producerDraftsTableSettingsV2, 'producerDraftsTableSettingsV2')
-    } else if (dst_table === "valid") {
-      column = table_valid.column(colid);
-      var producerValidTableSettingsV2 = loadTableSettings(table_columns_producers_validated, 'producerValidTableSettingsV2')
-      producerValidTableSettings[colid] = producerValidTableSettingsV2[colid] == 1 ? 0 : 1
-      saveTableSettings(producerValidTableSettingsV2, 'producerValidTableSettingsV2')
-    } else {
-      console.log(`unknown table. cant save column display settings`)
-      return
-    }
-    column.visible(!column.visible());
-  })
+  // show drafts tab
+  tabcontent = document.getElementById("tab_drafts")
+  tabcontent.style.display = "block";
+  init_datatables_generic("tab_drafts")
   manage_actions()
 })
-
-$("#btn_lot_save").on('click', handleSave)
-
-$("#btn_close_modal_import").on('click', () => {
-  window.location.reload()
-})
-
-$("#btn_submit_upload_form").on('click', () => {
-  $("#modal_import_form").submit()
-})
-
 </script>
 
 {% endblock %}

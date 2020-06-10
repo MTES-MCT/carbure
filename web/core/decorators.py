@@ -1,4 +1,4 @@
-from core.models import UserRights, UserPreferences, Lot
+from core.models import UserRights, UserPreferences, LotV2, LotTransaction
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 
@@ -27,17 +27,20 @@ def enrich_with_user_details(function):
     wrap.__name__ = function.__name__
     return wrap
 
+
 def restrict_to_producers(function):
     def wrap(request, *args, **kwargs):
         context = kwargs['context']
         if context['user_entity'].entity_type != 'Producteur':
             raise PermissionDenied
-        drafts = Lot.objects.filter(producer=context['user_entity'], status='Draft')
-        valid = Lot.objects.filter(producer=context['user_entity'], status='Validated')
-        corrections = Lot.objects.filter(producer=context['user_entity'], ea_delivery_status__in=['AC', 'AA', 'R'])
+        drafts = LotV2.objects.filter(added_by=context['user_entity'], status='Draft')
+        valid = LotV2.objects.filter(added_by=context['user_entity'], status='Validated')
+        corrections = LotTransaction.objects.filter(carbure_vendor=context['user_entity'], delivery_status__in=['AC', 'AA', 'R'])
+        received = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='N', lot__status="Validated")
         context['nb_corrections'] = len(corrections)
         context['nb_drafts'] = len(drafts)
         context['nb_valid'] = len(valid)
+        context['nb_received'] = len(received)
         context['nb_controles_dgec'] = 0
         return function(request, *args, **kwargs)
     wrap.__doc__ = function.__doc__

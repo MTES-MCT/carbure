@@ -1,6 +1,8 @@
-var lot_errors = {}
+const dt_config = {}
+const lot_errors = {}
 const selected_rows = []
-var table_columns_drafts = [
+
+const table_columns_drafts = [
 {title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
 {title:'ID', can_hide: true, can_duplicate: false, can_export: false, data:'lot_id'},
 {title:'Producteur', can_hide: true, can_duplicate: true, can_export: true, data:'producer_name'},
@@ -32,9 +34,9 @@ var table_columns_drafts = [
 
 const table_columns_drafts_v2 = [
 {title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
-{title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { console.log(full); return full.fields.producer_is_in_carbure ? full.fields.carbure_producer : `<i>${full.fields.unknown_producer}</i>` }},
+{title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer : `<i>${full.fields.unknown_producer}</i>` }},
 {title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
-{title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.country.code_pays : full.fields.unknown_production_country.code_pays }},
+{title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.country.code_pays : (full.fields.unknown_production_country ? full.fields.unknown_production_country.code_pays: "") }},
 {title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
 {title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.biocarburant.name }},
 {title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.matiere_premiere.name }},
@@ -59,6 +61,39 @@ const table_columns_drafts_v2 = [
 {title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.client_is_in_carbure ? full.tx.fields.carbure_client : `<i>${full.tx.fields.unknown_client}</i>`}},
 {title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site.name : `<i>${full.tx.fields.unknown_delivery_site}</i>` }},
 ]
+
+
+const table_columns_received_v2 = [
+{title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
+{title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer : `<i>${full.fields.unknown_producer}</i>` }},
+{title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
+{title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.country.code_pays : (full.fields.unknown_production_country ? full.fields.unknown_production_country.code_pays: "") }},
+{title:'Fournisseur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.tx.fields.vendor_is_in_carbure ? full.tx.fields.carbure_vendor : `<i>${full.tx.fields.unknown_vendor}</i>` }},
+{title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
+{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.biocarburant.name }},
+{title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.matiere_premiere.name }},
+{title:`Pays<br /> d'origine`, filter_title: 'Pays', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.pays_origine.code_pays }},
+
+{title:'EEC', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
+{title:'EL', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
+{title:'EP', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'},
+{title:'ETD', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'},
+{title:'EU', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'},
+{title:'ESCA', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'},
+{title:'ECCS', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'},
+{title:'ECCR', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'},
+{title:'EEE', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'},
+{title:'E', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_total', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'},
+{title:'Émissions de référence', hidden: true, can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'},
+{title:'% de réduction', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reduction'},
+
+{title:'N°DAE/DAU', can_hide: true, can_duplicate: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.dae}},
+{title:'Référence', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, tooltip: 'Champ libre - Référence client', render: (data, type, full, meta) => {return full.tx.fields.champ_libre}},
+{title:'Date d\'entrée<br /> en EA', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_date}},
+{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.client_is_in_carbure ? full.tx.fields.carbure_client : `<i>${full.tx.fields.unknown_client}</i>`}},
+{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site.name : `<i>${full.tx.fields.unknown_delivery_site}</i>` }},
+]
+
 
 var table_columns_producers_corrections = [
 {title:'Période', can_hide: true, data:'period'},
@@ -346,9 +381,9 @@ $("form").submit(function(event) {
   event.preventDefault()
 })
 
-$("#pagelength_drafts").on('change', function() {
-  let pagelength = $("#pagelength_drafts").val()
-  table_drafts.page.len(pagelength).draw()
+$("#pagelength").on('change', function() {
+  let pagelength = $("#pagelength").val()
+  window.table.page.len(pagelength).draw()
 })
 
 $("#pagelength_valid").on('change', function() {
@@ -470,8 +505,19 @@ function duplicate_lot(lot_id) {
   })
 }
 
-function manage_validate_button(draft_present) {
- if (draft_present === true) {
+function manage_validate_button() {
+  // check if we have drafts
+  let draft_present = false
+  for (let i = 0, len = selected_rows.length; i < len; i++) {
+    let rowdata = window.table.row(selected_rows[i]).data()
+    let statut = rowdata.fields.status
+    if (statut.toLowerCase() === "draft") {
+      draft_present = true
+      break;
+    }
+  }
+
+  if (draft_present === true) {
     $("#btn_open_modal_validate_lots").addClass('primary')
     $("#btn_open_modal_validate_lots").css("pointer-events", "auto")
     $("#btn_open_modal_validate_lots").removeClass('secondary')
@@ -479,11 +525,11 @@ function manage_validate_button(draft_present) {
     $("#modal_validate_lots_list").empty()
     let to_validate = []
     for (let i = 0, len = selected_rows.length; i < len; i++) {
-      let rowdata = table_drafts.row(selected_rows[i]).data()
-      let statut = rowdata['status']
+      let rowdata = window.table.row(selected_rows[i]).data()
+      let statut = rowdata.fields.status
       if (statut.toLowerCase() === "draft") {
-        $("#modal_validate_lots_list").append(`<li>${rowdata['production_site_name']} - ${rowdata['volume']} - ${rowdata['biocarburant_name']} - ${rowdata['matiere_premiere_name']}</li>`)
-        to_validate.push(rowdata['lot_id'])
+        $("#modal_validate_lots_list").append(`<li>${rowdata.fields.producer_is_in_carbure ? rowdata.fields.carbure_producer : rowdata.fields.unknown_producer} - ${rowdata.fields.volume} - ${rowdata.fields.biocarburant.name} - ${rowdata.fields.matiere_premiere.name}</li>`)
+        to_validate.push(rowdata.pk)
       }
       $("#modal_validate_lots_lots").val(to_validate.join(","))
     }
@@ -497,7 +543,16 @@ function manage_validate_button(draft_present) {
   }
 }
 
-function manage_delete_button(only_drafts_present) {
+function manage_delete_button() {
+  let only_drafts_present = true
+  for (let i = 0, len = selected_rows.length; i < len; i++) {
+    let rowdata = window.table.row(selected_rows[i]).data()
+    let statut = rowdata.fields.status
+    if (statut.toLowerCase() !== "draft") {
+      only_drafts_present = false
+      break;
+    }
+  }
   let keys = Object.keys(selected_rows)
   if (keys.length > 0 && only_drafts_present === true) {
     $("#btn_open_modal_delete_lots").addClass('primary')
@@ -506,11 +561,11 @@ function manage_delete_button(only_drafts_present) {
     $("#modal_delete_lots_list").empty()
     let to_delete = []
     for (let i = 0, len = selected_rows.length; i < len; i++) {
-      let rowdata = table_drafts.row(selected_rows[i]).data()
-      let statut = rowdata['status']
+      let rowdata = window.table.row(selected_rows[i]).data()
+      let statut = rowdata.fields.status
       if (statut.toLowerCase() === "draft") {
-        $("#modal_delete_lots_list").append(`<li>${rowdata['production_site_name']} - ${rowdata['volume']} - ${rowdata['biocarburant_name']} - ${rowdata['matiere_premiere_name']}</li>`)
-        to_delete.push(rowdata['lot_id'])
+        $("#modal_delete_lots_list").append(`<li>${rowdata.fields.producer_is_in_carbure ? rowdata.fields.carbure_producer : rowdata.fields.unknown_producer} - ${rowdata.fields.volume} - ${rowdata.fields.biocarburant.name} - ${rowdata.fields.matiere_premiere.name}</li>`)
+        to_delete.push(rowdata.pk)
       }
       $("#modal_delete_lots_lots").val(to_delete.join(","))
     }
@@ -524,7 +579,7 @@ function manage_delete_button(only_drafts_present) {
 
 function manage_duplicate_button() {
   if (selected_rows.length === 1) {
-    let lot_id = table_drafts.row(selected_rows[0]).data()['lot_id']
+    let lot_id = window.table.row(selected_rows[0]).data().pk
     $("#duplicate_lot").attr("onclick", `duplicate_lot(${lot_id})`)
     $("#duplicate_lot").addClass('primary')
     $("#duplicate_lot").css("pointer-events", "auto")
@@ -583,20 +638,8 @@ function check_biocarburants() {
 
 function manage_actions() {
   // buttons Valider, Supprimer et Ajouter
-  // if one of the rows is a draft, button Valider is active
-  let draft_present = false
-  let only_drafts_present = true
-  for (let i = 0, len = selected_rows.length; i < len; i++) {
-    let rowdata = table_drafts.row(selected_rows[i]).data()
-    let statut = rowdata['status']
-    if (statut.toLowerCase() === "draft") {
-      draft_present = true
-    } else {
-      only_drafts_present = false
-    }
-  }
-  manage_validate_button(draft_present)
-  manage_delete_button(only_drafts_present)
+  manage_validate_button()
+  manage_delete_button()
   manage_duplicate_button()
 }
 
@@ -1565,85 +1608,228 @@ $(".autocomplete_depots").autocomplete({
   },
 })
 
-})
+const dt_drafts_config = {
+	id: "datatable_drafts",
+	url: window.producers_api_lots_drafts_v2,
+	col_definition: table_columns_drafts_v2,
+	has_footer: true,
+	paging: true,
+	info: true,
+	dom: 'rtp',
+	columnDefs: [
+    {
+      targets: [0],
+      searchable:false,
+      orderable:false,
+      width:'1%',
+      className: 'dt-body-center',
+      render: function (data, type, full, meta) {
+        return '<input type="checkbox">';
+      }
+    },
+    {
+      className: "dt-center",
+      targets: "_all",
+      render: function (data, type, full, meta) {
+      	let col_name = table_columns_drafts_v2[meta.col].data
+      	if (table_columns_drafts_v2[meta.col]['render'] != undefined) {
+  		return table_columns_drafts_v2[meta.col]['render'](full)
+      	}
+      	return full['fields'][col_name]
+      }
+    },
+  ],
+  order: [[ 1, 'desc' ]],
+  ajax_dataSrc: function(res) {
+    data = {}
+    lots = JSON.parse(res['lots'])
+    for (let i = 0, len = lots.length; i < len; i++) {
+    	let lot = lots[i]
+    	data[lot.pk] = lot
+    }
+    txs = JSON.parse(res['transactions'])
+    for (let i = 0, len = txs.length; i < len; i++) {
+    	let tx = txs[i]
+    	data[tx.fields.lot].tx = tx
+    }
+    list = Object.values(data)
+    return list
+  },
+  post_init: function(table) {
+    let tbl_id = table.table().node().id
+    $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
+      display_producers_lot_modal(table, table_columns_drafts_v2, e)
+    })
+    $('#input_search_datatable').on('keyup', function() {
+        table.search(this.value).draw();
+    })
+
+    // Handle click on checkbox
+    $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
+      var $row = $(this).closest('tr');
+      // Get row data
+      var rowId = table.row($row).index();
+      // Determine whether row ID is in the list of selected row IDs
+      var index = $.inArray(rowId, selected_rows);
+      // If checkbox is checked and row ID is not in list of selected row IDs
+      if(this.checked && index === -1) {
+        selected_rows.push(rowId);
+      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+      } else if (!this.checked && index !== -1) {
+        selected_rows.splice(index, 1);
+      }
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+      // Show/Hide buttons depending on selected_rows content
+      manage_actions()
+    })
 
 
-function hideTab(tab_name) {
-  // hide content
-  tabcontent = document.getElementById(tab_name)
-  tabcontent.style.display = "none";
-  // change title class
-  tabtitle = document.getElementById(`${tab_name}_title`)
-  tabtitle.className = tabtitle.className.replace(" tabs__tab--selected", "")
+    // Handle click on "Select all" control
+    $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
+      if(this.checked){
+         $('#datatable_drafts tbody input[type="checkbox"]:not(:checked)').trigger('click');
+      } else {
+         $('#datatable_drafts tbody input[type="checkbox"]:checked').trigger('click');
+      }
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+    });
+
+    // Handle table draw event
+    table.on('draw', function(){
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+    });
+  }
 }
 
-function showTab(tab_name) {
-  // change title class
-  tabtitle = document.getElementById(`${tab_name}_title`)
-  tabtitle.className += " tabs__tab--selected"
-  // show content
-  tabcontent = document.getElementById(tab_name)
-  tabcontent.style.display = "block";
+const dt_received_config = {
+	id: "datatable_received",
+	url: window.producers_api_lots_received_v2,
+	col_definition: table_columns_received_v2,
+	has_footer: true,
+	paging: true,
+	info: true,
+	dom: 'rtp',
+	columnDefs: [
+    {
+      targets: [0],
+      searchable:false,
+      orderable:false,
+      width:'1%',
+      className: 'dt-body-center',
+      render: function (data, type, full, meta) {
+        return '<input type="checkbox">';
+      }
+    },
+    {
+      className: "dt-center",
+      targets: "_all",
+      render: function (data, type, full, meta) {
+      	let col_name = table_columns_received_v2[meta.col].data
+      	if (table_columns_received_v2[meta.col]['render'] != undefined) {
+  		return table_columns_received_v2[meta.col]['render'](full)
+      	}
+      	return full['fields'][col_name]
+      }
+    },
+  ],
+  order: [[ 1, 'desc' ]],
+  ajax_dataSrc: function(res) {
+    data = {}
+    lots = JSON.parse(res['lots'])
+    for (let i = 0, len = lots.length; i < len; i++) {
+    	let lot = lots[i]
+    	data[lot.pk] = lot
+    }
+    txs = JSON.parse(res['transactions'])
+    for (let i = 0, len = txs.length; i < len; i++) {
+    	let tx = txs[i]
+    	data[tx.fields.lot].tx = tx
+    }
+    list = Object.values(data)
+    return list
+  },
+  post_init: function(table) {
+    let tbl_id = table.table().node().id
+    $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
+      display_producers_lot_modal(table, table_columns_received_v2, e)
+    })
+    $('#input_search_datatable').on('keyup', function() {
+        table.search(this.value).draw();
+    })
+
+    // Handle click on checkbox
+    $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
+      var $row = $(this).closest('tr');
+      // Get row data
+      var rowId = table.row($row).index();
+      // Determine whether row ID is in the list of selected row IDs
+      var index = $.inArray(rowId, selected_rows);
+      // If checkbox is checked and row ID is not in list of selected row IDs
+      if(this.checked && index === -1) {
+        selected_rows.push(rowId);
+      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+      } else if (!this.checked && index !== -1) {
+        selected_rows.splice(index, 1);
+      }
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+      // Show/Hide buttons depending on selected_rows content
+      manage_actions()
+    })
+
+
+    // Handle click on "Select all" control
+    $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
+      if(this.checked){
+         $('#datatable_drafts tbody input[type="checkbox"]:not(:checked)').trigger('click');
+      } else {
+         $('#datatable_drafts tbody input[type="checkbox"]:checked').trigger('click');
+      }
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+    });
+
+    // Handle table draw event
+    table.on('draw', function(){
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+    });
+  }
 }
 
-// producers page tabs
-$("#tab_drafts_title").on('click', function() {
-  // hide tabs valid & corrections
-  hideTab("tab_valid")
-  hideTab("tab_errors")
-  // show drafts
-  showTab("tab_drafts")
-  init_datatables_drafts(window.producers_api_lots_drafts)
+dt_config['tab_drafts'] = dt_drafts_config
+dt_config['tab_received'] = dt_received_config
+
 })
 
-$("#tab_errors_title").on('click', function() {
-  // hide tabs valid & corrections
-  hideTab("tab_valid")
-  hideTab("tab_drafts")
-  // show drafts
-  showTab("tab_errors")
-  init_datatables_corrections(window.producers_api_lots_corrections)
-})
+// tab management v2
+$(".tabs__tab").on('click', function() {
+  // hide all
+  console.log(`clicked on tab ${this.id}`)
+  tabs = document.getElementsByClassName("tabcontent")
+  for (let i = 0, len = tabs.length; i < len; i++) {
+  	// hide tab content
+  	if (tabs[i].id !== this.dataset.dst) {
+  		tabs[i].style.display = "none";
+  	} else {
+  		tabs[i].style.display = "block";
+  	}
+  }
+  // remove tab title style
+  tabtitles = document.getElementsByClassName("tabs__tab")
+  for (let i = 0, len = tabtitles.length; i < len; i++) {
+  	tabtitles[i].className = tabtitles[i].className.replace(" tabs__tab--selected", "")
+  }
+  this.className = "tabs__tab tabs__tab--selected"
 
-$("#tab_valid_title").on('click', function() {
-  // hide tabs valid & corrections
-  hideTab("tab_drafts")
-  hideTab("tab_errors")
-  // show drafts
-  showTab("tab_valid")
-  init_datatables_validated(window.producers_api_lots_valid)
-})
-
-// operators page tabs
-$("#tab_operators_affiliations_title").on('click', function() {
-  hideTab("tab_operators_declared")
-  showTab("tab_operators_affiliations")
-  init_datatables_operators_affiliations()
-})
-
-$("#tab_operators_declared_title").on('click', function() {
-  hideTab("tab_operators_affiliations")
-  showTab("tab_operators_declared")
-  init_datatables_operators_declared()
-})
-
-// admin page tabs
-$("#tab_entities_title").on('click', function() {
-  hideTab("tab_users")
-  hideTab("tab_rights")
-  showTab("tab_entities")
-})
-
-$("#tab_users_title").on('click', function() {
-  hideTab("tab_entities")
-  hideTab("tab_rights")
-  showTab("tab_users")
-})
-
-$("#tab_rights_title").on('click', function() {
-  hideTab("tab_users")
-  hideTab("tab_entities")
-  showTab("tab_rights")
+  init_datatables_generic(this.dataset.dst)
 })
 
 
@@ -1725,117 +1911,49 @@ $("#add_lot").on('click', function() {
   modal.style.display = "flex"
 })
 
-
-function init_datatables_drafts_v2(url) {
-  const col_definition = table_columns_drafts_v2
+function init_datatables_generic(tab_name) {
+  const config = dt_config[tab_name]
+  const tblselector = `#${config.id}`
 
   // tab Drafts
-  if (!$.fn.DataTable.isDataTable('#datatable_drafts')) {
-      // create empty footer
-    let empty_footer = `<tr>${Array(col_definition.length).fill("<th></th>").join('')}</tr>`
-    $("#datatable_drafts tfoot").append(empty_footer)
-
-    var table_drafts = $('#datatable_drafts').DataTable({
-      paging: true,
-      info: true,
-      dom: 'rtp',
+  if (!$.fn.DataTable.isDataTable(tblselector)) {
+  	if (config.has_footer) {
+  	  // create empty footer
+      let empty_footer = `<tr>${Array(config.col_definition.length).fill("<th></th>").join('')}</tr>`
+      $(`${tblselector} tfoot`).append(empty_footer)
+  	}
+    var table = $(tblselector).DataTable({
+      paging: config.paging,
+      info: config.info,
+      dom: config.dom,
       scrollX: true,
-      columnDefs: [
-        {
-          targets: [0],
-          searchable:false,
-          orderable:false,
-          width:'1%',
-          className: 'dt-body-center',
-          render: function (data, type, full, meta) {
-            return '<input type="checkbox">';
-          }
-        },
-        {
-          className: "dt-center",
-          targets: "_all",
-          render: function (data, type, full, meta) {
-          	let col_name = col_definition[meta.col].data
-          	if (col_definition[meta.col]['render'] != undefined) {
-				return col_definition[meta.col]['render'](full)
-          	}
-          	return full['fields'][col_name]
-          }
-        },
-      ],
-      order: [[ 1, 'desc' ]],
-      columns: col_definition,
+      columnDefs: config.columnDefs,
+      order: config.order,
+      columns: config.col_definition,
       ajax: {
-        url: url,
-        dataSrc: function(res) {
-          data = {}
-          lots = JSON.parse(res['lots'])
-          for (let i = 0, len = lots.length; i < len; i++) {
-          	let lot = lots[i]
-          	data[lot.pk] = lot
-          }
-          txs = JSON.parse(res['transactions'])
-          for (let i = 0, len = txs.length; i < len; i++) {
-          	let tx = txs[i]
-          	data[tx.fields.lot].tx = tx
-          }
-          list = Object.values(data)
-          return list
-	    }
+        url: config.url,
+        dataSrc: config.ajax_dataSrc,
       },
     })
-
-    $("#datatable_drafts tbody").on('click', 'td',  (e) => {
-      display_producers_lot_modal(table_drafts, col_definition, e)
-    })
-    window.table_drafts = table_drafts
-    $('#input_search_datatable').on('keyup', function() {
-        table_drafts.search(this.value).draw();
-    })
-
-    // Handle click on checkbox
-    $('#datatable_drafts tbody').on('click', 'input[type="checkbox"]', function(e) {
-      var $row = $(this).closest('tr');
-      // Get row data
-      var rowId = table_drafts.row($row).index();
-      // Determine whether row ID is in the list of selected row IDs
-      var index = $.inArray(rowId, selected_rows);
-      // If checkbox is checked and row ID is not in list of selected row IDs
-      if(this.checked && index === -1) {
-        selected_rows.push(rowId);
-      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
-      } else if (!this.checked && index !== -1) {
-        selected_rows.splice(index, 1);
-      }
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table_drafts);
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-      // Show/Hide buttons depending on selected_rows content
-      manage_actions()
-    })
-
-
-    // Handle click on "Select all" control
-    $('thead input[name="select_all"]', table_drafts.table().container()).on('click', function(e){
-      if(this.checked){
-         $('#datatable_drafts tbody input[type="checkbox"]:not(:checked)').trigger('click');
-      } else {
-         $('#datatable_drafts tbody input[type="checkbox"]:checked').trigger('click');
-      }
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-    });
-
-    // Handle table draw event
-    table_drafts.on('draw', function(){
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table_drafts);
-    });
-
-    var producerDraftsTableSettingsV2 = loadTableSettings(col_definition, 'producerDraftsTableSettingsV2')
-    showHideTableColumns(table_drafts, producerDraftsTableSettingsV2, 'drafts')
+    if (config.post_init) {
+      config.post_init(table)
+    }
+    window[config.id] = table
+    window.table = table
+    var producerDraftsTableSettingsV2 = loadTableSettings(config.col_definition, 'producerDraftsTableSettingsV2')
+    showHideTableColumns(table, producerDraftsTableSettingsV2, 'drafts')
   } else {
-    window.table_drafts.draw()
+    window[config.id].draw()
+    window.table = window[config.id]
   }
 }
+
+$("#btn_lot_save").on('click', handleSave)
+
+$("#btn_close_modal_import").on('click', () => {
+  window.location.reload()
+})
+
+$("#btn_submit_upload_form").on('click', () => {
+  $("#modal_import_form").submit()
+})

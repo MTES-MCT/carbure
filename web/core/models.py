@@ -223,7 +223,7 @@ class LotV2(models.Model):
     # other
     status = models.CharField(max_length=64, choices=LOT_STATUS, default='Draft')
     source = models.CharField(max_length=32, choices=SOURCE_CHOICES, default='Manual')
-    added_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+    added_by = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
 
     # lot has been split into many sublots ?
     parent_lot = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
