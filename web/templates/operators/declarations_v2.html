@@ -1,0 +1,337 @@
+{% extends "common/base_private.html" %}
+
+{% block content  %}
+<div class="main" style="overflow-x: auto;">
+  <div class="panel">
+    <h3>Déclaration de durabilité</h3>
+    {% csrf_token %}
+
+    <ul class="tabs__tab-list">
+      <li id="tab_operators_affiliations_title" class="tabs__tab tabs__tab--selected" data-dst="tab_operators_affiliations">Lots en Attente ({{nb_affiliated_lots}})</li>
+      <li id="tab_operators_drafts_title" class="tabs__tab" data-dst="tab_operators_drafts">Brouillons ({{nb_drafts}})</li>
+      <li id="tab_operators_declared_title" class="tabs__tab" data-dst="tab_operators_declared">Lots déclarés ({{nb_declared}})</li>
+    </ul>
+
+    <div id="tab_operators_affiliations" class="tabcontent">
+      <p>Vos fournisseurs nous indiquent vous avoir transmis ces lots. Veuillez en vérifier les caractéristiques et valider leur réception.</p>
+      <div class="flex-container">
+        <a id="btn_open_modal_columns_affiliations" class="button modal-button" style="margin-right: 0px; margin-left: 5px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+          <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
+        </a>
+        <a class="button modal-button" href="{% url 'operators-api-export-affiliated' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px; margin-right: auto;">
+          <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
+        </a>
+      </div>
+
+
+
+      <table class="display nowrap" id="datatable_affiliations">
+        <!-- dynamically generated in js -->
+        <thead></thead>
+        <tfoot></tfoot>
+        <tbody></tbody>
+      </table>
+
+      <div class="button-container">
+        <div class="button-item">
+          <a id="btn_open_modal_accept_lots" class="button primary">Accepter Lots</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab_operators_drafts" class="tabcontent">
+      <p>Cet onglet vous permet d'importer les lots de vos fournisseurs qui ne sont pas enregistrés dans Carbure</p>
+
+      <table class="display nowrap" id="datatable_drafts">
+        <!-- dynamically generated in js -->
+        <thead></thead>
+        <tfoot></tfoot>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="tab_operators_declared" class="tabcontent">
+      <p>Vous trouverez ici tous les lots déclarés à la DGEC</p>
+
+      <div class="flex-container">
+        <a id="btn_open_modal_columns_declared" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
+          <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
+        </a>
+        <a class="button modal-button" href="{% url 'operators-api-declaration-export' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
+          <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
+        </a>
+        <select id="pagelength_valid" style="margin-top: auto;">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        <label for="input_search_datatable_valid" style="margin: auto 5px auto auto;">Rechercher:</label>
+        <input type="text" id="input_search_datatable_valid" style="width: 200px; margin-top: auto;" />
+      </div>
+
+
+      <table class="display nowrap" id="datatable_declared">
+        <!-- dynamically generated in js -->
+        <thead></thead>
+        <tfoot></tfoot>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal__backdrop" id="modal_columns_affiliations">
+  <div class="modal">
+    <div class="flex-container">
+      <table id="table_columns_affiliations_filter">
+        <!-- dynamically generated in js -->
+      </table>
+      <table id="table_columns_affiliations_filter2">
+        <!-- dynamically generated in js -->
+      </table>
+    </div>
+    <div class="form__group button__group">
+      <a class="button secondary close" id="btn_close_modal_columns_affiliations">Fermer</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_columns_declared">
+  <div class="modal">
+    <div class="flex-container">
+      <table id="table_columns_declared_filter">
+        <!-- dynamically generated in js -->
+      </table>
+      <table id="table_columns_declared_filter2">
+        <!-- dynamically generated in js -->
+      </table>
+    </div>
+    <div class="form__group button__group">
+      <a class="button secondary close" id="btn_close_modal_columns_declared">Fermer</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_edit_lot">
+  <div class="modal" style="max-width: none; margin: auto; max-height: 100%; overflow-y: auto;">
+    <p id="err_msg_dom">
+    </p>
+    <div class="flex-container modal-edit">
+      <div class="form__group" style="margin-top: var(--space-l);">
+        <h3 style="text-align: center;">Informations</h3>
+        <input type="hidden" id="lot_id" />
+        <dl>
+          <dt>Site de Production</dt>
+          <dd><input type="text" id="production_site_name" class="autocomplete_production_sites" readonly/></dd>
+          <dt>Volume à 20°C en Litres</dt>
+          <dd><input type="text" id="volume" readonly/></dd>
+          <dt>Biocarburant</dt>
+          <dd><input type="text" id="biocarburant_name" class="autocomplete_biocarburants" readonly/></dd>
+          <dt>Matiere Premiere</dt>
+          <dd><input type="text" id="matiere_premiere_name" class="autocomplete_mps" readonly/></dd>
+          <dt>Pays d'origine</dt>
+          <dd><input type="text" id="pays_origine_name" class="autocomplete_countries" readonly/></dd>
+        </dl>
+      </div>
+      <div class="form__group" style="margin-left: var(--space-l);">
+        <h3 style="text-align: center;">Destination</h3>
+        <dl>
+        <dt><label for="dae">Numéro de DAE / DAU</label></dt>
+        <dd><input id="dae" type="text" readonly/></dd>
+        <dt><label for="ea_name">Client</label></dt>
+        <dd><input type="text" id="ea_name" class="autocomplete_operators" readonly/></dd>
+        <dt><label for="ea_delivery_site">Site de livraison</label></dt>
+        <dd><input id="ea_delivery_site" type="text" readonly/></dd>
+        <dt><label for="ea_delivery_date">Date de livraison</label></dt>
+        <dd><input id="ea_delivery_date" type="text" placeholder="JJ/MM/AAAA" readonly/></dd>
+        <dt><label for="client_id">Référence</label></dt>
+        <dd><input id="client_id" type="text" readonly/></dd>
+        </dl>
+      </div>
+      <div class="form__group" style="margin-left: var(--space-l);">
+        <h3>Gaz à Effet de Serre</h3>
+        <span style="margin-top: -2em; display: block; text-align: left;"><small>en gCO2eq/MJ</small></span>
+        <table id="table_lot_ges">
+          <thead>
+            <th>Émissions</th>
+            <th>Réductions</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <label for="eec" title="Émissions résultant de l'extraction ou de la culture des matières premières">EEC </label><input type="text" id="eec" class="ges_field ges_incr" readonly/>
+              </td>
+              <td>
+                <label for="esca" title="Réductions d'émissions dues à l'accumulation du carbone dans les sols grâce à une meilleure gestion agricole">ESCA </label><input type="text" id="esca" class="ges_field ges_decr" readonly/>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label title="Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols">EL </label><input type="text" id="el" class="ges_field ges_incr" readonly />
+              </td>
+              <td>
+                <label title="Réductions d'émissions dues au piégeage et au stockage géologique du carbone">ECCS </label><input type="text" id="eccs" class="ges_field ges_decr" readonly/>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label title="Émissions résultant de la transformation">EP </label><input type="text" id="ep" class="ges_field ges_incr" readonly/>
+              </td>
+              <td>
+                <label title="Réductions d'émissions dues au piégeage et à la substitution du carbone">ECCR </label><input type="text" id="eccr" class="ges_field ges_decr" readonly/>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label title="Émissions résultant du transport et de la distribution">ETD </label><input type="text" id="etd" class="ges_field ges_incr" readonly/>
+              </td>
+              <td>
+                <label title="Réductions d'émissions dues à la production excédentaire d'électricité dans le cadre de la cogénération">EEE </label><input type="text" id="eee" class="ges_field ges_decr" readonly/>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label title="Émissions résultant du carburant à l'usage">EU </label><input type="text" id="eu" class="ges_field ges_incr" readonly/>
+              </td>
+              <td>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table>
+          <input type="hidden" id="ghg_reference" />
+          <thead>
+            <tr>
+              <th>Total gCO2eq/MJ</th>
+              <th id="reduction_title" title="">Réduction<small>*</small></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="ghg_total"></td>
+              <td id="ghg_reduction"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="form__group" style="display: none;" id="comments_section">
+    </div>
+    <div class="form__group" style="display: none;" id="add_comment_section">
+      <div style="display: flex;">
+        <p>{{user_entity_name}}:</p><input type="text" id="producer_comment" style="max-width: 80%; height: 2em; margin-left: 10px; margin-top: auto; margin-bottom: auto;" />
+      </div>
+      <a class="button primary" id="btn_accept_with_comment">Accepter sous réserve</a>
+    </div>
+    <div class="form__group" style="display: none;" id="reject_section">
+      <label style="margin-bottom: 1em; margin-top: 2em;" for="textarea_reject">Ajouter un motif de refus pour le fournisseur</label>
+      <textarea name="textarea" id="textarea_reject"></textarea>
+      <a class="button warning" id="btn_reject_with_comment">Refuser le lot</a>
+    </div>
+
+    <div class="form__group button__group">
+      <div class="button-item">
+        <a class="button primary" id="btn_lot_accept_final" style="display: none;">Accepter Lot</a>
+        <a class="button primary" id="show_add_comment_section">Accepter sous réserve</a>
+        <a class="button warning" id="show_reject_section">Refuser</a>
+      </div>
+      <div class="button-item button-push">
+        <a class="button secondary close" id="btn_close_modal_edit_lot">Annuler</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_accept_lots">
+  <div class="modal">
+    <span id="modal_accept_lots_form_err_message" style="color: red;"></span>
+    <form id="modal_accept_lots_form" method="POST" data-url="{% url 'operators-api-accept-lots' %}">
+      {% csrf_token %}
+      <p><b>Êtes vous certain de vouloir accepter le(s) lot(s) suivant(s)?</b></p>
+      <ul id="modal_accept_lots_list">
+      </ul>
+      <input type="hidden" id="modal_accept_lots_lots" name="lots">
+      <div class="form__group button__group">
+        <a class="button secondary" id="btn_close_modal_accept_lots">Annuler</a>
+        <button type="submit" class="button">Valider</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script type="text/javascript">
+window.operators_api_affiliated_lots = "{% url 'operators-api-affiliated-lots' %}"
+window.operators_api_declared_lots = "{% url 'operators-api-declared-lots' %}"
+window.operators_api_lot_comments = "{% url 'operators-api-lot-comments' %}"
+window.operators_api_accept_with_comments = "{% url 'operators-api-accept-lot-with-comment' %}"
+window.operators_api_reject_with_comments = "{% url 'operators-api-reject-lots' %}"
+
+$(document).ready(function() {
+  initFilters(table_columns_operators_affiliated, 'affiliations')
+  initFilters(table_columns_operators_declared, 'declared')
+
+  document.getElementById("tab_operators_affiliations").style.display = "block";
+  init_datatables_operators_affiliations()
+
+  manage_actions_operators_affiliation()
+
+  $("#btn_lot_accept_final").on('click', function() {
+    let lot_id = $("#lot_id").val()
+    $.ajax({
+      url:"{% url 'operators-api-accept-lot-correction' %}",
+      data: {'lot': lot_id,'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+      type        : 'POST',
+      success     : function(data, textStatus, jqXHR){
+        // Callback code
+        window.location.reload()
+      },
+      error       : function(e) {
+        if (e.status === 400) {
+          alert(e.responseJSON.message)
+          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+        } else {
+          alert("Server error. Please contact an administrator")
+          console.log(`server error ${JSON.stringify(e)}`)
+        }
+      }
+    })
+  })
+
+
+  /* column filter modal event management */
+  $('.toggle-vis').on('click', function(e) {
+    // Get the column API object
+    let colid = $(this).attr('data-column')
+    let dst_table = $(this).attr('data-table')
+
+
+    // Toggle the visibility
+    let column = ''
+    if (dst_table === "declared") {
+      column = window.table_operators_declared.column(colid);
+
+      var operatorsValidTableSettings = loadTableSettings(table_columns_operators_declared, 'operatorsValidTableSettings')
+      operatorsValidTableSettings[colid] = operatorsValidTableSettings[colid] == 1 ? 0 : 1
+      saveTableSettings(operatorsValidTableSettings, 'operatorsValidTableSettings')
+    } else if (dst_table === "affiliations") {
+      column = window.table_operators_affiliations.column(colid);
+
+      var operatorsAffiliationsTableSettings = loadTableSettings(table_columns_operators_affiliated, 'operatorsAffiliationsTableSettings')
+      operatorsAffiliationsTableSettings[colid] = operatorsAffiliationsTableSettings[colid] == 1 ? 0 : 1
+      saveTableSettings(operatorsAffiliationsTableSettings, 'operatorsAffiliationsTableSettings')
+    } else {
+      console.log(`unknown table. cant save column display settings`)
+      return
+    }
+    column.visible(!column.visible());
+  })
+
+})
+</script>
+{% endblock %}
