@@ -6,7 +6,6 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
-from django.db.models import Sum
 
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Lot, Pays
 from producers.models import ProducerCertificate, ProductionSiteInput, ProductionSiteOutput

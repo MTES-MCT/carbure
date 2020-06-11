@@ -96,6 +96,3 @@ class TestAdminUrlsAsProducer(TestCase):
         response = self.client.get(reverse('administrators-gestion-utilisateurs'))
         self.assertEqual(response.status_code, 403)
 
-    def test_access_admin_stats(self):
-        response = self.client.get(reverse('administrators-stats'))
-        self.assertEqual(response.status_code, 403)
