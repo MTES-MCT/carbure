@@ -7,6 +7,9 @@ from . import administrators_api
 
 urlpatterns = [
     path('v2/producers/', include('api.v2.producers.urls')),
+    path('v2/operators/', include('api.v2.operators.urls')),
+
+
 
     # public, autocomplete api
     path('biocarburant-autocomplete/', public_api.biocarburant_autocomplete, name='api-biocarburant-autocomplete'),
