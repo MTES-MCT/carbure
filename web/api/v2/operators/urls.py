@@ -4,13 +4,12 @@ from . import operators
 
 urlpatterns = [
     path('upload-xlsx-template', operators.excel_template_upload, name='api-v2-operators-excel-template-upload'),
-    path('download-xlsx-template-simple', operators.excel_template_download_simple, name='api-v2-operators-excel-template-download-simple'),
-    path('download-xlsx-template-advanced', operators.excel_template_download_advanced, name='api-v2-operators-excel-template-download-advanced'),
+    path('download-xlsx-template', operators.excel_template_download, name='api-v2-operators-excel-template-download'),
 
     # get
-    path('lots/drafts', operators.get_drafts, name='api-v2-operators-get-drafts'),
-    path('lots/received', operators.get_received, name='api-v2-operators-get-received'),
-    path('lots/declared', operators.get_declared, name='api-v2-operators-get-declared'),
+    path('lots/in', operators.get_in, name='api-v2-operators-get-in'),
+    path('lots/mb', operators.get_mb, name='api-v2-operators-get-mb'),
+    path('lots/out', operators.get_out, name='api-v2-operators-get-out'),
 
     # post
     path('lots/delete', operators.delete_lots, name='api-v2-operators_api-delete-lots'),

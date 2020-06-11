@@ -113,67 +113,98 @@ const table_columns_valid_v2 = [
 {title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site.name : `<i>${full.tx.fields.unknown_delivery_site}</i>` }},
 ]
 
-
-var table_columns_operators_affiliated = [
+const operators_table_columns_in_v2 = [
 {title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
-{title:'Période', can_hide: true, can_export: true, data:'period'},
-{title:'Fournisseur', can_hide: true,  can_export: true, data:'producer_name'},
-{title:'Site de<br />Production', can_hide: true,  can_filter: true, orderable: false, can_export: true, data:'production_site_name'},
-{title:'Numéro de lot', can_hide: true, can_duplicate: false, can_export: true, data:'carbure_id'},
-{title:'Volume<br /> à 20°C<br />en Litres', can_hide: true,  can_export: true, data: 'volume'},
-{title:'Biocarburant', can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'biocarburant_name'},
-{title:'Matière<br /> Première', can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'matiere_premiere_name'},
-{title:`Pays<br /> d'origine`, can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'pays_origine_name'},
+{title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer : `<i>${full.fields.unknown_producer}</i>` }},
+{title:'Site de<br /> Production', hidden: true, filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
+{title:'Pays de<br /> Production', hidden: true, filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.country.code_pays : (full.fields.unknown_production_country ? full.fields.unknown_production_country.code_pays: "") }},
+{title:'Fournisseur', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.tx.fields.vendor_is_in_carbure ? full.tx.fields.carbure_vendor : `<i>${full.tx.fields.unknown_vendor}</i>` }},
+{title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
+{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.biocarburant.name }},
+{title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.matiere_premiere.name }},
+{title:`Pays<br /> d'origine`, filter_title: 'Pays', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.pays_origine.code_pays }},
 
-{title:'EEC', can_hide: true,  can_export: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
-{title:'EL', can_hide: true,  can_export: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
-{title:'EP', can_hide: true,  can_export: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'},
-{title:'ETD', can_hide: true,  can_export: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'},
-{title:'EU', can_hide: true,  can_export: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'},
-{title:'ESCA', can_hide: true,  can_export: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'},
-{title:'ECCS', can_hide: true,  can_export: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'},
-{title:'ECCR', can_hide: true,  can_export: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'},
-{title:'EEE', can_hide: true,  can_export: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'},
-{title:'E', can_hide: true,  is_read_only: true, can_export: true, data: 'ghg_total', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'},
-{title:'Émissions de référence', can_hide: true,  is_read_only: true, can_export: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'},
-{title:'% de réduction', can_hide: true,  is_read_only: true, can_export: true, data: 'ghg_reduction'},
+{title:'EEC', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
+{title:'EL', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
+{title:'EP', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'},
+{title:'ETD', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'},
+{title:'EU', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'},
+{title:'ESCA', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'},
+{title:'ECCS', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'},
+{title:'ECCR', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'},
+{title:'EEE', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'},
+{title:'E', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_total', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'},
+{title:'Émissions de référence', hidden: true, can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'},
+{title:'% de réduction', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reduction'},
 
-{title:'N°DAE/DAU', can_hide: true, can_duplicate: false, can_export: true, data:'dae'},
-{title:'Référence', can_hide: true,  can_filter: true, orderable: false, can_export: true, data:'client_id', tooltip: 'Champ libre - Référence client'},
-{title:'Date d\'entrée<br />en EA', can_hide: true,  can_export: true, data:'ea_delivery_date'},
-{title:'Site de livraison', can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'ea_delivery_site'},
-{title:'Statut', can_hide: true, can_filter: true, orderable: false, can_export: true, data: 'ea_delivery_status'},
+{title:'N°DAE/DAU', can_hide: true, can_duplicate: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.dae}},
+{title:'Référence', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, tooltip: 'Champ libre - Référence client', render: (data, type, full, meta) => {return full.tx.fields.champ_libre}},
+{title:'Date d\'entrée<br /> en EA', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_date}},
+{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site.name : `<i>${full.tx.fields.unknown_delivery_site}</i>` }},
+{title:'Source', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.fields.status == 'Validated' ? 'Carbure' : 'Excel'} },
 ]
 
-var table_columns_operators_declared = [
-{title:'Période', can_hide: true, can_export: true, data:'period'},
-{title:'Numéro de lot', can_hide: true, can_duplicate: false, can_export: true, data:'carbure_id'},
-{title:'Fournisseur', can_hide: true,  can_export: true, data:'producer_name'},
-{title:'Site de<br />Production', can_hide: true,  can_filter: true, orderable: false, can_export: true, data:'production_site_name'},
-{title:'Volume<br /> à 20°C<br />en Litres', can_hide: true,  can_export: true, data: 'volume'},
-{title:'Biocarburant', can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'biocarburant_name'},
-{title:'Matière<br /> Première', can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'matiere_premiere_name'},
-{title:`Pays<br /> d'origine`, can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'pays_origine_name'},
+const operators_table_columns_mb_v2 = [
+{title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
+{title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer : `<i>${full.fields.unknown_producer}</i>` }},
+{title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
+{title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.country.code_pays : (full.fields.unknown_production_country ? full.fields.unknown_production_country.code_pays: "") }},
+{title:'Fournisseur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.tx.fields.vendor_is_in_carbure ? full.tx.fields.carbure_vendor : `<i>${full.tx.fields.unknown_vendor}</i>` }},
+{title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
+{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.biocarburant.name }},
+{title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.matiere_premiere.name }},
+{title:`Pays<br /> d'origine`, filter_title: 'Pays', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.pays_origine.code_pays }},
 
-{title:'EEC', can_hide: true,  can_export: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
-{title:'EL', can_hide: true,  can_export: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
-{title:'EP', can_hide: true,  can_export: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'},
-{title:'ETD', can_hide: true,  can_export: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'},
-{title:'EU', can_hide: true,  can_export: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'},
-{title:'ESCA', can_hide: true,  can_export: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'},
-{title:'ECCS', can_hide: true,  can_export: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'},
-{title:'ECCR', can_hide: true,  can_export: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'},
-{title:'EEE', can_hide: true,  can_export: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'},
-{title:'E', can_hide: true,  is_read_only: true, can_export: true, data: 'ghg_total', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'},
-{title:'Émissions de référence', can_hide: true,  is_read_only: true, can_export: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'},
-{title:'% de réduction', can_hide: true,  is_read_only: true, can_export: true, data: 'ghg_reduction'},
+{title:'EEC', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
+{title:'EL', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
+{title:'EP', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'},
+{title:'ETD', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'},
+{title:'EU', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'},
+{title:'ESCA', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'},
+{title:'ECCS', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'},
+{title:'ECCR', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'},
+{title:'EEE', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'},
+{title:'E', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_total', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'},
+{title:'Émissions de référence', hidden: true, can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'},
+{title:'% de réduction', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reduction'},
 
-{title:'N°DAE/DAU', can_hide: true, can_duplicate: false, can_export: true, data:'dae'},
-{title:'Référence', can_hide: true,  can_filter: true, orderable: false, can_export: true, data:'client_id', tooltip: 'Champ libre - Référence client'},
-{title:'Date d\'entrée<br />en EA', can_hide: true,  can_export: true, data:'ea_delivery_date'},
-{title:'Site de livraison', can_hide: true,  can_filter: true, orderable: false, can_export: true, data: 'ea_delivery_site'},
+{title:'N°DAE/DAU', can_hide: true, can_duplicate: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.dae}},
+{title:'Référence', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, tooltip: 'Champ libre - Référence client', render: (data, type, full, meta) => {return full.tx.fields.champ_libre}},
+{title:'Date d\'entrée<br /> en EA', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_date}},
+{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.client_is_in_carbure ? full.tx.fields.carbure_client : `<i>${full.tx.fields.unknown_client}</i>`}},
+{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site.name : `<i>${full.tx.fields.unknown_delivery_site}</i>` }},
 ]
 
+const operators_table_columns_out_v2 = [
+{title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
+{title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer : `<i>${full.fields.unknown_producer}</i>` }},
+{title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
+{title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.country.code_pays : (full.fields.unknown_production_country ? full.fields.unknown_production_country.code_pays: "") }},
+{title:'Fournisseur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.tx.fields.vendor_is_in_carbure ? full.tx.fields.carbure_vendor : `<i>${full.tx.fields.unknown_vendor}</i>` }},
+{title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
+{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.biocarburant.name }},
+{title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.matiere_premiere.name }},
+{title:`Pays<br /> d'origine`, filter_title: 'Pays', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.pays_origine.code_pays }},
+
+{title:'EEC', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
+{title:'EL', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
+{title:'EP', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'},
+{title:'ETD', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'},
+{title:'EU', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'},
+{title:'ESCA', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'},
+{title:'ECCS', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'},
+{title:'ECCR', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'},
+{title:'EEE', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'},
+{title:'E', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_total', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'},
+{title:'Émissions de référence', hidden: true, can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'},
+{title:'% de réduction', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reduction'},
+
+{title:'N°DAE/DAU', can_hide: true, can_duplicate: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.dae}},
+{title:'Référence', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, tooltip: 'Champ libre - Référence client', render: (data, type, full, meta) => {return full.tx.fields.champ_libre}},
+{title:'Date d\'entrée<br /> en EA', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_date}},
+{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.client_is_in_carbure ? full.tx.fields.carbure_client : `<i>${full.tx.fields.unknown_client}</i>`}},
+{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site.name : `<i>${full.tx.fields.unknown_delivery_site}</i>` }},
+]
 
 var table_columns_administrators = [
 {title:'Producteur', can_hide: true,  can_filter: true, orderable: false, can_export: true, data:'producer_name'},
@@ -313,6 +344,7 @@ $("form").submit(function(event) {
       err_msg_dom.text("")
       if (auto_reload === "0") {
       	  success_msg_dom.html(data.message)
+      	  err_msg_dom.html(data.errors)
       } else {
 	      window.location.reload()
       }
@@ -367,7 +399,15 @@ function loadTableSettings(table_columns, table_name) {
     columns = JSON.parse(tableSettings)
     let nb_columns = table_columns.length
     if (columns.length !== nb_columns) {
-      columns = Array(nb_columns).fill(1);
+      columns = []
+      for (let i = 0, len = nb_columns; i < len; i++) {
+        let coldef = table_columns[i]
+        if (coldef.hidden == true) {
+          columns.push(0)
+        } else {
+          columns.push(1)
+        }
+      }
       saveTableSettings(columns, table_name)
     }
   }
@@ -396,7 +436,6 @@ function saveAddLotSettings(settings) {
 
 function showHideTableColumns(table, columns, dom) {
   /* display table columns depending on config */
-  console.log(`showHideTableColumns for table ${columns} ${dom}`)
   let nb_columns = table.columns().data().length
   for (let i = 0, len = nb_columns; i < len; i++) {
     let isChecked = columns[i]
@@ -603,7 +642,7 @@ function manage_actions() {
   manage_duplicate_button()
 }
 
-function manage_actions_operators_affiliation() {
+function manage_actions_operators() {
   // bouton Accepter Lots
   $("#modal_accept_lots_list").empty()
   if (selected_rows.length > 0) {
@@ -611,12 +650,12 @@ function manage_actions_operators_affiliation() {
     $("#btn_open_modal_accept_lots").css("pointer-events", "auto")
     $("#btn_open_modal_accept_lots").removeClass('secondary')
 
-		let to_accept = []
+	let to_accept = []
     for (let i = 0, len = selected_rows.length; i < len; i++) {
-      let rowdata = table_operators_affiliations.row(selected_rows[i]).data()
-      $("#modal_accept_lots_list").append(`<li>${rowdata['producer_name']} - ${rowdata['volume']} - ${rowdata['biocarburant_name']} - ${rowdata['matiere_premiere_name']}</li>`)
-      to_accept.push(rowdata['lot_id'])
-      $("#modal_accept_lots_lots").val(to_accept.join(","))
+      let rowdata = window.table.row(selected_rows[i]).data()
+      $("#modal_accept_lots_list").append(`<li>${rowdata.tx.fields.vendor_is_in_carbure ? rowdata.tx.fields.carbure_vendor : rowdata.tx.fields.unknown_vendor} - ${rowdata.fields.volume} - ${rowdata.fields.biocarburant.name} - ${rowdata.fields.matiere_premiere.name}</li>`)
+      to_accept.push(rowdata.tx.pk)
+      $("#modal_accept_lots_txs").val(to_accept.join(","))
     }
   } else {
     $("#btn_open_modal_accept_lots").addClass('secondary')
@@ -690,7 +729,7 @@ function updateDataTableSelectAllCtrl(table){
       }
    }
 }
-
+/*
 function init_datatables_drafts(url) {
   // tab Drafts
   if (!$.fn.DataTable.isDataTable('#datatable_drafts')) {
@@ -1023,8 +1062,8 @@ function init_datatables_validated(url) {
     window.table_valid.draw()
   }
 }
-
-function init_datatables_operators_affiliations() {
+*/
+/*function init_datatables_operators_affiliations() {
   if (!$.fn.DataTable.isDataTable('#datatable_affiliations')) {
 
     let empty_footer = `<tr>${Array(table_columns_operators_affiliated.length).fill("<th></th>").join('')}</tr>`
@@ -1135,7 +1174,8 @@ function init_datatables_operators_affiliations() {
     window.table_operators_affiliations.draw()
   }
 }
-
+*/
+/*
 function init_datatables_operators_declared() {
   if (!$.fn.DataTable.isDataTable('#datatable_declared')) {
 
@@ -1200,6 +1240,7 @@ function init_datatables_operators_declared() {
     window.table_operators_declared.draw()
   }
 }
+*/
 
 function display_producers_lot_modal(table, columns, event) {
   // check if we clicked on the checkbox
@@ -1711,7 +1752,6 @@ const dt_received_config = {
     	data[tx.fields.lot].tx = tx
     }
     list = Object.values(data)
-    console.log(list)
     return list
   },
   post_init: function(table) {
@@ -1749,9 +1789,9 @@ const dt_received_config = {
     // Handle click on "Select all" control
     $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
       if(this.checked){
-         $('#datatable_drafts tbody input[type="checkbox"]:not(:checked)').trigger('click');
+         $('#datatable_received tbody input[type="checkbox"]:not(:checked)').trigger('click');
       } else {
-         $('#datatable_drafts tbody input[type="checkbox"]:checked').trigger('click');
+         $('#datatable_received tbody input[type="checkbox"]:checked').trigger('click');
       }
       // Prevent click event from propagating to parent
       e.stopPropagation();
@@ -1861,10 +1901,306 @@ const dt_valid_config = {
   }
 }
 
+const dt_operators_in_config = {
+	id: "datatable_in",
+	url: window.operators_api_lots_in_v2,
+	col_definition: operators_table_columns_in_v2,
+	has_footer: true,
+	paging: true,
+	info: true,
+	dom: 'rtp',
+	columnDefs: [
+    {
+      targets: [0],
+      searchable:false,
+      orderable:false,
+      width:'1%',
+      className: 'dt-body-center',
+      render: function (data, type, full, meta) {
+        return '<input type="checkbox">';
+      }
+    },
+    {
+      className: "dt-center",
+      targets: "_all",
+      render: function (data, type, full, meta) {
+      	let col_name = operators_table_columns_in_v2[meta.col].data
+      	if (operators_table_columns_in_v2[meta.col]['render'] != undefined) {
+  		  return operators_table_columns_in_v2[meta.col]['render'](full)
+      	}
+      	return full['fields'][col_name]
+      }
+    },
+  ],
+  order: [[ 1, 'desc' ]],
+  ajax_dataSrc: function(res) {
+    data = {}
+    lots = JSON.parse(res['lots'])
+    for (let i = 0, len = lots.length; i < len; i++) {
+    	let lot = lots[i]
+    	data[lot.pk] = lot
+    }
+    txs = JSON.parse(res['transactions'])
+    for (let i = 0, len = txs.length; i < len; i++) {
+    	let tx = txs[i]
+    	data[tx.fields.lot].tx = tx
+    }
+    list = Object.values(data)
+    return list
+  },
+  post_init: function(table) {
+    let tbl_id = table.table().node().id
+    $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
+      display_producers_lot_modal(table, operators_table_columns_in_v2, e)
+    })
+    $('#input_search_datatable').on('keyup', function() {
+        table.search(this.value).draw();
+    })
+
+    // Handle click on checkbox
+    $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
+      var $row = $(this).closest('tr');
+      // Get row data
+      var rowId = table.row($row).index();
+      // Determine whether row ID is in the list of selected row IDs
+      var index = $.inArray(rowId, selected_rows);
+      // If checkbox is checked and row ID is not in list of selected row IDs
+      if(this.checked && index === -1) {
+        selected_rows.push(rowId);
+      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+      } else if (!this.checked && index !== -1) {
+        selected_rows.splice(index, 1);
+      }
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+      // Show/Hide buttons depending on selected_rows content
+      manage_actions_operators()
+    })
+
+    // Handle click on "Select all" control
+    $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
+      if(this.checked){
+         $('#datatable_in tbody input[type="checkbox"]:not(:checked)').trigger('click');
+      } else {
+         $('#datatable_in tbody input[type="checkbox"]:checked').trigger('click');
+      }
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+    });
+
+    // Handle table draw event
+    table.on('draw', function(){
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+    });
+  }
+}
+
+const dt_operators_mb_config = {
+	id: "datatable_mb",
+	url: window.operators_api_lots_mb_v2,
+	col_definition: operators_table_columns_mb_v2,
+	has_footer: true,
+	paging: true,
+	info: true,
+	dom: 'rtp',
+	columnDefs: [
+    {
+      targets: [0],
+      searchable:false,
+      orderable:false,
+      width:'1%',
+      className: 'dt-body-center',
+      render: function (data, type, full, meta) {
+        return '<input type="checkbox">';
+      }
+    },
+    {
+      className: "dt-center",
+      targets: "_all",
+      render: function (data, type, full, meta) {
+      	let col_name = operators_table_columns_mb_v2[meta.col].data
+      	if (operators_table_columns_mb_v2[meta.col]['render'] != undefined) {
+  		  return operators_table_columns_mb_v2[meta.col]['render'](full)
+      	}
+      	return full['fields'][col_name]
+      }
+    },
+  ],
+  order: [[ 1, 'desc' ]],
+  ajax_dataSrc: function(res) {
+    data = {}
+    lots = JSON.parse(res['lots'])
+    for (let i = 0, len = lots.length; i < len; i++) {
+    	let lot = lots[i]
+    	data[lot.pk] = lot
+    }
+    txs = JSON.parse(res['transactions'])
+    for (let i = 0, len = txs.length; i < len; i++) {
+    	let tx = txs[i]
+    	data[tx.fields.lot].tx = tx
+    }
+    list = Object.values(data)
+    return list
+  },
+  post_init: function(table) {
+    let tbl_id = table.table().node().id
+    $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
+      display_producers_lot_modal(table, operators_table_columns_mb_v2, e)
+    })
+    $('#input_search_datatable').on('keyup', function() {
+        table.search(this.value).draw();
+    })
+
+    // Handle click on checkbox
+    $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
+      var $row = $(this).closest('tr');
+      // Get row data
+      var rowId = table.row($row).index();
+      // Determine whether row ID is in the list of selected row IDs
+      var index = $.inArray(rowId, selected_rows);
+      // If checkbox is checked and row ID is not in list of selected row IDs
+      if(this.checked && index === -1) {
+        selected_rows.push(rowId);
+      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+      } else if (!this.checked && index !== -1) {
+        selected_rows.splice(index, 1);
+      }
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+      // Show/Hide buttons depending on selected_rows content
+      manage_actions()
+    })
+
+
+    // Handle click on "Select all" control
+    $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
+      if(this.checked){
+         $('#datatable_mb tbody input[type="checkbox"]:not(:checked)').trigger('click');
+      } else {
+         $('#datatable_mb tbody input[type="checkbox"]:checked').trigger('click');
+      }
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+    });
+
+    // Handle table draw event
+    table.on('draw', function(){
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+    });
+  }
+}
+
+const dt_operators_out_config = {
+	id: "datatable_out",
+	url: window.operators_api_lots_out_v2,
+	col_definition: operators_table_columns_out_v2,
+	has_footer: true,
+	paging: true,
+	info: true,
+	dom: 'rtp',
+	columnDefs: [
+    {
+      targets: [0],
+      searchable:false,
+      orderable:false,
+      width:'1%',
+      className: 'dt-body-center',
+      render: function (data, type, full, meta) {
+        return '<input type="checkbox">';
+      }
+    },
+    {
+      className: "dt-center",
+      targets: "_all",
+      render: function (data, type, full, meta) {
+      	let col_name = operators_table_columns_out_v2[meta.col].data
+      	if (operators_table_columns_out_v2[meta.col]['render'] != undefined) {
+  		  return operators_table_columns_out_v2[meta.col]['render'](full)
+      	}
+      	return full['fields'][col_name]
+      }
+    },
+  ],
+  order: [[ 1, 'desc' ]],
+  ajax_dataSrc: function(res) {
+    data = {}
+    lots = JSON.parse(res['lots'])
+    for (let i = 0, len = lots.length; i < len; i++) {
+    	let lot = lots[i]
+    	data[lot.pk] = lot
+    }
+    txs = JSON.parse(res['transactions'])
+    for (let i = 0, len = txs.length; i < len; i++) {
+    	let tx = txs[i]
+    	data[tx.fields.lot].tx = tx
+    }
+    list = Object.values(data)
+    return list
+  },
+  post_init: function(table) {
+    let tbl_id = table.table().node().id
+    $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
+      display_producers_lot_modal(table, operators_table_columns_out_v2, e)
+    })
+    $('#input_search_datatable').on('keyup', function() {
+        table.search(this.value).draw();
+    })
+
+    // Handle click on checkbox
+    $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
+      var $row = $(this).closest('tr');
+      // Get row data
+      var rowId = table.row($row).index();
+      // Determine whether row ID is in the list of selected row IDs
+      var index = $.inArray(rowId, selected_rows);
+      // If checkbox is checked and row ID is not in list of selected row IDs
+      if(this.checked && index === -1) {
+        selected_rows.push(rowId);
+      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+      } else if (!this.checked && index !== -1) {
+        selected_rows.splice(index, 1);
+      }
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+      // Show/Hide buttons depending on selected_rows content
+      manage_actions()
+    })
+
+
+    // Handle click on "Select all" control
+    $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
+      if(this.checked){
+         $('#datatable_out tbody input[type="checkbox"]:not(:checked)').trigger('click');
+      } else {
+         $('#datatable_out tbody input[type="checkbox"]:checked').trigger('click');
+      }
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+    });
+
+    // Handle table draw event
+    table.on('draw', function(){
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+    });
+  }
+}
+
 dt_config['tab_drafts'] = dt_drafts_config
 dt_config['tab_received'] = dt_received_config
 dt_config['tab_errors'] = dt_errors_config
 dt_config['tab_valid'] = dt_valid_config
+dt_config['tab_operators_in'] = dt_operators_in_config
+dt_config['tab_operators_mb'] = dt_operators_mb_config
+dt_config['tab_operators_out'] = dt_operators_out_config
 
 })
 
@@ -2010,6 +2346,10 @@ function init_datatables_generic(tab_name) {
 $("#btn_lot_save").on('click', handleSave)
 
 $("#btn_close_modal_import").on('click', () => {
+  window.location.reload()
+})
+
+$("#btn_close_modal_accept_lots").on('click', () => {
   window.location.reload()
 })
 
