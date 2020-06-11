@@ -7,8 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Max, Min
 from django.core import serializers
 
-from core.decorators import enrich_with_user_details, restrict_to_producers
-from core.xlsx_template import create_template_xlsx_v2_simple, create_template_xlsx_v2_advanced
+from core.decorators import enrich_with_user_details, restrict_to_operators
+from core.xlsx_template import create_template_xlsx_v2_operators
 
 from core.models import Entity, ProductionSite, Pays, Biocarburant, MatierePremiere, Depot
 from core.models import LotV2, LotTransaction, TransactionError, LotV2Error
@@ -34,26 +34,15 @@ def load_excel_lot(context, lot_row):
         # producer_is_in_carbure = models.BooleanField(default=True)
         # carbure_producer = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='producer_lotv2')
         # unknown_producer = models.CharField(max_length=64, blank=True, default='')
-        if lot_row['producer'] == entity.name:
-            # redundant information. by default we assume the producer is the entity logged in
-            lot.producer_is_in_carbure = True
-            lot.carbure_producer = entity
-            lot.unknown_producer = ''
+        match = Entity.objects.filter(name=lot_row['producer']).count()
+        if match > 0:
+            raise Exception("Vous ne pouvez pas déclarer des lots d'un producteur déjà inscrit sur Carbure")
         else:
-            # do we know this producer ?
-            matches = Entity.objects.filter(name=lot_row['producer']).count()
-            if matches == 1:
-                # yes we do
-                # in this case, the producer should declare its production directly in Carbure
-                # we cannot allow someone else to declare for them
-                raise Exception("Vous ne pouvez pas déclarer des lots d'un producteur déjà inscrit sur Carbure")
-            else:
-                # ok, unknown producer. allow importation
-                lot.producer_is_in_carbure = False
-                lot.carbure_producer = None
-                lot.unknown_producer = lot_row['producer']
+            # ok, unknown producer. allow importation
+            lot.producer_is_in_carbure = False
+            lot.carbure_producer = None
+            lot.unknown_producer = lot_row['producer']
     else:
-        print('No producer in excel sheet. ')
         # default, current entity is the producer
         lot.producer_is_in_carbure = False
         lot.carbure_producer = None
@@ -62,52 +51,22 @@ def load_excel_lot(context, lot_row):
 
     if 'production_site' in lot_row:
         production_site = lot_row['production_site']
-        # production_site_is_in_carbure = models.BooleanField(default=True)
-        # carbure_production_site = models.ForeignKey(ProductionSite, null=True, blank=True, on_delete=models.SET_NULL)
-        # unknown_production_site = models.CharField(max_length=64, blank=True, default='')
-        if lot.producer_is_in_carbure:
-            try:
-                lot.carbure_production_site = ProductionSite.objects.get(producer=lot.carbure_producer, name=production_site)
-                lot.production_site_is_in_carbure = True
-                lot.unknown_production_site = ''
-                LotV2Error.objects.filter(lot=lot, field='production_site').delete()
-            except Exception:
-                # do not allow the use of an unknown production site if the producer is registered in Carbure
-                lot.carbure_production_site = None
-                lot.production_site_is_in_carbure = False
-                lot.unknown_production_site = ''
-                error, c = LotV2Error.objects.update_or_create(lot=lot, field='production_site',
-                                                               error='Site de production %s inconnu pour %s' % (production_site, lot.carbure_producer.name),
-                                                               defaults={'value': production_site})
+        lot.production_site_is_in_carbure = False
+        lot.carbure_production_site = None
+        if production_site is not None:
+            lot.unknown_production_site = production_site
         else:
-            # producer not in carbure
-            # accept any value
-            lot.production_site_is_in_carbure = False
-            lot.carbure_production_site = None
-            if production_site is not None:
-                lot.unknown_production_site = production_site
-            else:
-                lot.unknown_production_site = ''
+            lot.unknown_production_site = ''
     else:
         lot.production_site_is_in_carbure = False
         lot.carbure_production_site = None
         lot.unknown_production_site = ''
-        error, c = LotV2Error.objects.update_or_create(lot=lot, field='production_site',
-                                                       error='Champ production_site introuvable dans le fichier excel',
-                                                       defaults={'value': None})
-    if lot.producer_is_in_carbure is False:
-        if 'production_site_country' in lot_row:
-            try:
-                country = Pays.objects.get(code_pays=lot_row['production_site_country'])
-                lot.unknown_production_country = country
-            except Exception:
-                error, c = LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_country',
-                                                               error='Champ production_site_country incorrect',
-                                                               defaults={'value': lot_row['production_site_country']})
-        else:
-            error, c = LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_country',
-                                                           error='Merci de préciser une valeur dans le champ production_site_country',
-                                                           defaults={'value': None})
+
+    if 'production_site_country' in lot_row:
+        production_site_country = lot_row['production_site_country']
+        lot.production_site_country = production_site_country
+    else:
+        lot.production_site_country = None
 
     if 'biocarburant_code' in lot_row:
         biocarburant = lot_row['biocarburant_code']
@@ -257,15 +216,22 @@ def load_excel_lot(context, lot_row):
     lot.ghg_total = round(lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee, 2)
     lot.ghg_reference = 83.8
     lot.ghg_reduction = round((1.0 - (lot.ghg_total / lot.ghg_reference)) * 100.0, 2)
-
     lot.source = 'EXCEL'
     lot.save()
 
     transaction = LotTransaction()
     transaction.lot = lot
     transaction.save()
-    transaction.vendor_is_in_carbure = True
-    transaction.carbure_vendor = entity
+    transaction.vendor_is_in_carbure = False
+    transaction.carbure_vendor = None
+    if 'vendor' in lot_row:
+        vendor = lot_row['vendor']
+        transaction.unknown_vendor = vendor
+    else:
+        transaction.unknown_vendor = None
+    transaction.client_is_in_carbure = True
+    transaction.carbure_client = entity
+    transaction.unknown_client = ''
 
     if 'dae' in lot_row:
         dae = lot_row['dae']
@@ -297,24 +263,6 @@ def load_excel_lot(context, lot_row):
             e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_date',
                                                              error=msg,
                                                              defaults={'value': delivery_date})
-    if 'client' in lot_row and lot_row['client'] is not None:
-        client = lot_row['client']
-        matches = Entity.objects.filter(name=client).count()
-        if matches:
-            transaction.client_is_in_carbure = True
-            transaction.carbure_client = Entity.objects.get(name=client)
-            transaction.unknown_client = ''
-        else:
-            transaction.client_is_in_carbure = False
-            transaction.carbure_client = None
-            transaction.unknown_client = client
-        TransactionError.objects.filter(tx=transaction, field='client').delete()
-    else:
-        transaction.client_is_in_carbure = False
-        transaction.carbure_client = None
-        transaction.unknown_client = ''
-        e, c = TransactionError.objects.update_or_create(tx=transaction, field='client',
-                                                         defaults={'value': None, 'error': "Merci de préciser un client"})
 
     if 'delivery_site' in lot_row and lot_row['delivery_site'] is not None:
         delivery_site = lot_row['delivery_site']
@@ -360,16 +308,16 @@ def load_excel_lot(context, lot_row):
 
 @login_required
 @enrich_with_user_details
-@restrict_to_producers
-def excel_template_download_simple(request, *args, **kwargs):
+@restrict_to_operators
+def excel_template_download(request, *args, **kwargs):
     context = kwargs['context']
-    file_location = create_template_xlsx_v2_simple(context['user_entity'])
+    file_location = create_template_xlsx_v2_operators(context['user_entity'])
     try:
         with open(file_location, 'rb') as f:
             file_data = f.read()
             # sending response
             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="carbure_template_simple.xlsx"'
+            response['Content-Disposition'] = 'attachment; filename="carbure_template_traders.xlsx"'
             return response
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
@@ -377,24 +325,7 @@ def excel_template_download_simple(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
-@restrict_to_producers
-def excel_template_download_advanced(request, *args, **kwargs):
-    context = kwargs['context']
-    file_location = create_template_xlsx_v2_advanced(context['user_entity'])
-    try:
-        with open(file_location, 'rb') as f:
-            file_data = f.read()
-            # sending response
-            response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="carbure_template_advanced.xlsx"'
-            return response
-    except Exception as e:
-        return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
-
-
-@login_required
-@enrich_with_user_details
-@restrict_to_producers
+@restrict_to_operators
 def excel_template_upload(request, *args, **kwargs):
     context = kwargs['context']
     file = request.FILES.get('file')
@@ -430,23 +361,25 @@ def excel_template_upload(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
-@restrict_to_producers
-def get_drafts(request, *args, **kwargs):
+@restrict_to_operators
+def get_in(request, *args, **kwargs):
     context = kwargs['context']
-    lots = LotV2.objects.filter(added_by=context['user_entity'], status='Draft')
-    transactions_ids = set([tx['id__min'] for tx in LotTransaction.objects.filter(lot__in=lots).values('lot_id', 'id').annotate(Min('id'))])
+    # lots assigned by others + lots imported
+    transactions = list(LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='N', lot__status='Validated'))
+    transactions.extend(list(LotTransaction.objects.filter(carbure_client=context['user_entity'], lot__status='Draft', lot__added_by=context['user_entity'])))
+    lot_ids = [t.lot.id for t in transactions]
+    lots = LotV2.objects.filter(id__in=lot_ids)
     errors = LotV2Error.objects.filter(lot__in=lots)
-    first_transactions = LotTransaction.objects.filter(id__in=transactions_ids)
     sez = serializers.serialize('json', lots, use_natural_foreign_keys=True)
-    txsez = serializers.serialize('json', first_transactions, use_natural_foreign_keys=True)
+    txsez = serializers.serialize('json', transactions, use_natural_foreign_keys=True)
     errsez = serializers.serialize('json', errors, use_natural_foreign_keys=True)
     return JsonResponse({'lots': sez, 'errors': errsez, 'transactions': txsez})
 
 
 @login_required
 @enrich_with_user_details
-@restrict_to_producers
-def get_received(request, *args, **kwargs):
+@restrict_to_operators
+def get_mb(request, *args, **kwargs):
     context = kwargs['context']
     transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='N', lot__status="Validated")
     lot_ids = [t.lot.id for t in transactions]
@@ -460,8 +393,8 @@ def get_received(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
-@restrict_to_producers
-def get_declared(request, *args, **kwargs):
+@restrict_to_operators
+def get_out(request, *args, **kwargs):
     context = kwargs['context']
     transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], lot__status="Validated")
     lot_ids = [t.lot.id for t in transactions]
@@ -473,7 +406,7 @@ def get_declared(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
-@restrict_to_producers
+@restrict_to_operators
 def delete_lots(request, *args, **kwargs):
     context = kwargs['context']
     lot_ids = request.POST.get('lots', None)
@@ -490,28 +423,67 @@ def delete_lots(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'message': '%d lots supprimés' % (len(ids) - len(errors)), 'errors': errors})
 
 
+# not an api call
+def validate_lot(lot, tx):
+    if not tx.dae:
+        return False, 'Validation impossible. DAE manquant'
+    if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site:
+        return False, 'Validation impossible. Site de livraison manquant'
+    if tx.delivery_site_is_in_carbure and not tx.carbure_delivery_site:
+        return False, 'Validation impossible. Site de livraison manquant'
+    if not tx.delivery_date:
+        return False, 'Validation impossible. Date de livraison manquante'
+    if tx.client_is_in_carbure and not tx.carbure_client:
+        return False, 'Validation impossible. Veuillez renseigner un client'
+    if not tx.client_is_in_carbure and not tx.unknown_client:
+        return False, 'Validation impossible. Veuillez renseigner un client'
+    if not lot.volume:
+        return False, 'Validation impossible. Veuillez renseigner le volume'
+    if not lot.pays_origine:
+        return False, 'Validation impossible. Veuillez renseigner le pays d\'origine de la matière première'
+    try:
+        today = datetime.date.today()
+        # [PAYS][YYMM]P[IDProd]-[1....]-([S123])
+        # FR2002P001-1
+        if lot.producer_is_in_carbure:
+            lot.carbure_id = "%s%sP%d-%d" % ('FR', today.strftime('%y%m'), lot.carbure_producer.id, lot.id)
+        else:
+            lot.carbure_id = "%s%sP%s-%d" % ('FR', today.strftime('%y%m'), 'XXX', lot.id)
+        lot.status = "Validated"
+        lot.save()
+    except Exception:
+        return False, 'Erreur lors de la validation du lot'
+    return True, 'success'
+
+
 @login_required
 @enrich_with_user_details
-@restrict_to_producers
+@restrict_to_operators
 def accept_lots(request, *args, **kwargs):
     context = kwargs['context']
-    lot_ids = request.POST.get('lots', None)
+    tx_ids = request.POST.get('tx_ids', None)
     errors = []
-    if not lot_ids:
-        return JsonResponse({'status': 'error', 'message': 'Missing lot ids'}, status=400)
-    ids = lot_ids.split(',')
-    for lotid in ids:
-        lot = LotV2.objects.get(id=lotid, added_by=context['user_entity'], status='Draft')
+    if not tx_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing tx ids'}, status=400)
+    ids = tx_ids.split(',')
+    for txid in ids:
         try:
-            lot.delete()
+            tx = LotTransaction.objects.get(id=txid, carbure_client=context['user_entity'], delivery_status__in=['N', 'AC', 'AA'])
+            if tx.lot.status == 'Draft':
+                success, msg = validate_lot(tx.lot, tx)
+                if success is False:
+                    errors.append(msg)
+                    continue
+            tx.delivery_status = 'A'
+            tx.save()
         except Exception as e:
-            errors.append({'message': 'Impossible de supprimer le lot %s: introuvable ou déjà validé' % (), 'extra': str(e)})
-    return JsonResponse({'status': 'success', 'message': '%d lots supprimés' % (len(ids) - len(errors)), 'errors': errors})
+            errors.append({'message': 'Impossible d\'accepter la transaction: introuvable ou déjà validée', 'extra': str(e)})
+    return JsonResponse({'status': 'success', 'message': '%d lots acceptés' % (len(ids) - len(errors)), 'errors': errors})
 
 
 @login_required
 @enrich_with_user_details
-@restrict_to_producers
+@restrict_to_operators
 def declare_lots(request, *args, **kwargs):
     context = kwargs['context']
     lot_ids = request.POST.get('lots', None)
