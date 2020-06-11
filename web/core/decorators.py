@@ -1,4 +1,4 @@
-from core.models import UserRights, UserPreferences, LotV2, LotTransaction
+from core.models import UserRights, UserPreferences, LotV2, LotTransaction, Lot
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 

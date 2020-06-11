@@ -7,6 +7,7 @@ from django.http import Http404
 
 from core.models import UserRights, UserPreferences, MatierePremiere, Biocarburant, Lot, Entity, Pays
 from core.decorators import enrich_with_user_details
+from django.db.models import Sum
 
 def index(request):
   context = {}

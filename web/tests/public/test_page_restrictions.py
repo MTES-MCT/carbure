@@ -36,7 +36,7 @@ class RestrictedUrlsTestLoggedinProducer(TestCase):
     def test_home_loggedin(self):
         response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, "/producers/BIORAF1/")
+        self.assertEqual(response.url, "/producers/v2/BIORAF1/")
 
 class RestrictedUrlsTestLoggedinOperator(TestCase):
     def setUp(self):
