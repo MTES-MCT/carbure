@@ -14,7 +14,9 @@ urlpatterns = [
 
 
     path('producers/lot/delete', producers.delete_lots, name='api-v2-producers-delete-lots'),
-	path('producers/lot/validate', producers.validate_lots, name='api-v2-producers-validate-lots'),
+    path('producers/lot/validate', producers.validate_lots, name='api-v2-producers-validate-lots'),
+    path('producers/lot/duplicate', producers.duplicate_lot, name='api-v2-producers-duplicate-lot'),
+
 ]
 
 #path('producers/lots/corrections', producers_api.producers_lots_corrections, name='api-producers-lots-corrections'),
@@ -22,7 +24,6 @@ urlpatterns = [
 #path('producers/lots/all', producers_api.producers_lots_all, name='api-producers-lots-all'),
 
 #path('producers/lot/save', producers_api.producers_save_lot, name='producers-api-attestation-save-lot'),
-#path('producers/lot/duplicate', producers_api.producers_duplicate_lot, name='producers-api-duplicate-lot'),
 
 #path('producers/lot/comments', producers_api.producers_lot_comments, name='producers-api-lot-comments'),
 #path('producers/lot/save-comment', producers_api.producers_lot_save_comment, name='producers-api-save-comment'),

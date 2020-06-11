@@ -470,25 +470,19 @@ function preCheckAddLotSettings(columns) {
 }
 
 
-function duplicate_lot(lot_id) {
-  // get columns to duplicate
-  var addLotSettings = loadAddLotSettings()
-  var fields_to_ignore = []
-  for (let i = 0, len = addLotSettings.length; i < len; i++) {
-    if (addLotSettings[i] == 1) {
-      continue
-    }
-    let field_name = table_columns_drafts[i].data
-    fields_to_ignore.push(field_name)
-  }
-  let url = $("#duplicate_url").attr('data-url')
+function duplicate_lot(tx_id) {
+  var formdata = new FormData();
+  formdata.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
+  formdata.set('tx_id', tx_id)
   $.ajax({
-    url         : url,
-    data        : {'lot_id': lot_id, 'fields':fields_to_ignore, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+    url         : window.producers_api_lot_duplicate_v2,
+    data        : formdata,
     type        : 'POST',
+    processData : false,
+    contentType : false,
     success     : function(data, textStatus, jqXHR){
       // Callback code
-      window.table_drafts.ajax.reload()
+      window.table.ajax.reload()
       selected_rows.pop()
       manage_actions()
     },
@@ -578,8 +572,8 @@ function manage_delete_button() {
 
 function manage_duplicate_button() {
   if (selected_rows.length === 1) {
-    let lot_id = window.table.row(selected_rows[0]).data().pk
-    $("#duplicate_lot").attr("onclick", `duplicate_lot(${lot_id})`)
+    let tx_id = window.table.row(selected_rows[0]).data().tx.pk
+    $("#duplicate_lot").attr("onclick", `duplicate_lot(${tx_id})`)
     $("#duplicate_lot").addClass('primary')
     $("#duplicate_lot").css("pointer-events", "auto")
     $("#duplicate_lot").removeClass('secondary')
