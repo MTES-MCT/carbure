@@ -461,6 +461,32 @@ def get_received(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
+def get_corrections(request, *args, **kwargs):
+    context = kwargs['context']
+    transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status__in=['R', 'AC', 'AA'], lot__status="Validated")
+    lot_ids = [t.lot.id for t in transactions]
+    lots = LotV2.objects.filter(id__in=lot_ids)
+    sez = serializers.serialize('json', lots, use_natural_foreign_keys=True)
+    txsez = serializers.serialize('json', transactions, use_natural_foreign_keys=True)
+    return JsonResponse({'lots': sez, 'transactions': txsez})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def get_valid(request, *args, **kwargs):
+    context = kwargs['context']
+    transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], lot__status="Validated")
+    lot_ids = [t.lot.id for t in transactions]
+    lots = LotV2.objects.filter(id__in=lot_ids)
+    sez = serializers.serialize('json', lots, use_natural_foreign_keys=True)
+    txsez = serializers.serialize('json', transactions, use_natural_foreign_keys=True)
+    return JsonResponse({'lots': sez, 'transactions': txsez})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
 def delete_lots(request, *args, **kwargs):
     context = kwargs['context']
     lot_ids = request.POST.get('lots', None)
