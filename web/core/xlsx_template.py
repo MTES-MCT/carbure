@@ -70,6 +70,13 @@ def make_lots_sheet_v2_advanced(workbook, entity):
                          {'name': 'BONDUELLE', 'country': 'FR', 'production_site': 'NUEIL LES AUBIERS', 'ref': 'ISCC-FR-100001012', 'date':'2004/06/01', 'dc':'FR_042_2016'},
                          {'name': 'GEANTVERT', 'country': 'FR', 'production_site': 'BRUZAC', 'ref': 'ISCC-FR-100001013', 'date':'2005/04/01', 'dc':''},
                          {'name': 'GEANTVERT', 'country': 'FR', 'production_site': 'NIMES', 'ref': 'ISCC-FR-100001014', 'date':'1997/07/01', 'dc':'FR_002_2017'},
+                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-ES-100002010', 'date':'2016/02/01', 'dc':'ES_012_2016'},
+                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-ES-100005010', 'date':'2019/12/01', 'dc':''},
+                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-ES-100004010', 'date':'2007/11/01', 'dc':'ES_011_2018'},
+                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001011', 'date':'2001/01/01', 'dc':''},
+                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001012', 'date':'2004/06/01', 'dc':'FR_042_2016'},
+                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001013', 'date':'2005/04/01', 'dc':''},
+                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001014', 'date':'1997/07/01', 'dc':'FR_002_2017'},
                          ]
 
     foreign_clients = [{'name': 'BP', 'country': 'GB', 'delivery_site': 'DOVER'},

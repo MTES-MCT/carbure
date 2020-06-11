@@ -9,6 +9,8 @@ urlpatterns = [
     path('download-xlsx-template-advanced', producers.excel_template_download_advanced, name='api-v2-producers-excel-template-download-advanced'),
     path('lots/drafts', producers.get_drafts, name='api-v2-producers-get-drafts'),
     path('lots/received', producers.get_received, name='api-v2-producers-get-received'),
+    path('lots/corrections', producers.get_corrections, name='api-v2-producers-get-corrections'),
+    path('lots/valid', producers.get_valid, name='api-v2-producers-get-valid'),
 
 
     path('producers/lot/delete', producers.delete_lots, name='api-v2-producers-delete-lots'),
