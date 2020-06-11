@@ -390,6 +390,7 @@ $("#pagelength_lots_admin").on('change', function() {
 
 
 function loadTableSettings(table_columns, table_name) {
+  console.log(table_name)
   var tableSettings = localStorage.getItem(table_name);
   if (tableSettings === undefined || tableSettings === null) {
     let nb_columns = table_columns.length
@@ -1238,6 +1239,8 @@ function init_datatables_operators_declared() {
 
 function display_producers_lot_modal(table, columns, event) {
   // check if we clicked on the checkbox
+  console.log(event.target)
+  console.log(JSON.stringify(event.target))
   let colid = event.target._DT_CellIndex.column
   let rowid = event.target._DT_CellIndex.row
   let data = table.row(rowid).data()
@@ -1249,21 +1252,57 @@ function display_producers_lot_modal(table, columns, event) {
     return
   } else {
     let modal = document.getElementById("modal_edit_lot")
-    for (key in data) {
-      // set the value in the field
-      $(`#${key}`).val(data[key])
-      // reset error field to none
-      $(`#${key}_error`).html('')
+    $("#producer_name").val(data.fields.producer_is_in_carbure ? data.fields.carbure_producer : data.fields.unknown_producer)
+    if (data.errors['producer']) {
+      $("#producer_name_error").val(data.errors['producer'])
+    }
+    $("#production_site_name").val(data.fields.production_site_is_in_carbure ? data.fields.carbure_production_site.name : data.fields.unknown_production_site)
+    if (data.errors['production_site']) {
+      $("#production_site_name_error").val(data.errors['production_site'])
+    }
+    $("#production_site_country").val(data.fields.production_site_is_in_carbure ? data.fields.carbure_production_site.country.name : (data.fields.unknown_production_country ? data.fields.unknown_production_country.name : ''))
+    if (data.errors['production_site_country']) {
+      $("#production_site_country_error").val(data.errors['production_site_country'])
+    }
+    $("#volume").val(data.fields.volume)
+    if (data.errors['volume']) {
+      $("#volume_error").val(data.errors.volume)
+    }
+    $("#biocarburant").val(data.fields.biocarburant.name)
+    $("#biocarburant_code").val(data.fields.biocarburant.code)
+    if (data.errors['biocarburant']) {
+      $("#biocarburant_error").val(data.errors.biocarburant)
+    }
+    $("#matiere_premiere").val(data.fields.matiere_premiere.name)
+    $("#matiere_premiere_code").val(data.fields.matiere_premiere.code)
+    if (data.errors['matiere_premiere']) {
+      $("#matiere_premiere_error").val(data.errors.matiere_premiere)
+    }
+    $("#pays_origine").val(data.fields.pays_origine.name)
+    $("#pays_origine_code").val(data.fields.pays_origine.code_pays)
+    if (data.errors['pays_origine']) {
+      $("#pays_origine_error").val(data.errors.pays_origine)
     }
 
-    // override errors into the field
-    let lot_id = data['lot_id']
-    if (lot_id in lot_errors) {
-      let errors = lot_errors[lot_id]
-      for (key in errors) {
-        $(`#${key}`).val(errors[key])
-      }
+    console.log(data)
+    /* TX Related fields */
+    $("#dae").val(data.tx.fields.dae)
+    if (data.errors['dae']) {
+      $("#dae_error").val(data.errors.dae)
     }
+    $("#client").val(data.tx.fields.client_is_in_carbure ? data.tx.fields.carbure_client : data.tx.fields.unknown_client)
+    if (data.errors['client']) {
+      $("#client_error").val(data.errors.client)
+    }
+    $("#delivery_site").val(data.tx.fields.delivery_site_is_in_carbure ? data.tx.fields.carbure_delivery_site : data.tx.fields.unknown_delivery_site)
+    if (data.errors['delivery_site']) {
+      $("#delivery_site_error").val(data.errors.delivery_site)
+    }
+    $("#delivery_date").val(data.tx.fields.delivery_date)
+    if (data.errors['delivery_date']) {
+      $("#delivery_date_error").val(data.errors.delivery_date)
+    }
+
 
     // non-input keys
     ['ghg_total', 'ghg_reduction'].forEach(function(item, index) {
@@ -1272,6 +1311,7 @@ function display_producers_lot_modal(table, columns, event) {
     $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data['ghg_reference']} gCO2eq/MJ`)
 
     /* load errors */
+    /*
     $.ajax({url: window.producers_api_lot_errors,
       data: {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
       type        : 'POST',
@@ -1292,9 +1332,10 @@ function display_producers_lot_modal(table, columns, event) {
           console.log(`server error ${JSON.stringify(e)}`)
         }
       }
-    })
+    })*/
 
     /* load comments */
+    /*
     $.ajax({
       url         : window.producers_api_lot_comments,
       data        : {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
@@ -1325,7 +1366,7 @@ function display_producers_lot_modal(table, columns, event) {
           console.log(`server error ${JSON.stringify(e)}`)
         }
       }
-    })
+    })*/
 
     /* warning if the lot is validated */
     if (data['status'] == 'Validated') {
@@ -1640,12 +1681,18 @@ const dt_drafts_config = {
     lots = JSON.parse(res['lots'])
     for (let i = 0, len = lots.length; i < len; i++) {
     	let lot = lots[i]
-    	data[lot.pk] = lot
+      data[lot.pk] = lot
+    	data[lot.pk].errors = {}
     }
     txs = JSON.parse(res['transactions'])
     for (let i = 0, len = txs.length; i < len; i++) {
     	let tx = txs[i]
     	data[tx.fields.lot].tx = tx
+    }
+    errors = JSON.parse(res['errors'])
+    for (let i = 0, len = errors.length; i < len; i++) {
+      let error = errors[i]
+      data[error.fields.lot].errors[error.field] = error
     }
     list = Object.values(data)
     return list
