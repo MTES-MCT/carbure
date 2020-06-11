@@ -6,6 +6,7 @@ from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max, Min
 from django.core import serializers
+from django.db.models.fields import NOT_PROVIDED
 
 from core.decorators import enrich_with_user_details, restrict_to_producers
 from core.xlsx_template import create_template_xlsx_v2_simple, create_template_xlsx_v2_advanced
@@ -97,17 +98,18 @@ def load_excel_lot(context, lot_row):
                                                        defaults={'value': None})
     if lot.producer_is_in_carbure is False:
         if 'production_site_country' in lot_row:
-            try:
-                country = Pays.objects.get(code_pays=lot_row['production_site_country'])
-                lot.unknown_production_country = country
-            except Exception:
-                error, c = LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_country',
-                                                               error='Champ production_site_country incorrect',
-                                                               defaults={'value': lot_row['production_site_country']})
+            production_site_country = lot_row['production_site_country']
+            if production_site_country is None:
+                lot.unknown_production_country = None
+            else:
+                try:
+                    country = Pays.objects.get(code_pays=production_site_country)
+                except Exception:
+                    error, c = LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_country',
+                                                                   error='Champ production_site_country incorrect',
+                                                                   defaults={'value': production_site_country})
         else:
-            error, c = LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_country',
-                                                           error='Merci de préciser une valeur dans le champ production_site_country',
-                                                           defaults={'value': None})
+            lot.unknown_production_country = None
 
     if 'biocarburant_code' in lot_row:
         biocarburant = lot_row['biocarburant_code']
@@ -501,6 +503,47 @@ def delete_lots(request, *args, **kwargs):
         except Exception as e:
             errors.append({'message': 'Impossible de supprimer le lot %s: introuvable ou déjà validé' % (), 'extra': str(e)})
     return JsonResponse({'status': 'success', 'message': '%d lots supprimés' % (len(ids) - len(errors)), 'errors': errors})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def duplicate_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    tx_id = request.POST.get('tx_id', None)
+    try:
+        tx = LotTransaction.objects.get(id=tx_id, carbure_vendor=context['user_entity'])
+        lot = tx.lot
+        lot.pk = None
+        lot.save()
+        tx.pk = None
+        tx.lot = lot
+        tx.save()
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': 'Could not find lot to duplicate', 'extra':str(e)})
+    # hardcoded fields to remove
+    lot_fields_to_remove = ['carbure_id', 'status']
+    tx_fields_to_remove = ['dae', 'ea_delivery_status']
+    # optional fields to remove (user configuration)
+    lot_meta_fields = {f.name: f for f in LotV2._meta.get_fields()}
+    tx_meta_fields = {f.name: f for f in LotTransaction._meta.get_fields()}
+    for f in lot_fields_to_remove:
+        if f in lot_meta_fields:
+            meta_field = lot_meta_fields[f]
+            if meta_field.default != NOT_PROVIDED:
+                setattr(lot, f, meta_field.default)
+            else:
+                setattr(lot, f, '')
+    lot.save()
+    for f in tx_fields_to_remove:
+        if f in tx_meta_fields:
+            meta_field = tx_meta_fields[f]
+            if meta_field.default != NOT_PROVIDED:
+                setattr(tx, f, meta_field.default)
+            else:
+                setattr(tx, f, '')
+    tx.save()
+    return JsonResponse({'status': 'success', 'message': 'OK, lot %d created' % (lot.id)})
 
 
 @login_required
