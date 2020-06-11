@@ -256,7 +256,7 @@ class LotTransaction(models.Model):
     delivery_site_is_in_carbure = models.BooleanField(default=True)
     carbure_delivery_site = models.ForeignKey(Depot, null=True, blank=True, on_delete=models.SET_NULL)
     unknown_delivery_site = models.CharField(max_length=64, blank=True, default='')
-    unknown_delivery_site_country = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='unknown_delivery_site_country')
+    unknown_delivery_site_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.SET_NULL, related_name='unknown_delivery_site_country')
     delivery_status = models.CharField(max_length=64, choices=DELIVERY_STATUS, default='N')
 
     # ghg impact
