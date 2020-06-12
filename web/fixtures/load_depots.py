@@ -5,7 +5,7 @@ import csv
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import Depot
+from core.models import Depot, Pays
 
 filename = '%s/web/fixtures/csv/depots.csv' % (os.environ['CARBURE_HOME'])
 
