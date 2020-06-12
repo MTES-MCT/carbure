@@ -1294,7 +1294,7 @@ function display_producers_lot_modal(table, columns, event) {
     if (data.errors['client']) {
       $("#client_error").val(data.errors.client)
     }
-    $("#delivery_site").val(data.tx.fields.delivery_site_is_in_carbure ? data.tx.fields.carbure_delivery_site : data.tx.fields.unknown_delivery_site)
+    $("#delivery_site").val(data.tx.fields.delivery_site_is_in_carbure ? data.tx.fields.carbure_delivery_site.name : data.tx.fields.unknown_delivery_site)
     if (data.errors['delivery_site']) {
       $("#delivery_site_error").val(data.errors.delivery_site)
     }
@@ -1303,12 +1303,21 @@ function display_producers_lot_modal(table, columns, event) {
       $("#delivery_date_error").val(data.errors.delivery_date)
     }
 
+    /* Greenhouse gases values */
+    $("#eec").val(data.fields.eec)
+    $("#el").val(data.fields.el)
+    $("#ep").val(data.fields.ep)
+    $("#etd").val(data.fields.etd)
+    $("#eu").val(data.fields.eu)
+    $("#esca").val(data.fields.esca)
+    $("#eccs").val(data.fields.eccs)
+    $("#eccr").val(data.fields.eccr)
+    $("#eee").val(data.fields.eee)
 
     // non-input keys
-    ['ghg_total', 'ghg_reduction'].forEach(function(item, index) {
-      $(`#${item}`).html(data[item])
-    })
-    $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data['ghg_reference']} gCO2eq/MJ`)
+    $("#ghg_total").html(data.fields.ghg_total)
+    $("#ghg_reduction").html(`${data.fields.ghg_reduction}%`)
+    $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data.fields.ghg_reference} gCO2eq/MJ`)
 
     /* load errors */
     /*
@@ -1616,6 +1625,12 @@ $(".autocomplete_production_sites").autocomplete({
   serviceUrl: window.producers_api_production_sites_autocomplete,
   dataType: 'json',
   minChars: 0,
+  onSelect: function(suggestion) {
+    $("#production_site_id").val(suggestion.data)
+  },
+  onInvalidateSelection: function() {
+    $("#production_site_id").val('')
+  }
 })
 
 $(".autocomplete_countries").autocomplete({
@@ -1633,6 +1648,12 @@ $(".autocomplete_operators").autocomplete({
   serviceUrl: window.api_operators_autocomplete,
   dataType: 'json',
   minChars: 0,
+  onSelect: function(suggestion) {
+    $("#client_id").val(suggestion.data)
+  },
+  onInvalidateSelection: function() {
+    $("#client_id").val('')
+  }
 })
 
 $(".autocomplete_depots").autocomplete({
@@ -1640,8 +1661,17 @@ $(".autocomplete_depots").autocomplete({
   dataType: 'json',
   minChars: 1,
   onSelect: function(suggestion) {
-    $("#ea_delivery_site").val(suggestion.name)
+    $("#delivery_site").val(suggestion.name)
+    $("#delivery_site_id").val(suggestion.depot_id)
+    $("#delivery_site_country_code").val(suggestion.country_code)
+    $("#delivery_site_country").val(suggestion.country_name)
   },
+  onInvalidateSelection: function() {
+    $("#delivery_site").val('')
+    $("#delivery_site_id").val('')
+    $("#delivery_site_country_code").val('')
+    $("#delivery_site_country").val('')
+  }
 })
 
 const dt_drafts_config = {
