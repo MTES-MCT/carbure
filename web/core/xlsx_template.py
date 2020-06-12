@@ -29,7 +29,7 @@ def make_lots_sheet(workbook, entity):
 
     volumes = [1200, 2800, 8000, 4500, 13000]
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
-    today = datetime.date.today().strftime('%d/%m/%Y')
+    today = datetime.date.today().strftime('%Y-%m-%d')
     for i in range(10):
         p = random.choice(psites)
         mp = random.choice(mps)
@@ -100,7 +100,7 @@ def make_lots_sheet_v2_advanced(workbook, entity):
 
     volumes = [1200, 2800, 8000, 4500, 13000, 35000, 34960, 27854, 18000]
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
-    today = datetime.date.today().strftime('%d/%m/%Y')
+    today = datetime.date.today().strftime('%Y-%m-%d')
     for i in range(10):
         mp = random.choice(mps)
         ea = random.choice(eas)
@@ -150,7 +150,7 @@ def make_lots_sheet_v2_simple(workbook, entity):
 
     volumes = [1200, 2800, 8000, 4500, 13000]
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
-    today = datetime.date.today().strftime('%d/%m/%Y')
+    today = datetime.date.today().strftime('%Y-%m-%d')
     for i in range(10):
         mp = random.choice(mps)
         ea = random.choice(eas)
@@ -211,7 +211,7 @@ def make_operators_lots_sheet(workbook, entity):
 
     volumes = [1200, 2800, 8000, 4500, 13000, 35000, 34960, 27854, 18000]
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
-    today = datetime.date.today().strftime('%d/%m/%Y')
+    today = datetime.date.today().strftime('%Y-%m-%d')
     for i in range(10):
         mp = random.choice(mps)
         vendor = random.choice(vendors)

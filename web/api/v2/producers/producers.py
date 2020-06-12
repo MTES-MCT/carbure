@@ -665,13 +665,14 @@ def save_lot(request, *args, **kwargs):
                                                            defaults={'value': production_site_name})
 
     if lot.producer_is_in_carbure is False:
-        production_site_country_id = request.POST.get('production_site_country_id', '')
+        production_site_country_code = request.POST.get('production_site_country_code', '')
         production_site_country = request.POST.get('production_site_country', '')
-        if production_site_country_id == '':
+        if production_site_country_code == '':
             lot.unknown_production_country = None
         else:
             try:
-                country = Pays.objects.get(code_pays=production_site_country_id)
+                country = Pays.objects.get(code_pays=production_site_country_code)
+                lot.unknown_production_country = country
             except Exception:
                 lot.unknown_production_country = None
                 error, c = LotV2Error.objects.update_or_create(lot=lot, field='production_site_country',
@@ -826,6 +827,7 @@ def save_lot(request, *args, **kwargs):
         TransactionError.objects.filter(tx=transaction, field='dae').delete()
 
     delivery_date = request.POST.get('delivery_date', '')
+    print(delivery_date)
     if delivery_date == '':
         transaction.ea_delivery_date = None
         lot.period = ''
@@ -834,12 +836,12 @@ def save_lot(request, *args, **kwargs):
                                                          defaults={'value': None})
     else:
         try:
-            dd = datetime.datetime.strptime(delivery_date, '%d/%m/%Y')
+            dd = datetime.datetime.strptime(delivery_date, '%Y-%m-%d')
             transaction.delivery_date = dd
             lot.period = dd.strftime('%Y-%m')
             TransactionError.objects.filter(tx=transaction, field='delivery_date').delete()
         except Exception:
-            msg = "Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA"
+            msg = "Format de date incorrect: veuillez entrer une date au format AAAA-MM-JJ"
             e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_date',
                                                              error=msg,
                                                              defaults={'value': delivery_date})
@@ -867,7 +869,7 @@ def save_lot(request, *args, **kwargs):
     delivery_site_name = request.POST.get('delivery_site')
     if delivery_site_id != '':
         try:
-            delivery_site = Depot.objects.get(id=delivery_site_id)
+            delivery_site = Depot.objects.get(depot_id=delivery_site_id)
             transaction.delivery_site_is_in_carbure = True
             transaction.carbure_delivery_site = delivery_site
             transaction.unknown_delivery_site = ''
@@ -904,4 +906,4 @@ def save_lot(request, *args, **kwargs):
     transaction.champ_libre = request.POST.get('champ_libre', '')
     transaction.save()
     lot.save()
-    return JsonResponse({'status': 'success', 'lot_id': lot.id})
+    return JsonResponse({'status': 'success', 'lot_id': lot.id, 'transaction_id': transaction.id})
