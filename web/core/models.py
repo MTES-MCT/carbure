@@ -16,7 +16,7 @@ class Entity(models.Model):
         return self.name
 
     def natural_key(self):
-        return self.name
+        return {'name': self.name, 'id': self.id}
 
     def url_friendly_name(self):
         return self.name.replace(' ', '').upper()
@@ -120,7 +120,7 @@ class Depot(models.Model):
         return self.name
 
     def natural_key(self):
-        return {'depot_id': self.depot_id, 'name': self.name, 'city': self.city, 'country': self.country}
+        return {'depot_id': self.depot_id, 'name': self.name, 'city': self.city, 'country': self.country.natural_key()}
 
     class Meta:
         db_table = 'depots'
