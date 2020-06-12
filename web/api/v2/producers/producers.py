@@ -622,6 +622,7 @@ def save_lot(request, *args, **kwargs):
     context = kwargs['context']
     # new lot or edit?
     lot_id = request.POST.get('lot_id', None)
+    existing_lot = True
     if lot_id:
         try:
             lot = LotV2.objects.get(id=lot_id)
@@ -633,6 +634,7 @@ def save_lot(request, *args, **kwargs):
         # create empty lot
         lot = LotV2()
         lot.source = 'MANUAL'
+        existing_lot = False
         lot.save()
 
     entity = context['user_entity']
@@ -821,12 +823,14 @@ def save_lot(request, *args, **kwargs):
     lot.ghg_reduction = round((1.0 - (lot.ghg_total / lot.ghg_reference)) * 100.0, 2)
     lot.save()
 
-    transaction = LotTransaction()
-    transaction.lot = lot
-    transaction.save()
+    if existing_lot is False:
+        transaction = LotTransaction()
+        transaction.lot = lot
+        transaction.save()
+    else:
+        transaction = LotTransaction.objects.get(lot=lot)
     transaction.vendor_is_in_carbure = True
     transaction.carbure_vendor = entity
-
     transaction.dae = request.POST.get('dae', '')
     if transaction.dae == '':
         e, c = TransactionError.objects.update_or_create(tx=transaction, field='dae', error="Merci de préciser le numéro de DAE/DAU",
