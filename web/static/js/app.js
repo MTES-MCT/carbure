@@ -1634,10 +1634,15 @@ $(".autocomplete_production_sites").autocomplete({
   dataType: 'json',
   minChars: 0,
   onSelect: function(suggestion) {
+    console.log(suggestion)
     $("#production_site_id").val(suggestion.data)
+    $("#production_site_country").val(suggestion.country.name)
+    $("#production_site_country_code").val(suggestion.country.code_pays)
   },
   onInvalidateSelection: function() {
     $("#production_site_id").val('')
+    $("#production_site_country").val('')
+    $("#production_site_country_code").val('')
   }
 })
 

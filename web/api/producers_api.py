@@ -516,7 +516,7 @@ def producers_prod_site_autocomplete(request, *args, **kwargs):
     q = request.GET['query']
     producer = context['user_entity']
     production_sites = ProductionSite.objects.filter(producer=producer, name__icontains=q)
-    return JsonResponse({'suggestions': [{'value': s.name, 'data': s.id} for s in production_sites]})
+    return JsonResponse({'suggestions': [{'value': s.name, 'data': s.id, 'country': s.country.natural_key()} for s in production_sites]})
 
 
 @login_required

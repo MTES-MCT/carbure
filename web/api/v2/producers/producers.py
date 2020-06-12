@@ -290,12 +290,15 @@ def load_excel_lot(context, lot_row):
     else:
         try:
             delivery_date = lot_row['delivery_date']
-            dd = datetime.datetime.strptime(delivery_date, '%d/%m/%Y')
+            year = int(delivery_date[0:4])
+            month = int(delivery_date[5:7])
+            day = int(delivery_date[8:10])
+            dd = datetime.date(year=year, month=month, day=day)
             transaction.delivery_date = dd
             lot.period = dd.strftime('%Y-%m')
             TransactionError.objects.filter(tx=transaction, field='delivery_date').delete()
         except Exception:
-            msg = "Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA"
+            msg = "Format de date incorrect: veuillez entrer une date au format AAAA-MM-JJ"
             e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_date',
                                                              error=msg,
                                                              defaults={'value': delivery_date})
@@ -560,10 +563,13 @@ def validate_lots(request, *args, **kwargs):
     for lotid in ids:
         try:
             lot = LotV2.objects.get(id=lotid, added_by=context['user_entity'], status='Draft')
+            print('got lot')
             # we use .get() below because we should have a single transaction for this lot
             tx = LotTransaction.objects.get(lot=lot)
+            print('got tx')
+            print(tx)
         except Exception as e:
-            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Impossible de valider le lot %s: introuvable ou déjà validé' % (), 'extra': str(e)})
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Impossible de valider le lot: introuvable ou déjà validé' % (), 'extra': str(e)})
             continue
         # make sure all mandatory fields are set
         if not tx.dae:
@@ -605,6 +611,7 @@ def validate_lots(request, *args, **kwargs):
             results.append({'lot_id': lotid, 'status': 'error', 'message': 'Erreur lors de la validation du lot'})
             continue
         results.append({'lot_id': lotid, 'status': 'sucess'})
+    print({'status': 'success', 'message': results})
     return JsonResponse({'status': 'success', 'message': results})
 
 
@@ -654,8 +661,9 @@ def save_lot(request, *args, **kwargs):
     else:
         try:
             ps = ProductionSite.objects.get(id=production_site_id, producer=entity)
-            lot.producer_is_in_carbure = True
+            lot.production_site_is_in_carbure = True
             lot.carbure_production_site = ps
+            lot.unknown_production_site = ''
         except Exception:
             lot.production_site_is_in_carbure = False
             lot.carbure_production_site = None
@@ -664,7 +672,7 @@ def save_lot(request, *args, **kwargs):
                                                            error='Site de production %s inconnu pour %s' % (production_site_name, entity.name),
                                                            defaults={'value': production_site_name})
 
-    if lot.producer_is_in_carbure is False:
+    if lot.production_site_is_in_carbure is False:
         production_site_country_code = request.POST.get('production_site_country_code', '')
         production_site_country = request.POST.get('production_site_country', '')
         if production_site_country_code == '':
@@ -827,7 +835,6 @@ def save_lot(request, *args, **kwargs):
         TransactionError.objects.filter(tx=transaction, field='dae').delete()
 
     delivery_date = request.POST.get('delivery_date', '')
-    print(delivery_date)
     if delivery_date == '':
         transaction.ea_delivery_date = None
         lot.period = ''
@@ -836,7 +843,10 @@ def save_lot(request, *args, **kwargs):
                                                          defaults={'value': None})
     else:
         try:
-            dd = datetime.datetime.strptime(delivery_date, '%Y-%m-%d')
+            year = int(delivery_date[0:4])
+            month = int(delivery_date[5:7])
+            day = int(delivery_date[8:10])
+            dd = datetime.date(year=year, month=month, day=day)
             transaction.delivery_date = dd
             lot.period = dd.strftime('%Y-%m')
             TransactionError.objects.filter(tx=transaction, field='delivery_date').delete()
@@ -861,7 +871,8 @@ def save_lot(request, *args, **kwargs):
     else:
         transaction.client_is_in_carbure = False
         transaction.carbure_client = None
-        transaction.unknown_client = ''
+        transaction.unknown_client = client_name
+    if transaction.client_is_in_carbure is False and transaction.unknown_client == '':
         e, c = TransactionError.objects.update_or_create(tx=transaction, field='client',
                                                          defaults={'value': None, 'error': "Merci de préciser un client"})
 
@@ -886,11 +897,11 @@ def save_lot(request, *args, **kwargs):
                                                          defaults={'value': None, 'error': "Merci de préciser un site de livraison"})
 
     if transaction.delivery_site_is_in_carbure is False:
-        delivery_site_country_id = request.POST.get('delivery_site_country_id', '')
+        delivery_site_country_code = request.POST.get('delivery_site_country_code', '')
         delivery_site_country_name = request.POST.get('delivery_site_country', '')
-        if delivery_site_country_id != '':
+        if delivery_site_country_code != '':
             try:
-                country = Pays.objects.get(code_pays=delivery_site_country_id)
+                country = Pays.objects.get(code_pays=delivery_site_country_code)
                 transaction.unknown_delivery_site_country = country
             except Exception:
                 error, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site_country',
