@@ -14,7 +14,7 @@ class PublicApiTest(TestCase):
         MatierePremiere.objects.update_or_create(name="Maïs", code="MAIS")
         MatierePremiere.objects.update_or_create(name="Huiles végétales diverses", code="HVD")
 
-        Pays.objects.update_or_create(name='France', code_pays='FR')
+        france, c = Pays.objects.update_or_create(name='France', code_pays='FR')
         Pays.objects.update_or_create(name='Portugal', code_pays='PO')
 
         Entity.objects.update_or_create(name="BIORAF1", entity_type="Producteur")
@@ -28,7 +28,7 @@ class PublicApiTest(TestCase):
         Entity.objects.update_or_create(name="DGEC", entity_type="Administration")
         Entity.objects.update_or_create(name="Douane", entity_type="Administration")
 
-        Depot.objects.update_or_create(name="DEPOTTEST", depot_id="111", city="Paris")
+        Depot.objects.update_or_create(name="DEPOTTEST", depot_id="111", city="Paris", country=france)
 
     def test_bc_autocomplete(self):
         base_url = reverse('api-biocarburant-autocomplete')
