@@ -54,7 +54,7 @@ def load_excel_lot(context, lot_row):
                 lot.carbure_producer = None
                 lot.unknown_producer = lot_row['producer']
     else:
-        print('No producer in excel sheet. ')
+        # print('No producer in excel sheet. ')
         # default, current entity is the producer
         lot.producer_is_in_carbure = False
         lot.carbure_producer = None
@@ -117,7 +117,6 @@ def load_excel_lot(context, lot_row):
             lot.biocarburant = Biocarburant.objects.get(code=biocarburant)
             LotV2Error.objects.filter(lot=lot, field='biocarburant_code').delete()
         except Exception as e:
-            print('Exception fetching biocarburant named %s: %s' % (biocarburant, e))
             lot.biocarburant = None
             error, c = LotV2Error.objects.update_or_create(lot=lot, field='biocarburant_code',
                                                            error='Biocarburant inconnu',
@@ -563,11 +562,8 @@ def validate_lots(request, *args, **kwargs):
     for lotid in ids:
         try:
             lot = LotV2.objects.get(id=lotid, added_by=context['user_entity'], status='Draft')
-            print('got lot')
             # we use .get() below because we should have a single transaction for this lot
             tx = LotTransaction.objects.get(lot=lot)
-            print('got tx')
-            print(tx)
         except Exception as e:
             results.append({'lot_id': lotid, 'status': 'error', 'message': 'Impossible de valider le lot: introuvable ou déjà validé' % (), 'extra': str(e)})
             continue
@@ -611,7 +607,7 @@ def validate_lots(request, *args, **kwargs):
             results.append({'lot_id': lotid, 'status': 'error', 'message': 'Erreur lors de la validation du lot'})
             continue
         results.append({'lot_id': lotid, 'status': 'sucess'})
-    print({'status': 'success', 'message': results})
+    # print({'status': 'success', 'message': results})
     return JsonResponse({'status': 'success', 'message': results})
 
 
