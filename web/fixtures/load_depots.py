@@ -15,6 +15,8 @@ with open(filename) as csvfile:
         name = row[0]
         depot_id = row[1]
         city = row[2]
+        country = row[3]
         if city == "Ville":
             continue
-        obj, created = Depot.objects.update_or_create(depot_id=depot_id, defaults={'name': name, 'city':city})
+        country_obj = Pays.objects.get(code_pays=country)
+        obj, created = Depot.objects.update_or_create(depot_id=depot_id, defaults={'name': name, 'city':city, 'country': country_obj})

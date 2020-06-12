@@ -114,12 +114,13 @@ class Depot(models.Model):
     name = models.CharField(max_length=128, null=False, blank=False)
     city = models.CharField(max_length=128, null=True, blank=True)
     depot_id = models.CharField(max_length=32, null=False, blank=False)
+    country = models.ForeignKey(Pays, null=True, blank=False, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.name
 
     def natural_key(self):
-        return {'depot_id': self.depot_id, 'name': self.name, 'city': self.city}
+        return {'depot_id': self.depot_id, 'name': self.name, 'city': self.city, 'country': self.country}
 
     class Meta:
         db_table = 'depots'
