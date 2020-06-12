@@ -2420,8 +2420,8 @@ function init_datatables_generic(tab_name) {
     }
     window[config.id] = table
     window.table = table
-    var producerDraftsTableSettingsV2 = loadTableSettings(config.col_definition, 'producerDraftsTableSettingsV2')
-    showHideTableColumns(table, producerDraftsTableSettingsV2, 'drafts')
+    var tablesettings = loadTableSettings(config.col_definition, 'tab_name')
+    showHideTableColumns(table, tablesettings, tab_name)
   } else {
     window[config.id].draw()
     window.table = window[config.id]
