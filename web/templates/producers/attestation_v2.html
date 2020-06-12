@@ -283,9 +283,9 @@
           <dt>Producteur</dt>
           <dd><input type="text" id="producer_name" /><span id="producer_name_error" style="color:tomato;"></span></dd>
           <dt>Site de Production</dt>
-          <dd><input type="text" id="production_site_name" class="autocomplete_production_sites" /><span id="production_site_name_error" style="color:tomato;"></span></dd>
+          <dd><input type="text" id="production_site_name" class="autocomplete_production_sites" /><span id="production_site_name_error" style="color:tomato;"></span><input type="hidden" id="production_site_id" /></dd>
           <dt>Pays de Production</dt>
-          <dd><input type="text" id="production_site_country" /><span id="production_site_country_error" style="color:tomato;"></span></dd>
+          <dd><input type="text" id="production_site_country" /><span id="production_site_country_error" style="color:tomato;"></span><input type="hidden" id="production_site_country_code" /></dd>
           <dt>Volume à 20°C en Litres</dt>
           <dd><input type="text" id="volume" /><span id="volume_error" style="color:tomato;"></span></dd>
           <dt>Biocarburant</dt>
@@ -302,9 +302,11 @@
         <dt><label for="dae">Numéro douanier</label></dt>
         <dd><input id="dae" type="text" /><span id="dae_error" style="color:tomato;"></span></dd>
         <dt><label for="client">Client</label></dt>
-        <dd><input type="text" id="client" class="autocomplete_operators" /><span id="client_error" style="color:tomato;"></span></dd>
+        <dd><input type="text" id="client" class="autocomplete_operators" /><span id="client_error" style="color:tomato;"></span><input type="hidden" id="client_id" /></dd>
         <dt><label for="delivery_site">Site de livraison</label></dt>
-        <dd><input id="delivery_site" type="text" class="autocomplete_depots" /><span id="delivery_site_error" style="color:tomato;"></span></dd>
+        <dd><input id="delivery_site" type="text" class="autocomplete_depots" /><span id="delivery_site_error" style="color:tomato;"></span><input type="hidden" id="delivery_site_id" /></dd>
+        <dt><label for="delivery_site_country">Pays de livraison</label></dt>
+        <dd><input id="delivery_site_country" type="text" class="autocomplete_countries" /><span id="delivery_site_country_error" style="color:tomato;"></span><input type="hidden" id="delivery_site_country_code" /></dd>
         <dt><label for="delivery_date">Date de livraison</label></dt>
         <dd><input id="delivery_date" type="text" placeholder="JJ/MM/AAAA" /><span id="delivery_date_error" style="color:tomato;"></span></dd>
         <dt><label for="client_id">Champ Libre</label></dt>
@@ -397,6 +399,7 @@ window.producers_api_lots_received_v2 = "{% url 'api-v2-producers-get-received' 
 window.producers_api_lots_corrections_v2 = "{% url 'api-v2-producers-get-corrections' %}"
 window.producers_api_lots_valid_v2 = "{% url 'api-v2-producers-get-valid' %}"
 window.producers_api_lot_duplicate_v2 = "{% url 'api-v2-producers-duplicate-lot' %}"
+window.producers_api_lot_save_v2 = "{% url 'api-v2-producers-save-lot' %}"
 
 /*
 window.producers_api_lot_errors = "{% url 'producers-api-lot-errors' %}"

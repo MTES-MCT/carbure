@@ -606,3 +606,302 @@ def validate_lots(request, *args, **kwargs):
             continue
         results.append({'lot_id': lotid, 'status': 'sucess'})
     return JsonResponse({'status': 'success', 'message': results})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def save_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    # new lot or edit?
+    lot_id = request.POST.get('lot_id', None)
+    if lot_id:
+        try:
+            lot = LotV2.objects.get(id=lot_id)
+            if lot.added_by != context['user_entity']:
+                return JsonResponse({'status': 'error', 'message': "Permission denied"}, status=403)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': "Lot inconnu", 'extra': str(e)}, status=400)
+    else:
+        # create empty lot
+        lot = LotV2()
+        lot.source = 'MANUAL'
+        lot.save()
+
+    entity = context['user_entity']
+    lot.added_by = entity
+    producer_name = request.POST.get('producer_name', '')
+    if not producer_name:
+        lot.producer_is_in_carbure = False
+        lot.unknown_producer = ''
+        lot.carbure_producer = None
+    elif producer_name != entity.name:
+        lot.producer_is_in_carbure = False
+        lot.unknown_producer = producer_name
+        lot.carbure_producer = None
+    else:
+        lot.producer_is_in_carbure = True
+        lot.unknown_producer = ''
+        lot.carbure_producer = entity
+
+    production_site_id = request.POST.get('production_site_id', '')
+    production_site_name = request.POST.get('production_site_name', '')
+    if production_site_id == '':
+        # production site entered manually without autocomplete.
+        lot.production_site_is_in_carbure = False
+        lot.carbure_production_site = None
+        lot.unknown_production_site = production_site_name
+    else:
+        try:
+            ps = ProductionSite.objects.get(id=production_site_id, producer=entity)
+            lot.producer_is_in_carbure = True
+            lot.carbure_production_site = ps
+        except Exception:
+            lot.production_site_is_in_carbure = False
+            lot.carbure_production_site = None
+            lot.unknown_production_site = ''
+            error, c = LotV2Error.objects.update_or_create(lot=lot, field='production_site_name',
+                                                           error='Site de production %s inconnu pour %s' % (production_site_name, entity.name),
+                                                           defaults={'value': production_site_name})
+
+    if lot.producer_is_in_carbure is False:
+        production_site_country_id = request.POST.get('production_site_country_id', '')
+        production_site_country = request.POST.get('production_site_country', '')
+        if production_site_country_id == '':
+            lot.unknown_production_country = None
+        else:
+            try:
+                country = Pays.objects.get(code_pays=production_site_country_id)
+            except Exception:
+                lot.unknown_production_country = None
+                error, c = LotV2Error.objects.update_or_create(lot=lot, field='production_site_country',
+                                                               error='Pays de production inconnu',
+                                                               defaults={'value': production_site_country})
+
+    biocarburant_code = request.POST.get('biocarburant_code', '')
+    biocarburant_name = request.POST.get('biocarburant', '')
+    if biocarburant_code == '':
+        lot.biocarburant = None
+        error, c = LotV2Error.objects.update_or_create(lot=lot, field='biocarburant',
+                                                       error='Biocarburant inconnu',
+                                                       defaults={'value': biocarburant_name})
+    else:
+        try:
+            lot.biocarburant = Biocarburant.objects.get(code=biocarburant_code)
+        except Exception:
+            lot.biocarburant = None
+            error, c = LotV2Error.objects.update_or_create(lot=lot, field='biocarburant',
+                                                           error='Biocarburant inconnu',
+                                                           defaults={'value': biocarburant_name})
+    mp_code = request.POST.get('matiere_premiere_code', '')
+    mp_name = request.POST.get('matiere_premiere', '')
+    if mp_code == '':
+        lot.matiere_premiere = None
+        error, c = LotV2Error.objects.update_or_create(lot=lot, field='matiere_premiere',
+                                                       error='Matière première inconnue',
+                                                       defaults={'value': mp_name})
+    else:
+        try:
+            lot.matiere_premiere = MatierePremiere.objects.get(code=mp_code)
+        except Exception:
+            lot.matiere_premiere = None
+            error, c = LotV2Error.objects.update_or_create(lot=lot, field='matiere_premiere',
+                                                           error='Matière Première inconnue',
+                                                           defaults={'value': mp_name})
+
+    volume = request.POST.get('volume', 0)
+    try:
+        lot.volume = float(volume)
+        LotV2Error.objects.filter(lot=lot, field='volume').delete()
+    except Exception:
+        lot.volume = 0
+        e, c = LotV2Error.objects.update_or_create(lot=lot, field='volume',
+                                                   error='Format du volume incorrect', defaults={'value': volume})
+
+    pays_origine = request.POST.get('pays_origine', '')
+    pays_origine_code = request.POST.get('pays_origine_code', '')
+    if pays_origine_code == '':
+        lot.pays_origine = None
+        error, c = LotV2Error.objects.update_or_create(lot=lot, field='pays_origine',
+                                                       error="Merci de préciser le pays d'origine de la matière première",
+                                                       defaults={'value': pays_origine})
+    else:
+        try:
+            lot.pays_origine = Pays.objects.get(code_pays=pays_origine_code)
+            LotV2Error.objects.filter(lot=lot, field='pays_origine_code').delete()
+        except Exception:
+            lot.pays_origine = None
+            error, c = LotV2Error.objects.update_or_create(lot=lot, field='pays_origine',
+                                                           error='Pays inconnu',
+                                                           defaults={'value': pays_origine})
+    lot.eec = 0
+    eec = request.POST.get('eec', 0)
+    try:
+        lot.eec = float(eec)
+    except Exception:
+        error, c = LotV2Error.objects.update_or_create(lot=lot, field='eec',
+                                                       error='Format non reconnu',
+                                                       defaults={'value': eec})
+    lot.el = 0
+    el = request.POST.get('el', 0)
+    try:
+        lot.el = float(el)
+    except Exception:
+        error, c = LotV2Error.objects.update_or_create(lot=lot, field='el',
+                                                       error='Format non reconnu',
+                                                       defaults={'value': el})
+    lot.ep = 0
+    ep = request.POST.get('ep', 0)
+    try:
+        lot.ep = float(ep)
+    except Exception:
+        error, c = LotV2Error.objects.update_or_create(lot=lot, field='ep',
+                                                       error='Format non reconnu',
+                                                       defaults={'value': ep})
+    lot.etd = 0
+    etd = request.POST.get('etd', 0)
+    try:
+        lot.etd = float(etd)
+    except Exception:
+        error, c = LotV2Error.objects.update_or_create(lot=lot, field='etd',
+                                                       error='Format non reconnu',
+                                                       defaults={'value': etd})
+    lot.eu = 0
+    eu = request.POST.get('eu', 0)
+    try:
+        lot.eu = float(eu)
+    except Exception:
+        error, c = LotV2Error.objects.update_or_create(lot=lot, field='eu',
+                                                       error='Format non reconnu',
+                                                       defaults={'value': eu})
+    lot.esca = 0
+    esca = request.POST.get('esca', 0)
+    try:
+        lot.esca = float(esca)
+    except Exception:
+        error, c = LotV2Error.objects.update_or_create(lot=lot, field='esca',
+                                                       error='Format non reconnu',
+                                                       defaults={'value': esca})
+    lot.eccs = 0
+    eccs = request.POST.get('eccs', 0)
+    try:
+        lot.eccs = float(eccs)
+    except Exception:
+        error, c = LotV2Error.objects.update_or_create(lot=lot, field='eccs',
+                                                       error='Format non reconnu',
+                                                       defaults={'value': eccs})
+    lot.eccr = 0
+    eccr = request.POST.get('eccr', 0)
+    try:
+        lot.eccr = float(eccr)
+    except Exception:
+        error, c = LotV2Error.objects.update_or_create(lot=lot, field='eccr',
+                                                       error='Format non reconnu',
+                                                       defaults={'value': eccr})
+    lot.eee = 0
+    eee = request.POST.get('eee', 0)
+    try:
+        lot.eee = float(eee)
+    except Exception:
+        error, c = LotV2Error.objects.update_or_create(lot=lot, field='eee',
+                                                       error='Format non reconnu',
+                                                       defaults={'value': eee})
+    # calculs ghg
+    lot.ghg_total = round(lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee, 2)
+    lot.ghg_reference = 83.8
+    lot.ghg_reduction = round((1.0 - (lot.ghg_total / lot.ghg_reference)) * 100.0, 2)
+    lot.save()
+
+    transaction = LotTransaction()
+    transaction.lot = lot
+    transaction.save()
+    transaction.vendor_is_in_carbure = True
+    transaction.carbure_vendor = entity
+
+    transaction.dae = request.POST.get('dae', '')
+    if transaction.dae == '':
+        e, c = TransactionError.objects.update_or_create(tx=transaction, field='dae', error="Merci de préciser le numéro de DAE/DAU",
+                                                         defaults={'value': None})
+    else:
+        TransactionError.objects.filter(tx=transaction, field='dae').delete()
+
+    delivery_date = request.POST.get('delivery_date', '')
+    if delivery_date == '':
+        transaction.ea_delivery_date = None
+        lot.period = ''
+        e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_date',
+                                                         error="Merci de préciser la date de livraison",
+                                                         defaults={'value': None})
+    else:
+        try:
+            dd = datetime.datetime.strptime(delivery_date, '%d/%m/%Y')
+            transaction.delivery_date = dd
+            lot.period = dd.strftime('%Y-%m')
+            TransactionError.objects.filter(tx=transaction, field='delivery_date').delete()
+        except Exception:
+            msg = "Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA"
+            e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_date',
+                                                             error=msg,
+                                                             defaults={'value': delivery_date})
+
+    client_id = request.POST.get('client_id', '')
+    client_name = request.POST.get('client', '')
+    if client_id != '':
+        try:
+            client = Entity.objects.get(id=client_id)
+            transaction.client_is_in_carbure = True
+            transaction.carbure_client = client
+            transaction.unknown_client = ''
+        except Exception:
+            transaction.client_is_in_carbure = False
+            transaction.carbure_client = None
+            transaction.unknown_client = client_name
+    else:
+        transaction.client_is_in_carbure = False
+        transaction.carbure_client = None
+        transaction.unknown_client = ''
+        e, c = TransactionError.objects.update_or_create(tx=transaction, field='client',
+                                                         defaults={'value': None, 'error': "Merci de préciser un client"})
+
+    delivery_site_id = request.POST.get('delivery_site_id')
+    delivery_site_name = request.POST.get('delivery_site')
+    if delivery_site_id != '':
+        try:
+            delivery_site = Depot.objects.get(id=delivery_site_id)
+            transaction.delivery_site_is_in_carbure = True
+            transaction.carbure_delivery_site = delivery_site
+            transaction.unknown_delivery_site = ''
+        except Exception:
+            transaction.delivery_site_is_in_carbure = False
+            transaction.carbure_delivery_site = None
+            transaction.unknown_delivery_site = delivery_site_name
+    else:
+        transaction.delivery_site_is_in_carbure = False
+        transaction.carbure_delivery_site = None
+        transaction.unknown_delivery_site = delivery_site_name
+    if delivery_site_name == '':
+        e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site',
+                                                         defaults={'value': None, 'error': "Merci de préciser un site de livraison"})
+
+    if transaction.delivery_site_is_in_carbure is False:
+        delivery_site_country_id = request.POST.get('delivery_site_country_id', '')
+        delivery_site_country_name = request.POST.get('delivery_site_country', '')
+        if delivery_site_country_id != '':
+            try:
+                country = Pays.objects.get(code_pays=delivery_site_country_id)
+                transaction.unknown_delivery_site_country = country
+            except Exception:
+                error, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site_country',
+                                                                     error='Champ production_site_country incorrect',
+                                                                     defaults={'value': delivery_site_country_name})
+        else:
+            error, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site_country',
+                                                                 error='Merci de préciser le pays de livraison',
+                                                                 defaults={'value': None})
+
+    transaction.ghg_total = lot.ghg_total
+    transaction.ghg_reduction = lot.ghg_reduction
+    transaction.champ_libre = request.POST.get('champ_libre', '')
+    transaction.save()
+    lot.save()
+    return JsonResponse({'status': 'success', 'lot_id': lot.id})

@@ -12,11 +12,10 @@ urlpatterns = [
     path('lots/corrections', producers.get_corrections, name='api-v2-producers-get-corrections'),
     path('lots/valid', producers.get_valid, name='api-v2-producers-get-valid'),
 
-
     path('producers/lot/delete', producers.delete_lots, name='api-v2-producers-delete-lots'),
     path('producers/lot/validate', producers.validate_lots, name='api-v2-producers-validate-lots'),
     path('producers/lot/duplicate', producers.duplicate_lot, name='api-v2-producers-duplicate-lot'),
-
+    path('producers/lot/save', producers.save_lot, name='api-v2-producers-save-lot'),
 ]
 
 #path('producers/lots/corrections', producers_api.producers_lots_corrections, name='api-producers-lots-corrections'),
