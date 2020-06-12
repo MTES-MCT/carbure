@@ -480,7 +480,8 @@ def get_corrections(request, *args, **kwargs):
 @restrict_to_producers
 def get_valid(request, *args, **kwargs):
     context = kwargs['context']
-    transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], lot__status="Validated")
+    transactions = list(LotTransaction.objects.filter(carbure_vendor=context['user_entity'], lot__status='Validated'))
+    transactions.extend(list(LotTransaction.objects.filter(carbure_client=context['user_entity'], lot__status="Validated")))
     lot_ids = [t.lot.id for t in transactions]
     lots = LotV2.objects.filter(id__in=lot_ids)
     sez = serializers.serialize('json', lots, use_natural_foreign_keys=True)
