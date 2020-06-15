@@ -29,6 +29,7 @@ def load_excel_lot(context, lot_row):
     entity = context['user_entity']
     lot = LotV2()
     lot.added_by = entity
+    lot.added_by_user = context['user']
     if 'producer' in lot_row and lot_row['producer'] is not None:
         # this should be a bought or imported lot
         # check if we know the producer
@@ -56,8 +57,8 @@ def load_excel_lot(context, lot_row):
     else:
         # print('No producer in excel sheet. ')
         # default, current entity is the producer
-        lot.producer_is_in_carbure = False
-        lot.carbure_producer = None
+        lot.producer_is_in_carbure = True
+        lot.carbure_producer = entity
         lot.unknown_producer = ''
     lot.save()
 
@@ -314,11 +315,9 @@ def load_excel_lot(context, lot_row):
             transaction.unknown_client = client
         TransactionError.objects.filter(tx=transaction, field='client').delete()
     else:
-        transaction.client_is_in_carbure = False
-        transaction.carbure_client = None
+        transaction.client_is_in_carbure = True
+        transaction.carbure_client = entity
         transaction.unknown_client = ''
-        e, c = TransactionError.objects.update_or_create(tx=transaction, field='client',
-                                                         defaults={'value': None, 'error': "Merci de préciser un client"})
 
     if 'delivery_site' in lot_row and lot_row['delivery_site'] is not None:
         delivery_site = lot_row['delivery_site']
@@ -453,6 +452,21 @@ def get_drafts(request, *args, **kwargs):
 def get_received(request, *args, **kwargs):
     context = kwargs['context']
     transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='N', lot__status="Validated")
+    lot_ids = [t.lot.id for t in transactions]
+    lots = LotV2.objects.filter(id__in=lot_ids)
+    errors = LotV2Error.objects.filter(lot__in=lots)
+    sez = serializers.serialize('json', lots, use_natural_foreign_keys=True)
+    txsez = serializers.serialize('json', transactions, use_natural_foreign_keys=True)
+    errsez = serializers.serialize('json', errors, use_natural_foreign_keys=True)
+    return JsonResponse({'lots': sez, 'errors': errsez, 'transactions': txsez})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def get_mb(request, *args, **kwargs):
+    context = kwargs['context']
+    transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='A', lot__status="Validated")
     lot_ids = [t.lot.id for t in transactions]
     lots = LotV2.objects.filter(id__in=lot_ids)
     errors = LotV2Error.objects.filter(lot__in=lots)
@@ -603,6 +617,9 @@ def validate_lots(request, *args, **kwargs):
             else:
                 lot.carbure_id = "%s%sP%s-%d" % ('FR', today.strftime('%y%m'), 'XXX', lot.id)
             lot.status = "Validated"
+            if tx.carbure_client == context['user_entity']:
+                tx.delivery_status = 'A'
+                tx.save()
             lot.save()
         except Exception:
             results.append({'lot_id': lotid, 'status': 'error', 'message': 'Erreur lors de la validation du lot'})
@@ -636,6 +653,7 @@ def save_lot(request, *args, **kwargs):
 
     entity = context['user_entity']
     lot.added_by = entity
+    lot.added_by_user = request.user
     producer_name = request.POST.get('producer_name', '')
     if not producer_name:
         lot.producer_is_in_carbure = False

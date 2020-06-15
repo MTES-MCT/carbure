@@ -57,7 +57,7 @@ const table_columns_received_v2 = [
 {title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer.name : `<i>${full.fields.unknown_producer}</i>` }},
 {title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
 {title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.country.code_pays : (full.fields.unknown_production_country ? full.fields.unknown_production_country.code_pays: "") }},
-{title:'Fournisseur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.tx.fields.vendor_is_in_carbure ? full.tx.fields.carbure_vendor : `<i>${full.tx.fields.unknown_vendor}</i>` }},
+{title:'Fournisseur', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.tx.fields.vendor_is_in_carbure ? full.tx.fields.carbure_vendor.name : `<i>${full.tx.fields.unknown_vendor}</i>` }},
 {title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
 {title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.biocarburant.name }},
 {title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.matiere_premiere.name }},
@@ -81,6 +81,33 @@ const table_columns_received_v2 = [
 {title:'Date d\'entrée<br /> en EA', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_date}},
 {title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.client_is_in_carbure ? full.tx.fields.carbure_client.name : `<i>${full.tx.fields.unknown_client}</i>`}},
 {title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site.name : `<i>${full.tx.fields.unknown_delivery_site}</i>` }},
+]
+
+const table_columns_mb_v2 = [
+{title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
+{title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer.name : `<i>${full.fields.unknown_producer}</i>` }},
+{title:'Site de<br /> Production', hidden: true, filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
+{title:'Pays de<br /> Production', hidden: true, filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.country.code_pays : (full.fields.unknown_production_country ? full.fields.unknown_production_country.code_pays: "") }},
+{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.biocarburant.name }},
+{title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.matiere_premiere.name }},
+{title:`Pays<br /> d'origine`, filter_title: 'Pays', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.pays_origine.code_pays }},
+{title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
+
+{title:'EEC', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
+{title:'EL', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
+{title:'EP', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'},
+{title:'ETD', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'},
+{title:'EU', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'},
+{title:'ESCA', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'},
+{title:'ECCS', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'},
+{title:'ECCR', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'},
+{title:'EEE', hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'},
+{title:'E', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_total', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'},
+{title:'Émissions de référence', hidden: true, can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'},
+{title:'% de réduction', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reduction'},
+
+{title:'Référence', hidden:true, can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, tooltip: 'Champ libre - Référence client', render: (data, type, full, meta) => {return full.tx.fields.champ_libre}},
+{title:'Site de stockage', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site.name : `<i>${full.tx.fields.unknown_delivery_site}</i>` }},
 ]
 
 const table_columns_valid_v2 = [
@@ -455,20 +482,6 @@ function showHideTableColumns(table, columns, dom) {
   }
 }
 
-function preCheckAddLotSettings(columns) {
-  /* checks checkboxes according to config */
-  let nb_columns = table_drafts.columns().data().length
-  for (let i = 0, len = nb_columns; i < len; i++) {
-    let isChecked = columns[i]
-    let boxid = '#add_checkbox' + i
-    if (isChecked) {
-      $(boxid).prop("checked", true);
-    } else {
-      $(boxid).prop("checked", false);
-    }
-  }
-}
-
 
 function duplicate_lot(tx_id) {
   var formdata = new FormData();
@@ -675,7 +688,6 @@ function initDuplicateParams(table) {
 }
 
 function initFilters(table, dom) {
-  console.log(`initializing filters for table ${dom}`)
   var table_columns_filter = $(`#table_columns_${dom}_filter`)
   var table_columns_filter2 = $(`#table_columns_${dom}_filter2`)
   var columns_filter_html = ""
@@ -723,518 +735,6 @@ function updateDataTableSelectAllCtrl(table){
       }
    }
 }
-/*
-function init_datatables_drafts(url) {
-  // tab Drafts
-  if (!$.fn.DataTable.isDataTable('#datatable_drafts')) {
-      // create empty footer
-    let empty_footer = `<tr>${Array(table_columns_drafts.length).fill("<th></th>").join('')}</tr>`
-    $("#datatable_drafts tfoot").append(empty_footer)
-
-    var table_drafts = $('#datatable_drafts').DataTable({
-      paging: true,
-      info: true,
-      scrollX: true,
-      scrollY: 1000,
-      scrollCollapse: true,
-      language: {
-          search: "Rechercher:",
-          paginate: {
-              first:    '«',
-              previous: '‹',
-              next:     '›',
-              last:     '»'
-          },
-          aria: {
-              paginate: {
-                  first:    'Première',
-                  previous: 'Précédente',
-                  next:     'Suivante',
-                  last:     'Dernière'
-              }
-          }
-      },
-      dom: 'rtp',
-      columnDefs: [
-        {
-          className: "dt-center",
-          targets: "_all",
-          render: function(data, type, row, meta) {
-            let col_name = table_columns_drafts[meta.col].data
-            let lot_id = row['lot_id']
-            if (lot_id in lot_errors) {
-              if (col_name in lot_errors[lot_id]) {
-                let error = lot_errors[lot_id][col_name]
-                return `<span style="color:tomato;">${error}</span>`
-              }
-            }
-            return data
-          }
-        },
-        {
-          targets: 0,
-          searchable:false,
-          orderable:false,
-          width:'1%',
-          className: 'dt-body-center',
-          render: function (data, type, full, meta) {
-             return '<input type="checkbox">';
-          }
-        }
-      ],
-      order: [[ 1, 'desc' ]],
-      columns: table_columns_drafts,
-      ajax: {
-        url: url,
-        dataSrc: function(res) {
-          lots = res['lots']
-          for (let i = 0, len = lots.length; i < len; i++) {
-            // add checkbox on the fly
-            lots[i]["checkbox"] = `<input type="checkbox" />`
-          }
-          errors = res['errors']
-          for (let i = 0, len = errors.length; i < len; i++) {
-            let error = errors[i]
-            let lot_id = error.lot_id
-            if (!(lot_id in lot_errors)) {
-              lot_errors[lot_id] = {}
-            }
-            lot_errors[lot_id][error.field] = error.value
-          }
-          return lots
-        }
-      },
-      initComplete: function () {
-        count = 0;
-        this.api().columns().every(function () {
-          var column = this;
-          let table_column = table_columns_drafts[column.index()]
-          if (table_column.can_filter === true) {
-            var select = $('<select id="select_' + table_column.data + '" class="select2" ></select>')
-                .appendTo($(column.footer()).empty())
-                .on('change', function () {
-                  //Get the "text" property from each selected data
-                  //regex escape the value and store in array
-                  var data = $.map($(this).select2('data'), function(value, key) {
-                    return value.text ? '^' + $.fn.dataTable.util.escapeRegex(value.text) + '$' : null
-                  })
-                  //if no data selected use ""
-                  if (data.length === 0) {
-                    data = [""]
-                  }
-                  //join array into string with regex or (|)
-                  var val = data.join('|')
-                  //search for the option(s) selected
-                  column.search(val ? val : '', true, false).draw()
-                })
-            column.data().unique().sort().each(function (d, j) {
-              if (d === "") {
-                return
-              }
-              select.append('<option value="'+d+'">'+d+'</option>');
-            })
-            //use column title as selector and placeholder
-            $('#select_' + table_column.data).select2({
-              multiple: true,
-              closeOnSelect: true,
-              placeholder: "Filtrer " + (table_column.filter_title  ? table_column.filter_title : table_column.title),
-              placeholderOption: function () { return undefined; }
-            });
-            //initially clear select otherwise first option is selected
-            $('.select2').val(null).trigger('change')
-          } else {
-            $(column.footer()).append()
-          }
-        }).draw()
-      }
-    })
-
-    $("#datatable_drafts tbody").on('click', 'td',  (e) => {
-      display_producers_lot_modal(table_drafts, table_columns_drafts, e)
-    })
-    window.table_drafts = table_drafts
-    $('#input_search_datatable').on('keyup', function() {
-        table_drafts.search(this.value).draw();
-    })
-
-    // Handle click on checkbox
-    $('#datatable_drafts tbody').on('click', 'input[type="checkbox"]', function(e) {
-      var $row = $(this).closest('tr');
-      // Get row data
-      var rowId = table_drafts.row($row).index();
-      // Determine whether row ID is in the list of selected row IDs
-      var index = $.inArray(rowId, selected_rows);
-      // If checkbox is checked and row ID is not in list of selected row IDs
-      if(this.checked && index === -1) {
-        selected_rows.push(rowId);
-      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
-      } else if (!this.checked && index !== -1) {
-        selected_rows.splice(index, 1);
-      }
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table_drafts);
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-      // Show/Hide buttons depending on selected_rows content
-      manage_actions()
-    })
-
-
-    // Handle click on "Select all" control
-    $('thead input[name="select_all"]', table_drafts.table().container()).on('click', function(e){
-      if(this.checked){
-         $('#datatable_drafts tbody input[type="checkbox"]:not(:checked)').trigger('click');
-      } else {
-         $('#datatable_drafts tbody input[type="checkbox"]:checked').trigger('click');
-      }
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-    });
-
-    // Handle table draw event
-    table_drafts.on('draw', function(){
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table_drafts);
-    });
-
-    var producerDraftsTableSettings = loadTableSettings(table_columns_drafts, 'producerDraftsTableSettings')
-    showHideTableColumns(table_drafts, producerDraftsTableSettings, 'drafts')
-  } else {
-    window.table_drafts.draw()
-  }
-}
-
-function init_datatables_corrections(url) {
-  if (!$.fn.DataTable.isDataTable('#datatable_corrections')) {
-    var table_corrections = $("#datatable_corrections").DataTable({
-      paging: false,
-      info: false,
-      scrollX: true,
-      scrollY: 1000,
-      scrollCollapse: true,
-      dom: 't',
-      fixedColumns: {
-        leftColumns: 0,
-        rightColumns: 1,
-      },
-      columns: table_columns_producers_corrections,
-      ajax: {
-        url: url,
-        dataSrc: function(data) {
-          return data.lots
-        },
-      },
-      initComplete: function () {
-        count = 0;
-        this.api().columns().every(function () {
-          var column = this;
-          let table_column = table_columns_producers_corrections[column.index()]
-          if (table_column.can_filter === true) {
-            var select = $('<select id="select_' + table_column.data + '_correction" class="select2" ></select>')
-                .appendTo($(column.footer()).empty())
-                .on('change', function () {
-                  //Get the "text" property from each selected data
-                  //regex escape the value and store in array
-                  var data = $.map($(this).select2('data'), function(value, key) {
-                    return value.text ? '^' + $.fn.dataTable.util.escapeRegex(value.text) + '$' : null
-                  })
-                  //if no data selected use ""
-                  if (data.length === 0) {
-                    data = [""]
-                  }
-                  //join array into string with regex or (|)
-                  var val = data.join('|')
-                  //search for the option(s) selected
-                  column.search(val ? val : '', true, false).draw()
-                })
-            column.data().unique().sort().each(function (d, j) {
-              if (d === "") {
-                return
-              }
-              select.append('<option value="'+d+'">'+d+'</option>');
-            })
-            //use column title as selector and placeholder
-            $('#select_' + table_column.data + '_correction').select2({
-              multiple: true,
-              closeOnSelect: true,
-              placeholder: "Filtrer " + (table_column.filter_title  ? table_column.filter_title : table_column.title),
-              placeholderOption: function () { return undefined; }
-            });
-            //initially clear select otherwise first option is selected
-            $('.select2').val(null).trigger('change')
-          } else {
-            $(column.footer()).append()
-          }
-        }).draw()
-      }
-    })
-    $("#datatable_corrections tbody").on('click', 'td',  (e) => {
-      display_producers_lot_modal(table_corrections, table_columns_producers_corrections, e)
-    })
-    window.table_corrections = table_corrections
-    var producerErrorsTableSettings = loadTableSettings(table_columns_producers_corrections, 'producerErrorsTableSettings')
-    showHideTableColumns(table_corrections, producerErrorsTableSettings, 'errors')
-  } else {
-    window.table_corrections.draw()
-  }
-}
-
-function init_datatables_validated(url) {
-  if (!$.fn.DataTable.isDataTable('#datatable_valid')) {
-    let empty_footer = `<tr>${Array(table_columns_producers_validated.length).fill("<th></th>").join('')}</tr>`
-    $("#datatable_valid tfoot").append(empty_footer)
-
-    var table_valid = $("#datatable_valid").DataTable({
-      paging: false,
-      info: false,
-      scrollX: true,
-      scrollY: 1000,
-      scrollCollapse: true,
-      dom: 't',
-      fixedColumns: {
-        leftColumns: 0,
-        rightColumns: 1,
-      },
-      columns: table_columns_producers_validated,
-      ajax: {
-        url: url,
-        dataSrc: function(data) {
-          return data.lots
-        },
-      },
-      initComplete: function () {
-        count = 0;
-        this.api().columns().every(function () {
-          var column = this;
-          let table_column = table_columns_producers_validated[column.index()]
-          if (table_column.can_filter === true) {
-            var select = $('<select id="select_' + table_column.data + '_valid" class="select2" ></select>')
-                .appendTo($(column.footer()).empty())
-                .on('change', function () {
-                  //Get the "text" property from each selected data
-                  //regex escape the value and store in array
-                  var data = $.map($(this).select2('data'), function(value, key) {
-                    return value.text ? '^' + $.fn.dataTable.util.escapeRegex(value.text) + '$' : null
-                  })
-                  //if no data selected use ""
-                  if (data.length === 0) {
-                    data = [""]
-                  }
-                  //join array into string with regex or (|)
-                  var val = data.join('|')
-                  //search for the option(s) selected
-                  column.search(val ? val : '', true, false).draw()
-                })
-            column.data().unique().sort().each(function (d, j) {
-              if (d === "") {
-                return
-              }
-              select.append('<option value="'+d+'">'+d+'</option>');
-            })
-            //use column title as selector and placeholder
-            $('#select_' + table_column.data + '_valid').select2({
-              multiple: true,
-              closeOnSelect: true,
-              placeholder: "Filtrer " + (table_column.filter_title  ? table_column.filter_title : table_column.title),
-              placeholderOption: function () { return undefined; }
-            });
-            //initially clear select otherwise first option is selected
-            $('.select2').val(null).trigger('change')
-          } else {
-            $(column.footer()).append()
-          }
-        }).draw()
-      }
-    })
-    $("#datatable_valid tbody").on('click', 'td', (e) => {
-      display_producers_lot_modal(table_valid, table_columns_producers_validated, e)
-    })
-    window.table_valid = table_valid
-    var producerValidTableSettings = loadTableSettings(table_columns_producers_validated, 'producerValidTableSettings')
-    showHideTableColumns(table_valid, producerValidTableSettings, 'valid')
-  } else {
-    window.table_valid.draw()
-  }
-}
-*/
-/*function init_datatables_operators_affiliations() {
-  if (!$.fn.DataTable.isDataTable('#datatable_affiliations')) {
-
-    let empty_footer = `<tr>${Array(table_columns_operators_affiliated.length).fill("<th></th>").join('')}</tr>`
-    $("#datatable_affiliations tfoot").append(empty_footer)
-
-    let table = $('#datatable_affiliations').DataTable({
-      paging: false,
-      info: false,
-      scrollX: true,
-      fixedColumns: {
-      	leftColumns: 0,
-        rightColumns: 1,
-      },
-      dom: 'rtip',
-      columns: table_columns_operators_affiliated,
-      columnDefs: [
-        {
-          className: "dt-center",
-          targets: "_all",
-        },
-        {
-          targets: 0,
-          searchable:false,
-          orderable:false,
-          width:'1%',
-          className: 'dt-body-center',
-          render: function (data, type, full, meta) {
-             return '<input type="checkbox">';
-          }
-        }
-      ],
-      order: [[ 1, 'asc' ]],
-      ajax: {
-        url: window.operators_api_affiliated_lots,
-        dataSrc: function(json) {
-          for (let i = 0, len = json.length; i < len; i++) {
-            // add checkbox on the fly
-            json[i]["checkbox"] = `<input type="checkbox" />`
-          }
-          return json
-        }
-      },
-      initComplete: function() {
-        // create filter
-        this.api().columns().every(function () {
-          var column = this;
-          let table_column = table_columns_operators_affiliated[column.index()]
-          if (table_column.can_filter === true) {
-            var select = $('<select><option value=""></option></select>')
-            .appendTo($(column.footer()).empty())
-            .on('change', function() {
-              var val = $.fn.dataTable.util.escapeRegex($(this).val());
-              column.search(val ? '^'+val+'$' : '', true, false).draw();
-            });
-            column.data().unique().sort().each(function (d, j) {
-              select.append('<option value="'+d+'">'+d+'</option>')
-            });
-          } else {
-            $(column.footer()).append()
-          }
-        }).draw()
-      }
-    })
-    window.table_operators_affiliations = table
-    $("#datatable_affiliations tbody").on('click', 'td', (e) => {
-      display_operators_lot_modal(table, table_columns_operators_affiliated, e)
-    })
-    var operatorsAffiliationsTableSettings = loadTableSettings(table_columns_operators_affiliated, 'operatorsAffiliationsTableSettings')
-    showHideTableColumns(table, operatorsAffiliationsTableSettings, 'affiliations')
-
-    // Handle click on checkbox
-    $('#datatable_affiliations tbody').on('click', 'input[type="checkbox"]', function(e) {
-      var $row = $(this).closest('tr');
-      // Get row data
-      var rowId = table.row($row).index();
-      // Determine whether row ID is in the list of selected row IDs
-      var index = $.inArray(rowId, selected_rows);
-      // If checkbox is checked and row ID is not in list of selected row IDs
-      if(this.checked && index === -1) {
-        selected_rows.push(rowId);
-      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
-      } else if (!this.checked && index !== -1) {
-        selected_rows.splice(index, 1);
-      }
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-      // Show/Hide buttons depending on selected_rows content
-      manage_actions_operators_affiliation()
-    })
-
-    // Handle click on "Select all" control
-    $('thead input[name="select_all"]', table.table().container()).on('click', function(e) {
-    	console.log(`thead checkbox click`)
-      if (this.checked) {
-      	console.log(`header checkbox checked`)
-        $('#datatable_affiliations tbody input[type="checkbox"]:not(:checked)').trigger('click');
-      } else {
-      	console.log(`header checkbox unchecked`)
-        $('#datatable_affiliations tbody input[type="checkbox"]:checked').trigger('click');
-      }
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-    });
-
-  } else {
-    window.table_operators_affiliations.draw()
-  }
-}
-*/
-/*
-function init_datatables_operators_declared() {
-  if (!$.fn.DataTable.isDataTable('#datatable_declared')) {
-
-    let empty_footer = `<tr>${Array(table_columns_operators_declared.length).fill("<th></th>").join('')}</tr>`
-    $("#datatable_declared tfoot").append(empty_footer)
-
-    let table = $('#datatable_declared').DataTable({
-      paging: false,
-      info: false,
-      scrollX: true,
-      language: {
-          search: "Rechercher:"
-      },
-      dom: 'rtip',
-      columnDefs: [
-      {"className": "dt-center", "targets": "_all"}
-      ],
-      columns: table_columns_operators_declared,
-      ajax: {
-        url: window.operators_api_declared_lots,
-        dataSrc: function(json) {
-          for (let i = 0, len = json.length; i < len; i++) {
-            // add checkbox on the fly
-            json[i]["checkbox"] = `<input type="checkbox" />`
-          }
-          return json
-        }
-      },
-      initComplete: function() {
-        // create filter
-        this.api().columns().every(function () {
-          var column = this;
-          let table_column = table_columns_operators_declared[column.index()]
-          if (table_column.can_filter === true) {
-            var select = $('<select><option value=""></option></select>')
-            .appendTo($(column.footer()).empty())
-            .on('change', function() {
-              var val = $.fn.dataTable.util.escapeRegex($(this).val());
-              column.search(val ? '^'+val+'$' : '', true, false).draw();
-            });
-            column.data().unique().sort().each(function (d, j) {
-              select.append('<option value="'+d+'">'+d+'</option>')
-            });
-          } else {
-            $(column.footer()).append()
-          }
-        }).draw()
-      }
-    })
-    window.table_operators_declared = table
-    $("#datatable_declared tbody").on('click', 'td', (e) => {
-      display_operators_lot_modal(table, table_columns_operators_declared, e)
-    })
-    var operatorsValidTableSettings = loadTableSettings(table_columns_operators_declared, 'operatorsValidTableSettings')
-    showHideTableColumns(table, operatorsValidTableSettings, 'declared')
-
-    $('#input_search_datatable_valid').on('keyup', function() {
-      table.search(this.value).draw();
-    })
-
-  } else {
-    window.table_operators_declared.draw()
-  }
-}
-*/
 
 function display_producers_lot_modal(table, columns, event) {
   // check if we clicked on the checkbox
@@ -1750,6 +1250,7 @@ const dt_drafts_config = {
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
     })
+    initFilters(table_columns_drafts_v2, "tab_drafts")
 
     // Handle click on checkbox
     $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
@@ -1844,6 +1345,104 @@ const dt_received_config = {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
       display_producers_lot_modal(table, table_columns_received_v2, e)
+    })
+    $('#input_search_datatable').on('keyup', function() {
+        table.search(this.value).draw();
+    })
+
+    // Handle click on checkbox
+    $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
+      var $row = $(this).closest('tr');
+      // Get row data
+      var rowId = table.row($row).index();
+      // Determine whether row ID is in the list of selected row IDs
+      var index = $.inArray(rowId, selected_rows);
+      // If checkbox is checked and row ID is not in list of selected row IDs
+      if(this.checked && index === -1) {
+        selected_rows.push(rowId);
+      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+      } else if (!this.checked && index !== -1) {
+        selected_rows.splice(index, 1);
+      }
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+      // Show/Hide buttons depending on selected_rows content
+      manage_actions()
+    })
+
+
+    // Handle click on "Select all" control
+    $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
+      if(this.checked){
+         $('#datatable_received tbody input[type="checkbox"]:not(:checked)').trigger('click');
+      } else {
+         $('#datatable_received tbody input[type="checkbox"]:checked').trigger('click');
+      }
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+    });
+
+    // Handle table draw event
+    table.on('draw', function(){
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+    });
+  }
+}
+
+const dt_mb_config = {
+	id: "datatable_mb",
+	url: window.producers_api_lots_mb_v2,
+	col_definition: table_columns_mb_v2,
+	has_footer: true,
+	paging: true,
+	info: true,
+	dom: 'rtp',
+	columnDefs: [
+    {
+      targets: [0],
+      searchable:false,
+      orderable:false,
+      width:'1%',
+      className: 'dt-body-center',
+      render: function (data, type, full, meta) {
+        return '<input type="checkbox">';
+      }
+    },
+    {
+      className: "dt-center",
+      targets: "_all",
+      render: function (data, type, full, meta) {
+      	let col_name = table_columns_mb_v2[meta.col].data
+      	if (table_columns_mb_v2[meta.col]['render'] != undefined) {
+  		  return table_columns_mb_v2[meta.col]['render'](full)
+      	}
+      	return full['fields'][col_name]
+      }
+    },
+  ],
+  order: [[ 1, 'desc' ]],
+  ajax_dataSrc: function(res) {
+    data = {}
+    lots = JSON.parse(res['lots'])
+    for (let i = 0, len = lots.length; i < len; i++) {
+    	let lot = lots[i]
+    	data[lot.pk] = lot
+    }
+    txs = JSON.parse(res['transactions'])
+    for (let i = 0, len = txs.length; i < len; i++) {
+    	let tx = txs[i]
+    	data[tx.fields.lot].tx = tx
+    }
+    list = Object.values(data)
+    return list
+  },
+  post_init: function(table) {
+    let tbl_id = table.table().node().id
+    $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
+      display_producers_lot_modal(table, table_columns_mb_v2, e)
     })
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
@@ -2283,6 +1882,7 @@ const dt_operators_out_config = {
 dt_config['tab_drafts'] = dt_drafts_config
 dt_config['tab_received'] = dt_received_config
 dt_config['tab_errors'] = dt_errors_config
+dt_config['tab_mb'] = dt_mb_config
 dt_config['tab_valid'] = dt_valid_config
 dt_config['tab_operators_in'] = dt_operators_in_config
 dt_config['tab_operators_mb'] = dt_operators_mb_config
@@ -2420,7 +2020,7 @@ function init_datatables_generic(tab_name) {
     }
     window[config.id] = table
     window.table = table
-    var tablesettings = loadTableSettings(config.col_definition, 'tab_name')
+    var tablesettings = loadTableSettings(config.col_definition, tab_name)
     showHideTableColumns(table, tablesettings, tab_name)
   } else {
     window[config.id].draw()
@@ -2441,3 +2041,18 @@ $("#btn_close_modal_accept_lots").on('click', () => {
 $("#btn_submit_upload_form").on('click', () => {
   $("#modal_import_form").submit()
 })
+
+$('.toggle-vis').on('click', function(e) {
+// Get the column API object
+let colid = $(this).attr('data-column')
+let dst_table = $(this).attr('data-table')
+
+
+// Toggle the visibility
+let column = window.table.column(colid);
+var settings = loadTableSettings(table_columns_producers_corrections, dst_table)
+settings[colid] = settings[colid] == 1 ? 0 : 1
+saveTableSettings(settings, dst_table)
+column.visible(!column.visible());
+})
+

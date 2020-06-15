@@ -101,9 +101,9 @@
 				</tr>
 				<tr>
 					<td><b>dae</b></td>
-					<td>Numéro DAE ou DAU</td>
+					<td>Numéro douanier</td>
 					<td>Texte</td>
-					<td>2010153-1</td>
+					<td>FR2010153-1</td>
 				</tr>
 				<tr>
 					<td><b>champ_libre</b></td>
@@ -113,19 +113,21 @@
 				</tr>
 				<tr>
 					<td><b>client</b></td>
-					<td>Nom du client. Si votre client n'est pas enregistré sur Carbure, veuillez utiliser le <a href="{% url 'api-v2-producers-excel-template-download-advanced' %}">modèle Excel Avancé</a> La liste des sociétés inscrites est disponible dans le feuillet OperateursPetroliers du <a href="{% url 'api-v2-producers-excel-template-download-simple' %}">modèle Excel</a></td>
+					<td>Optionnel. Nom du client. Si ce champ n'est pas renseigné, le lot entrera dans votre Mass Balance. <br />
+						La liste des sociétés inscrites sur Carbure est disponible dans le feuillet Societes du <a href="{% url 'api-v2-producers-excel-template-download-simple' %}">modèle Excel</a><br />
+						Si votre client n'est pas enregistré sur Carbure, veuillez utiliser le <a href="{% url 'api-v2-producers-excel-template-download-advanced' %}">modèle Excel Avancé</a></td>
 					<td>Texte</td>
 					<td>TMF</td>
 				</tr>
 				<tr>
 					<td><b>delivery_date</b></td>
-					<td>Date d'entrée chez l'entrepositaire agréé</td>
+					<td>Optionnel. Date d'entrée chez l'entrepositaire agréé</td>
 					<td>AAAA/MM/JJ</td>
 					<td>2020/04/25</td>
 				</tr>
 				<tr>
 					<td><b>delivery_site</b></td>
-					<td>Code douanier du Site de livraison / Dépôt. Vous trouverez la correspondance Code/Dépôt dans le feuillet SitesDeLivraison du <a href="{% url 'api-v2-producers-excel-template-download-simple' %}">modèle Excel</a></td>
+					<td>Optionnel. Code douanier du Site de livraison / Dépôt. Vous trouverez la correspondance Code/Dépôt dans le feuillet SitesDeLivraison du <a href="{% url 'api-v2-producers-excel-template-download-simple' %}">modèle Excel</a></td>
 					<td>Nombre entier</td>
 					<td>654</td>
 				</tr>
@@ -275,7 +277,7 @@
 				</tr>
 				<tr>
 					<td><b>client</b></td>
-					<td>Nom du client. Si votre client n'est pas enregistré sur Carbure, veuillez utiliser le <a href="{% url 'api-v2-producers-excel-template-download-advanced' %}">modèle Excel Avancé</a> La liste des sociétés inscrites est disponible dans le feuillet OperateursPetroliers du <a href="{% url 'api-v2-producers-excel-template-download-simple' %}">modèle Excel</a></td>
+					<td>Nom du client. Si votre client n'est pas enregistré sur Carbure, veuillez utiliser le <a href="{% url 'api-v2-producers-excel-template-download-advanced' %}">modèle Excel Avancé</a> La liste des sociétés inscrites est disponible dans le feuillet Societes du <a href="{% url 'api-v2-producers-excel-template-download-simple' %}">modèle Excel</a></td>
 					<td>Texte</td>
 					<td>TMF</td>
 				</tr>

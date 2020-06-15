@@ -11,13 +11,14 @@
       <li id="tab_drafts_title" class="tabs__tab tabs__tab--selected" data-dst="tab_drafts">Brouillons ({{nb_drafts}})</li>
       <li id="tab_errors_title" class="tabs__tab" data-dst="tab_errors">Lots à corriger ({{nb_corrections}})</li>
       <li id="tab_received_title" class="tabs__tab" data-dst="tab_received">Lots reçus ({{nb_received}})</li>
+      <li id="tab_mb_title" class="tabs__tab" data-dst="tab_mb">Mass Balance ({{nb_mb}})</li>
       <li id="tab_valid_title" class="tabs__tab" data-dst="tab_valid">Lots validés ({{nb_valid}})</li>
     </ul>
 
     <div id="tab_drafts" class="tabcontent">
 
       <p>Cet espace vous permet de créer manuellement ou d'importer vos lots de biocarburants sous forme de brouillons. <br />
-      Une fois créés, n'oubliez pas de les valider pour les transmettre à vos clients.</p>
+      Une fois créés, n'oubliez pas de les valider pour les transmettre à vos clients ou les ajouter à votre Mass Balance.</p>
 
       <div class="flex-container">
         <a title="Importer Lots" class="button modal-button" id="btn_open_modal_import" style="margin-right: 0px; padding: 7px 10px 0px 10px;">
@@ -25,7 +26,7 @@
             <use xlink:href="#plus" aria-label="Ajouter/Importer Lots"></use>
           </svg>
         </a>
-        <a title="Afficher/Cacher des colonnes" id="btn_open_modal_columns_drafts" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
+        <a title="Afficher/Cacher des colonnes" id="btn_open_modal_columns_tab_drafts" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
         <a title="Exporter vers Excel" class="button modal-button" href="{% url 'producers-api-attestation-export-drafts' %}" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
@@ -95,6 +96,26 @@
       </div>
 
       <table class="display nowrap" id="datatable_received">
+        <!-- dynamically generated in js -->
+        <thead></thead>
+        <tfoot></tfoot>
+        <tbody></tbody>
+      </table>
+    </div>
+
+
+    <div id="tab_mb" class="tabcontent">
+      <p>Votre comptabilité matière.<br />
+         Vous pouvez découper ou fusionner des lots et les envoyer à vos clients. Un import Excel est également disponible.
+      </p>
+
+      <div class="flex-container">
+        <a id="btn_open_modal_columns_errors" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+          <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
+        </a>
+      </div>
+
+      <table class="display nowrap" id="datatable_mb">
         <!-- dynamically generated in js -->
         <thead></thead>
         <tfoot></tfoot>
@@ -191,7 +212,7 @@
           <span id="modal_import_form_err_message" style="color: red;"></span>
           <span id="modal_import_form_success_message" style="color: green;"></span>
           <dl>
-            <dt>Le modèle simplifié vous permet d'attribuer des lots provenant de vos propres usines à des clients enregistrés sur Carbure</dt>
+            <dt>Le modèle simplifié vous permet de créer des lots provenant de vos propres usines. Vous pouvez les affilier immédiatement à des clients enregistrés sur Carbure ou simplement les ajouter à votre Mass Balance.</dt>
             <dt><a href="{% url 'api-v2-producers-excel-template-download-simple' %}" >Télécharger le modèle simplifié</a></dt>
           </dl>
           <dl>
@@ -222,18 +243,18 @@
  </div>
 </div>
 
-<div class="modal__backdrop" id="modal_columns_drafts">
+<div class="modal__backdrop" id="modal_columns_tab_drafts">
   <div class="modal">
     <div class="flex-container">
-      <table id="table_columns_drafts_filter">
+      <table id="table_columns_tab_drafts_filter">
         <!-- dynamically generated in js -->
       </table>
-      <table id="table_columns_drafts_filter2">
+      <table id="table_columns_tab_drafts_filter2">
         <!-- dynamically generated in js -->
       </table>
     </div>
     <div class="form__group button__group">
-      <a class="button secondary close" id="btn_close_modal_columns_drafts">Fermer</a>
+      <a class="button secondary close" id="btn_close_modal_columns_tab_drafts">Fermer</a>
     </div>
   </div>
 </div>
@@ -270,6 +291,38 @@
   </div>
 </div>
 
+
+<div class="modal__backdrop" id="modal_columns_received">
+  <div class="modal">
+    <div class="flex-container">
+      <table id="table_columns_received_filter">
+        <!-- dynamically generated in js -->
+      </table>
+      <table id="table_columns_received_filter2">
+        <!-- dynamically generated in js -->
+      </table>
+    </div>
+    <div class="form__group button__group">
+      <a class="button secondary close" id="btn_close_modal_columns_received">Fermer</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_columns_mb">
+  <div class="modal">
+    <div class="flex-container">
+      <table id="table_columns_mb_filter">
+        <!-- dynamically generated in js -->
+      </table>
+      <table id="table_columns_mb_filter2">
+        <!-- dynamically generated in js -->
+      </table>
+    </div>
+    <div class="form__group button__group">
+      <a class="button secondary close" id="btn_close_modal_columns_mb">Fermer</a>
+    </div>
+  </div>
+</div>
 
 <div class="modal__backdrop" id="modal_edit_lot">
   <div class="modal" style="max-width: none; margin: auto; max-height: 100%; overflow-y: auto;">
@@ -396,6 +449,7 @@
 <script type="text/javascript">
 window.producers_api_lots_drafts_v2 = "{% url 'api-v2-producers-get-drafts' %}"
 window.producers_api_lots_received_v2 = "{% url 'api-v2-producers-get-received' %}"
+window.producers_api_lots_mb_v2 = "{% url 'api-v2-producers-get-mb' %}"
 window.producers_api_lots_corrections_v2 = "{% url 'api-v2-producers-get-corrections' %}"
 window.producers_api_lots_valid_v2 = "{% url 'api-v2-producers-get-valid' %}"
 window.producers_api_lot_duplicate_v2 = "{% url 'api-v2-producers-duplicate-lot' %}"
