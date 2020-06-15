@@ -1,6 +1,9 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+
+usermodel = get_user_model()
 
 
 class Entity(models.Model):
@@ -225,6 +228,7 @@ class LotV2(models.Model):
     status = models.CharField(max_length=64, choices=LOT_STATUS, default='Draft')
     source = models.CharField(max_length=32, choices=SOURCE_CHOICES, default='Manual')
     added_by = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
+    added_by_user = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
 
     # lot has been split into many sublots ?
     parent_lot = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
