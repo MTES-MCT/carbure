@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -229,6 +231,7 @@ class LotV2(models.Model):
     source = models.CharField(max_length=32, choices=SOURCE_CHOICES, default='Manual')
     added_by = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
     added_by_user = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
+    added_time = models.DateTimeField(auto_now_add=True)
 
     # lot has been split into many sublots ?
     parent_lot = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
