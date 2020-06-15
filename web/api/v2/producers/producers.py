@@ -1,6 +1,7 @@
 import random
 import openpyxl
 import datetime
+import io
 
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -111,6 +112,18 @@ def load_excel_lot(context, lot_row):
                                                                    defaults={'value': production_site_country})
         else:
             lot.unknown_production_country = None
+        if 'production_site_reference' in lot_row:
+            lot.unknown_production_site_reference = lot_row['production_site_reference']
+        else:
+            lot.unknown_production_site_reference = ''
+        if 'production_site_commissioning_date' in lot_row:
+            lot.unknown_production_site_com_date = lot_row['production_site_commissioning_date']
+        else:
+            lot.unknown_production_site_com_date = ''
+        if 'double_counting_registration' in lot_row:
+            lot.unknown_production_site_dbl_counting = lot_row['double_counting_registration']
+        else:
+            lot.unknown_production_site_dbl_counting = ''
 
     if 'biocarburant_code' in lot_row:
         biocarburant = lot_row['biocarburant_code']
@@ -608,6 +621,10 @@ def validate_lots(request, *args, **kwargs):
             msg = 'Validation impossible. Veuillez renseigner le pays d\'origine de la matière première'
             results.append({'lot_id': lotid, 'status': 'error', 'message': msg})
             continue
+
+        if lot.producer_is_in_carbure and lot.carbure_production_site == None:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Veuillez renseigner le site de production'})
+            continue
         try:
             today = datetime.date.today()
             # [PAYS][YYMM]P[IDProd]-[1....]-([S123])
@@ -937,3 +954,53 @@ def save_lot(request, *args, **kwargs):
     transaction.save()
     lot.save()
     return JsonResponse({'status': 'success', 'lot_id': lot.id, 'transaction_id': transaction.id})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def export_drafts(request, *args, **kwargs):
+    context = kwargs['context']
+    today = datetime.datetime.now()
+    filename = 'export_%s.csv' % (today.strftime('%Y%m%d_%H%M%S'))
+
+    lots = LotV2.objects.filter(added_by=context['user_entity'], status='Draft')
+    transactions_ids = set([tx['id__min'] for tx in LotTransaction.objects.filter(lot__in=lots).values('lot_id', 'id').annotate(Min('id'))])
+    transactions = {tx.lot: tx for tx in LotTransaction.objects.filter(id__in=transactions_ids)}
+
+    buffer = io.BytesIO()
+    header = "producer;production_site;production_site_country;production_site_reference;production_site_commissioning_date;double_counting_registration;volume;biocarburant_code;\
+              matiere_premiere_code;pays_origine_code;eec;el;ep;etd;eu;esca;eccs;eccr;eee;e;dae;champ_libre;client;delivery_date;delivery_site;delivery_site_country\n"
+    buffer.write(header.encode())
+    for lot in lots:
+        if lot not in transactions:
+            continue
+        tx = transactions[lot]
+        line = [lot.carbure_producer.name if lot.producer_is_in_carbure else lot.unknown_producer,
+                lot.carbure_production_site.name if lot.production_site_is_in_carbure else lot.unknown_production_site,
+                lot.carbure_production_site.country.code_pays if lot.production_site_is_in_carbure and lot.carbure_production_site.country else lot.unknown_production_country.code_pays if lot.unknown_production_country else '',
+                lot.unknown_production_site_reference,
+                lot.unknown_production_site_com_date,
+                lot.unknown_production_site_dbl_counting,
+                lot.volume,
+                lot.biocarburant.code if lot.biocarburant else '',
+                lot.matiere_premiere.code if lot.matiere_premiere else '',
+                lot.pays_origine.code_pays if lot.pays_origine else '',
+                lot.eec, lot.el, lot.ep, lot.etd, lot.eu, lot.esca,
+                lot.eccs, lot.eccr, lot.eee, lot.ghg_total,
+                # tx
+                tx.dae,
+                tx.champ_libre,
+                tx.carbure_client.name if tx.client_is_in_carbure else tx.unknown_client,
+                tx.delivery_date,
+                tx.carbure_delivery_site.depot_id if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site,
+                tx.carbure_delivery_site.country.code_pays if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site_country
+                ]
+        csvline = '%s\n' % (';'.join([str(k) for k in line]))
+        buffer.write(csvline.encode('iso-8859-1'))
+    csvfile = buffer.getvalue()
+    buffer.close()
+    response = HttpResponse(content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename="%s"' % (filename)
+    response.write(csvfile)
+    return response

@@ -697,14 +697,27 @@ function initFilters(table, dom) {
     if (column.can_hide === true) {
       // use two columns
       if (i <= (len / 2)) {
-        columns_filter_html += `<tr><td><input type="checkbox" id="checkbox_${dom}${i}" class="toggle-vis" data-column="${i}" data-table="${dom}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
+        columns_filter_html += `<tr><td><input type="checkbox" id="checkbox_${dom}${i}" class="toggle-vis-${dom}" data-column="${i}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
       } else {
-        columns_filter_html2 += `<tr><td><input type="checkbox" id="checkbox_${dom}${i}" class="toggle-vis" data-column="${i}" data-table="${dom}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
+        columns_filter_html2 += `<tr><td><input type="checkbox" id="checkbox_${dom}${i}" class="toggle-vis-${dom}" data-column="${i}"></td><td><label for="checkbox${i}" class="label-inline">${column.title}</label></td></tr>`
       }
     }
   }
   table_columns_filter.append(columns_filter_html)
   table_columns_filter2.append(columns_filter_html2)
+	$(`.toggle-vis-${dom}`).on('click', function(e) {
+		// Get the column API object
+		let colid = $(this).attr('data-column')
+		let table_columns = dt_config[dom].col_definition
+		// Toggle the visibility
+		let column = window.table.column(colid);
+		var settings = loadTableSettings(table_columns, dom)
+    // console.log(`toggling colid ${colid} dom ${dom} columns ${table_columns[colid]} current ${settings[colid]}`)
+		settings[colid] = settings[colid] == 1 ? 0 : 1
+		saveTableSettings(settings, dom)
+		column.visible(!column.visible());
+	})
+
 }
 
 function updateDataTableSelectAllCtrl(table){
@@ -2042,17 +2055,5 @@ $("#btn_submit_upload_form").on('click', () => {
   $("#modal_import_form").submit()
 })
 
-$('.toggle-vis').on('click', function(e) {
-// Get the column API object
-let colid = $(this).attr('data-column')
-let dst_table = $(this).attr('data-table')
 
-
-// Toggle the visibility
-let column = window.table.column(colid);
-var settings = loadTableSettings(table_columns_producers_corrections, dst_table)
-settings[colid] = settings[colid] == 1 ? 0 : 1
-saveTableSettings(settings, dst_table)
-column.visible(!column.visible());
-})
 
