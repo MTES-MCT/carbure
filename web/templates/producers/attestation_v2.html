@@ -250,7 +250,7 @@
         <input type="hidden" id="lot_id" />
         <dl>
           <dt>Le producteur est enregistré sur carbure ?</dt>
-          <dd>Oui <input type="radio" name="producer_is_in_carbure" id="producer_is_in_carbure_yes" value="yes"/> Non <input type="radio" name="producer_is_in_carbure" id="producer_is_in_carbure_no" value="no"/></dd>
+          <dd>Oui <input type="radio" name="producer_is_in_carbure" value="yes"/> Non <input type="radio" name="producer_is_in_carbure" value="no"/></dd>
 
           <!-- Producer is in Carbure -->
           <dt id="carbure_producer_name_label">Producteur</dt>
@@ -292,7 +292,7 @@
         <dd><input id="dae" type="text" /><span id="dae_error" style="color:tomato;"></span></dd>
 
         <dt>Le client est enregistré sur carbure ?</dt>
-        <dd>Oui <input type="radio" name="client_is_in_carbure" id="client_is_in_carbure_yes" value="yes"/> Non <input type="radio" name="client_is_in_carbure" id="client_is_in_carbure_no" value="no"/></dd>
+        <dd>Oui <input type="radio" name="client_is_in_carbure" value="yes"/> Non <input type="radio" name="client_is_in_carbure" value="no"/></dd>
 
 
         <!-- Client is in Carbure -->
@@ -407,6 +407,9 @@ window.producers_api_lots_corrections_v2 = "{% url 'api-v2-producers-get-correct
 window.producers_api_lots_valid_v2 = "{% url 'api-v2-producers-get-valid' %}"
 window.producers_api_lot_duplicate_v2 = "{% url 'api-v2-producers-duplicate-lot' %}"
 window.producers_api_lot_save_v2 = "{% url 'api-v2-producers-save-lot' %}"
+
+
+window.producers_api_producers_autocomplete_v2 = "{% url 'api-v2-producers-autocomplete' %}"
 
 /*
 window.producers_api_lot_errors = "{% url 'producers-api-lot-errors' %}"
