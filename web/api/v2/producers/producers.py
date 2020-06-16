@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Max, Min
 from django.core import serializers
 from django.db.models.fields import NOT_PROVIDED
+from django.db.models import Q
 
 from core.decorators import enrich_with_user_details, restrict_to_producers
 from core.xlsx_template import create_template_xlsx_v2_simple, create_template_xlsx_v2_advanced
@@ -130,7 +131,7 @@ def load_excel_lot(context, lot_row):
         try:
             lot.biocarburant = Biocarburant.objects.get(code=biocarburant)
             LotV2Error.objects.filter(lot=lot, field='biocarburant_code').delete()
-        except Exception as e:
+        except Exception:
             lot.biocarburant = None
             error, c = LotV2Error.objects.update_or_create(lot=lot, field='biocarburant_code',
                                                            error='Biocarburant inconnu',
@@ -674,7 +675,6 @@ def save_lot(request, *args, **kwargs):
     # easy fields first
     lot.unknown_producer = request.POST.get('unknown_producer_name', '')
     lot.unknown_production_site = request.POST.get('unknown_production_site_name', '')
-    lot.unknown_production_site_com_date = request.POST.get('unknown_production_site_com_date', '')
     lot.unknown_production_site_reference = request.POST.get('unknown_production_site_reference', '')
     lot.unknown_production_site_dbl_counting = request.POST.get('unknown_production_site_dbl_counting', '')
     unknown_production_site_country_code = request.POST.get('unknown_production_site_country_code', '')
@@ -683,7 +683,20 @@ def save_lot(request, *args, **kwargs):
         lot.unknown_production_country = country
     except Exception:
         lot.unknown_production_country = None
-
+    unknown_production_site_com_date = request.POST.get('unknown_production_site_com_date', '')
+    try:
+        year = int(unknown_production_site_com_date[0:4])
+        month = int(unknown_production_site_com_date[5:7])
+        day = int(unknown_production_site_com_date[8:10])
+        dd = datetime.date(year=year, month=month, day=day)
+        lot.unknown_production_site_com_date = dd
+        lot.period = dd.strftime('%Y-%m')
+        LotV2Error.objects.filter(tx=lot, field='unknown_production_site_com_date').delete()
+    except Exception:
+        msg = "Format de date incorrect: veuillez entrer une date au format AAAA-MM-JJ"
+        e, c = LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_com_date',
+                                                   error=msg,
+                                                   defaults={'value': unknown_production_site_com_date})
     # producer
     producer_is_in_carbure = request.POST.get('producer_is_in_carbure', "no")
     if producer_is_in_carbure == "no":
@@ -867,14 +880,14 @@ def save_lot(request, *args, **kwargs):
     else:
         transaction = LotTransaction.objects.get(lot=lot)
 
-    lot.unknown_client = request.POST.get('unknown_client', '')
-    lot.unknown_delivery_site = request.POST.get('unknown_delivery_site', '')
+    transaction.unknown_client = request.POST.get('unknown_client', '')
+    transaction.unknown_delivery_site = request.POST.get('unknown_delivery_site', '')
     unknown_delivery_site_country_code = request.POST.get('unknown_delivery_site_country_code', '')
     try:
         country = Pays.objects.get(code_pays=unknown_delivery_site_country_code)
-        lot.unknown_delivery_site_country = country
+        transaction.unknown_delivery_site_country = country
     except Exception:
-        lot.unknown_delivery_site_country = None
+        transaction.unknown_delivery_site_country = None
 
     transaction.vendor_is_in_carbure = True
     transaction.carbure_vendor = entity
@@ -903,7 +916,7 @@ def save_lot(request, *args, **kwargs):
 
     delivery_date = request.POST.get('delivery_date', '')
     if delivery_date == '':
-        transaction.ea_delivery_date = None
+        transaction.delivery_date = None
         lot.period = ''
         e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_date',
                                                          error="Merci de préciser la date de livraison",
@@ -918,6 +931,7 @@ def save_lot(request, *args, **kwargs):
             lot.period = dd.strftime('%Y-%m')
             TransactionError.objects.filter(tx=transaction, field='delivery_date').delete()
         except Exception:
+            transaction.delivery_date = None
             msg = "Format de date incorrect: veuillez entrer une date au format AAAA-MM-JJ"
             e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_date',
                                                              error=msg,
@@ -1011,3 +1025,22 @@ def get_producers_autocomplete(request, *args, **kwargs):
     ids = [r.entity.id for r in rights]
     entities = Entity.objects.filter(entity_type='Producteur', name__icontains=q, id__in=ids)
     return JsonResponse({'suggestions': [{'value': p.name, 'id': p.id} for p in entities]})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def get_clients_autocomplete(request, *args, **kwargs):
+    q = request.GET['query']
+    entities = Entity.objects.filter(entity_type__in=['Producteur', 'Trader', 'Opérateur'], name__icontains=q)
+    return JsonResponse({'suggestions': [{'value': p.name, 'id': p.id} for p in entities]})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def get_depots_autocomplete(request, *args, **kwargs):
+    q = request.GET['query']
+    depots = Depot.objects.filter(Q(name__icontains=q) | Q(city__icontains=q) | Q(depot_id__icontains=q))
+    results = [{'value': '%s - %s - %s' % (i.name, i.depot_id, i.city), 'name': i.name, 'depot_id': i.depot_id, 'city': i.city, 'country_code': i.country.code_pays, 'country_name': i.country.name} for i in depots]
+    return JsonResponse({'suggestions': results})

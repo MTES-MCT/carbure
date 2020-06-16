@@ -25,8 +25,9 @@ urlpatterns = [
     path('producers/lot/save', producers.save_lot, name='api-v2-producers-save-lot'),
 
 
-    path('producers/autocomplete', producers.get_producers_autocomplete, name='api-v2-producers-autocomplete'),
-
+    path('producers/get-producers-autocomplete', producers.get_producers_autocomplete, name='api-v2-producers-autocomplete'),
+    path('producers/get-clients-autocomplete', producers.get_clients_autocomplete, name='api-v2-clients-autocomplete'),
+    path('producers/get-depots-autocomplete', producers.get_depots_autocomplete, name='api-v2-depots-autocomplete'),
 ]
 
 #path('producers/lots/corrections', producers_api.producers_lots_corrections, name='api-producers-lots-corrections'),
