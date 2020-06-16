@@ -241,6 +241,10 @@ class LotV2(models.Model):
     parent_lot = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
     is_split = models.BooleanField(default=False)
 
+    # lot has been fused
+    is_fused = models.BooleanField(default=False)
+    fused_with = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='lotv2_fused_with')
+
     def __str__(self):
         return str(self.id)
 
