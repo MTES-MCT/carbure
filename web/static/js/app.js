@@ -751,7 +751,7 @@ function updateDataTableSelectAllCtrl(table){
 
 function producer_is_in_carbure(bool) {
 	if (bool) {
-    	$("#producer_is_in_carbure_yes").prop("checked", true)
+      $("input[name='producer_is_in_carbure']").filter("[value='yes']").prop("checked", true)
       $("#carbure_producer_name").show()
     	$("#carbure_producer_name_label").show()
       $("#carbure_production_site_name").show()
@@ -770,7 +770,7 @@ function producer_is_in_carbure(bool) {
     	$("#unknown_production_site_com_date").hide()
     	$("#unknown_production_site_com_date_label").hide()
 	} else {
-    	$("#producer_is_in_carbure_no").prop("checked", true)
+      $("input[name='producer_is_in_carbure']").filter("[value='no']").prop("checked", true)
       $("#carbure_producer_name").hide()
     	$("#carbure_producer_name_label").hide()
       $("#carbure_production_site_name").hide()
@@ -793,7 +793,7 @@ function producer_is_in_carbure(bool) {
 
 function client_is_in_carbure(bool) {
   if (bool) {
-    $("#client_is_in_carbure_yes").prop("checked", true)
+    $("input[name='client_is_in_carbure']").filter("[value='yes']").prop("checked", true)
     $("#carbure_client_label").show()
     $("#carbure_client").show()
     $("#carbure_delivery_site_label").show()
@@ -806,7 +806,7 @@ function client_is_in_carbure(bool) {
     $("#unknown_delivery_site_country_label").hide()
     $("#unknown_delivery_site_country").hide()
   } else {
-    $("#client_is_in_carbure_no").prop("checked", true)
+    $("input[name='client_is_in_carbure']").filter("[value='no']").prop("checked", true)
     $("#carbure_client_label").hide()
     $("#carbure_client").hide()
     $("#carbure_delivery_site_label").hide()
@@ -1115,8 +1115,12 @@ function handleSave(action) {
   var formdata = new FormData();
   formdata.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
   $(".modal-edit input").each(function() {
-    formdata.set($(this).attr('id'), $(this).val())
+    if ($(this).attr('id') !== undefined) {
+      formdata.set($(this).attr('id'), $(this).val())
+    }
   })
+  formdata.set("producer_is_in_carbure", document.querySelector('input[name="producer_is_in_carbure"]:checked').value)
+  formdata.set("client_is_in_carbure", document.querySelector('input[name="client_is_in_carbure"]:checked').value)
 
   // post form
   $.ajax({
@@ -1244,6 +1248,20 @@ $(".autocomplete_biocarburants").autocomplete({
   onInvalidateSelection: function() {
     $("#biocarburant_code").val('')
   },
+})
+
+$(".autocomplete_producers").autocomplete({
+  serviceUrl: window.producers_api_producers_autocomplete_v2,
+  dataType: 'json',
+  minChars: 0,
+  onSelect: function(suggestion) {
+    $("#carbure_producer_id").val(suggestion.id)
+    $("#carbure_producer_name").val(suggestion.value)
+  },
+  onInvalidateSelection: function() {
+    $("#carbure_producer_id").val('')
+    $("#carbure_producer_name").val('')
+  }
 })
 
 $(".autocomplete_production_sites").autocomplete({

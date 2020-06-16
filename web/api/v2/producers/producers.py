@@ -13,7 +13,7 @@ from core.decorators import enrich_with_user_details, restrict_to_producers
 from core.xlsx_template import create_template_xlsx_v2_simple, create_template_xlsx_v2_advanced
 
 from core.models import Entity, ProductionSite, Pays, Biocarburant, MatierePremiere, Depot
-from core.models import LotV2, LotTransaction, TransactionError, LotV2Error
+from core.models import LotV2, LotTransaction, TransactionError, LotV2Error, UserRights
 
 
 def get_random(model):
@@ -671,6 +671,15 @@ def save_lot(request, *args, **kwargs):
     entity = context['user_entity']
     lot.added_by = entity
     lot.added_by_user = request.user
+    producer_is_in_carbure = request.POST.get('producer_is_in_carbure', "no")
+    if producer_is_in_carbure == "no":
+        lot.producer_is_in_carbure = False
+    else:
+        lot.producer_is_in_carbure = True
+
+    carbure_producer_id = request.POST.get('carbure_producer_id', None)
+    #if carbure_producer_id:
+
     producer_name = request.POST.get('producer_name', '')
     if not producer_name:
         lot.producer_is_in_carbure = False
@@ -1004,3 +1013,14 @@ def export_drafts(request, *args, **kwargs):
     response['Content-Disposition'] = 'attachment; filename="%s"' % (filename)
     response.write(csvfile)
     return response
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def get_producers_autocomplete(request, *args, **kwargs):
+    q = request.GET['query']
+    rights = UserRights.objects.filter(user=request.user)
+    ids = [r.entity.id for r in rights]
+    entities = Entity.objects.filter(entity_type='Producteur', name__icontains=q, id__in=ids)
+    return JsonResponse({'suggestions': [{'value': p.name, 'id': p.id} for p in entities]})
