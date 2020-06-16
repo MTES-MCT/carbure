@@ -16,6 +16,7 @@ urlpatterns = [
     path('lots/valid', producers.get_valid, name='api-v2-producers-get-valid'),
 
     path('export/lots/drafts', producers.export_drafts, name='api-v2-producers-export-drafts'),
+    path('export/lots/mb', producers.export_mb, name='api-v2-producers-export-mb'),
 
 
 
