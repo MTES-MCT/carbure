@@ -15,6 +15,15 @@ def producers_index_v2(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
+def producers_mass_balance(request, *args, **kwargs):
+    context = kwargs['context']
+    context['current_url_name'] = 'producers-mb'
+    return render(request, 'producers/mass_balance.html', context)
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
 def producers_import_doc(request, *args, **kwargs):
     context = kwargs['context']
     context['current_url_name'] = 'producers-import-documentation'
