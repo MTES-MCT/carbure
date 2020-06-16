@@ -4,13 +4,13 @@ const selected_rows = []
 
 const table_columns_drafts_v2 = [
 {title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
-{title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer.name : `<i>${full.fields.unknown_producer}</i>` }},
+{title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.carbure_producer ? full.fields.carbure_producer.name : `<i>${full.fields.unknown_producer}</i>` }},
 {title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.carbure_production_site ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
 {title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.carbure_production_site ? full.fields.carbure_production_site.country.code_pays : (full.fields.unknown_production_country ? full.fields.unknown_production_country.code_pays: "") }},
 {title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
-{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.biocarburant.name }},
-{title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.matiere_premiere.name }},
-{title:`Pays<br /> d'origine`, filter_title: 'Pays', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.pays_origine.code_pays }},
+{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.biocarburant ? full.fields.biocarburant.name : ''}},
+{title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.matiere_premiere ? full.fields.matiere_premiere.name : ''}},
+{title:`Pays<br /> d'origine`, filter_title: 'Pays', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.pays_origine ? full.fields.pays_origine.code_pays : '' }},
 
 {title:'EEC', shown: false, hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
 {title:'EL', shown: false, hidden: true, can_hide: true, can_duplicate: true, can_export: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
@@ -885,18 +885,18 @@ function display_producers_lot_modal(table, columns, event) {
     if (data.errors['volume']) {
       $("#volume_error").val(data.errors.volume)
     }
-    $("#biocarburant").val(data.fields.biocarburant.name)
-    $("#biocarburant_code").val(data.fields.biocarburant.code)
+    $("#biocarburant").val(data.fields.biocarburant ? data.fields.biocarburant.name : '')
+    $("#biocarburant_code").val(data.fields.biocarburant ? data.fields.biocarburant.code : '')
     if (data.errors['biocarburant']) {
       $("#biocarburant_error").val(data.errors.biocarburant)
     }
-    $("#matiere_premiere").val(data.fields.matiere_premiere.name)
-    $("#matiere_premiere_code").val(data.fields.matiere_premiere.code)
+    $("#matiere_premiere").val(data.fields.matiere_premiere ? data.fields.matiere_premiere.name : '')
+    $("#matiere_premiere_code").val(data.fields.matiere_premiere ? data.fields.matiere_premiere.code : '')
     if (data.errors['matiere_premiere']) {
       $("#matiere_premiere_error").val(data.errors.matiere_premiere)
     }
-    $("#pays_origine").val(data.fields.pays_origine.name)
-    $("#pays_origine_code").val(data.fields.pays_origine.code_pays)
+    $("#pays_origine").val(data.fields.pays_origine ? data.fields.pays_origine.name : '')
+    $("#pays_origine_code").val(data.fields.pays_origine ? data.fields.pays_origine.code_pays : '')
     if (data.errors['pays_origine']) {
       $("#pays_origine_error").val(data.errors.pays_origine)
     }
@@ -918,7 +918,7 @@ function display_producers_lot_modal(table, columns, event) {
       $("#carbure_client_error").val(data.errors.client)
     }
     $("#carbure_delivery_site").val(data.tx.fields.carbure_delivery_site ? data.tx.fields.carbure_delivery_site.name : '')
-    $("#carbure_delivery_site_id").val(data.tx.fields.carbure_delivery_site ? data.tx.fields.carbure_delivery_site.id : '')
+    $("#carbure_delivery_site_id").val(data.tx.fields.carbure_delivery_site ? data.tx.fields.carbure_delivery_site.depot_id : '')
     if (data.errors['delivery_site']) {
       $("#carbure_delivery_site_error").val(data.errors.delivery_site)
     }
@@ -946,6 +946,7 @@ function display_producers_lot_modal(table, columns, event) {
     // non-input keys
     $("#ghg_total").html(data.fields.ghg_total)
     $("#ghg_reduction").html(`${data.fields.ghg_reduction}%`)
+    $("#ghg_reference").val(data.fields.ghg_reference)
     $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data.fields.ghg_reference} gCO2eq/MJ`)
 
     /* load errors */
@@ -1216,6 +1217,7 @@ $(".ges_field").on('change', function() {
   })
   var sum = sum_incr - sum_decr
   $("#ghg_total").text(sum.toFixed(2))
+  console.log(`ref ${ref} sum ${sum}`)
   var pct_reduction = (1.0 - (sum / ref)) * 100
   $("#ghg_reduction").text(`${pct_reduction.toFixed(2)}%`)
   $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${ref} gCO2eq/MJ`)
@@ -1236,7 +1238,6 @@ $(".autocomplete_mps").autocomplete({
   onInvalidateSelection: function() {
     $("#matiere_premiere_code").val('')
   },
-  showNoSuggestionNotice: true,
 })
 
 $(".autocomplete_biocarburants").autocomplete({
@@ -1274,15 +1275,10 @@ $(".autocomplete_production_sites").autocomplete({
   dataType: 'json',
   minChars: 0,
   onSelect: function(suggestion) {
-    console.log(suggestion)
-    $("#production_site_id").val(suggestion.data)
-    $("#production_site_country").val(suggestion.country.name)
-    $("#production_site_country_code").val(suggestion.country.code_pays)
+    $("#carbure_production_site_id").val(suggestion.data)
   },
   onInvalidateSelection: function() {
-    $("#production_site_id").val('')
-    $("#production_site_country").val('')
-    $("#production_site_country_code").val('')
+    $("#carbure_production_site_id").val('')
   }
 })
 
@@ -1290,7 +1286,6 @@ $(".autocomplete_countries").autocomplete({
   serviceUrl: window.api_country_autocomplete,
   dataType: 'json',
   onSelect: function(suggestion) {
-    console.log(suggestion)
     $(`#${this.id}_code`).val(suggestion.data)
   },
   onInvalidateSelection: function() {
@@ -1298,34 +1293,29 @@ $(".autocomplete_countries").autocomplete({
   }
 })
 
-$(".autocomplete_operators").autocomplete({
-  serviceUrl: window.api_operators_autocomplete,
+$(".autocomplete_clients").autocomplete({
+  serviceUrl: window.producers_api_clients_autocomplete_v2,
   dataType: 'json',
   minChars: 0,
   onSelect: function(suggestion) {
-    $("#client_id").val(suggestion.data)
+    $("#carbure_client_id").val(suggestion.id)
   },
   onInvalidateSelection: function() {
-    $("#client_id").val('')
+    $("#carbure_client_id").val('')
   }
 })
 
 $(".autocomplete_depots").autocomplete({
-  serviceUrl: window.api_depots_autocomplete,
+  serviceUrl: window.producers_api_depots_autocomplete_v2,
   dataType: 'json',
-  minChars: 1,
+  minChars: 0,
   onSelect: function(suggestion) {
-    console.log(suggestion)
-    $("#delivery_site").val(suggestion.name)
-    $("#delivery_site_id").val(suggestion.depot_id)
-    $("#delivery_site_country_code").val(suggestion.country_code)
-    $("#delivery_site_country").val(suggestion.country_name)
+    $("#carbure_delivery_site").val(suggestion.name)
+    $("#carbure_delivery_site_id").val(suggestion.depot_id)
   },
   onInvalidateSelection: function() {
-    $("#delivery_site").val('')
-    $("#delivery_site_id").val('')
-    $("#delivery_site_country_code").val('')
-    $("#delivery_site_country").val('')
+    $("#carbure_delivery_site").val('')
+    $("#carbure_delivery_site_id").val('')
   }
 })
 
