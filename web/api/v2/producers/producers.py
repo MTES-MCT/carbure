@@ -14,7 +14,7 @@ from core.decorators import enrich_with_user_details, restrict_to_producers
 from core.xlsx_template import create_template_xlsx_v2_simple, create_template_xlsx_v2_advanced
 
 from core.models import Entity, ProductionSite, Pays, Biocarburant, MatierePremiere, Depot
-from core.models import LotV2, LotTransaction, TransactionError, LotV2Error, UserRights
+from core.models import LotV2, LotTransaction, TransactionError, LotV2Error, UserRights, TransactionComment
 
 
 def get_random(model):
@@ -465,7 +465,7 @@ def get_drafts(request, *args, **kwargs):
 @restrict_to_producers
 def get_received(request, *args, **kwargs):
     context = kwargs['context']
-    transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='N', lot__status="Validated")
+    transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status__in=['N', 'AC'], lot__status="Validated")
     lot_ids = [t.lot.id for t in transactions]
     lots = LotV2.objects.filter(id__in=lot_ids)
     errors = LotV2Error.objects.filter(lot__in=lots)
@@ -495,7 +495,7 @@ def get_mb(request, *args, **kwargs):
 @restrict_to_producers
 def get_corrections(request, *args, **kwargs):
     context = kwargs['context']
-    transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status__in=['R', 'AC', 'AA'], lot__status="Validated")
+    transactions = LotTransaction.objects.filter(carbure_vendor=context['user_entity'], delivery_status__in=['R', 'AC', 'AA'], lot__status="Validated")
     lot_ids = [t.lot.id for t in transactions]
     lots = LotV2.objects.filter(id__in=lot_ids)
     sez = serializers.serialize('json', lots, use_natural_foreign_keys=True)
@@ -645,6 +645,76 @@ def validate_lots(request, *args, **kwargs):
         results.append({'lot_id': lotid, 'status': 'sucess'})
     # print({'status': 'success', 'message': results})
     return JsonResponse({'status': 'success', 'message': results})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def reject_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    # new lot or edit?
+    tx_id = request.POST.get('tx_id', None)
+    tx_comment = request.POST.get('comment', '')
+    if tx_id is None:
+        return JsonResponse({'status': 'error', 'message': "Missing TX ID from POST data"}, status=400)
+    if tx_comment == '':
+        return JsonResponse({'status': 'error', 'message': "Un commentaire est obligatoire en cas de refus"}, status=400)
+    try:
+        tx = LotTransaction.objects.get(carbure_client=context['user_entity'], delivery_status__in=['N', 'AC', 'AA'], id=tx_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Transaction inconnue", 'extra': str(e)}, status=400)
+    tx.delivery_status = 'R'
+    tx.save()
+    txerr = TransactionError()
+    txerr.entity = context['user_entity']
+    txerr.tx = tx
+    txerr.comment = tx_comment
+    txerr.save()
+    return JsonResponse({'status': 'success', 'tx_id': tx.id})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def accept_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    # new lot or edit?
+    tx_id = request.POST.get('tx_id', None)
+    if tx_id is None:
+        return JsonResponse({'status': 'error', 'message': "Missing TX ID from POST data"}, status=400)
+    try:
+        tx = LotTransaction.objects.get(carbure_client=context['user_entity'], delivery_status__in=['N', 'AC', 'AA'], id=tx_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Transaction inconnue", 'extra': str(e)}, status=400)
+    tx.delivery_status = 'A'
+    tx.save()
+    return JsonResponse({'status': 'success', 'tx_id': tx.id})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def accept_lot_with_correction(request, *args, **kwargs):
+    context = kwargs['context']
+    # new lot or edit?
+    tx_id = request.POST.get('tx_id', None)
+    tx_comment = request.POST.get('comment', '')
+    if tx_id is None:
+        return JsonResponse({'status': 'error', 'message': "Missing TX ID from POST data"}, status=400)
+    if tx_comment == '':
+        return JsonResponse({'status': 'error', 'message': "Un commentaire est obligatoire"}, status=400)
+    try:
+        tx = LotTransaction.objects.get(carbure_client=context['user_entity'], delivery_status__in=['N', 'AC', 'AA'], id=tx_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Transaction inconnue", 'extra': str(e)}, status=400)
+    tx.delivery_status = 'AC'
+    tx.save()
+    txc = TransactionComment()
+    txc.entity = context['user_entity']
+    txc.tx = tx
+    txc.comment = tx_comment
+    txc.save()
+    return JsonResponse({'status': 'success', 'tx_id': tx.id})
 
 
 @login_required

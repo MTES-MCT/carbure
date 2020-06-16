@@ -49,11 +49,13 @@ const table_columns_corrections_v2 = [
 {title:'Date de livraison', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_date}},
 {title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.client_is_in_carbure ? full.tx.fields.carbure_client.name : `<i>${full.tx.fields.unknown_client}</i>`}},
 {title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site.name : `<i>${full.tx.fields.unknown_delivery_site}</i>` }},
+{title:'Status', can_hide: true, can_filter: true, orderable: true, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_status}},
 ]
 
 
 const table_columns_received_v2 = [
 {title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
+{title:'Numéro de lot', can_hide: true, data:'carbure_id'},
 {title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer.name : `<i>${full.fields.unknown_producer}</i>` }},
 {title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
 {title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.country.code_pays : (full.fields.unknown_production_country ? full.fields.unknown_production_country.code_pays: "") }},
@@ -81,6 +83,7 @@ const table_columns_received_v2 = [
 {title:'Date d\'entrée<br /> en EA', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_date}},
 {title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.client_is_in_carbure ? full.tx.fields.carbure_client.name : `<i>${full.tx.fields.unknown_client}</i>`}},
 {title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site.name : `<i>${full.tx.fields.unknown_delivery_site}</i>` }},
+{title:'Status', can_hide: true, can_filter: true, orderable: true, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_status}},
 ]
 
 const table_columns_mb_v2 = [
@@ -116,6 +119,9 @@ const table_columns_valid_v2 = [
 {title:'Producteur', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer.name : `<i>${full.fields.unknown_producer}</i>` }},
 {title:'Site de<br /> Production', hidden:true, filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
 {title:'Fournisseur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.tx.fields.vendor_is_in_carbure ? full.tx.fields.carbure_vendor.name : `<i>${full.tx.fields.unknown_vendor}</i>` }},
+{title:'Date d\'entrée<br /> en EA', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_date}},
+{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.client_is_in_carbure ? full.tx.fields.carbure_client.name : `<i>${full.tx.fields.unknown_client}</i>`}},
+{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site.name : `<i>${full.tx.fields.unknown_delivery_site}</i>` }},
 {title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
 {title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.biocarburant.name }},
 {title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.matiere_premiere.name }},
@@ -136,9 +142,6 @@ const table_columns_valid_v2 = [
 
 {title:'N°DAE/DAU', can_hide: true, can_duplicate: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.dae}},
 {title:'Référence', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, tooltip: 'Champ libre - Référence client', render: (data, type, full, meta) => {return full.tx.fields.champ_libre}},
-{title:'Date d\'entrée<br /> en EA', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_date}},
-{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.client_is_in_carbure ? full.tx.fields.carbure_client.name : `<i>${full.tx.fields.unknown_client}</i>`}},
-{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site.name : `<i>${full.tx.fields.unknown_delivery_site}</i>` }},
 ]
 
 const operators_table_columns_in_v2 = [
@@ -404,11 +407,6 @@ $("form").submit(function(event) {
 $("#pagelength").on('change', function() {
   let pagelength = $("#pagelength").val()
   window.table.page.len(pagelength).draw()
-})
-
-$("#pagelength_valid").on('change', function() {
-  let pagelength = $("#pagelength_valid").val()
-  table_valid.page.len(pagelength).draw()
 })
 
 $("#pagelength_lots_admin").on('change', function() {
@@ -848,9 +846,12 @@ function display_producers_lot_modal(table, columns, event) {
     // ignore clicks on checkbox column
     return
   } else {
-    let modal = document.getElementById("modal_edit_lot")
+    let modal = document.getElementById("modal_lot")
     console.log(data)
+    $("#save_section").show()
+    $("#check_section").hide()
     $("#lot_id").val(data.pk)
+    $("#tx_id").val(data.tx.pk)
 
     if (data.fields.producer_is_in_carbure) {
     	producer_is_in_carbure(true)
@@ -1014,6 +1015,248 @@ function display_producers_lot_modal(table, columns, event) {
     } else {
       $("#err_msg_dom").html('')
     }
+    modal.style.display = "flex"
+  }
+}
+
+function display_producers_lot_received_modal(table, columns, event) {
+  // check if we clicked on the checkbox
+  let colid = event.target._DT_CellIndex.column
+  let rowid = event.target._DT_CellIndex.row
+  let data = table.row(rowid).data()
+  let table_column = columns[colid]
+  let comments_section = $("#comments_section")
+  comments_section.empty()
+  if (table_column['data'] === 'checkbox') {
+    // ignore clicks on checkbox column
+    return
+  } else {
+    let modal = document.getElementById("modal_lot")
+    console.log(data)
+    $("#save_section").hide()
+    $("#check_section").show()
+    $("#lot_id").val(data.pk)
+    $("#tx_id").val(data.tx.pk)
+
+    if (data.fields.producer_is_in_carbure) {
+    	producer_is_in_carbure(true)
+    } else {
+    	producer_is_in_carbure(false)
+    }
+
+    $("#carbure_producer_name").val(data.fields.carbure_producer ? data.fields.carbure_producer.name : '')
+    $("#carbure_producer_id").val(data.fields.carbure_producer ? data.fields.carbure_producer.id : '')
+    $("#carbure_production_site_name").val(data.fields.carbure_production_site ? data.fields.carbure_production_site.name : '')
+    $("#carbure_production_site_id").val(data.fields.carbure_production_site ? data.fields.carbure_production_site.id : '')
+    $("#unknown_producer_name").val(data.fields.unknown_producer)
+    $("#unknown_production_site_name").val(data.fields.unknown_production_site)
+    $("#unknown_production_site_country").val(data.fields.unknown_production_country ? data.fields.unknown_production_country.name : '')
+    $("#unknown_production_site_country_code").val(data.fields.unknown_production_country ? data.fields.unknown_production_country.code_pays : '')
+
+    $("#unknown_production_site_com_date").val(data.fields.unknown_production_site_com_date)
+    $("#unknown_production_site_reference").val(data.fields.unknown_production_site_reference)
+    $("#unknown_production_site_dbl_counting").val(data.fields.unknown_production_site_dbl_counting)
+
+
+
+    $("#volume").val(data.fields.volume)
+    $("#biocarburant").val(data.fields.biocarburant ? data.fields.biocarburant.name : '')
+    $("#biocarburant_code").val(data.fields.biocarburant ? data.fields.biocarburant.code : '')
+    $("#matiere_premiere").val(data.fields.matiere_premiere ? data.fields.matiere_premiere.name : '')
+    $("#matiere_premiere_code").val(data.fields.matiere_premiere ? data.fields.matiere_premiere.code : '')
+    $("#pays_origine").val(data.fields.pays_origine ? data.fields.pays_origine.name : '')
+    $("#pays_origine_code").val(data.fields.pays_origine ? data.fields.pays_origine.code_pays : '')
+    /* TX Related fields */
+    $("#dae").val(data.tx.fields.dae)
+
+    if (data.tx.fields.client_is_in_carbure) {
+      client_is_in_carbure(true)
+    } else {
+      client_is_in_carbure(false)
+    }
+
+    $("#carbure_client").val(data.tx.fields.carbure_client ? data.tx.fields.carbure_client.name : '')
+    $("#carbure_client_id").val(data.tx.fields.carbure_client ? data.tx.fields.carbure_client.id : '')
+    $("#carbure_delivery_site").val(data.tx.fields.carbure_delivery_site ? data.tx.fields.carbure_delivery_site.name : '')
+    $("#carbure_delivery_site_id").val(data.tx.fields.carbure_delivery_site ? data.tx.fields.carbure_delivery_site.depot_id : '')
+    $("#unknown_client").val(data.tx.fields.unknown_client)
+    $("#unknown_delivery_site").val(data.tx.fields.unknown_delivery_site)
+    $("#unknown_delivery_site_country").val(data.tx.fields.unknown_delivery_site_country ? data.tx.fields.unknown_delivery_site_country.name : '')
+    $("#unknown_delivery_site_country_code").val(data.tx.fields.unknown_delivery_site_country ? data.tx.fields.unknown_delivery_site_country.code_pays : '')
+    $("#delivery_date").val(data.tx.fields.delivery_date)
+    $("#champ_libre").val(data.tx.fields.champ_libre)
+
+    /* Greenhouse gases values */
+    $("#eec").val(data.fields.eec)
+    $("#el").val(data.fields.el)
+    $("#ep").val(data.fields.ep)
+    $("#etd").val(data.fields.etd)
+    $("#eu").val(data.fields.eu)
+    $("#esca").val(data.fields.esca)
+    $("#eccs").val(data.fields.eccs)
+    $("#eccr").val(data.fields.eccr)
+    $("#eee").val(data.fields.eee)
+
+    // non-input keys
+    $("#ghg_total").html(data.fields.ghg_total)
+    $("#ghg_reduction").html(`${data.fields.ghg_reduction}%`)
+    $("#ghg_reference").val(data.fields.ghg_reference)
+    $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data.fields.ghg_reference} gCO2eq/MJ`)
+
+    /* load comments */
+    /*
+    $.ajax({
+      url         : window.producers_api_lot_comments,
+      data        : {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+      type        : 'POST',
+      success     : function(d, textStatus, jqXHR){
+        // Callback code
+        // load existing comments into the form
+        for (let i = 0, len = d.length; i < len; i++) {
+          let c = d[i]
+          let html = `<p><b>${c.from}</b>: ${c.comment}</p>`
+          comments_section.append(html)
+        }
+        // add area to respond
+        if (data['status'] === "Draft" || data['ea_delivery_status'] === "Accepté") {
+          // do nothing
+        } else {
+          // add the ability to add a comment
+          let html = `<div style="display: flex;"><p>Ajouter un commentaire:</p><input type="text" name="textarea" id="textarea" style="max-width: 80%; height: 2em; margin-left: 10px; margin-top: auto; margin-bottom: auto;" /></div>`
+          comments_section.append(html)
+        }
+      },
+      error       : function(e) {
+        if (e.status === 400) {
+          alert(e.responseJSON.message)
+          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+        } else {
+          alert("Server error. Please contact an administrator")
+          console.log(`server error ${JSON.stringify(e)}`)
+        }
+      }
+    })*/
+    modal.style.display = "flex"
+  }
+}
+
+function display_producers_lot_correction_modal(table, columns, event) {
+  // check if we clicked on the checkbox
+  let colid = event.target._DT_CellIndex.column
+  let rowid = event.target._DT_CellIndex.row
+  let data = table.row(rowid).data()
+  let table_column = columns[colid]
+  let comments_section = $("#comments_section")
+  comments_section.empty()
+  if (table_column['data'] === 'checkbox') {
+    // ignore clicks on checkbox column
+    return
+  } else {
+    let modal = document.getElementById("modal_lot")
+    console.log(data)
+    $("#save_section").hide()
+    $("#check_section").show()
+    $("#lot_id").val(data.pk)
+    $("#tx_id").val(data.tx.pk)
+
+    if (data.fields.producer_is_in_carbure) {
+      producer_is_in_carbure(true)
+    } else {
+      producer_is_in_carbure(false)
+    }
+
+    $("#carbure_producer_name").val(data.fields.carbure_producer ? data.fields.carbure_producer.name : '')
+    $("#carbure_producer_id").val(data.fields.carbure_producer ? data.fields.carbure_producer.id : '')
+    $("#carbure_production_site_name").val(data.fields.carbure_production_site ? data.fields.carbure_production_site.name : '')
+    $("#carbure_production_site_id").val(data.fields.carbure_production_site ? data.fields.carbure_production_site.id : '')
+    $("#unknown_producer_name").val(data.fields.unknown_producer)
+    $("#unknown_production_site_name").val(data.fields.unknown_production_site)
+    $("#unknown_production_site_country").val(data.fields.unknown_production_country ? data.fields.unknown_production_country.name : '')
+    $("#unknown_production_site_country_code").val(data.fields.unknown_production_country ? data.fields.unknown_production_country.code_pays : '')
+
+    $("#unknown_production_site_com_date").val(data.fields.unknown_production_site_com_date)
+    $("#unknown_production_site_reference").val(data.fields.unknown_production_site_reference)
+    $("#unknown_production_site_dbl_counting").val(data.fields.unknown_production_site_dbl_counting)
+
+
+
+    $("#volume").val(data.fields.volume)
+    $("#biocarburant").val(data.fields.biocarburant ? data.fields.biocarburant.name : '')
+    $("#biocarburant_code").val(data.fields.biocarburant ? data.fields.biocarburant.code : '')
+    $("#matiere_premiere").val(data.fields.matiere_premiere ? data.fields.matiere_premiere.name : '')
+    $("#matiere_premiere_code").val(data.fields.matiere_premiere ? data.fields.matiere_premiere.code : '')
+    $("#pays_origine").val(data.fields.pays_origine ? data.fields.pays_origine.name : '')
+    $("#pays_origine_code").val(data.fields.pays_origine ? data.fields.pays_origine.code_pays : '')
+    /* TX Related fields */
+    $("#dae").val(data.tx.fields.dae)
+
+    if (data.tx.fields.client_is_in_carbure) {
+      client_is_in_carbure(true)
+    } else {
+      client_is_in_carbure(false)
+    }
+
+    $("#carbure_client").val(data.tx.fields.carbure_client ? data.tx.fields.carbure_client.name : '')
+    $("#carbure_client_id").val(data.tx.fields.carbure_client ? data.tx.fields.carbure_client.id : '')
+    $("#carbure_delivery_site").val(data.tx.fields.carbure_delivery_site ? data.tx.fields.carbure_delivery_site.name : '')
+    $("#carbure_delivery_site_id").val(data.tx.fields.carbure_delivery_site ? data.tx.fields.carbure_delivery_site.depot_id : '')
+    $("#unknown_client").val(data.tx.fields.unknown_client)
+    $("#unknown_delivery_site").val(data.tx.fields.unknown_delivery_site)
+    $("#unknown_delivery_site_country").val(data.tx.fields.unknown_delivery_site_country ? data.tx.fields.unknown_delivery_site_country.name : '')
+    $("#unknown_delivery_site_country_code").val(data.tx.fields.unknown_delivery_site_country ? data.tx.fields.unknown_delivery_site_country.code_pays : '')
+    $("#delivery_date").val(data.tx.fields.delivery_date)
+    $("#champ_libre").val(data.tx.fields.champ_libre)
+
+    /* Greenhouse gases values */
+    $("#eec").val(data.fields.eec)
+    $("#el").val(data.fields.el)
+    $("#ep").val(data.fields.ep)
+    $("#etd").val(data.fields.etd)
+    $("#eu").val(data.fields.eu)
+    $("#esca").val(data.fields.esca)
+    $("#eccs").val(data.fields.eccs)
+    $("#eccr").val(data.fields.eccr)
+    $("#eee").val(data.fields.eee)
+
+    // non-input keys
+    $("#ghg_total").html(data.fields.ghg_total)
+    $("#ghg_reduction").html(`${data.fields.ghg_reduction}%`)
+    $("#ghg_reference").val(data.fields.ghg_reference)
+    $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data.fields.ghg_reference} gCO2eq/MJ`)
+
+    /* load comments */
+    /*
+    $.ajax({
+      url         : window.producers_api_lot_comments,
+      data        : {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+      type        : 'POST',
+      success     : function(d, textStatus, jqXHR){
+        // Callback code
+        // load existing comments into the form
+        for (let i = 0, len = d.length; i < len; i++) {
+          let c = d[i]
+          let html = `<p><b>${c.from}</b>: ${c.comment}</p>`
+          comments_section.append(html)
+        }
+        // add area to respond
+        if (data['status'] === "Draft" || data['ea_delivery_status'] === "Accepté") {
+          // do nothing
+        } else {
+          // add the ability to add a comment
+          let html = `<div style="display: flex;"><p>Ajouter un commentaire:</p><input type="text" name="textarea" id="textarea" style="max-width: 80%; height: 2em; margin-left: 10px; margin-top: auto; margin-bottom: auto;" /></div>`
+          comments_section.append(html)
+        }
+      },
+      error       : function(e) {
+        if (e.status === 400) {
+          alert(e.responseJSON.message)
+          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+        } else {
+          alert("Server error. Please contact an administrator")
+          console.log(`server error ${JSON.stringify(e)}`)
+        }
+      }
+    })*/
     modal.style.display = "flex"
   }
 }
@@ -1472,11 +1715,12 @@ const dt_received_config = {
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_producers_lot_modal(table, table_columns_received_v2, e)
+      display_producers_lot_received_modal(table, table_columns_received_v2, e)
     })
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
     })
+    initFilters(table_columns_received_v2, "tab_received")
 
     // Handle click on checkbox
     $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
@@ -1575,6 +1819,7 @@ const dt_mb_config = {
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
     })
+    initFilters(table_columns_mb_v2, "tab_mb")
 
     // Handle click on checkbox
     $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
@@ -1660,6 +1905,8 @@ const dt_errors_config = {
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
       display_producers_lot_modal(table, table_columns_corrections_v2, e)
     })
+    initFilters(table_columns_corrections_v2, "tab_errors")
+
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
     })
@@ -2041,13 +2288,11 @@ $(".tabs__tab").on('click', function() {
   init_datatables_generic(this.dataset.dst)
 })
 
-
-$("#btn_reject_with_comment").on('click', function() {
-  let lot_id = $("#lot_id").val()
-  let comment = $("#textarea_reject").val()
+$("#btn_accept_lot").on('click', function() {
+  let tx_id = $("#tx_id").val()
   $.ajax({
-    url: window.operators_api_reject_with_comments,
-    data: {'lots': lot_id, comment:comment, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+    url: window.producers_api_lot_accept_v2,
+    data: {'tx_id': tx_id, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
     type        : 'POST',
     success     : function(data, textStatus, jqXHR){
       // Callback code
@@ -2065,12 +2310,36 @@ $("#btn_reject_with_comment").on('click', function() {
   })
 })
 
-$("#btn_accept_with_comment").on('click', function() {
-  let lot_id = $("#lot_id").val()
-  let comment = $("#producer_comment").val()
+$("#btn_reject_with_comment").on('click', function() {
+  let tx_id = $("#tx_id").val()
+  let comment = $("#textarea_reject").val()
   $.ajax({
-    url: window.operators_api_accept_with_comments,
-    data: {'lot': lot_id,'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value,
+    url: window.producers_api_lot_reject_v2,
+    data: {'tx_id': tx_id, comment:comment, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+    type        : 'POST',
+    success     : function(data, textStatus, jqXHR){
+      // Callback code
+      window.location.reload()
+    },
+    error       : function(e) {
+      if (e.status === 400) {
+        alert(e.responseJSON.message)
+        console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+      } else {
+        alert("Server error. Please contact an administrator")
+        console.log(`server error ${JSON.stringify(e)}`)
+      }
+    }
+  })
+})
+
+
+$("#btn_accept_with_comment").on('click', function() {
+  let tx_id = $("#tx_id").val()
+  let comment = $("#textarea_correction").val()
+  $.ajax({
+    url: window.producers_api_lot_accept_with_correction_v2,
+    data: {'tx_id': tx_id, comment: comment, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value,
            'comment': comment},
     type        : 'POST',
     success     : function(data, textStatus, jqXHR){
@@ -2101,9 +2370,9 @@ $("#show_reject_section").on('click', function() {
 })
 
 $("#add_lot").on('click', function() {
-  let modal = document.getElementById("modal_edit_lot")
+  let modal = document.getElementById("modal_lot")
   /* empty all input fields */
-  $("#modal_edit_lot input").each(function() {
+  $("#modal_lot input").each(function() {
     $(this).val('')
   })
   $("#err_msg_dom").html('')
