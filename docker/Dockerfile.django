@@ -30,6 +30,7 @@ COPY web/accounts /app/web/accounts
 COPY web/producers /app/web/producers
 COPY web/operators /app/web/operators
 COPY web/administrators /app/web/administrators
+COPY web/traders /app/web/traders
 COPY web/fixtures /app/web/fixtures
 COPY web/api /app/web/api
 COPY web/run.sh /app/web/run.sh

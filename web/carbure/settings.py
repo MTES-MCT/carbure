@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'producers',
     'operators',
     'administrators',
+    'traders',
     'api'
 ]
 
