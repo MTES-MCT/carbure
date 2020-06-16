@@ -70,7 +70,7 @@
          Vous pouvez effectuer des corrections si nécessaire ou simplement communiquer avec le client en cliquant sur un lot.</p>
 
       <div class="flex-container">
-        <a id="btn_open_modal_columns_errors" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+        <a id="btn_open_modal_columns_tab_errors" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
       </div>
@@ -88,7 +88,7 @@
          Si vos fournisseurs ne sont pas sur Carbure, vous devez importer les lots dans l'onglet Brouillon en utilisant le <a href="{% url 'api-v2-producers-excel-template-download-advanced' %}" >modèle avancé</a></p>
 
       <div class="flex-container">
-        <a id="btn_open_modal_columns_errors" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+        <a id="btn_open_modal_columns_tab_received" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
       </div>
@@ -208,39 +208,39 @@
   </div>
 </div>
 
-<div class="modal__backdrop" id="modal_columns_errors">
+<div class="modal__backdrop" id="modal_columns_tab_errors">
   <div class="modal">
     <div class="flex-container">
-      <table id="table_columns_errors_filter">
+      <table id="table_columns_tab_errors_filter">
         <!-- dynamically generated in js -->
       </table>
-      <table id="table_columns_errors_filter2">
+      <table id="table_columns_tab_errors_filter2">
         <!-- dynamically generated in js -->
       </table>
     </div>
     <div class="form__group button__group">
-      <a class="button secondary close" id="btn_close_modal_columns_errors">Fermer</a>
+      <a class="button secondary close" id="btn_close_modal_columns_tab_errors">Fermer</a>
     </div>
   </div>
 </div>
 
-<div class="modal__backdrop" id="modal_columns_valid">
+<div class="modal__backdrop" id="modal_columns_tab_received">
   <div class="modal">
     <div class="flex-container">
-      <table id="table_columns_valid_filter">
+      <table id="table_columns_tab_received_filter">
         <!-- dynamically generated in js -->
       </table>
-      <table id="table_columns_valid_filter2">
+      <table id="table_columns_tab_received_filter2">
         <!-- dynamically generated in js -->
       </table>
     </div>
     <div class="form__group button__group">
-      <a class="button secondary close" id="btn_close_modal_columns_valid">Fermer</a>
+      <a class="button secondary close" id="btn_close_modal_columns_tab_received">Fermer</a>
     </div>
   </div>
 </div>
 
-<div class="modal__backdrop" id="modal_edit_lot">
+<div class="modal__backdrop" id="modal_lot">
   <div class="modal" style="max-width: none; margin: auto; max-height: 100%; overflow-y: auto;">
     <p id="err_msg_dom">
     </p>
@@ -248,6 +248,7 @@
       <div class="form__group" style="margin-top: var(--space-l);">
         <h3 style="text-align: center;">Informations</h3>
         <input type="hidden" id="lot_id" />
+        <input type="hidden" id="tx_id" />
         <dl>
           <dt>Le producteur est enregistré sur carbure ?</dt>
           <dd>Oui <input type="radio" name="producer_is_in_carbure" value="yes"/> Non <input type="radio" name="producer_is_in_carbure" value="no"/></dd>
@@ -386,11 +387,61 @@
         </table>
       </div>
     </div>
-    <div class="form__group" id="comments_section">
-    </div>
-    <div class="form__group button__group">
+    <div class="form__group button__group" id="save_section">
       <a class="button primary" id="btn_lot_save">Sauvegarder</a>
       <a class="button secondary close" id="btn_close_modal_edit_lot">Annuler</a>
+    </div>
+    <div class="form__group button__group" id="check_section">
+        <div class="button-item">
+          <a class="button primary" id="btn_accept_lot">Accepter Lot</a>
+          <a class="button warning-light" id="btn_open_modal_accept_lot_with_comments">Accepter sous réserve</a>
+          <a class="button warning" id="btn_open_modal_reject_lot">Refuser</a>
+        </div>
+        <div class="button-item button-push">
+          <a class="button secondary close" id="btn_close_modal_edit_lot">Annuler</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="form__group" id="comments_section" style="display: none">
+      <div style="display: flex;">
+        <p>{{user_entity_name}}:</p><input type="text" id="comment" style="max-width: 80%; height: 2em; margin-left: 10px; margin-top: auto; margin-bottom: auto;" />
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal__backdrop" id="modal_reject_lot">
+  <div class="modal">
+    <div class="flex-container">
+      <div class="form__group">
+        <label style="margin-bottom: 1em; margin-top: 2em;" for="textarea_reject">Ajouter un motif de refus pour le fournisseur</label>
+        <textarea name="textarea" id="textarea_reject"></textarea>
+        <a class="button warning" id="btn_reject_with_comment">Refuser le lot</a>
+        <a class="button secondary close" id="btn_close_modal_reject_lot">Annuler</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_accept_lot_with_comments">
+  <div class="modal">
+    <div class="flex-container">
+      <div class="form__group">
+        <h5>Accepter sous réserve</h5>
+
+        <input type="radio" name="correction_type" value="sustainability"/> Il y a un problème relatif à la durabilité ou aux caractéristiques du lot (provenance, volume, gaz à effet de serre)<br />
+        <input type="radio" name="correction_type" value="tx"/> Il y a un problème sur la transaction (numéro douanier, site de livraison, date)<br />
+        <input type="radio" name="correction_type" value="both"/> Les deux<br />
+
+        <label style="margin-bottom: 1em; margin-top: 2em;" for="textarea_reject">Ajouter un commentaire pour le fournisseur</label>
+        <textarea name="textarea" id="textarea_correction"></textarea>
+        <div class="button-item">
+          <a class="button primary" id="btn_accept_with_comment">Accepter et demander une correction</a>
+          <a class="button secondary close" id="btn_close_modal_accept_lot_with_comments">Annuler</a>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -407,6 +458,9 @@ window.producers_api_lots_corrections_v2 = "{% url 'api-v2-producers-get-correct
 window.producers_api_lots_valid_v2 = "{% url 'api-v2-producers-get-valid' %}"
 window.producers_api_lot_duplicate_v2 = "{% url 'api-v2-producers-duplicate-lot' %}"
 window.producers_api_lot_save_v2 = "{% url 'api-v2-producers-save-lot' %}"
+window.producers_api_lot_reject_v2 = "{% url 'api-v2-producers-reject-lot' %}"
+window.producers_api_lot_accept_with_correction_v2 = "{% url 'api-v2-producers-accept-lot-with-correction' %}"
+window.producers_api_lot_accept_v2 = "{% url 'api-v2-producers-accept-lot' %}"
 
 
 window.producers_api_producers_autocomplete_v2 = "{% url 'api-v2-producers-autocomplete' %}"
