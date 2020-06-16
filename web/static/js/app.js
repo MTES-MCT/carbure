@@ -291,6 +291,7 @@ for (let i = 0, len = modals.length; i < len; i++) {
     }
   }
 }
+
 // clicking outside of the modal window will close it
 window.onclick = function(event) {
   for (let i = 0, len = modals.length; i < len; i++) {
@@ -874,6 +875,11 @@ function display_producers_lot_modal(table, columns, event) {
   let table_column = columns[colid]
   let comments_section = $("#comments_section")
   comments_section.empty()
+  $("#btn_close_modal_lot_save").on('click', function() {
+    let modal = document.getElementById('modal_lot')
+    modal.style.display = 'none';
+  })
+
   if (table_column['data'] === 'checkbox') {
     // ignore clicks on checkbox column
     return
@@ -882,6 +888,7 @@ function display_producers_lot_modal(table, columns, event) {
     console.log(data)
     $("#save_section").show()
     $("#check_section").hide()
+    $("#correct_section").hide()
     $("#lot_id").val(data.pk)
     $("#tx_id").val(data.tx.pk)
 
@@ -1059,6 +1066,12 @@ function display_producers_lot_received_modal(table, columns, event) {
   let table_column = columns[colid]
   let comments_section = $("#comments_section")
   comments_section.empty()
+  $("#btn_close_modal_lot_check").on('click', function() {
+    let modal = document.getElementById('modal_lot')
+    modal.style.display = 'none';
+  })
+
+
   if (table_column['data'] === 'checkbox') {
     // ignore clicks on checkbox column
     return
@@ -1066,6 +1079,7 @@ function display_producers_lot_received_modal(table, columns, event) {
     let modal = document.getElementById("modal_lot")
     console.log(data)
     $("#save_section").hide()
+    $("#correct_section").hide()
     $("#check_section").show()
     $("#lot_id").val(data.pk)
     $("#tx_id").val(data.tx.pk)
@@ -1180,6 +1194,11 @@ function display_producers_lot_correction_modal(table, columns, event) {
   let table_column = columns[colid]
   let comments_section = $("#comments_section")
   comments_section.empty()
+  $("#btn_close_modal_lot_correct").on('click', function() {
+    let modal = document.getElementById('modal_lot')
+    modal.style.display = 'none';
+  })
+
   if (table_column['data'] === 'checkbox') {
     // ignore clicks on checkbox column
     return
@@ -1187,7 +1206,8 @@ function display_producers_lot_correction_modal(table, columns, event) {
     let modal = document.getElementById("modal_lot")
     console.log(data)
     $("#save_section").hide()
-    $("#check_section").show()
+    $("#check_section").hide()
+    $("#correct_section").show()
     $("#lot_id").val(data.pk)
     $("#tx_id").val(data.tx.pk)
 
@@ -1937,7 +1957,7 @@ const dt_errors_config = {
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_producers_lot_modal(table, table_columns_corrections_v2, e)
+      display_producers_lot_correction_modal(table, table_columns_corrections_v2, e)
     })
     initFilters(table_columns_corrections_v2, "tab_errors")
 

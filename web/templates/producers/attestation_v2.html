@@ -417,23 +417,26 @@
     </div>
     <div class="form__group button__group" id="save_section">
       <a class="button primary" id="btn_lot_save">Sauvegarder</a>
-      <a class="button secondary close" id="btn_close_modal_edit_lot">Annuler</a>
+      <a class="button secondary close" id="btn_close_modal_lot_save">Annuler</a>
     </div>
     <div class="form__group button__group" id="check_section">
-        <div class="button-item">
-          <a class="button primary" id="btn_accept_lot">Accepter Lot</a>
-          <a class="button warning-light" id="btn_open_modal_accept_lot_with_comments">Accepter sous réserve</a>
-          <a class="button warning" id="btn_open_modal_reject_lot">Refuser</a>
-        </div>
-        <div class="button-item button-push">
-          <a class="button secondary close" id="btn_close_modal_edit_lot">Annuler</a>
-        </div>
+      <div class="button-item">
+        <a class="button primary" id="btn_accept_lot">Accepter Lot</a>
+        <a class="button warning-light" id="btn_open_modal_accept_lot_with_comments">Accepter sous réserve</a>
+        <a class="button warning" id="btn_open_modal_reject_lot">Refuser</a>
+      </div>
+      <div class="button-item button-push">
+        <a class="button secondary close" id="btn_close_modal_lot_check">Annuler</a>
       </div>
     </div>
-
-    <div class="form__group" id="comments_section" style="display: none">
-      <div style="display: flex;">
-        <p>{{user_entity_name}}:</p><input type="text" id="comment" style="max-width: 80%; height: 2em; margin-left: 10px; margin-top: auto; margin-bottom: auto;" />
+    <div class="form__group button__group" id="correct_section">
+      <p>Comment 1</p>
+      <p>Comment 2</p>
+      <div class="button-item">
+        <a class="button primary">btn test</a>
+      </div>
+      <div class="button-item button-push">
+        <a class="button secondary close" id="btn_close_modal_lot_correct">Annuler</a>
       </div>
     </div>
   </div>
