@@ -9,7 +9,7 @@ from django.utils.crypto import get_random_string
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
 from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, Lot, LotComment
-from core.models import LotError, GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error
+from core.models import LotError, GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
 
 
 class EntityAdmin(admin.ModelAdmin):
@@ -97,6 +97,11 @@ class TransactionErrorAdmin(admin.ModelAdmin):
     list_filter = ('field',)
 
 
+class TransactionCommentAdmin(admin.ModelAdmin):
+    list_display = ('entity', 'tx', 'comment')
+    search_fields = ('entity', 'tx', 'comment')
+
+
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
 admin.site.register(UserPreferences, UserPreferencesAdmin)
@@ -112,6 +117,7 @@ admin.site.register(Depot, DepotAdmin)
 admin.site.register(LotV2, LotV2Admin)
 admin.site.register(LotTransaction, TransactionAdmin)
 admin.site.register(TransactionError, TransactionErrorAdmin)
+admin.site.register(TransactionComment, TransactionCommentAdmin)
 admin.site.register(LotV2Error, LotV2ErrorAdmin)
 
 

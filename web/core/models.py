@@ -351,6 +351,20 @@ class TransactionError(models.Model):
         verbose_name_plural = 'TransactionsErrors'
 
 
+class TransactionComment(models.Model):
+    entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
+    tx = models.ForeignKey(LotTransaction, on_delete=models.CASCADE)
+    comment = models.TextField()
+
+    def __str__(self):
+        return str(self.comment)
+
+    class Meta:
+        db_table = 'tx_comments'
+        verbose_name = 'TransactionComment'
+        verbose_name_plural = 'TransactionComments'
+
+
 class GHGValues(models.Model):
     matiere_premiere = models.ForeignKey(MatierePremiere, blank=True, null=True, on_delete=models.CASCADE)
     biocarburant = models.ForeignKey(Biocarburant, on_delete=models.CASCADE)
