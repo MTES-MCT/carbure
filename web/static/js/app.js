@@ -1,6 +1,7 @@
 const dt_config = {}
 const lot_errors = {}
 const selected_rows = []
+const received_selected_rows = []
 
 const table_columns_drafts_v2 = [
 {title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
@@ -88,6 +89,7 @@ const table_columns_received_v2 = [
 
 const table_columns_mb_v2 = [
 {title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
+{title:'Numéro de lot', can_hide: true, data:'carbure_id'},
 {title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer.name : `<i>${full.fields.unknown_producer}</i>` }},
 {title:'Site de<br /> Production', hidden: true, filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
 {title:'Pays de<br /> Production', hidden: true, filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.country.code_pays : (full.fields.unknown_production_country ? full.fields.unknown_production_country.code_pays: "") }},
@@ -648,6 +650,35 @@ function manage_actions() {
   manage_duplicate_button()
 }
 
+function manage_accept_button() {
+  if (received_selected_rows.length > 0) {
+    $("#btn_open_modal_accept_lots").addClass('primary')
+    $("#btn_open_modal_accept_lots").css("pointer-events", "auto")
+    $("#btn_open_modal_accept_lots").removeClass('secondary')
+    $("#modal_accept_lots_list").empty()
+    let to_accept = []
+    for (let i = 0, len = received_selected_rows.length; i < len; i++) {
+      let rowdata = window.table.row(received_selected_rows[i]).data()
+      to_accept.push(rowdata.tx.pk)
+      $("#modal_accept_lots_list").append(`<li>${rowdata.fields.producer_is_in_carbure ? rowdata.fields.carbure_producer.name : rowdata.fields.unknown_producer} - ${rowdata.fields.volume} - ${rowdata.fields.biocarburant.name} - ${rowdata.fields.matiere_premiere.name}</li>`)
+      $("#modal_accept_lots_txids").val(to_accept.join(","))
+    }
+  } else {
+    $("#btn_open_modal_accept_lots").addClass('secondary')
+    $("#btn_open_modal_accept_lots").css("pointer-events", "none")
+    $("#btn_open_modal_accept_lots").removeClass('primary')
+    // cleanup validate modal
+    $("#modal_accept_lots_list").empty()
+  }
+}
+
+
+function manage_received_actions() {
+  // bouton Accepter Lots
+  manage_accept_button()
+}
+
+
 function manage_actions_operators() {
   // bouton Accepter Lots
   $("#modal_accept_lots_list").empty()
@@ -687,6 +718,7 @@ function initDuplicateParams(table) {
 }
 
 function initFilters(table, dom) {
+  console.log(`initFilters ${dom}`)
   var table_columns_filter = $(`#table_columns_${dom}_filter`)
   var table_columns_filter2 = $(`#table_columns_${dom}_filter2`)
   var columns_filter_html = ""
@@ -1662,6 +1694,7 @@ const dt_drafts_config = {
       // Update state of "Select all" control
       updateDataTableSelectAllCtrl(table);
     });
+    manage_actions()
   }
 }
 
@@ -1728,20 +1761,20 @@ const dt_received_config = {
       // Get row data
       var rowId = table.row($row).index();
       // Determine whether row ID is in the list of selected row IDs
-      var index = $.inArray(rowId, selected_rows);
+      var index = $.inArray(rowId, received_selected_rows);
       // If checkbox is checked and row ID is not in list of selected row IDs
       if(this.checked && index === -1) {
-        selected_rows.push(rowId);
+        received_selected_rows.push(rowId);
       // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
       } else if (!this.checked && index !== -1) {
-        selected_rows.splice(index, 1);
+        received_selected_rows.splice(index, 1);
       }
       // Update state of "Select all" control
       updateDataTableSelectAllCtrl(table);
       // Prevent click event from propagating to parent
       e.stopPropagation();
       // Show/Hide buttons depending on selected_rows content
-      manage_actions()
+      manage_received_actions()
     })
 
 
@@ -1761,6 +1794,7 @@ const dt_received_config = {
       // Update state of "Select all" control
       updateDataTableSelectAllCtrl(table);
     });
+    manage_received_actions()
   }
 }
 
