@@ -112,7 +112,8 @@ const table_columns_mb_v2 = [
 
 const table_columns_valid_v2 = [
 {title:'Période', can_hide: true, can_export: true, render: (data, type, full, meta) => { return full.fields.period }},
-{title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer.name : `<i>${full.fields.unknown_producer}</i>` }},
+{title:'ID', can_hide: true, can_export: true, render: (data, type, full, meta) => { return full.fields.carbure_id }},
+{title:'Producteur', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer.name : `<i>${full.fields.unknown_producer}</i>` }},
 {title:'Site de<br /> Production', hidden:true, filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
 {title:'Fournisseur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.tx.fields.vendor_is_in_carbure ? full.tx.fields.carbure_vendor.name : `<i>${full.tx.fields.unknown_vendor}</i>` }},
 {title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
@@ -1710,6 +1711,7 @@ const dt_valid_config = {
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
     })
+    initFilters(table_columns_valid_v2, "tab_valid")
   }
 }
 
