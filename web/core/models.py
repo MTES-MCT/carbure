@@ -206,7 +206,7 @@ class LotV2(models.Model):
     unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default='')
     unknown_production_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.SET_NULL, related_name='unknown_production_site_country')
 
-    unknown_production_site_com_date = models.CharField(max_length=64, blank=True, null=True, default='')
+    unknown_production_site_com_date = models.DateField(blank=True, null=True)
     unknown_production_site_reference = models.CharField(max_length=64, blank=True, null=True, default='')
     unknown_production_site_dbl_counting = models.CharField(max_length=64, blank=True, null=True, default='')
 

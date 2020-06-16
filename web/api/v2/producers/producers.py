@@ -671,65 +671,61 @@ def save_lot(request, *args, **kwargs):
     entity = context['user_entity']
     lot.added_by = entity
     lot.added_by_user = request.user
+    # easy fields first
+    lot.unknown_producer = request.POST.get('unknown_producer_name', '')
+    lot.unknown_production_site = request.POST.get('unknown_production_site_name', '')
+    lot.unknown_production_site_com_date = request.POST.get('unknown_production_site_com_date', '')
+    lot.unknown_production_site_reference = request.POST.get('unknown_production_site_reference', '')
+    lot.unknown_production_site_dbl_counting = request.POST.get('unknown_production_site_dbl_counting', '')
+    unknown_production_site_country_code = request.POST.get('unknown_production_site_country_code', '')
+    try:
+        country = Pays.objects.get(code_pays=unknown_production_site_country_code)
+        lot.unknown_production_country = country
+    except Exception:
+        lot.unknown_production_country = None
+
+    # producer
     producer_is_in_carbure = request.POST.get('producer_is_in_carbure', "no")
     if producer_is_in_carbure == "no":
         lot.producer_is_in_carbure = False
     else:
         lot.producer_is_in_carbure = True
-
     carbure_producer_id = request.POST.get('carbure_producer_id', None)
-    #if carbure_producer_id:
-
-    producer_name = request.POST.get('producer_name', '')
-    if not producer_name:
-        lot.producer_is_in_carbure = False
-        lot.unknown_producer = ''
-        lot.carbure_producer = None
-    elif producer_name != entity.name:
-        lot.producer_is_in_carbure = False
-        lot.unknown_producer = producer_name
-        lot.carbure_producer = None
-    else:
-        lot.producer_is_in_carbure = True
-        lot.unknown_producer = ''
-        lot.carbure_producer = entity
-
-    production_site_id = request.POST.get('production_site_id', '')
-    production_site_name = request.POST.get('production_site_name', '')
-    if production_site_id == '':
-        # production site entered manually without autocomplete.
-        lot.production_site_is_in_carbure = False
-        lot.carbure_production_site = None
-        lot.unknown_production_site = production_site_name
-    else:
-        try:
-            ps = ProductionSite.objects.get(id=production_site_id, producer=entity)
-            lot.production_site_is_in_carbure = True
-            lot.carbure_production_site = ps
-            lot.unknown_production_site = ''
-        except Exception:
-            lot.production_site_is_in_carbure = False
-            lot.carbure_production_site = None
-            lot.unknown_production_site = ''
-            error, c = LotV2Error.objects.update_or_create(lot=lot, field='production_site_name',
-                                                           error='Site de production %s inconnu pour %s' % (production_site_name, entity.name),
-                                                           defaults={'value': production_site_name})
-
-    if lot.production_site_is_in_carbure is False:
-        production_site_country_code = request.POST.get('production_site_country_code', '')
-        production_site_country = request.POST.get('production_site_country', '')
-        if production_site_country_code == '':
-            lot.unknown_production_country = None
+    carbure_producer_name = request.POST.get('carbure_producer_name', '')
+    try:
+        carbure_producer_id = int(carbure_producer_id)
+        rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+        producer = Entity.objects.get(id=carbure_producer_id, entity_type='Producteur')
+        if producer in rights:
+            lot.carbure_producer = producer
         else:
-            try:
-                country = Pays.objects.get(code_pays=production_site_country_code)
-                lot.unknown_production_country = country
-            except Exception:
-                lot.unknown_production_country = None
-                error, c = LotV2Error.objects.update_or_create(lot=lot, field='production_site_country',
-                                                               error='Pays de production inconnu',
-                                                               defaults={'value': production_site_country})
+            lot.carbure_producer = None
+            error, c = LotV2Error.objects.update_or_create(lot=lot, field='carbure_producer_name',
+                                                           error='Producteur inconnu: %s' % (carbure_producer_name),
+                                                           defaults={'value': carbure_producer_name})
+    except Exception:
+        lot.carbure_producer = None
 
+    if lot.producer_is_in_carbure:
+        lot.production_site_is_in_carbure = True
+    else:
+        lot.production_site_is_in_carbure = False
+
+    carbure_production_site_id = request.POST.get('carbure_production_site_id', None)
+    carbure_production_site_name = request.POST.get('carbure_production_site_name', '')
+    try:
+        ps = ProductionSite.objects.get(id=carbure_production_site_id, producer=lot.carbure_producer)
+        lot.carbure_production_site = ps
+    except Exception:
+        lot.carbure_production_site = None
+        if lot.carbure_producer is None:
+            error, c = LotV2Error.objects.update_or_create(lot=lot, field='carbure_production_site_name',
+                                                           error='Le site de production ne peut être renseigné sans le producteur',
+                                                           defaults={'value': carbure_production_site_name})
+        else:
+            error, c = LotV2Error.objects.update_or_create(lot=lot, field='carbure_production_site_name',
+                                                           error='Usine %s inconnue pour %s' % (carbure_production_site_name, lot.carbure_producer.name),
+                                                           defaults={'value': carbure_production_site_name})
     biocarburant_code = request.POST.get('biocarburant_code', '')
     biocarburant_name = request.POST.get('biocarburant', '')
     if biocarburant_code == '':
@@ -870,14 +866,40 @@ def save_lot(request, *args, **kwargs):
         transaction.save()
     else:
         transaction = LotTransaction.objects.get(lot=lot)
+
+    lot.unknown_client = request.POST.get('unknown_client', '')
+    lot.unknown_delivery_site = request.POST.get('unknown_delivery_site', '')
+    unknown_delivery_site_country_code = request.POST.get('unknown_delivery_site_country_code', '')
+    try:
+        country = Pays.objects.get(code_pays=unknown_delivery_site_country_code)
+        lot.unknown_delivery_site_country = country
+    except Exception:
+        lot.unknown_delivery_site_country = None
+
     transaction.vendor_is_in_carbure = True
     transaction.carbure_vendor = entity
     transaction.dae = request.POST.get('dae', '')
     if transaction.dae == '':
-        e, c = TransactionError.objects.update_or_create(tx=transaction, field='dae', error="Merci de préciser le numéro de DAE/DAU",
+        e, c = TransactionError.objects.update_or_create(tx=transaction, field='dae', error="Merci de préciser le numéro douanier (DAE/DAU..)",
                                                          defaults={'value': None})
     else:
         TransactionError.objects.filter(tx=transaction, field='dae').delete()
+
+    client_is_in_carbure = request.POST.get('client_is_in_carbure', 'no')
+    if client_is_in_carbure == 'no':
+        transaction.client_is_in_carbure = False
+    else:
+        transaction.client_is_in_carbure = True
+    carbure_client_id = request.POST.get('carbure_client_id', None)
+    carbure_client_name = request.POST.get('carbure_client_name', '')
+    try:
+        client = Entity.objects.get(id=carbure_client_id)
+        transaction.carbure_client = client
+        TransactionError.objects.filter(tx=transaction, field='carbure_client_name').delete()
+    except Exception:
+        transaction.carbure_client = None
+        e, c = TransactionError.objects.update_or_create(tx=transaction, field='carbure_client_name', error="%s introuvable dans Carbure" % (carbure_client_name),
+                                                         defaults={'value': carbure_client_name})
 
     delivery_date = request.POST.get('delivery_date', '')
     if delivery_date == '':
@@ -901,62 +923,27 @@ def save_lot(request, *args, **kwargs):
                                                              error=msg,
                                                              defaults={'value': delivery_date})
 
-    client_id = request.POST.get('client_id', '')
-    client_name = request.POST.get('client', '')
-    if client_id != '':
-        try:
-            client = Entity.objects.get(id=client_id)
-            transaction.client_is_in_carbure = True
-            transaction.carbure_client = client
-            transaction.unknown_client = ''
-        except Exception:
-            transaction.client_is_in_carbure = False
-            transaction.carbure_client = None
-            transaction.unknown_client = client_name
-    else:
-        transaction.client_is_in_carbure = False
-        transaction.carbure_client = None
-        transaction.unknown_client = client_name
-    if transaction.client_is_in_carbure is False and transaction.unknown_client == '':
-        e, c = TransactionError.objects.update_or_create(tx=transaction, field='client',
-                                                         defaults={'value': None, 'error': "Merci de préciser un client"})
+    transaction.champ_libre = request.POST.get('champ_libre', '')
 
-    delivery_site_id = request.POST.get('delivery_site_id')
-    delivery_site_name = request.POST.get('delivery_site')
-    if delivery_site_id != '':
-        try:
-            delivery_site = Depot.objects.get(depot_id=delivery_site_id)
-            transaction.delivery_site_is_in_carbure = True
-            transaction.carbure_delivery_site = delivery_site
-            transaction.unknown_delivery_site = ''
-        except Exception:
-            transaction.delivery_site_is_in_carbure = False
-            transaction.carbure_delivery_site = None
-            transaction.unknown_delivery_site = delivery_site_name
-    else:
+    delivery_site_is_in_carbure = request.POST.get('delivery_site_is_in_carbure', 'no')
+    if delivery_site_is_in_carbure == 'no':
         transaction.delivery_site_is_in_carbure = False
+    else:
+        transaction.delivery_site_is_in_carbure = True
+    carbure_delivery_site_id = request.POST.get('carbure_delivery_site_id', None)
+    carbure_delivery_site_name = request.POST.get('carbure_delivery_site_name', '')
+    if carbure_delivery_site_id is None:
         transaction.carbure_delivery_site = None
-        transaction.unknown_delivery_site = delivery_site_name
-    if delivery_site_name == '':
-        e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site',
-                                                         defaults={'value': None, 'error': "Merci de préciser un site de livraison"})
+    else:
+        try:
+            delivery_site = Depot.objects.get(depot_id=carbure_delivery_site_id)
+            transaction.carbure_delivery_site = delivery_site
+            TransactionError.objects.filter(tx=transaction, field='carbure_delivery_site_name').delete()
 
-    if transaction.delivery_site_is_in_carbure is False:
-        delivery_site_country_code = request.POST.get('delivery_site_country_code', '')
-        delivery_site_country_name = request.POST.get('delivery_site_country', '')
-        if delivery_site_country_code != '':
-            try:
-                country = Pays.objects.get(code_pays=delivery_site_country_code)
-                transaction.unknown_delivery_site_country = country
-            except Exception:
-                error, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site_country',
-                                                                     error='Champ production_site_country incorrect',
-                                                                     defaults={'value': delivery_site_country_name})
-        else:
-            error, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site_country',
-                                                                 error='Merci de préciser le pays de livraison',
-                                                                 defaults={'value': None})
-
+        except Exception:
+            transaction.carbure_delivery_site = None
+            e, c = TransactionError.objects.update_or_create(tx=transaction, field='carbure_delivery_site_name',
+                                                             defaults={'value': carbure_delivery_site_name, 'error': "Site de livraison inconnu"})
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
     transaction.champ_libre = request.POST.get('champ_libre', '')
