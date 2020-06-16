@@ -10,7 +10,7 @@ usermodel = get_user_model()
 
 class Entity(models.Model):
     ENTITY_TYPES = (('Producteur', 'Producteur'), ('Opérateur', 'Opérateur'),
-                    ('Administration', 'Administration'), ('Unknown', 'Unknown'))
+                    ('Administration', 'Administration'), ('Trader', 'Trader'), ('Unknown', 'Unknown'))
 
     name = models.CharField(max_length=64, unique=True)
     date_added = models.DateTimeField(auto_now_add=True)
