@@ -111,10 +111,10 @@ const table_columns_mb_v2 = [
 ]
 
 const table_columns_valid_v2 = [
+{title:'Période', can_hide: true, can_export: true, render: (data, type, full, meta) => { return full.fields.period }},
 {title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer.name : `<i>${full.fields.unknown_producer}</i>` }},
-{title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
-{title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.country.code_pays : (full.fields.unknown_production_country ? full.fields.unknown_production_country.code_pays: "") }},
-{title:'Fournisseur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.tx.fields.vendor_is_in_carbure ? full.tx.fields.carbure_vendor : `<i>${full.tx.fields.unknown_vendor}</i>` }},
+{title:'Site de<br /> Production', hidden:true, filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
+{title:'Fournisseur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.tx.fields.vendor_is_in_carbure ? full.tx.fields.carbure_vendor.name : `<i>${full.tx.fields.unknown_vendor}</i>` }},
 {title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
 {title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.biocarburant.name }},
 {title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.matiere_premiere.name }},
@@ -821,22 +821,19 @@ function client_is_in_carbure(bool) {
   }
 }
 
-$('input[type=radio][name=producer_is_in_carbure]').change(function() {
-  if (this.value == 'yes') {
-    producer_is_in_carbure(true)
-  } else {
-    producer_is_in_carbure(false)
-  }
+$('input[type=radio][name=producer_is_in_carbure][value=yes]').change(function() {
+  producer_is_in_carbure(true)
+})
+$('input[type=radio][name=producer_is_in_carbure][value=no]').change(function() {
+  producer_is_in_carbure(false)
 })
 
-$('input[type=radio][name=client_is_in_carbure]').change(function() {
-  if (this.value == 'yes') {
-    client_is_in_carbure(true)
-  } else {
-    client_is_in_carbure(false)
-  }
+$('input[type=radio][name=client_is_in_carbure][value=yes]').change(function() {
+  client_is_in_carbure(true)
 })
-
+$('input[type=radio][name=client_is_in_carbure][value=no]').change(function() {
+  client_is_in_carbure(false)
+})
 
 function display_producers_lot_modal(table, columns, event) {
   // check if we clicked on the checkbox

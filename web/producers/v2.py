@@ -28,3 +28,12 @@ def producers_import_doc(request, *args, **kwargs):
     context = kwargs['context']
     context['current_url_name'] = 'producers-import-documentation'
     return render(request, 'producers/import_doc.html', context)
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def producers_histo(request, *args, **kwargs):
+    context = kwargs['context']
+    context['current_url_name'] = 'producers-histo'
+    return render(request, 'producers/archives.html', context)
