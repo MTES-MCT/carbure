@@ -694,6 +694,27 @@ def accept_lot(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
+def accept_lots(request, *args, **kwargs):
+    context = kwargs['context']
+    # new lot or edit?
+    tx_ids = request.POST.get('tx_ids', None)
+    if tx_ids is None:
+        return JsonResponse({'status': 'error', 'message': "Missing TX IDs from POST data"}, status=400)
+
+    ids = tx_ids.split(',')
+    for txid in ids:
+        try:
+            tx = LotTransaction.objects.get(carbure_client=context['user_entity'], delivery_status__in=['N', 'AC', 'AA'], id=txid)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': "Transaction inconnue", 'extra': str(e)}, status=400)
+        tx.delivery_status = 'A'
+        tx.save()
+    return JsonResponse({'status': 'success'})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
 def accept_lot_with_correction(request, *args, **kwargs):
     context = kwargs['context']
     # new lot or edit?
