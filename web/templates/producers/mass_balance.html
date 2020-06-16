@@ -11,6 +11,8 @@
       <li id="tab_drafts_title" class="tabs__tab tabs__tab--selected" data-dst="tab_drafts">Brouillons ({{nb_drafts}})</li>
       <li id="tab_errors_title" class="tabs__tab" data-dst="tab_errors">Lots à corriger ({{nb_corrections}})</li>
       <li id="tab_received_title" class="tabs__tab" data-dst="tab_received">Lots reçus ({{nb_received}})</li>
+      <li id="tab_mb_title" class="tabs__tab" data-dst="tab_mb">Mass Balance ({{nb_mb}})</li>
+      <li id="tab_valid_title" class="tabs__tab" data-dst="tab_valid">Lots validés ({{nb_valid}})</li>
     </ul>
 
     <div id="tab_drafts" class="tabcontent">
@@ -94,6 +96,55 @@
       </div>
 
       <table class="display nowrap" id="datatable_received">
+        <!-- dynamically generated in js -->
+        <thead></thead>
+        <tfoot></tfoot>
+        <tbody></tbody>
+      </table>
+    </div>
+
+
+    <div id="tab_mb" class="tabcontent">
+      <p>Votre comptabilité matière.<br />
+         Vous pouvez découper ou fusionner des lots et les envoyer à vos clients. Un import Excel est également disponible.
+      </p>
+
+      <div class="flex-container">
+        <a id="btn_open_modal_columns_errors" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+          <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
+        </a>
+      </div>
+
+      <table class="display nowrap" id="datatable_mb">
+        <!-- dynamically generated in js -->
+        <thead></thead>
+        <tfoot></tfoot>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="tab_valid" class="tabcontent">
+      <p>Ces lots ont été validés et acceptés par vos clients.</p>
+
+      <div class="flex-container">
+        <a id="btn_open_modal_columns_valid" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
+          <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
+        </a>
+        <a class="button modal-button" href="{% url 'producers-api-attestation-export-valid' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
+          <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
+        </a>
+        <select id="pagelength_valid" style="margin-top: auto;">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        <label for="input_search_datatable_valid" style="margin: auto 5px auto auto;">Rechercher:</label>
+        <input type="text" id="input_search_datatable_valid" style="width: 200px; margin-top: auto;" />
+      </div>
+
+
+      <table class="display nowrap" id="datatable_valid">
         <!-- dynamically generated in js -->
         <thead></thead>
         <tfoot></tfoot>
@@ -240,6 +291,39 @@
   </div>
 </div>
 
+
+<div class="modal__backdrop" id="modal_columns_received">
+  <div class="modal">
+    <div class="flex-container">
+      <table id="table_columns_received_filter">
+        <!-- dynamically generated in js -->
+      </table>
+      <table id="table_columns_received_filter2">
+        <!-- dynamically generated in js -->
+      </table>
+    </div>
+    <div class="form__group button__group">
+      <a class="button secondary close" id="btn_close_modal_columns_received">Fermer</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_columns_mb">
+  <div class="modal">
+    <div class="flex-container">
+      <table id="table_columns_mb_filter">
+        <!-- dynamically generated in js -->
+      </table>
+      <table id="table_columns_mb_filter2">
+        <!-- dynamically generated in js -->
+      </table>
+    </div>
+    <div class="form__group button__group">
+      <a class="button secondary close" id="btn_close_modal_columns_mb">Fermer</a>
+    </div>
+  </div>
+</div>
+
 <div class="modal__backdrop" id="modal_edit_lot">
   <div class="modal" style="max-width: none; margin: auto; max-height: 100%; overflow-y: auto;">
     <p id="err_msg_dom">
@@ -249,32 +333,12 @@
         <h3 style="text-align: center;">Informations</h3>
         <input type="hidden" id="lot_id" />
         <dl>
-          <dt>Le producteur est enregistré sur carbure ?</dt>
-          <dd>Oui <input type="radio" name="producer_is_in_carbure" value="yes"/> Non <input type="radio" name="producer_is_in_carbure" value="no"/></dd>
-
-          <!-- Producer is in Carbure -->
           <dt>Producteur</dt>
-          <dd><input type="text" id="carbure_producer_name" class="autocomplete_producers" /><span id="carbure_producer_name_error" style="color:tomato;"></span><input type="hidden" id="carbure_producer_id" /></dd>
+          <dd><input type="text" id="producer_name" /><span id="producer_name_error" style="color:tomato;"></span></dd>
           <dt>Site de Production</dt>
           <dd><input type="text" id="production_site_name" class="autocomplete_production_sites" /><span id="production_site_name_error" style="color:tomato;"></span><input type="hidden" id="production_site_id" /></dd>
-
-          <!-- Producer is NOT in Carbure -->
-          <dt>Producteur</dt>
-          <dd><input type="text" id="unknown_producer_name" /><span id="unknown_producer_name_error" style="color:tomato;"></span></dd>
-          <dt>Site de Production</dt>
-          <dd><input type="text" id="unknown_production_site_name" /><span id="unknown_production_site_name_error" style="color:tomato;"></span></dd>
           <dt>Pays de Production</dt>
-          <dd><input type="text" id="unknown_production_site_country" class="autocomplete_countries"/><span id="unknown_production_site_country_error" style="color:tomato;"></span><input type="hidden" id="unknown_production_site_country_code" /></dd>
-          <dt>Référence Système Fournisseur</dt>
-          <dd><input type="text" id="unknown_production_site_reference" /><span id="unknown_production_site_reference_error" style="color:tomato;"></span></dd>
-          <dt>Numéro d'enregistrement double-compte</dt>
-          <dd><input type="text" id="unknown_production_site_dbl_counting" /><span id="unknown_production_site_dbl_counting_error" style="color:tomato;"></span></dd>
-          <dt>Date de mise en service</dt>
-          <dd><input type="text" id="unknown_production_site_com_date" /><span id="unknown_production_site_com_date_error" style="color:tomato;"></span></dd>
-
-
-
-
+          <dd><input type="text" id="production_site_country" class="autocomplete_countries"/><span id="production_site_country_error" style="color:tomato;"></span><input type="hidden" id="production_site_country_code" /></dd>
           <dt>Volume à 20°C en Litres</dt>
           <dd><input type="text" id="volume" /><span id="volume_error" style="color:tomato;"></span></dd>
           <dt>Biocarburant</dt>
