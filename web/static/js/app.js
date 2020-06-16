@@ -5,8 +5,8 @@ const selected_rows = []
 const table_columns_drafts_v2 = [
 {title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
 {title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer.name : `<i>${full.fields.unknown_producer}</i>` }},
-{title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
-{title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.country.code_pays : (full.fields.unknown_production_country ? full.fields.unknown_production_country.code_pays: "") }},
+{title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.carbure_production_site ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
+{title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.carbure_production_site ? full.fields.carbure_production_site.country.code_pays : (full.fields.unknown_production_country ? full.fields.unknown_production_country.code_pays: "") }},
 {title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
 {title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.biocarburant.name }},
 {title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.matiere_premiere.name }},
@@ -28,8 +28,8 @@ const table_columns_drafts_v2 = [
 {title:'N°Document douanier', can_hide: true, can_duplicate: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.dae}},
 {title:'Champ libre', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, tooltip: 'Champ libre - Référence client', render: (data, type, full, meta) => {return full.tx.fields.champ_libre}},
 {title:'Date de livraison', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_date}},
-{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.client_is_in_carbure ? full.tx.fields.carbure_client.name : `<i>${full.tx.fields.unknown_client}</i>`}},
-{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site.name : `<i>${full.tx.fields.unknown_delivery_site}</i>` }},
+{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.carbure_client ? full.tx.fields.carbure_client.name : `<i>${full.tx.fields.unknown_client}</i>`}},
+{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.carbure_delivery_site ? full.tx.fields.carbure_delivery_site.name : `<i>${full.tx.fields.unknown_delivery_site}</i>` }},
 ]
 
 const table_columns_corrections_v2 = [
@@ -872,8 +872,13 @@ function display_producers_lot_modal(table, columns, event) {
     }
     $("#unknown_producer_name").val(data.fields.unknown_producer)
     $("#unknown_production_site_name").val(data.fields.unknown_production_site)
-    $("#unknown_production_site_country").val(data.fields.unknown_production_site_country ? data.fields.unknown_production_site_country.name : '')
-    $("#unknown_production_site_country_code").val(data.fields.unknown_production_site_country ? data.fields.unknown_production_site_country.code_pays : '')
+    $("#unknown_production_site_country").val(data.fields.unknown_production_country ? data.fields.unknown_production_country.name : '')
+    $("#unknown_production_site_country_code").val(data.fields.unknown_production_country ? data.fields.unknown_production_country.code_pays : '')
+
+    $("#unknown_production_site_com_date").val(data.fields.unknown_production_site_com_date)
+    $("#unknown_production_site_reference").val(data.fields.unknown_production_site_reference)
+    $("#unknown_production_site_dbl_counting").val(data.fields.unknown_production_site_dbl_counting)
+
 
 
     $("#volume").val(data.fields.volume)
