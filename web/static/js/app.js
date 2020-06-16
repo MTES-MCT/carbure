@@ -749,6 +749,95 @@ function updateDataTableSelectAllCtrl(table){
    }
 }
 
+function producer_is_in_carbure(bool) {
+	if (bool) {
+    	$("#producer_is_in_carbure_yes").prop("checked", true)
+      $("#carbure_producer_name").show()
+    	$("#carbure_producer_name_label").show()
+      $("#carbure_production_site_name").show()
+    	$("#carbure_production_site_name_label").show()
+
+    	$("#unknown_producer_name").hide()
+    	$("#unknown_producer_name_label").hide()
+    	$("#unknown_production_site_name").hide()
+    	$("#unknown_production_site_name_label").hide()
+    	$("#unknown_production_site_country").hide()
+    	$("#unknown_production_site_country_label").hide()
+    	$("#unknown_production_site_reference").hide()
+    	$("#unknown_production_site_reference_label").hide()
+    	$("#unknown_production_site_dbl_counting").hide()
+    	$("#unknown_production_site_dbl_counting_label").hide()
+    	$("#unknown_production_site_com_date").hide()
+    	$("#unknown_production_site_com_date_label").hide()
+	} else {
+    	$("#producer_is_in_carbure_no").prop("checked", true)
+      $("#carbure_producer_name").hide()
+    	$("#carbure_producer_name_label").hide()
+      $("#carbure_production_site_name").hide()
+    	$("#carbure_production_site_name_label").hide()
+
+    	$("#unknown_producer_name").show()
+    	$("#unknown_producer_name_label").show()
+    	$("#unknown_production_site_name").show()
+    	$("#unknown_production_site_name_label").show()
+    	$("#unknown_production_site_country").show()
+    	$("#unknown_production_site_country_label").show()
+    	$("#unknown_production_site_reference").show()
+    	$("#unknown_production_site_reference_label").show()
+    	$("#unknown_production_site_dbl_counting").show()
+    	$("#unknown_production_site_dbl_counting_label").show()
+    	$("#unknown_production_site_com_date").show()
+    	$("#unknown_production_site_com_date_label").show()
+	}
+}
+
+function client_is_in_carbure(bool) {
+  if (bool) {
+    $("#client_is_in_carbure_yes").prop("checked", true)
+    $("#carbure_client_label").show()
+    $("#carbure_client").show()
+    $("#carbure_delivery_site_label").show()
+    $("#carbure_delivery_site").show()
+
+    $("#unknown_client_label").hide()
+    $("#unknown_client").hide()
+    $("#unknown_delivery_site_label").hide()
+    $("#unknown_delivery_site").hide()
+    $("#unknown_delivery_site_country_label").hide()
+    $("#unknown_delivery_site_country").hide()
+  } else {
+    $("#client_is_in_carbure_no").prop("checked", true)
+    $("#carbure_client_label").hide()
+    $("#carbure_client").hide()
+    $("#carbure_delivery_site_label").hide()
+    $("#carbure_delivery_site").hide()
+
+    $("#unknown_client_label").show()
+    $("#unknown_client").show()
+    $("#unknown_delivery_site_label").show()
+    $("#unknown_delivery_site").show()
+    $("#unknown_delivery_site_country_label").show()
+    $("#unknown_delivery_site_country").show()
+  }
+}
+
+$('input[type=radio][name=producer_is_in_carbure]').change(function() {
+  if (this.value == 'yes') {
+    producer_is_in_carbure(true)
+  } else {
+    producer_is_in_carbure(false)
+  }
+})
+
+$('input[type=radio][name=client_is_in_carbure]').change(function() {
+  if (this.value == 'yes') {
+    client_is_in_carbure(true)
+  } else {
+    client_is_in_carbure(false)
+  }
+})
+
+
 function display_producers_lot_modal(table, columns, event) {
   // check if we clicked on the checkbox
   let colid = event.target._DT_CellIndex.column
@@ -764,20 +853,29 @@ function display_producers_lot_modal(table, columns, event) {
     let modal = document.getElementById("modal_edit_lot")
     console.log(data)
     $("#lot_id").val(data.pk)
-    $("#producer_name").val(data.fields.producer_is_in_carbure ? data.fields.carbure_producer.name : data.fields.unknown_producer)
+
+    if (data.fields.producer_is_in_carbure) {
+    	producer_is_in_carbure(true)
+    } else {
+    	producer_is_in_carbure(false)
+    }
+
+    $("#carbure_producer_name").val(data.fields.carbure_producer ? data.fields.carbure_producer.name : '')
+    $("#carbure_producer_id").val(data.fields.carbure_producer ? data.fields.carbure_producer.id : '')
     if (data.errors['producer']) {
-      $("#producer_name_error").val(data.errors['producer'])
+      $("#carbure_producer_name_error").val(data.errors['producer'])
     }
-    $("#production_site_name").val(data.fields.production_site_is_in_carbure ? data.fields.carbure_production_site.name : data.fields.unknown_production_site)
+    $("#carbure_production_site_name").val(data.fields.carbure_production_site ? data.fields.carbure_production_site.name : '')
+    $("#carbure_production_site_id").val(data.fields.carbure_production_site ? data.fields.carbure_production_site.id : '')
     if (data.errors['production_site']) {
-      $("#production_site_name_error").val(data.errors['production_site'])
+      $("#carbure_production_site_name_error").val(data.errors['production_site'])
     }
-    $("#production_site_country").val(data.fields.production_site_is_in_carbure ? data.fields.carbure_production_site.country.name : (data.fields.unknown_production_country ? data.fields.unknown_production_country.name : ''))
-    if (data.errors['production_site_country']) {
-      $("#production_site_country_error").val(data.errors['production_site_country'])
-    }
-    $("#production_site_id").val(data.fields.production_site_is_in_carbure ? data.fields.carbure_production_site.id : '')
-    $("#production_site_country_code").val(data.fields.production_site_is_in_carbure ? data.fields.carbure_production_site.country.code_pays : (data.fields.unknown_production_country ? data.fields.unknown_production_country.code_pays : ''))
+    $("#unknown_producer_name").val(data.fields.unknown_producer)
+    $("#unknown_production_site_name").val(data.fields.unknown_production_site)
+    $("#unknown_production_site_country").val(data.fields.unknown_production_site_country ? data.fields.unknown_production_site_country.name : '')
+    $("#unknown_production_site_country_code").val(data.fields.unknown_production_site_country ? data.fields.unknown_production_site_country.code_pays : '')
+
+
     $("#volume").val(data.fields.volume)
     if (data.errors['volume']) {
       $("#volume_error").val(data.errors.volume)
@@ -802,21 +900,27 @@ function display_producers_lot_modal(table, columns, event) {
     if (data.errors['dae']) {
       $("#dae_error").val(data.errors.dae)
     }
-    $("#client").val(data.tx.fields.client_is_in_carbure ? data.tx.fields.carbure_client.name : data.tx.fields.unknown_client)
+
+    if (data.tx.fields.client_is_in_carbure) {
+      client_is_in_carbure(true)
+    } else {
+      client_is_in_carbure(false)
+    }
+
+    $("#carbure_client").val(data.tx.fields.carbure_client ? data.tx.fields.carbure_client.name : '')
+    $("#carbure_client_id").val(data.tx.fields.carbure_client ? data.tx.fields.carbure_client.id : '')
     if (data.errors['client']) {
-      $("#client_error").val(data.errors.client)
+      $("#carbure_client_error").val(data.errors.client)
     }
-    $("#client_id").val(data.tx.fields.client_is_in_carbure ? data.tx.fields.carbure_client.id : '')
-    $("#delivery_site").val(data.tx.fields.delivery_site_is_in_carbure ? data.tx.fields.carbure_delivery_site.name : data.tx.fields.unknown_delivery_site)
+    $("#carbure_delivery_site").val(data.tx.fields.carbure_delivery_site ? data.tx.fields.carbure_delivery_site.name : '')
+    $("#carbure_delivery_site_id").val(data.tx.fields.carbure_delivery_site ? data.tx.fields.carbure_delivery_site.id : '')
     if (data.errors['delivery_site']) {
-      $("#delivery_site_error").val(data.errors.delivery_site)
+      $("#carbure_delivery_site_error").val(data.errors.delivery_site)
     }
-    $("#delivery_site_id").val(data.tx.fields.delivery_site_is_in_carbure ? data.tx.fields.carbure_delivery_site.depot_id : '')
-    $("#delivery_site_country").val(data.tx.fields.delivery_site_is_in_carbure ? data.tx.fields.carbure_delivery_site.country.name : (data.tx.fields.unknown_delivery_site_country ? data.tx.fields.unknown_delivery_site_country.name : ''))
-    if (data.errors['delivery_site_country']) {
-      $("#delivery_site_country_error").val(data.errors.delivery_site_country)
-    }
-    $("#delivery_site_country_code").val(data.tx.fields.delivery_site_is_in_carbure ? data.tx.fields.carbure_delivery_site.country.code_pays : (data.tx.fields.unknown_delivery_site_country ? data.tx.fields.unknown_delivery_site_country.code_pays : ''))
+    $("#unknown_client").val(data.tx.fields.unknown_client)
+    $("#unknown_delivery_site").val(data.tx.fields.unknown_delivery_site)
+    $("#unknown_delivery_site_country").val(data.tx.fields.unknown_delivery_site_country ? data.tx.fields.unknown_delivery_site_country.name : '')
+    $("#unknown_delivery_site_country_code").val(data.tx.fields.unknown_delivery_site_country ? data.tx.fields.unknown_delivery_site_country.code_pays : '')
     $("#delivery_date").val(data.tx.fields.delivery_date)
     if (data.errors['delivery_date']) {
       $("#delivery_date_error").val(data.errors.delivery_date)
