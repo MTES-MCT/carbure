@@ -352,7 +352,9 @@ class TransactionError(models.Model):
 
 
 class TransactionComment(models.Model):
+    COMMENT_TOPIC = (('SUSTAINABILITY', 'Durabilité'), ('TX', 'Transaction'), ('BOTH', 'Les deux'))
     entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
+    topic = models.CharField(max_length=24, choices=COMMENT_TOPIC, default='BOTH')
     tx = models.ForeignKey(LotTransaction, on_delete=models.CASCADE)
     comment = models.TextField()
 
