@@ -2126,17 +2126,23 @@ const dt_operators_out_config = {
 
 const dt_admin_users = {
 	id: "datatable_users",
-	dt_config: {},
+	dt_config: {
+    paging: false,
+  },
 }
 
 const dt_admin_entities = {
 	id: "datatable_entities",
-	dt_config: {},
+  dt_config: {
+    paging: false,
+  },
 }
 
 const dt_admin_rights = {
 	id: "datatable_rights",
-	dt_config: {},
+  dt_config: {
+    paging: false,
+  },
 }
 
 
@@ -2315,7 +2321,7 @@ function init_tab_generic(tab_name) {
       var tablesettings = loadTableSettings(config.col_definition, tab_name)
   	  showHideTableColumns(table, tablesettings, tab_name)
   	} else {
-		  var table = $(tblselector).DataTable(config.dt_options)
+		  var table = $(tblselector).DataTable(config.dt_config)
   	}
     window[config.id] = table
     window.table = table
