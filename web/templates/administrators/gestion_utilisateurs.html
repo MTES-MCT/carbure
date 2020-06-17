@@ -7,7 +7,7 @@
         <h3>Settings</h3>
       </div>
       <ul class="tabs__tab-list">
-        <li id="tab_entities_title" class="tabs__tab" data-dst="tab_entities">Sociétés</li>
+        <li id="tab_entities_title" class="tabs__tab tabs__tab--selected" data-dst="tab_entities">Sociétés</li>
         <li id="tab_users_title" class="tabs__tab" data-dst="tab_users">Utilisateurs</li>
         <li id="tab_rights_title" class="tabs__tab" data-dst="tab_rights">Droits</li>
       </ul>
@@ -191,9 +191,10 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
-  $("#datatable_entities").DataTable({})
-  $("#datatable_users").DataTable({})
-  $("#datatable_rights").DataTable({})
+  // show drafts tab
+  tabcontent = document.getElementById("tab_users")
+  tabcontent.style.display = "block";
+  init_tab_generic("tab_users")
 })
 
 $(".autocomplete_entities").autocomplete({
@@ -212,7 +213,6 @@ $(".autocomplete_users").autocomplete({
   }
 })
 
-showTab("tab_entities")
 
 </script>
 {% endblock %}
