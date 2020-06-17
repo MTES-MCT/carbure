@@ -9,7 +9,7 @@
     <ul class="tabs__tab-list">
       <li id="tab_operators_drafts_title" class="tabs__tab" data-dst="tab_operators_drafts">Brouillons ({{nb_drafts}})</li>
       <li id="tab_operators_in_title" class="tabs__tab tabs__tab--selected" data-dst="tab_operators_in">Lots en attente ({{nb_in}})</li>
-      <li id="tab_operators_out_title" class="tabs__tab" data-dst="tab_operators_out">Lots acceptés ({{nb_out}})</li>
+      <li id="tab_operators_out_title" class="tabs__tab" data-dst="tab_operators_out">Lots déclarés ({{nb_out}})</li>
     </ul>
 
     <div id="tab_operators_drafts" class="tabcontent">
@@ -181,6 +181,41 @@
 
 {% include "common/modal_lot_ro.html" %}
 
+
+<div class="modal__backdrop" id="modal_reject_lot">
+  <div class="modal">
+    <div class="flex-container">
+      <div class="form__group">
+        <label style="margin-bottom: 1em; margin-top: 2em;" for="textarea_reject">Ajouter un motif de refus pour le fournisseur</label>
+        <textarea name="textarea" id="textarea_reject"></textarea>
+        <a class="button warning" id="btn_reject_with_comment">Refuser le lot</a>
+        <a class="button secondary close" id="btn_close_modal_reject_lot">Annuler</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_accept_lot_with_comments">
+  <div class="modal">
+    <div class="flex-container">
+      <div class="form__group">
+        <h5>Accepter sous réserve</h5>
+
+        <input type="radio" name="correction_type" value="sustainability"/> Il y a un problème relatif à la durabilité ou aux caractéristiques du lot (provenance, volume, gaz à effet de serre)<br />
+        <input type="radio" name="correction_type" value="tx"/> Il y a un problème sur la transaction (numéro douanier, site de livraison, date)<br />
+        <input type="radio" name="correction_type" value="both"/> Les deux<br />
+
+        <label style="margin-bottom: 1em; margin-top: 2em;" for="textarea_reject">Ajouter un commentaire pour le fournisseur</label>
+        <textarea name="textarea" id="textarea_correction"></textarea>
+        <div class="button-item">
+          <a class="button primary" id="btn_accept_with_comment">Accepter et demander une correction</a>
+          <a class="button secondary close" id="btn_close_modal_accept_lot_with_comments">Annuler</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal__backdrop" id="modal_accept_lots">
   <div class="modal">
     <a id="btn_close_modal_accept_lots" style="opacity: 0.5; margin: -1rem -1rem -1rem auto; float: right;">
@@ -212,6 +247,9 @@
 window.operators_api_lots_in_v2 = "{% url 'api-v2-operators-get-in' %}"
 window.operators_api_lots_mb_v2 = "{% url 'api-v2-operators-get-mb' %}"
 window.operators_api_lots_out_v2 = "{% url 'api-v2-operators-get-out' %}"
+window.api_lot_reject_v2 = "{% url 'api-v2-operators-reject-lot' %}"
+window.api_lot_accept_with_correction_v2 = "{% url 'api-v2-operators-accept-lot-with-correction' %}"
+window.api_lot_accept_v2 = "{% url 'api-v2-operators-accept-lot' %}"
 
 $(document).ready(function() {
   // show drafts tab

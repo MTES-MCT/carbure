@@ -15,4 +15,9 @@ urlpatterns = [
     path('lots/delete', operators.delete_lots, name='api-v2-operators_api-delete-lots'),
     path('lots/accept', operators.accept_lots, name='api-v2-operators_api-accept-lots'),
     path('lots/declare', operators.declare_lots, name='api-v2-operators_api-validate-lots'),
+
+
+    path('lot/reject', operators.reject_lot, name='api-v2-operators-reject-lot'),
+    path('lot/accept', operators.accept_lot, name='api-v2-operators-accept-lot'),
+    path('lot/accept-with-correction', operators.accept_lot_with_correction, name='api-v2-operators-accept-lot-with-correction'),
 ]

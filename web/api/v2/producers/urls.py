@@ -37,13 +37,3 @@ urlpatterns = [
     path('producers/get-clients-autocomplete', producers.get_clients_autocomplete, name='api-v2-clients-autocomplete'),
     path('producers/get-depots-autocomplete', producers.get_depots_autocomplete, name='api-v2-depots-autocomplete'),
 ]
-
-#path('producers/lots/corrections', producers_api.producers_lots_corrections, name='api-producers-lots-corrections'),
-#path('producers/lots/valid', producers_api.producers_lots_valid, name='api-producers-lots-valid'),
-#path('producers/lots/all', producers_api.producers_lots_all, name='api-producers-lots-all'),
-
-#path('producers/lot/save', producers_api.producers_save_lot, name='producers-api-attestation-save-lot'),
-
-#path('producers/lot/comments', producers_api.producers_lot_comments, name='producers-api-lot-comments'),
-#path('producers/lot/save-comment', producers_api.producers_lot_save_comment, name='producers-api-save-comment'),
-#path('producers/lot/errors', producers_api.producers_lot_errors, name='producers-api-lot-errors'),
