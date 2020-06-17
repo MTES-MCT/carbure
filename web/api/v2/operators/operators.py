@@ -378,14 +378,14 @@ def get_in(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_operators
-def get_mb(request, *args, **kwargs):
+def get_drafts(request, *args, **kwargs):
     context = kwargs['context']
-    transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='N', lot__status="Validated")
-    lot_ids = [t.lot.id for t in transactions]
-    lots = LotV2.objects.filter(id__in=lot_ids)
+    lots = LotV2.objects.filter(added_by=context['user_entity'], status='Draft')
+    transactions_ids = set([tx['id__min'] for tx in LotTransaction.objects.filter(lot__in=lots).values('lot_id', 'id').annotate(Min('id'))])
     errors = LotV2Error.objects.filter(lot__in=lots)
+    first_transactions = LotTransaction.objects.filter(id__in=transactions_ids)
     sez = serializers.serialize('json', lots, use_natural_foreign_keys=True)
-    txsez = serializers.serialize('json', transactions, use_natural_foreign_keys=True)
+    txsez = serializers.serialize('json', first_transactions, use_natural_foreign_keys=True)
     errsez = serializers.serialize('json', errors, use_natural_foreign_keys=True)
     return JsonResponse({'lots': sez, 'errors': errsez, 'transactions': txsez})
 
