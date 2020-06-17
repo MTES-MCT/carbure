@@ -56,15 +56,11 @@ def restrict_to_operators(function):
         if context['user_entity'].entity_type != 'Opérateur':
             raise PermissionDenied
         drafts = LotV2.objects.filter(added_by=context['user_entity'], status='Draft')
+        received = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status__in=['N', 'AC', 'AA'], lot__status="Validated")
+        declared = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='A', lot__status="Validated", lot__fused_with=None)
         context['nb_drafts'] = len(drafts)
-
-        received = list(LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='N', lot__status="Validated"))
-        received += list(LotTransaction.objects.filter(lot__added_by=context['user_entity'], lot__status="Draft"))
         context['nb_in'] = len(received)
-        declared = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='A')
-        context['nb_mb'] = len(declared)
-        out = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='N', lot__status="Validated")
-        context['nb_out'] = len(out)
+        context['nb_out'] = len(declared)
         context['nb_controles_dgec'] = 0
         return function(request, *args, **kwargs)
     wrap.__doc__ = function.__doc__

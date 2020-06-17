@@ -181,10 +181,11 @@ const operators_table_columns_mb_v2 = [
 
 const operators_table_columns_out_v2 = [
 {title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
+{title:'Période', can_hide: true, can_export: true, render: (data, type, full, meta) => { return full.fields.period }},
 {title:'Producteur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer.name : `<i>${full.fields.unknown_producer}</i>` }},
 {title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : `<i>${full.fields.unknown_production_site}</i>` }},
 {title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.country.code_pays : (full.fields.unknown_production_country ? full.fields.unknown_production_country.code_pays: "") }},
-{title:'Fournisseur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.tx.fields.vendor_is_in_carbure ? full.tx.fields.carbure_vendor : `<i>${full.tx.fields.unknown_vendor}</i>` }},
+{title:'Fournisseur', hidden: true, can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.tx.fields.carbure_vendor ? full.tx.fields.carbure_vendor.name : `<i>${full.tx.fields.unknown_vendor}</i>` }},
 {title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, data: 'volume'},
 {title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.biocarburant.name }},
 {title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.matiere_premiere.name }},
@@ -2209,7 +2210,7 @@ $("#btn_add_tx_comment").on('click', function() {
 $("#btn_accept_lot").on('click', function() {
   let tx_id = $("#tx_id").val()
   $.ajax({
-    url: window.producers_api_lot_accept_v2,
+    url: window.api_lot_accept_v2,
     data: {'tx_id': tx_id, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
     type        : 'POST',
     success     : function(data, textStatus, jqXHR){
@@ -2232,7 +2233,7 @@ $("#btn_reject_with_comment").on('click', function() {
   let tx_id = $("#tx_id").val()
   let comment = $("#textarea_reject").val()
   $.ajax({
-    url: window.producers_api_lot_reject_v2,
+    url: window.api_lot_reject_v2,
     data: {'tx_id': tx_id, comment:comment, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
     type        : 'POST',
     success     : function(data, textStatus, jqXHR){
@@ -2256,7 +2257,7 @@ $("#btn_accept_with_comment").on('click', function() {
   let tx_id = $("#tx_id").val()
   let comment = $("#textarea_correction").val()
   $.ajax({
-    url: window.producers_api_lot_accept_with_correction_v2,
+    url: window.api_lot_accept_with_correction_v2,
     data: {'tx_id': tx_id, comment: comment, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value,
            'comment': comment},
     type        : 'POST',
