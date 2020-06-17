@@ -56,9 +56,13 @@ def load_excel_lot(context, lot_row):
                 lot.producer_is_in_carbure = False
                 lot.carbure_producer = None
                 lot.unknown_producer = lot_row['producer']
+    elif 'producer' in lot_row and lot_row['producer'] is None:
+        lot.producer_is_in_carbure = False
+        lot.carbure_producer = None
+        lot.unknown_producer = ''
     else:
-        # print('No producer in excel sheet. ')
-        # default, current entity is the producer
+        # not producer column = simple template
+        # current entity is the producer
         lot.producer_is_in_carbure = True
         lot.carbure_producer = entity
         lot.unknown_producer = ''
