@@ -1187,7 +1187,7 @@ function display_producers_lot_correction_modal(table, columns, event) {
   let rowid = event.target._DT_CellIndex.row
   let data = table.row(rowid).data()
   let table_column = columns[colid]
-  let comments_section = $("#comments_section")
+  let comments_section = $("#comments_list")
   comments_section.empty()
   $("#btn_close_modal_lot_correct").on('click', function() {
     let modal = document.getElementById('modal_lot')
@@ -1278,27 +1278,21 @@ function display_producers_lot_correction_modal(table, columns, event) {
     $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data.fields.ghg_reference} gCO2eq/MJ`)
 
     /* load comments */
-    /*
     $.ajax({
-      url         : window.producers_api_lot_comments,
-      data        : {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+      url         : window.producers_api_lot_corrections_v2,
+      data        : {'tx_id': data.tx.pk, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
       type        : 'POST',
       success     : function(d, textStatus, jqXHR){
         // Callback code
         // load existing comments into the form
-        for (let i = 0, len = d.length; i < len; i++) {
-          let c = d[i]
-          let html = `<p><b>${c.from}</b>: ${c.comment}</p>`
+        let comments = JSON.parse(d.comments)
+        console.log(`comments: ${JSON.stringify(comments)}`)
+        for (let i = 0, len = comments.length; i < len; i++) {
+          let c = comments[i]
+          let html = `<dd><b>${c.fields.entity.name}</b>: ${c.fields.comment}</dd>`
           comments_section.append(html)
         }
-        // add area to respond
-        if (data['status'] === "Draft" || data['ea_delivery_status'] === "Accepté") {
-          // do nothing
-        } else {
-          // add the ability to add a comment
-          let html = `<div style="display: flex;"><p>Ajouter un commentaire:</p><input type="text" name="textarea" id="textarea" style="max-width: 80%; height: 2em; margin-left: 10px; margin-top: auto; margin-bottom: auto;" /></div>`
-          comments_section.append(html)
-        }
+        comments_section.append(`<dd><input id="new_comment" type="text" placeholder="Commentaire" /></dd>`)
       },
       error       : function(e) {
         if (e.status === 400) {
@@ -1309,7 +1303,8 @@ function display_producers_lot_correction_modal(table, columns, event) {
           console.log(`server error ${JSON.stringify(e)}`)
         }
       }
-    })*/
+    })
+
     modal.style.display = "flex"
   }
 }
@@ -1520,6 +1515,7 @@ $(".autocomplete_depots").autocomplete({
 })
 
 const dt_drafts_config = {
+  is_complex_dt: true,
 	id: "datatable_drafts",
 	url: window.producers_api_lots_drafts_v2,
 	col_definition: table_columns_drafts_v2,
@@ -2182,6 +2178,32 @@ $(".tabs__tab").on('click', function() {
   this.className = "tabs__tab tabs__tab--selected"
 
   init_tab_generic(this.dataset.dst)
+})
+
+$("#btn_add_tx_comment").on('click', function() {
+  // save lot + comment
+  // start with comment
+  let tx_id = $("#tx_id").val()
+  let comment = $("#new_comment").val()
+  $.ajax({
+    url: window.producers_api_lot_add_comment_v2,
+    data: {'tx_id': tx_id, comment:comment, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
+    type        : 'POST',
+    success     : function(data, textStatus, jqXHR){
+      // Callback code
+      // do nothing
+    },
+    error       : function(e) {
+      if (e.status === 400) {
+        alert(e.responseJSON.message)
+        console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
+      } else {
+        alert("Server error. Please contact an administrator")
+        console.log(`server error ${JSON.stringify(e)}`)
+      }
+    }
+  })
+  handleSave()
 })
 
 $("#btn_accept_lot").on('click', function() {

@@ -361,6 +361,9 @@ class TransactionComment(models.Model):
     def __str__(self):
         return str(self.comment)
 
+    def natural_key(self):
+        return {'entity': self.entity.natural_key(), 'topic':self.topic, 'comment':self.comment}
+
     class Meta:
         db_table = 'tx_comments'
         verbose_name = 'TransactionComment'

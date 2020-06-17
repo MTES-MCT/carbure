@@ -20,13 +20,16 @@ urlpatterns = [
 
 
 
-    path('producers/lot/delete', producers.delete_lots, name='api-v2-producers-delete-lots'),
-    path('producers/lot/validate', producers.validate_lots, name='api-v2-producers-validate-lots'),
-    path('producers/lot/duplicate', producers.duplicate_lot, name='api-v2-producers-duplicate-lot'),
-    path('producers/lot/save', producers.save_lot, name='api-v2-producers-save-lot'),
-    path('producers/lot/reject', producers.reject_lot, name='api-v2-producers-reject-lot'),
-    path('producers/lot/accept', producers.accept_lot, name='api-v2-producers-accept-lot'),
-    path('producers/lot/accept-with-correction', producers.accept_lot_with_correction, name='api-v2-producers-accept-lot-with-correction'),
+    path('lot/delete', producers.delete_lots, name='api-v2-producers-delete-lots'),
+    path('lot/validate', producers.validate_lots, name='api-v2-producers-validate-lots'),
+    path('lot/duplicate', producers.duplicate_lot, name='api-v2-producers-duplicate-lot'),
+    path('lot/save', producers.save_lot, name='api-v2-producers-save-lot'),
+    path('lot/reject', producers.reject_lot, name='api-v2-producers-reject-lot'),
+    path('lot/accept', producers.accept_lot, name='api-v2-producers-accept-lot'),
+    path('lot/accept-with-correction', producers.accept_lot_with_correction, name='api-v2-producers-accept-lot-with-correction'),
+    path('lot/get-corrections', producers.get_lot_corrections, name='api-v2-producers-get-lot-corrections'),
+    path('lot/add-corrections', producers.add_lot_correction, name='api-v2-producers-add-lot-correction'),
+
     path('producers/lots/accept', producers.accept_lots, name='api-v2-producers-accept-lots'),
 
 

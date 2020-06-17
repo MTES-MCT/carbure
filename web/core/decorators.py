@@ -36,7 +36,7 @@ def restrict_to_producers(function):
         drafts = LotV2.objects.filter(added_by=context['user_entity'], status='Draft')
         valid = LotV2.objects.filter(added_by=context['user_entity'], status='Validated')
         corrections = LotTransaction.objects.filter(carbure_vendor=context['user_entity'], delivery_status__in=['AC', 'AA', 'R'])
-        received = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='N', lot__status="Validated")
+        received = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status__in=['N', 'AC', 'AA'], lot__status="Validated")
         accepted = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='A', lot__status="Validated", lot__fused_with=None)
         context['nb_corrections'] = len(corrections)
         context['nb_drafts'] = len(drafts)
