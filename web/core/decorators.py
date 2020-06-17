@@ -55,6 +55,9 @@ def restrict_to_operators(function):
         context = kwargs['context']
         if context['user_entity'].entity_type != 'Opérateur':
             raise PermissionDenied
+        drafts = LotV2.objects.filter(added_by=context['user_entity'], status='Draft')
+        context['nb_drafts'] = len(drafts)
+
         received = list(LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='N', lot__status="Validated"))
         received += list(LotTransaction.objects.filter(lot__added_by=context['user_entity'], lot__status="Draft"))
         context['nb_in'] = len(received)
