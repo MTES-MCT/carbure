@@ -58,7 +58,7 @@ def make_lots_sheet_v2_advanced(workbook, entity):
 
     # 3/10 chances of having an imported lot
     imported_lots = [1, 1, 1, 0, 0, 0, 0, 0, 0, 0]
-    exported_lots = [1, 1, 1, 0, 0, 0, 0, 0, 0, 0]
+    exported_lots = [1, 1, 1, 0, 0, 0, 0, -1, -1, -1]
     unknown_producers = [{'name': 'ITANOL', 'country': 'IT', 'production_site': 'BERGAMO', 'ref': 'ISCC-IT-100001010', 'date':'2017-12-01', 'dc':'IT_001_2020'},
                          {'name': 'ITANOL', 'country': 'IT', 'production_site': 'FIRENZE', 'ref': 'ISCC-IT-100001011', 'date':'2014-03-01', 'dc':''},
                          {'name': 'PORTUGASOIL', 'country': 'PT', 'production_site': 'LISBOA', 'ref': 'ISCC-PT-100001110', 'date':'2011-10-01', 'dc':''},
@@ -119,10 +119,15 @@ def make_lots_sheet_v2_advanced(workbook, entity):
             p = random.choice(psites)
             row += [p.producer.name, p.name, p.country.code_pays, '', '', '']
         row += [volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 0, 'FR000000123', clientid]
-        if exported:
+        if exported == 1:
+            # client is not in carbure
             c = random.choice(foreign_clients)
             row += [c['name'], today, c['delivery_site'], c['country']]
+        elif exported == -1:
+            # into mass balance (i am the client)
+            row += ['', today, site.depot_id, 'FR']
         else:
+            # regular transaction. sell to someone else
             row += [ea.name, today, site.depot_id, 'FR']
 
         colid = 0
