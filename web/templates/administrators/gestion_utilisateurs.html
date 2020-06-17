@@ -15,6 +15,13 @@
 
     <div id="tab_entities" class="tabcontent">
       <h3>Sociétés</h3>
+      <div class="flex-container">
+        <a id="btn_open_modal_entity" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+          <svg class="icon" style="height:24px; width:24px">
+            <use xlink:href="#plus" aria-label="Ajouter une société"></use>
+          </svg>
+        </a>
+      </div>
       <table class="table" id="datatable_entities">
         <thead>
           <tr>
@@ -37,67 +44,73 @@
           {% endfor %}
         </tbody>
       </table>
-      <div class="flex-container-right">
-        <a class="button primary" id="btn_open_modal_entity">Ajouter Société</a>
-      </div>
     </div>
 
     <div id="tab_users" class="tabcontent">
       <h3>Utilisateurs</h3>
-          <table class="table" id="datatable_users">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Réinitialisation de mot de passe</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for user in users %}
-              <tr>
-                <td>{{user.name}}</td>
-                <td>{{user.email}}</td>
-                <td><a class="button primary" href="{% url 'administrators-reset-user-password' uid=user.id %}">Reset</a></td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="3">Aucun compte utilisateur enregistré à ce jour.</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          <div class="flex-container-right">
-            <a class="button primary" id="btn_open_modal_user">Ajouter Utilisateur</a>
-          </div>
+      <div class="flex-container">
+        <a id="btn_open_modal_user" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+          <svg class="icon" style="height:24px; width:24px">
+            <use xlink:href="#plus" aria-label="Ajouter Utilisateur"></use>
+          </svg>
+        </a>
+      </div>
+      <table class="table" id="datatable_users">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Réinitialisation de mot de passe</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>{{user.name}}</td>
+            <td>{{user.email}}</td>
+            <td><a class="button primary" href="{% url 'administrators-reset-user-password' uid=user.id %}">Reset</a></td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3">Aucun compte utilisateur enregistré à ce jour.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
 
     <div id="tab_rights" class="tabcontent">
       <h3>Droits</h3>
-          <table class="table" id="datatable_rights">
-            <thead>
-              <tr>
-                <th>Utilisateur</th>
-                <th>Société</th>
-                <th>Supprimer</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for right in user_rights %}
-              <tr>
-                <td>{{right.user.name}} - {{right.user.email}}</td>
-                <td>{{right.entity.name}}</td>
-                <td><a class="button primary btn_open_modal_right_delete" data-rightid="{{right.id}}" data-user="{{right.user.name}}" data-entity="{{right.entity.name}}">Supprimer</a></td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="3">Aucun droit enregistré à ce jour.</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          <div class="flex-container-right">
-            <a class="button primary" id="btn_open_modal_right">Ajouter Droit</a>
-          </div>
+      <div class="flex-container">
+        <a id="btn_open_modal_right" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+          <svg class="icon" style="height:24px; width:24px">
+            <use xlink:href="#plus" aria-label="Ajouter Droit"></use>
+          </svg>
+        </a>
+      </div>
+      <table class="table" id="datatable_rights">
+        <thead>
+          <tr>
+            <th>Utilisateur</th>
+            <th>Société</th>
+            <th>Supprimer</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for right in user_rights %}
+          <tr>
+            <td>{{right.user.name}} - {{right.user.email}}</td>
+            <td>{{right.entity.name}}</td>
+            <td><a class="button primary btn_open_modal_right_delete" data-rightid="{{right.id}}" data-user="{{right.user.name}}" data-entity="{{right.entity.name}}">Supprimer</a></td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3">Aucun droit enregistré à ce jour.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
     </div>
 		</div>
 	</div>
@@ -192,9 +205,9 @@
 
 $(document).ready(function() {
   // show drafts tab
-  tabcontent = document.getElementById("tab_users")
+  tabcontent = document.getElementById("tab_entities")
   tabcontent.style.display = "block";
-  init_tab_generic("tab_users")
+  init_tab_generic("tab_entities")
 })
 
 $(".autocomplete_entities").autocomplete({
