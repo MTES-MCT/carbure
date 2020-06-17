@@ -480,7 +480,7 @@ def get_received(request, *args, **kwargs):
 @restrict_to_producers
 def get_mb(request, *args, **kwargs):
     context = kwargs['context']
-    transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='A', lot__status="Validated")
+    transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='A', lot__status="Validated", lot__fused_with=None)
     lot_ids = [t.lot.id for t in transactions]
     lots = LotV2.objects.filter(id__in=lot_ids)
     errors = LotV2Error.objects.filter(lot__in=lots)
@@ -639,11 +639,49 @@ def validate_lots(request, *args, **kwargs):
                 tx.delivery_status = 'A'
                 tx.save()
             lot.save()
-        except Exception:
+            # if we are the client, check if we can fuse lots in the mass balance
+            if tx.carbure_client == context['user_entity'] and tx.delivery_site_is_in_carbure:
+                similar_lots_stored_there = LotTransaction.objects.filter(carbure_delivery_site=tx.carbure_delivery_site,
+                                                                          lot__biocarburant=tx.lot.biocarburant,
+                                                                          lot__matiere_premiere=tx.lot.matiere_premiere,
+                                                                          lot__ghg_total=tx.lot.ghg_total,
+                                                                          lot__status='Validated',
+                                                                          delivery_status='A')
+                print('found %d similar lots' % (len(similar_lots_stored_there)))
+                if len(similar_lots_stored_there) > 1:
+                    new_lot = LotV2()
+                    new_lot.period = tx.lot.period
+                    new_lot.carbure_id = "%s%sP%s-%dF" % ('FR', today.strftime('%y%m'), tx.carbure_client.id, lot.id)
+                    new_lot.biocarburant = tx.lot.biocarburant
+                    new_lot.matiere_premiere = tx.lot.matiere_premiere
+                    new_lot.ghg_total = tx.lot.ghg_total
+                    new_lot.ghg_reference = tx.lot.ghg_reference
+                    new_lot.ghg_reduction = tx.lot.ghg_reduction
+                    new_lot.status = "Validated"
+                    new_lot.is_fused = True
+                    new_lot.save()
+                    for tx in similar_lots_stored_there:
+                        tx.lot.is_fused = True
+                        tx.lot.fused_with = new_lot
+                        tx.lot.save()
+                        new_lot.volume += tx.lot.volume
+                    new_lot.save()
+                    new_tx = LotTransaction()
+                    new_tx.lot = new_lot
+                    new_tx.client_is_in_carbure = True
+                    new_tx.carbure_client = tx.carbure_client
+                    new_tx.carbure_delivery_site = tx.carbure_delivery_site
+                    new_tx.delivery_status = 'A'
+                    new_tx.ghg_total = new_lot.ghg_total
+                    new_tx.ghg_reduction = new_lot.ghg_reduction
+                    new_tx.champ_libre = 'FUSIONNÉ'
+                    new_tx.save()
+        except Exception as e:
+            print('exception during validation: %s' % (e))
             results.append({'lot_id': lotid, 'status': 'error', 'message': 'Erreur lors de la validation du lot'})
             continue
         results.append({'lot_id': lotid, 'status': 'sucess'})
-    # print({'status': 'success', 'message': results})
+    print({'status': 'success', 'message': results})
     return JsonResponse({'status': 'success', 'message': results})
 
 
@@ -775,19 +813,22 @@ def save_lot(request, *args, **kwargs):
     except Exception:
         lot.unknown_production_country = None
     unknown_production_site_com_date = request.POST.get('unknown_production_site_com_date', '')
-    try:
-        year = int(unknown_production_site_com_date[0:4])
-        month = int(unknown_production_site_com_date[5:7])
-        day = int(unknown_production_site_com_date[8:10])
-        dd = datetime.date(year=year, month=month, day=day)
-        lot.unknown_production_site_com_date = dd
-        lot.period = dd.strftime('%Y-%m')
-        LotV2Error.objects.filter(tx=lot, field='unknown_production_site_com_date').delete()
-    except Exception:
-        msg = "Format de date incorrect: veuillez entrer une date au format AAAA-MM-JJ"
-        e, c = LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_com_date',
-                                                   error=msg,
-                                                   defaults={'value': unknown_production_site_com_date})
+    if unknown_production_site_com_date == '':
+        lot.unknown_production_site_com_date = None
+    else:
+        try:
+            year = int(unknown_production_site_com_date[0:4])
+            month = int(unknown_production_site_com_date[5:7])
+            day = int(unknown_production_site_com_date[8:10])
+            dd = datetime.date(year=year, month=month, day=day)
+            lot.unknown_production_site_com_date = dd
+            lot.period = dd.strftime('%Y-%m')
+            LotV2Error.objects.filter(tx=lot, field='unknown_production_site_com_date').delete()
+        except Exception:
+            msg = "Format de date incorrect: veuillez entrer une date au format AAAA-MM-JJ"
+            e, c = LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_com_date',
+                                                       error=msg,
+                                                       defaults={'value': unknown_production_site_com_date})
     # producer
     producer_is_in_carbure = request.POST.get('producer_is_in_carbure', "no")
     if producer_is_in_carbure == "no":
@@ -1035,6 +1076,7 @@ def save_lot(request, *args, **kwargs):
         transaction.delivery_site_is_in_carbure = False
     else:
         transaction.delivery_site_is_in_carbure = True
+    print("delivery site is in carbure: %d" % (transaction.delivery_site_is_in_carbure))
     carbure_delivery_site_id = request.POST.get('carbure_delivery_site_id', None)
     carbure_delivery_site_name = request.POST.get('carbure_delivery_site_name', '')
     if carbure_delivery_site_id is None:
