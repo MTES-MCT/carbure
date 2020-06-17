@@ -278,7 +278,7 @@
         <input type="hidden" id="lot_id" />
         <input type="hidden" id="tx_id" />
         <dl>
-          <dt>Le producteur est enregistré sur carbure ?</dt>
+          <dt>Le producteur est enregistré sur Carbure ?</dt>
           <dd>Oui <input type="radio" name="producer_is_in_carbure" value="yes"/> Non <input type="radio" name="producer_is_in_carbure" value="no"/></dd>
 
           <!-- Producer is in Carbure -->
@@ -320,22 +320,26 @@
         <dt><label for="dae">Numéro douanier</label></dt>
         <dd><input id="dae" type="text" /><span id="dae_error" style="color:tomato;"></span></dd>
 
-        <dt>Le client est enregistré sur carbure ?</dt>
+        <dt>Le client est enregistré sur Carbure ?</dt>
         <dd>Oui <input type="radio" name="client_is_in_carbure" value="yes"/> Non <input type="radio" name="client_is_in_carbure" value="no"/></dd>
 
 
         <!-- Client is in Carbure -->
         <dt id="carbure_client_label"><label for="carbure_client">Client</label></dt>
         <dd><input type="text" id="carbure_client" class="autocomplete_clients" /><span id="carbure_client_error" style="color:tomato;"></span><input type="hidden" id="carbure_client_id" /></dd>
-
-        <dt id="carbure_delivery_site_label"><label for="carbure_delivery_site">Site de livraison</label></dt>
-        <dd><input id="carbure_delivery_site" type="text" class="autocomplete_depots" /><span id="carbure_delivery_site_error" style="color:tomato;"></span><input type="hidden" id="carbure_delivery_site_id" /></dd>
-
-
         <!-- Client is not in Carbure -->
         <dt id="unknown_client_label"><label for="unknown_client">Client</label></dt>
         <dd><input type="text" id="unknown_client" /><span id="unknown_client_error" style="color:tomato;"></span></dd>
 
+
+        <dt>Le site de livraison existe sur Carbure ?</dt>
+        <dd>Oui <input type="radio" name="delivery_site_is_in_carbure" value="yes"/> Non <input type="radio" name="delivery_site_is_in_carbure" value="no"/></dd>
+
+        <!-- Delivery site is in Carbure -->
+        <dt id="carbure_delivery_site_label"><label for="carbure_delivery_site">Site de livraison</label></dt>
+        <dd><input id="carbure_delivery_site" type="text" class="autocomplete_depots" /><span id="carbure_delivery_site_error" style="color:tomato;"></span><input type="hidden" id="carbure_delivery_site_id" /></dd>
+
+        <!-- Delivery site is not in Carbure -->
         <dt id="unknown_delivery_site_label"><label for="unknown_delivery_site">Site de livraison</label></dt>
         <dd><input id="unknown_delivery_site" type="text" /><span id="unknown_delivery_site_error" style="color:tomato;"></span></dd>
         <dt id="unknown_delivery_site_country_label"><label for="unknown_delivery_site_country">Pays de livraison</label></dt>
