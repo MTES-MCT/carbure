@@ -7,8 +7,8 @@ urlpatterns = [
     path('download-xlsx-template', operators.excel_template_download, name='api-v2-operators-excel-template-download'),
 
     # get
+    path('lots/drafts', operators.get_drafts, name='api-v2-operators-get-drafts'),
     path('lots/in', operators.get_in, name='api-v2-operators-get-in'),
-    path('lots/mb', operators.get_mb, name='api-v2-operators-get-mb'),
     path('lots/out', operators.get_out, name='api-v2-operators-get-out'),
 
     # post

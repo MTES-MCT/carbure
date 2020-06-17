@@ -244,8 +244,8 @@
 
 {% block extra_js %}
 <script type="text/javascript">
+window.operators_api_lots_drafts_v2 = "{% url 'api-v2-operators-get-drafts' %}"
 window.operators_api_lots_in_v2 = "{% url 'api-v2-operators-get-in' %}"
-window.operators_api_lots_mb_v2 = "{% url 'api-v2-operators-get-mb' %}"
 window.operators_api_lots_out_v2 = "{% url 'api-v2-operators-get-out' %}"
 window.api_lot_reject_v2 = "{% url 'api-v2-operators-reject-lot' %}"
 window.api_lot_accept_with_correction_v2 = "{% url 'api-v2-operators-accept-lot-with-correction' %}"
