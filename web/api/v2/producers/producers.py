@@ -928,8 +928,8 @@ def validate_lots(request, *args, **kwargs):
             tx.delivery_status = 'A'
             tx.save()
         lot.save()
-        try_fuse_lots(tx)
-        results.append({'lot_id': lotid, 'status': 'sucess'})
+        try_fuse_lots(context, tx, lot)
+        results.append({'lot_id': lotid, 'status': 'success'})
     return JsonResponse({'status': 'success', 'message': results})
 
 
@@ -992,7 +992,7 @@ def validate_mb_drafts_lots(request, *args, **kwargs):
         lot.save()
         lot.parent_lot.volume -= lot.volume
         lot.parent_lot.save()
-        results.append({'txid': txid, 'status': 'sucess'})
+        results.append({'txid': txid, 'status': 'success'})
     print(results)
     return JsonResponse({'status': 'success', 'message': results})
 
@@ -1414,7 +1414,6 @@ def save_lot(request, *args, **kwargs):
         transaction.delivery_site_is_in_carbure = False
     else:
         transaction.delivery_site_is_in_carbure = True
-    print("delivery site is in carbure: %d" % (transaction.delivery_site_is_in_carbure))
     carbure_delivery_site_id = request.POST.get('carbure_delivery_site_id', None)
     carbure_delivery_site_name = request.POST.get('carbure_delivery_site_name', '')
     if carbure_delivery_site_id is None:
