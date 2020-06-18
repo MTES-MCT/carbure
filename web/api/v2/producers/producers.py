@@ -11,7 +11,7 @@ from django.db.models.fields import NOT_PROVIDED
 from django.db.models import Q
 
 from core.decorators import enrich_with_user_details, restrict_to_producers
-from core.xlsx_template import create_template_xlsx_v2_simple, create_template_xlsx_v2_advanced
+from core.xlsx_template import create_template_xlsx_v2_simple, create_template_xlsx_v2_advanced, create_template_xlsx_v2_mb
 
 from core.models import Entity, ProductionSite, Pays, Biocarburant, MatierePremiere, Depot
 from core.models import LotV2, LotTransaction, TransactionError, LotV2Error, UserRights, TransactionComment
@@ -379,6 +379,151 @@ def load_excel_lot(context, lot_row):
     lot.save()
 
 
+# not an API call. helper function
+def load_excel_mb_lot(context, lot_row):
+    entity = context['user_entity']
+    # fields
+    if 'carbure_id' not in lot_row:
+        return False
+    carbure_id = lot_row['carbure_id']
+    try:
+        source_tx = LotTransaction.objects.get(lot__carbure_id=carbure_id)
+    except Exception as e:
+        print('Could not get lot with carbure_id %s' % (carbure_id))
+        print(e)
+        return False
+    source_lot = source_tx.lot
+    if source_tx.carbure_client == context['user_entity'] and source_tx.delivery_status == 'A' and source_lot.fused_with is None:
+        # good
+        pass
+    else:
+        return False
+
+    # okay, source lot exists and is in this user's mass balance
+    # create draft
+    lot = LotV2()
+    lot.parent_lot = source_lot
+    lot.added_by = entity
+    lot.added_by_user = context['user']
+    lot.save()
+
+    if 'volume' in lot_row:
+        volume = lot_row['volume']
+        try:
+            lot.volume = float(volume)
+            LotV2Error.objects.filter(lot=lot, field='volume').delete()
+        except Exception:
+            lot.volume = 0
+            e, c = LotV2Error.objects.update_or_create(lot=lot, field='volume',
+                                                       error='Format du volume incorrect', defaults={'value': volume})
+    else:
+        e, c = LotV2Error.objects.update_or_create(lot=lot, field='volume',
+                                                   error='Merci de préciser un volume', defaults={'value': volume})
+    lot.source = 'EXCEL'
+    lot.ghg_total = source_lot.ghg_total
+    lot.ghg_reduction = source_lot.ghg_reduction
+    lot.biocarburant = source_lot.biocarburant
+    lot.matiere_premiere = source_lot.matiere_premiere
+    lot.pays_origine = source_lot.pays_origine
+    lot.save()
+
+    transaction = LotTransaction()
+    transaction.lot = lot
+    transaction.save()
+    transaction.vendor_is_in_carbure = True
+    transaction.carbure_vendor = entity
+    if 'dae' in lot_row:
+        dae = lot_row['dae']
+        if dae is not None:
+            transaction.dae = dae
+            TransactionError.objects.filter(tx=transaction, field='dae').delete()
+        else:
+            e, c = TransactionError.objects.update_or_create(tx=transaction, field='dae', error="Merci de préciser le numéro de DAE/DAU",
+                                                             defaults={'value': dae})
+    else:
+        e, c = TransactionError.objects.update_or_create(tx=transaction, field='dae', error="Merci de préciser le numéro de DAE/DAU",
+                                                         defaults={'value': None})
+    if 'client' in lot_row and lot_row['client'] is not None:
+        client = lot_row['client']
+        matches = Entity.objects.filter(name=client).count()
+        if matches:
+            transaction.client_is_in_carbure = True
+            transaction.carbure_client = Entity.objects.get(name=client)
+            transaction.unknown_client = ''
+        else:
+            transaction.client_is_in_carbure = False
+            transaction.carbure_client = None
+            transaction.unknown_client = client
+        TransactionError.objects.filter(tx=transaction, field='client').delete()
+    else:
+        transaction.client_is_in_carbure = False
+        transaction.carbure_client = None
+        transaction.unknown_client = ''
+
+    if 'delivery_date' not in lot_row or lot_row['delivery_date'] == '':
+        transaction.delivery_date = None
+        lot.period = ''
+        e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_date',
+                                                         error="Merci de préciser la date de livraison",
+                                                         defaults={'value': None})
+    else:
+        try:
+            delivery_date = lot_row['delivery_date']
+            year = int(delivery_date[0:4])
+            month = int(delivery_date[5:7])
+            day = int(delivery_date[8:10])
+            dd = datetime.date(year=year, month=month, day=day)
+            transaction.delivery_date = dd
+            lot.period = dd.strftime('%Y-%m')
+            TransactionError.objects.filter(tx=transaction, field='delivery_date').delete()
+        except Exception:
+            msg = "Format de date incorrect: veuillez entrer une date au format AAAA-MM-JJ"
+            e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_date',
+                                                             error=msg,
+                                                             defaults={'value': delivery_date})
+
+    if 'delivery_site' in lot_row and lot_row['delivery_site'] is not None:
+        delivery_site = lot_row['delivery_site']
+        matches = Depot.objects.filter(depot_id=delivery_site).count()
+        if matches:
+            transaction.delivery_site_is_in_carbure = True
+            transaction.carbure_delivery_site = Depot.objects.get(depot_id=delivery_site)
+            transaction.unknown_client = ''
+        else:
+            transaction.delivery_site_is_in_carbure = False
+            transaction.carbure_delivery_site = None
+            transaction.unknown_delivery_site = delivery_site
+        TransactionError.objects.filter(tx=transaction, field='delivery_site').delete()
+    else:
+        transaction.delivery_site_is_in_carbure = False
+        transaction.carbure_delivery_site = None
+        transaction.unknown_delivery_site = ''
+        e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site',
+                                                         defaults={'value': None, 'error': "Merci de préciser un site de livraison"})
+
+    if transaction.delivery_site_is_in_carbure is False:
+        if 'delivery_site_country' in lot_row:
+            try:
+                country = Pays.objects.get(code_pays=lot_row['delivery_site_country'])
+                transaction.unknown_delivery_site_country = country
+            except Exception:
+                error, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site_country',
+                                                                     error='Champ production_site_country incorrect',
+                                                                     defaults={'value': lot_row['delivery_site_country']})
+        else:
+            error, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site_country',
+                                                                 error='Merci de préciser une valeur dans le champ production_site_country',
+                                                                 defaults={'value': None})
+
+    transaction.ghg_total = lot.ghg_total
+    transaction.ghg_reduction = lot.ghg_reduction
+
+    if 'champ_libre' in lot_row:
+        transaction.champ_libre = lot_row['champ_libre']
+    transaction.save()
+    lot.save()
+
+
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
@@ -408,6 +553,23 @@ def excel_template_download_advanced(request, *args, **kwargs):
             # sending response
             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename="carbure_template_advanced.xlsx"'
+            return response
+    except Exception as e:
+        return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def excel_template_download_mb(request, *args, **kwargs):
+    context = kwargs['context']
+    file_location = create_template_xlsx_v2_mb(context['user_entity'])
+    try:
+        with open(file_location, 'rb') as f:
+            file_data = f.read()
+            # sending response
+            response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment; filename="carbure_template_mb.xlsx"'
             return response
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
@@ -452,9 +614,45 @@ def excel_template_upload(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
+def excel_mb_template_upload(request, *args, **kwargs):
+    context = kwargs['context']
+    file = request.FILES.get('file')
+    if file is None:
+        return JsonResponse({'status': "error", 'message': "Merci d'ajouter un fichier"}, status=400)
+    # we can load the file
+    wb = openpyxl.load_workbook(file)
+    lots_sheet = wb['lots']
+    colid2field = {}
+    lots = []
+    # create a dictionary from the line
+    for i, row in enumerate(lots_sheet):
+        if i == 0:
+            # header
+            for i, col in enumerate(row):
+                colid2field[i] = col.value
+        else:
+            lot = {}
+            for i, col in enumerate(row):
+                field = colid2field[i]
+                lot[field] = col.value
+            lots.append(lot)
+    total_lots = len(lots)
+    lots_loaded = 0
+    for lot in lots:
+        try:
+            load_excel_mb_lot(context, lot)
+            lots_loaded += 1
+        except Exception as e:
+            print(e)
+    return JsonResponse({'status': "success", 'message': "%d/%d lots chargés correctement" % (lots_loaded, total_lots)})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
 def get_drafts(request, *args, **kwargs):
     context = kwargs['context']
-    lots = LotV2.objects.filter(added_by=context['user_entity'], status='Draft')
+    lots = LotV2.objects.filter(added_by=context['user_entity'], status='Draft', parent_lot=None)
     transactions_ids = set([tx['id__min'] for tx in LotTransaction.objects.filter(lot__in=lots).values('lot_id', 'id').annotate(Min('id'))])
     errors = LotV2Error.objects.filter(lot__in=lots)
     first_transactions = LotTransaction.objects.filter(id__in=transactions_ids)
@@ -462,6 +660,16 @@ def get_drafts(request, *args, **kwargs):
     txsez = serializers.serialize('json', first_transactions, use_natural_foreign_keys=True)
     errsez = serializers.serialize('json', errors, use_natural_foreign_keys=True)
     return JsonResponse({'lots': sez, 'errors': errsez, 'transactions': txsez})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def get_mb_drafts(request, *args, **kwargs):
+    context = kwargs['context']
+    tx = LotTransaction.objects.filter(lot__added_by=context['user_entity'], lot__status='Draft').exclude(lot__parent_lot=None)
+    txsez = serializers.serialize('json', tx, use_natural_foreign_keys=True)
+    return JsonResponse({'transactions': txsez})
 
 
 @login_required
@@ -543,6 +751,26 @@ def delete_lots(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
+def delete_mb_drafts_lots(request, *args, **kwargs):
+    context = kwargs['context']
+    lot_ids = request.POST.get('lots', None)
+    errors = []
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot ids'}, status=400)
+    ids = lot_ids.split(',')
+    for lotid in ids:
+        try:
+            lot = LotV2.objects.get(id=lotid)
+            lot.delete()
+        except Exception as e:
+            errors.append({'message': 'Impossible de supprimer le lot %s: introuvable ou déjà validé' % (lotid), 'extra': str(e)})
+    print(errors)
+    return JsonResponse({'status': 'success', 'message': '%d lots supprimés' % (len(ids) - len(errors)), 'errors': errors})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
 def duplicate_lot(request, *args, **kwargs):
     context = kwargs['context']
     tx_id = request.POST.get('tx_id', None)
@@ -581,6 +809,91 @@ def duplicate_lot(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'message': 'OK, lot %d created' % (lot.id)})
 
 
+def tx_is_valid(tx):
+    # make sure all mandatory fields are set
+    if not tx.dae:
+        return False, 'DAE manquant'
+    if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site:
+        return False, 'Site de livraison manquant'
+    if tx.delivery_site_is_in_carbure and not tx.carbure_delivery_site:
+        return False, 'Site de livraison manquant'
+    if not tx.delivery_date:
+        return False, 'Date de livraison manquante'
+    if tx.client_is_in_carbure and not tx.carbure_client:
+        return False, 'Veuillez renseigner un client'
+    if not tx.client_is_in_carbure and not tx.unknown_client:
+        return False, 'Veuillez renseigner un client'
+    return True, ''
+
+
+def lot_is_valid(lot):
+    if not lot.volume:
+        return False, 'Veuillez renseigner le volume'
+
+    if not lot.parent_lot:
+        if not lot.pays_origine:
+            return False, 'Veuillez renseigner le pays d\'origine de la matière première'
+        if lot.producer_is_in_carbure and lot.carbure_production_site is None:
+            return False, 'Veuillez préciser le site de production'
+    else:
+        # no need to check lot info
+        pass
+    return True, ''
+
+
+def generate_carbure_id(lot):
+    today = datetime.date.today()
+    # [PAYS][YYMM]P[IDProd]-[1....]-([S123])
+    # FR2002P001-1
+    country = 'XX'
+    if lot.carbure_production_site and lot.carbure_production_site.country:
+        country = lot.carbure_production_site.country.code_pays
+    yymm = today.strftime('%y%m')
+    idprod = 'XXX'
+    if lot.carbure_producer:
+        idprod = lot.carbure_producer.id
+    return "%s%sP%s-%d" % (country, yymm, idprod, lot.id)
+
+
+def try_fuse_lots(context, tx, lot):
+    # if we are the client, check if we can fuse lots in the mass balance
+    if tx.carbure_client == context['user_entity'] and tx.delivery_site_is_in_carbure:
+        similar_lots_stored_there = LotTransaction.objects.filter(carbure_delivery_site=tx.carbure_delivery_site,
+                                                                  lot__biocarburant=tx.lot.biocarburant,
+                                                                  lot__matiere_premiere=tx.lot.matiere_premiere,
+                                                                  lot__ghg_total=tx.lot.ghg_total,
+                                                                  lot__status='Validated',
+                                                                  delivery_status='A')
+        if len(similar_lots_stored_there) > 1:
+            new_lot = LotV2()
+            new_lot.period = tx.lot.period
+            new_lot.carbure_id = generate_carbure_id() + 'F'
+            new_lot.biocarburant = tx.lot.biocarburant
+            new_lot.matiere_premiere = tx.lot.matiere_premiere
+            new_lot.ghg_total = tx.lot.ghg_total
+            new_lot.ghg_reference = tx.lot.ghg_reference
+            new_lot.ghg_reduction = tx.lot.ghg_reduction
+            new_lot.status = "Validated"
+            new_lot.is_fused = True
+            new_lot.save()
+            for tx in similar_lots_stored_there:
+                tx.lot.is_fused = True
+                tx.lot.fused_with = new_lot
+                tx.lot.save()
+                new_lot.volume += tx.lot.volume
+            new_lot.save()
+            new_tx = LotTransaction()
+            new_tx.lot = new_lot
+            new_tx.client_is_in_carbure = True
+            new_tx.carbure_client = tx.carbure_client
+            new_tx.carbure_delivery_site = tx.carbure_delivery_site
+            new_tx.delivery_status = 'A'
+            new_tx.ghg_total = new_lot.ghg_total
+            new_tx.ghg_reduction = new_lot.ghg_reduction
+            new_tx.champ_libre = 'FUSIONNÉ'
+            new_tx.save()
+
+
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
@@ -601,91 +914,86 @@ def validate_lots(request, *args, **kwargs):
             results.append({'lot_id': lotid, 'status': 'error', 'message': 'Impossible de valider le lot: introuvable ou déjà validé' % (), 'extra': str(e)})
             continue
         # make sure all mandatory fields are set
-        if not tx.dae:
-            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. DAE manquant'})
+        tx_valid, error = tx_is_valid(tx)
+        if not tx_valid:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': error})
             continue
-        if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site:
-            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Site de livraison manquant'})
+        lot_valid, error = lot_is_valid(lot)
+        if not lot_valid:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': error})
             continue
-        if tx.delivery_site_is_in_carbure and not tx.carbure_delivery_site:
-            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Site de livraison manquant'})
+        lot.carbure_id = generate_carbure_id(lot)
+        lot.status = "Validated"
+        if tx.carbure_client == context['user_entity']:
+            tx.delivery_status = 'A'
+            tx.save()
+        lot.save()
+        try_fuse_lots(tx)
+        results.append({'lot_id': lotid, 'status': 'sucess'})
+    return JsonResponse({'status': 'success', 'message': results})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def validate_mb_drafts_lots(request, *args, **kwargs):
+    context = kwargs['context']
+    txids = request.POST.get('txids', None)
+    results = []
+    if not txids:
+        return JsonResponse({'status': 'error', 'message': 'Aucun lot sélectionné'}, status=400)
+
+    ids = txids.split(',')
+    for txid in ids:
+        tx = LotTransaction.objects.get(id=txid)
+        lot = tx.lot
+        if tx.lot.added_by != context['user_entity']:
+            results.append({'txid': txid, 'status': 'error', 'message': 'Ce lot ne vous appartient pas'})
             continue
-        if not tx.delivery_date:
-            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Date de livraison manquante'})
+        if tx.lot.status != 'Draft':
+            results.append({'txid': txid, 'status': 'error', 'message': 'Ce lot a déjà été validé'})
             continue
-        if tx.client_is_in_carbure and not tx.carbure_client:
-            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Veuillez renseigner un client'})
+        # make sure all mandatory fields are set
+        tx_valid, error = tx_is_valid(tx)
+        if not tx_valid:
+            results.append({'txid': txid, 'status': 'error', 'message': error})
             continue
-        if not tx.client_is_in_carbure and not tx.unknown_client:
-            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Veuillez renseigner un client'})
-            continue
-        if not lot.volume:
-            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Veuillez renseigner le volume'})
-            continue
-        if not lot.pays_origine:
-            msg = 'Validation impossible. Veuillez renseigner le pays d\'origine de la matière première'
-            results.append({'lot_id': lotid, 'status': 'error', 'message': msg})
+        lot_valid, error = lot_is_valid(lot)
+        if not lot_valid:
+            results.append({'txid': txid, 'status': 'error', 'message': error})
             continue
 
-        if lot.producer_is_in_carbure and lot.carbure_production_site == None:
-            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Veuillez renseigner le site de production'})
+        # check if we can extract the lot from the parent
+        if not lot.parent_lot:
+            results.append({'txid': txid, 'status': 'error', 'message': 'Missing source_lot'})
             continue
-        try:
-            today = datetime.date.today()
-            # [PAYS][YYMM]P[IDProd]-[1....]-([S123])
-            # FR2002P001-1
-            if lot.producer_is_in_carbure:
-                lot.carbure_id = "%s%sP%d-%d" % ('FR', today.strftime('%y%m'), lot.carbure_producer.id, lot.id)
-            else:
-                lot.carbure_id = "%s%sP%s-%d" % ('FR', today.strftime('%y%m'), 'XXX', lot.id)
-            lot.status = "Validated"
-            if tx.carbure_client == context['user_entity']:
-                tx.delivery_status = 'A'
-                tx.save()
-            lot.save()
-            # if we are the client, check if we can fuse lots in the mass balance
-            if tx.carbure_client == context['user_entity'] and tx.delivery_site_is_in_carbure:
-                similar_lots_stored_there = LotTransaction.objects.filter(carbure_delivery_site=tx.carbure_delivery_site,
-                                                                          lot__biocarburant=tx.lot.biocarburant,
-                                                                          lot__matiere_premiere=tx.lot.matiere_premiere,
-                                                                          lot__ghg_total=tx.lot.ghg_total,
-                                                                          lot__status='Validated',
-                                                                          delivery_status='A')
-                print('found %d similar lots' % (len(similar_lots_stored_there)))
-                if len(similar_lots_stored_there) > 1:
-                    new_lot = LotV2()
-                    new_lot.period = tx.lot.period
-                    new_lot.carbure_id = "%s%sP%s-%dF" % ('FR', today.strftime('%y%m'), tx.carbure_client.id, lot.id)
-                    new_lot.biocarburant = tx.lot.biocarburant
-                    new_lot.matiere_premiere = tx.lot.matiere_premiere
-                    new_lot.ghg_total = tx.lot.ghg_total
-                    new_lot.ghg_reference = tx.lot.ghg_reference
-                    new_lot.ghg_reduction = tx.lot.ghg_reduction
-                    new_lot.status = "Validated"
-                    new_lot.is_fused = True
-                    new_lot.save()
-                    for tx in similar_lots_stored_there:
-                        tx.lot.is_fused = True
-                        tx.lot.fused_with = new_lot
-                        tx.lot.save()
-                        new_lot.volume += tx.lot.volume
-                    new_lot.save()
-                    new_tx = LotTransaction()
-                    new_tx.lot = new_lot
-                    new_tx.client_is_in_carbure = True
-                    new_tx.carbure_client = tx.carbure_client
-                    new_tx.carbure_delivery_site = tx.carbure_delivery_site
-                    new_tx.delivery_status = 'A'
-                    new_tx.ghg_total = new_lot.ghg_total
-                    new_tx.ghg_reduction = new_lot.ghg_reduction
-                    new_tx.champ_libre = 'FUSIONNÉ'
-                    new_tx.save()
-        except Exception as e:
-            print('exception during validation: %s' % (e))
-            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Erreur lors de la validation du lot'})
+
+        if lot.biocarburant != lot.parent_lot.biocarburant:
+            results.append({'txid': txid, 'status': 'error', 'message': 'Biocarburants différents: ligne de mass balance %s, lot %s' % (lot.parent_lot.biocarburant.name, lot.biocarburant.name)})
             continue
-        results.append({'lot_id': lotid, 'status': 'sucess'})
-    print({'status': 'success', 'message': results})
+
+        if lot.matiere_premiere != lot.parent_lot.matiere_premiere:
+            results.append({'txid': txid, 'status': 'error', 'message': 'Matières premières différentes: ligne de mass balance %s, lot %s' % (lot.parent_lot.matiere_premiere.name, lot.matiere_premiere.name)})
+            continue
+
+        if lot.ghg_total != lot.parent_lot.ghg_total:
+            results.append({'txid': txid, 'status': 'error', 'message': 'Informations de durabilité différentes: ligne de mass balance %s, lot %s' % (lot.parent_lot.ghg_total, lot.ghg_total)})
+            continue
+
+        if lot.volume > lot.parent_lot.volume:
+            results.append({'txid': txid, 'status': 'error', 'message': 'Quantité disponible dans la mass balance insuffisante: Dispo %d litres, lot %d litres' % (lot.parent_lot.volume, lot.volume)})
+            continue
+
+        lot.carbure_id = generate_carbure_id(lot) + 'S'
+        lot.status = "Validated"
+        if tx.carbure_client == context['user_entity']:
+            tx.delivery_status = 'A'
+            tx.save()
+        lot.save()
+        lot.parent_lot.volume -= lot.volume
+        lot.parent_lot.save()
+        results.append({'txid': txid, 'status': 'sucess'})
+    print(results)
     return JsonResponse({'status': 'success', 'message': results})
 
 
@@ -1195,9 +1503,9 @@ def export_mb(request, *args, **kwargs):
     for tx in transactions:
         lot = tx.lot
         line = [lot.carbure_id,
-                lot.carbure_producer.name if lot.producer_is_in_carbure else lot.unknown_producer,
-                lot.carbure_production_site.name if lot.production_site_is_in_carbure else lot.unknown_production_site,
-                lot.carbure_production_site.country.code_pays if lot.production_site_is_in_carbure and lot.carbure_production_site.country else lot.unknown_production_country.code_pays if lot.unknown_production_country else '',
+                lot.carbure_producer.name if lot.carbure_producer else lot.unknown_producer,
+                lot.carbure_production_site.name if lot.carbure_production_site else lot.unknown_production_site,
+                lot.carbure_production_site.country.code_pays if lot.carbure_production_site and lot.carbure_production_site.country else lot.unknown_production_country.code_pays if lot.unknown_production_country else '',
                 lot.unknown_production_site_reference,
                 lot.unknown_production_site_com_date,
                 lot.unknown_production_site_dbl_counting,
@@ -1213,7 +1521,7 @@ def export_mb(request, *args, **kwargs):
                 tx.carbure_client.name if tx.client_is_in_carbure else tx.unknown_client,
                 tx.delivery_date,
                 tx.carbure_delivery_site.depot_id if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site,
-                tx.carbure_delivery_site.country.code_pays if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site_country
+                tx.carbure_delivery_site.country.code_pays if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site_country.code_pays if tx.unknown_delivery_site_country else ''
                 ]
         csvline = '%s\n' % (';'.join([str(k) for k in line]))
         buffer.write(csvline.encode('iso-8859-1'))

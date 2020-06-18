@@ -115,6 +115,24 @@ const table_columns_mb_v2 = [
 {title:'Site de stockage', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site.name : `<i>${full.tx.fields.unknown_delivery_site}</i>` }},
 ]
 
+const table_columns_mb_drafts_v2 = [
+{title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, can_duplicate: false, can_export: false, read_only: true, data:'checkbox'},
+{title:'Lot source', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.lot.parent_lot.carbure_id }},
+{title:'Biocarburant', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.lot.biocarburant ? full.fields.lot.biocarburant.name : ''}},
+{title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.lot.matiere_premiere ? full.fields.lot.matiere_premiere.name : ''}},
+{title:`Pays<br /> d'origine`, filter_title: 'Pays', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => { return full.fields.lot.pays_origine ? full.fields.lot.pays_origine.code_pays : '' }},
+{title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => { return full.fields.lot.volume }},
+
+{title:'E', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, tooltip: 'Total des émissions résultant de l\'utilisation du carburant', render: (data, type, full, meta) => { return full.fields.lot.ghg_total }},
+{title:'% de réduction', can_hide: true, can_duplicate: true, is_read_only: true, can_export: true, data: 'ghg_reduction', render: (data, type, full, meta) => { return full.fields.lot.ghg_reduction }},
+
+{title:'N°Document douanier', can_hide: true, can_duplicate: false, can_export: true, render: (data, type, full, meta) => {return full.fields.dae}},
+{title:'Champ libre', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, tooltip: 'Champ libre - Référence client', render: (data, type, full, meta) => {return full.fields.champ_libre}},
+{title:'Date de livraison', can_hide: true, can_duplicate: true, can_export: true, render: (data, type, full, meta) => {return full.fields.delivery_date}},
+{title:'Client', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.fields.carbure_client ? full.fields.carbure_client.name : `<i>${full.fields.unknown_client}</i>`}},
+{title:'Site de livraison', can_hide: true, can_duplicate: true, can_filter: true, orderable: false, can_export: true, render: (data, type, full, meta) => {return full.fields.carbure_delivery_site ? full.fields.carbure_delivery_site.name : `<i>${full.fields.unknown_delivery_site}</i>` }},
+]
+
 const table_columns_valid_v2 = [
 {title:'Période', can_hide: true, can_export: true, render: (data, type, full, meta) => { return full.fields.period }},
 {title:'ID', can_hide: true, can_export: true, render: (data, type, full, meta) => { return full.fields.carbure_id }},
@@ -217,22 +235,27 @@ for (let i = 0, len = modals.length; i < len; i++) {
   let modalid = modals[i].id
   let modal = document.getElementById(modalid)
   let btn_open_id = "btn_open_" + modalid
-  let btn_close_id = "btn_close_" + modalid
   var btn_open_modal = document.getElementById(btn_open_id)
-  var btn_close_modal = document.getElementById(btn_close_id)
 
   if (btn_open_modal !== null) {
     btn_open_modal.onclick = function() {
       modal.style.display = "flex"
-    }
-  }
-
-  if (btn_close_modal !== null) {
-    btn_close_modal.onclick = function() {
-      modal.style.display = "none"
+      window.modal = modal
     }
   }
 }
+
+var btns_close = document.getElementsByClassName("close")
+for (let i = 0, len = btns_close.length; i < len; i++) {
+  let btnid = btns_close[i].id
+  let btn = document.getElementById(btnid)
+  btn.onclick = function() {
+    // close modal
+    window.modal.style.display = "none"
+  }
+}
+
+
 
 // clicking outside of the modal window will close it
 window.onclick = function(event) {
@@ -493,6 +516,52 @@ function manage_validate_button() {
   }
 }
 
+function manage_validate_button_mb_drafts() {
+  if (selected_rows.length > 0) {
+    $("#btn_open_modal_validate_lots").addClass('primary')
+    $("#btn_open_modal_validate_lots").css("pointer-events", "auto")
+    $("#btn_open_modal_validate_lots").removeClass('secondary')
+    $("#modal_validate_lots_list").empty()
+    let to_validate = []
+    for (let i = 0, len = selected_rows.length; i < len; i++) {
+      let rowdata = window.table.row(selected_rows[i]).data()
+      $("#modal_validate_lots_list").append(`<li>${rowdata.fields.lot.volume} - ${rowdata.fields.lot.biocarburant.name} - ${rowdata.fields.lot.matiere_premiere.name}</li>`)
+      to_validate.push(rowdata.pk)
+      $("#modal_validate_lots_lots").val(to_validate.join(","))
+    }
+
+  } else {
+    $("#btn_open_modal_validate_lots").addClass('secondary')
+    $("#btn_open_modal_validate_lots").css("pointer-events", "none")
+    $("#btn_open_modal_validate_lots").removeClass('primary')
+    // cleanup validate modal
+    $("#modal_validate_lots_list").empty()
+  }
+}
+
+
+function manage_delete_button_mb_drafts() {
+  if (selected_rows.length > 0) {
+    $("#btn_open_modal_delete_lots").addClass('primary')
+    $("#btn_open_modal_delete_lots").css("pointer-events", "auto")
+    $("#btn_open_modal_delete_lots").removeClass('secondary')
+    $("#modal_delete_lots_list").empty()
+    let to_delete = []
+    for (let i = 0, len = selected_rows.length; i < len; i++) {
+      let rowdata = window.table.row(selected_rows[i]).data()
+      $("#modal_delete_lots_list").append(`<li>${rowdata.fields.lot.volume} - ${rowdata.fields.lot.biocarburant ? rowdata.fields.lot.biocarburant.name : ''} - ${rowdata.fields.lot.matiere_premiere ? rowdata.fields.lot.matiere_premiere.name : ''}</li>`)
+      to_delete.push(rowdata.fields.lot.id)
+      $("#modal_delete_lots_lots").val(to_delete.join(","))
+    }
+  } else {
+    $("#btn_open_modal_delete_lots").addClass('secondary')
+    $("#btn_open_modal_delete_lots").removeClass('primary')
+    $("#btn_open_modal_delete_lots").css("pointer-events", "none")
+    $("#modal_delete_lots_list").empty()
+  }
+}
+
+
 function manage_delete_button() {
   let only_drafts_present = true
   for (let i = 0, len = selected_rows.length; i < len; i++) {
@@ -593,6 +662,12 @@ function manage_actions() {
   manage_duplicate_button()
 }
 
+function manage_actions_mb_drafts() {
+  // buttons Valider et Supprimer
+  manage_validate_button_mb_drafts()
+  manage_delete_button_mb_drafts()
+}
+
 function manage_accept_button() {
   if (received_selected_rows.length > 0) {
     $("#btn_open_modal_accept_lots").addClass('primary')
@@ -660,7 +735,6 @@ function initDuplicateParams(table) {
 }
 
 function initFilters(table, dom) {
-  console.log(`initFilters ${dom}`)
   var table_columns_filter = $(`#table_columns_${dom}_filter`)
   var table_columns_filter2 = $(`#table_columns_${dom}_filter2`)
   var columns_filter_html = ""
@@ -1529,7 +1603,7 @@ const dt_drafts_config = {
     txs = JSON.parse(res['transactions'])
     for (let i = 0, len = txs.length; i < len; i++) {
     	let tx = txs[i]
-    	data[tx.fields.lot].tx = tx
+    	data[tx.fields.lot.id].tx = tx
     }
     errors = JSON.parse(res['errors'])
     for (let i = 0, len = errors.length; i < len; i++) {
@@ -1635,7 +1709,7 @@ const dt_received_config = {
     txs = JSON.parse(res['transactions'])
     for (let i = 0, len = txs.length; i < len; i++) {
     	let tx = txs[i]
-    	data[tx.fields.lot].tx = tx
+    	data[tx.fields.lot.id].tx = tx
     }
     list = Object.values(data)
     return list
@@ -1736,7 +1810,7 @@ const dt_mb_config = {
     txs = JSON.parse(res['transactions'])
     for (let i = 0, len = txs.length; i < len; i++) {
     	let tx = txs[i]
-    	data[tx.fields.lot].tx = tx
+    	data[tx.fields.lot.id].tx = tx
     }
     list = Object.values(data)
     return list
@@ -1826,7 +1900,7 @@ const dt_errors_config = {
     txs = JSON.parse(res['transactions'])
     for (let i = 0, len = txs.length; i < len; i++) {
     	let tx = txs[i]
-    	data[tx.fields.lot].tx = tx
+    	data[tx.fields.lot.id].tx = tx
     }
     list = Object.values(data)
     return list
@@ -1877,7 +1951,7 @@ const dt_valid_config = {
     txs = JSON.parse(res['transactions'])
     for (let i = 0, len = txs.length; i < len; i++) {
     	let tx = txs[i]
-    	data[tx.fields.lot].tx = tx
+    	data[tx.fields.lot.id].tx = tx
     }
     list = Object.values(data)
     return list
@@ -1893,6 +1967,98 @@ const dt_valid_config = {
     initFilters(table_columns_valid_v2, "tab_valid")
   }
 }
+
+const dt_mb_drafts_config = {
+  is_complex_dt: true,
+  id: "datatable_mb_drafts",
+  url: window.producers_api_lots_mb_drafts_v2,
+  col_definition: table_columns_mb_drafts_v2,
+  has_footer: true,
+  paging: true,
+  info: true,
+  dom: 'rtp',
+  columnDefs: [
+    {
+      targets: [0],
+      searchable:false,
+      orderable:false,
+      width:'1%',
+      className: 'dt-body-center',
+      render: function (data, type, full, meta) {
+        return '<input type="checkbox">';
+      }
+    },
+    {
+      className: "dt-center",
+      targets: "_all",
+      render: function (data, type, full, meta) {
+        let col_name = table_columns_mb_drafts_v2[meta.col].data
+        if (table_columns_mb_drafts_v2[meta.col]['render'] != undefined) {
+          return table_columns_mb_drafts_v2[meta.col]['render'](full)
+        }
+        return full['fields'][col_name]
+      }
+    },
+  ],
+  order: [[ 1, 'desc' ]],
+  ajax_dataSrc: function(res) {
+    return JSON.parse(res['transactions'])
+  },
+  post_init: function(table) {
+    let tbl_id = table.table().node().id
+    $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
+      display_producers_lot_draft_modal(table, table_columns_mb_drafts_v2, e)
+    })
+    $('#input_search_datatable').on('keyup', function() {
+        table.search(this.value).draw();
+    })
+    initFilters(table_columns_mb_drafts_v2, "tab_mb_drafts")
+
+    // Handle click on checkbox
+    $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
+      console.log(`select mb drafts`)
+      var $row = $(this).closest('tr');
+      // Get row data
+      var rowId = table.row($row).index();
+      // Determine whether row ID is in the list of selected row IDs
+      var index = $.inArray(rowId, selected_rows);
+      // If checkbox is checked and row ID is not in list of selected row IDs
+      if(this.checked && index === -1) {
+        selected_rows.push(rowId);
+      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
+      } else if (!this.checked && index !== -1) {
+        selected_rows.splice(index, 1);
+      }
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+      // Show/Hide buttons depending on selected_rows content
+      manage_actions_mb_drafts()
+    })
+
+
+    // Handle click on "Select all" control
+    $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
+      console.log(`select all mb drafts`)
+      if(this.checked){
+         $('#datatable_mb_drafts tbody input[type="checkbox"]:not(:checked)').trigger('click');
+      } else {
+         $('#datatable_mb_drafts tbody input[type="checkbox"]:checked').trigger('click');
+      }
+      // Prevent click event from propagating to parent
+      e.stopPropagation();
+    });
+
+    // Handle table draw event
+    table.on('draw', function(){
+      // Update state of "Select all" control
+      updateDataTableSelectAllCtrl(table);
+    });
+    manage_actions_mb_drafts()
+  }
+}
+
 
 const dt_operators_drafts_config = {
   is_complex_dt: true,
@@ -1938,7 +2104,7 @@ const dt_operators_drafts_config = {
     txs = JSON.parse(res['transactions'])
     for (let i = 0, len = txs.length; i < len; i++) {
       let tx = txs[i]
-      data[tx.fields.lot].tx = tx
+      data[tx.fields.lot.id].tx = tx
     }
     errors = JSON.parse(res['errors'])
     for (let i = 0, len = errors.length; i < len; i++) {
@@ -2044,7 +2210,7 @@ const dt_operators_in_config = {
     txs = JSON.parse(res['transactions'])
     for (let i = 0, len = txs.length; i < len; i++) {
     	let tx = txs[i]
-    	data[tx.fields.lot].tx = tx
+    	data[tx.fields.lot.id].tx = tx
     }
     list = Object.values(data)
     return list
@@ -2142,7 +2308,7 @@ const dt_operators_out_config = {
     txs = JSON.parse(res['transactions'])
     for (let i = 0, len = txs.length; i < len; i++) {
     	let tx = txs[i]
-    	data[tx.fields.lot].tx = tx
+    	data[tx.fields.lot.id].tx = tx
     }
     list = Object.values(data)
     return list
@@ -2219,11 +2385,14 @@ const dt_admin_rights = {
   },
 }
 
-
+// producer
 dt_config['tab_drafts'] = dt_drafts_config
 dt_config['tab_received'] = dt_received_config
 dt_config['tab_errors'] = dt_errors_config
+
 dt_config['tab_mb'] = dt_mb_config
+dt_config['tab_mb_drafts'] = dt_mb_drafts_config
+
 dt_config['tab_valid'] = dt_valid_config
 
 
