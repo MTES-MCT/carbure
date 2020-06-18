@@ -247,20 +247,23 @@ def load_excel_lot(context, lot_row):
                                                          defaults={'value': None})
 
     if 'delivery_date' not in lot_row or lot_row['delivery_date'] == '':
-        transaction.ea_delivery_date = None
+        transaction.delivery_date = None
         lot.period = ''
-        e, c = TransactionError.objects.update_or_create(tx=transaction, field='ea_delivery_date',
+        e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_date',
                                                          error="Merci de préciser la date de livraison",
                                                          defaults={'value': None})
     else:
         try:
             delivery_date = lot_row['delivery_date']
-            dd = datetime.datetime.strptime(delivery_date, '%d/%m/%Y')
+            year = int(delivery_date[0:4])
+            month = int(delivery_date[5:7])
+            day = int(delivery_date[8:10])
+            dd = datetime.date(year=year, month=month, day=day)
             transaction.delivery_date = dd
             lot.period = dd.strftime('%Y-%m')
             TransactionError.objects.filter(tx=transaction, field='delivery_date').delete()
         except Exception:
-            msg = "Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA"
+            msg = "Format de date incorrect: veuillez entrer une date au format AAAA-MM-JJ"
             e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_date',
                                                              error=msg,
                                                              defaults={'value': delivery_date})
@@ -318,7 +321,7 @@ def excel_template_download(request, *args, **kwargs):
             file_data = f.read()
             # sending response
             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="carbure_template_traders.xlsx"'
+            response['Content-Disposition'] = 'attachment; filename="carbure_template_operators.xlsx"'
             return response
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
@@ -749,3 +752,65 @@ def export_out(request, *args, **kwargs):
     response['Content-Disposition'] = 'attachment; filename="%s"' % (filename)
     response.write(csvfile)
     return response
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_operators
+def validate_lots(request, *args, **kwargs):
+    context = kwargs['context']
+    lot_ids = request.POST.get('lots', None)
+    results = []
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Aucun lot sélectionné'}, status=400)
+
+    ids = lot_ids.split(',')
+    for lotid in ids:
+        try:
+            lot = LotV2.objects.get(id=lotid, added_by=context['user_entity'], status='Draft')
+            # we use .get() below because we should have a single transaction for this lot
+            tx = LotTransaction.objects.get(lot=lot)
+        except Exception as e:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Impossible de valider le lot: introuvable ou déjà validé' % (), 'extra': str(e)})
+            continue
+        # make sure all mandatory fields are set
+        if not tx.dae:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. DAE manquant'})
+            continue
+        if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Site de livraison manquant'})
+            continue
+        if tx.delivery_site_is_in_carbure and not tx.carbure_delivery_site:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Site de livraison manquant'})
+            continue
+        if not tx.delivery_date:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Date de livraison manquante'})
+            continue
+        tx.client_is_in_carbure = True
+        tx.carbure_client = context['user_entity']
+        if not lot.volume:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Veuillez renseigner le volume'})
+            continue
+        if not lot.pays_origine:
+            msg = 'Validation impossible. Veuillez renseigner le pays d\'origine de la matière première'
+            results.append({'lot_id': lotid, 'status': 'error', 'message': msg})
+            continue
+
+        if lot.producer_is_in_carbure and lot.carbure_production_site is None:
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Validation impossible. Veuillez renseigner le site de production'})
+            continue
+        try:
+            today = datetime.date.today()
+            lot.carbure_id = "%s%sP%s-%d" % ('FR', today.strftime('%y%m'), 'XXX', lot.id)
+            lot.status = "Validated"
+            if tx.carbure_client == context['user_entity']:
+                tx.delivery_status = 'A'
+                tx.save()
+            lot.save()
+        except Exception as e:
+            print('exception during validation: %s' % (e))
+            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Erreur lors de la validation du lot'})
+            continue
+        results.append({'lot_id': lotid, 'status': 'sucess'})
+    print({'status': 'success', 'message': results})
+    return JsonResponse({'status': 'success', 'message': results})

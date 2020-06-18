@@ -58,7 +58,7 @@
       </table>
       <div class="button-container">
         <div class="button-item">
-          <a id="btn_open_modal_validate_lots" class="button primary">Accepter Lots</a>
+          <a id="btn_open_modal_validate_lots" class="button primary">Valider Lots</a>
         </div>
       </div>
     </div>
@@ -225,7 +225,7 @@
     </a>
     <span id="modal_accept_lots_form_err_message" style="color: red;"></span>
     <span id="modal_accept_lots_form_success_message" style="color: green;"></span>
-    <form id="modal_accept_lots_form" method="POST" data-url="{% url 'api-v2-operators_api-accept-lots' %}" data-reload="0">
+    <form id="modal_accept_lots_form" method="POST" data-url="{% url 'api-v2-operators-accept-lots' %}" data-reload="0">
       {% csrf_token %}
       <p><b>Êtes vous certain de vouloir accepter le(s) lot(s) suivant(s)?</b></p>
       <ul id="modal_accept_lots_list">
@@ -234,6 +234,50 @@
       <div class="form__group button__group">
         <a class="button secondary" id="btn_close_modal_accept_lots">Annuler</a>
         <button type="submit" class="button">Valider</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_delete_lots">
+  <div class="modal">
+    <span id="modal_delete_lots_form_err_message" style="color: red;"></span>
+    <form id="modal_delete_lots_form" method="POST" data-url="{% url 'api-v2-operators-delete-lots' %}">
+      {% csrf_token %}
+      <p>Êtes vous sûr de vouloir supprimer ce(s) lot(s) ?</p>
+      <ul id="modal_delete_lots_list">
+      </ul>
+      <input type="hidden" id="modal_delete_lots_lots" name="lots">
+      <div class="form__group button__group">
+        <a class="button secondary" id="btn_close_modal_delete_lots">Annuler</a>
+        <div class="button-container">
+          <div class="button-item">
+            <button type="submit" class="button">Valider</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_validate_lots">
+  <div class="modal">
+    <a id="btn_close_modal_validate_lots" style="opacity: 0.5; margin: -1rem -1rem -1rem auto; float: right;">
+      <svg class="icon" style="height:24px; width:24px">
+        <use xlink:href="#cross"></use>
+      </svg>
+    </a>
+    <span id="modal_validate_lots_form_err_message" style="color: red;"></span>
+    <span id="modal_validate_lots_form_success_message" style="color: green;"></span>
+    <form id="modal_validate_lots_form" method="POST" data-url="{% url 'api-v2-operators-validate-lots' %}">
+      {% csrf_token %}
+      <p><b>En validant le(s) lot(s) suivant(s), je certifie qu'ils respectent les critères du durabilité liés aux terres et que les informations renseignées sont réelles et valides.</b></p>
+      <ul id="modal_validate_lots_list">
+      </ul>
+      <input type="hidden" id="modal_validate_lots_lots" name="lots">
+      <div class="form__group button__group">
+        <button type="submit" class="button">Valider</button>
+        <a class="button secondary" id="btn_close_modal_validate_lots">Annuler</a>
       </div>
     </form>
   </div>
