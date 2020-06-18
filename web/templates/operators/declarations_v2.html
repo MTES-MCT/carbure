@@ -25,7 +25,7 @@
         <a title="Afficher/Cacher des colonnes" id="btn_open_modal_columns_tab_drafts" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
-        <a title="Exporter vers Excel" class="button modal-button" href="{% url 'api-v2-producers-export-drafts' %}" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+        <a title="Exporter vers Excel" class="button modal-button" href="{% url 'api-v2-operators-export-drafts' %}" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
           <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
         </a>
         <a title="Dupliquer un lot" id="duplicate_lot" class="button modal-button secondary" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
@@ -58,7 +58,7 @@
       </table>
       <div class="button-container">
         <div class="button-item">
-          <a id="btn_open_modal_validate_lots" class="button primary">Valider Lots</a>
+          <a id="btn_open_modal_validate_lots" class="button primary">Accepter Lots</a>
         </div>
       </div>
     </div>
@@ -71,7 +71,7 @@
         <a id="btn_open_modal_columns_affiliations" class="button modal-button" style="margin-right: 0px; margin-left: 5px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
-        <a class="button modal-button" href="{% url 'operators-api-export-affiliated' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px; margin-right: auto;">
+        <a class="button modal-button" href="{% url 'api-v2-operators-export-in' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px; margin-right: auto;">
           <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
         </a>
       </div>
@@ -94,7 +94,7 @@
         <a id="btn_open_modal_columns_declared" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
-        <a class="button modal-button" href="{% url 'operators-api-declaration-export' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
+        <a class="button modal-button" href="{% url 'api-v2-operators-export-out' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
           <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
         </a>
         <select id="pagelength_valid" style="margin-top: auto;">
