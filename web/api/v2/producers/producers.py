@@ -851,11 +851,12 @@ def generate_carbure_id(lot):
     yymm = today.strftime('%y%m')
     idprod = 'XXX'
     if lot.carbure_producer:
-        idprod = lot.carbure_producer.id
+        idprod = '%d' % (lot.carbure_producer.id)
     return "%s%sP%s-%d" % (country, yymm, idprod, lot.id)
 
 
-def try_fuse_lots(context, tx, lot):
+def try_fuse_lots(context, tx):
+    lot = tx.lot
     # if we are the client, check if we can fuse lots in the mass balance
     if tx.carbure_client == context['user_entity'] and tx.delivery_site_is_in_carbure:
         similar_lots_stored_there = LotTransaction.objects.filter(carbure_delivery_site=tx.carbure_delivery_site,
@@ -867,7 +868,6 @@ def try_fuse_lots(context, tx, lot):
         if len(similar_lots_stored_there) > 1:
             new_lot = LotV2()
             new_lot.period = tx.lot.period
-            new_lot.carbure_id = generate_carbure_id() + 'F'
             new_lot.biocarburant = tx.lot.biocarburant
             new_lot.matiere_premiere = tx.lot.matiere_premiere
             new_lot.ghg_total = tx.lot.ghg_total
@@ -875,7 +875,9 @@ def try_fuse_lots(context, tx, lot):
             new_lot.ghg_reduction = tx.lot.ghg_reduction
             new_lot.status = "Validated"
             new_lot.is_fused = True
+            # save here to get the object id, needed for carbure_id
             new_lot.save()
+            new_lot.carbure_id = generate_carbure_id(new_lot) + 'F'
             for tx in similar_lots_stored_there:
                 tx.lot.is_fused = True
                 tx.lot.fused_with = new_lot
@@ -928,7 +930,7 @@ def validate_lots(request, *args, **kwargs):
             tx.delivery_status = 'A'
             tx.save()
         lot.save()
-        try_fuse_lots(context, tx, lot)
+        try_fuse_lots(context, tx)
         results.append({'lot_id': lotid, 'status': 'success'})
     return JsonResponse({'status': 'success', 'message': results})
 
@@ -1038,6 +1040,7 @@ def accept_lot(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Transaction inconnue", 'extra': str(e)}, status=400)
     tx.delivery_status = 'A'
     tx.save()
+    try_fuse_lots(context, tx)
     return JsonResponse({'status': 'success', 'tx_id': tx.id})
 
 
@@ -1059,6 +1062,7 @@ def accept_lots(request, *args, **kwargs):
             return JsonResponse({'status': 'error', 'message': "Transaction inconnue", 'extra': str(e)}, status=400)
         tx.delivery_status = 'A'
         tx.save()
+        try_fuse_lots(context, tx)
     return JsonResponse({'status': 'success'})
 
 
