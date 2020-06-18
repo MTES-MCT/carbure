@@ -11,6 +11,11 @@ urlpatterns = [
     path('lots/in', operators.get_in, name='api-v2-operators-get-in'),
     path('lots/out', operators.get_out, name='api-v2-operators-get-out'),
 
+    # export
+    path('lots/drafts/export', operators.export_drafts, name='api-v2-operators-export-drafts'),
+    path('lots/in/export', operators.export_in, name='api-v2-operators-export-in'),
+    path('lots/out/export', operators.export_out, name='api-v2-operators-export-out'),
+
     # post
     path('lots/delete', operators.delete_lots, name='api-v2-operators_api-delete-lots'),
     path('lots/accept', operators.accept_lots, name='api-v2-operators_api-accept-lots'),
