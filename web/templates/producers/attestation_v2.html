@@ -118,7 +118,7 @@
       </ul>
       <input type="hidden" id="modal_delete_lots_lots" name="lots">
       <div class="form__group button__group">
-        <a class="button secondary" id="btn_close_modal_delete_lots">Annuler</a>
+        <a class="button secondary close" id="btn_close_modal_delete_lots">Annuler</a>
         <div class="button-container">
           <div class="button-item">
             <button type="submit" class="button">Valider</button>
@@ -131,7 +131,7 @@
 
 <div class="modal__backdrop" id="modal_validate_lots">
   <div class="modal">
-    <a id="btn_close_modal_validate_lots" style="opacity: 0.5; margin: -1rem -1rem -1rem auto; float: right;">
+    <a class="close" id="btn_close_modal_validate_lots_top" style="opacity: 0.5; margin: -1rem -1rem -1rem auto; float: right;">
       <svg class="icon" style="height:24px; width:24px">
         <use xlink:href="#cross"></use>
       </svg>
@@ -146,7 +146,7 @@
       <input type="hidden" id="modal_validate_lots_lots" name="lots">
       <div class="form__group button__group">
         <button type="submit" class="button">Valider</button>
-        <a class="button secondary" id="btn_close_modal_validate_lots">Annuler</a>
+        <a class="button secondary close" id="btn_close_modal_validate_lots_bottom">Annuler</a>
       </div>
     </form>
   </div>
@@ -154,7 +154,7 @@
 
 <div class="modal__backdrop" id="modal_accept_lots">
   <div class="modal">
-    <a id="btn_close_modal_accept_lots" style="opacity: 0.5; margin: -1rem -1rem -1rem auto; float: right;">
+    <a class="close" id="btn_close_modal_accept_lots_top" style="opacity: 0.5; margin: -1rem -1rem -1rem auto; float: right;">
       <svg class="icon" style="height:24px; width:24px">
         <use xlink:href="#cross"></use>
       </svg>
@@ -168,7 +168,7 @@
       <input type="hidden" id="modal_accept_lots_txids" name="tx_ids">
       <div class="form__group button__group">
         <button type="submit" class="button">Valider</button>
-        <a class="button secondary" id="btn_close_modal_accept_lots">Annuler</a>
+        <a class="button secondary close" id="btn_close_modal_accept_lots_bottom">Annuler</a>
       </div>
     </form>
   </div>
@@ -177,7 +177,7 @@
 
 <div class="modal__backdrop" id="modal_import">
   <div class="modal" style="max-width: none; margin: auto; max-height: 100%; overflow-y: auto;">
-    <a id="btn_close_modal_import" style="opacity: 0.5; margin: -1rem -1rem -1rem auto; float: right;">
+    <a class="close" id="btn_close_modal_import" style="opacity: 0.5; margin: -1rem -1rem -1rem auto; float: right;">
       <svg class="icon" style="height:24px; width:24px">
         <use xlink:href="#cross"></use>
       </svg>

@@ -7,7 +7,7 @@ import random
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import MatierePremiere, Biocarburant, Pays, Depot, Entity, ProductionSite
+from core.models import MatierePremiere, Biocarburant, Pays, Depot, Entity, ProductionSite, LotTransaction
 
 
 def make_lots_sheet(workbook, entity):
@@ -129,6 +129,52 @@ def make_lots_sheet_v2_advanced(workbook, entity):
         else:
             # regular transaction. sell to someone else
             row += [ea.name, today, site.depot_id, 'FR']
+
+        colid = 0
+        for elem in row:
+            worksheet_lots.write(i+1, colid, elem)
+            colid += 1
+
+
+def make_mb_extract_sheet(workbook, entity):
+    worksheet_lots = workbook.add_worksheet("lots")
+    clients = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur', 'Trader']).exclude(id=entity.id)
+    delivery_sites = Depot.objects.all()
+    mb_lots = LotTransaction.objects.filter(carbure_client=entity, delivery_status='A', lot__status="Validated", lot__fused_with=None)
+
+    # 4/10 chances of having an exported lot
+    exported_lots = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+    foreign_clients = [{'name': 'BP', 'country': 'GB', 'delivery_site': 'DOVER'},
+                       {'name': 'BP', 'country': 'GB', 'delivery_site': 'LIVERPOOL'},
+                       {'name': 'BP', 'country': 'GB', 'delivery_site': 'MANCHESTER'},
+                       {'name': 'EXXON', 'country': 'US', 'delivery_site': 'BOSTON'},
+                       {'name': 'EXXON', 'country': 'US', 'delivery_site': 'HOBOKEN'},
+                       {'name': 'IBERDROLA', 'country': 'ES', 'delivery_site': 'BCN'},
+                       {'name': 'IBERDROLA', 'country': 'ES', 'delivery_site': 'BILBAO'},
+                       ]
+
+    # header
+    bold = workbook.add_format({'bold': True})
+    columns = ['carbure_id', 'volume', 'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
+    for i, c in enumerate(columns):
+        worksheet_lots.write(0, i, c, bold)
+
+    clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
+    today = datetime.date.today().strftime('%Y-%m-%d')
+    for i in range(10):
+        client = random.choice(clients)
+        site = random.choice(delivery_sites)
+        exported = random.choice(exported_lots)
+        lot_source = random.choice(mb_lots)
+
+        row = [lot_source.lot.carbure_id, int(lot_source.lot.volume / 2), 'FR000000123', clientid]
+        if exported == 1:
+            # client is not in carbure
+            c = random.choice(foreign_clients)
+            row += [c['name'], today, c['delivery_site'], c['country']]
+        else:
+            # regular transaction. sell to someone else
+            row += [client.name, today, site.depot_id, '']
 
         colid = 0
         for elem in row:
@@ -361,6 +407,18 @@ def create_template_xlsx_v2_operators(entity):
     make_mps_sheet(workbook)
     make_biofuels_sheet(workbook)
     make_countries_sheet(workbook)
+    workbook.close()
+    return location
+
+
+def create_template_xlsx_v2_mb(entity):
+    # Create an new Excel file and add a worksheet.
+    location = '/tmp/carbure_template_mb.xlsx'
+    workbook = xlsxwriter.Workbook(location)
+    make_mb_extract_sheet(workbook, entity)
+    make_countries_sheet(workbook)
+    make_operators_sheet(workbook)
+    make_deliverysites_sheet(workbook)
     workbook.close()
     return location
 
