@@ -11,7 +11,7 @@ class ProductionSite(models.Model):
     date_mise_en_service = models.DateField(null=False, blank=False)
     ges_option = models.CharField(max_length=12, choices=GES_OPTIONS, default='Default')
     eligible_dc = models.BooleanField(default=False)
-    dc_reference = models.CharField(max_length=64, null=True, blank=True)
+    dc_reference = models.CharField(max_length=64, null=True, blank=True, default='')
 
     def __str__(self):
         return self.name
@@ -74,5 +74,3 @@ class ProducerCertificate(models.Model):
         db_table = 'producer_certificates'
         verbose_name = 'Certificat'
         verbose_name_plural = 'Certificats'
-
-
