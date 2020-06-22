@@ -21,12 +21,13 @@ from public import views as public_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('authtools.urls')),
-    path('accounts/', include('accounts.urls')),    
+    path('accounts/', include('accounts.urls')),
     path('', public_views.index, name='index'),
     path('public/', include('public.urls')),
     path('producers/', include('producers.urls')),
     path('operators/', include('operators.urls')),
+    path('traders/', include('traders.urls')),
     path('administrators/', include('administrators.urls')),
-    path('core/', include('core.urls')),    
-    path('api/', include('api.urls')),    
+    path('core/', include('core.urls')),
+    path('api/', include('api.urls')),
 ]
