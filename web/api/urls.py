@@ -8,6 +8,7 @@ from . import administrators_api
 urlpatterns = [
     path('v2/producers/', include('api.v2.producers.urls')),
     path('v2/operators/', include('api.v2.operators.urls')),
+    path('v2/traders/', include('api.v2.traders.urls')),
 
 
 

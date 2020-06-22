@@ -70,6 +70,23 @@ def restrict_to_operators(function):
     return wrap
 
 
+def restrict_to_traders(function):
+    def wrap(request, *args, **kwargs):
+        context = kwargs['context']
+        if context['user_entity'].entity_type != 'Trader':
+            raise PermissionDenied
+        drafts = LotV2.objects.filter(added_by=context['user_entity'], status='Draft')
+        received = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status__in=['N', 'AC', 'AA'], lot__status="Validated")
+        sent = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='A', lot__status="Validated", lot__fused_with=None)
+        context['nb_drafts'] = len(drafts)
+        context['nb_in'] = len(received)
+        context['nb_out'] = len(sent)
+        return function(request, *args, **kwargs)
+    wrap.__doc__ = function.__doc__
+    wrap.__name__ = function.__name__
+    return wrap
+
+
 def restrict_to_administrators(function):
     def wrap(request, *args, **kwargs):
         context = kwargs['context']

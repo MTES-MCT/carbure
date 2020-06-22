@@ -411,6 +411,18 @@ def create_template_xlsx_v2_operators(entity):
     return location
 
 
+def create_template_xlsx_v2_traders(entity):
+    # Create an new Excel file and add a worksheet.
+    location = '/tmp/carbure_template_traders.xlsx'
+    workbook = xlsxwriter.Workbook(location)
+    make_operators_lots_sheet(workbook, entity)
+    make_mps_sheet(workbook)
+    make_biofuels_sheet(workbook)
+    make_countries_sheet(workbook)
+    workbook.close()
+    return location
+
+
 def create_template_xlsx_v2_mb(entity):
     # Create an new Excel file and add a worksheet.
     location = '/tmp/carbure_template_mb.xlsx'
