@@ -7,12 +7,13 @@
     {% csrf_token %}
 
     <ul class="tabs__tab-list">
-      <li id="tab_operators_drafts_title" class="tabs__tab" data-dst="tab_operators_drafts">Brouillons ({{nb_drafts}})</li>
-      <li id="tab_operators_in_title" class="tabs__tab tabs__tab--selected" data-dst="tab_operators_in">Lots en attente ({{nb_in}})</li>
-      <li id="tab_operators_out_title" class="tabs__tab" data-dst="tab_operators_out">Lots déclarés ({{nb_out}})</li>
+      <li id="tab_traders_drafts_title" class="tabs__tab" data-dst="tab_traders_drafts">Brouillons ({{nb_drafts}})</li>
+      <li id="tab_traders_in_title" class="tabs__tab tabs__tab--selected" data-dst="tab_traders_in">Lots en attente ({{nb_in}})</li>
+      <li id="tab_traders_mb_title" class="tabs__tab" data-dst="tab_traders_mb">Mass Balance ({{nb_mb}})</li>
+      <li id="tab_traders_out_title" class="tabs__tab" data-dst="tab_traders_out">Lots déclarés ({{nb_out}})</li>
     </ul>
 
-    <div id="tab_operators_drafts" class="tabcontent">
+    <div id="tab_traders_drafts" class="tabcontent">
 
       <p>Cet espace vous permet de créer manuellement ou d'importer vos lots de biocarburants dont les fournisseurs ne sont pas enregistrés sur la plateforme Carbure.</p>
 
@@ -63,18 +64,16 @@
       </div>
     </div>
 
-    <div id="tab_operators_in" class="tabcontent">
-      <p>Cet onglet contient la liste des lots transmis par vos fournisseurs. Veuillez en vérifier les caractéristiques et valider leur réception. <br />
-         Vous pouvez également importer des lots via un fichier Excel via l'onglet Brouillons si votre fournisseur n'est pas inscrit sur Carbure.
-      </p>
+    <div id="tab_traders_in" class="tabcontent">
+      <p>Si vous avez une activité de négoce et que vos fournisseurs sont inscrits sur Carbure, les lots qu'ils vous envoient apparaîtront directement sur cette page.<br />
+         Si vos fournisseurs ne sont pas sur Carbure, vous devez importer les lots dans l'onglet Brouillon en utilisant le <a href="{% url 'api-v2-producers-excel-template-download-advanced' %}" >modèle avancé</a></p>
+
       <div class="flex-container">
-        <a id="btn_open_modal_columns_affiliations" class="button modal-button" style="margin-right: 0px; margin-left: 5px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+        <a id="btn_open_modal_columns_tab_received" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
-        <a class="button modal-button" href="{% url 'api-v2-operators-export-in' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px; margin-right: auto;">
-          <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
-        </a>
       </div>
+
       <table class="display nowrap" id="datatable_in">
         <!-- dynamically generated in js -->
         <thead></thead>
@@ -83,12 +82,38 @@
       </table>
       <div class="button-container">
         <div class="button-item">
-          <a id="btn_open_modal_accept_lots" class="button primary">Valider Lots</a>
+          <a id="btn_open_modal_accept_lots" class="button primary">Accepter Lots</a>
         </div>
       </div>
     </div>
 
-    <div id="tab_operators_out" class="tabcontent">
+    <div id="tab_traders_mb" class="tabcontent">
+      <p>Vous trouverez ici tous les lots acceptés et déclarés à la DGEC</p>
+      <div class="flex-container">
+        <a id="btn_open_modal_columns_declared" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
+          <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
+        </a>
+        <a class="button modal-button" href="{% url 'api-v2-operators-export-out' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
+          <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
+        </a>
+        <select id="pagelength_valid" style="margin-top: auto;">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        <label for="input_search_datatable_valid" style="margin: auto 5px auto auto;">Rechercher:</label>
+        <input type="text" id="input_search_datatable_valid" style="width: 200px; margin-top: auto;" />
+      </div>
+      <table class="display nowrap" id="datatable_mb">
+        <!-- dynamically generated in js -->
+        <thead></thead>
+        <tfoot></tfoot>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="tab_traders_out" class="tabcontent">
       <p>Vous trouverez ici tous les lots acceptés et déclarés à la DGEC</p>
       <div class="flex-container">
         <a id="btn_open_modal_columns_declared" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
@@ -288,18 +313,19 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-window.operators_api_lots_drafts_v2 = "{% url 'api-v2-traders-get-drafts' %}"
-window.operators_api_lots_in_v2 = "{% url 'api-v2-traders-get-in' %}"
-window.operators_api_lots_out_v2 = "{% url 'api-v2-traders-get-out' %}"
-window.api_lot_reject_v2 = "{% url 'api-v2-traders-reject-lot' %}"
-window.api_lot_accept_with_correction_v2 = "{% url 'api-v2-traders-accept-lot-with-correction' %}"
-window.api_lot_accept_v2 = "{% url 'api-v2-traders-accept-lot' %}"
+window.traders_get_drafts = "{% url 'api-v2-traders-get-drafts' %}"
+window.traders_get_in = "{% url 'api-v2-traders-get-in' %}"
+window.traders_get_out = "{% url 'api-v2-traders-get-out' %}"
+
+window.traders_reject_lot = "{% url 'api-v2-traders-reject-lot' %}"
+window.traders_accept_lot_with_correction = "{% url 'api-v2-traders-accept-lot-with-correction' %}"
+window.traders_accept_lot = "{% url 'api-v2-traders-accept-lot' %}"
 
 $(document).ready(function() {
   // show drafts tab
-  tabcontent = document.getElementById("tab_operators_in")
+  tabcontent = document.getElementById("tab_traders_in")
   tabcontent.style.display = "block";
-  init_tab_generic("tab_operators_in")
+  init_tab_generic("tab_traders_in")
   manage_actions_operators()
 })
 </script>
