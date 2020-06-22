@@ -9,7 +9,7 @@ from core.decorators import enrich_with_user_details, restrict_to_traders
 def traders_index(request, *args, **kwargs):
     context = kwargs['context']
     context['current_url_name'] = 'traders-index'
-    return render(request, 'traders/declarations_v2.html', context)
+    return render(request, 'traders/index.html', context)
 
 
 @login_required
