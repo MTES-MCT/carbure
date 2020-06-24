@@ -75,6 +75,17 @@ services:
     networks:
     - carbure
 
+  carbure-metabase:
+    restart: always
+    container_name: carbure_metabase
+    image: metabase/metabase
+    depends_on:
+    - carbure-mariadb
+    ports:
+    - 127.0.0.1:3000:3000
+    networks:
+    - carbure
+
 volumes:
   carburedb:
     name: carbure_carburedb
