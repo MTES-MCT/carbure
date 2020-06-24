@@ -182,37 +182,35 @@ def try_fuse_lots(context, tx):
 @restrict_to_producers
 def validate_lots(request, *args, **kwargs):
     context = kwargs['context']
-    lot_ids = request.POST.get('lots', None)
+    tx_ids = request.POST.get('lots', None)
     results = []
-    if not lot_ids:
+    if not tx_ids:
         return JsonResponse({'status': 'error', 'message': 'Aucun lot sélectionné'}, status=400)
 
-    ids = lot_ids.split(',')
-    for lotid in ids:
+    ids = tx_ids.split(',')
+    for txid in ids:
         try:
-            lot = LotV2.objects.get(id=lotid, added_by=context['user_entity'], status='Draft')
-            # we use .get() below because we should have a single transaction for this lot
-            tx = LotTransaction.objects.get(lot=lot)
+            tx = LotTransaction.objects.get(id=txid, lot__added_by=context['user_entity'], lot__status='Draft')
         except Exception as e:
-            results.append({'lot_id': lotid, 'status': 'error', 'message': 'Impossible de valider le lot: introuvable ou déjà validé' % (), 'extra': str(e)})
+            results.append({'tx_id': txid, 'status': 'error', 'message': 'Impossible de valider le lot: introuvable ou déjà validé', 'extra': str(e)})
             continue
         # make sure all mandatory fields are set
         tx_valid, error = tx_is_valid(tx)
         if not tx_valid:
-            results.append({'lot_id': lotid, 'status': 'error', 'message': error})
+            results.append({'tx_id': txid, 'status': 'error', 'message': error})
             continue
-        lot_valid, error = lot_is_valid(lot)
+        lot_valid, error = lot_is_valid(tx.lot)
         if not lot_valid:
-            results.append({'lot_id': lotid, 'status': 'error', 'message': error})
+            results.append({'tx_id': txid, 'status': 'error', 'message': error})
             continue
-        lot.carbure_id = generate_carbure_id(lot)
-        lot.status = "Validated"
+        tx.lot.carbure_id = generate_carbure_id(tx.lot)
+        tx.lot.status = "Validated"
         if tx.carbure_client == context['user_entity']:
             tx.delivery_status = 'A'
             tx.save()
-        lot.save()
+        tx.lot.save()
         try_fuse_lots(context, tx)
-        results.append({'lot_id': lotid, 'status': 'success'})
+        results.append({'tx_id': txid, 'status': 'success'})
     print(results)
     return JsonResponse({'status': 'success', 'message': results})
 
