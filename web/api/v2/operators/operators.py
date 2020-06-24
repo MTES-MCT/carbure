@@ -373,10 +373,12 @@ def get_in(request, *args, **kwargs):
     lot_ids = [t.lot.id for t in transactions]
     lots = LotV2.objects.filter(id__in=lot_ids)
     errors = LotV2Error.objects.filter(lot__in=lots)
+    comments = TransactionComment.objects.filter(tx__in=transactions)
     sez = serializers.serialize('json', lots, use_natural_foreign_keys=True)
     txsez = serializers.serialize('json', transactions, use_natural_foreign_keys=True)
     errsez = serializers.serialize('json', errors, use_natural_foreign_keys=True)
-    return JsonResponse({'lots': sez, 'errors': errsez, 'transactions': txsez})
+    commentssez = serializers.serialize('json', comments, use_natural_foreign_keys=True)
+    return JsonResponse({'lots': sez, 'errors': errsez, 'transactions': txsez, 'comments': commentssez})
 
 
 @login_required

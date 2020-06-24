@@ -13,12 +13,8 @@ from core.models import LotV2, LotTransaction, LotV2Error, TransactionComment
 def get_drafts(request, *args, **kwargs):
     context = kwargs['context']
     transactions = LotTransaction.objects.filter(lot__added_by=context['user_entity'], lot__status='Draft')
-    lot_ids = [t.lot.id for t in transactions]
-    lots = LotV2.objects.filter(id__in=lot_ids)
-    errors = LotV2Error.objects.filter(lot__in=lots)
     txsez = serializers.serialize('json', transactions, use_natural_foreign_keys=True)
-    errsez = serializers.serialize('json', errors, use_natural_foreign_keys=True)
-    return JsonResponse({'errors': errsez, 'transactions': txsez})
+    return JsonResponse({'transactions': txsez})
 
 
 @login_required

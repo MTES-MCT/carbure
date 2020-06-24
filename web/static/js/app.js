@@ -3,35 +3,38 @@ const lot_errors = {}
 const selected_rows = []
 const received_selected_rows = []
 
-const table_columns_drafts_v2 = [
-{title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, read_only: true, data:'checkbox'},
-{title:'Producteur', hidden: true, can_filter: true, filter_title: 'Producteur', can_hide: true, render: (data, type, full, meta) => { return full.fields.carbure_producer ? full.fields.carbure_producer.name : full.fields.unknown_producer }},
-{title:'Site de<br /> Production', can_filter: true, filter_title: 'Site', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.carbure_production_site ? full.fields.carbure_production_site.name : full.fields.unknown_production_site }},
-{title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.carbure_production_site ? full.fields.carbure_production_site.country.code_pays : (full.fields.unknown_production_country ? full.fields.unknown_production_country.code_pays: "") }},
-{title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, data: 'volume'},
-{title:'Biocarburant', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.biocarburant ? full.fields.biocarburant.name : ''}},
-{title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.matiere_premiere ? full.fields.matiere_premiere.name : ''}},
-{title:`Pays<br /> d'origine`, filter_title: 'Pays', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.pays_origine ? full.fields.pays_origine.code_pays : '' }},
+const columns_definitions = {
+'checkbox': {title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, read_only: true, render: (data, type, full, meta) => { return '<td><input type="checkbox" /></td>'}} ,
+'id': {title:'ID', hidden:true, can_hide: true, read_only: true, render: (data, type, full, meta) => { return full.pk }} ,
+'producer': {title:'Producteur', hidden: true, can_filter: true, filter_title: 'Producteur', can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.carbure_producer ? full.fields.lot.carbure_producer.name : full.fields.lot.unknown_producer }},
+'production_site': {title:'Site de<br /> Production', can_filter: true, filter_title: 'Site', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.lot.carbure_production_site ? full.fields.lot.carbure_production_site.name : full.fields.lot.unknown_production_site }},
+'production_country': {title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.lot.carbure_production_site ? full.fields.lot.carbure_production_site.country.code_pays : (full.fields.lot.unknown_production_country ? full.fields.lot.unknown_production_country.code_pays: "") }},
+'volume': {title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.volume }},
+'biocarburant': {title:'Biocarburant', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.lot.biocarburant ? full.fields.lot.biocarburant.name : ''}},
+'matiere_premiere': {title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.lot.matiere_premiere ? full.fields.lot.matiere_premiere.name : ''}},
+'pays_origine': {title:`Pays<br /> d'origine`, filter_title: 'Pays', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.lot.pays_origine ? full.fields.lot.pays_origine.code_pays : '' }},
+'eec': {title:'EEC', hidden: true, can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.eec }, tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
+'el': {title:'EL', hidden: true, can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.el }, tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
+'ep': {title:'EP', hidden: true, can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.ep }, tooltip: 'Émissions résultant de la transformation'},
+'etd': {title:'ETD', hidden: true, can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.etd }, tooltip: 'Émissions résultant du transport et de la distribution'},
+'eu': {title:'EU', hidden: true, can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.eu }, tooltip: 'Émissions résultant du carburant à l\'usage'},
+'esca': {title:'ESCA', hidden: true, can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.esca }, tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'},
+'eccs': {title:'ECCS', hidden: true, can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.eccs }, tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'},
+'eccr': {title:'ECCR', hidden: true, can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.eccr }, tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'},
+'eee': {title:'EEE', hidden: true, can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.eee }, tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'},
+'ghg_total': {title:'E', can_hide: true, is_read_only: true, render: (data, type, full, meta) => { return full.fields.lot.ghg_total }, tooltip: 'Total des émissions résultant de l\'utilisation du carburant'},
+'ghg_reference': {title:'Émissions de référence', hidden: true, can_hide: true, is_read_only: true, render: (data, type, full, meta) => { return full.fields.lot.ghg_reference }, tooltip: 'Total des émissions du carburant fossile de référence'},
+'ghg_reduction': {title:'% de réduction', can_hide: true, is_read_only: true, render: (data, type, full, meta) => { return full.fields.lot.ghg_reduction }},
+'dae': {title:'N°Document douanier', can_hide: true, render: (data, type, full, meta) => {return full.fields.dae}},
+'champ_libre': {title:'Champ libre', can_hide: true, can_filter: true, orderable: false, tooltip: 'Champ libre - Référence client', render: (data, type, full, meta) => {return full.fields.champ_libre}},
+'delivery_date': {title:'Date de livraison', can_hide: true, render: (data, type, full, meta) => {return full.fields.delivery_date}},
+'client': {title:'Client', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => {return full.fields.carbure_client ? full.fields.carbure_client.name : full.fields.unknown_client}},
+'delivery_site': {title:'Site de livraison', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => {return full.fields.carbure_delivery_site ? full.fields.carbure_delivery_site.name : full.fields.unknown_delivery_site }},
+}
 
-{title:'EEC', hidden: true, can_hide: true, data: 'eec', tooltip: 'Émissions résultant de l\'extraction ou de la culture des matières premières'},
-{title:'EL', hidden: true, can_hide: true, data: 'el', tooltip: 'Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l\'affectation des sols'},
-{title:'EP', hidden: true, can_hide: true, data: 'ep', tooltip: 'Émissions résultant de la transformation'},
-{title:'ETD', hidden: true, can_hide: true, data: 'etd', tooltip: 'Émissions résultant du transport et de la distribution'},
-{title:'EU', hidden: true, can_hide: true, data: 'eu', tooltip: 'Émissions résultant du carburant à l\'usage'},
-{title:'ESCA', hidden: true, can_hide: true, data: 'esca', tooltip: 'Réductions d\'émissions dues à l\'accumulation du carbone dans les sols grâce à une meilleure gestion agricole'},
-{title:'ECCS', hidden: true, can_hide: true, data: 'eccs', tooltip: 'Réductions d\'émissions dues au piégeage et au stockage géologique du carbone'},
-{title:'ECCR', hidden: true, can_hide: true, data: 'eccr', tooltip: 'Réductions d\'émissions dues au piégeage et à la substitution du carbone'},
-{title:'EEE', hidden: true, can_hide: true, data: 'eee', tooltip: 'Réductions d\'émissions dues à la production excédentaire d\'électricité dans le cadre de la cogénération'},
-{title:'E', can_hide: true, is_read_only: true, data: 'ghg_total', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'},
-{title:'Émissions de référence', hidden: true, can_hide: true, is_read_only: true, data: 'ghg_reference', tooltip: 'Total des émissions du carburant fossile de référence'},
-{title:'% de réduction', can_hide: true, is_read_only: true, data: 'ghg_reduction'},
+const producer_columns_drafts = ['checkbox', 'id', 'producer', 'production_site', 'volume', 'biocarburant', 'matiere_premiere', 'pays_origine',
+'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'dae', 'champ_libre', 'delivery_date', 'client', 'delivery_site']
 
-{title:'N°Document douanier', can_hide: true, render: (data, type, full, meta) => {return full.tx.fields.dae}},
-{title:'Champ libre', can_hide: true, can_filter: true, orderable: false, tooltip: 'Champ libre - Référence client', render: (data, type, full, meta) => {return full.tx.fields.champ_libre}},
-{title:'Date de livraison', can_hide: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_date}},
-{title:'Client', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => {return full.tx.fields.carbure_client ? full.tx.fields.carbure_client.name : full.tx.fields.unknown_client}},
-{title:'Site de livraison', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => {return full.tx.fields.carbure_delivery_site ? full.tx.fields.carbure_delivery_site.name : full.tx.fields.unknown_delivery_site }},
-]
 
 const table_columns_corrections_v2 = [
 {title:'Période', can_hide: true, data:'period'},
@@ -164,7 +167,7 @@ const table_columns_valid_v2 = [
 {title:'Référence', can_hide: true, can_filter: true, orderable: false, tooltip: 'Champ libre - Référence client', render: (data, type, full, meta) => {return full.tx.fields.champ_libre}},
 ]
 
-const operators_table_columns_drafts_v2 = table_columns_drafts_v2
+const operators_table_columns_drafts_v2 = table_columns_received_v2
 const operators_table_columns_in_v2 = table_columns_received_v2
 
 const operators_table_columns_out_v2 = [
@@ -467,29 +470,29 @@ $("form").submit(function(event) {
       // Callback code
       err_msg_dom.text("")
       if (auto_reload === "0") {
-      	  success_msg_dom.html(data.message)
-      	  err_msg_dom.html(data.errors)
+          success_msg_dom.html(data.message)
+          err_msg_dom.html(data.errors)
       } else {
-	      window.location.reload()
+        window.location.reload()
       }
     },
     error       : function(e) {
       if (e.status === 400) {
-      	if (Array.isArray(e.responseJSON.results)) {
-      		let text = ""
-      		for (let i = 0, len = e.responseJSON.results.length; i < len; i++) {
-      			text += `Lot ${e.responseJSON.results[i].lot_id}: ${e.responseJSON.results[i].message}<br />`
-      		}
-	   	    err_msg_dom.html(text)
-      	  	success_msg_dom.html("")
-      	} else {
-    	    err_msg_dom.text(e.responseJSON.message)
-      	  	success_msg_dom.html("")
-	   	    console.log(`error ${JSON.stringify(e.responseJSON.extra)}`)
-      	}
+        if (Array.isArray(e.responseJSON.results)) {
+          let text = ""
+          for (let i = 0, len = e.responseJSON.results.length; i < len; i++) {
+            text += `Lot ${e.responseJSON.results[i].lot_id}: ${e.responseJSON.results[i].message}<br />`
+          }
+          err_msg_dom.html(text)
+            success_msg_dom.html("")
+        } else {
+          err_msg_dom.text(e.responseJSON.message)
+            success_msg_dom.html("")
+          console.log(`error ${JSON.stringify(e.responseJSON.extra)}`)
+        }
       } else {
         err_msg_dom.text("Server error. Please contact an administrator")
-      	success_msg_dom.html("")
+        success_msg_dom.html("")
         console.log(`server error ${JSON.stringify(e)}`)
       }
     }
@@ -580,7 +583,7 @@ function duplicate_lot(tx_id) {
   formdata.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
   formdata.set('tx_id', tx_id)
   $.ajax({
-    url         : window.producers_api_lot_duplicate_v2,
+    url         : window.api_lot_duplicate_v2,
     data        : formdata,
     type        : 'POST',
     processData : false,
@@ -604,18 +607,7 @@ function duplicate_lot(tx_id) {
 }
 
 function manage_validate_button() {
-  // check if we have drafts
-  let draft_present = false
-  for (let i = 0, len = selected_rows.length; i < len; i++) {
-    let rowdata = window.table.row(selected_rows[i]).data()
-    let statut = rowdata.fields.status
-    if (statut.toLowerCase() === "draft") {
-      draft_present = true
-      break;
-    }
-  }
-
-  if (draft_present === true) {
+  if (selected_rows.length > 0) {
     $("#btn_open_modal_validate_lots").addClass('primary')
     $("#btn_open_modal_validate_lots").css("pointer-events", "auto")
     $("#btn_open_modal_validate_lots").removeClass('secondary')
@@ -624,14 +616,11 @@ function manage_validate_button() {
     let to_validate = []
     for (let i = 0, len = selected_rows.length; i < len; i++) {
       let rowdata = window.table.row(selected_rows[i]).data()
-      let statut = rowdata.fields.status
-      if (statut.toLowerCase() === "draft") {
-        $("#modal_validate_lots_list").append(`<li>${rowdata.fields.producer_is_in_carbure ? rowdata.fields.carbure_producer.name : rowdata.fields.unknown_producer} - ${rowdata.fields.volume} - ${rowdata.fields.biocarburant.name} - ${rowdata.fields.matiere_premiere.name}</li>`)
-        to_validate.push(rowdata.pk)
-      }
+      let lot = rowdata.fields.lot
+      $("#modal_validate_lots_list").append(`<li>${lot.producer_is_in_carbure ? lot.carbure_producer.name : lot.unknown_producer} - ${lot.volume} - ${lot.biocarburant.name} - ${lot.matiere_premiere.name}</li>`)
+      to_validate.push(rowdata.pk)
       $("#modal_validate_lots_lots").val(to_validate.join(","))
     }
-
   } else {
     $("#btn_open_modal_validate_lots").addClass('secondary')
     $("#btn_open_modal_validate_lots").css("pointer-events", "none")
@@ -688,17 +677,7 @@ function manage_delete_button_mb_drafts() {
 
 
 function manage_delete_button() {
-  let only_drafts_present = true
-  for (let i = 0, len = selected_rows.length; i < len; i++) {
-    let rowdata = window.table.row(selected_rows[i]).data()
-    let statut = rowdata.fields.status
-    if (statut.toLowerCase() !== "draft") {
-      only_drafts_present = false
-      break;
-    }
-  }
-  let keys = Object.keys(selected_rows)
-  if (keys.length > 0 && only_drafts_present === true) {
+  if (selected_rows.length > 0) {
     $("#btn_open_modal_delete_lots").addClass('primary')
     $("#btn_open_modal_delete_lots").css("pointer-events", "auto")
     $("#btn_open_modal_delete_lots").removeClass('secondary')
@@ -706,11 +685,9 @@ function manage_delete_button() {
     let to_delete = []
     for (let i = 0, len = selected_rows.length; i < len; i++) {
       let rowdata = window.table.row(selected_rows[i]).data()
-      let statut = rowdata.fields.status
-      if (statut.toLowerCase() === "draft") {
-        $("#modal_delete_lots_list").append(`<li>${rowdata.fields.producer_is_in_carbure ? rowdata.fields.carbure_producer.name : rowdata.fields.unknown_producer} - ${rowdata.fields.volume} - ${rowdata.fields.biocarburant.name} - ${rowdata.fields.matiere_premiere.name}</li>`)
-        to_delete.push(rowdata.pk)
-      }
+      let lot = rowdata.fields.lot
+      $("#modal_delete_lots_list").append(`<li>${lot.producer_is_in_carbure ? lot.carbure_producer.name : lot.unknown_producer} - ${lot.volume} - ${lot.biocarburant.name} - ${lot.matiere_premiere.name}</li>`)
+      to_delete.push(rowdata.pk)
       $("#modal_delete_lots_lots").val(to_delete.join(","))
     }
   } else {
@@ -723,13 +700,13 @@ function manage_delete_button() {
 
 function manage_duplicate_button() {
   if (selected_rows.length === 1) {
-    let tx_id = window.table.row(selected_rows[0]).data().tx.pk
+    let tx_id = window.table.row(selected_rows[0]).data().pk
     $("#duplicate_lot").attr("onclick", `duplicate_lot(${tx_id})`)
     $("#duplicate_lot").addClass('primary')
     $("#duplicate_lot").css("pointer-events", "auto")
     $("#duplicate_lot").removeClass('secondary')
   } else {
-  	$("#duplicate_lot").addClass('secondary')
+    $("#duplicate_lot").addClass('secondary')
     $("#duplicate_lot").css("pointer-events", "none")
     $("#duplicate_lot").removeClass('primary')
   }
@@ -780,7 +757,16 @@ function check_biocarburants() {
   })
 }
 
+function manage_actions_producers_drafts() {
+  // buttons Valider, Supprimer et Ajouter
+  manage_validate_button()
+  manage_delete_button()
+  manage_duplicate_button()
+}
+
+
 function manage_actions() {
+  console.log('manage_actions - deprecated')
   // buttons Valider, Supprimer et Ajouter
   manage_validate_button()
   manage_delete_button()
@@ -830,7 +816,7 @@ function manage_actions_operators() {
     $("#btn_open_modal_accept_lots").css("pointer-events", "auto")
     $("#btn_open_modal_accept_lots").removeClass('secondary')
 
-	let to_accept = []
+  let to_accept = []
     for (let i = 0, len = selected_rows.length; i < len; i++) {
       let rowdata = window.table.row(selected_rows[i]).data()
       $("#modal_accept_lots_list").append(`<li>${rowdata.tx.fields.carbure_vendor ? rowdata.tx.fields.carbure_vendor.name : rowdata.tx.fields.unknown_vendor} - ${rowdata.fields.volume} - ${rowdata.fields.biocarburant.name} - ${rowdata.fields.matiere_premiere.name}</li>`)
@@ -865,7 +851,8 @@ function initFilters(table, dom) {
   var columns_filter_html = ""
   var columns_filter_html2 = ""
   for (let i = 0, len = table.length; i < len; i++) {
-    let column = table[i]
+    let column_name = table[i]
+    let column = columns_definitions[column_name]
     if (column.can_hide === true) {
       // use two columns
       if (i <= (len / 2)) {
@@ -877,18 +864,18 @@ function initFilters(table, dom) {
   }
   table_columns_filter.append(columns_filter_html)
   table_columns_filter2.append(columns_filter_html2)
-	$(`.toggle-vis-${dom}`).on('click', function(e) {
-		// Get the column API object
-		let colid = $(this).attr('data-column')
-		let table_columns = dt_config[dom].col_definition
-		// Toggle the visibility
-		let column = window.table.column(colid);
-		var settings = loadTableSettings(table_columns, dom)
+  $(`.toggle-vis-${dom}`).on('click', function(e) {
+    // Get the column API object
+    let colid = $(this).attr('data-column')
+    let table_columns = dt_config[dom].col_definition
+    // Toggle the visibility
+    let column = window.table.column(colid);
+    var settings = loadTableSettings(table_columns, dom)
     // console.log(`toggling colid ${colid} dom ${dom} columns ${table_columns[colid]} current ${settings[colid]}`)
-		settings[colid] = settings[colid] == 1 ? 0 : 1
-		saveTableSettings(settings, dom)
-		column.visible(!column.visible());
-	})
+    settings[colid] = settings[colid] == 1 ? 0 : 1
+    saveTableSettings(settings, dom)
+    column.visible(!column.visible());
+  })
 
 }
 
@@ -922,45 +909,45 @@ function updateDataTableSelectAllCtrl(table){
 }
 
 function producer_is_in_carbure(bool) {
-	if (bool) {
+  if (bool) {
       $("input[name='producer_is_in_carbure']").filter("[value='yes']").prop("checked", true)
       $("#carbure_producer_name").show()
-    	$("#carbure_producer_name_label").show()
+      $("#carbure_producer_name_label").show()
       $("#carbure_production_site_name").show()
-    	$("#carbure_production_site_name_label").show()
+      $("#carbure_production_site_name_label").show()
 
-    	$("#unknown_producer_name").hide()
-    	$("#unknown_producer_name_label").hide()
-    	$("#unknown_production_site_name").hide()
-    	$("#unknown_production_site_name_label").hide()
-    	$("#unknown_production_site_country").hide()
-    	$("#unknown_production_site_country_label").hide()
-    	$("#unknown_production_site_reference").hide()
-    	$("#unknown_production_site_reference_label").hide()
-    	$("#unknown_production_site_dbl_counting").hide()
-    	$("#unknown_production_site_dbl_counting_label").hide()
-    	$("#unknown_production_site_com_date").hide()
-    	$("#unknown_production_site_com_date_label").hide()
-	} else {
+      $("#unknown_producer_name").hide()
+      $("#unknown_producer_name_label").hide()
+      $("#unknown_production_site_name").hide()
+      $("#unknown_production_site_name_label").hide()
+      $("#unknown_production_site_country").hide()
+      $("#unknown_production_site_country_label").hide()
+      $("#unknown_production_site_reference").hide()
+      $("#unknown_production_site_reference_label").hide()
+      $("#unknown_production_site_dbl_counting").hide()
+      $("#unknown_production_site_dbl_counting_label").hide()
+      $("#unknown_production_site_com_date").hide()
+      $("#unknown_production_site_com_date_label").hide()
+  } else {
       $("input[name='producer_is_in_carbure']").filter("[value='no']").prop("checked", true)
       $("#carbure_producer_name").hide()
-    	$("#carbure_producer_name_label").hide()
+      $("#carbure_producer_name_label").hide()
       $("#carbure_production_site_name").hide()
-    	$("#carbure_production_site_name_label").hide()
+      $("#carbure_production_site_name_label").hide()
 
-    	$("#unknown_producer_name").show()
-    	$("#unknown_producer_name_label").show()
-    	$("#unknown_production_site_name").show()
-    	$("#unknown_production_site_name_label").show()
-    	$("#unknown_production_site_country").show()
-    	$("#unknown_production_site_country_label").show()
-    	$("#unknown_production_site_reference").show()
-    	$("#unknown_production_site_reference_label").show()
-    	$("#unknown_production_site_dbl_counting").show()
-    	$("#unknown_production_site_dbl_counting_label").show()
-    	$("#unknown_production_site_com_date").show()
-    	$("#unknown_production_site_com_date_label").show()
-	}
+      $("#unknown_producer_name").show()
+      $("#unknown_producer_name_label").show()
+      $("#unknown_production_site_name").show()
+      $("#unknown_production_site_name_label").show()
+      $("#unknown_production_site_country").show()
+      $("#unknown_production_site_country_label").show()
+      $("#unknown_production_site_reference").show()
+      $("#unknown_production_site_reference_label").show()
+      $("#unknown_production_site_dbl_counting").show()
+      $("#unknown_production_site_dbl_counting_label").show()
+      $("#unknown_production_site_com_date").show()
+      $("#unknown_production_site_com_date_label").show()
+  }
 }
 
 function client_is_in_carbure(bool) {
@@ -1023,11 +1010,13 @@ $('input[type=radio][name=delivery_site_is_in_carbure][value=no]').change(functi
 })
 
 function display_producers_lot_draft_modal(table, columns, event) {
+  console.log(`clicked on producers draft lot`)
   // check if we clicked on the checkbox
   let colid = event.target._DT_CellIndex.column
   let rowid = event.target._DT_CellIndex.row
   let data = table.row(rowid).data()
-  let table_column = columns[colid]
+  let column_name = columns[colid]
+  let column_definition = columns_definitions[column_name]
   let comments_section = $("#comments_section")
   comments_section.empty()
   $("#btn_close_modal_lot_save").on('click', function() {
@@ -1035,185 +1024,120 @@ function display_producers_lot_draft_modal(table, columns, event) {
     modal.style.display = 'none';
   })
 
-  if (table_column['data'] === 'checkbox') {
+  if (column_name['data'] === 'checkbox') {
     // ignore clicks on checkbox column
     return
   } else {
     let modal = document.getElementById("modal_lot")
-    console.log(data)
     $("#save_section").show()
+    let lot = data.fields.lot
+    let tx = data.fields
+
+    console.log(data)
     $("#check_section").hide()
     $("#correct_section").hide()
-    $("#lot_id").val(data.pk)
-    $("#tx_id").val(data.tx.pk)
+    $("#lot_id").val(lot.id)
+    $("#tx_id").val(tx.id)
 
-    if (data.fields.producer_is_in_carbure) {
-    	producer_is_in_carbure(true)
+    if (lot.producer_is_in_carbure) {
+      producer_is_in_carbure(true)
     } else {
-    	producer_is_in_carbure(false)
+      producer_is_in_carbure(false)
     }
 
-    $("#carbure_producer_name").val(data.fields.carbure_producer ? data.fields.carbure_producer.name : '')
-    $("#carbure_producer_id").val(data.fields.carbure_producer ? data.fields.carbure_producer.id : '')
+    $("#carbure_producer_name").val(lot.carbure_producer ? lot.carbure_producer.name : '')
+    $("#carbure_producer_id").val(lot.carbure_producer ? lot.carbure_producer.id : '')
     if (data.errors['producer']) {
       $("#carbure_producer_name_error").val(data.errors['producer'])
     }
-    $("#carbure_production_site_name").val(data.fields.carbure_production_site ? data.fields.carbure_production_site.name : '')
-    $("#carbure_production_site_id").val(data.fields.carbure_production_site ? data.fields.carbure_production_site.id : '')
+    $("#carbure_production_site_name").val(lot.carbure_production_site ? lot.carbure_production_site.name : '')
+    $("#carbure_production_site_id").val(lot.carbure_production_site ? lot.carbure_production_site.id : '')
     if (data.errors['production_site']) {
       $("#carbure_production_site_name_error").val(data.errors['production_site'])
     }
-    $("#unknown_producer_name").val(data.fields.unknown_producer)
-    $("#unknown_production_site_name").val(data.fields.unknown_production_site)
-    $("#unknown_production_site_country").val(data.fields.unknown_production_country ? data.fields.unknown_production_country.name : '')
-    $("#unknown_production_site_country_code").val(data.fields.unknown_production_country ? data.fields.unknown_production_country.code_pays : '')
+    $("#unknown_producer_name").val(lot.unknown_producer)
+    $("#unknown_production_site_name").val(lot.unknown_production_site)
+    $("#unknown_production_site_country").val(lot.unknown_production_country ? lot.unknown_production_country.name : '')
+    $("#unknown_production_site_country_code").val(lot.unknown_production_country ? lot.unknown_production_country.code_pays : '')
 
-    $("#unknown_production_site_com_date").val(data.fields.unknown_production_site_com_date)
-    $("#unknown_production_site_reference").val(data.fields.unknown_production_site_reference)
-    $("#unknown_production_site_dbl_counting").val(data.fields.unknown_production_site_dbl_counting)
+    $("#unknown_production_site_com_date").val(lot.unknown_production_site_com_date)
+    $("#unknown_production_site_reference").val(lot.unknown_production_site_reference)
+    $("#unknown_production_site_dbl_counting").val(lot.unknown_production_site_dbl_counting)
 
 
 
-    $("#volume").val(data.fields.volume)
+    $("#volume").val(lot.volume)
     if (data.errors['volume']) {
       $("#volume_error").val(data.errors.volume)
     }
-    $("#biocarburant").val(data.fields.biocarburant ? data.fields.biocarburant.name : '')
-    $("#biocarburant_code").val(data.fields.biocarburant ? data.fields.biocarburant.code : '')
+    $("#biocarburant").val(lot.biocarburant ? lot.biocarburant.name : '')
+    $("#biocarburant_code").val(lot.biocarburant ? lot.biocarburant.code : '')
     if (data.errors['biocarburant']) {
       $("#biocarburant_error").val(data.errors.biocarburant)
     }
-    $("#matiere_premiere").val(data.fields.matiere_premiere ? data.fields.matiere_premiere.name : '')
-    $("#matiere_premiere_code").val(data.fields.matiere_premiere ? data.fields.matiere_premiere.code : '')
+    $("#matiere_premiere").val(lot.matiere_premiere ? lot.matiere_premiere.name : '')
+    $("#matiere_premiere_code").val(lot.matiere_premiere ? lot.matiere_premiere.code : '')
     if (data.errors['matiere_premiere']) {
       $("#matiere_premiere_error").val(data.errors.matiere_premiere)
     }
-    $("#pays_origine").val(data.fields.pays_origine ? data.fields.pays_origine.name : '')
-    $("#pays_origine_code").val(data.fields.pays_origine ? data.fields.pays_origine.code_pays : '')
+    $("#pays_origine").val(lot.pays_origine ? lot.pays_origine.name : '')
+    $("#pays_origine_code").val(lot.pays_origine ? lot.pays_origine.code_pays : '')
     if (data.errors['pays_origine']) {
       $("#pays_origine_error").val(data.errors.pays_origine)
     }
     /* TX Related fields */
-    $("#dae").val(data.tx.fields.dae)
+    $("#dae").val(tx.dae)
     if (data.errors['dae']) {
       $("#dae_error").val(data.errors.dae)
     }
 
-    if (data.tx.fields.client_is_in_carbure) {
+    if (tx.client_is_in_carbure) {
       client_is_in_carbure(true)
     } else {
       client_is_in_carbure(false)
     }
-    if (data.tx.fields.delivery_site_is_in_carbure) {
+    if (tx.delivery_site_is_in_carbure) {
       delivery_site_is_in_carbure(true)
     } else {
       delivery_site_is_in_carbure(false)
     }
 
-    $("#carbure_client").val(data.tx.fields.carbure_client ? data.tx.fields.carbure_client.name : '')
-    $("#carbure_client_id").val(data.tx.fields.carbure_client ? data.tx.fields.carbure_client.id : '')
+    $("#carbure_client").val(tx.carbure_client ? tx.carbure_client.name : '')
+    $("#carbure_client_id").val(tx.carbure_client ? tx.carbure_client.id : '')
     if (data.errors['client']) {
       $("#carbure_client_error").val(data.errors.client)
     }
-    $("#carbure_delivery_site").val(data.tx.fields.carbure_delivery_site ? data.tx.fields.carbure_delivery_site.name : '')
-    $("#carbure_delivery_site_id").val(data.tx.fields.carbure_delivery_site ? data.tx.fields.carbure_delivery_site.depot_id : '')
+    $("#carbure_delivery_site").val(tx.carbure_delivery_site ? tx.carbure_delivery_site.name : '')
+    $("#carbure_delivery_site_id").val(tx.carbure_delivery_site ? tx.carbure_delivery_site.depot_id : '')
     if (data.errors['delivery_site']) {
       $("#carbure_delivery_site_error").val(data.errors.delivery_site)
     }
-    $("#unknown_client").val(data.tx.fields.unknown_client)
-    $("#unknown_delivery_site").val(data.tx.fields.unknown_delivery_site)
-    $("#unknown_delivery_site_country").val(data.tx.fields.unknown_delivery_site_country ? data.tx.fields.unknown_delivery_site_country.name : '')
-    $("#unknown_delivery_site_country_code").val(data.tx.fields.unknown_delivery_site_country ? data.tx.fields.unknown_delivery_site_country.code_pays : '')
-    $("#delivery_date").val(data.tx.fields.delivery_date)
+    $("#unknown_client").val(tx.unknown_client)
+    $("#unknown_delivery_site").val(tx.unknown_delivery_site)
+    $("#unknown_delivery_site_country").val(tx.unknown_delivery_site_country ? tx.unknown_delivery_site_country.name : '')
+    $("#unknown_delivery_site_country_code").val(tx.unknown_delivery_site_country ? tx.unknown_delivery_site_country.code_pays : '')
+    $("#delivery_date").val(tx.delivery_date)
     if (data.errors['delivery_date']) {
       $("#delivery_date_error").val(data.errors.delivery_date)
     }
-    $("#champ_libre").val(data.tx.fields.champ_libre)
+    $("#champ_libre").val(tx.champ_libre)
 
     /* Greenhouse gases values */
-    $("#eec").val(data.fields.eec)
-    $("#el").val(data.fields.el)
-    $("#ep").val(data.fields.ep)
-    $("#etd").val(data.fields.etd)
-    $("#eu").val(data.fields.eu)
-    $("#esca").val(data.fields.esca)
-    $("#eccs").val(data.fields.eccs)
-    $("#eccr").val(data.fields.eccr)
-    $("#eee").val(data.fields.eee)
+    $("#eec").val(lot.eec)
+    $("#el").val(lot.el)
+    $("#ep").val(lot.ep)
+    $("#etd").val(lot.etd)
+    $("#eu").val(lot.eu)
+    $("#esca").val(lot.esca)
+    $("#eccs").val(lot.eccs)
+    $("#eccr").val(lot.eccr)
+    $("#eee").val(lot.eee)
 
     // non-input keys
-    $("#ghg_total").html(data.fields.ghg_total)
-    $("#ghg_reduction").html(`${data.fields.ghg_reduction}%`)
-    $("#ghg_reference").val(data.fields.ghg_reference)
-    $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data.fields.ghg_reference} gCO2eq/MJ`)
-
-    /* load errors */
-    /*
-    $.ajax({url: window.producers_api_lot_errors,
-      data: {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
-      type        : 'POST',
-      success     : function(data, textStatus, jqXHR){
-        // Callback code
-        // load existing errors into the form
-        for (let i = 0, len = data.length; i < len; i++) {
-          let dom = $(`#${data[i].field}_error`)
-          dom.html(`${data[i].error}`)
-        }
-      },
-      error       : function(e) {
-        if (e.status === 400) {
-          alert(e.responseJSON.message)
-          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-        } else {
-          alert("Server error. Please contact an administrator")
-          console.log(`server error ${JSON.stringify(e)}`)
-        }
-      }
-    })*/
-
-    /* load comments */
-    /*
-    $.ajax({
-      url         : window.producers_api_lot_comments,
-      data        : {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
-      type        : 'POST',
-      success     : function(d, textStatus, jqXHR){
-        // Callback code
-        // load existing comments into the form
-        for (let i = 0, len = d.length; i < len; i++) {
-          let c = d[i]
-          let html = `<p><b>${c.from}</b>: ${c.comment}</p>`
-          comments_section.append(html)
-        }
-        // add area to respond
-        if (data['status'] === "Draft" || data['ea_delivery_status'] === "Accepté") {
-          // do nothing
-        } else {
-          // add the ability to add a comment
-          let html = `<div style="display: flex;"><p>Ajouter un commentaire:</p><input type="text" name="textarea" id="textarea" style="max-width: 80%; height: 2em; margin-left: 10px; margin-top: auto; margin-bottom: auto;" /></div>`
-          comments_section.append(html)
-        }
-      },
-      error       : function(e) {
-        if (e.status === 400) {
-          alert(e.responseJSON.message)
-          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-        } else {
-          alert("Server error. Please contact an administrator")
-          console.log(`server error ${JSON.stringify(e)}`)
-        }
-      }
-    })*/
-
-    /* warning if the lot is validated */
-    if (data['status'] == 'Validated') {
-      let message = `<h3>Lot ${data['carbure_id']}</h3>
-      <h5 style="color: tomato">Attention, ce lot a déjà été déclaré à la DGEC et affilié à un client.</h5>
-      <span>Toute modification leur sera automatiquement notifiée et devra être acceptée par le client.</span>`
-      $("#err_msg_dom").html(message)
-    } else {
-      $("#err_msg_dom").html('')
-    }
+    $("#ghg_total").html(lot.ghg_total)
+    $("#ghg_reduction").html(`${lot.ghg_reduction}%`)
+    $("#ghg_reference").val(lot.ghg_reference)
+    $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${lot.ghg_reference} gCO2eq/MJ`)
     modal.style.display = "flex"
   }
 }
@@ -1231,7 +1155,6 @@ function display_generic_lot_received_modal(table, columns, event) {
     modal.style.display = 'none';
   })
 
-
   if (table_column['data'] === 'checkbox') {
     // ignore clicks on checkbox column
     return
@@ -1245,9 +1168,9 @@ function display_generic_lot_received_modal(table, columns, event) {
     $("#tx_id").val(data.tx.pk)
 
     if (data.fields.producer_is_in_carbure) {
-    	producer_is_in_carbure(true)
+      producer_is_in_carbure(true)
     } else {
-    	producer_is_in_carbure(false)
+      producer_is_in_carbure(false)
     }
 
     $("#carbure_producer_name").val(data.fields.carbure_producer ? data.fields.carbure_producer.name : '')
@@ -1314,39 +1237,13 @@ function display_generic_lot_received_modal(table, columns, event) {
     $("#ghg_reference").val(data.fields.ghg_reference)
     $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data.fields.ghg_reference} gCO2eq/MJ`)
 
-    /* load comments */
-    /*
-    $.ajax({
-      url         : window.producers_api_lot_comments,
-      data        : {'lot_id': data['lot_id'], 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
-      type        : 'POST',
-      success     : function(d, textStatus, jqXHR){
-        // Callback code
-        // load existing comments into the form
-        for (let i = 0, len = d.length; i < len; i++) {
-          let c = d[i]
-          let html = `<p><b>${c.from}</b>: ${c.comment}</p>`
-          comments_section.append(html)
-        }
-        // add area to respond
-        if (data['status'] === "Draft" || data['ea_delivery_status'] === "Accepté") {
-          // do nothing
-        } else {
-          // add the ability to add a comment
-          let html = `<div style="display: flex;"><p>Ajouter un commentaire:</p><input type="text" name="textarea" id="textarea" style="max-width: 80%; height: 2em; margin-left: 10px; margin-top: auto; margin-bottom: auto;" /></div>`
-          comments_section.append(html)
-        }
-      },
-      error       : function(e) {
-        if (e.status === 400) {
-          alert(e.responseJSON.message)
-          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-        } else {
-          alert("Server error. Please contact an administrator")
-          console.log(`server error ${JSON.stringify(e)}`)
-        }
-      }
-    })*/
+    console.log(`comments on lot: ${data.comments}`)
+    for (let i = 0, len = data.comments.length; i < len; i++) {
+      let c = comments[i]
+      let html = `<dd><b>${c.fields.entity.name}</b>: ${c.fields.comment}</dd>`
+      comments_section.append(html)
+    }
+    comments_section.append(`<dd><input id="new_comment" type="text" placeholder="Commentaire" /></dd>`)
     modal.style.display = "flex"
   }
 }
@@ -1495,7 +1392,7 @@ function handleSave(action) {
 
   // post form
   $.ajax({
-    url         : window.producers_api_lot_save_v2,
+    url         : window.api_lot_save_v2,
     data        : formdata,
     cache       : false,
     contentType : false,
@@ -1505,35 +1402,35 @@ function handleSave(action) {
       // Callback code
       // if there's an additional comment, save it as well
       console.log(`handleSave res: ${data}`)
-		  let comment = $("#textarea").val()
-		  if (comment) {
-		  	var formcomment = new FormData();
-		  	formcomment.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
-		  	formcomment.set('lot_id', document.getElementById('lot_id').value)
-		  	formcomment.set('comment', comment)
-			  $.ajax({
-			    url         : window.producers_api_attestation_save_lot_comment,
-			    data        : formcomment,
-			    cache       : false,
-			    contentType : false,
-			    processData : false,
-			    type        : 'POST',
-			    success     : function(data, textStatus, jqXHR) {
-			      // Callback code
-			      window.location.reload()
-			    },
-			    error       : function(e) {
-			      window.location.reload()
-			      if (e.status === 400) {
-			        err_msg_dom.html(`${e.responseJSON.message}`)
-			      } else {
-			        alert("Server error. Please contact an administrator")
-			      }
-			    }
-			  })
-			} else {
-		    window.location.reload()
-			}
+      let comment = $("#textarea").val()
+      if (comment) {
+        var formcomment = new FormData();
+        formcomment.set('csrfmiddlewaretoken', document.getElementsByName('csrfmiddlewaretoken')[0].value)
+        formcomment.set('lot_id', document.getElementById('lot_id').value)
+        formcomment.set('comment', comment)
+        $.ajax({
+          url         : window.api_lot_add_comment_v2,
+          data        : formcomment,
+          cache       : false,
+          contentType : false,
+          processData : false,
+          type        : 'POST',
+          success     : function(data, textStatus, jqXHR) {
+            // Callback code
+            window.location.reload()
+          },
+          error       : function(e) {
+            window.location.reload()
+            if (e.status === 400) {
+              err_msg_dom.html(`${e.responseJSON.message}`)
+            } else {
+              alert("Server error. Please contact an administrator")
+            }
+          }
+        })
+      } else {
+        window.location.reload()
+      }
     },
     error       : function(e) {
       if (e.status === 400) {
@@ -1582,7 +1479,6 @@ $(".ges_field").on('change', function() {
   })
   var sum = sum_incr - sum_decr
   $("#ghg_total").text(sum.toFixed(2))
-  console.log(`ref ${ref} sum ${sum}`)
   var pct_reduction = (1.0 - (sum / ref)) * 100
   $("#ghg_reduction").text(`${pct_reduction.toFixed(2)}%`)
   $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${ref} gCO2eq/MJ`)
@@ -1684,7 +1580,7 @@ $(".autocomplete_depots").autocomplete({
   }
 })
 
-function handleTableEvents(table, tbl_id) {
+function handleTableEvents(table, tbl_id, cb) {
   // search box
   $('#input_search_datatable').on('keyup', function() {
       table.search(this.value).draw()
@@ -1709,7 +1605,7 @@ function handleTableEvents(table, tbl_id) {
     // Prevent click event from propagating to parent
     e.stopPropagation()
     // Show/Hide buttons depending on selected_rows content
-    manage_actions()
+    cb()
   })
 
   // Handle click on "Select all" control
@@ -1732,36 +1628,40 @@ function handleTableEvents(table, tbl_id) {
 
 function parseApiFetchResponse(res) {
     data = {}
-    lots = JSON.parse(res['lots'])
-    for (let i = 0, len = lots.length; i < len; i++) {
-      let lot = lots[i]
-      data[lot.pk] = lot
-      data[lot.pk].errors = {}
-    }
     txs = JSON.parse(res['transactions'])
     for (let i = 0, len = txs.length; i < len; i++) {
       let tx = txs[i]
-      data[tx.fields.lot.id].tx = tx
+      data[tx.pk] = tx
+      data[tx.pk].errors = {}
+      data[tx.pk].comments = []
     }
-    errors = JSON.parse(res['errors'])
-    for (let i = 0, len = errors.length; i < len; i++) {
-      let error = errors[i]
-      data[error.fields.lot.id].errors[error.fields.field] = error
+    if (res.comments !== undefined) {
+      comments = JSON.parse(res['comments'])
+      for (let i = 0, len = comments.length; i < len; i++) {
+        let comment = comments[i]
+        data[comment.fields.tx.id].comments.push(comment)
+      }
     }
     list = Object.values(data)
     return list
 }
 
-const dt_drafts_config = {
+
+const dt_producers_drafts_columns = []
+for (let i = 0, len = producer_columns_drafts.length; i < len; i++) {
+  let colname = producer_columns_drafts[i]
+  dt_producers_drafts_columns.push(columns_definitions[colname])
+}
+
+const dt_producers_drafts_config = {
   is_complex_dt: true,
-	id: "datatable_drafts",
-	url: window.producers_api_lots_drafts_v2,
-	col_definition: table_columns_drafts_v2,
-	has_footer: true,
-	paging: true,
-	info: true,
-	dom: 'rtp',
-	columnDefs: [
+  id: "datatable_drafts",
+  url: window.api_get_drafts,
+  col_definition: dt_producers_drafts_columns,
+  paging: true,
+  info: true,
+  dom: 'rtp',
+  columnDefs: [
     {
       targets: [0],
       searchable:false,
@@ -1776,11 +1676,9 @@ const dt_drafts_config = {
       className: "dt-center",
       targets: "_all",
       render: function (data, type, full, meta) {
-      	let col_name = table_columns_drafts_v2[meta.col].data
-      	if (table_columns_drafts_v2[meta.col]['render'] != undefined) {
-  		return table_columns_drafts_v2[meta.col]['render'](full)
-      	}
-      	return full['fields'][col_name]
+        let col_name = producer_columns_drafts[meta.col]
+        let cd = columns_definitions[col_name]
+        return cd['render'](full)
       }
     },
   ],
@@ -1789,66 +1687,26 @@ const dt_drafts_config = {
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_producers_lot_draft_modal(table, table_columns_drafts_v2, e)
+      display_producers_lot_draft_modal(table, producer_columns_drafts, e)
     })
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
     })
-    initFilters(table_columns_drafts_v2, "tab_drafts")
-
-    // Handle click on checkbox
-    $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
-      var $row = $(this).closest('tr');
-      // Get row data
-      var rowId = table.row($row).index();
-      // Determine whether row ID is in the list of selected row IDs
-      var index = $.inArray(rowId, selected_rows);
-      // If checkbox is checked and row ID is not in list of selected row IDs
-      if(this.checked && index === -1) {
-        selected_rows.push(rowId);
-      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
-      } else if (!this.checked && index !== -1) {
-        selected_rows.splice(index, 1);
-      }
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-      // Show/Hide buttons depending on selected_rows content
-      manage_actions()
-    })
-
-
-    // Handle click on "Select all" control
-    $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
-      if(this.checked){
-         $('#datatable_drafts tbody input[type="checkbox"]:not(:checked)').trigger('click');
-      } else {
-         $('#datatable_drafts tbody input[type="checkbox"]:checked').trigger('click');
-      }
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-    });
-
-    // Handle table draw event
-    table.on('draw', function(){
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-    });
-    manage_actions()
+    initFilters(producer_columns_drafts, "tab_drafts")
+    handleTableEvents(table, tbl_id, manage_actions_producers_drafts)
+    manage_actions_producers_drafts()
   }
 }
 
 const dt_received_config = {
-	is_complex_dt: true,
-	id: "datatable_received",
-	url: window.producers_api_lots_received_v2,
-	col_definition: table_columns_received_v2,
-	has_footer: true,
-	paging: true,
-	info: true,
-	dom: 'rtp',
-	columnDefs: [
+  is_complex_dt: true,
+  id: "datatable_received",
+  url: window.producers_api_lots_received_v2,
+  col_definition: table_columns_received_v2,
+  paging: true,
+  info: true,
+  dom: 'rtp',
+  columnDefs: [
     {
       targets: [0],
       searchable:false,
@@ -1863,11 +1721,11 @@ const dt_received_config = {
       className: "dt-center",
       targets: "_all",
       render: function (data, type, full, meta) {
-      	let col_name = table_columns_received_v2[meta.col].data
-      	if (table_columns_received_v2[meta.col]['render'] != undefined) {
-  		  return table_columns_received_v2[meta.col]['render'](full)
-      	}
-      	return full['fields'][col_name]
+        let col_name = table_columns_received_v2[meta.col].data
+        if (table_columns_received_v2[meta.col]['render'] != undefined) {
+        return table_columns_received_v2[meta.col]['render'](full)
+        }
+        return full['fields'][col_name]
       }
     },
   ],
@@ -1876,13 +1734,13 @@ const dt_received_config = {
     data = {}
     lots = JSON.parse(res['lots'])
     for (let i = 0, len = lots.length; i < len; i++) {
-    	let lot = lots[i]
-    	data[lot.pk] = lot
+      let lot = lots[i]
+      data[lot.pk] = lot
     }
     txs = JSON.parse(res['transactions'])
     for (let i = 0, len = txs.length; i < len; i++) {
-    	let tx = txs[i]
-    	data[tx.fields.lot.id].tx = tx
+      let tx = txs[i]
+      data[tx.fields.lot.id].tx = tx
     }
     list = Object.values(data)
     return list
@@ -1896,60 +1754,20 @@ const dt_received_config = {
         table.search(this.value).draw();
     })
     initFilters(table_columns_received_v2, "tab_received")
-
-    // Handle click on checkbox
-    $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
-      var $row = $(this).closest('tr');
-      // Get row data
-      var rowId = table.row($row).index();
-      // Determine whether row ID is in the list of selected row IDs
-      var index = $.inArray(rowId, received_selected_rows);
-      // If checkbox is checked and row ID is not in list of selected row IDs
-      if(this.checked && index === -1) {
-        received_selected_rows.push(rowId);
-      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
-      } else if (!this.checked && index !== -1) {
-        received_selected_rows.splice(index, 1);
-      }
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-      // Show/Hide buttons depending on selected_rows content
-      manage_received_actions()
-    })
-
-
-    // Handle click on "Select all" control
-    $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
-      if(this.checked){
-         $('#datatable_received tbody input[type="checkbox"]:not(:checked)').trigger('click');
-      } else {
-         $('#datatable_received tbody input[type="checkbox"]:checked').trigger('click');
-      }
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-    });
-
-    // Handle table draw event
-    table.on('draw', function(){
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-    });
+    handleTableEvents(table, tbl_id)
     manage_received_actions()
   }
 }
 
 const dt_mb_config = {
-	is_complex_dt: true,
-	id: "datatable_mb",
-	url: window.producers_api_lots_mb_v2,
-	col_definition: table_columns_mb_v2,
-	has_footer: true,
-	paging: true,
-	info: true,
-	dom: 'rtp',
-	columnDefs: [
+  is_complex_dt: true,
+  id: "datatable_mb",
+  url: window.producers_api_lots_mb_v2,
+  col_definition: table_columns_mb_v2,
+  paging: true,
+  info: true,
+  dom: 'rtp',
+  columnDefs: [
     {
       targets: [0],
       searchable:false,
@@ -1964,11 +1782,11 @@ const dt_mb_config = {
       className: "dt-center",
       targets: "_all",
       render: function (data, type, full, meta) {
-      	let col_name = table_columns_mb_v2[meta.col].data
-      	if (table_columns_mb_v2[meta.col]['render'] != undefined) {
-  		  return table_columns_mb_v2[meta.col]['render'](full)
-      	}
-      	return full['fields'][col_name]
+        let col_name = table_columns_mb_v2[meta.col].data
+        if (table_columns_mb_v2[meta.col]['render'] != undefined) {
+        return table_columns_mb_v2[meta.col]['render'](full)
+        }
+        return full['fields'][col_name]
       }
     },
   ],
@@ -1977,13 +1795,13 @@ const dt_mb_config = {
     data = {}
     lots = JSON.parse(res['lots'])
     for (let i = 0, len = lots.length; i < len; i++) {
-    	let lot = lots[i]
-    	data[lot.pk] = lot
+      let lot = lots[i]
+      data[lot.pk] = lot
     }
     txs = JSON.parse(res['transactions'])
     for (let i = 0, len = txs.length; i < len; i++) {
-    	let tx = txs[i]
-    	data[tx.fields.lot.id].tx = tx
+      let tx = txs[i]
+      data[tx.fields.lot.id].tx = tx
     }
     list = Object.values(data)
     return list
@@ -1997,68 +1815,28 @@ const dt_mb_config = {
         table.search(this.value).draw();
     })
     initFilters(table_columns_mb_v2, "tab_mb")
-
-    // Handle click on checkbox
-    $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
-      var $row = $(this).closest('tr');
-      // Get row data
-      var rowId = table.row($row).index();
-      // Determine whether row ID is in the list of selected row IDs
-      var index = $.inArray(rowId, selected_rows);
-      // If checkbox is checked and row ID is not in list of selected row IDs
-      if(this.checked && index === -1) {
-        selected_rows.push(rowId);
-      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
-      } else if (!this.checked && index !== -1) {
-        selected_rows.splice(index, 1);
-      }
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-      // Show/Hide buttons depending on selected_rows content
-      manage_actions()
-    })
-
-
-    // Handle click on "Select all" control
-    $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
-      if(this.checked){
-         $('#datatable_received tbody input[type="checkbox"]:not(:checked)').trigger('click');
-      } else {
-         $('#datatable_received tbody input[type="checkbox"]:checked').trigger('click');
-      }
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-    });
-
-    // Handle table draw event
-    table.on('draw', function(){
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-    });
+    handleTableEvents(table, tbl_id)
   }
 }
 
 const dt_errors_config = {
-	is_complex_dt: true,
-	id: "datatable_corrections",
-	url: window.producers_api_lots_corrections_v2,
-	col_definition: table_columns_corrections_v2,
-	has_footer: true,
-	paging: true,
-	info: true,
-	dom: 'rtp',
-	columnDefs: [
+  is_complex_dt: true,
+  id: "datatable_corrections",
+  url: window.producers_api_lots_corrections_v2,
+  col_definition: table_columns_corrections_v2,
+  paging: true,
+  info: true,
+  dom: 'rtp',
+  columnDefs: [
     {
       className: "dt-center",
       targets: "_all",
       render: function (data, type, full, meta) {
-      	let col_name = table_columns_corrections_v2[meta.col].data
-      	if (table_columns_corrections_v2[meta.col]['render'] != undefined) {
-  		return table_columns_corrections_v2[meta.col]['render'](full)
-      	}
-      	return full['fields'][col_name]
+        let col_name = table_columns_corrections_v2[meta.col].data
+        if (table_columns_corrections_v2[meta.col]['render'] != undefined) {
+      return table_columns_corrections_v2[meta.col]['render'](full)
+        }
+        return full['fields'][col_name]
       }
     },
   ],
@@ -2067,13 +1845,13 @@ const dt_errors_config = {
     data = {}
     lots = JSON.parse(res['lots'])
     for (let i = 0, len = lots.length; i < len; i++) {
-    	let lot = lots[i]
-    	data[lot.pk] = lot
+      let lot = lots[i]
+      data[lot.pk] = lot
     }
     txs = JSON.parse(res['transactions'])
     for (let i = 0, len = txs.length; i < len; i++) {
-    	let tx = txs[i]
-    	data[tx.fields.lot.id].tx = tx
+      let tx = txs[i]
+      data[tx.fields.lot.id].tx = tx
     }
     list = Object.values(data)
     return list
@@ -2092,24 +1870,23 @@ const dt_errors_config = {
 }
 
 const dt_valid_config = {
-	is_complex_dt: true,
-	id: "datatable_valid",
-	url: window.producers_api_lots_valid_v2,
-	col_definition: table_columns_valid_v2,
-	has_footer: true,
-	paging: true,
-	info: true,
-	dom: 'rtp',
-	columnDefs: [
+  is_complex_dt: true,
+  id: "datatable_valid",
+  url: window.producers_api_lots_valid_v2,
+  col_definition: table_columns_valid_v2,
+  paging: true,
+  info: true,
+  dom: 'rtp',
+  columnDefs: [
     {
       className: "dt-center",
       targets: "_all",
       render: function (data, type, full, meta) {
-      	let col_name = table_columns_valid_v2[meta.col].data
-      	if (table_columns_valid_v2[meta.col]['render'] != undefined) {
-  		  return table_columns_valid_v2[meta.col]['render'](full)
-      	}
-      	return full['fields'][col_name]
+        let col_name = table_columns_valid_v2[meta.col].data
+        if (table_columns_valid_v2[meta.col]['render'] != undefined) {
+        return table_columns_valid_v2[meta.col]['render'](full)
+        }
+        return full['fields'][col_name]
       }
     },
   ],
@@ -2118,13 +1895,13 @@ const dt_valid_config = {
     data = {}
     lots = JSON.parse(res['lots'])
     for (let i = 0, len = lots.length; i < len; i++) {
-    	let lot = lots[i]
-    	data[lot.pk] = lot
+      let lot = lots[i]
+      data[lot.pk] = lot
     }
     txs = JSON.parse(res['transactions'])
     for (let i = 0, len = txs.length; i < len; i++) {
-    	let tx = txs[i]
-    	data[tx.fields.lot.id].tx = tx
+      let tx = txs[i]
+      data[tx.fields.lot.id].tx = tx
     }
     list = Object.values(data)
     return list
@@ -2146,7 +1923,6 @@ const dt_mb_drafts_config = {
   id: "datatable_mb_drafts",
   url: window.producers_api_lots_mb_drafts_v2,
   col_definition: table_columns_mb_drafts_v2,
-  has_footer: true,
   paging: true,
   info: true,
   dom: 'rtp',
@@ -2186,48 +1962,7 @@ const dt_mb_drafts_config = {
         table.search(this.value).draw();
     })
     initFilters(table_columns_mb_drafts_v2, "tab_mb_drafts")
-
-    // Handle click on checkbox
-    $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
-      console.log(`select mb drafts`)
-      var $row = $(this).closest('tr');
-      // Get row data
-      var rowId = table.row($row).index();
-      // Determine whether row ID is in the list of selected row IDs
-      var index = $.inArray(rowId, selected_rows);
-      // If checkbox is checked and row ID is not in list of selected row IDs
-      if(this.checked && index === -1) {
-        selected_rows.push(rowId);
-      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
-      } else if (!this.checked && index !== -1) {
-        selected_rows.splice(index, 1);
-      }
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-      // Show/Hide buttons depending on selected_rows content
-      manage_actions_mb_drafts()
-    })
-
-
-    // Handle click on "Select all" control
-    $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
-      console.log(`select all mb drafts`)
-      if(this.checked){
-         $('#datatable_mb_drafts tbody input[type="checkbox"]:not(:checked)').trigger('click');
-      } else {
-         $('#datatable_mb_drafts tbody input[type="checkbox"]:checked').trigger('click');
-      }
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-    });
-
-    // Handle table draw event
-    table.on('draw', function(){
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-    });
+    handleTableEvents(table, tbl_id)
     manage_actions_mb_drafts()
   }
 }
@@ -2238,7 +1973,6 @@ const dt_operators_drafts_config = {
   id: "datatable_drafts",
   url: window.operators_api_lots_drafts_v2,
   col_definition: operators_table_columns_drafts_v2,
-  has_footer: true,
   paging: true,
   info: true,
   dom: 'rtp',
@@ -2296,60 +2030,20 @@ const dt_operators_drafts_config = {
         table.search(this.value).draw();
     })
     initFilters(table_columns_drafts_v2, "tab_drafts")
-
-    // Handle click on checkbox
-    $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
-      var $row = $(this).closest('tr');
-      // Get row data
-      var rowId = table.row($row).index();
-      // Determine whether row ID is in the list of selected row IDs
-      var index = $.inArray(rowId, selected_rows);
-      // If checkbox is checked and row ID is not in list of selected row IDs
-      if(this.checked && index === -1) {
-        selected_rows.push(rowId);
-      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
-      } else if (!this.checked && index !== -1) {
-        selected_rows.splice(index, 1);
-      }
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-      // Show/Hide buttons depending on selected_rows content
-      manage_actions()
-    })
-
-
-    // Handle click on "Select all" control
-    $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
-      if(this.checked){
-         $('#datatable_drafts tbody input[type="checkbox"]:not(:checked)').trigger('click');
-      } else {
-         $('#datatable_drafts tbody input[type="checkbox"]:checked').trigger('click');
-      }
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-    });
-
-    // Handle table draw event
-    table.on('draw', function(){
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-    });
+    handleTableEvents(table, tbl_id)
     manage_actions()
   }
 }
 
 const dt_operators_in_config = {
-	is_complex_dt: true,
-	id: "datatable_in",
-	url: window.operators_api_lots_in_v2,
-	col_definition: operators_table_columns_in_v2,
-	has_footer: true,
-	paging: true,
-	info: true,
-	dom: 'rtp',
-	columnDefs: [
+  is_complex_dt: true,
+  id: "datatable_in",
+  url: window.operators_api_lots_in_v2,
+  col_definition: operators_table_columns_in_v2,
+  paging: true,
+  info: true,
+  dom: 'rtp',
+  columnDefs: [
     {
       targets: [0],
       searchable:false,
@@ -2364,90 +2058,35 @@ const dt_operators_in_config = {
       className: "dt-center",
       targets: "_all",
       render: function (data, type, full, meta) {
-      	let col_name = operators_table_columns_in_v2[meta.col].data
-      	if (operators_table_columns_in_v2[meta.col]['render'] != undefined) {
-  		  return operators_table_columns_in_v2[meta.col]['render'](full)
-      	}
-      	return full['fields'][col_name]
+        let col_name = operators_table_columns_in_v2[meta.col].data
+        if (operators_table_columns_in_v2[meta.col]['render'] != undefined) {
+        return operators_table_columns_in_v2[meta.col]['render'](full)
+        }
+        return full['fields'][col_name]
       }
     },
   ],
   order: [[ 1, 'desc' ]],
-  ajax_dataSrc: function(res) {
-    data = {}
-    lots = JSON.parse(res['lots'])
-    for (let i = 0, len = lots.length; i < len; i++) {
-    	let lot = lots[i]
-    	data[lot.pk] = lot
-    }
-    txs = JSON.parse(res['transactions'])
-    for (let i = 0, len = txs.length; i < len; i++) {
-    	let tx = txs[i]
-    	data[tx.fields.lot.id].tx = tx
-    }
-    list = Object.values(data)
-    return list
-  },
+  ajax_dataSrc: parseApiFetchResponse,
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
       display_generic_lot_received_modal(table, operators_table_columns_in_v2, e)
     })
-    $('#input_search_datatable').on('keyup', function() {
-        table.search(this.value).draw();
-    })
+    handleTableEvents(table, tbl_id)
 
-    // Handle click on checkbox
-    $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
-      var $row = $(this).closest('tr');
-      // Get row data
-      var rowId = table.row($row).index();
-      // Determine whether row ID is in the list of selected row IDs
-      var index = $.inArray(rowId, selected_rows);
-      // If checkbox is checked and row ID is not in list of selected row IDs
-      if(this.checked && index === -1) {
-        selected_rows.push(rowId);
-      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
-      } else if (!this.checked && index !== -1) {
-        selected_rows.splice(index, 1);
-      }
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-      // Show/Hide buttons depending on selected_rows content
-      manage_actions_operators()
-    })
-
-    // Handle click on "Select all" control
-    $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
-      if(this.checked){
-         $('#datatable_in tbody input[type="checkbox"]:not(:checked)').trigger('click');
-      } else {
-         $('#datatable_in tbody input[type="checkbox"]:checked').trigger('click');
-      }
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-    });
-
-    // Handle table draw event
-    table.on('draw', function(){
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-    });
   }
 }
 
 const dt_operators_out_config = {
-	is_complex_dt: true,
-	id: "datatable_out",
-	url: window.operators_api_lots_out_v2,
-	col_definition: operators_table_columns_out_v2,
-	has_footer: true,
-	paging: true,
-	info: true,
-	dom: 'rtp',
-	columnDefs: [
+  is_complex_dt: true,
+  id: "datatable_out",
+  url: window.operators_api_lots_out_v2,
+  col_definition: operators_table_columns_out_v2,
+  paging: true,
+  info: true,
+  dom: 'rtp',
+  columnDefs: [
     {
       targets: [0],
       searchable:false,
@@ -2462,11 +2101,11 @@ const dt_operators_out_config = {
       className: "dt-center",
       targets: "_all",
       render: function (data, type, full, meta) {
-      	let col_name = operators_table_columns_out_v2[meta.col].data
-      	if (operators_table_columns_out_v2[meta.col]['render'] != undefined) {
-  		  return operators_table_columns_out_v2[meta.col]['render'](full)
-      	}
-      	return full['fields'][col_name]
+        let col_name = operators_table_columns_out_v2[meta.col].data
+        if (operators_table_columns_out_v2[meta.col]['render'] != undefined) {
+        return operators_table_columns_out_v2[meta.col]['render'](full)
+        }
+        return full['fields'][col_name]
       }
     },
   ],
@@ -2475,13 +2114,13 @@ const dt_operators_out_config = {
     data = {}
     lots = JSON.parse(res['lots'])
     for (let i = 0, len = lots.length; i < len; i++) {
-    	let lot = lots[i]
-    	data[lot.pk] = lot
+      let lot = lots[i]
+      data[lot.pk] = lot
     }
     txs = JSON.parse(res['transactions'])
     for (let i = 0, len = txs.length; i < len; i++) {
-    	let tx = txs[i]
-    	data[tx.fields.lot.id].tx = tx
+      let tx = txs[i]
+      data[tx.fields.lot.id].tx = tx
     }
     list = Object.values(data)
     return list
@@ -2491,55 +2130,13 @@ const dt_operators_out_config = {
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
       display_producers_lot_modal(table, operators_table_columns_out_v2, e)
     })
-    $('#input_search_datatable').on('keyup', function() {
-        table.search(this.value).draw();
-    })
-
-    // Handle click on checkbox
-    $(`#${tbl_id} tbody`).on('click', 'input[type="checkbox"]', function(e) {
-      var $row = $(this).closest('tr');
-      // Get row data
-      var rowId = table.row($row).index();
-      // Determine whether row ID is in the list of selected row IDs
-      var index = $.inArray(rowId, selected_rows);
-      // If checkbox is checked and row ID is not in list of selected row IDs
-      if(this.checked && index === -1) {
-        selected_rows.push(rowId);
-      // Otherwise, if checkbox is not checked and row ID is in list of selected row IDs
-      } else if (!this.checked && index !== -1) {
-        selected_rows.splice(index, 1);
-      }
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-      // Show/Hide buttons depending on selected_rows content
-      manage_actions()
-    })
-
-
-    // Handle click on "Select all" control
-    $('thead input[name="select_all"]', table.table().container()).on('click', function(e){
-      if(this.checked){
-         $('#datatable_out tbody input[type="checkbox"]:not(:checked)').trigger('click');
-      } else {
-         $('#datatable_out tbody input[type="checkbox"]:checked').trigger('click');
-      }
-      // Prevent click event from propagating to parent
-      e.stopPropagation();
-    });
-
-    // Handle table draw event
-    table.on('draw', function(){
-      // Update state of "Select all" control
-      updateDataTableSelectAllCtrl(table);
-    });
+    handleTableEvents(table, tbl_id)
   }
 }
 
 const dt_admin_users = {
-	id: "datatable_users",
-	dt_config: {
+  id: "datatable_users",
+  dt_config: {
     paging: false,
   },
 }
@@ -2563,7 +2160,6 @@ const dt_traders_drafts_config = {
   id: "datatable_drafts",
   url: window.traders_get_drafts,
   col_definition: traders_columns_drafts,
-  has_footer: true,
   paging: true,
   info: true,
   dom: 'rtp',
@@ -2582,11 +2178,11 @@ const dt_traders_drafts_config = {
       className: "dt-center",
       targets: "_all",
       render: function (data, type, full, meta) {
-      	let col_name = traders_columns_drafts[meta.col].data
-      	if (traders_columns_drafts[meta.col]['render'] != undefined) {
-    		  return traders_columns_drafts[meta.col]['render'](full)
-      	}
-      	return full['fields'][col_name]
+        let col_name = traders_columns_drafts[meta.col].data
+        if (traders_columns_drafts[meta.col]['render'] != undefined) {
+          return traders_columns_drafts[meta.col]['render'](full)
+        }
+        return full['fields'][col_name]
       }
     },
   ],
@@ -2608,7 +2204,6 @@ const dt_traders_in_config = {
   id: "datatable_in",
   url: window.traders_get_in,
   col_definition: traders_columns_in,
-  has_footer: true,
   paging: true,
   info: true,
   dom: 'rtp',
@@ -2663,7 +2258,7 @@ const dt_traders_out_config = {
 }
 
 // producer
-dt_config['tab_drafts'] = dt_drafts_config
+dt_config['tab_drafts'] = dt_producers_drafts_config
 dt_config['tab_received'] = dt_received_config
 dt_config['tab_errors'] = dt_errors_config
 dt_config['tab_mb'] = dt_mb_config
@@ -2694,17 +2289,17 @@ $(".tabs__tab").on('click', function() {
   // hide all
   tabs = document.getElementsByClassName("tabcontent")
   for (let i = 0, len = tabs.length; i < len; i++) {
-  	// hide tab content
-  	if (tabs[i].id !== this.dataset.dst) {
-  		tabs[i].style.display = "none";
-  	} else {
-  		tabs[i].style.display = "block";
-  	}
+    // hide tab content
+    if (tabs[i].id !== this.dataset.dst) {
+      tabs[i].style.display = "none";
+    } else {
+      tabs[i].style.display = "block";
+    }
   }
   // remove tab title style
   tabtitles = document.getElementsByClassName("tabs__tab")
   for (let i = 0, len = tabtitles.length; i < len; i++) {
-  	tabtitles[i].className = tabtitles[i].className.replace(" tabs__tab--selected", "")
+    tabtitles[i].className = tabtitles[i].className.replace(" tabs__tab--selected", "")
   }
   this.className = "tabs__tab tabs__tab--selected"
 
@@ -2846,37 +2441,30 @@ $("#add_lot").on('click', function() {
 function init_tab_generic(tab_name) {
   const config = dt_config[tab_name]
   const tblselector = `#${config.id}`
-
-  // tab Drafts
   if (!$.fn.DataTable.isDataTable(tblselector)) {
-  	if (config.has_footer) {
-  	  // create empty footer
-      let empty_footer = `<tr>${Array(config.col_definition.length).fill("<th></th>").join('')}</tr>`
-      $(`${tblselector} tfoot`).append(empty_footer)
-  	}
-  	if (config.is_complex_dt) {
-	    var table = $(tblselector).DataTable({
-	      paging: config.paging,
-	      info: config.info,
-	      dom: config.dom,
-	      scrollX: true,
-	      columnDefs: config.columnDefs,
-	      order: config.order,
-	      columns: config.col_definition,
-	      ajax: {
-	        url: config.url,
-	        dataSrc: config.ajax_dataSrc,
-	      },
-	      initComplete: config.initComplete,
-	    })
+    if (config.is_complex_dt) {
+      var table = $(tblselector).DataTable({
+        paging: config.paging,
+        info: config.info,
+        dom: config.dom,
+        scrollX: true,
+        columnDefs: config.columnDefs,
+        order: config.order,
+        columns: config.col_definition,
+        ajax: {
+          url: config.url,
+          dataSrc: config.ajax_dataSrc,
+        },
+        initComplete: config.initComplete,
+      })
       if (config.post_init) {
         config.post_init(table)
       }
       var tablesettings = loadTableSettings(config.col_definition, tab_name)
-  	  showHideTableColumns(table, tablesettings, tab_name)
-  	} else {
-		  var table = $(tblselector).DataTable(config.dt_config)
-  	}
+      showHideTableColumns(table, tablesettings, tab_name)
+    } else {
+      var table = $(tblselector).DataTable(config.dt_config)
+    }
     window[config.id] = table
     window.table = table
   } else {

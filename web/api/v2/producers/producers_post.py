@@ -1,18 +1,10 @@
-import random
-import openpyxl
 import datetime
-import io
 
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.db.models import Max, Min
-from django.core import serializers
 from django.db.models.fields import NOT_PROVIDED
-from django.db.models import Q
 
 from core.decorators import enrich_with_user_details, restrict_to_producers
-from core.xlsx_template import create_template_xlsx_v2_simple, create_template_xlsx_v2_advanced, create_template_xlsx_v2_mb
-
 from core.models import Entity, ProductionSite, Pays, Biocarburant, MatierePremiere, Depot
 from core.models import LotV2, LotTransaction, TransactionError, LotV2Error, UserRights, TransactionComment
 
@@ -22,17 +14,18 @@ from core.models import LotV2, LotTransaction, TransactionError, LotV2Error, Use
 @restrict_to_producers
 def delete_lots(request, *args, **kwargs):
     context = kwargs['context']
-    lot_ids = request.POST.get('lots', None)
+    tx_ids = request.POST.get('lots', None)
     errors = []
-    if not lot_ids:
-        return JsonResponse({'status': 'error', 'message': 'Missing lot ids'}, status=400)
-    ids = lot_ids.split(',')
-    for lotid in ids:
-        lot = LotV2.objects.get(id=lotid, added_by=context['user_entity'], status='Draft')
+    if not tx_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing tx ids'}, status=400)
+    ids = tx_ids.split(',')
+    for txid in ids:
+        tx = LotTransaction.objects.get(id=txid, lot__added_by=context['user_entity'], lot__status='Draft')
         try:
-            lot.delete()
+            tx.lot.delete()
+            tx.delete()
         except Exception as e:
-            errors.append({'message': 'Impossible de supprimer le lot %s: introuvable ou déjà validé' % (), 'extra': str(e)})
+            errors.append({'message': 'Impossible de supprimer le lot: introuvable ou déjà validé', 'extra': str(e)})
     return JsonResponse({'status': 'success', 'message': '%d lots supprimés' % (len(ids) - len(errors)), 'errors': errors})
 
 
@@ -220,6 +213,7 @@ def validate_lots(request, *args, **kwargs):
         lot.save()
         try_fuse_lots(context, tx)
         results.append({'lot_id': lotid, 'status': 'success'})
+    print(results)
     return JsonResponse({'status': 'success', 'message': results})
 
 
