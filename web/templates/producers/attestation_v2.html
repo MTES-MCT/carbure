@@ -118,12 +118,13 @@
       </ul>
       <input type="hidden" id="modal_delete_lots_lots" name="lots">
       <div class="form__group button__group">
-        <a class="button secondary close" id="btn_close_modal_delete_lots">Annuler</a>
         <div class="button-container">
           <div class="button-item">
             <button type="submit" class="button">Valider</button>
           </div>
         </div>
+        <a class="button secondary close" id="btn_close_modal_delete_lots">Annuler</a>
+
       </div>
     </form>
   </div>
@@ -313,33 +314,35 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-window.producers_api_lots_drafts_v2 = "{% url 'api-v2-producers-get-drafts' %}"
-window.producers_api_lots_received_v2 = "{% url 'api-v2-producers-get-received' %}"
-window.producers_api_lots_mb_v2 = "{% url 'api-v2-producers-get-mb' %}"
-window.producers_api_lots_corrections_v2 = "{% url 'api-v2-producers-get-corrections' %}"
-window.producers_api_lots_valid_v2 = "{% url 'api-v2-producers-get-valid' %}"
-window.producers_api_lot_duplicate_v2 = "{% url 'api-v2-producers-duplicate-lot' %}"
-window.producers_api_lot_save_v2 = "{% url 'api-v2-producers-save-lot' %}"
+
+// API GET
+window.api_get_drafts = "{% url 'api-v2-producers-get-drafts' %}"
+window.api_get_in = "{% url 'api-v2-producers-get-in' %}"
+window.api_get_mb = "{% url 'api-v2-producers-get-mb' %}"
+window.api_get_corrections = "{% url 'api-v2-producers-get-corrections' %}"
+window.api_get_out = "{% url 'api-v2-producers-get-out' %}"
+
+
+// API POST
+window.api_lot_duplicate_v2 = "{% url 'api-v2-producers-duplicate-lot' %}"
+window.api_lot_save_v2 = "{% url 'api-v2-producers-save-lot' %}"
 window.api_lot_reject_v2 = "{% url 'api-v2-producers-reject-lot' %}"
 window.api_lot_accept_with_correction_v2 = "{% url 'api-v2-producers-accept-lot-with-correction' %}"
 window.api_lot_accept_v2 = "{% url 'api-v2-producers-accept-lot' %}"
-window.producers_api_lot_corrections_v2 = "{% url 'api-v2-producers-get-lot-corrections' %}"
-window.producers_api_lot_add_comment_v2 = "{% url 'api-v2-producers-add-lot-correction' %}"
+window.api_lot_add_comment_v2 = "{% url 'api-v2-producers-add-lot-correction' %}"
 
+
+// API MISC
+window.producers_api_ges = "{% url 'api-v2-get-ges' %}"
 window.producers_api_producers_autocomplete_v2 = "{% url 'api-v2-producers-autocomplete' %}"
 window.producers_api_clients_autocomplete_v2 = "{% url 'api-v2-clients-autocomplete' %}"
 window.producers_api_depots_autocomplete_v2 = "{% url 'api-v2-depots-autocomplete' %}"
-/*
-window.producers_api_lot_errors = "{% url 'producers-api-lot-errors' %}"
-window.producers_api_lot_comments = "{% url 'producers-api-lot-comments' %}"
-window.producers_api_attestation_save_lot = "{% url 'producers-api-attestation-save-lot' %}"
-window.producers_api_attestation_save_lot_comment = "{% url 'producers-api-save-comment' %}"
-*/
+window.producers_api_biocarburants_autocomplete = "{% url 'api-v2-biocarburants-autocomplete' %}"
+window.producers_api_mps_autocomplete = "{% url 'api-v2-mps-autocomplete' %}"
+window.producers_api_production_sites_autocomplete = "{% url 'api-v2-production-sites-autocomplete' %}"
 
-window.producers_api_ges = "{% url 'producers-api-ges' %}"
-window.producers_api_biocarburants_autocomplete = "{% url 'producers-api-biocarburants-autocomplete' %}"
-window.producers_api_mps_autocomplete = "{% url 'producers-api-mps-autocomplete' %}"
-window.producers_api_production_sites_autocomplete = "{% url 'producers-api-production-sites-autocomplete' %}"
+
+
 window.api_country_autocomplete = "{% url 'api-country-autocomplete' %}"
 window.api_operators_autocomplete = "{% url 'api-operators-autocomplete' %}"
 window.api_depots_autocomplete = "{% url 'api-depots-autocomplete' %}"

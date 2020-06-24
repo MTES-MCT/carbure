@@ -33,7 +33,7 @@ def restrict_to_producers(function):
         context = kwargs['context']
         if context['user_entity'].entity_type != 'Producteur':
             raise PermissionDenied
-        drafts = LotV2.objects.filter(added_by=context['user_entity'], status='Draft', parent_lot=None)
+        drafts = LotTransaction.objects.filter(lot__added_by=context['user_entity'], lot__status='Draft')
         mb_drafts = LotV2.objects.filter(added_by=context['user_entity'], status='Draft').exclude(parent_lot=None)
         valid = LotV2.objects.filter(added_by=context['user_entity'], status='Validated')
         corrections = LotTransaction.objects.filter(carbure_vendor=context['user_entity'], delivery_status__in=['AC', 'AA', 'R'])
