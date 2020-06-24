@@ -81,6 +81,18 @@ services:
     - ./data/certbot/conf:/etc/letsencrypt
     - ./data/certbot/www:/var/www/certbot
 
+  carbure-metabase:
+    restart: always
+    container_name: carbure_metabase
+    image: metabase/metabase
+    depends_on:
+    - carbure-mariadb
+    ports:
+    - 3000:3000
+    networks:
+    - carbure
+
+
 volumes:
   carburedb:
     name: carbure_carburedb
