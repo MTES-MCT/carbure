@@ -75,7 +75,13 @@
         <tfoot></tfoot>
         <tbody></tbody>
       </table>
+      <div class="button-container">
+        <div class="button-item">
+          <a id="btn_open_modal_fuse_lots" class="button primary">Fusionner Lots</a>
+        </div>
+      </div>
     </div>
+
   </div>
 </div>
 
@@ -180,13 +186,17 @@
     </form>
   </div>
 </div>
+
+{% include "common/modal_lot.html" %}
+
+
 {% endblock %}
 
 
 {% block extra_js %}
 <script type="text/javascript">
-window.producers_api_lots_mb_v2 = "{% url 'api-v2-producers-get-mb' %}"
-window.producers_api_lots_mb_drafts_v2 = "{% url 'api-v2-producers-get-mb-drafts' %}"
+window.api_get_mb = "{% url 'api-v2-producers-get-mb' %}"
+window.api_get_mb_drafts = "{% url 'api-v2-producers-get-mb-drafts' %}"
 
 $(document).ready(function() {
   // show drafts tab
