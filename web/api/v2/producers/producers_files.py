@@ -1,8 +1,11 @@
 import openpyxl
 import datetime
+import random
+import io
 
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.db.models import Max, Min
 
 from core.decorators import enrich_with_user_details, restrict_to_producers
 from core.xlsx_template import create_template_xlsx_v2_simple, create_template_xlsx_v2_advanced, create_template_xlsx_v2_mb
@@ -18,6 +21,7 @@ def get_random(model):
         element = model.objects.filter(pk=pk).first()
         if element:
             return element
+
 
 # not an API call. helper function
 def load_excel_lot(context, lot_row):
