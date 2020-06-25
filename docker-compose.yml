@@ -83,10 +83,16 @@ services:
     - carbure-mariadb
     ports:
     - 127.0.0.1:3000:3000
+    volumes:
+    - metabase-data:/metabase-data
+    environment:
+    - MB_DB_FILE: "/metabase-data/metabase.db"
     networks:
     - carbure
 
 volumes:
+  metabase-data:
+    name: carbure_metabasedb
   carburedb:
     name: carbure_carburedb
 
