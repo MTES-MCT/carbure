@@ -10,7 +10,7 @@
     <ul class="tabs__tab-list">
       <li id="tab_drafts_title" class="tabs__tab tabs__tab--selected" data-dst="tab_drafts">Brouillons ({{nb_drafts}})</li>
       <li id="tab_corrections_title" class="tabs__tab" data-dst="tab_corrections">Lots à corriger ({{nb_corrections}})</li>
-      <li id="tab_received_title" class="tabs__tab" data-dst="tab_received">Lots reçus ({{nb_received}})</li>
+      <li id="tab_in_title" class="tabs__tab" data-dst="tab_in">Lots reçus ({{nb_received}})</li>
     </ul>
 
     <div id="tab_drafts" class="tabcontent">
@@ -70,7 +70,7 @@
          Vous pouvez effectuer des corrections si nécessaire ou simplement communiquer avec le client en cliquant sur un lot.</p>
 
       <div class="flex-container">
-        <a id="btn_open_modal_columns_tab_errors" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+        <a id="btn_open_modal_columns_tab_corrections" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
       </div>
@@ -83,17 +83,17 @@
       </table>
     </div>
 
-    <div id="tab_received" class="tabcontent">
+    <div id="tab_in" class="tabcontent">
       <p>Si vous avez une activité de négoce et que vos fournisseurs sont inscrits sur Carbure, les lots qu'ils vous envoient apparaîtront directement sur cette page.<br />
          Si vos fournisseurs ne sont pas sur Carbure, vous devez importer les lots dans l'onglet Brouillon en utilisant le <a href="{% url 'api-v2-producers-excel-template-download-advanced' %}" >modèle avancé</a></p>
 
       <div class="flex-container">
-        <a id="btn_open_modal_columns_tab_received" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+        <a id="btn_open_modal_columns_tab_in" class="button modal-button" style="margin-left: 5px; margin-right: auto; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
       </div>
 
-      <table class="display nowrap" id="datatable_received">
+      <table class="display nowrap" id="datatable_in">
         <!-- dynamically generated in js -->
         <thead></thead>
         <tfoot></tfoot>
@@ -237,34 +237,34 @@
   </div>
 </div>
 
-<div class="modal__backdrop" id="modal_columns_tab_errors">
+<div class="modal__backdrop" id="modal_columns_tab_corrections">
   <div class="modal">
     <div class="flex-container">
-      <table id="table_columns_tab_errors_filter">
+      <table id="table_columns_tab_corrections_filter">
         <!-- dynamically generated in js -->
       </table>
-      <table id="table_columns_tab_errors_filter2">
+      <table id="table_columns_tab_corrections_filter2">
         <!-- dynamically generated in js -->
       </table>
     </div>
     <div class="form__group button__group">
-      <a class="button secondary close" id="btn_close_modal_columns_tab_errors">Fermer</a>
+      <a class="button secondary close" id="btn_close_modal_columns_tab_corrections">Fermer</a>
     </div>
   </div>
 </div>
 
-<div class="modal__backdrop" id="modal_columns_tab_received">
+<div class="modal__backdrop" id="modal_columns_tab_in">
   <div class="modal">
     <div class="flex-container">
-      <table id="table_columns_tab_received_filter">
+      <table id="table_columns_tab_in_filter">
         <!-- dynamically generated in js -->
       </table>
-      <table id="table_columns_tab_received_filter2">
+      <table id="table_columns_tab_in_filter2">
         <!-- dynamically generated in js -->
       </table>
     </div>
     <div class="form__group button__group">
-      <a class="button secondary close" id="btn_close_modal_columns_tab_received">Fermer</a>
+      <a class="button secondary close" id="btn_close_modal_columns_tab_in">Fermer</a>
     </div>
   </div>
 </div>
