@@ -6,6 +6,8 @@ const received_selected_rows = []
 const columns_definitions = {
 'checkbox': {title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, read_only: true, render: (data, type, full, meta) => { return '<td><input type="checkbox" /></td>'}} ,
 'id': {title:'ID', hidden:true, can_hide: true, read_only: true, render: (data, type, full, meta) => { return full.pk }} ,
+'period': {title:'Période', hidden:true, can_hide: true, read_only: true, render: (data, type, full, meta) => { return full.fields.lot.period }} ,
+'carbure_id': {title:'Numéro de lot', hidden:true, can_hide: true, read_only: true, render: (data, type, full, meta) => { return full.fields.lot.carbure_id }} ,
 'producer': {title:'Producteur', hidden: true, can_filter: true, filter_title: 'Producteur', can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.carbure_producer ? full.fields.lot.carbure_producer.name : full.fields.lot.unknown_producer }},
 'production_site': {title:'Site de<br /> Production', can_filter: true, filter_title: 'Site', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.lot.carbure_production_site ? full.fields.lot.carbure_production_site.name : full.fields.lot.unknown_production_site }},
 'production_country': {title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.lot.carbure_production_site ? full.fields.lot.carbure_production_site.country.code_pays : (full.fields.lot.unknown_production_country ? full.fields.lot.unknown_production_country.code_pays: "") }},
@@ -28,6 +30,7 @@ const columns_definitions = {
 'dae': {title:'N°Document douanier', can_hide: true, render: (data, type, full, meta) => {return full.fields.dae}},
 'champ_libre': {title:'Champ libre', can_hide: true, can_filter: true, orderable: false, tooltip: 'Champ libre - Référence client', render: (data, type, full, meta) => {return full.fields.champ_libre}},
 'delivery_date': {title:'Date de livraison', can_hide: true, render: (data, type, full, meta) => {return full.fields.delivery_date}},
+'delivery_status': {title:'Statut', can_hide: true, render: (data, type, full, meta) => {return full.fields.delivery_status}},
 'client': {title:'Client', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => {return full.fields.carbure_client ? full.fields.carbure_client.name : full.fields.unknown_client}},
 'delivery_site': {title:'Site de livraison', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => {return full.fields.carbure_delivery_site ? full.fields.carbure_delivery_site.name : full.fields.unknown_delivery_site }},
 }
@@ -36,26 +39,8 @@ const producer_columns_drafts = ['checkbox', 'id', 'producer', 'production_site'
 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'dae', 'champ_libre', 'delivery_date', 'client', 'delivery_site']
 
 
-const table_columns_corrections_v2 = [
-{title:'Période', can_hide: true, data:'period'},
-{title:'Numéro de lot', can_hide: true, data:'carbure_id'},
-{title:'Producteur', hidden: true, can_hide: true, render: (data, type, full, meta) => { return full.fields.producer_is_in_carbure ? full.fields.carbure_producer.name : full.fields.unknown_producer }},
-{title:'Site de<br /> Production', filter_title: 'Site', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.name : full.fields.unknown_production_site }},
-{title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.production_site_is_in_carbure ? full.fields.carbure_production_site.country.code_pays : (full.fields.unknown_production_country ? full.fields.unknown_production_country.code_pays: "") }},
-{title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, data: 'volume'},
-{title:'Biocarburant', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.biocarburant.name }},
-{title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.matiere_premiere.name }},
-{title:`Pays<br /> d'origine`, filter_title: 'Pays', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.pays_origine.code_pays }},
-{title:'E', can_hide: true, is_read_only: true, data: 'ghg_total', tooltip: 'Total des émissions résultant de l\'utilisation du carburant'},
-{title:'% de réduction', can_hide: true, is_read_only: true, data: 'ghg_reduction'},
-{title:'N°Document douanier', can_hide: true, render: (data, type, full, meta) => {return full.tx.fields.dae}},
-{title:'Champ libre', can_hide: true, can_filter: true, orderable: false, tooltip: 'Champ libre - Référence client', render: (data, type, full, meta) => {return full.tx.fields.champ_libre}},
-{title:'Date de livraison', can_hide: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_date}},
-{title:'Client', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => {return full.tx.fields.client_is_in_carbure ? full.tx.fields.carbure_client.name : full.tx.fields.unknown_client}},
-{title:'Site de livraison', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => {return full.tx.fields.delivery_site_is_in_carbure ? full.tx.fields.carbure_delivery_site.name : full.tx.fields.unknown_delivery_site }},
-{title:'Status', can_hide: true, can_filter: true, orderable: true, render: (data, type, full, meta) => {return full.tx.fields.delivery_status}},
-]
-
+const producer_columns_corrections = ['delivery_status', 'period', 'carbure_id', 'producer', 'production_site', 'production_country', 'volume', 'biocarburant', 'matiere_premiere',
+'pays_origine', 'ghg_total', 'ghg_reduction', 'dae', 'champ_libre', 'delivery_date', 'client', 'delivery_site']
 
 const table_columns_received_v2 = [
 {title:'<input name="select_all" value="1" type="checkbox">', can_hide: false, read_only: true, data:'checkbox'},
@@ -1009,8 +994,7 @@ $('input[type=radio][name=delivery_site_is_in_carbure][value=no]').change(functi
   delivery_site_is_in_carbure(false)
 })
 
-function display_producers_lot_draft_modal(table, columns, event) {
-  console.log(`clicked on producers draft lot`)
+function display_lot_modal(table, columns, event) {
   // check if we clicked on the checkbox
   let colid = event.target._DT_CellIndex.column
   let rowid = event.target._DT_CellIndex.row
@@ -1138,240 +1122,17 @@ function display_producers_lot_draft_modal(table, columns, event) {
     $("#ghg_reduction").html(`${lot.ghg_reduction}%`)
     $("#ghg_reference").val(lot.ghg_reference)
     $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${lot.ghg_reference} gCO2eq/MJ`)
-    modal.style.display = "flex"
-  }
-}
 
-function display_generic_lot_received_modal(table, columns, event) {
-  // check if we clicked on the checkbox
-  let colid = event.target._DT_CellIndex.column
-  let rowid = event.target._DT_CellIndex.row
-  let data = table.row(rowid).data()
-  let table_column = columns[colid]
-  let comments_section = $("#comments_section")
-  comments_section.empty()
-  $("#btn_close_modal_lot_check").on('click', function() {
-    let modal = document.getElementById('modal_lot')
-    modal.style.display = 'none';
-  })
-
-  if (table_column['data'] === 'checkbox') {
-    // ignore clicks on checkbox column
-    return
-  } else {
-    let modal = document.getElementById("modal_lot")
-    console.log(data)
-    $("#save_section").hide()
-    $("#correct_section").hide()
-    $("#check_section").show()
-    $("#lot_id").val(data.pk)
-    $("#tx_id").val(data.tx.pk)
-
-    if (data.fields.producer_is_in_carbure) {
-      producer_is_in_carbure(true)
-    } else {
-      producer_is_in_carbure(false)
-    }
-
-    $("#carbure_producer_name").val(data.fields.carbure_producer ? data.fields.carbure_producer.name : '')
-    $("#carbure_producer_id").val(data.fields.carbure_producer ? data.fields.carbure_producer.id : '')
-    $("#carbure_production_site_name").val(data.fields.carbure_production_site ? data.fields.carbure_production_site.name : '')
-    $("#carbure_production_site_id").val(data.fields.carbure_production_site ? data.fields.carbure_production_site.id : '')
-    $("#unknown_producer_name").val(data.fields.unknown_producer)
-    $("#unknown_production_site_name").val(data.fields.unknown_production_site)
-    $("#unknown_production_site_country").val(data.fields.unknown_production_country ? data.fields.unknown_production_country.name : '')
-    $("#unknown_production_site_country_code").val(data.fields.unknown_production_country ? data.fields.unknown_production_country.code_pays : '')
-
-    $("#unknown_production_site_com_date").val(data.fields.unknown_production_site_com_date)
-    $("#unknown_production_site_reference").val(data.fields.unknown_production_site_reference)
-    $("#unknown_production_site_dbl_counting").val(data.fields.unknown_production_site_dbl_counting)
-
-
-
-    $("#volume").val(data.fields.volume)
-    $("#biocarburant").val(data.fields.biocarburant ? data.fields.biocarburant.name : '')
-    $("#biocarburant_code").val(data.fields.biocarburant ? data.fields.biocarburant.code : '')
-    $("#matiere_premiere").val(data.fields.matiere_premiere ? data.fields.matiere_premiere.name : '')
-    $("#matiere_premiere_code").val(data.fields.matiere_premiere ? data.fields.matiere_premiere.code : '')
-    $("#pays_origine").val(data.fields.pays_origine ? data.fields.pays_origine.name : '')
-    $("#pays_origine_code").val(data.fields.pays_origine ? data.fields.pays_origine.code_pays : '')
-    /* TX Related fields */
-    $("#dae").val(data.tx.fields.dae)
-
-    if (data.tx.fields.client_is_in_carbure) {
-      client_is_in_carbure(true)
-    } else {
-      client_is_in_carbure(false)
-    }
-    if (data.tx.fields.delivery_site_is_in_carbure) {
-      delivery_site_is_in_carbure(true)
-    } else {
-      delivery_site_is_in_carbure(false)
-    }
-
-    $("#carbure_client").val(data.tx.fields.carbure_client ? data.tx.fields.carbure_client.name : '')
-    $("#carbure_client_id").val(data.tx.fields.carbure_client ? data.tx.fields.carbure_client.id : '')
-    $("#carbure_delivery_site").val(data.tx.fields.carbure_delivery_site ? data.tx.fields.carbure_delivery_site.name : '')
-    $("#carbure_delivery_site_id").val(data.tx.fields.carbure_delivery_site ? data.tx.fields.carbure_delivery_site.depot_id : '')
-    $("#unknown_client").val(data.tx.fields.unknown_client)
-    $("#unknown_delivery_site").val(data.tx.fields.unknown_delivery_site)
-    $("#unknown_delivery_site_country").val(data.tx.fields.unknown_delivery_site_country ? data.tx.fields.unknown_delivery_site_country.name : '')
-    $("#unknown_delivery_site_country_code").val(data.tx.fields.unknown_delivery_site_country ? data.tx.fields.unknown_delivery_site_country.code_pays : '')
-    $("#delivery_date").val(data.tx.fields.delivery_date)
-    $("#champ_libre").val(data.tx.fields.champ_libre)
-
-    /* Greenhouse gases values */
-    $("#eec").val(data.fields.eec)
-    $("#el").val(data.fields.el)
-    $("#ep").val(data.fields.ep)
-    $("#etd").val(data.fields.etd)
-    $("#eu").val(data.fields.eu)
-    $("#esca").val(data.fields.esca)
-    $("#eccs").val(data.fields.eccs)
-    $("#eccr").val(data.fields.eccr)
-    $("#eee").val(data.fields.eee)
-
-    // non-input keys
-    $("#ghg_total").html(data.fields.ghg_total)
-    $("#ghg_reduction").html(`${data.fields.ghg_reduction}%`)
-    $("#ghg_reference").val(data.fields.ghg_reference)
-    $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data.fields.ghg_reference} gCO2eq/MJ`)
-
-    console.log(`comments on lot: ${data.comments}`)
-    for (let i = 0, len = data.comments.length; i < len; i++) {
-      let c = comments[i]
-      let html = `<dd><b>${c.fields.entity.name}</b>: ${c.fields.comment}</dd>`
-      comments_section.append(html)
-    }
-    comments_section.append(`<dd><input id="new_comment" type="text" placeholder="Commentaire" /></dd>`)
-    modal.style.display = "flex"
-  }
-}
-
-function display_producers_lot_correction_modal(table, columns, event) {
-  // check if we clicked on the checkbox
-  let colid = event.target._DT_CellIndex.column
-  let rowid = event.target._DT_CellIndex.row
-  let data = table.row(rowid).data()
-  let table_column = columns[colid]
-  let comments_section = $("#comments_list")
-  comments_section.empty()
-  $("#btn_close_modal_lot_correct").on('click', function() {
-    let modal = document.getElementById('modal_lot')
-    modal.style.display = 'none';
-  })
-
-  if (table_column['data'] === 'checkbox') {
-    // ignore clicks on checkbox column
-    return
-  } else {
-    let modal = document.getElementById("modal_lot")
-    console.log(data)
-    $("#save_section").hide()
-    $("#check_section").hide()
-    $("#correct_section").show()
-    $("#lot_id").val(data.pk)
-    $("#tx_id").val(data.tx.pk)
-
-    if (data.fields.producer_is_in_carbure) {
-      producer_is_in_carbure(true)
-    } else {
-      producer_is_in_carbure(false)
-    }
-
-    $("#carbure_producer_name").val(data.fields.carbure_producer ? data.fields.carbure_producer.name : '')
-    $("#carbure_producer_id").val(data.fields.carbure_producer ? data.fields.carbure_producer.id : '')
-    $("#carbure_production_site_name").val(data.fields.carbure_production_site ? data.fields.carbure_production_site.name : '')
-    $("#carbure_production_site_id").val(data.fields.carbure_production_site ? data.fields.carbure_production_site.id : '')
-    $("#unknown_producer_name").val(data.fields.unknown_producer)
-    $("#unknown_production_site_name").val(data.fields.unknown_production_site)
-    $("#unknown_production_site_country").val(data.fields.unknown_production_country ? data.fields.unknown_production_country.name : '')
-    $("#unknown_production_site_country_code").val(data.fields.unknown_production_country ? data.fields.unknown_production_country.code_pays : '')
-
-    $("#unknown_production_site_com_date").val(data.fields.unknown_production_site_com_date)
-    $("#unknown_production_site_reference").val(data.fields.unknown_production_site_reference)
-    $("#unknown_production_site_dbl_counting").val(data.fields.unknown_production_site_dbl_counting)
-
-
-
-    $("#volume").val(data.fields.volume)
-    $("#biocarburant").val(data.fields.biocarburant ? data.fields.biocarburant.name : '')
-    $("#biocarburant_code").val(data.fields.biocarburant ? data.fields.biocarburant.code : '')
-    $("#matiere_premiere").val(data.fields.matiere_premiere ? data.fields.matiere_premiere.name : '')
-    $("#matiere_premiere_code").val(data.fields.matiere_premiere ? data.fields.matiere_premiere.code : '')
-    $("#pays_origine").val(data.fields.pays_origine ? data.fields.pays_origine.name : '')
-    $("#pays_origine_code").val(data.fields.pays_origine ? data.fields.pays_origine.code_pays : '')
-    /* TX Related fields */
-    $("#dae").val(data.tx.fields.dae)
-
-    if (data.tx.fields.client_is_in_carbure) {
-      client_is_in_carbure(true)
-    } else {
-      client_is_in_carbure(false)
-    }
-    if (data.tx.fields.delivery_site_is_in_carbure) {
-      delivery_site_is_in_carbure(true)
-    } else {
-      delivery_site_is_in_carbure(false)
-    }
-
-
-    $("#carbure_client").val(data.tx.fields.carbure_client ? data.tx.fields.carbure_client.name : '')
-    $("#carbure_client_id").val(data.tx.fields.carbure_client ? data.tx.fields.carbure_client.id : '')
-    $("#carbure_delivery_site").val(data.tx.fields.carbure_delivery_site ? data.tx.fields.carbure_delivery_site.name : '')
-    $("#carbure_delivery_site_id").val(data.tx.fields.carbure_delivery_site ? data.tx.fields.carbure_delivery_site.depot_id : '')
-    $("#unknown_client").val(data.tx.fields.unknown_client)
-    $("#unknown_delivery_site").val(data.tx.fields.unknown_delivery_site)
-    $("#unknown_delivery_site_country").val(data.tx.fields.unknown_delivery_site_country ? data.tx.fields.unknown_delivery_site_country.name : '')
-    $("#unknown_delivery_site_country_code").val(data.tx.fields.unknown_delivery_site_country ? data.tx.fields.unknown_delivery_site_country.code_pays : '')
-    $("#delivery_date").val(data.tx.fields.delivery_date)
-    $("#champ_libre").val(data.tx.fields.champ_libre)
-
-    /* Greenhouse gases values */
-    $("#eec").val(data.fields.eec)
-    $("#el").val(data.fields.el)
-    $("#ep").val(data.fields.ep)
-    $("#etd").val(data.fields.etd)
-    $("#eu").val(data.fields.eu)
-    $("#esca").val(data.fields.esca)
-    $("#eccs").val(data.fields.eccs)
-    $("#eccr").val(data.fields.eccr)
-    $("#eee").val(data.fields.eee)
-
-    // non-input keys
-    $("#ghg_total").html(data.fields.ghg_total)
-    $("#ghg_reduction").html(`${data.fields.ghg_reduction}%`)
-    $("#ghg_reference").val(data.fields.ghg_reference)
-    $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${data.fields.ghg_reference} gCO2eq/MJ`)
-
-    /* load comments */
-    $.ajax({
-      url         : window.producers_api_lot_corrections_v2,
-      data        : {'tx_id': data.tx.pk, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value},
-      type        : 'POST',
-      success     : function(d, textStatus, jqXHR){
-        // Callback code
-        // load existing comments into the form
-        let comments = JSON.parse(d.comments)
-        console.log(`comments: ${JSON.stringify(comments)}`)
-        for (let i = 0, len = comments.length; i < len; i++) {
-          let c = comments[i]
-          let html = `<dd><b>${c.fields.entity.name}</b>: ${c.fields.comment}</dd>`
-          comments_section.append(html)
-        }
-        comments_section.append(`<dd><input id="new_comment" type="text" placeholder="Commentaire" /></dd>`)
-      },
-      error       : function(e) {
-        if (e.status === 400) {
-          alert(e.responseJSON.message)
-          console.log(`server error ${JSON.stringify(e.responseJSON.extra)}`)
-        } else {
-          alert("Server error. Please contact an administrator")
-          console.log(`server error ${JSON.stringify(e)}`)
-        }
+    if (data.comments.length) {
+      console.log(`comments on lot: ${data.comments}`)
+      for (let i = 0, len = data.comments.length; i < len; i++) {
+        let c = comments[i]
+        console.log(c)
+        let html = `<dd><b>${c.fields.entity.name}</b>: ${c.fields.comment}</dd>`
+        comments_section.append(html)
       }
-    })
-
+      comments_section.append(`<dd><input id="new_comment" type="text" placeholder="Commentaire" /></dd>`)
+    }
     modal.style.display = "flex"
   }
 }
@@ -1639,7 +1400,14 @@ function parseApiFetchResponse(res) {
       comments = JSON.parse(res['comments'])
       for (let i = 0, len = comments.length; i < len; i++) {
         let comment = comments[i]
-        data[comment.fields.tx.id].comments.push(comment)
+        console.log(comment)
+        let txid = comment.fields.tx
+        if (data[txid] !== undefined) {
+          data[txid].comments.push(comment)
+        } else {
+          console.log(`Error. got comment on txid ${txid} but did not get associated tx.`)
+          console.log(data)
+        }
       }
     }
     list = Object.values(data)
@@ -1687,7 +1455,7 @@ const dt_producers_drafts_config = {
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_producers_lot_draft_modal(table, producer_columns_drafts, e)
+      display_lot_modal(table, producer_columns_drafts, e)
     })
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
@@ -1695,6 +1463,57 @@ const dt_producers_drafts_config = {
     initFilters(producer_columns_drafts, "tab_drafts")
     handleTableEvents(table, tbl_id, manage_actions_producers_drafts)
     manage_actions_producers_drafts()
+  }
+}
+
+
+const dt_producers_corrections_columns = []
+for (let i = 0, len = producer_columns_corrections.length; i < len; i++) {
+  let colname = producer_columns_corrections[i]
+  dt_producers_corrections_columns.push(columns_definitions[colname])
+}
+
+
+const dt_producers_corrections_config = {
+  is_complex_dt: true,
+  id: "datatable_corrections",
+  url: window.api_get_corrections,
+  col_definition: dt_producers_corrections_columns,
+  paging: true,
+  info: true,
+  dom: 'rtp',
+  columnDefs: [
+    {
+      targets: [0],
+      searchable:false,
+      orderable:false,
+      width:'1%',
+      className: 'dt-body-center',
+      render: function (data, type, full, meta) {
+        return '<input type="checkbox">';
+      }
+    },
+    {
+      className: "dt-center",
+      targets: "_all",
+      render: function (data, type, full, meta) {
+        let col_name = producer_columns_corrections[meta.col]
+        let cd = columns_definitions[col_name]
+        return cd['render'](full)
+      }
+    },
+  ],
+  order: [[ 1, 'desc' ]],
+  ajax_dataSrc: parseApiFetchResponse,
+  post_init: function(table) {
+    let tbl_id = table.table().node().id
+    $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
+      display_lot_modal(table, producer_columns_corrections, e)
+    })
+    $('#input_search_datatable').on('keyup', function() {
+        table.search(this.value).draw();
+    })
+    initFilters(producer_columns_corrections, "tab_corrections")
   }
 }
 
@@ -1748,7 +1567,7 @@ const dt_received_config = {
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_generic_lot_received_modal(table, table_columns_received_v2, e)
+      display_lot_modal(table, table_columns_received_v2, e)
     })
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
@@ -1809,63 +1628,13 @@ const dt_mb_config = {
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_producers_lot_modal(table, table_columns_mb_v2, e)
+      display_lot_modal(table, table_columns_mb_v2, e)
     })
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
     })
     initFilters(table_columns_mb_v2, "tab_mb")
     handleTableEvents(table, tbl_id)
-  }
-}
-
-const dt_errors_config = {
-  is_complex_dt: true,
-  id: "datatable_corrections",
-  url: window.producers_api_lots_corrections_v2,
-  col_definition: table_columns_corrections_v2,
-  paging: true,
-  info: true,
-  dom: 'rtp',
-  columnDefs: [
-    {
-      className: "dt-center",
-      targets: "_all",
-      render: function (data, type, full, meta) {
-        let col_name = table_columns_corrections_v2[meta.col].data
-        if (table_columns_corrections_v2[meta.col]['render'] != undefined) {
-      return table_columns_corrections_v2[meta.col]['render'](full)
-        }
-        return full['fields'][col_name]
-      }
-    },
-  ],
-  order: [[ 1, 'desc' ]],
-  ajax_dataSrc: function(res) {
-    data = {}
-    lots = JSON.parse(res['lots'])
-    for (let i = 0, len = lots.length; i < len; i++) {
-      let lot = lots[i]
-      data[lot.pk] = lot
-    }
-    txs = JSON.parse(res['transactions'])
-    for (let i = 0, len = txs.length; i < len; i++) {
-      let tx = txs[i]
-      data[tx.fields.lot.id].tx = tx
-    }
-    list = Object.values(data)
-    return list
-  },
-  post_init: function(table) {
-    let tbl_id = table.table().node().id
-    $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_producers_lot_correction_modal(table, table_columns_corrections_v2, e)
-    })
-    initFilters(table_columns_corrections_v2, "tab_errors")
-
-    $('#input_search_datatable').on('keyup', function() {
-        table.search(this.value).draw();
-    })
   }
 }
 
@@ -1909,7 +1678,7 @@ const dt_valid_config = {
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_producers_lot_modal(table, table_columns_valid_v2, e)
+      display_lot_modal(table, table_columns_valid_v2, e)
     })
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
@@ -1956,7 +1725,7 @@ const dt_mb_drafts_config = {
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_producers_lot_draft_modal(table, table_columns_mb_drafts_v2, e)
+      display_lot_modal(table, table_columns_mb_drafts_v2, e)
     })
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
@@ -2024,7 +1793,7 @@ const dt_operators_drafts_config = {
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_producers_lot_draft_modal(table, operators_table_columns_drafts_v2, e)
+      display_lot_modal(table, operators_table_columns_drafts_v2, e)
     })
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
@@ -2071,7 +1840,7 @@ const dt_operators_in_config = {
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_generic_lot_received_modal(table, operators_table_columns_in_v2, e)
+      display_lot_modal(table, operators_table_columns_in_v2, e)
     })
     handleTableEvents(table, tbl_id)
 
@@ -2128,7 +1897,7 @@ const dt_operators_out_config = {
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_producers_lot_modal(table, operators_table_columns_out_v2, e)
+      display_lot_modal(table, operators_table_columns_out_v2, e)
     })
     handleTableEvents(table, tbl_id)
   }
@@ -2191,7 +1960,7 @@ const dt_traders_drafts_config = {
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_producers_lot_draft_modal(table, traders_columns_drafts, e)
+      display_lot_modal(table, traders_columns_drafts, e)
     })
     initFilters(table_columns_drafts_v2, "tab_drafts")
     handleTableEvents(table, tbl_id)
@@ -2235,7 +2004,7 @@ const dt_traders_in_config = {
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_generic_lot_received_modal(table, traders_columns_in, e)
+      display_lot_modal(table, traders_columns_in, e)
     })
     initFilters(table_columns_drafts_v2, "tab_drafts")
     handleTableEvents(table, tbl_id)
@@ -2259,8 +2028,9 @@ const dt_traders_out_config = {
 
 // producer
 dt_config['tab_drafts'] = dt_producers_drafts_config
+dt_config['tab_corrections'] = dt_producers_corrections_config
+
 dt_config['tab_received'] = dt_received_config
-dt_config['tab_errors'] = dt_errors_config
 dt_config['tab_mb'] = dt_mb_config
 dt_config['tab_mb_drafts'] = dt_mb_drafts_config
 dt_config['tab_valid'] = dt_valid_config
