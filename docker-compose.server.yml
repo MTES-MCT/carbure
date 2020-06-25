@@ -91,7 +91,10 @@ services:
     - 3000:3000
     networks:
     - carbure
-
+    volumes:
+    - ./metabase:/metabase-data
+    environment:
+      MB_DB_FILE: "/metabase-data/metabase.db"
 
 volumes:
   carburedb:
