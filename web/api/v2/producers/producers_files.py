@@ -747,7 +747,7 @@ def export_histo(request, *args, **kwargs):
     today = datetime.datetime.now()
     filename = 'export_histo_%s.csv' % (today.strftime('%Y%m%d_%H%M%S'))
 
-    transactions = LotTransaction.objects.filter(carbure_vendor=context['user_entity'], delivery_status='A', lot__status="Validated")
+    transactions = LotTransaction.objects.filter(carbure_vendor=context['user_entity'], lot__status='Validated')
     buffer = io.BytesIO()
     header = "carbure_id;producer;production_site;production_site_country;production_site_reference;production_site_commissioning_date;double_counting_registration;volume;biocarburant_code;\
               matiere_premiere_code;pays_origine_code;eec;el;ep;etd;eu;esca;eccs;eccr;eee;e;dae;champ_libre;client;delivery_date;delivery_site;delivery_site_country\n"

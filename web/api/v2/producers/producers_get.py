@@ -70,7 +70,7 @@ def get_corrections(request, *args, **kwargs):
 @restrict_to_producers
 def get_out(request, *args, **kwargs):
     context = kwargs['context']
-    transactions = list(LotTransaction.objects.filter(carbure_vendor=context['user_entity'], lot__status='Validated'))
+    transactions = LotTransaction.objects.filter(carbure_vendor=context['user_entity'], lot__status='Validated')
     comments = TransactionComment.objects.filter(tx__in=transactions)
     txsez = serializers.serialize('json', transactions, use_natural_foreign_keys=True)
     commentssez = serializers.serialize('json', comments, use_natural_foreign_keys=True)
