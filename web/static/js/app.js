@@ -677,7 +677,7 @@ function manage_actions_mb_drafts() {
 }
 
 function manage_fuse_button_mb() {
-  if (selected_mb.length > 0) {
+  if (selected_mb.length > 1) {
     $("#btn_open_modal_fuse_lots").addClass('primary')
     $("#btn_open_modal_fuse_lots").css("pointer-events", "auto")
     $("#btn_open_modal_fuse_lots").removeClass('secondary')
@@ -687,7 +687,7 @@ function manage_fuse_button_mb() {
       let rowdata = window.table.row(selected_mb[i]).data()
       let lot = rowdata.fields.lot
       to_fuse.push(rowdata.pk)
-      $("#modal_fuse_lots_list").append(`<li>${lot.producer_is_in_carbure ? lot.carbure_producer.name : lot.unknown_producer} - ${lot.volume} - ${lot.biocarburant.name} - ${lot.matiere_premiere.name}</li>`)
+      $("#modal_fuse_lots_list").append(`<li>${lot.carbure_producer ? lot.carbure_producer.name : lot.unknown_producer} - ${lot.volume} - ${lot.biocarburant.name} - ${lot.matiere_premiere.name}</li>`)
       $("#modal_fuse_lots_txids").val(to_fuse.join(","))
     }
   } else {
@@ -1322,10 +1322,11 @@ function handleTableEvents(table, tbl_id, cb, selection_array) {
 
   // Handle click on "Select all" control
   $('thead input[name="select_all"]', table.table().container()).on('click', function(e) {
+  	console.log(`clicked select all`)
     if (this.checked) {
-       $('#datatable_drafts tbody input[type="checkbox"]:not(:checked)').trigger('click')
+       $(`#${tbl_id} tbody input[type="checkbox"]:not(:checked)`).trigger('click')
     } else {
-       $('#datatable_drafts tbody input[type="checkbox"]:checked').trigger('click')
+       $(`#${tbl_id} tbody input[type="checkbox"]:checked`).trigger('click')
     }
     // Prevent click event from propagating to parent
     e.stopPropagation()

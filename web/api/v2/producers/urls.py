@@ -37,6 +37,7 @@ urlpatterns = [
     path('lot/add-corrections', producers_post.add_lot_correction, name='api-v2-producers-add-lot-correction'),
     path('lot/mb/delete-drafts', producers_post.delete_mb_drafts_lots, name='api-v2-producers-delete-mb-drafts'),
     path('lot/mb/validate-drafts', producers_post.validate_mb_drafts_lots, name='api-v2-producers-validate-mb-drafts-lots'),
+    path('lot/mb/fuse', producers_post.fuse_mb_lots, name='api-v2-producers-fuse-mb-lots'),
 
 
     # misc

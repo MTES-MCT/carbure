@@ -187,6 +187,29 @@
   </div>
 </div>
 
+<div class="modal__backdrop" id="modal_fuse_lots">
+  <div class="modal">
+    <a class="close" id="btn_close_modal_fuse_lots_top" style="opacity: 0.5; margin: -1rem -1rem -1rem auto; float: right;">
+      <svg class="icon" style="height:24px; width:24px">
+        <use xlink:href="#cross"></use>
+      </svg>
+    </a>
+    <span id="modal_fuse_lots_form_err_message" style="color: red;"></span>
+    <span id="modal_fuse_lots_form_success_message" style="color: green;"></span>
+    <form id="modal_fuse_lots_form" method="POST" data-url="{% url 'api-v2-producers-fuse-mb-lots' %}">
+      {% csrf_token %}
+      <p><b>En validant le(s) lot(s) suivant(s), je certifie qu'ils respectent les critères du durabilité liés aux terres et que les informations renseignées sont réelles et valides.</b></p>
+      <ul id="modal_fuse_lots_list">
+      </ul>
+      <input type="hidden" id="modal_fuse_lots_lots" name="txids">
+      <div class="form__group button__group">
+        <button type="submit" class="button">Valider</button>
+        <a class="button secondary close" id="btn_close_modal_fuse_lots_bottom">Annuler</a>
+      </div>
+    </form>
+  </div>
+</div>
+
 {% include "common/modal_lot.html" %}
 
 

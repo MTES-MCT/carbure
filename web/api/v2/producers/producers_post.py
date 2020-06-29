@@ -136,45 +136,27 @@ def generate_carbure_id(lot):
     return "%s%sP%s-%d" % (country, yymm, idprod, lot.id)
 
 
-def try_fuse_lots(context, tx):
-    lot = tx.lot
-    # if we are the client, check if we can fuse lots in the mass balance
-    if tx.carbure_client == context['user_entity'] and tx.delivery_site_is_in_carbure:
-        similar_lots_stored_there = LotTransaction.objects.filter(carbure_delivery_site=tx.carbure_delivery_site,
-                                                                  lot__biocarburant=tx.lot.biocarburant,
-                                                                  lot__matiere_premiere=tx.lot.matiere_premiere,
-                                                                  lot__ghg_total=tx.lot.ghg_total,
-                                                                  lot__status='Validated',
-                                                                  delivery_status='A')
-        if len(similar_lots_stored_there) > 1:
-            new_lot = LotV2()
-            new_lot.period = tx.lot.period
-            new_lot.biocarburant = tx.lot.biocarburant
-            new_lot.matiere_premiere = tx.lot.matiere_premiere
-            new_lot.ghg_total = tx.lot.ghg_total
-            new_lot.ghg_reference = tx.lot.ghg_reference
-            new_lot.ghg_reduction = tx.lot.ghg_reduction
-            new_lot.status = "Validated"
-            new_lot.is_fused = True
-            # save here to get the object id, needed for carbure_id
-            new_lot.save()
-            new_lot.carbure_id = generate_carbure_id(new_lot) + 'F'
-            for tx in similar_lots_stored_there:
-                tx.lot.is_fused = True
-                tx.lot.fused_with = new_lot
-                tx.lot.save()
-                new_lot.volume += tx.lot.volume
-            new_lot.save()
-            new_tx = LotTransaction()
-            new_tx.lot = new_lot
-            new_tx.client_is_in_carbure = True
-            new_tx.carbure_client = tx.carbure_client
-            new_tx.carbure_delivery_site = tx.carbure_delivery_site
-            new_tx.delivery_status = 'A'
-            new_tx.ghg_total = new_lot.ghg_total
-            new_tx.ghg_reduction = new_lot.ghg_reduction
-            new_tx.champ_libre = 'FUSIONNÉ'
-            new_tx.save()
+def fuse_lots(txs):
+    new_tx = txs[0]
+
+    # create a new lot from previous tx data
+    new_lot = new_tx.lot
+    new_lot.pk = 0
+    new_lot.volume = 0
+    new_lot.save()
+
+    # create a new TX
+    new_tx.pk = 0
+    new_tx.dae = ''
+    new_tx.lot = new_lot
+    new_tx.save()
+
+    for tx in txs:
+        new_lot.volume += tx.lot.volume
+        tx.lot.is_fused = True
+        tx.lot.fused_with = new_lot
+        tx.lot.save()
+    new_lot.carbure_id = generate_carbure_id(new_lot) + 'F'
 
 
 @login_required
@@ -209,10 +191,35 @@ def validate_lots(request, *args, **kwargs):
             tx.delivery_status = 'A'
             tx.save()
         tx.lot.save()
-        try_fuse_lots(context, tx)
         results.append({'tx_id': txid, 'status': 'success'})
     print(results)
     return JsonResponse({'status': 'success', 'message': results})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def fuse_mb_lots(request, *args, **kwargs):
+    context = kwargs['context']
+    txids = request.POST.get('txids', None)
+    if not txids:
+        return JsonResponse({'status': 'error', 'message': 'Aucune ligne sélectionnée'}, status=400)
+
+    ids = txids.split(',')
+    first = LotTransaction.objects.get(id=ids[0], lot__added_by=context['user_entity'], lot__status='Validated')
+    txs = LotTransaction.objects.filter(id__in=ids, lot__added_by=context['user_entity'], lot__status='Validated',
+                                        lot__biocarburant=first.lot.biocarburant, lot__matiere_premiere=first.lot.matiere_premiere,
+                                        lot__ghg_total=first.ghg_total, lot__pays_origine=first.lot.pays_origine, delivery_site=first.delivery_site,
+                                        lot__carbure_producer=first.lot.carbure_producer, lot__unknown_producer=first.lot.unknown_producer,
+                                        lot__carbure_production_site=first.lot.carbure_production_site, lot__unknown_production_site=first.lot.unknown_production_site)
+    if len(txs) == len(txids):
+        # ok. all lots have the same sustainability details, we can merge them
+        fuse_lots(txs)
+        return JsonResponse({'status': 'success'})
+    else:
+        print(ids)
+        print(txs)
+        return JsonResponse({'status': 'error', 'message': "Fusion impossible. Les données de durabilité diffèrent.", 'extra': str(e)}, status=400)
 
 
 @login_required
@@ -320,7 +327,6 @@ def accept_lot(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Transaction inconnue", 'extra': str(e)}, status=400)
     tx.delivery_status = 'A'
     tx.save()
-    try_fuse_lots(context, tx)
     return JsonResponse({'status': 'success', 'tx_id': tx.id})
 
 
@@ -342,7 +348,6 @@ def accept_lots(request, *args, **kwargs):
             return JsonResponse({'status': 'error', 'message': "Transaction inconnue", 'extra': str(e)}, status=400)
         tx.delivery_status = 'A'
         tx.save()
-        try_fuse_lots(context, tx)
     return JsonResponse({'status': 'success'})
 
 

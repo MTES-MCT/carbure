@@ -389,19 +389,24 @@ def load_excel_mb_lot(context, lot_row):
         print('Could not get lot with carbure_id %s' % (carbure_id))
         print(e)
         return False
-    source_lot = source_tx.lot
-    if source_tx.carbure_client == context['user_entity'] and source_tx.delivery_status == 'A' and source_lot.fused_with is None:
+    source_lot = LotV2.objects.get(id=source_tx.lot.id)
+    lot = source_tx.lot
+    if source_tx.carbure_client == context['user_entity'] and source_tx.delivery_status == 'A' and lot.fused_with is None:
         # good
         pass
     else:
         return False
 
     # okay, source lot exists and is in this user's mass balance
-    # create draft
-    lot = LotV2()
+    # duplicate lot
+    lot.pk = None
     lot.parent_lot = source_lot
     lot.added_by = entity
     lot.added_by_user = context['user']
+    lot.status = 'Draft'
+    lot.carbure_id = ''
+    lot.is_fused = False
+    lot.source = 'EXCEL'
     lot.save()
 
     if 'volume' in lot_row:
@@ -416,12 +421,6 @@ def load_excel_mb_lot(context, lot_row):
     else:
         e, c = LotV2Error.objects.update_or_create(lot=lot, field='volume',
                                                    error='Merci de préciser un volume', defaults={'value': volume})
-    lot.source = 'EXCEL'
-    lot.ghg_total = source_lot.ghg_total
-    lot.ghg_reduction = source_lot.ghg_reduction
-    lot.biocarburant = source_lot.biocarburant
-    lot.matiere_premiere = source_lot.matiere_premiere
-    lot.pays_origine = source_lot.pays_origine
     lot.save()
 
     transaction = LotTransaction()
