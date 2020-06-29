@@ -15,6 +15,7 @@ urlpatterns = [
     path('download-xlsx-template-mb', producers_files.excel_template_download_mb, name='api-v2-producers-excel-template-mb'),
     path('export/lots/drafts', producers_files.export_drafts, name='api-v2-producers-export-drafts'),
     path('export/lots/mb', producers_files.export_mb, name='api-v2-producers-export-mb'),
+    path('export/lots/histo', producers_files.export_histo, name='api-v2-producers-export-histo'),
 
     # GET
     path('lots/drafts', producers_get.get_drafts, name='api-v2-producers-get-drafts'),
