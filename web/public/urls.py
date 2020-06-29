@@ -7,5 +7,4 @@ urlpatterns = [
     path('annuaire', views.annuaire, name='annuaire'),
     path('htmlreference', views.htmlreference, name='htmlreference'),
     path('stats', views.stats, name='public-stats'),
-    path('stats/<str:bc_code>/<str:mp_code>', views.stats_details, name='public-stats-details'),
 ]
