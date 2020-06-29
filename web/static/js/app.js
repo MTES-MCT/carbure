@@ -932,7 +932,6 @@ $('input[type=radio][name=delivery_site_is_in_carbure][value=no]').change(functi
 
 function display_lot_modal(table, columns, event, display_type) {
   // check if we clicked on the checkbox
-  console.log(`display modal event target: ${event.target}`)
   let colid = event.target._DT_CellIndex.column
   let rowid = event.target._DT_CellIndex.row
   let data = table.row(rowid).data()
@@ -1662,7 +1661,7 @@ const dt_producers_out_config = {
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_lot_modal(table, producer_columns_out, e, 'draft')
+      display_lot_modal(table, producer_columns_out, e, 'mb')
     })
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
