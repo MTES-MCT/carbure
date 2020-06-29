@@ -48,7 +48,7 @@ def get_in(request, *args, **kwargs):
 @restrict_to_producers
 def get_mb(request, *args, **kwargs):
     context = kwargs['context']
-    transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='A', lot__status="Validated", lot__fused_with=None)
+    transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='A', lot__status="Validated", lot__fused_with=None, lot__volume__gt=0)
     txsez = serializers.serialize('json', transactions, use_natural_foreign_keys=True)
     return JsonResponse({'transactions': txsez})
 

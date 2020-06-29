@@ -137,26 +137,61 @@ def generate_carbure_id(lot):
 
 
 def fuse_lots(txs):
-    new_tx = txs[0]
-
-    # create a new lot from previous tx data
-    new_lot = new_tx.lot
-    new_lot.pk = 0
-    new_lot.volume = 0
+    new_lot = LotV2()
     new_lot.save()
 
-    # create a new TX
-    new_tx.pk = 0
-    new_tx.dae = ''
-    new_tx.lot = new_lot
-    new_tx.save()
-
+    total_volume = 0
     for tx in txs:
-        new_lot.volume += tx.lot.volume
+        total_volume += tx.lot.volume
         tx.lot.is_fused = True
         tx.lot.fused_with = new_lot
         tx.lot.save()
+
+    # fill lot details
+    lot = txs[0].lot
+    new_lot.volume = total_volume
+    new_lot.period = lot.period
+    new_lot.producer_is_in_carbure = lot.producer_is_in_carbure
+    new_lot.carbure_producer = lot.carbure_producer
+    new_lot.unknown_producer = lot.unknown_producer
+    new_lot.production_site_is_in_carbure = lot.production_site_is_in_carbure
+    new_lot.carbure_production_site = lot.carbure_production_site
+    new_lot.unknown_production_site = lot.unknown_production_site
+    new_lot.unknown_production_site_com_date = lot.unknown_production_site_com_date
+    new_lot.unknown_production_site_reference = lot.unknown_production_site_reference
+    new_lot.unknown_production_site_dbl_counting = lot.unknown_production_site_dbl_counting
+    new_lot.matiere_premiere = lot.matiere_premiere
+    new_lot.biocarburant = lot.biocarburant
+    new_lot.pays_origine = lot.pays_origine
+    new_lot.eec = lot.eec
+    new_lot.el = lot.el
+    new_lot.ep = lot.ep
+    new_lot.etd = lot.etd
+    new_lot.eu = lot.eu
+    new_lot.esca = lot.esca
+    new_lot.eccs = lot.eccs
+    new_lot.eccr = lot.eccr
+    new_lot.eee = lot.eee
+    new_lot.ghg_total = lot.ghg_total
+    new_lot.ghg_reduction = lot.ghg_reduction
+    new_lot.ghg_reference = lot.ghg_reference
+    new_lot.status = 'Validated'
+    new_lot.source = 'FUSION'
+    new_lot.added_by = lot.added_by
+    new_lot.added_by_user = lot.added_by_user
+    new_lot.is_fused = False
+    new_lot.fused_with = None
+    new_lot.save()
+
+    # create a new TX
+    new_tx = txs[0]
+    new_tx.pk = None
+    new_tx.dae = ''
+    new_tx.lot = new_lot
+    new_tx.save()
     new_lot.carbure_id = generate_carbure_id(new_lot) + 'F'
+    new_lot.save()
+    print('new lot of %d of %s id %s' % (new_lot.volume, new_lot.biocarburant.name, new_lot.carbure_id))
 
 
 @login_required
@@ -209,17 +244,17 @@ def fuse_mb_lots(request, *args, **kwargs):
     first = LotTransaction.objects.get(id=ids[0], lot__added_by=context['user_entity'], lot__status='Validated')
     txs = LotTransaction.objects.filter(id__in=ids, lot__added_by=context['user_entity'], lot__status='Validated',
                                         lot__biocarburant=first.lot.biocarburant, lot__matiere_premiere=first.lot.matiere_premiere,
-                                        lot__ghg_total=first.ghg_total, lot__pays_origine=first.lot.pays_origine, delivery_site=first.delivery_site,
+                                        lot__ghg_total=first.ghg_total, lot__pays_origine=first.lot.pays_origine, carbure_delivery_site=first.carbure_delivery_site,
                                         lot__carbure_producer=first.lot.carbure_producer, lot__unknown_producer=first.lot.unknown_producer,
                                         lot__carbure_production_site=first.lot.carbure_production_site, lot__unknown_production_site=first.lot.unknown_production_site)
-    if len(txs) == len(txids):
+    if len(txs) == len(ids):
         # ok. all lots have the same sustainability details, we can merge them
         fuse_lots(txs)
         return JsonResponse({'status': 'success'})
     else:
         print(ids)
         print(txs)
-        return JsonResponse({'status': 'error', 'message': "Fusion impossible. Les données de durabilité diffèrent.", 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Fusion impossible. Les données de durabilité diffèrent."}, status=400)
 
 
 @login_required
