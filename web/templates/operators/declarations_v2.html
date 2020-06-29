@@ -288,9 +288,11 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-window.operators_api_lots_drafts_v2 = "{% url 'api-v2-operators-get-drafts' %}"
-window.operators_api_lots_in_v2 = "{% url 'api-v2-operators-get-in' %}"
-window.operators_api_lots_out_v2 = "{% url 'api-v2-operators-get-out' %}"
+// API GET
+window.api_get_drafts = "{% url 'api-v2-operators-get-drafts' %}"
+window.api_get_in = "{% url 'api-v2-operators-get-in' %}"
+window.api_get_out = "{% url 'api-v2-operators-get-out' %}"
+
 window.api_lot_reject_v2 = "{% url 'api-v2-operators-reject-lot' %}"
 window.api_lot_accept_with_correction_v2 = "{% url 'api-v2-operators-accept-lot-with-correction' %}"
 window.api_lot_accept_v2 = "{% url 'api-v2-operators-accept-lot' %}"
@@ -300,7 +302,6 @@ $(document).ready(function() {
   tabcontent = document.getElementById("tab_operators_in")
   tabcontent.style.display = "block";
   init_tab_generic("tab_operators_in")
-  manage_actions_operators()
 })
 </script>
 {% endblock %}
