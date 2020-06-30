@@ -149,6 +149,10 @@
         </table>
       </div>
     </div>
+    <div class="form__group button__group" id="comments_section">
+      <dl id="comments_list">
+      </dl>
+    </div>
     <div class="form__group button__group" id="save_section">
       <a class="button primary" id="btn_lot_save">Sauvegarder</a>
       <a class="button secondary close" id="btn_close_modal_lot_save">Annuler</a>
@@ -164,14 +168,16 @@
       </div>
     </div>
     <div class="form__group" id="correct_section">
-      <dl id="comments_list">
+      <dl>
+        <dd><input id="new_comment" type="text" placeholder="Commentaire" /></dd>
       </dl>
+
       <div class="form__group button__group">
         <div class="button-item">
           <a class="button primary" id="btn_add_tx_comment">Sauvegarder</a>
         </div>
         <div class="button-item button-push">
-          <a class="button secondary close" id="btn_close_modal_lot_correct">Annuler</a>
+          <a class="button secondary close" id="btn_close_modal_lot">Annuler</a>
         </div>
       </div>
     </div>
