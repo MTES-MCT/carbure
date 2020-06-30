@@ -573,27 +573,10 @@ function manage_actions_in() {
 
 
 function manage_actions_operators_drafts() {
-  // bouton Accepter Lots
-  $("#modal_accept_lots_list").empty()
-  if (selected_in.length > 0) {
-    $("#btn_open_modal_accept_lots").addClass('primary')
-    $("#btn_open_modal_accept_lots").css("pointer-events", "auto")
-    $("#btn_open_modal_accept_lots").removeClass('secondary')
-
-  let to_accept = []
-    for (let i = 0, len = selected_in.length; i < len; i++) {
-      let rowdata = window.table.row(selected_in[i]).data()
-      $("#modal_accept_lots_list").append(`<li>${rowdata.tx.fields.carbure_vendor ? rowdata.tx.fields.carbure_vendor.name : rowdata.tx.fields.unknown_vendor} - ${rowdata.fields.volume} - ${rowdata.fields.biocarburant.name} - ${rowdata.fields.matiere_premiere.name}</li>`)
-      to_accept.push(rowdata.tx.pk)
-      $("#modal_accept_lots_txs").val(to_accept.join(","))
-    }
-  } else {
-    $("#btn_open_modal_accept_lots").addClass('secondary')
-    $("#btn_open_modal_accept_lots").css("pointer-events", "none")
-    $("#btn_open_modal_accept_lots").removeClass('primary')
-    // cleanup validate modal
-    $("#modal_accept_lots_list").empty()
-  }
+  // boutons Dupliquer / Supprimer Lots
+  manage_delete_button()
+  manage_duplicate_button()
+  manage_validate_button()
 }
 
 function manage_actions_operators_in() {
@@ -602,19 +585,8 @@ function manage_actions_operators_in() {
 }
 
 
-function initDuplicateParams(table) {
-  var list_columns_filter = $("#list_columns_filter")
-  var list_columns_filter_html = ""
-  for (let i = 0, len = table.length; i < len; i++) {
-    let column = table[i]
-    if (column.can_duplicate === true) {
-      list_columns_filter_html += `<li class="flex-item-a"><input type="checkbox" id="add_checkbox${i}" class="toggle-lot-param" data-column="${i}"><label for="add_checkbox${i}" class="label-inline">${column.title}</label></li>`
-    }
-  }
-  list_columns_filter.append(list_columns_filter_html)
-}
-
 function initFilters(table, dom) {
+  console.log(`initFilters ${dom}`)
   var table_columns_filter = $(`#table_columns_${dom}_filter`)
   var table_columns_filter2 = $(`#table_columns_${dom}_filter2`)
   var columns_filter_html = ""
@@ -787,15 +759,15 @@ function display_lot_modal(table, columns, event, display_type) {
   let comments_section = $("#comments_list")
   comments_section.empty()
   $("#btn_close_modal_lot_save").on('click', function() {
-    let modal = document.getElementById('modal_lot')
-    modal.style.display = 'none';
+    window.modal = document.getElementById('modal_lot')
+    window.modal.style.display = 'none';
   })
 
   if (column_name['data'] === 'checkbox') {
     // ignore clicks on checkbox column
     return
   } else {
-    let modal = document.getElementById("modal_lot")
+    window.modal = document.getElementById("modal_lot")
     let lot = data.fields.lot
     let tx = data.fields
 
@@ -921,17 +893,14 @@ function display_lot_modal(table, columns, event, display_type) {
     $("#reduction_title").attr('title', `Par rapport à des émissions fossiles de référence de ${lot.ghg_reference} gCO2eq/MJ`)
 
     if (data.comments.length) {
-      $("#save_section").hide()
-      $("#correct_section").show()
       for (let i = 0, len = data.comments.length; i < len; i++) {
         let c = data.comments[i]
         // console.log(c)
         let html = `<dd><b>${c.fields.entity.name}</b>: ${c.fields.comment}</dd>`
         comments_section.append(html)
       }
-      comments_section.append(`<dd><input id="new_comment" type="text" placeholder="Commentaire" /></dd>`)
     }
-    modal.style.display = "flex"
+    window.modal.style.display = "flex"
   }
 }
 
@@ -1569,7 +1538,7 @@ const dt_operators_drafts_config = {
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
     })
-    initFilters(operators_columns_drafts, "tab_drafts")
+    initFilters(operators_columns_drafts, "tab_operators_drafts")
     handleTableEvents(table, tbl_id, manage_actions_operators_drafts, selected_drafts)
     manage_actions_operators_drafts()
   }
@@ -1621,7 +1590,7 @@ const dt_operators_in_config = {
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
     })
-    initFilters(operators_columns_in, "tab_in")
+    initFilters(operators_columns_in, "tab_operators_in")
     handleTableEvents(table, tbl_id, manage_actions_operators_in, selected_in)
     manage_actions_operators_in()
   }
@@ -1673,7 +1642,7 @@ const dt_operators_out_config = {
     $('#input_search_datatable').on('keyup', function() {
         table.search(this.value).draw();
     })
-    initFilters(operators_columns_out, "tab_out")
+    initFilters(operators_columns_out, "tab_operators_out")
   }
 }
 

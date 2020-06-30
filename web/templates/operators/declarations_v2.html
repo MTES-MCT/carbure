@@ -22,7 +22,7 @@
             <use xlink:href="#plus" aria-label="Ajouter/Importer Lots"></use>
           </svg>
         </a>
-        <a title="Afficher/Cacher des colonnes" id="btn_open_modal_columns_tab_drafts" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
+        <a title="Afficher/Cacher des colonnes" id="btn_open_modal_columns_tab_operators_drafts" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
         <a title="Exporter vers Excel" class="button modal-button" href="{% url 'api-v2-operators-export-drafts' %}" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
@@ -68,7 +68,7 @@
          Vous pouvez également importer des lots via un fichier Excel via l'onglet Brouillons si votre fournisseur n'est pas inscrit sur Carbure.
       </p>
       <div class="flex-container">
-        <a id="btn_open_modal_columns_affiliations" class="button modal-button" style="margin-right: 0px; margin-left: 5px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
+        <a id="btn_open_modal_columns_tab_operators_in" class="button modal-button" style="margin-right: 0px; margin-left: 5px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)">
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
         <a class="button modal-button" href="{% url 'api-v2-operators-export-in' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px; margin-right: auto;">
@@ -83,7 +83,7 @@
       </table>
       <div class="button-container">
         <div class="button-item">
-          <a id="btn_open_modal_accept_lots" class="button primary">Valider Lots</a>
+          <a id="btn_open_modal_accept_lots" class="button primary">Accepter Lots</a>
         </div>
       </div>
     </div>
@@ -91,7 +91,7 @@
     <div id="tab_operators_out" class="tabcontent">
       <p>Vous trouverez ici tous les lots acceptés et déclarés à la DGEC</p>
       <div class="flex-container">
-        <a id="btn_open_modal_columns_declared" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
+        <a id="btn_open_modal_columns_tab_operators_out" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
         <a class="button modal-button" href="{% url 'api-v2-operators-export-out' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
@@ -147,34 +147,50 @@
 </div>
 
 
-<div class="modal__backdrop" id="modal_columns_affiliations">
+<div class="modal__backdrop" id="modal_columns_tab_operators_drafts">
   <div class="modal">
     <div class="flex-container">
-      <table id="table_columns_affiliations_filter">
+      <table id="table_columns_tab_operators_drafts_filter">
         <!-- dynamically generated in js -->
       </table>
-      <table id="table_columns_affiliations_filter2">
+      <table id="table_columns_tab_operators_drafts_filter2">
         <!-- dynamically generated in js -->
       </table>
     </div>
     <div class="form__group button__group">
-      <a class="button secondary close" id="btn_close_modal_columns_affiliations">Fermer</a>
+      <a class="button secondary close" id="btn_close_modal_columns_tab_operators_drafts">Fermer</a>
     </div>
   </div>
 </div>
 
-<div class="modal__backdrop" id="modal_columns_declared">
+<div class="modal__backdrop" id="modal_columns_tab_operators_in">
   <div class="modal">
     <div class="flex-container">
-      <table id="table_columns_declared_filter">
+      <table id="table_columns_tab_operators_in_filter">
         <!-- dynamically generated in js -->
       </table>
-      <table id="table_columns_declared_filter2">
+      <table id="table_columns_tab_operators_in_filter2">
         <!-- dynamically generated in js -->
       </table>
     </div>
     <div class="form__group button__group">
-      <a class="button secondary close" id="btn_close_modal_columns_declared">Fermer</a>
+      <a class="button secondary close" id="btn_close_modal_columns_tab_operators_in">Fermer</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_columns_tab_operators_out">
+  <div class="modal">
+    <div class="flex-container">
+      <table id="table_columns_tab_operators_out_filter">
+        <!-- dynamically generated in js -->
+      </table>
+      <table id="table_columns_tab_operators_out_filter2">
+        <!-- dynamically generated in js -->
+      </table>
+    </div>
+    <div class="form__group button__group">
+      <a class="button secondary close" id="btn_close_modal_columns_tab_operators_out">Fermer</a>
     </div>
   </div>
 </div>
@@ -218,22 +234,21 @@
 
 <div class="modal__backdrop" id="modal_accept_lots">
   <div class="modal">
-    <a id="btn_close_modal_accept_lots" style="opacity: 0.5; margin: -1rem -1rem -1rem auto; float: right;">
+    <a class="close" id="btn_close_modal_accept_lots_top" style="opacity: 0.5; margin: -1rem -1rem -1rem auto; float: right;">
       <svg class="icon" style="height:24px; width:24px">
         <use xlink:href="#cross"></use>
       </svg>
     </a>
     <span id="modal_accept_lots_form_err_message" style="color: red;"></span>
     <span id="modal_accept_lots_form_success_message" style="color: green;"></span>
-    <form id="modal_accept_lots_form" method="POST" data-url="{% url 'api-v2-operators-accept-lots' %}" data-reload="0">
+    <form id="modal_accept_lots_form" method="POST" data-url="{% url 'api-v2-operators-accept-lots' %}">
       {% csrf_token %}
-      <p><b>Êtes vous certain de vouloir accepter le(s) lot(s) suivant(s)?</b></p>
       <ul id="modal_accept_lots_list">
       </ul>
-      <input type="hidden" id="modal_accept_lots_txs" name="tx_ids">
+      <input type="hidden" id="modal_accept_lots_txids" name="tx_ids">
       <div class="form__group button__group">
-        <a class="button secondary" id="btn_close_modal_accept_lots">Annuler</a>
         <button type="submit" class="button">Valider</button>
+        <a class="button secondary close" id="btn_close_modal_accept_lots_bottom">Annuler</a>
       </div>
     </form>
   </div>
@@ -249,7 +264,7 @@
       </ul>
       <input type="hidden" id="modal_delete_lots_lots" name="lots">
       <div class="form__group button__group">
-        <a class="button secondary" id="btn_close_modal_delete_lots">Annuler</a>
+        <a class="button secondary close" id="btn_close_modal_delete_lots">Annuler</a>
         <div class="button-container">
           <div class="button-item">
             <button type="submit" class="button">Valider</button>
@@ -277,7 +292,7 @@
       <input type="hidden" id="modal_validate_lots_lots" name="lots">
       <div class="form__group button__group">
         <button type="submit" class="button">Valider</button>
-        <a class="button secondary" id="btn_close_modal_validate_lots">Annuler</a>
+        <a class="button secondary close" id="btn_close_modal_validate_lots">Annuler</a>
       </div>
     </form>
   </div>
@@ -293,9 +308,12 @@ window.api_get_drafts = "{% url 'api-v2-operators-get-drafts' %}"
 window.api_get_in = "{% url 'api-v2-operators-get-in' %}"
 window.api_get_out = "{% url 'api-v2-operators-get-out' %}"
 
+window.api_lot_duplicate_v2 = "{% url 'api-v2-operators-duplicate-lot' %}"
+window.api_lot_save_v2 = "{% url 'api-v2-operators-save-lot' %}"
 window.api_lot_reject_v2 = "{% url 'api-v2-operators-reject-lot' %}"
 window.api_lot_accept_with_correction_v2 = "{% url 'api-v2-operators-accept-lot-with-correction' %}"
 window.api_lot_accept_v2 = "{% url 'api-v2-operators-accept-lot' %}"
+window.api_lot_add_comment_v2 = "{% url 'api-v2-operators-add-lot-correction' %}"
 
 $(document).ready(function() {
   // show drafts tab
