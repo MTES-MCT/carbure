@@ -1,6 +1,7 @@
 from django.urls import path, include
 
 from . import public_api
+from . import producers_api
 from . import operators_api
 from . import administrators_api
 
@@ -9,6 +10,15 @@ urlpatterns = [
     path('v2/operators/', include('api.v2.operators.urls')),
     path('v2/traders/', include('api.v2.traders.urls')),
 
+
+    # api v1
+    path('v1/producers/add-production-site', producers_api.producers_settings_add_site, name='producers-api-settings-add-site'),
+    path('v1/producers/add-production-site-certificate', producers_api.producers_settings_add_certif, name='producers-api-settings-add-certif'),
+    path('v1/producers/delete-production-site-certificate', producers_api.producers_settings_delete_certif, name='producers-api-settings-delete-certif'),
+    path('v1/producers/delete-production-site-mp', producers_api.producers_settings_delete_mp, name='producers-api-settings-delete-mp'),
+    path('v1/producers/add-production-site-mp', producers_api.producers_settings_add_mp, name='producers-api-settings-add-mp'),
+    path('v1/producers/delete-production-site-bc', producers_api.producers_settings_delete_biocarburant, name='producers-api-settings-delete-bc'),
+    path('v1/producers/add-production-site-bc', producers_api.producers_settings_add_biocarburant, name='producers-api-settings-add-biocarburant'),
 
 
     # public, autocomplete api
