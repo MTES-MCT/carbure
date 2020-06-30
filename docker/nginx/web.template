@@ -17,10 +17,8 @@ server {
 server {
     listen 443 ssl;
     server_name ${NGINX_HOSTS};
-
     charset     utf-8;
     client_max_body_size 5M;
-
 
     ssl_certificate /etc/letsencrypt/live/${NGINX_SSL_FOLDER}/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/${NGINX_SSL_FOLDER}/privkey.pem;
@@ -28,21 +26,30 @@ server {
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
     root /var/www/html;
-
-    # metabase
-    location /metabase {
-        proxy_pass http://carbure-metabase:3000;
-    }
-
     # serve static files
     location /static {
         alias /var/www/html;
     }
-
     # uwsgi
     location / {
         uwsgi_pass  django;
         include     /etc/nginx/conf.d/uwsgi_params;
+    }  
+}
+
+server {
+    listen 443 ssl;
+    server_name metabase.carbure.beta.gouv.fr;
+    charset     utf-8;
+    client_max_body_size 5M;
+
+    ssl_certificate /etc/letsencrypt/live/metabase.carbure.beta.gouv.fr/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/metabase.carbure.beta.gouv.fr/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    root /var/www/html;
+    location / {
+        proxy_pass http://carbure-metabase:3000;
     }
-    
 }
