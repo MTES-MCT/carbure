@@ -2,7 +2,6 @@ from django.urls import path, include
 
 from . import public_api
 from . import producers_api
-from . import operators_api
 from . import administrators_api
 
 urlpatterns = [
@@ -34,16 +33,6 @@ urlpatterns = [
     path('operators-csv/', public_api.operators_csv, name='api-operators-csv'),
     path('depots-csv/', public_api.depots_csv, name='api-depots-csv'),
 
-    # private, operators
-    path('operators/lots/declared', operators_api.operators_lots, name='operators-api-declared-lots'),
-    path('operators/lots/affiliated', operators_api.operators_lots_affilies, name='operators-api-affiliated-lots'),
-    path('operators/lots/accept', operators_api.operators_lot_accept, name='operators-api-accept-lots'),
-    path('operators/lots/accept-correction', operators_api.operators_lot_accept_correction, name='operators-api-accept-lot-correction'),
-    path('operators/lots/accept-with-comment', operators_api.operators_lot_accept_with_comment, name='operators-api-accept-lot-with-comment'),
-    path('operators/lots/reject', operators_api.operators_lot_reject, name='operators-api-reject-lots'),
-    path('operators/lots/comments', operators_api.operators_lot_comments, name='operators-api-lot-comments'),
-    path('operators/lots/export', operators_api.operators_export_lots, name='operators-api-declaration-export'),
-    path('operators/lots/affiliated/export', operators_api.operators_export_affiliated, name='operators-api-export-affiliated'),
 
     # private, administrators
     path('administrators/users-autocomplete/', administrators_api.admin_users_autocomplete, name='admin-api-users-autocomplete'),
