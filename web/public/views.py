@@ -41,8 +41,3 @@ def annuaire(request, *args, **kwargs):
     context['current_url_name'] = 'annuaire'
     return render(request, 'common/annuaire.html', context)
 
-
-def stats(request, *args, **kwargs):
-    context = {}
-    context['current_url_name'] = 'public-stats'
-    return render(request, 'public/stats_metabase.html', context)
