@@ -4,7 +4,7 @@
 if [ "$IMAGE_TAG" = "local" ]; then
    envsubst '$$NGINX_HOSTS' < /etc/nginx/conf.d/web.dev.template > /etc/nginx/conf.d/default.conf
 else
-   envsubst '$$NGINX_HOSTS $$NGINX_SSL_FOLDER' < /etc/nginx/conf.d/web.template > /etc/nginx/conf.d/default.conf
+   envsubst '$$NGINX_HOSTS $$NGINX_SSL_FOLDER $$METABASE_HOST $$METABASE_SSL_FOLDER' < /etc/nginx/conf.d/web.template > /etc/nginx/conf.d/default.conf
 fi    
 
 while :;
