@@ -5,10 +5,10 @@ if ! [ -x "$(command -v docker-compose)" ]; then
   exit 1
 fi
 
-domains=(carbure-dev.almalexia.org)
+domains=(metabase-dev.carbure.beta.gouv.fr)
 rsa_key_size=4096
 data_path="./data/certbot"
-email="letsencrypt_carburedev_mp@almalexia.org" # Adding a valid address is strongly recommended
+email="martin.planes@beta.gouv.fr" # Adding a valid address is strongly recommended
 staging=0 # Set to 1 if you're testing your setup to avoid hitting request limits
 
 if [ -d "$data_path" ]; then
@@ -30,6 +30,7 @@ fi
 echo "### Creating dummy certificate for $domains ..."
 path="/etc/letsencrypt/live/$domains"
 mkdir -p "$data_path/conf/live/$domains"
+echo "$data_path/conf/live/$domains"
 docker-compose run --rm --entrypoint "\
   openssl req -x509 -nodes -newkey rsa:2048 -days 1\
     -keyout '$path/privkey.pem' \
