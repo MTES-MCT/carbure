@@ -56,6 +56,8 @@ services:
     environment:
       NGINX_HOSTS: ${NGINX_HOSTS}
       NGINX_SSL_FOLDER: ${NGINX_SSL_FOLDER}
+      METABASE_HOST: ${METABASE_HOST}
+      METABASE_SSL_FOLDER: ${METABASE_SSL_FOLDER}
     command: /opt/run_nginx.sh
     depends_on:
     - carbure-django-uwsgi
