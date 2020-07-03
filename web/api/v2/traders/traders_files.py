@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Max, Min
 
 from core.decorators import enrich_with_user_details, restrict_to_traders
-from core.xlsx_template import create_template_xlsx_v2_simple, create_template_xlsx_v2_advanced, create_template_xlsx_v2_mb
+from core.xlsx_template import create_template_xlsx_v2_traders, create_template_xlsx_v2_mb
 
 from core.models import Entity, ProductionSite, Pays, Biocarburant, MatierePremiere, Depot
 from core.models import LotV2, LotTransaction, TransactionError, LotV2Error
@@ -525,13 +525,13 @@ def load_excel_mb_lot(context, lot_row):
 @restrict_to_traders
 def excel_template_download(request, *args, **kwargs):
     context = kwargs['context']
-    file_location = create_template_xlsx_v2_advanced(context['user_entity'])
+    file_location = create_template_xlsx_v2_traders(context['user_entity'])
     try:
         with open(file_location, 'rb') as f:
             file_data = f.read()
             # sending response
             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="carbure_template_advanced.xlsx"'
+            response['Content-Disposition'] = 'attachment; filename="carbure_template_traders.xlsx"'
             return response
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
