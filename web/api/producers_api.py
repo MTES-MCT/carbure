@@ -630,6 +630,7 @@ def producers_delete_lots(request, *args, **kwargs):
 @enrich_with_user_details
 @restrict_to_producers
 def producers_validate_lots(request, *args, **kwargs):
+    raise Exception('Deprecated')
     context = kwargs['context']
     lot_ids = request.POST.get('lots', None)
     results = []

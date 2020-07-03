@@ -54,11 +54,13 @@ class TestProducer(TestCase):
                     }
         response = self.client.post(reverse('api-v2-producers-save-lot'), postdata)
         self.assertEqual(response.status_code, 200)
-        # {"status": "success", "lot_id": 1, "transaction_id": 1}
+        # {"status": "success", "lot_id": 1, "": 1}
         res = json.loads(response.content)
+        tx_id = res['transaction_id']
         lot_id = res['lot_id']
+
         # 2 try to validate
-        response = self.client.post(reverse('api-v2-producers-validate-lots'), {'lots': lot_id})
+        response = self.client.post(reverse('api-v2-producers-validate-lots'), {'lots': tx_id})
         res = json.loads(response.content)
         lot = res['message'][0]
         self.assertEqual(lot['status'], 'error')
@@ -70,7 +72,7 @@ class TestProducer(TestCase):
         self.assertEqual(response.status_code, 200)
 
         # 4 validate again
-        response = self.client.post(reverse('api-v2-producers-validate-lots'), {'lots': lot_id})
+        response = self.client.post(reverse('api-v2-producers-validate-lots'), {'lots': tx_id})
         res = json.loads(response.content)
         lot = res['message'][0]
         self.assertEqual(lot['status'], 'success')
