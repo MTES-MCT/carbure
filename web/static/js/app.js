@@ -136,7 +136,8 @@ for (let i = 0, len = btns_edit_site.length; i < len; i++) {
   let site_id = btn.dataset.siteid
   btn.onclick = function() {
     let modal = document.getElementById("modal_site_edit")
-    modal.style.display = "flex"
+    window.modal = modal
+    window.modal.style.display = "flex"
     $("#modal_site_edit_site").val(site_id)
   }
 }
@@ -147,7 +148,8 @@ for (let i = 0, len = btns_delete_certif.length; i < len; i++) {
   let crtid = btn.dataset.crtid
   btn.onclick = function() {
     let modal = document.getElementById("modal_certif_delete")
-    modal.style.display = "flex"
+    window.modal = modal
+    window.modal.style.display = "flex"
     $("#modal_certif_crtid").val(crtid)
     $("#modal_certif_delete_site").text(btn.dataset.site)
     $("#modal_certif_delete_num").text(btn.dataset.num)
