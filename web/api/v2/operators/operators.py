@@ -29,6 +29,11 @@ def get_random(model):
 
 # not an API call. helper function
 def load_excel_lot(context, lot_row):
+    # check for empty row
+    if 'biocarburant_code' in lot_row and lot_row['biocarburant_code'] == None:
+        return False
+
+    # go
     entity = context['user_entity']
     lot = LotV2()
     lot.added_by = entity
@@ -309,8 +314,12 @@ def load_excel_lot(context, lot_row):
 
     if 'champ_libre' in lot_row:
         transaction.champ_libre = lot_row['champ_libre']
+        print(transaction.champ_libre)
+        if transaction.champ_libre is None:
+            transaction.champ_libre = ''
     transaction.save()
     lot.save()
+    return True
 
 
 @login_required
@@ -359,8 +368,9 @@ def excel_template_upload(request, *args, **kwargs):
     lots_loaded = 0
     for lot in lots:
         try:
-            load_excel_lot(context, lot)
-            lots_loaded += 1
+            loaded = load_excel_lot(context, lot)
+            if loaded:
+                lots_loaded += 1
         except Exception as e:
             print(e)
     return JsonResponse({'status': "success", 'message': "%d/%d lots chargés correctement" % (lots_loaded, total_lots)})
