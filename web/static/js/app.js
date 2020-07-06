@@ -340,7 +340,7 @@ function manage_validate_button() {
     for (let i = 0, len = selected_drafts.length; i < len; i++) {
       let rowdata = window.table.row(selected_drafts[i]).data()
       let lot = rowdata.fields.lot
-      $("#modal_validate_lots_list").append(`<li>${lot.producer_is_in_carbure ? lot.carbure_producer.name : lot.unknown_producer} - ${lot.volume} - ${lot.biocarburant.name} - ${lot.matiere_premiere.name}</li>`)
+      $("#modal_validate_lots_list").append(`<li>${lot.carbure_producer ? lot.carbure_producer.name : lot.unknown_producer} - ${lot.volume} - ${lot.biocarburant ? lot.biocarburant.name : ""} - ${lot.matiere_premiere ? lot.matiere_premiere.name : ""}</li>`)
       to_validate.push(rowdata.pk)
       $("#modal_validate_lots_lots").val(to_validate.join(","))
     }
@@ -409,7 +409,7 @@ function manage_delete_button() {
     for (let i = 0, len = selected_drafts.length; i < len; i++) {
       let rowdata = window.table.row(selected_drafts[i]).data()
       let lot = rowdata.fields.lot
-      $("#modal_delete_lots_list").append(`<li>${lot.producer_is_in_carbure ? lot.carbure_producer.name : lot.unknown_producer} - ${lot.volume} - ${lot.biocarburant.name} - ${lot.matiere_premiere.name}</li>`)
+      $("#modal_delete_lots_list").append(`<li>${lot.carbure_producer ? lot.carbure_producer.name : lot.unknown_producer} - ${lot.volume} - ${lot.biocarburant ? lot.biocarburant.name : ""} - ${lot.matiere_premiere ? lot.matiere_premiere.name : ""}</li>`)
       to_delete.push(rowdata.pk)
       $("#modal_delete_lots_lots").val(to_delete.join(","))
     }
