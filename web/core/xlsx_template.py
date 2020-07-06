@@ -30,6 +30,10 @@ def make_lots_sheet(workbook, entity):
     volumes = [1200, 2800, 8000, 4500, 13000]
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
     today = datetime.date.today().strftime('%Y-%m-%d')
+
+    if not len(psites):
+        return
+
     for i in range(10):
         p = random.choice(psites)
         mp = random.choice(mps)
@@ -116,6 +120,8 @@ def make_lots_sheet_v2_advanced(workbook, entity):
             p = random.choice(unknown_producers)
             row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc']]
         else:
+            if not len(psites):
+                continue
             p = random.choice(psites)
             row += [p.producer.name, p.name, p.country.code_pays, '', '', '']
         row += [volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 0, 'FR000000123', clientid]
@@ -185,7 +191,7 @@ def make_mb_extract_sheet(workbook, entity):
 def make_lots_sheet_v2_simple(workbook, entity):
     worksheet_lots = workbook.add_worksheet("lots")
     psites = ProductionSite.objects.filter(producer=entity)
-    eas = Entity.objects.filter(entity_type='Opérateur')
+    eas = Entity.objects.filter(entity_type__in=['Opérateur', 'Trader'])
     mps = MatierePremiere.objects.all()
     bcs = Biocarburant.objects.all()
     delivery_sites = Depot.objects.all()
@@ -202,6 +208,10 @@ def make_lots_sheet_v2_simple(workbook, entity):
     volumes = [1200, 2800, 8000, 4500, 13000]
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
     today = datetime.date.today().strftime('%Y-%m-%d')
+
+    if not len(psites):
+        return
+
     for i in range(10):
         mp = random.choice(mps)
         ea = random.choice(eas)
