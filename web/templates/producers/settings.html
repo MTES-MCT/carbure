@@ -42,20 +42,18 @@
             </div>
             <div class="form__group" style="margin-top: 0px;">
               <dl>
-                {% if site.certificate %}
+                {% for certificate in site.certificates %}
                 <dd>
-                  <a href="{{ site.certificate.certificate.url }}" target="_blank">{{site.certificate.certificate_id}}</a>
-                  <li class="label" style="background: var(--light-blue); padding: 2px;" title="Supprimer"><a class="btn_open_modal_delete_certif" data-crtid="{{site.certificate.id}}" data-site="{{site.name}}" data-num="{{site.certificate.certificate.name}}" data-expi="{{site.certificate.expiration}}">x</a>
+                  <a href="{{ site.certificate.certificate.url }}" target="_blank">{{certificate.certificate_id}}</a> {{certificate.expiration}}
+                  <li class="label" style="background: var(--light-blue); padding: 2px;" title="Supprimer"><a id="btn_open_modal_delete_certif" data-crtid="{{certificate.id}}" data-site="{{site.name}}" data-num="{{certificate.certificate.name}}" data-expi="{{certificate.expiration}}">x</a>
                 </dd>
-                <dd>Expiration: {{site.certificate.expiration}}</dd>
-                <dd>{{site.certificate.get_status_display}}</dd>
-                {% else %}
+                {% empty %}
                 <dd>Certificat manquant</dd>
-                {% endif %}
+                {% endfor %}
               </dl>
             </div>
             <div class="form__group" style="margin-top: 0px;">
-              <button type="submit" class="button btn_open_modal_site_edit" data-siteid="{{site.id}}" data-sitename="{{site.name}}" style="margin-right: 0px; padding-right: 1em; padding-left: 1em;">
+              <button type="submit" class="button" id="btn_open_modal_site_edit" data-siteid="{{site.id}}" data-sitename="{{site.name}}" style="margin-right: 0px; padding-right: 1em; padding-left: 1em;">
                 {% if site.certificate %}
               Modifier
               {% else %}
