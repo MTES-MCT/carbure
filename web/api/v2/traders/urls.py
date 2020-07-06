@@ -6,11 +6,14 @@ from . import traders_files
 
 urlpatterns = [
     # files / templates
+    path('upload-mb-xlsx-template', traders_files.excel_mb_template_upload, name='api-v2-traders-excel-mb-template-upload'),
     path('upload-xlsx-template', traders_files.excel_template_upload, name='api-v2-traders-excel-template-upload'),
     path('download-xlsx-template', traders_files.excel_template_download, name='api-v2-traders-excel-template-download'),
+    path('download-xlsx-template-mb', traders_files.excel_template_download_mb, name='api-v2-traders-excel-template-mb'),
     path('lots/drafts/export', traders_files.export_drafts, name='api-v2-traders-export-drafts'),
     path('lots/in/export', traders_files.export_in, name='api-v2-traders-export-in'),
     path('lots/out/export', traders_files.export_out, name='api-v2-traders-export-out'),
+    path('lots/mb/export', traders_files.export_mb, name='api-v2-traders-export-mb'),
 
 
     # GET
