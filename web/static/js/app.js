@@ -73,19 +73,6 @@ const operators_columns_out = ['carbure_id', 'producer', 'production_site', 'vol
 const traders_columns_drafts = ['checkbox', 'id', 'producer', 'production_site', 'volume', 'biocarburant', 'matiere_premiere', 'pays_origine',
 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'dae', 'champ_libre', 'delivery_date', 'client', 'delivery_site']
 
-const traders_columns_in = ['checkbox', 'id', 'delivery_status', 'carbure_id', 'producer', 'production_site', 'production_country', 'vendor', 'biocarburant', 'matiere_premiere', 'volume', 'pays_origine',
-'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'dae', 'champ_libre', 'delivery_date',  'delivery_site']
-
-const traders_columns_mb_drafts = ['checkbox', 'lot_source', 'producer', 'production_site', 'volume', 'biocarburant', 'matiere_premiere', 'pays_origine', 'client', 'delivery_site',
-'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'dae', 'champ_libre', 'delivery_date']
-
-const traders_columns_mb = ['checkbox', 'carbure_id', 'depot', 'volume', 'biocarburant', 'matiere_premiere', 'pays_origine', 'producer', 'production_site',
-'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'dae', 'champ_libre']
-
-const traders_columns_out = ['carbure_id', 'producer', 'production_site', 'volume', 'biocarburant', 'matiere_premiere', 'pays_origine',
-'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'dae', 'champ_libre', 'delivery_date', 'client', 'delivery_site']
-
-
 var administrators_columns =['carbure_id', 'producer', 'production_site', 'volume', 'biocarburant', 'matiere_premiere', 'pays_origine',
 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'dae', 'champ_libre', 'delivery_date', 'client', 'delivery_site']
 
@@ -1668,11 +1655,17 @@ const dt_admin_rights = {
   },
 }
 
-const dt_traders_drafts_config = {
+const dt_admin_columns = []
+for (let i = 0, len = administrators_columns.length; i < len; i++) {
+  let colname = administrators_columns[i]
+  dt_admin_columns.push(columns_definitions[colname])
+}
+
+const dt_admin_lots = {
   is_complex_dt: true,
-  id: "datatable_drafts",
-  url: window.traders_get_drafts,
-  col_definition: traders_columns_drafts,
+  id: "datatable",
+  url: window.api_get_out,
+  col_definition: dt_admin_columns,
   paging: true,
   info: true,
   dom: 'rtp',
@@ -1691,9 +1684,9 @@ const dt_traders_drafts_config = {
       className: "dt-center",
       targets: "_all",
       render: function (data, type, full, meta) {
-        let col_name = traders_columns_drafts[meta.col].data
-        if (traders_columns_drafts[meta.col]['render'] != undefined) {
-          return traders_columns_drafts[meta.col]['render'](full)
+        let col_name = administrators_columns[meta.col].data
+        if (administrators_columns[meta.col]['render'] != undefined) {
+          return administrators_columns[meta.col]['render'](full)
         }
         return full['fields'][col_name]
       }
@@ -1704,70 +1697,10 @@ const dt_traders_drafts_config = {
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_lot_modal(table, traders_columns_drafts, e)
+      display_lot_modal(table, administrators_columns, e)
     })
-    initFilters(table_columns_drafts_v2, "tab_drafts")
-    handleTableEvents(table, tbl_id, selected_drafts)
-    manage_actions()
+    initFilters(dt_admin_columns, "out")
   }
-}
-
-const dt_traders_in_config = {
-  is_complex_dt: true,
-  id: "datatable_in",
-  url: window.traders_get_in,
-  col_definition: traders_columns_in,
-  paging: true,
-  info: true,
-  dom: 'rtp',
-  columnDefs: [
-    {
-      targets: [0],
-      searchable:false,
-      orderable:false,
-      width:'1%',
-      className: 'dt-body-center',
-      render: function (data, type, full, meta) {
-        return '<input type="checkbox">';
-      }
-    },
-    {
-      className: "dt-center",
-      targets: "_all",
-      render: function (data, type, full, meta) {
-        let col_name = traders_columns_in[meta.col].data
-        if (traders_columns_in[meta.col]['render'] != undefined) {
-          return traders_columns_in[meta.col]['render'](full)
-        }
-        return full['fields'][col_name]
-      }
-    },
-  ],
-  order: [[ 1, 'desc' ]],
-  ajax_dataSrc: parseApiFetchResponse,
-  post_init: function(table) {
-    let tbl_id = table.table().node().id
-    $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_lot_modal(table, traders_columns_in, e)
-    })
-    initFilters(table_columns_drafts_v2, "tab_drafts")
-    handleTableEvents(table, tbl_id, selected_in)
-    manage_actions()
-  }
-}
-
-const dt_traders_mb_config = {
-  id: "datatable_mb",
-  dt_config: {
-    paging: false,
-  },
-}
-
-const dt_traders_out_config = {
-  id: "datatable_out",
-  dt_config: {
-    paging: false,
-  },
 }
 
 // producer
@@ -1783,17 +1716,12 @@ dt_config['tab_operators_drafts'] = dt_operators_drafts_config
 dt_config['tab_operators_in'] = dt_operators_in_config
 dt_config['tab_operators_out'] = dt_operators_out_config
 
-// traders
-dt_config['tab_traders_drafts'] = dt_traders_drafts_config
-dt_config['tab_traders_in'] = dt_traders_in_config
-dt_config['tab_traders_mb'] = dt_traders_mb_config
-dt_config['tab_traders_out'] = dt_traders_out_config
-
-
 // admin tabs
 dt_config['tab_users'] = dt_admin_users
 dt_config['tab_entities'] = dt_admin_entities
 dt_config['tab_rights'] = dt_admin_rights
+dt_config['tab_lots'] = dt_admin_lots
+
 
 })
 
