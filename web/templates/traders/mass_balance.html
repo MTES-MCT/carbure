@@ -8,8 +8,8 @@
     {% csrf_token %}
 
     <ul class="tabs__tab-list">
-      <li id="tab_producers_mb_drafts_title" class="tabs__tab" data-dst="tab_mb_drafts">Brouillons ({{nb_mb_drafts}})</li>
-      <li id="tab_producers_mb_title" class="tabs__tab tabs__tab--selected" data-dst="tab_mb">Mass Balance ({{nb_mb}})</li>
+      <li id="tab_traders_mb_drafts_title" class="tabs__tab" data-dst="tab_mb_drafts">Brouillons ({{nb_mb_drafts}})</li>
+      <li id="tab_traders_mb_title" class="tabs__tab tabs__tab--selected" data-dst="tab_mb">Mass Balance ({{nb_mb}})</li>
     </ul>
 
     <div id="tab_mb_drafts" class="tabcontent">
@@ -64,7 +64,7 @@
         <a id="btn_open_modal_columns_tab_mb" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
-        <a class="button modal-button" href="{% url 'api-v2-producers-export-mb' %}" style="margin-left: 5px; margin-right: auto; padding: 7px 10px 0px 10px;">
+        <a class="button modal-button" href="{% url 'api-v2-traders-export-mb' %}" style="margin-left: 5px; margin-right: auto; padding: 7px 10px 0px 10px;">
           <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
         </a>
       </div>
@@ -127,12 +127,12 @@
     <div class="flex-container">
       <div class="form__group">
         <h4>Importer Fichier</h4>
-        <form method="POST" id="modal_import_form" data-url="{% url 'api-v2-producers-excel-mb-template-upload' %}" data-reload="0">
+        <form method="POST" id="modal_import_form" data-url="{% url 'api-v2-traders-excel-mb-template-upload' %}" data-reload="0">
           <span id="modal_import_form_err_message" style="color: red;"></span>
           <span id="modal_import_form_success_message" style="color: green;"></span>
           <dl>
             <dt>Veuillez utiliser le modèle Excel suivant pour extraire des lots de votre Mass Balance et les envoyer à vos clients.</dt>
-            <dt><a href="{% url 'api-v2-producers-excel-template-mb' %}" >Télécharger le modèle</a></dt>
+            <dt><a href="{% url 'api-v2-traders-excel-template-mb' %}" >Télécharger le modèle</a></dt>
           </dl>
           {% csrf_token %}
           <input type="file" name="file" id="file_to_upload">
@@ -146,7 +146,7 @@
 <div class="modal__backdrop" id="modal_delete_lots">
   <div class="modal">
     <span id="modal_delete_lots_form_err_message" style="color: red;"></span>
-    <form id="modal_delete_lots_form" method="POST" data-url="{% url 'api-v2-producers-delete-mb-drafts' %}">
+    <form id="modal_delete_lots_form" method="POST" data-url="{% url 'api-v2-traders-delete-mb-drafts' %}">
       {% csrf_token %}
       <p>Êtes vous sûr de vouloir supprimer ce(s) lot(s) ?</p>
       <ul id="modal_delete_lots_list">
@@ -173,7 +173,7 @@
     </a>
     <span id="modal_validate_lots_form_err_message" style="color: red;"></span>
     <span id="modal_validate_lots_form_success_message" style="color: green;"></span>
-    <form id="modal_validate_lots_form" method="POST" data-url="{% url 'api-v2-producers-validate-mb-drafts-lots' %}">
+    <form id="modal_validate_lots_form" method="POST" data-url="{% url 'api-v2-traders-validate-mb-drafts-lots' %}">
       {% csrf_token %}
       <p><b>En validant le(s) lot(s) suivant(s), je certifie qu'ils respectent les critères du durabilité liés aux terres et que les informations renseignées sont réelles et valides.</b></p>
       <ul id="modal_validate_lots_list">
@@ -196,7 +196,7 @@
     </a>
     <span id="modal_fuse_lots_form_err_message" style="color: red;"></span>
     <span id="modal_fuse_lots_form_success_message" style="color: green;"></span>
-    <form id="modal_fuse_lots_form" method="POST" data-url="{% url 'api-v2-producers-fuse-mb-lots' %}">
+    <form id="modal_fuse_lots_form" method="POST" data-url="{% url 'api-v2-traders-fuse-mb-lots' %}">
       {% csrf_token %}
       <p><b>En validant le(s) lot(s) suivant(s), je certifie qu'ils respectent les critères du durabilité liés aux terres et que les informations renseignées sont réelles et valides.</b></p>
       <ul id="modal_fuse_lots_list">
@@ -218,8 +218,8 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-window.api_get_mb = "{% url 'api-v2-producers-get-mb' %}"
-window.api_get_mb_drafts = "{% url 'api-v2-producers-get-mb-drafts' %}"
+window.api_get_mb = "{% url 'api-v2-traders-get-mb' %}"
+window.api_get_mb_drafts = "{% url 'api-v2-traders-get-mb-drafts' %}"
 
 $(document).ready(function() {
   // show drafts tab

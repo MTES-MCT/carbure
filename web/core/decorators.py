@@ -43,7 +43,7 @@ def restrict_to_producers(function):
         context['nb_drafts'] = len(drafts)
         context['nb_mb_drafts'] = len(mb_drafts)
         context['nb_valid'] = len(valid)
-        context['nb_received'] = len(received)
+        context['nb_in'] = len(received)
         context['nb_mb'] = len(mb)
         context['nb_controles_dgec'] = 0
         return function(request, *args, **kwargs)
@@ -78,9 +78,15 @@ def restrict_to_traders(function):
         drafts = LotV2.objects.filter(added_by=context['user_entity'], status='Draft')
         received = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status__in=['N', 'AC', 'AA'], lot__status="Validated")
         sent = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='A', lot__status="Validated", lot__fused_with=None)
+        mb_drafts = LotV2.objects.filter(added_by=context['user_entity'], status='Draft').exclude(parent_lot=None)
+        mb = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='A', lot__status="Validated", lot__fused_with=None)
+        corrections = LotTransaction.objects.filter(carbure_vendor=context['user_entity'], delivery_status__in=['AC', 'AA', 'R'])
         context['nb_drafts'] = len(drafts)
         context['nb_in'] = len(received)
         context['nb_out'] = len(sent)
+        context['nb_mb'] = len(mb)
+        context['nb_mb_drafts'] = len(mb_drafts)
+        context['nb_corrections'] = len(corrections)
         return function(request, *args, **kwargs)
     wrap.__doc__ = function.__doc__
     wrap.__name__ = function.__name__
