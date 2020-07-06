@@ -22,7 +22,7 @@ def make_lots_sheet(workbook, entity):
     # header
     bold = workbook.add_format({'bold': True})
     columns = ['production_site_name', 'volume', 'biocarburant_code', 'matiere_premiere_code',
-               'pays_origine_code', 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'e', 'dae',
+               'pays_origine_code', 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'dae',
                'client_id', 'ea_delivery_date', 'ea_name', 'ea_delivery_site']
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
@@ -43,7 +43,7 @@ def make_lots_sheet(workbook, entity):
         site = random.choice(delivery_sites)
         volume = random.choice(volumes)
 
-        row = [p.name, volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 0,
+        row = [p.name, volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0,
                'FR000000123', clientid, today, ea.name, site.depot_id]
         colid = 0
         for elem in row:
@@ -97,7 +97,7 @@ def make_lots_sheet_v2_advanced(workbook, entity):
     columns = ['producer', 'production_site', 'production_site_country', 'production_site_reference',
                'production_site_commissioning_date', 'double_counting_registration',
                'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
-               'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'e',
+               'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
                'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
@@ -124,7 +124,7 @@ def make_lots_sheet_v2_advanced(workbook, entity):
                 continue
             p = random.choice(psites)
             row += [p.producer.name, p.name, p.country.code_pays, '', '', '']
-        row += [volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 0, 'FR000000123', clientid]
+        row += [volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 'FR000000123', clientid]
         if exported == 1:
             # client is not in carbure
             c = random.choice(foreign_clients)
@@ -200,7 +200,7 @@ def make_lots_sheet_v2_simple(workbook, entity):
     # header
     bold = workbook.add_format({'bold': True})
     columns = ['production_site', 'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
-               'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'e',
+               'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
                'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site']
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
@@ -221,7 +221,7 @@ def make_lots_sheet_v2_simple(workbook, entity):
         volume = random.choice(volumes)
 
         p = random.choice(psites)
-        row = [p.name, volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 0, 'FR000000123', clientid]
+        row = [p.name, volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 'FR000000123', clientid]
         row += [ea.name, today, site.depot_id]
 
         colid = 0
@@ -265,7 +265,7 @@ def make_traders_lots_sheet(workbook, entity):
     columns = ['producer', 'production_site', 'production_site_country', 'production_site_reference',
                'production_site_commissioning_date', 'double_counting_registration',
                'vendor', 'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
-               'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'e',
+               'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
                'dae', 'champ_libre', 'delivery_date', 'delivery_site', 'delivery_site_country']
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
@@ -283,7 +283,7 @@ def make_traders_lots_sheet(workbook, entity):
         row = []
         p = random.choice(unknown_producers)
         row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc']]
-        row += [vendor, volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 0, 'FR000000123', clientid]
+        row += [vendor, volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 'FR000000123', clientid]
         row += [today, site.depot_id, 'FR']
 
         colid = 0
@@ -327,7 +327,7 @@ def make_operators_lots_sheet(workbook, entity):
     columns = ['producer', 'production_site', 'production_site_country', 'production_site_reference',
                'production_site_commissioning_date', 'double_counting_registration',
                'vendor', 'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
-               'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'e',
+               'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
                'dae', 'champ_libre', 'delivery_date', 'delivery_site', 'delivery_site_country']
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
@@ -345,7 +345,7 @@ def make_operators_lots_sheet(workbook, entity):
         row = []
         p = random.choice(unknown_producers)
         row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc']]
-        row += [vendor, volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 0, 'FR000000123', clientid]
+        row += [vendor, volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 'FR000000123', clientid]
         row += [today, site.depot_id, 'FR']
 
         colid = 0
