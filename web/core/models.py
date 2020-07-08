@@ -292,7 +292,7 @@ class LotTransaction(models.Model):
     ghg_reduction = models.FloatField(default=0.0)
 
     # other
-    champ_libre = models.CharField(max_length=64, blank=True, default='')
+    champ_libre = models.CharField(max_length=64, blank=True, null=True, default='')
 
     def __str__(self):
         return str(self.id)

@@ -401,7 +401,7 @@ def make_countries_sheet(workbook):
 
 def make_operators_sheet(workbook):
     worksheet_operateurs = workbook.add_worksheet("Societes")
-    operators = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur'])
+    operators = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur', 'Trader'])
     # header
     bold = workbook.add_format({'bold': True})
     worksheet_operateurs.write('A1', 'name', bold)
