@@ -1,6 +1,6 @@
 	<aside class="side-menu" role="navigation" style="max-width: 170px;">
 		<ul>
-			<li><a {% if current_url_name == 'producers-index' %}class="active"{% endif %} href="{% url 'producers-index' producer_name=url_friendly_name %}">Attestations</a></li>
+			<li><a {% if current_url_name == 'producers-index' %}class="active"{% endif %} href="{% url 'producers-index' producer_name=url_friendly_name %}">Déclarations</a></li>
 			<li><a {% if current_url_name == 'producers-mb' %}class="active"{% endif %} href="{% url 'producers-mb' producer_name=url_friendly_name %}">Mass Balance</a></li>
 			<li><a {% if current_url_name == 'producers-histo' %}class="active"{% endif %} href="{% url 'producers-histo' producer_name=url_friendly_name %}">Historique</a></li>
 			<li><a {% if current_url_name == 'producers-controles' %}class="active"{% endif %} href="{% url 'producers-controles' producer_name=url_friendly_name %}">Contrôles
