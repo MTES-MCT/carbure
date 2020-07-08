@@ -135,6 +135,9 @@
             <dt><a href="{% url 'api-v2-traders-excel-template-mb' %}" >Télécharger le modèle</a></dt>
           </dl>
           {% csrf_token %}
+          <dl>
+            <a href="{% url 'traders-import-mb-documentation' %}" style="margin-bottom: 30px;">Documentation / Aide</a>
+          </dl>
           <input type="file" name="file" id="file_to_upload">
           <a class="button primary" id="btn_submit_upload_form">Envoyer</a>
         </form>

@@ -36,3 +36,11 @@ def traders_histo(request, *args, **kwargs):
 def import_doc(request, *args, **kwargs):
     context = kwargs['context']
     return render(request, 'traders/import_doc.html', context)
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_traders
+def import_mb_doc(request, *args, **kwargs):
+    context = kwargs['context']
+    return render(request, 'traders/import_mb_doc.html', context)
