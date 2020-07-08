@@ -77,6 +77,31 @@ def load_excel_lot(context, lot_row):
     else:
         lot.production_site_country = None
 
+    if 'production_site_reference' in lot_row:
+        production_site_reference = lot_row['production_site_reference']
+        lot.unknown_production_site_reference = production_site_reference
+    else:
+        lot.unknown_production_site_reference = None
+
+    if 'production_site_commissioning_date' in lot_row:
+        production_site_commissioning_date = lot_row['production_site_commissioning_date']
+        if isinstance(production_site_commissioning_date, datetime.datetime) or isinstance(production_site_commissioning_date, datetime.date):
+            dd = production_site_commissioning_date
+        else:
+            year = int(production_site_commissioning_date[0:4])
+            month = int(production_site_commissioning_date[5:7])
+            day = int(production_site_commissioning_date[8:10])
+            dd = datetime.date(year=year, month=month, day=day)
+        lot.unknown_production_site_com_date = dd
+    else:
+        lot.unknown_production_site_com_date = None
+
+    if 'double_counting_registration' in lot_row:
+        double_counting_registration = lot_row['double_counting_registration']
+        lot.unknown_production_site_dbl_counting = double_counting_registration
+    else:
+        lot.unknown_production_site_dbl_counting = None
+
     if 'biocarburant_code' in lot_row:
         biocarburant = lot_row['biocarburant_code']
         try:
