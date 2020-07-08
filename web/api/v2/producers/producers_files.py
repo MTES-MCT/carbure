@@ -25,6 +25,10 @@ def get_random(model):
 
 # not an API call. helper function
 def load_excel_lot(context, lot_row):
+    # check for empty row
+    if 'biocarburant_code' in lot_row and lot_row['biocarburant_code'] == None:
+        return False
+
     entity = context['user_entity']
     lot = LotV2()
     lot.added_by = entity
