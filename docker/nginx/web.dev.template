@@ -6,12 +6,6 @@ server {
 
     root /var/www/html;
 
-    # metabase
-    location /metabase {
-        proxy_pass http://carbure-metabase:3000;
-    }
-
-
     # serve static files
     location /static {
         alias /var/www/html;
