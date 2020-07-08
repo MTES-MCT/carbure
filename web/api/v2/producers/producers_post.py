@@ -35,7 +35,6 @@ def delete_lots(request, *args, **kwargs):
 @enrich_with_user_details
 @restrict_to_producers
 def delete_mb_drafts_lots(request, *args, **kwargs):
-    context = kwargs['context']
     lot_ids = request.POST.get('lots', None)
     errors = []
     if not lot_ids:

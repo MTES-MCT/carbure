@@ -305,10 +305,13 @@ def load_excel_lot(context, lot_row):
     else:
         try:
             delivery_date = lot_row['delivery_date']
-            year = int(delivery_date[0:4])
-            month = int(delivery_date[5:7])
-            day = int(delivery_date[8:10])
-            dd = datetime.date(year=year, month=month, day=day)
+            if isinstance(delivery_date, datetime.datetime) or isinstance(delivery_date, datetime.date):
+                dd = delivery_date
+            else:
+                year = int(delivery_date[0:4])
+                month = int(delivery_date[5:7])
+                day = int(delivery_date[8:10])
+                dd = datetime.date(year=year, month=month, day=day)
             transaction.delivery_date = dd
             lot.period = dd.strftime('%Y-%m')
             TransactionError.objects.filter(tx=transaction, field='delivery_date').delete()
@@ -372,6 +375,8 @@ def load_excel_lot(context, lot_row):
 
     if 'champ_libre' in lot_row:
         transaction.champ_libre = lot_row['champ_libre']
+        if transaction.champ_libre is None:
+            transaction.champ_libre = ''
     transaction.save()
     lot.save()
 
@@ -465,10 +470,13 @@ def load_excel_mb_lot(context, lot_row):
     else:
         try:
             delivery_date = lot_row['delivery_date']
-            year = int(delivery_date[0:4])
-            month = int(delivery_date[5:7])
-            day = int(delivery_date[8:10])
-            dd = datetime.date(year=year, month=month, day=day)
+            if isinstance(delivery_date, datetime.datetime) or isinstance(delivery_date, datetime.date):
+                dd = delivery_date
+            else:
+                year = int(delivery_date[0:4])
+                month = int(delivery_date[5:7])
+                day = int(delivery_date[8:10])
+                dd = datetime.date(year=year, month=month, day=day)
             transaction.delivery_date = dd
             lot.period = dd.strftime('%Y-%m')
             TransactionError.objects.filter(tx=transaction, field='delivery_date').delete()
