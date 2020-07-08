@@ -328,7 +328,7 @@ def make_operators_lots_sheet(workbook, entity):
                'production_site_commissioning_date', 'double_counting_registration',
                'vendor', 'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
                'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
-               'dae', 'champ_libre', 'delivery_date', 'delivery_site', 'delivery_site_country']
+               'dae', 'champ_libre', 'delivery_date', 'delivery_site']
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
 
@@ -346,7 +346,7 @@ def make_operators_lots_sheet(workbook, entity):
         p = random.choice(unknown_producers)
         row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc']]
         row += [vendor, volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 'FR000000123', clientid]
-        row += [today, site.depot_id, 'FR']
+        row += [today, site.depot_id]
 
         colid = 0
         for elem in row:

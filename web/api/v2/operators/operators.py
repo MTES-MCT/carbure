@@ -298,20 +298,6 @@ def load_excel_lot(context, lot_row):
         e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site',
                                                          defaults={'value': None, 'error': "Merci de préciser un site de livraison"})
 
-    if transaction.delivery_site_is_in_carbure is False:
-        if 'delivery_site_country' in lot_row:
-            try:
-                country = Pays.objects.get(code_pays=lot_row['delivery_site_country'])
-                transaction.unknown_delivery_site_country = country
-            except Exception:
-                error, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site_country',
-                                                                     error='Champ production_site_country incorrect',
-                                                                     defaults={'value': lot_row['delivery_site_country']})
-        else:
-            error, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site_country',
-                                                                 error='Merci de préciser une valeur dans le champ production_site_country',
-                                                                 defaults={'value': None})
-
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
 
