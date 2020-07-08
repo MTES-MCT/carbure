@@ -14,6 +14,10 @@ const columns_definitions = {
 'producer': {title:'Producteur', hidden: true, can_filter: true, filter_title: 'Producteur', can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.carbure_producer ? full.fields.lot.carbure_producer.name : full.fields.lot.unknown_producer }},
 'production_site': {title:'Site de<br /> Production', can_filter: true, filter_title: 'Site', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.lot.carbure_production_site ? full.fields.lot.carbure_production_site.name : full.fields.lot.unknown_production_site }},
 'production_country': {title:'Pays de<br /> Production', filter_title: 'Pays Production', can_hide: true, can_filter: true, orderable: false, render: (data, type, full, meta) => { return full.fields.lot.carbure_production_site ? full.fields.lot.carbure_production_site.country.code_pays : (full.fields.lot.unknown_production_country ? full.fields.lot.unknown_production_country.code_pays: "") }},
+'ps_com_date': {title:'Date de mise en service', hidden: true, can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.carbure_production_site ? full.fields.lot.carbure_production_site.date_mise_en_service : full.fields.lot.unknown_production_site_com_date }},
+'ps_ref': {title:'Référence sys. fournisseur', hidden: true, can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.carbure_production_site ? full.fields.lot.carbure_production_site.name : full.fields.lot.unknown_production_site_reference }},
+'ps_dbl': {title:'Num. double compte', hidden: true, can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.carbure_production_site ? full.fields.lot.carbure_production_site.dc_reference : full.fields.lot.unknown_production_site_dbl_counting }},
+
 'volume': {title:'Volume<br /> à 20°C<br /> en Litres', can_hide: true, render: (data, type, full, meta) => { return full.fields.lot.volume }},
 'biocarburant': {title:'Biocarburant', can_hide: true, can_filter: true, render: (data, type, full, meta) => { return full.fields.lot.biocarburant ? full.fields.lot.biocarburant.name : ''}},
 'matiere_premiere': {title:'Matière<br /> Première', filter_title:'MP', can_hide: true, can_filter: true, render: (data, type, full, meta) => { return full.fields.lot.matiere_premiere ? full.fields.lot.matiere_premiere.name : ''}},
@@ -60,7 +64,7 @@ const producer_columns_out = ['carbure_id', 'producer', 'production_site', 'volu
 
 
 
-const operators_columns_drafts = ['checkbox', 'id', 'producer', 'production_site', 'volume', 'biocarburant', 'matiere_premiere', 'pays_origine',
+const operators_columns_drafts = ['checkbox', 'id', 'producer', 'production_site', 'ps_com_date', 'ps_ref', 'ps_dbl', 'volume', 'biocarburant', 'matiere_premiere', 'pays_origine',
 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'dae', 'champ_libre', 'delivery_date', 'delivery_site']
 
 const operators_columns_in = ['checkbox', 'id', 'delivery_status', 'carbure_id', 'producer', 'production_site', 'production_country', 'vendor', 'biocarburant', 'matiere_premiere', 'volume', 'pays_origine',
