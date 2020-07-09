@@ -1,0 +1,78 @@
+/*
+====================================
+Small Screen - Tablate
+====================================
+*/
+@media screen and (min-width: 768px) and (max-width: 991px) {
+
+    .main-nav-area ul li > a {      
+        padding: 25px 0px 5px !important;   
+        display: inline-block!important;    
+    }
+
+    #btnav1-dd {
+        margin-bottom: 30px;
+    }
+
+    .header-bt h4 {
+        margin-bottom: 20px;
+    }
+    
+    .hb-item {
+        margin-bottom: 30px;
+    }
+
+    .pagination-area {
+        padding: 15px 0 40px;
+    }
+
+
+
+
+
+
+
+
+
+}
+
+/*
+====================================
+Xtra Small Screen - Small Mobile
+====================================
+*/
+@media screen and (max-width: 767px) {
+
+    .main-nav-area ul li > a {      
+        padding: 20px 0px 5px !important;   
+        display: inline-block!important;    
+    }
+
+    #btnav1-dd {
+        margin-bottom: 30px;
+    }
+
+    .main-nav-area .nav-logo {
+        width: 140px;
+    }
+
+    .header-bt h4 {
+        margin-bottom: 15px;
+    }
+    
+    .hb-item {
+        margin-bottom: 15px;
+    }
+
+    .pnt-right {
+        margin-top: 15px;
+    }
+
+    .pagination-area {
+        padding: 15px 0 30px;
+    }
+
+
+
+
+}
