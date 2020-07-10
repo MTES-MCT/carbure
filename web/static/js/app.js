@@ -1675,6 +1675,8 @@ const dt_admin_lots = {
   paging: true,
   info: true,
   dom: 'rtp',
+  serverSide: true,
+  processing: true,
   columnDefs: [
     {
       targets: [0],
@@ -1879,6 +1881,8 @@ function init_tab_generic(tab_name) {
         columnDefs: config.columnDefs,
         order: config.order,
         columns: config.col_definition,
+        processing: config.processing,
+        serverSide: config.serverSide,
         ajax: {
           url: config.url,
           dataSrc: config.ajax_dataSrc,
