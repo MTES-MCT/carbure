@@ -1703,7 +1703,7 @@ const dt_admin_lots = {
   post_init: function(table) {
     let tbl_id = table.table().node().id
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
-      display_lot_modal(table, administrators_columns, e)
+      display_lot_modal(table, administrators_columns, e, 'mb')
     })
 
     $('#input_search_datatable').on('keyup', function() {
