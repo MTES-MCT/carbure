@@ -33,18 +33,18 @@
 	</div>
 </div>
 
-<div class="modal__backdrop" id="modal_columns_admin">
+<div class="modal__backdrop" id="modal_columns">
   <div class="modal">
     <div class="flex-container">
-      <table id="table_columns_admin_filter">
+      <table id="table_columns_admin_tab_out_filter">
         <!-- dynamically generated in js -->
       </table>
-      <table id="table_columns_admin_filter2">
+      <table id="table_columns_admin_tab_out_filter2">
         <!-- dynamically generated in js -->
       </table>
     </div>
     <div class="form__group button__group">
-      <a class="button secondary close" id="btn_close_modal_columns_admin">Fermer</a>
+      <a class="button secondary close" id="btn_close_modal_columns">Fermer</a>
     </div>
   </div>
 </div>
@@ -58,7 +58,7 @@
 <script type="text/javascript">
 window.api_get_out = "{% url 'api-v2-admin-get-out' %}"
 $(document).ready(function() {
-  init_tab_generic("tab_lots")
+  init_tab_generic("admin_tab_out")
 })
 </script>
 {% endblock %}
