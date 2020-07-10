@@ -1705,7 +1705,7 @@ const dt_admin_lots = {
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
       display_lot_modal(table, administrators_columns, e)
     })
-    initFilters(dt_admin_columns, "out")
+    initFilters(administrators_columns, "admin_tab_out")
   }
 }
 
@@ -1726,7 +1726,7 @@ dt_config['tab_operators_out'] = dt_operators_out_config
 dt_config['tab_users'] = dt_admin_users
 dt_config['tab_entities'] = dt_admin_entities
 dt_config['tab_rights'] = dt_admin_rights
-dt_config['tab_lots'] = dt_admin_lots
+dt_config['admin_tab_out'] = dt_admin_lots
 
 
 })
