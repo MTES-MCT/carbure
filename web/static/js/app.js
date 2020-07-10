@@ -1705,6 +1705,11 @@ const dt_admin_lots = {
     $(`#${tbl_id} tbody`).on('click', 'td',  (e) => {
       display_lot_modal(table, administrators_columns, e)
     })
+
+    $('#input_search_datatable').on('keyup', function() {
+        table.search(this.value).draw()
+    })
+
     initFilters(administrators_columns, "admin_tab_out")
   }
 }
