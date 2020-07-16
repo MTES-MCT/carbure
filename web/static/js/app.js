@@ -441,7 +441,7 @@ function manage_duplicate_button() {
 
 function check_production_sites() {
   $.ajax({
-    url         : window.producers_api_production_sites_autocomplete + `?producer_id=${window.producer_id}&query=`,
+    url         : window.api_production_sites_autocomplete + `?producer_id=${window.producer_id}&query=`,
     type        : 'GET',
     success     : function(data, textStatus, jqXHR) {
       if (data['suggestions'].length == 0) {
@@ -456,7 +456,7 @@ function check_production_sites() {
 
 function check_mps() {
   $.ajax({
-    url         : window.producers_api_mps_autocomplete + `?producer_id=${window.producer_id}&query=`,
+    url         : window.api_mps_autocomplete + `?producer_id=${window.producer_id}&query=`,
     type        : 'GET',
     success     : function(data, textStatus, jqXHR) {
       if (data['suggestions'].length == 0) {
@@ -471,7 +471,7 @@ function check_mps() {
 
 function check_biocarburants() {
   $.ajax({
-    url         : window.producers_api_biocarburants_autocomplete + `?producer_id=${window.producer_id}&query=`,
+    url         : window.api_biocarburants_autocomplete + `?producer_id=${window.producer_id}&query=`,
     type        : 'GET',
     success     : function(data, textStatus, jqXHR) {
       if (data['suggestions'].length == 0) {
@@ -965,7 +965,7 @@ function handleSave(action) {
 
 function load_ges(mp, bc) {
   $.ajax({
-    url         : window.producers_api_ges + `?mp=${mp}&bc=${bc}`,
+    url         : window.api_ges + `?mp=${mp}&bc=${bc}`,
     cache       : false,
     contentType : false,
     processData : false,
@@ -1006,7 +1006,7 @@ $(".ges_field").on('change', function() {
 
 $(document).ready(function() {
 $(".autocomplete_mps").autocomplete({
-  serviceUrl: window.producers_api_mps_autocomplete,
+  serviceUrl: window.api_mps_autocomplete,
   dataType: 'json',
   minChars: 0,
   onSelect: function(suggestion) {
@@ -1022,7 +1022,7 @@ $(".autocomplete_mps").autocomplete({
 })
 
 $(".autocomplete_biocarburants").autocomplete({
-  serviceUrl: window.producers_api_biocarburants_autocomplete,
+  serviceUrl: window.api_biocarburants_autocomplete,
   dataType: 'json',
   minChars: 0,
   onSelect: function(suggestion) {
@@ -1038,7 +1038,7 @@ $(".autocomplete_biocarburants").autocomplete({
 })
 
 $(".autocomplete_producers").autocomplete({
-  serviceUrl: window.producers_api_producers_autocomplete_v2,
+  serviceUrl: window.api_producers_autocomplete_v2,
   dataType: 'json',
   minChars: 0,
   onSelect: function(suggestion) {
@@ -1052,7 +1052,7 @@ $(".autocomplete_producers").autocomplete({
 })
 
 $(".autocomplete_production_sites").autocomplete({
-  serviceUrl: window.producers_api_production_sites_autocomplete,
+  serviceUrl: window.api_production_sites_autocomplete,
   dataType: 'json',
   minChars: 0,
   onSelect: function(suggestion) {
@@ -1075,7 +1075,7 @@ $(".autocomplete_countries").autocomplete({
 })
 
 $(".autocomplete_clients").autocomplete({
-  serviceUrl: window.producers_api_clients_autocomplete_v2,
+  serviceUrl: window.api_clients_autocomplete_v2,
   dataType: 'json',
   minChars: 0,
   onSelect: function(suggestion) {
@@ -1087,7 +1087,7 @@ $(".autocomplete_clients").autocomplete({
 })
 
 $(".autocomplete_depots").autocomplete({
-  serviceUrl: window.producers_api_depots_autocomplete_v2,
+  serviceUrl: window.api_depots_autocomplete_v2,
   dataType: 'json',
   minChars: 0,
   onSelect: function(suggestion) {

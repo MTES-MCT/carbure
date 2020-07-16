@@ -3,6 +3,7 @@ from django.urls import path, include
 from . import public_api
 from . import producers_api
 from . import administrators_api
+from api.v2 import shared
 
 urlpatterns = [
     path('v2/producers/', include('api.v2.producers.urls')),
@@ -11,6 +12,18 @@ urlpatterns = [
     path('v2/administrators/', include('api.v2.administrators.urls')),
 
 
+    # misc - automplete
+    path('v2/shared/get-producers-autocomplete', shared.get_producers_autocomplete, name='api-v2-producers-autocomplete'),
+    path('v2/shared/get-clients-autocomplete', shared.get_clients_autocomplete, name='api-v2-clients-autocomplete'),
+    path('v2/shared/get-depots-autocomplete', shared.get_depots_autocomplete, name='api-v2-depots-autocomplete'),
+    path('v2/shared/get-prodsites-autocomplete', shared.get_prod_site_autocomplete, name='api-v2-production-sites-autocomplete'),
+    path('v2/shared/get-mps-autocomplete', shared.get_mps_autocomplete, name='api-v2-mps-autocomplete'),
+    path('v2/shared/get-bcs-autocomplete', shared.get_biocarburants_autocomplete, name='api-v2-biocarburants-autocomplete'),
+    path('v2/shared/get-ges', shared.get_ges, name='api-v2-get-ges'),
+
+
+
+    # ALL BELOW CALLS NEED TO BE DEPRECATED:
     # api v1
     path('v1/producers/add-production-site', producers_api.producers_settings_add_site, name='producers-api-settings-add-site'),
     path('v1/producers/add-production-site-certificate', producers_api.producers_settings_add_certif, name='producers-api-settings-add-certif'),
@@ -40,5 +53,4 @@ urlpatterns = [
     path('administrators/entities-autocomplete/', administrators_api.admin_entities_autocomplete, name='admin-api-entities-autocomplete'),
     path('administrators/lots', administrators_api.admin_lots, name='admin-api-lots'),
     path('administrators/export', administrators_api.admin_lots_export, name='admin-api-lots-export'),
-
 ]

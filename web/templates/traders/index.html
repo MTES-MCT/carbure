@@ -326,6 +326,21 @@ window.api_lot_accept_v2 = "{% url 'api-v2-traders-accept-lot' %}"
 window.api_lot_add_comment_v2 = "{% url 'api-v2-traders-add-lot-correction' %}"
 
 
+
+// API MISC
+// v2
+window.api_ges = "{% url 'api-v2-get-ges' %}"
+window.api_producers_autocomplete_v2 = "{% url 'api-v2-producers-autocomplete' %}"
+window.api_clients_autocomplete_v2 = "{% url 'api-v2-clients-autocomplete' %}"
+window.api_depots_autocomplete_v2 = "{% url 'api-v2-depots-autocomplete' %}"
+window.api_biocarburants_autocomplete = "{% url 'api-v2-biocarburants-autocomplete' %}"
+window.api_mps_autocomplete = "{% url 'api-v2-mps-autocomplete' %}"
+window.api_production_sites_autocomplete = "{% url 'api-v2-production-sites-autocomplete' %}"
+// legacy
+window.api_country_autocomplete = "{% url 'api-country-autocomplete' %}"
+window.api_operators_autocomplete = "{% url 'api-operators-autocomplete' %}"
+window.api_depots_autocomplete = "{% url 'api-depots-autocomplete' %}"
+
 $(document).ready(function() {
   // show drafts tab
   tabcontent = document.getElementById("tab_drafts")

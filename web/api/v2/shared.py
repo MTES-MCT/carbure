@@ -10,7 +10,6 @@ from producers.models import ProductionSite, ProductionSiteInput, ProductionSite
 
 @login_required
 @enrich_with_user_details
-@restrict_to_producers
 def get_producers_autocomplete(request, *args, **kwargs):
     q = request.GET['query']
     rights = UserRights.objects.filter(user=request.user)
@@ -21,7 +20,6 @@ def get_producers_autocomplete(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
-@restrict_to_producers
 def get_clients_autocomplete(request, *args, **kwargs):
     q = request.GET['query']
     entities = Entity.objects.filter(entity_type__in=['Producteur', 'Trader', 'Opérateur'], name__icontains=q)
@@ -30,7 +28,6 @@ def get_clients_autocomplete(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
-@restrict_to_producers
 def get_depots_autocomplete(request, *args, **kwargs):
     q = request.GET['query']
     depots = Depot.objects.filter(Q(name__icontains=q) | Q(city__icontains=q) | Q(depot_id__icontains=q))
@@ -40,7 +37,6 @@ def get_depots_autocomplete(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
-@restrict_to_producers
 def get_ges(request, *args, **kwargs):
     mp = request.GET.get('mp', None)
     bc = request.GET.get('bc', None)
@@ -64,7 +60,6 @@ def get_ges(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
-@restrict_to_producers
 def get_prod_site_autocomplete(request, *args, **kwargs):
     context = kwargs['context']
     q = request.GET['query']
@@ -75,7 +70,6 @@ def get_prod_site_autocomplete(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
-@restrict_to_producers
 def get_biocarburants_autocomplete(request, *args, **kwargs):
     context = kwargs['context']
     q = request.GET['query']
@@ -94,7 +88,6 @@ def get_biocarburants_autocomplete(request, *args, **kwargs):
 
 @login_required
 @enrich_with_user_details
-@restrict_to_producers
 def get_mps_autocomplete(request, *args, **kwargs):
     context = kwargs['context']
     q = request.GET['query']
