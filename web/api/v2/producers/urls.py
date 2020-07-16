@@ -3,7 +3,6 @@ from django.urls import path
 from . import producers_get
 from . import producers_post
 from . import producers_files
-from . import producers_misc
 
 
 urlpatterns = [
@@ -39,16 +38,4 @@ urlpatterns = [
     path('lot/mb/delete-drafts', producers_post.delete_mb_drafts_lots, name='api-v2-producers-delete-mb-drafts'),
     path('lot/mb/validate-drafts', producers_post.validate_mb_drafts_lots, name='api-v2-producers-validate-mb-drafts-lots'),
     path('lot/mb/fuse', producers_post.fuse_mb_lots, name='api-v2-producers-fuse-mb-lots'),
-
-
-    # misc
-    path('get-producers-autocomplete', producers_misc.get_producers_autocomplete, name='api-v2-producers-autocomplete'),
-    path('get-clients-autocomplete', producers_misc.get_clients_autocomplete, name='api-v2-clients-autocomplete'),
-    path('get-depots-autocomplete', producers_misc.get_depots_autocomplete, name='api-v2-depots-autocomplete'),
-    path('get-prodsites-autocomplete', producers_misc.get_prod_site_autocomplete, name='api-v2-production-sites-autocomplete'),
-    path('get-mps-autocomplete', producers_misc.get_mps_autocomplete, name='api-v2-mps-autocomplete'),
-    path('get-bcs-autocomplete', producers_misc.get_biocarburants_autocomplete, name='api-v2-biocarburants-autocomplete'),
-
-    path('get-ges', producers_misc.get_ges, name='api-v2-get-ges'),
-
 ]
