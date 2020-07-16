@@ -138,8 +138,8 @@ def fuse_mb_lots(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Aucune ligne sélectionnée'}, status=400)
 
     ids = txids.split(',')
-    first = LotTransaction.objects.get(id=ids[0], lot__added_by=context['user_entity'], lot__status='Validated')
-    txs = LotTransaction.objects.filter(id__in=ids, lot__added_by=context['user_entity'], lot__status='Validated',
+    first = LotTransaction.objects.get(id=ids[0], carbure_client=context['user_entity'], lot__status='Validated')
+    txs = LotTransaction.objects.filter(id__in=ids, carbure_client=context['user_entity'], lot__status='Validated',
                                         lot__biocarburant=first.lot.biocarburant, lot__matiere_premiere=first.lot.matiere_premiere,
                                         lot__ghg_total=first.ghg_total, lot__pays_origine=first.lot.pays_origine, carbure_delivery_site=first.carbure_delivery_site,
                                         lot__carbure_producer=first.lot.carbure_producer, lot__unknown_producer=first.lot.unknown_producer,

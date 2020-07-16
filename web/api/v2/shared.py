@@ -74,15 +74,19 @@ def get_biocarburants_autocomplete(request, *args, **kwargs):
     context = kwargs['context']
     q = request.GET['query']
     producer = context['user_entity']
-    production_site = request.GET.get('production_site', None)
-    if production_site is None:
-        ps = ProductionSite.objects.filter(producer=producer)
-        outputs = ProductionSiteOutput.objects.filter(production_site__in=ps, biocarburant__name__icontains=q)\
-                                              .values('biocarburant').distinct()
+    if producer.entity_type == 'Trader':
+        bcs = Biocarburant.objects.all()
     else:
-        outputs = ProductionSiteOutput.objects.filter(production_site=production_site, biocarburant__name__icontains=q)\
-                                              .values('biocarburant').distinct()
-    bcs = Biocarburant.objects.filter(id__in=outputs)
+
+        production_site = request.GET.get('production_site', None)
+        if production_site is None:
+            ps = ProductionSite.objects.filter(producer=producer)
+            outputs = ProductionSiteOutput.objects.filter(production_site__in=ps, biocarburant__name__icontains=q)\
+                                                  .values('biocarburant').distinct()
+        else:
+            outputs = ProductionSiteOutput.objects.filter(production_site=production_site, biocarburant__name__icontains=q)\
+                                                  .values('biocarburant').distinct()
+        bcs = Biocarburant.objects.filter(id__in=outputs)
     return JsonResponse({'suggestions': [{'value': s.name, 'data': s.code} for s in bcs]})
 
 
@@ -92,13 +96,16 @@ def get_mps_autocomplete(request, *args, **kwargs):
     context = kwargs['context']
     q = request.GET['query']
     producer = context['user_entity']
-    production_site = request.GET.get('production_site', None)
-    if production_site is None:
-        ps = ProductionSite.objects.filter(producer=producer)
-        inputs = ProductionSiteInput.objects.filter(production_site__in=ps, matiere_premiere__name__icontains=q)\
-                                            .values('matiere_premiere').distinct()
+    if producer.entity_type == 'Trader':
+        mps = MatierePremiere.objects.all()
     else:
-        inputs = ProductionSiteInput.objects.filter(production_site=ps, matiere_premiere__name__icontains=q)\
-                                            .values('matiere_premiere').distinct()
-    mps = MatierePremiere.objects.filter(id__in=inputs)
+        production_site = request.GET.get('production_site', None)
+        if production_site is None:
+            ps = ProductionSite.objects.filter(producer=producer)
+            inputs = ProductionSiteInput.objects.filter(production_site__in=ps, matiere_premiere__name__icontains=q)\
+                                                .values('matiere_premiere').distinct()
+        else:
+            inputs = ProductionSiteInput.objects.filter(production_site=ps, matiere_premiere__name__icontains=q)\
+                                                .values('matiere_premiere').distinct()
+        mps = MatierePremiere.objects.filter(id__in=inputs)
     return JsonResponse({'suggestions': [{'value': s.name, 'data': s.code} for s in mps]})

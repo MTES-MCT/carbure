@@ -139,8 +139,8 @@ def fuse_mb_lots(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Aucune ligne sélectionnée'}, status=400)
 
     ids = txids.split(',')
-    first = LotTransaction.objects.get(id=ids[0], lot__added_by=context['user_entity'], lot__status='Validated')
-    txs = LotTransaction.objects.filter(id__in=ids, lot__added_by=context['user_entity'], lot__status='Validated',
+    first = LotTransaction.objects.get(id=ids[0], carbure_client=context['user_entity'], lot__status='Validated')
+    txs = LotTransaction.objects.filter(id__in=ids, carbure_client=context['user_entity'], lot__status='Validated',
                                         lot__biocarburant=first.lot.biocarburant, lot__matiere_premiere=first.lot.matiere_premiere,
                                         lot__ghg_total=first.ghg_total, lot__pays_origine=first.lot.pays_origine, carbure_delivery_site=first.carbure_delivery_site,
                                         lot__carbure_producer=first.lot.carbure_producer, lot__unknown_producer=first.lot.unknown_producer,
@@ -150,8 +150,11 @@ def fuse_mb_lots(request, *args, **kwargs):
         common.fuse_lots(txs)
         return JsonResponse({'status': 'success'})
     else:
-        print(ids)
-        print(txs)
+        txs = LotTransaction.objects.filter(id__in=ids)
+        # for t in txs:
+        #     print('tx %d' % (t.id))
+        #     print(t.lot.added_by, t.lot.status, t.lot.biocarburant, t.lot.matiere_premiere, t.lot.ghg_total, t.lot.pays_origine, t.carbure_delivery_site)
+        #     print(t.lot.carbure_producer, t.lot.unknown_producer, t.lot.carbure_production_site, t.lot.unknown_production_site)
         return JsonResponse({'status': 'error', 'message': "Fusion impossible. Les données de durabilité diffèrent."}, status=400)
 
 
