@@ -184,7 +184,7 @@
       </svg>
     </a>
     <div class="flex-container">
-      <div class="form__group" style="width: 50%; margin-right: 30px;">
+      <div class="form__group" style="width: 100%; margin-right: 30px;">
         <h4>Importer Fichier</h4>
         <form method="POST" id="modal_import_form" data-url="{% url 'api-v2-traders-excel-template-upload' %}" data-reload="0">
           <span id="modal_import_form_err_message" style="color: red;"></span>
@@ -205,13 +205,6 @@
 
           <a class="button primary" id="btn_submit_upload_form">Envoyer</a>
         </form>
-      </div>
-      <div style="border-left: 1px solid;"></div>
-
-      <div class="form__group" style="width: 50%; margin-left: 30px;">
-        <h4>Ajout Manuel</h4>
-        <p>Créer un lot et remplir ses caractéristiques manuellement</p>
-        <a class="button primary" id="add_lot" style="position: absolute; left: 0; bottom: 0; top: auto;">Ajouter Lot</a>
       </div>
    </div>
  </div>
