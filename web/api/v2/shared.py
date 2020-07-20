@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 
-from core.decorators import enrich_with_user_details, restrict_to_producers
+from core.decorators import enrich_with_user_details
 
 from core.models import Entity, Biocarburant, MatierePremiere, Depot, GHGValues, UserRights
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
