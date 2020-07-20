@@ -1849,6 +1849,12 @@ $("#add_lot").on('click', function() {
   $("#correct_section").hide()
   $("#save_section").show()
 
+  $('input[type=radio][name=producer_is_in_carbure][value=yes]').prop("checked", true)
+  producer_is_in_carbure(true)
+  $('input[type=radio][name=client_is_in_carbure][value=yes]').prop("checked", true)
+  client_is_in_carbure(true)
+  $('input[type=radio][name=delivery_site_is_in_carbure][value=yes]').prop("checked", true)
+  delivery_site_is_in_carbure(true)
 
   /* empty all input fields */
   $("#modal_lot input").each(function() {
