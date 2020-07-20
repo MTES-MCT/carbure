@@ -362,32 +362,35 @@ def excel_template_upload(request, *args, **kwargs):
     if file is None:
         return JsonResponse({'status': "error", 'message': "Merci d'ajouter un fichier"}, status=400)
     # we can load the file
-    wb = openpyxl.load_workbook(file)
-    lots_sheet = wb['lots']
-    colid2field = {}
-    lots = []
-    # create a dictionary from the line
-    for i, row in enumerate(lots_sheet):
-        if i == 0:
-            # header
-            for i, col in enumerate(row):
-                colid2field[i] = col.value
-        else:
-            lot = {}
-            for i, col in enumerate(row):
-                field = colid2field[i]
-                lot[field] = col.value
-            lots.append(lot)
-    total_lots = len(lots)
-    lots_loaded = 0
-    for lot in lots:
-        try:
-            loaded = load_excel_lot(context, lot)
-            if loaded:
-                lots_loaded += 1
-        except Exception as e:
-            print(e)
-    return JsonResponse({'status': "success", 'message': "%d/%d lots chargés correctement" % (lots_loaded, total_lots)})
+    try:
+        wb = openpyxl.load_workbook(file)
+        lots_sheet = wb['lots']
+        colid2field = {}
+        lots = []
+        # create a dictionary from the line
+        for i, row in enumerate(lots_sheet):
+            if i == 0:
+                # header
+                for i, col in enumerate(row):
+                    colid2field[i] = col.value
+            else:
+                lot = {}
+                for i, col in enumerate(row):
+                    field = colid2field[i]
+                    lot[field] = col.value
+                lots.append(lot)
+        total_lots = len(lots)
+        lots_loaded = 0
+        for lot in lots:
+            try:
+                loaded = load_excel_lot(context, lot)
+                if loaded:
+                    lots_loaded += 1
+            except Exception as e:
+                print(e)
+        return JsonResponse({'status': "success", 'message': "%d/%d lots chargés correctement" % (lots_loaded, total_lots)})
+    except Exception as e:
+        return JsonResponse({'status': "error", 'message': "Format du fichier Excel non reconnu. Avez-vous utilisé l'un des templates fournis?"})
 
 
 @login_required
