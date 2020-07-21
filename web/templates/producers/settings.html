@@ -44,7 +44,7 @@
               <dl>
                 {% for certificate in site.certificates %}
                 <dd>
-                  <a href="{{ site.certificate.certificate.url }}" target="_blank">{{certificate.certificate_id}}</a> {{certificate.expiration}}
+                  <a href="{{ site.certificate.certificate.url }}" target="_blank">{{certificate.certificate_id}}</a> {% if certificate.expiration < today %}<span style="color: red;">{{certificate.expiration}}</span>{% else %} {{certificate.expiration}} {% endif %}
                   <li class="label" style="background: var(--light-blue); padding: 2px;" title="Supprimer"><a class="btn_open_modal_delete_certif" data-crtid="{{certificate.id}}" data-site="{{site.name}}" data-num="{{certificate.certificate.name}}" data-expi="{{certificate.expiration}}">x</a>
                 </dd>
                 {% empty %}
