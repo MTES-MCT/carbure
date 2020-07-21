@@ -42,6 +42,16 @@ def producers_histo(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
+def stats(request, *args, **kwargs):
+    context = kwargs['context']
+    context['current_url_name'] = 'producers-stats'
+    context['producer_id'] = context['user_entity'].id
+    return render(request, 'producers/stats.html', context)
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
 def new_design(request, *args, **kwargs):
     context = kwargs['context']
     context['current_url_name'] = 'producers-new-design'
