@@ -10,8 +10,7 @@ urlpatterns = [
     path('v2/<slug:producer_name>/mass-balance', v2.producers_mass_balance, name='producers-mb'),
     path('v2/<slug:producer_name>/archives', v2.producers_histo, name='producers-histo'),
     path('v2/import-documentation', v2.producers_import_doc, name='producers-import-documentation'),
-
-
+    path('v2/<slug:producer_name>/stats', v2.stats, name='producers-stats'),
     path('v2/new_design', v2.new_design, name='producers-new-design'),
 
 ]
