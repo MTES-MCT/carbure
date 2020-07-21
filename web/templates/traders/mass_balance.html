@@ -64,9 +64,15 @@
         <a id="btn_open_modal_columns_tab_mb" class="button modal-button" style="margin-left: 5px; margin-right: 0px; padding: var(--space-xs) var(--space-xs) 0 var(--space-xs)" >
           <img src="/static/images/icons/internal/funnel2.svg" height="24" width="24"  style="margin-bottom: 5px;" />
         </a>
-        <a class="button modal-button" href="{% url 'api-v2-traders-export-mb' %}" style="margin-left: 5px; margin-right: auto; padding: 7px 10px 0px 10px;">
+        <a class="button modal-button" href="{% url 'api-v2-traders-export-mb' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
           <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
         </a>
+        <select id="pagelength_2" style="margin-top: auto; margin-left: 5px; margin-right: auto;">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
       </div>
 
       <table class="display nowrap" id="datatable_mb">
@@ -178,7 +184,7 @@
     <span id="modal_validate_lots_form_success_message" style="color: green;"></span>
     <form id="modal_validate_lots_form" method="POST" data-url="{% url 'api-v2-traders-validate-mb-drafts-lots' %}">
       {% csrf_token %}
-      <p><b>En validant le(s) lot(s) suivant(s), je certifie qu'ils respectent les critères du durabilité liés aux terres et que les informations renseignées sont réelles et valides.</b></p>
+      <p><b>En cliquant sur Valider, je confirme que les lots suivants seront déduis de ma mass balance et envoyés à mes clients.</b></p>
       <ul id="modal_validate_lots_list">
       </ul>
       <input type="hidden" id="modal_validate_lots_lots" name="txids">
@@ -201,7 +207,7 @@
     <span id="modal_fuse_lots_form_success_message" style="color: green;"></span>
     <form id="modal_fuse_lots_form" method="POST" data-url="{% url 'api-v2-traders-fuse-mb-lots' %}">
       {% csrf_token %}
-      <p><b>En validant le(s) lot(s) suivant(s), je certifie qu'ils respectent les critères du durabilité liés aux terres et que les informations renseignées sont réelles et valides.</b></p>
+      <p><b>En cliquant sur Valider, tous les lots présentant les mêmes caractéristiques de durabilité seront fusionnés.</b></p>
       <ul id="modal_fuse_lots_list">
       </ul>
       <input type="hidden" id="modal_fuse_lots_txids" name="txids">
