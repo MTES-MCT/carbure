@@ -139,23 +139,37 @@ def fuse_mb_lots(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Aucune ligne sélectionnée'}, status=400)
 
     ids = txids.split(',')
-    first = LotTransaction.objects.get(id=ids[0], carbure_client=context['user_entity'], lot__status='Validated')
-    txs = LotTransaction.objects.filter(id__in=ids, carbure_client=context['user_entity'], lot__status='Validated',
-                                        lot__biocarburant=first.lot.biocarburant, lot__matiere_premiere=first.lot.matiere_premiere,
-                                        lot__ghg_total=first.ghg_total, lot__pays_origine=first.lot.pays_origine, carbure_delivery_site=first.carbure_delivery_site,
-                                        lot__carbure_producer=first.lot.carbure_producer, lot__unknown_producer=first.lot.unknown_producer,
-                                        lot__carbure_production_site=first.lot.carbure_production_site)
-    if len(txs) == len(ids):
-        # ok. all lots have the same sustainability details, we can merge them
-        common.fuse_lots(txs)
-        return JsonResponse({'status': 'success'})
+    # on fusionne tout ce qu'il est possible de fusionner
+    # 1 on recupere tous les lots
+    txs = LotTransaction.objects.filter(id__in=ids, carbure_client=context['user_entity'], lot__status='Validated')
+
+    groups = {}
+    for t in txs:
+        key = '%s-%s-%s-%s' % (t.lot.biocarburant.id, t.lot.matiere_premiere.id, str(t.lot.ghg_total), t.lot.pays_origine.id)
+        if t.lot.producer_is_in_carbure:
+            key += '%s' % (t.lot.carbure_producer.id)
+        else:
+            key += '%s' % (t.lot.unknown_production_site_reference)
+
+        if t.delivery_site_is_in_carbure:
+            key += '%s' % (t.carbure_delivery_site.id)
+        else:
+            key += '%s' % (t.unknown_delivery_site)
+
+        if key not in groups:
+            groups[key] = []
+        groups[key].append(t)
+    print(groups)
+    fused = 0
+    for k, v in groups.items():
+        if len(v) > 1:
+            # we can fuse something!
+            common.fuse_lots(v)
+            fused += len(v)
+    if fused == 0:
+        return JsonResponse({'status': 'error', 'message': "Aucune possibilité de fusion"}, status=400)
     else:
-        txs = LotTransaction.objects.filter(id__in=ids)
-        for t in txs:
-            print('tx %d' % (t.id))
-            print(t.lot.added_by, t.lot.status, t.lot.biocarburant, t.lot.matiere_premiere, t.lot.ghg_total, t.lot.pays_origine, t.carbure_delivery_site)
-            print(t.lot.carbure_producer, t.lot.unknown_producer, t.lot.carbure_production_site)
-        return JsonResponse({'status': 'error', 'message': "Fusion impossible. Les données de durabilité diffèrent."}, status=400)
+        return JsonResponse({'status': 'success', 'message': "%d lignes fusionnées" % (fused)}, status=400)
 
 
 @login_required

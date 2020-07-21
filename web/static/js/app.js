@@ -232,6 +232,13 @@ $("#pagelength").on('change', function() {
   window.table.page.len(pagelength).draw()
 })
 
+
+/* TODO: be smarter */
+$("#pagelength_2").on('change', function() {
+  let pagelength = $("#pagelength_2").val()
+  window.table.page.len(pagelength).draw()
+})
+
 $("#pagelength_lots_admin").on('change', function() {
   let pagelength = $("#pagelength_lots_admin").val()
   table.page.len(pagelength).draw()
