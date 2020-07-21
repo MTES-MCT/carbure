@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth.decorators import login_required
 from core.decorators import enrich_with_user_details, restrict_to_producers
 from django.shortcuts import render
@@ -28,6 +30,7 @@ def producers_controles(request, *args, **kwargs):
 def producers_settings(request, *args, **kwargs):
     context = kwargs['context']
     context['current_url_name'] = 'producers-settings'
+    context['today'] = datetime.date.today()
     context['sites'] = ProductionSite.objects.filter(producer=context['user_entity'])
     mps = ProductionSiteInput.objects.filter(production_site__in=context['sites'])
     outputs = ProductionSiteOutput.objects.filter(production_site__in=context['sites'])
