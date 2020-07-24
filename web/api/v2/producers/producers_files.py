@@ -619,7 +619,7 @@ def excel_template_upload(request, *args, **kwargs):
                 load_excel_lot(context, lot)
                 lots_loaded += 1
             except Exception as e:
-                print(e)
+                print(str(e))
         return JsonResponse({'status': "success", 'message': "%d/%d lots chargés correctement" % (lots_loaded, total_lots)})
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "Format du fichier Excel non reconnu. Avez-vous utilisé l'un des templates fournis?", 'error': str(e)})
