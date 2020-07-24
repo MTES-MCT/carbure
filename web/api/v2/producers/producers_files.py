@@ -39,7 +39,7 @@ def load_excel_lot(context, lot_row):
         # producer_is_in_carbure = models.BooleanField(default=True)
         # carbure_producer = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='producer_lotv2')
         # unknown_producer = models.CharField(max_length=64, blank=True, default='')
-        if lot_row['producer'] == entity.name:
+        if lot_row['producer'].strip() == entity.name:
             # redundant information. by default we assume the producer is the entity logged in
             lot.producer_is_in_carbure = True
             lot.carbure_producer = entity
@@ -51,6 +51,7 @@ def load_excel_lot(context, lot_row):
                 # yes we do
                 # in this case, the producer should declare its production directly in Carbure
                 # we cannot allow someone else to declare for them
+                print('[%s] [%s]' % (lot_row['producer'], entity.name))
                 raise Exception("Vous ne pouvez pas déclarer des lots d'un producteur déjà inscrit sur Carbure")
             else:
                 # ok, unknown producer. allow importation
@@ -593,6 +594,7 @@ def excel_template_upload(request, *args, **kwargs):
         return JsonResponse({'status': "error", 'message': "Merci d'ajouter un fichier"}, status=400)
     # we can load the file
     wb = openpyxl.load_workbook(file)
+    debug = ''
     try:
         lots_sheet = wb['lots']
         colid2field = {}
@@ -612,6 +614,7 @@ def excel_template_upload(request, *args, **kwargs):
         total_lots = len(lots)
         lots_loaded = 0
         for lot in lots:
+            debug += '%s' % (lot)
             try:
                 load_excel_lot(context, lot)
                 lots_loaded += 1
