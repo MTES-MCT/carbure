@@ -17,7 +17,7 @@ def get_out(request, *args, **kwargs):
     search = request.GET.get('search[value]', None)
 
     if search != '':
-        filtered = LotTransaction.objects.filter(lot__status='Validated').filter(Q(lot__matiere_premiere__name__icontains=search) |
+        transactions = LotTransaction.objects.filter(lot__status='Validated').filter(Q(lot__matiere_premiere__name__icontains=search) |
                                                                                  Q(lot__biocarburant__name__icontains=search) |
                                                                                  Q(lot__carbure_producer__name__icontains=search) |
                                                                                  Q(lot__unknown_producer__icontains=search) |
@@ -28,11 +28,11 @@ def get_out(request, *args, **kwargs):
                                                                                  Q(carbure_delivery_site__name__icontains=search) |
                                                                                  Q(unknown_delivery_site__icontains=search)
                                                                                  )
-        transactions = filtered[start:start+length]
+        page = transactions[start:start+length]
     else:
-        filtered = LotTransaction.objects.filter(lot__status='Validated')[start:start+length]
-        transactions = filtered
-    comments = TransactionComment.objects.filter(tx__in=[t for t in transactions])
-    txsez = serializers.serialize('json', transactions, use_natural_foreign_keys=True)
+        transactions = LotTransaction.objects.filter(lot__status='Validated')
+        page = transactions[start:start+length]
+    comments = TransactionComment.objects.filter(tx__in=[t for t in page])
+    txsez = serializers.serialize('json', page, use_natural_foreign_keys=True)
     commentssez = serializers.serialize('json', comments, use_natural_foreign_keys=True)
-    return JsonResponse({'transactions': txsez, 'comments': commentssez, 'recordsFiltered': len(filtered)})
+    return JsonResponse({'transactions': txsez, 'comments': commentssez, 'recordsFiltered': len(page), 'recordsTotal': len(transactions)})

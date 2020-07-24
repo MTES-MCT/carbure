@@ -1679,7 +1679,6 @@ const dt_admin_lots = {
   id: "datatable",
   url: window.api_get_out,
   col_definition: dt_admin_columns,
-  paging: true,
   info: true,
   dom: 'rtp',
   serverSide: true,
