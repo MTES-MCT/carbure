@@ -32,6 +32,7 @@ def load_excel_lot(context, lot_row):
     entity = context['user_entity']
     lot = LotV2()
     lot.added_by = entity
+    lot.data_origin_entity = entity
     lot.added_by_user = context['user']
     if 'producer' in lot_row and lot_row['producer'] is not None:
         # this should be a bought or imported lot
@@ -412,6 +413,7 @@ def load_excel_mb_lot(context, lot_row):
     lot.pk = None
     lot.parent_lot = source_lot
     lot.added_by = entity
+    lot.data_origin_entity = lot.parent_lot.data_origin_entity
     lot.added_by_user = context['user']
     lot.status = 'Draft'
     lot.carbure_id = ''

@@ -36,6 +36,7 @@ def load_excel_lot(context, lot_row):
     # go
     entity = context['user_entity']
     lot = LotV2()
+    lot.data_origin_entity = entity
     lot.added_by = entity
     if 'producer' in lot_row and lot_row['producer'] is not None:
         # this should be a bought or imported lot
@@ -870,6 +871,7 @@ def save_lot(request, *args, **kwargs):
 
     entity = context['user_entity']
     lot.added_by = entity
+    lot.data_origin_entity = entity
     lot.added_by_user = request.user
     # easy fields first
     lot.unknown_producer = request.POST.get('unknown_producer_name', '')
