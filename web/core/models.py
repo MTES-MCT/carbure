@@ -135,7 +135,7 @@ class Depot(models.Model):
 
 from producers.models import ProductionSite
 
-
+# deprecated. Use LotV2
 class Lot(models.Model):
     VALID = "Validated"
     DRAFT = "Draft"
@@ -245,6 +245,9 @@ class LotV2(models.Model):
     is_fused = models.BooleanField(default=False)
     fused_with = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='lotv2_fused_with')
 
+    # entity responsible for the original data
+    data_origin_entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='data_origin_entity')
+
     def natural_key(self):
         return {'id': self.id, 'period': self.period, 'carbure_id': self.carbure_id, 'producer_is_in_carbure': self.producer_is_in_carbure, 'carbure_producer': self.carbure_producer.natural_key() if self.carbure_producer else None,
         'unknown_producer': self.unknown_producer, 'production_site_is_in_carbure': self.production_site_is_in_carbure, 'carbure_production_site': self.carbure_production_site.natural_key() if self.carbure_production_site else None,
@@ -316,7 +319,7 @@ class LotComment(models.Model):
         verbose_name = 'LotComment'
         verbose_name_plural = 'LotComments'
 
-
+# deprecated. use LotV2Error
 class LotError(models.Model):
     lot = models.ForeignKey(Lot, null=False, blank=False, on_delete=models.CASCADE)
     field = models.CharField(max_length=32, null=False, blank=False)
