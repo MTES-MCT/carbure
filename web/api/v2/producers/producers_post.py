@@ -309,6 +309,7 @@ def accept_lot_with_correction(request, *args, **kwargs):
     # new lot or edit?
     tx_id = request.POST.get('tx_id', None)
     tx_comment = request.POST.get('comment', '')
+    correction_type = request.POST.get('correction_type', 'BOTH')
     if tx_id is None:
         return JsonResponse({'status': 'error', 'message': "Missing TX ID from POST data"}, status=400)
     if tx_comment == '':
@@ -322,6 +323,7 @@ def accept_lot_with_correction(request, *args, **kwargs):
     txc = TransactionComment()
     txc.entity = context['user_entity']
     txc.tx = tx
+    txc.topic = correction_type
     txc.comment = tx_comment
     txc.save()
     return JsonResponse({'status': 'success', 'tx_id': tx.id})

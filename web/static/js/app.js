@@ -1817,10 +1817,11 @@ $("#btn_reject_with_comment").on('click', function() {
 $("#btn_accept_with_comment").on('click', function() {
   let tx_id = $("#tx_id").val()
   let comment = $("#textarea_correction").val()
+  let correction_type = $("input[name='correction_type']:checked").val()
   $.ajax({
     url: window.api_lot_accept_with_correction_v2,
     data: {'tx_id': tx_id, comment: comment, 'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value,
-           'comment': comment},
+           'comment': comment, 'correction_type': correction_type},
     type        : 'POST',
     success     : function(data, textStatus, jqXHR){
       // Callback code
