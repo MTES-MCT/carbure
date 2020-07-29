@@ -377,6 +377,7 @@ def save_lot(request, *args, **kwargs):
 
     entity = context['user_entity']
     lot.added_by = entity
+    lot.data_origin_entity = entity
     lot.added_by_user = request.user
     # easy fields first
     lot.unknown_producer = request.POST.get('unknown_producer_name', '')
