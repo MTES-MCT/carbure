@@ -342,7 +342,9 @@ def add_lot_correction(request, *args, **kwargs):
     if tx_comment == '':
         return JsonResponse({'status': 'error', 'message': "Un commentaire est obligatoire"}, status=400)
     try:
-        tx = LotTransaction.objects.get(lot__data_origin_entity=context['user_entity'], delivery_status__in=['N', 'AC', 'AA', 'R'], id=tx_id)
+        tx = LotTransaction.objects.get(delivery_status__in=['N', 'AC', 'AA', 'R'], id=tx_id)
+        if tx.lot.data_origin_entity != context['user_entity'] and tx.carbure_vendor != context['user_entity']:
+            return JsonResponse({'status': 'error', 'message': "Permission Denied"}, status=403)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Transaction inconnue", 'extra': str(e)}, status=400)
     tx.delivery_status = 'AA'
@@ -663,11 +665,11 @@ def save_lot(request, *args, **kwargs):
     if lot_id:
         try:
             lot = LotV2.objects.get(id=lot_id)
-            if lot.data_origin_entity != context['user_entity'] or lot.added_by != context['user_entity']:
+            if lot.data_origin_entity == context['user_entity'] or lot.added_by == context['user_entity']:
+                can_edit_lot = True
+            else:
                 # user not allowed to modify Lot
                 can_edit_lot = False
-            else:
-                can_edit_lot = True
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': "Lot inconnu", 'extra': str(e)}, status=400)
     else:

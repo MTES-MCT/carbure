@@ -47,7 +47,7 @@ const columns_definitions = {
 const producer_columns_drafts = ['checkbox', 'id', 'producer', 'production_site', 'volume', 'biocarburant', 'matiere_premiere', 'pays_origine',
 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'dae', 'champ_libre', 'delivery_date', 'client', 'delivery_site']
 
-const producer_columns_corrections = ['delivery_status', 'period', 'carbure_id', 'client', 'delivery_site', 'producer', 'production_site', 'production_country', 'volume', 'biocarburant', 'matiere_premiere',
+const producer_columns_corrections = ['delivery_status', 'period', 'carbure_id', 'vendor', 'client', 'delivery_site', 'producer', 'production_site', 'production_country', 'volume', 'biocarburant', 'matiere_premiere',
 'pays_origine', 'ghg_total', 'ghg_reduction', 'dae', 'champ_libre', 'delivery_date']
 
 const producer_columns_in = ['checkbox', 'id', 'delivery_status', 'carbure_id', 'producer', 'production_site', 'production_country', 'vendor', 'biocarburant', 'matiere_premiere', 'volume', 'pays_origine',

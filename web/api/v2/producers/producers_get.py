@@ -65,16 +65,16 @@ def get_corrections(request, *args, **kwargs):
     # corrections de type "Durabilite" ou "Les deux" pour mes lots
     tx_added = LotTransaction.objects.filter(lot__data_origin_entity=context['user_entity'], delivery_status__in=['R', 'AC', 'AA'], lot__status="Validated")
     comments_tx_added = TransactionComment.objects.filter(tx__in=tx_added, topic__in=['SUSTAINABILITY', 'BOTH'])
-    print('mes lots - dura & both')
-    for c in comments_tx_added:
-        print(c.tx.carbure_vendor, context['user_entity'], c.entity, c.comment, c.topic)
+    #print('mes lots - dura & both')
+    #for c in comments_tx_added:
+    #    print(c.tx.carbure_vendor, context['user_entity'], c.entity, c.comment, c.topic)
 
     # corrections de type "Transaction" ou "les deux" pour les lots vendus
     tx_sold = LotTransaction.objects.filter(carbure_vendor=context['user_entity'], delivery_status__in=['R', 'AC', 'AA'], lot__status="Validated")
     comments_tx_sold = TransactionComment.objects.filter(tx__in=tx_sold, topic__in=['TX', 'BOTH'])
-    print('mes lots vendus - TX & both')
-    for c in comments_tx_sold:
-        print(c.tx.carbure_vendor, context['user_entity'], c.entity, c.comment, c.topic)
+    #print('mes lots vendus - TX & both')
+    #for c in comments_tx_sold:
+    #    print(c.tx.carbure_vendor, context['user_entity'], c.entity, c.comment, c.topic)
 
     # union de tout ça
     comments = set(list(chain(comments_tx_added, comments_tx_sold)))
@@ -84,6 +84,7 @@ def get_corrections(request, *args, **kwargs):
     processed_tx = []
     for t in transactions:
         if t.carbure_vendor != context['user_entity']:
+            print(t.carbure_vendor, context['user_entity'])
             t.carbure_client = anon
             t.client_is_in_carbure = True
             t.delivery_site_is_in_carbure = True
