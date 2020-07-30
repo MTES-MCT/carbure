@@ -5,7 +5,7 @@ from itertools import chain
 
 from core.decorators import enrich_with_user_details, restrict_to_producers
 
-from core.models import LotV2, LotTransaction, LotV2Error, TransactionComment
+from core.models import Entity, LotV2, LotTransaction, LotV2Error, TransactionComment
 
 
 @login_required
@@ -59,6 +59,9 @@ def get_mb(request, *args, **kwargs):
 @restrict_to_producers
 def get_corrections(request, *args, **kwargs):
     context = kwargs['context']
+
+    anon, created = Entity.objects.get_or_create(name='Anonymisé', entity_type='Producteur')
+
     # corrections de type "Durabilite" ou "Les deux" pour mes lots
     tx_added = LotTransaction.objects.filter(lot__data_origin_entity=context['user_entity'], delivery_status__in=['R', 'AC', 'AA'], lot__status="Validated")
     comments_tx_added = TransactionComment.objects.filter(tx__in=tx_added, topic__in=['SUSTAINABILITY', 'BOTH'])
@@ -70,7 +73,20 @@ def get_corrections(request, *args, **kwargs):
     # union de tout ça
     transactions = set(list(chain(tx_added, tx_sold)))
     comments = set(list(chain(comments_tx_added, comments_tx_sold)))
-    txsez = serializers.serialize('json', transactions, use_natural_foreign_keys=True)
+
+    # anonymisation des données
+    processed_tx = []
+    processed_comments = []
+    for t in transactions:
+        if t.carbure_vendor != context['user_entity']:
+            t.carbure_client = None
+            t.unknown_client = 'Anonymisé'
+        processed_tx.append(t)
+    for c in comments:
+        if c.tx.carbure_vendor != context['user_entity']:
+            c.entity = anon
+        processed_comments.append(c)
+    txsez = serializers.serialize('json', processed_tx, use_natural_foreign_keys=True)
     commentssez = serializers.serialize('json', comments, use_natural_foreign_keys=True)
     return JsonResponse({'transactions': txsez, 'comments': commentssez})
 
