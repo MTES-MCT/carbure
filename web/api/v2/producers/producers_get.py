@@ -1,9 +1,8 @@
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
-from itertools import chain
 
-from core.decorators import enrich_with_user_details, restrict_to_producers
+from core.decorators import enrich_with_user_details, restrict_to_producers, get_producer_corrections
 
 from core.models import Pays, Entity, Depot, LotV2, LotTransaction, LotV2Error, TransactionComment
 
@@ -62,29 +61,13 @@ def get_corrections(request, *args, **kwargs):
     anon, created = Entity.objects.get_or_create(name='Anonymisé', entity_type='Producteur')
     france = Pays.objects.get(code_pays='FR')
     anon_site, created = Depot.objects.get_or_create(name='Anonymisé', depot_id='0', country=france)
-    # corrections de type "Durabilite" ou "Les deux" pour mes lots
-    tx_added = LotTransaction.objects.filter(lot__data_origin_entity=context['user_entity'], delivery_status__in=['R', 'AC', 'AA'], lot__status="Validated")
-    comments_tx_added = TransactionComment.objects.filter(tx__in=tx_added, topic__in=['SUSTAINABILITY', 'BOTH'])
-    #print('mes lots - dura & both')
-    #for c in comments_tx_added:
-    #    print(c.tx.carbure_vendor, context['user_entity'], c.entity, c.comment, c.topic)
 
-    # corrections de type "Transaction" ou "les deux" pour les lots vendus
-    tx_sold = LotTransaction.objects.filter(carbure_vendor=context['user_entity'], delivery_status__in=['R', 'AC', 'AA'], lot__status="Validated")
-    comments_tx_sold = TransactionComment.objects.filter(tx__in=tx_sold, topic__in=['TX', 'BOTH'])
-    #print('mes lots vendus - TX & both')
-    #for c in comments_tx_sold:
-    #    print(c.tx.carbure_vendor, context['user_entity'], c.entity, c.comment, c.topic)
-
-    # union de tout ça
-    comments = set(list(chain(comments_tx_added, comments_tx_sold)))
-    transactions = set([c.tx for c in comments])
+    transactions, comments = get_producer_corrections(context['user_entity'])
 
     # anonymisation des données
     processed_tx = []
     for t in transactions:
         if t.carbure_vendor != context['user_entity']:
-            print(t.carbure_vendor, context['user_entity'])
             t.carbure_client = anon
             t.client_is_in_carbure = True
             t.delivery_site_is_in_carbure = True

@@ -1,6 +1,21 @@
-from core.models import UserRights, UserPreferences, LotV2, LotTransaction, Lot
+from core.models import UserRights, UserPreferences, LotV2, LotTransaction, TransactionComment
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
+
+from itertools import chain
+
+# not an http endpoint
+def get_producer_corrections(entity):
+    # corrections de type "Durabilite" ou "Les deux" pour mes lots
+    tx_added = LotTransaction.objects.filter(lot__data_origin_entity=entity, delivery_status__in=['R', 'AC', 'AA'], lot__status="Validated")
+    comments_tx_added = TransactionComment.objects.filter(tx__in=tx_added, topic__in=['SUSTAINABILITY', 'BOTH'])
+    # corrections de type "Transaction" ou "les deux" pour les lots vendus
+    tx_sold = LotTransaction.objects.filter(carbure_vendor=entity, delivery_status__in=['R', 'AC', 'AA'], lot__status="Validated")
+    comments_tx_sold = TransactionComment.objects.filter(tx__in=tx_sold, topic__in=['TX', 'BOTH'])
+    # union de tout ça
+    comments = set(list(chain(comments_tx_added, comments_tx_sold)))
+    transactions = set([c.tx for c in comments])
+    return transactions, comments
 
 
 def enrich_with_user_details(function):
@@ -36,7 +51,7 @@ def restrict_to_producers(function):
         drafts = LotTransaction.objects.filter(lot__added_by=context['user_entity'], lot__status='Draft')
         mb_drafts = LotV2.objects.filter(added_by=context['user_entity'], status='Draft').exclude(parent_lot=None)
         valid = LotV2.objects.filter(added_by=context['user_entity'], status='Validated')
-        corrections = LotTransaction.objects.filter(carbure_vendor=context['user_entity'], delivery_status__in=['AC', 'AA', 'R'])
+        corrections, _ = get_producer_corrections(context['user_entity'])
         received = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status__in=['N', 'AC', 'AA'], lot__status="Validated")
         mb = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='A', lot__status="Validated", lot__fused_with=None)
         context['nb_corrections'] = len(corrections)
