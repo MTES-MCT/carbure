@@ -342,7 +342,7 @@ def add_lot_correction(request, *args, **kwargs):
     if tx_comment == '':
         return JsonResponse({'status': 'error', 'message': "Un commentaire est obligatoire"}, status=400)
     try:
-        tx = LotTransaction.objects.get(carbure_vendor=context['user_entity'], delivery_status__in=['N', 'AC', 'AA', 'R'], id=tx_id)
+        tx = LotTransaction.objects.get(lot__data_origin_entity=context['user_entity'], delivery_status__in=['N', 'AC', 'AA', 'R'], id=tx_id)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Transaction inconnue", 'extra': str(e)}, status=400)
     tx.delivery_status = 'AA'
@@ -355,28 +355,8 @@ def add_lot_correction(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'tx_id': tx.id})
 
 
-@login_required
-@enrich_with_user_details
-@restrict_to_producers
-def save_lot(request, *args, **kwargs):
-    context = kwargs['context']
-    # new lot or edit?
-    lot_id = request.POST.get('lot_id', None)
-    existing_lot = True
-    if lot_id:
-        try:
-            lot = LotV2.objects.get(id=lot_id)
-            if lot.added_by != context['user_entity']:
-                return JsonResponse({'status': 'error', 'message': "Permission denied"}, status=403)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': "Lot inconnu", 'extra': str(e)}, status=400)
-    else:
-        # create empty lot
-        lot = LotV2()
-        lot.source = 'MANUAL'
-        existing_lot = False
-        lot.save()
-
+# not an http endpoint
+def update_lot(lot, request, context):
     entity = context['user_entity']
     lot.data_origin_entity = entity
     lot.added_by = entity
@@ -585,13 +565,8 @@ def save_lot(request, *args, **kwargs):
     lot.ghg_reduction = round((1.0 - (lot.ghg_total / lot.ghg_reference)) * 100.0, 2)
     lot.save()
 
-    if existing_lot is False:
-        transaction = LotTransaction()
-        transaction.lot = lot
-        transaction.save()
-    else:
-        transaction = LotTransaction.objects.get(lot=lot)
-
+# not an http endpoint
+def update_tx(transaction, lot, request, context):
     transaction.unknown_client = request.POST.get('unknown_client', '')
     transaction.unknown_delivery_site = request.POST.get('unknown_delivery_site', '')
     unknown_delivery_site_country_code = request.POST.get('unknown_delivery_site_country_code', '')
@@ -601,8 +576,6 @@ def save_lot(request, *args, **kwargs):
     except Exception:
         transaction.unknown_delivery_site_country = None
 
-    transaction.vendor_is_in_carbure = True
-    transaction.carbure_vendor = entity
     transaction.dae = request.POST.get('dae', '')
     if transaction.dae == '':
         e, c = TransactionError.objects.update_or_create(tx=transaction, field='dae', error="Merci de préciser le numéro douanier (DAE/DAU..)",
@@ -673,6 +646,63 @@ def save_lot(request, *args, **kwargs):
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
     transaction.champ_libre = request.POST.get('champ_libre', '')
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def save_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    # new lot or edit?
+    lot_id = request.POST.get('lot_id', None)
+    tx_id = request.POST.get('tx_id', None)
+    existing_lot = True
+    can_edit_lot = False
+    can_edit_tx = False
+
+    if lot_id:
+        try:
+            lot = LotV2.objects.get(id=lot_id)
+            if lot.data_origin_entity != context['user_entity'] or lot.added_by != context['user_entity']:
+                # user not allowed to modify Lot
+                can_edit_lot = False
+            else:
+                can_edit_lot = True
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': "Lot inconnu", 'extra': str(e)}, status=400)
+    else:
+        # create empty lot
+        lot = LotV2()
+        lot.source = 'MANUAL'
+        existing_lot = False
+        lot.save()
+        can_edit_lot = True
+
+    if can_edit_lot:
+        update_lot(lot, request, context)
+
+    if existing_lot is False:
+        # create new TX
+        transaction = LotTransaction()
+        transaction.lot = lot
+        transaction.vendor_is_in_carbure = True
+        transaction.carbure_vendor = context['user_entity']
+        transaction.save()
+        can_edit_tx = True
+    else:
+        transaction = LotTransaction.objects.get(id=tx_id)
+        # check rights
+        if transaction.carbure_vendor == context['user_entity']:
+            can_edit_tx = True
+        else:
+            can_edit_tx = False
+
+    if can_edit_tx:
+        update_tx(transaction, lot, request, context)
+
     transaction.save()
     lot.save()
+
+    if not can_edit_tx and not can_edit_lot:
+        return JsonResponse({'status': 'error', 'message': "Permission denied"}, status=403)
     return JsonResponse({'status': 'success', 'lot_id': lot.id, 'transaction_id': transaction.id})

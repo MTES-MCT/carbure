@@ -98,8 +98,9 @@ class TransactionErrorAdmin(admin.ModelAdmin):
 
 
 class TransactionCommentAdmin(admin.ModelAdmin):
-    list_display = ('entity', 'tx', 'comment')
+    list_display = ('entity', 'tx', 'comment', 'topic')
     search_fields = ('entity', 'tx', 'comment')
+    list_filter = ('topic', )
 
 
 admin.site.register(Entity, EntityAdmin)

@@ -59,17 +59,22 @@ def get_mb(request, *args, **kwargs):
 @restrict_to_producers
 def get_corrections(request, *args, **kwargs):
     context = kwargs['context']
-
     anon, created = Entity.objects.get_or_create(name='Anonymisé', entity_type='Producteur')
     france = Pays.objects.get(code_pays='FR')
     anon_site, created = Depot.objects.get_or_create(name='Anonymisé', depot_id='0', country=france)
     # corrections de type "Durabilite" ou "Les deux" pour mes lots
     tx_added = LotTransaction.objects.filter(lot__data_origin_entity=context['user_entity'], delivery_status__in=['R', 'AC', 'AA'], lot__status="Validated")
     comments_tx_added = TransactionComment.objects.filter(tx__in=tx_added, topic__in=['SUSTAINABILITY', 'BOTH'])
+    print('mes lots - dura & both')
+    for c in comments_tx_added:
+        print(c.tx.carbure_vendor, context['user_entity'], c.entity, c.comment, c.topic)
 
     # corrections de type "Transaction" ou "les deux" pour les lots vendus
     tx_sold = LotTransaction.objects.filter(carbure_vendor=context['user_entity'], delivery_status__in=['R', 'AC', 'AA'], lot__status="Validated")
     comments_tx_sold = TransactionComment.objects.filter(tx__in=tx_sold, topic__in=['TX', 'BOTH'])
+    print('mes lots vendus - TX & both')
+    for c in comments_tx_sold:
+        print(c.tx.carbure_vendor, context['user_entity'], c.entity, c.comment, c.topic)
 
     # union de tout ça
     comments = set(list(chain(comments_tx_added, comments_tx_sold)))
@@ -77,7 +82,6 @@ def get_corrections(request, *args, **kwargs):
 
     # anonymisation des données
     processed_tx = []
-    processed_comments = []
     for t in transactions:
         if t.carbure_vendor != context['user_entity']:
             t.carbure_client = anon
@@ -85,8 +89,10 @@ def get_corrections(request, *args, **kwargs):
             t.delivery_site_is_in_carbure = True
             t.carbure_delivery_site = anon_site
         processed_tx.append(t)
+
+    processed_comments = []
     for c in comments:
-        if c.tx.carbure_vendor != context['user_entity']:
+        if c.tx.carbure_vendor != context['user_entity'] and c.entity != context['user_entity']:
             c.entity = anon
         processed_comments.append(c)
     txsez = serializers.serialize('json', processed_tx, use_natural_foreign_keys=True)
