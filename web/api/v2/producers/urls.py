@@ -27,6 +27,7 @@ urlpatterns = [
 
     # POST
     path('lot/delete', producers_post.delete_lots, name='api-v2-producers-delete-lots'),
+    path('lot/delete-all-drafts', producers_post.delete_all_drafts, name='api-v2-producers-delete-all-drafts'),
     path('lot/validate', producers_post.validate_lots, name='api-v2-producers-validate-lots'),
     path('lot/duplicate', producers_post.duplicate_lot, name='api-v2-producers-duplicate-lot'),
     path('lot/save', producers_post.save_lot, name='api-v2-producers-save-lot'),

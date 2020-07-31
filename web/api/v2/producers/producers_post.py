@@ -34,6 +34,15 @@ def delete_lots(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
+def delete_all_drafts(request, *args, **kwargs):
+    context = kwargs['context']
+    LotTransaction.objects.filter(lot__added_by=context['user_entity'], lot__status='Draft').delete()
+    return JsonResponse({'status': 'success'})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
 def delete_mb_drafts_lots(request, *args, **kwargs):
     lot_ids = request.POST.get('lots', None)
     errors = []
