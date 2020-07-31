@@ -3,6 +3,7 @@ from django.urls import path
 from . import producers_get
 from . import producers_post
 from . import producers_files
+from api.v2 import shared
 
 
 urlpatterns = [
@@ -30,12 +31,12 @@ urlpatterns = [
     path('lot/delete-all-drafts', producers_post.delete_all_drafts, name='api-v2-producers-delete-all-drafts'),
     path('lot/validate', producers_post.validate_lots, name='api-v2-producers-validate-lots'),
     path('lot/duplicate', producers_post.duplicate_lot, name='api-v2-producers-duplicate-lot'),
-    path('lot/save', producers_post.save_lot, name='api-v2-producers-save-lot'),
+    path('lot/save', shared.save_lot, name='api-v2-producers-save-lot'),
     path('lot/reject', producers_post.reject_lot, name='api-v2-producers-reject-lot'),
     path('lot/accept', producers_post.accept_lot, name='api-v2-producers-accept-lot'),
     path('lots/accept', producers_post.accept_lots, name='api-v2-producers-accept-lots'),
     path('lot/accept-with-correction', producers_post.accept_lot_with_correction, name='api-v2-producers-accept-lot-with-correction'),
-    path('lot/add-corrections', producers_post.add_lot_correction, name='api-v2-producers-add-lot-correction'),
+    path('lot/add-corrections', shared.add_lot_correction, name='api-v2-producers-add-lot-correction'),
     path('lot/mb/delete-drafts', producers_post.delete_mb_drafts_lots, name='api-v2-producers-delete-mb-drafts'),
     path('lot/mb/validate-drafts', producers_post.validate_mb_drafts_lots, name='api-v2-producers-validate-mb-drafts-lots'),
     path('lot/mb/fuse', producers_post.fuse_mb_lots, name='api-v2-producers-fuse-mb-lots'),
