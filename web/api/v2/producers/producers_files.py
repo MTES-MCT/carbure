@@ -25,9 +25,12 @@ def get_random(model):
 
 # not an API call. helper function
 def load_excel_lot(context, lot_row):
+    lot_errors = []
+    tx_errors = []
+
     # check for empty row
     if 'biocarburant_code' in lot_row and lot_row['biocarburant_code'] == None:
-        return False
+        return None, None, None, None
 
     entity = context['user_entity']
     lot = LotV2()
@@ -52,7 +55,6 @@ def load_excel_lot(context, lot_row):
                 # yes we do
                 # in this case, the producer should declare its production directly in Carbure
                 # we cannot allow someone else to declare for them
-                print('[%s] [%s]' % (lot_row['producer'], entity.name))
                 raise Exception("Vous ne pouvez pas déclarer des lots d'un producteur déjà inscrit sur Carbure")
             else:
                 # ok, unknown producer. allow importation
@@ -69,7 +71,7 @@ def load_excel_lot(context, lot_row):
         lot.producer_is_in_carbure = True
         lot.carbure_producer = entity
         lot.unknown_producer = ''
-    lot.save()
+    # lot.save()
 
     if 'production_site' in lot_row:
         production_site = lot_row['production_site']
@@ -81,15 +83,15 @@ def load_excel_lot(context, lot_row):
                 lot.carbure_production_site = ProductionSite.objects.get(producer=lot.carbure_producer, name=production_site)
                 lot.production_site_is_in_carbure = True
                 lot.unknown_production_site = ''
-                LotV2Error.objects.filter(lot=lot, field='production_site').delete()
             except Exception:
                 # do not allow the use of an unknown production site if the producer is registered in Carbure
                 lot.carbure_production_site = None
                 lot.production_site_is_in_carbure = False
                 lot.unknown_production_site = ''
-                error, c = LotV2Error.objects.update_or_create(lot=lot, field='production_site',
-                                                               error='Site de production %s inconnu pour %s' % (production_site, lot.carbure_producer.name),
-                                                               defaults={'value': production_site})
+                error = LotV2Error(lot=lot, field='production_site',
+                                   error='Site de production %s inconnu pour %s' % (production_site, lot.carbure_producer.name),
+                                   value=production_site)
+                lot_errors.append(error)
         else:
             # producer not in carbure
             # accept any value
@@ -103,9 +105,10 @@ def load_excel_lot(context, lot_row):
         lot.production_site_is_in_carbure = False
         lot.carbure_production_site = None
         lot.unknown_production_site = ''
-        error, c = LotV2Error.objects.update_or_create(lot=lot, field='production_site',
-                                                       error='Champ production_site introuvable dans le fichier excel',
-                                                       defaults={'value': None})
+        error = LotV2Error(lot=lot, field='production_site',
+                           error='Champ production_site introuvable dans le fichier excel',
+                           value=None)
+        lot_errors.append(error)
     if lot.producer_is_in_carbure is False:
         if 'production_site_country' in lot_row:
             production_site_country = lot_row['production_site_country']
@@ -115,9 +118,10 @@ def load_excel_lot(context, lot_row):
                 try:
                     country = Pays.objects.get(code_pays=production_site_country)
                 except Exception:
-                    error, c = LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_country',
-                                                                   error='Champ production_site_country incorrect',
-                                                                   defaults={'value': production_site_country})
+                    error = LotV2Error(lot=lot, field='unknown_production_country',
+                                       error='Champ production_site_country incorrect',
+                                       value=production_site_country)
+                    lot_errors.append(error)
         else:
             lot.unknown_production_country = None
         if 'production_site_reference' in lot_row:
@@ -137,156 +141,140 @@ def load_excel_lot(context, lot_row):
         biocarburant = lot_row['biocarburant_code']
         try:
             lot.biocarburant = Biocarburant.objects.get(code=biocarburant)
-            LotV2Error.objects.filter(lot=lot, field='biocarburant_code').delete()
         except Exception:
             lot.biocarburant = None
-            error, c = LotV2Error.objects.update_or_create(lot=lot, field='biocarburant_code',
-                                                           error='Biocarburant inconnu',
-                                                           defaults={'value': biocarburant})
+            lot_errors.append(LotV2Error(lot=lot, field='biocarburant_code',
+                                         error='Biocarburant inconnu',
+                                         value=biocarburant))
     else:
         biocarburant = None
         lot.biocarburant = None
-        error, c = LotV2Error.objects.update_or_create(lot=lot, field='biocarburant_code',
-                                                       error='Merci de préciser le Biocarburant',
-                                                       defaults={'value': biocarburant})
+        lot_errors.append(LotV2Error(lot=lot, field='biocarburant_code',
+                                     error='Merci de préciser le Biocarburant',
+                                     value=biocarburant))
     if 'matiere_premiere_code' in lot_row:
         matiere_premiere = lot_row['matiere_premiere_code']
         try:
             lot.matiere_premiere = MatierePremiere.objects.get(code=matiere_premiere)
-            LotV2Error.objects.filter(lot=lot, field='matiere_premiere_code').delete()
         except Exception:
             lot.matiere_premiere = None
-            error, c = LotV2Error.objects.update_or_create(lot=lot, field='matiere_premiere_code',
-                                                           error='Matière Première inconnue',
-                                                           defaults={'value': matiere_premiere})
+            lot_errors.append(LotV2Error(lot=lot, field='matiere_premiere_code',
+                                         error='Matière Première inconnue',
+                                         value=matiere_premiere))
     else:
         matiere_premiere = None
         lot.matiere_premiere = None
-        error, c = LotV2Error.objects.update_or_create(lot=lot, field='matiere_premiere_code',
-                                                       error='Merci de préciser la matière première',
-                                                       defaults={'value': matiere_premiere})
+        lot_errors.append(LotV2Error(lot=lot, field='matiere_premiere_code',
+                                     error='Merci de préciser la matière première',
+                                     value=matiere_premiere))
 
     if 'volume' in lot_row:
         volume = lot_row['volume']
         try:
             lot.volume = float(volume)
-            LotV2Error.objects.filter(lot=lot, field='volume').delete()
         except Exception:
             lot.volume = 0
-            e, c = LotV2Error.objects.update_or_create(lot=lot, field='volume',
-                                                       error='Format du volume incorrect', defaults={'value': volume})
+            lot_errors.append(LotV2Error(lot=lot, field='volume',
+                                         error='Format du volume incorrect', value=volume))
     else:
-        e, c = LotV2Error.objects.update_or_create(lot=lot, field='volume',
-                                                   error='Merci de préciser un volume', defaults={'value': volume})
+        lot_errors.append(LotV2Error(lot=lot, field='volume',
+                                     error='Merci de préciser un volume', value=volume))
 
     if 'pays_origine_code' in lot_row:
         pays_origine = lot_row['pays_origine_code']
         try:
             lot.pays_origine = Pays.objects.get(code_pays=pays_origine)
-            LotV2Error.objects.filter(lot=lot, field='pays_origine_code').delete()
         except Exception:
             lot.pays_origine = None
-            error, c = LotV2Error.objects.update_or_create(lot=lot, field='pays_origine_code',
-                                                           error='Pays inconnu',
-                                                           defaults={'value': pays_origine})
+            lot_errors.append(LotV2Error(lot=lot, field='pays_origine_code', error='Pays inconnu', value=pays_origine))
     else:
         pays_origine = None
         lot.pays_origine = None
-        error, c = LotV2Error.objects.update_or_create(lot=lot, field='pays_origine_code',
-                                                       error='Merci de préciser le pays',
-                                                       defaults={'value': pays_origine})
+        lot_errors.append(LotV2Error(lot=lot, field='pays_origine_code', error='Merci de préciser le pays', value=pays_origine))
+
     lot.eec = 0
     if 'eec' in lot_row:
         eec = lot_row['eec']
         try:
             lot.eec = float(eec)
-        except:
-            error, c = LotV2Error.objects.update_or_create(lot=lot, field='eec',
-                                                           error='Format non reconnu',
-                                                           defaults={'value': eec})
+        except Exception:
+            lot_errors.append(LotV2Error(lot=lot, field='eec', error='Format non reconnu', value=eec))
+
     lot.el = 0
     if 'el' in lot_row:
         el = lot_row['el']
         try:
             lot.el = float(el)
-        except:
-            error, c = LotV2Error.objects.update_or_create(lot=lot, field='el',
-                                                           error='Format non reconnu',
-                                                           defaults={'value': el})
+        except Exception:
+            lot_errors.append(LotV2Error(lot=lot, field='el', error='Format non reconnu', value=el))
+
     lot.ep = 0
     if 'ep' in lot_row:
         ep = lot_row['ep']
         try:
             lot.ep = float(ep)
-        except:
-            error, c = LotV2Error.objects.update_or_create(lot=lot, field='ep',
-                                                           error='Format non reconnu',
-                                                           defaults={'value': ep})
+        except Exception:
+            lot_errors.append(LotV2Error(lot=lot, field='ep', error='Format non reconnu', value=ep))
+
     lot.etd = 0
     if 'etd' in lot_row:
         etd = lot_row['etd']
         try:
             lot.etd = float(etd)
-        except:
-            error, c = LotV2Error.objects.update_or_create(lot=lot, field='etd',
-                                                           error='Format non reconnu',
-                                                           defaults={'value': etd})
+        except Exception:
+            lot_errors.append(LotV2Error(lot=lot, field='etd', error='Format non reconnu', value=etd))
+
     lot.eu = 0
     if 'eu' in lot_row:
         eu = lot_row['eu']
         try:
             lot.eu = float(eu)
-        except:
-            error, c = LotV2Error.objects.update_or_create(lot=lot, field='eu',
-                                                           error='Format non reconnu',
-                                                           defaults={'value': eu})
+        except Exception:
+            lot_errors.append(LotV2Error(lot=lot, field='eu', error='Format non reconnu', value=eu))
+
     lot.esca = 0
     if 'esca' in lot_row:
         esca = lot_row['esca']
         try:
             lot.esca = float(esca)
-        except:
-            error, c = LotV2Error.objects.update_or_create(lot=lot, field='esca',
-                                                           error='Format non reconnu',
-                                                           defaults={'value': esca})
+        except Exception:
+            lot_errors.append(LotV2Error(lot=lot, field='esca', error='Format non reconnu', value=esca))
+
     lot.eccs = 0
     if 'eccs' in lot_row:
         eccs = lot_row['eccs']
         try:
             lot.eccs = float(eccs)
-        except:
-            error, c = LotV2Error.objects.update_or_create(lot=lot, field='eccs',
-                                                           error='Format non reconnu',
-                                                           defaults={'value': eccs})
+        except Exception:
+            lot_errors.append(LotV2Error(lot=lot, field='eccs', error='Format non reconnu', value=eccs))
+
     lot.eccr = 0
     if 'eccr' in lot_row:
         eccr = lot_row['eccr']
         try:
             lot.eccr = float(eccr)
-        except:
-            error, c = LotV2Error.objects.update_or_create(lot=lot, field='eccr',
-                                                           error='Format non reconnu',
-                                                           defaults={'value': eccr})
+        except Exception:
+            lot_errors.append(LotV2Error(lot=lot, field='eccr', error='Format non reconnu', value=eccr))
+
     lot.eee = 0
     if 'eee' in lot_row:
         eee = lot_row['eee']
         try:
             lot.eee = float(eee)
-        except:
-            error, c = LotV2Error.objects.update_or_create(lot=lot, field='eee',
-                                                           error='Format non reconnu',
-                                                           defaults={'value': eee})
+        except Exception:
+            lot_errors.append(LotV2Error(lot=lot, field='eee', error='Format non reconnu', value=eee))
+
     # calculs ghg
     lot.ghg_total = round(lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee, 2)
     lot.ghg_reference = 83.8
     lot.ghg_reduction = round((1.0 - (lot.ghg_total / lot.ghg_reference)) * 100.0, 2)
 
     lot.source = 'EXCEL'
-    lot.save()
+    # lot.save()
 
     transaction = LotTransaction()
     transaction.lot = lot
-    transaction.save()
+    # transaction.save()
     transaction.vendor_is_in_carbure = True
     transaction.carbure_vendor = entity
 
@@ -294,20 +282,15 @@ def load_excel_lot(context, lot_row):
         dae = lot_row['dae']
         if dae is not None:
             transaction.dae = dae
-            TransactionError.objects.filter(tx=transaction, field='dae').delete()
         else:
-            e, c = TransactionError.objects.update_or_create(tx=transaction, field='dae', error="Merci de préciser le numéro de DAE/DAU",
-                                                             defaults={'value': dae})
+            tx_errors.append(TransactionError(tx=transaction, field='dae', error="Merci de préciser le numéro de DAE/DAU", value=dae))
     else:
-        e, c = TransactionError.objects.update_or_create(tx=transaction, field='dae', error="Merci de préciser le numéro de DAE/DAU",
-                                                         defaults={'value': None})
+        tx_errors.append(TransactionError(tx=transaction, field='dae', error="Merci de préciser le numéro de DAE/DAU", value=None))
 
     if 'delivery_date' not in lot_row or lot_row['delivery_date'] == '':
         transaction.ea_delivery_date = None
         lot.period = ''
-        e, c = TransactionError.objects.update_or_create(tx=transaction, field='ea_delivery_date',
-                                                         error="Merci de préciser la date de livraison",
-                                                         defaults={'value': None})
+        tx_errors.append(TransactionError(tx=transaction, field='ea_delivery_date', error="Merci de préciser la date de livraison", value=None))
     else:
         try:
             delivery_date = lot_row['delivery_date']
@@ -323,9 +306,8 @@ def load_excel_lot(context, lot_row):
             TransactionError.objects.filter(tx=transaction, field='delivery_date').delete()
         except Exception:
             msg = "Format de date incorrect: veuillez entrer une date au format AAAA-MM-JJ"
-            e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_date',
-                                                             error=msg,
-                                                             defaults={'value': delivery_date})
+            tx_errors.append(TransactionError(tx=transaction, field='delivery_date', error=msg, value=delivery_date))
+
     if 'client' in lot_row and lot_row['client'] is not None:
         client = lot_row['client']
         matches = Entity.objects.filter(name=client).count()
@@ -337,7 +319,6 @@ def load_excel_lot(context, lot_row):
             transaction.client_is_in_carbure = False
             transaction.carbure_client = None
             transaction.unknown_client = client
-        TransactionError.objects.filter(tx=transaction, field='client').delete()
     else:
         transaction.client_is_in_carbure = True
         transaction.carbure_client = entity
@@ -354,13 +335,11 @@ def load_excel_lot(context, lot_row):
             transaction.delivery_site_is_in_carbure = False
             transaction.carbure_delivery_site = None
             transaction.unknown_delivery_site = delivery_site
-        TransactionError.objects.filter(tx=transaction, field='delivery_site').delete()
     else:
         transaction.delivery_site_is_in_carbure = False
         transaction.carbure_delivery_site = None
         transaction.unknown_delivery_site = ''
-        e, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site',
-                                                         defaults={'value': None, 'error': "Merci de préciser un site de livraison"})
+        tx_errors.append(TransactionError(tx=transaction, field='delivery_site', value=None, error="Merci de préciser un site de livraison"))
 
     if transaction.delivery_site_is_in_carbure is False:
         if 'delivery_site_country' in lot_row:
@@ -368,13 +347,13 @@ def load_excel_lot(context, lot_row):
                 country = Pays.objects.get(code_pays=lot_row['delivery_site_country'])
                 transaction.unknown_delivery_site_country = country
             except Exception:
-                error, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site_country',
-                                                                     error='Champ production_site_country incorrect',
-                                                                     defaults={'value': lot_row['delivery_site_country']})
+                tx_errors.append(TransactionError(tx=transaction, field='delivery_site_country',
+                                                  error='Champ production_site_country incorrect',
+                                                  value=lot_row['delivery_site_country']))
         else:
-            error, c = TransactionError.objects.update_or_create(tx=transaction, field='delivery_site_country',
-                                                                 error='Merci de préciser une valeur dans le champ production_site_country',
-                                                                 defaults={'value': None})
+            tx_errors.append(TransactionError(tx=transaction, field='delivery_site_country',
+                                              error='Merci de préciser une valeur dans le champ production_site_country',
+                                              value=None))
 
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
@@ -383,8 +362,9 @@ def load_excel_lot(context, lot_row):
         transaction.champ_libre = lot_row['champ_libre']
         if transaction.champ_libre is None:
             transaction.champ_libre = ''
-    transaction.save()
-    lot.save()
+    # transaction.save()
+    # lot.save()
+    return lot, transaction, lot_errors, tx_errors
 
 
 # not an API call. helper function
@@ -596,7 +576,6 @@ def excel_template_upload(request, *args, **kwargs):
         return JsonResponse({'status': "error", 'message': "Merci d'ajouter un fichier"}, status=400)
     # we can load the file
     wb = openpyxl.load_workbook(file)
-    debug = ''
     try:
         lots_sheet = wb['lots']
         colid2field = {}
@@ -615,13 +594,43 @@ def excel_template_upload(request, *args, **kwargs):
                 lots.append(lot)
         total_lots = len(lots)
         lots_loaded = 0
+        lots_to_insert = []
+        txs_to_insert = []
+        lot_errors = []
+        tx_errors = []
         for lot in lots:
-            debug += '%s' % (lot)
             try:
-                load_excel_lot(context, lot)
+                lot, tx, l_errors, t_errors = load_excel_lot(context, lot)
+                if lot is None:
+                    continue
                 lots_loaded += 1
+                lots_to_insert.append(lot)
+                txs_to_insert.append(tx)
+                lot_errors.append(l_errors)
+                tx_errors.append(t_errors)
             except Exception as e:
-                print(str(e))
+                print('Could not load %s' % (lot))
+                print(e)
+        LotV2.objects.bulk_create(lots_to_insert, batch_size=100)
+        # with mysql, returned object does not contain ids
+        # so we need to fetch the newest lots in the DB
+        new_lots = [lot for lot in LotV2.objects.filter(added_by=context['user_entity']).order_by('-id')[0:len(lots_to_insert)]]
+        # and sort them to match transaction order
+        for lot, tx in zip(sorted(new_lots, key=lambda x: x.id), txs_to_insert):
+            tx.lot_id = lot.id
+        LotTransaction.objects.bulk_create(txs_to_insert, batch_size=100)
+        for lot, errors in zip(sorted(new_lots, key=lambda x: x.id), lot_errors):
+            for e in errors:
+                e.lot_id = lot.id
+        flat_errors = [item for sublist in lot_errors for item in sublist]
+        LotV2Error.objects.bulk_create(flat_errors, batch_size=100)
+
+        new_txs = [t for t in LotTransaction.objects.filter(lot__added_by=context['user_entity']).order_by('-id')[0:len(lots_to_insert)]]
+        for tx, errors in zip(sorted(new_txs, key=lambda x: x.id), tx_errors):
+            for e in errors:
+                e.tx_id = tx.id
+        flat_tx_errors = [item for sublist in tx_errors for item in sublist]
+        TransactionError.objects.bulk_create(flat_tx_errors, batch_size=100)
         return JsonResponse({'status': "success", 'message': "%d/%d lots chargés correctement" % (lots_loaded, total_lots)})
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "Format du fichier Excel non reconnu. Avez-vous utilisé l'un des templates fournis?", 'error': str(e)})
