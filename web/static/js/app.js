@@ -35,6 +35,7 @@ const columns_definitions = {
 'ghg_reference': {title:'Émissions de référence', hidden: true, can_hide: true, is_read_only: true, render: (data, type, full, meta) => { return full.fields.lot.ghg_reference }, tooltip: 'Total des émissions du carburant fossile de référence'},
 'ghg_reduction': {title:'% de réduction', can_hide: true, is_read_only: true, render: (data, type, full, meta) => { return full.fields.lot.ghg_reduction }},
 'dae': {title:'N°Document douanier', can_hide: true, render: (data, type, full, meta) => {return full.fields.dae}},
+'origin': {title:'Origine', can_hide: true, render: (data, type, full, meta) => {return full.fields.lot.data_origin_entity ? full.fields.lot.data_origin_entity.name : '' }},
 'vendor': {title:'Fournisseur', can_hide: true, render: (data, type, full, meta) => {return full.fields.carbure_vendor ? full.fields.carbure_vendor.name : full.fields.unknown_vendor }},
 'champ_libre': {title:'Champ libre', can_hide: true, can_filter: true, orderable: false, tooltip: 'Champ libre - Référence client', render: (data, type, full, meta) => {return full.fields.champ_libre}},
 'delivery_date': {title:'Date de livraison', can_hide: true, render: (data, type, full, meta) => {return full.fields.delivery_date}},
@@ -47,7 +48,7 @@ const columns_definitions = {
 const producer_columns_drafts = ['checkbox', 'id', 'producer', 'production_site', 'volume', 'biocarburant', 'matiere_premiere', 'pays_origine',
 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'dae', 'champ_libre', 'delivery_date', 'client', 'delivery_site']
 
-const producer_columns_corrections = ['delivery_status', 'period', 'carbure_id', 'vendor', 'client', 'delivery_site', 'producer', 'production_site', 'production_country', 'volume', 'biocarburant', 'matiere_premiere',
+const producer_columns_corrections = ['delivery_status', 'period', 'carbure_id', 'origin', 'vendor', 'client', 'delivery_site', 'producer', 'production_site', 'production_country', 'volume', 'biocarburant', 'matiere_premiere',
 'pays_origine', 'ghg_total', 'ghg_reduction', 'dae', 'champ_libre', 'delivery_date']
 
 const producer_columns_in = ['checkbox', 'id', 'delivery_status', 'carbure_id', 'producer', 'production_site', 'production_country', 'vendor', 'biocarburant', 'matiere_premiere', 'volume', 'pays_origine',

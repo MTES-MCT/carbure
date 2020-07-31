@@ -3,6 +3,7 @@ from django.urls import path
 from . import traders_get
 from . import traders_post
 from . import traders_files
+from api.v2 import shared
 
 urlpatterns = [
     # files / templates
@@ -29,12 +30,12 @@ urlpatterns = [
     path('lot/delete', traders_post.delete_lots, name='api-v2-traders-delete-lots'),
     path('lot/validate', traders_post.validate_lots, name='api-v2-traders-validate-lots'),
     path('lot/duplicate', traders_post.duplicate_lot, name='api-v2-traders-duplicate-lot'),
-    path('lot/save', traders_post.save_lot, name='api-v2-traders-save-lot'),
+    path('lot/save', shared.save_lot, name='api-v2-traders-save-lot'),
     path('lot/reject', traders_post.reject_lot, name='api-v2-traders-reject-lot'),
     path('lot/accept', traders_post.accept_lot, name='api-v2-traders-accept-lot'),
     path('lots/accept', traders_post.accept_lots, name='api-v2-traders-accept-lots'),
     path('lot/accept-with-correction', traders_post.accept_lot_with_correction, name='api-v2-traders-accept-lot-with-correction'),
-    path('lot/add-corrections', traders_post.add_lot_correction, name='api-v2-traders-add-lot-correction'),
+    path('lot/add-corrections', shared.add_lot_correction, name='api-v2-traders-add-lot-correction'),
     path('lot/mb/delete-drafts', traders_post.delete_mb_drafts_lots, name='api-v2-traders-delete-mb-drafts'),
     path('lot/mb/validate-drafts', traders_post.validate_mb_drafts_lots, name='api-v2-traders-validate-mb-drafts-lots'),
     path('lot/mb/fuse', traders_post.fuse_mb_lots, name='api-v2-traders-fuse-mb-lots'),

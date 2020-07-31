@@ -95,7 +95,7 @@ def restrict_to_traders(function):
         sent = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='A', lot__status="Validated", lot__fused_with=None)
         mb_drafts = LotV2.objects.filter(added_by=context['user_entity'], status='Draft').exclude(parent_lot=None)
         mb = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status='A', lot__status="Validated", lot__fused_with=None)
-        corrections = LotTransaction.objects.filter(carbure_vendor=context['user_entity'], delivery_status__in=['AC', 'AA', 'R'])
+        corrections, _ = get_producer_corrections(context['user_entity'])
         context['nb_drafts'] = len(drafts)
         context['nb_in'] = len(received)
         context['nb_out'] = len(sent)
