@@ -113,7 +113,7 @@
     <span id="modal_delete_lots_form_err_message" style="color: red;"></span>
     <form id="modal_delete_lots_form" method="POST" data-url="{% url 'api-v2-producers-delete-lots' %}">
       {% csrf_token %}
-      <p>Êtes vous sûr de vouloir supprimer ce(s) lot(s) ?</p>
+      <p>Êtes vous sûr de vouloir supprimer ce(s) lot(s) ? <a id="btn_open_modal_delete_all_drafts"><small>Supprimer tous les brouillons</small></a></p>
       <ul id="modal_delete_lots_list">
       </ul>
       <input type="hidden" id="modal_delete_lots_lots" name="lots">
@@ -124,7 +124,23 @@
           </div>
         </div>
         <a class="button secondary close" id="btn_close_modal_delete_lots">Annuler</a>
+      </div>
+    </form>
+  </div>
+</div>
 
+<div class="modal__backdrop" id="modal_delete_all_drafts">
+  <div class="modal">
+    <form id="modal_delete_all_drafts_form" method="POST" data-url="{% url 'api-v2-producers-delete-all-drafts' %}">
+      {% csrf_token %}
+      <p>Êtes vous sûr de vouloir supprimer tous vos brouillons ?</p>
+      <div class="form__group button__group">
+        <div class="button-container">
+          <div class="button-item">
+            <button type="submit" class="button">Valider</button>
+          </div>
+        </div>
+        <a class="button secondary close" id="btn_close_modal_delete_all_drafts">Annuler</a>
       </div>
     </form>
   </div>
