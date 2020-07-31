@@ -102,12 +102,13 @@ class Pays(models.Model):
     code_pays = models.CharField(max_length=64)
     name = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
+    is_in_europe = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
 
     def natural_key(self):
-        return {'code_pays': self.code_pays, 'name': self.name}
+        return {'code_pays': self.code_pays, 'name': self.name, 'is_in_europe': self.is_in_europe}
 
     class Meta:
         db_table = 'pays'

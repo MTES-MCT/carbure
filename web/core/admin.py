@@ -41,8 +41,9 @@ class MatierePremiereAdmin(admin.ModelAdmin):
 
 
 class PaysAdmin(admin.ModelAdmin):
-    list_display = ('name', )
-    search_fields = ('name', )
+    list_display = ('name', 'code_pays', 'is_in_europe')
+    search_fields = ('name', 'code_pays', )
+    list_filter = ('is_in_europe', )
 
 
 class LotAdmin(admin.ModelAdmin):
