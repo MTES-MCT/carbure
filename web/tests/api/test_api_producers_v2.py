@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from core.models import Entity, UserRights, Pays, MatierePremiere, Biocarburant, Depot
+from core.models import Entity, UserRights, Pays, MatierePremiere, Biocarburant, Depot, LotTransaction
 
 from producers.models import ProductionSite
 
@@ -75,5 +75,6 @@ class TestProducer(TestCase):
         # 4 validate again
         response = self.client.post(reverse('api-v2-producers-validate-lots'), {'lots': tx_id})
         res = json.loads(response.content)
+        print(res)
         lot = res['message'][0]
         self.assertEqual(lot['status'], 'success')

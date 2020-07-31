@@ -337,32 +337,3 @@ def accept_lot_with_correction(request, *args, **kwargs):
     txc.save()
     return JsonResponse({'status': 'success', 'tx_id': tx.id})
 
-
-@login_required
-@enrich_with_user_details
-@restrict_to_producers
-def add_lot_correction(request, *args, **kwargs):
-    context = kwargs['context']
-    # new lot or edit?
-    tx_id = request.POST.get('tx_id', None)
-    tx_comment = request.POST.get('comment', '')
-    if tx_id is None:
-        return JsonResponse({'status': 'error', 'message': "Missing TX ID from POST data"}, status=400)
-    if tx_comment == '':
-        return JsonResponse({'status': 'error', 'message': "Un commentaire est obligatoire"}, status=400)
-    try:
-        tx = LotTransaction.objects.get(delivery_status__in=['N', 'AC', 'AA', 'R'], id=tx_id)
-        if tx.lot.data_origin_entity != context['user_entity'] and tx.carbure_vendor != context['user_entity']:
-            return JsonResponse({'status': 'error', 'message': "Permission Denied"}, status=403)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Transaction inconnue", 'extra': str(e)}, status=400)
-    tx.delivery_status = 'AA'
-    tx.save()
-    txc = TransactionComment()
-    txc.entity = context['user_entity']
-    txc.tx = tx
-    txc.comment = tx_comment
-    txc.save()
-    return JsonResponse({'status': 'success', 'tx_id': tx.id})
-
-

@@ -1,3 +1,4 @@
+import datetime
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -5,7 +6,7 @@ from django.db.models import Q
 from core.decorators import enrich_with_user_details
 
 from core.models import Entity, Biocarburant, MatierePremiere, Depot, GHGValues, UserRights
-from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, TransactionComment
+from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, TransactionComment, Pays
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 
 

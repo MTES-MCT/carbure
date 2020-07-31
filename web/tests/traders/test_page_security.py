@@ -78,11 +78,6 @@ class TestForbiddenUrlsAsTrader(TestCase):
         response = self.client.get(reverse('administrators-gestion-utilisateurs'))
         self.assertEqual(response.status_code, 403)
 
-    def test_access_producers_api(self):
-        for pattern in apiv2producersurls:
-            response = self.client.get(reverse(pattern.name))
-            self.assertEqual(response.status_code, 403)
-
     def test_access_operators_api(self):
         for pattern in apiv2operatorsurls:
             response = self.client.get(reverse(pattern.name))
