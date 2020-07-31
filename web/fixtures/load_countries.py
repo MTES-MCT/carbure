@@ -20,10 +20,10 @@ with open(filename) as csvfile:
         name_fr = row[1]
         if len(row) == 3:
             name_en = name_fr
-            is_in_europe = bool(row[2])
+            is_in_europe = True if row[2] == '1' else False
         else:
             name_en = row[2]
-            is_in_europe = bool(row[3])
+            is_in_europe = True if row[3] == '1' else False
             
         obj, created = Pays.objects.update_or_create(code_pays=code_pays, defaults={'name':name_fr, 'name_en': name_en, 'is_in_europe': is_in_europe})
         
