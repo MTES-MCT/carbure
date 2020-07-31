@@ -13,10 +13,18 @@ with open(filename) as csvfile:
     reader = csv.reader(csvfile, delimiter=';', quotechar='"')
     for row in reader:
         code_pays = row[0]
-        full_name = row[1]
-
-        print(code_pays)
-        print(full_name)
-        obj, created = Pays.objects.update_or_create(code_pays=code_pays, defaults={'name':full_name})
+        if code_pays == 'code_pays':
+            # header
+            continue
+        
+        name_fr = row[1]
+        if len(row) == 3:
+            name_en = name_fr
+            is_in_europe = bool(row[2])
+        else:
+            name_en = row[2]
+            is_in_europe = bool(row[3])
+            
+        obj, created = Pays.objects.update_or_create(code_pays=code_pays, defaults={'name':name_fr, 'name_en': name_en, 'is_in_europe': is_in_europe})
         
         
