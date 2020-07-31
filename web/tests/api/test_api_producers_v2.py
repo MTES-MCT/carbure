@@ -68,6 +68,7 @@ class TestProducer(TestCase):
         # 3 edit and fix
         postdata['pays_origine_code'] = self.country.code_pays
         postdata['lot_id'] = lot_id
+        postdata['tx_id'] = tx_id
         response = self.client.post(reverse('api-v2-producers-save-lot'), postdata)
         self.assertEqual(response.status_code, 200)
 
