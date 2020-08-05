@@ -17,6 +17,11 @@ def tx_is_valid(tx):
         return False, 'Veuillez renseigner un client'
     if not tx.client_is_in_carbure and not tx.unknown_client:
         return False, 'Veuillez renseigner un client'
+
+    if tx.unknown_delivery_site_country is not None and tx.unknown_delivery_site_country.is_in_europe and tx.lot.pays_origine is None:
+        return False, "Veuillez renseigner le pays d'origine de la matière première - Marché européen"
+    if tx.carbure_delivery_site is not None and tx.carbure_delivery_site.depot.country.is_in_europe and tx.lot.pays_origine is None:
+        return False, "Veuillez renseigner le pays d'origine de la matière première - Marché européen"
     return True, ''
 
 
