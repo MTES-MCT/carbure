@@ -141,8 +141,8 @@ def update_lot(lot, request, context):
             dd = datetime.date(year=year, month=month, day=day)
             lot.unknown_production_site_com_date = dd
             lot.period = dd.strftime('%Y-%m')
-            LotV2Error.objects.filter(tx=lot, field='unknown_production_site_com_date').delete()
-        except Exception:
+            LotV2Error.objects.filter(lot=lot, field='unknown_production_site_com_date').delete()
+        except Exception as e:
             msg = "Format de date incorrect: veuillez entrer une date au format AAAA-MM-JJ"
             e, c = LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_com_date',
                                                        error=msg,
@@ -176,19 +176,23 @@ def update_lot(lot, request, context):
 
     carbure_production_site_id = request.POST.get('carbure_production_site_id', None)
     carbure_production_site_name = request.POST.get('carbure_production_site_name', '')
-    try:
-        ps = ProductionSite.objects.get(id=carbure_production_site_id, producer=lot.carbure_producer)
-        lot.carbure_production_site = ps
-    except Exception:
-        lot.carbure_production_site = None
-        if lot.carbure_producer is None:
-            error, c = LotV2Error.objects.update_or_create(lot=lot, field='carbure_production_site_name',
-                                                           error='Le site de production ne peut être renseigné sans le producteur',
-                                                           defaults={'value': carbure_production_site_name})
+    if lot.producer_is_in_carbure:
+        if carbure_production_site_id is not None and carbure_production_site_id != '':
+            try:
+                ps = ProductionSite.objects.get(id=int(carbure_production_site_id), producer=lot.carbure_producer)
+                lot.carbure_production_site = ps
+                LotV2Error.objects.filter(lot=lot, field='carbure_production_site_name').delete()
+            except Exception:
+                lot.carbure_production_site = None
+                error, c = LotV2Error.objects.update_or_create(lot=lot, field='carbure_production_site_name',
+                                                               error='Usine %s inconnue pour %s' % (carbure_production_site_name, lot.carbure_producer.name),
+                                                               defaults={'value': carbure_production_site_name})
         else:
+            lot.carbure_production_site = None
             error, c = LotV2Error.objects.update_or_create(lot=lot, field='carbure_production_site_name',
-                                                           error='Usine %s inconnue pour %s' % (carbure_production_site_name, lot.carbure_producer.name),
+                                                           error='Veuillez renseigner une usine de production valide',
                                                            defaults={'value': carbure_production_site_name})
+
     biocarburant_code = request.POST.get('biocarburant_code', '')
     biocarburant_name = request.POST.get('biocarburant', '')
     if biocarburant_code == '':

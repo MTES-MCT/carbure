@@ -25,8 +25,10 @@ def lot_is_valid(lot):
         return False, 'Veuillez renseigner le volume'
 
     if not lot.parent_lot:
-        if not lot.pays_origine:
-            return False, 'Veuillez renseigner le pays d\'origine de la matière première'
+        if not lot.biocarburant:
+            return False, 'Veuillez renseigner le type de biocarburant'
+        if not lot.matiere_premiere:
+            return False, 'Veuillez renseigner la matière première'
         if lot.producer_is_in_carbure and lot.carbure_production_site is None:
             return False, 'Veuillez préciser le site de production'
     else:
