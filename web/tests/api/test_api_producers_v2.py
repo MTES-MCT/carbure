@@ -34,7 +34,7 @@ class TestProducer(TestCase):
 
         # create production site
         self.production_site, created = ProductionSite.objects.update_or_create(producer=self.producer_entity, name='production-site-test', country=self.country, defaults={'date_mise_en_service': datetime.date.today()})
-        self.delivery_site, created = Depot.objects.update_or_create(depot_id=555, defaults={'name': 'Fake Depot', 'city': 'Jaxu'})
+        self.delivery_site, created = Depot.objects.update_or_create(depot_id=555, defaults={'name': 'Fake Depot', 'city': 'Jaxu', 'country': self.country})
 
     def test_lot_lifecycle(self):
         # 1 create a draft with invalid data
