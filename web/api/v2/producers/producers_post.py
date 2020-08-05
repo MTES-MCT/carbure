@@ -337,3 +337,42 @@ def accept_lot_with_correction(request, *args, **kwargs):
     txc.save()
     return JsonResponse({'status': 'success', 'tx_id': tx.id})
 
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def enable_mac(request, *args, **kwargs):
+    context = kwargs['context']
+    context['user_entity'].producer_with_mac = True
+    context['user_entity'].save()
+    return JsonResponse({'status': 'success'})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def disable_mac(request, *args, **kwargs):
+    context = kwargs['context']
+    context['user_entity'].producer_with_mac = False
+    context['user_entity'].save()
+    return JsonResponse({'status': 'success'})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def enable_trading(request, *args, **kwargs):
+    context = kwargs['context']
+    context['user_entity'].producer_with_trading = True
+    context['user_entity'].save()
+    return JsonResponse({'status': 'success'})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
+def disable_trading(request, *args, **kwargs):
+    context = kwargs['context']
+    context['user_entity'].producer_with_trading = False
+    context['user_entity'].save()
+    return JsonResponse({'status': 'success'})

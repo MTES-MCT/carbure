@@ -17,13 +17,13 @@
     <div class="form__group">
       <fieldset>
         <h3>Mises à Consommation</h3>
-        <input type="checkbox" checked="checked" name="checkbox" id="checkbox-mac" value="1"><label for="checkbox-mac" class="label-inline">Ma société effectue des Mises à Consommation</label>
+        <input type="checkbox" {% if user_entity.producer_with_mac %}checked="checked"{% endif %} name="checkbox" id="producers-checkbox-mac" value="1"><label for="producers-checkbox-mac" class="label-inline">Ma société effectue des Mises à Consommation</label>
       </fieldset>
     </div>
     <div class="form__group">
       <fieldset>
         <h3>Trading</h3>
-        <input type="checkbox" checked="checked" name="checkbox" id="checkbox-trading" value="1"><label for="checkbox-trading" class="label-inline">Ma société a une activité de négoce</label>
+        <input type="checkbox" {% if user_entity.producer_with_trading %}checked="checked"{% endif %} name="checkbox" id="producers-checkbox-trading" value="1"><label for="producers-checkbox-trading" class="label-inline">Ma société a une activité de négoce</label>
       </fieldset>
     </div>
     <h3>Sites de production</h3>
@@ -404,6 +404,22 @@ $("#btn_close_modal_add_bc").on('click', function() {
   let input_to_clear = $(`#input_bc_site_${site}`)
   input_to_clear.val('')
 })
+
+$('#producers-checkbox-mac').change(function() {
+    if (this.checked) {
+      $.ajax({url:"{% url 'api-v2-producers-settings-enable-mac' %}", data: {'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value}, type: 'POST', success: () => {window.location.reload()} })
+    } else {
+      $.ajax({url:"{% url 'api-v2-producers-settings-disable-mac' %}", data: {'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value}, type: 'POST', success: () => {window.location.reload()} })
+    }
+});
+
+$('#producers-checkbox-trading').change(function() {
+    if (this.checked) {
+      $.ajax({url:"{% url 'api-v2-producers-settings-enable-trading' %}", data: {'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value}, type: 'POST', success: () => {window.location.reload()} })
+    } else {
+      $.ajax({url:"{% url 'api-v2-producers-settings-disable-trading' %}", data: {'csrfmiddlewaretoken':document.getElementsByName('csrfmiddlewaretoken')[0].value}, type: 'POST', success: () => {window.location.reload()} })
+    }
+});
 
 </script>
 {% endblock %}

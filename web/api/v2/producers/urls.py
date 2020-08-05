@@ -40,4 +40,10 @@ urlpatterns = [
     path('lot/mb/delete-drafts', producers_post.delete_mb_drafts_lots, name='api-v2-producers-delete-mb-drafts'),
     path('lot/mb/validate-drafts', producers_post.validate_mb_drafts_lots, name='api-v2-producers-validate-mb-drafts-lots'),
     path('lot/mb/fuse', producers_post.fuse_mb_lots, name='api-v2-producers-fuse-mb-lots'),
+
+    # POST - Settings
+    path('settings/enable-mac', producers_post.enable_mac, name='api-v2-producers-settings-enable-mac'),
+    path('settings/disable-mac', producers_post.disable_mac, name='api-v2-producers-settings-disable-mac'),
+    path('settings/enable-trading', producers_post.enable_trading, name='api-v2-producers-settings-enable-trading'),
+    path('settings/disable-trading', producers_post.disable_trading, name='api-v2-producers-settings-disable-trading'),
 ]
