@@ -28,7 +28,7 @@ class TestProducer(TestCase):
         self.client.login(username='testproducer@almalexia.org', password='totopouet42')
 
         # setup plenty of data to work with
-        self.country, created = Pays.objects.update_or_create(code_pays='VTN', name='Voituristan')
+        self.country, created = Pays.objects.update_or_create(code_pays='VTN', name='Voituristan', defaults={'is_in_europe':True})
         self.mp, created = MatierePremiere.objects.update_or_create(code='CA', name='CAILLOU')
         self.biocarburant, created = Biocarburant.objects.update_or_create(code='EL', name='Électricité')
 
