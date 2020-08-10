@@ -1880,6 +1880,7 @@ $("#add_lot").on('click', function() {
   check_biocarburants()
   $("#reduction_title").attr('title', '')
   modal.style.display = "flex"
+  window.modal = modal
 })
 
 function init_tab_generic(tab_name) {
