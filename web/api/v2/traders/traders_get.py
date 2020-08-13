@@ -57,9 +57,9 @@ def get_mb(request, *args, **kwargs):
 @restrict_to_traders
 def get_corrections(request, *args, **kwargs):
     context = kwargs['context']
-    anon, created = Entity.objects.get_or_create(name='Anonymisé', entity_type='Producteur')
+    anon, created = Entity.objects.get_or_create(name='Confidentiel', entity_type='Producteur')
     france = Pays.objects.get(code_pays='FR')
-    anon_site, created = Depot.objects.get_or_create(name='Anonymisé', depot_id='0', country=france)
+    anon_site, created = Depot.objects.get_or_create(name='Confidentiel', depot_id='0', country=france)
 
     transactions, comments = get_producer_corrections(context['user_entity'])
 
