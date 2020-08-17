@@ -411,3 +411,28 @@ class GHGValues(models.Model):
         verbose_name = 'Valeur GES de référence'
         verbose_name_plural = 'Valeurs GES de référence'
 
+
+class CheckRule(models.Model):
+    CONDITIONS = (('EQ', 'Equals'), ('GT', 'Greater Than'), ('GTE', 'Greater Than or Equal'), ('LT', 'Less Than'), ('LTE', 'Less Than or Equal'), ('DIFF', 'Is Different than'), ('IN', 'Is In'), ('NIN', 'Is Not In'))
+
+    condition_col = models.CharField(max_length=32, null=True, blank=True)
+    condition = models.CharField(max_length=64, choices=CONDITIONS, default='EQ')
+    condition_value = models.CharField(max_length=256, null=True, blank=True)
+
+    check_col = models.CharField(max_length=32, null=True, blank=True)
+    check = models.CharField(max_length=64, choices=CONDITIONS, default='EQ')
+    check_value = models.CharField(max_length=256, null=True, blank=True)
+
+    warning_to_user = models.BooleanField(default=False)
+    warning_to_admin = models.BooleanField(default=False)
+    block_validation = models.BooleanField(default=False)
+    message = models.CharField(max_length=256, blank=True, null=True, default='')
+
+    def __str__(self):
+        return ''
+
+    class Meta:
+        db_table = 'check_rules'
+        verbose_name = 'Règle Métier'
+        verbose_name_plural = 'Règles Métier'
+

@@ -10,6 +10,7 @@ from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
 from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, Lot, LotComment
 from core.models import LotError, GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
+from core.models import CheckRule
 
 
 class EntityAdmin(admin.ModelAdmin):
@@ -104,6 +105,12 @@ class TransactionCommentAdmin(admin.ModelAdmin):
     list_filter = ('topic', )
 
 
+class CheckRuleAdmin(admin.ModelAdmin):
+    list_display = ('condition_col', 'condition', 'condition_value', 'check_col', 'check', 'check_value', 'warning_to_user', 'warning_to_admin', 'block_validation')
+    search_fields = ('condition_col', 'condition_value', 'check_col', 'check_value')
+    list_filter = ('block_validation', 'warning_to_user', 'warning_to_admin')
+
+
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
 admin.site.register(UserPreferences, UserPreferencesAdmin)
@@ -115,12 +122,12 @@ admin.site.register(LotComment, LotCommentAdmin)
 admin.site.register(LotError, LotErrorAdmin)
 admin.site.register(GHGValues, GHGValuesAdmin)
 admin.site.register(Depot, DepotAdmin)
-
 admin.site.register(LotV2, LotV2Admin)
 admin.site.register(LotTransaction, TransactionAdmin)
 admin.site.register(TransactionError, TransactionErrorAdmin)
 admin.site.register(TransactionComment, TransactionCommentAdmin)
 admin.site.register(LotV2Error, LotV2ErrorAdmin)
+admin.site.register(CheckRule, CheckRuleAdmin)
 
 
 # authtool custom user model
