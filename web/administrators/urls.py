@@ -9,6 +9,7 @@ urlpatterns = [
     path('suivi-certificats', views.administrators_suivi_certificats, name='administrators-suivi-certificats'),
     path('suivi-certificats/<int:id>', views.administrators_certificate_details, name='administrators-certificate-details'),
     path('gestion-utilisateurs', views.administrators_gestion_utilisateurs, name='administrators-gestion-utilisateurs'),
+    path('alertes', views.alertes, name='administrators-alertes'),
 
 
     # TODO: move to API

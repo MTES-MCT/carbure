@@ -257,3 +257,12 @@ def administrators_delete_right(request, *args, **kwargs):
   except Exception as e:
     return JsonResponse({'status':'error', 'message':"Unknown error. Please contact an administrator", 'extra':str(e)}, status=400)
   return JsonResponse({'status':'success', 'message':'User Right deleted'})
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_administrators
+def alertes(request, *args, **kwargs):
+    context = kwargs['context']
+    context['current_url_name'] = 'administrators-alertes'
+    return render(request, 'administrators/alertes.html', context)
