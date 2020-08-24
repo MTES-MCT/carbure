@@ -85,6 +85,9 @@ var administrators_columns =['carbure_id', 'producer', 'production_site', 'volum
 /* modals management */
 var modals = document.getElementsByClassName("modal__backdrop");
 
+window.previous_modal = null
+window.modal = null
+
 for (let i = 0, len = modals.length; i < len; i++) {
   let modalid = modals[i].id
   let modal = document.getElementById(modalid)
@@ -94,6 +97,11 @@ for (let i = 0, len = modals.length; i < len; i++) {
   if (btn_open_modal !== null) {
     btn_open_modal.onclick = function() {
       modal.style.display = "flex"
+      // in case of a modal opening another modal, we save it
+      if (window.modal !== null) {
+        // we already have a modal open
+        window.previous_modal = window.modal
+      }
       window.modal = modal
     }
   }
@@ -106,6 +114,9 @@ for (let i = 0, len = btns_close.length; i < len; i++) {
   btn.onclick = function() {
     // close modal
     window.modal.style.display = "none"
+    if (window.previous_modal !== null) {
+      window.modal = window.previous_modal
+    }
   }
 }
 
