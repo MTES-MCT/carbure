@@ -1881,6 +1881,9 @@ $("#add_lot").on('click', function() {
   $("#reduction_title").attr('title', '')
   modal.style.display = "flex"
   window.modal = modal
+
+  let today = new Date().toISOString().slice(0, 10)
+  $("#delivery_date").val(today)
 })
 
 function init_tab_generic(tab_name) {
