@@ -67,11 +67,22 @@ def get_corrections(request, *args, **kwargs):
     # anonymisation des données
     processed_tx = []
     for t in transactions:
+        # est-ce un de mes lots qui a été revendu ?
         if t.carbure_vendor != context['user_entity']:
+            # on récupère le DAE initial
+            initial_tx = LotTransaction.objects.filter(lot=t.lot).order_by('delivery_date')[0]
+            #### OU ---
+            # on rend les données confidentielles mais on utilise le DAE initial
             t.carbure_client = anon
+            t.dae = initial_tx.dae
             t.client_is_in_carbure = True
             t.delivery_site_is_in_carbure = True
             t.carbure_delivery_site = anon_site
+            t.unknown_client = 'Confidentiel'
+            t.unknown_delivery_site = 'Confidentiel'
+            t.unknown_delivery_site_country = france
+            t.champ_libre = ''
+            t.delivery_date = None
         processed_tx.append(t)
 
     processed_comments = []
