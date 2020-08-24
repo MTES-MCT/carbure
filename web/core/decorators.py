@@ -4,6 +4,7 @@ from django.shortcuts import render
 
 from itertools import chain
 
+
 # not an http endpoint
 def get_producer_corrections(entity):
     # corrections de type "Durabilite" ou "Les deux" pour mes lots
