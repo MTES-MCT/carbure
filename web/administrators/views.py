@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
 
-from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Lot, Pays
+from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays
 from producers.models import ProducerCertificate, ProductionSiteInput, ProductionSiteOutput
 
 
