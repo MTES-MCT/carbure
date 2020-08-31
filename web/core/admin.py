@@ -8,8 +8,8 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.utils.crypto import get_random_string
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
-from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, Lot, LotComment
-from core.models import LotError, GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
+from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays
+from core.models import GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
 from core.models import CheckRule
 
 
@@ -45,23 +45,6 @@ class PaysAdmin(admin.ModelAdmin):
     list_display = ('name', 'code_pays', 'is_in_europe')
     search_fields = ('name', 'code_pays', )
     list_filter = ('is_in_europe', )
-
-
-class LotAdmin(admin.ModelAdmin):
-    list_display = ('period', 'carbure_id', 'producer', 'production_site', 'ea_delivery_site', 'ea_delivery_date', 'ea', 'biocarburant', 'matiere_premiere', 'client_id', 'status', 'ea_delivery_status')
-    search_fields = ('dae', 'client_id', 'ea_delivery_status', 'carbure_id')
-    list_filter = ('producer', 'ea', 'status', 'ea_delivery_status', 'period')
-
-
-class LotCommentAdmin(admin.ModelAdmin):
-    list_display = ('entity', 'lot', 'comment')
-    search_fields = ('entity', 'lot', 'comment')
-
-
-class LotErrorAdmin(admin.ModelAdmin):
-    list_display = ('lot', 'field', 'value', 'error')
-    search_fields = ('lot', 'field', 'value', 'error')
-    list_filter = ('field', )
 
 
 class LotV2ErrorAdmin(admin.ModelAdmin):
@@ -117,9 +100,6 @@ admin.site.register(UserPreferences, UserPreferencesAdmin)
 admin.site.register(Biocarburant, BiocarburantAdmin)
 admin.site.register(MatierePremiere, MatierePremiereAdmin)
 admin.site.register(Pays, PaysAdmin)
-admin.site.register(Lot, LotAdmin)
-admin.site.register(LotComment, LotCommentAdmin)
-admin.site.register(LotError, LotErrorAdmin)
 admin.site.register(GHGValues, GHGValuesAdmin)
 admin.site.register(Depot, DepotAdmin)
 admin.site.register(LotV2, LotV2Admin)

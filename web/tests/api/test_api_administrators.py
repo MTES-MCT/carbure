@@ -25,10 +25,6 @@ class AdminApiSecurityTests(TestCase):
         self.assertEqual(response.status_code, 403)
         response = self.client.get(reverse('admin-api-entities-autocomplete'))
         self.assertEqual(response.status_code, 403)
-        response = self.client.get(reverse('admin-api-lots'))
-        self.assertEqual(response.status_code, 403)
-        response = self.client.get(reverse('admin-api-lots-export'))
-        self.assertEqual(response.status_code, 403)
         self.client.logout()
 
     def test_access_operator(self):
@@ -36,10 +32,6 @@ class AdminApiSecurityTests(TestCase):
         response = self.client.get(reverse('admin-api-users-autocomplete'))
         self.assertEqual(response.status_code, 403)
         response = self.client.get(reverse('admin-api-entities-autocomplete'))
-        self.assertEqual(response.status_code, 403)
-        response = self.client.get(reverse('admin-api-lots'))
-        self.assertEqual(response.status_code, 403)
-        response = self.client.get(reverse('admin-api-lots-export'))
         self.assertEqual(response.status_code, 403)
         self.client.logout()
 
@@ -66,15 +58,3 @@ class AdminApiTest(TestCase):
         self.assertEqual(response.status_code, 200)
         # make sure we can json load the response
         data = json.loads(response.content)
-
-    def test_lots(self):
-        url = reverse('admin-api-lots')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        # make sure we can json load the response
-        data = json.loads(response.content)
-
-    def test_export(self):
-        url = reverse('admin-api-lots-export')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
