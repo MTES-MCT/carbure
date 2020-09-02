@@ -277,14 +277,15 @@ def load_excel_lot(context, lot_row):
     # transaction.save()
     transaction.vendor_is_in_carbure = True
     transaction.carbure_vendor = entity
+    transaction.is_mac = False
+    if 'mac' in lot_row and lot_row['mac'] == '1':
+        transaction.is_mac = True
 
+    transaction.dae = None
     if 'dae' in lot_row:
         dae = lot_row['dae']
-        if dae is not None:
-            transaction.dae = dae
-        else:
-            tx_errors.append(TransactionError(tx=transaction, field='dae', error="Merci de préciser le numéro de DAE/DAU", value=dae))
-    else:
+        transaction.dae = dae
+    if transaction.dae is None and transaction.is_mac is False:
         tx_errors.append(TransactionError(tx=transaction, field='dae', error="Merci de préciser le numéro de DAE/DAU", value=None))
 
     if 'delivery_date' not in lot_row or lot_row['delivery_date'] == '':
@@ -362,8 +363,6 @@ def load_excel_lot(context, lot_row):
         transaction.champ_libre = lot_row['champ_libre']
         if transaction.champ_libre is None:
             transaction.champ_libre = ''
-    # transaction.save()
-    # lot.save()
     return lot, transaction, lot_errors, tx_errors
 
 
