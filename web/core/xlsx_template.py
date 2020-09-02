@@ -139,7 +139,7 @@ def make_lots_sheet_v2_advanced(workbook, entity):
             row += [ea.name, today, site.depot_id, 'FR']
 
         if entity.producer_with_mac:
-            row += ['0']
+            row += [0]
 
         colid = 0
         for elem in row:
