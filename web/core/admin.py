@@ -60,8 +60,9 @@ class GHGValuesAdmin(admin.ModelAdmin):
 
 
 class DepotAdmin(admin.ModelAdmin):
-    list_display = ('name', 'depot_id', 'city')
+    list_display = ('name', 'depot_id', 'city', 'depot_type')
     search_fields = ('name', 'city', 'depot_id')
+    list_filter = ('depot_type',)
 
 
 class LotV2Admin(admin.ModelAdmin):
