@@ -120,10 +120,12 @@ class Pays(models.Model):
 
 
 class Depot(models.Model):
+    TYPE_DEPOT = (('EFS', 'EFS'), ('EFPE', 'EFPE'), ('OTHER', 'Autre'),)
     name = models.CharField(max_length=128, null=False, blank=False)
     city = models.CharField(max_length=128, null=True, blank=True)
     depot_id = models.CharField(max_length=32, null=False, blank=False)
     country = models.ForeignKey(Pays, null=True, blank=False, on_delete=models.SET_NULL)
+    depot_type = models.CharField(max_length=32, choices=TYPE_DEPOT, default='OTHER')
 
     def __str__(self):
         return self.name

@@ -52,6 +52,16 @@ def stats(request, *args, **kwargs):
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
+def mac(request, *args, **kwargs):
+    context = kwargs['context']
+    context['current_url_name'] = 'producers-mac'
+    context['producer_id'] = context['user_entity'].id
+    return render(request, 'producers/mac.html', context)
+
+
+@login_required
+@enrich_with_user_details
+@restrict_to_producers
 def new_design(request, *args, **kwargs):
     context = kwargs['context']
     context['current_url_name'] = 'producers-new-design'
