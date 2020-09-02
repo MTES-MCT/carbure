@@ -24,38 +24,6 @@ def get_random(model):
 @login_required
 @enrich_with_user_details
 @restrict_to_producers
-def producers_import_csv_template(request, *args, **kwargs):
-    context = kwargs['context']
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="template.csv"'
-    writer = csv.writer(response, delimiter=';')
-    writer.writerow(['production_site_name', 'volume', 'biocarburant_code', 'matiere_premiere_code',
-                     'pays_origine_code', 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'e', 'dae',
-                     'client_id', 'ea_delivery_date', 'ea_name', 'ea_delivery_site'])
-    psites = ProductionSite.objects.filter(producer=context['user_entity'])
-    eas = Entity.objects.filter(entity_type='Opérateur')
-    mps = MatierePremiere.objects.all()
-    bcs = Biocarburant.objects.all()
-    countries = Pays.objects.all()
-    delivery_sites = ['Grandpuits', 'Le Havre', 'Tournefeuille', 'Guangzhou']
-    volumes = [1200, 2800, 8000, 4500, 13000]
-    clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
-    today = datetime.date.today().strftime('%d/%m/%Y')
-    for p in psites:
-        mp = random.choice(mps)
-        ea = random.choice(eas)
-        bc = random.choice(bcs)
-        country = random.choice(countries)
-        site = random.choice(delivery_sites)
-        volume = random.choice(volumes)
-        writer.writerow([p.name, volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 0,
-                         'DAE0000001', clientid, today, ea.name, site])
-    return response
-
-
-@login_required
-@enrich_with_user_details
-@restrict_to_producers
 def producers_import_excel_template(request, *args, **kwargs):
     context = kwargs['context']
     file_location = create_template_xlsx(context['user_entity'])
