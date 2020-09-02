@@ -278,7 +278,8 @@ def load_excel_lot(context, lot_row):
     transaction.vendor_is_in_carbure = True
     transaction.carbure_vendor = entity
     transaction.is_mac = False
-    if 'mac' in lot_row and lot_row['mac'] == '1':
+    print(lot_row)
+    if 'mac' in lot_row and lot_row['mac'] == 1:
         transaction.is_mac = True
 
     transaction.dae = None
