@@ -1,5 +1,3 @@
-import datetime
-
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -143,57 +141,9 @@ from producers.models import ProductionSite
 
 # deprecated. Use LotV2
 class Lot(models.Model):
-    VALID = "Validated"
-    DRAFT = "Draft"
-    LOT_STATUS = ((DRAFT, 'Brouillon'), (VALID, 'Validé'))
-    DELIVERY_STATUS = (('N', 'En Attente'), ('A', 'Accepté'), ('R', 'Refusé'), ('AC', 'À corriger'), ('AA', 'Corrigé'))
-
-    period = models.CharField(max_length=64, blank=True, default='')
     carbure_id = models.CharField(max_length=64, blank=True, default='')
-    # producer
-    producer = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='producer')
-    production_site = models.ForeignKey(ProductionSite, null=True, blank=True, on_delete=models.SET_NULL)
-
-    # client / delivery
-    dae = models.CharField(max_length=64, blank=True, default='')
-    ea_delivery_date = models.DateField(blank=True, null=True)
-    ea_delivery_site = models.CharField(max_length=64, blank=True, default='')
-    ea = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='ea')
-
-    # lot details
-    volume = models.IntegerField(default=0)
-    matiere_premiere = models.ForeignKey(MatierePremiere, null=True, on_delete=models.SET_NULL)
-    biocarburant = models.ForeignKey(Biocarburant, null=True, on_delete=models.SET_NULL)
-    pays_origine = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='pays_origine')
-
-    # GHG values
-    eec = models.FloatField(default=0.0)
-    el = models.FloatField(default=0.0)
-    ep = models.FloatField(default=0.0)
-    etd = models.FloatField(default=0.0)
-    eu = models.FloatField(default=0.0)
-    esca = models.FloatField(default=0.0)
-    eccs = models.FloatField(default=0.0)
-    eccr = models.FloatField(default=0.0)
-    eee = models.FloatField(default=0.0)
-    ghg_total = models.FloatField(default=0.0)
-    ghg_reference = models.FloatField(default=0.0)
-    ghg_reduction = models.FloatField(default=0.0)
-
-    # other
-    client_id = models.CharField(max_length=64, blank=True, default='')
-    status = models.CharField(max_length=64, choices=LOT_STATUS, default='Draft')
-
-    # ea delivery confirmation
-    ea_delivery_status = models.CharField(max_length=64, choices=DELIVERY_STATUS, default='N')
-
-    def __str__(self):
-        return str(self.id)
-
     class Meta:
         db_table = 'lots'
-        verbose_name = 'Lot'
-        verbose_name_plural = 'Lots'
 
 
 class LotV2(models.Model):
@@ -313,35 +263,6 @@ class LotTransaction(models.Model):
         verbose_name_plural = 'Transactions'
 
 
-class LotComment(models.Model):
-    entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
-    lot = models.ForeignKey(Lot, on_delete=models.CASCADE)
-    comment = models.TextField()
-
-    def __str__(self):
-        return str(self.comment)
-
-    class Meta:
-        db_table = 'lots_comments'
-        verbose_name = 'LotComment'
-        verbose_name_plural = 'LotComments'
-
-# deprecated. use LotV2Error
-class LotError(models.Model):
-    lot = models.ForeignKey(Lot, null=False, blank=False, on_delete=models.CASCADE)
-    field = models.CharField(max_length=32, null=False, blank=False)
-    value = models.CharField(max_length=128, null=True, blank=True)
-    error = models.CharField(max_length=256, null=False, blank=False)
-
-    def __str__(self):
-        return self.error
-
-    class Meta:
-        db_table = 'lots_errors'
-        verbose_name = 'LotError'
-        verbose_name_plural = 'LotErrors'
-
-
 class LotV2Error(models.Model):
     lot = models.ForeignKey(LotV2, null=False, blank=False, on_delete=models.CASCADE)
     field = models.CharField(max_length=32, null=False, blank=False)
@@ -435,4 +356,3 @@ class CheckRule(models.Model):
         db_table = 'check_rules'
         verbose_name = 'Règle Métier'
         verbose_name_plural = 'Règles Métier'
-
