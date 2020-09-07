@@ -65,10 +65,29 @@ class DepotAdmin(admin.ModelAdmin):
     list_filter = ('depot_type',)
 
 
+def reset_checked_status(modeladmin, request, queryset):
+    queryset.update(blocking_sanity_checked_passed=False)
+    queryset.update(nonblocking_sanity_checked_passed=False)
+
+
+def check_blocking_rules(modeladmin, request, queryset):
+    queryset.update(blocking_sanity_checked_passed=True)
+
+
+def check_nonblocking_rules(modeladmin, request, queryset):
+    queryset.update(nonblocking_sanity_checked_passed=True)
+
+
+reset_checked_status.short_description = "Reset Checked status"
+check_blocking_rules.short_description = "Run blocking sanity checks"
+check_nonblocking_rules.short_description = "Run non blocking sanity checks"
+
+
 class LotV2Admin(admin.ModelAdmin):
     list_display = ('period', 'carbure_id', 'carbure_producer', 'carbure_production_site', 'biocarburant', 'matiere_premiere', 'status')
     search_fields = ('carbure_producer__name', 'biocarburant__name', 'matiere_premiere__name', 'carbure_id', 'period')
-    list_filter = ('period', 'carbure_producer', 'is_split', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused')
+    list_filter = ('period', 'carbure_producer', 'is_split', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused', 'blocking_sanity_checked_passed', 'nonblocking_sanity_checked_passed')
+    actions = [check_blocking_rules, check_nonblocking_rules, reset_checked_status]
 
 
 class TransactionAdmin(admin.ModelAdmin):

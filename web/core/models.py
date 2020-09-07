@@ -206,6 +206,10 @@ class LotV2(models.Model):
     # entity responsible for the original data
     data_origin_entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='data_origin_entity')
 
+    # sanity checks
+    blocking_sanity_checked_passed = models.BooleanField(default=False)
+    nonblocking_sanity_checked_passed = models.BooleanField(default=False)
+
     def natural_key(self):
         return {'id': self.id, 'period': self.period, 'carbure_id': self.carbure_id, 'producer_is_in_carbure': self.producer_is_in_carbure, 'carbure_producer': self.carbure_producer.natural_key() if self.carbure_producer else None,
         'unknown_producer': self.unknown_producer, 'production_site_is_in_carbure': self.production_site_is_in_carbure, 'carbure_production_site': self.carbure_production_site.natural_key() if self.carbure_production_site else None,
