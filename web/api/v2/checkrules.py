@@ -23,7 +23,6 @@ def eval_node(lot_value, operator, rule_value):
 
 
 def exec_rule(obj, rule):
-    print('Running rule %s on lot %s' % (rule, obj))
     lot_value = getattr(obj, rule.condition_col)
     if eval_node(lot_value, rule.condition, rule.condition_value):
         # keep going for second condition
