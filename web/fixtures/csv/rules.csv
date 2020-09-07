@@ -1,5 +1,5 @@
 condition_col;condition;condition_value;check_col;check;check_value;user_warning;admin_warning;blocking;message
 matiere_premiere;EQ;COLZA;biocarburant;EQ;ET;0;0;1;Matière première incompatible avec Éthanol
 matiere_premiere;EQ;BETTERAVE;eec;LTE;15;1;1;0;Valeur GES de production anormalement faible
-matiere_premiere;EQ;HUILE_PALME;pays_origine;IN;MY;ID;0;1;0;Huile de palme potentiellement non-durable
+matiere_premiere;EQ;HUILE_PALME;pays_origine;IN;MY,ID;0;1;0;Huile de palme potentiellement non-durable
 

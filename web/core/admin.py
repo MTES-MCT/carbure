@@ -10,7 +10,7 @@ from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
 from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays
 from core.models import GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
-from core.models import CheckRule
+from core.models import CheckRule, LotValidationError
 from api.v2.common import run_blocking_rules, run_nonblocking_rules
 
 
@@ -133,6 +133,7 @@ admin.site.register(TransactionError, TransactionErrorAdmin)
 admin.site.register(TransactionComment, TransactionCommentAdmin)
 admin.site.register(LotV2Error, LotV2ErrorAdmin)
 admin.site.register(CheckRule, CheckRuleAdmin)
+admin.site.register(LotValidationError, LotValidationErrorAdmin)
 
 
 # authtool custom user model

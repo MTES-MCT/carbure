@@ -2,11 +2,17 @@ import datetime
 
 from core.models import LotV2, CheckRule
 from api.v2.checkrules import exec_rule
+from functools import partial, reduce
 
 
 def run_rules(queryset, rules):
+    # print('Running rules')
     for obj in queryset:
-        map(exec_rule, rules)
+        # print('Running %d rules for lot %s' % (len(rules), obj))
+        p = partial(exec_rule, obj)
+        res = reduce(lambda x, y: x+y, map(p, rules))
+        if res > 0:
+            print('Lot %d triggered a checkrule')
 
 
 def run_blocking_rules(queryset):
