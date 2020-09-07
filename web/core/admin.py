@@ -11,6 +11,7 @@ from authtools.forms import UserCreationForm
 from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays
 from core.models import GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
 from core.models import CheckRule
+from api.v2.common import run_blocking_rules, run_nonblocking_rules
 
 
 class EntityAdmin(admin.ModelAdmin):
@@ -53,6 +54,10 @@ class LotV2ErrorAdmin(admin.ModelAdmin):
     list_filter = ('field', )
 
 
+class LotValidationErrorAdmin(admin.ModelAdmin):
+    list_display = ('lot', 'rule')
+
+
 class GHGValuesAdmin(admin.ModelAdmin):
     list_display = ('matiere_premiere', 'biocarburant', 'condition', 'eec_default', 'ep_default', 'etd_default')
     search_fields = ('matiere_premiere', 'biocarburant')
@@ -71,11 +76,11 @@ def reset_checked_status(modeladmin, request, queryset):
 
 
 def check_blocking_rules(modeladmin, request, queryset):
-    queryset.update(blocking_sanity_checked_passed=True)
+    run_blocking_rules(queryset)
 
 
 def check_nonblocking_rules(modeladmin, request, queryset):
-    queryset.update(nonblocking_sanity_checked_passed=True)
+    run_nonblocking_rules(queryset)
 
 
 reset_checked_status.short_description = "Reset Checked status"
@@ -84,7 +89,7 @@ check_nonblocking_rules.short_description = "Run non blocking sanity checks"
 
 
 class LotV2Admin(admin.ModelAdmin):
-    list_display = ('period', 'carbure_id', 'carbure_producer', 'carbure_production_site', 'biocarburant', 'matiere_premiere', 'status')
+    list_display = ('period', 'carbure_id', 'carbure_producer', 'carbure_production_site', 'biocarburant', 'matiere_premiere', 'status', 'blocking_sanity_checked_passed', 'nonblocking_sanity_checked_passed')
     search_fields = ('carbure_producer__name', 'biocarburant__name', 'matiere_premiere__name', 'carbure_id', 'period')
     list_filter = ('period', 'carbure_producer', 'is_split', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused', 'blocking_sanity_checked_passed', 'nonblocking_sanity_checked_passed')
     actions = [check_blocking_rules, check_nonblocking_rules, reset_checked_status]
