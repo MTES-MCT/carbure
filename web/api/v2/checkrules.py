@@ -5,13 +5,13 @@ def eval_node(lot_value, operator, rule_value):
     if operator == 'EQ':
         return lot_value == rule_value
     elif operator == 'GT':
-        return lot_value > rule_value
+        return lot_value > float(rule_value)
     elif operator == 'LT':
-        return lot_value < rule_value
+        return lot_value < float(rule_value)
     elif operator == 'GTE':
-        return lot_value >= rule_value
+        return lot_value >= float(rule_value)
     elif operator == 'LTE':
-        return lot_value <= rule_value
+        return lot_value <= float(rule_value)
     elif operator == 'DIFF':
         return lot_value != rule_value
     elif operator == 'IN':
