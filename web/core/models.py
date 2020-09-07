@@ -358,9 +358,22 @@ class CheckRule(models.Model):
     message = models.CharField(max_length=256, blank=True, null=True, default='')
 
     def __str__(self):
-        return ''
+        return self.message
 
     class Meta:
         db_table = 'check_rules'
         verbose_name = 'Règle Métier'
         verbose_name_plural = 'Règles Métier'
+
+
+class LotValidationError(models.Model):
+    lot = models.ForeignKey(LotV2, null=False, blank=False, on_delete=models.CASCADE)
+    rule = models.ForeignKey(CheckRule, null=False, blank=False, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.rule
+
+    class Meta:
+        db_table = 'validation_errors'
+        verbose_name = 'LotValidationError'
+        verbose_name_plural = 'LotValidationErrors'

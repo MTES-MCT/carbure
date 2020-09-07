@@ -1,10 +1,24 @@
 import datetime
 
-from core.models import LotV2
+from core.models import LotV2, CheckRule
+from api.v2.checkrules import exec_rule
 
 
-def check_lot(lot, tx, checkrule):
-    pass
+def run_rules(queryset, rules):
+    for obj in queryset:
+        map(exec_rule, rules)
+
+
+def run_blocking_rules(queryset):
+    queryset.update(blocking_sanity_checked_passed=True)
+    rules = CheckRule.objects.filter(block_validation=True)
+    run_rules(queryset, rules)
+
+
+def run_nonblocking_rules(queryset):
+    queryset.update(nonblocking_sanity_checked_passed=True)
+    rules = CheckRule.objects.filter(block_validation=False)
+    run_rules(queryset, rules)
 
 
 def tx_is_valid(tx):
