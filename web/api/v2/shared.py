@@ -462,6 +462,8 @@ def save_lot(request, *args, **kwargs):
         update_tx(transaction, lot, request, context)
 
     transaction.save()
+    lot.blocking_sanity_checked_passed = False
+    lot.nonblocking_sanity_checked_passed = False
     lot.save()
 
     if not can_edit_tx and not can_edit_lot:

@@ -3,6 +3,10 @@ import datetime
 from core.models import LotV2
 
 
+def check_lot(lot, tx, checkrule):
+    pass
+
+
 def tx_is_valid(tx):
     # make sure all mandatory fields are set
     if not tx.dae:
