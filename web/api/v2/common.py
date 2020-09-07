@@ -12,7 +12,7 @@ def run_rules(queryset, rules):
         p = partial(exec_rule, obj)
         res = reduce(lambda x, y: x+y, map(p, rules))
         if res > 0:
-            print('Lot %d triggered a checkrule')
+            print('Lot %d triggered a checkrule' % (obj.id))
 
 
 def run_blocking_rules(queryset):

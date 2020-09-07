@@ -73,6 +73,9 @@ class Biocarburant(models.Model):
     def __str__(self):
         return self.name
 
+    def __eq__(self, other):
+        return self.code == other
+
     def natural_key(self):
         return {'code': self.code, 'name': self.name}
 
@@ -90,6 +93,9 @@ class MatierePremiere(models.Model):
 
     def __str__(self):
         return self.name
+
+    def __eq__(self, other):
+        return self.code == other
 
     def natural_key(self):
         return {'code': self.code, 'name': self.name}
