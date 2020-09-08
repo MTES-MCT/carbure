@@ -17,6 +17,7 @@ Ensuite, créez un environnement virtuel pour python3:
 
 - virtualenv -p python3 venv
 - source venv/bin/activate
+- pip install -r requirements.txt
 
 Vous pouvez désormais builder les images docker et lancer le projet:
 

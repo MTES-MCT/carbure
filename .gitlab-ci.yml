@@ -4,6 +4,12 @@ stages:
 - test
 - deploy
 
+include:
+  - template: Dependency-Scanning.gitlab-ci.yml
+
+variables:
+  DS_PYTHON_VERSION: 3
+
 prune_images:
   stage: prune
   script:
