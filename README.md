@@ -19,9 +19,15 @@ Ensuite, créez un environnement virtuel pour python3:
 - source venv/bin/activate
 - pip install -r requirements.txt
 
+Je recommande de créer un alias pour charger l'environnement de développement.
+par exemple:
+- alias carbure='cd /path/du/repository; source loadenv.sh;'
+
 Vous pouvez désormais builder les images docker et lancer le projet:
 
 - docker-compose build
 - docker-compose up -d
+
+Le script loadenv.sh permet d'interagir
 
 
