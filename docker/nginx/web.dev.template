@@ -11,7 +11,7 @@ server {
         alias /var/www/html;
     }
 
-    # uwsgi
+    # proxy pass
     location / {
         proxy_pass  http://carbure-django:8001;
     }
