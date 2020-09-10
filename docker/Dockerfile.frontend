@@ -1,0 +1,11 @@
+FROM node:alpine
+
+WORKDIR /app
+
+COPY front/package.json /app
+
+RUN npm install
+
+COPY front /app
+
+CMD ["npm", "run", "start"]

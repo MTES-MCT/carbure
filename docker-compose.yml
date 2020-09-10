@@ -1,4 +1,4 @@
-version: '3.5'
+version: "3.5"
 services:
   carbure-mariadb:
     image: mariadb:latest
@@ -11,9 +11,9 @@ services:
       MYSQL_USER: ${DJANGO_DB_USER}
       MYSQL_PASSWORD: ${DJANGO_DB_PASSWORD}
     volumes:
-    - carburedb:/var/lib/mysql
+      - carburedb:/var/lib/mysql
     networks:
-    - carbure
+      - carbure
 
   carbure-django:
     build:
@@ -44,15 +44,28 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_STORAGE_BUCKET_NAME: ${AWS_STORAGE_BUCKET_NAME}
-      AWS_S3_REGION_NAME:  ${AWS_S3_REGION_NAME}
+      AWS_S3_REGION_NAME: ${AWS_S3_REGION_NAME}
       AWS_S3_ENDPOINT_URL: ${AWS_S3_ENDPOINT_URL}
       AWS_S3_USE_SSL: ${AWS_S3_USE_SSL}
     volumes:
-    - ${CARBURE_HOME}:/app #for dev only, allows for auto-refresh of files
+      - ${CARBURE_HOME}:/app #for dev only, allows for auto-refresh of files
     depends_on:
-    - carbure-mariadb
+      - carbure-mariadb
     networks:
-    - carbure
+      - carbure
+
+  carbure-frontend:
+    stdin_open: true
+    restart: always
+    container_name: carbure_frontend
+    build:
+      context: ${CARBURE_HOME}
+      dockerfile: docker/Dockerfile.frontend
+    ports:
+      - 1234:1234 # needed for hot-reloading
+    volumes:
+      - "/app/node_modules"
+      - "./front:/app"
 
   carbure-web-proxy:
     build:
@@ -66,14 +79,14 @@ services:
       IMAGE_TAG: ${IMAGE_TAG}
     command: /opt/run_nginx.sh
     depends_on:
-    - carbure-django
+      - carbure-django
     volumes:
-    # dev: mount static directory
-    - ${CARBURE_HOME}/web/static:/var/www/html
+      # dev: mount static directory
+      - ${CARBURE_HOME}/web/static:/var/www/html
     ports:
-    - 8090:80
+      - 8090:80
     networks:
-    - carbure
+      - carbure
 
 volumes:
   carburedb:
@@ -82,4 +95,3 @@ volumes:
 networks:
   carbure:
     name: carbure_default
-
