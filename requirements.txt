@@ -55,7 +55,6 @@ rsa==3.4.2
 s3transfer==0.3.3
 sentry-sdk==0.14.2
 six==1.14.0
-slackclient==2.5.0
 sqlparse==0.3.0
 typing-extensions==3.7.4.1
 urllib3==1.25.7
