@@ -15,4 +15,9 @@ server {
     location / {
         proxy_pass  http://carbure-django:8001;
     }
+
+    # proxy pass
+    location /v2/ {
+        proxy_pass  http://carbure-frontend:1234/;
+    }
 }

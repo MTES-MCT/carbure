@@ -132,5 +132,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# node.js
+# node.js 
 node_modules
+.parcel-cache

@@ -1,0 +1,26 @@
+{
+  "name": "carbure-frontend",
+  "version": "1.0.0",
+  "description": "",
+  "author": "",
+  "license": "ISC",
+  "main": "dist/index.html",
+  "targets": {
+    "main": {
+      "publicUrl": "/v2"
+    }
+  },
+  "scripts": {
+    "local": "parcel src/index.html",
+    "start": "parcel src/index.html --target main",
+    "build": "parcel build src/index.html  --target main",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "parcel": "^2.0.0-beta.1"
+  },
+  "dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  }
+}
