@@ -30,6 +30,10 @@ server {
     location /static {
         alias /var/www/html;
     }
+    # serve v2 static files
+    location /v2 {
+        alias /var/www/html_v2;
+    }
     # uwsgi
     location / {
         uwsgi_pass  django;
