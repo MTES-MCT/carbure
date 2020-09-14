@@ -385,6 +385,7 @@ def update_tx(transaction, lot, request, context):
                                                              defaults={'value': delivery_date})
 
     transaction.champ_libre = request.POST.get('champ_libre', '')
+    transaction.is_mac = True if request.POST.get('is_mac', False) == "yes" else False
 
     delivery_site_is_in_carbure = request.POST.get('delivery_site_is_in_carbure', 'no')
     if delivery_site_is_in_carbure == 'no':
