@@ -41,3 +41,6 @@ def annuaire(request, *args, **kwargs):
     context['current_url_name'] = 'annuaire'
     return render(request, 'common/annuaire.html', context)
 
+
+def stats(request):
+    return redirect('https://metabase.carbure.beta.gouv.fr/public/dashboard/a9c045a5-c2fb-481a-ab85-f55bce8ae3c0')
