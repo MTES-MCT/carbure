@@ -80,6 +80,9 @@
         <dd><input id="delivery_date" type="text" /><span id="delivery_date_error" style="color:tomato;"></span></dd>
         <dt><label for="champ_libre">Champ Libre</label></dt>
         <dd><input id="champ_libre" type="text" /><span id="champ_libre_error" style="color:tomato;"></span></dd>
+        {% if user_entity.producer_with_mac %}
+        <dt><input type="checkbox" name="is_mac" value="yes"/>Il s'agit d'une mise à consommation</dt>
+        {% endif %}
         </dl>
       </div>
       <div class="form__group" style="margin-left: var(--space-l);">
