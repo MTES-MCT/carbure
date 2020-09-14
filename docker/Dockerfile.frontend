@@ -1,11 +1,16 @@
-FROM node:alpine
+FROM node:alpine AS development
 
 WORKDIR /app
 
-COPY front/package.json /app
+COPY front/package.json /app/
 
 RUN npm install
 
 COPY front /app
 
 CMD ["npm", "run", "start"]
+
+FROM development AS production
+
+CMD ["npm", "run", "build"]
+

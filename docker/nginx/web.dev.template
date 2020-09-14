@@ -17,7 +17,7 @@ server {
     }
 
     # proxy pass
-    location /v2/ {
-        proxy_pass  http://carbure-frontend:1234/;
+    location /v2 {
+        proxy_pass  http://carbure-frontend:1234;
     }
 }

@@ -1,4 +1,4 @@
-version: '3.5'
+version: "3.5"
 services:
   carbure-mariadb:
     image: mariadb:latest
@@ -11,9 +11,9 @@ services:
       MYSQL_USER: ${DJANGO_DB_USER}
       MYSQL_PASSWORD: ${DJANGO_DB_PASSWORD}
     volumes:
-    - carburedb:/var/lib/mysql
+      - carburedb:/var/lib/mysql
     networks:
-    - carbure
+      - carbure
 
   carbure-django-uwsgi:
     command: bash /app/web/run.sh
@@ -41,13 +41,23 @@ services:
       AWS_ACCESS_KEY_ID: ${SCALEWAY_API_KEY}
       AWS_SECRET_ACCESS_KEY: ${SCALEWAY_API_SECRET}
       AWS_STORAGE_BUCKET_NAME: ${SCALEWAY_BUCKET_NAME}
-      AWS_S3_REGION_NAME:  ${SCALEWAY_REGION_NAME}
+      AWS_S3_REGION_NAME: ${SCALEWAY_REGION_NAME}
       AWS_S3_ENDPOINT_URL: ${SCALEWAY_S3_ENDPOINT}
       AWS_S3_USE_SSL: 1
     depends_on:
-    - carbure-mariadb
+      - carbure-mariadb
     networks:
-    - carbure
+      - carbure
+
+  carbure-frontend:
+    container_name: carbure_frontend
+    build:
+      context: ${CARBURE_HOME}
+      dockerfile: docker/Dockerfile.frontend
+      target: production
+    volumes:
+      - "/app/node_modules"
+      - "./front:/app"
 
   carbure-web-proxy:
     restart: always
@@ -60,15 +70,16 @@ services:
       METABASE_SSL_FOLDER: ${METABASE_SSL_FOLDER}
     command: /opt/run_nginx.sh
     depends_on:
-    - carbure-django-uwsgi
+      - carbure-django-uwsgi
+      - carbure-frontend
     ports:
-    - 80:80
-    - 443:443
+      - 80:80
+      - 443:443
     networks:
-    - carbure
+      - carbure
     volumes:
-    - ./data/certbot/conf:/etc/letsencrypt
-    - ./data/certbot/www:/var/www/certbot
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
 
   watchtower:
     image: containrrr/watchtower
@@ -80,21 +91,21 @@ services:
     image: certbot/certbot
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     volumes:
-    - ./data/certbot/conf:/etc/letsencrypt
-    - ./data/certbot/www:/var/www/certbot
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
 
   carbure-metabase:
     restart: always
     container_name: carbure_metabase
     image: metabase/metabase
     depends_on:
-    - carbure-mariadb
+      - carbure-mariadb
     ports:
-    - 3000:3000
+      - 3000:3000
     networks:
-    - carbure
+      - carbure
     volumes:
-    - ./metabase:/metabase-data
+      - ./metabase:/metabase-data
     environment:
       MB_DB_FILE: "/metabase-data/metabase.db"
 
@@ -105,4 +116,3 @@ volumes:
 networks:
   carbure:
     name: carbure_default
-
