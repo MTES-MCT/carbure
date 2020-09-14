@@ -241,6 +241,7 @@ def make_traders_lots_sheet(workbook, entity):
     bcs = Biocarburant.objects.all()
     delivery_sites = Depot.objects.all()
     countries = Pays.objects.all()
+    eas = Entity.objects.filter(entity_type__in=['Opérateur', 'Trader'])
 
     # 3/10 chances of having an imported lot
     unknown_producers = [{'name': 'ITANOL', 'country': 'IT', 'production_site': 'BERGAMO', 'ref': 'ISCC-IT-100001010', 'date':'2017-12-01', 'dc':'IT_001_2020'},
@@ -271,7 +272,7 @@ def make_traders_lots_sheet(workbook, entity):
                'production_site_commissioning_date', 'double_counting_registration',
                'vendor', 'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
                'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
-               'dae', 'champ_libre', 'delivery_date', 'delivery_site', 'delivery_site_country']
+               'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
 
@@ -285,11 +286,15 @@ def make_traders_lots_sheet(workbook, entity):
         country = random.choice(countries)
         site = random.choice(delivery_sites)
         volume = random.choice(volumes)
+        ea = None
+        if i % 3 == 1:
+            ea = random.choice(eas)
+
         row = []
         p = random.choice(unknown_producers)
         row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc']]
         row += [vendor, volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 'FR000000123', clientid]
-        row += [today, site.depot_id, 'FR']
+        row += [ea.name if ea else '', today, site.depot_id, 'FR']
 
         colid = 0
         for elem in row:
