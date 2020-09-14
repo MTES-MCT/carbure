@@ -2,4 +2,5 @@ FROM nginx:latest
 
 COPY ./docker/nginx/ /etc/nginx/conf.d/
 COPY ./web/static /var/www/html
+COPY ./front/dist /var/www/html_v2
 COPY ./docker/run_nginx.sh /opt/run_nginx.sh
