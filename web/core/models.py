@@ -95,7 +95,9 @@ class MatierePremiere(models.Model):
         return self.name
 
     def __eq__(self, other):
-        return self.code == other
+        if type(other) == type('str'):
+            return self.code == other
+        return self.code == other.code
 
     def natural_key(self):
         return {'code': self.code, 'name': self.name}
