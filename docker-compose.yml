@@ -61,7 +61,6 @@ services:
     build:
       context: ${CARBURE_HOME}
       dockerfile: docker/Dockerfile.frontend
-      target: development
     ports:
       - 1234:1234 # needed for hot-reloading
     volumes:
