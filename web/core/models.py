@@ -249,7 +249,7 @@ class LotTransaction(models.Model):
     unknown_vendor = models.CharField(max_length=64, blank=True, null=True, default='')
 
     # client / delivery
-    dae = models.CharField(max_length=64, blank=True, default='')
+    dae = models.CharField(max_length=128, blank=True, default='')
     client_is_in_carbure = models.BooleanField(default=True)
     carbure_client = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='client_transaction')
     unknown_client = models.CharField(max_length=64, blank=True, default='')
