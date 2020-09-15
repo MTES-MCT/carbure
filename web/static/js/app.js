@@ -760,6 +760,13 @@ $('input[type=radio][name=delivery_site_is_in_carbure][value=yes]').change(funct
 $('input[type=radio][name=delivery_site_is_in_carbure][value=no]').change(function() {
   delivery_site_is_in_carbure(false)
 })
+$('input[type=checkbox][name=is_mac]').change(function() {
+  if (this.checked) {
+    $("#is_mac").val("yes")
+  } else {
+    $("#is_mac").val("no")
+  }
+})
 
 function display_lot_modal(table, columns, event, display_type) {
   // check if we clicked on the checkbox
@@ -886,6 +893,13 @@ function display_lot_modal(table, columns, event, display_type) {
       $("#delivery_date_error").val(data.errors.delivery_date)
     }
     $("#champ_libre").val(tx.champ_libre)
+    if (tx.is_mac) {
+      $("#is_mac").prop("checked", "checked")
+      $("#is_mac").val("yes")
+    } else {
+      $("#is_mac").prop("checked", "")
+      $("#is_mac").val("no")
+    }
 
     /* Greenhouse gases values */
     $("#eec").val(lot.eec)
