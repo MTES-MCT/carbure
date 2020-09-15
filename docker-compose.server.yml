@@ -52,7 +52,7 @@ services:
   carbure-frontend:
     container_name: carbure_frontend
     build:
-      context: ${CARBURE_HOME}
+      context: .
       dockerfile: docker/Dockerfile.frontend
       target: production
     volumes:
