@@ -1,0 +1,4 @@
+FROM docker:dind
+
+# install node, parcel and modules needed to build frontend
+
