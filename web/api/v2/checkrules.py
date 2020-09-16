@@ -45,6 +45,13 @@ def sanity_check(lot):
             raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_admin=True, block_validation=False)
 
     # consistence des matieres premieres avec biocarburant
+    if lot.biocarburant.is_alcool and lot.matiere_premiere.compatible_alcool is False:
+        raise_error(lot, 'MP_BC_INCOHERENT', warning_to_user=True, warning_to_admin=True)
+
+
+    if lot.biocarburant.is_graisse and lot.matiere_premiere.compatible_graisse is False:
+        raise_error(lot, 'MP_BC_INCOHERENT', warning_to_user=True, warning_to_admin=True)
+
     if lot.biocarburant.code in ['EMHV', 'EMHU', 'EMHA', 'HVOG', 'HVOE', 'HOE', 'HOG']:
         if lot.matiere_premiere.code in ['BETTERAVE', 'MAIS', 'BLE', 'ORGE', 'EP2', 'RESIDUS_DE_BIERE', 'TRITICALE', 'SEIGLE', 'AMIDON_RESIDUEL',
                                          'MAT_LIGNO_CELLULOSIQUE', 'MAT_CELLULOSIQUE_NON_ALIMENTAIRE', 'BAGASSE', 'COQUES', 'PAILLE', 'DECHETS_BOIS',
