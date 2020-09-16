@@ -1,0 +1,17 @@
+/* Variables definition */
+
+:root {
+  /* Colors */
+  --blue: #3150c0;
+  --black: #26353f;
+  --gray: #667095;
+  --white: #f9f9fc;
+  --light-gray: #ebeff3;
+
+  /* Theme */
+  --theme-primary: var(--blue);
+  --theme-text-primary: var(--black);
+  --theme-text-secondary: var(--gray);
+  --theme-background-light: var(--white);
+  --theme-background-dark: var(--light-gray);
+}
