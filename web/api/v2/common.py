@@ -1,30 +1,12 @@
 import datetime
 
-from core.models import LotV2, CheckRule
-from api.v2.checkrules import exec_rule
-from functools import partial, reduce
+from core.models import LotV2
+from api.v2.checkrules import sanity_check
 
 
-def run_rules(queryset, rules):
-    # print('Running rules')
+def run_sanity_checks(queryset):
     for obj in queryset:
-        # print('Running %d rules for lot %s' % (len(rules), obj))
-        p = partial(exec_rule, obj)
-        res = reduce(lambda x, y: x+y, map(p, rules))
-        if res > 0:
-            print('Lot %d triggered a checkrule' % (obj.id))
-
-
-def run_blocking_rules(queryset):
-    queryset.update(blocking_sanity_checked_passed=True)
-    rules = CheckRule.objects.filter(block_validation=True)
-    run_rules(queryset, rules)
-
-
-def run_nonblocking_rules(queryset):
-    queryset.update(nonblocking_sanity_checked_passed=True)
-    rules = CheckRule.objects.filter(block_validation=False)
-    run_rules(queryset, rules)
+        sanity_check(obj)
 
 
 def tx_is_valid(tx):
