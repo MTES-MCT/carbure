@@ -2,9 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('', views.get_settings, name='api-v3-settings-get'),
     path('add-production-site', views.add_production_site, name='api-v3-settings-add-production-site'),
     path('delete-production-site', views.delete_production_site, name='api-v3-settings-delete-production-site'),
-    path('get-production-sites', views.get_production_sites, name='api-v3-settings-get-production-sites'),
     path('add-production-site-certificate', views.add_production_site_certificate, name='api-v3-settings-add-production-site-certificate'),
     path('delete-production-site-certificate', views.delete_production_site_certificate, name='api-v3-settings-delete-production-site-certificate'),
     path('add-production-site-matiere-premiere', views.add_production_site_mp, name='api-v3-settings-add-production-site-matiere-premiere'),
