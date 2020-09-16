@@ -4,6 +4,9 @@ from api.v1 import public_api, producers_api, administrators_api
 from api.v2 import shared
 
 urlpatterns = [
+    path('v3/', include('api.v3.urls')),
+
+   
     # SEP 2020: separating into 4 different folders may not have been the best idea ever given the huge overlap in terms of functionality
     # TODO: merge producers/operators/traders together but keep admin separate
     path('v2/producers/', include('api.v2.producers.urls')),
