@@ -14,4 +14,6 @@ with open(filename) as csvfile:
     for row in reader:
         code = row[0]
         name = row[1]
-        obj, created = MatierePremiere.objects.update_or_create(code=code, defaults={'name':name, 'description':''})
+        compat_alcool = row[2]
+        compat_graisse = row[3]
+        obj, created = MatierePremiere.objects.update_or_create(code=code, defaults={'name':name, 'description':'', 'compatible_alcool': compat_alcool, 'compatible_graisse': compat_graisse})
