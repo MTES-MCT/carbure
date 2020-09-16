@@ -28,7 +28,7 @@ def get_countries(request):
     countries = Pays.objects.all()
     if q:
         countries = countries.filter(Q(name__icontains=q) | Q(code__icontains=q))
-    sez = [{'code_pays': c.code_pays, 'name': c.name, 'name_en': c.name_en, 'is_in_europe': c.is_in_europe} for c in countries]
+    sez = [c.natural_key() for c in countries]
     return JsonResponse({'status': 'success', 'data': sez})
 
 
@@ -73,8 +73,36 @@ def get_operators(request):
 
 
 def get_delivery_sites(request):
-    pass
+    q = request.GET.get('query', False)
+    dsites = Depot.objects.all()
+    if q:
+        dsites = dsites.filter(Q(name__icontains=q) | Q(depot_id__icontains=q))
+    sez = [{'name': d.name, 'city': d.city, 'depot_id': d.depot_id, 'country': d.country.natural_key(), 'depot_type': d.depot_type} for d in dsites]
+    return JsonResponse({'status': 'success', 'data': sez})
 
 
 def get_production_sites(request):
-    pass
+    q = request.GET.get('query', False)
+    pid = request.GET.get('producer_id', False)
+    psites = ProductionSite.objects.all()
+    if q:
+        psites = psites.filter(name__icontains=q)
+    if pid:
+        psites = psites.filter(producer__id=pid)
+
+    psitesbyid = {p.id: p for p in psites}
+    for k, v in psitesbyid.items():
+        v.inputs = []
+        v.outputs = []
+
+    inputs = ProductionSiteInput.objects.filter(production_site__in=psites)
+    for i in inputs:
+        psitesbyid[i.production_site.id].inputs.append(i.matiere_premiere.natural_key())
+
+    outputs = ProductionSiteOutput.objects.filter(production_site__in=psites)
+    for o in outputs:
+        psitesbyid[o.production_site.id].outputs.append(o.biocarburant.natural_key())
+    sez = [{'name': p.name, 'id': p.id, 'country': p.country.natural_key(), 'date_mise_en_service': p.date_mise_en_service,
+            'ges_option': p.ges_option, 'eligible_dc': p.eligible_dc, 'dc_reference': p.dc_reference,
+            'inputs': p.inputs, 'outputs': p.outputs} for p in psites]
+    return JsonResponse({'status': 'success', 'data': sez})
