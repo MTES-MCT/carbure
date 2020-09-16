@@ -3,6 +3,10 @@ from . import views
 
 urlpatterns = [
     # GET
+    path('', views.get_lots, name='api-v3-lots-get'),
+    path('snapshot', views.get_snapshot, name='api-v3-lots-get-snapshot'),
+
+
     #path('lots/drafts', views.get_drafts, name='api-v2-producers-get-drafts'),
     #path('lots/mb-drafts', views.get_mb_drafts, name='api-v2-producers-get-mb-drafts'),
     #path('lots/in', views.get_in, name='api-v2-producers-get-in'),
