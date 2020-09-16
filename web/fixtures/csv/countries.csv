@@ -1,6 +1,6 @@
 code_pays;name_fr;name_en;is_in_europe
 N/A;N/A;N/A;0
-AD;Andorre;Andorra;0
+AD;Andorre;Andorra;1
 AE;Émirats arabes unis;United Arab Emirates;0
 AF;Afghanistan;0
 AG;Antigua-et-Barbuda;Antigua and Barbuda;0
@@ -74,7 +74,7 @@ FJ;Fidji;Fiji;0
 FK;Îles Falkland (Malvinas);Falkland Islands (Malvinas);0
 FM;États fédérés de Micronésie;Federated States of Micronesia;0
 FO;Îles Féroé;Faroe Islands;0
-FR;France;0
+FR;France;1
 GA;Gabon;0
 GB;Royaume-Uni;United Kingdom;0
 GD;Grenade;Grenada;0
