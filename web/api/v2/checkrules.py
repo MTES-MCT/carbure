@@ -31,26 +31,26 @@ def raise_error(lot, rule_triggered, warning_to_user=True, warning_to_admin=Fals
 def sanity_check(lot):
     # réduction de GES
     if lot.ghg_reduction < 50:
-        raise_error(lot, 'GHG_REDUC_INF_50', warning_user=True, blocking=True)
+        raise_error(lot, 'GHG_REDUC_INF_50', warning_to_user=True, block_validation=True)
     commissioning_date = lot.carbure_production_site.date_mise_en_service if lot.carbure_production_site else lot.unknown_production_site_com_date
     if commissioning_date > oct2015 and lot.ghg_reduction < 60:
-        raise_error(lot, 'GHG_REDUC_INF_60', warning_user=True, blocking=True)
+        raise_error(lot, 'GHG_REDUC_INF_60', warning_to_user=True, block_validation=True)
     if commissioning_date >= jan2021 and lot.ghg_reduction < 65:
-        raise_error(lot, 'GHG_REDUC_INF_65', warning_user=True, blocking=True)
+        raise_error(lot, 'GHG_REDUC_INF_65', warning_to_user=True, block_validation=True)
 
     # provenance des matieres premieres
     if lot.matiere_premiere.code == 'SOJA':
         # TODO: remplacer par une liste de pays "douteux" ou a l'inverse utiliser une whitelist et lever une alerte si le pays n'est pas dedans
         if lot.pays_origine.code_pays == 'SE':
-            raise_error(lot, 'PROVENANCE_MP', warning_user=True, warning_admin=True, blocking=False)
+            raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_admin=True, block_validation=False)
 
     # consistence des matieres premieres avec biocarburant
     if lot.biocarburant.code in ['EMHV', 'EMHU', 'EMHA', 'HVOG', 'HVOE', 'HOE', 'HOG']:
         if lot.matiere_premiere.code in ['BETTERAVE', 'MAIS', 'BLE', 'ORGE', 'EP2', 'RESIDUS_DE_BIERE', 'TRITICALE', 'SEIGLE', 'AMIDON_RESIDUEL',
                                          'MAT_LIGNO_CELLULOSIQUE', 'MAT_CELLULOSIQUE_NON_ALIMENTAIRE', 'BAGASSE', 'COQUES', 'PAILLE', 'DECHETS_BOIS',
                                          'GLYCERINE_BRUTE', 'RESIDUS_VINIQUES', 'CANNE_A_SUCRE']:
-            raise_error(lot, 'MP_BC_INCOHERENT', warning_user=True, blocking=True)
+            raise_error(lot, 'MP_BC_INCOHERENT', warning_to_user=True, block_validation=True)
 
     if lot.biocarburant.code in ['ET', 'ETBE', 'MTBE']:
         if lot.matiere_premiere.code in ['BRAI_TALLOL', 'POME', 'SOJA', 'TOURNESOL', 'COLZA', 'PALME', 'UCO', 'C1', 'C2', 'C3']:
-            raise_error(lot, 'MP_BC_INCOHERENT', warning_user=True, blocking=True)
+            raise_error(lot, 'MP_BC_INCOHERENT', warning_to_user=True, block_validation=True)
