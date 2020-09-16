@@ -1,0 +1,21 @@
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  margin: 12px 30px;
+}
+
+.marianne {
+  height: 46px;
+}
+
+.carbure {
+  margin-left: 16px;
+  font-family: "Evolventa";
+  letter-spacing: 0.05em;
+  color: var(--theme-text-primary);
+}
+
+.betagouv {
+  height: 40px;
+}
