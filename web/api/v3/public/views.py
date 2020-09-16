@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.db.models import Q
-from core.models import Entity, Biocarburant, MatierePremiere, Depot, GHGValues, Pays
+from core.models import Entity, Biocarburant, MatierePremiere, Depot, Pays
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 
 
@@ -33,7 +33,9 @@ def get_countries(request):
 
 
 def get_ges(request):
-    pass
+    # TODO
+    return JsonResponse({'status': 'success', 'data': {'eec': 0.0, 'el': 0.0, 'ep': 0.0, 'etd': 0.0, 'eu': 0.0,
+                         'esca': 0.0, 'eccs': 0.0, 'eccr': 0.0, 'eee': 0.0}})
 
 
 def get_entities(request):
@@ -104,5 +106,5 @@ def get_production_sites(request):
         psitesbyid[o.production_site.id].outputs.append(o.biocarburant.natural_key())
     sez = [{'name': p.name, 'id': p.id, 'country': p.country.natural_key(), 'date_mise_en_service': p.date_mise_en_service,
             'ges_option': p.ges_option, 'eligible_dc': p.eligible_dc, 'dc_reference': p.dc_reference,
-            'inputs': p.inputs, 'outputs': p.outputs} for p in psites]
+            'inputs': p.inputs, 'outputs': p.outputs, 'producer': p.producer.natural_key()} for p in psites]
     return JsonResponse({'status': 'success', 'data': sez})
