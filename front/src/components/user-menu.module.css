@@ -1,0 +1,7 @@
+.userMenu {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  margin-left: auto;
+  margin-right: 30px;
+}
