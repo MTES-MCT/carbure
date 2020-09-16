@@ -37,7 +37,7 @@ class BiocarburantAdmin(admin.ModelAdmin):
 
 
 class MatierePremiereAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description')
+    list_display = ('code', 'name', 'description')
     search_fields = ('name', )
     readonly_fields = ('code', )
 
