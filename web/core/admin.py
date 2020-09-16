@@ -77,19 +77,19 @@ def reset_checked_status(modeladmin, request, queryset):
     queryset.update(nonblocking_sanity_checked_passed=False)
 
 
-def run_sanity_checks(modeladmin, request, queryset):
+def admin_run_sanity_checks(modeladmin, request, queryset):
     run_sanity_checks(queryset)
 
 
 reset_checked_status.short_description = "Reset sanity checks status"
-run_sanity_checks.short_description = "Run sanity checks"
+admin_run_sanity_checks.short_description = "Run sanity checks"
 
 
 class LotV2Admin(admin.ModelAdmin):
     list_display = ('period', 'carbure_id', 'carbure_producer', 'carbure_production_site', 'biocarburant', 'matiere_premiere', 'status', 'blocking_sanity_checked_passed', 'nonblocking_sanity_checked_passed')
     search_fields = ('carbure_producer__name', 'biocarburant__name', 'matiere_premiere__name', 'carbure_id', 'period')
     list_filter = ('period', 'carbure_producer', 'is_split', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused', 'blocking_sanity_checked_passed', 'nonblocking_sanity_checked_passed')
-    actions = [run_sanity_checks, reset_checked_status]
+    actions = [admin_run_sanity_checks, reset_checked_status]
 
 
 class TransactionAdmin(admin.ModelAdmin):
