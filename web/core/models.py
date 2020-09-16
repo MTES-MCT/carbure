@@ -69,6 +69,8 @@ class Biocarburant(models.Model):
     pci_kg = models.FloatField(default=0)
     pci_litre = models.FloatField(default=0)
     masse_volumique = models.FloatField(default=0)
+    is_alcool = models.BooleanField(default=False)
+    is_graisse = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -90,6 +92,8 @@ class MatierePremiere(models.Model):
     description = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
     code = models.CharField(max_length=64, unique=True)
+    compatible_alcool = models.BooleanField(default=False)
+    compatible_graisse = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

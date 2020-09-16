@@ -31,15 +31,17 @@ class UserPreferencesAdmin(admin.ModelAdmin):
 
 
 class BiocarburantAdmin(admin.ModelAdmin):
-    list_display = ('code', 'name', 'description')
+    list_display = ('code', 'name', 'description', 'is_alcool', 'is_graisse')
     search_fields = ('name', )
     readonly_fields = ('code', )
+    list_filter = ('is_alcool', 'is_graisse', )
 
 
 class MatierePremiereAdmin(admin.ModelAdmin):
-    list_display = ('code', 'name', 'description')
+    list_display = ('code', 'name', 'description', 'compatible_alcool', 'compatible_graisse')
     search_fields = ('name', )
     readonly_fields = ('code', )
+    list_filter = ('compatible_alcool', 'compatible_graisse',)
 
 
 class PaysAdmin(admin.ModelAdmin):
