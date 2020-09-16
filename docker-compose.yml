@@ -61,8 +61,6 @@ services:
     build:
       context: ${CARBURE_HOME}
       dockerfile: docker/Dockerfile.frontend
-    ports:
-      - 1234:1234 # needed for hot-reloading
     volumes:
       - "/app/node_modules"
       - "./front:/app" # needed for hot-reloading
