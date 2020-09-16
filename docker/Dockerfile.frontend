@@ -3,6 +3,7 @@ FROM node:alpine
 WORKDIR /app
 
 COPY front/package.json /app/
+COPY front/package-lock.json /app/
 
 RUN npm install
 
