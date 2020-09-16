@@ -10,8 +10,8 @@ from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
 from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays
 from core.models import GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
-from core.models import CheckRule, LotValidationError
-from api.v2.common import run_blocking_rules, run_nonblocking_rules
+from core.models import LotValidationError
+from api.v2.common import run_sanity_checks
 
 
 class EntityAdmin(admin.ModelAdmin):
@@ -55,7 +55,9 @@ class LotV2ErrorAdmin(admin.ModelAdmin):
 
 
 class LotValidationErrorAdmin(admin.ModelAdmin):
-    list_display = ('lot', 'rule')
+    list_display = ('lot', 'rule_triggered', 'warning_to_user', 'warning_to_admin', 'block_validation')
+    list_filter = ('warning_to_admin', 'warning_to_user', 'block_validation')
+    search_fields = ('rule_triggered', 'message')
 
 
 class GHGValuesAdmin(admin.ModelAdmin):
@@ -75,24 +77,19 @@ def reset_checked_status(modeladmin, request, queryset):
     queryset.update(nonblocking_sanity_checked_passed=False)
 
 
-def check_blocking_rules(modeladmin, request, queryset):
-    run_blocking_rules(queryset)
+def run_sanity_checks(modeladmin, request, queryset):
+    run_sanity_checks(queryset)
 
 
-def check_nonblocking_rules(modeladmin, request, queryset):
-    run_nonblocking_rules(queryset)
-
-
-reset_checked_status.short_description = "Reset Checked status"
-check_blocking_rules.short_description = "Run blocking sanity checks"
-check_nonblocking_rules.short_description = "Run non blocking sanity checks"
+reset_checked_status.short_description = "Reset sanity checks status"
+run_sanity_checks.short_description = "Run sanity checks"
 
 
 class LotV2Admin(admin.ModelAdmin):
     list_display = ('period', 'carbure_id', 'carbure_producer', 'carbure_production_site', 'biocarburant', 'matiere_premiere', 'status', 'blocking_sanity_checked_passed', 'nonblocking_sanity_checked_passed')
     search_fields = ('carbure_producer__name', 'biocarburant__name', 'matiere_premiere__name', 'carbure_id', 'period')
     list_filter = ('period', 'carbure_producer', 'is_split', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused', 'blocking_sanity_checked_passed', 'nonblocking_sanity_checked_passed')
-    actions = [check_blocking_rules, check_nonblocking_rules, reset_checked_status]
+    actions = [run_sanity_checks, reset_checked_status]
 
 
 class TransactionAdmin(admin.ModelAdmin):
@@ -113,12 +110,6 @@ class TransactionCommentAdmin(admin.ModelAdmin):
     list_filter = ('topic', )
 
 
-class CheckRuleAdmin(admin.ModelAdmin):
-    list_display = ('condition_col', 'condition', 'condition_value', 'check_col', 'check', 'check_value', 'warning_to_user', 'warning_to_admin', 'block_validation')
-    search_fields = ('condition_col', 'condition_value', 'check_col', 'check_value')
-    list_filter = ('block_validation', 'warning_to_user', 'warning_to_admin')
-
-
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
 admin.site.register(UserPreferences, UserPreferencesAdmin)
@@ -132,7 +123,6 @@ admin.site.register(LotTransaction, TransactionAdmin)
 admin.site.register(TransactionError, TransactionErrorAdmin)
 admin.site.register(TransactionComment, TransactionCommentAdmin)
 admin.site.register(LotV2Error, LotV2ErrorAdmin)
-admin.site.register(CheckRule, CheckRuleAdmin)
 admin.site.register(LotValidationError, LotValidationErrorAdmin)
 
 
