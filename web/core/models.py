@@ -349,6 +349,7 @@ class GHGValues(models.Model):
         verbose_name_plural = 'Valeurs GES de référence'
 
 
+# deprecated, to delete
 class CheckRule(models.Model):
     CONDITIONS = (('EQ', 'Equals'), ('GT', 'Greater Than'), ('GTE', 'Greater Than or Equal'), ('LT', 'Less Than'), ('LTE', 'Less Than or Equal'), ('DIFF', 'Is Different than'), ('IN', 'Is In'), ('NIN', 'Is Not In'))
 
@@ -376,7 +377,12 @@ class CheckRule(models.Model):
 
 class LotValidationError(models.Model):
     lot = models.ForeignKey(LotV2, null=False, blank=False, on_delete=models.CASCADE)
-    rule = models.ForeignKey(CheckRule, null=False, blank=False, on_delete=models.CASCADE)
+    rule_triggered = models.CharField(max_length=64, blank=True, null=True, default='')
+
+    warning_to_user = models.BooleanField(default=False)
+    warning_to_admin = models.BooleanField(default=False)
+    block_validation = models.BooleanField(default=False)
+    message = models.TextField(blank=True, null=True, default='')
 
     def __str__(self):
         return self.rule
