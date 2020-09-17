@@ -1,11 +1,13 @@
+import io
 import datetime
 import calendar
 import dateutil.relativedelta
 from django.db.models import Q
 from django.db.models.functions import TruncMonth
 from django.db.models import Count
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from core.models import LotTransaction, Entity, UserRights, MatierePremiere, Biocarburant, Pays
+from core.xlsx_template import create_xslx_from_transactions
 
 
 def get_lots(request):
@@ -20,6 +22,7 @@ def get_lots(request):
     clients = request.GET.getlist('clients', False)
     limit = request.GET.get('limit', "100")
     from_idx = request.GET.get('from_idx', "0")
+    export = request.GET.get('export', False)
 
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
@@ -70,7 +73,15 @@ def get_lots(request):
     data['total'] = len(txs)
     data['returned'] = len(returned)
     data['from'] = from_idx
-    return JsonResponse({'status': 'success', 'data': data})
+    if not export:
+        return JsonResponse({'status': 'success', 'data': data})
+    else:
+        file_location = create_xslx_from_transactions(producer, returned)
+        with open(file_location, "rb") as excel:
+            data = excel.read()
+            response = HttpResponse(data=data, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            response['Content-Disposition'] = 'attachment; filename="%s"' % (file_location)
+        return response
 
 
 def get_snapshot(request):
@@ -121,3 +132,71 @@ def get_snapshot(request):
             d['delta'] = (d['deadline'] - today).days
     data['deadlines'] = list(deadlines)
     return JsonResponse({'status': 'success', 'data': data})
+
+
+def add_lot(request):
+    pass
+
+
+def update_lot(request):
+    pass
+
+
+def delete_lot(request):
+    pass
+
+
+def duplicate_lot(request):
+    pass
+
+
+def validate_lot(request):
+    pass
+
+
+def accept_lot(request):
+    pass
+
+
+def reject_lot(request):
+    pass
+
+
+def comment_lot(request):
+    pass
+
+
+def check_lot(request):
+    pass
+
+
+def batch_delete(request):
+    pass
+
+
+def batch_validate(request):
+    pass
+
+
+def batch_accept(request):
+    pass
+
+
+def batch_reject(request):
+    pass
+
+
+def delete_all_drafts(request):
+    pass
+
+
+def upload(request):
+    pass
+
+
+def template_simple(request):
+    pass
+
+
+def template_advanced(request):
+    pass
