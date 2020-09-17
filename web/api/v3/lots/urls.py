@@ -17,11 +17,6 @@ urlpatterns = [
     path('comment', views.comment_lot, name='api-v3-comment-lot'),
     path('sanity-check', views.check_lot, name='api-v3-check-lot'),
 
-    # BATCH
-    path('delete-batch', views.batch_delete, name='api-v3-batch-delete'),
-    path('validate-batch', views.batch_validate, name='api-v3-batch-validate'),
-    path('accept-batch', views.batch_accept, name='api-v3-batch-accept'),
-    path('reject-batch', views.batch_reject, name='api-v3-batch-reject'),
     # SPECIAL
     path('delete-all-drafts', views.delete_all_drafts, name='api-v3-delete-all-drafts'),
 
