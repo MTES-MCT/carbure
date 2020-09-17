@@ -8,7 +8,7 @@ from django.db.models.fields import NOT_PROVIDED
 from django.http import JsonResponse, HttpResponse
 from core.models import LotV2, LotTransaction, Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment
 from core.xlsx_template import create_xslx_from_transactions, create_template_xlsx_v2_simple, create_template_xlsx_v2_advanced
-from core.common import tx_is_valid, lot_is_valid, generate_carbure_id, load_excel_file
+from core.common import tx_is_valid, lot_is_valid, generate_carbure_id, load_excel_file, load_lot
 from api.v3.sanity_checks import sanity_check
 
 
@@ -137,7 +137,21 @@ def get_snapshot(request):
 
 
 def add_lot(request):
-    pass
+    entity_id = request.POST.get('entity_id', False)
+    if not entity_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
+
+    try:
+        entity = Entity.objects.get(id=entity_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)}, status=400)
+
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    if entity not in rights:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+    load_lot(entity, request.user, request.POST.dict(), 'MANUAL')
+    return JsonResponse({'status': 'success'})
 
 
 def update_lot(request):
