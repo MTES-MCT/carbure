@@ -1,5 +1,9 @@
 import datetime
+import calendar
+import dateutil.relativedelta
 from django.db.models import Q
+from django.db.models.functions import TruncMonth
+from django.db.models import Count
 from django.http import JsonResponse
 from core.models import LotTransaction, Entity, UserRights, MatierePremiere, Biocarburant, Pays
 
@@ -71,6 +75,7 @@ def get_lots(request):
 
 def get_snapshot(request):
     data = {}
+    today = datetime.date.today()
 
     producer = request.GET.get('producer_id', False)
     if producer is None:
@@ -98,11 +103,21 @@ def get_snapshot(request):
     countries = [c.natural_key() for c in Pays.objects.filter(id__in=txs.values('lot__pays_origine').distinct())]
     c1 = txs.values('carbure_client__name').distinct()
     c2 = txs.values('unknown_client').distinct()
-    clients = list(c1)+list(c2)
+    clients = [c['carbure_client__name'] for c in c1]+[c['unknown_client'] for c in c2]
 
     ps1 = txs.values('lot__carbure_production_site__name').distinct()
     ps2 = txs.values('lot__unknown_production_site').distinct()
     psites = list(ps1) + list(ps2)
     data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs, 'periods': periods, 'production_sites': psites, 'countries_of_origin': countries, 'clients': clients}
-    print(data)
+
+    deadlines = txs.filter(lot__status='Draft').annotate(month=TruncMonth('delivery_date')).values('month').annotate(total=Count('id'))
+    for d in deadlines:
+        if d['month'] is None:
+            d['deadline'] = None
+        else:
+            nextmonth = d['month'] + dateutil.relativedelta.relativedelta(months=+1)
+            (_, day) = calendar.monthrange(nextmonth.year, nextmonth.month)
+            d['deadline'] = d['month'].replace(month=nextmonth.month, day=day)
+            d['delta'] = (d['deadline'] - today).days
+    data['deadlines'] = list(deadlines)
     return JsonResponse({'status': 'success', 'data': data})
