@@ -1,7 +1,7 @@
 import datetime
 import openpyxl
 
-from core.models import LotV2, LotTransaction, LotV2Error, TransactionError
+from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
 
 from api.v2.checkrules import sanity_check
@@ -467,43 +467,44 @@ def fill_delivery_site_data(lot_row, transaction):
     return tx_errors
 
 
-def load_excel_lot(entity, user, lot_row):
+def load_lot(entity, user, lot_dict, source):
     lot_errors = []
     tx_errors = []
 
     # check for empty row
-    if 'biocarburant_code' in lot_row and lot_row['biocarburant_code'] == None:
+    if lot_dict.get('biocarburant_code', None) is None:
         return None, None, None, None
 
     lot = LotV2()
     lot.added_by = entity
     lot.data_origin_entity = entity
     lot.added_by_user = user
-    lot.source = 'EXCEL'
+    lot.source = source
 
-    lot_errors.append(fill_producer_info(entity, lot_row, lot))
-    lot_errors.append(fill_production_site_info(entity, lot_row, lot))
-    lot_errors.append(fill_biocarburant_info(lot_row, lot))
-    lot_errors.append(fill_matiere_premiere_info(lot_row, lot))
-    lot_errors.append(fill_volume_info(lot_row, lot))
-    lot_errors.append(fill_pays_origine_info(lot_row, lot))
-    lot_errors.append(fill_ghg_info(lot_row, lot))
+    lot_errors.append(fill_producer_info(entity, lot_dict, lot))
+    lot_errors.append(fill_production_site_info(entity, lot_dict, lot))
+    lot_errors.append(fill_biocarburant_info(lot_dict, lot))
+    lot_errors.append(fill_matiere_premiere_info(lot_dict, lot))
+    lot_errors.append(fill_volume_info(lot_dict, lot))
+    lot_errors.append(fill_pays_origine_info(lot_dict, lot))
+    lot_errors.append(fill_ghg_info(lot_dict, lot))
+    lot.save()
 
     transaction = LotTransaction()
     transaction.lot = lot
     transaction.vendor_is_in_carbure = True
     transaction.carbure_vendor = entity
     transaction.is_mac = False
-    if 'mac' in lot_row and lot_row['mac'] == 1:
+    if 'mac' in lot_dict and lot_dict['mac'] == 1:
         transaction.is_mac = True
 
-    tx_errors.append(fill_dae_data(lot_row, transaction))
-    tx_errors.append(fill_delivery_date(lot_row, lot, transaction))
-    tx_errors.append(fill_client_data(entity, lot_row, transaction))
-    tx_errors.append(fill_delivery_site_data(lot_row, transaction))
+    tx_errors.append(fill_dae_data(lot_dict, transaction))
+    tx_errors.append(fill_delivery_date(lot_dict, lot, transaction))
+    tx_errors.append(fill_client_data(entity, lot_dict, transaction))
+    tx_errors.append(fill_delivery_site_data(lot_dict, transaction))
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
-    transaction.champ_libre = lot_row['champ_libre'] if 'champ_libre' in lot_row else ''
+    transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
     return lot, transaction, lot_errors, tx_errors
 
 
@@ -533,7 +534,7 @@ def load_excel_file(entity, user, file):
         tx_errors = []
         for lot in lots:
             try:
-                lot, tx, l_errors, t_errors = load_excel_lot(entity, user, lot)
+                lot, tx, l_errors, t_errors = load_lot(entity, user, lot, 'EXCEL')
                 if lot is None:
                     continue
                 lots_loaded += 1

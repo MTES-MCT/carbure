@@ -520,13 +520,6 @@ def create_template_xlsx_v2_mb(entity):
 # API V3
 def make_dump_lots_sheet(workbook, entity, transactions):
     worksheet_lots = workbook.add_worksheet("lots")
-    psites = ProductionSite.objects.filter(producer=entity)
-    eas = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur', 'Trader']).exclude(id=entity.id)
-    mps = MatierePremiere.objects.all()
-    bcs = Biocarburant.objects.all()
-    delivery_sites = Depot.objects.all()
-    countries = Pays.objects.all()
-
     # header
     bold = workbook.add_format({'bold': True})
     columns = ['carbure_id', 'producer', 'production_site', 'production_site_country', 'production_site_reference',
