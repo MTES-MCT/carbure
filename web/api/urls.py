@@ -1,51 +1,7 @@
 from django.urls import path, include
 
-from api.v1 import public_api, producers_api, administrators_api
-from api.v2 import shared
-
 urlpatterns = [
     path('v3/', include('api.v3.urls')),
-
-   
-    # SEP 2020: separating into 4 different folders may not have been the best idea ever given the huge overlap in terms of functionality
-    # TODO: merge producers/operators/traders together but keep admin separate
-    path('v2/producers/', include('api.v2.producers.urls')),
-    path('v2/operators/', include('api.v2.operators.urls')),
-    path('v2/traders/', include('api.v2.traders.urls')),
-    path('v2/administrators/', include('api.v2.administrators.urls')),
-
-    # misc - automplete (authenticated users)
-    path('v2/shared/get-producers-autocomplete', shared.get_producers_autocomplete, name='api-v2-producers-autocomplete'),
-    path('v2/shared/get-clients-autocomplete', shared.get_clients_autocomplete, name='api-v2-clients-autocomplete'),
-    path('v2/shared/get-depots-autocomplete', shared.get_depots_autocomplete, name='api-v2-depots-autocomplete'),
-    path('v2/shared/get-prodsites-autocomplete', shared.get_prod_site_autocomplete, name='api-v2-production-sites-autocomplete'),
-    path('v2/shared/get-mps-autocomplete', shared.get_mps_autocomplete, name='api-v2-mps-autocomplete'),
-    path('v2/shared/get-bcs-autocomplete', shared.get_biocarburants_autocomplete, name='api-v2-biocarburants-autocomplete'),
-    path('v2/shared/get-ges', shared.get_ges, name='api-v2-get-ges'),
-
-
-
-    # ALL BELOW CALLS NEED TO BE DEPRECATED:
-    # api v1
-    path('v1/producers/add-production-site', producers_api.producers_settings_add_site, name='producers-api-settings-add-site'),
-    path('v1/producers/add-production-site-certificate', producers_api.producers_settings_add_certif, name='producers-api-settings-add-certif'),
-    path('v1/producers/delete-production-site-certificate', producers_api.producers_settings_delete_certif, name='producers-api-settings-delete-certif'),
-    path('v1/producers/delete-production-site-mp', producers_api.producers_settings_delete_mp, name='producers-api-settings-delete-mp'),
-    path('v1/producers/add-production-site-mp', producers_api.producers_settings_add_mp, name='producers-api-settings-add-mp'),
-    path('v1/producers/delete-production-site-bc', producers_api.producers_settings_delete_biocarburant, name='producers-api-settings-delete-bc'),
-    path('v1/producers/add-production-site-bc', producers_api.producers_settings_add_biocarburant, name='producers-api-settings-add-biocarburant'),
-    # public, autocomplete api
-    path('v1/public/biocarburant-autocomplete/', public_api.biocarburant_autocomplete, name='api-biocarburant-autocomplete'),
-    path('v1/public/matiere-premiere-autocomplete/', public_api.matiere_premiere_autocomplete, name='api-matiere-premiere-autocomplete'),
-    path('v1/public/country-autocomplete/', public_api.country_autocomplete, name='api-country-autocomplete'),
-    path('v1/public/operators-autocomplete/', public_api.operators_autocomplete, name='api-operators-autocomplete'),
-    path('v1/public/depots-autocomplete/', public_api.depots_autocomplete, name='api-depots-autocomplete'),
-    path('v1/public/biocarburant-csv/', public_api.biocarburant_csv, name='api-biocarburant-csv'),
-    path('v1/public/matiere-premiere-csv/', public_api.matiere_premiere_csv, name='api-matiere-premiere-csv'),
-    path('v1/public/country-csv/', public_api.country_csv, name='api-country-csv'),
-    path('v1/public/operators-csv/', public_api.operators_csv, name='api-operators-csv'),
-    path('v1/public/depots-csv/', public_api.depots_csv, name='api-depots-csv'),
-    # private, administrators
-    path('v1/administrators/users-autocomplete/', administrators_api.admin_users_autocomplete, name='admin-api-users-autocomplete'),
-    path('v1/administrators/entities-autocomplete/', administrators_api.admin_entities_autocomplete, name='admin-api-entities-autocomplete'),
+    path('v2/', include('api.v2.urls')),
+    path('v1/', include('api.v1.urls')),
 ]
