@@ -7,9 +7,10 @@ from django.db.models import Count
 from django.db.models.fields import NOT_PROVIDED
 from django.http import JsonResponse, HttpResponse
 from core.models import LotV2, LotTransaction, Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment
-from core.xlsx_template import create_xslx_from_transactions
-from core.common import tx_is_valid, lot_is_valid, generate_carbure_id, fuse_lots
+from core.xlsx_template import create_xslx_from_transactions, create_template_xlsx_v2_simple, create_template_xlsx_v2_advanced
+from core.common import tx_is_valid, lot_is_valid, generate_carbure_id, load_excel_file
 from api.v3.sanity_checks import sanity_check
+
 
 def get_lots(request):
     status = request.GET.get('status', False)
@@ -321,7 +322,7 @@ def comment_lot(request):
 def check_lot(request):
     tx_ids = request.POST.get('tx_ids', None)
     if not tx_ids:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
+        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
     for tx_id in tx_ids:
         try:
             tx = LotTransaction.objects.get(id=tx_id)
@@ -336,7 +337,9 @@ def check_lot(request):
 
 
 def delete_all_drafts(request):
-    entity_id = request.POST.get('entity_id')
+    entity_id = request.POST.get('entity_id', False)
+    if not entity_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
 
     try:
         entity = Entity.objects.get(id=entity_id)
@@ -351,13 +354,76 @@ def delete_all_drafts(request):
     return JsonResponse({'status': 'success'})
 
 
-def upload(request):
-    pass
-
-
 def template_simple(request):
-    pass
+    entity_id = request.POST.get('entity_id', False)
+    if not entity_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
+
+    try:
+        entity = Entity.objects.get(id=entity_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)}, status=400)
+
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    if entity not in rights:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+    file_location = create_template_xlsx_v2_simple(entity)
+    try:
+        with open(file_location, 'rb') as f:
+            file_data = f.read()
+            # sending response
+            response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment; filename="carbure_template_simple.xlsx"'
+            return response
+    except Exception as e:
+        return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
 
 
 def template_advanced(request):
-    pass
+    entity_id = request.POST.get('entity_id', False)
+    if not entity_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
+
+    try:
+        entity = Entity.objects.get(id=entity_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)}, status=400)
+
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    if entity not in rights:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+    file_location = create_template_xlsx_v2_advanced(entity)
+    try:
+        with open(file_location, 'rb') as f:
+            file_data = f.read()
+            # sending response
+            response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment; filename="carbure_template_advanced.xlsx"'
+            return response
+    except Exception as e:
+        return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
+
+
+def upload(request):
+    file = request.FILES.get('file')
+    entity_id = request.POST.get('entity_id', False)
+    if not entity_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
+    if file is None:
+        return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
+
+    try:
+        entity = Entity.objects.get(id=entity_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)}, status=400)
+
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    if entity not in rights:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+    nb_loaded, nb_total = load_excel_file(entity, request.user, file)
+    if nb_loaded is False:
+        return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
+    return JsonResponse({'status': 'success', 'loaded': nb_loaded, 'total': nb_total})
