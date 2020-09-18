@@ -11,7 +11,7 @@ from authtools.forms import UserCreationForm
 from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays
 from core.models import GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
 from core.models import LotValidationError
-from api.v2.common import run_sanity_checks
+from api.v3.sanity_checks import queryset_sanity_check
 
 
 class EntityAdmin(admin.ModelAdmin):
@@ -80,7 +80,7 @@ def reset_checked_status(modeladmin, request, queryset):
 
 
 def admin_run_sanity_checks(modeladmin, request, queryset):
-    run_sanity_checks(queryset)
+    queryset_sanity_check(queryset)
 
 
 reset_checked_status.short_description = "Reset sanity checks status"

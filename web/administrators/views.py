@@ -1,5 +1,3 @@
-import datetime
-
 from django.contrib.auth.decorators import login_required
 from core.decorators import enrich_with_user_details, restrict_to_administrators
 from django.shortcuts import render, redirect
@@ -7,7 +5,7 @@ from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
 
-from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays
+from core.models import Entity, UserRights, LotValidationError
 from producers.models import ProducerCertificate, ProductionSiteInput, ProductionSiteOutput
 
 
@@ -259,4 +257,5 @@ def administrators_delete_right(request, *args, **kwargs):
 def alertes(request, *args, **kwargs):
     context = kwargs['context']
     context['current_url_name'] = 'administrators-alertes'
+    context['alertes'] = LotValidationError.objects.all()
     return render(request, 'administrators/alertes.html', context)

@@ -396,6 +396,7 @@ class LotValidationError(models.Model):
     warning_to_admin = models.BooleanField(default=False)
     block_validation = models.BooleanField(default=False)
     message = models.TextField(blank=True, null=True, default='')
+    details = models.TextField(blank=True, null=True, default='')
 
     def __str__(self):
         return self.rule_triggered

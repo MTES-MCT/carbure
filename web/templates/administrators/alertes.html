@@ -11,19 +11,19 @@
 						<th>Entité</th>
 						<th>Lot</th>
 						<th>Alerte</th>
-						<th>Date création</th>
-						<th>Masquer</th>
+						<th>Détails</th>
 					</tr>
 				</thead>
 				<tbody>
+					{% for alerte in alertes %}
 					<tr>
 						<th></th>
-						<th>Producteur 1</th>
-						<th>FRXXX - Biogaz - Blé</th>
-						<th>BC / MP Incohérent</th>
-						<th>2020-05-05</th>
-						<th></th>
+						<th>{{alerte.lot.added_by}}</th>
+						<th>{{alerte.lot.carbure_id}}</th>
+						<th>{{alerte.rule_triggered}}</th>
+						<th>{{alerte.details}}</th>
 					</tr>
+					{% endfor %}
 				</tbody>
 			</table>
 		</div>
