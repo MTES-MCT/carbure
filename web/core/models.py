@@ -398,7 +398,7 @@ class LotValidationError(models.Model):
     message = models.TextField(blank=True, null=True, default='')
 
     def __str__(self):
-        return self.rule
+        return self.rule_triggered
 
     class Meta:
         db_table = 'validation_errors'
