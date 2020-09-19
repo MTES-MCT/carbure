@@ -1,17 +1,24 @@
-/* Variables definition */
-
 :root {
-  /* Colors */
-  --blue: #3150c0;
-  --black: #26353f;
-  --gray: #667095;
-  --white: #f9f9fc;
-  --light-gray: #ebeff3;
+  --white: #ffffff;
+  --black: #202328;
 
-  /* Theme */
-  --theme-primary: var(--blue);
-  --theme-text-primary: var(--black);
-  --theme-text-secondary: var(--gray);
-  --theme-background-light: var(--white);
-  --theme-background-dark: var(--light-gray);
+  --blue-light: #d5dbef;
+  --blue-medium: #3150c0;
+  --blue-dark: #000091;
+
+  --red-light: #ffdbd2;
+  --red-medium: #ffb7a5;
+  --red-dark: #e1000f;
+
+  --green-light: #c5e6d8;
+  --green-medium: #8acdb0;
+  --green-dark: #169b62;
+
+  --orange-light: #ffe6cf;
+  --orange-medium: #ffcc9f;
+  --orange-dark: #ff9940;
+
+  --gray-light: #f6f6f6;
+  --gray-medium: #bfbfbf;
+  --gray-dark: #808080;
 }
