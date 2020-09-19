@@ -1,6 +1,6 @@
 .topBar {
   display: flex;
-  background-color: var(--theme-background-light);
+  background-color: var(--white);
 }
 
 .pageNav {
@@ -15,11 +15,11 @@
   padding: 0 16px;
   font-size: 18px;
   text-decoration: none;
-  color: var(--theme-text-secondary);
+  color: var(--black);
 }
 
 .activePageLink {
-  color: var(--theme-text-primary);
+  font-weight: 600;
 }
 
 .activePageLink::after {
@@ -29,5 +29,6 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: var(--theme-primary);
+  background-color: var(--blue-medium);
+}
 }
