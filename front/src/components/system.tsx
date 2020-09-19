@@ -25,3 +25,19 @@ export const Select = ({
   </div>
 )
 
+type MenuProps = {
+  label: string
+  className?: string
+  children: React.ReactNode
+  [k: string]: any
+}
+
+export const Menu = ({ label, className, children, ...props }: MenuProps) => (
+  <Select {...props} value="label" className={cl(styles.menu, className)}>
+    <option hidden value="label">
+      {label}
+    </option>
+    {children}
+  </Select>
+)
+
