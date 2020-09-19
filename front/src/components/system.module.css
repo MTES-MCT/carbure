@@ -78,3 +78,30 @@
   background-color: var(--blue-dark);
 }
 
+/* ALERT COMPONENT */
+.alert {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  border: 1px solid var(--gray-medium);
+  background-color: var(--gray-light);
+  border-radius: 5px;
+  padding: 8px 16px;
+}
+
+.alertHide {
+  color: var(--blue-dark);
+  text-decoration: underline;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.alertWarning {
+  border-color: var(--orange-medium);
+  background-color: var(--orange-light);
+}
+
+.alertError {
+  border-color: var(--red-medium);
+  background-color: var(--red-light);
+}

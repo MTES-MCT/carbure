@@ -57,3 +57,26 @@ export const Button = ({ type, children, ...props }: ButtonProps) => {
     </button>
   )
 }
+
+type AlertProps = {
+  type: string
+  children: React.ReactNode
+  onClose: (event: React.MouseEvent) => void
+  [k: string]: any
+}
+
+export const Alert = ({ type, children, onClose, ...props }: AlertProps) => {
+  const className = cl(styles.alert, {
+    [styles.alertWarning]: type === "warning",
+    [styles.alertError]: type === "error",
+  })
+
+  return (
+    <div {...props} className={className}>
+      {children}
+      <span className={styles.alertHide} onClick={onClose}>
+        Masquer ce message
+      </span>
+    </div>
+  )
+}
