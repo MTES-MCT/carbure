@@ -41,3 +41,19 @@ export const Menu = ({ label, className, children, ...props }: MenuProps) => (
   </Select>
 )
 
+type ButtonProps = {
+  type?: string
+  children: React.ReactNode
+}
+
+export const Button = ({ type, children, ...props }: ButtonProps) => {
+  const className = cl(styles.button, {
+    [styles.buttonPrimary]: type === "primary",
+  })
+
+  return (
+    <button {...props} className={className}>
+      {children}
+    </button>
+  )
+}
