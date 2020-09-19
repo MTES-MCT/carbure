@@ -18,6 +18,10 @@
   color: var(--black);
 }
 
+.pageLink:hover {
+  color: var(--blue-medium);
+}
+
 .activePageLink {
   font-weight: 600;
 }
