@@ -1,0 +1,44 @@
+/* SELECT COMPONENT */
+.selectWrapper {
+  display: flex;
+  position: relative;
+  align-items: center;
+  background-color: var(--gray-light);
+  border: 1px solid var(--gray-medium);
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.select {
+  flex: 1;
+  align-self: stretch;
+  appearance: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: Source Sans Pro, Arial, sans-serif;
+  padding: 12px;
+  padding-right: 36px;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.selectArrow {
+  position: absolute;
+  right: 8px;
+  pointer-events: none;
+  margin-top: 5px;
+}
+
+.selectWrapper:hover {
+  border-color: var(--blue-medium);
+}
+
+.selectWrapper:hover .select {
+  color: var(--blue-medium);
+}
+
+.selectWrapper:hover .selectArrow {
+  stroke: var(--blue-medium);
+}
+
