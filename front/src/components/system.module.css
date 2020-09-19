@@ -53,3 +53,28 @@
   font-weight: normal;
 }
 
+/* BUTTON COMPONENT */
+.button {
+  background-color: var(--gray-light);
+  border: 1px solid var(--gray-medium);
+  border-radius: 4px;
+  font-weight: 600;
+  padding: 8px;
+  padding-right: 16px;
+  cursor: pointer;
+}
+
+.button:active {
+  background-color: var(--gray-medium);
+}
+
+.buttonPrimary {
+  color: var(--white);
+  background-color: var(--blue-medium);
+  border-color: var(--blue-medium);
+}
+
+.buttonPrimary:active {
+  background-color: var(--blue-dark);
+}
+
