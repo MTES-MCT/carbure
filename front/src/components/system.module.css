@@ -55,6 +55,8 @@
 
 /* BUTTON COMPONENT */
 .button {
+  display: flex;
+  align-items: center;
   background-color: var(--gray-light);
   border: 1px solid var(--gray-medium);
   border-radius: 4px;
@@ -66,6 +68,10 @@
 
 .button:active {
   background-color: var(--gray-medium);
+}
+
+.button svg {
+  margin-right: 8px;
 }
 
 .buttonPrimary {
@@ -104,4 +110,11 @@
 .alertError {
   border-color: var(--red-medium);
   background-color: var(--red-light);
+}
+
+/* TITLE COMPONENT */
+.title {
+  font-size: 24px;
+  font-family: Evolventa;
+  margin: 0;
 }

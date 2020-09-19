@@ -4,19 +4,14 @@ import cl from "clsx"
 import styles from "./system.module.css"
 import { ChevronDown } from "./icons"
 
-type SelectProps = {
+type DomProps = {
   className?: string
   style?: CSSProperties
   children: React.ReactNode
   [k: string]: any // ...props
 }
 
-export const Select = ({
-  style,
-  className,
-  children,
-  ...props
-}: SelectProps) => (
+export const Select = ({ style, className, children, ...props }: DomProps) => (
   <div style={style} className={cl(styles.selectWrapper, className)}>
     <select {...props} className={styles.select}>
       {children}
@@ -80,3 +75,9 @@ export const Alert = ({ type, children, onClose, ...props }: AlertProps) => {
     </div>
   )
 }
+
+export const Title = ({ children, className, ...props }: DomProps) => (
+  <h1 {...props} className={cl(styles.title, props.className)}>
+    {children}
+  </h1>
+)
