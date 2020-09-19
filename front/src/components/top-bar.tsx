@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom"
 
 import styles from "./top-bar.module.css"
 import Logo from "./logo"
-import UserMenu from "./user-menu"
+import { Menu } from "./system"
 
 type PageLinkProps = {
   to: string
@@ -18,6 +18,15 @@ const PageLink = ({ to, children }: PageLinkProps) => (
   >
     {children}
   </NavLink>
+)
+
+const UserMenu = () => (
+  <Menu
+    label="José-Marie-Pierre de Laporte d'Entrée"
+    className={styles.userMenu}
+  >
+    <option>Logout</option>
+  </Menu>
 )
 
 const Topbar = () => (
