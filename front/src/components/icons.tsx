@@ -8,7 +8,7 @@ type IconProps = {
   color?: string
   stroke?: number
   className?: string
-  [k: string]: string | number | void
+  [k: string]: any
 }
 
 export const ChevronDown = ({
