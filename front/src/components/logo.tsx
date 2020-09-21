@@ -7,9 +7,13 @@ import logoBetaGouv from "../assets/images/betagouvfr.svg"
 
 const Logo = () => (
   <Link to="/" className={styles.logo}>
-    <img src={logoMarianne} className={styles.marianne} />
+    <img src={logoMarianne} alt="marianne logo" className={styles.marianne} />
     <span className={styles.carbure}>carbure.</span>
-    <img src={logoBetaGouv} className={styles.betagouv} />
+    <img
+      src={logoBetaGouv}
+      alt="beta.gouv.fr logo"
+      className={styles.betagouv}
+    />
   </Link>
 )
 
