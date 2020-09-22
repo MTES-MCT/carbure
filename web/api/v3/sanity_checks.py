@@ -33,6 +33,8 @@ def raise_error(lot, rule_triggered, warning_to_user=True, warning_to_admin=Fals
 
 def sanity_check(lot):
     now = datetime.datetime.now()
+    # cleanup previous errors
+    LotValidationError.objects.filter(lot=lot).delete()
     # réduction de GES
     if lot.ghg_reduction > 100:
         raise_error(lot, 'GHG_REDUC_SUP_100', warning_to_user=True, block_validation=True, details="GES reduction %f%%" % (lot.ghg_reduction))
