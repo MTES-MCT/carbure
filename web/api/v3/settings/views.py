@@ -6,6 +6,9 @@ from producers.models import ProductionSite, ProductionSiteInput, ProductionSite
 
 
 def get_settings(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'status': 'error', 'message': "User is not authenticated"})
+
     # user-rights
     rights = UserRights.objects.filter(user=request.user)
     rights_sez = [{'entity': r.entity.natural_key()} for r in rights]
@@ -57,7 +60,7 @@ def add_production_site(request):
                                                                          'ges_option': ges_option})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
-                            'extra': str(e)}, status=400)
+                             'extra': str(e)}, status=400)
     return JsonResponse({'status': 'success'})
 
 
