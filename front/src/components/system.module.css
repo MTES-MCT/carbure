@@ -85,6 +85,37 @@
   background-color: var(--blue-dark);
 }
 
+/* STATUS BUTTON */
+.statusButton {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-around;
+  /* height: 95px; */
+  font-family: Evolventa;
+  font-size: 20px;
+  font-weight: 400;
+  border-radius: 5px;
+  padding: 20px 24px;
+  padding-bottom: 24px;
+}
+
+.activeStatusButton {
+  border-bottom: 4px solid var(--blue-medium);
+  padding-bottom: 21px;
+}
+
+.statusButtonLabel {
+  text-align: left;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+.activeStatusButton .statusButtonLabel {
+  color: var(--blue-medium);
+}
+
 /* ALERT COMPONENT */
 .alert {
   display: flex;
