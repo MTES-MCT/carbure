@@ -33,7 +33,7 @@ const App = () => {
       <Topbar settings={settings} entity={entity} setEntity={setEntity} />
 
       <Route path="/transactions">
-        <Transactions />
+        <Transactions settings={settings} entity={entity} />
       </Route>
 
       <Route path="/logout">
