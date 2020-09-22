@@ -1,6 +1,7 @@
 .transactionSnapshot {
   background-color: var(--gray-light);
   padding: 32px 120px;
+  margin-top: 1px;
 }
 
 .topRow {
@@ -26,4 +27,29 @@
 
 .buttonRow button:last-child {
   margin-right: 0;
+}
+
+.lastRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 120px;
+  background-color: var(--white);
+  box-shadow: 0px 1px 2px var(--gray-medium);
+}
+
+.filters {
+  display: flex;
+}
+
+.filters > div {
+  margin-right: 8px;
+}
+
+.filters > div > select {
+  width: 150px;
+  overflow: hidden;
+}
+
+.searchInput input {
+  width: 165px;
 }
