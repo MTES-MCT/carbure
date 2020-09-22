@@ -7,4 +7,23 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 32px;
+}
+
+.buttonRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+.buttonRow button {
+  margin: 0 12px;
+}
+
+.buttonRow button:first-child {
+  margin-left: 0;
+}
+
+.buttonRow button:last-child {
+  margin-right: 0;
 }
