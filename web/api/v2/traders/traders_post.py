@@ -125,7 +125,7 @@ def validate_lots(request, *args, **kwargs):
             tx.save()
         tx.lot.save()
         results.append({'tx_id': txid, 'status': 'success'})
-    print(results)
+    #print(results)
     return JsonResponse({'status': 'success', 'message': results})
 
 
