@@ -155,6 +155,7 @@ def add_lot(request):
 
 
 def update_lot(request):
+    # set is_valid to False
     pass
 
 
@@ -243,8 +244,15 @@ def validate_lot(request):
         if not lot_valid:
             return JsonResponse({'status': 'error', 'message': "Invalid lot: %s" % (error)}, status=400)
 
-        tx.lot.carbure_id = generate_carbure_id(tx.lot)
-        tx.lot.status = "Validated"
+        # run sanity_checks
+        sanity_check(lot)
+        blocking_sanity_checks = LotValidationError.objects.filter(lot=lot, block_validation=True)
+        if len(blocking_sanity_checks):
+            tx.lot.is_valid = False
+        else:
+            tx.lot.is_valid = True
+            tx.lot.carbure_id = generate_carbure_id(tx.lot)
+            tx.lot.status = "Validated"
         # when the lot is added to mass balance, auto-accept
         if tx.carbure_client == tx.carbure_vendor:
             tx.delivery_status = 'A'
