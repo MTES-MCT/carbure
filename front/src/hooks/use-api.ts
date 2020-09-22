@@ -70,7 +70,7 @@ function useAPI<T>(callAPI: ApiCaller<T>) {
   function useResolve(...args: any[]) {
     useEffect(() => {
       resolve(...args)
-    }, args)
+    }, args) // eslint-disable-line react-hooks/exhaustive-deps
   }
 
   return { ...state, resolve, useResolve }
