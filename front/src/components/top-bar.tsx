@@ -1,13 +1,29 @@
 import React from "react"
 import { NavLink } from "react-router-dom"
 
+import { ApiState } from "../hooks/use-api"
+import { Settings } from "../services/settings"
+
 import styles from "./top-bar.module.css"
+
+import { Menu, MenuLink } from "./system"
 import Logo from "./logo"
-import { Menu } from "./system"
 
 type PageLinkProps = {
   to: string
   children: React.ReactNode
+}
+
+type UserMenuProps = {
+  settings: ApiState<Settings>
+  entity: number
+  setEntity: (entity: number) => void
+}
+
+type TopbarProps = {
+  settings: ApiState<Settings>
+  entity: number
+  setEntity: (entity: number) => void
 }
 
 const PageLink = ({ to, children }: PageLinkProps) => (
@@ -20,27 +36,42 @@ const PageLink = ({ to, children }: PageLinkProps) => (
   </NavLink>
 )
 
-const UserMenu = () => (
-  <Menu
-    label="José-Marie-Pierre de Laporte d'Entrée"
-    className={styles.userMenu}
-  >
-    <option>Logout</option>
-  </Menu>
-)
+const UserMenu = ({ settings, entity, setEntity }: UserMenuProps) => {
+  function onChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    // ignore options with no values
+    if (e.target.value) setEntity(parseInt(e.target.value, 10))
+  }
 
-const Topbar = () => (
+  return (
+    <Menu className={styles.userMenu} value={entity} onChange={onChange}>
+      <optgroup label="Organisation">
+        {settings.data?.rights.map(({ entity }) => (
+          <option key={entity.id} value={entity.id}>
+            {entity.name}
+          </option>
+        ))}
+      </optgroup>
+      <optgroup label="Utilisateur">
+        <option disabled>jpldlde@user.com</option>
+        <MenuLink to="/settings">Paramètres</MenuLink>
+        <MenuLink to="/logout">Se déconnecter</MenuLink>
+      </optgroup>
+    </Menu>
+  )
+}
+
+const Topbar = ({ settings, entity, setEntity }: TopbarProps) => (
   <div className={styles.topBar}>
     <Logo />
 
     <nav className={styles.pageNav}>
       <PageLink to="/stocks">Stocks</PageLink>
       <PageLink to="/transactions">Transactions</PageLink>
-      <PageLink to="/controles">Contrôles</PageLink>
-      <PageLink to="/annuaire">Annuaire</PageLink>
+      <PageLink to="/controls">Contrôles</PageLink>
+      <PageLink to="/directory">Annuaire</PageLink>
     </nav>
 
-    <UserMenu />
+    <UserMenu settings={settings} entity={entity} setEntity={setEntity} />
   </div>
 )
 
