@@ -1,6 +1,14 @@
 import api, { ApiResponse } from "./api"
 
 
+export enum LotStatus {
+  Drafts = "drafts",
+  Validated = "validated",
+  ToFix = "tofix",
+  Accepted = "accepted",
+  // Weird = "weird" @TODO
+}
+
 export type Snapshot = {
   lots: {
     drafts: number
