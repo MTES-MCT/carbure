@@ -37,6 +37,8 @@ const PageLink = ({ to, children }: PageLinkProps) => (
 )
 
 const UserMenu = ({ settings, entity, setEntity }: UserMenuProps) => {
+  if (!settings.data) return null
+
   function onChange(e: React.ChangeEvent<HTMLSelectElement>) {
     // ignore options with no values
     if (e.target.value) setEntity(parseInt(e.target.value, 10))
@@ -45,14 +47,14 @@ const UserMenu = ({ settings, entity, setEntity }: UserMenuProps) => {
   return (
     <Menu className={styles.userMenu} value={entity} onChange={onChange}>
       <optgroup label="Organisation">
-        {settings.data?.rights.map(({ entity }) => (
+        {settings.data.rights.map(({ entity }) => (
           <option key={entity.id} value={entity.id}>
             {entity.name}
           </option>
         ))}
       </optgroup>
       <optgroup label="Utilisateur">
-        <option disabled>jpldlde@user.com</option>
+        <option disabled>{settings.data.email}</option>
         <MenuLink to="/settings">Paramètres</MenuLink>
         <MenuLink to="/logout">Se déconnecter</MenuLink>
       </optgroup>
