@@ -1,4 +1,5 @@
 /* SELECT COMPONENT */
+
 .selectWrapper {
   display: flex;
   position: relative;
@@ -17,9 +18,10 @@
   border: none;
   cursor: pointer;
   font-family: Source Sans Pro, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
   padding: 12px;
   padding-right: 36px;
-  font-weight: 600;
   z-index: 1;
 }
 
@@ -27,7 +29,6 @@
   position: absolute;
   right: 8px;
   pointer-events: none;
-  margin-top: 5px;
 }
 
 .selectWrapper:hover {
@@ -43,6 +44,7 @@
 }
 
 /* MENU COMPONENT */
+
 .menu {
   border: none;
   background-color: transparent;
@@ -55,6 +57,7 @@
 }
 
 /* BUTTON COMPONENT */
+
 .button {
   display: flex;
   align-items: center;
@@ -86,6 +89,7 @@
 }
 
 /* STATUS BUTTON */
+
 .statusButton {
   display: flex;
   flex: 1;
@@ -95,6 +99,7 @@
   font-family: Evolventa;
   font-size: 20px;
   font-weight: 400;
+  background-color: var(--white);
   border-radius: 5px;
   padding: 20px 24px;
   padding-bottom: 24px;
@@ -116,6 +121,7 @@
 }
 
 /* ALERT COMPONENT */
+
 .alert {
   display: flex;
   align-items: center;
@@ -144,8 +150,47 @@
 }
 
 /* TITLE COMPONENT */
+
 .title {
   font-size: 24px;
   font-family: Evolventa;
   margin: 0;
+}
+
+/* INPUT COMPONENT */
+
+.input {
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--gray-medium);
+  background-color: var(--gray-light);
+}
+
+.input:hover {
+  color: var(--blue-medium);
+  border-color: var(--blue-medium);
+}
+
+/* SEARCH INPUT COMPONENT */
+
+.searchInputWrapper {
+  display: flex;
+  position: relative;
+}
+
+.searchInputWrapper:hover svg {
+  stroke: var(--blue-medium);
+}
+
+.searchInput {
+  border-radius: 45px;
+  padding-left: 40px;
+  padding-right: 8px;
+}
+
+.searchInputWrapper svg {
+  position: absolute;
+  left: 12px;
+  align-self: center;
+  pointer-events: none;
 }

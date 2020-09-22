@@ -6,13 +6,22 @@ import { ApiState } from "../hooks/use-api"
 import styles from "./transaction-snapshot.module.css"
 
 import { Plus } from "./icons"
-import { Title, Button, StatusButton } from "./system"
+import { Title, Button, StatusButton, Select, SearchInput } from "./system"
 
 const STATUS = [
   { key: LotStatus.Drafts, label: "Brouillons" },
-  { key: LotStatus.Validated, label: "Lots Envoyés" },
-  { key: LotStatus.ToFix, label: "Lots à Corriger" },
-  { key: LotStatus.Accepted, label: "Lots Acceptés" },
+  { key: LotStatus.Validated, label: "Lots envoyés" },
+  { key: LotStatus.ToFix, label: "Lots à corriger" },
+  { key: LotStatus.Accepted, label: "Lots acceptés" },
+]
+
+const FILTERS = [
+  { key: "periods", label: "Période" },
+  { key: "production_sites", label: "Site de production" },
+  { key: "matieres_premieres", label: "Matière Première" },
+  { key: "biocarburants", label: "Biocarburant" },
+  { key: "countries_of_origin", label: "Pays d'origine" },
+  { key: "clients", label: "Client" },
 ]
 
 type TransactionSnapshotProps = {
@@ -26,28 +35,52 @@ const TransactionSnapshot = ({
   activeStatus,
   toggleStatus,
 }: TransactionSnapshotProps) => (
-  <div className={styles.transactionSnapshot}>
-    <div className={styles.topRow}>
-      <Title>Transactions</Title>
+  <React.Fragment>
+    <div className={styles.transactionSnapshot}>
+      <div className={styles.topRow}>
+        <Title>Transactions</Title>
 
-      <Button type="primary">
-        <Plus />
-        Ajouter des lots
-      </Button>
+        <Button type="primary">
+          <Plus />
+          Ajouter des lots
+        </Button>
+      </div>
+
+      <div className={styles.buttonRow}>
+        {STATUS.map(({ key, label }) => (
+          <StatusButton
+            key={key}
+            active={activeStatus[key]}
+            amount={snapshot.data?.lots[key] ?? "N/A"}
+            label={label}
+            onClick={() => toggleStatus(key)}
+          />
+        ))}
+      </div>
     </div>
 
-    <div className={styles.buttonRow}>
-      {STATUS.map(({ key, label }) => (
-        <StatusButton
-          key={key}
-          active={activeStatus[key]}
-          amount={snapshot.data?.lots[key] ?? 0}
-          label={label}
-          onClick={() => toggleStatus(key)}
-        />
-      ))}
+    <div className={styles.lastRow}>
+      <div className={styles.filters}>
+        {FILTERS.map(({ key, label }) => (
+          <Select>
+            <option disabled selected>
+              {label}
+            </option>
+            {snapshot.data?.filters[key as keyof Snapshot["filters"]].map(
+              ({ key, label }) => (
+                <option value={key}>{label}</option>
+              )
+            )}
+          </Select>
+        ))}
+      </div>
+
+      <SearchInput
+        className={styles.searchInput}
+        placeholder="Rechercher un lot"
+      />
     </div>
-  </div>
+  </React.Fragment>
 )
 
 export default TransactionSnapshot

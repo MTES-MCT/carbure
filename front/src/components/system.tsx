@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom"
 import cl from "clsx"
 
 import styles from "./system.module.css"
-import { ChevronDown } from "./icons"
+import { ChevronDown, Search } from "./icons"
 
 type SystemProps = {
   className?: string
@@ -82,7 +82,7 @@ export const Button = ({
 
 type StatusButtonProps = ButtonProps & {
   active: boolean
-  amount: number
+  amount: number | string
   label: string
 }
 
@@ -143,4 +143,21 @@ export const Title = ({ children, className, ...props }: TitleProps) => (
   <h1 {...props} className={cl(styles.title, className)}>
     {children}
   </h1>
+)
+
+// INPUT COMPONENT
+
+type InputProps = SystemProps & React.HTMLProps<HTMLInputElement>
+
+export const Input = ({ className, ...props }: InputProps) => (
+  <input {...props} className={cl(styles.input, className)} />
+)
+
+// SEARCH INPUT COMPONENT
+
+export const SearchInput = ({ className, ...props }: InputProps) => (
+  <div className={cl(styles.searchInputWrapper, className)}>
+    <Search size={20} color="var(--gray-medium)" />
+    <Input {...props} className={styles.searchInput} />
+  </div>
 )
