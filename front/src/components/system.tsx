@@ -1,17 +1,26 @@
 import React, { CSSProperties } from "react"
+import { useHistory } from "react-router-dom"
 import cl from "clsx"
 
 import styles from "./system.module.css"
 import { ChevronDown } from "./icons"
 
-type DomProps = {
+type SystemProps = {
   className?: string
   style?: CSSProperties
   children: React.ReactNode
-  [k: string]: any // ...props
 }
 
-export const Select = ({ style, className, children, ...props }: DomProps) => (
+// SELECT COMPONENT
+
+type SelectProps = SystemProps & React.HTMLProps<HTMLSelectElement>
+
+export const Select = ({
+  style,
+  className,
+  children,
+  ...props
+}: SelectProps) => (
   <div style={style} className={cl(styles.selectWrapper, className)}>
     <select {...props} className={styles.select}>
       {children}
@@ -20,26 +29,37 @@ export const Select = ({ style, className, children, ...props }: DomProps) => (
   </div>
 )
 
-type MenuProps = {
-  label: string
-  className?: string
-  children: React.ReactNode
-  [k: string]: any
-}
+// MENU COMPONENT
 
-export const Menu = ({ label, className, children, ...props }: MenuProps) => (
-  <Select {...props} value="label" className={cl(styles.menu, className)}>
-    <option hidden value="label">
-      {label}
-    </option>
+export const Menu = ({ className, children, ...props }: SelectProps) => (
+  <Select {...props} className={cl(styles.menu, className)}>
     {children}
   </Select>
 )
 
-type ButtonProps = {
-  type?: string
-  children: React.ReactNode
+// MENU LINK COMPONENT
+
+type MenuLinkProps = SystemProps &
+  React.HTMLProps<HTMLOptionElement> & {
+    to: string
+  }
+
+export const MenuLink = ({ to, children, ...props }: MenuLinkProps) => {
+  const history = useHistory()
+
+  return (
+    <option {...props} onClick={() => history.push(to)}>
+      {children}
+    </option>
+  )
 }
+
+// BUTTON COMPONENT
+
+type ButtonProps = SystemProps &
+  React.HTMLProps<HTMLButtonElement> & {
+    type?: string
+  }
 
 export const Button = ({ type, children, ...props }: ButtonProps) => {
   const className = cl(styles.button, {
@@ -53,21 +73,28 @@ export const Button = ({ type, children, ...props }: ButtonProps) => {
   )
 }
 
-type AlertProps = {
-  type: string
-  children: React.ReactNode
-  onClose: (event: React.MouseEvent) => void
-  [k: string]: any
-}
+// ALERT COMPONENT
 
-export const Alert = ({ type, children, onClose, ...props }: AlertProps) => {
-  const className = cl(styles.alert, {
+type AlertProps = SystemProps &
+  React.HTMLProps<HTMLDivElement> & {
+    type?: string
+    onClose: (event: React.MouseEvent) => void
+  }
+
+export const Alert = ({
+  type,
+  children,
+  className,
+  onClose,
+  ...props
+}: AlertProps) => {
+  const divClassName = cl(styles.alert, className, {
     [styles.alertWarning]: type === "warning",
     [styles.alertError]: type === "error",
   })
 
   return (
-    <div {...props} className={className}>
+    <div {...props} className={divClassName}>
       {children}
       <span className={styles.alertHide} onClick={onClose}>
         Masquer ce message
@@ -76,8 +103,11 @@ export const Alert = ({ type, children, onClose, ...props }: AlertProps) => {
   )
 }
 
-export const Title = ({ children, className, ...props }: DomProps) => (
-  <h1 {...props} className={cl(styles.title, props.className)}>
+// TITLE COMPONENT
+type TitleProps = SystemProps & React.HTMLProps<HTMLHeadingElement>
+
+export const Title = ({ children, className, ...props }: TitleProps) => (
+  <h1 {...props} className={cl(styles.title, className)}>
     {children}
   </h1>
 )
