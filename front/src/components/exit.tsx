@@ -4,7 +4,7 @@ import { useEffect } from "react"
 const Exit = ({ to }: { to: string }) => {
   useEffect(() => {
     window.location.pathname = to
-  }, [])
+  }, [to])
 
   return null
 }
