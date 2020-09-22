@@ -59,3 +59,28 @@ export const Plus = ({
     <line x1={5} y1={12} x2={19} y2={12} />
   </svg>
 )
+
+export const Search = ({
+  size = 24,
+  color = "currentColor",
+  stroke = 2,
+  className,
+  ...props
+}: IconProps) => (
+  <svg
+    className={cl("icon", "icon-search", className)}
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    stroke-width={stroke}
+    stroke={color}
+    fill="none"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    {...props}
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <circle cx="10" cy="10" r="7" />
+    <line x1="21" y1="21" x2="15" y2="15" />
+  </svg>
+)
