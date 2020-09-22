@@ -278,7 +278,7 @@ def load_excel_lot(context, lot_row):
     transaction.vendor_is_in_carbure = True
     transaction.carbure_vendor = entity
     transaction.is_mac = False
-    print(lot_row)
+    #print(lot_row)
     if 'mac' in lot_row and lot_row['mac'] == 1:
         transaction.is_mac = True
 
@@ -609,7 +609,7 @@ def excel_template_upload(request, *args, **kwargs):
                 lot_errors.append(l_errors)
                 tx_errors.append(t_errors)
             except Exception as e:
-                print('Could not load %s' % (lot))
+                #print('Could not load %s' % (lot))
                 print(e)
         LotV2.objects.bulk_create(lots_to_insert, batch_size=100)
         # with mysql, returned object does not contain ids
