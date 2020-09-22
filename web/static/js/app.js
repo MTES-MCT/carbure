@@ -1193,7 +1193,7 @@ function parseApiFetchResponse(res) {
       comments = JSON.parse(res['comments'])
       for (let i = 0, len = comments.length; i < len; i++) {
         let comment = comments[i]
-        let txid = comment.fields.tx
+        let txid = comment.fields.tx.id
         if (data[txid] !== undefined) {
           data[txid].comments.push(comment)
         } else {
