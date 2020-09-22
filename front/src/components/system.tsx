@@ -8,7 +8,7 @@ import { ChevronDown } from "./icons"
 type SystemProps = {
   className?: string
   style?: CSSProperties
-  children: React.ReactNode
+  children?: React.ReactNode
 }
 
 // SELECT COMPONENT
@@ -61,17 +61,50 @@ type ButtonProps = SystemProps &
     type?: string
   }
 
-export const Button = ({ type, children, ...props }: ButtonProps) => {
-  const className = cl(styles.button, {
+export const Button = ({
+  type,
+  className,
+  children,
+  ...props
+}: ButtonProps) => {
+  const btnClassName = cl(styles.button, className, {
     [styles.buttonPrimary]: type === "primary",
   })
 
   return (
-    <button {...props} className={className}>
+    <button {...props} className={btnClassName}>
       {children}
     </button>
   )
 }
+
+// STATUS BUTTON COMPONENT
+
+type StatusButtonProps = ButtonProps & {
+  active: boolean
+  amount: number
+  label: string
+}
+
+export const StatusButton = ({
+  active,
+  amount,
+  label,
+  className,
+  ...props
+}: StatusButtonProps) => (
+  <Button
+    {...props}
+    className={cl(
+      styles.statusButton,
+      active && styles.activeStatusButton,
+      className
+    )}
+  >
+    <span>{amount}</span>
+    <span className={styles.statusButtonLabel}>{label}</span>
+  </Button>
+)
 
 // ALERT COMPONENT
 
