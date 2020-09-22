@@ -116,22 +116,32 @@ def get_snapshot(request):
     accepted = len(txs.filter(lot__status='Validated', delivery_status='A'))
     data['lots'] = {'drafts': drafts, 'validated': validated, 'tofix': tofix, 'accepted': accepted}
 
-    m = [m.natural_key() for m in MatierePremiere.objects.filter(id__in=txs.values('lot__matiere_premiere').distinct())]
-    bcs = [b.natural_key() for b in Biocarburant.objects.filter(id__in=txs.values('lot__biocarburant').distinct())]
-    periods = [p for p in txs.values('lot__period').distinct()]
-    countries = [c.natural_key() for c in Pays.objects.filter(id__in=txs.values('lot__pays_origine').distinct())]
-    c1 = txs.values('carbure_client__name').distinct()
-    c2 = txs.values('unknown_client').distinct()
-    clients = [c['carbure_client__name'] for c in c1]+[c['unknown_client'] for c in c2]
+    mps = [{'key': m.code, 'label': m.name}
+           for m in MatierePremiere.objects.filter(id__in=txs.values('lot__matiere_premiere').distinct())]
 
-    ps1 = txs.values('lot__carbure_production_site__name').distinct()
-    ps2 = txs.values('lot__unknown_production_site').distinct()
-    psites = list(ps1) + list(ps2)
-    data['filters'] = {'matieres_premieres': m, 'biocarburants': bcs, 'periods': periods, 'production_sites': psites,
-                       'countries_of_origin': countries, 'clients': clients}
+    bcs = [{'key': b.code, 'label': b.name}
+           for b in Biocarburant.objects.filter(id__in=txs.values('lot__biocarburant').distinct())]
 
-    tx_drafts = txs.filter(lot__status='Draft')
-    deadlines = tx_drafts.annotate(month=TruncMonth('delivery_date')).values('month').annotate(total=Count('id'))
+    periods = [{'key': i, 'label': p['lot__period']}
+               for i, p in enumerate(txs.values('lot__period').distinct()) if p['lot__period']]
+
+    countries = [{'key': c.code_pays, 'label': c.name}
+                 for c in Pays.objects.filter(id__in=txs.values('lot__pays_origine').distinct())]
+
+    c1 = [c['carbure_client__name'] for c in txs.values('carbure_client__name').distinct()]
+    c2 = [c['unknown_client'] for c in txs.values('unknown_client').distinct()]
+
+    clients = [{'key': i, 'label': c} for i, c in enumerate(c1 + c2) if c]
+
+    ps1 = [p['lot__carbure_production_site__name'] for p in txs.values('lot__carbure_production_site__name').distinct()]
+    ps2 = [p['lot__unknown_production_site'] for p in txs.values('lot__unknown_production_site').distinct()]
+    psites = [{'key': i, 'label': p} for i, p in enumerate(ps1 + ps2) if p]
+
+    data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs, 'periods': periods,
+                       'production_sites': psites, 'countries_of_origin': countries, 'clients': clients}
+
+    deadlines = txs.filter(lot__status='Draft').annotate(month=TruncMonth(
+        'delivery_date')).values('month').annotate(total=Count('id'))
     for d in deadlines:
         if d['month'] is None:
             d['deadline'] = None
