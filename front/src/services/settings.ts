@@ -9,6 +9,7 @@ export type Entity = {
 }
 
 export type Settings = {
+  email: string
   rights: Entity[]
 }
 
