@@ -17,11 +17,10 @@ const Transactions = ({ settings, entity }: TransactionsProps) => {
   const snapshot = useAPI(getSnapshot)
 
   const [activeStatus, setActiveStatus] = useState<ActiveStatus>({
-    drafts: true,
-    tofix: false,
-    accepted: false,
-    refused: false,
-    validated: false,
+    [LotStatus.Drafts]: true,
+    [LotStatus.ToFix]: false,
+    [LotStatus.Accepted]: false,
+    [LotStatus.Validated]: false,
   })
 
   function toggleStatus(status: LotStatus) {
