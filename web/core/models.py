@@ -94,6 +94,7 @@ class MatierePremiere(models.Model):
     code = models.CharField(max_length=64, unique=True)
     compatible_alcool = models.BooleanField(default=False)
     compatible_graisse = models.BooleanField(default=False)
+    is_double_compte = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -104,7 +105,7 @@ class MatierePremiere(models.Model):
         return self.code == other.code
 
     def natural_key(self):
-        return {'code': self.code, 'name': self.name}
+        return {'code': self.code, 'name': self.name, 'is_double_compte': self.is_double_compte}
 
     class Meta:
         db_table = 'matieres_premieres'

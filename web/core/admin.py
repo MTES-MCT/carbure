@@ -41,7 +41,7 @@ class MatierePremiereAdmin(admin.ModelAdmin):
     list_display = ('code', 'name', 'description', 'compatible_alcool', 'compatible_graisse')
     search_fields = ('name', )
     readonly_fields = ('code', )
-    list_filter = ('compatible_alcool', 'compatible_graisse',)
+    list_filter = ('compatible_alcool', 'compatible_graisse', 'is_double_compte')
 
 
 class PaysAdmin(admin.ModelAdmin):
