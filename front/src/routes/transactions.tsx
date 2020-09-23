@@ -21,8 +21,9 @@ const Transactions = ({ settings, entity }: TransactionsProps) => {
   const snapshot = useAPI(getSnapshot)
   const transactions = useAPI(getLots)
 
-  const [activeStatus, setActiveStatus] = useState(LotStatus.Drafts)
+  const [activeStatus, setActiveStatus] = useState(LotStatus.Draft)
   const [page, setPage] = useState(0)
+  const [filters, setFilters] = useState({})
 
   if (entity < 0 || !settings.data) {
     return null
@@ -33,7 +34,10 @@ const Transactions = ({ settings, entity }: TransactionsProps) => {
   )!
 
   snapshot.useResolve(right.entity.id)
-  transactions.useResolve(activeStatus, right.entity.id, page, LIMIT)
+  transactions.useResolve(activeStatus, right.entity.id, filters, page, LIMIT)
+
+  // boolean for conditional rendering of certain children
+  const hasData = transactions.data && transactions.data.total > 0
 
   return (
     <React.Fragment>
@@ -41,20 +45,24 @@ const Transactions = ({ settings, entity }: TransactionsProps) => {
         snapshot={snapshot}
         activeStatus={activeStatus}
         setActiveStatus={setActiveStatus}
+        filters={filters}
+        setFilters={setFilters}
       />
 
       <Main>
-        {transactions.data && (
-          <TransactionList transactions={transactions.data.lots} />
-        )}
+        {hasData && <TransactionList transactions={transactions.data!.lots} />}
 
-        {transactions.data && (
+        {hasData && (
           <Pagination
             from={page}
             limit={LIMIT}
-            total={transactions.data.total}
+            total={transactions.data!.total}
             onChange={setPage}
           />
+        )}
+
+        {!hasData && (
+          <span>Aucune transaction trouvée pour ces paramètres.</span>
         )}
       </Main>
     </React.Fragment>

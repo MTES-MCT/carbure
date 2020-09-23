@@ -9,7 +9,7 @@ import { Plus } from "./icons"
 import { Title, Button, StatusButton, Select, SearchInput } from "./system"
 
 const STATUS = [
-  { key: LotStatus.Drafts, label: "Brouillons" },
+  { key: LotStatus.Draft, label: "Brouillons" },
   { key: LotStatus.Validated, label: "Lots envoyés" },
   { key: LotStatus.ToFix, label: "Lots à corriger" },
   { key: LotStatus.Accepted, label: "Lots acceptés" },
@@ -28,12 +28,16 @@ type TransactionSnapshotProps = {
   snapshot: ApiState<Snapshot>
   activeStatus: string
   setActiveStatus: Function
+  filters: { [k: string]: string }
+  setFilters: Function
 }
 
 const TransactionSnapshot = ({
   snapshot,
   activeStatus,
   setActiveStatus,
+  filters,
+  setFilters,
 }: TransactionSnapshotProps) => (
   <React.Fragment>
     <div className={styles.transactionSnapshot}>
@@ -62,10 +66,15 @@ const TransactionSnapshot = ({
     <div className={styles.lastRow}>
       <div className={styles.filters}>
         {FILTERS.map(({ key, label }) => (
-          <Select key={key} defaultValue="label">
-            <option value="label" disabled>
-              {label}
-            </option>
+          <Select
+            key={key}
+            value={filters[key]}
+            defaultValue=""
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              setFilters({ ...filters, [key]: e.target.value })
+            }
+          >
+            <option value="">{label}</option>
             {snapshot.data?.filters[key as keyof Snapshot["filters"]].map(
               ({ key, label }) => (
                 <option key={key} value={key}>

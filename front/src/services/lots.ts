@@ -6,11 +6,11 @@ export type Pagination = {
 }
 
 export enum LotStatus {
-  Drafts = "drafts",
+  Draft = "draft",
   Validated = "validated",
   ToFix = "tofix",
   Accepted = "accepted",
-  // Weird = "weird" @TODO
+  Weird = "weird",
 }
 
 export type CarbureClient = any
@@ -114,10 +114,11 @@ export type Filter = {
 
 export type Snapshot = {
   lots: {
-    [LotStatus.Drafts]: number
+    [LotStatus.Draft]: number
     [LotStatus.Validated]: number
     [LotStatus.ToFix]: number
     [LotStatus.Accepted]: number
+    [LotStatus.Weird]: number
   }
 
   filters: {
@@ -132,15 +133,37 @@ export type Snapshot = {
   deadlines: any[]
 }
 
+// extract the status name from the lot details
+export function getStatus(lot: Lot): LotStatus {
+  const status = lot.lot.status.toLowerCase()
+  const delivery = lot.delivery_status
+
+  if (status === "draft") {
+    return LotStatus.Draft
+  } else if (status === "validated") {
+    if (["N", "AA"].includes(delivery)) {
+      return LotStatus.Validated
+    } else if (delivery === "AC") {
+      return LotStatus.ToFix
+    } else if (delivery === "A") {
+      return LotStatus.Accepted
+    }
+  }
+
+  return LotStatus.Weird
+}
+
 export function getLots(
   status: LotStatus,
   producerID: number,
+  filters: any,
   from: number,
   limit: number
 ): ApiResponse<Lots> {
   return api.get("/lots", {
     status,
     producer_id: producerID,
+    ...filters,
     from_idx: from * limit,
     limit,
   })
