@@ -6,12 +6,16 @@
 }
 
 body {
+  display: flex;
   margin: 0;
   font-family: Source Sans Pro, Arial, sans-serif;
   font-size: 16px;
   line-height: 1.5em;
-  background-color: #ededed;
-  overflow-x: hidden;
+  background-color: var(--body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  flex: 1;
 }
