@@ -3,7 +3,7 @@ import cl from "clsx"
 
 import styles from "./transaction-list.module.css"
 
-import { Lot, LotStatus } from "../services/lots"
+import { getStatus, Lot, LotStatus } from "../services/lots"
 import { Table } from "./system"
 import { truncate } from "../utils/format"
 
@@ -23,6 +23,14 @@ const COLUMNS = [
   "Économie",
 ]
 
+const STATUS = {
+  [LotStatus.Draft]: "Brouillon",
+  [LotStatus.Validated]: "Envoyé",
+  [LotStatus.ToFix]: "À corriger",
+  [LotStatus.Accepted]: "Accepté",
+  [LotStatus.Weird]: "Problème",
+}
+
 const Cell = ({ text }: { text: string }) => (
   <span title={text}>{truncate(text)}</span>
 )
@@ -36,7 +44,7 @@ const DualCell = ({ top, bottom }: { top: string; bottom: string }) => (
   </div>
 )
 
-const Status = ({ value }: { value: string }) => (
+const Status = ({ value }: { value: LotStatus }) => (
   <span
     className={cl(styles.status, {
       [styles.statusValidated]: value === LotStatus.Validated,
@@ -44,7 +52,7 @@ const Status = ({ value }: { value: string }) => (
       [styles.statusAccepted]: value === LotStatus.Accepted,
     })}
   >
-    {value}
+    {STATUS[value]}
   </span>
 )
 
@@ -57,7 +65,7 @@ const TransactionList = ({ transactions }: TransactionListProps) => (
         </td>
 
         <td>
-          <Status value={transaction.lot.status.toLowerCase()} />
+          <Status value={getStatus(transaction)} />
         </td>
 
         <td>
