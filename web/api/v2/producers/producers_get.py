@@ -122,7 +122,7 @@ def get_out(request, *args, **kwargs):
                                        )
         page = filtered[start:start+length]
     else:
-        transactions = LotTransaction.objects.filter(lot__status='Validated')
+        transactions = LotTransaction.objects.filter(carbure_vendor=context['user_entity'], lot__status='Validated')
         filtered = transactions
         page = transactions[start:start+length]
     comments = TransactionComment.objects.filter(tx__in=[t for t in page])
