@@ -1477,6 +1477,8 @@ const dt_producers_out_config = {
   paging: true,
   info: true,
   dom: 'rtp',
+  serverSide: true,
+  processing: true,
   columnDefs: [
     {
       targets: [0],
