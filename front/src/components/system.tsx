@@ -11,6 +11,12 @@ type SystemProps = {
   children?: React.ReactNode
 }
 
+type MainProps = SystemProps & React.HTMLProps<HTMLDivElement>
+
+export const Main = ({ className, ...props }: MainProps) => (
+  <main {...props} className={cl(styles.main, className)} />
+)
+
 // SELECT COMPONENT
 
 type SelectProps = SystemProps & React.HTMLProps<HTMLSelectElement>
@@ -161,3 +167,30 @@ export const SearchInput = ({ className, ...props }: InputProps) => (
     <Input {...props} className={styles.searchInput} />
   </div>
 )
+
+// TABLE COMPONENT
+
+type TableProps<T> = SystemProps &
+  Omit<React.HTMLProps<HTMLTableElement>, "rows"> & {
+    rows: T[]
+    columns: string[]
+    children: (row: T, i: number) => React.ReactNode
+  }
+
+export function Table<T>({ columns, rows, children, ...props }: TableProps<T>) {
+  return (
+    <table {...props} className={styles.table}>
+      <thead>
+        <tr className={styles.header}>
+          <th>
+            <input type="checkbox" />
+          </th>
+          {columns.map((column) => (
+            <th key={column}>{column}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>{rows.map((row, i) => children(row, i))}</tbody>
+    </table>
+  )
+}
