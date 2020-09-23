@@ -14,7 +14,9 @@ def get_drafts(request, *args, **kwargs):
     context = kwargs['context']
     transactions = LotTransaction.objects.filter(lot__added_by=context['user_entity'], lot__status='Draft')
     txsez = serializers.serialize('json', transactions, use_natural_foreign_keys=True)
-    return JsonResponse({'transactions': txsez})
+    comments_tx_added = TransactionComment.objects.filter(tx__in=transactions, topic__in=['SUSTAINABILITY', 'BOTH'])
+    commentssez = serializers.serialize('json', comments, use_natural_foreign_keys=True)
+    return JsonResponse({'transactions': txsez, 'comments': commentssez})
 
 
 @login_required
