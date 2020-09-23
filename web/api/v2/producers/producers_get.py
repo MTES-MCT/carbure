@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.core import serializers
 
 from core.decorators import enrich_with_user_details, restrict_to_producers, get_producer_corrections
@@ -102,8 +103,29 @@ def get_corrections(request, *args, **kwargs):
 @restrict_to_producers
 def get_out(request, *args, **kwargs):
     context = kwargs['context']
-    transactions = LotTransaction.objects.filter(carbure_vendor=context['user_entity'], lot__status='Validated')
-    comments = TransactionComment.objects.filter(tx__in=transactions)
-    txsez = serializers.serialize('json', transactions, use_natural_foreign_keys=True)
+    start = int(request.GET.get('start', 0))
+    length = int(request.GET.get('length', 25))
+    search = request.GET.get('search[value]', None)
+
+    if search != '':
+        transactions = LotTransaction.objects.filter(carbure_vendor=context['user_entity'], lot__status='Validated')
+        filtered = transactions.filter(Q(lot__matiere_premiere__name__icontains=search) |
+                                       Q(lot__biocarburant__name__icontains=search) |
+                                       Q(lot__carbure_producer__name__icontains=search) |
+                                       Q(lot__unknown_producer__icontains=search) |
+                                       Q(lot__carbure_id__icontains=search) |
+                                       Q(lot__pays_origine__name__icontains=search) |
+                                       Q(carbure_client__name__icontains=search) |
+                                       Q(unknown_client__icontains=search) |
+                                       Q(carbure_delivery_site__name__icontains=search) |
+                                       Q(unknown_delivery_site__icontains=search)
+                                       )
+        page = filtered[start:start+length]
+    else:
+        transactions = LotTransaction.objects.filter(lot__status='Validated')
+        filtered = transactions
+        page = transactions[start:start+length]
+    comments = TransactionComment.objects.filter(tx__in=[t for t in page])
+    txsez = serializers.serialize('json', page, use_natural_foreign_keys=True)
     commentssez = serializers.serialize('json', comments, use_natural_foreign_keys=True)
-    return JsonResponse({'transactions': txsez, 'comments': commentssez})
+    return JsonResponse({'transactions': txsez, 'comments': commentssez, 'recordsFiltered': len(filtered), 'recordsTotal': len(transactions)})
