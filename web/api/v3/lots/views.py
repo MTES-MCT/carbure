@@ -72,7 +72,7 @@ def get_lots(request):
     returned = txs[from_idx:from_idx+limit]
 
     data = {}
-    data['lots'] = [t.natural_key() for t in txs]
+    data['lots'] = [t.natural_key() for t in returned]
     data['total'] = len(txs)
     data['returned'] = len(returned)
     data['from'] = from_idx
