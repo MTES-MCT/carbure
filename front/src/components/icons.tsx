@@ -35,6 +35,54 @@ export const ChevronDown = ({
   </svg>
 )
 
+export const ChevronLeft = ({
+  size = 24,
+  color = "currentColor",
+  stroke = 2,
+  className,
+  ...props
+}: IconProps) => (
+  <svg
+    className={cl("icon", "icon-chevron-down", className)}
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    strokeWidth={stroke}
+    stroke={color}
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <polyline points="15 6 9 12 15 18" />
+  </svg>
+)
+
+export const ChevronRight = ({
+  size = 24,
+  color = "currentColor",
+  stroke = 2,
+  className,
+  ...props
+}: IconProps) => (
+  <svg
+    className={cl("icon", "icon-chevron-down", className)}
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    strokeWidth={stroke}
+    stroke={color}
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <polyline points="9 6 15 12 9 18" />
+  </svg>
+)
+
 export const Plus = ({
   size = 24,
   color = "currentColor",
@@ -72,11 +120,11 @@ export const Search = ({
     width={size}
     height={size}
     viewBox="0 0 24 24"
-    stroke-width={stroke}
+    strokeWidth={stroke}
     stroke={color}
     fill="none"
-    stroke-linecap="round"
-    stroke-linejoin="round"
+    strokeLinecap="round"
+    strokeLinejoin="round"
     {...props}
   >
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
