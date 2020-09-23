@@ -26,14 +26,14 @@ const FILTERS = [
 
 type TransactionSnapshotProps = {
   snapshot: ApiState<Snapshot>
-  activeStatus: { [k: string]: boolean }
-  toggleStatus: Function
+  activeStatus: string
+  setActiveStatus: Function
 }
 
 const TransactionSnapshot = ({
   snapshot,
   activeStatus,
-  toggleStatus,
+  setActiveStatus,
 }: TransactionSnapshotProps) => (
   <React.Fragment>
     <div className={styles.transactionSnapshot}>
@@ -50,10 +50,10 @@ const TransactionSnapshot = ({
         {STATUS.map(({ key, label }) => (
           <StatusButton
             key={key}
-            active={activeStatus[key]}
-            amount={snapshot.data?.lots[key] ?? "N/A"}
+            active={key === activeStatus}
+            amount={snapshot.data?.lots[key] ?? "…"}
             label={label}
-            onClick={() => toggleStatus(key)}
+            onClick={() => setActiveStatus(key)}
           />
         ))}
       </div>
@@ -62,13 +62,15 @@ const TransactionSnapshot = ({
     <div className={styles.lastRow}>
       <div className={styles.filters}>
         {FILTERS.map(({ key, label }) => (
-          <Select>
-            <option disabled selected>
+          <Select key={key} defaultValue="label">
+            <option value="label" disabled>
               {label}
             </option>
             {snapshot.data?.filters[key as keyof Snapshot["filters"]].map(
               ({ key, label }) => (
-                <option value={key}>{label}</option>
+                <option key={key} value={key}>
+                  {label}
+                </option>
               )
             )}
           </Select>
