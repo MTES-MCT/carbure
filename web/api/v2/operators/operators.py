@@ -619,6 +619,8 @@ def reject_lot(request, *args, **kwargs):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Transaction inconnue", 'extra': str(e)}, status=400)
     tx.delivery_status = 'R'
+    tx.lot.status = 'Draft'
+    tx.lot.save()
     tx.save()
     txerr = TransactionComment()
     txerr.entity = context['user_entity']
