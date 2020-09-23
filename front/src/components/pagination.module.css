@@ -1,0 +1,27 @@
+.pagination {
+  display: flex;
+  align-items: stretch;
+  padding: 16px 8px;
+  background-color: var(--white);
+  margin-top: 32px;
+  border: 1px solid var(--gray-medium);
+  border-radius: 5px;
+  align-self: center;
+}
+
+.paginationButton {
+  margin: 0 8px;
+  padding: 8px;
+  width: 42px;
+  justify-content: center;
+}
+
+.paginationButton svg {
+  margin: 0;
+}
+
+.paginationTotal {
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+}
