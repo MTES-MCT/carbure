@@ -1,31 +1,28 @@
 import React, { useState } from "react"
 
-import { Settings } from "../services/settings"
-
 import useAPI, { ApiState } from "../hooks/use-api"
-import { getSnapshot, LotStatus } from "../services/lots"
+import { Settings } from "../services/settings"
+import { getSnapshot, getLots, LotStatus } from "../services/lots"
+
+import { Main } from "../components/system"
 import TransactionSnapshot from "../components/transaction-snapshot"
+import TransactionList from "../components/transaction-list"
+import Pagination from "../components/pagination"
+
+// @TODO harcoded pagination limit value
+const LIMIT = 10
 
 type TransactionsProps = {
   settings: ApiState<Settings>
   entity: number
 }
 
-type ActiveStatus = { [k: string]: boolean }
-
 const Transactions = ({ settings, entity }: TransactionsProps) => {
   const snapshot = useAPI(getSnapshot)
+  const transactions = useAPI(getLots)
 
-  const [activeStatus, setActiveStatus] = useState<ActiveStatus>({
-    [LotStatus.Drafts]: true,
-    [LotStatus.ToFix]: false,
-    [LotStatus.Accepted]: false,
-    [LotStatus.Validated]: false,
-  })
-
-  function toggleStatus(status: LotStatus) {
-    setActiveStatus({ ...activeStatus, [status]: !activeStatus[status] })
-  }
+  const [activeStatus, setActiveStatus] = useState(LotStatus.Drafts)
+  const [page, setPage] = useState(0)
 
   if (entity < 0 || !settings.data) {
     return null
@@ -36,14 +33,30 @@ const Transactions = ({ settings, entity }: TransactionsProps) => {
   )!
 
   snapshot.useResolve(right.entity.id)
+  transactions.useResolve(activeStatus, right.entity.id, page, LIMIT)
 
   return (
     <React.Fragment>
       <TransactionSnapshot
         snapshot={snapshot}
         activeStatus={activeStatus}
-        toggleStatus={toggleStatus}
+        setActiveStatus={setActiveStatus}
       />
+
+      <Main>
+        {transactions.data && (
+          <TransactionList transactions={transactions.data.lots} />
+        )}
+
+        {transactions.data && (
+          <Pagination
+            from={page}
+            limit={LIMIT}
+            total={transactions.data.total}
+            onChange={setPage}
+          />
+        )}
+      </Main>
     </React.Fragment>
   )
 }
