@@ -44,6 +44,15 @@ def get_lots(request):
 
     txs = LotTransaction.objects.filter(lot__carbure_producer=producer)
 
+    if status == 'draft':
+        txs = txs.filter(lot__status='Draft')
+    elif status == 'validated':
+        txs = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA'])
+    elif status == 'tofix':
+        txs = txs.filter(lot__status='Validated', delivery_status='AC')
+    elif status == 'accepted':
+        txs = txs.filter(lot__status='Validated', delivery_status='A')
+
     # apply filters
     date_from = datetime.date.today().replace(month=1, day=1)
     date_until = datetime.date.today().replace(month=12, day=31)
@@ -110,11 +119,11 @@ def get_snapshot(request):
 
     txs = LotTransaction.objects.filter(lot__carbure_producer=producer)
 
-    drafts = len(txs.filter(lot__status='Draft'))
+    draft = len(txs.filter(lot__status='Draft'))
     validated = len(txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA']))
     tofix = len(txs.filter(lot__status='Validated', delivery_status='AC'))
     accepted = len(txs.filter(lot__status='Validated', delivery_status='A'))
-    data['lots'] = {'drafts': drafts, 'validated': validated, 'tofix': tofix, 'accepted': accepted}
+    data['lots'] = {'draft': draft, 'validated': validated, 'tofix': tofix, 'accepted': accepted}
 
     mps = [{'key': m.code, 'label': m.name}
            for m in MatierePremiere.objects.filter(id__in=txs.values('lot__matiere_premiere').distinct())]
