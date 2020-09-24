@@ -244,6 +244,9 @@ class LotV2(models.Model):
         db_table = 'lots_v2'
         verbose_name = 'LotV2'
         verbose_name_plural = 'LotsV2'
+        indexes = [
+            models.Index(fields=["status"]),
+        ]
 
 
 class LotTransaction(models.Model):
@@ -294,6 +297,10 @@ class LotTransaction(models.Model):
         db_table = 'transactions'
         verbose_name = 'Transaction'
         verbose_name_plural = 'Transactions'
+        indexes = [
+            models.Index(fields=["carbure_vendor"]),
+            models.Index(fields=["carbure_client"]),
+        ]
 
 
 class LotV2Error(models.Model):
