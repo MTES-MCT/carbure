@@ -36,7 +36,6 @@ COPY web/api /app/web/api
 COPY web/run.sh /app/web/run.sh
 
 COPY scripts /app/scripts
-COPY web/tests /app/web/tests
 
 
 
