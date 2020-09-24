@@ -400,17 +400,17 @@ def excel_template_upload(request, *args, **kwargs):
 @restrict_to_operators
 def get_in(request, *args, **kwargs):
     context = kwargs['context']
+    now = datetime.datetime.now()
     # lots assigned by others + lots imported
-    transactions = LotTransaction.objects.filter(carbure_client=context['user_entity'], delivery_status__in=['N', 'AC', 'AA'], lot__status="Validated")
-    lot_ids = [t.lot.id for t in transactions]
-    lots = LotV2.objects.filter(id__in=lot_ids)
-    errors = LotV2Error.objects.filter(lot__in=lots)
+    transactions = LotTransaction.objects.select_related('lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
+                                                         'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant',
+                                                         'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
+                                                         'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country').filter(carbure_client=context['user_entity'], delivery_status__in=['N', 'AC', 'AA'], lot__status="Validated")
     comments = TransactionComment.objects.filter(tx__in=transactions)
-    #sez = serializers.serialize('json', lots, use_natural_foreign_keys=True)
     txsez = serializers.serialize('json', transactions, use_natural_foreign_keys=True)
-    errsez = serializers.serialize('json', errors, use_natural_foreign_keys=True)
     commentssez = serializers.serialize('json', comments, use_natural_foreign_keys=True)
-    return JsonResponse({'errors': errsez, 'transactions': txsez, 'comments': commentssez})
+    print(datetime.datetime.now() - now)
+    return JsonResponse({'transactions': txsez, 'comments': commentssez})
 
 
 @login_required
