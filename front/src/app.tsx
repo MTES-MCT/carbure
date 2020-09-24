@@ -5,6 +5,7 @@ import useAPI from "./hooks/use-api"
 import { getSettings } from "./services/settings"
 
 import Topbar from "./components/top-bar"
+import Footer from "./components/footer"
 import Logout from "./routes/logout"
 import Transactions from "./routes/transactions"
 import Exit from "./components/exit"
@@ -39,6 +40,7 @@ const App = () => {
       <Route path="/logout">
         <Logout />
       </Route>
+      <Footer />
     </BrowserRouter>
   )
 }
