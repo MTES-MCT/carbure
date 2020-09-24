@@ -5,6 +5,8 @@ WORKDIR /app
 COPY front/package.json /app/
 COPY front/package-lock.json /app/
 
+ENV PATH /app/node_modules/.bin:$PATH
+
 RUN npm install
 
 COPY front /app
