@@ -244,10 +244,8 @@ $("#pagelength").on('change', function() {
   window.table.page.len(pagelength).draw()
 })
 
-
-/* TODO: be smarter */
-$("#pagelength_2").on('change', function() {
-  let pagelength = $("#pagelength_2").val()
+$(".pagelength").on('change', function() {
+  let pagelength = $(this).val()
   window.table.page.len(pagelength).draw()
 })
 
