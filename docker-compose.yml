@@ -58,6 +58,7 @@ services:
     stdin_open: true
     restart: always
     container_name: carbure_frontend
+    image: carbure_web:local    
     build:
       context: ${CARBURE_HOME}
       dockerfile: docker/Dockerfile.frontend
@@ -67,6 +68,8 @@ services:
     volumes:
       - "/app/node_modules"
       - "./front:/app" # needed for hot-reloading
+    networks:
+      - carbure
 
   carbure-web-proxy:
     build:
