@@ -410,6 +410,9 @@ def update_tx(transaction, lot, request, context):
     transaction.ghg_reduction = lot.ghg_reduction
     transaction.champ_libre = request.POST.get('champ_libre', '')
 
+    if transaction.delivery_status in ['R', 'AC']:
+        transaction.delivery_status = 'AA'
+
 
 @login_required
 @enrich_with_user_details
