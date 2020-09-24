@@ -1,10 +1,10 @@
 import datetime
-from core.models import LotValidationError, MatierePremiere, Biocarburant, Pays
+from core.models import LotValidationError
 
 # init data cache
-#MPS = {m.code: m for m in MatierePremiere.objects.all()}
-#BCS = {b.code: b for b in Biocarburant.objects.all()}
-#COUNTRIES = {p.code_pays: p for p in Pays.objects.all()}
+# MPS = {m.code: m for m in MatierePremiere.objects.all()}
+# BCS = {b.code: b for b in Biocarburant.objects.all()}
+# COUNTRIES = {p.code_pays: p for p in Pays.objects.all()}
 
 # definitions
 
@@ -70,7 +70,6 @@ def sanity_check(lot):
         else:
             pass
 
-
     if lot.biocarburant and lot.matiere_premiere:
         # consistence des matieres premieres avec biocarburant
         if lot.biocarburant.is_alcool and lot.matiere_premiere.compatible_alcool is False:
@@ -95,14 +94,12 @@ def sanity_check(lot):
             if lot.biocarburant.code == 'EMHA' and lot.matiere_premiere.code not in ['HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2', 'HUILES_OU_GRAISSES_ANIMALES_CAT3']:
                 raise_error(lot, 'MP_BC_INCOHERENT', warning_to_user=True, warning_to_admin=True, details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
 
-
         if lot.matiere_premiere.code in ['HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2', 'HUILES_OU_GRAISSES_ANIMALES_CAT3'] and lot.biocarburant.code != 'EMHA':
             raise_error(lot, 'MP_BC_INCOHERENT', warning_to_user=True, warning_to_admin=True, details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
         if lot.matiere_premiere.code == 'HUILE_ALIMENTAIRE_USAGEE' and lot.biocarburant.code != 'EMHU':
             raise_error(lot, 'MP_BC_INCOHERENT', warning_to_user=True, warning_to_admin=True, details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
         if lot.matiere_premiere.code in ['COLZA', 'TOURNESOL', 'SOJA', 'HUILE_PALME', 'EFFLUENTS_HUILERIES_PALME_RAFLE'] and lot.biocarburant.code != 'EMHV':
             raise_error(lot, 'MP_BC_INCOHERENT', warning_to_user=True, warning_to_admin=True, details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
-
 
         if lot.biocarburant.is_alcool:
             if lot.biocarburant.code in ['ET', 'ETBE'] and lot.matiere_premiere.code not in ['MAIS', 'BLE', 'BETTERAVE', 'CANNE_A_SUCRE', 'RESIDUS_VINIQUES']:
@@ -114,6 +111,7 @@ def sanity_check(lot):
     after = datetime.datetime.now()
     duration = after - now
     print(duration)
+
 
 def queryset_sanity_check(queryset):
     for lot in queryset:

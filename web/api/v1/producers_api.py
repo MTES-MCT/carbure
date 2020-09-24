@@ -1,5 +1,4 @@
 import random
-import csv
 import datetime
 
 from django.contrib.auth.decorators import login_required
@@ -7,7 +6,7 @@ from django.db.models import Max
 from django.http import JsonResponse, HttpResponse
 
 from core.decorators import enrich_with_user_details, restrict_to_producers
-from core.models import Biocarburant, MatierePremiere, Pays, Entity, GHGValues
+from core.models import Biocarburant, MatierePremiere, Pays, GHGValues
 from producers.models import ProductionSite, ProductionSiteOutput, ProductionSiteInput, ProducerCertificate
 from core.xlsx_template import create_template_xlsx
 
@@ -46,7 +45,8 @@ def producers_prod_site_autocomplete(request, *args, **kwargs):
     q = request.GET['query']
     producer = context['user_entity']
     production_sites = ProductionSite.objects.filter(producer=producer, name__icontains=q)
-    return JsonResponse({'suggestions': [{'value': s.name, 'data': s.id, 'country': s.country.natural_key()} for s in production_sites]})
+    suggestions = [{'value': s.name, 'data': s.id, 'country': s.country.natural_key()} for s in production_sites]
+    return JsonResponse({'suggestions': suggestions})
 
 
 @login_required
@@ -209,7 +209,8 @@ def producers_settings_add_site(request, *args, **kwargs):
     try:
         obj, created = ProductionSite.objects.update_or_create(producer=context['user_entity'], country=country,
                                                                name=name,
-                                                               defaults={'date_mise_en_service': date_mise_en_service, 'ges_option': ges_option})
+                                                               defaults={'date_mise_en_service': date_mise_en_service,
+                                                                         'ges_option': ges_option})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
                             'extra': str(e)}, status=400)

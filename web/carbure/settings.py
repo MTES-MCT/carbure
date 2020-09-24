@@ -27,7 +27,7 @@ SECRET_KEY = env('SECRET_KEY')
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-if env('TEST') == False:
+if env('TEST') is False:
     sentry_sdk.init(
         dsn=env('SENTRY_DSN'),
         integrations=[DjangoIntegration()],
@@ -89,9 +89,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'carbure.wsgi.application'
 
-if env('TEST') == False:
-    DATABASES = {
-    'default': {
+if env('TEST') is False:
+    DATABASES = {'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': env('DJANGO_DATABASE'),
         'USER': env('DJANGO_DB_USER'),
@@ -102,7 +101,7 @@ if env('TEST') == False:
     }
 else:
     print('TESTING MODE')
-    DATABASES = {'default': {'ENGINE':'django.db.backends.sqlite3'}}
+    DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3'}}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -145,18 +144,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'index'
 
-if env('TEST') == False:
+if env('TEST') is False:
     EMAIL_HOST = env('EMAIL_HOST')
     EMAIL_PORT = env('EMAIL_PORT')
     EMAIL_HOST_USER = env('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
     EMAIL_USE_TLS = env('EMAIL_USE_TLS')
-    DEFAULT_FROM_EMAIL="contact@carbure.beta.gouv.fr"
+    DEFAULT_FROM_EMAIL = "contact@carbure.beta.gouv.fr"
 
     # file storage
     DEFAULT_FILE_STORAGE = 'carbure.storage_backends.MediaStorage'
     AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
-    AWS_ACCESS_KEY_ID= env("AWS_ACCESS_KEY_ID")
+    AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
     AWS_S3_ENDPOINT_URL = env("AWS_S3_ENDPOINT_URL")
     AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME")
