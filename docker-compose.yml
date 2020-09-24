@@ -58,13 +58,13 @@ services:
     stdin_open: true
     restart: always
     container_name: carbure_frontend
-    image: carbure_web:local    
+    image: carbure_frontend:local    
     build:
       context: ${CARBURE_HOME}
       dockerfile: docker/Dockerfile.frontend
     volumes:
       - "/app/node_modules"
-      - "./front:/app" # needed for hot-reloading
+      - "./front/src:/app/src" # needed for hot-reloading
     networks:
       - carbure
 
