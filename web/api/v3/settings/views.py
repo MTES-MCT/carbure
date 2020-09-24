@@ -38,12 +38,14 @@ def add_production_site(request):
     try:
         country = Pays.objects.get(code_pays=country)
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown country_code %s" % (country), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown country_code %s" % (country), 'extra': str(e)},
+                            status=400)
 
     try:
         producer = Entity.objects.get(id=producer, entity_type='Producteur')
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown producer %s" % (producer), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown producer %s" % (producer), 'extra': str(e)},
+                            status=400)
 
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     if producer not in rights:
@@ -51,7 +53,8 @@ def add_production_site(request):
 
     try:
         obj, created = ProductionSite.objects.update_or_create(producer=producer, country=country, name=name,
-                                                               defaults={'date_mise_en_service': date_mise_en_service, 'ges_option': ges_option})
+                                                               defaults={'date_mise_en_service': date_mise_en_service,
+                                                                         'ges_option': ges_option})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
                             'extra': str(e)}, status=400)
@@ -68,12 +71,14 @@ def delete_production_site(request):
     # we have all the data, make sure we are allowed to delete it
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     if ps.producer not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit production site %s" % (site)}, status=403)
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit production site %s" % (site)},
+                            status=403)
 
     # make sure there is no impact by deleting this
     lots = LotV2.objects.filter(carbure_production_site=ps, status='Validated')
     if len(lots) > 0:
-        return JsonResponse({'status': 'error', 'message': "Validated lots associated with this production site. Cannot delete"}, status=400)
+        msg = "Validated lots associated with this production site. Cannot delete"
+        return JsonResponse({'status': 'error', 'message': msg}, status=400)
     ps.delete()
     return JsonResponse({'status': 'success'})
 
@@ -90,7 +95,8 @@ def add_production_site_certificate(request):
     try:
         producer = Entity.objects.get(id=producer, entity_type='Producteur')
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown producer %s" % (producer), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown producer %s" % (producer), 'extra': str(e)},
+                            status=400)
 
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     if producer not in rights:
@@ -171,7 +177,8 @@ def add_production_site_mp(request):
     # we have all the data, make sure we are allowed to delete it
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     if ps.producer not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit production site %s" % (site)}, status=403)
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit production site %s" % (site)},
+                            status=403)
 
     try:
         obj, created = ProductionSiteInput.objects.update_or_create(production_site=site, matiere_premiere=mp)
@@ -193,7 +200,8 @@ def delete_production_site_mp(request):
     try:
         mp = MatierePremiere.objects.get(code=mp)
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown matiere_premiere_code %s" % (mp), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown matiere_premiere_code %s" % (mp), 'extra': str(e)},
+                            status=400)
 
     try:
         ps = ProductionSite.objects.get(id=site)
@@ -203,7 +211,8 @@ def delete_production_site_mp(request):
     # we have all the data, make sure we are allowed to delete it
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     if ps.producer not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit production site %s" % (site)}, status=403)
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit production site %s" % (site)},
+                            status=403)
 
     try:
         obj = ProductionSiteInput.objects.get(production_site=ps, matiere_premiere=mp)
@@ -226,7 +235,8 @@ def add_production_site_bc(request):
     try:
         biocarburant = Biocarburant.objects.get(code=biocarburant)
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown biocarburant_code %s" % (biocarburant), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown biocarburant_code %s" % (biocarburant),
+                            'extra': str(e)}, status=400)
 
     try:
         site = ProductionSite.objects.get(id=site)
@@ -236,7 +246,8 @@ def add_production_site_bc(request):
     # we have all the data, make sure we are allowed to delete it
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     if site.producer not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit production site %s" % (site)}, status=403)
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit production site %s" % (site)},
+                            status=403)
 
     try:
         obj, created = ProductionSiteOutput.objects.update_or_create(production_site=site, biocarburant=biocarburant)
@@ -258,17 +269,20 @@ def delete_production_site_bc(request):
     try:
         biocarburant = Biocarburant.objects.get(code=biocarburant)
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown biocarburant_code %s" % (biocarburant), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown biocarburant_code %s" % (biocarburant),
+                            'extra': str(e)}, status=400)
 
     try:
         ps = ProductionSite.objects.get(id=site)
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown Production Site %s" % (site), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown Production Site %s" % (site), 'extra': str(e)},
+                            status=400)
 
     # we have all the data, make sure we are allowed to delete it
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     if ps.producer not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit production site %s" % (site)}, status=403)
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit production site %s" % (site)},
+                            status=403)
 
     try:
         obj = ProductionSiteOutput.objects.get(production_site=ps, biocarburant=biocarburant)
@@ -285,7 +299,8 @@ def enable_mac(request, *args, **kwargs):
     try:
         producer = Entity.objects.get(id=producer, entity_type='Producteur')
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown Producer %s" % (producer), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown Producer %s" % (producer), 'extra': str(e)},
+                            status=400)
 
     # we have all the data, make sure we are allowed to delete it
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
@@ -303,7 +318,8 @@ def disable_mac(request, *args, **kwargs):
     try:
         producer = Entity.objects.get(id=producer, entity_type='Producteur')
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown Producer %s" % (producer), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown Producer %s" % (producer), 'extra': str(e)},
+                            status=400)
 
     # we have all the data, make sure we are allowed to delete it
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
@@ -321,7 +337,8 @@ def enable_trading(request, *args, **kwargs):
     try:
         producer = Entity.objects.get(id=producer, entity_type='Producteur')
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown Producer %s" % (producer), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown Producer %s" % (producer), 'extra': str(e)},
+                            status=400)
 
     # we have all the data, make sure we are allowed to delete it
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
@@ -339,7 +356,8 @@ def disable_trading(request, *args, **kwargs):
     try:
         producer = Entity.objects.get(id=producer, entity_type='Producteur')
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown Producer %s" % (producer), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown Producer %s" % (producer), 'extra': str(e)},
+                            status=400)
 
     # we have all the data, make sure we are allowed to delete it
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]

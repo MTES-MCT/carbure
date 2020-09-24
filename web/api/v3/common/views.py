@@ -9,7 +9,8 @@ def get_matieres_premieres(request):
     mps = MatierePremiere.objects.all()
     if q:
         mps = mps.filter(Q(name__icontains=q) | Q(code__icontains=q))
-    sez = [{'code': m.code, 'name': m.name, 'description': m.description, 'compatible_alcool': m.compatible_alcool, 'compatible_graisse': m.compatible_graisse} for m in mps]
+    sez = [{'code': m.code, 'name': m.name, 'description': m.description, 'compatible_alcool': m.compatible_alcool,
+            'compatible_graisse': m.compatible_graisse} for m in mps]
     return JsonResponse({'status': 'success', 'data': sez})
 
 
@@ -79,7 +80,8 @@ def get_delivery_sites(request):
     dsites = Depot.objects.all()
     if q:
         dsites = dsites.filter(Q(name__icontains=q) | Q(depot_id__icontains=q))
-    sez = [{'name': d.name, 'city': d.city, 'depot_id': d.depot_id, 'country': d.country.natural_key(), 'depot_type': d.depot_type} for d in dsites]
+    sez = [{'name': d.name, 'city': d.city, 'depot_id': d.depot_id, 'country': d.country.natural_key(),
+            'depot_type': d.depot_type} for d in dsites]
     return JsonResponse({'status': 'success', 'data': sez})
 
 
@@ -104,7 +106,8 @@ def get_production_sites(request):
     outputs = ProductionSiteOutput.objects.filter(production_site__in=psites)
     for o in outputs:
         psitesbyid[o.production_site.id].outputs.append(o.biocarburant.natural_key())
-    sez = [{'name': p.name, 'id': p.id, 'country': p.country.natural_key(), 'date_mise_en_service': p.date_mise_en_service,
+    sez = [{'name': p.name, 'id': p.id, 'country': p.country.natural_key(),
+            'date_mise_en_service': p.date_mise_en_service,
             'ges_option': p.ges_option, 'eligible_dc': p.eligible_dc, 'dc_reference': p.dc_reference,
             'inputs': p.inputs, 'outputs': p.outputs, 'producer': p.producer.natural_key()} for p in psites]
     return JsonResponse({'status': 'success', 'data': sez})

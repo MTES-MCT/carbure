@@ -2,12 +2,12 @@ from django.http import JsonResponse
 
 
 def get_users(request):
-    pass
+    return JsonResponse({"status": "error", "message": "Not implemented"}, status=400)
 
 
 def get_entities():
-    pass
+    return JsonResponse({"status": "error", "message": "Not implemented"}, status=400)
 
 
 def get_rights():
-    pass
+    return JsonResponse({"status": "error", "message": "Not implemented"}, status=400)

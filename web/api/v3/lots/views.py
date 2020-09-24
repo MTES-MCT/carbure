@@ -6,8 +6,10 @@ from django.db.models.functions import TruncMonth
 from django.db.models import Count
 from django.db.models.fields import NOT_PROVIDED
 from django.http import JsonResponse, HttpResponse
-from core.models import LotV2, LotTransaction, Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment
-from core.xlsx_template import create_xslx_from_transactions, create_template_xlsx_v2_simple, create_template_xlsx_v2_advanced
+from core.models import LotV2, LotTransaction, LotValidationError
+from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment
+from core.xlsx_template import create_xslx_from_transactions, create_template_xlsx_v2_simple
+from core.xlsx_template import create_template_xlsx_v2_advanced
 from core.common import tx_is_valid, lot_is_valid, generate_carbure_id, load_excel_file, load_lot
 from api.v3.sanity_checks import sanity_check
 
@@ -33,7 +35,8 @@ def get_lots(request):
     try:
         producer = Entity.objects.get(id=producer, entity_type='Producteur')
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown producer %s" % (producer), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown producer %s" % (producer), 'extra': str(e)},
+                            status=400)
 
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     if producer not in rights:
@@ -56,7 +59,8 @@ def get_lots(request):
     if periods:
         txs = txs.filter(lot__period__in=periods)
     if production_sites:
-        txs = txs.filter(Q(lot__carbure_production_site__name__in=production_sites) | Q(lot__unknown_production_site__in=production_sites))
+        txs = txs.filter(Q(lot__carbure_production_site__name__in=production_sites) |
+                         Q(lot__unknown_production_site__in=production_sites))
     if matieres_premieres:
         txs = txs.filter(lot__matiere_premiere__code__in=matieres_premieres)
     if biocarburants:
@@ -81,7 +85,8 @@ def get_lots(request):
         file_location = create_xslx_from_transactions(producer, returned)
         with open(file_location, "rb") as excel:
             data = excel.read()
-            response = HttpResponse(data=data, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            response = HttpResponse(data=data, content_type=ctype)
             response['Content-Disposition'] = 'attachment; filename="%s"' % (file_location)
         return response
 
@@ -96,7 +101,8 @@ def get_snapshot(request):
     try:
         producer = Entity.objects.get(id=producer, entity_type='Producteur')
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown producer %s" % (producer), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown producer %s" % (producer), 'extra': str(e)},
+                            status=400)
 
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     if producer not in rights:
@@ -110,7 +116,7 @@ def get_snapshot(request):
     accepted = len(txs.filter(lot__status='Validated', delivery_status='A'))
     data['lots'] = {'drafts': drafts, 'validated': validated, 'tofix': tofix, 'accepted': accepted}
 
-    mps = [m.natural_key() for m in MatierePremiere.objects.filter(id__in=txs.values('lot__matiere_premiere').distinct())]
+    m = [m.natural_key() for m in MatierePremiere.objects.filter(id__in=txs.values('lot__matiere_premiere').distinct())]
     bcs = [b.natural_key() for b in Biocarburant.objects.filter(id__in=txs.values('lot__biocarburant').distinct())]
     periods = [p for p in txs.values('lot__period').distinct()]
     countries = [c.natural_key() for c in Pays.objects.filter(id__in=txs.values('lot__pays_origine').distinct())]
@@ -121,9 +127,11 @@ def get_snapshot(request):
     ps1 = txs.values('lot__carbure_production_site__name').distinct()
     ps2 = txs.values('lot__unknown_production_site').distinct()
     psites = list(ps1) + list(ps2)
-    data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs, 'periods': periods, 'production_sites': psites, 'countries_of_origin': countries, 'clients': clients}
+    data['filters'] = {'matieres_premieres': m, 'biocarburants': bcs, 'periods': periods, 'production_sites': psites,
+                       'countries_of_origin': countries, 'clients': clients}
 
-    deadlines = txs.filter(lot__status='Draft').annotate(month=TruncMonth('delivery_date')).values('month').annotate(total=Count('id'))
+    tx_drafts = txs.filter(lot__status='Draft')
+    deadlines = tx_drafts.annotate(month=TruncMonth('delivery_date')).values('month').annotate(total=Count('id'))
     for d in deadlines:
         if d['month'] is None:
             d['deadline'] = None
@@ -144,7 +152,8 @@ def add_lot(request):
     try:
         entity = Entity.objects.get(id=entity_id)
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
+                            status=400)
 
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     if entity not in rights:
@@ -165,7 +174,8 @@ def duplicate_lot(request):
     try:
         tx = LotTransaction.objects.get(id=tx_id)
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id), 'extra': str(e)},
+                            status=400)
 
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     if tx.lot.added_by not in rights:
@@ -208,7 +218,8 @@ def delete_lot(request):
         try:
             tx = LotTransaction.objects.get(id=tx_id)
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id), 'extra': str(e)}, status=400)
+            return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id), 'extra': str(e)},
+                                status=400)
 
         rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
         if tx.lot.added_by not in rights:
@@ -216,7 +227,8 @@ def delete_lot(request):
 
         # only allow to delete pending or rejected transactions
         if tx.delivery_status not in ['N', 'R']:
-            return JsonResponse({'status': 'forbidden', 'message': "Transaction already accepted by client"}, status=403)
+            return JsonResponse({'status': 'forbidden', 'message': "Transaction already accepted by client"},
+                                status=403)
         tx.lot.delete()
     return JsonResponse({'status': 'success'})
 
@@ -245,8 +257,8 @@ def validate_lot(request):
             return JsonResponse({'status': 'error', 'message': "Invalid lot: %s" % (error)}, status=400)
 
         # run sanity_checks
-        sanity_check(lot)
-        blocking_sanity_checks = LotValidationError.objects.filter(lot=lot, block_validation=True)
+        sanity_check(tx.lot)
+        blocking_sanity_checks = LotValidationError.objects.filter(lot=tx.lot, block_validation=True)
         if len(blocking_sanity_checks):
             tx.lot.is_valid = False
         else:
@@ -327,10 +339,12 @@ def comment_lot(request):
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     # only the client, vendor and producer can comment
     if tx.carbure_client not in rights or tx.carbure_vendor not in rights or tx.lot.carbure_producer not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to comment on this transaction"}, status=403)
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to comment on this transaction"},
+                            status=403)
 
     if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to comment on behalf of this entity"}, status=403)
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to comment on behalf of this entity"},
+                            status=403)
 
     txc = TransactionComment()
     txc.entity = entity
@@ -366,7 +380,8 @@ def delete_all_drafts(request):
     try:
         entity = Entity.objects.get(id=entity_id)
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
+                            status=400)
 
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     if entity not in rights:
@@ -384,7 +399,8 @@ def template_simple(request):
     try:
         entity = Entity.objects.get(id=entity_id)
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
+                            status=400)
 
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     if entity not in rights:
@@ -410,7 +426,8 @@ def template_advanced(request):
     try:
         entity = Entity.objects.get(id=entity_id)
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
+                            status=400)
 
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     if entity not in rights:
@@ -439,7 +456,8 @@ def upload(request):
     try:
         entity = Entity.objects.get(id=entity_id)
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
+                            status=400)
 
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     if entity not in rights:
