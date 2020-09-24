@@ -112,6 +112,15 @@ export type Filter = {
   label: string
 }
 
+export enum Filters {
+  MatieresPremieres = "matieres_premieres",
+  Biocarburants = "biocarburants",
+  Periods = "periods",
+  ProductionSites = "production_sites",
+  CountriesOfOrigin = "countries_of_origin",
+  Clients = "clients",
+}
+
 export type Snapshot = {
   lots: {
     [LotStatus.Draft]: number
@@ -122,12 +131,12 @@ export type Snapshot = {
   }
 
   filters: {
-    matieres_premieres: Filter[]
-    biocarburants: Filter[]
-    periods: Filter[]
-    production_sites: Filter[]
-    countries_of_origin: Filter[]
-    clients: Filter[]
+    [Filters.MatieresPremieres]: Filter[]
+    [Filters.Biocarburants]: Filter[]
+    [Filters.Periods]: Filter[]
+    [Filters.ProductionSites]: Filter[]
+    [Filters.CountriesOfOrigin]: Filter[]
+    [Filters.Clients]: Filter[]
   }
 
   deadlines: any[]

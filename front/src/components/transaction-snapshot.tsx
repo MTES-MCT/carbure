@@ -1,12 +1,12 @@
 import React from "react"
 
-import { LotStatus, Snapshot } from "../services/lots"
+import { Filter, Filters, LotStatus, Snapshot } from "../services/lots"
 import { ApiState } from "../hooks/use-api"
 
 import styles from "./transaction-snapshot.module.css"
 
 import { Plus } from "./icons"
-import { Title, Button, StatusButton, Select, SearchInput } from "./system"
+import { Title, Button, StatusButton, SearchInput, Select } from "./system"
 
 const STATUS = [
   { key: LotStatus.Draft, label: "Brouillons" },
@@ -16,12 +16,12 @@ const STATUS = [
 ]
 
 const FILTERS = [
-  { key: "periods", label: "Période" },
-  { key: "production_sites", label: "Site de production" },
-  { key: "matieres_premieres", label: "Matière Première" },
-  { key: "biocarburants", label: "Biocarburant" },
-  { key: "countries_of_origin", label: "Pays d'origine" },
-  { key: "clients", label: "Client" },
+  { key: Filters.Periods, label: "Période" },
+  { key: Filters.ProductionSites, label: "Site de production" },
+  { key: Filters.MatieresPremieres, label: "Matière Première" },
+  { key: Filters.Biocarburants, label: "Biocarburant" },
+  { key: Filters.CountriesOfOrigin, label: "Pays d'origine" },
+  { key: Filters.Clients, label: "Client" },
 ]
 
 type TransactionSnapshotProps = {
@@ -75,13 +75,11 @@ const TransactionSnapshot = ({
             }
           >
             <option value="">{label}</option>
-            {snapshot.data?.filters[key as keyof Snapshot["filters"]].map(
-              ({ key, label }) => (
-                <option key={key} value={key}>
-                  {label}
-                </option>
-              )
-            )}
+            {snapshot.data?.filters[key].map(({ key, label }) => (
+              <option key={key} value={key}>
+                {label}
+              </option>
+            ))}
           </Select>
         ))}
       </div>
