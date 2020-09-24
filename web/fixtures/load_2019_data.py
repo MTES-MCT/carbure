@@ -65,8 +65,10 @@ for i, lot in enumerate(lots):
         print('Could not find operator %s in operators' % (lop))
         continue
     op = operators[lop]
-    lc = lot['production_site_country'].upper()
-    if lc not in countries:
+    lc = lot['production_site_country']
+    if lc is not None:
+        lc = lc.upper()
+    else:
         if lot['double_counting_registration'] and lot['double_counting_registration'][0:2] in countries:
             lc = lot['double_counting_registration'][0:2]
         else:
@@ -78,7 +80,8 @@ for i, lot in enumerate(lots):
     if type(lupscd) != type(today) and type(lupscd) != type(now):
         if lupscd == None:
             lupscd = datetime.datetime(year=2008, month=10, day=5)
-        elif type(lupscd) == type(0.01):
+        # float and integers
+        elif type(lupscd) == type(0.01) or type(lupscd) == type(2000):
             if lupscd > 1950 and lupscd < 2050:
                 lupscd = datetime.datetime(year=int(lupscd), month=1, day=1)
             else:
