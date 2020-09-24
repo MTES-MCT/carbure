@@ -17,7 +17,7 @@ server {
     }
 
     # frontend dev server proxy pass
-    location /v2/ {
+    location /v2 {
         proxy_pass  http://carbure-frontend:3000/v2/;
     }
 
