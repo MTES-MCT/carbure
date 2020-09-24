@@ -130,7 +130,9 @@ def validate_lots(request, *args, **kwargs):
         tx.lot.status = "Validated"
         if tx.carbure_client == context['user_entity']:
             tx.delivery_status = 'A'
-            tx.save()
+        else:
+            tx.delivery_status = 'N'
+        tx.save()
         tx.lot.save()
         results.append({'tx_id': txid, 'status': 'success'})
     print('Producers - Validate lot: %s' % (results))
