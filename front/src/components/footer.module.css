@@ -1,0 +1,13 @@
+.footerContainer {
+  display: flex;
+  height: 200px;
+}
+
+.flexCell {
+  flex-grow: 1;
+  flex-basis: 25%;
+}
+
+.footerImage {
+  max-height: 100%;
+}
