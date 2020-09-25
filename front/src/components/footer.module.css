@@ -31,11 +31,11 @@
   text-align: center;
 }
 
-a,
-a:hover,
-a:focus,
-a:visited,
-a:active {
+.footerContainer a,
+.footerContainer a:hover,
+.footerContainer a:focus,
+.footerContainer a:visited,
+.footerContainer a:active {
   color: #0053b3;
 }
 
@@ -54,7 +54,7 @@ a:active {
 }
 
 .footerContainer h2 {
-  font-family: Evolventa,Trebuchet MS,sans-serif;
+  font-family: Evolventa, Trebuchet MS, sans-serif;
   font-size: 1.75em;
   line-height: 1.25em;
   margin-top: 0;
