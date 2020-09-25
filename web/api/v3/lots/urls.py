@@ -19,6 +19,8 @@ urlpatterns = [
 
     # SPECIAL
     path('delete-all-drafts', views.delete_all_drafts, name='api-v3-delete-all-drafts'),
+    path('validate-all-drafts', views.validate_all_drafts, name='api-v3-validate-all-drafts'),
+    path('accept-all', views.accept_all, name='api-v3-accept-all'),
 
     # IMPORT/FILES
     path('upload', views.upload, name='api-v3-upload'),
