@@ -74,12 +74,13 @@
         <a class="button modal-button" href="{% url 'api-v2-operators-export-in' %}" style="margin-left: 5px; padding: 7px 10px 0px 10px;">
           <img src="/static/images/icons/download2.png" height="24" width="24"  style="margin-bottom: 5px;"/>
         </a>
-        <select class="pagelength" style="margin-top: auto; margin-right: auto;">
+        <select class="pagelength" style="margin-top: auto;">
           <option value="10">10</option>
           <option value="25">25</option>
           <option value="50">50</option>
           <option value="100">100</option>
         </select>
+        <a id="btn_open_modal_accept_lots" class="button primary" style="margin-left: 5px; margin-right: auto;">Accepter Lots</a>
       </div>
       <table class="display nowrap" id="datatable_in">
         <!-- dynamically generated in js -->
@@ -87,11 +88,6 @@
         <tfoot></tfoot>
         <tbody></tbody>
       </table>
-      <div class="button-container">
-        <div class="button-item">
-          <a id="btn_open_modal_accept_lots" class="button primary">Accepter Lots</a>
-        </div>
-      </div>
     </div>
 
     <div id="tab_operators_out" class="tabcontent">
@@ -249,12 +245,31 @@
     <span id="modal_accept_lots_form_success_message" style="color: green;"></span>
     <form id="modal_accept_lots_form" method="POST" data-url="{% url 'api-v2-operators-accept-lots' %}">
       {% csrf_token %}
+      <p>Êtes vous sûr de vouloir accepter ce(s) lot(s) ? <a id="btn_open_modal_accept_all"><small>Accepter tous les lots</small></a></p>
       <ul id="modal_accept_lots_list">
       </ul>
       <input type="hidden" id="modal_accept_lots_txids" name="tx_ids">
       <div class="form__group button__group">
         <button type="submit" class="button">Valider</button>
         <a class="button secondary close" id="btn_close_modal_accept_lots_bottom">Annuler</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal__backdrop" id="modal_accept_all">
+  <div class="modal">
+    <form id="modal_accept_all_form" method="POST" data-url="{% url 'api-v3-accept-all' %}">
+      {% csrf_token %}
+      <p>Êtes vous sûr de vouloir accepter tous les lots ?</p>
+      <div class="form__group button__group">
+        <div class="button-container">
+          <div class="button-item">
+            <button type="submit" class="button">Accepter</button>
+          </div>
+        </div>
+        <input type="hidden" id="modal_accept_all_entity_id" name="entity_id" value="{{user_entity.id}}">
+        <a class="button secondary close" id="btn_close_modal_accept_all">Annuler</a>
       </div>
     </form>
   </div>
