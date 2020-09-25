@@ -13,7 +13,7 @@ export type Option = {
 }
 
 type SelectLabelProps = SystemProps & {
-  value: Option | Option[] | null
+  value: Option["key"] | Option["key"][] | null
   placeholder?: string
   onChange: (value: SelectLabelProps["value"]) => void
 }
@@ -36,18 +36,21 @@ function isEmpty(value: SelectProps["value"]) {
 // check if the given opton is selected
 function isSelected(value: SelectProps["value"], option: Option) {
   if (Array.isArray(value)) {
-    return value.includes(option)
+    return value.includes(option.key)
   } else {
-    return value?.key === option.key
+    return value === option.key
   }
 }
 
 // combine selected values in one element with their label
-function renderSelected(value: SelectProps["value"]) {
+function renderSelected(value: SelectProps["value"], options: Option[]) {
   if (Array.isArray(value)) {
-    return value.map((v) => v.label).join(", ")
+    return options
+      .filter((o) => value.includes(o.key))
+      .map((v) => v.label)
+      .join(", ")
   } else {
-    return value?.label
+    return options.find((o) => o.key === value)?.label
   }
 }
 
@@ -74,18 +77,19 @@ function useSelect(
       // prevent closing of option list
       e.stopPropagation()
 
-      if (value.includes(option)) {
-        onChange(value.filter((o) => o.key !== option.key))
+      if (value.includes(option.key)) {
+        onChange(value.filter((key) => key !== option.key))
       } else {
-        onChange([...value, option])
+        onChange([...value, option.key])
       }
     } else {
-      onChange(option)
+      onChange(option.key)
     }
   }
 
   // what to display in the dropdown label
-  const selected = renderSelected(value) || placeholder || "Choisir une valeur"
+  const selected =
+    renderSelected(value, options) || placeholder || "Choisir une valeur"
 
   // filter options according to search query
   const queryOptions =
