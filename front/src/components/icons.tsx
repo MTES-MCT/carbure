@@ -8,18 +8,21 @@ type IconProps = {
   color?: string
   stroke?: number
   className?: string
+  title?: string
   [k: string]: any
 }
 
-export const ChevronDown = ({
+const Icon = ({
   size = 24,
   color = "currentColor",
   stroke = 2,
   className,
+  title,
+  children,
   ...props
 }: IconProps) => (
   <svg
-    className={cl("icon", "icon-chevron-down", className)}
+    className={cl("icon", className)}
     width={size}
     height={size}
     viewBox="0 0 24 24"
@@ -30,130 +33,52 @@ export const ChevronDown = ({
     strokeLinejoin="round"
     {...props}
   >
+    <title>{title}</title>
+    {children}
+  </svg>
+)
+
+export const ChevronDown = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon", "icon-chevron-down", className)}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <polyline points="6 9 12 15 18 9" />
-  </svg>
+  </Icon>
 )
 
-export const ChevronLeft = ({
-  size = 24,
-  color = "currentColor",
-  stroke = 2,
-  className,
-  ...props
-}: IconProps) => (
-  <svg
-    className={cl("icon", "icon-chevron-down", className)}
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    strokeWidth={stroke}
-    stroke={color}
-    fill="none"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
+export const ChevronLeft = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon", "icon-chevron-down", className)}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <polyline points="15 6 9 12 15 18" />
-  </svg>
+  </Icon>
 )
 
-export const ChevronRight = ({
-  size = 24,
-  color = "currentColor",
-  stroke = 2,
-  className,
-  ...props
-}: IconProps) => (
-  <svg
-    className={cl("icon", "icon-chevron-down", className)}
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    strokeWidth={stroke}
-    stroke={color}
-    fill="none"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
+export const ChevronRight = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon", "icon-chevron-right", className)}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <polyline points="9 6 15 12 9 18" />
-  </svg>
+  </Icon>
 )
 
-export const Plus = ({
-  size = 24,
-  color = "currentColor",
-  stroke = 2,
-  className,
-  ...props
-}: IconProps) => (
-  <svg
-    className={cl("icon", "icon-plus", className)}
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    strokeWidth={stroke}
-    stroke={color}
-    fill="none"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
+export const Plus = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon", "icon-plus", className)}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <line x1={12} y1={5} x2={12} y2={19} />
     <line x1={5} y1={12} x2={19} y2={12} />
-  </svg>
+  </Icon>
 )
 
-export const Search = ({
-  size = 24,
-  color = "currentColor",
-  stroke = 2,
-  className,
-  ...props
-}: IconProps) => (
-  <svg
-    className={cl("icon", "icon-search", className)}
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    strokeWidth={stroke}
-    stroke={color}
-    fill="none"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
+export const Search = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon", "icon-search", className)}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <circle cx="10" cy="10" r="7" />
     <line x1="21" y1="21" x2="15" y2="15" />
-  </svg>
+  </Icon>
 )
 
-export const Cross = ({
-  size = 24,
-  color = "currentColor",
-  stroke = 2,
-  className,
-  ...props
-}: IconProps) => (
-  <svg
-    className={cl("icon", "icon-cross", className)}
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    strokeWidth={stroke}
-    stroke={color}
-    fill="none"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
-  >
+export const Cross = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon", "icon-cross", className)}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <line x1="18" y1="6" x2="6" y2="18" />
     <line x1="6" y1="6" x2="18" y2="18" />
-  </svg>
+  </Icon>
 )
