@@ -1,29 +1,17 @@
 import React from "react"
-import { NavLink } from "react-router-dom"
+import { NavLink, Link } from "react-router-dom"
 
 import { ApiState } from "../hooks/use-api"
-import { Settings } from "../services/settings"
+import { Entity, Settings } from "../services/settings"
 
 import styles from "./top-bar.module.css"
 
-import { Menu, MenuLink } from "./system"
+import Menu from "./dropdown/menu"
 import Logo from "./logo"
 
 type PageLinkProps = {
   to: string
   children: React.ReactNode
-}
-
-type UserMenuProps = {
-  settings: ApiState<Settings>
-  entity: number
-  setEntity: (entity: number) => void
-}
-
-type TopbarProps = {
-  settings: ApiState<Settings>
-  entity: number
-  setEntity: (entity: number) => void
 }
 
 const PageLink = ({ to, children }: PageLinkProps) => (
@@ -36,30 +24,45 @@ const PageLink = ({ to, children }: PageLinkProps) => (
   </NavLink>
 )
 
+type UserMenuProps = {
+  settings: ApiState<Settings>
+  entity: Entity | null
+  setEntity: (entity: Entity) => void
+}
+
 const UserMenu = ({ settings, entity, setEntity }: UserMenuProps) => {
   if (!settings.data) return null
 
-  function onChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    // ignore options with no values
-    if (e.target.value) setEntity(parseInt(e.target.value, 10))
-  }
-
   return (
-    <Menu className={styles.userMenu} value={entity} onChange={onChange}>
-      <optgroup label="Organisation">
+    <Menu
+      className={styles.userMenu}
+      label={entity?.name ?? settings.data.email}
+    >
+      <Menu.Group label="Organisations">
         {settings.data.rights.map(({ entity }) => (
-          <option key={entity.id} value={entity.id}>
+          <Menu.Item key={entity.id} onClick={() => setEntity(entity)}>
             {entity.name}
-          </option>
+          </Menu.Item>
         ))}
-      </optgroup>
-      <optgroup label="Utilisateur">
-        <option disabled>{settings.data.email}</option>
-        <MenuLink to="/settings">Paramètres</MenuLink>
-        <MenuLink to="/logout">Se déconnecter</MenuLink>
-      </optgroup>
+      </Menu.Group>
+
+      <Menu.Group label="Utilisateur">
+        <Menu.Item>{settings.data.email}</Menu.Item>
+        <Menu.Item>
+          <Link to="/settings">Paramètres</Link>
+        </Menu.Item>
+        <Menu.Item>
+          <Link to="/logout">Se déconnecter</Link>
+        </Menu.Item>
+      </Menu.Group>
     </Menu>
   )
+}
+
+type TopbarProps = {
+  settings: ApiState<Settings>
+  entity: Entity | null
+  setEntity: (entity: Entity) => void
 }
 
 const Topbar = ({ settings, entity, setEntity }: TopbarProps) => (

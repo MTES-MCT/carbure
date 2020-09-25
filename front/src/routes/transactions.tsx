@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 
 import useAPI, { ApiState } from "../hooks/use-api"
-import { Settings } from "../services/settings"
+import { Entity, Settings } from "../services/settings"
 import { getSnapshot, getLots, LotStatus } from "../services/lots"
 
 import { Main } from "../components/system"
@@ -14,7 +14,7 @@ const LIMIT = 10
 
 type TransactionsProps = {
   settings: ApiState<Settings>
-  entity: number
+  entity: Entity | null
 }
 
 const Transactions = ({ settings, entity }: TransactionsProps) => {
@@ -25,16 +25,12 @@ const Transactions = ({ settings, entity }: TransactionsProps) => {
   const [page, setPage] = useState(0)
   const [filters, setFilters] = useState({})
 
-  if (entity < 0 || !settings.data) {
+  if (entity === null || !settings.data) {
     return null
   }
 
-  const right = settings.data.rights.find(
-    (right) => right.entity.id === entity
-  )!
-
-  snapshot.useResolve(right.entity.id)
-  transactions.useResolve(activeStatus, right.entity.id, filters, page, LIMIT)
+  snapshot.useResolve(entity.id)
+  transactions.useResolve(activeStatus, entity.id, filters, page, LIMIT)
 
   // boolean for conditional rendering of certain children
   const hasData = transactions.data && transactions.data.total > 0
