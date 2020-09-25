@@ -7,16 +7,20 @@ import logoFabNum from "../assets/images/logo-fabriquenumerique.svg"
 const Footer = () => (
   <div className={styles.footerContainer}>
     <div className={styles.flexCell}>
-      <img src={logoMTES}
+      <div className={styles.centerImage}>
+        <img src={logoMTES}
            alt="Logo MTES"
            className={styles.footerImage} />
+      </div>
     </div>
 
     <div className={styles.flexCell}>
-      <img src={logoFabNum}
-           alt="Logo Fabrique Numerique"
-           className={styles.footerImage}
-      />
+      <div className={styles.centerImage}>
+        <img src={logoFabNum}
+             alt="Logo Fabrique Numerique"
+             className={styles.footerImage}
+        />
+      </div>
     </div>
 
     <div className={styles.flexCell}>
@@ -28,7 +32,7 @@ const Footer = () => (
     </div>
 
     <div className={styles.flexCell}>
-      <ul>
+      <ul className={styles.footerLinks}>
         <li>
           <h2>carbure.beta.gouv.fr</h2>
         </li>
