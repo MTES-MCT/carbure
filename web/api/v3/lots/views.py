@@ -18,12 +18,12 @@ def get_lots(request):
     status = request.GET.get('status', False)
     producer = request.GET.get('producer_id', False)
     year = request.GET.get('year', False)
-    periods = request.GET.getlist('periods', False)
-    production_sites = request.GET.getlist('production_sites', False)
-    matieres_premieres = request.GET.getlist('matieres_premieres', False)
-    countries_of_origin = request.GET.getlist('countries_of_origin', False)
-    biocarburants = request.GET.getlist('biocarburants', False)
-    clients = request.GET.getlist('clients', False)
+    periods = request.GET.getlist('periods')
+    production_sites = request.GET.getlist('production_sites')
+    matieres_premieres = request.GET.getlist('matieres_premieres')
+    countries_of_origin = request.GET.getlist('countries_of_origin')
+    biocarburants = request.GET.getlist('biocarburants')
+    clients = request.GET.getlist('clients')
     limit = request.GET.get('limit', "100")
     from_idx = request.GET.get('from_idx', "0")
     export = request.GET.get('export', False)
@@ -44,6 +44,7 @@ def get_lots(request):
 
     txs = LotTransaction.objects.filter(lot__carbure_producer=producer)
 
+    # filter by status
     if status == 'draft':
         txs = txs.filter(lot__status='Draft')
     elif status == 'validated':
@@ -73,7 +74,7 @@ def get_lots(request):
     if matieres_premieres:
         txs = txs.filter(lot__matiere_premiere__code__in=matieres_premieres)
     if biocarburants:
-        txs = txs.filter(lot__biocarburant__code__in=matieres_premieres)
+        txs = txs.filter(lot__biocarburant__code__in=biocarburants)
     if countries_of_origin:
         txs = txs.filter(lot__pays_origine__code_pays__in=countries_of_origin)
     if clients:
@@ -131,20 +132,18 @@ def get_snapshot(request):
     bcs = [{'key': b.code, 'label': b.name}
            for b in Biocarburant.objects.filter(id__in=txs.values('lot__biocarburant').distinct())]
 
-    periods = [{'key': i, 'label': p['lot__period']}
-               for i, p in enumerate(txs.values('lot__period').distinct()) if p['lot__period']]
-
     countries = [{'key': c.code_pays, 'label': c.name}
                  for c in Pays.objects.filter(id__in=txs.values('lot__pays_origine').distinct())]
 
+    periods = [p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']]
+
     c1 = [c['carbure_client__name'] for c in txs.values('carbure_client__name').distinct()]
     c2 = [c['unknown_client'] for c in txs.values('unknown_client').distinct()]
-
-    clients = [{'key': i, 'label': c} for i, c in enumerate(c1 + c2) if c]
+    clients = [c for c in c1 + c2 if c]
 
     ps1 = [p['lot__carbure_production_site__name'] for p in txs.values('lot__carbure_production_site__name').distinct()]
     ps2 = [p['lot__unknown_production_site'] for p in txs.values('lot__unknown_production_site').distinct()]
-    psites = [{'key': i, 'label': p} for i, p in enumerate(ps1 + ps2) if p]
+    psites = [p for p in ps1 + ps2 if p]
 
     data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs, 'periods': periods,
                        'production_sites': psites, 'countries_of_origin': countries, 'clients': clients}
