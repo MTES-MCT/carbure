@@ -1,3 +1,4 @@
+import { Option } from "../components/dropdown/select"
 import api, { ApiResponse } from "./api"
 
 export type Pagination = {
@@ -107,11 +108,6 @@ export type Lots = {
   lots: Lot[]
 }
 
-export type Filter = {
-  key: string
-  label: string
-}
-
 export enum Filters {
   MatieresPremieres = "matieres_premieres",
   Biocarburants = "biocarburants",
@@ -131,12 +127,12 @@ export type Snapshot = {
   }
 
   filters: {
-    [Filters.MatieresPremieres]: Filter[]
-    [Filters.Biocarburants]: Filter[]
-    [Filters.Periods]: Filter[]
-    [Filters.ProductionSites]: Filter[]
-    [Filters.CountriesOfOrigin]: Filter[]
-    [Filters.Clients]: Filter[]
+    [Filters.MatieresPremieres]: Option[]
+    [Filters.Biocarburants]: Option[]
+    [Filters.CountriesOfOrigin]: Option[]
+    [Filters.Periods]: string[]
+    [Filters.ProductionSites]: string[]
+    [Filters.Clients]: string[]
   }
 
   deadlines: any[]

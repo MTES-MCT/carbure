@@ -25,11 +25,21 @@ const FILTERS = [
   { key: Filters.Clients, label: "Client" },
 ]
 
+function normalizeFilters(filters: any[] = []) {
+  return filters.map((filter) => {
+    if (typeof filter === "string") {
+      return { key: filter, label: filter }
+    } else {
+      return filter
+    }
+  })
+}
+
 type TransactionSnapshotProps = {
   snapshot: ApiState<Snapshot>
   activeStatus: string
   setActiveStatus: Function
-  filters: { [k: string]: Option | Option[] | null }
+  filters: { [k: string]: Option["key"] | Option["key"][] | null }
   setFilters: Function
 }
 
@@ -73,7 +83,7 @@ const TransactionSnapshot = ({
             key={key}
             value={filters[key] ?? []}
             placeholder={label}
-            options={snapshot.data?.filters[key] ?? []}
+            options={normalizeFilters(snapshot.data?.filters[key])}
             onChange={(value) => setFilters({ ...filters, [key]: value })}
           />
         ))}
