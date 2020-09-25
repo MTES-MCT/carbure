@@ -1,4 +1,5 @@
-import React from "react"
+import React, { useState } from "react"
+import cl from "clsx"
 
 import styles from "./select.module.css"
 
@@ -12,13 +13,87 @@ export type Option = {
 }
 
 type SelectLabelProps = SystemProps & {
-  value: Option | null
+  value: Option | Option[] | null
   placeholder?: string
-  onChange: (value: Option | null) => void
+  onChange: (value: SelectLabelProps["value"]) => void
 }
 
 type SelectProps = SelectLabelProps & {
   options: Option[]
+  search?: boolean
+  multiple?: boolean
+}
+
+// check if the value is empty
+function isEmpty(value: SelectProps["value"]) {
+  if (Array.isArray(value)) {
+    return value.length === 0
+  } else {
+    return value ?? true
+  }
+}
+
+// check if the given opton is selected
+function isSelected(value: SelectProps["value"], option: Option) {
+  if (Array.isArray(value)) {
+    return value.includes(option)
+  } else {
+    return value?.key === option.key
+  }
+}
+
+// combine selected values in one element with their label
+function renderSelected(value: SelectProps["value"]) {
+  if (Array.isArray(value)) {
+    return value.map((v) => v.label).join(", ")
+  } else {
+    return value?.label
+  }
+}
+
+function useSelect(
+  value: SelectProps["value"],
+  placeholder: string | undefined,
+  options: Option[],
+  onChange: SelectProps["onChange"],
+  multiple: boolean
+) {
+  const dd = useDropdown()
+  const [query, setQuery] = useState("")
+
+  // reset the value
+  function clear(e: React.MouseEvent) {
+    e.stopPropagation()
+    onChange(null)
+    setQuery("")
+  }
+
+  // select an option
+  function select(e: React.MouseEvent, option: Option) {
+    if (multiple && Array.isArray(value)) {
+      // prevent closing of option list
+      e.stopPropagation()
+
+      if (value.includes(option)) {
+        onChange(value.filter((o) => o.key !== option.key))
+      } else {
+        onChange([...value, option])
+      }
+    } else {
+      onChange(option)
+    }
+  }
+
+  // what to display in the dropdown label
+  const selected = renderSelected(value) || placeholder || "Choisir une valeur"
+
+  // filter options according to search query
+  const queryOptions =
+    query.length > 0
+      ? options.filter((option) => option.label.toLowerCase().includes(query))
+      : options
+
+  return { dd, selected, queryOptions, query, select, clear, setQuery }
 }
 
 export const Select = ({
@@ -27,33 +102,62 @@ export const Select = ({
   options,
   onChange,
   children,
+  search = false,
+  multiple = false,
   ...props
 }: SelectProps) => {
-  const dd = useDropdown()
-
-  function clear(e: React.MouseEvent) {
-    e.stopPropagation()
-    onChange(null)
-  }
+  const {
+    dd,
+    query,
+    selected,
+    queryOptions,
+    clear,
+    select,
+    setQuery,
+  } = useSelect(value, placeholder, options, onChange, multiple)
 
   return (
     <Dropdown {...props} onClick={dd.toggle}>
       <Dropdown.Label className={styles.selectLabel}>
-        <span className={styles.selectValue}>
-          {value?.label ?? placeholder}
+        <span title={selected} className={styles.selectValue}>
+          {selected}
         </span>
 
-        {value && <Cross className={styles.selectCross} onClick={clear} />}
+        {!isEmpty(value) && (
+          <Cross className={styles.selectCross} onClick={clear} />
+        )}
       </Dropdown.Label>
 
       <Dropdown.Items open={dd.isOpen}>
-        {options.map((option) => (
+        {search && (
+          <li>
+            <input
+              type="text"
+              value={query}
+              placeholder="Rechercher..."
+              className={styles.selectSearch}
+              onChange={(e) => setQuery(e.target.value.toLowerCase())}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </li>
+        )}
+
+        {queryOptions.map((option) => (
           <li
             key={option.key}
             title={option.label}
-            value={option.key}
-            onClick={() => onChange(option)}
+            onClick={(e) => select(e, option)}
+            className={cl(isSelected(value, option) && styles.selectSelected)}
           >
+            {multiple && (
+              <input
+                readOnly
+                type="checkbox"
+                checked={isSelected(value, option)}
+                className={styles.selectMultiple}
+              />
+            )}
+
             {option.label}
           </li>
         ))}

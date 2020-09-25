@@ -27,4 +27,19 @@
   text-overflow: ellipsis;
   border: none;
   font-size: 13px;
+  background-color: transparent;
+}
+
+.selectSearch {
+  width: 100%;
+}
+
+.selectMultiple {
+  margin: 0;
+  padding: 0;
+  margin-right: 8px;
+}
+
+li.selectSelected {
+  background-color: var(--blue-light);
 }

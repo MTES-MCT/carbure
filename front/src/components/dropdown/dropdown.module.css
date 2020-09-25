@@ -37,11 +37,14 @@
 }
 
 .dropdownItems li {
+  display: flex;
+  align-items: center;
   padding: 8px 12px;
   flex-shrink: 0;
   overflow-x: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  border-bottom: 1px solid var(--gray-light);
 }
 
 .dropdownItems li:hover {

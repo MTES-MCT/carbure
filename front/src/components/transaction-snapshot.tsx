@@ -29,7 +29,7 @@ type TransactionSnapshotProps = {
   snapshot: ApiState<Snapshot>
   activeStatus: string
   setActiveStatus: Function
-  filters: { [k: string]: Option }
+  filters: { [k: string]: Option | Option[] | null }
   setFilters: Function
 }
 
@@ -68,8 +68,10 @@ const TransactionSnapshot = ({
       <div className={styles.filters}>
         {FILTERS.map(({ key, label }) => (
           <Select
+            search
+            multiple
             key={key}
-            value={filters[key]}
+            value={filters[key] ?? []}
             placeholder={label}
             options={snapshot.data?.filters[key] ?? []}
             onChange={(value) => setFilters({ ...filters, [key]: value })}
