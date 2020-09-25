@@ -11,7 +11,7 @@
 }
 
 .dropdownLabel:hover {
-  color: var(--blue-dark);
+  color: var(--blue-medium);
   stroke: var(--blue-medium);
 }
 
@@ -34,10 +34,6 @@
   margin: 0;
   padding: 0;
   overflow-y: auto;
-}
-
-.dropdownItemsUp {
-  top: 0;
 }
 
 .dropdownItems li {

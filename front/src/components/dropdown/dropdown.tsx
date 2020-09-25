@@ -44,13 +44,11 @@ const DropdownLabel = ({
 type DropdownItemsProps = SystemProps &
   React.HTMLProps<HTMLUListElement> & {
     open: boolean
-    up?: boolean
     children: React.ReactNode
   }
 
 const DropdownItems = ({
   open,
-  up = false,
   children,
   className,
   ...props
@@ -60,11 +58,7 @@ const DropdownItems = ({
   return (
     <ul
       {...props}
-      className={cl(
-        styles.dropdownItems,
-        up && styles.dropdownItemsUp,
-        className
-      )}
+      className={cl("dropdown-items", styles.dropdownItems, className)}
     >
       {children}
     </ul>

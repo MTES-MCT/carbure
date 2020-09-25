@@ -43,9 +43,7 @@ export const Select = ({
           {value?.label ?? placeholder}
         </span>
 
-        {value && (
-          <Cross className={styles.selectCross} size={12} onClick={clear} />
-        )}
+        {value && <Cross className={styles.selectCross} onClick={clear} />}
       </Dropdown.Label>
 
       <Dropdown.Items open={dd.isOpen}>
