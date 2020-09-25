@@ -32,7 +32,7 @@ server {
     }
     # serve v2 static files
     location /v2 {
-        try_files /var/www/html_v2/$uri /var/www/html_v2/index.html;
+        try_files $uri /var/www/html_v2/index.html;
     }
     # uwsgi
     location / {
