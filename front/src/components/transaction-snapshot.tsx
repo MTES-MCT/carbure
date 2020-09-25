@@ -1,12 +1,13 @@
 import React from "react"
 
-import { Filter, Filters, LotStatus, Snapshot } from "../services/lots"
+import { Filters, LotStatus, Snapshot } from "../services/lots"
 import { ApiState } from "../hooks/use-api"
 
 import styles from "./transaction-snapshot.module.css"
 
 import { Plus } from "./icons"
-import { Title, Button, StatusButton, SearchInput, Select } from "./system"
+import { Title, Button, StatusButton, SearchInput } from "./system"
+import Select, { Option } from "./dropdown/select"
 
 const STATUS = [
   { key: LotStatus.Draft, label: "Brouillons" },
@@ -28,7 +29,7 @@ type TransactionSnapshotProps = {
   snapshot: ApiState<Snapshot>
   activeStatus: string
   setActiveStatus: Function
-  filters: { [k: string]: string }
+  filters: { [k: string]: Option }
   setFilters: Function
 }
 
@@ -69,18 +70,10 @@ const TransactionSnapshot = ({
           <Select
             key={key}
             value={filters[key]}
-            defaultValue=""
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-              setFilters({ ...filters, [key]: e.target.value })
-            }
-          >
-            <option value="">{label}</option>
-            {snapshot.data?.filters[key].map(({ key, label }) => (
-              <option key={key} value={key}>
-                {label}
-              </option>
-            ))}
-          </Select>
+            placeholder={label}
+            options={snapshot.data?.filters[key] ?? []}
+            onChange={(value) => setFilters({ ...filters, [key]: value })}
+          />
         ))}
       </div>
 
