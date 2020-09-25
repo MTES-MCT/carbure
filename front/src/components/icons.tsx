@@ -132,3 +132,28 @@ export const Search = ({
     <line x1="21" y1="21" x2="15" y2="15" />
   </svg>
 )
+
+export const Cross = ({
+  size = 24,
+  color = "currentColor",
+  stroke = 2,
+  className,
+  ...props
+}: IconProps) => (
+  <svg
+    className={cl("icon", "icon-cross", className)}
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    strokeWidth={stroke}
+    stroke={color}
+    fill="none"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+)

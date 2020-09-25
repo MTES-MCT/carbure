@@ -97,6 +97,10 @@
   border-color: var(--blue-medium);
 }
 
+.buttonPrimary:hover {
+  color: var(--white);
+}
+
 .buttonPrimary:active {
   background-color: var(--blue-dark);
 }

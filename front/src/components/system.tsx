@@ -5,7 +5,7 @@ import cl from "clsx"
 import styles from "./system.module.css"
 import { ChevronDown, Search } from "./icons"
 
-type SystemProps = {
+export type SystemProps = {
   className?: string
   style?: CSSProperties
   children?: React.ReactNode

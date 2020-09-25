@@ -45,9 +45,8 @@
   margin-right: 8px;
 }
 
-.filters > div > select {
+.filters > div {
   width: 155px;
-  overflow: hidden;
 }
 
 .searchInput input {

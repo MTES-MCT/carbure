@@ -1,0 +1,30 @@
+.selectLabel {
+  padding: 8px 12px;
+  background-color: var(--gray-light);
+  border: 1px solid var(--gray-medium);
+  border-radius: 5px;
+}
+
+.selectLabel:hover {
+  border-color: var(--blue-medium);
+}
+
+.selectCross {
+  width: 12px;
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+.selectCross:hover {
+  stroke: var(--red-dark);
+}
+
+.selectValue {
+  font-weight: 600;
+  flex-shrink: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: none;
+  font-size: 13px;
+}
