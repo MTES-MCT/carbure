@@ -66,7 +66,6 @@ function useSelect(
 
   // reset the value
   function clear(e: React.MouseEvent) {
-    e.stopPropagation()
     onChange(null)
     setQuery("")
   }
