@@ -1,0 +1,37 @@
+.modalWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: var(--black);
+  opacity: 0.5;
+}
+
+.modal {
+  position: relative;
+  padding: 16px;
+  background-color: var(--gray-light);
+  border: 1px solid var(--gray-medium);
+  min-width: 400px;
+  min-height: 400px;
+  margin: 32px;
+}
+
+.closeModal {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  cursor: pointer;
+}
