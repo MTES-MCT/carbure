@@ -2,7 +2,8 @@ import React from "react"
 import { NavLink, Link } from "react-router-dom"
 
 import { ApiState } from "../hooks/use-api"
-import { Entity, Settings } from "../services/settings"
+import { EntitySelection } from "../hooks/use-app"
+import { Settings } from "../services/types"
 
 import styles from "./top-bar.module.css"
 
@@ -26,22 +27,21 @@ const PageLink = ({ to, children }: PageLinkProps) => (
 
 type UserMenuProps = {
   settings: ApiState<Settings>
-  entity: Entity | null
-  setEntity: (entity: Entity) => void
+  entity: EntitySelection
 }
 
-const UserMenu = ({ settings, entity, setEntity }: UserMenuProps) => {
+const UserMenu = ({ settings, entity }: UserMenuProps) => {
   if (!settings.data) return null
 
   return (
-    <Menu
-      className={styles.userMenu}
-      label={entity?.name ?? settings.data.email}
-    >
+    <Menu className={styles.userMenu} label={entity.selected?.name ?? "Menu"}>
       <Menu.Group label="Organisations">
-        {settings.data.rights.map(({ entity }) => (
-          <Menu.Item key={entity.id} onClick={() => setEntity(entity)}>
-            {entity.name}
+        {settings.data.rights.map((right) => (
+          <Menu.Item
+            key={right.entity.id}
+            onClick={() => entity.selectEntity(right.entity)}
+          >
+            {right.entity.name}
           </Menu.Item>
         ))}
       </Menu.Group>
@@ -61,11 +61,10 @@ const UserMenu = ({ settings, entity, setEntity }: UserMenuProps) => {
 
 type TopbarProps = {
   settings: ApiState<Settings>
-  entity: Entity | null
-  setEntity: (entity: Entity) => void
+  entity: EntitySelection
 }
 
-const Topbar = ({ settings, entity, setEntity }: TopbarProps) => (
+const Topbar = ({ settings, entity }: TopbarProps) => (
   <div className={styles.topBar}>
     <Logo />
 
@@ -76,7 +75,7 @@ const Topbar = ({ settings, entity, setEntity }: TopbarProps) => (
       <PageLink to="/directory">Annuaire</PageLink>
     </nav>
 
-    <UserMenu settings={settings} entity={entity} setEntity={setEntity} />
+    <UserMenu settings={settings} entity={entity} />
   </div>
 )
 
