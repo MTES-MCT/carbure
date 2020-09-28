@@ -6,7 +6,7 @@ import { StatusSelection, FilterSelection } from "../hooks/use-transactions"
 
 import styles from "./transaction-snapshot.module.css"
 
-import { Plus } from "./icons"
+import { Plus } from "./system/icons"
 import { Title, Button, StatusButton, SearchInput, Box } from "./system"
 import Select from "./system/select"
 

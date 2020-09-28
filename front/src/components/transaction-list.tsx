@@ -11,7 +11,7 @@ import { truncate } from "../utils/format"
 import { getStatus } from "../services/lots"
 
 import { Alert, Box, Table } from "./system"
-import { AlertCircle, Check, ChevronRight, Copy, Cross } from "./icons"
+import { AlertCircle, Check, ChevronRight, Copy, Cross } from "./system/icons"
 import Pagination from "./pagination"
 
 const COLUMNS = [
