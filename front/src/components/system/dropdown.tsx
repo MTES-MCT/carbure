@@ -4,7 +4,7 @@ import cl from "clsx"
 import styles from "./dropdown.module.css"
 
 import { SystemProps } from "."
-import { ChevronDown } from "../icons"
+import { ChevronDown } from "./icons"
 
 export function useDropdown() {
   const [isOpen, setOpen] = useState(false)

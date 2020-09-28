@@ -2,7 +2,7 @@ import React from "react"
 
 import styles from "./pagination.module.css"
 
-import { ChevronLeft, ChevronRight } from "./icons"
+import { ChevronLeft, ChevronRight } from "./system/icons"
 import { Button, Select } from "./system"
 
 // generate a list of numbers from 0 to size-1
