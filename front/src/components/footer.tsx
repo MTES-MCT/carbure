@@ -1,24 +1,23 @@
 import React from "react"
 
-import styles from "./footer.module.css";
+import styles from "./footer.module.css"
 import logoMTES from "../assets/images/logo-mtes.svg"
 import logoFabNum from "../assets/images/logo-fabriquenumerique.svg"
 
 const Footer = () => (
-  <div className={styles.footerContainer}>
+  <footer className={styles.footerContainer}>
     <div className={styles.flexCell}>
       <div className={styles.centerImage}>
-        <img src={logoMTES}
-           alt="Logo MTES"
-           className={styles.footerImage} />
+        <img src={logoMTES} alt="Logo MTES" className={styles.footerImage} />
       </div>
     </div>
 
     <div className={styles.flexCell}>
       <div className={styles.centerImage}>
-        <img src={logoFabNum}
-             alt="Logo Fabrique Numerique"
-             className={styles.footerImage}
+        <img
+          src={logoFabNum}
+          alt="Logo Fabrique Numerique"
+          className={styles.footerImage}
         />
       </div>
     </div>
@@ -54,7 +53,7 @@ const Footer = () => (
         </li>
       </ul>
     </div>
-  </div>
+  </footer>
 )
 
 export default Footer

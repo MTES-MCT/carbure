@@ -1,35 +1,40 @@
 .transactionSnapshot {
+  display: flex;
+  flex-direction: column;
+}
+
+.transactionSummary {
   background-color: var(--gray-light);
   padding: 32px 120px;
   margin-top: 1px;
 }
 
-.topRow {
+.transactionHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32px;
 }
 
-.buttonRow {
+.transactionStatus {
   display: flex;
   justify-content: space-between;
   align-items: stretch;
 }
 
-.buttonRow button {
+.transactionStatus button {
   margin: 0 12px;
 }
 
-.buttonRow button:first-child {
+.transactionStatus button:first-child {
   margin-left: 0;
 }
 
-.buttonRow button:last-child {
+.transactionStatus button:last-child {
   margin-right: 0;
 }
 
-.lastRow {
+.transactionFilters {
   display: flex;
   justify-content: space-between;
   padding: 16px 120px;
@@ -37,15 +42,15 @@
   box-shadow: 0px 1px 2px var(--gray-medium);
 }
 
-.filters {
+.filterGroup {
   display: flex;
 }
 
-.filters > div {
+.filterGroup > div {
   margin-right: 8px;
 }
 
-.filters > div {
+.filterGroup > div {
   width: 155px;
 }
 

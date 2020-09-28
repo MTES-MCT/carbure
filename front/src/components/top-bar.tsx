@@ -65,7 +65,7 @@ type TopbarProps = {
 }
 
 const Topbar = ({ settings, entity }: TopbarProps) => (
-  <div className={styles.topBar}>
+  <header className={styles.topBar}>
     <Logo />
 
     <nav className={styles.pageNav}>
@@ -76,7 +76,7 @@ const Topbar = ({ settings, entity }: TopbarProps) => (
     </nav>
 
     <UserMenu settings={settings} entity={entity} />
-  </div>
+  </header>
 )
 
 export default Topbar
