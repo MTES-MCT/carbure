@@ -194,11 +194,28 @@
   font-weight: 600;
   border: 1px solid var(--gray-medium);
   background-color: var(--gray-light);
+  padding: 8px;
+  font-weight: 400;
 }
 
 .input:hover {
   color: var(--blue-medium);
   border-color: var(--blue-medium);
+}
+
+/* LABEL TEXT FIELD COMPONENT */
+
+.labelWrapper {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  font-style: italic;
+  margin-bottom: 8px;
+}
+
+.labelTextArea,
+.labelTextArea textarea {
+  flex: 1;
 }
 
 /* SEARCH INPUT COMPONENT */
@@ -215,7 +232,7 @@
 .searchInput {
   border-radius: 45px;
   padding-left: 40px;
-  padding-right: 8px;
+  padding-right: 16px;
 }
 
 .searchInputWrapper svg {
@@ -223,6 +240,18 @@
   left: 12px;
   align-self: center;
   pointer-events: none;
+}
+
+/* LABEL CHECKBOX COMPONENT */
+
+.labelCheckbox {
+  display: flex;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.labelCheckbox input {
+  margin-right: 8px;
 }
 
 /* TABLE COMPONENT */
