@@ -7,15 +7,14 @@ import { SystemProps } from "../system"
 import { Cross } from "../icons"
 import { Dropdown, useDropdown } from "./dropdown"
 
-export type Option = {
-  key: string | number
-  label: string
-}
+type Key = string | number
+export type Option = { key: Key; label: string }
+export type SelectValue = Key | Key[] | null
 
 type SelectLabelProps = SystemProps & {
-  value: Option["key"] | Option["key"][] | null
+  value: SelectValue
   placeholder?: string
-  onChange: (value: SelectLabelProps["value"]) => void
+  onChange: (value: SelectValue) => void
 }
 
 type SelectProps = SelectLabelProps & {
@@ -25,7 +24,7 @@ type SelectProps = SelectLabelProps & {
 }
 
 // check if the value is empty
-function isEmpty(value: SelectProps["value"]) {
+function isEmpty(value: SelectValue) {
   if (Array.isArray(value)) {
     return value.length === 0
   } else {
@@ -34,7 +33,7 @@ function isEmpty(value: SelectProps["value"]) {
 }
 
 // check if the given opton is selected
-function isSelected(value: SelectProps["value"], option: Option) {
+function isSelected(value: SelectValue, option: Option) {
   if (Array.isArray(value)) {
     return value.includes(option.key)
   } else {
@@ -43,19 +42,35 @@ function isSelected(value: SelectProps["value"], option: Option) {
 }
 
 // combine selected values in one element with their label
-function renderSelected(value: SelectProps["value"], options: Option[]) {
+function renderSelected(
+  value: SelectValue,
+  options: Option[],
+  placeholder: string = "Choisir une valeur"
+) {
+  let selected
+
   if (Array.isArray(value)) {
-    return options
+    selected = options
       .filter((o) => value.includes(o.key))
       .map((v) => v.label)
       .join(", ")
   } else {
-    return options.find((o) => o.key === value)?.label
+    selected = options.find((o) => o.key === value)?.label
   }
+
+  return selected ?? placeholder
 }
 
+// get only options containing the given query
+function filterOptions(options: Option[], query: string) {
+  return query.length > 0
+    ? options.filter((option) => option.label.toLowerCase().includes(query))
+    : options
+}
+
+// custom hook  for managing select
 function useSelect(
-  value: SelectProps["value"],
+  value: SelectValue,
   placeholder: string | undefined,
   options: Option[],
   onChange: SelectProps["onChange"],
@@ -64,37 +79,38 @@ function useSelect(
   const dd = useDropdown()
   const [query, setQuery] = useState("")
 
-  // reset the value
+  // reset the value, reset the query, close the menu
   function clear(e: React.MouseEvent) {
+    e.stopPropagation()
     onChange(null)
     setQuery("")
+    dd.toggle(false)
   }
 
   // select an option
   function select(e: React.MouseEvent, option: Option) {
-    if (multiple && Array.isArray(value)) {
-      // prevent closing of option list
-      e.stopPropagation()
+    if (!multiple) {
+      // single value selection
+      return onChange(option.key)
+    }
 
-      if (value.includes(option.key)) {
-        onChange(value.filter((key) => key !== option.key))
-      } else {
-        onChange([...value, option.key])
-      }
+    // prevent closing of option list
+    e.stopPropagation()
+
+    if (!Array.isArray(value)) {
+      onChange([option.key])
+    } else if (value.includes(option.key)) {
+      onChange(value.filter((key) => key !== option.key))
     } else {
-      onChange(option.key)
+      onChange([...value, option.key])
     }
   }
 
   // what to display in the dropdown label
-  const selected =
-    renderSelected(value, options) || placeholder || "Choisir une valeur"
+  const selected = renderSelected(value, options, placeholder)
 
   // filter options according to search query
-  const queryOptions =
-    query.length > 0
-      ? options.filter((option) => option.label.toLowerCase().includes(query))
-      : options
+  const queryOptions = filterOptions(options, query)
 
   return { dd, selected, queryOptions, query, select, clear, setQuery }
 }
