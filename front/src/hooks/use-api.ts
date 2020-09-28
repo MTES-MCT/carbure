@@ -1,5 +1,4 @@
 import { useEffect, useReducer, useState } from "react"
-import { ApiPromise } from "../services/api"
 
 enum ApiStatus {
   Pending = "pending",
@@ -41,11 +40,11 @@ type ApiReducer<T> = React.Reducer<ApiState<T>, ApiAction<T>>
 
 type ApiHook<T> = [
   ApiState<T>,
-  React.Dispatch<React.SetStateAction<ApiPromise<T> | null>>
+  React.Dispatch<React.SetStateAction<Promise<T> | null>>
 ]
 
 function useAPI<T>(): ApiHook<T> {
-  const [promise, setPromise] = useState<ApiPromise<T> | null>(null)
+  const [promise, setPromise] = useState<Promise<T> | null>(null)
   const [state, dispatch] = useReducer<ApiReducer<T>>(reducer, initialState)
 
   useEffect(() => {
@@ -63,17 +62,14 @@ function useAPI<T>(): ApiHook<T> {
         const res = await promise
 
         // stop doing anything if this request was canceled
-        if (canceled) {
-          return
-        }
-
-        if (res.status === "success") {
-          dispatch({ type: ApiStatus.Success, payload: res.data })
-        } else if (res.status === "error" || res.status === "forbidden") {
-          dispatch({ type: ApiStatus.Error, payload: res.message })
+        if (!canceled) {
+          // and dispatch the data if it was a success
+          dispatch({ type: ApiStatus.Success, payload: res })
         }
       } catch (err) {
-        dispatch({ type: ApiStatus.Error, payload: err.message })
+        if (!canceled) {
+          dispatch({ type: ApiStatus.Error, payload: err.message })
+        }
       }
     }
 

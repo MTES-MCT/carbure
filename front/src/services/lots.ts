@@ -1,13 +1,26 @@
-import api, { ApiPromise } from "./api"
-import { Lot, Lots, LotStatus, Snapshot } from "./types"
+import { ApiFilters, Lot, Lots, LotStatus, Snapshot } from "./types"
 
-// give the same form to all filters in order to render them easily
-// @TODO change any type
-function normalizeFilters(filters: any) {
-  for (const key in filters) {
-    filters[key] = filters[key].map((filter: any) =>
-      typeof filter === "string" ? { key: filter, label: filter } : filter
-    )
+import api from "./api"
+import { FilterSelection } from "../hooks/use-transactions"
+
+// give the same type to all filters in order to render them easily
+function normalizeFilters(filters: ApiFilters): Snapshot["filters"] {
+  return {
+    matieres_premieres: filters.matieres_premieres,
+    biocarburants: filters.biocarburants,
+    countries_of_origin: filters.countries_of_origin,
+    periods: filters.periods.map((filter: string) => ({
+      key: filter,
+      label: filter,
+    })),
+    production_sites: filters.production_sites.map((filter: string) => ({
+      key: filter,
+      label: filter,
+    })),
+    clients: filters.clients.map((filter: string) => ({
+      key: filter,
+      label: filter,
+    })),
   }
 }
 
@@ -31,21 +44,22 @@ export function getStatus(lot: Lot): LotStatus {
   return LotStatus.Weird
 }
 
-export function getSnapshot(producerID: number): ApiPromise<Snapshot> {
-  return api
-    .get("/lots/snapshot", { producer_id: producerID })
-    .then((snapshot: any) => {
-      normalizeFilters(snapshot.data.filters)
-      return snapshot
-    })
+export async function getSnapshot(producerID: number): Promise<Snapshot> {
+  const snapshot = await api.get("/lots/snapshot", {
+    producer_id: producerID,
+  })
+
+  snapshot.filters = normalizeFilters(snapshot.filters)
+
+  return snapshot
 }
 
 export function getLots(
   status: LotStatus,
   producerID: number,
-  filters: any, // @TODO
+  filters: FilterSelection["selected"],
   pagination: { page: number; limit: number }
-): ApiPromise<Lots> {
+): Promise<Lots> {
   return api.get("/lots", {
     status,
     producer_id: producerID,
