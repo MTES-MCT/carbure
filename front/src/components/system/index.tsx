@@ -48,31 +48,6 @@ export const Select = ({
   </div>
 )
 
-// MENU COMPONENT
-
-export const Menu = ({ className, children, ...props }: SelectProps) => (
-  <Select {...props} className={cl(styles.menu, className)}>
-    {children}
-  </Select>
-)
-
-// MENU LINK COMPONENT
-
-type MenuLinkProps = SystemProps &
-  React.HTMLProps<HTMLOptionElement> & {
-    to: string
-  }
-
-export const MenuLink = ({ to, children, ...props }: MenuLinkProps) => {
-  const history = useHistory()
-
-  return (
-    <option {...props} onClick={() => history.push(to)}>
-      {children}
-    </option>
-  )
-}
-
 // BUTTON COMPONENT
 
 type ButtonProps = SystemProps &
