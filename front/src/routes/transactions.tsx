@@ -1,36 +1,33 @@
-import React, { useState } from "react"
+import React from "react"
 
-import useAPI, { ApiState } from "../hooks/use-api"
-import { Entity, Settings } from "../services/settings"
-import { getSnapshot, getLots, LotStatus } from "../services/lots"
+import { EntitySelection } from "../hooks/use-app"
+import { Settings } from "../services/types"
+import { ApiState } from "../hooks/use-api"
+
+import useTransactions from "../hooks/use-transactions"
 
 import { Main } from "../components/system"
 import TransactionSnapshot from "../components/transaction-snapshot"
 import TransactionList from "../components/transaction-list"
 import Pagination from "../components/pagination"
 
-// @TODO harcoded pagination limit value
-const LIMIT = 10
-
 type TransactionsProps = {
   settings: ApiState<Settings>
-  entity: Entity | null
+  entity: EntitySelection
 }
 
 const Transactions = ({ settings, entity }: TransactionsProps) => {
-  const snapshot = useAPI(getSnapshot)
-  const transactions = useAPI(getLots)
-
-  const [activeStatus, setActiveStatus] = useState(LotStatus.Draft)
-  const [page, setPage] = useState(0)
-  const [filters, setFilters] = useState({})
+  const {
+    status,
+    filters,
+    pagination,
+    snapshot,
+    transactions,
+  } = useTransactions(entity)
 
   if (entity === null || !settings.data) {
     return null
   }
-
-  snapshot.useResolve(entity.id)
-  transactions.useResolve(activeStatus, entity.id, filters, page, LIMIT)
 
   // boolean for conditional rendering of certain children
   const hasData = transactions.data && transactions.data.total > 0
@@ -39,10 +36,8 @@ const Transactions = ({ settings, entity }: TransactionsProps) => {
     <React.Fragment>
       <TransactionSnapshot
         snapshot={snapshot}
-        activeStatus={activeStatus}
-        setActiveStatus={setActiveStatus}
+        status={status}
         filters={filters}
-        setFilters={setFilters}
       />
 
       <Main>
@@ -50,10 +45,10 @@ const Transactions = ({ settings, entity }: TransactionsProps) => {
 
         {hasData && (
           <Pagination
-            from={page}
-            limit={LIMIT}
+            page={pagination.selected.page}
+            limit={pagination.selected.limit}
             total={transactions.data!.total}
-            onChange={setPage}
+            onChange={pagination.setPage}
           />
         )}
 
