@@ -85,3 +85,16 @@ export const AlertCircle = ({ className, ...props }: IconProps) => (
     <line x1="12" y1="16" x2="12.01" y2="16" />
   </Icon>
 )
+
+export const Copy = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-cross", className)}>
+    <rect x="8" y="8" width="12" height="12" rx="2" />
+    <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2" />
+  </Icon>
+)
+
+export const Check = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-cross", className)}>
+    <path d="M5 12l5 5l10 -10" />
+  </Icon>
+)
