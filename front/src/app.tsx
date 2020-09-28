@@ -1,25 +1,16 @@
-import React, { useState } from "react"
+import React from "react"
 import { BrowserRouter, Route } from "react-router-dom"
 
-import useAPI from "./hooks/use-api"
-import { Entity, getSettings } from "./services/settings"
+import useApp from "./hooks/use-app"
 
+import Exit from "./components/exit"
 import Topbar from "./components/top-bar"
 import Footer from "./components/footer"
 import Logout from "./routes/logout"
 import Transactions from "./routes/transactions"
-import Exit from "./components/exit"
 
 const App = () => {
-  const [entity, setEntity] = useState<Entity | null>(null)
-
-  const settings = useAPI(getSettings)
-  settings.useResolve()
-
-  // select the default entity if not already done
-  if (entity === null && settings.data) {
-    setEntity(settings.data.rights[0].entity)
-  }
+  const { entity, settings } = useApp()
 
   if (settings.loading) {
     return <h1>Loading...</h1>
@@ -31,7 +22,7 @@ const App = () => {
 
   return (
     <BrowserRouter basename="/v2">
-      <Topbar settings={settings} entity={entity} setEntity={setEntity} />
+      <Topbar settings={settings} entity={entity} />
 
       <Route path="/transactions">
         <Transactions settings={settings} entity={entity} />
