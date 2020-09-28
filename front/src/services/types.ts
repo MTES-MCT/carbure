@@ -1,4 +1,4 @@
-import { Option } from "../components/dropdown/select"
+import { Option } from "../components/system/select"
 
 export type Pagination = {
   from?: number

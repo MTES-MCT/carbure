@@ -3,7 +3,7 @@ import cl from "clsx"
 
 import styles from "./select.module.css"
 
-import { SystemProps } from "../system"
+import { SystemProps } from "."
 import { Cross } from "../icons"
 import { Dropdown, useDropdown } from "./dropdown"
 

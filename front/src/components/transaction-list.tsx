@@ -8,6 +8,7 @@ import styles from "./transaction-list.module.css"
 
 import { truncate } from "../utils/format"
 import { getStatus } from "../services/lots"
+
 import { Alert, Box, Table } from "./system"
 import { AlertCircle, ChevronRight } from "./icons"
 import Pagination from "./pagination"
