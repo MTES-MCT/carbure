@@ -38,12 +38,16 @@ const Modal = ({ className, onClose, children, ...props }: ModalProps) => {
   )
 }
 
-export const ModalRoute = ({ children, ...props }: RouteProps) => {
+type ModalRouteProps = RouteProps & {
+  back: string
+}
+
+export const ModalRoute = ({ children, back, ...props }: ModalRouteProps) => {
   const history = useHistory()
 
   return (
     <Route {...props}>
-      <Modal onClose={() => history.goBack()}>{children}</Modal>
+      <Modal onClose={() => history.push(back)}>{children}</Modal>
     </Route>
   )
 }

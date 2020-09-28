@@ -43,7 +43,7 @@ const Transactions = ({ settings, entity }: TransactionsProps) => {
         pagination={pagination}
       />
 
-      <ModalRoute exact path="/transactions/:id">
+      <ModalRoute exact path="/transactions/:id" back="/transactions">
         <TransactionDetails transactions={transactions.data} />
       </ModalRoute>
     </Main>
