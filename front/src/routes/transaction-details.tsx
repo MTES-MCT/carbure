@@ -5,18 +5,28 @@ import { Lots } from "../services/types"
 
 import useTransactionDetails from "../hooks/use-transaction-details"
 
+import { Box, Title } from "../components/system"
+import TransactionForm from "../components/transaction-form"
+
 type TransactionDetailsProps = {
   transactions: Lots | null
 }
 
 const TransactionDetails = ({ transactions }: TransactionDetailsProps) => {
-  const transaction = useTransactionDetails(transactions)
+  const [transaction, change] = useTransactionDetails(transactions)
 
   if (transaction === null) {
     return <Redirect to="/transactions" />
   }
 
-  return <span>{JSON.stringify(transaction)}</span>
+  console.log(transaction)
+
+  return (
+    <Box>
+      <Title>Transaction #{transaction.id}</Title>
+      <TransactionForm transaction={transaction} onChange={change} />
+    </Box>
+  )
 }
 
 export default TransactionDetails
