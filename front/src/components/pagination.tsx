@@ -1,13 +1,21 @@
 import React from "react"
-import { ChevronLeft, ChevronRight } from "./icons"
 
 import styles from "./pagination.module.css"
+
+import { ChevronLeft, ChevronRight } from "./icons"
 import { Button, Select } from "./system"
 
 // generate a list of numbers from 0 to size-1
 const list = (size: number) => Array.from(Array(Math.ceil(size)).keys())
 
-const Pagination = ({ from, limit, total, onChange }: any) => {
+type PaginationProps = {
+  page: number
+  total: number
+  limit: number
+  onChange: (p: number) => void
+}
+
+const Pagination = ({ page, limit, total, onChange }: PaginationProps) => {
   const pages = Math.ceil(total / limit)
 
   function changePage(index: number) {
@@ -18,13 +26,13 @@ const Pagination = ({ from, limit, total, onChange }: any) => {
     <div className={styles.pagination}>
       <Button
         className={styles.paginationButton}
-        onClick={() => changePage(from - 1)}
+        onClick={() => changePage(page - 1)}
       >
         <ChevronLeft />
       </Button>
 
       <Select
-        value={from}
+        value={page}
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
           changePage(parseInt(e.target.value, 10))
         }
@@ -40,7 +48,7 @@ const Pagination = ({ from, limit, total, onChange }: any) => {
 
       <Button
         className={styles.paginationButton}
-        onClick={() => changePage(from + 1)}
+        onClick={() => changePage(page + 1)}
       >
         <ChevronRight />
       </Button>

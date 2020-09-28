@@ -1,11 +1,14 @@
 import React from "react"
 import cl from "clsx"
 
+import { Lot, LotStatus } from "../services/types"
+
 import styles from "./transaction-list.module.css"
 
-import { getStatus, Lot, LotStatus } from "../services/lots"
+import { getStatus } from "../services/lots"
 import { Table } from "./system"
 import { truncate } from "../utils/format"
+import { ChevronRight } from "./icons"
 
 type TransactionListProps = {
   transactions: Lot[]
@@ -31,13 +34,13 @@ const STATUS = {
   [LotStatus.Weird]: "Problème",
 }
 
-const Cell = ({ text }: { text: string }) => (
+const OneLine = ({ text }: { text: string }) => (
   <span title={text}>{truncate(text)}</span>
 )
 
-const DualCell = ({ top, bottom }: { top: string; bottom: string }) => (
+const TwoLines = ({ top, bottom }: { top: string; bottom: string }) => (
   <div className={styles.dualRow}>
-    <Cell text={top} />
+    <OneLine text={top} />
     <span title={bottom} className={styles.extraInfo}>
       {truncate(bottom, 40)}
     </span>
@@ -69,15 +72,15 @@ const TransactionList = ({ transactions }: TransactionListProps) => (
         </td>
 
         <td>
-          <Cell text={transaction.lot.period} />
+          <OneLine text={transaction.lot.period} />
         </td>
 
         <td>
-          <Cell text={transaction.dae} />
+          <OneLine text={transaction.dae} />
         </td>
 
         <td>
-          <Cell
+          <OneLine
             text={
               transaction.carbure_client?.name ?? transaction.unknown_client
             }
@@ -85,14 +88,14 @@ const TransactionList = ({ transactions }: TransactionListProps) => (
         </td>
 
         <td>
-          <DualCell
+          <TwoLines
             top={transaction.lot.biocarburant.name}
             bottom={`${transaction.lot.volume}L`}
           />
         </td>
 
         <td>
-          <DualCell
+          <TwoLines
             top={
               transaction.lot.carbure_producer?.name ??
               transaction.lot.unknown_producer
@@ -105,7 +108,7 @@ const TransactionList = ({ transactions }: TransactionListProps) => (
         </td>
 
         <td>
-          <DualCell
+          <TwoLines
             top={
               transaction.carbure_delivery_site?.city ??
               transaction.unknown_delivery_site
@@ -118,17 +121,19 @@ const TransactionList = ({ transactions }: TransactionListProps) => (
         </td>
 
         <td>
-          <DualCell
+          <TwoLines
             top={transaction.lot.matiere_premiere.name}
             bottom={transaction.lot.pays_origine.name}
           />
         </td>
 
         <td>
-          <Cell text={`${transaction.lot.ghg_reduction}%`} />
+          <OneLine text={`${transaction.lot.ghg_reduction}%`} />
         </td>
 
-        <td>{">"}</td>
+        <td>
+          <ChevronRight />
+        </td>
       </tr>
     )}
   </Table>

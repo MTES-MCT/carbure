@@ -1,13 +1,14 @@
 import React from "react"
 
-import { Filters, LotStatus, Snapshot } from "../services/lots"
 import { ApiState } from "../hooks/use-api"
+import { Filters, LotStatus, Snapshot } from "../services/types"
+import { StatusSelection, FilterSelection } from "../hooks/use-transactions"
 
 import styles from "./transaction-snapshot.module.css"
 
 import { Plus } from "./icons"
 import { Title, Button, StatusButton, SearchInput } from "./system"
-import Select, { Option } from "./dropdown/select"
+import Select from "./dropdown/select"
 
 const STATUS = [
   { key: LotStatus.Draft, label: "Brouillons" },
@@ -25,30 +26,16 @@ const FILTERS = [
   { key: Filters.Clients, label: "Client" },
 ]
 
-function normalizeFilters(filters: any[] = []) {
-  return filters.map((filter) => {
-    if (typeof filter === "string") {
-      return { key: filter, label: filter }
-    } else {
-      return filter
-    }
-  })
-}
-
 type TransactionSnapshotProps = {
   snapshot: ApiState<Snapshot>
-  activeStatus: string
-  setActiveStatus: Function
-  filters: { [k: string]: Option["key"] | Option["key"][] | null }
-  setFilters: Function
+  status: StatusSelection
+  filters: FilterSelection
 }
 
 const TransactionSnapshot = ({
   snapshot,
-  activeStatus,
-  setActiveStatus,
+  status,
   filters,
-  setFilters,
 }: TransactionSnapshotProps) => (
   <React.Fragment>
     <div className={styles.transactionSnapshot}>
@@ -65,10 +52,10 @@ const TransactionSnapshot = ({
         {STATUS.map(({ key, label }) => (
           <StatusButton
             key={key}
-            active={key === activeStatus}
+            active={key === status.active}
             amount={snapshot.data?.lots[key] ?? "…"}
             label={label}
-            onClick={() => setActiveStatus(key)}
+            onClick={() => status.setActive(key)}
           />
         ))}
       </div>
@@ -81,10 +68,10 @@ const TransactionSnapshot = ({
             search
             multiple
             key={key}
-            value={filters[key] ?? []}
+            value={filters.selected[key]}
             placeholder={label}
-            options={normalizeFilters(snapshot.data?.filters[key])}
-            onChange={(value) => setFilters({ ...filters, [key]: value })}
+            options={snapshot.data?.filters[key] ?? []}
+            onChange={(value) => filters.selectFilter(key, value)}
           />
         ))}
       </div>
