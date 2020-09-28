@@ -159,6 +159,7 @@ export const Alert = ({
 }
 
 // TITLE COMPONENT
+
 type TitleProps = SystemProps & React.HTMLProps<HTMLHeadingElement>
 
 export const Title = ({ children, className, ...props }: TitleProps) => (
@@ -173,6 +174,50 @@ type InputProps = SystemProps & React.HTMLProps<HTMLInputElement>
 
 export const Input = ({ className, ...props }: InputProps) => (
   <input {...props} className={cl(styles.input, className)} />
+)
+
+// FORM INPUT COMPONENT
+
+type LabelInputProps = SystemProps &
+  React.HTMLProps<HTMLInputElement> & {
+    label: React.ReactNode
+  }
+
+export const LabelInput = ({ label, className, ...props }: LabelInputProps) => (
+  <label className={cl(styles.labelWrapper, className)}>
+    {label}
+    <Input {...props} />
+  </label>
+)
+
+// TEXT AREA COMPONENT
+
+type LabelTextAreaProps = SystemProps &
+  React.HTMLProps<HTMLTextAreaElement> & {
+    label: React.ReactNode
+  }
+
+export const LabelTextArea = ({
+  label,
+  className,
+  ...props
+}: LabelTextAreaProps) => (
+  <label className={cl(styles.labelWrapper, styles.labelTextArea)}>
+    {label}
+    <textarea {...props} />
+  </label>
+)
+
+// LABEL CHECKBOX COMPONENT
+export const LabelCheckbox = ({
+  label,
+  className,
+  ...props
+}: LabelInputProps) => (
+  <label className={cl(styles.labelCheckbox)}>
+    <input type="checkbox" {...props} />
+    {label}
+  </label>
 )
 
 // SEARCH INPUT COMPONENT

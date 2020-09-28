@@ -198,6 +198,10 @@
   font-weight: 400;
 }
 
+.input:focus {
+  border-color: var(--blue-medium);
+}
+
 .input:hover {
   color: var(--blue-medium);
   border-color: var(--blue-medium);

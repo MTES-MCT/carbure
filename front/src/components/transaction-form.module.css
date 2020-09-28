@@ -1,0 +1,32 @@
+.transactionForm {
+  display: flex;
+  margin-top: 32px;
+}
+
+.transactionForm > div {
+  flex: 1;
+}
+
+.transactionForm > div:last-child {
+  flex: 0;
+}
+
+.middleColumn {
+  margin: 0 32px;
+}
+
+.transactionGES {
+  display: flex;
+}
+
+.transactionGES > div:first-child {
+  margin-right: 8px;
+}
+
+.transactionGES input {
+  width: 64px;
+}
+
+.transactionTotal {
+  width: 136px;
+}
