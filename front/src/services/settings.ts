@@ -1,16 +1,6 @@
-import api, { ApiResponse } from "./api"
+import api, { ApiPromise } from "./api"
+import { Settings } from "./types"
 
-export type Entity = {
-  id: number
-  name: string
-  entity_type: string
-}
-
-export type Settings = {
-  email: string
-  rights: { entity: Entity }[]
-}
-
-export function getSettings(): ApiResponse<Settings> {
+export function getSettings(): ApiPromise<Settings> {
   return api.get("/settings")
 }

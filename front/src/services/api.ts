@@ -6,9 +6,11 @@ type Params = { [k: string]: any }
 type Options = { [k: string]: any }
 
 export type ApiResponse<T> =
-  | Promise<{ status: "error"; message: string }>
-  | Promise<{ status: "forbidden"; message: string }>
-  | Promise<{ status: "success"; data: T }>
+  | { status: "error"; message: string }
+  | { status: "forbidden"; message: string }
+  | { status: "success"; data: T }
+
+export type ApiPromise<T> = Promise<ApiResponse<T>>
 
 function readyParams(params: Params) {
   const okParams: Params = {}
@@ -22,11 +24,11 @@ function readyParams(params: Params) {
   return okParams
 }
 
-function get<T>(
+function get<T = any>(
   endpoint: string,
   params?: Params,
   options?: Options
-): ApiResponse<T> {
+): ApiPromise<T> {
   let url = API_ROOT + endpoint
 
   if (params) {
@@ -36,11 +38,11 @@ function get<T>(
   return fetch(url, options).then((res) => res.json())
 }
 
-function post<T>(
+function post<T = any>(
   endpoint: string,
   body?: Params,
   options?: Options
-): ApiResponse<T> {
+): ApiPromise<T> {
   const fetchOptions: Params = { ...options, method: "POST" }
 
   if (body) {
