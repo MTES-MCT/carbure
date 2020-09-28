@@ -1,4 +1,5 @@
 import React from "react"
+import { Link } from "react-router-dom"
 
 import { ApiState } from "../hooks/use-api"
 import { Filters, LotStatus, Snapshot } from "../services/types"
@@ -42,10 +43,12 @@ const TransactionSnapshot = ({
       <div className={styles.transactionHeader}>
         <Title>Transactions</Title>
 
-        <Button type="primary">
-          <Plus />
-          Ajouter des lots
-        </Button>
+        <Link to="/transactions/add">
+          <Button type="primary">
+            <Plus />
+            Ajouter des lots
+          </Button>
+        </Link>
       </div>
 
       <div className={styles.transactionStatus}>

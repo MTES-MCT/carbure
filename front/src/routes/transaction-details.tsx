@@ -33,7 +33,7 @@ const TransactionDetails = ({ transactions }: TransactionDetailsProps) => {
 
       <Modal.Buttons>
         <Button type="primary">
-          <Save size={18} /> Sauvegarder
+          <Save /> Sauvegarder
         </Button>
         <Button onClick={close}>
           <Cross /> Annuler

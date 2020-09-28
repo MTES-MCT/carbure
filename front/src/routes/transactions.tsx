@@ -1,8 +1,7 @@
 import React from "react"
+import { Route, Switch } from "react-router-dom"
 
 import { EntitySelection } from "../hooks/use-app"
-import { Settings } from "../services/types"
-import { ApiState } from "../hooks/use-api"
 
 import useTransactions from "../hooks/use-transactions"
 
@@ -10,14 +9,13 @@ import { Main } from "../components/system"
 import TransactionSnapshot from "../components/transaction-snapshot"
 import TransactionList from "../components/transaction-list"
 import TransactionDetails from "./transaction-details"
-import { Route } from "react-router-dom"
+import TransactionAdd from "./transaction-add"
 
 type TransactionsProps = {
-  settings: ApiState<Settings>
   entity: EntitySelection
 }
 
-const Transactions = ({ settings, entity }: TransactionsProps) => {
+const Transactions = ({ entity }: TransactionsProps) => {
   const {
     status,
     filters,
@@ -26,7 +24,7 @@ const Transactions = ({ settings, entity }: TransactionsProps) => {
     transactions,
   } = useTransactions(entity)
 
-  if (entity.selected === null || settings.data === null) {
+  if (entity.selected === null) {
     return null
   }
 
@@ -43,9 +41,15 @@ const Transactions = ({ settings, entity }: TransactionsProps) => {
         pagination={pagination}
       />
 
-      <Route exact path="/transactions/:id">
-        <TransactionDetails transactions={transactions.data} />
-      </Route>
+      <Switch>
+        <Route path="/transactions/add">
+          <TransactionAdd entity={entity} />
+        </Route>
+
+        <Route exact path="/transactions/:id">
+          <TransactionDetails transactions={transactions.data} />
+        </Route>
+      </Switch>
     </Main>
   )
 }

@@ -16,6 +16,10 @@
   margin-bottom: 32px;
 }
 
+.transactionHeader a {
+  text-decoration: none;
+}
+
 .transactionStatus {
   display: flex;
   justify-content: space-between;

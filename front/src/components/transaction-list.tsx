@@ -64,7 +64,6 @@ const TransactionRow = ({ transaction }: { transaction: Lot }) => {
 
   return (
     <tr
-      key={transaction.lot.id}
       className={styles.transactionRow}
       onClick={() => history.push(`/transactions/${transaction.lot.id}`)}
     >
@@ -170,7 +169,9 @@ const TransactionList = ({
   return (
     <Box className={styles.transactionList}>
       <Table columns={COLUMNS} rows={transactions.lots}>
-        {(transaction) => <TransactionRow transaction={transaction} />}
+        {(transaction) => (
+          <TransactionRow key={transaction.lot.id} transaction={transaction} />
+        )}
       </Table>
 
       <Pagination

@@ -103,12 +103,6 @@ const TransactionForm = ({
           value={tr.champ_libre}
           onChange={onChange}
         />
-        <LabelCheckbox
-          name="mac"
-          checked={tr.mac}
-          label="Mise à consommation ?"
-          onChange={onChange}
-        />
       </Box>
 
       <Box>
@@ -200,6 +194,14 @@ const TransactionForm = ({
           value={tr.eu}
           step={0.1}
           className={styles.transactionTotal}
+          onChange={onChange}
+        />
+
+        <LabelCheckbox
+          name="mac"
+          label="Mise à consommation ?"
+          checked={tr.mac}
+          className={styles.transactionMAC}
           onChange={onChange}
         />
       </Box>

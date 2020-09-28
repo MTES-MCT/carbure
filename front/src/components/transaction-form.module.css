@@ -7,10 +7,6 @@
   flex: 1;
 }
 
-.transactionForm > div:last-child {
-  flex: 0;
-}
-
 .middleColumn {
   margin: 0 32px;
 }
@@ -23,10 +19,6 @@
   margin-right: 8px;
 }
 
-.transactionGES input {
-  width: 64px;
-}
-
-.transactionTotal {
-  width: 136px;
+.transactionMAC {
+  margin: auto;
 }
