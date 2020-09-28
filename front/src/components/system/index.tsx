@@ -88,6 +88,7 @@ export const Button = ({
 }: ButtonProps) => {
   const btnClassName = cl(styles.button, className, {
     [styles.buttonPrimary]: type === "primary",
+    [styles.buttonWarning]: type === "warning",
   })
 
   return (

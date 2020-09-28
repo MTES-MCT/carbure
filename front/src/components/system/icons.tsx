@@ -106,3 +106,11 @@ export const Save = ({ className, ...props }: IconProps) => (
     <polyline points="14 4 14 8 8 8 8 4" />
   </Icon>
 )
+
+export const Message = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-save", className)}>
+    <path d="M4 21v-13a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v6a3 3 0 0 1 -3 3h-9l-4 4" />
+    <line x1="12" y1="8" x2="12" y2="11" />
+    <line x1="12" y1="14" x2="12" y2="14.01" />
+  </Icon>
+)

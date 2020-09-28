@@ -1,10 +1,9 @@
 import React, { useState } from "react"
 import { createPortal } from "react-dom"
-import { Route, RouteProps, useHistory } from "react-router-dom"
 import cl from "clsx"
 
 import styles from "./modal.module.css"
-import { Cross } from "../icons"
+import { Cross } from "./icons"
 
 const root = document.getElementById("modal")!
 
@@ -17,6 +16,19 @@ export function useModal() {
     close: () => setOpened(false),
   }
 }
+
+type ModalButtonsProps = {
+  className?: string
+  children: React.ReactNode
+  onClose?: (event: React.MouseEvent) => void
+  [k: string]: any
+}
+
+const ModalButtons = ({ className, children, ...props }: ModalButtonsProps) => (
+  <div {...props} className={cl(styles.modalButtons, className)}>
+    {children}
+  </div>
+)
 
 type ModalProps = {
   className?: string
@@ -38,18 +50,5 @@ const Modal = ({ className, onClose, children, ...props }: ModalProps) => {
   )
 }
 
-type ModalRouteProps = RouteProps & {
-  back: string
-}
-
-export const ModalRoute = ({ children, back, ...props }: ModalRouteProps) => {
-  const history = useHistory()
-
-  return (
-    <Route {...props}>
-      <Modal onClose={() => history.push(back)}>{children}</Modal>
-    </Route>
-  )
-}
-
+Modal.Buttons = ModalButtons
 export default Modal
