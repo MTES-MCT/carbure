@@ -177,8 +177,8 @@ def add_lot(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    load_lot(entity, request.user, request.POST.dict(), 'MANUAL')
-    return JsonResponse({'status': 'success'})
+    lot, tx, lot_errors, tx_errors = load_lot(entity, request.user, request.POST.dict(), 'MANUAL')
+    return JsonResponse({'status': 'success', 'data': tx.natural_key()})
 
 
 def update_lot(request):
