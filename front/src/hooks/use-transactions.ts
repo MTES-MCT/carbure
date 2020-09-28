@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 
 import { EntitySelection } from "./use-app"
-import { SelectValue } from "../components/dropdown/select"
+import { SelectValue } from "../components/system/select"
 import { LotStatus, Filters, Lots, Snapshot } from "../services/types"
 
 import useAPI from "../hooks/use-api"

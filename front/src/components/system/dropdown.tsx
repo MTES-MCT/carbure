@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react"
 import cl from "clsx"
 
 import styles from "./dropdown.module.css"
-import { SystemProps } from "../system"
+
+import { SystemProps } from "."
 import { ChevronDown } from "../icons"
 
 export function useDropdown() {

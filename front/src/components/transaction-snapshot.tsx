@@ -8,7 +8,7 @@ import styles from "./transaction-snapshot.module.css"
 
 import { Plus } from "./icons"
 import { Title, Button, StatusButton, SearchInput, Box } from "./system"
-import Select from "./dropdown/select"
+import Select from "./system/select"
 
 const STATUS = [
   { key: LotStatus.Draft, label: "Brouillons" },
