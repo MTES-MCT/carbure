@@ -68,26 +68,28 @@
 .button {
   display: flex;
   align-items: center;
-  background-color: var(--gray-light);
+  background-color: var(--white);
   border: 1px solid var(--gray-medium);
   border-radius: 4px;
   font-weight: 600;
-  padding: 8px;
+  padding: 8px 12px;
   padding-right: 16px;
   cursor: pointer;
+}
+
+.button :global(.icon) {
+  width: 20px;
+  margin-right: 8px;
 }
 
 .button:hover {
   color: var(--blue-medium);
   border-color: var(--blue-medium);
+  background-color: var(--gray-light);
 }
 
 .button:active {
-  background-color: var(--gray-medium);
-}
-
-.button svg {
-  margin-right: 8px;
+  transform: translate3D(1px, 1px, 0);
 }
 
 .buttonPrimary {
@@ -98,10 +100,19 @@
 
 .buttonPrimary:hover {
   color: var(--white);
+  background-color: var(--blue-dark);
 }
 
-.buttonPrimary:active {
-  background-color: var(--blue-dark);
+.buttonWarning {
+  color: var(--orange-dark);
+  background-color: var(--orange-light);
+  border-color: var(--orange-medium);
+}
+
+.buttonWarning:hover {
+  color: var(--white);
+  background-color: var(--orange-dark);
+  border-color: var(--orange-dark);
 }
 
 /* STATUS BUTTON */
@@ -260,10 +271,12 @@
   align-items: center;
   font-size: 14px;
   font-weight: 600;
+  cursor: pointer;
 }
 
 .labelCheckbox input[type="checkbox"] {
   margin-right: 8px;
+  cursor: pointer;
 }
 
 /* TABLE COMPONENT */

@@ -7,10 +7,10 @@ import { ApiState } from "../hooks/use-api"
 import useTransactions from "../hooks/use-transactions"
 
 import { Main } from "../components/system"
-import { ModalRoute } from "../components/system/modal"
 import TransactionSnapshot from "../components/transaction-snapshot"
 import TransactionList from "../components/transaction-list"
 import TransactionDetails from "./transaction-details"
+import { Route } from "react-router-dom"
 
 type TransactionsProps = {
   settings: ApiState<Settings>
@@ -43,9 +43,9 @@ const Transactions = ({ settings, entity }: TransactionsProps) => {
         pagination={pagination}
       />
 
-      <ModalRoute exact path="/transactions/:id" back="/transactions">
+      <Route exact path="/transactions/:id">
         <TransactionDetails transactions={transactions.data} />
-      </ModalRoute>
+      </Route>
     </Main>
   )
 }
