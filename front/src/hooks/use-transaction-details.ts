@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { useParams } from "react-router-dom"
+
+import useForm, { FormFields } from "./use-form"
 import { Lot, Lots } from "../services/types"
 
 export interface TransactionFormState {
@@ -70,32 +72,16 @@ function extractFormData(tr: Lot): TransactionFormState {
   }
 }
 
-type Fields = HTMLInputElement | HTMLTextAreaElement
-
-function isCheckbox(element: Fields): element is HTMLInputElement {
-  return element.tagName === "INPUT" && element.type === "checkbox"
-}
-
-function parseValue(element: Fields) {
-  if (isCheckbox(element)) {
-    return element.checked
-  } else if (element.type === "number") {
-    return parseFloat(element.value)
-  } else {
-    return element.value
-  }
-}
-
 export type TransactionDetailsHook = [
   TransactionFormState | null,
-  <T extends Fields>(e: React.ChangeEvent<T>) => void
+  <T extends FormFields>(e: React.ChangeEvent<T>) => void
 ]
 
 export default function useTransactionDetails(
   transactions: Lots | null
 ): TransactionDetailsHook {
   const params: { id: string } = useParams()
-  const [form, setForm] = useState<TransactionFormState | null>(null)
+  const [form, onChange, setForm] = useForm<TransactionFormState | null>(null)
 
   if (transactions) {
     const transactionID = parseInt(params.id, 10)
@@ -112,14 +98,5 @@ export default function useTransactionDetails(
     }
   }
 
-  function change<T extends Fields>(e: React.ChangeEvent<T>) {
-    if (form) {
-      setForm({
-        ...form,
-        [e.target.name]: parseValue(e.target),
-      })
-    }
-  }
-
-  return [form, change]
+  return [form, onChange]
 }
