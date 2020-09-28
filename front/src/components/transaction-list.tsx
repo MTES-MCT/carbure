@@ -10,7 +10,7 @@ import { truncate } from "../utils/format"
 import { getStatus } from "../services/lots"
 
 import { Alert, Box, Table } from "./system"
-import { AlertCircle, ChevronRight } from "./icons"
+import { AlertCircle, Check, ChevronRight, Copy, Cross } from "./icons"
 import Pagination from "./pagination"
 
 const COLUMNS = [
@@ -59,7 +59,7 @@ const TwoLines = ({ top, bottom }: { top: string; bottom: string }) => (
 )
 
 const TransactionRow = ({ transaction }: { transaction: Lot }) => (
-  <tr key={transaction.lot.id} className={styles.row}>
+  <tr key={transaction.lot.id} className={styles.transactionRow}>
     <td>
       <input type="checkbox" name={transaction.dae} />
     </td>
@@ -126,8 +126,14 @@ const TransactionRow = ({ transaction }: { transaction: Lot }) => (
       <Line text={`${transaction.lot.ghg_reduction}%`} />
     </td>
 
-    <td>
-      <ChevronRight />
+    <td className={styles.actionColumn}>
+      <ChevronRight className={styles.transactionArrow} />
+
+      <div className={styles.transactionActions}>
+        <Copy size={20} title="Dupliquer le lot" />
+        <Check size={20} title="Valider le lot" />
+        <Cross size={20} title="Supprimer le lot" />
+      </div>
     </td>
   </tr>
 )
