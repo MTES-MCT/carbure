@@ -56,4 +56,5 @@
 
 .searchInput input {
   width: 165px;
+  background-color: var(--gray-light);
 }

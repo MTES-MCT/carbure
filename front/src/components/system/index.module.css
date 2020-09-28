@@ -189,20 +189,27 @@
 
 /* INPUT COMPONENT */
 
-.input {
+.input,
+.textarea {
   font-size: 13px;
   font-weight: 600;
   border: 1px solid var(--gray-medium);
-  background-color: var(--gray-light);
+  background-color: var(--white);
   padding: 8px;
   font-weight: 400;
 }
 
-.input:focus {
+.textarea {
+  font-size: 12px;
+}
+
+.input:focus,
+.textarea:focus {
   border-color: var(--blue-medium);
 }
 
-.input:hover {
+.input:hover,
+.textarea:hover {
   color: var(--blue-medium);
   border-color: var(--blue-medium);
 }
@@ -218,7 +225,7 @@
 }
 
 .labelTextArea,
-.labelTextArea textarea {
+.textarea {
   flex: 1;
 }
 
@@ -250,11 +257,12 @@
 
 .labelCheckbox {
   display: flex;
+  align-items: center;
   font-size: 14px;
   font-weight: 600;
 }
 
-.labelCheckbox input {
+.labelCheckbox input[type="checkbox"] {
   margin-right: 8px;
 }
 

@@ -204,7 +204,7 @@ export const LabelTextArea = ({
 }: LabelTextAreaProps) => (
   <label className={cl(styles.labelWrapper, styles.labelTextArea)}>
     {label}
-    <textarea {...props} />
+    <textarea {...props} className={styles.textarea} />
   </label>
 )
 
