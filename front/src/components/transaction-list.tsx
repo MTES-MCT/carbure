@@ -158,7 +158,7 @@ const TransactionList = ({
   if (transactions === null || transactions.lots.length === 0) {
     return (
       <Box className={styles.transactionList}>
-        <Alert type="warning">
+        <Alert kind="warning">
           <AlertCircle />
           Aucune transaction trouvée pour ces paramètres
         </Alert>

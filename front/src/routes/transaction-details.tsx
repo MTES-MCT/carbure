@@ -29,16 +29,15 @@ const TransactionDetails = ({ transactions }: TransactionDetailsProps) => {
   return (
     <Modal onClose={close}>
       <Title>Transaction #{transaction.id}</Title>
-      <TransactionForm transaction={transaction} onChange={change} />
 
-      <Modal.Buttons>
-        <Button type="primary">
+      <TransactionForm transaction={transaction} onChange={change}>
+        <Button submit kind="primary">
           <Save /> Sauvegarder
         </Button>
         <Button onClick={close}>
           <Cross /> Annuler
         </Button>
-      </Modal.Buttons>
+      </TransactionForm>
     </Modal>
   )
 }

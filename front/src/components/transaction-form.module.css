@@ -1,9 +1,14 @@
 .transactionForm {
   display: flex;
+  flex-direction: column;
   margin-top: 32px;
 }
 
-.transactionForm > div {
+.transactionFields {
+  display: flex;
+}
+
+.transactionFields > div {
   flex: 1;
 }
 
@@ -21,4 +26,11 @@
 
 .transactionMAC {
   margin: auto;
+}
+
+.transactionFormButtons {
+  display: flex;
+  margin-top: auto;
+  justify-content: space-between;
+  padding-top: 32px;
 }
