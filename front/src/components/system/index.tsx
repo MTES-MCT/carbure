@@ -1,5 +1,4 @@
 import React, { CSSProperties } from "react"
-import { useHistory } from "react-router-dom"
 import cl from "clsx"
 
 import styles from "./index.module.css"
@@ -190,7 +189,7 @@ export const LabelCheckbox = ({
   className,
   ...props
 }: LabelInputProps) => (
-  <label className={cl(styles.labelCheckbox)}>
+  <label className={cl(styles.labelCheckbox, className)}>
     <input type="checkbox" {...props} />
     {label}
   </label>

@@ -189,6 +189,7 @@
 
 .input,
 .textarea {
+  width: 100%;
   font-size: 13px;
   font-weight: 600;
   border: 1px solid var(--gray-medium);

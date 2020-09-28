@@ -25,7 +25,7 @@ const App = () => {
       <Topbar settings={settings} entity={entity} />
 
       <Route path="/transactions">
-        <Transactions settings={settings} entity={entity} />
+        <Transactions entity={entity} />
       </Route>
 
       <Route path="/logout">
