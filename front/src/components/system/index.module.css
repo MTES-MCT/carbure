@@ -50,19 +50,6 @@
   stroke: var(--blue-medium);
 }
 
-/* MENU COMPONENT */
-
-.menu {
-  border: none;
-  background-color: transparent;
-}
-
-.menu .select {
-  font-size: 18px;
-  font-weight: normal;
-  text-align: right;
-}
-
 /* BUTTON COMPONENT */
 
 .button {
