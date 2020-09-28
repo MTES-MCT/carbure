@@ -31,6 +31,7 @@ const App = () => {
       <Route path="/logout">
         <Logout />
       </Route>
+
       <Footer />
     </BrowserRouter>
   )

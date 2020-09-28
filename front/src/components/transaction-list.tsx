@@ -1,5 +1,6 @@
 import React from "react"
 import cl from "clsx"
+import { useHistory } from "react-router-dom"
 
 import { Lot, Lots, LotStatus } from "../services/types"
 import { PageSelection } from "../hooks/use-transactions"
@@ -58,85 +59,93 @@ const TwoLines = ({ top, bottom }: { top: string; bottom: string }) => (
   </div>
 )
 
-const TransactionRow = ({ transaction }: { transaction: Lot }) => (
-  <tr key={transaction.lot.id} className={styles.transactionRow}>
-    <td>
-      <input type="checkbox" name={transaction.dae} />
-    </td>
+const TransactionRow = ({ transaction }: { transaction: Lot }) => {
+  const history = useHistory()
 
-    <td>
-      <Status value={getStatus(transaction)} />
-    </td>
+  return (
+    <tr
+      key={transaction.lot.id}
+      className={styles.transactionRow}
+      onClick={() => history.push(`/transactions/${transaction.lot.id}`)}
+    >
+      <td>
+        <input type="checkbox" name={transaction.dae} />
+      </td>
 
-    <td>
-      <Line text={transaction.lot.period} />
-    </td>
+      <td>
+        <Status value={getStatus(transaction)} />
+      </td>
 
-    <td>
-      <Line text={transaction.dae} />
-    </td>
+      <td>
+        <Line text={transaction.lot.period} />
+      </td>
 
-    <td>
-      <Line
-        text={transaction.carbure_client?.name ?? transaction.unknown_client}
-      />
-    </td>
+      <td>
+        <Line text={transaction.dae} />
+      </td>
 
-    <td>
-      <TwoLines
-        top={transaction.lot.biocarburant.name}
-        bottom={`${transaction.lot.volume}L`}
-      />
-    </td>
+      <td>
+        <Line
+          text={transaction.carbure_client?.name ?? transaction.unknown_client}
+        />
+      </td>
 
-    <td>
-      <TwoLines
-        top={
-          transaction.lot.carbure_producer?.name ??
-          transaction.lot.unknown_producer
-        }
-        bottom={
-          transaction.lot.carbure_production_site?.country.name ??
-          transaction.lot.unknown_production_country
-        }
-      />
-    </td>
+      <td>
+        <TwoLines
+          top={transaction.lot.biocarburant.name}
+          bottom={`${transaction.lot.volume}L`}
+        />
+      </td>
 
-    <td>
-      <TwoLines
-        top={
-          transaction.carbure_delivery_site?.city ??
-          transaction.unknown_delivery_site
-        }
-        bottom={
-          transaction.carbure_delivery_site?.country.name ??
-          transaction.unknown_delivery_site_country?.name
-        }
-      />
-    </td>
+      <td>
+        <TwoLines
+          top={
+            transaction.lot.carbure_producer?.name ??
+            transaction.lot.unknown_producer
+          }
+          bottom={
+            transaction.lot.carbure_production_site?.country.name ??
+            transaction.lot.unknown_production_country
+          }
+        />
+      </td>
 
-    <td>
-      <TwoLines
-        top={transaction.lot.matiere_premiere.name}
-        bottom={transaction.lot.pays_origine.name}
-      />
-    </td>
+      <td>
+        <TwoLines
+          top={
+            transaction.carbure_delivery_site?.city ??
+            transaction.unknown_delivery_site
+          }
+          bottom={
+            transaction.carbure_delivery_site?.country.name ??
+            transaction.unknown_delivery_site_country?.name
+          }
+        />
+      </td>
 
-    <td>
-      <Line text={`${transaction.lot.ghg_reduction}%`} />
-    </td>
+      <td>
+        <TwoLines
+          top={transaction.lot.matiere_premiere.name}
+          bottom={transaction.lot.pays_origine.name}
+        />
+      </td>
 
-    <td className={styles.actionColumn}>
-      <ChevronRight className={styles.transactionArrow} />
+      <td>
+        <Line text={`${transaction.lot.ghg_reduction}%`} />
+      </td>
 
-      <div className={styles.transactionActions}>
-        <Copy size={20} title="Dupliquer le lot" />
-        <Check size={20} title="Valider le lot" />
-        <Cross size={20} title="Supprimer le lot" />
-      </div>
-    </td>
-  </tr>
-)
+      <td className={styles.actionColumn}>
+        <ChevronRight className={styles.transactionArrow} />
+
+        <div className={styles.transactionActions}>
+          <Copy size={20} title="Dupliquer le lot" />
+          <Check size={20} title="Valider le lot" />
+          <Cross size={20} title="Supprimer le lot" />
+        </div>
+      </td>
+    </tr>
+  )
+}
 
 type TransactionListProps = {
   transactions: Lots | null

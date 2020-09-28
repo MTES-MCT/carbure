@@ -7,8 +7,10 @@ import { ApiState } from "../hooks/use-api"
 import useTransactions from "../hooks/use-transactions"
 
 import { Main } from "../components/system"
+import { ModalRoute } from "../components/system/modal"
 import TransactionSnapshot from "../components/transaction-snapshot"
 import TransactionList from "../components/transaction-list"
+import TransactionDetails from "./transaction-details"
 
 type TransactionsProps = {
   settings: ApiState<Settings>
@@ -24,7 +26,7 @@ const Transactions = ({ settings, entity }: TransactionsProps) => {
     transactions,
   } = useTransactions(entity)
 
-  if (entity === null || !settings.data) {
+  if (entity.selected === null || settings.data === null) {
     return null
   }
 
@@ -37,9 +39,13 @@ const Transactions = ({ settings, entity }: TransactionsProps) => {
       />
 
       <TransactionList
-        transactions={transactions.data!}
+        transactions={transactions.data}
         pagination={pagination}
       />
+
+      <ModalRoute exact path="/transactions/:id">
+        <TransactionDetails transactions={transactions.data} />
+      </ModalRoute>
     </Main>
   )
 }
