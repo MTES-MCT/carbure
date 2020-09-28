@@ -51,22 +51,28 @@ export const Select = ({
 
 type ButtonProps = SystemProps &
   React.HTMLProps<HTMLButtonElement> & {
-    type?: string
+    submit?: boolean
+    kind?: string
   }
 
 export const Button = ({
-  type,
+  submit = false,
+  kind,
   className,
   children,
   ...props
 }: ButtonProps) => {
   const btnClassName = cl(styles.button, className, {
-    [styles.buttonPrimary]: type === "primary",
-    [styles.buttonWarning]: type === "warning",
+    [styles.buttonPrimary]: kind === "primary",
+    [styles.buttonWarning]: kind === "warning",
   })
 
   return (
-    <button {...props} className={btnClassName}>
+    <button
+      {...props}
+      type={submit ? "submit" : undefined}
+      className={btnClassName}
+    >
       {children}
     </button>
   )
@@ -104,12 +110,12 @@ export const StatusButton = ({
 
 type AlertProps = SystemProps &
   React.HTMLProps<HTMLDivElement> & {
-    type?: string
+    kind?: string
     onClose?: (event: React.MouseEvent) => void
   }
 
 export const Alert = ({
-  type,
+  kind: type,
   children,
   className,
   onClose,

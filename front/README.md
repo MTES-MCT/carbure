@@ -7,6 +7,7 @@
 - `react-dom`
 - `react-router-dom` (client-side routing)
 - `clsx` (conditional css class selection)
+- `js-cookie`
 
 ## Structure
 

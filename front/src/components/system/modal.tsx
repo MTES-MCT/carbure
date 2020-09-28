@@ -17,19 +17,6 @@ export function useModal() {
   }
 }
 
-type ModalButtonsProps = {
-  className?: string
-  children: React.ReactNode
-  onClose?: (event: React.MouseEvent) => void
-  [k: string]: any
-}
-
-const ModalButtons = ({ className, children, ...props }: ModalButtonsProps) => (
-  <div {...props} className={cl(styles.modalButtons, className)}>
-    {children}
-  </div>
-)
-
 type ModalProps = {
   className?: string
   children: React.ReactNode
@@ -50,5 +37,4 @@ const Modal = ({ className, onClose, children, ...props }: ModalProps) => {
   )
 }
 
-Modal.Buttons = ModalButtons
 export default Modal

@@ -35,10 +35,3 @@
   right: 16px;
   cursor: pointer;
 }
-
-.modalButtons {
-  display: flex;
-  margin-top: auto;
-  justify-content: space-between;
-  padding-top: 32px;
-}

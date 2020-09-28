@@ -2,6 +2,7 @@ import { ApiFilters, Lot, Lots, LotStatus, Snapshot } from "./types"
 
 import api from "./api"
 import { FilterSelection } from "../hooks/use-transactions"
+import { TransactionFormState } from "../hooks/use-transaction-details"
 
 // give the same type to all filters in order to render them easily
 function normalizeFilters(filters: ApiFilters): Snapshot["filters"] {
@@ -67,4 +68,11 @@ export function getLots(
     from_idx: pagination.page * pagination.limit,
     limit: pagination.limit,
   })
+}
+
+export function addLots(
+  entityID: number,
+  lotDetails: TransactionFormState
+): Promise<void> {
+  return api.post("/lots/add", { entity_id: entityID, ...lotDetails })
 }

@@ -1,3 +1,4 @@
+import Cookies from "js-cookie"
 import { stringify } from "querystring"
 
 const API_ROOT = `${window.location.origin}/api/v3`
@@ -37,6 +38,17 @@ async function checkResponse<T>(res: Response): Promise<T> {
   }
 }
 
+// converts an javascript object into FormData
+function toFormData(obj: any): FormData {
+  const formData = new FormData()
+
+  for (const key in obj) {
+    formData.append(key, obj[key].toString())
+  }
+
+  return formData
+}
+
 async function get<T = any>(
   endpoint: string,
   params?: Params,
@@ -59,9 +71,16 @@ async function post<T = any>(
 ): Promise<T> {
   const url = API_ROOT + endpoint
   const fetchOptions: Params = { ...options, method: "POST" }
+  const csrf = Cookies.get("csrftoken")
+
+  // fetchOptions.headers = {
+  //   "Content-Type": "multipart/form-data",
+  //   "X-CSRFToken": csrf,
+  // }
 
   if (body) {
-    fetchOptions.body = JSON.stringify(filterParams(body))
+    fetchOptions.body = toFormData(body)
+    fetchOptions.body.append("csrfmiddlewaretoken", csrf)
   }
 
   const res = await fetch(url, fetchOptions)

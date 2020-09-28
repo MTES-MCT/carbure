@@ -47,7 +47,7 @@ function extractFormData(tr: Lot): TransactionFormState {
     production_site_country: tr.lot.carbure_production_site.country.code_pays,
     production_site_reference: tr.lot.unknown_production_site_reference ?? "",
     production_site_commissioning_date:
-      tr.lot.unknown_production_site_com_date ?? "",
+      tr.lot.unknown_production_site_com_date ?? "2020-09-21", //@TODO fill this correctly somewhere, otherwise API crash
     volume: tr.lot.volume,
     eec: tr.lot.eec,
     el: tr.lot.el,
