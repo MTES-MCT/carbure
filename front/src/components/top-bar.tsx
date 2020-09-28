@@ -7,8 +7,22 @@ import { Settings } from "../services/types"
 
 import styles from "./top-bar.module.css"
 
-import Menu from "./dropdown/menu"
-import Logo from "./logo"
+import logoMarianne from "../assets/images/logo-marianne.svg"
+import logoBetaGouv from "../assets/images/betagouvfr.svg"
+
+import Menu from "./system/menu"
+
+const Logo = () => (
+  <Link to="/" className={styles.logo}>
+    <img src={logoMarianne} alt="marianne logo" className={styles.marianne} />
+    <span className={styles.carbure}>carbure.</span>
+    <img
+      src={logoBetaGouv}
+      alt="beta.gouv.fr logo"
+      className={styles.betagouv}
+    />
+  </Link>
+)
 
 type PageLinkProps = {
   to: string
