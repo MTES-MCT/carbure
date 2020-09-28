@@ -10,9 +10,8 @@ export type ApiResponse<T> =
   | { status: "forbidden"; message: string }
   | { status: "success"; data: T }
 
-export type ApiPromise<T> = Promise<ApiResponse<T>>
-
-function readyParams(params: Params) {
+// keep only parameters that are defined
+function filterParams(params: Params) {
   const okParams: Params = {}
 
   for (const key in params) {
@@ -24,32 +23,49 @@ function readyParams(params: Params) {
   return okParams
 }
 
-function get<T = any>(
+// check if the api response is correct and return its data
+// if there's a problem, throw an error
+async function checkResponse<T>(res: Response): Promise<T> {
+  const json: ApiResponse<T> = await res.json()
+
+  // if the response contains an error, throw it so we can catch it elsewhere
+  if (json.status === "error" || json.status === "forbidden") {
+    throw new Error(json.message)
+  } else {
+    // otherwise, return only the fetched data
+    return json.data
+  }
+}
+
+async function get<T = any>(
   endpoint: string,
   params?: Params,
   options?: Options
-): ApiPromise<T> {
+): Promise<T> {
   let url = API_ROOT + endpoint
 
   if (params) {
-    url += "?" + stringify(readyParams(params))
+    url += "?" + stringify(filterParams(params))
   }
 
-  return fetch(url, options).then((res) => res.json())
+  const res = await fetch(url, options)
+  return checkResponse<T>(res)
 }
 
-function post<T = any>(
+async function post<T = any>(
   endpoint: string,
   body?: Params,
   options?: Options
-): ApiPromise<T> {
+): Promise<T> {
+  const url = API_ROOT + endpoint
   const fetchOptions: Params = { ...options, method: "POST" }
 
   if (body) {
-    fetchOptions.body = JSON.stringify(readyParams(body))
+    fetchOptions.body = JSON.stringify(filterParams(body))
   }
 
-  return fetch(API_ROOT + endpoint, fetchOptions).then((res) => res.json())
+  const res = await fetch(url, fetchOptions)
+  return checkResponse<T>(res)
 }
 
 export default { get, post }

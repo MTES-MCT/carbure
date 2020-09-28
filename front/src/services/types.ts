@@ -116,6 +116,15 @@ export enum Filters {
   Clients = "clients",
 }
 
+export interface ApiFilters {
+  matieres_premieres: Option[]
+  biocarburants: Option[]
+  countries_of_origin: Option[]
+  periods: string[]
+  production_sites: string[]
+  clients: string[]
+}
+
 export type Snapshot = {
   lots: {
     [key in LotStatus]: number
