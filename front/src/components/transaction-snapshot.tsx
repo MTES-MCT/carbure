@@ -7,7 +7,7 @@ import { StatusSelection, FilterSelection } from "../hooks/use-transactions"
 import styles from "./transaction-snapshot.module.css"
 
 import { Plus } from "./icons"
-import { Title, Button, StatusButton, SearchInput } from "./system"
+import { Title, Button, StatusButton, SearchInput, Box } from "./system"
 import Select from "./dropdown/select"
 
 const STATUS = [
@@ -37,9 +37,9 @@ const TransactionSnapshot = ({
   status,
   filters,
 }: TransactionSnapshotProps) => (
-  <React.Fragment>
-    <div className={styles.transactionSnapshot}>
-      <div className={styles.topRow}>
+  <Box className={styles.transactionSnapshot}>
+    <div className={styles.transactionSummary}>
+      <div className={styles.transactionHeader}>
         <Title>Transactions</Title>
 
         <Button type="primary">
@@ -48,7 +48,7 @@ const TransactionSnapshot = ({
         </Button>
       </div>
 
-      <div className={styles.buttonRow}>
+      <div className={styles.transactionStatus}>
         {STATUS.map(({ key, label }) => (
           <StatusButton
             key={key}
@@ -61,8 +61,8 @@ const TransactionSnapshot = ({
       </div>
     </div>
 
-    <div className={styles.lastRow}>
-      <div className={styles.filters}>
+    <div className={styles.transactionFilters}>
+      <div className={styles.filterGroup}>
         {FILTERS.map(({ key, label }) => (
           <Select
             search
@@ -81,7 +81,7 @@ const TransactionSnapshot = ({
         placeholder="Rechercher un lot"
       />
     </div>
-  </React.Fragment>
+  </Box>
 )
 
 export default TransactionSnapshot

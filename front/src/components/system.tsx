@@ -12,11 +12,23 @@ export type SystemProps = {
   children?: React.ReactNode
 }
 
-type MainProps = SystemProps & React.HTMLProps<HTMLDivElement>
+type BoxProps = SystemProps &
+  React.HTMLProps<HTMLDivElement> & {
+    as?: string | React.ComponentType<any>
+  }
 
-export const Main = ({ className, ...props }: MainProps) => (
-  <main {...props} className={cl(styles.main, className)} />
+export const Box = ({
+  as: Component = "div",
+  className,
+  children,
+  ...props
+}: BoxProps) => (
+  <Component {...props} className={cl(styles.box, className)}>
+    {children}
+  </Component>
 )
+
+export const Main = (props: BoxProps) => <Box {...props} as="main" />
 
 // SELECT COMPONENT
 
@@ -118,7 +130,7 @@ export const StatusButton = ({
 type AlertProps = SystemProps &
   React.HTMLProps<HTMLDivElement> & {
     type?: string
-    onClose: (event: React.MouseEvent) => void
+    onClose?: (event: React.MouseEvent) => void
   }
 
 export const Alert = ({
@@ -136,9 +148,12 @@ export const Alert = ({
   return (
     <div {...props} className={divClassName}>
       {children}
-      <span className={styles.alertHide} onClick={onClose}>
-        Masquer ce message
-      </span>
+
+      {onClose && (
+        <span className={styles.alertHide} onClick={onClose}>
+          Masquer ce message
+        </span>
+      )}
     </div>
   )
 }

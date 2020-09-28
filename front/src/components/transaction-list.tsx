@@ -1,18 +1,16 @@
 import React from "react"
 import cl from "clsx"
 
-import { Lot, LotStatus } from "../services/types"
+import { Lot, Lots, LotStatus } from "../services/types"
+import { PageSelection } from "../hooks/use-transactions"
 
 import styles from "./transaction-list.module.css"
 
-import { getStatus } from "../services/lots"
-import { Table } from "./system"
 import { truncate } from "../utils/format"
-import { ChevronRight } from "./icons"
-
-type TransactionListProps = {
-  transactions: Lot[]
-}
+import { getStatus } from "../services/lots"
+import { Alert, Box, Table } from "./system"
+import { AlertCircle, ChevronRight } from "./icons"
+import Pagination from "./pagination"
 
 const COLUMNS = [
   "Statut",
@@ -34,19 +32,6 @@ const STATUS = {
   [LotStatus.Weird]: "Problème",
 }
 
-const OneLine = ({ text }: { text: string }) => (
-  <span title={text}>{truncate(text)}</span>
-)
-
-const TwoLines = ({ top, bottom }: { top: string; bottom: string }) => (
-  <div className={styles.dualRow}>
-    <OneLine text={top} />
-    <span title={bottom} className={styles.extraInfo}>
-      {truncate(bottom, 40)}
-    </span>
-  </div>
-)
-
 const Status = ({ value }: { value: LotStatus }) => (
   <span
     className={cl(styles.status, {
@@ -59,84 +44,127 @@ const Status = ({ value }: { value: LotStatus }) => (
   </span>
 )
 
-const TransactionList = ({ transactions }: TransactionListProps) => (
-  <Table columns={COLUMNS} rows={transactions}>
-    {(transaction) => (
-      <tr key={transaction.lot.id} className={styles.row}>
-        <td>
-          <input type="checkbox" name={transaction.dae} />
-        </td>
-
-        <td>
-          <Status value={getStatus(transaction)} />
-        </td>
-
-        <td>
-          <OneLine text={transaction.lot.period} />
-        </td>
-
-        <td>
-          <OneLine text={transaction.dae} />
-        </td>
-
-        <td>
-          <OneLine
-            text={
-              transaction.carbure_client?.name ?? transaction.unknown_client
-            }
-          />
-        </td>
-
-        <td>
-          <TwoLines
-            top={transaction.lot.biocarburant.name}
-            bottom={`${transaction.lot.volume}L`}
-          />
-        </td>
-
-        <td>
-          <TwoLines
-            top={
-              transaction.lot.carbure_producer?.name ??
-              transaction.lot.unknown_producer
-            }
-            bottom={
-              transaction.lot.carbure_production_site?.country.name ??
-              transaction.lot.unknown_production_country
-            }
-          />
-        </td>
-
-        <td>
-          <TwoLines
-            top={
-              transaction.carbure_delivery_site?.city ??
-              transaction.unknown_delivery_site
-            }
-            bottom={
-              transaction.carbure_delivery_site?.country.name ??
-              transaction.unknown_delivery_site_country?.name
-            }
-          />
-        </td>
-
-        <td>
-          <TwoLines
-            top={transaction.lot.matiere_premiere.name}
-            bottom={transaction.lot.pays_origine.name}
-          />
-        </td>
-
-        <td>
-          <OneLine text={`${transaction.lot.ghg_reduction}%`} />
-        </td>
-
-        <td>
-          <ChevronRight />
-        </td>
-      </tr>
-    )}
-  </Table>
+const Line = ({ text, small = false }: { text: string; small?: boolean }) => (
+  <span title={text} className={cl(small && styles.extraInfo)}>
+    {truncate(text, small ? 40 : 18)}
+  </span>
 )
+
+const TwoLines = ({ top, bottom }: { top: string; bottom: string }) => (
+  <div className={styles.dualRow}>
+    <Line text={top} />
+    <Line small text={bottom} />
+  </div>
+)
+
+const TransactionRow = ({ transaction }: { transaction: Lot }) => (
+  <tr key={transaction.lot.id} className={styles.row}>
+    <td>
+      <input type="checkbox" name={transaction.dae} />
+    </td>
+
+    <td>
+      <Status value={getStatus(transaction)} />
+    </td>
+
+    <td>
+      <Line text={transaction.lot.period} />
+    </td>
+
+    <td>
+      <Line text={transaction.dae} />
+    </td>
+
+    <td>
+      <Line
+        text={transaction.carbure_client?.name ?? transaction.unknown_client}
+      />
+    </td>
+
+    <td>
+      <TwoLines
+        top={transaction.lot.biocarburant.name}
+        bottom={`${transaction.lot.volume}L`}
+      />
+    </td>
+
+    <td>
+      <TwoLines
+        top={
+          transaction.lot.carbure_producer?.name ??
+          transaction.lot.unknown_producer
+        }
+        bottom={
+          transaction.lot.carbure_production_site?.country.name ??
+          transaction.lot.unknown_production_country
+        }
+      />
+    </td>
+
+    <td>
+      <TwoLines
+        top={
+          transaction.carbure_delivery_site?.city ??
+          transaction.unknown_delivery_site
+        }
+        bottom={
+          transaction.carbure_delivery_site?.country.name ??
+          transaction.unknown_delivery_site_country?.name
+        }
+      />
+    </td>
+
+    <td>
+      <TwoLines
+        top={transaction.lot.matiere_premiere.name}
+        bottom={transaction.lot.pays_origine.name}
+      />
+    </td>
+
+    <td>
+      <Line text={`${transaction.lot.ghg_reduction}%`} />
+    </td>
+
+    <td>
+      <ChevronRight />
+    </td>
+  </tr>
+)
+
+type TransactionListProps = {
+  transactions: Lots | null
+  pagination: PageSelection
+}
+
+const TransactionList = ({
+  transactions,
+  pagination,
+}: TransactionListProps) => {
+  if (transactions === null || transactions.lots.length === 0) {
+    return (
+      <Box className={styles.transactionList}>
+        <Alert type="warning">
+          <AlertCircle />
+          Aucune transaction trouvée pour ces paramètres
+        </Alert>
+      </Box>
+    )
+  }
+
+  return (
+    <Box className={styles.transactionList}>
+      <Table columns={COLUMNS} rows={transactions.lots}>
+        {(transaction) => <TransactionRow transaction={transaction} />}
+      </Table>
+
+      <Pagination
+        page={pagination.selected.page}
+        limit={pagination.selected.limit}
+        total={transactions.total}
+        onChange={pagination.setPage}
+      />
+    </Box>
+  )
+}
 
 export default TransactionList

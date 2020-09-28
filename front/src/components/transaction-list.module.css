@@ -1,4 +1,8 @@
-tbody tr.row:hover {
+.transactionList {
+  padding: 32px 120px;
+}
+
+.transactionList tr.row:hover {
   background-color: var(--gray-highlight);
   cursor: pointer;
   z-index: 2;

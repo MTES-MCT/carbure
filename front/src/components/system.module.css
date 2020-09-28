@@ -1,9 +1,8 @@
-/* MAIN COMPONENT */
+/* box COMPONENT */
 
-.main {
+.box {
   display: flex;
   flex-direction: column;
-  padding: 32px 120px;
 }
 
 /* SELECT COMPONENT */
@@ -164,6 +163,20 @@
 .alertError {
   border-color: var(--red-medium);
   background-color: var(--red-light);
+}
+
+.alert :global(.icon) {
+  width: 20px;
+  margin-right: 8px;
+  stroke: var(--gray-dark);
+}
+
+.alertWarning :global(.icon) {
+  stroke: var(--orange-dark);
+}
+
+.alertError :global(.icon) {
+  stroke: var(--red-dark);
 }
 
 /* TITLE COMPONENT */
