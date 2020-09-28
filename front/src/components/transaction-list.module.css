@@ -83,10 +83,6 @@
   display: block;
 }
 
-.transactionActions :global(.icon) {
-  cursor: pointer;
-}
-
 .transactionActions :global(.icon):hover {
   stroke: var(--blue-medium);
 }
