@@ -1,6 +1,8 @@
 import React from "react"
 import cl from "clsx"
 
+import styles from "./icons.module.css"
+
 // icons were adapted from https://github.com/tabler/tabler-icons
 
 type IconProps = {
@@ -34,7 +36,6 @@ const Icon = ({
     {...props}
   >
     <title>{title}</title>
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     {children}
   </svg>
 )
@@ -108,9 +109,22 @@ export const Save = ({ className, ...props }: IconProps) => (
 )
 
 export const Message = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("icon-save", className)}>
+  <Icon {...props} className={cl("icon-message", className)}>
     <path d="M4 21v-13a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v6a3 3 0 0 1 -3 3h-9l-4 4" />
     <line x1="12" y1="8" x2="12" y2="11" />
     <line x1="12" y1="14" x2="12" y2="14.01" />
+  </Icon>
+)
+
+export const Loader = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-loader", styles.loader, className)}>
+    <line x1="12" y1="6" x2="12" y2="3" />
+    <line x1="16.25" y1="7.75" x2="18.4" y2="5.6" />
+    <line x1="18" y1="12" x2="21" y2="12" />
+    <line x1="16.25" y1="16.25" x2="18.4" y2="18.4" />
+    <line x1="12" y1="18" x2="12" y2="21" />
+    <line x1="7.75" y1="16.25" x2="5.6" y2="18.4" />
+    <line x1="6" y1="12" x2="3" y2="12" />
+    <line x1="7.75" y1="7.75" x2="5.6" y2="5.6" />
   </Icon>
 )
