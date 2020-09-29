@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 
 import { EntitySelection } from "./use-app"
-import { Option } from "../components/system/select"
 import { LotStatus, Filters, Lots, Snapshot } from "../services/types"
 
 import useAPI from "../hooks/use-api"
