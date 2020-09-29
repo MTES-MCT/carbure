@@ -7,9 +7,9 @@ import { SystemProps } from "."
 import { Cross } from "./icons"
 import { Dropdown, useDropdown } from "./dropdown"
 
-type Key = string | number
-export type Option = { key: Key; label: string }
-export type SelectValue = Key | Key[] | null
+type Value = string | number
+export type Option = { value: Value; label: string }
+export type SelectValue = Value | Value[] | null
 
 type SelectLabelProps = SystemProps & {
   value: SelectValue
@@ -21,6 +21,7 @@ type SelectProps = SelectLabelProps & {
   options: Option[]
   search?: boolean
   multiple?: boolean
+  clear?: boolean
 }
 
 // check if the value is empty
@@ -35,9 +36,9 @@ function isEmpty(value: SelectValue) {
 // check if the given opton is selected
 function isSelected(value: SelectValue, option: Option) {
   if (Array.isArray(value)) {
-    return value.includes(option.key)
+    return value.includes(option.value)
   } else {
-    return value === option.key
+    return value === option.value
   }
 }
 
@@ -51,11 +52,11 @@ function renderSelected(
 
   if (Array.isArray(value)) {
     selected = options
-      .filter((o) => value.includes(o.key))
+      .filter((o) => value.includes(o.value))
       .map((v) => v.label)
       .join(", ")
   } else {
-    selected = options.find((o) => o.key === value)?.label
+    selected = options.find((o) => o.value === value)?.label
   }
 
   return selected ?? placeholder
@@ -80,7 +81,7 @@ function useSelect(
   const [query, setQuery] = useState("")
 
   // reset the value, reset the query, close the menu
-  function clear(e: React.MouseEvent) {
+  function reset(e: React.MouseEvent) {
     e.stopPropagation()
     onChange(null)
     setQuery("")
@@ -91,18 +92,18 @@ function useSelect(
   function select(e: React.MouseEvent, option: Option) {
     if (!multiple) {
       // single value selection
-      return onChange(option.key)
+      return onChange(option.value)
     }
 
     // prevent closing of option list
     e.stopPropagation()
 
     if (!Array.isArray(value)) {
-      onChange([option.key])
-    } else if (value.includes(option.key)) {
-      onChange(value.filter((key) => key !== option.key))
+      onChange([option.value])
+    } else if (value.includes(option.value)) {
+      onChange(value.filter((key) => key !== option.value))
     } else {
-      onChange([...value, option.key])
+      onChange([...value, option.value])
     }
   }
 
@@ -112,7 +113,7 @@ function useSelect(
   // filter options according to search query
   const queryOptions = filterOptions(options, query)
 
-  return { dd, selected, queryOptions, query, select, clear, setQuery }
+  return { dd, selected, queryOptions, query, select, reset, setQuery }
 }
 
 export const Select = ({
@@ -123,6 +124,7 @@ export const Select = ({
   children,
   search = false,
   multiple = false,
+  clear = false,
   ...props
 }: SelectProps) => {
   const {
@@ -130,7 +132,7 @@ export const Select = ({
     query,
     selected,
     queryOptions,
-    clear,
+    reset,
     select,
     setQuery,
   } = useSelect(value, placeholder, options, onChange, multiple)
@@ -142,8 +144,8 @@ export const Select = ({
           {selected}
         </span>
 
-        {!isEmpty(value) && (
-          <Cross className={styles.selectCross} onClick={clear} />
+        {clear && !isEmpty(value) && (
+          <Cross className={styles.selectCross} onClick={reset} />
         )}
       </Dropdown.Label>
 
@@ -163,7 +165,7 @@ export const Select = ({
 
         {queryOptions.map((option) => (
           <li
-            key={option.key}
+            key={option.value}
             title={option.label}
             onClick={(e) => select(e, option)}
             className={cl(isSelected(value, option) && styles.selectSelected)}

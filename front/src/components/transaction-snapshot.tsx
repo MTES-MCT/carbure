@@ -68,6 +68,7 @@ const TransactionSnapshot = ({
       <div className={styles.filterGroup}>
         {FILTERS.map(({ key, label }) => (
           <Select
+            clear
             search
             multiple
             key={key}
