@@ -24,8 +24,13 @@ const TransactionForm = ({
   onChange,
   onSubmit,
 }: TransactionFormProps) => {
+  function submit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    onSubmit && onSubmit(e)
+  }
+
   return (
-    <form className={styles.transactionForm} onSubmit={onSubmit}>
+    <form className={styles.transactionForm} onSubmit={submit}>
       <div className={styles.transactionFields}>
         <Box>
           <LabelInput
@@ -44,6 +49,7 @@ const TransactionForm = ({
           />
           <LabelInput
             readOnly={readOnly}
+            type="number"
             label="Volume à 20°C en Litres"
             name="volume"
             value={tr.volume}
