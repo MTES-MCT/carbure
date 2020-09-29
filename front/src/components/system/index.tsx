@@ -1,9 +1,10 @@
 import React, { CSSProperties } from "react"
+import ReactSelect, { Props as ReactSelectProps } from "react-select"
 import cl from "clsx"
 
 import styles from "./index.module.css"
 
-import { ChevronDown, Search } from "./icons"
+import { Loader, Search } from "./icons"
 
 export type SystemProps = {
   className?: string
@@ -31,20 +32,14 @@ export const Main = (props: BoxProps) => <Box {...props} as="main" />
 
 // SELECT COMPONENT
 
-type SelectProps = SystemProps & React.HTMLProps<HTMLSelectElement>
+type SelectProps = SystemProps & ReactSelectProps
 
-export const Select = ({
-  style,
-  className,
-  children,
-  ...props
-}: SelectProps) => (
-  <div style={style} className={cl(styles.selectWrapper, className)}>
-    <select {...props} className={styles.select}>
-      {children}
-    </select>
-    <ChevronDown className={styles.selectArrow} />
-  </div>
+export const Select = ({ className, ...props }: SelectProps) => (
+  <ReactSelect
+    {...props}
+    classNamePrefix="select"
+    className={cl("select", className)}
+  />
 )
 
 // BUTTON COMPONENT
@@ -53,10 +48,12 @@ type ButtonProps = SystemProps &
   React.HTMLProps<HTMLButtonElement> & {
     submit?: boolean
     kind?: string
+    icon?: React.ComponentType
   }
 
 export const Button = ({
   submit = false,
+  icon: Icon,
   kind,
   className,
   children,
@@ -73,10 +70,30 @@ export const Button = ({
       type={submit ? "submit" : undefined}
       className={btnClassName}
     >
+      {Icon && <Icon />}
       {children}
     </button>
   )
 }
+
+// ASYNC BUTTON COMPONENT
+
+type AsyncButtonProps = ButtonProps & {
+  loading: boolean
+}
+
+export const AsyncButton = ({
+  loading,
+  icon,
+  disabled,
+  ...props
+}: AsyncButtonProps) => (
+  <Button
+    {...props}
+    icon={loading ? Loader : icon}
+    disabled={loading || disabled}
+  />
+)
 
 // STATUS BUTTON COMPONENT
 

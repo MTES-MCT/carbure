@@ -7,47 +7,47 @@
 
 /* SELECT COMPONENT */
 
-.selectWrapper {
+:global(.select) {
   display: flex;
-  position: relative;
-  align-items: center;
-  background-color: var(--gray-light);
-  border: 1px solid var(--gray-medium);
-  border-radius: 5px;
-  font-weight: bold;
-}
-
-.select {
-  flex: 1;
-  align-self: stretch;
-  appearance: none;
-  background: transparent;
-  border: none;
-  cursor: pointer;
   font-family: Source Sans Pro, Arial, sans-serif;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
-  padding: 12px;
-  padding-right: 36px;
   z-index: 1;
 }
 
-.selectArrow {
-  position: absolute;
-  right: 8px;
-  pointer-events: none;
+:global(.select *) {
+  transition: none !important;
 }
 
-.selectWrapper:hover {
+:global(div.select__control) {
+  flex: 1;
+  border: 1px solid var(--gray-medium);
+  cursor: pointer;
+}
+
+:global(div.select__control):hover {
   border-color: var(--blue-medium);
 }
 
-.selectWrapper:hover .select {
+:global(div.select__control):hover {
   color: var(--blue-medium);
+  border-color: var(--blue-medium);
 }
 
-.selectWrapper:hover .selectArrow {
-  stroke: var(--blue-medium);
+:global(div.select__dropdown-indicator svg) {
+  fill: var(--black);
+}
+
+:global(div.select__control:hover div.select__dropdown-indicator svg) {
+  fill: var(--blue-medium);
+}
+
+:global(.select__indicator-separator) {
+  display: none;
+}
+
+:global(.select__value-container) {
+  min-width: 36px;
 }
 
 /* BUTTON COMPONENT */
@@ -77,6 +77,11 @@
 
 .button:active {
   transform: translate3D(1px, 1px, 0);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: auto;
 }
 
 .buttonPrimary {
