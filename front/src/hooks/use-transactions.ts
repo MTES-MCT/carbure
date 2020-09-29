@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react"
 
 import { EntitySelection } from "./use-app"
-import { SelectValue } from "../components/system/select"
+import { Option } from "../components/system/select"
 import { LotStatus, Filters, Lots, Snapshot } from "../services/types"
 
 import useAPI from "../hooks/use-api"
 import { getSnapshot, getLots } from "../services/lots"
+import { SelectValue } from "../components/system/select"
 
 // @TODO harcoded pagination limit value
 const LIMIT = 10

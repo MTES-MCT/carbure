@@ -1,5 +1,4 @@
 import React, { CSSProperties } from "react"
-import ReactSelect, { Props as ReactSelectProps } from "react-select"
 import cl from "clsx"
 
 import styles from "./index.module.css"
@@ -29,18 +28,6 @@ export const Box = ({
 )
 
 export const Main = (props: BoxProps) => <Box {...props} as="main" />
-
-// SELECT COMPONENT
-
-type SelectProps = SystemProps & ReactSelectProps
-
-export const Select = ({ className, ...props }: SelectProps) => (
-  <ReactSelect
-    {...props}
-    classNamePrefix="select"
-    className={cl("select", className)}
-  />
-)
 
 // BUTTON COMPONENT
 

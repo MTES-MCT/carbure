@@ -27,3 +27,8 @@
   align-items: center;
   margin-left: 8px;
 }
+
+.paginationSelect :global(.dropdown-items) {
+  top: unset;
+  bottom: 100%;
+}

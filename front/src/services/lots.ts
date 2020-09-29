@@ -11,15 +11,15 @@ function normalizeFilters(filters: ApiFilters): Snapshot["filters"] {
     biocarburants: filters.biocarburants,
     countries_of_origin: filters.countries_of_origin,
     periods: filters.periods.map((filter: string) => ({
-      key: filter,
+      value: filter,
       label: filter,
     })),
     production_sites: filters.production_sites.map((filter: string) => ({
-      key: filter,
+      value: filter,
       label: filter,
     })),
     clients: filters.clients.map((filter: string) => ({
-      key: filter,
+      value: filter,
       label: filter,
     })),
   }

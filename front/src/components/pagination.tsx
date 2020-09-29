@@ -3,12 +3,13 @@ import React from "react"
 import styles from "./pagination.module.css"
 
 import { ChevronLeft, ChevronRight } from "./system/icons"
-import { Button, Select } from "./system"
+import { Button } from "./system"
+import Select from "./system/select"
 
 // generate a list of numbers from 0 to size-1
 const list = (size: number) =>
   Array.from(Array(Math.ceil(size)).keys()).map((i) => ({
-    value: `${i}`,
+    value: i,
     label: `${i + 1}`,
   }))
 
@@ -38,11 +39,10 @@ const Pagination = ({ page, limit, total, onChange }: PaginationProps) => {
       </Button>
 
       <Select
-        value={pages[page]}
+        value={page}
         options={pages}
-        isSearchable={false}
-        menuPlacement="top"
-        onChange={({ value }: any) => changePage(value)}
+        className={styles.paginationSelect}
+        onChange={(value) => changePage(value as number)}
       />
 
       <span className={styles.paginationTotal}>sur {pageCount}</span>
