@@ -7,7 +7,18 @@ import {
 
 import styles from "./transaction-form.module.css"
 
+import {
+  findBiocarburants,
+  findCountries,
+  findEntities,
+  findMatieresPremieres,
+  findProducers,
+  findProductionSites,
+  findDeliverySites,
+} from "../services/common"
+
 import { Box, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
+import AutoComplete from "./system/autocomplete"
 
 type TransactionFormProps = {
   readOnly?: boolean
@@ -33,18 +44,21 @@ const TransactionForm = ({
     <form className={styles.transactionForm} onSubmit={submit}>
       <div className={styles.transactionFields}>
         <Box>
-          <LabelInput
+          <AutoComplete
             readOnly={readOnly}
             label="Producteur"
             name="producer"
             value={tr.producer}
+            getOptions={findProducers}
             onChange={onChange}
           />
-          <LabelInput
+
+          <AutoComplete
             readOnly={readOnly}
             label="Site de production"
             name="production_site"
             value={tr.production_site}
+            getOptions={findProductionSites}
             onChange={onChange}
           />
           <LabelInput
@@ -55,25 +69,28 @@ const TransactionForm = ({
             value={tr.volume}
             onChange={onChange}
           />
-          <LabelInput
+          <AutoComplete
             readOnly={readOnly}
             label="Biocarburant"
             name="biocarburant_code"
             value={tr.biocarburant_code}
+            getOptions={findBiocarburants}
             onChange={onChange}
           />
-          <LabelInput
+          <AutoComplete
             readOnly={readOnly}
             label="Matiere Premiere"
             name="matiere_premiere_code"
             value={tr.matiere_premiere_code}
+            getOptions={findMatieresPremieres}
             onChange={onChange}
           />
-          <LabelInput
+          <AutoComplete
             readOnly={readOnly}
             label="Pays d'origine"
             name="pays_origine_code"
             value={tr.pays_origine_code}
+            getOptions={findCountries}
             onChange={onChange}
           />
         </Box>
@@ -86,18 +103,20 @@ const TransactionForm = ({
             value={tr.dae}
             onChange={onChange}
           />
-          <LabelInput
+          <AutoComplete
             readOnly={readOnly}
             label="Client"
             name="client"
             value={tr.client}
+            getOptions={findEntities}
             onChange={onChange}
           />
-          <LabelInput
+          <AutoComplete
             readOnly={readOnly}
             label="Site de livraison"
             name="delivery_site"
             value={tr.delivery_site}
+            getOptions={findDeliverySites}
             onChange={onChange}
           />
           <LabelInput

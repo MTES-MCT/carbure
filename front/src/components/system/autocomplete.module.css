@@ -1,0 +1,6 @@
+.suggestions {
+  top: calc(100% - 6px);
+  background-color: var(--white);
+  border-color: var(--blue-medium);
+  font-weight: 600;
+}
