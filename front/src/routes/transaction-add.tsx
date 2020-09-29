@@ -6,7 +6,7 @@ import { TransactionFormState } from "../hooks/use-transaction-details"
 import useAPI from "../hooks/use-api"
 import useForm from "../hooks/use-form"
 
-import { Button, Title } from "../components/system"
+import { AsyncButton, Button, Title } from "../components/system"
 import Modal from "../components/system/modal"
 import TransactionForm from "../components/transaction-form"
 import { Save, Cross } from "../components/system/icons"
@@ -19,7 +19,7 @@ type TransactionAddProps = {
 
 const TransactionAdd = ({ entity }: TransactionAddProps) => {
   const history = useHistory()
-  const [request, resolve] = useAPI()
+  const [addedLot, resolve] = useAPI()
 
   const [form, change] = useForm<TransactionFormState>({
     id: -1,
@@ -58,9 +58,7 @@ const TransactionAdd = ({ entity }: TransactionAddProps) => {
     history.push("/transactions")
   }
 
-  function submit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-
+  function submit() {
     if (entity.selected && form) {
       resolve(addLots(entity.selected.id, form))
     }
@@ -71,11 +69,16 @@ const TransactionAdd = ({ entity }: TransactionAddProps) => {
       <Title>Créer un nouveau lot</Title>
 
       <TransactionForm transaction={form!} onChange={change} onSubmit={submit}>
-        <Button submit kind="primary">
-          <Save /> Créer lot
-        </Button>
-        <Button onClick={close}>
-          <Cross /> Annuler
+        <AsyncButton
+          submit
+          kind="primary"
+          icon={Save}
+          loading={addedLot.loading}
+        >
+          Créer lot
+        </AsyncButton>
+        <Button icon={Cross} onClick={close}>
+          Annuler
         </Button>
       </TransactionForm>
     </Modal>
