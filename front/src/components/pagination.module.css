@@ -16,8 +16,10 @@
   justify-content: center;
 }
 
-.paginationButton svg {
+.paginationButton svg:global(.icon) {
   margin: 0;
+  width: 24px;
+  height: 24px;
 }
 
 .paginationTotal {

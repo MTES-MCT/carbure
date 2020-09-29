@@ -6,7 +6,11 @@ import { ChevronLeft, ChevronRight } from "./system/icons"
 import { Button, Select } from "./system"
 
 // generate a list of numbers from 0 to size-1
-const list = (size: number) => Array.from(Array(Math.ceil(size)).keys())
+const list = (size: number) =>
+  Array.from(Array(Math.ceil(size)).keys()).map((i) => ({
+    value: `${i}`,
+    label: `${i + 1}`,
+  }))
 
 type PaginationProps = {
   page: number
@@ -16,15 +20,17 @@ type PaginationProps = {
 }
 
 const Pagination = ({ page, limit, total, onChange }: PaginationProps) => {
-  const pages = Math.ceil(total / limit)
+  const pageCount = Math.ceil(total / limit)
+  const pages = list(pageCount)
 
   function changePage(index: number) {
-    onChange(Math.max(0, Math.min(index, pages - 1)))
+    onChange(Math.max(0, Math.min(index, pageCount - 1)))
   }
 
   return (
     <div className={styles.pagination}>
       <Button
+        disabled={page === 0}
         className={styles.paginationButton}
         onClick={() => changePage(page - 1)}
       >
@@ -32,21 +38,17 @@ const Pagination = ({ page, limit, total, onChange }: PaginationProps) => {
       </Button>
 
       <Select
-        value={page}
-        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-          changePage(parseInt(e.target.value, 10))
-        }
-      >
-        {list(pages).map((i) => (
-          <option key={i} value={i}>
-            {i + 1}
-          </option>
-        ))}
-      </Select>
+        value={pages[page]}
+        options={pages}
+        isSearchable={false}
+        menuPlacement="top"
+        onChange={({ value }: any) => changePage(value)}
+      />
 
-      <span className={styles.paginationTotal}>sur {pages}</span>
+      <span className={styles.paginationTotal}>sur {pageCount}</span>
 
       <Button
+        disabled={page === pageCount - 1}
         className={styles.paginationButton}
         onClick={() => changePage(page + 1)}
       >
