@@ -72,6 +72,7 @@ services:
     build:
       context: ${CARBURE_HOME}
       dockerfile: docker/Dockerfile.web
+      target: nginx
     restart: always
     container_name: carbure_web
     image: carbure_web:local
