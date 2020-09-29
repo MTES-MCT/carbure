@@ -126,13 +126,13 @@ def get_snapshot(request):
     accepted = len(txs.filter(lot__status='Validated', delivery_status='A'))
     data['lots'] = {'draft': draft, 'validated': validated, 'tofix': tofix, 'accepted': accepted}
 
-    mps = [{'key': m.code, 'label': m.name}
+    mps = [{'value': m.code, 'label': m.name}
            for m in MatierePremiere.objects.filter(id__in=txs.values('lot__matiere_premiere').distinct())]
 
-    bcs = [{'key': b.code, 'label': b.name}
+    bcs = [{'value': b.code, 'label': b.name}
            for b in Biocarburant.objects.filter(id__in=txs.values('lot__biocarburant').distinct())]
 
-    countries = [{'key': c.code_pays, 'label': c.name}
+    countries = [{'value': c.code_pays, 'label': c.name}
                  for c in Pays.objects.filter(id__in=txs.values('lot__pays_origine').distinct())]
 
     periods = [p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']]
