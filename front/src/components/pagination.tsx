@@ -1,4 +1,7 @@
 import React from "react"
+import cl from "clsx"
+
+import { PageSelection } from "../hooks/helpers/use-pagination"
 
 import styles from "./pagination.module.css"
 
@@ -13,44 +16,56 @@ const list = (size: number) =>
     label: `${i + 1}`,
   }))
 
+const limits = [
+  { value: 10, label: "10" },
+  { value: 25, label: "25" },
+  { value: 50, label: "50" },
+  { value: 100, label: "100" },
+]
+
 type PaginationProps = {
-  page: number
+  pagination: PageSelection
   total: number
-  limit: number
-  onChange: (p: number) => void
 }
 
-const Pagination = ({ page, limit, total, onChange }: PaginationProps) => {
-  const pageCount = Math.ceil(total / limit)
+const Pagination = ({ pagination, total }: PaginationProps) => {
+  const pageCount = Math.ceil(total / pagination.limit)
   const pages = list(pageCount)
-
-  function changePage(index: number) {
-    onChange(Math.max(0, Math.min(index, pageCount - 1)))
-  }
 
   return (
     <div className={styles.pagination}>
       <Button
-        disabled={page === 0}
+        disabled={pagination.page === 0}
         className={styles.paginationButton}
-        onClick={() => changePage(page - 1)}
+        onClick={() => pagination.setPage(pagination.page - 1)}
       >
         <ChevronLeft />
       </Button>
 
       <Select
-        value={page}
+        value={pagination.page}
         options={pages}
         className={styles.paginationSelect}
-        onChange={(value) => changePage(value as number)}
+        onChange={(value) => pagination.setPage(value as number)}
       />
 
-      <span className={styles.paginationTotal}>sur {pageCount}</span>
+      <span className={cl(styles.paginationText, styles.paginationTotal)}>
+        sur {pageCount},
+      </span>
+
+      <Select
+        value={pagination.limit}
+        options={limits}
+        className={styles.paginationSelect}
+        onChange={(value) => pagination.setLimit(value as number)}
+      />
+
+      <span className={styles.paginationText}>résultats</span>
 
       <Button
-        disabled={page === pageCount - 1}
+        disabled={pagination.page === pageCount - 1}
         className={styles.paginationButton}
-        onClick={() => changePage(page + 1)}
+        onClick={() => pagination.setPage(pagination.page + 1)}
       >
         <ChevronRight />
       </Button>
