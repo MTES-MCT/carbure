@@ -13,16 +13,21 @@ export type SystemProps = {
 
 type BoxProps = SystemProps &
   React.HTMLProps<HTMLDivElement> & {
+    row?: boolean
     as?: string | React.ComponentType<any>
   }
 
 export const Box = ({
+  row = false,
   as: Component = "div",
   className,
   children,
   ...props
 }: BoxProps) => (
-  <Component {...props} className={cl(styles.box, className)}>
+  <Component
+    {...props}
+    className={cl(styles.box, row && styles.boxRow, className)}
+  >
     {children}
   </Component>
 )
@@ -168,10 +173,21 @@ export type LabelInputProps = SystemProps &
     label: React.ReactNode
   }
 
-export const LabelInput = ({ label, className, ...props }: LabelInputProps) => (
-  <label className={cl(styles.labelWrapper, className)}>
+export const LabelInput = ({
+  label,
+  disabled,
+  className,
+  ...props
+}: LabelInputProps) => (
+  <label
+    className={cl(
+      styles.labelWrapper,
+      disabled && styles.disabledLabel,
+      className
+    )}
+  >
     {label}
-    <Input {...props} />
+    <Input {...props} disabled={disabled} />
   </label>
 )
 

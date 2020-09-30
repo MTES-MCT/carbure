@@ -63,7 +63,38 @@ export function getLots(
 
 export function addLots(
   entityID: number,
-  lotDetails: TransactionFormState
+  tx: TransactionFormState
 ): Promise<void> {
-  return api.post("/lots/add", { entity_id: entityID, ...lotDetails })
+  const params = {
+    entity_id: entityID,
+    biocarburant_code: tx.biocarburant?.code,
+    matiere_premiere_code: tx.matiere_premiere?.code,
+    pays_origine_code: tx.pays_origine?.code_pays,
+    producer: tx.carbure_producer?.name ?? tx.unknown_producer,
+    production_site:
+      tx.carbure_production_site?.name ?? tx.unknown_production_site,
+    production_site_country: tx.unknown_production_country,
+    production_site_reference: tx.unknown_production_site_reference,
+    production_site_commissioning_date: tx.unknown_production_site_com_date,
+    double_counting_registration: tx.unknown_production_site_dbl_counting,
+    volume: tx.volume,
+    eec: tx.eec,
+    el: tx.el,
+    ep: tx.ep,
+    etd: tx.etd,
+    eu: tx.eu,
+    esca: tx.esca,
+    eccs: tx.eccs,
+    eccr: tx.eccr,
+    eee: tx.eee,
+    dae: tx.dae,
+    champ_libre: tx.champ_libre,
+    client: tx.carbure_client?.name ?? tx.unknown_client,
+    delivery_date: tx.delivery_date,
+    delivery_site: tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site,
+    delivery_site_country: tx.unknown_delivery_site_country,
+    mac: tx.mac,
+  }
+
+  return api.post("/lots/add", params)
 }

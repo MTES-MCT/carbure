@@ -5,6 +5,10 @@
   flex-direction: column;
 }
 
+.boxRow {
+  flex-direction: row;
+}
+
 /* BUTTON COMPONENT */
 
 .button {
@@ -161,6 +165,12 @@
 
 .textarea {
   font-size: 12px;
+  margin-bottom: 0;
+}
+
+.input:disabled,
+.textarea:disabled {
+  background-color: var(--gray-highlight);
 }
 
 .input:focus,
@@ -182,6 +192,11 @@
   font-size: 14px;
   font-style: italic;
   margin-bottom: 8px;
+}
+
+.disabledLabel {
+  color: var(--gray-medium);
+  pointer-events: none;
 }
 
 .labelTextArea,
@@ -221,6 +236,11 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  height: 60px;
+  padding-top: 32px;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
 .labelCheckbox input[type="checkbox"] {
