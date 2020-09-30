@@ -14,7 +14,7 @@ import {
   findDeliverySites,
 } from "../services/common"
 
-import { Box, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
+import { Alert, Box, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
 import AutoComplete from "./system/autocomplete"
 import { FormFields } from "../hooks/helpers/use-form"
 
@@ -34,6 +34,7 @@ type TransactionFormProps = {
   readOnly?: boolean
   transaction: TransactionFormState
   children: React.ReactNode
+  error: string | null
   onChange: <T extends FormFields>(e: React.ChangeEvent<T>) => void
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
 }
@@ -42,6 +43,7 @@ const TransactionForm = ({
   children,
   readOnly = false,
   transaction: tx,
+  error,
   onChange,
   onSubmit,
 }: TransactionFormProps) => {
@@ -387,6 +389,12 @@ const TransactionForm = ({
           />
         </Box>
       </Box>
+
+      {error && (
+        <Alert kind="error" className={styles.transactionError}>
+          {error}
+        </Alert>
+      )}
 
       <div className={styles.transactionFormButtons}>{children}</div>
     </form>
