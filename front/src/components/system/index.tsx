@@ -256,3 +256,11 @@ export function Table<T>({ columns, rows, children, ...props }: TableProps<T>) {
     </table>
   )
 }
+
+// LOADER OVERLAY
+
+export const LoaderOverlay = () => (
+  <Box className={styles.loaderOverlay}>
+    <Loader color="var(--black)" size={72} />
+  </Box>
+)

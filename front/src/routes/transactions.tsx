@@ -36,10 +36,7 @@ const Transactions = ({ entity }: TransactionsProps) => {
         filters={filters}
       />
 
-      <TransactionList
-        transactions={transactions.data}
-        pagination={pagination}
-      />
+      <TransactionList transactions={transactions} pagination={pagination} />
 
       <Switch>
         <Route path="/transactions/add">

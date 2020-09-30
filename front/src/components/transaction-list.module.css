@@ -1,4 +1,5 @@
 .transactionList {
+  position: relative;
   padding: 32px 120px;
 }
 
@@ -8,7 +9,7 @@
 
 .transactionList tr.transactionRow:hover {
   background-color: var(--gray-highlight);
-  z-index: 2;
+  z-index: 1;
 }
 
 .status {
