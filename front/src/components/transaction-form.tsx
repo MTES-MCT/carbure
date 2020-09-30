@@ -48,16 +48,15 @@ const TransactionForm = ({
             readOnly={readOnly}
             label="Producteur"
             name="producer"
-            value={tr.producer}
+            value={tr.carbure_producer}
             getOptions={findProducers}
             onChange={onChange}
           />
-
           <AutoComplete
             readOnly={readOnly}
             label="Site de production"
             name="production_site"
-            value={tr.production_site}
+            value={tr.carbure_production_site}
             getOptions={findProductionSites}
             onChange={onChange}
           />
@@ -73,7 +72,7 @@ const TransactionForm = ({
             readOnly={readOnly}
             label="Biocarburant"
             name="biocarburant_code"
-            value={tr.biocarburant_code}
+            value={tr.biocarburant}
             getOptions={findBiocarburants}
             onChange={onChange}
           />
@@ -81,7 +80,7 @@ const TransactionForm = ({
             readOnly={readOnly}
             label="Matiere Premiere"
             name="matiere_premiere_code"
-            value={tr.matiere_premiere_code}
+            value={tr.matiere_premiere}
             getOptions={findMatieresPremieres}
             onChange={onChange}
           />
@@ -89,7 +88,7 @@ const TransactionForm = ({
             readOnly={readOnly}
             label="Pays d'origine"
             name="pays_origine_code"
-            value={tr.pays_origine_code}
+            value={tr.pays_origine}
             getOptions={findCountries}
             onChange={onChange}
           />
