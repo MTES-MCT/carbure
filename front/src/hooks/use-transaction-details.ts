@@ -1,23 +1,16 @@
 import { useParams } from "react-router-dom"
 
 import { Lots } from "../services/types"
-import { FormFields } from "./helpers/use-form"
 
 import useTransactionForm, {
   toTransactionFormState,
-  TransactionFormState,
 } from "./helpers/use-transaction-form"
+import useClose from "./helpers/use-close"
 
-type TransactionDetailsHook = [
-  TransactionFormState | null,
-  <T extends FormFields>(e: React.ChangeEvent<T>) => void
-]
-
-export default function useTransactionDetails(
-  transactions: Lots | null
-): TransactionDetailsHook {
+export default function useTransactionDetails(transactions: Lots | null) {
+  const close = useClose("/transactions")
   const params: { id: string } = useParams()
-  const [form, onChange, setForm] = useTransactionForm()
+  const { form, change, setForm } = useTransactionForm()
 
   if (transactions) {
     const transactionID = parseInt(params.id, 10)
@@ -34,5 +27,5 @@ export default function useTransactionDetails(
     }
   }
 
-  return [form, onChange]
+  return { form, change, close }
 }
