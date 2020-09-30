@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 
 import { Entity, Settings } from "../services/types"
 
-import useAPI, { ApiState } from "./use-api"
+import useAPI, { ApiState } from "./helpers/use-api"
 import { getSettings } from "../services/settings"
 
 export type EntitySelection = {

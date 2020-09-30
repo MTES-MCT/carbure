@@ -16,7 +16,7 @@ function parseValue(element: FormFields) {
   }
 }
 
-type FormHook<T> = [
+export type FormHook<T> = [
   T | null,
   <T extends FormFields>(e: React.ChangeEvent<T>) => void,
   React.Dispatch<React.SetStateAction<T | null>>

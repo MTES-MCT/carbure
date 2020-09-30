@@ -1,9 +1,6 @@
 import React from "react"
 
-import {
-  TransactionDetailsHook,
-  TransactionFormState,
-} from "../hooks/use-transaction-details"
+import { TransactionFormState } from "../hooks/helpers/use-transaction-form"
 
 import styles from "./transaction-form.module.css"
 
@@ -19,6 +16,7 @@ import {
 
 import { Box, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
 import AutoComplete from "./system/autocomplete"
+import { FormFields } from "../hooks/helpers/use-form"
 
 // shorthand to build autocomplete value & label getters
 const get = (key: string) => (obj: { [k: string]: any } | null) =>
@@ -28,14 +26,14 @@ type TransactionFormProps = {
   readOnly?: boolean
   transaction: TransactionFormState
   children: React.ReactNode
-  onChange: TransactionDetailsHook[1]
+  onChange: <T extends FormFields>(e: React.ChangeEvent<T>) => void
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
 }
 
 const TransactionForm = ({
   children,
   readOnly = false,
-  transaction: tr,
+  transaction: tx,
   onChange,
   onSubmit,
 }: TransactionFormProps) => {
@@ -53,7 +51,7 @@ const TransactionForm = ({
             type="number"
             label="Volume à 20°C en Litres"
             name="volume"
-            value={tr.volume}
+            value={tx.volume}
             onChange={onChange}
           />
           <AutoComplete
@@ -61,7 +59,7 @@ const TransactionForm = ({
             label="Biocarburant"
             placeholder="Rechercher un biocarburant..."
             name="biocarburant"
-            value={tr.biocarburant}
+            value={tx.biocarburant}
             getValue={get("code")}
             getLabel={get("name")}
             getQuery={findBiocarburants}
@@ -72,7 +70,7 @@ const TransactionForm = ({
             label="Matiere Premiere"
             placeholder="Rechercher une matière première..."
             name="matiere_premiere"
-            value={tr.matiere_premiere}
+            value={tx.matiere_premiere}
             getValue={get("code")}
             getLabel={get("name")}
             getQuery={findMatieresPremieres}
@@ -83,7 +81,7 @@ const TransactionForm = ({
             label="Pays d'origine"
             placeholder="Rechercher un pays..."
             name="pays_origine"
-            value={tr.pays_origine}
+            value={tx.pays_origine}
             getValue={get("code_pays")}
             getLabel={get("name")}
             getQuery={findCountries}
@@ -93,7 +91,7 @@ const TransactionForm = ({
           <LabelTextArea
             label="Champ Libre"
             name="champ_libre"
-            value={tr.champ_libre}
+            value={tx.champ_libre}
             onChange={onChange}
           />
         </Box>
@@ -101,18 +99,18 @@ const TransactionForm = ({
           <LabelCheckbox
             name="producer_is_in_carbure"
             label="Producteur enregistré sur Carbure ?"
-            checked={tr.producer_is_in_carbure}
+            checked={tx.producer_is_in_carbure}
             onChange={onChange}
           />
 
-          {tr.producer_is_in_carbure ? (
+          {tx.producer_is_in_carbure ? (
             <React.Fragment>
               <AutoComplete
                 readOnly={readOnly}
                 label="Producteur"
                 placeholder="Rechercher un producteur..."
                 name="carbure_producer"
-                value={tr.carbure_producer}
+                value={tx.carbure_producer}
                 getValue={get("id")}
                 getLabel={get("name")}
                 getQuery={findProducers}
@@ -124,7 +122,7 @@ const TransactionForm = ({
                 label="Site de production"
                 placeholder="Rechercher un site de production..."
                 name="carbure_production_site"
-                value={tr.carbure_production_site}
+                value={tx.carbure_production_site}
                 getValue={get("id")}
                 getLabel={get("name")}
                 getQuery={findProductionSites}
@@ -137,26 +135,26 @@ const TransactionForm = ({
                 readOnly={readOnly}
                 label="Producteur"
                 name="unknown_producer"
-                value={tr.unknown_producer}
+                value={tx.unknown_producer}
                 onChange={onChange}
               />
               <LabelInput
                 readOnly={readOnly}
                 label="Site de production"
                 name="unknown_production_site"
-                value={tr.unknown_production_site}
+                value={tx.unknown_production_site}
                 onChange={onChange}
               />
             </React.Fragment>
           )}
 
           <AutoComplete
-            disabled={tr.producer_is_in_carbure}
+            disabled={tx.producer_is_in_carbure}
             readOnly={readOnly}
             label="Pays de production"
             placeholder="Rechercher un pays..."
             name="unknown_production_country"
-            value={tr.unknown_production_country}
+            value={tx.unknown_production_country}
             getValue={get("code_pays")}
             getLabel={get("name")}
             getQuery={findCountries}
@@ -164,26 +162,26 @@ const TransactionForm = ({
           />
           <LabelInput
             readOnly={readOnly}
-            disabled={tr.producer_is_in_carbure}
+            disabled={tx.producer_is_in_carbure}
             label="N° d'enregistrement double-compte"
             name="unknown_production_site_dbl_counting"
-            value={tr.unknown_production_site_dbl_counting}
+            value={tx.unknown_production_site_dbl_counting}
             onChange={onChange}
           />
           <LabelInput
             readOnly={readOnly}
-            disabled={tr.producer_is_in_carbure}
+            disabled={tx.producer_is_in_carbure}
             label="Référence Système Fournisseur"
             name="unknown_production_site_reference"
-            value={tr.unknown_production_site_reference}
+            value={tx.unknown_production_site_reference}
             onChange={onChange}
           />
           <LabelInput
             readOnly={readOnly}
-            disabled={tr.producer_is_in_carbure}
+            disabled={tx.producer_is_in_carbure}
             label="Date de mise en service"
             name="unknown_production_site_com_date"
-            value={tr.unknown_production_site_com_date}
+            value={tx.unknown_production_site_com_date}
             onChange={onChange}
           />
         </Box>
@@ -192,17 +190,17 @@ const TransactionForm = ({
           <LabelCheckbox
             name="client_is_in_carbure"
             label="Client enregistré sur Carbure ?"
-            checked={tr.client_is_in_carbure}
+            checked={tx.client_is_in_carbure}
             onChange={onChange}
           />
 
-          {tr.client_is_in_carbure ? (
+          {tx.client_is_in_carbure ? (
             <AutoComplete
               readOnly={readOnly}
               label="Client"
               placeholder="Rechercher un client..."
               name="carbure_client"
-              value={tr.carbure_client}
+              value={tx.carbure_client}
               getValue={get("id")}
               getLabel={get("name")}
               getQuery={findEntities}
@@ -213,7 +211,7 @@ const TransactionForm = ({
               readOnly={readOnly}
               label="Client"
               name="unknown_client"
-              value={tr.unknown_client}
+              value={tx.unknown_client}
               onChange={onChange}
             />
           )}
@@ -221,17 +219,17 @@ const TransactionForm = ({
           <LabelCheckbox
             name="delivery_site_is_on_carbure"
             label="Site de livraison enregistré sur Carbure ?"
-            checked={tr.delivery_site_is_on_carbure}
+            checked={tx.delivery_site_is_on_carbure}
             onChange={onChange}
           />
 
-          {tr.delivery_site_is_on_carbure ? (
+          {tx.delivery_site_is_on_carbure ? (
             <AutoComplete
               readOnly={readOnly}
               label="Site de livraison"
               placeholder="Rechercher un site de livraison..."
               name="carbure_delivery_site"
-              value={tr.carbure_delivery_site}
+              value={tx.carbure_delivery_site}
               getValue={get("depot_id")}
               getLabel={get("name")}
               getQuery={findDeliverySites}
@@ -243,18 +241,18 @@ const TransactionForm = ({
                 readOnly={readOnly}
                 label="Site de livraison"
                 name="unknown_delivery_site"
-                value={tr.unknown_delivery_site}
+                value={tx.unknown_delivery_site}
                 onChange={onChange}
               />
             </React.Fragment>
           )}
 
           <AutoComplete
-            disabled={tr.delivery_site_is_on_carbure}
+            disabled={tx.delivery_site_is_on_carbure}
             readOnly={readOnly}
             label="Pays de livraison"
             name="unknown_delivery_site_country"
-            value={tr.unknown_delivery_site_country}
+            value={tx.unknown_delivery_site_country}
             getValue={get("code_pays")}
             getLabel={get("name")}
             getQuery={findCountries}
@@ -265,7 +263,7 @@ const TransactionForm = ({
             readOnly={readOnly}
             label="Numéro douanier (DAE, DAA...)"
             name="dae"
-            value={tr.dae}
+            value={tx.dae}
             onChange={onChange}
           />
 
@@ -274,7 +272,7 @@ const TransactionForm = ({
             type="date"
             label="Date de livraison"
             name="delivery_date"
-            value={tr.delivery_date}
+            value={tx.delivery_date}
             onChange={onChange}
           />
         </Box>
@@ -287,7 +285,7 @@ const TransactionForm = ({
                 type="number"
                 label="EEC"
                 name="eec"
-                value={tr.eec}
+                value={tx.eec}
                 step={0.1}
                 onChange={onChange}
               />
@@ -296,7 +294,7 @@ const TransactionForm = ({
                 type="number"
                 label="EL"
                 name="el"
-                value={tr.el}
+                value={tx.el}
                 step={0.1}
                 onChange={onChange}
               />
@@ -305,7 +303,7 @@ const TransactionForm = ({
                 type="number"
                 label="EP"
                 name="ep"
-                value={tr.ep}
+                value={tx.ep}
                 step={0.1}
                 onChange={onChange}
               />
@@ -314,7 +312,7 @@ const TransactionForm = ({
                 type="number"
                 label="ETD"
                 name="etd"
-                value={tr.etd}
+                value={tx.etd}
                 step={0.1}
                 onChange={onChange}
               />
@@ -326,7 +324,7 @@ const TransactionForm = ({
                 type="number"
                 label="ESCA"
                 name="esca"
-                value={tr.esca}
+                value={tx.esca}
                 step={0.1}
                 onChange={onChange}
               />
@@ -335,7 +333,7 @@ const TransactionForm = ({
                 type="number"
                 label="ECCS"
                 name="eccs"
-                value={tr.eccs}
+                value={tx.eccs}
                 step={0.1}
                 onChange={onChange}
               />
@@ -344,7 +342,7 @@ const TransactionForm = ({
                 type="number"
                 label="ECCR"
                 name="eccr"
-                value={tr.eccr}
+                value={tx.eccr}
                 step={0.1}
                 onChange={onChange}
               />
@@ -353,7 +351,7 @@ const TransactionForm = ({
                 type="number"
                 label="EEE"
                 name="eee"
-                value={tr.eee}
+                value={tx.eee}
                 step={0.1}
                 onChange={onChange}
               />
@@ -365,7 +363,7 @@ const TransactionForm = ({
             type="number"
             label="EU"
             name="eu"
-            value={tr.eu}
+            value={tx.eu}
             step={0.1}
             className={styles.transactionTotal}
             onChange={onChange}
@@ -374,7 +372,7 @@ const TransactionForm = ({
           <LabelCheckbox
             name="mac"
             label="Mise à consommation ?"
-            checked={tr.mac}
+            checked={tx.mac}
             className={styles.transactionMAC}
             onChange={onChange}
           />

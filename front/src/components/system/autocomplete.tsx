@@ -5,7 +5,7 @@ import { LabelInput, LabelInputProps } from "."
 import styles from "./autocomplete.module.css"
 
 import Dropdown, { useDropdown } from "./dropdown"
-import useAPI from "../../hooks/use-api"
+import useAPI from "../../hooks/helpers/use-api"
 
 // AUTOCOMPLETE COMPONENT
 
