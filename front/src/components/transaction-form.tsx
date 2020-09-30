@@ -22,6 +22,14 @@ import { FormFields } from "../hooks/helpers/use-form"
 const get = (key: string) => (obj: { [k: string]: any } | null) =>
   obj && key in obj ? String(obj[key]) : ""
 
+const getters = {
+  code: get("code"),
+  name: get("name"),
+  code_pays: get("code_pays"),
+  id: get("id"),
+  depot_id: get("depot_id"),
+}
+
 type TransactionFormProps = {
   readOnly?: boolean
   transaction: TransactionFormState
@@ -60,8 +68,8 @@ const TransactionForm = ({
             placeholder="Rechercher un biocarburant..."
             name="biocarburant"
             value={tx.biocarburant}
-            getValue={get("code")}
-            getLabel={get("name")}
+            getValue={getters.code}
+            getLabel={getters.name}
             getQuery={findBiocarburants}
             onChange={onChange}
           />
@@ -71,8 +79,8 @@ const TransactionForm = ({
             placeholder="Rechercher une matière première..."
             name="matiere_premiere"
             value={tx.matiere_premiere}
-            getValue={get("code")}
-            getLabel={get("name")}
+            getValue={getters.code}
+            getLabel={getters.name}
             getQuery={findMatieresPremieres}
             onChange={onChange}
           />
@@ -82,8 +90,8 @@ const TransactionForm = ({
             placeholder="Rechercher un pays..."
             name="pays_origine"
             value={tx.pays_origine}
-            getValue={get("code_pays")}
-            getLabel={get("name")}
+            getValue={getters.code_pays}
+            getLabel={getters.name}
             getQuery={findCountries}
             onChange={onChange}
           />
@@ -111,8 +119,8 @@ const TransactionForm = ({
                 placeholder="Rechercher un producteur..."
                 name="carbure_producer"
                 value={tx.carbure_producer}
-                getValue={get("id")}
-                getLabel={get("name")}
+                getValue={getters.id}
+                getLabel={getters.name}
                 getQuery={findProducers}
                 onChange={onChange}
               />
@@ -123,8 +131,8 @@ const TransactionForm = ({
                 placeholder="Rechercher un site de production..."
                 name="carbure_production_site"
                 value={tx.carbure_production_site}
-                getValue={get("id")}
-                getLabel={get("name")}
+                getValue={getters.id}
+                getLabel={getters.name}
                 getQuery={findProductionSites}
                 onChange={onChange}
               />
@@ -155,8 +163,8 @@ const TransactionForm = ({
             placeholder="Rechercher un pays..."
             name="unknown_production_country"
             value={tx.unknown_production_country}
-            getValue={get("code_pays")}
-            getLabel={get("name")}
+            getValue={getters.code_pays}
+            getLabel={getters.name}
             getQuery={findCountries}
             onChange={onChange}
           />
@@ -179,6 +187,7 @@ const TransactionForm = ({
           <LabelInput
             readOnly={readOnly}
             disabled={tx.producer_is_in_carbure}
+            type="date"
             label="Date de mise en service"
             name="unknown_production_site_com_date"
             value={tx.unknown_production_site_com_date}
@@ -201,8 +210,8 @@ const TransactionForm = ({
               placeholder="Rechercher un client..."
               name="carbure_client"
               value={tx.carbure_client}
-              getValue={get("id")}
-              getLabel={get("name")}
+              getValue={getters.id}
+              getLabel={getters.name}
               getQuery={findEntities}
               onChange={onChange}
             />
@@ -230,8 +239,8 @@ const TransactionForm = ({
               placeholder="Rechercher un site de livraison..."
               name="carbure_delivery_site"
               value={tx.carbure_delivery_site}
-              getValue={get("depot_id")}
-              getLabel={get("name")}
+              getValue={getters.depot_id}
+              getLabel={getters.name}
               getQuery={findDeliverySites}
               onChange={onChange}
             />
@@ -253,8 +262,8 @@ const TransactionForm = ({
             label="Pays de livraison"
             name="unknown_delivery_site_country"
             value={tx.unknown_delivery_site_country}
-            getValue={get("code_pays")}
-            getLabel={get("name")}
+            getValue={getters.code_pays}
+            getLabel={getters.name}
             getQuery={findCountries}
             onChange={onChange}
           />

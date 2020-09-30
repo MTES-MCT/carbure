@@ -110,7 +110,7 @@ export interface Lot {
   carbure_production_site: ProductionSite
   unknown_production_site: string
   unknown_production_country: Country
-  unknown_production_site_com_date: string
+  unknown_production_site_com_date: string | null
   unknown_production_site_dbl_counting: string
   unknown_production_site_reference: string
 

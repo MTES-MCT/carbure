@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { useParams } from "react-router-dom"
 
 import { Lots } from "../services/types"
@@ -12,20 +13,22 @@ export default function useTransactionDetails(transactions: Lots | null) {
   const params: { id: string } = useParams()
   const { form, change, setForm } = useTransactionForm()
 
-  if (transactions) {
-    const transactionID = parseInt(params.id, 10)
+  const transactionID = parseInt(params.id, 10)
 
-    // find the relevant lot
-    // @TODO would be nice to be able to fetch details for only one lot
-    const transaction = transactions.lots.find(
-      (lot) => lot.lot.id === transactionID
-    )
+  useEffect(() => {
+    if (transactions) {
+      // find the relevant lot
+      // @TODO would be nice to be able to fetch details for only one lot
+      const transaction = transactions.lots.find(
+        (lot) => lot.lot.id === transactionID
+      )
 
-    // initialize the form with data coming from the loaded transaction
-    if (transaction && form === null) {
-      setForm(toTransactionFormState(transaction))
+      // initialize the form with data coming from the loaded transaction
+      if (transaction) {
+        setForm(toTransactionFormState(transaction))
+      }
     }
-  }
+  }, [transactionID, transactions, setForm])
 
   return { form, change, close }
 }
