@@ -1,28 +1,25 @@
-import { ApiFilters, Lot, Lots, LotStatus, Snapshot } from "./types"
+import { Lot, Lots, LotStatus, Snapshot } from "./types"
 
 import api from "./api"
 import { FilterSelection } from "../hooks/use-transactions"
 import { TransactionFormState } from "../hooks/use-transaction-details"
 
+function toOption(value: string) {
+  return { value, label: value }
+}
+
 // give the same type to all filters in order to render them easily
-function normalizeFilters(filters: ApiFilters): Snapshot["filters"] {
-  return {
-    matieres_premieres: filters.matieres_premieres,
-    biocarburants: filters.biocarburants,
-    countries_of_origin: filters.countries_of_origin,
-    periods: filters.periods.map((filter: string) => ({
-      value: filter,
-      label: filter,
-    })),
-    production_sites: filters.production_sites.map((filter: string) => ({
-      value: filter,
-      label: filter,
-    })),
-    clients: filters.clients.map((filter: string) => ({
-      value: filter,
-      label: filter,
-    })),
+function normalizeFilters(snapshot: any): Snapshot {
+  snapshot.filters = {
+    matieres_premieres: snapshot.filters.matieres_premieres,
+    biocarburants: snapshot.filters.biocarburants,
+    countries_of_origin: snapshot.filters.countries_of_origin,
+    periods: snapshot.filters.periods.map(toOption),
+    production_sites: snapshot.filters.production_sites.map(toOption),
+    clients: snapshot.filters.clients.map(toOption),
   }
+
+  return snapshot
 }
 
 // extract the status name from the lot details
@@ -45,14 +42,8 @@ export function getStatus(lot: Lot): LotStatus {
   return LotStatus.Weird
 }
 
-export async function getSnapshot(producerID: number): Promise<Snapshot> {
-  const snapshot = await api.get("/lots/snapshot", {
-    producer_id: producerID,
-  })
-
-  snapshot.filters = normalizeFilters(snapshot.filters)
-
-  return snapshot
+export function getSnapshot(producer_id: number): Promise<Snapshot> {
+  return api.get("/lots/snapshot", { producer_id }).then(normalizeFilters)
 }
 
 export function getLots(
