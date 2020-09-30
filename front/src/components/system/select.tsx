@@ -59,7 +59,7 @@ function renderSelected(
     selected = options.find((o) => o.value === value)?.label
   }
 
-  return selected ?? placeholder
+  return selected || placeholder
 }
 
 // get only options containing the given query
