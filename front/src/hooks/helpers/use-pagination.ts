@@ -9,19 +9,12 @@ export type PageSelection = {
 
 // manage pagination state
 export function usePageSelection(): PageSelection {
-  const [{ page, limit }, setPagination] = useState({ page: 0, limit: 10 })
+  const [page, setPage] = useState(0)
+  const [limit, setLimit] = useState(10)
 
   useEffect(() => {
     setPage(0)
   }, [limit])
-
-  function setPage(page: number) {
-    setPagination({ limit, page })
-  }
-
-  function setLimit(limit: number) {
-    setPagination({ page, limit })
-  }
 
   return { page, limit, setPage, setLimit }
 }

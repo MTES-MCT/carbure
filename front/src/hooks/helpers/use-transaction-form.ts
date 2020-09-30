@@ -87,7 +87,8 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
     carbure_production_site: tx.lot.carbure_production_site,
     unknown_production_site: tx.lot.unknown_production_site,
     unknown_production_site_reference: tx.lot.unknown_production_site_reference,
-    unknown_production_site_com_date: tx.lot.unknown_production_site_com_date,
+    unknown_production_site_com_date:
+      tx.lot.unknown_production_site_com_date ?? "",
     unknown_production_site_dbl_counting:
       tx.lot.unknown_production_site_dbl_counting,
 
