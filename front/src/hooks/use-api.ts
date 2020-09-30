@@ -20,7 +20,7 @@ type ApiAction<T> =
 function reducer<T>(state: ApiState<T>, action: ApiAction<T>): ApiState<T> {
   switch (action.type) {
     case ApiStatus.Pending:
-      return { loading: true, error: null, data: null }
+      return { ...state, loading: true }
     case ApiStatus.Error:
       return { loading: false, error: action.payload, data: null }
     case ApiStatus.Success:
