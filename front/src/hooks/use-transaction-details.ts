@@ -36,12 +36,12 @@ export interface TransactionFormState {
   matiere_premiere: MatierePremiere
 
   producer_is_in_carbure: boolean
-  carbure_producer: Entity
+  carbure_producer: Entity | null
   unknown_producer: string | null
   unknown_production_country: string | null
 
   production_site_is_in_carbure: boolean
-  carbure_production_site: ProductionSite
+  carbure_production_site: ProductionSite | null
   unknown_production_site: string | null
   unknown_production_site_com_date: string | null
   // unknown_production_site_dbl_counting: string | null
