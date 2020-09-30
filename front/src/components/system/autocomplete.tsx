@@ -7,7 +7,45 @@ import styles from "./autocomplete.module.css"
 import Dropdown, { useDropdown } from "./dropdown"
 import useAPI from "../../hooks/helpers/use-api"
 
-// AUTOCOMPLETE COMPONENT
+function useAutoComplete<T>(
+  value: T,
+  name: string,
+  onChange: (e: any) => void,
+  getLabel: (option: T) => string,
+  getQuery: (query: string) => Promise<T[]>
+) {
+  const dd = useDropdown()
+
+  const [query, setQuery] = useState("")
+  const [suggestions, resolve] = useAPI<T[]>()
+
+  // modify input content when passed value is changed
+  useEffect(() => {
+    setQuery(getLabel(value))
+  }, [value, getLabel])
+
+  // refetch the list of suggestions when query changes
+  useEffect(() => {
+    getQuery && resolve(getQuery(query))
+  }, [query, getQuery, resolve])
+
+  // on change, modify the query to match selection and send event to parent
+  function change(value: T) {
+    setQuery(getLabel(value))
+    onChange({ target: { name, value } })
+  }
+
+  // open the suggestions box according to current state
+  function openSuggestions() {
+    if (query.length > 0 && suggestions.data && suggestions.data.length > 0) {
+      dd.toggle(true)
+    } else {
+      dd.toggle(false)
+    }
+  }
+
+  return { dd, query, suggestions, setQuery, change, openSuggestions }
+}
 
 type AutoCompleteProps<T> = Omit<LabelInputProps, "value"> & {
   value: T
@@ -22,36 +60,20 @@ function AutoComplete<T>({
   value,
   name,
   options,
+  onChange,
   getValue,
   getLabel,
   getQuery,
-  onChange,
   ...props
 }: AutoCompleteProps<T>) {
-  const dd = useDropdown()
-  const [query, setQuery] = useState("")
-  const [suggestions, resolve] = useAPI<T[]>()
-
-  useEffect(() => {
-    setQuery(getLabel(value))
-  }, [value])
-
-  useEffect(() => {
-    getQuery && resolve(getQuery(query))
-  }, [query, getQuery, resolve])
-
-  function change(option: T) {
-    setQuery(getLabel(option))
-    onChange({ target: { name: name!, value: option } })
-  }
-
-  function openSuggestions() {
-    if (query.length > 0 && suggestions.data && suggestions.data.length > 0) {
-      dd.toggle(true)
-    } else {
-      dd.toggle(false)
-    }
-  }
+  const {
+    query,
+    dd,
+    suggestions,
+    setQuery,
+    change,
+    openSuggestions,
+  } = useAutoComplete(value, name!, onChange, getLabel, getQuery)
 
   return (
     <Dropdown>
