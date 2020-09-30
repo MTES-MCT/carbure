@@ -12,6 +12,44 @@
   z-index: 1;
 }
 
+/* v  ugly forcing of column width so the table stays stable */
+
+/* 1st column (checkbox) */
+tr.transactionRow td:nth-child(1) {
+  min-width: 40px;
+  max-width: 40px;
+}
+
+/* 2nd column (status) */
+tr.transactionRow td:nth-child(2) {
+  min-width: 80px;
+  max-width: 80px;
+}
+
+/* 3rd column (periode) */
+tr.transactionRow td:nth-child(3 + 1) {
+  min-width: 104px;
+  max-width: 104px;
+}
+
+/* 4th-9th column (periode) */
+tr.transactionRow td:nth-child(n + 4) {
+  min-width: 128px;
+  max-width: 128px;
+}
+
+/* 10th column (GES) */
+tr.transactionRow td:nth-child(10) {
+  min-width: 40px;
+  max-width: 40px;
+}
+
+/* 11th column (icons) */
+tr.transactionRow td:nth-child(11) {
+  min-width: 82px;
+  max-width: 82px;
+}
+
 .status {
   color: var(--gray-dark);
   background-color: var(--gray-light);
@@ -62,6 +100,12 @@
   flex-direction: column;
 }
 
+.rowLine {
+  overflow-x: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .extraInfo {
   font-size: 12px;
   color: var(--gray-dark);
@@ -71,6 +115,7 @@
 .actionColumn {
   width: 82px;
   text-align: center;
+  color: var(--gray-dark);
 }
 
 .transactionActions {
@@ -81,7 +126,9 @@
   display: none;
 }
 .transactionRow:hover .transactionActions {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .transactionActions :global(.icon):hover {
