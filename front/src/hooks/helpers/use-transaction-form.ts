@@ -7,6 +7,7 @@ import {
   MatierePremiere,
   ProductionSite,
 } from "../../services/types"
+import useAPI from "./use-api"
 
 import useForm from "./use-form"
 
@@ -101,38 +102,6 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
   }
 }
 
-export function toTransactionPostData(tx: TransactionFormState) {
-  return {
-    biocarburant_code: tx.biocarburant?.code,
-    matiere_premiere_code: tx.matiere_premiere?.code,
-    pays_origine_code: tx.pays_origine?.code_pays,
-    producer: tx.carbure_producer?.name ?? tx.unknown_producer,
-    production_site:
-      tx.carbure_production_site?.name ?? tx.unknown_production_site,
-    production_site_country: tx.unknown_production_country,
-    production_site_reference: tx.unknown_production_site_reference,
-    production_site_commissioning_date: tx.unknown_production_site_com_date,
-    double_counting_registration: tx.unknown_production_site_dbl_counting,
-    volume: tx.volume,
-    eec: tx.eec,
-    el: tx.el,
-    ep: tx.ep,
-    etd: tx.etd,
-    eu: tx.eu,
-    esca: tx.esca,
-    eccs: tx.eccs,
-    eccr: tx.eccr,
-    eee: tx.eee,
-    dae: tx.dae,
-    champ_libre: tx.champ_libre,
-    client: tx.carbure_client?.name ?? tx.unknown_client,
-    delivery_date: tx.delivery_date,
-    delivery_site: tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site,
-    delivery_site_country: tx.unknown_delivery_site_country,
-    mac: tx.mac,
-  }
-}
-
 // empty form state
 const initialState: TransactionFormState = {
   id: 0,
@@ -179,5 +148,17 @@ const initialState: TransactionFormState = {
 }
 
 export default function useTransactionForm() {
-  return useForm<TransactionFormState | null>(initialState)
+  const [request, resolve] = useAPI()
+
+  const [form, change, setForm] = useForm<TransactionFormState | null>(
+    initialState
+  )
+
+  return {
+    form,
+    request,
+    change,
+    resolve,
+    setForm,
+  }
 }
