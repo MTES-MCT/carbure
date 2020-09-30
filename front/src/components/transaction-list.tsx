@@ -3,7 +3,7 @@ import cl from "clsx"
 import { useHistory } from "react-router-dom"
 
 import { Transaction, Lots, LotStatus } from "../services/types"
-import { PageSelection } from "../hooks/use-transactions"
+import { PageSelection } from "../hooks/helpers/use-pagination"
 import { ApiState } from "../hooks/helpers/use-api"
 
 import styles from "./transaction-list.module.css"
@@ -181,12 +181,7 @@ const TransactionList = ({
             )}
           </Table>
 
-          <Pagination
-            page={pagination.selected.page}
-            limit={pagination.selected.limit}
-            total={tx.total}
-            onChange={pagination.setPage}
-          />
+          <Pagination pagination={pagination} total={tx.total} />
         </React.Fragment>
       )}
     </Box>

@@ -82,14 +82,15 @@ export function getLots(
   status: LotStatus,
   producerID: number,
   filters: FilterSelection["selected"],
-  pagination: { page: number; limit: number }
+  page: number,
+  limit: number
 ): Promise<Lots> {
   return api.get("/lots", {
     status,
     producer_id: producerID,
     ...filters,
-    from_idx: pagination.page * pagination.limit,
-    limit: pagination.limit,
+    from_idx: page * limit,
+    limit: limit,
   })
 }
 

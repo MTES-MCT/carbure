@@ -13,6 +13,7 @@
   margin: 0 8px;
   padding: 8px;
   width: 42px;
+  background-color: var(--gray-light);
   justify-content: center;
 }
 
@@ -22,10 +23,14 @@
   height: 24px;
 }
 
-.paginationTotal {
+.paginationText {
   display: flex;
   align-items: center;
   margin-left: 8px;
+}
+
+.paginationTotal {
+  margin-right: 8px;
 }
 
 .paginationSelect :global(.dropdown-items) {

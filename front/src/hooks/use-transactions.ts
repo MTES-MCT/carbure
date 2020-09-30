@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react"
 
 import { EntitySelection } from "./use-app"
+import { SelectValue } from "../components/system/select"
 import { LotStatus, Filters, Lots, Snapshot } from "../services/types"
 
 import useAPI from "./helpers/use-api"
+import { PageSelection, usePageSelection } from "./helpers/use-pagination"
 import { getSnapshot, getLots } from "../services/lots"
-import { SelectValue } from "../components/system/select"
-
-// @TODO harcoded pagination limit value
-const LIMIT = 10
 
 export type StatusSelection = {
   active: LotStatus
@@ -44,31 +42,6 @@ function useFilterSelection(): FilterSelection {
   return { selected, selectFilter }
 }
 
-export type PageSelection = {
-  selected: {
-    page: number
-    limit: number
-  }
-
-  setPage: (p: number) => void
-  setLimit: (l: number) => void
-}
-
-// manage pagination state
-function usePageSelection(): PageSelection {
-  const [selected, setPagination] = useState({ page: 0, limit: LIMIT })
-
-  function setPage(page: number) {
-    setPagination({ ...selected, page })
-  }
-
-  function setLimit(limit: number) {
-    setPagination({ ...selected, limit })
-  }
-
-  return { selected, setPage, setLimit }
-}
-
 // fetches current snapshot when parameters change
 function useGetSnapshot(entity: EntitySelection) {
   const [snapshot, resolve] = useAPI<Snapshot>()
@@ -98,7 +71,8 @@ function useGetLots(
           status.active,
           entity.selected.id,
           filters.selected,
-          pagination.selected
+          pagination.page,
+          pagination.limit
         )
       )
     }
@@ -107,7 +81,8 @@ function useGetLots(
     status.active,
     entity.selected,
     filters.selected,
-    pagination.selected,
+    pagination.page,
+    pagination.limit,
   ])
 
   return transactions
