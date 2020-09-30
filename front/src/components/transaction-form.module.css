@@ -4,20 +4,21 @@
   margin-top: 32px;
 }
 
-.transactionFields {
-  display: flex;
+.transactionFields > div {
+  flex: 3;
+}
+
+.transactionFields > div:last-child {
+  flex: 2;
+}
+
+.transactionFields > div:nth-child(2),
+.transactionFields > div:nth-child(3) {
+  margin-top: -68px;
 }
 
 .transactionFields > div {
-  flex: 1;
-}
-
-.middleColumn {
-  margin: 0 32px;
-}
-
-.transactionGES {
-  display: flex;
+  margin-right: 32px;
 }
 
 .transactionGES > div:first-child {
@@ -25,7 +26,7 @@
 }
 
 .transactionMAC {
-  margin: auto;
+  margin: 0 auto;
 }
 
 .transactionFormButtons {

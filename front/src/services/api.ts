@@ -24,6 +24,19 @@ function filterParams(params: Params) {
   return okParams
 }
 
+// converts an javascript object into FormData
+function toFormData(obj: any): FormData {
+  const formData = new FormData()
+
+  for (const key in obj) {
+    if (obj[key] || obj[key] === 0) {
+      formData.append(key, obj[key].toString())
+    }
+  }
+
+  return formData
+}
+
 // check if the api response is correct and return its data
 // if there's a problem, throw an error
 async function checkResponse<T>(res: Response): Promise<T> {
@@ -36,17 +49,6 @@ async function checkResponse<T>(res: Response): Promise<T> {
     // otherwise, return only the fetched data
     return json.data
   }
-}
-
-// converts an javascript object into FormData
-function toFormData(obj: any): FormData {
-  const formData = new FormData()
-
-  for (const key in obj) {
-    formData.append(key, obj[key].toString())
-  }
-
-  return formData
 }
 
 async function get<T = any>(
@@ -72,11 +74,6 @@ async function post<T = any>(
   const url = API_ROOT + endpoint
   const fetchOptions: Params = { ...options, method: "POST" }
   const csrf = Cookies.get("csrftoken")
-
-  // fetchOptions.headers = {
-  //   "Content-Type": "multipart/form-data",
-  //   "X-CSRFToken": csrf,
-  // }
 
   if (body) {
     fetchOptions.body = toFormData(body)

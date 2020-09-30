@@ -20,7 +20,6 @@ export interface TransactionFormState {
   champ_libre: string
   delivery_date: string
   mac: boolean
-  pays_origine: Country
 
   eec: number
   el: number
@@ -32,28 +31,30 @@ export interface TransactionFormState {
   eccr: number
   eee: number
 
-  biocarburant: Biocarburant
-  matiere_premiere: MatierePremiere
+  biocarburant: Biocarburant | null
+  matiere_premiere: MatierePremiere | null
+  pays_origine: Country | null
 
   producer_is_in_carbure: boolean
   carbure_producer: Entity | null
-  unknown_producer: string | null
-  unknown_production_country: string | null
+  unknown_producer: string
 
   production_site_is_in_carbure: boolean
   carbure_production_site: ProductionSite | null
-  unknown_production_site: string | null
-  unknown_production_site_com_date: string | null
-  // unknown_production_site_dbl_counting: string | null
-  unknown_production_site_reference: string | null
+  unknown_production_site: string
+  unknown_production_country: Country | null
+  unknown_production_site_com_date: string
+  unknown_production_site_reference: string
+  unknown_production_site_dbl_counting: string
 
   client_is_in_carbure: boolean
-  client: Entity | null
-  unknown_client: string | null
+  carbure_client: Entity | null
+  unknown_client: string
 
   delivery_site_is_on_carbure: boolean
-  delivery_site: DeliverySite | null
-  delivery_site_country: string
+  carbure_delivery_site: DeliverySite | null
+  unknown_delivery_site: string
+  unknown_delivery_site_country: Country | null
 }
 
 function extractFormData(tr: Lot): TransactionFormState {
@@ -64,7 +65,6 @@ function extractFormData(tr: Lot): TransactionFormState {
     champ_libre: tr.champ_libre,
     delivery_date: tr.delivery_date,
     mac: tr.is_mac,
-    pays_origine: tr.lot.pays_origine,
 
     eec: tr.lot.eec,
     el: tr.lot.el,
@@ -78,6 +78,7 @@ function extractFormData(tr: Lot): TransactionFormState {
 
     biocarburant: tr.lot.biocarburant,
     matiere_premiere: tr.lot.matiere_premiere,
+    pays_origine: tr.lot.pays_origine,
 
     producer_is_in_carbure: tr.lot.producer_is_in_carbure,
     carbure_producer: tr.lot.carbure_producer,
@@ -88,18 +89,19 @@ function extractFormData(tr: Lot): TransactionFormState {
     carbure_production_site: tr.lot.carbure_production_site,
     unknown_production_site: tr.lot.unknown_production_site,
     unknown_production_site_reference: tr.lot.unknown_production_site_reference,
+    unknown_production_site_dbl_counting:
+      tr.lot.unknown_production_site_dbl_counting,
     unknown_production_site_com_date:
       tr.lot.unknown_production_site_com_date ?? "2020-09-21", //@TODO fill this correctly somewhere, otherwise API crash
 
     client_is_in_carbure: tr.client_is_in_carbure,
-    client: tr.carbure_client,
+    carbure_client: tr.carbure_client,
     unknown_client: tr.unknown_client,
 
     delivery_site_is_on_carbure: tr.delivery_site_is_in_carbure,
-    delivery_site: tr.carbure_delivery_site,
-    delivery_site_country:
-      tr.carbure_delivery_site?.country.code_pays ??
-      tr.unknown_delivery_site_country,
+    carbure_delivery_site: tr.carbure_delivery_site,
+    unknown_delivery_site: tr.unknown_delivery_site,
+    unknown_delivery_site_country: tr.unknown_delivery_site_country,
   }
 }
 
