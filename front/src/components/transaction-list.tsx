@@ -160,18 +160,30 @@ const TransactionList = ({
 }: TransactionListProps) => {
   const tx = transactions.data
 
+  const hasError = typeof transactions.error === "string"
+  const isEmpty = tx === null || tx.lots.length === 0
+
   return (
     <Box className={styles.transactionList}>
       {transactions.loading && <LoaderOverlay />}
 
-      {tx === null || tx.lots.length === 0 ? (
+      {isEmpty && (
         <Alert kind="warning">
           <AlertCircle />
           Aucune transaction trouvée pour ces paramètres
         </Alert>
-      ) : (
+      )}
+
+      {hasError && (
+        <Alert kind="error">
+          <AlertCircle />
+          {transactions.error}
+        </Alert>
+      )}
+
+      {!isEmpty && !hasError && (
         <React.Fragment>
-          <Table columns={COLUMNS} rows={tx.lots}>
+          <Table columns={COLUMNS} rows={tx!.lots}>
             {(transaction) => (
               <TransactionRow
                 key={transaction.lot.id}
@@ -180,7 +192,7 @@ const TransactionList = ({
             )}
           </Table>
 
-          <Pagination pagination={pagination} total={tx.total} />
+          <Pagination pagination={pagination} total={tx!.total} />
         </React.Fragment>
       )}
     </Box>
