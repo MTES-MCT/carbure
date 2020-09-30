@@ -2,7 +2,7 @@ import React from "react"
 import cl from "clsx"
 import { useHistory } from "react-router-dom"
 
-import { Lot, Lots, LotStatus } from "../services/types"
+import { Transaction, Lots, LotStatus } from "../services/types"
 import { PageSelection } from "../hooks/use-transactions"
 
 import styles from "./transaction-list.module.css"
@@ -59,7 +59,7 @@ const TwoLines = ({ top, bottom }: { top: string; bottom: string }) => (
   </div>
 )
 
-const TransactionRow = ({ transaction }: { transaction: Lot }) => {
+const TransactionRow = ({ transaction }: { transaction: Transaction }) => {
   const history = useHistory()
 
   return (

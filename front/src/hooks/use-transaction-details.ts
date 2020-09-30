@@ -1,111 +1,14 @@
 import { useParams } from "react-router-dom"
 
-import {
-  Biocarburant,
-  Country,
-  DeliverySite,
-  Entity,
-  Lot,
-  Lots,
-  MatierePremiere,
-  ProductionSite,
-} from "../services/types"
+import { Lots } from "../services/types"
+import { FormFields } from "./helpers/use-form"
 
-import useForm, { FormFields } from "./use-form"
+import useTransactionForm, {
+  toTransactionFormState,
+  TransactionFormState,
+} from "./helpers/use-transaction-form"
 
-export interface TransactionFormState {
-  id: number
-  dae: string
-  volume: number
-  champ_libre: string
-  delivery_date: string
-  mac: boolean
-
-  eec: number
-  el: number
-  ep: number
-  etd: number
-  eu: number
-  esca: number
-  eccs: number
-  eccr: number
-  eee: number
-
-  biocarburant: Biocarburant | null
-  matiere_premiere: MatierePremiere | null
-  pays_origine: Country | null
-
-  producer_is_in_carbure: boolean
-  carbure_producer: Entity | null
-  unknown_producer: string
-
-  production_site_is_in_carbure: boolean
-  carbure_production_site: ProductionSite | null
-  unknown_production_site: string
-  unknown_production_country: Country | null
-  unknown_production_site_com_date: string
-  unknown_production_site_reference: string
-  unknown_production_site_dbl_counting: string
-
-  client_is_in_carbure: boolean
-  carbure_client: Entity | null
-  unknown_client: string
-
-  delivery_site_is_on_carbure: boolean
-  carbure_delivery_site: DeliverySite | null
-  unknown_delivery_site: string
-  unknown_delivery_site_country: Country | null
-}
-
-function extractFormData(tr: Lot): TransactionFormState {
-  return {
-    id: tr.lot.id,
-    dae: tr.dae,
-    volume: tr.lot.volume,
-    champ_libre: tr.champ_libre,
-    delivery_date: tr.delivery_date,
-    mac: tr.is_mac,
-
-    eec: tr.lot.eec,
-    el: tr.lot.el,
-    ep: tr.lot.ep,
-    etd: tr.lot.etd,
-    eu: tr.lot.eu,
-    esca: tr.lot.esca,
-    eccs: tr.lot.eccs,
-    eccr: tr.lot.eccr,
-    eee: tr.lot.eee,
-
-    biocarburant: tr.lot.biocarburant,
-    matiere_premiere: tr.lot.matiere_premiere,
-    pays_origine: tr.lot.pays_origine,
-
-    producer_is_in_carbure: tr.lot.producer_is_in_carbure,
-    carbure_producer: tr.lot.carbure_producer,
-    unknown_producer: tr.lot.unknown_producer,
-    unknown_production_country: tr.lot.unknown_production_country,
-
-    production_site_is_in_carbure: tr.lot.production_site_is_in_carbure,
-    carbure_production_site: tr.lot.carbure_production_site,
-    unknown_production_site: tr.lot.unknown_production_site,
-    unknown_production_site_reference: tr.lot.unknown_production_site_reference,
-    unknown_production_site_dbl_counting:
-      tr.lot.unknown_production_site_dbl_counting,
-    unknown_production_site_com_date:
-      tr.lot.unknown_production_site_com_date ?? "2020-09-21", //@TODO fill this correctly somewhere, otherwise API crash
-
-    client_is_in_carbure: tr.client_is_in_carbure,
-    carbure_client: tr.carbure_client,
-    unknown_client: tr.unknown_client,
-
-    delivery_site_is_on_carbure: tr.delivery_site_is_in_carbure,
-    carbure_delivery_site: tr.carbure_delivery_site,
-    unknown_delivery_site: tr.unknown_delivery_site,
-    unknown_delivery_site_country: tr.unknown_delivery_site_country,
-  }
-}
-
-export type TransactionDetailsHook = [
+type TransactionDetailsHook = [
   TransactionFormState | null,
   <T extends FormFields>(e: React.ChangeEvent<T>) => void
 ]
@@ -114,7 +17,7 @@ export default function useTransactionDetails(
   transactions: Lots | null
 ): TransactionDetailsHook {
   const params: { id: string } = useParams()
-  const [form, onChange, setForm] = useForm<TransactionFormState | null>(null)
+  const [form, onChange, setForm] = useTransactionForm()
 
   if (transactions) {
     const transactionID = parseInt(params.id, 10)
@@ -127,7 +30,7 @@ export default function useTransactionDetails(
 
     // initialize the form with data coming from the loaded transaction
     if (transaction && form === null) {
-      setForm(extractFormData(transaction))
+      setForm(toTransactionFormState(transaction))
     }
   }
 

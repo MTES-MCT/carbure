@@ -76,7 +76,7 @@ export interface ProductionSiteDetails extends ProductionSite {
   producer: Entity
 }
 
-export interface LotDetails {
+export interface Lot {
   id: number
   carbure_id: string
   volume: number
@@ -118,8 +118,8 @@ export interface LotDetails {
   fused_with: null // @TODO
 }
 
-export interface Lot {
-  lot: LotDetails
+export interface Transaction {
+  lot: Lot
   dae: string
   delivery_status: string
   delivery_date: string
@@ -144,7 +144,7 @@ export interface Lots {
   from: number
   returned: number
   total: number
-  lots: Lot[]
+  lots: Transaction[]
 }
 
 export enum Filters {
