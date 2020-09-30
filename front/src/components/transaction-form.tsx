@@ -20,12 +20,16 @@ import {
 import { Box, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
 import AutoComplete from "./system/autocomplete"
 
+// shorthand to build autocomplete value & label getters
+const get = (key: string) => (obj: { [k: string]: any } | null) =>
+  obj && key in obj ? String(obj[key]) : ""
+
 type TransactionFormProps = {
   readOnly?: boolean
   transaction: TransactionFormState
-  onChange?: TransactionDetailsHook[1]
-  onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
   children: React.ReactNode
+  onChange: TransactionDetailsHook[1]
+  onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
 }
 
 const TransactionForm = ({
@@ -47,17 +51,21 @@ const TransactionForm = ({
           <AutoComplete
             readOnly={readOnly}
             label="Producteur"
-            name="producer"
+            name="carbure_producer"
             value={tr.carbure_producer}
-            getOptions={findProducers}
+            getValue={get("id")}
+            getLabel={get("name")}
+            getQuery={findProducers}
             onChange={onChange}
           />
           <AutoComplete
             readOnly={readOnly}
             label="Site de production"
-            name="production_site"
+            name="carbure_production_site"
             value={tr.carbure_production_site}
-            getOptions={findProductionSites}
+            getValue={get("id")}
+            getLabel={get("name")}
+            getQuery={findProductionSites}
             onChange={onChange}
           />
           <LabelInput
@@ -71,25 +79,31 @@ const TransactionForm = ({
           <AutoComplete
             readOnly={readOnly}
             label="Biocarburant"
-            name="biocarburant_code"
+            name="biocarburant"
             value={tr.biocarburant}
-            getOptions={findBiocarburants}
+            getValue={get("code")}
+            getLabel={get("name")}
+            getQuery={findBiocarburants}
             onChange={onChange}
           />
           <AutoComplete
             readOnly={readOnly}
             label="Matiere Premiere"
-            name="matiere_premiere_code"
+            name="matiere_premiere"
             value={tr.matiere_premiere}
-            getOptions={findMatieresPremieres}
+            getValue={get("code")}
+            getLabel={get("name")}
+            getQuery={findMatieresPremieres}
             onChange={onChange}
           />
           <AutoComplete
             readOnly={readOnly}
             label="Pays d'origine"
-            name="pays_origine_code"
+            name="pays_origine"
             value={tr.pays_origine}
-            getOptions={findCountries}
+            getValue={get("code_pays")}
+            getLabel={get("name")}
+            getQuery={findCountries}
             onChange={onChange}
           />
         </Box>
@@ -105,9 +119,11 @@ const TransactionForm = ({
           <AutoComplete
             readOnly={readOnly}
             label="Client"
-            name="client"
+            name="carbure_client"
             value={tr.client}
-            getOptions={findEntities}
+            getValue={get("id")}
+            getLabel={get("name")}
+            getQuery={findEntities}
             onChange={onChange}
           />
           <AutoComplete
@@ -115,7 +131,9 @@ const TransactionForm = ({
             label="Site de livraison"
             name="delivery_site"
             value={tr.delivery_site}
-            getOptions={findDeliverySites}
+            getValue={get("depot_id")}
+            getLabel={get("name")}
+            getQuery={findDeliverySites}
             onChange={onChange}
           />
           <LabelInput

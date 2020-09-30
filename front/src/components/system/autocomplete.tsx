@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react"
 
 import { LabelInput, LabelInputProps } from "."
-import { Option } from "./select"
 
 import styles from "./autocomplete.module.css"
 
@@ -10,40 +9,40 @@ import useAPI from "../../hooks/use-api"
 
 // AUTOCOMPLETE COMPONENT
 
-type AutoCompleteProps = LabelInputProps & {
-  value: string
-  options?: Option[]
-  getOptions?: (query: string) => Promise<any>
-  onChange?: (e: any) => void
+type AutoCompleteProps<T> = Omit<LabelInputProps, "value"> & {
+  value: T
+  options?: T[]
+  getValue: (option: T) => string
+  getLabel: (option: T) => string
+  onChange: (e: any) => void
+  getQuery: (query: string) => Promise<T[]>
 }
 
-const AutoComplete = ({
+function AutoComplete<T>({
   value,
   name,
   options,
-  getOptions,
+  getValue,
+  getLabel,
+  getQuery,
   onChange,
   ...props
-}: AutoCompleteProps) => {
+}: AutoCompleteProps<T>) {
   const dd = useDropdown()
   const [query, setQuery] = useState("")
-  const [suggestions, resolve] = useAPI<Option[]>()
+  const [suggestions, resolve] = useAPI<T[]>()
 
   useEffect(() => {
-    const option = options?.find((o) => o.value.toString() === value)
-    option && setQuery(option.label)
-  }, [value, options])
+    setQuery(getLabel(value))
+  }, [value])
 
   useEffect(() => {
-    getOptions && resolve(getOptions(query))
-  }, [query, getOptions, resolve])
+    getQuery && resolve(getQuery(query))
+  }, [query, getQuery, resolve])
 
-  function change(option: Option) {
-    setQuery(option.label)
-
-    if (onChange) {
-      onChange({ target: { name: name!, value: option.value.toString() } })
-    }
+  function change(option: T) {
+    setQuery(getLabel(option))
+    onChange({ target: { name: name!, value: option } })
   }
 
   function openSuggestions() {
@@ -66,9 +65,9 @@ const AutoComplete = ({
       />
 
       <Dropdown.Items open={dd.isOpen} className={styles.suggestions}>
-        {suggestions.data?.map((o) => (
-          <li key={o.value} onClick={() => change(o)}>
-            {o.label}
+        {suggestions.data?.map((option) => (
+          <li key={getValue(option)} onClick={() => change(option)}>
+            {getLabel(option)}
           </li>
         ))}
       </Dropdown.Items>
