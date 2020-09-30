@@ -277,6 +277,9 @@
 .table tbody tr td {
   font-weight: 600;
   padding: 16px 8px;
+  overflow-x: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* LOADER OVERLAY COMPONENT */

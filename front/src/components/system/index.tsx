@@ -261,6 +261,6 @@ export function Table<T>({ columns, rows, children, ...props }: TableProps<T>) {
 
 export const LoaderOverlay = () => (
   <Box className={styles.loaderOverlay}>
-    <Loader color="var(--black)" size={72} />
+    <Loader color="var(--black)" size={48} />
   </Box>
 )

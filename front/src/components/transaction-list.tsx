@@ -8,7 +8,6 @@ import { ApiState } from "../hooks/helpers/use-api"
 
 import styles from "./transaction-list.module.css"
 
-import { truncate } from "../utils/format"
 import { getStatus } from "../services/lots"
 
 import { Alert, Box, LoaderOverlay, Table } from "./system"
@@ -48,8 +47,8 @@ const Status = ({ value }: { value: LotStatus }) => (
 )
 
 const Line = ({ text, small = false }: { text: string; small?: boolean }) => (
-  <span title={text} className={cl(small && styles.extraInfo)}>
-    {truncate(text, small ? 40 : 18)}
+  <span title={text} className={cl(styles.rowLine, small && styles.extraInfo)}>
+    {text}
   </span>
 )
 
