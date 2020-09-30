@@ -31,11 +31,11 @@ const TransactionDetails = ({ transactions }: TransactionDetailsProps) => {
       <Title>Transaction #{transaction.id}</Title>
 
       <TransactionForm transaction={transaction} onChange={change}>
-        <Button submit kind="primary">
-          <Save /> Sauvegarder
+        <Button submit icon={Save} kind="primary">
+          Sauvegarder
         </Button>
-        <Button onClick={close}>
-          <Cross /> Annuler
+        <Button icon={Cross} onClick={close}>
+          Annuler
         </Button>
       </TransactionForm>
     </Modal>
