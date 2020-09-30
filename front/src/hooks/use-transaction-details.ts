@@ -1,19 +1,27 @@
 import { useParams } from "react-router-dom"
 
+import {
+  Biocarburant,
+  Country,
+  DeliverySite,
+  Entity,
+  Lot,
+  Lots,
+  MatierePremiere,
+  ProductionSite,
+} from "../services/types"
+
 import useForm, { FormFields } from "./use-form"
-import { Lot, Lots } from "../services/types"
 
 export interface TransactionFormState {
   id: number
-  biocarburant_code: string
-  matiere_premiere_code: string
-  pays_origine_code: string
-  producer: string
-  production_site: string
-  production_site_country: string
-  production_site_reference: string
-  production_site_commissioning_date: string
+  dae: string
   volume: number
+  champ_libre: string
+  delivery_date: string
+  mac: boolean
+  pays_origine: Country
+
   eec: number
   el: number
   ep: number
@@ -23,32 +31,41 @@ export interface TransactionFormState {
   eccs: number
   eccr: number
   eee: number
-  dae: string
-  champ_libre: string
-  client: string
-  delivery_date: string
-  delivery_site: string
+
+  biocarburant: Biocarburant
+  matiere_premiere: MatierePremiere
+
+  producer_is_in_carbure: boolean
+  carbure_producer: Entity
+  unknown_producer: string | null
+  unknown_production_country: string | null
+
+  production_site_is_in_carbure: boolean
+  carbure_production_site: ProductionSite
+  unknown_production_site: string | null
+  unknown_production_site_com_date: string | null
+  // unknown_production_site_dbl_counting: string | null
+  unknown_production_site_reference: string | null
+
+  client_is_in_carbure: boolean
+  client: Entity | null
+  unknown_client: string | null
+
+  delivery_site_is_on_carbure: boolean
+  delivery_site: DeliverySite | null
   delivery_site_country: string
-  mac: boolean
 }
 
 function extractFormData(tr: Lot): TransactionFormState {
   return {
     id: tr.lot.id,
-    biocarburant_code: tr.lot.biocarburant.code,
-    matiere_premiere_code: tr.lot.matiere_premiere.code,
-    pays_origine_code: tr.lot.pays_origine.code_pays,
-    producer:
-      tr.lot.carbure_producer?.id.toString() ?? tr.lot.unknown_producer ?? "",
-    production_site:
-      tr.lot.carbure_production_site?.id.toString() ??
-      tr.lot.unknown_production_site ??
-      "",
-    production_site_country: tr.lot.carbure_production_site.country.code_pays,
-    production_site_reference: tr.lot.unknown_production_site_reference ?? "",
-    production_site_commissioning_date:
-      tr.lot.unknown_production_site_com_date ?? "2020-09-21", //@TODO fill this correctly somewhere, otherwise API crash
+    dae: tr.dae,
     volume: tr.lot.volume,
+    champ_libre: tr.champ_libre,
+    delivery_date: tr.delivery_date,
+    mac: tr.is_mac,
+    pays_origine: tr.lot.pays_origine,
+
     eec: tr.lot.eec,
     el: tr.lot.el,
     ep: tr.lot.ep,
@@ -58,16 +75,31 @@ function extractFormData(tr: Lot): TransactionFormState {
     eccs: tr.lot.eccs,
     eccr: tr.lot.eccr,
     eee: tr.lot.eee,
-    dae: tr.dae,
-    champ_libre: tr.champ_libre,
-    client: tr.carbure_client?.id ?? tr.unknown_client ?? "",
-    delivery_date: tr.delivery_date,
-    delivery_site:
-      tr.carbure_delivery_site?.id ?? tr.unknown_delivery_site ?? "",
+
+    biocarburant: tr.lot.biocarburant,
+    matiere_premiere: tr.lot.matiere_premiere,
+
+    producer_is_in_carbure: tr.lot.producer_is_in_carbure,
+    carbure_producer: tr.lot.carbure_producer,
+    unknown_producer: tr.lot.unknown_producer,
+    unknown_production_country: tr.lot.unknown_production_country,
+
+    production_site_is_in_carbure: tr.lot.production_site_is_in_carbure,
+    carbure_production_site: tr.lot.carbure_production_site,
+    unknown_production_site: tr.lot.unknown_production_site,
+    unknown_production_site_reference: tr.lot.unknown_production_site_reference,
+    unknown_production_site_com_date:
+      tr.lot.unknown_production_site_com_date ?? "2020-09-21", //@TODO fill this correctly somewhere, otherwise API crash
+
+    client_is_in_carbure: tr.client_is_in_carbure,
+    client: tr.carbure_client,
+    unknown_client: tr.unknown_client,
+
+    delivery_site_is_on_carbure: tr.delivery_site_is_in_carbure,
+    delivery_site: tr.carbure_delivery_site,
     delivery_site_country:
       tr.carbure_delivery_site?.country.code_pays ??
       tr.unknown_delivery_site_country,
-    mac: tr.is_mac,
   }
 }
 

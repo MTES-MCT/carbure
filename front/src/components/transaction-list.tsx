@@ -85,7 +85,9 @@ const TransactionRow = ({ transaction }: { transaction: Lot }) => {
 
       <td>
         <Line
-          text={transaction.carbure_client?.name ?? transaction.unknown_client}
+          text={
+            transaction.carbure_client?.name ?? transaction.unknown_client ?? ""
+          }
         />
       </td>
 
@@ -113,7 +115,8 @@ const TransactionRow = ({ transaction }: { transaction: Lot }) => {
         <TwoLines
           top={
             transaction.carbure_delivery_site?.city ??
-            transaction.unknown_delivery_site
+            transaction.unknown_delivery_site ??
+            ""
           }
           bottom={
             transaction.carbure_delivery_site?.country.name ??
