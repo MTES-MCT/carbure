@@ -15,7 +15,7 @@ type TransactionDetailsProps = {
 }
 
 const TransactionDetails = ({ transactions }: TransactionDetailsProps) => {
-  const { form, change, close } = useTransactionDetails(transactions)
+  const { form, request, change, close } = useTransactionDetails(transactions)
 
   if (form === null) {
     return <Redirect to="/transactions" />
@@ -25,7 +25,11 @@ const TransactionDetails = ({ transactions }: TransactionDetailsProps) => {
     <Modal onClose={close}>
       <Title>Transaction #{form.id}</Title>
 
-      <TransactionForm transaction={form} onChange={change}>
+      <TransactionForm
+        transaction={form}
+        error={request.error}
+        onChange={change}
+      >
         <Button submit icon={Save} kind="primary">
           Sauvegarder
         </Button>

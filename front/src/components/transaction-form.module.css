@@ -16,7 +16,6 @@
 .transactionFields > div:nth-child(3) {
   margin-top: -68px;
 }
-
 .transactionFields > div {
   margin-right: 32px;
 }
@@ -29,9 +28,13 @@
   margin: 0 auto;
 }
 
+.transactionError {
+  margin-top: 16px;
+}
+
 .transactionFormButtons {
   display: flex;
   margin-top: auto;
   justify-content: space-between;
-  padding-top: 32px;
+  margin-top: 16px;
 }

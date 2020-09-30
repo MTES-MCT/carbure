@@ -11,7 +11,7 @@ import useClose from "./helpers/use-close"
 export default function useTransactionDetails(transactions: Lots | null) {
   const close = useClose("/transactions")
   const params: { id: string } = useParams()
-  const { form, change, setForm } = useTransactionForm()
+  const { form, request, change, setForm } = useTransactionForm()
 
   const transactionID = parseInt(params.id, 10)
 
@@ -30,5 +30,5 @@ export default function useTransactionDetails(transactions: Lots | null) {
     }
   }, [transactionID, transactions, setForm])
 
-  return { form, change, close }
+  return { form, request, change, close }
 }

@@ -11,7 +11,7 @@ export default function useTransactionAdd(entity: EntitySelection) {
 
   function submit() {
     if (entity.selected && form) {
-      resolve(addLots(entity.selected.id, form))
+      resolve(addLots(entity.selected.id, form).then(close))
     }
   }
 

@@ -139,7 +139,6 @@ export const Select = ({
     reset,
     select,
     change,
-    setQuery,
   } = useSelect(value, placeholder, options, onChange, multiple)
 
   return (
