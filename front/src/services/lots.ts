@@ -45,11 +45,11 @@ export function toTransactionPostData(tx: TransactionFormState) {
     pays_origine_code: tx.pays_origine?.code_pays,
 
     producer: tx.producer_is_in_carbure
-      ? tx.carbure_producer!.name
+      ? tx.carbure_producer?.name
       : tx.unknown_producer,
 
     production_site: tx.production_site_is_in_carbure
-      ? tx.carbure_production_site!.name
+      ? tx.carbure_production_site?.name
       : tx.unknown_production_site,
 
     production_site_country: !tx.production_site_is_in_carbure
@@ -66,11 +66,11 @@ export function toTransactionPostData(tx: TransactionFormState) {
       : "",
 
     client: tx.client_is_in_carbure
-      ? tx.carbure_client!.name
+      ? tx.carbure_client?.name
       : tx.unknown_client,
 
     delivery_site: tx.delivery_site_is_on_carbure
-      ? tx.carbure_delivery_site!.name
+      ? tx.carbure_delivery_site?.name
       : tx.unknown_delivery_site,
 
     delivery_site_country: !tx.delivery_site_is_on_carbure

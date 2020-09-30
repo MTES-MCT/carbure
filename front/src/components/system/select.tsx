@@ -3,7 +3,7 @@ import cl from "clsx"
 
 import styles from "./select.module.css"
 
-import { SystemProps } from "."
+import { Input, SystemProps } from "."
 import { Cross } from "./icons"
 import { Dropdown, useDropdown } from "./dropdown"
 
@@ -107,13 +107,17 @@ function useSelect(
     }
   }
 
+  function change(e: React.ChangeEvent<HTMLInputElement>) {
+    setQuery(e.target.value.toLowerCase())
+  }
+
   // what to display in the dropdown label
   const selected = renderSelected(value, options, placeholder)
 
   // filter options according to search query
   const queryOptions = filterOptions(options, query)
 
-  return { dd, selected, queryOptions, query, select, reset, setQuery }
+  return { dd, selected, queryOptions, query, select, reset, change, setQuery }
 }
 
 export const Select = ({
@@ -134,6 +138,7 @@ export const Select = ({
     queryOptions,
     reset,
     select,
+    change,
     setQuery,
   } = useSelect(value, placeholder, options, onChange, multiple)
 
@@ -152,12 +157,12 @@ export const Select = ({
       <Dropdown.Items open={dd.isOpen}>
         {search && (
           <li>
-            <input
+            <Input
               type="text"
               value={query}
               placeholder="Rechercher..."
               className={styles.selectSearch}
-              onChange={(e) => setQuery(e.target.value.toLowerCase())}
+              onChange={change}
               onClick={(e) => e.stopPropagation()}
             />
           </li>

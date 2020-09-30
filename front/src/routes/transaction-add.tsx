@@ -4,7 +4,7 @@ import { Redirect } from "react-router-dom"
 import { AsyncButton, Button, Title } from "../components/system"
 import Modal from "../components/system/modal"
 import TransactionForm from "../components/transaction-form"
-import { Save, Cross } from "../components/system/icons"
+import { Cross, Plus } from "../components/system/icons"
 import { EntitySelection } from "../hooks/use-app"
 import useTransactionAdd from "../hooks/use-transaction-add"
 
@@ -27,7 +27,7 @@ const TransactionAdd = ({ entity }: TransactionAddProps) => {
         <AsyncButton
           submit
           kind="primary"
-          icon={Save}
+          icon={Plus}
           loading={request.loading}
         >
           Créer lot
