@@ -4,13 +4,14 @@ import { useHistory } from "react-router-dom"
 
 import { Transaction, Lots, LotStatus } from "../services/types"
 import { PageSelection } from "../hooks/use-transactions"
+import { ApiState } from "../hooks/helpers/use-api"
 
 import styles from "./transaction-list.module.css"
 
 import { truncate } from "../utils/format"
 import { getStatus } from "../services/lots"
 
-import { Alert, Box, Table } from "./system"
+import { Alert, Box, LoaderOverlay, Table } from "./system"
 import { AlertCircle, Check, ChevronRight, Copy, Cross } from "./system/icons"
 import Pagination from "./pagination"
 
@@ -150,7 +151,7 @@ const TransactionRow = ({ transaction }: { transaction: Transaction }) => {
 }
 
 type TransactionListProps = {
-  transactions: Lots | null
+  transactions: ApiState<Lots>
   pagination: PageSelection
 }
 
@@ -158,31 +159,36 @@ const TransactionList = ({
   transactions,
   pagination,
 }: TransactionListProps) => {
-  if (transactions === null || transactions.lots.length === 0) {
-    return (
-      <Box className={styles.transactionList}>
+  const tx = transactions.data
+
+  return (
+    <Box className={styles.transactionList}>
+      {transactions.loading && <LoaderOverlay />}
+
+      {tx === null || tx.lots.length === 0 ? (
         <Alert kind="warning">
           <AlertCircle />
           Aucune transaction trouvée pour ces paramètres
         </Alert>
-      </Box>
-    )
-  }
+      ) : (
+        <React.Fragment>
+          <Table columns={COLUMNS} rows={tx.lots}>
+            {(transaction) => (
+              <TransactionRow
+                key={transaction.lot.id}
+                transaction={transaction}
+              />
+            )}
+          </Table>
 
-  return (
-    <Box className={styles.transactionList}>
-      <Table columns={COLUMNS} rows={transactions.lots}>
-        {(transaction) => (
-          <TransactionRow key={transaction.lot.id} transaction={transaction} />
-        )}
-      </Table>
-
-      <Pagination
-        page={pagination.selected.page}
-        limit={pagination.selected.limit}
-        total={transactions.total}
-        onChange={pagination.setPage}
-      />
+          <Pagination
+            page={pagination.selected.page}
+            limit={pagination.selected.limit}
+            total={tx.total}
+            onChange={pagination.setPage}
+          />
+        </React.Fragment>
+      )}
     </Box>
   )
 }
