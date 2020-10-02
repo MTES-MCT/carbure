@@ -119,9 +119,21 @@ export function getLots(
   })
 }
 
-export function addLots(entityID: number, params: any): Promise<Transaction> {
+export function addLot(entityID: number, params: any): Promise<Transaction> {
   return api.post("/lots/add", {
     entity_id: entityID,
+    ...toTransactionPostData(params),
+  })
+}
+
+export function updateLot(
+  entityID: number,
+  transactionID: number,
+  params: any
+): Promise<Transaction> {
+  return api.post("/lots/update", {
+    entity_id: entityID,
+    tx_id: transactionID,
     ...toTransactionPostData(params),
   })
 }

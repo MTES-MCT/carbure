@@ -44,7 +44,10 @@ const Transactions = ({ entity }: TransactionsProps) => {
         </Route>
 
         <Route exact path="/transactions/:id">
-          <TransactionDetails transactions={transactions.data} />
+          <TransactionDetails
+            entity={entity}
+            transactions={transactions.data}
+          />
         </Route>
       </Switch>
     </Main>

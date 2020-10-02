@@ -7,7 +7,6 @@ import {
   MatierePremiere,
   ProductionSite,
 } from "../../services/types"
-import useAPI from "./use-api"
 
 import useForm from "./use-form"
 
@@ -149,17 +148,5 @@ const initialState: TransactionFormState = {
 }
 
 export default function useTransactionForm() {
-  const [request, resolve] = useAPI()
-
-  const [form, change, setForm] = useForm<TransactionFormState | null>(
-    initialState
-  )
-
-  return {
-    form,
-    request,
-    change,
-    resolve,
-    setForm,
-  }
+  return useForm<TransactionFormState | null>(initialState)
 }
