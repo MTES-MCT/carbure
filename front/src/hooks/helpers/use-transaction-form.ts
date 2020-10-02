@@ -56,7 +56,7 @@ export interface TransactionFormState {
 
 export function toTransactionFormState(tx: Transaction): TransactionFormState {
   return {
-    id: tx.lot.id,
+    id: tx.id,
     dae: tx.dae,
     volume: tx.lot.volume,
     champ_libre: tx.champ_libre,

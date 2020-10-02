@@ -22,6 +22,8 @@ const Transactions = ({ entity }: TransactionsProps) => {
     pagination,
     snapshot,
     transactions,
+    deleter,
+    duplicator,
   } = useTransactions(entity)
 
   if (entity.selected === null) {
@@ -36,7 +38,12 @@ const Transactions = ({ entity }: TransactionsProps) => {
         filters={filters}
       />
 
-      <TransactionList transactions={transactions} pagination={pagination} />
+      <TransactionList
+        transactions={transactions}
+        pagination={pagination}
+        onDelete={deleter.resolveDeleteLot}
+        onDuplicate={duplicator.resolveDuplicateLot}
+      />
 
       <Switch>
         <Route path="/transactions/add">

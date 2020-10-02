@@ -59,13 +59,33 @@ const TwoLines = ({ top, bottom }: { top: string; bottom: string }) => (
   </div>
 )
 
-const TransactionRow = ({ transaction }: { transaction: Transaction }) => {
+type TransactionRowProps = {
+  transaction: Transaction
+  onDelete: (id: number) => void
+  onDuplicate: (id: number) => void
+}
+
+const TransactionRow = ({
+  transaction,
+  onDelete,
+  onDuplicate,
+}: TransactionRowProps) => {
   const history = useHistory()
+
+  function handleDuplicate(e: React.MouseEvent) {
+    e.stopPropagation()
+    onDuplicate(transaction.id)
+  }
+
+  function handleDelete(e: React.MouseEvent) {
+    e.stopPropagation()
+    onDelete(transaction.id)
+  }
 
   return (
     <tr
       className={styles.transactionRow}
-      onClick={() => history.push(`/transactions/${transaction.lot.id}`)}
+      onClick={() => history.push(`/transactions/${transaction.id}`)}
     >
       <td>
         <input type="checkbox" name={transaction.dae} />
@@ -140,9 +160,9 @@ const TransactionRow = ({ transaction }: { transaction: Transaction }) => {
         <ChevronRight className={styles.transactionArrow} />
 
         <div className={styles.transactionActions}>
-          <Copy size={20} title="Dupliquer le lot" />
-          <Check size={20} title="Valider le lot" />
-          <Cross size={20} title="Supprimer le lot" />
+          <Copy title="Dupliquer le lot" onClick={handleDuplicate} />
+          <Check title="Valider le lot" />
+          <Cross title="Supprimer le lot" onClick={handleDelete} />
         </div>
       </td>
     </tr>
@@ -152,11 +172,15 @@ const TransactionRow = ({ transaction }: { transaction: Transaction }) => {
 type TransactionListProps = {
   transactions: ApiState<Lots>
   pagination: PageSelection
+  onDelete: (id: number) => void
+  onDuplicate: (id: number) => void
 }
 
 const TransactionList = ({
   transactions,
   pagination,
+  onDelete,
+  onDuplicate,
 }: TransactionListProps) => {
   const tx = transactions.data
 
@@ -187,8 +211,10 @@ const TransactionList = ({
           <Table columns={COLUMNS} rows={tx!.lots}>
             {(transaction) => (
               <TransactionRow
-                key={transaction.lot.id}
+                key={transaction.id}
                 transaction={transaction}
+                onDelete={onDelete}
+                onDuplicate={onDuplicate}
               />
             )}
           </Table>

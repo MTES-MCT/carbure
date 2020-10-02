@@ -137,3 +137,17 @@ export function updateLot(
     ...toTransactionPostData(params),
   })
 }
+
+export function duplicateLot(entityID: number, transactionID: number) {
+  return api.post("/lots/duplicate", {
+    entity_id: entityID,
+    tx_id: transactionID,
+  })
+}
+
+export function deleteLots(entityID: number, transactionIDs: number[]) {
+  return api.post("/lots/delete", {
+    entity_id: entityID,
+    tx_ids: transactionIDs,
+  })
+}
