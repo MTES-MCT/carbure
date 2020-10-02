@@ -4,8 +4,11 @@ import { EntitySelection } from "./use-app"
 import { SelectValue } from "../components/system/select"
 import { LotStatus, Filters, Lots, Snapshot } from "../services/types"
 
+import {
+  PageSelection,
+  usePageSelection,
+} from "../components/system/pagination"
 import useAPI, { ApiState } from "./helpers/use-api"
-import { PageSelection, usePageSelection } from "./helpers/use-pagination"
 
 import {
   getSnapshot,

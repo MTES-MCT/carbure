@@ -1,13 +1,11 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import cl from "clsx"
-
-import { PageSelection } from "../hooks/helpers/use-pagination"
 
 import styles from "./pagination.module.css"
 
-import { ChevronLeft, ChevronRight } from "./system/icons"
-import { Button } from "./system"
-import Select from "./system/select"
+import { ChevronLeft, ChevronRight } from "./icons"
+import { Button } from "."
+import Select from "./select"
 
 // generate a list of numbers from 0 to size-1
 const list = (size: number) =>
@@ -22,6 +20,25 @@ const limits = [
   { value: 50, label: "50" },
   { value: 100, label: "100" },
 ]
+
+export type PageSelection = {
+  page: number
+  limit: number
+  setPage: (p: number) => void
+  setLimit: (l: number) => void
+}
+
+// manage pagination state
+export function usePageSelection(): PageSelection {
+  const [page, setPage] = useState(0)
+  const [limit, setLimit] = useState(10)
+
+  useEffect(() => {
+    setPage(0)
+  }, [limit])
+
+  return { page, limit, setPage, setLimit }
+}
 
 type PaginationProps = {
   pagination: PageSelection
