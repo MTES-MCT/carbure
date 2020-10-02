@@ -2,16 +2,23 @@ import { useEffect } from "react"
 import { useParams } from "react-router-dom"
 
 import { Lots } from "../services/types"
+import { EntitySelection } from "./use-app"
 
 import useTransactionForm, {
   toTransactionFormState,
 } from "./helpers/use-transaction-form"
+import useAPI from "./helpers/use-api"
 import useClose from "./helpers/use-close"
+import { updateLot } from "../services/lots"
 
-export default function useTransactionDetails(transactions: Lots | null) {
+export default function useTransactionDetails(
+  entity: EntitySelection,
+  transactions: Lots | null
+) {
   const close = useClose("/transactions")
   const params: { id: string } = useParams()
-  const { form, request, change, setForm } = useTransactionForm()
+  const [form, change, setForm] = useTransactionForm()
+  const [request, resolve] = useAPI()
 
   const transactionID = parseInt(params.id, 10)
 
@@ -30,5 +37,11 @@ export default function useTransactionDetails(transactions: Lots | null) {
     }
   }, [transactionID, transactions, setForm])
 
-  return { form, request, change, close }
+  function submit() {
+    if (entity.selected && form) {
+      resolve(updateLot(entity.selected.id, transactionID, form).then(close))
+    }
+  }
+
+  return { form, request, change, submit, close }
 }
