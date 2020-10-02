@@ -250,6 +250,7 @@ export function Table<T>({ columns, rows, children, ...props }: TableProps<T>) {
           {columns.map((column) => (
             <th key={column}>{column}</th>
           ))}
+          <th />
         </tr>
       </thead>
       <tbody>{rows.map((row, i) => children(row, i))}</tbody>

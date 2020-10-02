@@ -256,6 +256,7 @@
   border-collapse: collapse;
   font-weight: 600;
   font-size: 14px;
+  table-layout: fixed;
 }
 
 .table tbody tr:nth-child(even) {
