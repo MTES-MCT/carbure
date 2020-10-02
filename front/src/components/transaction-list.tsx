@@ -3,7 +3,7 @@ import cl from "clsx"
 import { useHistory } from "react-router-dom"
 
 import { Transaction, Lots, LotStatus } from "../services/types"
-import { PageSelection } from "../hooks/helpers/use-pagination"
+import { PageSelection } from "./system/pagination"
 import { ApiState } from "../hooks/helpers/use-api"
 
 import styles from "./transaction-list.module.css"
@@ -12,7 +12,7 @@ import { getStatus } from "../services/lots"
 
 import { Alert, Box, LoaderOverlay, Table } from "./system"
 import { AlertCircle, Check, ChevronRight, Copy, Cross } from "./system/icons"
-import Pagination from "./pagination"
+import Pagination from "./system/pagination"
 
 const COLUMNS = [
   "Statut",
