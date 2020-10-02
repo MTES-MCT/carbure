@@ -1,7 +1,7 @@
 import React from "react"
 import { Redirect } from "react-router-dom"
 
-import { Alert, AsyncButton, Button, Title } from "../components/system"
+import { AsyncButton, Button, Title } from "../components/system"
 import Modal from "../components/system/modal"
 import TransactionForm from "../components/transaction-form"
 import { Cross, Plus } from "../components/system/icons"

@@ -4,9 +4,15 @@ import { EntitySelection } from "./use-app"
 import { SelectValue } from "../components/system/select"
 import { LotStatus, Filters, Lots, Snapshot } from "../services/types"
 
-import useAPI from "./helpers/use-api"
+import useAPI, { ApiState } from "./helpers/use-api"
 import { PageSelection, usePageSelection } from "./helpers/use-pagination"
-import { getSnapshot, getLots } from "../services/lots"
+
+import {
+  getSnapshot,
+  getLots,
+  deleteLots,
+  duplicateLot,
+} from "../services/lots"
 
 export type StatusSelection = {
   active: LotStatus
@@ -43,16 +49,20 @@ function useFilterSelection(): FilterSelection {
 }
 
 // fetches current snapshot when parameters change
-function useGetSnapshot(entity: EntitySelection) {
+function useGetSnapshot(
+  entity: EntitySelection
+): [ApiState<Snapshot>, () => void] {
   const [snapshot, resolve] = useAPI<Snapshot>()
 
-  useEffect(() => {
+  function refresh() {
     if (entity.selected?.id) {
       resolve(getSnapshot(entity.selected.id))
     }
-  }, [resolve, entity.selected])
+  }
 
-  return snapshot
+  useEffect(refresh, [resolve, entity.selected])
+
+  return [snapshot, refresh]
 }
 
 // fetches current transaction list when parameters change
@@ -61,10 +71,10 @@ function useGetLots(
   status: StatusSelection,
   filters: FilterSelection,
   pagination: PageSelection
-) {
+): [ApiState<Lots>, () => void] {
   const [transactions, resolve] = useAPI<Lots>()
 
-  useEffect(() => {
+  function resolveGetLots() {
     if (entity.selected?.id) {
       resolve(
         getLots(
@@ -76,7 +86,9 @@ function useGetLots(
         )
       )
     }
-  }, [
+  }
+
+  useEffect(resolveGetLots, [
     resolve,
     status.active,
     entity.selected,
@@ -85,7 +97,31 @@ function useGetLots(
     pagination.limit,
   ])
 
-  return transactions
+  return [transactions, resolveGetLots]
+}
+
+function useDuplicateLot(entity: EntitySelection, refresh: () => void) {
+  const [request, resolve] = useAPI<void>()
+
+  function resolveDuplicateLot(lotID: number) {
+    if (entity.selected && window.confirm("Voulez vous dupliquer ce lot ?")) {
+      resolve(duplicateLot(entity.selected.id, lotID).then(refresh))
+    }
+  }
+
+  return { ...request, resolveDuplicateLot }
+}
+
+function useDeleteLots(entity: EntitySelection, refresh: () => void) {
+  const [request, resolve] = useAPI<void>()
+
+  function resolveDeleteLot(lotID: number) {
+    if (entity.selected && window.confirm("Voulez vous supprimer ce lot ?")) {
+      resolve(deleteLots(entity.selected.id, [lotID]).then(refresh))
+    }
+  }
+
+  return { ...request, resolveDeleteLot }
 }
 
 export default function useTransactions(entity: EntitySelection) {
@@ -93,8 +129,25 @@ export default function useTransactions(entity: EntitySelection) {
   const filters = useFilterSelection()
   const pagination = usePageSelection()
 
-  const snapshot = useGetSnapshot(entity)
-  const transactions = useGetLots(entity, status, filters, pagination)
+  const [snapshot, resolveGetSnapshot] = useGetSnapshot(entity)
+  const [transactions, resolveGetLots] = useGetLots(entity, status, filters, pagination) // prettier-ignore
 
-  return { status, filters, pagination, snapshot, transactions }
+  function refresh() {
+    resolveGetLots()
+    resolveGetSnapshot()
+  }
+
+  const deleter = useDeleteLots(entity, refresh)
+  const duplicator = useDuplicateLot(entity, refresh)
+
+  return {
+    status,
+    filters,
+    pagination,
+    snapshot,
+    transactions,
+    deleter,
+    duplicator,
+    refresh,
+  }
 }

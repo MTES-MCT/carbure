@@ -107,6 +107,10 @@
   justify-content: space-between;
 }
 
+.transactionActions :global(.icon) {
+  width: 20px;
+}
+
 .transactionActions :global(.icon):hover {
   stroke: var(--blue-medium);
 }

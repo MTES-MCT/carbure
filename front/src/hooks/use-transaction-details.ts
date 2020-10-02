@@ -27,7 +27,7 @@ export default function useTransactionDetails(
       // find the relevant lot
       // @TODO would be nice to be able to fetch details for only one lot
       const transaction = transactions.lots.find(
-        (lot) => lot.lot.id === transactionID
+        (lot) => lot.id === transactionID
       )
 
       // initialize the form with data coming from the loaded transaction
