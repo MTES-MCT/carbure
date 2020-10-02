@@ -56,7 +56,7 @@ const TransactionSnapshot = ({
           <StatusButton
             key={key}
             active={key === status.active}
-            amount={snapshot.data?.lots[key] ?? "…"}
+            amount={snapshot.loading ? "…" : snapshot.data?.lots[key] ?? 0}
             label={label}
             onClick={() => status.setActive(key)}
           />
@@ -73,7 +73,7 @@ const TransactionSnapshot = ({
             multiple
             key={key}
             value={filters.selected[key]}
-            placeholder={label}
+            placeholder={snapshot.loading ? "…" : label}
             options={snapshot.data?.filters[key] ?? []}
             onChange={(value) => filters.selectFilter(key, value)}
           />
