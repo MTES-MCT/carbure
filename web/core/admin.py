@@ -89,8 +89,8 @@ admin_run_sanity_checks.short_description = "Run sanity checks"
 
 class LotV2Admin(admin.ModelAdmin):
     list_display = ('period', 'carbure_id', 'carbure_producer', 'carbure_production_site', 'biocarburant', 'matiere_premiere', 'status', 'blocking_sanity_checked_passed', 'nonblocking_sanity_checked_passed')
-    search_fields = ('carbure_producer__name', 'biocarburant__name', 'matiere_premiere__name', 'carbure_id', 'period')
-    list_filter = ('period', 'carbure_producer', 'is_split', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused', 'blocking_sanity_checked_passed', 'nonblocking_sanity_checked_passed', 'is_valid')
+    search_fields = ('carbure_producer__name', 'biocarburant__name', 'matiere_premiere__name', 'carbure_id', 'period', 'added_by_user_email')
+    list_filter = ('period', 'carbure_producer', 'is_split', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused', 'blocking_sanity_checked_passed', 'nonblocking_sanity_checked_passed', 'is_valid', 'added_by', 'added_by_user')
     actions = [admin_run_sanity_checks, reset_checked_status]
 
 
