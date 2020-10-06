@@ -69,11 +69,11 @@ export function toTransactionPostData(tx: TransactionFormState) {
       ? tx.carbure_client?.name
       : tx.unknown_client,
 
-    delivery_site: tx.delivery_site_is_on_carbure
-      ? tx.carbure_delivery_site?.name
+    delivery_site: tx.delivery_site_is_in_carbure
+      ? tx.carbure_delivery_site?.depot_id
       : tx.unknown_delivery_site,
 
-    delivery_site_country: !tx.delivery_site_is_on_carbure
+    delivery_site_country: !tx.delivery_site_is_in_carbure
       ? tx.unknown_delivery_site_country
       : "",
   }
