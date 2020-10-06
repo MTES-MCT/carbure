@@ -331,7 +331,7 @@ class TransactionError(models.Model):
         return self.error
 
     def natural_key(self):
-        return {'tx_id': self.lot.id, 'field': self.field, 'value': self.value, 'error': self.error}
+        return {'tx_id': self.tx.id, 'field': self.field, 'value': self.value, 'error': self.error}
 
     class Meta:
         db_table = 'tx_errors'
