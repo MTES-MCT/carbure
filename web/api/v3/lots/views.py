@@ -6,7 +6,7 @@ from django.db.models.functions import TruncMonth
 from django.db.models import Count
 from django.db.models.fields import NOT_PROVIDED
 from django.http import JsonResponse, HttpResponse
-from core.models import LotV2, LotTransaction
+from core.models import LotV2, LotTransaction, LotV2Error, TransactionError
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment
 from core.xlsx_template import create_xslx_from_transactions, create_template_xlsx_v2_simple
 from core.xlsx_template import create_template_xlsx_v2_advanced
@@ -27,6 +27,7 @@ def get_lots(request):
     limit = request.GET.get('limit', "100")
     from_idx = request.GET.get('from_idx', "0")
     export = request.GET.get('export', False)
+    query = request.GET.get('query', False)
 
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
@@ -70,11 +71,45 @@ def get_lots(request):
     if clients:
         txs = txs.filter(Q(carbure_client__name__in=clients) | Q(unknown_client__in=clients))
 
+    if query:
+        txs = transactions.filter(Q(lot__matiere_premiere__name__icontains=search) |
+                                  Q(lot__biocarburant__name__icontains=search) |
+                                  Q(lot__carbure_producer__name__icontains=search) |
+                                  Q(lot__unknown_producer__icontains=search) |
+                                  Q(lot__carbure_id__icontains=search) |
+                                  Q(lot__pays_origine__name__icontains=search) |
+                                  Q(carbure_client__name__icontains=search) |
+                                  Q(unknown_client__icontains=search) |
+                                  Q(carbure_delivery_site__name__icontains=search) |
+                                  Q(unknown_delivery_site__icontains=search)
+                                  )
+
+
     limit = int(limit)
     from_idx = int(from_idx)
     returned = txs[from_idx:from_idx+limit]
 
     data = {}
+    raw_lot_errors = LotV2Error.objects.filter(id__in=[t.lot.id for t in txs])
+    lot_errors = {}
+    for err in raw_lot_errors:
+        if err.id not in lot_errors:
+            lot_errors[err.id] = []
+        lot_errors[err.id].append(err)
+    raw_tx_errors = TransactionError.objects.filter(id__in=[t.id for t in txs])
+    tx_errors = {}
+    for err in raw_tx_errors:
+        if err.id not in tx_errors:
+            tx_errors[err.id] = []
+        tx_errors[err.id].append(err)
+
+    for t in txs:
+        t.errors = []
+        t.lot.errors = []
+        if t.id in tx_errors:
+            t.errors = tx_errors[t.id]
+        if t.lot.id in lot_errors:
+            t.lot.errors = lot_errors[t.lot.id]
     data['lots'] = [t.natural_key() for t in txs]
     data['total'] = len(txs)
     data['returned'] = len(returned)
