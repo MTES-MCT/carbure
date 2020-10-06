@@ -18,7 +18,7 @@ export default function useTransactionDetails(
   const close = useClose("/transactions")
   const params: { id: string } = useParams()
   const [form, change, setForm] = useTransactionForm()
-  const [request, resolve] = useAPI()
+  const [request, resolve] = useAPI(updateLot)
 
   const transactionID = parseInt(params.id, 10)
 
@@ -39,7 +39,7 @@ export default function useTransactionDetails(
 
   function submit() {
     if (entity.selected && form) {
-      resolve(updateLot(entity.selected.id, transactionID, form).then(close))
+      resolve(entity.selected.id, transactionID, form).then(close)
     }
   }
 

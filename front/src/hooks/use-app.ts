@@ -16,10 +16,10 @@ function useEntity(): EntitySelection {
 }
 
 function useGetSettings(): ApiState<Settings> {
-  const [settings, resolve] = useAPI<Settings>()
+  const [settings, resolve] = useAPI(getSettings)
 
   useEffect(() => {
-    resolve(getSettings())
+    resolve()
   }, [resolve])
 
   return settings

@@ -9,11 +9,11 @@ import { addLot } from "../services/lots"
 export default function useTransactionAdd(entity: EntitySelection) {
   const close = useClose("/transactions")
   const [form, change] = useTransactionForm()
-  const [request, resolve] = useAPI()
+  const [request, resolve] = useAPI(addLot)
 
   function submit() {
     if (entity.selected && form) {
-      resolve(addLot(entity.selected.id, form).then(close))
+      resolve(entity.selected.id, form).then(close)
     }
   }
 
