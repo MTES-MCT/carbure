@@ -1,8 +1,10 @@
 import datetime
 import openpyxl
 
+from django.http import JsonResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
+from core.models import LotValidationError
 
 from api.v2.checkrules import sanity_check
 
@@ -467,7 +469,7 @@ def fill_delivery_site_data(lot_row, transaction):
     return tx_errors
 
 
-def load_lot(entity, user, lot_dict, source):
+def load_lot(entity, user, lot_dict, source, transaction=None):
     lot_errors = []
     tx_errors = []
 
@@ -475,11 +477,14 @@ def load_lot(entity, user, lot_dict, source):
     if lot_dict.get('biocarburant_code', None) is None:
         return None, None, None, None
 
-    lot = LotV2()
-    lot.added_by = entity
-    lot.data_origin_entity = entity
-    lot.added_by_user = user
-    lot.source = source
+    if transaction is None:
+        lot = LotV2()
+        lot.added_by = entity
+        lot.data_origin_entity = entity
+        lot.added_by_user = user
+        lot.source = source
+    else:
+        lot = transaction.lot
 
     lot_errors.append(fill_producer_info(entity, lot_dict, lot))
     lot_errors.append(fill_production_site_info(entity, lot_dict, lot))
@@ -488,12 +493,14 @@ def load_lot(entity, user, lot_dict, source):
     lot_errors.append(fill_volume_info(lot_dict, lot))
     lot_errors.append(fill_pays_origine_info(lot_dict, lot))
     lot_errors.append(fill_ghg_info(lot_dict, lot))
+    lot.is_valid = False
     lot.save()
 
-    transaction = LotTransaction()
-    transaction.lot = lot
-    transaction.vendor_is_in_carbure = True
-    transaction.carbure_vendor = entity
+    if transaction is None:
+        transaction = LotTransaction()
+        transaction.lot = lot
+        transaction.vendor_is_in_carbure = True
+        transaction.carbure_vendor = entity
     transaction.is_mac = False
     if 'mac' in lot_dict and lot_dict['mac'] == 1:
         transaction.is_mac = True
@@ -505,6 +512,7 @@ def load_lot(entity, user, lot_dict, source):
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
     transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
+    transaction.save()
     return lot, transaction, lot_errors, tx_errors
 
 
@@ -580,3 +588,39 @@ def load_excel_file(entity, user, file):
         return lots_loaded, total_lots
     except Exception:
         return False, False
+
+
+def validate_lots(user, tx_ids):
+    for tx_id in tx_ids:
+        try:
+            tx = LotTransaction.objects.get(id=tx_id, lot__status='Draft')
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': "Draft not found", 'extra': str(e)}, status=400)
+
+        rights = [r.entity for r in UserRights.objects.filter(user=user)]
+        if tx.lot.added_by not in rights:
+            return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+        # make sure all mandatory fields are set
+        tx_valid, error = tx_is_valid(tx)
+        if not tx_valid:
+            return JsonResponse({'status': 'error', 'message': "Invalid transaction: %s" % (error)}, status=400)
+
+        lot_valid, error = lot_is_valid(tx.lot)
+        if not lot_valid:
+            return JsonResponse({'status': 'error', 'message': "Invalid lot: %s" % (error)}, status=400)
+
+        # run sanity_checks
+        sanity_check(tx.lot)
+        blocking_sanity_checks = LotValidationError.objects.filter(lot=tx.lot, block_validation=True)
+        if len(blocking_sanity_checks):
+            tx.lot.is_valid = False
+        else:
+            tx.lot.is_valid = True
+            tx.lot.carbure_id = generate_carbure_id(tx.lot)
+            tx.lot.status = "Validated"
+        # when the lot is added to mass balance, auto-accept
+        if tx.carbure_client == tx.carbure_vendor:
+            tx.delivery_status = 'A'
+            tx.save()
+        tx.lot.save()
