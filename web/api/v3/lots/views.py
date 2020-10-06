@@ -100,20 +100,20 @@ def get_lots(request):
     returned = txs[from_idx:from_idx+limit]
 
     data = {}
-    raw_lot_errors = LotV2Error.objects.filter(id__in=[t.lot.id for t in txs])
+    raw_lot_errors = LotV2Error.objects.filter(id__in=[t.lot.id for t in returned])
     lot_errors = {}
     for err in raw_lot_errors:
         if err.id not in lot_errors:
             lot_errors[err.id] = []
         lot_errors[err.id].append(err)
-    raw_tx_errors = TransactionError.objects.filter(id__in=[t.id for t in txs])
+    raw_tx_errors = TransactionError.objects.filter(id__in=[t.id for t in returned])
     tx_errors = {}
     for err in raw_tx_errors:
         if err.id not in tx_errors:
             tx_errors[err.id] = []
         tx_errors[err.id].append(err)
 
-    for t in txs:
+    for t in returned:
         t.errors = []
         t.lot.errors = []
         if t.id in tx_errors:
