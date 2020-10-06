@@ -105,22 +105,17 @@ def get_lots(request):
     for err in raw_lot_errors:
         if err.id not in lot_errors:
             lot_errors[err.id] = []
-        lot_errors[err.id].append(err)
+        lot_errors[err.id].append(err.natural_key())
     raw_tx_errors = TransactionError.objects.filter(id__in=[t.id for t in returned])
     tx_errors = {}
     for err in raw_tx_errors:
         if err.id not in tx_errors:
             tx_errors[err.id] = []
-        tx_errors[err.id].append(err)
+        tx_errors[err.id].append(err.natural_key())
 
-    for t in returned:
-        t.errors = []
-        t.lot.errors = []
-        if t.id in tx_errors:
-            t.errors = tx_errors[t.id]
-        if t.lot.id in lot_errors:
-            t.lot.errors = lot_errors[t.lot.id]
     data['lots'] = [t.natural_key() for t in returned]
+    data['lots_errors'] = lot_errors
+    data['tx_errors'] = tx_errors
     data['total'] = len(txs)
     data['returned'] = len(returned)
     data['from'] = from_idx
