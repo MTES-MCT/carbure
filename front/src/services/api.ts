@@ -40,6 +40,10 @@ function toFormData(obj: any): FormData {
 // check if the api response is correct and return its data
 // if there's a problem, throw an error
 async function checkResponse<T>(res: Response): Promise<T> {
+  if (!res.ok) {
+    throw new Error("Server error")
+  }
+
   const json: ApiResponse<T> = await res.json()
 
   // if the response contains an error, throw it so we can catch it elsewhere
