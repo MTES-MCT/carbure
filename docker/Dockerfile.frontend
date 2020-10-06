@@ -1,15 +1,14 @@
-FROM node:alpine AS development
+FROM node:alpine
 
 WORKDIR /app
 
-COPY front/package.json /app
+COPY front/package.json /app/
+COPY front/package-lock.json /app/
+
+ENV PATH /app/node_modules/.bin:$PATH
 
 RUN npm install
 
 COPY front /app
 
 CMD ["npm", "run", "start"]
-
-FROM node:alpine AS production
-
-CMD ["npm", "run", "build"]

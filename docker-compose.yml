@@ -58,16 +58,13 @@ services:
     stdin_open: true
     restart: always
     container_name: carbure_frontend
-    image: carbure_frontend:local    
+    image: carbure_frontend:local
     build:
       context: ${CARBURE_HOME}
       dockerfile: docker/Dockerfile.frontend
-      target: development
-    ports:
-      - 1234:1234 # needed for hot-reloading
     volumes:
-      - "/app/node_modules"
-      - "./front:/app" # needed for hot-reloading
+      - ./front:/app # needed for hot-reloading
+      - node_modules:/app/node_modules
     networks:
       - carbure
 
@@ -75,6 +72,7 @@ services:
     build:
       context: ${CARBURE_HOME}
       dockerfile: docker/Dockerfile.web
+      target: nginx
     restart: always
     container_name: carbure_web
     image: carbure_web:local
@@ -96,6 +94,8 @@ services:
 volumes:
   carburedb:
     name: carbure_carburedb
+  node_modules:
+    name: carbure_nodemodules
 
 networks:
   carbure:

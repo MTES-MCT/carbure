@@ -1,0 +1,74 @@
+.topBar {
+  display: flex;
+  background-color: var(--white);
+  padding-right: 120px;
+  box-shadow: 0px 1px 2px var(--gray-medium);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  margin: 12px 30px;
+}
+
+.marianne {
+  height: 46px;
+}
+
+.carbure {
+  margin-left: 16px;
+  font-family: "Evolventa";
+  letter-spacing: 0.05em;
+  color: var(--black);
+}
+
+.betagouv {
+  height: 40px;
+}
+
+.pageNav {
+  display: flex;
+  margin-left: 32px;
+}
+
+.pageLink {
+  display: flex;
+  position: relative;
+  align-items: center;
+  padding: 0 16px;
+  font-size: 18px;
+  text-decoration: none;
+  color: var(--black);
+}
+
+.pageLink:hover {
+  color: var(--blue-medium);
+}
+
+.activePageLink {
+  font-weight: 600;
+}
+
+.activePageLink::after {
+  position: absolute;
+  content: "";
+  height: 4px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--blue-medium);
+}
+
+.userMenu {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  margin-left: auto;
+}
+
+.userMenu :global(.dropdown-items) {
+  right: 0;
+  min-width: 250px;
+  max-height: 100vh;
+}

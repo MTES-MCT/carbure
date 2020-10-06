@@ -28,15 +28,18 @@ def get_countries(request):
     q = request.GET.get('query', False)
     countries = Pays.objects.all()
     if q:
-        countries = countries.filter(Q(name__icontains=q) | Q(code__icontains=q))
+        countries = countries.filter(Q(name__icontains=q) | Q(code_pays__icontains=q))
     sez = [c.natural_key() for c in countries]
     return JsonResponse({'status': 'success', 'data': sez})
 
 
 def get_ges(request):
     # TODO
-    return JsonResponse({'status': 'success', 'data': {'eec': 0.0, 'el': 0.0, 'ep': 0.0, 'etd': 0.0, 'eu': 0.0,
-                         'esca': 0.0, 'eccs': 0.0, 'eccr': 0.0, 'eee': 0.0}})
+    return JsonResponse({
+        'status': 'success',
+        'data': {'eec': 0.0, 'el': 0.0, 'ep': 0.0, 'etd': 0.0, 'eu': 0.0,
+                 'esca': 0.0, 'eccs': 0.0, 'eccr': 0.0, 'eee': 0.0}
+    })
 
 
 def get_entities(request):

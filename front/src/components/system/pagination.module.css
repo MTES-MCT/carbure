@@ -1,0 +1,39 @@
+.pagination {
+  display: flex;
+  align-items: stretch;
+  padding: 16px 8px;
+  background-color: var(--white);
+  margin-top: 32px;
+  border: 1px solid var(--gray-medium);
+  border-radius: 5px;
+  align-self: center;
+}
+
+.paginationButton {
+  margin: 0 8px;
+  padding: 8px;
+  width: 42px;
+  background-color: var(--gray-light);
+  justify-content: center;
+}
+
+.paginationButton svg:global(.icon) {
+  margin: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.paginationText {
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+}
+
+.paginationTotal {
+  margin-right: 8px;
+}
+
+.paginationSelect :global(.dropdown-items) {
+  top: unset;
+  bottom: 100%;
+}
