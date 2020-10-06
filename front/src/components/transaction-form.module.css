@@ -1,0 +1,40 @@
+.transactionForm {
+  display: flex;
+  flex-direction: column;
+  margin-top: 32px;
+}
+
+.transactionFields > div {
+  flex: 3;
+}
+
+.transactionFields > div:last-child {
+  flex: 2;
+}
+
+.transactionFields > div:nth-child(2),
+.transactionFields > div:nth-child(3) {
+  margin-top: -68px;
+}
+.transactionFields > div {
+  margin-right: 32px;
+}
+
+.transactionGES > div:first-child {
+  margin-right: 8px;
+}
+
+.transactionMAC {
+  margin: 0 auto;
+}
+
+.transactionError {
+  margin-top: 16px;
+}
+
+.transactionFormButtons {
+  display: flex;
+  margin-top: auto;
+  justify-content: space-between;
+  margin-top: 16px;
+}

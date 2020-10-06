@@ -1,5 +1,18 @@
-FROM nginx:latest
+FROM node:alpine AS node
+
+WORKDIR /app
+
+COPY front/package.json /app/
+
+RUN npm install
+
+COPY front /app
+
+RUN npm run build
+
+FROM nginx:latest AS nginx
 
 COPY ./docker/nginx/ /etc/nginx/conf.d/
 COPY ./web/static /var/www/html
+COPY --from=node /app/build /var/www/html_v2
 COPY ./docker/run_nginx.sh /opt/run_nginx.sh

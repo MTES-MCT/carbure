@@ -49,16 +49,6 @@ services:
     networks:
       - carbure
 
-  carbure-frontend:
-    container_name: carbure_frontend
-    build:
-      context: ${CARBURE_HOME}
-      dockerfile: docker/Dockerfile.frontend
-      target: production
-    volumes:
-      - "/app/node_modules"
-      - carburedist:/app/dist
-
   carbure-web-proxy:
     restart: always
     container_name: carbure_web
@@ -71,7 +61,6 @@ services:
     command: /opt/run_nginx.sh
     depends_on:
       - carbure-django-uwsgi
-      - carbure-frontend
     ports:
       - 80:80
       - 443:443
@@ -80,7 +69,6 @@ services:
     volumes:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
-      - carburedist:/var/www/html_v2
 
   watchtower:
     image: containrrr/watchtower
@@ -113,8 +101,6 @@ services:
 volumes:
   carburedb:
     name: carbure_carburedb
-  carburedist:
-    name: carbure_carburedist
 
 networks:
   carbure:
