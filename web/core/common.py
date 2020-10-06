@@ -469,7 +469,7 @@ def fill_delivery_site_data(lot_row, transaction):
     return tx_errors
 
 
-def load_lot(entity, user, lot_dict, source):
+def load_lot(entity, user, lot_dict, source, transaction=None):
     lot_errors = []
     tx_errors = []
 
@@ -477,11 +477,14 @@ def load_lot(entity, user, lot_dict, source):
     if lot_dict.get('biocarburant_code', None) is None:
         return None, None, None, None
 
-    lot = LotV2()
-    lot.added_by = entity
-    lot.data_origin_entity = entity
-    lot.added_by_user = user
-    lot.source = source
+    if transaction is None:
+        lot = LotV2()
+        lot.added_by = entity
+        lot.data_origin_entity = entity
+        lot.added_by_user = user
+        lot.source = source
+    else:
+        lot = transaction.lot
 
     lot_errors.append(fill_producer_info(entity, lot_dict, lot))
     lot_errors.append(fill_production_site_info(entity, lot_dict, lot))
@@ -490,12 +493,14 @@ def load_lot(entity, user, lot_dict, source):
     lot_errors.append(fill_volume_info(lot_dict, lot))
     lot_errors.append(fill_pays_origine_info(lot_dict, lot))
     lot_errors.append(fill_ghg_info(lot_dict, lot))
+    lot.is_valid = False
     lot.save()
 
-    transaction = LotTransaction()
-    transaction.lot = lot
-    transaction.vendor_is_in_carbure = True
-    transaction.carbure_vendor = entity
+    if transaction is None:
+        transaction = LotTransaction()
+        transaction.lot = lot
+        transaction.vendor_is_in_carbure = True
+        transaction.carbure_vendor = entity
     transaction.is_mac = False
     if 'mac' in lot_dict and lot_dict['mac'] == 1:
         transaction.is_mac = True
@@ -507,6 +512,7 @@ def load_lot(entity, user, lot_dict, source):
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
     transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
+    transaction.save()
     return lot, transaction, lot_errors, tx_errors
 
 

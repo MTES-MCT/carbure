@@ -8,7 +8,7 @@ urlpatterns = [
 
     # POST
     path('add', views.add_lot, name='api-v3-add-lot'),
-    path('update', views.add_lot, name='api-v3-update-lot'),
+    path('update', views.update_lot, name='api-v3-update-lot'),
     path('delete', views.delete_lot, name='api-v3-delete-lot'),
     path('duplicate', views.duplicate_lot, name='api-v3-duplicate-lot'),
     path('validate', views.validate_lot, name='api-v3-validate-lot'),
