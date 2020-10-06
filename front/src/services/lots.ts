@@ -151,3 +151,10 @@ export function deleteLots(entityID: number, transactionIDs: number[]) {
     tx_ids: transactionIDs,
   })
 }
+
+export function validateLots(entityID: number, transactionIDs: number[]) {
+  return api.post("/lots/validate", {
+    entity_id: entityID,
+    tx_ids: transactionIDs,
+  })
+}

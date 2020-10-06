@@ -63,12 +63,14 @@ type TransactionRowProps = {
   transaction: Transaction
   onDelete: (id: number) => void
   onDuplicate: (id: number) => void
+  onValidate: (id: number) => void
 }
 
 const TransactionRow = ({
   transaction,
   onDelete,
   onDuplicate,
+  onValidate,
 }: TransactionRowProps) => {
   const history = useHistory()
 
@@ -80,6 +82,11 @@ const TransactionRow = ({
   function handleDelete(e: React.MouseEvent) {
     e.stopPropagation()
     onDelete(transaction.id)
+  }
+
+  function handleValidate(e: React.MouseEvent) {
+    e.stopPropagation()
+    onValidate(transaction.id)
   }
 
   return (
@@ -161,7 +168,7 @@ const TransactionRow = ({
 
         <div className={styles.transactionActions}>
           <Copy title="Dupliquer le lot" onClick={handleDuplicate} />
-          <Check title="Valider le lot" />
+          <Check title="Valider le lot" onClick={handleValidate} />
           <Cross title="Supprimer le lot" onClick={handleDelete} />
         </div>
       </td>
@@ -174,6 +181,7 @@ type TransactionListProps = {
   pagination: PageSelection
   onDelete: (id: number) => void
   onDuplicate: (id: number) => void
+  onValidate: (id: number) => void
 }
 
 const TransactionList = ({
@@ -181,6 +189,7 @@ const TransactionList = ({
   pagination,
   onDelete,
   onDuplicate,
+  onValidate,
 }: TransactionListProps) => {
   const tx = transactions.data
 
@@ -215,6 +224,7 @@ const TransactionList = ({
                 transaction={transaction}
                 onDelete={onDelete}
                 onDuplicate={onDuplicate}
+                onValidate={onValidate}
               />
             )}
           </Table>
