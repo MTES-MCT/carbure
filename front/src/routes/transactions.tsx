@@ -24,6 +24,7 @@ const Transactions = ({ entity }: TransactionsProps) => {
     transactions,
     deleter,
     duplicator,
+    validator,
   } = useTransactions(entity)
 
   if (entity.selected === null) {
@@ -43,6 +44,7 @@ const Transactions = ({ entity }: TransactionsProps) => {
         pagination={pagination}
         onDelete={deleter.resolveDeleteLot}
         onDuplicate={duplicator.resolveDuplicateLot}
+        onValidate={validator.resolveValidateLot}
       />
 
       <Switch>
