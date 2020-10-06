@@ -6,11 +6,11 @@ from django.db.models.functions import TruncMonth
 from django.db.models import Count
 from django.db.models.fields import NOT_PROVIDED
 from django.http import JsonResponse, HttpResponse
-from core.models import LotV2, LotTransaction, LotValidationError
+from core.models import LotV2, LotTransaction
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment
 from core.xlsx_template import create_xslx_from_transactions, create_template_xlsx_v2_simple
 from core.xlsx_template import create_template_xlsx_v2_advanced
-from core.common import tx_is_valid, lot_is_valid, generate_carbure_id, load_excel_file, load_lot
+from core.common import validate_lots, load_excel_file, load_lot
 from api.v3.sanity_checks import sanity_check
 
 
@@ -182,8 +182,33 @@ def add_lot(request):
 
 
 def update_lot(request):
-    # set is_valid to False
-    pass
+    entity_id = request.POST.get('entity_id', False)
+    if not entity_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
+
+    try:
+        entity = Entity.objects.get(id=entity_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
+                            status=400)
+
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    if entity not in rights:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+    tx_id = request.POST.get('tx_id', False)
+    if not tx_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_id"}, status=400)
+
+    try:
+        tx = LotTransaction.objects.get(id=tx_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown transaction %s" % (tx_id), 'extra': str(e)},
+                            status=400)
+
+
+    load_lot(entity, request.user, request.POST.dict(), 'MANUAL', tx)
+    return JsonResponse({'status': 'success'})
 
 
 def duplicate_lot(request):
@@ -255,39 +280,7 @@ def validate_lot(request):
     tx_ids = request.POST.get('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
-    for tx_id in tx_ids:
-        try:
-            tx = LotTransaction.objects.get(id=tx_id, lot__status='Draft')
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': "Draft not found", 'extra': str(e)}, status=400)
-
-        rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-        if tx.lot.added_by not in rights:
-            return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-
-        # make sure all mandatory fields are set
-        tx_valid, error = tx_is_valid(tx)
-        if not tx_valid:
-            return JsonResponse({'status': 'error', 'message': "Invalid transaction: %s" % (error)}, status=400)
-
-        lot_valid, error = lot_is_valid(tx.lot)
-        if not lot_valid:
-            return JsonResponse({'status': 'error', 'message': "Invalid lot: %s" % (error)}, status=400)
-
-        # run sanity_checks
-        sanity_check(tx.lot)
-        blocking_sanity_checks = LotValidationError.objects.filter(lot=tx.lot, block_validation=True)
-        if len(blocking_sanity_checks):
-            tx.lot.is_valid = False
-        else:
-            tx.lot.is_valid = True
-            tx.lot.carbure_id = generate_carbure_id(tx.lot)
-            tx.lot.status = "Validated"
-        # when the lot is added to mass balance, auto-accept
-        if tx.carbure_client == tx.carbure_vendor:
-            tx.delivery_status = 'A'
-            tx.save()
-        tx.lot.save()
+    validate_lots(request.user, tx_ids)
     return JsonResponse({'status': 'success'})
 
 
@@ -390,6 +383,25 @@ def check_lot(request):
     return JsonResponse({'status': 'success'})
 
 
+def accept_all(request):
+    entity_id = request.POST.get('entity_id', False)
+    if not entity_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
+
+    try:
+        entity = Entity.objects.get(id=entity_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
+                            status=400)
+
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    if entity not in rights:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+    LotTransaction.objects.filter(carbure_client=entity, delivery_status__in=['N', 'AC', 'AA']).update(delivery_status='A')
+    return JsonResponse({'status': 'success'})
+
+
 def delete_all_drafts(request):
     entity_id = request.POST.get('entity_id', False)
     if not entity_id:
@@ -406,6 +418,27 @@ def delete_all_drafts(request):
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').delete()
+    return JsonResponse({'status': 'success'})
+
+
+def validate_all_drafts(request):
+    entity_id = request.POST.get('entity_id', False)
+    if not entity_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
+
+    try:
+        entity = Entity.objects.get(id=entity_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
+                            status=400)
+
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    if entity not in rights:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+    drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft')
+    tx_ids = [d.id for d in drafts]
+    validate_lots(request.user, tx_ids)
     return JsonResponse({'status': 'success'})
 
 
