@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from "react"
+import { useReducer, useRef } from "react"
 
 enum ApiStatus {
   Pending = "pending",
@@ -37,51 +37,34 @@ const initialState = {
 }
 
 type ApiReducer<T> = React.Reducer<ApiState<T>, ApiAction<T>>
+type Resolver<T extends any[]> = (...args: T) => Promise<void>
+type ApiHook<T extends any[], U> = [ApiState<U>, Resolver<T>]
 
-type ApiHook<T> = [
-  ApiState<T>,
-  React.Dispatch<React.SetStateAction<Promise<T> | null>>
-]
+function useAPI<T extends any[], U>(
+  createPromise: (...args: T) => Promise<U>
+): ApiHook<T, U> {
+  const resolve = useRef<Resolver<T> | null>(null)
+  const [state, dispatch] = useReducer<ApiReducer<U>>(reducer, initialState)
 
-function useAPI<T>(): ApiHook<T> {
-  const [promise, setPromise] = useState<Promise<T> | null>(null)
-  const [state, dispatch] = useReducer<ApiReducer<T>>(reducer, initialState)
-
-  useEffect(() => {
-    let canceled = false
-
-    async function resolve() {
-      // don't run fetch if the promise is not set
-      if (!promise) return
-
+  if (resolve.current === null) {
+    resolve.current = async (...args: T) => {
       // signal that the request process started
       dispatch({ type: ApiStatus.Pending })
 
       try {
         // actually call the api and wait for the response
-        const res = await promise
+        const res = await createPromise(...args)
 
-        // stop doing anything if this request was canceled
-        if (!canceled) {
-          // and dispatch the data if it was a success
-          dispatch({ type: ApiStatus.Success, payload: res })
-        }
+        // dispatch the data if it was a success
+        dispatch({ type: ApiStatus.Success, payload: res })
       } catch (err) {
-        if (!canceled) {
-          dispatch({ type: ApiStatus.Error, payload: err.message })
-        }
+        // otherwise save the error
+        dispatch({ type: ApiStatus.Error, payload: err.message })
       }
     }
+  }
 
-    resolve()
-
-    // cancel the request if the component is rerendered while the server is working
-    return () => {
-      canceled = true
-    }
-  }, [promise]) // restart the process every time the promise changes
-
-  return [state, setPromise]
+  return [state, resolve.current]
 }
 
 export default useAPI
