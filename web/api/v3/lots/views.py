@@ -164,8 +164,33 @@ def add_lot(request):
 
 
 def update_lot(request):
-    # set is_valid to False
-    pass
+    entity_id = request.POST.get('entity_id', False)
+    if not entity_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
+
+    try:
+        entity = Entity.objects.get(id=entity_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
+                            status=400)
+
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    if entity not in rights:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+    tx_id = request.POST.get('tx_id', False)
+    if not tx_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_id"}, status=400)
+
+    try:
+        tx = LotTransaction.objects.get(id=tx_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown transaction %s" % (tx_id), 'extra': str(e)},
+                            status=400)
+
+
+    load_lot(entity, request.user, request.POST.dict(), 'MANUAL', tx)
+    return JsonResponse({'status': 'success'})
 
 
 def duplicate_lot(request):
