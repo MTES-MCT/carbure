@@ -48,7 +48,7 @@ export interface TransactionFormState {
   carbure_client: Entity | null
   unknown_client: string
 
-  delivery_site_is_on_carbure: boolean
+  delivery_site_is_in_carbure: boolean
   carbure_delivery_site: DeliverySite | null
   unknown_delivery_site: string
   unknown_delivery_site_country: Country | null
@@ -95,7 +95,7 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
     carbure_client: tx.carbure_client,
     unknown_client: tx.unknown_client,
 
-    delivery_site_is_on_carbure: tx.delivery_site_is_in_carbure,
+    delivery_site_is_in_carbure: tx.delivery_site_is_in_carbure,
     carbure_delivery_site: tx.carbure_delivery_site,
     unknown_delivery_site: tx.unknown_delivery_site,
     unknown_delivery_site_country: tx.unknown_delivery_site_country,
@@ -141,7 +141,7 @@ const initialState: TransactionFormState = {
   carbure_client: null,
   unknown_client: "",
 
-  delivery_site_is_on_carbure: true,
+  delivery_site_is_in_carbure: true,
   carbure_delivery_site: null,
   unknown_delivery_site: "",
   unknown_delivery_site_country: null,

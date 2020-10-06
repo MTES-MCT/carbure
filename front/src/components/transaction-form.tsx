@@ -228,13 +228,13 @@ const TransactionForm = ({
           )}
 
           <LabelCheckbox
-            name="delivery_site_is_on_carbure"
+            name="delivery_site_is_in_carbure"
             label="Site de livraison enregistré sur Carbure ?"
-            checked={tx.delivery_site_is_on_carbure}
+            checked={tx.delivery_site_is_in_carbure}
             onChange={onChange}
           />
 
-          {tx.delivery_site_is_on_carbure ? (
+          {tx.delivery_site_is_in_carbure ? (
             <AutoComplete
               readOnly={readOnly}
               label="Site de livraison"
@@ -259,7 +259,7 @@ const TransactionForm = ({
           )}
 
           <AutoComplete
-            disabled={tx.delivery_site_is_on_carbure}
+            disabled={tx.delivery_site_is_in_carbure}
             readOnly={readOnly}
             label="Pays de livraison"
             name="unknown_delivery_site_country"
