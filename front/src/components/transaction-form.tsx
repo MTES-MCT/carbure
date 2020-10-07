@@ -391,7 +391,7 @@ const TransactionForm = ({
       </Box>
 
       {error && (
-        <Alert kind="error" className={styles.transactionError}>
+        <Alert level="error" className={styles.transactionError}>
           {error}
         </Alert>
       )}

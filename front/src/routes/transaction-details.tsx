@@ -45,7 +45,7 @@ const TransactionDetails = ({
           submit
           name="update"
           icon={Save}
-          kind="primary"
+          level="primary"
           onClick={submit}
         >
           Sauvegarder
