@@ -82,16 +82,16 @@ def get_lots(request):
         txs = txs.filter(Q(carbure_client__name__in=clients) | Q(unknown_client__in=clients))
 
     if query:
-        txs = transactions.filter(Q(lot__matiere_premiere__name__icontains=search) |
-                                  Q(lot__biocarburant__name__icontains=search) |
-                                  Q(lot__carbure_producer__name__icontains=search) |
-                                  Q(lot__unknown_producer__icontains=search) |
-                                  Q(lot__carbure_id__icontains=search) |
-                                  Q(lot__pays_origine__name__icontains=search) |
-                                  Q(carbure_client__name__icontains=search) |
-                                  Q(unknown_client__icontains=search) |
-                                  Q(carbure_delivery_site__name__icontains=search) |
-                                  Q(unknown_delivery_site__icontains=search)
+        txs = transactions.filter(Q(lot__matiere_premiere__name__icontains=query) |
+                                  Q(lot__biocarburant__name__icontains=query) |
+                                  Q(lot__carbure_producer__name__icontains=query) |
+                                  Q(lot__unknown_producer__icontains=query) |
+                                  Q(lot__carbure_id__icontains=query) |
+                                  Q(lot__pays_origine__name__icontains=query) |
+                                  Q(carbure_client__name__icontains=query) |
+                                  Q(unknown_client__icontains=query) |
+                                  Q(carbure_delivery_site__name__icontains=query) |
+                                  Q(unknown_delivery_site__icontains=query)
                                   )
 
 
