@@ -87,17 +87,17 @@ function useTransactionSelection(
 function useGetSnapshot(
   entity: EntitySelection
 ): [ApiState<Snapshot>, () => void] {
-  const [snapshot, resolve] = useAPI(getSnapshot)
+  const [snapshot, resolveSnapshot] = useAPI(getSnapshot)
 
-  function resolveGetLots() {
+  function resolve() {
     if (entity.selected?.id) {
-      resolve(entity.selected.id)
+      resolveSnapshot(entity.selected.id)
     }
   }
 
-  useEffect(resolveGetLots, [resolve, entity.selected])
+  useEffect(resolve, [resolveSnapshot, entity.selected])
 
-  return [snapshot, resolveGetLots]
+  return [snapshot, resolve]
 }
 
 // fetches current transaction list when parameters change
@@ -107,30 +107,37 @@ function useGetLots(
   filters: FilterSelection,
   pagination: PageSelection
 ): [ApiState<Lots>, () => void] {
-  const [transactions, resolve] = useAPI(getLots)
+  const [transactions, resolveLots] = useAPI(getLots)
 
-  function resolveGetLots() {
+  const { page, limit, setPage } = pagination
+
+  function resolve() {
     if (entity.selected?.id) {
-      resolve(
+      resolveLots(
         status.active,
         entity.selected.id,
         filters.selected,
-        pagination.page,
-        pagination.limit
+        page,
+        limit
       )
     }
   }
 
-  useEffect(resolveGetLots, [
-    resolve,
+  useEffect(resolve, [
+    resolveLots,
     status.active,
     entity.selected,
     filters.selected,
-    pagination.page,
-    pagination.limit,
+    page,
+    limit,
   ])
 
-  return [transactions, resolveGetLots]
+  // reset page to 0 when filters change
+  useEffect(() => {
+    setPage(0)
+  }, [status.active, entity.selected, filters.selected, limit, setPage])
+
+  return [transactions, resolve]
 }
 
 function useDuplicateLot(entity: EntitySelection, refresh: () => void) {
