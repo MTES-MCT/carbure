@@ -26,6 +26,7 @@ const Transactions = ({ entity }: TransactionsProps) => {
     deleter,
     duplicator,
     validator,
+    refresh,
   } = useTransactions(entity)
 
   if (entity.selected === null) {
@@ -51,13 +52,14 @@ const Transactions = ({ entity }: TransactionsProps) => {
 
       <Switch>
         <Route path="/transactions/add">
-          <TransactionAdd entity={entity} />
+          <TransactionAdd entity={entity} refresh={refresh} />
         </Route>
 
         <Route exact path="/transactions/:id">
           <TransactionDetails
             entity={entity}
             transactions={transactions.data}
+            refresh={refresh}
           />
         </Route>
       </Switch>
