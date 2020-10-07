@@ -67,6 +67,18 @@
   border-color: var(--orange-dark);
 }
 
+.buttonDanger {
+  color: var(--red-dark);
+  background-color: var(--red-light);
+  border-color: var(--red-medium);
+}
+
+.buttonDanger:hover {
+  color: var(--white);
+  background-color: var(--red-dark);
+  border-color: var(--red-dark);
+}
+
 /* STATUS BUTTON */
 
 .statusButton {

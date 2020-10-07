@@ -50,14 +50,14 @@ function useFilterSelection(): FilterSelection {
 }
 
 export type TransactionSelection = {
+  selected: number[]
   has: (id: number) => boolean
   selectOne: (id: number) => void
-  selectAll: (e: React.ChangeEvent<HTMLInputElement>) => void
+  selectMany: (e: React.ChangeEvent<HTMLInputElement>, ids: number[]) => void
+  setSelected: React.Dispatch<React.SetStateAction<number[]>>
 }
 
-function useTransactionSelection(
-  transactions: Lots | null
-): TransactionSelection {
+function useTransactionSelection(): TransactionSelection {
   const [selected, setSelected] = useState<number[]>([])
 
   function has(id: number) {
@@ -72,15 +72,15 @@ function useTransactionSelection(
     }
   }
 
-  function selectAll(e: React.ChangeEvent<HTMLInputElement>) {
-    if (e.target.checked && transactions) {
-      setSelected(transactions.lots.map((tx) => tx.id))
+  function selectMany(e: React.ChangeEvent<HTMLInputElement>, ids: number[]) {
+    if (e.target.checked) {
+      setSelected(ids)
     } else {
       setSelected([])
     }
   }
 
-  return { has, selectOne, selectAll }
+  return { selected, has, selectOne, selectMany, setSelected }
 }
 
 // fetches current snapshot when parameters change
@@ -105,11 +105,13 @@ function useGetLots(
   entity: EntitySelection,
   status: StatusSelection,
   filters: FilterSelection,
-  pagination: PageSelection
+  pagination: PageSelection,
+  selection: TransactionSelection
 ): [ApiState<Lots>, () => void] {
   const [transactions, resolveLots] = useAPI(getLots)
 
   const { page, limit, setPage } = pagination
+  const { setSelected } = selection
 
   function resolve() {
     if (entity.selected?.id) {
@@ -135,7 +137,15 @@ function useGetLots(
   // reset page to 0 when filters change
   useEffect(() => {
     setPage(0)
-  }, [status.active, entity.selected, filters.selected, limit, setPage])
+    setSelected([])
+  }, [
+    status.active,
+    entity.selected,
+    filters.selected,
+    limit,
+    setPage,
+    setSelected,
+  ])
 
   return [transactions, resolve]
 }
@@ -155,9 +165,9 @@ function useDuplicateLot(entity: EntitySelection, refresh: () => void) {
 function useDeleteLots(entity: EntitySelection, refresh: () => void) {
   const [request, resolveDelete] = useAPI(deleteLots)
 
-  function resolve(lotID: number) {
+  function resolve(lotIDs: number[]) {
     if (entity.selected && window.confirm("Voulez vous supprimer ce lot ?")) {
-      resolveDelete(entity.selected.id, [lotID]).then(refresh)
+      resolveDelete(entity.selected.id, lotIDs).then(refresh)
     }
   }
 
@@ -167,9 +177,9 @@ function useDeleteLots(entity: EntitySelection, refresh: () => void) {
 function useValidateLots(entity: EntitySelection, refresh: () => void) {
   const [request, resolveValidate] = useAPI(validateLots)
 
-  function resolve(lotID: number) {
+  function resolve(lotIDs: number[]) {
     if (entity.selected && window.confirm("Voulez vous envoyer ce lot ?")) {
-      resolveValidate(entity.selected.id, [lotID]).then(refresh)
+      resolveValidate(entity.selected.id, lotIDs).then(refresh)
     }
   }
 
@@ -180,16 +190,15 @@ export default function useTransactions(entity: EntitySelection) {
   const status = useStatusSelection()
   const filters = useFilterSelection()
   const pagination = usePageSelection()
+  const selection = useTransactionSelection()
 
   const [snapshot, resolveGetSnapshot] = useGetSnapshot(entity)
-  const [transactions, resolveGetLots] = useGetLots(entity, status, filters, pagination) // prettier-ignore
+  const [transactions, resolveGetLots] = useGetLots(entity, status, filters, pagination, selection) // prettier-ignore
 
   function refresh() {
     resolveGetLots()
     resolveGetSnapshot()
   }
-
-  const selection = useTransactionSelection(transactions.data)
 
   const deleter = useDeleteLots(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
