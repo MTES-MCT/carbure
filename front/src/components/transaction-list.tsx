@@ -156,7 +156,7 @@ const TransactionRow = ({
 
         <div className={styles.transactionActions}>
           <Copy title="Dupliquer le lot" onClick={stopProp(onDuplicate)} />
-          <Check title="Valider le lot" onClick={stopProp(onValidate)} />
+          <Check title="Envoyer le lot" onClick={stopProp(onValidate)} />
           <Cross title="Supprimer le lot" onClick={stopProp(onDelete)} />
         </div>
       </td>
@@ -218,9 +218,9 @@ const TransactionList = ({
                 transaction={tx}
                 selected={selection.has(tx.id)}
                 onSelect={() => selection.selectOne(tx.id)}
-                onDelete={() => onDuplicate(tx.id)}
-                onDuplicate={() => onValidate(tx.id)}
-                onValidate={() => onDelete(tx.id)}
+                onDuplicate={() => onDuplicate(tx.id)}
+                onValidate={() => onValidate(tx.id)}
+                onDelete={() => onDelete(tx.id)}
               />
             )}
           </Table>
