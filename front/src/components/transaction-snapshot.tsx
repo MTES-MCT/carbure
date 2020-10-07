@@ -44,7 +44,7 @@ const TransactionSnapshot = ({
         <Title>Transactions</Title>
 
         <Link to="/transactions/add">
-          <Button kind="primary">
+          <Button level="primary">
             <Plus />
             Ajouter des lots
           </Button>

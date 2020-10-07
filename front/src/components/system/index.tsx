@@ -39,21 +39,21 @@ export const Main = (props: BoxProps) => <Box {...props} as="main" />
 type ButtonProps = SystemProps &
   React.HTMLProps<HTMLButtonElement> & {
     submit?: boolean
-    kind?: string
+    level?: string
     icon?: React.ComponentType
   }
 
 export const Button = ({
   submit = false,
   icon: Icon,
-  kind,
+  level,
   className,
   children,
   ...props
 }: ButtonProps) => {
   const btnClassName = cl(styles.button, className, {
-    [styles.buttonPrimary]: kind === "primary",
-    [styles.buttonWarning]: kind === "warning",
+    [styles.buttonPrimary]: level === "primary",
+    [styles.buttonWarning]: level === "warning",
   })
 
   return (
@@ -119,20 +119,20 @@ export const StatusButton = ({
 
 type AlertProps = SystemProps &
   React.HTMLProps<HTMLDivElement> & {
-    kind?: string
+    level?: "warning" | "error" | "info"
     onClose?: (event: React.MouseEvent) => void
   }
 
 export const Alert = ({
-  kind: type,
+  level,
   children,
   className,
   onClose,
   ...props
 }: AlertProps) => {
   const divClassName = cl(styles.alert, className, {
-    [styles.alertWarning]: type === "warning",
-    [styles.alertError]: type === "error",
+    [styles.alertWarning]: level === "warning",
+    [styles.alertError]: level === "error",
   })
 
   return (

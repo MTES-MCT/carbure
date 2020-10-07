@@ -35,7 +35,7 @@ const TransactionAdd = ({ entity, refresh }: TransactionAddProps) => {
       >
         <AsyncButton
           submit
-          kind="primary"
+          level="primary"
           icon={Plus}
           loading={request.loading}
         >
