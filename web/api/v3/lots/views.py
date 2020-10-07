@@ -307,7 +307,7 @@ def delete_lot(request):
 
 
 def validate_lot(request):
-    tx_ids = request.POST.get('tx_ids', None)
+    tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
     validate_lots(request.user, tx_ids)
@@ -315,7 +315,7 @@ def validate_lot(request):
 
 
 def accept_lot(request):
-    tx_ids = request.POST.get('tx_ids', None)
+    tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
     for tx_id in tx_ids:
