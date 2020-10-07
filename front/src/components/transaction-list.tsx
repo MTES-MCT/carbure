@@ -11,7 +11,7 @@ import styles from "./transaction-list.module.css"
 
 import { getStatus } from "../services/lots"
 
-import { Alert, Box, LoaderOverlay, Table } from "./system"
+import { Alert, Box, Button, LoaderOverlay, Table } from "./system"
 import { AlertCircle, Check, ChevronRight, Copy, Cross } from "./system/icons"
 import Pagination from "./system/pagination"
 
@@ -65,6 +65,35 @@ function stopProp(handler: Function = () => {}) {
     e.stopPropagation()
     handler()
   }
+}
+
+type ActionProps = {
+  disabled: boolean
+  onDelete: () => void
+  onValidate: () => void
+}
+
+const Actions = ({ disabled, onDelete, onValidate }: ActionProps) => {
+  return (
+    <Box row className={cl(styles.actionBar)}>
+      <Button
+        disabled={disabled}
+        icon={Check}
+        level="primary"
+        onClick={onValidate}
+      >
+        Valider la sélection
+      </Button>
+      <Button
+        disabled={disabled}
+        icon={Cross}
+        level="danger"
+        onClick={onDelete}
+      >
+        Supprimer la sélection
+      </Button>
+    </Box>
+  )
 }
 
 type TransactionRowProps = {
@@ -168,9 +197,9 @@ type TransactionListProps = {
   transactions: ApiState<Lots>
   pagination: PageSelection
   selection: TransactionSelection
-  onDelete: (id: number) => void
+  onDelete: (ids: number[]) => void
+  onValidate: (ids: number[]) => void
   onDuplicate: (id: number) => void
-  onValidate: (id: number) => void
 }
 
 const TransactionList = ({
@@ -182,6 +211,7 @@ const TransactionList = ({
   onValidate,
 }: TransactionListProps) => {
   const tx = transactions.data
+  const ids = tx ? tx.lots.map((t) => t.id) : []
 
   const isLoading = transactions.loading
   const isError = typeof transactions.error === "string"
@@ -192,14 +222,14 @@ const TransactionList = ({
       {isLoading && <LoaderOverlay />}
 
       {isError && (
-        <Alert kind="error">
+        <Alert level="error">
           <AlertCircle />
           {transactions.error}
         </Alert>
       )}
 
       {!isError && isEmpty && (
-        <Alert kind="warning">
+        <Alert level="warning">
           <AlertCircle />
           Aucune transaction trouvée pour ces paramètres
         </Alert>
@@ -207,10 +237,16 @@ const TransactionList = ({
 
       {!isError && !isEmpty && (
         <React.Fragment>
+          <Actions
+            disabled={selection.selected.length === 0}
+            onDelete={() => onDelete(selection.selected)}
+            onValidate={() => onValidate(selection.selected)}
+          />
+
           <Table
             columns={COLUMNS}
             rows={tx!.lots}
-            onSelectAll={selection.selectAll}
+            onSelectAll={(e) => selection.selectMany(e, ids)}
           >
             {(tx) => (
               <TransactionRow
@@ -219,8 +255,8 @@ const TransactionList = ({
                 selected={selection.has(tx.id)}
                 onSelect={() => selection.selectOne(tx.id)}
                 onDuplicate={() => onDuplicate(tx.id)}
-                onValidate={() => onValidate(tx.id)}
-                onDelete={() => onDelete(tx.id)}
+                onValidate={() => onValidate([tx.id])}
+                onDelete={() => onDelete([tx.id])}
               />
             )}
           </Table>

@@ -115,3 +115,11 @@
 .transactionActions :global(.icon):hover {
   stroke: var(--blue-medium);
 }
+
+.actionBar {
+  margin-bottom: 24px;
+}
+
+.actionBar button {
+  margin-right: 16px;
+}

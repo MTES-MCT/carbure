@@ -54,6 +54,7 @@ export const Button = ({
   const btnClassName = cl(styles.button, className, {
     [styles.buttonPrimary]: level === "primary",
     [styles.buttonWarning]: level === "warning",
+    [styles.buttonDanger]: level === "danger",
   })
 
   return (
