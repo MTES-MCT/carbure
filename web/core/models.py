@@ -416,3 +416,61 @@ class LotValidationError(models.Model):
         db_table = 'validation_errors'
         verbose_name = 'LotValidationError'
         verbose_name_plural = 'LotValidationErrors'
+
+
+class ISCCScope(models.Model):
+    scope = models.CharField(max_length=8, null=False, blank=False)
+    description = models.CharField(max_length=256, null=False, blank=False)
+
+    def __str__(self):
+        return self.scope
+
+    class Meta:
+        db_table = 'iscc_scopes'
+        verbose_name = 'ISCC Scope'
+        verbose_name_plural = 'ISCC Scopes'
+
+
+class ISCCCertificate(models.Model):
+    certificate_id = models.CharField(max_length=64, null=False, blank=False)
+    certificate_holder = models.CharField(max_length=256, null=False, blank=False)
+    addons = models.CharField(max_length=256, null=False, blank=False)
+    valid_from = models.DateField(null=False)
+    valid_until = models.DateField(null=False)
+    issuing_cb = models.CharField(max_length=256, default='')
+    location = models.CharField(max_length=256, default='')
+
+    def __str__(self):
+        return self.certificate_id
+
+    class Meta:
+        db_table = 'iscc_certificates'
+        verbose_name = 'ISCC Certificate'
+        verbose_name_plural = 'ISCC Certificates'
+
+
+class ISCCCertificateRawMaterial(models.Model):
+    certificate = models.ForeignKey(ISCCCertificate, blank=False, null=False, on_delete=models.CASCADE)
+    raw_material = models.CharField(max_length=32, blank=False, null=False)
+    # add foreign key to MatierePremiere ?
+
+    def __str__(self):
+        return self.raw_material
+
+    class Meta:
+        db_table = 'iscc_certificates_raw_materials'
+        verbose_name = 'ISCC Certificate Raw Material'
+        verbose_name_plural = 'ISCC Certificate Raw Materials'
+
+
+class ISCCCertificateScope(models.Model):
+    certificate = models.ForeignKey(ISCCCertificate, blank=False, null=False, on_delete=models.CASCADE)
+    scope = models.ForeignKey(ISCCScope, blank=False, null=False, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.scope.scope
+
+    class Meta:
+        db_table = 'iscc_certificates_scopes'
+        verbose_name = 'ISCC Certificate Scope'
+        verbose_name_plural = 'ISCC Certificate Scopes'
