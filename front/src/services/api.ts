@@ -29,7 +29,9 @@ function toFormData(obj: any): FormData {
   const formData = new FormData()
 
   for (const key in obj) {
-    if (obj[key] || obj[key] === 0) {
+    if (Array.isArray(obj[key])) {
+      obj[key].forEach((value: any) => formData.append(key, value.toString()))
+    } else if (obj[key] || obj[key] === 0) {
       formData.append(key, obj[key].toString())
     }
   }
