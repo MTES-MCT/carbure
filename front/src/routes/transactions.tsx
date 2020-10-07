@@ -42,9 +42,9 @@ const Transactions = ({ entity }: TransactionsProps) => {
       <TransactionList
         transactions={transactions}
         pagination={pagination}
-        onDelete={deleter.resolveDeleteLot}
-        onDuplicate={duplicator.resolveDuplicateLot}
-        onValidate={validator.resolveValidateLot}
+        onDelete={deleter.resolve}
+        onDuplicate={duplicator.resolve}
+        onValidate={validator.resolve}
       />
 
       <Switch>
