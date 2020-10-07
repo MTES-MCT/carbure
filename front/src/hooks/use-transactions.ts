@@ -100,39 +100,39 @@ function useGetLots(
 }
 
 function useDuplicateLot(entity: EntitySelection, refresh: () => void) {
-  const [request, resolve] = useAPI(duplicateLot)
+  const [request, resolveDuplicate] = useAPI(duplicateLot)
 
-  function resolveDuplicateLot(lotID: number) {
+  function resolve(lotID: number) {
     if (entity.selected && window.confirm("Voulez vous dupliquer ce lot ?")) {
-      resolve(entity.selected.id, lotID).then(refresh)
+      resolveDuplicate(entity.selected.id, lotID).then(refresh)
     }
   }
 
-  return { ...request, resolveDuplicateLot }
+  return { ...request, resolve }
 }
 
 function useDeleteLots(entity: EntitySelection, refresh: () => void) {
-  const [request, resolve] = useAPI(deleteLots)
+  const [request, resolveDelete] = useAPI(deleteLots)
 
-  function resolveDeleteLot(lotID: number) {
+  function resolve(lotID: number) {
     if (entity.selected && window.confirm("Voulez vous supprimer ce lot ?")) {
-      resolve(entity.selected.id, [lotID]).then(refresh)
+      resolveDelete(entity.selected.id, [lotID]).then(refresh)
     }
   }
 
-  return { ...request, resolveDeleteLot }
+  return { ...request, resolve }
 }
 
 function useValidateLots(entity: EntitySelection, refresh: () => void) {
-  const [request, resolve] = useAPI(validateLots)
+  const [request, resolveValidate] = useAPI(validateLots)
 
-  function resolveValidateLot(lotID: number) {
+  function resolve(lotID: number) {
     if (entity.selected && window.confirm("Voulez vous envoyer ce lot ?")) {
-      resolve(entity.selected.id, [lotID]).then(refresh)
+      resolveValidate(entity.selected.id, [lotID]).then(refresh)
     }
   }
 
-  return { ...request, resolveValidateLot }
+  return { ...request, resolve }
 }
 
 export default function useTransactions(entity: EntitySelection) {
