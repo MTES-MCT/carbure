@@ -31,7 +31,7 @@
 .button:hover {
   color: var(--blue-medium);
   border-color: var(--blue-medium);
-  background-color: var(--gray-light);
+  background-color: var(--gray-highlight);
 }
 
 .button:active {

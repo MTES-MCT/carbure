@@ -6,6 +6,7 @@
 }
 
 .selectLabel:hover {
+  background-color: var(--gray-highlight);
   border-color: var(--blue-medium);
 }
 

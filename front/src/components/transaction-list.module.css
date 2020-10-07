@@ -30,6 +30,7 @@
   color: var(--gray-dark);
   background-color: var(--gray-light);
   border-radius: 50px;
+  border: 1px solid var(--gray-highlight);
   font-size: 11px;
   text-transform: capitalize;
   padding: 4px 8px;
