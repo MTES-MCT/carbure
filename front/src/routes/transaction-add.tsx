@@ -10,10 +10,14 @@ import useTransactionAdd from "../hooks/use-transaction-add"
 
 type TransactionAddProps = {
   entity: EntitySelection
+  refresh: () => void
 }
 
-const TransactionAdd = ({ entity }: TransactionAddProps) => {
-  const { form, request, change, submit, close } = useTransactionAdd(entity)
+const TransactionAdd = ({ entity, refresh }: TransactionAddProps) => {
+  const { form, request, change, submit, close } = useTransactionAdd(
+    entity,
+    refresh
+  )
 
   if (entity.selected === null) {
     return <Redirect to="/transactions" />

@@ -13,7 +13,8 @@ import { updateLot } from "../services/lots"
 
 export default function useTransactionDetails(
   entity: EntitySelection,
-  transactions: Lots | null
+  transactions: Lots | null,
+  refresh: () => void
 ) {
   const close = useClose("/transactions")
   const params: { id: string } = useParams()
@@ -39,7 +40,7 @@ export default function useTransactionDetails(
 
   function submit() {
     if (entity.selected && form) {
-      resolve(entity.selected.id, transactionID, form).then(close)
+      resolve(entity.selected.id, transactionID, form).then(close).then(refresh)
     }
   }
 
