@@ -3,6 +3,7 @@ import cl from "clsx"
 import { useHistory } from "react-router-dom"
 
 import { Transaction, Lots, LotStatus } from "../services/types"
+import { TransactionSelection } from "../hooks/use-transactions"
 import { PageSelection } from "./system/pagination"
 import { ApiState } from "../hooks/helpers/use-api"
 
@@ -59,117 +60,104 @@ const TwoLines = ({ top, bottom }: { top: string; bottom: string }) => (
   </div>
 )
 
+function stopProp(handler: Function = () => {}) {
+  return (e: React.SyntheticEvent) => {
+    e.stopPropagation()
+    handler()
+  }
+}
+
 type TransactionRowProps = {
   transaction: Transaction
-  onDelete: (id: number) => void
-  onDuplicate: (id: number) => void
-  onValidate: (id: number) => void
+  selected: boolean
+  onDelete: () => void
+  onDuplicate: () => void
+  onValidate: () => void
+  onSelect: () => void
 }
 
 const TransactionRow = ({
-  transaction,
+  transaction: tx,
+  selected,
   onDelete,
   onDuplicate,
   onValidate,
+  onSelect,
 }: TransactionRowProps) => {
   const history = useHistory()
-
-  function handleDuplicate(e: React.MouseEvent) {
-    e.stopPropagation()
-    onDuplicate(transaction.id)
-  }
-
-  function handleDelete(e: React.MouseEvent) {
-    e.stopPropagation()
-    onDelete(transaction.id)
-  }
-
-  function handleValidate(e: React.MouseEvent) {
-    e.stopPropagation()
-    onValidate(transaction.id)
-  }
 
   return (
     <tr
       className={styles.transactionRow}
-      onClick={() => history.push(`/transactions/${transaction.id}`)}
+      onClick={() => history.push(`/transactions/${tx.id}`)}
     >
       <td>
-        <input type="checkbox" name={transaction.dae} />
-      </td>
-
-      <td>
-        <Status value={getStatus(transaction)} />
-      </td>
-
-      <td>
-        <Line text={transaction.lot.period} />
-      </td>
-
-      <td>
-        <Line text={transaction.dae} />
-      </td>
-
-      <td>
-        <Line
-          text={
-            transaction.carbure_client?.name ?? transaction.unknown_client ?? ""
-          }
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={onSelect}
+          onClick={stopProp()}
         />
       </td>
 
       <td>
-        <TwoLines
-          top={transaction.lot.biocarburant.name}
-          bottom={`${transaction.lot.volume}L`}
-        />
+        <Status value={getStatus(tx)} />
+      </td>
+
+      <td>
+        <Line text={tx.lot.period} />
+      </td>
+
+      <td>
+        <Line text={tx.dae} />
+      </td>
+
+      <td>
+        <Line text={tx.carbure_client?.name ?? tx.unknown_client ?? ""} />
+      </td>
+
+      <td>
+        <TwoLines top={tx.lot.biocarburant.name} bottom={`${tx.lot.volume}L`} />
       </td>
 
       <td>
         <TwoLines
-          top={
-            transaction.lot.carbure_producer?.name ??
-            transaction.lot.unknown_producer
-          }
+          top={tx.lot.carbure_producer?.name ?? tx.lot.unknown_producer}
           bottom={
-            transaction.lot.carbure_production_site?.country.name ??
-            transaction.lot.unknown_production_country
+            tx.lot.carbure_production_site?.country.name ??
+            tx.lot.unknown_production_country
           }
         />
       </td>
 
       <td>
         <TwoLines
-          top={
-            transaction.carbure_delivery_site?.city ??
-            transaction.unknown_delivery_site ??
-            ""
-          }
+          top={tx.carbure_delivery_site?.city ?? tx.unknown_delivery_site ?? ""}
           bottom={
-            transaction.carbure_delivery_site?.country.name ??
-            transaction.unknown_delivery_site_country?.name
+            tx.carbure_delivery_site?.country.name ??
+            tx.unknown_delivery_site_country?.name
           }
         />
       </td>
 
       <td>
         <TwoLines
-          top={transaction.lot.matiere_premiere.name}
-          bottom={transaction.lot.pays_origine.name}
+          top={tx.lot.matiere_premiere.name}
+          bottom={tx.lot.pays_origine.name}
         />
       </td>
 
       <td>
-        <Line text={`${transaction.lot.ghg_reduction}%`} />
+        <Line text={`${tx.lot.ghg_reduction}%`} />
       </td>
 
       <td className={styles.actionColumn}>
         <ChevronRight className={styles.transactionArrow} />
 
         <div className={styles.transactionActions}>
-          <Copy title="Dupliquer le lot" onClick={handleDuplicate} />
-          <Check title="Valider le lot" onClick={handleValidate} />
-          <Cross title="Supprimer le lot" onClick={handleDelete} />
+          <Copy title="Dupliquer le lot" onClick={stopProp(onDuplicate)} />
+          <Check title="Valider le lot" onClick={stopProp(onValidate)} />
+          <Cross title="Supprimer le lot" onClick={stopProp(onDelete)} />
         </div>
       </td>
     </tr>
@@ -179,6 +167,7 @@ const TransactionRow = ({
 type TransactionListProps = {
   transactions: ApiState<Lots>
   pagination: PageSelection
+  selection: TransactionSelection
   onDelete: (id: number) => void
   onDuplicate: (id: number) => void
   onValidate: (id: number) => void
@@ -186,6 +175,7 @@ type TransactionListProps = {
 
 const TransactionList = ({
   transactions,
+  selection,
   pagination,
   onDelete,
   onDuplicate,
@@ -217,14 +207,20 @@ const TransactionList = ({
 
       {!isError && !isEmpty && (
         <React.Fragment>
-          <Table columns={COLUMNS} rows={tx!.lots}>
-            {(transaction) => (
+          <Table
+            columns={COLUMNS}
+            rows={tx!.lots}
+            onSelectAll={selection.selectAll}
+          >
+            {(tx) => (
               <TransactionRow
-                key={transaction.id}
-                transaction={transaction}
-                onDelete={onDelete}
-                onDuplicate={onDuplicate}
-                onValidate={onValidate}
+                key={tx.id}
+                transaction={tx}
+                selected={selection.has(tx.id)}
+                onSelect={() => selection.selectOne(tx.id)}
+                onDelete={() => onDuplicate(tx.id)}
+                onDuplicate={() => onValidate(tx.id)}
+                onValidate={() => onDelete(tx.id)}
               />
             )}
           </Table>

@@ -22,6 +22,7 @@ const Transactions = ({ entity }: TransactionsProps) => {
     pagination,
     snapshot,
     transactions,
+    selection,
     deleter,
     duplicator,
     validator,
@@ -41,6 +42,7 @@ const Transactions = ({ entity }: TransactionsProps) => {
 
       <TransactionList
         transactions={transactions}
+        selection={selection}
         pagination={pagination}
         onDelete={deleter.resolve}
         onDuplicate={duplicator.resolve}
