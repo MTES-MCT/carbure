@@ -237,15 +237,22 @@ type TableProps<T> = SystemProps &
     rows: T[]
     columns: string[]
     children: (row: T, i: number) => React.ReactNode
+    onSelectAll: (e: React.ChangeEvent<HTMLInputElement>) => void
   }
 
-export function Table<T>({ columns, rows, children, ...props }: TableProps<T>) {
+export function Table<T>({
+  columns,
+  rows,
+  children,
+  onSelectAll,
+  ...props
+}: TableProps<T>) {
   return (
     <table {...props} className={styles.table}>
       <thead>
         <tr className={styles.header}>
           <th>
-            <input type="checkbox" />
+            <input type="checkbox" onChange={onSelectAll} />
           </th>
           {columns.map((column) => (
             <th key={column}>{column}</th>

@@ -49,6 +49,40 @@ function useFilterSelection(): FilterSelection {
   return { selected, selectFilter }
 }
 
+export type TransactionSelection = {
+  has: (id: number) => boolean
+  selectOne: (id: number) => void
+  selectAll: (e: React.ChangeEvent<HTMLInputElement>) => void
+}
+
+function useTransactionSelection(
+  transactions: Lots | null
+): TransactionSelection {
+  const [selected, setSelected] = useState<number[]>([])
+
+  function has(id: number) {
+    return selected.includes(id)
+  }
+
+  function selectOne(id: number) {
+    if (has(id)) {
+      setSelected(selected.filter((sid) => sid !== id))
+    } else {
+      setSelected([...selected, id])
+    }
+  }
+
+  function selectAll(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.checked && transactions) {
+      setSelected(transactions.lots.map((tx) => tx.id))
+    } else {
+      setSelected([])
+    }
+  }
+
+  return { has, selectOne, selectAll }
+}
+
 // fetches current snapshot when parameters change
 function useGetSnapshot(
   entity: EntitySelection
@@ -148,6 +182,8 @@ export default function useTransactions(entity: EntitySelection) {
     resolveGetSnapshot()
   }
 
+  const selection = useTransactionSelection(transactions.data)
+
   const deleter = useDeleteLots(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
   const validator = useValidateLots(entity, refresh)
@@ -158,6 +194,7 @@ export default function useTransactions(entity: EntitySelection) {
     pagination,
     snapshot,
     transactions,
+    selection,
     deleter,
     duplicator,
     validator,
