@@ -73,28 +73,21 @@ type ActionProps = {
   onValidate: () => void
 }
 
-const Actions = ({ disabled, onDelete, onValidate }: ActionProps) => {
-  return (
-    <Box row className={cl(styles.actionBar)}>
-      <Button
-        disabled={disabled}
-        icon={Check}
-        level="primary"
-        onClick={onValidate}
-      >
-        Valider la sélection
-      </Button>
-      <Button
-        disabled={disabled}
-        icon={Cross}
-        level="danger"
-        onClick={onDelete}
-      >
-        Supprimer la sélection
-      </Button>
-    </Box>
-  )
-}
+const Actions = ({ disabled, onDelete, onValidate }: ActionProps) => (
+  <Box row className={cl(styles.actionBar)}>
+    <Button
+      disabled={disabled}
+      icon={Check}
+      level="primary"
+      onClick={onValidate}
+    >
+      Valider la sélection
+    </Button>
+    <Button disabled={disabled} icon={Cross} level="danger" onClick={onDelete}>
+      Supprimer la sélection
+    </Button>
+  </Box>
+)
 
 type TransactionRowProps = {
   transaction: Transaction
@@ -213,6 +206,10 @@ const TransactionList = ({
   const tx = transactions.data
   const ids = tx ? tx.lots.map((t) => t.id) : []
 
+  const allSelected =
+    selection.selected.length > 0 &&
+    selection.selected.every((id, i) => ids[i] === id)
+
   const isLoading = transactions.loading
   const isError = typeof transactions.error === "string"
   const isEmpty = tx === null || tx.lots.length === 0
@@ -246,6 +243,7 @@ const TransactionList = ({
           <Table
             columns={COLUMNS}
             rows={tx!.lots}
+            selected={allSelected}
             onSelectAll={(e) => selection.selectMany(e, ids)}
           >
             {(tx) => (
