@@ -5,6 +5,8 @@ urlpatterns = [
     # GET
     path('', views.get_lots, name='api-v3-lots-get'),
     path('snapshot', views.get_snapshot, name='api-v3-lots-get-snapshot'),
+    path('summary-in', views.get_summary_in, name='api-v3-lots-get-summary-in'),
+    path('summary-out', views.get_summary_out, name='api-v3-lots-get-summary-out'),
 
     # POST
     path('add', views.add_lot, name='api-v3-add-lot'),
