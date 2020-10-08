@@ -31,7 +31,7 @@
 .button:hover {
   color: var(--blue-medium);
   border-color: var(--blue-medium);
-  background-color: var(--gray-light);
+  background-color: var(--gray-highlight);
 }
 
 .button:active {
@@ -65,6 +65,18 @@
   color: var(--white);
   background-color: var(--orange-dark);
   border-color: var(--orange-dark);
+}
+
+.buttonDanger {
+  color: var(--red-dark);
+  background-color: var(--red-light);
+  border-color: var(--red-medium);
+}
+
+.buttonDanger:hover {
+  color: var(--white);
+  background-color: var(--red-dark);
+  border-color: var(--red-dark);
 }
 
 /* STATUS BUTTON */

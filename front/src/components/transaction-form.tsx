@@ -138,6 +138,31 @@ const TransactionForm = ({
                 getQuery={findProductionSites}
                 onChange={onChange}
               />
+              <LabelInput
+                disabled
+                readOnly
+                label="Pays de production"
+                value={tx.carbure_production_site?.country?.name}
+              />
+              <LabelInput
+                readOnly
+                disabled
+                type="date"
+                label="Date de mise en service"
+                value={tx.carbure_production_site?.date_mise_en_service}
+              />
+              <LabelInput
+                readOnly
+                disabled
+                label="N° d'enregistrement double-compte"
+                value=""
+              />
+              <LabelInput
+                readOnly
+                disabled
+                label="Référence Système Fournisseur"
+                value=""
+              />
             </React.Fragment>
           ) : (
             <React.Fragment>
@@ -155,46 +180,45 @@ const TransactionForm = ({
                 value={tx.unknown_production_site}
                 onChange={onChange}
               />
+              <AutoComplete
+                disabled={tx.producer_is_in_carbure}
+                readOnly={readOnly}
+                label="Pays de production"
+                placeholder="Rechercher un pays..."
+                name="unknown_production_country"
+                value={tx.unknown_production_country}
+                getValue={getters.code_pays}
+                getLabel={getters.name}
+                getQuery={findCountries}
+                onChange={onChange}
+              />
+              <LabelInput
+                readOnly={readOnly}
+                disabled={tx.producer_is_in_carbure}
+                type="date"
+                label="Date de mise en service"
+                name="unknown_production_site_com_date"
+                value={tx.unknown_production_site_com_date}
+                onChange={onChange}
+              />
+              <LabelInput
+                readOnly={readOnly}
+                disabled={tx.producer_is_in_carbure}
+                label="N° d'enregistrement double-compte"
+                name="unknown_production_site_dbl_counting"
+                value={tx.unknown_production_site_dbl_counting}
+                onChange={onChange}
+              />
+              <LabelInput
+                readOnly={readOnly}
+                disabled={tx.producer_is_in_carbure}
+                label="Référence Système Fournisseur"
+                name="unknown_production_site_reference"
+                value={tx.unknown_production_site_reference}
+                onChange={onChange}
+              />
             </React.Fragment>
           )}
-
-          <AutoComplete
-            disabled={tx.producer_is_in_carbure}
-            readOnly={readOnly}
-            label="Pays de production"
-            placeholder="Rechercher un pays..."
-            name="unknown_production_country"
-            value={tx.unknown_production_country}
-            getValue={getters.code_pays}
-            getLabel={getters.name}
-            getQuery={findCountries}
-            onChange={onChange}
-          />
-          <LabelInput
-            readOnly={readOnly}
-            disabled={tx.producer_is_in_carbure}
-            label="N° d'enregistrement double-compte"
-            name="unknown_production_site_dbl_counting"
-            value={tx.unknown_production_site_dbl_counting}
-            onChange={onChange}
-          />
-          <LabelInput
-            readOnly={readOnly}
-            disabled={tx.producer_is_in_carbure}
-            label="Référence Système Fournisseur"
-            name="unknown_production_site_reference"
-            value={tx.unknown_production_site_reference}
-            onChange={onChange}
-          />
-          <LabelInput
-            readOnly={readOnly}
-            disabled={tx.producer_is_in_carbure}
-            type="date"
-            label="Date de mise en service"
-            name="unknown_production_site_com_date"
-            value={tx.unknown_production_site_com_date}
-            onChange={onChange}
-          />
         </Box>
 
         <Box className={styles.middleColumn}>
@@ -258,6 +282,14 @@ const TransactionForm = ({
             </React.Fragment>
           )}
 
+          {tx.delivery_site_is_in_carbure ? (
+          <LabelInput
+            disabled
+            readOnly
+            label="Pays de livraison"
+            value={tx.carbure_delivery_site?.country?.name}
+          />
+          ) : (
           <AutoComplete
             disabled={tx.delivery_site_is_in_carbure}
             readOnly={readOnly}
@@ -269,6 +301,7 @@ const TransactionForm = ({
             getQuery={findCountries}
             onChange={onChange}
           />
+          )}
 
           <LabelInput
             readOnly={readOnly}
@@ -391,7 +424,7 @@ const TransactionForm = ({
       </Box>
 
       {error && (
-        <Alert kind="error" className={styles.transactionError}>
+        <Alert level="error" className={styles.transactionError}>
           {error}
         </Alert>
       )}

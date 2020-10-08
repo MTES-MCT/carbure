@@ -39,21 +39,22 @@ export const Main = (props: BoxProps) => <Box {...props} as="main" />
 type ButtonProps = SystemProps &
   React.HTMLProps<HTMLButtonElement> & {
     submit?: boolean
-    kind?: string
+    level?: "primary" | "warning" | "danger"
     icon?: React.ComponentType
   }
 
 export const Button = ({
   submit = false,
   icon: Icon,
-  kind,
+  level,
   className,
   children,
   ...props
 }: ButtonProps) => {
   const btnClassName = cl(styles.button, className, {
-    [styles.buttonPrimary]: kind === "primary",
-    [styles.buttonWarning]: kind === "warning",
+    [styles.buttonPrimary]: level === "primary",
+    [styles.buttonWarning]: level === "warning",
+    [styles.buttonDanger]: level === "danger",
   })
 
   return (
@@ -119,20 +120,20 @@ export const StatusButton = ({
 
 type AlertProps = SystemProps &
   React.HTMLProps<HTMLDivElement> & {
-    kind?: string
+    level?: "warning" | "error" | "info"
     onClose?: (event: React.MouseEvent) => void
   }
 
 export const Alert = ({
-  kind: type,
+  level,
   children,
   className,
   onClose,
   ...props
 }: AlertProps) => {
   const divClassName = cl(styles.alert, className, {
-    [styles.alertWarning]: type === "warning",
-    [styles.alertError]: type === "error",
+    [styles.alertWarning]: level === "warning",
+    [styles.alertError]: level === "error",
   })
 
   return (
@@ -236,16 +237,25 @@ type TableProps<T> = SystemProps &
   Omit<React.HTMLProps<HTMLTableElement>, "rows"> & {
     rows: T[]
     columns: string[]
+    selected: boolean
     children: (row: T, i: number) => React.ReactNode
+    onSelectAll: (e: React.ChangeEvent<HTMLInputElement>) => void
   }
 
-export function Table<T>({ columns, rows, children, ...props }: TableProps<T>) {
+export function Table<T>({
+  columns,
+  rows,
+  selected,
+  children,
+  onSelectAll,
+  ...props
+}: TableProps<T>) {
   return (
     <table {...props} className={styles.table}>
       <thead>
         <tr className={styles.header}>
           <th>
-            <input type="checkbox" />
+            <input type="checkbox" checked={selected} onChange={onSelectAll} />
           </th>
           {columns.map((column) => (
             <th key={column}>{column}</th>

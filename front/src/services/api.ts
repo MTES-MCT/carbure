@@ -29,7 +29,9 @@ function toFormData(obj: any): FormData {
   const formData = new FormData()
 
   for (const key in obj) {
-    if (obj[key] || obj[key] === 0) {
+    if (Array.isArray(obj[key])) {
+      obj[key].forEach((value: any) => formData.append(key, value.toString()))
+    } else if (obj[key] || obj[key] === 0) {
       formData.append(key, obj[key].toString())
     }
   }
@@ -40,6 +42,10 @@ function toFormData(obj: any): FormData {
 // check if the api response is correct and return its data
 // if there's a problem, throw an error
 async function checkResponse<T>(res: Response): Promise<T> {
+  if (res.status === 500) {
+    throw new Error("Erreur serveur")
+  }
+
   const json: ApiResponse<T> = await res.json()
 
   // if the response contains an error, throw it so we can catch it elsewhere

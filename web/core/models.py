@@ -312,6 +312,9 @@ class LotV2Error(models.Model):
     def __str__(self):
         return self.error
 
+    def natural_key(self):
+        return {'lot_id': self.lot.id, 'field': self.field, 'value': self.value, 'error': self.error}
+
     class Meta:
         db_table = 'lotsv2_errors'
         verbose_name = 'LotV2Error'
@@ -326,6 +329,9 @@ class TransactionError(models.Model):
 
     def __str__(self):
         return self.error
+
+    def natural_key(self):
+        return {'tx_id': self.tx.id, 'field': self.field, 'value': self.value, 'error': self.error}
 
     class Meta:
         db_table = 'tx_errors'

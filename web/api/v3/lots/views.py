@@ -82,17 +82,17 @@ def get_lots(request):
         txs = txs.filter(Q(carbure_client__name__in=clients) | Q(unknown_client__in=clients))
 
     if query:
-        txs = transactions.filter(Q(lot__matiere_premiere__name__icontains=query) |
-                                  Q(lot__biocarburant__name__icontains=query) |
-                                  Q(lot__carbure_producer__name__icontains=query) |
-                                  Q(lot__unknown_producer__icontains=query) |
-                                  Q(lot__carbure_id__icontains=query) |
-                                  Q(lot__pays_origine__name__icontains=query) |
-                                  Q(carbure_client__name__icontains=query) |
-                                  Q(unknown_client__icontains=query) |
-                                  Q(carbure_delivery_site__name__icontains=query) |
-                                  Q(unknown_delivery_site__icontains=query)
-                                  )
+        txs = txs.filter(Q(lot__matiere_premiere__name__icontains=query) |
+                         Q(lot__biocarburant__name__icontains=query) |
+                         Q(lot__carbure_producer__name__icontains=query) |
+                         Q(lot__unknown_producer__icontains=query) |
+                         Q(lot__carbure_id__icontains=query) |
+                         Q(lot__pays_origine__name__icontains=query) |
+                         Q(carbure_client__name__icontains=query) |
+                         Q(unknown_client__icontains=query) |
+                         Q(carbure_delivery_site__name__icontains=query) |
+                         Q(unknown_delivery_site__icontains=query)
+        )
 
 
     limit = int(limit)
@@ -105,22 +105,17 @@ def get_lots(request):
     for err in raw_lot_errors:
         if err.id not in lot_errors:
             lot_errors[err.id] = []
-        lot_errors[err.id].append(err)
+        lot_errors[err.id].append(err.natural_key())
     raw_tx_errors = TransactionError.objects.filter(id__in=[t.id for t in returned])
     tx_errors = {}
     for err in raw_tx_errors:
         if err.id not in tx_errors:
             tx_errors[err.id] = []
-        tx_errors[err.id].append(err)
+        tx_errors[err.id].append(err.natural_key())
 
-    for t in returned:
-        t.errors = []
-        t.lot.errors = []
-        if t.id in tx_errors:
-            t.errors = tx_errors[t.id]
-        if t.lot.id in lot_errors:
-            t.lot.errors = lot_errors[t.lot.id]
     data['lots'] = [t.natural_key() for t in returned]
+    data['lots_errors'] = lot_errors
+    data['tx_errors'] = tx_errors
     data['total'] = len(txs)
     data['returned'] = len(returned)
     data['from'] = from_idx
@@ -312,7 +307,7 @@ def delete_lot(request):
 
 
 def validate_lot(request):
-    tx_ids = request.POST.get('tx_ids', None)
+    tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
     validate_lots(request.user, tx_ids)
@@ -320,7 +315,7 @@ def validate_lot(request):
 
 
 def accept_lot(request):
-    tx_ids = request.POST.get('tx_ids', None)
+    tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
     for tx_id in tx_ids:
