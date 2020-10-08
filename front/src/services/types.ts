@@ -64,6 +64,7 @@ export interface ProductionSite {
   id: number
   name: string
   country: Country
+  date_mise_en_service: string
 }
 
 export interface ProductionSiteDetails extends ProductionSite {
