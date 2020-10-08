@@ -1,9 +1,8 @@
 import datetime
 import calendar
 import dateutil.relativedelta
-from django.db.models import Q
+from django.db.models import Q, F, Case, When, Count
 from django.db.models.functions import TruncMonth
-from django.db.models import Count
 from django.db.models.fields import NOT_PROVIDED
 from django.http import JsonResponse, HttpResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError
@@ -12,6 +11,14 @@ from core.xlsx_template import create_xslx_from_transactions, create_template_xl
 from core.xlsx_template import create_template_xlsx_v2_advanced
 from core.common import validate_lots, load_excel_file, load_lot
 from api.v3.sanity_checks import sanity_check
+
+
+sort_key_to_django_field = {'period' : 'lot__period',
+                            'biocarburant': 'lot__biocarburant__name',
+                            'matiere_premiere': 'lot__matiere_premiere__name',
+                            'ghg_reduction': 'lot__ghg_reduction',
+                            'volume': 'lot__volume',
+                            'pays_origine': 'lot__pays_origine__name'}
 
 
 def get_lots(request):
@@ -28,6 +35,8 @@ def get_lots(request):
     from_idx = request.GET.get('from_idx', "0")
     export = request.GET.get('export', False)
     query = request.GET.get('query', False)
+    sort_by = request.GET.get('sort_by', False)
+    order = request.GET.get('order', False)
 
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
@@ -97,6 +106,21 @@ def get_lots(request):
 
     limit = int(limit)
     from_idx = int(from_idx)
+    if sort_by:
+        if sort_by in sort_key_to_django_field:
+            key = sort_key_to_django_field[sort_by]
+            if order == 'desc':
+                txs = txs.order_by('-%s' % key)
+            else:
+                txs = txs.order_by(key)
+        elif sort_by == 'client':
+            txs = txs.annotate(client=Case(When(client_is_in_carbure=True, then=F('carbure_client__name')), default=F('unknown_client')))
+            if order == 'desc':
+                txs = txs.order_by('-client')
+            else:
+                txs = txs.order_by('client')
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Unknown sort_by key'}, status=400)
     returned = txs[from_idx:from_idx+limit]
 
     data = {}
