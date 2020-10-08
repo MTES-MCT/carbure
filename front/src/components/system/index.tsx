@@ -236,29 +236,23 @@ export const SearchInput = ({ className, ...props }: InputProps) => (
 type TableProps<T> = SystemProps &
   Omit<React.HTMLProps<HTMLTableElement>, "rows"> & {
     rows: T[]
-    columns: string[]
-    selected: boolean
+    columns: React.ReactNode[]
     children: (row: T, i: number) => React.ReactNode
-    onSelectAll: (e: React.ChangeEvent<HTMLInputElement>) => void
   }
 
 export function Table<T>({
   columns,
   rows,
-  selected,
   children,
-  onSelectAll,
+  className,
   ...props
 }: TableProps<T>) {
   return (
-    <table {...props} className={styles.table}>
+    <table {...props} className={cl(styles.table, className)}>
       <thead>
         <tr className={styles.header}>
-          <th>
-            <input type="checkbox" checked={selected} onChange={onSelectAll} />
-          </th>
-          {columns.map((column) => (
-            <th key={column}>{column}</th>
+          {columns.map((column, i) => (
+            <th key={i}>{column}</th>
           ))}
           <th />
         </tr>
