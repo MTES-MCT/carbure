@@ -14,6 +14,7 @@ import {
   duplicateLot,
   validateLots,
 } from "../services/lots"
+import confirm from "../components/system/confirm"
 
 export type StatusSelection = {
   active: LotStatus
@@ -153,8 +154,13 @@ function useGetLots(
 function useDuplicateLot(entity: EntitySelection, refresh: () => void) {
   const [request, resolveDuplicate] = useAPI(duplicateLot)
 
-  function resolve(lotID: number) {
-    if (entity.selected && window.confirm("Voulez vous dupliquer ce lot ?")) {
+  async function resolve(lotID: number) {
+    const shouldDuplicate = await confirm(
+      "Dupliquer lots",
+      "Voulez vous dupliquer ce lot ?"
+    )
+
+    if (entity.selected && shouldDuplicate) {
       resolveDuplicate(entity.selected.id, lotID).then(refresh)
     }
   }
@@ -165,8 +171,13 @@ function useDuplicateLot(entity: EntitySelection, refresh: () => void) {
 function useDeleteLots(entity: EntitySelection, refresh: () => void) {
   const [request, resolveDelete] = useAPI(deleteLots)
 
-  function resolve(lotIDs: number[]) {
-    if (entity.selected && window.confirm("Voulez vous supprimer ce lot ?")) {
+  async function resolve(lotIDs: number[]) {
+    const shouldDelete = await confirm(
+      "Supprimer lots",
+      "Voulez vous supprimer ce(s) lot(s) ?"
+    )
+
+    if (entity.selected && shouldDelete) {
       resolveDelete(entity.selected.id, lotIDs).then(refresh)
     }
   }
@@ -177,8 +188,13 @@ function useDeleteLots(entity: EntitySelection, refresh: () => void) {
 function useValidateLots(entity: EntitySelection, refresh: () => void) {
   const [request, resolveValidate] = useAPI(validateLots)
 
-  function resolve(lotIDs: number[]) {
-    if (entity.selected && window.confirm("Voulez vous envoyer ce lot ?")) {
+  async function resolve(lotIDs: number[]) {
+    const shouldValidate = await confirm(
+      "Envoyer lots",
+      "Voulez vous envoyer ce(s) lot(s) ?"
+    )
+
+    if (entity.selected && shouldValidate) {
       resolveValidate(entity.selected.id, lotIDs).then(refresh)
     }
   }
