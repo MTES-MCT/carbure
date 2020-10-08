@@ -215,6 +215,71 @@ def get_snapshot(request):
     data['deadlines'] = list(deadlines)
     return JsonResponse({'status': 'success', 'data': data})
 
+def get_summary_in(request):
+    entity = request.GET.get('entity_id', False)
+    if entity is None:
+        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
+    try:
+        entity = Entity.objects.get(id=entity)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity), 'extra': str(e)},
+                            status=400)
+
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    if entity not in rights:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+    # get my pending incoming lots
+    txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status='N')
+
+    # group / summary
+    data = {}
+    for t in txs:
+        delivery_site = t.carbure_delivery_site.name if t.delivery_site_is_in_carbure and t.carbure_delivery_site else t.unknown_delivery_site
+        if delivery_site not in data:
+            data[delivery_site] = {}
+        if t.carbure_vendor.name not in data[delivery_site]:
+            data[delivery_site][t.carbure_vendor.name] = {}
+        if t.lot.biocarburant.name not in data[delivery_site][t.carbure_vendor.name]:
+            data[delivery_site][t.carbure_vendor.name][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0}
+        line = data[delivery_site][t.carbure_vendor.name][t.lot.biocarburant.name]
+        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] + t.lot.volume * t.lot.ghg_reduction) / (line['volume'] + t.lot.volume)
+        line['volume'] += t.lot.volume
+    return JsonResponse({'status': 'success', 'data': data})
+
+
+def get_summary_out(request):
+    entity = request.GET.get('entity_id', False)
+    if entity is None:
+        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
+    try:
+        entity = Entity.objects.get(id=entity)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity), 'extra': str(e)},
+                            status=400)
+
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    if entity not in rights:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+    # get my pending sent lots
+    txs = LotTransaction.objects.filter(carbure_vendor=entity, lot__status='Validated', delivery_status='N')
+
+    # group / summary
+    data = {}
+    for t in txs:
+        client_name = t.carbure_client.name if t.client_is_in_carbure and t.carbure_client else t.unknown_client
+        if client_name not in data:
+            data[client_name] = {}
+        delivery_site = t.carbure_delivery_site.name if t.delivery_site_is_in_carbure and t.carbure_delivery_site else t.unknown_delivery_site
+        if delivery_site not in data[client_name]:
+            data[client_name][delivery_site] = {}
+        if t.lot.biocarburant.name not in data[client_name][delivery_site]:
+            data[client_name][delivery_site][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0}
+        line = data[client_name][delivery_site][t.lot.biocarburant.name]
+        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] + t.lot.volume * t.lot.ghg_reduction) / (line['volume'] + t.lot.volume)
+        line['volume'] += t.lot.volume
+    return JsonResponse({'status': 'success', 'data': data})
 
 def add_lot(request):
     entity_id = request.POST.get('entity_id', False)
