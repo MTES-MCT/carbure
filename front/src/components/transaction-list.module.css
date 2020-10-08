@@ -35,7 +35,7 @@
 .transactionList table th:nth-child(2),
 .transactionList table th:nth-last-child(2),
 .transactionList table th:last-child {
-  width: 82px;
+  width: 88px;
 }
 
 .actionColumn {

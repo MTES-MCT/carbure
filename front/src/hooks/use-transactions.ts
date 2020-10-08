@@ -23,7 +23,7 @@ export type SearchSelection = {
 
 // manage search query
 function useSearchSelection(): SearchSelection {
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState("")
   return { query, setQuery }
 }
 
@@ -86,6 +86,33 @@ function useTransactionSelection(): TransactionSelection {
   return { selected, has, selectOne, selectMany }
 }
 
+// valeurs acceptables pour le sort_by: ['period', 'client', 'biocarburant', 'matiere_premiere', 'ghg_reduction', 'volume', 'pays_origine']
+
+export type SortingSelection = {
+  column: string
+  order: "asc" | "desc"
+  sortBy: (c: string) => void
+}
+
+function useSortingSelection(): SortingSelection {
+  const [current, setCurrent] = useState<{
+    column: string
+    order: "asc" | "desc"
+  }>({ column: "", order: "asc" })
+
+  function sortBy(column: string) {
+    if (current.column !== column) {
+      return setCurrent({ column, order: "asc" })
+    } else if (current.order === "asc") {
+      return setCurrent({ column, order: "desc" })
+    } else if (current.order === "desc") {
+      return setCurrent({ column: "", order: "asc" })
+    }
+  }
+
+  return { ...current, sortBy }
+}
+
 // fetches current snapshot when parameters change
 function useGetSnapshot(
   entity: EntitySelection
@@ -110,7 +137,8 @@ function useGetLots(
   filters: FilterSelection,
   pagination: PageSelection,
   selection: TransactionSelection,
-  search: SearchSelection
+  search: SearchSelection,
+  sorting: SortingSelection
 ): [ApiState<Lots>, () => void] {
   const [transactions, resolveLots] = useAPI(getLots)
 
@@ -126,6 +154,8 @@ function useGetLots(
         page,
         limit,
         search.query,
+        sorting.column,
+        sorting.order
       )
     }
   }
@@ -138,6 +168,8 @@ function useGetLots(
     page,
     limit,
     search.query,
+    sorting.column,
+    sorting.order,
   ])
 
   // reset page to 0 when filters change
@@ -213,9 +245,10 @@ export default function useTransactions(entity: EntitySelection) {
   const pagination = usePageSelection()
   const selection = useTransactionSelection()
   const search = useSearchSelection()
+  const sorting = useSortingSelection()
 
   const [snapshot, resolveGetSnapshot] = useGetSnapshot(entity)
-  const [transactions, resolveGetLots] = useGetLots(entity, status, filters, pagination, selection, search) // prettier-ignore
+  const [transactions, resolveGetLots] = useGetLots(entity, status, filters, pagination, selection, search, sorting) // prettier-ignore
 
   function refresh() {
     resolveGetLots()
@@ -233,10 +266,11 @@ export default function useTransactions(entity: EntitySelection) {
     snapshot,
     transactions,
     selection,
+    search,
+    sorting,
     deleter,
     duplicator,
     validator,
     refresh,
-    search,
   }
 }

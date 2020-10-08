@@ -279,12 +279,14 @@
   background-color: var(--white);
 }
 
-.header th {
+.table th {
   color: var(--blue-medium);
   text-transform: uppercase;
   text-align: left;
   font-size: 12px;
   padding: 8px;
+  user-select: none;
+  cursor: pointer;
 }
 
 .table tbody tr td {

@@ -1,8 +1,8 @@
 import React from "react"
 import cl from "clsx"
 
-import { Lots, LotStatus, Transaction } from "../services/types"
-import { StatusSelection, TransactionSelection } from "../hooks/use-transactions" // prettier-ignore
+import { Lots, LotStatus } from "../services/types"
+import { StatusSelection, TransactionSelection, SortingSelection } from "../hooks/use-transactions" // prettier-ignore
 import { PageSelection } from "./system/pagination"
 import { ApiState } from "../hooks/helpers/use-api"
 
@@ -16,15 +16,15 @@ import { TransactionRow, TransactionRowContainer } from "./transaction-row"
 // valeurs acceptables pour le sort_by: ['period', 'client', 'biocarburant', 'matiere_premiere', 'ghg_reduction', 'volume', 'pays_origine']
 
 const COLUMNS = [
-  "Statut",
-  "Date d'ajout",
-  "N° Douane",
-  "Client",
-  "Biocarburant",
-  "Provenance",
-  "Destination",
-  "Mat. Première",
-  "Économie",
+  { key: "", label: "Statut" },
+  { key: "period", label: "Date d'ajout" },
+  { key: "", label: "N° Douane" },
+  { key: "client", label: "Client" },
+  { key: "biocarburant", label: "Biocarburant" },
+  { key: "pays_origine", label: "Provenance" },
+  { key: "", label: "Destination" },
+  { key: "matiere_premiere", label: "Mat. Première" },
+  { key: "ghg_reduction", label: "Économie" },
 ]
 
 function stopProp(handler: Function = () => {}) {
@@ -32,6 +32,17 @@ function stopProp(handler: Function = () => {}) {
     e.stopPropagation()
     handler()
   }
+}
+
+function isEverythingSelected(ids: number[], selected: number[]) {
+  ids.sort()
+  selected.sort()
+
+  return (
+    ids.length > 0 &&
+    ids.length === selected.length &&
+    selected.every((id, i) => ids[i] === id)
+  )
 }
 
 type ActionProps = {
@@ -56,33 +67,46 @@ const Actions = ({ disabled, onDelete, onValidate }: ActionProps) => (
   </Box>
 )
 
-function isEverythingSelected(ids: number[], selected: number[]) {
-  ids.sort()
-  selected.sort()
-
-  return (
-    ids.length > 0 &&
-    ids.length === selected.length &&
-    selected.every((id, i) => ids[i] === id)
-  )
+type TxColumnsProps = {
+  sorting: SortingSelection
+  children: React.ReactNode
 }
+
+const TransactionColumns = ({ sorting, children }: TxColumnsProps) => (
+  <thead>
+    <tr>
+      {children}
+      {COLUMNS.map((column, i) => (
+        <th key={i} onClick={() => sorting.sortBy(column.key)}>
+          {column.label}
+          {sorting.column && sorting.column === column.key && (
+            <span>{sorting.order === "asc" ? " ▲" : " ▼"}</span>
+          )}
+        </th>
+      ))}
+      <th />
+    </tr>
+  </thead>
+)
 
 type DraftTableProps = {
   transactions: Lots
   selection: TransactionSelection
+  sorting: SortingSelection
   onDelete: (ids: number[]) => void
   onValidate: (ids: number[]) => void
   onDuplicate: (id: number) => void
 }
 
 const DraftTable = ({
-  transactions: tx,
+  transactions,
+  sorting,
   selection,
   onDelete,
   onDuplicate,
   onValidate,
 }: DraftTableProps) => {
-  const ids = tx ? tx.lots.map((t) => t.id) : []
+  const ids = transactions ? transactions.lots.map((t) => t.id) : []
 
   const selectAllCheckbox = (
     <input
@@ -93,71 +117,79 @@ const DraftTable = ({
   )
 
   return (
-    <Table
-      columns={[selectAllCheckbox, ...COLUMNS]}
-      rows={tx!.lots}
-      className={styles.draftTransactionTable}
-    >
-      {(tx) => (
-        <TransactionRowContainer key={tx.id} id={tx.id}>
-          <td>
-            <input
-              type="checkbox"
-              checked={selection.has(tx.id)}
-              onChange={() => selection.selectOne(tx.id)}
-              onClick={stopProp()}
-            />
-          </td>
+    <Table className={styles.draftTransactionTable}>
+      <TransactionColumns sorting={sorting}>
+        <th>{selectAllCheckbox}</th>
+      </TransactionColumns>
 
-          <TransactionRow transaction={tx} />
+      <tbody>
+        {transactions.lots.map((tx) => (
+          <TransactionRowContainer key={tx.id} id={tx.id}>
+            <td>
+              <input
+                type="checkbox"
+                checked={selection.has(tx.id)}
+                onChange={() => selection.selectOne(tx.id)}
+                onClick={stopProp()}
+              />
+            </td>
 
-          <td className={styles.actionColumn}>
-            <ChevronRight className={styles.transactionArrow} />
+            <TransactionRow transaction={tx} />
 
-            <div className={styles.transactionActions}>
-              <Copy
-                title="Dupliquer le lot"
-                onClick={stopProp(() => onDuplicate(tx.id))}
-              />
-              <Check
-                title="Envoyer le lot"
-                onClick={stopProp(() => onValidate([tx.id]))}
-              />
-              <Cross
-                title="Supprimer le lot"
-                onClick={stopProp(() => onDelete([tx.id]))}
-              />
-            </div>
-          </td>
-        </TransactionRowContainer>
-      )}
+            <td className={styles.actionColumn}>
+              <ChevronRight className={styles.transactionArrow} />
+
+              <div className={styles.transactionActions}>
+                <Copy
+                  title="Dupliquer le lot"
+                  onClick={stopProp(() => onDuplicate(tx.id))}
+                />
+                <Check
+                  title="Envoyer le lot"
+                  onClick={stopProp(() => onValidate([tx.id]))}
+                />
+                <Cross
+                  title="Supprimer le lot"
+                  onClick={stopProp(() => onDelete([tx.id]))}
+                />
+              </div>
+            </td>
+          </TransactionRowContainer>
+        ))}
+      </tbody>
     </Table>
   )
 }
 
-const TransactionTable = ({ transactions: tx }: { transactions: Lots }) => (
-  <Table
-    columns={[null, ...COLUMNS]}
-    rows={tx!.lots}
-    className={styles.transactionTable}
-  >
-    {(tx) => (
-      <TransactionRowContainer key={tx.id} id={tx.id}>
-        <td />
+type TxTableProps = {
+  transactions: Lots
+  sorting: SortingSelection
+}
 
-        <TransactionRow transaction={tx} />
+const TransactionTable = ({ transactions, sorting }: TxTableProps) => (
+  <Table className={styles.transactionTable}>
+    <TransactionColumns sorting={sorting}>
+      <th /> {/* empty first column */}
+    </TransactionColumns>
 
-        <td className={styles.actionColumn}>
-          <ChevronRight className={styles.transactionArrow} />
-        </td>
-      </TransactionRowContainer>
-    )}
+    <tbody>
+      {transactions.lots.map((tx) => (
+        <TransactionRowContainer key={tx.id} id={tx.id}>
+          <td /> {/* empty first column */}
+          <TransactionRow transaction={tx} />
+          <td className={styles.actionColumn}>
+            <ChevronRight className={styles.transactionArrow} />
+          </td>
+        </TransactionRowContainer>
+      ))}
+    </tbody>
   </Table>
 )
 
 type TransactionListProps = {
   transactions: ApiState<Lots>
   status: StatusSelection
+  sorting: SortingSelection
   selection: TransactionSelection
   pagination: PageSelection
   onDelete: (ids: number[]) => void
@@ -168,6 +200,7 @@ type TransactionListProps = {
 const TransactionList = ({
   transactions,
   status,
+  sorting,
   selection,
   pagination,
   onDelete,
@@ -212,12 +245,13 @@ const TransactionList = ({
             <DraftTable
               transactions={tx!}
               selection={selection}
+              sorting={sorting}
               onDuplicate={onDuplicate}
               onValidate={onValidate}
               onDelete={onDelete}
             />
           ) : (
-            <TransactionTable transactions={tx!} />
+            <TransactionTable transactions={tx!} sorting={sorting} />
           )}
 
           <Pagination pagination={pagination} total={tx!.total} />
