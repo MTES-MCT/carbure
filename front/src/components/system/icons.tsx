@@ -128,3 +128,14 @@ export const Loader = ({ className, ...props }: IconProps) => (
     <line x1="7.75" y1="7.75" x2="5.6" y2="5.6" />
   </Icon>
 )
+
+export const Rapport = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-rapport", className)}>
+      <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+      <rect x="9" y="3" width="6" height="4" rx="2" />
+      <line x1="9" y1="12" x2="9.01" y2="12" />
+      <line x1="13" y1="12" x2="15" y2="12" />
+      <line x1="9" y1="16" x2="9.01" y2="16" />
+      <line x1="13" y1="16" x2="15" y2="16" />
+  </Icon> 
+)

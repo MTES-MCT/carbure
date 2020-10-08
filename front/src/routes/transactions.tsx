@@ -10,6 +10,7 @@ import TransactionSnapshot from "../components/transaction-snapshot"
 import TransactionList from "../components/transaction-list"
 import TransactionDetails from "./transaction-details"
 import TransactionAdd from "./transaction-add"
+import TransactionOutSummary from "./transaction-out-summary"
 
 type TransactionsProps = {
   entity: EntitySelection
@@ -55,6 +56,10 @@ const Transactions = ({ entity }: TransactionsProps) => {
       <Switch>
         <Route path="/transactions/add">
           <TransactionAdd entity={entity} refresh={refresh} />
+        </Route>
+
+        <Route path="/transactions/show-summary-out">
+          <TransactionOutSummary entity={entity} />
         </Route>
 
         <Route exact path="/transactions/:id">
