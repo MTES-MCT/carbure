@@ -24,11 +24,12 @@ const Transactions = ({ entity }: TransactionsProps) => {
     snapshot,
     transactions,
     selection,
+    search,
+    sorting,
     deleter,
     duplicator,
     validator,
     refresh,
-    search,
   } = useTransactions(entity)
 
   if (entity.selected === null) {
@@ -47,6 +48,7 @@ const Transactions = ({ entity }: TransactionsProps) => {
       <TransactionList
         transactions={transactions}
         status={status}
+        sorting={sorting}
         selection={selection}
         pagination={pagination}
         onDelete={deleter.resolve}

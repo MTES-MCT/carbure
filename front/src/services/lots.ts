@@ -110,6 +110,8 @@ export function getLots(
   page: number,
   limit: number,
   query: string,
+  sortBy: string,
+  order: string
 ): Promise<Lots> {
   return api.get("/lots", {
     status,
@@ -118,6 +120,8 @@ export function getLots(
     from_idx: page * limit,
     limit: limit,
     query: query,
+    sort_by: sortBy,
+    order: order,
   })
 }
 

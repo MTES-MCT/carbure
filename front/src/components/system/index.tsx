@@ -233,31 +233,12 @@ export const SearchInput = ({ className, ...props }: InputProps) => (
 
 // TABLE COMPONENT
 
-type TableProps<T> = SystemProps &
-  Omit<React.HTMLProps<HTMLTableElement>, "rows"> & {
-    rows: T[]
-    columns: React.ReactNode[]
-    children: (row: T, i: number) => React.ReactNode
-  }
+type TableProps<T> = SystemProps & React.HTMLProps<HTMLTableElement>
 
-export function Table<T>({
-  columns,
-  rows,
-  children,
-  className,
-  ...props
-}: TableProps<T>) {
+export function Table<T>({ children, className, ...props }: TableProps<T>) {
   return (
     <table {...props} className={cl(styles.table, className)}>
-      <thead>
-        <tr className={styles.header}>
-          {columns.map((column, i) => (
-            <th key={i}>{column}</th>
-          ))}
-          <th />
-        </tr>
-      </thead>
-      <tbody>{rows.map((row, i) => children(row, i))}</tbody>
+      {children}
     </table>
   )
 }
