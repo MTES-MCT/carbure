@@ -433,6 +433,9 @@ class ISCCScope(models.Model):
 
 class ISCCCertificate(models.Model):
     certificate_id = models.CharField(max_length=64, null=False, blank=False)
+    # warning, this column must be manually altered in db to support utf8mb4
+    # command: ALTER TABLE iscc_certificates CHANGE certificate_holder certificate_holder VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    # do not change anything
     certificate_holder = models.CharField(max_length=256, null=False, blank=False)
     addons = models.CharField(max_length=256, null=False, blank=False)
     valid_from = models.DateField(null=False)
@@ -451,7 +454,7 @@ class ISCCCertificate(models.Model):
 
 class ISCCCertificateRawMaterial(models.Model):
     certificate = models.ForeignKey(ISCCCertificate, blank=False, null=False, on_delete=models.CASCADE)
-    raw_material = models.CharField(max_length=32, blank=False, null=False)
+    raw_material = models.CharField(max_length=128, blank=False, null=False)
     # add foreign key to MatierePremiere ?
 
     def __str__(self):

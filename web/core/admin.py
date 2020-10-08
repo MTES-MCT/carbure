@@ -11,6 +11,7 @@ from authtools.forms import UserCreationForm
 from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays
 from core.models import GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
 from core.models import LotValidationError
+from core.models import ISCCScope, ISCCCertificate, ISCCCertificateRawMaterial, ISCCCertificateScope
 from api.v3.sanity_checks import queryset_sanity_check
 
 
@@ -112,6 +113,26 @@ class TransactionCommentAdmin(admin.ModelAdmin):
     list_filter = ('topic', )
 
 
+class ISCCScopeAdmin(admin.ModelAdmin):
+    list_display = ('scope', 'description')
+    search_fields = ('scope', 'description')
+
+    
+class ISCCCertificateAdmin(admin.ModelAdmin):
+    list_display = ('certificate_id', 'certificate_holder', 'valid_from', 'valid_until')
+    search_fields = ('certificate_id', 'certificate_holder', 'issuing_cb')
+
+    
+class ISCCCertificateRawMaterialAdmin(admin.ModelAdmin):
+    list_display = ('certificate', 'raw_material')
+    search_fields = ('certificate', 'raw_material')
+
+
+class ISCCCertificateScopeAdmin(admin.ModelAdmin):
+    list_display = ('certificate', 'scope')
+    search_fields = ('certificate', 'scope')
+
+   
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
 admin.site.register(UserPreferences, UserPreferencesAdmin)
@@ -126,6 +147,10 @@ admin.site.register(TransactionError, TransactionErrorAdmin)
 admin.site.register(TransactionComment, TransactionCommentAdmin)
 admin.site.register(LotV2Error, LotV2ErrorAdmin)
 admin.site.register(LotValidationError, LotValidationErrorAdmin)
+admin.site.register(ISCCScope, ISCCScopeAdmin)
+admin.site.register(ISCCCertificate, ISCCCertificateAdmin)
+admin.site.register(ISCCCertificateRawMaterial, ISCCCertificateRawMaterialAdmin)
+admin.site.register(ISCCCertificateScope, ISCCCertificateScopeAdmin)
 
 
 # authtool custom user model
