@@ -16,6 +16,17 @@ import {
 } from "../services/lots"
 import confirm from "../components/system/confirm"
 
+export type SearchSelection = {
+  query: string
+  setQuery: (s: string) => void
+}
+
+// manage search query
+function useSearchSelection(): SearchSelection {
+  const [query, setQuery] = useState('')
+  return { query, setQuery }
+}
+
 export type StatusSelection = {
   active: LotStatus
   setActive: (s: LotStatus) => void
@@ -107,7 +118,8 @@ function useGetLots(
   status: StatusSelection,
   filters: FilterSelection,
   pagination: PageSelection,
-  selection: TransactionSelection
+  selection: TransactionSelection,
+  search: SearchSelection
 ): [ApiState<Lots>, () => void] {
   const [transactions, resolveLots] = useAPI(getLots)
 
@@ -121,7 +133,8 @@ function useGetLots(
         entity.selected.id,
         filters.selected,
         page,
-        limit
+        limit,
+        search.query,
       )
     }
   }
@@ -133,6 +146,7 @@ function useGetLots(
     filters.selected,
     page,
     limit,
+    search.query,
   ])
 
   // reset page to 0 when filters change
@@ -207,9 +221,10 @@ export default function useTransactions(entity: EntitySelection) {
   const filters = useFilterSelection()
   const pagination = usePageSelection()
   const selection = useTransactionSelection()
+  const search = useSearchSelection()
 
   const [snapshot, resolveGetSnapshot] = useGetSnapshot(entity)
-  const [transactions, resolveGetLots] = useGetLots(entity, status, filters, pagination, selection) // prettier-ignore
+  const [transactions, resolveGetLots] = useGetLots(entity, status, filters, pagination, selection, search) // prettier-ignore
 
   function refresh() {
     resolveGetLots()
@@ -231,5 +246,6 @@ export default function useTransactions(entity: EntitySelection) {
     duplicator,
     validator,
     refresh,
+    search,
   }
 }

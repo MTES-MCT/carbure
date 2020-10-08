@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 
 import { ApiState } from "../hooks/helpers/use-api"
 import { Filters, LotStatus, Snapshot } from "../services/types"
-import { StatusSelection, FilterSelection } from "../hooks/use-transactions"
+import { StatusSelection, FilterSelection, SearchSelection } from "../hooks/use-transactions"
 
 import styles from "./transaction-snapshot.module.css"
 
@@ -31,12 +31,14 @@ type TransactionSnapshotProps = {
   snapshot: ApiState<Snapshot>
   status: StatusSelection
   filters: FilterSelection
+  search: SearchSelection
 }
 
 const TransactionSnapshot = ({
   snapshot,
   status,
   filters,
+  search,
 }: TransactionSnapshotProps) => (
   <Box className={styles.transactionSnapshot}>
     <div className={styles.transactionSummary}>
@@ -83,6 +85,7 @@ const TransactionSnapshot = ({
       <SearchInput
         className={styles.searchInput}
         placeholder="Rechercher un lot"
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => search.setQuery(e.target.value)}
       />
     </div>
   </Box>

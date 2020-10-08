@@ -27,6 +27,7 @@ const Transactions = ({ entity }: TransactionsProps) => {
     duplicator,
     validator,
     refresh,
+    search,
   } = useTransactions(entity)
 
   if (entity.selected === null) {
@@ -39,6 +40,7 @@ const Transactions = ({ entity }: TransactionsProps) => {
         snapshot={snapshot}
         status={status}
         filters={filters}
+        search={search}
       />
 
       <TransactionList
