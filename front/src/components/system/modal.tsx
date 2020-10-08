@@ -1,8 +1,9 @@
 import React, { useState } from "react"
-import { createPortal } from "react-dom"
+import ReactDOM from "react-dom"
 import cl from "clsx"
 
 import styles from "./modal.module.css"
+
 import { Cross } from "./icons"
 
 const root = document.getElementById("modal")!
@@ -25,7 +26,7 @@ type ModalProps = {
 }
 
 const Modal = ({ className, onClose, children, ...props }: ModalProps) => {
-  return createPortal(
+  return ReactDOM.createPortal(
     <div className={styles.modalWrapper}>
       <div className={styles.overlay} onClick={onClose} />
       <div {...props} className={cl(styles.modal, className)}>

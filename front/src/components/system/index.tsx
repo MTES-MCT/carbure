@@ -39,7 +39,7 @@ export const Main = (props: BoxProps) => <Box {...props} as="main" />
 type ButtonProps = SystemProps &
   React.HTMLProps<HTMLButtonElement> & {
     submit?: boolean
-    level?: string
+    level?: "primary" | "warning" | "danger"
     icon?: React.ComponentType
   }
 
