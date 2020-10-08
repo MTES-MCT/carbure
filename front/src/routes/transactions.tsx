@@ -22,8 +22,12 @@ const Transactions = ({ entity }: TransactionsProps) => {
     pagination,
     snapshot,
     transactions,
+    selection,
     deleter,
     duplicator,
+    validator,
+    refresh,
+    search,
   } = useTransactions(entity)
 
   if (entity.selected === null) {
@@ -36,24 +40,28 @@ const Transactions = ({ entity }: TransactionsProps) => {
         snapshot={snapshot}
         status={status}
         filters={filters}
+        search={search}
       />
 
       <TransactionList
         transactions={transactions}
+        selection={selection}
         pagination={pagination}
-        onDelete={deleter.resolveDeleteLot}
-        onDuplicate={duplicator.resolveDuplicateLot}
+        onDelete={deleter.resolve}
+        onDuplicate={duplicator.resolve}
+        onValidate={validator.resolve}
       />
 
       <Switch>
         <Route path="/transactions/add">
-          <TransactionAdd entity={entity} />
+          <TransactionAdd entity={entity} refresh={refresh} />
         </Route>
 
         <Route exact path="/transactions/:id">
           <TransactionDetails
             entity={entity}
             transactions={transactions.data}
+            refresh={refresh}
           />
         </Route>
       </Switch>

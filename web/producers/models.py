@@ -17,7 +17,7 @@ class ProductionSite(models.Model):
         return self.name
 
     def natural_key(self):
-        return {'name': self.name, 'country': self.country.natural_key(), 'id': self.id}
+        return {'name': self.name, 'country': self.country.natural_key(), 'id': self.id, 'date_mise_en_service': self.date_mise_en_service}
 
     class Meta:
         db_table = 'producer_sites'

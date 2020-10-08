@@ -593,6 +593,11 @@ def load_excel_file(entity, user, file):
 def validate_lots(user, tx_ids):
     for tx_id in tx_ids:
         try:
+            tx_id = int(tx_id)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': "tx_id must be an integer", 'extra': str(e)}, status=400)
+        print('Trying to validate tx id %d' % (tx_id))
+        try:
             tx = LotTransaction.objects.get(id=tx_id, lot__status='Draft')
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': "Draft not found", 'extra': str(e)}, status=400)

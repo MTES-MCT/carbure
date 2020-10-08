@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import cl from "clsx"
 
 import styles from "./pagination.module.css"
@@ -32,10 +32,6 @@ export type PageSelection = {
 export function usePageSelection(): PageSelection {
   const [page, setPage] = useState(0)
   const [limit, setLimit] = useState(10)
-
-  useEffect(() => {
-    setPage(0)
-  }, [limit])
 
   return { page, limit, setPage, setLimit }
 }

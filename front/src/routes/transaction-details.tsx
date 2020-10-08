@@ -14,15 +14,18 @@ import TransactionForm from "../components/transaction-form"
 type TransactionDetailsProps = {
   entity: EntitySelection
   transactions: Lots | null
+  refresh: () => void
 }
 
 const TransactionDetails = ({
   entity,
   transactions,
+  refresh,
 }: TransactionDetailsProps) => {
   const { form, request, change, submit, close } = useTransactionDetails(
     entity,
-    transactions
+    transactions,
+    refresh
   )
 
   if (form === null) {
@@ -42,7 +45,7 @@ const TransactionDetails = ({
           submit
           name="update"
           icon={Save}
-          kind="primary"
+          level="primary"
           onClick={submit}
         >
           Sauvegarder

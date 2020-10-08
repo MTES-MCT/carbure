@@ -6,14 +6,17 @@ import useTransactionForm from "../hooks/helpers/use-transaction-form"
 import useClose from "./helpers/use-close"
 import { addLot } from "../services/lots"
 
-export default function useTransactionAdd(entity: EntitySelection) {
+export default function useTransactionAdd(
+  entity: EntitySelection,
+  refresh: () => void
+) {
   const close = useClose("/transactions")
   const [form, change] = useTransactionForm()
-  const [request, resolve] = useAPI()
+  const [request, resolve] = useAPI(addLot)
 
   function submit() {
     if (entity.selected && form) {
-      resolve(addLot(entity.selected.id, form).then(close))
+      resolve(entity.selected.id, form).then(close).then(refresh)
     }
   }
 

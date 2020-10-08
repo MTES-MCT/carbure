@@ -17,7 +17,7 @@ function useAutoComplete<T>(
   const dd = useDropdown()
 
   const [query, setQuery] = useState("")
-  const [suggestions, resolve] = useAPI<T[]>()
+  const [suggestions, resolve] = useAPI<[string], T[]>(getQuery)
 
   // modify input content when passed value is changed
   useEffect(() => {
@@ -26,7 +26,7 @@ function useAutoComplete<T>(
 
   // refetch the list of suggestions when query changes
   useEffect(() => {
-    getQuery && resolve(getQuery(query))
+    resolve(query)
   }, [query, getQuery, resolve])
 
   // on change, modify the query to match selection and send event to parent

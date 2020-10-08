@@ -3,6 +3,7 @@ import cl from "clsx"
 import { useHistory } from "react-router-dom"
 
 import { Transaction, Lots, LotStatus } from "../services/types"
+import { TransactionSelection } from "../hooks/use-transactions"
 import { PageSelection } from "./system/pagination"
 import { ApiState } from "../hooks/helpers/use-api"
 
@@ -10,7 +11,7 @@ import styles from "./transaction-list.module.css"
 
 import { getStatus } from "../services/lots"
 
-import { Alert, Box, LoaderOverlay, Table } from "./system"
+import { Alert, Box, Button, LoaderOverlay, Table } from "./system"
 import { AlertCircle, Check, ChevronRight, Copy, Cross } from "./system/icons"
 import Pagination from "./system/pagination"
 
@@ -59,110 +60,126 @@ const TwoLines = ({ top, bottom }: { top: string; bottom: string }) => (
   </div>
 )
 
+function stopProp(handler: Function = () => {}) {
+  return (e: React.SyntheticEvent) => {
+    e.stopPropagation()
+    handler()
+  }
+}
+
+type ActionProps = {
+  disabled: boolean
+  onDelete: () => void
+  onValidate: () => void
+}
+
+const Actions = ({ disabled, onDelete, onValidate }: ActionProps) => (
+  <Box row className={cl(styles.actionBar)}>
+    <Button
+      disabled={disabled}
+      icon={Check}
+      level="primary"
+      onClick={onValidate}
+    >
+      Valider la sélection
+    </Button>
+    <Button disabled={disabled} icon={Cross} level="danger" onClick={onDelete}>
+      Supprimer la sélection
+    </Button>
+  </Box>
+)
+
 type TransactionRowProps = {
   transaction: Transaction
-  onDelete: (id: number) => void
-  onDuplicate: (id: number) => void
+  selected: boolean
+  onDelete: () => void
+  onDuplicate: () => void
+  onValidate: () => void
+  onSelect: () => void
 }
 
 const TransactionRow = ({
-  transaction,
+  transaction: tx,
+  selected,
   onDelete,
   onDuplicate,
+  onValidate,
+  onSelect,
 }: TransactionRowProps) => {
   const history = useHistory()
-
-  function handleDuplicate(e: React.MouseEvent) {
-    e.stopPropagation()
-    onDuplicate(transaction.id)
-  }
-
-  function handleDelete(e: React.MouseEvent) {
-    e.stopPropagation()
-    onDelete(transaction.id)
-  }
 
   return (
     <tr
       className={styles.transactionRow}
-      onClick={() => history.push(`/transactions/${transaction.id}`)}
+      onClick={() => history.push(`/transactions/${tx.id}`)}
     >
       <td>
-        <input type="checkbox" name={transaction.dae} />
-      </td>
-
-      <td>
-        <Status value={getStatus(transaction)} />
-      </td>
-
-      <td>
-        <Line text={transaction.lot.period} />
-      </td>
-
-      <td>
-        <Line text={transaction.dae} />
-      </td>
-
-      <td>
-        <Line
-          text={
-            transaction.carbure_client?.name ?? transaction.unknown_client ?? ""
-          }
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={onSelect}
+          onClick={stopProp()}
         />
       </td>
 
       <td>
-        <TwoLines
-          top={transaction.lot.biocarburant.name}
-          bottom={`${transaction.lot.volume}L`}
-        />
+        <Status value={getStatus(tx)} />
+      </td>
+
+      <td>
+        <Line text={tx.lot.period} />
+      </td>
+
+      <td>
+        <Line text={tx.dae} />
+      </td>
+
+      <td>
+        <Line text={tx.carbure_client?.name ?? tx.unknown_client ?? ""} />
+      </td>
+
+      <td>
+        <TwoLines top={tx.lot.biocarburant.name} bottom={`${tx.lot.volume}L`} />
       </td>
 
       <td>
         <TwoLines
-          top={
-            transaction.lot.carbure_producer?.name ??
-            transaction.lot.unknown_producer
-          }
+          top={tx.lot.carbure_producer?.name ?? tx.lot.unknown_producer}
           bottom={
-            transaction.lot.carbure_production_site?.country.name ??
-            transaction.lot.unknown_production_country
+            tx.lot.carbure_production_site?.country.name ??
+            tx.lot.unknown_production_country
           }
         />
       </td>
 
       <td>
         <TwoLines
-          top={
-            transaction.carbure_delivery_site?.city ??
-            transaction.unknown_delivery_site ??
-            ""
-          }
+          top={tx.carbure_delivery_site?.city ?? tx.unknown_delivery_site ?? ""}
           bottom={
-            transaction.carbure_delivery_site?.country.name ??
-            transaction.unknown_delivery_site_country?.name
+            tx.carbure_delivery_site?.country.name ??
+            tx.unknown_delivery_site_country?.name
           }
         />
       </td>
 
       <td>
         <TwoLines
-          top={transaction.lot.matiere_premiere.name}
-          bottom={transaction.lot.pays_origine.name}
+          top={tx.lot.matiere_premiere.name}
+          bottom={tx.lot.pays_origine.name}
         />
       </td>
 
       <td>
-        <Line text={`${transaction.lot.ghg_reduction}%`} />
+        <Line text={`${tx.lot.ghg_reduction}%`} />
       </td>
 
       <td className={styles.actionColumn}>
         <ChevronRight className={styles.transactionArrow} />
 
         <div className={styles.transactionActions}>
-          <Copy title="Dupliquer le lot" onClick={handleDuplicate} />
-          <Check title="Valider le lot" />
-          <Cross title="Supprimer le lot" onClick={handleDelete} />
+          <Copy title="Dupliquer le lot" onClick={stopProp(onDuplicate)} />
+          <Check title="Envoyer le lot" onClick={stopProp(onValidate)} />
+          <Cross title="Supprimer le lot" onClick={stopProp(onDelete)} />
         </div>
       </td>
     </tr>
@@ -172,17 +189,26 @@ const TransactionRow = ({
 type TransactionListProps = {
   transactions: ApiState<Lots>
   pagination: PageSelection
-  onDelete: (id: number) => void
+  selection: TransactionSelection
+  onDelete: (ids: number[]) => void
+  onValidate: (ids: number[]) => void
   onDuplicate: (id: number) => void
 }
 
 const TransactionList = ({
   transactions,
+  selection,
   pagination,
   onDelete,
   onDuplicate,
+  onValidate,
 }: TransactionListProps) => {
   const tx = transactions.data
+  const ids = tx ? tx.lots.map((t) => t.id) : []
+
+  const allSelected =
+    selection.selected.length > 0 &&
+    selection.selected.every((id, i) => ids[i] === id)
 
   const isLoading = transactions.loading
   const isError = typeof transactions.error === "string"
@@ -193,14 +219,14 @@ const TransactionList = ({
       {isLoading && <LoaderOverlay />}
 
       {isError && (
-        <Alert kind="error">
+        <Alert level="error">
           <AlertCircle />
           {transactions.error}
         </Alert>
       )}
 
       {!isError && isEmpty && (
-        <Alert kind="warning">
+        <Alert level="warning">
           <AlertCircle />
           Aucune transaction trouvée pour ces paramètres
         </Alert>
@@ -208,13 +234,27 @@ const TransactionList = ({
 
       {!isError && !isEmpty && (
         <React.Fragment>
-          <Table columns={COLUMNS} rows={tx!.lots}>
-            {(transaction) => (
+          <Actions
+            disabled={selection.selected.length === 0}
+            onDelete={() => onDelete(selection.selected)}
+            onValidate={() => onValidate(selection.selected)}
+          />
+
+          <Table
+            columns={COLUMNS}
+            rows={tx!.lots}
+            selected={allSelected}
+            onSelectAll={(e) => selection.selectMany(e, ids)}
+          >
+            {(tx) => (
               <TransactionRow
-                key={transaction.id}
-                transaction={transaction}
-                onDelete={onDelete}
-                onDuplicate={onDuplicate}
+                key={tx.id}
+                transaction={tx}
+                selected={selection.has(tx.id)}
+                onSelect={() => selection.selectOne(tx.id)}
+                onDuplicate={() => onDuplicate(tx.id)}
+                onValidate={() => onValidate([tx.id])}
+                onDelete={() => onDelete([tx.id])}
               />
             )}
           </Table>
