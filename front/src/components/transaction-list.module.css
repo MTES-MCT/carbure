@@ -3,54 +3,6 @@
   padding: 32px 120px;
 }
 
-.transactionRow {
-  cursor: pointer;
-}
-
-.transactionList tr.transactionRow:hover {
-  background-color: var(--gray-highlight);
-  z-index: 1;
-}
-
-/* v  forcing of column width so the table stays stable */
-
-/* 1st column (checkbox) */
-.transactionList table th:first-child {
-  width: 40px;
-}
-
-/* 2nd and last columns (status + actions) */
-.transactionList table th:nth-child(2),
-.transactionList table th:nth-last-child(2),
-.transactionList table th:last-child {
-  width: 82px;
-}
-
-.status {
-  color: var(--gray-dark);
-  background-color: var(--gray-light);
-  border-radius: 50px;
-  border: 1px solid var(--gray-highlight);
-  font-size: 11px;
-  text-transform: capitalize;
-  padding: 4px 8px;
-}
-
-.statusValidated {
-  color: var(--blue-dark);
-  background-color: var(--blue-light);
-}
-
-.statusToFix {
-  color: var(--orange-dark);
-  background-color: var(--orange-light);
-}
-
-.statusAccepted {
-  color: var(--green-dark);
-  background-color: var(--green-light);
-}
-
 .alertDrafts {
   padding: 8px 16px;
 }
@@ -72,21 +24,18 @@
   background-color: var(--red-light);
 }
 
-.dualRow {
-  display: flex;
-  flex-direction: column;
+/* v  forcing of column width so the table stays stable */
+
+/* 1st column (checkbox) */
+.transactionList table th:first-child {
+  width: 40px;
 }
 
-.rowLine {
-  overflow-x: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.extraInfo {
-  font-size: 12px;
-  color: var(--gray-dark);
-  font-style: italic;
+/* 2nd and last columns (status + actions) */
+.transactionList table th:nth-child(2),
+.transactionList table th:nth-last-child(2),
+.transactionList table th:last-child {
+  width: 82px;
 }
 
 .actionColumn {
@@ -99,21 +48,21 @@
   display: none;
 }
 
-.transactionRow:hover .transactionArrow {
-  display: none;
-}
-.transactionRow:hover .transactionActions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 .transactionActions :global(.icon) {
   width: 20px;
 }
 
 .transactionActions :global(.icon):hover {
   stroke: var(--blue-medium);
+}
+
+.draftTransactionTable tr:hover .transactionArrow {
+  display: none;
+}
+.draftTransactionTable tr:hover .transactionActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .actionBar {

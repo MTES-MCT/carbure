@@ -65,12 +65,11 @@ export type TransactionSelection = {
   selected: number[]
   has: (id: number) => boolean
   selectOne: (id: number) => void
-  selectMany: (e: React.ChangeEvent<HTMLInputElement>, ids: number[]) => void
-  setSelected: React.Dispatch<React.SetStateAction<number[]>>
+  selectMany: React.Dispatch<React.SetStateAction<number[]>>
 }
 
 function useTransactionSelection(): TransactionSelection {
-  const [selected, setSelected] = useState<number[]>([])
+  const [selected, selectMany] = useState<number[]>([])
 
   function has(id: number) {
     return selected.includes(id)
@@ -78,21 +77,13 @@ function useTransactionSelection(): TransactionSelection {
 
   function selectOne(id: number) {
     if (has(id)) {
-      setSelected(selected.filter((sid) => sid !== id))
+      selectMany(selected.filter((sid) => sid !== id))
     } else {
-      setSelected([...selected, id])
+      selectMany([...selected, id])
     }
   }
 
-  function selectMany(e: React.ChangeEvent<HTMLInputElement>, ids: number[]) {
-    if (e.target.checked) {
-      setSelected(ids)
-    } else {
-      setSelected([])
-    }
-  }
-
-  return { selected, has, selectOne, selectMany, setSelected }
+  return { selected, has, selectOne, selectMany }
 }
 
 // fetches current snapshot when parameters change
@@ -124,7 +115,7 @@ function useGetLots(
   const [transactions, resolveLots] = useAPI(getLots)
 
   const { page, limit, setPage } = pagination
-  const { setSelected } = selection
+  const { selectMany } = selection
 
   function resolve() {
     if (entity.selected?.id) {
@@ -152,14 +143,14 @@ function useGetLots(
   // reset page to 0 when filters change
   useEffect(() => {
     setPage(0)
-    setSelected([])
+    selectMany([])
   }, [
     status.active,
     entity.selected,
     filters.selected,
     limit,
     setPage,
-    setSelected,
+    selectMany,
   ])
 
   return [transactions, resolve]

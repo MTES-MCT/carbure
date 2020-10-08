@@ -46,6 +46,7 @@ const Transactions = ({ entity }: TransactionsProps) => {
 
       <TransactionList
         transactions={transactions}
+        status={status}
         selection={selection}
         pagination={pagination}
         onDelete={deleter.resolve}
