@@ -1,5 +1,5 @@
 import { Transaction, Lots, LotStatus, Snapshot } from "./types"
-import { FilterSelection } from "../hooks/use-transactions"
+import { FilterSelection, SearchSelection } from "../hooks/use-transactions"
 import { TransactionFormState } from "../hooks/helpers/use-transaction-form"
 
 import api from "./api"
@@ -108,7 +108,8 @@ export function getLots(
   producerID: number,
   filters: FilterSelection["selected"],
   page: number,
-  limit: number
+  limit: number,
+  query: string,
 ): Promise<Lots> {
   return api.get("/lots", {
     status,
@@ -116,6 +117,7 @@ export function getLots(
     ...filters,
     from_idx: page * limit,
     limit: limit,
+    query: query,
   })
 }
 
