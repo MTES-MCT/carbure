@@ -160,3 +160,15 @@ export function validateLots(entityID: number, transactionIDs: number[]) {
     tx_ids: transactionIDs,
   })
 }
+
+export function getLotsOutSummary(entityID: number) {
+  return api.get("/lots/summary-out", {
+    entity_id: entityID,
+  })
+}
+
+export function getLotsInSummary(entityID: number) {
+  return api.get("/lots/summary-in", {
+    entity_id: entityID,
+  })
+}

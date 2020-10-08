@@ -3,11 +3,15 @@ import { Link } from "react-router-dom"
 
 import { ApiState } from "../hooks/helpers/use-api"
 import { Filters, LotStatus, Snapshot } from "../services/types"
-import { StatusSelection, FilterSelection, SearchSelection } from "../hooks/use-transactions"
+import {
+  StatusSelection,
+  FilterSelection,
+  SearchSelection,
+} from "../hooks/use-transactions"
 
 import styles from "./transaction-snapshot.module.css"
 
-import { Plus } from "./system/icons"
+import { Plus, Rapport } from "./system/icons"
 import { Title, Button, StatusButton, SearchInput, Box } from "./system"
 import Select from "./system/select"
 
@@ -45,12 +49,21 @@ const TransactionSnapshot = ({
       <div className={styles.transactionHeader}>
         <Title>Transactions</Title>
 
-        <Link to="/transactions/add">
-          <Button level="primary">
-            <Plus />
-            Ajouter des lots
-          </Button>
-        </Link>
+        <Box row>
+          <Link to="/transactions/add">
+            <Button level="primary">
+              <Plus />
+              Ajouter des lots
+            </Button>
+          </Link>
+          {status.active === LotStatus.Validated && (
+            <Link to="/transactions/show-summary-out">
+              <Button className={styles.transactionButtons} level="primary" icon={Rapport}>
+                Rapport
+              </Button>
+            </Link>
+          )}
+        </Box>
       </div>
 
       <div className={styles.transactionStatus}>
@@ -85,7 +98,9 @@ const TransactionSnapshot = ({
       <SearchInput
         className={styles.searchInput}
         placeholder="Rechercher un lot"
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => search.setQuery(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          search.setQuery(e.target.value)
+        }
       />
     </div>
   </Box>

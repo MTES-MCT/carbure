@@ -62,3 +62,7 @@
   width: 165px;
   background-color: var(--gray-light);
 }
+
+.transactionButtons {
+  margin-left: 4px;
+}
