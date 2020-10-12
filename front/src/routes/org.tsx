@@ -1,7 +1,8 @@
 import React from "react"
 
-import { Settings } from "../services/types"
-import { ApiState } from "../hooks/helpers/use-api"
+import { AppHook } from "../hooks/use-app"
+
+import useEntity from "../hooks/helpers/use-entity"
 
 import { Redirect, Route, Switch } from "../components/relative-route"
 import Topbar from "../components/top-bar"
@@ -9,35 +10,43 @@ import Footer from "../components/footer"
 import Transactions from "./transactions"
 
 type MainProps = {
-  settings: ApiState<Settings>
+  app: AppHook
 }
 
-const Org = ({ settings }: MainProps) => (
-  <React.Fragment>
-    <Topbar settings={settings} />
+const Org = ({ app }: MainProps) => {
+  const entity = useEntity()
 
-    <Switch>
-      <Route relative path="stocks">
-        Stocks
-      </Route>
+  if (!app.hasEntity(entity!)) {
+    return <Redirect to="/" />
+  }
 
-      <Route relative path="transactions/:status">
-        <Transactions />
-      </Route>
+  return (
+    <React.Fragment>
+      <Topbar settings={app.settings} entity={entity} />
 
-      <Route relative path="controls">
-        Contrôles
-      </Route>
+      <Switch>
+        <Route relative path="stocks">
+          Stocks
+        </Route>
 
-      <Route relative path="directory">
-        Annuaire
-      </Route>
+        <Route relative path="transactions/:status">
+          <Transactions />
+        </Route>
 
-      <Redirect relative to="transactions/draft" />
-    </Switch>
+        <Route relative path="controls">
+          Contrôles
+        </Route>
 
-    <Footer />
-  </React.Fragment>
-)
+        <Route relative path="directory">
+          Annuaire
+        </Route>
+
+        <Redirect relative to="transactions/draft" />
+      </Switch>
+
+      <Footer />
+    </React.Fragment>
+  )
+}
 
 export default Org

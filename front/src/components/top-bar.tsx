@@ -11,7 +11,6 @@ import logoBetaGouv from "../assets/images/betagouvfr.svg"
 
 import Menu from "./system/menu"
 import { Link, NavLink } from "./relative-route"
-import useEntity from "../hooks/helpers/use-entity"
 
 const Logo = () => (
   <Link to="/" className={styles.logo}>
@@ -75,26 +74,23 @@ const UserMenu = ({ settings, entity }: UserMenuProps) => {
 }
 
 type TopbarProps = {
+  entity: EntitySelection
   settings: ApiState<Settings>
 }
 
-const Topbar = ({ settings }: TopbarProps) => {
-  const entity = useEntity()
+const Topbar = ({ entity, settings }: TopbarProps) => (
+  <header className={styles.topBar}>
+    <Logo />
 
-  return (
-    <header className={styles.topBar}>
-      <Logo />
+    <nav className={styles.pageNav}>
+      <PageLink to="stocks">Stocks</PageLink>
+      <PageLink to="transactions">Transactions</PageLink>
+      <PageLink to="controls">Contrôles</PageLink>
+      <PageLink to="directory">Annuaire</PageLink>
+    </nav>
 
-      <nav className={styles.pageNav}>
-        <PageLink to="stocks">Stocks</PageLink>
-        <PageLink to="transactions">Transactions</PageLink>
-        <PageLink to="controls">Contrôles</PageLink>
-        <PageLink to="directory">Annuaire</PageLink>
-      </nav>
-
-      <UserMenu settings={settings} entity={entity} />
-    </header>
-  )
-}
+    <UserMenu settings={settings} entity={entity} />
+  </header>
+)
 
 export default Topbar
