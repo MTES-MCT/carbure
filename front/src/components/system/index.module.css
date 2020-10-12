@@ -279,6 +279,11 @@
   background-color: var(--white);
 }
 
+.table tbody tr:hover {
+  background-color: var(--gray-highlight);
+  z-index: 1;
+}
+
 .table th {
   color: var(--blue-medium);
   text-transform: uppercase;

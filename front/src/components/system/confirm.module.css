@@ -5,6 +5,10 @@ div.confirm {
   padding-left: 24px;
 }
 
+.confirmMessage {
+  margin: 32px 0;
+}
+
 .confirmButtons {
   justify-content: flex-end;
 }

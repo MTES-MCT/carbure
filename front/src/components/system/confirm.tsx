@@ -21,7 +21,8 @@ export const Confirm = ({
 }: ConfirmProps) => (
   <Modal className={styles.confirm} onClose={onCancel}>
     <Title>{title}</Title>
-    <p>{description}</p>
+
+    <p className={styles.confirmMessage}>{description}</p>
 
     <Box row className={styles.confirmButtons}>
       <Button level="primary" onClick={onConfirm}>
