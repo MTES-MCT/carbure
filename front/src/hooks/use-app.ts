@@ -15,12 +15,22 @@ function useGetSettings(): ApiState<Settings> {
   return settings
 }
 
-export default function useApp() {
+export type AppHook = {
+  settings: ApiState<Settings>
+  hasEntity: (e: number) => boolean
+  getDefaultEntity: () => number | undefined
+}
+
+export default function useApp(): AppHook {
   const settings = useGetSettings()
+
+  function hasEntity(entity: number) {
+    return Boolean(settings.data?.rights.find((r) => r.entity.id === entity))
+  }
 
   function getDefaultEntity() {
     return settings.data?.rights[0].entity.id
   }
 
-  return { settings, getDefaultEntity }
+  return { settings, hasEntity, getDefaultEntity }
 }

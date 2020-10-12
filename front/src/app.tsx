@@ -11,7 +11,8 @@ import Logout from "./routes/logout"
 import Org from "./routes/org"
 
 const App = () => {
-  const { settings, getDefaultEntity } = useApp()
+  const app = useApp()
+  const { settings, getDefaultEntity } = app
 
   if (settings.error) {
     return <Exit to="/" />
@@ -24,7 +25,7 @@ const App = () => {
       {settings.data && (
         <Switch>
           <Route path="/org/:entity">
-            <Org settings={settings} />
+            <Org app={app} />
           </Route>
 
           <Route path="/logout">
