@@ -43,8 +43,3 @@
 .transactionRow {
   cursor: pointer;
 }
-
-table tr.transactionRow:hover {
-  background-color: var(--gray-highlight);
-  z-index: 1;
-}
