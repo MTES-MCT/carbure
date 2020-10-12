@@ -299,6 +299,9 @@ def add_lot(request):
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     lot, tx, lot_errors, tx_errors = load_lot(entity, request.user, request.POST.dict(), 'MANUAL')
+    if not tx:
+        return JsonResponse({'status': 'error', 'message': 'Could not add lot to database'}, status=400)
+
     return JsonResponse({'status': 'success', 'data': tx.natural_key()})
 
 
