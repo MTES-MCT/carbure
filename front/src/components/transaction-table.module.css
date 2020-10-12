@@ -1,40 +1,14 @@
-.transactionList {
-  position: relative;
-  padding: 32px 120px;
-}
-
-.alertDrafts {
-  padding: 8px 16px;
-}
-
-.alertHide {
-  color: var(--blue-dark);
-  text-decoration: underline;
-  cursor: pointer;
-  margin-left: auto;
-}
-
-.alertWarning {
-  border-color: var(--orange-medium);
-  background-color: var(--orange-light);
-}
-
-.alertError {
-  border-color: var(--red-medium);
-  background-color: var(--red-light);
-}
-
 /* v  forcing of column width so the table stays stable */
 
 /* 1st column (checkbox) */
-.transactionList table th:first-child {
+.transactionTable thead th:first-child {
   width: 40px;
 }
 
 /* 2nd and last columns (status + actions) */
-.transactionList table th:nth-child(2),
-.transactionList table th:nth-last-child(2),
-.transactionList table th:last-child {
+.transactionTable thead th:nth-child(2),
+.transactionTable thead th:nth-last-child(2),
+.transactionTable thead th:last-child {
   width: 88px;
 }
 
@@ -56,19 +30,11 @@
   stroke: var(--blue-medium);
 }
 
-.draftTransactionTable tr:hover .transactionArrow {
+.editableTable tr:hover .transactionArrow {
   display: none;
 }
-.draftTransactionTable tr:hover .transactionActions {
+.editableTable tr:hover .transactionActions {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.actionBar {
-  margin-bottom: 24px;
-}
-
-.actionBar button {
-  margin-right: 16px;
 }
