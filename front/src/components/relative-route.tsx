@@ -61,10 +61,30 @@ export const Redirect = ({
   return <BaseRedirect {...props} from={baseFrom} to={baseTo} />
 }
 
-export const Switch = ({ children }: SwitchProps) => (
-  <BaseSwitch>
-    {React.Children.map(children, (child: any) =>
-      child?.props?.relative ? child.type(child.props) : child
-    )}
-  </BaseSwitch>
-)
+// the basic Switch component from react-router only works with basic react-router Route component
+// this component tricks it into working with the custom routing components of this file
+export const Switch = ({ children }: SwitchProps) => {
+  const match = useRouteMatch()
+
+  return (
+    <BaseSwitch>
+      {React.Children.map(children, (child: any) => {
+        // not relative child, return as is
+        if (!child?.props?.relative) {
+          return child
+        }
+        // relative route child, create equivalent base route
+        else if (child.type === Route) {
+          const path = pt.join(match.path, child.props.path)
+          return <BaseRoute {...child.props} path={path} />
+        }
+        // relative redirect child, create equivalent base redirect
+        else if (child.type === Redirect && child.props.relative) {
+          const from = child.props.from && pt.join(match.url, child.props.from)
+          const to = pt.join(match.url, child.props.to)
+          return <BaseRedirect {...child.props} from={from} to={to} />
+        }
+      })}
+    </BaseSwitch>
+  )
+}
