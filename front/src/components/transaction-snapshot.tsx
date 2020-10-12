@@ -46,7 +46,7 @@ const TransactionSnapshot = ({
         <Title>Transactions</Title>
 
         <Box row>
-          <Link relative to="add">
+          <Link relative to="../draft/add">
             <Button level="primary">
               <Plus />
               Ajouter des lots
@@ -68,7 +68,7 @@ const TransactionSnapshot = ({
 
       <div className={styles.transactionStatus}>
         {STATUS.map(({ key, label }) => (
-          <Link relative key={key} to={`../${key}`}>
+          <Link key={key} relative to={`../${key}`}>
             <StatusButton
               active={key === status.active}
               amount={snapshot.loading ? "…" : snapshot.data?.lots[key] ?? 0}

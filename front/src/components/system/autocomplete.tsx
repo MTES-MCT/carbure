@@ -26,7 +26,7 @@ function useAutoComplete<T>(
 
   // refetch the list of suggestions when query changes
   useEffect(() => {
-    resolve(query)
+    return resolve(query).cancel
   }, [query, getQuery, resolve])
 
   // on change, modify the query to match selection and send event to parent

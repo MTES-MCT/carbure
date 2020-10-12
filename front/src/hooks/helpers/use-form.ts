@@ -26,12 +26,10 @@ export default function useForm<T>(initialState: T): FormHook<T> {
   const [form, setForm] = useState<T>(initialState)
 
   function change<T extends FormFields>(e: React.ChangeEvent<T>) {
-    if (form) {
-      setForm({
-        ...form,
-        [e.target.name]: parseValue(e.target),
-      })
-    }
+    setForm({
+      ...form,
+      [e.target.name]: parseValue(e.target),
+    })
   }
 
   return [form, change, setForm]
