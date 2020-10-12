@@ -233,15 +233,13 @@ export const SearchInput = ({ className, ...props }: InputProps) => (
 
 // TABLE COMPONENT
 
-type TableProps<T> = SystemProps & React.HTMLProps<HTMLTableElement>
+type TableProps = SystemProps & React.HTMLProps<HTMLTableElement>
 
-export function Table<T>({ children, className, ...props }: TableProps<T>) {
-  return (
-    <table {...props} className={cl(styles.table, className)}>
-      {children}
-    </table>
-  )
-}
+export const Table = ({ children, className, ...props }: TableProps) => (
+  <table {...props} className={cl(styles.table, className)}>
+    {children}
+  </table>
+)
 
 // LOADER OVERLAY
 

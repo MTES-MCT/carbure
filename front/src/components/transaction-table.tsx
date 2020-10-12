@@ -1,10 +1,10 @@
 import React from "react"
+import cl from "clsx"
 
 import { Lots, LotStatus } from "../services/types"
 import { StatusSelection, TransactionSelection, SortingSelection } from "../hooks/use-transactions" // prettier-ignore
-import { PageSelection } from "./system/pagination"
 
-import styles from "./transaction-list.module.css"
+import styles from "./transaction-table.module.css"
 
 import { Table } from "./system"
 import { Check, ChevronRight, Copy, Cross } from "./system/icons"
@@ -115,7 +115,7 @@ const EditableTable = ({
   )
 
   return (
-    <Table className={styles.draftTransactionTable}>
+    <Table className={cl(styles.transactionTable, styles.editableTable)}>
       <TransactionColumns sorting={sorting}>
         <th>{selectAllCheckbox}</th>
       </TransactionColumns>
