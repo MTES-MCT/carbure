@@ -127,7 +127,7 @@ function useGetSnapshot(
 
   function resolve() {
     if (entity !== null) {
-      resolveSnapshot(entity)
+      return resolveSnapshot(entity).cancel
     }
   }
 
@@ -153,7 +153,7 @@ function useGetLots(
 
   function resolve() {
     if (entity !== null) {
-      resolveLots(
+      return resolveLots(
         status.active,
         entity,
         filters.selected,
@@ -162,7 +162,7 @@ function useGetLots(
         search.query,
         sorting.column,
         sorting.order
-      )
+      ).cancel
     }
   }
 

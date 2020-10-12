@@ -3,9 +3,7 @@ import { useParams } from "react-router-dom"
 import { Lots } from "../services/types"
 import { EntitySelection } from "./helpers/use-entity"
 
-import useTransactionForm, {
-  toTransactionFormState,
-} from "./helpers/use-transaction-form"
+import useTransactionForm, { toTransactionFormState } from "./helpers/use-transaction-form" // prettier-ignore
 import useAPI, { ApiState } from "./helpers/use-api"
 import useClose from "./helpers/use-close"
 import { updateLot } from "../services/lots"
@@ -35,7 +33,8 @@ export default function useTransactionDetails(
       setForm(toTransactionFormState(transaction))
     } else {
       // if transaction can't be loaded, close the modal
-      close()
+      // (in a setImmediate so it's executed outside the render loop)
+      setImmediate(close)
     }
   }
 

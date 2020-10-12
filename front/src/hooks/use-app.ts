@@ -9,7 +9,7 @@ function useGetSettings(): ApiState<Settings> {
   const [settings, resolve] = useAPI(getSettings)
 
   useEffect(() => {
-    resolve()
+    return resolve().cancel
   }, [resolve])
 
   return settings
