@@ -12,7 +12,7 @@ type MainProps = {
   settings: ApiState<Settings>
 }
 
-const Main = ({ settings }: MainProps) => (
+const Org = ({ settings }: MainProps) => (
   <React.Fragment>
     <Topbar settings={settings} />
 
@@ -40,4 +40,4 @@ const Main = ({ settings }: MainProps) => (
   </React.Fragment>
 )
 
-export default Main
+export default Org

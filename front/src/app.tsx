@@ -8,7 +8,7 @@ import { Redirect, Route, Switch } from "./components/relative-route"
 import Exit from "./components/exit"
 
 import Logout from "./routes/logout"
-import Main from "./routes/main"
+import Org from "./routes/org"
 
 const App = () => {
   const { settings, getDefaultEntity } = useApp()
@@ -24,7 +24,7 @@ const App = () => {
       {settings.data && (
         <Switch>
           <Route path="/org/:entity">
-            <Main settings={settings} />
+            <Org settings={settings} />
           </Route>
 
           <Route path="/logout">
