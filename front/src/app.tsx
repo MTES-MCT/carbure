@@ -32,7 +32,7 @@ const App = () => {
             <Logout />
           </Route>
 
-          {settings.data && <Redirect to={`/org/${getDefaultEntity()}`} />}
+          <Redirect to={`/org/${getDefaultEntity()}`} />
         </Switch>
       )}
     </BrowserRouter>
