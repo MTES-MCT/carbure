@@ -1,11 +1,11 @@
 import React from "react"
 import cl from "clsx"
-import { useHistory } from "react-router-dom"
 
 import styles from "./transaction-row.module.css"
 
 import { getStatus } from "../services/lots"
 import { LotStatus, Transaction } from "../services/types"
+import { useRelativePush } from "./relative-route"
 
 const STATUS = {
   [LotStatus.Draft]: "Brouillon",
@@ -105,12 +105,12 @@ type TxContainerProps = {
 }
 
 export const TransactionRowContainer = ({ id, children }: TxContainerProps) => {
-  const history = useHistory()
+  const relativePush = useRelativePush()
 
   return (
     <tr
       className={styles.transactionRow}
-      onClick={() => history.push(`/transactions/${id}`)}
+      onClick={() => relativePush(`/${id}`)}
     >
       {children}
     </tr>
