@@ -169,13 +169,13 @@ type TxTableProps = {
 const TransactionTable = ({ transactions, sorting }: TxTableProps) => (
   <Table className={styles.transactionTable}>
     <TransactionColumns sorting={sorting}>
-      <th /> {/* empty first column */}
+      <th />
     </TransactionColumns>
 
     <tbody>
       {transactions.lots.map((tx) => (
         <TransactionRowContainer key={tx.id} id={tx.id}>
-          <td /> {/* empty first column */}
+          <td />
           <TransactionRow transaction={tx} />
           <td className={styles.actionColumn}>
             <ChevronRight className={styles.transactionArrow} />

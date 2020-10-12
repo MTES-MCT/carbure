@@ -1,5 +1,5 @@
 import { Transaction, Lots, LotStatus, Snapshot } from "./types"
-import { FilterSelection, SearchSelection } from "../hooks/use-transactions"
+import { FilterSelection } from "../hooks/use-transactions"
 import { TransactionFormState } from "../hooks/helpers/use-transaction-form"
 
 import api from "./api"
