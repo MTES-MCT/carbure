@@ -63,6 +63,8 @@ def get_lots(request):
         txs = txs.filter(lot__status='Validated', delivery_status='AC')
     elif status == 'accepted':
         txs = txs.filter(lot__status='Validated', delivery_status='A')
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Unknown status'}, status=400)
 
     # apply filters
     date_from = datetime.date.today().replace(month=1, day=1)
