@@ -1,8 +1,7 @@
 import React from "react"
-import { NavLink, Link } from "react-router-dom"
 
 import { ApiState } from "../hooks/helpers/use-api"
-import { EntitySelection } from "../hooks/use-app"
+import { EntitySelection } from "../hooks/helpers/use-entity"
 import { Settings } from "../services/types"
 
 import styles from "./top-bar.module.css"
@@ -11,6 +10,8 @@ import logoMarianne from "../assets/images/logo-marianne.svg"
 import logoBetaGouv from "../assets/images/betagouvfr.svg"
 
 import Menu from "./system/menu"
+import { Link, NavLink } from "./relative-route"
+import useEntity from "../hooks/helpers/use-entity"
 
 const Logo = () => (
   <Link to="/" className={styles.logo}>
@@ -31,6 +32,7 @@ type PageLinkProps = {
 
 const PageLink = ({ to, children }: PageLinkProps) => (
   <NavLink
+    relative
     to={to}
     className={styles.pageLink}
     activeClassName={styles.activePageLink}
@@ -45,23 +47,22 @@ type UserMenuProps = {
 }
 
 const UserMenu = ({ settings, entity }: UserMenuProps) => {
-  if (!settings.data) return null
+  const selected = settings.data?.rights.find(
+    (right) => right.entity.id === entity
+  )
 
   return (
-    <Menu className={styles.userMenu} label={entity.selected?.name ?? "Menu"}>
+    <Menu className={styles.userMenu} label={selected?.entity.name ?? "Menu"}>
       <Menu.Group label="Organisations">
-        {settings.data.rights.map((right) => (
-          <Menu.Item
-            key={right.entity.id}
-            onClick={() => entity.selectEntity(right.entity)}
-          >
-            {right.entity.name}
+        {settings.data?.rights.map((right) => (
+          <Menu.Item key={right.entity.id}>
+            <Link to={`/org/${right.entity.id}`}>{right.entity.name}</Link>
           </Menu.Item>
         ))}
       </Menu.Group>
 
       <Menu.Group label="Utilisateur">
-        <Menu.Item>{settings.data.email}</Menu.Item>
+        <Menu.Item>{settings.data?.email}</Menu.Item>
         <Menu.Item>
           <Link to="/settings">Paramètres</Link>
         </Menu.Item>
@@ -75,22 +76,25 @@ const UserMenu = ({ settings, entity }: UserMenuProps) => {
 
 type TopbarProps = {
   settings: ApiState<Settings>
-  entity: EntitySelection
 }
 
-const Topbar = ({ settings, entity }: TopbarProps) => (
-  <header className={styles.topBar}>
-    <Logo />
+const Topbar = ({ settings }: TopbarProps) => {
+  const entity = useEntity()
 
-    <nav className={styles.pageNav}>
-      <PageLink to="/stocks">Stocks</PageLink>
-      <PageLink to="/transactions">Transactions</PageLink>
-      <PageLink to="/controls">Contrôles</PageLink>
-      <PageLink to="/directory">Annuaire</PageLink>
-    </nav>
+  return (
+    <header className={styles.topBar}>
+      <Logo />
 
-    <UserMenu settings={settings} entity={entity} />
-  </header>
-)
+      <nav className={styles.pageNav}>
+        <PageLink to="stocks">Stocks</PageLink>
+        <PageLink to="transactions">Transactions</PageLink>
+        <PageLink to="controls">Contrôles</PageLink>
+        <PageLink to="directory">Annuaire</PageLink>
+      </nav>
+
+      <UserMenu settings={settings} entity={entity} />
+    </header>
+  )
+}
 
 export default Topbar

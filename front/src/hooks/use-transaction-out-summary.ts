@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { EntitySelection } from "./use-app"
+import { EntitySelection } from "./helpers/use-entity"
 
 import useAPI from "./helpers/use-api"
 import useForm from "../hooks/helpers/use-form"
@@ -11,25 +11,23 @@ export interface TransactionOutSummaryFormState {
   [delivery_site: string]: {
     [supplier: string]: {
       [biocarburant: string]: {
-        volume: number,
-        avg_ghg_reduction: number,
+        volume: number
+        avg_ghg_reduction: number
       }
     }
-  } 
+  }
 }
 
-export default function useTransactionOutSummary(
-  entity: EntitySelection,
-) {
+export default function useTransactionOutSummary(entity: EntitySelection) {
   const close = useClose("/transactions")
   const [form, change] = useForm({})
   const [request, resolve] = useAPI(getLotsOutSummary)
 
   useEffect(() => {
-    if (entity.selected?.id) {
-      resolve(entity.selected.id)
+    if (entity !== null) {
+      resolve(entity)
     }
-  }, [resolve, entity.selected])
+  }, [resolve, entity])
 
   return {
     form,

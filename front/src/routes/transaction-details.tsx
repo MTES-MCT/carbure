@@ -1,19 +1,19 @@
 import React from "react"
-import { Redirect } from "react-router-dom"
 
 import { Lots } from "../services/types"
-import { EntitySelection } from "../hooks/use-app"
+import { EntitySelection } from "../hooks/helpers/use-entity"
 
 import useTransactionDetails from "../hooks/use-transaction-details"
 
 import Modal from "../components/system/modal"
-import { Button, Title } from "../components/system"
+import { Button, LoaderOverlay, Title } from "../components/system"
 import { Save, Cross } from "../components/system/icons"
 import TransactionForm from "../components/transaction-form"
+import { ApiState } from "../hooks/helpers/use-api"
 
 type TransactionDetailsProps = {
   entity: EntitySelection
-  transactions: Lots | null
+  transactions: ApiState<Lots>
   refresh: () => void
 }
 
@@ -28,13 +28,9 @@ const TransactionDetails = ({
     refresh
   )
 
-  if (form === null) {
-    return <Redirect to="/transactions" />
-  }
-
   return (
     <Modal onClose={close}>
-      <Title>Transaction #{form.id}</Title>
+      <Title>Transaction #{form.id ?? "N/A"}</Title>
 
       <TransactionForm
         transaction={form}
@@ -54,6 +50,8 @@ const TransactionDetails = ({
           Annuler
         </Button>
       </TransactionForm>
+
+      {transactions.loading && <LoaderOverlay />}
     </Modal>
   )
 }

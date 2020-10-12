@@ -1,11 +1,10 @@
 import React from "react"
-import { Redirect } from "react-router-dom"
 
 import { AsyncButton, Button, Title } from "../components/system"
 import Modal from "../components/system/modal"
 import TransactionForm from "../components/transaction-form"
 import { Cross, Plus } from "../components/system/icons"
-import { EntitySelection } from "../hooks/use-app"
+import { EntitySelection } from "../hooks/helpers/use-entity"
 import useTransactionAdd from "../hooks/use-transaction-add"
 
 type TransactionAddProps = {
@@ -19,16 +18,12 @@ const TransactionAdd = ({ entity, refresh }: TransactionAddProps) => {
     refresh
   )
 
-  if (entity.selected === null) {
-    return <Redirect to="/transactions" />
-  }
-
   return (
     <Modal onClose={close}>
       <Title>Créer un nouveau lot</Title>
 
       <TransactionForm
-        transaction={form!}
+        transaction={form}
         error={request.error}
         onChange={change}
         onSubmit={submit}

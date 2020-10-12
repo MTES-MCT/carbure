@@ -1,23 +1,18 @@
 import React from "react"
-import { Route, Switch } from "react-router-dom"
-
-import { EntitySelection } from "../hooks/use-app"
 
 import useTransactions from "../hooks/use-transactions"
 
 import { Main } from "../components/system"
+import { Route, Switch } from "../components/relative-route"
 import TransactionSnapshot from "../components/transaction-snapshot"
 import TransactionList from "../components/transaction-list"
 import TransactionDetails from "./transaction-details"
 import TransactionAdd from "./transaction-add"
 import TransactionOutSummary from "./transaction-out-summary"
 
-type TransactionsProps = {
-  entity: EntitySelection
-}
-
-const Transactions = ({ entity }: TransactionsProps) => {
+const Transactions = () => {
   const {
+    entity,
     status,
     filters,
     pagination,
@@ -30,9 +25,9 @@ const Transactions = ({ entity }: TransactionsProps) => {
     duplicator,
     validator,
     refresh,
-  } = useTransactions(entity)
+  } = useTransactions()
 
-  if (entity.selected === null) {
+  if (entity === null) {
     return null
   }
 
@@ -57,18 +52,18 @@ const Transactions = ({ entity }: TransactionsProps) => {
       />
 
       <Switch>
-        <Route path="/transactions/add">
+        <Route relative path="add">
           <TransactionAdd entity={entity} refresh={refresh} />
         </Route>
 
-        <Route path="/transactions/show-summary-out">
+        <Route relative path="show-summary-out">
           <TransactionOutSummary entity={entity} />
         </Route>
 
-        <Route exact path="/transactions/:id">
+        <Route relative path=":id">
           <TransactionDetails
             entity={entity}
-            transactions={transactions.data}
+            transactions={transactions}
             refresh={refresh}
           />
         </Route>

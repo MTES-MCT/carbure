@@ -26,15 +26,18 @@
   align-items: stretch;
 }
 
-.transactionStatus button {
+.transactionStatus a {
+  display: flex;
   margin: 0 12px;
+  flex: 1;
+  text-decoration: none;
 }
 
-.transactionStatus button:first-child {
+.transactionStatus a:first-child {
   margin-left: 0;
 }
 
-.transactionStatus button:last-child {
+.transactionStatus a:last-child {
   margin-right: 0;
 }
 

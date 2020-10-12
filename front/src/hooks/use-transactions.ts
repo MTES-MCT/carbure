@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
 
-import { EntitySelection } from "./use-app"
 import { SelectValue } from "../components/system/select"
 import { LotStatus, Filters, Lots, Snapshot } from "../services/types"
 
@@ -15,6 +14,8 @@ import {
   validateLots,
 } from "../services/lots"
 import confirm from "../components/system/confirm"
+import { useHistory, useParams } from "react-router-dom"
+import useEntity, { EntitySelection } from "./helpers/use-entity"
 
 export type SearchSelection = {
   query: string
@@ -34,7 +35,12 @@ export type StatusSelection = {
 
 // manage currently selected transaction status
 function useStatusSelection(): StatusSelection {
-  const [active, setActive] = useState(LotStatus.Draft)
+  const history = useHistory()
+  const params: { status: LotStatus } = useParams()
+
+  const active = params.status
+  const setActive = (status: LotStatus) => history.push(`/org/${status}`)
+
   return { active, setActive }
 }
 
@@ -120,12 +126,12 @@ function useGetSnapshot(
   const [snapshot, resolveSnapshot] = useAPI(getSnapshot)
 
   function resolve() {
-    if (entity.selected?.id) {
-      resolveSnapshot(entity.selected.id)
+    if (entity !== null) {
+      resolveSnapshot(entity)
     }
   }
 
-  useEffect(resolve, [resolveSnapshot, entity.selected])
+  useEffect(resolve, [resolveSnapshot, entity])
 
   return [snapshot, resolve]
 }
@@ -146,10 +152,10 @@ function useGetLots(
   const { selectMany } = selection
 
   function resolve() {
-    if (entity.selected?.id) {
+    if (entity !== null) {
       resolveLots(
         status.active,
-        entity.selected.id,
+        entity,
         filters.selected,
         page,
         limit,
@@ -160,29 +166,31 @@ function useGetLots(
     }
   }
 
-  useEffect(resolve, [
-    resolveLots,
-    status.active,
-    entity.selected,
-    filters.selected,
-    page,
-    limit,
-    search.query,
-    sorting.column,
-    sorting.order,
-  ])
-
   // reset page to 0 when filters change
   useEffect(() => {
     setPage(0)
     selectMany([])
   }, [
     status.active,
-    entity.selected,
+    entity,
     filters.selected,
+    sorting.column,
+    sorting.order,
     limit,
     setPage,
     selectMany,
+  ])
+
+  useEffect(resolve, [
+    resolveLots,
+    status.active,
+    entity,
+    filters.selected,
+    page,
+    limit,
+    search.query,
+    sorting.column,
+    sorting.order,
   ])
 
   return [transactions, resolve]
@@ -197,8 +205,8 @@ function useDuplicateLot(entity: EntitySelection, refresh: () => void) {
       "Voulez vous dupliquer ce lot ?"
     )
 
-    if (entity.selected && shouldDuplicate) {
-      resolveDuplicate(entity.selected.id, lotID).then(refresh)
+    if (entity !== null && shouldDuplicate) {
+      resolveDuplicate(entity, lotID).then(refresh)
     }
   }
 
@@ -214,8 +222,8 @@ function useDeleteLots(entity: EntitySelection, refresh: () => void) {
       "Voulez vous supprimer ce(s) lot(s) ?"
     )
 
-    if (entity.selected && shouldDelete) {
-      resolveDelete(entity.selected.id, lotIDs).then(refresh)
+    if (entity !== null && shouldDelete) {
+      resolveDelete(entity, lotIDs).then(refresh)
     }
   }
 
@@ -231,15 +239,17 @@ function useValidateLots(entity: EntitySelection, refresh: () => void) {
       "Voulez vous envoyer ce(s) lot(s) ?"
     )
 
-    if (entity.selected && shouldValidate) {
-      resolveValidate(entity.selected.id, lotIDs).then(refresh)
+    if (entity !== null && shouldValidate) {
+      resolveValidate(entity, lotIDs).then(refresh)
     }
   }
 
   return { ...request, resolve }
 }
 
-export default function useTransactions(entity: EntitySelection) {
+export default function useTransactions() {
+  const entity = useEntity()
+
   const status = useStatusSelection()
   const filters = useFilterSelection()
   const pagination = usePageSelection()
@@ -260,6 +270,7 @@ export default function useTransactions(entity: EntitySelection) {
   const validator = useValidateLots(entity, refresh)
 
   return {
+    entity,
     status,
     filters,
     pagination,
