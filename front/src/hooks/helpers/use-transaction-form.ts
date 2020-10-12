@@ -148,5 +148,5 @@ const initialState: TransactionFormState = {
 }
 
 export default function useTransactionForm() {
-  return useForm<TransactionFormState | null>(initialState)
+  return useForm<TransactionFormState>(initialState)
 }
