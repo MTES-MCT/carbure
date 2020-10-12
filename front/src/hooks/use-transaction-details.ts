@@ -1,4 +1,3 @@
-import { useEffect } from "react"
 import { useParams } from "react-router-dom"
 
 import { Lots } from "../services/types"
@@ -23,20 +22,22 @@ export default function useTransactionDetails(
 
   const transactionID = parseInt(params.id, 10)
 
-  useEffect(() => {
-    if (transactions) {
-      // find the relevant lot
-      // @TODO would be nice to be able to fetch details for only one lot
-      const transaction = transactions.data?.lots.find(
-        (lot) => lot.id === transactionID
-      )
+  // if form data is not initialized, fill it instantly with data coming from transaction list
+  if (transactions.data && (form.id === -1 || form.id !== transactionID)) {
+    // find the relevant lot
+    // @TODO would be nice to be able to fetch details for only one lot
+    const transaction = transactions.data?.lots.find(
+      (lot) => lot.id === transactionID
+    )
 
+    if (transaction) {
       // initialize the form with data coming from the loaded transaction
-      if (transaction) {
-        setForm(toTransactionFormState(transaction))
-      }
+      setForm(toTransactionFormState(transaction))
+    } else {
+      // if transaction can't be loaded, close the modal
+      close()
     }
-  }, [transactionID, transactions, setForm])
+  }
 
   function submit() {
     if (entity !== null && form) {
