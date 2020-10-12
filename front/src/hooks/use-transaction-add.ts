@@ -14,9 +14,14 @@ export default function useTransactionAdd(
   const [form, change] = useTransactionForm()
   const [request, resolve] = useAPI(addLot)
 
-  function submit() {
-    if (entity !== null && form) {
-      resolve(entity, form).then(close).then(refresh)
+  async function submit() {
+    if (entity === null) return
+
+    const res = await resolve(entity, form)
+
+    if (res) {
+      refresh()
+      close()
     }
   }
 

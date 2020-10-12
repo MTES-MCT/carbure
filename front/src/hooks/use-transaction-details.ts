@@ -38,9 +38,14 @@ export default function useTransactionDetails(
     }
   }
 
-  function submit() {
-    if (entity !== null && form) {
-      resolve(entity, transactionID, form).then(close).then(refresh)
+  async function submit() {
+    if (entity === null) return
+
+    const res = await resolve(entity, transactionID, form)
+
+    if (res) {
+      refresh()
+      close()
     }
   }
 

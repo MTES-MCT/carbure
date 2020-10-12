@@ -6,7 +6,7 @@ import { EntitySelection } from "../hooks/helpers/use-entity"
 import useTransactionDetails from "../hooks/use-transaction-details"
 
 import Modal from "../components/system/modal"
-import { Button, LoaderOverlay, Title } from "../components/system"
+import { AsyncButton, Button, LoaderOverlay, Title } from "../components/system"
 import { Save, Cross } from "../components/system/icons"
 import TransactionForm from "../components/transaction-form"
 import { ApiState } from "../hooks/helpers/use-api"
@@ -37,15 +37,15 @@ const TransactionDetails = ({
         error={request.error}
         onChange={change}
       >
-        <Button
+        <AsyncButton
           submit
-          name="update"
           icon={Save}
           level="primary"
+          loading={request.loading}
           onClick={submit}
         >
           Sauvegarder
-        </Button>
+        </AsyncButton>
         <Button icon={Cross} onClick={close}>
           Annuler
         </Button>
