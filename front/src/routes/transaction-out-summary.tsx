@@ -14,10 +14,6 @@ type TransactionOutSummaryProps = {
 const TransactionOutSummary = ({ entity }: TransactionOutSummaryProps) => {
   const { form, request, change, close } = useTransactionOutSummary(entity)
 
-  if (entity === null) {
-    return <Redirect to="/transactions" />
-  }
-
   return (
     <Modal onClose={close}>
       <Title>Bilan des sorties</Title>

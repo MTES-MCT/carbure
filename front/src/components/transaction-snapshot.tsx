@@ -6,7 +6,7 @@ import { StatusSelection, FilterSelection, SearchSelection } from "../hooks/use-
 
 import styles from "./transaction-snapshot.module.css"
 
-import { Plus, Rapport } from "./system/icons"
+import { Plus } from "./system/icons"
 import { Title, Button, StatusButton, SearchInput, Box } from "./system"
 import Select from "./system/select"
 import { Link } from "./relative-route"
@@ -52,17 +52,6 @@ const TransactionSnapshot = ({
               Ajouter des lots
             </Button>
           </Link>
-          {status.active === LotStatus.Validated && (
-            <Link to="/transactions/show-summary-out">
-              <Button
-                className={styles.transactionButtons}
-                level="primary"
-                icon={Rapport}
-              >
-                Rapport
-              </Button>
-            </Link>
-          )}
         </Box>
       </div>
 

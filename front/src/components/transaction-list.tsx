@@ -9,17 +9,22 @@ import { ApiState } from "../hooks/helpers/use-api"
 import styles from "./transaction-list.module.css"
 
 import { Alert, Box, Button, LoaderOverlay } from "./system"
-import { AlertCircle, Check, Cross } from "./system/icons"
+import { AlertCircle, Check, Cross, Rapport } from "./system/icons"
 import Pagination from "./system/pagination"
 import TransactionTable from "./transaction-table"
+import { Link } from "./relative-route"
 
-type ActionProps = {
+type DraftActionProps = {
   disabled: boolean
   onDelete: () => void
   onValidate: () => void
 }
 
-const Actions = ({ disabled, onDelete, onValidate }: ActionProps) => (
+type ValidatedLotsActionProps = {
+
+}
+
+const DraftLotsActions = ({ disabled, onDelete, onValidate }: DraftActionProps) => (
   <Box row className={cl(styles.actionBar)}>
     <Button
       disabled={disabled}
@@ -32,6 +37,20 @@ const Actions = ({ disabled, onDelete, onValidate }: ActionProps) => (
     <Button disabled={disabled} icon={Cross} level="danger" onClick={onDelete}>
       Supprimer la sélection
     </Button>
+  </Box>
+)
+
+const ValidatedLotsActions = ({}: ValidatedLotsActionProps) => (
+  <Box row className={cl(styles.actionBar)}>
+    <Link to="validated/show-summary-out">
+      <Button
+        className={styles.transactionButtons}
+        level="primary"
+        icon={Rapport}
+      >
+        Rapport de sorties
+      </Button>
+    </Link>
   </Box>
 )
 
@@ -81,13 +100,15 @@ const TransactionList = ({
       {!isError && !isEmpty && (
         <React.Fragment>
           {status.active === LotStatus.Draft && (
-            <Actions
+            <DraftLotsActions
               disabled={selection.selected.length === 0}
               onDelete={() => onDelete(selection.selected)}
               onValidate={() => onValidate(selection.selected)}
             />
           )}
-
+          {status.active === LotStatus.Validated && (
+            <ValidatedLotsActions />
+          )}
           <Box>
             <TransactionTable
               status={status}
