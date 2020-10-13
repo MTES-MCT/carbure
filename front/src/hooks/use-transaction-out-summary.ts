@@ -19,7 +19,7 @@ export interface TransactionOutSummaryFormState {
 }
 
 export default function useTransactionOutSummary(entity: EntitySelection) {
-  const close = useClose("/transactions")
+  const close = useClose("../")
   const [form, change] = useForm({})
   const [request, resolve] = useAPI(getLotsOutSummary)
 
