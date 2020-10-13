@@ -42,7 +42,7 @@ const DraftLotsActions = ({ disabled, onDelete, onValidate }: DraftActionProps) 
 
 const ValidatedLotsActions = ({}: ValidatedLotsActionProps) => (
   <Box row className={cl(styles.actionBar)}>
-    <Link to="validated/show-summary-out">
+    <Link to="./validated/show-summary-out">
       <Button
         className={styles.transactionButtons}
         level="primary"
