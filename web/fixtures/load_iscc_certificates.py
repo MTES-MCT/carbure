@@ -54,7 +54,10 @@ def bulk_save(bulk_crt, bulk_scopes, bulk_rm):
     
             
 def load_certificates():
-    last_crt = ISCCCertificate.objects.latest('id')
+    try:
+        last_crt = ISCCCertificate.objects.latest('id')
+    except:
+        last_crt = None
     filename = '%s/web/fixtures/csv/Certificates_2020-10-08.csv' % (os.environ['CARBURE_HOME'])
 
     csvfile = open(filename, 'r')
@@ -102,8 +105,9 @@ def load_certificates():
     print('loading certificate %d' % (i))    
     csvfile.close()
     if i > 10000:
-        nb_deleted, _ = ISCCCertificate.objects.filter(id__lte=last_crt.id).delete()
-        print('%d objects created, %d certificates deleted' % (i, nb_deleted))
+        if last_crt:
+            nb_deleted, _ = ISCCCertificate.objects.filter(id__lte=last_crt.id).delete()
+            print('%d objects created, %d certificates deleted' % (i, nb_deleted))
     return
         
 
