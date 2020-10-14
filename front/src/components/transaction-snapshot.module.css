@@ -16,10 +16,6 @@
   margin-bottom: 32px;
 }
 
-.transactionHeader a {
-  text-decoration: none;
-}
-
 .transactionStatus {
   display: flex;
   justify-content: space-between;
@@ -30,7 +26,6 @@
   display: flex;
   margin: 0 12px;
   flex: 1;
-  text-decoration: none;
 }
 
 .transactionStatus a:first-child {
