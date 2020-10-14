@@ -18,7 +18,7 @@ const TransactionOutSummary = ({ entity }: TransactionOutSummaryProps) => {
     <Modal onClose={close}>
       <Title>Bilan des sorties</Title>
 
-      <TransactionOutSummaryForm data={form!} onChange={change} />
+      <TransactionOutSummaryForm data={form!} onChange={change} loading={request.loading} />
     </Modal>
   )
 }

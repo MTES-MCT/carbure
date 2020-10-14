@@ -8,8 +8,8 @@ import useClose from "./helpers/use-close"
 import { getLotsOutSummary } from "../services/lots"
 
 export interface TransactionOutSummaryFormState {
-  [delivery_site: string]: {
-    [supplier: string]: {
+  [client: string]: {
+    [delivery_site: string]: {
       [biocarburant: string]: {
         volume: number
         avg_ghg_reduction: number
