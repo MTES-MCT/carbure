@@ -17,21 +17,19 @@ function parseValue(element: FormFields) {
 }
 
 export type FormHook<T> = [
-  T | null,
+  T,
   <T extends FormFields>(e: React.ChangeEvent<T>) => void,
-  React.Dispatch<React.SetStateAction<T | null>>
+  React.Dispatch<React.SetStateAction<T>>
 ]
 
 export default function useForm<T>(initialState: T): FormHook<T> {
-  const [form, setForm] = useState<T | null>(initialState)
+  const [form, setForm] = useState<T>(initialState)
 
   function change<T extends FormFields>(e: React.ChangeEvent<T>) {
-    if (form) {
-      setForm({
-        ...form,
-        [e.target.name]: parseValue(e.target),
-      })
-    }
+    setForm({
+      ...form,
+      [e.target.name]: parseValue(e.target),
+    })
   }
 
   return [form, change, setForm]

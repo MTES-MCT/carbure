@@ -1,4 +1,4 @@
-import { EntitySelection } from "./use-app"
+import { EntitySelection } from "./helpers/use-entity"
 
 import useAPI from "./helpers/use-api"
 import useTransactionForm from "../hooks/helpers/use-transaction-form"
@@ -10,13 +10,18 @@ export default function useTransactionAdd(
   entity: EntitySelection,
   refresh: () => void
 ) {
-  const close = useClose("/transactions")
+  const close = useClose("../")
   const [form, change] = useTransactionForm()
   const [request, resolve] = useAPI(addLot)
 
-  function submit() {
-    if (entity.selected && form) {
-      resolve(entity.selected.id, form).then(close).then(refresh)
+  async function submit() {
+    if (entity === null) return
+
+    const res = await resolve(entity, form)
+
+    if (res) {
+      refresh()
+      close()
     }
   }
 

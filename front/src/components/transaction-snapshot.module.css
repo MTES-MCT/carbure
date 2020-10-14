@@ -16,25 +16,23 @@
   margin-bottom: 32px;
 }
 
-.transactionHeader a {
-  text-decoration: none;
-}
-
 .transactionStatus {
   display: flex;
   justify-content: space-between;
   align-items: stretch;
 }
 
-.transactionStatus button {
+.transactionStatus a {
+  display: flex;
   margin: 0 12px;
+  flex: 1;
 }
 
-.transactionStatus button:first-child {
+.transactionStatus a:first-child {
   margin-left: 0;
 }
 
-.transactionStatus button:last-child {
+.transactionStatus a:last-child {
   margin-right: 0;
 }
 
@@ -60,6 +58,7 @@
 
 .searchInput input {
   width: 165px;
+  height: 100%;
   background-color: var(--gray-light);
 }
 

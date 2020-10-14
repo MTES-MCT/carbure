@@ -131,11 +131,19 @@ export const Loader = ({ className, ...props }: IconProps) => (
 
 export const Rapport = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("icon-rapport", className)}>
-      <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
-      <rect x="9" y="3" width="6" height="4" rx="2" />
-      <line x1="9" y1="12" x2="9.01" y2="12" />
-      <line x1="13" y1="12" x2="15" y2="12" />
-      <line x1="9" y1="16" x2="9.01" y2="16" />
-      <line x1="13" y1="16" x2="15" y2="16" />
-  </Icon> 
+    <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+    <rect x="9" y="3" width="6" height="4" rx="2" />
+    <line x1="9" y1="12" x2="9.01" y2="12" />
+    <line x1="13" y1="12" x2="15" y2="12" />
+    <line x1="9" y1="16" x2="9.01" y2="16" />
+    <line x1="13" y1="16" x2="15" y2="16" />
+  </Icon>
+)
+
+export const Download = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-rapport", className)}>
+    <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+    <polyline points="7 11 12 16 17 11" />
+    <line x1="12" y1="4" x2="12" y2="16" />
+  </Icon>
 )

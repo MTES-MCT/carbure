@@ -1,5 +1,5 @@
 import { Transaction, Lots, LotStatus, Snapshot } from "./types"
-import { FilterSelection, SearchSelection } from "../hooks/use-transactions"
+import { FilterSelection } from "../hooks/use-transactions"
 import { TransactionFormState } from "../hooks/helpers/use-transaction-form"
 
 import api from "./api"
@@ -110,6 +110,8 @@ export function getLots(
   page: number,
   limit: number,
   query: string,
+  sortBy: string,
+  order: string
 ): Promise<Lots> {
   return api.get("/lots", {
     status,
@@ -118,6 +120,27 @@ export function getLots(
     from_idx: page * limit,
     limit: limit,
     query: query,
+    sort_by: sortBy,
+    order: order,
+  })
+}
+
+export function downloadLots(
+  status: LotStatus,
+  producerID: number,
+  filters: FilterSelection["selected"],
+  query: string,
+  sortBy: string,
+  order: string
+) {
+  return api.download("/lots", {
+    status,
+    producer_id: producerID,
+    ...filters,
+    query: query,
+    sort_by: sortBy,
+    order: order,
+    export: true,
   })
 }
 
@@ -158,6 +181,18 @@ export function validateLots(entityID: number, transactionIDs: number[]) {
   return api.post("/lots/validate", {
     entity_id: entityID,
     tx_ids: transactionIDs,
+  })
+}
+
+export function deleteAllDraftLots(entityID: number) {
+  return api.post("/lots/delete-all-drafts", {
+    entity_id: entityID,
+  })
+}
+
+export function validateAllDraftLots(entityID: number) {
+  return api.post("/lots/validate-all-drafts", {
+    entity_id: entityID,
   })
 }
 

@@ -57,6 +57,16 @@ async function checkResponse<T>(res: Response): Promise<T> {
   }
 }
 
+function download(endpoint: string, params: Params) {
+  let url = API_ROOT + endpoint
+
+  if (params) {
+    url += "?" + stringify(filterParams(params))
+  }
+
+  return window.open(url)
+}
+
 async function get<T = any>(
   endpoint: string,
   params?: Params,
@@ -90,4 +100,4 @@ async function post<T = any>(
   return checkResponse<T>(res)
 }
 
-export default { get, post }
+export default { download, get, post }

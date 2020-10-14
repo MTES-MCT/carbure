@@ -1,46 +1,51 @@
-import { useEffect } from "react"
 import { useParams } from "react-router-dom"
 
 import { Lots } from "../services/types"
-import { EntitySelection } from "./use-app"
+import { EntitySelection } from "./helpers/use-entity"
 
-import useTransactionForm, {
-  toTransactionFormState,
-} from "./helpers/use-transaction-form"
-import useAPI from "./helpers/use-api"
+import useTransactionForm, { toTransactionFormState } from "./helpers/use-transaction-form" // prettier-ignore
+import useAPI, { ApiState } from "./helpers/use-api"
 import useClose from "./helpers/use-close"
 import { updateLot } from "../services/lots"
 
 export default function useTransactionDetails(
   entity: EntitySelection,
-  transactions: Lots | null,
+  transactions: ApiState<Lots | null>,
   refresh: () => void
 ) {
-  const close = useClose("/transactions")
+  const close = useClose("../")
   const params: { id: string } = useParams()
   const [form, change, setForm] = useTransactionForm()
   const [request, resolve] = useAPI(updateLot)
 
   const transactionID = parseInt(params.id, 10)
 
-  useEffect(() => {
-    if (transactions) {
-      // find the relevant lot
-      // @TODO would be nice to be able to fetch details for only one lot
-      const transaction = transactions.lots.find(
-        (lot) => lot.id === transactionID
-      )
+  // if form data is not initialized, fill it instantly with data coming from transaction list
+  if (transactions.data && (form.id === -1 || form.id !== transactionID)) {
+    // find the relevant lot
+    // @TODO would be nice to be able to fetch details for only one lot
+    const transaction = transactions.data?.lots.find(
+      (lot) => lot.id === transactionID
+    )
 
+    if (transaction) {
       // initialize the form with data coming from the loaded transaction
-      if (transaction) {
-        setForm(toTransactionFormState(transaction))
-      }
+      setForm(toTransactionFormState(transaction))
+    } else {
+      // if transaction can't be loaded, close the modal
+      // (in a setImmediate so it's executed outside the render loop)
+      setImmediate(close)
     }
-  }, [transactionID, transactions, setForm])
+  }
 
-  function submit() {
-    if (entity.selected && form) {
-      resolve(entity.selected.id, transactionID, form).then(close).then(refresh)
+  async function submit() {
+    if (entity === null) return
+
+    const res = await resolve(entity, transactionID, form)
+
+    if (res) {
+      refresh()
+      close()
     }
   }
 

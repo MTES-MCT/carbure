@@ -19,6 +19,7 @@ const limits = [
   { value: 25, label: "25" },
   { value: 50, label: "50" },
   { value: 100, label: "100" },
+  { value: null, label: "Tous" },
 ]
 
 export type PageSelection = {
@@ -42,7 +43,7 @@ type PaginationProps = {
 }
 
 const Pagination = ({ pagination, total }: PaginationProps) => {
-  const pageCount = Math.ceil(total / pagination.limit)
+  const pageCount = pagination.limit ? Math.ceil(total / pagination.limit) : 1
   const pages = list(pageCount)
 
   return (
