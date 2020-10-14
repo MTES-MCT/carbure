@@ -12,13 +12,13 @@ type TransactionOutSummaryProps = {
 }
 
 const TransactionOutSummary = ({ entity }: TransactionOutSummaryProps) => {
-  const { form, request, change, close } = useTransactionOutSummary(entity)
+  const { request, close } = useTransactionOutSummary(entity)
 
   return (
     <Modal onClose={close}>
       <Title>Bilan des sorties</Title>
 
-      <TransactionOutSummaryForm data={form!} onChange={change} loading={request.loading} />
+      <TransactionOutSummaryForm data={request.data} loading={request.loading} />
     </Modal>
   )
 }
