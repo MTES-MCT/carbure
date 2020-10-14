@@ -18,8 +18,8 @@ type DraftActionProps = {
   selection: number
   onDelete: () => void
   onValidate: () => void
-  onDeleteAll?: () => void
-  onValidateAll?: () => void
+  onDeleteAll: () => void
+  onValidateAll: () => void
 }
 
 const DraftLotsActions = ({
@@ -60,9 +60,7 @@ const ExportActions = ({ onExportAll }: ExportActionsProps) => (
   </React.Fragment>
 )
 
-type ValidatedLotsActionProps = {}
-
-const ValidatedLotsActions = ({}: ValidatedLotsActionProps) => (
+const ValidatedLotsActions = () => (
   <React.Fragment>
     <Link to="./validated/show-summary-out">
       <Button
@@ -92,6 +90,8 @@ type TransactionListProps = {
   onValidate: (ids: number[]) => void
   onDuplicate: (id: number) => void
   onExportAll: () => void
+  onDeleteAll: () => void
+  onValidateAll: () => void
 }
 
 const TransactionList = ({
@@ -104,6 +104,8 @@ const TransactionList = ({
   onDuplicate,
   onValidate,
   onExportAll,
+  onDeleteAll,
+  onValidateAll,
 }: TransactionListProps) => {
   const tx = transactions.data
 
@@ -137,6 +139,8 @@ const TransactionList = ({
                 selection={selection.selected.length}
                 onDelete={() => onDelete(selection.selected)}
                 onValidate={() => onValidate(selection.selected)}
+                onDeleteAll={onDeleteAll}
+                onValidateAll={onValidateAll}
               />
             )}
             {status.active === LotStatus.Validated && <ValidatedLotsActions />}

@@ -184,6 +184,18 @@ export function validateLots(entityID: number, transactionIDs: number[]) {
   })
 }
 
+export function deleteAllDraftLots(entityID: number) {
+  return api.post("/lots/delete-all-drafts", {
+    entity_id: entityID,
+  })
+}
+
+export function validateAllDraftLots(entityID: number) {
+  return api.post("/lots/validate-all-drafts", {
+    entity_id: entityID,
+  })
+}
+
 export function getLotsOutSummary(entityID: number) {
   return api.get("/lots/summary-out", {
     entity_id: entityID,
