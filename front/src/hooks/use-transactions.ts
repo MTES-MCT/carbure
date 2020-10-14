@@ -212,7 +212,17 @@ function useGetLots(
   return { ...transactions, resolve, exportAll }
 }
 
-function useUploadLotFile(entity: EntitySelection, refresh: () => void) {
+export interface Uploader {
+  loading: boolean
+  data: any
+  error: string | null
+  resolve: (f: File) => void
+}
+
+function useUploadLotFile(
+  entity: EntitySelection,
+  refresh: () => void
+): Uploader {
   const [request, resolveUpload] = useAPI(uploadLotFile)
 
   async function resolve(file: File) {
@@ -241,7 +251,13 @@ function useDuplicateLot(entity: EntitySelection, refresh: () => void) {
   return { ...request, resolve }
 }
 
-function useDeleteLots(entity: EntitySelection, refresh: () => void) {
+export interface Deleter {
+  loading: boolean
+  resolve: (l: number[]) => void
+  resolveAll: () => void
+}
+
+function useDeleteLots(entity: EntitySelection, refresh: () => void): Deleter {
   const [request, resolveDelete] = useAPI(deleteLots)
   const [requestAll, resolveDeleteAll] = useAPI(deleteAllDraftLots)
 
@@ -270,7 +286,16 @@ function useDeleteLots(entity: EntitySelection, refresh: () => void) {
   return { loading: request.loading || requestAll.loading, resolve, resolveAll }
 }
 
-function useValidateLots(entity: EntitySelection, refresh: () => void) {
+export interface Validator {
+  loading: boolean
+  resolve: (l: number[]) => void
+  resolveAll: () => void
+}
+
+function useValidateLots(
+  entity: EntitySelection,
+  refresh: () => void
+): Validator {
   const [request, resolveValidate] = useAPI(validateLots)
   const [requestAll, resolveValidateAll] = useAPI(validateAllDraftLots)
 
