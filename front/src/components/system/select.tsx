@@ -7,7 +7,7 @@ import { Input, SystemProps } from "."
 import { Cross } from "./icons"
 import { Dropdown, useDropdown } from "./dropdown"
 
-type Value = string | number
+type Value = string | number | null
 export type Option = { value: Value; label: string }
 export type SelectValue = Value | Value[] | null
 
