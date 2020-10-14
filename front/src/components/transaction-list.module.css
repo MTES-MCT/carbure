@@ -7,6 +7,6 @@
   margin-bottom: 24px;
 }
 
-.actionBar button {
+.actionBar > * {
   margin-right: 16px;
 }

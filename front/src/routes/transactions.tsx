@@ -24,6 +24,7 @@ const Transactions = () => {
     deleter,
     duplicator,
     validator,
+    uploader,
     refresh,
   } = useTransactions()
 
@@ -46,6 +47,7 @@ const Transactions = () => {
         sorting={sorting}
         selection={selection}
         pagination={pagination}
+        onUpload={uploader.resolve}
         onDelete={deleter.resolve}
         onValidate={validator.resolve}
         onDuplicate={duplicator.resolve}

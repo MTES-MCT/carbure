@@ -22,14 +22,6 @@ import Pagination from "./system/pagination"
 import TransactionTable from "./transaction-table"
 import { Link } from "./relative-route"
 
-type DraftActionProps = {
-  selection: number
-  onDelete: () => void
-  onValidate: () => void
-  onDeleteAll: () => void
-  onValidateAll: () => void
-}
-
 type ExportActionsProps = {
   onExportAll: () => void
 }
@@ -42,16 +34,31 @@ const ExportActions = ({ onExportAll }: ExportActionsProps) => (
   </React.Fragment>
 )
 
+type DraftActionProps = {
+  selection: number
+  onUpload: (f: File) => void
+  onDelete: () => void
+  onValidate: () => void
+  onDeleteAll: () => void
+  onValidateAll: () => void
+}
+
 const DraftLotsActions = ({
   selection,
+  onUpload,
   onDelete,
   onValidate,
   onDeleteAll,
   onValidateAll,
 }: DraftActionProps) => (
   <React.Fragment>
-    <Button icon={Upload} onClick={() => console.log("importing")}>
-      Importer lots
+    <Button as="label" icon={Upload}>
+      Importer fichier
+      <input
+        type="file"
+        style={{ display: "none" }}
+        onChange={(e) => onUpload(e!.target.files![0])}
+      />
     </Button>
 
     <Link relative to="add">
@@ -80,7 +87,7 @@ const DraftLotsActions = ({
 
 const ValidatedLotsActions = () => (
   <React.Fragment>
-    <Link to="./validated/show-summary-out">
+    <Link relative to="show-summary-out">
       <Button
         className={styles.transactionButtons}
         level="primary"
@@ -104,6 +111,7 @@ type TransactionListProps = {
   sorting: SortingSelection
   selection: TransactionSelection
   pagination: PageSelection
+  onUpload: (f: File) => void
   onDelete: (ids: number[]) => void
   onValidate: (ids: number[]) => void
   onDuplicate: (id: number) => void
@@ -118,6 +126,7 @@ const TransactionList = ({
   sorting,
   selection,
   pagination,
+  onUpload,
   onDelete,
   onDuplicate,
   onValidate,
@@ -155,6 +164,7 @@ const TransactionList = ({
             {status.active === LotStatus.Draft && (
               <DraftLotsActions
                 selection={selection.selected.length}
+                onUpload={onUpload}
                 onDelete={() => onDelete(selection.selected)}
                 onValidate={() => onValidate(selection.selected)}
                 onDeleteAll={onDeleteAll}

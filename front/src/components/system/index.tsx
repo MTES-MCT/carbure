@@ -11,6 +11,10 @@ export type SystemProps = {
   children?: React.ReactNode
 }
 
+type AsProp = {
+  as?: string | React.ComponentType<any>
+}
+
 type BoxProps = SystemProps &
   React.HTMLProps<HTMLDivElement> & {
     row?: boolean
@@ -37,6 +41,7 @@ export const Main = (props: BoxProps) => <Box {...props} as="main" />
 // BUTTON COMPONENT
 
 type ButtonProps = SystemProps &
+  AsProp &
   React.HTMLProps<HTMLButtonElement> & {
     submit?: boolean
     level?: "primary" | "warning" | "danger" | "success" | "secondary"
@@ -44,6 +49,7 @@ type ButtonProps = SystemProps &
   }
 
 export const Button = ({
+  as: Tag = "button",
   submit = false,
   icon: Icon,
   level,
@@ -60,14 +66,14 @@ export const Button = ({
   })
 
   return (
-    <button
+    <Tag
       {...props}
       type={submit ? "submit" : undefined}
       className={btnClassName}
     >
       {Icon && <Icon />}
       {children}
-    </button>
+    </Tag>
   )
 }
 
