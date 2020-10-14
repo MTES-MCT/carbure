@@ -104,7 +104,7 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
 
 // empty form state
 const initialState: TransactionFormState = {
-  id: 0,
+  id: -1,
   dae: "",
   volume: 0,
   champ_libre: "",
@@ -148,5 +148,5 @@ const initialState: TransactionFormState = {
 }
 
 export default function useTransactionForm() {
-  return useForm<TransactionFormState | null>(initialState)
+  return useForm<TransactionFormState>(initialState)
 }

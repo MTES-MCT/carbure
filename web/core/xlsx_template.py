@@ -532,7 +532,7 @@ def make_dump_lots_sheet(workbook, entity, transactions):
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
 
-    for tx in transactions:
+    for i, tx in enumerate(transactions):
         lot = tx.lot
         row = [lot.carbure_id,
                lot.carbure_producer.name if lot.carbure_producer else lot.unknown_producer,
@@ -543,7 +543,7 @@ def make_dump_lots_sheet(workbook, entity, transactions):
                lot.matiere_premiere.code if lot.matiere_premiere else '',
                lot.pays_origine.code_pays if lot.pays_origine else '',
                lot.eec, lot.el, lot.ep, lot.etd, lot.eu, lot.esca, lot.eccs, lot.eccr, lot.eee, lot.ghg_total,
-               tx.dae, tx.champ_libre, tx.carbure_client.name if tx.client_is_in_carbure else tx.unknown_client, tx.delivery_date,
+               tx.dae, tx.champ_libre, tx.carbure_client.name if tx.client_is_in_carbure and tx.carbure_client else tx.unknown_client, tx.delivery_date,
                tx.carbure_delivery_site.depot_id if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site,
                tx.carbure_delivery_site.country.code_pays if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site_country.code_pays if tx.unknown_delivery_site_country else ''
                ]

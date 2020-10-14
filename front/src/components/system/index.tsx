@@ -39,7 +39,7 @@ export const Main = (props: BoxProps) => <Box {...props} as="main" />
 type ButtonProps = SystemProps &
   React.HTMLProps<HTMLButtonElement> & {
     submit?: boolean
-    level?: "primary" | "warning" | "danger"
+    level?: "primary" | "warning" | "danger" | "success" | "secondary"
     icon?: React.ComponentType
   }
 
@@ -55,6 +55,8 @@ export const Button = ({
     [styles.buttonPrimary]: level === "primary",
     [styles.buttonWarning]: level === "warning",
     [styles.buttonDanger]: level === "danger",
+    [styles.buttonSuccess]: level === "success",
+    [styles.buttonSecondary]: level === "secondary",
   })
 
   return (
@@ -233,40 +235,13 @@ export const SearchInput = ({ className, ...props }: InputProps) => (
 
 // TABLE COMPONENT
 
-type TableProps<T> = SystemProps &
-  Omit<React.HTMLProps<HTMLTableElement>, "rows"> & {
-    rows: T[]
-    columns: string[]
-    selected: boolean
-    children: (row: T, i: number) => React.ReactNode
-    onSelectAll: (e: React.ChangeEvent<HTMLInputElement>) => void
-  }
+type TableProps = SystemProps & React.HTMLProps<HTMLTableElement>
 
-export function Table<T>({
-  columns,
-  rows,
-  selected,
-  children,
-  onSelectAll,
-  ...props
-}: TableProps<T>) {
-  return (
-    <table {...props} className={styles.table}>
-      <thead>
-        <tr className={styles.header}>
-          <th>
-            <input type="checkbox" checked={selected} onChange={onSelectAll} />
-          </th>
-          {columns.map((column) => (
-            <th key={column}>{column}</th>
-          ))}
-          <th />
-        </tr>
-      </thead>
-      <tbody>{rows.map((row, i) => children(row, i))}</tbody>
-    </table>
-  )
-}
+export const Table = ({ children, className, ...props }: TableProps) => (
+  <table {...props} className={cl(styles.table, className)}>
+    {children}
+  </table>
+)
 
 // LOADER OVERLAY
 

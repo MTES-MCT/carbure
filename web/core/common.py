@@ -513,6 +513,7 @@ def load_lot(entity, user, lot_dict, source, transaction=None):
     transaction.ghg_reduction = lot.ghg_reduction
     transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
     transaction.save()
+    lot.save()
     return lot, transaction, lot_errors, tx_errors
 
 

@@ -1,8 +1,7 @@
-import { useHistory } from "react-router-dom"
+import { useRelativePush } from "../../components/relative-route"
 
 // create a shortcut function to go to the specified link
 export default function useClose(to: string) {
-  const history = useHistory()
-  const close = () => history.push(to)
-  return close
+  const push = useRelativePush()
+  return () => push(to)
 }

@@ -1,19 +1,15 @@
 import React from "react"
-import { Link } from "react-router-dom"
 
 import { ApiState } from "../hooks/helpers/use-api"
 import { Filters, LotStatus, Snapshot } from "../services/types"
-import {
-  StatusSelection,
-  FilterSelection,
-  SearchSelection,
-} from "../hooks/use-transactions"
+import { StatusSelection, FilterSelection, SearchSelection } from "../hooks/use-transactions" // prettier-ignore
 
 import styles from "./transaction-snapshot.module.css"
 
-import { Plus, Rapport } from "./system/icons"
+import { Plus } from "./system/icons"
 import { Title, Button, StatusButton, SearchInput, Box } from "./system"
 import Select from "./system/select"
+import { Link } from "./relative-route"
 
 const STATUS = [
   { key: LotStatus.Draft, label: "Brouillons" },
@@ -50,31 +46,24 @@ const TransactionSnapshot = ({
         <Title>Transactions</Title>
 
         <Box row>
-          <Link to="/transactions/add">
+          <Link relative to="../draft/add">
             <Button level="primary">
               <Plus />
               Ajouter des lots
             </Button>
           </Link>
-          {status.active === LotStatus.Validated && (
-            <Link to="/transactions/show-summary-out">
-              <Button className={styles.transactionButtons} level="primary" icon={Rapport}>
-                Rapport
-              </Button>
-            </Link>
-          )}
         </Box>
       </div>
 
       <div className={styles.transactionStatus}>
         {STATUS.map(({ key, label }) => (
-          <StatusButton
-            key={key}
-            active={key === status.active}
-            amount={snapshot.loading ? "…" : snapshot.data?.lots[key] ?? 0}
-            label={label}
-            onClick={() => status.setActive(key)}
-          />
+          <Link key={key} relative to={`../${key}`}>
+            <StatusButton
+              active={key === status.active}
+              amount={snapshot.loading ? "…" : snapshot.data?.lots[key] ?? 0}
+              label={label}
+            />
+          </Link>
         ))}
       </div>
     </div>

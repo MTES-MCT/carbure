@@ -1,18 +1,18 @@
 import React from "react"
-import { BrowserRouter, Route } from "react-router-dom"
+import { BrowserRouter } from "react-router-dom"
 
 import useApp from "./hooks/use-app"
 
 import { LoaderOverlay } from "./components/system"
+import { Redirect, Route, Switch } from "./components/relative-route"
 import Exit from "./components/exit"
-import Topbar from "./components/top-bar"
-import Footer from "./components/footer"
 
 import Logout from "./routes/logout"
-import Transactions from "./routes/transactions"
+import Org from "./routes/org"
 
 const App = () => {
-  const { entity, settings } = useApp()
+  const app = useApp()
+  const { settings, getDefaultEntity } = app
 
   if (settings.error) {
     return <Exit to="/" />
@@ -22,17 +22,19 @@ const App = () => {
     <BrowserRouter basename="/v2">
       {settings.loading && <LoaderOverlay />}
 
-      <Topbar settings={settings} entity={entity} />
+      {settings.data && (
+        <Switch>
+          <Route path="/org/:entity">
+            <Org app={app} />
+          </Route>
 
-      <Route path="/transactions">
-        <Transactions entity={entity} />
-      </Route>
+          <Route path="/logout">
+            <Logout />
+          </Route>
 
-      <Route path="/logout">
-        <Logout />
-      </Route>
-
-      <Footer />
+          <Redirect to={`/org/${getDefaultEntity()}`} />
+        </Switch>
+      )}
     </BrowserRouter>
   )
 }

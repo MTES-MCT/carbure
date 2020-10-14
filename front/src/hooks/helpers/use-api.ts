@@ -36,35 +36,55 @@ const initialState = {
   data: null,
 }
 
+type CancelablePromise = Promise<boolean> & { cancel?: () => void }
+type Resolver<T extends any[]> = (...args: T) => CancelablePromise
 type ApiReducer<T> = React.Reducer<ApiState<T>, ApiAction<T>>
-type Resolver<T extends any[]> = (...args: T) => Promise<void>
 type ApiHook<T extends any[], U> = [ApiState<U>, Resolver<T>]
 
 function useAPI<T extends any[], U>(
   createPromise: (...args: T) => Promise<U>
 ): ApiHook<T, U> {
-  const resolve = useRef<Resolver<T> | null>(null)
+  const resolveRef = useRef<Resolver<T> | null>(null)
   const [state, dispatch] = useReducer<ApiReducer<U>>(reducer, initialState)
 
-  if (resolve.current === null) {
-    resolve.current = async (...args: T) => {
-      // signal that the request process started
-      dispatch({ type: ApiStatus.Pending })
+  if (resolveRef.current === null) {
+    resolveRef.current = (...args: T) => {
+      let cancelled = false
 
-      try {
-        // actually call the api and wait for the response
-        const res = await createPromise(...args)
+      // returns true if it was a success, false otherwise
+      const resolve = async () => {
+        if (!cancelled) {
+          // signal that the request process started
+          dispatch({ type: ApiStatus.Pending })
+        }
 
-        // dispatch the data if it was a success
-        dispatch({ type: ApiStatus.Success, payload: res })
-      } catch (err) {
-        // otherwise save the error
-        dispatch({ type: ApiStatus.Error, payload: err.message })
+        try {
+          // actually call the api and wait for the response
+          const res = await createPromise(...args)
+
+          // dispatch the data if it was a success
+          if (!cancelled) {
+            dispatch({ type: ApiStatus.Success, payload: res })
+            return true
+          }
+        } catch (err) {
+          // otherwise save the error
+          if (!cancelled) {
+            dispatch({ type: ApiStatus.Error, payload: err.message })
+          }
+        }
+
+        return false
       }
+
+      const promise: CancelablePromise = resolve()
+      promise.cancel = () => { cancelled = true } // prettier-ignore
+
+      return promise
     }
   }
 
-  return [state, resolve.current]
+  return [state, resolveRef.current]
 }
 
 export default useAPI

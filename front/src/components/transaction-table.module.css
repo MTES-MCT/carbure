@@ -1,0 +1,40 @@
+/* v  forcing of column width so the table stays stable */
+
+/* 1st column (checkbox) */
+.transactionTable thead th:first-child {
+  width: 40px;
+}
+
+/* 2nd and last columns (status + actions) */
+.transactionTable thead th:nth-child(2),
+.transactionTable thead th:nth-last-child(2),
+.transactionTable thead th:last-child {
+  width: 88px;
+}
+
+.actionColumn {
+  width: 82px;
+  text-align: center;
+  color: var(--gray-dark);
+}
+
+.transactionActions {
+  display: none;
+}
+
+.transactionActions :global(.icon) {
+  width: 20px;
+}
+
+.transactionActions :global(.icon):hover {
+  stroke: var(--blue-medium);
+}
+
+.editableTable tr:hover .transactionArrow {
+  display: none;
+}
+.editableTable tr:hover .transactionActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

@@ -140,29 +140,17 @@ const TransactionForm = ({
               />
               <LabelInput
                 disabled
-                readOnly
                 label="Pays de production"
-                value={tx.carbure_production_site?.country?.name}
+                defaultValue={tx.carbure_production_site?.country?.name}
               />
               <LabelInput
-                readOnly
                 disabled
                 type="date"
                 label="Date de mise en service"
-                value={tx.carbure_production_site?.date_mise_en_service}
+                defaultValue={tx.carbure_production_site?.date_mise_en_service}
               />
-              <LabelInput
-                readOnly
-                disabled
-                label="N° d'enregistrement double-compte"
-                value=""
-              />
-              <LabelInput
-                readOnly
-                disabled
-                label="Référence Système Fournisseur"
-                value=""
-              />
+              <LabelInput disabled label="N° d'enregistrement double-compte" />
+              <LabelInput disabled label="Référence Système Fournisseur" />
             </React.Fragment>
           ) : (
             <React.Fragment>
@@ -283,24 +271,23 @@ const TransactionForm = ({
           )}
 
           {tx.delivery_site_is_in_carbure ? (
-          <LabelInput
-            disabled
-            readOnly
-            label="Pays de livraison"
-            value={tx.carbure_delivery_site?.country?.name}
-          />
+            <LabelInput
+              disabled
+              label="Pays de livraison"
+              defaultValue={tx.carbure_delivery_site?.country?.name}
+            />
           ) : (
-          <AutoComplete
-            disabled={tx.delivery_site_is_in_carbure}
-            readOnly={readOnly}
-            label="Pays de livraison"
-            name="unknown_delivery_site_country"
-            value={tx.unknown_delivery_site_country}
-            getValue={getters.code_pays}
-            getLabel={getters.name}
-            getQuery={findCountries}
-            onChange={onChange}
-          />
+            <AutoComplete
+              disabled={tx.delivery_site_is_in_carbure}
+              readOnly={readOnly}
+              label="Pays de livraison"
+              name="unknown_delivery_site_country"
+              value={tx.unknown_delivery_site_country}
+              getValue={getters.code_pays}
+              getLabel={getters.name}
+              getQuery={findCountries}
+              onChange={onChange}
+            />
           )}
 
           <LabelInput
