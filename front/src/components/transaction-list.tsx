@@ -50,9 +50,9 @@ const DraftLotsActions = ({
 
   function onDelete() {
     if (hasSelection) {
-      validator.resolve(selection.selected)
+      deleter.resolve(selection.selected)
     } else {
-      validator.resolveAll()
+      deleter.resolveAll()
     }
   }
 
@@ -147,29 +147,31 @@ const TransactionList = ({
 
   return (
     <Box className={styles.transactionList}>
-      <ActionBar>
-        <Button icon={Download} disabled={isEmpty} onClick={onExportAll}>
-          Exporter tout
-        </Button>
-
-        {status.active === LotStatus.Draft && (
-          <DraftLotsActions
-            disabled={isEmpty}
-            selection={selection}
-            uploader={uploader}
-            deleter={deleter}
-            validator={validator}
-          />
-        )}
-
-        {status.active === LotStatus.Validated && <ValidatedLotsActions />}
-      </ActionBar>
-
       {isError && (
         <Alert level="error">
           <AlertCircle />
           {transactions.error}
         </Alert>
+      )}
+
+      {!isError && (
+        <ActionBar>
+          <Button icon={Download} disabled={isEmpty} onClick={onExportAll}>
+            Exporter tout
+          </Button>
+
+          {status.active === LotStatus.Draft && (
+            <DraftLotsActions
+              disabled={isEmpty}
+              selection={selection}
+              uploader={uploader}
+              deleter={deleter}
+              validator={validator}
+            />
+          )}
+
+          {status.active === LotStatus.Validated && <ValidatedLotsActions />}
+        </ActionBar>
       )}
 
       {!isError && isEmpty && (
