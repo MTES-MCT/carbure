@@ -17,24 +17,14 @@ import {
   Upload,
   Plus,
 } from "./system/icons"
+
 import { Alert, Box, Button, LoaderOverlay } from "./system"
 import Pagination from "./system/pagination"
 import TransactionTable from "./transaction-table"
 import { Link } from "./relative-route"
 
-type ExportActionsProps = {
-  onExportAll: () => void
-}
-
-const ExportActions = ({ onExportAll }: ExportActionsProps) => (
-  <React.Fragment>
-    <Button icon={Download} onClick={onExportAll}>
-      Exporter tout
-    </Button>
-  </React.Fragment>
-)
-
 type DraftActionProps = {
+  disabled: boolean
   selection: number
   onUpload: (f: File) => void
   onDelete: () => void
@@ -44,6 +34,7 @@ type DraftActionProps = {
 }
 
 const DraftLotsActions = ({
+  disabled,
   selection,
   onUpload,
   onDelete,
@@ -70,6 +61,7 @@ const DraftLotsActions = ({
     <Button
       icon={Check}
       level="success"
+      disabled={disabled}
       onClick={selection > 0 ? onValidate : onValidateAll}
     >
       Envoyer {selection > 0 ? `sélection` : "tout"}
@@ -78,6 +70,7 @@ const DraftLotsActions = ({
     <Button
       icon={Cross}
       level="danger"
+      disabled={disabled}
       onClick={selection > 0 ? onDelete : onDeleteAll}
     >
       Supprimer {selection > 0 ? `sélection` : "tout"}
@@ -86,17 +79,15 @@ const DraftLotsActions = ({
 )
 
 const ValidatedLotsActions = () => (
-  <React.Fragment>
-    <Link relative to="show-summary-out">
-      <Button
-        className={styles.transactionButtons}
-        level="primary"
-        icon={Rapport}
-      >
-        Rapport de sorties
-      </Button>
-    </Link>
-  </React.Fragment>
+  <Link relative to="show-summary-out">
+    <Button
+      className={styles.transactionButtons}
+      level="primary"
+      icon={Rapport}
+    >
+      Rapport de sorties
+    </Button>
+  </Link>
 )
 
 const ActionBar = ({ children }: { children: React.ReactNode }) => (
@@ -142,6 +133,26 @@ const TransactionList = ({
 
   return (
     <Box className={styles.transactionList}>
+      <ActionBar>
+        <Button icon={Download} disabled={isEmpty} onClick={onExportAll}>
+          Exporter tout
+        </Button>
+
+        {status.active === LotStatus.Draft && (
+          <DraftLotsActions
+            disabled={isEmpty}
+            selection={selection.selected.length}
+            onUpload={onUpload}
+            onDelete={() => onDelete(selection.selected)}
+            onValidate={() => onValidate(selection.selected)}
+            onDeleteAll={onDeleteAll}
+            onValidateAll={onValidateAll}
+          />
+        )}
+
+        {status.active === LotStatus.Validated && <ValidatedLotsActions />}
+      </ActionBar>
+
       {isError && (
         <Alert level="error">
           <AlertCircle />
@@ -158,22 +169,6 @@ const TransactionList = ({
 
       {!isError && !isEmpty && (
         <React.Fragment>
-          <ActionBar>
-            <ExportActions onExportAll={onExportAll} />
-
-            {status.active === LotStatus.Draft && (
-              <DraftLotsActions
-                selection={selection.selected.length}
-                onUpload={onUpload}
-                onDelete={() => onDelete(selection.selected)}
-                onValidate={() => onValidate(selection.selected)}
-                onDeleteAll={onDeleteAll}
-                onValidateAll={onValidateAll}
-              />
-            )}
-            {status.active === LotStatus.Validated && <ValidatedLotsActions />}
-          </ActionBar>
-
           <Box>
             <TransactionTable
               status={status}
