@@ -20,21 +20,23 @@ const App = () => {
 
   return (
     <BrowserRouter basename="/v2">
-      {settings.loading && <LoaderOverlay />}
+      <div id="app">
+        {settings.loading && <LoaderOverlay />}
 
-      {settings.data && (
-        <Switch>
-          <Route path="/org/:entity">
-            <Org app={app} />
-          </Route>
+        {settings.data && (
+          <Switch>
+            <Route path="/org/:entity">
+              <Org app={app} />
+            </Route>
 
-          <Route path="/logout">
-            <Logout />
-          </Route>
+            <Route path="/logout">
+              <Logout />
+            </Route>
 
-          <Redirect to={`/org/${getDefaultEntity()}`} />
-        </Switch>
-      )}
+            <Redirect to={`/org/${getDefaultEntity()}`} />
+          </Switch>
+        )}
+      </div>
     </BrowserRouter>
   )
 }

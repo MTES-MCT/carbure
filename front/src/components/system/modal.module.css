@@ -8,6 +8,7 @@
   bottom: 0;
   left: 0;
   z-index: 2;
+  padding: 32px;
 }
 
 .overlay {
@@ -27,7 +28,6 @@
   border: 1px solid var(--gray-medium);
   min-width: 400px;
   min-height: 400px;
-  margin: 32px;
   max-height: 100%;
   overflow-y: auto;
 }
