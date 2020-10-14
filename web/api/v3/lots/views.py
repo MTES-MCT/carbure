@@ -13,7 +13,7 @@ from core.common import validate_lots, load_excel_file, load_lot
 from api.v3.sanity_checks import sanity_check
 
 
-sort_key_to_django_field = {'period' : 'lot__period',
+sort_key_to_django_field = {'period': 'lot__period',
                             'biocarburant': 'lot__biocarburant__name',
                             'matiere_premiere': 'lot__matiere_premiere__name',
                             'ghg_reduction': 'lot__ghg_reduction',
@@ -31,7 +31,7 @@ def get_lots(request):
     countries_of_origin = request.GET.getlist('countries_of_origin')
     biocarburants = request.GET.getlist('biocarburants')
     clients = request.GET.getlist('clients')
-    limit = request.GET.get('limit', "100")
+    limit = request.GET.get('limit', None)
     from_idx = request.GET.get('from_idx', "0")
     export = request.GET.get('export', False)
     query = request.GET.get('query', False)
@@ -103,11 +103,8 @@ def get_lots(request):
                          Q(unknown_client__icontains=query) |
                          Q(carbure_delivery_site__name__icontains=query) |
                          Q(unknown_delivery_site__icontains=query)
-        )
+                         )
 
-
-    limit = int(limit)
-    from_idx = int(from_idx)
     if sort_by:
         if sort_by in sort_key_to_django_field:
             key = sort_key_to_django_field[sort_by]
@@ -116,22 +113,31 @@ def get_lots(request):
             else:
                 txs = txs.order_by(key)
         elif sort_by == 'client':
-            txs = txs.annotate(client=Case(When(client_is_in_carbure=True, then=F('carbure_client__name')), default=F('unknown_client')))
+            txs = txs.annotate(client=Case(When(client_is_in_carbure=True, then=F(
+                'carbure_client__name')), default=F('unknown_client')))
             if order == 'desc':
                 txs = txs.order_by('-client')
             else:
                 txs = txs.order_by('client')
         else:
             return JsonResponse({'status': 'error', 'message': 'Unknown sort_by key'}, status=400)
-    returned = txs[from_idx:from_idx+limit]
+
+    from_idx = int(from_idx)
+    returned = txs[from_idx:]
+
+    if limit != None:
+        limit = int(limit)
+        returned = txs[:limit]
 
     data = {}
+
     raw_lot_errors = LotV2Error.objects.filter(id__in=[t.lot.id for t in returned])
     lot_errors = {}
     for err in raw_lot_errors:
         if err.id not in lot_errors:
             lot_errors[err.id] = []
         lot_errors[err.id].append(err.natural_key())
+
     raw_tx_errors = TransactionError.objects.filter(id__in=[t.id for t in returned])
     tx_errors = {}
     for err in raw_tx_errors:
@@ -145,6 +151,7 @@ def get_lots(request):
     data['total'] = len(txs)
     data['returned'] = len(returned)
     data['from'] = from_idx
+
     if not export:
         return JsonResponse({'status': 'success', 'data': data})
     else:
@@ -152,7 +159,7 @@ def get_lots(request):
         with open(file_location, "rb") as excel:
             data = excel.read()
             ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            response = HttpResponse(data=data, content_type=ctype)
+            response = HttpResponse(content=data, content_type=ctype)
             response['Content-Disposition'] = 'attachment; filename="%s"' % (file_location)
         return response
 
@@ -217,6 +224,7 @@ def get_snapshot(request):
     data['deadlines'] = list(deadlines)
     return JsonResponse({'status': 'success', 'data': data})
 
+
 def get_summary_in(request):
     entity = request.GET.get('entity_id', False)
     if entity is None:
@@ -245,7 +253,8 @@ def get_summary_in(request):
         if t.lot.biocarburant.name not in data[delivery_site][t.carbure_vendor.name]:
             data[delivery_site][t.carbure_vendor.name][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0}
         line = data[delivery_site][t.carbure_vendor.name][t.lot.biocarburant.name]
-        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] + t.lot.volume * t.lot.ghg_reduction) / (line['volume'] + t.lot.volume)
+        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
+                                     t.lot.volume * t.lot.ghg_reduction) / (line['volume'] + t.lot.volume)
         line['volume'] += t.lot.volume
     return JsonResponse({'status': 'success', 'data': data})
 
@@ -279,9 +288,11 @@ def get_summary_out(request):
         if t.lot.biocarburant.name not in data[client_name][delivery_site]:
             data[client_name][delivery_site][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0}
         line = data[client_name][delivery_site][t.lot.biocarburant.name]
-        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] + t.lot.volume * t.lot.ghg_reduction) / (line['volume'] + t.lot.volume)
+        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
+                                     t.lot.volume * t.lot.ghg_reduction) / (line['volume'] + t.lot.volume)
         line['volume'] += t.lot.volume
     return JsonResponse({'status': 'success', 'data': data})
+
 
 def add_lot(request):
     entity_id = request.POST.get('entity_id', False)
@@ -329,7 +340,6 @@ def update_lot(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Unknown transaction %s" % (tx_id), 'extra': str(e)},
                             status=400)
-
 
     load_lot(entity, request.user, request.POST.dict(), 'MANUAL', tx)
     return JsonResponse({'status': 'success'})
@@ -522,7 +532,8 @@ def accept_all(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    LotTransaction.objects.filter(carbure_client=entity, delivery_status__in=['N', 'AC', 'AA']).update(delivery_status='A')
+    LotTransaction.objects.filter(carbure_client=entity, delivery_status__in=[
+                                  'N', 'AC', 'AA']).update(delivery_status='A')
     return JsonResponse({'status': 'success'})
 
 
