@@ -9,6 +9,7 @@ import useAPI, { ApiState } from "./helpers/use-api"
 import {
   getSnapshot,
   getLots,
+  downloadLots,
   deleteLots,
   duplicateLot,
   validateLots,
@@ -145,7 +146,7 @@ function useGetLots(
   selection: TransactionSelection,
   search: SearchSelection,
   sorting: SortingSelection
-): [ApiState<Lots>, () => void] {
+): [ApiState<Lots>, () => void, () => void] {
   const [transactions, resolveLots] = useAPI(getLots)
 
   const { page, limit, setPage } = pagination
@@ -163,6 +164,19 @@ function useGetLots(
         sorting.column,
         sorting.order
       ).cancel
+    }
+  }
+
+  function exportAll() {
+    if (entity !== null) {
+      downloadLots(
+        status.active,
+        entity,
+        filters.selected,
+        search.query,
+        sorting.column,
+        sorting.order
+      )
     }
   }
 
@@ -193,7 +207,7 @@ function useGetLots(
     sorting.order,
   ])
 
-  return [transactions, resolve]
+  return [transactions, resolve, exportAll]
 }
 
 function useDuplicateLot(entity: EntitySelection, refresh: () => void) {
@@ -258,7 +272,7 @@ export default function useTransactions() {
   const sorting = useSortingSelection()
 
   const [snapshot, resolveGetSnapshot] = useGetSnapshot(entity)
-  const [transactions, resolveGetLots] = useGetLots(entity, status, filters, pagination, selection, search, sorting) // prettier-ignore
+  const [transactions, resolveGetLots, exportAll] = useGetLots(entity, status, filters, pagination, selection, search, sorting) // prettier-ignore
 
   function refresh() {
     resolveGetLots()
@@ -282,6 +296,7 @@ export default function useTransactions() {
     deleter,
     duplicator,
     validator,
+    exportAll,
     refresh,
   }
 }

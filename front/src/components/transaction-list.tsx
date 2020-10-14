@@ -9,39 +9,61 @@ import { ApiState } from "../hooks/helpers/use-api"
 import styles from "./transaction-list.module.css"
 
 import { Alert, Box, Button, LoaderOverlay } from "./system"
-import { AlertCircle, Check, Cross, Rapport } from "./system/icons"
+import { AlertCircle, Check, Cross, Rapport, Download } from "./system/icons"
 import Pagination from "./system/pagination"
 import TransactionTable from "./transaction-table"
 import { Link } from "./relative-route"
 
 type DraftActionProps = {
-  disabled: boolean
+  selection: number
   onDelete: () => void
   onValidate: () => void
+  onDeleteAll?: () => void
+  onValidateAll?: () => void
 }
 
-type ValidatedLotsActionProps = {
-
-}
-
-const DraftLotsActions = ({ disabled, onDelete, onValidate }: DraftActionProps) => (
-  <Box row className={cl(styles.actionBar)}>
+const DraftLotsActions = ({
+  selection,
+  onDelete,
+  onValidate,
+  onDeleteAll,
+  onValidateAll,
+}: DraftActionProps) => (
+  <React.Fragment>
     <Button
-      disabled={disabled}
       icon={Check}
-      level="primary"
-      onClick={onValidate}
+      level="success"
+      onClick={selection > 0 ? onValidate : onValidateAll}
     >
-      Valider la sélection
+      Valider {selection > 0 ? `sélection` : "tout"}
     </Button>
-    <Button disabled={disabled} icon={Cross} level="danger" onClick={onDelete}>
-      Supprimer la sélection
+
+    <Button
+      icon={Cross}
+      level="danger"
+      onClick={selection > 0 ? onDelete : onDeleteAll}
+    >
+      Supprimer {selection > 0 ? `sélection` : "tout"}
     </Button>
-  </Box>
+  </React.Fragment>
 )
 
+type ExportActionsProps = {
+  onExportAll: () => void
+}
+
+const ExportActions = ({ onExportAll }: ExportActionsProps) => (
+  <React.Fragment>
+    <Button icon={Download} onClick={onExportAll}>
+      Exporter tout
+    </Button>
+  </React.Fragment>
+)
+
+type ValidatedLotsActionProps = {}
+
 const ValidatedLotsActions = ({}: ValidatedLotsActionProps) => (
-  <Box row className={cl(styles.actionBar)}>
+  <React.Fragment>
     <Link to="./validated/show-summary-out">
       <Button
         className={styles.transactionButtons}
@@ -51,6 +73,12 @@ const ValidatedLotsActions = ({}: ValidatedLotsActionProps) => (
         Rapport de sorties
       </Button>
     </Link>
+  </React.Fragment>
+)
+
+const ActionBar = ({ children }: { children: React.ReactNode }) => (
+  <Box row className={cl(styles.actionBar)}>
+    {children}
   </Box>
 )
 
@@ -63,6 +91,7 @@ type TransactionListProps = {
   onDelete: (ids: number[]) => void
   onValidate: (ids: number[]) => void
   onDuplicate: (id: number) => void
+  onExportAll: () => void
 }
 
 const TransactionList = ({
@@ -74,6 +103,7 @@ const TransactionList = ({
   onDelete,
   onDuplicate,
   onValidate,
+  onExportAll,
 }: TransactionListProps) => {
   const tx = transactions.data
 
@@ -99,16 +129,19 @@ const TransactionList = ({
 
       {!isError && !isEmpty && (
         <React.Fragment>
-          {status.active === LotStatus.Draft && (
-            <DraftLotsActions
-              disabled={selection.selected.length === 0}
-              onDelete={() => onDelete(selection.selected)}
-              onValidate={() => onValidate(selection.selected)}
-            />
-          )}
-          {status.active === LotStatus.Validated && (
-            <ValidatedLotsActions />
-          )}
+          <ActionBar>
+            <ExportActions onExportAll={onExportAll} />
+
+            {status.active === LotStatus.Draft && (
+              <DraftLotsActions
+                selection={selection.selected.length}
+                onDelete={() => onDelete(selection.selected)}
+                onValidate={() => onValidate(selection.selected)}
+              />
+            )}
+            {status.active === LotStatus.Validated && <ValidatedLotsActions />}
+          </ActionBar>
+
           <Box>
             <TransactionTable
               status={status}
