@@ -2,8 +2,6 @@ import { useEffect } from "react"
 import { EntitySelection } from "./helpers/use-entity"
 
 import useAPI from "./helpers/use-api"
-import useForm from "../hooks/helpers/use-form"
-
 import useClose from "./helpers/use-close"
 import { getLotsOutSummary } from "../services/lots"
 
@@ -20,7 +18,6 @@ export interface TransactionOutSummaryFormState {
 
 export default function useTransactionOutSummary(entity: EntitySelection) {
   const close = useClose("..")
-  const [form, change] = useForm({})
   const [request, resolve] = useAPI(getLotsOutSummary)
 
   useEffect(() => {
@@ -30,9 +27,7 @@ export default function useTransactionOutSummary(entity: EntitySelection) {
   }, [resolve, entity])
 
   return {
-    form,
     request,
-    change,
     close,
   }
 }

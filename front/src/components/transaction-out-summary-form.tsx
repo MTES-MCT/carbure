@@ -5,17 +5,14 @@ import { TransactionOutSummaryFormState } from "../hooks/use-transaction-out-sum
 import styles from "./transaction-out-summary-form.module.css"
 
 import { Box, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
-import { FormFields } from "../hooks/helpers/use-form"
 
 type TransactionOutSummaryFormProps = {
   data: TransactionOutSummaryFormState
-  onChange: <T extends FormFields>(e: React.ChangeEvent<T>) => void,
   loading: boolean
 }
 
 const TransactionOutSummaryForm = ({
   data,
-  onChange,
   loading,
 }: TransactionOutSummaryFormProps) => {
   return (
@@ -33,7 +30,7 @@ const TransactionOutSummaryForm = ({
               </tr>
             </thead>
             <tbody>
-            {Object.entries(data).map(([client, sites]) => (
+            {data? Object.entries(data).map(([client, sites]) => (
               Object.entries(sites).map(([delivery_site, biocarburants]) => (
                 Object.entries(biocarburants).map(([biocarburant, values]) => (
                   <tr>
@@ -43,7 +40,7 @@ const TransactionOutSummaryForm = ({
                     <td>{values.volume}L</td>
                     <td>{values.avg_ghg_reduction}%</td>
                   </tr> 
-                ))))))}       
+                )))))) : <p>Aucun Lot sortant</p>}       
             </tbody>
           </table>
         }
