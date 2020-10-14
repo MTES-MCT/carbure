@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react"
 
 import { SelectValue } from "../components/system/select"
-import { LotStatus, Filters, Lots, Snapshot } from "../services/types"
+import { LotStatus, Filters } from "../services/types"
 
 import { PageSelection, usePageSelection } from "../components/system/pagination" // prettier-ignore
-import useAPI, { ApiState } from "./helpers/use-api"
+import useAPI from "./helpers/use-api"
 
 import {
   getSnapshot,
@@ -13,6 +13,8 @@ import {
   deleteLots,
   duplicateLot,
   validateLots,
+  validateAllDraftLots,
+  deleteAllDraftLots,
 } from "../services/lots"
 import confirm from "../components/system/confirm"
 import { useHistory, useParams } from "react-router-dom"
@@ -121,9 +123,7 @@ function useSortingSelection(): SortingSelection {
 }
 
 // fetches current snapshot when parameters change
-function useGetSnapshot(
-  entity: EntitySelection
-): [ApiState<Snapshot>, () => void] {
+function useGetSnapshot(entity: EntitySelection) {
   const [snapshot, resolveSnapshot] = useAPI(getSnapshot)
 
   function resolve() {
@@ -134,7 +134,7 @@ function useGetSnapshot(
 
   useEffect(resolve, [resolveSnapshot, entity])
 
-  return [snapshot, resolve]
+  return { ...snapshot, resolve }
 }
 
 // fetches current transaction list when parameters change
@@ -146,7 +146,7 @@ function useGetLots(
   selection: TransactionSelection,
   search: SearchSelection,
   sorting: SortingSelection
-): [ApiState<Lots>, () => void, () => void] {
+) {
   const [transactions, resolveLots] = useAPI(getLots)
 
   const { page, limit, setPage } = pagination
@@ -207,7 +207,7 @@ function useGetLots(
     sorting.order,
   ])
 
-  return [transactions, resolve, exportAll]
+  return { ...transactions, resolve, exportAll }
 }
 
 function useDuplicateLot(entity: EntitySelection, refresh: () => void) {
@@ -229,11 +229,12 @@ function useDuplicateLot(entity: EntitySelection, refresh: () => void) {
 
 function useDeleteLots(entity: EntitySelection, refresh: () => void) {
   const [request, resolveDelete] = useAPI(deleteLots)
+  const [requestAll, resolveDeleteAll] = useAPI(deleteAllDraftLots)
 
   async function resolve(lotIDs: number[]) {
     const shouldDelete = await confirm(
       "Supprimer lots",
-      "Voulez vous supprimer ce(s) lot(s) ?"
+      "Voulez vous supprimer les lots sélectionnés ?"
     )
 
     if (entity !== null && shouldDelete) {
@@ -241,16 +242,28 @@ function useDeleteLots(entity: EntitySelection, refresh: () => void) {
     }
   }
 
-  return { ...request, resolve }
+  async function resolveAll() {
+    const shouldDelete = await confirm(
+      "Supprimer lots",
+      "Voulez vous supprimer tous les lots ?"
+    )
+
+    if (entity !== null && shouldDelete) {
+      resolveDeleteAll(entity).then(refresh)
+    }
+  }
+
+  return { loading: request.loading || requestAll.loading, resolve, resolveAll }
 }
 
 function useValidateLots(entity: EntitySelection, refresh: () => void) {
   const [request, resolveValidate] = useAPI(validateLots)
+  const [requestAll, resolveValidateAll] = useAPI(validateAllDraftLots)
 
   async function resolve(lotIDs: number[]) {
     const shouldValidate = await confirm(
       "Envoyer lots",
-      "Voulez vous envoyer ce(s) lot(s) ?"
+      "Voulez vous envoyer les lots sélectionnés ?"
     )
 
     if (entity !== null && shouldValidate) {
@@ -258,7 +271,18 @@ function useValidateLots(entity: EntitySelection, refresh: () => void) {
     }
   }
 
-  return { ...request, resolve }
+  async function resolveAll() {
+    const shouldValidate = await confirm(
+      "Envoyer lots",
+      "Voulez vous envoyer tous ces lots ?"
+    )
+
+    if (entity !== null && shouldValidate) {
+      resolveValidateAll(entity).then(refresh)
+    }
+  }
+
+  return { loading: request.loading || requestAll.loading, resolve, resolveAll }
 }
 
 export default function useTransactions() {
@@ -271,12 +295,12 @@ export default function useTransactions() {
   const search = useSearchSelection()
   const sorting = useSortingSelection()
 
-  const [snapshot, resolveGetSnapshot] = useGetSnapshot(entity)
-  const [transactions, resolveGetLots, exportAll] = useGetLots(entity, status, filters, pagination, selection, search, sorting) // prettier-ignore
+  const snapshot = useGetSnapshot(entity)
+  const transactions = useGetLots(entity, status, filters, pagination, selection, search, sorting) // prettier-ignore
 
   function refresh() {
-    resolveGetLots()
-    resolveGetSnapshot()
+    snapshot.resolve()
+    transactions.resolve()
   }
 
   const deleter = useDeleteLots(entity, refresh)
@@ -296,7 +320,6 @@ export default function useTransactions() {
     deleter,
     duplicator,
     validator,
-    exportAll,
     refresh,
   }
 }
