@@ -2,7 +2,7 @@ import React from "react"
 import cl from "clsx"
 
 import { Lots, LotStatus } from "../services/types"
-import { StatusSelection, TransactionSelection, SortingSelection } from "../hooks/use-transactions" // prettier-ignore
+import { StatusSelection, TransactionSelection, SortingSelection, Deleter, Uploader, Validator } from "../hooks/use-transactions" // prettier-ignore
 import { PageSelection } from "./system/pagination"
 import { ApiState } from "../hooks/helpers/use-api"
 
@@ -18,65 +18,83 @@ import {
   Plus,
 } from "./system/icons"
 
-import { Alert, Box, Button, LoaderOverlay } from "./system"
+import { Alert, AsyncButton, Box, Button, LoaderOverlay } from "./system"
 import Pagination from "./system/pagination"
 import TransactionTable from "./transaction-table"
 import { Link } from "./relative-route"
 
 type DraftActionProps = {
   disabled: boolean
-  selection: number
-  onUpload: (f: File) => void
-  onDelete: () => void
-  onValidate: () => void
-  onDeleteAll: () => void
-  onValidateAll: () => void
+  selection: TransactionSelection
+  uploader: Uploader
+  deleter: Deleter
+  validator: Validator
 }
 
 const DraftLotsActions = ({
   disabled,
   selection,
-  onUpload,
-  onDelete,
-  onValidate,
-  onDeleteAll,
-  onValidateAll,
-}: DraftActionProps) => (
-  <React.Fragment>
-    <Button as="label" icon={Upload}>
-      Importer fichier
-      <input
-        type="file"
-        style={{ display: "none" }}
-        onChange={(e) => onUpload(e!.target.files![0])}
-      />
-    </Button>
+  uploader,
+  deleter,
+  validator,
+}: DraftActionProps) => {
+  const hasSelection = selection.selected.length > 0
 
-    <Link relative to="add">
-      <Button icon={Plus} level="primary">
-        Créer lot
-      </Button>
-    </Link>
+  function onValidate() {
+    if (hasSelection) {
+      validator.resolve(selection.selected)
+    } else {
+      validator.resolveAll()
+    }
+  }
 
-    <Button
-      icon={Check}
-      level="success"
-      disabled={disabled}
-      onClick={selection > 0 ? onValidate : onValidateAll}
-    >
-      Envoyer {selection > 0 ? `sélection` : "tout"}
-    </Button>
+  function onDelete() {
+    if (hasSelection) {
+      validator.resolve(selection.selected)
+    } else {
+      validator.resolveAll()
+    }
+  }
 
-    <Button
-      icon={Cross}
-      level="danger"
-      disabled={disabled}
-      onClick={selection > 0 ? onDelete : onDeleteAll}
-    >
-      Supprimer {selection > 0 ? `sélection` : "tout"}
-    </Button>
-  </React.Fragment>
-)
+  return (
+    <React.Fragment>
+      <AsyncButton as="label" icon={Upload} loading={uploader.loading}>
+        Importer fichier
+        <input
+          type="file"
+          style={{ display: "none" }}
+          onChange={(e) => uploader.resolve(e!.target.files![0])}
+        />
+      </AsyncButton>
+
+      <Link relative to="add">
+        <Button icon={Plus} level="primary">
+          Créer lot
+        </Button>
+      </Link>
+
+      <AsyncButton
+        icon={Check}
+        level="success"
+        loading={validator.loading}
+        disabled={disabled}
+        onClick={onValidate}
+      >
+        Envoyer {hasSelection ? `sélection` : "tout"}
+      </AsyncButton>
+
+      <AsyncButton
+        icon={Cross}
+        level="danger"
+        loading={deleter.loading}
+        disabled={disabled}
+        onClick={onDelete}
+      >
+        Supprimer {hasSelection ? `sélection` : "tout"}
+      </AsyncButton>
+    </React.Fragment>
+  )
+}
 
 const ValidatedLotsActions = () => (
   <Link relative to="show-summary-out">
@@ -102,13 +120,11 @@ type TransactionListProps = {
   sorting: SortingSelection
   selection: TransactionSelection
   pagination: PageSelection
-  onUpload: (f: File) => void
-  onDelete: (ids: number[]) => void
-  onValidate: (ids: number[]) => void
+  deleter: Deleter
+  uploader: Uploader
+  validator: Validator
   onDuplicate: (id: number) => void
   onExportAll: () => void
-  onDeleteAll: () => void
-  onValidateAll: () => void
 }
 
 const TransactionList = ({
@@ -117,13 +133,11 @@ const TransactionList = ({
   sorting,
   selection,
   pagination,
-  onUpload,
-  onDelete,
+  deleter,
+  uploader,
+  validator,
   onDuplicate,
-  onValidate,
   onExportAll,
-  onDeleteAll,
-  onValidateAll,
 }: TransactionListProps) => {
   const tx = transactions.data
 
@@ -141,12 +155,10 @@ const TransactionList = ({
         {status.active === LotStatus.Draft && (
           <DraftLotsActions
             disabled={isEmpty}
-            selection={selection.selected.length}
-            onUpload={onUpload}
-            onDelete={() => onDelete(selection.selected)}
-            onValidate={() => onValidate(selection.selected)}
-            onDeleteAll={onDeleteAll}
-            onValidateAll={onValidateAll}
+            selection={selection}
+            uploader={uploader}
+            deleter={deleter}
+            validator={validator}
           />
         )}
 
@@ -176,8 +188,8 @@ const TransactionList = ({
               selection={selection}
               sorting={sorting}
               onDuplicate={onDuplicate}
-              onValidate={onValidate}
-              onDelete={onDelete}
+              onValidate={validator.resolve}
+              onDelete={deleter.resolve}
             />
             {isLoading && <LoaderOverlay />}
           </Box>

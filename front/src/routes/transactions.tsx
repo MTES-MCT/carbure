@@ -47,13 +47,11 @@ const Transactions = () => {
         sorting={sorting}
         selection={selection}
         pagination={pagination}
-        onUpload={uploader.resolve}
-        onDelete={deleter.resolve}
-        onValidate={validator.resolve}
+        uploader={uploader}
+        deleter={deleter}
+        validator={validator}
         onDuplicate={duplicator.resolve}
         onExportAll={transactions.exportAll}
-        onDeleteAll={deleter.resolveAll}
-        onValidateAll={validator.resolveAll}
       />
 
       <Switch>
