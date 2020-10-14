@@ -140,10 +140,18 @@ export const Rapport = ({ className, ...props }: IconProps) => (
   </Icon>
 )
 
-export const Download = ({ className, ...props }: IconProps) => (
+export const Upload = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("icon-rapport", className)}>
     <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
     <polyline points="7 11 12 16 17 11" />
+    <line x1="12" y1="4" x2="12" y2="16" />
+  </Icon>
+)
+
+export const Download = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-rapport", className)}>
+    <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+    <polyline points="7 9 12 4 17 9" />
     <line x1="12" y1="4" x2="12" y2="16" />
   </Icon>
 )

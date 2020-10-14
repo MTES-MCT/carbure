@@ -245,7 +245,7 @@ function useDeleteLots(entity: EntitySelection, refresh: () => void) {
   async function resolveAll() {
     const shouldDelete = await confirm(
       "Supprimer lots",
-      "Voulez vous supprimer tous les lots ?"
+      "Voulez vous supprimer tous ces lots ?"
     )
 
     if (entity !== null && shouldDelete) {

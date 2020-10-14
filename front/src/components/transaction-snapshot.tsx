@@ -44,15 +44,6 @@ const TransactionSnapshot = ({
     <div className={styles.transactionSummary}>
       <div className={styles.transactionHeader}>
         <Title>Transactions</Title>
-
-        <Box row>
-          <Link relative to="../draft/add">
-            <Button level="primary">
-              <Plus />
-              Ajouter des lots
-            </Button>
-          </Link>
-        </Box>
       </div>
 
       <div className={styles.transactionStatus}>
