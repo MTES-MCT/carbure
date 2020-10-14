@@ -8,8 +8,16 @@ import { ApiState } from "../hooks/helpers/use-api"
 
 import styles from "./transaction-list.module.css"
 
+import {
+  AlertCircle,
+  Check,
+  Cross,
+  Rapport,
+  Download,
+  Upload,
+  Plus,
+} from "./system/icons"
 import { Alert, Box, Button, LoaderOverlay } from "./system"
-import { AlertCircle, Check, Cross, Rapport, Download } from "./system/icons"
 import Pagination from "./system/pagination"
 import TransactionTable from "./transaction-table"
 import { Link } from "./relative-route"
@@ -22,32 +30,6 @@ type DraftActionProps = {
   onValidateAll: () => void
 }
 
-const DraftLotsActions = ({
-  selection,
-  onDelete,
-  onValidate,
-  onDeleteAll,
-  onValidateAll,
-}: DraftActionProps) => (
-  <React.Fragment>
-    <Button
-      icon={Check}
-      level="success"
-      onClick={selection > 0 ? onValidate : onValidateAll}
-    >
-      Valider {selection > 0 ? `sélection` : "tout"}
-    </Button>
-
-    <Button
-      icon={Cross}
-      level="danger"
-      onClick={selection > 0 ? onDelete : onDeleteAll}
-    >
-      Supprimer {selection > 0 ? `sélection` : "tout"}
-    </Button>
-  </React.Fragment>
-)
-
 type ExportActionsProps = {
   onExportAll: () => void
 }
@@ -56,6 +38,42 @@ const ExportActions = ({ onExportAll }: ExportActionsProps) => (
   <React.Fragment>
     <Button icon={Download} onClick={onExportAll}>
       Exporter tout
+    </Button>
+  </React.Fragment>
+)
+
+const DraftLotsActions = ({
+  selection,
+  onDelete,
+  onValidate,
+  onDeleteAll,
+  onValidateAll,
+}: DraftActionProps) => (
+  <React.Fragment>
+    <Button icon={Upload} onClick={() => console.log("importing")}>
+      Importer lots
+    </Button>
+
+    <Link relative to="add">
+      <Button icon={Plus} level="primary">
+        Créer lot
+      </Button>
+    </Link>
+
+    <Button
+      icon={Check}
+      level="success"
+      onClick={selection > 0 ? onValidate : onValidateAll}
+    >
+      Envoyer {selection > 0 ? `sélection` : "tout"}
+    </Button>
+
+    <Button
+      icon={Cross}
+      level="danger"
+      onClick={selection > 0 ? onDelete : onDeleteAll}
+    >
+      Supprimer {selection > 0 ? `sélection` : "tout"}
     </Button>
   </React.Fragment>
 )
