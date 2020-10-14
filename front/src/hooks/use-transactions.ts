@@ -15,7 +15,9 @@ import {
   validateLots,
   validateAllDraftLots,
   deleteAllDraftLots,
+  uploadLotFile,
 } from "../services/lots"
+
 import confirm from "../components/system/confirm"
 import { useHistory, useParams } from "react-router-dom"
 import useEntity, { EntitySelection } from "./helpers/use-entity"
@@ -210,6 +212,18 @@ function useGetLots(
   return { ...transactions, resolve, exportAll }
 }
 
+function useUploadLotFile(entity: EntitySelection, refresh: () => void) {
+  const [request, resolveUpload] = useAPI(uploadLotFile)
+
+  async function resolve(file: File) {
+    if (entity !== null) {
+      resolveUpload(entity, file).then(refresh)
+    }
+  }
+
+  return { ...request, resolve }
+}
+
 function useDuplicateLot(entity: EntitySelection, refresh: () => void) {
   const [request, resolveDuplicate] = useAPI(duplicateLot)
 
@@ -304,6 +318,7 @@ export default function useTransactions() {
   }
 
   const deleter = useDeleteLots(entity, refresh)
+  const uploader = useUploadLotFile(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
   const validator = useValidateLots(entity, refresh)
 
@@ -318,6 +333,7 @@ export default function useTransactions() {
     search,
     sorting,
     deleter,
+    uploader,
     duplicator,
     validator,
     refresh,

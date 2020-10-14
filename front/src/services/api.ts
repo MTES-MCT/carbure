@@ -32,7 +32,7 @@ function toFormData(obj: any): FormData {
     if (Array.isArray(obj[key])) {
       obj[key].forEach((value: any) => formData.append(key, value.toString()))
     } else if (obj[key] || obj[key] === 0) {
-      formData.append(key, obj[key].toString())
+      formData.append(key, obj[key])
     }
   }
 
@@ -58,13 +58,8 @@ async function checkResponse<T>(res: Response): Promise<T> {
 }
 
 function download(endpoint: string, params: Params) {
-  let url = API_ROOT + endpoint
-
-  if (params) {
-    url += "?" + stringify(filterParams(params))
-  }
-
-  return window.open(url)
+  let query = params ? "?" + stringify(filterParams(params)) : ""
+  return window.open(API_ROOT + endpoint + query)
 }
 
 async function get<T = any>(
@@ -72,13 +67,8 @@ async function get<T = any>(
   params?: Params,
   options?: Options
 ): Promise<T> {
-  let url = API_ROOT + endpoint
-
-  if (params) {
-    url += "?" + stringify(filterParams(params))
-  }
-
-  const res = await fetch(url, options)
+  let query = params ? "?" + stringify(filterParams(params)) : ""
+  const res = await fetch(API_ROOT + endpoint + query, options)
   return checkResponse<T>(res)
 }
 
@@ -87,7 +77,6 @@ async function post<T = any>(
   body?: Params,
   options?: Options
 ): Promise<T> {
-  const url = API_ROOT + endpoint
   const fetchOptions: Params = { ...options, method: "POST" }
   const csrf = Cookies.get("csrftoken")
 
@@ -96,7 +85,7 @@ async function post<T = any>(
     fetchOptions.body.append("csrfmiddlewaretoken", csrf)
   }
 
-  const res = await fetch(url, fetchOptions)
+  const res = await fetch(API_ROOT + endpoint, fetchOptions)
   return checkResponse<T>(res)
 }
 

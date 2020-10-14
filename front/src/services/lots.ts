@@ -151,6 +151,13 @@ export function addLot(entityID: number, params: any): Promise<Transaction> {
   })
 }
 
+export function uploadLotFile(entityID: number, file: File): Promise<void> {
+  return api.post("/lots/upload", {
+    entity_id: entityID,
+    file,
+  })
+}
+
 export function updateLot(
   entityID: number,
   transactionID: number,
