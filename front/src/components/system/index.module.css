@@ -56,6 +56,17 @@
   background-color: var(--blue-dark);
 }
 
+.buttonSecondary {
+  color: var(--blue-dark);
+  background-color: var(--blue-light);
+  border-color: var(--blue-medium);
+}
+
+.buttonSecondary:hover {
+  color: var(--white);
+  background-color: var(--blue-dark);
+}
+
 .buttonWarning {
   color: var(--orange-dark);
   background-color: var(--orange-light);
@@ -78,6 +89,18 @@
   color: var(--white);
   background-color: var(--red-dark);
   border-color: var(--red-dark);
+}
+
+.buttonSuccess {
+  color: var(--green-dark);
+  background-color: var(--green-light);
+  border-color: var(--green-medium);
+}
+
+.buttonSuccess:hover {
+  color: var(--white);
+  background-color: var(--green-dark);
+  border-color: var(--green-dark);
 }
 
 /* STATUS BUTTON */

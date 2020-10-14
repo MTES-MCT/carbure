@@ -39,7 +39,7 @@ export const Main = (props: BoxProps) => <Box {...props} as="main" />
 type ButtonProps = SystemProps &
   React.HTMLProps<HTMLButtonElement> & {
     submit?: boolean
-    level?: "primary" | "warning" | "danger"
+    level?: "primary" | "warning" | "danger" | "success" | "secondary"
     icon?: React.ComponentType
   }
 
@@ -55,6 +55,8 @@ export const Button = ({
     [styles.buttonPrimary]: level === "primary",
     [styles.buttonWarning]: level === "warning",
     [styles.buttonDanger]: level === "danger",
+    [styles.buttonSuccess]: level === "success",
+    [styles.buttonSecondary]: level === "secondary",
   })
 
   return (

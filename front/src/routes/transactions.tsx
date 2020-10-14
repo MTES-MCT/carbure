@@ -25,6 +25,7 @@ const Transactions = () => {
     duplicator,
     validator,
     refresh,
+    exportAll,
   } = useTransactions()
 
   if (entity === null) {
@@ -49,6 +50,7 @@ const Transactions = () => {
         onDelete={deleter.resolve}
         onDuplicate={duplicator.resolve}
         onValidate={validator.resolve}
+        onExportAll={exportAll}
       />
 
       <Switch>

@@ -125,6 +125,25 @@ export function getLots(
   })
 }
 
+export function downloadLots(
+  status: LotStatus,
+  producerID: number,
+  filters: FilterSelection["selected"],
+  query: string,
+  sortBy: string,
+  order: string
+) {
+  return api.download("/lots", {
+    status,
+    producer_id: producerID,
+    ...filters,
+    query: query,
+    sort_by: sortBy,
+    order: order,
+    export: true,
+  })
+}
+
 export function addLot(entityID: number, params: any): Promise<Transaction> {
   return api.post("/lots/add", {
     entity_id: entityID,
