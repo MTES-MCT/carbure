@@ -525,7 +525,7 @@ def make_dump_lots_sheet(workbook, entity, transactions):
     columns = ['carbure_id', 'producer', 'production_site', 'production_site_country', 'production_site_reference',
                'production_site_commissioning_date', 'double_counting_registration',
                'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
-               'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
+               'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total',
                'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
     if entity.producer_with_mac:
         columns.append('mac')
