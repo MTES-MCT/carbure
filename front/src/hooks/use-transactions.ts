@@ -78,6 +78,7 @@ export type TransactionSelection = {
   has: (id: number) => boolean
   selectOne: (id: number) => void
   selectMany: React.Dispatch<React.SetStateAction<number[]>>
+  reset: () => void
 }
 
 function useTransactionSelection(): TransactionSelection {
@@ -85,6 +86,10 @@ function useTransactionSelection(): TransactionSelection {
 
   function has(id: number) {
     return selected.includes(id)
+  }
+
+  function reset() {
+    selectMany([])
   }
 
   function selectOne(id: number) {
@@ -95,7 +100,7 @@ function useTransactionSelection(): TransactionSelection {
     }
   }
 
-  return { selected, has, selectOne, selectMany }
+  return { selected, has, selectOne, selectMany, reset }
 }
 
 // valeurs acceptables pour le sort_by: ['period', 'client', 'biocarburant', 'matiere_premiere', 'ghg_reduction', 'volume', 'pays_origine']
@@ -254,22 +259,40 @@ function useDuplicateLot(entity: EntitySelection, refresh: () => void) {
 
 export interface Deleter {
   loading: boolean
-  resolve: (l: number[]) => void
+  resolve: (l: number) => void
+  resolveSelection: () => void
   resolveAll: () => void
 }
 
-function useDeleteLots(entity: EntitySelection, refresh: () => void): Deleter {
+function useDeleteLots(
+  entity: EntitySelection,
+  selection: TransactionSelection,
+  refresh: () => void
+): Deleter {
   const [request, resolveDelete] = useAPI(deleteLots)
   const [requestAll, resolveDeleteAll] = useAPI(deleteAllDraftLots)
 
-  async function resolve(lotIDs: number[]) {
+  async function resolve(lotID: number) {
+    const shouldDelete = await confirm(
+      "Supprimer lots",
+      "Voulez vous supprimer ce lot ?"
+    )
+
+    if (entity !== null && shouldDelete) {
+      resolveDelete(entity, [lotID]).then(selection.reset).then(refresh)
+    }
+  }
+
+  async function resolveSelection() {
     const shouldDelete = await confirm(
       "Supprimer lots",
       "Voulez vous supprimer les lots sélectionnés ?"
     )
 
     if (entity !== null && shouldDelete) {
-      resolveDelete(entity, lotIDs).then(refresh)
+      resolveDelete(entity, selection.selected)
+        .then(selection.reset)
+        .then(refresh)
     }
   }
 
@@ -284,30 +307,50 @@ function useDeleteLots(entity: EntitySelection, refresh: () => void): Deleter {
     }
   }
 
-  return { loading: request.loading || requestAll.loading, resolve, resolveAll }
+  return {
+    loading: request.loading || requestAll.loading,
+    resolve,
+    resolveSelection,
+    resolveAll,
+  }
 }
 
 export interface Validator {
   loading: boolean
-  resolve: (l: number[]) => void
+  resolve: (l: number) => void
+  resolveSelection: () => void
   resolveAll: () => void
 }
 
 function useValidateLots(
   entity: EntitySelection,
+  selection: TransactionSelection,
   refresh: () => void
 ): Validator {
   const [request, resolveValidate] = useAPI(validateLots)
   const [requestAll, resolveValidateAll] = useAPI(validateAllDraftLots)
 
-  async function resolve(lotIDs: number[]) {
+  async function resolve(lotID: number) {
+    const shouldValidate = await confirm(
+      "Envoyer lots",
+      "Voulez vous envoyer ce lot ?"
+    )
+
+    if (entity !== null && shouldValidate) {
+      resolveValidate(entity, [lotID]).then(selection.reset).then(refresh)
+    }
+  }
+
+  async function resolveSelection() {
     const shouldValidate = await confirm(
       "Envoyer lots",
       "Voulez vous envoyer les lots sélectionnés ?"
     )
 
     if (entity !== null && shouldValidate) {
-      resolveValidate(entity, lotIDs).then(refresh)
+      resolveValidate(entity, selection.selected)
+        .then(selection.reset)
+        .then(refresh)
     }
   }
 
@@ -322,7 +365,12 @@ function useValidateLots(
     }
   }
 
-  return { loading: request.loading || requestAll.loading, resolve, resolveAll }
+  return {
+    loading: request.loading || requestAll.loading,
+    resolve,
+    resolveSelection,
+    resolveAll,
+  }
 }
 
 export default function useTransactions() {
@@ -343,10 +391,10 @@ export default function useTransactions() {
     transactions.resolve()
   }
 
-  const deleter = useDeleteLots(entity, refresh)
   const uploader = useUploadLotFile(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
-  const validator = useValidateLots(entity, refresh)
+  const deleter = useDeleteLots(entity, selection, refresh)
+  const validator = useValidateLots(entity, selection, refresh)
 
   return {
     entity,
