@@ -290,6 +290,7 @@ export interface Deleter {
 function useDeleteLots(
   entity: EntitySelection,
   selection: TransactionSelection,
+  filters: FilterSelection,
   refresh: () => void
 ): Deleter {
   const [request, resolveDelete] = useAPI(deleteLots)
@@ -325,8 +326,10 @@ function useDeleteLots(
       "Voulez vous supprimer tous ces lots ?"
     )
 
-    if (entity !== null && shouldDelete) {
-      resolveDeleteAll(entity).then(selection.reset).then(refresh)
+    const year = filters.selected[Filters.Year] as number | null
+
+    if (entity !== null && year !== null && shouldDelete) {
+      resolveDeleteAll(entity, year).then(selection.reset).then(refresh)
     }
   }
 
@@ -348,6 +351,7 @@ export interface Validator {
 function useValidateLots(
   entity: EntitySelection,
   selection: TransactionSelection,
+  filters: FilterSelection,
   refresh: () => void
 ): Validator {
   const [request, resolveValidate] = useAPI(validateLots)
@@ -383,8 +387,10 @@ function useValidateLots(
       "Voulez vous envoyer tous ces lots ?"
     )
 
-    if (entity !== null && shouldValidate) {
-      resolveValidateAll(entity).then(selection.reset).then(refresh)
+    const year = filters.selected[Filters.Year] as number | null
+
+    if (entity !== null && year !== null && shouldValidate) {
+      resolveValidateAll(entity, year).then(selection.reset).then(refresh)
     }
   }
 
@@ -416,8 +422,8 @@ export default function useTransactions() {
 
   const uploader = useUploadLotFile(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
-  const deleter = useDeleteLots(entity, selection, refresh)
-  const validator = useValidateLots(entity, selection, refresh)
+  const deleter = useDeleteLots(entity, selection, filters, refresh)
+  const validator = useValidateLots(entity, selection, filters, refresh)
 
   return {
     entity,
