@@ -166,8 +166,17 @@ def get_lots(request):
 
 def get_snapshot(request):
     data = {}
+    year = request.GET.get('year', False)
     today = datetime.date.today()
-
+    date_from = datetime.date.today().replace(month=1, day=1)
+    date_until = datetime.date.today().replace(month=12, day=31)
+    if year:
+        try:
+            year = int(year)
+            date_from = datetime.date(year=year, month=1, day=1)
+            date_until = datetime.date(year=year, month=12, day=31)
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
     producer = request.GET.get('producer_id', False)
     if producer is None:
         return JsonResponse({'status': 'error', 'message': "Missing producer_id"}, status=400)
@@ -182,6 +191,7 @@ def get_snapshot(request):
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     txs = LotTransaction.objects.filter(lot__carbure_producer=producer)
+    txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
 
     draft = len(txs.filter(lot__status='Draft'))
     validated = len(txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA']))
