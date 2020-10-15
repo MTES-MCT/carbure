@@ -156,6 +156,7 @@ export enum Filters {
   ProductionSites = "production_sites",
   CountriesOfOrigin = "countries_of_origin",
   Clients = "clients",
+  Year = "year",
 }
 
 export interface Snapshot {

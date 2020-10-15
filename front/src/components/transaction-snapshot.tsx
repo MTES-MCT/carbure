@@ -43,6 +43,15 @@ const TransactionSnapshot = ({
     <div className={styles.transactionSummary}>
       <div className={styles.transactionHeader}>
         <Title>Transactions</Title>
+
+        <Select
+          level="primary"
+          className={styles.transactionYear}
+          value={filters.selected[Filters.Year]}
+          placeholder={snapshot.loading ? "…" : "Choisir une année"}
+          options={snapshot.data?.filters[Filters.Year] ?? []}
+          onChange={(value) => filters.selectFilter(Filters.Year, value)}
+        />
       </div>
 
       <div className={styles.transactionStatus}>

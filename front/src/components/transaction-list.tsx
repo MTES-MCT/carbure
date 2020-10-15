@@ -59,7 +59,7 @@ const DraftLotsActions = ({
   return (
     <React.Fragment>
       <AsyncButton as="label" icon={Upload} loading={uploader.loading}>
-        Importer fichier
+        Importer lots
         <input
           type="file"
           style={{ display: "none" }}

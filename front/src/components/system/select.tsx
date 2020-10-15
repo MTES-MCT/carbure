@@ -11,19 +11,6 @@ type Value = string | number | null
 export type Option = { value: Value; label: string }
 export type SelectValue = Value | Value[] | null
 
-type SelectLabelProps = SystemProps & {
-  value: SelectValue
-  placeholder?: string
-  onChange: (value: SelectValue) => void
-}
-
-type SelectProps = SelectLabelProps & {
-  options: Option[]
-  search?: boolean
-  multiple?: boolean
-  clear?: boolean
-}
-
 // check if the value is empty
 function isEmpty(value: SelectValue) {
   if (Array.isArray(value)) {
@@ -120,12 +107,28 @@ function useSelect(
   return { dd, selected, queryOptions, query, select, reset, change, setQuery }
 }
 
+type SelectLabelProps = SystemProps & {
+  value: SelectValue
+  placeholder?: string
+  level?: "primary"
+  onChange: (value: SelectValue) => void
+}
+
+type SelectProps = SelectLabelProps & {
+  options: Option[]
+  search?: boolean
+  multiple?: boolean
+  clear?: boolean
+}
+
 export const Select = ({
   value,
   placeholder,
   options,
-  onChange,
+  level,
+  className,
   children,
+  onChange,
   search = false,
   multiple = false,
   clear = false,
@@ -141,9 +144,13 @@ export const Select = ({
     change,
   } = useSelect(value, placeholder, options, onChange, multiple)
 
+  const labelClassName = cl(styles.selectLabel, className, {
+    [styles.selectPrimary]: level === "primary",
+  })
+
   return (
     <Dropdown {...props} onClick={dd.toggle}>
-      <Dropdown.Label className={styles.selectLabel}>
+      <Dropdown.Label className={labelClassName}>
         <span title={selected} className={styles.selectValue}>
           {selected}
         </span>
