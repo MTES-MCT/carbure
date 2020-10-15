@@ -3,7 +3,7 @@ import cl from "clsx"
 
 import styles from "./index.module.css"
 
-import { Loader, Search } from "./icons"
+import { AlertTriangle, Loader, Search } from "./icons"
 
 export type SystemProps = {
   className?: string
@@ -169,9 +169,12 @@ export const Title = ({ children, className, ...props }: TitleProps) => (
 
 // INPUT COMPONENT
 
-type InputProps = SystemProps & React.HTMLProps<HTMLInputElement>
+type InputProps = SystemProps &
+  React.HTMLProps<HTMLInputElement> & {
+    error?: string
+  }
 
-export const Input = ({ className, ...props }: InputProps) => (
+export const Input = ({ className, error, ...props }: InputProps) => (
   <input {...props} className={cl(styles.input, className)} />
 )
 
@@ -180,22 +183,29 @@ export const Input = ({ className, ...props }: InputProps) => (
 export type LabelInputProps = SystemProps &
   React.HTMLProps<HTMLInputElement> & {
     label: React.ReactNode
+    error?: string
   }
 
 export const LabelInput = ({
   label,
   disabled,
+  error,
   className,
   ...props
 }: LabelInputProps) => (
   <label
+    title={error}
     className={cl(
       styles.labelWrapper,
       disabled && styles.disabledLabel,
+      error && styles.errorLabel,
       className
     )}
   >
-    {label}
+    <span>
+      {label}
+      {error && <AlertTriangle size={16} />}
+    </span>
     <Input {...props} disabled={disabled} />
   </label>
 )
@@ -205,6 +215,7 @@ export const LabelInput = ({
 type LabelTextAreaProps = SystemProps &
   React.HTMLProps<HTMLTextAreaElement> & {
     label: React.ReactNode
+    error?: string
   }
 
 export const LabelTextArea = ({

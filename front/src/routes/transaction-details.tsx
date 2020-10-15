@@ -11,6 +11,29 @@ import { Save, Cross } from "../components/system/icons"
 import TransactionForm from "../components/transaction-form"
 import { ApiState } from "../hooks/helpers/use-api"
 
+function getFieldErrors(transactions: Lots | null, id: number) {
+  if (transactions === null) return {}
+
+  const fieldErrors: { [k: string]: string } = {}
+
+  const lotsErrors = transactions.lots_errors[id] ?? []
+  const txErrors = transactions.tx_errors[id] ?? []
+
+  lotsErrors.forEach(({ field, error }) => {
+    fieldErrors[field] = fieldErrors[field]
+      ? `${fieldErrors[field]}, ${error}`
+      : error
+  })
+
+  txErrors.forEach(({ field, error }) => {
+    fieldErrors[field] = fieldErrors[field]
+      ? `${fieldErrors[field]}, ${error}`
+      : error
+  })
+
+  return fieldErrors
+}
+
 type TransactionDetailsProps = {
   entity: EntitySelection
   transactions: ApiState<Lots>
@@ -36,6 +59,7 @@ const TransactionDetails = ({
         transaction={form}
         error={request.error}
         onChange={change}
+        fieldErrors={getFieldErrors(transactions.data, form.id)}
       >
         <AsyncButton
           submit

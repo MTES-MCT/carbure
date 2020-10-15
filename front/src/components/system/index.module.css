@@ -234,6 +234,16 @@
   margin-bottom: 8px;
 }
 
+.labelWrapper > span {
+  display: flex;
+  align-items: center;
+}
+
+.labelWrapper > span :global(.icon) {
+  margin-top: 2px;
+  margin-left: 4px;
+}
+
 .disabledLabel {
   color: var(--gray-medium);
   pointer-events: none;
@@ -242,6 +252,19 @@
 .labelTextArea,
 .textarea {
   flex: 1;
+}
+
+.errorLabel,
+.errorLabel:hover,
+.errorLabel:focus {
+  color: var(--red-dark);
+}
+
+.errorLabel input,
+.errorLabel:hover input,
+.errorLabel:focus input {
+  color: var(--red-dark);
+  border-color: var(--red-dark);
 }
 
 /* SEARCH INPUT COMPONENT */
@@ -296,6 +319,10 @@
   font-weight: 600;
   font-size: 14px;
   table-layout: fixed;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid var(--gray-highlight);
 }
 
 .table tbody tr:nth-child(even) {
