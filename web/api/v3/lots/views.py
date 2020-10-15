@@ -223,7 +223,7 @@ def get_snapshot(request):
 
     data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs, 'periods': periods,
                        'production_sites': psites, 'countries_of_origin': countries, 'clients': clients,
-                       'years': years}
+                       'year': years}
 
     deadlines = txs.filter(lot__status='Draft').annotate(month=TruncMonth(
         'delivery_date')).values('month').annotate(total=Count('id'))
