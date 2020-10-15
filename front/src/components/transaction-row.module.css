@@ -43,3 +43,17 @@
 .transactionRow {
   cursor: pointer;
 }
+
+.transactionRowError > td:first-child {
+  position: relative;
+}
+
+.transactionRowError > td:first-child::after {
+  border-left: 4px solid var(--red-dark);
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 4px;
+}

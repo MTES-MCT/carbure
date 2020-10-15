@@ -147,6 +147,24 @@ export interface Lots {
   returned: number
   total: number
   lots: Transaction[]
+
+  tx_errors: {
+    [key: string]: {
+      tx_id: number
+      field: string
+      value: string
+      error: string
+    }[]
+  }
+
+  lots_errors: {
+    [key: string]: {
+      lot_id: number
+      field: string
+      value: string
+      error: string
+    }[]
+  }
 }
 
 export enum Filters {
