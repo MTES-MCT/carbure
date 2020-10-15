@@ -101,15 +101,20 @@ export const TransactionRow = ({ transaction: tx }: TxRowProps) => (
 
 type TxContainerProps = {
   id: number
+  error: boolean
   children: React.ReactNode
 }
 
-export const TransactionRowContainer = ({ id, children }: TxContainerProps) => {
+export const TransactionRowContainer = ({
+  id,
+  error,
+  children,
+}: TxContainerProps) => {
   const relativePush = useRelativePush()
 
   return (
     <tr
-      className={styles.transactionRow}
+      className={cl(styles.transactionRow, error && styles.transactionRowError)}
       onClick={() => relativePush(`/${id}`)}
     >
       {children}

@@ -62,6 +62,13 @@ const TransactionColumns = ({ sorting, children }: TxColumnsProps) => (
   </thead>
 )
 
+function hasErrors(transactions: Lots, id: number): boolean {
+  return (
+    transactions.lots_errors[id]?.length > 0 ||
+    transactions.tx_errors[id]?.length > 0
+  )
+}
+
 type ReadOnlyTableProps = {
   transactions: Lots
   sorting: SortingSelection
@@ -75,7 +82,11 @@ const ReadOnlyTable = ({ transactions, sorting }: ReadOnlyTableProps) => (
 
     <tbody>
       {transactions.lots.map((tx) => (
-        <TransactionRowContainer key={tx.id} id={tx.id}>
+        <TransactionRowContainer
+          key={tx.id}
+          id={tx.id}
+          error={hasErrors(transactions, tx.id)}
+        >
           <td />
           <TransactionRow transaction={tx} />
           <td className={styles.actionColumn}>
@@ -122,7 +133,11 @@ const EditableTable = ({
 
       <tbody>
         {transactions.lots.map((tx) => (
-          <TransactionRowContainer key={tx.id} id={tx.id}>
+          <TransactionRowContainer
+            key={tx.id}
+            id={tx.id}
+            error={hasErrors(transactions, tx.id)}
+          >
             <td>
               <input
                 type="checkbox"
