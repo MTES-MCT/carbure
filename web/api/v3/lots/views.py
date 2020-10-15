@@ -3,6 +3,7 @@ import calendar
 import dateutil.relativedelta
 from django.db.models import Q, F, Case, When, Count
 from django.db.models.functions import TruncMonth
+from django.db.models.functions import Extract
 from django.db.models.fields import NOT_PROVIDED
 from django.http import JsonResponse, HttpResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError
@@ -191,6 +192,8 @@ def get_snapshot(request):
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     txs = LotTransaction.objects.filter(lot__carbure_producer=producer)
+    data['years'] = [t.year for t in txs.dates('delivery_date', 'year')]
+
     txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
 
     draft = len(txs.filter(lot__status='Draft'))
