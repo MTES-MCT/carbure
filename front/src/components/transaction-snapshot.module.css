@@ -27,7 +27,7 @@
   align-items: stretch;
 }
 
-.transactionStatus a {
+.transactionStatus button {
   display: flex;
   margin: 0 12px;
   flex: 1;

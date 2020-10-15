@@ -17,8 +17,9 @@ function normalizeFilters(snapshot: any): Snapshot {
     periods: snapshot.filters.periods.map(toOption),
     production_sites: snapshot.filters.production_sites.map(toOption),
     clients: snapshot.filters.clients.map(toOption),
-    year: snapshot.filters.year.map(toOption),
   }
+
+  snapshot.years = snapshot.years.map(toOption)
 
   return snapshot
 }
@@ -111,6 +112,7 @@ export function getLots(
   status: LotStatus,
   producerID: number,
   filters: FilterSelection["selected"],
+  year: number,
   page: number,
   limit: number,
   query: string,
@@ -118,14 +120,15 @@ export function getLots(
   order: string
 ): Promise<Lots> {
   return api.get("/lots", {
-    status,
-    producer_id: producerID,
     ...filters,
+    producer_id: producerID,
     from_idx: page * limit,
-    limit: limit,
-    query: query,
     sort_by: sortBy,
-    order: order,
+    status,
+    year,
+    limit,
+    query,
+    order,
   })
 }
 
@@ -133,17 +136,19 @@ export function downloadLots(
   status: LotStatus,
   producerID: number,
   filters: FilterSelection["selected"],
+  year: number,
   query: string,
   sortBy: string,
   order: string
 ) {
   return api.download("/lots", {
-    status,
-    producer_id: producerID,
     ...filters,
-    query: query,
+    producer_id: producerID,
     sort_by: sortBy,
-    order: order,
+    status,
+    year,
+    query,
+    order,
     export: true,
   })
 }

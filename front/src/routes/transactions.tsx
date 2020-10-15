@@ -15,6 +15,7 @@ const Transactions = () => {
     entity,
     status,
     filters,
+    year,
     pagination,
     snapshot,
     transactions,
@@ -38,6 +39,7 @@ const Transactions = () => {
         snapshot={snapshot}
         status={status}
         filters={filters}
+        year={year}
         search={search}
       />
 
