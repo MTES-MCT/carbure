@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react"
+import { useParams } from "react-router-dom"
 
 import { SelectValue } from "../components/system/select"
-import { LotStatus, Filters } from "../services/types"
+import { LotStatus, Filters, Lots } from "../services/types"
 
 import { PageSelection, usePageSelection } from "../components/system/pagination" // prettier-ignore
 import useAPI from "./helpers/use-api"
@@ -19,44 +20,54 @@ import {
 } from "../services/lots"
 
 import confirm from "../components/system/confirm"
-import { useHistory, useParams } from "react-router-dom"
 import useEntity, { EntitySelection } from "./helpers/use-entity"
+import { useRelativePush } from "../components/relative-route"
 
-export type SearchSelection = {
+export interface SearchSelection {
   query: string
   setQuery: (s: string) => void
 }
 
 // manage search query
-function useSearchSelection(): SearchSelection {
-  const [query, setQuery] = useState("")
+function useSearchSelection(pagination: PageSelection): SearchSelection {
+  const [query, setQueryState] = useState("")
+
+  function setQuery(query: string) {
+    pagination.setPage(0)
+    setQueryState(query)
+  }
+
   return { query, setQuery }
 }
 
-export type StatusSelection = {
+export interface StatusSelection {
   active: LotStatus
   setActive: (s: LotStatus) => void
 }
 
 // manage currently selected transaction status
-function useStatusSelection(): StatusSelection {
-  const history = useHistory()
+function useStatusSelection(pagination: PageSelection): StatusSelection {
+  const push = useRelativePush()
   const params: { status: LotStatus } = useParams()
 
   const active = params.status
-  const setActive = (status: LotStatus) => history.push(`/org/${status}`)
+
+  function setActive(status: LotStatus) {
+    pagination.setPage(0)
+    push(`../${status}`)
+  }
 
   return { active, setActive }
 }
 
-export type FilterSelection = {
+export interface FilterSelection {
   selected: { [k in Filters]: SelectValue }
-  selectFilter: (type: Filters, value: SelectValue) => void
+  select: (type: Filters, value: SelectValue) => void
   reset: () => void
 }
 
 // manage current filter selection
-function useFilterSelection(): FilterSelection {
+function useFilterSelection(pagination: PageSelection): FilterSelection {
   const [selected, setFilters] = useState<FilterSelection["selected"]>({
     [Filters.Biocarburants]: null,
     [Filters.MatieresPremieres]: null,
@@ -64,10 +75,10 @@ function useFilterSelection(): FilterSelection {
     [Filters.Periods]: null,
     [Filters.Clients]: null,
     [Filters.ProductionSites]: null,
-    [Filters.Year]: new Date().getFullYear(),
   })
 
-  function selectFilter(type: Filters, value: SelectValue) {
+  function select(type: Filters, value: SelectValue) {
+    pagination.setPage(0)
     setFilters({ ...selected, [type]: value })
   }
 
@@ -79,14 +90,33 @@ function useFilterSelection(): FilterSelection {
       [Filters.Periods]: null,
       [Filters.Clients]: null,
       [Filters.ProductionSites]: null,
-      [Filters.Year]: selected[Filters.Year],
     })
   }
 
-  return { selected, selectFilter, reset }
+  return { selected, select, reset }
 }
 
-export type TransactionSelection = {
+export interface YearSelection {
+  selected: number
+  setYear: (y: number) => void
+}
+
+function useYearSelection(
+  pagination: PageSelection,
+  filters: FilterSelection
+): YearSelection {
+  const [selected, setSelected] = useState(new Date().getFullYear())
+
+  function setYear(year: number) {
+    pagination.setPage(0)
+    filters.reset()
+    setSelected(year)
+  }
+
+  return { selected, setYear }
+}
+
+export interface TransactionSelection {
   selected: number[]
   has: (id: number) => boolean
   selectOne: (id: number) => void
@@ -94,8 +124,17 @@ export type TransactionSelection = {
   reset: () => void
 }
 
-function useTransactionSelection(): TransactionSelection {
+function useTransactionSelection(
+  transactions: TransactionHook
+): TransactionSelection {
   const [selected, selectMany] = useState<number[]>([])
+
+  const tx = transactions.data?.lots.map((lot) => lot.id) ?? []
+
+  // if some selected transactions are not on the current list, remove them
+  if (selected.some((id) => !tx.includes(id))) {
+    selectMany(selected.filter((id) => tx.includes(id)))
+  }
 
   function has(id: number) {
     return selected.includes(id)
@@ -118,7 +157,7 @@ function useTransactionSelection(): TransactionSelection {
 
 // valeurs acceptables pour le sort_by: ['period', 'client', 'biocarburant', 'matiere_premiere', 'ghg_reduction', 'volume', 'pays_origine']
 
-export type SortingSelection = {
+export interface SortingSelection {
   column: string
   order: "asc" | "desc"
   sortBy: (c: string) => void
@@ -144,28 +183,34 @@ function useSortingSelection(): SortingSelection {
 }
 
 // fetches current snapshot when parameters change
-function useGetSnapshot(entity: EntitySelection, filters: FilterSelection) {
+function useGetSnapshot(entity: EntitySelection, year: YearSelection) {
   const [snapshot, resolveSnapshot] = useAPI(getSnapshot)
 
-  const years = snapshot.data?.filters[Filters.Year]
-  const selectedYear = filters.selected[Filters.Year] as number | null
+  const years = snapshot.data?.years
 
-  if (years && !years.some((year) => year.value === selectedYear)) {
-    filters.selectFilter(Filters.Year, years[0].value)
+  // if the currently selected year is not in the list of available years
+  // set it to the first available value
+  if (years && !years.some((option) => option.value === year.selected)) {
+    year.setYear(years[0].value as number)
   }
 
   function resolve() {
-    if (entity !== null && selectedYear !== null) {
-      const request = resolveSnapshot(entity, selectedYear)
-      // reset the filters when snapshot changes
-      request.then(filters.reset)
-      return request.cancel
+    if (entity !== null) {
+      return resolveSnapshot(entity, year.selected).cancel
     }
   }
 
-  useEffect(resolve, [resolveSnapshot, entity, selectedYear])
+  useEffect(resolve, [resolveSnapshot, entity, year.selected])
 
   return { ...snapshot, resolve }
+}
+
+interface TransactionHook {
+  loading: boolean
+  error: string | null
+  data: Lots | null
+  resolve: () => void
+  exportAll: () => void
 }
 
 // fetches current transaction list when parameters change
@@ -173,30 +218,12 @@ function useGetLots(
   entity: EntitySelection,
   status: StatusSelection,
   filters: FilterSelection,
+  year: YearSelection,
   pagination: PageSelection,
-  selection: TransactionSelection,
   search: SearchSelection,
   sorting: SortingSelection
-) {
+): TransactionHook {
   const [transactions, resolveLots] = useAPI(getLots)
-
-  const { page, limit, setPage } = pagination
-  const { selectMany } = selection
-
-  function resolve() {
-    if (entity !== null) {
-      return resolveLots(
-        status.active,
-        entity,
-        filters.selected,
-        page,
-        limit,
-        search.query,
-        sorting.column,
-        sorting.order
-      ).cancel
-    }
-  }
 
   function exportAll() {
     if (entity !== null) {
@@ -204,6 +231,7 @@ function useGetLots(
         status.active,
         entity,
         filters.selected,
+        year.selected,
         search.query,
         sorting.column,
         sorting.order
@@ -211,28 +239,30 @@ function useGetLots(
     }
   }
 
-  // reset page to 0 when filters change
-  useEffect(() => {
-    setPage(0)
-    selectMany([])
-  }, [
-    status.active,
-    entity,
-    filters.selected,
-    sorting.column,
-    sorting.order,
-    limit,
-    setPage,
-    selectMany,
-  ])
+  function resolve() {
+    if (entity !== null) {
+      return resolveLots(
+        status.active,
+        entity,
+        filters.selected,
+        year.selected,
+        pagination.page,
+        pagination.limit,
+        search.query,
+        sorting.column,
+        sorting.order
+      ).cancel
+    }
+  }
 
   useEffect(resolve, [
     resolveLots,
     status.active,
     entity,
     filters.selected,
-    page,
-    limit,
+    year.selected,
+    pagination.page,
+    pagination.limit,
     search.query,
     sorting.column,
     sorting.order,
@@ -290,7 +320,7 @@ export interface Deleter {
 function useDeleteLots(
   entity: EntitySelection,
   selection: TransactionSelection,
-  filters: FilterSelection,
+  year: YearSelection,
   refresh: () => void
 ): Deleter {
   const [request, resolveDelete] = useAPI(deleteLots)
@@ -303,7 +333,7 @@ function useDeleteLots(
     )
 
     if (entity !== null && shouldDelete) {
-      resolveDelete(entity, [lotID]).then(selection.reset).then(refresh)
+      resolveDelete(entity, [lotID]).then(refresh)
     }
   }
 
@@ -314,9 +344,7 @@ function useDeleteLots(
     )
 
     if (entity !== null && shouldDelete) {
-      resolveDelete(entity, selection.selected)
-        .then(selection.reset)
-        .then(refresh)
+      resolveDelete(entity, selection.selected).then(refresh)
     }
   }
 
@@ -326,10 +354,8 @@ function useDeleteLots(
       "Voulez vous supprimer tous ces lots ?"
     )
 
-    const year = filters.selected[Filters.Year] as number | null
-
-    if (entity !== null && year !== null && shouldDelete) {
-      resolveDeleteAll(entity, year).then(selection.reset).then(refresh)
+    if (entity !== null && shouldDelete) {
+      resolveDeleteAll(entity, year.selected).then(refresh)
     }
   }
 
@@ -351,7 +377,7 @@ export interface Validator {
 function useValidateLots(
   entity: EntitySelection,
   selection: TransactionSelection,
-  filters: FilterSelection,
+  year: YearSelection,
   refresh: () => void
 ): Validator {
   const [request, resolveValidate] = useAPI(validateLots)
@@ -364,7 +390,7 @@ function useValidateLots(
     )
 
     if (entity !== null && shouldValidate) {
-      resolveValidate(entity, [lotID]).then(selection.reset).then(refresh)
+      resolveValidate(entity, [lotID]).then(refresh)
     }
   }
 
@@ -375,9 +401,7 @@ function useValidateLots(
     )
 
     if (entity !== null && shouldValidate) {
-      resolveValidate(entity, selection.selected)
-        .then(selection.reset)
-        .then(refresh)
+      resolveValidate(entity, selection.selected).then(refresh)
     }
   }
 
@@ -387,10 +411,8 @@ function useValidateLots(
       "Voulez vous envoyer tous ces lots ?"
     )
 
-    const year = filters.selected[Filters.Year] as number | null
-
-    if (entity !== null && year !== null && shouldValidate) {
-      resolveValidateAll(entity, year).then(selection.reset).then(refresh)
+    if (entity !== null && shouldValidate) {
+      resolveValidateAll(entity, year.selected).then(refresh)
     }
   }
 
@@ -405,15 +427,16 @@ function useValidateLots(
 export default function useTransactions() {
   const entity = useEntity()
 
-  const status = useStatusSelection()
-  const filters = useFilterSelection()
-  const pagination = usePageSelection()
-  const selection = useTransactionSelection()
-  const search = useSearchSelection()
   const sorting = useSortingSelection()
+  const pagination = usePageSelection()
 
-  const snapshot = useGetSnapshot(entity, filters)
-  const transactions = useGetLots(entity, status, filters, pagination, selection, search, sorting) // prettier-ignore
+  const status = useStatusSelection(pagination)
+  const search = useSearchSelection(pagination)
+  const filters = useFilterSelection(pagination)
+  const year = useYearSelection(pagination, filters)
+
+  const snapshot = useGetSnapshot(entity, year)
+  const transactions = useGetLots(entity, status, filters, year, pagination, search, sorting) // prettier-ignore
 
   function refresh() {
     snapshot.resolve()
@@ -422,13 +445,17 @@ export default function useTransactions() {
 
   const uploader = useUploadLotFile(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
-  const deleter = useDeleteLots(entity, selection, filters, refresh)
-  const validator = useValidateLots(entity, selection, filters, refresh)
+
+  const selection = useTransactionSelection(transactions)
+
+  const deleter = useDeleteLots(entity, selection, year, refresh)
+  const validator = useValidateLots(entity, selection, year, refresh)
 
   return {
     entity,
     status,
     filters,
+    year,
     pagination,
     snapshot,
     transactions,

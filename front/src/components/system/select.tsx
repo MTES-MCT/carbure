@@ -107,18 +107,15 @@ function useSelect(
   return { dd, selected, queryOptions, query, select, reset, change, setQuery }
 }
 
-type SelectLabelProps = SystemProps & {
-  value: SelectValue
+type SelectProps = SystemProps & {
   placeholder?: string
   level?: "primary"
-  onChange: (value: SelectValue) => void
-}
-
-type SelectProps = SelectLabelProps & {
-  options: Option[]
   search?: boolean
   multiple?: boolean
   clear?: boolean
+  value: SelectValue
+  options: Option[]
+  onChange: (value: SelectValue) => void
 }
 
 export const Select = ({
