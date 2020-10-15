@@ -63,6 +63,7 @@ function useFilterSelection(): FilterSelection {
     [Filters.Periods]: null,
     [Filters.Clients]: null,
     [Filters.ProductionSites]: null,
+    [Filters.Year]: null,
   })
 
   function selectFilter(type: Filters, value: SelectValue) {

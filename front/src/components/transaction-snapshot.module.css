@@ -16,6 +16,11 @@
   margin-bottom: 32px;
 }
 
+.transactionYear {
+  font-size: 18px;
+  padding: 12px 16px;
+}
+
 .transactionStatus {
   display: flex;
   justify-content: space-between;

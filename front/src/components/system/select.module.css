@@ -10,6 +10,17 @@
   border-color: var(--blue-medium);
 }
 
+.selectPrimary {
+  color: var(--white);
+  background-color: var(--blue-medium);
+  border-color: var(--blue-medium);
+}
+
+.selectPrimary:hover {
+  color: var(--white);
+  background-color: var(--blue-dark);
+}
+
 .selectCross {
   width: 16px;
   flex-shrink: 0;
@@ -27,7 +38,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   border: none;
-  font-size: 13px;
   background-color: transparent;
 }
 
