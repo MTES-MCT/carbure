@@ -91,8 +91,8 @@ type EditableTableProps = {
   transactions: Lots
   selection: TransactionSelection
   sorting: SortingSelection
-  onDelete: (ids: number[]) => void
-  onValidate: (ids: number[]) => void
+  onDelete: (id: number) => void
+  onValidate: (id: number) => void
   onDuplicate: (id: number) => void
 }
 
@@ -144,11 +144,11 @@ const EditableTable = ({
                 />
                 <Check
                   title="Envoyer le lot"
-                  onClick={stopProp(() => onValidate([tx.id]))}
+                  onClick={stopProp(() => onValidate(tx.id))}
                 />
                 <Cross
                   title="Supprimer le lot"
-                  onClick={stopProp(() => onDelete([tx.id]))}
+                  onClick={stopProp(() => onDelete(tx.id))}
                 />
               </div>
             </td>
@@ -164,8 +164,8 @@ type TransactionTableProps = {
   status: StatusSelection
   sorting: SortingSelection
   selection: TransactionSelection
-  onDelete: (ids: number[]) => void
-  onValidate: (ids: number[]) => void
+  onDelete: (id: number) => void
+  onValidate: (id: number) => void
   onDuplicate: (id: number) => void
 }
 
