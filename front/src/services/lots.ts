@@ -195,15 +195,17 @@ export function validateLots(entityID: number, transactionIDs: number[]) {
   })
 }
 
-export function deleteAllDraftLots(entityID: number) {
+export function deleteAllDraftLots(entityID: number, year: number) {
   return api.post("/lots/delete-all-drafts", {
     entity_id: entityID,
+    year,
   })
 }
 
-export function validateAllDraftLots(entityID: number) {
+export function validateAllDraftLots(entityID: number, year: number) {
   return api.post("/lots/validate-all-drafts", {
     entity_id: entityID,
+    year,
   })
 }
 
