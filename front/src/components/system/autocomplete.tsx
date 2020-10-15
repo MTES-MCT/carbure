@@ -19,6 +19,13 @@ function useAutoComplete<T>(
   const [query, setQuery] = useState("")
   const [suggestions, resolve] = useAPI<[string], T[]>(getQuery)
 
+  // on change, modify the query to match selection and send event to parent
+  function change(value: T) {
+    setQuery(getLabel(value))
+    onChange({ target: { name, value } })
+    dd.toggle(false)
+  }
+
   // modify input content when passed value is changed
   useEffect(() => {
     setQuery(getLabel(value))
@@ -29,22 +36,7 @@ function useAutoComplete<T>(
     return resolve(query).cancel
   }, [query, getQuery, resolve])
 
-  // on change, modify the query to match selection and send event to parent
-  function change(value: T) {
-    setQuery(getLabel(value))
-    onChange({ target: { name, value } })
-  }
-
-  // open the suggestions box according to current state
-  function openSuggestions() {
-    if (query.length > 0 && suggestions.data && suggestions.data.length > 0) {
-      dd.toggle(true)
-    } else {
-      dd.toggle(false)
-    }
-  }
-
-  return { dd, query, suggestions, setQuery, change, openSuggestions }
+  return { dd, query, suggestions, setQuery, change }
 }
 
 type AutoCompleteProps<T> = Omit<LabelInputProps, "value"> & {
@@ -66,29 +58,30 @@ function AutoComplete<T>({
   getQuery,
   ...props
 }: AutoCompleteProps<T>) {
-  const {
-    query,
-    dd,
-    suggestions,
-    setQuery,
-    change,
-    openSuggestions,
-  } = useAutoComplete(value, name!, onChange, getLabel, getQuery)
+  const { dd, query, suggestions, setQuery, change } = useAutoComplete(
+    value,
+    name!,
+    onChange,
+    getLabel,
+    getQuery
+  )
 
   return (
     <Dropdown>
       <LabelInput
         {...props}
         value={query}
-        onKeyDown={openSuggestions}
+        onClick={(e) => e.stopPropagation()}
+        onFocus={() => dd.toggle(true)}
+        onBlur={() => dd.toggle(false)}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setQuery(e.target.value)
         }
       />
 
       <Dropdown.Items open={dd.isOpen} className={styles.suggestions}>
-        {suggestions.data?.map((option) => (
-          <li key={getValue(option)} onClick={() => change(option)}>
+        {suggestions.data?.map((option, i) => (
+          <li key={getValue(option)} onMouseDown={() => change(option)}>
             {getLabel(option)}
           </li>
         ))}
