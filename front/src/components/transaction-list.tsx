@@ -25,7 +25,7 @@ import { Link } from "./relative-route"
 
 type DraftActionProps = {
   disabled: boolean
-  selection: TransactionSelection
+  hasSelection: boolean
   uploader: Uploader
   deleter: Deleter
   validator: Validator
@@ -33,16 +33,14 @@ type DraftActionProps = {
 
 const DraftLotsActions = ({
   disabled,
-  selection,
+  hasSelection,
   uploader,
   deleter,
   validator,
 }: DraftActionProps) => {
-  const hasSelection = selection.selected.length > 0
-
   function onValidate() {
     if (hasSelection) {
-      validator.resolve(selection.selected)
+      validator.resolveSelection()
     } else {
       validator.resolveAll()
     }
@@ -50,7 +48,7 @@ const DraftLotsActions = ({
 
   function onDelete() {
     if (hasSelection) {
-      deleter.resolve(selection.selected)
+      deleter.resolveSelection()
     } else {
       deleter.resolveAll()
     }
@@ -163,7 +161,7 @@ const TransactionList = ({
           {status.active === LotStatus.Draft && (
             <DraftLotsActions
               disabled={isEmpty}
-              selection={selection}
+              hasSelection={selection.selected.length > 0}
               uploader={uploader}
               deleter={deleter}
               validator={validator}

@@ -78,6 +78,7 @@ export type TransactionSelection = {
   has: (id: number) => boolean
   selectOne: (id: number) => void
   selectMany: React.Dispatch<React.SetStateAction<number[]>>
+  reset: () => void
 }
 
 function useTransactionSelection(): TransactionSelection {
@@ -85,6 +86,10 @@ function useTransactionSelection(): TransactionSelection {
 
   function has(id: number) {
     return selected.includes(id)
+  }
+
+  function reset() {
+    selectMany([])
   }
 
   function selectOne(id: number) {
@@ -95,7 +100,7 @@ function useTransactionSelection(): TransactionSelection {
     }
   }
 
-  return { selected, has, selectOne, selectMany }
+  return { selected, has, selectOne, selectMany, reset }
 }
 
 // valeurs acceptables pour le sort_by: ['period', 'client', 'biocarburant', 'matiere_premiere', 'ghg_reduction', 'volume', 'pays_origine']
@@ -126,16 +131,16 @@ function useSortingSelection(): SortingSelection {
 }
 
 // fetches current snapshot when parameters change
-function useGetSnapshot(entity: EntitySelection) {
+function useGetSnapshot(entity: EntitySelection, year: number | null) {
   const [snapshot, resolveSnapshot] = useAPI(getSnapshot)
 
   function resolve() {
-    if (entity !== null) {
-      return resolveSnapshot(entity).cancel
+    if (entity !== null && year !== null) {
+      return resolveSnapshot(entity, year).cancel
     }
   }
 
-  useEffect(resolve, [resolveSnapshot, entity])
+  useEffect(resolve, [resolveSnapshot, entity, year])
 
   return { ...snapshot, resolve }
 }
@@ -254,22 +259,40 @@ function useDuplicateLot(entity: EntitySelection, refresh: () => void) {
 
 export interface Deleter {
   loading: boolean
-  resolve: (l: number[]) => void
+  resolve: (l: number) => void
+  resolveSelection: () => void
   resolveAll: () => void
 }
 
-function useDeleteLots(entity: EntitySelection, refresh: () => void): Deleter {
+function useDeleteLots(
+  entity: EntitySelection,
+  selection: TransactionSelection,
+  refresh: () => void
+): Deleter {
   const [request, resolveDelete] = useAPI(deleteLots)
   const [requestAll, resolveDeleteAll] = useAPI(deleteAllDraftLots)
 
-  async function resolve(lotIDs: number[]) {
+  async function resolve(lotID: number) {
+    const shouldDelete = await confirm(
+      "Supprimer lots",
+      "Voulez vous supprimer ce lot ?"
+    )
+
+    if (entity !== null && shouldDelete) {
+      resolveDelete(entity, [lotID]).then(selection.reset).then(refresh)
+    }
+  }
+
+  async function resolveSelection() {
     const shouldDelete = await confirm(
       "Supprimer lots",
       "Voulez vous supprimer les lots sélectionnés ?"
     )
 
     if (entity !== null && shouldDelete) {
-      resolveDelete(entity, lotIDs).then(refresh)
+      resolveDelete(entity, selection.selected)
+        .then(selection.reset)
+        .then(refresh)
     }
   }
 
@@ -280,34 +303,54 @@ function useDeleteLots(entity: EntitySelection, refresh: () => void): Deleter {
     )
 
     if (entity !== null && shouldDelete) {
-      resolveDeleteAll(entity).then(refresh)
+      resolveDeleteAll(entity).then(selection.reset).then(refresh)
     }
   }
 
-  return { loading: request.loading || requestAll.loading, resolve, resolveAll }
+  return {
+    loading: request.loading || requestAll.loading,
+    resolve,
+    resolveSelection,
+    resolveAll,
+  }
 }
 
 export interface Validator {
   loading: boolean
-  resolve: (l: number[]) => void
+  resolve: (l: number) => void
+  resolveSelection: () => void
   resolveAll: () => void
 }
 
 function useValidateLots(
   entity: EntitySelection,
+  selection: TransactionSelection,
   refresh: () => void
 ): Validator {
   const [request, resolveValidate] = useAPI(validateLots)
   const [requestAll, resolveValidateAll] = useAPI(validateAllDraftLots)
 
-  async function resolve(lotIDs: number[]) {
+  async function resolve(lotID: number) {
+    const shouldValidate = await confirm(
+      "Envoyer lots",
+      "Voulez vous envoyer ce lot ?"
+    )
+
+    if (entity !== null && shouldValidate) {
+      resolveValidate(entity, [lotID]).then(selection.reset).then(refresh)
+    }
+  }
+
+  async function resolveSelection() {
     const shouldValidate = await confirm(
       "Envoyer lots",
       "Voulez vous envoyer les lots sélectionnés ?"
     )
 
     if (entity !== null && shouldValidate) {
-      resolveValidate(entity, lotIDs).then(refresh)
+      resolveValidate(entity, selection.selected)
+        .then(selection.reset)
+        .then(refresh)
     }
   }
 
@@ -318,11 +361,16 @@ function useValidateLots(
     )
 
     if (entity !== null && shouldValidate) {
-      resolveValidateAll(entity).then(refresh)
+      resolveValidateAll(entity).then(selection.reset).then(refresh)
     }
   }
 
-  return { loading: request.loading || requestAll.loading, resolve, resolveAll }
+  return {
+    loading: request.loading || requestAll.loading,
+    resolve,
+    resolveSelection,
+    resolveAll,
+  }
 }
 
 export default function useTransactions() {
@@ -335,7 +383,7 @@ export default function useTransactions() {
   const search = useSearchSelection()
   const sorting = useSortingSelection()
 
-  const snapshot = useGetSnapshot(entity)
+  const snapshot = useGetSnapshot(entity, filters.selected[Filters.Year] as number | null) // prettier-ignore
   const transactions = useGetLots(entity, status, filters, pagination, selection, search, sorting) // prettier-ignore
 
   function refresh() {
@@ -343,10 +391,10 @@ export default function useTransactions() {
     transactions.resolve()
   }
 
-  const deleter = useDeleteLots(entity, refresh)
   const uploader = useUploadLotFile(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
-  const validator = useValidateLots(entity, refresh)
+  const deleter = useDeleteLots(entity, selection, refresh)
+  const validator = useValidateLots(entity, selection, refresh)
 
   return {
     entity,
