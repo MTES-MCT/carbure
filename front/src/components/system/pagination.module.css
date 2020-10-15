@@ -33,7 +33,7 @@
   margin-right: 8px;
 }
 
-.paginationSelect :global(.dropdown-items) {
+.paginationSelect + :global(.dropdown-items) {
   top: unset;
   bottom: 100%;
 }
