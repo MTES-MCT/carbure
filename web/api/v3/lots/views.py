@@ -546,8 +546,19 @@ def accept_all(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    LotTransaction.objects.filter(carbure_client=entity, delivery_status__in=[
-                                  'N', 'AC', 'AA']).update(delivery_status='A')
+    lots = LotTransaction.objects.filter(carbure_client=entity, delivery_status__in=[
+                                  'N', 'AC', 'AA'])
+    year = request.POST.get('year', False)
+    date_from = datetime.date.today().replace(month=1, day=1)
+    date_until = datetime.date.today().replace(month=12, day=31)
+    if year:
+        try:
+            year = int(year)
+            date_from = datetime.date(year=year, month=1, day=1)
+            date_until = datetime.date(year=year, month=12, day=31)
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
+    lots.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until).update(delivery_status='A')
     return JsonResponse({'status': 'success'})
 
 
@@ -566,7 +577,18 @@ def delete_all_drafts(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').delete()
+    drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft')
+    year = request.POST.get('year', False)
+    date_from = datetime.date.today().replace(month=1, day=1)
+    date_until = datetime.date.today().replace(month=12, day=31)
+    if year:
+        try:
+            year = int(year)
+            date_from = datetime.date(year=year, month=1, day=1)
+            date_until = datetime.date(year=year, month=12, day=31)
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
+    drafts.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until).delete()
     return JsonResponse({'status': 'success'})
 
 
@@ -586,6 +608,18 @@ def validate_all_drafts(request):
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft')
+    year = request.POST.get('year', False)
+    date_from = datetime.date.today().replace(month=1, day=1)
+    date_until = datetime.date.today().replace(month=12, day=31)
+    if year:
+        try:
+            year = int(year)
+            date_from = datetime.date(year=year, month=1, day=1)
+            date_until = datetime.date(year=year, month=12, day=31)
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
+    drafts = drafts.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
+
     tx_ids = [d.id for d in drafts]
     validate_lots(request.user, tx_ids)
     return JsonResponse({'status': 'success'})
