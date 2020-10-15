@@ -25,7 +25,7 @@ const Modal = ({ className, onClose, children, ...props }: ModalProps) => {
 
     window.addEventListener("keydown", onEscape)
     return () => window.removeEventListener("keydown", onEscape)
-  }, [])
+  }, [onClose])
 
   return ReactDOM.createPortal(
     <div className={styles.modalWrapper}>
