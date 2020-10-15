@@ -23,7 +23,7 @@ function normalizeFilters(snapshot: any): Snapshot {
   return snapshot
 }
 
-export function toTransactionPostData(tx: TransactionFormState) {
+function toTransactionPostData(tx: TransactionFormState) {
   return {
     volume: tx.volume,
     dae: tx.dae,
@@ -100,8 +100,11 @@ export function getStatus(lot: Transaction): LotStatus {
   return LotStatus.Weird
 }
 
-export function getSnapshot(producer_id: number): Promise<Snapshot> {
-  return api.get("/lots/snapshot", { producer_id }).then(normalizeFilters)
+export function getSnapshot(
+  producer_id: number,
+  year: number
+): Promise<Snapshot> {
+  return api.get("/lots/snapshot", { producer_id, year }).then(normalizeFilters)
 }
 
 export function getLots(

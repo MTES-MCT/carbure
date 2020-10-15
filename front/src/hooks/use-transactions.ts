@@ -126,16 +126,16 @@ function useSortingSelection(): SortingSelection {
 }
 
 // fetches current snapshot when parameters change
-function useGetSnapshot(entity: EntitySelection) {
+function useGetSnapshot(entity: EntitySelection, year: number | null) {
   const [snapshot, resolveSnapshot] = useAPI(getSnapshot)
 
   function resolve() {
-    if (entity !== null) {
-      return resolveSnapshot(entity).cancel
+    if (entity !== null && year !== null) {
+      return resolveSnapshot(entity, year).cancel
     }
   }
 
-  useEffect(resolve, [resolveSnapshot, entity])
+  useEffect(resolve, [resolveSnapshot, entity, year])
 
   return { ...snapshot, resolve }
 }
@@ -335,7 +335,7 @@ export default function useTransactions() {
   const search = useSearchSelection()
   const sorting = useSortingSelection()
 
-  const snapshot = useGetSnapshot(entity)
+  const snapshot = useGetSnapshot(entity, filters.selected[Filters.Year] as number | null) // prettier-ignore
   const transactions = useGetLots(entity, status, filters, pagination, selection, search, sorting) // prettier-ignore
 
   function refresh() {
