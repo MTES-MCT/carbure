@@ -52,11 +52,12 @@ function useStatusSelection(): StatusSelection {
 export type FilterSelection = {
   selected: { [k in Filters]: SelectValue }
   selectFilter: (type: Filters, value: SelectValue) => void
+  reset: () => void
 }
 
 // manage current filter selection
 function useFilterSelection(): FilterSelection {
-  const [selected, setFilters] = useState({
+  const [selected, setFilters] = useState<FilterSelection["selected"]>({
     [Filters.Biocarburants]: null,
     [Filters.MatieresPremieres]: null,
     [Filters.CountriesOfOrigin]: null,
@@ -70,7 +71,19 @@ function useFilterSelection(): FilterSelection {
     setFilters({ ...selected, [type]: value })
   }
 
-  return { selected, selectFilter }
+  function reset() {
+    setFilters({
+      [Filters.Biocarburants]: null,
+      [Filters.MatieresPremieres]: null,
+      [Filters.CountriesOfOrigin]: null,
+      [Filters.Periods]: null,
+      [Filters.Clients]: null,
+      [Filters.ProductionSites]: null,
+      [Filters.Year]: selected[Filters.Year],
+    })
+  }
+
+  return { selected, selectFilter, reset }
 }
 
 export type TransactionSelection = {
@@ -131,16 +144,26 @@ function useSortingSelection(): SortingSelection {
 }
 
 // fetches current snapshot when parameters change
-function useGetSnapshot(entity: EntitySelection, year: number | null) {
+function useGetSnapshot(entity: EntitySelection, filters: FilterSelection) {
   const [snapshot, resolveSnapshot] = useAPI(getSnapshot)
 
+  const years = snapshot.data?.filters[Filters.Year]
+  const selectedYear = filters.selected[Filters.Year] as number | null
+
+  if (years && !years.some((year) => year.value === selectedYear)) {
+    filters.selectFilter(Filters.Year, years[0].value)
+  }
+
   function resolve() {
-    if (entity !== null && year !== null) {
-      return resolveSnapshot(entity, year).cancel
+    if (entity !== null && selectedYear !== null) {
+      const request = resolveSnapshot(entity, selectedYear)
+      // reset the filters when snapshot changes
+      request.then(filters.reset)
+      return request.cancel
     }
   }
 
-  useEffect(resolve, [resolveSnapshot, entity, year])
+  useEffect(resolve, [resolveSnapshot, entity, selectedYear])
 
   return { ...snapshot, resolve }
 }
@@ -383,7 +406,7 @@ export default function useTransactions() {
   const search = useSearchSelection()
   const sorting = useSortingSelection()
 
-  const snapshot = useGetSnapshot(entity, filters.selected[Filters.Year] as number | null) // prettier-ignore
+  const snapshot = useGetSnapshot(entity, filters)
   const transactions = useGetLots(entity, status, filters, pagination, selection, search, sorting) // prettier-ignore
 
   function refresh() {
