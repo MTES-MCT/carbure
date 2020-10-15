@@ -141,7 +141,7 @@ export const Rapport = ({ className, ...props }: IconProps) => (
 )
 
 export const Upload = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("icon-rapport", className)}>
+  <Icon {...props} className={cl("icon-upload", className)}>
     <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
     <polyline points="7 11 12 16 17 11" />
     <line x1="12" y1="4" x2="12" y2="16" />
@@ -149,9 +149,16 @@ export const Upload = ({ className, ...props }: IconProps) => (
 )
 
 export const Download = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("icon-rapport", className)}>
+  <Icon {...props} className={cl("icon-download", className)}>
     <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
     <polyline points="7 9 12 4 17 9" />
     <line x1="12" y1="4" x2="12" y2="16" />
+  </Icon>
+)
+
+export const AlertTriangle = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-alert-triangle", className)}>
+    <path d="M12 9v2m0 4v.01" />
+    <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" />
   </Icon>
 )

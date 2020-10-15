@@ -35,6 +35,7 @@ type TransactionFormProps = {
   transaction: TransactionFormState
   children: React.ReactNode
   error: string | null
+  fieldErrors?: { [k: string]: string }
   onChange: <T extends FormFields>(e: React.ChangeEvent<T>) => void
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
 }
@@ -44,6 +45,7 @@ const TransactionForm = ({
   readOnly = false,
   transaction: tx,
   error,
+  fieldErrors = {},
   onChange,
   onSubmit,
 }: TransactionFormProps) => {
@@ -62,6 +64,7 @@ const TransactionForm = ({
             label="Volume à 20°C en Litres"
             name="volume"
             value={tx.volume}
+            error={fieldErrors.volume}
             onChange={onChange}
           />
           <AutoComplete
@@ -70,6 +73,7 @@ const TransactionForm = ({
             placeholder="Rechercher un biocarburant..."
             name="biocarburant"
             value={tx.biocarburant}
+            error={fieldErrors.biocarburant}
             getValue={getters.code}
             getLabel={getters.name}
             getQuery={findBiocarburants}
@@ -81,6 +85,7 @@ const TransactionForm = ({
             placeholder="Rechercher une matière première..."
             name="matiere_premiere"
             value={tx.matiere_premiere}
+            error={fieldErrors.matiere_premiere}
             getValue={getters.code}
             getLabel={getters.name}
             getQuery={findMatieresPremieres}
@@ -92,6 +97,7 @@ const TransactionForm = ({
             placeholder="Rechercher un pays..."
             name="pays_origine"
             value={tx.pays_origine}
+            error={fieldErrors.pays_origine}
             getValue={getters.code_pays}
             getLabel={getters.name}
             getQuery={findCountries}
@@ -102,6 +108,7 @@ const TransactionForm = ({
             label="Champ Libre"
             name="champ_libre"
             value={tx.champ_libre}
+            error={fieldErrors.champ_libre}
             onChange={onChange}
           />
         </Box>
@@ -121,6 +128,7 @@ const TransactionForm = ({
                 placeholder="Rechercher un producteur..."
                 name="carbure_producer"
                 value={tx.carbure_producer}
+                error={fieldErrors.carbure_producer}
                 getValue={getters.id}
                 getLabel={getters.name}
                 getQuery={findProducers}
@@ -133,6 +141,7 @@ const TransactionForm = ({
                 placeholder="Rechercher un site de production..."
                 name="carbure_production_site"
                 value={tx.carbure_production_site}
+                error={fieldErrors.carbure_production_site}
                 getValue={getters.id}
                 getLabel={getters.name}
                 getQuery={findProductionSites}
@@ -159,6 +168,7 @@ const TransactionForm = ({
                 label="Producteur"
                 name="unknown_producer"
                 value={tx.unknown_producer}
+                error={fieldErrors.unknown_producer}
                 onChange={onChange}
               />
               <LabelInput
@@ -166,6 +176,7 @@ const TransactionForm = ({
                 label="Site de production"
                 name="unknown_production_site"
                 value={tx.unknown_production_site}
+                error={fieldErrors.unknown_production_site}
                 onChange={onChange}
               />
               <AutoComplete
@@ -175,6 +186,7 @@ const TransactionForm = ({
                 placeholder="Rechercher un pays..."
                 name="unknown_production_country"
                 value={tx.unknown_production_country}
+                error={fieldErrors.unknown_production_country}
                 getValue={getters.code_pays}
                 getLabel={getters.name}
                 getQuery={findCountries}
@@ -187,6 +199,7 @@ const TransactionForm = ({
                 label="Date de mise en service"
                 name="unknown_production_site_com_date"
                 value={tx.unknown_production_site_com_date}
+                error={fieldErrors.unknown_production_site_com_date}
                 onChange={onChange}
               />
               <LabelInput
@@ -195,6 +208,7 @@ const TransactionForm = ({
                 label="N° d'enregistrement double-compte"
                 name="unknown_production_site_dbl_counting"
                 value={tx.unknown_production_site_dbl_counting}
+                error={fieldErrors.unknown_production_site_dbl_counting}
                 onChange={onChange}
               />
               <LabelInput
@@ -203,6 +217,7 @@ const TransactionForm = ({
                 label="Référence Système Fournisseur"
                 name="unknown_production_site_reference"
                 value={tx.unknown_production_site_reference}
+                error={fieldErrors.unknown_production_site_reference}
                 onChange={onChange}
               />
             </React.Fragment>
@@ -224,6 +239,7 @@ const TransactionForm = ({
               placeholder="Rechercher un client..."
               name="carbure_client"
               value={tx.carbure_client}
+              error={fieldErrors.carbure_client}
               getValue={getters.id}
               getLabel={getters.name}
               getQuery={findEntities}
@@ -235,6 +251,7 @@ const TransactionForm = ({
               label="Client"
               name="unknown_client"
               value={tx.unknown_client}
+              error={fieldErrors.unknown_client}
               onChange={onChange}
             />
           )}
@@ -253,6 +270,7 @@ const TransactionForm = ({
               placeholder="Rechercher un site de livraison..."
               name="carbure_delivery_site"
               value={tx.carbure_delivery_site}
+              error={fieldErrors.carbure_delivery_site}
               getValue={getters.depot_id}
               getLabel={getters.name}
               getQuery={findDeliverySites}
@@ -265,6 +283,7 @@ const TransactionForm = ({
                 label="Site de livraison"
                 name="unknown_delivery_site"
                 value={tx.unknown_delivery_site}
+                error={fieldErrors.unknown_delivery_site}
                 onChange={onChange}
               />
             </React.Fragment>
@@ -283,6 +302,7 @@ const TransactionForm = ({
               label="Pays de livraison"
               name="unknown_delivery_site_country"
               value={tx.unknown_delivery_site_country}
+              error={fieldErrors.unknown_delivery_site_country}
               getValue={getters.code_pays}
               getLabel={getters.name}
               getQuery={findCountries}
@@ -295,6 +315,7 @@ const TransactionForm = ({
             label="Numéro douanier (DAE, DAA...)"
             name="dae"
             value={tx.dae}
+            error={fieldErrors.dae}
             onChange={onChange}
           />
 
@@ -304,6 +325,7 @@ const TransactionForm = ({
             label="Date de livraison"
             name="delivery_date"
             value={tx.delivery_date}
+            error={fieldErrors.delivery_date}
             onChange={onChange}
           />
         </Box>
@@ -317,6 +339,7 @@ const TransactionForm = ({
                 label="EEC"
                 name="eec"
                 value={tx.eec}
+                error={fieldErrors.eec}
                 step={0.1}
                 onChange={onChange}
               />
@@ -326,6 +349,7 @@ const TransactionForm = ({
                 label="EL"
                 name="el"
                 value={tx.el}
+                error={fieldErrors.el}
                 step={0.1}
                 onChange={onChange}
               />
@@ -335,6 +359,7 @@ const TransactionForm = ({
                 label="EP"
                 name="ep"
                 value={tx.ep}
+                error={fieldErrors.ep}
                 step={0.1}
                 onChange={onChange}
               />
@@ -344,6 +369,7 @@ const TransactionForm = ({
                 label="ETD"
                 name="etd"
                 value={tx.etd}
+                error={fieldErrors.etd}
                 step={0.1}
                 onChange={onChange}
               />
@@ -356,6 +382,7 @@ const TransactionForm = ({
                 label="ESCA"
                 name="esca"
                 value={tx.esca}
+                error={fieldErrors.esca}
                 step={0.1}
                 onChange={onChange}
               />
@@ -365,6 +392,7 @@ const TransactionForm = ({
                 label="ECCS"
                 name="eccs"
                 value={tx.eccs}
+                error={fieldErrors.eccs}
                 step={0.1}
                 onChange={onChange}
               />
@@ -374,6 +402,7 @@ const TransactionForm = ({
                 label="ECCR"
                 name="eccr"
                 value={tx.eccr}
+                error={fieldErrors.eccr}
                 step={0.1}
                 onChange={onChange}
               />
@@ -383,6 +412,7 @@ const TransactionForm = ({
                 label="EEE"
                 name="eee"
                 value={tx.eee}
+                error={fieldErrors.eee}
                 step={0.1}
                 onChange={onChange}
               />
@@ -395,6 +425,7 @@ const TransactionForm = ({
             label="EU"
             name="eu"
             value={tx.eu}
+            error={fieldErrors.eu}
             step={0.1}
             className={styles.transactionTotal}
             onChange={onChange}
