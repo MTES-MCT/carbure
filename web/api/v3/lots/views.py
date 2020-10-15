@@ -128,7 +128,7 @@ def get_lots(request):
 
     if limit != None:
         limit = int(limit)
-        returned = txs[:limit]
+        returned = returned[:limit]
 
     data = {}
 
@@ -547,7 +547,7 @@ def accept_all(request):
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     lots = LotTransaction.objects.filter(carbure_client=entity, delivery_status__in=[
-                                  'N', 'AC', 'AA'])
+        'N', 'AC', 'AA'])
     year = request.POST.get('year', False)
     date_from = datetime.date.today().replace(month=1, day=1)
     date_until = datetime.date.today().replace(month=12, day=31)
