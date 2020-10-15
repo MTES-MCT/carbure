@@ -192,7 +192,7 @@ def get_snapshot(request):
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     txs = LotTransaction.objects.filter(lot__carbure_producer=producer)
-    data['years'] = [t.year for t in txs.dates('delivery_date', 'year')]
+    years = [t.year for t in txs.dates('delivery_date', 'year')]
 
     txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
 
@@ -222,7 +222,8 @@ def get_snapshot(request):
     psites = [p for p in ps1 + ps2 if p]
 
     data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs, 'periods': periods,
-                       'production_sites': psites, 'countries_of_origin': countries, 'clients': clients}
+                       'production_sites': psites, 'countries_of_origin': countries, 'clients': clients,
+                       'years': years}
 
     deadlines = txs.filter(lot__status='Draft').annotate(month=TruncMonth(
         'delivery_date')).values('month').annotate(total=Count('id'))
