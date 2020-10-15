@@ -17,7 +17,7 @@ function normalizeFilters(snapshot: any): Snapshot {
     periods: snapshot.filters.periods.map(toOption),
     production_sites: snapshot.filters.production_sites.map(toOption),
     clients: snapshot.filters.clients.map(toOption),
-    year: [],
+    year: snapshot.filters.year.map(toOption),
   }
 
   return snapshot
