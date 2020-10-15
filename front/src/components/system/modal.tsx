@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect } from "react"
 import ReactDOM from "react-dom"
 import cl from "clsx"
 
@@ -6,26 +6,27 @@ import styles from "./modal.module.css"
 
 import { Cross } from "./icons"
 
-const root = document.getElementById("modal")!
-
-export function useModal() {
-  const [isOpen, setOpened] = useState(false)
-
-  return {
-    isOpen,
-    open: () => setOpened(true),
-    close: () => setOpened(false),
-  }
-}
+const portal = document.getElementById("modal")!
 
 type ModalProps = {
   className?: string
   children: React.ReactNode
-  onClose?: (event: React.MouseEvent) => void
+  onClose: () => void
   [k: string]: any
 }
 
 const Modal = ({ className, onClose, children, ...props }: ModalProps) => {
+  useEffect(() => {
+    function onEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        onClose()
+      }
+    }
+
+    window.addEventListener("keydown", onEscape)
+    return () => window.removeEventListener("keydown", onEscape)
+  }, [])
+
   return ReactDOM.createPortal(
     <div className={styles.modalWrapper}>
       <div className={styles.overlay} onClick={onClose} />
@@ -34,7 +35,7 @@ const Modal = ({ className, onClose, children, ...props }: ModalProps) => {
         {children}
       </div>
     </div>,
-    root
+    portal
   )
 }
 

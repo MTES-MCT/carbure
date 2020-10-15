@@ -22,8 +22,20 @@ export function useDropdown() {
     if (!isOpen) return
 
     const close = () => setOpen(false)
+
+    function onEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        close()
+      }
+    }
+
     window.addEventListener("click", close)
-    return () => window.removeEventListener("click", close)
+    window.addEventListener("keydown", onEscape)
+
+    return () => {
+      window.removeEventListener("click", close)
+      window.removeEventListener("keydown", onEscape)
+    }
   }, [isOpen])
 
   return { isOpen, toggle }
