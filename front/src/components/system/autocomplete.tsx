@@ -16,14 +16,13 @@ function useAutoComplete<T>(
 ) {
   const dd = useDropdown()
 
-  const [query, setQuery] = useState("")
+  const [query, setQuery] = useState(getLabel(value))
   const [suggestions, resolve] = useAPI<[string], T[]>(getQuery)
 
   // on change, modify the query to match selection and send event to parent
   function change(value: T) {
     setQuery(getLabel(value))
     onChange({ target: { name, value } })
-    dd.toggle(false)
   }
 
   // modify input content when passed value is changed
