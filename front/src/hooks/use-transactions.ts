@@ -303,7 +303,7 @@ function useDeleteLots(
     )
 
     if (entity !== null && shouldDelete) {
-      resolveDeleteAll(entity).then(refresh)
+      resolveDeleteAll(entity).then(selection.reset).then(refresh)
     }
   }
 
@@ -361,7 +361,7 @@ function useValidateLots(
     )
 
     if (entity !== null && shouldValidate) {
-      resolveValidateAll(entity).then(refresh)
+      resolveValidateAll(entity).then(selection.reset).then(refresh)
     }
   }
 
