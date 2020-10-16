@@ -203,7 +203,7 @@ def get_snapshot(request):
     if producer not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    txs = LotTransaction.objects.filter(lot__carbure_producer=producer)
+    txs = LotTransaction.objects.filter(lot__added_by=producer)
     data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
 
     txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
