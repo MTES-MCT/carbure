@@ -8,13 +8,22 @@ import styles from "./transaction-table.module.css"
 
 import { Table } from "./system"
 import { Check, ChevronRight, Copy, Cross } from "./system/icons"
-import { TransactionRow, TransactionRowContainer } from "./transaction-row"
+import { TransactionRow, TransactionRowContainer, StockTransactionRow } from "./transaction-row"
 
 const COLUMNS = [
   { key: "", label: "Statut" },
   { key: "period", label: "Date d'ajout" },
   { key: "", label: "N° Douane" },
   { key: "client", label: "Client" },
+  { key: "biocarburant", label: "Biocarburant" },
+  { key: "pays_origine", label: "Provenance" },
+  { key: "", label: "Destination" },
+  { key: "matiere_premiere", label: "Mat. Première" },
+  { key: "ghg_reduction", label: "Économie" },
+]
+
+const STOCK_COLUMNS = [
+  { key: "carbure_id", label: "ID" },
   { key: "biocarburant", label: "Biocarburant" },
   { key: "pays_origine", label: "Provenance" },
   { key: "", label: "Destination" },
@@ -219,5 +228,46 @@ export const StockTable = ({
   transactions,
   sorting,
 }: StockTableProps) => {
-  return <ReadOnlyTable transactions={transactions} sorting={sorting} />
+  return <ReadOnlyStockTable transactions={transactions} sorting={sorting} />
 }
+
+const StockTransactionColumns = ({ sorting, children }: TxColumnsProps) => (
+  <thead>
+    <tr>
+      {children}
+      {STOCK_COLUMNS.map((column, i) => (
+        <th key={i} onClick={() => sorting.sortBy(column.key)}>
+          {column.label}
+          {sorting.column && sorting.column === column.key && (
+            <span>{sorting.order === "asc" ? " ▲" : " ▼"}</span>
+          )}
+        </th>
+      ))}
+      <th />
+    </tr>
+  </thead>
+)
+
+const ReadOnlyStockTable = ({ transactions, sorting }: ReadOnlyTableProps) => (
+  <Table className={styles.transactionTable}>
+    <StockTransactionColumns sorting={sorting}>
+      <th />
+    </StockTransactionColumns>
+
+    <tbody>
+      {transactions.lots.map((tx) => (
+        <TransactionRowContainer
+          key={tx.id}
+          id={tx.id}
+          error={hasErrors(transactions, tx.id)}
+        >
+          <td />
+          <StockTransactionRow transaction={tx} />
+          <td className={styles.actionColumn}>
+            <ChevronRight className={styles.transactionArrow} />
+          </td>
+        </TransactionRowContainer>
+      ))}
+    </tbody>
+  </Table>
+)

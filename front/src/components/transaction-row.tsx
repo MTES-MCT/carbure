@@ -122,3 +122,47 @@ export const TransactionRowContainer = ({
     </tr>
   )
 }
+
+export const StockTransactionRow = ({ transaction: tx }: TxRowProps) => (
+  <React.Fragment>
+
+    <td>
+      <Line text={tx.lot.carbure_id} />
+    </td>
+
+    <td>
+      <TwoLines top={tx.lot.biocarburant.name} bottom={`${tx.lot.volume}L`} />
+    </td>
+
+    <td>
+      <TwoLines
+        top={tx.lot.carbure_producer?.name ?? tx.lot.unknown_producer}
+        bottom={
+          tx.lot.carbure_production_site?.country.name ??
+          tx.lot.unknown_production_country
+        }
+      />
+    </td>
+
+    <td>
+      <TwoLines
+        top={tx.carbure_delivery_site?.city ?? tx.unknown_delivery_site ?? ""}
+        bottom={
+          tx.carbure_delivery_site?.country.name ??
+          tx.unknown_delivery_site_country?.name
+        }
+      />
+    </td>
+
+    <td>
+      <TwoLines
+        top={tx.lot.matiere_premiere.name}
+        bottom={tx.lot.pays_origine.name}
+      />
+    </td>
+
+    <td>
+      <Line text={`${tx.lot.ghg_reduction}%`} />
+    </td>
+  </React.Fragment>
+)
