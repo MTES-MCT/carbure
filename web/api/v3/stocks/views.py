@@ -1,9 +1,7 @@
-import datetime
-from django.db.models import Q, F, Case, When, Count
-from django.http import JsonResponse, HttpResponse
-from core.models import LotV2, LotTransaction, LotV2Error, TransactionError
+from django.db.models import Q
+from django.http import JsonResponse
+from core.models import LotTransaction
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays
-from core.xlsx_template import create_xslx_from_transactions
 
 
 sort_key_to_django_field = {'period': 'lot__period',
@@ -75,13 +73,6 @@ def get_stocks(request):
                 txs = txs.order_by('-%s' % key)
             else:
                 txs = txs.order_by(key)
-        elif sort_by == 'client':
-            txs = txs.annotate(client=Case(When(client_is_in_carbure=True, then=F(
-                'carbure_client__name')), default=F('unknown_client')))
-            if order == 'desc':
-                txs = txs.order_by('-client')
-            else:
-                txs = txs.order_by('client')
         else:
             return JsonResponse({'status': 'error', 'message': 'Unknown sort_by key'}, status=400)
 
@@ -93,28 +84,10 @@ def get_stocks(request):
         returned = returned[:limit]
 
     data = {}
-
-    raw_lot_errors = LotV2Error.objects.filter(id__in=[t.lot.id for t in returned])
-    lot_errors = {}
-    for err in raw_lot_errors:
-        if err.id not in lot_errors:
-            lot_errors[err.id] = []
-        lot_errors[err.id].append(err.natural_key())
-
-    raw_tx_errors = TransactionError.objects.filter(id__in=[t.id for t in returned])
-    tx_errors = {}
-    for err in raw_tx_errors:
-        if err.id not in tx_errors:
-            tx_errors[err.id] = []
-        tx_errors[err.id].append(err.natural_key())
-
     data['lots'] = [t.natural_key() for t in returned]
-    data['lots_errors'] = lot_errors
-    data['tx_errors'] = tx_errors
     data['total'] = len(txs)
     data['returned'] = len(returned)
     data['from'] = from_idx
-
     return JsonResponse({'status': 'success', 'data': data})
 
 
