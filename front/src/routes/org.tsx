@@ -8,6 +8,7 @@ import { Redirect, Route, Switch } from "../components/relative-route"
 import Topbar from "../components/top-bar"
 import Footer from "../components/footer"
 import { Transactions, Stocks } from "./transactions"
+import Settings from "./settings"
 
 type MainProps = {
   app: AppHook
@@ -33,9 +34,12 @@ const Org = ({ app }: MainProps) => {
           <Transactions />
         </Route>
 
+        <Route relative path="settings">
+          <Settings entity={entity} />
+        </Route>
+
         <Redirect relative to="transactions/draft" />
       </Switch>
-
       <Footer />
     </React.Fragment>
   )
