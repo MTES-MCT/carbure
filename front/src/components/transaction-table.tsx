@@ -2,13 +2,15 @@ import React from "react"
 import cl from "clsx"
 
 import { Lots, LotStatus } from "../services/types"
-import { StatusSelection, TransactionSelection, SortingSelection } from "../hooks/use-transactions" // prettier-ignore
+import { SortingSelection } from "../hooks/use-transactions" // prettier-ignore
 
 import styles from "./transaction-table.module.css"
 
 import { Table } from "./system"
 import { Check, ChevronRight, Copy, Cross } from "./system/icons"
 import { TransactionRow, TransactionRowContainer, StockTransactionRow } from "./transaction-row"
+import { TransactionSelection } from "../hooks/query/use-selection"
+import { StatusSelection } from "../hooks/query/use-status"
 
 const COLUMNS = [
   { key: "", label: "Statut" },
