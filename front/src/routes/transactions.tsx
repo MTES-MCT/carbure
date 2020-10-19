@@ -1,11 +1,11 @@
 import React from "react"
 
-import useTransactions from "../hooks/use-transactions"
+import { useTransactions, useStocks } from "../hooks/use-transactions"
 
 import { Main } from "../components/system"
 import { Route, Switch } from "../components/relative-route"
 import { TransactionSnapshot, StockSnapshot } from "../components/transaction-snapshot"
-import TransactionList from "../components/transaction-list"
+import { StockList, TransactionList } from "../components/transaction-list"
 import TransactionDetails from "./transaction-details"
 import TransactionAdd from "./transaction-add"
 import TransactionOutSummary from "./transaction-out-summary"
@@ -80,21 +80,14 @@ export const Transactions = () => {
 export const Stocks = () => {
    const {
     entity,
-    status,
     filters,
-    year,
     pagination,
     snapshot,
     transactions,
-    selection,
     search,
     sorting,
-    deleter,
-    duplicator,
-    validator,
-    uploader,
     refresh,
-  } = useTransactions()
+  } = useStocks()
 
   if (entity === null) {
     return null
@@ -104,23 +97,14 @@ export const Stocks = () => {
     <Main>
       <StockSnapshot
         snapshot={snapshot}
-        status={status}
         filters={filters}
-        year={year}
         search={search}
       />
 
-      <TransactionList
+      <StockList
         transactions={transactions}
-        status={status}
         sorting={sorting}
-        selection={selection}
         pagination={pagination}
-        uploader={uploader}
-        deleter={deleter}
-        validator={validator}
-        onDuplicate={duplicator.resolve}
-        onExportAll={transactions.exportAll}
       />
     </Main>
   )

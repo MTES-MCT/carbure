@@ -184,7 +184,7 @@ type TransactionTableProps = {
   onDuplicate: (id: number) => void
 }
 
-const TransactionTable = ({
+export const TransactionTable = ({
   transactions,
   status,
   sorting,
@@ -210,4 +210,14 @@ const TransactionTable = ({
   )
 }
 
-export default TransactionTable
+type StockTableProps = {
+  transactions: Lots
+  sorting: SortingSelection
+}
+
+export const StockTable = ({
+  transactions,
+  sorting,
+}: StockTableProps) => {
+  return <ReadOnlyTable transactions={transactions} sorting={sorting} />
+}

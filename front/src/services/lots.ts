@@ -1,4 +1,4 @@
-import { Transaction, Lots, LotStatus, Snapshot } from "./types"
+import { Transaction, Lots, LotStatus, Snapshot, StockSnapshot } from "./types"
 import { FilterSelection } from "../hooks/use-transactions"
 import { TransactionFormState } from "../hooks/helpers/use-transaction-form"
 
@@ -223,5 +223,42 @@ export function getLotsOutSummary(entityID: number) {
 export function getLotsInSummary(entityID: number) {
   return api.get("/lots/summary-in", {
     entity_id: entityID,
+  })
+}
+
+// give the same type to all filters in order to render them easily
+function normalizeStockSnapshotFilters(snapshot: any): StockSnapshot {
+  snapshot.filters = {
+    matieres_premieres: snapshot.filters.matieres_premieres,
+    biocarburants: snapshot.filters.biocarburants,
+    countries_of_origin: snapshot.filters.countries_of_origin,
+    production_sites: snapshot.filters.production_sites.map(toOption),
+  }
+  return snapshot
+}
+
+export function getStockSnapshot(
+  entity_id: number,
+): Promise<StockSnapshot> {
+  return api.get("/stocks/snapshot", { entity_id }).then(normalizeStockSnapshotFilters)
+}
+
+export function getStocks(
+  entityID: number,
+  filters: FilterSelection["selected"],
+  page: number,
+  limit: number,
+  query: string,
+  sortBy: string,
+  order: string
+): Promise<Lots> {
+  return api.get("/stocks", {
+    ...filters,
+    entity_id: entityID,
+    from_idx: page * limit,
+    sort_by: sortBy,
+    limit,
+    query,
+    order,
   })
 }
