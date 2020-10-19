@@ -449,6 +449,14 @@ class ISCCCertificate(models.Model):
     issuing_cb = models.CharField(max_length=256, default='')
     location = models.CharField(max_length=256, default='')
 
+    def natural_key(self):
+        return {'certificate_id': self.certificate_id,
+                'certificate_holder': self.certificate_holder,
+                'location': self.location,
+                'valid_from': self.valid_from,
+                'valid_until': self.valid_until,
+                'issuing_cb': self.issuing_cb}
+
     def __str__(self):
         return self.certificate_id
 
@@ -492,6 +500,14 @@ class DBSCertificate(models.Model):
     valid_from = models.DateField(null=False)
     valid_until = models.DateField(null=False)
     certification_type = models.CharField(max_length=256, default='')
+
+    def natural_key(self):
+        return {'certificate_id': self.certificate_id,
+                'certificate_holder': self.certificate_holder,
+                'holder_address': self.holder_address,
+                'valid_from': self.valid_from,
+                'valid_until': self.valid_until,
+                'certification_type': self.certification_type}
 
     def __str__(self):
         return self.certificate_id

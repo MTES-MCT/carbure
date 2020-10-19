@@ -307,6 +307,22 @@ def update_production_site(request, *args, **kwargs):
 
 
 @check_rights('entity_id')
+def get_iscc_trading_certificates(request, *args, **kwargs):
+    context = kwargs['context']
+    objects = EntityISCCTradingCertificate.objects.filter(entity=context['entity'])
+    sez = [o.certificate.natural_key() for o in objects]
+    return JsonResponse({'status': 'success', 'data': sez})
+
+
+@check_rights('entity_id')
+def get_2bs_trading_certificates(request, *args, **kwargs):
+    context = kwargs['context']
+    objects = EntityDBSTradingCertificate.objects.filter(entity=context['entity'])
+    sez = [o.certificate.natural_key() for o in objects]
+    return JsonResponse({'status': 'success', 'data': sez})
+
+
+@check_rights('entity_id')
 def add_iscc_trading_certificate(request, *args, **kwargs):
     context = kwargs['context']
     certificate_id = request.POST.get('certificate_id', False)
