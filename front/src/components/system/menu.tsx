@@ -4,14 +4,16 @@ import cl from "clsx"
 import styles from "./menu.module.css"
 
 import { Dropdown, useDropdown, DropdownProps } from "./dropdown"
+import { Link } from "react-router-dom"
 
 type MenuItemProps = React.HTMLProps<HTMLLIElement> & {
+  to?: string
   children: React.ReactNode
 }
 
-const MenuItem = ({ children, ...props }: MenuItemProps) => (
-  <li {...props} className={styles.menuItem}>
-    {children}
+const MenuItem = ({ to, children, ...props }: MenuItemProps) => (
+  <li {...props} className={to ? styles.menuItemLink : styles.menuItem}>
+    {to ? <Link to={to}>{children}</Link> : children}
   </li>
 )
 
