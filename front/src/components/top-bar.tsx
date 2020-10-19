@@ -63,7 +63,7 @@ const UserMenu = ({ settings, entity }: UserMenuProps) => {
       <Menu.Group label="Utilisateur">
         <Menu.Item>{settings.data?.email}</Menu.Item>
         <Menu.Item>
-          <Link to="/settings">Paramètres</Link>
+          <Link to={`/org/${selected?.entity.id}/settings`}>Paramètres</Link>
         </Menu.Item>
         <Menu.Item>
           <Link to="/logout">Se déconnecter</Link>

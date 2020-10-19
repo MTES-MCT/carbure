@@ -3,19 +3,13 @@ import { AppHook } from "../hooks/use-app"
 
 import { Main, Box, Title } from "../components/system"
 import { Redirect } from "../components/relative-route"
-import useEntity from "../hooks/helpers/use-entity"
+import { EntitySelection } from "../hooks/helpers/use-entity"
 
-type MainProps = {
-  app: AppHook
+type SettingsProps = {
+  entity: EntitySelection
 }
 
-const Settings = ({ app }: MainProps) => {
-  const entity = useEntity()
-
-  if (!app.hasEntity(entity!)) {
-    return <Redirect to="/" />
-  }
-
+const Settings = ({ entity }: SettingsProps) => {
   return (
     <Main>
 	  <Box>
