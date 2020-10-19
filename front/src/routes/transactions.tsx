@@ -1,6 +1,7 @@
 import React from "react"
 
-import { useTransactions, useStocks } from "../hooks/use-transactions"
+import { useStocks } from "../hooks/use-transactions"
+import useTransactions from "../hooks/transactions/use-transactions"
 
 import { Main } from "../components/system"
 import { Route, Switch } from "../components/relative-route"
@@ -52,8 +53,7 @@ export const Transactions = () => {
         uploader={uploader}
         deleter={deleter}
         validator={validator}
-        onDuplicate={duplicator.resolve}
-        onExportAll={transactions.exportAll}
+        duplicator={duplicator}
       />
 
       <Switch>
