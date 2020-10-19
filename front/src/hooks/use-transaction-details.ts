@@ -1,12 +1,35 @@
 import { useParams } from "react-router-dom"
 
-import { Lots } from "../services/types"
+import { Lots, Transaction } from "../services/types"
 import { EntitySelection } from "./helpers/use-entity"
 
 import useTransactionForm, { toTransactionFormState } from "./helpers/use-transaction-form" // prettier-ignore
 import useAPI, { ApiState } from "./helpers/use-api"
 import useClose from "./helpers/use-close"
 import { updateLot } from "../services/lots"
+
+function getFieldErrors(tx: Transaction, transactions: Lots) {
+  if (transactions === null) return {}
+
+  const fieldErrors: { [k: string]: string } = {}
+
+  const lotsErrors = transactions.lots_errors[tx.lot.id] ?? []
+  const txErrors = transactions.tx_errors[tx.id] ?? []
+
+  lotsErrors.forEach(({ field, error, value }) => {
+    fieldErrors[field] = fieldErrors[field]
+      ? `${fieldErrors[field]}, ${error} (${field} = ${value})`
+      : error
+  })
+
+  txErrors.forEach(({ field, error, value }) => {
+    fieldErrors[field] = fieldErrors[field]
+      ? `${fieldErrors[field]}, ${error} (${field} = ${value})`
+      : error
+  })
+
+  return fieldErrors
+}
 
 export default function useTransactionDetails(
   entity: EntitySelection,
@@ -20,14 +43,19 @@ export default function useTransactionDetails(
 
   const transactionID = parseInt(params.id, 10)
 
+  // find the relevant lot
+  // @TODO would be nice to be able to fetch details for only one lot
+  const transaction = transactions.data?.lots.find(
+    (lot) => lot.id === transactionID
+  )
+
+  const fieldErrors =
+    transaction && transactions.data
+      ? getFieldErrors(transaction, transactions.data)
+      : {}
+
   // if form data is not initialized, fill it instantly with data coming from transaction list
   if (transactions.data && (form.id === -1 || form.id !== transactionID)) {
-    // find the relevant lot
-    // @TODO would be nice to be able to fetch details for only one lot
-    const transaction = transactions.data?.lots.find(
-      (lot) => lot.id === transactionID
-    )
-
     if (transaction) {
       // initialize the form with data coming from the loaded transaction
       setForm(toTransactionFormState(transaction))
@@ -49,5 +77,5 @@ export default function useTransactionDetails(
     }
   }
 
-  return { form, request, change, submit, close }
+  return { form, fieldErrors, request, change, submit, close }
 }
