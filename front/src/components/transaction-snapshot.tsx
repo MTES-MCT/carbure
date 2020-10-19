@@ -18,8 +18,6 @@ const TRANSACTIONS_STATUS = [
 
 const STOCK_STATUS = [
   { key: LotStatus.Draft, label: "Brouillons" },
-  { key: LotStatus.Validated, label: "Lots envoyés" },
-  { key: LotStatus.ToFix, label: "Lots à corriger" },
 ]
 
 const FILTERS = [
