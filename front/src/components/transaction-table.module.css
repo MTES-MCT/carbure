@@ -30,10 +30,10 @@
   stroke: var(--blue-medium);
 }
 
-.editableTable tr:hover .transactionArrow {
+.actionTable tr:hover .transactionArrow {
   display: none;
 }
-.editableTable tr:hover .transactionActions {
+.actionTable tr:hover .transactionActions {
   display: flex;
   align-items: center;
   justify-content: space-between;

@@ -59,7 +59,7 @@ const DraftLotsActions = ({
     if (hasSelection) {
       deleter.deleteSelection()
     } else {
-      deleter.deleteSelection()
+      deleter.deleteAllDrafts()
     }
   }
 
