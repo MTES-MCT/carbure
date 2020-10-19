@@ -8,6 +8,16 @@ import useAPI, { ApiState } from "./helpers/use-api"
 import useClose from "./helpers/use-close"
 import { updateLot } from "../services/lots"
 
+interface ErrorData {
+  field: string
+  value: string
+  error: string
+}
+
+function stringifyError({ field, value, error }: ErrorData) {
+  return `${error} (${field} = ${value})`
+}
+
 function getFieldErrors(tx: Transaction, transactions: Lots) {
   if (transactions === null) return {}
 
@@ -16,16 +26,12 @@ function getFieldErrors(tx: Transaction, transactions: Lots) {
   const lotsErrors = transactions.lots_errors[tx.lot.id] ?? []
   const txErrors = transactions.tx_errors[tx.id] ?? []
 
-  lotsErrors.forEach(({ field, error, value }) => {
-    fieldErrors[field] = fieldErrors[field]
-      ? `${fieldErrors[field]}, ${error} (${field} = ${value})`
-      : error
+  lotsErrors.forEach((err) => {
+    fieldErrors[err.field] = stringifyError(err)
   })
 
-  txErrors.forEach(({ field, error, value }) => {
-    fieldErrors[field] = fieldErrors[field]
-      ? `${fieldErrors[field]}, ${error} (${field} = ${value})`
-      : error
+  txErrors.forEach((err) => {
+    fieldErrors[err.field] = stringifyError(err)
   })
 
   return fieldErrors
