@@ -14,6 +14,11 @@ export enum LotStatus {
   Stock = "stock",
 }
 
+export enum GESOption {
+  Default = "Default",
+  Actual = "Actual",
+}
+
 export interface Entity {
   id: number
   name: string

@@ -53,3 +53,15 @@ export function findGHG(
 ): Promise<any[]> {
   return api.get("/common/ghg", { biocarburant_code, matiere_premiere_code })
 }
+
+export function findISCCCertificates(query: string) {
+  return api.get("/common/iscc-certificates", {
+    query: query,
+  })
+}
+
+export function find2BSCertificates(query: string) {
+  return api.get("/common/2bs-certificates", {
+    query: query,
+  })
+}
