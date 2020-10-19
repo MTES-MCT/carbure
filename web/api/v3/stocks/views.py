@@ -37,10 +37,7 @@ def get_stocks(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    txs = LotTransaction.objects.filter(carbure_client=entity)
-
-    # filter by status
-    txs = txs.filter(lot__status='Validated')
+    txs = LotTransaction.objects.filter(carbure_client=entity, delivery_status='A', lot__status="Validated", lot__fused_with=None, lot__volume__gt=0)
 
     # apply filters
     if production_sites:
