@@ -88,6 +88,8 @@ def get_stocks(request):
     data['total'] = len(txs)
     data['returned'] = len(returned)
     data['from'] = from_idx
+    data['tx_errors'] = []
+    data['lots_errors'] = []
     return JsonResponse({'status': 'success', 'data': data})
 
 

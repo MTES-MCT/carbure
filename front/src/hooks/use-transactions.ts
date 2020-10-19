@@ -77,6 +77,7 @@ function useFilterSelection(pagination: PageSelection): FilterSelection {
     [Filters.Periods]: null,
     [Filters.Clients]: null,
     [Filters.ProductionSites]: null,
+    [Filters.DeliverySites]: null,
   })
 
   function select(type: Filters, value: SelectValue) {
@@ -92,6 +93,7 @@ function useFilterSelection(pagination: PageSelection): FilterSelection {
       [Filters.Periods]: null,
       [Filters.Clients]: null,
       [Filters.ProductionSites]: null,
+      [Filters.DeliverySites]: null,
     })
   }
 

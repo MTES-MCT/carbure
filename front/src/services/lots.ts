@@ -233,6 +233,7 @@ function normalizeStockSnapshotFilters(snapshot: any): StockSnapshot {
     biocarburants: snapshot.filters.biocarburants,
     countries_of_origin: snapshot.filters.countries_of_origin,
     production_sites: snapshot.filters.production_sites.map(toOption),
+    delivery_sites: snapshot.filters.delivery_sites.map(toOption),
   }
   return snapshot
 }
