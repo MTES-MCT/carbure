@@ -54,19 +54,19 @@ const UserMenu = ({ settings, entity }: UserMenuProps) => {
     <Menu className={styles.userMenu} label={selected?.entity.name ?? "Menu"}>
       <Menu.Group label="Organisations">
         {settings.data?.rights.map((right) => (
-          <Menu.Item key={right.entity.id}>
-            <Link to={`/org/${right.entity.id}`}>{right.entity.name}</Link>
+          <Menu.Item key={right.entity.id} to={`/org/${right.entity.id}`}>
+            {right.entity.name}
           </Menu.Item>
         ))}
       </Menu.Group>
 
       <Menu.Group label="Utilisateur">
         <Menu.Item>{settings.data?.email}</Menu.Item>
-        <Menu.Item>
-          <Link to={`/org/${selected?.entity.id}/settings`}>Paramètres</Link>
+        <Menu.Item to={`/org/${selected?.entity.id}/settings`}>
+          Paramètres
         </Menu.Item>
-        <Menu.Item>
-          <Link to="/logout">Se déconnecter</Link>
+        <Menu.Item to="/logout">
+          Se déconnecter
         </Menu.Item>
       </Menu.Group>
     </Menu>
