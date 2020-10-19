@@ -156,6 +156,7 @@ export const TransactionList = ({
         <Alert level="error">
           <AlertCircle />
           {transactions.error}
+          {isLoading && <LoaderOverlay />}
         </Alert>
       )}
 
@@ -183,6 +184,7 @@ export const TransactionList = ({
         <Alert level="warning">
           <AlertCircle />
           Aucune transaction trouvée pour ces paramètres
+          {isLoading && <LoaderOverlay />}
         </Alert>
       )}
 
@@ -204,8 +206,6 @@ export const TransactionList = ({
           <Pagination pagination={pagination} total={tx!.total} />
         </React.Fragment>
       )}
-
-      {isLoading && (isError || isEmpty) && <LoaderOverlay />}
     </Box>
   )
 }
