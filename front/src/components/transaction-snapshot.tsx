@@ -22,7 +22,15 @@ const FILTERS = [
   { key: Filters.MatieresPremieres, label: "Matière Première" },
   { key: Filters.Biocarburants, label: "Biocarburant" },
   { key: Filters.CountriesOfOrigin, label: "Pays d'origine" },
-  { key: Filters.Clients, label: "Client" },
+  { key: Filters.DeliverySites, label: "Sites de livraison" },
+]
+
+const STOCK_FILTERS = [
+  { key: Filters.ProductionSites, label: "Site de production" },
+  { key: Filters.MatieresPremieres, label: "Matière Première" },
+  { key: Filters.Biocarburants, label: "Biocarburant" },
+  { key: Filters.CountriesOfOrigin, label: "Pays d'origine" },
+  { key: Filters.DeliverySites, label: "Sites de livraison" },
 ]
 
 type TransactionSnapshotProps = {
@@ -115,7 +123,7 @@ export const StocksSnapshot = ({
 
     <div className={styles.transactionFilters}>
       <div className={styles.filterGroup}>
-        {FILTERS.map(({ key, label }) => (
+        {STOCK_FILTERS.map(({ key, label }) => (
           <Select
             clear
             search
