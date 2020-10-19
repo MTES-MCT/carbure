@@ -1,6 +1,8 @@
+import datetime
 from django.http import JsonResponse
 from django.db.models import Q
 from core.models import Entity, Biocarburant, MatierePremiere, Depot, Pays
+from core.models import ISCCCertificate, DBSCertificate
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 
 
@@ -113,4 +115,30 @@ def get_production_sites(request):
             'date_mise_en_service': p.date_mise_en_service,
             'ges_option': p.ges_option, 'eligible_dc': p.eligible_dc, 'dc_reference': p.dc_reference,
             'inputs': p.inputs, 'outputs': p.outputs, 'producer': p.producer.natural_key()} for p in psites]
+    return JsonResponse({'status': 'success', 'data': sez})
+
+
+def get_iscc_certificates(request):
+    q = request.GET.get('query', False)
+    today = datetime.date.today()
+    cert = ISCCCertificate.objects.filter(valid_until__gte=today)
+    if q:
+        cert = cert.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
+    sez = [{'certificate_id': c.certificate_id, 'certificate_holder': c.certificate_holder,
+            'valid_from': c.valid_from.strftime('%y-%m-%d'),
+            'valid_until': c.valid_until.strftime('%y-%m-%d'),
+            'issuing_cb': c.issuing_cb, 'location': c.location} for c in cert]
+    return JsonResponse({'status': 'success', 'data': sez})
+
+
+def get_2bs_certificates(request):
+    q = request.GET.get('query', False)
+    today = datetime.date.today()
+    cert = DBSCertificate.objects.filter(valid_until__gte=today)
+    if q:
+        cert = cert.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
+    sez = [{'certificate_id': c.certificate_id, 'certificate_holder': c.certificate_holder,
+            'valid_from': c.valid_from.strftime('%y-%m-%d'),
+            'valid_until': c.valid_until.strftime('%y-%m-%d'), 'holder_address': c.holder_address,
+            'certification_type': c.certification_type} for c in cert]
     return JsonResponse({'status': 'success', 'data': sez})

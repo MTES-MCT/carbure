@@ -1,7 +1,8 @@
-from core.models import UserRights, UserPreferences, LotV2, LotTransaction, TransactionComment
+from core.models import UserRights, UserPreferences, LotV2, LotTransaction, TransactionComment, Entity
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
-
+from django.http import JsonResponse
+from functools import wraps
 from itertools import chain
 
 
@@ -118,3 +119,28 @@ def restrict_to_administrators(function):
     wrap.__doc__ = function.__doc__
     wrap.__name__ = function.__name__
     return wrap
+
+
+# check that request.POST contains an entity_id and request.user is allowed to make changes
+def check_rights(entity_id_field):
+    def actual_decorator(function):
+        @wraps(function)
+        def wrap(request, *args, **kwargs):
+            entity_id = request.POST.get(entity_id_field, False)
+            if not entity_id:
+                return JsonResponse({'status': 'error', 'message': "Missing field %s" % (entity_id_field)}, status=400)
+
+            try:
+                entity = Entity.objects.get(id=entity_id)
+            except Exception:
+                return JsonResponse({'status': 'error', 'message': "Unknown Entity %s" % (entity_id)}, status=400)
+
+            rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+            if entity not in rights:
+                return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit entity"}, status=403)
+            context = {}
+            context['entity'] = entity
+            kwargs['context'] = context
+            return function(request, *args, **kwargs)
+        return wrap
+    return actual_decorator

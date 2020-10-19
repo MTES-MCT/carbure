@@ -3,6 +3,8 @@ import datetime
 from django.http import JsonResponse
 from core.models import Entity, UserRights, LotV2, Pays, MatierePremiere, Biocarburant
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput, ProducerCertificate
+from core.decorators import check_rights
+from core.models import ISCCCertificate, DBSCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate
 
 
 def get_settings(request):
@@ -83,78 +85,6 @@ def delete_production_site(request):
         msg = "Validated lots associated with this production site. Cannot delete"
         return JsonResponse({'status': 'error', 'message': msg}, status=400)
     ps.delete()
-    return JsonResponse({'status': 'success'})
-
-
-def add_production_site_certificate(request):
-    producer = request.POST.get('producer_id')
-    certif_id = request.POST.get('certif_id')
-    site = request.POST.get('production_site_id')
-    form_file = request.FILES.get('file', None)
-    form_exp_date = request.POST.get('expiration_date')
-
-    if producer is None:
-        return JsonResponse({'status': 'error', 'message': "Missing producer"}, status=400)
-    try:
-        producer = Entity.objects.get(id=producer, entity_type='Producteur')
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown producer %s" % (producer), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if producer not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit producer"}, status=403)
-
-    if certif_id is None:
-        return JsonResponse({'status': 'error', 'message': "Missing certif_id"},
-                            status=400)
-    if form_exp_date is None:
-        return JsonResponse({'status': 'error', 'message': "Missing expiration_date"},
-                            status=400)
-    try:
-        exp_date = datetime.datetime.strptime(form_exp_date, '%Y-%m-%d')
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Date format must be YYYY-MM-DD"},
-                            status=400)
-
-    if site is None:
-        return JsonResponse({'status': 'error', 'message': "Missing production_site_id"},
-                            status=400)
-    try:
-        site = ProductionSite.objects.get(producer=producer, id=site)
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Unknown production_site"}, status=400)
-
-    if form_file is None:
-        return JsonResponse({'status': 'error', 'message': "Missing file"}, status=400)
-    try:
-        obj, c = ProducerCertificate.objects.update_or_create(producer=producer,
-                                                              production_site=site, certificate_id=certif_id,
-                                                              defaults={'expiration': exp_date,
-                                                                        'certificate': form_file})
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
-                             'extra': str(e)}, status=400)
-    return JsonResponse({'status': 'success'})
-
-
-def delete_production_site_certificate(request):
-    certif_id = request.POST.get('certif_id')
-    if certif_id is None:
-        return JsonResponse({'status': 'error', 'message': "Veuillez entrer une valeur dans le champ Identifiant"},
-                            status=400)
-
-    try:
-        crt = ProducerCertificate.objects.get(id=certif_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
-                             'extra': str(e)}, status=400)
-
-    # we have all the data, make sure we are allowed to delete it
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if crt.producer not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-    crt.delete()
     return JsonResponse({'status': 'success'})
 
 
@@ -369,4 +299,60 @@ def disable_trading(request, *args, **kwargs):
 
     producer.producer_with_trading = True
     producer.save()
+    return JsonResponse({'status': 'success'})
+
+
+def update_production_site(request, *args, **kwargs):
+    pass
+
+
+@check_rights('entity_id')
+def add_iscc_trading_certificate(request, *args, **kwargs):
+    context = kwargs['context']
+    certificate_id = request.POST.get('certificate_id', False)
+    try:
+        certificate = ISCCCertificate.objects.get(certificate_id=certificate_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
+
+    EntityISCCTradingCertificate.objects.update_or_create(entity=context['entity'], certificate=certificate)
+    return JsonResponse({'status': 'success'})
+
+
+@check_rights('entity_id')
+def add_2bs_trading_certificate(request, *args, **kwargs):
+    context = kwargs['context']
+    certificate_id = request.POST.get('certificate_id', False)
+    try:
+        certificate = DBSCertificate.objects.get(certificate_id=certificate_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
+
+    EntityDBSTradingCertificate.objects.update_or_create(entity=context['entity'], certificate=certificate)
+    return JsonResponse({'status': 'success'})
+
+
+@check_rights('entity_id')
+def delete_iscc_trading_certificate(request, *args, **kwargs):
+    context = kwargs['context']
+    certificate_id = request.POST.get('certificate_id', False)
+    try:
+        certificate = ISCCCertificate.objects.get(certificate_id=certificate_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
+
+    EntityISCCTradingCertificate.objects.delete(entity=context['entity'], certificate=certificate)
+    return JsonResponse({'status': 'success'})
+
+
+@check_rights('entity_id')
+def delete_2bs_trading_certificate(request, *args, **kwargs):
+    context = kwargs['context']
+    certificate_id = request.POST.get('certificate_id', False)
+    try:
+        certificate = DBSCertificate.objects.get(certificate_id=certificate_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
+
+    EntityDBSTradingCertificate.objects.delete(entity=context['entity'], certificate=certificate)
     return JsonResponse({'status': 'success'})

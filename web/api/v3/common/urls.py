@@ -12,4 +12,7 @@ urlpatterns = [
     path('traders', views.get_traders, name='api-v3-public-get-traders'),
     path('delivery-sites', views.get_delivery_sites, name='api-v3-public-get-delivery-sites'),
     path('production-sites', views.get_production_sites, name='api-v3-public-get-production-sites'),
+
+    path('iscc-certificates', views.get_iscc_certificates, name='api-v3-public-search-iscc-certificates'),
+    path('2bs-certificates', views.get_2bs_certificates, name='api-v3-public-search-2bs-certificates'),
 ]
