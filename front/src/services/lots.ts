@@ -1,5 +1,6 @@
 import { Transaction, Lots, LotStatus, Snapshot, StockSnapshot } from "./types"
-import { FilterSelection } from "../hooks/use-transactions"
+import { FilterSelection as FilterSelection_old } from "../hooks/use-transactions"
+import { FilterSelection } from "../hooks/query/use-filters"
 import { TransactionFormState } from "../hooks/helpers/use-transaction-form"
 
 import api from "./api"
@@ -247,7 +248,7 @@ export function getStockSnapshot(entity_id: number): Promise<StockSnapshot> {
 
 export function getStocks(
   entityID: number,
-  filters: FilterSelection["selected"],
+  filters: FilterSelection_old["selected"],
   page: number,
   limit: number,
   query: string,

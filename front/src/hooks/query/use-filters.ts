@@ -5,7 +5,7 @@ import { SelectValue } from "../../components/system/select"
 import { Filters } from "../../services/types"
 
 export interface FilterSelection {
-  selected: { [k in Filters]: SelectValue }
+  selected: { [k in Filters]?: SelectValue }
   select: (type: Filters, value: SelectValue) => void
   reset: () => void
 }
