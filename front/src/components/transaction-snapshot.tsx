@@ -2,7 +2,9 @@ import React from "react"
 
 import { ApiState } from "../hooks/helpers/use-api"
 import { Filters, LotStatus, Snapshot, StockSnapshot } from "../services/types"
-import { StatusSelection, FilterSelection, SearchSelection, YearSelection } from "../hooks/use-transactions" // prettier-ignore
+import { FilterSelection, SearchSelection } from "../hooks/use-transactions" // prettier-ignore
+import { StatusSelection } from "../hooks/query/use-status"
+import { YearSelection } from "../hooks/query/use-year"
 
 import styles from "./transaction-snapshot.module.css"
 

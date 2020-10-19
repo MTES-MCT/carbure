@@ -6,11 +6,11 @@ import { SortingSelection } from "../hooks/use-transactions" // prettier-ignore
 import { PageSelection } from "./system/pagination"
 import { ApiState } from "../hooks/helpers/use-api"
 
+import { LotGetter } from "../hooks/transactions/use-get-lots"
 import { LotUploader } from "../hooks/actions/use-upload-file"
 import { LotDeleter } from "../hooks/actions/use-delete-lots"
 import { LotValidator } from "../hooks/actions/use-validate-lots"
 import { LotDuplicator } from "../hooks/actions/use-duplicate-lots"
-import { LotGetter } from "../hooks/actions/use-get-lots"
 import { StatusSelection } from "../hooks/query/use-status"
 import { TransactionSelection } from "../hooks/query/use-selection"
 
