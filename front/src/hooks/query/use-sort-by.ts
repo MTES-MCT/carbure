@@ -1,4 +1,6 @@
 import { useState } from "react"
+import { PageSelection } from "../../components/system/pagination"
+import { Pagination } from "../../services/types"
 
 export interface SortingSelection {
   column: string
@@ -6,13 +8,17 @@ export interface SortingSelection {
   sortBy: (c: string) => void
 }
 
-export default function useSortingSelection(): SortingSelection {
+export default function useSortingSelection(
+  pagination: PageSelection
+): SortingSelection {
   const [current, setCurrent] = useState<{
     column: string
     order: "asc" | "desc"
   }>({ column: "", order: "asc" })
 
   function sortBy(column: string) {
+    pagination.setPage(0)
+
     if (current.column !== column) {
       return setCurrent({ column, order: "asc" })
     } else if (current.column && current.order === "asc") {
