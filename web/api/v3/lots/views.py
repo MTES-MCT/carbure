@@ -28,6 +28,7 @@ def get_lots(request):
     year = request.GET.get('year', False)
     periods = request.GET.getlist('periods')
     production_sites = request.GET.getlist('production_sites')
+    delivery_sites = request.GET.getlist('delivery_sites')
     matieres_premieres = request.GET.getlist('matieres_premieres')
     countries_of_origin = request.GET.getlist('countries_of_origin')
     biocarburants = request.GET.getlist('biocarburants')
@@ -93,6 +94,9 @@ def get_lots(request):
         txs = txs.filter(lot__pays_origine__code_pays__in=countries_of_origin)
     if clients:
         txs = txs.filter(Q(carbure_client__name__in=clients) | Q(unknown_client__in=clients))
+    if delivery_sites:
+        txs = txs.filter(Q(carbure_delivery_site__name__in=delivery_sites)
+                         | Q(unknown_delivery_site__in=delivery_sites))
 
     if query:
         txs = txs.filter(Q(lot__matiere_premiere__name__icontains=query) |
@@ -231,11 +235,11 @@ def get_snapshot(request):
 
     ps1 = [p['lot__carbure_production_site__name'] for p in txs.values('lot__carbure_production_site__name').distinct()]
     ps2 = [p['lot__unknown_production_site'] for p in txs.values('lot__unknown_production_site').distinct()]
-    psites = [p for p in ps1 + ps2 if p]
+    psites = list(set([p for p in ps1 + ps2 if p]))
 
     ds1 = [p['carbure_delivery_site__name'] for p in txs.values('carbure_delivery_site__name').distinct()]
     ds2 = [p['unknown_delivery_site'] for p in txs.values('unknown_delivery_site').distinct()]
-    dsites = [d for d in ds1 + ds2 if d]
+    dsites = list(set([d for d in ds1 + ds2 if d]))
 
     data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs, 'periods': periods,
                        'production_sites': psites, 'countries_of_origin': countries, 'clients': clients,

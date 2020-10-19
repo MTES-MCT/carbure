@@ -37,7 +37,8 @@ def get_stocks(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    txs = LotTransaction.objects.filter(carbure_client=entity, delivery_status='A', lot__status="Validated", lot__fused_with=None, lot__volume__gt=0)
+    txs = LotTransaction.objects.filter(carbure_client=entity, delivery_status='A',
+                                        lot__status="Validated", lot__fused_with=None, lot__volume__gt=0)
 
     # apply filters
     if production_sites:
@@ -50,7 +51,8 @@ def get_stocks(request):
     if countries_of_origin:
         txs = txs.filter(lot__pays_origine__code_pays__in=countries_of_origin)
     if delivery_sites:
-        txs = txs.filter(Q(carbure_delivery_site__in=delivery_sites) | Q(unknown_delivery_site__in=delivery_sites))
+        txs = txs.filter(Q(carbure_delivery_site__name__in=delivery_sites)
+                         | Q(unknown_delivery_site__in=delivery_sites))
 
     if query:
         txs = txs.filter(Q(lot__matiere_premiere__name__icontains=query) |
@@ -118,11 +120,11 @@ def get_snapshot(request):
 
     ds1 = [c['carbure_delivery_site__name'] for c in txs.values('carbure_delivery_site__name').distinct()]
     ds2 = [c['unknown_delivery_site'] for c in txs.values('unknown_delivery_site').distinct()]
-    delivery_sites = [s for s in ds1 + ds2 if s]
+    delivery_sites = list(set([s for s in ds1 + ds2 if s]))
 
     ps1 = [p['lot__carbure_production_site__name'] for p in txs.values('lot__carbure_production_site__name').distinct()]
     ps2 = [p['lot__unknown_production_site'] for p in txs.values('lot__unknown_production_site').distinct()]
-    psites = [p for p in ps1 + ps2 if p]
+    psites = list(set([p for p in ps1 + ps2 if p]))
 
     data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs,
                        'production_sites': psites, 'countries_of_origin': countries, 'delivery_sites': delivery_sites}
