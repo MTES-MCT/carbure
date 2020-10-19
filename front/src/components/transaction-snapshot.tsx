@@ -41,7 +41,7 @@ const STOCK_FILTERS = [
 function mapFilters(filters: FilterSelection["selected"]): [Filters, string, SelectValue][] {
   return Object.entries(filters).map(([key, value]) => {
     const filter = key as Filters
-    return [filter, FILTER_LABELS[filter], value]
+    return [filter, FILTER_LABELS[filter], value ?? null]
   })
 }
 
