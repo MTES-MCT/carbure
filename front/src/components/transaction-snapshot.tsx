@@ -11,7 +11,7 @@ import { SearchSelection } from "../hooks/query/use-search"
 import styles from "./transaction-snapshot.module.css"
 
 import { Title, StatusButton, SearchInput, Box } from "./system"
-import Select from "./system/select"
+import Select, { SelectValue } from "./system/select"
 
 const TRANSACTIONS_STATUS = [
   { key: LotStatus.Draft, label: "Brouillons" },
@@ -37,6 +37,13 @@ const STOCK_FILTERS = [
   { key: Filters.CountriesOfOrigin, label: "Pays d'origine" },
   { key: Filters.DeliverySites, label: "Sites de livraison" },
 ]
+
+function mapFilters(filters: FilterSelection["selected"]): [Filters, string, SelectValue][] {
+  return Object.entries(filters).map(([key, value]) => {
+    const filter = key as Filters
+    return [filter, FILTER_LABELS[filter], value]
+  })
+}
 
 type TransactionSnapshotProps = {
   snapshot: ApiState<Snapshot>
@@ -83,16 +90,16 @@ export const TransactionSnapshot = ({
 
     <div className={styles.transactionFilters}>
       <div className={styles.filterGroup}>
-        {Object.entries(filters.selected).map(([filter, value]) => (
+        {mapFilters(filters.selected).map(([filter, label, value]) => (
           <Select
             clear
             search
             multiple
             key={filter}
             value={value}
-            placeholder={snapshot.loading ? "…" : FILTER_LABELS[filter as Filters]}
-            options={snapshot.data?.filters[filter as Filters] ?? []}
-            onChange={(value) => filters.select(filter as Filters, value)}
+            placeholder={snapshot.loading ? "…" : label}
+            options={snapshot.data?.filters[filter] ?? []}
+            onChange={(value) => filters.select(filter, value)}
           />
         ))}
       </div>
