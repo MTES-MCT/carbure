@@ -358,8 +358,8 @@ def update_lot(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Unknown transaction %s" % (tx_id), 'extra': str(e)},
                             status=400)
-    LotV2Error.objects.filter(lot=tx.lot).delete()
-    TransactionError.objects.filter(tx=tx).delete()
+    LotV2Error.objects.filter(id=tx.lot.id).delete()
+    TransactionError.objects.filter(id=tx.id).delete()
     load_lot(entity, request.user, request.POST.dict(), 'MANUAL', tx)
     return JsonResponse({'status': 'success'})
 
