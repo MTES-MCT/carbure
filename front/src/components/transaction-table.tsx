@@ -80,12 +80,12 @@ function hasErrors(transactions: Lots, id: number): boolean {
   )
 }
 
-type ReadOnlyTableProps = {
+type DisplayTableProps = {
   transactions: Lots
   sorting: SortingSelection
 }
 
-const ReadOnlyTable = ({ transactions, sorting }: ReadOnlyTableProps) => (
+const DisplayTable = ({ transactions, sorting }: DisplayTableProps) => (
   <Table className={styles.transactionTable}>
     <TransactionColumns sorting={sorting}>
       <th />
@@ -109,7 +109,7 @@ const ReadOnlyTable = ({ transactions, sorting }: ReadOnlyTableProps) => (
   </Table>
 )
 
-type EditableTableProps = {
+type ActionTableProps = {
   transactions: Lots
   selection: TransactionSelection
   sorting: SortingSelection
@@ -118,14 +118,14 @@ type EditableTableProps = {
   onDuplicate: (id: number) => void
 }
 
-const EditableTable = ({
+const ActionTable = ({
   transactions,
   sorting,
   selection,
   onDelete,
   onDuplicate,
   onValidate,
-}: EditableTableProps) => {
+}: ActionTableProps) => {
   const ids = transactions ? transactions.lots.map((t) => t.id) : []
 
   const selectAllCheckbox = (
@@ -137,7 +137,7 @@ const EditableTable = ({
   )
 
   return (
-    <Table className={cl(styles.transactionTable, styles.editableTable)}>
+    <Table className={cl(styles.transactionTable, styles.actionTable)}>
       <TransactionColumns sorting={sorting}>
         <th>{selectAllCheckbox}</th>
       </TransactionColumns>
@@ -204,13 +204,13 @@ export const TransactionTable = ({
   onDuplicate,
   onValidate,
 }: TransactionTableProps) => {
-  // return readonly table for transactions that aren't drafts
+  // return Display table for transactions that aren't drafts
   if (status.active !== LotStatus.Draft) {
-    return <ReadOnlyTable transactions={transactions} sorting={sorting} />
+    return <DisplayTable transactions={transactions} sorting={sorting} />
   }
 
   return (
-    <EditableTable
+    <ActionTable
       transactions={transactions}
       selection={selection}
       sorting={sorting}
@@ -230,7 +230,7 @@ export const StockTable = ({
   transactions,
   sorting,
 }: StockTableProps) => {
-  return <ReadOnlyStockTable transactions={transactions} sorting={sorting} />
+  return <DisplayStockTable transactions={transactions} sorting={sorting} />
 }
 
 const StockTransactionColumns = ({ sorting, children }: TxColumnsProps) => (
@@ -250,8 +250,8 @@ const StockTransactionColumns = ({ sorting, children }: TxColumnsProps) => (
   </thead>
 )
 
-const ReadOnlyStockTable = ({ transactions, sorting }: ReadOnlyTableProps) => (
-  <Table className={styles.transactionTable}>
+const DisplayStockTable = ({ transactions, sorting }: DisplayTableProps) => (
+  <Table>
     <StockTransactionColumns sorting={sorting}>
       <th />
     </StockTransactionColumns>
