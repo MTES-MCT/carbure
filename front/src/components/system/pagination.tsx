@@ -32,7 +32,12 @@ export type PageSelection = {
 // manage pagination state
 export function usePageSelection(): PageSelection {
   const [page, setPage] = useState(0)
-  const [limit, setLimit] = useState(10)
+  const [limit, setLimitState] = useState(10)
+
+  function setLimit(limit: number) {
+    setPage(0)
+    setLimitState(limit)
+  }
 
   return { page, limit, setPage, setLimit }
 }
