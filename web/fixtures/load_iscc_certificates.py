@@ -11,6 +11,7 @@ from core.models import ISCCScope, ISCCCertificate, ISCCCertificateScope, ISCCCe
 
 scopes = {}
 today = datetime.date.today()
+CSV_FOLDER = '/tmp'
 
 def fix_nulls(s):
     for line in s:
@@ -58,7 +59,8 @@ def load_certificates():
         last_crt = ISCCCertificate.objects.latest('id')
     except:
         last_crt = None
-    filename = '%s/web/fixtures/csv/Certificates_2020-10-08.csv' % (os.environ['CARBURE_HOME'])
+
+    filename = '%s/Certificates_%s.csv' % (CSV_FOLDER, today.strftime('%y-%m-%d'))
 
     csvfile = open(filename, 'r')
     reader = csv.DictReader(fix_nulls(csvfile), delimiter=',', quotechar='"')
