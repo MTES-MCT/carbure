@@ -21,13 +21,13 @@ export default function useGetSnapshot(
     year.setYear(years[0].value as number)
   }
 
-  function resolve() {
+  function getSnapshot() {
     if (entity !== null) {
       return resolveSnapshot(entity, year.selected).cancel
     }
   }
 
-  useEffect(resolve, [resolveSnapshot, entity, year.selected])
+  useEffect(getSnapshot, [resolveSnapshot, entity, year.selected])
 
-  return { ...snapshot, resolve }
+  return { ...snapshot, getSnapshot }
 }
