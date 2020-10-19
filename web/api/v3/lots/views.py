@@ -126,7 +126,7 @@ def get_lots(request):
     from_idx = int(from_idx)
     returned = txs[from_idx:]
 
-    if limit != None:
+    if limit is not None:
         limit = int(limit)
         returned = returned[:limit]
 
@@ -221,8 +221,13 @@ def get_snapshot(request):
     ps2 = [p['lot__unknown_production_site'] for p in txs.values('lot__unknown_production_site').distinct()]
     psites = [p for p in ps1 + ps2 if p]
 
+    ds1 = [p['carbure_delivery_site__name'] for p in txs.values('carbure_delivery_site__name').distinct()]
+    ds2 = [p['unknown_delivery_site'] for p in txs.values('unknown_delivery_site').distinct()]
+    dsites = [d for d in ds1 + ds2 if d]
+
     data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs, 'periods': periods,
-                       'production_sites': psites, 'countries_of_origin': countries, 'clients': clients}
+                       'production_sites': psites, 'countries_of_origin': countries, 'clients': clients,
+                       'delivery_sites': dsites}
 
     deadlines = txs.filter(lot__status='Draft').annotate(month=TruncMonth(
         'delivery_date')).values('month').annotate(total=Count('id'))
