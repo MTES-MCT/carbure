@@ -4,7 +4,7 @@ import { useTransactions, useStocks } from "../hooks/use-transactions"
 
 import { Main } from "../components/system"
 import { Route, Switch } from "../components/relative-route"
-import { TransactionSnapshot, StockSnapshot } from "../components/transaction-snapshot"
+import { TransactionSnapshot, StocksSnapshot } from "../components/transaction-snapshot"
 import { StockList, TransactionList } from "../components/transaction-list"
 import TransactionDetails from "./transaction-details"
 import TransactionAdd from "./transaction-add"
@@ -95,7 +95,7 @@ export const Stocks = () => {
 
   return (
     <Main>
-      <StockSnapshot
+      <StocksSnapshot
         snapshot={snapshot}
         filters={filters}
         search={search}

@@ -1,7 +1,7 @@
 import React from "react"
 
 import { ApiState } from "../hooks/helpers/use-api"
-import { Filters, LotStatus, Snapshot } from "../services/types"
+import { Filters, LotStatus, Snapshot, StockSnapshot } from "../services/types"
 import { StatusSelection, FilterSelection, SearchSelection, YearSelection } from "../hooks/use-transactions" // prettier-ignore
 
 import styles from "./transaction-snapshot.module.css"
@@ -96,12 +96,12 @@ export const TransactionSnapshot = ({
 )
 
 type StockSnapshotProps = {
-  snapshot: ApiState<Snapshot>
+  snapshot: ApiState<StockSnapshot>
   filters: FilterSelection
   search: SearchSelection
 }
 
-export const StockSnapshot = ({
+export const StocksSnapshot = ({
   snapshot,
   filters,
   search,

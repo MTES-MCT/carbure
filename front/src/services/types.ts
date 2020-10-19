@@ -197,10 +197,6 @@ export interface Settings {
 }
 
 export interface StockSnapshot {
-  lots: {
-    [key in LotStatus]: number
-  }
-
   filters: {
     [key in Filters]: Option[]
   }
