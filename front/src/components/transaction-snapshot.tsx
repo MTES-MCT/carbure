@@ -9,11 +9,17 @@ import styles from "./transaction-snapshot.module.css"
 import { Title, StatusButton, SearchInput, Box } from "./system"
 import Select from "./system/select"
 
-const STATUS = [
+const TRANSACTIONS_STATUS = [
   { key: LotStatus.Draft, label: "Brouillons" },
   { key: LotStatus.Validated, label: "Lots envoyés" },
   { key: LotStatus.ToFix, label: "Lots à corriger" },
   { key: LotStatus.Accepted, label: "Lots acceptés" },
+]
+
+const STOCK_STATUS = [
+  { key: LotStatus.Draft, label: "Brouillons" },
+  { key: LotStatus.Validated, label: "Lots envoyés" },
+  { key: LotStatus.ToFix, label: "Lots à corriger" },
 ]
 
 const FILTERS = [
@@ -33,7 +39,7 @@ type TransactionSnapshotProps = {
   search: SearchSelection
 }
 
-const TransactionSnapshot = ({
+export const TransactionSnapshot = ({
   snapshot,
   status,
   filters,
@@ -56,7 +62,60 @@ const TransactionSnapshot = ({
       </div>
 
       <div className={styles.transactionStatus}>
-        {STATUS.map(({ key, label }) => (
+        {TRANSACTIONS_STATUS.map(({ key, label }) => (
+          <StatusButton
+            key={key}
+            active={key === status.active}
+            amount={snapshot.loading ? "…" : snapshot.data?.lots[key] ?? 0}
+            label={label}
+            onClick={() => status.setActive(key)}
+          />
+        ))}
+      </div>
+    </div>
+
+    <div className={styles.transactionFilters}>
+      <div className={styles.filterGroup}>
+        {FILTERS.map(({ key, label }) => (
+          <Select
+            clear
+            search
+            multiple
+            key={key}
+            value={filters.selected[key]}
+            placeholder={snapshot.loading ? "…" : label}
+            options={snapshot.data?.filters[key] ?? []}
+            onChange={(value) => filters.select(key, value)}
+          />
+        ))}
+      </div>
+
+      <SearchInput
+        className={styles.searchInput}
+        placeholder="Rechercher un lot"
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          search.setQuery(e.target.value)
+        }
+      />
+    </div>
+  </Box>
+)
+
+export const StockSnapshot = ({
+  snapshot,
+  status,
+  filters,
+  year,
+  search,
+}: TransactionSnapshotProps) => (
+  <Box className={styles.transactionSnapshot}>
+    <div className={styles.transactionSummary}>
+      <div className={styles.transactionHeader}>
+        <Title>Stock</Title>
+      </div>
+
+      <div className={styles.transactionStatus}>
+        {STOCK_STATUS.map(({ key, label }) => (
           <StatusButton
             key={key}
             active={key === status.active}

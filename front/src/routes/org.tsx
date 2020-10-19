@@ -7,7 +7,7 @@ import useEntity from "../hooks/helpers/use-entity"
 import { Redirect, Route, Switch } from "../components/relative-route"
 import Topbar from "../components/top-bar"
 import Footer from "../components/footer"
-import Transactions from "./transactions"
+import { Transactions, Stocks } from "./transactions"
 
 type MainProps = {
   app: AppHook
@@ -26,7 +26,7 @@ const Org = ({ app }: MainProps) => {
 
       <Switch>
         <Route relative path="stocks">
-          Stocks
+          <Stocks />
         </Route>
 
         <Route relative path="transactions/:status">
