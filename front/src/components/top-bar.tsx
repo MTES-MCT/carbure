@@ -85,8 +85,6 @@ const Topbar = ({ entity, settings }: TopbarProps) => (
     <nav className={styles.pageNav}>
       <PageLink to="stocks">Stocks</PageLink>
       <PageLink to="transactions">Transactions</PageLink>
-      <PageLink to="controls">Contrôles</PageLink>
-      <PageLink to="directory">Annuaire</PageLink>
     </nav>
 
     <UserMenu settings={settings} entity={entity} />

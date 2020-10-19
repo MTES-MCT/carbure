@@ -33,14 +33,6 @@ const Org = ({ app }: MainProps) => {
           <Transactions />
         </Route>
 
-        <Route relative path="controls">
-          Contrôles
-        </Route>
-
-        <Route relative path="directory">
-          Annuaire
-        </Route>
-
         <Redirect relative to="transactions/draft" />
       </Switch>
 
