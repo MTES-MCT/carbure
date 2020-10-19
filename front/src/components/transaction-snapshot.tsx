@@ -2,9 +2,11 @@ import React from "react"
 
 import { ApiState } from "../hooks/helpers/use-api"
 import { Filters, LotStatus, Snapshot, StockSnapshot } from "../services/types"
-import { FilterSelection, SearchSelection } from "../hooks/use-transactions" // prettier-ignore
+import { FilterSelection as FilterSelection_old, SearchSelection as SearchSelection_old } from "../hooks/use-transactions" // prettier-ignore
 import { StatusSelection } from "../hooks/query/use-status"
 import { YearSelection } from "../hooks/query/use-year"
+import { FilterSelection } from "../hooks/query/use-filters"
+import { SearchSelection } from "../hooks/query/use-search"
 
 import styles from "./transaction-snapshot.module.css"
 
@@ -18,14 +20,15 @@ const TRANSACTIONS_STATUS = [
   { key: LotStatus.Accepted, label: "Lots acceptés" },
 ]
 
-const FILTERS = [
-  { key: Filters.Periods, label: "Période" },
-  { key: Filters.ProductionSites, label: "Site de production" },
-  { key: Filters.MatieresPremieres, label: "Matière Première" },
-  { key: Filters.Biocarburants, label: "Biocarburant" },
-  { key: Filters.CountriesOfOrigin, label: "Pays d'origine" },
-  { key: Filters.DeliverySites, label: "Sites de livraison" },
-]
+const FILTER_LABELS = {
+  [Filters.Periods]: "Période",
+  [Filters.ProductionSites]: "Site de production",
+  [Filters.MatieresPremieres]: "Matière Première",
+  [Filters.Biocarburants]: "Biocarburant",
+  [Filters.CountriesOfOrigin]: "Pays d'origine",
+  [Filters.DeliverySites]: "Sites de livraison",
+  [Filters.Clients]: "Clients"
+}
 
 const STOCK_FILTERS = [
   { key: Filters.ProductionSites, label: "Site de production" },
@@ -80,16 +83,16 @@ export const TransactionSnapshot = ({
 
     <div className={styles.transactionFilters}>
       <div className={styles.filterGroup}>
-        {FILTERS.map(({ key, label }) => (
+        {Object.entries(filters.selected).map(([filter, value]) => (
           <Select
             clear
             search
             multiple
-            key={key}
-            value={filters.selected[key]}
-            placeholder={snapshot.loading ? "…" : label}
-            options={snapshot.data?.filters[key] ?? []}
-            onChange={(value) => filters.select(key, value)}
+            key={filter}
+            value={value}
+            placeholder={snapshot.loading ? "…" : FILTER_LABELS[filter as Filters]}
+            options={snapshot.data?.filters[filter as Filters] ?? []}
+            onChange={(value) => filters.select(filter as Filters, value)}
           />
         ))}
       </div>
@@ -107,8 +110,8 @@ export const TransactionSnapshot = ({
 
 type StockSnapshotProps = {
   snapshot: ApiState<StockSnapshot>
-  filters: FilterSelection
-  search: SearchSelection
+  filters: FilterSelection_old
+  search: SearchSelection_old
 }
 
 export const StocksSnapshot = ({
