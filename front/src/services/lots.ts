@@ -238,10 +238,10 @@ function normalizeStockSnapshotFilters(snapshot: any): StockSnapshot {
   return snapshot
 }
 
-export function getStockSnapshot(
-  entity_id: number,
-): Promise<StockSnapshot> {
-  return api.get("/stocks/snapshot", { entity_id }).then(normalizeStockSnapshotFilters)
+export function getStockSnapshot(entity_id: number): Promise<StockSnapshot> {
+  return api
+    .get("/stocks/snapshot", { entity_id })
+    .then(normalizeStockSnapshotFilters)
 }
 
 export function getStocks(

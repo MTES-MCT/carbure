@@ -2,9 +2,17 @@ import React from "react"
 import cl from "clsx"
 
 import { Lots, LotStatus } from "../services/types"
-import { StatusSelection, TransactionSelection, SortingSelection, Deleter, Uploader, Validator } from "../hooks/use-transactions" // prettier-ignore
+import { SortingSelection } from "../hooks/use-transactions" // prettier-ignore
 import { PageSelection } from "./system/pagination"
 import { ApiState } from "../hooks/helpers/use-api"
+
+import { LotUploader } from "../hooks/actions/use-upload-file"
+import { LotDeleter } from "../hooks/actions/use-delete-lots"
+import { LotValidator } from "../hooks/actions/use-validate-lots"
+import { LotDuplicator } from "../hooks/actions/use-duplicate-lots"
+import { LotGetter } from "../hooks/actions/use-get-lots"
+import { StatusSelection } from "../hooks/query/use-status"
+import { TransactionSelection } from "../hooks/query/use-selection"
 
 import styles from "./transaction-list.module.css"
 
@@ -23,12 +31,13 @@ import Pagination from "./system/pagination"
 import { TransactionTable, StockTable } from "./transaction-table"
 import { Link } from "./relative-route"
 
+
 type DraftActionProps = {
   disabled: boolean
   hasSelection: boolean
-  uploader: Uploader
-  deleter: Deleter
-  validator: Validator
+  uploader: LotUploader
+  deleter: LotDeleter
+  validator: LotValidator
 }
 
 const DraftLotsActions = ({
@@ -40,17 +49,17 @@ const DraftLotsActions = ({
 }: DraftActionProps) => {
   function onValidate() {
     if (hasSelection) {
-      validator.resolveSelection()
+      validator.validateSelection()
     } else {
-      validator.resolveAll()
+      validator.validateAllDrafts()
     }
   }
 
   function onDelete() {
     if (hasSelection) {
-      deleter.resolveSelection()
+      deleter.deleteSelection()
     } else {
-      deleter.resolveAll()
+      deleter.deleteSelection()
     }
   }
 
@@ -61,7 +70,7 @@ const DraftLotsActions = ({
         <input
           type="file"
           style={{ display: "none" }}
-          onChange={(e) => uploader.resolve(e!.target.files![0])}
+          onChange={(e) => uploader.uploadFile(e!.target.files![0])}
         />
       </AsyncButton>
 
@@ -113,16 +122,15 @@ const ActionBar = ({ children }: { children: React.ReactNode }) => (
 )
 
 type TransactionListProps = {
-  transactions: ApiState<Lots>
+  transactions: LotGetter
   status: StatusSelection
   sorting: SortingSelection
   selection: TransactionSelection
   pagination: PageSelection
-  deleter: Deleter
-  uploader: Uploader
-  validator: Validator
-  onDuplicate: (id: number) => void
-  onExportAll: () => void
+  deleter: LotDeleter
+  uploader: LotUploader
+  validator: LotValidator
+  duplicator: LotDuplicator
 }
 
 export const TransactionList = ({
@@ -134,8 +142,7 @@ export const TransactionList = ({
   deleter,
   uploader,
   validator,
-  onDuplicate,
-  onExportAll,
+  duplicator,
 }: TransactionListProps) => {
   const tx = transactions.data
 
@@ -154,7 +161,7 @@ export const TransactionList = ({
 
       {!isError && (
         <ActionBar>
-          <Button icon={Download} disabled={isEmpty} onClick={onExportAll}>
+          <Button icon={Download} disabled={isEmpty} onClick={transactions.exportAllTransactions}>
             Exporter tout
           </Button>
 
@@ -187,9 +194,9 @@ export const TransactionList = ({
               transactions={tx!}
               selection={selection}
               sorting={sorting}
-              onDuplicate={onDuplicate}
-              onValidate={validator.resolve}
-              onDelete={deleter.resolve}
+              onDuplicate={duplicator.duplicateLot}
+              onValidate={validator.validateLot}
+              onDelete={deleter.deleteLot}
             />
             {isLoading && <LoaderOverlay />}
           </Box>
