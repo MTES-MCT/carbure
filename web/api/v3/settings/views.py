@@ -302,8 +302,36 @@ def disable_trading(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
+@check_rights('entity_id')
 def update_production_site(request, *args, **kwargs):
-    pass
+    production_site_id = request.POST.get('production_site_id', False)
+
+    if not production_site_id:
+        return JsonResponse({'status': 'error', 'message': "Missing field production_site_id"}, status=400)
+
+    psite = ProductionSite.objects.get(id=production_site_id)
+    name = request.POST.get('name', False)
+    ges_option = request.POST.get('ges_option', False)
+    date_mise_en_service = request.POST.get('date_mise_en_service', False)
+    eligible_dc = request.POST.get('eligible_dc', False)
+    country_code = request.POST.get('country_code', False)
+
+    if name:
+        psite.name = name
+    if ges_option:
+        psite.ges_option = ges_option
+    if date_mise_en_service:
+        psite.date_mise_en_service = date_mise_en_service
+    if eligible_dc:
+        psite.eligible_dc = eligible_dc
+    if country_code:
+        try:
+            country = Pays.objects.get(code_pays=country_code)
+            psite.country = country
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': "Unknown country"}, status=400)
+    psite.save()
+    return JsonResponse({'status': 'success'})
 
 
 @check_rights('entity_id')
