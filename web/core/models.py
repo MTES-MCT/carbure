@@ -483,3 +483,20 @@ class ISCCCertificateScope(models.Model):
         db_table = 'iscc_certificates_scopes'
         verbose_name = 'ISCC Certificate Scope'
         verbose_name_plural = 'ISCC Certificate Scopes'
+
+
+class DBSCertificate(models.Model):
+    certificate_id = models.CharField(max_length=64, null=False, blank=False)
+    certificate_holder = models.CharField(max_length=256, null=False, blank=False)
+    holder_address = models.CharField(max_length=256, null=False, blank=False)
+    valid_from = models.DateField(null=False)
+    valid_until = models.DateField(null=False)
+    certification_type = models.CharField(max_length=256, default='')
+
+    def __str__(self):
+        return self.certificate_id
+
+    class Meta:
+        db_table = 'dbs_certificates'
+        verbose_name = '2BS Certificate'
+        verbose_name_plural = '2BS Certificates'
