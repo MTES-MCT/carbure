@@ -9,6 +9,7 @@ import Exit from "./components/exit"
 
 import Logout from "./routes/logout"
 import Org from "./routes/org"
+import Settings from "./routes/settings"
 
 const App = () => {
   const app = useApp()
@@ -27,6 +28,10 @@ const App = () => {
           <Switch>
             <Route path="/org/:entity">
               <Org app={app} />
+            </Route>
+
+            <Route path="/settings">
+              <Settings app={app} />
             </Route>
 
             <Route path="/logout">
