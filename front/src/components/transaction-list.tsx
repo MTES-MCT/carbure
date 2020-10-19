@@ -188,21 +188,24 @@ export const TransactionList = ({
 
       {!isError && !isEmpty && (
         <React.Fragment>
-          <TransactionTable
-            status={status}
-            transactions={tx!}
-            selection={selection}
-            sorting={sorting}
-            onDuplicate={duplicator.duplicateLot}
-            onValidate={validator.validateLot}
-            onDelete={deleter.deleteLot}
-          />
+          <Box>
+            <TransactionTable
+              status={status}
+              transactions={tx!}
+              selection={selection}
+              sorting={sorting}
+              onDuplicate={duplicator.duplicateLot}
+              onValidate={validator.validateLot}
+              onDelete={deleter.deleteLot}
+            />
+            {isLoading && <LoaderOverlay />}
+          </Box>
 
           <Pagination pagination={pagination} total={tx!.total} />
         </React.Fragment>
       )}
 
-      {isLoading && <LoaderOverlay />}
+      {isLoading && (isError || isEmpty) && <LoaderOverlay />}
     </Box>
   )
 }
