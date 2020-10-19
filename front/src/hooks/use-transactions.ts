@@ -10,6 +10,8 @@ import useAPI from "./helpers/use-api"
 import {
   getSnapshot,
   getLots,
+  getStocks,
+  getStockSnapshot,
   downloadLots,
   deleteLots,
   duplicateLot,
@@ -424,7 +426,7 @@ function useValidateLots(
   }
 }
 
-export default function useTransactions() {
+export function useTransactions() {
   const entity = useEntity()
 
   const sorting = useSortingSelection()
@@ -466,6 +468,93 @@ export default function useTransactions() {
     uploader,
     duplicator,
     validator,
+    refresh,
+  }
+}
+
+interface StockHook {
+  loading: boolean
+  error: string | null
+  data: Lots | null
+  resolve: () => void
+}
+
+function useGetStockSnapshot(entity: EntitySelection) {
+  const [snapshot, resolveStockSnapshot] = useAPI(getStockSnapshot)
+
+  function resolve() {
+    if (entity !== null) {
+      return resolveStockSnapshot(entity, ).cancel
+    }
+  }
+
+  useEffect(resolve, [resolveStockSnapshot, entity])
+
+  return { ...snapshot, resolve }
+}
+
+
+// fetches current transaction list when parameters change
+function useGetStocks(
+  entity: EntitySelection,
+  filters: FilterSelection,
+  pagination: PageSelection,
+  search: SearchSelection,
+  sorting: SortingSelection
+): StockHook {
+  const [transactions, resolveStocks] = useAPI(getStocks)
+
+  function resolve() {
+    if (entity !== null) {
+      return resolveStocks(
+        entity,
+        filters.selected,
+        pagination.page,
+        pagination.limit,
+        search.query,
+        sorting.column,
+        sorting.order
+      ).cancel
+    }
+  }
+
+  useEffect(resolve, [
+    resolveStocks,
+    entity,
+    filters.selected,
+    pagination.page,
+    pagination.limit,
+    search.query,
+    sorting.column,
+    sorting.order,
+  ])
+
+  return { ...transactions, resolve }
+}
+
+export function useStocks() {
+  const entity = useEntity()
+
+  const sorting = useSortingSelection()
+  const pagination = usePageSelection()
+
+  const search = useSearchSelection(pagination)
+  const filters = useFilterSelection(pagination)
+  const snapshot = useGetStockSnapshot(entity)
+  const transactions = useGetStocks(entity, filters, pagination, search, sorting) // prettier-ignore
+
+  function refresh() {
+    transactions.resolve()
+  }
+
+  return {
+    entity,
+    filters,
+    pagination,
+    snapshot,
+    transactions,
+    search,
+    sorting,
     refresh,
   }
 }

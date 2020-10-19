@@ -16,10 +16,6 @@ const TRANSACTIONS_STATUS = [
   { key: LotStatus.Accepted, label: "Lots acceptés" },
 ]
 
-const STOCK_STATUS = [
-  { key: LotStatus.Draft, label: "Brouillons" },
-]
-
 const FILTERS = [
   { key: Filters.Periods, label: "Période" },
   { key: Filters.ProductionSites, label: "Site de production" },
@@ -99,29 +95,21 @@ export const TransactionSnapshot = ({
   </Box>
 )
 
+type StockSnapshotProps = {
+  snapshot: ApiState<Snapshot>
+  filters: FilterSelection
+  search: SearchSelection
+}
+
 export const StockSnapshot = ({
   snapshot,
-  status,
   filters,
-  year,
   search,
-}: TransactionSnapshotProps) => (
+}: StockSnapshotProps) => (
   <Box className={styles.transactionSnapshot}>
     <div className={styles.transactionSummary}>
       <div className={styles.transactionHeader}>
         <Title>Stock</Title>
-      </div>
-
-      <div className={styles.transactionStatus}>
-        {STOCK_STATUS.map(({ key, label }) => (
-          <StatusButton
-            key={key}
-            active={key === status.active}
-            amount={snapshot.loading ? "…" : snapshot.data?.lots[key] ?? 0}
-            label={label}
-            onClick={() => status.setActive(key)}
-          />
-        ))}
       </div>
     </div>
 

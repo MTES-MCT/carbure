@@ -11,6 +11,7 @@ export enum LotStatus {
   ToFix = "tofix",
   Accepted = "accepted",
   Weird = "weird",
+  Stock = "stock",
 }
 
 export interface Entity {
@@ -193,4 +194,14 @@ export interface Snapshot {
 export interface Settings {
   email: string
   rights: { entity: Entity }[]
+}
+
+export interface StockSnapshot {
+  lots: {
+    [key in LotStatus]: number
+  }
+
+  filters: {
+    [key in Filters]: Option[]
+  }
 }

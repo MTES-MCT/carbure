@@ -20,7 +20,7 @@ import {
 
 import { Alert, AsyncButton, Box, Button, LoaderOverlay } from "./system"
 import Pagination from "./system/pagination"
-import TransactionTable from "./transaction-table"
+import { TransactionTable, StockTable } from "./transaction-table"
 import { Link } from "./relative-route"
 
 type DraftActionProps = {
@@ -125,7 +125,7 @@ type TransactionListProps = {
   onExportAll: () => void
 }
 
-const TransactionList = ({
+export const TransactionList = ({
   transactions,
   status,
   sorting,
@@ -201,4 +201,53 @@ const TransactionList = ({
   )
 }
 
-export default TransactionList
+type StockListProps = {
+  transactions: ApiState<Lots>
+  sorting: SortingSelection
+  pagination: PageSelection
+}
+
+export const StockList = ({
+  transactions,
+  sorting,
+  pagination,
+}: StockListProps) => {
+  const tx = transactions.data
+
+  const isLoading = transactions.loading
+  const isError = typeof transactions.error === "string"
+  const isEmpty = tx === null || tx.lots.length === 0
+
+  return (
+    <Box className={styles.transactionList}>
+      {isError && (
+        <Alert level="error">
+          <AlertCircle />
+          {transactions.error}
+        </Alert>
+      )}
+
+      {!isError && isEmpty && (
+        <Alert level="warning">
+          <AlertCircle />
+          Aucune transaction trouvée pour ces paramètres
+        </Alert>
+      )}
+
+      {!isError && !isEmpty && (
+        <React.Fragment>
+          <Box>
+            <StockTable
+              transactions={tx!}
+              sorting={sorting}
+            />
+            {isLoading && <LoaderOverlay />}
+          </Box>
+
+          <Pagination pagination={pagination} total={tx!.total} />
+        </React.Fragment>
+      )}
+    </Box>
+  )
+}
+

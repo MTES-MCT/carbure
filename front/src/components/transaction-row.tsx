@@ -13,6 +13,7 @@ const STATUS = {
   [LotStatus.ToFix]: "À corriger",
   [LotStatus.Accepted]: "Accepté",
   [LotStatus.Weird]: "Problème",
+  [LotStatus.Stock]: "Stock",
 }
 
 const Status = ({ value }: { value: LotStatus }) => (
