@@ -2,7 +2,6 @@ import {usePageSelection } from "../../components/system/pagination" // prettier
 
 import useUploadLotFile from "../actions/use-upload-file"
 import useDuplicateLot from "../actions/use-duplicate-lots"
-import useGetLots from "../actions/use-get-lots"
 import useDeleteLots from "../actions/use-delete-lots"
 import useValidateLots from "../actions/use-validate-lots"
 
@@ -15,8 +14,7 @@ import useYearSelection from "../query/use-year"
 
 import useEntity from "../helpers/use-entity"
 import useGetSnapshot from "./use-snapshot"
-
-// valeurs acceptables pour le sort_by: ['period', 'client', 'biocarburant', 'matiere_premiere', 'ghg_reduction', 'volume', 'pays_origine']
+import useGetLots from "./use-get-lots"
 
 export default function useTransactions() {
   const entity = useEntity()
@@ -33,7 +31,7 @@ export default function useTransactions() {
   const transactions = useGetLots(entity, status, filters, year, pagination, search, sorting) // prettier-ignore
 
   function refresh() {
-    snapshot.resolve()
+    snapshot.getSnapshot()
     transactions.getTransactions()
   }
 
