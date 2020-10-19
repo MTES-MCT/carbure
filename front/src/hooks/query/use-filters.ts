@@ -12,17 +12,12 @@ export interface FilterSelection {
 
 // manage current filter selection
 export default function useFilterSelection(
+  initialState: FilterSelection["selected"],
   pagination: PageSelection
 ): FilterSelection {
-  const [selected, setFilters] = useState<FilterSelection["selected"]>({
-    [Filters.Biocarburants]: null,
-    [Filters.MatieresPremieres]: null,
-    [Filters.CountriesOfOrigin]: null,
-    [Filters.Periods]: null,
-    [Filters.Clients]: null,
-    [Filters.ProductionSites]: null,
-    [Filters.DeliverySites]: null,
-  })
+  const [selected, setFilters] = useState<FilterSelection["selected"]>(
+    initialState
+  )
 
   function select(type: Filters, value: SelectValue) {
     pagination.setPage(0)
@@ -30,15 +25,7 @@ export default function useFilterSelection(
   }
 
   function reset() {
-    setFilters({
-      [Filters.Biocarburants]: null,
-      [Filters.MatieresPremieres]: null,
-      [Filters.CountriesOfOrigin]: null,
-      [Filters.Periods]: null,
-      [Filters.Clients]: null,
-      [Filters.ProductionSites]: null,
-      [Filters.DeliverySites]: null,
-    })
+    setFilters(initialState)
   }
 
   return { selected, select, reset }

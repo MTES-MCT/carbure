@@ -1,3 +1,5 @@
+import { Filters } from "../../services/types"
+
 import {usePageSelection } from "../../components/system/pagination" // prettier-ignore
 
 import useUploadLotFile from "../actions/use-upload-file"
@@ -16,15 +18,24 @@ import useEntity from "../helpers/use-entity"
 import useGetSnapshot from "./use-snapshot"
 import useGetLots from "./use-get-lots"
 
+const initialFilters = {
+  [Filters.Biocarburants]: null,
+  [Filters.MatieresPremieres]: null,
+  [Filters.CountriesOfOrigin]: null,
+  [Filters.Periods]: null,
+  [Filters.Clients]: null,
+  [Filters.ProductionSites]: null,
+  [Filters.DeliverySites]: null,
+}
+
 export default function useTransactions() {
   const entity = useEntity()
-
-  const sorting = useSortingSelection()
   const pagination = usePageSelection()
 
+  const sorting = useSortingSelection(pagination)
   const status = useStatusSelection(pagination)
   const search = useSearchSelection(pagination)
-  const filters = useFilterSelection(pagination)
+  const filters = useFilterSelection(initialFilters, pagination)
   const year = useYearSelection(pagination, filters)
 
   const snapshot = useGetSnapshot(entity, year)
