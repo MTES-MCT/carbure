@@ -33,11 +33,11 @@
   flex: 1;
 }
 
-.transactionStatus a:first-child {
+.transactionStatus button:first-child {
   margin-left: 0;
 }
 
-.transactionStatus a:last-child {
+.transactionStatus button:last-child {
   margin-right: 0;
 }
 
