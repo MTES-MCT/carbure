@@ -500,3 +500,29 @@ class DBSCertificate(models.Model):
         db_table = 'dbs_certificates'
         verbose_name = '2BS Certificate'
         verbose_name_plural = '2BS Certificates'
+
+
+class EntityISCCTradingCertificate(models.Model):
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
+    certificate = models.ForeignKey(ISCCCertificate, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.certificate.certificate_id
+
+    class Meta:
+        db_table = 'entity_iscc_trading_certificates'
+        verbose_name = 'Certificat de Trading ISCC'
+        verbose_name_plural = 'Certificats de Trading ISCC'
+
+
+class EntityDBSTradingCertificate(models.Model):
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
+    certificate = models.ForeignKey(DBSCertificate, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.certificate.certificate_id
+
+    class Meta:
+        db_table = 'entity_2bs_trading_certificates'
+        verbose_name = 'Certificat de Trading 2BS'
+        verbose_name_plural = 'Certificats de Trading 2BS'

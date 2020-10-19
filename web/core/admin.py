@@ -12,6 +12,7 @@ from core.models import Entity, UserRights, UserPreferences, Biocarburant, Matie
 from core.models import GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
 from core.models import LotValidationError
 from core.models import ISCCScope, ISCCCertificate, ISCCCertificateRawMaterial, ISCCCertificateScope, DBSCertificate
+from core.models import EntityISCCTradingCertificate, EntityDBSTradingCertificate
 from api.v3.sanity_checks import queryset_sanity_check
 
 
@@ -138,6 +139,16 @@ class DBSCertificateAdmin(admin.ModelAdmin):
     search_fields = ('certificate_id', 'certificate_holder',)
 
 
+class EntityISCCTradingCertificateAdmin(admin.ModelAdmin):
+    list_display = ('entity', 'certificate',)
+    search_fields = ('entity', 'certificate',)
+
+
+class EntityDBSTradingCertificateAdmin(admin.ModelAdmin):
+    list_display = ('entity', 'certificate',)
+    search_fields = ('entity', 'certificate',)
+
+
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
 admin.site.register(UserPreferences, UserPreferencesAdmin)
@@ -157,6 +168,8 @@ admin.site.register(ISCCCertificate, ISCCCertificateAdmin)
 admin.site.register(ISCCCertificateRawMaterial, ISCCCertificateRawMaterialAdmin)
 admin.site.register(ISCCCertificateScope, ISCCCertificateScopeAdmin)
 admin.site.register(DBSCertificate, DBSCertificateAdmin)
+admin.site.register(EntityISCCTradingCertificate, EntityISCCTradingCertificateAdmin)
+admin.site.register(EntityDBSTradingCertificate, EntityDBSTradingCertificateAdmin)
 
 
 # authtool custom user model
