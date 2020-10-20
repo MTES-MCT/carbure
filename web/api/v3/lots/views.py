@@ -22,7 +22,7 @@ sort_key_to_django_field = {'period': 'lot__period',
                             'pays_origine': 'lot__pays_origine__name'}
 
 
-def transaction_with_errors(tx):
+def tx_natural_key_with_errors(tx):
     data = tx.natural_key()
     tx_errors = [err.natural_key() for err in tx.transactionerror_set.all()]
     lots_errors = [err.natural_key() for err in tx.lot.lotv2error_set.all()]
@@ -118,9 +118,12 @@ def get_lots(request):
                          Q(carbure_delivery_site__name__icontains=query) |
                          Q(unknown_delivery_site__icontains=query)
                          )
+
+    tx_with_errors = txs.annotate(Count('transactionerror'), Count('lot__lotv2error')).filter(
+        Q(transactionerror__count__gt=0) | Q(lot__lotv2error__count__gt=0))
+
     if invalid:
-        txs = txs.annotate(Count('transactionerror'), Count('lot__lotv2error')).filter(
-            Q(transactionerror__count__gt=0) | Q(lot__lotv2error__count__gt=0))
+        txs = tx_with_errors
 
     if sort_by:
         if sort_by in sort_key_to_django_field:
@@ -148,10 +151,11 @@ def get_lots(request):
 
     data = {}
 
-    data['lots'] = [transaction_with_errors(t) for t in returned]
+    data['lots'] = [tx_natural_key_with_errors(t) for t in returned]
     data['total'] = len(txs)
     data['returned'] = len(returned)
     data['from'] = from_idx
+    data['errors'] = tx_with_errors.count()
 
     if not export:
         return JsonResponse({'status': 'success', 'data': data})
