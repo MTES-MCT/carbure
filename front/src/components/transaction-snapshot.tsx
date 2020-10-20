@@ -28,7 +28,7 @@ const FILTER_LABELS = {
   [Filters.Biocarburants]: "Biocarburant",
   [Filters.CountriesOfOrigin]: "Pays d'origine",
   [Filters.DeliverySites]: "Sites de livraison",
-  [Filters.Clients]: "Clients"
+  [Filters.Clients]: "Clients",
 }
 
 const STOCK_FILTERS = [
@@ -39,7 +39,9 @@ const STOCK_FILTERS = [
   { key: Filters.DeliverySites, label: "Sites de livraison" },
 ]
 
-function mapFilters(filters: FilterSelection["selected"]): [Filters, string, SelectValue][] {
+function mapFilters(
+  filters: FilterSelection["selected"]
+): [Filters, string, SelectValue][] {
   return Object.entries(filters).map(([key, value]) => {
     const filter = key as Filters
     return [filter, FILTER_LABELS[filter], value ?? null]
@@ -81,10 +83,10 @@ export const TransactionSnapshot = ({
           <StatusButton
             key={key}
             active={key === status.active}
-            amount={snapshot.loading ? <Loader size={19} /> : snapshot.data?.lots[key] ?? 0}
+            amount={snapshot.loading ? <Loader /> : snapshot.data?.lots[key]}
             label={label}
             onClick={() => status.setActive(key)}
-            />
+          />
         ))}
       </div>
     </div>
