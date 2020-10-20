@@ -1,7 +1,7 @@
 import React from "react"
 
 import { Lots, LotStatus } from "../services/types"
-import { SortingSelection } from "../hooks/use-transactions" // prettier-ignore
+import { SortingSelection } from "../hooks/query/use-sort-by" // prettier-ignore
 import { PageSelection } from "./system/pagination"
 import { ApiState } from "../hooks/helpers/use-api"
 

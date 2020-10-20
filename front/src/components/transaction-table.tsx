@@ -2,7 +2,7 @@ import React from "react"
 import cl from "clsx"
 
 import { Lots, LotStatus } from "../services/types"
-import { SortingSelection } from "../hooks/use-transactions" // prettier-ignore
+import { SortingSelection } from "../hooks/query/use-sort-by" // prettier-ignore
 
 import styles from "./transaction-table.module.css"
 

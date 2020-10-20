@@ -2,7 +2,6 @@ import React from "react"
 
 import { ApiState } from "../hooks/helpers/use-api"
 import { Filters, LotStatus, Snapshot, StockSnapshot } from "../services/types"
-import { FilterSelection as FilterSelection_old, SearchSelection as SearchSelection_old } from "../hooks/use-transactions" // prettier-ignore
 import { StatusSelection } from "../hooks/query/use-status"
 import { YearSelection } from "../hooks/query/use-year"
 import { FilterSelection } from "../hooks/query/use-filters"
@@ -30,14 +29,6 @@ const FILTER_LABELS = {
   [Filters.DeliverySites]: "Sites de livraison",
   [Filters.Clients]: "Clients",
 }
-
-const STOCK_FILTERS = [
-  { key: Filters.ProductionSites, label: "Site de production" },
-  { key: Filters.MatieresPremieres, label: "Matière Première" },
-  { key: Filters.Biocarburants, label: "Biocarburant" },
-  { key: Filters.CountriesOfOrigin, label: "Pays d'origine" },
-  { key: Filters.DeliverySites, label: "Sites de livraison" },
-]
 
 function mapFilters(
   filters: FilterSelection["selected"]
@@ -120,8 +111,8 @@ export const TransactionSnapshot = ({
 
 type StockSnapshotProps = {
   snapshot: ApiState<StockSnapshot>
-  filters: FilterSelection_old
-  search: SearchSelection_old
+  filters: FilterSelection
+  search: SearchSelection
 }
 
 export const StocksSnapshot = ({
@@ -138,16 +129,16 @@ export const StocksSnapshot = ({
 
     <div className={styles.transactionFilters}>
       <div className={styles.filterGroup}>
-        {STOCK_FILTERS.map(({ key, label }) => (
+      {mapFilters(filters.selected).map(([filter, label, value]) => (
           <Select
             clear
             search
             multiple
-            key={key}
-            value={filters.selected[key]}
-            placeholder={snapshot.loading ? "…" : label}
-            options={snapshot.data?.filters[key] ?? []}
-            onChange={(value) => filters.select(key, value)}
+            key={filter}
+            value={value}
+            placeholder={label}
+            options={snapshot.data?.filters[filter] ?? []}
+            onChange={(value) => filters.select(filter, value)}
           />
         ))}
       </div>
