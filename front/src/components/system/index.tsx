@@ -100,12 +100,14 @@ export const AsyncButton = ({
 
 type StatusButtonProps = ButtonProps & {
   active: boolean
-  amount: React.ReactNode
+  loading: boolean
+  amount: number
   label: string
 }
 
 export const StatusButton = ({
   active,
+  loading,
   amount,
   label,
   className,
@@ -119,7 +121,9 @@ export const StatusButton = ({
       className
     )}
   >
-    <span className={styles.statusButtonAmount}>{amount}</span>
+    <span className={styles.statusButtonAmount}>
+      {loading ? <Loader /> : amount}
+    </span>
     <span className={styles.statusButtonLabel}>{label}</span>
   </Button>
 )

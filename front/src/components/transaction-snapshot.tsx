@@ -9,7 +9,6 @@ import { SearchSelection } from "../hooks/query/use-search"
 
 import styles from "./transaction-snapshot.module.css"
 
-import { Loader } from "./system/icons"
 import { Title, StatusButton, SearchInput, Box } from "./system"
 import Select, { SelectValue } from "./system/select"
 
@@ -74,7 +73,8 @@ export const TransactionSnapshot = ({
           <StatusButton
             key={key}
             active={key === status.active}
-            amount={snapshot.loading ? <Loader /> : snapshot.data?.lots[key]}
+            loading={snapshot.loading}
+            amount={snapshot.data?.lots[key] ?? 0}
             label={label}
             onClick={() => status.setActive(key)}
           />
@@ -129,7 +129,7 @@ export const StocksSnapshot = ({
 
     <div className={styles.transactionFilters}>
       <div className={styles.filterGroup}>
-      {mapFilters(filters.selected).map(([filter, label, value]) => (
+        {mapFilters(filters.selected).map(([filter, label, value]) => (
           <Select
             clear
             search
