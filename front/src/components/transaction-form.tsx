@@ -1,6 +1,7 @@
 import React from "react"
 
 import { TransactionFormState } from "../hooks/helpers/use-transaction-form"
+import { FormFields } from "../hooks/helpers/use-form"
 
 import styles from "./transaction-form.module.css"
 
@@ -14,10 +15,10 @@ import {
   findDeliverySites,
 } from "../services/common"
 
-import { Box, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
+import { Box, Button, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
+import { Cross } from "./system/icons"
 import { Alert } from "./system/alert"
 import AutoComplete from "./system/autocomplete"
-import { FormFields } from "../hooks/helpers/use-form"
 
 // shorthand to build autocomplete value & label getters
 const get = (key: string) => (obj: { [k: string]: any } | null) =>
@@ -39,6 +40,7 @@ type TransactionFormProps = {
   fieldErrors?: { [k: string]: string }
   onChange: <T extends FormFields>(e: React.ChangeEvent<T>) => void
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
+  onClose?: () => void
 }
 
 const TransactionForm = ({
@@ -49,6 +51,7 @@ const TransactionForm = ({
   fieldErrors = {},
   onChange,
   onSubmit,
+  onClose,
 }: TransactionFormProps) => {
   function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -448,7 +451,18 @@ const TransactionForm = ({
         </Alert>
       )}
 
-      <div className={styles.transactionFormButtons}>{children}</div>
+      <div className={styles.transactionFormButtons}>
+        {children}
+        {onClose && (
+          <Button
+            icon={Cross}
+            className={styles.transactionFormClose}
+            onClick={onClose}
+          >
+            Annuler
+          </Button>
+        )}
+      </div>
     </form>
   )
 }

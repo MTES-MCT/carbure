@@ -1,6 +1,6 @@
 import React from "react"
 
-import { Lots } from "../services/types"
+import { Lots, LotStatus } from "../services/types"
 import { EntitySelection } from "../hooks/helpers/use-entity"
 
 import useTransactionDetails from "../hooks/use-transaction-details"
@@ -10,6 +10,13 @@ import { AsyncButton, Button, LoaderOverlay, Title } from "../components/system"
 import { Save, Cross } from "../components/system/icons"
 import TransactionForm from "../components/transaction-form"
 import { ApiState } from "../hooks/helpers/use-api"
+
+function canSave(status: LotStatus | null) {
+  return (
+    (status !== null && status === LotStatus.Draft) ||
+    status === LotStatus.Validated
+  )
+}
 
 type TransactionDetailsProps = {
   entity: EntitySelection
@@ -22,11 +29,15 @@ const TransactionDetails = ({
   transactions,
   refresh,
 }: TransactionDetailsProps) => {
-  const { form,request, fieldErrors,  change, submit, close } = useTransactionDetails(
-    entity,
-    transactions,
-    refresh
-  )
+  const {
+    form,
+    request,
+    status,
+    fieldErrors,
+    change,
+    submit,
+    close,
+  } = useTransactionDetails(entity, transactions, refresh)
 
   return (
     <Modal onClose={close}>
@@ -37,19 +48,19 @@ const TransactionDetails = ({
         error={request.error}
         fieldErrors={fieldErrors}
         onChange={change}
+        onClose={close}
       >
-        <AsyncButton
-          submit
-          icon={Save}
-          level="primary"
-          loading={request.loading}
-          onClick={submit}
-        >
-          Sauvegarder
-        </AsyncButton>
-        <Button icon={Cross} onClick={close}>
-          Annuler
-        </Button>
+        {canSave(status) && (
+          <AsyncButton
+            submit
+            icon={Save}
+            level="primary"
+            loading={request.loading}
+            onClick={submit}
+          >
+            Sauvegarder
+          </AsyncButton>
+        )}
       </TransactionForm>
 
       {transactions.loading && <LoaderOverlay />}
