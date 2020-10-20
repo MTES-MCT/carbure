@@ -11,8 +11,8 @@ import { updateLot } from "../services/lots"
 function getFieldErrors(tx: Transaction) {
   const fieldErrors: { [k: string]: string } = {}
 
-  tx.errors.forEach(({ field, value, error }) => {
-    fieldErrors[field] = `${error} (${field} = ${value})`
+  tx.errors.forEach(({ field, error }) => {
+    fieldErrors[field] = error
   })
 
   return fieldErrors

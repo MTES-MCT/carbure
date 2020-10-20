@@ -13,6 +13,7 @@ import useTransactionSelection from "../query/use-selection"
 import useSortingSelection from "../query/use-sort-by"
 import useStatusSelection from "../query/use-status"
 import useYearSelection from "../query/use-year"
+import useInvalidSelection from "../query/use-invalid"
 
 import useEntity from "../helpers/use-entity"
 import useGetSnapshot from "./use-snapshot"
@@ -32,14 +33,15 @@ export default function useTransactions() {
   const entity = useEntity()
   const pagination = usePageSelection()
 
+  const invalid = useInvalidSelection(pagination)
   const sorting = useSortingSelection(pagination)
-  const status = useStatusSelection(pagination)
   const search = useSearchSelection(pagination)
+  const status = useStatusSelection(pagination, invalid)
   const filters = useFilterSelection(initialFilters, pagination)
-  const year = useYearSelection(pagination, filters)
+  const year = useYearSelection(pagination, filters, invalid)
 
   const snapshot = useGetSnapshot(entity, year)
-  const transactions = useGetLots(entity, status, filters, year, pagination, search, sorting) // prettier-ignore
+  const transactions = useGetLots(entity, status, filters, year, pagination, search, sorting, invalid) // prettier-ignore
 
   function refresh() {
     snapshot.getSnapshot()
@@ -63,6 +65,7 @@ export default function useTransactions() {
     transactions,
     selection,
     search,
+    invalid,
     sorting,
     deleter,
     uploader,

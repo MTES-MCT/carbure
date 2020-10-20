@@ -16,6 +16,7 @@ export const Transactions = () => {
     status,
     filters,
     year,
+    invalid,
     pagination,
     snapshot,
     transactions,
@@ -49,6 +50,7 @@ export const Transactions = () => {
         sorting={sorting}
         selection={selection}
         pagination={pagination}
+        invalid={invalid}
         uploader={uploader}
         deleter={deleter}
         validator={validator}
