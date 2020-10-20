@@ -7,7 +7,8 @@ import useEntity from "../hooks/helpers/use-entity"
 import { Redirect, Route, Switch } from "../components/relative-route"
 import Topbar from "../components/top-bar"
 import Footer from "../components/footer"
-import { Transactions, Stocks } from "./transactions"
+import Transactions from "./transactions"
+import Stocks from "./stock"
 import Settings from "./settings"
 
 type MainProps = {
