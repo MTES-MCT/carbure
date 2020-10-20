@@ -8,7 +8,11 @@ import styles from "./transaction-table.module.css"
 
 import { Table } from "./system"
 import { Check, ChevronRight, Copy, Cross } from "./system/icons"
-import { TransactionRow, TransactionRowContainer, StockTransactionRow } from "./transaction-row"
+import {
+  TransactionRow,
+  TransactionRowContainer,
+  StockTransactionRow,
+} from "./transaction-row"
 import { TransactionSelection } from "../hooks/query/use-selection"
 import { StatusSelection } from "../hooks/query/use-status"
 
@@ -18,9 +22,9 @@ const COLUMNS = [
   { key: "", label: "N° Douane" },
   { key: "client", label: "Client" },
   { key: "biocarburant", label: "Biocarburant" },
+  { key: "matiere_premiere", label: "Mat. Première" },
   { key: "pays_origine", label: "Provenance" },
   { key: "", label: "Destination" },
-  { key: "matiere_premiere", label: "Mat. Première" },
   { key: "ghg_reduction", label: "Économie" },
 ]
 
@@ -226,10 +230,7 @@ type StockTableProps = {
   sorting: SortingSelection
 }
 
-export const StockTable = ({
-  transactions,
-  sorting,
-}: StockTableProps) => {
+export const StockTable = ({ transactions, sorting }: StockTableProps) => {
   return <DisplayStockTable transactions={transactions} sorting={sorting} />
 }
 

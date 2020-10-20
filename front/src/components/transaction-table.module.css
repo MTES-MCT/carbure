@@ -12,6 +12,10 @@
   width: 88px;
 }
 
+.transactionTable thead th:nth-child(3) {
+  width: 108px;
+}
+
 .actionColumn {
   width: 82px;
   text-align: center;
