@@ -123,8 +123,15 @@
   padding-bottom: 24px;
 }
 
-.statusButton :global(.icon) {
-  margin-right: 0;
+.statusButtonAmount {
+  display: flex;
+  align-items: center;
+  height: 24px;
+}
+
+.statusButtonAmount :global(.icon) {
+  width: unset;
+  margin: 1px;
 }
 
 .activeStatusButton {

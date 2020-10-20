@@ -119,7 +119,7 @@ export const StatusButton = ({
       className
     )}
   >
-    <span>{amount}</span>
+    <span className={styles.statusButtonAmount}>{amount}</span>
     <span className={styles.statusButtonLabel}>{label}</span>
   </Button>
 )
