@@ -1,9 +1,8 @@
 import React from "react"
-import cl from "clsx"
 
 import { Lots, LotStatus } from "../services/types"
 import { SortingSelection } from "../hooks/use-transactions" // prettier-ignore
-import { PageSelection } from "./system/pagination"
+import { PageSelection } from "../hooks/query/use-pagination"
 import { ApiState } from "../hooks/helpers/use-api"
 
 import { LotGetter } from "../hooks/transactions/use-get-lots"
@@ -16,110 +15,17 @@ import { TransactionSelection } from "../hooks/query/use-selection"
 
 import styles from "./transaction-list.module.css"
 
-import {
-  AlertCircle,
-  Check,
-  Cross,
-  Rapport,
-  Download,
-  Upload,
-  Plus,
-} from "./system/icons"
-
-import { Alert, AsyncButton, Box, Button, LoaderOverlay } from "./system"
+import { AlertCircle } from "./system/icons"
+import { Alert, Box, LoaderOverlay } from "./system"
 import Pagination from "./system/pagination"
 import { TransactionTable, StockTable } from "./transaction-table"
-import { Link } from "./relative-route"
 
-
-type DraftActionProps = {
-  disabled: boolean
-  hasSelection: boolean
-  uploader: LotUploader
-  deleter: LotDeleter
-  validator: LotValidator
-}
-
-const DraftLotsActions = ({
-  disabled,
-  hasSelection,
-  uploader,
-  deleter,
-  validator,
-}: DraftActionProps) => {
-  function onValidate() {
-    if (hasSelection) {
-      validator.validateSelection()
-    } else {
-      validator.validateAllDrafts()
-    }
-  }
-
-  function onDelete() {
-    if (hasSelection) {
-      deleter.deleteSelection()
-    } else {
-      deleter.deleteAllDrafts()
-    }
-  }
-
-  return (
-    <React.Fragment>
-      <AsyncButton as="label" icon={Upload} loading={uploader.loading}>
-        Importer lots
-        <input
-          type="file"
-          style={{ display: "none" }}
-          onChange={(e) => uploader.uploadFile(e!.target.files![0])}
-        />
-      </AsyncButton>
-
-      <Link relative to="add">
-        <Button icon={Plus} level="primary">
-          Créer lot
-        </Button>
-      </Link>
-
-      <AsyncButton
-        icon={Check}
-        level="success"
-        loading={validator.loading}
-        disabled={disabled}
-        onClick={onValidate}
-      >
-        Envoyer {hasSelection ? `sélection` : "tout"}
-      </AsyncButton>
-
-      <AsyncButton
-        icon={Cross}
-        level="danger"
-        loading={deleter.loading}
-        disabled={disabled}
-        onClick={onDelete}
-      >
-        Supprimer {hasSelection ? `sélection` : "tout"}
-      </AsyncButton>
-    </React.Fragment>
-  )
-}
-
-const ValidatedLotsActions = () => (
-  <Link relative to="show-summary-out">
-    <Button
-      className={styles.transactionButtons}
-      level="primary"
-      icon={Rapport}
-    >
-      Rapport de sorties
-    </Button>
-  </Link>
-)
-
-const ActionBar = ({ children }: { children: React.ReactNode }) => (
-  <Box row className={cl(styles.actionBar)}>
-    {children}
-  </Box>
-)
+import {
+  ActionBar,
+  DraftLotsActions,
+  ExportAction,
+  ValidatedLotsActions,
+} from "./transaction-actions"
 
 type TransactionListProps = {
   transactions: LotGetter
@@ -162,9 +68,10 @@ export const TransactionList = ({
 
       {!isError && (
         <ActionBar>
-          <Button icon={Download} disabled={isEmpty} onClick={transactions.exportAllTransactions}>
-            Exporter tout
-          </Button>
+          <ExportAction
+            isEmpty={isEmpty}
+            onExportAll={transactions.exportAllTransactions}
+          />
 
           {status.active === LotStatus.Draft && (
             <DraftLotsActions
@@ -246,10 +153,7 @@ export const StockList = ({
       {!isError && !isEmpty && (
         <React.Fragment>
           <Box>
-            <StockTable
-              transactions={tx!}
-              sorting={sorting}
-            />
+            <StockTable transactions={tx!} sorting={sorting} />
             {isLoading && <LoaderOverlay />}
           </Box>
 
@@ -259,4 +163,3 @@ export const StockList = ({
     </Box>
   )
 }
-
