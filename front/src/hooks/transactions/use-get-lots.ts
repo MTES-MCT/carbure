@@ -8,6 +8,7 @@ import { SearchSelection } from "../query/use-search"
 import { SortingSelection } from "../query/use-sort-by"
 import { StatusSelection } from "../query/use-status"
 import { YearSelection } from "../query/use-year"
+import { InvalidSelection } from "../query/use-invalid"
 
 import * as api from "../../services/lots"
 import useAPI from "../helpers/use-api"
@@ -28,7 +29,8 @@ export default function useGetLots(
   year: YearSelection,
   pagination: PageSelection,
   search: SearchSelection,
-  sorting: SortingSelection
+  sorting: SortingSelection,
+  invalid: InvalidSelection
 ): LotGetter {
   const [transactions, resolveLots] = useAPI(api.getLots)
 
@@ -57,7 +59,8 @@ export default function useGetLots(
         pagination.limit,
         search.query,
         sorting.column,
-        sorting.order
+        sorting.order,
+        invalid.active
       ).cancel
     }
   }
@@ -73,6 +76,7 @@ export default function useGetLots(
     search.query,
     sorting.column,
     sorting.order,
+    invalid.active,
   ])
 
   return { ...transactions, getTransactions, exportAllTransactions }

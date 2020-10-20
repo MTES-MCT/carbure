@@ -12,11 +12,13 @@ import { LotValidator } from "../hooks/actions/use-validate-lots"
 import { LotDuplicator } from "../hooks/actions/use-duplicate-lots"
 import { StatusSelection } from "../hooks/query/use-status"
 import { TransactionSelection } from "../hooks/query/use-selection"
+import { InvalidSelection } from "../hooks/query/use-invalid"
 
 import styles from "./transaction-list.module.css"
 
 import { AlertCircle } from "./system/icons"
-import { Alert, Box, LoaderOverlay } from "./system"
+import { Box, LoaderOverlay } from "./system"
+import { Alert, AlertFilter } from "./system/alert"
 import Pagination from "./system/pagination"
 import { TransactionTable, StockTable } from "./transaction-table"
 
@@ -31,6 +33,7 @@ type TransactionListProps = {
   transactions: LotGetter
   status: StatusSelection
   sorting: SortingSelection
+  invalid: InvalidSelection
   selection: TransactionSelection
   pagination: PageSelection
   deleter: LotDeleter
@@ -43,6 +46,7 @@ export const TransactionList = ({
   transactions,
   status,
   sorting,
+  invalid,
   selection,
   pagination,
   deleter,
@@ -51,9 +55,10 @@ export const TransactionList = ({
   duplicator,
 }: TransactionListProps) => {
   const tx = transactions.data
+  const errorCount = tx?.errors ?? 0
 
   const isLoading = transactions.loading
-  const isError = typeof transactions.error === "string"
+  const isError = transactions.error !== null
   const isEmpty = tx === null || tx.lots.length === 0
 
   return (
@@ -85,6 +90,20 @@ export const TransactionList = ({
 
           {status.active === LotStatus.Validated && <ValidatedLotsActions />}
         </ActionBar>
+      )}
+
+      {errorCount > 0 && (
+        <AlertFilter
+          level="error"
+          active={invalid.active}
+          onActivate={() => invalid.setInvalid(true)}
+          onDispose={() => invalid.setInvalid(false)}
+        >
+          <AlertCircle />
+          <span>
+            <b>{errorCount} lots</b> présentent des <b>incohérences</b>
+          </span>
+        </AlertFilter>
       )}
 
       {!isError && isEmpty && (

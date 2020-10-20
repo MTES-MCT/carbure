@@ -4,6 +4,7 @@ import { PageSelection } from "../../components/system/pagination"
 import { LotStatus } from "../../services/types"
 
 import { useRelativePush } from "../../components/relative-route"
+import { InvalidSelection } from "./use-invalid"
 
 export interface StatusSelection {
   active: LotStatus
@@ -12,7 +13,8 @@ export interface StatusSelection {
 
 // manage currently selected transaction status
 export default function useStatusSelection(
-  pagination: PageSelection
+  pagination: PageSelection,
+  invalid: InvalidSelection
 ): StatusSelection {
   const push = useRelativePush()
   const params: { status: LotStatus } = useParams()
@@ -21,6 +23,7 @@ export default function useStatusSelection(
 
   function setActive(status: LotStatus) {
     pagination.setPage(0)
+    invalid.setInvalid(false)
     push(`../${status}`)
   }
 

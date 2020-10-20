@@ -160,6 +160,8 @@ export interface Lots {
   from: number
   returned: number
   total: number
+  errors: number
+
   lots: Transaction[]
 
   tx_errors: {
