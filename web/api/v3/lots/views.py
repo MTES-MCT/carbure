@@ -22,6 +22,14 @@ sort_key_to_django_field = {'period': 'lot__period',
                             'pays_origine': 'lot__pays_origine__name'}
 
 
+def transaction_with_errors(tx):
+    data = tx.natural_key()
+    tx_errors = [err.natural_key() for err in tx.transactionerror_set.all()]
+    lots_errors = [err.natural_key() for err in tx.lot.lotv2error_set.all()]
+    data['errors'] = tx_errors + lots_errors
+    return data
+
+
 def get_lots(request):
     status = request.GET.get('status', False)
     producer = request.GET.get('producer_id', False)
@@ -137,34 +145,7 @@ def get_lots(request):
 
     data = {}
 
-    raw_lot_errors = LotV2Error.objects.filter(id__in=[t.lot.id for t in returned])
-    lot_errors = {}
-    for err in raw_lot_errors:
-        if err.id not in lot_errors:
-            lot_errors[err.id] = []
-        lot_errors[err.id].append(err.natural_key())
-
-    raw_tx_errors = TransactionError.objects.filter(id__in=[t.id for t in returned])
-    tx_errors = {}
-    for err in raw_tx_errors:
-        if err.id not in tx_errors:
-            tx_errors[err.id] = []
-        tx_errors[err.id].append(err.natural_key())
-
-    deadlines = txs.filter(lot__status='Draft').annotate(month=TruncMonth(
-        'delivery_date')).values('month').annotate(total=Count('id'))
-    for d in deadlines:
-        if d['month'] is None:
-            d['deadline'] = None
-        else:
-            nextmonth = d['month'] + dateutil.relativedelta.relativedelta(months=+1)
-            (_, day) = calendar.monthrange(nextmonth.year, nextmonth.month)
-            d['deadline'] = d['month'].replace(month=nextmonth.month, day=day)
-            d['delta'] = (d['deadline'] - today).days
-    data['deadlines'] = list(deadlines)
-    data['lots'] = [t.natural_key() for t in returned]
-    data['lots_errors'] = lot_errors
-    data['tx_errors'] = tx_errors
+    data['lots'] = [transaction_with_errors(t) for t in returned]
     data['total'] = len(txs)
     data['returned'] = len(returned)
     data['from'] = from_idx
@@ -364,8 +345,8 @@ def update_lot(request):
                             status=400)
     if tx.delivery_status == 'A':
         return JsonResponse({'status': 'forbidden', 'message': "Tx / Lot already validated and accepted"}, status=400)
-    LotV2Error.objects.filter(id=tx.lot.id).delete()
-    TransactionError.objects.filter(id=tx.id).delete()
+    LotV2Error.objects.filter(lot_id=tx.lot.id).delete()
+    TransactionError.objects.filter(tx_id=tx.id).delete()
     load_lot(entity, request.user, request.POST.dict(), 'MANUAL', tx)
     return JsonResponse({'status': 'success'})
 
