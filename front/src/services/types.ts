@@ -148,6 +148,12 @@ export interface Transaction {
   carbure_delivery_site: DeliverySite | null
   unknown_delivery_site: string
   unknown_delivery_site_country: Country
+
+  errors: {
+    field: string
+    value: string
+    error: string
+  }[]
 }
 
 export interface Lots {
