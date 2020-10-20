@@ -128,39 +128,6 @@ export const StatusButton = ({
   </Button>
 )
 
-// ALERT COMPONENT
-
-type AlertProps = SystemProps &
-  React.HTMLProps<HTMLDivElement> & {
-    level?: "warning" | "error" | "info"
-    onClose?: (event: React.MouseEvent) => void
-  }
-
-export const Alert = ({
-  level,
-  children,
-  className,
-  onClose,
-  ...props
-}: AlertProps) => {
-  const divClassName = cl(styles.alert, className, {
-    [styles.alertWarning]: level === "warning",
-    [styles.alertError]: level === "error",
-  })
-
-  return (
-    <div {...props} className={divClassName}>
-      {children}
-
-      {onClose && (
-        <span className={styles.alertHide} onClick={onClose}>
-          Masquer ce message
-        </span>
-      )}
-    </div>
-  )
-}
-
 // TITLE COMPONENT
 
 type TitleProps = SystemProps & React.HTMLProps<HTMLHeadingElement>

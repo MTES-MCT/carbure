@@ -14,7 +14,8 @@ import {
   findDeliverySites,
 } from "../services/common"
 
-import { Alert, Box, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
+import { Box, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
+import { Alert } from "./system/alert"
 import AutoComplete from "./system/autocomplete"
 import { FormFields } from "../hooks/helpers/use-form"
 
@@ -270,7 +271,7 @@ const TransactionForm = ({
               placeholder="Rechercher un site de livraison..."
               name="carbure_delivery_site"
               value={tx.carbure_delivery_site}
-              error={fieldErrors.delivery_site}
+              error={fieldErrors.carbure_delivery_site_name}
               getValue={getters.depot_id}
               getLabel={getters.name}
               getQuery={findDeliverySites}
