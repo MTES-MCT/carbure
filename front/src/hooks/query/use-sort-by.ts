@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { PageSelection } from "../../components/system/pagination"
-import { Pagination } from "../../services/types"
 
 export interface SortingSelection {
   column: string
