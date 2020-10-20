@@ -47,7 +47,7 @@ def get_lots(request):
     query = request.GET.get('query', False)
     sort_by = request.GET.get('sort_by', False)
     order = request.GET.get('order', False)
-    today = datetime.date.today()
+    invalid = request.GET.get('invalid', False)
 
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
@@ -118,6 +118,9 @@ def get_lots(request):
                          Q(carbure_delivery_site__name__icontains=query) |
                          Q(unknown_delivery_site__icontains=query)
                          )
+    if invalid:
+        txs = txs.annotate(Count('transactionerror'), Count('lot__lotv2error')).filter(
+            Q(transactionerror__count__gt=0) | Q(lot__lotv2error__count__gt=0))
 
     if sort_by:
         if sort_by in sort_key_to_django_field:
