@@ -16,6 +16,41 @@ const STATUS = {
   [LotStatus.Stock]: "Stock",
 }
 
+const cells = [
+  // period
+  (tx: Transaction) => tx.lot.period,
+
+  // dae
+  (tx: Transaction) => tx.dae,
+
+  // client
+  (tx: Transaction) => tx.carbure_client?.name ?? tx.unknown_client ?? "",
+
+  // biocarburant
+  (tx: Transaction) => [tx.lot.biocarburant.name, tx.lot.volume.toString()],
+
+  // matiere premiere
+  (tx: Transaction) => [tx.lot.matiere_premiere.name, tx.lot.pays_origine.name],
+
+  // production site
+  (tx: Transaction) => [
+    tx.lot.carbure_production_site?.name ?? tx.lot.unknown_production_site,
+    tx.lot.carbure_production_site?.country.name ?? tx.lot.unknown_production_country, // prettier-ignore
+  ],
+
+  // delivery site
+  (tx: Transaction) => {
+    const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
+    const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name // prettier-ignore
+    const city = tx.carbure_delivery_site?.city // prettier-ignore
+
+    return [name ?? "", city ? `${country}, ${city}` : country]
+  },
+
+  // ghg reduction
+  (tx: Transaction) => `${tx.lot.ghg_reduction}%`,
+]
+
 const Status = ({ value }: { value: LotStatus }) => (
   <span
     className={cl(styles.status, {
@@ -34,69 +69,43 @@ const Line = ({ text, small = false }: { text: string; small?: boolean }) => (
   </span>
 )
 
-const TwoLines = ({ top, bottom }: { top: string; bottom: string }) => (
+const TwoLines = ({ text }: { text: string[] }) => (
+  <div className={styles.dualRow}>
+    <Line text={text[0]} />
+    <Line small text={text[1]} />
+  </div>
+)
+
+const TwoLines_old = ({ top, bottom }: { top: string; bottom: string }) => (
   <div className={styles.dualRow}>
     <Line text={top} />
     <Line small text={bottom} />
   </div>
 )
 
+function mapCells(getters: typeof cells, transaction: Transaction) {
+  return getters.map((getter) => getter(transaction))
+}
+
 type TxRowProps = {
   transaction: Transaction
 }
 
-export const TransactionRow = ({ transaction: tx }: TxRowProps) => (
+export const TransactionRow = ({ transaction }: TxRowProps) => (
   <React.Fragment>
     <td>
-      <Status value={getStatus(tx)} />
+      <Status value={getStatus(transaction)} />
     </td>
 
-    <td>
-      <Line text={tx.lot.period} />
-    </td>
-
-    <td>
-      <Line text={tx.dae} />
-    </td>
-
-    <td>
-      <Line text={tx.carbure_client?.name ?? tx.unknown_client ?? ""} />
-    </td>
-
-    <td>
-      <TwoLines top={tx.lot.biocarburant.name} bottom={`${tx.lot.volume}L`} />
-    </td>
-
-    <td>
-      <TwoLines
-        top={tx.lot.carbure_producer?.name ?? tx.lot.unknown_producer}
-        bottom={
-          tx.lot.carbure_production_site?.country.name ??
-          tx.lot.unknown_production_country
-        }
-      />
-    </td>
-
-    <td>
-      <TwoLines
-        top={tx.carbure_delivery_site?.city ?? tx.unknown_delivery_site ?? ""}
-        bottom={
-          tx.carbure_delivery_site?.country.name ??
-          tx.unknown_delivery_site_country?.name
-        }
-      />
-    </td>
-
-    <td>
-      <TwoLines
-        top={tx.lot.matiere_premiere.name}
-        bottom={tx.lot.pays_origine.name}
-      />
-    </td>
-
-    <td>
-      <Line text={`${tx.lot.ghg_reduction}%`} />
-    </td>
+    {mapCells(cells, transaction).map((value, i) => (
+      <td>
+        {Array.isArray(value) ? (
+          <TwoLines key={i} text={value} />
+        ) : (
+          <Line key={i} text={value} />
+        )}
+      </td>
+    ))}
   </React.Fragment>
 )
 
@@ -125,17 +134,19 @@ export const TransactionRowContainer = ({
 
 export const StockTransactionRow = ({ transaction: tx }: TxRowProps) => (
   <React.Fragment>
-
     <td>
       <Line text={tx.lot.carbure_id} />
     </td>
 
     <td>
-      <TwoLines top={tx.lot.biocarburant.name} bottom={`${tx.lot.volume}L`} />
+      <TwoLines_old
+        top={tx.lot.biocarburant.name}
+        bottom={`${tx.lot.volume}L`}
+      />
     </td>
 
     <td>
-      <TwoLines
+      <TwoLines_old
         top={tx.lot.carbure_producer?.name ?? tx.lot.unknown_producer}
         bottom={
           tx.lot.carbure_production_site?.country.name ??
@@ -145,7 +156,7 @@ export const StockTransactionRow = ({ transaction: tx }: TxRowProps) => (
     </td>
 
     <td>
-      <TwoLines
+      <TwoLines_old
         top={tx.carbure_delivery_site?.city ?? tx.unknown_delivery_site ?? ""}
         bottom={
           tx.carbure_delivery_site?.country.name ??
@@ -155,7 +166,7 @@ export const StockTransactionRow = ({ transaction: tx }: TxRowProps) => (
     </td>
 
     <td>
-      <TwoLines
+      <TwoLines_old
         top={tx.lot.matiere_premiere.name}
         bottom={tx.lot.pays_origine.name}
       />
