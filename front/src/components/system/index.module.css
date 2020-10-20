@@ -149,50 +149,6 @@
   color: var(--blue-medium);
 }
 
-/* ALERT COMPONENT */
-
-.alert {
-  display: flex;
-  position: relative;
-  align-items: center;
-  font-size: 14px;
-  border: 1px solid var(--gray-medium);
-  background-color: var(--gray-light);
-  border-radius: 5px;
-  padding: 8px 16px;
-}
-
-.alertHide {
-  color: var(--blue-dark);
-  text-decoration: underline;
-  cursor: pointer;
-  margin-left: auto;
-}
-
-.alertWarning {
-  border-color: var(--orange-medium);
-  background-color: var(--orange-light);
-}
-
-.alertError {
-  border-color: var(--red-medium);
-  background-color: var(--red-light);
-}
-
-.alert :global(.icon) {
-  width: 20px;
-  margin-right: 8px;
-  stroke: var(--gray-dark);
-}
-
-.alertWarning :global(.icon) {
-  stroke: var(--orange-dark);
-}
-
-.alertError :global(.icon) {
-  stroke: var(--red-dark);
-}
-
 /* TITLE COMPONENT */
 
 .title {
