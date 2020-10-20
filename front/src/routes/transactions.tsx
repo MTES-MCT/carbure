@@ -9,6 +9,7 @@ import { TransactionList } from "../components/transaction-list"
 import TransactionDetails from "./transaction-details"
 import TransactionAdd from "./transaction-add"
 import TransactionOutSummary from "./transaction-out-summary"
+import TransactionFilters from "../components/transaction-filters"
 
 export const Transactions = () => {
   const {
@@ -36,12 +37,12 @@ export const Transactions = () => {
 
   return (
     <Main>
-      <TransactionSnapshot
-        snapshot={snapshot}
-        status={status}
+      <TransactionSnapshot snapshot={snapshot} status={status} year={year} />
+
+      <TransactionFilters
         filters={filters}
-        year={year}
         search={search}
+        options={snapshot.data?.filters}
       />
 
       <TransactionList
