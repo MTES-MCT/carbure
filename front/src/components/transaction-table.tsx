@@ -4,6 +4,9 @@ import cl from "clsx"
 import { Lots, LotStatus } from "../services/types"
 import { SortingSelection } from "../hooks/query/use-sort-by" // prettier-ignore
 
+import { TransactionSelection } from "../hooks/query/use-selection"
+import { StatusSelection } from "../hooks/query/use-status"
+
 import styles from "./transaction-table.module.css"
 
 import { Table } from "./system"
@@ -13,8 +16,6 @@ import {
   TransactionRowContainer,
   StockTransactionRow,
 } from "./transaction-row"
-import { TransactionSelection } from "../hooks/query/use-selection"
-import { StatusSelection } from "../hooks/query/use-status"
 
 const COLUMNS = [
   { key: "", label: "Statut" },
@@ -94,13 +95,12 @@ const DisplayTable = ({ transactions, sorting }: DisplayTableProps) => (
     <TransactionColumns sorting={sorting}>
       <th />
     </TransactionColumns>
-
     <tbody>
       {transactions.lots.map((tx) => (
         <TransactionRowContainer
           key={tx.id}
           id={tx.id}
-          error={hasErrors(transactions, tx.id)}
+          error={tx.errors.length > 0}
         >
           <td />
           <TransactionRow transaction={tx} />
@@ -151,7 +151,7 @@ const ActionTable = ({
           <TransactionRowContainer
             key={tx.id}
             id={tx.id}
-            error={hasErrors(transactions, tx.id)}
+            error={tx.errors.length > 0}
           >
             <td>
               <input

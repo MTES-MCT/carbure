@@ -98,11 +98,11 @@ export const TransactionRow = ({ transaction }: TxRowProps) => (
     </td>
 
     {mapCells(cells, transaction).map((value, i) => (
-      <td>
+      <td key={i}>
         {Array.isArray(value) ? (
-          <TwoLines key={i} text={value} />
+          <TwoLines text={value} />
         ) : (
-          <Line key={i} text={value} />
+          <Line text={value} />
         )}
       </td>
     ))}
@@ -125,7 +125,7 @@ export const TransactionRowContainer = ({
   return (
     <tr
       className={cl(styles.transactionRow, error && styles.transactionRowError)}
-      onClick={() => relativePush(`/${id}`)}
+      onClick={() => relativePush(`${id}`)}
     >
       {children}
     </tr>

@@ -8,30 +8,11 @@ import useAPI, { ApiState } from "./helpers/use-api"
 import useClose from "./helpers/use-close"
 import { updateLot } from "../services/lots"
 
-interface ErrorData {
-  field: string
-  value: string
-  error: string
-}
-
-function stringifyError({ field, value, error }: ErrorData) {
-  return `${error} (${field} = ${value})`
-}
-
-function getFieldErrors(tx: Transaction, transactions: Lots) {
-  if (transactions === null) return {}
-
+function getFieldErrors(tx: Transaction) {
   const fieldErrors: { [k: string]: string } = {}
 
-  const lotsErrors = transactions.lots_errors[tx.lot.id] ?? []
-  const txErrors = transactions.tx_errors[tx.id] ?? []
-
-  lotsErrors.forEach((err) => {
-    fieldErrors[err.field] = stringifyError(err)
-  })
-
-  txErrors.forEach((err) => {
-    fieldErrors[err.field] = stringifyError(err)
+  tx.errors.forEach(({ field, value, error }) => {
+    fieldErrors[field] = `${error} (${field} = ${value})`
   })
 
   return fieldErrors
@@ -55,10 +36,7 @@ export default function useTransactionDetails(
     (lot) => lot.id === transactionID
   )
 
-  const fieldErrors =
-    transaction && transactions.data
-      ? getFieldErrors(transaction, transactions.data)
-      : {}
+  const fieldErrors = transaction ? getFieldErrors(transaction) : {}
 
   // if form data is not initialized, fill it instantly with data coming from transaction list
   if (transactions.data && (form.id === -1 || form.id !== transactionID)) {
