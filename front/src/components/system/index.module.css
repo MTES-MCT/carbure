@@ -123,6 +123,10 @@
   padding-bottom: 24px;
 }
 
+.statusButton :global(.icon) {
+  margin-right: 0;
+}
+
 .activeStatusButton {
   border-bottom: 4px solid var(--blue-medium);
   padding-bottom: 21px;

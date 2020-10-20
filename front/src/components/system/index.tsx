@@ -100,7 +100,7 @@ export const AsyncButton = ({
 
 type StatusButtonProps = ButtonProps & {
   active: boolean
-  amount: number | string
+  amount: React.ReactNode
   label: string
 }
 
