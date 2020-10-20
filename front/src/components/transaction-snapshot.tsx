@@ -41,72 +41,41 @@ function mapFilters(
 type TransactionSnapshotProps = {
   snapshot: ApiState<Snapshot>
   status: StatusSelection
-  filters: FilterSelection
   year: YearSelection
-  search: SearchSelection
 }
 
 export const TransactionSnapshot = ({
   snapshot,
   status,
-  filters,
   year,
-  search,
 }: TransactionSnapshotProps) => (
-  <Box className={styles.transactionSnapshot}>
-    <div className={styles.transactionSummary}>
-      <div className={styles.transactionHeader}>
-        <Title>Transactions</Title>
+  <div className={styles.transactionSnapshot}>
+    <div className={styles.transactionHeader}>
+      <Title>Transactions</Title>
 
-        <Select
-          level="primary"
-          className={styles.transactionYear}
-          value={year.selected}
-          placeholder={snapshot.loading ? "…" : "Choisir une année"}
-          options={snapshot.data?.years ?? []}
-          onChange={(value) => year.setYear(value as number)}
-        />
-      </div>
-
-      <div className={styles.transactionStatus}>
-        {TRANSACTIONS_STATUS.map(({ key, label }) => (
-          <StatusButton
-            key={key}
-            active={key === status.active}
-            loading={snapshot.loading}
-            amount={snapshot.data?.lots[key] ?? 0}
-            label={label}
-            onClick={() => status.setActive(key)}
-          />
-        ))}
-      </div>
-    </div>
-
-    <div className={styles.transactionFilters}>
-      <div className={styles.filterGroup}>
-        {mapFilters(filters.selected).map(([filter, label, value]) => (
-          <Select
-            clear
-            search
-            multiple
-            key={filter}
-            value={value}
-            placeholder={label}
-            options={snapshot.data?.filters[filter] ?? []}
-            onChange={(value) => filters.select(filter, value)}
-          />
-        ))}
-      </div>
-
-      <SearchInput
-        className={styles.searchInput}
-        placeholder="Rechercher un lot"
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          search.setQuery(e.target.value)
-        }
+      <Select
+        level="primary"
+        className={styles.transactionYear}
+        value={year.selected}
+        placeholder={snapshot.loading ? "…" : "Choisir une année"}
+        options={snapshot.data?.years ?? []}
+        onChange={(value) => year.setYear(value as number)}
       />
     </div>
-  </Box>
+
+    <div className={styles.transactionStatus}>
+      {TRANSACTIONS_STATUS.map(({ key, label }) => (
+        <StatusButton
+          key={key}
+          active={key === status.active}
+          loading={snapshot.loading}
+          amount={snapshot.data?.lots[key] ?? 0}
+          label={label}
+          onClick={() => status.setActive(key)}
+        />
+      ))}
+    </div>
+  </div>
 )
 
 type StockSnapshotProps = {

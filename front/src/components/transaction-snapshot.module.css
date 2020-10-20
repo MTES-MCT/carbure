@@ -1,9 +1,4 @@
 .transactionSnapshot {
-  display: flex;
-  flex-direction: column;
-}
-
-.transactionSummary {
   background-color: var(--gray-light);
   padding: 32px 120px;
   margin-top: 1px;
@@ -39,34 +34,4 @@
 
 .transactionStatus button:last-child {
   margin-right: 0;
-}
-
-.transactionFilters {
-  display: flex;
-  justify-content: space-between;
-  padding: 16px 120px;
-  background-color: var(--white);
-  box-shadow: 0px 1px 2px var(--gray-medium);
-}
-
-.filterGroup {
-  display: flex;
-}
-
-.filterGroup > div {
-  margin-right: 8px;
-}
-
-.filterGroup > div {
-  width: 155px;
-}
-
-.searchInput input {
-  width: 165px;
-  height: 100%;
-  background-color: var(--gray-light);
-}
-
-.transactionButtons {
-  margin-left: 4px;
 }
