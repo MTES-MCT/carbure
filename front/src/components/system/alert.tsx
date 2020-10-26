@@ -54,7 +54,7 @@ export const AlertFilter = ({
 
   return (
     <Alert {...props} className={styles.alertFilter}>
-      {children}
+      <span>{children}</span>
 
       {active ? (
         <span className={styles.alertLink} onClick={onDispose}>
