@@ -44,16 +44,26 @@
   cursor: pointer;
 }
 
-.transactionRowError > td:first-child {
+.transactionRowError > td:first-child,
+.transactionRowDeadline > td:first-child {
   position: relative;
 }
 
-.transactionRowError > td:first-child::after {
-  border-left: 4px solid var(--red-dark);
+.transactionRowError > td:first-child::after,
+.transactionRowDeadline > td:first-child::after {
+  border-left: 4px solid;
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   bottom: 0;
   width: 4px;
+}
+
+.transactionRowDeadline > td:first-child::after {
+  border-color: var(--orange-dark);
+}
+
+.transactionRowError > td:first-child::after {
+  border-color: var(--red-dark);
 }

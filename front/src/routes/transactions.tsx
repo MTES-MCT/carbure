@@ -18,6 +18,7 @@ export const Transactions = () => {
     filters,
     year,
     invalid,
+    deadline,
     pagination,
     snapshot,
     transactions,
@@ -52,6 +53,7 @@ export const Transactions = () => {
         selection={selection}
         pagination={pagination}
         invalid={invalid}
+        deadline={deadline}
         uploader={uploader}
         deleter={deleter}
         validator={validator}
