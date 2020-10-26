@@ -13,7 +13,7 @@ def get_settings(request):
 
     # user-rights
     rights = UserRights.objects.filter(user=request.user)
-    rights_sez = [{'entity': r.entity.natural_key()} for r in rights]
+    rights_sez = [{'entity': r.entity.natural_key(), 'rights': 'rw'} for r in rights]
     return JsonResponse({'status': 'success', 'data': {'rights': rights_sez, 'email': request.user.email}})
 
 
