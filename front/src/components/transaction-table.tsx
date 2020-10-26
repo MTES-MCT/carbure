@@ -9,8 +9,6 @@ import { StatusSelection } from "../hooks/query/use-status"
 
 import styles from "./transaction-table.module.css"
 
-import { getStatus } from "../services/lots"
-
 import { Table } from "./system"
 import { Check, ChevronRight, Copy, Cross } from "./system/icons"
 import {
@@ -90,7 +88,7 @@ function hasErrors(transactions: Lots, id: number): boolean {
 function hasDeadline(transactions: Lots, id: number): boolean {
   const tx = transactions.lots.find((tx) => tx.id === id)
 
-  if (!tx || getStatus(tx) !== LotStatus.Draft) return false
+  if (!tx || tx.status !== LotStatus.Draft) return false
 
   const deadline = new Date(transactions.deadlines.date)
   const deliveryDate = new Date(tx?.delivery_date)
