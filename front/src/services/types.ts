@@ -23,6 +23,8 @@ export interface Entity {
   id: number
   name: string
   entity_type: string
+  has_mac: boolean
+  has_trading: boolean
 }
 
 export interface Country {
@@ -199,7 +201,12 @@ export interface Snapshot {
 
 export interface Settings {
   email: string
-  rights: { entity: Entity }[]
+  rights: UserRight[]
+}
+
+export interface UserRight {
+  entity: Entity
+  rights: string
 }
 
 export interface StockSnapshot {
