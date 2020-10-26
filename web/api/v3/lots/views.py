@@ -195,7 +195,7 @@ def get_lots(request):
     if not export:
         return JsonResponse({'status': 'success', 'data': data})
     else:
-        file_location = create_xslx_from_transactions(producer, returned)
+        file_location = create_xslx_from_transactions(entity, returned)
         with open(file_location, "rb") as excel:
             data = excel.read()
             ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"

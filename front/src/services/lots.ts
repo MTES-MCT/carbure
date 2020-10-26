@@ -147,7 +147,7 @@ export function downloadLots(
 ) {
   return api.download("/lots", {
     ...filters,
-    producer_id: producerID,
+    entity_id: producerID,
     sort_by: sortBy,
     status,
     year,
