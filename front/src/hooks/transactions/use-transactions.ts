@@ -16,9 +16,10 @@ import useYearSelection from "../query/use-year"
 import useInvalidSelection from "../query/use-invalid"
 import useDeadlineSelection from "../query/use-deadline"
 
-import useEntity from "../helpers/use-entity"
+import useEntity, { EntitySelection } from "../helpers/use-entity"
 import useGetSnapshot from "./use-snapshot"
 import useGetLots from "./use-get-lots"
+import { AppHook } from "../use-app"
 
 const initialFilters = {
   [Filters.Biocarburants]: null,
@@ -30,8 +31,7 @@ const initialFilters = {
   [Filters.DeliverySites]: null,
 }
 
-export default function useTransactions() {
-  const entity = useEntity()
+export default function useTransactions(entity: EntitySelection) {
   const pagination = usePageSelection()
 
   const invalid = useInvalidSelection(pagination)

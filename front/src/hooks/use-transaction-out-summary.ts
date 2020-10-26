@@ -22,7 +22,7 @@ export default function useTransactionOutSummary(entity: EntitySelection) {
 
   useEffect(() => {
     if (entity !== null) {
-      resolve(entity)
+      resolve(entity.id)
     }
   }, [resolve, entity])
 

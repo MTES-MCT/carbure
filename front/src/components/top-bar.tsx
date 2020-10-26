@@ -45,33 +45,23 @@ type UserMenuProps = {
   entity: EntitySelection
 }
 
-const UserMenu = ({ settings, entity }: UserMenuProps) => {
-  const selected = settings.data?.rights.find(
-    (right) => right.entity.id === entity
-  )
-
-  return (
-    <Menu className={styles.userMenu} label={selected?.entity.name ?? "Menu"}>
-      <Menu.Group label="Organisations">
-        {settings.data?.rights.map((right) => (
-          <Menu.Item key={right.entity.id} to={`/org/${right.entity.id}`}>
-            {right.entity.name}
-          </Menu.Item>
-        ))}
-      </Menu.Group>
-
-      <Menu.Group label="Utilisateur">
-        <Menu.Item>{settings.data?.email}</Menu.Item>
-        <Menu.Item to={`/org/${selected?.entity.id}/settings`}>
-          Paramètres
+const UserMenu = ({ settings, entity }: UserMenuProps) => (
+  <Menu className={styles.userMenu} label={entity?.name ?? "Menu"}>
+    <Menu.Group label="Organisations">
+      {settings.data?.rights.map((right) => (
+        <Menu.Item key={right.entity.id} to={`/org/${right.entity.id}`}>
+          {right.entity.name}
         </Menu.Item>
-        <Menu.Item to="/logout">
-          Se déconnecter
-        </Menu.Item>
-      </Menu.Group>
-    </Menu>
-  )
-}
+      ))}
+    </Menu.Group>
+
+    <Menu.Group label="Utilisateur">
+      <Menu.Item>{settings.data?.email}</Menu.Item>
+      <Menu.Item to={`/org/${entity?.id}/settings`}>Paramètres</Menu.Item>
+      <Menu.Item to="/logout">Se déconnecter</Menu.Item>
+    </Menu.Group>
+  </Menu>
+)
 
 type TopbarProps = {
   entity: EntitySelection

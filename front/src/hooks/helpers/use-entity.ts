@@ -1,10 +1,13 @@
 import { useParams } from "react-router-dom"
 
-export type EntitySelection = number | null
+import { Entity } from "../../services/types"
+import { AppHook } from "../use-app"
 
-export default function useEntity(): EntitySelection {
+export type EntitySelection = Entity | null
+
+export default function useEntity(app: AppHook): EntitySelection {
   const params: { entity: string } = useParams()
   const entity = parseInt(params.entity, 10)
 
-  return isNaN(entity) ? null : entity
+  return isNaN(entity) ? null : app.getEntity(entity)
 }

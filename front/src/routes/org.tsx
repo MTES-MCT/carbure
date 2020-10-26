@@ -16,23 +16,23 @@ type MainProps = {
 }
 
 const Org = ({ app }: MainProps) => {
-  const entity = useEntity()
+  const entity = useEntity(app)
 
-  if (!app.hasEntity(entity!)) {
+  if (!entity) {
     return <Redirect to="/" />
   }
 
   return (
     <React.Fragment>
-      <Topbar settings={app.settings} entity={entity} />
+      <Topbar entity={entity} settings={app.settings} />
 
       <Switch>
         <Route relative path="stocks">
-          <Stocks />
+          <Stocks entity={entity} />
         </Route>
 
         <Route relative path="transactions/:status">
-          <Transactions />
+          <Transactions entity={entity} />
         </Route>
 
         <Route relative path="settings">

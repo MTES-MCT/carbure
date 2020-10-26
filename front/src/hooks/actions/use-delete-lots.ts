@@ -30,7 +30,7 @@ export default function useDeleteLots(
     )
 
     if (entity !== null && shouldDelete) {
-      resolveDelete(entity, [lotID]).then(refresh)
+      resolveDelete(entity.id, [lotID]).then(refresh)
     }
   }
 
@@ -41,7 +41,7 @@ export default function useDeleteLots(
     )
 
     if (entity !== null && shouldDelete) {
-      resolveDelete(entity, selection.selected).then(refresh)
+      resolveDelete(entity.id, selection.selected).then(refresh)
     }
   }
 
@@ -52,7 +52,7 @@ export default function useDeleteLots(
     )
 
     if (entity !== null && shouldDelete) {
-      resolveDeleteAll(entity, year.selected).then(refresh)
+      resolveDeleteAll(entity.id, year.selected).then(refresh)
     }
   }
 

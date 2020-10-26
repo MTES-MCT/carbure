@@ -1,10 +1,12 @@
-
 import { useEffect } from "react"
 import { Filters, Lots } from "../services/types"
 import useAPI from "./helpers/use-api"
 import { getStocks, getStockSnapshot } from "../services/lots"
-import useEntity, { EntitySelection } from "./helpers/use-entity"
-import { PageSelection, usePageSelection } from "../components/system/pagination"
+import { EntitySelection } from "./helpers/use-entity"
+import {
+  PageSelection,
+  usePageSelection,
+} from "../components/system/pagination"
 import useFilterSelection, { FilterSelection } from "./query/use-filters"
 import useSearchSelection, { SearchSelection } from "./query/use-search"
 import useSortingSelection, { SortingSelection } from "./query/use-sort-by"
@@ -21,7 +23,7 @@ function useGetStockSnapshot(entity: EntitySelection) {
 
   function resolve() {
     if (entity !== null) {
-      return resolveStockSnapshot(entity).cancel
+      return resolveStockSnapshot(entity.id).cancel
     }
   }
 
@@ -43,7 +45,7 @@ function useGetStocks(
   function resolve() {
     if (entity !== null) {
       return resolveStocks(
-        entity,
+        entity.id,
         filters.selected,
         pagination.page,
         pagination.limit,
@@ -75,9 +77,7 @@ const initialFilters = {
   [Filters.DeliverySites]: null,
 }
 
-export function useStocks() {
-  const entity = useEntity()
-
+export function useStocks(entity: EntitySelection) {
   const pagination = usePageSelection()
   const sorting = useSortingSelection(pagination)
 
@@ -91,7 +91,6 @@ export function useStocks() {
   }
 
   return {
-    entity,
     filters,
     pagination,
     snapshot,
