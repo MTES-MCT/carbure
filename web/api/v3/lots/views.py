@@ -153,6 +153,7 @@ def get_lots(request):
 
     data['lots'] = [tx_natural_key_with_errors(t) for t in returned]
     data['total'] = len(txs)
+    data['deadlines'] = {'date': deadline_date, 'total': deadline_total}
     data['returned'] = len(returned)
     data['from'] = from_idx
     data['errors'] = tx_with_errors.count()
