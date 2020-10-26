@@ -18,7 +18,7 @@ export default function useUploadLotFile(
 
   async function uploadFile(file: File) {
     if (entity !== null) {
-      resolveUpload(entity, file).then(refresh)
+      resolveUpload(entity.id, file).then(refresh)
     }
   }
 

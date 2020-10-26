@@ -23,7 +23,7 @@ export default function useGetSnapshot(
 
   function getSnapshot() {
     if (entity !== null) {
-      return resolveSnapshot(entity, year.selected).cancel
+      return resolveSnapshot(entity.id, year.selected).cancel
     }
   }
 

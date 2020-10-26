@@ -17,7 +17,7 @@ export default function useTransactionAdd(
   async function submit() {
     if (entity === null) return
 
-    const res = await resolve(entity, form)
+    const res = await resolve(entity.id, form)
 
     if (res) {
       refresh()

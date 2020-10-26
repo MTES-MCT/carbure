@@ -1,42 +1,38 @@
 import React from "react"
 
-import { useStocks } from "../hooks/use-stock"
+import { EntitySelection } from "../hooks/helpers/use-entity"
 
+import { useStocks } from "../hooks/use-stock"
 import { Main } from "../components/system"
 import { StocksSnapshot } from "../components/transaction-snapshot"
 import { StockList } from "../components/transaction-list"
 
-export const Stocks = () => {
+export const Stocks = ({ entity }: { entity: EntitySelection }) => {
   const {
-   entity,
-   filters,
-   pagination,
-   snapshot,
-   transactions,
-   search,
-   sorting,
-   refresh,
- } = useStocks()
+    filters,
+    pagination,
+    snapshot,
+    transactions,
+    search,
+    sorting,
+    refresh,
+  } = useStocks(entity)
 
- if (entity === null) {
-   return null
- }
+  if (entity === null) {
+    return null
+  }
 
- return (
-   <Main>
-     <StocksSnapshot
-       snapshot={snapshot}
-       filters={filters}
-       search={search}
-     />
+  return (
+    <Main>
+      <StocksSnapshot snapshot={snapshot} filters={filters} search={search} />
 
-     <StockList
-       transactions={transactions}
-       sorting={sorting}
-       pagination={pagination}
-     />
-   </Main>
- )
+      <StockList
+        transactions={transactions}
+        sorting={sorting}
+        pagination={pagination}
+      />
+    </Main>
+  )
 }
 
 export default Stocks

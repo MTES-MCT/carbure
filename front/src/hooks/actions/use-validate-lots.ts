@@ -30,7 +30,7 @@ export default function useValidateLots(
     )
 
     if (entity !== null && shouldValidate) {
-      resolveValidate(entity, [lotID]).then(refresh)
+      resolveValidate(entity.id, [lotID]).then(refresh)
     }
   }
 
@@ -41,7 +41,7 @@ export default function useValidateLots(
     )
 
     if (entity !== null && shouldValidate) {
-      resolveValidate(entity, selection.selected).then(refresh)
+      resolveValidate(entity.id, selection.selected).then(refresh)
     }
   }
 
@@ -52,7 +52,7 @@ export default function useValidateLots(
     )
 
     if (entity !== null && shouldValidate) {
-      resolveValidateAll(entity, year.selected).then(refresh)
+      resolveValidateAll(entity.id, year.selected).then(refresh)
     }
   }
 

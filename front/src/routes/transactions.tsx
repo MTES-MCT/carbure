@@ -1,5 +1,7 @@
 import React from "react"
 
+import { EntitySelection } from "../hooks/helpers/use-entity"
+
 import useTransactions from "../hooks/transactions/use-transactions"
 
 import { Main } from "../components/system"
@@ -11,9 +13,8 @@ import TransactionAdd from "./transaction-add"
 import TransactionOutSummary from "./transaction-out-summary"
 import TransactionFilters from "../components/transaction-filters"
 
-export const Transactions = () => {
+export const Transactions = ({ entity }: { entity: EntitySelection }) => {
   const {
-    entity,
     status,
     filters,
     year,
@@ -30,7 +31,7 @@ export const Transactions = () => {
     validator,
     uploader,
     refresh,
-  } = useTransactions()
+  } = useTransactions(entity)
 
   if (entity === null) {
     return null

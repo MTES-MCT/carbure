@@ -40,7 +40,7 @@ export default function useGetLots(
     if (entity !== null) {
       api.downloadLots(
         status.active,
-        entity,
+        entity.id,
         filters.selected,
         year.selected,
         search.query,
@@ -54,7 +54,7 @@ export default function useGetLots(
     if (entity !== null) {
       return resolveLots(
         status.active,
-        entity,
+        entity.id,
         filters.selected,
         year.selected,
         pagination.page,
@@ -71,7 +71,7 @@ export default function useGetLots(
   useEffect(getTransactions, [
     resolveLots,
     status.active,
-    entity,
+    entity?.id,
     filters.selected,
     year.selected,
     pagination.page,

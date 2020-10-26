@@ -23,7 +23,7 @@ export default function useDuplicateLot(
     )
 
     if (entity !== null && shouldDuplicate) {
-      resolveDuplicate(entity, lotID).then(refresh)
+      resolveDuplicate(entity.id, lotID).then(refresh)
     }
   }
 
