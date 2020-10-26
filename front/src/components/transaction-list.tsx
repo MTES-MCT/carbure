@@ -64,8 +64,7 @@ export const TransactionList = ({
   return (
     <Box className={styles.transactionList}>
       {isError && (
-        <Alert level="error">
-          <AlertCircle />
+        <Alert level="error" icon={AlertCircle}>
           {transactions.error}
           {isLoading && <LoaderOverlay />}
         </Alert>
@@ -95,11 +94,11 @@ export const TransactionList = ({
       {errorCount > 0 && (
         <AlertFilter
           level="error"
+          icon={AlertCircle}
           active={invalid.active}
           onActivate={() => invalid.setInvalid(true)}
           onDispose={() => invalid.setInvalid(false)}
         >
-          <AlertCircle />
           <span>
             <b>{errorCount} lots</b> présentent des <b>incohérences</b>
           </span>
@@ -107,8 +106,7 @@ export const TransactionList = ({
       )}
 
       {!isError && isEmpty && (
-        <Alert level="warning">
-          <AlertCircle />
+        <Alert level="warning" icon={AlertCircle}>
           Aucune transaction trouvée pour ces paramètres
           {isLoading && <LoaderOverlay />}
         </Alert>
@@ -156,15 +154,13 @@ export const StockList = ({
   return (
     <Box className={styles.transactionList}>
       {isError && (
-        <Alert level="error">
-          <AlertCircle />
+        <Alert level="error" icon={AlertCircle}>
           {transactions.error}
         </Alert>
       )}
 
       {!isError && isEmpty && (
-        <Alert level="warning">
-          <AlertCircle />
+        <Alert level="warning" icon={AlertCircle}>
           Aucune transaction trouvée pour ces paramètres
         </Alert>
       )}

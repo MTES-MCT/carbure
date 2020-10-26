@@ -8,11 +8,18 @@ import { SystemProps } from "./index"
 
 export type AlertProps = SystemProps &
   React.HTMLProps<HTMLDivElement> & {
+    icon?: React.ComponentType
     level?: "warning" | "error" | "info"
     onClose?: (event: React.MouseEvent) => void
   }
 
-export const Alert = ({ level, children, className, ...props }: AlertProps) => {
+export const Alert = ({
+  level,
+  icon: AlertIcon,
+  children,
+  className,
+  ...props
+}: AlertProps) => {
   const divClassName = cl(styles.alert, className, {
     [styles.alertWarning]: level === "warning",
     [styles.alertError]: level === "error",
@@ -20,6 +27,7 @@ export const Alert = ({ level, children, className, ...props }: AlertProps) => {
 
   return (
     <div {...props} className={divClassName}>
+      {AlertIcon && <AlertIcon />}
       {children}
     </div>
   )
