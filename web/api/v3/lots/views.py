@@ -38,6 +38,7 @@ def get_lots(request):
     query = request.GET.get('query', False)
     sort_by = request.GET.get('sort_by', False)
     order = request.GET.get('order', False)
+    today = datetime.date.today()
 
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
