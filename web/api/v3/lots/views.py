@@ -33,7 +33,7 @@ def tx_natural_key_with_errors(tx):
 
 def get_lots(request):
     status = request.GET.get('status', False)
-    producer = request.GET.get('producer_id', False)
+    entity = request.GET.get('entity_id', False)
     year = request.GET.get('year', False)
     periods = request.GET.getlist('periods')
     production_sites = request.GET.getlist('production_sites')
@@ -53,19 +53,19 @@ def get_lots(request):
 
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
-    if producer is None:
-        return JsonResponse({'status': 'error', 'message': "Missing producer_id"}, status=400)
+    if entity is None:
+        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
     try:
-        producer = Entity.objects.get(id=producer, entity_type='Producteur')
+        entity = Entity.objects.get(id=entity)
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown producer %s" % (producer), 'extra': str(e)},
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity), 'extra': str(e)},
                             status=400)
 
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if producer not in rights:
+    if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    txs = LotTransaction.objects.filter(lot__added_by=producer)
+    txs = LotTransaction.objects.filter(lot__added_by=entity)
 
     # filter by status
     if status == 'draft':
@@ -187,8 +187,8 @@ def get_snapshot(request):
     data = {}
     year = request.GET.get('year', False)
     today = datetime.date.today()
-    date_from = datetime.date.today().replace(month=1, day=1)
-    date_until = datetime.date.today().replace(month=12, day=31)
+    date_from = today.replace(month=1, day=1)
+    date_until = today().replace(month=12, day=31)
     if year:
         try:
             year = int(year)
@@ -196,20 +196,20 @@ def get_snapshot(request):
             date_until = datetime.date(year=year, month=12, day=31)
         except Exception:
             return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
-    producer = request.GET.get('producer_id', False)
-    if producer is None:
-        return JsonResponse({'status': 'error', 'message': "Missing producer_id"}, status=400)
+    entity = request.GET.get('entity_id', False)
+    if entity is None:
+        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
     try:
-        producer = Entity.objects.get(id=producer, entity_type='Producteur')
+        entity = Entity.objects.get(id=entity)
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown producer %s" % (producer), 'extra': str(e)},
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity), 'extra': str(e)},
                             status=400)
 
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if producer not in rights:
+    if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    txs = LotTransaction.objects.filter(lot__added_by=producer)
+    txs = LotTransaction.objects.filter(lot__added_by=entity)
     data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
 
     txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
