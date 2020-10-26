@@ -38,9 +38,9 @@ export default function useTransactions() {
   const deadline = useDeadlineSelection(pagination)
   const sorting = useSortingSelection(pagination)
   const search = useSearchSelection(pagination)
-  const status = useStatusSelection(pagination, invalid)
   const filters = useFilterSelection(initialFilters, pagination)
-  const year = useYearSelection(pagination, filters, invalid)
+  const status = useStatusSelection(pagination, invalid, deadline)
+  const year = useYearSelection(pagination, filters, invalid, deadline)
 
   const snapshot = useGetSnapshot(entity, year)
   const transactions = useGetLots(entity, status, filters, year, pagination, search, sorting, invalid, deadline) // prettier-ignore
