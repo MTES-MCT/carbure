@@ -6,8 +6,8 @@ import { EntitySelection } from "../hooks/helpers/use-entity"
 import useTransactionDetails from "../hooks/use-transaction-details"
 
 import Modal from "../components/system/modal"
-import { AsyncButton, Button, LoaderOverlay, Title } from "../components/system"
-import { Save, Cross } from "../components/system/icons"
+import { AsyncButton, LoaderOverlay, Title } from "../components/system"
+import { Save } from "../components/system/icons"
 import TransactionForm from "../components/transaction-form"
 import { ApiState } from "../hooks/helpers/use-api"
 
@@ -44,6 +44,7 @@ const TransactionDetails = ({
       <Title>Transaction #{form.id ?? "N/A"}</Title>
 
       <TransactionForm
+        readOnly={!canSave(status)}
         transaction={form}
         error={request.error}
         fieldErrors={fieldErrors}

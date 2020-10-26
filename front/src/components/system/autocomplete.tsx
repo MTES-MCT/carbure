@@ -51,6 +51,7 @@ function AutoComplete<T>({
   value,
   name,
   options,
+  readOnly,
   onChange,
   getValue,
   getLabel,
@@ -70,21 +71,24 @@ function AutoComplete<T>({
       <LabelInput
         {...props}
         value={query}
+        readOnly={readOnly}
         onClick={(e) => e.stopPropagation()}
-        onFocus={() => dd.toggle(true)}
-        onBlur={() => dd.toggle(false)}
+        onFocus={readOnly ? undefined : () => dd.toggle(true)}
+        onBlur={readOnly ? undefined : () => dd.toggle(false)}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setQuery(e.target.value)
         }
       />
 
-      <Dropdown.Items open={dd.isOpen} className={styles.suggestions}>
-        {suggestions.data?.map((option, i) => (
-          <li key={getValue(option)} onMouseDown={() => change(option)}>
-            {getLabel(option)}
-          </li>
-        ))}
-      </Dropdown.Items>
+      {!readOnly && (
+        <Dropdown.Items open={dd.isOpen} className={styles.suggestions}>
+          {suggestions.data?.map((option, i) => (
+            <li key={getValue(option)} onMouseDown={() => change(option)}>
+              {getLabel(option)}
+            </li>
+          ))}
+        </Dropdown.Items>
+      )}
     </Dropdown>
   )
 }
