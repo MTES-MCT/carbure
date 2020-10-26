@@ -1,0 +1,14 @@
+.settingsTop {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--gray-light);
+  padding: 32px 120px;
+  margin-top: 1px;
+}
+
+.settingsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
