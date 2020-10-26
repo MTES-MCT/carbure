@@ -418,6 +418,9 @@ class LotValidationError(models.Model):
     def __str__(self):
         return self.rule_triggered
 
+    def natural_key(self):
+        return {'lot_id': self.lot.id, 'error': self.message, 'details': self.details, 'is_blocking': self.block_validation, 'is_warning': self.warning_to_user}
+
     class Meta:
         db_table = 'validation_errors'
         verbose_name = 'LotValidationError'

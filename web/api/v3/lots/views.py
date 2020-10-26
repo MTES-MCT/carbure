@@ -26,7 +26,8 @@ def tx_natural_key_with_errors(tx):
     data = tx.natural_key()
     tx_errors = [err.natural_key() for err in tx.transactionerror_set.all()]
     lots_errors = [err.natural_key() for err in tx.lot.lotv2error_set.all()]
-    data['errors'] = tx_errors + lots_errors
+    validation_errors = [err.natural_key() for err in tx.lot.lotvalidationerror_set.all()]
+    data['errors'] = tx_errors + lots_errors + validation_errors
     return data
 
 
