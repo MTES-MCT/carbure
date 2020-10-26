@@ -102,16 +102,15 @@ export function getStatus(lot: Transaction): LotStatus {
   return LotStatus.Weird
 }
 
-export function getSnapshot(
-  producer_id: number,
-  year: number
-): Promise<Snapshot> {
-  return api.get("/lots/snapshot", { producer_id, year }).then(normalizeFilters)
+export function getSnapshot(entityID: number, year: number): Promise<Snapshot> {
+  return api
+    .get("/lots/snapshot", { entity_id: entityID, year })
+    .then(normalizeFilters)
 }
 
 export function getLots(
   status: LotStatus,
-  producerID: number,
+  entityID: number,
   filters: FilterSelection["selected"],
   year: number,
   page: number,
@@ -124,7 +123,7 @@ export function getLots(
 ): Promise<Lots> {
   return api.get("/lots", {
     ...filters,
-    producer_id: producerID,
+    entity_id: entityID,
     from_idx: page * limit,
     sort_by: sortBy,
     status,

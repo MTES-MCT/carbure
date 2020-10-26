@@ -66,7 +66,7 @@ def get_lots(request):
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     if entity.entity_type == 'Producteur':
-        txs = LotTransaction.objects.objects.select_related('lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
+        txs = LotTransaction.objects.select_related('lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
                                                              'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant',
                                                              'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
                                                              'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country')
@@ -83,7 +83,7 @@ def get_lots(request):
         else:
             return JsonResponse({'status': 'error', 'message': 'Unknown status'}, status=400)
     elif entity.entity_type == 'Opérateur':
-        txs = LotTransaction.objects.objects.select_related('lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
+        txs = LotTransaction.objects.select_related('lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
                                                              'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant',
                                                              'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
                                                              'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country')
@@ -209,7 +209,7 @@ def get_snapshot(request):
     year = request.GET.get('year', False)
     today = datetime.date.today()
     date_from = today.replace(month=1, day=1)
-    date_until = today().replace(month=12, day=31)
+    date_until = today.replace(month=12, day=31)
     if year:
         try:
             year = int(year)
