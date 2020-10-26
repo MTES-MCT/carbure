@@ -51,20 +51,20 @@ function toTransactionPostData(tx: TransactionFormState) {
       ? tx.carbure_producer?.name
       : tx.unknown_producer,
 
-    production_site: tx.production_site_is_in_carbure
+    production_site: tx.producer_is_in_carbure
       ? tx.carbure_production_site?.name
       : tx.unknown_production_site,
 
-    production_site_country: !tx.production_site_is_in_carbure
+    production_site_country: !tx.producer_is_in_carbure
       ? tx.unknown_production_country
       : "",
-    production_site_reference: !tx.production_site_is_in_carbure
+    production_site_reference: !tx.producer_is_in_carbure
       ? tx.unknown_production_site_reference
       : "",
-    production_site_commissioning_date: !tx.production_site_is_in_carbure
+    production_site_commissioning_date: !tx.producer_is_in_carbure
       ? tx.unknown_production_site_com_date
       : "",
-    double_counting_registration: !tx.production_site_is_in_carbure
+    double_counting_registration: !tx.producer_is_in_carbure
       ? tx.unknown_production_site_dbl_counting
       : "",
 
