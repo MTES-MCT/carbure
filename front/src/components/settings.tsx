@@ -1,13 +1,12 @@
 import React from "react"
 import { EntitySelection } from "../hooks/helpers/use-entity"
-import { UserRight } from "../services/types"
+import { SettingsGetter } from "../hooks/use-app"
 
 import styles from "./settings.module.css"
-import useApi, { ApiState } from "../hooks/helpers/use-api"
+import useApi from "../hooks/helpers/use-api"
 import { enableMAC, disableMAC } from "../services/settings"
 
 import { Box } from "./system"
-import { SettingsGetter } from "../hooks/settings/use-get-settings"
 
 type GeneralSettingsProps = {
   entity: EntitySelection
@@ -41,13 +40,13 @@ export const GeneralSettings = ({ entity, settings }: GeneralSettingsProps) => {
         <h3>Mises à Consommation</h3>
         <input
           type="checkbox"
-          checked={hasMAC}
+          defaultChecked={hasMAC}
           onChange={onChangeMac}
           name="hasMAC"
         />
         <label>Ma société effectue des Mises à Consommation</label>
         <h3>Trading</h3>
-        <input type="checkbox" checked={hasTrading} name="hasTrading" />
+        <input type="checkbox" defaultChecked={hasTrading} name="hasTrading" />
         <label>Ma société a une activité de négoce</label>
       </fieldset>
     </Box>

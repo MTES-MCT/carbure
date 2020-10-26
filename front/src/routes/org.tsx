@@ -36,7 +36,7 @@ const Org = ({ app }: MainProps) => {
         </Route>
 
         <Route relative path="settings">
-          <Settings entity={entity} />
+          <Settings entity={entity} settings={app.settings} />
         </Route>
 
         <Redirect relative to="transactions/draft" />

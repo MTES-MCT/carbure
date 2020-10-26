@@ -1,9 +1,10 @@
 import { EntitySelection } from "../helpers/use-entity"
-import { useGetSettings } from "./use-get-settings"
+import { SettingsGetter } from "../use-app"
 
-export default function useSettings(entity: EntitySelection) {
-  const settings = useGetSettings(entity)
-
+export default function useSettings(
+  entity: EntitySelection,
+  settings: SettingsGetter
+) {
   return {
     entity,
     settings,

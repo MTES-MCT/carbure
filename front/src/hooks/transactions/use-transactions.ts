@@ -1,6 +1,7 @@
 import { Filters } from "../../services/types"
+import { EntitySelection } from "../helpers/use-entity"
 
-import {usePageSelection } from "../../components/system/pagination" // prettier-ignore
+import { usePageSelection } from "../../components/system/pagination" // prettier-ignore
 
 import useUploadLotFile from "../actions/use-upload-file"
 import useDuplicateLot from "../actions/use-duplicate-lots"
@@ -16,10 +17,8 @@ import useYearSelection from "../query/use-year"
 import useInvalidSelection from "../query/use-invalid"
 import useDeadlineSelection from "../query/use-deadline"
 
-import useEntity, { EntitySelection } from "../helpers/use-entity"
 import useGetSnapshot from "./use-snapshot"
 import useGetLots from "./use-get-lots"
-import { AppHook } from "../use-app"
 
 const initialFilters = {
   [Filters.Biocarburants]: null,

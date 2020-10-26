@@ -3,7 +3,7 @@ import { useEffect } from "react"
 import { EntitySelection } from "../helpers/use-entity"
 
 import * as api from "../../services/settings"
-import useAPI, { ApiState } from "../helpers/use-api"
+import useAPI from "../helpers/use-api"
 import { Settings } from "../../services/types"
 
 export type SettingsGetter = {
@@ -14,9 +14,7 @@ export type SettingsGetter = {
 }
 
 // fetches current snapshot when parameters change
-export function useGetSettings(
-  entity: EntitySelection,
-) : SettingsGetter {
+export function useGetSettings(entity: EntitySelection): SettingsGetter {
   const [settings, resolveSettings] = useAPI(api.getSettings)
 
   function resolve() {
