@@ -106,9 +106,7 @@ export const TransactionList = ({
           onActivate={() => invalid.setInvalid(true)}
           onDispose={() => invalid.setInvalid(false)}
         >
-          <span>
-            <b>{errorCount} lots</b> présentent des <b>incohérences</b>
-          </span>
+          <b>{errorCount} lots</b> présentent des <b>incohérences</b>
         </AlertFilter>
       )}
 
@@ -120,10 +118,8 @@ export const TransactionList = ({
           onActivate={() => deadline.setDeadline(true)}
           onDispose={() => deadline.setDeadline(false)}
         >
-          <span>
-            <b>{deadlineCount} lots</b> doivent être validés et envoyés avant le{" "}
-            <b>{format(deadlineDate!, "d MMMM", { locale: fr })}</b>
-          </span>
+          <b>{deadlineCount} lots</b> doivent être validés et envoyés avant le{" "}
+          <b>{format(deadlineDate!, "d MMMM", { locale: fr })}</b>
         </AlertFilter>
       )}
 
