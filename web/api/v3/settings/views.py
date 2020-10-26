@@ -227,7 +227,7 @@ def delete_production_site_bc(request):
 
 
 def enable_mac(request, *args, **kwargs):
-    producer = request.POST.get('producer_id')
+    producer = request.POST.get('entity_id')
 
     try:
         producer = Entity.objects.get(id=producer, entity_type='Producteur')
@@ -246,7 +246,7 @@ def enable_mac(request, *args, **kwargs):
 
 
 def disable_mac(request, *args, **kwargs):
-    producer = request.POST.get('producer_id')
+    producer = request.POST.get('entity_id')
 
     try:
         producer = Entity.objects.get(id=producer, entity_type='Producteur')
