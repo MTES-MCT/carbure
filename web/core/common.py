@@ -388,7 +388,7 @@ def fill_ghg_info(lot_row, lot):
 
 def fill_dae_data(lot_row, transaction):
     tx_errors = []
-    transaction.dae = None
+    transaction.dae = ''
     if 'dae' in lot_row:
         dae = lot_row['dae']
         transaction.dae = dae
@@ -400,9 +400,9 @@ def fill_dae_data(lot_row, transaction):
 def fill_delivery_date(lot_row, lot, transaction):
     tx_errors = []
     if 'delivery_date' not in lot_row or lot_row['delivery_date'] == '':
-        transaction.ea_delivery_date = None
-        lot.period = ''
-        tx_errors.append(TransactionError(tx=transaction, field='ea_delivery_date', error="Merci de préciser la date de livraison", value=None))
+        transaction.delivery_date = datetime.date.today()
+        lot.period = datetime.date.today().strftime('%Y-%m')
+        tx_errors.append(TransactionError(tx=transaction, field='delivery_date', error="Merci de préciser la date de livraison", value=None))
     else:
         try:
             delivery_date = lot_row['delivery_date']
