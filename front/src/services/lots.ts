@@ -83,23 +83,38 @@ function toTransactionPostData(tx: TransactionFormState) {
 }
 
 // extract the status name from the lot details
-export function getStatus(lot: Transaction): LotStatus {
+export function getStatus(lot: Transaction, entity: number): LotStatus {
   const status = lot.lot.status.toLowerCase()
   const delivery = lot.delivery_status
+
+  const isProducer = lot.carbure_vendor?.id === entity
+  const isOperator = lot.carbure_client?.id === entity
 
   if (status === "draft") {
     return LotStatus.Draft
   } else if (status === "validated") {
-    if (["N", "AA"].includes(delivery)) {
-      return LotStatus.Validated
-    } else if (delivery === "AC") {
-      return LotStatus.ToFix
-    } else if (delivery === "A") {
+    if (delivery === "A") {
       return LotStatus.Accepted
+    } else if (isOperator && ["N", "AA", "AC"].includes(delivery)) {
+      return LotStatus.Inbox
+    } else if (isProducer) {
+      if (["N", "AA"].includes(delivery)) {
+        return LotStatus.Validated
+      } else if (delivery === "AC") {
+        return LotStatus.ToFix
+      }
     }
   }
 
   return LotStatus.Weird
+}
+
+function normalizeStatus(transactions: any, entityID: number) {
+  transactions.lots.forEach((tx: any) => {
+    tx.status = getStatus(tx, entityID)
+  })
+
+  return transactions
 }
 
 export function getSnapshot(entityID: number, year: number): Promise<Snapshot> {
@@ -121,7 +136,7 @@ export function getLots(
   invalid: boolean,
   deadline: boolean
 ): Promise<Lots> {
-  return api.get("/lots", {
+  const params = {
     ...filters,
     entity_id: entityID,
     from_idx: page * limit,
@@ -133,7 +148,9 @@ export function getLots(
     order,
     invalid,
     deadline,
-  })
+  }
+
+  return api.get("/lots", params).then((txs) => normalizeStatus(txs, entityID))
 }
 
 export function downloadLots(
