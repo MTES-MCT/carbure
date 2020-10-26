@@ -1,13 +1,15 @@
 import React from "react"
 import cl from "clsx"
+import differenceInCalendarMonths from "date-fns/differenceInCalendarMonths"
 
 import { Lots, LotStatus } from "../services/types"
 import { SortingSelection } from "../hooks/query/use-sort-by" // prettier-ignore
-
 import { TransactionSelection } from "../hooks/query/use-selection"
 import { StatusSelection } from "../hooks/query/use-status"
 
 import styles from "./transaction-table.module.css"
+
+import { getStatus } from "../services/lots"
 
 import { Table } from "./system"
 import { Check, ChevronRight, Copy, Cross } from "./system/icons"
@@ -85,6 +87,16 @@ function hasErrors(transactions: Lots, id: number): boolean {
   )
 }
 
+function hasDeadline(transactions: Lots, id: number): boolean {
+  const tx = transactions.lots.find((tx) => tx.id === id)
+
+  if (!tx || getStatus(tx) !== LotStatus.Draft) return false
+
+  const deadline = new Date(transactions.deadlines.date)
+  const deliveryDate = new Date(tx?.delivery_date)
+  return differenceInCalendarMonths(deadline, deliveryDate) === 1
+}
+
 type DisplayTableProps = {
   transactions: Lots
   sorting: SortingSelection
@@ -101,6 +113,7 @@ const DisplayTable = ({ transactions, sorting }: DisplayTableProps) => (
           key={tx.id}
           id={tx.id}
           error={tx.errors.length > 0}
+          deadline={hasDeadline(transactions, tx.id)}
         >
           <td />
           <TransactionRow transaction={tx} />
@@ -152,6 +165,7 @@ const ActionTable = ({
             key={tx.id}
             id={tx.id}
             error={tx.errors.length > 0}
+            deadline={hasDeadline(transactions, tx.id)}
           >
             <td>
               <input
@@ -263,6 +277,7 @@ const DisplayStockTable = ({ transactions, sorting }: DisplayTableProps) => (
           key={tx.id}
           id={tx.id}
           error={hasErrors(transactions, tx.id)}
+          deadline={hasDeadline(transactions, tx.id)}
         >
           <td />
           <StockTransactionRow transaction={tx} />

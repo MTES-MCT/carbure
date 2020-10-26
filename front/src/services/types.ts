@@ -164,6 +164,11 @@ export interface Lots {
 
   lots: Transaction[]
 
+  deadlines: {
+    date: string
+    total: number
+  }
+
   tx_errors: {
     [key: string]: {
       tx_id: number
@@ -201,8 +206,6 @@ export interface Snapshot {
   filters: {
     [key in Filters]: Option[]
   }
-
-  deadlines: any[]
 
   years: Option[]
 }

@@ -1,4 +1,6 @@
 import React from "react"
+import format from "date-fns/format"
+import fr from "date-fns/locale/fr"
 
 import { Lots, LotStatus } from "../services/types"
 import { SortingSelection } from "../hooks/query/use-sort-by" // prettier-ignore
@@ -13,10 +15,11 @@ import { LotDuplicator } from "../hooks/actions/use-duplicate-lots"
 import { StatusSelection } from "../hooks/query/use-status"
 import { TransactionSelection } from "../hooks/query/use-selection"
 import { InvalidSelection } from "../hooks/query/use-invalid"
+import { DeadlineSelection } from "../hooks/query/use-deadline"
 
 import styles from "./transaction-list.module.css"
 
-import { AlertCircle } from "./system/icons"
+import { AlertCircle, Calendar } from "./system/icons"
 import { Box, LoaderOverlay } from "./system"
 import { Alert, AlertFilter } from "./system/alert"
 import Pagination from "./system/pagination"
@@ -34,6 +37,7 @@ type TransactionListProps = {
   status: StatusSelection
   sorting: SortingSelection
   invalid: InvalidSelection
+  deadline: DeadlineSelection
   selection: TransactionSelection
   pagination: PageSelection
   deleter: LotDeleter
@@ -47,6 +51,7 @@ export const TransactionList = ({
   status,
   sorting,
   invalid,
+  deadline,
   selection,
   pagination,
   deleter,
@@ -56,6 +61,8 @@ export const TransactionList = ({
 }: TransactionListProps) => {
   const tx = transactions.data
   const errorCount = tx?.errors ?? 0
+  const deadlineCount = tx?.deadlines.total ?? 0
+  const deadlineDate = tx ? new Date(tx.deadlines.date) : null
 
   const isLoading = transactions.loading
   const isError = transactions.error !== null
@@ -101,6 +108,21 @@ export const TransactionList = ({
         >
           <span>
             <b>{errorCount} lots</b> présentent des <b>incohérences</b>
+          </span>
+        </AlertFilter>
+      )}
+
+      {deadlineCount > 0 && (
+        <AlertFilter
+          level="warning"
+          icon={Calendar}
+          active={deadline.active}
+          onActivate={() => deadline.setDeadline(true)}
+          onDispose={() => deadline.setDeadline(false)}
+        >
+          <span>
+            <b>{deadlineCount} lots</b> doivent être validés et envoyés avant le{" "}
+            <b>{format(deadlineDate!, "d MMMM", { locale: fr })}</b>
           </span>
         </AlertFilter>
       )}

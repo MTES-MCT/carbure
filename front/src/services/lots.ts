@@ -119,7 +119,8 @@ export function getLots(
   query: string,
   sortBy: string,
   order: string,
-  invalid: boolean
+  invalid: boolean,
+  deadline: boolean
 ): Promise<Lots> {
   return api.get("/lots", {
     ...filters,
@@ -132,6 +133,7 @@ export function getLots(
     query,
     order,
     invalid,
+    deadline,
   })
 }
 
