@@ -35,8 +35,6 @@ export interface TransactionFormState {
   producer_is_in_carbure: boolean
   carbure_producer: Entity | null
   unknown_producer: string
-
-  production_site_is_in_carbure: boolean
   carbure_production_site: ProductionSite | null
   unknown_production_site: string
   unknown_production_country: Country | null
@@ -82,7 +80,6 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
     unknown_producer: tx.lot.unknown_producer,
     unknown_production_country: tx.lot.unknown_production_country,
 
-    production_site_is_in_carbure: tx.lot.production_site_is_in_carbure,
     carbure_production_site: tx.lot.carbure_production_site,
     unknown_production_site: tx.lot.unknown_production_site,
     unknown_production_site_reference: tx.lot.unknown_production_site_reference,
@@ -129,7 +126,6 @@ const initialState: TransactionFormState = {
   carbure_producer: null,
   unknown_producer: "",
 
-  production_site_is_in_carbure: true,
   carbure_production_site: null,
   unknown_production_site: "",
   unknown_production_country: null,

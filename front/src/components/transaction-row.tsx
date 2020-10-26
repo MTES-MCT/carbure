@@ -14,6 +14,7 @@ const STATUS = {
   [LotStatus.Accepted]: "Accepté",
   [LotStatus.Weird]: "Problème",
   [LotStatus.Stock]: "Stock",
+  [LotStatus.Inbox]: "Reçu",
 }
 
 const cells = [

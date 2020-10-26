@@ -12,6 +12,7 @@ export enum LotStatus {
   Accepted = "accepted",
   Weird = "weird",
   Stock = "stock",
+  Inbox = "in",
 }
 
 export enum GESOption {
