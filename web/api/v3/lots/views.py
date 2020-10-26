@@ -146,6 +146,17 @@ def get_lots(request):
             tx_errors[err.id] = []
         tx_errors[err.id].append(err.natural_key())
 
+    deadlines = txs.filter(lot__status='Draft').annotate(month=TruncMonth(
+        'delivery_date')).values('month').annotate(total=Count('id'))
+    for d in deadlines:
+        if d['month'] is None:
+            d['deadline'] = None
+        else:
+            nextmonth = d['month'] + dateutil.relativedelta.relativedelta(months=+1)
+            (_, day) = calendar.monthrange(nextmonth.year, nextmonth.month)
+            d['deadline'] = d['month'].replace(month=nextmonth.month, day=day)
+            d['delta'] = (d['deadline'] - today).days
+    data['deadlines'] = list(deadlines)
     data['lots'] = [t.natural_key() for t in returned]
     data['lots_errors'] = lot_errors
     data['tx_errors'] = tx_errors
@@ -228,18 +239,6 @@ def get_snapshot(request):
     data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs, 'periods': periods,
                        'production_sites': psites, 'countries_of_origin': countries, 'clients': clients,
                        'delivery_sites': dsites}
-
-    deadlines = txs.filter(lot__status='Draft').annotate(month=TruncMonth(
-        'delivery_date')).values('month').annotate(total=Count('id'))
-    for d in deadlines:
-        if d['month'] is None:
-            d['deadline'] = None
-        else:
-            nextmonth = d['month'] + dateutil.relativedelta.relativedelta(months=+1)
-            (_, day) = calendar.monthrange(nextmonth.year, nextmonth.month)
-            d['deadline'] = d['month'].replace(month=nextmonth.month, day=day)
-            d['delta'] = (d['deadline'] - today).days
-    data['deadlines'] = list(deadlines)
     return JsonResponse({'status': 'success', 'data': data})
 
 
