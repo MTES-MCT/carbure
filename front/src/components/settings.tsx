@@ -3,14 +3,15 @@ import { EntitySelection } from "../hooks/helpers/use-entity"
 import { UserRight } from "../services/types"
 
 import styles from "./settings.module.css"
-import { ApiState } from "../hooks/helpers/use-api"
-import { Settings } from "../services/types"
+import useApi, { ApiState }  from "../hooks/helpers/use-api"
+import { enableMAC, disableMAC } from "../services/settings"
 
 import { Box } from "./system"
+import { SettingsGetter } from "../hooks/settings/use-get-settings"
 
 type GeneralSettingsProps = {
   entity: EntitySelection,
-  settings: ApiState<Settings>,
+  settings: SettingsGetter,
 }
   
 export const GeneralSettings = ({
@@ -18,6 +19,21 @@ export const GeneralSettings = ({
   settings,
 }: GeneralSettingsProps) => {
   const currentEntitySettings: UserRight | undefined = settings.data?.rights.find(element => element.entity.id === entity)
+  const hasMAC : boolean = currentEntitySettings?.entity.has_mac?? false
+  const hasTrading : boolean = currentEntitySettings?.entity.has_trading?? false
+  const [macEnabled, resolveMacEnabled] = useApi(enableMAC)
+  const [macDisabled, resolveMacDisabled] = useApi(disableMAC)
+
+  function onChangeMac(event: React.ChangeEvent<HTMLInputElement>) : void {
+    if (entity === null) {
+      return
+    }
+    if (event.target.checked) {
+      resolveMacEnabled(entity).then(settings.resolve)
+    } else {
+      resolveMacDisabled(entity).then(settings.resolve)
+    }
+  }
 
   if (currentEntitySettings === undefined) {
     return null
@@ -27,10 +43,10 @@ export const GeneralSettings = ({
     <Box>
       <fieldset>
         <h3>Mises à Consommation</h3>
-        <input type="checkbox" checked={currentEntitySettings.entity.has_mac} name="checkbox" id="checkbox-mac" />
+        <input type="checkbox" checked={hasMAC} onChange={onChangeMac} name="hasMAC" />
         <label>Ma société effectue des Mises à Consommation</label>
         <h3>Trading</h3>
-        <input type="checkbox" checked={currentEntitySettings.entity.has_trading} name="checkbox" id="checkbox-trading" />
+        <input type="checkbox" checked={hasTrading} name="hasTrading" />
         <label>Ma société a une activité de négoce</label>
       </fieldset>
     </Box>  
