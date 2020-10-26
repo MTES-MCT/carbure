@@ -230,16 +230,27 @@ def get_snapshot(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    txs = LotTransaction.objects.filter(lot__added_by=entity)
-    data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
+    if entity.entity_type == 'Producteur':
+        txs = LotTransaction.objects.filter(lot__added_by=entity)
+        data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
 
-    txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
+        txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
 
-    draft = len(txs.filter(lot__status='Draft'))
-    validated = len(txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA']))
-    tofix = len(txs.filter(lot__status='Validated', delivery_status='AC'))
-    accepted = len(txs.filter(lot__status='Validated', delivery_status='A'))
-    data['lots'] = {'draft': draft, 'validated': validated, 'tofix': tofix, 'accepted': accepted}
+        draft = len(txs.filter(lot__status='Draft'))
+        validated = len(txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA']))
+        tofix = len(txs.filter(lot__status='Validated', delivery_status='AC'))
+        accepted = len(txs.filter(lot__status='Validated', delivery_status='A'))
+        data['lots'] = {'draft': draft, 'validated': validated, 'tofix': tofix, 'accepted': accepted}
+    elif entity.entity_type == 'Opérateur':
+        txs = LotTransaction.objects.filter(carbure_client=entity)
+        data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
+        txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
+        draft = len(txs.filter(lot__status='Draft'))
+        ins = len(txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA', 'AC']))
+        accepted = len(txs.filter(lot__status='Validated', delivery_status='A'))
+        data['lots'] = {'draft': draft, 'accepted': accepted, 'in': ins}
+    else:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
 
     mps = [{'value': m.code, 'label': m.name}
            for m in MatierePremiere.objects.filter(id__in=txs.values('lot__matiere_premiere').distinct())]
