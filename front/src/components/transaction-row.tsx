@@ -27,7 +27,7 @@ const cells = [
   (tx: Transaction) => tx.carbure_client?.name ?? tx.unknown_client ?? "",
 
   // biocarburant
-  (tx: Transaction) => [tx.lot.biocarburant.name, tx.lot.volume.toString()],
+  (tx: Transaction) => [tx.lot.biocarburant.name, `${tx.lot.volume}L`],
 
   // matiere premiere
   (tx: Transaction) => [tx.lot.matiere_premiere.name, tx.lot.pays_origine.name],
