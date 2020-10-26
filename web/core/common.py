@@ -126,6 +126,7 @@ def fuse_lots(txs):
 
 
 def fill_producer_info(entity, lot_row, lot):
+    lot_errors = []
     if 'producer' in lot_row and lot_row['producer'] is not None:
         # check if we know the producer
         if lot_row['producer'].strip() == entity.name:
@@ -140,7 +141,13 @@ def fill_producer_info(entity, lot_row, lot):
                 # yes we do
                 # in this case, the producer should declare its production directly in Carbure
                 # we cannot allow someone else to declare for them
-                raise Exception("Vous ne pouvez pas déclarer des lots d'un producteur déjà inscrit sur Carbure")
+                lot.producer_is_in_carbure = False
+                lot.carbure_producer = None
+                lot.unknown_producer = ''
+                error = LotV2Error(lot=lot, field='carbure_producer',
+                                   error="Vous ne pouvez pas déclarer des lots d'un producteur déjà inscrit sur Carbure",
+                                   value=lot_row['producer'])
+                lot_errors.append(error)                
             else:
                 # ok, unknown producer. allow importation
                 lot.producer_is_in_carbure = False
@@ -157,6 +164,7 @@ def fill_producer_info(entity, lot_row, lot):
         lot.producer_is_in_carbure = True
         lot.carbure_producer = entity
         lot.unknown_producer = ''
+    return lot_errors
 
 
 def fill_production_site_info(entity, lot_row, lot):
@@ -217,7 +225,7 @@ def fill_production_site_info(entity, lot_row, lot):
         if 'production_site_commissioning_date' in lot_row:
             lot.unknown_production_site_com_date = lot_row['production_site_commissioning_date']
         else:
-            lot.unknown_production_site_com_date = ''
+            lot.unknown_production_site_com_date = None
         if 'double_counting_registration' in lot_row:
             lot.unknown_production_site_dbl_counting = lot_row['double_counting_registration']
         else:
@@ -517,6 +525,8 @@ def load_lot(entity, user, lot_dict, source, transaction=None):
     transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
     transaction.save()
     lot.save()
+    lot_errors = [item for sublist in lot_errors for item in sublist]
+    tx_errors = [item for sublist in tx_errors for item in sublist]
     return lot, transaction, lot_errors, tx_errors
 
 
