@@ -416,8 +416,11 @@ def fill_delivery_date(lot_row, lot, transaction):
 
 def fill_client_data(entity, lot_row, transaction):
     tx_errors = []
-
-    if 'client' in lot_row and lot_row['client'] is not None:
+    if entity.entity_type == 'Opérateur':
+        transaction.client_is_in_carbure = True
+        transaction.carbure_client = entity
+        transaction.unknown_client = ''
+    elif 'client' in lot_row and lot_row['client'] is not None:
         client = lot_row['client']
         matches = Entity.objects.filter(name=client).count()
         if matches:
