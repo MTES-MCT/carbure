@@ -1,6 +1,7 @@
 import { useState } from "react"
 
 import { PageSelection } from "../../components/system/pagination"
+import { DeadlineSelection } from "./use-deadline"
 import { FilterSelection } from "./use-filters"
 import { InvalidSelection } from "./use-invalid"
 
@@ -12,7 +13,8 @@ export interface YearSelection {
 export default function useYearSelection(
   pagination: PageSelection,
   filters: FilterSelection,
-  invalid: InvalidSelection
+  invalid: InvalidSelection,
+  deadline: DeadlineSelection
 ): YearSelection {
   const [selected, setSelected] = useState(new Date().getFullYear())
 
@@ -20,6 +22,7 @@ export default function useYearSelection(
     pagination.setPage(0)
     filters.reset()
     invalid.setInvalid(false)
+    deadline.setDeadline(false)
     setSelected(year)
   }
 
