@@ -12,12 +12,14 @@ import styles from "./transaction-snapshot.module.css"
 import { Title, StatusButton, SearchInput, Box } from "./system"
 import Select, { SelectValue } from "./system/select"
 
-const TRANSACTIONS_STATUS = [
-  { key: LotStatus.Draft, label: "Brouillons" },
-  { key: LotStatus.Validated, label: "Lots envoyés" },
-  { key: LotStatus.ToFix, label: "Lots à corriger" },
-  { key: LotStatus.Accepted, label: "Lots acceptés" },
-]
+const STATUS_LABEL = {
+  [LotStatus.Draft]: { singular: "Brouillon", plural: "Brouillons" },
+  [LotStatus.Validated]: { singular: "Lot envoyé", plural: "Lots envoyés" },
+  [LotStatus.ToFix]: { singular: "Lot à corriger", plural: "Lots à corriger" },
+  [LotStatus.Accepted]: { singular: "Lot accepté", plural: "Lots acceptés" },
+  [LotStatus.Weird]: { singular: "Lot incohérent", plural: "Lots incohérents" },
+  [LotStatus.Stock]: { singular: "Stock", plural: "Stocks" },
+}
 
 const FILTER_LABELS = {
   [Filters.Periods]: "Période",
@@ -27,6 +29,18 @@ const FILTER_LABELS = {
   [Filters.CountriesOfOrigin]: "Pays d'origine",
   [Filters.DeliverySites]: "Sites de livraison",
   [Filters.Clients]: "Clients",
+}
+
+function mapStatus(
+  statuses: Snapshot["lots"] | undefined
+): [LotStatus, string, number][] {
+  if (!statuses) return []
+
+  return Object.entries(statuses).map(([key, amount = 0]) => {
+    const status = key as LotStatus
+    const labels = STATUS_LABEL[status]
+    return [status, amount === 1 ? labels.singular : labels.plural, amount]
+  })
 }
 
 function mapFilters(
@@ -64,12 +78,12 @@ export const TransactionSnapshot = ({
     </div>
 
     <div className={styles.transactionStatus}>
-      {TRANSACTIONS_STATUS.map(({ key, label }) => (
+      {mapStatus(snapshot.data?.lots).map(([key, label, amount]) => (
         <StatusButton
           key={key}
           active={key === status.active}
           loading={snapshot.loading}
-          amount={snapshot.data?.lots[key] ?? 0}
+          amount={amount}
           label={label}
           onClick={() => status.setActive(key)}
         />
