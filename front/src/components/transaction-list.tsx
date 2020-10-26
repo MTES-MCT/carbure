@@ -62,7 +62,10 @@ export const TransactionList = ({
   const tx = transactions.data
   const errorCount = tx?.errors ?? 0
   const deadlineCount = tx?.deadlines.total ?? 0
-  const deadlineDate = tx ? new Date(tx.deadlines.date) : null
+
+  const deadlineDate = tx
+    ? format(new Date(tx.deadlines.date), "d MMMM", { locale: fr })
+    : null
 
   const isLoading = transactions.loading
   const isError = transactions.error !== null
@@ -106,7 +109,15 @@ export const TransactionList = ({
           onActivate={() => invalid.setInvalid(true)}
           onDispose={() => invalid.setInvalid(false)}
         >
-          <b>{errorCount} lots</b> présentent des <b>incohérences</b>
+          {errorCount === 1 ? (
+            <span>
+              <b>1 lot</b> présente des <b>incohérences</b>
+            </span>
+          ) : (
+            <span>
+              <b>{errorCount} lots</b> présentent des <b>incohérences</b>
+            </span>
+          )}
         </AlertFilter>
       )}
 
@@ -118,8 +129,17 @@ export const TransactionList = ({
           onActivate={() => deadline.setDeadline(true)}
           onDispose={() => deadline.setDeadline(false)}
         >
-          <b>{deadlineCount} lots</b> doivent être validés et envoyés avant le{" "}
-          <b>{format(deadlineDate!, "d MMMM", { locale: fr })}</b>
+          {deadlineCount === 1 ? (
+            <span>
+              <b>1 lot</b> doit être validé et envoyé avant le{" "}
+              <b>{deadlineDate}</b>
+            </span>
+          ) : (
+            <span>
+              <b>{deadlineCount} lots</b> doivent être validés et envoyés avant
+              le <b>{deadlineDate}</b>
+            </span>
+          )}
         </AlertFilter>
       )}
 
