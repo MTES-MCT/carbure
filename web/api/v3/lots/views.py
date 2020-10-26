@@ -65,19 +65,40 @@ def get_lots(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    txs = LotTransaction.objects.filter(lot__added_by=entity)
-
-    # filter by status
-    if status == 'draft':
-        txs = txs.filter(lot__status='Draft')
-    elif status == 'validated':
-        txs = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA'])
-    elif status == 'tofix':
-        txs = txs.filter(lot__status='Validated', delivery_status='AC')
-    elif status == 'accepted':
-        txs = txs.filter(lot__status='Validated', delivery_status='A')
+    if entity.entity_type == 'Producteur':
+        txs = LotTransaction.objects.objects.select_related('lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
+                                                             'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant',
+                                                             'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
+                                                             'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country')
+        txs = txs.filter(lot__added_by=entity)                                                         
+        # filter by status
+        if status == 'draft':
+            txs = txs.filter(lot__status='Draft')
+        elif status == 'validated':
+            txs = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA'])
+        elif status == 'tofix':
+            txs = txs.filter(lot__status='Validated', delivery_status='AC')
+        elif status == 'accepted':
+            txs = txs.filter(lot__status='Validated', delivery_status='A')
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Unknown status'}, status=400)
+    elif entity.entity_type == 'Opérateur':
+        txs = LotTransaction.objects.objects.select_related('lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
+                                                             'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant',
+                                                             'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
+                                                             'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country')
+        txs = txs.filter(carbure_client=entity)
+        # filter by status
+        if status == 'draft':
+            txs = txs.filter(lot__status='Draft')
+        elif status == 'in':
+            txs = txs.filter(delivery_status__in=['N', 'AC', 'AA'], lot__status="Validated")
+        elif status == 'accepted':
+            txs = txs.filter(lot__status='Validated', delivery_status='A')
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Unknown status'}, status=400)        
     else:
-        return JsonResponse({'status': 'error', 'message': 'Unknown status'}, status=400)
+        return JsonResponse({'status': 'error', 'message': 'Unknown entity_type'}, status=400)        
 
     # apply filters
     date_from = datetime.date.today().replace(month=1, day=1)
