@@ -2,6 +2,8 @@ FROM node:alpine
 
 WORKDIR /app
 
+COPY front/public /app/public
+COPY front/tsconfig.json /app/
 COPY front/package.json /app/
 COPY front/package-lock.json /app/
 
@@ -9,6 +11,6 @@ ENV PATH /app/node_modules/.bin:$PATH
 
 RUN npm install
 
-COPY front /app
+COPY front/src /app/src
 
 CMD ["npm", "run", "start"]
