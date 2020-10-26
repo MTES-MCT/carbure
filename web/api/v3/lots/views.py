@@ -48,6 +48,7 @@ def get_lots(request):
     sort_by = request.GET.get('sort_by', False)
     order = request.GET.get('order', False)
     invalid = request.GET.get('invalid', False)
+    deadline = request.GET.get('deadline', False)
 
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
@@ -142,6 +143,18 @@ def get_lots(request):
         else:
             return JsonResponse({'status': 'error', 'message': 'Unknown sort_by key'}, status=400)
 
+    now = datetime.datetime.now()
+    (_, last_day) = calendar.monthrange(now.year, now.month)
+    deadline_date = now.replace(day=last_day)
+    prev_month = deadline_date.month - 1 if deadline_date.month > 1 else 12
+    txs_with_deadline = txs.filter(lot__status='Draft', delivery_date__year=now.year, delivery_date__month=prev_month)
+    deadlines = txs_with_deadline.annotate(month=TruncMonth('delivery_date')).values('month').annotate(total=Count('id'))
+    deadline_str = deadline_date.strftime("%Y-%m-%d")
+    deadline_total = deadlines[0]['total'] if deadlines.count() > 0 else 0
+
+    if deadline:
+        txs = txs_with_deadline
+
     from_idx = int(from_idx)
     returned = txs[from_idx:]
 
@@ -150,13 +163,12 @@ def get_lots(request):
         returned = returned[:limit]
 
     data = {}
-
     data['lots'] = [tx_natural_key_with_errors(t) for t in returned]
     data['total'] = len(txs)
-    data['deadlines'] = {'date': deadline_date, 'total': deadline_total}
     data['returned'] = len(returned)
     data['from'] = from_idx
     data['errors'] = tx_with_errors.count()
+    data['deadlines'] = {'date': deadline_str, 'total': deadline_total}
 
     if not export:
         return JsonResponse({'status': 'success', 'data': data})
