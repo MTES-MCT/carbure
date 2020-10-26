@@ -23,7 +23,7 @@ class Entity(models.Model):
         return self.name
 
     def natural_key(self):
-        return {'name': self.name, 'id': self.id, 'entity_type': self.entity_type}
+        return {'name': self.name, 'id': self.id, 'entity_type': self.entity_type, 'has_mac': self.producer_with_mac, 'has_trading': self.producer_with_trading}
 
     def url_friendly_name(self):
         return self.name.replace(' ', '').upper()
