@@ -259,17 +259,18 @@ def fill_matiere_premiere_info(lot_row, lot):
         matiere_premiere = lot_row['matiere_premiere_code']
         try:
             lot.matiere_premiere = MatierePremiere.objects.get(code=matiere_premiere)
+            LotV2Error.objects.filter(lot=lot, field='matiere_premiere_code').delete()
         except Exception:
             lot.matiere_premiere = None
             lot_errors.append(LotV2Error(lot=lot, field='matiere_premiere_code',
                                          error='Matière Première inconnue',
                                          value=matiere_premiere))
     else:
-        matiere_premiere = None
+        print('here')
         lot.matiere_premiere = None
         lot_errors.append(LotV2Error(lot=lot, field='matiere_premiere_code',
                                      error='Merci de préciser la matière première',
-                                     value=matiere_premiere))
+                                     value=None))
     return lot_errors
 
 
@@ -279,13 +280,20 @@ def fill_volume_info(lot_row, lot):
         volume = lot_row['volume']
         try:
             lot.volume = float(volume)
+            if lot.volume <= 0:
+                lot_errors.append(LotV2Error(lot=lot, field='volume',
+                                            error='Le volume doit être supérieur à 0', value=volume))
+            else:
+                # everything is fine, delete all errors linked to volume              
+                LotV2Error.objects.filter(lot=lot, field='volume').delete()
         except Exception:
             lot.volume = 0
             lot_errors.append(LotV2Error(lot=lot, field='volume',
                                          error='Format du volume incorrect', value=volume))
     else:
+        lot.volume = 0
         lot_errors.append(LotV2Error(lot=lot, field='volume',
-                                     error='Merci de préciser un volume', value=volume))
+                                     error='Merci de préciser un volume', value=''))
     return lot_errors
 
 
@@ -391,8 +399,9 @@ def fill_dae_data(lot_row, transaction):
     transaction.dae = ''
     if 'dae' in lot_row:
         dae = lot_row['dae']
-        transaction.dae = dae
-    if transaction.dae is None and transaction.is_mac is False:
+        if dae is not None:
+            transaction.dae = dae
+    if transaction.dae == '' and transaction.is_mac is False:
         tx_errors.append(TransactionError(tx=transaction, field='dae', error="Merci de préciser le numéro de DAE/DAU", value=None))
     return tx_errors
 
@@ -484,6 +493,7 @@ def load_lot(entity, user, lot_dict, source, transaction=None):
     lot_errors = []
     tx_errors = []
 
+    print(lot_dict)
     # check for empty row
     if lot_dict.get('biocarburant_code', None) is None:
         return None, None, None, None
@@ -505,11 +515,11 @@ def load_lot(entity, user, lot_dict, source, transaction=None):
     lot_errors.append(fill_pays_origine_info(lot_dict, lot))
     lot_errors.append(fill_ghg_info(lot_dict, lot))
     lot.is_valid = False
-    lot.save()
+    #lot.save()
 
     if transaction is None:
         transaction = LotTransaction()
-        transaction.lot = lot
+        #transaction.lot = lot
         transaction.vendor_is_in_carbure = True
         transaction.carbure_vendor = entity
     transaction.is_mac = False
@@ -523,8 +533,8 @@ def load_lot(entity, user, lot_dict, source, transaction=None):
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
     transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
-    transaction.save()
-    lot.save()
+    #transaction.save()
+    #lot.save()
     lot_errors = [item for sublist in lot_errors for item in sublist]
     tx_errors = [item for sublist in tx_errors for item in sublist]
     return lot, transaction, lot_errors, tx_errors
@@ -567,42 +577,45 @@ def load_excel_file(entity, user, file):
             except Exception as e:
                 print('Could not load %s' % (lot))
                 print(e)
-
-        # below lines are for batch insert of Lots, Transactions and errors
-        # it's a bit rough
-        # with mysql, returned object from bulk_create do not contain ids
-        # since LotTransaction object requires the Lot foreign key, we need to fetch the Lots after creation
-        # and sort them to assign the Transaction to the correct Lot
-
-        # 1: Batch insert of Lot objects
-        LotV2.objects.bulk_create(lots_to_insert, batch_size=100)
-        # 2: Fetch newly created lots
-        new_lots = [lot for lot in LotV2.objects.filter(added_by=entity).order_by('-id')[0:len(lots_to_insert)]]
-        # 3: Sort by ID (might be overkill but better safe than sorry)
-        for lot, tx in zip(sorted(new_lots, key=lambda x: x.id), txs_to_insert):
-            # 4: Assign lot.id to tx
-            tx.lot_id = lot.id
-        # 5: Batch insert transaction
-        LotTransaction.objects.bulk_create(txs_to_insert, batch_size=100)
-
-        # likewise, LotError and TransactionError require a foreign key
-        # 6 assign lot.id to LotError
-        for lot, errors in zip(sorted(new_lots, key=lambda x: x.id), lot_errors):
-            for e in errors:
-                e.lot_id = lot.id
-        flat_errors = [item for sublist in lot_errors for item in sublist]
-        LotV2Error.objects.bulk_create(flat_errors, batch_size=100)
-        # 7 assign tx.id to TransactionError
-        new_txs = [t for t in LotTransaction.objects.filter(lot__added_by=entity).order_by('-id')[0:len(lots_to_insert)]]
-        for tx, errors in zip(sorted(new_txs, key=lambda x: x.id), tx_errors):
-            for e in errors:
-                e.tx_id = tx.id
-        flat_tx_errors = [item for sublist in tx_errors for item in sublist]
-        TransactionError.objects.bulk_create(flat_tx_errors, batch_size=100)
+        bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors)
         return lots_loaded, total_lots
-    except Exception:
+    except Exception as e:
+        print(e)
         return False, False
 
+
+def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
+    # below lines are for batch insert of Lots, Transactions and errors
+    # it's a bit rough
+    # with mysql, returned object from bulk_create do not contain ids
+    # since LotTransaction object requires the Lot foreign key, we need to fetch the Lots after creation
+    # and sort them to assign the Transaction to the correct Lot
+
+    # 1: Batch insert of Lot objects
+    LotV2.objects.bulk_create(lots_to_insert, batch_size=100)
+    # 2: Fetch newly created lots
+    new_lots = [lot for lot in LotV2.objects.filter(added_by=entity).order_by('-id')[0:len(lots_to_insert)]]
+    # 3: Sort by ID (might be overkill but better safe than sorry)
+    for lot, tx in zip(sorted(new_lots, key=lambda x: x.id), txs_to_insert):
+        # 4: Assign lot.id to tx
+        tx.lot_id = lot.id
+    # 5: Batch insert transaction
+    LotTransaction.objects.bulk_create(txs_to_insert, batch_size=100)
+
+    # likewise, LotError and TransactionError require a foreign key
+    # 6 assign lot.id to LotError
+    for lot, errors in zip(sorted(new_lots, key=lambda x: x.id), lot_errors):
+        for e in errors:
+            e.lot_id = lot.id
+    flat_errors = [item for sublist in lot_errors for item in sublist]
+    LotV2Error.objects.bulk_create(flat_errors, batch_size=100)
+    # 7 assign tx.id to TransactionError
+    new_txs = [t for t in LotTransaction.objects.filter(lot__added_by=entity).order_by('-id')[0:len(lots_to_insert)]]
+    for tx, errors in zip(sorted(new_txs, key=lambda x: x.id), tx_errors):
+        for e in errors:
+            e.tx_id = tx.id
+    flat_tx_errors = [item for sublist in tx_errors for item in sublist]
+    TransactionError.objects.bulk_create(flat_tx_errors, batch_size=100)    
 
 def validate_lots(user, tx_ids):
     for tx_id in tx_ids:
