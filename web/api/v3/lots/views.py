@@ -296,7 +296,7 @@ def get_summary_in(request):
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     # get my pending incoming lots
-    txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status='N')
+    txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AA', 'AC'])
 
     # group / summary
     data = {}

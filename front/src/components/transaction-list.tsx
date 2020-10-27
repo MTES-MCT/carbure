@@ -30,6 +30,7 @@ import {
   DraftLotsActions,
   ExportAction,
   ValidatedLotsActions,
+  InboxLotsActions,
 } from "./transaction-actions"
 
 type TransactionListProps = {
@@ -98,6 +99,7 @@ export const TransactionList = ({
           )}
 
           {status.active === LotStatus.Validated && <ValidatedLotsActions />}
+          {status.active === LotStatus.Inbox && <InboxLotsActions />}
         </ActionBar>
       )}
 

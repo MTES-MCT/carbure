@@ -11,6 +11,7 @@ import { TransactionList } from "../components/transaction-list"
 import TransactionDetails from "./transaction-details"
 import TransactionAdd from "./transaction-add"
 import TransactionOutSummary from "./transaction-out-summary"
+import TransactionInSummary from "./transaction-in-summary"
 import TransactionFilters from "../components/transaction-filters"
 
 export const Transactions = ({ entity }: { entity: EntitySelection }) => {
@@ -68,6 +69,10 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
 
         <Route relative path="show-summary-out">
           <TransactionOutSummary entity={entity} />
+        </Route>
+
+        <Route relative path="show-summary-in">
+          <TransactionInSummary entity={entity} />
         </Route>
 
         <Route relative path=":id">
