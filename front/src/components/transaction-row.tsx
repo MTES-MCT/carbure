@@ -3,18 +3,17 @@ import cl from "clsx"
 
 import styles from "./transaction-row.module.css"
 
-import { getStatus } from "../services/lots"
 import { LotStatus, Transaction } from "../services/types"
 import { useRelativePush } from "./relative-route"
 
 const STATUS = {
   [LotStatus.Draft]: "Brouillon",
-  [LotStatus.Validated]: "Envoyé",
+  [LotStatus.Validated]: "En attente",
+  [LotStatus.Inbox]: "En attente",
   [LotStatus.ToFix]: "À corriger",
   [LotStatus.Accepted]: "Accepté",
   [LotStatus.Weird]: "Problème",
   [LotStatus.Stock]: "Stock",
-  [LotStatus.Inbox]: "Reçu",
 }
 
 const cells = [
@@ -28,7 +27,7 @@ const cells = [
   (tx: Transaction) => tx.carbure_client?.name ?? tx.unknown_client ?? "",
 
   // biocarburant
-  (tx: Transaction) => [tx.lot.biocarburant.name, tx.lot.volume.toString()],
+  (tx: Transaction) => [tx.lot.biocarburant.name, `${tx.lot.volume}L`],
 
   // matiere premiere
   (tx: Transaction) => [tx.lot.matiere_premiere.name, tx.lot.pays_origine.name],
@@ -55,7 +54,8 @@ const cells = [
 const Status = ({ value }: { value: LotStatus }) => (
   <span
     className={cl(styles.status, {
-      [styles.statusValidated]: value === LotStatus.Validated,
+      [styles.statusWaiting]:
+        value === LotStatus.Validated || value === LotStatus.Inbox,
       [styles.statusToFix]: value === LotStatus.ToFix,
       [styles.statusAccepted]: value === LotStatus.Accepted,
     })}
@@ -95,7 +95,7 @@ type TxRowProps = {
 export const TransactionRow = ({ transaction }: TxRowProps) => (
   <React.Fragment>
     <td>
-      <Status value={getStatus(transaction)} />
+      <Status value={transaction.status} />
     </td>
 
     {mapCells(cells, transaction).map((value, i) => (

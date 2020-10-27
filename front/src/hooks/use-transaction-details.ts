@@ -6,7 +6,7 @@ import { EntitySelection } from "./helpers/use-entity"
 import useTransactionForm, { toTransactionFormState } from "./helpers/use-transaction-form" // prettier-ignore
 import useAPI, { ApiState } from "./helpers/use-api"
 import useClose from "./helpers/use-close"
-import { getStatus, updateLot } from "../services/lots"
+import { updateLot } from "../services/lots"
 
 function getFieldErrors(tx: Transaction) {
   const fieldErrors: { [k: string]: string } = {}
@@ -37,7 +37,7 @@ export default function useTransactionDetails(
   )
 
   const fieldErrors = transaction ? getFieldErrors(transaction) : {}
-  const status = transaction ? getStatus(transaction) : null
+  const status = transaction ? transaction.status : null
 
   // if form data is not initialized, fill it instantly with data coming from transaction list
   if (transactions.data && (form.id === -1 || form.id !== transactionID)) {
