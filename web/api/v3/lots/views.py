@@ -10,7 +10,7 @@ from core.models import LotV2, LotTransaction, LotV2Error, TransactionError
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment
 from core.xlsx_template import create_xslx_from_transactions, create_template_xlsx_v2_simple
 from core.xlsx_template import create_template_xlsx_v2_advanced
-from core.common import validate_lots, load_excel_file, load_lot
+from core.common import validate_lots, load_excel_file, load_lot, bulk_insert
 from api.v3.sanity_checks import sanity_check
 
 
@@ -368,7 +368,7 @@ def add_lot(request):
     lot, tx, lot_errors, tx_errors = load_lot(entity, request.user, request.POST.dict(), 'MANUAL')
     if not tx:
         return JsonResponse({'status': 'error', 'message': 'Could not add lot to database'}, status=400)
-
+    bulk_insert(entity, [lot], [tx], lot_errors, tx_errors)
     return JsonResponse({'status': 'success', 'data': tx.natural_key()})
 
 
@@ -400,7 +400,11 @@ def update_lot(request):
         return JsonResponse({'status': 'forbidden', 'message': "Tx / Lot already validated and accepted"}, status=400)
     LotV2Error.objects.filter(lot_id=tx.lot.id).delete()
     TransactionError.objects.filter(tx_id=tx.id).delete()
-    load_lot(entity, request.user, request.POST.dict(), 'MANUAL', tx)
+    lot, tx, lot_errors, tx_errors = load_lot(entity, request.user, request.POST.dict(), 'MANUAL', tx)
+    lot.save()
+    tx.save()
+    LotV2Error.objects.bulk_create(lot_errors)
+    TransactionError.objects.bulk_create(tx_errors)       
     return JsonResponse({'status': 'success'})
 
 
