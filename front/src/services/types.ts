@@ -132,6 +132,7 @@ export interface Transaction {
   id: number
   lot: Lot
   dae: string
+  status: LotStatus
   delivery_status: string
   delivery_date: string
   champ_libre: string

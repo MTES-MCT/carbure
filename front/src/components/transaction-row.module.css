@@ -4,11 +4,10 @@
   border-radius: 50px;
   border: 1px solid var(--gray-highlight);
   font-size: 11px;
-  text-transform: capitalize;
   padding: 4px 8px;
 }
 
-.statusValidated {
+.statusWaiting {
   color: var(--blue-dark);
   background-color: var(--blue-light);
 }
