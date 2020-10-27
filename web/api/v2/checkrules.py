@@ -42,7 +42,7 @@ def sanity_check(lot):
     if lot.matiere_premiere.code == 'SOJA':
         # TODO: remplacer par une liste de pays "douteux" ou a l'inverse utiliser une whitelist et lever une alerte si le pays n'est pas dedans
         if lot.pays_origine.code_pays == 'SE':
-            raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_admin=True, block_validation=False)
+            raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_to_admin=True, block_validation=False)
 
     # consistence des matieres premieres avec biocarburant
     if lot.biocarburant.is_alcool and lot.matiere_premiere.compatible_alcool is False:
