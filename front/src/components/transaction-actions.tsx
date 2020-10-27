@@ -105,6 +105,18 @@ export const ValidatedLotsActions = () => (
   </Link>
 )
 
+export const InboxLotsActions = () => (
+  <Link relative to="show-summary-in">
+    <Button
+      className={styles.transactionButtons}
+      level="primary"
+      icon={Rapport}
+    >
+      Rapport d'entrées
+    </Button>
+  </Link>
+)
+
 export const ActionBar = ({ children }: { children: React.ReactNode }) => (
   <Box row className={cl(styles.actionBar)}>
     {children}
