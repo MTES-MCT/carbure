@@ -1,0 +1,22 @@
+div.dialog {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 16px;
+  padding-top: 24px;
+  padding-left: 24px;
+}
+
+.dialogMessage {
+  margin-top: 32px;
+  margin-bottom: 16px;
+}
+
+.dialogButtons {
+  margin-top: 16px;
+  justify-content: flex-end;
+}
+
+.dialogButtons button {
+  margin-left: 8px;
+}
