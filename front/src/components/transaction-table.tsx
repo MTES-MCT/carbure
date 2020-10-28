@@ -48,6 +48,12 @@ const getDraftActions = ({ onValidate, onDuplicate, onDelete }: Actions) =>
     { icon: Cross, title: "Supprimer le lot", action: onDelete },
   ])
 
+const getToFixActions = ({ onValidate, onDelete }: Actions) =>
+  C.actions([
+    { icon: Check, title: "Valider le lot", action: onValidate },
+    { icon: Cross, title: "Supprimer le lot", action: onDelete },
+  ])
+
 const getInboxActions = ({ onAccept, onComment, onReject }: Actions) =>
   C.actions([
     { icon: Check, title: "Accepter le lot", action: onAccept },
@@ -102,7 +108,11 @@ export const TransactionTable = ({
 
   let columns = []
 
-  if (status.is(LotStatus.Draft) || status.is(LotStatus.Inbox)) {
+  if (
+    status.is(LotStatus.Draft) ||
+    status.is(LotStatus.Inbox) ||
+    status.is(LotStatus.ToFix)
+  ) {
     columns.push(C.selector(selection))
   } else {
     columns.push(C.empty)
@@ -116,6 +126,8 @@ export const TransactionTable = ({
 
   if (status.is(LotStatus.Draft)) {
     columns.push(getDraftActions({ onValidate, onDuplicate, onDelete }))
+  } else if (status.is(LotStatus.ToFix)) {
+    columns.push(getToFixActions({ onValidate, onDelete }))
   } else if (status.is(LotStatus.Inbox)) {
     columns.push(getInboxActions({ onAccept, onComment, onReject }))
   } else {
