@@ -4,7 +4,7 @@ import { SettingsGetter } from "../hooks/use-app"
 
 import styles from "./settings.module.css"
 import useApi from "../hooks/helpers/use-api"
-import { enableMAC, disableMAC } from "../services/settings"
+import { enableMAC, disableMAC, disableTrading, enableTrading } from "../services/settings"
 
 import { Box } from "./system"
 
@@ -18,6 +18,9 @@ export const GeneralSettings = ({ entity, settings }: GeneralSettingsProps) => {
   const hasTrading: boolean = entity?.has_trading ?? false
   const [macEnabled, resolveMacEnabled] = useApi(enableMAC)
   const [macDisabled, resolveMacDisabled] = useApi(disableMAC)
+  const [tradingEnabled, resolveTradingEnabled] = useApi(enableTrading)
+  const [tradingDisabled, resolveTradingDisabled] = useApi(disableTrading)
+
 
   function onChangeMac(event: React.ChangeEvent<HTMLInputElement>): void {
     if (entity === null) {
@@ -27,6 +30,17 @@ export const GeneralSettings = ({ entity, settings }: GeneralSettingsProps) => {
       resolveMacEnabled(entity.id).then(settings.resolve)
     } else {
       resolveMacDisabled(entity.id).then(settings.resolve)
+    }
+  }
+
+  function onChangeTrading(event: React.ChangeEvent<HTMLInputElement>): void {
+    if (entity === null) {
+      return
+    }
+    if (event.target.checked) {
+      resolveTradingEnabled(entity.id).then(settings.resolve)
+    } else {
+      resolveTradingDisabled(entity.id).then(settings.resolve)
     }
   }
 
@@ -46,7 +60,12 @@ export const GeneralSettings = ({ entity, settings }: GeneralSettingsProps) => {
         />
         <label>Ma société effectue des Mises à Consommation</label>
         <h3>Trading</h3>
-        <input type="checkbox" defaultChecked={hasTrading} name="hasTrading" />
+        <input 
+          type="checkbox" 
+          defaultChecked={hasTrading} 
+          onChange={onChangeTrading}
+          name="hasTrading" 
+        />
         <label>Ma société a une activité de négoce</label>
       </fieldset>
     </Box>
