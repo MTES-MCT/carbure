@@ -13,18 +13,18 @@ import { Check, Cross, Download, Plus, Rapport, Upload } from "./system/icons"
 import { LotAcceptor } from "../hooks/actions/use-accept-lots"
 import { LotRejector } from "../hooks/actions/use-reject-lots"
 
-type ExportActionProps = {
+type ExportActionsProps = {
   isEmpty: boolean
   onExportAll: () => void
 }
 
-export const ExportAction = ({ isEmpty, onExportAll }: ExportActionProps) => (
+export const ExportActions = ({ isEmpty, onExportAll }: ExportActionsProps) => (
   <Button icon={Download} disabled={isEmpty} onClick={onExportAll}>
     Exporter
   </Button>
 )
 
-type DraftActionProps = {
+type DraftActionsProps = {
   disabled: boolean
   hasSelection: boolean
   uploader: LotUploader
@@ -38,7 +38,7 @@ export const DraftActions = ({
   uploader,
   deleter,
   validator,
-}: DraftActionProps) => {
+}: DraftActionsProps) => {
   function onValidate() {
     if (hasSelection) {
       validator.validateSelection()
@@ -95,7 +95,26 @@ export const DraftActions = ({
   )
 }
 
-type InboxActionProps = {
+type ToFixActionsProps = {
+  disabled: boolean
+  deleter: LotDeleter
+}
+
+export const ToFixActions = ({ disabled, deleter }: ToFixActionsProps) => {
+  return (
+    <AsyncButton
+      icon={Cross}
+      level="danger"
+      loading={deleter.loading}
+      disabled={disabled}
+      onClick={deleter.deleteSelection}
+    >
+      Supprimer sélection
+    </AsyncButton>
+  )
+}
+
+type InboxActionsProps = {
   disabled: boolean
   hasSelection: boolean
   acceptor: LotAcceptor
@@ -107,7 +126,7 @@ export const InboxActions = ({
   hasSelection,
   acceptor,
   rejector,
-}: InboxActionProps) => {
+}: InboxActionsProps) => {
   function onAccept() {
     if (hasSelection) {
       acceptor.acceptSelection()
@@ -149,7 +168,7 @@ export const InboxActions = ({
   )
 }
 
-export const ValidatedLotsActions = () => (
+export const OutSummaryActions = () => (
   <Link relative to="show-summary-out">
     <Button
       className={styles.transactionButtons}

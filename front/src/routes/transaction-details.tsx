@@ -11,12 +11,7 @@ import { Save } from "../components/system/icons"
 import TransactionForm from "../components/transaction-form"
 import { ApiState } from "../hooks/helpers/use-api"
 
-function canSave(status: LotStatus | null) {
-  return (
-    (status !== null && status === LotStatus.Draft) ||
-    status === LotStatus.Validated
-  )
-}
+const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 
 type TransactionDetailsProps = {
   entity: EntitySelection
@@ -44,14 +39,14 @@ const TransactionDetails = ({
       <Title>Transaction #{form.id ?? "N/A"}</Title>
 
       <TransactionForm
-        readOnly={!canSave(status)}
+        readOnly={!EDITABLE.includes(status)}
         transaction={form}
         error={request.error}
         fieldErrors={fieldErrors}
         onChange={change}
         onClose={close}
       >
-        {canSave(status) && (
+        {EDITABLE.includes(status) && (
           <AsyncButton
             submit
             icon={Save}

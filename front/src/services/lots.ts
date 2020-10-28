@@ -83,24 +83,28 @@ function toTransactionPostData(tx: TransactionFormState) {
 }
 
 // extract the status name from the lot details
-export function getStatus(lot: Transaction, entity: number): LotStatus {
-  const status = lot.lot.status.toLowerCase()
-  const delivery = lot.delivery_status
+export function getStatus(transaction: Transaction, entity: number): LotStatus {
+  const status = transaction.lot.status.toLowerCase()
+  const delivery = transaction.delivery_status
 
-  const isProducer = lot.carbure_vendor?.id === entity
-  const isOperator = lot.carbure_client?.id === entity
+  const isProducer = transaction.carbure_vendor?.id === entity
+  const isOperator = transaction.carbure_client?.id === entity
 
   if (status === "draft") {
     return LotStatus.Draft
   } else if (status === "validated") {
     if (delivery === "A") {
       return LotStatus.Accepted
-    } else if (isOperator && ["N", "AA", "AC"].includes(delivery)) {
+    }
+    // OPERATEUR
+    else if (isOperator && ["N", "AA", "AC"].includes(delivery)) {
       return LotStatus.Inbox
-    } else if (isProducer) {
+    }
+    // PRODUCTEUR
+    else if (isProducer) {
       if (["N", "AA"].includes(delivery)) {
         return LotStatus.Validated
-      } else if (delivery === "AC") {
+      } else if (["AC", "R"].includes(delivery)) {
         return LotStatus.ToFix
       }
     }
