@@ -22,6 +22,7 @@ export default function useAcceptLots(
   refresh: () => void
 ): LotAcceptor {
   const [request, resolveAccept] = useAPI(api.acceptLots)
+  const [requestComment, resolveAcceptAndComment] = useAPI(api.acceptAndCommentLot) // prettier-ignore
   const [requestAll, resolveAcceptAll] = useAPI(api.acceptAllInboxLots)
 
   async function acceptLot(lotID: number) {
@@ -42,7 +43,7 @@ export default function useAcceptLots(
     )
 
     if (entity !== null && comment) {
-      resolveAccept(entity.id, [lotID]).then(refresh)
+      resolveAcceptAndComment(entity.id, lotID, comment).then(refresh)
     }
   }
 
@@ -69,7 +70,7 @@ export default function useAcceptLots(
   }
 
   return {
-    loading: request.loading || requestAll.loading,
+    loading: request.loading || requestAll.loading || requestComment.loading,
     acceptLot,
     acceptAndCommentLot,
     acceptSelection,

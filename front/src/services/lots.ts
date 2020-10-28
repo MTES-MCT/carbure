@@ -228,11 +228,40 @@ export function acceptLots(entityID: number, transactionIDs: number[]) {
   })
 }
 
-export function rejectLots(entityID: number, transactionIDs: number[]) {
+export function rejectLots(
+  entityID: number,
+  transactionIDs: number[],
+  comment: string
+) {
   return api.post("/lots/reject", {
     entity_id: entityID,
     tx_ids: transactionIDs,
+    comment,
   })
+}
+
+export function commentLot(
+  entityID: number,
+  transactionID: number,
+  comment: string
+) {
+  return api.post("/lots/comment", {
+    entity_id: entityID,
+    tx_id: transactionID,
+    comment,
+    comment_type: "BOTH",
+  })
+}
+
+export function acceptAndCommentLot(
+  entityID: number,
+  transactionID: number,
+  comment: string
+) {
+  const accepting = acceptLots(entityID, [transactionID])
+  const commenting = commentLot(entityID, transactionID, comment)
+
+  return Promise.all([accepting, commenting])
 }
 
 export function deleteAllDraftLots(entityID: number, year: number) {
@@ -256,10 +285,15 @@ export function acceptAllInboxLots(entityID: number, year: number) {
   })
 }
 
-export function rejectAllInboxLots(entityID: number, year: number) {
+export function rejectAllInboxLots(
+  entityID: number,
+  year: number,
+  comment: string
+) {
   return api.post("/lots/reject-all", {
     entity_id: entityID,
     year,
+    comment,
   })
 }
 
