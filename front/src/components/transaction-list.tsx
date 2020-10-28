@@ -30,10 +30,11 @@ import { TransactionTable, StockTable } from "./transaction-table"
 import {
   ActionBar,
   DraftActions,
-  ExportAction,
-  ValidatedLotsActions,
+  ExportActions,
+  OutSummaryActions,
   InboxActions,
   InboxSummaryActions,
+  ToFixActions,
 } from "./transaction-actions"
 
 type TransactionListProps = {
@@ -92,10 +93,13 @@ export const TransactionList = ({
 
       {!isError && (
         <ActionBar>
-          <ExportAction
+          <ExportActions
             isEmpty={isEmpty}
             onExportAll={transactions.exportAllTransactions}
           />
+
+          {status.is(LotStatus.Validated) && <OutSummaryActions />}
+          {status.is(LotStatus.Accepted) && <InboxSummaryActions />}
 
           {status.is(LotStatus.Draft) && (
             <DraftActions
@@ -116,8 +120,12 @@ export const TransactionList = ({
             />
           )}
 
-          {status.is(LotStatus.Validated) && <ValidatedLotsActions />}
-          {status.is(LotStatus.Accepted) && <InboxSummaryActions />}
+          {status.is(LotStatus.ToFix) && (
+            <ToFixActions
+              disabled={selection.selected.length === 0}
+              deleter={deleter}
+            />
+          )}
         </ActionBar>
       )}
 
