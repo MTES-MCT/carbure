@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom"
 
-import { Lots, Transaction } from "../services/types"
+import { Lots, LotStatus, Transaction } from "../services/types"
 import { EntitySelection } from "./helpers/use-entity"
 
 import useTransactionForm, { toTransactionFormState } from "./helpers/use-transaction-form" // prettier-ignore
@@ -37,7 +37,7 @@ export default function useTransactionDetails(
   )
 
   const fieldErrors = transaction ? getFieldErrors(transaction) : {}
-  const status = transaction ? transaction.status : null
+  const status = transaction ? transaction.status : LotStatus.Weird
 
   // if form data is not initialized, fill it instantly with data coming from transaction list
   if (transactions.data && (form.id === -1 || form.id !== transactionID)) {
