@@ -27,7 +27,7 @@ export default function useRejectLots(
     const comment = await prompt("Refuser lots", "Voulez vous refuser ce lot ?")
 
     if (entity !== null && comment) {
-      resolveReject(entity.id, [lotID]).then(refresh)
+      resolveReject(entity.id, [lotID], comment).then(refresh)
     }
   }
 
@@ -38,7 +38,7 @@ export default function useRejectLots(
     )
 
     if (entity !== null && comment) {
-      resolveReject(entity.id, selection.selected).then(refresh)
+      resolveReject(entity.id, selection.selected, comment).then(refresh)
     }
   }
 
@@ -49,7 +49,7 @@ export default function useRejectLots(
     )
 
     if (entity !== null && comment) {
-      resolveRejectAll(entity.id, year.selected).then(refresh)
+      resolveRejectAll(entity.id, year.selected, comment).then(refresh)
     }
   }
 
