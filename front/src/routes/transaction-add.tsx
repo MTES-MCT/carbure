@@ -27,6 +27,7 @@ const TransactionAdd = ({ entity, refresh }: TransactionAddProps) => {
         error={request.error}
         onChange={change}
         onSubmit={submit}
+        onClose={close}
       >
         <AsyncButton
           submit
@@ -36,9 +37,6 @@ const TransactionAdd = ({ entity, refresh }: TransactionAddProps) => {
         >
           Créer lot
         </AsyncButton>
-        <Button icon={Cross} onClick={close}>
-          Annuler
-        </Button>
       </TransactionForm>
     </Modal>
   )
