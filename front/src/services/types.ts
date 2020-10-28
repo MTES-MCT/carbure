@@ -23,7 +23,7 @@ export enum GESOption {
 export interface Entity {
   id: number
   name: string
-  entity_type: string
+  entity_type: "Producteur" | "Opérateur" | "Trader" | "Administration"
   has_mac: boolean
   has_trading: boolean
 }

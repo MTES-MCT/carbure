@@ -2,16 +2,17 @@ import React from "react"
 import cl from "clsx"
 
 import styles from "./icons.module.css"
+import { SystemProps } from "."
 
 // icons were adapted from https://github.com/tabler/tabler-icons
 
-type IconProps = {
+export type IconProps = SystemProps & {
   size?: number
   color?: string
   stroke?: number
   className?: string
   title?: string
-  [k: string]: any
+  onClick?: (e: React.MouseEvent) => void
 }
 
 const Icon = ({

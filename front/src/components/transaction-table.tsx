@@ -2,206 +2,76 @@ import React from "react"
 import cl from "clsx"
 import differenceInCalendarMonths from "date-fns/differenceInCalendarMonths"
 
-import { Lots, LotStatus } from "../services/types"
+import { Entity, Lots, LotStatus, Transaction } from "../services/types"
 import { SortingSelection } from "../hooks/query/use-sort-by" // prettier-ignore
 import { TransactionSelection } from "../hooks/query/use-selection"
 import { StatusSelection } from "../hooks/query/use-status"
 
 import styles from "./transaction-table.module.css"
 
-import { Table } from "./system"
-import { Check, ChevronRight, Copy, Cross } from "./system/icons"
-import {
-  TransactionRow,
-  TransactionRowContainer,
-  StockTransactionRow,
-} from "./transaction-row"
+import { useRelativePush } from "./relative-route"
 
-const COLUMNS = [
-  { key: "", label: "Statut" },
-  { key: "period", label: "Date d'ajout" },
-  { key: "", label: "N° Douane" },
-  { key: "client", label: "Client" },
-  { key: "biocarburant", label: "Biocarburant" },
-  { key: "matiere_premiere", label: "Mat. Première" },
-  { key: "pays_origine", label: "Provenance" },
-  { key: "", label: "Destination" },
-  { key: "ghg_reduction", label: "Économie" },
+import { Check, Copy, Cross } from "./system/icons"
+import Table, { Row } from "./system/table"
+import * as C from "./transaction-columns"
+
+export const PRODUCER_COLUMNS = [
+  C.status,
+  C.period,
+  C.dae,
+  C.biocarburant,
+  C.matierePremiere,
+  C.client,
+  C.productionSite,
+  C.deliverySite,
+  C.ghgReduction,
 ]
 
-const STOCK_COLUMNS = [
-  { key: "carbure_id", label: "ID" },
-  { key: "biocarburant", label: "Biocarburant" },
-  { key: "pays_origine", label: "Provenance" },
-  { key: "", label: "Destination" },
-  { key: "matiere_premiere", label: "Mat. Première" },
-  { key: "ghg_reduction", label: "Économie" },
+export const OPERATOR_COLUMNS = [
+  C.status,
+  C.period,
+  C.dae,
+  C.biocarburant,
+  C.matierePremiere,
+  C.vendor,
+  C.productionSite,
+  C.deliverySite,
+  C.ghgReduction,
 ]
 
-function stopProp(handler: Function = () => {}) {
-  return (e: React.SyntheticEvent) => {
-    e.stopPropagation()
-    handler()
-  }
-}
+type Actions = Record<string, (id: number) => void>
 
-function isEverythingSelected(ids: number[], selected: number[]) {
-  ids.sort()
-  selected.sort()
+const getDraftActions = ({ onValidate, onDuplicate, onDelete }: Actions) =>
+  C.actions([
+    { icon: Check, title: "Envoyer le lot", action: onValidate },
+    { icon: Copy, title: "Dupliquer le lot", action: onDuplicate },
+    { icon: Cross, title: "Supprimer le lot", action: onDelete },
+  ])
 
-  return (
-    ids.length > 0 &&
-    ids.length === selected.length &&
-    selected.every((id, i) => ids[i] === id)
-  )
-}
+const getInboxActions = ({ onAccept, onComment, onReject }: Actions) =>
+  C.actions([
+    { icon: Check, title: "Accepter le lot", action: onAccept },
+    { icon: Copy, title: "Accepter sous réserve", action: onComment },
+    { icon: Cross, title: "Refuser le lot", action: onReject },
+  ])
 
-type TxColumnsProps = {
-  sorting: SortingSelection
-  children: React.ReactNode
-}
-
-const TransactionColumns = ({ sorting, children }: TxColumnsProps) => (
-  <thead>
-    <tr>
-      {children}
-      {COLUMNS.map((column, i) => (
-        <th key={i} onClick={() => sorting.sortBy(column.key)}>
-          {column.label}
-          {sorting.column && sorting.column === column.key && (
-            <span>{sorting.order === "asc" ? " ▲" : " ▼"}</span>
-          )}
-        </th>
-      ))}
-      <th />
-    </tr>
-  </thead>
-)
-
-function hasErrors(transactions: Lots, id: number): boolean {
+export function hasErrors(transactions: Lots, id: number): boolean {
   return (
     transactions.lots_errors[id]?.length > 0 ||
     transactions.tx_errors[id]?.length > 0
   )
 }
 
-function hasDeadline(transactions: Lots, id: number): boolean {
-  const tx = transactions.lots.find((tx) => tx.id === id)
-
+export function hasDeadline(tx: Transaction, deadline: string): boolean {
   if (!tx || tx.status !== LotStatus.Draft) return false
 
-  const deadline = new Date(transactions.deadlines.date)
+  const deadlineDate = new Date(deadline)
   const deliveryDate = new Date(tx?.delivery_date)
-  return differenceInCalendarMonths(deadline, deliveryDate) === 1
-}
-
-type DisplayTableProps = {
-  transactions: Lots
-  sorting: SortingSelection
-}
-
-const DisplayTable = ({ transactions, sorting }: DisplayTableProps) => (
-  <Table className={styles.transactionTable}>
-    <TransactionColumns sorting={sorting}>
-      <th />
-    </TransactionColumns>
-    <tbody>
-      {transactions.lots.map((tx) => (
-        <TransactionRowContainer
-          key={tx.id}
-          id={tx.id}
-          error={tx.errors.length > 0}
-          deadline={hasDeadline(transactions, tx.id)}
-        >
-          <td />
-          <TransactionRow transaction={tx} />
-          <td className={styles.actionColumn}>
-            <ChevronRight className={styles.transactionArrow} />
-          </td>
-        </TransactionRowContainer>
-      ))}
-    </tbody>
-  </Table>
-)
-
-type ActionTableProps = {
-  transactions: Lots
-  selection: TransactionSelection
-  sorting: SortingSelection
-  onDelete: (id: number) => void
-  onValidate: (id: number) => void
-  onDuplicate: (id: number) => void
-}
-
-const ActionTable = ({
-  transactions,
-  sorting,
-  selection,
-  onDelete,
-  onDuplicate,
-  onValidate,
-}: ActionTableProps) => {
-  const ids = transactions ? transactions.lots.map((t) => t.id) : []
-
-  const selectAllCheckbox = (
-    <input
-      type="checkbox"
-      checked={isEverythingSelected(ids, selection.selected)}
-      onChange={(e) => selection.selectMany(e.target.checked ? ids : [])}
-    />
-  )
-
-  return (
-    <Table className={cl(styles.transactionTable, styles.actionTable)}>
-      <TransactionColumns sorting={sorting}>
-        <th>{selectAllCheckbox}</th>
-      </TransactionColumns>
-
-      <tbody>
-        {transactions.lots.map((tx) => (
-          <TransactionRowContainer
-            key={tx.id}
-            id={tx.id}
-            error={tx.errors.length > 0}
-            deadline={hasDeadline(transactions, tx.id)}
-          >
-            <td>
-              <input
-                type="checkbox"
-                checked={selection.has(tx.id)}
-                onChange={() => selection.selectOne(tx.id)}
-                onClick={stopProp()}
-              />
-            </td>
-
-            <TransactionRow transaction={tx} />
-
-            <td className={styles.actionColumn}>
-              <ChevronRight className={styles.transactionArrow} />
-
-              <div className={styles.transactionActions}>
-                <Copy
-                  title="Dupliquer le lot"
-                  onClick={stopProp(() => onDuplicate(tx.id))}
-                />
-                <Check
-                  title="Envoyer le lot"
-                  onClick={stopProp(() => onValidate(tx.id))}
-                />
-                <Cross
-                  title="Supprimer le lot"
-                  onClick={stopProp(() => onDelete(tx.id))}
-                />
-              </div>
-            </td>
-          </TransactionRowContainer>
-        ))}
-      </tbody>
-    </Table>
-  )
+  return differenceInCalendarMonths(deadlineDate, deliveryDate) === 1
 }
 
 type TransactionTableProps = {
+  entity: Entity
   transactions: Lots
   status: StatusSelection
   sorting: SortingSelection
@@ -209,9 +79,13 @@ type TransactionTableProps = {
   onDelete: (id: number) => void
   onValidate: (id: number) => void
   onDuplicate: (id: number) => void
+  onAccept: (id: number) => void
+  onComment: (id: number) => void
+  onReject: (id: number) => void
 }
 
-export const TransactionTable = ({
+const TransactionTable = ({
+  entity,
   transactions,
   status,
   sorting,
@@ -219,71 +93,53 @@ export const TransactionTable = ({
   onDelete,
   onDuplicate,
   onValidate,
+  onAccept,
+  onComment,
+  onReject,
 }: TransactionTableProps) => {
-  // return Display table for transactions that aren't drafts
-  if (status.active !== LotStatus.Draft) {
-    return <DisplayTable transactions={transactions} sorting={sorting} />
+  const relativePush = useRelativePush()
+  const deadline = transactions.deadlines.date
+
+  let columns = []
+
+  if (status.active === LotStatus.Draft || status.active === LotStatus.Inbox) {
+    columns.push(C.selector(selection))
+  } else {
+    columns.push(C.empty)
   }
 
+  if (entity.entity_type === "Producteur") {
+    columns.push(...PRODUCER_COLUMNS)
+  } else if (entity.entity_type === "Opérateur") {
+    columns.push(...OPERATOR_COLUMNS)
+  }
+
+  if (status.active === LotStatus.Draft) {
+    columns.push(getDraftActions({ onValidate, onDuplicate, onDelete }))
+  } else if (status.active === LotStatus.Inbox) {
+    columns.push(getInboxActions({ onAccept, onComment, onReject }))
+  } else {
+    columns.push(C.arrow)
+  }
+
+  const rows: Row<Transaction>[] = transactions.lots.map((tx) => ({
+    value: tx,
+    onClick: () => relativePush(`${tx.id}`),
+    className: cl({
+      [styles.transactionRowError]: tx.errors.length > 0,
+      [styles.transactionRowDeadline]: hasDeadline(tx, deadline),
+    }),
+  }))
+
   return (
-    <ActionTable
-      transactions={transactions}
-      selection={selection}
-      sorting={sorting}
-      onDuplicate={onDuplicate}
-      onValidate={onValidate}
-      onDelete={onDelete}
+    <Table
+      columns={columns}
+      rows={rows}
+      sortBy={sorting.column}
+      order={sorting.order}
+      onSort={sorting.sortBy}
     />
   )
 }
 
-type StockTableProps = {
-  transactions: Lots
-  sorting: SortingSelection
-}
-
-export const StockTable = ({ transactions, sorting }: StockTableProps) => {
-  return <DisplayStockTable transactions={transactions} sorting={sorting} />
-}
-
-const StockTransactionColumns = ({ sorting, children }: TxColumnsProps) => (
-  <thead>
-    <tr>
-      {children}
-      {STOCK_COLUMNS.map((column, i) => (
-        <th key={i} onClick={() => sorting.sortBy(column.key)}>
-          {column.label}
-          {sorting.column && sorting.column === column.key && (
-            <span>{sorting.order === "asc" ? " ▲" : " ▼"}</span>
-          )}
-        </th>
-      ))}
-      <th />
-    </tr>
-  </thead>
-)
-
-const DisplayStockTable = ({ transactions, sorting }: DisplayTableProps) => (
-  <Table>
-    <StockTransactionColumns sorting={sorting}>
-      <th />
-    </StockTransactionColumns>
-
-    <tbody>
-      {transactions.lots.map((tx) => (
-        <TransactionRowContainer
-          key={tx.id}
-          id={tx.id}
-          error={hasErrors(transactions, tx.id)}
-          deadline={hasDeadline(transactions, tx.id)}
-        >
-          <td />
-          <StockTransactionRow transaction={tx} />
-          <td className={styles.actionColumn}>
-            <ChevronRight className={styles.transactionArrow} />
-          </td>
-        </TransactionRowContainer>
-      ))}
-    </tbody>
-  </Table>
-)
+export default TransactionTable
