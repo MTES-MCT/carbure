@@ -23,8 +23,7 @@ import { AlertCircle, Calendar } from "./system/icons"
 import { Box, LoaderOverlay } from "./system"
 import { Alert, AlertFilter } from "./system/alert"
 import Pagination from "./system/pagination"
-import TransactionTable from "./transaction-table"
-import StockTable from "./stock-table"
+import { TransactionTable, StockTable } from "./transaction-table"
 
 import {
   ActionBar,
