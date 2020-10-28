@@ -16,7 +16,7 @@ chardet==3.0.4
 colorama==0.4.3
 contextlib2==0.6.0
 coverage==5.1
-cryptography==2.8
+cryptography==3.2.1
 distlib==0.3.0
 distro==1.4.0
 Django==3.0.7
