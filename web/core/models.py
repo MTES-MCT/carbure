@@ -18,6 +18,8 @@ class Entity(models.Model):
     producer_with_mac = models.BooleanField(default=False)
     producer_with_trading = models.BooleanField(default=False)
     trading_certificate = models.FileField(null=True, blank=True)
+    has_mac = models.BooleanField(default=False)
+    has_trading = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
