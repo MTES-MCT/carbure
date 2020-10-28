@@ -193,6 +193,7 @@ export const TransactionList = ({
               onAccept={acceptor.acceptLot}
               onComment={acceptor.acceptAndCommentLot}
               onReject={rejector.rejectLot}
+              onCorrect={validator.validateAndCommentLot}
             />
             {isLoading && <LoaderOverlay />}
           </Box>

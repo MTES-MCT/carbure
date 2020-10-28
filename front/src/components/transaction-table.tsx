@@ -48,9 +48,9 @@ const getDraftActions = ({ onValidate, onDuplicate, onDelete }: Actions) =>
     { icon: Cross, title: "Supprimer le lot", action: onDelete },
   ])
 
-const getToFixActions = ({ onValidate, onDelete }: Actions) =>
+const getToFixActions = ({ onCorrect, onDelete }: Actions) =>
   C.actions([
-    { icon: Check, title: "Valider le lot", action: onValidate },
+    { icon: Check, title: "Renvoyer le lot", action: onCorrect },
     { icon: Cross, title: "Supprimer le lot", action: onDelete },
   ])
 
@@ -88,6 +88,7 @@ type TransactionTableProps = {
   onAccept: (id: number) => void
   onComment: (id: number) => void
   onReject: (id: number) => void
+  onCorrect: (id: number) => void
 }
 
 export const TransactionTable = ({
@@ -102,6 +103,7 @@ export const TransactionTable = ({
   onAccept,
   onComment,
   onReject,
+  onCorrect,
 }: TransactionTableProps) => {
   const relativePush = useRelativePush()
   const deadline = transactions.deadlines.date
@@ -127,7 +129,7 @@ export const TransactionTable = ({
   if (status.is(LotStatus.Draft)) {
     columns.push(getDraftActions({ onValidate, onDuplicate, onDelete }))
   } else if (status.is(LotStatus.ToFix)) {
-    columns.push(getToFixActions({ onValidate, onDelete }))
+    columns.push(getToFixActions({ onCorrect, onDelete }))
   } else if (status.is(LotStatus.Inbox)) {
     columns.push(getInboxActions({ onAccept, onComment, onReject }))
   } else {

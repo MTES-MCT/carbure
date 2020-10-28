@@ -257,6 +257,17 @@ export function commentLot(
   })
 }
 
+export function validateAndCommentLot(
+  entityID: number,
+  transactionID: number,
+  comment: string
+) {
+  const accepting = validateLots(entityID, [transactionID])
+  const commenting = commentLot(entityID, transactionID, comment)
+
+  return Promise.all([accepting, commenting])
+}
+
 export function acceptAndCommentLot(
   entityID: number,
   transactionID: number,

@@ -16,8 +16,13 @@
 .transactionFields > div:nth-child(3) {
   margin-top: -68px;
 }
+
 .transactionFields > div {
   margin-right: 32px;
+}
+
+.transactionFields > div:last-child {
+  margin-right: 0;
 }
 
 .transactionGES > div:first-child {
@@ -38,6 +43,14 @@
   margin-top: 24px;
 }
 
-.transactionFormClose {
+.transactionFormButtons button {
+  margin-right: 16px;
+}
+
+.transactionFormButtons button:last-child {
+  margin-right: 0;
+}
+
+button.transactionFormClose {
   margin-left: auto;
 }

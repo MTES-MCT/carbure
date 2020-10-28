@@ -58,7 +58,6 @@ export default function useTransactionDetails(
 
     if (res) {
       refresh()
-      close()
     }
   }
 
