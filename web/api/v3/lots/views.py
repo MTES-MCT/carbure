@@ -397,7 +397,7 @@ def update_lot(request):
         return JsonResponse({'status': 'error', 'message': "Unknown transaction %s" % (tx_id), 'extra': str(e)},
                             status=400)
     if tx.delivery_status == 'A':
-        return JsonResponse({'status': 'forbidden', 'message': "Tx / Lot already validated and accepted"}, status=400)
+        return JsonResponse({'status': 'forbidden', 'message': "Tx already validated and accepted %d" % (tx.id)}, status=400)
     LotV2Error.objects.filter(lot_id=tx.lot.id).delete()
     TransactionError.objects.filter(tx_id=tx.id).delete()
     lot, tx, lot_errors, tx_errors = load_lot(entity, request.user, request.POST.dict(), 'MANUAL', tx)
