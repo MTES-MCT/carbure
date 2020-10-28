@@ -368,7 +368,7 @@ def add_lot(request):
     lot, tx, lot_errors, tx_errors = load_lot(entity, request.user, request.POST.dict(), 'MANUAL')
     if not tx:
         return JsonResponse({'status': 'error', 'message': 'Could not add lot to database'}, status=400)
-    bulk_insert(entity, [lot], [tx], lot_errors, tx_errors)
+    bulk_insert(entity, [lot], [tx], [lot_errors], [tx_errors])
     return JsonResponse({'status': 'success', 'data': tx.natural_key()})
 
 
@@ -500,7 +500,7 @@ def accept_lot(request):
 
 
 def reject_lot(request):
-    tx_ids = request.POST.get('tx_ids', None)
+    tx_ids = request.POST.getlist('tx_ids', None)
     tx_comment = request.POST.get('comment', None)
     if not tx_ids:
         return JsonResponse({'status': 'error', 'message': "Missing tx_ids"}, status=400)
