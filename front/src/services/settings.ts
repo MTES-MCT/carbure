@@ -73,6 +73,18 @@ export function disableMAC(entityID: number) {
   })
 }
 
+export function enableTrading(entityID: number) {
+  return api.post("/settings/enable-trading", {
+  	entity_id: entityID,
+  })
+}
+
+export function disableTrading(entityID: number) {
+  return api.post("/settings/disable-trading", {
+  	entity_id: entityID,
+  })
+}
+
 export function getISCCTradingCertificates(entityID: number) {
   return api.get("/settings/get-iscc-trading-certificates", {
     entity_id: entityID,

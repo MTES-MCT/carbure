@@ -297,7 +297,7 @@ def disable_trading(request, *args, **kwargs):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit entity"}, status=403)
 
-    entity.has_trading = True
+    entity.has_trading = False
     entity.save()
     return JsonResponse({'status': 'success'})
 
