@@ -61,6 +61,9 @@ const getInboxActions = ({ onAccept, onComment, onReject }: Actions) =>
     { icon: Cross, title: "Refuser le lot", action: onReject },
   ])
 
+const getDuplicateActions = ({ onDuplicate }: Actions) =>
+  C.actions([{ icon: Copy, title: "Dupliquer le lot", action: onDuplicate }])
+
 export function hasErrors(transactions: Lots, id: number): boolean {
   return (
     transactions.lots_errors[id]?.length > 0 ||
@@ -108,6 +111,9 @@ export const TransactionTable = ({
   const relativePush = useRelativePush()
   const deadline = transactions.deadlines.date
 
+  const isProducer = entity.entity_type === "Producteur"
+  const isOperator = entity.entity_type === "Opérateur"
+
   let columns = []
 
   if (
@@ -120,9 +126,9 @@ export const TransactionTable = ({
     columns.push(C.empty)
   }
 
-  if (entity.entity_type === "Producteur") {
+  if (isProducer) {
     columns.push(...PRODUCER_COLUMNS)
-  } else if (entity.entity_type === "Opérateur") {
+  } else if (isOperator) {
     columns.push(...OPERATOR_COLUMNS)
   }
 
@@ -132,6 +138,8 @@ export const TransactionTable = ({
     columns.push(getToFixActions({ onCorrect, onDelete }))
   } else if (status.is(LotStatus.Inbox)) {
     columns.push(getInboxActions({ onAccept, onComment, onReject }))
+  } else if (isProducer) {
+    columns.push(getDuplicateActions({ onDuplicate }))
   } else {
     columns.push(C.arrow)
   }
