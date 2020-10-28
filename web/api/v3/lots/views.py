@@ -90,7 +90,7 @@ def get_lots(request):
         txs = txs.filter(carbure_client=entity)
         # filter by status
         if status == 'draft':
-            txs = txs.filter(lot__status='Draft')
+            txs = txs.filter(lot__added_by=entity, lot__status='Draft')
         elif status == 'in':
             txs = txs.filter(delivery_status__in=['N', 'AC', 'AA'], lot__status="Validated")
         elif status == 'accepted':
@@ -245,7 +245,7 @@ def get_snapshot(request):
         txs = LotTransaction.objects.filter(carbure_client=entity)
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
         txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-        draft = len(txs.filter(lot__status='Draft'))
+        draft = len(txs.filter(lot__added_by=entity, lot__status='Draft'))
         ins = len(txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA', 'AC']))
         accepted = len(txs.filter(lot__status='Validated', delivery_status='A'))
         data['lots'] = {'draft': draft, 'accepted': accepted, 'in': ins}
