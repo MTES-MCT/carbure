@@ -10,6 +10,8 @@ import { LotValidator } from "../hooks/actions/use-validate-lots"
 import { Link } from "./relative-route"
 import { AsyncButton, Box, Button } from "./system"
 import { Check, Cross, Download, Plus, Rapport, Upload } from "./system/icons"
+import { LotAcceptor } from "../hooks/actions/use-accept-lots"
+import { LotRejector } from "../hooks/actions/use-reject-lots"
 
 type ExportActionProps = {
   isEmpty: boolean
@@ -30,7 +32,7 @@ type DraftActionProps = {
   validator: LotValidator
 }
 
-export const DraftLotsActions = ({
+export const DraftActions = ({
   disabled,
   hasSelection,
   uploader,
@@ -93,6 +95,60 @@ export const DraftLotsActions = ({
   )
 }
 
+type InboxActionProps = {
+  disabled: boolean
+  hasSelection: boolean
+  acceptor: LotAcceptor
+  rejector: LotRejector
+}
+
+export const InboxActions = ({
+  disabled,
+  hasSelection,
+  acceptor,
+  rejector,
+}: InboxActionProps) => {
+  function onAccept() {
+    if (hasSelection) {
+      acceptor.acceptSelection()
+    } else {
+      acceptor.acceptAllInbox()
+    }
+  }
+
+  function onReject() {
+    if (hasSelection) {
+      rejector.rejectSelection()
+    } else {
+      rejector.rejectAllInbox()
+    }
+  }
+
+  return (
+    <React.Fragment>
+      <AsyncButton
+        icon={Check}
+        level="success"
+        loading={acceptor.loading}
+        disabled={disabled}
+        onClick={onAccept}
+      >
+        Accepter {hasSelection ? `sélection` : "tout"}
+      </AsyncButton>
+
+      <AsyncButton
+        icon={Cross}
+        level="danger"
+        loading={rejector.loading}
+        disabled={disabled}
+        onClick={onReject}
+      >
+        Refuser {hasSelection ? `sélection` : "tout"}
+      </AsyncButton>
+    </React.Fragment>
+  )
+}
+
 export const ValidatedLotsActions = () => (
   <Link relative to="show-summary-out">
     <Button
@@ -105,7 +161,7 @@ export const ValidatedLotsActions = () => (
   </Link>
 )
 
-export const InboxLotsActions = () => (
+export const InboxSummaryActions = () => (
   <Link relative to="show-summary-in">
     <Button
       className={styles.transactionButtons}

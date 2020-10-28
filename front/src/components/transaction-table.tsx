@@ -11,7 +11,7 @@ import styles from "./transaction-table.module.css"
 
 import { useRelativePush } from "./relative-route"
 
-import { Check, Copy, Cross } from "./system/icons"
+import { AlertTriangle, Check, Copy, Cross } from "./system/icons"
 import Table, { Row } from "./system/table"
 import * as C from "./transaction-columns"
 
@@ -51,7 +51,7 @@ const getDraftActions = ({ onValidate, onDuplicate, onDelete }: Actions) =>
 const getInboxActions = ({ onAccept, onComment, onReject }: Actions) =>
   C.actions([
     { icon: Check, title: "Accepter le lot", action: onAccept },
-    { icon: Copy, title: "Accepter sous réserve", action: onComment },
+    { icon: AlertTriangle, title: "Accepter sous réserve", action: onComment },
     { icon: Cross, title: "Refuser le lot", action: onReject },
   ])
 
@@ -102,7 +102,7 @@ export const TransactionTable = ({
 
   let columns = []
 
-  if (status.active === LotStatus.Draft || status.active === LotStatus.Inbox) {
+  if (status.is(LotStatus.Draft) || status.is(LotStatus.Inbox)) {
     columns.push(C.selector(selection))
   } else {
     columns.push(C.empty)
@@ -114,9 +114,9 @@ export const TransactionTable = ({
     columns.push(...OPERATOR_COLUMNS)
   }
 
-  if (status.active === LotStatus.Draft) {
+  if (status.is(LotStatus.Draft)) {
     columns.push(getDraftActions({ onValidate, onDuplicate, onDelete }))
-  } else if (status.active === LotStatus.Inbox) {
+  } else if (status.is(LotStatus.Inbox)) {
     columns.push(getInboxActions({ onAccept, onComment, onReject }))
   } else {
     columns.push(C.arrow)

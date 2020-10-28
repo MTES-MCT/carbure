@@ -5,7 +5,7 @@ import { YearSelection } from "../query/use-year"
 import * as api from "../../services/lots"
 import useAPI from "../helpers/use-api"
 
-import confirm from "../../components/system/confirm"
+import { confirm } from "../../components/system/dialog"
 
 export interface LotValidator {
   loading: boolean

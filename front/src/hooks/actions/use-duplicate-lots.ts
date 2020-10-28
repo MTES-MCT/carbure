@@ -3,7 +3,7 @@ import { EntitySelection } from "../helpers/use-entity"
 import * as api from "../../services/lots"
 import useAPI from "../helpers/use-api"
 
-import confirm from "../../components/system/confirm"
+import { confirm } from "../../components/system/dialog"
 
 export interface LotDuplicator {
   loading: boolean

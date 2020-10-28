@@ -12,6 +12,8 @@ import { LotUploader } from "../hooks/actions/use-upload-file"
 import { LotDeleter } from "../hooks/actions/use-delete-lots"
 import { LotValidator } from "../hooks/actions/use-validate-lots"
 import { LotDuplicator } from "../hooks/actions/use-duplicate-lots"
+import { LotAcceptor } from "../hooks/actions/use-accept-lots"
+import { LotRejector } from "../hooks/actions/use-reject-lots"
 import { StatusSelection } from "../hooks/query/use-status"
 import { TransactionSelection } from "../hooks/query/use-selection"
 import { InvalidSelection } from "../hooks/query/use-invalid"
@@ -27,10 +29,11 @@ import { TransactionTable, StockTable } from "./transaction-table"
 
 import {
   ActionBar,
-  DraftLotsActions,
+  DraftActions,
   ExportAction,
   ValidatedLotsActions,
-  InboxLotsActions,
+  InboxActions,
+  InboxSummaryActions,
 } from "./transaction-actions"
 
 type TransactionListProps = {
@@ -46,6 +49,8 @@ type TransactionListProps = {
   uploader: LotUploader
   validator: LotValidator
   duplicator: LotDuplicator
+  acceptor: LotAcceptor
+  rejector: LotRejector
 }
 
 export const TransactionList = ({
@@ -61,6 +66,8 @@ export const TransactionList = ({
   uploader,
   validator,
   duplicator,
+  acceptor,
+  rejector,
 }: TransactionListProps) => {
   const tx = transactions.data
   const errorCount = tx?.errors ?? 0
@@ -90,8 +97,8 @@ export const TransactionList = ({
             onExportAll={transactions.exportAllTransactions}
           />
 
-          {status.active === LotStatus.Draft && (
-            <DraftLotsActions
+          {status.is(LotStatus.Draft) && (
+            <DraftActions
               disabled={isEmpty}
               hasSelection={selection.selected.length > 0}
               uploader={uploader}
@@ -100,8 +107,17 @@ export const TransactionList = ({
             />
           )}
 
-          {status.active === LotStatus.Validated && <ValidatedLotsActions />}
-          {status.active === LotStatus.Inbox && <InboxLotsActions />}
+          {status.is(LotStatus.Inbox) && (
+            <InboxActions
+              disabled={isEmpty}
+              hasSelection={selection.selected.length > 0}
+              acceptor={acceptor}
+              rejector={rejector}
+            />
+          )}
+
+          {status.is(LotStatus.Validated) && <ValidatedLotsActions />}
+          {status.is(LotStatus.Accepted) && <InboxSummaryActions />}
         </ActionBar>
       )}
 
@@ -166,9 +182,9 @@ export const TransactionList = ({
               onDuplicate={duplicator.duplicateLot}
               onValidate={validator.validateLot}
               onDelete={deleter.deleteLot}
-              onAccept={() => console.log("@TODO ACCEPT")}
-              onComment={() => console.log("@TODO COMMENT")}
-              onReject={() => console.log("@TODO REJECT")}
+              onAccept={acceptor.acceptLot}
+              onComment={acceptor.acceptAndCommentLot}
+              onReject={rejector.rejectLot}
             />
             {isLoading && <LoaderOverlay />}
           </Box>

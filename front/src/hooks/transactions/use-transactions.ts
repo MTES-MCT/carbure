@@ -7,6 +7,8 @@ import useUploadLotFile from "../actions/use-upload-file"
 import useDuplicateLot from "../actions/use-duplicate-lots"
 import useDeleteLots from "../actions/use-delete-lots"
 import useValidateLots from "../actions/use-validate-lots"
+import useRejectLots from "../actions/use-reject-lots"
+import useAcceptLots from "../actions/use-accept-lots"
 
 import useFilterSelection from "../query/use-filters"
 import useSearchSelection from "../query/use-search"
@@ -55,6 +57,8 @@ export default function useTransactions(entity: EntitySelection) {
   const duplicator = useDuplicateLot(entity, refresh)
   const deleter = useDeleteLots(entity, selection, year, refresh)
   const validator = useValidateLots(entity, selection, year, refresh)
+  const acceptor = useAcceptLots(entity, selection, year, refresh)
+  const rejector = useRejectLots(entity, selection, year, refresh)
 
   return {
     entity,
@@ -73,6 +77,8 @@ export default function useTransactions(entity: EntitySelection) {
     uploader,
     duplicator,
     validator,
+    acceptor,
+    rejector,
     refresh,
   }
 }
