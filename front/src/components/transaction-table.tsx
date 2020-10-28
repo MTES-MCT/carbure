@@ -84,7 +84,7 @@ type TransactionTableProps = {
   onReject: (id: number) => void
 }
 
-const TransactionTable = ({
+export const TransactionTable = ({
   entity,
   transactions,
   status,
@@ -142,4 +142,44 @@ const TransactionTable = ({
   )
 }
 
-export default TransactionTable
+type StockTableProps = {
+  transactions: Lots
+  sorting: SortingSelection
+}
+
+export const StockTable = ({ transactions, sorting }: StockTableProps) => {
+  const relativePush = useRelativePush()
+  const deadline = transactions.deadlines?.date
+
+  const columns = [
+    C.empty,
+    C.carbureID,
+    C.biocarburant,
+    C.productionSite,
+    C.deliverySite,
+    C.matierePremiere,
+    C.ghgReduction,
+    C.arrow,
+  ]
+
+  const rows: Row<Transaction>[] = transactions.lots.map((tx) => ({
+    value: tx,
+    onClick: () => relativePush(`${tx.id}`),
+    className: cl({
+      [styles.transactionRowError]: hasErrors(transactions, tx.id),
+      [styles.transactionRowDeadline]: hasDeadline(tx, deadline),
+    }),
+  }))
+
+  return (
+    <Table
+      columns={columns}
+      rows={rows}
+      sortBy={sorting.column}
+      order={sorting.order}
+      onSort={sorting.sortBy}
+    />
+  )
+}
+
+export default StockTable
