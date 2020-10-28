@@ -1,9 +1,9 @@
 import React from "react"
 
-import { AsyncButton, Button, Title } from "../components/system"
+import { AsyncButton, Title } from "../components/system"
 import Modal from "../components/system/modal"
 import TransactionForm from "../components/transaction-form"
-import { Cross, Plus } from "../components/system/icons"
+import { Plus } from "../components/system/icons"
 import { EntitySelection } from "../hooks/helpers/use-entity"
 import useTransactionAdd from "../hooks/use-transaction-add"
 

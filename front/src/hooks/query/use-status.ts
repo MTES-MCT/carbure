@@ -9,6 +9,7 @@ import { useRelativePush } from "../../components/relative-route"
 
 export interface StatusSelection {
   active: LotStatus
+  is: (s: LotStatus) => boolean
   setActive: (s: LotStatus) => void
 }
 
@@ -23,6 +24,10 @@ export default function useStatusSelection(
 
   const active = params.status
 
+  function is(status: LotStatus) {
+    return active === status
+  }
+
   function setActive(status: LotStatus) {
     pagination.setPage(0)
     invalid.setInvalid(false)
@@ -30,5 +35,5 @@ export default function useStatusSelection(
     push(`../${status}`)
   }
 
-  return { active, setActive }
+  return { active, is, setActive }
 }

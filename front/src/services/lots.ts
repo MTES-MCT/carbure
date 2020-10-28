@@ -221,6 +221,20 @@ export function validateLots(entityID: number, transactionIDs: number[]) {
   })
 }
 
+export function acceptLots(entityID: number, transactionIDs: number[]) {
+  return api.post("/lots/accept", {
+    entity_id: entityID,
+    tx_ids: transactionIDs,
+  })
+}
+
+export function rejectLots(entityID: number, transactionIDs: number[]) {
+  return api.post("/lots/reject", {
+    entity_id: entityID,
+    tx_ids: transactionIDs,
+  })
+}
+
 export function deleteAllDraftLots(entityID: number, year: number) {
   return api.post("/lots/delete-all-drafts", {
     entity_id: entityID,
@@ -230,6 +244,20 @@ export function deleteAllDraftLots(entityID: number, year: number) {
 
 export function validateAllDraftLots(entityID: number, year: number) {
   return api.post("/lots/validate-all-drafts", {
+    entity_id: entityID,
+    year,
+  })
+}
+
+export function acceptAllInboxLots(entityID: number, year: number) {
+  return api.post("/lots/accept-all", {
+    entity_id: entityID,
+    year,
+  })
+}
+
+export function rejectAllInboxLots(entityID: number, year: number) {
+  return api.post("/lots/reject-all", {
     entity_id: entityID,
     year,
   })

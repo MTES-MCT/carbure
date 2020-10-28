@@ -78,7 +78,7 @@ export const Prompt = ({
       <span className={styles.dialogMessage}>{description}</span>
 
       <LabelInput
-        label="Commentaire"
+        label="Commentaire (obligatoire)"
         value={comment}
         className={styles.promptInput}
         onChange={(e) => setComment(e.target.value)}

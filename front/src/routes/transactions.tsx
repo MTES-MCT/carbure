@@ -31,6 +31,8 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
     duplicator,
     validator,
     uploader,
+    acceptor,
+    rejector,
     refresh,
   } = useTransactions(entity)
 
@@ -61,6 +63,8 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         deleter={deleter}
         validator={validator}
         duplicator={duplicator}
+        acceptor={acceptor}
+        rejector={rejector}
       />
 
       <Switch>

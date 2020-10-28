@@ -152,7 +152,7 @@ export const Input = ({ className, error, ...props }: InputProps) => (
 // FORM INPUT COMPONENT
 
 export type LabelInputProps = SystemProps &
-  React.HTMLProps<HTMLInputElement> & {
+  React.InputHTMLAttributes<HTMLInputElement> & {
     label: React.ReactNode
     error?: string
   }
