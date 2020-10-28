@@ -77,7 +77,7 @@ def get_lots(request):
         elif status == 'validated':
             txs = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA'])
         elif status == 'tofix':
-            txs = txs.filter(lot__status='Validated', delivery_status='AC')
+            txs = txs.filter(lot__status='Validated', delivery_status__in=['AC', 'R'])
         elif status == 'accepted':
             txs = txs.filter(lot__status='Validated', delivery_status='A')
         else:
@@ -238,7 +238,7 @@ def get_snapshot(request):
 
         draft = len(txs.filter(lot__status='Draft'))
         validated = len(txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA']))
-        tofix = len(txs.filter(lot__status='Validated', delivery_status='AC'))
+        tofix = len(txs.filter(lot__status='Validated', delivery_status__in=['AC', 'R']))
         accepted = len(txs.filter(lot__status='Validated', delivery_status='A'))
         data['lots'] = {'draft': draft, 'validated': validated, 'tofix': tofix, 'accepted': accepted}
     elif entity.entity_type == 'Opérateur':
