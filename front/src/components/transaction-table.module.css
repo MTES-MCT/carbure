@@ -15,7 +15,7 @@
 }
 
 .transactionRowDeadline > td:first-child::after {
-  border-color: var(--orange-dark);
+  border-color: var(--orange-medium);
 }
 
 .transactionRowError > td:first-child::after {
