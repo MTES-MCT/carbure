@@ -109,6 +109,7 @@ const TransactionForm = ({
           />
 
           <LabelTextArea
+            readOnly={readOnly}
             label="Champ Libre"
             name="champ_libre"
             value={tx.champ_libre}
@@ -118,6 +119,7 @@ const TransactionForm = ({
         </Box>
         <Box>
           <LabelCheckbox
+            disabled={readOnly}
             name="producer_is_in_carbure"
             label="Producteur enregistré sur Carbure ?"
             checked={tx.producer_is_in_carbure}
@@ -230,6 +232,7 @@ const TransactionForm = ({
 
         <Box className={styles.middleColumn}>
           <LabelCheckbox
+            disabled={readOnly}
             name="client_is_in_carbure"
             label="Client enregistré sur Carbure ?"
             checked={tx.client_is_in_carbure}
@@ -261,6 +264,7 @@ const TransactionForm = ({
           )}
 
           <LabelCheckbox
+            disabled={readOnly}
             name="delivery_site_is_in_carbure"
             label="Site de livraison enregistré sur Carbure ?"
             checked={tx.delivery_site_is_in_carbure}
@@ -436,6 +440,7 @@ const TransactionForm = ({
           />
 
           <LabelCheckbox
+            disabled={readOnly}
             name="mac"
             label="Mise à consommation ?"
             checked={tx.mac}
