@@ -33,10 +33,11 @@ def sanity_check(lot):
     if lot.ghg_reduction < 50:
         raise_error(lot, 'GHG_REDUC_INF_50', warning_to_user=True, block_validation=True)
     commissioning_date = lot.carbure_production_site.date_mise_en_service if lot.carbure_production_site else lot.unknown_production_site_com_date
-    if commissioning_date > oct2015 and lot.ghg_reduction < 60:
-        raise_error(lot, 'GHG_REDUC_INF_60', warning_to_user=True, block_validation=True)
-    if commissioning_date >= jan2021 and lot.ghg_reduction < 65:
-        raise_error(lot, 'GHG_REDUC_INF_65', warning_to_user=True, block_validation=True)
+    if commissioning_date:
+        if commissioning_date > oct2015 and lot.ghg_reduction < 60:
+            raise_error(lot, 'GHG_REDUC_INF_60', warning_to_user=True, block_validation=True)
+        if commissioning_date >= jan2021 and lot.ghg_reduction < 65:
+            raise_error(lot, 'GHG_REDUC_INF_65', warning_to_user=True, block_validation=True)
 
     # provenance des matieres premieres
     if lot.matiere_premiere.code == 'SOJA':
