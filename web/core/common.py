@@ -655,6 +655,6 @@ def validate_lots(user, tx_ids):
         if tx.carbure_client == tx.carbure_vendor:
             tx.delivery_status = 'A'
             tx.save()
-        if tx.delivery_status in = ['AA', 'AC', 'R']:
+        if tx.delivery_status in ['AA', 'AC', 'R']:
             tx.delivery_status = 'AA'
         tx.lot.save()
