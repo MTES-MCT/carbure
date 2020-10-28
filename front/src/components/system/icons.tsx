@@ -174,3 +174,9 @@ export const Calendar = ({ className, ...props }: IconProps) => (
     <line x1="12" y1="15" x2="12" y2="18" />
   </Icon>
 )
+
+export const Return = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-return", className)}>
+    <path d="M9 11l-4 4l4 4m-4 -4h11a4 4 0 0 0 0 -8h-1" />
+  </Icon>
+)

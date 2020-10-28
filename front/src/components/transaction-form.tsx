@@ -16,7 +16,7 @@ import {
 } from "../services/common"
 
 import { Box, Button, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
-import { Cross } from "./system/icons"
+import { Return } from "./system/icons"
 import { Alert } from "./system/alert"
 import AutoComplete from "./system/autocomplete"
 
@@ -455,11 +455,11 @@ const TransactionForm = ({
         {children}
         {onClose && (
           <Button
-            icon={Cross}
+            icon={Return}
             className={styles.transactionFormClose}
             onClick={onClose}
           >
-            Annuler
+            Retour
           </Button>
         )}
       </div>

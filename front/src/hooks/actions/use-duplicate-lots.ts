@@ -7,7 +7,7 @@ import { confirm } from "../../components/system/dialog"
 
 export interface LotDuplicator {
   loading: boolean
-  duplicateLot: (i: number) => void
+  duplicateLot: (i: number) => Promise<boolean>
 }
 
 export default function useDuplicateLot(
@@ -18,13 +18,15 @@ export default function useDuplicateLot(
 
   async function duplicateLot(lotID: number) {
     const shouldDuplicate = await confirm(
-      "Dupliquer lots",
+      "Dupliquer lot",
       "Voulez vous dupliquer ce lot ?"
     )
 
     if (entity !== null && shouldDuplicate) {
-      resolveDuplicate(entity.id, lotID).then(refresh)
+      await resolveDuplicate(entity.id, lotID).then(refresh)
     }
+
+    return shouldDuplicate
   }
 
   return { loading: request.loading, duplicateLot }

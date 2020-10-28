@@ -9,9 +9,9 @@ import { confirm } from "../../components/system/dialog"
 
 export interface LotDeleter {
   loading: boolean
-  deleteLot: (l: number) => void
-  deleteSelection: () => void
-  deleteAllDrafts: () => void
+  deleteLot: (l: number) => Promise<boolean>
+  deleteSelection: () => Promise<boolean>
+  deleteAllDrafts: () => Promise<boolean>
 }
 
 export default function useDeleteLots(
@@ -25,35 +25,41 @@ export default function useDeleteLots(
 
   async function deleteLot(lotID: number) {
     const shouldDelete = await confirm(
-      "Supprimer lots",
+      "Supprimer lot",
       "Voulez vous supprimer ce lot ?"
     )
 
     if (entity !== null && shouldDelete) {
-      resolveDelete(entity.id, [lotID]).then(refresh)
+      await resolveDelete(entity.id, [lotID]).then(refresh)
     }
+
+    return shouldDelete
   }
 
   async function deleteSelection() {
     const shouldDelete = await confirm(
-      "Supprimer lots",
+      "Supprimer lot",
       "Voulez vous supprimer les lots sélectionnés ?"
     )
 
     if (entity !== null && shouldDelete) {
-      resolveDelete(entity.id, selection.selected).then(refresh)
+      await resolveDelete(entity.id, selection.selected).then(refresh)
     }
+
+    return shouldDelete
   }
 
   async function deleteAllDrafts() {
     const shouldDelete = await confirm(
-      "Supprimer lots",
+      "Supprimer lot",
       "Voulez vous supprimer tous ces lots ?"
     )
 
     if (entity !== null && shouldDelete) {
-      resolveDeleteAll(entity.id, year.selected).then(refresh)
+      await resolveDeleteAll(entity.id, year.selected).then(refresh)
     }
+
+    return shouldDelete
   }
 
   return {

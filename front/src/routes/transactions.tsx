@@ -85,6 +85,10 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
             entity={entity}
             transactions={transactions}
             refresh={refresh}
+            deleter={deleter}
+            validator={validator}
+            acceptor={acceptor}
+            rejector={rejector}
           />
         </Route>
       </Switch>

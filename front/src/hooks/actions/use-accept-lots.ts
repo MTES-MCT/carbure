@@ -9,10 +9,10 @@ import { confirm, prompt } from "../../components/system/dialog"
 
 export interface LotAcceptor {
   loading: boolean
-  acceptLot: (l: number) => void
-  acceptAndCommentLot: (l: number) => void
-  acceptSelection: () => void
-  acceptAllInbox: () => void
+  acceptLot: (l: number) => Promise<boolean>
+  acceptAndCommentLot: (l: number) => Promise<boolean>
+  acceptSelection: () => Promise<boolean>
+  acceptAllInbox: () => Promise<boolean>
 }
 
 export default function useAcceptLots(
@@ -27,46 +27,54 @@ export default function useAcceptLots(
 
   async function acceptLot(lotID: number) {
     const shouldAccept = await confirm(
-      "Accepter lots",
+      "Accepter lot",
       "Voulez vous accepter ce lot ?"
     )
 
     if (entity !== null && shouldAccept) {
-      resolveAccept(entity.id, [lotID]).then(refresh)
+      await resolveAccept(entity.id, [lotID]).then(refresh)
     }
+
+    return shouldAccept
   }
 
   async function acceptAndCommentLot(lotID: number) {
     const comment = await prompt(
-      "Accepter lots",
+      "Accepter lot",
       "Voulez vous accepter ce lot sous réserve ?"
     )
 
     if (entity !== null && comment) {
-      resolveAcceptAndComment(entity.id, lotID, comment).then(refresh)
+      await resolveAcceptAndComment(entity.id, lotID, comment).then(refresh)
     }
+
+    return Boolean(comment)
   }
 
   async function acceptSelection() {
     const shouldAccept = await confirm(
-      "Accepter lots",
+      "Accepter lot",
       "Voulez vous accepter les lots sélectionnés ?"
     )
 
     if (entity !== null && shouldAccept) {
-      resolveAccept(entity.id, selection.selected).then(refresh)
+      await resolveAccept(entity.id, selection.selected).then(refresh)
     }
+
+    return shouldAccept
   }
 
   async function acceptAllInbox() {
     const shouldAccept = await confirm(
-      "Accepter lots",
+      "Accepter lot",
       "Voulez vous accepter tous ces lots ?"
     )
 
     if (entity !== null && shouldAccept) {
-      resolveAcceptAll(entity.id, year.selected).then(refresh)
+      await resolveAcceptAll(entity.id, year.selected).then(refresh)
     }
+
+    return shouldAccept
   }
 
   return {

@@ -9,9 +9,9 @@ import { prompt } from "../../components/system/dialog"
 
 export interface LotRejector {
   loading: boolean
-  rejectLot: (l: number) => void
-  rejectSelection: () => void
-  rejectAllInbox: () => void
+  rejectLot: (l: number) => Promise<boolean>
+  rejectSelection: () => Promise<boolean>
+  rejectAllInbox: () => Promise<boolean>
 }
 
 export default function useRejectLots(
@@ -24,33 +24,39 @@ export default function useRejectLots(
   const [requestAll, resolveRejectAll] = useAPI(api.rejectAllInboxLots)
 
   async function rejectLot(lotID: number) {
-    const comment = await prompt("Refuser lots", "Voulez vous refuser ce lot ?")
+    const comment = await prompt("Refuser lot", "Voulez vous refuser ce lot ?")
 
     if (entity !== null && comment) {
       resolveReject(entity.id, [lotID], comment).then(refresh)
     }
+
+    return Boolean(comment)
   }
 
   async function rejectSelection() {
     const comment = await prompt(
-      "Refuser lots",
+      "Refuser lot",
       "Voulez vous refuser les lots sélectionnés ?"
     )
 
     if (entity !== null && comment) {
-      resolveReject(entity.id, selection.selected, comment).then(refresh)
+      await resolveReject(entity.id, selection.selected, comment).then(refresh)
     }
+
+    return Boolean(comment)
   }
 
   async function rejectAllInbox() {
     const comment = await prompt(
-      "Refuser lots",
+      "Refuser lot",
       "Voulez vous refuser tous ces lots ?"
     )
 
     if (entity !== null && comment) {
-      resolveRejectAll(entity.id, year.selected, comment).then(refresh)
+      await resolveRejectAll(entity.id, year.selected, comment).then(refresh)
     }
+
+    return Boolean(comment)
   }
 
   return {
