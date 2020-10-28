@@ -2,7 +2,7 @@ import React from "react"
 import format from "date-fns/format"
 import fr from "date-fns/locale/fr"
 
-import { Lots, LotStatus } from "../services/types"
+import { Entity, Lots, LotStatus } from "../services/types"
 import { SortingSelection } from "../hooks/query/use-sort-by" // prettier-ignore
 import { PageSelection } from "./system/pagination"
 import { ApiState } from "../hooks/helpers/use-api"
@@ -23,7 +23,8 @@ import { AlertCircle, Calendar } from "./system/icons"
 import { Box, LoaderOverlay } from "./system"
 import { Alert, AlertFilter } from "./system/alert"
 import Pagination from "./system/pagination"
-import { TransactionTable, StockTable } from "./transaction-table"
+import TransactionTable from "./transaction-table"
+import StockTable from "./stock-table"
 
 import {
   ActionBar,
@@ -34,6 +35,7 @@ import {
 } from "./transaction-actions"
 
 type TransactionListProps = {
+  entity: Entity
   transactions: LotGetter
   status: StatusSelection
   sorting: SortingSelection
@@ -48,6 +50,7 @@ type TransactionListProps = {
 }
 
 export const TransactionList = ({
+  entity,
   transactions,
   status,
   sorting,
@@ -156,6 +159,7 @@ export const TransactionList = ({
         <React.Fragment>
           <Box>
             <TransactionTable
+              entity={entity}
               status={status}
               transactions={tx!}
               selection={selection}
@@ -163,6 +167,9 @@ export const TransactionList = ({
               onDuplicate={duplicator.duplicateLot}
               onValidate={validator.validateLot}
               onDelete={deleter.deleteLot}
+              onAccept={() => console.log("@TODO ACCEPT")}
+              onComment={() => console.log("@TODO COMMENT")}
+              onReject={() => console.log("@TODO REJECT")}
             />
             {isLoading && <LoaderOverlay />}
           </Box>

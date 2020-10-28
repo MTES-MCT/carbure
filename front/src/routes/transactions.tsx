@@ -49,6 +49,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
       />
 
       <TransactionList
+        entity={entity}
         transactions={transactions}
         status={status}
         sorting={sorting}

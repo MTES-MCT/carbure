@@ -4,21 +4,22 @@ import { Transaction } from "../../services/types"
 export interface TransactionSelection {
   selected: number[]
   has: (id: number) => boolean
-  selectOne: (id: number) => void
-  selectMany: React.Dispatch<React.SetStateAction<number[]>>
+  toggleSelect: (id: number) => void
+  toggleSelectAll: (t: boolean) => void
+  isAllSelected: () => boolean
   reset: () => void
 }
 
 export default function useTransactionSelection(
   transactions?: Transaction[]
 ): TransactionSelection {
-  const [selected, selectMany] = useState<number[]>([])
+  const [selected, setSelection] = useState<number[]>([])
 
   const tx = transactions ? transactions.map((t) => t.id) : []
 
   // if some selected transactions are not on the current list, remove them
   if (selected.some((id) => !tx.includes(id))) {
-    selectMany(selected.filter((id) => tx.includes(id)))
+    setSelection(selected.filter((id) => tx.includes(id)))
   }
 
   function has(id: number) {
@@ -26,16 +27,42 @@ export default function useTransactionSelection(
   }
 
   function reset() {
-    selectMany([])
+    setSelection([])
   }
 
-  function selectOne(id: number) {
+  function toggleSelect(id: number) {
     if (has(id)) {
-      selectMany(selected.filter((sid) => sid !== id))
+      setSelection(selected.filter((sid) => sid !== id))
     } else {
-      selectMany([...selected, id])
+      setSelection([...selected, id])
     }
   }
 
-  return { selected, has, selectOne, selectMany, reset }
+  function toggleSelectAll(toggle: boolean) {
+    if (toggle) {
+      setSelection(tx)
+    } else {
+      setSelection([])
+    }
+  }
+
+  function isAllSelected() {
+    tx.sort()
+    selected.sort()
+
+    return (
+      tx.length > 0 &&
+      tx.length === selected.length &&
+      selected.every((id, i) => tx[i] === id)
+    )
+  }
+
+  return {
+    selected,
+    has,
+    toggleSelect,
+    toggleSelectAll,
+    isAllSelected,
+    reset,
+  }
 }

@@ -1,44 +1,23 @@
-/* v  forcing of column width so the table stays stable */
-
-/* 1st column (checkbox) */
-.transactionTable thead th:first-child {
-  width: 40px;
+.transactionRowError > td:first-child,
+.transactionRowDeadline > td:first-child {
+  position: relative;
 }
 
-/* 2nd and last columns (status + actions) */
-.transactionTable thead th:nth-child(2),
-.transactionTable thead th:nth-last-child(2),
-.transactionTable thead th:last-child {
-  width: 88px;
+.transactionRowError > td:first-child::after,
+.transactionRowDeadline > td:first-child::after {
+  border-left: 4px solid;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 4px;
 }
 
-.transactionTable thead th:nth-child(3) {
-  width: 108px;
+.transactionRowDeadline > td:first-child::after {
+  border-color: var(--orange-dark);
 }
 
-.actionColumn {
-  width: 82px;
-  text-align: center;
-  color: var(--gray-dark);
-}
-
-.transactionActions {
-  display: none;
-}
-
-.transactionActions :global(.icon) {
-  width: 20px;
-}
-
-.transactionActions :global(.icon):hover {
-  stroke: var(--blue-medium);
-}
-
-.actionTable tr:hover .transactionArrow {
-  display: none;
-}
-.actionTable tr:hover .transactionActions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.transactionRowError > td:first-child::after {
+  border-color: var(--red-dark);
 }
