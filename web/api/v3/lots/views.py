@@ -263,9 +263,6 @@ def get_snapshot(request):
 
     periods = [p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']]
 
-    c1 = [c['carbure_client__name'] for c in txs.values('carbure_client__name').distinct()]
-    c2 = [c['unknown_client'] for c in txs.values('unknown_client').distinct()]
-    clients = [c for c in c1 + c2 if c]
 
     ps1 = [p['lot__carbure_production_site__name'] for p in txs.values('lot__carbure_production_site__name').distinct()]
     ps2 = [p['lot__unknown_production_site'] for p in txs.values('lot__unknown_production_site').distinct()]
@@ -275,9 +272,22 @@ def get_snapshot(request):
     ds2 = [p['unknown_delivery_site'] for p in txs.values('unknown_delivery_site').distinct()]
     dsites = list(set([d for d in ds1 + ds2 if d]))
 
-    data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs, 'periods': periods,
-                       'production_sites': psites, 'countries_of_origin': countries, 'clients': clients,
-                       'delivery_sites': dsites}
+    filters = {'matieres_premieres': mps, 'biocarburants': bcs, 'periods': periods,
+                       'production_sites': psites, 'countries_of_origin': countries, 'delivery_sites': dsites}
+
+    if entity.entity_type == 'Producteur':
+        c1 = [c['carbure_client__name'] for c in txs.values('carbure_client__name').distinct()]
+        c2 = [c['unknown_client'] for c in txs.values('unknown_client').distinct()]
+        clients = [c for c in c1 + c2 if c]
+        filters['clients'] = clients
+    elif entity.entity_type == 'Opérateur':
+        v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
+        v2 = [v['unknown_vendor'] for v in txs.values('unknown_vendor').distinct()]
+        vendors = [v for v in v1 + v2 if v]
+        filters['vendors'] = vendors
+
+    data['filters'] = filters
+
     return JsonResponse({'status': 'success', 'data': data})
 
 
