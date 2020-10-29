@@ -43,14 +43,14 @@ export const Main = (props: BoxProps) => <Box {...props} as="main" />
 type ButtonProps = SystemProps &
   AsProp &
   React.HTMLProps<HTMLButtonElement> & {
-    submit?: boolean
+    submit?: string | boolean
     level?: "primary" | "warning" | "danger" | "success" | "secondary"
     icon?: React.ComponentType
   }
 
 export const Button = ({
   as: Tag = "button",
-  submit = false,
+  submit,
   icon: Icon,
   level,
   className,
@@ -69,6 +69,7 @@ export const Button = ({
     <Tag
       {...props}
       type={submit ? "submit" : undefined}
+      form={typeof submit === "string" ? submit : undefined}
       className={btnClassName}
     >
       {Icon && <Icon />}
@@ -141,7 +142,7 @@ export const Title = ({ children, className, ...props }: TitleProps) => (
 // INPUT COMPONENT
 
 type InputProps = SystemProps &
-  React.HTMLProps<HTMLInputElement> & {
+  React.InputHTMLAttributes<HTMLInputElement> & {
     error?: string
   }
 
@@ -151,11 +152,10 @@ export const Input = ({ className, error, ...props }: InputProps) => (
 
 // FORM INPUT COMPONENT
 
-export type LabelInputProps = SystemProps &
-  React.InputHTMLAttributes<HTMLInputElement> & {
-    label: React.ReactNode
-    error?: string
-  }
+export type LabelInputProps = InputProps & {
+  label: React.ReactNode
+  error?: string
+}
 
 export const LabelInput = ({
   label,

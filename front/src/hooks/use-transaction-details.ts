@@ -34,6 +34,7 @@ export default function useTransactionDetails(
   const [details, resolveDetails] = useAPI(api.getDetails)
   const [request, resolve] = useAPI(api.updateLot)
 
+  const entityID = entity?.id
   const txID = parseInt(params.id, 10)
   const tx = details.data?.transaction
 
@@ -48,9 +49,9 @@ export default function useTransactionDetails(
   }
 
   async function submit() {
-    if (entity === null) return
+    if (!entityID) return
 
-    const res = await resolve(entity.id, txID, form)
+    const res = await resolve(entityID, txID, form)
 
     if (res) {
       refresh()
@@ -58,10 +59,10 @@ export default function useTransactionDetails(
   }
 
   useEffect(() => {
-    if (entity) {
-      return resolveDetails(entity.id, txID).cancel
+    if (entityID) {
+      return resolveDetails(entityID, txID).cancel
     }
-  }, [entity?.id, txID])
+  }, [resolveDetails, entityID, txID])
 
   return {
     form,
