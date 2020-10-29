@@ -23,7 +23,7 @@
 
 .modal {
   position: relative;
-  padding: 32px;
+  padding: 24px;
   background-color: var(--gray-light);
   border: 1px solid var(--gray-medium);
   min-width: 400px;

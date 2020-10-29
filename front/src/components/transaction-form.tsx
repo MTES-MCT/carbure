@@ -16,9 +16,10 @@ import {
 } from "../services/common"
 
 import { Box, Button, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
-import { AlertTriangle, Message, Return } from "./system/icons"
+import { Message, Return } from "./system/icons"
 import { Alert } from "./system/alert"
 import AutoComplete from "./system/autocomplete"
+import { LotStatus } from "../services/types"
 
 // shorthand to build autocomplete value & label getters
 const get = (key: string) => (obj: { [k: string]: any } | null) =>
@@ -33,6 +34,7 @@ const getters = {
 }
 
 type TransactionFormProps = {
+  status?: LotStatus
   readOnly?: boolean
   transaction: TransactionFormState
   children: React.ReactNode
@@ -44,6 +46,7 @@ type TransactionFormProps = {
 }
 
 const TransactionForm = ({
+  status,
   children,
   readOnly = false,
   transaction: tx,
@@ -459,12 +462,11 @@ const TransactionForm = ({
       <div className={styles.transactionFormButtons}>
         {children}
         <div className={styles.transactionRightButtons}>
-          <Button level="warning" icon={Message}>
-            Voir les commentaires (12)
-          </Button>
-          <Button level="danger" icon={AlertTriangle}>
-            Voir les erreurs (4)
-          </Button>
+          {status && status !== LotStatus.Draft && (
+            <Button level="warning" icon={Message}>
+              Voir les commentaires (12)
+            </Button>
+          )}
           {onClose && (
             <Button icon={Return} onClick={onClose}>
               Retour
