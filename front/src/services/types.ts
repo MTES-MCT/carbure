@@ -113,13 +113,13 @@ export interface Lot {
   pays_origine: Country
 
   producer_is_in_carbure: boolean
-  carbure_producer: Entity
+  carbure_producer: Entity | null
   unknown_producer: string
 
   production_site_is_in_carbure: boolean
-  carbure_production_site: ProductionSite
+  carbure_production_site: ProductionSite | null
   unknown_production_site: string
-  unknown_production_country: Country
+  unknown_production_country: Country | null
   unknown_production_site_com_date: string | null
   unknown_production_site_dbl_counting: string
   unknown_production_site_reference: string
@@ -149,7 +149,7 @@ export interface Transaction {
   delivery_site_is_in_carbure: boolean
   carbure_delivery_site: DeliverySite | null
   unknown_delivery_site: string
-  unknown_delivery_site_country: Country
+  unknown_delivery_site_country: Country | null
 
   errors: {
     field: string
