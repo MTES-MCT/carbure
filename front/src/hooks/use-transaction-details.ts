@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { useParams } from "react-router-dom"
 
-import { Errors, Lots, LotStatus } from "../services/types"
+import { Errors, LotStatus } from "../services/types"
 import { EntitySelection } from "./helpers/use-entity"
 
 import useTransactionForm, { toTransactionFormState } from "./helpers/use-transaction-form" // prettier-ignore

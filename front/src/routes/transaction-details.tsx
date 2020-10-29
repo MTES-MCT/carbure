@@ -1,8 +1,7 @@
 import React from "react"
 
-import { Lots, LotStatus } from "../services/types"
+import { LotStatus } from "../services/types"
 import { EntitySelection } from "../hooks/helpers/use-entity"
-import { ApiState } from "../hooks/helpers/use-api"
 import { LotDeleter } from "../hooks/actions/use-delete-lots"
 import { LotAcceptor } from "../hooks/actions/use-accept-lots"
 import { LotRejector } from "../hooks/actions/use-reject-lots"
@@ -19,7 +18,6 @@ const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 
 type TransactionDetailsProps = {
   entity: EntitySelection
-  transactions: ApiState<Lots>
   deleter: LotDeleter
   validator: LotValidator
   acceptor: LotAcceptor
@@ -29,7 +27,6 @@ type TransactionDetailsProps = {
 
 const TransactionDetails = ({
   entity,
-  transactions,
   deleter,
   validator,
   acceptor,
@@ -38,6 +35,7 @@ const TransactionDetails = ({
 }: TransactionDetailsProps) => {
   const {
     form,
+    details,
     request,
     status,
     fieldErrors,
@@ -45,7 +43,7 @@ const TransactionDetails = ({
     change,
     submit,
     close,
-  } = useTransactionDetails(entity, transactions, refresh)
+  } = useTransactionDetails(entity, refresh)
 
   async function run(
     action: (i: number) => Promise<boolean>,
@@ -67,7 +65,7 @@ const TransactionDetails = ({
       <TransactionForm
         readOnly={!EDITABLE.includes(status)}
         transaction={form}
-        error={request.error}
+        error={details.error ?? request.error}
         fieldErrors={fieldErrors}
         validationErrors={validationErrors}
         onChange={change}
@@ -153,7 +151,7 @@ const TransactionDetails = ({
         )}
       </TransactionForm>
 
-      {transactions.loading && <LoaderOverlay />}
+      {details.loading && <LoaderOverlay />}
     </Modal>
   )
 }
