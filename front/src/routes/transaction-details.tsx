@@ -46,12 +46,14 @@ const TransactionDetails = ({
     form,
     details,
     request,
+    comment,
     status,
     fieldErrors,
     validationErrors,
     change,
     submit,
     close,
+    addComment,
   } = useTransactionDetails(entity, refresh)
 
   async function run(
@@ -83,8 +85,9 @@ const TransactionDetails = ({
 
       {details.data && details.data.comments.length > 0 && (
         <Comments
+          loading={comment.loading}
           comments={details.data.comments}
-          onComment={(c) => console.log(c)}
+          onComment={addComment}
         />
       )}
 
