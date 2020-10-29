@@ -50,6 +50,8 @@ def get_lots(request):
     order = request.GET.get('order', False)
     invalid = request.GET.get('invalid', False)
     deadline = request.GET.get('deadline', False)
+    vendors = request.GET.getlist('vendors')
+
 
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
@@ -128,6 +130,8 @@ def get_lots(request):
     if delivery_sites:
         txs = txs.filter(Q(carbure_delivery_site__name__in=delivery_sites)
                          | Q(unknown_delivery_site__in=delivery_sites))
+    if vendors:
+        txs = txs.filter(Q(carbure_vendor__name__in=vendors) | Q(unknown_vendor__in=vendors))
 
     if query:
         txs = txs.filter(Q(lot__matiere_premiere__name__icontains=query) |
