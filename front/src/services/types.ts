@@ -172,6 +172,12 @@ export interface LotError {
   error: string
 }
 
+export interface Errors {
+  tx_errors?: TransactionError[]
+  lots_errors?: LotError[]
+  validation_errors?: ValidationError[]
+}
+
 export interface ValidationError {
   lot_id: number
   error: string
@@ -195,12 +201,20 @@ export interface Lots {
   }
 
   errors: {
-    [id: string]: {
-      tx_errors?: TransactionError[]
-      lots_errors?: LotError[]
-      validation_errors?: ValidationError[]
-    }
+    [id: string]: Errors
   }
+}
+
+export interface Comment {
+  entity: Entity
+  topic: string
+  comment: string
+}
+
+export interface LotDetails {
+  transaction: Transaction
+  comments: Comment[]
+  errors: Errors
 }
 
 export enum Filters {
