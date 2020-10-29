@@ -7,11 +7,20 @@ import { LotAcceptor } from "../hooks/actions/use-accept-lots"
 import { LotRejector } from "../hooks/actions/use-reject-lots"
 import { LotValidator } from "../hooks/actions/use-validate-lots"
 
+import styles from "../components/transaction-form.module.css"
+
 import useTransactionDetails from "../hooks/use-transaction-details"
 
 import Modal from "../components/system/modal"
-import { AsyncButton, LoaderOverlay, Title } from "../components/system"
-import { AlertTriangle, Check, Cross, Save } from "../components/system/icons"
+import { AsyncButton, Button, LoaderOverlay, Title } from "../components/system"
+import {
+  AlertTriangle,
+  Check,
+  Cross,
+  Return,
+  Save,
+} from "../components/system/icons"
+import Comments from "../components/comments"
 import TransactionForm from "../components/transaction-form"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
@@ -63,18 +72,27 @@ const TransactionDetails = ({
       <Title>Transaction #{form.id ?? "N/A"}</Title>
 
       <TransactionForm
+        id="transaction-details"
         readOnly={!EDITABLE.includes(status)}
         transaction={form}
         error={details.error ?? request.error}
         fieldErrors={fieldErrors}
         validationErrors={validationErrors}
         onChange={change}
-        onClose={close}
-      >
+      />
+
+      {details.data && details.data.comments.length > 0 && (
+        <Comments
+          comments={details.data.comments}
+          onComment={(c) => console.log(c)}
+        />
+      )}
+
+      <div className={styles.transactionFormButtons}>
         {status === LotStatus.Draft && (
           <React.Fragment>
             <AsyncButton
-              submit
+              submit="transaction-details"
               icon={Save}
               level="primary"
               loading={request.loading}
@@ -83,7 +101,6 @@ const TransactionDetails = ({
               Sauvegarder
             </AsyncButton>
             <AsyncButton
-              submit
               icon={Check}
               level="success"
               loading={validator.loading}
@@ -96,7 +113,6 @@ const TransactionDetails = ({
 
         {status === LotStatus.ToFix && (
           <AsyncButton
-            submit
             icon={Check}
             level="success"
             loading={validator.loading}
@@ -108,7 +124,6 @@ const TransactionDetails = ({
 
         {EDITABLE.includes(status) && (
           <AsyncButton
-            submit
             icon={Cross}
             level="danger"
             loading={deleter.loading}
@@ -121,7 +136,6 @@ const TransactionDetails = ({
         {status === LotStatus.Inbox && (
           <React.Fragment>
             <AsyncButton
-              submit
               icon={Check}
               level="success"
               loading={acceptor.loading}
@@ -130,7 +144,6 @@ const TransactionDetails = ({
               Accepter
             </AsyncButton>
             <AsyncButton
-              submit
               icon={AlertTriangle}
               level="warning"
               loading={acceptor.loading}
@@ -139,7 +152,6 @@ const TransactionDetails = ({
               Accepter sous réserve
             </AsyncButton>
             <AsyncButton
-              submit
               icon={Cross}
               level="danger"
               loading={rejector.loading}
@@ -149,7 +161,15 @@ const TransactionDetails = ({
             </AsyncButton>
           </React.Fragment>
         )}
-      </TransactionForm>
+
+        <Button
+          icon={Return}
+          className={styles.transactionCloseButton}
+          onClick={close}
+        >
+          Retour
+        </Button>
+      </div>
 
       {details.loading && <LoaderOverlay />}
     </Modal>

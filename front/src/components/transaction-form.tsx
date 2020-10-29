@@ -16,8 +16,7 @@ import {
   findDeliverySites,
 } from "../services/common"
 
-import { Box, Button, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
-import { Return } from "./system/icons"
+import { Box, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
 import { Alert } from "./system/alert"
 import AutoComplete from "./system/autocomplete"
 
@@ -34,19 +33,18 @@ const getters = {
 }
 
 type TransactionFormProps = {
+  id?: string
   readOnly?: boolean
   transaction: TransactionFormState
-  children: React.ReactNode
   error: string | null
   fieldErrors?: { [k: string]: string }
   validationErrors?: ValidationError[]
   onChange: <T extends FormFields>(e: React.ChangeEvent<T>) => void
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
-  onClose?: () => void
 }
 
 const TransactionForm = ({
-  children,
+  id,
   readOnly = false,
   transaction: tx,
   error,
@@ -54,7 +52,6 @@ const TransactionForm = ({
   validationErrors = [],
   onChange,
   onSubmit,
-  onClose,
 }: TransactionFormProps) => {
   function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -62,7 +59,7 @@ const TransactionForm = ({
   }
 
   return (
-    <form className={styles.transactionForm} onSubmit={submit}>
+    <form id={id} className={styles.transactionForm} onSubmit={submit}>
       <Box row className={styles.transactionFields}>
         <Box>
           <LabelInput
@@ -468,20 +465,6 @@ const TransactionForm = ({
           </ul>
         </Alert>
       )}
-
-      <div className={styles.transactionFormButtons}>
-        {children}
-
-        {onClose && (
-          <Button
-            icon={Return}
-            className={styles.transactionCloseButton}
-            onClick={onClose}
-          >
-            Retour
-          </Button>
-        )}
-      </div>
     </form>
   )
 }
