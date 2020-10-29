@@ -21,6 +21,21 @@ sort_key_to_django_field = {'period': 'lot__period',
                             'volume': 'lot__volume',
                             'pays_origine': 'lot__pays_origine__name'}
 
+def get_errors(tx):
+    grouped_errors = {}
+    tx_errors = [err.natural_key() for err in tx.transactionerror_set.all()]
+    lots_errors = [err.natural_key() for err in tx.lot.lotv2error_set.all()]
+    validation_errors = [err.natural_key() for err in tx.lot.lotvalidationerror_set.all()]
+
+    if len(tx_errors) > 0:
+        grouped_errors['tx_errors'] = tx_errors
+    if len(lots_errors) > 0:
+        grouped_errors['lots_errors'] = lots_errors
+    if len(validation_errors) > 0:
+        grouped_errors['validation_errors'] = validation_errors
+
+    return grouped_errors
+
 def get_lots(request):
     status = request.GET.get('status', False)
     entity = request.GET.get('entity_id', False)
@@ -181,18 +196,7 @@ def get_lots(request):
     errors = {}
 
     for tx in returned:
-        grouped_errors = {}
-        tx_errors = [err.natural_key() for err in tx.transactionerror_set.all()]
-        lots_errors = [err.natural_key() for err in tx.lot.lotv2error_set.all()]
-        validation_errors = [err.natural_key() for err in tx.lot.lotvalidationerror_set.all()]
-
-        if len(tx_errors) > 0:
-            grouped_errors['tx_errors'] = tx_errors
-        if len(lots_errors) > 0:
-            grouped_errors['lots_errors'] = lots_errors
-        if len(validation_errors) > 0:
-            grouped_errors['validation_errors'] = validation_errors
-
+        grouped_errors = get_errors(tx)
         if len(grouped_errors) > 0:
             errors[tx.id] = grouped_errors
 
@@ -215,6 +219,38 @@ def get_lots(request):
             response = HttpResponse(content=data, content_type=ctype)
             response['Content-Disposition'] = 'attachment; filename="%s"' % (file_location)
         return response
+
+
+def get_details(request):
+    tx_id = request.GET.get('tx_id', False)
+    entity_id = request.GET.get('entity_id', False)
+
+    if not tx_id:
+        return JsonResponse({'status': 'error', 'message': 'Missing tx_id'}, status=400)
+    if not entity_id:
+        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
+    
+    try:
+        entity = Entity.objects.get(id=entity_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity), 'extra': str(e)}, status=400)
+
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+
+    if entity not in rights:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+    tx = LotTransaction.objects.get(pk=tx_id)
+
+    if tx.carbure_client != entity and tx.carbure_vendor != entity:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+    data = {}
+    data['transaction'] = tx.natural_key()
+    data['errors'] = get_errors(tx)
+    data['comments'] = [c.natural_key() for c in tx.transactioncomment_set.all()]
+
+    return JsonResponse({'status': 'success', 'data': data})
 
 
 def get_snapshot(request):
