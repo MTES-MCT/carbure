@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { Filters, Lots } from "../services/types"
+import { Lots } from "../services/types"
 import useAPI from "./helpers/use-api"
 import { getStocks, getStockSnapshot } from "../services/lots"
 import { EntitySelection } from "./helpers/use-entity"
@@ -70,19 +70,12 @@ function useGetStocks(
   return { ...transactions, resolve }
 }
 
-const initialFilters = {
-  [Filters.Biocarburants]: null,
-  [Filters.MatieresPremieres]: null,
-  [Filters.CountriesOfOrigin]: null,
-  [Filters.DeliverySites]: null,
-}
-
 export function useStocks(entity: EntitySelection) {
   const pagination = usePageSelection()
   const sorting = useSortingSelection(pagination)
 
   const search = useSearchSelection(pagination)
-  const filters = useFilterSelection(initialFilters, pagination)
+  const filters = useFilterSelection(pagination)
   const snapshot = useGetStockSnapshot(entity)
   const transactions = useGetStocks(entity, filters, pagination, search, sorting) // prettier-ignore
 

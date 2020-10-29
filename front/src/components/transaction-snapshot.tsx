@@ -1,16 +1,15 @@
 import React from "react"
 
 import { ApiState } from "../hooks/helpers/use-api"
-import { Filters, LotStatus, Snapshot, StockSnapshot } from "../services/types"
+import { LotStatus, Snapshot } from "../services/types"
 import { StatusSelection } from "../hooks/query/use-status"
 import { YearSelection } from "../hooks/query/use-year"
-import { FilterSelection } from "../hooks/query/use-filters"
-import { SearchSelection } from "../hooks/query/use-search"
 
 import styles from "./transaction-snapshot.module.css"
 
-import { Title, StatusButton, SearchInput, Box } from "./system"
-import Select, { SelectValue } from "./system/select"
+import { Title, StatusButton, Box } from "./system"
+import Select from "./system/select"
+import { Alert } from "./system/alert"
 
 const STATUS_ORDER = [
   LotStatus.Draft,
@@ -30,16 +29,6 @@ const STATUS_LABEL = {
   [LotStatus.Weird]: { singular: "Lot incohérent", plural: "Lots incohérents" },
   [LotStatus.Inbox]: { singular: "Lot reçu", plural: "Lots reçus" },
   [LotStatus.Stock]: { singular: "Lot en stock", plural: "Lots en stock" },
-}
-
-const FILTER_LABELS = {
-  [Filters.Periods]: "Période",
-  [Filters.ProductionSites]: "Site de production",
-  [Filters.MatieresPremieres]: "Matière Première",
-  [Filters.Biocarburants]: "Biocarburant",
-  [Filters.CountriesOfOrigin]: "Pays d'origine",
-  [Filters.DeliverySites]: "Sites de livraison",
-  [Filters.Clients]: "Clients",
 }
 
 function mapStatus(
@@ -62,15 +51,6 @@ function mapStatus(
   })
 }
 
-function mapFilters(
-  filters: FilterSelection["selected"]
-): [Filters, string, SelectValue][] {
-  return Object.entries(filters).map(([key, value]) => {
-    const filter = key as Filters
-    return [filter, FILTER_LABELS[filter], value ?? null]
-  })
-}
-
 type TransactionSnapshotProps = {
   snapshot: ApiState<Snapshot>
   status: StatusSelection
@@ -83,75 +63,46 @@ export const TransactionSnapshot = ({
   year,
 }: TransactionSnapshotProps) => (
   <div className={styles.transactionSnapshot}>
-    <div className={styles.transactionHeader}>
-      <Title>Transactions</Title>
+    {snapshot.error && <Alert level="error">{snapshot.error}</Alert>}
 
-      <Select
-        level="primary"
-        className={styles.transactionYear}
-        value={year.selected}
-        placeholder={snapshot.loading ? "…" : "Choisir une année"}
-        options={snapshot.data?.years ?? []}
-        onChange={(value) => year.setYear(value as number)}
-      />
-    </div>
+    {!snapshot.error && (
+      <React.Fragment>
+        <div className={styles.transactionHeader}>
+          <Title>Transactions</Title>
 
-    <div className={styles.transactionStatus}>
-      {mapStatus(snapshot.data?.lots).map(([key, label, amount]) => (
-        <StatusButton
-          key={key}
-          active={key === status.active}
-          loading={snapshot.loading}
-          amount={amount}
-          label={label}
-          onClick={() => status.setActive(key)}
-        />
-      ))}
-    </div>
+          <Select
+            level="primary"
+            className={styles.transactionYear}
+            value={year.selected}
+            placeholder={snapshot.loading ? "…" : "Choisir une année"}
+            options={snapshot.data?.years ?? []}
+            onChange={(value) => year.setYear(value as number)}
+          />
+        </div>
+
+        <div className={styles.transactionStatus}>
+          {mapStatus(snapshot.data?.lots).map(([key, label, amount]) => (
+            <StatusButton
+              key={key}
+              active={key === status.active}
+              loading={snapshot.loading}
+              amount={amount}
+              label={label}
+              onClick={() => status.setActive(key)}
+            />
+          ))}
+        </div>
+      </React.Fragment>
+    )}
   </div>
 )
 
-type StockSnapshotProps = {
-  snapshot: ApiState<StockSnapshot>
-  filters: FilterSelection
-  search: SearchSelection
-}
-
-export const StocksSnapshot = ({
-  snapshot,
-  filters,
-  search,
-}: StockSnapshotProps) => (
+export const StocksSnapshot = () => (
   <Box className={styles.transactionSnapshot}>
     <div className={styles.transactionSummary}>
       <div className={styles.transactionHeader}>
         <Title>Stock</Title>
       </div>
-    </div>
-
-    <div className={styles.transactionFilters}>
-      <div className={styles.filterGroup}>
-        {mapFilters(filters.selected).map(([filter, label, value]) => (
-          <Select
-            clear
-            search
-            multiple
-            key={filter}
-            value={value}
-            placeholder={label}
-            options={snapshot.data?.filters[filter] ?? []}
-            onChange={(value) => filters.select(filter, value)}
-          />
-        ))}
-      </div>
-
-      <SearchInput
-        className={styles.searchInput}
-        placeholder="Rechercher un lot"
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          search.setQuery(e.target.value)
-        }
-      />
     </div>
   </Box>
 )

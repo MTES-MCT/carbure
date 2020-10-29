@@ -7,7 +7,18 @@ import { SearchSelection } from "../hooks/query/use-search"
 import styles from "./transaction-filters.module.css"
 
 import { SearchInput } from "./system"
-import Select, { SelectValue } from "./system/select"
+import Select, { Option, SelectValue } from "./system/select"
+
+const FILTER_ORDER = [
+  Filters.Periods,
+  Filters.Biocarburants,
+  Filters.MatieresPremieres,
+  Filters.Clients,
+  Filters.Vendors,
+  Filters.CountriesOfOrigin,
+  Filters.ProductionSites,
+  Filters.DeliverySites,
+]
 
 const FILTER_LABELS = {
   [Filters.Periods]: "Période",
@@ -17,42 +28,55 @@ const FILTER_LABELS = {
   [Filters.CountriesOfOrigin]: "Pays d'origine",
   [Filters.DeliverySites]: "Sites de livraison",
   [Filters.Clients]: "Clients",
+  [Filters.Vendors]: "Fournisseurs",
 }
 
 export function mapFilters(
-  filters: FilterSelection["selected"]
-): [Filters, string, SelectValue][] {
-  return Object.entries(filters).map(([key, value]) => {
+  filters: Snapshot["filters"],
+  selected: FilterSelection["selected"]
+): [Filters, string, SelectValue, Option[]][] {
+  const filterList = Object.entries(filters)
+
+  filterList.sort(
+    (a, b) =>
+      FILTER_ORDER.indexOf(a[0] as Filters) -
+      FILTER_ORDER.indexOf(b[0] as Filters)
+  )
+
+  return filterList.map(([key, options]) => {
     const filter = key as Filters
-    return [filter, FILTER_LABELS[filter], value ?? null]
+    const value = selected[filter] ?? null
+    return [filter, FILTER_LABELS[filter], value, options ?? []]
   })
 }
 
 type TransactionFiltersProps = {
-  filters: FilterSelection
+  selection: FilterSelection
   search: SearchSelection
-  options?: Snapshot["filters"]
+  filters: Snapshot["filters"]
 }
 
 const TransactionFilters = ({
-  filters,
   search,
-  options,
+  selection,
+  filters,
 }: TransactionFiltersProps) => (
   <div className={styles.transactionFilters}>
     <div className={styles.filterGroup}>
-      {mapFilters(filters.selected).map(([filter, label, value]) => (
-        <Select
-          clear
-          search
-          multiple
-          key={filter}
-          value={value}
-          placeholder={label}
-          options={(options && options[filter]) ?? []}
-          onChange={(value) => filters.select(filter, value)}
-        />
-      ))}
+      {mapFilters(filters, selection.selected).map(
+        ([filter, label, selected, options]) => (
+          <Select
+            clear
+            search
+            multiple
+            key={filter}
+            value={selected}
+            placeholder={label}
+            options={options}
+            onChange={(value) => selection.select(filter, value)}
+          />
+        )
+      )}
     </div>
 
     <SearchInput

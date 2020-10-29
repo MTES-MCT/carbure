@@ -45,9 +45,9 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
       <TransactionSnapshot snapshot={snapshot} status={status} year={year} />
 
       <TransactionFilters
-        filters={filters}
         search={search}
-        options={snapshot.data?.filters}
+        selection={filters}
+        filters={snapshot.data?.filters ?? {}}
       />
 
       <TransactionList

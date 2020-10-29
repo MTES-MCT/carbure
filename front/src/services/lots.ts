@@ -1,4 +1,11 @@
-import { Transaction, Lots, LotStatus, Snapshot, StockSnapshot } from "./types"
+import {
+  Transaction,
+  Lots,
+  LotStatus,
+  Snapshot,
+  StockSnapshot,
+  Filters,
+} from "./types"
 import { FilterSelection } from "../hooks/query/use-filters"
 import { TransactionFormState } from "../hooks/helpers/use-transaction-form"
 
@@ -10,15 +17,13 @@ function toOption(value: string) {
 
 // give the same type to all filters in order to render them easily
 function normalizeFilters(snapshot: any): Snapshot {
-  snapshot.filters = {
-    matieres_premieres: snapshot.filters.matieres_premieres,
-    biocarburants: snapshot.filters.biocarburants,
-    countries_of_origin: snapshot.filters.countries_of_origin,
-    periods: snapshot.filters.periods.map(toOption),
-    production_sites: snapshot.filters.production_sites.map(toOption),
-    clients: snapshot.filters.clients.map(toOption),
-    delivery_sites: snapshot.filters.delivery_sites.map(toOption),
-  }
+  Object.values(Filters).forEach((key) => {
+    const filter = snapshot.filters[key]
+
+    if (filter && typeof filter[0] === "string") {
+      snapshot.filters[key] = filter.map(toOption)
+    }
+  })
 
   snapshot.years = snapshot.years.map(toOption)
 
