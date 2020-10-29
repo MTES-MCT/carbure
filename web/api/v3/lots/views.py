@@ -21,16 +21,6 @@ sort_key_to_django_field = {'period': 'lot__period',
                             'volume': 'lot__volume',
                             'pays_origine': 'lot__pays_origine__name'}
 
-
-def tx_natural_key_with_errors(tx):
-    data = tx.natural_key()
-    tx_errors = [err.natural_key() for err in tx.transactionerror_set.all()]
-    lots_errors = [err.natural_key() for err in tx.lot.lotv2error_set.all()]
-    validation_errors = [err.natural_key() for err in tx.lot.lotvalidationerror_set.all()]
-    data['errors'] = tx_errors + lots_errors + validation_errors
-    return data
-
-
 def get_lots(request):
     status = request.GET.get('status', False)
     entity = request.GET.get('entity_id', False)
@@ -146,8 +136,8 @@ def get_lots(request):
                          Q(unknown_delivery_site__icontains=query)
                          )
 
-    tx_with_errors = txs.annotate(Count('transactionerror'), Count('lot__lotv2error')).filter(
-        Q(transactionerror__count__gt=0) | Q(lot__lotv2error__count__gt=0))
+    tx_with_errors = txs.annotate(Count('transactionerror'), Count('lot__lotv2error'), Count('lot__lotvalidationerror')).filter(
+        Q(transactionerror__count__gt=0) | Q(lot__lotv2error__count__gt=0) | Q(lot__lotvalidationerror__count__gt=0))
 
     if invalid:
         txs = tx_with_errors
@@ -188,12 +178,31 @@ def get_lots(request):
         limit = int(limit)
         returned = returned[:limit]
 
+    errors = {}
+
+    for tx in returned:
+        grouped_errors = {}
+        tx_errors = [err.natural_key() for err in tx.transactionerror_set.all()]
+        lots_errors = [err.natural_key() for err in tx.lot.lotv2error_set.all()]
+        validation_errors = [err.natural_key() for err in tx.lot.lotvalidationerror_set.all()]
+
+        if len(tx_errors) > 0:
+            grouped_errors['tx_errors'] = tx_errors
+        if len(lots_errors) > 0:
+            grouped_errors['lots_errors'] = lots_errors
+        if len(validation_errors) > 0:
+            grouped_errors['validation_errors'] = validation_errors
+
+        if len(grouped_errors) > 0:
+            errors[tx.id] = grouped_errors
+
     data = {}
-    data['lots'] = [tx_natural_key_with_errors(t) for t in returned]
+    data['lots'] = [t.natural_key() for t in returned]
     data['total'] = len(txs)
+    data['total_errors'] = tx_with_errors.count()
     data['returned'] = len(returned)
     data['from'] = from_idx
-    data['errors'] = tx_with_errors.count()
+    data['errors'] = errors
     data['deadlines'] = {'date': deadline_str, 'total': deadline_total}
 
     if not export:
