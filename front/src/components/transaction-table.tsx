@@ -64,13 +64,6 @@ const getInboxActions = ({ onAccept, onComment, onReject }: Actions) =>
 const getDuplicateActions = ({ onDuplicate }: Actions) =>
   C.actions([{ icon: Copy, title: "Dupliquer le lot", action: onDuplicate }])
 
-export function hasErrors(transactions: Lots, id: number): boolean {
-  return (
-    transactions.lots_errors[id]?.length > 0 ||
-    transactions.tx_errors[id]?.length > 0
-  )
-}
-
 export function hasDeadline(tx: Transaction, deadline: string): boolean {
   if (!tx || tx.status !== LotStatus.Draft) return false
 
@@ -148,7 +141,7 @@ export const TransactionTable = ({
     value: tx,
     onClick: () => relativePush(`${tx.id}`),
     className: cl({
-      [styles.transactionRowError]: tx.errors.length > 0,
+      [styles.transactionRowError]: tx.id in transactions.errors,
       [styles.transactionRowDeadline]: hasDeadline(tx, deadline),
     }),
   }))
@@ -188,7 +181,7 @@ export const StockTable = ({ transactions, sorting }: StockTableProps) => {
     value: tx,
     onClick: () => relativePush(`${tx.id}`),
     className: cl({
-      [styles.transactionRowError]: hasErrors(transactions, tx.id),
+      [styles.transactionRowError]: tx.id in transactions.errors,
       [styles.transactionRowDeadline]: hasDeadline(tx, deadline),
     }),
   }))

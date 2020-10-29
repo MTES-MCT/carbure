@@ -41,6 +41,7 @@ const TransactionDetails = ({
     request,
     status,
     fieldErrors,
+    validationErrors,
     change,
     submit,
     close,
@@ -64,11 +65,11 @@ const TransactionDetails = ({
       <Title>Transaction #{form.id ?? "N/A"}</Title>
 
       <TransactionForm
-        status={status}
         readOnly={!EDITABLE.includes(status)}
         transaction={form}
         error={request.error}
         fieldErrors={fieldErrors}
+        validationErrors={validationErrors}
         onChange={change}
         onClose={close}
       >

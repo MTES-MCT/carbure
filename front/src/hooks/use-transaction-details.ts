@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom"
 
-import { Lots, LotStatus, Transaction } from "../services/types"
+import { Lots, LotStatus } from "../services/types"
 import { EntitySelection } from "./helpers/use-entity"
 
 import useTransactionForm, { toTransactionFormState } from "./helpers/use-transaction-form" // prettier-ignore
@@ -8,11 +8,16 @@ import useAPI, { ApiState } from "./helpers/use-api"
 import useClose from "./helpers/use-close"
 import { updateLot } from "../services/lots"
 
-function getFieldErrors(tx: Transaction) {
+function getFieldErrors(txs: Lots, id: number) {
+  const errors = txs.errors[id] ?? {}
   const fieldErrors: { [k: string]: string } = {}
 
-  tx.errors.forEach(({ field, error }) => {
-    fieldErrors[field] = error
+  errors.lots_errors?.forEach((err) => {
+    fieldErrors[err.field] = err.error
+  })
+
+  errors.tx_errors?.forEach((err) => {
+    fieldErrors[err.field] = err.error
   })
 
   return fieldErrors
@@ -28,19 +33,19 @@ export default function useTransactionDetails(
   const [form, change, setForm] = useTransactionForm()
   const [request, resolve] = useAPI(updateLot)
 
-  const transactionID = parseInt(params.id, 10)
+  const txs = transactions.data
+  const txID = parseInt(params.id, 10)
 
   // find the relevant lot
   // @TODO would be nice to be able to fetch details for only one lot
-  const transaction = transactions.data?.lots.find(
-    (lot) => lot.id === transactionID
-  )
+  const transaction = txs?.lots.find((lot) => lot.id === txID)
 
-  const fieldErrors = transaction ? getFieldErrors(transaction) : {}
+  const fieldErrors = txs ? getFieldErrors(txs, txID) : {}
+  const validationErrors = txs?.errors[txID]?.validation_errors ?? []
   const status = transaction ? transaction.status : LotStatus.Weird
 
   // if form data is not initialized, fill it instantly with data coming from transaction list
-  if (transactions.data && (form.id === -1 || form.id !== transactionID)) {
+  if (transactions.data && (form.id === -1 || form.id !== txID)) {
     if (transaction) {
       // initialize the form with data coming from the loaded transaction
       setForm(toTransactionFormState(transaction))
@@ -54,12 +59,21 @@ export default function useTransactionDetails(
   async function submit() {
     if (entity === null) return
 
-    const res = await resolve(entity.id, transactionID, form)
+    const res = await resolve(entity.id, txID, form)
 
     if (res) {
       refresh()
     }
   }
 
-  return { form, fieldErrors, status, request, change, submit, close }
+  return {
+    form,
+    fieldErrors,
+    validationErrors,
+    status,
+    request,
+    change,
+    submit,
+    close,
+  }
 }
