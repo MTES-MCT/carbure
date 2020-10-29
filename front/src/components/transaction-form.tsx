@@ -16,7 +16,7 @@ import {
 } from "../services/common"
 
 import { Box, Button, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
-import { Return } from "./system/icons"
+import { AlertTriangle, Message, Return } from "./system/icons"
 import { Alert } from "./system/alert"
 import AutoComplete from "./system/autocomplete"
 
@@ -458,15 +458,19 @@ const TransactionForm = ({
 
       <div className={styles.transactionFormButtons}>
         {children}
-        {onClose && (
-          <Button
-            icon={Return}
-            className={styles.transactionFormClose}
-            onClick={onClose}
-          >
-            Retour
+        <div className={styles.transactionRightButtons}>
+          <Button level="warning" icon={Message}>
+            Voir les commentaires (12)
           </Button>
-        )}
+          <Button level="danger" icon={AlertTriangle}>
+            Voir les erreurs (4)
+          </Button>
+          {onClose && (
+            <Button icon={Return} onClick={onClose}>
+              Retour
+            </Button>
+          )}
+        </div>
       </div>
     </form>
   )
