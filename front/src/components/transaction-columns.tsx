@@ -35,7 +35,7 @@ const Status = ({ value }: { value: LotStatus }) => (
 
 type LineProps = { text: string; small?: boolean }
 
-const Line = ({ text = "", small = false }: LineProps) => (
+const Line = ({ text, small = false }: LineProps) => (
   <span title={text} className={cl(styles.rowLine, small && styles.extraInfo)}>
     {text}
   </span>
@@ -122,7 +122,7 @@ export const productionSite: Column<Transaction> = {
   render: (tx) => (
     <TwoLines
       text={tx.lot.carbure_production_site?.name ?? tx.lot.unknown_production_site} // prettier-ignore
-      sub={tx.lot.carbure_production_site?.country.name ?? tx.lot.unknown_production_country} // prettier-ignore
+      sub={tx.lot.carbure_production_site?.country.name ?? tx.lot.unknown_production_country?.name ?? ''} // prettier-ignore
     />
   ),
 }
@@ -131,7 +131,7 @@ export const deliverySite: Column<Transaction> = {
   header: "Site de livraison",
   render: (tx) => {
     const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
-    const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name // prettier-ignore
+    const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name ?? '' // prettier-ignore
     const city = tx.carbure_delivery_site?.city
     const location = city ? `${country}, ${city}` : country
 
