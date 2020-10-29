@@ -33,6 +33,7 @@ export default function useTransactionDetails(
   const [form, change, setForm] = useTransactionForm()
   const [details, resolveDetails] = useAPI(api.getDetails)
   const [request, resolve] = useAPI(api.updateLot)
+  const [comment, resolveComment] = useAPI(api.commentLot)
 
   const entityID = entity?.id
   const txID = parseInt(params.id, 10)
@@ -58,6 +59,13 @@ export default function useTransactionDetails(
     }
   }
 
+  async function addComment(message: string) {
+    if (entityID) {
+      await resolveComment(entityID, txID, message)
+      await resolveDetails(entityID, txID)
+    }
+  }
+
   useEffect(() => {
     if (entityID) {
       return resolveDetails(entityID, txID).cancel
@@ -67,6 +75,7 @@ export default function useTransactionDetails(
   return {
     form,
     details,
+    comment,
     fieldErrors,
     validationErrors,
     status,
@@ -74,5 +83,6 @@ export default function useTransactionDetails(
     change,
     submit,
     close,
+    addComment,
   }
 }
