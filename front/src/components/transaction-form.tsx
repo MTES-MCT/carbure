@@ -2,6 +2,7 @@ import React from "react"
 
 import { TransactionFormState } from "../hooks/helpers/use-transaction-form"
 import { FormFields } from "../hooks/helpers/use-form"
+import { ValidationError } from "../services/types"
 
 import styles from "./transaction-form.module.css"
 
@@ -16,10 +17,9 @@ import {
 } from "../services/common"
 
 import { Box, Button, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
-import { Message, Return } from "./system/icons"
+import { Return } from "./system/icons"
 import { Alert } from "./system/alert"
 import AutoComplete from "./system/autocomplete"
-import { LotStatus } from "../services/types"
 
 // shorthand to build autocomplete value & label getters
 const get = (key: string) => (obj: { [k: string]: any } | null) =>
@@ -34,24 +34,24 @@ const getters = {
 }
 
 type TransactionFormProps = {
-  status?: LotStatus
   readOnly?: boolean
   transaction: TransactionFormState
   children: React.ReactNode
   error: string | null
   fieldErrors?: { [k: string]: string }
+  validationErrors?: ValidationError[]
   onChange: <T extends FormFields>(e: React.ChangeEvent<T>) => void
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
   onClose?: () => void
 }
 
 const TransactionForm = ({
-  status,
   children,
   readOnly = false,
   transaction: tx,
   error,
   fieldErrors = {},
+  validationErrors = [],
   onChange,
   onSubmit,
   onClose,
@@ -459,20 +459,28 @@ const TransactionForm = ({
         </Alert>
       )}
 
+      {validationErrors.length > 0 && (
+        <Alert level="error" className={styles.transactionError}>
+          <ul className={styles.validationErrors}>
+            {validationErrors.map((err) => (
+              <li>{err.error || "Erreur de validation"}</li>
+            ))}
+          </ul>
+        </Alert>
+      )}
+
       <div className={styles.transactionFormButtons}>
         {children}
-        <div className={styles.transactionRightButtons}>
-          {status && status !== LotStatus.Draft && (
-            <Button level="warning" icon={Message}>
-              Voir les commentaires (12)
-            </Button>
-          )}
-          {onClose && (
-            <Button icon={Return} onClick={onClose}>
-              Retour
-            </Button>
-          )}
-        </div>
+
+        {onClose && (
+          <Button
+            icon={Return}
+            className={styles.transactionCloseButton}
+            onClick={onClose}
+          >
+            Retour
+          </Button>
+        )}
       </div>
     </form>
   )

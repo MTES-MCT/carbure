@@ -158,11 +158,34 @@ export interface Transaction {
   }[]
 }
 
+export interface TransactionError {
+  tx_id: number
+  field: string
+  value: string
+  error: string
+}
+
+export interface LotError {
+  lot_id: number
+  field: string
+  value: string
+  error: string
+}
+
+export interface ValidationError {
+  lot_id: number
+  error: string
+  details: string
+  fields: string[]
+  is_warning: boolean
+  is_blocking: boolean
+}
+
 export interface Lots {
   from: number
   returned: number
   total: number
-  errors: number
+  total_errors: number
 
   lots: Transaction[]
 
@@ -171,22 +194,12 @@ export interface Lots {
     total: number
   }
 
-  tx_errors: {
-    [key: string]: {
-      tx_id: number
-      field: string
-      value: string
-      error: string
-    }[]
-  }
-
-  lots_errors: {
-    [key: string]: {
-      lot_id: number
-      field: string
-      value: string
-      error: string
-    }[]
+  errors: {
+    [id: string]: {
+      tx_errors?: TransactionError[]
+      lots_errors?: LotError[]
+      validation_errors?: ValidationError[]
+    }
   }
 }
 

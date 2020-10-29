@@ -70,17 +70,17 @@ export const TransactionList = ({
   acceptor,
   rejector,
 }: TransactionListProps) => {
-  const tx = transactions.data
-  const errorCount = tx?.errors ?? 0
-  const deadlineCount = tx?.deadlines.total ?? 0
+  const txs = transactions.data
+  const errorCount = txs?.total_errors ?? 0
+  const deadlineCount = txs?.deadlines.total ?? 0
 
-  const deadlineDate = tx
-    ? format(new Date(tx.deadlines.date), "d MMMM", { locale: fr })
+  const deadlineDate = txs
+    ? format(new Date(txs.deadlines.date), "d MMMM", { locale: fr })
     : null
 
   const isLoading = transactions.loading
   const isError = transactions.error !== null
-  const isEmpty = tx === null || tx.lots.length === 0
+  const isEmpty = txs === null || txs.lots.length === 0
 
   return (
     <Box className={styles.transactionList}>
@@ -184,7 +184,7 @@ export const TransactionList = ({
             <TransactionTable
               entity={entity}
               status={status}
-              transactions={tx!}
+              transactions={txs!}
               selection={selection}
               sorting={sorting}
               onDuplicate={duplicator.duplicateLot}
@@ -198,7 +198,7 @@ export const TransactionList = ({
             {isLoading && <LoaderOverlay />}
           </Box>
 
-          <Pagination pagination={pagination} total={tx!.total} />
+          <Pagination pagination={pagination} total={txs!.total} />
         </React.Fragment>
       )}
     </Box>
@@ -216,11 +216,11 @@ export const StockList = ({
   sorting,
   pagination,
 }: StockListProps) => {
-  const tx = transactions.data
+  const txs = transactions.data
 
   const isLoading = transactions.loading
   const isError = typeof transactions.error === "string"
-  const isEmpty = tx === null || tx.lots.length === 0
+  const isEmpty = txs === null || txs.lots.length === 0
 
   return (
     <Box className={styles.transactionList}>
@@ -239,11 +239,11 @@ export const StockList = ({
       {!isError && !isEmpty && (
         <React.Fragment>
           <Box>
-            <StockTable transactions={tx!} sorting={sorting} />
+            <StockTable transactions={txs!} sorting={sorting} />
             {isLoading && <LoaderOverlay />}
           </Box>
 
-          <Pagination pagination={pagination} total={tx!.total} />
+          <Pagination pagination={pagination} total={txs!.total} />
         </React.Fragment>
       )}
     </Box>

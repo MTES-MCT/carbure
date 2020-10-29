@@ -51,7 +51,11 @@
   margin-right: 0;
 }
 
-.transactionRightButtons {
-  display: flex;
+.transactionCloseButton {
   margin-left: auto;
+}
+
+.validationErrors {
+  padding: 0 16px;
+  margin: 0;
 }
