@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     # GET
     path('', views.get_lots, name='api-v3-lots-get'),
+    path('details', views.get_details, name='api-v3-lots-get-details'),
     path('snapshot', views.get_snapshot, name='api-v3-lots-get-snapshot'),
     path('summary-in', views.get_summary_in, name='api-v3-lots-get-summary-in'),
     path('summary-out', views.get_summary_out, name='api-v3-lots-get-summary-out'),
