@@ -5,6 +5,7 @@ import {
   Snapshot,
   StockSnapshot,
   Filters,
+  LotDetails,
 } from "./types"
 import { FilterSelection } from "../hooks/query/use-filters"
 import { TransactionFormState } from "../hooks/helpers/use-transaction-form"
@@ -160,6 +161,18 @@ export function getLots(
   }
 
   return api.get("/lots", params).then((txs) => normalizeStatus(txs, entityID))
+}
+
+export function getDetails(
+  entityID: number,
+  transactionID: number
+): Promise<LotDetails> {
+  return api
+    .get("/lots/details", { entity_id: entityID, tx_id: transactionID })
+    .then((details) => {
+      details.transaction.status = getStatus(details.transaction, entityID)
+      return details
+    })
 }
 
 export function downloadLots(

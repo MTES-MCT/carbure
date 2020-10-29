@@ -1,15 +1,15 @@
+import { useEffect } from "react"
 import { useParams } from "react-router-dom"
 
-import { Lots, LotStatus } from "../services/types"
+import { Errors, Lots, LotStatus } from "../services/types"
 import { EntitySelection } from "./helpers/use-entity"
 
 import useTransactionForm, { toTransactionFormState } from "./helpers/use-transaction-form" // prettier-ignore
-import useAPI, { ApiState } from "./helpers/use-api"
+import useAPI from "./helpers/use-api"
 import useClose from "./helpers/use-close"
-import { updateLot } from "../services/lots"
+import * as api from "../services/lots"
 
-function getFieldErrors(txs: Lots, id: number) {
-  const errors = txs.errors[id] ?? {}
+function getFieldErrors(errors: Errors) {
   const fieldErrors: { [k: string]: string } = {}
 
   errors.lots_errors?.forEach((err) => {
@@ -25,35 +25,26 @@ function getFieldErrors(txs: Lots, id: number) {
 
 export default function useTransactionDetails(
   entity: EntitySelection,
-  transactions: ApiState<Lots | null>,
   refresh: () => void
 ) {
-  const close = useClose("../")
   const params: { id: string } = useParams()
+
+  const close = useClose("../")
   const [form, change, setForm] = useTransactionForm()
-  const [request, resolve] = useAPI(updateLot)
+  const [details, resolveDetails] = useAPI(api.getDetails)
+  const [request, resolve] = useAPI(api.updateLot)
 
-  const txs = transactions.data
   const txID = parseInt(params.id, 10)
+  const tx = details.data?.transaction
 
-  // find the relevant lot
-  // @TODO would be nice to be able to fetch details for only one lot
-  const transaction = txs?.lots.find((lot) => lot.id === txID)
-
-  const fieldErrors = txs ? getFieldErrors(txs, txID) : {}
-  const validationErrors = txs?.errors[txID]?.validation_errors ?? []
-  const status = transaction ? transaction.status : LotStatus.Weird
+  const fieldErrors = details.data ? getFieldErrors(details.data.errors) : {}
+  const validationErrors = details.data?.errors.validation_errors ?? []
+  const status = tx ? tx.status : LotStatus.Weird
 
   // if form data is not initialized, fill it instantly with data coming from transaction list
-  if (transactions.data && (form.id === -1 || form.id !== txID)) {
-    if (transaction) {
-      // initialize the form with data coming from the loaded transaction
-      setForm(toTransactionFormState(transaction))
-    } else {
-      // if transaction can't be loaded, close the modal
-      // (in a setImmediate so it's executed outside the render loop)
-      setImmediate(close)
-    }
+  if (tx && (form.id === -1 || form.id !== tx.id)) {
+    // initialize the form with data coming from the loaded transaction
+    setForm(toTransactionFormState(tx))
   }
 
   async function submit() {
@@ -66,8 +57,15 @@ export default function useTransactionDetails(
     }
   }
 
+  useEffect(() => {
+    if (entity) {
+      return resolveDetails(entity.id, txID).cancel
+    }
+  }, [entity?.id, txID])
+
   return {
     form,
+    details,
     fieldErrors,
     validationErrors,
     status,
