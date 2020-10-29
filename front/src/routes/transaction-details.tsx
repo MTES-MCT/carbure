@@ -11,8 +11,20 @@ import { LotValidator } from "../hooks/actions/use-validate-lots"
 import useTransactionDetails from "../hooks/use-transaction-details"
 
 import Modal from "../components/system/modal"
-import { AsyncButton, LoaderOverlay, Title } from "../components/system"
-import { AlertTriangle, Check, Cross, Save } from "../components/system/icons"
+import {
+  AsyncButton,
+  Box,
+  Button,
+  LoaderOverlay,
+  Title,
+} from "../components/system"
+import {
+  AlertTriangle,
+  Check,
+  Cross,
+  Message,
+  Save,
+} from "../components/system/icons"
 import TransactionForm from "../components/transaction-form"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]

@@ -51,6 +51,7 @@
   margin-right: 0;
 }
 
-button.transactionFormClose {
+.transactionRightButtons {
+  display: flex;
   margin-left: auto;
 }
