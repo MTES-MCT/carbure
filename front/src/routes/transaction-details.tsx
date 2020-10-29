@@ -11,13 +11,7 @@ import { LotValidator } from "../hooks/actions/use-validate-lots"
 import useTransactionDetails from "../hooks/use-transaction-details"
 
 import Modal from "../components/system/modal"
-import {
-  AsyncButton,
-  Box,
-  Button,
-  LoaderOverlay,
-  Title,
-} from "../components/system"
+import { AsyncButton, LoaderOverlay, Title } from "../components/system"
 import {
   AlertTriangle,
   Check,
@@ -76,6 +70,7 @@ const TransactionDetails = ({
       <Title>Transaction #{form.id ?? "N/A"}</Title>
 
       <TransactionForm
+        status={status}
         readOnly={!EDITABLE.includes(status)}
         transaction={form}
         error={request.error}
