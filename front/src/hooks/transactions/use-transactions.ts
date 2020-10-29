@@ -1,4 +1,3 @@
-import { Filters } from "../../services/types"
 import { EntitySelection } from "../helpers/use-entity"
 
 import { usePageSelection } from "../../components/system/pagination" // prettier-ignore
@@ -22,16 +21,6 @@ import useDeadlineSelection from "../query/use-deadline"
 import useGetSnapshot from "./use-snapshot"
 import useGetLots from "./use-get-lots"
 
-const initialFilters = {
-  [Filters.Biocarburants]: null,
-  [Filters.MatieresPremieres]: null,
-  [Filters.CountriesOfOrigin]: null,
-  [Filters.Periods]: null,
-  [Filters.Clients]: null,
-  [Filters.ProductionSites]: null,
-  [Filters.DeliverySites]: null,
-}
-
 export default function useTransactions(entity: EntitySelection) {
   const pagination = usePageSelection()
 
@@ -39,7 +28,7 @@ export default function useTransactions(entity: EntitySelection) {
   const deadline = useDeadlineSelection(pagination)
   const sorting = useSortingSelection(pagination)
   const search = useSearchSelection(pagination)
-  const filters = useFilterSelection(initialFilters, pagination)
+  const filters = useFilterSelection(pagination)
   const status = useStatusSelection(pagination, invalid, deadline)
   const year = useYearSelection(pagination, filters, invalid, deadline)
 

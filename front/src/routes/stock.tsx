@@ -6,6 +6,7 @@ import { useStocks } from "../hooks/use-stock"
 import { Main } from "../components/system"
 import { StocksSnapshot } from "../components/transaction-snapshot"
 import { StockList } from "../components/transaction-list"
+import TransactionFilters from "../components/transaction-filters"
 
 export const Stocks = ({ entity }: { entity: EntitySelection }) => {
   const {
@@ -24,7 +25,13 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
 
   return (
     <Main>
-      <StocksSnapshot snapshot={snapshot} filters={filters} search={search} />
+      <StocksSnapshot />
+
+      <TransactionFilters
+        search={search}
+        selection={filters}
+        filters={snapshot.data?.filters ?? {}}
+      />
 
       <StockList
         transactions={transactions}

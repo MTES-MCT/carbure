@@ -198,6 +198,7 @@ export enum Filters {
   CountriesOfOrigin = "countries_of_origin",
   Clients = "clients",
   DeliverySites = "delivery_sites",
+  Vendors = "vendors",
 }
 
 export interface Snapshot {
@@ -206,7 +207,7 @@ export interface Snapshot {
   }
 
   filters: {
-    [key in Filters]: Option[]
+    [key in Filters]?: Option[]
   }
 
   years: Option[]

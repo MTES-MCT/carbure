@@ -4,6 +4,8 @@ import { PageSelection } from "../../components/system/pagination"
 import { SelectValue } from "../../components/system/select"
 import { Filters } from "../../services/types"
 
+const defaultState = {}
+
 export interface FilterSelection {
   selected: { [k in Filters]?: SelectValue }
   select: (type: Filters, value: SelectValue) => void
@@ -12,11 +14,10 @@ export interface FilterSelection {
 
 // manage current filter selection
 export default function useFilterSelection(
-  initialState: FilterSelection["selected"],
   pagination: PageSelection
 ): FilterSelection {
   const [selected, setFilters] = useState<FilterSelection["selected"]>(
-    initialState
+    defaultState
   )
 
   function select(type: Filters, value: SelectValue) {
@@ -25,7 +26,7 @@ export default function useFilterSelection(
   }
 
   function reset() {
-    setFilters(initialState)
+    setFilters(defaultState)
   }
 
   return { selected, select, reset }
