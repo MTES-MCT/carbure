@@ -83,7 +83,6 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         <Route relative path=":id">
           <TransactionDetails
             entity={entity}
-            transactions={transactions}
             refresh={refresh}
             deleter={deleter}
             validator={validator}
