@@ -17,7 +17,6 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
     stock,
     search,
     sorting,
-    refresh,
   } = useStocks(entity)
 
   if (entity === null) {

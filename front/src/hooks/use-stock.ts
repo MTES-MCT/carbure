@@ -87,10 +87,6 @@ export function useStocks(entity: EntitySelection) {
   const snapshot = useGetStockSnapshot(entity)
   const stock = useGetStocks(entity, filters, status, pagination, search, sorting) // prettier-ignore
 
-  function refresh() {
-    stock.resolve()
-  }
-
   return {
     filters,
     pagination,
@@ -99,6 +95,5 @@ export function useStocks(entity: EntitySelection) {
     stock,
     search,
     sorting,
-    refresh,
   }
 }
