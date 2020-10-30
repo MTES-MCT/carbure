@@ -45,13 +45,14 @@ function useGetStocks(
   sorting: SortingSelection
 ): StockHook {
   const [stock, resolveStocks] = useAPI(getStocks)
+  const entityID = entity?.id
 
   function resolve() {
-    if (entity !== null) {
+    if (entityID !== null) {
       return resolveStocks(
-        entity.id,
+        entityID,
         filters.selected,
-        status,
+        status.active,
         pagination.page,
         pagination.limit,
         search.query,
@@ -63,9 +64,9 @@ function useGetStocks(
 
   useEffect(resolve, [
     resolveStocks,
-    entity,
+    entityID,
     filters.selected,
-    status,
+    status.active,
     pagination.page,
     pagination.limit,
     search.query,

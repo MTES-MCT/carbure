@@ -45,13 +45,10 @@ export function useStockStatusSelection(
   const push = useRelativePush()
   const params: { status: LotStatus } = useParams()
 
-  console.log(`Stock status: ${params.status}`)
   if (params.status === null || params.status === undefined) {
     params.status = LotStatus.Draft
   }
   const active = params.status
-
-
 
   function is(status: LotStatus) {
     return active === status
