@@ -10,6 +10,7 @@ import {
 } from "../components/system"
 import { Alert } from "../components/system/alert"
 import {
+  Back,
   Check,
   ChevronDown,
   Cross,
@@ -24,6 +25,7 @@ const styles = {
     background: "var(--gray-light)",
     marginTop: 1,
     boxShadow: "0 0 2px var(--gray-medium)",
+    justifyContent: "center",
   },
 
   detailsBody: {
@@ -115,7 +117,12 @@ const TransactionDetails = () => {
   return (
     <Main>
       <Box row style={styles.detailsHeader}>
-        <Title>Détails de la transaction #1456</Title>
+        <Box row style={{ flex: 1, maxWidth: 1080 }}>
+          <Back
+            style={{ marginLeft: -36, marginRight: 12, cursor: "pointer" }}
+          />
+          <Title>Détails de la transaction #1456</Title>
+        </Box>
       </Box>
 
       <Box style={styles.detailsBody}>

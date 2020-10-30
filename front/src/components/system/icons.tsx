@@ -180,3 +180,11 @@ export const Return = ({ className, ...props }: IconProps) => (
     <path d="M9 11l-4 4l4 4m-4 -4h11a4 4 0 0 0 0 -8h-1" />
   </Icon>
 )
+
+export const Back = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-back", className)}>
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <line x1="5" y1="12" x2="11" y2="18" />
+    <line x1="5" y1="12" x2="11" y2="6" />
+  </Icon>
+)
