@@ -362,9 +362,9 @@ export function getStockSnapshot(entity_id: number): Promise<StockSnapshot> {
 }
 
 export function getStocks(
-  entityID: number,
+  entityID: number | undefined,
   filters: FilterSelection["selected"],
-  status: StatusSelection,
+  status: string,
   page: number,
   limit: number,
   query: string,
@@ -374,7 +374,7 @@ export function getStocks(
   return api.get("/stocks", {
     ...filters,
     status,
-    entity_id: entityID,
+    entity_id: entityID?? null,
     from_idx: page * limit,
     sort_by: sortBy,
     limit,
