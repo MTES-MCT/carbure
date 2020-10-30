@@ -27,7 +27,7 @@ const Org = ({ app }: MainProps) => {
       <Topbar entity={entity} settings={app.settings} />
 
       <Switch>
-        <Route relative path="stocks">
+        <Route relative path="stocks/:status">
           <Stocks entity={entity} />
         </Route>
 
