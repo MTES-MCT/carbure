@@ -1,4 +1,3 @@
-import { NONAME } from "dns"
 import React from "react"
 
 import {
@@ -28,7 +27,9 @@ const styles = {
   },
 
   detailsBody: {
-    padding: "24px 240px",
+    margin: "24px 120px",
+    maxWidth: 1080,
+    alignSelf: "center",
   },
 
   detailsErrors: {
@@ -269,40 +270,38 @@ const TransactionDetails = () => {
               eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </span>
           </Box>
-          <Box style={styles.detailsSectionRightColumn}>
-            <Box row>
-              <Box style={{ marginRight: 16 }}>
-                <span
-                  style={{
-                    fontSize: 14,
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Émissions
-                </span>
-                <LabelInput label="EEC" type="number" />
-                <LabelInput label="EL" type="number" />
-                <LabelInput label="EP" type="number" />
-                <LabelInput label="ETD" type="number" />
-              </Box>
-              <Box>
-                <span
-                  style={{
-                    fontSize: 14,
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Réductions
-                </span>
-                <LabelInput label="ESCA" type="number" />
-                <LabelInput label="ECCS" type="number" />
-                <LabelInput label="ECCR" type="number" />
-                <LabelInput label="EEE" type="number" />
-              </Box>
+          <Box row style={styles.detailsSectionRightColumn}>
+            <Box style={{ flex: 1, marginRight: 16 }}>
+              <span
+                style={{
+                  fontSize: 14,
+                  fontWeight: "bold",
+                  textAlign: "center",
+                }}
+              >
+                Émissions
+              </span>
+              <LabelInput label="EEC" type="number" />
+              <LabelInput label="EL" type="number" />
+              <LabelInput label="EP" type="number" />
+              <LabelInput label="ETD" type="number" />
+              <LabelInput label="EU" type="number" />
             </Box>
-            <LabelInput label="EU" type="number" />
+            <Box style={{ flex: 1 }}>
+              <span
+                style={{
+                  fontSize: 14,
+                  fontWeight: "bold",
+                  textAlign: "center",
+                }}
+              >
+                Réductions
+              </span>
+              <LabelInput label="ESCA" type="number" />
+              <LabelInput label="ECCS" type="number" />
+              <LabelInput label="ECCR" type="number" />
+              <LabelInput label="EEE" type="number" />
+            </Box>
           </Box>
         </Box>
 
