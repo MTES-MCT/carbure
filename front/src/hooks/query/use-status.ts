@@ -37,3 +37,24 @@ export default function useStatusSelection(
 
   return { active, is, setActive }
 }
+
+// manage currently selected transaction status
+export function useStockStatusSelection(
+  pagination: PageSelection,
+): StatusSelection {
+  const push = useRelativePush()
+  const params: { status: LotStatus } = useParams()
+
+  const active = params.status
+
+  function is(status: LotStatus) {
+    return active === status
+  }
+
+  function setActive(status: LotStatus) {
+    pagination.setPage(0)
+    push(`../${status}`)
+  }
+
+  return { active, is, setActive }
+}
