@@ -10,6 +10,9 @@ import {
 import useFilterSelection, { FilterSelection } from "./query/use-filters"
 import useSearchSelection, { SearchSelection } from "./query/use-search"
 import useSortingSelection, { SortingSelection } from "./query/use-sort-by"
+import useStatusSelection, { StatusSelection } from "./query/use-status"
+import useInvalidSelection from "./query/use-invalid"
+import useDeadlineSelection from "./query/use-deadline"
 
 interface StockHook {
   loading: boolean
@@ -36,17 +39,19 @@ function useGetStockSnapshot(entity: EntitySelection) {
 function useGetStocks(
   entity: EntitySelection,
   filters: FilterSelection,
+  status: StatusSelection,
   pagination: PageSelection,
   search: SearchSelection,
   sorting: SortingSelection
 ): StockHook {
-  const [transactions, resolveStocks] = useAPI(getStocks)
+  const [stock, resolveStocks] = useAPI(getStocks)
 
   function resolve() {
     if (entity !== null) {
       return resolveStocks(
         entity.id,
         filters.selected,
+        status,
         pagination.page,
         pagination.limit,
         search.query,
@@ -60,6 +65,7 @@ function useGetStocks(
     resolveStocks,
     entity,
     filters.selected,
+    status,
     pagination.page,
     pagination.limit,
     search.query,
@@ -67,27 +73,30 @@ function useGetStocks(
     sorting.order,
   ])
 
-  return { ...transactions, resolve }
+  return { ...stock, resolve }
 }
 
 export function useStocks(entity: EntitySelection) {
   const pagination = usePageSelection()
   const sorting = useSortingSelection(pagination)
-
+  const invalid = useInvalidSelection(pagination)
+  const deadline = useDeadlineSelection(pagination)  
+  const status = useStatusSelection(pagination, invalid, deadline)
   const search = useSearchSelection(pagination)
   const filters = useFilterSelection(pagination)
   const snapshot = useGetStockSnapshot(entity)
-  const transactions = useGetStocks(entity, filters, pagination, search, sorting) // prettier-ignore
+  const stock = useGetStocks(entity, filters, status, pagination, search, sorting) // prettier-ignore
 
   function refresh() {
-    transactions.resolve()
+    stock.resolve()
   }
 
   return {
     filters,
     pagination,
     snapshot,
-    transactions,
+    status,
+    stock,
     search,
     sorting,
     refresh,

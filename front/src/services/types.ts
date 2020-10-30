@@ -251,6 +251,10 @@ export interface UserRight {
 }
 
 export interface StockSnapshot {
+  lots: {
+    [key in LotStatus]: number
+  }
+
   filters: {
     [key in Filters]: Option[]
   }

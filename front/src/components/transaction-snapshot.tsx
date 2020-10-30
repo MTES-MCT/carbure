@@ -1,7 +1,7 @@
 import React from "react"
 
 import { ApiState } from "../hooks/helpers/use-api"
-import { LotStatus, Snapshot } from "../services/types"
+import { LotStatus, Snapshot, StockSnapshot } from "../services/types"
 import { StatusSelection } from "../hooks/query/use-status"
 import { YearSelection } from "../hooks/query/use-year"
 
@@ -32,7 +32,7 @@ const STATUS_LABEL = {
 }
 
 function mapStatus(
-  statuses: Snapshot["lots"] | undefined
+  statuses: {[key: string] : number}  | undefined
 ): [LotStatus, string, number][] {
   if (!statuses) return []
 
@@ -97,14 +97,36 @@ export const TransactionSnapshot = ({
   </div>
 )
 
-export const StocksSnapshot = () => (
-  <Box className={styles.transactionSnapshot}>
-    <div className={styles.transactionSummary}>
-      <div className={styles.transactionHeader}>
-        <Title>Stock</Title>
-      </div>
-    </div>
-  </Box>
+type StockSnapshotProps = {
+  snapshot: ApiState<StockSnapshot>
+  status: StatusSelection
+}
+
+export const StocksSnapshot = ({snapshot, status} : StockSnapshotProps) => (
+  <div className={styles.transactionSnapshot}>
+    {snapshot.error && <Alert level="error">{snapshot.error}</Alert>}
+
+    {!snapshot.error && (
+      <React.Fragment>
+        <div className={styles.transactionHeader}>
+          <Title>Stock</Title>
+        </div>
+
+        <div className={styles.transactionStatus}>
+          {mapStatus(snapshot.data?.lots).map(([key, label, amount]) => (
+            <StatusButton
+              key={key}
+              active={key === status.active}
+              loading={snapshot.loading}
+              amount={amount}
+              label={label}
+              onClick={() => status.setActive(key)}
+            />
+          ))}
+        </div>
+      </React.Fragment>
+    )}
+  </div>
 )
 
 export default TransactionSnapshot
