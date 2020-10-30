@@ -10,7 +10,7 @@ import {
 import useFilterSelection, { FilterSelection } from "./query/use-filters"
 import useSearchSelection, { SearchSelection } from "./query/use-search"
 import useSortingSelection, { SortingSelection } from "./query/use-sort-by"
-import useStatusSelection, { StatusSelection } from "./query/use-status"
+import { useStockStatusSelection, StatusSelection } from "./query/use-status"
 import useInvalidSelection from "./query/use-invalid"
 import useDeadlineSelection from "./query/use-deadline"
 
@@ -79,9 +79,7 @@ function useGetStocks(
 export function useStocks(entity: EntitySelection) {
   const pagination = usePageSelection()
   const sorting = useSortingSelection(pagination)
-  const invalid = useInvalidSelection(pagination)
-  const deadline = useDeadlineSelection(pagination)  
-  const status = useStatusSelection(pagination, invalid, deadline)
+  const status = useStockStatusSelection(pagination)
   const search = useSearchSelection(pagination)
   const filters = useFilterSelection(pagination)
   const snapshot = useGetStockSnapshot(entity)
