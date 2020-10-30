@@ -158,13 +158,12 @@ export const TransactionTable = ({
 }
 
 type StockTableProps = {
-  transactions: Lots
+  stock: Lots | null
   sorting: SortingSelection
 }
 
-export const StockTable = ({ transactions, sorting }: StockTableProps) => {
+export const StockTable = ({ stock, sorting }: StockTableProps) => {
   const relativePush = useRelativePush()
-  const deadline = transactions.deadlines?.date
 
   const columns = [
     C.empty,
@@ -177,13 +176,14 @@ export const StockTable = ({ transactions, sorting }: StockTableProps) => {
     C.arrow,
   ]
 
-  const rows: Row<Transaction>[] = transactions.lots.map((tx) => ({
+  if (stock === null) {
+    console.log('Stock null')
+    return null
+  }
+
+  const rows: Row<Transaction>[] = stock.lots.map((tx) => ({
     value: tx,
     onClick: () => relativePush(`${tx.id}`),
-    className: cl({
-      [styles.transactionRowError]: tx.id in transactions.errors,
-      [styles.transactionRowDeadline]: hasDeadline(tx, deadline),
-    }),
   }))
 
   return (
@@ -196,5 +196,3 @@ export const StockTable = ({ transactions, sorting }: StockTableProps) => {
     />
   )
 }
-
-export default StockTable

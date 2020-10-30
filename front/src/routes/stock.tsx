@@ -13,7 +13,8 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
     filters,
     pagination,
     snapshot,
-    transactions,
+    status,
+    stock,
     search,
     sorting,
     refresh,
@@ -25,7 +26,10 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
 
   return (
     <Main>
-      <StocksSnapshot />
+      <StocksSnapshot 
+        snapshot={snapshot}
+        status={status} 
+      />
 
       <TransactionFilters
         search={search}
@@ -34,10 +38,11 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
       />
 
       <StockList
-        transactions={transactions}
+        stock={stock}
         sorting={sorting}
         pagination={pagination}
       />
+
     </Main>
   )
 }

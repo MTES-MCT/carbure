@@ -206,27 +206,27 @@ export const TransactionList = ({
 }
 
 type StockListProps = {
-  transactions: ApiState<Lots>
+  stock: ApiState<Lots>
   sorting: SortingSelection
   pagination: PageSelection
 }
 
 export const StockList = ({
-  transactions,
+  stock,
   sorting,
   pagination,
 }: StockListProps) => {
-  const txs = transactions.data
+  const txs = stock.data
 
-  const isLoading = transactions.loading
-  const isError = typeof transactions.error === "string"
+  const isLoading = stock.loading
+  const isError = typeof stock.error === "string"
   const isEmpty = txs === null || txs.lots.length === 0
 
   return (
     <Box className={styles.transactionList}>
       {isError && (
         <Alert level="error" icon={AlertCircle}>
-          {transactions.error}
+          {stock.error}
         </Alert>
       )}
 
@@ -239,7 +239,10 @@ export const StockList = ({
       {!isError && !isEmpty && (
         <React.Fragment>
           <Box>
-            <StockTable transactions={txs!} sorting={sorting} />
+            <StockTable 
+              stock={txs!} 
+              sorting={sorting} 
+            />
             {isLoading && <LoaderOverlay />}
           </Box>
 
