@@ -7,7 +7,7 @@ import { YearSelection } from "../hooks/query/use-year"
 
 import styles from "./transaction-snapshot.module.css"
 
-import { Title, StatusButton, Box } from "./system"
+import { Title, StatusButton } from "./system"
 import Select from "./system/select"
 import { Alert } from "./system/alert"
 
@@ -32,7 +32,7 @@ const STATUS_LABEL = {
 }
 
 function mapStatus(
-  statuses: {[key: string] : number}  | undefined
+  statuses: { [key: string]: number } | undefined
 ): [LotStatus, string, number][] {
   if (!statuses) return []
 
@@ -102,7 +102,7 @@ type StockSnapshotProps = {
   status: StatusSelection
 }
 
-export const StocksSnapshot = ({snapshot, status} : StockSnapshotProps) => (
+export const StocksSnapshot = ({ snapshot, status }: StockSnapshotProps) => (
   <div className={styles.transactionSnapshot}>
     {snapshot.error && <Alert level="error">{snapshot.error}</Alert>}
 
