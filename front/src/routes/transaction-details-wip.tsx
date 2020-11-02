@@ -290,6 +290,7 @@ const TransactionDetails = () => {
               <span style={styles.error}>
                 Merci de renseigner un numéro de douane
               </span>
+              <LabelInput label="Date de livraison" type="date" />
               <LabelInput
                 label="Client"
                 placeholder="Rechercher un client sur Carbure..."
@@ -304,7 +305,6 @@ const TransactionDetails = () => {
               <span style={styles.link}>
                 Le site de livraison n'est pas enregistré sur Carbure ?
               </span>
-              <LabelInput label="Date de livraison" type="date" />
             </Box>
           </Box>
 
