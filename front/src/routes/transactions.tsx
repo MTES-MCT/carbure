@@ -8,8 +8,8 @@ import { Main } from "../components/system"
 import { Route, Switch } from "../components/relative-route"
 import { TransactionSnapshot } from "../components/transaction-snapshot"
 import { TransactionList } from "../components/transaction-list"
-import TransactionDetails from "./transaction-details-wip"
-// import TransactionDetails from "./transaction-details"
+// import TransactionDetails from "./transaction-details-wip"
+import TransactionDetails from "./transaction-details"
 import TransactionAdd from "./transaction-add"
 import TransactionOutSummary from "./transaction-out-summary"
 import TransactionInSummary from "./transaction-in-summary"
@@ -81,7 +81,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
           <TransactionInSummary entity={entity} />
         </Route>
 
-        {/* <Route relative path=":id">
+        <Route relative path=":id">
           <TransactionDetails
             entity={entity}
             refresh={refresh}
@@ -90,11 +90,11 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
             acceptor={acceptor}
             rejector={rejector}
           />
-        </Route> */}
-
-        <Route relative path=":id">
-          <TransactionDetails />
         </Route>
+
+        {/* <Route relative path=":id">
+          <TransactionDetails />
+        </Route> */}
       </Switch>
     </Main>
   )

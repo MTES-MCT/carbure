@@ -24,6 +24,7 @@
 .modal {
   position: relative;
   padding: 24px;
+  padding-bottom: 0;
   background-color: var(--gray-light);
   border: 1px solid var(--gray-medium);
   min-width: 400px;

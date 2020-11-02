@@ -11,8 +11,6 @@ import styles from "../components/transaction-form.module.css"
 
 import useTransactionDetails from "../hooks/use-transaction-details"
 
-import Modal from "../components/system/modal"
-import { AsyncButton, Button, LoaderOverlay, Title } from "../components/system"
 import {
   AlertTriangle,
   Check,
@@ -20,6 +18,9 @@ import {
   Return,
   Save,
 } from "../components/system/icons"
+import { AsyncButton, Button, LoaderOverlay, Title } from "../components/system"
+import { Collapsible } from "../components/system/alert"
+import Modal from "../components/system/modal"
 import Comments from "../components/comments"
 import TransactionForm from "../components/transaction-form"
 
@@ -79,9 +80,22 @@ const TransactionDetails = ({
         transaction={form}
         error={details.error ?? request.error}
         fieldErrors={fieldErrors}
-        validationErrors={validationErrors}
         onChange={change}
       />
+
+      {validationErrors.length > 0 && (
+        <Collapsible
+          level="error"
+          title={`Erreurs (${validationErrors.length})`}
+          className={styles.transactionError}
+        >
+          <ul className={styles.validationErrors}>
+            {validationErrors.map((err) => (
+              <li>{err.error || "Erreur de validation"}</li>
+            ))}
+          </ul>
+        </Collapsible>
+      )}
 
       {details.data && details.data.comments.length > 0 && (
         <Comments
