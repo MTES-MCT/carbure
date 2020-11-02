@@ -6,6 +6,7 @@ import * as api from "../../services/lots"
 import useAPI from "../helpers/use-api"
 
 import { confirm, prompt } from "../../components/system/dialog"
+import { CommentPrompt } from "../../components/comments"
 
 export interface LotValidator {
   loading: boolean
@@ -41,7 +42,8 @@ export default function useValidateLots(
   async function validateAndCommentLot(lotID: number) {
     const comment = await prompt(
       "Envoyer lot",
-      "Voulez vous renvoyer ce lot corrigé ?"
+      "Voulez vous renvoyer ce lot corrigé ?",
+      CommentPrompt
     )
 
     if (entity !== null && comment) {
