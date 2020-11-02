@@ -5,7 +5,7 @@ import fr from "date-fns/locale/fr"
 import { Entity, Lots, LotStatus } from "../services/types"
 import { SortingSelection } from "../hooks/query/use-sort-by" // prettier-ignore
 import { PageSelection } from "./system/pagination"
-import { ApiState } from "../hooks/helpers/use-api"
+import { StockHook } from "../hooks/use-stock"
 
 import { LotGetter } from "../hooks/transactions/use-get-lots"
 import { LotUploader } from "../hooks/actions/use-upload-file"
@@ -35,6 +35,7 @@ import {
   InboxActions,
   InboxSummaryActions,
   ToFixActions,
+  StockActions,
 } from "./transaction-actions"
 
 type TransactionListProps = {
@@ -206,15 +207,31 @@ export const TransactionList = ({
 }
 
 type StockListProps = {
-  stock: ApiState<Lots>
+  stock: StockHook
   sorting: SortingSelection
   pagination: PageSelection
+  status: StatusSelection
+  selection: TransactionSelection
+  deleter: LotDeleter
+  uploader: LotUploader
+  validator: LotValidator
+  acceptor: LotAcceptor
+  rejector: LotRejector
+  duplicator: LotDuplicator
 }
 
 export const StockList = ({
   stock,
   sorting,
   pagination,
+  status,
+  selection,
+  deleter,
+  uploader,
+  validator,
+  acceptor,
+  rejector,
+  duplicator
 }: StockListProps) => {
   const txs = stock.data
 
@@ -234,6 +251,41 @@ export const StockList = ({
         <Alert level="warning" icon={AlertCircle}>
           Aucune transaction trouvée pour ces paramètres
         </Alert>
+      )}
+
+      {!isError && (
+        <ActionBar>
+          <ExportActions
+            isEmpty={isEmpty}
+            onExportAll={stock.exportAllTransactions}
+          />
+
+          {status.is(LotStatus.Inbox) && <InboxSummaryActions />}
+
+          {status.is(LotStatus.Draft) && (
+            <DraftActions
+              disabled={isEmpty}
+              hasSelection={selection.selected.length > 0}
+              uploader={uploader}
+              deleter={deleter}
+              validator={validator}
+            />
+          )}
+
+          {status.is(LotStatus.Inbox) && (
+            <InboxActions
+              disabled={isEmpty}
+              hasSelection={selection.selected.length > 0}
+              acceptor={acceptor}
+              rejector={rejector}
+            />
+          )}
+
+          {status.is(LotStatus.Stock) && (
+            <StockActions
+            />
+          )}
+        </ActionBar>
       )}
 
       {!isError && !isEmpty && (
