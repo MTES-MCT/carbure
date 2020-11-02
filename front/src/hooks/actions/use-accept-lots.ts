@@ -6,6 +6,7 @@ import * as api from "../../services/lots"
 import useAPI from "../helpers/use-api"
 
 import { confirm, prompt } from "../../components/system/dialog"
+import { CommentWithTypePrompt } from "../../components/comments"
 
 export interface LotAcceptor {
   loading: boolean
@@ -39,16 +40,22 @@ export default function useAcceptLots(
   }
 
   async function acceptAndCommentLot(lotID: number) {
-    const comment = await prompt(
+    const result = await prompt(
       "Accepter lot",
-      "Voulez vous accepter ce lot sous réserve ?"
+      "Voulez vous accepter ce lot sous réserve ?",
+      CommentWithTypePrompt
     )
 
-    if (entity !== null && comment) {
-      await resolveAcceptAndComment(entity.id, lotID, comment).then(refresh)
+    if (entity !== null && result) {
+      await resolveAcceptAndComment(
+        entity.id,
+        lotID,
+        result.comment,
+        result.topic
+      ).then(refresh)
     }
 
-    return Boolean(comment)
+    return Boolean(result)
   }
 
   async function acceptSelection() {
