@@ -1,112 +1,51 @@
-import React, { useState } from "react"
+import React from "react"
 import ReactDOM from "react-dom"
 
 import styles from "./dialog.module.css"
 
-import { Title, Box, Button, LabelInput } from "."
+import { Title, Box, Button } from "."
 import Modal from "./modal"
 
-type ConfirmProps = {
-  title: string
-  description: string
-  onConfirm: () => void
+export type PromptFormProps<T> = {
+  children?: React.ReactNode
+  onConfirm: (c: T) => void
   onCancel: () => void
 }
 
-export const Confirm = ({
-  title,
-  description,
-  onConfirm,
-  onCancel,
-}: ConfirmProps) => (
-  <Modal className={styles.dialog} onClose={onCancel}>
-    <Title>{title}</Title>
-
-    <span className={styles.dialogMessage}>{description}</span>
-
-    <Box row className={styles.dialogButtons}>
-      <Button level="primary" onClick={onConfirm}>
-        OK
-      </Button>
-      <Button onClick={onCancel}>Annuler</Button>
-    </Box>
-  </Modal>
-)
-
-// return a promise that resolves only when the confirm or cancel button is clicked
-export function confirm(title: string, description: string): Promise<boolean> {
-  return new Promise((resolve) => {
-    const container = document.createElement("tmp")
-
-    function close(result: boolean) {
-      resolve(result)
-      ReactDOM.unmountComponentAtNode(container)
-    }
-
-    // render component imperatively, outside of the regular react container
-    ReactDOM.render(
-      <Confirm
-        title={title}
-        description={description}
-        onConfirm={() => close(true)}
-        onCancel={() => close(false)}
-      />,
-      container
-    )
-  })
-}
-
-type PromptProps = {
+type PromptProps<T> = {
   title: string
   description: string
-  onConfirm: (c: string) => void
+  form: React.ComponentType<PromptFormProps<T>>
+  onConfirm: (c: T) => void
   onCancel: () => void
 }
 
-export const Prompt = ({
+export function Prompt<T>({
   title,
   description,
+  form: Form,
   onConfirm,
   onCancel,
-}: PromptProps) => {
-  const [comment, setComment] = useState("")
-
+}: PromptProps<T>) {
   return (
     <Modal className={styles.dialog} onClose={onCancel}>
       <Title>{title}</Title>
-
       <span className={styles.dialogMessage}>{description}</span>
-
-      <LabelInput
-        label="Commentaire (obligatoire)"
-        value={comment}
-        className={styles.promptInput}
-        onChange={(e) => setComment(e.target.value)}
-      />
-
-      <Box row className={styles.dialogButtons}>
-        <Button
-          level="primary"
-          disabled={!comment}
-          onClick={() => onConfirm(comment)}
-        >
-          OK
-        </Button>
-        <Button onClick={onCancel}>Annuler</Button>
-      </Box>
+      <Form onConfirm={onConfirm} onCancel={onCancel} />
     </Modal>
   )
 }
 
 // return a promise that resolves only when the confirm or cancel button is clicked
-export function prompt(
+export function prompt<T>(
   title: string,
-  description: string
-): Promise<string | undefined> {
+  description: string,
+  form: React.ComponentType<PromptFormProps<T>>
+): Promise<T | undefined> {
   return new Promise((resolve) => {
     const container = document.createElement("tmp")
 
-    function close(result?: string) {
+    function close(result?: T) {
       resolve(result)
       ReactDOM.unmountComponentAtNode(container)
     }
@@ -116,10 +55,24 @@ export function prompt(
       <Prompt
         title={title}
         description={description}
-        onConfirm={(comment) => close(comment)}
+        form={form}
+        onConfirm={close}
         onCancel={() => close(undefined)}
       />,
       container
     )
   })
+}
+
+const ConfirmPrompt = ({ onConfirm, onCancel }: PromptFormProps<boolean>) => (
+  <Box row className={styles.dialogButtons}>
+    <Button level="primary" onClick={() => onConfirm(true)}>
+      OK
+    </Button>
+    <Button onClick={onCancel}>Annuler</Button>
+  </Box>
+)
+
+export function confirm(title: string, description: string) {
+  return prompt(title, description, ConfirmPrompt).then(Boolean)
 }
