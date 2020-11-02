@@ -3,6 +3,7 @@ import { Lots } from "../services/types"
 import useAPI from "./helpers/use-api"
 import { getStocks, getStockSnapshot } from "../services/lots"
 import { EntitySelection } from "./helpers/use-entity"
+import useYearSelection from "./query/use-year"
 import {
   PageSelection,
   usePageSelection,
@@ -10,15 +11,24 @@ import {
 import useFilterSelection, { FilterSelection } from "./query/use-filters"
 import useSearchSelection, { SearchSelection } from "./query/use-search"
 import useSortingSelection, { SortingSelection } from "./query/use-sort-by"
-import { useStockStatusSelection, StatusSelection } from "./query/use-status"
 import useInvalidSelection from "./query/use-invalid"
 import useDeadlineSelection from "./query/use-deadline"
+import { useStockStatusSelection, StatusSelection } from "./query/use-status"
+import useTransactionSelection from "./query/use-selection"
 
-interface StockHook {
+import useUploadLotFile from "./actions/use-upload-file"
+import useDuplicateLot from "./actions/use-duplicate-lots"
+import useDeleteLots from "./actions/use-delete-lots"
+import useValidateLots from "./actions/use-validate-lots"
+import useRejectLots from "./actions/use-reject-lots"
+import useAcceptLots from "./actions/use-accept-lots"
+
+export interface StockHook {
   loading: boolean
   error: string | null
   data: Lots | null
   resolve: () => void
+  exportAllTransactions: () => void
 }
 
 function useGetStockSnapshot(entity: EntitySelection) {
@@ -47,6 +57,10 @@ function useGetStocks(
   const [stock, resolveStocks] = useAPI(getStocks)
   const entityID = entity?.id
 
+  function exportAllTransactions() {
+    return null
+  }
+
   function resolve() {
     if (entityID !== null) {
       return resolveStocks(
@@ -74,7 +88,7 @@ function useGetStocks(
     sorting.order,
   ])
 
-  return { ...stock, resolve }
+  return { ...stock, resolve, exportAllTransactions }
 }
 
 export function useStocks(entity: EntitySelection) {
@@ -84,7 +98,22 @@ export function useStocks(entity: EntitySelection) {
   const search = useSearchSelection(pagination)
   const filters = useFilterSelection(pagination)
   const snapshot = useGetStockSnapshot(entity)
+  const invalid = useInvalidSelection(pagination)
+  const deadline = useDeadlineSelection(pagination)
+  const year = useYearSelection(pagination, filters, invalid, deadline)
   const stock = useGetStocks(entity, filters, status, pagination, search, sorting) // prettier-ignore
+
+
+  function refresh() {
+  }
+
+  const selection = useTransactionSelection(stock.data?.lots)
+  const uploader = useUploadLotFile(entity, refresh)
+  const duplicator = useDuplicateLot(entity, refresh)
+  const deleter = useDeleteLots(entity, selection, year, refresh)
+  const validator = useValidateLots(entity, selection, year, refresh)
+  const acceptor = useAcceptLots(entity, selection, year, refresh)
+  const rejector = useRejectLots(entity, selection, year, refresh)
 
   return {
     filters,
@@ -94,5 +123,12 @@ export function useStocks(entity: EntitySelection) {
     stock,
     search,
     sorting,
+    selection,
+    uploader,
+    duplicator,
+    deleter,
+    validator,
+    acceptor,
+    rejector,    
   }
 }

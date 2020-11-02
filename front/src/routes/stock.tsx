@@ -17,6 +17,13 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
     stock,
     search,
     sorting,
+    selection,
+    uploader,
+    duplicator,
+    deleter,
+    validator,
+    acceptor,
+    rejector,  
   } = useStocks(entity)
 
   if (entity === null) {
@@ -40,6 +47,14 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
         stock={stock}
         sorting={sorting}
         pagination={pagination}
+        status={status}
+        selection={selection}
+        deleter={deleter}
+        uploader={uploader}
+        validator={validator}
+        acceptor={acceptor}
+        rejector={rejector}
+        duplicator={duplicator}
       />
 
     </Main>
