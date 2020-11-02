@@ -250,6 +250,16 @@ export function acceptLots(entityID: number, transactionIDs: number[]) {
   })
 }
 
+export function acceptLotsWithReserve(
+  entityID: number,
+  transactionIDs: number[]
+) {
+  return api.post("/lots/accept-with-reserves", {
+    entity_id: entityID,
+    tx_ids: transactionIDs,
+  })
+}
+
 export function rejectLots(
   entityID: number,
   transactionIDs: number[],
@@ -291,7 +301,7 @@ export function acceptAndCommentLot(
   transactionID: number,
   comment: string
 ) {
-  const accepting = acceptLots(entityID, [transactionID])
+  const accepting = acceptLotsWithReserve(entityID, [transactionID])
   const commenting = commentLot(entityID, transactionID, comment)
 
   return Promise.all([accepting, commenting])
