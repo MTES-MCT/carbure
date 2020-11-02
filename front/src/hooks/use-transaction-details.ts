@@ -49,6 +49,12 @@ export default function useTransactionDetails(
     setForm(toTransactionFormState(tx))
   }
 
+  function refreshDetails() {
+    if (entityID) {
+      resolveDetails(entityID, txID)
+    }
+  }
+
   async function submit() {
     if (!entityID) return
 
@@ -56,12 +62,13 @@ export default function useTransactionDetails(
 
     if (res) {
       refresh()
+      refreshDetails()
     }
   }
 
   async function addComment(message: string) {
     if (entityID) {
-      await resolveComment(entityID, txID, message)
+      await resolveComment(entityID, txID, message, "both")
       await resolveDetails(entityID, txID)
     }
   }
@@ -84,5 +91,6 @@ export default function useTransactionDetails(
     submit,
     close,
     addComment,
+    refreshDetails,
   }
 }
