@@ -10,7 +10,6 @@ import Footer from "../components/footer"
 import Transactions from "./transactions"
 import Stocks from "./stock"
 import Settings from "./settings"
-import TransactionDetails from "./transaction-details-wip"
 
 type MainProps = {
   app: AppHook
@@ -30,10 +29,6 @@ const Org = ({ app }: MainProps) => {
       <Switch>
         <Route relative path="stocks/:status">
           <Stocks entity={entity} />
-        </Route>
-
-        <Route relative path="transactions/details/:id">
-          <TransactionDetails />
         </Route>
 
         <Route relative path="transactions/:status">
