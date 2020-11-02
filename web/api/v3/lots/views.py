@@ -558,6 +558,24 @@ def accept_lot(request):
     return JsonResponse({'status': 'success'})
 
 
+def accept_with_reserves(request):
+    tx_ids = request.POST.getlist('tx_ids', None)
+    if not tx_ids:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
+    for tx_id in tx_ids:
+        try:
+            tx = LotTransaction.objects.get(delivery_status__in=['N', 'AC', 'AA'], id=tx_id)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': "TX not found", 'extra': str(e)}, status=400)
+
+        rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+        if tx.carbure_client not in rights:
+            return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+        tx.delivery_status = 'AC'
+        tx.save()
+    return JsonResponse({'status': 'success'})
+
+
 def reject_lot(request):
     tx_ids = request.POST.getlist('tx_ids', None)
     tx_comment = request.POST.get('comment', None)
