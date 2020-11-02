@@ -6,6 +6,7 @@ import * as api from "../../services/lots"
 import useAPI from "../helpers/use-api"
 
 import { prompt } from "../../components/system/dialog"
+import { CommentPrompt } from "../../components/comments"
 
 export interface LotRejector {
   loading: boolean
@@ -24,7 +25,11 @@ export default function useRejectLots(
   const [requestAll, resolveRejectAll] = useAPI(api.rejectAllInboxLots)
 
   async function rejectLot(lotID: number) {
-    const comment = await prompt("Refuser lot", "Voulez vous refuser ce lot ?")
+    const comment = await prompt(
+      "Refuser lot",
+      "Voulez vous refuser ce lot ?",
+      CommentPrompt
+    )
 
     if (entity !== null && comment) {
       resolveReject(entity.id, [lotID], comment).then(refresh)
@@ -36,7 +41,8 @@ export default function useRejectLots(
   async function rejectSelection() {
     const comment = await prompt(
       "Refuser lot",
-      "Voulez vous refuser les lots sélectionnés ?"
+      "Voulez vous refuser les lots sélectionnés ?",
+      CommentPrompt
     )
 
     if (entity !== null && comment) {
@@ -49,7 +55,8 @@ export default function useRejectLots(
   async function rejectAllInbox() {
     const comment = await prompt(
       "Refuser lot",
-      "Voulez vous refuser tous ces lots ?"
+      "Voulez vous refuser tous ces lots ?",
+      CommentPrompt
     )
 
     if (entity !== null && comment) {

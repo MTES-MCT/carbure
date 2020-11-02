@@ -1,5 +1,6 @@
 import datetime
 import openpyxl
+from django.db.models import Q
 
 from django.http import JsonResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
@@ -625,7 +626,7 @@ def validate_lots(user, tx_ids):
             return JsonResponse({'status': 'error', 'message': "tx_id must be an integer", 'extra': str(e)}, status=400)
         print('Trying to validate tx id %d' % (tx_id))
         try:
-            tx = LotTransaction.objects.get(id=tx_id, lot__status='Draft')
+            tx = LotTransaction.objects.get(Q(id=tx_id), Q(lot__status='Draft') | Q(delivery_status__in=['AA', 'AC', 'R']))
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': "Draft not found", 'extra': str(e)}, status=400)
 
@@ -645,16 +646,21 @@ def validate_lots(user, tx_ids):
         # run sanity_checks
         sanity_check(tx.lot)
         blocking_sanity_checks = LotValidationError.objects.filter(lot=tx.lot, block_validation=True)
+        
         if len(blocking_sanity_checks):
             tx.lot.is_valid = False
         else:
             tx.lot.is_valid = True
             tx.lot.carbure_id = generate_carbure_id(tx.lot)
             tx.lot.status = "Validated"
+
         # when the lot is added to mass balance, auto-accept
         if tx.carbure_client == tx.carbure_vendor:
             tx.delivery_status = 'A'
-            tx.save()
         if tx.delivery_status in ['AA', 'AC', 'R']:
             tx.delivery_status = 'AA'
+        
+        tx.save()
         tx.lot.save()
+
+    return JsonResponse({'status': 'success'})

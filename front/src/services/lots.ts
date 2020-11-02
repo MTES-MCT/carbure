@@ -210,6 +210,18 @@ export function uploadLotFile(entityID: number, file: File): Promise<void> {
   })
 }
 
+export function downloadTemplateSimple(entityID: number) {
+  return api.download("/lots/download-template-simple", {
+    entity_id: entityID,
+  })
+}
+
+export function downloadTemplateAdvanced(entityID: number) {
+  return api.download("/lots/download-template-advanced", {
+    entity_id: entityID,
+  })
+}
+
 export function updateLot(
   entityID: number,
   transactionID: number,
@@ -275,13 +287,14 @@ export function rejectLots(
 export function commentLot(
   entityID: number,
   transactionID: number,
-  comment: string
+  comment: string,
+  topic: string
 ) {
   return api.post("/lots/comment", {
     entity_id: entityID,
     tx_id: transactionID,
+    comment_type: topic,
     comment,
-    comment_type: "BOTH",
   })
 }
 
@@ -290,19 +303,20 @@ export function validateAndCommentLot(
   transactionID: number,
   comment: string
 ) {
-  const accepting = validateLots(entityID, [transactionID])
-  const commenting = commentLot(entityID, transactionID, comment)
+  const validating = validateLots(entityID, [transactionID])
+  const commenting = commentLot(entityID, transactionID, comment, "both")
 
-  return Promise.all([accepting, commenting])
+  return Promise.all([validating, commenting])
 }
 
 export function acceptAndCommentLot(
   entityID: number,
   transactionID: number,
-  comment: string
+  comment: string,
+  topic: string
 ) {
   const accepting = acceptLotsWithReserve(entityID, [transactionID])
-  const commenting = commentLot(entityID, transactionID, comment)
+  const commenting = commentLot(entityID, transactionID, comment, topic)
 
   return Promise.all([accepting, commenting])
 }
