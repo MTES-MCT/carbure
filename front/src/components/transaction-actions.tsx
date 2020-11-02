@@ -6,12 +6,13 @@ import styles from "./transaction-actions.module.css"
 import { LotDeleter } from "../hooks/actions/use-delete-lots"
 import { LotUploader } from "../hooks/actions/use-upload-file"
 import { LotValidator } from "../hooks/actions/use-validate-lots"
+import { LotAcceptor } from "../hooks/actions/use-accept-lots"
+import { LotRejector } from "../hooks/actions/use-reject-lots"
 
 import { Link } from "./relative-route"
 import { AsyncButton, Box, Button } from "./system"
 import { Check, Cross, Download, Plus, Rapport, Upload } from "./system/icons"
-import { LotAcceptor } from "../hooks/actions/use-accept-lots"
-import { LotRejector } from "../hooks/actions/use-reject-lots"
+import { prompt, PromptFormProps } from "./system/dialog"
 
 type ExportActionsProps = {
   isEmpty: boolean
@@ -31,6 +32,50 @@ type DraftActionsProps = {
   deleter: LotDeleter
   validator: LotValidator
 }
+
+const ImportPromptFactory = (uploader: LotUploader) => ({
+  onConfirm,
+  onCancel,
+}: PromptFormProps<File>) => (
+  <Box style={{ maxWidth: 480 }}>
+    <Box className={styles.importExplanation}>
+      Le modèle simplifié vous permet de créer des lots provenant de vos propres
+      usines. Vous pouvez les affilier immédiatement à des clients enregistrés
+      sur Carbure ou simplement les ajouter à votre Mass Balance.
+      <span
+        className={styles.downloadLink}
+        onClick={uploader.downloadTemplateSimple}
+      >
+        Télécharger le modèle simplifié
+      </span>
+    </Box>
+
+    <Box className={styles.importExplanation}>
+      Le modèle avancé permet d'importer dans Carbure des lots achetés auprès de
+      fournisseurs qui nous sont inconnus (fournisseurs étrangers ou producteurs
+      français captifs). Vous avez également la possibilité d'attribuer ces lots
+      à des clients étrangers.
+      <span
+        className={styles.downloadLink}
+        onClick={uploader.downloadTemplateAdvanced}
+      >
+        Télécharger le modèle avancé
+      </span>
+    </Box>
+
+    <Box row className={styles.dialogButtons}>
+      <Button as="label" level="primary" icon={Upload}>
+        Importer lots
+        <input
+          type="file"
+          style={{ display: "none" }}
+          onChange={(e) => onConfirm(e!.target.files![0])}
+        />
+      </Button>
+      <Button onClick={onCancel}>Annuler</Button>
+    </Box>
+  </Box>
+)
 
 export const DraftActions = ({
   disabled,
@@ -55,15 +100,22 @@ export const DraftActions = ({
     }
   }
 
+  async function onUpload() {
+    const file = await prompt(
+      "Import Excel",
+      "Importer un fichier Excel standardisé.",
+      ImportPromptFactory(uploader)
+    )
+
+    if (file) {
+      uploader.uploadFile(file)
+    }
+  }
+
   return (
     <React.Fragment>
-      <AsyncButton as="label" icon={Upload} loading={uploader.loading}>
+      <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
         Importer lots
-        <input
-          type="file"
-          style={{ display: "none" }}
-          onChange={(e) => uploader.uploadFile(e!.target.files![0])}
-        />
       </AsyncButton>
 
       <Link relative to="add">

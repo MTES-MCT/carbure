@@ -25,6 +25,7 @@ import Comments from "../components/comments"
 import TransactionForm from "../components/transaction-form"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
+const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]
 
 type TransactionDetailsProps = {
   entity: EntitySelection
@@ -55,18 +56,16 @@ const TransactionDetails = ({
     submit,
     close,
     addComment,
+    refreshDetails,
   } = useTransactionDetails(entity, refresh)
 
-  async function run(
-    action: (i: number) => Promise<boolean>,
-    needSave = false
-  ) {
-    if (needSave) {
-      await submit()
-    }
+  const isEditable = EDITABLE.includes(status)
+  const isCommentable = COMMENTABLE.includes(status)
 
+  async function run(action: (i: number) => Promise<boolean>) {
     if (await action(form.id)) {
-      close()
+      refresh()
+      refreshDetails()
     }
   }
 
@@ -76,7 +75,7 @@ const TransactionDetails = ({
 
       <TransactionForm
         id="transaction-details"
-        readOnly={!EDITABLE.includes(status)}
+        readOnly={!isEditable}
         transaction={form}
         error={details.error ?? request.error}
         fieldErrors={fieldErrors}
@@ -90,8 +89,8 @@ const TransactionDetails = ({
           className={styles.transactionError}
         >
           <ul className={styles.validationErrors}>
-            {validationErrors.map((err) => (
-              <li>{err.error || "Erreur de validation"}</li>
+            {validationErrors.map((err, i) => (
+              <li key={i}>{err.error || "Erreur de validation"}</li>
             ))}
           </ul>
         </Collapsible>
@@ -99,6 +98,7 @@ const TransactionDetails = ({
 
       {details.data && details.data.comments.length > 0 && (
         <Comments
+          readOnly={!isCommentable}
           loading={comment.loading}
           comments={details.data.comments}
           onComment={addComment}
@@ -106,26 +106,27 @@ const TransactionDetails = ({
       )}
 
       <div className={styles.transactionFormButtons}>
+        {isEditable && (
+          <AsyncButton
+            submit="transaction-details"
+            icon={Save}
+            level="primary"
+            loading={request.loading}
+            onClick={submit}
+          >
+            Sauvegarder
+          </AsyncButton>
+        )}
+
         {status === LotStatus.Draft && (
-          <React.Fragment>
-            <AsyncButton
-              submit="transaction-details"
-              icon={Save}
-              level="primary"
-              loading={request.loading}
-              onClick={submit}
-            >
-              Sauvegarder
-            </AsyncButton>
-            <AsyncButton
-              icon={Check}
-              level="success"
-              loading={validator.loading}
-              onClick={() => run(validator.validateLot, true)}
-            >
-              Envoyer
-            </AsyncButton>
-          </React.Fragment>
+          <AsyncButton
+            icon={Check}
+            level="success"
+            loading={validator.loading}
+            onClick={() => run(validator.validateLot)}
+          >
+            Envoyer
+          </AsyncButton>
         )}
 
         {status === LotStatus.ToFix && (
@@ -133,7 +134,7 @@ const TransactionDetails = ({
             icon={Check}
             level="success"
             loading={validator.loading}
-            onClick={() => run(validator.validateAndCommentLot, true)}
+            onClick={() => run(validator.validateAndCommentLot)}
           >
             Renvoyer
           </AsyncButton>

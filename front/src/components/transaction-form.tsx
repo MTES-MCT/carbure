@@ -2,7 +2,6 @@ import React from "react"
 
 import { TransactionFormState } from "../hooks/helpers/use-transaction-form"
 import { FormFields } from "../hooks/helpers/use-form"
-import { ValidationError } from "../services/types"
 
 import styles from "./transaction-form.module.css"
 
