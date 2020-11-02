@@ -11,7 +11,6 @@ import { FilterSelection } from "../hooks/query/use-filters"
 import { TransactionFormState } from "../hooks/helpers/use-transaction-form"
 
 import api from "./api"
-import { StatusSelection } from "../hooks/query/use-status"
 
 function toOption(value: string) {
   return { value, label: value }
@@ -374,7 +373,7 @@ export function getStocks(
   return api.get("/stocks", {
     ...filters,
     status,
-    entity_id: entityID?? null,
+    entity_id: entityID ?? null,
     from_idx: page * limit,
     sort_by: sortBy,
     limit,
