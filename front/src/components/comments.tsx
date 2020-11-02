@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { Comment } from "../services/types"
 import styles from "./comments.module.css"
 import { AsyncButton, Box, Input } from "./system"
+import { Collapsible } from "./system/alert"
 
 type CommentsProps = {
   loading: boolean
@@ -19,27 +20,35 @@ const Comments = ({ loading, comments, onComment }: CommentsProps) => {
   }
 
   return (
-    <Box as="fieldset" className={styles.comments}>
-      <legend>Commentaires</legend>
-      <ul>
-        {comments.map((c, i) => (
-          <li key={i}>
-            <b>{c.entity.name}:</b> {c.comment}
-          </li>
-        ))}
-      </ul>
-      <Box row as="form" onSubmit={onSubmit}>
+    <Collapsible
+      level="warning"
+      title={`Commentaires (${comments.length})`}
+      className={styles.comments}
+    >
+      <table className={styles.commentsList}>
+        <tbody>
+          {comments.map((c, i) => (
+            <tr key={i}>
+              <td>
+                <b>{c.entity.name}:</b>
+              </td>
+              <td>{c.comment}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <Box row as="form" className={styles.commentsForm} onSubmit={onSubmit}>
         <Input
           type="text"
           placeholder="Entrez un commentaire..."
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
-        <AsyncButton submit loading={loading} level="primary">
+        <AsyncButton submit loading={loading}>
           Envoyer
         </AsyncButton>
       </Box>
-    </Box>
+    </Collapsible>
   )
 }
 
