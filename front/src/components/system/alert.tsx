@@ -2,7 +2,8 @@ import React, { useState } from "react"
 import cl from "clsx"
 
 import styles from "./alert.module.css"
-import { SystemProps } from "./index"
+import { Box, SystemProps, Title } from "./index"
+import { ChevronDown } from "./icons"
 
 // ALERT COMPONENT
 
@@ -75,6 +76,38 @@ export const AlertFilter = ({
       >
         Masquer ce message
       </span>
+    </Alert>
+  )
+}
+
+type CollapsibleProps = AlertProps & {
+  title: string
+}
+
+export const Collapsible = ({
+  title,
+  children,
+  ...props
+}: CollapsibleProps) => {
+  const [collasped, setCollapsed] = useState(false)
+
+  return (
+    <Alert
+      style={{ flexDirection: "column", alignItems: "stretch" }}
+      {...props}
+    >
+      <Box
+        row
+        onClick={() => setCollapsed(!collasped)}
+        style={{ cursor: "pointer" }}
+      >
+        <Title className={styles.collapsibleTitle}>{title}</Title>
+        <ChevronDown className={styles.collapsibleArrow} />
+      </Box>
+
+      {!collasped && (
+        <Box className={styles.collapsibleDetails}>{children}</Box>
+      )}
     </Alert>
   )
 }

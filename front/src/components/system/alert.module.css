@@ -21,7 +21,7 @@
   background-color: var(--red-light);
 }
 
-.alert :global(.icon) {
+.alert > :global(.icon) {
   width: 20px;
   margin-right: 8px;
   stroke: var(--gray-dark);
@@ -48,4 +48,17 @@
 
 .alertClose {
   margin-left: auto;
+}
+
+.collapsibleTitle {
+  font-size: 15px;
+}
+
+.collapsibleArrow {
+  margin-left: auto;
+  margin-right: -8px;
+}
+
+.collapsibleDetails {
+  margin: 8px 0;
 }
