@@ -104,7 +104,10 @@ export const Collapsible = ({
         <Title className={styles.collapsibleTitle}>{title}</Title>
         <ChevronDown className={styles.collapsibleArrow} />
       </Box>
-      {!collasped && children}
+
+      {!collasped && (
+        <Box className={styles.collapsibleDetails}>{children}</Box>
+      )}
     </Alert>
   )
 }
