@@ -1,3 +1,13 @@
 .comments {
-  padding: 16px;
+  padding: 8px 16px;
+  margin: 16px 0;
+}
+
+.commentsList {
+  padding: 8px 0;
+  margin: 0;
+}
+
+.commentsForm {
+  margin-bottom: 8px;
 }
