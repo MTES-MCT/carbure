@@ -38,7 +38,6 @@ type TransactionFormProps = {
   transaction: TransactionFormState
   error: string | null
   fieldErrors?: { [k: string]: string }
-  validationErrors?: ValidationError[]
   onChange: <T extends FormFields>(e: React.ChangeEvent<T>) => void
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
 }
@@ -49,7 +48,6 @@ const TransactionForm = ({
   transaction: tx,
   error,
   fieldErrors = {},
-  validationErrors = [],
   onChange,
   onSubmit,
 }: TransactionFormProps) => {
@@ -134,7 +132,7 @@ const TransactionForm = ({
                 placeholder="Rechercher un producteur..."
                 name="carbure_producer"
                 value={tx.carbure_producer}
-                error={fieldErrors.producer}
+                error={fieldErrors.carbure_producer}
                 getValue={getters.id}
                 getLabel={getters.name}
                 getQuery={findProducers}
@@ -453,16 +451,6 @@ const TransactionForm = ({
       {error && (
         <Alert level="error" className={styles.transactionError}>
           {error}
-        </Alert>
-      )}
-
-      {validationErrors.length > 0 && (
-        <Alert level="error" className={styles.transactionError}>
-          <ul className={styles.validationErrors}>
-            {validationErrors.map((err) => (
-              <li>{err.error || "Erreur de validation"}</li>
-            ))}
-          </ul>
         </Alert>
       )}
     </form>
