@@ -129,4 +129,5 @@ def get_snapshot(request):
     data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs,
                        'production_sites': psites, 'countries_of_origin': countries, 'delivery_sites': delivery_sites}
 
+    data['lots'] = {'draft': 12, 'in': 246, 'stock': 23}
     return JsonResponse({'status': 'success', 'data': data})

@@ -74,7 +74,7 @@ const Topbar = ({ entity, settings }: TopbarProps) => (
 
     <nav className={styles.pageNav}>
       {entity?.has_trading && 
-      <PageLink to="stocks/drafts">Stocks</PageLink>
+      <PageLink to="stocks/draft">Stocks</PageLink>
       }
       <PageLink to="transactions">Transactions</PageLink>
     </nav>
