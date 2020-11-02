@@ -210,6 +210,18 @@ export function uploadLotFile(entityID: number, file: File): Promise<void> {
   })
 }
 
+export function downloadTemplateSimple(entityID: number) {
+  return api.download("/lots/download-template-simple", {
+    entity_id: entityID,
+  })
+}
+
+export function downloadTemplateAdvanced(entityID: number) {
+  return api.download("/lots/download-template-advanced", {
+    entity_id: entityID,
+  })
+}
+
 export function updateLot(
   entityID: number,
   transactionID: number,

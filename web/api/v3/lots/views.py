@@ -799,7 +799,7 @@ def validate_all_drafts(request):
 
 
 def template_simple(request):
-    entity_id = request.POST.get('entity_id', False)
+    entity_id = request.GET.get('entity_id', False)
     if not entity_id:
         return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
 
@@ -826,7 +826,7 @@ def template_simple(request):
 
 
 def template_advanced(request):
-    entity_id = request.POST.get('entity_id', False)
+    entity_id = request.GET.get('entity_id', False)
     if not entity_id:
         return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
 

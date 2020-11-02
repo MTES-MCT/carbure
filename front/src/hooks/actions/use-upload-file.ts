@@ -8,6 +8,8 @@ export interface LotUploader {
   data: any
   error: string | null
   uploadFile: (f: File) => void
+  downloadTemplateSimple: () => void
+  downloadTemplateAdvanced: () => void
 }
 
 export default function useUploadLotFile(
@@ -22,5 +24,22 @@ export default function useUploadLotFile(
     }
   }
 
-  return { ...request, uploadFile }
+  function downloadTemplateSimple() {
+    if (entity !== null) {
+      api.downloadTemplateSimple(entity.id)
+    }
+  }
+
+  function downloadTemplateAdvanced() {
+    if (entity !== null) {
+      api.downloadTemplateAdvanced(entity.id)
+    }
+  }
+
+  return {
+    ...request,
+    uploadFile,
+    downloadTemplateSimple,
+    downloadTemplateAdvanced,
+  }
 }
