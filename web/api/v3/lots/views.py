@@ -536,8 +536,7 @@ def validate_lot(request):
     tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
-    validate_lots(request.user, tx_ids)
-    return JsonResponse({'status': 'success'})
+    return validate_lots(request.user, tx_ids)
 
 
 def accept_lot(request):
@@ -796,8 +795,7 @@ def validate_all_drafts(request):
     drafts = drafts.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
 
     tx_ids = [d.id for d in drafts]
-    validate_lots(request.user, tx_ids)
-    return JsonResponse({'status': 'success'})
+    return validate_lots(request.user, tx_ids)
 
 
 def template_simple(request):
