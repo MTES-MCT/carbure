@@ -7,12 +7,18 @@ import { PromptFormProps } from "./system/dialog"
 import RadioGroup from "./system/radio-group"
 
 type CommentsProps = {
+  readOnly: boolean
   loading: boolean
   comments: Comment[]
   onComment: (c: string) => void
 }
 
-const Comments = ({ loading, comments, onComment }: CommentsProps) => {
+const Comments = ({
+  readOnly,
+  loading,
+  comments,
+  onComment,
+}: CommentsProps) => {
   const [comment, setComment] = useState("")
 
   function onSubmit(e: React.FormEvent) {
@@ -27,7 +33,7 @@ const Comments = ({ loading, comments, onComment }: CommentsProps) => {
       title={`Commentaires (${comments.length})`}
       className={styles.comments}
     >
-      <table className={styles.commentsList}>
+      <table>
         <tbody>
           {comments.map((c, i) => (
             <tr key={i}>
@@ -39,17 +45,20 @@ const Comments = ({ loading, comments, onComment }: CommentsProps) => {
           ))}
         </tbody>
       </table>
-      <Box row as="form" className={styles.commentsForm} onSubmit={onSubmit}>
-        <Input
-          type="text"
-          placeholder="Entrez un commentaire..."
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-        />
-        <AsyncButton submit loading={loading}>
-          Envoyer
-        </AsyncButton>
-      </Box>
+
+      {!readOnly && (
+        <Box row as="form" className={styles.commentsForm} onSubmit={onSubmit}>
+          <Input
+            type="text"
+            placeholder="Entrez un commentaire..."
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
+          <AsyncButton submit loading={loading}>
+            Envoyer
+          </AsyncButton>
+        </Box>
+      )}
     </Collapsible>
   )
 }

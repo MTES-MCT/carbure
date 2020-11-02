@@ -25,6 +25,7 @@ import Comments from "../components/comments"
 import TransactionForm from "../components/transaction-form"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
+const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]
 
 type TransactionDetailsProps = {
   entity: EntitySelection
@@ -58,6 +59,9 @@ const TransactionDetails = ({
     refreshDetails,
   } = useTransactionDetails(entity, refresh)
 
+  const isEditable = EDITABLE.includes(status)
+  const isCommentable = COMMENTABLE.includes(status)
+
   async function run(action: (i: number) => Promise<boolean>) {
     if (await action(form.id)) {
       refresh()
@@ -71,7 +75,7 @@ const TransactionDetails = ({
 
       <TransactionForm
         id="transaction-details"
-        readOnly={!EDITABLE.includes(status)}
+        readOnly={!isEditable}
         transaction={form}
         error={details.error ?? request.error}
         fieldErrors={fieldErrors}
@@ -94,6 +98,7 @@ const TransactionDetails = ({
 
       {details.data && details.data.comments.length > 0 && (
         <Comments
+          readOnly={!isCommentable}
           loading={comment.loading}
           comments={details.data.comments}
           onComment={addComment}
@@ -101,7 +106,7 @@ const TransactionDetails = ({
       )}
 
       <div className={styles.transactionFormButtons}>
-        {EDITABLE.includes(status) && (
+        {isEditable && (
           <AsyncButton
             submit="transaction-details"
             icon={Save}
