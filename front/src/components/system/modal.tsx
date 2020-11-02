@@ -5,14 +5,12 @@ import cl from "clsx"
 import styles from "./modal.module.css"
 
 import { Cross } from "./icons"
+import { SystemProps } from "."
 
 const portal = document.getElementById("modal")!
 
-type ModalProps = {
-  className?: string
-  children: React.ReactNode
+type ModalProps = SystemProps & {
   onClose: () => void
-  [k: string]: any
 }
 
 const Modal = ({ className, onClose, children, ...props }: ModalProps) => {

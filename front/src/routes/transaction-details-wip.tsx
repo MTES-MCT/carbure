@@ -16,6 +16,7 @@ import {
   Return,
   Save,
 } from "../components/system/icons"
+import Modal from "../components/system/modal"
 import Select from "../components/system/select"
 
 function createStyleSheet<T extends { [key: string]: React.CSSProperties }>(
@@ -25,36 +26,46 @@ function createStyleSheet<T extends { [key: string]: React.CSSProperties }>(
 }
 
 const styles = createStyleSheet({
+  modal: {
+    maxWidth: 1080,
+  },
+
   detailsHeaderContainer: {
-    padding: "32px 120px",
-    background: "var(--gray-light)",
-    marginTop: 1,
-    boxShadow: "0 0 2px var(--gray-medium)",
+    // padding: "32px 120px",
+    marginRight: 32,
+    marginBottom: 32,
+    // background: "var(--gray-light)",
+    // marginTop: 1
+    // boxShadow: "0 0 2px var(--gray-medium)",
     justifyContent: "center",
   },
 
   detailsHeader: {
     flex: 1,
-    maxWidth: 1080,
-    justifyContent: "space-between",
+    // maxWidth: 1080,
+    // justifyContent: "space-between",
     alignItems: "center",
     position: "relative",
   },
 
   backButton: {
+    display: "none",
     position: "absolute",
     left: -36,
     cursor: "pointer",
   },
 
   actionButton: {
-    fontSize: 18,
+    fontSize: 14,
+    alignSelf: "center",
+    marginLeft: 32,
   },
 
   detailsBody: {
-    margin: "24px 120px",
-    maxWidth: 1080,
+    // margin: "24px 120px",
+    // maxWidth: 1080,
     alignSelf: "center",
+    marginBottom: 32,
   },
 
   detailsErrors: {
@@ -144,7 +155,7 @@ const styles = createStyleSheet({
 
 const TransactionDetails = () => {
   return (
-    <Main>
+    <Modal onClose={() => {}} style={styles.modal}>
       <Box row style={styles.detailsHeaderContainer}>
         <Box row style={styles.detailsHeader}>
           <Back style={styles.backButton} />
@@ -368,7 +379,7 @@ const TransactionDetails = () => {
           Le serveur n'a pas pu être contacté
         </Alert>
       </Box>
-    </Main>
+    </Modal>
   )
 }
 
