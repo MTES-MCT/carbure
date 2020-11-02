@@ -55,18 +55,13 @@ const TransactionDetails = ({
     submit,
     close,
     addComment,
+    refreshDetails,
   } = useTransactionDetails(entity, refresh)
 
-  async function run(
-    action: (i: number) => Promise<boolean>,
-    needSave = false
-  ) {
-    if (needSave) {
-      await submit()
-    }
-
+  async function run(action: (i: number) => Promise<boolean>) {
     if (await action(form.id)) {
-      close()
+      refresh()
+      refreshDetails()
     }
   }
 
@@ -90,8 +85,8 @@ const TransactionDetails = ({
           className={styles.transactionError}
         >
           <ul className={styles.validationErrors}>
-            {validationErrors.map((err) => (
-              <li>{err.error || "Erreur de validation"}</li>
+            {validationErrors.map((err, i) => (
+              <li key={i}>{err.error || "Erreur de validation"}</li>
             ))}
           </ul>
         </Collapsible>
@@ -106,26 +101,27 @@ const TransactionDetails = ({
       )}
 
       <div className={styles.transactionFormButtons}>
+        {EDITABLE.includes(status) && (
+          <AsyncButton
+            submit="transaction-details"
+            icon={Save}
+            level="primary"
+            loading={request.loading}
+            onClick={submit}
+          >
+            Sauvegarder
+          </AsyncButton>
+        )}
+
         {status === LotStatus.Draft && (
-          <React.Fragment>
-            <AsyncButton
-              submit="transaction-details"
-              icon={Save}
-              level="primary"
-              loading={request.loading}
-              onClick={submit}
-            >
-              Sauvegarder
-            </AsyncButton>
-            <AsyncButton
-              icon={Check}
-              level="success"
-              loading={validator.loading}
-              onClick={() => run(validator.validateLot, true)}
-            >
-              Envoyer
-            </AsyncButton>
-          </React.Fragment>
+          <AsyncButton
+            icon={Check}
+            level="success"
+            loading={validator.loading}
+            onClick={() => run(validator.validateLot)}
+          >
+            Envoyer
+          </AsyncButton>
         )}
 
         {status === LotStatus.ToFix && (
@@ -133,7 +129,7 @@ const TransactionDetails = ({
             icon={Check}
             level="success"
             loading={validator.loading}
-            onClick={() => run(validator.validateAndCommentLot, true)}
+            onClick={() => run(validator.validateAndCommentLot)}
           >
             Renvoyer
           </AsyncButton>
