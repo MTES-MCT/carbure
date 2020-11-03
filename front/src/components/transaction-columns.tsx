@@ -67,7 +67,7 @@ export const carbureID: Column<Transaction> = {
 }
 
 export const period: Column<Transaction> = {
-  header: "Date d'ajout",
+  header: "Période",
   sortBy: "period",
   className: styles.dateColumn,
   render: (tx) => <Line text={tx.lot.period} />,
@@ -79,9 +79,8 @@ export const dae: Column<Transaction> = {
 }
 
 export const ghgReduction: Column<Transaction> = {
-  header: "Économie",
+  header: "Réduction GES",
   sortBy: "ghg_reduction",
-  className: styles.narrowColumn,
   render: (tx) => <Line text={`${tx.lot.ghg_reduction}%`} />,
 }
 
