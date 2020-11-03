@@ -1,9 +1,8 @@
 import { useParams } from "react-router-dom"
 
 import { PageSelection } from "../../components/system/pagination"
+import { SpecialSelection } from "./use-special"
 import { LotStatus } from "../../services/types"
-import { InvalidSelection } from "./use-invalid"
-import { DeadlineSelection } from "./use-deadline"
 
 import { useRelativePush } from "../../components/relative-route"
 
@@ -16,8 +15,7 @@ export interface StatusSelection {
 // manage currently selected transaction status
 export default function useStatusSelection(
   pagination: PageSelection,
-  invalid: InvalidSelection,
-  deadline: DeadlineSelection
+  special: SpecialSelection
 ): StatusSelection {
   const push = useRelativePush()
   const params: { status: LotStatus } = useParams()
@@ -30,8 +28,7 @@ export default function useStatusSelection(
 
   function setActive(status: LotStatus) {
     pagination.setPage(0)
-    invalid.setInvalid(false)
-    deadline.setDeadline(false)
+    special.reset()
     push(`../${status}`)
   }
 
@@ -40,7 +37,7 @@ export default function useStatusSelection(
 
 // manage currently selected transaction status
 export function useStockStatusSelection(
-  pagination: PageSelection,
+  pagination: PageSelection
 ): StatusSelection {
   const push = useRelativePush()
   const params: { status: LotStatus } = useParams()

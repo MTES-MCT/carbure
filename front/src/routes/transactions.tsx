@@ -19,8 +19,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
     status,
     filters,
     year,
-    invalid,
-    deadline,
+    special,
     pagination,
     snapshot,
     transactions,
@@ -57,8 +56,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         sorting={sorting}
         selection={selection}
         pagination={pagination}
-        invalid={invalid}
-        deadline={deadline}
+        special={special}
         uploader={uploader}
         deleter={deleter}
         validator={validator}

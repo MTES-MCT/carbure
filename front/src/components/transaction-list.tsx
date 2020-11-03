@@ -2,7 +2,7 @@ import React from "react"
 import format from "date-fns/format"
 import fr from "date-fns/locale/fr"
 
-import { Entity, Lots, LotStatus } from "../services/types"
+import { Entity, LotStatus } from "../services/types"
 import { SortingSelection } from "../hooks/query/use-sort-by" // prettier-ignore
 import { PageSelection } from "./system/pagination"
 import { StockHook } from "../hooks/use-stock"
@@ -16,8 +16,6 @@ import { LotAcceptor } from "../hooks/actions/use-accept-lots"
 import { LotRejector } from "../hooks/actions/use-reject-lots"
 import { StatusSelection } from "../hooks/query/use-status"
 import { TransactionSelection } from "../hooks/query/use-selection"
-import { InvalidSelection } from "../hooks/query/use-invalid"
-import { DeadlineSelection } from "../hooks/query/use-deadline"
 
 import styles from "./transaction-list.module.css"
 
@@ -37,14 +35,14 @@ import {
   ToFixActions,
   StockActions,
 } from "./transaction-actions"
+import { SpecialSelection } from "../hooks/query/use-special"
 
 type TransactionListProps = {
   entity: Entity
   transactions: LotGetter
   status: StatusSelection
   sorting: SortingSelection
-  invalid: InvalidSelection
-  deadline: DeadlineSelection
+  special: SpecialSelection
   selection: TransactionSelection
   pagination: PageSelection
   deleter: LotDeleter
@@ -60,8 +58,7 @@ export const TransactionList = ({
   transactions,
   status,
   sorting,
-  invalid,
-  deadline,
+  special,
   selection,
   pagination,
   deleter,
@@ -134,9 +131,9 @@ export const TransactionList = ({
         <AlertFilter
           level="error"
           icon={AlertCircle}
-          active={invalid.active}
-          onActivate={() => invalid.setInvalid(true)}
-          onDispose={() => invalid.setInvalid(false)}
+          active={special.invalid}
+          onActivate={() => special.setInvalid(true)}
+          onDispose={() => special.setInvalid(false)}
         >
           {errorCount === 1 ? (
             <span>
@@ -154,9 +151,9 @@ export const TransactionList = ({
         <AlertFilter
           level="warning"
           icon={Calendar}
-          active={deadline.active}
-          onActivate={() => deadline.setDeadline(true)}
-          onDispose={() => deadline.setDeadline(false)}
+          active={special.deadline}
+          onActivate={() => special.setDeadline(true)}
+          onDispose={() => special.setDeadline(false)}
         >
           {deadlineCount === 1 ? (
             <span>

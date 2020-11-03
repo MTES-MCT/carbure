@@ -11,8 +11,6 @@ import {
 import useFilterSelection, { FilterSelection } from "./query/use-filters"
 import useSearchSelection, { SearchSelection } from "./query/use-search"
 import useSortingSelection, { SortingSelection } from "./query/use-sort-by"
-import useInvalidSelection from "./query/use-invalid"
-import useDeadlineSelection from "./query/use-deadline"
 import { useStockStatusSelection, StatusSelection } from "./query/use-status"
 import useTransactionSelection from "./query/use-selection"
 
@@ -22,6 +20,7 @@ import useDeleteLots from "./actions/use-delete-lots"
 import useValidateLots from "./actions/use-validate-lots"
 import useRejectLots from "./actions/use-reject-lots"
 import useAcceptLots from "./actions/use-accept-lots"
+import useSpecialSelection from "./query/use-special"
 
 export interface StockHook {
   loading: boolean
@@ -98,14 +97,11 @@ export function useStocks(entity: EntitySelection) {
   const search = useSearchSelection(pagination)
   const filters = useFilterSelection(pagination)
   const snapshot = useGetStockSnapshot(entity)
-  const invalid = useInvalidSelection(pagination)
-  const deadline = useDeadlineSelection(pagination)
-  const year = useYearSelection(pagination, filters, invalid, deadline)
+  const special = useSpecialSelection(pagination)
+  const year = useYearSelection(pagination, filters, special)
   const stock = useGetStocks(entity, filters, status, pagination, search, sorting) // prettier-ignore
 
-
-  function refresh() {
-  }
+  function refresh() {}
 
   const selection = useTransactionSelection(stock.data?.lots)
   const uploader = useUploadLotFile(entity, refresh)
@@ -129,6 +125,6 @@ export function useStocks(entity: EntitySelection) {
     deleter,
     validator,
     acceptor,
-    rejector,    
+    rejector,
   }
 }
