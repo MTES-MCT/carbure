@@ -36,7 +36,7 @@ export const empty: Column<any> = {
 export const status: Column<Transaction> = {
   header: "Statut",
   className: styles.narrowColumn,
-  render: (tx) => <Status transaction={tx} />,
+  render: (tx) => <Status small transaction={tx} />,
 }
 
 export const carbureID: Column<Transaction> = {

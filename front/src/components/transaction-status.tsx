@@ -3,6 +3,7 @@ import cl from "clsx"
 
 import { Transaction } from "../services/types"
 import styles from "./transaction-status.module.css"
+import { Box, Title } from "./system"
 
 function getStatusText(tx: Transaction): string {
   if (tx.lot.status === "Draft") {
@@ -40,13 +41,32 @@ function getStatusClass(tx: Transaction): string {
 }
 
 type StatusProps = {
+  small?: boolean
   transaction: Transaction
 }
 
-const Status = ({ transaction }: StatusProps) => (
-  <span className={cl(styles.status, getStatusClass(transaction))}>
+const Status = ({ small, transaction }: StatusProps) => (
+  <span
+    className={cl(
+      styles.status,
+      small && styles.smallStatus,
+      getStatusClass(transaction)
+    )}
+  >
     {getStatusText(transaction)}
   </span>
+)
+
+type StatusTitleProps = {
+  transaction: Transaction | undefined
+  children: React.ReactNode
+}
+
+export const StatusTitle = ({ transaction, children }: StatusTitleProps) => (
+  <Box row className={styles.statusTitle}>
+    <Title>{children}</Title>
+    {transaction && <Status transaction={transaction} />}
+  </Box>
 )
 
 export default Status

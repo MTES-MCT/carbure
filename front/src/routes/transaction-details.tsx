@@ -18,11 +18,12 @@ import {
   Return,
   Save,
 } from "../components/system/icons"
-import { AsyncButton, Button, LoaderOverlay, Title } from "../components/system"
+import { AsyncButton, Button, LoaderOverlay } from "../components/system"
 import { Collapsible } from "../components/system/alert"
 import Modal from "../components/system/modal"
 import Comments from "../components/comments"
 import TransactionForm from "../components/transaction-form"
+import { StatusTitle } from "../components/transaction-status"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]
@@ -72,7 +73,9 @@ const TransactionDetails = ({
 
   return (
     <Modal onClose={close}>
-      <Title>Transaction #{form.id ?? "N/A"}</Title>
+      <StatusTitle transaction={details.data?.transaction}>
+        Détails du lot
+      </StatusTitle>
 
       <TransactionForm
         id="transaction-details"
