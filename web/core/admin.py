@@ -56,12 +56,14 @@ class LotV2ErrorAdmin(admin.ModelAdmin):
     list_display = ('lot', 'field', 'value', 'error')
     search_fields = ('lot', 'field', 'value', 'error')
     list_filter = ('field', )
+    raw_id_fields = ('lot', )
 
 
 class LotValidationErrorAdmin(admin.ModelAdmin):
     list_display = ('lot', 'rule_triggered', 'warning_to_user', 'warning_to_admin', 'block_validation')
     list_filter = ('warning_to_admin', 'warning_to_user', 'block_validation')
     search_fields = ('rule_triggered', 'message')
+    raw_id_fields = ('lot', )
 
 
 class GHGValuesAdmin(admin.ModelAdmin):
@@ -94,6 +96,7 @@ class LotV2Admin(admin.ModelAdmin):
     search_fields = ('carbure_producer__name', 'biocarburant__name', 'matiere_premiere__name', 'carbure_id', 'period', 'added_by_user_email')
     list_filter = ('period', 'carbure_producer', 'is_split', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused', 'blocking_sanity_checked_passed', 'nonblocking_sanity_checked_passed', 'is_valid', 'added_by', 'added_by_user')
     actions = [admin_run_sanity_checks, reset_checked_status]
+    raw_id_fields = ('fused_with', 'parent_lot', )
 
 
 class TransactionAdmin(admin.ModelAdmin):
@@ -107,12 +110,14 @@ class TransactionErrorAdmin(admin.ModelAdmin):
     list_display = ('tx', 'field', 'error', 'value')
     search_fields = ('field', 'error', 'value')
     list_filter = ('field',)
+    raw_id_fields = ('tx', )
 
 
 class TransactionCommentAdmin(admin.ModelAdmin):
     list_display = ('entity', 'tx', 'comment', 'topic')
     search_fields = ('entity', 'tx', 'comment')
     list_filter = ('topic', )
+    raw_id_fields = ('tx', )
 
 
 class ISCCScopeAdmin(admin.ModelAdmin):
@@ -128,11 +133,13 @@ class ISCCCertificateAdmin(admin.ModelAdmin):
 class ISCCCertificateRawMaterialAdmin(admin.ModelAdmin):
     list_display = ('certificate', 'raw_material')
     search_fields = ('certificate', 'raw_material')
+    raw_id_fields = ('certificate', )
 
 
 class ISCCCertificateScopeAdmin(admin.ModelAdmin):
     list_display = ('certificate', 'scope')
     search_fields = ('certificate', 'scope')
+    raw_id_fields = ('certificate', )
 
 
 class DBSCertificateAdmin(admin.ModelAdmin):
