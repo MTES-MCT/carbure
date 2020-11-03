@@ -1,7 +1,7 @@
 import React from "react"
 import cl from "clsx"
 
-import { LotStatus, Transaction } from "../services/types"
+import { Transaction } from "../services/types"
 import { Column } from "./system/table"
 import { IconProps } from "./system/icons"
 
@@ -9,29 +9,7 @@ import styles from "./transaction-columns.module.css"
 
 import { TransactionSelection } from "../hooks/query/use-selection"
 import { ChevronRight } from "./system/icons"
-
-const STATUS = {
-  [LotStatus.Draft]: "Brouillon",
-  [LotStatus.Validated]: "En attente",
-  [LotStatus.Inbox]: "En attente",
-  [LotStatus.ToFix]: "À corriger",
-  [LotStatus.Accepted]: "Accepté",
-  [LotStatus.Weird]: "Problème",
-  [LotStatus.Stock]: "Stock",
-}
-
-const Status = ({ value }: { value: LotStatus }) => (
-  <span
-    className={cl(styles.status, {
-      [styles.statusWaiting]:
-        value === LotStatus.Validated || value === LotStatus.Inbox,
-      [styles.statusToFix]: value === LotStatus.ToFix,
-      [styles.statusAccepted]: value === LotStatus.Accepted,
-    })}
-  >
-    {STATUS[value]}
-  </span>
-)
+import Status from "./transaction-status"
 
 type LineProps = { text: string; small?: boolean }
 
@@ -58,7 +36,7 @@ export const empty: Column<any> = {
 export const status: Column<Transaction> = {
   header: "Statut",
   className: styles.narrowColumn,
-  render: (tx) => <Status value={tx.status} />,
+  render: (tx) => <Status transaction={tx} />,
 }
 
 export const carbureID: Column<Transaction> = {

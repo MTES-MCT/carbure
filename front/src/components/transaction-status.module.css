@@ -1,0 +1,28 @@
+.status {
+  color: var(--gray-dark);
+  background-color: var(--gray-light);
+  border-radius: 50px;
+  border: 1px solid var(--gray-highlight);
+  font-size: 11px;
+  padding: 4px 8px;
+}
+
+.statusWaiting {
+  color: var(--blue-dark);
+  background-color: var(--blue-light);
+}
+
+.statusToFix {
+  color: var(--orange-dark);
+  background-color: var(--orange-light);
+}
+
+.statusAccepted {
+  color: var(--green-dark);
+  background-color: var(--green-light);
+}
+
+.statusRejected {
+  color: var(--red-dark);
+  background-color: var(--red-light);
+}

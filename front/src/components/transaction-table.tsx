@@ -65,7 +65,7 @@ const getDuplicateActions = ({ onDuplicate }: Actions) =>
   C.actions([{ icon: Copy, title: "Dupliquer le lot", action: onDuplicate }])
 
 export function hasDeadline(tx: Transaction, deadline: string): boolean {
-  if (!tx || tx.status !== LotStatus.Draft) return false
+  if (!tx || tx.lot.status !== "Draft") return false
 
   const deadlineDate = new Date(deadline)
   const deliveryDate = new Date(tx?.delivery_date)
@@ -177,7 +177,7 @@ export const StockTable = ({ stock, sorting }: StockTableProps) => {
   ]
 
   if (stock === null) {
-    console.log('Stock null')
+    console.log("Stock null")
     return null
   }
 
