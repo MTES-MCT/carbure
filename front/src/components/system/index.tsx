@@ -204,10 +204,17 @@ export const LabelTextArea = ({
 export const LabelCheckbox = ({
   label,
   className,
+  disabled,
   ...props
 }: LabelInputProps) => (
-  <label className={cl(styles.labelCheckbox, className)}>
-    <input type="checkbox" {...props} />
+  <label
+    className={cl(
+      styles.labelCheckbox,
+      disabled && styles.disabledLabel,
+      className
+    )}
+  >
+    <input type="checkbox" disabled={disabled} {...props} />
     {label}
   </label>
 )

@@ -11,7 +11,7 @@ export default function useTransactionAdd(
   refresh: () => void
 ) {
   const close = useClose("../")
-  const [form, hasChange, change] = useTransactionForm()
+  const [form, hasChange, change] = useTransactionForm(entity)
   const [request, resolve] = useAPI(addLot)
 
   async function submit() {
