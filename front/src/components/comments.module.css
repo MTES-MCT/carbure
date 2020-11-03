@@ -3,8 +3,17 @@
   margin: 16px 0;
 }
 
+.comments table {
+  align-self: flex-start;
+}
+
 .commentsForm {
   margin-top: 8px;
+}
+
+.commentsForm button {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .dialogButtons {
