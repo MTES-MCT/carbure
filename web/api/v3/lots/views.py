@@ -173,6 +173,8 @@ def get_lots(request):
                 txs = txs.order_by('client')
         else:
             return JsonResponse({'status': 'error', 'message': 'Unknown sort_by key'}, status=400)
+    else:
+        txs = txs.order_by('-id')
 
     now = datetime.datetime.now()
     (_, last_day) = calendar.monthrange(now.year, now.month)
