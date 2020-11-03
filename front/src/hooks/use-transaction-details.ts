@@ -41,7 +41,7 @@ export default function useTransactionDetails(
 
   const fieldErrors = details.data ? getFieldErrors(details.data.errors) : {}
   const validationErrors = details.data?.errors.validation_errors ?? []
-  const status = tx ? tx.status : LotStatus.Weird
+  const status = tx && entity ? api.getStatus(tx, entity.id) : LotStatus.Weird
 
   // if form data is not initialized, fill it instantly with data coming from transaction list
   if (tx && (form.id === -1 || form.id !== tx.id)) {
