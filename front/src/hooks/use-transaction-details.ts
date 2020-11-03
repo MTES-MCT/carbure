@@ -30,7 +30,7 @@ export default function useTransactionDetails(
   const params: { id: string } = useParams()
 
   const close = useClose("../")
-  const [form, hasChange, change, setForm] = useTransactionForm()
+  const [form, hasChange, change, setForm] = useTransactionForm(entity)
   const [details, resolveDetails] = useAPI(api.getDetails)
   const [request, resolveUpdate] = useAPI(api.updateLot)
   const [comment, resolveComment] = useAPI(api.commentLot)

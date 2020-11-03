@@ -76,6 +76,7 @@ const TransactionDetails = ({
 
       <TransactionForm
         id="transaction-details"
+        entity={entity}
         readOnly={!isEditable}
         transaction={form}
         error={details.error ?? request.error}

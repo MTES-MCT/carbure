@@ -2,6 +2,7 @@ import React from "react"
 
 import { TransactionFormState } from "../hooks/helpers/use-transaction-form"
 import { FormFields } from "../hooks/helpers/use-form"
+import { EntitySelection } from "../hooks/helpers/use-entity"
 
 import styles from "./transaction-form.module.css"
 
@@ -33,6 +34,7 @@ const getters = {
 
 type TransactionFormProps = {
   id?: string
+  entity: EntitySelection
   readOnly?: boolean
   transaction: TransactionFormState
   error: string | null
@@ -43,6 +45,7 @@ type TransactionFormProps = {
 
 const TransactionForm = ({
   id,
+  entity,
   readOnly = false,
   transaction: tx,
   error,
@@ -50,6 +53,9 @@ const TransactionForm = ({
   onChange,
   onSubmit,
 }: TransactionFormProps) => {
+  const isProducer = entity?.entity_type === "Producteur"
+  const isOperator = entity?.entity_type === "Opérateur"
+
   function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     onSubmit && onSubmit(e)
@@ -116,7 +122,7 @@ const TransactionForm = ({
         </Box>
         <Box>
           <LabelCheckbox
-            disabled={readOnly}
+            disabled={readOnly || isProducer}
             name="producer_is_in_carbure"
             label="Producteur enregistré sur Carbure ?"
             checked={tx.producer_is_in_carbure}
@@ -126,7 +132,7 @@ const TransactionForm = ({
           {tx.producer_is_in_carbure ? (
             <React.Fragment>
               <AutoComplete
-                readOnly={readOnly}
+                readOnly={readOnly || isProducer}
                 label="Producteur"
                 placeholder="Rechercher un producteur..."
                 name="carbure_producer"
@@ -229,7 +235,7 @@ const TransactionForm = ({
 
         <Box className={styles.middleColumn}>
           <LabelCheckbox
-            disabled={readOnly}
+            disabled={readOnly || isOperator}
             name="client_is_in_carbure"
             label="Client enregistré sur Carbure ?"
             checked={tx.client_is_in_carbure}
@@ -238,7 +244,7 @@ const TransactionForm = ({
 
           {tx.client_is_in_carbure ? (
             <AutoComplete
-              readOnly={readOnly}
+              readOnly={readOnly || isOperator}
               label="Client"
               placeholder="Rechercher un client..."
               name="carbure_client"
