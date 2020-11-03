@@ -99,7 +99,7 @@ class LotV2Admin(admin.ModelAdmin):
 class TransactionAdmin(admin.ModelAdmin):
     list_display = ('carbure_vendor', 'carbure_client', 'dae', 'carbure_delivery_site', 'delivery_date', 'delivery_status')
     search_fields = ('lot__id', 'dae', 'champ_libre')
-    list_filter = ('carbure_vendor', 'carbure_client', 'delivery_status', 'is_mac')
+    list_filter = ('carbure_vendor', 'carbure_client', 'delivery_status', 'is_mac', 'is_batch')
     raw_id_fields = ('lot',)
 
 

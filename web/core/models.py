@@ -281,6 +281,8 @@ class LotTransaction(models.Model):
     champ_libre = models.CharField(max_length=64, blank=True, null=True, default='')
     # mise a consommation?
     is_mac = models.BooleanField(default=False)
+    # this PoS is part of a multiple PoS batch 
+    is_batch = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.id)
@@ -292,7 +294,7 @@ class LotTransaction(models.Model):
         'unknown_client': self.unknown_client, 'delivery_date': self.delivery_date, 'delivery_site_is_in_carbure': self.delivery_site_is_in_carbure,
         'carbure_delivery_site': self.carbure_delivery_site.natural_key() if self.carbure_delivery_site else None, 'unknown_delivery_site': self.unknown_delivery_site,
         'unknown_delivery_site_country': self.unknown_delivery_site_country.natural_key() if self.unknown_delivery_site_country else None, 'delivery_status': self.delivery_status,
-        'champ_libre': self.champ_libre, 'is_mac': self.is_mac,
+        'champ_libre': self.champ_libre, 'is_mac': self.is_mac, 'is_batch': self.is_batch,
         'id': self.id}
 
     class Meta:
