@@ -7,7 +7,7 @@ import { SortingSelection } from "../hooks/query/use-sort-by" // prettier-ignore
 import { PageSelection } from "./system/pagination"
 import { StockHook } from "../hooks/use-stock"
 
-import { LotGetter } from "../hooks/transactions/use-get-lots"
+import { LotGetter } from "../hooks/use-transactions"
 import { LotUploader } from "../hooks/actions/use-upload-file"
 import { LotDeleter } from "../hooks/actions/use-delete-lots"
 import { LotValidator } from "../hooks/actions/use-validate-lots"
@@ -231,7 +231,7 @@ export const StockList = ({
   validator,
   acceptor,
   rejector,
-  duplicator
+  duplicator,
 }: StockListProps) => {
   const txs = stock.data
 
@@ -281,20 +281,14 @@ export const StockList = ({
             />
           )}
 
-          {status.is(LotStatus.Stock) && (
-            <StockActions
-            />
-          )}
+          {status.is(LotStatus.Stock) && <StockActions />}
         </ActionBar>
       )}
 
       {!isError && !isEmpty && (
         <React.Fragment>
           <Box>
-            <StockTable 
-              stock={txs!} 
-              sorting={sorting} 
-            />
+            <StockTable stock={txs!} sorting={sorting} />
             {isLoading && <LoaderOverlay />}
           </Box>
 
