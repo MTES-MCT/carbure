@@ -51,22 +51,22 @@ def sanity_check(lot):
     if lot.matiere_premiere and lot.pays_origine:
         if lot.matiere_premiere.code == 'SOJA':
             if lot.pays_origine.code_pays not in ['US', 'AR', 'BR', 'UY', 'PY']:
-                raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_admin=True, block_validation=False, details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
+                raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_to_admin=True, block_validation=False, details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
         elif lot.matiere_premiere.code == 'HUILE_PALME':
             if lot.pays_origine.code_pays not in ['ID', 'MY', 'HN']:
-                raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_admin=True, block_validation=False, details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
+                raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_to_admin=True, block_validation=False, details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
         elif lot.matiere_premiere.code == 'COLZA':
             if lot.pays_origine.code_pays not in ['US', 'CA'] and not lot.pays_origine.is_in_europe:
-                raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_admin=True, block_validation=False, details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
+                raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_to_admin=True, block_validation=False, details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
         elif lot.matiere_premiere.code == 'CANNE_A_SUCRE':
             if lot.pays_origine.code_pays not in ['BR', 'BO']:
-                raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_admin=True, block_validation=False, details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
+                raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_to_admin=True, block_validation=False, details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
         elif lot.matiere_premiere.code == 'MAIS':
             if not lot.pays_origine.is_in_europe and lot.pays_origine.code_pays != 'US':
-                raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_admin=True, block_validation=False, details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
+                raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_to_admin=True, block_validation=False, details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
         elif lot.matiere_premiere.code == 'BETTERAVE':
             if not lot.pays_origine.is_in_europe:
-                raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_admin=True, block_validation=False, details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
+                raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_to_admin=True, block_validation=False, details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
         else:
             pass
 
