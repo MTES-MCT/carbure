@@ -110,8 +110,8 @@ export const matierePremiere: Column<Transaction> = {
   sortBy: "matiere_premiere",
   render: (tx) => (
     <TwoLines
-      text={tx.lot.matiere_premiere.name}
-      sub={tx.lot.pays_origine.name}
+      text={tx.lot.matiere_premiere?.name}
+      sub={tx.lot.pays_origine?.name}
     />
   ),
 }
