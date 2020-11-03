@@ -107,8 +107,27 @@ def get_snapshot(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    txs = LotTransaction.objects.filter(carbure_client=entity)
+    if entity.entity_type in ['Producteur', 'Opérateur']:
+        # drafts are lot that will be extracted from mass balance and sent to a client
+        tx_drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
+        draft = len(tx_drafts)
+        tx_inbox = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AC', 'AA'])
+        inbox = len(tx_inbox)
+        tx_stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0)
+        stock = len(tx_stock)
+        data['lots'] = {'draft': draft, 'in': inbox,  'stock': stock}
+    else:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
 
+    # create union of querysets just to create filters 
+    # txs = tx_drafts.union(tx_inbox, tx_stock)
+    # txids = txs.values('id').distinct()
+    # problem with using above code calling union, doing it manually
+    txids = []
+    txids += [t['id'] for t in tx_drafts.values('id').distinct()]
+    txids += [t['id'] for t in tx_inbox.values('id').distinct()]
+    txids += [t['id'] for t in tx_stock.values('id').distinct()]
+    txs = LotTransaction.objects.filter(id__in=txids)
     mps = [{'value': m.code, 'label': m.name}
            for m in MatierePremiere.objects.filter(id__in=txs.values('lot__matiere_premiere').distinct())]
 
@@ -129,5 +148,4 @@ def get_snapshot(request):
     data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs,
                        'production_sites': psites, 'countries_of_origin': countries, 'delivery_sites': delivery_sites}
 
-    data['lots'] = {'draft': 12, 'in': 246, 'stock': 23}
     return JsonResponse({'status': 'success', 'data': data})
