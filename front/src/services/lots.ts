@@ -119,14 +119,6 @@ export function getStatus(transaction: Transaction, entity: number): LotStatus {
   return LotStatus.Weird
 }
 
-function normalizeStatus(transactions: any, entityID: number) {
-  transactions.lots.forEach((tx: any) => {
-    tx.status = getStatus(tx, entityID)
-  })
-
-  return transactions
-}
-
 export function getSnapshot(entityID: number, year: number): Promise<Snapshot> {
   return api
     .get("/lots/snapshot", { entity_id: entityID, year })
@@ -160,19 +152,14 @@ export function getLots(
     deadline,
   }
 
-  return api.get("/lots", params).then((txs) => normalizeStatus(txs, entityID))
+  return api.get("/lots", params)
 }
 
 export function getDetails(
   entityID: number,
   transactionID: number
 ): Promise<LotDetails> {
-  return api
-    .get("/lots/details", { entity_id: entityID, tx_id: transactionID })
-    .then((details) => {
-      details.transaction.status = getStatus(details.transaction, entityID)
-      return details
-    })
+  return api.get("/lots/details", { entity_id: entityID, tx_id: transactionID })
 }
 
 export function downloadLots(

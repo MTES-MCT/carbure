@@ -92,7 +92,7 @@ export interface Lot {
   volume: number
   period: string
   source: string
-  status: LotStatus
+  status: "Draft" | "Validated"
   data_origin_entity: Entity | null
   eccr: number
   eccs: number
@@ -132,8 +132,7 @@ export interface Transaction {
   id: number
   lot: Lot
   dae: string
-  status: LotStatus
-  delivery_status: string
+  delivery_status: "N" | "AC" | "AA" | "A" | "R"
   delivery_date: string
   champ_libre: string
   is_mac: boolean
