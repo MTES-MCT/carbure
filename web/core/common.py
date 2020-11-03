@@ -494,7 +494,6 @@ def load_lot(entity, user, lot_dict, source, transaction=None):
     lot_errors = []
     tx_errors = []
 
-    print(lot_dict)
     # check for empty row
     if lot_dict.get('biocarburant_code', None) is None:
         return None, None, None, None
