@@ -428,6 +428,7 @@ def add_lot(request):
     if not tx:
         return JsonResponse({'status': 'error', 'message': 'Could not add lot to database'}, status=400)
     bulk_insert(entity, [lot], [tx], [lot_errors], [tx_errors])
+    sanity_check(tx.lot)
     return JsonResponse({'status': 'success', 'data': tx.natural_key()})
 
 
@@ -464,6 +465,7 @@ def update_lot(request):
     tx.save()
     LotV2Error.objects.bulk_create(lot_errors)
     TransactionError.objects.bulk_create(tx_errors)       
+    sanity_check(tx.lot)
     return JsonResponse({'status': 'success'})
 
 

@@ -48,7 +48,7 @@ def sanity_check(lot):
             raise_error(lot, 'GHG_REDUC_INF_65', warning_to_user=True, block_validation=True, details="GES reduction %f%%" % (lot.ghg_reduction))
 
     # provenance des matieres premieres
-    if lot.matiere_premiere:
+    if lot.matiere_premiere and lot.pays_origine:
         if lot.matiere_premiere.code == 'SOJA':
             if lot.pays_origine.code_pays not in ['US', 'AR', 'BR', 'UY', 'PY']:
                 raise_error(lot, 'PROVENANCE_MP', warning_to_user=True, warning_admin=True, block_validation=False, details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
