@@ -168,9 +168,9 @@ export const StockTable = ({ stock, sorting }: StockTableProps) => {
   const columns = [
     C.empty,
     C.carbureID,
+    C.depot,
+    C.origine,
     C.biocarburant,
-    C.productionSite,
-    C.deliverySite,
     C.matierePremiere,
     C.ghgReduction,
     C.arrow,

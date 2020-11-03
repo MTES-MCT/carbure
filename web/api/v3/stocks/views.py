@@ -13,6 +13,7 @@ sort_key_to_django_field = {'period': 'lot__period',
 
 
 def get_stocks(request):
+    status = request.GET.get('status', False)
     entity = request.GET.get('entity_id', False)
     production_sites = request.GET.getlist('production_sites')
     matieres_premieres = request.GET.getlist('matieres_premieres')
@@ -25,6 +26,8 @@ def get_stocks(request):
     sort_by = request.GET.get('sort_by', False)
     order = request.GET.get('order', False)
 
+    if not status:
+        return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
     if entity is None:
         return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
     try:
@@ -37,8 +40,17 @@ def get_stocks(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    txs = LotTransaction.objects.filter(carbure_client=entity, delivery_status='A',
-                                        lot__status="Validated", lot__fused_with=None, lot__volume__gt=0)
+    if entity.entity_type in ['Producteur', 'Opérateur']:
+        if status == "draft":
+            txs = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
+        elif status == "in":
+            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AC', 'AA'])
+        elif status == "stock":
+            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0)
+        else:
+            return JsonResponse({'status': 'error', 'message': "Unknown status"}, status=400)
+    else:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
 
     # apply filters
     if production_sites:

@@ -34,6 +34,7 @@ import {
   InboxSummaryActions,
   ToFixActions,
   StockActions,
+  StockDraftActions,
 } from "./transaction-actions"
 import { SpecialSelection } from "../hooks/query/use-special"
 
@@ -244,12 +245,6 @@ export const StockList = ({
         </Alert>
       )}
 
-      {!isError && isEmpty && (
-        <Alert level="warning" icon={AlertCircle}>
-          Aucune transaction trouvée pour ces paramètres
-        </Alert>
-      )}
-
       {!isError && (
         <ActionBar>
           <ExportActions
@@ -260,7 +255,7 @@ export const StockList = ({
           {status.is(LotStatus.Inbox) && <InboxSummaryActions />}
 
           {status.is(LotStatus.Draft) && (
-            <DraftActions
+            <StockDraftActions
               disabled={isEmpty}
               hasSelection={selection.selected.length > 0}
               uploader={uploader}
@@ -280,6 +275,12 @@ export const StockList = ({
 
           {status.is(LotStatus.Stock) && <StockActions />}
         </ActionBar>
+      )}
+
+      {!isError && isEmpty && (
+        <Alert level="warning" icon={AlertCircle}>
+          Aucune transaction trouvée pour ces paramètres
+        </Alert>
       )}
 
       {!isError && !isEmpty && (

@@ -147,6 +147,70 @@ export const DraftActions = ({
   )
 }
 
+export const StockDraftActions = ({
+  disabled,
+  hasSelection,
+  uploader,
+  deleter,
+  validator,
+}: DraftActionsProps) => {
+  function onValidate() {
+    if (hasSelection) {
+      validator.validateSelection()
+    } else {
+      validator.validateAllDrafts()
+    }
+  }
+
+  function onDelete() {
+    if (hasSelection) {
+      deleter.deleteSelection()
+    } else {
+      deleter.deleteAllDrafts()
+    }
+  }
+
+  async function onUpload() {
+    const file = await prompt(
+      "Import Excel",
+      "Importer un fichier Excel standardisé.",
+      ImportPromptFactory(uploader)
+    )
+
+    if (file) {
+      uploader.uploadFile(file)
+    }
+  }
+
+  return (
+    <React.Fragment>
+      <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
+        Importer lots
+      </AsyncButton>
+
+      <AsyncButton
+        icon={Check}
+        level="success"
+        loading={validator.loading}
+        disabled={disabled}
+        onClick={onValidate}
+      >
+        Envoyer {hasSelection ? `sélection` : "tout"}
+      </AsyncButton>
+
+      <AsyncButton
+        icon={Cross}
+        level="danger"
+        loading={deleter.loading}
+        disabled={disabled}
+        onClick={onDelete}
+      >
+        Supprimer {hasSelection ? `sélection` : "tout"}
+      </AsyncButton>
+    </React.Fragment>
+  )
+}
+
 type ToFixActionsProps = {
   disabled: boolean
   deleter: LotDeleter
@@ -245,13 +309,13 @@ export const InboxSummaryActions = () => (
 )
 
 export const StockActions = () => (
-  <Link relative to="show-summary-in">
+  <Link relative to="send-complex">
     <Button
       className={styles.transactionButtons}
       level="primary"
       icon={Rapport}
     >
-      Rapport d'entrées
+      Envoi complexe
     </Button>
   </Link>
 )
