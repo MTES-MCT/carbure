@@ -176,11 +176,6 @@
   margin-bottom: 0;
 }
 
-.input:disabled,
-.textarea:disabled {
-  background-color: var(--gray-highlight);
-}
-
 .input:focus,
 .textarea:focus {
   border-color: var(--blue-medium);
@@ -197,6 +192,12 @@
   color: initial;
   border: 1px solid var(--gray-medium);
   background-color: var(--white);
+}
+
+.input:disabled,
+.textarea:disabled {
+  background-color: var(--gray-highlight);
+  color: var(--gray-dark);
 }
 
 /* LABEL TEXT FIELD COMPONENT */
@@ -237,7 +238,7 @@
 
 .errorLabel input,
 .errorLabel:hover input,
-.errorLabel:focus input {
+.errorLabel input:focus {
   color: var(--red-dark);
   border-color: var(--red-dark);
 }
