@@ -7,8 +7,9 @@ import {
   MatierePremiere,
   ProductionSite,
 } from "../../services/types"
+import { EntitySelection } from "./use-entity"
 
-import useForm from "./use-form"
+import useForm, { FormHook } from "./use-form"
 
 export interface TransactionFormState {
   id: number
@@ -143,6 +144,31 @@ const initialState: TransactionFormState = {
   unknown_delivery_site_country: null,
 }
 
-export default function useTransactionForm() {
-  return useForm<TransactionFormState>(initialState)
+export default function useTransactionForm(
+  entity: EntitySelection
+): FormHook<TransactionFormState> {
+  const [form, hasChange, onChange, setForm] = useForm<TransactionFormState>(
+    initialState
+  )
+
+  const isProducer = entity?.entity_type === "Producteur"
+  const isOperator = entity?.entity_type === "Opérateur"
+
+  if (isProducer && form.carbure_producer?.id !== entity?.id) {
+    setForm({
+      ...form,
+      producer_is_in_carbure: true,
+      carbure_producer: entity,
+    })
+  }
+
+  if (isOperator && form.carbure_client?.id !== entity?.id) {
+    setForm({
+      ...form,
+      client_is_in_carbure: true,
+      carbure_client: entity,
+    })
+  }
+
+  return [form, hasChange, onChange, setForm]
 }

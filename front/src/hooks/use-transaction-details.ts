@@ -30,9 +30,9 @@ export default function useTransactionDetails(
   const params: { id: string } = useParams()
 
   const close = useClose("../")
-  const [form, change, setForm] = useTransactionForm()
+  const [form, hasChange, change, setForm] = useTransactionForm(entity)
   const [details, resolveDetails] = useAPI(api.getDetails)
-  const [request, resolve] = useAPI(api.updateLot)
+  const [request, resolveUpdate] = useAPI(api.updateLot)
   const [comment, resolveComment] = useAPI(api.commentLot)
 
   const entityID = entity?.id
@@ -58,11 +58,12 @@ export default function useTransactionDetails(
   async function submit() {
     if (!entityID) return
 
-    const res = await resolve(entityID, txID, form)
+    const res = await resolveUpdate(entityID, txID, form)
 
     if (res) {
       refresh()
       refreshDetails()
+      setForm(form)
     }
   }
 
@@ -81,6 +82,7 @@ export default function useTransactionDetails(
 
   return {
     form,
+    hasChange,
     details,
     comment,
     fieldErrors,

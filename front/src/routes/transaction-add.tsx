@@ -27,6 +27,7 @@ const TransactionAdd = ({ entity, refresh }: TransactionAddProps) => {
 
       <TransactionForm
         id="transaction-add"
+        entity={entity}
         transaction={form}
         error={request.error}
         onChange={change}
