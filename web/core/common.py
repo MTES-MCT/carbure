@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
 from core.models import LotValidationError
-
+import dateutil.parser
 from api.v2.checkrules import sanity_check
 
 
@@ -434,10 +434,7 @@ def fill_delivery_date(lot_row, lot, transaction):
             if isinstance(delivery_date, datetime.datetime) or isinstance(delivery_date, datetime.date):
                 dd = delivery_date
             else:
-                year = int(delivery_date[0:4])
-                month = int(delivery_date[5:7])
-                day = int(delivery_date[8:10])
-                dd = datetime.date(year=year, month=month, day=day)
+                dd = dateutil.parser.parse(delivery_date, dayfirst=True)
             transaction.delivery_date = dd
             lot.period = dd.strftime('%Y-%m')
             TransactionError.objects.filter(tx=transaction, field='delivery_date').delete()
