@@ -88,10 +88,6 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
             rejector={rejector}
           />
         </Route>
-
-        {/* <Route relative path=":id">
-          <TransactionDetails />
-        </Route> */}
       </Switch>
     </Main>
   )
