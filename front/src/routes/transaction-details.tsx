@@ -46,6 +46,7 @@ const TransactionDetails = ({
 }: TransactionDetailsProps) => {
   const {
     form,
+    hasChange,
     details,
     request,
     comment,
@@ -108,6 +109,7 @@ const TransactionDetails = ({
       <div className={styles.transactionFormButtons}>
         {isEditable && (
           <AsyncButton
+            disabled={!hasChange}
             submit="transaction-details"
             icon={Save}
             level="primary"
@@ -120,6 +122,7 @@ const TransactionDetails = ({
 
         {status === LotStatus.Draft && (
           <AsyncButton
+            disabled={hasChange}
             icon={Check}
             level="success"
             loading={validator.loading}
@@ -131,6 +134,7 @@ const TransactionDetails = ({
 
         {status === LotStatus.ToFix && (
           <AsyncButton
+            disabled={hasChange}
             icon={Check}
             level="success"
             loading={validator.loading}
@@ -140,7 +144,7 @@ const TransactionDetails = ({
           </AsyncButton>
         )}
 
-        {EDITABLE.includes(status) && (
+        {isEditable && (
           <AsyncButton
             icon={Cross}
             level="danger"

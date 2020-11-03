@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 
 export type FormFields = HTMLInputElement | HTMLTextAreaElement
 
@@ -18,19 +18,28 @@ function parseValue(element: FormFields) {
 
 export type FormHook<T> = [
   T,
+  boolean,
   <T extends FormFields>(e: React.ChangeEvent<T>) => void,
-  React.Dispatch<React.SetStateAction<T>>
+  (s: T) => void
 ]
 
 export default function useForm<T>(initialState: T): FormHook<T> {
-  const [form, setForm] = useState<T>(initialState)
+  const [form, setFormState] = useState<T>(initialState)
+  const hasChange = useRef(false)
 
-  function change<T extends FormFields>(e: React.ChangeEvent<T>) {
-    setForm({
+  function change<U extends FormFields>(e: React.ChangeEvent<U>) {
+    hasChange.current = true
+
+    setFormState({
       ...form,
       [e.target.name]: parseValue(e.target),
     })
   }
 
-  return [form, change, setForm]
+  function setForm(state: T) {
+    hasChange.current = false
+    setFormState(state)
+  }
+
+  return [form, hasChange.current, change, setForm]
 }
