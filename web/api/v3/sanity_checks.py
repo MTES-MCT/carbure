@@ -19,6 +19,7 @@ rules['MP_BC_INCOHERENT'] = "Matière Première incohérente avec le Biocarburan
 rules['GHG_REDUC_INF_60'] = "La réduction de gaz à effet de serre est inférieure à 60% pour une usine dont la date de mise en service est ultérieure au 5 Octobre 2015. Il n'est pas possible d'enregistrer ce lot dans CarbuRe"
 rules['GHG_REDUC_INF_65'] = "La réduction de gaz à effet de serre est inférieure à 65% pour une usine dont la date de mise en service est ultérieure au 1er Janvier 2021. Il n'est pas possible d'enregistrer ce lot dans CarbuRe"
 rules['MISSING_REF_DBL_COUNTING'] = "Numéro d'enregistrement Double Compte manquant"
+rules['VOLUME_FAIBLE'] = "Volume faible"
 
 
 def raise_error(lot, rule_triggered, warning_to_user=True, warning_to_admin=False, block_validation=False, details=''):
@@ -35,6 +36,12 @@ def sanity_check(lot):
     now = datetime.datetime.now()
     # cleanup previous errors
     LotValidationError.objects.filter(lot=lot).delete()
+
+    # check volume
+    if lot.volume < 2000:
+        raise_error(lot, 'VOLUME_FAIBLE', warning_to_user=True, warning_to_admin=True)
+
+
     # réduction de GES
     if lot.ghg_reduction > 100:
         raise_error(lot, 'GHG_REDUC_SUP_100', warning_to_user=True, block_validation=True, details="GES reduction %f%%" % (lot.ghg_reduction))
