@@ -224,7 +224,22 @@ def fill_production_site_info(entity, lot_row, lot):
         else:
             lot.unknown_production_site_reference = ''
         if 'production_site_commissioning_date' in lot_row:
-            lot.unknown_production_site_com_date = lot_row['production_site_commissioning_date']
+            try:
+                com_date = lot_row['production_site_commissioning_date']
+                if isinstance(com_date, datetime.datetime) or isinstance(com_date, datetime.date):
+                    dd = com_date
+                else:
+                    year = int(com_date[0:4])
+                    month = int(com_date[5:7])
+                    day = int(com_date[8:10])
+                    dd = datetime.date(year=year, month=month, day=day)
+                lot.unknown_production_site_com_date = dd
+            except Exception:
+                msg = "Format de date incorrect: veuillez entrer une date au format AAAA-MM-JJ"
+                error = LotV2Error(lot=lot, field='unknown_production_site_com_date',
+                                    error=msg,
+                                    value=lot_row['production_site_commissioning_date'])
+                lot_errors.append(error)
         else:
             lot.unknown_production_site_com_date = None
         if 'double_counting_registration' in lot_row:
