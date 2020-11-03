@@ -192,6 +192,13 @@
   border-color: var(--blue-medium);
 }
 
+.input:read-only,
+.textarea:read-only {
+  color: initial;
+  border: 1px solid var(--gray-medium);
+  background-color: var(--white);
+}
+
 /* LABEL TEXT FIELD COMPONENT */
 
 .labelWrapper {
