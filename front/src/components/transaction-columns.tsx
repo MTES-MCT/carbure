@@ -104,8 +104,30 @@ export const productionSite: Column<Transaction> = {
   ),
 }
 
+export const origine: Column<Transaction> = {
+  header: "Cert. Producteur",
+  render: (tx) => (
+    <TwoLines
+      text={tx.lot.carbure_production_site?.name ?? tx.lot.unknown_production_site_reference} // prettier-ignore
+      sub={tx.lot.carbure_production_site?.country.name ?? tx.lot.unknown_production_country?.name ?? ''} // prettier-ignore
+    />
+  ),
+}
+
 export const deliverySite: Column<Transaction> = {
   header: "Site de livraison",
+  render: (tx) => {
+    const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
+    const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name ?? '' // prettier-ignore
+    const city = tx.carbure_delivery_site?.city
+    const location = city ? `${country}, ${city}` : country
+
+    return <TwoLines text={name} sub={location} />
+  },
+}
+
+export const depot: Column<Transaction> = {
+  header: "Dépôt",
   render: (tx) => {
     const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
     const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name ?? '' // prettier-ignore
