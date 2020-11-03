@@ -49,10 +49,14 @@ def sanity_check(lot):
         raise_error(lot, 'GHG_REDUC_INF_50', warning_to_user=True, block_validation=True, details="GES reduction %f%%" % (lot.ghg_reduction))
     commissioning_date = lot.carbure_production_site.date_mise_en_service if lot.carbure_production_site else lot.unknown_production_site_com_date
     if commissioning_date:
-        if commissioning_date > oct2015 and lot.ghg_reduction < 60:
-            raise_error(lot, 'GHG_REDUC_INF_60', warning_to_user=True, block_validation=True, details="GES reduction %f%%" % (lot.ghg_reduction))
-        if commissioning_date >= jan2021 and lot.ghg_reduction < 65:
-            raise_error(lot, 'GHG_REDUC_INF_65', warning_to_user=True, block_validation=True, details="GES reduction %f%%" % (lot.ghg_reduction))
+        print(commissioning_date, type(commissioning_date))
+        try:
+            if commissioning_date > oct2015 and lot.ghg_reduction < 60:
+                raise_error(lot, 'GHG_REDUC_INF_60', warning_to_user=True, block_validation=True, details="GES reduction %f%%" % (lot.ghg_reduction))
+            if commissioning_date >= jan2021 and lot.ghg_reduction < 65:
+                raise_error(lot, 'GHG_REDUC_INF_65', warning_to_user=True, block_validation=True, details="GES reduction %f%%" % (lot.ghg_reduction))
+        except:
+            pass
 
     # provenance des matieres premieres
     if lot.matiere_premiere and lot.pays_origine:
