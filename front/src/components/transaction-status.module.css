@@ -3,6 +3,12 @@
   background-color: var(--gray-light);
   border-radius: 50px;
   border: 1px solid var(--gray-highlight);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 4px 16px;
+}
+
+.smallStatus {
   font-size: 11px;
   padding: 4px 8px;
 }
@@ -25,4 +31,12 @@
 .statusRejected {
   color: var(--red-dark);
   background-color: var(--red-light);
+}
+
+.statusTitle {
+  align-items: center;
+}
+
+.statusTitle .status {
+  margin-left: 16px;
 }

@@ -18,11 +18,12 @@ import {
   Return,
   Save,
 } from "../components/system/icons"
-import { AsyncButton, Button, LoaderOverlay, Title } from "../components/system"
+import { AsyncButton, Button, LoaderOverlay } from "../components/system"
 import { Collapsible } from "../components/system/alert"
 import Modal from "../components/system/modal"
 import Comments from "../components/comments"
 import TransactionForm from "../components/transaction-form"
+import { StatusTitle } from "../components/transaction-status"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]
@@ -46,6 +47,7 @@ const TransactionDetails = ({
 }: TransactionDetailsProps) => {
   const {
     form,
+    hasChange,
     details,
     request,
     comment,
@@ -71,10 +73,13 @@ const TransactionDetails = ({
 
   return (
     <Modal onClose={close}>
-      <Title>Transaction #{form.id ?? "N/A"}</Title>
+      <StatusTitle transaction={details.data?.transaction}>
+        Détails du lot
+      </StatusTitle>
 
       <TransactionForm
         id="transaction-details"
+        entity={entity}
         readOnly={!isEditable}
         transaction={form}
         error={details.error ?? request.error}
@@ -108,6 +113,7 @@ const TransactionDetails = ({
       <div className={styles.transactionFormButtons}>
         {isEditable && (
           <AsyncButton
+            disabled={!hasChange}
             submit="transaction-details"
             icon={Save}
             level="primary"
@@ -120,6 +126,7 @@ const TransactionDetails = ({
 
         {status === LotStatus.Draft && (
           <AsyncButton
+            disabled={hasChange}
             icon={Check}
             level="success"
             loading={validator.loading}
@@ -131,6 +138,7 @@ const TransactionDetails = ({
 
         {status === LotStatus.ToFix && (
           <AsyncButton
+            disabled={hasChange}
             icon={Check}
             level="success"
             loading={validator.loading}
@@ -140,7 +148,7 @@ const TransactionDetails = ({
           </AsyncButton>
         )}
 
-        {EDITABLE.includes(status) && (
+        {isEditable && (
           <AsyncButton
             icon={Cross}
             level="danger"
