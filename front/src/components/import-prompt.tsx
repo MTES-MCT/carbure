@@ -3,7 +3,7 @@ import React from "react"
 import { LotUploader } from "../hooks/actions/use-upload-file"
 import { PromptFormProps } from "./system/dialog"
 
-import styles from "./transaction-actions.module.css"
+import styles from "./import-prompt.module.css"
 
 import { Upload } from "./system/icons"
 import { Box, Button } from "./system"
@@ -13,7 +13,7 @@ const ImportPrompt = ({
   onConfirm,
   onCancel,
 }: PromptFormProps<File>) => (
-  <Box style={{ maxWidth: 480 }}>
+  <Box className={styles.importPrompt}>
     {children}
 
     <Box row className={styles.dialogButtons}>
@@ -21,7 +21,7 @@ const ImportPrompt = ({
         Importer lots
         <input
           type="file"
-          style={{ display: "none" }}
+          className={styles.importFileInput}
           onChange={(e) => onConfirm(e!.target.files![0])}
         />
       </Button>

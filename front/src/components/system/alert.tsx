@@ -87,19 +87,17 @@ type CollapsibleProps = AlertProps & {
 export const Collapsible = ({
   title,
   children,
+  className,
   ...props
 }: CollapsibleProps) => {
   const [collasped, setCollapsed] = useState(false)
 
   return (
-    <Alert
-      style={{ flexDirection: "column", alignItems: "stretch" }}
-      {...props}
-    >
+    <Alert {...props} className={cl(styles.collapsibleAlert, className)}>
       <Box
         row
         onClick={() => setCollapsed(!collasped)}
-        style={{ cursor: "pointer" }}
+        className={styles.collapsibleBar}
       >
         <Title className={styles.collapsibleTitle}>{title}</Title>
         <ChevronDown className={styles.collapsibleArrow} />

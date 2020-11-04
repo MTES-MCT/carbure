@@ -317,11 +317,7 @@ export const InboxActions = ({
 
 export const OutSummaryActions = () => (
   <Link relative to="show-summary-out">
-    <Button
-      className={styles.transactionButtons}
-      level="primary"
-      icon={Rapport}
-    >
+    <Button level="primary" icon={Rapport}>
       Rapport de sorties
     </Button>
   </Link>
@@ -329,11 +325,7 @@ export const OutSummaryActions = () => (
 
 export const InboxSummaryActions = () => (
   <Link relative to="show-summary-in">
-    <Button
-      className={styles.transactionButtons}
-      level="primary"
-      icon={Rapport}
-    >
+    <Button level="primary" icon={Rapport}>
       Rapport d'entrées
     </Button>
   </Link>
@@ -341,11 +333,7 @@ export const InboxSummaryActions = () => (
 
 export const StockActions = () => (
   <Link relative to="send-complex">
-    <Button
-      className={styles.transactionButtons}
-      level="primary"
-      icon={Rapport}
-    >
+    <Button level="primary" icon={Rapport}>
       Envoi complexe
     </Button>
   </Link>
