@@ -286,7 +286,7 @@ export const StockList = ({
       {!isError && !isEmpty && (
         <React.Fragment>
           <Box>
-            <StockTable stock={txs!} sorting={sorting} />
+            <StockTable stock={txs!} sorting={sorting} status={status} selection={selection} />
             {isLoading && <LoaderOverlay />}
           </Box>
 

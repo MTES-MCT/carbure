@@ -501,6 +501,58 @@ def fill_delivery_site_data(lot_row, transaction):
                                               value=None))
     return tx_errors
 
+def load_mb_lot(entity, user, lot_dict, source):
+    lot_errors = []
+    tx_errors = []
+
+    # check for empty row
+    if lot_dict.get('carbure_id', None) is None:
+        return None, None, None, None
+    carbure_id = lot_dict['carbure_id']
+    # get source transaction
+    try:
+        source_tx = LotTransaction.objects.get(lot__carbure_id=carbure_id)
+        source_lot = LotV2.objects.get(id=source_tx.lot.id)
+    except Exception:
+        print('Could not find carbure_id %s' % (carbure_id))
+        return None, None, None, None
+    lot = source_tx.lot
+
+    if source_tx.carbure_client == entity and source_tx.delivery_status == 'A' and lot.fused_with is None:
+        # I am the client of this lot, I have accepted it and it's not fused with anything else
+        # this lot is currently in my mass balance
+        pass
+    else:
+        return None, None, None, None
+
+    # let's create a new lot and transaction
+    lot.pk = None
+    lot.parent_lot = source_lot
+    lot.added_by = entity
+    lot.data_origin_entity = lot.parent_lot.data_origin_entity
+    lot.added_by_user = user
+    lot.status = 'Draft'
+    lot.carbure_id = ''
+    lot.is_fused = False
+    lot.source = 'EXCEL'
+    lot_errors.append(fill_volume_info(lot_dict, lot))
+
+    transaction = LotTransaction()
+    # done in bulk_insert
+    # transaction.lot = lot
+    transaction.vendor_is_in_carbure = True
+    transaction.carbure_vendor = entity
+
+    tx_errors.append(fill_dae_data(lot_dict, transaction))
+    tx_errors.append(fill_delivery_date(lot_dict, lot, transaction))
+    tx_errors.append(fill_client_data(entity, lot_dict, transaction))
+    tx_errors.append(fill_delivery_site_data(lot_dict, transaction))
+    transaction.ghg_total = lot.ghg_total
+    transaction.ghg_reduction = lot.ghg_reduction
+    transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
+    lot_errors = [item for sublist in lot_errors for item in sublist]
+    tx_errors = [item for sublist in tx_errors for item in sublist]
+    return lot, transaction, lot_errors, tx_errors
 
 def load_lot(entity, user, lot_dict, source, transaction=None):
     lot_errors = []
@@ -527,11 +579,11 @@ def load_lot(entity, user, lot_dict, source, transaction=None):
     lot_errors.append(fill_pays_origine_info(lot_dict, lot))
     lot_errors.append(fill_ghg_info(lot_dict, lot))
     lot.is_valid = False
-    #lot.save()
 
     if transaction is None:
         transaction = LotTransaction()
-        #transaction.lot = lot
+        # done in bulk_insert
+        #transaction.lot = lot 
         transaction.vendor_is_in_carbure = True
         transaction.carbure_vendor = entity
     transaction.is_mac = False
@@ -545,14 +597,12 @@ def load_lot(entity, user, lot_dict, source, transaction=None):
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
     transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
-    #transaction.save()
-    #lot.save()
     lot_errors = [item for sublist in lot_errors for item in sublist]
     tx_errors = [item for sublist in tx_errors for item in sublist]
     return lot, transaction, lot_errors, tx_errors
 
 
-def load_excel_file(entity, user, file):
+def load_excel_file(entity, user, file, mass_balance=False):
     wb = openpyxl.load_workbook(file)
     try:
         lots_sheet = wb['lots']
@@ -578,7 +628,10 @@ def load_excel_file(entity, user, file):
         tx_errors = []
         for lot in lots:
             try:
-                lot, tx, l_errors, t_errors = load_lot(entity, user, lot, 'EXCEL')
+                if mass_balance:
+                    lot, tx, l_errors, t_errors = load_mb_lot(entity, user, lot, 'EXCEL')
+                else:
+                    lot, tx, l_errors, t_errors = load_lot(entity, user, lot, 'EXCEL')
                 if lot is None:
                     continue
                 lots_loaded += 1
