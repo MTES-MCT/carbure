@@ -1,4 +1,4 @@
-import { useReducer, useRef } from "react"
+import { useCallback, useReducer } from "react"
 
 enum ApiStatus {
   Pending = "pending",
@@ -44,11 +44,11 @@ type ApiHook<T extends any[], U> = [ApiState<U>, Resolver<T>]
 function useAPI<T extends any[], U>(
   createPromise: (...args: T) => Promise<U>
 ): ApiHook<T, U> {
-  const resolveRef = useRef<Resolver<T> | null>(null)
+  // const resolveRef = useRef<Resolver<T> | null>(null)
   const [state, dispatch] = useReducer<ApiReducer<U>>(reducer, initialState)
 
-  if (resolveRef.current === null) {
-    resolveRef.current = (...args: T) => {
+  const resolve = useCallback(
+    (...args: T) => {
       let cancelled = false
 
       // returns true if it was a success, false otherwise
@@ -81,10 +81,11 @@ function useAPI<T extends any[], U>(
       promise.cancel = () => { cancelled = true } // prettier-ignore
 
       return promise
-    }
-  }
+    },
+    [dispatch, createPromise]
+  )
 
-  return [state, resolveRef.current]
+  return [state, resolve]
 }
 
 export default useAPI
