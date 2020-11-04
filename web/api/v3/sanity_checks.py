@@ -13,7 +13,8 @@ jan2021 = datetime.date(year=2021, month=1, day=1)
 
 rules = {}
 rules['GHG_REDUC_INF_50'] = "La réduction de gaz à effet de serre est inférieure à 50%, il n'est pas possible d'enregistrer ce lot dans CarbuRe"
-rules['GHG_REDUC_SUP_100'] = "La réduction de gaz à effet de serre est supérieur à 100%, il n'est pas possible d'enregistrer ce lot dans CarbuRe"
+rules['GHG_REDUC_SUP_100'] = "La réduction de gaz à effet de serre est supérieure à 100%, il n'est pas possible d'enregistrer ce lot dans CarbuRe"
+rules['GHG_REDUC_SUP_99'] = "La réduction de gaz à effet de serre est supérieure à 99%, êtes vous sûr de vouloir valider ce lot ?"
 rules['PROVENANCE_MP'] = "Êtes vous sûr de la provenance de votre matière première ?"
 rules['MP_BC_INCOHERENT'] = "Matière Première incohérente avec le Biocarburant"
 rules['GHG_REDUC_INF_60'] = "La réduction de gaz à effet de serre est inférieure à 60% pour une usine dont la date de mise en service est ultérieure au 5 Octobre 2015. Il n'est pas possible d'enregistrer ce lot dans CarbuRe"
@@ -45,6 +46,8 @@ def sanity_check(lot):
     # réduction de GES
     if lot.ghg_reduction > 100:
         raise_error(lot, 'GHG_REDUC_SUP_100', warning_to_user=True, block_validation=True, details="GES reduction %f%%" % (lot.ghg_reduction))
+    if lot.ghg_reduction > 99:
+        raise_error(lot, 'GHG_REDUC_SUP_99', warning_to_user=True, warning_to_admin=True, details="GES reduction %f%%" % (lot.ghg_reduction))
     if lot.ghg_reduction < 50:
         raise_error(lot, 'GHG_REDUC_INF_50', warning_to_user=True, block_validation=True, details="GES reduction %f%%" % (lot.ghg_reduction))
     commissioning_date = lot.carbure_production_site.date_mise_en_service if lot.carbure_production_site else lot.unknown_production_site_com_date
