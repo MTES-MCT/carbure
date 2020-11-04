@@ -10,6 +10,7 @@ from core.models import LotV2, LotTransaction, LotV2Error, TransactionError
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment
 from core.xlsx_template import create_xslx_from_transactions, create_template_xlsx_v2_simple
 from core.xlsx_template import create_template_xlsx_v2_advanced, create_template_xlsx_v2_mb
+from core.xlsx_template import create_template_xlsx_v2_operators
 from core.common import validate_lots, load_excel_file, load_lot, bulk_insert
 from api.v3.sanity_checks import sanity_check
 
@@ -898,13 +899,13 @@ def template_blend(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    file_location = create_template_xlsx_v2_mb(entity)
+    file_location = create_template_xlsx_v2_operators(entity)
     try:
         with open(file_location, 'rb') as f:
             file_data = f.read()
             # sending response
             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="carbure_template_mass_balance.xlsx"'
+            response['Content-Disposition'] = 'attachment; filename="carbure_template_operator.xlsx"'
             return response
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
@@ -976,7 +977,7 @@ def upload_blend(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    nb_loaded, nb_total = load_excel_file(entity, request.user, file, mass_balance=True)
+    nb_loaded, nb_total = load_excel_file(entity, request.user, file)
     if nb_loaded is False:
         return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
     return JsonResponse({'status': 'success', 'loaded': nb_loaded, 'total': nb_total})
