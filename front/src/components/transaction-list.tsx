@@ -103,7 +103,7 @@ export const TransactionList = ({
           />
 
           {status.is(LotStatus.Validated) && <OutSummaryActions />}
-          {status.is(LotStatus.Accepted) && <InboxSummaryActions />}
+          {((isOperator || isTrader) && status.is(LotStatus.Inbox)) && <InboxSummaryActions />}
 
           {(isProducer || isTrader) && status.is(LotStatus.Draft) && (
             <ProducerDraftActions
