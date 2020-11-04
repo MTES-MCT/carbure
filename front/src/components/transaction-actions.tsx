@@ -12,7 +12,12 @@ import { LotRejector } from "../hooks/actions/use-reject-lots"
 import { Link } from "./relative-route"
 import { AsyncButton, Box, Button } from "./system"
 import { Check, Cross, Download, Plus, Rapport, Upload } from "./system/icons"
-import { prompt, PromptFormProps } from "./system/dialog"
+import { prompt } from "./system/dialog"
+import {
+  ProducerImportPromptFactory,
+  OperatorImportPromptFactory,
+  StockImportPromptFactory,
+} from "./import-prompt"
 
 type ExportActionsProps = {
   isEmpty: boolean
@@ -33,81 +38,7 @@ type DraftActionsProps = {
   validator: LotValidator
 }
 
-const ImportPromptFactory = (uploader: LotUploader) => ({
-  onConfirm,
-  onCancel,
-}: PromptFormProps<File>) => (
-  <Box style={{ maxWidth: 480 }}>
-    <Box className={styles.importExplanation}>
-      Le modèle simplifié vous permet de créer des lots provenant de vos propres
-      usines. Vous pouvez les affilier immédiatement à des clients enregistrés
-      sur Carbure ou simplement les ajouter à votre Mass Balance.
-      <span
-        className={styles.downloadLink}
-        onClick={uploader.downloadTemplateSimple}
-      >
-        Télécharger le modèle simplifié
-      </span>
-    </Box>
-
-    <Box className={styles.importExplanation}>
-      Le modèle avancé permet d'importer dans Carbure des lots achetés auprès de
-      fournisseurs qui nous sont inconnus (fournisseurs étrangers ou producteurs
-      français captifs). Vous avez également la possibilité d'attribuer ces lots
-      à des clients étrangers.
-      <span
-        className={styles.downloadLink}
-        onClick={uploader.downloadTemplateAdvanced}
-      >
-        Télécharger le modèle avancé
-      </span>
-    </Box>
-
-    <Box row className={styles.dialogButtons}>
-      <Button as="label" level="primary" icon={Upload}>
-        Importer lots
-        <input
-          type="file"
-          style={{ display: "none" }}
-          onChange={(e) => onConfirm(e!.target.files![0])}
-        />
-      </Button>
-      <Button onClick={onCancel}>Annuler</Button>
-    </Box>
-  </Box>
-)
-
-const StockImportPromptFactory = (uploader: LotUploader) => ({
-  onConfirm,
-  onCancel,
-}: PromptFormProps<File>) => (
-  <Box style={{ maxWidth: 480 }}>
-    <Box className={styles.importExplanation}>
-      Ce modèle vous permet de créer des lots à partir de votre Mass Balance (onglet Lots en Stock)
-      <span
-        className={styles.downloadLink}
-        onClick={uploader.downloadTemplateMassBalance}
-      >
-        Télécharger le modèle
-      </span>
-    </Box>
-
-    <Box row className={styles.dialogButtons}>
-      <Button as="label" level="primary" icon={Upload}>
-        Importer lots
-        <input
-          type="file"
-          style={{ display: "none" }}
-          onChange={(e) => onConfirm(e!.target.files![0])}
-        />
-      </Button>
-      <Button onClick={onCancel}>Annuler</Button>
-    </Box>
-  </Box>
-)
-
-
-export const DraftActions = ({
+export const ProducerDraftActions = ({
   disabled,
   hasSelection,
   uploader,
@@ -134,7 +65,7 @@ export const DraftActions = ({
     const file = await prompt(
       "Import Excel",
       "Importer un fichier Excel standardisé.",
-      ImportPromptFactory(uploader)
+      ProducerImportPromptFactory(uploader)
     )
 
     if (file) {
@@ -162,6 +93,76 @@ export const DraftActions = ({
         onClick={onValidate}
       >
         Envoyer {hasSelection ? `sélection` : "tout"}
+      </AsyncButton>
+
+      <AsyncButton
+        icon={Cross}
+        level="danger"
+        loading={deleter.loading}
+        disabled={disabled}
+        onClick={onDelete}
+      >
+        Supprimer {hasSelection ? `sélection` : "tout"}
+      </AsyncButton>
+    </React.Fragment>
+  )
+}
+
+export const OperatorDraftActions = ({
+  disabled,
+  hasSelection,
+  uploader,
+  deleter,
+  validator,
+}: DraftActionsProps) => {
+  function onValidate() {
+    if (hasSelection) {
+      validator.validateSelection()
+    } else {
+      validator.validateAllDrafts()
+    }
+  }
+
+  function onDelete() {
+    if (hasSelection) {
+      deleter.deleteSelection()
+    } else {
+      deleter.deleteAllDrafts()
+    }
+  }
+
+  async function onUpload() {
+    const file = await prompt(
+      "Import Excel",
+      "Importer un fichier Excel standardisé.",
+      OperatorImportPromptFactory(uploader)
+    )
+
+    if (file) {
+      uploader.uploadFile(file)
+    }
+  }
+
+  return (
+    <React.Fragment>
+      <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
+        Importer lots
+      </AsyncButton>
+
+      <Link relative to="add">
+        <Button icon={Plus} level="primary">
+          Créer lot
+        </Button>
+      </Link>
+
+      <AsyncButton
+        icon={Check}
+        level="success"
+        loading={validator.loading}
+        disabled={disabled}
+        onClick={onValidate}
+      >
+        Valider {hasSelection ? `sélection` : "tout"}
       </AsyncButton>
 
       <AsyncButton
