@@ -55,6 +55,7 @@ const TransactionForm = ({
 }: TransactionFormProps) => {
   const isProducer = entity?.entity_type === "Producteur"
   const isOperator = entity?.entity_type === "Opérateur"
+  const isTrader = entity?.entity_type === "Trader"
 
   function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -70,6 +71,14 @@ const TransactionForm = ({
             name="mac"
             label="Il s'agit d'une mise à consommation ?"
             checked={tx.mac}
+            onChange={onChange}
+          />
+          <LabelInput
+            readOnly={readOnly}
+            label="Numéro douanier (DAE, DAA...)"
+            name="dae"
+            value={tx.dae}
+            error={fieldErrors.dae}
             onChange={onChange}
           />
           <LabelInput
@@ -117,19 +126,19 @@ const TransactionForm = ({
             getQuery={findCountries}
             onChange={onChange}
           />
-
-          <LabelTextArea
+          <LabelInput
             readOnly={readOnly}
-            label="Champ Libre"
-            name="champ_libre"
-            value={tx.champ_libre}
-            error={fieldErrors.champ_libre}
+            type="date"
+            label="Date de livraison"
+            name="delivery_date"
+            value={tx.delivery_date}
+            error={fieldErrors.delivery_date}
             onChange={onChange}
           />
         </Box>
         <Box>
           <LabelCheckbox
-            disabled={readOnly || isProducer}
+            disabled={readOnly || isProducer || isTrader || isOperator}
             name="producer_is_in_carbure"
             label="Producteur enregistré sur Carbure ?"
             checked={tx.producer_is_in_carbure}
@@ -328,22 +337,12 @@ const TransactionForm = ({
             />
           )}
 
-          <LabelInput
+          <LabelTextArea
             readOnly={readOnly}
-            label="Numéro douanier (DAE, DAA...)"
-            name="dae"
-            value={tx.dae}
-            error={fieldErrors.dae}
-            onChange={onChange}
-          />
-
-          <LabelInput
-            readOnly={readOnly}
-            type="date"
-            label="Date de livraison"
-            name="delivery_date"
-            value={tx.delivery_date}
-            error={fieldErrors.delivery_date}
+            label="Champ Libre"
+            name="champ_libre"
+            value={tx.champ_libre}
+            error={fieldErrors.champ_libre}
             onChange={onChange}
           />
         </Box>

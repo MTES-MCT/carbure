@@ -222,6 +222,7 @@ export default function useTransactionForm(
 
   const isProducer = entity?.entity_type === "Producteur"
   const isOperator = entity?.entity_type === "Opérateur"
+  const isTrader = entity?.entity_type === "Trader"
 
   if (isProducer && form.carbure_producer?.id !== entity?.id) {
     setForm({
@@ -236,6 +237,14 @@ export default function useTransactionForm(
       ...form,
       client_is_in_carbure: true,
       carbure_client: entity,
+      producer_is_in_carbure: false,
+    })
+  }
+
+  if (isTrader && form.producer_is_in_carbure) {
+    setForm({
+      ...form,
+      producer_is_in_carbure: false,
     })
   }
 

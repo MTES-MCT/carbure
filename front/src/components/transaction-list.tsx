@@ -80,6 +80,7 @@ export const TransactionList = ({
 
   const isProducer = entity.entity_type === "Producteur"
   const isOperator = entity.entity_type === "Opérateur"
+  const isTrader = entity.entity_type === "Trader"
 
   const isLoading = transactions.loading
   const isError = transactions.error !== null
@@ -104,7 +105,7 @@ export const TransactionList = ({
           {status.is(LotStatus.Validated) && <OutSummaryActions />}
           {status.is(LotStatus.Accepted) && <InboxSummaryActions />}
 
-          {isProducer && status.is(LotStatus.Draft) && (
+          {(isProducer || isTrader) && status.is(LotStatus.Draft) && (
             <ProducerDraftActions
               disabled={isEmpty}
               hasSelection={selection.selected.length > 0}

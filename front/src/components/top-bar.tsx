@@ -63,6 +63,10 @@ const UserMenu = ({ settings, entity }: UserMenuProps) => (
   </Menu>
 )
 
+function canTrade(entity: EntitySelection) {
+  return entity && (entity.has_trading || entity.entity_type === "Trader")
+}
+
 type TopbarProps = {
   entity: EntitySelection
   settings: ApiState<Settings>
@@ -73,7 +77,7 @@ const Topbar = ({ entity, settings }: TopbarProps) => (
     <Logo />
 
     <nav className={styles.pageNav}>
-      {entity?.has_trading && <PageLink to="stocks">Stocks</PageLink>}
+      {canTrade(entity) && <PageLink to="stocks">Stocks</PageLink>}
       <PageLink to="transactions">Transactions</PageLink>
     </nav>
 

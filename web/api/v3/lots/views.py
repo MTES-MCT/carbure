@@ -73,7 +73,7 @@ def get_lots(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    if entity.entity_type == 'Producteur':
+    if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader':
         txs = LotTransaction.objects.select_related('lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
                                                              'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant',
                                                              'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
@@ -282,7 +282,7 @@ def get_snapshot(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    if entity.entity_type == 'Producteur':
+    if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader':
         txs = LotTransaction.objects.filter(lot__added_by=entity)
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
 
