@@ -19,11 +19,11 @@ import {
   Save,
 } from "../components/system/icons"
 import { AsyncButton, Button, LoaderOverlay } from "../components/system"
-import { Collapsible } from "../components/system/alert"
 import Modal from "../components/system/modal"
 import Comments from "../components/comments"
 import TransactionForm from "../components/transaction-form"
 import { StatusTitle } from "../components/transaction-status"
+import ValidationErrors from "../components/validation-errors"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]
@@ -91,17 +91,7 @@ const TransactionDetails = ({
       />
 
       {validationErrors.length > 0 && (
-        <Collapsible
-          level="error"
-          title={`Erreurs (${validationErrors.length})`}
-          className={styles.transactionError}
-        >
-          <ul className={styles.validationErrors}>
-            {validationErrors.map((err, i) => (
-              <li key={i}>{err.error || "Erreur de validation"}</li>
-            ))}
-          </ul>
-        </Collapsible>
+        <ValidationErrors validationErrors={validationErrors} />
       )}
 
       {details.data && details.data.comments.length > 0 && (

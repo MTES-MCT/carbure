@@ -4,6 +4,7 @@ import styles from "./comments.module.css"
 import { AsyncButton, Box, Button, Input, LabelInput } from "./system"
 import { Collapsible } from "./system/alert"
 import { PromptFormProps } from "./system/dialog"
+import { Message } from "./system/icons"
 import RadioGroup from "./system/radio-group"
 
 type CommentsProps = {
@@ -29,7 +30,8 @@ const Comments = ({
 
   return (
     <Collapsible
-      level="warning"
+      level="info"
+      icon={Message}
       title={`Commentaires (${comments.length})`}
       className={styles.comments}
     >

@@ -24,6 +24,7 @@ export const Alert = ({
   const divClassName = cl(styles.alert, className, {
     [styles.alertWarning]: level === "warning",
     [styles.alertError]: level === "error",
+    [styles.alertInfo]: level === "info",
   })
 
   return (
@@ -86,6 +87,7 @@ type CollapsibleProps = AlertProps & {
 
 export const Collapsible = ({
   title,
+  icon: CollapsibleIcon,
   children,
   className,
   ...props
@@ -99,6 +101,7 @@ export const Collapsible = ({
         onClick={() => setCollapsed(!collasped)}
         className={styles.collapsibleBar}
       >
+        {CollapsibleIcon && <CollapsibleIcon />}
         <Title className={styles.collapsibleTitle}>{title}</Title>
         <ChevronDown className={styles.collapsibleArrow} />
       </Box>

@@ -1,0 +1,8 @@
+.transactionError {
+  margin-top: 16px;
+}
+
+.validationErrors {
+  padding: 0 16px;
+  margin: 0;
+}

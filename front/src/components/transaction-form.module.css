@@ -33,10 +33,6 @@
   height: 68px;
 }
 
-.transactionError {
-  margin-top: 16px;
-}
-
 .transactionFormButtons {
   display: flex;
   margin-top: auto;
@@ -54,9 +50,4 @@
 
 .transactionCloseButton {
   margin-left: auto;
-}
-
-.validationErrors {
-  padding: 0 16px;
-  margin: 0;
 }
