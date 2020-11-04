@@ -4,7 +4,11 @@ import { useParams } from "react-router-dom"
 import { Errors, LotStatus } from "../services/types"
 import { EntitySelection } from "./helpers/use-entity"
 
-import useTransactionForm, { toTransactionFormState } from "./helpers/use-transaction-form" // prettier-ignore
+import useTransactionForm, {
+  toTransactionFormState,
+  toTransactionPostData,
+} from "./helpers/use-transaction-form"
+
 import useAPI from "./helpers/use-api"
 import useClose from "./helpers/use-close"
 import * as api from "../services/lots"
@@ -58,7 +62,7 @@ export default function useTransactionDetails(
   async function submit() {
     if (!entityID) return
 
-    const res = await resolveUpdate(entityID, txID, form)
+    const res = await resolveUpdate(entityID, txID, toTransactionPostData(form))
 
     if (res) {
       refresh()

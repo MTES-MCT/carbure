@@ -31,63 +31,6 @@ function normalizeFilters(snapshot: any): Snapshot {
   return snapshot
 }
 
-function toTransactionPostData(tx: TransactionFormState) {
-  return {
-    volume: tx.volume,
-    dae: tx.dae,
-    champ_libre: tx.champ_libre,
-    delivery_date: tx.delivery_date,
-    mac: tx.mac,
-
-    eec: tx.eec,
-    el: tx.el,
-    ep: tx.ep,
-    etd: tx.etd,
-    eu: tx.eu,
-    esca: tx.esca,
-    eccs: tx.eccs,
-    eccr: tx.eccr,
-    eee: tx.eee,
-
-    biocarburant_code: tx.biocarburant?.code,
-    matiere_premiere_code: tx.matiere_premiere?.code,
-    pays_origine_code: tx.pays_origine?.code_pays,
-
-    producer: tx.producer_is_in_carbure
-      ? tx.carbure_producer?.name
-      : tx.unknown_producer,
-
-    production_site: tx.producer_is_in_carbure
-      ? tx.carbure_production_site?.name
-      : tx.unknown_production_site,
-
-    production_site_country: !tx.producer_is_in_carbure
-      ? tx.unknown_production_country
-      : "",
-    production_site_reference: !tx.producer_is_in_carbure
-      ? tx.unknown_production_site_reference
-      : "",
-    production_site_commissioning_date: !tx.producer_is_in_carbure
-      ? tx.unknown_production_site_com_date
-      : "",
-    double_counting_registration: !tx.producer_is_in_carbure
-      ? tx.unknown_production_site_dbl_counting
-      : "",
-
-    client: tx.client_is_in_carbure
-      ? tx.carbure_client?.name
-      : tx.unknown_client,
-
-    delivery_site: tx.delivery_site_is_in_carbure
-      ? tx.carbure_delivery_site?.depot_id
-      : tx.unknown_delivery_site,
-
-    delivery_site_country: !tx.delivery_site_is_in_carbure
-      ? tx.unknown_delivery_site_country
-      : "",
-  }
-}
-
 // extract the status name from the lot details
 export function getStatus(transaction: Transaction, entity: number): LotStatus {
   const status = transaction.lot.status.toLowerCase()
@@ -186,7 +129,7 @@ export function downloadLots(
 export function addLot(entityID: number, params: any): Promise<Transaction> {
   return api.post("/lots/add", {
     entity_id: entityID,
-    ...toTransactionPostData(params),
+    ...params,
   })
 }
 
@@ -249,7 +192,7 @@ export function updateLot(
   return api.post("/lots/update", {
     entity_id: entityID,
     tx_id: transactionID,
-    ...toTransactionPostData(params),
+    ...params,
   })
 }
 
