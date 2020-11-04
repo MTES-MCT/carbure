@@ -150,7 +150,6 @@ const TransactionForm = ({
                 getQuery={findProducers}
                 onChange={onChange}
               />
-
               <AutoComplete
                 readOnly={readOnly}
                 label="Site de production"
@@ -161,6 +160,7 @@ const TransactionForm = ({
                 getValue={getters.id}
                 getLabel={getters.name}
                 getQuery={findProductionSites}
+                queryArgs={[tx.carbure_producer?.id]}
                 onChange={onChange}
               />
               <LabelInput
