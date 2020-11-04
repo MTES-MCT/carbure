@@ -9,6 +9,7 @@ export interface LotUploader {
   error: string | null
   uploadFile: (f: File) => void
   uploadMassBalanceFile: (f: File) => void
+  uploadOperatorFile: (f: File) => void
   downloadTemplateSimple: () => void
   downloadTemplateAdvanced: () => void
   downloadTemplateMassBalance: () => void
@@ -23,6 +24,9 @@ export default function useUploadLotFile(
   const [requestMB, resolveUploadMassBalance] = useAPI(
     api.uploadMassBalanceFile
   )
+  const [requestOperator, resolveUploadOperator] = useAPI(
+    api.uploadOperatorLotFile
+  )
 
   async function uploadFile(file: File) {
     if (entity !== null) {
@@ -33,6 +37,12 @@ export default function useUploadLotFile(
   async function uploadMassBalanceFile(file: File) {
     if (entity !== null) {
       resolveUploadMassBalance(entity.id, file).then(refresh)
+    }
+  }
+
+  async function uploadOperatorFile(file: File) {
+    if (entity !== null) {
+      resolveUploadOperator(entity.id, file).then(refresh)
     }
   }
 
@@ -64,6 +74,7 @@ export default function useUploadLotFile(
     ...request,
     uploadFile,
     uploadMassBalanceFile,
+    uploadOperatorFile,
     downloadTemplateSimple,
     downloadTemplateAdvanced,
     downloadTemplateMassBalance,

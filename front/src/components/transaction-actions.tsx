@@ -139,7 +139,7 @@ export const OperatorDraftActions = ({
     )
 
     if (file) {
-      uploader.uploadFile(file)
+      uploader.uploadOperatorFile(file)
     }
   }
 

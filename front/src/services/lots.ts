@@ -207,6 +207,16 @@ export function uploadMassBalanceFile(
   })
 }
 
+export function uploadOperatorLotFile(
+  entityID: number,
+  file: File
+): Promise<void> {
+  return api.post("/lots/upload-blend", {
+    entity_id: entityID,
+    file,
+  })
+}
+
 export function downloadTemplateSimple(entityID: number) {
   return api.download("/lots/download-template-simple", {
     entity_id: entityID,
@@ -226,7 +236,7 @@ export function downloadTemplateMassBalance(entityID: number) {
 }
 
 export function downloadTemplateOperator(entityID: number) {
-  return api.download("/lots/download-template-operator", {
+  return api.download("/lots/download-template-blend", {
     entity_id: entityID,
   })
 }
