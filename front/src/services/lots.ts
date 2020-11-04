@@ -94,7 +94,7 @@ export function getLots(
     deadline,
   }
 
-  return api.get("/lots", params)
+  return api.get("/lots/", params)
 }
 
 export function getDetails(
