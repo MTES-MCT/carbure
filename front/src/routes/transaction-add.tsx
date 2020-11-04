@@ -6,9 +6,10 @@ import styles from "../components/transaction-form.module.css"
 
 import useTransactionAdd from "../hooks/use-transaction-add"
 import Modal from "../components/system/modal"
-import { AsyncButton, Button, Title } from "../components/system"
-import TransactionForm from "../components/transaction-form"
+import { AsyncButton, Button } from "../components/system"
 import { Plus, Return } from "../components/system/icons"
+import { StatusTitle } from "../components/transaction-status"
+import TransactionForm from "../components/transaction-form"
 
 type TransactionAddProps = {
   entity: EntitySelection
@@ -23,7 +24,7 @@ const TransactionAdd = ({ entity, refresh }: TransactionAddProps) => {
 
   return (
     <Modal onClose={close}>
-      <Title>Créer une nouvelle transaction</Title>
+      <StatusTitle editable>Créer une nouvelle transaction</StatusTitle>
 
       <TransactionForm
         id="transaction-add"
