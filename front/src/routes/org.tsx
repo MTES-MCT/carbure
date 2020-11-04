@@ -27,8 +27,16 @@ const Org = ({ app }: MainProps) => {
       <Topbar entity={entity} settings={app.settings} />
 
       <Switch>
+        <Route relative exact path="stocks">
+          <Redirect relative to="draft" />
+        </Route>
+
         <Route relative path="stocks/:status">
           <Stocks entity={entity} />
+        </Route>
+
+        <Route relative exact path="transactions">
+          <Redirect relative to="draft" />
         </Route>
 
         <Route relative path="transactions/:status">
@@ -38,8 +46,6 @@ const Org = ({ app }: MainProps) => {
         <Route relative path="settings">
           <Settings entity={entity} settings={app.settings} />
         </Route>
-
-        <Redirect relative to="transactions/draft" />
       </Switch>
       <Footer />
     </React.Fragment>
