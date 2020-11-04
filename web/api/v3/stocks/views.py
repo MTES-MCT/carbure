@@ -40,7 +40,7 @@ def get_stocks(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    if entity.entity_type in ['Producteur', 'Opérateur']:
+    if entity.entity_type in ['Producteur', 'Opérateur', 'Trader']:
         if status == "draft":
             txs = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
         elif status == "in":
@@ -119,7 +119,7 @@ def get_snapshot(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    if entity.entity_type in ['Producteur', 'Opérateur']:
+    if entity.entity_type in ['Producteur', 'Opérateur', 'Trader']:
         # drafts are lot that will be extracted from mass balance and sent to a client
         tx_drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
         draft = len(tx_drafts)
