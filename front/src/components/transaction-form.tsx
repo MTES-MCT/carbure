@@ -66,7 +66,7 @@ const TransactionForm = ({
       <Box row className={styles.transactionFields}>
         <Box>
           <LabelCheckbox
-            disabled={true}
+            disabled={readOnly || !entity?.has_mac}
             name="mac"
             label="Il s'agit d'une mise à consommation ?"
             checked={tx.mac}
