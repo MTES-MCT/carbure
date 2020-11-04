@@ -46,6 +46,8 @@ const Org = ({ app }: MainProps) => {
         <Route relative path="settings">
           <Settings entity={entity} settings={app.settings} />
         </Route>
+
+        <Redirect relative to="transactions" />
       </Switch>
       <Footer />
     </React.Fragment>
