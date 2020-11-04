@@ -276,10 +276,8 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  height: 60px;
-  padding-top: 32px;
-  padding-bottom: 8px;
-  margin-bottom: 8px;
+  height: 68px;
+  padding: 8px 0;
   flex-shrink: 0;
 }
 

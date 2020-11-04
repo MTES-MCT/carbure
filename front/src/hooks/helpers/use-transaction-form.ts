@@ -29,6 +29,10 @@ export interface TransactionFormState {
   eccr: number
   eee: number
 
+  ghg_total: number
+  ghg_reduction: number
+  ghg_reference: number
+
   biocarburant: Biocarburant | null
   matiere_premiere: MatierePremiere | null
   pays_origine: Country | null
@@ -71,6 +75,10 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
     eccs: tx.lot.eccs,
     eccr: tx.lot.eccr,
     eee: tx.lot.eee,
+
+    ghg_total: tx.lot.ghg_total,
+    ghg_reduction: tx.lot.ghg_reduction,
+    ghg_reference: tx.lot.ghg_reference,
 
     biocarburant: tx.lot.biocarburant,
     matiere_premiere: tx.lot.matiere_premiere,
@@ -119,6 +127,10 @@ const initialState: TransactionFormState = {
   eccs: 0,
   eccr: 0,
   eee: 0,
+
+  ghg_total: 0,
+  ghg_reduction: 0,
+  ghg_reference: 83.8,
 
   biocarburant: null,
   matiere_premiere: null,

@@ -58,14 +58,24 @@ const Status = ({ small, transaction }: StatusProps) => (
 )
 
 type StatusTitleProps = {
+  editable?: boolean
   transaction: Transaction | undefined
   children: React.ReactNode
 }
 
-export const StatusTitle = ({ transaction, children }: StatusTitleProps) => (
+export const StatusTitle = ({
+  editable,
+  transaction,
+  children,
+}: StatusTitleProps) => (
   <Box row className={styles.statusTitle}>
     <Title>{children}</Title>
     {transaction && <Status transaction={transaction} />}
+    {!editable && (
+      <span className={styles.transactionEditable}>
+        (Ce lot ne peut pas être modifié)
+      </span>
+    )}
   </Box>
 )
 

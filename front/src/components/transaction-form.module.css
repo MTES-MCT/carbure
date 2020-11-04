@@ -1,7 +1,7 @@
 .transactionForm {
   display: flex;
   flex-direction: column;
-  margin-top: 32px;
+  margin-top: 8px;
 }
 
 .transactionFields > div {
@@ -12,11 +12,6 @@
   flex: 2;
 }
 
-.transactionFields > div:nth-child(2),
-.transactionFields > div:nth-child(3) {
-  margin-top: -68px;
-}
-
 .transactionFields > div {
   margin-right: 32px;
 }
@@ -25,12 +20,17 @@
   margin-right: 0;
 }
 
-.transactionGES > div:first-child {
+.transactionGES > *:first-child {
   margin-right: 8px;
 }
 
-.transactionMAC {
-  margin: 0 auto;
+.transactionGESHeader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 14px;
+  height: 68px;
 }
 
 .transactionError {
