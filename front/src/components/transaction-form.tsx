@@ -65,6 +65,13 @@ const TransactionForm = ({
     <form id={id} className={styles.transactionForm} onSubmit={submit}>
       <Box row className={styles.transactionFields}>
         <Box>
+          <LabelCheckbox
+            disabled={true}
+            name="mac"
+            label="Il s'agit d'une mise à consommation ?"
+            checked={tx.mac}
+            onChange={onChange}
+          />
           <LabelInput
             readOnly={readOnly}
             type="number"
@@ -344,6 +351,7 @@ const TransactionForm = ({
         <Box>
           <Box row className={styles.transactionGES}>
             <Box>
+              <span className={styles.transactionGESHeader}>Émissions</span>
               <LabelInput
                 readOnly={readOnly}
                 type="number"
@@ -384,9 +392,21 @@ const TransactionForm = ({
                 step={0.1}
                 onChange={onChange}
               />
+              <LabelInput
+                readOnly={readOnly}
+                type="number"
+                label="EU"
+                name="eu"
+                value={tx.eu}
+                error={fieldErrors.eu}
+                step={0.1}
+                className={styles.transactionTotal}
+                onChange={onChange}
+              />
             </Box>
 
             <Box>
+              <span className={styles.transactionGESHeader}>Réductions</span>
               <LabelInput
                 readOnly={readOnly}
                 type="number"
@@ -429,27 +449,18 @@ const TransactionForm = ({
               />
             </Box>
           </Box>
-
-          <LabelInput
-            readOnly={readOnly}
-            type="number"
-            label="EU"
-            name="eu"
-            value={tx.eu}
-            error={fieldErrors.eu}
-            step={0.1}
-            className={styles.transactionTotal}
-            onChange={onChange}
-          />
-
-          <LabelCheckbox
-            disabled={readOnly}
-            name="mac"
-            label="Mise à consommation ?"
-            checked={tx.mac}
-            className={styles.transactionMAC}
-            onChange={onChange}
-          />
+          <Box row className={styles.transactionGES}>
+            <LabelInput
+              readOnly
+              label="Total"
+              value={`${tx.ghg_total} gCO2eq/MJ`}
+            />
+            <LabelInput
+              readOnly
+              label="Réduction"
+              value={`${tx.ghg_reduction}%`}
+            />
+          </Box>
         </Box>
       </Box>
 

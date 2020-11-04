@@ -73,8 +73,11 @@ const TransactionDetails = ({
 
   return (
     <Modal onClose={close}>
-      <StatusTitle transaction={details.data?.transaction}>
-        Détails du lot
+      <StatusTitle
+        editable={isEditable}
+        transaction={details.data?.transaction}
+      >
+        Détails de la transaction
       </StatusTitle>
 
       <TransactionForm

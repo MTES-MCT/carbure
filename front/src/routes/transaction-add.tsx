@@ -23,7 +23,7 @@ const TransactionAdd = ({ entity, refresh }: TransactionAddProps) => {
 
   return (
     <Modal onClose={close}>
-      <Title>Créer un nouveau lot</Title>
+      <Title>Créer une nouvelle transaction</Title>
 
       <TransactionForm
         id="transaction-add"
