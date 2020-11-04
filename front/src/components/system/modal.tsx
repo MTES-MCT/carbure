@@ -29,8 +29,8 @@ const Modal = ({ className, onClose, children, ...props }: ModalProps) => {
     <div className={styles.modalWrapper}>
       <div className={styles.overlay} onClick={onClose} />
       <div {...props} className={cl(styles.modal, className)}>
-        <Cross className={styles.closeModal} onClick={onClose} />
         {children}
+        <Cross className={styles.closeModal} onClick={onClose} />
       </div>
     </div>,
     portal

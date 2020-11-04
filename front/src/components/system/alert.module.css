@@ -21,6 +21,11 @@
   background-color: var(--red-light);
 }
 
+.alertInfo {
+  border-color: var(--blue-medium);
+  background-color: var(--blue-light);
+}
+
 .alert > :global(.icon) {
   width: 20px;
   margin-right: 8px;
@@ -33,6 +38,10 @@
 
 .alertError :global(.icon) {
   stroke: var(--red-dark);
+}
+
+.alertInfo :global(.icon) {
+  stroke: var(--blue-dark);
 }
 
 .alertFilter {
@@ -57,6 +66,11 @@
 
 .collapsibleBar {
   cursor: pointer;
+  align-items: center;
+}
+
+.collapsibleBar > :global(.icon):first-child {
+  margin-right: 8px;
 }
 
 .collapsibleTitle {
