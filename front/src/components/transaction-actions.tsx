@@ -31,37 +31,11 @@ export const ExportActions = ({ isEmpty, onExportAll }: ExportActionsProps) => (
   </Button>
 )
 
-type DraftActionsProps = {
-  disabled: boolean
-  hasSelection: boolean
+type ImportActionsProps = {
   uploader: LotUploader
-  deleter: LotDeleter
-  validator: LotValidator
 }
 
-export const ProducerDraftActions = ({
-  disabled,
-  hasSelection,
-  uploader,
-  deleter,
-  validator,
-}: DraftActionsProps) => {
-  function onValidate() {
-    if (hasSelection) {
-      validator.validateSelection()
-    } else {
-      validator.validateAllDrafts()
-    }
-  }
-
-  function onDelete() {
-    if (hasSelection) {
-      deleter.deleteSelection()
-    } else {
-      deleter.deleteAllDrafts()
-    }
-  }
-
+export const ProducerImportActions = ({ uploader }: ImportActionsProps) => {
   async function onUpload() {
     const file = await prompt(
       "Import Excel",
@@ -75,63 +49,12 @@ export const ProducerDraftActions = ({
   }
 
   return (
-    <React.Fragment>
-      <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
-        Importer lots
-      </AsyncButton>
-
-      <Link relative to="add">
-        <Button icon={Plus} level="primary">
-          Créer lot
-        </Button>
-      </Link>
-
-      <AsyncButton
-        icon={Check}
-        level="success"
-        loading={validator.loading}
-        disabled={disabled}
-        onClick={onValidate}
-      >
-        Envoyer {hasSelection ? `sélection` : "tout"}
-      </AsyncButton>
-
-      <AsyncButton
-        icon={Cross}
-        level="danger"
-        loading={deleter.loading}
-        disabled={disabled}
-        onClick={onDelete}
-      >
-        Supprimer {hasSelection ? `sélection` : "tout"}
-      </AsyncButton>
-    </React.Fragment>
+    <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
+      Importer lots
+    </AsyncButton>
   )
 }
-
-export const TraderDraftActions = ({
-  disabled,
-  hasSelection,
-  uploader,
-  deleter,
-  validator,
-}: DraftActionsProps) => {
-  function onValidate() {
-    if (hasSelection) {
-      validator.validateSelection()
-    } else {
-      validator.validateAllDrafts()
-    }
-  }
-
-  function onDelete() {
-    if (hasSelection) {
-      deleter.deleteSelection()
-    } else {
-      deleter.deleteAllDrafts()
-    }
-  }
-
+export const TraderImportActions = ({ uploader }: ImportActionsProps) => {
   async function onUpload() {
     const file = await prompt(
       "Import Excel",
@@ -145,63 +68,13 @@ export const TraderDraftActions = ({
   }
 
   return (
-    <React.Fragment>
-      <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
-        Importer lots
-      </AsyncButton>
-
-      <Link relative to="add">
-        <Button icon={Plus} level="primary">
-          Créer lot
-        </Button>
-      </Link>
-
-      <AsyncButton
-        icon={Check}
-        level="success"
-        loading={validator.loading}
-        disabled={disabled}
-        onClick={onValidate}
-      >
-        Envoyer {hasSelection ? `sélection` : "tout"}
-      </AsyncButton>
-
-      <AsyncButton
-        icon={Cross}
-        level="danger"
-        loading={deleter.loading}
-        disabled={disabled}
-        onClick={onDelete}
-      >
-        Supprimer {hasSelection ? `sélection` : "tout"}
-      </AsyncButton>
-    </React.Fragment>
+    <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
+      Importer lots
+    </AsyncButton>
   )
 }
 
-export const OperatorDraftActions = ({
-  disabled,
-  hasSelection,
-  uploader,
-  deleter,
-  validator,
-}: DraftActionsProps) => {
-  function onValidate() {
-    if (hasSelection) {
-      validator.validateSelection()
-    } else {
-      validator.validateAllDrafts()
-    }
-  }
-
-  function onDelete() {
-    if (hasSelection) {
-      deleter.deleteSelection()
-    } else {
-      deleter.deleteAllDrafts()
-    }
-  }
-
+export const OperatorImportActions = ({ uploader }: ImportActionsProps) => {
   async function onUpload() {
     const file = await prompt(
       "Import Excel",
@@ -215,44 +88,31 @@ export const OperatorDraftActions = ({
   }
 
   return (
-    <React.Fragment>
-      <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
-        Importer lots
-      </AsyncButton>
-
-      <Link relative to="add">
-        <Button icon={Plus} level="primary">
-          Créer lot
-        </Button>
-      </Link>
-
-      <AsyncButton
-        icon={Check}
-        level="success"
-        loading={validator.loading}
-        disabled={disabled}
-        onClick={onValidate}
-      >
-        Valider {hasSelection ? `sélection` : "tout"}
-      </AsyncButton>
-
-      <AsyncButton
-        icon={Cross}
-        level="danger"
-        loading={deleter.loading}
-        disabled={disabled}
-        onClick={onDelete}
-      >
-        Supprimer {hasSelection ? `sélection` : "tout"}
-      </AsyncButton>
-    </React.Fragment>
+    <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
+      Importer lots
+    </AsyncButton>
   )
 }
 
-export const StockDraftActions = ({
+export const CreateActions = () => (
+  <Link relative to="add">
+    <Button icon={Plus} level="primary">
+      Créer lot
+    </Button>
+  </Link>
+)
+
+type DraftActionsProps = {
+  disabled: boolean
+  hasSelection: boolean
+  uploader: LotUploader
+  deleter: LotDeleter
+  validator: LotValidator
+}
+
+export const DraftActions = ({
   disabled,
   hasSelection,
-  uploader,
   deleter,
   validator,
 }: DraftActionsProps) => {
@@ -272,24 +132,8 @@ export const StockDraftActions = ({
     }
   }
 
-  async function onUpload() {
-    const file = await prompt(
-      "Import Excel",
-      "Importer un fichier Excel standardisé.",
-      StockImportPromptFactory(uploader)
-    )
-
-    if (file) {
-      uploader.uploadMassBalanceFile(file)
-    }
-  }
-
   return (
     <React.Fragment>
-      <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
-        Importer lots
-      </AsyncButton>
-
       <AsyncButton
         icon={Check}
         level="success"
@@ -310,6 +154,26 @@ export const StockDraftActions = ({
         Supprimer {hasSelection ? `sélection` : "tout"}
       </AsyncButton>
     </React.Fragment>
+  )
+}
+
+export const StockImportActions = ({ uploader }: ImportActionsProps) => {
+  async function onUpload() {
+    const file = await prompt(
+      "Import Excel",
+      "Importer un fichier Excel standardisé.",
+      StockImportPromptFactory(uploader)
+    )
+
+    if (file) {
+      uploader.uploadMassBalanceFile(file)
+    }
+  }
+
+  return (
+    <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
+      Importer lots
+    </AsyncButton>
   )
 }
 
