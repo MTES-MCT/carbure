@@ -81,6 +81,26 @@ export const OperatorImportPromptFactory = (uploader: LotUploader) => ({
   </ImportPrompt>
 )
 
+export const TraderImportPromptFactory = (uploader: LotUploader) => ({
+  onConfirm,
+  onCancel,
+}: PromptFormProps<File>) => (
+  <ImportPrompt onConfirm={onConfirm} onCancel={onCancel}>
+    <Box className={styles.importExplanation}>
+      Le modèle Excel permet d'importer dans Carbure des lots achetés auprès de
+      fournisseurs qui nous sont inconnus (fournisseurs étrangers ou producteurs
+      français captifs). Vous avez également la possibilité d'attribuer ces lots
+      à des clients étrangers.
+      <span
+        className={styles.downloadLink}
+        onClick={uploader.downloadTemplateTrader}
+      >
+        Télécharger le modèle
+      </span>
+    </Box>
+  </ImportPrompt>
+)
+
 export const StockImportPromptFactory = (uploader: LotUploader) => ({
   onConfirm,
   onCancel,

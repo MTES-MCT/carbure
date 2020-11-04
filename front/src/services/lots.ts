@@ -183,6 +183,12 @@ export function downloadTemplateOperator(entityID: number) {
   })
 }
 
+export function downloadTemplateTrader(entityID: number) {
+  return api.download("/lots/download-template-trader", {
+    entity_id: entityID,
+  })
+}
+
 export function updateLot(
   entityID: number,
   transactionID: number,

@@ -2,7 +2,7 @@
   color: var(--gray-dark);
   background-color: var(--gray-light);
   border-radius: 50px;
-  border: 1px solid var(--gray-highlight);
+  box-shadow: 1px 1px 3px var(--gray-medium);
   font-weight: 600;
   font-size: 14px;
   padding: 4px 16px;
