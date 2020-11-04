@@ -164,7 +164,12 @@ type StockTableProps = {
   selection: TransactionSelection
 }
 
-export const StockTable = ({ stock, status, sorting, selection }: StockTableProps) => {
+export const StockTable = ({
+  stock,
+  status,
+  sorting,
+  selection,
+}: StockTableProps) => {
   const relativePush = useRelativePush()
 
   const columns = []
@@ -180,7 +185,7 @@ export const StockTable = ({ stock, status, sorting, selection }: StockTableProp
 
   if (status.is(LotStatus.Draft)) {
     columns.push(C.selector(selection))
-  } 
+  }
 
   if (status.is(LotStatus.Inbox)) {
     columns.push(C.selector(selection))
@@ -195,7 +200,6 @@ export const StockTable = ({ stock, status, sorting, selection }: StockTableProp
   columns.push(...default_columns)
 
   if (stock === null) {
-    console.log("Stock null")
     return null
   }
 
