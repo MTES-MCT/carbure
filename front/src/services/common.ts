@@ -39,12 +39,15 @@ export function findTraders(query: string): Promise<Entity[]> {
   return api.get("/common/traders", { query })
 }
 
-export function findDeliverySites(query: string): Promise<DeliverySite[]> {
-  return api.get("/common/delivery-sites", { query })
+export function findProductionSites(
+  query?: string,
+  producerID?: number
+): Promise<ProductionSite[]> {
+  return api.get("/common/production-sites", { query, producer_id: producerID })
 }
 
-export function findProductionSites(query: string): Promise<ProductionSite[]> {
-  return api.get("/common/production-sites", { query })
+export function findDeliverySites(query: string): Promise<DeliverySite[]> {
+  return api.get("/common/delivery-sites", { query })
 }
 
 export function findGHG(

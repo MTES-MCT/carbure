@@ -10,14 +10,15 @@ import useAPI from "../../hooks/helpers/use-api"
 function useAutoComplete<T>(
   value: T,
   name: string,
+  queryArgs: any[],
   onChange: (e: any) => void,
   getLabel: (option: T) => string,
-  getQuery: (query: string) => Promise<T[]>
+  getQuery: (q: string, ...a: any[]) => Promise<T[]>
 ) {
   const dd = useDropdown()
 
   const [query, setQuery] = useState(getLabel(value))
-  const [suggestions, resolve] = useAPI<[string], T[]>(getQuery)
+  const [suggestions, resolveQuery] = useAPI(getQuery)
 
   // on change, modify the query to match selection and send event to parent
   function change(value: T) {
@@ -32,8 +33,8 @@ function useAutoComplete<T>(
 
   // refetch the list of suggestions when query changes
   useEffect(() => {
-    return resolve(query).cancel
-  }, [query, getQuery, resolve])
+    return resolveQuery(query, ...queryArgs).cancel
+  }, [query, getQuery, resolveQuery, ...queryArgs]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return { dd, query, suggestions, setQuery, change }
 }
@@ -41,16 +42,18 @@ function useAutoComplete<T>(
 type AutoCompleteProps<T> = Omit<LabelInputProps, "value"> & {
   value: T
   options?: T[]
+  queryArgs?: any[]
   getValue: (option: T) => string
   getLabel: (option: T) => string
   onChange: (e: any) => void
-  getQuery: (query: string) => Promise<T[]>
+  getQuery: (q: string, ...a: any[]) => Promise<T[]>
 }
 
 function AutoComplete<T>({
   value,
   name,
   options,
+  queryArgs = [],
   readOnly,
   onChange,
   getValue,
@@ -61,6 +64,7 @@ function AutoComplete<T>({
   const { dd, query, suggestions, setQuery, change } = useAutoComplete(
     value,
     name!,
+    queryArgs,
     onChange,
     getLabel,
     getQuery
