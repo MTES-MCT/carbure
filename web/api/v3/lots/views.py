@@ -635,8 +635,9 @@ def comment_lot(request):
         return JsonResponse({'status': 'error', 'message': "TX not found", 'extra': str(e)}, status=400)
 
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+
     # only the client, vendor and producer can comment
-    if tx.carbure_client not in rights or tx.carbure_vendor not in rights or tx.lot.carbure_producer not in rights:
+    if tx.carbure_client not in rights and tx.carbure_vendor not in rights and tx.lot.carbure_producer not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed to comment on this transaction"},
                             status=403)
 
