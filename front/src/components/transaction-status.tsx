@@ -5,8 +5,8 @@ import { Transaction } from "../services/types"
 import styles from "./transaction-status.module.css"
 import { Box, Title } from "./system"
 
-function getStatusText(tx: Transaction): string {
-  if (tx.lot.status === "Draft") {
+function getStatusText(tx: Transaction | undefined): string {
+  if (!tx || tx.lot.status === "Draft") {
     return "Brouillon"
   }
 
@@ -24,8 +24,8 @@ function getStatusText(tx: Transaction): string {
   }
 }
 
-function getStatusClass(tx: Transaction): string {
-  if (tx.lot.status === "Draft") return ""
+function getStatusClass(tx: Transaction | undefined): string {
+  if (!tx || tx.lot.status === "Draft") return ""
 
   switch (tx.delivery_status) {
     case "N":
@@ -42,7 +42,7 @@ function getStatusClass(tx: Transaction): string {
 
 type StatusProps = {
   small?: boolean
-  transaction: Transaction
+  transaction: Transaction | undefined
 }
 
 const Status = ({ small, transaction }: StatusProps) => (
@@ -59,7 +59,7 @@ const Status = ({ small, transaction }: StatusProps) => (
 
 type StatusTitleProps = {
   editable?: boolean
-  transaction: Transaction | undefined
+  transaction?: Transaction
   children: React.ReactNode
 }
 
@@ -70,7 +70,7 @@ export const StatusTitle = ({
 }: StatusTitleProps) => (
   <Box row className={styles.statusTitle}>
     <Title>{children}</Title>
-    {transaction && <Status transaction={transaction} />}
+    <Status transaction={transaction} />
     {!editable && (
       <span className={styles.transactionEditable}>
         (Ce lot ne peut pas être modifié)
