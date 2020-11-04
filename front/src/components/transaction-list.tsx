@@ -20,25 +20,28 @@ import { SpecialSelection } from "../hooks/query/use-special"
 
 import styles from "./transaction-list.module.css"
 
-import { AlertCircle, Calendar } from "./system/icons"
+import { AlertCircle } from "./system/icons"
 import { Box, LoaderOverlay } from "./system"
-import { Alert, AlertFilter } from "./system/alert"
+import { Alert } from "./system/alert"
 import Pagination from "./system/pagination"
 import { TransactionTable, StockTable } from "./transaction-table"
 
 import {
   ActionBar,
-  ProducerDraftActions,
-  OperatorDraftActions,
+  DraftActions,
+  ProducerImportActions,
+  OperatorImportActions,
   ExportActions,
   OutSummaryActions,
   InboxActions,
   InboxSummaryActions,
   ToFixActions,
   StockActions,
-  StockDraftActions,
-  TraderDraftActions,
+  StockImportActions,
+  TraderImportActions,
+  CreateActions,
 } from "./transaction-actions"
+import { DeadlineFilter, InvalidFilter } from "./special-filters"
 
 type TransactionListProps = {
   entity: Entity
@@ -104,36 +107,29 @@ export const TransactionList = ({
           />
 
           {status.is(LotStatus.Validated) && <OutSummaryActions />}
-          {((isOperator || isTrader) && status.is(LotStatus.Inbox)) && <InboxSummaryActions />}
 
-          {isProducer && status.is(LotStatus.Draft) && (
-            <ProducerDraftActions
-              disabled={isEmpty}
-              hasSelection={selection.selected.length > 0}
-              uploader={uploader}
-              deleter={deleter}
-              validator={validator}
-            />
+          {(isOperator || isTrader) && status.is(LotStatus.Inbox) && (
+            <InboxSummaryActions />
           )}
 
-          {isTrader && status.is(LotStatus.Draft) && (
-            <TraderDraftActions
-              disabled={isEmpty}
-              hasSelection={selection.selected.length > 0}
-              uploader={uploader}
-              deleter={deleter}
-              validator={validator}
-            />
-          )}
+          {status.is(LotStatus.Draft) && (
+            <React.Fragment>
+              {isProducer && <ProducerImportActions uploader={uploader} />}
 
-          {isOperator && status.is(LotStatus.Draft) && (
-            <OperatorDraftActions
-              disabled={isEmpty}
-              hasSelection={selection.selected.length > 0}
-              uploader={uploader}
-              deleter={deleter}
-              validator={validator}
-            />
+              {isTrader && <TraderImportActions uploader={uploader} />}
+
+              {isOperator && <OperatorImportActions uploader={uploader} />}
+
+              <CreateActions />
+
+              <DraftActions
+                disabled={isEmpty}
+                hasSelection={selection.selected.length > 0}
+                uploader={uploader}
+                deleter={deleter}
+                validator={validator}
+              />
+            </React.Fragment>
           )}
 
           {status.is(LotStatus.Inbox) && (
@@ -155,45 +151,15 @@ export const TransactionList = ({
       )}
 
       {errorCount > 0 && (
-        <AlertFilter
-          level="error"
-          icon={AlertCircle}
-          active={special.invalid}
-          onActivate={() => special.setInvalid(true)}
-          onDispose={() => special.setInvalid(false)}
-        >
-          {errorCount === 1 ? (
-            <span>
-              <b>1 lot</b> présente des <b>incohérences</b>
-            </span>
-          ) : (
-            <span>
-              <b>{errorCount} lots</b> présentent des <b>incohérences</b>
-            </span>
-          )}
-        </AlertFilter>
+        <InvalidFilter errorCount={errorCount} special={special} />
       )}
 
       {deadlineCount > 0 && (
-        <AlertFilter
-          level="warning"
-          icon={Calendar}
-          active={special.deadline}
-          onActivate={() => special.setDeadline(true)}
-          onDispose={() => special.setDeadline(false)}
-        >
-          {deadlineCount === 1 ? (
-            <span>
-              <b>1 lot</b> doit être validé et envoyé avant le{" "}
-              <b>{deadlineDate}</b>
-            </span>
-          ) : (
-            <span>
-              <b>{deadlineCount} lots</b> doivent être validés et envoyés avant
-              le <b>{deadlineDate}</b>
-            </span>
-          )}
-        </AlertFilter>
+        <DeadlineFilter
+          deadlineCount={deadlineCount}
+          deadlineDate={deadlineDate}
+          special={special}
+        />
       )}
 
       {!isError && isEmpty && (
@@ -281,7 +247,11 @@ export const StockList = ({
           {status.is(LotStatus.Inbox) && <InboxSummaryActions />}
 
           {status.is(LotStatus.Draft) && (
-            <StockDraftActions
+            <StockImportActions uploader={uploader} />
+          )}
+
+          {status.is(LotStatus.Draft) && (
+            <DraftActions
               disabled={isEmpty}
               hasSelection={selection.selected.length > 0}
               uploader={uploader}
