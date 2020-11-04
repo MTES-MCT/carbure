@@ -37,6 +37,7 @@ import {
   ToFixActions,
   StockActions,
   StockDraftActions,
+  TraderDraftActions,
 } from "./transaction-actions"
 
 type TransactionListProps = {
@@ -105,8 +106,18 @@ export const TransactionList = ({
           {status.is(LotStatus.Validated) && <OutSummaryActions />}
           {((isOperator || isTrader) && status.is(LotStatus.Inbox)) && <InboxSummaryActions />}
 
-          {(isProducer || isTrader) && status.is(LotStatus.Draft) && (
+          {isProducer && status.is(LotStatus.Draft) && (
             <ProducerDraftActions
+              disabled={isEmpty}
+              hasSelection={selection.selected.length > 0}
+              uploader={uploader}
+              deleter={deleter}
+              validator={validator}
+            />
+          )}
+
+          {isTrader && status.is(LotStatus.Draft) && (
+            <TraderDraftActions
               disabled={isEmpty}
               hasSelection={selection.selected.length > 0}
               uploader={uploader}

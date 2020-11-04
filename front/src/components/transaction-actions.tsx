@@ -17,6 +17,7 @@ import {
   ProducerImportPromptFactory,
   OperatorImportPromptFactory,
   StockImportPromptFactory,
+  TraderImportPromptFactory,
 } from "./import-prompt"
 
 type ExportActionsProps = {
@@ -66,6 +67,76 @@ export const ProducerDraftActions = ({
       "Import Excel",
       "Importer un fichier Excel standardisé.",
       ProducerImportPromptFactory(uploader)
+    )
+
+    if (file) {
+      uploader.uploadFile(file)
+    }
+  }
+
+  return (
+    <React.Fragment>
+      <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
+        Importer lots
+      </AsyncButton>
+
+      <Link relative to="add">
+        <Button icon={Plus} level="primary">
+          Créer lot
+        </Button>
+      </Link>
+
+      <AsyncButton
+        icon={Check}
+        level="success"
+        loading={validator.loading}
+        disabled={disabled}
+        onClick={onValidate}
+      >
+        Envoyer {hasSelection ? `sélection` : "tout"}
+      </AsyncButton>
+
+      <AsyncButton
+        icon={Cross}
+        level="danger"
+        loading={deleter.loading}
+        disabled={disabled}
+        onClick={onDelete}
+      >
+        Supprimer {hasSelection ? `sélection` : "tout"}
+      </AsyncButton>
+    </React.Fragment>
+  )
+}
+
+export const TraderDraftActions = ({
+  disabled,
+  hasSelection,
+  uploader,
+  deleter,
+  validator,
+}: DraftActionsProps) => {
+  function onValidate() {
+    if (hasSelection) {
+      validator.validateSelection()
+    } else {
+      validator.validateAllDrafts()
+    }
+  }
+
+  function onDelete() {
+    if (hasSelection) {
+      deleter.deleteSelection()
+    } else {
+      deleter.deleteAllDrafts()
+    }
+  }
+
+  async function onUpload() {
+    const file = await prompt(
+      "Import Excel",
+      "Importer un fichier Excel standardisé.",
+      TraderImportPromptFactory(uploader)
     )
 
     if (file) {

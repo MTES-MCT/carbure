@@ -14,6 +14,7 @@ export interface LotUploader {
   downloadTemplateAdvanced: () => void
   downloadTemplateMassBalance: () => void
   downloadTemplateOperator: () => void
+  downloadTemplateTrader: () => void
 }
 
 export default function useUploadLotFile(
@@ -70,6 +71,12 @@ export default function useUploadLotFile(
     }
   }
 
+  function downloadTemplateTrader() {
+    if (entity !== null) {
+      api.downloadTemplateTrader(entity.id)
+    }
+  }
+
   return {
     ...request,
     uploadFile,
@@ -79,5 +86,6 @@ export default function useUploadLotFile(
     downloadTemplateAdvanced,
     downloadTemplateMassBalance,
     downloadTemplateOperator,
+    downloadTemplateTrader,
   }
 }
