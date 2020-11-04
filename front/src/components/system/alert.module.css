@@ -50,6 +50,15 @@
   margin-left: auto;
 }
 
+.collapsibleAlert {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.collapsibleBar {
+  cursor: pointer;
+}
+
 .collapsibleTitle {
   font-size: 15px;
 }
