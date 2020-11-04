@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 
 export type FormFields = HTMLInputElement | HTMLTextAreaElement
 
@@ -36,10 +36,13 @@ export default function useForm<T>(initialState: T): FormHook<T> {
     })
   }
 
-  function setForm(state: T) {
-    hasChange.current = false
-    setFormState(state)
-  }
+  const setForm = useCallback(
+    (state: T) => {
+      hasChange.current = false
+      setFormState(state)
+    },
+    [setFormState]
+  )
 
   return [form, hasChange.current, change, setForm]
 }

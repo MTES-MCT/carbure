@@ -81,7 +81,7 @@ export default function useTransactionDetails(
     if (tx) {
       setForm(toTransactionFormState(tx))
     }
-  }, [tx])
+  }, [tx, setForm])
 
   return {
     form,
