@@ -12,6 +12,7 @@ export interface LotUploader {
   downloadTemplateSimple: () => void
   downloadTemplateAdvanced: () => void
   downloadTemplateMassBalance: () => void
+  downloadTemplateOperator: () => void
 }
 
 export default function useUploadLotFile(
@@ -19,7 +20,9 @@ export default function useUploadLotFile(
   refresh: () => void
 ): LotUploader {
   const [request, resolveUpload] = useAPI(api.uploadLotFile)
-  const [requestMB, resolveUploadMassBalance] = useAPI(api.uploadMassBalanceFile)
+  const [requestMB, resolveUploadMassBalance] = useAPI(
+    api.uploadMassBalanceFile
+  )
 
   async function uploadFile(file: File) {
     if (entity !== null) {
@@ -51,12 +54,19 @@ export default function useUploadLotFile(
     }
   }
 
+  function downloadTemplateOperator() {
+    if (entity !== null) {
+      api.downloadTemplateOperator(entity.id)
+    }
+  }
+
   return {
     ...request,
     uploadFile,
     uploadMassBalanceFile,
     downloadTemplateSimple,
     downloadTemplateAdvanced,
-    downloadTemplateMassBalance
+    downloadTemplateMassBalance,
+    downloadTemplateOperator,
   }
 }

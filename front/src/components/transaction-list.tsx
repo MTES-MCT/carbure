@@ -16,6 +16,7 @@ import { LotAcceptor } from "../hooks/actions/use-accept-lots"
 import { LotRejector } from "../hooks/actions/use-reject-lots"
 import { StatusSelection } from "../hooks/query/use-status"
 import { TransactionSelection } from "../hooks/query/use-selection"
+import { SpecialSelection } from "../hooks/query/use-special"
 
 import styles from "./transaction-list.module.css"
 
@@ -27,7 +28,8 @@ import { TransactionTable, StockTable } from "./transaction-table"
 
 import {
   ActionBar,
-  DraftActions,
+  ProducerDraftActions,
+  OperatorDraftActions,
   ExportActions,
   OutSummaryActions,
   InboxActions,
@@ -36,7 +38,6 @@ import {
   StockActions,
   StockDraftActions,
 } from "./transaction-actions"
-import { SpecialSelection } from "../hooks/query/use-special"
 
 type TransactionListProps = {
   entity: Entity
@@ -77,6 +78,9 @@ export const TransactionList = ({
     ? format(new Date(txs.deadlines.date), "d MMMM", { locale: fr })
     : null
 
+  const isProducer = entity.entity_type === "Producteur"
+  const isOperator = entity.entity_type === "Opérateur"
+
   const isLoading = transactions.loading
   const isError = transactions.error !== null
   const isEmpty = txs === null || txs.lots.length === 0
@@ -100,8 +104,18 @@ export const TransactionList = ({
           {status.is(LotStatus.Validated) && <OutSummaryActions />}
           {status.is(LotStatus.Accepted) && <InboxSummaryActions />}
 
-          {status.is(LotStatus.Draft) && (
-            <DraftActions
+          {isProducer && status.is(LotStatus.Draft) && (
+            <ProducerDraftActions
+              disabled={isEmpty}
+              hasSelection={selection.selected.length > 0}
+              uploader={uploader}
+              deleter={deleter}
+              validator={validator}
+            />
+          )}
+
+          {isOperator && status.is(LotStatus.Draft) && (
+            <OperatorDraftActions
               disabled={isEmpty}
               hasSelection={selection.selected.length > 0}
               uploader={uploader}
@@ -286,7 +300,12 @@ export const StockList = ({
       {!isError && !isEmpty && (
         <React.Fragment>
           <Box>
-            <StockTable stock={txs!} sorting={sorting} status={status} selection={selection} />
+            <StockTable
+              stock={txs!}
+              sorting={sorting}
+              status={status}
+              selection={selection}
+            />
             {isLoading && <LoaderOverlay />}
           </Box>
 
