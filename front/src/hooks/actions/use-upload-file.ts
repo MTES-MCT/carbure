@@ -22,12 +22,8 @@ export default function useUploadLotFile(
   refresh: () => void
 ): LotUploader {
   const [request, resolveUpload] = useAPI(api.uploadLotFile)
-  const [requestMB, resolveUploadMassBalance] = useAPI(
-    api.uploadMassBalanceFile
-  )
-  const [requestOperator, resolveUploadOperator] = useAPI(
-    api.uploadOperatorLotFile
-  )
+  const [, resolveUploadMassBalance] = useAPI(api.uploadMassBalanceFile)
+  const [, resolveUploadOperator] = useAPI(api.uploadOperatorLotFile)
 
   async function uploadFile(file: File) {
     if (entity !== null) {
