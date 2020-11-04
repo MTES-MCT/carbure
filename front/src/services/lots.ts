@@ -36,8 +36,8 @@ export function getStatus(transaction: Transaction, entity: number): LotStatus {
   const status = transaction.lot.status.toLowerCase()
   const delivery = transaction.delivery_status
 
-  const isProducer = transaction.carbure_vendor?.id === entity
-  const isOperator = transaction.carbure_client?.id === entity
+  const isVendor = transaction.carbure_vendor?.id === entity
+  const isClient = transaction.carbure_client?.id === entity
 
   if (status === "draft") {
     return LotStatus.Draft
@@ -46,11 +46,11 @@ export function getStatus(transaction: Transaction, entity: number): LotStatus {
       return LotStatus.Accepted
     }
     // OPERATEUR
-    else if (isOperator && ["N", "AA", "AC"].includes(delivery)) {
+    else if (isClient && ["N", "AA", "AC"].includes(delivery)) {
       return LotStatus.Inbox
     }
     // PRODUCTEUR
-    else if (isProducer) {
+    else if (isVendor) {
       if (["N", "AA"].includes(delivery)) {
         return LotStatus.Validated
       } else if (["AC", "R"].includes(delivery)) {

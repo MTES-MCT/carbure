@@ -106,6 +106,7 @@ export const TransactionTable = ({
 
   const isProducer = entity.entity_type === "Producteur"
   const isOperator = entity.entity_type === "Opérateur"
+  const isTrader = entity.entity_type === "Trader"
 
   let columns = []
 
@@ -119,7 +120,7 @@ export const TransactionTable = ({
     columns.push(C.empty)
   }
 
-  if (isProducer) {
+  if (isProducer || isTrader) {
     columns.push(...PRODUCER_COLUMNS)
   } else if (isOperator) {
     columns.push(...OPERATOR_COLUMNS)
@@ -131,7 +132,7 @@ export const TransactionTable = ({
     columns.push(getToFixActions({ onCorrect, onDelete }))
   } else if (status.is(LotStatus.Inbox)) {
     columns.push(getInboxActions({ onAccept, onComment, onReject }))
-  } else if (isProducer) {
+  } else if (isProducer || isTrader) {
     columns.push(getDuplicateActions({ onDuplicate }))
   } else {
     columns.push(C.arrow)
