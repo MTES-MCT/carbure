@@ -36,4 +36,5 @@ urlpatterns = [
     path('download-template-advanced', views.template_advanced, name='api-v3-template-advanced'),
     path('download-template-mass-balance', views.template_mass_balance, name='api-v3-template-mass-balance'),
     path('download-template-blend', views.template_blend, name='api-v3-template-blend'),
+    path('download-template-trader', views.template_trader, name='api-v3-template-trader'),
 ]
