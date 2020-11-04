@@ -1,8 +1,10 @@
 import { EntitySelection } from "./helpers/use-entity"
 
-import useAPI from "./helpers/use-api"
-import useTransactionForm from "../hooks/helpers/use-transaction-form"
+import useTransactionForm, {
+  toTransactionPostData,
+} from "../hooks/helpers/use-transaction-form"
 
+import useAPI from "./helpers/use-api"
 import useClose from "./helpers/use-close"
 import { addLot } from "../services/lots"
 
@@ -17,7 +19,7 @@ export default function useTransactionAdd(
   async function submit() {
     if (entity === null) return
 
-    const res = await resolve(entity.id, form)
+    const res = await resolve(entity.id, toTransactionPostData(form))
 
     if (res) {
       refresh()
