@@ -47,12 +47,6 @@ export default function useTransactionDetails(
   const validationErrors = details.data?.errors.validation_errors ?? []
   const status = tx && entity ? api.getStatus(tx, entity.id) : LotStatus.Weird
 
-  // if form data is not initialized, fill it instantly with data coming from transaction list
-  if (tx && (form.id === -1 || form.id !== tx.id)) {
-    // initialize the form with data coming from the loaded transaction
-    setForm(toTransactionFormState(tx))
-  }
-
   function refreshDetails() {
     if (entityID) {
       resolveDetails(entityID, txID)
@@ -67,7 +61,6 @@ export default function useTransactionDetails(
     if (res) {
       refresh()
       refreshDetails()
-      setForm(form)
     }
   }
 
@@ -83,6 +76,12 @@ export default function useTransactionDetails(
       return resolveDetails(entityID, txID).cancel
     }
   }, [resolveDetails, entityID, txID])
+
+  useEffect(() => {
+    if (tx) {
+      setForm(toTransactionFormState(tx))
+    }
+  }, [tx])
 
   return {
     form,

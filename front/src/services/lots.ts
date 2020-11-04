@@ -8,7 +8,6 @@ import {
   LotDetails,
 } from "./types"
 import { FilterSelection } from "../hooks/query/use-filters"
-import { TransactionFormState } from "../hooks/helpers/use-transaction-form"
 
 import api from "./api"
 
