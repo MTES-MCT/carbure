@@ -169,6 +169,7 @@ export const StockTable = ({ stock, status, sorting, selection }: StockTableProp
 
   const columns = []
   const default_columns = [
+    C.status,
     C.origine,
     C.biocarburant,
     C.matierePremiere,
