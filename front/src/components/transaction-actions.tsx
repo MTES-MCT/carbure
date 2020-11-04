@@ -77,6 +77,36 @@ const ImportPromptFactory = (uploader: LotUploader) => ({
   </Box>
 )
 
+const StockImportPromptFactory = (uploader: LotUploader) => ({
+  onConfirm,
+  onCancel,
+}: PromptFormProps<File>) => (
+  <Box style={{ maxWidth: 480 }}>
+    <Box className={styles.importExplanation}>
+      Ce modèle vous permet de créer des lots à partir de votre Mass Balance (onglet Lots en Stock)
+      <span
+        className={styles.downloadLink}
+        onClick={uploader.downloadTemplateMassBalance}
+      >
+        Télécharger le modèle
+      </span>
+    </Box>
+
+    <Box row className={styles.dialogButtons}>
+      <Button as="label" level="primary" icon={Upload}>
+        Importer lots
+        <input
+          type="file"
+          style={{ display: "none" }}
+          onChange={(e) => onConfirm(e!.target.files![0])}
+        />
+      </Button>
+      <Button onClick={onCancel}>Annuler</Button>
+    </Box>
+  </Box>
+)
+
+
 export const DraftActions = ({
   disabled,
   hasSelection,
@@ -174,11 +204,11 @@ export const StockDraftActions = ({
     const file = await prompt(
       "Import Excel",
       "Importer un fichier Excel standardisé.",
-      ImportPromptFactory(uploader)
+      StockImportPromptFactory(uploader)
     )
 
     if (file) {
-      uploader.uploadFile(file)
+      uploader.uploadMassBalanceFile(file)
     }
   }
 
