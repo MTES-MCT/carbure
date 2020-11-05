@@ -160,7 +160,7 @@ export function toTransactionPostData(tx: TransactionFormState) {
       : tx.unknown_delivery_site,
 
     delivery_site_country: !tx.delivery_site_is_in_carbure
-      ? tx.unknown_delivery_site_country
+      ? tx.unknown_delivery_site_country?.code_pays
       : "",
   }
 }
