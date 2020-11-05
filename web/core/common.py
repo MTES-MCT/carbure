@@ -43,11 +43,26 @@ def lot_is_valid(lot):
 
     if not lot.parent_lot:
         if not lot.biocarburant:
-            return False, 'Veuillez renseigner le type de biocarburant'
+            error = 'Veuillez renseigner le type de biocarburant'
+            LotV2Error.objects.update_or_create(lot=lot, field='biocarburant', value='', error=error)
+            return False, error
         if not lot.matiere_premiere:
-            return False, 'Veuillez renseigner la matière première'
+            error = 'Veuillez renseigner la matière première'
+            LotV2Error.objects.update_or_create(lot=lot, field='matiere_premiere', value='', error=error)
+            return False, error            
         if lot.producer_is_in_carbure and lot.carbure_production_site is None:
-            return False, 'Veuillez préciser le site de production'
+            error = 'Veuillez préciser le site de production'
+            LotV2Error.objects.update_or_create(lot=lot, field='carbure_production_site', value='', error=error)
+            return False, error            
+        if not lot.producer_is_in_carbure:
+            if not lot.unknown_production_site_com_date:
+                error = "Veuillez renseigner la date de mise en service de l'usine"
+                LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_com_date', value='', error=error)
+                return False, error                
+            if not lot.unknown_production_site_reference:
+                error = "Veuillez renseigner le certificat de l'usine de production ou du fournisseur"
+                LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_reference', value='', error=error)
+                return False, error                
     else:
         # no need to check lot info
         pass
@@ -160,11 +175,16 @@ def fill_producer_info(entity, lot_row, lot):
         lot.carbure_producer = None
         lot.unknown_producer = ''
     else:
-        # no producer column = simple template
-        # current entity is the producer
-        lot.producer_is_in_carbure = True
-        lot.carbure_producer = entity
-        lot.unknown_producer = ''
+        # no producer column = simple template (producer)
+        if entity.entity_type == 'Producteur':
+            # current entity is the producer
+            lot.producer_is_in_carbure = True
+            lot.carbure_producer = entity
+            lot.unknown_producer = ''
+        else:
+            lot.producer_is_in_carbure = False
+            lot.carbure_producer = None
+            lot.unknown_producer = ''
     return lot_errors
 
 
@@ -468,6 +488,26 @@ def fill_client_data(entity, lot_row, transaction):
     return tx_errors
 
 
+def fill_vendor_data(entity, lot_row, transaction):
+    tx_errors = []
+    # by default, assume we are the vendor / supplier
+    transaction.vendor_is_in_carbure = True
+    transaction.carbure_vendor = entity 
+    transaction.unknown_vendor = None
+    if 'vendor' in lot_row:
+        transaction.vendor_is_in_carbure = False
+        transaction.carbure_vendor = None
+        transaction.unknown_vendor = lot_row['vendor']
+    else:
+        # do nothing unless we are Operator
+        if entity.entity_type == 'Opérateur':
+            # as an operator, I am saving lots in Carbure but not specifying who sold them to me.
+            # so be it
+            transaction.vendor_is_in_carbure = False
+            transaction.carbure_vendor = None
+            transaction.unknown_vendor = ''
+    return tx_errors
+
 def fill_delivery_site_data(lot_row, transaction):
     tx_errors = []
     if 'delivery_site' in lot_row and lot_row['delivery_site'] is not None:
@@ -582,10 +622,6 @@ def load_lot(entity, user, lot_dict, source, transaction=None):
 
     if transaction is None:
         transaction = LotTransaction()
-        # done in bulk_insert
-        #transaction.lot = lot 
-        transaction.vendor_is_in_carbure = True
-        transaction.carbure_vendor = entity
     transaction.is_mac = False
     if 'mac' in lot_dict and lot_dict['mac'] == 1:
         transaction.is_mac = True
@@ -593,6 +629,7 @@ def load_lot(entity, user, lot_dict, source, transaction=None):
     tx_errors.append(fill_dae_data(lot_dict, transaction))
     tx_errors.append(fill_delivery_date(lot_dict, lot, transaction))
     tx_errors.append(fill_client_data(entity, lot_dict, transaction))
+    tx_errors.append(fill_vendor_data(entity, lot_dict, transaction))
     tx_errors.append(fill_delivery_site_data(lot_dict, transaction))
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
@@ -701,6 +738,7 @@ def validate_lots(user, tx_ids):
         # make sure all mandatory fields are set
         tx_valid, error = tx_is_valid(tx)
         if not tx_valid:
+            
             return JsonResponse({'status': 'error', 'message': "Invalid transaction: %s" % (error)}, status=400)
 
         lot_valid, error = lot_is_valid(tx.lot)

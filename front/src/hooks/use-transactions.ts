@@ -38,7 +38,7 @@ function useGetSnapshot(entity: EntitySelection, year: YearSelection) {
 
   // if the currently selected year is not in the list of available years
   // set it to the first available value
-  if (years && !years.some((option) => option.value === year.selected)) {
+  if (years?.length && !years.some((option) => option.value === year.selected)) {
     year.setYear(years[0].value as number)
   }
 
