@@ -2,17 +2,17 @@ import React from "react"
 import cl from "clsx"
 import differenceInCalendarMonths from "date-fns/differenceInCalendarMonths"
 
-import { Entity, Lots, LotStatus, Transaction } from "../services/types"
-import { SortingSelection } from "../hooks/query/use-sort-by" // prettier-ignore
-import { TransactionSelection } from "../hooks/query/use-selection"
-import { StatusSelection } from "../hooks/query/use-status"
+import { Entity, Lots, LotStatus, Transaction } from "../../services/types"
+import { SortingSelection } from "../../hooks/query/use-sort-by" // prettier-ignore
+import { TransactionSelection } from "../../hooks/query/use-selection"
+import { StatusSelection } from "../../hooks/query/use-status"
 
 import styles from "./transaction-table.module.css"
 
-import { useRelativePush } from "./relative-route"
+import { useRelativePush } from "../relative-route"
 
-import { AlertTriangle, Check, Copy, Cross } from "./system/icons"
-import Table, { Row } from "./system/table"
+import { AlertTriangle, Check, Copy, Cross } from "../system/icons"
+import Table, { Row } from "../system/table"
 import * as C from "./transaction-columns"
 
 export const PRODUCER_COLUMNS = [

@@ -1,15 +1,15 @@
 import React from "react"
 
-import { ApiState } from "../hooks/helpers/use-api"
-import { LotStatus, Snapshot, StockSnapshot } from "../services/types"
-import { StatusSelection } from "../hooks/query/use-status"
-import { YearSelection } from "../hooks/query/use-year"
+import { ApiState } from "../../hooks/helpers/use-api"
+import { LotStatus, Snapshot, StockSnapshot } from "../../services/types"
+import { StatusSelection } from "../../hooks/query/use-status"
+import { YearSelection } from "../../hooks/query/use-year"
 
 import styles from "./transaction-snapshot.module.css"
 
-import { Title, StatusButton } from "./system"
-import Select from "./system/select"
-import { Alert } from "./system/alert"
+import { Title, StatusButton } from "../system"
+import Select from "../system/select"
+import { Alert } from "../system/alert"
 
 const STATUS_ORDER = [
   LotStatus.Draft,

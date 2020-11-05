@@ -1,15 +1,15 @@
 import React from "react"
 
-import { LotStatus } from "../services/types"
-import { EntitySelection } from "../hooks/helpers/use-entity"
-import { LotDeleter } from "../hooks/actions/use-delete-lots"
-import { LotAcceptor } from "../hooks/actions/use-accept-lots"
-import { LotRejector } from "../hooks/actions/use-reject-lots"
-import { LotValidator } from "../hooks/actions/use-validate-lots"
+import { LotStatus } from "../../services/types"
+import { EntitySelection } from "../../hooks/helpers/use-entity"
+import { LotDeleter } from "../../hooks/actions/use-delete-lots"
+import { LotAcceptor } from "../../hooks/actions/use-accept-lots"
+import { LotRejector } from "../../hooks/actions/use-reject-lots"
+import { LotValidator } from "../../hooks/actions/use-validate-lots"
 
-import styles from "../components/transaction-form.module.css"
+import styles from "../../components/transaction/transaction-form.module.css"
 
-import useTransactionDetails from "../hooks/use-transaction-details"
+import useTransactionDetails from "../../hooks/use-transaction-details"
 
 import {
   AlertTriangle,
@@ -17,13 +17,13 @@ import {
   Cross,
   Return,
   Save,
-} from "../components/system/icons"
-import { AsyncButton, Button, LoaderOverlay } from "../components/system"
-import Modal from "../components/system/modal"
-import Comments from "../components/comments"
-import TransactionForm from "../components/transaction-form"
-import { StatusTitle } from "../components/transaction-status"
-import ValidationErrors from "../components/validation-errors"
+} from "../../components/system/icons"
+import { AsyncButton, Button, LoaderOverlay } from "../../components/system"
+import Modal from "../../components/system/modal"
+import Comments from "../../components/comments"
+import TransactionForm from "../../components/transaction/transaction-form"
+import { StatusTitle } from "../../components/transaction/transaction-status"
+import ValidationErrors from "../../components/validation-errors"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]

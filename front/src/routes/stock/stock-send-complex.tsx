@@ -1,10 +1,10 @@
 import React from "react"
-import { Title } from "../components/system"
+import { Title } from "../../components/system"
 
-import Modal from "../components/system/modal"
-import { StockSendComplexForm } from "../components/stock-send-complex-form"
-import { EntitySelection } from "../hooks/helpers/use-entity"
-import useTransactionInSummary from "../hooks/use-transaction-in-summary"
+import Modal from "../../components/system/modal"
+import { StockSendComplexForm } from "../../components/stock/stock-send-complex-form"
+import { EntitySelection } from "../../hooks/helpers/use-entity"
+import useTransactionInSummary from "../../hooks/use-transaction-in-summary"
 
 type StockSendComplexProps = {
   entity: EntitySelection

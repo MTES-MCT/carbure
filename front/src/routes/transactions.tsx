@@ -6,13 +6,14 @@ import useTransactions from "../hooks/use-transactions"
 
 import { Main } from "../components/system"
 import { Route, Switch } from "../components/relative-route"
-import { TransactionSnapshot } from "../components/transaction-snapshot"
-import { TransactionList } from "../components/transaction-list"
-import TransactionDetails from "./transaction-details"
-import TransactionAdd from "./transaction-add"
-import TransactionOutSummary from "./transaction-out-summary"
-import TransactionInSummary from "./transaction-in-summary"
-import TransactionFilters from "../components/transaction-filters"
+import { TransactionSnapshot } from "../components/transaction/transaction-snapshot"
+import { TransactionList } from "../components/transaction/transaction-list"
+import TransactionFilters from "../components/transaction/transaction-filters"
+
+import TransactionDetails from "./transaction/transaction-details"
+import TransactionAdd from "./transaction/transaction-add"
+import TransactionOutSummary from "./transaction/transaction-out-summary"
+import TransactionInSummary from "./transaction/transaction-in-summary"
 
 export const Transactions = ({ entity }: { entity: EntitySelection }) => {
   const {

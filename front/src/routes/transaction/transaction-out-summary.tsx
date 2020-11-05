@@ -1,10 +1,10 @@
 import React from "react"
 
-import { Title } from "../components/system"
-import Modal from "../components/system/modal"
-import TransactionOutSummaryForm from "../components/transaction-out-summary-form"
-import { EntitySelection } from "../hooks/helpers/use-entity"
-import useTransactionOutSummary from "../hooks/use-transaction-out-summary"
+import { Title } from "../../components/system"
+import Modal from "../../components/system/modal"
+import TransactionOutSummaryForm from "../../components/transaction/transaction-out-summary-form"
+import { EntitySelection } from "../../hooks/helpers/use-entity"
+import useTransactionOutSummary from "../../hooks/use-transaction-out-summary"
 
 type TransactionOutSummaryProps = {
   entity: EntitySelection

@@ -3,22 +3,22 @@ import cl from "clsx"
 
 import styles from "./transaction-actions.module.css"
 
-import { LotDeleter } from "../hooks/actions/use-delete-lots"
-import { LotUploader } from "../hooks/actions/use-upload-file"
-import { LotValidator } from "../hooks/actions/use-validate-lots"
-import { LotAcceptor } from "../hooks/actions/use-accept-lots"
-import { LotRejector } from "../hooks/actions/use-reject-lots"
+import { LotDeleter } from "../../hooks/actions/use-delete-lots"
+import { LotUploader } from "../../hooks/actions/use-upload-file"
+import { LotValidator } from "../../hooks/actions/use-validate-lots"
+import { LotAcceptor } from "../../hooks/actions/use-accept-lots"
+import { LotRejector } from "../../hooks/actions/use-reject-lots"
 
-import { Link } from "./relative-route"
-import { AsyncButton, Box, Button } from "./system"
-import { Check, Cross, Download, Plus, Rapport, Upload } from "./system/icons"
-import { prompt } from "./system/dialog"
+import { Link } from "../relative-route"
+import { AsyncButton, Box, Button } from "../system"
+import { Check, Cross, Download, Plus, Rapport, Upload } from "../system/icons"
+import { prompt } from "../system/dialog"
 import {
   ProducerImportPromptFactory,
   OperatorImportPromptFactory,
   StockImportPromptFactory,
   TraderImportPromptFactory,
-} from "./import-prompt"
+} from "../import-prompt"
 
 type ExportActionsProps = {
   isEmpty: boolean
