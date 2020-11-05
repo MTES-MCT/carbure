@@ -1,14 +1,14 @@
 import React from "react"
 import cl from "clsx"
 
-import { Transaction } from "../services/types"
-import { Column } from "./system/table"
-import { IconProps } from "./system/icons"
+import { Transaction } from "../../services/types"
+import { Column } from "../system/table"
+import { IconProps } from "../system/icons"
 
 import styles from "./transaction-columns.module.css"
 
-import { TransactionSelection } from "../hooks/query/use-selection"
-import { ChevronRight } from "./system/icons"
+import { TransactionSelection } from "../../hooks/query/use-selection"
+import { ChevronRight } from "../system/icons"
 import Status from "./transaction-status"
 
 type LineProps = { text: string; small?: boolean }

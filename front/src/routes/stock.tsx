@@ -4,12 +4,12 @@ import { EntitySelection } from "../hooks/helpers/use-entity"
 
 import { useStocks } from "../hooks/use-stock"
 import { Main } from "../components/system"
-import { StocksSnapshot } from "../components/transaction-snapshot"
-import { StockList } from "../components/transaction-list"
-import TransactionFilters from "../components/transaction-filters"
+import { StocksSnapshot } from "../components/transaction/transaction-snapshot"
+import { StockList } from "../components/transaction/transaction-list"
+import TransactionFilters from "../components/transaction/transaction-filters"
 import { Route, Switch } from "../components/relative-route"
-import { StockInSummary } from "./stock-in-summary"
-import { StockSendComplex } from "./stock-send-complex"
+import { StockInSummary } from "./stock/stock-in-summary"
+import { StockSendComplex } from "./stock/stock-send-complex"
 
 export const Stocks = ({ entity }: { entity: EntitySelection }) => {
   const {

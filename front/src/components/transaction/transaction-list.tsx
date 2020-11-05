@@ -2,28 +2,28 @@ import React from "react"
 import format from "date-fns/format"
 import fr from "date-fns/locale/fr"
 
-import { Entity, LotStatus } from "../services/types"
-import { SortingSelection } from "../hooks/query/use-sort-by" // prettier-ignore
-import { PageSelection } from "./system/pagination"
-import { StockHook } from "../hooks/use-stock"
+import { Entity, LotStatus } from "../../services/types"
+import { SortingSelection } from "../../hooks/query/use-sort-by" // prettier-ignore
+import { PageSelection } from "../system/pagination"
+import { StockHook } from "../../hooks/use-stock"
 
-import { LotGetter } from "../hooks/use-transactions"
-import { LotUploader } from "../hooks/actions/use-upload-file"
-import { LotDeleter } from "../hooks/actions/use-delete-lots"
-import { LotValidator } from "../hooks/actions/use-validate-lots"
-import { LotDuplicator } from "../hooks/actions/use-duplicate-lots"
-import { LotAcceptor } from "../hooks/actions/use-accept-lots"
-import { LotRejector } from "../hooks/actions/use-reject-lots"
-import { StatusSelection } from "../hooks/query/use-status"
-import { TransactionSelection } from "../hooks/query/use-selection"
-import { SpecialSelection } from "../hooks/query/use-special"
+import { LotGetter } from "../../hooks/use-transactions"
+import { LotUploader } from "../../hooks/actions/use-upload-file"
+import { LotDeleter } from "../../hooks/actions/use-delete-lots"
+import { LotValidator } from "../../hooks/actions/use-validate-lots"
+import { LotDuplicator } from "../../hooks/actions/use-duplicate-lots"
+import { LotAcceptor } from "../../hooks/actions/use-accept-lots"
+import { LotRejector } from "../../hooks/actions/use-reject-lots"
+import { StatusSelection } from "../../hooks/query/use-status"
+import { TransactionSelection } from "../../hooks/query/use-selection"
+import { SpecialSelection } from "../../hooks/query/use-special"
 
 import styles from "./transaction-list.module.css"
 
-import { AlertCircle } from "./system/icons"
-import { Box, LoaderOverlay } from "./system"
-import { Alert } from "./system/alert"
-import Pagination from "./system/pagination"
+import { AlertCircle } from "../system/icons"
+import { Box, LoaderOverlay } from "../system"
+import { Alert } from "../system/alert"
+import Pagination from "../system/pagination"
 import { TransactionTable, StockTable } from "./transaction-table"
 
 import {
@@ -41,7 +41,7 @@ import {
   TraderImportActions,
   CreateActions,
 } from "./transaction-actions"
-import { DeadlineFilter, InvalidFilter } from "./special-filters"
+import { DeadlineFilter, InvalidFilter } from "../special-filters"
 
 type TransactionListProps = {
   entity: Entity

@@ -1,13 +1,13 @@
 import React from "react"
 
-import { Filters, Snapshot } from "../services/types"
-import { FilterSelection } from "../hooks/query/use-filters"
-import { SearchSelection } from "../hooks/query/use-search"
+import { Filters, Snapshot } from "../../services/types"
+import { FilterSelection } from "../../hooks/query/use-filters"
+import { SearchSelection } from "../../hooks/query/use-search"
 
 import styles from "./transaction-filters.module.css"
 
-import { SearchInput } from "./system"
-import Select, { Option, SelectValue } from "./system/select"
+import { SearchInput } from "../system"
+import Select, { Option, SelectValue } from "../system/select"
 
 const FILTER_ORDER = [
   Filters.Periods,

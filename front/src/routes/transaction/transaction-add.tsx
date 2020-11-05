@@ -1,15 +1,15 @@
 import React from "react"
 
-import { EntitySelection } from "../hooks/helpers/use-entity"
+import { EntitySelection } from "../../hooks/helpers/use-entity"
 
-import styles from "../components/transaction-form.module.css"
+import styles from "../../components/transaction/transaction-form.module.css"
 
-import useTransactionAdd from "../hooks/use-transaction-add"
-import Modal from "../components/system/modal"
-import { AsyncButton, Button } from "../components/system"
-import { Plus, Return } from "../components/system/icons"
-import { StatusTitle } from "../components/transaction-status"
-import TransactionForm from "../components/transaction-form"
+import useTransactionAdd from "../../hooks/use-transaction-add"
+import Modal from "../../components/system/modal"
+import { AsyncButton, Button } from "../../components/system"
+import { Plus, Return } from "../../components/system/icons"
+import { StatusTitle } from "../../components/transaction/transaction-status"
+import TransactionForm from "../../components/transaction/transaction-form"
 
 type TransactionAddProps = {
   entity: EntitySelection

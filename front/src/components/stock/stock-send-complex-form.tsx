@@ -1,11 +1,11 @@
 import React from "react"
 
-import { TransactionOutSummaryFormState } from "../hooks/use-transaction-out-summary"
-import { StockSendComplex } from "../routes/stock-send-complex"
+import { TransactionOutSummaryFormState } from "../../hooks/use-transaction-out-summary"
+import { StockSendComplex } from "../../routes/stock/stock-send-complex"
 
 import styles from "./stock-send-complex-form.module.css"
 
-import { Box, Button, LabelCheckbox, LabelInput, LabelTextArea } from "./system"
+import { Box, Button, LabelCheckbox, LabelInput, LabelTextArea } from "../system"
 
 type StockSendComplexFormProps = {
   data: TransactionOutSummaryFormState

@@ -1,9 +1,9 @@
 import React from "react"
 import cl from "clsx"
 
-import { Transaction } from "../services/types"
+import { Transaction } from "../../services/types"
 import styles from "./transaction-status.module.css"
-import { Box, Title } from "./system"
+import { Box, Title } from "../system"
 
 function getStatusText(tx: Transaction | undefined): string {
   if (!tx || tx.lot.status === "Draft") {
