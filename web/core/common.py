@@ -219,10 +219,6 @@ def fill_production_site_info(entity, lot_row, lot):
         lot.production_site_is_in_carbure = False
         lot.carbure_production_site = None
         lot.unknown_production_site = ''
-        error = LotV2Error(lot=lot, field='production_site',
-                           error='Champ production_site introuvable dans le fichier excel',
-                           value=None)
-        lot_errors.append(error)
     if lot.producer_is_in_carbure is False:
         if 'production_site_country' in lot_row:
             production_site_country = lot_row['production_site_country']

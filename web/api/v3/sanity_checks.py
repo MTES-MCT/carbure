@@ -22,7 +22,6 @@ rules['GHG_REDUC_INF_65'] = "La réduction de gaz à effet de serre est inférie
 rules['MISSING_REF_DBL_COUNTING'] = "Numéro d'enregistrement Double Compte manquant"
 rules['VOLUME_FAIBLE'] = "Volume faible. La déclaration doit se faire en Litres."
 
-
 def raise_error(lot, rule_triggered, warning_to_user=True, warning_to_admin=False, block_validation=False, details=''):
     d = {'warning_to_user': warning_to_user,
          'warning_to_admin': warning_to_admin,
