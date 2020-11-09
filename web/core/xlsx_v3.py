@@ -9,47 +9,9 @@ django.setup()
 
 from core.models import MatierePremiere, Biocarburant, Pays, Depot, Entity, ProductionSite, LotTransaction
 
-
-def make_lots_sheet(workbook, entity):
-    worksheet_lots = workbook.add_worksheet("lots")
-    psites = ProductionSite.objects.filter(producer=entity)
-    eas = Entity.objects.filter(entity_type='Opérateur')
-    mps = MatierePremiere.objects.all()
-    bcs = Biocarburant.objects.all()
-    delivery_sites = Depot.objects.all()
-    countries = Pays.objects.all()
-
-    # header
-    bold = workbook.add_format({'bold': True})
-    columns = ['production_site_name', 'volume', 'biocarburant_code', 'matiere_premiere_code',
-               'pays_origine_code', 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'dae',
-               'client_id', 'ea_delivery_date', 'ea_name', 'ea_delivery_site']
-    for i, c in enumerate(columns):
-        worksheet_lots.write(0, i, c, bold)
-
-    volumes = [1200, 2800, 8000, 4500, 13000]
-    clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
-    today = datetime.date.today().strftime('%Y-%m-%d')
-
-    if not len(psites):
-        return
-
-    for i in range(10):
-        p = random.choice(psites)
-        mp = random.choice(mps)
-        ea = random.choice(eas)
-        bc = random.choice(bcs)
-        country = random.choice(countries)
-        site = random.choice(delivery_sites)
-        volume = random.choice(volumes)
-
-        row = [p.name, volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0,
-               'FR000000123', clientid, today, ea.name, site.depot_id]
-        colid = 0
-        for elem in row:
-            worksheet_lots.write(i+1, colid, elem)
-            colid += 1
-
+def get_random_dae():
+    today = datetime.date.today()
+    return 'TEST%dFR0000%d' % (today.year, random.randint(100000, 900000))
 
 def make_producers_lots_sheet_advanced(workbook, entity):
     worksheet_lots = workbook.add_worksheet("lots")
@@ -125,7 +87,7 @@ def make_producers_lots_sheet_advanced(workbook, entity):
                 continue
             p = random.choice(psites)
             row += [p.producer.name, p.name, p.country.code_pays, '', '', '']
-        row += [volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(0, 3), random.randint(0, 1), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, '2020FR0000%d' % (random.randint(100000, 900000)), clientid]
+        row += [volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(0, 3), random.randint(0, 1), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), clientid]
         if exported == 1:
             # client is not in carbure
             c = random.choice(foreign_clients)
@@ -177,7 +139,7 @@ def make_mb_extract_sheet(workbook, entity):
         exported = random.choice(exported_lots)
         lot_source = random.choice(mb_lots)
 
-        row = [lot_source.lot.carbure_id, int(lot_source.lot.volume / 2), '2020FR0000%d' % (random.randint(100000, 900000)), clientid]
+        row = [lot_source.lot.carbure_id, int(lot_source.lot.volume / 2), get_random_dae(), clientid]
         if exported == 1:
             # client is not in carbure
             c = random.choice(foreign_clients)
@@ -224,7 +186,7 @@ def make_producers_lots_sheet_simple(workbook, entity):
         volume = random.randint(34000, 36000)
 
         p = random.choice(psites)
-        row = [p.name, volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(0, 3), random.randint(0, 1), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, '2020FR0000%d' % (random.randint(100000, 900000)), clientid]
+        row = [p.name, volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(0, 3), random.randint(0, 1), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), clientid]
         row += [client.name, today, site.depot_id]
 
         colid = 0
@@ -289,7 +251,7 @@ def make_traders_lots_sheet(workbook, entity):
         row = []
         p = random.choice(unknown_producers)
         row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc']]
-        row += [vendor, volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(0, 3), random.randint(0, 1), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, '2020FR0000%d' % (random.randint(100000, 900000)), clientid]
+        row += [vendor, volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(0, 3), random.randint(0, 1), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), clientid]
         row += [client.name if client else '', today, site.depot_id, 'FR']
 
         colid = 0
@@ -349,7 +311,7 @@ def make_operators_lots_sheet(workbook, entity):
         row = []
         p = random.choice(unknown_producers)
         row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc']]
-        row += [vendor, volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(0, 3), random.randint(0, 1), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, '2020FR0000%d' % (random.randint(100000, 900000)), clientid]
+        row += [vendor, volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(0, 3), random.randint(0, 1), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), clientid]
         row += [today, site.depot_id]
 
         colid = 0
