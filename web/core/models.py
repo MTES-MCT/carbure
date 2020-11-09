@@ -500,13 +500,31 @@ class ISCCCertificateScope(models.Model):
         verbose_name_plural = 'ISCC Certificate Scopes'
 
 
+class DBSScope(models.Model):
+    certification_type = models.CharField(max_length=512, default='')
+
+    def natural_key(self):
+        return {'certification_type': self.certification_type}
+
+    def __str__(self):
+        return self.certification_type
+
+    class Meta:
+        db_table = 'dbs_scopes'
+        verbose_name = '2BS Scope'
+        verbose_name_plural = '2BS Scopes'
+
+
 class DBSCertificate(models.Model):
     certificate_id = models.CharField(max_length=64, null=False, blank=False)
     certificate_holder = models.CharField(max_length=256, null=False, blank=False)
-    holder_address = models.CharField(max_length=256, null=False, blank=False)
-    valid_from = models.DateField(null=False)
-    valid_until = models.DateField(null=False)
-    certification_type = models.CharField(max_length=256, default='')
+    # warning, this column must be manually altered in db to support utf8mb4
+    # command: ALTER TABLE dbs_certificates CHANGE certificate_holder certificate_holder VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    # do not change this field 
+    holder_address = models.CharField(max_length=512, null=False, blank=False)
+    valid_from = models.DateField()
+    valid_until = models.DateField()
+    certification_type = models.CharField(max_length=512, default='')
 
     def natural_key(self):
         return {'certificate_id': self.certificate_id,
