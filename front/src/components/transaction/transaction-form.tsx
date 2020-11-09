@@ -138,7 +138,7 @@ const TransactionForm = ({
         </Box>
         <Box>
           <LabelCheckbox
-            disabled={readOnly || isProducer || isTrader || isOperator}
+            disabled={readOnly || isTrader || isOperator}
             name="producer_is_in_carbure"
             label="Producteur enregistré sur Carbure ?"
             checked={tx.producer_is_in_carbure}
