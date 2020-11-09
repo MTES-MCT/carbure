@@ -19,7 +19,6 @@ urlpatterns = [
     path('accept-with-reserves', views.accept_with_reserves, name='api-v3-accept-lot-with-reserves'),
     path('reject', views.reject_lot, name='api-v3-reject-lot'),
     path('comment', views.comment_lot, name='api-v3-comment-lot'),
-    path('sanity-check', views.check_lot, name='api-v3-check-lot'),
 
     # SPECIAL
     path('delete-all-drafts', views.delete_all_drafts, name='api-v3-delete-all-drafts'),
