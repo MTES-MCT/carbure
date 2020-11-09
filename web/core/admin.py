@@ -155,8 +155,8 @@ class DBSCertificateScopeAdmin(admin.ModelAdmin):
 
 
 class DBSCertificateAdmin(admin.ModelAdmin):
-    list_display = ('certificate_id', 'certificate_holder', 'valid_from', 'valid_until')
-    search_fields = ('certificate_id', 'certificate_holder',)
+    list_display = ('certificate_id', 'certificate_holder', 'holder_address', 'valid_from', 'valid_until')
+    search_fields = ('certificate_id', 'certificate_holder', 'holder_address')
 
 
 class EntityISCCTradingCertificateAdmin(admin.ModelAdmin):
