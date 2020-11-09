@@ -17,6 +17,14 @@ def get_settings(request):
     return JsonResponse({'status': 'success', 'data': {'rights': rights_sez, 'email': request.user.email}})
 
 
+@check_rights('entity_id')
+def get_production_sites(request, *args, **kwargs):
+    context = kwargs['context']
+    psites = ProductionSite.objects.filter(producer=context['entity'])
+    psites_sez = [p.natural_key() for p in psites]
+    return JsonResponse({'status': 'success', 'data': psites_sez})
+
+
 def add_production_site(request):
     country = request.POST.get('country_code')
     name = request.POST.get('name')
