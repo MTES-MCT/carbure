@@ -309,7 +309,7 @@ class LotTransaction(models.Model):
 
 class LotV2Error(models.Model):
     lot = models.ForeignKey(LotV2, null=False, blank=False, on_delete=models.CASCADE)
-    field = models.CharField(max_length=32, null=False, blank=False)
+    field = models.CharField(max_length=64, null=False, blank=False)
     value = models.CharField(max_length=128, null=True, blank=True)
     error = models.CharField(max_length=256, null=False, blank=False)
 
@@ -327,7 +327,7 @@ class LotV2Error(models.Model):
 
 class TransactionError(models.Model):
     tx = models.ForeignKey(LotTransaction, null=False, blank=False, on_delete=models.CASCADE)
-    field = models.CharField(max_length=32, null=False, blank=False)
+    field = models.CharField(max_length=64, null=False, blank=False)
     value = models.CharField(max_length=128, null=True, blank=True)
     error = models.CharField(max_length=256, null=False, blank=False)
 
