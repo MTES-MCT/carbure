@@ -11,7 +11,8 @@ from authtools.forms import UserCreationForm
 from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays
 from core.models import GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
 from core.models import LotValidationError
-from core.models import ISCCScope, ISCCCertificate, ISCCCertificateRawMaterial, ISCCCertificateScope, DBSCertificate, DBSScope
+from core.models import ISCCScope, ISCCCertificate, ISCCCertificateRawMaterial, ISCCCertificateScope
+from core.models import DBSCertificate, DBSScope, DBSCertificateScope
 from core.models import EntityISCCTradingCertificate, EntityDBSTradingCertificate
 from api.v3.sanity_checks import queryset_sanity_check
 
@@ -147,6 +148,12 @@ class DBSScopeAdmin(admin.ModelAdmin):
     search_fields = ('certification_type', )
 
 
+class DBSCertificateScopeAdmin(admin.ModelAdmin):
+    list_display = ('certificate', 'scope')
+    search_fields = ('certificate', 'scope')
+    raw_id_fields = ('certificate', )
+
+
 class DBSCertificateAdmin(admin.ModelAdmin):
     list_display = ('certificate_id', 'certificate_holder', 'valid_from', 'valid_until')
     search_fields = ('certificate_id', 'certificate_holder',)
@@ -182,6 +189,7 @@ admin.site.register(ISCCCertificateRawMaterial, ISCCCertificateRawMaterialAdmin)
 admin.site.register(ISCCCertificateScope, ISCCCertificateScopeAdmin)
 admin.site.register(DBSCertificate, DBSCertificateAdmin)
 admin.site.register(DBSScope, DBSScopeAdmin)
+admin.site.register(DBSCertificateScope, DBSCertificateScopeAdmin)
 admin.site.register(EntityISCCTradingCertificate, EntityISCCTradingCertificateAdmin)
 admin.site.register(EntityDBSTradingCertificate, EntityDBSTradingCertificateAdmin)
 

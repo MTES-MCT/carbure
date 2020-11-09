@@ -513,7 +513,7 @@ class DBSScope(models.Model):
         db_table = 'dbs_scopes'
         verbose_name = '2BS Scope'
         verbose_name_plural = '2BS Scopes'
-
+        
 
 class DBSCertificate(models.Model):
     certificate_id = models.CharField(max_length=64, null=False, blank=False)
@@ -541,6 +541,19 @@ class DBSCertificate(models.Model):
         db_table = 'dbs_certificates'
         verbose_name = '2BS Certificate'
         verbose_name_plural = '2BS Certificates'
+
+
+class DBSCertificateScope(models.Model):
+    certificate = models.ForeignKey(DBSCertificate, blank=False, null=False, on_delete=models.CASCADE)
+    scope = models.ForeignKey(DBSScope, blank=False, null=False, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.scope.scope
+
+    class Meta:
+        db_table = 'dbs_certificates_scopes'
+        verbose_name = '2BS Certificate Scope'
+        verbose_name_plural = '2BS Certificate Scopes'
 
 
 class EntityISCCTradingCertificate(models.Model):
