@@ -19,6 +19,7 @@ import re
 rootUrl = 'https://www.iscc-system.org/wp-admin/admin-ajax.php?action=get_wdtable&table_id=1'
 DESTINATION_FOLDER = '/tmp/'
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+PAGELENGTH = 3000
 
 def get_wdtNonce():
     html_content = requests.get('https://www.iscc-system.org/certificates/all-certificates/', headers=HEADERS).text
@@ -34,14 +35,14 @@ def get_certificateData(nonce, recordsTotal, test):
     allData = []
     start = 0
     if test:
-        recordsTotal = 1000
+        recordsTotal = PAGELENGTH
     while start < recordsTotal:
         print(start)
-        r = requests.post(rootUrl, data ={'length': 1000, 'start': start, 'draw': 1, 'wdtNonce': nonce}, headers=HEADERS)
+        r = requests.post(rootUrl, data ={'length': PAGELENGTH, 'start': start, 'draw': 1, 'wdtNonce': nonce}, headers=HEADERS)
         certificates = json.loads(r.content.decode('utf-8')) 
         data = pd.DataFrame.from_dict(certificates['data'])
         allData.append(data)
-        start = start + 1000
+        start = start + PAGELENGTH
     return allData
 
 def cleanCertificateData(data):
