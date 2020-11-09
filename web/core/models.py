@@ -520,6 +520,7 @@ class DBSCertificate(models.Model):
     certificate_holder = models.CharField(max_length=256, null=False, blank=False)
     # warning, this column must be manually altered in db to support utf8mb4
     # command: ALTER TABLE dbs_certificates CHANGE certificate_holder certificate_holder VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    # command: ALTER TABLE dbs_certificates CHANGE holder_address holder_address VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
     # do not change this field 
     holder_address = models.CharField(max_length=512, null=False, blank=False)
     valid_from = models.DateField()
