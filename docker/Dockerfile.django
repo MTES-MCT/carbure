@@ -36,6 +36,7 @@ COPY web/api /app/web/api
 COPY web/run.sh /app/web/run.sh
 
 COPY scripts /app/scripts
+COPY cron /app/cron
 
 
 
