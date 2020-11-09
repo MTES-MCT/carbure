@@ -73,11 +73,11 @@ def generate_carbure_id(lot):
     today = datetime.date.today()
     # [PAYS][YYMM]P[IDProd]-[1....]-([S123])
     # FR2002P001-1
-    country = 'XX'
+    country = '00'
     if lot.carbure_production_site and lot.carbure_production_site.country:
         country = lot.carbure_production_site.country.code_pays
     yymm = today.strftime('%y%m')
-    idprod = 'XXX'
+    idprod = '000'
     if lot.carbure_producer:
         idprod = '%d' % (lot.carbure_producer.id)
     return "%s%sP%s-%d" % (country, yymm, idprod, lot.id)
