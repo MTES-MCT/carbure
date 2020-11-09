@@ -17,7 +17,8 @@ class ProductionSite(models.Model):
         return self.name
 
     def natural_key(self):
-        return {'name': self.name, 'country': self.country.natural_key(), 'id': self.id, 'date_mise_en_service': self.date_mise_en_service}
+        return {'name': self.name, 'country': self.country.natural_key(), 'id': self.id, 'date_mise_en_service': self.date_mise_en_service,
+        'inputs': self.productionsiteinput_set.all(), 'outputs': productionsiteoutput_set.all()}
 
     class Meta:
         db_table = 'producer_sites'
@@ -35,6 +36,9 @@ class ProductionSiteInput(models.Model):
     def __str__(self):
         return self.matiere_premiere.name
 
+    def natural_key():
+        return self.matiere_premiere.natural_key()
+
     class Meta:
         db_table = 'production_sites_input'
         verbose_name = 'Site de Production - Filiere'
@@ -50,6 +54,9 @@ class ProductionSiteOutput(models.Model):
 
     def __str__(self):
         return self.biocarburant.name
+
+    def natural_key():
+        return self.biocarburant.natural_key()
 
     class Meta:
         db_table = 'production_sites_output'
