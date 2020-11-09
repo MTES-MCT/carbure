@@ -92,7 +92,7 @@ def load_certificates():
             vu = row['valid_until'].split('.')
             valid_until = datetime.date(year=2000 + int(vu[2]), month=int(vu[1]), day=int(vu[0]))
         except:
-            valid_from = datetime.date(year=1970, month=1, day=1)            
+            valid_until = datetime.date(year=1970, month=1, day=1)            
         d = {'addons': row['addons'],
              'issuing_cb': row['issuing_cb'],
              'location': row['map'],
