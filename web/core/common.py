@@ -713,7 +713,11 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
         for e in errors:
             e.tx_id = tx.id
     flat_tx_errors = [item for sublist in tx_errors for item in sublist]
-    TransactionError.objects.bulk_create(flat_tx_errors, batch_size=100)    
+    TransactionError.objects.bulk_create(flat_tx_errors, batch_size=100)
+    # 8 run sanity checks
+    for lot in new_lots:
+        sanity_check(lot)
+    
 
 def validate_lots(user, tx_ids):
     for tx_id in tx_ids:

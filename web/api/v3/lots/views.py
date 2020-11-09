@@ -8,10 +8,8 @@ from django.db.models.fields import NOT_PROVIDED
 from django.http import JsonResponse, HttpResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment
-from core.xlsx_template import create_xslx_from_transactions, create_template_xlsx_v2_simple
-from core.xlsx_template import create_template_xlsx_v2_advanced, create_template_xlsx_v2_mb
-from core.xlsx_template import create_template_xlsx_v2_operators
-from core.xlsx_template import create_template_xlsx_v2_traders
+from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_stock, template_operators, template_traders
+from core.xlsx_v3 import export_transactions
 from core.common import validate_lots, load_excel_file, load_lot, bulk_insert
 from api.v3.sanity_checks import sanity_check
 
@@ -432,7 +430,6 @@ def add_lot(request):
     if not tx:
         return JsonResponse({'status': 'error', 'message': 'Could not add lot to database'}, status=400)
     bulk_insert(entity, [lot], [tx], [lot_errors], [tx_errors])
-    sanity_check(tx.lot)
     return JsonResponse({'status': 'success', 'data': tx.natural_key()})
 
 
@@ -655,23 +652,6 @@ def comment_lot(request):
     return JsonResponse({'status': 'success'})
 
 
-def check_lot(request):
-    tx_ids = request.POST.get('tx_ids', None)
-    if not tx_ids:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
-    for tx_id in tx_ids:
-        try:
-            tx = LotTransaction.objects.get(id=tx_id)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': "TX not found", 'extra': str(e)}, status=400)
-
-        rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-        if tx.carbure_client not in rights:
-            return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-        sanity_check(tx.lot)
-    return JsonResponse({'status': 'success'})
-
-
 def accept_all(request):
     entity_id = request.POST.get('entity_id', False)
     if not entity_id:
@@ -820,7 +800,7 @@ def template_simple(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    file_location = create_template_xlsx_v2_simple(entity)
+    file_location = template_producers_simple(entity)
     try:
         with open(file_location, 'rb') as f:
             file_data = f.read()
@@ -847,7 +827,7 @@ def template_advanced(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    file_location = create_template_xlsx_v2_advanced(entity)
+    file_location = template_producers_advanced(entity)
     try:
         with open(file_location, 'rb') as f:
             file_data = f.read()
