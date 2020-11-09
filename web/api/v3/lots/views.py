@@ -854,7 +854,7 @@ def template_mass_balance(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    file_location = create_template_xlsx_v2_mb(entity)
+    file_location = template_stock(entity)
     try:
         with open(file_location, 'rb') as f:
             file_data = f.read()

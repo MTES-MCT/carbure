@@ -177,7 +177,7 @@ def make_mb_extract_sheet(workbook, entity):
         exported = random.choice(exported_lots)
         lot_source = random.choice(mb_lots)
 
-        row = [lot_source.lot.carbure_id, int(lot_source.lot.volume / 2), 'FR000000123', clientid]
+        row = [lot_source.lot.carbure_id, int(lot_source.lot.volume / 2), '2020FR0000%d' % (random.randint(100000, 900000)), clientid]
         if exported == 1:
             # client is not in carbure
             c = random.choice(foreign_clients)
