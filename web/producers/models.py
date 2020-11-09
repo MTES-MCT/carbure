@@ -36,7 +36,7 @@ class ProductionSiteInput(models.Model):
     def __str__(self):
         return self.matiere_premiere.name
 
-    def natural_key():
+    def natural_key(self):
         return self.matiere_premiere.natural_key()
 
     class Meta:
@@ -55,7 +55,7 @@ class ProductionSiteOutput(models.Model):
     def __str__(self):
         return self.biocarburant.name
 
-    def natural_key():
+    def natural_key(self):
         return self.biocarburant.natural_key()
 
     class Meta:
