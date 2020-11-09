@@ -785,7 +785,7 @@ def validate_all_drafts(request):
     return validate_lots(request.user, tx_ids)
 
 
-def template_simple(request):
+def get_template_producers_simple(request):
     entity_id = request.GET.get('entity_id', False)
     if not entity_id:
         return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
@@ -812,7 +812,7 @@ def template_simple(request):
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
 
 
-def template_advanced(request):
+def get_template_producers_advanced(request):
     entity_id = request.GET.get('entity_id', False)
     if not entity_id:
         return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
@@ -839,7 +839,7 @@ def template_advanced(request):
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
 
 
-def template_mass_balance(request):
+def get_template_mass_balance(request):
     entity_id = request.GET.get('entity_id', False)
     if not entity_id:
         return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
@@ -866,7 +866,7 @@ def template_mass_balance(request):
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
 
 
-def template_blend(request):
+def get_template_blend(request):
     entity_id = request.GET.get('entity_id', False)
     if not entity_id:
         return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
@@ -881,7 +881,7 @@ def template_blend(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    file_location = create_template_xlsx_v2_operators(entity)
+    file_location = template_operators(entity)
     try:
         with open(file_location, 'rb') as f:
             file_data = f.read()
@@ -893,7 +893,7 @@ def template_blend(request):
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
 
 
-def template_trader(request):
+def get_template_trader(request):
     entity_id = request.GET.get('entity_id', False)
     if not entity_id:
         return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
@@ -908,7 +908,7 @@ def template_trader(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    file_location = create_template_xlsx_v2_traders(entity)
+    file_location = template_traders(entity)
     try:
         with open(file_location, 'rb') as f:
             file_data = f.read()

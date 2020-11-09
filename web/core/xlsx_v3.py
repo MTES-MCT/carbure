@@ -239,9 +239,8 @@ def make_traders_lots_sheet(workbook, entity):
     bcs = Biocarburant.objects.all()
     delivery_sites = Depot.objects.all()
     countries = Pays.objects.all()
-    eas = Entity.objects.filter(entity_type__in=['Opérateur', 'Trader'])
+    clients = Entity.objects.filter(entity_type__in=['Opérateur', 'Trader'])
 
-    # 3/10 chances of having an imported lot
     unknown_producers = [{'name': 'ITANOL', 'country': 'IT', 'production_site': 'BERGAMO', 'ref': 'ISCC-IT-100001010', 'date':'2017-12-01', 'dc':'IT_001_2020'},
                          {'name': 'ITANOL', 'country': 'IT', 'production_site': 'FIRENZE', 'ref': 'ISCC-IT-100001011', 'date':'2014-03-01', 'dc':''},
                          {'name': 'PORTUGASOIL', 'country': 'PT', 'production_site': 'LISBOA', 'ref': 'ISCC-PT-100001110', 'date':'2011-10-01', 'dc':''},
@@ -274,7 +273,6 @@ def make_traders_lots_sheet(workbook, entity):
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
 
-    volumes = [1200, 2800, 8000, 4500, 13000, 35000, 34960, 27854, 18000]
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
     today = datetime.date.today().strftime('%Y-%m-%d')
     for i in range(10):
@@ -283,16 +281,16 @@ def make_traders_lots_sheet(workbook, entity):
         bc = random.choice(bcs)
         country = random.choice(countries)
         site = random.choice(delivery_sites)
-        volume = random.choice(volumes)
-        ea = None
+        volume = random.randint(34000, 36000)
+        client = None
         if i % 3 == 1:
-            ea = random.choice(eas)
+            client = random.choice(clients)
 
         row = []
         p = random.choice(unknown_producers)
         row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc']]
-        row += [vendor, volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 'FR000000123', clientid]
-        row += [ea.name if ea else '', today, site.depot_id, 'FR']
+        row += [vendor, volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(0, 3), random.randint(0, 1), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, '2020FR0000%d' % (random.randint(100000, 900000)), clientid]
+        row += [client.name if client else '', today, site.depot_id, 'FR']
 
         colid = 0
         for elem in row:
@@ -307,7 +305,6 @@ def make_operators_lots_sheet(workbook, entity):
     delivery_sites = Depot.objects.all()
     countries = Pays.objects.all()
 
-    # 3/10 chances of having an imported lot
     unknown_producers = [{'name': 'ITANOL', 'country': 'IT', 'production_site': 'BERGAMO', 'ref': 'ISCC-IT-100001010', 'date':'2017-12-01', 'dc':'IT_001_2020'},
                          {'name': 'ITANOL', 'country': 'IT', 'production_site': 'FIRENZE', 'ref': 'ISCC-IT-100001011', 'date':'2014-03-01', 'dc':''},
                          {'name': 'PORTUGASOIL', 'country': 'PT', 'production_site': 'LISBOA', 'ref': 'ISCC-PT-100001110', 'date':'2011-10-01', 'dc':''},
@@ -340,7 +337,6 @@ def make_operators_lots_sheet(workbook, entity):
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
 
-    volumes = [1200, 2800, 8000, 4500, 13000, 35000, 34960, 27854, 18000]
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
     today = datetime.date.today().strftime('%Y-%m-%d')
     for i in range(10):
@@ -349,11 +345,11 @@ def make_operators_lots_sheet(workbook, entity):
         bc = random.choice(bcs)
         country = random.choice(countries)
         site = random.choice(delivery_sites)
-        volume = random.choice(volumes)
+        volume = random.randint(34000, 36000)
         row = []
         p = random.choice(unknown_producers)
         row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc']]
-        row += [vendor, volume, bc.code, mp.code, country.code_pays, 12, 4, 2, 0, 3.3, 0, 0, 0, 0, 'FR000000123', clientid]
+        row += [vendor, volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(0, 3), random.randint(0, 1), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, '2020FR0000%d' % (random.randint(100000, 900000)), clientid]
         row += [today, site.depot_id]
 
         colid = 0

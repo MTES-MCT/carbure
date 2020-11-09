@@ -31,9 +31,9 @@ urlpatterns = [
     path('upload-mass-balance', views.upload_mass_balance, name='api-v3-upload-mass-balance'),
     path('upload-blend', views.upload_blend, name='api-v3-upload-blend'),
 
-    path('download-template-simple', views.template_simple, name='api-v3-template-simple'),
-    path('download-template-advanced', views.template_advanced, name='api-v3-template-advanced'),
-    path('download-template-mass-balance', views.template_mass_balance, name='api-v3-template-mass-balance'),
-    path('download-template-blend', views.template_blend, name='api-v3-template-blend'),
-    path('download-template-trader', views.template_trader, name='api-v3-template-trader'),
+    path('download-template-simple', views.get_template_producers_simple, name='api-v3-template-simple'),
+    path('download-template-advanced', views.get_template_producers_advanced, name='api-v3-template-advanced'),
+    path('download-template-mass-balance', views.get_template_mass_balance, name='api-v3-template-mass-balance'),
+    path('download-template-blend', views.get_template_blend, name='api-v3-template-blend'),
+    path('download-template-trader', views.get_template_trader, name='api-v3-template-trader'),
 ]
