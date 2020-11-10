@@ -143,6 +143,7 @@ def fuse_lots(txs):
 
 def fill_producer_info(entity, lot_row, lot):
     lot_errors = []
+    print(lot_row)
     if 'producer' in lot_row and lot_row['producer'] is not None:
         # check if we know the producer
         if lot_row['producer'].strip() == entity.name:
@@ -166,6 +167,7 @@ def fill_producer_info(entity, lot_row, lot):
                 lot_errors.append(error)                
             else:
                 # ok, unknown producer. allow importation
+                print('should be here')
                 lot.producer_is_in_carbure = False
                 lot.carbure_producer = None
                 lot.unknown_producer = lot_row['producer']
@@ -348,7 +350,7 @@ def fill_pays_origine_info(lot_row, lot):
 def fill_ghg_info(lot_row, lot):
     lot_errors = []
     lot.eec = 0
-    if 'eec' in lot_row:
+    if 'eec' in lot_row and lot_row['eec'] is not None:
         eec = lot_row['eec']
         try:
             lot.eec = float(eec)
@@ -356,7 +358,7 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='eec', error='Format non reconnu', value=eec))
 
     lot.el = 0
-    if 'el' in lot_row:
+    if 'el' in lot_row and lot_row['el'] is not None:
         el = lot_row['el']
         try:
             lot.el = float(el)
@@ -364,7 +366,7 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='el', error='Format non reconnu', value=el))
 
     lot.ep = 0
-    if 'ep' in lot_row:
+    if 'ep' in lot_row and lot_row['ep'] is not None:
         ep = lot_row['ep']
         try:
             lot.ep = float(ep)
@@ -372,7 +374,7 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='ep', error='Format non reconnu', value=ep))
 
     lot.etd = 0
-    if 'etd' in lot_row:
+    if 'etd' in lot_row and lot_row['etd'] is not None:
         etd = lot_row['etd']
         try:
             lot.etd = float(etd)
@@ -380,7 +382,7 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='etd', error='Format non reconnu', value=etd))
 
     lot.eu = 0
-    if 'eu' in lot_row:
+    if 'eu' in lot_row and lot_row['eu'] is not None:
         eu = lot_row['eu']
         try:
             lot.eu = float(eu)
@@ -388,7 +390,7 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='eu', error='Format non reconnu', value=eu))
 
     lot.esca = 0
-    if 'esca' in lot_row:
+    if 'esca' in lot_row and lot_row['esca'] is not None:
         esca = lot_row['esca']
         try:
             lot.esca = float(esca)
@@ -396,7 +398,7 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='esca', error='Format non reconnu', value=esca))
 
     lot.eccs = 0
-    if 'eccs' in lot_row:
+    if 'eccs' in lot_row and lot_row['eccs'] is not None:
         eccs = lot_row['eccs']
         try:
             lot.eccs = float(eccs)
@@ -404,7 +406,7 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='eccs', error='Format non reconnu', value=eccs))
 
     lot.eccr = 0
-    if 'eccr' in lot_row:
+    if 'eccr' in lot_row and lot_row['eccr'] is not None:
         eccr = lot_row['eccr']
         try:
             lot.eccr = float(eccr)
@@ -412,7 +414,7 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='eccr', error='Format non reconnu', value=eccr))
 
     lot.eee = 0
-    if 'eee' in lot_row:
+    if 'eee' in lot_row and lot_row['eee'] is not None:
         eee = lot_row['eee']
         try:
             lot.eee = float(eee)
@@ -440,10 +442,9 @@ def fill_dae_data(lot_row, transaction):
 
 def fill_delivery_date(lot_row, lot, transaction):
     tx_errors = []
-    if 'delivery_date' not in lot_row or lot_row['delivery_date'] == '':
+    if 'delivery_date' not in lot_row or lot_row['delivery_date'] == '' or lot_row['delivery_date'] is None:
         transaction.delivery_date = datetime.date.today()
         lot.period = datetime.date.today().strftime('%Y-%m')
-        tx_errors.append(TransactionError(tx=transaction, field='delivery_date', error="Merci de préciser la date de livraison", value=None))
     else:
         try:
             delivery_date = lot_row['delivery_date']
@@ -659,13 +660,14 @@ def load_excel_file(entity, user, file, mass_balance=False):
         txs_to_insert = []
         lot_errors = []
         tx_errors = []
-        for lot in lots:
+        for lot_row in lots:
             try:
                 if mass_balance:
-                    lot, tx, l_errors, t_errors = load_mb_lot(entity, user, lot, 'EXCEL')
+                    lot, tx, l_errors, t_errors = load_mb_lot(entity, user, lot_row, 'EXCEL')
                 else:
-                    lot, tx, l_errors, t_errors = load_lot(entity, user, lot, 'EXCEL')
+                    lot, tx, l_errors, t_errors = load_lot(entity, user, lot_row, 'EXCEL')
                 if lot is None:
+                    print('Could not load lot %s' % (lot_row))
                     continue
                 lots_loaded += 1
                 lots_to_insert.append(lot)
@@ -715,6 +717,7 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
     flat_tx_errors = [item for sublist in tx_errors for item in sublist]
     TransactionError.objects.bulk_create(flat_tx_errors, batch_size=100)
     # 8 run sanity checks
+    # can we run in parallel ?
     for lot in new_lots:
         sanity_check(lot)
     
