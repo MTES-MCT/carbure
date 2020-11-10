@@ -193,12 +193,17 @@ export function updateLot(
   entityID: number,
   transactionID: number,
   params: any
-): Promise<Transaction> {
-  return api.post("/lots/update", {
-    entity_id: entityID,
-    tx_id: transactionID,
-    ...params,
-  })
+): Promise<boolean> {
+  return (
+    api
+      .post("/lots/update", {
+        entity_id: entityID,
+        tx_id: transactionID,
+        ...params,
+      })
+      // resolve to true if it was a success
+      .then(() => true)
+  )
 }
 
 export function duplicateLot(entityID: number, transactionID: number) {

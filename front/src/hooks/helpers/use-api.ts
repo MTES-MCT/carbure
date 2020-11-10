@@ -36,10 +36,10 @@ const initialState = {
   data: null,
 }
 
-type CancelablePromise = Promise<boolean> & { cancel?: () => void }
-type Resolver<T extends any[]> = (...args: T) => CancelablePromise
+type CancelablePromise<T> = Promise<T | undefined> & { cancel?: () => void }
+type Resolver<T extends any[], U> = (...args: T) => CancelablePromise<U>
 type ApiReducer<T> = React.Reducer<ApiState<T>, ApiAction<T>>
-type ApiHook<T extends any[], U> = [ApiState<U>, Resolver<T>]
+type ApiHook<T extends any[], U> = [ApiState<U>, Resolver<T, U>]
 
 function useAPI<T extends any[], U>(
   createPromise: (...args: T) => Promise<U>
@@ -52,7 +52,7 @@ function useAPI<T extends any[], U>(
       let cancelled = false
 
       // returns true if it was a success, false otherwise
-      const resolve = async () => {
+      async function resolve() {
         if (!cancelled) {
           // signal that the request process started
           dispatch({ type: ApiStatus.Pending })
@@ -65,7 +65,7 @@ function useAPI<T extends any[], U>(
           // dispatch the data if it was a success
           if (!cancelled) {
             dispatch({ type: ApiStatus.Success, payload: res })
-            return true
+            return res
           }
         } catch (err) {
           // otherwise save the error
@@ -73,11 +73,9 @@ function useAPI<T extends any[], U>(
             dispatch({ type: ApiStatus.Error, payload: err.message })
           }
         }
-
-        return false
       }
 
-      const promise: CancelablePromise = resolve()
+      const promise: CancelablePromise<U> = resolve()
       promise.cancel = () => { cancelled = true } // prettier-ignore
 
       return promise

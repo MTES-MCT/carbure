@@ -432,8 +432,8 @@ def add_lot(request):
     lot, tx, lot_errors, tx_errors = load_lot(entity, request.user, request.POST.dict(), 'MANUAL')
     if not tx:
         return JsonResponse({'status': 'error', 'message': 'Could not add lot to database'}, status=400)
-    bulk_insert(entity, [lot], [tx], [lot_errors], [tx_errors])
-    return JsonResponse({'status': 'success', 'data': tx.natural_key()})
+    new_lots, new_txs = bulk_insert(entity, [lot], [tx], [lot_errors], [tx_errors])
+    return JsonResponse({'status': 'success', 'data': new_txs[0].natural_key()})
 
 
 def update_lot(request):

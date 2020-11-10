@@ -4,6 +4,7 @@ import useTransactionForm, {
   toTransactionPostData,
 } from "../hooks/helpers/use-transaction-form"
 
+import { useRelativePush } from "../components/relative-route"
 import useAPI from "./helpers/use-api"
 import useClose from "./helpers/use-close"
 import { addLot } from "../services/lots"
@@ -13,6 +14,7 @@ export default function useTransactionAdd(
   refresh: () => void
 ) {
   const close = useClose("../")
+  const relativePush = useRelativePush()
   const [form, hasChange, change] = useTransactionForm(entity)
   const [request, resolve] = useAPI(addLot)
 
@@ -23,7 +25,7 @@ export default function useTransactionAdd(
 
     if (res) {
       refresh()
-      close()
+      relativePush(`../${res.id}`)
     }
   }
 
