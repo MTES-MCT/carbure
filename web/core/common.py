@@ -172,7 +172,6 @@ def fuse_lots(txs):
 
 def fill_producer_info(entity, lot_row, lot):
     lot_errors = []
-    print(lot_row)
     if 'producer' in lot_row and lot_row['producer'] is not None:
         # check if we know the producer
         if lot_row['producer'].strip() == entity.name:
@@ -196,7 +195,6 @@ def fill_producer_info(entity, lot_row, lot):
                 lot_errors.append(error)                
             else:
                 # ok, unknown producer. allow importation
-                print('should be here')
                 lot.producer_is_in_carbure = False
                 lot.carbure_producer = None
                 lot.unknown_producer = lot_row['producer']
@@ -329,7 +327,6 @@ def fill_matiere_premiere_info(lot_row, lot):
                                          error='Matière Première inconnue',
                                          value=matiere_premiere))
     else:
-        print('here')
         lot.matiere_premiere = None
         lot_errors.append(LotV2Error(lot=lot, field='matiere_premiere_code',
                                      error='Merci de préciser la matière première',
@@ -700,7 +697,6 @@ def load_excel_file(entity, user, file, mass_balance=False):
                 else:
                     lot, tx, l_errors, t_errors = load_lot(entity, user, lot_row, 'EXCEL')
                 if lot is None:
-                    print('Could not load lot %s' % (lot_row))
                     continue
                 lots_loaded += 1
                 lots_to_insert.append(lot)
@@ -708,7 +704,6 @@ def load_excel_file(entity, user, file, mass_balance=False):
                 lot_errors.append(l_errors)
                 tx_errors.append(t_errors)
             except Exception as e:
-                print('Could not load %s' % (lot_row))
                 print(e)
         bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors)
         return lots_loaded, total_lots
