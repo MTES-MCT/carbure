@@ -9,7 +9,7 @@
   align-self: center;
 }
 
-.paginationButton {
+button.paginationButton {
   margin: 0 8px;
   padding: 8px;
   width: 42px;
