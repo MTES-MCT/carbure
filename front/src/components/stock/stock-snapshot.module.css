@@ -1,0 +1,32 @@
+.stockSnapshot {
+  background-color: var(--gray-light);
+  padding: 32px 120px;
+  margin-top: 1px;
+}
+
+.stockHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.stockStatus {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+.stockStatus button {
+  display: flex;
+  margin: 0 12px;
+  flex: 1;
+}
+
+.stockStatus button:first-child {
+  margin-left: 0;
+}
+
+.stockStatus button:last-child {
+  margin-right: 0;
+}

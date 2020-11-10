@@ -31,7 +31,7 @@ const STATUS_LABEL = {
   [LotStatus.Stock]: { singular: "Lot en stock", plural: "Lots en stock" },
 }
 
-function mapStatus(
+export function mapStatus(
   statuses: { [key: string]: number } | undefined
 ): [LotStatus, string, number][] {
   if (!statuses) return []
@@ -78,38 +78,6 @@ export const TransactionSnapshot = ({
             options={snapshot.data?.years ?? []}
             onChange={(value) => year.setYear(value as number)}
           />
-        </div>
-
-        <div className={styles.transactionStatus}>
-          {mapStatus(snapshot.data?.lots).map(([key, label, amount]) => (
-            <StatusButton
-              key={key}
-              active={key === status.active}
-              loading={snapshot.loading}
-              amount={amount}
-              label={label}
-              onClick={() => status.setActive(key)}
-            />
-          ))}
-        </div>
-      </React.Fragment>
-    )}
-  </div>
-)
-
-type StockSnapshotProps = {
-  snapshot: ApiState<StockSnapshot>
-  status: StatusSelection
-}
-
-export const StocksSnapshot = ({ snapshot, status }: StockSnapshotProps) => (
-  <div className={styles.transactionSnapshot}>
-    {snapshot.error && <Alert level="error">{snapshot.error}</Alert>}
-
-    {!snapshot.error && (
-      <React.Fragment>
-        <div className={styles.transactionHeader}>
-          <Title>Stock</Title>
         </div>
 
         <div className={styles.transactionStatus}>
