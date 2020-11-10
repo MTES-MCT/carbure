@@ -509,7 +509,7 @@ def export_transactions(entity, transactions):
     make_countries_sheet(workbook)
     make_mps_sheet(workbook)
     make_biofuels_sheet(workbook)
-    make_operators_lots_sheet(workbook)
+    make_clients_sheet(workbook)
     make_deliverysites_sheet(workbook)
     workbook.close()
     return location
