@@ -748,6 +748,8 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
     # can we run in parallel ?
     for lot in new_lots:
         sanity_check(lot)
+
+    return new_lots, new_txs
     
 
 def validate_lots(user, tx_ids):
