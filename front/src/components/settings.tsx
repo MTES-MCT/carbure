@@ -3,24 +3,36 @@ import { EntitySelection } from "../hooks/helpers/use-entity"
 import { SettingsGetter } from "../hooks/use-app"
 
 import styles from "./settings.module.css"
-import useApi from "../hooks/helpers/use-api"
-import { enableMAC, disableMAC, disableTrading, enableTrading } from "../services/settings"
 
-import { Box } from "./system"
+import {
+  enableMAC,
+  disableMAC,
+  disableTrading,
+  enableTrading,
+} from "../services/settings"
+import useAPI from "../hooks/helpers/use-api"
+import { Section, BoxProps, Title, LabelCheckbox } from "./system"
+
+export const SettingsHeader = (props: BoxProps) => (
+  <div className={styles.settingsTop}>
+    <div {...props} className={styles.settingsHeader} />
+  </div>
+)
+
+export const SettingsBody = (props: BoxProps) => (
+  <div {...props} className={styles.settingsBody} />
+)
 
 type GeneralSettingsProps = {
   entity: EntitySelection
   settings: SettingsGetter
 }
 
-export const GeneralSettings = ({ entity, settings }: GeneralSettingsProps) => {
+export const MACSettings = ({ entity, settings }: GeneralSettingsProps) => {
   const hasMAC: boolean = entity?.has_mac ?? false
-  const hasTrading: boolean = entity?.has_trading ?? false
-  const [macEnabled, resolveMacEnabled] = useApi(enableMAC)
-  const [macDisabled, resolveMacDisabled] = useApi(disableMAC)
-  const [tradingEnabled, resolveTradingEnabled] = useApi(enableTrading)
-  const [tradingDisabled, resolveTradingDisabled] = useApi(disableTrading)
 
+  const [requestEnable, resolveMacEnabled] = useAPI(enableMAC)
+  const [requestDisable, resolveMacDisabled] = useAPI(disableMAC)
 
   function onChangeMac(event: React.ChangeEvent<HTMLInputElement>): void {
     if (entity === null) {
@@ -33,10 +45,34 @@ export const GeneralSettings = ({ entity, settings }: GeneralSettingsProps) => {
     }
   }
 
+  if (entity === null) {
+    return null
+  }
+
+  return (
+    <Section>
+      <Title>Mises à Consommation</Title>
+
+      <LabelCheckbox
+        label="Ma société effectue des Mises à Consommation"
+        checked={hasMAC}
+        onChange={onChangeMac}
+      />
+    </Section>
+  )
+}
+
+export const TradingSettings = ({ entity, settings }: GeneralSettingsProps) => {
+  const hasTrading: boolean = entity?.has_trading ?? false
+
+  const [requestEnable, resolveTradingEnabled] = useAPI(enableTrading)
+  const [requestDisable, resolveTradingDisabled] = useAPI(disableTrading)
+
   function onChangeTrading(event: React.ChangeEvent<HTMLInputElement>): void {
     if (entity === null) {
       return
     }
+
     if (event.target.checked) {
       resolveTradingEnabled(entity.id).then(settings.resolve)
     } else {
@@ -44,52 +80,31 @@ export const GeneralSettings = ({ entity, settings }: GeneralSettingsProps) => {
     }
   }
 
-  if (entity === null) {
-    return null
-  }
-
   return (
-    <Box>
-      <fieldset>
-        <h3>Mises à Consommation</h3>
-        <input
-          type="checkbox"
-          defaultChecked={hasMAC}
-          onChange={onChangeMac}
-          name="hasMAC"
-        />
-        <label>Ma société effectue des Mises à Consommation</label>
-        <h3>Trading</h3>
-        <input 
-          type="checkbox" 
-          defaultChecked={hasTrading} 
-          onChange={onChangeTrading}
-          name="hasTrading" 
-        />
-        <label>Ma société a une activité de négoce</label>
-      </fieldset>
-    </Box>
+    <Section>
+      <Title>Trading</Title>
+
+      <LabelCheckbox
+        label="Ma société a une activité de négoce"
+        checked={hasTrading}
+        onChange={onChangeTrading}
+      />
+    </Section>
   )
 }
 
-type ProductionSitesSettingsProps = {
-  data: number
-}
+type ProductionSitesSettingsProps = {}
 
-export const ProductionSitesSettings = ({
-  data,
-}: ProductionSitesSettingsProps) => (
-  <Box>
-    <p>Sites de Production</p>
-  </Box>
+export const ProductionSitesSettings = ({}: ProductionSitesSettingsProps) => (
+  <Section>
+    <Title>Sites de Production</Title>
+  </Section>
 )
 
-type DeliverySitesSettingsProps = {
-  data: number
-}
+type DeliverySitesSettingsProps = {}
 
-export const DeliverySitesSettings = ({ data }: DeliverySitesSettingsProps) => (
-  <Box>
-    <p>Dépôts</p>
-  </Box>
+export const DeliverySitesSettings = ({}: DeliverySitesSettingsProps) => (
+  <Section>
+    <Title>Dépôts</Title>
+  </Section>
 )

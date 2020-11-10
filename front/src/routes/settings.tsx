@@ -3,11 +3,12 @@ import React from "react"
 import { EntitySelection } from "../hooks/helpers/use-entity"
 import { SettingsGetter } from "../hooks/helpers/use-get-settings"
 
-import styles from "../components/settings.module.css"
-
-import { Main, Box, Title } from "../components/system"
+import { Main, Title } from "../components/system"
 import {
-  GeneralSettings,
+  SettingsHeader,
+  SettingsBody,
+  MACSettings,
+  TradingSettings,
   ProductionSitesSettings,
   DeliverySitesSettings,
 } from "../components/settings"
@@ -20,14 +21,16 @@ type SettingsProps = {
 const Settings = ({ entity, settings }: SettingsProps) => {
   return (
     <Main>
-      <Box className={styles.settingsTop}>
-        <div className={styles.settingsHeader}>
-          <Title>Paramètres</Title>
-        </div>
-      </Box>
-      <GeneralSettings entity={entity} settings={settings} />
-      <ProductionSitesSettings data={0} />
-      <DeliverySitesSettings data={0} />
+      <SettingsHeader>
+        <Title>Paramètres</Title>
+      </SettingsHeader>
+
+      <SettingsBody>
+        <MACSettings entity={entity} settings={settings} />
+        <TradingSettings entity={entity} settings={settings} />
+        <ProductionSitesSettings />
+        <DeliverySitesSettings />
+      </SettingsBody>
     </Main>
   )
 }
