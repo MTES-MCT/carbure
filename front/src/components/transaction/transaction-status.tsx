@@ -1,9 +1,12 @@
 import React from "react"
 import cl from "clsx"
+import format from "date-fns/format"
+import fr from "date-fns/locale/fr"
 
-import { Transaction } from "../../services/types"
+import { LotDetails, Transaction } from "../../services/types"
 import styles from "./transaction-status.module.css"
 import { Box, Title } from "../system"
+import { hasDeadline } from "./transaction-table"
 
 function getStatusText(tx: Transaction | undefined): string {
   if (!tx || tx.lot.status === "Draft") {
@@ -59,24 +62,37 @@ const Status = ({ small, transaction }: StatusProps) => (
 
 type StatusTitleProps = {
   editable?: boolean
-  transaction?: Transaction
+  details?: LotDetails | null
   children: React.ReactNode
 }
 
 export const StatusTitle = ({
   editable,
-  transaction,
+  details,
   children,
-}: StatusTitleProps) => (
-  <Box row className={styles.statusTitle}>
-    <Title>{children}</Title>
-    <Status transaction={transaction} />
-    {!editable && (
-      <span className={styles.transactionEditable}>
-        (Ce lot ne peut pas être modifié)
-      </span>
-    )}
-  </Box>
-)
+}: StatusTitleProps) => {
+  const deadlineDate = details
+    ? format(new Date(details.deadline), "d MMMM Y", { locale: fr })
+    : null
+
+  return (
+    <Box row className={styles.statusTitle}>
+      <Title>{children}</Title>
+      <Status transaction={details?.transaction} />
+
+      {details && hasDeadline(details.transaction, details.deadline) && (
+        <span className={styles.transactionDeadline}>
+          Ce lot doit être validé avant le <b>{deadlineDate}</b>
+        </span>
+      )}
+
+      {!editable && (
+        <span className={styles.transactionEditable}>
+          (Ce lot ne peut pas être modifié)
+        </span>
+      )}
+    </Box>
+  )
+}
 
 export default Status

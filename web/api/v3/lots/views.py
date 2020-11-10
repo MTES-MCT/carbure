@@ -245,9 +245,14 @@ def get_details(request):
     if tx.carbure_client != entity and tx.carbure_vendor != entity:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
+    now = datetime.datetime.now()
+    (_, last_day) = calendar.monthrange(now.year, now.month)
+    deadline_date = now.replace(day=last_day)
+
     data = {}
     data['transaction'] = tx.natural_key()
     data['errors'] = get_errors(tx)
+    data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['comments'] = [c.natural_key() for c in tx.transactioncomment_set.all()]
 
     return JsonResponse({'status': 'success', 'data': data})

@@ -73,10 +73,7 @@ const TransactionDetails = ({
 
   return (
     <Modal onClose={close}>
-      <StatusTitle
-        editable={isEditable}
-        transaction={details.data?.transaction}
-      >
+      <StatusTitle editable={isEditable} details={details.data}>
         Détails de la transaction
       </StatusTitle>
 
