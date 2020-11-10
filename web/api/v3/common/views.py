@@ -1,4 +1,5 @@
 import datetime
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.db.models import Q
 from core.models import Entity, Biocarburant, MatierePremiere, Depot, Pays
@@ -84,7 +85,7 @@ def get_delivery_sites(request):
     q = request.GET.get('query', False)
     dsites = Depot.objects.all()
     if q:
-        dsites = dsites.filter(Q(name__icontains=q) | Q(depot_id__icontains=q))
+        dsites = dsites.filter(Q(name__icontains=q) | Q(depot_id__icontains=q) | Q(city__icontains=q))
     sez = [{'name': d.name, 'city': d.city, 'depot_id': d.depot_id, 'country': d.country.natural_key(),
             'depot_type': d.depot_type} for d in dsites]
     return JsonResponse({'status': 'success', 'data': sez})
@@ -142,3 +143,40 @@ def get_2bs_certificates(request):
             'valid_until': c.valid_until.strftime('%y-%m-%d'), 'holder_address': c.holder_address,
             'certification_type': c.certification_type} for c in cert]
     return JsonResponse({'status': 'success', 'data': sez})
+
+
+@login_required
+def create_delivery_site(request):
+    name = request.POST.get('name', False)
+    city = request.POST.get('city', False)
+    country = request.POST.get('country_code', False)
+    depot_id = request.POST.get('depot_id', False)
+    depot_type = request.POST.get('depot_type', False)
+
+    if not name:
+        return JsonResponse({'status': 'error', 'message': 'Missing name'}, status=400)
+    if not city:
+        return JsonResponse({'status': 'error', 'message': 'Missing city'}, status=400)
+    if not country:
+        return JsonResponse({'status': 'error', 'message': 'Missing country'}, status=400)
+    if not depot_id:
+        return JsonResponse({'status': 'error', 'message': 'Missing depot_id'}, status=400)
+    if not depot_type:
+        return JsonResponse({'status': 'error', 'message': 'Missing depot_type'}, status=400)                        
+
+    try:
+        country = Pays.objects.get(code_pays=country)
+    except Exception as e:
+        print(e)
+        return JsonResponse({'status': 'error', 'message': 'Unknown country_code %s' % (country)}, status=400)                        
+
+    if depot_type not in ['EFS', 'EFPE', 'OTHER']:
+        return JsonResponse({'status': 'error', 'message': 'Unknown depot_type %s' % (depot_type)}, status=400)                        
+
+    d = {'name': name, 'city': city, 'depot_type': depot_type}
+    try:
+        Depot.objects.update_or_create(depot_id=depot_id, country=country, defaults=d)
+    except Exception as e:
+        print(e)
+        return JsonResponse({'status': 'error', 'message': 'Server error'}, status=500)
+    return JsonResponse({'status': 'success'})
