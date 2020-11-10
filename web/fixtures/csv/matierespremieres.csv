@@ -3,8 +3,8 @@ BLE;Blé;1;0
 CANNE_A_SUCRE;Canne à sucre;1;0
 COLZA;Colza;0;1
 DECHETS_ORGANIQUES_MENAGERS;Déchets organiques ménagers;1;1
-FUMIER_HUMIDE;Fumier humide;1;1
-FUMIER_SEC;Fumier sec;1;1
+FUMIER_HUMIDE;Fumier humide;1;0
+FUMIER_SEC;Fumier sec;1;0
 HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2;Huiles ou graisses animales  (catégorie I et/ou II );0;1
 HUILES_OU_GRAISSES_ANIMALES_CAT3;Huiles ou graisses animales  (catégorie III);0;1
 HUILE_PALME;Huile de palme;0;1
@@ -13,14 +13,15 @@ MAIS;Maïs;1;0
 RESIDUS_VINIQUES;Résidus viniques;1;0
 SOJA;Soja;0;1
 TOURNESOL;Tournesol;0;1
-GLYCERINE_BRUTE;Glycérine brute;1;0
+GLYCERINE_BRUTE;Glycérine brute;1;1
 DECHETS_BOIS;Déchets de bois;1;0
 DECHETS_INDUSTRIELS;Déchets industriels;1;1
 ALGUES;Algues;1;1
 PAILLE;Paille;1;0
 BOUES_EPURATION;Boues d'épuration;1;1
 EFFLUENTS_HUILERIES_PALME_RAFLE;Effluents d'huileries de palme et rafles;0;1
-BRAI_TALLOL;Brai de tallol.;1;0
+BRAI_TALLOL;Brai de tallol.;0;1
+TALLOL;Tallol.;0;1
 BAGASSE;Bagasse;1;0
 COQUES;Coques;1;0
 BALLES;Balles (enveloppes);1;0
