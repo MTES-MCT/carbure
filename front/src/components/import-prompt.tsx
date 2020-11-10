@@ -38,7 +38,7 @@ export const ProducerImportPromptFactory = (uploader: LotUploader) => ({
     <Box className={styles.importExplanation}>
       Le modèle simplifié vous permet de créer des lots provenant de vos propres
       usines. Vous pouvez les affilier immédiatement à des clients enregistrés
-      sur Carbure ou simplement les ajouter à votre Mass Balance.
+      sur Carbure ou simplement les ajouter à votre Stock.
       <span
         className={styles.downloadLink}
         onClick={uploader.downloadTemplateSimple}
