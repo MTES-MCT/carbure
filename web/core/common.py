@@ -62,7 +62,7 @@ def lot_is_valid(lot):
             if not lot.unknown_production_site_reference:
                 error = "Veuillez renseigner le certificat de l'usine de production ou du fournisseur"
                 LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_reference', value='', error=error)
-                return False, error                
+                return False, error
     else:
         # no need to check lot info
         pass
