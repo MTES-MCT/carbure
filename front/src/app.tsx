@@ -3,7 +3,6 @@ import { BrowserRouter } from "react-router-dom"
 
 import useApp from "./hooks/use-app"
 
-import { LoaderOverlay } from "./components/system"
 import { Redirect, Route, Switch } from "./components/relative-route"
 import Exit from "./components/exit"
 
@@ -21,8 +20,6 @@ const App = () => {
   return (
     <BrowserRouter basename="/v2">
       <div id="app">
-        {settings.loading && <LoaderOverlay />}
-
         {settings.data && (
           <Switch>
             <Route path="/org/:entity">
