@@ -64,10 +64,17 @@ const TransactionDetails = ({
   const isEditable = EDITABLE.includes(status)
   const isCommentable = COMMENTABLE.includes(status)
 
-  async function run(action: (i: number) => Promise<boolean>) {
+  async function run(
+    action: (i: number) => Promise<boolean>,
+    closeOnDone: boolean = false
+  ) {
     if (await action(form.id)) {
       refresh()
       refreshDetails()
+
+      if (closeOnDone) {
+        close()
+      }
     }
   }
 
@@ -143,7 +150,7 @@ const TransactionDetails = ({
             icon={Cross}
             level="danger"
             loading={deleter.loading}
-            onClick={() => run(deleter.deleteLot)}
+            onClick={() => run(deleter.deleteLot, true)}
           >
             Supprimer
           </AsyncButton>
@@ -171,7 +178,7 @@ const TransactionDetails = ({
               icon={Cross}
               level="danger"
               loading={rejector.loading}
-              onClick={() => run(rejector.rejectLot)}
+              onClick={() => run(rejector.rejectLot, true)}
             >
               Refuser
             </AsyncButton>
