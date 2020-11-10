@@ -150,11 +150,11 @@ export const TransactionList = ({
         </ActionBar>
       )}
 
-      {errorCount > 0 && (
+      {!special.deadline && errorCount > 0 && (
         <InvalidFilter errorCount={errorCount} special={special} />
       )}
 
-      {deadlineCount > 0 && (
+      {!special.invalid && deadlineCount > 0 && (
         <DeadlineFilter
           deadlineCount={deadlineCount}
           deadlineDate={deadlineDate}
