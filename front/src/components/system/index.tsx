@@ -15,7 +15,7 @@ type AsProp = {
   as?: string | React.ComponentType<any>
 }
 
-type BoxProps = SystemProps &
+export type BoxProps = SystemProps &
   React.HTMLProps<HTMLDivElement> & {
     row?: boolean
     as?: string | React.ComponentType<any>
@@ -37,6 +37,10 @@ export const Box = ({
 )
 
 export const Main = (props: BoxProps) => <Box {...props} as="main" />
+
+export const Section = ({ className, ...props }: BoxProps) => (
+  <Box {...props} as="section" className={cl(styles.section, className)} />
+)
 
 // BUTTON COMPONENT
 

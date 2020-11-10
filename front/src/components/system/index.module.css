@@ -10,6 +10,13 @@
   flex-direction: row;
 }
 
+.section {
+  background-color: var(--white);
+  border: 1px solid var(--gray-highlight);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
 /* BUTTON COMPONENT */
 
 .button {
@@ -273,8 +280,7 @@
 .labelCheckbox {
   display: flex;
   align-items: center;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 16px;
   cursor: pointer;
   height: 68px;
   padding: 8px 0;
@@ -282,7 +288,7 @@
 }
 
 .labelCheckbox input[type="checkbox"] {
-  margin-right: 8px;
+  margin-right: 12px;
   cursor: pointer;
 }
 
