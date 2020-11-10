@@ -441,10 +441,11 @@ def fill_dae_data(lot_row, transaction):
 
 
 def fill_delivery_date(lot_row, lot, transaction):
+    today = datetime.date.today()
     tx_errors = []
     if 'delivery_date' not in lot_row or lot_row['delivery_date'] == '' or lot_row['delivery_date'] is None:
-        transaction.delivery_date = datetime.date.today()
-        lot.period = datetime.date.today().strftime('%Y-%m')
+        transaction.delivery_date = today
+        lot.period = today.strftime('%Y-%m')
     else:
         try:
             delivery_date = lot_row['delivery_date']
@@ -452,11 +453,20 @@ def fill_delivery_date(lot_row, lot, transaction):
                 dd = delivery_date
             else:
                 dd = dateutil.parser.parse(delivery_date, dayfirst=True)
-            transaction.delivery_date = dd
-            lot.period = dd.strftime('%Y-%m')
-            TransactionError.objects.filter(tx=transaction, field='delivery_date').delete()
-        except Exception:
-            msg = "Format de date incorrect: veuillez entrer une date au format AAAA-MM-JJ"
+            if (dd.date() - today) > datetime.timedelta(days=3650) or (dd.date() - today) < datetime.timedelta(days=-3650):
+                transaction.delivery_date = dd
+                lot.period = today.strftime('%Y-%m')
+                msg = "Date incorrecte: veuillez entrer des données récentes (%s)" % (dd)
+                tx_errors.append(TransactionError(tx=transaction, field='delivery_date', error=msg, value=delivery_date))
+            else:
+                transaction.delivery_date = dd
+                lot.period = dd.strftime('%Y-%m')
+                TransactionError.objects.filter(tx=transaction, field='delivery_date').delete()
+        except Exception as e:
+            print(e)
+            transaction.delivery_date = None
+            lot.period = today.strftime('%Y-%m')
+            msg = "Format de date incorrect: veuillez entrer une date au format AAAA-MM-JJ (%s)" % (lot_row['delivery_date'])
             tx_errors.append(TransactionError(tx=transaction, field='delivery_date', error=msg, value=delivery_date))
     return tx_errors
 
@@ -675,7 +685,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
                 lot_errors.append(l_errors)
                 tx_errors.append(t_errors)
             except Exception as e:
-                print('Could not load %s' % (lot))
+                print('Could not load %s' % (lot_row))
                 print(e)
         bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors)
         return lots_loaded, total_lots
