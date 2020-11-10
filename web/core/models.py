@@ -80,6 +80,9 @@ class Biocarburant(models.Model):
     def __eq__(self, other):
         return self.code == other
 
+    def __hash__(self):
+        return super().__hash__()
+
     def natural_key(self):
         return {'code': self.code, 'name': self.name}
 
