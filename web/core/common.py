@@ -46,6 +46,16 @@ def tx_is_valid(tx):
         TransactionError.objects.update_or_create(tx=tx, field='unknown_client', value='', error=error)
         is_valid = False
 
+    if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site:
+        error = 'Veuillez renseigner un site de livraison'
+        TransactionError.objects.update_or_create(tx=tx, field='unknown_delivery_site', value='', error=error)
+        is_valid = False
+
+    if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site_country:
+        error = 'Veuillez renseigner un pays de livraison'
+        TransactionError.objects.update_or_create(tx=tx, field='unknown_delivery_site_country', value='', error=error)
+        is_valid = False        
+
     if tx.unknown_delivery_site_country is not None and tx.unknown_delivery_site_country.is_in_europe and tx.lot.pays_origine is None:
         error = "Veuillez renseigner le pays d'origine de la matière première - Marché européen"
         TransactionError.objects.update_or_create(tx=tx, field='unknown_delivery_site_country', value='', error=error)
@@ -766,6 +776,7 @@ def validate_lots(user, tx_ids):
         lot_valid = lot_is_valid(tx.lot)
         # run sanity_checks
         is_sane = sanity_check(tx.lot)
+        print('tx valid %s lot valid %s is_sane %s' % (tx_valid, lot_valid, is_sane))
 
         if not is_sane or not lot_valid or not tx_valid:
             tx.lot.is_valid = False
