@@ -14,7 +14,6 @@ from core.models import LotValidationError
 from core.models import ISCCScope, ISCCCertificate, ISCCCertificateRawMaterial, ISCCCertificateScope
 from core.models import DBSCertificate, DBSScope, DBSCertificateScope
 from core.models import EntityISCCTradingCertificate, EntityDBSTradingCertificate
-from api.v3.sanity_checks import queryset_sanity_check
 
 
 class EntityAdmin(admin.ModelAdmin):
@@ -79,24 +78,10 @@ class DepotAdmin(admin.ModelAdmin):
     list_filter = ('depot_type',)
 
 
-def reset_checked_status(modeladmin, request, queryset):
-    queryset.update(blocking_sanity_checked_passed=False)
-    queryset.update(nonblocking_sanity_checked_passed=False)
-
-
-def admin_run_sanity_checks(modeladmin, request, queryset):
-    queryset_sanity_check(queryset)
-
-
-reset_checked_status.short_description = "Reset sanity checks status"
-admin_run_sanity_checks.short_description = "Run sanity checks"
-
-
 class LotV2Admin(admin.ModelAdmin):
     list_display = ('period', 'carbure_id', 'carbure_producer', 'carbure_production_site', 'biocarburant', 'matiere_premiere', 'status',)
     search_fields = ('carbure_producer__name', 'biocarburant__name', 'matiere_premiere__name', 'carbure_id', 'period',)
     list_filter = ('period', 'carbure_producer', 'is_split', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused', 'blocking_sanity_checked_passed', 'nonblocking_sanity_checked_passed', 'is_valid', 'added_by', 'added_by_user')
-    actions = [admin_run_sanity_checks, reset_checked_status]
     raw_id_fields = ('fused_with', 'parent_lot', )
 
 
