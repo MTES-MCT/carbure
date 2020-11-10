@@ -9,7 +9,7 @@ from core.decorators import enrich_with_user_details
 def index(request):
     context = {}
     if request.user.is_authenticated:
-        return redirect('home')
+        return redirect('/v2/')
     return render(request, 'public/index.html', context)
 
 
