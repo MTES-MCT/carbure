@@ -57,8 +57,9 @@ export const dae: Column<Transaction> = {
 }
 
 export const ghgReduction: Column<Transaction> = {
-  header: "Réduction GES",
+  header: "Réd. GES",
   sortBy: "ghg_reduction",
+  className: styles.narrowColumn,
   render: (tx) => <Line text={`${tx.lot.ghg_reduction}%`} />,
 }
 

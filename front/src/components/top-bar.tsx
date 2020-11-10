@@ -55,9 +55,8 @@ const UserMenu = ({ settings, entity }: UserMenuProps) => (
       ))}
     </Menu.Group>
 
-    <Menu.Group label="Utilisateur">
-      <Menu.Item>{settings.data?.email}</Menu.Item>
-      <Menu.Item to={`/org/${entity?.id}/settings`}>Paramètres</Menu.Item>
+    <Menu.Group label={settings.data?.email ?? "Utilisateur"}>
+      <Menu.Item to="/account">Mon compte</Menu.Item>
       <Menu.Item to="/logout">Se déconnecter</Menu.Item>
     </Menu.Group>
   </Menu>
@@ -79,6 +78,7 @@ const Topbar = ({ entity, settings }: TopbarProps) => (
     <nav className={styles.pageNav}>
       {canTrade(entity) && <PageLink to="stocks">Stocks</PageLink>}
       <PageLink to="transactions">Transactions</PageLink>
+      <PageLink to="settings">Paramètres</PageLink>
     </nav>
 
     <UserMenu settings={settings} entity={entity} />
