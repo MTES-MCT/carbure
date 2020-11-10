@@ -286,51 +286,6 @@
   cursor: pointer;
 }
 
-/* TABLE COMPONENT */
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-weight: 600;
-  font-size: 14px;
-  table-layout: fixed;
-}
-
-.table tbody tr {
-  border-bottom: 1px solid var(--gray-highlight);
-}
-
-.table tbody tr:nth-child(even) {
-  background-color: var(--gray-light);
-}
-
-.table tbody tr:nth-child(odd) {
-  background-color: var(--white);
-}
-
-.table tbody tr:hover {
-  background-color: var(--gray-highlight);
-  z-index: 1;
-}
-
-.table th {
-  color: var(--blue-medium);
-  text-transform: uppercase;
-  text-align: left;
-  font-size: 12px;
-  padding: 8px;
-  user-select: none;
-  cursor: pointer;
-}
-
-.table tbody tr td {
-  font-weight: 600;
-  padding: 16px 8px;
-  overflow-x: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
 /* LOADER OVERLAY COMPONENT */
 
 .loaderOverlay {
