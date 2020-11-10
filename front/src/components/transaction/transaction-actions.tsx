@@ -157,26 +157,6 @@ export const DraftActions = ({
   )
 }
 
-export const StockImportActions = ({ uploader }: ImportActionsProps) => {
-  async function onUpload() {
-    const file = await prompt(
-      "Import Excel",
-      "Importer un fichier Excel standardisé.",
-      StockImportPromptFactory(uploader)
-    )
-
-    if (file) {
-      uploader.uploadMassBalanceFile(file)
-    }
-  }
-
-  return (
-    <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
-      Importer lots
-    </AsyncButton>
-  )
-}
-
 type ToFixActionsProps = {
   disabled: boolean
   deleter: LotDeleter
@@ -262,14 +242,6 @@ export const InboxSummaryActions = () => (
   <Link relative to="show-summary-in">
     <Button level="primary" icon={Rapport}>
       Rapport d'entrées
-    </Button>
-  </Link>
-)
-
-export const StockActions = () => (
-  <Link relative to="send-complex">
-    <Button level="primary" icon={Rapport}>
-      Envoi complexe
     </Button>
   </Link>
 )
