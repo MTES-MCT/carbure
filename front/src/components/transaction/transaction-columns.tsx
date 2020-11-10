@@ -78,7 +78,7 @@ export const biocarburant: Column<Transaction> = {
   header: "Biocarburant",
   sortBy: "biocarburant",
   render: (tx) => (
-    <TwoLines text={tx.lot.biocarburant.name} sub={`${tx.lot.volume}L`} />
+    <TwoLines text={tx.lot.biocarburant?.name} sub={`${tx.lot.volume}L`} />
   ),
 }
 
