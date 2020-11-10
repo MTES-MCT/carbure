@@ -46,3 +46,8 @@
   font-size: 16px;
   color: var(--gray-dark);
 }
+
+.transactionDeadline {
+  color: var(--orange-dark);
+  margin-left: 16px;
+}

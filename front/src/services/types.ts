@@ -213,6 +213,7 @@ export interface Comment {
 export interface LotDetails {
   transaction: Transaction
   comments: Comment[]
+  deadline: string
   errors: Errors
 }
 
