@@ -1,6 +1,6 @@
 import datetime
 import calendar
-import dateutil.relativedelta
+from dateutil.relativedelta import *
 from django.db.models import Q, F, Case, When, Count
 from django.db.models.functions import TruncMonth
 from django.db.models.functions import Extract
@@ -154,8 +154,18 @@ def get_lots(request):
     tx_with_errors = txs.annotate(Count('transactionerror'), Count('lot__lotv2error'), Count('lot__lotvalidationerror')).filter(
         Q(transactionerror__count__gt=0) | Q(lot__lotv2error__count__gt=0) | Q(lot__lotvalidationerror__count__gt=0))
 
+    now = datetime.datetime.now()
+    (_, last_day) = calendar.monthrange(now.year, now.month)
+    deadline_date = now.replace(day=last_day)
+    affected_date = deadline_date - relativedelta(months=1)
+    txs_with_deadline = txs.filter(lot__status='Draft', delivery_date__year=affected_date.year, delivery_date__month=affected_date.month)
+    deadline_str = deadline_date.strftime("%Y-%m-%d")
+    deadline_total = txs_with_deadline.count()
+
     if invalid:
         txs = tx_with_errors
+    elif deadline:
+        txs = txs_with_deadline
 
     if sort_by:
         if sort_by in sort_key_to_django_field:
@@ -175,18 +185,6 @@ def get_lots(request):
             return JsonResponse({'status': 'error', 'message': 'Unknown sort_by key'}, status=400)
     else:
         txs = txs.order_by('-id')
-
-    now = datetime.datetime.now()
-    (_, last_day) = calendar.monthrange(now.year, now.month)
-    deadline_date = now.replace(day=last_day)
-    prev_month = deadline_date.month - 1 if deadline_date.month > 1 else 12
-    txs_with_deadline = txs.filter(lot__status='Draft', delivery_date__year=now.year, delivery_date__month=prev_month)
-    deadlines = txs_with_deadline.annotate(month=TruncMonth('delivery_date')).values('month').annotate(total=Count('id'))
-    deadline_str = deadline_date.strftime("%Y-%m-%d")
-    deadline_total = deadlines[0]['total'] if deadlines.count() > 0 else 0
-
-    if deadline:
-        txs = txs_with_deadline
 
     from_idx = int(from_idx)
     returned = txs[from_idx:]
