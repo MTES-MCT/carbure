@@ -18,11 +18,12 @@ export const InvalidFilter = ({ errorCount, special }: InvalidFilterProps) => (
   >
     {errorCount === 1 ? (
       <span>
-        <b>1 lot</b> présente des <b>incohérences</b>
+        Parmi ces résultats, <b>1 lot</b> présente des <b>incohérences</b>
       </span>
     ) : (
       <span>
-        <b>{errorCount} lots</b> présentent des <b>incohérences</b>
+        Parmi ces résultats, <b>{errorCount} lots</b> présentent des{" "}
+        <b>incohérences</b>
       </span>
     )}
   </AlertFilter>
@@ -48,12 +49,13 @@ export const DeadlineFilter = ({
   >
     {deadlineCount === 1 ? (
       <span>
-        <b>1 lot</b> doit être validé et envoyé avant le <b>{deadlineDate}</b>
+        Parmi ces résultats, <b>1 lot</b> doit être validé et envoyé avant le{" "}
+        <b>{deadlineDate}</b>
       </span>
     ) : (
       <span>
-        <b>{deadlineCount} lots</b> doivent être validés et envoyés avant le{" "}
-        <b>{deadlineDate ?? "N/A"}</b>
+        Parmi ces résultats, <b>{deadlineCount} lots</b> doivent être validés et
+        envoyés avant le <b>{deadlineDate ?? "N/A"}</b>
       </span>
     )}
   </AlertFilter>
