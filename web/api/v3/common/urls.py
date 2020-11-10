@@ -15,4 +15,7 @@ urlpatterns = [
 
     path('iscc-certificates', views.get_iscc_certificates, name='api-v3-public-search-iscc-certificates'),
     path('2bs-certificates', views.get_2bs_certificates, name='api-v3-public-search-2bs-certificates'),
+
+    path('create-delivery-site', views.create_delivery_site, name='api-v3-public-create-delivery-site'),
+
 ]
