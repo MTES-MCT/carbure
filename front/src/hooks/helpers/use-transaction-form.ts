@@ -224,7 +224,11 @@ export default function useTransactionForm(
   const isOperator = entity?.entity_type === "Opérateur"
   const isTrader = entity?.entity_type === "Trader"
 
-  if (isProducer && form.carbure_producer?.id !== entity?.id) {
+  if (
+    isProducer &&
+    form.producer_is_in_carbure &&
+    form.carbure_producer?.id !== entity?.id
+  ) {
     setForm({
       ...form,
       producer_is_in_carbure: true,
