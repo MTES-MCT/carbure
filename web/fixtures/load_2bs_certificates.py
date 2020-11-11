@@ -135,7 +135,7 @@ def summary(nb_valid, nb_invalid, new_scopes, new_certificates, new_certificates
         for ncs in new_certificates_scopes:
             mail_content += "Mise à jour du certificat [%s] - [%s]: Ajout de la certification: %s<br />\n" % (ncs.certificate.certificate_id, ncs.certificate.certificate_holder, ncs.scope.certification_type)
     if email:
-        send_mail('[carbure-bot] - Certificats 2BS', mail_content, 'carbure@beta.gouv.fr', ['carbure@beta.gouv.fr'], fail_silently=False)
+        send_mail('Certificats 2BS', mail_content, 'carbure@beta.gouv.fr', ['carbure@beta.gouv.fr'], fail_silently=False)
     else:
         print(mail_content)
         
