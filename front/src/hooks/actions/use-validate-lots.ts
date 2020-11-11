@@ -29,7 +29,7 @@ export default function useValidateLots(
   async function validateLot(lotID: number) {
     const shouldValidate = await confirm(
       "Envoyer lot",
-      "Voulez vous envoyer ce lot ?"
+      "En envoyant ce lot, je certifie qu'il respecte les critères du durabilité liés aux terres et que les informations renseignées sont réelles et valides"
     )
 
     if (entity !== null && shouldValidate) {
@@ -56,7 +56,7 @@ export default function useValidateLots(
   async function validateSelection() {
     const shouldValidate = await confirm(
       "Envoyer lot",
-      "Voulez vous envoyer les lots sélectionnés ?"
+      "En envoyant les lots suivants, je certifie qu'ils respectent les critères du durabilité liés aux terres et que les informations renseignées sont réelles et valides"
     )
 
     if (entity !== null && shouldValidate) {
@@ -68,8 +68,8 @@ export default function useValidateLots(
 
   async function validateAllDrafts() {
     const shouldValidate = await confirm(
-      "Envoyer lot",
-      "Voulez vous envoyer tous ces lots ?"
+      "Envoyer tous les brouillons",
+      "En envoyant ces lots, je certifie qu'ils respectent les critères du durabilité liés aux terres et que les informations renseignées sont réelles et valides"
     )
 
     if (entity !== null && shouldValidate) {
