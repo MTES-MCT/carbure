@@ -1,37 +1,38 @@
-BETTERAVE;Betterave;1;0
-BLE;Blé;1;0
-CANNE_A_SUCRE;Canne à sucre;1;0
-COLZA;Colza;0;1
-DECHETS_ORGANIQUES_MENAGERS;Déchets organiques ménagers;1;1
-FUMIER_HUMIDE;Fumier humide;1;0
-FUMIER_SEC;Fumier sec;1;0
-HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2;Huiles ou graisses animales  (catégorie I et/ou II );0;1
-HUILES_OU_GRAISSES_ANIMALES_CAT3;Huiles ou graisses animales  (catégorie III);0;1
-HUILE_PALME;Huile de palme;0;1
-HUILE_ALIMENTAIRE_USAGEE;Huile alimentaire usagée;0;1
-MAIS;Maïs;1;0
-RESIDUS_VINIQUES;Résidus viniques;1;0
-SOJA;Soja;0;1
-TOURNESOL;Tournesol;0;1
-GLYCERINE_BRUTE;Glycérine brute;1;1
-DECHETS_BOIS;Déchets de bois;1;0
-DECHETS_INDUSTRIELS;Déchets industriels;1;1
-ALGUES;Algues;1;1
-PAILLE;Paille;1;0
-BOUES_EPURATION;Boues d'épuration;1;1
-EFFLUENTS_HUILERIES_PALME_RAFLE;Effluents d'huileries de palme et rafles;0;1
-BRAI_TALLOL;Brai de tallol.;0;1
-TALLOL;Tallol.;0;1
-BAGASSE;Bagasse;1;0
-COQUES;Coques;1;0
-BALLES;Balles (enveloppes);1;0
-RAPES;Râpes;1;0
-DECHETS_MUNICIPAUX_MELANGE;Déchets municipaux en mélange (Hors déchets ménagers triés);1;1
-MAT_CELLULOSIQUE_NON_ALIMENTAIRE;Matières cellulosiques d'origine non alimentaire;1;0
-MAT_LIGNO_CELLULOSIQUE;Matières ligno-cellulosiques (Hors grumes de sciage & de placage);1;0
-EP2;Égouts pauvres de 2ème extraction;1;0
-AMIDON_RESIDUEL;Amidon résiduel;1;0
-SEIGLE;Seigle;1;0
-ORGE;Orge;1;0
-TRITICALE;Triticale;1;0
-RESIDUS_DE_BIERE;Résidus de bière;1;0
+code;nom;fermentescible;graisse;is_double_compte;makes_huile_vegetale
+BETTERAVE;Betterave;1;0;0;0
+BLE;Blé;1;0;0;0
+CANNE_A_SUCRE;Canne à sucre;1;0;0;0
+COLZA;Colza;0;1;0;1
+DECHETS_ORGANIQUES_MENAGERS;Déchets organiques ménagers;1;1;0;0
+FUMIER_HUMIDE;Fumier humide;1;0;0;0
+FUMIER_SEC;Fumier sec;1;0;0;0
+HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2;Huiles ou graisses animales  (catégorie I et/ou II );0;1;0;0
+HUILES_OU_GRAISSES_ANIMALES_CAT3;Huiles ou graisses animales  (catégorie III);0;1;0;0
+HUILE_PALME;Huile de palme;0;1;0;0
+HUILE_ALIMENTAIRE_USAGEE;Huile alimentaire usagée;0;1;0;0
+MAIS;Maïs;1;0;0;0
+RESIDUS_VINIQUES;Résidus viniques;1;0;0;0
+SOJA;Soja;0;1;0;1
+TOURNESOL;Tournesol;0;1;0;1
+GLYCERINE_BRUTE;Glycérine brute;1;1;0;0
+DECHETS_BOIS;Déchets de bois;1;0;0;0
+DECHETS_INDUSTRIELS;Déchets industriels;1;1;0;0
+ALGUES;Algues;1;1;0;0
+PAILLE;Paille;1;0;0;0
+BOUES_EPURATION;Boues d'épuration;1;1;0;0
+EFFLUENTS_HUILERIES_PALME_RAFLE;Effluents d'huileries de palme et rafles;0;1;0;0
+BRAI_TALLOL;Brai de tallol.;0;1;0;0
+TALLOL;Tallol.;0;1;0;0
+BAGASSE;Bagasse;1;0;0;0
+COQUES;Coques;1;0;0;0
+BALLES;Balles (enveloppes);1;0;0;0
+RAPES;Râpes;1;0;0;0
+DECHETS_MUNICIPAUX_MELANGE;Déchets municipaux en mélange (Hors déchets ménagers triés);1;1;0;0
+MAT_CELLULOSIQUE_NON_ALIMENTAIRE;Matières cellulosiques d'origine non alimentaire;1;0;0;0
+MAT_LIGNO_CELLULOSIQUE;Matières ligno-cellulosiques (Hors grumes de sciage & de placage);1;0;0;0
+EP2;Égouts pauvres de 2ème extraction;1;0;0;0
+AMIDON_RESIDUEL;Amidon résiduel;1;0;0;0
+SEIGLE;Seigle;1;0;0;0
+ORGE;Orge;1;0;0;0
+TRITICALE;Triticale;1;0;0;0
+RESIDUS_DE_BIERE;Résidus de bière;1;0;0;0
