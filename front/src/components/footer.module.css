@@ -4,7 +4,7 @@
   background: #1c1c1c;
   color: #fff;
   padding: 2em 0;
-  font-size: 16px;
+  font-size: var(--font-size);
   line-height: 1.5em;
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;

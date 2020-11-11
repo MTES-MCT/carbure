@@ -4,7 +4,7 @@
   display: flex;
   position: relative;
   align-items: center;
-  font-size: 14px;
+  font-size: var(--font-size);
   border: 1px solid var(--gray-medium);
   background-color: var(--gray-light);
   border-radius: 5px;
@@ -74,7 +74,7 @@
 }
 
 .collapsibleTitle {
-  font-size: 15px;
+  font-size: var(--font-size);
 }
 
 .collapsibleArrow {

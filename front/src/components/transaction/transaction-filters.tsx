@@ -81,7 +81,7 @@ const TransactionFilters = ({
 
     <SearchInput
       className={styles.searchInput}
-      placeholder="Rechercher un lot"
+      placeholder="Rechercher..."
       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
         search.setQuery(e.target.value)
       }
