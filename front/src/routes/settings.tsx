@@ -7,7 +7,7 @@ import { Main, Title } from "../components/system"
 import { SettingsHeader, SettingsBody } from "../components/settings"
 import DeliverySitesSettings from "../components/settings/delivery-site-settings"
 import ProductionSitesSettings from "../components/settings/production-site-settings"
-import BBSCertificateSettings from "../components/settings/2bs-certificates-settings"
+import DBSCertificateSettings from "../components/settings/2bs-certificates-settings"
 import ISCCCertificateSettings from "../components/settings/iscc-certificates-settings"
 import CompanySettings from "../components/settings/company-settings"
 
@@ -29,7 +29,7 @@ const Settings = ({ entity, settings }: SettingsProps) => {
       <SettingsBody>
         <CompanySettings entity={entity} settings={settings} />
         {hasTrading && <ISCCCertificateSettings entity={entity} />}
-        {hasTrading && <BBSCertificateSettings entity={entity} />}
+        {hasTrading && <DBSCertificateSettings entity={entity} />}
         {isProducer && <ProductionSitesSettings entity={entity} />}
         <DeliverySitesSettings entity={entity} />
       </SettingsBody>

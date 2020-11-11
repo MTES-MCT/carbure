@@ -56,6 +56,16 @@ tr:hover .settingsTableActions {
 .settingsTableActions :global(.icon) {
   color: var(--gray-dark);
 }
+
 .settingsTableActions :global(.icon:hover) {
   color: var(--blue-medium);
+}
+
+.dialogButtons {
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.dialogButtons button {
+  margin-left: 8px;
 }
