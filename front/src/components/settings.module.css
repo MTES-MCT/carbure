@@ -19,4 +19,10 @@
 
 .settingsBody h1 {
   font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.settingsCheckbox {
+  height: auto;
+  margin: 8px 0;
 }

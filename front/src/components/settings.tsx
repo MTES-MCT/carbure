@@ -4,14 +4,23 @@ import { SettingsGetter } from "../hooks/use-app"
 
 import styles from "./settings.module.css"
 
-import {
-  enableMAC,
-  disableMAC,
-  disableTrading,
-  enableTrading,
-} from "../services/settings"
+import * as api from "../services/settings"
 import useAPI from "../hooks/helpers/use-api"
-import { Section, BoxProps, Title, LabelCheckbox } from "./system"
+import {
+  Section,
+  BoxProps,
+  Title,
+  LabelCheckbox,
+  LoaderOverlay,
+} from "./system"
+
+function toggleMAC(toggle: boolean, entityID: number) {
+  return toggle ? api.enableMAC(entityID) : api.disableMAC(entityID)
+}
+
+function toggleTrading(toggle: boolean, entityID: number) {
+  return toggle ? api.enableTrading(entityID) : api.disableTrading(entityID)
+}
 
 export const SettingsHeader = (props: BoxProps) => (
   <div className={styles.settingsTop}>
@@ -28,20 +37,28 @@ type GeneralSettingsProps = {
   settings: SettingsGetter
 }
 
-export const MACSettings = ({ entity, settings }: GeneralSettingsProps) => {
+export const CompanySettings = ({ entity, settings }: GeneralSettingsProps) => {
+  const isOperator = entity?.entity_type === "Opérateur"
+  const isTrader = entity?.entity_type === "Trader"
+
   const hasMAC: boolean = entity?.has_mac ?? false
+  const hasTrading: boolean = entity?.has_trading ?? false
 
-  const [requestEnable, resolveMacEnabled] = useAPI(enableMAC)
-  const [requestDisable, resolveMacDisabled] = useAPI(disableMAC)
+  const [requestMAC, resolveToggleMAC] = useAPI(toggleMAC)
+  const [requestTrading, resolveToggleTrading] = useAPI(toggleTrading)
 
-  function onChangeMac(event: React.ChangeEvent<HTMLInputElement>): void {
-    if (entity === null) {
-      return
+  const isLoading =
+    settings.loading || requestMAC.loading || requestTrading.loading
+
+  function onChangeMac(e: React.ChangeEvent<HTMLInputElement>): void {
+    if (entity !== null) {
+      resolveToggleMAC(e.target.checked, entity.id).then(settings.resolve)
     }
-    if (event.target.checked) {
-      resolveMacEnabled(entity.id).then(settings.resolve)
-    } else {
-      resolveMacDisabled(entity.id).then(settings.resolve)
+  }
+
+  function onChangeTrading(e: React.ChangeEvent<HTMLInputElement>): void {
+    if (entity !== null) {
+      resolveToggleTrading(e.target.checked, entity.id).then(settings.resolve)
     }
   }
 
@@ -51,47 +68,44 @@ export const MACSettings = ({ entity, settings }: GeneralSettingsProps) => {
 
   return (
     <Section>
-      <Title>Mises à Consommation</Title>
+      <Title>Société</Title>
 
       <LabelCheckbox
+        disabled={isOperator}
         label="Ma société effectue des Mises à Consommation"
-        checked={hasMAC}
+        checked={hasMAC || isOperator}
         onChange={onChangeMac}
+        className={styles.settingsCheckbox}
       />
-    </Section>
-  )
-}
-
-export const TradingSettings = ({ entity, settings }: GeneralSettingsProps) => {
-  const hasTrading: boolean = entity?.has_trading ?? false
-
-  const [requestEnable, resolveTradingEnabled] = useAPI(enableTrading)
-  const [requestDisable, resolveTradingDisabled] = useAPI(disableTrading)
-
-  function onChangeTrading(event: React.ChangeEvent<HTMLInputElement>): void {
-    if (entity === null) {
-      return
-    }
-
-    if (event.target.checked) {
-      resolveTradingEnabled(entity.id).then(settings.resolve)
-    } else {
-      resolveTradingDisabled(entity.id).then(settings.resolve)
-    }
-  }
-
-  return (
-    <Section>
-      <Title>Trading</Title>
 
       <LabelCheckbox
+        disabled={isOperator || isTrader}
         label="Ma société a une activité de négoce"
-        checked={hasTrading}
+        checked={hasTrading || isTrader}
         onChange={onChangeTrading}
+        className={styles.settingsCheckbox}
       />
+
+      {isLoading && <LoaderOverlay />}
     </Section>
   )
 }
+
+type ISCCCertificateSettingsProps = {}
+
+export const ISCCCertificateSettings = ({}: ISCCCertificateSettingsProps) => (
+  <Section>
+    <Title>Certificats ISCC</Title>
+  </Section>
+)
+
+type BBSCertificateSettingsProps = {}
+
+export const BBSCertificateSettings = ({}: BBSCertificateSettingsProps) => (
+  <Section>
+    <Title>Certificats 2BS</Title>
+  </Section>
+)
 
 type ProductionSitesSettingsProps = {}
 
