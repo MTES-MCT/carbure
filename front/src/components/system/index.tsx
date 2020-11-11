@@ -159,17 +159,19 @@ export const Input = ({ className, error, ...props }: InputProps) => (
 export type LabelInputProps = InputProps & {
   label: React.ReactNode
   error?: string
+  tooltip?: string
 }
 
 export const LabelInput = ({
   label,
   disabled,
   error,
+  tooltip,
   className,
   ...props
 }: LabelInputProps) => (
   <label
-    title={error}
+    title={error? error : tooltip}
     className={cl(
       styles.labelWrapper,
       disabled && styles.disabledLabel,

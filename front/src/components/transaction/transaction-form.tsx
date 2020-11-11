@@ -358,6 +358,7 @@ const TransactionForm = ({
                 name="eec"
                 value={tx.eec}
                 error={fieldErrors.eec}
+                tooltip="Émissions résultant de l'extraction ou de la culture des matières premières"
                 step={0.1}
                 onChange={onChange}
               />
@@ -368,6 +369,7 @@ const TransactionForm = ({
                 name="el"
                 value={tx.el}
                 error={fieldErrors.el}
+                tooltip="Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols"
                 step={0.1}
                 onChange={onChange}
               />
@@ -378,6 +380,7 @@ const TransactionForm = ({
                 name="ep"
                 value={tx.ep}
                 error={fieldErrors.ep}
+                tooltip="Émissions résultant de la transformation"
                 step={0.1}
                 onChange={onChange}
               />
@@ -388,6 +391,7 @@ const TransactionForm = ({
                 name="etd"
                 value={tx.etd}
                 error={fieldErrors.etd}
+                tooltip="Émissions résultant du transport et de la distribution'"
                 step={0.1}
                 onChange={onChange}
               />
@@ -398,6 +402,7 @@ const TransactionForm = ({
                 name="eu"
                 value={tx.eu}
                 error={fieldErrors.eu}
+                tooltip="Émissions résultant du carburant à l'usage"
                 step={0.1}
                 className={styles.transactionTotal}
                 onChange={onChange}
@@ -413,6 +418,7 @@ const TransactionForm = ({
                 name="esca"
                 value={tx.esca}
                 error={fieldErrors.esca}
+                tooltip="Réductions d'émissions dues à l'accumulation du carbone dans les sols grâce à une meilleure gestion agricole"
                 step={0.1}
                 onChange={onChange}
               />
@@ -423,6 +429,7 @@ const TransactionForm = ({
                 name="eccs"
                 value={tx.eccs}
                 error={fieldErrors.eccs}
+                tooltip="Réductions d'émissions dues au piégeage et au stockage géologique du carbone"
                 step={0.1}
                 onChange={onChange}
               />
@@ -433,6 +440,7 @@ const TransactionForm = ({
                 name="eccr"
                 value={tx.eccr}
                 error={fieldErrors.eccr}
+                tooltip="Réductions d\'émissions dues au piégeage et à la substitution du carbone"
                 step={0.1}
                 onChange={onChange}
               />
@@ -443,6 +451,7 @@ const TransactionForm = ({
                 name="eee"
                 value={tx.eee}
                 error={fieldErrors.eee}
+                tooltip="Réductions d'émissions dues à la production excédentaire d'électricité dans le cadre de la cogénération"
                 step={0.1}
                 onChange={onChange}
               />
