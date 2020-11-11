@@ -220,8 +220,8 @@
 .labelWrapper > span {
   display: flex;
   align-items: center;
-  opacity: 0.75;
   margin-left: 4px;
+  color: var(--gray-dark);
 }
 
 .labelWrapper > span :global(.icon) {
@@ -230,7 +230,7 @@
 }
 
 .disabledLabel {
-  color: var(--gray-medium);
+  opacity: 0.5;
   pointer-events: none;
 }
 
@@ -284,7 +284,6 @@
   font-size: var(--font-size);
   cursor: pointer;
   height: 66px;
-  /* padding: 8px 0; */
   margin-top: 12px;
   flex-shrink: 0;
 }

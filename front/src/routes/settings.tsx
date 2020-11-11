@@ -10,6 +10,8 @@ import {
   CompanySettings,
   ProductionSitesSettings,
   DeliverySitesSettings,
+  ISCCCertificateSettings,
+  BBSCertificateSettings,
 } from "../components/settings"
 
 type SettingsProps = {
@@ -18,6 +20,8 @@ type SettingsProps = {
 }
 
 const Settings = ({ entity, settings }: SettingsProps) => {
+  const isProducer = entity?.entity_type === "Producteur"
+
   return (
     <Main>
       <SettingsHeader>
@@ -26,7 +30,9 @@ const Settings = ({ entity, settings }: SettingsProps) => {
 
       <SettingsBody>
         <CompanySettings entity={entity} settings={settings} />
-        <ProductionSitesSettings />
+        {entity?.has_trading && <ISCCCertificateSettings />}
+        {entity?.has_trading && <BBSCertificateSettings />}
+        {isProducer && <ProductionSitesSettings />}
         <DeliverySitesSettings />
       </SettingsBody>
     </Main>
