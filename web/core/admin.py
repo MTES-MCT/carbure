@@ -40,10 +40,10 @@ class BiocarburantAdmin(admin.ModelAdmin):
 
 
 class MatierePremiereAdmin(admin.ModelAdmin):
-    list_display = ('code', 'name', 'description', 'compatible_alcool', 'compatible_graisse')
+    list_display = ('code', 'name', 'description', 'compatible_alcool', 'compatible_graisse', 'is_double_compte', 'is_huile_vegetale')
     search_fields = ('name', )
     readonly_fields = ('code', )
-    list_filter = ('compatible_alcool', 'compatible_graisse', 'is_double_compte')
+    list_filter = ('compatible_alcool', 'compatible_graisse', 'is_double_compte', 'is_huile_vegetale')
 
 
 class PaysAdmin(admin.ModelAdmin):

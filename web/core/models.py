@@ -100,7 +100,8 @@ class MatierePremiere(models.Model):
     compatible_alcool = models.BooleanField(default=False)
     compatible_graisse = models.BooleanField(default=False)
     is_double_compte = models.BooleanField(default=False)
-
+    is_huile_vegetale = models.BooleanField(default=False)
+    
     def __str__(self):
         return self.name
 
