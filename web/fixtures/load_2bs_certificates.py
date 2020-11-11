@@ -4,6 +4,7 @@ import csv
 import calendar
 import datetime
 import re
+import argparse
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -21,9 +22,18 @@ def save_certificate(certificate_id, scopes, details):
         scope2dbscope[s] = scope
     try:
         certificate, created = DBSCertificate.objects.update_or_create(certificate_id=certificate_id, defaults=details)
-        DBSCertificateScope.objects.filter(certificate=certificate).delete()
+        existing_scopes = {cs.scope: cs for cs in DBSCertificateScope.objects.filter(certificate=certificate)}
         for s in scopes:
-            DBSCertificateScope.objects.update_or_create(certificate=certificate, scope=scope2dbscope[s])
+            dbscope = scope2dbscope[s]
+            if dbscope in existing_scopes:
+                del existing_scopes[dbscope]
+            else:
+                DBSCertificateScope.objects.update_or_create(certificate=certificate, scope=scope2dbscope[s])
+        if len(existing_scopes):
+            print('The following scopes have been removed from certificate [%s] - [%s]' % (certificate.certificate_id, certificate.certificate_holder))
+            for k, v in existing_scopes.items():
+                print(v.scope.certification_type)
+                v.delete()
         return certificate
     except Exception as e:
         print('')
@@ -98,11 +108,57 @@ def load_valid_certificates():
     csvfile.close()
     return
 
-        
-def main():
+def send_summary_email(new_scopes, new_certificates, new_certificates_scopes):
+    pass
+
+def display_summary(new_scopes, new_certificates, new_certificates_scopes):
+    if not len(new_scopes):
+        print('No new scopes')
+    else:
+        for ns in new_scopes:
+            print('New 2BS scope detected: %s' % (ns.certification_type))
+
+    if not len(new_certificates):
+        print('No new certificates')
+    else:
+        for nc in new_certificates:
+            print('New 2BS certificate added: %s %s' % (nc.certificate_id, nc.certificate_holder))
+
+    if not len(new_certificates_scopes):
+        print('No new certificates scopes')
+    else:
+        for ncs in new_certificates_scopes:
+            print('New scope added for 2BS certificate: [%s] - [%s]: %s' % (ncs.certificate.certificate_id, ncs.certificate.certificate_holder, ncs.scope.certification_type))
+
+
+def main(args):
+    # get latest data from db
+    last_scope_id = DBSScope.objects.latest('id').id
+    last_certificate_id = DBSCertificate.objects.latest('id').id
+    last_certificate_scope_id = DBSCertificateScope.objects.latest('id').id
+
+    # update data
     load_valid_certificates()
     print('')
     load_invalid_certificates()
         
+    # check what has been updated
+    new_scopes = []
+    new_certificates = []
+    new_certificates_scopes = []
+    if last_scope_id != DBSScope.objects.latest('id').id:
+        new_scopes = DBSScope.objects.filter(id__gt=last_scope_id)
+    if last_certificate_id != DBSCertificate.objects.latest('id').id:
+        new_certificates = DBSCertificate.objects.filter(id__gt=last_certificate_id)
+    if last_certificate_scope_id != DBSCertificateScope.objects.latest('id').id:
+        new_certificates_scopes = DBSCertificateScope.objects.filter(id__gt=last_certificate_scope_id)
+    if args.email:
+        send_summary_email(new_scopes, new_certificates, new_certificates_scopes)
+    else:
+        display_summary(new_scopes, new_certificates, new_certificates_scopes)
+
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Load 2BS certificates in database')
+    parser.add_argument('--email', dest='email', action='store_true', default=False, help='Send a summary email')
+    args = parser.parse_args()    
+    main(args)
