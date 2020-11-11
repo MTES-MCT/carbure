@@ -156,6 +156,7 @@ export const TransactionList = ({
           deadlineCount={deadlineCount}
           deadlineDate={deadlineDate}
           special={special}
+          entity={entity}
         />
       )}
 
