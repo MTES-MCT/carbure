@@ -1,4 +1,5 @@
 import React from "react"
+import { EntitySelection } from "../hooks/helpers/use-entity"
 import { SpecialSelection } from "../hooks/query/use-special"
 import { AlertFilter } from "./system/alert"
 import { AlertCircle, Calendar } from "./system/icons"
@@ -34,12 +35,14 @@ type DeadlineFilterProps = {
   deadlineCount: number
   deadlineDate: string | null
   special: SpecialSelection
+  entity: EntitySelection
 }
 
 export const DeadlineFilter = ({
   deadlineCount,
   deadlineDate,
   special,
+  entity,
 }: DeadlineFilterProps) => (
   <AlertFilter
     level="warning"
@@ -51,12 +54,12 @@ export const DeadlineFilter = ({
     {deadlineCount === 1 ? (
       <span>
         {!special.deadline && "Parmi ces résultats, "}
-        <b>1 lot</b> doit être validé et envoyé avant le <b>{deadlineDate}</b>
+        <b>1 lot</b> doit être {entity?.entity_type === 'Opérateur' && "accepté"} {entity?.entity_type !== 'Opérateur' && "validé et envoyé"} avant le <b>{deadlineDate}</b>
       </span>
     ) : (
       <span>
         {!special.deadline && "Parmi ces résultats, "}
-        <b>{deadlineCount} lots</b> doivent être validés et envoyés avant le{" "}
+        <b>{deadlineCount} lots</b> doivent être {entity?.entity_type === 'Opérateur' && "acceptés"} {entity?.entity_type !== 'Opérateur' && "validés et envoyés"} avant le{" "}
         <b>{deadlineDate ?? "N/A"}</b>
       </span>
     )}
