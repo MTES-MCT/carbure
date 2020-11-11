@@ -7,8 +7,7 @@ import { Main, Title } from "../components/system"
 import {
   SettingsHeader,
   SettingsBody,
-  MACSettings,
-  TradingSettings,
+  CompanySettings,
   ProductionSitesSettings,
   DeliverySitesSettings,
 } from "../components/settings"
@@ -26,8 +25,7 @@ const Settings = ({ entity, settings }: SettingsProps) => {
       </SettingsHeader>
 
       <SettingsBody>
-        <MACSettings entity={entity} settings={settings} />
-        <TradingSettings entity={entity} settings={settings} />
+        <CompanySettings entity={entity} settings={settings} />
         <ProductionSitesSettings />
         <DeliverySitesSettings />
       </SettingsBody>
