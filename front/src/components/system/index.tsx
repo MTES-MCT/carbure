@@ -171,7 +171,7 @@ export const LabelInput = ({
   ...props
 }: LabelInputProps) => (
   <label
-    title={error? error : tooltip}
+    title={error ? error : tooltip}
     className={cl(
       styles.labelWrapper,
       disabled && styles.disabledLabel,
@@ -201,7 +201,7 @@ export const LabelTextArea = ({
   ...props
 }: LabelTextAreaProps) => (
   <label className={cl(styles.labelWrapper, styles.labelTextArea)}>
-    {label}
+    <span>{label}</span>
     <textarea {...props} className={styles.textarea} />
   </label>
 )

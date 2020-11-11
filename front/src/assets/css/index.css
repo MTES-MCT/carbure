@@ -14,7 +14,7 @@ body {
   display: flex;
   margin: 0;
   font-family: Source Sans Pro, Arial, sans-serif;
-  font-size: 16px;
+  font-size: var(--font-size);
   line-height: 1.5em;
   background-color: var(--body);
   -webkit-font-smoothing: antialiased;

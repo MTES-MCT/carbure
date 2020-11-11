@@ -21,13 +21,13 @@
 }
 
 .menu .menuItem {
-  font-size: 16px;
+  font-size: var(--font-size);
   padding-left: 32px;
 }
 
 .menu .menuItemLink {
   padding: 0;
-  font-size: 16px;
+  font-size: var(--font-size);
 }
 
 .menu .menuItemLink a {
