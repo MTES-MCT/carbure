@@ -1,13 +1,14 @@
 import datetime
 import openpyxl
 from django.db.models import Q
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 
 from django.http import JsonResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
 from core.models import LotValidationError
 import dateutil.parser
-from api.v3.sanity_checks import sanity_check
+from api.v3.sanity_checks import sanity_check, bulk_sanity_checks
 
 
 def tx_is_valid(tx):
@@ -667,6 +668,7 @@ def load_lot(entity, user, lot_dict, source, transaction=None):
 
 
 def load_excel_file(entity, user, file, mass_balance=False):
+    print('File received %s' % (datetime.datetime.now()))
     wb = openpyxl.load_workbook(file)
     try:
         lots_sheet = wb['lots']
@@ -690,6 +692,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
         txs_to_insert = []
         lot_errors = []
         tx_errors = []
+        print('File read %s' % (datetime.datetime.now()))
         for lot_row in lots:
             try:
                 if mass_balance:
@@ -705,14 +708,24 @@ def load_excel_file(entity, user, file, mass_balance=False):
                 tx_errors.append(t_errors)
             except Exception as e:
                 print(e)
+        print('File processed %s' % (datetime.datetime.now()))
         bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors)
+        print('Lots loaded in database %s' % (datetime.datetime.now()))
         return lots_loaded, total_lots
     except Exception as e:
         print(e)
         return False, False
 
 
+def run_io_tasks_in_parallel(task, args):
+    with ThreadPoolExecutor() as executor:
+        results = executor.map(task, args)
+        for result in results:
+            pass
+
+
 def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
+    print('Starting bulk_insert %s' % (datetime.datetime.now()))
     # below lines are for batch insert of Lots, Transactions and errors
     # it's a bit rough
     # with mysql, returned object from bulk_create do not contain ids
@@ -746,11 +759,14 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
     TransactionError.objects.bulk_create(flat_tx_errors, batch_size=100)
     # 8 run sanity checks
     # can we run in parallel ?
-    for lot in new_lots:
-        sanity_check(lot)
-
+    print('bulk_insert finished, starting sanity checks %s' % (datetime.datetime.now()))
+    bulk_sanity_checks(new_lots)
+    print('bulk sanity_checks finished')
+    #print('starting io_bound threadpool %s' % (datetime.datetime.now()))   
+    #run_io_tasks_in_parallel(sanity_check, new_lots)
+    #print('sanity_checks finished %s' % (datetime.datetime.now()))   
     return new_lots, new_txs
-    
+
 
 def validate_lots(user, tx_ids):
     for tx_id in tx_ids:
@@ -772,7 +788,7 @@ def validate_lots(user, tx_ids):
         tx_valid = tx_is_valid(tx)
         lot_valid = lot_is_valid(tx.lot)
         # run sanity_checks
-        is_sane = sanity_check(tx.lot)
+        is_sane = bulk_sanity_checks([tx.lot])[0]
         print('tx valid %s lot valid %s is_sane %s' % (tx_valid, lot_valid, is_sane))
 
         if not is_sane or not lot_valid or not tx_valid:

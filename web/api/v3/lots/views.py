@@ -11,7 +11,7 @@ from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays,
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_stock, template_operators, template_traders
 from core.xlsx_v3 import export_transactions
 from core.common import validate_lots, load_excel_file, load_lot, bulk_insert
-from api.v3.sanity_checks import sanity_check
+from api.v3.sanity_checks import bulk_sanity_checks
 
 
 sort_key_to_django_field = {'period': 'lot__period',
@@ -469,7 +469,7 @@ def update_lot(request):
     tx.save()
     LotV2Error.objects.bulk_create(lot_errors)
     TransactionError.objects.bulk_create(tx_errors)       
-    sanity_check(tx.lot)
+    bulk_sanity_checks([tx.lot])
     return JsonResponse({'status': 'success'})
 
 

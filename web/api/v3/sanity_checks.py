@@ -28,8 +28,10 @@ def raise_warning(lot, rule_triggered, details=''):
          'block_validation': False,
          'message': rules[rule_triggered],
          'details': details,
+         'lot': lot,
+         'rule_triggered': rule_triggered,
          }
-    LotValidationError.objects.update_or_create(lot=lot, rule_triggered=rule_triggered, defaults=d)
+    return LotValidationError(**d)
 
 def raise_error(lot, rule_triggered, details=''):
     d = {'warning_to_user': True,
@@ -37,100 +39,121 @@ def raise_error(lot, rule_triggered, details=''):
          'block_validation': True,
          'message': rules[rule_triggered],
          'details': details,
+         'lot': lot,
+         'rule_triggered': rule_triggered,         
          }
-    LotValidationError.objects.update_or_create(lot=lot, rule_triggered=rule_triggered, defaults=d)
-    return False
+    return LotValidationError(**d)
+
+def bulk_sanity_checks(lots):
+    results = []
+    errors = []
+    # cleanup previous errors
+    LotValidationError.objects.filter(lot__in=lots).delete()
+    for lot in lots:
+        is_sane, validation_errors = sanity_check(lot)
+        errors += validation_errors
+        results.append(is_sane)
+    LotValidationError.objects.bulk_create(errors)
+    return results
 
 def sanity_check(lot):
     is_sane = True
-    now = datetime.datetime.now()
-    # cleanup previous errors
-    LotValidationError.objects.filter(lot=lot).delete()
+    errors = []
 
     # check volume
     if lot.volume < 2000:
-        raise_warning(lot, 'VOLUME_FAIBLE')
-
+        errors.append(raise_warning(lot, 'VOLUME_FAIBLE'))
 
     # réduction de GES
     if lot.ghg_reduction > 100:
-        is_sane = raise_error(lot, 'GHG_REDUC_SUP_100', details="GES reduction %f%%" % (lot.ghg_reduction))
+        is_sane = False
+        errors.append(raise_error(lot, 'GHG_REDUC_SUP_100', details="GES reduction %f%%" % (lot.ghg_reduction)))
     if lot.ghg_reduction > 99:
-        raise_warning(lot, 'GHG_REDUC_SUP_99', details="GES reduction %f%%" % (lot.ghg_reduction))
+        errors.append(raise_warning(lot, 'GHG_REDUC_SUP_99', details="GES reduction %f%%" % (lot.ghg_reduction)))
     if lot.ghg_reduction < 50:
-        is_sane = raise_error(lot, 'GHG_REDUC_INF_50', details="GES reduction %f%%" % (lot.ghg_reduction))
+        is_sane = False
+        errors.append(raise_error(lot, 'GHG_REDUC_INF_50', details="GES reduction %f%%" % (lot.ghg_reduction)))
 
     commissioning_date = lot.carbure_production_site.date_mise_en_service if lot.carbure_production_site else lot.unknown_production_site_com_date
     if commissioning_date and isinstance(commissioning_date, datetime.datetime) or isinstance(commissioning_date, datetime.date):
         if commissioning_date > oct2015 and lot.ghg_reduction < 60:
-            is_sane = raise_error(lot, 'GHG_REDUC_INF_60', details="GES reduction %f%%" % (lot.ghg_reduction))
+            is_sane = False
+            errors.append(raise_error(lot, 'GHG_REDUC_INF_60', details="GES reduction %f%%" % (lot.ghg_reduction)))
         if commissioning_date >= jan2021 and lot.ghg_reduction < 65:
-            is_sane = raise_error(lot, 'GHG_REDUC_INF_65', details="GES reduction %f%%" % (lot.ghg_reduction))
+            is_sane = False
+            errors.append(raise_error(lot, 'GHG_REDUC_INF_65', details="GES reduction %f%%" % (lot.ghg_reduction)))
 
     # provenance des matieres premieres
     if lot.matiere_premiere and lot.pays_origine:
         if lot.matiere_premiere.code == 'SOJA':
             if lot.pays_origine.code_pays not in ['US', 'AR', 'BR', 'UY', 'PY']:
-                raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
+                errors.append(raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
         elif lot.matiere_premiere.code == 'HUILE_PALME':
             if lot.pays_origine.code_pays not in ['ID', 'MY', 'HN']:
-                raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
+                errors.append(raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
         elif lot.matiere_premiere.code == 'COLZA':
             if lot.pays_origine.code_pays not in ['US', 'CA', 'AU'] and not lot.pays_origine.is_in_europe:
-                raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
+                errors.append(raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
         elif lot.matiere_premiere.code == 'CANNE_A_SUCRE':
             if lot.pays_origine.code_pays not in ['BR', 'BO']:
-                raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
+                errors.append(raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
         elif lot.matiere_premiere.code == 'MAIS':
             if not lot.pays_origine.is_in_europe and lot.pays_origine.code_pays != 'US':
-                raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
+                errors.append(raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
         elif lot.matiere_premiere.code == 'BETTERAVE':
             if not lot.pays_origine.is_in_europe:
-                raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name))
+                errors.append(raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
         else:
             pass
 
     if lot.biocarburant and lot.matiere_premiere:
         # consistence des matieres premieres avec biocarburant
         if lot.biocarburant.is_alcool and lot.matiere_premiere.compatible_alcool is False:
-            is_sane = raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
+            is_sane = False
+            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
         if lot.biocarburant.is_graisse and lot.matiere_premiere.compatible_graisse is False:
-            is_sane = raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
+            is_sane = False
+            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
 
         # double comptage, cas specifiques
         if lot.matiere_premiere.is_double_compte:
             if lot.unknown_production_site_dbl_counting is None or (lot.carbure_production_site and not lot.carbure_production_site.dc_reference):
-                is_sane = raise_error(lot, 'MISSING_REF_DBL_COUNTING', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
+                is_sane = False
+                errors.append(raise_error(lot, 'MISSING_REF_DBL_COUNTING', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
 
         if lot.biocarburant.code in ['ETH'] and lot.matiere_premiere.code in ['RESIDUS_VINIQUES']:
             if lot.unknown_production_site_dbl_counting is None or (lot.carbure_production_site and not lot.carbure_production_site.dc_reference):
-                is_sane = raise_error(lot, 'MISSING_REF_DBL_COUNTING', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
+                is_sane = False
+                errors.append(raise_error(lot, 'MISSING_REF_DBL_COUNTING', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
 
         if lot.biocarburant.is_graisse:
             if lot.biocarburant.code == 'EMHU' and lot.matiere_premiere.code != 'HUILE_ALIMENTAIRE_USAGEE':
-                is_sane = raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
+                is_sane = False
+                errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
             if lot.biocarburant.code == 'EMHV' and lot.matiere_premiere.code not in ['COLZA', 'TOURNESOL', 'SOJA', 'HUILE_PALME', 'EFFLUENTS_HUILERIES_PALME_RAFLE']:
-                is_sane = raise_error(lot, 'MP_BC_INCOHERENT',  details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
+                is_sane = False
+                errors.append(raise_error(lot, 'MP_BC_INCOHERENT',  details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
             if lot.biocarburant.code == 'EMHA' and lot.matiere_premiere.code not in ['HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2', 'HUILES_OU_GRAISSES_ANIMALES_CAT3']:
-                is_sane = raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
+                is_sane = False
+                errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
 
         if lot.matiere_premiere.code in ['HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2', 'HUILES_OU_GRAISSES_ANIMALES_CAT3'] and lot.biocarburant.code != 'EMHA':
-            is_sane = raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
+            is_sane = False
+            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
         if lot.matiere_premiere.code == 'HUILE_ALIMENTAIRE_USAGEE' and lot.biocarburant.code != 'EMHU':
-            is_sane = raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
+            is_sane = False
+            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
 
         if lot.biocarburant.is_alcool:
             if lot.biocarburant.code in ['ETH', 'ETBE'] and lot.matiere_premiere.code not in ['MAIS', 'BLE', 'BETTERAVE', 'CANNE_A_SUCRE', 'RESIDUS_VINIQUES']:
-                is_sane = raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
+                is_sane = False
+                errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
 
         if lot.matiere_premiere.code in ['MAIS', 'BLE', 'BETTERAVE', 'CANNE_A_SUCRE', 'RESIDUS_VINIQUES'] and lot.biocarburant.code not in ['ETH', 'ETBE']:
-            is_sane = raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
+            is_sane = False
+            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
 
         if not lot.matiere_premiere.is_huile_vegetale and lot.biocarburant.code in ['HVOE', 'HVOG']:
-            is_sane = raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
-
-
-    after = datetime.datetime.now()
-    duration = after - now
-    print(duration)
-    return is_sane
+            is_sane = False
+            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
+    return is_sane, errors
