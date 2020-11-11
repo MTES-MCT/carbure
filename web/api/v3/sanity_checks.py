@@ -14,13 +14,13 @@ jan2021 = datetime.date(year=2021, month=1, day=1)
 rules = {}
 rules['GHG_REDUC_INF_50'] = "La réduction de gaz à effet de serre est inférieure à 50%, il n'est pas possible d'enregistrer ce lot dans CarbuRe"
 rules['GHG_REDUC_SUP_100'] = "La réduction de gaz à effet de serre est supérieure à 100%, il n'est pas possible d'enregistrer ce lot dans CarbuRe"
-rules['GHG_REDUC_SUP_99'] = "La réduction de gaz à effet de serre est supérieure à 99%, êtes vous sûr de vouloir valider ce lot ?"
-rules['PROVENANCE_MP'] = "Êtes vous sûr de la provenance de votre matière première ?"
+rules['GHG_REDUC_SUP_99'] = "La réduction de gaz à effet de serre est supérieure à 99%"
+rules['PROVENANCE_MP'] = "La provenance de la matière première est inhabituelle"
 rules['MP_BC_INCOHERENT'] = "Matière Première incohérente avec le Biocarburant"
 rules['GHG_REDUC_INF_60'] = "La réduction de gaz à effet de serre est inférieure à 60% pour une usine dont la date de mise en service est ultérieure au 5 Octobre 2015. Il n'est pas possible d'enregistrer ce lot dans CarbuRe"
 rules['GHG_REDUC_INF_65'] = "La réduction de gaz à effet de serre est inférieure à 65% pour une usine dont la date de mise en service est ultérieure au 1er Janvier 2021. Il n'est pas possible d'enregistrer ce lot dans CarbuRe"
 rules['MISSING_REF_DBL_COUNTING'] = "Numéro d'enregistrement Double Compte manquant"
-rules['VOLUME_FAIBLE'] = "Volume faible. Êtes-vous sûr d'avoir déclaré le volume en litres ?"
+rules['VOLUME_FAIBLE'] = "Volume inhabituellement faible."
 
 def raise_warning(lot, rule_triggered, details=''):
     d = {'warning_to_user': True,
