@@ -126,6 +126,10 @@ def sanity_check(lot):
         if lot.matiere_premiere.code in ['MAIS', 'BLE', 'BETTERAVE', 'CANNE_A_SUCRE', 'RESIDUS_VINIQUES'] and lot.biocarburant.code not in ['ETH', 'ETBE']:
             is_sane = raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
 
+        if not lot.matiere_premiere.is_huile_vegetale and lot.biocarburant.code in ['HVOE', 'HVOG']:
+            is_sane = raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name))
+
+
     after = datetime.datetime.now()
     duration = after - now
     print(duration)
