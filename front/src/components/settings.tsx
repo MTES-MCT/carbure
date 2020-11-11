@@ -38,11 +38,17 @@ type GeneralSettingsProps = {
 }
 
 export const CompanySettings = ({ entity, settings }: GeneralSettingsProps) => {
+  const isOperator = entity?.entity_type === "Opérateur"
+  const isTrader = entity?.entity_type === "Trader"
+
   const hasMAC: boolean = entity?.has_mac ?? false
   const hasTrading: boolean = entity?.has_trading ?? false
 
   const [requestMAC, resolveToggleMAC] = useAPI(toggleMAC)
   const [requestTrading, resolveToggleTrading] = useAPI(toggleTrading)
+
+  const isLoading =
+    settings.loading || requestMAC.loading || requestTrading.loading
 
   function onChangeMac(e: React.ChangeEvent<HTMLInputElement>): void {
     if (entity !== null) {
@@ -65,23 +71,41 @@ export const CompanySettings = ({ entity, settings }: GeneralSettingsProps) => {
       <Title>Société</Title>
 
       <LabelCheckbox
+        disabled={isOperator}
         label="Ma société effectue des Mises à Consommation"
-        checked={hasMAC}
+        checked={hasMAC || isOperator}
         onChange={onChangeMac}
         className={styles.settingsCheckbox}
       />
 
       <LabelCheckbox
+        disabled={isOperator || isTrader}
         label="Ma société a une activité de négoce"
-        checked={hasTrading}
+        checked={hasTrading || isTrader}
         onChange={onChangeTrading}
         className={styles.settingsCheckbox}
       />
 
-      {(requestMAC.loading || requestTrading.loading) && <LoaderOverlay />}
+      {isLoading && <LoaderOverlay />}
     </Section>
   )
 }
+
+type ISCCCertificateSettingsProps = {}
+
+export const ISCCCertificateSettings = ({}: ISCCCertificateSettingsProps) => (
+  <Section>
+    <Title>Certificats ISCC</Title>
+  </Section>
+)
+
+type BBSCertificateSettingsProps = {}
+
+export const BBSCertificateSettings = ({}: BBSCertificateSettingsProps) => (
+  <Section>
+    <Title>Certificats 2BS</Title>
+  </Section>
+)
 
 type ProductionSitesSettingsProps = {}
 
