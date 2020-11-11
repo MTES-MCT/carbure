@@ -5,6 +5,7 @@ import calendar
 import datetime
 import re
 import argparse
+from django.core.mail import send_mail
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -66,8 +67,9 @@ def load_invalid_certificates():
         if not certificate:
             continue
         print(i, end="\r")
+    print('')
     csvfile.close()
-    return
+    return i
 
 def load_valid_certificates():
     filename = '%s/Certificates2BS_%s.csv' % (CSV_FOLDER, today.strftime('%Y-%m-%d'))
@@ -105,31 +107,38 @@ def load_valid_certificates():
         if not certificate:
             continue
         print(i, end="\r")
+    print('')
     csvfile.close()
-    return
+    return i
 
-def send_summary_email(new_scopes, new_certificates, new_certificates_scopes):
-    pass
+def summary(nb_valid, nb_invalid, new_scopes, new_certificates, new_certificates_scopes, email):
+    mail_content = "Güten Früden, <br />\n"
+    mail_content += "Le chargement des certificats 2BS s'est bien passé.<br />\n"
 
-def display_summary(new_scopes, new_certificates, new_certificates_scopes):
+    mail_content += "%d certificats valides et %d certificats invalides ont été chargés<br />\n" % (nb_valid, nb_invalid)
+    
     if not len(new_scopes):
-        print('No new scopes')
+        mail_content += "Aucun nouveau type de certification détecté<br />\n"
     else:
         for ns in new_scopes:
-            print('New 2BS scope detected: %s' % (ns.certification_type))
+            mail_content += "Nouveau type de certification 2BS détecté: %s<br />\n" % (ns.certification_type)
 
     if not len(new_certificates):
-        print('No new certificates')
+        mail_content += "Aucun nouveau certificat détecté<br />\n"
     else:
         for nc in new_certificates:
-            print('New 2BS certificate added: %s %s' % (nc.certificate_id, nc.certificate_holder))
+            mail_content += "Nouveau certificat 2BS détecté: [%s] - [%s]<br />\n" % (nc.certificate_id, nc.certificate_holder)
 
     if not len(new_certificates_scopes):
-        print('No new certificates scopes')
+        mail_content += "Aucune modification de certificat détectée<br />\n"
     else:
         for ncs in new_certificates_scopes:
-            print('New scope added for 2BS certificate: [%s] - [%s]: %s' % (ncs.certificate.certificate_id, ncs.certificate.certificate_holder, ncs.scope.certification_type))
-
+            mail_content += "Mise à jour du certificat [%s] - [%s]: Ajout de la certification: %s<br />\n" % (ncs.certificate.certificate_id, ncs.certificate.certificate_holder, ncs.scope.certification_type)
+    if email:
+        send_mail('[carbure-bot] - Certificats 2BS', mail_content, 'carbure@beta.gouv.fr', ['carbure@beta.gouv.fr'], fail_silently=False)
+    else:
+        print(mail_content)
+        
 
 def main(args):
     # get latest data from db
@@ -138,9 +147,9 @@ def main(args):
     last_certificate_scope_id = DBSCertificateScope.objects.latest('id').id
 
     # update data
-    load_valid_certificates()
+    nb_valid_certificates = load_valid_certificates()
     print('')
-    load_invalid_certificates()
+    nb_invalid_certificates = load_invalid_certificates()
         
     # check what has been updated
     new_scopes = []
@@ -152,10 +161,7 @@ def main(args):
         new_certificates = DBSCertificate.objects.filter(id__gt=last_certificate_id)
     if last_certificate_scope_id != DBSCertificateScope.objects.latest('id').id:
         new_certificates_scopes = DBSCertificateScope.objects.filter(id__gt=last_certificate_scope_id)
-    if args.email:
-        send_summary_email(new_scopes, new_certificates, new_certificates_scopes)
-    else:
-        display_summary(new_scopes, new_certificates, new_certificates_scopes)
+    summary(nb_valid_certificates, nb_invalid_certificates, new_scopes, new_certificates, new_certificates_scopes, args.email)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load 2BS certificates in database')
