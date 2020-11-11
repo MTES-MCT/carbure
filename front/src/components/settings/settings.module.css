@@ -20,25 +20,6 @@
   font-size: 20px;
 }
 
-.settingsSectionHeader {
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px;
-}
-
-.settingsSectionHeader button {
-  font-size: 14px;
-}
-
-.settingsSectionBody {
-  padding: 24px;
-  padding-top: 0;
-}
-
-.settingsSectionForm {
-  padding: 0 24px;
-}
-
 .settingsCheckbox {
   align-self: flex-start;
   height: auto;

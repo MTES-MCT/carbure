@@ -10,12 +10,6 @@
   flex-direction: row;
 }
 
-.section {
-  background-color: var(--white);
-  border: 1px solid var(--gray-medium);
-  margin-bottom: 24px;
-}
-
 /* BUTTON COMPONENT */
 
 .button {
