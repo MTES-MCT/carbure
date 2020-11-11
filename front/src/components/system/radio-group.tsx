@@ -12,7 +12,7 @@ type RadioGroupProps = {
 const RadioGroup = ({ value, options, onChange }: RadioGroupProps) => (
   <Box className={styles.radioGroup}>
     {options.map((option) => (
-      <label key={option.value} className={styles.radioGroupLabel}>
+      <Box row as="label" key={option.value} className={styles.radioGroupLabel}>
         <input
           type="radio"
           checked={option.value === value}
@@ -21,7 +21,7 @@ const RadioGroup = ({ value, options, onChange }: RadioGroupProps) => (
           onChange={onChange}
         />
         {option.label}
-      </label>
+      </Box>
     ))}
   </Box>
 )
