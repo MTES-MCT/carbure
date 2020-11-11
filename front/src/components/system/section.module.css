@@ -1,0 +1,24 @@
+.section {
+  background-color: var(--white);
+  border: 1px solid var(--gray-medium);
+  margin-bottom: 24px;
+}
+
+.sectionHeader {
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+}
+
+.sectionHeader button {
+  font-size: 14px;
+}
+
+.sectionBody {
+  padding: 24px;
+  padding-top: 0;
+}
+
+.sectionForm {
+  padding: 0 24px;
+}

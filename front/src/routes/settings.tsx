@@ -4,15 +4,12 @@ import { EntitySelection } from "../hooks/helpers/use-entity"
 import { SettingsGetter } from "../hooks/helpers/use-get-settings"
 
 import { Main, Title } from "../components/system"
-import {
-  SettingsHeader,
-  SettingsBody,
-  CompanySettings,
-  ProductionSitesSettings,
-  DeliverySitesSettings,
-  ISCCCertificateSettings,
-  BBSCertificateSettings,
-} from "../components/settings"
+import { SettingsHeader, SettingsBody } from "../components/settings"
+import DeliverySitesSettings from "../components/settings/delivery-site-settings"
+import ProductionSitesSettings from "../components/settings/production-site-settings"
+import BBSCertificateSettings from "../components/settings/2bs-certificates-settings"
+import ISCCCertificateSettings from "../components/settings/iscc-certificates-settings"
+import CompanySettings from "../components/settings/company-settings"
 
 type SettingsProps = {
   entity: EntitySelection
