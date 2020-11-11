@@ -142,10 +142,15 @@ def summary(nb_valid, nb_invalid, new_scopes, new_certificates, new_certificates
 
 def main(args):
     # get latest data from db
-    last_scope_id = DBSScope.objects.latest('id').id
-    last_certificate_id = DBSCertificate.objects.latest('id').id
-    last_certificate_scope_id = DBSCertificateScope.objects.latest('id').id
-
+    try:
+        last_scope_id = DBSScope.objects.latest('id').id
+        last_certificate_id = DBSCertificate.objects.latest('id').id
+        last_certificate_scope_id = DBSCertificateScope.objects.latest('id').id
+    except:
+        last_scope_id = 0
+        last_certificate_id = 0
+        last_certificate_scope_id = 0
+        
     # update data
     nb_valid_certificates = load_valid_certificates()
     print('')
