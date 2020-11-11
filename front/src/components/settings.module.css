@@ -10,7 +10,6 @@
 .settingsHeader {
   display: flex;
   justify-content: space-between;
-  align-items: center;
 }
 
 .settingsBody {
@@ -19,10 +18,63 @@
 
 .settingsBody h1 {
   font-size: 20px;
-  margin-bottom: 16px;
+}
+
+.settingsSectionHeader {
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+}
+
+.settingsSectionHeader button {
+  font-size: 14px;
+}
+
+.settingsSectionBody {
+  padding: 24px;
+  padding-top: 0;
+}
+
+.settingsSectionForm {
+  padding: 0 24px;
 }
 
 .settingsCheckbox {
+  align-self: flex-start;
   height: auto;
   margin: 8px 0;
+}
+
+.settingsTable {
+  margin-top: 8px;
+}
+
+.settingsTableEmptyColumn {
+  width: 32px;
+}
+
+.settingsTableIDColumn {
+  width: 128px;
+}
+
+.settingsTableActionColumn {
+  width: 88px;
+  text-align: center;
+}
+
+.settingsTableActions {
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+tr:hover .settingsTableActions {
+  display: flex;
+}
+
+.settingsTableActions :global(.icon) {
+  color: var(--gray-dark);
+}
+.settingsTableActions :global(.icon:hover) {
+  color: var(--blue-medium);
 }

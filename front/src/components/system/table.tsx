@@ -28,9 +28,9 @@ export interface Row<T> {
 type TableProps<T> = SystemProps & {
   rows: Row<T>[]
   columns: Column<T>[]
-  sortBy: string
-  order: "asc" | "desc"
-  onSort: (s: string) => void
+  sortBy?: string
+  order?: "asc" | "desc"
+  onSort?: (s: string) => void
 }
 
 export default function Table<T>({
@@ -50,7 +50,7 @@ export default function Table<T>({
             <th
               key={c}
               className={column.className}
-              onClick={() => column.sortBy && onSort(column.sortBy)}
+              onClick={() => column.sortBy && onSort && onSort(column.sortBy)}
             >
               {column.header ?? null}
               {sortBy && sortBy === column.sortBy && (
