@@ -25,4 +25,13 @@ urlpatterns = [
     path('', public_views.index, name='index'),
     path('stats', public_views.stats, name='stats'),
     path('api/', include('api.urls')),
+
+    # deprecated - will be removed soon
+    path('public/', include('public.urls')),
+    path('producers/', include('producers.urls')),
+    path('operators/', include('operators.urls')),
+    path('traders/', include('traders.urls')),
+    path('administrators/', include('administrators.urls')),
+    path('core/', include('core.urls')),
+
 ]
