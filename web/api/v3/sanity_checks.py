@@ -1,4 +1,5 @@
 import datetime
+from django import db
 from core.models import LotValidationError
 
 # init data cache
@@ -45,15 +46,18 @@ def raise_error(lot, rule_triggered, details=''):
     return LotValidationError(**d)
 
 def bulk_sanity_checks(lots):
+    db.connections.close_all()
     results = []
     errors = []
+    print('starting bulk_sanity_check %s' % (datetime.datetime.now()))
     # cleanup previous errors
     LotValidationError.objects.filter(lot__in=lots).delete()
     for lot in lots:
         is_sane, validation_errors = sanity_check(lot)
         errors += validation_errors
         results.append(is_sane)
-    LotValidationError.objects.bulk_create(errors)
+    LotValidationError.objects.bulk_create(errors, batch_size=1000)
+    print('finished bulk_sanity_check %s' % (datetime.datetime.now()))
     return results
 
 def sanity_check(lot):

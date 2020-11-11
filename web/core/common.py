@@ -1,7 +1,7 @@
 import datetime
 import openpyxl
 from django.db.models import Q
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+from multiprocessing import Process
 
 from django.http import JsonResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
@@ -749,15 +749,18 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
     # and sort them to assign the Transaction to the correct Lot
 
     # 1: Batch insert of Lot objects
-    LotV2.objects.bulk_create(lots_to_insert, batch_size=100)
+    LotV2.objects.bulk_create(lots_to_insert, batch_size=1000)
     # 2: Fetch newly created lots
-    new_lots = [lot for lot in LotV2.objects.filter(added_by=entity).order_by('-id')[0:len(lots_to_insert)]]
+    new_lots = [lot for lot in LotV2.objects
+        .select_related('matiere_premiere', 'biocarburant', 'pays_origine', 'carbure_production_site')
+        .filter(added_by=entity).order_by('-id')[0:len(lots_to_insert)]
+    ]
     # 3: Sort by ID (might be overkill but better safe than sorry)
     for lot, tx in zip(sorted(new_lots, key=lambda x: x.id), txs_to_insert):
         # 4: Assign lot.id to tx
         tx.lot_id = lot.id
     # 5: Batch insert transaction
-    LotTransaction.objects.bulk_create(txs_to_insert, batch_size=100)
+    LotTransaction.objects.bulk_create(txs_to_insert, batch_size=1000)
 
     # likewise, LotError and TransactionError require a foreign key
     # 6 assign lot.id to LotError
@@ -765,18 +768,19 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
         for e in errors:
             e.lot_id = lot.id
     flat_errors = [item for sublist in lot_errors for item in sublist]
-    LotV2Error.objects.bulk_create(flat_errors, batch_size=100)
+    LotV2Error.objects.bulk_create(flat_errors, batch_size=1000)
     # 7 assign tx.id to TransactionError
     new_txs = [t for t in LotTransaction.objects.filter(lot__added_by=entity).order_by('-id')[0:len(lots_to_insert)]]
     for tx, errors in zip(sorted(new_txs, key=lambda x: x.id), tx_errors):
         for e in errors:
             e.tx_id = tx.id
     flat_tx_errors = [item for sublist in tx_errors for item in sublist]
-    TransactionError.objects.bulk_create(flat_tx_errors, batch_size=100)
+    TransactionError.objects.bulk_create(flat_tx_errors, batch_size=1000)
     # 8 run sanity checks
-    print('bulk_insert finished, starting sanity checks %s' % (datetime.datetime.now()))
-    bulk_sanity_checks(new_lots)
-    print('bulk sanity_checks finished %s' % (datetime.datetime.now()))
+    print('calling bulk_sanity_check in background %s' % (datetime.datetime.now()))
+    p = Process(target=bulk_sanity_checks, args=(new_lots,))
+    p.start()
+    print('done calling bulk_sanity_check in background %s' % (datetime.datetime.now()))
     return new_lots, new_txs
 
 
