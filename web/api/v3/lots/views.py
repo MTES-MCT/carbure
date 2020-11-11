@@ -10,7 +10,7 @@ from core.models import LotV2, LotTransaction, LotV2Error, TransactionError
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_stock, template_operators, template_traders
 from core.xlsx_v3 import export_transactions
-from core.common import validate_lots, load_excel_file, load_lot, bulk_insert
+from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data
 from api.v3.sanity_checks import bulk_sanity_checks
 
 
@@ -429,7 +429,9 @@ def add_lot(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    lot, tx, lot_errors, tx_errors = load_lot(entity, request.user, request.POST.dict(), 'MANUAL')
+    # prefetch some data
+    d = get_prefetched_data(entity)
+    lot, tx, lot_errors, tx_errors = load_lot(d, entity, request.user, request.POST.dict(), 'MANUAL')
     if not tx:
         return JsonResponse({'status': 'error', 'message': 'Could not add lot to database'}, status=400)
     new_lots, new_txs = bulk_insert(entity, [lot], [tx], [lot_errors], [tx_errors])
@@ -464,7 +466,8 @@ def update_lot(request):
         return JsonResponse({'status': 'forbidden', 'message': "Tx already validated and accepted %d" % (tx.id)}, status=400)
     LotV2Error.objects.filter(lot_id=tx.lot.id).delete()
     TransactionError.objects.filter(tx_id=tx.id).delete()
-    lot, tx, lot_errors, tx_errors = load_lot(entity, request.user, request.POST.dict(), 'MANUAL', tx)
+    d = get_prefetched_data(entity)
+    lot, tx, lot_errors, tx_errors = load_lot(d, entity, request.user, request.POST.dict(), 'MANUAL', tx)
     lot.save()
     tx.save()
     LotV2Error.objects.bulk_create(lot_errors)

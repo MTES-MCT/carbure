@@ -10,6 +10,16 @@ from core.models import LotValidationError
 import dateutil.parser
 from api.v3.sanity_checks import sanity_check, bulk_sanity_checks
 
+def get_prefetched_data(entity):
+    d = {}
+    d['producers'] = {p.name: p for p in Entity.objects.filter(entity_type='Producteur')}
+    d['countries'] = {p.code_pays: p for p in Pays.objects.all()}
+    d['biocarburants'] = {b.code: b for b in Biocarburant.objects.all()}
+    d['matieres_premieres'] = {m.code: m for m in MatierePremiere.objects.all()}
+    d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.filter(producer=entity)}
+    d['depots'] = {d.depot_id: d for d in Depot.objects.all()}
+    d['clients'] = {c.name: c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
+    return d
 
 def tx_is_valid(tx):
     is_valid = True
@@ -171,8 +181,9 @@ def fuse_lots(txs):
     print('new lot of %d of %s id %s' % (new_lot.volume, new_lot.biocarburant.name, new_lot.carbure_id))
 
 
-def fill_producer_info(entity, lot_row, lot):
+def fill_producer_info(entity, lot_row, lot, prefetched_data):
     lot_errors = []
+    all_producers = prefetched_data['producers']
     if 'producer' in lot_row and lot_row['producer'] is not None:
         # check if we know the producer
         if lot_row['producer'].strip() == entity.name:
@@ -182,8 +193,7 @@ def fill_producer_info(entity, lot_row, lot):
             lot.unknown_producer = ''
         else:
             # it's not me. do we know this producer ?
-            matches = Entity.objects.filter(name=lot_row['producer']).count()
-            if matches == 1:
+            if lot_row['producer'] in all_producers:
                 # yes we do
                 # in this case, the producer should declare its production directly in Carbure
                 # we cannot allow someone else to declare for them
@@ -218,16 +228,18 @@ def fill_producer_info(entity, lot_row, lot):
     return lot_errors
 
 
-def fill_production_site_info(entity, lot_row, lot):
+def fill_production_site_info(entity, lot_row, lot, prefetched_data):
     lot_errors = []
+    my_production_sites = prefetched_data['production_sites']
+    countries = prefetched_data['countries']
     if 'production_site' in lot_row:
         production_site = lot_row['production_site']
         if lot.producer_is_in_carbure:
-            try:
-                lot.carbure_production_site = ProductionSite.objects.get(producer=lot.carbure_producer, name=production_site)
+            if production_site in my_production_sites:
+                lot.carbure_production_site = my_production_sites[production_site]
                 lot.production_site_is_in_carbure = True
                 lot.unknown_production_site = ''
-            except Exception:
+            else:
                 # do not allow the use of an unknown production site if the producer is registered in Carbure
                 lot.carbure_production_site = None
                 lot.production_site_is_in_carbure = False
@@ -255,10 +267,9 @@ def fill_production_site_info(entity, lot_row, lot):
             if production_site_country is None:
                 lot.unknown_production_country = None
             else:
-                try:
-                    country = Pays.objects.get(code_pays=production_site_country)
-                    lot.unknown_production_country = country
-                except Exception:
+                if production_site_country in countries:
+                    lot.unknown_production_country = countries[production_site_country]
+                else:
                     error = LotV2Error(lot=lot, field='unknown_production_country',
                                        error='Champ production_site_country incorrect',
                                        value=production_site_country)
@@ -295,13 +306,14 @@ def fill_production_site_info(entity, lot_row, lot):
     return lot_errors
 
 
-def fill_biocarburant_info(lot_row, lot):
+def fill_biocarburant_info(lot_row, lot, prefetched_data):
     lot_errors = []
+    biocarburants = prefetched_data['biocarburants']
     if 'biocarburant_code' in lot_row:
         biocarburant = lot_row['biocarburant_code']
-        try:
-            lot.biocarburant = Biocarburant.objects.get(code=biocarburant)
-        except Exception:
+        if biocarburant in biocarburants:
+            lot.biocarburant = biocarburants[biocarburant]
+        else:
             lot.biocarburant = None
             lot_errors.append(LotV2Error(lot=lot, field='biocarburant_code',
                                          error='Biocarburant inconnu',
@@ -315,14 +327,14 @@ def fill_biocarburant_info(lot_row, lot):
     return lot_errors
 
 
-def fill_matiere_premiere_info(lot_row, lot):
+def fill_matiere_premiere_info(lot_row, lot, prefetched_data):
     lot_errors = []
+    mps = prefetched_data['matieres_premieres']
     if 'matiere_premiere_code' in lot_row:
         matiere_premiere = lot_row['matiere_premiere_code']
-        try:
-            lot.matiere_premiere = MatierePremiere.objects.get(code=matiere_premiere)
-            LotV2Error.objects.filter(lot=lot, field='matiere_premiere_code').delete()
-        except Exception:
+        if matiere_premiere in mps:
+            lot.matiere_premiere = mps[matiere_premiere]
+        else:
             lot.matiere_premiere = None
             lot_errors.append(LotV2Error(lot=lot, field='matiere_premiere_code',
                                          error='Matière Première inconnue',
@@ -344,9 +356,6 @@ def fill_volume_info(lot_row, lot):
             if lot.volume <= 0:
                 lot_errors.append(LotV2Error(lot=lot, field='volume',
                                             error='Le volume doit être supérieur à 0', value=volume))
-            else:
-                # everything is fine, delete all errors linked to volume              
-                LotV2Error.objects.filter(lot=lot, field='volume').delete()
         except Exception:
             lot.volume = 0
             lot_errors.append(LotV2Error(lot=lot, field='volume',
@@ -358,13 +367,14 @@ def fill_volume_info(lot_row, lot):
     return lot_errors
 
 
-def fill_pays_origine_info(lot_row, lot):
+def fill_pays_origine_info(lot_row, lot, prefetched_data):
     lot_errors = []
+    countries = prefetched_data['countries']
     if 'pays_origine_code' in lot_row:
         pays_origine = lot_row['pays_origine_code']
-        try:
-            lot.pays_origine = Pays.objects.get(code_pays=pays_origine)
-        except Exception:
+        if pays_origine in countries:
+            lot.pays_origine = countries[pays_origine]
+        else:
             lot.pays_origine = None
             lot_errors.append(LotV2Error(lot=lot, field='pays_origine_code', error='Pays inconnu', value=pays_origine))
     else:
@@ -482,7 +492,6 @@ def fill_delivery_date(lot_row, lot, transaction):
                 dd = dateutil.parser.parse(delivery_date, dayfirst=True)
                 transaction.delivery_date = dd
                 lot.period = dd.strftime('%Y-%m')
-                TransactionError.objects.filter(tx=transaction, field='delivery_date').delete()
         except Exception as e:
             print(e)
             transaction.delivery_date = None
@@ -492,18 +501,18 @@ def fill_delivery_date(lot_row, lot, transaction):
     return tx_errors
 
 
-def fill_client_data(entity, lot_row, transaction):
+def fill_client_data(entity, lot_row, transaction, prefetched_data):
     tx_errors = []
+    clients = prefetched_data['clients']
     if entity.entity_type == 'Opérateur':
         transaction.client_is_in_carbure = True
         transaction.carbure_client = entity
         transaction.unknown_client = ''
     elif 'client' in lot_row and lot_row['client'] is not None:
         client = lot_row['client']
-        matches = Entity.objects.filter(name=client).count()
-        if matches:
+        if client in clients:
             transaction.client_is_in_carbure = True
-            transaction.carbure_client = Entity.objects.get(name=client)
+            transaction.carbure_client = clients[client]
             transaction.unknown_client = ''
         else:
             transaction.client_is_in_carbure = False
@@ -536,14 +545,15 @@ def fill_vendor_data(entity, lot_row, transaction):
             transaction.unknown_vendor = ''
     return tx_errors
 
-def fill_delivery_site_data(lot_row, transaction):
+def fill_delivery_site_data(lot_row, transaction, prefetched_data):
     tx_errors = []
+    depots = prefetched_data['depots']
+    countries = prefetched_data['countries']
     if 'delivery_site' in lot_row and lot_row['delivery_site'] is not None:
         delivery_site = lot_row['delivery_site']
-        matches = Depot.objects.filter(depot_id=delivery_site).count()
-        if matches:
+        if delivery_site in depots:
             transaction.delivery_site_is_in_carbure = True
-            transaction.carbure_delivery_site = Depot.objects.get(depot_id=delivery_site)
+            transaction.carbure_delivery_site = depots[delivery_site]
             transaction.unknown_client = ''
         else:
             transaction.delivery_site_is_in_carbure = False
@@ -556,10 +566,11 @@ def fill_delivery_site_data(lot_row, transaction):
         tx_errors.append(TransactionError(tx=transaction, field='delivery_site', value=None, error="Merci de préciser un site de livraison"))
     if transaction.delivery_site_is_in_carbure is False:
         if 'delivery_site_country' in lot_row:
-            try:
-                country = Pays.objects.get(code_pays=lot_row['delivery_site_country'])
+            country_code = lot_row['delivery_site_country']
+            if country_code in countries: 
+                country = countries[country_code]
                 transaction.unknown_delivery_site_country = country
-            except Exception:
+            else:
                 tx_errors.append(TransactionError(tx=transaction, field='delivery_site_country',
                                                   error='Champ production_site_country incorrect',
                                                   value=lot_row['delivery_site_country']))
@@ -569,7 +580,7 @@ def fill_delivery_site_data(lot_row, transaction):
                                               value=None))
     return tx_errors
 
-def load_mb_lot(entity, user, lot_dict, source):
+def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
     lot_errors = []
     tx_errors = []
 
@@ -613,8 +624,8 @@ def load_mb_lot(entity, user, lot_dict, source):
 
     tx_errors.append(fill_dae_data(lot_dict, transaction))
     tx_errors.append(fill_delivery_date(lot_dict, lot, transaction))
-    tx_errors.append(fill_client_data(entity, lot_dict, transaction))
-    tx_errors.append(fill_delivery_site_data(lot_dict, transaction))
+    tx_errors.append(fill_client_data(entity, lot_dict, transaction, prefetched_data, ))
+    tx_errors.append(fill_delivery_site_data(lot_dict, transaction, prefetched_data, ))
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
     transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
@@ -622,7 +633,8 @@ def load_mb_lot(entity, user, lot_dict, source):
     tx_errors = [item for sublist in tx_errors for item in sublist]
     return lot, transaction, lot_errors, tx_errors
 
-def load_lot(entity, user, lot_dict, source, transaction=None):
+def load_lot(prefetched_data, entity, user, lot_dict, source, transaction=None):
+    now = datetime.datetime.now()
     lot_errors = []
     tx_errors = []
 
@@ -639,36 +651,40 @@ def load_lot(entity, user, lot_dict, source, transaction=None):
     else:
         lot = transaction.lot
 
-    lot_errors.append(fill_producer_info(entity, lot_dict, lot))
-    lot_errors.append(fill_production_site_info(entity, lot_dict, lot))
-    lot_errors.append(fill_biocarburant_info(lot_dict, lot))
-    lot_errors.append(fill_matiere_premiere_info(lot_dict, lot))
-    lot_errors.append(fill_volume_info(lot_dict, lot))
-    lot_errors.append(fill_pays_origine_info(lot_dict, lot))
-    lot_errors.append(fill_ghg_info(lot_dict, lot))
+    lot_errors += fill_producer_info(entity, lot_dict, lot, prefetched_data)
+    lot_errors += fill_production_site_info(entity, lot_dict, lot, prefetched_data)
+    lot_errors += fill_biocarburant_info(lot_dict, lot, prefetched_data)
+    lot_errors += fill_matiere_premiere_info(lot_dict, lot, prefetched_data)
+    lot_errors += fill_volume_info(lot_dict, lot)
+    lot_errors += fill_pays_origine_info(lot_dict, lot, prefetched_data)
+    lot_errors += fill_ghg_info(lot_dict, lot)
     lot.is_valid = False
 
+    #print('lot data loaded in %s' % (datetime.datetime.now() - now))
     if transaction is None:
         transaction = LotTransaction()
     transaction.is_mac = False
     if 'mac' in lot_dict and lot_dict['mac'] == 1:
         transaction.is_mac = True
 
-    tx_errors.append(fill_dae_data(lot_dict, transaction))
-    tx_errors.append(fill_delivery_date(lot_dict, lot, transaction))
-    tx_errors.append(fill_client_data(entity, lot_dict, transaction))
-    tx_errors.append(fill_vendor_data(entity, lot_dict, transaction))
-    tx_errors.append(fill_delivery_site_data(lot_dict, transaction))
+    tx_errors += fill_dae_data(lot_dict, transaction)
+    tx_errors += fill_delivery_date(lot_dict, lot, transaction)
+    tx_errors += fill_client_data(entity, lot_dict, transaction, prefetched_data)
+    tx_errors += fill_vendor_data(entity, lot_dict, transaction)
+    tx_errors += fill_delivery_site_data(lot_dict, transaction, prefetched_data)
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
     transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
-    lot_errors = [item for sublist in lot_errors for item in sublist]
-    tx_errors = [item for sublist in tx_errors for item in sublist]
+    #print('tx data loaded in %s' % (datetime.datetime.now() - now))
     return lot, transaction, lot_errors, tx_errors
 
 
 def load_excel_file(entity, user, file, mass_balance=False):
     print('File received %s' % (datetime.datetime.now()))
+
+    # prefetch some data
+    prefetched_data = get_prefetched_data(entity)
+
     wb = openpyxl.load_workbook(file)
     try:
         lots_sheet = wb['lots']
@@ -696,9 +712,9 @@ def load_excel_file(entity, user, file, mass_balance=False):
         for lot_row in lots:
             try:
                 if mass_balance:
-                    lot, tx, l_errors, t_errors = load_mb_lot(entity, user, lot_row, 'EXCEL')
+                    lot, tx, l_errors, t_errors = load_mb_lot(prefetched_data, entity, user, lot_row, 'EXCEL')
                 else:
-                    lot, tx, l_errors, t_errors = load_lot(entity, user, lot_row, 'EXCEL')
+                    lot, tx, l_errors, t_errors = load_lot(prefetched_data, entity, user, lot_row, 'EXCEL')
                 if lot is None:
                     continue
                 lots_loaded += 1
@@ -758,13 +774,9 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
     flat_tx_errors = [item for sublist in tx_errors for item in sublist]
     TransactionError.objects.bulk_create(flat_tx_errors, batch_size=100)
     # 8 run sanity checks
-    # can we run in parallel ?
     print('bulk_insert finished, starting sanity checks %s' % (datetime.datetime.now()))
     bulk_sanity_checks(new_lots)
-    print('bulk sanity_checks finished')
-    #print('starting io_bound threadpool %s' % (datetime.datetime.now()))   
-    #run_io_tasks_in_parallel(sanity_check, new_lots)
-    #print('sanity_checks finished %s' % (datetime.datetime.now()))   
+    print('bulk sanity_checks finished %s' % (datetime.datetime.now()))
     return new_lots, new_txs
 
 
