@@ -7,10 +7,11 @@ import { Main, Title } from "../components/system"
 import {
   SettingsHeader,
   SettingsBody,
-  MACSettings,
-  TradingSettings,
+  CompanySettings,
   ProductionSitesSettings,
   DeliverySitesSettings,
+  ISCCCertificateSettings,
+  BBSCertificateSettings,
 } from "../components/settings"
 
 type SettingsProps = {
@@ -19,6 +20,8 @@ type SettingsProps = {
 }
 
 const Settings = ({ entity, settings }: SettingsProps) => {
+  const isProducer = entity?.entity_type === "Producteur"
+
   return (
     <Main>
       <SettingsHeader>
@@ -26,9 +29,10 @@ const Settings = ({ entity, settings }: SettingsProps) => {
       </SettingsHeader>
 
       <SettingsBody>
-        <MACSettings entity={entity} settings={settings} />
-        <TradingSettings entity={entity} settings={settings} />
-        <ProductionSitesSettings />
+        <CompanySettings entity={entity} settings={settings} />
+        {entity?.has_trading && <ISCCCertificateSettings />}
+        {entity?.has_trading && <BBSCertificateSettings />}
+        {isProducer && <ProductionSitesSettings />}
         <DeliverySitesSettings />
       </SettingsBody>
     </Main>
