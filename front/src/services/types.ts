@@ -259,3 +259,21 @@ export interface StockSnapshot {
     [key in Filters]: Option[]
   }
 }
+
+export type DBSCertificate = {
+  certificate_id: string
+  certificate_holder: string
+  holder_address: string
+  valid_from: string
+  valid_until: string
+  certification_type: string
+}
+
+export type ISCCCertificate = {
+  certificate_id: string
+  certificate_holder: string
+  location: string
+  valid_from: string
+  valid_until: string
+  issuing_cb: string
+}

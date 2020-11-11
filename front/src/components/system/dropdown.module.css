@@ -41,7 +41,7 @@
 .dropdownItems li {
   display: flex;
   align-items: center;
-  padding: 8px 12px;
+  padding: 10px 12px;
   flex-shrink: 0;
   overflow-x: hidden;
   white-space: nowrap;

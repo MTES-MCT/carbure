@@ -70,6 +70,8 @@ function AutoComplete<T>({
     getQuery
   )
 
+  const isEmpty = !suggestions.data || suggestions.data.length === 0
+
   return (
     <Dropdown>
       <LabelInput
@@ -84,7 +86,7 @@ function AutoComplete<T>({
         }
       />
 
-      {!readOnly && (
+      {!readOnly && !isEmpty && (
         <Dropdown.Items open={dd.isOpen} className={styles.suggestions}>
           {suggestions.data?.map((option, i) => (
             <li key={getValue(option)} onMouseDown={() => change(option)}>

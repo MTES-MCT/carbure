@@ -4,15 +4,12 @@ import { EntitySelection } from "../hooks/helpers/use-entity"
 import { SettingsGetter } from "../hooks/helpers/use-get-settings"
 
 import { Main, Title } from "../components/system"
-import {
-  SettingsHeader,
-  SettingsBody,
-  CompanySettings,
-  ProductionSitesSettings,
-  DeliverySitesSettings,
-  ISCCCertificateSettings,
-  BBSCertificateSettings,
-} from "../components/settings"
+import { SettingsHeader, SettingsBody } from "../components/settings"
+import DeliverySitesSettings from "../components/settings/delivery-site-settings"
+import ProductionSitesSettings from "../components/settings/production-site-settings"
+import DBSCertificateSettings from "../components/settings/2bs-certificates-settings"
+import ISCCCertificateSettings from "../components/settings/iscc-certificates-settings"
+import CompanySettings from "../components/settings/company-settings"
 
 type SettingsProps = {
   entity: EntitySelection
@@ -21,19 +18,20 @@ type SettingsProps = {
 
 const Settings = ({ entity, settings }: SettingsProps) => {
   const isProducer = entity?.entity_type === "Producteur"
+  const hasTrading = entity?.has_trading ?? false
 
   return (
     <Main>
       <SettingsHeader>
-        <Title>Paramètres</Title>
+        <Title>Paramètres {entity?.name}</Title>
       </SettingsHeader>
 
       <SettingsBody>
         <CompanySettings entity={entity} settings={settings} />
-        {entity?.has_trading && <ISCCCertificateSettings />}
-        {entity?.has_trading && <BBSCertificateSettings />}
-        {isProducer && <ProductionSitesSettings />}
-        <DeliverySitesSettings />
+        {hasTrading && <ISCCCertificateSettings entity={entity} />}
+        {hasTrading && <DBSCertificateSettings entity={entity} />}
+        {isProducer && <ProductionSitesSettings entity={entity} />}
+        <DeliverySitesSettings entity={entity} />
       </SettingsBody>
     </Main>
   )
