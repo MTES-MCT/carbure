@@ -1,0 +1,71 @@
+.settingsTop {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--gray-light);
+  padding: 32px 120px;
+  margin-top: 1px;
+  box-shadow: 0px 1px 2px var(--gray-medium);
+}
+
+.settingsHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.settingsBody {
+  padding: 32px 120px;
+}
+
+.settingsBody h1 {
+  font-size: 20px;
+}
+
+.settingsCheckbox {
+  align-self: flex-start;
+  height: auto;
+  margin: 8px 0;
+}
+
+.settingsTable {
+  margin-top: 8px;
+}
+
+.settingsTableEmptyColumn {
+  width: 32px;
+}
+
+.settingsTableIDColumn {
+  width: 128px;
+}
+
+.settingsTableActionColumn {
+  width: 88px;
+  text-align: center;
+}
+
+.settingsTableActions {
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+tr:hover .settingsTableActions {
+  display: flex;
+}
+
+.settingsTableActions :global(.icon) {
+  color: var(--gray-dark);
+}
+
+.settingsTableActions :global(.icon:hover) {
+  color: var(--blue-medium);
+}
+
+.dialogButtons {
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.dialogButtons button {
+  margin-left: 8px;
+}

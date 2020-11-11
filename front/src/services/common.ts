@@ -1,8 +1,10 @@
 import {
   Biocarburant,
   Country,
+  DBSCertificate,
   DeliverySite,
   Entity,
+  ISCCCertificate,
   MatierePremiere,
   ProductionSite,
 } from "./types"
@@ -57,13 +59,15 @@ export function findGHG(
   return api.get("/common/ghg", { biocarburant_code, matiere_premiere_code })
 }
 
-export function findISCCCertificates(query: string) {
+export function findISCCCertificates(
+  query: string
+): Promise<ISCCCertificate[]> {
   return api.get("/common/iscc-certificates", {
     query: query,
   })
 }
 
-export function find2BSCertificates(query: string) {
+export function find2BSCertificates(query: string): Promise<DBSCertificate[]> {
   return api.get("/common/2bs-certificates", {
     query: query,
   })

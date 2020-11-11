@@ -126,7 +126,7 @@ def check_rights(entity_id_field):
     def actual_decorator(function):
         @wraps(function)
         def wrap(request, *args, **kwargs):
-            entity_id = request.POST.get(entity_id_field, False)
+            entity_id = request.POST.get(entity_id_field, request.GET.get(entity_id_field, False))
             if not entity_id:
                 return JsonResponse({'status': 'error', 'message': "Missing field %s" % (entity_id_field)}, status=400)
 

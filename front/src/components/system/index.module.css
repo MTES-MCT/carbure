@@ -10,14 +10,6 @@
   flex-direction: row;
 }
 
-.section {
-  align-items: flex-start;
-  background-color: var(--white);
-  border: 1px solid var(--gray-highlight);
-  padding: 24px;
-  margin-bottom: 24px;
-}
-
 /* BUTTON COMPONENT */
 
 .button {
