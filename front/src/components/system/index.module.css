@@ -231,9 +231,9 @@
   flex: 1;
 }
 
-.errorLabel,
-.errorLabel:hover,
-.errorLabel:focus {
+.errorLabel > span,
+.errorLabel:hover > span,
+.errorLabel:focus > span {
   color: var(--red-dark);
 }
 
