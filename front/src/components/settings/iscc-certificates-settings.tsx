@@ -10,13 +10,13 @@ import * as common from "../../services/common"
 import useAPI from "../../hooks/helpers/use-api"
 
 import { Title, Button, Box, LoaderOverlay } from "../system"
-import { AlertCircle, Plus } from "../system/icons"
+import { AlertCircle, Cross, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
 import { SectionHeader, SectionBody, Section } from "../system/section"
-import { prompt, PromptFormProps } from "../system/dialog"
+import { confirm, prompt, PromptFormProps } from "../system/dialog"
 import AutoComplete from "../system/autocomplete"
 import { EMPTY_COLUMN } from "."
-import Table, { Column, Line } from "../system/table"
+import Table, { Actions, Column, Line } from "../system/table"
 
 const ISCCPrompt = ({
   onConfirm,
@@ -66,14 +66,21 @@ type ISCCCertificateSettingsProps = {
 const ISCCCertificateSettings = ({ entity }: ISCCCertificateSettingsProps) => {
   const [requestGetISCC, resolveGetISCC] = useAPI(api.getISCCTradingCertificates); // prettier-ignore
   const [requestAddISCC, resolveAddISCC] = useAPI(api.addISCCTradingCertificate); // prettier-ignore
+  const [requestDelISCC, resolveDelISCC] = useAPI(api.deleteISCCTradingCertificate); // prettier-ignore
 
   const entityID = entity?.id
   const certificates = requestGetISCC.data ?? []
 
-  const isLoading = requestGetISCC.loading || requestAddISCC.loading
+  const isLoading =
+    requestGetISCC.loading || requestAddISCC.loading || requestDelISCC.loading
+
   const isEmpty = certificates.length === 0
 
-  const rows = certificates.map((c) => ({ value: c }))
+  function refresh() {
+    if (entityID) {
+      resolveGetISCC(entityID)
+    }
+  }
 
   async function createISCCCertificate() {
     const data = await prompt(
@@ -89,11 +96,36 @@ const ISCCCertificateSettings = ({ entity }: ISCCCertificateSettingsProps) => {
     }
   }
 
+  async function deleteISCCCertificate(iscc: ISCCCertificate) {
+    if (
+      entityID &&
+      (await confirm(
+        "Suppresion certificat",
+        `Voulez-vous vraiment supprimer le certificat ISCC "${iscc.certificate_id}" ?`
+      ))
+    ) {
+      resolveDelISCC(entityID, iscc.certificate_id).then(refresh)
+    }
+  }
+
   useEffect(() => {
     if (entityID) {
       resolveGetISCC(entityID)
     }
   }, [entityID])
+
+  const columns = [
+    ...COLUMNS,
+    Actions([
+      {
+        icon: Cross,
+        title: "Supprimer le certificat",
+        action: deleteISCCCertificate,
+      },
+    ]),
+  ]
+
+  const rows = certificates.map((c) => ({ value: c }))
 
   return (
     <Section>
@@ -112,7 +144,7 @@ const ISCCCertificateSettings = ({ entity }: ISCCCertificateSettingsProps) => {
         </SectionBody>
       )}
 
-      {!isEmpty && <Table columns={COLUMNS} rows={rows} />}
+      {!isEmpty && <Table columns={columns} rows={rows} />}
 
       {isLoading && <LoaderOverlay />}
     </Section>

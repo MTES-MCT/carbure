@@ -114,7 +114,7 @@ const DBSCertificateSettings = ({ entity }: DBSCertificateSettingsProps) => {
 
   const columns = [
     ...COLUMNS,
-    Actions<DBSCertificate>([
+    Actions([
       {
         icon: Cross,
         title: "Supprimer le certificat",

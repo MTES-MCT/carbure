@@ -161,7 +161,7 @@ const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
 
   const columns = [
     ...PRODUCTION_SITE_COLUMNS,
-    Actions<ProductionSite>([
+    Actions([
       {
         icon: Cross,
         title: "Supprimer le site de production",
