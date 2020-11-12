@@ -1,6 +1,32 @@
 .suggestions {
-  top: calc(100% - 10px);
-  background-color: var(--white);
-  border-color: var(--blue-medium);
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  max-height: 33vh;
+  background-color: var(--gray-light);
+  border: 1px solid var(--gray-medium);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  z-index: 2;
+  font-size: var(--font-size);
+  margin-top: -8px;
+}
+
+.suggestions li {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  flex-shrink: 0;
+  overflow-x: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid var(--gray-light);
+}
+
+.suggestions li:hover,
+.focusedSuggestion {
+  background-color: var(--gray-highlight);
   font-weight: 600;
 }
