@@ -4,6 +4,7 @@ import cl from "clsx"
 import { SystemProps } from "."
 
 import styles from "./table.module.css"
+import { ChevronRight, IconProps } from "./icons"
 
 type LineProps = { text: string; small?: boolean }
 
@@ -21,6 +22,37 @@ export const TwoLines = ({ text, sub }: TwoLinesProps) => (
     <Line small text={sub} />
   </div>
 )
+
+interface Action<T> {
+  icon: React.ComponentType<IconProps>
+  title: string
+  action: (i: T) => void
+}
+
+export function Actions<T>(actions: Action<T>[]): Column<T> {
+  return {
+    className: styles.actionColumn,
+
+    render: (cell) => (
+      <React.Fragment>
+        <ChevronRight className={styles.actionArrow} />
+
+        <div className={styles.actionList}>
+          {actions.map(({ icon: Icon, title, action }, i) => (
+            <Icon
+              key={i}
+              title={title}
+              onClick={(e) => {
+                e.stopPropagation()
+                action(cell)
+              }}
+            />
+          ))}
+        </div>
+      </React.Fragment>
+    ),
+  }
+}
 
 export interface Column<T> {
   /** element displayed in table header */

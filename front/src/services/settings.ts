@@ -122,11 +122,11 @@ export function addISCCTradingCertificate(
 }
 
 export function deleteISCCTradingCertificate(
-  productionSiteID: number,
+  entityID: number,
   certificate_id: string
 ) {
   return api.post("/settings/delete-iscc-trading-certificate", {
-    production_site_id: productionSiteID,
+    entity_id: entityID,
     certificate_id: certificate_id,
   })
 }
@@ -150,11 +150,11 @@ export function add2BSTradingCertificate(
 }
 
 export function delete2BSTradingCertificate(
-  productionSiteID: number,
+  entityID: number,
   certificate_id: string
 ) {
   return api.post("/settings/delete-2bs-trading-certificate", {
-    production_site_id: productionSiteID,
+    entity_id: entityID,
     certificate_id: certificate_id,
   })
 }
