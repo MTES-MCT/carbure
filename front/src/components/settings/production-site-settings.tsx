@@ -12,7 +12,7 @@ import useForm from "../../hooks/helpers/use-form"
 import { Title, Box, Button, LabelInput, LoaderOverlay } from "../system"
 import { AlertCircle, Cross, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
-import Table, { Column, Row } from "../system/table"
+import Table, { Column, Line, Row } from "../system/table"
 import { Country, ProductionSite } from "../../services/types"
 import { SectionHeader, SectionBody, Section } from "../system/section"
 import { prompt, PromptFormProps } from "../system/dialog"
@@ -86,17 +86,17 @@ const PRODUCTION_SITE_COLUMNS: Column<ProductionSite>[] = [
   {
     header: "Nom",
     className: styles.settingsTableColumn,
-    render: (ps) => <span>{ps.name}</span>,
+    render: (ps) => <Line text={ps.name} />,
   },
   {
     header: "Pays",
     className: styles.settingsTableColumn,
-    render: (ps) => <span>{ps.country?.name}</span>,
+    render: (ps) => <Line text={ps.country?.name} />,
   },
   {
     header: "Date de mise en service",
     className: styles.settingsTableColumn,
-    render: (ps) => <span>{ps.date_mise_en_service}</span>,
+    render: (ps) => <Line text={ps.date_mise_en_service} />,
   },
 ]
 type ProductionSitesSettingsProps = {

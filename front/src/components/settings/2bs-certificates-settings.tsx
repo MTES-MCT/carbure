@@ -15,7 +15,7 @@ import { Alert } from "../system/alert"
 import { SectionHeader, SectionBody, Section } from "../system/section"
 import { prompt, PromptFormProps } from "../system/dialog"
 import AutoComplete from "../system/autocomplete"
-import Table, { Column } from "../system/table"
+import Table, { Column, Line } from "../system/table"
 import { EMPTY_COLUMN } from "."
 
 const DBSPrompt = ({
@@ -54,9 +54,9 @@ const DBSPrompt = ({
 
 const COLUMNS: Column<DBSCertificate>[] = [
   EMPTY_COLUMN,
-  { header: "ID", render: (c) => <span>{c.certificate_id}</span> },
-  { header: "Détenteur", render: (c) => <span>{c.certificate_holder}</span> },
-  { header: "Valide jusqu'au", render: (c) => <span>{c.valid_until}</span> },
+  { header: "ID", render: (c) => <Line text={c.certificate_id} /> },
+  { header: "Détenteur", render: (c) => <Line text={c.certificate_holder} /> },
+  { header: "Valide jusqu'au", render: (c) => <Line text={c.valid_until} /> },
 ]
 
 type DBSCertificateSettingsProps = {

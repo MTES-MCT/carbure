@@ -11,7 +11,7 @@ import useAPI from "../../hooks/helpers/use-api"
 import { Title, Button, LabelInput, Box, LoaderOverlay } from "../system"
 import { AlertCircle, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
-import Table, { Column, Row } from "../system/table"
+import Table, { Column, Line, Row } from "../system/table"
 import {
   SectionHeader,
   SectionForm,
@@ -89,22 +89,22 @@ const DELIVERY_SITE_COLUMNS: Column<DeliverySite>[] = [
   {
     header: "N° douane",
     className: styles.settingsTableIDColumn,
-    render: (ds) => <span>{ds.depot_id}</span>,
+    render: (ds) => <Line text={ds.depot_id} />,
   },
   {
     header: "Nom",
     className: styles.settingsTableColumn,
-    render: (ds) => <span>{ds.name}</span>,
+    render: (ds) => <Line text={ds.name} />,
   },
   {
     header: "Ville",
     className: styles.settingsTableColumn,
-    render: (ds) => <span>{ds.city}</span>,
+    render: (ds) => <Line text={ds.city} />,
   },
   {
     header: "Pays",
     className: styles.settingsTableColumn,
-    render: (ds) => <span>{ds.country.name}</span>,
+    render: (ds) => <Line text={ds.country.name} />,
   },
 ]
 

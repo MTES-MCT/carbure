@@ -1,20 +1,3 @@
-.dualRow {
-  display: flex;
-  flex-direction: column;
-}
-
-.rowLine {
-  overflow-x: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.extraInfo {
-  font-size: 14px;
-  color: var(--gray-dark);
-  font-style: italic;
-}
-
 .checkboxColumn {
   width: 40px;
   text-align: center;
