@@ -1,5 +1,5 @@
 import api from "./api"
-import { Settings, GESOption, DBSCertificate } from "./types"
+import { Settings, GESOption, DBSCertificate, ISCCCertificate } from "./types"
 
 export function getSettings(): Promise<Settings> {
   return api.get("/settings/")
@@ -103,7 +103,9 @@ export function disableTrading(entityID: number) {
   })
 }
 
-export function getISCCTradingCertificates(entityID: number) {
+export function getISCCTradingCertificates(
+  entityID: number
+): Promise<ISCCCertificate[]> {
   return api.get("/settings/get-iscc-trading-certificates", {
     entity_id: entityID,
   })

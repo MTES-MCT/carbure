@@ -54,15 +54,9 @@ const DBSPrompt = ({
 
 const COLUMNS: Column<DBSCertificate>[] = [
   EMPTY_COLUMN,
-  { header: "ID", render: (dbs) => <span>{dbs.certificate_id}</span> },
-  {
-    header: "Détenteur",
-    render: (dbs) => <span>{dbs.certificate_holder}</span>,
-  },
-  {
-    header: "Valide jusqu'au",
-    render: (dbs) => <span>{dbs.valid_until}</span>,
-  },
+  { header: "ID", render: (c) => <span>{c.certificate_id}</span> },
+  { header: "Détenteur", render: (c) => <span>{c.certificate_holder}</span> },
+  { header: "Valide jusqu'au", render: (c) => <span>{c.valid_until}</span> },
 ]
 
 type DBSCertificateSettingsProps = {
