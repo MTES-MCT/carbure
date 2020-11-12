@@ -5,6 +5,23 @@ import { SystemProps } from "."
 
 import styles from "./table.module.css"
 
+type LineProps = { text: string; small?: boolean }
+
+export const Line = ({ text, small = false }: LineProps) => (
+  <span title={text} className={cl(styles.rowLine, small && styles.extraInfo)}>
+    {text}
+  </span>
+)
+
+type TwoLinesProps = { text: string; sub: string }
+
+export const TwoLines = ({ text, sub }: TwoLinesProps) => (
+  <div className={styles.dualRow}>
+    <Line text={text} />
+    <Line small text={sub} />
+  </div>
+)
+
 export interface Column<T> {
   /** element displayed in table header */
   header?: React.ReactNode
