@@ -46,7 +46,6 @@ def raise_error(lot, rule_triggered, details=''):
     return LotValidationError(**d)
 
 def bulk_sanity_checks(lots):
-    db.connections.close_all()
     results = []
     errors = []
     print('starting bulk_sanity_check %s' % (datetime.datetime.now()))
