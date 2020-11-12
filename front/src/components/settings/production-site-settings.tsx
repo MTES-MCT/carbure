@@ -4,11 +4,12 @@ import { EntitySelection } from "../../hooks/helpers/use-entity"
 
 import styles from "./settings.module.css"
 
+import * as api from "../../services/settings"
 import * as common from "../../services/common"
 import useAPI from "../../hooks/helpers/use-api"
 import useForm from "../../hooks/helpers/use-form"
 
-import { Title, Box, Button, LabelInput } from "../system"
+import { Title, Box, Button, LabelInput, LoaderOverlay } from "../system"
 import { AlertCircle, Cross, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
 import Table, { Column, Row } from "../system/table"
@@ -107,10 +108,13 @@ type ProductionSitesSettingsProps = {
 }
 
 const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
-  const [requestGetProductionSites, resolveGetProductionSites] = useAPI(common.findProductionSites); // prettier-ignore
+  const [requestGetProductionSites, resolveGetProductionSites] = useAPI(common.findProductionSites) // prettier-ignore
+  const [requestAddProductionSite, resolveAddProductionSite] = useAPI(api.addProductionSite) // prettier-ignore
 
   const entityID = entity?.id
   const productionSites = requestGetProductionSites.data ?? []
+
+  const isLoading = requestAddProductionSite.loading || requestGetProductionSites.loading // prettier-ignore
   const isEmpty = productionSites.length === 0
 
   const columns = [
@@ -134,7 +138,15 @@ const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
       ProductionSitePrompt
     )
 
-    // @TODO actually add the certificate
+    if (entityID && data && data.country) {
+      resolveAddProductionSite(
+        entityID,
+        data.name,
+        data.date_mise_en_service,
+        true,
+        data.country.code_pays
+      ).then(() => resolveGetProductionSites("", entityID))
+    }
   }
 
   useEffect(() => {
@@ -163,6 +175,8 @@ const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
       {!isEmpty && (
         <Table columns={columns} rows={rows} className={styles.settingsTable} />
       )}
+
+      {isLoading && <LoaderOverlay />}
     </Section>
   )
 }

@@ -6,14 +6,14 @@ export function getSettings(): Promise<Settings> {
 }
 
 export function addProductionSite(
-  entityID: number,
+  producerID: number,
   name: string,
   date_mise_en_service: string,
   ges_option: boolean,
   country_code: string
 ) {
   return api.post("/settings/add-production-site", {
-    entity_id: entityID,
+    producer_id: producerID,
     name: name,
     date_mise_en_service: date_mise_en_service,
     ges_option: ges_option ? GESOption.Actual : GESOption.Default,
