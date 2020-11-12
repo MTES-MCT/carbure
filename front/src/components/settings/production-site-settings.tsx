@@ -12,7 +12,7 @@ import useForm from "../../hooks/helpers/use-form"
 import { Title, Box, Button, LabelInput, LoaderOverlay } from "../system"
 import { AlertCircle, Cross, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
-import Table, { Column, Line, Row } from "../system/table"
+import Table, { Actions, Column, Line, Row } from "../system/table"
 import { Country, ProductionSite } from "../../services/types"
 import { SectionHeader, SectionBody, Section } from "../system/section"
 import { prompt, PromptFormProps } from "../system/dialog"
@@ -115,14 +115,13 @@ const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
 
   const columns = [
     ...PRODUCTION_SITE_COLUMNS,
-    {
-      className: styles.settingsTableActionColumn,
-      render: () => (
-        <Box row className={styles.settingsTableActions}>
-          <Cross title="Supprimer le site de production" />
-        </Box>
-      ),
-    },
+    Actions<ProductionSite>([
+      {
+        icon: Cross,
+        title: "Supprimer le site de production",
+        action: () => console.log("supprimer"),
+      },
+    ]),
   ]
 
   const rows: Row<ProductionSite>[] = productionSites.map((ps) => ({ value: ps })); // prettier-ignore

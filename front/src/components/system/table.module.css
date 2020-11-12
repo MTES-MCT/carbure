@@ -61,16 +61,26 @@
 
 .actionColumn {
   width: 88px;
-  text-align: center;
+}
+
+.actionCell {
+  align-items: center;
+  justify-content: center;
   color: var(--gray-dark);
 }
 
-.actionColumn :global(.icon) {
+.actionCell :global(.icon) {
   width: 20px;
 }
 
-.actionColumn :global(.icon):hover {
+.actionCell :global(.icon):hover {
   stroke: var(--blue-medium);
+}
+
+.actionList {
+  align-self: stretch;
+  align-items: center;
+  justify-content: space-around;
 }
 
 .actionList,
@@ -80,6 +90,4 @@ tr:hover .actionArrow {
 
 tr:hover .actionList {
   display: flex;
-  align-items: center;
-  justify-content: space-around;
 }
