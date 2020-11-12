@@ -119,7 +119,7 @@ const DeliverySitesSettings = ({ entity }: DeliverySitesSettingsProps) => {
 
   const entityID = entity?.id
   const deliverySites = requestGetDeliverySites.data ?? []
-  const isEmpty = query.length === 0 || deliverySites.length === 0
+  const isEmpty = deliverySites.length === 0
 
   async function createDeliverySite() {
     const data = await prompt(
@@ -157,7 +157,7 @@ const DeliverySitesSettings = ({ entity }: DeliverySitesSettingsProps) => {
         />
       </SectionForm>
 
-      {isEmpty && (
+      {query.length > 0 && isEmpty && (
         <SectionBody>
           <Alert icon={AlertCircle} level="warning">
             Aucun site de livraison trouvé
