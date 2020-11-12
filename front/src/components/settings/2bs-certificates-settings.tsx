@@ -9,12 +9,14 @@ import * as api from "../../services/settings"
 import * as common from "../../services/common"
 import useAPI from "../../hooks/helpers/use-api"
 
-import { Title, Button, Box } from "../system"
+import { Title, Button, Box, LoaderOverlay } from "../system"
 import { AlertCircle, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
 import { SectionHeader, SectionBody, Section } from "../system/section"
 import { prompt, PromptFormProps } from "../system/dialog"
 import AutoComplete from "../system/autocomplete"
+import Table, { Column } from "../system/table"
+import { EMPTY_COLUMN } from "."
 
 const DBSPrompt = ({
   onConfirm,
@@ -50,16 +52,34 @@ const DBSPrompt = ({
   )
 }
 
+const COLUMNS: Column<DBSCertificate>[] = [
+  EMPTY_COLUMN,
+  { header: "ID", render: (dbs) => <span>{dbs.certificate_id}</span> },
+  {
+    header: "Détenteur",
+    render: (dbs) => <span>{dbs.certificate_holder}</span>,
+  },
+  {
+    header: "Valide jusqu'au",
+    render: (dbs) => <span>{dbs.valid_until}</span>,
+  },
+]
+
 type DBSCertificateSettingsProps = {
   entity: EntitySelection
 }
 
 const DBSCertificateSettings = ({ entity }: DBSCertificateSettingsProps) => {
   const [requestGet2BS, resolveGet2BS] = useAPI(api.get2BSTradingCertificates) // prettier-ignore
+  const [requestAdd2BS, resolveAdd2BS] = useAPI(api.add2BSTradingCertificate) // prettier-ignore
 
   const entityID = entity?.id
   const certificates = requestGet2BS.data ?? []
+
+  const isLoading = requestGet2BS.loading || requestAdd2BS.loading
   const isEmpty = certificates.length === 0
+
+  const rows = certificates.map((c) => ({ value: c }))
 
   async function create2BSCertificate() {
     const data = await prompt(
@@ -68,7 +88,11 @@ const DBSCertificateSettings = ({ entity }: DBSCertificateSettingsProps) => {
       DBSPrompt
     )
 
-    // @TODO actually add the certificate
+    if (entityID && data) {
+      resolveAdd2BS(entityID, data.certificate_id).then(() =>
+        resolveGet2BS(entityID)
+      )
+    }
   }
 
   useEffect(() => {
@@ -93,6 +117,10 @@ const DBSCertificateSettings = ({ entity }: DBSCertificateSettingsProps) => {
           </Alert>
         </SectionBody>
       )}
+
+      {!isEmpty && <Table columns={COLUMNS} rows={rows} />}
+
+      {isLoading && <LoaderOverlay />}
     </Section>
   )
 }

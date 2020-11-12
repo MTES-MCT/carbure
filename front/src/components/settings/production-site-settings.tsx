@@ -17,6 +17,7 @@ import { Country, ProductionSite } from "../../services/types"
 import { SectionHeader, SectionBody, Section } from "../system/section"
 import { prompt, PromptFormProps } from "../system/dialog"
 import AutoComplete from "../system/autocomplete"
+import { EMPTY_COLUMN } from "."
 
 type ProductionSiteState = {
   name: string
@@ -78,11 +79,6 @@ const ProductionSitePrompt = ({
       </Box>
     </Box>
   )
-}
-
-const EMPTY_COLUMN = {
-  className: styles.settingsTableEmptyColumn,
-  render: () => null,
 }
 
 const PRODUCTION_SITE_COLUMNS: Column<ProductionSite>[] = [

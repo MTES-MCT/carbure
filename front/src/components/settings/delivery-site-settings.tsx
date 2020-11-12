@@ -21,6 +21,7 @@ import {
 import { prompt, PromptFormProps } from "../system/dialog"
 import useForm from "../../hooks/helpers/use-form"
 import AutoComplete from "../system/autocomplete"
+import { EMPTY_COLUMN } from "."
 
 type DeliverySiteState = {
   name: string
@@ -84,10 +85,7 @@ const DeliverySitePrompt = ({
 }
 
 const DELIVERY_SITE_COLUMNS: Column<DeliverySite>[] = [
-  {
-    className: styles.settingsTableEmptyColumn,
-    render: () => null,
-  },
+  EMPTY_COLUMN,
   {
     header: "N° douane",
     className: styles.settingsTableIDColumn,
@@ -109,6 +107,7 @@ const DELIVERY_SITE_COLUMNS: Column<DeliverySite>[] = [
     render: (ds) => <span>{ds.country.name}</span>,
   },
 ]
+
 type DeliverySitesSettingsProps = {
   entity: EntitySelection
 }
