@@ -1,7 +1,7 @@
 import React from "react"
 import cl from "clsx"
 
-import { SystemProps } from "."
+import { Box, SystemProps } from "."
 
 import styles from "./table.module.css"
 import { ChevronRight, IconProps } from "./icons"
@@ -34,10 +34,10 @@ export function Actions<T>(actions: Action<T>[]): Column<T> {
     className: styles.actionColumn,
 
     render: (cell) => (
-      <React.Fragment>
+      <Box className={styles.actionCell}>
         <ChevronRight className={styles.actionArrow} />
 
-        <div className={styles.actionList}>
+        <Box row className={styles.actionList}>
           {actions.map(({ icon: Icon, title, action }, i) => (
             <Icon
               key={i}
@@ -48,8 +48,8 @@ export function Actions<T>(actions: Action<T>[]): Column<T> {
               }}
             />
           ))}
-        </div>
-      </React.Fragment>
+        </Box>
+      </Box>
     ),
   }
 }

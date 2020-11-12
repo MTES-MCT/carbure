@@ -38,29 +38,6 @@
   width: 128px;
 }
 
-.settingsTableActionColumn {
-  width: 88px;
-  text-align: center;
-}
-
-.settingsTableActions {
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-tr:hover .settingsTableActions {
-  display: flex;
-}
-
-.settingsTableActions :global(.icon) {
-  color: var(--gray-dark);
-}
-
-.settingsTableActions :global(.icon:hover) {
-  color: var(--blue-medium);
-}
-
 .dialogButtons {
   justify-content: flex-end;
   margin-top: 16px;
