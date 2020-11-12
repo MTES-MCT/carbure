@@ -72,3 +72,19 @@ export function find2BSCertificates(query: string): Promise<DBSCertificate[]> {
     query: query,
   })
 }
+
+export function addDeliverySite(
+  name: string,
+  city: string,
+  country: string,
+  depotID: string,
+  depotType: string
+): Promise<any> {
+  return api.post("/common/create-delivery-site", {
+    name: name,
+    city: city,
+    country_code: country,
+    depot_id: depotID,
+    depot_type: depotType,
+  })
+}
