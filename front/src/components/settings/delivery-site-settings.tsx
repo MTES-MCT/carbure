@@ -8,7 +8,7 @@ import styles from "./settings.module.css"
 import * as common from "../../services/common"
 import useAPI from "../../hooks/helpers/use-api"
 
-import { Title, Button, LabelInput, Box, LoaderOverlay } from "../system"
+import { Title, Button, LabelInput, Box, LoaderOverlay, Label } from "../system"
 import { AlertCircle, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
 import Table, { Column, Line, Row } from "../system/table"
@@ -22,13 +22,20 @@ import { prompt, PromptFormProps } from "../system/dialog"
 import useForm from "../../hooks/helpers/use-form"
 import AutoComplete from "../system/autocomplete"
 import { EMPTY_COLUMN } from "."
+import RadioGroup from "../system/radio-group"
+
+const DEPOT_TYPES = [
+  { label: "EFS", value: "EFS" },
+  { label: "EPPE", value: "EPPE" },
+  { label: "Autre", value: "OTHER" },
+]
 
 type DeliverySiteState = {
   name: string
   city: string
   country: Country | null
   depot_id: string
-  depot_type: "EFS" | "EPPE" | "OTHER" | ""
+  depot_type: "EFS" | "EPPE" | "OTHER"
 }
 
 const DeliverySitePrompt = ({
@@ -40,7 +47,7 @@ const DeliverySitePrompt = ({
     city: "",
     country: null,
     depot_id: "",
-    depot_type: "",
+    depot_type: "OTHER",
   })
 
   const canSave = Boolean(
@@ -53,11 +60,34 @@ const DeliverySitePrompt = ({
 
   return (
     <Box as="form">
-      <LabelInput label="Nom du site" name="name" onChange={onChange} />
-      <LabelInput label="ID de douane" name="depot_id" onChange={onChange} />
-      <LabelInput label="Type de dépôt" name="depot_type" onChange={onChange} />
-      <LabelInput label="Ville" name="city" onChange={onChange} />
+      <Label label="Type de dépôt">
+        <RadioGroup
+          row
+          value={deliverySite.depot_type}
+          name="depot_type"
+          onChange={onChange}
+          options={DEPOT_TYPES}
+        />
+      </Label>
 
+      <LabelInput
+        label="Nom du site"
+        name="name"
+        value={deliverySite.name}
+        onChange={onChange}
+      />
+      <LabelInput
+        label="ID de douane"
+        name="depot_id"
+        value={deliverySite.depot_id}
+        onChange={onChange}
+      />
+      <LabelInput
+        label="Ville"
+        name="city"
+        value={deliverySite.city}
+        onChange={onChange}
+      />
       <AutoComplete
         label="Pays"
         placeholder="Rechercher un pays..."
