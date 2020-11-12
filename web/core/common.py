@@ -2,6 +2,7 @@ import datetime
 import openpyxl
 from django.db.models import Q
 from multiprocessing import Process
+import pandas as pd
 
 from django.http import JsonResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
@@ -508,7 +509,7 @@ def fill_client_data(entity, lot_row, transaction, prefetched_data):
         transaction.client_is_in_carbure = True
         transaction.carbure_client = entity
         transaction.unknown_client = ''
-    elif 'client' in lot_row and lot_row['client'] is not None:
+    elif 'client' in lot_row and lot_row['client'] is not None and lot_row['client'] != '':
         client = lot_row['client']
         if client in clients:
             transaction.client_is_in_carbure = True
@@ -685,31 +686,36 @@ def load_excel_file(entity, user, file, mass_balance=False):
     # prefetch some data
     prefetched_data = get_prefetched_data(entity)
 
-    wb = openpyxl.load_workbook(file)
+    #wb = openpyxl.load_workbook(file)
     try:
-        lots_sheet = wb['lots']
-        colid2field = {}
-        lots = []
+        #lots_sheet = wb['lots']
+        #colid2field = {}
+        #lots = []
         # create a dictionary from the line
-        for i, row in enumerate(lots_sheet):
-            if i == 0:
-                # header
-                for i, col in enumerate(row):
-                    colid2field[i] = col.value
-            else:
-                lot = {}
-                for i, col in enumerate(row):
-                    field = colid2field[i]
-                    lot[field] = col.value
-                lots.append(lot)
-        total_lots = len(lots)
+        #for i, row in enumerate(lots_sheet):
+        #    if i == 0:
+        #        # header
+        #        for i, col in enumerate(row):
+        #            colid2field[i] = col.value
+        #    else:
+        #        lot = {}
+        #        for i, col in enumerate(row):
+        #            field = colid2field[i]
+        #            lot[field] = col.value
+        #        lots.append(lot)
+        #total_lots = len(lots)
+        df = pd.read_excel(file)
+        df.fillna('', inplace=True)
+        total_lots = len(df)
         lots_loaded = 0
         lots_to_insert = []
         txs_to_insert = []
         lot_errors = []
         tx_errors = []
         print('File read %s' % (datetime.datetime.now()))
-        for lot_row in lots:
+        for row in df.iterrows():
+            lot_row = row[1]
+        #for lot_row in lots:
             try:
                 if mass_balance:
                     lot, tx, l_errors, t_errors = load_mb_lot(prefetched_data, entity, user, lot_row, 'EXCEL')
@@ -724,6 +730,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
                 tx_errors.append(t_errors)
             except Exception as e:
                 print(e)
+                print(lot_row)
         print('File processed %s' % (datetime.datetime.now()))
         bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors)
         print('Lots loaded in database %s' % (datetime.datetime.now()))
@@ -731,13 +738,6 @@ def load_excel_file(entity, user, file, mass_balance=False):
     except Exception as e:
         print(e)
         return False, False
-
-
-def run_io_tasks_in_parallel(task, args):
-    with ThreadPoolExecutor() as executor:
-        results = executor.map(task, args)
-        for result in results:
-            pass
 
 
 def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
