@@ -74,6 +74,7 @@ typing-extensions==3.7.4.1
 urllib3==1.25.7
 webencodings==0.5.1
 wrapt==1.12.1
+xlrd==1.2.0
 XlsxWriter==1.2.8
 yarl==1.4.2
 zipp==3.1.0
