@@ -114,37 +114,6 @@ export const arrow: Column<Transaction> = {
   render: () => <ChevronRight />,
 }
 
-interface Action {
-  icon: React.ComponentType<IconProps>
-  title: string
-  action: (i: number) => void
-}
-
-type Actions = (a: Action[]) => Column<Transaction>
-
-export const actions: Actions = (actions) => ({
-  className: styles.actionColumn,
-
-  render: (tx) => (
-    <React.Fragment>
-      <ChevronRight className={styles.actionArrow} />
-
-      <div className={styles.actionList}>
-        {actions.map(({ icon: Icon, title, action }, i) => (
-          <Icon
-            key={i}
-            title={title}
-            onClick={(e) => {
-              e.stopPropagation()
-              action(tx.id)
-            }}
-          />
-        ))}
-      </div>
-    </React.Fragment>
-  ),
-})
-
 type Selector = (s: TransactionSelection) => Column<Transaction>
 
 export const selector: Selector = (selection) => ({

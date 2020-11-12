@@ -10,28 +10,3 @@
 .dateColumn {
   width: 108px;
 }
-
-.actionColumn {
-  width: 88px;
-  text-align: center;
-  color: var(--gray-dark);
-}
-
-.actionColumn :global(.icon) {
-  width: 20px;
-}
-
-.actionColumn :global(.icon):hover {
-  stroke: var(--blue-medium);
-}
-
-.actionList,
-tr:hover .actionArrow {
-  display: none;
-}
-
-tr:hover .actionList {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-}
