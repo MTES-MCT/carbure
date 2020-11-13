@@ -3,6 +3,8 @@ import django
 import csv
 import calendar
 import datetime
+import argparse
+from django.core.mail import send_mail
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -59,7 +61,8 @@ def save_certificate_raw_materials(certificate, raw_materials):
         ISCCCertificateRawMaterial.objects.update_or_create(certificate=certificate, raw_material=raw_material.strip())
 
 def save_certificate_scope(certificate, scopes):
-    ISCCCertificateScope.objects.filter(certificate=certificate).delete()
+    deletions = []
+    existing_scopes = {cs.scope.scope: cs for cs in ISCCCertificateScope.objects.filter(certificate=certificate)}
     for scope in scopes.split(','):
         scope = scope.strip()
         if not scope:
@@ -68,17 +71,25 @@ def save_certificate_scope(certificate, scopes):
             if certificate.valid_until > today:
                 print('Could not find scope [%s] in scopes' % (scope))
             continue
-        ISCCCertificateScope.objects.update_or_create(certificate=certificate, scope=VALID_SCOPES[scope])
-    
-            
+        if scope in existing_scopes:
+            del existing_scopes[scope]
+        else:
+            ISCCCertificateScope.objects.update_or_create(certificate=certificate, scope=VALID_SCOPES[scope])
+    if len(existing_scopes):
+        for k, v in existing_scopes.items():
+            v.delete()
+            deletions.append(v)
+    return deletions
+
 def load_certificates():
+    nb_valid = 0
+    nb_expired = 0
+    certificate_deletions = []
+    certificate_scopes_deletions = []
     filename = '%s/Certificates_%s.csv' % (CSV_FOLDER, today.strftime('%Y-%m-%d'))
     csvfile = open(filename, 'r')
     reader = csv.DictReader(fix_nulls(csvfile), delimiter=',', quotechar='"')
     i = 0
-    bulk_crt = []
-    bulk_scopes = []
-    bulk_rm = []
     for row in reader:
         i += 1
         # create certificate
@@ -102,18 +113,84 @@ def load_certificates():
         if not certificate:
             continue
         # save associated scopes
-        save_certificate_scope(certificate, row['scope'])
+        certificate_scopes_deletions += save_certificate_scope(certificate, row['scope'])
         # and raw materials
         save_certificate_raw_materials(certificate, row['raw_material'])
         print(i, end="\r")
+        if valid_until >= today:
+            nb_valid += 1
+        else:
+            nb_expired += 1
     csvfile.close()
-    return
+    return nb_valid, nb_expired, certificate_scopes_deletions
 
+
+def summary(nb_valid, nb_invalid, new_scopes, new_certificates, new_certificates_scopes, scope_deletions, email):
+    mail_content = "Güten Früden, <br />\n"
+    mail_content += "Le chargement des certificats ISCC s'est bien passé.<br />\n"
+
+    mail_content += "%d certificats valides et %d certificats expirés ont été chargés<br />\n" % (nb_valid, nb_invalid)
+    
+    if not len(new_scopes):
+        mail_content += "Aucun nouveau type de certification détecté<br />\n"
+    else:
+        for ns in new_scopes:
+            mail_content += "Nouveau type de certification ISCC détecté: %s - %s<br />\n" % (ns.scope, ns.description)
+
+    if not len(new_certificates):
+        mail_content += "Aucun nouveau certificat détecté<br />\n"
+    else:
+        for nc in new_certificates:
+            mail_content += "Nouveau certificat ISCC détecté: [%s] - [%s]<br />\n" % (nc.certificate_id, nc.certificate_holder)
+
+    if not len(new_certificates_scopes):
+        mail_content += "Aucune modification de certificat détectée<br />\n"
+    else:
+        for ncs in new_certificates_scopes:
+            mail_content += "Mise à jour du certificat [%s] - [%s]: Ajout de la certification: %s - %s<br />\n" % (ncs.certificate.certificate_id, ncs.certificate.certificate_holder, ncs.scope.scope, ncs.scope.description)
+
+    if len(scope_deletions):
+        for sd in scope_deletions:
+            mail_content += "Suppression du scope [%s] - [%s] pour le certificat [%s] - [%s]" % (sd.scope.scope, sd.scope.description, sd.certificate.certificate_id, sd.certificate.certificate_holder)
+
+    if email:
+        send_mail('Certificats ISCC - %d certificats - %d nouveaux' % (nb_valid + nb_invalid, len(new_certificates)), mail_content, 'carbure@beta.gouv.fr', ['carbure@beta.gouv.fr'], fail_silently=False)
+    else:
+        print(mail_content)
         
-def main():
+        
+def main(args):
     load_scopes()
-    # load_raw_materials()
     load_certificates()
         
+    # get latest data from db
+    try:
+        last_scope_id = ISCCScope.objects.latest('id').id
+        last_certificate_id = ISCCCertificate.objects.latest('id').id
+        last_certificate_scope_id = ISCCCertificateScope.objects.latest('id').id
+    except:
+        last_scope_id = 0
+        last_certificate_id = 0
+        last_certificate_scope_id = 0
+        
+    # update data
+    nb_valid_certificates, nb_expired_certificates, scope_deletions = load_certificates()
+        
+    # check what has been updated
+    new_scopes = []
+    new_certificates = []
+    new_certificates_scopes = []
+    if last_scope_id != ISCCScope.objects.latest('id').id:
+        new_scopes = ISCCScope.objects.filter(id__gt=last_scope_id)
+    if last_certificate_id != ISCCCertificate.objects.latest('id').id:
+        new_certificates = ISCCCertificate.objects.filter(id__gt=last_certificate_id)
+    if last_certificate_scope_id != ISCCCertificateScope.objects.latest('id').id:
+        new_certificates_scopes = ISCCCertificateScope.objects.filter(id__gt=last_certificate_scope_id)
+    summary(nb_valid_certificates, nb_expired_certificates, new_scopes, new_certificates, new_certificates_scopes, scope_deletions, args.email)
+
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Load ISCC certificates in database')
+    parser.add_argument('--email', dest='email', action='store_true', default=False, help='Send a summary email')
+    args = parser.parse_args()    
+    main(args)
+
