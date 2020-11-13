@@ -9,12 +9,14 @@ import * as api from "../../services/settings"
 import * as common from "../../services/common"
 import useAPI from "../../hooks/helpers/use-api"
 
-import { Title, Button, Box } from "../system"
-import { AlertCircle, Plus } from "../system/icons"
+import { Title, Button, Box, LoaderOverlay } from "../system"
+import { AlertCircle, Cross, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
 import { SectionHeader, SectionBody, Section } from "../system/section"
-import { prompt, PromptFormProps } from "../system/dialog"
+import { confirm, prompt, PromptFormProps } from "../system/dialog"
 import AutoComplete from "../system/autocomplete"
+import Table, { Actions, Column, Line } from "../system/table"
+import { EMPTY_COLUMN } from "."
 
 const DBSPrompt = ({
   onConfirm,
@@ -50,16 +52,35 @@ const DBSPrompt = ({
   )
 }
 
+const COLUMNS: Column<DBSCertificate>[] = [
+  EMPTY_COLUMN,
+  { header: "ID", render: (c) => <Line text={c.certificate_id} /> },
+  { header: "Détenteur", render: (c) => <Line text={c.certificate_holder} /> },
+  { header: "Valide jusqu'au", render: (c) => <Line text={c.valid_until} /> },
+]
+
 type DBSCertificateSettingsProps = {
   entity: EntitySelection
 }
 
 const DBSCertificateSettings = ({ entity }: DBSCertificateSettingsProps) => {
   const [requestGet2BS, resolveGet2BS] = useAPI(api.get2BSTradingCertificates) // prettier-ignore
+  const [requestAdd2BS, resolveAdd2BS] = useAPI(api.add2BSTradingCertificate) // prettier-ignore
+  const [requestDel2BS, resolveDel2BS] = useAPI(api.delete2BSTradingCertificate) // prettier-ignore
 
   const entityID = entity?.id
   const certificates = requestGet2BS.data ?? []
+
+  const isLoading =
+    requestGet2BS.loading || requestAdd2BS.loading || requestDel2BS.loading
+
   const isEmpty = certificates.length === 0
+
+  function refresh() {
+    if (entityID) {
+      resolveGet2BS(entityID)
+    }
+  }
 
   async function create2BSCertificate() {
     const data = await prompt(
@@ -68,7 +89,21 @@ const DBSCertificateSettings = ({ entity }: DBSCertificateSettingsProps) => {
       DBSPrompt
     )
 
-    // @TODO actually add the certificate
+    if (entityID && data) {
+      resolveAdd2BS(entityID, data.certificate_id).then(refresh)
+    }
+  }
+
+  async function delete2BSCertificate(dbs: DBSCertificate) {
+    if (
+      entityID &&
+      (await confirm(
+        "Suppresion certificat",
+        `Voulez-vous vraiment supprimer le certificat 2BS "${dbs.certificate_id}" ?`
+      ))
+    ) {
+      resolveDel2BS(entityID, dbs.certificate_id).then(refresh)
+    }
   }
 
   useEffect(() => {
@@ -76,6 +111,19 @@ const DBSCertificateSettings = ({ entity }: DBSCertificateSettingsProps) => {
       resolveGet2BS(entityID)
     }
   }, [entityID])
+
+  const columns = [
+    ...COLUMNS,
+    Actions([
+      {
+        icon: Cross,
+        title: "Supprimer le certificat",
+        action: delete2BSCertificate,
+      },
+    ]),
+  ]
+
+  const rows = certificates.map((c) => ({ value: c }))
 
   return (
     <Section>
@@ -93,6 +141,10 @@ const DBSCertificateSettings = ({ entity }: DBSCertificateSettingsProps) => {
           </Alert>
         </SectionBody>
       )}
+
+      {!isEmpty && <Table columns={columns} rows={rows} />}
+
+      {isLoading && <LoaderOverlay />}
     </Section>
   )
 }

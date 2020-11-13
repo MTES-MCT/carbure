@@ -11,3 +11,8 @@ export const SettingsHeader = (props: BoxProps) => (
 export const SettingsBody = (props: BoxProps) => (
   <Box {...props} className={styles.settingsBody} />
 )
+
+export const EMPTY_COLUMN = {
+  className: styles.settingsTableEmptyColumn,
+  render: () => null,
+}

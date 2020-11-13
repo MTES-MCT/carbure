@@ -1,8 +1,7 @@
 import React from "react"
-import cl from "clsx"
 
 import { Transaction } from "../../services/types"
-import { Column } from "../system/table"
+import { Column, Line, TwoLines } from "../system/table"
 import { IconProps } from "../system/icons"
 
 import styles from "./transaction-columns.module.css"
@@ -10,23 +9,6 @@ import styles from "./transaction-columns.module.css"
 import { TransactionSelection } from "../../hooks/query/use-selection"
 import { ChevronRight } from "../system/icons"
 import Status from "./transaction-status"
-
-type LineProps = { text: string; small?: boolean }
-
-const Line = ({ text, small = false }: LineProps) => (
-  <span title={text} className={cl(styles.rowLine, small && styles.extraInfo)}>
-    {text}
-  </span>
-)
-
-type TwoLinesProps = { text: string; sub: string }
-
-const TwoLines = ({ text, sub }: TwoLinesProps) => (
-  <div className={styles.dualRow}>
-    <Line text={text} />
-    <Line small text={sub} />
-  </div>
-)
 
 export const empty: Column<any> = {
   className: styles.checkboxColumn,
@@ -131,37 +113,6 @@ export const arrow: Column<Transaction> = {
   className: styles.actionColumn,
   render: () => <ChevronRight />,
 }
-
-interface Action {
-  icon: React.ComponentType<IconProps>
-  title: string
-  action: (i: number) => void
-}
-
-type Actions = (a: Action[]) => Column<Transaction>
-
-export const actions: Actions = (actions) => ({
-  className: styles.actionColumn,
-
-  render: (tx) => (
-    <React.Fragment>
-      <ChevronRight className={styles.actionArrow} />
-
-      <div className={styles.actionList}>
-        {actions.map(({ icon: Icon, title, action }, i) => (
-          <Icon
-            key={i}
-            title={title}
-            onClick={(e) => {
-              e.stopPropagation()
-              action(tx.id)
-            }}
-          />
-        ))}
-      </div>
-    </React.Fragment>
-  ),
-})
 
 type Selector = (s: TransactionSelection) => Column<Transaction>
 

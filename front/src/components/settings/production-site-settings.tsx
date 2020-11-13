@@ -4,18 +4,20 @@ import { EntitySelection } from "../../hooks/helpers/use-entity"
 
 import styles from "./settings.module.css"
 
+import * as api from "../../services/settings"
 import * as common from "../../services/common"
 import useAPI from "../../hooks/helpers/use-api"
 import useForm from "../../hooks/helpers/use-form"
 
-import { Title, Box, Button, LabelInput } from "../system"
+import { Title, Box, Button, LabelInput, LoaderOverlay } from "../system"
 import { AlertCircle, Cross, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
-import Table, { Column, Row } from "../system/table"
+import Table, { Actions, Column, Line, Row } from "../system/table"
 import { Country, ProductionSite } from "../../services/types"
 import { SectionHeader, SectionBody, Section } from "../system/section"
-import { prompt, PromptFormProps } from "../system/dialog"
+import { confirm, prompt, PromptFormProps } from "../system/dialog"
 import AutoComplete from "../system/autocomplete"
+import { EMPTY_COLUMN } from "."
 
 type ProductionSiteState = {
   name: string
@@ -79,27 +81,22 @@ const ProductionSitePrompt = ({
   )
 }
 
-const EMPTY_COLUMN = {
-  className: styles.settingsTableEmptyColumn,
-  render: () => null,
-}
-
 const PRODUCTION_SITE_COLUMNS: Column<ProductionSite>[] = [
   EMPTY_COLUMN,
   {
     header: "Nom",
     className: styles.settingsTableColumn,
-    render: (ps) => <span>{ps.name}</span>,
+    render: (ps) => <Line text={ps.name} />,
   },
   {
     header: "Pays",
     className: styles.settingsTableColumn,
-    render: (ps) => <span>{ps.country?.name}</span>,
+    render: (ps) => <Line text={ps.country?.name} />,
   },
   {
     header: "Date de mise en service",
     className: styles.settingsTableColumn,
-    render: (ps) => <span>{ps.date_mise_en_service}</span>,
+    render: (ps) => <Line text={ps.date_mise_en_service} />,
   },
 ]
 type ProductionSitesSettingsProps = {
@@ -107,34 +104,53 @@ type ProductionSitesSettingsProps = {
 }
 
 const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
-  const [requestGetProductionSites, resolveGetProductionSites] = useAPI(common.findProductionSites); // prettier-ignore
+  const [requestGetProductionSites, resolveGetProductionSites] = useAPI(common.findProductionSites) // prettier-ignore
+  const [requestAddProductionSite, resolveAddProductionSite] = useAPI(api.addProductionSite) // prettier-ignore
+  const [requestDelProductionSite, resolveDelProductionSite] = useAPI(api.deleteProductionSite) // prettier-ignore
 
   const entityID = entity?.id
   const productionSites = requestGetProductionSites.data ?? []
+
+  const isLoading =
+    requestAddProductionSite.loading ||
+    requestGetProductionSites.loading ||
+    requestDelProductionSite.loading
+
   const isEmpty = productionSites.length === 0
 
-  const columns = [
-    ...PRODUCTION_SITE_COLUMNS,
-    {
-      className: styles.settingsTableActionColumn,
-      render: () => (
-        <Box row className={styles.settingsTableActions}>
-          <Cross title="Supprimer le site de production" />
-        </Box>
-      ),
-    },
-  ]
-
-  const rows: Row<ProductionSite>[] = productionSites.map((ps) => ({ value: ps })); // prettier-ignore
+  function refresh() {
+    if (entityID) {
+      resolveGetProductionSites("", entityID)
+    }
+  }
 
   async function createProductionSite() {
     const data = await prompt(
-      "Ajouter un site de production",
+      "Ajout site de production",
       "Veuillez entrer les informations de votre nouveau site de production.",
       ProductionSitePrompt
     )
 
-    // @TODO actually add the certificate
+    if (entityID && data && data.country) {
+      resolveAddProductionSite(
+        entityID,
+        data.name,
+        data.date_mise_en_service,
+        true,
+        data.country.code_pays
+      ).then(refresh)
+    }
+  }
+
+  async function removeProductionSite(ps: ProductionSite) {
+    if (
+      await confirm(
+        "Suppression site",
+        `Voulez-vous vraiment supprimer le site de production "${ps.name}" ?`
+      )
+    ) {
+      resolveDelProductionSite(ps.id).then(refresh)
+    }
   }
 
   useEffect(() => {
@@ -142,6 +158,19 @@ const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
       resolveGetProductionSites("", entityID)
     }
   }, [entityID])
+
+  const columns = [
+    ...PRODUCTION_SITE_COLUMNS,
+    Actions([
+      {
+        icon: Cross,
+        title: "Supprimer le site de production",
+        action: removeProductionSite,
+      },
+    ]),
+  ]
+
+  const rows: Row<ProductionSite>[] = productionSites.map((ps) => ({ value: ps })); // prettier-ignore
 
   return (
     <Section>
@@ -163,6 +192,8 @@ const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
       {!isEmpty && (
         <Table columns={columns} rows={rows} className={styles.settingsTable} />
       )}
+
+      {isLoading && <LoaderOverlay />}
     </Section>
   )
 }

@@ -150,23 +150,26 @@ export const Input = ({ className, error, ...props }: InputProps) => (
   <input {...props} className={cl(styles.input, className)} />
 )
 
-// FORM INPUT COMPONENT
+// LABEL COMPONENT
 
-export type LabelInputProps = InputProps & {
-  label: React.ReactNode
-  error?: string
-  tooltip?: string
-}
+type LabelProps = SystemProps &
+  React.HTMLProps<HTMLLabelElement> & {
+    error?: string | null
+    tooltip?: string
+    label: string
+  }
 
-export const LabelInput = ({
-  label,
+export const Label = ({
+  className,
   disabled,
   error,
   tooltip,
-  className,
+  label,
+  children,
   ...props
-}: LabelInputProps) => (
+}: LabelProps) => (
   <label
+    {...props}
     title={error ? error : tooltip}
     className={cl(
       styles.labelWrapper,
@@ -179,15 +182,42 @@ export const LabelInput = ({
       {label}
       {error && <AlertTriangle size={16} />}
     </span>
-    <Input {...props} disabled={disabled} />
+    {children}
   </label>
+)
+
+// FORM INPUT COMPONENT
+
+export type LabelInputProps = InputProps & {
+  label: string
+  error?: string
+  tooltip?: string
+}
+
+export const LabelInput = ({
+  label,
+  disabled,
+  error,
+  tooltip,
+  className,
+  ...props
+}: LabelInputProps) => (
+  <Label
+    disabled={disabled}
+    error={error}
+    tooltip={tooltip}
+    className={cl(className)}
+    label={label}
+  >
+    <Input {...props} disabled={disabled} />
+  </Label>
 )
 
 // TEXT AREA COMPONENT
 
 type LabelTextAreaProps = SystemProps &
   React.HTMLProps<HTMLTextAreaElement> & {
-    label: React.ReactNode
+    label: string
     error?: string
   }
 
@@ -196,13 +226,13 @@ export const LabelTextArea = ({
   className,
   ...props
 }: LabelTextAreaProps) => (
-  <label className={cl(styles.labelWrapper, styles.labelTextArea)}>
-    <span>{label}</span>
+  <Label label={label} className={cl(styles.labelTextArea, className)}>
     <textarea {...props} className={styles.textarea} />
-  </label>
+  </Label>
 )
 
 // LABEL CHECKBOX COMPONENT
+
 export const LabelCheckbox = ({
   label,
   className,
