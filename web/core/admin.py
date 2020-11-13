@@ -124,7 +124,7 @@ class ISCCCertificateRawMaterialAdmin(admin.ModelAdmin):
 
 class ISCCCertificateScopeAdmin(admin.ModelAdmin):
     list_display = ('certificate', 'scope')
-    search_fields = ('certificate', 'scope')
+    search_fields = ('certificate__certificate_id', 'certificate__certificate_holder', 'scope__scope')
     raw_id_fields = ('certificate', )
 
 
