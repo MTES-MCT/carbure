@@ -47,7 +47,6 @@ def load_invalid_certificates():
     csvfile = open(filename, 'r')
     reader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
     i = 0
-    bulk_crt = []
     for row in reader:
         i += 1
         # invalid: Nom,Coordonnées,Numéro 2BS,Date de retrait
@@ -76,7 +75,6 @@ def load_valid_certificates():
     csvfile = open(filename, 'r')
     reader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
     i = 0
-    bulk_crt = []
     for row in reader:
         i += 1
         # valid: Nom,Coordonnées,Pays,Type de certification,Numéro 2BS,Date originale de certification,Date de fin de validité du certificat,Certificat
