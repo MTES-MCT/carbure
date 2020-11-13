@@ -393,7 +393,7 @@ def delete_iscc_trading_certificate(request, *args, **kwargs):
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
 
-    EntityISCCTradingCertificate.objects.delete(entity=context['entity'], certificate=certificate)
+    EntityISCCTradingCertificate.objects.get(entity=context['entity'], certificate=certificate).delete()
     return JsonResponse({'status': 'success'})
 
 
@@ -406,5 +406,5 @@ def delete_2bs_trading_certificate(request, *args, **kwargs):
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
 
-    EntityDBSTradingCertificate.objects.delete(entity=context['entity'], certificate=certificate)
+    EntityDBSTradingCertificate.objects.get(entity=context['entity'], certificate=certificate).delete()
     return JsonResponse({'status': 'success'})

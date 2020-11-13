@@ -8,10 +8,10 @@ import styles from "./settings.module.css"
 import * as common from "../../services/common"
 import useAPI from "../../hooks/helpers/use-api"
 
-import { Title, Button, LabelInput, Box } from "../system"
+import { Title, Button, LabelInput, Box, LoaderOverlay, Label } from "../system"
 import { AlertCircle, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
-import Table, { Column, Row } from "../system/table"
+import Table, { Column, Line, Row } from "../system/table"
 import {
   SectionHeader,
   SectionForm,
@@ -21,13 +21,21 @@ import {
 import { prompt, PromptFormProps } from "../system/dialog"
 import useForm from "../../hooks/helpers/use-form"
 import AutoComplete from "../system/autocomplete"
+import { EMPTY_COLUMN } from "."
+import RadioGroup from "../system/radio-group"
+
+const DEPOT_TYPES = [
+  { label: "EFS", value: "EFS" },
+  { label: "EPPE", value: "EPPE" },
+  { label: "Autre", value: "OTHER" },
+]
 
 type DeliverySiteState = {
   name: string
   city: string
   country: Country | null
   depot_id: string
-  depot_type: "EFS" | "EPPE" | "OTHER" | ""
+  depot_type: "EFS" | "EPPE" | "OTHER"
 }
 
 const DeliverySitePrompt = ({
@@ -39,7 +47,7 @@ const DeliverySitePrompt = ({
     city: "",
     country: null,
     depot_id: "",
-    depot_type: "",
+    depot_type: "OTHER",
   })
 
   const canSave = Boolean(
@@ -52,11 +60,34 @@ const DeliverySitePrompt = ({
 
   return (
     <Box as="form">
-      <LabelInput label="Nom du site" name="name" onChange={onChange} />
-      <LabelInput label="ID de douane" name="depot_id" onChange={onChange} />
-      <LabelInput label="Type de dépôt" name="depot_type" onChange={onChange} />
-      <LabelInput label="Ville" name="city" onChange={onChange} />
+      <Label label="Type de dépôt">
+        <RadioGroup
+          row
+          value={deliverySite.depot_type}
+          name="depot_type"
+          onChange={onChange}
+          options={DEPOT_TYPES}
+        />
+      </Label>
 
+      <LabelInput
+        label="Nom du site"
+        name="name"
+        value={deliverySite.name}
+        onChange={onChange}
+      />
+      <LabelInput
+        label="ID de douane"
+        name="depot_id"
+        value={deliverySite.depot_id}
+        onChange={onChange}
+      />
+      <LabelInput
+        label="Ville"
+        name="city"
+        value={deliverySite.city}
+        onChange={onChange}
+      />
       <AutoComplete
         label="Pays"
         placeholder="Rechercher un pays..."
@@ -84,31 +115,29 @@ const DeliverySitePrompt = ({
 }
 
 const DELIVERY_SITE_COLUMNS: Column<DeliverySite>[] = [
-  {
-    className: styles.settingsTableEmptyColumn,
-    render: () => null,
-  },
+  EMPTY_COLUMN,
   {
     header: "N° douane",
     className: styles.settingsTableIDColumn,
-    render: (ds) => <span>{ds.depot_id}</span>,
+    render: (ds) => <Line text={ds.depot_id} />,
   },
   {
     header: "Nom",
     className: styles.settingsTableColumn,
-    render: (ds) => <span>{ds.name}</span>,
+    render: (ds) => <Line text={ds.name} />,
   },
   {
     header: "Ville",
     className: styles.settingsTableColumn,
-    render: (ds) => <span>{ds.city}</span>,
+    render: (ds) => <Line text={ds.city} />,
   },
   {
     header: "Pays",
     className: styles.settingsTableColumn,
-    render: (ds) => <span>{ds.country.name}</span>,
+    render: (ds) => <Line text={ds.country.name} />,
   },
 ]
+
 type DeliverySitesSettingsProps = {
   entity: EntitySelection
 }
@@ -116,10 +145,13 @@ type DeliverySitesSettingsProps = {
 const DeliverySitesSettings = ({ entity }: DeliverySitesSettingsProps) => {
   const [query, setQuery] = useState("")
   const [requestGetDeliverySites, resolveGetDeliverySites] = useAPI(common.findDeliverySites); // prettier-ignore
+  const [requestAddDeliverySite, resolveAddDeliverySite] = useAPI(common.addDeliverySite); // prettier-ignore
 
   const entityID = entity?.id
   const deliverySites = requestGetDeliverySites.data ?? []
-  const isEmpty = query.length === 0 || deliverySites.length === 0
+
+  const isLoading = requestGetDeliverySites.loading || requestAddDeliverySite.loading // prettier-ignore
+  const isEmpty = deliverySites.length === 0 || query.length === 0
 
   async function createDeliverySite() {
     const data = await prompt(
@@ -128,7 +160,15 @@ const DeliverySitesSettings = ({ entity }: DeliverySitesSettingsProps) => {
       DeliverySitePrompt
     )
 
-    // @TODO actually add the certificate
+    if (entityID && data && data.country) {
+      resolveAddDeliverySite(
+        data.name,
+        data.city,
+        data.country.code_pays,
+        data.depot_id,
+        data.depot_type
+      ).then(() => setQuery(data.depot_id))
+    }
   }
 
   const rows: Row<DeliverySite>[] = deliverySites.map((ds) => ({ value: ds }))
@@ -157,7 +197,7 @@ const DeliverySitesSettings = ({ entity }: DeliverySitesSettingsProps) => {
         />
       </SectionForm>
 
-      {isEmpty && (
+      {query.length > 0 && isEmpty && (
         <SectionBody>
           <Alert icon={AlertCircle} level="warning">
             Aucun site de livraison trouvé
@@ -172,6 +212,8 @@ const DeliverySitesSettings = ({ entity }: DeliverySitesSettingsProps) => {
           className={styles.settingsTable}
         />
       )}
+
+      {isLoading && <LoaderOverlay />}
     </Section>
   )
 }

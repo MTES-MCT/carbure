@@ -3,7 +3,7 @@ div.dialog {
   flex-direction: column;
   min-height: 0;
   padding: 20px;
-  max-width: 500px;
+  max-width: 560px;
 }
 
 .dialogMessage {

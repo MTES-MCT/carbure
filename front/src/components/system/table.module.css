@@ -41,3 +41,53 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+.dualRow {
+  display: flex;
+  flex-direction: column;
+}
+
+.rowLine {
+  overflow-x: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.extraInfo {
+  font-size: 14px;
+  color: var(--gray-dark);
+  font-style: italic;
+}
+
+.actionColumn {
+  width: 88px;
+}
+
+.actionCell {
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-dark);
+}
+
+.actionCell :global(.icon) {
+  width: 20px;
+}
+
+.actionCell :global(.icon):hover {
+  stroke: var(--blue-medium);
+}
+
+.actionList {
+  align-self: stretch;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.actionList,
+tr:hover .actionArrow {
+  display: none;
+}
+
+tr:hover .actionList {
+  display: flex;
+}

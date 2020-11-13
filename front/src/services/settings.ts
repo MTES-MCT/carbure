@@ -1,19 +1,19 @@
 import api from "./api"
-import { Settings, GESOption } from "./types"
+import { Settings, GESOption, DBSCertificate, ISCCCertificate } from "./types"
 
 export function getSettings(): Promise<Settings> {
   return api.get("/settings/")
 }
 
 export function addProductionSite(
-  entityID: number,
+  producerID: number,
   name: string,
   date_mise_en_service: string,
   ges_option: boolean,
   country_code: string
 ) {
   return api.post("/settings/add-production-site", {
-    entity_id: entityID,
+    producer_id: producerID,
     name: name,
     date_mise_en_service: date_mise_en_service,
     ges_option: ges_option ? GESOption.Actual : GESOption.Default,
@@ -103,7 +103,9 @@ export function disableTrading(entityID: number) {
   })
 }
 
-export function getISCCTradingCertificates(entityID: number) {
+export function getISCCTradingCertificates(
+  entityID: number
+): Promise<ISCCCertificate[]> {
   return api.get("/settings/get-iscc-trading-certificates", {
     entity_id: entityID,
   })
@@ -120,16 +122,18 @@ export function addISCCTradingCertificate(
 }
 
 export function deleteISCCTradingCertificate(
-  productionSiteID: number,
+  entityID: number,
   certificate_id: string
 ) {
   return api.post("/settings/delete-iscc-trading-certificate", {
-    production_site_id: productionSiteID,
+    entity_id: entityID,
     certificate_id: certificate_id,
   })
 }
 
-export function get2BSTradingCertificates(entityID: number) {
+export function get2BSTradingCertificates(
+  entityID: number
+): Promise<DBSCertificate[]> {
   return api.get("/settings/get-2bs-trading-certificates", {
     entity_id: entityID,
   })
@@ -146,11 +150,11 @@ export function add2BSTradingCertificate(
 }
 
 export function delete2BSTradingCertificate(
-  productionSiteID: number,
+  entityID: number,
   certificate_id: string
 ) {
   return api.post("/settings/delete-2bs-trading-certificate", {
-    production_site_id: productionSiteID,
+    entity_id: entityID,
     certificate_id: certificate_id,
   })
 }

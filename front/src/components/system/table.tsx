@@ -1,9 +1,58 @@
 import React from "react"
 import cl from "clsx"
 
-import { SystemProps } from "."
+import { Box, SystemProps } from "."
 
 import styles from "./table.module.css"
+import { ChevronRight, IconProps } from "./icons"
+
+type LineProps = { text: string; small?: boolean }
+
+export const Line = ({ text, small = false }: LineProps) => (
+  <span title={text} className={cl(styles.rowLine, small && styles.extraInfo)}>
+    {text}
+  </span>
+)
+
+type TwoLinesProps = { text: string; sub: string }
+
+export const TwoLines = ({ text, sub }: TwoLinesProps) => (
+  <div className={styles.dualRow}>
+    <Line text={text} />
+    <Line small text={sub} />
+  </div>
+)
+
+interface Action<T> {
+  icon: React.ComponentType<IconProps>
+  title: string
+  action: (i: T) => void
+}
+
+export function Actions<T>(actions: Action<T>[]): Column<T> {
+  return {
+    className: styles.actionColumn,
+
+    render: (cell) => (
+      <Box className={styles.actionCell}>
+        <ChevronRight className={styles.actionArrow} />
+
+        <Box row className={styles.actionList}>
+          {actions.map(({ icon: Icon, title, action }, i) => (
+            <Icon
+              key={i}
+              title={title}
+              onClick={(e) => {
+                e.stopPropagation()
+                action(cell)
+              }}
+            />
+          ))}
+        </Box>
+      </Box>
+    ),
+  }
+}
 
 export interface Column<T> {
   /** element displayed in table header */

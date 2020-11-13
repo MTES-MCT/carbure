@@ -12,7 +12,7 @@ import styles from "./transaction-table.module.css"
 import { useRelativePush } from "../relative-route"
 
 import { AlertTriangle, Check, Copy, Cross } from "../system/icons"
-import Table, { Row } from "../system/table"
+import Table, { Actions, Column, Row } from "../system/table"
 import * as C from "./transaction-columns"
 
 export const PRODUCER_COLUMNS = [
@@ -39,30 +39,31 @@ export const OPERATOR_COLUMNS = [
   C.ghgReduction,
 ]
 
-type Actions = Record<string, (id: number) => void>
+type A = Record<string, (id: number) => void>
+type CT = Column<Transaction>
 
-const getDraftActions = ({ onValidate, onDuplicate, onDelete }: Actions) =>
-  C.actions([
-    { icon: Check, title: "Envoyer le lot", action: onValidate },
-    { icon: Copy, title: "Dupliquer le lot", action: onDuplicate },
-    { icon: Cross, title: "Supprimer le lot", action: onDelete },
+const getDraftActions = ({ onValidate, onDuplicate, onDelete }: A): CT =>
+  Actions([
+    { icon: Check, title: "Envoyer le lot", action: (tx) => onValidate(tx.id) },
+    { icon: Copy, title: "Dupliquer le lot", action: (tx) => onDuplicate(tx.id) }, // prettier-ignore
+    { icon: Cross, title: "Supprimer le lot", action: (tx) => onDelete(tx.id) },
   ])
 
-const getToFixActions = ({ onCorrect, onDelete }: Actions) =>
-  C.actions([
-    { icon: Check, title: "Renvoyer le lot", action: onCorrect },
-    { icon: Cross, title: "Supprimer le lot", action: onDelete },
+const getToFixActions = ({ onCorrect, onDelete }: A): CT =>
+  Actions([
+    { icon: Check, title: "Renvoyer le lot", action: (tx) => onCorrect(tx.id) },
+    { icon: Cross, title: "Supprimer le lot", action: (tx) => onDelete(tx.id) },
   ])
 
-const getInboxActions = ({ onAccept, onComment, onReject }: Actions) =>
-  C.actions([
-    { icon: Check, title: "Accepter le lot", action: onAccept },
-    { icon: AlertTriangle, title: "Accepter sous réserve", action: onComment },
-    { icon: Cross, title: "Refuser le lot", action: onReject },
+const getInboxActions = ({ onAccept, onComment, onReject }: A): CT =>
+  Actions([
+    { icon: Check, title: "Accepter le lot", action: (tx) => onAccept(tx.id) },
+    { icon: AlertTriangle, title: "Accepter sous réserve", action: (tx) => onComment(tx.id) }, // prettier-ignore
+    { icon: Cross, title: "Refuser le lot", action: (tx) => onReject(tx.id) },
   ])
 
-const getDuplicateActions = ({ onDuplicate }: Actions) =>
-  C.actions([{ icon: Copy, title: "Dupliquer le lot", action: onDuplicate }])
+const getDuplicateActions = ({ onDuplicate }: A): Column<Transaction> =>
+  Actions([{ icon: Copy, title: "Dupliquer le lot", action: (tx) => onDuplicate(tx.id) }]) // prettier-ignore
 
 export function hasDeadline(tx: Transaction, deadline: string): boolean {
   if (!tx || tx.lot.status !== "Draft") return false
