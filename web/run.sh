@@ -10,7 +10,6 @@ python3 /app/web/fixtures/load_countries.py
 python3 /app/web/fixtures/load_matierespremieres.py
 python3 /app/web/fixtures/load_ghg_values.py
 python3 /app/web/fixtures/load_depots.py
-python3 /app/web/fixtures/load_iscc_certificates.py
 
 if [ "$IMAGE_TAG" = "local" ] ; then
     python3 /app/web/manage.py runserver 0.0.0.0:8001
