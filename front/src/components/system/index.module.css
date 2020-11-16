@@ -209,14 +209,14 @@
   margin-bottom: 12px;
 }
 
-.labelWrapper > span {
+.labelWrapper .labelText {
   display: flex;
   align-items: center;
   margin-left: 4px;
   color: var(--gray-dark);
 }
 
-.labelWrapper > span :global(.icon) {
+.labelWrapper .labelText :global(.icon) {
   margin-top: 2px;
   margin-left: 4px;
 }
