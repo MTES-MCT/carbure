@@ -118,7 +118,7 @@ class ISCCCertificateAdmin(admin.ModelAdmin):
 
 class ISCCCertificateRawMaterialAdmin(admin.ModelAdmin):
     list_display = ('certificate', 'raw_material')
-    search_fields = ('certificate', 'raw_material')
+    search_fields = ('certificate__certificate_id', 'raw_material')
     raw_id_fields = ('certificate', )
 
 
