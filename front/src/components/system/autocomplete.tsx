@@ -15,9 +15,15 @@ function useAutoComplete<T>(
   getQuery: (q: string, ...a: any[]) => Promise<T[]>
 ) {
   const dd = useDropdown()
+  const timeout = useRef<NodeJS.Timeout>()
 
   const [query, setQuery] = useState(getLabel(value))
   const [suggestions, resolveQuery] = useAPI(getQuery)
+
+  const debouncedResolveQuery = (q: string, ...a: any[]) => {
+    if (timeout.current) clearTimeout(timeout.current)
+    timeout.current = setTimeout(() => resolveQuery(q, ...a), 150)
+  }
 
   // on change, modify the query to match selection and send event to parent
   function change(value: T) {
@@ -34,7 +40,7 @@ function useAutoComplete<T>(
       dd.toggle(false)
     } else {
       dd.toggle(true)
-      resolveQuery(query, ...queryArgs)
+      debouncedResolveQuery(query, ...queryArgs)
     }
   }
 
@@ -42,6 +48,11 @@ function useAutoComplete<T>(
   useEffect(() => {
     setQuery(getLabel(value))
   }, [value, getLabel])
+
+  // clear timeout in case it's still active
+  useEffect(() => {
+    return () => timeout.current && clearTimeout(timeout.current)
+  }, [])
 
   return { dd, query, suggestions, onQuery, change }
 }
