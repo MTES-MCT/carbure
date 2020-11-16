@@ -71,7 +71,7 @@ def add_production_site(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
                              'extra': str(e)}, status=400)
-    return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'success', 'data': obj.natural_key() })
 
 
 def delete_production_site(request):
@@ -126,6 +126,78 @@ def add_production_site_mp(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
                              'extra': str(e)}, status=400)
+    return JsonResponse({'status': 'success'})
+
+
+def set_production_site_mp(request):
+    site = request.POST.get('production_site_id')
+    mp_list = request.POST.getlist('matiere_premiere_codes')
+
+    if site is None:
+        return JsonResponse({'status': 'error', 'message': "Missing production_site_id"}, status=400)
+    if mp_list is None:
+        return JsonResponse({'status': 'error', 'message': "Missing matiere_premiere_codes"}, status=400)
+
+    try:
+        mp_list = MatierePremiere.objects.filter(code__in=mp_list)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown MP_list %s" % (mp_list), 'extra': str(e)}, status=400)
+
+    try:
+        ps = ProductionSite.objects.get(id=site)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown Production Site", 'extra': str(e)}, status=400)
+
+    # we have all the data, make sure we are allowed to delete it
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    if ps.producer not in rights:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit production site %s" % (site)},
+                            status=403)
+
+    try:
+        ProductionSiteInput.objects.filter(production_site=ps).delete()
+        for mp in mp_list:
+            obj, created = ProductionSiteInput.objects.update_or_create(production_site=ps, matiere_premiere=mp)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
+                             'extra': str(e)}, status=400)
+
+    return JsonResponse({'status': 'success'})
+
+
+def set_production_site_bc(request):
+    site = request.POST.get('production_site_id')
+    bc_list = request.POST.getlist('biocarburant_codes')
+
+    if site is None:
+        return JsonResponse({'status': 'error', 'message': "Missing production_site_id"}, status=400)
+    if bc_list is None:
+        return JsonResponse({'status': 'error', 'message': "Missing biocarburant_codes"}, status=400)
+
+    try:
+        bc_list = Biocarburant.objects.filter(code__in=bc_list)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown BC_list %s" % (bc_list), 'extra': str(e)}, status=400)
+
+    try:
+        ps = ProductionSite.objects.get(id=site)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown Production Site", 'extra': str(e)}, status=400)
+
+    # we have all the data, make sure we are allowed to delete it
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    if ps.producer not in rights:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit production site %s" % (site)},
+                            status=403)
+
+    try:
+        ProductionSiteOutput.objects.filter(production_site=ps).delete()
+        for bc in bc_list:
+            obj, created = ProductionSiteOutput.objects.update_or_create(production_site=ps, biocarburant=bc)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
+                             'extra': str(e)}, status=400)
+
     return JsonResponse({'status': 'success'})
 
 

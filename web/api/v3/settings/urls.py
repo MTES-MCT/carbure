@@ -14,6 +14,10 @@ urlpatterns = [
     path('delete-production-site', views.delete_production_site, name='api-v3-settings-delete-production-site'),
     path('update-production-site', views.update_production_site, name='api-v3-settings-update-production_site'),
 
+    path('set-production-site-matieres-premieres', views.set_production_site_mp,
+         name='api-v3-settings-set-production-site-matieres-premieres'),
+    path('set-production-site-biocarburants', views.set_production_site_bc,
+         name='api-v3-settings-set-production-site-biocarburants'),
 
     path('add-production-site-matiere-premiere', views.add_production_site_mp,
          name='api-v3-settings-add-production-site-matiere-premiere'),

@@ -1,5 +1,11 @@
 import api from "./api"
-import { Settings, GESOption, DBSCertificate, ISCCCertificate } from "./types"
+import {
+  Settings,
+  GESOption,
+  DBSCertificate,
+  ISCCCertificate,
+  ProductionSite,
+} from "./types"
 
 export function getSettings(): Promise<Settings> {
   return api.get("/settings/")
@@ -11,7 +17,7 @@ export function addProductionSite(
   date_mise_en_service: string,
   ges_option: boolean,
   country_code: string
-) {
+): Promise<ProductionSite> {
   return api.post("/settings/add-production-site", {
     producer_id: producerID,
     name: name,
@@ -28,6 +34,26 @@ export function addProductionSiteMP(
   return api.post("/settings/add-production-site-matiere-premiere", {
     production_site_id: productionSiteID,
     matiere_premiere_code: matiere_premiere_code,
+  })
+}
+
+export function setProductionSiteMP(
+  productionSiteID: number,
+  matieresPremieres: string[]
+) {
+  return api.post("/settings/set-production-site-matieres-premieres", {
+    production_site_id: productionSiteID,
+    matiere_premiere_codes: matieresPremieres,
+  })
+}
+
+export function setProductionSiteBC(
+  productionSiteID: number,
+  biocarburants: string[]
+) {
+  return api.post("/settings/set-production-site-biocarburants", {
+    production_site_id: productionSiteID,
+    biocarburant_codes: biocarburants,
   })
 }
 
@@ -111,10 +137,7 @@ export function getISCCCertificates(
   })
 }
 
-export function addISCCCertificate(
-  entityID: number,
-  certificate_id: string
-) {
+export function addISCCCertificate(entityID: number, certificate_id: string) {
   return api.post("/settings/add-iscc-certificate", {
     entity_id: entityID,
     certificate_id: certificate_id,
@@ -139,20 +162,14 @@ export function get2BSCertificates(
   })
 }
 
-export function add2BSCertificate(
-  entityID: number,
-  certificate_id: string
-) {
+export function add2BSCertificate(entityID: number, certificate_id: string) {
   return api.post("/settings/add-2bs-certificate", {
     entity_id: entityID,
     certificate_id: certificate_id,
   })
 }
 
-export function delete2BSCertificate(
-  entityID: number,
-  certificate_id: string
-) {
+export function delete2BSCertificate(entityID: number, certificate_id: string) {
   return api.post("/settings/delete-2bs-certificate", {
     entity_id: entityID,
     certificate_id: certificate_id,
