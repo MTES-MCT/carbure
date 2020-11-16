@@ -112,7 +112,7 @@ const ISCCCertificateSettings = ({ entity }: ISCCCertificateSettingsProps) => {
     if (entityID) {
       resolveGetISCC(entityID)
     }
-  }, [entityID])
+  }, [entityID, resolveGetISCC])
 
   const columns = [
     ...COLUMNS,

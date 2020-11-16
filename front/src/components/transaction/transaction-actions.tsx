@@ -16,7 +16,6 @@ import { prompt } from "../system/dialog"
 import {
   ProducerImportPromptFactory,
   OperatorImportPromptFactory,
-  StockImportPromptFactory,
   TraderImportPromptFactory,
 } from "../import-prompt"
 

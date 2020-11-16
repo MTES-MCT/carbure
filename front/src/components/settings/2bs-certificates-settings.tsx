@@ -110,7 +110,7 @@ const DBSCertificateSettings = ({ entity }: DBSCertificateSettingsProps) => {
     if (entityID) {
       resolveGet2BS(entityID)
     }
-  }, [entityID])
+  }, [entityID, resolveGet2BS])
 
   const columns = [
     ...COLUMNS,

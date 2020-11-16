@@ -2,7 +2,6 @@ import React from "react"
 
 import { Transaction } from "../../services/types"
 import { Column, Line, TwoLines } from "../system/table"
-import { IconProps } from "../system/icons"
 
 import styles from "./transaction-columns.module.css"
 

@@ -81,7 +81,7 @@ function useKeyboardControls<T>(
 
     window.addEventListener("keydown", onKeyDown)
     return () => window.removeEventListener("keydown", onKeyDown)
-  }, [options, focused, onFocus, onChange, setFocus])
+  }, [options, list, focused, onFocus, onChange, setFocus])
 }
 
 // dumb polling to reposition the options in case of scrolling

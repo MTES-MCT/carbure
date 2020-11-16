@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
 
 import { EntitySelection } from "../../hooks/helpers/use-entity"
 
@@ -29,14 +29,15 @@ const ProductionSitePrompt = ({
   onConfirm,
   onCancel,
 }: PromptFormProps<ProductionSiteState>) => {
-  const [productionSite, _, onChange] = useForm<ProductionSiteState>({
+  const [productionSite, hasChanged, onChange] = useForm<ProductionSiteState>({
     name: "",
     country: null,
     date_mise_en_service: "",
   })
 
   const canSave = Boolean(
-    productionSite.country &&
+    hasChanged &&
+      productionSite.country &&
       productionSite.date_mise_en_service &&
       productionSite.name
   )
@@ -157,7 +158,7 @@ const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
     if (entityID) {
       resolveGetProductionSites("", entityID)
     }
-  }, [entityID])
+  }, [entityID, resolveGetProductionSites])
 
   const columns = [
     ...PRODUCTION_SITE_COLUMNS,

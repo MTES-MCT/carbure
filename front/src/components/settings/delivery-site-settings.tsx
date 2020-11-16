@@ -42,7 +42,7 @@ const DeliverySitePrompt = ({
   onConfirm,
   onCancel,
 }: PromptFormProps<DeliverySiteState>) => {
-  const [deliverySite, _, onChange] = useForm<DeliverySiteState>({
+  const [deliverySite, hasChange, onChange] = useForm<DeliverySiteState>({
     name: "",
     city: "",
     country: null,
@@ -51,7 +51,8 @@ const DeliverySitePrompt = ({
   })
 
   const canSave = Boolean(
-    deliverySite.country &&
+    hasChange &&
+      deliverySite.country &&
       deliverySite.city &&
       deliverySite.name &&
       deliverySite.depot_id &&
@@ -177,7 +178,7 @@ const DeliverySitesSettings = ({ entity }: DeliverySitesSettingsProps) => {
     if (query) {
       resolveGetDeliverySites(query)
     }
-  }, [query])
+  }, [query, resolveGetDeliverySites])
 
   return (
     <Section>
