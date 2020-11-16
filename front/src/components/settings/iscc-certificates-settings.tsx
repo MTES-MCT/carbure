@@ -64,9 +64,9 @@ type ISCCCertificateSettingsProps = {
 }
 
 const ISCCCertificateSettings = ({ entity }: ISCCCertificateSettingsProps) => {
-  const [requestGetISCC, resolveGetISCC] = useAPI(api.getISCCTradingCertificates); // prettier-ignore
-  const [requestAddISCC, resolveAddISCC] = useAPI(api.addISCCTradingCertificate); // prettier-ignore
-  const [requestDelISCC, resolveDelISCC] = useAPI(api.deleteISCCTradingCertificate); // prettier-ignore
+  const [requestGetISCC, resolveGetISCC] = useAPI(api.getISCCCertificates); // prettier-ignore
+  const [requestAddISCC, resolveAddISCC] = useAPI(api.addISCCCertificate); // prettier-ignore
+  const [requestDelISCC, resolveDelISCC] = useAPI(api.deleteISCCCertificate); // prettier-ignore
 
   const entityID = entity?.id
   const certificates = requestGetISCC.data ?? []

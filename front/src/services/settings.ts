@@ -103,57 +103,57 @@ export function disableTrading(entityID: number) {
   })
 }
 
-export function getISCCTradingCertificates(
+export function getISCCCertificates(
   entityID: number
 ): Promise<ISCCCertificate[]> {
-  return api.get("/settings/get-iscc-trading-certificates", {
+  return api.get("/settings/get-iscc-certificates", {
     entity_id: entityID,
   })
 }
 
-export function addISCCTradingCertificate(
+export function addISCCCertificate(
   entityID: number,
   certificate_id: string
 ) {
-  return api.post("/settings/add-iscc-trading-certificate", {
+  return api.post("/settings/add-iscc-certificate", {
     entity_id: entityID,
     certificate_id: certificate_id,
   })
 }
 
-export function deleteISCCTradingCertificate(
+export function deleteISCCCertificate(
   entityID: number,
   certificate_id: string
 ) {
-  return api.post("/settings/delete-iscc-trading-certificate", {
+  return api.post("/settings/delete-iscc-certificate", {
     entity_id: entityID,
     certificate_id: certificate_id,
   })
 }
 
-export function get2BSTradingCertificates(
+export function get2BSCertificates(
   entityID: number
 ): Promise<DBSCertificate[]> {
-  return api.get("/settings/get-2bs-trading-certificates", {
+  return api.get("/settings/get-2bs-certificates", {
     entity_id: entityID,
   })
 }
 
-export function add2BSTradingCertificate(
+export function add2BSCertificate(
   entityID: number,
   certificate_id: string
 ) {
-  return api.post("/settings/add-2bs-trading-certificate", {
+  return api.post("/settings/add-2bs-certificate", {
     entity_id: entityID,
     certificate_id: certificate_id,
   })
 }
 
-export function delete2BSTradingCertificate(
+export function delete2BSCertificate(
   entityID: number,
   certificate_id: string
 ) {
-  return api.post("/settings/delete-2bs-trading-certificate", {
+  return api.post("/settings/delete-2bs-certificate", {
     entity_id: entityID,
     certificate_id: certificate_id,
   })
