@@ -1,11 +1,14 @@
 import React, { useEffect, useRef, useState } from "react"
 
+import styles from "./autocomplete.module.css"
+
+import useAPI from "../../hooks/helpers/use-api"
 import { Input, InputProps, Label, LabelProps } from "."
 import { DropdownItem, DropdownOptions, useDropdown } from "./dropdown"
-import useAPI from "../../hooks/helpers/use-api"
+import { Cross } from "./icons"
 
 function useAutoComplete<T>(
-  value: T,
+  value: T | null,
   name: string,
   queryArgs: any[],
   onChange: (e: any) => void,
@@ -15,7 +18,7 @@ function useAutoComplete<T>(
   const dd = useDropdown()
   const timeout = useRef<NodeJS.Timeout>()
 
-  const [query, setQuery] = useState(getLabel(value))
+  const [query, setQuery] = useState(value ? getLabel(value) : "")
   const [suggestions, resolveQuery] = useAPI(getQuery)
 
   const debouncedResolveQuery = (q: string, ...a: any[]) => {
@@ -44,7 +47,7 @@ function useAutoComplete<T>(
 
   // modify input content when passed value is changed
   useEffect(() => {
-    setQuery(getLabel(value))
+    setQuery(value ? getLabel(value) : "")
   }, [value, getLabel])
 
   // clear timeout in case it's still active
@@ -56,7 +59,7 @@ function useAutoComplete<T>(
 }
 
 type AutoCompleteProps<T> = Omit<InputProps, "value"> & {
-  value: T
+  value: T | null
   options?: T[]
   queryArgs?: any[]
   getValue: (option: T) => string
@@ -133,5 +136,58 @@ export function LabelAutoComplete<T>({
     <Label label={label} error={error} tooltip={tooltip}>
       <AutoComplete {...props} />
     </Label>
+  )
+}
+
+type MultiAutocompleteProps<T> = Omit<
+  AutoCompleteProps<T>,
+  "value" | "onChange"
+> & {
+  value: T[]
+  onChange: (e: any) => void
+}
+
+export function MultiAutocomplete<T>({
+  value,
+  name,
+  onChange,
+  getLabel,
+  getValue,
+  ...props
+}: MultiAutocompleteProps<T>) {
+  function addValue(e: any) {
+    // if the value is not already in the list, add it
+    if (!value.some((v) => getValue(v) === getValue(e.target.value))) {
+      onChange({ target: { name, value: [...value, e.target.value] } })
+    }
+  }
+
+  // remove the given value from the list
+  function removeValue(option: T) {
+    const next = value.filter((v) => getValue(v) !== getValue(option))
+    onChange({ target: { name, value: next } })
+  }
+
+  return (
+    <div className={styles.multiWrapper}>
+      {value.map((v) => (
+        <span key={getValue(v)} className={styles.multiValue}>
+          {getLabel(v)}
+          <Cross
+            className={styles.multiValueDelete}
+            onClick={() => removeValue(v)}
+          />
+        </span>
+      ))}
+      <AutoComplete<T>
+        {...props}
+        value={null}
+        name={name}
+        onChange={addValue}
+        getValue={getValue}
+        getLabel={getLabel}
+        className={styles.multiInput}
+      />
+    </div>
   )
 }

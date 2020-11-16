@@ -1,0 +1,39 @@
+.multiWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  background-color: var(--white);
+  border: 1px solid var(--gray-medium);
+  padding: 4px;
+}
+
+.multiWrapper:hover {
+  border-color: var(--blue-medium);
+}
+
+.multiValue {
+  display: flex;
+  align-items: center;
+  background: var(--blue-light);
+  padding: 0 8px;
+  margin: 4px;
+}
+
+.multiValueDelete {
+  cursor: pointer;
+  height: 16px;
+  width: 16px;
+  margin-left: 8px;
+}
+
+.multiValueDelete:hover {
+  color: var(--red-dark);
+}
+
+.multiWrapper input.multiInput {
+  border: none;
+  background-color: transparent;
+  width: auto;
+  padding: 0;
+  margin: 6px;
+}

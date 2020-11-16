@@ -178,7 +178,7 @@ export const Label = ({
       className
     )}
   >
-    <span>
+    <span className={styles.labelText}>
       {label}
       {error && <AlertTriangle size={16} />}
     </span>
