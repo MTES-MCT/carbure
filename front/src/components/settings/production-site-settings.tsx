@@ -6,6 +6,7 @@ import {
   Country,
   MatierePremiere,
   ProductionSite,
+  ProductionSiteDetails,
 } from "../../services/types"
 
 import styles from "./settings.module.css"
@@ -16,7 +17,7 @@ import useAPI from "../../hooks/helpers/use-api"
 import useForm from "../../hooks/helpers/use-form"
 
 import { Title, Box, Button, LabelInput, LoaderOverlay, Label } from "../system"
-import { AlertCircle, Cross, Plus } from "../system/icons"
+import { AlertCircle, Cross, Plus, Save } from "../system/icons"
 import { Alert } from "../system/alert"
 import Table, { Actions, Column, Line, Row } from "../system/table"
 
@@ -33,34 +34,41 @@ type ProductionSiteState = {
   biocarburants: Biocarburant[]
 }
 
+type ProductionSitePromptProps = PromptFormProps<ProductionSiteState> & {
+  productionSite?: ProductionSiteDetails
+}
+
 const ProductionSitePrompt = ({
+  productionSite,
   onConfirm,
   onCancel,
-}: PromptFormProps<ProductionSiteState>) => {
-  const [productionSite, hasChanged, onChange] = useForm<ProductionSiteState>({
-    name: "",
-    country: null,
-    date_mise_en_service: "",
-    matieres_premieres: [],
-    biocarburants: [],
+}: ProductionSitePromptProps) => {
+  const [form, hasChanged, onChange] = useForm<ProductionSiteState>({
+    name: productionSite?.name ?? "",
+    country: productionSite?.country ?? null,
+    date_mise_en_service: productionSite?.date_mise_en_service ?? "",
+    matieres_premieres: productionSite?.inputs ?? [],
+    biocarburants: productionSite?.outputs ?? [],
   })
 
   const canSave = Boolean(
-    hasChanged &&
-      productionSite.country &&
-      productionSite.date_mise_en_service &&
-      productionSite.name
+    hasChanged && form.country && form.date_mise_en_service && form.name
   )
 
   return (
     <Box as="form">
-      <LabelInput label="Nom du site" name="name" onChange={onChange} />
+      <LabelInput
+        label="Nom du site"
+        name="name"
+        value={form.name}
+        onChange={onChange}
+      />
 
       <LabelAutoComplete
         label="Pays"
         placeholder="Rechercher un pays..."
         name="country"
-        value={productionSite.country}
+        value={form.country}
         getValue={(c) => c?.code_pays ?? ""}
         getLabel={(c) => c?.name ?? ""}
         getQuery={common.findCountries}
@@ -71,12 +79,13 @@ const ProductionSitePrompt = ({
         type="date"
         label="Date de mise en service"
         name="date_mise_en_service"
+        value={form.date_mise_en_service}
         onChange={onChange}
       />
 
       <Label label="Matieres premieres">
         <MultiAutocomplete
-          value={productionSite.matieres_premieres}
+          value={form.matieres_premieres}
           name="matieres_premieres"
           placeholder="Ajouter matières premières..."
           getValue={(o) => o.code}
@@ -88,7 +97,7 @@ const ProductionSitePrompt = ({
 
       <Label label="Biocarburants">
         <MultiAutocomplete
-          value={productionSite.biocarburants}
+          value={form.biocarburants}
           name="biocarburants"
           placeholder="Ajouter biocarburants..."
           getValue={(o) => o.code}
@@ -101,11 +110,11 @@ const ProductionSitePrompt = ({
       <Box row className={styles.dialogButtons}>
         <Button
           level="primary"
-          icon={Plus}
+          icon={Save}
           disabled={!canSave}
-          onClick={() => productionSite && onConfirm(productionSite)}
+          onClick={() => form && onConfirm(form)}
         >
-          Ajouter
+          Sauvegarder
         </Button>
         <Button onClick={onCancel}>Annuler</Button>
       </Box>
@@ -113,7 +122,7 @@ const ProductionSitePrompt = ({
   )
 }
 
-const PRODUCTION_SITE_COLUMNS: Column<ProductionSite>[] = [
+const PRODUCTION_SITE_COLUMNS: Column<ProductionSiteDetails>[] = [
   EMPTY_COLUMN,
   {
     header: "Nom",
@@ -136,9 +145,10 @@ type ProductionSitesSettingsProps = {
 }
 
 const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
-  const [requestGetProductionSites, resolveGetProductionSites] = useAPI(common.findProductionSites) // prettier-ignore
+  const [requestGetProductionSites, resolveGetProductionSites] = useAPI(api.getProductionSites) // prettier-ignore
   const [requestAddProductionSite, resolveAddProductionSite] = useAPI(api.addProductionSite) // prettier-ignore
   const [requestDelProductionSite, resolveDelProductionSite] = useAPI(api.deleteProductionSite) // prettier-ignore
+  const [requestUpdateProductionSite, resolveUpdateProductionSite] = useAPI(api.updateProductionSite) // prettier-ignore
 
   const [requestSetProductionSiteMP, resolveSetProductionSiteMP] = useAPI(api.setProductionSiteMP) // prettier-ignore
   const [requestSetProductionSiteBC, resolveSetProductionSiteBC] = useAPI(api.setProductionSiteBC) // prettier-ignore
@@ -151,13 +161,14 @@ const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
     requestGetProductionSites.loading ||
     requestDelProductionSite.loading ||
     requestSetProductionSiteBC.loading ||
-    requestSetProductionSiteMP.loading
+    requestSetProductionSiteMP.loading ||
+    requestUpdateProductionSite.loading
 
   const isEmpty = productionSites.length === 0
 
   function refresh() {
     if (entityID) {
-      resolveGetProductionSites("", entityID)
+      resolveGetProductionSites(entityID)
     }
   }
 
@@ -173,8 +184,8 @@ const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
         entityID,
         data.name,
         data.date_mise_en_service,
-        true,
-        data.country.code_pays
+        data.country.code_pays,
+        true
       )
 
       if (ps) {
@@ -184,6 +195,33 @@ const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
         const bcs = data.biocarburants.map((bc) => bc.code)
         await resolveSetProductionSiteBC(ps.id, bcs)
       }
+
+      refresh()
+    }
+  }
+
+  async function editProductionSite(ps: ProductionSiteDetails) {
+    const data = await prompt<ProductionSiteState>(
+      "Modification site de production",
+      "Veuillez entrer les nouvelles informations de votre site de production.",
+      (props) => <ProductionSitePrompt {...props} productionSite={ps} />
+    )
+
+    if (entityID && data && data.country) {
+      await resolveUpdateProductionSite(
+        entityID,
+        ps.id,
+        data.name,
+        data.date_mise_en_service,
+        data.country.code_pays,
+        true
+      )
+
+      const mps = data.matieres_premieres.map((mp) => mp.code)
+      await resolveSetProductionSiteMP(ps.id, mps)
+
+      const bcs = data.biocarburants.map((bc) => bc.code)
+      await resolveSetProductionSiteBC(ps.id, bcs)
 
       refresh()
     }
@@ -202,7 +240,7 @@ const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
 
   useEffect(() => {
     if (entityID) {
-      resolveGetProductionSites("", entityID)
+      resolveGetProductionSites(entityID)
     }
   }, [entityID, resolveGetProductionSites])
 
@@ -217,7 +255,10 @@ const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
     ]),
   ]
 
-  const rows: Row<ProductionSite>[] = productionSites.map((ps) => ({ value: ps })); // prettier-ignore
+  const rows: Row<ProductionSiteDetails>[] = productionSites.map((ps) => ({
+    value: ps,
+    onClick: () => editProductionSite(ps),
+  }))
 
   return (
     <Section>
