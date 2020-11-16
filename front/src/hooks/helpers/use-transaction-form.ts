@@ -1,3 +1,5 @@
+import format from "date-fns/format"
+
 import {
   Biocarburant,
   Country,
@@ -7,6 +9,7 @@ import {
   MatierePremiere,
   ProductionSite,
 } from "../../services/types"
+
 import { EntitySelection } from "./use-entity"
 
 import useForm, { FormHook } from "./use-form"
@@ -113,7 +116,7 @@ export function toTransactionPostData(tx: TransactionFormState) {
     volume: tx.volume,
     dae: tx.dae,
     champ_libre: tx.champ_libre,
-    delivery_date: tx.delivery_date,
+    delivery_date: format(new Date(tx.delivery_date), "dd/MM/yyyy"),
     mac: tx.mac,
 
     eec: tx.eec,
