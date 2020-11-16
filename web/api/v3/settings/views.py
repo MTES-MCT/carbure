@@ -343,7 +343,7 @@ def update_production_site(request, *args, **kwargs):
 
 
 @check_rights('entity_id')
-def get_iscc_trading_certificates(request, *args, **kwargs):
+def get_iscc_certificates(request, *args, **kwargs):
     context = kwargs['context']
     objects = EntityISCCTradingCertificate.objects.filter(entity=context['entity'])
     sez = [o.certificate.natural_key() for o in objects]
@@ -351,7 +351,7 @@ def get_iscc_trading_certificates(request, *args, **kwargs):
 
 
 @check_rights('entity_id')
-def get_2bs_trading_certificates(request, *args, **kwargs):
+def get_2bs_certificates(request, *args, **kwargs):
     context = kwargs['context']
     objects = EntityDBSTradingCertificate.objects.filter(entity=context['entity'])
     sez = [o.certificate.natural_key() for o in objects]
@@ -359,7 +359,7 @@ def get_2bs_trading_certificates(request, *args, **kwargs):
 
 
 @check_rights('entity_id')
-def add_iscc_trading_certificate(request, *args, **kwargs):
+def add_iscc_certificate(request, *args, **kwargs):
     context = kwargs['context']
     certificate_id = request.POST.get('certificate_id', False)
     try:
@@ -372,7 +372,7 @@ def add_iscc_trading_certificate(request, *args, **kwargs):
 
 
 @check_rights('entity_id')
-def add_2bs_trading_certificate(request, *args, **kwargs):
+def add_2bs_certificate(request, *args, **kwargs):
     context = kwargs['context']
     certificate_id = request.POST.get('certificate_id', False)
     try:
@@ -385,7 +385,7 @@ def add_2bs_trading_certificate(request, *args, **kwargs):
 
 
 @check_rights('entity_id')
-def delete_iscc_trading_certificate(request, *args, **kwargs):
+def delete_iscc_certificate(request, *args, **kwargs):
     context = kwargs['context']
     certificate_id = request.POST.get('certificate_id', False)
     try:
@@ -398,7 +398,7 @@ def delete_iscc_trading_certificate(request, *args, **kwargs):
 
 
 @check_rights('entity_id')
-def delete_2bs_trading_certificate(request, *args, **kwargs):
+def delete_2bs_certificate(request, *args, **kwargs):
     context = kwargs['context']
     certificate_id = request.POST.get('certificate_id', False)
     try:

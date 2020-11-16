@@ -25,10 +25,10 @@ urlpatterns = [
          name='api-v3-settings-delete-production-site-biocarburant'),
 
 
-    path('get-iscc-trading-certificates', views.get_iscc_trading_certificates, name='api-v3-settings-get-iscc-trading-certificates'),
-    path('get-2bs-trading-certificates', views.get_2bs_trading_certificates, name='api-v3-settings-get-2bs-trading-certificates'),
-    path('add-iscc-trading-certificate', views.add_iscc_trading_certificate, name='api-v3-settings-add-iscc-trading-certificate'),
-    path('add-2bs-trading-certificate', views.add_2bs_trading_certificate, name='api-v3-settings-add-2bs-trading-certificate'),
-    path('delete-iscc-trading-certificate', views.delete_iscc_trading_certificate, name='api-v3-settings-delete-iscc-trading-certificate'),
-    path('delete-2bs-trading-certificate', views.delete_2bs_trading_certificate, name='api-v3-settings-delete-2bs-trading-certificate'),
+    path('get-iscc-certificates', views.get_iscc_certificates, name='api-v3-settings-get-iscc-certificates'),
+    path('get-2bs-certificates', views.get_2bs_certificates, name='api-v3-settings-get-2bs-certificates'),
+    path('add-iscc-certificate', views.add_iscc_certificate, name='api-v3-settings-add-iscc-certificate'),
+    path('add-2bs-certificate', views.add_2bs_certificate, name='api-v3-settings-add-2bs-certificate'),
+    path('delete-iscc-certificate', views.delete_iscc_certificate, name='api-v3-settings-delete-iscc-certificate'),
+    path('delete-2bs-certificate', views.delete_2bs_certificate, name='api-v3-settings-delete-2bs-certificate'),
 ]

@@ -64,9 +64,9 @@ type DBSCertificateSettingsProps = {
 }
 
 const DBSCertificateSettings = ({ entity }: DBSCertificateSettingsProps) => {
-  const [requestGet2BS, resolveGet2BS] = useAPI(api.get2BSTradingCertificates) // prettier-ignore
-  const [requestAdd2BS, resolveAdd2BS] = useAPI(api.add2BSTradingCertificate) // prettier-ignore
-  const [requestDel2BS, resolveDel2BS] = useAPI(api.delete2BSTradingCertificate) // prettier-ignore
+  const [requestGet2BS, resolveGet2BS] = useAPI(api.get2BSCertificates) // prettier-ignore
+  const [requestAdd2BS, resolveAdd2BS] = useAPI(api.add2BSCertificate) // prettier-ignore
+  const [requestDel2BS, resolveDel2BS] = useAPI(api.delete2BSCertificate) // prettier-ignore
 
   const entityID = entity?.id
   const certificates = requestGet2BS.data ?? []
