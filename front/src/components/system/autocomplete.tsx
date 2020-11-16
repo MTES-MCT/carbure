@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 
-import styles from "./dropdown.module.css"
-
-import { LabelInput, LabelInputProps } from "."
+import { Input, InputProps, Label, LabelProps } from "."
 import { DropdownItem, DropdownOptions, useDropdown } from "./dropdown"
 import useAPI from "../../hooks/helpers/use-api"
 
@@ -57,7 +55,7 @@ function useAutoComplete<T>(
   return { dd, query, suggestions, onQuery, change }
 }
 
-type AutoCompleteProps<T> = Omit<LabelInputProps, "value"> & {
+type AutoCompleteProps<T> = Omit<InputProps, "value"> & {
   value: T
   options?: T[]
   queryArgs?: any[]
@@ -67,7 +65,7 @@ type AutoCompleteProps<T> = Omit<LabelInputProps, "value"> & {
   getQuery: (q: string, ...a: any[]) => Promise<T[]>
 }
 
-function AutoComplete<T>({
+export function AutoComplete<T>({
   value,
   name,
   queryArgs = [],
@@ -78,7 +76,7 @@ function AutoComplete<T>({
   getQuery,
   ...props
 }: AutoCompleteProps<T>) {
-  const container = useRef<HTMLDivElement>(null)
+  const target = useRef<HTMLInputElement>(null)
 
   const { dd, query, suggestions, onQuery, change } = useAutoComplete(
     value,
@@ -92,20 +90,20 @@ function AutoComplete<T>({
   const isEmpty = !suggestions.data || suggestions.data.length === 0
 
   return (
-    <div ref={container}>
-      <LabelInput
+    <React.Fragment>
+      <Input
         {...props}
         value={query}
         readOnly={readOnly}
         onChange={onQuery}
+        innerRef={target}
         onBlur={() => dd.toggle(false)}
       />
 
-      {!readOnly && !isEmpty && dd.isOpen && container.current && (
+      {!readOnly && !isEmpty && dd.isOpen && target.current && (
         <DropdownOptions
-          parent={container.current}
+          parent={target.current}
           options={suggestions.data!}
-          className={styles.suggestions}
           onChange={change}
         >
           {(options, focused) =>
@@ -121,8 +119,19 @@ function AutoComplete<T>({
           }
         </DropdownOptions>
       )}
-    </div>
+    </React.Fragment>
   )
 }
 
-export default AutoComplete
+export function LabelAutoComplete<T>({
+  label,
+  error,
+  tooltip,
+  ...props
+}: AutoCompleteProps<T> & LabelProps) {
+  return (
+    <Label label={label} error={error} tooltip={tooltip}>
+      <AutoComplete {...props} />
+    </Label>
+  )
+}

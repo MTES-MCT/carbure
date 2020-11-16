@@ -18,7 +18,7 @@ import {
 
 import { Box, LabelCheckbox, LabelInput, LabelTextArea } from "../system"
 import { Alert } from "../system/alert"
-import AutoComplete from "../system/autocomplete"
+import { LabelAutoComplete } from "../system/autocomplete"
 
 // shorthand to build autocomplete value & label getters
 const get = (key: string) => (obj: { [k: string]: any } | null) =>
@@ -90,7 +90,7 @@ const TransactionForm = ({
             error={fieldErrors.volume}
             onChange={onChange}
           />
-          <AutoComplete
+          <LabelAutoComplete
             readOnly={readOnly}
             label="Biocarburant"
             placeholder="Rechercher un biocarburant..."
@@ -102,7 +102,7 @@ const TransactionForm = ({
             getQuery={findBiocarburants}
             onChange={onChange}
           />
-          <AutoComplete
+          <LabelAutoComplete
             readOnly={readOnly}
             label="Matiere Premiere"
             placeholder="Rechercher une matière première..."
@@ -114,7 +114,7 @@ const TransactionForm = ({
             getQuery={findMatieresPremieres}
             onChange={onChange}
           />
-          <AutoComplete
+          <LabelAutoComplete
             readOnly={readOnly}
             label="Pays d'origine"
             placeholder="Rechercher un pays..."
@@ -147,7 +147,7 @@ const TransactionForm = ({
 
           {tx.producer_is_in_carbure ? (
             <React.Fragment>
-              <AutoComplete
+              <LabelAutoComplete
                 readOnly={readOnly || isProducer}
                 label="Producteur"
                 placeholder="Rechercher un producteur..."
@@ -159,7 +159,7 @@ const TransactionForm = ({
                 getQuery={findProducers}
                 onChange={onChange}
               />
-              <AutoComplete
+              <LabelAutoComplete
                 readOnly={readOnly}
                 label="Site de production"
                 placeholder="Rechercher un site de production..."
@@ -204,7 +204,7 @@ const TransactionForm = ({
                 error={fieldErrors.production_site}
                 onChange={onChange}
               />
-              <AutoComplete
+              <LabelAutoComplete
                 disabled={tx.producer_is_in_carbure}
                 readOnly={readOnly}
                 label="Pays de production"
@@ -259,7 +259,7 @@ const TransactionForm = ({
           />
 
           {tx.client_is_in_carbure ? (
-            <AutoComplete
+            <LabelAutoComplete
               readOnly={readOnly || isOperator}
               label="Client"
               placeholder="Rechercher un client..."
@@ -291,7 +291,7 @@ const TransactionForm = ({
           />
 
           {tx.delivery_site_is_in_carbure ? (
-            <AutoComplete
+            <LabelAutoComplete
               readOnly={readOnly}
               label="Site de livraison"
               placeholder="Rechercher un site de livraison..."
@@ -323,7 +323,7 @@ const TransactionForm = ({
               defaultValue={tx.carbure_delivery_site?.country?.name}
             />
           ) : (
-            <AutoComplete
+            <LabelAutoComplete
               disabled={tx.delivery_site_is_in_carbure}
               readOnly={readOnly}
               label="Pays de livraison"

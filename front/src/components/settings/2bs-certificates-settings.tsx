@@ -14,7 +14,7 @@ import { AlertCircle, Cross, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
 import { SectionHeader, SectionBody, Section } from "../system/section"
 import { confirm, prompt, PromptFormProps } from "../system/dialog"
-import AutoComplete from "../system/autocomplete"
+import { LabelAutoComplete } from "../system/autocomplete"
 import Table, { Actions, Column, Line } from "../system/table"
 import { EMPTY_COLUMN } from "."
 
@@ -26,7 +26,7 @@ const DBSPrompt = ({
 
   return (
     <Box>
-      <AutoComplete
+      <LabelAutoComplete
         label="Certificat 2BS"
         placeholder="Rechercher un certificat 2BS..."
         name="dbs_certificate"

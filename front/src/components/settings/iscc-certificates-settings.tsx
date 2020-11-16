@@ -14,7 +14,7 @@ import { AlertCircle, Cross, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
 import { SectionHeader, SectionBody, Section } from "../system/section"
 import { confirm, prompt, PromptFormProps } from "../system/dialog"
-import AutoComplete from "../system/autocomplete"
+import { LabelAutoComplete } from "../system/autocomplete"
 import { EMPTY_COLUMN } from "."
 import Table, { Actions, Column, Line } from "../system/table"
 
@@ -26,7 +26,7 @@ const ISCCPrompt = ({
 
   return (
     <Box>
-      <AutoComplete
+      <LabelAutoComplete
         label="Certificat ISCC"
         placeholder="Rechercher un certificat ISCC..."
         name="iscc_certificate"

@@ -199,7 +199,7 @@ export const DropdownItem = ({
 type DropdownProps = {
   above?: boolean
   end?: boolean
-  parent: HTMLDivElement
+  parent: Element
   className?: string
   children: React.ReactNode
   listRef?: React.RefObject<HTMLUListElement>
@@ -239,7 +239,7 @@ export function Dropdown({
 
 type DropdownOptionsProps<T> = {
   above?: boolean
-  parent: HTMLDivElement
+  parent: Element
   className?: string
   options: T[]
   children: (s: T[], f: number) => React.ReactNode
