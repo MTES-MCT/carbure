@@ -141,19 +141,19 @@ export const Title = ({ children, className, ...props }: TitleProps) => (
 
 // INPUT COMPONENT
 
-type InputProps = SystemProps &
+export type InputProps = SystemProps &
   React.InputHTMLAttributes<HTMLInputElement> & {
-    error?: string
+    innerRef?: React.Ref<HTMLInputElement>
   }
 
-export const Input = ({ className, error, ...props }: InputProps) => (
-  <input {...props} className={cl(styles.input, className)} />
+export const Input = ({ className, innerRef, ...props }: InputProps) => (
+  <input {...props} ref={innerRef} className={cl(styles.input, className)} />
 )
 
 // LABEL COMPONENT
 
-type LabelProps = SystemProps &
-  React.HTMLProps<HTMLLabelElement> & {
+export type LabelProps = SystemProps &
+  Omit<React.HTMLProps<HTMLLabelElement>, "value" | "onChange"> & {
     error?: string | null
     tooltip?: string
     label: string

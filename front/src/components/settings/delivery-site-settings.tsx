@@ -20,7 +20,7 @@ import {
 } from "../system/section"
 import { prompt, PromptFormProps } from "../system/dialog"
 import useForm from "../../hooks/helpers/use-form"
-import AutoComplete from "../system/autocomplete"
+import { LabelAutoComplete } from "../system/autocomplete"
 import { EMPTY_COLUMN } from "."
 import RadioGroup from "../system/radio-group"
 
@@ -89,7 +89,7 @@ const DeliverySitePrompt = ({
         value={deliverySite.city}
         onChange={onChange}
       />
-      <AutoComplete
+      <LabelAutoComplete
         label="Pays"
         placeholder="Rechercher un pays..."
         name="country"

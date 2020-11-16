@@ -9,14 +9,14 @@ import * as common from "../../services/common"
 import useAPI from "../../hooks/helpers/use-api"
 import useForm from "../../hooks/helpers/use-form"
 
-import { Title, Box, Button, LabelInput, LoaderOverlay } from "../system"
+import { Title, Box, Button, LabelInput, LoaderOverlay, Label } from "../system"
 import { AlertCircle, Cross, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
 import Table, { Actions, Column, Line, Row } from "../system/table"
 import { Country, ProductionSite } from "../../services/types"
 import { SectionHeader, SectionBody, Section } from "../system/section"
 import { confirm, prompt, PromptFormProps } from "../system/dialog"
-import AutoComplete from "../system/autocomplete"
+import { LabelAutoComplete } from "../system/autocomplete"
 import { EMPTY_COLUMN } from "."
 
 type ProductionSiteState = {
@@ -46,7 +46,7 @@ const ProductionSitePrompt = ({
     <Box as="form">
       <LabelInput label="Nom du site" name="name" onChange={onChange} />
 
-      <AutoComplete
+      <LabelAutoComplete
         label="Pays"
         placeholder="Rechercher un pays..."
         name="country"
@@ -64,7 +64,85 @@ const ProductionSitePrompt = ({
         onChange={onChange}
       />
 
-      {/* <b>Matieres premieres:</b> */}
+      <Label label="Matieres premieres">
+        <div
+          style={{
+            display: "flex",
+            border: "1px solid var(--blue-medium)",
+            background: "var(--white)",
+            minHeight: 36,
+            padding: 6,
+            flexWrap: "wrap",
+          }}
+        >
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              background: "var(--blue-light)",
+              padding: "4px 8px",
+              margin: 4,
+            }}
+          >
+            Colza
+            <Cross size={16} style={{ marginLeft: 8 }} />
+          </span>
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              background: "var(--blue-light)",
+              padding: "4px 8px",
+              margin: 4,
+            }}
+          >
+            Colza
+            <Cross size={16} style={{ marginLeft: 8 }} />
+          </span>
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              background: "var(--blue-light)",
+              padding: "4px 8px",
+              margin: 4,
+            }}
+          >
+            Huiles issues de la consommation
+            <Cross size={16} style={{ marginLeft: 8 }} />
+          </span>
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              background: "var(--blue-light)",
+              padding: "4px 8px",
+              margin: 4,
+            }}
+          >
+            Colza
+            <Cross size={16} style={{ marginLeft: 8 }} />
+          </span>
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              background: "var(--blue-light)",
+              padding: "4px 8px",
+              margin: 4,
+            }}
+          >
+            Huiles issues de la consommation
+            <Cross size={16} style={{ marginLeft: 8 }} />
+          </span>
+
+          <input
+            style={{ border: "none", background: "transparent " }}
+            placeholder="Ajouter une matière première"
+          />
+        </div>
+      </Label>
+
       {/* <b>Biocarburants:</b> */}
 
       <Box row className={styles.dialogButtons}>
