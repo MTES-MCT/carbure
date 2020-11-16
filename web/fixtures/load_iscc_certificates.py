@@ -125,7 +125,7 @@ def load_certificates():
     return nb_valid, nb_expired, certificate_scopes_deletions
 
 
-def summary(nb_valid, nb_invalid, new_scopes, new_certificates, new_certificates_scopes, scope_deletions, email):
+def summary(nb_valid, nb_invalid, new_scopes, new_certificates, new_certificates_scopes, scope_deletions, args):
     mail_content = "Güten Früden, <br />\n"
     mail_content += "Le chargement des certificats ISCC s'est bien passé.<br />\n"
 
@@ -153,8 +153,12 @@ def summary(nb_valid, nb_invalid, new_scopes, new_certificates, new_certificates
         for sd in scope_deletions:
             mail_content += "Suppression du scope [%s] - [%s] pour le certificat [%s] - [%s]" % (sd.scope.scope, sd.scope.description, sd.certificate.certificate_id, sd.certificate.certificate_holder)
 
-    if email:
-        send_mail('Certificats ISCC - %d certificats - %d nouveaux' % (nb_valid + nb_invalid, len(new_certificates)), mail_content, 'carbure@beta.gouv.fr', ['carbure@beta.gouv.fr'], fail_silently=False)
+    if args.email:
+        if args.test:
+            dst = ['martin.planes@beta.gouv.fr']
+        else:
+            dst = ['carbure@beta.gouv.fr']
+        send_mail('Certificats ISCC - %d certificats - %d nouveaux' % (nb_valid + nb_invalid, len(new_certificates)), mail_content, 'carbure@beta.gouv.fr', dst, fail_silently=False)
     else:
         print(mail_content)
         
@@ -186,11 +190,12 @@ def main(args):
         new_certificates = ISCCCertificate.objects.filter(id__gt=last_certificate_id)
     if last_certificate_scope_id != ISCCCertificateScope.objects.latest('id').id:
         new_certificates_scopes = ISCCCertificateScope.objects.filter(id__gt=last_certificate_scope_id)
-    summary(nb_valid_certificates, nb_expired_certificates, new_scopes, new_certificates, new_certificates_scopes, scope_deletions, args.email)
+    summary(nb_valid_certificates, nb_expired_certificates, new_scopes, new_certificates, new_certificates_scopes, scope_deletions, args)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load ISCC certificates in database')
     parser.add_argument('--email', dest='email', action='store_true', default=False, help='Send a summary email')
+    parser.add_argument('--test', dest='test', action='store_true', default=False, help='Send summary email to developers only')    
     args = parser.parse_args()    
     main(args)
 

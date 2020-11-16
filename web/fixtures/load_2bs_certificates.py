@@ -109,7 +109,7 @@ def load_valid_certificates():
     csvfile.close()
     return i
 
-def summary(nb_valid, nb_invalid, new_scopes, new_certificates, new_certificates_scopes, email):
+def summary(nb_valid, nb_invalid, new_scopes, new_certificates, new_certificates_scopes, args):
     mail_content = "Güten Früden, <br />\n"
     mail_content += "Le chargement des certificats 2BS s'est bien passé.<br />\n"
 
@@ -132,8 +132,11 @@ def summary(nb_valid, nb_invalid, new_scopes, new_certificates, new_certificates
     else:
         for ncs in new_certificates_scopes:
             mail_content += "Mise à jour du certificat [%s] - [%s]: Ajout de la certification: %s<br />\n" % (ncs.certificate.certificate_id, ncs.certificate.certificate_holder, ncs.scope.certification_type)
-    if email:
-        send_mail('Certificats 2BS', mail_content, 'carbure@beta.gouv.fr', ['carbure@beta.gouv.fr'], fail_silently=False)
+    if args.email:
+        dst = ['carbure@beta.gouv.fr']
+        if args.test:
+            dst = ['martin.planes@beta.gouv.fr']            
+        send_mail('Certificats 2BS', mail_content, 'carbure@beta.gouv.fr', dst, fail_silently=False)
     else:
         print(mail_content)
         
@@ -164,10 +167,11 @@ def main(args):
         new_certificates = DBSCertificate.objects.filter(id__gt=last_certificate_id)
     if last_certificate_scope_id != DBSCertificateScope.objects.latest('id').id:
         new_certificates_scopes = DBSCertificateScope.objects.filter(id__gt=last_certificate_scope_id)
-    summary(nb_valid_certificates, nb_invalid_certificates, new_scopes, new_certificates, new_certificates_scopes, args.email)
+    summary(nb_valid_certificates, nb_invalid_certificates, new_scopes, new_certificates, new_certificates_scopes, args)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load 2BS certificates in database')
     parser.add_argument('--email', dest='email', action='store_true', default=False, help='Send a summary email')
+    parser.add_argument('--test', dest='test', action='store_true', default=False, help='Send summary email to developers')    
     args = parser.parse_args()    
     main(args)
