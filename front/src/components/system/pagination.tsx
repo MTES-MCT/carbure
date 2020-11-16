@@ -62,6 +62,7 @@ const Pagination = ({ pagination, total }: PaginationProps) => {
       </Button>
 
       <Select
+        above
         value={pagination.page}
         options={pages}
         className={styles.paginationSelect}
@@ -73,6 +74,7 @@ const Pagination = ({ pagination, total }: PaginationProps) => {
       </span>
 
       <Select
+        above
         value={pagination.limit}
         options={limits}
         className={styles.paginationSelect}

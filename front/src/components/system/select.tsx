@@ -1,11 +1,16 @@
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import cl from "clsx"
 
 import styles from "./select.module.css"
 
 import { Input, SystemProps } from "."
 import { Cross } from "./icons"
-import { Dropdown, useDropdown } from "./dropdown"
+import {
+  DropdownItem,
+  DropdownLabel,
+  DropdownOptions,
+  useDropdown,
+} from "./dropdown"
 
 type Value = string | number | null
 export type Option = { value: Value; label: string }
@@ -76,14 +81,14 @@ function useSelect(
   }
 
   // select an option
-  function select(e: React.MouseEvent, option: Option) {
+  function select(option: Option, e?: React.MouseEvent) {
     if (!multiple) {
       // single value selection
       return onChange(option.value)
     }
 
     // prevent closing of option list
-    e.stopPropagation()
+    e && e.stopPropagation()
 
     if (!Array.isArray(value)) {
       onChange([option.value])
@@ -94,7 +99,7 @@ function useSelect(
     }
   }
 
-  function change(e: React.ChangeEvent<HTMLInputElement>) {
+  function onQueryChange(e: React.ChangeEvent<HTMLInputElement>) {
     setQuery(e.target.value.toLowerCase())
   }
 
@@ -104,10 +109,20 @@ function useSelect(
   // filter options according to search query
   const queryOptions = filterOptions(options, query)
 
-  return { dd, selected, queryOptions, query, select, reset, change, setQuery }
+  return {
+    dd,
+    selected,
+    queryOptions,
+    query,
+    select,
+    reset,
+    onQueryChange,
+    setQuery,
+  }
 }
 
 type SelectProps = SystemProps & {
+  above?: boolean
   placeholder?: string
   level?: "primary"
   search?: boolean
@@ -119,6 +134,7 @@ type SelectProps = SystemProps & {
 }
 
 export const Select = ({
+  above,
   value,
   placeholder,
   options,
@@ -138,16 +154,18 @@ export const Select = ({
     queryOptions,
     reset,
     select,
-    change,
+    onQueryChange,
   } = useSelect(value, placeholder, options, onChange, multiple)
+
+  const container = useRef<HTMLDivElement>(null)
 
   const labelClassName = cl(styles.selectLabel, className, {
     [styles.selectPrimary]: level === "primary",
   })
 
   return (
-    <Dropdown {...props} onClick={dd.toggle}>
-      <Dropdown.Label className={labelClassName}>
+    <div {...props} ref={container} onClick={dd.toggle}>
+      <DropdownLabel className={labelClassName} onEnter={() => dd.toggle(true)}>
         <span title={selected} className={styles.selectValue}>
           {selected}
         </span>
@@ -155,43 +173,55 @@ export const Select = ({
         {clear && !isEmpty(value) && (
           <Cross className={styles.selectCross} onClick={reset} />
         )}
-      </Dropdown.Label>
+      </DropdownLabel>
 
-      <Dropdown.Items open={dd.isOpen}>
-        {search && (
-          <li>
-            <Input
-              type="text"
-              value={query}
-              placeholder="Rechercher..."
-              className={styles.selectSearch}
-              onChange={change}
-              onClick={(e) => e.stopPropagation()}
-            />
-          </li>
-        )}
+      {dd.isOpen && container.current && (
+        <DropdownOptions
+          above={above}
+          parent={container.current}
+          options={queryOptions}
+          onChange={select}
+        >
+          {(options, focused) => (
+            <React.Fragment>
+              {search && (
+                <li>
+                  <Input
+                    type="text"
+                    placeholder="Rechercher..."
+                    className={styles.selectSearch}
+                    value={query}
+                    onChange={onQueryChange}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </li>
+              )}
 
-        {queryOptions.map((option) => (
-          <li
-            key={option.value}
-            title={option.label}
-            onClick={(e) => select(e, option)}
-            className={cl(isSelected(value, option) && styles.selectSelected)}
-          >
-            {multiple && (
-              <input
-                readOnly
-                type="checkbox"
-                checked={isSelected(value, option)}
-                className={styles.selectMultiple}
-              />
-            )}
+              {options.map((option, i) => (
+                <DropdownItem
+                  key={option.value}
+                  title={option.label}
+                  focused={focused === i}
+                  selected={isSelected(value, option)}
+                  onClick={(e) => select(option, e)}
+                >
+                  {multiple && (
+                    <input
+                      readOnly
+                      type="checkbox"
+                      checked={isSelected(value, option)}
+                      className={styles.selectMultiple}
+                    />
+                  )}
 
-            {option.label}
-          </li>
-        ))}
-      </Dropdown.Items>
-    </Dropdown>
+                  {option.label}
+                </DropdownItem>
+              ))}
+            </React.Fragment>
+          )}
+        </DropdownOptions>
+      )}
+    </div>
   )
 }
 
