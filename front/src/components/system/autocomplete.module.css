@@ -33,6 +33,7 @@
 .multiWrapper input.multiInput {
   border: none;
   background-color: transparent;
+  outline: none;
   width: auto;
   padding: 0;
   margin: 6px;

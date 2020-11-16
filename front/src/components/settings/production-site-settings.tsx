@@ -140,13 +140,18 @@ const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
   const [requestAddProductionSite, resolveAddProductionSite] = useAPI(api.addProductionSite) // prettier-ignore
   const [requestDelProductionSite, resolveDelProductionSite] = useAPI(api.deleteProductionSite) // prettier-ignore
 
+  const [requestSetProductionSiteMP, resolveSetProductionSiteMP] = useAPI(api.setProductionSiteMP) // prettier-ignore
+  const [requestSetProductionSiteBC, resolveSetProductionSiteBC] = useAPI(api.setProductionSiteBC) // prettier-ignore
+
   const entityID = entity?.id
   const productionSites = requestGetProductionSites.data ?? []
 
   const isLoading =
     requestAddProductionSite.loading ||
     requestGetProductionSites.loading ||
-    requestDelProductionSite.loading
+    requestDelProductionSite.loading ||
+    requestSetProductionSiteBC.loading ||
+    requestSetProductionSiteMP.loading
 
   const isEmpty = productionSites.length === 0
 
@@ -164,13 +169,23 @@ const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
     )
 
     if (entityID && data && data.country) {
-      resolveAddProductionSite(
+      const ps = await resolveAddProductionSite(
         entityID,
         data.name,
         data.date_mise_en_service,
         true,
         data.country.code_pays
-      ).then(refresh)
+      )
+
+      if (ps) {
+        const mps = data.matieres_premieres.map((mp) => mp.code)
+        await resolveSetProductionSiteMP(ps.id, mps)
+
+        const bcs = data.biocarburants.map((bc) => bc.code)
+        await resolveSetProductionSiteBC(ps.id, bcs)
+      }
+
+      refresh()
     }
   }
 
