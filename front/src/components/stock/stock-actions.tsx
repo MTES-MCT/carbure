@@ -1,12 +1,11 @@
 import React from "react"
 
 import { Link } from "../relative-route"
-import { AsyncButton, Box, Button } from "../system"
+import { AsyncButton, Button } from "../system"
 import { Rapport, Upload } from "../system/icons"
 import { prompt } from "../system/dialog"
 import { StockImportPromptFactory } from "../import-prompt"
 import { LotUploader } from "../../hooks/actions/use-upload-file"
-
 
 type ImportActionsProps = {
   uploader: LotUploader
