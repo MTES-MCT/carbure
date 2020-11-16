@@ -6,7 +6,7 @@ import {
   Entity,
   ISCCCertificate,
   MatierePremiere,
-  ProductionSite,
+  ProductionSiteDetails,
 } from "./types"
 
 import api from "./api"
@@ -44,7 +44,7 @@ export function findTraders(query: string): Promise<Entity[]> {
 export function findProductionSites(
   query?: string,
   producerID?: number
-): Promise<ProductionSite[]> {
+): Promise<ProductionSiteDetails[]> {
   return api.get("/common/production-sites", { query, producer_id: producerID })
 }
 

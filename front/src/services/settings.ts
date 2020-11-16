@@ -5,18 +5,27 @@ import {
   DBSCertificate,
   ISCCCertificate,
   ProductionSite,
+  ProductionSiteDetails,
 } from "./types"
 
 export function getSettings(): Promise<Settings> {
   return api.get("/settings/")
 }
 
+export function getProductionSites(
+  entityID: number
+): Promise<ProductionSiteDetails[]> {
+  return api.get("/settings/get-production-sites", {
+    entity_id: entityID,
+  })
+}
+
 export function addProductionSite(
   producerID: number,
   name: string,
   date_mise_en_service: string,
-  ges_option: boolean,
-  country_code: string
+  country_code: string,
+  ges_option: boolean
 ): Promise<ProductionSite> {
   return api.post("/settings/add-production-site", {
     producer_id: producerID,
@@ -34,6 +43,30 @@ export function addProductionSiteMP(
   return api.post("/settings/add-production-site-matiere-premiere", {
     production_site_id: productionSiteID,
     matiere_premiere_code: matiere_premiere_code,
+  })
+}
+
+export function deleteProductionSite(productionSiteID: number) {
+  return api.post("/settings/delete-production-site", {
+    production_site_id: productionSiteID,
+  })
+}
+
+export function updateProductionSite(
+  entityID: number,
+  productionSiteID: number,
+  name: string,
+  date_mise_en_service: string,
+  country_code: string,
+  ges_option: boolean
+) {
+  return api.post("/settings/update-production-site", {
+    entity_id: entityID,
+    production_site_id: productionSiteID,
+    name: name,
+    date_mise_en_service: date_mise_en_service,
+    ges_option: ges_option ? GESOption.Actual : GESOption.Default,
+    country_code: country_code,
   })
 }
 
@@ -64,12 +97,6 @@ export function addProductionSiteBC(
   return api.post("/settings/add-production-site-biocarburant", {
     production_site_id: productionSiteID,
     biocarburant_code: biocarburant_code,
-  })
-}
-
-export function deleteProductionSite(productionSiteID: number) {
-  return api.post("/settings/delete-production-site", {
-    production_site_id: productionSiteID,
   })
 }
 
