@@ -1,13 +1,8 @@
-.dropdown {
-  position: relative;
-  cursor: pointer;
-  font-size: 14px;
-}
-
 .dropdownLabel {
   display: flex;
   position: relative;
   align-items: center;
+  cursor: pointer;
 }
 
 .dropdownLabel:hover {
@@ -21,24 +16,21 @@
   padding-left: 4px;
 }
 
-.dropdownItems {
+.dropdown {
   display: flex;
   flex-direction: column;
   position: absolute;
-  top: 100%;
-  min-width: 100%;
-  max-height: 33vh;
   background-color: var(--gray-light);
   border: 1px solid var(--gray-medium);
   list-style: none;
   margin: 0;
   padding: 0;
-  overflow-y: auto;
   z-index: 2;
   font-size: var(--font-size);
+  cursor: pointer;
 }
 
-.dropdownItems li {
+.dropdown li {
   display: flex;
   align-items: center;
   padding: 10px 12px;
@@ -49,6 +41,21 @@
   border-bottom: 1px solid var(--gray-light);
 }
 
-.dropdownItems li:hover {
+.dropdown li:hover,
+.dropdown .focusedOption {
   background-color: var(--gray-highlight);
+  font-weight: 600;
+}
+
+.dropdown .selectedOption {
+  background-color: var(--blue-light);
+}
+
+.dropdownOptions {
+  max-height: 33vh;
+  overflow-y: auto;
+}
+
+.suggestions {
+  margin-top: -8px;
 }

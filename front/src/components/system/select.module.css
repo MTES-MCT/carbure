@@ -50,7 +50,3 @@
   padding: 0;
   margin-right: 12px;
 }
-
-li.selectSelected {
-  background-color: var(--blue-light);
-}

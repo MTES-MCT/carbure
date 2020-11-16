@@ -1,10 +1,11 @@
-import React from "react"
+import React, { useRef } from "react"
 import cl from "clsx"
 
 import styles from "./menu.module.css"
 
-import { Dropdown, useDropdown, DropdownProps } from "./dropdown"
+import { Dropdown, DropdownLabel, useDropdown } from "./dropdown"
 import { Link } from "react-router-dom"
+import { SystemProps } from "."
 
 type MenuItemProps = React.HTMLProps<HTMLLIElement> & {
   to?: string
@@ -24,23 +25,39 @@ type MenuGroupProps = React.HTMLProps<HTMLUListElement> & {
 
 const MenuGroup = ({ label, children }: MenuGroupProps) => (
   <ul className={styles.menuGroup}>
-    <li className={styles.menuGroupLabel}>{label}</li>
+    <li className={styles.menuGroupLabel} onClick={(e) => e.stopPropagation()}>
+      {label}
+    </li>
     {children}
   </ul>
 )
 
-const Menu = ({ children, label, className, ...props }: DropdownProps) => {
+export type MenuProps = SystemProps & React.HTMLProps<HTMLDivElement>
+
+const Menu = ({ children, label, className, ...props }: MenuProps) => {
+  const container = useRef<HTMLDivElement>(null)
   const dd = useDropdown()
 
   return (
-    <Dropdown
+    <div
       {...props}
+      ref={container}
       className={cl(styles.menu, className)}
       onClick={dd.toggle}
     >
-      <Dropdown.Label className={styles.menuLabel}>{label}</Dropdown.Label>
-      <Dropdown.Items open={dd.isOpen}>{children}</Dropdown.Items>
-    </Dropdown>
+      <DropdownLabel
+        className={styles.menuLabel}
+        onEnter={() => dd.toggle(true)}
+      >
+        {label}
+      </DropdownLabel>
+
+      {dd.isOpen && container.current && (
+        <Dropdown end parent={container.current} className={styles.menuItems}>
+          {children}
+        </Dropdown>
+      )}
+    </div>
   )
 }
 
