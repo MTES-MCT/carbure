@@ -144,3 +144,13 @@ def check_rights(entity_id_field):
             return function(request, *args, **kwargs)
         return wrap
     return actual_decorator
+
+def is_admin(function):
+    @wraps(function)
+    def wrap(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return JsonResponse({'status': 'forbidden', 'message': "User not authenticated"}, status=403)
+        if not request.user.is_staff:
+            return JsonResponse({'status': 'forbidden', 'message': "User not admin"}, status=403)
+        return function(request, *args, **kwargs)
+    return wrap
