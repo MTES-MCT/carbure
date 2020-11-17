@@ -8,20 +8,20 @@ from django.contrib.auth.forms import PasswordResetForm
 
 @is_admin
 def get_users(request):
-    query = request.POST.get('q', False)
+    q = request.GET.get('q', False)
     user_model = get_user_model()
     users = user_model.objects.all()
-    if query:
-        users = users.filter(Q(username__icontains=q) | Q(email__icontains=q) | Q(name__icontains=q))
-    users_sez = [u.natural_key() for u in users]
+    if q:
+        users = users.filter(Q(email__icontains=q) | Q(name__icontains=q))
+    users_sez = [{'email': u.email, 'name': u.name} for u in users]
     return JsonResponse({"status": "success", "data": users_sez})
 
 
 @is_admin
 def get_entities(request):
-    query = request.POST.get('q', False)
+    q = request.GET.get('q', False)
     entities = Entity.objects.all()
-    if query:
+    if q:
         entities = entities.filter(name__icontains=q)
     entities_sez = [u.natural_key() for u in entities]
     return JsonResponse({"status": "success", "data": entities_sez})
@@ -29,10 +29,10 @@ def get_entities(request):
 
 @is_admin
 def get_rights(request):
-    query = request.POST.get('q', False)
+    q = request.GET.get('q', False)
     rights = UserRights.objects.all()
-    if query:
-        rights = rights.filter(Q(user__username__icontains=q) | Q(user__email__icontains=q) | Q(user__name__icontains=q) | Q(entity__name__icontains=q))
+    if q:
+        rights = rights.filter(Q(user__email__icontains=q) | Q(user__name__icontains=q) | Q(entity__name__icontains=q))
     rights_sez = [r.natural_key() for u in rights]
     return JsonResponse({"status": "success", "data": rights_sez})
 
