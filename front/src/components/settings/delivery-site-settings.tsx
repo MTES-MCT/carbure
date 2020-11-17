@@ -156,8 +156,8 @@ const DeliverySitesSettings = ({ entity }: DeliverySitesSettingsProps) => {
 
   async function createDeliverySite() {
     const data = await prompt(
-      "Ajouter un site de livraison",
-      "Veuillez entrer les informations de votre nouveau site de livraison.",
+      "Ajouter un dépôt",
+      "Veuillez entrer les informations de votre nouveau dépôt.",
       DeliverySitePrompt
     )
 
@@ -183,15 +183,15 @@ const DeliverySitesSettings = ({ entity }: DeliverySitesSettingsProps) => {
   return (
     <Section>
       <SectionHeader>
-        <Title>Sites de livraison</Title>
+        <Title>Dépôts</Title>
         <Button level="primary" icon={Plus} onClick={createDeliverySite}>
-          Ajouter un site de livraison
+          Ajouter un dépôt
         </Button>
       </SectionHeader>
 
       <SectionForm>
         <LabelInput
-          label="Vérifier l'existence d'un site de livraison"
+          label="Vérifier l'existence d'un dépôt"
           placeholder="Rechercher sur Carbure..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -201,7 +201,7 @@ const DeliverySitesSettings = ({ entity }: DeliverySitesSettingsProps) => {
       {query.length > 0 && isEmpty && (
         <SectionBody>
           <Alert icon={AlertCircle} level="warning">
-            Aucun site de livraison trouvé
+            Aucun dépôt trouvé
           </Alert>
         </SectionBody>
       )}
