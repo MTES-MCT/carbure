@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 
-import { EntitySelection } from "../../hooks/helpers/use-entity"
 import { Country, DeliverySite } from "../../services/types"
+import { DeliverySiteSettingsHook } from "../../hooks/settings/use-delivery-sites"
 
 import styles from "./settings.module.css"
 
 import * as common from "../../services/common"
-import useAPI from "../../hooks/helpers/use-api"
 
+import useForm from "../../hooks/helpers/use-form"
 import { Title, Button, LabelInput, Box, LoaderOverlay, Label } from "../system"
 import { AlertCircle, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
@@ -18,11 +18,10 @@ import {
   SectionBody,
   Section,
 } from "../system/section"
-import { prompt, PromptFormProps } from "../system/dialog"
-import useForm from "../../hooks/helpers/use-form"
+import { PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete } from "../system/autocomplete"
-import { EMPTY_COLUMN } from "."
 import RadioGroup from "../system/radio-group"
+import { EMPTY_COLUMN } from "."
 
 const DEPOT_TYPES = [
   { label: "EFS", value: "EFS" },
@@ -38,7 +37,7 @@ type DeliverySiteState = {
   depot_type: "EFS" | "EPPE" | "OTHER"
 }
 
-const DeliverySitePrompt = ({
+export const DeliverySitePrompt = ({
   onConfirm,
   onCancel,
 }: PromptFormProps<DeliverySiteState>) => {
@@ -140,51 +139,23 @@ const DELIVERY_SITE_COLUMNS: Column<DeliverySite>[] = [
 ]
 
 type DeliverySitesSettingsProps = {
-  entity: EntitySelection
+  settings: DeliverySiteSettingsHook
 }
 
-const DeliverySitesSettings = ({ entity }: DeliverySitesSettingsProps) => {
-  const [query, setQuery] = useState("")
-  const [requestGetDeliverySites, resolveGetDeliverySites] = useAPI(common.findDeliverySites); // prettier-ignore
-  const [requestAddDeliverySite, resolveAddDeliverySite] = useAPI(common.addDeliverySite); // prettier-ignore
-
-  const entityID = entity?.id
-  const deliverySites = requestGetDeliverySites.data ?? []
-
-  const isLoading = requestGetDeliverySites.loading || requestAddDeliverySite.loading // prettier-ignore
-  const isEmpty = deliverySites.length === 0 || query.length === 0
-
-  async function createDeliverySite() {
-    const data = await prompt(
-      "Ajouter un dépôt",
-      "Veuillez entrer les informations de votre nouveau dépôt.",
-      DeliverySitePrompt
-    )
-
-    if (entityID && data && data.country) {
-      resolveAddDeliverySite(
-        data.name,
-        data.city,
-        data.country.code_pays,
-        data.depot_id,
-        data.depot_type
-      ).then(() => setQuery(data.depot_id))
-    }
-  }
-
-  const rows: Row<DeliverySite>[] = deliverySites.map((ds) => ({ value: ds }))
-
-  useEffect(() => {
-    if (query) {
-      resolveGetDeliverySites(query)
-    }
-  }, [query, resolveGetDeliverySites])
+const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
+  const rows: Row<DeliverySite>[] = settings.deliverySites.map((ds) => ({
+    value: ds,
+  }))
 
   return (
     <Section>
       <SectionHeader>
         <Title>Dépôts</Title>
-        <Button level="primary" icon={Plus} onClick={createDeliverySite}>
+        <Button
+          level="primary"
+          icon={Plus}
+          onClick={settings.createDeliverySite}
+        >
           Ajouter un dépôt
         </Button>
       </SectionHeader>
@@ -193,12 +164,12 @@ const DeliverySitesSettings = ({ entity }: DeliverySitesSettingsProps) => {
         <LabelInput
           label="Vérifier l'existence d'un dépôt"
           placeholder="Rechercher sur Carbure..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          value={settings.query}
+          onChange={(e) => settings.setQuery(e.target.value)}
         />
       </SectionForm>
 
-      {query.length > 0 && isEmpty && (
+      {settings.query.length > 0 && settings.isEmpty && (
         <SectionBody>
           <Alert icon={AlertCircle} level="warning">
             Aucun dépôt trouvé
@@ -206,7 +177,7 @@ const DeliverySitesSettings = ({ entity }: DeliverySitesSettingsProps) => {
         </SectionBody>
       )}
 
-      {!isEmpty && (
+      {!settings.isEmpty && (
         <Table
           columns={DELIVERY_SITE_COLUMNS}
           rows={rows}
@@ -214,7 +185,7 @@ const DeliverySitesSettings = ({ entity }: DeliverySitesSettingsProps) => {
         />
       )}
 
-      {isLoading && <LoaderOverlay />}
+      {settings.isLoading && <LoaderOverlay />}
     </Section>
   )
 }

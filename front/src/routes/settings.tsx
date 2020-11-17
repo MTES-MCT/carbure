@@ -10,6 +10,7 @@ import ProductionSitesSettings from "../components/settings/production-site-sett
 import DBSCertificateSettings from "../components/settings/2bs-certificates-settings"
 import ISCCCertificateSettings from "../components/settings/iscc-certificates-settings"
 import CompanySettings from "../components/settings/company-settings"
+import useSettings from "../hooks/use-settings"
 
 type SettingsProps = {
   entity: EntitySelection
@@ -17,6 +18,14 @@ type SettingsProps = {
 }
 
 const Settings = ({ entity, settings }: SettingsProps) => {
+  const {
+    company,
+    productionSites,
+    deliverySites,
+    dbsCertificates,
+    isccCertificates,
+  } = useSettings(entity, settings)
+
   const isProducer = entity?.entity_type === "Producteur"
   const isTrader = entity?.entity_type === "Trader"
   const isOperator = entity?.entity_type === "Opérateur"
@@ -30,11 +39,18 @@ const Settings = ({ entity, settings }: SettingsProps) => {
       </SettingsHeader>
 
       <SettingsBody>
-        <CompanySettings entity={entity} settings={settings} />
-        {hasCertificates && <ISCCCertificateSettings entity={entity} />}
-        {hasCertificates && <DBSCertificateSettings entity={entity} />}
-        {isProducer && <ProductionSitesSettings entity={entity} />}
-        {isOperator && <DeliverySitesSettings entity={entity} />}
+        <CompanySettings entity={entity} settings={company} />
+
+        {hasCertificates && (
+          <ISCCCertificateSettings settings={isccCertificates} />
+        )}
+
+        {hasCertificates && (
+          <DBSCertificateSettings settings={dbsCertificates} />
+        )}
+
+        {isProducer && <ProductionSitesSettings settings={productionSites} />}
+        {isOperator && <DeliverySitesSettings settings={deliverySites} />}
       </SettingsBody>
     </Main>
   )
