@@ -41,8 +41,29 @@
 .dialogButtons {
   justify-content: flex-end;
   margin-top: 16px;
+  margin-bottom: 20px;
 }
 
 .dialogButtons button {
   margin-left: 8px;
+}
+
+.settingsForm > div > label {
+  flex: 1;
+}
+
+.settingsForm > div > label:first-child {
+  margin-right: 16px;
+}
+
+.settingsFormColumns > div:first-child {
+  margin-right: 16px;
+}
+
+.settingsForm hr {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--gray-highlight);
+  margin: 16px 0;
 }

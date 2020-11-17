@@ -3,6 +3,7 @@ import React from "react"
 import {
   Biocarburant,
   Country,
+  GESOption,
   MatierePremiere,
   ProductionSiteDetails,
 } from "../../services/types"
@@ -12,7 +13,15 @@ import styles from "./settings.module.css"
 import * as common from "../../services/common"
 import useForm from "../../hooks/helpers/use-form"
 
-import { Title, Box, Button, LabelInput, LoaderOverlay, Label } from "../system"
+import {
+  Title,
+  Box,
+  Button,
+  LabelInput,
+  LoaderOverlay,
+  Label,
+  LabelCheckbox,
+} from "../system"
 import { AlertCircle, Cross, Plus, Save } from "../system/icons"
 import { Alert } from "../system/alert"
 import Table, { Actions, Column, Line, Row } from "../system/table"
@@ -22,16 +31,41 @@ import { PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete, MultiAutocomplete } from "../system/autocomplete"
 import { EMPTY_COLUMN } from "."
 import { ProductionSiteSettingsHook } from "../../hooks/settings/use-production-sites"
+import RadioGroup from "../system/radio-group"
 
 export type ProductionSiteState = {
+  // site
+  site_id: string
   name: string
-  country: Country | null
   date_mise_en_service: string
+  ges_option: GESOption
+  // double counting
+  eligible_dc: boolean
+  dc_reference: string
+
+  // address
+  city: string
+  postal_code: string
+  country: Country | null
+
+  // manager
+  manager_name: string
+  manager_phone: string
+  manager_email: string
+
+  // input/output
   matieres_premieres: MatierePremiere[]
   biocarburants: Biocarburant[]
 }
 
+const GES_OPTIONS = [
+  { value: GESOption.Default, label: "Valeurs par défaut" },
+  { value: GESOption.Actual, label: "Valeurs réelles" },
+]
+
 type ProductionSitePromptProps = PromptFormProps<ProductionSiteState>
+
+// ville/code postal/addresse/pays numéro d'identification (SIRET), nom/prénom/téléphone/mail du gérant
 
 export const ProductionSitePromptFactory = (
   productionSite?: ProductionSiteDetails
@@ -41,9 +75,22 @@ export const ProductionSitePromptFactory = (
     onCancel,
   }: ProductionSitePromptProps) {
     const [form, hasChanged, onChange] = useForm<ProductionSiteState>({
+      site_id: productionSite?.site_id ?? "",
       name: productionSite?.name ?? "",
-      country: productionSite?.country ?? null,
       date_mise_en_service: productionSite?.date_mise_en_service ?? "",
+      ges_option: productionSite?.ges_option ?? GESOption.Default,
+
+      eligible_dc: productionSite?.eligible_dc ?? false,
+      dc_reference: productionSite?.dc_reference ?? "",
+
+      city: productionSite?.city ?? "",
+      postal_code: productionSite?.postal_code ?? "",
+      country: productionSite?.country ?? null,
+
+      manager_name: productionSite?.manager_name ?? "",
+      manager_phone: productionSite?.manager_phone ?? "",
+      manager_email: productionSite?.manager_email ?? "",
+
       matieres_premieres: productionSite?.inputs ?? [],
       biocarburants: productionSite?.outputs ?? [],
     })
@@ -53,13 +100,48 @@ export const ProductionSitePromptFactory = (
     )
 
     return (
-      <Box as="form">
+      <Box as="form" className={styles.settingsForm}>
+        <hr />
+
         <LabelInput
           label="Nom du site"
           name="name"
           value={form.name}
           onChange={onChange}
         />
+
+        <Box row>
+          <LabelInput
+            label="N° d'identification (SIRET)"
+            name="site_id"
+            value={form.site_id}
+            onChange={onChange}
+          />
+          <LabelInput
+            type="date"
+            label="Date de mise en service"
+            name="date_mise_en_service"
+            value={form.date_mise_en_service}
+            onChange={onChange}
+          />
+        </Box>
+
+        <hr />
+
+        <Box row>
+          <LabelInput
+            label="Ville"
+            name="city"
+            value={form.city}
+            onChange={onChange}
+          />
+          <LabelInput
+            label="Code postal"
+            name="postal_code"
+            value={form.postal_code}
+            onChange={onChange}
+          />
+        </Box>
 
         <LabelAutoComplete
           label="Pays"
@@ -72,13 +154,60 @@ export const ProductionSitePromptFactory = (
           onChange={onChange}
         />
 
+        <hr />
+
         <LabelInput
-          type="date"
-          label="Date de mise en service"
-          name="date_mise_en_service"
-          value={form.date_mise_en_service}
+          label="Nom du gérant"
+          name="manager_name"
+          value={form.manager_name}
           onChange={onChange}
         />
+        <Box row>
+          <LabelInput
+            label="N° de téléphone du gérant"
+            name="manager_phone"
+            value={form.manager_phone}
+            onChange={onChange}
+          />
+          <LabelInput
+            label="Addresse email du gérant"
+            name="manager_email"
+            value={form.manager_email}
+            onChange={onChange}
+          />
+        </Box>
+
+        <hr />
+
+        <Box row>
+          <LabelCheckbox
+            label="Éligible au double-compte ?"
+            name="eligible_dc"
+            checked={form.eligible_dc}
+            onChange={onChange}
+          />
+          <LabelInput
+            disabled={!form.eligible_dc}
+            label="Référence double-compte"
+            name="dc_reference"
+            value={form.dc_reference}
+            onChange={onChange}
+          />
+        </Box>
+
+        <hr />
+
+        <Label label="Options GES">
+          <RadioGroup
+            row
+            value={form.ges_option}
+            name="ges_option"
+            options={GES_OPTIONS}
+            onChange={onChange}
+          />
+        </Label>
+
+        <hr />
 
         <Label label="Matieres premieres">
           <MultiAutocomplete
@@ -91,7 +220,6 @@ export const ProductionSitePromptFactory = (
             onChange={onChange}
           />
         </Label>
-
         <Label label="Biocarburants">
           <MultiAutocomplete
             value={form.biocarburants}
@@ -103,7 +231,6 @@ export const ProductionSitePromptFactory = (
             onChange={onChange}
           />
         </Label>
-
         <Box row className={styles.dialogButtons}>
           <Button
             level="primary"
