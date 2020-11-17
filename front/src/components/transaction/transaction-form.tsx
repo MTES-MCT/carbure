@@ -391,7 +391,7 @@ const TransactionForm = ({
                 name="etd"
                 value={tx.etd}
                 error={fieldErrors.etd}
-                tooltip="Émissions résultant du transport et de la distribution'"
+                tooltip="Émissions résultant du transport et de la distribution"
                 step={0.1}
                 onChange={onChange}
               />

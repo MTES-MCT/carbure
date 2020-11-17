@@ -56,7 +56,7 @@ export default function useValidateLots(
   async function validateSelection() {
     const shouldValidate = await confirm(
       "Envoyer lot",
-      "En envoyant les lots suivants, je certifie qu'ils respectent les critères du durabilité liés aux terres et que les informations renseignées sont réelles et valides"
+      "En envoyant les lots suivants, je certifie qu'ils respectent les critères de durabilité liés aux terres et que les informations renseignées sont réelles et valides"
     )
 
     if (entity !== null && shouldValidate) {
