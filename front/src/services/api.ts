@@ -11,12 +11,16 @@ export type ApiResponse<T> =
   | { status: "forbidden"; message: string }
   | { status: "success"; data: T }
 
+function isEmpty(value: any) {
+  return typeof value === "undefined" || value === null
+}
+
 // keep only parameters that are defined
 function filterParams(params: Params) {
   const okParams: Params = {}
 
   for (const key in params) {
-    if (params[key] || params[key] === 0) {
+    if (!isEmpty(params[key])) {
       okParams[key] = params[key]
     }
   }
@@ -31,7 +35,7 @@ function toFormData(obj: any): FormData {
   for (const key in obj) {
     if (Array.isArray(obj[key])) {
       obj[key].forEach((value: any) => formData.append(key, value.toString()))
-    } else if (obj[key] || obj[key] === 0) {
+    } else if (!isEmpty(obj[key])) {
       formData.append(key, obj[key])
     }
   }
