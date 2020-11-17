@@ -1,24 +1,22 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 
-import { EntitySelection } from "../../hooks/helpers/use-entity"
+import { ISCCCertificateSettingsHook } from "../../hooks/settings/use-iscc-certificates"
 import { ISCCCertificate } from "../../services/types"
 
 import styles from "./settings.module.css"
 
-import * as api from "../../services/settings"
 import * as common from "../../services/common"
-import useAPI from "../../hooks/helpers/use-api"
 
 import { Title, Button, Box, LoaderOverlay } from "../system"
 import { AlertCircle, Cross, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
 import { SectionHeader, SectionBody, Section } from "../system/section"
-import { confirm, prompt, PromptFormProps } from "../system/dialog"
+import { PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete } from "../system/autocomplete"
 import { EMPTY_COLUMN } from "."
 import Table, { Actions, Column, Line } from "../system/table"
 
-const ISCCPrompt = ({
+export const ISCCPrompt = ({
   onConfirm,
   onCancel,
 }: PromptFormProps<ISCCCertificate>) => {
@@ -60,83 +58,39 @@ const COLUMNS: Column<ISCCCertificate>[] = [
 ]
 
 type ISCCCertificateSettingsProps = {
-  entity: EntitySelection
+  settings: ISCCCertificateSettingsHook
 }
 
-const ISCCCertificateSettings = ({ entity }: ISCCCertificateSettingsProps) => {
-  const [requestGetISCC, resolveGetISCC] = useAPI(api.getISCCCertificates); // prettier-ignore
-  const [requestAddISCC, resolveAddISCC] = useAPI(api.addISCCCertificate); // prettier-ignore
-  const [requestDelISCC, resolveDelISCC] = useAPI(api.deleteISCCCertificate); // prettier-ignore
-
-  const entityID = entity?.id
-  const certificates = requestGetISCC.data ?? []
-
-  const isLoading =
-    requestGetISCC.loading || requestAddISCC.loading || requestDelISCC.loading
-
-  const isEmpty = certificates.length === 0
-
-  function refresh() {
-    if (entityID) {
-      resolveGetISCC(entityID)
-    }
-  }
-
-  async function createISCCCertificate() {
-    const data = await prompt(
-      "Ajouter un certificat ISCC",
-      "Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond.",
-      ISCCPrompt
-    )
-
-    if (entityID && data) {
-      resolveAddISCC(entityID, data.certificate_id).then(() =>
-        resolveGetISCC(entityID)
-      )
-    }
-  }
-
-  async function deleteISCCCertificate(iscc: ISCCCertificate) {
-    if (
-      entityID &&
-      (await confirm(
-        "Suppresion certificat",
-        `Voulez-vous vraiment supprimer le certificat ISCC "${iscc.certificate_id}" ?`
-      ))
-    ) {
-      resolveDelISCC(entityID, iscc.certificate_id).then(refresh)
-    }
-  }
-
-  useEffect(() => {
-    if (entityID) {
-      resolveGetISCC(entityID)
-    }
-  }, [entityID, resolveGetISCC])
-
+const ISCCCertificateSettings = ({
+  settings,
+}: ISCCCertificateSettingsProps) => {
   const columns = [
     ...COLUMNS,
     Actions([
       {
         icon: Cross,
         title: "Supprimer le certificat",
-        action: deleteISCCCertificate,
+        action: settings.deleteISCCCertificate,
       },
     ]),
   ]
 
-  const rows = certificates.map((c) => ({ value: c }))
+  const rows = settings.certificates.map((c) => ({ value: c }))
 
   return (
     <Section>
       <SectionHeader>
         <Title>Certificats ISCC</Title>
-        <Button level="primary" icon={Plus} onClick={createISCCCertificate}>
+        <Button
+          level="primary"
+          icon={Plus}
+          onClick={settings.addISCCCertificate}
+        >
           Ajouter un certificat ISCC
         </Button>
       </SectionHeader>
 
-      {isEmpty && (
+      {settings.isEmpty && (
         <SectionBody>
           <Alert icon={AlertCircle} level="warning">
             Aucun certificat ISCC trouvé
@@ -144,9 +98,9 @@ const ISCCCertificateSettings = ({ entity }: ISCCCertificateSettingsProps) => {
         </SectionBody>
       )}
 
-      {!isEmpty && <Table columns={columns} rows={rows} />}
+      {!settings.isEmpty && <Table columns={columns} rows={rows} />}
 
-      {isLoading && <LoaderOverlay />}
+      {settings.isLoading && <LoaderOverlay />}
     </Section>
   )
 }
