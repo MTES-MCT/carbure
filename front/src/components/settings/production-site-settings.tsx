@@ -31,93 +31,93 @@ export type ProductionSiteState = {
   biocarburants: Biocarburant[]
 }
 
-type ProductionSitePromptProps = PromptFormProps<ProductionSiteState> & {
+type ProductionSitePromptProps = PromptFormProps<ProductionSiteState>
+
+export const ProductionSitePromptFactory = (
   productionSite?: ProductionSiteDetails
-}
+) =>
+  function ProductionSitePrompt({
+    onConfirm,
+    onCancel,
+  }: ProductionSitePromptProps) {
+    const [form, hasChanged, onChange] = useForm<ProductionSiteState>({
+      name: productionSite?.name ?? "",
+      country: productionSite?.country ?? null,
+      date_mise_en_service: productionSite?.date_mise_en_service ?? "",
+      matieres_premieres: productionSite?.inputs ?? [],
+      biocarburants: productionSite?.outputs ?? [],
+    })
 
-export const ProductionSitePrompt = ({
-  productionSite,
-  onConfirm,
-  onCancel,
-}: ProductionSitePromptProps) => {
-  const [form, hasChanged, onChange] = useForm<ProductionSiteState>({
-    name: productionSite?.name ?? "",
-    country: productionSite?.country ?? null,
-    date_mise_en_service: productionSite?.date_mise_en_service ?? "",
-    matieres_premieres: productionSite?.inputs ?? [],
-    biocarburants: productionSite?.outputs ?? [],
-  })
+    const canSave = Boolean(
+      hasChanged && form.country && form.date_mise_en_service && form.name
+    )
 
-  const canSave = Boolean(
-    hasChanged && form.country && form.date_mise_en_service && form.name
-  )
-
-  return (
-    <Box as="form">
-      <LabelInput
-        label="Nom du site"
-        name="name"
-        value={form.name}
-        onChange={onChange}
-      />
-
-      <LabelAutoComplete
-        label="Pays"
-        placeholder="Rechercher un pays..."
-        name="country"
-        value={form.country}
-        getValue={(c) => c?.code_pays ?? ""}
-        getLabel={(c) => c?.name ?? ""}
-        getQuery={common.findCountries}
-        onChange={onChange}
-      />
-
-      <LabelInput
-        type="date"
-        label="Date de mise en service"
-        name="date_mise_en_service"
-        value={form.date_mise_en_service}
-        onChange={onChange}
-      />
-
-      <Label label="Matieres premieres">
-        <MultiAutocomplete
-          value={form.matieres_premieres}
-          name="matieres_premieres"
-          placeholder="Ajouter matières premières..."
-          getValue={(o) => o.code}
-          getLabel={(o) => o.name}
-          getQuery={common.findMatieresPremieres}
+    return (
+      <Box as="form">
+        <LabelInput
+          label="Nom du site"
+          name="name"
+          value={form.name}
           onChange={onChange}
         />
-      </Label>
 
-      <Label label="Biocarburants">
-        <MultiAutocomplete
-          value={form.biocarburants}
-          name="biocarburants"
-          placeholder="Ajouter biocarburants..."
-          getValue={(o) => o.code}
-          getLabel={(o) => o.name}
-          getQuery={common.findBiocarburants}
+        <LabelAutoComplete
+          label="Pays"
+          placeholder="Rechercher un pays..."
+          name="country"
+          value={form.country}
+          getValue={(c) => c?.code_pays ?? ""}
+          getLabel={(c) => c?.name ?? ""}
+          getQuery={common.findCountries}
           onChange={onChange}
         />
-      </Label>
 
-      <Box row className={styles.dialogButtons}>
-        <Button
-          level="primary"
-          icon={Save}
-          disabled={!canSave}
-          onClick={() => form && onConfirm(form)}
-        >
-          Sauvegarder
-        </Button>
-        <Button onClick={onCancel}>Annuler</Button>
+        <LabelInput
+          type="date"
+          label="Date de mise en service"
+          name="date_mise_en_service"
+          value={form.date_mise_en_service}
+          onChange={onChange}
+        />
+
+        <Label label="Matieres premieres">
+          <MultiAutocomplete
+            value={form.matieres_premieres}
+            name="matieres_premieres"
+            placeholder="Ajouter matières premières..."
+            getValue={(o) => o.code}
+            getLabel={(o) => o.name}
+            getQuery={common.findMatieresPremieres}
+            onChange={onChange}
+          />
+        </Label>
+
+        <Label label="Biocarburants">
+          <MultiAutocomplete
+            value={form.biocarburants}
+            name="biocarburants"
+            placeholder="Ajouter biocarburants..."
+            getValue={(o) => o.code}
+            getLabel={(o) => o.name}
+            getQuery={common.findBiocarburants}
+            onChange={onChange}
+          />
+        </Label>
+
+        <Box row className={styles.dialogButtons}>
+          <Button
+            level="primary"
+            icon={Save}
+            disabled={!canSave}
+            onClick={() => form && onConfirm(form)}
+          >
+            Sauvegarder
+          </Button>
+          <Button onClick={onCancel}>Annuler</Button>
+        </Box>
       </Box>
-    </Box>
-  )
-}
+    )
+  }
 
 const PRODUCTION_SITE_COLUMNS: Column<ProductionSiteDetails>[] = [
   EMPTY_COLUMN,
