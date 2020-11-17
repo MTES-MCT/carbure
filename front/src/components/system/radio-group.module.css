@@ -1,13 +1,10 @@
-.radioGroup {
-  margin: 8px 0;
-}
-
 .radioGroupButton {
   margin-right: 8px;
 }
 
 .radioGroupLabel {
-  margin-bottom: 8px;
+  padding: 9px;
   margin-right: 24px;
+  font-size: var(--font-size);
   font-style: normal;
 }
