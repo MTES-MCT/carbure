@@ -1,24 +1,22 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 
-import { EntitySelection } from "../../hooks/helpers/use-entity"
+import { DBSCertificateSettingsHook } from "../../hooks/settings/use-2bs-certificates"
 import { DBSCertificate } from "../../services/types"
 
 import styles from "./settings.module.css"
 
-import * as api from "../../services/settings"
 import * as common from "../../services/common"
-import useAPI from "../../hooks/helpers/use-api"
 
 import { Title, Button, Box, LoaderOverlay } from "../system"
 import { AlertCircle, Cross, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
 import { SectionHeader, SectionBody, Section } from "../system/section"
-import { confirm, prompt, PromptFormProps } from "../system/dialog"
+import { PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete } from "../system/autocomplete"
 import Table, { Actions, Column, Line } from "../system/table"
 import { EMPTY_COLUMN } from "."
 
-const DBSPrompt = ({
+export const DBSPrompt = ({
   onConfirm,
   onCancel,
 }: PromptFormProps<DBSCertificate>) => {
@@ -60,81 +58,37 @@ const COLUMNS: Column<DBSCertificate>[] = [
 ]
 
 type DBSCertificateSettingsProps = {
-  entity: EntitySelection
+  settings: DBSCertificateSettingsHook
 }
 
-const DBSCertificateSettings = ({ entity }: DBSCertificateSettingsProps) => {
-  const [requestGet2BS, resolveGet2BS] = useAPI(api.get2BSCertificates) // prettier-ignore
-  const [requestAdd2BS, resolveAdd2BS] = useAPI(api.add2BSCertificate) // prettier-ignore
-  const [requestDel2BS, resolveDel2BS] = useAPI(api.delete2BSCertificate) // prettier-ignore
-
-  const entityID = entity?.id
-  const certificates = requestGet2BS.data ?? []
-
-  const isLoading =
-    requestGet2BS.loading || requestAdd2BS.loading || requestDel2BS.loading
-
-  const isEmpty = certificates.length === 0
-
-  function refresh() {
-    if (entityID) {
-      resolveGet2BS(entityID)
-    }
-  }
-
-  async function create2BSCertificate() {
-    const data = await prompt(
-      "Ajouter un certificat 2BS",
-      "Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond.",
-      DBSPrompt
-    )
-
-    if (entityID && data) {
-      resolveAdd2BS(entityID, data.certificate_id).then(refresh)
-    }
-  }
-
-  async function delete2BSCertificate(dbs: DBSCertificate) {
-    if (
-      entityID &&
-      (await confirm(
-        "Suppresion certificat",
-        `Voulez-vous vraiment supprimer le certificat 2BS "${dbs.certificate_id}" ?`
-      ))
-    ) {
-      resolveDel2BS(entityID, dbs.certificate_id).then(refresh)
-    }
-  }
-
-  useEffect(() => {
-    if (entityID) {
-      resolveGet2BS(entityID)
-    }
-  }, [entityID, resolveGet2BS])
-
+const DBSCertificateSettings = ({ settings }: DBSCertificateSettingsProps) => {
   const columns = [
     ...COLUMNS,
     Actions([
       {
         icon: Cross,
         title: "Supprimer le certificat",
-        action: delete2BSCertificate,
+        action: settings.delete2BSCertificate,
       },
     ]),
   ]
 
-  const rows = certificates.map((c) => ({ value: c }))
+  const rows = settings.certificates.map((c) => ({ value: c }))
 
   return (
     <Section>
       <SectionHeader>
         <Title>Certificats 2BS</Title>
-        <Button level="primary" icon={Plus} onClick={create2BSCertificate}>
+        <Button
+          level="primary"
+          icon={Plus}
+          onClick={settings.add2BSCertificate}
+        >
           Ajouter un certificat 2BS
         </Button>
       </SectionHeader>
 
-      {isEmpty && (
+      {settings.isEmpty && (
         <SectionBody>
           <Alert icon={AlertCircle} level="warning">
             Aucun certificat 2BS trouvé
@@ -142,9 +96,9 @@ const DBSCertificateSettings = ({ entity }: DBSCertificateSettingsProps) => {
         </SectionBody>
       )}
 
-      {!isEmpty && <Table columns={columns} rows={rows} />}
+      {!settings.isEmpty && <Table columns={columns} rows={rows} />}
 
-      {isLoading && <LoaderOverlay />}
+      {settings.isLoading && <LoaderOverlay />}
     </Section>
   )
 }
