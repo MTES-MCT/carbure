@@ -33,7 +33,7 @@ def get_rights(request):
     rights = UserRights.objects.all()
     if q:
         rights = rights.filter(Q(user__email__icontains=q) | Q(user__name__icontains=q) | Q(entity__name__icontains=q))
-    rights_sez = [r.natural_key() for u in rights]
+    rights_sez = [u.natural_key() for u in rights]
     return JsonResponse({"status": "success", "data": rights_sez})
 
 

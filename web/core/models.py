@@ -57,6 +57,9 @@ class UserRights(models.Model):
     def __str__(self):
         return '%s - %s' % (self.user.email, self.entity.name)
 
+    def natural_key(self):
+        return {'name': self.user.name, 'email': self.user.email, 'entity': self.entity.name, 'entity_type': self.entity.entity_type}
+
     class Meta:
         db_table = 'users_rights'
         verbose_name = 'User Right'
