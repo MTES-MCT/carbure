@@ -3,7 +3,7 @@ div.dialog {
   flex-direction: column;
   min-height: 0;
   padding: 20px;
-  max-width: 560px;
+  padding-bottom: 0;
 }
 
 .dialogMessage {
@@ -14,6 +14,7 @@ div.dialog {
 .dialogButtons {
   margin-top: 16px;
   justify-content: flex-end;
+  margin-bottom: 20px;
 }
 
 .dialogButtons button {

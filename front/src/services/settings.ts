@@ -25,14 +25,70 @@ export function addProductionSite(
   name: string,
   date_mise_en_service: string,
   country_code: string,
-  ges_option: boolean
+  ges_option: GESOption,
+  site_id: string,
+  city: string,
+  postal_code: string,
+  eligible_dc: boolean,
+  dc_reference: string,
+  manager_name: string,
+  manager_phone: string,
+  manager_email: string
 ): Promise<ProductionSite> {
   return api.post("/settings/add-production-site", {
     producer_id: producerID,
     name: name,
     date_mise_en_service: date_mise_en_service,
-    ges_option: ges_option ? GESOption.Actual : GESOption.Default,
+    ges_option: ges_option,
     country_code: country_code,
+    site_id,
+    city,
+    postal_code,
+    eligible_dc,
+    dc_reference,
+    manager_name,
+    manager_phone,
+    manager_email,
+  })
+}
+
+export function updateProductionSite(
+  entity_id: number,
+  production_site_id: number,
+  name: string,
+  date_mise_en_service: string,
+  country_code: string,
+  ges_option: GESOption,
+  site_id: string,
+  city: string,
+  postal_code: string,
+  eligible_dc: boolean,
+  dc_reference: string,
+  manager_name: string,
+  manager_phone: string,
+  manager_email: string
+) {
+  return api.post("/settings/update-production-site", {
+    entity_id,
+    production_site_id,
+    name,
+    date_mise_en_service,
+    ges_option,
+    country_code,
+    site_id,
+    city,
+    postal_code,
+    eligible_dc,
+    dc_reference,
+    manager_name,
+    manager_phone,
+    manager_email,
+  })
+}
+
+export function deleteProductionSite(productionSiteID: number) {
+  return api.post("/settings/delete-production-site", {
+    production_site_id: productionSiteID,
   })
 }
 
@@ -43,30 +99,6 @@ export function addProductionSiteMP(
   return api.post("/settings/add-production-site-matiere-premiere", {
     production_site_id: productionSiteID,
     matiere_premiere_code: matiere_premiere_code,
-  })
-}
-
-export function deleteProductionSite(productionSiteID: number) {
-  return api.post("/settings/delete-production-site", {
-    production_site_id: productionSiteID,
-  })
-}
-
-export function updateProductionSite(
-  entityID: number,
-  productionSiteID: number,
-  name: string,
-  date_mise_en_service: string,
-  country_code: string,
-  ges_option: boolean
-) {
-  return api.post("/settings/update-production-site", {
-    entity_id: entityID,
-    production_site_id: productionSiteID,
-    name: name,
-    date_mise_en_service: date_mise_en_service,
-    ges_option: ges_option ? GESOption.Actual : GESOption.Default,
-    country_code: country_code,
   })
 }
 
