@@ -1,19 +1,15 @@
-import React, { useEffect } from "react"
+import React from "react"
 
-import { EntitySelection } from "../../hooks/helpers/use-entity"
 import {
   Biocarburant,
   Country,
   MatierePremiere,
-  ProductionSite,
   ProductionSiteDetails,
 } from "../../services/types"
 
 import styles from "./settings.module.css"
 
-import * as api from "../../services/settings"
 import * as common from "../../services/common"
-import useAPI from "../../hooks/helpers/use-api"
 import useForm from "../../hooks/helpers/use-form"
 
 import { Title, Box, Button, LabelInput, LoaderOverlay, Label } from "../system"
@@ -22,11 +18,12 @@ import { Alert } from "../system/alert"
 import Table, { Actions, Column, Line, Row } from "../system/table"
 
 import { SectionHeader, SectionBody, Section } from "../system/section"
-import { confirm, prompt, PromptFormProps } from "../system/dialog"
+import { PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete, MultiAutocomplete } from "../system/autocomplete"
 import { EMPTY_COLUMN } from "."
+import { ProductionSiteSettingsHook } from "../../hooks/settings/use-production-sites"
 
-type ProductionSiteState = {
+export type ProductionSiteState = {
   name: string
   country: Country | null
   date_mise_en_service: string
@@ -38,7 +35,7 @@ type ProductionSitePromptProps = PromptFormProps<ProductionSiteState> & {
   productionSite?: ProductionSiteDetails
 }
 
-const ProductionSitePrompt = ({
+export const ProductionSitePrompt = ({
   productionSite,
   onConfirm,
   onCancel,
@@ -140,136 +137,46 @@ const PRODUCTION_SITE_COLUMNS: Column<ProductionSiteDetails>[] = [
     render: (ps) => <Line text={ps.date_mise_en_service} />,
   },
 ]
+
 type ProductionSitesSettingsProps = {
-  entity: EntitySelection
+  settings: ProductionSiteSettingsHook
 }
 
-const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
-  const [requestGetProductionSites, resolveGetProductionSites] = useAPI(api.getProductionSites) // prettier-ignore
-  const [requestAddProductionSite, resolveAddProductionSite] = useAPI(api.addProductionSite) // prettier-ignore
-  const [requestDelProductionSite, resolveDelProductionSite] = useAPI(api.deleteProductionSite) // prettier-ignore
-  const [requestUpdateProductionSite, resolveUpdateProductionSite] = useAPI(api.updateProductionSite) // prettier-ignore
-
-  const [requestSetProductionSiteMP, resolveSetProductionSiteMP] = useAPI(api.setProductionSiteMP) // prettier-ignore
-  const [requestSetProductionSiteBC, resolveSetProductionSiteBC] = useAPI(api.setProductionSiteBC) // prettier-ignore
-
-  const entityID = entity?.id
-  const productionSites = requestGetProductionSites.data ?? []
-
-  const isLoading =
-    requestAddProductionSite.loading ||
-    requestGetProductionSites.loading ||
-    requestDelProductionSite.loading ||
-    requestSetProductionSiteBC.loading ||
-    requestSetProductionSiteMP.loading ||
-    requestUpdateProductionSite.loading
-
-  const isEmpty = productionSites.length === 0
-
-  function refresh() {
-    if (entityID) {
-      resolveGetProductionSites(entityID)
-    }
-  }
-
-  async function createProductionSite() {
-    const data = await prompt(
-      "Ajout site de production",
-      "Veuillez entrer les informations de votre nouveau site de production.",
-      ProductionSitePrompt
-    )
-
-    if (entityID && data && data.country) {
-      const ps = await resolveAddProductionSite(
-        entityID,
-        data.name,
-        data.date_mise_en_service,
-        data.country.code_pays,
-        true
-      )
-
-      if (ps) {
-        const mps = data.matieres_premieres.map((mp) => mp.code)
-        await resolveSetProductionSiteMP(ps.id, mps)
-
-        const bcs = data.biocarburants.map((bc) => bc.code)
-        await resolveSetProductionSiteBC(ps.id, bcs)
-      }
-
-      refresh()
-    }
-  }
-
-  async function editProductionSite(ps: ProductionSiteDetails) {
-    const data = await prompt<ProductionSiteState>(
-      "Modification site de production",
-      "Veuillez entrer les nouvelles informations de votre site de production.",
-      (props) => <ProductionSitePrompt {...props} productionSite={ps} />
-    )
-
-    if (entityID && data && data.country) {
-      await resolveUpdateProductionSite(
-        entityID,
-        ps.id,
-        data.name,
-        data.date_mise_en_service,
-        data.country.code_pays,
-        true
-      )
-
-      const mps = data.matieres_premieres.map((mp) => mp.code)
-      await resolveSetProductionSiteMP(ps.id, mps)
-
-      const bcs = data.biocarburants.map((bc) => bc.code)
-      await resolveSetProductionSiteBC(ps.id, bcs)
-
-      refresh()
-    }
-  }
-
-  async function removeProductionSite(ps: ProductionSite) {
-    if (
-      await confirm(
-        "Suppression site",
-        `Voulez-vous vraiment supprimer le site de production "${ps.name}" ?`
-      )
-    ) {
-      resolveDelProductionSite(ps.id).then(refresh)
-    }
-  }
-
-  useEffect(() => {
-    if (entityID) {
-      resolveGetProductionSites(entityID)
-    }
-  }, [entityID, resolveGetProductionSites])
-
+const ProductionSitesSettings = ({
+  settings,
+}: ProductionSitesSettingsProps) => {
   const columns = [
     ...PRODUCTION_SITE_COLUMNS,
     Actions([
       {
         icon: Cross,
         title: "Supprimer le site de production",
-        action: removeProductionSite,
+        action: settings.removeProductionSite,
       },
     ]),
   ]
 
-  const rows: Row<ProductionSiteDetails>[] = productionSites.map((ps) => ({
-    value: ps,
-    onClick: () => editProductionSite(ps),
-  }))
+  const rows: Row<ProductionSiteDetails>[] = settings.productionSites.map(
+    (ps) => ({
+      value: ps,
+      onClick: () => settings.editProductionSite(ps),
+    })
+  )
 
   return (
     <Section>
       <SectionHeader>
         <Title>Sites de production</Title>
-        <Button level="primary" icon={Plus} onClick={createProductionSite}>
+        <Button
+          level="primary"
+          icon={Plus}
+          onClick={settings.createProductionSite}
+        >
           Ajouter un site de production
         </Button>
       </SectionHeader>
 
-      {isEmpty && (
+      {settings.isEmpty && (
         <SectionBody>
           <Alert icon={AlertCircle} level="warning">
             Aucun site de production trouvé
@@ -277,11 +184,11 @@ const ProductionSitesSettings = ({ entity }: ProductionSitesSettingsProps) => {
         </SectionBody>
       )}
 
-      {!isEmpty && (
+      {!settings.isEmpty && (
         <Table columns={columns} rows={rows} className={styles.settingsTable} />
       )}
 
-      {isLoading && <LoaderOverlay />}
+      {settings.isLoading && <LoaderOverlay />}
     </Section>
   )
 }
