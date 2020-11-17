@@ -27,18 +27,15 @@ def get_production_sites(request, *args, **kwargs):
         v.inputs = []
         v.outputs = []
 
-    inputs = ProductionSiteInput.objects.filter(production_site__in=psites)
-    for i in inputs:
-        psitesbyid[i.production_site.id].inputs.append(i.matiere_premiere.natural_key())
+    data = []
 
-    outputs = ProductionSiteOutput.objects.filter(production_site__in=psites)
-    for o in outputs:
-        psitesbyid[o.production_site.id].outputs.append(o.biocarburant.natural_key())
-    sez = [{'name': p.name, 'id': p.id, 'country': p.country.natural_key(),
-            'date_mise_en_service': p.date_mise_en_service,
-            'ges_option': p.ges_option, 'eligible_dc': p.eligible_dc, 'dc_reference': p.dc_reference,
-            'inputs': p.inputs, 'outputs': p.outputs, 'producer': p.producer.natural_key()} for p in psites]
-    return JsonResponse({'status': 'success', 'data': sez})
+    for p in psites:
+        psite_data = p.natural_key()
+        psite_data['inputs'] = [i.natural_key() for i in p.productionsiteinput_set.all()]
+        psite_data['outputs'] = [o.natural_key() for o in p.productionsiteoutput_set.all()]
+        data.append(psite_data)
+
+    return JsonResponse({'status': 'success', 'data': data})
 
 
 def add_production_site(request):
@@ -47,6 +44,17 @@ def add_production_site(request):
     date_mise_en_service = request.POST.get('date_mise_en_service')
     ges_option = request.POST.get('ges_option')
     producer = request.POST.get('producer_id')
+
+    eligible_dc = request.POST.get('eligible_dc')
+    eligible_dc = eligible_dc == 'true'
+    dc_reference = request.POST.get('dc_reference')
+
+    site_id = request.POST.get('site_id')
+    city = request.POST.get('city')
+    postal_code = request.POST.get('postal_code')
+    manager_name = request.POST.get('manager_name')
+    manager_phone = request.POST.get('manager_phone')
+    manager_email = request.POST.get('manager_email')
 
     if country is None:
         return JsonResponse({'status': 'error', 'message': "Missing country_code"}, status=400)
@@ -58,6 +66,18 @@ def add_production_site(request):
         return JsonResponse({'status': 'error', 'message': "Missing ges_option"}, status=400)
     if producer is None:
         return JsonResponse({'status': 'error', 'message': "Missing producer"}, status=400)
+    if site_id is None:
+        return JsonResponse({'status': 'error', 'message': "Missing site id"}, status=400)
+    if postal_code is None:
+        return JsonResponse({'status': 'error', 'message': "Missing postal code"}, status=400)
+    if manager_name is None:
+        return JsonResponse({'status': 'error', 'message': "Missing manager name"}, status=400)
+    if manager_phone is None:
+        return JsonResponse({'status': 'error', 'message': "Missing manager phone"}, status=400)
+    if manager_email is None:
+        return JsonResponse({'status': 'error', 'message': "Missing manager email"}, status=400)
+    if city is None:
+        return JsonResponse({'status': 'error', 'message': "Missing city"}, status=400)
 
     try:
         date_mise_en_service = datetime.datetime.strptime(date_mise_en_service, '%Y-%m-%d')
@@ -81,13 +101,73 @@ def add_production_site(request):
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit producer"}, status=403)
 
     try:
-        obj, created = ProductionSite.objects.update_or_create(producer=producer, country=country, name=name,
-                                                               defaults={'date_mise_en_service': date_mise_en_service,
-                                                                         'ges_option': ges_option})
+        obj, created = ProductionSite.objects.update_or_create(producer=producer, country=country, name=name, city=city,
+            postal_code=postal_code, eligible_dc=eligible_dc, dc_reference=dc_reference, site_id=site_id, 
+            manager_name=manager_name, manager_phone=manager_phone, manager_email=manager_email,
+            date_mise_en_service=date_mise_en_service, ges_option=ges_option)
+
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
                              'extra': str(e)}, status=400)
     return JsonResponse({'status': 'success', 'data': obj.natural_key() })
+
+
+@check_rights('entity_id')
+def update_production_site(request, *args, **kwargs):
+    production_site_id = request.POST.get('production_site_id', False)
+
+    if not production_site_id:
+        return JsonResponse({'status': 'error', 'message': "Missing field production_site_id"}, status=400)
+
+    psite = ProductionSite.objects.get(id=production_site_id)
+
+    country_code = request.POST.get('country_code')
+    name = request.POST.get('name')
+    date_mise_en_service = request.POST.get('date_mise_en_service')
+    ges_option = request.POST.get('ges_option')
+
+    eligible_dc = request.POST.get('eligible_dc')
+    eligible_dc = eligible_dc == 'true'
+    dc_reference = request.POST.get('dc_reference')
+
+    site_id = request.POST.get('site_id')
+    city = request.POST.get('city')
+    postal_code = request.POST.get('postal_code')
+    manager_name = request.POST.get('manager_name')
+    manager_phone = request.POST.get('manager_phone')
+    manager_email = request.POST.get('manager_email')
+
+    if name:
+        psite.name = name
+    if ges_option:
+        psite.ges_option = ges_option
+    if date_mise_en_service:
+        psite.date_mise_en_service = date_mise_en_service
+    if eligible_dc is not None:
+        psite.eligible_dc = eligible_dc
+    if dc_reference:
+        psite.dc_reference = dc_reference
+    if site_id:
+        psite.site_id = site_id
+    if city:
+        psite.city = city
+    if postal_code:
+        psite.postal_code = postal_code
+    if manager_name:
+        psite.manager_name = manager_name
+    if manager_phone:
+        psite.manager_phone = manager_phone
+    if manager_email:
+        psite.manager_email = manager_email
+    if country_code:
+        try:
+            country = Pays.objects.get(code_pays=country_code)
+            psite.country = country
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': "Unknown country"}, status=400)
+
+    psite.save()
+    return JsonResponse({'status': 'success'})
 
 
 def delete_production_site(request):
@@ -110,8 +190,6 @@ def delete_production_site(request):
         return JsonResponse({'status': 'error', 'message': msg}, status=400)
     ps.delete()
     return JsonResponse({'status': 'success'})
-
-
 
 
 def set_production_site_mp(request):
@@ -399,37 +477,6 @@ def disable_trading(request, *args, **kwargs):
     entity.save()
     return JsonResponse({'status': 'success'})
 
-
-@check_rights('entity_id')
-def update_production_site(request, *args, **kwargs):
-    production_site_id = request.POST.get('production_site_id', False)
-
-    if not production_site_id:
-        return JsonResponse({'status': 'error', 'message': "Missing field production_site_id"}, status=400)
-
-    psite = ProductionSite.objects.get(id=production_site_id)
-    name = request.POST.get('name', False)
-    ges_option = request.POST.get('ges_option', False)
-    date_mise_en_service = request.POST.get('date_mise_en_service', False)
-    eligible_dc = request.POST.get('eligible_dc', False)
-    country_code = request.POST.get('country_code', False)
-
-    if name:
-        psite.name = name
-    if ges_option:
-        psite.ges_option = ges_option
-    if date_mise_en_service:
-        psite.date_mise_en_service = date_mise_en_service
-    if eligible_dc:
-        psite.eligible_dc = eligible_dc
-    if country_code:
-        try:
-            country = Pays.objects.get(code_pays=country_code)
-            psite.country = country
-        except Exception:
-            return JsonResponse({'status': 'error', 'message': "Unknown country"}, status=400)
-    psite.save()
-    return JsonResponse({'status': 'success'})
 
 
 @check_rights('entity_id')

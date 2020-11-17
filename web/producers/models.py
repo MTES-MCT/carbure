@@ -13,12 +13,21 @@ class ProductionSite(models.Model):
     eligible_dc = models.BooleanField(default=False)
     dc_reference = models.CharField(max_length=64, null=True, blank=True, default='')
 
+    site_id = models.CharField(max_length=64, blank=False, null=False)
+    city = models.CharField(max_length=64, blank=False, null=False)
+    postal_code = models.CharField(max_length=64, blank=False, null=False)
+    manager_name = models.CharField(max_length=64, blank=False, null=False)
+    manager_phone = models.CharField(max_length=64, blank=False, null=False)
+    manager_email = models.CharField(max_length=64, blank=False, null=False)
+
     def __str__(self):
         return self.name
 
     def natural_key(self):
         return {'name': self.name, 'country': self.country.natural_key(), 'id': self.id, 'date_mise_en_service': self.date_mise_en_service,
-        }
+            'site_id': self.site_id, 'postal_code': self.postal_code, 'manager_name': self.manager_name, 'manager_phone': self.manager_phone, 
+            'manager_email': self.manager_email, 'ges_option': self.ges_option, 'eligible_dc': self.eligible_dc, 
+            'dc_reference': self.dc_reference, 'city': self.city}
 
     class Meta:
         db_table = 'producer_sites'
