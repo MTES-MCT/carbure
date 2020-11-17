@@ -63,7 +63,15 @@ export default function useProductionSites(
         data.name,
         data.date_mise_en_service,
         data.country.code_pays,
-        true
+        data.ges_option,
+        data.site_id,
+        data.city,
+        data.postal_code,
+        data.eligible_dc,
+        data.dc_reference,
+        data.manager_name,
+        data.manager_phone,
+        data.manager_email
       )
 
       if (ps) {
@@ -92,7 +100,15 @@ export default function useProductionSites(
         data.name,
         data.date_mise_en_service,
         data.country.code_pays,
-        true
+        data.ges_option,
+        data.site_id,
+        data.city,
+        data.postal_code,
+        data.eligible_dc,
+        data.dc_reference,
+        data.manager_name,
+        data.manager_phone,
+        data.manager_email
       )
 
       const mps = data.matieres_premieres.map((mp) => mp.code)

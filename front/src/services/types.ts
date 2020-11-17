@@ -20,10 +20,17 @@ export enum GESOption {
   Actual = "Actual",
 }
 
+export enum EntityType {
+  Producer = "Producteur",
+  Operator = "Opérateur",
+  Trader = "Trader",
+  Administration = "Administration",
+}
+
 export interface Entity {
   id: number
   name: string
-  entity_type: "Producteur" | "Opérateur" | "Trader" | "Administration"
+  entity_type: EntityType
   has_mac: boolean
   has_trading: boolean
 }
@@ -78,12 +85,17 @@ export interface ProductionSite {
 
 export interface ProductionSiteDetails extends ProductionSite {
   date_mise_en_service: string
-  ges_option: string
+  ges_option: GESOption
   eligible_dc: boolean
-  dc_reference: null // @TODO
+  dc_reference: string | null
   inputs: MatierePremiere[]
   outputs: Biocarburant[]
-  producer: Entity
+  site_id: string
+  postal_code: string
+  city: string
+  manager_name: string
+  manager_phone: string
+  manager_email: string
 }
 
 export interface Lot {
