@@ -18,7 +18,10 @@ type SettingsProps = {
 
 const Settings = ({ entity, settings }: SettingsProps) => {
   const isProducer = entity?.entity_type === "Producteur"
-  const hasTrading = entity?.has_trading ?? false
+  const isTrader = entity?.entity_type === "Trader"
+  const isOperator = entity?.entity_type === "Opérateur"
+
+  const hasCertificates = isProducer || isTrader
 
   return (
     <Main>
@@ -28,10 +31,10 @@ const Settings = ({ entity, settings }: SettingsProps) => {
 
       <SettingsBody>
         <CompanySettings entity={entity} settings={settings} />
-        {hasTrading && <ISCCCertificateSettings entity={entity} />}
-        {hasTrading && <DBSCertificateSettings entity={entity} />}
+        {hasCertificates && <ISCCCertificateSettings entity={entity} />}
+        {hasCertificates && <DBSCertificateSettings entity={entity} />}
         {isProducer && <ProductionSitesSettings entity={entity} />}
-        <DeliverySitesSettings entity={entity} />
+        {isOperator && <DeliverySitesSettings entity={entity} />}
       </SettingsBody>
     </Main>
   )
