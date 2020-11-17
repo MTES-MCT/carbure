@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import { useEffect } from "react"
 
 import { EntitySelection } from "../helpers/use-entity"
 import { ProductionSiteDetails } from "../../services/types"
@@ -6,7 +6,7 @@ import { ProductionSiteDetails } from "../../services/types"
 import useAPI from "../helpers/use-api"
 import * as api from "../../services/settings"
 import {
-  ProductionSitePrompt,
+  ProductionSitePromptFactory,
   ProductionSiteState,
 } from "../../components/settings/production-site-settings"
 import { confirm, prompt } from "../../components/system/dialog"
@@ -54,7 +54,7 @@ export default function useProductionSites(
     const data = await prompt(
       "Ajout site de production",
       "Veuillez entrer les informations de votre nouveau site de production.",
-      ProductionSitePrompt
+      ProductionSitePromptFactory()
     )
 
     if (entityID && data && data.country) {
@@ -82,7 +82,7 @@ export default function useProductionSites(
     const data = await prompt<ProductionSiteState>(
       "Modification site de production",
       "Veuillez entrer les nouvelles informations de votre site de production.",
-      (props) => <ProductionSitePrompt {...props} productionSite={ps} />
+      ProductionSitePromptFactory(ps)
     )
 
     if (entityID && data && data.country) {
