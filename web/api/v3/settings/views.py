@@ -5,6 +5,7 @@ from core.models import Entity, UserRights, LotV2, Pays, MatierePremiere, Biocar
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput, ProducerCertificate
 from core.decorators import check_rights
 from core.models import ISCCCertificate, DBSCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate
+from core.models import ProductionSiteCertificate
 
 
 def get_settings(request):
@@ -544,4 +545,59 @@ def delete_2bs_certificate(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
 
     EntityDBSTradingCertificate.objects.get(entity=context['entity'], certificate=certificate).delete()
+    return JsonResponse({'status': 'success'})
+
+
+@check_rights('entity_id')
+def get_my_certificates(request, *args, **kwargs):
+    context = kwargs['context']
+    today = datetime.date.today()
+    certificates_iscc = EntityISCCTradingCertificate.objects.filter(entity=context['entity'], certificate__valid_until__gte=today)
+    certificates_2bs = EntityDBSTradingCertificate.objects.filter(entity=context['entity'], certificate__valid_until__gte=today)
+
+    sez_data = [{'certificate_id': c.certificate.certificate_id, 'holder': c.certificate.certificate_holder, 'type': 'ISCC'} for c in certificates_iscc]
+    sez_data += [{'certificate_id': c.certificate.certificate_id, 'holder': c.certificate.certificate_holder, 'type': '2BS'} for c in certificates_2bs]
+    return JsonResponse({'status': 'success', 'data': sez_data})
+
+
+@check_rights('entity_id')
+def add_production_site_certificate(request, *args, **kwargs):
+    context = kwargs['context']
+    certificate_id = request.POST.get('certificate_id', False)
+    certificate_type = request.POST.get('certificate_type', False)
+
+    certificate_iscc = None
+    certificate_2bs = None
+    try:
+        if certificate_type == 'ISCC':
+            certificate_iscc = EntityISCCTradingCertificate.objects.get(certificate_id=certificate_id)
+        else:
+            certificate_2bs = EntityDBSTradingCertificate.objects.get(certificate_id=certificate_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
+
+    ProductionSiteCertificate.objects.update_or_create(entity=context['entity'], type=certificate_type, certificate_2bs=certificate_2bs, certificate_iscc=certificate_iscc)
+    return JsonResponse({'status': 'success'})
+
+
+
+@check_rights('entity_id')
+def delete_production_site_certificate(request, *args, **kwargs):
+    context = kwargs['context']
+    certificate_id = request.POST.get('certificate_id', False)
+    certificate_type = request.POST.get('certificate_type', False)
+
+    if not certificate_id:
+        return JsonResponse({'status': 'error', 'message': 'Please provide a certificate_id'}, status=400)
+    if not certificate_type:
+        return JsonResponse({'status': 'error', 'message': 'Please provide a certificate_type'}, status=400)
+
+    try:
+        if certificate_type == 'ISCC':
+            ProductionSiteCertificate.objects.get(entity=context['entity'], type=certificate_type, certificate_iscc__certificate_id=certificate_id).delete()
+        else:
+            ProductionSiteCertificate.objects.get(entity=context['entity'], type=certificate_type, certificate_2bs__certificate_id=certificate_id).delete()
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
+
     return JsonResponse({'status': 'success'})
