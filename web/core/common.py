@@ -388,7 +388,7 @@ def fill_pays_origine_info(lot_row, lot, prefetched_data):
 def fill_ghg_info(lot_row, lot):
     lot_errors = []
     lot.eec = 0
-    if 'eec' in lot_row and lot_row['eec'] is not None:
+    if 'eec' in lot_row and lot_row['eec'] is not None and lot_row['eec'] != '':
         eec = lot_row['eec']
         try:
             lot.eec = float(eec)
@@ -396,7 +396,7 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='eec', error='Format non reconnu', value=eec))
 
     lot.el = 0
-    if 'el' in lot_row and lot_row['el'] is not None:
+    if 'el' in lot_row and lot_row['el'] is not None and lot_row['el'] != '':
         el = lot_row['el']
         try:
             lot.el = float(el)
@@ -404,7 +404,7 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='el', error='Format non reconnu', value=el))
 
     lot.ep = 0
-    if 'ep' in lot_row and lot_row['ep'] is not None:
+    if 'ep' in lot_row and lot_row['ep'] is not None and lot_row['ep'] != '':
         ep = lot_row['ep']
         try:
             lot.ep = float(ep)
@@ -412,7 +412,7 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='ep', error='Format non reconnu', value=ep))
 
     lot.etd = 0
-    if 'etd' in lot_row and lot_row['etd'] is not None:
+    if 'etd' in lot_row and lot_row['etd'] is not None and lot_row['etd'] != '':
         etd = lot_row['etd']
         try:
             lot.etd = float(etd)
@@ -420,7 +420,7 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='etd', error='Format non reconnu', value=etd))
 
     lot.eu = 0
-    if 'eu' in lot_row and lot_row['eu'] is not None:
+    if 'eu' in lot_row and lot_row['eu'] is not None and lot_row['eu'] != '':
         eu = lot_row['eu']
         try:
             lot.eu = float(eu)
@@ -428,7 +428,7 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='eu', error='Format non reconnu', value=eu))
 
     lot.esca = 0
-    if 'esca' in lot_row and lot_row['esca'] is not None:
+    if 'esca' in lot_row and lot_row['esca'] is not None and lot_row['esca'] != '':
         esca = lot_row['esca']
         try:
             lot.esca = float(esca)
@@ -436,7 +436,7 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='esca', error='Format non reconnu', value=esca))
 
     lot.eccs = 0
-    if 'eccs' in lot_row and lot_row['eccs'] is not None:
+    if 'eccs' in lot_row and lot_row['eccs'] is not None and lot_row['eccs'] != '':
         eccs = lot_row['eccs']
         try:
             lot.eccs = float(eccs)
@@ -444,7 +444,7 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='eccs', error='Format non reconnu', value=eccs))
 
     lot.eccr = 0
-    if 'eccr' in lot_row and lot_row['eccr'] is not None:
+    if 'eccr' in lot_row and lot_row['eccr'] is not None and lot_row['eccr'] != '':
         eccr = lot_row['eccr']
         try:
             lot.eccr = float(eccr)
@@ -452,7 +452,7 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='eccr', error='Format non reconnu', value=eccr))
 
     lot.eee = 0
-    if 'eee' in lot_row and lot_row['eee'] is not None:
+    if 'eee' in lot_row and lot_row['eee'] is not None and lot_row['eee'] != '':
         eee = lot_row['eee']
         try:
             lot.eee = float(eee)
@@ -491,8 +491,8 @@ def fill_delivery_date(lot_row, lot, transaction):
                 dd = delivery_date
             else:
                 dd = dateutil.parser.parse(delivery_date, dayfirst=True)
-                transaction.delivery_date = dd
-                lot.period = dd.strftime('%Y-%m')
+            transaction.delivery_date = dd
+            lot.period = dd.strftime('%Y-%m')
         except Exception as e:
             print(e)
             transaction.delivery_date = None
@@ -551,7 +551,7 @@ def fill_delivery_site_data(lot_row, transaction, prefetched_data):
     depots = prefetched_data['depots']
     countries = prefetched_data['countries']
     if 'delivery_site' in lot_row and lot_row['delivery_site'] is not None:
-        delivery_site = lot_row['delivery_site']
+        delivery_site = str(lot_row['delivery_site'])
         if delivery_site in depots:
             transaction.delivery_site_is_in_carbure = True
             transaction.carbure_delivery_site = depots[delivery_site]
@@ -635,7 +635,6 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
     return lot, transaction, lot_errors, tx_errors
 
 def load_lot(prefetched_data, entity, user, lot_dict, source, transaction=None):
-    now = datetime.datetime.now()
     lot_errors = []
     tx_errors = []
 
@@ -661,7 +660,6 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, transaction=None):
     lot_errors += fill_ghg_info(lot_dict, lot)
     lot.is_valid = False
 
-    #print('lot data loaded in %s' % (datetime.datetime.now() - now))
     if transaction is None:
         transaction = LotTransaction()
     transaction.is_mac = False
@@ -676,7 +674,6 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, transaction=None):
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
     transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
-    #print('tx data loaded in %s' % (datetime.datetime.now() - now))
     return lot, transaction, lot_errors, tx_errors
 
 
@@ -686,24 +683,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
     # prefetch some data
     prefetched_data = get_prefetched_data(entity)
 
-    #wb = openpyxl.load_workbook(file)
     try:
-        #lots_sheet = wb['lots']
-        #colid2field = {}
-        #lots = []
-        # create a dictionary from the line
-        #for i, row in enumerate(lots_sheet):
-        #    if i == 0:
-        #        # header
-        #        for i, col in enumerate(row):
-        #            colid2field[i] = col.value
-        #    else:
-        #        lot = {}
-        #        for i, col in enumerate(row):
-        #            field = colid2field[i]
-        #            lot[field] = col.value
-        #        lots.append(lot)
-        #total_lots = len(lots)
         df = pd.read_excel(file)
         df.fillna('', inplace=True)
         total_lots = len(df)
@@ -715,7 +695,6 @@ def load_excel_file(entity, user, file, mass_balance=False):
         print('File read %s' % (datetime.datetime.now()))
         for row in df.iterrows():
             lot_row = row[1]
-        #for lot_row in lots:
             try:
                 if mass_balance:
                     lot, tx, l_errors, t_errors = load_mb_lot(prefetched_data, entity, user, lot_row, 'EXCEL')
