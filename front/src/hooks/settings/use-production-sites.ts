@@ -30,6 +30,7 @@ export default function useProductionSites(
 
   const [requestSetProductionSiteMP, resolveSetProductionSiteMP] = useAPI(api.setProductionSiteMP) // prettier-ignore
   const [requestSetProductionSiteBC, resolveSetProductionSiteBC] = useAPI(api.setProductionSiteBC) // prettier-ignore
+  const [requestSetProductionSiteCertificates, resolveSetProductionSiteCertificates] = useAPI(api.setProductionSiteCertificates) // prettier-ignore
 
   const entityID = entity?.id
   const productionSites = requestGetProductionSites.data ?? []
@@ -40,7 +41,8 @@ export default function useProductionSites(
     requestDelProductionSite.loading ||
     requestSetProductionSiteBC.loading ||
     requestSetProductionSiteMP.loading ||
-    requestUpdateProductionSite.loading
+    requestUpdateProductionSite.loading ||
+    requestSetProductionSiteCertificates.loading
 
   const isEmpty = productionSites.length === 0
 
@@ -80,9 +82,12 @@ export default function useProductionSites(
 
         const bcs = data.biocarburants.map((bc) => bc.code)
         await resolveSetProductionSiteBC(ps.id, bcs)
-      }
 
-      refresh()
+        const cs = data.certificates.map((c) => c.certificate_id)
+        await resolveSetProductionSiteCertificates(entityID, ps.id, cs)
+
+        refresh()
+      }
     }
   }
 
@@ -116,6 +121,9 @@ export default function useProductionSites(
 
       const bcs = data.biocarburants.map((bc) => bc.code)
       await resolveSetProductionSiteBC(ps.id, bcs)
+
+      const cs = data.certificates.map((c) => c.certificate_id)
+      await resolveSetProductionSiteCertificates(entityID, ps.id, cs)
 
       refresh()
     }
