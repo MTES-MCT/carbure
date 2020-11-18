@@ -230,9 +230,9 @@
   flex: 1;
 }
 
-.errorLabel > span,
-.errorLabel:hover > span,
-.errorLabel:focus > span {
+.errorLabel .labelText,
+.errorLabel:hover .labelText,
+.errorLabel:focus .labelText {
   color: var(--red-dark);
 }
 
