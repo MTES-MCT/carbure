@@ -304,3 +304,9 @@ export type ISCCCertificate = {
   valid_until: string
   issuing_cb: string
 }
+
+export type Certificate = {
+  certificate_id: string
+  holder: string
+  type: "2BS" | "ISCC"
+}

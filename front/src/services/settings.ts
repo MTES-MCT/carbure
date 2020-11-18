@@ -6,6 +6,7 @@ import {
   ISCCCertificate,
   ProductionSite,
   ProductionSiteDetails,
+  Certificate,
 } from "./types"
 
 export function getSettings(): Promise<Settings> {
@@ -149,6 +150,16 @@ export function deleteProductionSiteBC(
   return api.post("/settings/delete-production-site-biocarburant", {
     production_site_id: productionSiteID,
     biocarburant_code: biocarburant_code,
+  })
+}
+
+export function findCertificates(
+  query: string,
+  entity_id: number
+): Promise<Certificate[]> {
+  return api.get("/settings/get-my-certificates", {
+    entity_id,
+    query,
   })
 }
 

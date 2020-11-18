@@ -9,6 +9,7 @@ div.dialog {
 .dialogMessage {
   margin-top: 32px;
   margin-bottom: 16px;
+  max-width: 600px;
 }
 
 .dialogButtons {
