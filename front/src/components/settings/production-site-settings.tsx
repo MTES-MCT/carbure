@@ -30,7 +30,7 @@ import { SectionHeader, SectionBody, Section } from "../system/section"
 import { DialogButtons, PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete, MultiAutocomplete } from "../system/autocomplete"
 import RadioGroup from "../system/radio-group"
-import { EMPTY_COLUMN, SettingsForm } from "."
+import { EMPTY_COLUMN, formatDate, SettingsForm } from "."
 
 export type ProductionSiteState = {
   // site
@@ -261,7 +261,7 @@ const PRODUCTION_SITE_COLUMNS: Column<ProductionSiteDetails>[] = [
   {
     header: "Date de mise en service",
     className: styles.settingsTableColumn,
-    render: (ps) => <Line text={ps.date_mise_en_service} />,
+    render: (ps) => <Line text={formatDate(ps.date_mise_en_service)} />,
   },
 ]
 

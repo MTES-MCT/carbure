@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-
 import { ISCCCertificateSettingsHook } from "../../hooks/settings/use-iscc-certificates"
 import { ISCCCertificate } from "../../services/types"
 
@@ -11,7 +10,7 @@ import { Alert } from "../system/alert"
 import { SectionHeader, SectionBody, Section } from "../system/section"
 import { DialogButtons, PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete } from "../system/autocomplete"
-import { EMPTY_COLUMN, SettingsForm } from "."
+import { EMPTY_COLUMN, expiration, SettingsForm } from "."
 import Table, { Actions, Column, Line } from "../system/table"
 
 export const ISCCPrompt = ({
@@ -52,7 +51,7 @@ const COLUMNS: Column<ISCCCertificate>[] = [
   EMPTY_COLUMN,
   { header: "ID", render: (c) => <Line text={c.certificate_id} /> },
   { header: "Détenteur", render: (c) => <Line text={c.certificate_holder} /> },
-  { header: "Valide jusqu'au", render: (c) => <Line text={c.valid_until} /> },
+  { header: "Valide jusqu'au", render: (c) => <Line text={expiration(c)} /> },
 ]
 
 type ISCCCertificateSettingsProps = {
