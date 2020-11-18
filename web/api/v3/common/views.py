@@ -86,8 +86,7 @@ def get_delivery_sites(request):
     dsites = Depot.objects.all()
     if q:
         dsites = dsites.filter(Q(name__icontains=q) | Q(depot_id__icontains=q) | Q(city__icontains=q))
-    sez = [{'name': d.name, 'city': d.city, 'depot_id': d.depot_id, 'country': d.country.natural_key(),
-            'depot_type': d.depot_type} for d in dsites]
+    sez = [d.natural_key() for d in dsites]
     return JsonResponse({'status': 'success', 'data': sez})
 
 
@@ -152,6 +151,10 @@ def create_delivery_site(request):
     country = request.POST.get('country_code', False)
     depot_id = request.POST.get('depot_id', False)
     depot_type = request.POST.get('depot_type', False)
+    
+    address = request.POST.get('address', False)
+    postal_code = request.POST.get('postal_code', False)
+    ownership_type = request.POST.get('ownership_type', False)
 
     if not name:
         return JsonResponse({'status': 'error', 'message': 'Missing name'}, status=400)
@@ -160,9 +163,15 @@ def create_delivery_site(request):
     if not country:
         return JsonResponse({'status': 'error', 'message': 'Missing country'}, status=400)
     if not depot_id:
-        return JsonResponse({'status': 'error', 'message': 'Missing depot_id'}, status=400)
+        return JsonResponse({'status': 'error', 'message': 'Missing depot id'}, status=400)
     if not depot_type:
-        return JsonResponse({'status': 'error', 'message': 'Missing depot_type'}, status=400)                        
+        return JsonResponse({'status': 'error', 'message': 'Missing depot type'}, status=400)                        
+    if not address:
+        return JsonResponse({'status': 'error', 'message': 'Missing address'}, status=400)                        
+    if not postal_code:
+        return JsonResponse({'status': 'error', 'message': 'Missing postal code'}, status=400)                        
+    if not ownership_type:
+        return JsonResponse({'status': 'error', 'message': 'Missing ownership type'}, status=400)                        
 
     try:
         country = Pays.objects.get(code_pays=country)
@@ -171,9 +180,13 @@ def create_delivery_site(request):
         return JsonResponse({'status': 'error', 'message': 'Unknown country_code %s' % (country)}, status=400)                        
 
     if depot_type not in ['EFS', 'EFPE', 'OTHER']:
-        return JsonResponse({'status': 'error', 'message': 'Unknown depot_type %s' % (depot_type)}, status=400)                        
+        return JsonResponse({'status': 'error', 'message': 'Unknown depot type %s' % (depot_type)}, status=400)                        
+    if ownership_type not in ['OWN', 'THIRD_PARTY']:
+        return JsonResponse({'status': 'error', 'message': 'Unknown ownership type %s' % (ownership_type)}, status=400)                        
 
-    d = {'name': name, 'city': city, 'depot_type': depot_type}
+    d = {'name': name, 'city': city, 'depot_type': depot_type, 'address': address, 
+        'postal_code': postal_code, 'ownership_type': ownership_type}
+
     try:
         Depot.objects.update_or_create(depot_id=depot_id, country=country, defaults=d)
     except Exception as e:
