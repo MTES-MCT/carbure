@@ -293,7 +293,7 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
                     dd = datetime.date(year=year, month=month, day=day)
                 lot.unknown_production_site_com_date = dd
             except Exception:
-                msg = "Format de date incorrect: veuillez entrer une date au format AAAA-MM-JJ"
+                msg = "Veuillez entrer une date au format AAAA-MM-JJ"
                 error = LotV2Error(lot=lot, field='unknown_production_site_com_date',
                                     error=msg,
                                     value=lot_row['production_site_commissioning_date'])
