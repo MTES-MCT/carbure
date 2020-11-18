@@ -72,7 +72,7 @@ class ProductionSiteOutput(models.Model):
         verbose_name = 'Site de Production - Biocarburant'
         verbose_name_plural = 'Sites de Production - Biocarburants'
 
-
+# deprecated
 class ProducerCertificate(models.Model):
     CERTIF_STATUS_CHOICES = [("Pending", "En Attente de validation"), ("Valid", "Validé"), ("Expired", "Expiré")]
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE)
@@ -90,3 +90,4 @@ class ProducerCertificate(models.Model):
         db_table = 'producer_certificates'
         verbose_name = 'Certificat'
         verbose_name_plural = 'Certificats'
+
