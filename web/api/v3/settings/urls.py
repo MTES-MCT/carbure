@@ -35,4 +35,9 @@ urlpatterns = [
     path('add-2bs-certificate', views.add_2bs_certificate, name='api-v3-settings-add-2bs-certificate'),
     path('delete-iscc-certificate', views.delete_iscc_certificate, name='api-v3-settings-delete-iscc-certificate'),
     path('delete-2bs-certificate', views.delete_2bs_certificate, name='api-v3-settings-delete-2bs-certificate'),
+
+
+    path('get-my-certificates', views.get_my_certificates, name='api-v3-settings-get-my-certificates'),
+    path('add-production-site-certificate', views.add_production_site_certificate, name='api-v3-settings-add-production-site-certificate'),
+    path('delete-production-site-certificate', views.delete_production_site_certificate, name='api-v3-settings-delete-production-site-certificate'),
 ]
