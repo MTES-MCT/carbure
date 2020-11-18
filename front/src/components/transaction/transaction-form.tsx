@@ -224,7 +224,7 @@ const TransactionForm = ({
                 label="Date de mise en service"
                 name="unknown_production_site_com_date"
                 value={tx.unknown_production_site_com_date}
-                error={fieldErrors.production_site_com_date}
+                error={fieldErrors.unknown_production_site_com_date}
                 onChange={onChange}
               />
               <LabelInput
