@@ -9,6 +9,7 @@ import DeliverySitesSettings from "../components/settings/delivery-site-settings
 import ProductionSitesSettings from "../components/settings/production-site-settings"
 import DBSCertificateSettings from "../components/settings/2bs-certificates-settings"
 import ISCCCertificateSettings from "../components/settings/iscc-certificates-settings"
+import NationalSystemCertificatesSettings from "../components/settings/national-system-certificates-settings"
 import CompanySettings from "../components/settings/company-settings"
 import useSettings from "../hooks/use-settings"
 
@@ -24,6 +25,7 @@ const Settings = ({ entity, settings }: SettingsProps) => {
     deliverySites,
     dbsCertificates,
     isccCertificates,
+    nationalSystemCertificates,
   } = useSettings(entity, settings)
 
   const isProducer = entity?.entity_type === "Producteur"
@@ -47,6 +49,12 @@ const Settings = ({ entity, settings }: SettingsProps) => {
 
         {hasCertificates && (
           <DBSCertificateSettings settings={dbsCertificates} />
+        )}
+
+        {isOperator && (
+          <NationalSystemCertificatesSettings
+            settings={nationalSystemCertificates}
+          />
         )}
 
         {isProducer && <ProductionSitesSettings settings={productionSites} />}
