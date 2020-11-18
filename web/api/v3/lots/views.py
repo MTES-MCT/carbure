@@ -162,11 +162,13 @@ def get_lots(request):
     deadline_str = deadline_date.strftime("%Y-%m-%d")
     deadline_total = txs_with_deadline.count()
 
-    if invalid:
+    if invalid == 'true':
         txs = tx_with_errors
     elif deadline:
         txs = txs_with_deadline
-
+    else:
+        pass
+    
     if sort_by:
         if sort_by in sort_key_to_django_field:
             key = sort_key_to_django_field[sort_by]
