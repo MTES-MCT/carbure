@@ -588,3 +588,26 @@ class EntityDBSTradingCertificate(models.Model):
         db_table = 'entity_2bs_trading_certificates'
         verbose_name = 'Certificat de Trading 2BS'
         verbose_name_plural = 'Certificats de Trading 2BS'
+
+
+class ProductionSiteCertificate(models.Model):
+    CERTIFICATE_TYPE = [("ISCC", "ISCC"), ("2BS", "2BS")]
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
+    production_site = models.ForeignKey(ProductionSite, null=True, on_delete=models.CASCADE)
+    type = models.CharField(max_length=32, choices=CERTIFICATE_TYPE, default="Pending")
+    
+    certificate_iscc = models.ForeignKey(EntityISCCTradingCertificate, null=True, blank=True, on_delete=models.CASCADE)
+    certificate_2bs = models.ForeignKey(EntityDBSTradingCertificate, null=True, blank=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.certificate_id
+
+    def natural_key(self):
+        return {'type': self.type, 'certificate_id': self.certificate_iscc.certificate.certificate_id if self.type == 'ISCC' else self.certificate_2bs.certificate.certificate_id}
+
+    class Meta:
+        db_table = 'production_sites_certificates'
+        verbose_name = 'Certificat de site de production'
+        verbose_name_plural = 'Certificats de sites de productions'
+
+        

@@ -13,7 +13,7 @@ from core.models import GHGValues, Depot, LotV2, LotTransaction, TransactionErro
 from core.models import LotValidationError
 from core.models import ISCCScope, ISCCCertificate, ISCCCertificateRawMaterial, ISCCCertificateScope
 from core.models import DBSCertificate, DBSScope, DBSCertificateScope
-from core.models import EntityISCCTradingCertificate, EntityDBSTradingCertificate
+from core.models import EntityISCCTradingCertificate, EntityDBSTradingCertificate, ProductionSiteCertificate
 
 
 class EntityAdmin(admin.ModelAdmin):
@@ -154,6 +154,12 @@ class EntityDBSTradingCertificateAdmin(admin.ModelAdmin):
     search_fields = ('entity', 'certificate',)
 
 
+class ProductionSiteCertificateAdmin(admin.ModelAdmin):
+    list_display = ('production_site', 'type', 'certificate_iscc', 'certificate_2bs')
+    search_fields = ('production_site', 'certificate_iscc', 'certificate_2bs',)
+    list_filter = ('type',)
+
+
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
 admin.site.register(UserPreferences, UserPreferencesAdmin)
@@ -177,6 +183,7 @@ admin.site.register(DBSScope, DBSScopeAdmin)
 admin.site.register(DBSCertificateScope, DBSCertificateScopeAdmin)
 admin.site.register(EntityISCCTradingCertificate, EntityISCCTradingCertificateAdmin)
 admin.site.register(EntityDBSTradingCertificate, EntityDBSTradingCertificateAdmin)
+admin.site.register(ProductionSiteCertificate, ProductionSiteCertificateAdmin)
 
 
 # authtool custom user model
