@@ -103,7 +103,7 @@ export const ProductionSitePromptFactory = (
       matieres_premieres: productionSite?.inputs ?? [],
       biocarburants: productionSite?.outputs ?? [],
 
-      certificates: [],
+      certificates: productionSite?.certificates ?? [],
     })
 
     const canSave = Boolean(

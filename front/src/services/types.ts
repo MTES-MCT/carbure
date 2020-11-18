@@ -111,6 +111,7 @@ export interface ProductionSiteDetails extends ProductionSite {
   manager_name: string
   manager_phone: string
   manager_email: string
+  certificates: Certificate[]
 }
 
 export interface Lot {

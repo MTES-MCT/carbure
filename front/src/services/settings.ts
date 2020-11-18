@@ -163,6 +163,18 @@ export function findCertificates(
   })
 }
 
+export function setProductionSiteCertificates(
+  entity_id: number,
+  production_site_id: number,
+  certificate_ids: string[]
+) {
+  return api.post("/settings/set-production-site-certificates", {
+    entity_id,
+    production_site_id,
+    certificate_ids,
+  })
+}
+
 export function enablePublicDirectory(entityID: number) {
   return api.post("/settings/enable-public-directory", {
     entity_id: entityID,
