@@ -1,17 +1,16 @@
 import React, { useState } from "react"
-
 import { ISCCCertificateSettingsHook } from "../../hooks/settings/use-iscc-certificates"
 import { ISCCCertificate } from "../../services/types"
 
 import * as common from "../../services/common"
 
-import { Title, Button, Box, LoaderOverlay } from "../system"
+import { Title, Button, LoaderOverlay } from "../system"
 import { AlertCircle, Cross, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
 import { SectionHeader, SectionBody, Section } from "../system/section"
 import { DialogButtons, PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete } from "../system/autocomplete"
-import { EMPTY_COLUMN } from "."
+import { EMPTY_COLUMN, expiration, SettingsForm } from "."
 import Table, { Actions, Column, Line } from "../system/table"
 
 export const ISCCPrompt = ({
@@ -21,7 +20,7 @@ export const ISCCPrompt = ({
   const [certificate, setCertificate] = useState<ISCCCertificate | null>(null)
 
   return (
-    <Box>
+    <SettingsForm>
       <LabelAutoComplete
         label="Certificat ISCC"
         placeholder="Rechercher un certificat ISCC..."
@@ -44,7 +43,7 @@ export const ISCCPrompt = ({
         </Button>
         <Button onClick={onCancel}>Annuler</Button>
       </DialogButtons>
-    </Box>
+    </SettingsForm>
   )
 }
 
@@ -52,7 +51,7 @@ const COLUMNS: Column<ISCCCertificate>[] = [
   EMPTY_COLUMN,
   { header: "ID", render: (c) => <Line text={c.certificate_id} /> },
   { header: "Détenteur", render: (c) => <Line text={c.certificate_holder} /> },
-  { header: "Valide jusqu'au", render: (c) => <Line text={c.valid_until} /> },
+  { header: "Valide jusqu'au", render: (c) => <Line text={expiration(c)} /> },
 ]
 
 type ISCCCertificateSettingsProps = {

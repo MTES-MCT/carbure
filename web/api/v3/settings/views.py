@@ -1,4 +1,5 @@
 import datetime
+from dateutil.relativedelta import *
 
 from django.http import JsonResponse
 from core.models import Entity, UserRights, LotV2, Pays, MatierePremiere, Biocarburant
@@ -479,11 +480,11 @@ def disable_trading(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-
 @check_rights('entity_id')
 def get_iscc_certificates(request, *args, **kwargs):
     context = kwargs['context']
-    objects = EntityISCCTradingCertificate.objects.filter(entity=context['entity'])
+    one_year_ago = datetime.datetime.now() - relativedelta(years=1)
+    objects = EntityISCCTradingCertificate.objects.filter(entity=context['entity'], certificate__valid_until__gte=one_year_ago)
     sez = [o.certificate.natural_key() for o in objects]
     return JsonResponse({'status': 'success', 'data': sez})
 
@@ -491,7 +492,8 @@ def get_iscc_certificates(request, *args, **kwargs):
 @check_rights('entity_id')
 def get_2bs_certificates(request, *args, **kwargs):
     context = kwargs['context']
-    objects = EntityDBSTradingCertificate.objects.filter(entity=context['entity'])
+    one_year_ago = datetime.datetime.now() - relativedelta(years=1)
+    objects = EntityDBSTradingCertificate.objects.filter(entity=context['entity'], certificate__valid_until__gte=one_year_ago)
     sez = [o.certificate.natural_key() for o in objects]
     return JsonResponse({'status': 'success', 'data': sez})
 

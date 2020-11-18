@@ -38,6 +38,7 @@ function useAutoComplete<T>(
     setQuery(query)
 
     if (query.length === 0) {
+      onChange({ target: { name, value: null } })
       dd.toggle(false)
     } else {
       dd.toggle(true)

@@ -149,11 +149,17 @@ class Depot(models.Model):
     country = models.ForeignKey(Pays, null=True, blank=False, on_delete=models.SET_NULL)
     depot_type = models.CharField(max_length=32, choices=TYPE_DEPOT, default='OTHER')
 
+    address = models.CharField(max_length=128, null=False, blank=False)
+    postal_code = models.CharField(max_length=32, null=False, blank=False)
+    TYPE_OWNERSHIP = (('OWN', 'Propre'), ('THIRD_PARTY', 'Tiers'))
+    ownership_type = models.CharField(max_length=32, choices=TYPE_OWNERSHIP, default='THIRD_PARTY')
+    
     def __str__(self):
         return self.name
 
     def natural_key(self):
-        return {'depot_id': self.depot_id, 'name': self.name, 'city': self.city, 'country': self.country.natural_key()}
+        return {'depot_id': self.depot_id, 'name': self.name, 'city': self.city, 'country': self.country.natural_key(), 
+            'depot_type': self.depot_type, 'address': self.address, 'postal_code': self.postal_code, 'ownership_type': self.ownership_type}
 
     class Meta:
         db_table = 'depots'
