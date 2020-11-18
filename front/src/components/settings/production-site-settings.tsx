@@ -7,6 +7,7 @@ import {
   MatierePremiere,
   ProductionSiteDetails,
 } from "../../services/types"
+import { ProductionSiteSettingsHook } from "../../hooks/settings/use-production-sites"
 
 import styles from "./settings.module.css"
 
@@ -25,13 +26,11 @@ import {
 import { AlertCircle, Cross, Plus, Save } from "../system/icons"
 import { Alert } from "../system/alert"
 import Table, { Actions, Column, Line, Row } from "../system/table"
-
 import { SectionHeader, SectionBody, Section } from "../system/section"
 import { DialogButtons, PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete, MultiAutocomplete } from "../system/autocomplete"
-import { EMPTY_COLUMN } from "."
-import { ProductionSiteSettingsHook } from "../../hooks/settings/use-production-sites"
 import RadioGroup from "../system/radio-group"
+import { EMPTY_COLUMN } from "."
 
 export type ProductionSiteState = {
   // site
@@ -60,6 +59,7 @@ export type ProductionSiteState = {
 
 const GES_OPTIONS = [
   { value: GESOption.Default, label: "Valeurs par défaut" },
+  { value: GESOption.NUTS2, label: "Valeurs NUTS2" },
   { value: GESOption.Actual, label: "Valeurs réelles" },
 ]
 

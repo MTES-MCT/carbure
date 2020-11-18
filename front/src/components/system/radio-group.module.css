@@ -4,7 +4,8 @@
 
 .radioGroupLabel {
   padding: 9px;
-  margin-right: 24px;
+  margin-right: 16px;
   font-size: var(--font-size);
   font-style: normal;
+  flex-shrink: 0;
 }

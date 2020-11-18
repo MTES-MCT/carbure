@@ -18,6 +18,7 @@ export enum LotStatus {
 export enum GESOption {
   Default = "Default",
   Actual = "Actual",
+  NUTS2 = "NUTS2",
 }
 
 export enum EntityType {
