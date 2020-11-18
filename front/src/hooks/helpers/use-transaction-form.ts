@@ -111,12 +111,22 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
   }
 }
 
+function formatDate(value: string) {
+  try {
+    const date = new Date(value)
+    const formatted = format(date, "dd/MM/yyyy")
+    return formatted
+  } catch (e) {
+    return null
+  }
+}
+
 export function toTransactionPostData(tx: TransactionFormState) {
   return {
     volume: tx.volume,
     dae: tx.dae,
     champ_libre: tx.champ_libre,
-    delivery_date: format(new Date(tx.delivery_date), "dd/MM/yyyy"),
+    delivery_date: formatDate(tx.delivery_date),
     mac: tx.mac,
 
     eec: tx.eec,
