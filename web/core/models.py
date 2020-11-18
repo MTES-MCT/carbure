@@ -20,12 +20,14 @@ class Entity(models.Model):
     trading_certificate = models.FileField(null=True, blank=True)
     has_mac = models.BooleanField(default=False)
     has_trading = models.BooleanField(default=False)
+    national_system_certificate = models.CharField(max_length=64, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
     def natural_key(self):
-        return {'name': self.name, 'id': self.id, 'entity_type': self.entity_type, 'has_mac': self.has_mac, 'has_trading': self.has_trading}
+        return {'name': self.name, 'id': self.id, 'entity_type': self.entity_type, 'has_mac': self.has_mac, 'has_trading': self.has_trading, 
+            'national_system_certificate': self.national_system_certificate}
 
     def url_friendly_name(self):
         return self.name.replace(' ', '').upper()
