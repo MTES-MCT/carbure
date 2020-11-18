@@ -1,6 +1,6 @@
 import React from "react"
 
-import { Country, DeliverySite } from "../../services/types"
+import { Country, DeliverySite, DepotType } from "../../services/types"
 import { DeliverySiteSettingsHook } from "../../hooks/settings/use-delivery-sites"
 
 import styles from "./settings.module.css"
@@ -23,18 +23,22 @@ import { LabelAutoComplete } from "../system/autocomplete"
 import RadioGroup from "../system/radio-group"
 import { EMPTY_COLUMN } from "."
 
-const DEPOT_TYPES = [
-  { label: "EFS", value: "EFS" },
-  { label: "EPPE", value: "EPPE" },
-  { label: "Autre", value: "OTHER" },
-]
+const DEPOT_TYPE_LABELS = {
+  [DepotType.EFS]: "EFS",
+  [DepotType.EFPE]: "EFPE",
+  [DepotType.Other]: "Autre",
+}
+
+// prettier-ignore
+const DEPOT_TYPES = Object.entries(DEPOT_TYPE_LABELS)
+  .map(([value, label]) => ({ value, label }))
 
 type DeliverySiteState = {
   name: string
   city: string
   country: Country | null
   depot_id: string
-  depot_type: "EFS" | "EPPE" | "OTHER"
+  depot_type: DepotType
 }
 
 export const DeliverySitePrompt = ({
@@ -46,7 +50,7 @@ export const DeliverySitePrompt = ({
     city: "",
     country: null,
     depot_id: "",
-    depot_type: "OTHER",
+    depot_type: DepotType.Other,
   })
 
   const canSave = Boolean(
@@ -120,6 +124,11 @@ const DELIVERY_SITE_COLUMNS: Column<DeliverySite>[] = [
     header: "N° douane",
     className: styles.settingsTableIDColumn,
     render: (ds) => <Line text={ds.depot_id} />,
+  },
+  {
+    header: "Type",
+    className: styles.settingsTableIDColumn,
+    render: (ds) => <Line text={DEPOT_TYPE_LABELS[ds.depot_type]} />,
   },
   {
     header: "Nom",
