@@ -410,6 +410,22 @@ def delete_production_site_bc(request):
     return JsonResponse({'status': 'success'})
 
 
+@check_rights('entity_id')
+def set_national_system_certificate(request, *args, **kwargs):
+    entity = kwargs['context']['entity']
+    national_system_certificate = request.POST.get('national_system_certificate', False)
+
+    if entity.entity_type != 'Opérateur':
+        return JsonResponse({'status': 'error', 'message': "Only operators can be given a national system certificate"}, status=400)
+
+    if not national_system_certificate:
+        return JsonResponse({'status': 'error', 'message': "Missing national system certificate"}, status=400)
+    
+    entity.national_system_certificate = national_system_certificate
+    entity.save()
+    return JsonResponse({'status': 'success'})
+
+
 def enable_mac(request, *args, **kwargs):
     entity = request.POST.get('entity_id')
 
