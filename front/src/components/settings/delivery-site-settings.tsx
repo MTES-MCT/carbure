@@ -18,7 +18,7 @@ import {
   SectionBody,
   Section,
 } from "../system/section"
-import { PromptFormProps } from "../system/dialog"
+import { DialogButtons, PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete } from "../system/autocomplete"
 import RadioGroup from "../system/radio-group"
 import { EMPTY_COLUMN } from "."
@@ -99,7 +99,7 @@ export const DeliverySitePrompt = ({
         onChange={onChange}
       />
 
-      <Box row className={styles.dialogButtons}>
+      <DialogButtons>
         <Button
           level="primary"
           icon={Plus}
@@ -109,7 +109,7 @@ export const DeliverySitePrompt = ({
           Ajouter
         </Button>
         <Button onClick={onCancel}>Annuler</Button>
-      </Box>
+      </DialogButtons>
     </Box>
   )
 }

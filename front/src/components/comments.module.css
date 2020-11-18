@@ -16,11 +16,6 @@
   border-bottom-left-radius: 0;
 }
 
-.dialogButtons {
+.commentInput {
   margin-top: 16px;
-  justify-content: flex-end;
-}
-
-.dialogButtons button {
-  margin-left: 8px;
 }

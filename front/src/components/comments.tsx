@@ -1,9 +1,11 @@
 import React, { useState } from "react"
 import { Comment } from "../services/types"
+
 import styles from "./comments.module.css"
+
 import { AsyncButton, Box, Button, Input, LabelInput } from "./system"
 import { Collapsible } from "./system/alert"
-import { PromptFormProps } from "./system/dialog"
+import { DialogButtons, PromptFormProps } from "./system/dialog"
 import { Message } from "./system/icons"
 import RadioGroup from "./system/radio-group"
 
@@ -81,11 +83,11 @@ export const CommentPrompt = ({
       <LabelInput
         label="Commentaire (obligatoire)"
         value={comment}
-        className={styles.promptInput}
+        className={styles.commentInput}
         onChange={(e) => setComment(e.target.value)}
       />
 
-      <Box row className={styles.dialogButtons}>
+      <DialogButtons>
         <Button
           level="primary"
           disabled={!comment}
@@ -94,7 +96,7 @@ export const CommentPrompt = ({
           OK
         </Button>
         <Button onClick={onCancel}>Annuler</Button>
-      </Box>
+      </DialogButtons>
     </Box>
   )
 }
@@ -137,11 +139,11 @@ export const CommentWithTypePrompt = ({
       <LabelInput
         label="Commentaire (obligatoire)"
         value={comment}
-        className={styles.promptInput}
+        className={styles.commentInput}
         onChange={(e) => setComment(e.target.value)}
       />
 
-      <Box row className={styles.dialogButtons}>
+      <DialogButtons>
         <Button
           level="primary"
           disabled={!comment || !topic}
@@ -150,7 +152,7 @@ export const CommentWithTypePrompt = ({
           Accepter et demander une correction
         </Button>
         <Button onClick={onCancel}>Annuler</Button>
-      </Box>
+      </DialogButtons>
     </Box>
   )
 }

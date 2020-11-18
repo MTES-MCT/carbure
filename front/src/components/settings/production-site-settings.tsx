@@ -27,7 +27,7 @@ import { Alert } from "../system/alert"
 import Table, { Actions, Column, Line, Row } from "../system/table"
 
 import { SectionHeader, SectionBody, Section } from "../system/section"
-import { PromptFormProps } from "../system/dialog"
+import { DialogButtons, PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete, MultiAutocomplete } from "../system/autocomplete"
 import { EMPTY_COLUMN } from "."
 import { ProductionSiteSettingsHook } from "../../hooks/settings/use-production-sites"
@@ -231,7 +231,7 @@ export const ProductionSitePromptFactory = (
             onChange={onChange}
           />
         </Label>
-        <Box row className={styles.dialogButtons}>
+        <DialogButtons>
           <Button
             level="primary"
             icon={Save}
@@ -241,7 +241,7 @@ export const ProductionSitePromptFactory = (
             Sauvegarder
           </Button>
           <Button onClick={onCancel}>Annuler</Button>
-        </Box>
+        </DialogButtons>
       </Box>
     )
   }
