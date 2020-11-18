@@ -6,6 +6,7 @@ import {
   Entity,
   ISCCCertificate,
   MatierePremiere,
+  OwnershipType,
   ProductionSiteDetails,
 } from "./types"
 
@@ -76,15 +77,21 @@ export function find2BSCertificates(query: string): Promise<DBSCertificate[]> {
 export function addDeliverySite(
   name: string,
   city: string,
-  country: string,
-  depotID: string,
-  depotType: string
+  country_code: string,
+  depot_id: string,
+  depot_type: string,
+  address: string,
+  postal_code: string,
+  ownership_type: OwnershipType
 ): Promise<any> {
   return api.post("/common/create-delivery-site", {
-    name: name,
-    city: city,
-    country_code: country,
-    depot_id: depotID,
-    depot_type: depotType,
+    name,
+    city,
+    country_code,
+    depot_id,
+    depot_type,
+    address,
+    postal_code,
+    ownership_type,
   })
 }
