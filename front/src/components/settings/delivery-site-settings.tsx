@@ -14,7 +14,7 @@ import * as common from "../../services/common"
 
 import useForm from "../../hooks/helpers/use-form"
 import { Title, Button, LabelInput, Box, LoaderOverlay, Label } from "../system"
-import { AlertCircle, Back, Plus, Return, Save } from "../system/icons"
+import { AlertCircle, Plus, Return, Save } from "../system/icons"
 import { Alert } from "../system/alert"
 import Table, { Column, Line, Row } from "../system/table"
 import {

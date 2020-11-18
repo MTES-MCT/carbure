@@ -111,7 +111,7 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
   }
 }
 
-function formatDate(value: string) {
+function excelDate(value: string) {
   try {
     const date = new Date(value)
     const formatted = format(date, "dd/MM/yyyy")
@@ -126,7 +126,7 @@ export function toTransactionPostData(tx: TransactionFormState) {
     volume: tx.volume,
     dae: tx.dae,
     champ_libre: tx.champ_libre,
-    delivery_date: formatDate(tx.delivery_date),
+    delivery_date: excelDate(tx.delivery_date),
     mac: tx.mac,
 
     eec: tx.eec,
