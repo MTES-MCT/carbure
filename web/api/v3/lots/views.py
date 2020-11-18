@@ -164,11 +164,11 @@ def get_lots(request):
 
     if invalid == 'true':
         txs = tx_with_errors
-    elif deadline:
+    elif deadline == 'true':
         txs = txs_with_deadline
     else:
         pass
-    
+
     if sort_by:
         if sort_by in sort_key_to_django_field:
             key = sort_key_to_django_field[sort_by]
