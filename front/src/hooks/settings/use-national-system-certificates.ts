@@ -1,6 +1,10 @@
+import { EntitySelection } from "../helpers/use-entity"
+
+import useAPI from "../helpers/use-api"
+import * as api from "../../services/settings"
 import { NationalSystemCertificatesPrompt } from "../../components/settings/national-system-certificates-settings"
 import { prompt } from "../../components/system/dialog"
-import { EntitySelection } from "../helpers/use-entity"
+import { SettingsGetter } from "../use-app"
 
 export interface NationalSystemCertificatesSettingsHook {
   isLoading: boolean
@@ -9,10 +13,15 @@ export interface NationalSystemCertificatesSettingsHook {
 }
 
 export default function useNationalSystemCertificates(
-  entity: EntitySelection
+  entity: EntitySelection,
+  settings: SettingsGetter
 ): NationalSystemCertificatesSettingsHook {
-  const isLoading = false
-  const certificateNumber = ""
+  const [requestSetNSC, resolveSetNSC] = useAPI(
+    api.setNationalSystemCertificate
+  )
+
+  const isLoading = requestSetNSC.loading || settings.loading
+  const certificateNumber = entity?.national_system_certificate ?? ""
 
   async function editNationalSystemCertificates() {
     const certificate = await prompt(
@@ -21,8 +30,9 @@ export default function useNationalSystemCertificates(
       NationalSystemCertificatesPrompt
     )
 
-    if (certificate) {
-      // @TODO call the api to update number
+    if (entity && certificate) {
+      await resolveSetNSC(entity.id, certificate)
+      settings.resolve()
     }
   }
 
