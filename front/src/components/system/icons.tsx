@@ -196,3 +196,10 @@ export const Back = ({ className, ...props }: IconProps) => (
     <line x1="5" y1="12" x2="11" y2="6" />
   </Icon>
 )
+
+export const Edit = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-edit", className)}>
+    <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+    <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
+  </Icon>
+)
