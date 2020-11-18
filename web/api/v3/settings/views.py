@@ -2,6 +2,7 @@ import datetime
 from dateutil.relativedelta import *
 
 from django.http import JsonResponse
+from django.db.models import Q
 from core.models import Entity, UserRights, LotV2, Pays, MatierePremiere, Biocarburant
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput, ProducerCertificate
 from core.decorators import check_rights
@@ -553,9 +554,14 @@ def delete_2bs_certificate(request, *args, **kwargs):
 @check_rights('entity_id')
 def get_my_certificates(request, *args, **kwargs):
     context = kwargs['context']
+    query = request.GET.get('query', '')
     today = datetime.date.today()
-    certificates_iscc = EntityISCCTradingCertificate.objects.filter(entity=context['entity'], certificate__valid_until__gte=today)
-    certificates_2bs = EntityDBSTradingCertificate.objects.filter(entity=context['entity'], certificate__valid_until__gte=today)
+
+    certificates_iscc = EntityISCCTradingCertificate.objects.filter(Q(entity=context['entity']), Q(certificate__valid_until__gte=today), 
+        Q(certificate__certificate_id__icontains=query) | Q(certificate__certificate_holder__icontains=query))
+
+    certificates_2bs = EntityDBSTradingCertificate.objects.filter(Q(entity=context['entity']), Q(certificate__valid_until__gte=today), 
+        Q(certificate__certificate_id__icontains=query) | Q(certificate__certificate_holder__icontains=query))
 
     sez_data = [{'certificate_id': c.certificate.certificate_id, 'holder': c.certificate.certificate_holder, 'type': 'ISCC'} for c in certificates_iscc]
     sez_data += [{'certificate_id': c.certificate.certificate_id, 'holder': c.certificate.certificate_holder, 'type': '2BS'} for c in certificates_2bs]

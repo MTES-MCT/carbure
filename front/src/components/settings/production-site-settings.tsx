@@ -2,12 +2,15 @@ import React from "react"
 
 import {
   Biocarburant,
+  Certificate,
   Country,
   GESOption,
   MatierePremiere,
   ProductionSiteDetails,
 } from "../../services/types"
+
 import { ProductionSiteSettingsHook } from "../../hooks/settings/use-production-sites"
+import { EntitySelection } from "../../hooks/helpers/use-entity"
 
 import styles from "./settings.module.css"
 
@@ -31,6 +34,7 @@ import { DialogButtons, PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete, MultiAutocomplete } from "../system/autocomplete"
 import RadioGroup from "../system/radio-group"
 import { EMPTY_COLUMN, formatDate, SettingsForm } from "."
+import { findCertificates } from "../../services/settings"
 
 export type ProductionSiteState = {
   // site
@@ -38,6 +42,7 @@ export type ProductionSiteState = {
   name: string
   date_mise_en_service: string
   ges_option: GESOption
+
   // double counting
   eligible_dc: boolean
   dc_reference: string
@@ -55,6 +60,9 @@ export type ProductionSiteState = {
   // input/output
   matieres_premieres: MatierePremiere[]
   biocarburants: Biocarburant[]
+
+  // certificates
+  certificates: Certificate[]
 }
 
 const GES_OPTIONS = [
@@ -68,6 +76,7 @@ type ProductionSitePromptProps = PromptFormProps<ProductionSiteState>
 // ville/code postal/addresse/pays numéro d'identification (SIRET), nom/prénom/téléphone/mail du gérant
 
 export const ProductionSitePromptFactory = (
+  entity: EntitySelection,
   productionSite?: ProductionSiteDetails
 ) =>
   function ProductionSitePrompt({
@@ -93,6 +102,8 @@ export const ProductionSitePromptFactory = (
 
       matieres_premieres: productionSite?.inputs ?? [],
       biocarburants: productionSite?.outputs ?? [],
+
+      certificates: [],
     })
 
     const canSave = Boolean(
@@ -214,8 +225,8 @@ export const ProductionSitePromptFactory = (
             value={form.matieres_premieres}
             name="matieres_premieres"
             placeholder="Ajouter matières premières..."
-            getValue={(o) => o.code}
-            getLabel={(o) => o.name}
+            getValue={(o) => o?.code ?? ""}
+            getLabel={(o) => o?.name ?? ""}
             getQuery={common.findMatieresPremieres}
             onChange={onChange}
           />
@@ -231,6 +242,24 @@ export const ProductionSitePromptFactory = (
             onChange={onChange}
           />
         </Label>
+
+        <hr />
+
+        <Label label="Certificats (2BS, ISCC)">
+          <MultiAutocomplete
+            name="certificates"
+            placeholder="Rechercher des certificats..."
+            value={form.certificates}
+            getValue={(c) => c.certificate_id}
+            getLabel={(c) => c.certificate_id}
+            getQuery={findCertificates}
+            queryArgs={[entity?.id]}
+            onChange={onChange}
+          />
+        </Label>
+
+        <hr />
+
         <DialogButtons>
           <Button
             level="primary"

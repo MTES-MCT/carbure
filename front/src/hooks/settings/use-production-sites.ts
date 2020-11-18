@@ -54,7 +54,7 @@ export default function useProductionSites(
     const data = await prompt(
       "Ajout site de production",
       "Veuillez entrer les informations de votre nouveau site de production.",
-      ProductionSitePromptFactory()
+      ProductionSitePromptFactory(entity)
     )
 
     if (entityID && data && data.country) {
@@ -90,7 +90,7 @@ export default function useProductionSites(
     const data = await prompt<ProductionSiteState>(
       "Modification site de production",
       "Veuillez entrer les nouvelles informations de votre site de production.",
-      ProductionSitePromptFactory(ps)
+      ProductionSitePromptFactory(entity, ps)
     )
 
     if (entityID && data && data.country) {
