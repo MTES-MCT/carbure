@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react"
-import { DeliverySitePrompt } from "../../components/settings/delivery-site-settings"
-import useAPI from "../helpers/use-api"
+
 import { EntitySelection } from "../helpers/use-entity"
+import { DeliverySite } from "../../services/types"
+
+import useAPI from "../helpers/use-api"
 import * as common from "../../services/common"
 import { prompt } from "../../components/system/dialog"
-import { DeliverySite } from "../../services/types"
+import { DeliverySitePromptFactory } from "../../components/settings/delivery-site-settings"
 
 export interface DeliverySiteSettingsHook {
   isEmpty: boolean
   isLoading: boolean
   query: string
   deliverySites: DeliverySite[]
-  createDeliverySite: () => {}
+  createDeliverySite: () => void
+  showDeliverySite: (d: DeliverySite) => void
   setQuery: (q: string) => void
 }
 
@@ -32,7 +35,7 @@ export default function useDeliverySites(
     const data = await prompt(
       "Ajouter un dépôt",
       "Veuillez entrer les informations de votre nouveau dépôt.",
-      DeliverySitePrompt
+      DeliverySitePromptFactory()
     )
 
     if (entityID && data && data.country) {
@@ -41,9 +44,20 @@ export default function useDeliverySites(
         data.city,
         data.country.code_pays,
         data.depot_id,
-        data.depot_type
+        data.depot_type,
+        data.address,
+        data.postal_code,
+        data.ownership_type
       ).then(() => setQuery(data.depot_id))
     }
+  }
+
+  async function showDeliverySite(ds: DeliverySite) {
+    prompt(
+      "Détails du dépôt",
+      `Informations concernant le dépôt ${ds.depot_id}`,
+      DeliverySitePromptFactory(ds, true)
+    )
   }
 
   useEffect(() => {
@@ -58,6 +72,7 @@ export default function useDeliverySites(
     query,
     deliverySites,
     createDeliverySite,
+    showDeliverySite,
     setQuery,
   }
 }

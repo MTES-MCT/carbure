@@ -7,6 +7,7 @@ type RadioGroupProps = {
   value: string
   name?: string
   row?: boolean
+  readOnly?: boolean
   options: { value: string; label: string }[]
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
@@ -16,6 +17,7 @@ const RadioGroup = ({
   value,
   name,
   options,
+  readOnly,
   onChange,
 }: RadioGroupProps) => (
   <Box row={row} className={styles.radioGroup}>
@@ -23,6 +25,7 @@ const RadioGroup = ({
       <Box row as="label" key={option.value} className={styles.radioGroupLabel}>
         <input
           type="radio"
+          disabled={readOnly}
           checked={option.value === value}
           value={option.value}
           name={name}
