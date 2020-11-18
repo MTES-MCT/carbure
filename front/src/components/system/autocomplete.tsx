@@ -158,7 +158,10 @@ export function MultiAutocomplete<T>({
 }: MultiAutocompleteProps<T>) {
   function addValue(e: any) {
     // if the value is not already in the list, add it
-    if (!value.some((v) => getValue(v) === getValue(e.target.value))) {
+    if (
+      e.target.value !== null &&
+      !value.some((v) => getValue(v) === getValue(e.target.value))
+    ) {
       onChange({ target: { name, value: [...value, e.target.value] } })
     }
   }
