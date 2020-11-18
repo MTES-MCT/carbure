@@ -506,7 +506,7 @@ def disable_trading(request, *args, **kwargs):
 def get_iscc_certificates(request, *args, **kwargs):
     context = kwargs['context']
     one_year_ago = datetime.datetime.now() - relativedelta(years=1)
-    objects = EntityISCCTradingCertificate.objects.filter(entity=context['entity'], certificate__valid_until__gte=one_year_ago)
+    objects = EntityISCCTradingCertificate.objects.filter(entity=context['entity'], certificate__valid_until__gte=one_year_ago)[:100]
     sez = [o.certificate.natural_key() for o in objects]
     return JsonResponse({'status': 'success', 'data': sez})
 
@@ -515,7 +515,7 @@ def get_iscc_certificates(request, *args, **kwargs):
 def get_2bs_certificates(request, *args, **kwargs):
     context = kwargs['context']
     one_year_ago = datetime.datetime.now() - relativedelta(years=1)
-    objects = EntityDBSTradingCertificate.objects.filter(entity=context['entity'], certificate__valid_until__gte=one_year_ago)
+    objects = EntityDBSTradingCertificate.objects.filter(entity=context['entity'], certificate__valid_until__gte=one_year_ago)[:100]
     sez = [o.certificate.natural_key() for o in objects]
     return JsonResponse({'status': 'success', 'data': sez})
 
