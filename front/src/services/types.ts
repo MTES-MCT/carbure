@@ -75,12 +75,20 @@ export enum DepotType {
   Other = "OTHER",
 }
 
+export enum OwnershipType {
+  Own = "OWN",
+  ThirdParty = "THIRD_PARTY",
+}
+
 export interface DeliverySite {
   name: string
   city: string
   depot_id: string
   country: Country
   depot_type: DepotType
+  postal_code: string
+  address: string
+  ownership_type: OwnershipType
 }
 
 export interface ProductionSite {
