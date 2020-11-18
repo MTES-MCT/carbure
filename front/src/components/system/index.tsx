@@ -206,8 +206,8 @@ export const LabelInput = ({
     disabled={disabled}
     error={error}
     tooltip={tooltip}
-    className={cl(className)}
     label={label}
+    className={className}
   >
     <Input {...props} disabled={disabled} />
   </Label>

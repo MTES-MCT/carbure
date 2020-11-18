@@ -4,7 +4,7 @@ from core.models import Entity, MatierePremiere, Biocarburant, Pays
 
 
 class ProductionSite(models.Model):
-    GES_OPTIONS = [('Default', 'Valeurs par défaut'), ('Actual', 'Valeurs réelles')]
+    GES_OPTIONS = [('Default', 'Valeurs par défaut'), ('Actual', 'Valeurs réelles'), ('NUTS2', 'Valeurs NUTS2')]
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE)
     name = models.CharField(max_length=64, blank=False, null=False)
     country = models.ForeignKey(Pays, null=False, on_delete=models.CASCADE)

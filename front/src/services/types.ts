@@ -18,6 +18,7 @@ export enum LotStatus {
 export enum GESOption {
   Default = "Default",
   Actual = "Actual",
+  NUTS2 = "NUTS2",
 }
 
 export enum EntityType {
@@ -68,12 +69,18 @@ export interface BiocarburantDetails extends Biocarburant {
   is_graisse: boolean
 }
 
+export enum DepotType {
+  EFS = "EFS",
+  EFPE = "EFPE",
+  Other = "OTHER",
+}
+
 export interface DeliverySite {
   name: string
   city: string
   depot_id: string
   country: Country
-  depot_type?: string
+  depot_type: DepotType
 }
 
 export interface ProductionSite {
