@@ -21,7 +21,7 @@ import {
 import { DialogButtons, PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete } from "../system/autocomplete"
 import RadioGroup from "../system/radio-group"
-import { EMPTY_COLUMN } from "."
+import { EMPTY_COLUMN, SettingsForm } from "."
 
 const DEPOT_TYPE_LABELS = {
   [DepotType.EFS]: "EFS",
@@ -63,7 +63,7 @@ export const DeliverySitePrompt = ({
   )
 
   return (
-    <Box as="form">
+    <SettingsForm>
       <Label label="Type de dépôt">
         <RadioGroup
           row
@@ -114,7 +114,7 @@ export const DeliverySitePrompt = ({
         </Button>
         <Button onClick={onCancel}>Annuler</Button>
       </DialogButtons>
-    </Box>
+    </SettingsForm>
   )
 }
 

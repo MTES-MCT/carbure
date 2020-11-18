@@ -30,7 +30,7 @@ import { SectionHeader, SectionBody, Section } from "../system/section"
 import { DialogButtons, PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete, MultiAutocomplete } from "../system/autocomplete"
 import RadioGroup from "../system/radio-group"
-import { EMPTY_COLUMN } from "."
+import { EMPTY_COLUMN, SettingsForm } from "."
 
 export type ProductionSiteState = {
   // site
@@ -100,7 +100,7 @@ export const ProductionSitePromptFactory = (
     )
 
     return (
-      <Box as="form" className={styles.settingsForm}>
+      <SettingsForm>
         <hr />
 
         <LabelInput
@@ -242,7 +242,7 @@ export const ProductionSitePromptFactory = (
           </Button>
           <Button onClick={onCancel}>Annuler</Button>
         </DialogButtons>
-      </Box>
+      </SettingsForm>
     )
   }
 
