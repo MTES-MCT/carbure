@@ -287,9 +287,7 @@ def get_snapshot(request):
     if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader':
         txs = LotTransaction.objects.filter(lot__added_by=entity)
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
-
         txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-
         draft = len(txs.filter(lot__status='Draft'))
         validated = len(txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA']))
         tofix = len(txs.filter(lot__status='Validated', delivery_status__in=['AC', 'R']))
