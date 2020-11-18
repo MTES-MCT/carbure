@@ -6,6 +6,10 @@ import styles from "./dialog.module.css"
 import { Title, Box, Button } from "."
 import Modal from "./modal"
 
+export const DialogButtons = (props: any) => (
+  <Box {...props} row className={styles.dialogButtons} />
+)
+
 export type PromptFormProps<T> = {
   children?: React.ReactNode
   onConfirm: (c: T) => void
@@ -65,12 +69,12 @@ export function prompt<T>(
 }
 
 const ConfirmPrompt = ({ onConfirm, onCancel }: PromptFormProps<boolean>) => (
-  <Box row className={styles.dialogButtons}>
+  <DialogButtons>
     <Button level="primary" onClick={() => onConfirm(true)}>
       OK
     </Button>
     <Button onClick={onCancel}>Annuler</Button>
-  </Box>
+  </DialogButtons>
 )
 
 export function confirm(title: string, description: string) {

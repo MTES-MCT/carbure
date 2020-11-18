@@ -16,12 +16,3 @@
   cursor: pointer;
   margin-top: 8px;
 }
-
-.dialogButtons {
-  margin-top: 16px;
-  justify-content: flex-end;
-}
-
-.dialogButtons button {
-  margin-left: 8px;
-}
