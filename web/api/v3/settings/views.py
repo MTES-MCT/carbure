@@ -32,10 +32,15 @@ def get_production_sites(request, *args, **kwargs):
 
     data = []
 
-    for p in psites:
-        psite_data = p.natural_key()
-        psite_data['inputs'] = [i.natural_key() for i in p.productionsiteinput_set.all()]
-        psite_data['outputs'] = [o.natural_key() for o in p.productionsiteoutput_set.all()]
+    for ps in psites:
+        psite_data = ps.natural_key()
+        psite_data['inputs'] = [i.natural_key() for i in ps.productionsiteinput_set.all()]
+        psite_data['outputs'] = [o.natural_key() for o in ps.productionsiteoutput_set.all()]
+        certificates = []
+        for pc in ps.productionsitecertificate_set.all():
+            c = pc.certificate_iscc.certificate if pc.type == 'ISCC' else pc.certificate_2bs.certificate
+            certificates.append({'certificate_id': c.certificate_id, 'holder': c.certificate_holder, 'type': pc.type})
+        psite_data['certificates'] = certificates 
         data.append(psite_data)
 
     return JsonResponse({'status': 'success', 'data': data})
@@ -567,6 +572,33 @@ def get_my_certificates(request, *args, **kwargs):
     sez_data += [{'certificate_id': c.certificate.certificate_id, 'holder': c.certificate.certificate_holder, 'type': '2BS'} for c in certificates_2bs]
     return JsonResponse({'status': 'success', 'data': sez_data})
 
+
+@check_rights('entity_id')
+def set_production_site_certificates(request, *args, **kwargs):
+    context = kwargs['context']
+    certificate_ids = request.POST.getlist('certificate_ids')
+    production_site_id = request.POST.get('production_site_id', False)
+
+    try:
+        psite = ProductionSite.objects.get(pk=production_site_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find requested production site"}, status=400)
+ 
+    try:
+        certificates_iscc = EntityISCCTradingCertificate.objects.filter(certificate__certificate_id__in=certificate_ids)
+        certificate_2bs = EntityDBSTradingCertificate.objects.filter(certificate__certificate_id__in=certificate_ids)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find requested certificates"}, status=400)
+
+    try:
+        ProductionSiteCertificate.objects.filter(entity=context['entity'], production_site=psite).delete()
+        psc_iscc = [ProductionSiteCertificate(entity=context['entity'], production_site=psite, type='ISCC', certificate_2bs=None, certificate_iscc=c) for c in certificates_iscc]
+        psc_2bs = [ProductionSiteCertificate(entity=context['entity'], production_site=psite, type='2BS', certificate_2bs=c, certificate_iscc=None) for c in certificate_2bs]
+        ProductionSiteCertificate.objects.bulk_create(psc_iscc + psc_2bs)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not update production site certificates"}, status=400)
+        
+    return JsonResponse({'status': 'success'})
 
 @check_rights('entity_id')
 def add_production_site_certificate(request, *args, **kwargs):
