@@ -1,4 +1,5 @@
 import React from "react"
+import { useLocation } from "react-router-dom"
 
 import { ApiState } from "../hooks/helpers/use-api"
 import { EntitySelection } from "../hooks/helpers/use-entity"
@@ -40,27 +41,38 @@ const PageLink = ({ to, children }: PageLinkProps) => (
   </NavLink>
 )
 
+function changeOrg(path: string, entity: number) {
+  return path.replace(/org\/[0-9]+/, `org/${entity}`)
+}
+
 type UserMenuProps = {
   settings: ApiState<Settings>
   entity: EntitySelection
 }
 
-const UserMenu = ({ settings, entity }: UserMenuProps) => (
-  <Menu className={styles.userMenu} label={entity?.name ?? "Menu"}>
-    <Menu.Group label="Organisations">
-      {settings.data?.rights.map((right) => (
-        <Menu.Item key={right.entity.id} to={`/org/${right.entity.id}`}>
-          {right.entity.name}
-        </Menu.Item>
-      ))}
-    </Menu.Group>
+const UserMenu = ({ settings, entity }: UserMenuProps) => {
+  const location = useLocation()
 
-    <Menu.Group label={settings.data?.email ?? "Utilisateur"}>
-      <Menu.Item to="/account">Mon compte</Menu.Item>
-      <Menu.Item to="/logout">Se déconnecter</Menu.Item>
-    </Menu.Group>
-  </Menu>
-)
+  return (
+    <Menu className={styles.userMenu} label={entity?.name ?? "Menu"}>
+      <Menu.Group label="Organisations">
+        {settings.data?.rights.map((right) => (
+          <Menu.Item
+            key={right.entity.id}
+            to={changeOrg(location.pathname, right.entity.id)}
+          >
+            {right.entity.name}
+          </Menu.Item>
+        ))}
+      </Menu.Group>
+
+      <Menu.Group label={settings.data?.email ?? "Utilisateur"}>
+        <Menu.Item to="/account">Mon compte</Menu.Item>
+        <Menu.Item to="/logout">Se déconnecter</Menu.Item>
+      </Menu.Group>
+    </Menu>
+  )
+}
 
 function canTrade(entity: EntitySelection) {
   return entity && (entity.has_trading || entity.entity_type === "Trader")
