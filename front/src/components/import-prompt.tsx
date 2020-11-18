@@ -1,7 +1,7 @@
 import React from "react"
 
 import { LotUploader } from "../hooks/actions/use-upload-file"
-import { PromptFormProps } from "./system/dialog"
+import { DialogButtons, PromptFormProps } from "./system/dialog"
 
 import styles from "./import-prompt.module.css"
 
@@ -16,7 +16,7 @@ const ImportPrompt = ({
   <Box className={styles.importPrompt}>
     {children}
 
-    <Box row className={styles.dialogButtons}>
+    <DialogButtons>
       <Button as="label" level="primary" icon={Upload}>
         Importer lots
         <input
@@ -26,7 +26,7 @@ const ImportPrompt = ({
         />
       </Button>
       <Button onClick={onCancel}>Annuler</Button>
-    </Box>
+    </DialogButtons>
   </Box>
 )
 

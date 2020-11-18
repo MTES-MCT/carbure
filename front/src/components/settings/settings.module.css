@@ -38,16 +38,6 @@
   width: 128px;
 }
 
-.dialogButtons {
-  justify-content: flex-end;
-  margin-top: 16px;
-  margin-bottom: 20px;
-}
-
-.dialogButtons button {
-  margin-left: 8px;
-}
-
 .settingsForm > div > label {
   flex: 1;
 }

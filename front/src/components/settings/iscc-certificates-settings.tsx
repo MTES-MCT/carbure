@@ -3,15 +3,13 @@ import React, { useState } from "react"
 import { ISCCCertificateSettingsHook } from "../../hooks/settings/use-iscc-certificates"
 import { ISCCCertificate } from "../../services/types"
 
-import styles from "./settings.module.css"
-
 import * as common from "../../services/common"
 
 import { Title, Button, Box, LoaderOverlay } from "../system"
 import { AlertCircle, Cross, Plus } from "../system/icons"
 import { Alert } from "../system/alert"
 import { SectionHeader, SectionBody, Section } from "../system/section"
-import { PromptFormProps } from "../system/dialog"
+import { DialogButtons, PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete } from "../system/autocomplete"
 import { EMPTY_COLUMN } from "."
 import Table, { Actions, Column, Line } from "../system/table"
@@ -35,7 +33,7 @@ export const ISCCPrompt = ({
         getLabel={(c) => c?.certificate_id ?? ""}
       />
 
-      <Box row className={styles.dialogButtons}>
+      <DialogButtons>
         <Button
           level="primary"
           icon={Plus}
@@ -45,7 +43,7 @@ export const ISCCPrompt = ({
           Ajouter
         </Button>
         <Button onClick={onCancel}>Annuler</Button>
-      </Box>
+      </DialogButtons>
     </Box>
   )
 }
