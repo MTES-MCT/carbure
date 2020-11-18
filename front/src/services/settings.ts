@@ -187,6 +187,16 @@ export function disablePublicDirectory(entityID: number) {
   })
 }
 
+export function setNationalSystemCertificate(
+  entity_id: number,
+  national_system_certificate: string
+) {
+  return api.post("/settings/set-national-system-certificate", {
+    entity_id,
+    national_system_certificate,
+  })
+}
+
 export function enableMAC(entityID: number) {
   return api.post("/settings/enable-mac", {
     entity_id: entityID,

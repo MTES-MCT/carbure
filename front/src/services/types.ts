@@ -34,6 +34,7 @@ export interface Entity {
   entity_type: EntityType
   has_mac: boolean
   has_trading: boolean
+  national_system_certificate: string
 }
 
 export interface Country {
