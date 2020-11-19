@@ -14,12 +14,12 @@ type CompanySettingsProps = {
 }
 
 const CompanySettings = ({ entity, settings }: CompanySettingsProps) => {
-  const isOperator = entity?.entity_type === "Opérateur"
-  const isTrader = entity?.entity_type === "Trader"
-
   if (entity === null) {
     return null
   }
+
+  const isOperator = entity.entity_type === "Opérateur"
+  const isTrader = entity.entity_type === "Trader"
 
   return (
     <Section>
@@ -29,9 +29,8 @@ const CompanySettings = ({ entity, settings }: CompanySettingsProps) => {
 
       <SectionBody>
         <LabelCheckbox
-          disabled={isOperator}
           label="Ma société effectue des Mises à Consommation"
-          checked={settings.hasMAC || isOperator}
+          checked={settings.hasMAC}
           onChange={settings.onChangeMAC}
           className={styles.settingsCheckbox}
         />
