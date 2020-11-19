@@ -23,6 +23,7 @@ urlpatterns = [
     path('accounts/', include('authtools.urls')),
     path('accounts/', include('accounts.urls')),
     path('', public_views.index, name='index'),
+
     path('stats', public_views.stats, name='stats'),
     path('api/', include('api.urls')),
 
@@ -32,5 +33,6 @@ urlpatterns = [
     path('traders/', include('traders.urls')),
     path('administrators/', include('administrators.urls')),
     path('core/', include('core.urls')),
+    path('annuaire', public_views.annuaire, name='annuaire'),
 
 ]

@@ -13,7 +13,7 @@ def get_users(request):
     users = user_model.objects.all()
     if q:
         users = users.filter(Q(email__icontains=q) | Q(name__icontains=q))
-    users_sez = [{'email': u.email, 'name': u.name} for u in users]
+    users_sez = [{'email': u.email, 'name': u.name, 'id': u.id} for u in users]
     return JsonResponse({"status": "success", "data": users_sez})
 
 

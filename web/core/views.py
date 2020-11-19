@@ -21,5 +21,5 @@ def set_default_entity(request, *args, **kwargs):
   if len(right) >= 1:
       UserPreferences.objects.update_or_create(user=request.user, defaults={'default_entity':entity})
       # return to home  
-      return redirect('home')
+      return redirect('index')
   raise PermissionDenied
