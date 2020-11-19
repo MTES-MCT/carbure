@@ -251,7 +251,7 @@ export const ProductionSitePromptFactory = (
             placeholder="Rechercher des certificats..."
             value={form.certificates}
             getValue={(c) => c.certificate_id}
-            getLabel={(c) => c.certificate_id}
+            getLabel={(c) => c.certificate_id + " - " + c.holder}
             getQuery={findCertificates}
             queryArgs={[entity?.id]}
             onChange={onChange}
