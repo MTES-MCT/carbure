@@ -27,6 +27,8 @@ const Org = ({ app }: MainProps) => {
       <Topbar entity={entity} settings={app.settings} />
 
       <Switch>
+        <Route relative exact path="administration" render={() => (window.location.pathname = "/administrators/")} />
+
         <Route relative exact path="stocks">
           <Redirect relative to="draft" />
         </Route>

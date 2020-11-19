@@ -15,3 +15,8 @@ def index(request):
 
 def stats(request):
     return redirect('https://metabase.carbure.beta.gouv.fr/public/dashboard/a9c045a5-c2fb-481a-ab85-f55bce8ae3c0')
+
+
+def annuaire(request):
+    context = {}
+    return render(request, 'public/index.html', context)
