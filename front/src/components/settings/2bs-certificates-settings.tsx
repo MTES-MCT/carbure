@@ -30,7 +30,8 @@ export const DBSPrompt = ({
         getQuery={common.find2BSCertificates}
         onChange={(e: any) => setCertificate(e.target.value)}
         getValue={(c) => c?.certificate_id ?? ""}
-        getLabel={(c) => c?.certificate_id ?? ""}
+        getLabel={(c) => c?.certificate_id + " - " + c?.certificate_holder ?? ""}
+
       />
 
       <DialogButtons>
