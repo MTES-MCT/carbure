@@ -2,7 +2,8 @@ import { EntitySelection } from "../helpers/use-entity"
 
 import useAPI from "../helpers/use-api"
 import * as api from "../../services/settings"
-import { NationalSystemCertificatesPrompt } from "../../components/settings/national-system-certificates-settings"
+
+import { NationalSystemCertificatesPromptFactory } from "../../components/settings/national-system-certificates-settings"
 import { prompt } from "../../components/system/dialog"
 import { SettingsGetter } from "../use-app"
 
@@ -27,7 +28,7 @@ export default function useNationalSystemCertificates(
     const certificate = await prompt(
       "Modifier n° de certificat",
       "Entrez votre numéro de certificat du Système National",
-      NationalSystemCertificatesPrompt
+      NationalSystemCertificatesPromptFactory(certificateNumber)
     )
 
     if (entity && certificate) {
