@@ -8,34 +8,37 @@ import { PromptFormProps, DialogButtons } from "../system/dialog"
 import { Edit, Save } from "../system/icons"
 import { SectionHeader, SectionBody, Section } from "../system/section"
 
-export const NationalSystemCertificatesPrompt = ({
-  onConfirm,
-  onCancel,
-}: PromptFormProps<string>) => {
-  const [certificate, setCertificate] = useState<string>("")
+export const NationalSystemCertificatesPromptFactory = (
+  currentCertificate: string = ""
+) =>
+  function NationalSystemCertificatesPrompt({
+    onConfirm,
+    onCancel,
+  }: PromptFormProps<string>) {
+    const [certificate, setCertificate] = useState<string>(currentCertificate)
 
-  return (
-    <SettingsForm>
-      <LabelInput
-        label="Certificat Système National"
-        value={certificate}
-        onChange={(e) => setCertificate(e.target.value)}
-      />
+    return (
+      <SettingsForm>
+        <LabelInput
+          label="Certificat Système National"
+          value={certificate}
+          onChange={(e) => setCertificate(e.target.value)}
+        />
 
-      <DialogButtons>
-        <Button
-          level="primary"
-          icon={Save}
-          disabled={!certificate}
-          onClick={() => certificate && onConfirm(certificate)}
-        >
-          Sauvegarder
-        </Button>
-        <Button onClick={onCancel}>Annuler</Button>
-      </DialogButtons>
-    </SettingsForm>
-  )
-}
+        <DialogButtons>
+          <Button
+            level="primary"
+            icon={Save}
+            disabled={!certificate}
+            onClick={() => certificate && onConfirm(certificate)}
+          >
+            Sauvegarder
+          </Button>
+          <Button onClick={onCancel}>Annuler</Button>
+        </DialogButtons>
+      </SettingsForm>
+    )
+  }
 
 type NationalSystemCertificatesSettingsProps = {
   settings: NationalSystemCertificatesSettingsHook
