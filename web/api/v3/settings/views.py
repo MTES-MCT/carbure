@@ -426,76 +426,38 @@ def set_national_system_certificate(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
+@check_rights('entity_id')
 def enable_mac(request, *args, **kwargs):
-    entity = request.POST.get('entity_id')
-
-    try:
-        entity = Entity.objects.get(id=entity, entity_type='Producteur')
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity), 'extra': str(e)},
-                            status=400)
-
-    # we have all the data, make sure we are allowed to delete it
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit entity"}, status=403)
-
+    entity = kwargs['context']['entity']
     entity.has_mac = True
     entity.save()
     return JsonResponse({'status': 'success'})
 
 
+@check_rights('entity_id')
 def disable_mac(request, *args, **kwargs):
-    entity = request.POST.get('entity_id')
-
-    try:
-        entity = Entity.objects.get(id=entity, entity_type='Producteur')
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity), 'extra': str(e)},
-                            status=400)
-
-    # we have all the data, make sure we are allowed to delete it
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit entity"}, status=403)
-
+    entity = kwargs['context']['entity']
     entity.has_mac = False
     entity.save()
     return JsonResponse({'status': 'success'})
 
-
+@check_rights('entity_id')
 def enable_trading(request, *args, **kwargs):
-    entity = request.POST.get('entity_id')
+    entity = kwargs['context']['entity']
 
-    try:
-        entity = Entity.objects.get(id=entity, entity_type__in=['Producteur', 'Trader'])
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity), 'extra': str(e)},
-                            status=400)
-
-    # we have all the data, make sure we are allowed to delete it
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit entity"}, status=403)
+    if entity.entity_type not in ['Producteur', 'Trader']:
+        return JsonResponse({'status': 'error', 'message': "This entity cannot have a trading activity"}, status=400)
 
     entity.has_trading = True
     entity.save()
     return JsonResponse({'status': 'success'})
 
-
+@check_rights('entity_id')
 def disable_trading(request, *args, **kwargs):
-    entity = request.POST.get('entity_id')
+    entity = kwargs['context']['entity']
 
-    try:
-        entity = Entity.objects.get(id=entity, entity_type__in=['Producteur', 'Trader'])
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity), 'extra': str(e)},
-                            status=400)
-
-    # we have all the data, make sure we are allowed to delete it
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit entity"}, status=403)
+    if entity.entity_type not in ['Producteur', 'Trader']:
+        return JsonResponse({'status': 'error', 'message': "This entity cannot have a trading activity"}, status=400)
 
     entity.has_trading = False
     entity.save()
