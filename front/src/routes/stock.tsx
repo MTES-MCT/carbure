@@ -28,6 +28,7 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
     validator,
     acceptor,
     rejector,
+    sender,
   } = useStocks(entity)
 
   if (entity === null) {
@@ -63,6 +64,7 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
         acceptor={acceptor}
         rejector={rejector}
         duplicator={duplicator}
+        sender={sender}
       />
 
       <Switch>

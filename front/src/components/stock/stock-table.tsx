@@ -7,14 +7,25 @@ import { StatusSelection } from "../../hooks/query/use-status"
 
 import { useRelativePush } from "../relative-route"
 
-import Table, { Row } from "../system/table"
+import Table, { Actions, Column, Row } from "../system/table"
 import * as C from "../transaction/transaction-columns"
+import { ChevronRight } from "../system/icons"
+import { LotSender } from "../../hooks/actions/use-send-lots"
+
+type A = Record<string, (id: number) => void>
+type CT = Column<Transaction>
+
+const getStockActions = ({ onSend }: A): CT =>
+  Actions([
+  { icon: ChevronRight, title: "Envoyer", action: (tx) => onSend(tx.id) },
+])
 
 type StockTableProps = {
   stock: Lots | null
   status: StatusSelection
   sorting: SortingSelection
   selection: TransactionSelection
+  sender: LotSender
 }
 
 export const StockTable = ({
@@ -22,16 +33,18 @@ export const StockTable = ({
   status,
   sorting,
   selection,
+  sender,
 }: StockTableProps) => {
   const relativePush = useRelativePush()
+  const sendLot = sender.sendLot
+
 
   const columns = []
   const default_columns = [
-    C.status,
     C.origine,
+    C.vendor,
     C.biocarburant,
     C.matierePremiere,
-    C.client,
     C.deliverySite,
     C.ghgReduction,
   ]
@@ -51,6 +64,10 @@ export const StockTable = ({
   }
 
   columns.push(...default_columns)
+
+  if (status.is(LotStatus.Stock)) {
+    columns.push(getStockActions({ sendLot }))
+  }
 
   if (stock === null) {
     return null

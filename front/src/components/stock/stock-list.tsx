@@ -11,6 +11,7 @@ import { LotValidator } from "../../hooks/actions/use-validate-lots"
 import { LotDuplicator } from "../../hooks/actions/use-duplicate-lots"
 import { LotAcceptor } from "../../hooks/actions/use-accept-lots"
 import { LotRejector } from "../../hooks/actions/use-reject-lots"
+import { LotSender } from "../../hooks/actions/use-send-lots"
 import { StatusSelection } from "../../hooks/query/use-status"
 import { TransactionSelection } from "../../hooks/query/use-selection"
 
@@ -47,6 +48,7 @@ type StockListProps = {
   acceptor: LotAcceptor
   rejector: LotRejector
   duplicator: LotDuplicator
+  sender: LotSender
 }
 
 export const StockList = ({
@@ -60,7 +62,7 @@ export const StockList = ({
   validator,
   acceptor,
   rejector,
-  duplicator,
+  sender,
 }: StockListProps) => {
   const txs = stock.data
 
@@ -126,6 +128,7 @@ export const StockList = ({
               sorting={sorting}
               status={status}
               selection={selection}
+              sender={sender}
             />
             {isLoading && <LoaderOverlay />}
           </Box>
