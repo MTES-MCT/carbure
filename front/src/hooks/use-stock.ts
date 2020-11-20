@@ -21,6 +21,7 @@ import useValidateLots from "./actions/use-validate-lots"
 import useRejectLots from "./actions/use-reject-lots"
 import useAcceptLots from "./actions/use-accept-lots"
 import useSpecialSelection from "./query/use-special"
+import useSendLot from "./actions/use-send-lots"
 
 export interface StockHook {
   loading: boolean
@@ -110,6 +111,7 @@ export function useStocks(entity: EntitySelection) {
   const validator = useValidateLots(entity, selection, year, refresh)
   const acceptor = useAcceptLots(entity, selection, year, refresh)
   const rejector = useRejectLots(entity, selection, year, refresh)
+  const sender = useSendLot(entity, refresh)
 
   return {
     filters,
@@ -126,5 +128,6 @@ export function useStocks(entity: EntitySelection) {
     validator,
     acceptor,
     rejector,
+    sender,
   }
 }

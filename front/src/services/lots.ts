@@ -10,6 +10,7 @@ import {
 import { FilterSelection } from "../hooks/query/use-filters"
 
 import api from "./api"
+import { dae } from "../components/transaction/transaction-columns"
 
 function toOption(value: string) {
   return { value, label: value }
@@ -375,5 +376,17 @@ export function getStocks(
     limit,
     query,
     order,
+  })
+}
+
+export function sendLotFromStock(entityID: number, tx_id: number, volume: number, client: string, delivery_site: string, delivery_date: string) {
+  return api.post("/lots/send-lot-from-stock", {
+    entity_id: entityID,
+    tx_id: tx_id,
+    volume: volume,
+    client: client,
+    delivery_site: delivery_site,
+    delivery_date: delivery_date,
+    dae: dae,
   })
 }
