@@ -11,6 +11,8 @@ import { FilterSelection } from "../hooks/query/use-filters"
 
 import api from "./api"
 import { dae } from "../components/transaction/transaction-columns"
+import differenceInCalendarMonths from "date-fns/differenceInCalendarMonths"
+
 
 function toOption(value: string) {
   return { value, label: value }
@@ -389,4 +391,12 @@ export function sendLotFromStock(entityID: number, tx_id: number, volume: number
     delivery_date: delivery_date,
     dae: dae,
   })
+}
+
+export function hasDeadline(tx: Transaction, deadline: string): boolean {
+  if (!tx || tx.lot.status !== "Draft") return false
+
+  const deadlineDate = new Date(deadline)
+  const deliveryDate = new Date(tx?.delivery_date)
+  return differenceInCalendarMonths(deadlineDate, deliveryDate) === 1
 }
