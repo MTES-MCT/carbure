@@ -107,6 +107,7 @@ def load_certificates():
         d = {'addons': row['addons'],
              'issuing_cb': row['issuing_cb'],
              'location': row['map'],
+             'download_link': row['certificate_report'],
         }
         # save certificate
         certificate = save_certificate(row['certificate'], row['certificate_holder'], valid_from, valid_until, d)

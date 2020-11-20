@@ -478,7 +478,8 @@ class ISCCCertificate(models.Model):
                 'location': self.location,
                 'valid_from': self.valid_from,
                 'valid_until': self.valid_until,
-                'issuing_cb': self.issuing_cb}
+                'issuing_cb': self.issuing_cb,
+                'download_link': self.download_link}
 
     def __str__(self):
         return self.certificate_id
@@ -550,7 +551,8 @@ class DBSCertificate(models.Model):
                 'holder_address': self.holder_address,
                 'valid_from': self.valid_from,
                 'valid_until': self.valid_until,
-                'certification_type': self.certification_type}
+                'certification_type': self.certification_type,
+                'download_link': self.download_link}
 
     def __str__(self):
         return self.certificate_id
