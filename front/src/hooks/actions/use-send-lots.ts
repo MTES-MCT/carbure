@@ -11,8 +11,6 @@ export interface LotSender {
   sendLot: (i: number) => Promise<any>
 }
 
-
-
 export default function useSendLot(
   entity: EntitySelection,
   refresh: () => void

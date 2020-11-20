@@ -1,12 +1,11 @@
 import React from "react"
 import cl from "clsx"
-import differenceInCalendarMonths from "date-fns/differenceInCalendarMonths"
 
 import { Entity, Lots, LotStatus, Transaction } from "../../services/types"
 import { SortingSelection } from "../../hooks/query/use-sort-by" // prettier-ignore
 import { TransactionSelection } from "../../hooks/query/use-selection"
 import { StatusSelection } from "../../hooks/query/use-status"
-
+import { hasDeadline } from "../../services/lots"
 import styles from "./transaction-table.module.css"
 
 import { useRelativePush } from "../relative-route"
@@ -64,14 +63,6 @@ const getInboxActions = ({ onAccept, onComment, onReject }: A): CT =>
 
 const getDuplicateActions = ({ onDuplicate }: A): Column<Transaction> =>
   Actions([{ icon: Copy, title: "Dupliquer le lot", action: (tx) => onDuplicate(tx.id) }]) // prettier-ignore
-
-export function hasDeadline(tx: Transaction, deadline: string): boolean {
-  if (!tx || tx.lot.status !== "Draft") return false
-
-  const deadlineDate = new Date(deadline)
-  const deliveryDate = new Date(tx?.delivery_date)
-  return differenceInCalendarMonths(deadlineDate, deliveryDate) === 1
-}
 
 type TransactionTableProps = {
   entity: Entity

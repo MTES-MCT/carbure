@@ -6,7 +6,7 @@ import fr from "date-fns/locale/fr"
 import { LotDetails, Transaction } from "../../services/types"
 import styles from "./transaction-status.module.css"
 import { Box, Title } from "../system"
-import { hasDeadline } from "./transaction-table"
+import { hasDeadline } from "../../services/lots"
 
 function getStatusText(tx: Transaction | undefined): string {
   if (!tx || tx.lot.status === "Draft") {
