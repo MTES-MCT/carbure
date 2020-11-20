@@ -470,6 +470,7 @@ class ISCCCertificate(models.Model):
     valid_until = models.DateField(null=False)
     issuing_cb = models.CharField(max_length=256, default='')
     location = models.CharField(max_length=256, default='')
+    download_link = models.CharField(max_length=512, default='')
 
     def natural_key(self):
         return {'certificate_id': self.certificate_id,
@@ -541,6 +542,7 @@ class DBSCertificate(models.Model):
     valid_from = models.DateField()
     valid_until = models.DateField()
     certification_type = models.CharField(max_length=512, default='')
+    download_link = models.CharField(max_length=512, default='')
 
     def natural_key(self):
         return {'certificate_id': self.certificate_id,
