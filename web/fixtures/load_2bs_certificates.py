@@ -60,7 +60,8 @@ def load_invalid_certificates():
              'holder_address': '%s' % (row['Coordonnées']),
              'valid_from': datetime.date(year=1970, month=1, day=1),
              'valid_until': valid_until,
-             'certification_type': ''}
+             'certification_type': '',
+             'download_link': 'https://www.2bsvs.org/scripts/telecharger_certificat.php?certificat=%s' % (row['Numéro 2BS'])}
         # save certificate
         certificate = save_certificate(row['Numéro 2BS'], [], d)
         if not certificate:
@@ -94,6 +95,7 @@ def load_valid_certificates():
              'holder_address': '%s - %s' % (row['Coordonnées'], row['Pays']),
              'valid_from': valid_from,
              'valid_until': valid_until,
+             'download_link': 'https://www.2bsvs.org/scripts/telecharger_certificat.php?certificat=%s' % (row['Numéro 2BS']),
             }
         scopes = []
         if row['Type de certification']:
