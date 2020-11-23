@@ -133,6 +133,8 @@ def make_mb_extract_sheet(workbook, entity):
 
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
     today = datetime.date.today().strftime('%Y-%m-%d')
+    if not len(mb_lots):
+        return
     for i in range(10):
         client = random.choice(clients)
         site = random.choice(delivery_sites)
