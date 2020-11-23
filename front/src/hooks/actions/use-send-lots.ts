@@ -20,7 +20,7 @@ export default function useSendLot(
   async function sendLot(txID: number) {
     const shouldSend = await prompt(
       "Envoyer lot",
-      "Voulez vous envoyer ce lot ?",
+      "Veuillez préciser les détails du lot à envoyer",
       StockSendLotPrompt
     )
 

@@ -996,3 +996,40 @@ def upload_blend(request):
     if nb_loaded is False:
         return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
     return JsonResponse({'status': 'success', 'loaded': nb_loaded, 'total': nb_total})
+
+
+def send_lot_from_stock(request):
+    tx_id = request.POST.get('tx_id', False)
+    entity_id = request.POST.get('entity_id', False)
+    volume = request.POST.get('volume', False)
+    client_id = request.POST.get('client_id', False)
+    delivery_site = request.POST.get('delivery_site', False)
+    delivery_date = request.POST.get('delivery_date', False)
+    dae = request.POST.get('dae', False)
+
+    if not tx_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_id"}, status=400)
+    if not entity_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
+    if not volume:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing volume"}, status=400)
+    if not client_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing client_id"}, status=400)
+    if not delivery_site:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing delivery_site"}, status=400)
+    if not delivery_date:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing delivery_date"}, status=400)
+    if not dae:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing dae"}, status=400)                                
+
+    try:
+        tx = LotTransaction.objects.get(delivery_status__in=['N', 'AC', 'AA'], id=tx_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "TX not found", 'extra': str(e)}, status=400)
+
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    if tx.carbure_client not in rights:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+    tx.delivery_status = 'A'
+    tx.save()
+    return JsonResponse({'status': 'success'})

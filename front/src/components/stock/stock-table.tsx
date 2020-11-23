@@ -9,15 +9,15 @@ import { useRelativePush } from "../relative-route"
 
 import Table, { Actions, Column, Row } from "../system/table"
 import * as C from "../transaction/transaction-columns"
-import { ChevronRight } from "../system/icons"
+import { Edit } from "../system/icons"
 import { LotSender } from "../../hooks/actions/use-send-lots"
 
 type A = Record<string, (id: number) => void>
 type CT = Column<Transaction>
 
-const getStockActions = ({ onSend }: A): CT =>
+const getStockActions = ({ sendLot }: A): CT =>
   Actions([
-  { icon: ChevronRight, title: "Envoyer", action: (tx) => onSend(tx.id) },
+  { icon: Edit, title: "Envoyer", action: (tx) => sendLot(tx.id) },
 ])
 
 type StockTableProps = {
@@ -45,7 +45,6 @@ export const StockTable = ({
     C.vendor,
     C.biocarburant,
     C.matierePremiere,
-    C.deliverySite,
     C.ghgReduction,
   ]
 
@@ -56,11 +55,13 @@ export const StockTable = ({
   if (status.is(LotStatus.Inbox)) {
     columns.push(C.selector(selection))
     columns.push(C.carbureID)
+    columns.push(C.depot)
   }
 
   if (status.is(LotStatus.Stock)) {
     columns.push(C.empty)
     columns.push(C.carbureID)
+    columns.push(C.depot)
   }
 
   columns.push(...default_columns)
