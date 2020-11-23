@@ -10,9 +10,7 @@ import {
 import { FilterSelection } from "../hooks/query/use-filters"
 
 import api from "./api"
-import { dae } from "../components/transaction/transaction-columns"
 import differenceInCalendarMonths from "date-fns/differenceInCalendarMonths"
-
 
 function toOption(value: string) {
   return { value, label: value }
@@ -381,15 +379,25 @@ export function getStocks(
   })
 }
 
-export function sendLotFromStock(entityID: number, tx_id: number, volume: number, client: string, delivery_site: string, delivery_date: string) {
+export function sendLotFromStock(
+  entity_id: number,
+  tx_id: number,
+  volume: number,
+  dae: string,
+  delivery_date: string,
+  client: string,
+  delivery_site: string,
+  delivery_site_country?: string
+) {
   return api.post("/lots/send-lot-from-stock", {
-    entity_id: entityID,
-    tx_id: tx_id,
-    volume: volume,
-    client: client,
-    delivery_site: delivery_site,
-    delivery_date: delivery_date,
-    dae: dae,
+    entity_id,
+    tx_id,
+    volume,
+    dae,
+    delivery_date,
+    client,
+    delivery_site,
+    delivery_site_country,
   })
 }
 

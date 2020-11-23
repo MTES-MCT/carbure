@@ -34,7 +34,7 @@ export const OPERATOR_COLUMNS = [
   C.matierePremiere,
   C.vendor,
   C.productionSite,
-  C.deliverySite,
+  C.depot,
   C.ghgReduction,
 ]
 
