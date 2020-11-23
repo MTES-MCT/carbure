@@ -20,6 +20,9 @@ urlpatterns = [
     path('reject', views.reject_lot, name='api-v3-reject-lot'),
     path('comment', views.comment_lot, name='api-v3-comment-lot'),
 
+    path('send-lot-from-stock', views.send_lot_from_stock, name='api-v3-send-lot-from-stock'),
+
+
     # SPECIAL
     path('delete-all-drafts', views.delete_all_drafts, name='api-v3-delete-all-drafts'),
     path('validate-all-drafts', views.validate_all_drafts, name='api-v3-validate-all-drafts'),

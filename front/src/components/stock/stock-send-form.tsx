@@ -1,5 +1,7 @@
 import React, { useState } from "react"
+import { findEntities } from "../../services/common"
 import { Box, Button, LabelInput } from "../system"
+import { LabelAutoComplete } from "../system/autocomplete"
 import { DialogButtons, PromptFormProps } from "../system/dialog"
 
 interface StockSendDetails {
@@ -9,6 +11,9 @@ interface StockSendDetails {
   delivery_site: string,
   dae: string
 }
+
+const get = (key: string) => (obj: { [k: string]: any } | null) =>
+  obj && key in obj ? String(obj[key]) : ""
 
 export const StockSendLotPrompt = ({
   onConfirm,
@@ -33,6 +38,7 @@ export const StockSendLotPrompt = ({
         value={volume}
         onChange={(e) => setVolume(parseInt(e.target.value))}
       />
+
       <LabelInput
         label="Client"
         value={client}

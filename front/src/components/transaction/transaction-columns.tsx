@@ -108,6 +108,18 @@ export const deliverySite: Column<Transaction> = {
   },
 }
 
+export const depot: Column<Transaction> = {
+  header: "Dépôt",
+  render: (tx) => {
+    const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
+    const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name ?? '' // prettier-ignore
+    const city = tx.carbure_delivery_site?.city
+    const location = city ? `${country}, ${city}` : country
+
+    return <TwoLines text={name} sub={location} />
+  },  
+}
+
 export const arrow: Column<Transaction> = {
   className: styles.actionColumn,
   render: () => <ChevronRight />,
