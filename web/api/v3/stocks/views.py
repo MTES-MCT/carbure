@@ -163,7 +163,7 @@ def get_snapshot(request):
     return JsonResponse({'status': 'success', 'data': data})
 
 
-def send_lot_from_stock(request):
+def send_lot(request):
     tx_id = request.POST.get('tx_id', False)
     entity_id = request.POST.get('entity_id', False)
     volume = request.POST.get('volume', False)
