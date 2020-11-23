@@ -18,17 +18,32 @@ export default function useSendLot(
   const [request, resolveSend] = useAPI(api.sendLotFromStock)
 
   async function sendLot(txID: number) {
-    const shouldSend = await prompt(
+    const sent = await prompt(
       "Envoyer lot",
       "Veuillez préciser les détails du lot à envoyer",
       StockSendLotPrompt
     )
 
-    if (entity !== null && shouldSend) {
-      await resolveSend(entity.id, txID, shouldSend.volume, shouldSend.client, shouldSend.delivery_site, shouldSend.delivery_date).then(refresh)
+    if (entity !== null && sent) {
+      await resolveSend(
+        entity.id,
+        txID,
+        sent.volume,
+        sent.dae,
+        sent.delivery_date,
+        sent.client_is_in_carbure
+          ? sent.carbure_client?.name ?? ""
+          : sent.unknown_client,
+        sent.delivery_site_is_in_carbure
+          ? sent.carbure_delivery_site?.name ?? ""
+          : sent.unknown_delivery_site,
+        !sent.delivery_site_is_in_carbure
+          ? sent.unknown_delivery_site_country?.code_pays ?? ""
+          : ""
+      ).then(refresh)
     }
 
-    return shouldSend
+    return sent
   }
 
   return { loading: request.loading, sendLot }
