@@ -3,7 +3,6 @@ import {
   Lots,
   LotStatus,
   Snapshot,
-  StockSnapshot,
   Filters,
   LotDetails,
 } from "./types"
@@ -12,7 +11,7 @@ import { FilterSelection } from "../hooks/query/use-filters"
 import api from "./api"
 import differenceInCalendarMonths from "date-fns/differenceInCalendarMonths"
 
-function toOption(value: string) {
+export function toOption(value: string) {
   return { value, label: value }
 }
 
@@ -336,68 +335,6 @@ export function getLotsOutSummary(entityID: number) {
 export function getLotsInSummary(entityID: number) {
   return api.get("/lots/summary-in", {
     entity_id: entityID,
-  })
-}
-
-// give the same type to all filters in order to render them easily
-function normalizeStockSnapshotFilters(snapshot: any): StockSnapshot {
-  snapshot.filters = {
-    matieres_premieres: snapshot.filters.matieres_premieres,
-    biocarburants: snapshot.filters.biocarburants,
-    countries_of_origin: snapshot.filters.countries_of_origin,
-    production_sites: snapshot.filters.production_sites.map(toOption),
-    delivery_sites: snapshot.filters.delivery_sites.map(toOption),
-  }
-  return snapshot
-}
-
-export function getStockSnapshot(entity_id: number): Promise<StockSnapshot> {
-  return api
-    .get("/stocks/snapshot", { entity_id })
-    .then(normalizeStockSnapshotFilters)
-}
-
-export function getStocks(
-  entityID: number | undefined,
-  filters: FilterSelection["selected"],
-  status: string,
-  page: number,
-  limit: number,
-  query: string,
-  sortBy: string,
-  order: string
-): Promise<Lots> {
-  return api.get("/stocks", {
-    ...filters,
-    status,
-    entity_id: entityID ?? null,
-    from_idx: page * limit,
-    sort_by: sortBy,
-    limit,
-    query,
-    order,
-  })
-}
-
-export function sendLotFromStock(
-  entity_id: number,
-  tx_id: number,
-  volume: number,
-  dae: string,
-  delivery_date: string,
-  client: string,
-  delivery_site: string,
-  delivery_site_country?: string
-) {
-  return api.post("/lots/send-lot-from-stock", {
-    entity_id,
-    tx_id,
-    volume,
-    dae,
-    delivery_date,
-    client,
-    delivery_site,
-    delivery_site_country,
   })
 }
 

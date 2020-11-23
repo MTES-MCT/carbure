@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { Lots } from "../services/types"
 import useAPI from "./helpers/use-api"
-import { getStocks, getStockSnapshot } from "../services/lots"
+import { getStocks, getStockSnapshot } from "../services/stocks"
 import { EntitySelection } from "./helpers/use-entity"
 import useYearSelection from "./query/use-year"
 import {
