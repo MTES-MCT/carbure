@@ -115,9 +115,10 @@ export function AutoComplete<T>({
               <DropdownItem
                 key={getValue(o)}
                 focused={focused === i}
+                title={getLabel(o)}
                 onClick={() => change(o)}
               >
-                {getLabel(o)}
+                <span>{getLabel(o)}</span>
               </DropdownItem>
             ))
           }
