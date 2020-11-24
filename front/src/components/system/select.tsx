@@ -185,7 +185,7 @@ export const Select = ({
           {(options, focused) => (
             <React.Fragment>
               {search && (
-                <li>
+                <DropdownItem>
                   <Input
                     type="text"
                     placeholder="Rechercher..."
@@ -194,7 +194,7 @@ export const Select = ({
                     onChange={onQueryChange}
                     onClick={(e) => e.stopPropagation()}
                   />
-                </li>
+                </DropdownItem>
               )}
 
               {options.map((option, i) => (
@@ -214,7 +214,7 @@ export const Select = ({
                     />
                   )}
 
-                  {option.label}
+                  <span>{option.label}</span>
                 </DropdownItem>
               ))}
             </React.Fragment>
