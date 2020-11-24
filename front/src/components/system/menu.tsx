@@ -3,7 +3,7 @@ import cl from "clsx"
 
 import styles from "./menu.module.css"
 
-import { Dropdown, DropdownLabel, useDropdown } from "./dropdown"
+import { Dropdown, DropdownItem, DropdownLabel, useDropdown } from "./dropdown"
 import { Link } from "react-router-dom"
 import { SystemProps } from "."
 
@@ -13,9 +13,12 @@ type MenuItemProps = React.HTMLProps<HTMLLIElement> & {
 }
 
 const MenuItem = ({ to, children, ...props }: MenuItemProps) => (
-  <li {...props} className={to ? styles.menuItemLink : styles.menuItem}>
+  <DropdownItem
+    {...props}
+    className={to ? styles.menuItemLink : styles.menuItem}
+  >
     {to ? <Link to={to}>{children}</Link> : children}
-  </li>
+  </DropdownItem>
 )
 
 type MenuGroupProps = React.HTMLProps<HTMLUListElement> & {
@@ -25,9 +28,12 @@ type MenuGroupProps = React.HTMLProps<HTMLUListElement> & {
 
 const MenuGroup = ({ label, children }: MenuGroupProps) => (
   <ul className={styles.menuGroup}>
-    <li className={styles.menuGroupLabel} onClick={(e) => e.stopPropagation()}>
+    <DropdownItem
+      className={styles.menuGroupLabel}
+      onClick={(e) => e.stopPropagation()}
+    >
       {label}
-    </li>
+    </DropdownItem>
     {children}
   </ul>
 )
