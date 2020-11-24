@@ -586,16 +586,58 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
     tx_errors = []
 
     # check for empty row
-    if lot_dict.get('carbure_id', None) is None:
-        return None, None, None, None
-    carbure_id = lot_dict['carbure_id']
-    # get source transaction
-    try:
-        source_tx = LotTransaction.objects.get(lot__carbure_id=carbure_id)
-        source_lot = LotV2.objects.get(id=source_tx.lot.id)
-    except Exception:
-        print('Could not find carbure_id %s' % (carbure_id))
-        return None, None, None, None
+    if lot_dict.get('volume', None) is None:
+        return None, None, "Missing volume", None
+
+    carbure_id = lot_dict.get('carbure_id', False)
+    tx_id = lot_dict.get('tx_id', False)
+    biocarburant = lot_dict.get('biocarburant', False)
+    depot = lot_dict.get('depot', False)
+    matiere_premiere = lot_dict.get('matiere_premiere', False)
+    ghg_reduction = lot_dict.get('ghg_reduction', False)
+
+    if tx_id:
+        try:
+            source_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status='A', id=tx_id)
+            source_lot = LotV2.objects.get(id=source_tx.lot.id)
+        except Exception as e:
+            return None, None, "TX not found", None
+    elif carbure_id:
+        try:
+            source_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status='A', lot__carbure_id=carbure_id)
+            source_lot = LotV2.objects.get(id=source_tx.lot.id)
+        except Exception as e:
+            return None, None, "TX not found", None
+    else:
+        # try to find it via filters
+        matching_txs = LotTransaction.objects.filter(carbure_client=entity, delivery_status='A')
+        if biocarburant:
+            try:
+                bc = Biocarburant.objects.get(code=biocarburant)
+            except:
+                return None, None, "Unknown biocarburant", None
+            matching_txs = matching_txs.filter(lot__biocarburant=bc)
+        if matiere_premiere:
+            try:
+                mp = MatierePremiere.objects.get(code=matiere_premiere)
+            except:
+                return None, None, "Unknown matiere premiere", None
+            matching_txs = matching_txs.filter(lot__matiere_premiere=mp)
+        if ghg_reduction:
+            matching_txs = matching_txs.filter(lot__ghg_reduction=float(ghg_reduction))
+        if depot:
+            try:
+                depot = Depot.objects.get(depot_id=depot)
+            except:
+                return None, None, "Unknown depot", None
+            matching_txs = matching_txs.filter(delivery_site=depot)
+
+        if matching_txs.count() == 1:
+            source_tx = matching_txs[0]
+            source_lot = LotV2.objects.get(id=source_tx.lot.id)
+        else:
+            return None, None, "Could not find mass balance line", None
+
     lot = source_tx.lot
 
     if source_tx.carbure_client == entity and source_tx.delivery_status == 'A' and lot.fused_with is None:
@@ -603,7 +645,7 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
         # this lot is currently in my mass balance
         pass
     else:
-        return None, None, None, None
+        return None, None, "Cannot extract from this lot", None
 
     # let's create a new lot and transaction
     lot.pk = None

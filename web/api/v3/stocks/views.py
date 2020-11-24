@@ -1,8 +1,9 @@
 from django.db.models import Q
 from django.http import JsonResponse
 from core.models import LotTransaction
-from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays
-
+from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, LotV2, Depot
+from core.decorators import check_rights
+from core.common import get_prefetched_data, load_mb_lot, bulk_insert
 
 sort_key_to_django_field = {'period': 'lot__period',
                             'biocarburant': 'lot__biocarburant__name',
@@ -162,8 +163,9 @@ def get_snapshot(request):
 
     return JsonResponse({'status': 'success', 'data': data})
 
-
-def send_lot(request):
+@check_rights('entity_id')
+def send_lot(request, *args, **kwargs):
+    context = kwargs['context']
     tx_id = request.POST.get('tx_id', False)
     entity_id = request.POST.get('entity_id', False)
     volume = request.POST.get('volume', False)
@@ -185,16 +187,14 @@ def send_lot(request):
     if not delivery_date:
         return JsonResponse({'status': 'forbidden', 'message': "Missing delivery_date"}, status=400)
     if not dae:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing dae"}, status=400)                                
+        return JsonResponse({'status': 'forbidden', 'message': "Missing dae"}, status=400)                                    
 
-    try:
-        tx = LotTransaction.objects.get(delivery_status__in=['N', 'AC', 'AA'], id=tx_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "TX not found", 'extra': str(e)}, status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if tx.carbure_client not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-    tx.delivery_status = 'A'
-    tx.save()
+    # found the stock line
+    # prefetch some data
+    d = get_prefetched_data(context['entity'])
+    # create sub-transaction
+    lot, tx, lot_errors, tx_errors = load_mb_lot(d, context['entity'], request.user, request.POST.dict(), 'MANUAL')
+    if not tx:
+        return JsonResponse({'status': 'error', 'message': 'Could not add lot to database: %s' % (lot_errors)}, status=400)
+    new_lots, new_txs = bulk_insert(context['entity'], [lot], [tx], [lot_errors], [tx_errors])
     return JsonResponse({'status': 'success'})

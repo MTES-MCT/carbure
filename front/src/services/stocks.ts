@@ -54,7 +54,7 @@ export function sendLotFromStock(
   delivery_site: string,
   delivery_site_country?: string
 ) {
-  return api.post("/lots/send-lot-from-stock", {
+  return api.post("/stocks/send-lot", {
     entity_id,
     tx_id,
     volume,
