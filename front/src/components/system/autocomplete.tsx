@@ -14,6 +14,7 @@ function useAutoComplete<T>(
   minLength: number,
   target: Element | null,
   onChange: (e: any) => void,
+  getValue: (option: T) => string,
   getLabel: (option: T) => string,
   getQuery: (q: string, ...a: any[]) => Promise<T[]>
 ) {
@@ -29,7 +30,7 @@ function useAutoComplete<T>(
     dd.toggle(false)
   }
 
-  function onQuery(
+  async function onQuery(
     e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLInputElement>
   ) {
     const query = "value" in e.target ? e.target.value : ""
@@ -40,7 +41,24 @@ function useAutoComplete<T>(
       dd.toggle(false)
     } else {
       dd.toggle(true)
-      resolveQuery(query, ...queryArgs)
+
+      const results = await resolveQuery(query, ...queryArgs)
+
+      // check if the typed value matches a result from the api
+      // if so, trigger the onChange callback
+      if (results && results.length > 0 && query.length > 0) {
+        const compare = query.toLowerCase()
+
+        const suggestion = results.find((suggestion) => {
+          const label = getLabel(suggestion).toLowerCase()
+          const value = getValue(suggestion).toLowerCase()
+          return compare === label || compare === value
+        })
+
+        if (suggestion) {
+          onChange({ target: { name, value: suggestion } })
+        }
+      }
     }
   }
 
@@ -84,6 +102,7 @@ export function AutoComplete<T>({
     minLength,
     target.current,
     onChange,
+    getValue,
     getLabel,
     getQuery
   )
