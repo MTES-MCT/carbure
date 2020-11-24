@@ -124,6 +124,9 @@ def get_iscc_certificates(request):
     cert = ISCCCertificate.objects.filter(valid_until__gte=today)
     if q:
         cert = cert.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
+
+    cert = cert[0:100]
+    
     sez = [{'certificate_id': c.certificate_id, 'certificate_holder': c.certificate_holder,
             'valid_from': c.valid_from.strftime('%y-%m-%d'),
             'valid_until': c.valid_until.strftime('%y-%m-%d'),
@@ -137,6 +140,9 @@ def get_2bs_certificates(request):
     cert = DBSCertificate.objects.filter(valid_until__gte=today)
     if q:
         cert = cert.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
+
+    cert = cert[0:100]
+
     sez = [{'certificate_id': c.certificate_id, 'certificate_holder': c.certificate_holder,
             'valid_from': c.valid_from.strftime('%y-%m-%d'),
             'valid_until': c.valid_until.strftime('%y-%m-%d'), 'holder_address': c.holder_address,
