@@ -468,12 +468,15 @@ def update_lot(request):
     TransactionError.objects.filter(tx_id=tx.id).delete()
     d = get_prefetched_data(entity)
     lot, tx, lot_errors, tx_errors = load_lot(d, entity, request.user, request.POST.dict(), 'MANUAL', tx)
-    lot.save()
-    tx.save()
-    LotV2Error.objects.bulk_create(lot_errors)
-    TransactionError.objects.bulk_create(tx_errors)       
-    bulk_sanity_checks([tx.lot])
-    return JsonResponse({'status': 'success'})
+    if lot:
+        lot.save()
+        tx.save()
+        LotV2Error.objects.bulk_create(lot_errors)
+        TransactionError.objects.bulk_create(tx_errors)       
+        bulk_sanity_checks([tx.lot])
+        return JsonResponse({'status': 'success'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Could not save lot: %s' % (lot_errors)})
 
 
 def duplicate_lot(request):
