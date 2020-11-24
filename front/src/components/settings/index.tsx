@@ -11,7 +11,7 @@ import { Box, BoxProps } from "../system"
 export function formatDate(str: string) {
   try {
     const date = new Date(str)
-    const formatted = format(date, "dd/MM/Y", { locale: fr })
+    const formatted = format(date, "dd/MM/y", { locale: fr })
     return formatted
   } catch (e) {
     return "N/A"
