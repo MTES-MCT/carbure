@@ -11,20 +11,16 @@ function useAutoComplete<T>(
   value: T | null,
   name: string,
   queryArgs: any[],
+  minLength: number,
+  target: Element | null,
   onChange: (e: any) => void,
   getLabel: (option: T) => string,
   getQuery: (q: string, ...a: any[]) => Promise<T[]>
 ) {
-  const dd = useDropdown()
-  const timeout = useRef<NodeJS.Timeout>()
+  const dd = useDropdown(target)
 
   const [query, setQuery] = useState(value ? getLabel(value) : "")
   const [suggestions, resolveQuery] = useAPI(getQuery)
-
-  const debouncedResolveQuery = (q: string, ...a: any[]) => {
-    if (timeout.current) clearTimeout(timeout.current)
-    timeout.current = setTimeout(() => resolveQuery(q, ...a), 150)
-  }
 
   // on change, modify the query to match selection and send event to parent
   function change(value: T) {
@@ -33,16 +29,18 @@ function useAutoComplete<T>(
     dd.toggle(false)
   }
 
-  function onQuery(e: React.ChangeEvent<HTMLInputElement>) {
-    const query = e.target.value
+  function onQuery(
+    e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLInputElement>
+  ) {
+    const query = "value" in e.target ? e.target.value : ""
     setQuery(query)
 
-    if (query.length === 0) {
+    if (query.length < minLength) {
       onChange({ target: { name, value: null } })
       dd.toggle(false)
     } else {
       dd.toggle(true)
-      debouncedResolveQuery(query, ...queryArgs)
+      resolveQuery(query, ...queryArgs)
     }
   }
 
@@ -51,11 +49,6 @@ function useAutoComplete<T>(
     setQuery(value ? getLabel(value) : "")
   }, [value, getLabel])
 
-  // clear timeout in case it's still active
-  useEffect(() => {
-    return () => timeout.current && clearTimeout(timeout.current)
-  }, [])
-
   return { dd, query, suggestions, onQuery, change }
 }
 
@@ -63,6 +56,7 @@ type AutoCompleteProps<T> = Omit<InputProps, "value"> & {
   value: T | null
   options?: T[]
   queryArgs?: any[]
+  minLength?: number
   getValue: (option: T) => string
   getLabel: (option: T) => string
   onChange: (e: any) => void
@@ -74,6 +68,7 @@ export function AutoComplete<T>({
   name,
   queryArgs = [],
   readOnly,
+  minLength = 1,
   onChange,
   getValue,
   getLabel,
@@ -86,6 +81,8 @@ export function AutoComplete<T>({
     value,
     name!,
     queryArgs,
+    minLength,
+    target.current,
     onChange,
     getLabel,
     getQuery
@@ -101,6 +98,7 @@ export function AutoComplete<T>({
         readOnly={readOnly}
         onChange={onQuery}
         innerRef={target}
+        onClick={onQuery}
         onBlur={() => dd.toggle(false)}
       />
 
@@ -180,7 +178,10 @@ export function MultiAutocomplete<T>({
           {getLabel(v)}
           <Cross
             className={styles.multiValueDelete}
-            onClick={() => removeValue(v)}
+            onClick={(e) => {
+              e.preventDefault()
+              removeValue(v)
+            }}
           />
         </span>
       ))}
