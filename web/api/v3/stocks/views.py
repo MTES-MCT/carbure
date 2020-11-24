@@ -169,7 +169,7 @@ def send_lot(request, *args, **kwargs):
     tx_id = request.POST.get('tx_id', False)
     entity_id = request.POST.get('entity_id', False)
     volume = request.POST.get('volume', False)
-    client_id = request.POST.get('client_id', False)
+    client = request.POST.get('client', False)
     delivery_site = request.POST.get('delivery_site', False)
     delivery_date = request.POST.get('delivery_date', False)
     dae = request.POST.get('dae', False)
@@ -180,8 +180,8 @@ def send_lot(request, *args, **kwargs):
         return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
     if not volume:
         return JsonResponse({'status': 'forbidden', 'message': "Missing volume"}, status=400)
-    if not client_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing client_id"}, status=400)
+    if not client:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing client"}, status=400)
     if not delivery_site:
         return JsonResponse({'status': 'forbidden', 'message': "Missing delivery_site"}, status=400)
     if not delivery_date:

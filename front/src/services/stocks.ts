@@ -60,7 +60,7 @@ export function sendLotFromStock(
     volume,
     dae,
     delivery_date,
-    client_id,
+    client: client_id,
     delivery_site,
     delivery_site_country,
   })

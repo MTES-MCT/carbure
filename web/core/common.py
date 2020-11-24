@@ -660,8 +660,6 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
     lot_errors.append(fill_volume_info(lot_dict, lot))
 
     transaction = LotTransaction()
-    # done in bulk_insert
-    # transaction.lot = lot
     transaction.vendor_is_in_carbure = True
     transaction.carbure_vendor = entity
 
