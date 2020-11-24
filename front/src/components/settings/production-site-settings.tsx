@@ -192,17 +192,16 @@ export const ProductionSitePromptFactory = (
 
         <Box row>
           <LabelCheckbox
-            label="Éligible au double-compte ?"
+            disabled
+            label="Éligible au double-comptage ?"
             name="eligible_dc"
-            checked={form.eligible_dc}
-            onChange={onChange}
+            defaultChecked={form.eligible_dc}
           />
           <LabelInput
-            disabled={!form.eligible_dc}
-            label="Référence double-compte"
+            disabled
+            label="Référence double-comptage"
             name="dc_reference"
-            value={form.dc_reference}
-            onChange={onChange}
+            defaultValue={form.dc_reference}
           />
         </Box>
 
