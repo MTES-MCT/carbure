@@ -66,6 +66,11 @@ export const StockTable = ({
 
   columns.push(...default_columns)
 
+  if (status.is(LotStatus.Draft)) {
+    columns.push(C.client)
+    columns.push(C.deliverySite)
+  }
+
   if (status.is(LotStatus.Stock)) {
     columns.push(getStockActions({ sendLot }))
   }

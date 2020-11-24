@@ -32,7 +32,7 @@ export default function useSendLot(
         sent.dae,
         sent.delivery_date,
         sent.client_is_in_carbure
-          ? `${sent.carbure_client?.id ?? ""}`
+          ? `${sent.carbure_client?.name ?? ""}`
           : sent.unknown_client,
         sent.delivery_site_is_in_carbure
           ? sent.carbure_delivery_site?.name ?? ""
