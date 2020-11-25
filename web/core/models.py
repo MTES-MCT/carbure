@@ -473,13 +473,16 @@ class ISCCCertificate(models.Model):
     download_link = models.CharField(max_length=512, default='')
 
     def natural_key(self):
+        scope = [s.scope.scope for s in self.iscccertificatescope_set.all()]
+
         return {'certificate_id': self.certificate_id,
                 'certificate_holder': self.certificate_holder,
                 'location': self.location,
                 'valid_from': self.valid_from,
                 'valid_until': self.valid_until,
                 'issuing_cb': self.issuing_cb,
-                'download_link': self.download_link}
+                'download_link': self.download_link,
+                'scope': scope}
 
     def __str__(self):
         return self.certificate_id
@@ -546,13 +549,15 @@ class DBSCertificate(models.Model):
     download_link = models.CharField(max_length=512, default='')
 
     def natural_key(self):
+        scope = [s.scope.certification_type for s in self.dbscertificatescope_set.all()]
         return {'certificate_id': self.certificate_id,
                 'certificate_holder': self.certificate_holder,
                 'holder_address': self.holder_address,
                 'valid_from': self.valid_from,
                 'valid_until': self.valid_until,
                 'certification_type': self.certification_type,
-                'download_link': self.download_link}
+                'download_link': self.download_link,
+                'scope': scope}
 
     def __str__(self):
         return self.certificate_id

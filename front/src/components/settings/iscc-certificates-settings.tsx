@@ -29,7 +29,9 @@ export const ISCCPrompt = ({
         getQuery={common.findISCCCertificates}
         onChange={(e: any) => setCertificate(e.target.value)}
         getValue={(c) => c?.certificate_id ?? ""}
-        getLabel={(c) => c?.certificate_id + " - " + c?.certificate_holder ?? ""}
+        getLabel={(c) =>
+          c?.certificate_id + " - " + c?.certificate_holder ?? ""
+        }
       />
 
       <DialogButtons>
@@ -50,6 +52,7 @@ export const ISCCPrompt = ({
 const COLUMNS: Column<ISCCCertificate>[] = [
   EMPTY_COLUMN,
   { header: "ID", render: (c) => <Line text={c.certificate_id} /> },
+  { header: "Périmètre", render: (c) => <Line text={c.scope.join(", ")} /> },
   { header: "Détenteur", render: (c) => <Line text={c.certificate_holder} /> },
   { header: "Valide jusqu'au", render: (c) => <Line text={expiration(c)} /> },
 ]
