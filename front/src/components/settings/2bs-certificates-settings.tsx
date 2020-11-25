@@ -1,7 +1,10 @@
 import React, { useState } from "react"
+import cl from "clsx"
 
 import { DBSCertificateSettingsHook } from "../../hooks/settings/use-2bs-certificates"
 import { DBSCertificate } from "../../services/types"
+
+import styles from "./settings.module.css"
 
 import * as common from "../../services/common"
 
@@ -69,6 +72,7 @@ const DBSCertificateSettings = ({ settings }: DBSCertificateSettingsProps) => {
       render: (c) => (
         <ExpirationDate
           date={c.valid_until}
+          updated={c.has_been_updated}
           onUpdate={() => settings.update2BSCertificate(c)}
         />
       ),
@@ -82,7 +86,10 @@ const DBSCertificateSettings = ({ settings }: DBSCertificateSettingsProps) => {
     ]),
   ]
 
-  const rows = settings.certificates.map((c) => ({ value: c }))
+  const rows = settings.certificates.map((c) => ({
+    value: c,
+    className: cl(c.has_been_updated && styles.expiredRow),
+  }))
 
   return (
     <Section>
