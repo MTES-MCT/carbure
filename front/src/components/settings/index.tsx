@@ -2,11 +2,12 @@ import React from "react"
 import format from "date-fns/format"
 import isBefore from "date-fns/isBefore"
 import fr from "date-fns/locale/fr"
-
-import { DBSCertificate, ISCCCertificate } from "../../services/types"
+import cl from "clsx"
 
 import styles from "./settings.module.css"
-import { Box, BoxProps } from "../system"
+import { Box, BoxProps, Button } from "../system"
+import { Refresh } from "../system/icons"
+import { DBSCertificate, ISCCCertificate } from "../../services/types"
 
 export function formatDate(str: string) {
   try {
@@ -18,17 +19,13 @@ export function formatDate(str: string) {
   }
 }
 
-export function expiration(certificate: ISCCCertificate | DBSCertificate) {
+export function isExpired(date: string) {
   try {
     const now = new Date()
-    const valid_until = new Date(certificate.valid_until)
-    const formatted = formatDate(certificate.valid_until)
-
+    const valid_until = new Date(date)
     return isBefore(valid_until, now)
-      ? `Expiré depuis le ${formatted}`
-      : formatted
   } catch (e) {
-    return "N/A"
+    return false
   }
 }
 
@@ -45,6 +42,31 @@ export const SettingsBody = (props: BoxProps) => (
 export const SettingsForm = (props: BoxProps) => (
   <Box {...props} as="form" className={styles.settingsForm} />
 )
+
+type ExpirationDateProps = {
+  date: string
+  onUpdate: () => void
+}
+
+export const ExpirationDate = ({ date, onUpdate }: ExpirationDateProps) => {
+  const expired = isExpired(date)
+  const formatted = formatDate(date)
+
+  return (
+    <span className={cl(styles.expirationDate, expired && styles.expired)}>
+      {expired && (
+        <React.Fragment>
+          Expiré depuis le {formatted}
+          <Button icon={Refresh} onClick={onUpdate}>
+            Mise à jour
+          </Button>
+        </React.Fragment>
+      )}
+
+      {!expired && formatted}
+    </span>
+  )
+}
 
 export const EMPTY_COLUMN = {
   className: styles.settingsTableEmptyColumn,

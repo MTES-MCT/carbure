@@ -14,6 +14,7 @@ export interface ISCCCertificateSettingsHook {
   certificates: ISCCCertificate[]
   addISCCCertificate: () => void
   deleteISCCCertificate: (d: ISCCCertificate) => void
+  updateISCCCertificate: (d: ISCCCertificate) => void
 }
 
 export default function useISCCCertificates(
@@ -22,12 +23,16 @@ export default function useISCCCertificates(
   const [requestGetISCC, resolveGetISCC] = useAPI(api.getISCCCertificates)
   const [requestAddISCC, resolveAddISCC] = useAPI(api.addISCCCertificate)
   const [requestDelISCC, resolveDelISCC] = useAPI(api.deleteISCCCertificate)
+  const [requestUpdateISCC, resolveUpdateISCC] = useAPI(api.updateISCCCertificate) // prettier-ignore
 
   const entityID = entity?.id
   const certificates = requestGetISCC.data ?? []
 
   const isLoading =
-    requestGetISCC.loading || requestAddISCC.loading || requestDelISCC.loading
+    requestGetISCC.loading ||
+    requestAddISCC.loading ||
+    requestDelISCC.loading ||
+    requestUpdateISCC.loading
 
   const isEmpty = certificates.length === 0
 
@@ -39,7 +44,7 @@ export default function useISCCCertificates(
 
   async function addISCCCertificate() {
     const data = await prompt(
-      "Ajouter un certificat ISCC",
+      "Ajout certificat ISCC",
       "Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond.",
       ISCCPrompt
     )
@@ -63,6 +68,22 @@ export default function useISCCCertificates(
     }
   }
 
+  async function updateISCCCertificate(iscc: ISCCCertificate) {
+    const data = await prompt(
+      "Mise à jour certificat ISCC",
+      "Veuillez sélectionner un nouveau certificat pour remplacer l'ancien.",
+      ISCCPrompt
+    )
+
+    if (entityID && data) {
+      resolveUpdateISCC(
+        entityID,
+        iscc.certificate_id,
+        data.certificate_id
+      ).then(refresh)
+    }
+  }
+
   useEffect(() => {
     if (entityID) {
       resolveGetISCC(entityID)
@@ -75,5 +96,6 @@ export default function useISCCCertificates(
     certificates,
     addISCCCertificate,
     deleteISCCCertificate,
+    updateISCCCertificate,
   }
 }
