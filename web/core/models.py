@@ -628,9 +628,6 @@ class ProductionSiteCertificate(models.Model):
     certificate_iscc = models.ForeignKey(EntityISCCTradingCertificate, null=True, blank=True, on_delete=models.CASCADE)
     certificate_2bs = models.ForeignKey(EntityDBSTradingCertificate, null=True, blank=True, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.certificate_id
-
     def natural_key(self):
         return {'type': self.type, 'certificate_id': self.certificate_iscc.certificate.certificate_id if self.type == 'ISCC' else self.certificate_2bs.certificate.certificate_id}
 
