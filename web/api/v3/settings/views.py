@@ -469,7 +469,7 @@ def get_iscc_certificates(request, *args, **kwargs):
     context = kwargs['context']
     one_year_ago = datetime.datetime.now() - relativedelta(years=1)
     objects = EntityISCCTradingCertificate.objects.filter(entity=context['entity'], certificate__valid_until__gte=one_year_ago)[:100]
-    sez = [o.certificate.natural_key() for o in objects]
+    sez = [o.natural_key() for o in objects]
     return JsonResponse({'status': 'success', 'data': sez})
 
 
@@ -478,7 +478,7 @@ def get_2bs_certificates(request, *args, **kwargs):
     context = kwargs['context']
     one_year_ago = datetime.datetime.now() - relativedelta(years=1)
     objects = EntityDBSTradingCertificate.objects.filter(entity=context['entity'], certificate__valid_until__gte=one_year_ago)[:100]
-    sez = [o.certificate.natural_key() for o in objects]
+    sez = [o.natural_key() for o in objects]
     return JsonResponse({'status': 'success', 'data': sez})
 
 
@@ -642,14 +642,14 @@ def update_iscc_certificate(request, *args, **kwargs):
 
     # find old certificate
     try:
-        old_certificate = ISCCCertificate.objects.get(certificate_id=old_certificate_id)
+        old_certificate = EntityISCCTradingCertificate.objects.get(certificate__certificate_id=old_certificate_id)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find old requested certificate"}, status=400)    
 
     # then update previously linked certificates
     old_certificate.has_been_updated = True
     old_certificate.save()    
-    ProductionSiteCertificate.objects.filter(entity=entity, type='ISCC', certificate_iscc__certificate=old_certificate).update(certificate_iscc=new_certificate)
+    ProductionSiteCertificate.objects.filter(entity=entity, type='ISCC', certificate_iscc=old_certificate).update(certificate_iscc=new_certificate)
     return JsonResponse({'status': 'success'})
 
 
@@ -674,13 +674,13 @@ def update_2bs_certificate(request, *args, **kwargs):
 
     # find old certificate
     try:
-        old_certificate = DBSCertificate.objects.get(certificate_id=old_certificate_id)
+        old_certificate = EntityDBSTradingCertificate.objects.get(certificate__certificate_id=old_certificate_id)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find old requested certificate"}, status=400)    
 
     # then update previously linked certificates
     old_certificate.has_been_updated = True
     old_certificate.save()
-    ProductionSiteCertificate.objects.filter(entity=entity, type='2BS', certificate_2bs__certificate=old_certificate).update(certificate_2bs=new_certificate)
+    ProductionSiteCertificate.objects.filter(entity=entity, type='2BS', certificate_2bs=old_certificate).update(certificate_2bs=new_certificate)
     return JsonResponse({'status': 'success'})
 
