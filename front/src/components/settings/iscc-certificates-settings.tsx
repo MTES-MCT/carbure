@@ -10,7 +10,7 @@ import { Alert } from "../system/alert"
 import { SectionHeader, SectionBody, Section } from "../system/section"
 import { DialogButtons, PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete } from "../system/autocomplete"
-import { EMPTY_COLUMN, expiration, SettingsForm } from "."
+import { EMPTY_COLUMN, ExpirationDate, SettingsForm } from "."
 import Table, { Actions, Column, Line } from "../system/table"
 
 export const ISCCPrompt = ({
@@ -29,7 +29,9 @@ export const ISCCPrompt = ({
         getQuery={common.findISCCCertificates}
         onChange={(e: any) => setCertificate(e.target.value)}
         getValue={(c) => c?.certificate_id ?? ""}
-        getLabel={(c) => c?.certificate_id + " - " + c?.certificate_holder ?? ""}
+        getLabel={(c) =>
+          c?.certificate_id + " - " + c?.certificate_holder ?? ""
+        }
       />
 
       <DialogButtons>
@@ -51,7 +53,7 @@ const COLUMNS: Column<ISCCCertificate>[] = [
   EMPTY_COLUMN,
   { header: "ID", render: (c) => <Line text={c.certificate_id} /> },
   { header: "Détenteur", render: (c) => <Line text={c.certificate_holder} /> },
-  { header: "Valide jusqu'au", render: (c) => <Line text={expiration(c)} /> },
+  { header: "Périmètre", render: (c) => <Line text={c.scope.join(", ")} /> },
 ]
 
 type ISCCCertificateSettingsProps = {
@@ -61,8 +63,17 @@ type ISCCCertificateSettingsProps = {
 const ISCCCertificateSettings = ({
   settings,
 }: ISCCCertificateSettingsProps) => {
-  const columns = [
+  const columns: Column<ISCCCertificate>[] = [
     ...COLUMNS,
+    {
+      header: "Valide jusqu'au",
+      render: (c) => (
+        <ExpirationDate
+          date={c.valid_until}
+          onUpdate={() => settings.updateISCCCertificate(c)}
+        />
+      ),
+    },
     Actions([
       {
         icon: Cross,

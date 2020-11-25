@@ -203,3 +203,10 @@ export const Edit = ({ className, ...props }: IconProps) => (
     <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
   </Icon>
 )
+
+export const Refresh = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-refresh", className)}>
+    <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
+    <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
+  </Icon>
+)
