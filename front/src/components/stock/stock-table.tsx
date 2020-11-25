@@ -42,33 +42,31 @@ export const StockTable = ({
   const columns = []
   const default_columns = [
     C.origine,
-    C.vendor,
     C.biocarburant,
     C.matierePremiere,
     C.ghgReduction,
   ]
 
-  if (status.is(LotStatus.Draft)) {
+  if (status.is(LotStatus.ToSend)) {
     columns.push(C.selector(selection))
   }
 
   if (status.is(LotStatus.Inbox)) {
     columns.push(C.selector(selection))
-    columns.push(C.carbureID)
     columns.push(C.depot)
+    columns.push(C.vendor)
   }
 
   if (status.is(LotStatus.Stock)) {
     columns.push(C.empty)
-    columns.push(C.carbureID)
     columns.push(C.depot)
   }
 
   columns.push(...default_columns)
 
-  if (status.is(LotStatus.Draft)) {
+  if (status.is(LotStatus.ToSend)) {
     columns.push(C.client)
-    columns.push(C.deliverySite)
+    columns.push(C.destination)
   }
 
   if (status.is(LotStatus.Stock)) {

@@ -42,7 +42,7 @@ def get_stocks(request):
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     if entity.entity_type in ['Producteur', 'Trader']:
-        if status == "draft":
+        if status == "tosend":
             txs = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
         elif status == "in":
             txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AC', 'AA'])
@@ -128,7 +128,7 @@ def get_snapshot(request):
         inbox = len(tx_inbox)
         tx_stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0)
         stock = len(tx_stock)
-        data['lots'] = {'draft': draft, 'in': inbox,  'stock': stock}
+        data['lots'] = {'in': inbox,  'stock': stock, 'tosend': draft}
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
 

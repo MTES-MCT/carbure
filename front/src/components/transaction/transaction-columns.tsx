@@ -87,7 +87,7 @@ export const productionSite: Column<Transaction> = {
 }
 
 export const origine: Column<Transaction> = {
-  header: "Cert. Producteur",
+  header: "Usine",
   render: (tx) => (
     <TwoLines
       text={tx.lot.carbure_production_site?.name ?? tx.lot.unknown_production_site_reference} // prettier-ignore
@@ -110,6 +110,18 @@ export const deliverySite: Column<Transaction> = {
 
 export const depot: Column<Transaction> = {
   header: "Dépôt",
+  render: (tx) => {
+    const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
+    const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name ?? '' // prettier-ignore
+    const city = tx.carbure_delivery_site?.city
+    const location = city ? `${country}, ${city}` : country
+
+    return <TwoLines text={name} sub={location} />
+  },  
+}
+
+export const destination: Column<Transaction> = {
+  header: "Destination",
   render: (tx) => {
     const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
     const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name ?? '' // prettier-ignore
