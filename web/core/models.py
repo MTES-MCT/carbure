@@ -579,6 +579,7 @@ class DBSCertificateScope(models.Model):
 class EntityISCCTradingCertificate(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     certificate = models.ForeignKey(ISCCCertificate, on_delete=models.CASCADE)
+    has_been_updated = models.BooleanField(default=False)
 
     def __str__(self):
         return self.certificate.certificate_id
@@ -592,6 +593,7 @@ class EntityISCCTradingCertificate(models.Model):
 class EntityDBSTradingCertificate(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     certificate = models.ForeignKey(DBSCertificate, on_delete=models.CASCADE)
+    has_been_updated = models.BooleanField(default=False)
 
     def __str__(self):
         return self.certificate.certificate_id

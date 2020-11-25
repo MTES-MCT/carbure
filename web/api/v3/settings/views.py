@@ -632,8 +632,6 @@ def update_iscc_certificate(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Please provide an old_certificate_id'}, status=400)
     if not new_certificate_id:
         return JsonResponse({'status': 'error', 'message': 'Please provide an new_certificate_id'}, status=400)        
-    if not certificate_type:
-        return JsonResponse({'status': 'error', 'message': 'Please provide a certificate_type'}, status=400)
 
     # first, add the new certificate to the account
     try:
@@ -650,6 +648,8 @@ def update_iscc_certificate(request, *args, **kwargs):
 
     # then update previously linked certificates
     ProductionSiteCertificate.objects.filter(entity=entity, type='ISCC', certificate_iscc=old_certificate).update(certificate_iscc=new_certificate)
+    old_certificate.has_been_updated = True
+    old_certificate.save()    
     return JsonResponse({'status': 'success'})
 
 
@@ -664,8 +664,6 @@ def update_2bs_certificate(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Please provide an old_certificate_id'}, status=400)
     if not new_certificate_id:
         return JsonResponse({'status': 'error', 'message': 'Please provide an new_certificate_id'}, status=400)        
-    if not certificate_type:
-        return JsonResponse({'status': 'error', 'message': 'Please provide a certificate_type'}, status=400)
 
     # first, add the new certificate to the account
     try:
@@ -682,5 +680,7 @@ def update_2bs_certificate(request, *args, **kwargs):
 
     # then update previously linked certificates
     ProductionSiteCertificate.objects.filter(entity=entity, type='2BS', certificate_2bs=old_certificate).update(certificate_2bs=new_certificate)
+    old_certificate.has_been_updated = True
+    old_certificate.save()
     return JsonResponse({'status': 'success'})
 
