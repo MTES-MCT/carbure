@@ -100,7 +100,16 @@ function useAdjustPosition(
   }, [setPosition, parent, above, end])
 }
 
-export function useDropdown() {
+function isInside(container?: Element | null, element?: EventTarget | null) {
+  return (
+    element &&
+    container &&
+    element instanceof Element &&
+    container.contains(element)
+  )
+}
+
+export function useDropdown(target?: Element | null) {
   const [isOpen, setOpen] = useState(false)
 
   function toggle(value?: any) {
@@ -115,22 +124,26 @@ export function useDropdown() {
   useEffect(() => {
     if (!isOpen) return
 
-    const close = () => setOpen(false)
-
-    function onCloseKey(e: KeyboardEvent) {
-      if (["Escape", "Tab"].includes(e.key)) {
-        close()
+    function onCloseClick(e: MouseEvent) {
+      if (!isInside(target, e.target)) {
+        setOpen(false)
       }
     }
 
-    window.addEventListener("click", close)
+    function onCloseKey(e: KeyboardEvent) {
+      if (["Escape", "Tab"].includes(e.key)) {
+        setOpen(false)
+      }
+    }
+
+    window.addEventListener("click", onCloseClick)
     window.addEventListener("keydown", onCloseKey)
 
     return () => {
-      window.removeEventListener("click", close)
+      window.removeEventListener("click", onCloseClick)
       window.removeEventListener("keydown", onCloseKey)
     }
-  }, [isOpen])
+  }, [isOpen, target])
 
   return { isOpen, toggle }
 }

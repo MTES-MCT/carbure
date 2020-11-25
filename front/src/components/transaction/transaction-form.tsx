@@ -99,6 +99,7 @@ const TransactionForm = ({
             error={fieldErrors.biocarburant_code}
             getValue={getters.code}
             getLabel={getters.name}
+            minLength={0}
             getQuery={findBiocarburants}
             onChange={onChange}
           />
@@ -111,6 +112,7 @@ const TransactionForm = ({
             error={fieldErrors.matiere_premiere_code}
             getValue={getters.code}
             getLabel={getters.name}
+            minLength={0}
             getQuery={findMatieresPremieres}
             onChange={onChange}
           />
@@ -168,6 +170,7 @@ const TransactionForm = ({
                 error={fieldErrors.production_site}
                 getValue={getters.id}
                 getLabel={getters.name}
+                minLength={0}
                 getQuery={findProductionSites}
                 queryArgs={[tx.carbure_producer?.id]}
                 onChange={onChange}
