@@ -12,7 +12,7 @@ import { SectionHeader, SectionBody, Section } from "../system/section"
 import { DialogButtons, PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete } from "../system/autocomplete"
 import Table, { Actions, Column, Line } from "../system/table"
-import { EMPTY_COLUMN, expiration, SettingsForm } from "."
+import { EMPTY_COLUMN, ExpirationDate, SettingsForm } from "."
 
 export const DBSPrompt = ({
   onConfirm,
@@ -53,9 +53,9 @@ export const DBSPrompt = ({
 const COLUMNS: Column<DBSCertificate>[] = [
   EMPTY_COLUMN,
   { header: "ID", render: (c) => <Line text={c.certificate_id} /> },
-  { header: "Périmètre", render: (c) => <Line text={c.scope.join(", ")} /> },
   { header: "Détenteur", render: (c) => <Line text={c.certificate_holder} /> },
-  { header: "Valide jusqu'au", render: (c) => <Line text={expiration(c)} /> },
+  { header: "Périmètre", render: (c) => <Line text={c.scope.join(", ")} /> },
+  { header: "Valide jusqu'au", render: (c) => <ExpirationDate date={c.valid_until} /> }, // prettier-ignore
 ]
 
 type DBSCertificateSettingsProps = {

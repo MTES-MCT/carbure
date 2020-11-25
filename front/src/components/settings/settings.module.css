@@ -61,3 +61,23 @@
   border-bottom: 1px solid var(--gray-highlight);
   margin: 16px 0;
 }
+
+.expirationDate {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.expirationDate.expired {
+  color: var(--orange-dark);
+}
+
+.expirationDate.expired button {
+  font-size: 14px;
+  margin-left: 12px;
+  padding: 4px 8px;
+}
+
+.expirationDate.expired button :global(.icon) {
+  width: 14px;
+}
