@@ -68,7 +68,7 @@ export const ExpirationDate = ({
         </React.Fragment>
       )}
 
-      {expired && updated && "Mis à jour"}
+      {expired && updated && `Mis à jour (${formatted})`}
 
       {!expired && formatted}
     </span>
