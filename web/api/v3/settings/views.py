@@ -510,29 +510,31 @@ def add_2bs_certificate(request, *args, **kwargs):
 
 @check_rights('entity_id')
 def delete_iscc_certificate(request, *args, **kwargs):
-    context = kwargs['context']
+    entity = kwargs['context']['entity']
     certificate_id = request.POST.get('certificate_id', False)
+    
     try:
         certificate = ISCCCertificate.objects.get(certificate_id=certificate_id)
+        EntityISCCTradingCertificate.objects.get(entity=entity, certificate=certificate).delete()
+        ProductionSiteCertificate.objects.filter(entity=entity, certificate_iscc__certificate=certificate).delete()
     except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Could not delete requested certificate"}, status=400)
 
-    EntityISCCTradingCertificate.objects.get(entity=context['entity'], certificate=certificate).delete()
-    ProductionSiteCertificate.objects.filter(entity=context['entity'], certificate_iscc=certificate).delete()
     return JsonResponse({'status': 'success'})
 
 
 @check_rights('entity_id')
 def delete_2bs_certificate(request, *args, **kwargs):
-    context = kwargs['context']
+    entity = kwargs['context']['entity']
     certificate_id = request.POST.get('certificate_id', False)
+    
     try:
         certificate = DBSCertificate.objects.get(certificate_id=certificate_id)
+        EntityDBSTradingCertificate.objects.get(entity=entity, certificate=certificate).delete()
+        ProductionSiteCertificate.objects.filter(entity=entity, certificate_2bs__certificate=certificate).delete()
     except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Could not delete requested certificate"}, status=400)
 
-    EntityDBSTradingCertificate.objects.get(entity=context['entity'], certificate=certificate).delete()
-    ProductionSiteCertificate.objects.filter(entity=context['entity'], certificate_2bs=certificate).delete()
     return JsonResponse({'status': 'success'})
 
 
