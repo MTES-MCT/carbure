@@ -5,6 +5,7 @@ import * as api from "../../services/settings"
 import { DBSCertificate } from "../../services/types"
 import useAPI from "../helpers/use-api"
 import { EntitySelection } from "../helpers/use-entity"
+import { ProductionSiteSettingsHook } from "./use-production-sites"
 
 export interface DBSCertificateSettingsHook {
   isEmpty: boolean
@@ -16,7 +17,8 @@ export interface DBSCertificateSettingsHook {
 }
 
 export default function use2BSCertificates(
-  entity: EntitySelection
+  entity: EntitySelection,
+  productionSites: ProductionSiteSettingsHook
 ): DBSCertificateSettingsHook {
   const [requestGet2BS, resolveGet2BS] = useAPI(api.get2BSCertificates)
   const [requestAdd2BS, resolveAdd2BS] = useAPI(api.add2BSCertificate)
@@ -60,7 +62,10 @@ export default function use2BSCertificates(
         `Voulez-vous vraiment supprimer le certificat 2BS "${dbs.certificate_id}" ?`
       ))
     ) {
-      resolveDel2BS(entityID, dbs.certificate_id).then(refresh)
+      resolveDel2BS(entityID, dbs.certificate_id).then(() => {
+        refresh()
+        productionSites.refresh()
+      })
     }
   }
 
@@ -72,9 +77,12 @@ export default function use2BSCertificates(
     )
 
     if (entityID && data) {
-      // prettier-ignore
-      resolveUpdate2BS(entityID, dbs.certificate_id, data.certificate_id)
-        .then(refresh)
+      resolveUpdate2BS(entityID, dbs.certificate_id, data.certificate_id).then(
+        () => {
+          refresh()
+          productionSites.refresh()
+        }
+      )
     }
   }
 

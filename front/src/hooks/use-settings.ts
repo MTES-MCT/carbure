@@ -14,8 +14,8 @@ export default function useSettings(
   const company = useCompany(entity, settings)
   const productionSites = useProductionSites(entity)
   const deliverySites = useDeliverySites(entity)
-  const dbsCertificates = use2BSCertificates(entity)
-  const isccCertificates = useISCCCertificates(entity)
+  const dbsCertificates = use2BSCertificates(entity, productionSites)
+  const isccCertificates = useISCCCertificates(entity, productionSites)
   const nationalSystemCertificates = useNationalSystemCertificates(entity, settings) // prettier-ignore
 
   return {
