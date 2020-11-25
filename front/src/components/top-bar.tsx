@@ -94,10 +94,10 @@ const Topbar = ({ entity, settings }: TopbarProps) => (
     <nav className={styles.pageNav}>
       {canTrade(entity) && <PageLink to="stocks">Stocks</PageLink>}
       <PageLink to="transactions">Transactions</PageLink>
-      <PageLink to="settings">Société</PageLink>
       {isAdmin(entity) && (
         <PageLink to="administration">Administration</PageLink>
       )}
+      <PageLink to="settings">Société</PageLink>
     </nav>
 
     <UserMenu settings={settings} entity={entity} />
