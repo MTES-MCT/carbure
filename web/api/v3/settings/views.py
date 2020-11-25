@@ -619,3 +619,68 @@ def delete_production_site_certificate(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
 
     return JsonResponse({'status': 'success'})
+
+
+@check_rights('entity_id')
+def update_iscc_certificate(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    old_certificate_id = request.POST.get('old_certificate_id', False)
+    new_certificate_id = request.POST.get('new_certificate_id', False)
+
+    if not old_certificate_id:
+        return JsonResponse({'status': 'error', 'message': 'Please provide an old_certificate_id'}, status=400)
+    if not new_certificate_id:
+        return JsonResponse({'status': 'error', 'message': 'Please provide an new_certificate_id'}, status=400)        
+    if not certificate_type:
+        return JsonResponse({'status': 'error', 'message': 'Please provide a certificate_type'}, status=400)
+
+    # first, add the new certificate to the account
+    try:
+        new_certificate = ISCCCertificate.objects.get(certificate_id=new_certificate_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find new requested certificate"}, status=400)
+    EntityISCCTradingCertificate.objects.update_or_create(entity=entity, certificate=new_certificate)    
+
+    # find old certificate
+    try:
+        old_certificate = ISCCCertificate.objects.get(certificate_id=old_certificate_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find old requested certificate"}, status=400)    
+
+    # then update previously linked certificates
+    ProductionSiteCertificate.objects.filter(entity=entity, type='ISCC', certificate_iscc=old_certificate).update(certificate_iscc=new_certificate)
+    return JsonResponse({'status': 'success'})
+
+
+@check_rights('entity_id')
+def update_2bs_certificate(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    old_certificate_id = request.POST.get('old_certificate_id', False)
+    new_certificate_id = request.POST.get('new_certificate_id', False)
+
+    if not old_certificate_id:
+        return JsonResponse({'status': 'error', 'message': 'Please provide an old_certificate_id'}, status=400)
+    if not new_certificate_id:
+        return JsonResponse({'status': 'error', 'message': 'Please provide an new_certificate_id'}, status=400)        
+    if not certificate_type:
+        return JsonResponse({'status': 'error', 'message': 'Please provide a certificate_type'}, status=400)
+
+    # first, add the new certificate to the account
+    try:
+        new_certificate = DBSCertificate.objects.get(certificate_id=new_certificate_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find new requested certificate"}, status=400)
+    EntityDBSTradingCertificate.objects.update_or_create(entity=entity, certificate=new_certificate)    
+
+    # find old certificate
+    try:
+        old_certificate = DBSCertificate.objects.get(certificate_id=old_certificate_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find old requested certificate"}, status=400)    
+
+    # then update previously linked certificates
+    ProductionSiteCertificate.objects.filter(entity=entity, type='2BS', certificate_2bs=old_certificate).update(certificate_2bs=new_certificate)
+    return JsonResponse({'status': 'success'})
+
