@@ -56,7 +56,7 @@ export const ExpirationDate = ({ date, onUpdate }: ExpirationDateProps) => {
     <span className={cl(styles.expirationDate, expired && styles.expired)}>
       {expired && (
         <React.Fragment>
-          Expiré depuis le {formatted}
+          Expiré ({formatted})
           <Button icon={Refresh} onClick={onUpdate}>
             Mise à jour
           </Button>
