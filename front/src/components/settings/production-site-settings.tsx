@@ -226,6 +226,7 @@ export const ProductionSitePromptFactory = (
             placeholder="Ajouter matières premières..."
             getValue={(o) => o?.code ?? ""}
             getLabel={(o) => o?.name ?? ""}
+            minLength={0}
             getQuery={common.findMatieresPremieres}
             onChange={onChange}
           />
@@ -237,6 +238,7 @@ export const ProductionSitePromptFactory = (
             placeholder="Ajouter biocarburants..."
             getValue={(o) => o.code}
             getLabel={(o) => o.name}
+            minLength={0}
             getQuery={common.findBiocarburants}
             onChange={onChange}
           />
@@ -251,6 +253,7 @@ export const ProductionSitePromptFactory = (
             value={form.certificates}
             getValue={(c) => c.certificate_id}
             getLabel={(c) => c.certificate_id + " - " + c.holder}
+            minLength={0}
             getQuery={findCertificates}
             queryArgs={[entity?.id]}
             onChange={onChange}

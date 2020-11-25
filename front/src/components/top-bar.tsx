@@ -79,7 +79,7 @@ function canTrade(entity: EntitySelection) {
 }
 
 function isAdmin(entity: EntitySelection) {
-  return entity && (entity.entity_type === "Administration")
+  return entity && entity.entity_type === "Administration"
 }
 
 type TopbarProps = {
@@ -94,8 +94,10 @@ const Topbar = ({ entity, settings }: TopbarProps) => (
     <nav className={styles.pageNav}>
       {canTrade(entity) && <PageLink to="stocks">Stocks</PageLink>}
       <PageLink to="transactions">Transactions</PageLink>
-      <PageLink to="settings">Paramètres</PageLink>
-      {isAdmin(entity) && <PageLink to="administration">Administration</PageLink>}
+      <PageLink to="settings">Société</PageLink>
+      {isAdmin(entity) && (
+        <PageLink to="administration">Administration</PageLink>
+      )}
     </nav>
 
     <UserMenu settings={settings} entity={entity} />

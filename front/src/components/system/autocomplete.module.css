@@ -4,7 +4,7 @@
   align-content: center;
   background-color: var(--white);
   border: 1px solid var(--gray-medium);
-  padding: 4px;
+  padding: 3px;
 }
 
 .multiWrapper:hover {
@@ -15,8 +15,8 @@
   display: flex;
   align-items: center;
   background: var(--blue-light);
-  padding: 0 8px;
-  margin: 4px;
+  padding: 2px 8px;
+  margin: 3px;
 }
 
 .multiValueDelete {
@@ -36,6 +36,5 @@
   background-color: transparent;
   outline: none;
   width: auto;
-  padding: 0;
-  margin: 6px;
+  padding: 7px;
 }

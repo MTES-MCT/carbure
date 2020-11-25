@@ -24,7 +24,7 @@ const CompanySettings = ({ entity, settings }: CompanySettingsProps) => {
   return (
     <Section>
       <SectionHeader>
-        <Title>Société</Title>
+        <Title>Options</Title>
       </SectionHeader>
 
       <SectionBody>
