@@ -62,6 +62,10 @@
   margin: 16px 0;
 }
 
+.expiredRow {
+  opacity: 0.5;
+}
+
 .expirationDate {
   display: flex;
   align-items: center;

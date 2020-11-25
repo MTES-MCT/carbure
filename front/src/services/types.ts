@@ -297,6 +297,7 @@ export type DBSCertificate = {
   valid_until: string
   certification_type: string
   scope: string[]
+  has_been_updated: boolean
 }
 
 export type ISCCCertificate = {
@@ -307,6 +308,7 @@ export type ISCCCertificate = {
   valid_until: string
   issuing_cb: string
   scope: string[]
+  has_been_updated: boolean
 }
 
 export type Certificate = {

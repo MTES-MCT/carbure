@@ -1,6 +1,9 @@
 import React, { useState } from "react"
+import cl from "clsx"
 import { ISCCCertificateSettingsHook } from "../../hooks/settings/use-iscc-certificates"
 import { ISCCCertificate } from "../../services/types"
+
+import styles from "./settings.module.css"
 
 import * as common from "../../services/common"
 
@@ -70,6 +73,7 @@ const ISCCCertificateSettings = ({
       render: (c) => (
         <ExpirationDate
           date={c.valid_until}
+          updated={c.has_been_updated}
           onUpdate={() => settings.updateISCCCertificate(c)}
         />
       ),
@@ -83,7 +87,10 @@ const ISCCCertificateSettings = ({
     ]),
   ]
 
-  const rows = settings.certificates.map((c) => ({ value: c }))
+  const rows = settings.certificates.map((c) => ({
+    value: c,
+    className: cl(c.has_been_updated && styles.expiredRow),
+  }))
 
   return (
     <Section>
