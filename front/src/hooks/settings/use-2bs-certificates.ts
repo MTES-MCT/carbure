@@ -12,6 +12,7 @@ export interface DBSCertificateSettingsHook {
   certificates: DBSCertificate[]
   add2BSCertificate: () => void
   delete2BSCertificate: (d: DBSCertificate) => void
+  update2BSCertificate: (d: DBSCertificate) => void
 }
 
 export default function use2BSCertificates(
@@ -20,12 +21,16 @@ export default function use2BSCertificates(
   const [requestGet2BS, resolveGet2BS] = useAPI(api.get2BSCertificates)
   const [requestAdd2BS, resolveAdd2BS] = useAPI(api.add2BSCertificate)
   const [requestDel2BS, resolveDel2BS] = useAPI(api.delete2BSCertificate)
+  const [requestUpdate2BS, resolveUpdate2BS] = useAPI(api.update2BSCertificate)
 
   const entityID = entity?.id
   const certificates = requestGet2BS.data ?? []
 
   const isLoading =
-    requestGet2BS.loading || requestAdd2BS.loading || requestDel2BS.loading
+    requestGet2BS.loading ||
+    requestAdd2BS.loading ||
+    requestDel2BS.loading ||
+    requestUpdate2BS.loading
 
   const isEmpty = certificates.length === 0
 
@@ -37,7 +42,7 @@ export default function use2BSCertificates(
 
   async function add2BSCertificate() {
     const data = await prompt(
-      "Ajouter un certificat 2BS",
+      "Ajout certificat 2BS",
       "Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond.",
       DBSPrompt
     )
@@ -59,6 +64,20 @@ export default function use2BSCertificates(
     }
   }
 
+  async function update2BSCertificate(dbs: DBSCertificate) {
+    const data = await prompt(
+      "Mise à jour certificat 2BS",
+      "Veuillez sélectionner un nouveau certificat pour remplacer l'ancien.",
+      DBSPrompt
+    )
+
+    if (entityID && data) {
+      // prettier-ignore
+      resolveUpdate2BS(entityID, dbs.certificate_id, data.certificate_id)
+        .then(refresh)
+    }
+  }
+
   useEffect(() => {
     if (entityID) {
       resolveGet2BS(entityID)
@@ -71,5 +90,6 @@ export default function use2BSCertificates(
     certificates,
     add2BSCertificate,
     delete2BSCertificate,
+    update2BSCertificate,
   }
 }

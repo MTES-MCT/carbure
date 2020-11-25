@@ -55,7 +55,6 @@ const COLUMNS: Column<DBSCertificate>[] = [
   { header: "ID", render: (c) => <Line text={c.certificate_id} /> },
   { header: "Détenteur", render: (c) => <Line text={c.certificate_holder} /> },
   { header: "Périmètre", render: (c) => <Line text={c.scope.join(", ")} /> },
-  { header: "Valide jusqu'au", render: (c) => <ExpirationDate date={c.valid_until} /> }, // prettier-ignore
 ]
 
 type DBSCertificateSettingsProps = {
@@ -63,8 +62,17 @@ type DBSCertificateSettingsProps = {
 }
 
 const DBSCertificateSettings = ({ settings }: DBSCertificateSettingsProps) => {
-  const columns = [
+  const columns: Column<DBSCertificate>[] = [
     ...COLUMNS,
+    {
+      header: "Valide jusqu'au",
+      render: (c) => (
+        <ExpirationDate
+          date={c.valid_until}
+          onUpdate={() => settings.update2BSCertificate(c)}
+        />
+      ),
+    },
     Actions([
       {
         icon: Cross,

@@ -7,6 +7,7 @@ import cl from "clsx"
 import styles from "./settings.module.css"
 import { Box, BoxProps, Button } from "../system"
 import { Refresh } from "../system/icons"
+import { DBSCertificate, ISCCCertificate } from "../../services/types"
 
 export function formatDate(str: string) {
   try {
@@ -42,7 +43,12 @@ export const SettingsForm = (props: BoxProps) => (
   <Box {...props} as="form" className={styles.settingsForm} />
 )
 
-export const ExpirationDate = ({ date }: { date: string }) => {
+type ExpirationDateProps = {
+  date: string
+  onUpdate: () => void
+}
+
+export const ExpirationDate = ({ date, onUpdate }: ExpirationDateProps) => {
   const expired = isExpired(date)
   const formatted = formatDate(date)
 
@@ -51,7 +57,9 @@ export const ExpirationDate = ({ date }: { date: string }) => {
       {expired && (
         <React.Fragment>
           Expiré depuis le {formatted}
-          <Button icon={Refresh}>Mise à jour</Button>
+          <Button icon={Refresh} onClick={onUpdate}>
+            Mise à jour
+          </Button>
         </React.Fragment>
       )}
 

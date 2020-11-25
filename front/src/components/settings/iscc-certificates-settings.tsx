@@ -54,7 +54,6 @@ const COLUMNS: Column<ISCCCertificate>[] = [
   { header: "ID", render: (c) => <Line text={c.certificate_id} /> },
   { header: "Détenteur", render: (c) => <Line text={c.certificate_holder} /> },
   { header: "Périmètre", render: (c) => <Line text={c.scope.join(", ")} /> },
-  { header: "Valide jusqu'au", render: (c) => <ExpirationDate date={c.valid_until} /> }, // prettier-ignore
 ]
 
 type ISCCCertificateSettingsProps = {
@@ -64,8 +63,17 @@ type ISCCCertificateSettingsProps = {
 const ISCCCertificateSettings = ({
   settings,
 }: ISCCCertificateSettingsProps) => {
-  const columns = [
+  const columns: Column<ISCCCertificate>[] = [
     ...COLUMNS,
+    {
+      header: "Valide jusqu'au",
+      render: (c) => (
+        <ExpirationDate
+          date={c.valid_until}
+          onUpdate={() => settings.updateISCCCertificate(c)}
+        />
+      ),
+    },
     Actions([
       {
         icon: Cross,

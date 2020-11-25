@@ -246,6 +246,18 @@ export function deleteISCCCertificate(
   })
 }
 
+export function updateISCCCertificate(
+  entity_id: number,
+  old_certificate_id: string,
+  new_certificate_id: string
+) {
+  return api.post("/settings/update-iscc-certificate", {
+    entity_id,
+    old_certificate_id,
+    new_certificate_id,
+  })
+}
+
 export function get2BSCertificates(
   entityID: number
 ): Promise<DBSCertificate[]> {
@@ -265,5 +277,17 @@ export function delete2BSCertificate(entityID: number, certificate_id: string) {
   return api.post("/settings/delete-2bs-certificate", {
     entity_id: entityID,
     certificate_id: certificate_id,
+  })
+}
+
+export function update2BSCertificate(
+  entity_id: number,
+  old_certificate_id: string,
+  new_certificate_id: string
+) {
+  return api.post("/settings/update-2bs-certificate", {
+    entity_id,
+    old_certificate_id,
+    new_certificate_id,
   })
 }
