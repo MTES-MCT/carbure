@@ -19,6 +19,7 @@ const STATUS_ORDER = [
   LotStatus.Stock,
   LotStatus.Accepted,
   LotStatus.Weird,
+  LotStatus.ToSend,
 ]
 
 const STATUS_LABEL = {
@@ -29,6 +30,7 @@ const STATUS_LABEL = {
   [LotStatus.Weird]: { singular: "Lot incohérent", plural: "Lots incohérents" },
   [LotStatus.Inbox]: { singular: "Lot reçu", plural: "Lots reçus" },
   [LotStatus.Stock]: { singular: "Lot en stock", plural: "Lots en stock" },
+  [LotStatus.ToSend]: { singular: "Lot à envoyer", plural: "Lots à envoyer" },
 }
 
 export function mapStatus(

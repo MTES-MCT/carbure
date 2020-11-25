@@ -13,6 +13,7 @@ export enum LotStatus {
   Weird = "weird",
   Stock = "stock",
   Inbox = "in",
+  ToSend = "tosend",
 }
 
 export enum GESOption {
