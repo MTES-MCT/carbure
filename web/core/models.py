@@ -589,6 +589,11 @@ class EntityISCCTradingCertificate(models.Model):
     def __str__(self):
         return self.certificate.certificate_id
 
+    def natural_key(self):
+        data = self.certificate.natural_key()
+        data['has_been_updated'] = self.has_been_updated
+        return data
+
     class Meta:
         db_table = 'entity_iscc_trading_certificates'
         verbose_name = 'Certificat de Trading ISCC'
@@ -602,6 +607,11 @@ class EntityDBSTradingCertificate(models.Model):
 
     def __str__(self):
         return self.certificate.certificate_id
+
+    def natural_key(self):
+        data = self.certificate.natural_key()
+        data['has_been_updated'] = self.has_been_updated
+        return data
 
     class Meta:
         db_table = 'entity_2bs_trading_certificates'
