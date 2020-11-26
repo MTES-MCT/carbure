@@ -48,7 +48,7 @@ div.pendingAlert {
 }
 
 .faqIcon {
-  border: 1px solid var(--blue-medium);
+  border: 2px solid var(--blue-dark);
   border-radius: 50%;
 }
 

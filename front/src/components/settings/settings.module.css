@@ -42,6 +42,10 @@
   width: 600px;
 }
 
+.settingsForm a {
+  margin: 16px 0;
+}
+
 .settingsForm > div > label {
   flex: 1;
 }
