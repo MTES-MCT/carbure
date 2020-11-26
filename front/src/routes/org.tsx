@@ -37,7 +37,7 @@ const Org = ({ app }: MainProps) => {
 
       <Switch>
         <Route relative exact path="account">
-          <Account />
+          <Account settings={app.settings} />
         </Route>
 
         <Route relative exact path="../pending">
