@@ -71,16 +71,14 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border: 3px solid var(--black);
+  color: var(--blue-medium);
+  border: 3px solid var(--blue-medium);
   border-radius: 50%;
-  color: var(--black);
-  opacity: 0.5;
+  opacity: 0.45;
   margin-left: 42px;
   margin-right: -78px;
 }
 
 .faq:hover {
-  color: var(--blue-medium);
-  border-color: var(--blue-medium);
   opacity: 1;
 }
