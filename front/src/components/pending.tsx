@@ -2,7 +2,8 @@ import React from "react"
 import styles from "./pending.module.css"
 import { Link } from "./relative-route"
 import { Box, Main, Title } from "./system"
-import { AlertTriangle } from "./system/icons"
+import { Alert } from "./system/alert"
+import { AlertTriangle, Question } from "./system/icons"
 
 const Pending = () => (
   <Main className={styles.container}>
@@ -12,18 +13,61 @@ const Pending = () => (
     </p>
 
     <Box className={styles.accountMessage}>
-      <span>
-        <AlertTriangle className={styles.alertIcon} />
-        Il semblerait que votre compte ne soit lié à aucune entité enregistrée
-        sur CarbuRe.
-      </span>
+      <Alert level="warning" className={styles.pendingAlert}>
+        <span>
+          <AlertTriangle className={styles.alertIcon} />
+          Il semblerait que votre compte ne soit lié à aucune entité enregistrée
+          sur CarbuRe.
+        </span>
 
-      <span>
-        Veuillez vous rendre vous sur le menu
-        <Link relative to="account" className={styles.accountLink}>
-          Mon Compte
-        </Link>
-        pour effectuer une demande d'accès.
+        <span>
+          Veuillez vous rendre vous sur la page
+          <Link relative to="account" className={styles.link}>
+            Mon Compte
+          </Link>
+          du menu pour effectuer une demande d'accès.
+        </span>
+      </Alert>
+
+      <Alert level="info" className={styles.pendingAlert}>
+        <span>
+          <Question className={styles.faqIcon} />
+          Vous avez des questions concernant le fonctionnement de CarbuRe ?
+        </span>
+        <span>
+          <a
+            href="/faq"
+            target="_blank"
+            rel="noreferrer"
+            className={styles.link}
+          >
+            Notre FAQ
+          </a>{" "}
+          contient de nombreuses ressources pouvant vous aider dans votre
+          utilisation du produit.
+        </span>
+      </Alert>
+
+      <span className={styles.info}>
+        Pour plus d'informations contactez nous sur
+        <a
+          href="https://carbure-beta-gouv.slack.com/"
+          target="_blank"
+          rel="noreferrer"
+          className={styles.link}
+        >
+          le Slack de CarbuRe
+        </a>
+        ou par e-mail à l'addresse
+        <a
+          href="mailto:carbure@beta.gouv.fr"
+          target="_blank"
+          rel="noreferrer"
+          className={styles.link}
+        >
+          carbure@beta.gouv.fr
+        </a>
+        .
       </span>
     </Box>
   </Main>
