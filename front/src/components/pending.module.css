@@ -13,14 +13,16 @@ p.subtitle {
   font-size: 24px;
   color: var(--gray-dark);
   margin-top: 24px;
+  margin-bottom: 0;
 }
 
 div.accountMessage {
   align-items: center;
-  margin-top: 64px;
+  margin-top: 48px;
 }
 
-div.accountMessage span {
+div.accountMessage span,
+div.pendingAlert span {
   display: inline-flex;
   align-items: center;
   font-size: 18px;
@@ -28,13 +30,31 @@ div.accountMessage span {
   text-align: center;
 }
 
-.alertIcon {
+div.pendingAlert span:last-child {
+  margin-bottom: 0;
+}
+
+div.pendingAlert {
+  flex-direction: column;
+  padding: 24px 32px;
+  width: 864px;
+  margin-bottom: 48px;
+}
+
+.alertIcon,
+.faqIcon {
   color: var(--gray-dark);
   margin-right: 12px;
 }
 
-.accountLink {
+.faqIcon {
+  border: 1px solid var(--blue-medium);
+  border-radius: 50%;
+}
+
+.link {
   color: var(--blue-medium);
   text-decoration: underline;
-  margin: 0 8px;
+  margin: 0 6px;
+  flex-shrink: 0;
 }
