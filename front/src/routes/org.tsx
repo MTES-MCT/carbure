@@ -7,18 +7,27 @@ import useEntity from "../hooks/helpers/use-entity"
 import { Redirect, Route, Switch } from "../components/relative-route"
 import Topbar from "../components/top-bar"
 import Footer from "../components/footer"
+import Exit from "../components/exit"
 import Transactions from "./transactions"
 import Stocks from "./stock"
 import Settings from "./settings"
+import Pending from "./pending"
+import Account from "./account"
 
 type MainProps = {
   app: AppHook
 }
 
 const Org = ({ app }: MainProps) => {
-  const entity = useEntity(app)
+  const { entity, pending } = useEntity(app)
 
-  if (!entity) {
+  // a user with entities tries to access the pending or another entity's page
+  if (app.hasEntities() && !entity) {
+    return <Redirect to="/" />
+  }
+
+  // a user with no entities tries to access an entity page
+  if (!app.hasEntities() && !pending) {
     return <Redirect to="/" />
   }
 
@@ -27,7 +36,17 @@ const Org = ({ app }: MainProps) => {
       <Topbar entity={entity} settings={app.settings} />
 
       <Switch>
-        <Route relative exact path="administration" render={() => (window.location.pathname = "/administrators/")} />
+        <Route relative exact path="account">
+          <Account />
+        </Route>
+
+        <Route relative exact path="../pending">
+          <Pending />
+        </Route>
+
+        <Route relative exact path="administration">
+          <Exit to="/administrators/" />
+        </Route>
 
         <Route relative exact path="stocks">
           <Redirect relative to="draft" />
@@ -51,6 +70,7 @@ const Org = ({ app }: MainProps) => {
 
         <Redirect relative to="transactions" />
       </Switch>
+
       <Footer />
     </React.Fragment>
   )
