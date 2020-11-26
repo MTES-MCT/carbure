@@ -45,9 +45,11 @@ def raise_error(lot, rule_triggered, details=''):
          }
     return LotValidationError(**d)
 
-def bulk_sanity_checks(lots):
+def bulk_sanity_checks(lots, background=True):
     results = []
     errors = []
+    if background == True:
+        db.connections.close_all()
     print('starting bulk_sanity_check %s' % (datetime.datetime.now()))
     # cleanup previous errors
     LotValidationError.objects.filter(lot__in=lots).delete()
