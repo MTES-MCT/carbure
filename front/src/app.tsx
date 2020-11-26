@@ -4,23 +4,26 @@ import { BrowserRouter } from "react-router-dom"
 import useApp from "./hooks/use-app"
 
 import { Redirect, Route, Switch } from "./components/relative-route"
-import Exit from "./components/exit"
 
 import Logout from "./routes/logout"
 import Org from "./routes/org"
+import { Alert } from "./components/system/alert"
+import { AlertTriangle } from "./components/system/icons"
 
 const App = () => {
   const app = useApp()
   const { settings, getDefaultEntity } = app
 
-  if (settings.error) {
-    return <Exit to="/" />
-  }
-
   return (
     <BrowserRouter basename="/v2">
       <div id="app">
-        {settings.data && (
+        {settings.error && (
+          <Alert level="error" icon={AlertTriangle}>
+            {settings.error}
+          </Alert>
+        )}
+
+        {!settings.error && settings.data && (
           <Switch>
             <Route path="/org/:entity">
               <Org app={app} />
