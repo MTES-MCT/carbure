@@ -1,0 +1,40 @@
+.container {
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  padding: 32px 120px;
+}
+
+h1.welcome {
+  font-size: 48px;
+}
+
+p.subtitle {
+  font-size: 24px;
+  color: var(--gray-dark);
+  margin-top: 24px;
+}
+
+div.accountMessage {
+  align-items: center;
+  margin-top: 64px;
+}
+
+div.accountMessage span {
+  display: inline-flex;
+  align-items: center;
+  font-size: 18px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.alertIcon {
+  color: var(--gray-dark);
+  margin-right: 12px;
+}
+
+.accountLink {
+  color: var(--blue-medium);
+  text-decoration: underline;
+  margin: 0 8px;
+}
