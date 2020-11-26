@@ -7,11 +7,11 @@ import useEntity from "../hooks/helpers/use-entity"
 import { Redirect, Route, Switch } from "../components/relative-route"
 import Topbar from "../components/top-bar"
 import Footer from "../components/footer"
+import Pending from "../components/pending"
 import Exit from "../components/exit"
 import Transactions from "./transactions"
 import Stocks from "./stock"
 import Settings from "./settings"
-import Pending from "./pending"
 import Account from "./account"
 
 type MainProps = {
