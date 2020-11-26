@@ -473,7 +473,7 @@ def update_lot(request):
         tx.save()
         LotV2Error.objects.bulk_create(lot_errors)
         TransactionError.objects.bulk_create(tx_errors)       
-        bulk_sanity_checks([tx.lot])
+        bulk_sanity_checks([tx.lot], background=False)
         return JsonResponse({'status': 'success'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Could not save lot: %s' % (lot_errors)})
