@@ -12,6 +12,7 @@ import logoBetaGouv from "../assets/images/betagouvfr.svg"
 
 import Menu from "./system/menu"
 import { Link, NavLink } from "./relative-route"
+import { Question } from "./system/icons"
 
 const Logo = () => (
   <Link to="/" className={styles.logo}>
@@ -109,6 +110,16 @@ const Topbar = ({ entity, settings }: TopbarProps) => (
     </nav>
 
     <UserMenu settings={settings} entity={entity} />
+
+    <a
+      href="/"
+      target="_blank"
+      rel="noreferrer"
+      title="FAQ"
+      className={styles.faq}
+    >
+      <Question />
+    </a>
   </header>
 )
 
