@@ -5,12 +5,13 @@ from django.db.models import Q, F, Case, When, Count
 from django.db.models.functions import TruncMonth
 from django.db.models.functions import Extract
 from django.db.models.fields import NOT_PROVIDED
+from django import db
 from django.http import JsonResponse, HttpResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_stock, template_operators, template_traders
 from core.xlsx_v3 import export_transactions
-from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data
+from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates
 from api.v3.sanity_checks import bulk_sanity_checks
 
 
@@ -435,6 +436,7 @@ def add_lot(request):
     if not tx:
         return JsonResponse({'status': 'error', 'message': 'Could not add lot to database'}, status=400)
     new_lots, new_txs = bulk_insert(entity, [lot], [tx], [lot_errors], [tx_errors])
+    db.connections.close_all()
     return JsonResponse({'status': 'success', 'data': new_txs[0].natural_key()})
 
 
@@ -474,6 +476,7 @@ def update_lot(request):
         LotV2Error.objects.bulk_create(lot_errors)
         TransactionError.objects.bulk_create(tx_errors)       
         bulk_sanity_checks([tx.lot], background=False)
+        check_duplicates(entity, [tx.lot], [tx], background=False)
         return JsonResponse({'status': 'success'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Could not save lot: %s' % (lot_errors)})

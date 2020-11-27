@@ -1,6 +1,7 @@
 import datetime
 import openpyxl
-from django.db.models import Q
+from django import db
+from django.db.models import Q, Count
 from multiprocessing import Process
 import pandas as pd
 
@@ -10,6 +11,63 @@ from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionS
 from core.models import LotValidationError
 import dateutil.parser
 from api.v3.sanity_checks import sanity_check, bulk_sanity_checks
+
+def check_duplicates(entity, new_lots, new_txs, background=True):
+    if background:
+        db.connections.close_all()
+    new_daes = [t.dae for t in new_txs]
+    print(new_daes)
+    duplicates = LotTransaction.objects.filter(dae__in=new_daes).values('dae', 'lot__biocarburant_id', 'lot__volume').annotate(count=Count('dae')).filter(count__gt=1)
+    if duplicates.count() > 0:
+        print('Found duplicates')
+        print(duplicates)
+        # method:
+        # when a duplicate exists, the first validated one is right
+        for d in duplicates:
+            dae = d['dae']
+            matches = LotTransaction.objects.filter(dae=dae).order_by('id')
+            only_drafts = True
+            tx_with_valid_lot = False
+            for m in matches:
+                if m.lot.status != 'Draft':
+                    only_drafts = False
+                    if not tx_with_valid_lot:
+                        tx_with_valid_lot = m
+            # if there are only drafts, the first one is right
+            if only_drafts:
+                print('Only drafts, keep the first one %d' % (matches[0].id))
+                for m in matches[1:]:
+                    print('deleting %d' % m.id)
+                    m.delete()
+            else:
+                # otherwise
+                # if we have a valid tx with this DAE AND we created it, delete everything else 
+                if tx_with_valid_lot.lot.added_by == entity:
+                    matches.exclude(id=tx_with_valid_lot.id).delete()
+                else:
+                    # there is a tx with a valid lot, this DAE, but we haven't created it
+                    # it can happen if the producer has already created the tx and the operator tries to upload it
+                    # or the operator has created it and the producer is trying to upload it
+                    # take the existing tx. if vendor is not in carbure, assume we are the vendor
+                    # if client not in carbure, assume we are the client
+                    if not tx_with_valid_lot.client_is_in_carbure:
+                        # assume we are the client
+                        tx_with_valid_lot.client_is_in_carbure = True
+                        tx_with_valid_lot.carbure_client = entity
+                        latest_tx = matches[-1]
+                        tx_with_valid_lot.delivery_site_is_in_carbure = latest_tx.delivery_site_is_in_carbure
+                        tx_with_valid_lot.carbure_delivery_site = latest_tx.carbure_delivery_site
+                        tx_with_valid_lot.unknown_delivery_site = latest_tx.unknown_delivery_site
+                        tx_with_valid_lot.unknown_delivery_site_country = latest_tx.unknown_delivery_site_country
+                    else:
+                        # assume we are the vendor
+                        tx_with_valid_lot.vendor_is_in_carbure = True
+                        tx_with_valid_lot.carbure_vendor = entity
+                    tx_with_valid_lot.save()
+                    matches.exclude(id=tx_with_valid_lot.id).delete()
+    else:
+        print('No duplicate DAE found')
+
 
 def get_prefetched_data(entity):
     d = {}
@@ -797,9 +855,10 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
     TransactionError.objects.bulk_create(flat_tx_errors, batch_size=100)
     # 8 run sanity checks
     print('calling bulk_sanity_check in background %s' % (datetime.datetime.now()))
-    #bulk_sanity_checks(new_lots)
     p = Process(target=bulk_sanity_checks, args=(new_lots,))
     p.start()
+    d = Process(target=check_duplicates, args=(entity, new_lots, new_txs))
+    d.start()
     return new_lots, new_txs
 
 
