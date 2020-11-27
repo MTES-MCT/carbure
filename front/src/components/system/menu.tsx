@@ -4,20 +4,23 @@ import cl from "clsx"
 import styles from "./menu.module.css"
 
 import { Dropdown, DropdownItem, DropdownLabel, useDropdown } from "./dropdown"
-import { Link } from "react-router-dom"
+import { LinkProps } from "react-router-dom"
 import { SystemProps } from "."
+import { Link } from "../relative-route"
 
-type MenuItemProps = React.HTMLProps<HTMLLIElement> & {
-  to?: string
-  children: React.ReactNode
-}
+type MenuItemProps = SystemProps & React.HTMLProps<HTMLLIElement>
 
-const MenuItem = ({ to, children, ...props }: MenuItemProps) => (
-  <DropdownItem
-    {...props}
-    className={to ? styles.menuItemLink : styles.menuItem}
-  >
-    {to ? <Link to={to}>{children}</Link> : children}
+const MenuItem = ({ children, ...props }: MenuItemProps) => (
+  <DropdownItem {...props} className={styles.menuItem}>
+    {children}
+  </DropdownItem>
+)
+
+type MenuItemLinkProps = MenuItemProps & LinkProps & { relative?: boolean }
+
+const MenuItemLink = ({ children, ...props }: MenuItemLinkProps) => (
+  <DropdownItem className={styles.menuItemLink}>
+    <Link {...props}>{children}</Link>
   </DropdownItem>
 )
 
@@ -69,5 +72,6 @@ const Menu = ({ children, label, className, ...props }: MenuProps) => {
 
 Menu.Group = MenuGroup
 Menu.Item = MenuItem
+Menu.ItemLink = MenuItemLink
 
 export default Menu

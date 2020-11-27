@@ -63,3 +63,22 @@
   font-size: 18px;
   margin-left: auto;
 }
+
+.faq {
+  display: flex;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--blue-medium);
+  border: 3px solid var(--blue-medium);
+  border-radius: 50%;
+  opacity: 0.45;
+  margin-left: 42px;
+  margin-right: -78px;
+}
+
+.faq:hover {
+  opacity: 1;
+}

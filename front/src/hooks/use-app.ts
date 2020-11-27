@@ -28,8 +28,9 @@ export function useGetSettings(): SettingsGetter {
 export type AppHook = {
   settings: SettingsGetter
   hasEntity: (e: number) => boolean
+  hasEntities: () => boolean
   getEntity: (id: number) => Entity | null
-  getDefaultEntity: () => number | undefined
+  getDefaultEntity: () => string
 }
 
 export default function useApp(): AppHook {
@@ -44,9 +45,17 @@ export default function useApp(): AppHook {
     return Boolean(getEntity(entity))
   }
 
-  function getDefaultEntity() {
-    return settings.data?.rights[0].entity.id
+  function hasEntities() {
+    return Boolean(settings.data?.rights.length)
   }
 
-  return { settings, hasEntity, getEntity, getDefaultEntity }
+  function getDefaultEntity() {
+    if (!settings.data || settings.data.rights.length === 0) {
+      return "pending"
+    } else {
+      return `${settings.data.rights[0].entity.id}`
+    }
+  }
+
+  return { settings, hasEntity, hasEntities, getEntity, getDefaultEntity }
 }
