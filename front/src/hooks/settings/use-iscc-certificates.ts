@@ -7,6 +7,7 @@ import { confirm, prompt } from "../../components/system/dialog"
 import * as api from "../../services/settings"
 import useAPI from "../helpers/use-api"
 import { ISCCPrompt } from "../../components/settings/iscc-certificates-settings"
+import { ProductionSiteSettingsHook } from "./use-production-sites"
 
 export interface ISCCCertificateSettingsHook {
   isEmpty: boolean
@@ -18,7 +19,8 @@ export interface ISCCCertificateSettingsHook {
 }
 
 export default function useISCCCertificates(
-  entity: EntitySelection
+  entity: EntitySelection,
+  productionSites: ProductionSiteSettingsHook
 ): ISCCCertificateSettingsHook {
   const [requestGetISCC, resolveGetISCC] = useAPI(api.getISCCCertificates)
   const [requestAddISCC, resolveAddISCC] = useAPI(api.addISCCCertificate)
@@ -64,7 +66,10 @@ export default function useISCCCertificates(
         `Voulez-vous vraiment supprimer le certificat ISCC "${iscc.certificate_id}" ?`
       ))
     ) {
-      resolveDelISCC(entityID, iscc.certificate_id).then(refresh)
+      resolveDelISCC(entityID, iscc.certificate_id).then(() => {
+        refresh()
+        productionSites.refresh()
+      })
     }
   }
 
@@ -80,7 +85,10 @@ export default function useISCCCertificates(
         entityID,
         iscc.certificate_id,
         data.certificate_id
-      ).then(refresh)
+      ).then(() => {
+        refresh()
+        productionSites.refresh()
+      })
     }
   }
 

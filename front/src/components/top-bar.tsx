@@ -12,6 +12,7 @@ import logoBetaGouv from "../assets/images/betagouvfr.svg"
 
 import Menu from "./system/menu"
 import { Link, NavLink } from "./relative-route"
+import { Question } from "./system/icons"
 
 const Logo = () => (
   <Link to="/" className={styles.logo}>
@@ -52,23 +53,28 @@ type UserMenuProps = {
 
 const UserMenu = ({ settings, entity }: UserMenuProps) => {
   const location = useLocation()
+  const hasRights = settings.data && settings.data.rights.length > 0
 
   return (
     <Menu className={styles.userMenu} label={entity?.name ?? "Menu"}>
-      <Menu.Group label="Organisations">
-        {settings.data?.rights.map((right) => (
-          <Menu.Item
-            key={right.entity.id}
-            to={changeOrg(location.pathname, right.entity.id)}
-          >
-            {right.entity.name}
-          </Menu.Item>
-        ))}
-      </Menu.Group>
+      {hasRights && (
+        <Menu.Group label="Organisations">
+          {settings.data?.rights.map((right) => (
+            <Menu.ItemLink
+              key={right.entity.id}
+              to={changeOrg(location.pathname, right.entity.id)}
+            >
+              {right.entity.name}
+            </Menu.ItemLink>
+          ))}
+        </Menu.Group>
+      )}
 
       <Menu.Group label={settings.data?.email ?? "Utilisateur"}>
-        <Menu.Item to="/account">Mon compte</Menu.Item>
-        <Menu.Item to="/logout">Se déconnecter</Menu.Item>
+        <Menu.ItemLink relative to="account">
+          Mon compte
+        </Menu.ItemLink>
+        <Menu.ItemLink to="/logout">Se déconnecter</Menu.ItemLink>
       </Menu.Group>
     </Menu>
   )
@@ -93,14 +99,27 @@ const Topbar = ({ entity, settings }: TopbarProps) => (
 
     <nav className={styles.pageNav}>
       {canTrade(entity) && <PageLink to="stocks">Stocks</PageLink>}
-      <PageLink to="transactions">Transactions</PageLink>
-      <PageLink to="settings">Société</PageLink>
+
+      {entity && <PageLink to="transactions">Transactions</PageLink>}
+
       {isAdmin(entity) && (
         <PageLink to="administration">Administration</PageLink>
       )}
+
+      {entity && <PageLink to="settings">Société</PageLink>}
     </nav>
 
     <UserMenu settings={settings} entity={entity} />
+
+    <a
+      href="/"
+      target="_blank"
+      rel="noreferrer"
+      title="FAQ"
+      className={styles.faq}
+    >
+      <Question />
+    </a>
   </header>
 )
 

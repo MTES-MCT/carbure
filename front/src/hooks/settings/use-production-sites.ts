@@ -18,6 +18,7 @@ export interface ProductionSiteSettingsHook {
   createProductionSite: () => void
   editProductionSite: (p: ProductionSiteDetails) => void
   removeProductionSite: (p: ProductionSiteDetails) => void
+  refresh: () => void
 }
 
 export default function useProductionSites(
@@ -153,5 +154,6 @@ export default function useProductionSites(
     createProductionSite,
     editProductionSite,
     removeProductionSite,
+    refresh,
   }
 }

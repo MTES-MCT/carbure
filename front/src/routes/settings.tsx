@@ -37,7 +37,7 @@ const Settings = ({ entity, settings }: SettingsProps) => {
   return (
     <Main>
       <SettingsHeader>
-        <Title>Paramètres {entity?.name}</Title>
+        <Title>{entity?.name}</Title>
       </SettingsHeader>
 
       <SettingsBody>
