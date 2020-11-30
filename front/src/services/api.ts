@@ -50,13 +50,18 @@ async function checkResponse<T>(res: Response): Promise<T> {
     throw new Error("Erreur serveur")
   }
 
-  const json: ApiResponse<T> = await res.json()
+  // default data to true in case the api sends nothing
+  const parsed = await res.json()
+  parsed.data = parsed.data ?? true
+
+  const json: ApiResponse<T> = parsed
 
   // if the response contains an error, throw it so we can catch it elsewhere
   if (json.status === "error" || json.status === "forbidden") {
     throw new Error(json.message)
-  } else {
-    // otherwise, return only the fetched data
+  }
+  // otherwise, return only the fetched data
+  else {
     return json.data
   }
 }
