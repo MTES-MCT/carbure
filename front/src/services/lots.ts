@@ -213,41 +213,66 @@ export function updateLot(
 }
 
 export function duplicateLot(entityID: number, transactionID: number) {
-  return api.post("/lots/duplicate", {
-    entity_id: entityID,
-    tx_id: transactionID,
-  })
+  return (
+    api
+      .post("/lots/duplicate", {
+        entity_id: entityID,
+        tx_id: transactionID,
+      })
+      // resolve to true if it was a success
+      .then(() => true)
+  )
 }
 
 export function deleteLots(entityID: number, transactionIDs: number[]) {
-  return api.post("/lots/delete", {
-    entity_id: entityID,
-    tx_ids: transactionIDs,
-  })
+  return (
+    api
+      .post("/lots/delete", {
+        entity_id: entityID,
+        tx_ids: transactionIDs,
+      })
+      // resolve to true if it was a success
+      .then(() => true)
+  )
 }
 
 export function validateLots(entityID: number, transactionIDs: number[]) {
-  return api.post("/lots/validate", {
-    entity_id: entityID,
-    tx_ids: transactionIDs,
-  })
+  return (
+    api
+      .post("/lots/validate", {
+        entity_id: entityID,
+        tx_ids: transactionIDs,
+      })
+      // resolve to true if it was a success
+      .then(() => true)
+  )
 }
 
 export function acceptLots(entityID: number, transactionIDs: number[]) {
-  return api.post("/lots/accept", {
-    entity_id: entityID,
-    tx_ids: transactionIDs,
-  })
+  return (
+    api
+      .post("/lots/accept", {
+        entity_id: entityID,
+        tx_ids: transactionIDs,
+      })
+      // resolve to true if it was a success
+      .then(() => true)
+  )
 }
 
 export function acceptLotsWithReserve(
   entityID: number,
   transactionIDs: number[]
 ) {
-  return api.post("/lots/accept-with-reserves", {
-    entity_id: entityID,
-    tx_ids: transactionIDs,
-  })
+  return (
+    api
+      .post("/lots/accept-with-reserves", {
+        entity_id: entityID,
+        tx_ids: transactionIDs,
+      })
+      // resolve to true if it was a success
+      .then(() => true)
+  )
 }
 
 export function rejectLots(
@@ -255,11 +280,16 @@ export function rejectLots(
   transactionIDs: number[],
   comment: string
 ) {
-  return api.post("/lots/reject", {
-    entity_id: entityID,
-    tx_ids: transactionIDs,
-    comment,
-  })
+  return (
+    api
+      .post("/lots/reject", {
+        entity_id: entityID,
+        tx_ids: transactionIDs,
+        comment,
+      })
+      // resolve to true if it was a success
+      .then(() => true)
+  )
 }
 
 export function commentLot(
@@ -300,24 +330,39 @@ export function acceptAndCommentLot(
 }
 
 export function deleteAllDraftLots(entityID: number, year: number) {
-  return api.post("/lots/delete-all-drafts", {
-    entity_id: entityID,
-    year,
-  })
+  return (
+    api
+      .post("/lots/delete-all-drafts", {
+        entity_id: entityID,
+        year,
+      })
+      // resolve to true if it was a success
+      .then(() => true)
+  )
 }
 
 export function validateAllDraftLots(entityID: number, year: number) {
-  return api.post("/lots/validate-all-drafts", {
-    entity_id: entityID,
-    year,
-  })
+  return (
+    api
+      .post("/lots/validate-all-drafts", {
+        entity_id: entityID,
+        year,
+      })
+      // resolve to true if it was a success
+      .then(() => true)
+  )
 }
 
 export function acceptAllInboxLots(entityID: number, year: number) {
-  return api.post("/lots/accept-all", {
-    entity_id: entityID,
-    year,
-  })
+  return (
+    api
+      .post("/lots/accept-all", {
+        entity_id: entityID,
+        year,
+      })
+      // resolve to true if it was a success
+      .then(() => true)
+  )
 }
 
 export function rejectAllInboxLots(
@@ -325,11 +370,16 @@ export function rejectAllInboxLots(
   year: number,
   comment: string
 ) {
-  return api.post("/lots/reject-all", {
-    entity_id: entityID,
-    year,
-    comment,
-  })
+  return (
+    api
+      .post("/lots/reject-all", {
+        entity_id: entityID,
+        year,
+        comment,
+      })
+      // resolve to true if it was a success
+      .then(() => true)
+  )
 }
 
 export function getLotsOutSummary(entityID: number) {
