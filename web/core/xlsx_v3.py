@@ -156,6 +156,55 @@ def make_mb_extract_sheet(workbook, entity):
             colid += 1
 
 
+def make_mb_extract_sheet_bcghg(workbook, entity):
+    worksheet_lots = workbook.add_worksheet("lots")
+    clients = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur', 'Trader']).exclude(id=entity.id)
+    delivery_sites = Depot.objects.all()
+    mb_lots = LotTransaction.objects.filter(carbure_client=entity, delivery_status='A', lot__status="Validated", lot__fused_with=None)
+
+    # 4/10 chances of having an exported lot
+    exported_lots = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+    foreign_clients = [{'name': 'BP', 'country': 'GB', 'delivery_site': 'DOVER'},
+                       {'name': 'BP', 'country': 'GB', 'delivery_site': 'LIVERPOOL'},
+                       {'name': 'BP', 'country': 'GB', 'delivery_site': 'MANCHESTER'},
+                       {'name': 'EXXON', 'country': 'US', 'delivery_site': 'BOSTON'},
+                       {'name': 'EXXON', 'country': 'US', 'delivery_site': 'HOBOKEN'},
+                       {'name': 'IBERDROLA', 'country': 'ES', 'delivery_site': 'BCN'},
+                       {'name': 'IBERDROLA', 'country': 'ES', 'delivery_site': 'BILBAO'},
+                       ]
+
+    # header
+    bold = workbook.add_format({'bold': True})
+    columns = ['biocarburant', 'ghg_total', 'volume', 'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
+    for i, c in enumerate(columns):
+        worksheet_lots.write(0, i, c, bold)
+
+    clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
+    today = datetime.date.today().strftime('%Y-%m-%d')
+    if not len(mb_lots):
+        return
+    for i in range(10):
+        client = random.choice(clients)
+        site = random.choice(delivery_sites)
+        exported = random.choice(exported_lots)
+        lot_source = random.choice(mb_lots)
+
+        row = [lot_source.lot.biocarburant.code, lot_source.lot.ghg_total, int(lot_source.lot.volume / 2), get_random_dae(), clientid]
+        if exported == 1:
+            # client is not in carbure
+            c = random.choice(foreign_clients)
+            row += [c['name'], today, c['delivery_site'], c['country']]
+        else:
+            # regular transaction. sell to someone else
+            row += [client.name, today, site.depot_id, '']
+
+        colid = 0
+        for elem in row:
+            worksheet_lots.write(i+1, colid, elem)
+            colid += 1
+
+
+
 def make_producers_lots_sheet_simple(workbook, entity):
     worksheet_lots = workbook.add_worksheet("lots")
     psites = ProductionSite.objects.filter(producer=entity)
@@ -454,6 +503,22 @@ def template_stock(entity):
     location = '/tmp/carbure_template_mb.xlsx'
     workbook = xlsxwriter.Workbook(location)
     make_mb_extract_sheet(workbook, entity)
+    make_countries_sheet(workbook)
+    make_clients_sheet(workbook)
+    make_deliverysites_sheet(workbook)
+    workbook.close()
+    return location
+
+
+def template_stock_bcghg(entity):
+    # create a list of lots to send from stock
+    # but instead of using carbure_id as a key, we'll use the biofuel and its sustainability characteristics (ghg)
+    # why ?
+    # because users are more likely to know the details of what they're sending than the carbure id
+    # Knowing CarbureID forces them to download their stock from carbure  
+    location = '/tmp/carbure_template_mb.xlsx'
+    workbook = xlsxwriter.Workbook(location)
+    make_mb_extract_sheet_bcghg(workbook, entity)
     make_countries_sheet(workbook)
     make_clients_sheet(workbook)
     make_deliverysites_sheet(workbook)

@@ -9,7 +9,7 @@ from django import db
 from django.http import JsonResponse, HttpResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment
-from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_stock, template_operators, template_traders
+from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
 from core.xlsx_v3 import export_transactions
 from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates
 from api.v3.sanity_checks import bulk_sanity_checks
@@ -846,33 +846,6 @@ def get_template_producers_advanced(request):
             # sending response
             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename="carbure_template_advanced.xlsx"'
-            return response
-    except Exception as e:
-        return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
-
-
-def get_template_mass_balance(request):
-    entity_id = request.GET.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-
-    file_location = template_stock(entity)
-    try:
-        with open(file_location, 'rb') as f:
-            file_data = f.read()
-            # sending response
-            response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="carbure_template_mass_balance.xlsx"'
             return response
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
