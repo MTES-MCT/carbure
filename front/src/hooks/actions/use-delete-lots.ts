@@ -6,6 +6,7 @@ import * as api from "../../services/lots"
 import useAPI from "../helpers/use-api"
 
 import { confirm } from "../../components/system/dialog"
+import { useNotificationContext } from "../../components/system/notifications"
 
 export interface LotDeleter {
   loading: boolean
@@ -20,8 +21,32 @@ export default function useDeleteLots(
   year: YearSelection,
   refresh: () => void
 ): LotDeleter {
+  const notifications = useNotificationContext()
+
   const [request, resolveDelete] = useAPI(api.deleteLots)
   const [requestAll, resolveDeleteAll] = useAPI(api.deleteAllDraftLots)
+
+  async function notifyDelete(promise: Promise<any>, many: boolean = false) {
+    const res = await promise
+
+    if (res) {
+      refresh()
+
+      notifications.push({
+        level: "success",
+        text: many
+          ? "Les lots ont bien été supprimés !"
+          : "Le lot a bien été supprimé !",
+      })
+    } else {
+      notifications.push({
+        level: "error",
+        text: many
+          ? "Impossible de supprimer les lots."
+          : "Impossible de supprimer le lot.",
+      })
+    }
+  }
 
   async function deleteLot(lotID: number) {
     const shouldDelete = await confirm(
@@ -30,7 +55,7 @@ export default function useDeleteLots(
     )
 
     if (entity !== null && shouldDelete) {
-      await resolveDelete(entity.id, [lotID]).then(refresh)
+      notifyDelete(resolveDelete(entity.id, [lotID]))
     }
 
     return shouldDelete
@@ -43,7 +68,7 @@ export default function useDeleteLots(
     )
 
     if (entity !== null && shouldDelete) {
-      await resolveDelete(entity.id, selection.selected).then(refresh)
+      notifyDelete(resolveDelete(entity.id, selection.selected), true)
     }
 
     return shouldDelete
@@ -56,7 +81,7 @@ export default function useDeleteLots(
     )
 
     if (entity !== null && shouldDelete) {
-      await resolveDeleteAll(entity.id, year.selected).then(refresh)
+      notifyDelete(resolveDeleteAll(entity.id, year.selected), true)
     }
 
     return shouldDelete

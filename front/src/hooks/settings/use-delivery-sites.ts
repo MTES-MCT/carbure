@@ -7,6 +7,7 @@ import useAPI from "../helpers/use-api"
 import * as common from "../../services/common"
 import { prompt } from "../../components/system/dialog"
 import { DeliverySitePromptFactory } from "../../components/settings/delivery-site-settings"
+import { useNotificationContext } from "../../components/system/notifications"
 
 export interface DeliverySiteSettingsHook {
   isEmpty: boolean
@@ -21,6 +22,8 @@ export interface DeliverySiteSettingsHook {
 export default function useDeliverySites(
   entity: EntitySelection
 ): DeliverySiteSettingsHook {
+  const notifications = useNotificationContext()
+
   const [query, setQuery] = useState("")
   const [requestGetDeliverySites, resolveGetDeliverySites] = useAPI(common.findDeliverySites); // prettier-ignore
   const [requestAddDeliverySite, resolveAddDeliverySite] = useAPI(common.addDeliverySite); // prettier-ignore
@@ -39,7 +42,7 @@ export default function useDeliverySites(
     )
 
     if (entityID && data && data.country) {
-      resolveAddDeliverySite(
+      const res = await resolveAddDeliverySite(
         data.name,
         data.city,
         data.country.code_pays,
@@ -48,7 +51,21 @@ export default function useDeliverySites(
         data.address,
         data.postal_code,
         data.ownership_type
-      ).then(() => setQuery(data.depot_id))
+      )
+
+      if (res) {
+        setQuery(data.depot_id)
+
+        notifications.push({
+          level: "success",
+          text: "Le dépôt a bien été créé !",
+        })
+      } else {
+        notifications.push({
+          level: "error",
+          text: "Impossible de créer le dépôt.",
+        })
+      }
     }
   }
 

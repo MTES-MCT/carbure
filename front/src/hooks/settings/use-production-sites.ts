@@ -10,6 +10,7 @@ import {
   ProductionSiteState,
 } from "../../components/settings/production-site-settings"
 import { confirm, prompt } from "../../components/system/dialog"
+import { useNotificationContext } from "../../components/system/notifications"
 
 export interface ProductionSiteSettingsHook {
   isEmpty: boolean
@@ -24,6 +25,8 @@ export interface ProductionSiteSettingsHook {
 export default function useProductionSites(
   entity: EntitySelection
 ): ProductionSiteSettingsHook {
+  const notifications = useNotificationContext()
+
   const [requestGetProductionSites, resolveGetProductionSites] = useAPI(api.getProductionSites) // prettier-ignore
   const [requestAddProductionSite, resolveAddProductionSite] = useAPI(api.addProductionSite) // prettier-ignore
   const [requestDelProductionSite, resolveDelProductionSite] = useAPI(api.deleteProductionSite) // prettier-ignore
@@ -87,7 +90,17 @@ export default function useProductionSites(
         const cs = data.certificates.map((c) => c.certificate_id)
         await resolveSetProductionSiteCertificates(entityID, ps.id, cs)
 
+        notifications.push({
+          level: "success",
+          text: "Le site de production a bien été créé !",
+        })
+
         refresh()
+      } else {
+        notifications.push({
+          level: "error",
+          text: "Impossible de créer le site de production.",
+        })
       }
     }
   }
@@ -100,7 +113,7 @@ export default function useProductionSites(
     )
 
     if (entityID && data && data.country) {
-      await resolveUpdateProductionSite(
+      const res = await resolveUpdateProductionSite(
         entityID,
         ps.id,
         data.name,
@@ -126,7 +139,19 @@ export default function useProductionSites(
       const cs = data.certificates.map((c) => c.certificate_id)
       await resolveSetProductionSiteCertificates(entityID, ps.id, cs)
 
-      refresh()
+      if (res) {
+        refresh()
+
+        notifications.push({
+          level: "success",
+          text: "Le site de production a bien été modifié !",
+        })
+      } else {
+        notifications.push({
+          level: "error",
+          text: "Impossible de modifier le site de production.",
+        })
+      }
     }
   }
 
@@ -137,7 +162,21 @@ export default function useProductionSites(
         `Voulez-vous vraiment supprimer le site de production "${ps.name}" ?`
       )
     ) {
-      resolveDelProductionSite(ps.id).then(refresh)
+      const res = resolveDelProductionSite(ps.id)
+
+      if (res) {
+        refresh()
+
+        notifications.push({
+          level: "success",
+          text: "Le site de production a bien été supprimé !",
+        })
+      } else {
+        notifications.push({
+          level: "error",
+          text: "Impossible de supprimer le site de production",
+        })
+      }
     }
   }
 

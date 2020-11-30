@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import { DBSPrompt } from "../../components/settings/2bs-certificates-settings"
 import { confirm, prompt } from "../../components/system/dialog"
+import { useNotificationContext } from "../../components/system/notifications"
 import * as api from "../../services/settings"
 import { DBSCertificate } from "../../services/types"
 import useAPI from "../helpers/use-api"
@@ -20,6 +21,8 @@ export default function use2BSCertificates(
   entity: EntitySelection,
   productionSites: ProductionSiteSettingsHook
 ): DBSCertificateSettingsHook {
+  const notifications = useNotificationContext()
+
   const [requestGet2BS, resolveGet2BS] = useAPI(api.get2BSCertificates)
   const [requestAdd2BS, resolveAdd2BS] = useAPI(api.add2BSCertificate)
   const [requestDel2BS, resolveDel2BS] = useAPI(api.delete2BSCertificate)
@@ -39,6 +42,25 @@ export default function use2BSCertificates(
   function refresh() {
     if (entityID) {
       resolveGet2BS(entityID)
+      productionSites.refresh()
+    }
+  }
+
+  async function notifyCertificate(promise: Promise<any>, action: string) {
+    const res = await promise
+
+    if (res) {
+      refresh()
+
+      notifications.push({
+        level: "success",
+        text: `Le certificat a bien été ${action} !`,
+      })
+    } else {
+      notifications.push({
+        level: "error",
+        text: `Le certificat n'a pas pu être ${action}.`,
+      })
     }
   }
 
@@ -50,7 +72,7 @@ export default function use2BSCertificates(
     )
 
     if (entityID && data) {
-      resolveAdd2BS(entityID, data.certificate_id).then(refresh)
+      notifyCertificate(resolveAdd2BS(entityID, data.certificate_id), "ajouté")
     }
   }
 
@@ -62,10 +84,7 @@ export default function use2BSCertificates(
         `Voulez-vous vraiment supprimer le certificat 2BS "${dbs.certificate_id}" ?`
       ))
     ) {
-      resolveDel2BS(entityID, dbs.certificate_id).then(() => {
-        refresh()
-        productionSites.refresh()
-      })
+      notifyCertificate(resolveDel2BS(entityID, dbs.certificate_id), "supprimé")
     }
   }
 
@@ -77,11 +96,9 @@ export default function use2BSCertificates(
     )
 
     if (entityID && data) {
-      resolveUpdate2BS(entityID, dbs.certificate_id, data.certificate_id).then(
-        () => {
-          refresh()
-          productionSites.refresh()
-        }
+      notifyCertificate(
+        resolveUpdate2BS(entityID, dbs.certificate_id, data.certificate_id),
+        "mis à jour"
       )
     }
   }

@@ -2,6 +2,7 @@ import { EntitySelection } from "../helpers/use-entity"
 
 import * as api from "../../services/lots"
 import useAPI from "../helpers/use-api"
+import { useNotificationContext } from "../../components/system/notifications"
 
 export interface LotUploader {
   loading: boolean
@@ -22,25 +23,51 @@ export default function useUploadLotFile(
   entity: EntitySelection,
   refresh: () => void
 ): LotUploader {
+  const notifications = useNotificationContext()
+
   const [request, resolveUpload] = useAPI(api.uploadLotFile)
   const [, resolveUploadMassBalance] = useAPI(api.uploadMassBalanceFile)
   const [, resolveUploadOperator] = useAPI(api.uploadOperatorLotFile)
 
-  async function uploadFile(file: File) {
+  async function notifyImport(promise: Promise<any>) {
+    notifications.push({
+      text: "L'importation a débuté, veuillez patienter.",
+    })
+
+    const res: any = await promise
+
+    if (res) {
+      const level =
+        res.loaded === 0
+          ? "error"
+          : res.loaded < res.total
+          ? "warning"
+          : "success"
+
+      notifications.push({
+        level,
+        text: `${res.loaded} transactions sur ${res.total} ont été importées depuis le fichier.`,
+      })
+
+      refresh()
+    }
+  }
+
+  function uploadFile(file: File) {
     if (entity !== null) {
-      resolveUpload(entity.id, file).then(refresh)
+      notifyImport(resolveUpload(entity.id, file))
     }
   }
 
   async function uploadMassBalanceFile(file: File) {
     if (entity !== null) {
-      resolveUploadMassBalance(entity.id, file).then(refresh)
+      notifyImport(resolveUploadMassBalance(entity.id, file))
     }
   }
 
   async function uploadOperatorFile(file: File) {
     if (entity !== null) {
-      resolveUploadOperator(entity.id, file).then(refresh)
+      notifyImport(resolveUploadOperator(entity.id, file))
     }
   }
 

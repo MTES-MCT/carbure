@@ -12,6 +12,7 @@ import useTransactionForm, {
 import useAPI from "./helpers/use-api"
 import useClose from "./helpers/use-close"
 import * as api from "../services/lots"
+import { useNotificationContext } from "../components/system/notifications"
 
 function getFieldErrors(errors: Errors) {
   const fieldErrors: { [k: string]: string } = {}
@@ -32,6 +33,7 @@ export default function useTransactionDetails(
   refresh: () => void
 ) {
   const params: { id: string } = useParams()
+  const notifications = useNotificationContext()
 
   const close = useClose("../")
   const [form, hasChange, change, setForm] = useTransactionForm(entity)
@@ -61,6 +63,16 @@ export default function useTransactionDetails(
     if (res) {
       refresh()
       refreshDetails()
+
+      notifications.push({
+        level: "success",
+        text: "Le lot a bien été sauvegardé !",
+      })
+    } else {
+      notifications.push({
+        level: "error",
+        text: "Impossible de sauvegarder ce lot.",
+      })
     }
   }
 
