@@ -236,9 +236,8 @@
   color: var(--red-dark);
 }
 
-.errorLabel input,
-.errorLabel:hover input,
-.errorLabel input:focus {
+.errorLabel input.input,
+.errorLabel textarea.textarea {
   color: var(--red-dark);
   border-color: var(--red-dark);
 }
