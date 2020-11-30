@@ -27,22 +27,22 @@ export interface StockHook {
   loading: boolean
   error: string | null
   data: Lots | null
-  resolve: () => void
+  getStock: () => void
   exportAllTransactions: () => void
 }
 
 function useGetStockSnapshot(entity: EntitySelection) {
   const [snapshot, resolveStockSnapshot] = useAPI(getStockSnapshot)
 
-  function resolve() {
+  function getSnapshot() {
     if (entity !== null) {
       return resolveStockSnapshot(entity.id).cancel
     }
   }
 
-  useEffect(resolve, [resolveStockSnapshot, entity])
+  useEffect(getSnapshot, [resolveStockSnapshot, entity])
 
-  return { ...snapshot, resolve }
+  return { ...snapshot, getSnapshot }
 }
 
 // fetches current transaction list when parameters change
@@ -61,7 +61,7 @@ function useGetStocks(
     return null
   }
 
-  function resolve() {
+  function getStock() {
     if (entityID !== null) {
       return resolveStocks(
         entityID,
@@ -76,7 +76,7 @@ function useGetStocks(
     }
   }
 
-  useEffect(resolve, [
+  useEffect(getStock, [
     resolveStocks,
     entityID,
     filters.selected,
@@ -88,7 +88,7 @@ function useGetStocks(
     sorting.order,
   ])
 
-  return { ...stock, resolve, exportAllTransactions }
+  return { ...stock, getStock, exportAllTransactions }
 }
 
 export function useStocks(entity: EntitySelection) {
@@ -102,7 +102,10 @@ export function useStocks(entity: EntitySelection) {
   const year = useYearSelection(pagination, filters, special)
   const stock = useGetStocks(entity, filters, status, pagination, search, sorting) // prettier-ignore
 
-  function refresh() {}
+  function refresh() {
+    snapshot.getSnapshot()
+    stock.getStock()
+  }
 
   const selection = useTransactionSelection(stock.data?.lots)
   const uploader = useUploadLotFile(entity, refresh)
