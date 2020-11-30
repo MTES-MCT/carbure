@@ -1,5 +1,5 @@
 import { FilterSelection } from "../hooks/query/use-filters"
-import { Lots, StockSnapshot } from "./types"
+import { Lots, LotStatus, StockSnapshot, Transaction } from "./types"
 
 import api from "./api"
 import { toOption } from "./lots"
@@ -14,6 +14,26 @@ function normalizeStockSnapshotFilters(snapshot: any): StockSnapshot {
     delivery_sites: snapshot.filters.delivery_sites.map(toOption),
   }
   return snapshot
+}
+
+// extract the status name from the lot details
+export function getStockStatus(transaction: Transaction): LotStatus {
+  const status = transaction.lot.status.toLowerCase()
+  const delivery = transaction.delivery_status
+
+  if (status === "draft") {
+    if (["A", "N"].includes(delivery)) {
+      return LotStatus.ToSend
+    }
+  } else if (status === "validated") {
+    if (["N"].includes(delivery)) {
+      return LotStatus.Inbox
+    } else if (["A"].includes(delivery)) {
+      return LotStatus.Stock
+    }
+  }
+
+  return LotStatus.Weird
 }
 
 export function getStockSnapshot(entity_id: number): Promise<StockSnapshot> {

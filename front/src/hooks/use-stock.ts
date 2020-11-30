@@ -132,5 +132,6 @@ export function useStocks(entity: EntitySelection) {
     acceptor,
     rejector,
     sender,
+    refresh,
   }
 }
