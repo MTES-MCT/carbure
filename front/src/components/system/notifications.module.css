@@ -27,3 +27,15 @@
   margin-left: 8px;
   cursor: pointer;
 }
+
+.notification.success {
+  background-color: var(--green-dark);
+}
+
+.notification.warning {
+  background-color: var(--orange-dark);
+}
+
+.notification.error {
+  background-color: var(--red-dark);
+}
