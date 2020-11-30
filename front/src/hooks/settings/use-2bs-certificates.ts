@@ -58,7 +58,7 @@ export default function use2BSCertificates(
     if (
       entityID &&
       (await confirm(
-        "Suppresion certificat",
+        "Suppression certificat",
         `Voulez-vous vraiment supprimer le certificat 2BS "${dbs.certificate_id}" ?`
       ))
     ) {

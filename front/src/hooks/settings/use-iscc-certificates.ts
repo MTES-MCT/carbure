@@ -62,7 +62,7 @@ export default function useISCCCertificates(
     if (
       entityID &&
       (await confirm(
-        "Suppresion certificat",
+        "Suppression certificat",
         `Voulez-vous vraiment supprimer le certificat ISCC "${iscc.certificate_id}" ?`
       ))
     ) {
