@@ -280,6 +280,11 @@ export const ProductionSitePromptFactory = (
 const PRODUCTION_SITE_COLUMNS: Column<ProductionSiteDetails>[] = [
   EMPTY_COLUMN,
   {
+    header: "ID",
+    className: styles.settingsTableColumn,
+    render: (ps) => <Line text={`${ps.site_id}`} />,
+  },
+  {
     header: "Nom",
     className: styles.settingsTableColumn,
     render: (ps) => <Line text={ps.name} />,
