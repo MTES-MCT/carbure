@@ -7,6 +7,7 @@ import useAPI from "../helpers/use-api"
 
 import { confirm, prompt } from "../../components/system/dialog"
 import { CommentPrompt } from "../../components/comments"
+import { useNotificationContext } from "../../components/system/notifications"
 
 export interface LotValidator {
   loading: boolean
@@ -22,9 +23,33 @@ export default function useValidateLots(
   year: YearSelection,
   refresh: () => void
 ): LotValidator {
+  const notifications = useNotificationContext()
+
   const [request, resolveValidate] = useAPI(api.validateLots)
   const [requestComment, resolveValidateAndComment] = useAPI(api.validateAndCommentLot) // prettier-ignore
   const [requestAll, resolveValidateAll] = useAPI(api.validateAllDraftLots)
+
+  async function notifyValidate(promise: Promise<any>, many: boolean = false) {
+    const res = await promise
+
+    if (res) {
+      refresh()
+
+      notifications.push({
+        level: "success",
+        text: many
+          ? "Les lots ont bien été envoyés !"
+          : "Le lot a bien été envoyé !",
+      })
+    } else {
+      notifications.push({
+        level: "error",
+        text: many
+          ? "Impossible d'envoyer les lots."
+          : "Impossible d'envoyer le lot.",
+      })
+    }
+  }
 
   async function validateLot(lotID: number) {
     const shouldValidate = await confirm(
@@ -33,7 +58,7 @@ export default function useValidateLots(
     )
 
     if (entity !== null && shouldValidate) {
-      await resolveValidate(entity.id, [lotID]).then(refresh)
+      notifyValidate(resolveValidate(entity.id, [lotID]))
     }
 
     return shouldValidate
@@ -47,7 +72,7 @@ export default function useValidateLots(
     )
 
     if (entity !== null && comment) {
-      await resolveValidateAndComment(entity.id, lotID, comment).then(refresh)
+      notifyValidate(resolveValidateAndComment(entity.id, lotID, comment))
     }
 
     return Boolean(comment)
@@ -60,7 +85,7 @@ export default function useValidateLots(
     )
 
     if (entity !== null && shouldValidate) {
-      await resolveValidate(entity.id, selection.selected).then(refresh)
+      notifyValidate(resolveValidate(entity.id, selection.selected), true)
     }
 
     return shouldValidate
@@ -73,7 +98,7 @@ export default function useValidateLots(
     )
 
     if (entity !== null && shouldValidate) {
-      await resolveValidateAll(entity.id, year.selected).then(refresh)
+      notifyValidate(resolveValidateAll(entity.id, year.selected), true)
     }
 
     return shouldValidate
