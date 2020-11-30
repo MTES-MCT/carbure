@@ -36,8 +36,11 @@ function useAutoComplete<T>(
     const query = "value" in e.target ? e.target.value : ""
     setQuery(query)
 
-    if (query.length < minLength) {
+    if (query.length === 0) {
       onChange({ target: { name, value: null } })
+    }
+
+    if (query.length < minLength) {
       dd.toggle(false)
     } else {
       dd.toggle(true)
@@ -50,9 +53,7 @@ function useAutoComplete<T>(
         const compare = query.toLowerCase()
 
         const suggestion = results.find((suggestion) => {
-          const label = getLabel(suggestion).toLowerCase()
-          const value = getValue(suggestion).toLowerCase()
-          return compare === label || compare === value
+          return compare === getLabel(suggestion).toLowerCase()
         })
 
         if (suggestion) {
