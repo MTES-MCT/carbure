@@ -200,79 +200,49 @@ export function updateLot(
   transactionID: number,
   params: any
 ): Promise<boolean> {
-  return (
-    api
-      .post("/lots/update", {
-        entity_id: entityID,
-        tx_id: transactionID,
-        ...params,
-      })
-      // resolve to true if it was a success
-      .then(() => true)
-  )
+  return api.post("/lots/update", {
+    entity_id: entityID,
+    tx_id: transactionID,
+    ...params,
+  })
 }
 
 export function duplicateLot(entityID: number, transactionID: number) {
-  return (
-    api
-      .post("/lots/duplicate", {
-        entity_id: entityID,
-        tx_id: transactionID,
-      })
-      // resolve to true if it was a success
-      .then(() => true)
-  )
+  return api.post("/lots/duplicate", {
+    entity_id: entityID,
+    tx_id: transactionID,
+  })
 }
 
 export function deleteLots(entityID: number, transactionIDs: number[]) {
-  return (
-    api
-      .post("/lots/delete", {
-        entity_id: entityID,
-        tx_ids: transactionIDs,
-      })
-      // resolve to true if it was a success
-      .then(() => true)
-  )
+  return api.post("/lots/delete", {
+    entity_id: entityID,
+    tx_ids: transactionIDs,
+  })
 }
 
 export function validateLots(entityID: number, transactionIDs: number[]) {
-  return (
-    api
-      .post("/lots/validate", {
-        entity_id: entityID,
-        tx_ids: transactionIDs,
-      })
-      // resolve to true if it was a success
-      .then(() => true)
-  )
+  return api.post("/lots/validate", {
+    entity_id: entityID,
+    tx_ids: transactionIDs,
+  })
 }
 
 export function acceptLots(entityID: number, transactionIDs: number[]) {
-  return (
-    api
-      .post("/lots/accept", {
-        entity_id: entityID,
-        tx_ids: transactionIDs,
-      })
-      // resolve to true if it was a success
-      .then(() => true)
-  )
+  return api.post("/lots/accept", {
+    entity_id: entityID,
+    tx_ids: transactionIDs,
+  })
 }
 
 export function acceptLotsWithReserve(
   entityID: number,
   transactionIDs: number[]
 ) {
-  return (
-    api
-      .post("/lots/accept-with-reserves", {
-        entity_id: entityID,
-        tx_ids: transactionIDs,
-      })
-      // resolve to true if it was a success
-      .then(() => true)
-  )
+  return api.post("/lots/accept-with-reserves", {
+    entity_id: entityID,
+    tx_ids: transactionIDs,
+  })
 }
 
 export function rejectLots(
@@ -280,16 +250,11 @@ export function rejectLots(
   transactionIDs: number[],
   comment: string
 ) {
-  return (
-    api
-      .post("/lots/reject", {
-        entity_id: entityID,
-        tx_ids: transactionIDs,
-        comment,
-      })
-      // resolve to true if it was a success
-      .then(() => true)
-  )
+  return api.post("/lots/reject", {
+    entity_id: entityID,
+    tx_ids: transactionIDs,
+    comment,
+  })
 }
 
 export function commentLot(
@@ -330,39 +295,24 @@ export function acceptAndCommentLot(
 }
 
 export function deleteAllDraftLots(entityID: number, year: number) {
-  return (
-    api
-      .post("/lots/delete-all-drafts", {
-        entity_id: entityID,
-        year,
-      })
-      // resolve to true if it was a success
-      .then(() => true)
-  )
+  return api.post("/lots/delete-all-drafts", {
+    entity_id: entityID,
+    year,
+  })
 }
 
 export function validateAllDraftLots(entityID: number, year: number) {
-  return (
-    api
-      .post("/lots/validate-all-drafts", {
-        entity_id: entityID,
-        year,
-      })
-      // resolve to true if it was a success
-      .then(() => true)
-  )
+  return api.post("/lots/validate-all-drafts", {
+    entity_id: entityID,
+    year,
+  })
 }
 
 export function acceptAllInboxLots(entityID: number, year: number) {
-  return (
-    api
-      .post("/lots/accept-all", {
-        entity_id: entityID,
-        year,
-      })
-      // resolve to true if it was a success
-      .then(() => true)
-  )
+  return api.post("/lots/accept-all", {
+    entity_id: entityID,
+    year,
+  })
 }
 
 export function rejectAllInboxLots(
@@ -370,16 +320,11 @@ export function rejectAllInboxLots(
   year: number,
   comment: string
 ) {
-  return (
-    api
-      .post("/lots/reject-all", {
-        entity_id: entityID,
-        year,
-        comment,
-      })
-      // resolve to true if it was a success
-      .then(() => true)
-  )
+  return api.post("/lots/reject-all", {
+    entity_id: entityID,
+    year,
+    comment,
+  })
 }
 
 export function getLotsOutSummary(entityID: number) {
