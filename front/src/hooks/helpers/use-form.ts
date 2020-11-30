@@ -10,7 +10,8 @@ function parseValue(element: FormFields) {
   if (isCheckbox(element)) {
     return element.checked
   } else if (element.type === "number") {
-    return parseFloat(element.value)
+    const parsed = parseFloat(element.value)
+    return isNaN(parsed) ? "" : parsed
   } else {
     return element.value
   }

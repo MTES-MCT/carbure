@@ -5,13 +5,14 @@ import { Entity, Lots, LotStatus, Transaction } from "../../services/types"
 import { SortingSelection } from "../../hooks/query/use-sort-by" // prettier-ignore
 import { TransactionSelection } from "../../hooks/query/use-selection"
 import { StatusSelection } from "../../hooks/query/use-status"
-import { hasDeadline } from "../../services/lots"
+
 import styles from "./transaction-table.module.css"
 
+import { hasDeadline } from "../../services/lots"
 import { useRelativePush } from "../relative-route"
 
 import { AlertTriangle, Check, Copy, Cross } from "../system/icons"
-import Table, { Actions, Column, Row } from "../system/table"
+import Table, { Actions, arrow, Column, Row } from "../system/table"
 import * as C from "./transaction-columns"
 
 export const PRODUCER_COLUMNS = [
@@ -127,7 +128,7 @@ export const TransactionTable = ({
   } else if (isProducer || isTrader) {
     columns.push(getDuplicateActions({ onDuplicate }))
   } else {
-    columns.push(C.arrow)
+    columns.push(arrow)
   }
 
   const rows: Row<Transaction>[] = transactions.lots.map((tx) => ({
