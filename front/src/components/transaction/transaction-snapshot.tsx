@@ -34,11 +34,13 @@ const STATUS_LABEL = {
 }
 
 export function mapStatus(
-  statuses: { [key: string]: number } | undefined
+  statuses: { [key: string]: number } | undefined,
+  placeholder: LotStatus[]
 ): [LotStatus, string, number][] {
-  if (!statuses) return []
-
-  const statusList = Object.entries(statuses)
+  const statusList: [string, number][] =
+    typeof statuses === "undefined"
+      ? placeholder.map((s) => [s, 0])
+      : Object.entries(statuses)
 
   statusList.sort(
     (a, b) =>
@@ -54,12 +56,14 @@ export function mapStatus(
 }
 
 type TransactionSnapshotProps = {
+  placeholder: LotStatus[]
   snapshot: ApiState<Snapshot>
   status: StatusSelection
   year: YearSelection
 }
 
 export const TransactionSnapshot = ({
+  placeholder,
   snapshot,
   status,
   year,
@@ -83,16 +87,18 @@ export const TransactionSnapshot = ({
         </div>
 
         <div className={styles.transactionStatus}>
-          {mapStatus(snapshot.data?.lots).map(([key, label, amount]) => (
-            <StatusButton
-              key={key}
-              active={key === status.active}
-              loading={snapshot.loading}
-              amount={amount}
-              label={label}
-              onClick={() => status.setActive(key)}
-            />
-          ))}
+          {mapStatus(snapshot.data?.lots, placeholder).map(
+            ([key, label, amount]) => (
+              <StatusButton
+                key={key}
+                active={key === status.active}
+                loading={snapshot.loading}
+                amount={amount}
+                label={label}
+                onClick={() => status.setActive(key)}
+              />
+            )
+          )}
         </div>
       </React.Fragment>
     )}

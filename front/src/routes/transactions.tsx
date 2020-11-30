@@ -70,9 +70,18 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
     return <Redirect relative to=".." />
   }
 
+  const statusPlaceholder = isOperator
+    ? OPERATOR_STATUSES
+    : PRODUCTOR_TRADER_STATUSES
+
   return (
     <Main>
-      <TransactionSnapshot snapshot={snapshot} status={status} year={year} />
+      <TransactionSnapshot
+        snapshot={snapshot}
+        status={status}
+        year={year}
+        placeholder={statusPlaceholder}
+      />
 
       <TransactionFilters
         search={search}

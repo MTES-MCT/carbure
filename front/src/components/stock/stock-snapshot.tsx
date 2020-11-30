@@ -1,7 +1,7 @@
 import React from "react"
 
 import { ApiState } from "../../hooks/helpers/use-api"
-import { StockSnapshot } from "../../services/types"
+import { LotStatus, StockSnapshot } from "../../services/types"
 import { StatusSelection } from "../../hooks/query/use-status"
 
 import styles from "./stock-snapshot.module.css"
@@ -10,6 +10,8 @@ import { Title, StatusButton } from "../system"
 import { Alert } from "../system/alert"
 
 import { mapStatus } from "../transaction/transaction-snapshot"
+
+const STOCK_STATUSES = [LotStatus.Inbox, LotStatus.Stock, LotStatus.ToSend]
 
 type StockSnapshotProps = {
   snapshot: ApiState<StockSnapshot>
@@ -27,16 +29,18 @@ export const StocksSnapshot = ({ snapshot, status }: StockSnapshotProps) => (
         </div>
 
         <div className={styles.stockStatus}>
-          {mapStatus(snapshot.data?.lots).map(([key, label, amount]) => (
-            <StatusButton
-              key={key}
-              active={key === status.active}
-              loading={snapshot.loading}
-              amount={amount}
-              label={label}
-              onClick={() => status.setActive(key)}
-            />
-          ))}
+          {mapStatus(snapshot.data?.lots, STOCK_STATUSES).map(
+            ([key, label, amount]) => (
+              <StatusButton
+                key={key}
+                active={key === status.active}
+                loading={snapshot.loading}
+                amount={amount}
+                label={label}
+                onClick={() => status.setActive(key)}
+              />
+            )
+          )}
         </div>
       </React.Fragment>
     )}
