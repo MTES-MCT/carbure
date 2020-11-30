@@ -895,8 +895,12 @@ def validate_lots(user, tx_ids):
             # when the lot is added to mass balance, auto-accept
             if tx.carbure_client == tx.carbure_vendor:
                 tx.delivery_status = 'A'
-            if tx.delivery_status in ['AA', 'AC', 'R']:
+            # if we save a lot that was requiring a fix, change status to 'AA'    
+            if tx.delivery_status in ['AC', 'R']:
                 tx.delivery_status = 'AA'
+            # if the client is not in carbure, auto-accept
+            if not tx.client_is_in_carbure:
+                tx.delivery_status = 'A'
         
         tx.save()
         tx.lot.save()
