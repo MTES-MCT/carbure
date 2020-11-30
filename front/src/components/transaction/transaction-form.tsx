@@ -475,11 +475,11 @@ const TransactionForm = ({
         </Box>
       </Box>
 
-      {error && (
+      {/* {error && (
         <Alert level="error" className={styles.transactionError}>
           {error}
         </Alert>
-      )}
+      )} */}
     </form>
   )
 }
