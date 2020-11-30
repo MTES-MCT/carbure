@@ -14,7 +14,7 @@ import TransactionDetails from "./transaction/transaction-details"
 import TransactionAdd from "./transaction/transaction-add"
 import TransactionOutSummary from "./transaction/transaction-out-summary"
 import TransactionInSummary from "./transaction/transaction-in-summary"
-import { EntityType, LotStatus } from "../services/types"
+import { EntityType, Filters, LotStatus } from "../services/types"
 
 // prettier-ignore
 const OPERATOR_STATUSES = [
@@ -23,11 +23,31 @@ const OPERATOR_STATUSES = [
   LotStatus.Accepted,
 ]
 
-const PRODUCTOR_TRADER_STATUSES = [
+const PRODUCER_TRADER_STATUSES = [
   LotStatus.Draft,
   LotStatus.Validated,
   LotStatus.ToFix,
   LotStatus.Accepted,
+]
+
+const OPERATOR_FILTERS = [
+  Filters.Periods,
+  Filters.Biocarburants,
+  Filters.MatieresPremieres,
+  Filters.Vendors,
+  Filters.CountriesOfOrigin,
+  Filters.ProductionSites,
+  Filters.DeliverySites,
+]
+
+const PRODUCER_TRADER_FILTERS = [
+  Filters.Periods,
+  Filters.Biocarburants,
+  Filters.MatieresPremieres,
+  Filters.Clients,
+  Filters.CountriesOfOrigin,
+  Filters.ProductionSites,
+  Filters.DeliverySites,
 ]
 
 export const Transactions = ({ entity }: { entity: EntitySelection }) => {
@@ -65,14 +85,18 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
 
   if (
     (isProducer || isTrader) &&
-    !PRODUCTOR_TRADER_STATUSES.includes(status.active)
+    !PRODUCER_TRADER_STATUSES.includes(status.active)
   ) {
     return <Redirect relative to=".." />
   }
 
   const statusPlaceholder = isOperator
     ? OPERATOR_STATUSES
-    : PRODUCTOR_TRADER_STATUSES
+    : PRODUCER_TRADER_STATUSES
+
+  const filtersPlaceholder = isOperator
+    ? OPERATOR_FILTERS
+    : PRODUCER_TRADER_FILTERS
 
   return (
     <Main>
@@ -86,7 +110,8 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
       <TransactionFilters
         search={search}
         selection={filters}
-        filters={snapshot.data?.filters ?? {}}
+        filters={snapshot.data?.filters}
+        placeholder={filtersPlaceholder}
       />
 
       <TransactionList

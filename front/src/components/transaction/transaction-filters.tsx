@@ -32,10 +32,14 @@ const FILTER_LABELS = {
 }
 
 export function mapFilters(
-  filters: Snapshot["filters"],
-  selected: FilterSelection["selected"]
+  filters: Snapshot["filters"] | undefined,
+  selected: FilterSelection["selected"],
+  placeholder: Filters[]
 ): [Filters, string, SelectValue, Option[]][] {
-  const filterList = Object.entries(filters)
+  const filterList: [string, Option[]?][] =
+    typeof filters === "undefined"
+      ? placeholder.map((f) => [f, []])
+      : Object.entries(filters)
 
   filterList.sort(
     (a, b) =>
@@ -53,17 +57,19 @@ export function mapFilters(
 type TransactionFiltersProps = {
   selection: FilterSelection
   search: SearchSelection
-  filters: Snapshot["filters"]
+  filters: Snapshot["filters"] | undefined
+  placeholder: Filters[]
 }
 
 const TransactionFilters = ({
   search,
   selection,
   filters,
+  placeholder,
 }: TransactionFiltersProps) => (
   <div className={styles.transactionFilters}>
     <div className={styles.filterGroup}>
-      {mapFilters(filters, selection.selected).map(
+      {mapFilters(filters, selection.selected, placeholder).map(
         ([filter, label, selected, options]) => (
           <Select
             clear
