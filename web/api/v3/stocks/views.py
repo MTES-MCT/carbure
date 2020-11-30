@@ -280,3 +280,62 @@ def upload_mass_balance(request):
         return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
     return JsonResponse({'status': 'success', 'loaded': nb_loaded, 'total': nb_total})
 
+
+# given a set of objectives and constraints, outputs a list of lots/sublots that solves the problem
+@check_rights('entity_id')
+def generate_batch(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    volume = request.GET.get('volume', False)
+    biocarburant = request.GET.get('biocarburant_code', False)
+    depot_source = request.GET.get('depot_id', False)
+    mp_blacklist = request.GET.getlist('mp_blacklist', False)
+    ghg_target = request.GET.get('ghg_target', False)
+
+    if not biocarburant:
+        return JsonResponse({'status': "error", 'message': "Missing biocarburant_code"}, status=400)
+    if not volume:
+        return JsonResponse({'status': "error", 'message': "Missing volume"}, status=400)
+
+
+    # get current stock
+    txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0)
+    # filter by requested biofuel
+    txs = txs.filter(lot__biocarburant__code=biocarburant)
+    
+    stock_per_depot = {}
+    for tx in txs:
+        if tx.delivery_site_is_in_carbure:
+            if tx.carbure_delivery_site not in stock_per_depot:
+                stock_per_depot[tx.carbure_delivery_site] = []
+            stock_per_depot[tx.carbure_delivery_site].append(tx)
+        else:
+            if tx.unknown_delivery_site not in stock_per_depot:
+                stock_per_depot[tx.unknown_delivery_site] = []
+            stock_per_depot[tx.unknown_delivery_site].append(tx)
+    # filter by depot_source if requested
+    depots_to_check = stock_per_depot.keys()
+    if depot_source:
+        if depot_source not in stock_per_depot:
+            return JsonResponse({'status': 'error', 'message': 'Could not find enough volume in depot %s' % (depot_source)}, status=400)
+        else:
+            depots_to_check = [stock_per_depot[depot_source]]
+
+    # do the actual calculations 
+    for depot in depots_to_check:
+        # do we have enough volume ?
+        pass
+
+    return JsonResponse({'status': 'success', 'data': []})
+
+
+# create many transactions at once from the send-complex modal window
+def send_batch(request):
+    entity = request.POST.get('entity_id', False)
+    dae = request.POST.get('dae', False)
+    client = request.POST.get('client', False)
+    delivery_site = request.POST.get('delivery_site', False)
+    unknown_delivery_site_country_code = request.POST.get('unknown_delivery_site_country_code', False)
+    actual_data = request.POST.getlist('transactions', False)
+
+    return JsonResponse({'status': 'success'})
