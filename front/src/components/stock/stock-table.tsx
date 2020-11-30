@@ -55,6 +55,7 @@ export const StockTable = ({
     columns.push(C.selector(selection))
     columns.push(C.depot)
     columns.push(C.vendor)
+    columns.push(C.dae)
   }
 
   if (status.is(LotStatus.Stock)) {
@@ -65,6 +66,7 @@ export const StockTable = ({
   columns.push(...default_columns)
 
   if (status.is(LotStatus.ToSend)) {
+    columns.push(C.dae)
     columns.push(C.client)
     columns.push(C.destination)
   }
