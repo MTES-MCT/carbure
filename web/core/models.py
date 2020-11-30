@@ -113,7 +113,9 @@ class MatierePremiere(models.Model):
     def __eq__(self, other):
         if type(other) == type('str'):
             return self.code == other
-        return self.code == other.code
+        if other:
+            return self.code == other.code
+        return self.code
 
     def natural_key(self):
         return {'code': self.code, 'name': self.name, 'is_double_compte': self.is_double_compte}
