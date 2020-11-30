@@ -8,6 +8,7 @@ import * as api from "../../services/settings"
 import useAPI from "../helpers/use-api"
 import { ISCCPrompt } from "../../components/settings/iscc-certificates-settings"
 import { ProductionSiteSettingsHook } from "./use-production-sites"
+import { useNotificationContext } from "../../components/system/notifications"
 
 export interface ISCCCertificateSettingsHook {
   isEmpty: boolean
@@ -22,6 +23,8 @@ export default function useISCCCertificates(
   entity: EntitySelection,
   productionSites: ProductionSiteSettingsHook
 ): ISCCCertificateSettingsHook {
+  const notifications = useNotificationContext()
+
   const [requestGetISCC, resolveGetISCC] = useAPI(api.getISCCCertificates)
   const [requestAddISCC, resolveAddISCC] = useAPI(api.addISCCCertificate)
   const [requestDelISCC, resolveDelISCC] = useAPI(api.deleteISCCCertificate)
@@ -41,6 +44,25 @@ export default function useISCCCertificates(
   function refresh() {
     if (entityID) {
       resolveGetISCC(entityID)
+      productionSites.refresh()
+    }
+  }
+
+  async function notifyCertificate(promise: Promise<any>, action: string) {
+    const res = await promise
+
+    if (res) {
+      refresh()
+
+      notifications.push({
+        level: "success",
+        text: `Le certificat a bien été ${action} !`,
+      })
+    } else {
+      notifications.push({
+        level: "error",
+        text: `Le certificat n'a pas pu être ${action}.`,
+      })
     }
   }
 
@@ -52,9 +74,7 @@ export default function useISCCCertificates(
     )
 
     if (entityID && data) {
-      resolveAddISCC(entityID, data.certificate_id).then(() =>
-        resolveGetISCC(entityID)
-      )
+      notifyCertificate(resolveAddISCC(entityID, data.certificate_id), "ajouté")
     }
   }
 
@@ -66,10 +86,10 @@ export default function useISCCCertificates(
         `Voulez-vous vraiment supprimer le certificat ISCC "${iscc.certificate_id}" ?`
       ))
     ) {
-      resolveDelISCC(entityID, iscc.certificate_id).then(() => {
-        refresh()
-        productionSites.refresh()
-      })
+      notifyCertificate(
+        resolveDelISCC(entityID, iscc.certificate_id),
+        "supprimé"
+      )
     }
   }
 
@@ -81,14 +101,10 @@ export default function useISCCCertificates(
     )
 
     if (entityID && data) {
-      resolveUpdateISCC(
-        entityID,
-        iscc.certificate_id,
-        data.certificate_id
-      ).then(() => {
-        refresh()
-        productionSites.refresh()
-      })
+      notifyCertificate(
+        resolveUpdateISCC(entityID, iscc.certificate_id, data.certificate_id),
+        "mis à jour"
+      )
     }
   }
 

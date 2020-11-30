@@ -42,6 +42,7 @@ export default function use2BSCertificates(
   function refresh() {
     if (entityID) {
       resolveGet2BS(entityID)
+      productionSites.refresh()
     }
   }
 
@@ -50,16 +51,15 @@ export default function use2BSCertificates(
 
     if (res) {
       refresh()
-      productionSites.refresh()
 
       notifications.push({
         level: "success",
-        text: `Le certificat a bien été ${action}`,
+        text: `Le certificat a bien été ${action} !`,
       })
     } else {
       notifications.push({
         level: "error",
-        text: `Le certificat n'a pas pu être ${action}`,
+        text: `Le certificat n'a pas pu être ${action}.`,
       })
     }
   }
