@@ -926,8 +926,8 @@ def upload(request):
     nb_loaded, nb_total = load_excel_file(entity, request.user, file)
     if nb_loaded is False:
         return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
-    return JsonResponse({'status': 'success', 'loaded': nb_loaded, 'total': nb_total})
-
+    data = {'loaded': nb_loaded, 'total': nb_total}
+    return JsonResponse({'status': 'success', 'data': data})
 
 
 def upload_blend(request):
@@ -951,6 +951,7 @@ def upload_blend(request):
     nb_loaded, nb_total = load_excel_file(entity, request.user, file)
     if nb_loaded is False:
         return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
-    return JsonResponse({'status': 'success', 'loaded': nb_loaded, 'total': nb_total})
+    data = {'loaded': nb_loaded, 'total': nb_total}
+    return JsonResponse({'status': 'success', 'data': data})
 
 
