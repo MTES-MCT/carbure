@@ -14,7 +14,7 @@ import useClose from "./helpers/use-close"
 import * as api from "../services/lots"
 import { useNotificationContext } from "../components/system/notifications"
 
-function getFieldErrors(errors: Errors) {
+export function getFieldErrors(errors: Errors) {
   const fieldErrors: { [k: string]: string } = {}
 
   errors.lots_errors?.forEach((err) => {
