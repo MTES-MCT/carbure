@@ -178,17 +178,31 @@ const TransactionForm = ({
               />
               <LabelInput
                 disabled
+                name="carbure_production_site_country"
                 label="Pays de production"
-                defaultValue={tx.carbure_production_site?.country?.name}
+                defaultValue={tx.carbure_production_site?.country?.name ?? ""}
               />
               <LabelInput
                 disabled
+                name="carbure_production_site_date"
                 type="date"
                 label="Date de mise en service"
-                defaultValue={tx.carbure_production_site?.date_mise_en_service}
+                defaultValue={
+                  tx.carbure_production_site?.date_mise_en_service ?? ""
+                }
               />
-              <LabelInput disabled label="N° d'enregistrement double-compte" />
-              <LabelInput disabled label="Référence Système Fournisseur" />
+              <LabelInput
+                disabled
+                name="carbure_production_site_dbl_counting"
+                label="N° d'enregistrement double-compte"
+                defaultValue=""
+              />
+              <LabelInput
+                disabled
+                name="carbure_production_site_reference"
+                label="Référence Système Fournisseur"
+                defaultValue=""
+              />
             </React.Fragment>
           ) : (
             <React.Fragment>
@@ -324,7 +338,8 @@ const TransactionForm = ({
             <LabelInput
               disabled
               label="Pays de livraison"
-              defaultValue={tx.carbure_delivery_site?.country?.name}
+              name="delivery_site_country"
+              defaultValue={tx.carbure_delivery_site?.country?.name ?? ""}
             />
           ) : (
             <LabelAutoComplete
@@ -465,12 +480,14 @@ const TransactionForm = ({
             <LabelInput
               readOnly
               label="Total"
-              value={`${tx.ghg_total} gCO2eq/MJ`}
+              name="ghg_total"
+              defaultValue={`${tx.ghg_total} gCO2eq/MJ`}
             />
             <LabelInput
               readOnly
               label="Réduction"
-              value={`${tx.ghg_reduction}%`}
+              name="ghg_reduction"
+              defaultValue={`${tx.ghg_reduction}%`}
             />
           </Box>
         </Box>

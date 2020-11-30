@@ -14,7 +14,6 @@ function useAutoComplete<T>(
   minLength: number,
   target: Element | null,
   onChange: (e: any) => void,
-  getValue: (option: T) => string,
   getLabel: (option: T) => string,
   getQuery: (q: string, ...a: any[]) => Promise<T[]>
 ) {
@@ -103,7 +102,6 @@ export function AutoComplete<T>({
     minLength,
     target.current,
     onChange,
-    getValue,
     getLabel,
     getQuery
   )
@@ -115,6 +113,7 @@ export function AutoComplete<T>({
       <Input
         {...props}
         value={query}
+        name={name}
         readOnly={readOnly}
         onChange={onQuery}
         innerRef={target}

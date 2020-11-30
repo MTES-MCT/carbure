@@ -66,7 +66,7 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
     dae: tx.dae,
     volume: tx.lot.volume,
     champ_libre: tx.champ_libre,
-    delivery_date: tx.delivery_date,
+    delivery_date: tx.delivery_date ?? "",
     mac: tx.is_mac,
 
     eec: tx.lot.eec,
