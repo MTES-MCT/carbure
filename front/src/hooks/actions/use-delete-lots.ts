@@ -42,8 +42,8 @@ export default function useDeleteLots(
       notifications.push({
         level: "error",
         text: many
-          ? "Impossible de supprimer certains de ces lots."
-          : "Impossible de supprimer ce lot.",
+          ? "Impossible de supprimer les lots."
+          : "Impossible de supprimer le lot.",
       })
     }
   }
