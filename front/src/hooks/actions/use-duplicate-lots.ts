@@ -25,14 +25,16 @@ export default function useDuplicateLot(
     )
 
     if (entity !== null && shouldDuplicate) {
-      await resolveDuplicate(entity.id, lotID)
+      const res = await resolveDuplicate(entity.id, lotID)
 
-      refresh()
+      if (res) {
+        refresh()
 
-      notifications.push({
-        level: "success",
-        text: "Le lot a bien été dupliqué !",
-      })
+        notifications.push({
+          level: "success",
+          text: "Le lot a bien été dupliqué !",
+        })
+      }
     }
 
     return shouldDuplicate

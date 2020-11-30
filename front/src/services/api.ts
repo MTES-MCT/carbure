@@ -71,7 +71,7 @@ async function get<T = any>(
   params?: Params,
   options?: Options
 ): Promise<T> {
-  let opts : Options = { credentials: 'same-origin', ...options}
+  let opts: Options = { credentials: "same-origin", ...options }
   let query = params ? "?" + stringify(filterParams(params)) : ""
   const res = await fetch(API_ROOT + endpoint + query, opts)
   return checkResponse<T>(res)
@@ -94,4 +94,5 @@ async function post<T = any>(
   return checkResponse<T>(res)
 }
 
-export default { download, get, post }
+const api = { download, get, post }
+export default api
