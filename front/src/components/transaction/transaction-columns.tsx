@@ -1,12 +1,12 @@
 import React from "react"
 
 import { Transaction } from "../../services/types"
+import { TransactionSelection } from "../../hooks/query/use-selection"
 import { Column, Line, TwoLines } from "../system/table"
 
 import styles from "./transaction-columns.module.css"
 
-import { TransactionSelection } from "../../hooks/query/use-selection"
-import { ChevronRight } from "../system/icons"
+import { Box } from "../system"
 import Status from "./transaction-status"
 
 export const empty: Column<any> = {
@@ -146,11 +146,13 @@ export const selector: Selector = (selection) => ({
   ),
 
   render: (tx) => (
-    <input
-      type="checkbox"
-      checked={selection.has(tx.id)}
-      onChange={() => selection.toggleSelect(tx.id)}
-      onClick={(e) => e.stopPropagation()}
-    />
+    <Box className={styles.checkboxWrapper}>
+      <input
+        type="checkbox"
+        checked={selection.has(tx.id)}
+        onChange={() => selection.toggleSelect(tx.id)}
+        onClick={(e) => e.stopPropagation()}
+      />
+    </Box>
   ),
 })
