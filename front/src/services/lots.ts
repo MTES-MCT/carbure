@@ -171,8 +171,14 @@ export function downloadTemplateAdvanced(entityID: number) {
   })
 }
 
-export function downloadTemplateMassBalance(entityID: number) {
-  return api.download("/lots/download-template-mass-balance", {
+export function downloadTemplateMassBalanceCarbureID(entityID: number) {
+  return api.download("/stocks/download-template-mass-balance", {
+    entity_id: entityID,
+  })
+}
+
+export function downloadTemplateMassBalanceBCGHG(entityID: number) {
+  return api.download("/stocks/download-template-mass-balance-bcghg", {
     entity_id: entityID,
   })
 }

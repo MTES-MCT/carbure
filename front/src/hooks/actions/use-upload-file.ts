@@ -12,7 +12,8 @@ export interface LotUploader {
   uploadOperatorFile: (f: File) => void
   downloadTemplateSimple: () => void
   downloadTemplateAdvanced: () => void
-  downloadTemplateMassBalance: () => void
+  downloadTemplateMassBalanceCarbureID: () => void
+  downloadTemplateMassBalanceBCGHG: () => void
   downloadTemplateOperator: () => void
   downloadTemplateTrader: () => void
 }
@@ -55,9 +56,15 @@ export default function useUploadLotFile(
     }
   }
 
-  function downloadTemplateMassBalance() {
+  function downloadTemplateMassBalanceCarbureID() {
     if (entity !== null) {
-      api.downloadTemplateMassBalance(entity.id)
+      api.downloadTemplateMassBalanceCarbureID(entity.id)
+    }
+  }
+
+  function downloadTemplateMassBalanceBCGHG() {
+    if (entity !== null) {
+      api.downloadTemplateMassBalanceBCGHG(entity.id)
     }
   }
 
@@ -80,7 +87,8 @@ export default function useUploadLotFile(
     uploadOperatorFile,
     downloadTemplateSimple,
     downloadTemplateAdvanced,
-    downloadTemplateMassBalance,
+    downloadTemplateMassBalanceCarbureID,
+    downloadTemplateMassBalanceBCGHG,
     downloadTemplateOperator,
     downloadTemplateTrader,
   }

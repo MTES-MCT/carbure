@@ -1,9 +1,10 @@
 from django.db.models import Q
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from core.models import LotTransaction
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, LotV2, Depot
 from core.decorators import check_rights
 from core.common import get_prefetched_data, load_mb_lot, bulk_insert
+from core.xlsx_v3 import template_stock, template_stock_bcghg
 
 sort_key_to_django_field = {'period': 'lot__period',
                             'biocarburant': 'lot__biocarburant__name',
@@ -165,6 +166,7 @@ def get_snapshot(request):
 
 @check_rights('entity_id')
 def send_lot(request, *args, **kwargs):
+
     context = kwargs['context']
     tx_id = request.POST.get('tx_id', False)
     entity_id = request.POST.get('entity_id', False)
@@ -198,3 +200,57 @@ def send_lot(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Could not add lot to database: %s' % (lot_errors)}, status=400)
     new_lots, new_txs = bulk_insert(context['entity'], [lot], [tx], [lot_errors], [tx_errors])
     return JsonResponse({'status': 'success'})
+
+
+def get_template_mass_balance(request):
+    entity_id = request.GET.get('entity_id', False)
+    if not entity_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
+
+    try:
+        entity = Entity.objects.get(id=entity_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
+                            status=400)
+
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    if entity not in rights:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+    file_location = template_stock(entity)
+    try:
+        with open(file_location, 'rb') as f:
+            file_data = f.read()
+            # sending response
+            response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment; filename="carbure_template_mass_balance.xlsx"'
+            return response
+    except Exception as e:
+        return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
+
+
+def get_template_mass_balance_bcghg(request):
+    entity_id = request.GET.get('entity_id', False)
+    if not entity_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
+
+    try:
+        entity = Entity.objects.get(id=entity_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
+                            status=400)
+
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    if entity not in rights:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+    file_location = template_stock(entity)
+    try:
+        with open(file_location, 'rb') as f:
+            file_data = f.read()
+            # sending response
+            response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment; filename="carbure_template_mass_balance.xlsx"'
+            return response
+    except Exception as e:
+        return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)

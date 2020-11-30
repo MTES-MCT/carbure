@@ -107,14 +107,19 @@ export const StockImportPromptFactory = (uploader: LotUploader) => ({
 }: PromptFormProps<File>) => (
   <ImportPrompt onConfirm={onConfirm} onCancel={onCancel}>
     <Box className={styles.importExplanation}>
-      Ce modèle vous permet de créer des lots à partir de votre Mass Balance
-      (onglet Lots en Stock)
+      Ce modèle vous permet de créer des lots à partir de votre stock
       <span
         className={styles.downloadLink}
-        onClick={uploader.downloadTemplateMassBalance}
+        onClick={uploader.downloadTemplateMassBalanceCarbureID}
       >
-        Télécharger le modèle
+        Télécharger le modèle 1
       </span>
+      <span
+        className={styles.downloadLink}
+        onClick={uploader.downloadTemplateMassBalanceBCGHG}
+      >
+        Télécharger le modèle 2
+      </span>      
     </Box>
   </ImportPrompt>
 )

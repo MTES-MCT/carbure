@@ -87,11 +87,11 @@ export const StockList = ({
 
           {status.is(LotStatus.Inbox) && <InboxSummaryActions />}
 
-          {status.is(LotStatus.Draft) && (
+          {status.is(LotStatus.ToSend) && (
             <StockImportActions uploader={uploader} />
           )}
 
-          {status.is(LotStatus.Draft) && (
+          {status.is(LotStatus.ToSend) && (
             <DraftActions
               disabled={isEmpty}
               hasSelection={selection.selected.length > 0}
