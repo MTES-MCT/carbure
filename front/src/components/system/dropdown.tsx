@@ -132,6 +132,9 @@ export function useDropdown(target?: Element | null) {
 
     function onCloseKey(e: KeyboardEvent) {
       if (["Escape", "Tab"].includes(e.key)) {
+        // prevent this event from triggering other similar callbacks
+        // like the one that closes open modals
+        e.stopImmediatePropagation()
         setOpen(false)
       }
     }
