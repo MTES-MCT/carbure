@@ -6,6 +6,7 @@ import * as api from "../../services/settings"
 import { NationalSystemCertificatesPromptFactory } from "../../components/settings/national-system-certificates-settings"
 import { prompt } from "../../components/system/dialog"
 import { SettingsGetter } from "../use-app"
+import { useNotificationContext } from "../../components/system/notifications"
 
 export interface NationalSystemCertificatesSettingsHook {
   isLoading: boolean
@@ -17,6 +18,8 @@ export default function useNationalSystemCertificates(
   entity: EntitySelection,
   settings: SettingsGetter
 ): NationalSystemCertificatesSettingsHook {
+  const notifications = useNotificationContext()
+
   const [requestSetNSC, resolveSetNSC] = useAPI(
     api.setNationalSystemCertificate
   )
@@ -32,8 +35,21 @@ export default function useNationalSystemCertificates(
     )
 
     if (entity && certificate) {
-      await resolveSetNSC(entity.id, certificate)
-      settings.resolve()
+      const res = await resolveSetNSC(entity.id, certificate)
+
+      if (res) {
+        settings.resolve()
+
+        notifications.push({
+          level: "success",
+          text: "Le n° de certificat a bien été modifié !",
+        })
+      } else {
+        notifications.push({
+          level: "error",
+          text: "Impossible de modifier le n° de certificat.",
+        })
+      }
     }
   }
 

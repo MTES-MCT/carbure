@@ -9,6 +9,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32px;
+  height: 48px;
 }
 
 .stockStatus {

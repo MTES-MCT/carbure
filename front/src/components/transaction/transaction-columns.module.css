@@ -1,5 +1,5 @@
-.checkboxColumn {
-  width: 40px;
+table .checkboxColumn {
+  width: 52px;
   text-align: center;
 }
 
@@ -9,4 +9,9 @@
 
 .dateColumn {
   width: 108px;
+}
+
+.checkboxWrapper {
+  align-items: center;
+  justify-content: center;
 }

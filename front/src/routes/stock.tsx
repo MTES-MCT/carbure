@@ -1,16 +1,24 @@
 import React from "react"
 
 import { EntitySelection } from "../hooks/helpers/use-entity"
+import { EntityType, Filters } from "../services/types"
 
 import { useStocks } from "../hooks/use-stock"
+import { Redirect, Route, Switch } from "../components/relative-route"
+import { StockInSummary } from "./stock/stock-in-summary"
+import { StockSendComplex } from "./stock/stock-send-complex"
 import { Main } from "../components/system"
 import { StocksSnapshot } from "../components/stock/stock-snapshot"
 import { StockList } from "../components/stock/stock-list"
 import TransactionFilters from "../components/transaction/transaction-filters"
-import { Redirect, Route, Switch } from "../components/relative-route"
-import { StockInSummary } from "./stock/stock-in-summary"
-import { StockSendComplex } from "./stock/stock-send-complex"
-import { EntityType } from "../services/types"
+
+const FILTERS = [
+  Filters.Biocarburants,
+  Filters.MatieresPremieres,
+  Filters.CountriesOfOrigin,
+  Filters.ProductionSites,
+  Filters.DeliverySites,
+]
 
 export const Stocks = ({ entity }: { entity: EntitySelection }) => {
   const {
@@ -49,7 +57,8 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
       <TransactionFilters
         search={search}
         selection={filters}
-        filters={snapshot.data?.filters ?? {}}
+        filters={snapshot.data?.filters}
+        placeholder={FILTERS}
       />
 
       <StockList

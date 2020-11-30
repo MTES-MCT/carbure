@@ -278,7 +278,8 @@ def upload_mass_balance(request):
     nb_loaded, nb_total = load_excel_file(entity, request.user, file, mass_balance=True)
     if nb_loaded is False:
         return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
-    return JsonResponse({'status': 'success', 'loaded': nb_loaded, 'total': nb_total})
+    data = {'loaded': nb_loaded, 'total': nb_total}
+    return JsonResponse({'status': 'success', 'data': data})
 
 
 # given a set of objectives and constraints, outputs a list of lots/sublots that solves the problem

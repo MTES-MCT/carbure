@@ -7,7 +7,7 @@ import { StatusSelection } from "../../hooks/query/use-status"
 
 import { useRelativePush } from "../relative-route"
 
-import Table, { Actions, Column, Row } from "../system/table"
+import Table, { Actions, arrow, Column, Row } from "../system/table"
 import * as C from "../transaction/transaction-columns"
 import { Edit } from "../system/icons"
 import { LotSender } from "../../hooks/actions/use-send-lots"
@@ -16,9 +16,7 @@ type A = Record<string, (id: number) => void>
 type CT = Column<Transaction>
 
 const getStockActions = ({ sendLot }: A): CT =>
-  Actions([
-  { icon: Edit, title: "Envoyer", action: (tx) => sendLot(tx.id) },
-])
+  Actions([{ icon: Edit, title: "Envoyer", action: (tx) => sendLot(tx.id) }])
 
 type StockTableProps = {
   stock: Lots | null
@@ -27,6 +25,8 @@ type StockTableProps = {
   selection: TransactionSelection
   sender: LotSender
 }
+
+const COLUMNS = [C.origine, C.biocarburant, C.matierePremiere, C.ghgReduction]
 
 export const StockTable = ({
   stock,
@@ -38,14 +38,7 @@ export const StockTable = ({
   const relativePush = useRelativePush()
   const sendLot = sender.sendLot
 
-
   const columns = []
-  const default_columns = [
-    C.origine,
-    C.biocarburant,
-    C.matierePremiere,
-    C.ghgReduction,
-  ]
 
   if (status.is(LotStatus.ToSend)) {
     columns.push(C.selector(selection))
@@ -63,12 +56,17 @@ export const StockTable = ({
     columns.push(C.depot)
   }
 
-  columns.push(...default_columns)
+  columns.push(...COLUMNS)
 
   if (status.is(LotStatus.ToSend)) {
     columns.push(C.dae)
     columns.push(C.client)
     columns.push(C.destination)
+    columns.push(arrow)
+  }
+
+  if (status.is(LotStatus.Inbox)) {
+    columns.push(arrow)
   }
 
   if (status.is(LotStatus.Stock)) {
