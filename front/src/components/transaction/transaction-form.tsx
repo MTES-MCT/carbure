@@ -19,6 +19,7 @@ import {
 import { Box, LabelCheckbox, LabelInput, LabelTextArea } from "../system"
 import { Alert } from "../system/alert"
 import { LabelAutoComplete } from "../system/autocomplete"
+import { AlertTriangle } from "../system/icons"
 
 // shorthand to build autocomplete value & label getters
 const get = (key: string) => (obj: { [k: string]: any } | null) =>
@@ -167,7 +168,7 @@ const TransactionForm = ({
                 placeholder="Rechercher un site de production..."
                 name="carbure_production_site"
                 value={tx.carbure_production_site}
-                error={fieldErrors.production_site}
+                error={fieldErrors.carbure_production_site}
                 getValue={getters.id}
                 getLabel={getters.name}
                 minLength={0}
@@ -245,7 +246,7 @@ const TransactionForm = ({
                 label="Référence Système Fournisseur"
                 name="unknown_production_site_reference"
                 value={tx.unknown_production_site_reference}
-                error={fieldErrors.production_site_reference}
+                error={fieldErrors.unknown_production_site_reference}
                 onChange={onChange}
               />
             </React.Fragment>
@@ -475,11 +476,15 @@ const TransactionForm = ({
         </Box>
       </Box>
 
-      {/* {error && (
-        <Alert level="error" className={styles.transactionError}>
+      {error && (
+        <Alert
+          level="error"
+          icon={AlertTriangle}
+          className={styles.transactionError}
+        >
           {error}
         </Alert>
-      )} */}
+      )}
     </form>
   )
 }
