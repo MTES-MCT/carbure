@@ -8,16 +8,19 @@ import styles from "./transaction-status.module.css"
 import { Box, Title } from "../system"
 import { hasDeadline } from "../../services/lots"
 
-function getStatusText(tx: Transaction | undefined): string {
+function getStatusText(
+  tx: Transaction | undefined,
+  isStock: boolean = false
+): string {
   if (!tx || tx.lot.status === "Draft") {
-    return "Brouillon"
+    return isStock ? "À envoyer" : "Brouillon"
   }
 
   switch (tx.delivery_status) {
     case "N":
       return "En attente"
     case "A":
-      return "Accepté"
+      return isStock ? "En stock" : "Accepté"
     case "R":
       return "Refusé"
     case "AC":
@@ -27,8 +30,13 @@ function getStatusText(tx: Transaction | undefined): string {
   }
 }
 
-function getStatusClass(tx: Transaction | undefined): string {
-  if (!tx || tx.lot.status === "Draft") return ""
+function getStatusClass(
+  tx: Transaction | undefined,
+  isStock?: boolean
+): string {
+  if (!tx || tx.lot.status === "Draft") {
+    return isStock ? styles.statusWaiting : ""
+  }
 
   switch (tx.delivery_status) {
     case "N":
@@ -44,29 +52,32 @@ function getStatusClass(tx: Transaction | undefined): string {
 }
 
 type StatusProps = {
+  stock?: boolean
   small?: boolean
   transaction: Transaction | undefined
 }
 
-const Status = ({ small, transaction }: StatusProps) => (
+const Status = ({ stock, small, transaction }: StatusProps) => (
   <span
     className={cl(
       styles.status,
       small && styles.smallStatus,
-      getStatusClass(transaction)
+      getStatusClass(transaction, stock)
     )}
   >
-    {getStatusText(transaction)}
+    {getStatusText(transaction, stock)}
   </span>
 )
 
 type StatusTitleProps = {
+  stock?: boolean
   editable?: boolean
   details?: LotDetails | null
   children: React.ReactNode
 }
 
 export const StatusTitle = ({
+  stock,
   editable,
   details,
   children,
@@ -78,7 +89,7 @@ export const StatusTitle = ({
   return (
     <Box row className={styles.statusTitle}>
       <Title>{children}</Title>
-      <Status transaction={details?.transaction} />
+      <Status stock={stock} transaction={details?.transaction} />
 
       {details && hasDeadline(details.transaction, details.deadline) && (
         <span className={styles.transactionDeadline}>
