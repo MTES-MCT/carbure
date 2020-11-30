@@ -117,7 +117,7 @@ export const depot: Column<Transaction> = {
     const location = city ? `${country}, ${city}` : country
 
     return <TwoLines text={name} sub={location} />
-  },  
+  },
 }
 
 export const destination: Column<Transaction> = {
@@ -129,12 +129,7 @@ export const destination: Column<Transaction> = {
     const location = city ? `${country}, ${city}` : country
 
     return <TwoLines text={name} sub={location} />
-  },  
-}
-
-export const arrow: Column<Transaction> = {
-  className: styles.actionColumn,
-  render: () => <ChevronRight />,
+  },
 }
 
 type Selector = (s: TransactionSelection) => Column<Transaction>

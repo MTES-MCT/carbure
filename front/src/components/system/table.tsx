@@ -23,6 +23,15 @@ export const TwoLines = ({ text, sub }: TwoLinesProps) => (
   </div>
 )
 
+export const arrow: Column<any> = {
+  className: styles.actionColumn,
+  render: () => (
+    <Box className={styles.actionCell}>
+      <ChevronRight />
+    </Box>
+  ),
+}
+
 interface Action<T> {
   icon: React.ComponentType<IconProps>
   title: string
