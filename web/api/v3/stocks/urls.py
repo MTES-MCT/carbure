@@ -9,5 +9,6 @@ urlpatterns = [
 
     path('download-template-mass-balance', views.get_template_mass_balance, name='api-v3-template-mass-balance'),
     path('download-template-mass-balance-bcghg', views.get_template_mass_balance_bcghg, name='api-v3-template-mass-balance-bcghg'),
+    path('upload-mass-balance', views.upload_mass_balance, name='api-v3-upload-mass-balance'),
 
 ]

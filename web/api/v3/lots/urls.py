@@ -28,7 +28,6 @@ urlpatterns = [
 
     # IMPORT/FILES
     path('upload', views.upload, name='api-v3-upload'),
-    path('upload-mass-balance', views.upload_mass_balance, name='api-v3-upload-mass-balance'),
     path('upload-blend', views.upload_blend, name='api-v3-upload-blend'),
 
     path('download-template-simple', views.get_template_producers_simple, name='api-v3-template-simple'),
