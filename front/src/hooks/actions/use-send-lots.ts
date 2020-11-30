@@ -5,6 +5,7 @@ import useAPI from "../helpers/use-api"
 
 import { prompt } from "../../components/system/dialog"
 import { StockSendLotPrompt } from "../../components/stock/stock-send-form"
+import { useNotificationContext } from "../../components/system/notifications"
 
 export interface LotSender {
   loading: boolean
@@ -15,6 +16,7 @@ export default function useSendLot(
   entity: EntitySelection,
   refresh: () => void
 ): LotSender {
+  const notifications = useNotificationContext()
   const [request, resolveSend] = useAPI(api.sendLotFromStock)
 
   async function sendLot(txID: number) {
@@ -25,7 +27,7 @@ export default function useSendLot(
     )
 
     if (entity !== null && sent) {
-      await resolveSend(
+      const res = await resolveSend(
         entity.id,
         txID,
         sent.volume,
@@ -40,7 +42,21 @@ export default function useSendLot(
         !sent.delivery_site_is_in_carbure
           ? sent.unknown_delivery_site_country?.code_pays ?? ""
           : ""
-      ).then(refresh)
+      )
+
+      if (res) {
+        refresh()
+
+        notifications.push({
+          level: "success",
+          text: "Le lot a bien été préparé pour l'envoi !",
+        })
+      } else {
+        notifications.push({
+          level: "success",
+          text: "Impossible d'envoyer le lot.",
+        })
+      }
     }
 
     return sent
