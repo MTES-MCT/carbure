@@ -7,6 +7,7 @@ import useAPI from "../helpers/use-api"
 
 import { prompt } from "../../components/system/dialog"
 import { CommentPrompt } from "../../components/comments"
+import { useNotificationContext } from "../../components/system/notifications"
 
 export interface LotRejector {
   loading: boolean
@@ -21,8 +22,32 @@ export default function useRejectLots(
   year: YearSelection,
   refresh: () => void
 ): LotRejector {
+  const notifications = useNotificationContext()
+
   const [request, resolveReject] = useAPI(api.rejectLots)
   const [requestAll, resolveRejectAll] = useAPI(api.rejectAllInboxLots)
+
+  async function notifyReject(promise: Promise<any>, many: boolean = false) {
+    const res = await promise
+
+    if (res) {
+      refresh()
+
+      notifications.push({
+        level: "success",
+        text: many
+          ? "Les lots ont bien été refusés !"
+          : "Le lot a bien été refusé !",
+      })
+    } else {
+      notifications.push({
+        level: "error",
+        text: many
+          ? "Impossible de refuser les lots."
+          : "Impossible de refuser le lot.",
+      })
+    }
+  }
 
   async function rejectLot(lotID: number) {
     const comment = await prompt(
@@ -32,7 +57,7 @@ export default function useRejectLots(
     )
 
     if (entity !== null && comment) {
-      resolveReject(entity.id, [lotID], comment).then(refresh)
+      notifyReject(resolveReject(entity.id, [lotID], comment))
     }
 
     return Boolean(comment)
@@ -46,7 +71,7 @@ export default function useRejectLots(
     )
 
     if (entity !== null && comment) {
-      await resolveReject(entity.id, selection.selected, comment).then(refresh)
+      notifyReject(resolveReject(entity.id, selection.selected, comment), true)
     }
 
     return Boolean(comment)
@@ -60,7 +85,7 @@ export default function useRejectLots(
     )
 
     if (entity !== null && comment) {
-      await resolveRejectAll(entity.id, year.selected, comment).then(refresh)
+      notifyReject(resolveRejectAll(entity.id, year.selected, comment), true)
     }
 
     return Boolean(comment)
