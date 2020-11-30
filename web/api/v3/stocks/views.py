@@ -244,7 +244,7 @@ def get_template_mass_balance_bcghg(request):
     if entity not in rights:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
-    file_location = template_stock(entity)
+    file_location = template_stock_bcghg(entity)
     try:
         with open(file_location, 'rb') as f:
             file_data = f.read()
