@@ -49,7 +49,7 @@ const Org = ({ app }: MainProps) => {
         </Route>
 
         <Route relative exact path="stocks">
-          <Redirect relative to="draft" />
+          <Redirect relative to="in" />
         </Route>
 
         <Route relative path="stocks/:status">
