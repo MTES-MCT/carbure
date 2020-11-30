@@ -175,7 +175,7 @@ def make_mb_extract_sheet_bcghg(workbook, entity):
 
     # header
     bold = workbook.add_format({'bold': True})
-    columns = ['biocarburant', 'ghg_total', 'volume', 'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
+    columns = ['biocarburant', 'matiere_premiere', 'ghg_total', 'depot', 'volume', 'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
 
@@ -189,7 +189,9 @@ def make_mb_extract_sheet_bcghg(workbook, entity):
         exported = random.choice(exported_lots)
         lot_source = random.choice(mb_lots)
 
-        row = [lot_source.lot.biocarburant.code, lot_source.lot.ghg_total, int(lot_source.lot.volume / 2), get_random_dae(), clientid]
+        row = [lot_source.lot.biocarburant.code, lot_source.lot.matiere_premiere.code, lot_source.lot.ghg_total, 
+               lot_source.carbure_delivery_site.depot_id if lot_source.delivery_site_is_in_carbure else lot_source.unknown_delivery_site, 
+               int(lot_source.lot.volume / 2), get_random_dae(), clientid]
         if exported == 1:
             # client is not in carbure
             c = random.choice(foreign_clients)

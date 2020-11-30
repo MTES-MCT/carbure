@@ -682,14 +682,9 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
                 return None, None, "Unknown matiere premiere", None
             matching_txs = matching_txs.filter(lot__matiere_premiere=mp)
         if ghg_reduction:
-            matching_txs = matching_txs.filter(lot__ghg_reduction=float(ghg_reduction))
+            matching_txs = matching_txs.filter(lot__ghg_reduction=ghg_reduction)
         if depot:
-            try:
-                depot = Depot.objects.get(depot_id=depot)
-            except:
-                return None, None, "Unknown depot", None
-            matching_txs = matching_txs.filter(delivery_site=depot)
-
+            matching_txs = matching_txs.filter(Q(carbure_delivery_site__depot_id=depot) | Q(unknown_delivery_site=depot))
         if matching_txs.count() == 1:
             source_tx = matching_txs[0]
             source_lot = LotV2.objects.get(id=source_tx.lot.id)
@@ -799,6 +794,8 @@ def load_excel_file(entity, user, file, mass_balance=False):
                 else:
                     lot, tx, l_errors, t_errors = load_lot(prefetched_data, entity, user, lot_row, 'EXCEL')
                 if lot is None:
+                    #print('Error loading line %s' % (lot_row))
+                    print(l_errors)
                     continue
                 lots_loaded += 1
                 lots_to_insert.append(lot)

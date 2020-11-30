@@ -929,29 +929,6 @@ def upload(request):
     return JsonResponse({'status': 'success', 'loaded': nb_loaded, 'total': nb_total})
 
 
-def upload_mass_balance(request):
-    file = request.FILES.get('file')
-    entity_id = request.POST.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
-    if file is None:
-        return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-
-    nb_loaded, nb_total = load_excel_file(entity, request.user, file, mass_balance=True)
-    if nb_loaded is False:
-        return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
-    return JsonResponse({'status': 'success', 'loaded': nb_loaded, 'total': nb_total})
-
 
 def upload_blend(request):
     file = request.FILES.get('file')

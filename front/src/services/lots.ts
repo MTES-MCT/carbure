@@ -143,7 +143,7 @@ export function uploadMassBalanceFile(
   entityID: number,
   file: File
 ): Promise<void> {
-  return api.post("/lots/upload-mass-balance", {
+  return api.post("/stocks/upload-mass-balance", {
     entity_id: entityID,
     file,
   })
