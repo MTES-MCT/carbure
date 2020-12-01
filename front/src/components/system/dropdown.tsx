@@ -188,6 +188,7 @@ type DropdownItemProps = React.HTMLProps<HTMLLIElement> & {
   selected?: boolean
   focused?: boolean
   className?: string
+  allowFocus?: boolean
   children: React.ReactNode
 }
 
@@ -196,11 +197,12 @@ export const DropdownItem = ({
   focused,
   className,
   children,
+  allowFocus,
   ...props
 }: DropdownItemProps) => (
   <li
     {...props}
-    onMouseDown={(e) => e.preventDefault()}
+    onMouseDown={allowFocus ? undefined : (e) => e.preventDefault()}
     className={cl(
       className,
       styles.dropdownItem,
