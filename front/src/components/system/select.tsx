@@ -185,7 +185,7 @@ export const Select = ({
           {(options, focused) => (
             <React.Fragment>
               {search && (
-                <DropdownItem>
+                <DropdownItem allowFocus>
                   <Input
                     type="text"
                     placeholder="Rechercher..."

@@ -16,7 +16,9 @@ type A = Record<string, (id: number) => void>
 type CT = Column<Transaction>
 
 const getStockActions = ({ sendLot }: A): CT =>
-  Actions([{ icon: Edit, title: "Envoyer", action: (tx) => sendLot(tx.id) }])
+  Actions([
+    { icon: Edit, title: "Préparer l'envoi", action: (tx) => sendLot(tx.id) },
+  ])
 
 type StockTableProps = {
   stock: Lots | null

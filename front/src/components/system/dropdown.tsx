@@ -132,6 +132,9 @@ export function useDropdown(target?: Element | null) {
 
     function onCloseKey(e: KeyboardEvent) {
       if (["Escape", "Tab"].includes(e.key)) {
+        // prevent this event from triggering other similar callbacks
+        // like the one that closes open modals
+        e.stopImmediatePropagation()
         setOpen(false)
       }
     }
@@ -185,6 +188,7 @@ type DropdownItemProps = React.HTMLProps<HTMLLIElement> & {
   selected?: boolean
   focused?: boolean
   className?: string
+  allowFocus?: boolean
   children: React.ReactNode
 }
 
@@ -193,11 +197,12 @@ export const DropdownItem = ({
   focused,
   className,
   children,
+  allowFocus,
   ...props
 }: DropdownItemProps) => (
   <li
     {...props}
-    onMouseDown={(e) => e.preventDefault()}
+    onMouseDown={allowFocus ? undefined : (e) => e.preventDefault()}
     className={cl(
       className,
       styles.dropdownItem,

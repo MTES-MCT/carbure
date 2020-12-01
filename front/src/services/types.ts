@@ -163,7 +163,7 @@ export interface Transaction {
   lot: Lot
   dae: string
   delivery_status: "N" | "AC" | "AA" | "A" | "R"
-  delivery_date: string
+  delivery_date: string | null
   champ_libre: string
   is_mac: boolean
 

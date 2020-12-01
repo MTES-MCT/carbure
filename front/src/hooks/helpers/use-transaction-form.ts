@@ -66,7 +66,7 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
     dae: tx.dae,
     volume: tx.lot.volume,
     champ_libre: tx.champ_libre,
-    delivery_date: tx.delivery_date,
+    delivery_date: tx.delivery_date ?? "",
     mac: tx.is_mac,
 
     eec: tx.lot.eec,
@@ -227,7 +227,8 @@ const initialState: TransactionFormState = {
 }
 
 export default function useTransactionForm(
-  entity: EntitySelection
+  entity: EntitySelection,
+  isStock: boolean = false
 ): FormHook<TransactionFormState> {
   const [form, hasChange, onChange, setForm] = useForm<TransactionFormState>(
     initialState
@@ -237,32 +238,34 @@ export default function useTransactionForm(
   const isOperator = entity?.entity_type === "Opérateur"
   const isTrader = entity?.entity_type === "Trader"
 
-  if (
-    isProducer &&
-    form.producer_is_in_carbure &&
-    form.carbure_producer?.id !== entity?.id
-  ) {
-    setForm({
-      ...form,
-      producer_is_in_carbure: true,
-      carbure_producer: entity,
-    })
-  }
+  if (!isStock) {
+    if (
+      isProducer &&
+      form.producer_is_in_carbure &&
+      form.carbure_producer?.id !== entity?.id
+    ) {
+      setForm({
+        ...form,
+        producer_is_in_carbure: true,
+        carbure_producer: entity,
+      })
+    }
 
-  if (isOperator && form.carbure_client?.id !== entity?.id) {
-    setForm({
-      ...form,
-      client_is_in_carbure: true,
-      carbure_client: entity,
-      producer_is_in_carbure: false,
-    })
-  }
+    if (isOperator && form.carbure_client?.id !== entity?.id) {
+      setForm({
+        ...form,
+        client_is_in_carbure: true,
+        carbure_client: entity,
+        producer_is_in_carbure: false,
+      })
+    }
 
-  if (isTrader && form.producer_is_in_carbure) {
-    setForm({
-      ...form,
-      producer_is_in_carbure: false,
-    })
+    if (isTrader && form.producer_is_in_carbure) {
+      setForm({
+        ...form,
+        producer_is_in_carbure: false,
+      })
+    }
   }
 
   return [form, hasChange, onChange, setForm]

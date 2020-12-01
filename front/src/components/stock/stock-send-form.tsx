@@ -162,7 +162,7 @@ export const StockSendLotPrompt = ({
           icon={Check}
           onClick={() => onConfirm(form)}
         >
-          Envoyer
+          Valider
         </Button>
         <Button onClick={onCancel}>Annuler</Button>
       </DialogButtons>

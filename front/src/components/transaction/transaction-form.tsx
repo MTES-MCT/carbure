@@ -19,6 +19,7 @@ import {
 import { Box, LabelCheckbox, LabelInput, LabelTextArea } from "../system"
 import { Alert } from "../system/alert"
 import { LabelAutoComplete } from "../system/autocomplete"
+import { AlertTriangle } from "../system/icons"
 
 // shorthand to build autocomplete value & label getters
 const get = (key: string) => (obj: { [k: string]: any } | null) =>
@@ -167,7 +168,7 @@ const TransactionForm = ({
                 placeholder="Rechercher un site de production..."
                 name="carbure_production_site"
                 value={tx.carbure_production_site}
-                error={fieldErrors.production_site}
+                error={fieldErrors.carbure_production_site}
                 getValue={getters.id}
                 getLabel={getters.name}
                 minLength={0}
@@ -177,17 +178,31 @@ const TransactionForm = ({
               />
               <LabelInput
                 disabled
+                name="carbure_production_site_country"
                 label="Pays de production"
-                defaultValue={tx.carbure_production_site?.country?.name}
+                defaultValue={tx.carbure_production_site?.country?.name ?? ""}
               />
               <LabelInput
                 disabled
+                name="carbure_production_site_date"
                 type="date"
                 label="Date de mise en service"
-                defaultValue={tx.carbure_production_site?.date_mise_en_service}
+                defaultValue={
+                  tx.carbure_production_site?.date_mise_en_service ?? ""
+                }
               />
-              <LabelInput disabled label="N° d'enregistrement double-compte" />
-              <LabelInput disabled label="Référence Système Fournisseur" />
+              <LabelInput
+                disabled
+                name="carbure_production_site_dbl_counting"
+                label="N° d'enregistrement double-compte"
+                defaultValue=""
+              />
+              <LabelInput
+                disabled
+                name="carbure_production_site_reference"
+                label="Référence Système Fournisseur"
+                defaultValue=""
+              />
             </React.Fragment>
           ) : (
             <React.Fragment>
@@ -245,7 +260,7 @@ const TransactionForm = ({
                 label="Référence Système Fournisseur"
                 name="unknown_production_site_reference"
                 value={tx.unknown_production_site_reference}
-                error={fieldErrors.production_site_reference}
+                error={fieldErrors.unknown_production_site_reference}
                 onChange={onChange}
               />
             </React.Fragment>
@@ -323,7 +338,8 @@ const TransactionForm = ({
             <LabelInput
               disabled
               label="Pays de livraison"
-              defaultValue={tx.carbure_delivery_site?.country?.name}
+              name="delivery_site_country"
+              defaultValue={tx.carbure_delivery_site?.country?.name ?? ""}
             />
           ) : (
             <LabelAutoComplete
@@ -464,22 +480,28 @@ const TransactionForm = ({
             <LabelInput
               readOnly
               label="Total"
-              value={`${tx.ghg_total} gCO2eq/MJ`}
+              name="ghg_total"
+              defaultValue={`${tx.ghg_total} gCO2eq/MJ`}
             />
             <LabelInput
               readOnly
               label="Réduction"
-              value={`${tx.ghg_reduction}%`}
+              name="ghg_reduction"
+              defaultValue={`${tx.ghg_reduction}%`}
             />
           </Box>
         </Box>
       </Box>
 
-      {/* {error && (
-        <Alert level="error" className={styles.transactionError}>
+      {error && (
+        <Alert
+          level="error"
+          icon={AlertTriangle}
+          className={styles.transactionError}
+        >
           {error}
         </Alert>
-      )} */}
+      )}
     </form>
   )
 }

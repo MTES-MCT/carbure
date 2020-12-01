@@ -343,6 +343,10 @@ export function hasDeadline(tx: Transaction, deadline: string): boolean {
   if (!tx || tx.lot.status !== "Draft") return false
 
   const deadlineDate = new Date(deadline)
-  const deliveryDate = new Date(tx?.delivery_date)
+
+  const deliveryDate = tx?.delivery_date
+    ? new Date(tx.delivery_date)
+    : new Date()
+
   return differenceInCalendarMonths(deadlineDate, deliveryDate) === 1
 }
