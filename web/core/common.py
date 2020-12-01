@@ -16,8 +16,7 @@ def check_duplicates(entity, new_lots, new_txs, background=True):
     if background:
         db.connections.close_all()
     new_daes = [t.dae for t in new_txs]
-    print(new_daes)
-    duplicates = LotTransaction.objects.filter(dae__in=new_daes).values('dae', 'lot__biocarburant_id', 'lot__volume').annotate(count=Count('dae')).filter(count__gt=1)
+    duplicates = LotTransaction.objects.filter(dae__in=new_daes, lot__status='Validated').values('dae', 'lot__biocarburant_id', 'lot__volume').annotate(count=Count('dae')).filter(count__gt=1)
     if duplicates.count() > 0:
         print('Found duplicates')
         print(duplicates)
@@ -25,46 +24,33 @@ def check_duplicates(entity, new_lots, new_txs, background=True):
         # when a duplicate exists, the first validated one is right
         for d in duplicates:
             dae = d['dae']
-            matches = LotTransaction.objects.filter(dae=dae).order_by('id')
-            only_drafts = True
-            tx_with_valid_lot = False
+            matches = LotTransaction.objects.filter(dae=dae, lot__status='Validated').order_by('id')
+            first_valid = matches[0]
             for m in matches:
-                if m.lot.status != 'Draft':
-                    only_drafts = False
-                    if not tx_with_valid_lot:
-                        tx_with_valid_lot = m
-            # if there are only drafts, the first one is right
-            if only_drafts:
-                print('Only drafts, keep the first one %d' % (matches[0].id))
-                for m in matches[1:]:
-                    print('deleting %d' % m.id)
-                    m.delete()
-            else:
-                # otherwise
                 # if we have a valid tx with this DAE AND we created it, delete everything else 
-                if tx_with_valid_lot.lot.added_by == entity:
-                    matches.exclude(id=tx_with_valid_lot.id).delete()
+                if first_valid.lot.added_by == entity:
+                    matches.exclude(id=first_valid.id).delete()
                 else:
                     # there is a tx with a valid lot, this DAE, but we haven't created it
                     # it can happen if the producer has already created the tx and the operator tries to upload it
                     # or the operator has created it and the producer is trying to upload it
                     # take the existing tx. if vendor is not in carbure, assume we are the vendor
                     # if client not in carbure, assume we are the client
-                    if not tx_with_valid_lot.client_is_in_carbure:
+                    if not first_valid.client_is_in_carbure:
                         # assume we are the client
-                        tx_with_valid_lot.client_is_in_carbure = True
-                        tx_with_valid_lot.carbure_client = entity
+                        first_valid.client_is_in_carbure = True
+                        first_valid.carbure_client = entity
                         latest_tx = matches[-1]
-                        tx_with_valid_lot.delivery_site_is_in_carbure = latest_tx.delivery_site_is_in_carbure
-                        tx_with_valid_lot.carbure_delivery_site = latest_tx.carbure_delivery_site
-                        tx_with_valid_lot.unknown_delivery_site = latest_tx.unknown_delivery_site
-                        tx_with_valid_lot.unknown_delivery_site_country = latest_tx.unknown_delivery_site_country
+                        first_valid.delivery_site_is_in_carbure = latest_tx.delivery_site_is_in_carbure
+                        first_valid.carbure_delivery_site = latest_tx.carbure_delivery_site
+                        first_valid.unknown_delivery_site = latest_tx.unknown_delivery_site
+                        first_valid.unknown_delivery_site_country = latest_tx.unknown_delivery_site_country
                     else:
                         # assume we are the vendor
-                        tx_with_valid_lot.vendor_is_in_carbure = True
-                        tx_with_valid_lot.carbure_vendor = entity
-                    tx_with_valid_lot.save()
-                    matches.exclude(id=tx_with_valid_lot.id).delete()
+                        first_valid.vendor_is_in_carbure = True
+                        first_valid.carbure_vendor = entity
+                    first_valid.save()
+                    matches.exclude(id=first_valid.id).delete()
     else:
         print('No duplicate DAE found')
 
