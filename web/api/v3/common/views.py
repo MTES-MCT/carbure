@@ -9,7 +9,7 @@ from producers.models import ProductionSite, ProductionSiteInput, ProductionSite
 
 def get_matieres_premieres(request):
     q = request.GET.get('query', False)
-    mps = MatierePremiere.objects.all()
+    mps = MatierePremiere.objects.filter(is_displayed=True)
     if q:
         mps = mps.filter(Q(name__icontains=q) | Q(code__icontains=q))
     sez = [{'code': m.code, 'name': m.name, 'description': m.description, 'compatible_alcool': m.compatible_alcool,
@@ -19,7 +19,7 @@ def get_matieres_premieres(request):
 
 def get_biocarburants(request):
     q = request.GET.get('query', False)
-    bcs = Biocarburant.objects.all()
+    bcs = Biocarburant.objects.filter(is_displayed=True)
     if q:
         bcs = bcs.filter(Q(name__icontains=q) | Q(code__icontains=q))
     sez = [{'code': b.code, 'name': b.name, 'description': b.description, 'pci_kg': b.pci_kg, 'pci_litre': b.pci_litre,

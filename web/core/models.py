@@ -78,6 +78,7 @@ class Biocarburant(models.Model):
     masse_volumique = models.FloatField(default=0)
     is_alcool = models.BooleanField(default=False)
     is_graisse = models.BooleanField(default=False)
+    is_displayed = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -106,7 +107,9 @@ class MatierePremiere(models.Model):
     compatible_graisse = models.BooleanField(default=False)
     is_double_compte = models.BooleanField(default=False)
     is_huile_vegetale = models.BooleanField(default=False)
+    is_displayed = models.BooleanField(default=True)
     
+
     def __str__(self):
         return self.name
 
