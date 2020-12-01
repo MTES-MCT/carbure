@@ -7,7 +7,7 @@ import styles from "./dropdown.module.css"
 import { SystemProps } from "."
 import { ChevronDown } from "./icons"
 
-const portal = document.getElementById("modal")!
+const portal = document.getElementById("dropdown")!
 
 // scroll to the specific dropdown option when the focus changes
 function scrollToIndex(list: Element | null, focused: number) {

@@ -34,7 +34,7 @@ const EntityPrompt = ({ onConfirm, onCancel }: PromptFormProps<Entity>) => {
     <SettingsForm>
       <LabelAutoComplete
         label="Organisation"
-        placeholder="Rechercher une société.."
+        placeholder="Rechercher une société..."
         name="entity"
         value={entity}
         getQuery={common.findEntities}
