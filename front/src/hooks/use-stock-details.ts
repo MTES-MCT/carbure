@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { useParams } from "react-router-dom"
 
-import { Errors, LotStatus } from "../services/types"
+import { LotStatus } from "../services/types"
 import { EntitySelection } from "./helpers/use-entity"
 
 import useTransactionForm, {
@@ -13,22 +13,10 @@ import useAPI from "./helpers/use-api"
 import useClose from "./helpers/use-close"
 import * as api from "../services/lots"
 import { useNotificationContext } from "../components/system/notifications"
+import { getFieldErrors } from "./use-transaction-details"
+import { getStockStatus } from "../services/stocks"
 
-export function getFieldErrors(errors: Errors) {
-  const fieldErrors: { [k: string]: string } = {}
-
-  errors.lots_errors?.forEach((err) => {
-    fieldErrors[err.field] = err.error
-  })
-
-  errors.tx_errors?.forEach((err) => {
-    fieldErrors[err.field] = err.error
-  })
-
-  return fieldErrors
-}
-
-export default function useTransactionDetails(
+export default function useStockDetails(
   entity: EntitySelection,
   refresh: () => void
 ) {
@@ -36,10 +24,9 @@ export default function useTransactionDetails(
   const notifications = useNotificationContext()
 
   const close = useClose("../")
-  const [form, hasChange, change, setForm] = useTransactionForm(entity)
+  const [form, hasChange, change, setForm] = useTransactionForm(entity, true)
   const [details, resolveDetails] = useAPI(api.getDetails)
   const [request, resolveUpdate] = useAPI(api.updateLot)
-  const [comment, resolveComment] = useAPI(api.commentLot)
 
   const entityID = entity?.id
   const txID = parseInt(params.id, 10)
@@ -47,7 +34,7 @@ export default function useTransactionDetails(
 
   const fieldErrors = details.data ? getFieldErrors(details.data.errors) : {}
   const validationErrors = details.data?.errors.validation_errors ?? []
-  const status = tx && entity ? api.getStatus(tx, entity.id) : LotStatus.Weird
+  const status = tx && entity ? getStockStatus(tx) : LotStatus.Weird
 
   function refreshDetails() {
     if (entityID) {
@@ -76,13 +63,6 @@ export default function useTransactionDetails(
     }
   }
 
-  async function addComment(message: string) {
-    if (entityID) {
-      await resolveComment(entityID, txID, message, "both")
-      await resolveDetails(entityID, txID)
-    }
-  }
-
   useEffect(() => {
     if (entityID) {
       return resolveDetails(entityID, txID).cancel
@@ -99,7 +79,6 @@ export default function useTransactionDetails(
     form,
     hasChange,
     details,
-    comment,
     fieldErrors,
     validationErrors,
     status,
@@ -107,7 +86,6 @@ export default function useTransactionDetails(
     change,
     submit,
     close,
-    addComment,
     refreshDetails,
   }
 }

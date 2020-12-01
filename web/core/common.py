@@ -636,7 +636,7 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
     carbure_id = lot_dict.get('carbure_id', False)
     tx_id = lot_dict.get('tx_id', False)
     biocarburant = lot_dict.get('biocarburant', False)
-    depot = lot_dict.get('depot', False)
+    delivery_site = lot_dict.get('delivery_site', False)
     matiere_premiere = lot_dict.get('matiere_premiere', False)
     ghg_reduction = lot_dict.get('ghg_reduction', False)
 
@@ -669,8 +669,8 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
             matching_txs = matching_txs.filter(lot__matiere_premiere=mp)
         if ghg_reduction:
             matching_txs = matching_txs.filter(lot__ghg_reduction=ghg_reduction)
-        if depot:
-            matching_txs = matching_txs.filter(Q(carbure_delivery_site__depot_id=depot) | Q(unknown_delivery_site=depot))
+        if delivery_site:
+            matching_txs = matching_txs.filter(Q(carbure_delivery_site__depot_id=delivery_site) | Q(unknown_delivery_site=delivery_site))
         if matching_txs.count() == 1:
             source_tx = matching_txs[0]
             source_lot = LotV2.objects.get(id=source_tx.lot.id)

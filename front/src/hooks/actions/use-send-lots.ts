@@ -21,7 +21,7 @@ export default function useSendLot(
 
   async function sendLot(txID: number) {
     const sent = await prompt(
-      "Envoyer lot",
+      "Préparer lot",
       "Veuillez préciser les détails du lot à envoyer",
       StockSendLotPrompt
     )
@@ -37,7 +37,7 @@ export default function useSendLot(
           ? `${sent.carbure_client?.name ?? ""}`
           : sent.unknown_client,
         sent.delivery_site_is_in_carbure
-          ? sent.carbure_delivery_site?.name ?? ""
+          ? sent.carbure_delivery_site?.depot_id ?? ""
           : sent.unknown_delivery_site,
         !sent.delivery_site_is_in_carbure
           ? sent.unknown_delivery_site_country?.code_pays ?? ""

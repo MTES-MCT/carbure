@@ -14,7 +14,6 @@ function useAutoComplete<T>(
   minLength: number,
   target: Element | null,
   onChange: (e: any) => void,
-  getValue: (option: T) => string,
   getLabel: (option: T) => string,
   getQuery: (q: string, ...a: any[]) => Promise<T[]>
 ) {
@@ -36,8 +35,11 @@ function useAutoComplete<T>(
     const query = "value" in e.target ? e.target.value : ""
     setQuery(query)
 
-    if (query.length < minLength) {
+    if (query.length === 0) {
       onChange({ target: { name, value: null } })
+    }
+
+    if (query.length < minLength) {
       dd.toggle(false)
     } else {
       dd.toggle(true)
@@ -50,9 +52,7 @@ function useAutoComplete<T>(
         const compare = query.toLowerCase()
 
         const suggestion = results.find((suggestion) => {
-          const label = getLabel(suggestion).toLowerCase()
-          const value = getValue(suggestion).toLowerCase()
-          return compare === label || compare === value
+          return compare === getLabel(suggestion).toLowerCase()
         })
 
         if (suggestion) {
@@ -102,7 +102,6 @@ export function AutoComplete<T>({
     minLength,
     target.current,
     onChange,
-    getValue,
     getLabel,
     getQuery
   )
@@ -114,6 +113,7 @@ export function AutoComplete<T>({
       <Input
         {...props}
         value={query}
+        name={name}
         readOnly={readOnly}
         onChange={onQuery}
         innerRef={target}

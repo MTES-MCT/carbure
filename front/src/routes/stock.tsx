@@ -11,6 +11,7 @@ import { Main } from "../components/system"
 import { StocksSnapshot } from "../components/stock/stock-snapshot"
 import { StockList } from "../components/stock/stock-list"
 import TransactionFilters from "../components/transaction/transaction-filters"
+import StockDetails from "./stock/stock-details"
 
 const FILTERS = [
   Filters.Biocarburants,
@@ -37,6 +38,7 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
     acceptor,
     rejector,
     sender,
+    refresh,
   } = useStocks(entity)
 
   if (entity === null) {
@@ -80,8 +82,21 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
         <Route relative path="show-summary-in">
           <StockInSummary entity={entity} />
         </Route>
+
         <Route relative path="send-complex">
           <StockSendComplex entity={entity} />
+        </Route>
+
+        <Route relative path=":id">
+          <StockDetails
+            entity={entity}
+            deleter={deleter}
+            validator={validator}
+            acceptor={acceptor}
+            rejector={rejector}
+            sender={sender}
+            refresh={refresh}
+          />
         </Route>
       </Switch>
     </Main>

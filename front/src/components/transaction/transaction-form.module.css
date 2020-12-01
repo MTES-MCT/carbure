@@ -52,3 +52,7 @@
 .transactionCloseButton {
   margin-left: auto;
 }
+
+.transactionError {
+  margin-top: 16px;
+}
