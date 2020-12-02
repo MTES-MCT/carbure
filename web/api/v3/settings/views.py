@@ -442,12 +442,12 @@ def add_delivery_site(request, *args, **kwargs):
                              'extra': str(e)}, status=400)
 
     try:
-        eds = EntityDepot.objects.update_or_create(entity=entity, depot=ds, ownership_type=ownership_type)
+        EntityDepot.objects.update_or_create(entity=entity, depot=ds, ownership_type=ownership_type)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Could not link entity to delivery site",
                              'extra': str(e)}, status=400)
 
-    return JsonResponse({'status': 'success', 'data': eds.natural_key()})
+    return JsonResponse({'status': 'success'})
     
 
 @check_rights('entity_id')
@@ -456,12 +456,12 @@ def delete_delivery_site(request, *args, **kwargs):
     delivery_site_id = request.POST.get('delivery_site_id', False)
 
     try:
-        EntityDepot.objects.get(entity=entity, depot__id=delivery_site_id).delete()
+        EntityDepot.objects.get(entity=entity, depot__depot_id=delivery_site_id).delete()
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Could not delete entity's delivery site",
                              'extra': str(e)}, status=400)
 
-    return JsonResponse({'status': 'success', 'data': ds})
+    return JsonResponse({'status': 'success'})
     
 
 @check_rights('entity_id')

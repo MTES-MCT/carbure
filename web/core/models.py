@@ -175,8 +175,7 @@ class EntityDepot(models.Model):
         return str(self.id)
 
     def natural_key(self):
-        return {'id': self.id, 'depot': self.depot.natural_key(), 'entity': self.entity.natural_key(), 
-            'ownership_type': self.ownership_type}
+        return {'depot': self.depot.natural_key(),'ownership_type': self.ownership_type}
 
     class Meta:
         db_table = 'entity_depot'
