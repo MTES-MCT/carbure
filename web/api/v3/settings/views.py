@@ -3,7 +3,7 @@ from dateutil.relativedelta import *
 
 from django.http import JsonResponse
 from django.db.models import Q
-from core.models import Entity, UserRights, LotV2, Pays, MatierePremiere, Biocarburant
+from core.models import Entity, UserRights, LotV2, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput, ProducerCertificate
 from core.decorators import check_rights
 from core.models import ISCCCertificate, DBSCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate
@@ -409,6 +409,63 @@ def delete_production_site_bc(request):
                              'extra': str(e)}, status=400)
     return JsonResponse({'status': 'success'})
 
+
+@check_rights('entity_id')
+def get_delivery_sites(request, *args, **kwargs):
+    entity = kwargs['context']['entity']
+
+    try:
+        ds = EntityDepot.objects.filter(entity=entity)
+        ds = [d.natural_key() for d in ds]
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Could not find entity's delivery sites",
+                             'extra': str(e)}, status=400)
+
+    return JsonResponse({'status': 'success', 'data': ds})
+    
+
+@check_rights('entity_id')
+def add_delivery_site(request, *args, **kwargs):
+    entity = kwargs['context']['entity']
+    delivery_site_id = request.POST.get('delivery_site_id', False)
+    ownership_type = request.POST.get('ownership_type', False)
+
+    if not delivery_site_id:
+        return JsonResponse({'status': 'error', 'message': "Missing delivery site id"}, status=400)
+    if not ownership_type:
+        return JsonResponse({'status': 'error', 'message': "Missing ownership type"}, status=400)
+
+    try:
+        ds = Depot.objects.get(pk=delivery_site_id)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Could not find delivery site",
+                             'extra': str(e)}, status=400)
+
+    if entity.entity_type != 'Opérateur' and ds.depot_type == 'EFS':
+        return JsonResponse({'status': 'error', 'message': "Only operators can register an EFS site"}, status=400)
+
+    try:
+        EntityDepot.objects.update_or_create(entity=entity, depot=ds, defaults={'ownership_type': ownership_type})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Could not link entity to delivery site",
+                             'extra': str(e)}, status=400)
+
+    return JsonResponse({'status': 'success'})
+    
+
+@check_rights('entity_id')
+def delete_delivery_site(request, *args, **kwargs):
+    entity = kwargs['context']['entity']
+    delivery_site_id = request.POST.get('delivery_site_id', False)
+
+    try:
+        EntityDepot.objects.filter(entity=entity, depot__depot_id=delivery_site_id).delete()
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Could not delete entity's delivery site",
+                             'extra': str(e)}, status=400)
+
+    return JsonResponse({'status': 'success'})
+    
 
 @check_rights('entity_id')
 def set_national_system_certificate(request, *args, **kwargs):

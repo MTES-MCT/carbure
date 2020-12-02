@@ -49,8 +49,11 @@ export function findProductionSites(
   return api.get("/common/production-sites", { query, producer_id: producerID })
 }
 
-export function findDeliverySites(query: string): Promise<DeliverySite[]> {
-  return api.get("/common/delivery-sites", { query })
+export function findDeliverySites(
+  query: string,
+  entity_id?: number
+): Promise<DeliverySite[]> {
+  return api.get("/common/delivery-sites", { query, entity_id })
 }
 
 export function findGHG(

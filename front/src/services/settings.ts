@@ -7,6 +7,7 @@ import {
   ProductionSite,
   ProductionSiteDetails,
   Certificate,
+  OwnershipType,
 } from "./types"
 
 export function getSettings(): Promise<Settings> {
@@ -172,6 +173,34 @@ export function setProductionSiteCertificates(
     entity_id,
     production_site_id,
     certificate_ids,
+  })
+}
+
+export function getDeliverySites(entity_id: number) {
+  return api.get("/settings/get-delivery-sites", {
+    entity_id,
+  })
+}
+
+export function addDeliverySite(
+  entity_id: number,
+  delivery_site_id: string,
+  ownership_type: OwnershipType
+) {
+  return api.post("/settings/add-delivery-site", {
+    entity_id,
+    delivery_site_id,
+    ownership_type,
+  })
+}
+
+export function deleteDeliverySite(
+  entity_id: number,
+  delivery_site_id: string
+) {
+  return api.post("/settings/delete-delivery-site", {
+    entity_id,
+    delivery_site_id,
   })
 }
 
