@@ -30,7 +30,7 @@ export default function useUploadLotFile(
   const [, resolveUploadOperator] = useAPI(api.uploadOperatorLotFile)
 
   async function notifyImport(promise: Promise<any>) {
-    notifications.push({
+    const startNotif = notifications.push({
       text: "L'importation a débuté, veuillez patienter.",
     })
 
@@ -44,9 +44,11 @@ export default function useUploadLotFile(
           ? "warning"
           : "success"
 
+      notifications.dispose(startNotif.key)
+
       notifications.push({
         level,
-        text: `${res.loaded} transactions sur ${res.total} ont été importées depuis le fichier.`,
+        text: `${res.loaded} lots sur ${res.total} ont été importées depuis le fichier.`,
       })
 
       refresh()
