@@ -59,7 +59,6 @@ export const StockList = ({
   selection,
   deleter,
   uploader,
-  validator,
   acceptor,
   rejector,
   sender,
@@ -97,7 +96,7 @@ export const StockList = ({
               hasSelection={selection.selected.length > 0}
               uploader={uploader}
               deleter={deleter}
-              validator={validator}
+              sender={sender}
             />
           )}
 

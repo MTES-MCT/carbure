@@ -64,7 +64,7 @@ export function getStocks(
   })
 }
 
-export function sendLotFromStock(
+export function createDraftFromStock(
   entity_id: number,
   tx_id: number,
   volume: number,
@@ -74,7 +74,7 @@ export function sendLotFromStock(
   delivery_site: string,
   delivery_site_country?: string
 ) {
-  return api.post("/stocks/send-lot", {
+  return api.post("/stocks/create-lot", {
     entity_id,
     tx_id,
     volume,
@@ -84,4 +84,12 @@ export function sendLotFromStock(
     delivery_site,
     delivery_site_country,
   })
+}
+
+export function sendDraftsFromStock() {
+
+}
+
+export function sendAllDraftFromStock() {
+
 }

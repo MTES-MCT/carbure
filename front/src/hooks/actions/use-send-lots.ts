@@ -6,18 +6,24 @@ import useAPI from "../helpers/use-api"
 import { prompt } from "../../components/system/dialog"
 import { StockSendLotPrompt } from "../../components/stock/stock-send-form"
 import { useNotificationContext } from "../../components/system/notifications"
+import { TransactionSelection } from "../query/use-selection"
 
 export interface LotSender {
   loading: boolean
-  sendLot: (i: number) => Promise<any>
+  sendLot: (i: number) => Promise<boolean>
+  sendAll: () => Promise<boolean>
+  sendSelection: () => Promise<boolean>
 }
 
 export default function useSendLot(
   entity: EntitySelection,
+  selection: TransactionSelection,
   refresh: () => void
 ): LotSender {
   const notifications = useNotificationContext()
-  const [request, resolveSend] = useAPI(api.sendLotFromStock)
+  const [request, resolveSend] = useAPI(api.createDraftFromStock)
+  const [requestAll, resolveSendAll] = useAPI(api.sendDraftsFromStock)
+  const [requestAll, resolveSendAll] = useAPI(api.sendAllDraftFromStock)
 
   async function sendLot(txID: number) {
     const sent = await prompt(
@@ -62,5 +68,31 @@ export default function useSendLot(
     return sent
   }
 
-  return { loading: request.loading, sendLot }
+  async function sendSelection() {
+    const shouldSend = await confirm(
+      "Envoyer lots",
+      "Voulez vous envoyer les lots sélectionnés ?"
+    )
+
+    if (entity !== null && shouldSend) {
+      notifySend(resolveSend(entity.id, selection.selected), true)
+    }
+
+    return shouldSend
+  }
+
+  async function sendAllDrafts() {
+    const shouldSend = await confirm(
+      "Envoyer lots",
+      "Voulez vous envoyer tous ces lots ?"
+    )
+
+    if (entity !== null && shouldDelete) {
+      notifySend(resolveSendAll(entity.id), true)
+    }
+
+    return shouldSend
+  }
+
+  return { loading: request.loading, sendLot, sendSelection, sendAllDrafts }
 }
