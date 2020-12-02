@@ -1,8 +1,8 @@
 import React from "react"
 
 import { Link } from "../relative-route"
+import { Check, Cross, Download, Plus, Rapport, Upload } from "../system/icons"
 import { AsyncButton, Button } from "../system"
-import { Rapport, Upload } from "../system/icons"
 import { prompt } from "../system/dialog"
 import { StockImportPromptFactory } from "../import-prompt"
 import { LotUploader } from "../../hooks/actions/use-upload-file"
@@ -76,7 +76,7 @@ export const StockDraftActions = ({
       <AsyncButton
         icon={Check}
         level="success"
-        loading={validator.loading}
+        loading={sender.loading}
         disabled={disabled}
         onClick={onValidate}
       >

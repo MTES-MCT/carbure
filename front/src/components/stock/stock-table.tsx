@@ -15,9 +15,9 @@ import { LotSender } from "../../hooks/actions/use-send-lots"
 type A = Record<string, (id: number) => void>
 type CT = Column<Transaction>
 
-const getStockActions = ({ sendLot }: A): CT =>
+const getStockActions = ({ createDrafts }: A): CT =>
   Actions([
-    { icon: Edit, title: "Préparer l'envoi", action: (tx) => sendLot(tx.id) },
+    { icon: Edit, title: "Préparer l'envoi", action: (tx) => createDrafts(tx.id) },
   ])
 
 type StockTableProps = {
@@ -38,7 +38,7 @@ export const StockTable = ({
   sender,
 }: StockTableProps) => {
   const relativePush = useRelativePush()
-  const sendLot = sender.sendLot
+  const createDrafts = sender.createDrafts
 
   const columns = []
 
@@ -72,7 +72,7 @@ export const StockTable = ({
   }
 
   if (status.is(LotStatus.Stock)) {
-    columns.push(getStockActions({ sendLot }))
+    columns.push(getStockActions({ createDrafts }))
   }
 
   if (stock === null) {

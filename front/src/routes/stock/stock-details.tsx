@@ -130,7 +130,7 @@ const StockDetails = ({
               icon={Edit}
               level="primary"
               loading={acceptor.loading}
-              onClick={() => run(sender.sendLot, true)}
+              onClick={() => run(sender.createDrafts, true)}
             >
               Préparer l'envoi
             </AsyncButton>

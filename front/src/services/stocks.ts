@@ -64,7 +64,7 @@ export function getStocks(
   })
 }
 
-export function createDraftFromStock(
+export function createDraftsFromStock(
   entity_id: number,
   tx_id: number,
   volume: number,
@@ -74,7 +74,7 @@ export function createDraftFromStock(
   delivery_site: string,
   delivery_site_country?: string
 ) {
-  return api.post("/stocks/create-lot", {
+  return api.post("/stocks/create-drafts", {
     entity_id,
     tx_id,
     volume,
@@ -86,10 +86,15 @@ export function createDraftFromStock(
   })
 }
 
-export function sendDraftsFromStock() {
-
+export function sendDraftsFromStock(entityID: number, transactionIDs: number[]) {
+  return api.post("/stocks/send-drafts", {
+    entity_id: entityID,
+    tx_ids: transactionIDs,
+  })
 }
 
-export function sendAllDraftFromStock() {
-
+export function sendAllDraftFromStock(entityID: number) {
+  return api.post("/stocks/send-all-drafts", {
+    entity_id: entityID,
+  })
 }
