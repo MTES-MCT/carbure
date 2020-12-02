@@ -78,7 +78,7 @@ def get_lots(request):
                                                              'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant',
                                                              'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
                                                              'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country')
-        txs = txs.filter(lot__added_by=entity)                                                         
+        txs = txs.filter(lot__added_by=entity)
         # filter by status
         if status == 'draft':
             txs = txs.filter(lot__status='Draft')
@@ -104,9 +104,9 @@ def get_lots(request):
         elif status == 'accepted':
             txs = txs.filter(lot__status='Validated', delivery_status='A')
         else:
-            return JsonResponse({'status': 'error', 'message': 'Unknown status'}, status=400)        
+            return JsonResponse({'status': 'error', 'message': 'Unknown status'}, status=400)
     else:
-        return JsonResponse({'status': 'error', 'message': 'Unknown entity_type'}, status=400)        
+        return JsonResponse({'status': 'error', 'message': 'Unknown entity_type'}, status=400)
 
     # apply filters
     date_from = datetime.date.today().replace(month=1, day=1)
@@ -232,7 +232,7 @@ def get_details(request):
         return JsonResponse({'status': 'error', 'message': 'Missing tx_id'}, status=400)
     if not entity_id:
         return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
-    
+
     try:
         entity = Entity.objects.get(id=entity_id)
     except Exception as e:
@@ -474,9 +474,9 @@ def update_lot(request):
         lot.save()
         tx.save()
         LotV2Error.objects.bulk_create(lot_errors)
-        TransactionError.objects.bulk_create(tx_errors)       
+        TransactionError.objects.bulk_create(tx_errors)
         bulk_sanity_checks([tx.lot], background=False)
-        check_duplicates(entity, [tx.lot], [tx], background=False)
+        check_duplicates([tx], background=False)
         return JsonResponse({'status': 'success'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Could not save lot: %s' % (lot_errors)})
@@ -551,7 +551,10 @@ def validate_lot(request):
     tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
-    return validate_lots(request.user, tx_ids)
+    response = validate_lots(request.user, tx_ids)
+    txs = LotTransaction.objects.filter(id__in=tx_ids)
+    check_duplicates(txs, background=False)
+    return response
 
 
 def accept_lot(request):
@@ -794,7 +797,9 @@ def validate_all_drafts(request):
     drafts = drafts.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
 
     tx_ids = [d.id for d in drafts]
-    return validate_lots(request.user, tx_ids)
+    response = validate_lots(request.user, tx_ids)
+    check_duplicates(drafts, background=False)
+    return response
 
 
 def get_template_producers_simple(request):

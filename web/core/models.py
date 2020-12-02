@@ -26,7 +26,7 @@ class Entity(models.Model):
         return self.name
 
     def natural_key(self):
-        return {'name': self.name, 'id': self.id, 'entity_type': self.entity_type, 'has_mac': self.has_mac, 'has_trading': self.has_trading, 
+        return {'name': self.name, 'id': self.id, 'entity_type': self.entity_type, 'has_mac': self.has_mac, 'has_trading': self.has_trading,
             'national_system_certificate': self.national_system_certificate}
 
     def url_friendly_name(self):
@@ -108,7 +108,7 @@ class MatierePremiere(models.Model):
     is_double_compte = models.BooleanField(default=False)
     is_huile_vegetale = models.BooleanField(default=False)
     is_displayed = models.BooleanField(default=True)
-    
+
 
     def __str__(self):
         return self.name
@@ -153,12 +153,12 @@ class Depot(models.Model):
     postal_code = models.CharField(max_length=32, null=False, blank=False)
     TYPE_OWNERSHIP = (('OWN', 'Propre'), ('THIRD_PARTY', 'Tiers'))
     ownership_type = models.CharField(max_length=32, choices=TYPE_OWNERSHIP, default='THIRD_PARTY')
-    
+
     def __str__(self):
         return self.name
 
     def natural_key(self):
-        return {'depot_id': self.depot_id, 'name': self.name, 'city': self.city, 'country': self.country.natural_key(), 
+        return {'depot_id': self.depot_id, 'name': self.name, 'city': self.city, 'country': self.country.natural_key(),
             'depot_type': self.depot_type, 'address': self.address, 'postal_code': self.postal_code, 'ownership_type': self.ownership_type}
 
     class Meta:
@@ -266,7 +266,7 @@ class LotV2(models.Model):
 
 class LotTransaction(models.Model):
     DELIVERY_STATUS = (('N', 'En Attente'), ('A', 'Accepté'), ('R', 'Refusé'), ('AC', 'À corriger'), ('AA', 'Corrigé'))
-    lot = models.ForeignKey(LotV2, null=False, blank=False, on_delete=models.CASCADE)
+    lot = models.ForeignKey(LotV2, null=False, blank=False, on_delete=models.CASCADE, related_name='tx_lot')
 
     # vendor / producer
     vendor_is_in_carbure = models.BooleanField(default=True)
@@ -294,7 +294,7 @@ class LotTransaction(models.Model):
     champ_libre = models.CharField(max_length=64, blank=True, null=True, default='')
     # mise a consommation?
     is_mac = models.BooleanField(default=False)
-    # this PoS is part of a multiple PoS batch 
+    # this PoS is part of a multiple PoS batch
     is_batch = models.BooleanField(default=False)
 
     def __str__(self):
@@ -531,7 +531,7 @@ class DBSScope(models.Model):
         db_table = 'dbs_scopes'
         verbose_name = '2BS Scope'
         verbose_name_plural = '2BS Scopes'
-        
+
 
 class DBSCertificate(models.Model):
     certificate_id = models.CharField(max_length=64, null=False, blank=False)
@@ -539,7 +539,7 @@ class DBSCertificate(models.Model):
     # warning, this column must be manually altered in db to support utf8mb4
     # command: ALTER TABLE dbs_certificates CHANGE certificate_holder certificate_holder VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
     # command: ALTER TABLE dbs_certificates CHANGE holder_address holder_address VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-    # do not change this field 
+    # do not change this field
     holder_address = models.CharField(max_length=512, null=False, blank=False)
     valid_from = models.DateField()
     valid_until = models.DateField()
@@ -622,7 +622,7 @@ class ProductionSiteCertificate(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     production_site = models.ForeignKey(ProductionSite, null=True, on_delete=models.CASCADE)
     type = models.CharField(max_length=32, choices=CERTIFICATE_TYPE, default="Pending")
-    
+
     certificate_iscc = models.ForeignKey(EntityISCCTradingCertificate, null=True, blank=True, on_delete=models.CASCADE)
     certificate_2bs = models.ForeignKey(EntityDBSTradingCertificate, null=True, blank=True, on_delete=models.CASCADE)
 
@@ -634,4 +634,3 @@ class ProductionSiteCertificate(models.Model):
         verbose_name = 'Certificat de site de production'
         verbose_name_plural = 'Certificats de sites de productions'
 
-        
