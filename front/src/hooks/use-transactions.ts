@@ -34,21 +34,25 @@ import useSpecialSelection from "./query/use-special"
 function useGetSnapshot(entity: EntitySelection, year: YearSelection) {
   const [snapshot, resolveSnapshot] = useAPI(api.getSnapshot)
 
+  const entityID = entity?.id
   const years = snapshot.data?.years
 
   // if the currently selected year is not in the list of available years
   // set it to the first available value
-  if (years?.length && !years.some((option) => option.value === year.selected)) {
+  if (
+    years?.length &&
+    !years.some((option) => option.value === year.selected)
+  ) {
     year.setYear(years[0].value as number)
   }
 
   function getSnapshot() {
-    if (entity !== null) {
-      return resolveSnapshot(entity.id, year.selected).cancel
+    if (typeof entityID !== "undefined") {
+      return resolveSnapshot(entityID, year.selected).cancel
     }
   }
 
-  useEffect(getSnapshot, [resolveSnapshot, entity, year.selected])
+  useEffect(getSnapshot, [resolveSnapshot, entityID, year.selected])
 
   return { ...snapshot, getSnapshot }
 }
@@ -74,6 +78,8 @@ function useGetLots(
 ): LotGetter {
   const [transactions, resolveLots] = useAPI(api.getLots)
 
+  const entityID = entity?.id
+
   function exportAllTransactions() {
     if (entity !== null) {
       api.downloadLots(
@@ -89,10 +95,10 @@ function useGetLots(
   }
 
   function getTransactions() {
-    if (entity !== null) {
+    if (typeof entityID !== "undefined") {
       return resolveLots(
         status.active,
-        entity.id,
+        entityID,
         filters.selected,
         year.selected,
         pagination.page,
@@ -109,7 +115,7 @@ function useGetLots(
   useEffect(getTransactions, [
     resolveLots,
     status.active,
-    entity?.id,
+    entityID,
     filters.selected,
     year.selected,
     pagination.page,
