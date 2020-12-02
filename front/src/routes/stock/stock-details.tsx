@@ -143,8 +143,8 @@ const StockDetails = ({
               disabled={hasChange}
               icon={Check}
               level="success"
-              loading={validator.loading}
-              onClick={() => run(validator.validateLot)}
+              loading={sender.loading}
+              onClick={() => run(sender.sendLot)}
             >
               Envoyer
             </AsyncButton>

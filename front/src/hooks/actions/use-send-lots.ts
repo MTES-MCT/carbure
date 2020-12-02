@@ -13,6 +13,7 @@ export interface LotSender {
   createDrafts: (i: number) => Promise<boolean>
   sendAllDrafts: () => Promise<boolean>
   sendSelection: () => Promise<boolean>
+  sendLot: (l: number) => Promise<boolean>
 }
 
 export default function useSendLot(
@@ -98,6 +99,19 @@ export default function useSendLot(
     return Boolean(sent)
   }
 
+  async function sendLot(lotID: number) {
+    const shouldSend = await confirm(
+      "Envoyer lots",
+      "Voulez vous envoyer ce lot ?"
+    )
+
+    if (entity !== null && shouldSend) {
+      notifySend(resolveSend(entity.id, [lotID]), true)
+    }
+
+    return shouldSend
+  }
+
   async function sendSelection() {
     const shouldSend = await confirm(
       "Envoyer lots",
@@ -126,5 +140,5 @@ export default function useSendLot(
 
   return {
     loading: requestCreate.loading || requestSend.loading || requestSendAll.loading,
-    createDrafts, sendSelection, sendAllDrafts }
+    createDrafts, sendSelection, sendAllDrafts, sendLot }
 }

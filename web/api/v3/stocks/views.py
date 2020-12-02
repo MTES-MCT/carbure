@@ -4,7 +4,7 @@ from core.models import LotTransaction
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, LotV2, Depot
 from core.decorators import check_rights
 from core.common import get_prefetched_data, load_mb_lot, bulk_insert
-from core.common import load_excel_file
+from core.common import load_excel_file, send_lot_from_stock
 from core.xlsx_v3 import template_stock, template_stock_bcghg
 
 sort_key_to_django_field = {'period': 'lot__period',
@@ -331,14 +331,25 @@ def generate_batch(request, *args, **kwargs):
 
 
 def send_drafts(request):
-    entity = request.POST.get('entity_id', False)
-    dae = request.POST.get('dae', False)
-    client = request.POST.get('client', False)
-    delivery_site = request.POST.get('delivery_site', False)
-    unknown_delivery_site_country_code = request.POST.get('unknown_delivery_site_country_code', False)
-    actual_data = request.POST.getlist('transactions', False)
+    tx_ids = request.POST.getlist('tx_ids', False)
 
-    return JsonResponse({'status': 'success'})
+    if not tx_ids:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
+
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    send_errors = []
+    for tx_id in tx_ids:
+        try:
+            tx = LotTransaction.objects.get(id=tx_id)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id), 'extra': str(e)},
+                                status=400)
+
+        sent, errors = send_lot_from_stock(rights, tx)
+        if not sent:
+            send_errors.append(errors)
+
+    return JsonResponse({'status': 'success', 'data': send_errors})
 
 
 def send_all_drafts(request):

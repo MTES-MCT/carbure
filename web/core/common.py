@@ -11,6 +11,38 @@ import dateutil.parser
 from api.v3.sanity_checks import bulk_sanity_checks
 
 
+def send_lot_from_stock(rights, tx):
+    lot = tx.lot
+    if tx.lot.added_by not in rights:
+        return False, "User not allowed to send this tx"
+
+    # only allow to send drafts
+    if tx.lot.status != 'Draft':
+        return False, "Tx already sent"
+
+    # make sure all mandatory fields are set
+    tx_valid = tx_is_valid(tx)
+    if not tx_valid:
+        return False, 'Transaction invalide'
+    lot_valid = lot_is_valid(lot)
+    if not lot_valid:
+        return False, 'Lot invalide'
+
+    # check if we can extract the lot from the parent
+    if not lot.parent_lot:
+        return False, 'Tx does not have parent'
+
+    if lot.volume > lot.parent_lot.volume:
+        return False, 'Quantité disponible dans la mass balance insuffisante: Dispo %d litres, lot %d litres' % (lot.parent_lot.volume, lot.volume)
+
+    lot.carbure_id = generate_carbure_id(lot) + 'S'
+    lot.status = "Validated"
+    lot.save()
+    lot.parent_lot.volume -= lot.volume
+    lot.parent_lot.save()
+    return True, ''
+
+
 def check_duplicates(new_txs, background=True):
     if background:
         db.connections.close_all()
