@@ -15,7 +15,7 @@ interface Notification {
   key: string
   level: "default" | "success" | "error" | "warning"
   text: string
-  timeout: NodeJS.Timeout
+  timeout: NodeJS.Timeout | null
 }
 
 interface NotificationsHook {
@@ -24,7 +24,7 @@ interface NotificationsHook {
     text: string
     duration?: number
     level?: Notification["level"]
-  }) => void
+  }) => Notification
   dispose: (k: string) => void
 }
 
@@ -53,7 +53,7 @@ function useNotifications(): NotificationsHook {
       const notification = list.find((n) => n.key === key)
 
       if (notification) {
-        clearTimeout(notification.timeout)
+        notification.timeout && clearTimeout(notification.timeout)
         return list.filter((n) => n.key !== key)
       }
 
@@ -101,7 +101,12 @@ const Notifications = ({ notifications }: NotificationsProps) => {
 
 const NotificationsContext = React.createContext<NotificationsHook>({
   list: [],
-  push: () => {},
+  push: () => ({
+    key: "",
+    level: "default",
+    text: "",
+    timeout: null,
+  }),
   dispose: () => {},
 })
 
