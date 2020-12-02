@@ -57,10 +57,13 @@ export const vendor: Column<Transaction> = {
 }
 
 export const biocarburant: Column<Transaction> = {
-  header: "Biocarburant",
+  header: "Biocarburant (litres)",
   sortBy: "biocarburant",
   render: (tx) => (
-    <TwoLines text={tx.lot.biocarburant?.name} sub={`${tx.lot.volume}L`} />
+    <TwoLines
+      text={tx.lot.biocarburant?.name}
+      sub={tx.lot.volume.toLocaleString("fr-FR")}
+    />
   ),
 }
 
