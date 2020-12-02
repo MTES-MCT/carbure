@@ -41,10 +41,15 @@ const Settings = ({ entity, settings }: SettingsProps) => {
       </SettingsHeader>
 
       <SettingsBody>
-        <CompanySettings entity={entity} settings={company} />
+        {(isProducer || isTrader || isOperator) && (
+          <CompanySettings entity={entity} settings={company} />
+        )}
+
+        {(isProducer || isTrader || isOperator) && (
+          <DeliverySitesSettings settings={deliverySites} />
+        )}
 
         {isProducer && <ProductionSitesSettings settings={productionSites} />}
-        {isOperator && <DeliverySitesSettings settings={deliverySites} />}
 
         {hasCertificates && (
           <ISCCCertificateSettings settings={isccCertificates} />
