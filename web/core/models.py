@@ -151,20 +151,37 @@ class Depot(models.Model):
 
     address = models.CharField(max_length=128, null=False, blank=False)
     postal_code = models.CharField(max_length=32, null=False, blank=False)
-    TYPE_OWNERSHIP = (('OWN', 'Propre'), ('THIRD_PARTY', 'Tiers'))
-    ownership_type = models.CharField(max_length=32, choices=TYPE_OWNERSHIP, default='THIRD_PARTY')
 
     def __str__(self):
         return self.name
 
     def natural_key(self):
         return {'depot_id': self.depot_id, 'name': self.name, 'city': self.city, 'country': self.country.natural_key(),
-            'depot_type': self.depot_type, 'address': self.address, 'postal_code': self.postal_code, 'ownership_type': self.ownership_type}
+            'depot_type': self.depot_type, 'address': self.address, 'postal_code': self.postal_code}
 
     class Meta:
         db_table = 'depots'
         verbose_name = 'Dépôt'
         verbose_name_plural = 'Dépôts'
+
+class EntityDepot(models.Model):
+    TYPE_OWNERSHIP = (('OWN', 'Propre'), ('THIRD_PARTY', 'Tiers'))
+
+    entity = models.ForeignKey(Entity, null=False, blank=False, on_delete=models.CASCADE)
+    depot = models.ForeignKey(Depot, null=False, blank=False, on_delete=models.CASCADE)
+    ownership_type = models.CharField(max_length=32, choices=TYPE_OWNERSHIP, default='THIRD_PARTY')
+
+    def __str__(self):
+        return str(self.id)
+
+    def natural_key(self):
+        return {'id': self.id, 'depot': self.depot.natural_key(), 'entity': self.entity.natural_key(), 
+            'ownership_type': self.ownership_type}
+
+    class Meta:
+        db_table = 'entity_depot'
+        verbose_name = 'Dépôt Entité'
+        verbose_name_plural = 'Dépôts Entité'
 
 
 from producers.models import ProductionSite
