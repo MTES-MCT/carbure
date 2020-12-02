@@ -32,12 +32,12 @@ export default function useTransactionAdd(
 
       notifications.push({
         level: "success",
-        text: `La transaction a bien été créée !`,
+        text: "Le lot a bien été créée !",
       })
     } else {
       notifications.push({
         level: "error",
-        text: "Impossible de créer cette transaction.",
+        text: "Impossible de créer ce lot.",
       })
     }
   }
