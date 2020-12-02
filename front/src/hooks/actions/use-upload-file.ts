@@ -52,6 +52,13 @@ export default function useUploadLotFile(
       })
 
       refresh()
+    } else {
+      notifications.dispose(startNotif.key)
+
+      notifications.push({
+        level: "error",
+        text: "Le fichier n'a pas pu être importé.",
+      })
     }
   }
 
