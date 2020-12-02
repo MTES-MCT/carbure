@@ -34,10 +34,6 @@
   width: 32px;
 }
 
-.settingsTableIDColumn {
-  width: 128px;
-}
-
 .settingsForm {
   width: 600px;
 }
@@ -64,6 +60,13 @@
   border: none;
   border-bottom: 1px solid var(--gray-highlight);
   margin: 16px 0;
+}
+
+.settingsLink {
+  color: var(--blue-medium);
+  text-decoration: underline;
+  margin: 0 6px;
+  flex-shrink: 0;
 }
 
 .expiredRow {
