@@ -114,7 +114,7 @@ export function useStocks(entity: EntitySelection) {
   const validator = useValidateLots(entity, selection, year, refresh)
   const acceptor = useAcceptLots(entity, selection, year, refresh)
   const rejector = useRejectLots(entity, selection, year, refresh)
-  const sender = useSendLot(entity, refresh)
+  const sender = useSendLot(entity, selection, refresh)
 
   return {
     filters,

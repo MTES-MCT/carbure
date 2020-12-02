@@ -165,8 +165,9 @@ def get_snapshot(request):
 
     return JsonResponse({'status': 'success', 'data': data})
 
+
 @check_rights('entity_id')
-def create_lot(request, *args, **kwargs):
+def create_drafts(request, *args, **kwargs):
     context = kwargs['context']
     tx_id = request.POST.get('tx_id', False)
     entity_id = request.POST.get('entity_id', False)
@@ -327,18 +328,6 @@ def generate_batch(request, *args, **kwargs):
         pass
 
     return JsonResponse({'status': 'success', 'data': []})
-
-
-# create many transactions at once from the send-complex modal window
-def create_batch(request):
-    entity = request.POST.get('entity_id', False)
-    dae = request.POST.get('dae', False)
-    client = request.POST.get('client', False)
-    delivery_site = request.POST.get('delivery_site', False)
-    unknown_delivery_site_country_code = request.POST.get('unknown_delivery_site_country_code', False)
-    actual_data = request.POST.getlist('transactions', False)
-
-    return JsonResponse({'status': 'success'})
 
 
 def send_drafts(request):

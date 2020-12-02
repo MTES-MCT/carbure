@@ -2,7 +2,7 @@ import { EntitySelection } from "../helpers/use-entity"
 
 import * as api from "../../services/stocks"
 import useAPI from "../helpers/use-api"
-
+import { confirm } from "../../components/system/dialog"
 import { prompt } from "../../components/system/dialog"
 import { StockSendLotPrompt } from "../../components/stock/stock-send-form"
 import { useNotificationContext } from "../../components/system/notifications"
@@ -10,8 +10,8 @@ import { TransactionSelection } from "../query/use-selection"
 
 export interface LotSender {
   loading: boolean
-  sendLot: (i: number) => Promise<boolean>
-  sendAll: () => Promise<boolean>
+  createDrafts: (i: number) => Promise<boolean>
+  sendAllDrafts: () => Promise<boolean>
   sendSelection: () => Promise<boolean>
 }
 
@@ -21,11 +21,55 @@ export default function useSendLot(
   refresh: () => void
 ): LotSender {
   const notifications = useNotificationContext()
-  const [request, resolveSend] = useAPI(api.createDraftFromStock)
-  const [requestAll, resolveSendAll] = useAPI(api.sendDraftsFromStock)
-  const [requestAll, resolveSendAll] = useAPI(api.sendAllDraftFromStock)
+  const [requestCreate, resolveCreate] = useAPI(api.createDraftsFromStock)
+  const [requestSend, resolveSend] = useAPI(api.sendDraftsFromStock)
+  const [requestSendAll, resolveSendAll] = useAPI(api.sendAllDraftFromStock)
 
-  async function sendLot(txID: number) {
+  async function notifyCreated(promise: Promise<any>, many: boolean = false) {
+    const res = await promise
+
+    if (res) {
+      refresh()
+
+      notifications.push({
+        level: "success",
+        text: many
+          ? "Les lots ont bien été créés !"
+          : "Le lot a bien été créé !",
+      })
+    } else {
+      notifications.push({
+        level: "error",
+        text: many
+          ? "Impossible de créer les lots."
+          : "Impossible de créer le lot.",
+      })
+    }
+  }
+
+  async function notifySend(promise: Promise<any>, many: boolean = false) {
+    const res = await promise
+
+    if (res) {
+      refresh()
+
+      notifications.push({
+        level: "success",
+        text: many
+          ? "Les lots ont bien été envoyés !"
+          : "Le lot a bien été envoyé !",
+      })
+    } else {
+      notifications.push({
+        level: "error",
+        text: many
+          ? "Impossible d'envoyer les lots."
+          : "Impossible d'envoyer le lot.",
+      })
+    }
+  }
+
+  async function createDrafts(txID: number) {
     const sent = await prompt(
       "Préparer lot",
       "Veuillez préciser les détails du lot à envoyer",
@@ -33,7 +77,7 @@ export default function useSendLot(
     )
 
     if (entity !== null && sent) {
-      const res = await resolveSend(
+      notifyCreated(resolveCreate(
         entity.id,
         txID,
         sent.volume,
@@ -48,24 +92,10 @@ export default function useSendLot(
         !sent.delivery_site_is_in_carbure
           ? sent.unknown_delivery_site_country?.code_pays ?? ""
           : ""
-      )
-
-      if (res) {
-        refresh()
-
-        notifications.push({
-          level: "success",
-          text: "Le lot a bien été préparé pour l'envoi !",
-        })
-      } else {
-        notifications.push({
-          level: "success",
-          text: "Impossible d'envoyer le lot.",
-        })
-      }
+      ))
     }
 
-    return sent
+    return Boolean(sent)
   }
 
   async function sendSelection() {
@@ -87,12 +117,14 @@ export default function useSendLot(
       "Voulez vous envoyer tous ces lots ?"
     )
 
-    if (entity !== null && shouldDelete) {
+    if (entity !== null && shouldSend) {
       notifySend(resolveSendAll(entity.id), true)
     }
 
     return shouldSend
   }
 
-  return { loading: request.loading, sendLot, sendSelection, sendAllDrafts }
+  return {
+    loading: requestCreate.loading || requestSend.loading || requestSendAll.loading,
+    createDrafts, sendSelection, sendAllDrafts }
 }

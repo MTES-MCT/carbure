@@ -25,7 +25,6 @@ import { StockTable } from "./stock-table"
 
 import {
   ActionBar,
-  DraftActions,
   ExportActions,
   InboxActions,
   InboxSummaryActions,
@@ -34,6 +33,7 @@ import {
 import {
   StockActions,
   StockImportActions,
+  StockDraftActions,
 } from "./stock-actions"
 
 type StockListProps = {
@@ -91,7 +91,7 @@ export const StockList = ({
           )}
 
           {status.is(LotStatus.ToSend) && (
-            <DraftActions
+            <StockDraftActions
               disabled={isEmpty}
               hasSelection={selection.selected.length > 0}
               uploader={uploader}
