@@ -134,7 +134,7 @@ def get_snapshot(request):
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
 
-    # create union of querysets just to create filters 
+    # create union of querysets just to create filters
     # txs = tx_drafts.union(tx_inbox, tx_stock)
     # txids = txs.values('id').distinct()
     # problem with using above code calling union, doing it manually
@@ -166,8 +166,7 @@ def get_snapshot(request):
     return JsonResponse({'status': 'success', 'data': data})
 
 @check_rights('entity_id')
-def send_lot(request, *args, **kwargs):
-
+def create_lot(request, *args, **kwargs):
     context = kwargs['context']
     tx_id = request.POST.get('tx_id', False)
     entity_id = request.POST.get('entity_id', False)
@@ -190,7 +189,7 @@ def send_lot(request, *args, **kwargs):
     if not delivery_date:
         return JsonResponse({'status': 'forbidden', 'message': "Missing delivery_date"}, status=400)
     if not dae:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing dae"}, status=400)                                    
+        return JsonResponse({'status': 'forbidden', 'message': "Missing dae"}, status=400)
 
     # found the stock line
     # prefetch some data
@@ -303,7 +302,7 @@ def generate_batch(request, *args, **kwargs):
     txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0)
     # filter by requested biofuel
     txs = txs.filter(lot__biocarburant__code=biocarburant)
-    
+
     stock_per_depot = {}
     for tx in txs:
         if tx.delivery_site_is_in_carbure:
@@ -322,7 +321,7 @@ def generate_batch(request, *args, **kwargs):
         else:
             depots_to_check = [stock_per_depot[depot_source]]
 
-    # do the actual calculations 
+    # do the actual calculations
     for depot in depots_to_check:
         # do we have enough volume ?
         pass
@@ -331,7 +330,29 @@ def generate_batch(request, *args, **kwargs):
 
 
 # create many transactions at once from the send-complex modal window
-def send_batch(request):
+def create_batch(request):
+    entity = request.POST.get('entity_id', False)
+    dae = request.POST.get('dae', False)
+    client = request.POST.get('client', False)
+    delivery_site = request.POST.get('delivery_site', False)
+    unknown_delivery_site_country_code = request.POST.get('unknown_delivery_site_country_code', False)
+    actual_data = request.POST.getlist('transactions', False)
+
+    return JsonResponse({'status': 'success'})
+
+
+def send_drafts(request):
+    entity = request.POST.get('entity_id', False)
+    dae = request.POST.get('dae', False)
+    client = request.POST.get('client', False)
+    delivery_site = request.POST.get('delivery_site', False)
+    unknown_delivery_site_country_code = request.POST.get('unknown_delivery_site_country_code', False)
+    actual_data = request.POST.getlist('transactions', False)
+
+    return JsonResponse({'status': 'success'})
+
+
+def send_all_drafts(request):
     entity = request.POST.get('entity_id', False)
     dae = request.POST.get('dae', False)
     client = request.POST.get('client', False)
