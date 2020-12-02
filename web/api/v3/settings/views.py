@@ -441,8 +441,11 @@ def add_delivery_site(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Could not find delivery site",
                              'extra': str(e)}, status=400)
 
+    if entity.entity_type != 'Opérateur' and ds.depot_type == 'EFS':
+        return JsonResponse({'status': 'error', 'message': "Only operators can register an EFS site"}, status=400)
+
     try:
-        EntityDepot.objects.update_or_create(entity=entity, depot=ds, ownership_type=ownership_type)
+        EntityDepot.objects.update_or_create(entity=entity, depot=ds, defaults={'ownership_type': ownership_type})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Could not link entity to delivery site",
                              'extra': str(e)}, status=400)
@@ -456,7 +459,7 @@ def delete_delivery_site(request, *args, **kwargs):
     delivery_site_id = request.POST.get('delivery_site_id', False)
 
     try:
-        EntityDepot.objects.get(entity=entity, depot__depot_id=delivery_site_id).delete()
+        EntityDepot.objects.filter(entity=entity, depot__depot_id=delivery_site_id).delete()
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Could not delete entity's delivery site",
                              'extra': str(e)}, status=400)

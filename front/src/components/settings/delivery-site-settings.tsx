@@ -40,61 +40,63 @@ const DEPOT_TYPES = Object.entries(DEPOT_TYPE_LABELS)
 const OWNERSHIP_TYPES = Object.entries(OWNERSHIP_LABELS)
   .map(([value, label]) => ({ value, label }))
 
-export const DeliverySiteFinderPrompt = ({
-  onConfirm,
-  onCancel,
-}: PromptFormProps<EntityDeliverySite>) => {
-  const [form, hasChange, onChange] = useForm<EntityDeliverySite>({
-    depot: null,
-    ownership_type: OwnershipType.ThirdParty,
-  })
+export const DeliverySiteFinderPromptFactory = (entityID?: number) =>
+  function DeliverySiteFinderPrompt({
+    onConfirm,
+    onCancel,
+  }: PromptFormProps<EntityDeliverySite>) {
+    const [form, hasChange, onChange] = useForm<EntityDeliverySite>({
+      depot: null,
+      ownership_type: OwnershipType.ThirdParty,
+    })
 
-  return (
-    <SettingsForm>
-      <LabelAutoComplete
-        label="Dépôt"
-        placeholder="Rechercher un dépôt..."
-        name="depot"
-        value={form.depot}
-        getQuery={common.findDeliverySites}
-        onChange={onChange}
-        getValue={(d) => d.depot_id}
-        getLabel={(d) => d.name}
-      />
-
-      <Label label="Propriété">
-        <RadioGroup
-          row
-          value={form.ownership_type}
-          name="ownership_type"
-          options={OWNERSHIP_TYPES}
+    return (
+      <SettingsForm>
+        <LabelAutoComplete
+          label="Dépôt"
+          placeholder="Rechercher un dépôt..."
+          name="depot"
+          value={form.depot}
+          getQuery={common.findDeliverySites}
           onChange={onChange}
+          getValue={(d) => d.depot_id}
+          getLabel={(d) => d.name}
+          queryArgs={[entityID]}
         />
-      </Label>
 
-      <a
-        href="mailto:carbure@beta.gouv.fr"
-        target="_blank"
-        rel="noreferrer"
-        className={styles.settingsLink}
-      >
-        Le dépôt que je recherche n'est pas enregistré sur CarbuRe.
-      </a>
+        <Label label="Propriété">
+          <RadioGroup
+            row
+            value={form.ownership_type}
+            name="ownership_type"
+            options={OWNERSHIP_TYPES}
+            onChange={onChange}
+          />
+        </Label>
 
-      <DialogButtons>
-        <Button
-          level="primary"
-          icon={Plus}
-          disabled={!hasChange}
-          onClick={() => onConfirm(form)}
+        <a
+          href="mailto:carbure@beta.gouv.fr"
+          target="_blank"
+          rel="noreferrer"
+          className={styles.settingsLink}
         >
-          Ajouter
-        </Button>
-        <Button onClick={onCancel}>Annuler</Button>
-      </DialogButtons>
-    </SettingsForm>
-  )
-}
+          Le dépôt que je recherche n'est pas enregistré sur CarbuRe.
+        </a>
+
+        <DialogButtons>
+          <Button
+            level="primary"
+            icon={Plus}
+            disabled={!hasChange}
+            onClick={() => onConfirm(form)}
+          >
+            Ajouter
+          </Button>
+          <Button onClick={onCancel}>Annuler</Button>
+        </DialogButtons>
+      </SettingsForm>
+    )
+  }
 
 type DeliverySiteState = {
   name: string

@@ -8,7 +8,7 @@ import * as api from "../../services/settings"
 import { confirm, prompt } from "../../components/system/dialog"
 import {
   DeliverySitePromptFactory,
-  DeliverySiteFinderPrompt,
+  DeliverySiteFinderPromptFactory,
 } from "../../components/settings/delivery-site-settings"
 import { useNotificationContext } from "../../components/system/notifications"
 
@@ -54,7 +54,7 @@ export default function useDeliverySites(
     const data = await prompt(
       "Ajouter dépôt",
       "Veuillez rechercher un dépôt que vous utilisez.",
-      DeliverySiteFinderPrompt
+      DeliverySiteFinderPromptFactory(entityID)
     )
 
     if (entityID && data && data.depot) {
