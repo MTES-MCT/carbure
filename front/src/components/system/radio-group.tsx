@@ -9,7 +9,7 @@ type RadioGroupProps = {
   row?: boolean
   readOnly?: boolean
   options: { value: string; label: string }[]
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 const RadioGroup = ({
