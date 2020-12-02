@@ -59,7 +59,7 @@ const Settings = ({ entity, settings }: SettingsProps) => {
           <DBSCertificateSettings settings={dbsCertificates} />
         )}
 
-        {isOperator && (
+        {((isProducer && entity?.has_mac) || isOperator) && (
           <NationalSystemCertificatesSettings
             settings={nationalSystemCertificates}
           />
