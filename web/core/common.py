@@ -1,5 +1,4 @@
 import datetime
-import openpyxl
 from django import db
 from django.db.models import Q, Count
 from multiprocessing import Process
@@ -8,49 +7,57 @@ import pandas as pd
 from django.http import JsonResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
-from core.models import LotValidationError
 import dateutil.parser
-from api.v3.sanity_checks import sanity_check, bulk_sanity_checks
+from api.v3.sanity_checks import bulk_sanity_checks
 
-def check_duplicates(entity, new_lots, new_txs, background=True):
+
+def check_duplicates(new_txs, background=True):
     if background:
         db.connections.close_all()
     new_daes = [t.dae for t in new_txs]
     duplicates = LotTransaction.objects.filter(dae__in=new_daes, lot__status='Validated').values('dae', 'lot__biocarburant_id', 'lot__volume').annotate(count=Count('dae')).filter(count__gt=1)
     if duplicates.count() > 0:
-        print('Found duplicates')
-        print(duplicates)
+        #print('Found duplicates')
+        #print(duplicates)
         # method:
         # when a duplicate exists, the first validated one is right
         for d in duplicates:
             dae = d['dae']
-            matches = LotTransaction.objects.filter(dae=dae, lot__status='Validated').order_by('id')
+            biocarburant_id = d['lot__biocarburant_id']
+            volume = d['lot__volume']
+            matches = LotTransaction.objects.filter(dae=dae, lot__biocarburant_id=biocarburant_id, lot__volume=volume, lot__status='Validated').order_by('id')
             first_valid = matches[0]
-            for m in matches:
-                # if we have a valid tx with this DAE AND we created it, delete everything else 
-                if first_valid.lot.added_by == entity:
-                    matches.exclude(id=first_valid.id).delete()
+            for m in matches[1:]:
+                # there is already a tx with a valid lot and this DAE
+                # it can happen if the producer has already created the tx and the operator tries to upload it
+                # or the operator has created it and the producer is trying to upload it
+                # or a user has validated a duplicate
+
+                # take the existing tx. if vendor is not in carbure, assume we are the vendor
+                # if client not in carbure, assume we are the client
+                if not first_valid.client_is_in_carbure and m.client_is_in_carbure:
+                    # assume we are the client
+                    first_valid.client_is_in_carbure = True
+                    first_valid.carbure_client = m.carbure_client
+                    first_valid.delivery_site_is_in_carbure = m.delivery_site_is_in_carbure
+                    first_valid.carbure_delivery_site = m.carbure_delivery_site
+                    first_valid.unknown_delivery_site = m.unknown_delivery_site
+                    first_valid.unknown_delivery_site_country = m.unknown_delivery_site_country
+                elif not first_valid.lot.producer_is_in_carbure and m.lot.producer_is_in_carbure:
+                    # we are the producer
+                    first_valid.producer_is_in_carbure = True
+                    first_valid.lot.carbure_producer = m.lot.carbure_producer
+                    first_valid.lot.production_site_is_in_carbure = m.lot.production_site_is_in_carbure
+                    first_valid.lot.carbure_production_site = m.lot.carbure_production_site
                 else:
-                    # there is a tx with a valid lot, this DAE, but we haven't created it
-                    # it can happen if the producer has already created the tx and the operator tries to upload it
-                    # or the operator has created it and the producer is trying to upload it
-                    # take the existing tx. if vendor is not in carbure, assume we are the vendor
-                    # if client not in carbure, assume we are the client
-                    if not first_valid.client_is_in_carbure:
-                        # assume we are the client
-                        first_valid.client_is_in_carbure = True
-                        first_valid.carbure_client = entity
-                        latest_tx = matches[-1]
-                        first_valid.delivery_site_is_in_carbure = latest_tx.delivery_site_is_in_carbure
-                        first_valid.carbure_delivery_site = latest_tx.carbure_delivery_site
-                        first_valid.unknown_delivery_site = latest_tx.unknown_delivery_site
-                        first_valid.unknown_delivery_site_country = latest_tx.unknown_delivery_site_country
-                    else:
-                        # assume we are the vendor
-                        first_valid.vendor_is_in_carbure = True
-                        first_valid.carbure_vendor = entity
-                    first_valid.save()
-                    matches.exclude(id=first_valid.id).delete()
+                    # assume it's just a duplicate, do nothing
+                    #print('this %d looks like a duplicate of %d' % (m.id, first_valid.id))
+                    #print('First: %s %s %s New %s %s %s' % (first_valid.dae, first_valid.lot.biocarburant.name, first_valid.lot.volume, m.dae, m.lot.biocarburant.name, m.lot.volume))
+                    pass
+            first_valid.lot.save()
+            first_valid.save()
+            matches.exclude(id=first_valid.id).delete()
+        LotV2.objects.filter(tx_lot__isnull=True).delete()
     else:
         print('No duplicate DAE found')
 
@@ -110,7 +117,7 @@ def tx_is_valid(tx):
     if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site_country:
         error = 'Veuillez renseigner un pays de livraison'
         TransactionError.objects.update_or_create(tx=tx, field='unknown_delivery_site_country', value='', error=error)
-        is_valid = False        
+        is_valid = False
 
     if tx.unknown_delivery_site_country is not None and tx.unknown_delivery_site_country.is_in_europe and tx.lot.pays_origine is None:
         error = "Veuillez renseigner le pays d'origine de la matière première - Marché européen"
@@ -248,7 +255,7 @@ def fill_producer_info(entity, lot_row, lot, prefetched_data):
                 error = LotV2Error(lot=lot, field='carbure_producer',
                                    error="Vous ne pouvez pas déclarer des lots d'un producteur déjà inscrit sur Carbure",
                                    value=lot_row['producer'])
-                lot_errors.append(error)                
+                lot_errors.append(error)
             else:
                 # ok, unknown producer. allow importation
                 lot.producer_is_in_carbure = False
@@ -574,7 +581,7 @@ def fill_vendor_data(entity, lot_row, transaction):
     tx_errors = []
     # by default, assume we are the vendor / supplier
     transaction.vendor_is_in_carbure = True
-    transaction.carbure_vendor = entity 
+    transaction.carbure_vendor = entity
     transaction.unknown_vendor = None
     if 'vendor' in lot_row:
         transaction.vendor_is_in_carbure = False
@@ -612,7 +619,7 @@ def fill_delivery_site_data(lot_row, transaction, prefetched_data):
     if transaction.delivery_site_is_in_carbure is False:
         if 'delivery_site_country' in lot_row:
             country_code = lot_row['delivery_site_country']
-            if country_code in countries: 
+            if country_code in countries:
                 country = countries[country_code]
                 transaction.unknown_delivery_site_country = country
             else:
@@ -840,7 +847,7 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
     print('calling bulk_sanity_check in background %s' % (datetime.datetime.now()))
     p = Process(target=bulk_sanity_checks, args=(new_lots,))
     p.start()
-    d = Process(target=check_duplicates, args=(entity, new_lots, new_txs))
+    d = Process(target=check_duplicates, args=(new_txs))
     d.start()
     return new_lots, new_txs
 
@@ -878,13 +885,16 @@ def validate_lots(user, tx_ids):
             # when the lot is added to mass balance, auto-accept
             if tx.carbure_client == tx.carbure_vendor:
                 tx.delivery_status = 'A'
-            # if we save a lot that was requiring a fix, change status to 'AA'    
-            if tx.delivery_status in ['AC', 'R']:
-                tx.delivery_status = 'AA'
-            # if the client is not in carbure, auto-accept
-            if not tx.client_is_in_carbure:
+            elif tx.carbure_client and tx.carbure_client.entity_type == 'Opérateur':
                 tx.delivery_status = 'A'
-        
+            # if the client is not in carbure, auto-accept
+            elif not tx.client_is_in_carbure:
+                tx.delivery_status = 'A'
+            # if we save a lot that was requiring a fix, change status to 'AA'
+            elif tx.delivery_status in ['AC', 'R']:
+                tx.delivery_status = 'AA'
+            else:
+                pass
         tx.save()
         tx.lot.save()
 
