@@ -90,7 +90,6 @@ export interface DeliverySite {
   depot_type: DepotType
   postal_code: string
   address: string
-  ownership_type: OwnershipType
 }
 
 export interface ProductionSite {

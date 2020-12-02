@@ -1,32 +1,25 @@
 import React from "react"
 
+import { Country, DepotType, OwnershipType } from "../../services/types"
 import {
-  Country,
-  DeliverySite,
-  DepotType,
-  OwnershipType,
-} from "../../services/types"
-import { DeliverySiteSettingsHook } from "../../hooks/settings/use-delivery-sites"
+  DeliverySiteSettingsHook,
+  EntityDeliverySite,
+} from "../../hooks/settings/use-delivery-sites"
 
 import styles from "./settings.module.css"
 
 import * as common from "../../services/common"
 
-import useForm from "../../hooks/helpers/use-form"
 import { Title, Button, LabelInput, Box, LoaderOverlay, Label } from "../system"
-import { AlertCircle, Plus, Return, Save } from "../system/icons"
+import { AlertCircle, Cross, Plus, Return } from "../system/icons"
 import { Alert } from "../system/alert"
-import Table, { Column, Line, Row } from "../system/table"
-import {
-  SectionHeader,
-  SectionForm,
-  SectionBody,
-  Section,
-} from "../system/section"
+import Table, { Actions, Column, Line, Row } from "../system/table"
+import { SectionHeader, SectionBody, Section } from "../system/section"
 import { DialogButtons, PromptFormProps } from "../system/dialog"
 import { LabelAutoComplete } from "../system/autocomplete"
 import RadioGroup from "../system/radio-group"
 import { EMPTY_COLUMN, SettingsForm } from "."
+import useForm from "../../hooks/helpers/use-form"
 
 const DEPOT_TYPE_LABELS = {
   [DepotType.EFS]: "EFS",
@@ -47,6 +40,64 @@ const DEPOT_TYPES = Object.entries(DEPOT_TYPE_LABELS)
 const OWNERSHIP_TYPES = Object.entries(OWNERSHIP_LABELS)
   .map(([value, label]) => ({ value, label }))
 
+export const DeliverySiteFinderPromptFactory = (entityID?: number) =>
+  function DeliverySiteFinderPrompt({
+    onConfirm,
+    onCancel,
+  }: PromptFormProps<EntityDeliverySite>) {
+    const [form, hasChange, onChange] = useForm<EntityDeliverySite>({
+      depot: null,
+      ownership_type: OwnershipType.ThirdParty,
+    })
+
+    return (
+      <SettingsForm>
+        <LabelAutoComplete
+          label="Dépôt"
+          placeholder="Rechercher un dépôt..."
+          name="depot"
+          value={form.depot}
+          getQuery={common.findDeliverySites}
+          onChange={onChange}
+          getValue={(d) => d.depot_id}
+          getLabel={(d) => d.name}
+          queryArgs={[entityID]}
+        />
+
+        <Label label="Propriété">
+          <RadioGroup
+            row
+            value={form.ownership_type}
+            name="ownership_type"
+            options={OWNERSHIP_TYPES}
+            onChange={onChange}
+          />
+        </Label>
+
+        <a
+          href="mailto:carbure@beta.gouv.fr"
+          target="_blank"
+          rel="noreferrer"
+          className={styles.settingsLink}
+        >
+          Le dépôt que je recherche n'est pas enregistré sur CarbuRe.
+        </a>
+
+        <DialogButtons>
+          <Button
+            level="primary"
+            icon={Plus}
+            disabled={!hasChange}
+            onClick={() => onConfirm(form)}
+          >
+            Ajouter
+          </Button>
+          <Button onClick={onCancel}>Annuler</Button>
+        </DialogButtons>
+      </SettingsForm>
+    )
+  }
+
 type DeliverySiteState = {
   name: string
   city: string
@@ -58,51 +109,48 @@ type DeliverySiteState = {
   ownership_type: OwnershipType
 }
 
-export const DeliverySitePromptFactory = (
-  deliverySite?: DeliverySite,
-  readOnly?: boolean
-) =>
+export const DeliverySitePromptFactory = (deliverySite?: EntityDeliverySite) =>
   function DeliverySitePrompt({
-    onConfirm,
     onCancel,
   }: PromptFormProps<DeliverySiteState>) {
-    const [form, hasChange, onChange] = useForm<DeliverySiteState>({
-      name: deliverySite?.name ?? "",
-      city: deliverySite?.city ?? "",
-      country: deliverySite?.country ?? null,
-      depot_id: deliverySite?.depot_id ?? "",
-      depot_type: deliverySite?.depot_type ?? DepotType.Other,
-      address: deliverySite?.address ?? "",
-      postal_code: deliverySite?.postal_code ?? "",
+    const form: DeliverySiteState = {
+      name: deliverySite?.depot?.name ?? "",
+      city: deliverySite?.depot?.city ?? "",
+      country: deliverySite?.depot?.country ?? null,
+      depot_id: deliverySite?.depot?.depot_id ?? "",
+      depot_type: deliverySite?.depot?.depot_type ?? DepotType.Other,
+      address: deliverySite?.depot?.address ?? "",
+      postal_code: deliverySite?.depot?.postal_code ?? "",
       ownership_type: deliverySite?.ownership_type ?? OwnershipType.Own,
-    })
-
-    const canSave = Boolean(
-      hasChange &&
-        form.country &&
-        form.city &&
-        form.name &&
-        form.depot_id &&
-        form.depot_type
-    )
+    }
 
     return (
       <SettingsForm>
         <hr />
 
+        <Label label="Propriété">
+          <RadioGroup
+            row
+            readOnly
+            value={form.ownership_type}
+            name="ownership_type"
+            options={OWNERSHIP_TYPES}
+          />
+        </Label>
+
+        <hr />
+
         <LabelInput
-          readOnly={readOnly}
+          readOnly
           label="Nom du site"
           name="name"
-          value={form.name}
-          onChange={onChange}
+          defaultValue={form.name}
         />
         <LabelInput
-          readOnly={readOnly}
+          readOnly
           label="ID de douane"
           name="depot_id"
-          value={form.depot_id}
-          onChange={onChange}
+          defaultValue={form.depot_id}
         />
 
         <hr />
@@ -110,10 +158,9 @@ export const DeliverySitePromptFactory = (
         <Label label="Type de dépôt">
           <RadioGroup
             row
-            readOnly={readOnly}
+            readOnly
             value={form.depot_type}
             name="depot_type"
-            onChange={onChange}
             options={DEPOT_TYPES}
           />
         </Label>
@@ -121,108 +168,67 @@ export const DeliverySitePromptFactory = (
         <hr />
 
         <LabelInput
-          readOnly={readOnly}
+          readOnly
           label="Adresse"
           name="address"
-          value={form.address}
-          onChange={onChange}
+          defaultValue={form.address}
         />
 
         <Box row>
           <LabelInput
-            readOnly={readOnly}
+            readOnly
             label="Ville"
             name="city"
-            value={form.city}
-            onChange={onChange}
+            defaultValue={form.city}
           />
           <LabelInput
-            readOnly={readOnly}
+            readOnly
             label="Code postal"
             name="postal_code"
-            value={form.postal_code}
-            onChange={onChange}
+            defaultValue={form.postal_code}
           />
         </Box>
 
-        <LabelAutoComplete
-          readOnly={readOnly}
+        <LabelInput
+          readOnly
           label="Pays"
           placeholder="Rechercher un pays..."
           name="country"
-          value={form.country}
-          getValue={(c) => c?.code_pays ?? ""}
-          getLabel={(c) => c?.name ?? ""}
-          getQuery={common.findCountries}
-          onChange={onChange}
+          defaultValue={form.country?.name}
         />
 
         <hr />
 
-        <Label label="Propriété">
-          <RadioGroup
-            row
-            readOnly={readOnly}
-            value={form.ownership_type}
-            name="ownership_type"
-            onChange={onChange}
-            options={OWNERSHIP_TYPES}
-          />
-        </Label>
-
-        <hr />
-
         <DialogButtons>
-          {!readOnly && (
-            <React.Fragment>
-              <Button
-                level="primary"
-                icon={Save}
-                disabled={!canSave}
-                onClick={() => form && onConfirm(form)}
-              >
-                Sauvegarder
-              </Button>
-              <Button onClick={onCancel}>Annuler</Button>
-            </React.Fragment>
-          )}
-
-          {readOnly && (
-            <Button icon={Return} onClick={onCancel}>
-              Retour
-            </Button>
-          )}
+          <Button icon={Return} onClick={onCancel}>
+            Retour
+          </Button>
         </DialogButtons>
       </SettingsForm>
     )
   }
 
-const DELIVERY_SITE_COLUMNS: Column<DeliverySite>[] = [
+const DELIVERY_SITE_COLUMNS: Column<EntityDeliverySite>[] = [
   EMPTY_COLUMN,
   {
-    header: "N° douane",
-    className: styles.settingsTableIDColumn,
-    render: (ds) => <Line text={ds.depot_id} />,
-  },
-  {
-    header: "Type",
-    className: styles.settingsTableIDColumn,
-    render: (ds) => <Line text={DEPOT_TYPE_LABELS[ds.depot_type]} />,
+    header: "ID",
+    render: (ds) => <Line text={ds.depot!.depot_id} />,
   },
   {
     header: "Nom",
     className: styles.settingsTableColumn,
-    render: (ds) => <Line text={ds.name} />,
+    render: (ds) => <Line text={ds.depot!.name} />,
+  },
+  {
+    header: "Type",
+    render: (ds) => <Line text={DEPOT_TYPE_LABELS[ds.depot!.depot_type]} />,
   },
   {
     header: "Ville",
     className: styles.settingsTableColumn,
-    render: (ds) => <Line text={ds.city} />,
-  },
-  {
-    header: "Pays",
-    className: styles.settingsTableColumn,
-    render: (ds) => <Line text={ds.country.name} />,
+    render: (ds) => (
+      <Line text={`${ds.depot!.city}, ${ds.depot!.country.name}`} />
+    ),
   },
 ]
 
@@ -231,7 +237,18 @@ type DeliverySitesSettingsProps = {
 }
 
 const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
-  const rows: Row<DeliverySite>[] = settings.deliverySites.map((ds) => ({
+  const columns: Column<EntityDeliverySite>[] = [
+    ...DELIVERY_SITE_COLUMNS,
+    Actions([
+      {
+        icon: Cross,
+        title: "Supprimer le dépôt",
+        action: (ds) => settings.deleteDeliverySite(ds),
+      },
+    ]),
+  ]
+
+  const rows: Row<EntityDeliverySite>[] = settings.deliverySites.map((ds) => ({
     value: ds,
     onClick: () => settings.showDeliverySite(ds),
   }))
@@ -240,25 +257,12 @@ const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
     <Section>
       <SectionHeader>
         <Title>Dépôts</Title>
-        <Button
-          level="primary"
-          icon={Plus}
-          onClick={settings.createDeliverySite}
-        >
+        <Button level="primary" icon={Plus} onClick={settings.addDeliverySite}>
           Ajouter un dépôt
         </Button>
       </SectionHeader>
 
-      <SectionForm>
-        <LabelInput
-          label="Vérifier l'existence d'un dépôt"
-          placeholder="Rechercher sur Carbure..."
-          value={settings.query}
-          onChange={(e) => settings.setQuery(e.target.value)}
-        />
-      </SectionForm>
-
-      {settings.query.length > 0 && settings.isEmpty && (
+      {settings.isEmpty && (
         <SectionBody>
           <Alert icon={AlertCircle} level="warning">
             Aucun dépôt trouvé
@@ -267,11 +271,7 @@ const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
       )}
 
       {!settings.isEmpty && (
-        <Table
-          columns={DELIVERY_SITE_COLUMNS}
-          rows={rows}
-          className={styles.settingsTable}
-        />
+        <Table columns={columns} rows={rows} className={styles.settingsTable} />
       )}
 
       {settings.isLoading && <LoaderOverlay />}

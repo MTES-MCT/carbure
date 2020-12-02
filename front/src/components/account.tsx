@@ -43,7 +43,12 @@ const EntityPrompt = ({ onConfirm, onCancel }: PromptFormProps<Entity>) => {
         getLabel={(e) => e.name}
       />
 
-      <a href="/" className={pendingStyles.link}>
+      <a
+        href="mailto:carbure@beta.gouv.fr"
+        target="_blank"
+        rel="noreferrer"
+        className={pendingStyles.link}
+      >
         Ma société n'est pas enregistrée sur CarbuRe.
       </a>
 

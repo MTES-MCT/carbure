@@ -83,9 +83,19 @@ def get_operators(request):
 
 def get_delivery_sites(request):
     q = request.GET.get('query', False)
-    dsites = Depot.objects.all()
-    if q:
-        dsites = dsites.filter(Q(name__icontains=q) | Q(depot_id__icontains=q) | Q(city__icontains=q))
+    entity_id = request.GET.get('entity_id', False)
+
+    try:
+        dsites = Depot.objects.all()
+        if q:
+            dsites = dsites.filter(Q(name__icontains=q) | Q(depot_id__icontains=q) | Q(city__icontains=q))
+        if entity_id:
+            entity = Entity.objects.get(pk=entity_id)
+            if entity.entity_type != 'Opérateur':
+                dsites = dsites.filter(Q(depot_type__in=['EFS', 'Other']))
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Could not find delivery sites", 'extra': str(e)}, status=400)
+    
     sez = [d.natural_key() for d in dsites]
     return JsonResponse({'status': 'success', 'data': sez})
 
