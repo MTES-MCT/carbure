@@ -8,7 +8,7 @@ from core.models import Entity, UserRights, LotV2, Pays, MatierePremiere, Biocar
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput, ProducerCertificate
 from core.decorators import check_rights
 from core.models import ISCCCertificate, DBSCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate
-from core.models import ProductionSiteCertificate
+from core.models import ProductionSiteCertificate, UserRightsRequests
 
 
 def get_settings(request):
@@ -748,4 +748,16 @@ def update_2bs_certificate(request, *args, **kwargs):
 
 @login_required
 def request_entity_access(request):
+    entity_id = request.POST.get('entity_id', False)
+    comment = request.POST.get('comment', '')
+
+    if not entity_id:
+        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
+
+    try:
+        entity = Entity.objects.get(id=entity_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find entity"}, status=400)
+
+    UserRightsRequests.objects.update_or_create(user=request.user, entity=entity, defaults={'comment': comment})
     return JsonResponse({'status': 'success'})
