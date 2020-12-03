@@ -8,7 +8,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.utils.crypto import get_random_string
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
-from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays
+from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
 from core.models import GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
 from core.models import LotValidationError
 from core.models import ISCCScope, ISCCCertificate, ISCCCertificateRawMaterial, ISCCCertificateScope
@@ -25,6 +25,11 @@ class EntityAdmin(admin.ModelAdmin):
 class UserRightsAdmin(admin.ModelAdmin):
     list_display = ('user', 'entity')
     search_fields = ('user', 'entity')
+
+
+class UserRightsRequestsAdmin(admin.ModelAdmin):
+    list_display = ('user', 'entity', 'status')
+    search_fields = ('user', 'entity', 'status')
 
 
 class UserPreferencesAdmin(admin.ModelAdmin):
@@ -162,6 +167,7 @@ class ProductionSiteCertificateAdmin(admin.ModelAdmin):
 
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
+admin.site.register(UserRightsRequests, UserRightsRequestsAdmin)
 admin.site.register(UserPreferences, UserPreferencesAdmin)
 admin.site.register(Biocarburant, BiocarburantAdmin)
 admin.site.register(MatierePremiere, MatierePremiereAdmin)
