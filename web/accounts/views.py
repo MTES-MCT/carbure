@@ -44,6 +44,9 @@ def register(request):
         if errors:
             return render(request, "registration/register.html", {'errors': errors, 'email': email if email else '', 'name': name if name else ''})
         user_model = get_user_model()
-        obj, created = user_model.objects.update_or_create(name=name, email=email)
+        try:
+            obj, created = user_model.objects.update_or_create(name=name, email=email)
+        except:
+            return render(request, "registration/register.html", {'errors': ['Utilisateur déjà inscrit'], 'email': email if email else '', 'name': name if name else ''})
         return render(request, "registration/register_complete.html")
     return render(request, "registration/register.html")

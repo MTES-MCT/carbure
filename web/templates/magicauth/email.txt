@@ -1,0 +1,9 @@
+Bonjour {{ user.name }},
+
+Pour accéder à CarbuRe, il vous suffit de cliquer sur ce lien de connexion:  https://carbure.beta.gouv.fr{% url 'magicauth-wait' token.key %}?next={{ next_url|urlencode }}
+
+Ce lien n'est valable que {{ TOKEN_DURATION_MINUTES }} minutes. Il est à usage unique.
+
+Bonne journée,
+
+L'équipe CarbuRe
