@@ -272,11 +272,18 @@ export interface Snapshot {
 export interface Settings {
   email: string
   rights: UserRight[]
+  requests: UserRightRequest[]
 }
 
 export interface UserRight {
   entity: Entity
   rights: string
+}
+
+export interface UserRightRequest {
+  entity: Entity
+  status: string
+  date: Date
 }
 
 export interface StockSnapshot {

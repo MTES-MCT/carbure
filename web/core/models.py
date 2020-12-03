@@ -69,7 +69,7 @@ class UserRights(models.Model):
 
 
 class UserRightsRequests(models.Model):
-    STATUS_TYPES = (('PENDING', 'En attente de validation'), ('ACCEPTED', 'Acceoté'), ('REJECTED', 'Refusé'), ('REVOKED', 'Révoqué'))
+    STATUS_TYPES = (('PENDING', 'En attente de validation'), ('ACCEPTED', 'Accepté'), ('REJECTED', 'Refusé'), ('REVOKED', 'Révoqué'))
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
