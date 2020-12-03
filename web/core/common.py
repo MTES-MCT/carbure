@@ -877,7 +877,7 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
     TransactionError.objects.bulk_create(flat_tx_errors, batch_size=100)
     # 8 run sanity checks
     print('calling bulk_sanity_check in background %s' % (datetime.datetime.now()))
-    p = Process(target=bulk_sanity_checks, args=(new_lots,))
+    p = Process(target=bulk_sanity_checks, args=(new_txs))
     p.start()
     d = Process(target=check_duplicates, args=(new_txs))
     d.start()
@@ -904,7 +904,7 @@ def validate_lots(user, tx_ids):
         tx_valid = tx_is_valid(tx)
         lot_valid = lot_is_valid(tx.lot)
         # run sanity_checks
-        is_sane = bulk_sanity_checks([tx.lot])[0]
+        is_sane = bulk_sanity_checks([tx])[0]
         print('tx valid %s lot valid %s is_sane %s' % (tx_valid, lot_valid, is_sane))
 
         if not is_sane or not lot_valid or not tx_valid:

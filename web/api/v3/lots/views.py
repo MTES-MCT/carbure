@@ -476,7 +476,7 @@ def update_lot(request):
         tx.save()
         LotV2Error.objects.bulk_create(lot_errors)
         TransactionError.objects.bulk_create(tx_errors)
-        bulk_sanity_checks([tx.lot], background=False)
+        bulk_sanity_checks([tx], background=False)
         check_duplicates([tx], background=False)
         return JsonResponse({'status': 'success'})
     else:

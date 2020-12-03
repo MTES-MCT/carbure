@@ -22,6 +22,8 @@ rules['GHG_REDUC_INF_60'] = "La réduction de gaz à effet de serre est inférie
 rules['GHG_REDUC_INF_65'] = "La réduction de gaz à effet de serre est inférieure à 65% pour une usine dont la date de mise en service est ultérieure au 1er Janvier 2021. Il n'est pas possible d'enregistrer ce lot dans CarbuRe"
 rules['MISSING_REF_DBL_COUNTING'] = "Numéro d'enregistrement Double Compte manquant"
 rules['VOLUME_FAIBLE'] = "Volume inhabituellement faible."
+rules['MAC_BC_WRONG'] = "Biocarburant incompatible avec un mise à consommation (seuls ED95 ou B100 sont autorisés)"
+
 
 def raise_warning(lot, rule_triggered, details=''):
     d = {'warning_to_user': True,
@@ -34,6 +36,7 @@ def raise_warning(lot, rule_triggered, details=''):
          }
     return LotValidationError(**d)
 
+
 def raise_error(lot, rule_triggered, details=''):
     d = {'warning_to_user': True,
          'warning_to_admin': True,
@@ -41,29 +44,36 @@ def raise_error(lot, rule_triggered, details=''):
          'message': rules[rule_triggered],
          'details': details,
          'lot': lot,
-         'rule_triggered': rule_triggered,         
+         'rule_triggered': rule_triggered,
          }
     return LotValidationError(**d)
 
-def bulk_sanity_checks(lots, background=True):
+
+def bulk_sanity_checks(txs, background=True):
     results = []
     errors = []
     if background == True:
         db.connections.close_all()
     print('starting bulk_sanity_check %s' % (datetime.datetime.now()))
     # cleanup previous errors
+    lots = [t.lot for t in txs]
     LotValidationError.objects.filter(lot__in=lots).delete()
-    for lot in lots:
-        is_sane, validation_errors = sanity_check(lot)
+    for tx in txs:
+        is_sane, validation_errors = sanity_check(tx)
         errors += validation_errors
         results.append(is_sane)
     LotValidationError.objects.bulk_create(errors, batch_size=1000)
     print('finished bulk_sanity_check %s' % (datetime.datetime.now()))
     return results
 
-def sanity_check(lot):
+
+def sanity_check(tx):
+    lot = tx.lot
     is_sane = True
     errors = []
+
+    if tx.is_mac and lot.biocarburant and lot.biocarburant.code not in ['ED95', 'B100']:
+        errors.append(raise_error(lot, 'MAC_BC_WRONG'))
 
     # check volume
     if lot.volume < 2000:
