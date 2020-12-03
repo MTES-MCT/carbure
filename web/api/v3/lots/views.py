@@ -149,7 +149,8 @@ def get_lots(request):
                          Q(carbure_client__name__icontains=query) |
                          Q(unknown_client__icontains=query) |
                          Q(carbure_delivery_site__name__icontains=query) |
-                         Q(unknown_delivery_site__icontains=query)
+                         Q(unknown_delivery_site__icontains=query) |
+                         Q(dae__icontains=query)
                          )
 
     tx_with_errors = txs.annotate(Count('transactionerror'), Count('lot__lotv2error'), Count('lot__lotvalidationerror')).filter(
