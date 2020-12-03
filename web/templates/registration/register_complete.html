@@ -1,0 +1,18 @@
+{% extends "common/base.html" %}
+
+
+{% block content %}
+<main role="main" class="site-content">
+  <section class="section section-grey">
+    <div class="container container-full-down">
+      <h2 class="section__title">Inscription</h2>
+
+      <p>
+        Votre demande d'inscription a bien été prise en compte.
+	Vous pouvez désormais <a href="{% url 'magicauth-login' %}">vous connecter</a>.
+      </p>
+
+    </div>
+  </section>
+</main>
+{% endblock %}

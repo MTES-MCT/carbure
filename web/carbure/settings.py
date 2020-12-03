@@ -54,7 +54,8 @@ INSTALLED_APPS = [
     'operators',
     'administrators',
     'traders',
-    'api'
+    'api',
+    'magicauth',
 ]
 
 AUTH_USER_MODEL = 'authtools.User'
@@ -143,6 +144,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'
+
+MAGICAUTH_FROM_EMAIL = 'noreply@carbure.beta.gouv.fr'
+MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = 'index'
+MAGICAUTH_EMAIL_FIELD = 'email'
 
 if env('TEST') is False:
     EMAIL_HOST = env('EMAIL_HOST')
