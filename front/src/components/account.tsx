@@ -67,21 +67,22 @@ const EntityPrompt = ({ onConfirm, onCancel }: PromptFormProps<Entity>) => {
   )
 }
 
-const Status = ({ granted }: { granted: boolean }) => (
+const Status = ({ status }: { status: string }) => (
   <span
     className={cl(
       statusStyles.status,
       statusStyles.smallStatus,
-      granted ? statusStyles.statusAccepted : statusStyles.statusWaiting
+      status == "ACCEPTED" ? statusStyles.statusAccepted : statusStyles.statusWaiting
     )}
   >
-    {granted ? "Autorisé" : "En attente"}
+    {status}
   </span>
 )
 
 interface AccessRight {
-  granted: boolean
+  status: string
   entity: Entity
+  date: Date
 }
 
 const COLUMNS: Column<AccessRight>[] = [
@@ -89,7 +90,7 @@ const COLUMNS: Column<AccessRight>[] = [
   {
     header: "Statut",
     className: colStyles.narrowColumn,
-    render: (r) => <Status granted={r.granted} />,
+    render: (r) => <Status status={r.status} />,
   },
   {
     header: "Organisation",
@@ -115,10 +116,10 @@ export const AccountAccesRights = ({ settings }: AccountAccesRightsProps) => {
     )
   }
 
-  const rights = settings.data?.rights ?? []
+  const requests = settings.data?.requests ?? []
 
-  const rows: Row<AccessRight>[] = rights.map((r) => ({
-    value: { granted: true, entity: r.entity },
+  const rows: Row<AccessRight>[] = requests.map((r) => ({
+    value: { status: r.status, entity: r.entity, date: r.date },
   }))
 
   return (
@@ -130,7 +131,7 @@ export const AccountAccesRights = ({ settings }: AccountAccesRightsProps) => {
         </Button>
       </SectionHeader>
 
-      {rights.length === 0 && (
+      {requests.length === 0 && (
         <SectionBody>
           <Alert level="warning" icon={AlertTriangle}>
             Aucune autorisation pour ce compte, ajoutez une organisation pour
@@ -139,7 +140,7 @@ export const AccountAccesRights = ({ settings }: AccountAccesRightsProps) => {
         </SectionBody>
       )}
 
-      {rights.length > 0 && <Table columns={COLUMNS} rows={rows} />}
+      {requests.length > 0 && <Table columns={COLUMNS} rows={rows} />}
     </Section>
   )
 }
