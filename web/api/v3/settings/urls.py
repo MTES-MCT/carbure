@@ -49,4 +49,7 @@ urlpatterns = [
 
      path('update-iscc-certificate', views.update_iscc_certificate, name='api-v3-settings-update-iscc-certificate'),
      path('update-2bs-certificate', views.update_2bs_certificate, name='api-v3-settings-update-2bs-certificate'),
+
+     path('request-entity-access', views.request_entity_access, name='api-v3-settings-request-entity-access'),
+
 ]

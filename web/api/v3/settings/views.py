@@ -3,6 +3,7 @@ from dateutil.relativedelta import *
 
 from django.http import JsonResponse
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 from core.models import Entity, UserRights, LotV2, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput, ProducerCertificate
 from core.decorators import check_rights
@@ -40,7 +41,7 @@ def get_production_sites(request, *args, **kwargs):
         for pc in ps.productionsitecertificate_set.all():
             c = pc.certificate_iscc.certificate if pc.type == 'ISCC' else pc.certificate_2bs.certificate
             certificates.append({'certificate_id': c.certificate_id, 'holder': c.certificate_holder, 'type': pc.type})
-        psite_data['certificates'] = certificates 
+        psite_data['certificates'] = certificates
         data.append(psite_data)
 
     return JsonResponse({'status': 'success', 'data': data})
@@ -110,7 +111,7 @@ def add_production_site(request):
 
     try:
         obj, created = ProductionSite.objects.update_or_create(producer=producer, country=country, name=name, city=city,
-            postal_code=postal_code, eligible_dc=eligible_dc, dc_reference=dc_reference, site_id=site_id, 
+            postal_code=postal_code, eligible_dc=eligible_dc, dc_reference=dc_reference, site_id=site_id,
             manager_name=manager_name, manager_phone=manager_phone, manager_email=manager_email,
             date_mise_en_service=date_mise_en_service, ges_option=ges_option)
 
@@ -422,7 +423,7 @@ def get_delivery_sites(request, *args, **kwargs):
                              'extra': str(e)}, status=400)
 
     return JsonResponse({'status': 'success', 'data': ds})
-    
+
 
 @check_rights('entity_id')
 def add_delivery_site(request, *args, **kwargs):
@@ -451,7 +452,7 @@ def add_delivery_site(request, *args, **kwargs):
                              'extra': str(e)}, status=400)
 
     return JsonResponse({'status': 'success'})
-    
+
 
 @check_rights('entity_id')
 def delete_delivery_site(request, *args, **kwargs):
@@ -465,7 +466,7 @@ def delete_delivery_site(request, *args, **kwargs):
                              'extra': str(e)}, status=400)
 
     return JsonResponse({'status': 'success'})
-    
+
 
 @check_rights('entity_id')
 def set_national_system_certificate(request, *args, **kwargs):
@@ -477,7 +478,7 @@ def set_national_system_certificate(request, *args, **kwargs):
 
     if not national_system_certificate:
         return JsonResponse({'status': 'error', 'message': "Missing national system certificate"}, status=400)
-    
+
     entity.national_system_certificate = national_system_certificate
     entity.save()
     return JsonResponse({'status': 'success'})
@@ -569,7 +570,7 @@ def add_2bs_certificate(request, *args, **kwargs):
 def delete_iscc_certificate(request, *args, **kwargs):
     entity = kwargs['context']['entity']
     certificate_id = request.POST.get('certificate_id', False)
-    
+
     try:
         certificate = ISCCCertificate.objects.get(certificate_id=certificate_id)
         EntityISCCTradingCertificate.objects.get(entity=entity, certificate=certificate).delete()
@@ -584,7 +585,7 @@ def delete_iscc_certificate(request, *args, **kwargs):
 def delete_2bs_certificate(request, *args, **kwargs):
     entity = kwargs['context']['entity']
     certificate_id = request.POST.get('certificate_id', False)
-    
+
     try:
         certificate = DBSCertificate.objects.get(certificate_id=certificate_id)
         EntityDBSTradingCertificate.objects.get(entity=entity, certificate=certificate).delete()
@@ -601,10 +602,10 @@ def get_my_certificates(request, *args, **kwargs):
     query = request.GET.get('query', '')
     today = datetime.date.today()
 
-    certificates_iscc = EntityISCCTradingCertificate.objects.filter(Q(entity=context['entity']), Q(certificate__valid_until__gte=today), 
+    certificates_iscc = EntityISCCTradingCertificate.objects.filter(Q(entity=context['entity']), Q(certificate__valid_until__gte=today),
         Q(certificate__certificate_id__icontains=query) | Q(certificate__certificate_holder__icontains=query))
 
-    certificates_2bs = EntityDBSTradingCertificate.objects.filter(Q(entity=context['entity']), Q(certificate__valid_until__gte=today), 
+    certificates_2bs = EntityDBSTradingCertificate.objects.filter(Q(entity=context['entity']), Q(certificate__valid_until__gte=today),
         Q(certificate__certificate_id__icontains=query) | Q(certificate__certificate_holder__icontains=query))
 
     sez_data = [{'certificate_id': c.certificate.certificate_id, 'holder': c.certificate.certificate_holder, 'type': 'ISCC'} for c in certificates_iscc]
@@ -622,7 +623,7 @@ def set_production_site_certificates(request, *args, **kwargs):
         psite = ProductionSite.objects.get(pk=production_site_id)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find requested production site"}, status=400)
- 
+
     try:
         certificates_iscc = EntityISCCTradingCertificate.objects.filter(certificate__certificate_id__in=certificate_ids)
         certificate_2bs = EntityDBSTradingCertificate.objects.filter(certificate__certificate_id__in=certificate_ids)
@@ -636,7 +637,7 @@ def set_production_site_certificates(request, *args, **kwargs):
         ProductionSiteCertificate.objects.bulk_create(psc_iscc + psc_2bs)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not update production site certificates"}, status=400)
-        
+
     return JsonResponse({'status': 'success'})
 
 @check_rights('entity_id')
@@ -657,7 +658,6 @@ def add_production_site_certificate(request, *args, **kwargs):
 
     ProductionSiteCertificate.objects.update_or_create(entity=context['entity'], type=certificate_type, certificate_2bs=certificate_2bs, certificate_iscc=certificate_iscc)
     return JsonResponse({'status': 'success'})
-
 
 
 @check_rights('entity_id')
@@ -692,24 +692,24 @@ def update_iscc_certificate(request, *args, **kwargs):
     if not old_certificate_id:
         return JsonResponse({'status': 'error', 'message': 'Please provide an old_certificate_id'}, status=400)
     if not new_certificate_id:
-        return JsonResponse({'status': 'error', 'message': 'Please provide an new_certificate_id'}, status=400)        
+        return JsonResponse({'status': 'error', 'message': 'Please provide an new_certificate_id'}, status=400)
 
     # first, add the new certificate to the account
     try:
         new_certificate = ISCCCertificate.objects.get(certificate_id=new_certificate_id)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find new requested certificate"}, status=400)
-    new_certificate, _ = EntityISCCTradingCertificate.objects.update_or_create(entity=entity, certificate=new_certificate)    
+    new_certificate, _ = EntityISCCTradingCertificate.objects.update_or_create(entity=entity, certificate=new_certificate)
 
     # find old certificate
     try:
         old_certificate = EntityISCCTradingCertificate.objects.get(certificate__certificate_id=old_certificate_id)
     except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not find old requested certificate"}, status=400)    
+        return JsonResponse({'status': 'error', 'message': "Could not find old requested certificate"}, status=400)
 
     # then update previously linked certificates
     old_certificate.has_been_updated = True
-    old_certificate.save()    
+    old_certificate.save()
     ProductionSiteCertificate.objects.filter(entity=entity, type='ISCC', certificate_iscc=old_certificate).update(certificate_iscc=new_certificate)
     return JsonResponse({'status': 'success'})
 
@@ -724,20 +724,20 @@ def update_2bs_certificate(request, *args, **kwargs):
     if not old_certificate_id:
         return JsonResponse({'status': 'error', 'message': 'Please provide an old_certificate_id'}, status=400)
     if not new_certificate_id:
-        return JsonResponse({'status': 'error', 'message': 'Please provide an new_certificate_id'}, status=400)        
+        return JsonResponse({'status': 'error', 'message': 'Please provide an new_certificate_id'}, status=400)
 
     # first, add the new certificate to the account
     try:
         new_certificate = DBSCertificate.objects.get(certificate_id=new_certificate_id)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find new requested certificate"}, status=400)
-    new_certificate, _ = EntityDBSTradingCertificate.objects.update_or_create(entity=entity, certificate=new_certificate)    
+    new_certificate, _ = EntityDBSTradingCertificate.objects.update_or_create(entity=entity, certificate=new_certificate)
 
     # find old certificate
     try:
         old_certificate = EntityDBSTradingCertificate.objects.get(certificate__certificate_id=old_certificate_id)
     except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not find old requested certificate"}, status=400)    
+        return JsonResponse({'status': 'error', 'message': "Could not find old requested certificate"}, status=400)
 
     # then update previously linked certificates
     old_certificate.has_been_updated = True
@@ -745,3 +745,7 @@ def update_2bs_certificate(request, *args, **kwargs):
     ProductionSiteCertificate.objects.filter(entity=entity, type='2BS', certificate_2bs=old_certificate).update(certificate_2bs=new_certificate)
     return JsonResponse({'status': 'success'})
 
+
+@login_required
+def request_entity_access(request):
+    return JsonResponse({'status': 'success'})

@@ -68,6 +68,21 @@ class UserRights(models.Model):
         verbose_name_plural = 'Users Rights'
 
 
+class UserRightsRequests(models.Model):
+    STATUS_TYPES = (('PENDING', 'En attente de validation'), ('ACCEPTED', 'Acceoté'), ('REJECTED', 'Refusé'), ('REVOKED', 'Révoqué'))
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
+    date_requested = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=32, choices=STATUS_TYPES, default='PENDING')
+    comment = models.TextField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'users_rights_requests'
+        verbose_name = 'User Right Request'
+        verbose_name_plural = 'Users Rights Requests'
+
+
 class Biocarburant(models.Model):
     name = models.CharField(max_length=64)
     description = models.CharField(max_length=128)
