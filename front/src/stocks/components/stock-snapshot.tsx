@@ -1,8 +1,8 @@
 import React from "react"
 
-import { ApiState } from "common/hooks/helpers/use-api"
+import { ApiState } from "common/hooks/use-api"
 import { LotStatus, StockSnapshot } from "common/types"
-import { StatusSelection } from "common/hooks/query/use-status"
+import { StatusSelection } from "transactions/hooks/query/use-status"
 
 import styles from "./stock-snapshot.module.css"
 

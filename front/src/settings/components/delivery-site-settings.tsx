@@ -26,7 +26,7 @@ import { DialogButtons, PromptFormProps } from "common/components/dialog"
 import { LabelAutoComplete } from "common/components/autocomplete"
 import RadioGroup from "common/components/radio-group"
 import { EMPTY_COLUMN, SettingsForm } from "./common"
-import useForm from "common/hooks/helpers/use-form"
+import useForm from "common/hooks/use-form"
 
 const DEPOT_TYPE_LABELS = {
   [DepotType.EFS]: "EFS",

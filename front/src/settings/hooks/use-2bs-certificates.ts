@@ -4,7 +4,7 @@ import { confirm, prompt } from "common/components/dialog"
 import { useNotificationContext } from "common/components/notifications"
 import * as api from "../api"
 import { DBSCertificate } from "common/types"
-import useAPI from "common/hooks/helpers/use-api"
+import useAPI from "common/hooks/use-api"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { ProductionSiteSettingsHook } from "./use-production-sites"
 

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react"
 
 import styles from "./autocomplete.module.css"
 
-import useAPI from "../hooks/helpers/use-api"
+import useAPI from "../hooks/use-api"
 import { Input, InputProps, Label, LabelProps } from "."
 import { DropdownItem, DropdownOptions, useDropdown } from "./dropdown"
 import { Cross } from "./icons"

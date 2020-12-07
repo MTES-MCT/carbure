@@ -5,7 +5,7 @@ import { ISCCCertificate } from "common/types"
 
 import { confirm, prompt } from "common/components/dialog"
 import * as api from "../api"
-import useAPI from "common/hooks/helpers/use-api"
+import useAPI from "common/hooks/use-api"
 import { ISCCPrompt } from "../components/iscc-certificates-settings"
 import { ProductionSiteSettingsHook } from "./use-production-sites"
 import { useNotificationContext } from "common/components/notifications"

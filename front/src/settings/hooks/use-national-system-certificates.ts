@@ -1,6 +1,6 @@
 import { EntitySelection } from "carbure/hooks/use-entity"
 
-import useAPI from "common/hooks/helpers/use-api"
+import useAPI from "common/hooks/use-api"
 import * as api from "../api"
 
 import { NationalSystemCertificatesPromptFactory } from "../components/national-system-certificates-settings"

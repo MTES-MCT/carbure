@@ -1,4 +1,4 @@
-import api from "common/fetch"
+import api from "common/services/api"
 import {
   Settings,
   GESOption,

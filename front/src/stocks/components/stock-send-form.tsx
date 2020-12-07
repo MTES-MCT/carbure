@@ -3,7 +3,7 @@ import React from "react"
 import { Entity, DeliverySite, Country } from "common/types"
 
 import { findCountries, findDeliverySites, findEntities } from "common/api"
-import useForm from "common/hooks/helpers/use-form"
+import useForm from "common/hooks/use-form"
 
 import { Box, Button, LabelCheckbox, LabelInput } from "common/components"
 import { LabelAutoComplete } from "common/components/autocomplete"

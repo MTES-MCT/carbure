@@ -1,7 +1,7 @@
 import React from "react"
 
 import { Transaction } from "common/types"
-import { TransactionSelection } from "common/hooks/query/use-selection"
+import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { Column, Line, TwoLines } from "common/components/table"
 
 import styles from "./transaction-columns.module.css"

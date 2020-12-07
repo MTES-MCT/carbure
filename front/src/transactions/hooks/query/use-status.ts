@@ -1,10 +1,10 @@
 import { useParams } from "react-router-dom"
 
-import { PageSelection } from "../../components/pagination"
+import { PageSelection } from "../../../common/components/pagination"
 import { SpecialSelection } from "./use-special"
-import { LotStatus } from "../../types"
+import { LotStatus } from "../../../common/types"
 
-import { useRelativePush } from "../../components/relative-route"
+import { useRelativePush } from "../../../common/components/relative-route"
 
 export interface StatusSelection {
   active: LotStatus

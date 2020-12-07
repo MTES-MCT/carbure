@@ -1,7 +1,7 @@
 import React from "react"
 
-import { TransactionFormState } from "common/hooks/helpers/use-transaction-form"
-import { FormFields } from "common/hooks/helpers/use-form"
+import { TransactionFormState } from "transactions/hooks/use-transaction-form"
+import { FormFields } from "common/hooks/use-form"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
 import styles from "./transaction-form.module.css"

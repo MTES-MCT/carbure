@@ -2,7 +2,7 @@ import { EntitySelection } from "carbure/hooks/use-entity"
 import { SettingsGetter } from "carbure/hooks/use-app"
 
 import * as api from "../api"
-import useAPI from "common/hooks/helpers/use-api"
+import useAPI from "common/hooks/use-api"
 
 export function toggleMAC(toggle: boolean, entityID: number) {
   return toggle ? api.enableMAC(entityID) : api.disableMAC(entityID)

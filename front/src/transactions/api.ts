@@ -6,9 +6,9 @@ import {
   Filters,
   LotDetails,
 } from "common/types"
-import { FilterSelection } from "common/hooks/query/use-filters"
+import { FilterSelection } from "transactions/hooks/query/use-filters"
 
-import api from "common/fetch"
+import api from "common/services/api"
 import differenceInCalendarMonths from "date-fns/differenceInCalendarMonths"
 
 export function toOption(value: string) {

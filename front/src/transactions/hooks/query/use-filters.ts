@@ -1,8 +1,8 @@
 import { useState } from "react"
 
-import { PageSelection } from "../../components/pagination"
-import { SelectValue } from "../../components/select"
-import { Filters } from "../../types"
+import { PageSelection } from "../../../common/components/pagination"
+import { SelectValue } from "../../../common/components/select"
+import { Filters } from "../../../common/types"
 
 const defaultState = {}
 

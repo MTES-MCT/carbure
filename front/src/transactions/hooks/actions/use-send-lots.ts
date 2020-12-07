@@ -1,11 +1,11 @@
 import { EntitySelection } from "carbure/hooks/use-entity"
 
 import * as api from "stocks/api"
-import useAPI from "../helpers/use-api"
-import { confirm } from "../../components/dialog"
-import { prompt } from "../../components/dialog"
+import useAPI from "../../../common/hooks/use-api"
+import { confirm } from "../../../common/components/dialog"
+import { prompt } from "../../../common/components/dialog"
 import { StockSendLotPrompt } from "stocks/components/stock-send-form"
-import { useNotificationContext } from "../../components/notifications"
+import { useNotificationContext } from "../../../common/components/notifications"
 import { TransactionSelection } from "../query/use-selection"
 
 export interface LotSender {

@@ -1,7 +1,7 @@
-import { FilterSelection } from "common/hooks/query/use-filters"
+import { FilterSelection } from "transactions/hooks/query/use-filters"
 import { Lots, LotStatus, StockSnapshot, Transaction } from "common/types"
 
-import api from "common/fetch"
+import api from "common/services/api"
 import { toOption } from "transactions/api"
 
 // give the same type to all filters in order to render them easily

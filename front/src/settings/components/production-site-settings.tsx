@@ -15,7 +15,7 @@ import { EntitySelection } from "carbure/hooks/use-entity"
 import styles from "./settings.module.css"
 
 import * as common from "common/api"
-import useForm from "common/hooks/helpers/use-form"
+import useForm from "common/hooks/use-form"
 
 import {
   Title,
