@@ -9,7 +9,7 @@ import { confirm, prompt } from "common/components/dialog"
 import {
   DeliverySitePromptFactory,
   DeliverySiteFinderPromptFactory,
-} from "../components/delivery-site-settings"
+} from "../components/delivery-site"
 import { useNotificationContext } from "common/components/notifications"
 
 export interface EntityDeliverySite {

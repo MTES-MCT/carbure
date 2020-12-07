@@ -8,7 +8,7 @@ import * as api from "../api"
 import {
   ProductionSitePromptFactory,
   ProductionSiteState,
-} from "../components/production-site-settings"
+} from "../components/production-site"
 import { confirm, prompt } from "common/components/dialog"
 import { useNotificationContext } from "common/components/notifications"
 

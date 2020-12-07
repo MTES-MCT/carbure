@@ -12,12 +12,12 @@ import useProductionSites from "./hooks/use-production-sites"
 
 import { Main, Title } from "common/components"
 import { SettingsHeader, SettingsBody } from "./components/common"
-import DeliverySitesSettings from "./components/delivery-site-settings"
-import ProductionSitesSettings from "./components/production-site-settings"
-import DBSCertificateSettings from "./components/2bs-certificates-settings"
-import ISCCCertificateSettings from "./components/iscc-certificates-settings"
-import NationalSystemCertificatesSettings from "./components/national-system-certificates-settings"
-import CompanySettings from "./components/company-settings"
+import DeliverySitesSettings from "./components/delivery-site"
+import ProductionSitesSettings from "./components/production-site"
+import DBSCertificateSettings from "./components/2bs-certificates"
+import ISCCCertificateSettings from "./components/iscc-certificates"
+import NationalSystemCertificatesSettings from "./components/national-system-certificates"
+import CompanySettings from "./components/company"
 
 function useSettings(entity: EntitySelection, settings: SettingsGetter) {
   const company = useCompany(entity, settings)

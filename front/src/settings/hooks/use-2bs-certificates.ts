@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { DBSPrompt } from "../components/2bs-certificates-settings"
+import { DBSPrompt } from "../components/2bs-certificates"
 import { confirm, prompt } from "common/components/dialog"
 import { useNotificationContext } from "common/components/notifications"
 import * as api from "../api"
