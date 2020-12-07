@@ -1,16 +1,16 @@
 import { useEffect } from "react"
 
-import { EntitySelection } from "../../common/hooks/helpers/use-entity"
-import { DeliverySite, OwnershipType } from "../../common/types"
+import { EntitySelection } from "carbure/hooks/use-entity"
+import { DeliverySite, OwnershipType } from "common/types"
 
-import useAPI from "../../common/hooks/helpers/use-api"
+import useAPI from "common/hooks/helpers/use-api"
 import * as api from "../api"
-import { confirm, prompt } from "../../common/system/dialog"
+import { confirm, prompt } from "common/system/dialog"
 import {
   DeliverySitePromptFactory,
   DeliverySiteFinderPromptFactory,
 } from "../components/delivery-site-settings"
-import { useNotificationContext } from "../../common/system/notifications"
+import { useNotificationContext } from "common/system/notifications"
 
 export interface EntityDeliverySite {
   depot: DeliverySite | null

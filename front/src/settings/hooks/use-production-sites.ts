@@ -1,16 +1,16 @@
 import { useEffect } from "react"
 
-import { EntitySelection } from "../../common/hooks/helpers/use-entity"
-import { ProductionSiteDetails } from "../../common/types"
+import { EntitySelection } from "carbure/hooks/use-entity"
+import { ProductionSiteDetails } from "common/types"
 
-import useAPI from "../../common/hooks/helpers/use-api"
+import useAPI from "common/hooks/helpers/use-api"
 import * as api from "../api"
 import {
   ProductionSitePromptFactory,
   ProductionSiteState,
 } from "../components/production-site-settings"
-import { confirm, prompt } from "../../common/system/dialog"
-import { useNotificationContext } from "../../common/system/notifications"
+import { confirm, prompt } from "common/system/dialog"
+import { useNotificationContext } from "common/system/notifications"
 
 export interface ProductionSiteSettingsHook {
   isEmpty: boolean

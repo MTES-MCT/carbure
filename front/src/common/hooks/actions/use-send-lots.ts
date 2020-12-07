@@ -1,10 +1,10 @@
-import { EntitySelection } from "../helpers/use-entity"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
-import * as api from "../../../stocks/api"
+import * as api from "stocks/api"
 import useAPI from "../helpers/use-api"
 import { confirm } from "../../system/dialog"
 import { prompt } from "../../system/dialog"
-import { StockSendLotPrompt } from "../../../stocks/components/stock-send-form"
+import { StockSendLotPrompt } from "stocks/components/stock-send-form"
 import { useNotificationContext } from "../../system/notifications"
 import { TransactionSelection } from "../query/use-selection"
 

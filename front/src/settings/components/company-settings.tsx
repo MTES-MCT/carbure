@@ -1,16 +1,12 @@
 import React from "react"
 
-import { EntitySelection } from "../../common/hooks/helpers/use-entity"
+import { EntitySelection } from "carbure/hooks/use-entity"
 import { CompanySettingsHook } from "../hooks/use-company"
 
 import styles from "./settings.module.css"
 
-import { Title, LabelCheckbox, LoaderOverlay } from "../../common/system"
-import {
-  SectionHeader,
-  SectionBody,
-  Section,
-} from "../../common/system/section"
+import { Title, LabelCheckbox, LoaderOverlay } from "common/system"
+import { SectionHeader, SectionBody, Section } from "common/system/section"
 
 type CompanySettingsProps = {
   entity: EntitySelection

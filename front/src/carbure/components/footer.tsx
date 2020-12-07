@@ -1,5 +1,3 @@
-import React from "react"
-
 import styles from "./footer.module.css"
 import logoMTES from "../assets/images/logo-mtes.svg"
 import logoFabNum from "../assets/images/logo-fabriquenumerique.svg"

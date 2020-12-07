@@ -1,8 +1,8 @@
-import { EntitySelection } from "../helpers/use-entity"
+import { EntitySelection } from "carbure/hooks/use-entity"
 import { TransactionSelection } from "../query/use-selection"
 import { YearSelection } from "../query/use-year"
 
-import * as api from "../../../transactions/api"
+import * as api from "transactions/api"
 import useAPI from "../helpers/use-api"
 
 import { confirm } from "../../system/dialog"

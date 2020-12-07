@@ -1,12 +1,12 @@
 import React from "react"
 
-import { Transaction } from "../../common/types"
-import { TransactionSelection } from "../../common/hooks/query/use-selection"
-import { Column, Line, TwoLines } from "../../common/system/table"
+import { Transaction } from "common/types"
+import { TransactionSelection } from "common/hooks/query/use-selection"
+import { Column, Line, TwoLines } from "common/system/table"
 
 import styles from "./transaction-columns.module.css"
 
-import { Box } from "../../common/system"
+import { Box } from "common/system"
 import Status from "./transaction-status"
 
 export const empty: Column<any> = {

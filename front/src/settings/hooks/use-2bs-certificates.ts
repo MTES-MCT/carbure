@@ -1,11 +1,11 @@
 import { useEffect } from "react"
 import { DBSPrompt } from "../components/2bs-certificates-settings"
-import { confirm, prompt } from "../../common/system/dialog"
-import { useNotificationContext } from "../../common/system/notifications"
+import { confirm, prompt } from "common/system/dialog"
+import { useNotificationContext } from "common/system/notifications"
 import * as api from "../api"
-import { DBSCertificate } from "../../common/types"
-import useAPI from "../../common/hooks/helpers/use-api"
-import { EntitySelection } from "../../common/hooks/helpers/use-entity"
+import { DBSCertificate } from "common/types"
+import useAPI from "common/hooks/helpers/use-api"
+import { EntitySelection } from "carbure/hooks/use-entity"
 import { ProductionSiteSettingsHook } from "./use-production-sites"
 
 export interface DBSCertificateSettingsHook {

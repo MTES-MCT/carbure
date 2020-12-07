@@ -1,14 +1,14 @@
-import { EntitySelection } from "../../common/hooks/helpers/use-entity"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
 import useTransactionForm, {
   toTransactionPostData,
-} from "../../common/hooks/helpers/use-transaction-form"
+} from "common/hooks/helpers/use-transaction-form"
 
-import { useRelativePush } from "../../common/components/relative-route"
-import useAPI from "../../common/hooks/helpers/use-api"
-import useClose from "../../common/hooks/helpers/use-close"
+import { useRelativePush } from "common/components/relative-route"
+import useAPI from "common/hooks/helpers/use-api"
+import useClose from "common/hooks/helpers/use-close"
 import { addLot } from "../api"
-import { useNotificationContext } from "../../common/system/notifications"
+import { useNotificationContext } from "common/system/notifications"
 
 export default function useTransactionAdd(
   entity: EntitySelection,

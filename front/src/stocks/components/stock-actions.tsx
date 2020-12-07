@@ -1,20 +1,13 @@
 import React from "react"
 
-import { Link } from "../../common/components/relative-route"
-import {
-  Check,
-  Cross,
-  Download,
-  Plus,
-  Rapport,
-  Upload,
-} from "../../common/system/icons"
-import { AsyncButton, Button } from "../../common/system"
-import { prompt } from "../../common/system/dialog"
-import { StockImportPromptFactory } from "../../common/components/import-prompt"
-import { LotUploader } from "../../common/hooks/actions/use-upload-file"
-import { LotDeleter } from "../../common/hooks/actions/use-delete-lots"
-import { LotSender } from "../../common/hooks/actions/use-send-lots"
+import { Link } from "common/components/relative-route"
+import { Check, Cross, Rapport, Upload } from "common/system/icons"
+import { AsyncButton, Button } from "common/system"
+import { prompt } from "common/system/dialog"
+import { StockImportPromptFactory } from "common/components/import-prompt"
+import { LotUploader } from "common/hooks/actions/use-upload-file"
+import { LotDeleter } from "common/hooks/actions/use-delete-lots"
+import { LotSender } from "common/hooks/actions/use-send-lots"
 
 type ImportActionsProps = {
   uploader: LotUploader

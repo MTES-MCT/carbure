@@ -3,9 +3,9 @@ import cl from "clsx"
 import format from "date-fns/format"
 import fr from "date-fns/locale/fr"
 
-import { LotDetails, Transaction } from "../../common/types"
+import { LotDetails, Transaction } from "common/types"
 import styles from "./transaction-status.module.css"
-import { Box, Title } from "../../common/system"
+import { Box, Title } from "common/system"
 import { hasDeadline } from "../api"
 
 function getStatusText(

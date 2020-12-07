@@ -1,10 +1,10 @@
 import { useEffect } from "react"
 
-import { EntitySelection } from "../../common/hooks/helpers/use-entity"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
 import * as api from "../api"
-import useAPI from "../../common/hooks/helpers/use-api"
-import { Settings } from "../../common/types"
+import useAPI from "common/hooks/helpers/use-api"
+import { Settings } from "common/types"
 
 export type SettingsGetter = {
   loading: boolean

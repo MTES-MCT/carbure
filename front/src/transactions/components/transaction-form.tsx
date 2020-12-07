@@ -1,8 +1,8 @@
 import React from "react"
 
-import { TransactionFormState } from "../../common/hooks/helpers/use-transaction-form"
-import { FormFields } from "../../common/hooks/helpers/use-form"
-import { EntitySelection } from "../../common/hooks/helpers/use-entity"
+import { TransactionFormState } from "common/hooks/helpers/use-transaction-form"
+import { FormFields } from "common/hooks/helpers/use-form"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
 import styles from "./transaction-form.module.css"
 
@@ -14,17 +14,12 @@ import {
   findProducers,
   findProductionSites,
   findDeliverySites,
-} from "../../common/api"
+} from "common/api"
 
-import {
-  Box,
-  LabelCheckbox,
-  LabelInput,
-  LabelTextArea,
-} from "../../common/system"
-import { Alert } from "../../common/system/alert"
-import { LabelAutoComplete } from "../../common/system/autocomplete"
-import { AlertTriangle } from "../../common/system/icons"
+import { Box, LabelCheckbox, LabelInput, LabelTextArea } from "common/system"
+import { Alert } from "common/system/alert"
+import { LabelAutoComplete } from "common/system/autocomplete"
+import { AlertTriangle } from "common/system/icons"
 
 // shorthand to build autocomplete value & label getters
 const get = (key: string) => (obj: { [k: string]: any } | null) =>

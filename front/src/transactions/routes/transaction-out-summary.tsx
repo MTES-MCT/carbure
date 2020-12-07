@@ -1,6 +1,6 @@
 import React from "react"
 
-import { EntitySelection } from "common/hooks/helpers/use-entity"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
 import { Title } from "common/system"
 import Modal from "common/system/modal"

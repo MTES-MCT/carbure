@@ -1,5 +1,5 @@
 import React from "react"
-import { EntitySelection } from "../hooks/helpers/use-entity"
+import { EntitySelection } from "carbure/hooks/use-entity"
 import { SpecialSelection } from "../hooks/query/use-special"
 import { AlertFilter } from "common/system/alert"
 import { AlertCircle, Calendar } from "common/system/icons"

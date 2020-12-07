@@ -1,29 +1,23 @@
 import React from "react"
 
-import { LotStatus } from "../../common/types"
-import { EntitySelection } from "../../common/hooks/helpers/use-entity"
-import { LotDeleter } from "../../common/hooks/actions/use-delete-lots"
-import { LotAcceptor } from "../../common/hooks/actions/use-accept-lots"
-import { LotRejector } from "../../common/hooks/actions/use-reject-lots"
-import { LotValidator } from "../../common/hooks/actions/use-validate-lots"
+import { LotStatus } from "common/types"
+import { EntitySelection } from "carbure/hooks/use-entity"
+import { LotDeleter } from "common/hooks/actions/use-delete-lots"
+import { LotAcceptor } from "common/hooks/actions/use-accept-lots"
+import { LotRejector } from "common/hooks/actions/use-reject-lots"
+import { LotValidator } from "common/hooks/actions/use-validate-lots"
 
 import styles from "../components/transaction-form.module.css"
 
 import useTransactionDetails from "../hooks/use-transaction-details"
 
-import {
-  AlertTriangle,
-  Check,
-  Cross,
-  Return,
-  Save,
-} from "../../common/system/icons"
-import { AsyncButton, Button, LoaderOverlay } from "../../common/system"
-import Modal from "../../common/system/modal"
-import Comments from "../../common/components/comments"
+import { AlertTriangle, Check, Cross, Return, Save } from "common/system/icons"
+import { AsyncButton, Button, LoaderOverlay } from "common/system"
+import Modal from "common/system/modal"
+import Comments from "common/components/comments"
 import TransactionForm from "../components/transaction-form"
 import { StatusTitle } from "../components/transaction-status"
-import ValidationErrors from "../../common/components/validation-errors"
+import ValidationErrors from "common/components/validation-errors"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]

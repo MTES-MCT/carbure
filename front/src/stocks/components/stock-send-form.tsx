@@ -1,18 +1,14 @@
 import React from "react"
 
-import { Entity, DeliverySite, Country } from "../../common/types"
+import { Entity, DeliverySite, Country } from "common/types"
 
-import {
-  findCountries,
-  findDeliverySites,
-  findEntities,
-} from "../../common/api"
-import useForm from "../../common/hooks/helpers/use-form"
+import { findCountries, findDeliverySites, findEntities } from "common/api"
+import useForm from "common/hooks/helpers/use-form"
 
-import { Box, Button, LabelCheckbox, LabelInput } from "../../common/system"
-import { LabelAutoComplete } from "../../common/system/autocomplete"
-import { DialogButtons, PromptFormProps } from "../../common/system/dialog"
-import { Check } from "../../common/system/icons"
+import { Box, Button, LabelCheckbox, LabelInput } from "common/system"
+import { LabelAutoComplete } from "common/system/autocomplete"
+import { DialogButtons, PromptFormProps } from "common/system/dialog"
+import { Check } from "common/system/icons"
 
 interface StockSendDetails {
   volume: number
