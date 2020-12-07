@@ -1,17 +1,17 @@
 import { useEffect } from "react"
 import { useParams } from "react-router-dom"
 
-import { Errors, LotStatus } from "../../common/types"
-import { EntitySelection } from "../../common/hooks/helpers/use-entity"
+import { Errors, LotStatus } from "common/types"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
 import useTransactionForm, {
   toTransactionFormState,
   toTransactionPostData,
-} from "../../common/hooks/helpers/use-transaction-form"
+} from "common/hooks/helpers/use-transaction-form"
 
-import useAPI from "../../common/hooks/helpers/use-api"
-import useClose from "../../common/hooks/helpers/use-close"
-import { useNotificationContext } from "../../common/system/notifications"
+import useAPI from "common/hooks/helpers/use-api"
+import useClose from "common/hooks/helpers/use-close"
+import { useNotificationContext } from "common/system/notifications"
 import * as api from "../api"
 
 export function getFieldErrors(errors: Errors) {

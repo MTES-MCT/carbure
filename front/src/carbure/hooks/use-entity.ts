@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom"
 
-import { Entity } from "../../types"
-import { AppHook } from "../../../carbure/hooks"
+import { Entity } from "common/types"
+import { AppHook } from "./use-app"
 
 export type EntitySelection = Entity | null
 

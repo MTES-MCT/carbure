@@ -2,23 +2,19 @@ import React, { useState } from "react"
 import cl from "clsx"
 
 import { DBSCertificateSettingsHook } from "../hooks/use-2bs-certificates"
-import { DBSCertificate } from "../../common/types"
+import { DBSCertificate } from "common/types"
 
 import styles from "./settings.module.css"
 
-import * as common from "../../common/api"
+import * as common from "common/api"
 
-import { Title, Button, LoaderOverlay } from "../../common/system"
-import { AlertCircle, Cross, Plus } from "../../common/system/icons"
-import { Alert } from "../../common/system/alert"
-import {
-  SectionHeader,
-  SectionBody,
-  Section,
-} from "../../common/system/section"
-import { DialogButtons, PromptFormProps } from "../../common/system/dialog"
-import { LabelAutoComplete } from "../../common/system/autocomplete"
-import Table, { Actions, Column, Line } from "../../common/system/table"
+import { Title, Button, LoaderOverlay } from "common/system"
+import { AlertCircle, Cross, Plus } from "common/system/icons"
+import { Alert } from "common/system/alert"
+import { SectionHeader, SectionBody, Section } from "common/system/section"
+import { DialogButtons, PromptFormProps } from "common/system/dialog"
+import { LabelAutoComplete } from "common/system/autocomplete"
+import Table, { Actions, Column, Line } from "common/system/table"
 import { EMPTY_COLUMN, ExpirationDate, SettingsForm } from "./common"
 
 export const DBSPrompt = ({

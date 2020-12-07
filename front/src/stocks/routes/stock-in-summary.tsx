@@ -1,10 +1,10 @@
 import React from "react"
-import { Title } from "../../common/system"
+import { Title } from "common/system"
 
-import Modal from "../../common/system/modal"
-import TransactionInSummaryForm from "../../transactions/components/transaction-in-summary-form"
-import { EntitySelection } from "../../common/hooks/helpers/use-entity"
-import useTransactionInSummary from "../../transactions/hooks/use-transaction-in-summary"
+import Modal from "common/system/modal"
+import TransactionInSummaryForm from "transactions/components/transaction-in-summary-form"
+import { EntitySelection } from "carbure/hooks/use-entity"
+import useTransactionInSummary from "transactions/hooks/use-transaction-in-summary"
 
 type StockInSummaryProps = {
   entity: EntitySelection

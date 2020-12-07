@@ -1,17 +1,17 @@
 import { useEffect } from "react"
 
-import { Lots } from "../../common/types"
-import { PageSelection } from "../../common/system/pagination"
-import { EntitySelection } from "../../common/hooks/helpers/use-entity"
-import { FilterSelection } from "../../common/hooks/query/use-filters"
-import { SearchSelection } from "../../common/hooks/query/use-search"
-import { SortingSelection } from "../../common/hooks/query/use-sort-by"
-import { StatusSelection } from "../../common/hooks/query/use-status"
-import { YearSelection } from "../../common/hooks/query/use-year"
-import { SpecialSelection } from "../../common/hooks/query/use-special"
+import { Lots } from "common/types"
+import { PageSelection } from "common/system/pagination"
+import { EntitySelection } from "carbure/hooks/use-entity"
+import { FilterSelection } from "common/hooks/query/use-filters"
+import { SearchSelection } from "common/hooks/query/use-search"
+import { SortingSelection } from "common/hooks/query/use-sort-by"
+import { StatusSelection } from "common/hooks/query/use-status"
+import { YearSelection } from "common/hooks/query/use-year"
+import { SpecialSelection } from "common/hooks/query/use-special"
 
 import * as api from "../api"
-import useAPI from "../../common/hooks/helpers/use-api"
+import useAPI from "common/hooks/helpers/use-api"
 
 // fetches current snapshot when parameters change
 export function useGetSnapshot(entity: EntitySelection, year: YearSelection) {

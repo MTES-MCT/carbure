@@ -10,7 +10,7 @@ import {
   ProductionSite,
 } from "../../types"
 
-import { EntitySelection } from "./use-entity"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
 import useForm, { FormHook } from "./use-form"
 

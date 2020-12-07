@@ -1,6 +1,6 @@
-import { EntitySelection } from "../helpers/use-entity"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
-import * as api from "../../../transactions/api"
+import * as api from "transactions/api"
 import useAPI from "../helpers/use-api"
 
 import { confirm } from "../../system/dialog"

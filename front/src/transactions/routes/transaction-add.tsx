@@ -1,13 +1,13 @@
 import React from "react"
 
-import { EntitySelection } from "../../common/hooks/helpers/use-entity"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
 import styles from "../components/transaction-form.module.css"
 
 import useTransactionAdd from "../hooks/use-transaction-add"
-import Modal from "../../common/system/modal"
-import { AsyncButton, Button } from "../../common/system"
-import { Plus, Return } from "../../common/system/icons"
+import Modal from "common/system/modal"
+import { AsyncButton, Button } from "common/system"
+import { Plus, Return } from "common/system/icons"
 import { StatusTitle } from "../components/transaction-status"
 import TransactionForm from "../components/transaction-form"
 

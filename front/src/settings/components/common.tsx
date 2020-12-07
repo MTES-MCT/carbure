@@ -5,9 +5,9 @@ import fr from "date-fns/locale/fr"
 import cl from "clsx"
 
 import styles from "./settings.module.css"
-import { Box, BoxProps, Button } from "../../common/system"
-import { Refresh } from "../../common/system/icons"
-import { DBSCertificate, ISCCCertificate } from "../../common/types"
+import { Box, BoxProps, Button } from "common/system"
+import { Refresh } from "common/system/icons"
+import { DBSCertificate, ISCCCertificate } from "common/types"
 
 export function formatDate(str: string) {
   try {

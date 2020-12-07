@@ -1,6 +1,6 @@
 import React from "react"
 
-import { EntitySelection } from "common/hooks/helpers/use-entity"
+import { EntitySelection } from "carbure/hooks/use-entity"
 import { EntityType, Filters, LotStatus } from "common/types"
 
 import { usePageSelection } from "common/system/pagination"

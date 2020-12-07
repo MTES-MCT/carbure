@@ -2,7 +2,7 @@ import React from "react"
 import { useLocation } from "react-router-dom"
 
 import { ApiState } from "common/hooks/helpers/use-api"
-import { EntitySelection } from "common/hooks/helpers/use-entity"
+import { EntitySelection } from "carbure/hooks/use-entity"
 import { Settings } from "common/types"
 
 import Menu from "common/system/menu"

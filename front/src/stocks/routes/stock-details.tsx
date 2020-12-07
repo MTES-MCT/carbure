@@ -1,22 +1,22 @@
 import React from "react"
 
-import { LotStatus } from "../../common/types"
-import { EntitySelection } from "../../common/hooks/helpers/use-entity"
-import { LotDeleter } from "../../common/hooks/actions/use-delete-lots"
-import { LotAcceptor } from "../../common/hooks/actions/use-accept-lots"
-import { LotRejector } from "../../common/hooks/actions/use-reject-lots"
-import { LotValidator } from "../../common/hooks/actions/use-validate-lots"
-import { LotSender } from "../../common/hooks/actions/use-send-lots"
+import { LotStatus } from "common/types"
+import { EntitySelection } from "carbure/hooks/use-entity"
+import { LotDeleter } from "common/hooks/actions/use-delete-lots"
+import { LotAcceptor } from "common/hooks/actions/use-accept-lots"
+import { LotRejector } from "common/hooks/actions/use-reject-lots"
+import { LotValidator } from "common/hooks/actions/use-validate-lots"
+import { LotSender } from "common/hooks/actions/use-send-lots"
 
-import styles from "../../transactions/components/transaction-form.module.css"
+import styles from "transactions/components/transaction-form.module.css"
 
 import useStockDetails from "../hooks/use-stock-details"
-import Modal from "../../common/system/modal"
-import { Check, Cross, Edit, Return, Save } from "../../common/system/icons"
-import { AsyncButton, Button, LoaderOverlay } from "../../common/system"
-import TransactionForm from "../../transactions/components/transaction-form"
-import ValidationErrors from "../../common/components/validation-errors"
-import { StatusTitle } from "../../transactions/components/transaction-status"
+import Modal from "common/system/modal"
+import { Check, Cross, Edit, Return, Save } from "common/system/icons"
+import { AsyncButton, Button, LoaderOverlay } from "common/system"
+import TransactionForm from "transactions/components/transaction-form"
+import ValidationErrors from "common/components/validation-errors"
+import { StatusTitle } from "transactions/components/transaction-status"
 
 const EDITABLE = [LotStatus.ToSend]
 

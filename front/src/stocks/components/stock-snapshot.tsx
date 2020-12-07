@@ -1,15 +1,15 @@
 import React from "react"
 
-import { ApiState } from "../../common/hooks/helpers/use-api"
-import { LotStatus, StockSnapshot } from "../../common/types"
-import { StatusSelection } from "../../common/hooks/query/use-status"
+import { ApiState } from "common/hooks/helpers/use-api"
+import { LotStatus, StockSnapshot } from "common/types"
+import { StatusSelection } from "common/hooks/query/use-status"
 
 import styles from "./stock-snapshot.module.css"
 
-import { Title, StatusButton } from "../../common/system"
-import { Alert } from "../../common/system/alert"
+import { Title, StatusButton } from "common/system"
+import { Alert } from "common/system/alert"
 
-import { mapStatus } from "../../transactions/components/transaction-snapshot"
+import { mapStatus } from "transactions/components/transaction-snapshot"
 
 const STOCK_STATUSES = [LotStatus.Inbox, LotStatus.Stock, LotStatus.ToSend]
 

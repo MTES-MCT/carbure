@@ -7,15 +7,15 @@ import {
   GESOption,
   MatierePremiere,
   ProductionSiteDetails,
-} from "../../common/types"
+} from "common/types"
 
 import { ProductionSiteSettingsHook } from "../hooks/use-production-sites"
-import { EntitySelection } from "../../common/hooks/helpers/use-entity"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
 import styles from "./settings.module.css"
 
-import * as common from "../../common/api"
-import useForm from "../../common/hooks/helpers/use-form"
+import * as common from "common/api"
+import useForm from "common/hooks/helpers/use-form"
 
 import {
   Title,
@@ -25,21 +25,17 @@ import {
   LoaderOverlay,
   Label,
   LabelCheckbox,
-} from "../../common/system"
-import { AlertCircle, Cross, Plus, Save } from "../../common/system/icons"
-import { Alert } from "../../common/system/alert"
-import Table, { Actions, Column, Line, Row } from "../../common/system/table"
-import {
-  SectionHeader,
-  SectionBody,
-  Section,
-} from "../../common/system/section"
-import { DialogButtons, PromptFormProps } from "../../common/system/dialog"
+} from "common/system"
+import { AlertCircle, Cross, Plus, Save } from "common/system/icons"
+import { Alert } from "common/system/alert"
+import Table, { Actions, Column, Line, Row } from "common/system/table"
+import { SectionHeader, SectionBody, Section } from "common/system/section"
+import { DialogButtons, PromptFormProps } from "common/system/dialog"
 import {
   LabelAutoComplete,
   MultiAutocomplete,
-} from "../../common/system/autocomplete"
-import RadioGroup from "../../common/system/radio-group"
+} from "common/system/autocomplete"
+import RadioGroup from "common/system/radio-group"
 import { EMPTY_COLUMN, formatDate, SettingsForm } from "./common"
 import { findCertificates } from "../api"
 

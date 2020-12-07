@@ -1,7 +1,14 @@
 import React from "react"
 
-import { EntitySelection } from "common/hooks/helpers/use-entity"
+import { EntitySelection } from "carbure/hooks/use-entity"
 import { SettingsGetter } from "./hooks/use-get-settings"
+
+import use2BSCertificates from "./hooks/use-2bs-certificates"
+import useCompany from "./hooks/use-company"
+import useDeliverySites from "./hooks/use-delivery-sites"
+import useISCCCertificates from "./hooks/use-iscc-certificates"
+import useNationalSystemCertificates from "./hooks/use-national-system-certificates"
+import useProductionSites from "./hooks/use-production-sites"
 
 import { Main, Title } from "common/system"
 import { SettingsHeader, SettingsBody } from "./components/common"
@@ -11,7 +18,24 @@ import DBSCertificateSettings from "./components/2bs-certificates-settings"
 import ISCCCertificateSettings from "./components/iscc-certificates-settings"
 import NationalSystemCertificatesSettings from "./components/national-system-certificates-settings"
 import CompanySettings from "./components/company-settings"
-import useSettings from "./hook"
+
+function useSettings(entity: EntitySelection, settings: SettingsGetter) {
+  const company = useCompany(entity, settings)
+  const productionSites = useProductionSites(entity)
+  const deliverySites = useDeliverySites(entity)
+  const dbsCertificates = use2BSCertificates(entity, productionSites)
+  const isccCertificates = useISCCCertificates(entity, productionSites)
+  const nationalSystemCertificates = useNationalSystemCertificates(entity, settings) // prettier-ignore
+
+  return {
+    productionSites,
+    deliverySites,
+    dbsCertificates,
+    isccCertificates,
+    nationalSystemCertificates,
+    company,
+  }
+}
 
 type SettingsProps = {
   entity: EntitySelection

@@ -1,18 +1,18 @@
 import React from "react"
 import cl from "clsx"
 
-import { Entity, Lots, LotStatus, Transaction } from "../../common/types"
-import { SortingSelection } from "../../common/hooks/query/use-sort-by" // prettier-ignore
-import { TransactionSelection } from "../../common/hooks/query/use-selection"
-import { StatusSelection } from "../../common/hooks/query/use-status"
+import { Entity, Lots, LotStatus, Transaction } from "common/types"
+import { SortingSelection } from "common/hooks/query/use-sort-by" // prettier-ignore
+import { TransactionSelection } from "common/hooks/query/use-selection"
+import { StatusSelection } from "common/hooks/query/use-status"
 
 import styles from "./transaction-table.module.css"
 
 import { hasDeadline } from "../api"
-import { useRelativePush } from "../../common/components/relative-route"
+import { useRelativePush } from "common/components/relative-route"
 
-import { AlertTriangle, Check, Copy, Cross } from "../../common/system/icons"
-import Table, { Actions, arrow, Column, Row } from "../../common/system/table"
+import { AlertTriangle, Check, Copy, Cross } from "common/system/icons"
+import Table, { Actions, arrow, Column, Row } from "common/system/table"
 import * as C from "./transaction-columns"
 
 export const PRODUCER_COLUMNS = [

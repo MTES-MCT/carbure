@@ -3,14 +3,14 @@ import cl from "clsx"
 
 import styles from "./transaction-actions.module.css"
 
-import { LotDeleter } from "../../common/hooks/actions/use-delete-lots"
-import { LotUploader } from "../../common/hooks/actions/use-upload-file"
-import { LotValidator } from "../../common/hooks/actions/use-validate-lots"
-import { LotAcceptor } from "../../common/hooks/actions/use-accept-lots"
-import { LotRejector } from "../../common/hooks/actions/use-reject-lots"
+import { LotDeleter } from "common/hooks/actions/use-delete-lots"
+import { LotUploader } from "common/hooks/actions/use-upload-file"
+import { LotValidator } from "common/hooks/actions/use-validate-lots"
+import { LotAcceptor } from "common/hooks/actions/use-accept-lots"
+import { LotRejector } from "common/hooks/actions/use-reject-lots"
 
-import { Link } from "../../common/components/relative-route"
-import { AsyncButton, Box, Button } from "../../common/system"
+import { Link } from "common/components/relative-route"
+import { AsyncButton, Box, Button } from "common/system"
 import {
   Check,
   Cross,
@@ -18,13 +18,13 @@ import {
   Plus,
   Rapport,
   Upload,
-} from "../../common/system/icons"
-import { prompt } from "../../common/system/dialog"
+} from "common/system/icons"
+import { prompt } from "common/system/dialog"
 import {
   ProducerImportPromptFactory,
   OperatorImportPromptFactory,
   TraderImportPromptFactory,
-} from "../../common/components/import-prompt"
+} from "common/components/import-prompt"
 
 type ExportActionsProps = {
   isEmpty: boolean

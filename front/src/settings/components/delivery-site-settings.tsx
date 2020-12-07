@@ -1,6 +1,6 @@
 import React from "react"
 
-import { Country, DepotType, OwnershipType } from "../../common/types"
+import { Country, DepotType, OwnershipType } from "common/types"
 import {
   DeliverySiteSettingsHook,
   EntityDeliverySite,
@@ -8,7 +8,7 @@ import {
 
 import styles from "./settings.module.css"
 
-import * as common from "../../common/api"
+import * as common from "common/api"
 
 import {
   Title,
@@ -17,20 +17,16 @@ import {
   Box,
   LoaderOverlay,
   Label,
-} from "../../common/system"
-import { AlertCircle, Cross, Plus, Return } from "../../common/system/icons"
-import { Alert } from "../../common/system/alert"
-import Table, { Actions, Column, Line, Row } from "../../common/system/table"
-import {
-  SectionHeader,
-  SectionBody,
-  Section,
-} from "../../common/system/section"
-import { DialogButtons, PromptFormProps } from "../../common/system/dialog"
-import { LabelAutoComplete } from "../../common/system/autocomplete"
-import RadioGroup from "../../common/system/radio-group"
+} from "common/system"
+import { AlertCircle, Cross, Plus, Return } from "common/system/icons"
+import { Alert } from "common/system/alert"
+import Table, { Actions, Column, Line, Row } from "common/system/table"
+import { SectionHeader, SectionBody, Section } from "common/system/section"
+import { DialogButtons, PromptFormProps } from "common/system/dialog"
+import { LabelAutoComplete } from "common/system/autocomplete"
+import RadioGroup from "common/system/radio-group"
 import { EMPTY_COLUMN, SettingsForm } from "./common"
-import useForm from "../../common/hooks/helpers/use-form"
+import useForm from "common/hooks/helpers/use-form"
 
 const DEPOT_TYPE_LABELS = {
   [DepotType.EFS]: "EFS",

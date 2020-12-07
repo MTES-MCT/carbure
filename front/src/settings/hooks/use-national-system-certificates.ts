@@ -1,12 +1,12 @@
-import { EntitySelection } from "../../common/hooks/helpers/use-entity"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
-import useAPI from "../../common/hooks/helpers/use-api"
+import useAPI from "common/hooks/helpers/use-api"
 import * as api from "../api"
 
 import { NationalSystemCertificatesPromptFactory } from "../components/national-system-certificates-settings"
-import { prompt } from "../../common/system/dialog"
-import { SettingsGetter } from "../../carbure/hooks"
-import { useNotificationContext } from "../../common/system/notifications"
+import { prompt } from "common/system/dialog"
+import { SettingsGetter } from "carbure/hooks/use-app"
+import { useNotificationContext } from "common/system/notifications"
 
 export interface NationalSystemCertificatesSettingsHook {
   isLoading: boolean
