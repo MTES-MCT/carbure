@@ -2,7 +2,7 @@ import React from "react"
 import { Title } from "common/components"
 
 import Modal from "common/components/modal"
-import { StockSendComplexForm } from "../components/stock-send-complex-form"
+import { StockSendComplexForm } from "../components/send-complex-form"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import useTransactionInSummary from "transactions/hooks/use-transaction-in-summary"
 

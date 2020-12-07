@@ -23,7 +23,7 @@ import {
   ProducerImportPromptFactory,
   OperatorImportPromptFactory,
   TraderImportPromptFactory,
-} from "./list-import"
+} from "./import"
 
 import styles from "./list-actions.module.css"
 
