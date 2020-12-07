@@ -2,7 +2,7 @@ import React from "react"
 
 import { LotStatus } from "common/types"
 import { SortingSelection } from "common/hooks/query/use-sort-by"
-import { PageSelection } from "common/system/pagination"
+import { PageSelection } from "common/components/pagination"
 import { LotUploader } from "common/hooks/actions/use-upload-file"
 import { LotDeleter } from "common/hooks/actions/use-delete-lots"
 import { LotValidator } from "common/hooks/actions/use-validate-lots"
@@ -16,10 +16,10 @@ import { StockHook } from "../hooks/use-stock"
 
 import styles from "./stock-list.module.css"
 
-import { AlertCircle } from "common/system/icons"
-import { Box, LoaderOverlay } from "common/system"
-import { Alert } from "common/system/alert"
-import Pagination from "common/system/pagination"
+import { AlertCircle } from "common/components/icons"
+import { Box, LoaderOverlay } from "common/components"
+import { Alert } from "common/components/alert"
+import Pagination from "common/components/pagination"
 
 import {
   ActionBar,

@@ -2,8 +2,8 @@ import React from "react"
 
 import { EntitySelection } from "carbure/hooks/use-entity"
 
-import { Title } from "common/system"
-import Modal from "common/system/modal"
+import { Title } from "common/components"
+import Modal from "common/components/modal"
 import TransactionInSummaryForm from "../components/transaction-in-summary-form"
 import useTransactionInSummary from "../hooks/use-transaction-in-summary"
 

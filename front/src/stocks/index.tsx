@@ -3,7 +3,7 @@ import React from "react"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { EntityType, Filters } from "common/types"
 
-import { usePageSelection } from "common/system/pagination"
+import { usePageSelection } from "common/components/pagination"
 import useSortingSelection from "common/hooks/query/use-sort-by"
 import { useStockStatusSelection } from "common/hooks/query/use-status"
 import useSearchSelection from "common/hooks/query/use-search"
@@ -20,7 +20,7 @@ import useRejectLots from "common/hooks/actions/use-reject-lots"
 import useSendLot from "common/hooks/actions/use-send-lots"
 import { useGetStocks, useGetStockSnapshot } from "./hooks/use-stock"
 
-import { Main } from "common/system"
+import { Main } from "common/components"
 
 import { Redirect, Route, Switch } from "common/components/relative-route"
 import { StocksSnapshot } from "./components/stock-snapshot"

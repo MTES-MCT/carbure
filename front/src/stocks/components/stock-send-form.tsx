@@ -5,10 +5,10 @@ import { Entity, DeliverySite, Country } from "common/types"
 import { findCountries, findDeliverySites, findEntities } from "common/api"
 import useForm from "common/hooks/helpers/use-form"
 
-import { Box, Button, LabelCheckbox, LabelInput } from "common/system"
-import { LabelAutoComplete } from "common/system/autocomplete"
-import { DialogButtons, PromptFormProps } from "common/system/dialog"
-import { Check } from "common/system/icons"
+import { Box, Button, LabelCheckbox, LabelInput } from "common/components"
+import { LabelAutoComplete } from "common/components/autocomplete"
+import { DialogButtons, PromptFormProps } from "common/components/dialog"
+import { Check } from "common/components/icons"
 
 interface StockSendDetails {
   volume: number

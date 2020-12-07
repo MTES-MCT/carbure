@@ -12,7 +12,7 @@ import useTransactionForm, {
 import useAPI from "common/hooks/helpers/use-api"
 import useClose from "common/hooks/helpers/use-close"
 import * as api from "transactions/api"
-import { useNotificationContext } from "common/system/notifications"
+import { useNotificationContext } from "common/components/notifications"
 import { getFieldErrors } from "transactions/hooks/use-transaction-details"
 import { getStockStatus } from "../api"
 

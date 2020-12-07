@@ -6,8 +6,8 @@ import { SearchSelection } from "common/hooks/query/use-search"
 
 import styles from "./transaction-filters.module.css"
 
-import { SearchInput } from "common/system"
-import Select, { Option, SelectValue } from "common/system/select"
+import { SearchInput } from "common/components"
+import Select, { Option, SelectValue } from "common/components/select"
 
 const FILTER_ORDER = [
   Filters.Periods,

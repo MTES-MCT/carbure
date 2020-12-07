@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 
 import { Lots } from "common/types"
-import { PageSelection } from "common/system/pagination"
+import { PageSelection } from "common/components/pagination"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { FilterSelection } from "common/hooks/query/use-filters"
 import { SearchSelection } from "common/hooks/query/use-search"

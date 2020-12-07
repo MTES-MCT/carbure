@@ -6,7 +6,7 @@ import styles from "./menu.module.css"
 import { Dropdown, DropdownItem, DropdownLabel, useDropdown } from "./dropdown"
 import { LinkProps } from "react-router-dom"
 import { SystemProps } from "."
-import { Link } from "../components/relative-route"
+import { Link } from "./relative-route"
 
 type MenuItemProps = SystemProps & React.HTMLProps<HTMLLIElement>
 

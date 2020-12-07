@@ -10,7 +10,7 @@ import useISCCCertificates from "./hooks/use-iscc-certificates"
 import useNationalSystemCertificates from "./hooks/use-national-system-certificates"
 import useProductionSites from "./hooks/use-production-sites"
 
-import { Main, Title } from "common/system"
+import { Main, Title } from "common/components"
 import { SettingsHeader, SettingsBody } from "./components/common"
 import DeliverySitesSettings from "./components/delivery-site-settings"
 import ProductionSitesSettings from "./components/production-site-settings"

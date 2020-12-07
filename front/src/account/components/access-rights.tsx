@@ -10,14 +10,18 @@ import pendingStyles from "carbure/components/pending.module.css"
 
 import * as common from "common/api"
 
-import { Button, Title } from "common/system"
-import { AlertTriangle, Plus } from "common/system/icons"
+import { Button, Title } from "common/components"
+import { AlertTriangle, Plus } from "common/components/icons"
 import { EMPTY_COLUMN, SettingsForm } from "settings/components/common"
-import { LabelAutoComplete } from "common/system/autocomplete"
-import { Alert } from "common/system/alert"
-import Table, { Column, Line, Row } from "common/system/table"
-import { Section, SectionBody, SectionHeader } from "common/system/section"
-import { DialogButtons, prompt, PromptFormProps } from "common/system/dialog"
+import { LabelAutoComplete } from "common/components/autocomplete"
+import { Alert } from "common/components/alert"
+import Table, { Column, Line, Row } from "common/components/table"
+import { Section, SectionBody, SectionHeader } from "common/components/section"
+import {
+  DialogButtons,
+  prompt,
+  PromptFormProps,
+} from "common/components/dialog"
 
 const EntityPrompt = ({ onConfirm, onCancel }: PromptFormProps<Entity>) => {
   const [entity, setEntity] = useState<Entity | null>(null)

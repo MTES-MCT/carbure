@@ -9,8 +9,8 @@ import {
   ProductionSitePromptFactory,
   ProductionSiteState,
 } from "../components/production-site-settings"
-import { confirm, prompt } from "common/system/dialog"
-import { useNotificationContext } from "common/system/notifications"
+import { confirm, prompt } from "common/components/dialog"
+import { useNotificationContext } from "common/components/notifications"
 
 export interface ProductionSiteSettingsHook {
   isEmpty: boolean

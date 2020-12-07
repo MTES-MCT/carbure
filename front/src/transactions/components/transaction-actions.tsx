@@ -10,7 +10,7 @@ import { LotAcceptor } from "common/hooks/actions/use-accept-lots"
 import { LotRejector } from "common/hooks/actions/use-reject-lots"
 
 import { Link } from "common/components/relative-route"
-import { AsyncButton, Box, Button } from "common/system"
+import { AsyncButton, Box, Button } from "common/components"
 import {
   Check,
   Cross,
@@ -18,13 +18,14 @@ import {
   Plus,
   Rapport,
   Upload,
-} from "common/system/icons"
-import { prompt } from "common/system/dialog"
+} from "common/components/icons"
+import { prompt } from "common/components/dialog"
+
 import {
   ProducerImportPromptFactory,
   OperatorImportPromptFactory,
   TraderImportPromptFactory,
-} from "common/components/import-prompt"
+} from "./import-prompt"
 
 type ExportActionsProps = {
   isEmpty: boolean

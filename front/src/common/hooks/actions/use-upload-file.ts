@@ -2,7 +2,7 @@ import { EntitySelection } from "carbure/hooks/use-entity"
 
 import * as api from "transactions/api"
 import useAPI from "../helpers/use-api"
-import { useNotificationContext } from "../../system/notifications"
+import { useNotificationContext } from "../../components/notifications"
 
 export interface LotUploader {
   loading: boolean

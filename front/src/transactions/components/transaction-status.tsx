@@ -5,7 +5,7 @@ import fr from "date-fns/locale/fr"
 
 import { LotDetails, Transaction } from "common/types"
 import styles from "./transaction-status.module.css"
-import { Box, Title } from "common/system"
+import { Box, Title } from "common/components"
 import { hasDeadline } from "../api"
 
 function getStatusText(
