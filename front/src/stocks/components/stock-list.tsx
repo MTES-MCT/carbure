@@ -12,7 +12,7 @@ import { LotRejector } from "transactions/hooks/actions/use-reject-lots"
 import { LotSender } from "transactions/hooks/actions/use-send-lots"
 import { StatusSelection } from "transactions/hooks/query/use-status"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
-import { StockHook } from "../hooks/use-stock"
+import { StockHook } from "../hooks/use-stock-list"
 
 import styles from "./stock-list.module.css"
 
@@ -26,7 +26,7 @@ import {
   ExportActions,
   InboxActions,
   InboxSummaryActions,
-} from "transactions/components/transaction-actions"
+} from "transactions/components/list-actions"
 
 import {
   StockActions,

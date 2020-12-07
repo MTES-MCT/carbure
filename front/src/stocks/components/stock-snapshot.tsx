@@ -9,7 +9,7 @@ import styles from "./stock-snapshot.module.css"
 import { Title, StatusButton } from "common/components"
 import { Alert } from "common/components/alert"
 
-import { mapStatus } from "transactions/components/transaction-snapshot"
+import { mapStatus } from "transactions/components/list-snapshot"
 
 const STOCK_STATUSES = [LotStatus.Inbox, LotStatus.Stock, LotStatus.ToSend]
 

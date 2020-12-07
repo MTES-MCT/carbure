@@ -7,7 +7,7 @@ import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
 import { LotRejector } from "transactions/hooks/actions/use-reject-lots"
 import { LotValidator } from "transactions/hooks/actions/use-validate-lots"
 
-import styles from "../components/transaction-form.module.css"
+import styles from "../components/form.module.css"
 
 import useTransactionDetails from "../hooks/use-transaction-details"
 
@@ -20,10 +20,10 @@ import {
 } from "common/components/icons"
 import { AsyncButton, Button, LoaderOverlay } from "common/components"
 import Modal from "common/components/modal"
-import TransactionForm from "../components/transaction-form"
-import { StatusTitle } from "../components/transaction-status"
-import Comments from "../components/comments"
-import ValidationErrors from "../components/validation-errors"
+import TransactionForm from "../components/form"
+import { StatusTitle } from "../components/status"
+import Comments from "../components/form-comments"
+import ValidationErrors from "../components/form-errors"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]

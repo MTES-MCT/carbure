@@ -18,14 +18,14 @@ import useValidateLots from "transactions/hooks/actions/use-validate-lots"
 import useAcceptLots from "transactions/hooks/actions/use-accept-lots"
 import useRejectLots from "transactions/hooks/actions/use-reject-lots"
 import useSendLot from "transactions/hooks/actions/use-send-lots"
-import { useGetStocks, useGetStockSnapshot } from "./hooks/use-stock"
+import { useGetStocks, useGetStockSnapshot } from "./hooks/use-stock-list"
 
 import { Main } from "common/components"
 
 import { Redirect, Route, Switch } from "common/components/relative-route"
 import { StocksSnapshot } from "./components/stock-snapshot"
 import { StockList } from "./components/stock-list"
-import TransactionFilters from "transactions/components/transaction-filters"
+import TransactionFilters from "transactions/components/list-filters"
 
 import StockDetails from "./routes/stock-details"
 import { StockInSummary } from "./routes/stock-in-summary"

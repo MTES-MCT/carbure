@@ -4,10 +4,10 @@ import { Transaction } from "common/types"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { Column, Line, TwoLines } from "common/components/table"
 
-import styles from "./transaction-columns.module.css"
-
 import { Box } from "common/components"
-import Status from "./transaction-status"
+import Status from "./status"
+
+import styles from "./list-columns.module.css"
 
 export const empty: Column<any> = {
   className: styles.checkboxColumn,

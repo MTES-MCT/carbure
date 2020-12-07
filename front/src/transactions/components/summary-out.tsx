@@ -2,15 +2,15 @@ import React from "react"
 import { TransactionOutSummaryFormState } from "../hooks/use-transaction-out-summary"
 import { Box } from "common/components"
 
-type TransactionOutSummaryFormProps = {
+type TransactionOutSummaryTableProps = {
   data: TransactionOutSummaryFormState
   loading: boolean
 }
 
-const TransactionOutSummaryForm = ({
+const TransactionOutSummaryTable = ({
   data,
   loading,
-}: TransactionOutSummaryFormProps) => {
+}: TransactionOutSummaryTableProps) => {
   return (
     <Box row>
       {loading && <p>Chargement</p>}
@@ -18,8 +18,8 @@ const TransactionOutSummaryForm = ({
         <table>
           <thead>
             <tr>
+              <th>Client</th>
               <th>Site de Livraison</th>
-              <th>Fournisseur</th>
               <th>Biocarburant</th>
               <th>Volume</th>
               <th>Réduction de GES</th>
@@ -27,13 +27,13 @@ const TransactionOutSummaryForm = ({
           </thead>
           <tbody>
             {data ? (
-              Object.entries(data).map(([delivery_site, vendors]) =>
-                Object.entries(vendors).map(([vendor, biocarburants]) =>
+              Object.entries(data).map(([client, sites]) =>
+                Object.entries(sites).map(([delivery_site, biocarburants]) =>
                   Object.entries(biocarburants).map(
                     ([biocarburant, values]) => (
                       <tr>
+                        <td>{client}</td>
                         <td>{delivery_site}</td>
-                        <td>{vendor}</td>
                         <td>{biocarburant}</td>
                         <td>{values.volume}L</td>
                         <td>{values.avg_ghg_reduction}%</td>
@@ -52,4 +52,4 @@ const TransactionOutSummaryForm = ({
   )
 }
 
-export default TransactionOutSummaryForm
+export default TransactionOutSummaryTable

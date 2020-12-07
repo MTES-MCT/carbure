@@ -4,10 +4,10 @@ import { Filters, Snapshot } from "common/types"
 import { FilterSelection } from "transactions/hooks/query/use-filters"
 import { SearchSelection } from "transactions/hooks/query/use-search"
 
-import styles from "./transaction-filters.module.css"
-
 import { SearchInput } from "common/components"
 import Select, { Option, SelectValue } from "common/components/select"
+
+import styles from "./list-filters.module.css"
 
 const FILTER_ORDER = [
   Filters.Periods,

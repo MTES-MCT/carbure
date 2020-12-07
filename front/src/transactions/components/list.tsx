@@ -6,7 +6,7 @@ import { Entity, LotStatus } from "common/types"
 import { SortingSelection } from "transactions/hooks/query/use-sort-by" // prettier-ignore
 import { PageSelection } from "common/components/pagination"
 
-import { LotGetter } from "../hooks/use-transactions"
+import { LotGetter } from "../hooks/use-transaction-list"
 import { LotUploader } from "transactions/hooks/actions/use-upload-file"
 import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
 import { LotValidator } from "transactions/hooks/actions/use-validate-lots"
@@ -17,13 +17,13 @@ import { StatusSelection } from "transactions/hooks/query/use-status"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { SpecialSelection } from "transactions/hooks/query/use-special"
 
-import styles from "./transaction-list.module.css"
-
 import { AlertCircle } from "common/components/icons"
 import { Box, LoaderOverlay } from "common/components"
 import { Alert } from "common/components/alert"
 import Pagination from "common/components/pagination"
-import { TransactionTable } from "./transaction-table"
+import { TransactionTable } from "./list-table"
+
+import styles from "./list.module.css"
 
 import {
   ActionBar,
@@ -37,8 +37,8 @@ import {
   ToFixActions,
   TraderImportActions,
   CreateActions,
-} from "./transaction-actions"
-import { DeadlineFilter, InvalidFilter } from "./special-filters"
+} from "./list-actions"
+import { DeadlineFilter, InvalidFilter } from "./list-special-filters"
 
 type TransactionListProps = {
   entity: Entity

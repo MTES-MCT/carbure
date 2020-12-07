@@ -6,14 +6,14 @@ import { SortingSelection } from "transactions/hooks/query/use-sort-by" // prett
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { StatusSelection } from "transactions/hooks/query/use-status"
 
-import styles from "./transaction-table.module.css"
-
 import { hasDeadline } from "../api"
 import { useRelativePush } from "common/components/relative-route"
 
 import { AlertTriangle, Check, Copy, Cross } from "common/components/icons"
 import Table, { Actions, arrow, Column, Row } from "common/components/table"
-import * as C from "./transaction-columns"
+import * as C from "./list-columns"
+
+import styles from "./list-table.module.css"
 
 export const PRODUCER_COLUMNS = [
   C.status,

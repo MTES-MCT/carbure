@@ -1,8 +1,6 @@
 import React from "react"
 import cl from "clsx"
 
-import styles from "./transaction-actions.module.css"
-
 import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
 import { LotUploader } from "transactions/hooks/actions/use-upload-file"
 import { LotValidator } from "transactions/hooks/actions/use-validate-lots"
@@ -25,7 +23,9 @@ import {
   ProducerImportPromptFactory,
   OperatorImportPromptFactory,
   TraderImportPromptFactory,
-} from "./import-prompt"
+} from "./list-import"
+
+import styles from "./list-actions.module.css"
 
 type ExportActionsProps = {
   isEmpty: boolean

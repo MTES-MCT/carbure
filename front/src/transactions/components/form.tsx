@@ -4,7 +4,7 @@ import { TransactionFormState } from "transactions/hooks/use-transaction-form"
 import { FormFields } from "common/hooks/use-form"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
-import styles from "./transaction-form.module.css"
+import styles from "./form.module.css"
 
 import {
   findBiocarburants,

@@ -7,7 +7,7 @@ import useAPI from "../../../common/hooks/use-api"
 
 import { confirm, prompt } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
-import { CommentWithTypePrompt } from "transactions/components/comments"
+import { CommentWithTypePrompt } from "transactions/components/form-comments"
 
 export interface LotAcceptor {
   loading: boolean

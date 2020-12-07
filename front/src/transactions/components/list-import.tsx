@@ -3,10 +3,10 @@ import React from "react"
 import { LotUploader } from "transactions/hooks/actions/use-upload-file"
 import { DialogButtons, PromptFormProps } from "common/components/dialog"
 
-import styles from "./import-prompt.module.css"
-
 import { Upload } from "common/components/icons"
 import { Box, Button } from "common/components"
+
+import styles from "./list-import.module.css"
 
 const ImportPrompt = ({
   children,

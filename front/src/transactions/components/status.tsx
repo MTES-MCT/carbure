@@ -4,9 +4,10 @@ import format from "date-fns/format"
 import fr from "date-fns/locale/fr"
 
 import { LotDetails, Transaction } from "common/types"
-import styles from "./transaction-status.module.css"
 import { Box, Title } from "common/components"
 import { hasDeadline } from "../api"
+
+import styles from "./status.module.css"
 
 function getStatusText(
   tx: Transaction | undefined,
