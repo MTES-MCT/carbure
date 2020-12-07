@@ -11,11 +11,11 @@ import { LotSender } from "common/hooks/actions/use-send-lots"
 import styles from "transactions/components/transaction-form.module.css"
 
 import useStockDetails from "../hooks/use-stock-details"
-import Modal from "common/system/modal"
-import { Check, Cross, Edit, Return, Save } from "common/system/icons"
-import { AsyncButton, Button, LoaderOverlay } from "common/system"
+import Modal from "common/components/modal"
+import { Check, Cross, Edit, Return, Save } from "common/components/icons"
+import { AsyncButton, Button, LoaderOverlay } from "common/components"
 import TransactionForm from "transactions/components/transaction-form"
-import ValidationErrors from "common/components/validation-errors"
+import ValidationErrors from "transactions/components/validation-errors"
 import { StatusTitle } from "transactions/components/transaction-status"
 
 const EDITABLE = [LotStatus.ToSend]

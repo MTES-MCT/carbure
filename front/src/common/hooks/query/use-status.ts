@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom"
 
-import { PageSelection } from "../../system/pagination"
+import { PageSelection } from "../../components/pagination"
 import { SpecialSelection } from "./use-special"
 import { LotStatus } from "../../types"
 

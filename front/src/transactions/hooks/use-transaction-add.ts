@@ -8,7 +8,7 @@ import { useRelativePush } from "common/components/relative-route"
 import useAPI from "common/hooks/helpers/use-api"
 import useClose from "common/hooks/helpers/use-close"
 import { addLot } from "../api"
-import { useNotificationContext } from "common/system/notifications"
+import { useNotificationContext } from "common/components/notifications"
 
 export default function useTransactionAdd(
   entity: EntitySelection,

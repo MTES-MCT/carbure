@@ -1,12 +1,12 @@
 import React from "react"
 
-import { LotUploader } from "../hooks/actions/use-upload-file"
-import { DialogButtons, PromptFormProps } from "common/system/dialog"
+import { LotUploader } from "common/hooks/actions/use-upload-file"
+import { DialogButtons, PromptFormProps } from "common/components/dialog"
 
 import styles from "./import-prompt.module.css"
 
-import { Upload } from "common/system/icons"
-import { Box, Button } from "common/system"
+import { Upload } from "common/components/icons"
+import { Box, Button } from "common/components"
 
 const ImportPrompt = ({
   children,

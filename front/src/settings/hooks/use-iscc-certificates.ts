@@ -3,12 +3,12 @@ import { useEffect } from "react"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { ISCCCertificate } from "common/types"
 
-import { confirm, prompt } from "common/system/dialog"
+import { confirm, prompt } from "common/components/dialog"
 import * as api from "../api"
 import useAPI from "common/hooks/helpers/use-api"
 import { ISCCPrompt } from "../components/iscc-certificates-settings"
 import { ProductionSiteSettingsHook } from "./use-production-sites"
-import { useNotificationContext } from "common/system/notifications"
+import { useNotificationContext } from "common/components/notifications"
 
 export interface ISCCCertificateSettingsHook {
   isEmpty: boolean

@@ -1,13 +1,13 @@
 import React, { useState } from "react"
-import { Comment } from "../types"
+import { Comment } from "common/types"
 
 import styles from "./comments.module.css"
 
-import { AsyncButton, Box, Button, Input, LabelInput } from "common/system"
-import { Collapsible } from "common/system/alert"
-import { DialogButtons, PromptFormProps } from "common/system/dialog"
-import { Message } from "common/system/icons"
-import RadioGroup from "common/system/radio-group"
+import { AsyncButton, Box, Button, Input, LabelInput } from "common/components"
+import { Collapsible } from "common/components/alert"
+import { DialogButtons, PromptFormProps } from "common/components/dialog"
+import { Message } from "common/components/icons"
+import RadioGroup from "common/components/radio-group"
 
 type CommentsProps = {
   readOnly: boolean

@@ -6,8 +6,8 @@ import { StatusSelection } from "common/hooks/query/use-status"
 
 import styles from "./stock-snapshot.module.css"
 
-import { Title, StatusButton } from "common/system"
-import { Alert } from "common/system/alert"
+import { Title, StatusButton } from "common/components"
+import { Alert } from "common/components/alert"
 
 import { mapStatus } from "transactions/components/transaction-snapshot"
 

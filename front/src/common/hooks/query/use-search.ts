@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-import { PageSelection } from "../../system/pagination"
+import { PageSelection } from "../../components/pagination"
 
 export interface SearchSelection {
   query: string

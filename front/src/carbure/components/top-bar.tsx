@@ -5,9 +5,9 @@ import { ApiState } from "common/hooks/helpers/use-api"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { Settings } from "common/types"
 
-import Menu from "common/system/menu"
+import Menu from "common/components/menu"
 import { Link, NavLink } from "common/components/relative-route"
-import { Question } from "common/system/icons"
+import { Question } from "common/components/icons"
 
 import logoMarianne from "../assets/images/logo-marianne.svg"
 import logoBetaGouv from "../assets/images/betagouvfr.svg"

@@ -5,12 +5,12 @@ import { DeliverySite, OwnershipType } from "common/types"
 
 import useAPI from "common/hooks/helpers/use-api"
 import * as api from "../api"
-import { confirm, prompt } from "common/system/dialog"
+import { confirm, prompt } from "common/components/dialog"
 import {
   DeliverySitePromptFactory,
   DeliverySiteFinderPromptFactory,
 } from "../components/delivery-site-settings"
-import { useNotificationContext } from "common/system/notifications"
+import { useNotificationContext } from "common/components/notifications"
 
 export interface EntityDeliverySite {
   depot: DeliverySite | null

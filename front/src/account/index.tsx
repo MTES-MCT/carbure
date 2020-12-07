@@ -1,6 +1,6 @@
 import { SettingsGetter } from "settings/hooks/use-get-settings"
 
-import { Main, Title } from "common/system"
+import { Main, Title } from "common/components"
 import { SettingsHeader, SettingsBody } from "settings/components/common"
 
 import { AccountAccesRights } from "./components/access-rights"

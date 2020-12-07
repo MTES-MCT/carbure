@@ -5,9 +5,9 @@ import { YearSelection } from "../query/use-year"
 import * as api from "transactions/api"
 import useAPI from "../helpers/use-api"
 
-import { prompt } from "../../system/dialog"
-import { CommentPrompt } from "../../components/comments"
-import { useNotificationContext } from "../../system/notifications"
+import { prompt } from "../../components/dialog"
+import { useNotificationContext } from "../../components/notifications"
+import { CommentPrompt } from "transactions/components/comments"
 
 export interface LotRejector {
   loading: boolean

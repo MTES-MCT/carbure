@@ -11,7 +11,7 @@ import useTransactionForm, {
 
 import useAPI from "common/hooks/helpers/use-api"
 import useClose from "common/hooks/helpers/use-close"
-import { useNotificationContext } from "common/system/notifications"
+import { useNotificationContext } from "common/components/notifications"
 import * as api from "../api"
 
 export function getFieldErrors(errors: Errors) {

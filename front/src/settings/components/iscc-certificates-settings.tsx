@@ -7,14 +7,14 @@ import styles from "./settings.module.css"
 
 import * as common from "common/api"
 
-import { Title, Button, LoaderOverlay } from "common/system"
-import { AlertCircle, Cross, Plus } from "common/system/icons"
-import { Alert } from "common/system/alert"
-import { SectionHeader, SectionBody, Section } from "common/system/section"
-import { DialogButtons, PromptFormProps } from "common/system/dialog"
-import { LabelAutoComplete } from "common/system/autocomplete"
+import { Title, Button, LoaderOverlay } from "common/components"
+import { AlertCircle, Cross, Plus } from "common/components/icons"
+import { Alert } from "common/components/alert"
+import { SectionHeader, SectionBody, Section } from "common/components/section"
+import { DialogButtons, PromptFormProps } from "common/components/dialog"
+import { LabelAutoComplete } from "common/components/autocomplete"
 import { EMPTY_COLUMN, ExpirationDate, SettingsForm } from "./common"
-import Table, { Actions, Column, Line } from "common/system/table"
+import Table, { Actions, Column, Line } from "common/components/table"
 
 export const ISCCPrompt = ({
   onConfirm,

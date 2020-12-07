@@ -3,10 +3,10 @@ import { SettingsForm } from "./common"
 
 import { NationalSystemCertificatesSettingsHook } from "../hooks/use-national-system-certificates"
 
-import { Title, LoaderOverlay, LabelInput, Button } from "common/system"
-import { PromptFormProps, DialogButtons } from "common/system/dialog"
-import { Edit, Save } from "common/system/icons"
-import { SectionHeader, SectionBody, Section } from "common/system/section"
+import { Title, LoaderOverlay, LabelInput, Button } from "common/components"
+import { PromptFormProps, DialogButtons } from "common/components/dialog"
+import { Edit, Save } from "common/components/icons"
+import { SectionHeader, SectionBody, Section } from "common/components/section"
 
 export const NationalSystemCertificatesPromptFactory = (
   currentCertificate: string = ""

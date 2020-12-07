@@ -5,8 +5,8 @@ import { YearSelection } from "../query/use-year"
 import * as api from "transactions/api"
 import useAPI from "../helpers/use-api"
 
-import { confirm } from "../../system/dialog"
-import { useNotificationContext } from "../../system/notifications"
+import { confirm } from "../../components/dialog"
+import { useNotificationContext } from "../../components/notifications"
 
 export interface LotDeleter {
   loading: boolean

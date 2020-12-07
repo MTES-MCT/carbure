@@ -1,8 +1,8 @@
 import { SettingsGetter } from "settings/hooks/use-get-settings"
 
-import { Button, LabelInput, Title } from "common/system"
-import { Edit } from "common/system/icons"
-import { Section, SectionBody, SectionHeader } from "common/system/section"
+import { Button, LabelInput, Title } from "common/components"
+import { Edit } from "common/components/icons"
+import { Section, SectionBody, SectionHeader } from "common/components/section"
 
 type AccountAuthenticationProps = {
   settings: SettingsGetter

@@ -25,17 +25,17 @@ import {
   LoaderOverlay,
   Label,
   LabelCheckbox,
-} from "common/system"
-import { AlertCircle, Cross, Plus, Save } from "common/system/icons"
-import { Alert } from "common/system/alert"
-import Table, { Actions, Column, Line, Row } from "common/system/table"
-import { SectionHeader, SectionBody, Section } from "common/system/section"
-import { DialogButtons, PromptFormProps } from "common/system/dialog"
+} from "common/components"
+import { AlertCircle, Cross, Plus, Save } from "common/components/icons"
+import { Alert } from "common/components/alert"
+import Table, { Actions, Column, Line, Row } from "common/components/table"
+import { SectionHeader, SectionBody, Section } from "common/components/section"
+import { DialogButtons, PromptFormProps } from "common/components/dialog"
 import {
   LabelAutoComplete,
   MultiAutocomplete,
-} from "common/system/autocomplete"
-import RadioGroup from "common/system/radio-group"
+} from "common/components/autocomplete"
+import RadioGroup from "common/components/radio-group"
 import { EMPTY_COLUMN, formatDate, SettingsForm } from "./common"
 import { findCertificates } from "../api"
 

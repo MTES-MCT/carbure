@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-import { PageSelection } from "../../system/pagination"
+import { PageSelection } from "../../components/pagination"
 import { FilterSelection } from "./use-filters"
 import { SpecialSelection } from "./use-special"
 

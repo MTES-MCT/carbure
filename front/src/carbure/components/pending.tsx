@@ -1,9 +1,9 @@
 import styles from "./pending.module.css"
 
 import { Link } from "common/components/relative-route"
-import { Box, Main, Title } from "common/system"
-import { Alert } from "common/system/alert"
-import { AlertTriangle, Question } from "common/system/icons"
+import { Box, Main, Title } from "common/components"
+import { Alert } from "common/components/alert"
+import { AlertTriangle, Question } from "common/components/icons"
 
 const Pending = () => (
   <Main className={styles.container}>

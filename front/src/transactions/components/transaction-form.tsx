@@ -16,10 +16,15 @@ import {
   findDeliverySites,
 } from "common/api"
 
-import { Box, LabelCheckbox, LabelInput, LabelTextArea } from "common/system"
-import { Alert } from "common/system/alert"
-import { LabelAutoComplete } from "common/system/autocomplete"
-import { AlertTriangle } from "common/system/icons"
+import {
+  Box,
+  LabelCheckbox,
+  LabelInput,
+  LabelTextArea,
+} from "common/components"
+import { Alert } from "common/components/alert"
+import { LabelAutoComplete } from "common/components/autocomplete"
+import { AlertTriangle } from "common/components/icons"
 
 // shorthand to build autocomplete value & label getters
 const get = (key: string) => (obj: { [k: string]: any } | null) =>

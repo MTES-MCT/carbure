@@ -4,9 +4,9 @@ import { BrowserRouter } from "react-router-dom"
 import { AppHook, useApp } from "./hooks/use-app"
 import useEntity from "./hooks/use-entity"
 
-import { Alert } from "common/system/alert"
-import { AlertTriangle } from "common/system/icons"
-import NotificationsProvider from "common/system/notifications"
+import { Alert } from "common/components/alert"
+import { AlertTriangle } from "common/components/icons"
+import NotificationsProvider from "common/components/notifications"
 
 import { Redirect, Route, Switch } from "common/components/relative-route"
 import Topbar from "./components/top-bar"

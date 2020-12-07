@@ -11,13 +11,19 @@ import styles from "../components/transaction-form.module.css"
 
 import useTransactionDetails from "../hooks/use-transaction-details"
 
-import { AlertTriangle, Check, Cross, Return, Save } from "common/system/icons"
-import { AsyncButton, Button, LoaderOverlay } from "common/system"
-import Modal from "common/system/modal"
-import Comments from "common/components/comments"
+import {
+  AlertTriangle,
+  Check,
+  Cross,
+  Return,
+  Save,
+} from "common/components/icons"
+import { AsyncButton, Button, LoaderOverlay } from "common/components"
+import Modal from "common/components/modal"
 import TransactionForm from "../components/transaction-form"
 import { StatusTitle } from "../components/transaction-status"
-import ValidationErrors from "common/components/validation-errors"
+import Comments from "../components/comments"
+import ValidationErrors from "../components/validation-errors"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]

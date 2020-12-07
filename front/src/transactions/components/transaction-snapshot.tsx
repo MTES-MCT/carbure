@@ -7,9 +7,9 @@ import { YearSelection } from "common/hooks/query/use-year"
 
 import styles from "./transaction-snapshot.module.css"
 
-import { Title, StatusButton } from "common/system"
-import Select from "common/system/select"
-import { Alert } from "common/system/alert"
+import { Title, StatusButton } from "common/components"
+import Select from "common/components/select"
+import { Alert } from "common/components/alert"
 
 const STATUS_ORDER = [
   LotStatus.Draft,

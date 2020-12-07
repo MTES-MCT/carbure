@@ -17,14 +17,14 @@ import {
   Box,
   LoaderOverlay,
   Label,
-} from "common/system"
-import { AlertCircle, Cross, Plus, Return } from "common/system/icons"
-import { Alert } from "common/system/alert"
-import Table, { Actions, Column, Line, Row } from "common/system/table"
-import { SectionHeader, SectionBody, Section } from "common/system/section"
-import { DialogButtons, PromptFormProps } from "common/system/dialog"
-import { LabelAutoComplete } from "common/system/autocomplete"
-import RadioGroup from "common/system/radio-group"
+} from "common/components"
+import { AlertCircle, Cross, Plus, Return } from "common/components/icons"
+import { Alert } from "common/components/alert"
+import Table, { Actions, Column, Line, Row } from "common/components/table"
+import { SectionHeader, SectionBody, Section } from "common/components/section"
+import { DialogButtons, PromptFormProps } from "common/components/dialog"
+import { LabelAutoComplete } from "common/components/autocomplete"
+import RadioGroup from "common/components/radio-group"
 import { EMPTY_COLUMN, SettingsForm } from "./common"
 import useForm from "common/hooks/helpers/use-form"
 
