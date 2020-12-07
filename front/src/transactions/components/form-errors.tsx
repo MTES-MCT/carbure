@@ -2,10 +2,10 @@ import React from "react"
 
 import { ValidationError } from "common/types"
 
-import styles from "./validation-errors.module.css"
-
 import { Collapsible } from "common/components/alert"
 import { AlertTriangle, AlertOctagon } from "common/components/icons"
+
+import styles from "./form-errors.module.css"
 
 type ValidationErrorsProps = {
   validationErrors: ValidationError[]

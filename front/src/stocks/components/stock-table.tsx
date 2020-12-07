@@ -8,7 +8,7 @@ import { StatusSelection } from "transactions/hooks/query/use-status"
 import { useRelativePush } from "common/components/relative-route"
 
 import Table, { Actions, arrow, Column, Row } from "common/components/table"
-import * as C from "transactions/components/transaction-columns"
+import * as C from "transactions/components/list-columns"
 import { Edit } from "common/components/icons"
 import { LotSender } from "transactions/hooks/actions/use-send-lots"
 

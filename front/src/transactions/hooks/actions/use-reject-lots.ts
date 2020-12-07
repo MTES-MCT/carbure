@@ -7,7 +7,7 @@ import useAPI from "../../../common/hooks/use-api"
 
 import { prompt } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
-import { CommentPrompt } from "transactions/components/comments"
+import { CommentPrompt } from "transactions/components/form-comments"
 
 export interface LotRejector {
   loading: boolean

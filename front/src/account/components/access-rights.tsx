@@ -4,8 +4,8 @@ import cl from "clsx"
 import { Entity } from "common/types"
 import { SettingsGetter } from "settings/hooks/use-get-settings"
 
-import statusStyles from "transactions/components/transaction-status.module.css"
-import colStyles from "transactions/components/transaction-columns.module.css"
+import statusStyles from "transactions/components/status.module.css"
+import colStyles from "transactions/components/list-columns.module.css"
 import pendingStyles from "carbure/components/pending.module.css"
 
 import * as common from "common/api"

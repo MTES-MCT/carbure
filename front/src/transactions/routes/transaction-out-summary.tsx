@@ -5,7 +5,7 @@ import { EntitySelection } from "carbure/hooks/use-entity"
 import { Title } from "common/components"
 import Modal from "common/components/modal"
 import useTransactionOutSummary from "../hooks/use-transaction-out-summary"
-import TransactionOutSummaryForm from "../components/transaction-out-summary-form"
+import TransactionOutSummaryTable from "../components/summary-out"
 
 type TransactionOutSummaryProps = {
   entity: EntitySelection
@@ -18,7 +18,7 @@ const TransactionOutSummary = ({ entity }: TransactionOutSummaryProps) => {
     <Modal onClose={close}>
       <Title>Bilan des sorties</Title>
 
-      <TransactionOutSummaryForm
+      <TransactionOutSummaryTable
         data={request.data}
         loading={request.loading}
       />
