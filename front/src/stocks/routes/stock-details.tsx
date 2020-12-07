@@ -2,11 +2,11 @@ import React from "react"
 
 import { LotStatus } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
-import { LotDeleter } from "common/hooks/actions/use-delete-lots"
-import { LotAcceptor } from "common/hooks/actions/use-accept-lots"
-import { LotRejector } from "common/hooks/actions/use-reject-lots"
-import { LotValidator } from "common/hooks/actions/use-validate-lots"
-import { LotSender } from "common/hooks/actions/use-send-lots"
+import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
+import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
+import { LotRejector } from "transactions/hooks/actions/use-reject-lots"
+import { LotValidator } from "transactions/hooks/actions/use-validate-lots"
+import { LotSender } from "transactions/hooks/actions/use-send-lots"
 
 import styles from "transactions/components/transaction-form.module.css"
 

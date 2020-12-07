@@ -8,11 +8,9 @@ import {
   Transaction,
   MatierePremiere,
   ProductionSite,
-} from "../../types"
-
+} from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
-
-import useForm, { FormHook } from "./use-form"
+import useForm, { FormHook } from "common/hooks/use-form"
 
 export interface TransactionFormState {
   id: number

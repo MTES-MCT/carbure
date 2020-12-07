@@ -2,9 +2,9 @@ import React from "react"
 import cl from "clsx"
 
 import { Entity, Lots, LotStatus, Transaction } from "common/types"
-import { SortingSelection } from "common/hooks/query/use-sort-by" // prettier-ignore
-import { TransactionSelection } from "common/hooks/query/use-selection"
-import { StatusSelection } from "common/hooks/query/use-status"
+import { SortingSelection } from "transactions/hooks/query/use-sort-by" // prettier-ignore
+import { TransactionSelection } from "transactions/hooks/query/use-selection"
+import { StatusSelection } from "transactions/hooks/query/use-status"
 
 import styles from "./transaction-table.module.css"
 

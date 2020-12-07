@@ -1,16 +1,16 @@
 import React from "react"
 
 import { Lots, LotStatus, Transaction } from "common/types"
-import { SortingSelection } from "common/hooks/query/use-sort-by" // prettier-ignore
-import { TransactionSelection } from "common/hooks/query/use-selection"
-import { StatusSelection } from "common/hooks/query/use-status"
+import { SortingSelection } from "transactions/hooks/query/use-sort-by" // prettier-ignore
+import { TransactionSelection } from "transactions/hooks/query/use-selection"
+import { StatusSelection } from "transactions/hooks/query/use-status"
 
 import { useRelativePush } from "common/components/relative-route"
 
 import Table, { Actions, arrow, Column, Row } from "common/components/table"
 import * as C from "transactions/components/transaction-columns"
 import { Edit } from "common/components/icons"
-import { LotSender } from "common/hooks/actions/use-send-lots"
+import { LotSender } from "transactions/hooks/actions/use-send-lots"
 
 type A = Record<string, (id: number) => void>
 type CT = Column<Transaction>

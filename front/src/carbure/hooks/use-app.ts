@@ -2,7 +2,7 @@ import { useEffect } from "react"
 
 import { Entity, Settings } from "common/types"
 
-import useAPI from "common/hooks/helpers/use-api"
+import useAPI from "common/hooks/use-api"
 import * as api from "settings/api"
 
 export type SettingsGetter = {

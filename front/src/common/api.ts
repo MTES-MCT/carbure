@@ -10,7 +10,7 @@ import {
   ProductionSiteDetails,
 } from "./types"
 
-import api from "./fetch"
+import api from "./services/api"
 
 export function findMatieresPremieres(
   query: string

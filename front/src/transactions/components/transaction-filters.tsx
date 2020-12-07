@@ -1,8 +1,8 @@
 import React from "react"
 
 import { Filters, Snapshot } from "common/types"
-import { FilterSelection } from "common/hooks/query/use-filters"
-import { SearchSelection } from "common/hooks/query/use-search"
+import { FilterSelection } from "transactions/hooks/query/use-filters"
+import { SearchSelection } from "transactions/hooks/query/use-search"
 
 import styles from "./transaction-filters.module.css"
 

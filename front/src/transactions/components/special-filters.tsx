@@ -1,5 +1,5 @@
 import { EntitySelection } from "carbure/hooks/use-entity"
-import { SpecialSelection } from "common/hooks/query/use-special"
+import { SpecialSelection } from "transactions/hooks/query/use-special"
 import { AlertFilter } from "common/components/alert"
 import { AlertCircle, Calendar } from "common/components/icons"
 

@@ -3,11 +3,11 @@ import cl from "clsx"
 
 import styles from "./transaction-actions.module.css"
 
-import { LotDeleter } from "common/hooks/actions/use-delete-lots"
-import { LotUploader } from "common/hooks/actions/use-upload-file"
-import { LotValidator } from "common/hooks/actions/use-validate-lots"
-import { LotAcceptor } from "common/hooks/actions/use-accept-lots"
-import { LotRejector } from "common/hooks/actions/use-reject-lots"
+import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
+import { LotUploader } from "transactions/hooks/actions/use-upload-file"
+import { LotValidator } from "transactions/hooks/actions/use-validate-lots"
+import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
+import { LotRejector } from "transactions/hooks/actions/use-reject-lots"
 
 import { Link } from "common/components/relative-route"
 import { AsyncButton, Box, Button } from "common/components"

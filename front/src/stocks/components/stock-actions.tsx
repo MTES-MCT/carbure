@@ -5,9 +5,9 @@ import { Check, Cross, Rapport, Upload } from "common/components/icons"
 import { AsyncButton, Button } from "common/components"
 import { prompt } from "common/components/dialog"
 import { StockImportPromptFactory } from "transactions/components/import-prompt"
-import { LotUploader } from "common/hooks/actions/use-upload-file"
-import { LotDeleter } from "common/hooks/actions/use-delete-lots"
-import { LotSender } from "common/hooks/actions/use-send-lots"
+import { LotUploader } from "transactions/hooks/actions/use-upload-file"
+import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
+import { LotSender } from "transactions/hooks/actions/use-send-lots"
 
 type ImportActionsProps = {
   uploader: LotUploader

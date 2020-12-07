@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Transaction } from "../../types"
+import { Transaction } from "../../../common/types"
 
 export interface TransactionSelection {
   selected: number[]

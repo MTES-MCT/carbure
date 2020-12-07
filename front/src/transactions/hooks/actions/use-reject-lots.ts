@@ -3,10 +3,10 @@ import { TransactionSelection } from "../query/use-selection"
 import { YearSelection } from "../query/use-year"
 
 import * as api from "transactions/api"
-import useAPI from "../helpers/use-api"
+import useAPI from "../../../common/hooks/use-api"
 
-import { prompt } from "../../components/dialog"
-import { useNotificationContext } from "../../components/notifications"
+import { prompt } from "../../../common/components/dialog"
+import { useNotificationContext } from "../../../common/components/notifications"
 import { CommentPrompt } from "transactions/components/comments"
 
 export interface LotRejector {

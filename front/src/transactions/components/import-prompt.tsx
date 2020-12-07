@@ -1,6 +1,6 @@
 import React from "react"
 
-import { LotUploader } from "common/hooks/actions/use-upload-file"
+import { LotUploader } from "transactions/hooks/actions/use-upload-file"
 import { DialogButtons, PromptFormProps } from "common/components/dialog"
 
 import styles from "./import-prompt.module.css"

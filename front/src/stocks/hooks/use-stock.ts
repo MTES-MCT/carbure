@@ -1,13 +1,13 @@
 import { useEffect } from "react"
 import { Lots } from "common/types"
-import useAPI from "common/hooks/helpers/use-api"
+import useAPI from "common/hooks/use-api"
 import { getStocks, getStockSnapshot } from "../api"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { PageSelection } from "common/components/pagination"
-import { FilterSelection } from "common/hooks/query/use-filters"
-import { SearchSelection } from "common/hooks/query/use-search"
-import { SortingSelection } from "common/hooks/query/use-sort-by"
-import { StatusSelection } from "common/hooks/query/use-status"
+import { FilterSelection } from "transactions/hooks/query/use-filters"
+import { SearchSelection } from "transactions/hooks/query/use-search"
+import { SortingSelection } from "transactions/hooks/query/use-sort-by"
+import { StatusSelection } from "transactions/hooks/query/use-status"
 
 export interface StockHook {
   loading: boolean
