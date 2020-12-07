@@ -440,7 +440,7 @@ def add_delivery_site(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Missing ownership type"}, status=400)
 
     try:
-        ds = Depot.objects.get(pk=delivery_site_id)
+        ds = Depot.objects.get(depot_id=delivery_site_id)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Could not find delivery site",
                              'extra': str(e)}, status=400)
