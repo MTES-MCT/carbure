@@ -10,7 +10,8 @@ import pendingStyles from "carbure/components/pending.module.css"
 
 import * as common from "common/api"
 
-import { Button, Title } from "common/components"
+import { Title } from "common/components"
+import { Button } from "common/components/button"
 import { AlertTriangle, Plus } from "common/components/icons"
 import { EMPTY_COLUMN, SettingsForm } from "settings/components/common"
 import { LabelAutoComplete } from "common/components/autocomplete"

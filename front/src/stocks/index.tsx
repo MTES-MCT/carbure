@@ -28,8 +28,8 @@ import { StockList } from "./components/list"
 import TransactionFilters from "transactions/components/list-filters"
 
 import StockDetails from "./routes/stock-details"
-import { StockInSummary } from "./routes/stock-in-summary"
-import { StockSendComplex } from "./routes/stock-send-complex"
+import StockInSummary from "./routes/stock-in-summary"
+import StockSendComplex from "./routes/stock-send-complex"
 
 const FILTERS = [
   Filters.Biocarburants,

@@ -1,7 +1,9 @@
 import React, { useState } from "react"
 import { Comment } from "common/types"
 
-import { AsyncButton, Box, Button, Input, LabelInput } from "common/components"
+import { Box } from "common/components"
+import { Input, LabelInput } from "common/components/input"
+import { AsyncButton, Button } from "common/components/button"
 import { Collapsible } from "common/components/alert"
 import { DialogButtons, PromptFormProps } from "common/components/dialog"
 import { Message } from "common/components/icons"

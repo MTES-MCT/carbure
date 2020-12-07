@@ -4,7 +4,7 @@ import cl from "clsx"
 import styles from "./pagination.module.css"
 
 import { ChevronLeft, ChevronRight } from "./icons"
-import { Button } from "."
+import { Button } from "./button"
 import Select from "./select"
 
 // generate a list of numbers from 0 to size-1

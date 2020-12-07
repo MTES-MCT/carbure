@@ -18,7 +18,8 @@ import {
   Return,
   Save,
 } from "common/components/icons"
-import { AsyncButton, Button, LoaderOverlay } from "common/components"
+import { LoaderOverlay } from "common/components"
+import { AsyncButton, Button } from "common/components/button"
 import Modal from "common/components/modal"
 import TransactionForm from "../components/form"
 import { StatusTitle } from "../components/status"

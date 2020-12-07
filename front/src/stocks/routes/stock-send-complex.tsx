@@ -10,7 +10,7 @@ type StockSendComplexProps = {
   entity: EntitySelection
 }
 
-export const StockSendComplex = ({ entity }: StockSendComplexProps) => {
+const StockSendComplex = ({ entity }: StockSendComplexProps) => {
   const { request, close } = useTransactionInSummary(entity)
 
   return (
@@ -21,3 +21,5 @@ export const StockSendComplex = ({ entity }: StockSendComplexProps) => {
     </Modal>
   )
 }
+
+export default StockSendComplex

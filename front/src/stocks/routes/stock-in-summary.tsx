@@ -10,7 +10,7 @@ type StockInSummaryProps = {
   entity: EntitySelection
 }
 
-export const StockInSummary = ({ entity }: StockInSummaryProps) => {
+const StockInSummary = ({ entity }: StockInSummaryProps) => {
   const { request, close } = useTransactionInSummary(entity)
 
   return (
@@ -24,3 +24,5 @@ export const StockInSummary = ({ entity }: StockInSummaryProps) => {
     </Modal>
   )
 }
+
+export default StockInSummary

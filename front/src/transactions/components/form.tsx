@@ -16,12 +16,12 @@ import {
   findDeliverySites,
 } from "common/api"
 
+import { Box } from "common/components"
 import {
-  Box,
   LabelCheckbox,
   LabelInput,
   LabelTextArea,
-} from "common/components"
+} from "common/components/input"
 import { Alert } from "common/components/alert"
 import { LabelAutoComplete } from "common/components/autocomplete"
 import { AlertTriangle } from "common/components/icons"

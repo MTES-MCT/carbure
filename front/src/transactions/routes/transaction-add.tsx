@@ -6,7 +6,7 @@ import styles from "../components/form.module.css"
 
 import useTransactionAdd from "../hooks/use-transaction-add"
 import Modal from "common/components/modal"
-import { AsyncButton, Button } from "common/components"
+import { AsyncButton, Button } from "common/components/button"
 import { Plus, Return } from "common/components/icons"
 import { StatusTitle } from "../components/status"
 import TransactionForm from "../components/form"

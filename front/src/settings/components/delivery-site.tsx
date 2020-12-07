@@ -10,14 +10,9 @@ import styles from "./settings.module.css"
 
 import * as common from "common/api"
 
-import {
-  Title,
-  Button,
-  LabelInput,
-  Box,
-  LoaderOverlay,
-  Label,
-} from "common/components"
+import { Title, Box, LoaderOverlay } from "common/components"
+import { LabelInput, Label } from "common/components/input"
+import { Button } from "common/components/button"
 import { AlertCircle, Cross, Plus, Return } from "common/components/icons"
 import { Alert } from "common/components/alert"
 import Table, { Actions, Column, Line, Row } from "common/components/table"

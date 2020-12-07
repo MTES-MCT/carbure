@@ -1,0 +1,138 @@
+/* BUTTON COMPONENT */
+
+.button {
+  display: flex;
+  align-items: center;
+  background-color: var(--white);
+  border: 1px solid var(--gray-medium);
+  border-radius: 4px;
+  font-weight: 600;
+  padding: 8px 12px;
+  padding-right: 16px;
+  cursor: pointer;
+  font-family: Source Sans Pro;
+  font-size: var(--font-size);
+  color: var(--black);
+}
+
+.button :global(.icon) {
+  width: 20px;
+  margin-right: 8px;
+}
+
+.button:hover {
+  color: var(--blue-medium);
+  border-color: var(--blue-medium);
+  background-color: var(--gray-highlight);
+}
+
+.button:active {
+  transform: translate3D(1px, 1px, 0);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: auto;
+  pointer-events: none;
+}
+
+.buttonPrimary {
+  color: var(--white);
+  background-color: var(--blue-medium);
+  border-color: var(--blue-medium);
+}
+
+.buttonPrimary:hover {
+  color: var(--white);
+  background-color: var(--blue-dark);
+}
+
+.buttonSecondary {
+  color: var(--blue-dark);
+  background-color: var(--blue-light);
+  border-color: var(--blue-medium);
+}
+
+.buttonSecondary:hover {
+  color: var(--white);
+  background-color: var(--blue-dark);
+}
+
+.buttonWarning {
+  color: var(--orange-dark);
+  background-color: var(--orange-light);
+  border-color: var(--orange-medium);
+}
+
+.buttonWarning:hover {
+  color: var(--white);
+  background-color: var(--orange-dark);
+  border-color: var(--orange-dark);
+}
+
+.buttonDanger {
+  color: var(--red-dark);
+  background-color: var(--red-light);
+  border-color: var(--red-medium);
+}
+
+.buttonDanger:hover {
+  color: var(--white);
+  background-color: var(--red-dark);
+  border-color: var(--red-dark);
+}
+
+.buttonSuccess {
+  color: var(--green-dark);
+  background-color: var(--green-light);
+  border-color: var(--green-medium);
+}
+
+.buttonSuccess:hover {
+  color: var(--white);
+  background-color: var(--green-dark);
+  border-color: var(--green-dark);
+}
+
+/* STATUS BUTTON */
+
+.statusButton {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-around;
+  font-family: Evolventa;
+  font-size: 20px;
+  font-weight: 400;
+  background-color: var(--white);
+  border-radius: 5px;
+  padding: 20px 24px;
+  padding-bottom: 24px;
+}
+
+.statusButtonAmount {
+  display: flex;
+  align-items: center;
+  height: 24px;
+}
+
+.statusButtonAmount :global(.icon) {
+  width: unset;
+  margin: 1px;
+}
+
+.activeStatusButton {
+  border-bottom: 4px solid var(--blue-medium);
+  padding-bottom: 21px;
+}
+
+.statusButtonLabel {
+  text-align: left;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+.activeStatusButton .statusButtonLabel {
+  color: var(--blue-medium);
+}

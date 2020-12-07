@@ -8,7 +8,8 @@ import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
 import { LotRejector } from "transactions/hooks/actions/use-reject-lots"
 
 import { Link } from "common/components/relative-route"
-import { AsyncButton, Box, Button } from "common/components"
+import { Box } from "common/components"
+import { AsyncButton, Button } from "common/components/button"
 import {
   Check,
   Cross,

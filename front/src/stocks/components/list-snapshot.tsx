@@ -4,7 +4,8 @@ import { ApiState } from "common/hooks/use-api"
 import { LotStatus, StockSnapshot } from "common/types"
 import { StatusSelection } from "transactions/hooks/query/use-status"
 
-import { Title, StatusButton } from "common/components"
+import { Title } from "common/components"
+import { StatusButton } from "common/components/button"
 import { Alert } from "common/components/alert"
 
 import { mapStatus } from "transactions/components/list-snapshot"

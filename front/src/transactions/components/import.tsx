@@ -4,7 +4,8 @@ import { LotUploader } from "transactions/hooks/actions/use-upload-file"
 import { DialogButtons, PromptFormProps } from "common/components/dialog"
 
 import { Upload } from "common/components/icons"
-import { Box, Button } from "common/components"
+import { Box } from "common/components"
+import { Button } from "common/components/button"
 
 import styles from "./import.module.css"
 

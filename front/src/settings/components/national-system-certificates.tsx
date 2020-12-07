@@ -3,7 +3,9 @@ import { SettingsForm } from "./common"
 
 import { NationalSystemCertificatesSettingsHook } from "../hooks/use-national-system-certificates"
 
-import { Title, LoaderOverlay, LabelInput, Button } from "common/components"
+import { Title, LoaderOverlay } from "common/components"
+import { LabelInput } from "common/components/input"
+import { Button } from "common/components/button"
 import { PromptFormProps, DialogButtons } from "common/components/dialog"
 import { Edit, Save } from "common/components/icons"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
