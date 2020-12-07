@@ -4,7 +4,7 @@ import { Filters, Snapshot } from "common/types"
 import { FilterSelection } from "transactions/hooks/query/use-filters"
 import { SearchSelection } from "transactions/hooks/query/use-search"
 
-import { SearchInput } from "common/components"
+import { SearchInput } from "common/components/input"
 import Select, { Option, SelectValue } from "common/components/select"
 
 import styles from "./list-filters.module.css"

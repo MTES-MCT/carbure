@@ -1,6 +1,8 @@
 import { SettingsGetter } from "settings/hooks/use-get-settings"
 
-import { Button, LabelInput, Title } from "common/components"
+import { Title } from "common/components"
+import { LabelInput } from "common/components/input"
+import { Button } from "common/components/button"
 import { Edit } from "common/components/icons"
 import { Section, SectionBody, SectionHeader } from "common/components/section"
 

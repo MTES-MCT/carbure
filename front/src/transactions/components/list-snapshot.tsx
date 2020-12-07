@@ -5,7 +5,8 @@ import { ApiState } from "common/hooks/use-api"
 import { StatusSelection } from "transactions/hooks/query/use-status"
 import { YearSelection } from "transactions/hooks/query/use-year"
 
-import { Title, StatusButton } from "common/components"
+import { Title } from "common/components"
+import { StatusButton } from "common/components/button"
 import Select from "common/components/select"
 import { Alert } from "common/components/alert"
 

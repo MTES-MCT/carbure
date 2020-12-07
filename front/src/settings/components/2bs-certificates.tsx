@@ -8,7 +8,8 @@ import styles from "./settings.module.css"
 
 import * as common from "common/api"
 
-import { Title, Button, LoaderOverlay } from "common/components"
+import { Title, LoaderOverlay } from "common/components"
+import { Button } from "common/components/button"
 import { AlertCircle, Cross, Plus } from "common/components/icons"
 import { Alert } from "common/components/alert"
 import { SectionHeader, SectionBody, Section } from "common/components/section"

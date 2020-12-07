@@ -3,7 +3,8 @@ import ReactDOM from "react-dom"
 
 import styles from "./dialog.module.css"
 
-import { Title, Box, Button } from "."
+import { Title, Box } from "."
+import { Button } from "./button"
 import Modal from "./modal"
 
 export const DialogButtons = (props: any) => (

@@ -2,7 +2,7 @@ import React from "react"
 
 import { Link } from "common/components/relative-route"
 import { Check, Cross, Rapport, Upload } from "common/components/icons"
-import { AsyncButton, Button } from "common/components"
+import { AsyncButton, Button } from "common/components/button"
 import { prompt } from "common/components/dialog"
 import { StockImportPromptFactory } from "transactions/components/import"
 import { LotUploader } from "transactions/hooks/actions/use-upload-file"

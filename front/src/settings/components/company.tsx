@@ -5,7 +5,8 @@ import { CompanySettingsHook } from "../hooks/use-company"
 
 import styles from "./settings.module.css"
 
-import { Title, LabelCheckbox, LoaderOverlay } from "common/components"
+import { Title, LoaderOverlay } from "common/components"
+import { LabelCheckbox } from "common/components/input"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 
 type CompanySettingsProps = {

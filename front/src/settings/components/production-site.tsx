@@ -17,15 +17,9 @@ import styles from "./settings.module.css"
 import * as common from "common/api"
 import useForm from "common/hooks/use-form"
 
-import {
-  Title,
-  Box,
-  Button,
-  LabelInput,
-  LoaderOverlay,
-  Label,
-  LabelCheckbox,
-} from "common/components"
+import { Title, Box, LoaderOverlay } from "common/components"
+import { LabelInput, Label, LabelCheckbox } from "common/components/input"
+import { Button } from "common/components/button"
 import { AlertCircle, Cross, Plus, Save } from "common/components/icons"
 import { Alert } from "common/components/alert"
 import Table, { Actions, Column, Line, Row } from "common/components/table"
