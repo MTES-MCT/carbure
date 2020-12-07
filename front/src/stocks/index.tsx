@@ -23,8 +23,8 @@ import { useGetStocks, useGetStockSnapshot } from "./hooks/use-stock-list"
 import { Main } from "common/components"
 
 import { Redirect, Route, Switch } from "common/components/relative-route"
-import { StocksSnapshot } from "./components/stock-snapshot"
-import { StockList } from "./components/stock-list"
+import { StocksSnapshot } from "./components/list-snapshot"
+import { StockList } from "./components/list"
 import TransactionFilters from "transactions/components/list-filters"
 
 import StockDetails from "./routes/stock-details"

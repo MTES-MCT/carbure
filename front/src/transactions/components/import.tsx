@@ -6,7 +6,7 @@ import { DialogButtons, PromptFormProps } from "common/components/dialog"
 import { Upload } from "common/components/icons"
 import { Box, Button } from "common/components"
 
-import styles from "./list-import.module.css"
+import styles from "./import.module.css"
 
 const ImportPrompt = ({
   children,

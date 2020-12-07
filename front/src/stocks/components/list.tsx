@@ -14,8 +14,6 @@ import { StatusSelection } from "transactions/hooks/query/use-status"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { StockHook } from "../hooks/use-stock-list"
 
-import styles from "./stock-list.module.css"
-
 import { AlertCircle } from "common/components/icons"
 import { Box, LoaderOverlay } from "common/components"
 import { Alert } from "common/components/alert"
@@ -32,8 +30,10 @@ import {
   StockActions,
   StockImportActions,
   StockDraftActions,
-} from "./stock-actions"
-import { StockTable } from "./stock-table"
+} from "./list-actions"
+import { StockTable } from "./list-table"
+
+import styles from "./list.module.css"
 
 type StockListProps = {
   stock: StockHook

@@ -4,7 +4,7 @@ import * as api from "stocks/api"
 import useAPI from "../../../common/hooks/use-api"
 import { confirm } from "../../../common/components/dialog"
 import { prompt } from "../../../common/components/dialog"
-import { StockSendLotPrompt } from "stocks/components/stock-send-form"
+import { StockSendLotPrompt } from "stocks/components/send-form"
 import { useNotificationContext } from "../../../common/components/notifications"
 import { TransactionSelection } from "../query/use-selection"
 

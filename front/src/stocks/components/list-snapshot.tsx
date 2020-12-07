@@ -4,12 +4,12 @@ import { ApiState } from "common/hooks/use-api"
 import { LotStatus, StockSnapshot } from "common/types"
 import { StatusSelection } from "transactions/hooks/query/use-status"
 
-import styles from "./stock-snapshot.module.css"
-
 import { Title, StatusButton } from "common/components"
 import { Alert } from "common/components/alert"
 
 import { mapStatus } from "transactions/components/list-snapshot"
+
+import styles from "./list-snapshot.module.css"
 
 const STOCK_STATUSES = [LotStatus.Inbox, LotStatus.Stock, LotStatus.ToSend]
 
