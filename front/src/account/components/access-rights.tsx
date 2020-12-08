@@ -1,8 +1,9 @@
 import { useState } from "react"
 import cl from "clsx"
 
-import { Entity } from "common/types"
+import { Entity, UserRightStatus } from "common/types"
 import { SettingsGetter } from "settings/hooks/use-get-settings"
+import { AccountHook } from "../index"
 
 import statusStyles from "transactions/components/status.module.css"
 import colStyles from "transactions/components/list-columns.module.css"
@@ -10,7 +11,7 @@ import pendingStyles from "carbure/components/pending.module.css"
 
 import * as common from "common/api"
 
-import { Title } from "common/components"
+import { LoaderOverlay, Title } from "common/components"
 import { Button } from "common/components/button"
 import { AlertTriangle, Plus } from "common/components/icons"
 import { EMPTY_COLUMN, SettingsForm } from "settings/components/common"
@@ -18,13 +19,12 @@ import { LabelAutoComplete } from "common/components/autocomplete"
 import { Alert } from "common/components/alert"
 import Table, { Column, Line, Row } from "common/components/table"
 import { Section, SectionBody, SectionHeader } from "common/components/section"
-import {
-  DialogButtons,
-  prompt,
-  PromptFormProps,
-} from "common/components/dialog"
+import { DialogButtons, PromptFormProps } from "common/components/dialog"
 
-const EntityPrompt = ({ onConfirm, onCancel }: PromptFormProps<Entity>) => {
+export const EntityPrompt = ({
+  onConfirm,
+  onCancel,
+}: PromptFormProps<Entity>) => {
   const [entity, setEntity] = useState<Entity | null>(null)
 
   return (
@@ -64,22 +64,30 @@ const EntityPrompt = ({ onConfirm, onCancel }: PromptFormProps<Entity>) => {
   )
 }
 
-const Status = ({ status }: { status: string }) => (
+const STATUS_LABEL = {
+  [UserRightStatus.Pending]: "En attente",
+  [UserRightStatus.Accepted]: "Accepté",
+  [UserRightStatus.Rejected]: "Refusé",
+  [UserRightStatus.Revoked]: "Révoqué",
+}
+
+const Status = ({ status }: { status: UserRightStatus }) => (
   <span
     className={cl(
       statusStyles.status,
       statusStyles.smallStatus,
-      status === "ACCEPTED"
-        ? statusStyles.statusAccepted
-        : statusStyles.statusWaiting
+      status === UserRightStatus.Accepted && statusStyles.statusAccepted,
+      status === UserRightStatus.Pending && statusStyles.statusWaiting,
+      status === UserRightStatus.Rejected && statusStyles.statusRejected,
+      status === UserRightStatus.Revoked && statusStyles.statusToFix
     )}
   >
-    {status}
+    {STATUS_LABEL[status]}
   </span>
 )
 
 interface AccessRight {
-  status: string
+  status: UserRightStatus
   entity: Entity
   date: Date
 }
@@ -104,17 +112,13 @@ const COLUMNS: Column<AccessRight>[] = [
 
 type AccountAccesRightsProps = {
   settings: SettingsGetter
+  account: AccountHook
 }
 
-export const AccountAccesRights = ({ settings }: AccountAccesRightsProps) => {
-  async function askEntity() {
-    const entity = await prompt(
-      "Ajout organisation",
-      "Recherchez la société qui vous emploie pour pouvoir accéder à ses données.",
-      EntityPrompt
-    )
-  }
-
+export const AccountAccesRights = ({
+  settings,
+  account,
+}: AccountAccesRightsProps) => {
   const requests = settings.data?.requests ?? []
 
   const rows: Row<AccessRight>[] = requests.map((r) => ({
@@ -125,7 +129,7 @@ export const AccountAccesRights = ({ settings }: AccountAccesRightsProps) => {
     <Section>
       <SectionHeader>
         <Title>Demande d'accès</Title>
-        <Button level="primary" icon={Plus} onClick={askEntity}>
+        <Button level="primary" icon={Plus} onClick={account.askEntityAccess}>
           Ajouter une organisation
         </Button>
       </SectionHeader>
@@ -140,6 +144,8 @@ export const AccountAccesRights = ({ settings }: AccountAccesRightsProps) => {
       )}
 
       {requests.length > 0 && <Table columns={COLUMNS} rows={rows} />}
+
+      {account.isLoading && <LoaderOverlay />}
     </Section>
   )
 }
