@@ -107,7 +107,7 @@ def sanity_check(tx):
             if lot.pays_origine.code_pays not in ['ID', 'MY', 'HN']:
                 errors.append(raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
         elif lot.matiere_premiere.code == 'COLZA':
-            if lot.pays_origine.code_pays not in ['US', 'CA', 'AU'] and not lot.pays_origine.is_in_europe:
+            if lot.pays_origine.code_pays not in ['US', 'CA', 'AU', 'UA', 'CN', 'IN', 'DE', 'FR', 'PL', 'UK'] and not lot.pays_origine.is_in_europe:
                 errors.append(raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
         elif lot.matiere_premiere.code == 'CANNE_A_SUCRE':
             if lot.pays_origine.code_pays not in ['BR', 'BO']:
