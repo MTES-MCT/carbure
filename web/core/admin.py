@@ -38,17 +38,17 @@ class UserPreferencesAdmin(admin.ModelAdmin):
 
 
 class BiocarburantAdmin(admin.ModelAdmin):
-    list_display = ('code', 'name', 'description', 'is_alcool', 'is_graisse')
+    list_display = ('code', 'name', 'description', 'is_alcool', 'is_graisse', 'is_displayed')
     search_fields = ('name', )
     readonly_fields = ('code', )
-    list_filter = ('is_alcool', 'is_graisse', )
+    list_filter = ('is_alcool', 'is_graisse', 'is_displayed')
 
 
 class MatierePremiereAdmin(admin.ModelAdmin):
-    list_display = ('code', 'name', 'description', 'compatible_alcool', 'compatible_graisse', 'is_double_compte', 'is_huile_vegetale')
+    list_display = ('code', 'name', 'description', 'compatible_alcool', 'compatible_graisse', 'is_double_compte', 'is_huile_vegetale', 'is_displayed')
     search_fields = ('name', )
     readonly_fields = ('code', )
-    list_filter = ('compatible_alcool', 'compatible_graisse', 'is_double_compte', 'is_huile_vegetale')
+    list_filter = ('compatible_alcool', 'compatible_graisse', 'is_double_compte', 'is_huile_vegetale', 'is_displayed')
 
 
 class PaysAdmin(admin.ModelAdmin):
