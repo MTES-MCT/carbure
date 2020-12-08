@@ -1,0 +1,125 @@
+/* INPUT COMPONENT */
+
+.input,
+.textarea {
+  width: 100%;
+  font-size: var(--font-size);
+  border: 1px solid var(--gray-medium);
+  background-color: var(--white);
+  padding: 10px;
+  font-weight: 500;
+}
+
+.textarea {
+  font-size: var(--font-size);
+  margin-bottom: 0;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: var(--blue-medium);
+}
+
+.input:hover,
+.textarea:hover {
+  color: var(--blue-medium);
+  border-color: var(--blue-medium);
+}
+
+.input:read-only,
+.textarea:read-only {
+  color: initial;
+  border: 1px solid var(--gray-medium);
+  background-color: transparent;
+}
+
+.input:disabled,
+.textarea:disabled {
+  background-color: var(--gray-highlight);
+  color: var(--gray-dark);
+}
+
+/* LABEL TEXT FIELD COMPONENT */
+
+.labelWrapper {
+  display: flex;
+  flex-direction: column;
+  font-size: 15px;
+  font-style: italic;
+  margin-bottom: 12px;
+}
+
+.labelWrapper .labelText {
+  display: flex;
+  align-items: center;
+  margin-left: 4px;
+  color: var(--gray-dark);
+}
+
+.labelWrapper .labelText :global(.icon) {
+  margin-top: 2px;
+  margin-left: 4px;
+}
+
+.disabledLabel {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.labelTextArea,
+.textarea {
+  flex: 1;
+}
+
+.errorLabel .labelText,
+.errorLabel:hover .labelText,
+.errorLabel:focus .labelText {
+  color: var(--red-dark);
+}
+
+.errorLabel input.input,
+.errorLabel textarea.textarea {
+  color: var(--red-dark);
+  border-color: var(--red-dark);
+}
+
+/* SEARCH INPUT COMPONENT */
+
+.searchInputWrapper {
+  display: flex;
+  position: relative;
+}
+
+.searchInputWrapper:hover svg {
+  stroke: var(--blue-medium);
+}
+
+.searchInput {
+  border-radius: 45px;
+  padding-left: 40px;
+  padding-right: 16px;
+}
+
+.searchInputWrapper svg {
+  position: absolute;
+  left: 12px;
+  align-self: center;
+  pointer-events: none;
+}
+
+/* LABEL CHECKBOX COMPONENT */
+
+.labelCheckbox {
+  display: flex;
+  align-items: center;
+  font-size: var(--font-size);
+  cursor: pointer;
+  height: 66px;
+  margin-top: 12px;
+  flex-shrink: 0;
+}
+
+.labelCheckbox input[type="checkbox"] {
+  margin-right: 12px;
+  cursor: pointer;
+}

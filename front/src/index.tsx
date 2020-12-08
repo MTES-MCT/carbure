@@ -1,13 +1,13 @@
 import React from "react"
 import ReactDOM from "react-dom"
 
-import "./assets/css/index.css"
+import "./carbure/assets/css/index.css"
 import * as serviceWorker from "./serviceWorker"
-import App from "./app"
+import CarbureApp from "./carbure"
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <CarbureApp />
   </React.StrictMode>,
   document.getElementById("root")
 )
