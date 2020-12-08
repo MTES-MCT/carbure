@@ -17,7 +17,7 @@ export const AccountAuthentication = ({
     <Section>
       <SectionHeader>
         <Title>Identifiants</Title>
-        <Button level="primary" icon={Edit}>
+        <Button disabled level="primary" icon={Edit}>
           Modifier mes identifiants
         </Button>
       </SectionHeader>

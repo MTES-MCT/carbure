@@ -280,9 +280,16 @@ export interface UserRight {
   rights: string
 }
 
+export enum UserRightStatus {
+  Pending = "PENDING",
+  Accepted = "ACCEPTED",
+  Rejected = "REJECTED",
+  Revoked = "REVOKED",
+}
+
 export interface UserRightRequest {
   entity: Entity
-  status: string
+  status: UserRightStatus
   date: Date
 }
 
