@@ -22,4 +22,5 @@ with open(filename) as csvfile:
         compat_graisse = row[3]
         is_double_compte = row[4]
         is_huile_vegetale = row[5]
-        obj, created = MatierePremiere.objects.update_or_create(code=code, defaults={'name':name, 'description':'', 'compatible_alcool': compat_alcool, 'compatible_graisse': compat_graisse, 'is_double_compte': is_double_compte, 'is_huile_vegetale': is_huile_vegetale})
+        is_displayed = row[6]        
+        obj, created = MatierePremiere.objects.update_or_create(code=code, defaults={'name':name, 'description':'', 'compatible_alcool': compat_alcool, 'compatible_graisse': compat_graisse, 'is_double_compte': is_double_compte, 'is_huile_vegetale': is_huile_vegetale, 'is_displayed': is_displayed})
