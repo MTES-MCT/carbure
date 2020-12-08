@@ -73,7 +73,7 @@
   margin-right: 8px;
 }
 
-.collapsibleTitle {
+.alert .collapsibleTitle {
   font-size: var(--font-size);
 }
 
