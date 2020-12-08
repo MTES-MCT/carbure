@@ -7,8 +7,6 @@ import styles from "./modal.module.css"
 import { Cross } from "./icons"
 import { SystemProps } from "."
 
-const portal = document.getElementById("modal")!
-
 type ModalProps = SystemProps & {
   onClose: () => void
 }
@@ -33,7 +31,7 @@ const Modal = ({ className, onClose, children, ...props }: ModalProps) => {
         <Cross className={styles.closeModal} onClick={onClose} />
       </div>
     </div>,
-    portal
+    document.getElementById("modal")!
   )
 }
 
