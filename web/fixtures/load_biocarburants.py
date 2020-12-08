@@ -22,4 +22,5 @@ with open(filename) as csvfile:
         mv = row[4]
         is_alcool = row[5]
         is_graisse = row[6]
-        obj, created = Biocarburant.objects.update_or_create(code=code, defaults={'name': name, 'description':'', 'pci_kg':pcikg, 'pci_litre':pcil, 'masse_volumique':mv, 'is_alcool': is_alcool, 'is_graisse': is_graisse})
+        is_displayed = row[7]
+        obj, created = Biocarburant.objects.update_or_create(code=code, defaults={'name': name, 'description':'', 'pci_kg':pcikg, 'pci_litre':pcil, 'masse_volumique':mv, 'is_alcool': is_alcool, 'is_graisse': is_graisse, 'is_displayed': is_displayed})
