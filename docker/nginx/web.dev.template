@@ -14,6 +14,8 @@ server {
     # proxy pass
     location / {
         proxy_pass  http://carbure-django:8001;
+        proxy_set_header Host            $host;
+        proxy_set_header X-Forwarded-For $remote_addr;	
     }
 
     # frontend dev server proxy pass
