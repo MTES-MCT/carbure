@@ -1,6 +1,13 @@
 import { rest } from "msw"
 
-import { country, deliverySite, producer, trader } from "common/__test__/data"
+import {
+  country,
+  deliverySite,
+  expiredISCCCertificate,
+  isccCertificate,
+  producer,
+  trader,
+} from "common/__test__/data"
 
 export const okEntitySearch = rest.get(
   "/api/v3/common/entities",
@@ -33,6 +40,18 @@ export const okDeliverySitesSearch = rest.get(
       ctx.json({
         status: "success",
         data: [deliverySite],
+      })
+    )
+  }
+)
+
+export const okISCCSearch = rest.get(
+  "/api/v3/common/iscc-certificates",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: [isccCertificate, expiredISCCCertificate],
       })
     )
   }

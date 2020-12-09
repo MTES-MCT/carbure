@@ -80,7 +80,7 @@ export default function useISCCCertificates(
 
   async function deleteISCCCertificate(iscc: ISCCCertificate) {
     if (
-      entityID &&
+      typeof entityID !== "undefined" &&
       (await confirm(
         "Suppression certificat",
         `Voulez-vous vraiment supprimer le certificat ISCC "${iscc.certificate_id}" ?`

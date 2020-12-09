@@ -76,7 +76,7 @@ test("check a delivery site details", async () => {
   expect(input.getAttribute("value")).toBe("Test Delivery Site")
 })
 
-test("remove a delivery site section in settings", async () => {
+test("remove a delivery site in settings", async () => {
   setDeliverySites([deliverySite])
 
   render(<SettingsWithHooks entity={producer} />)

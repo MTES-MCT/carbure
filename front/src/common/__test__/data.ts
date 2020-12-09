@@ -79,3 +79,25 @@ export const productionSite = {
   outputs: [],
   certificates: [],
 }
+
+// ISCC CERTIFICATES
+
+export const expiredISCCCertificate = {
+  certificate_id: "Expired ISCC Test",
+  certificate_holder: "Expired Holder Test",
+  valid_from: "1990-01-01",
+  valid_until: "2000-01-01",
+  issuing_cb: "Expired Authority Test",
+  location: "",
+  scope: ["Expired Scope Test"],
+}
+
+export const isccCertificate = {
+  certificate_id: "ISCC Test",
+  certificate_holder: "Holder Test",
+  valid_from: "2020-04-25",
+  valid_until: "2021-04-24",
+  issuing_cb: "Authority Test",
+  location: "",
+  scope: ["Scope Test"],
+}

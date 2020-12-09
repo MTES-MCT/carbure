@@ -3,11 +3,21 @@ import { setupServer } from "msw/node"
 
 import { OwnershipType } from "common/types"
 
-import { deliverySite, producer, productionSite } from "common/__test__/data"
-import { okCountrySearch, okDeliverySitesSearch } from "common/__test__/api"
+import {
+  deliverySite,
+  isccCertificate,
+  producer,
+  productionSite,
+} from "common/__test__/data"
+import {
+  okCountrySearch,
+  okDeliverySitesSearch,
+  okISCCSearch,
+} from "common/__test__/api"
 
 let deliverySites: any[] = []
 let productionSites: any[] = []
+let isccCertificates: any[] = []
 
 export function setDeliverySites(nextDeliverySites: any[]) {
   deliverySites = nextDeliverySites.map((ds) => ({
@@ -18,6 +28,10 @@ export function setDeliverySites(nextDeliverySites: any[]) {
 
 export function setProductionSites(nextProductionSites: any[]) {
   productionSites = nextProductionSites
+}
+
+export function setISCCCertificates(nextISCCCertificates: any[]) {
+  isccCertificates = nextISCCCertificates
 }
 
 export const okSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
@@ -136,9 +150,33 @@ export const okISCC = rest.get(
     return res(
       ctx.json({
         status: "success",
-        data: [],
+        data: isccCertificates,
       })
     )
+  }
+)
+
+export const okAddISCC = rest.post(
+  "/api/v3/settings/add-iscc-certificate",
+  (req, res, ctx) => {
+    setISCCCertificates([isccCertificate])
+    return res(ctx.json({ status: "success" }))
+  }
+)
+
+export const okDeleteISCC = rest.post(
+  "/api/v3/settings/delete-iscc-certificate",
+  (req, res, ctx) => {
+    setISCCCertificates([])
+    return res(ctx.json({ status: "success" }))
+  }
+)
+
+export const okUpdateISCC = rest.post(
+  "/api/v3/settings/update-iscc-certificate",
+  (req, res, ctx) => {
+    setISCCCertificates([isccCertificate])
+    return res(ctx.json({ status: "success" }))
   }
 )
 
@@ -166,8 +204,12 @@ export default setupServer(
   okSetBiocarburant,
   okSetMatierePremiere,
   okSetCertificates,
-  ok2BS,
   okISCC,
+  okAddISCC,
+  okDeleteISCC,
+  okUpdateISCC,
+  ok2BS,
   okDeliverySitesSearch,
-  okCountrySearch
+  okCountrySearch,
+  okISCCSearch
 )
