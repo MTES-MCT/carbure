@@ -62,6 +62,20 @@ test("add a delivery site in settings", async () => {
   })
 })
 
+test("check a delivery site details", async () => {
+  setDeliverySites([deliverySite])
+
+  render(<SettingsWithHooks entity={producer} />)
+
+  const ds = await waitFor(() => screen.getByText("Test Delivery Site"))
+
+  userEvent.click(ds)
+
+  const input = screen.getByLabelText("Nom du site")
+
+  expect(input.getAttribute("value")).toBe("Test Delivery Site")
+})
+
 test("remove a delivery site section in settings", async () => {
   setDeliverySites([deliverySite])
 
