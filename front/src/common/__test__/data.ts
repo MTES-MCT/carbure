@@ -58,3 +58,24 @@ export const deliverySite = {
   address: "Test Address",
   postal_code: "64430",
 }
+
+// PRODUCTION SITES
+
+export const productionSite = {
+  name: "Test Production Site",
+  country: country,
+  id: 2,
+  date_mise_en_service: "2000-01-31",
+  site_id: "123456",
+  postal_code: "64430",
+  manager_name: "Bob",
+  manager_phone: "012345678",
+  manager_email: "bob@bobby.bob",
+  ges_option: "Actual",
+  eligible_dc: true,
+  dc_reference: "bobobobobob",
+  city: "Baigorri",
+  inputs: [],
+  outputs: [],
+  certificates: [],
+}

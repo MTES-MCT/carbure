@@ -3,6 +3,7 @@ import { setupServer } from "msw/node"
 
 import { UserRightStatus } from "common/types"
 import { producer, trader } from "common/__test__/data"
+import { okEntitySearch } from "common/__test__/api"
 
 let accessRequests: any[] = []
 
@@ -27,18 +28,6 @@ export const okSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
   )
 })
 
-export const okEntitySearch = rest.get(
-  "/api/v3/common/entities",
-  (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: [producer, trader],
-      })
-    )
-  }
-)
-
 export const okAccessRequest = rest.post(
   "/api/v3/settings/request-entity-access",
   (req, res, ctx) => {
@@ -47,4 +36,4 @@ export const okAccessRequest = rest.post(
   }
 )
 
-export default setupServer(okSettings, okEntitySearch, okAccessRequest)
+export default setupServer(okSettings, okAccessRequest, okEntitySearch)
