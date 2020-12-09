@@ -4,9 +4,15 @@ import { setupServer } from "msw/node"
 import { UserRightStatus } from "common/types"
 import { producer, trader } from "common/__test__/data"
 
-let accessRequests = [
-  { entity: producer, date: new Date(), status: UserRightStatus.Accepted },
-]
+let accessRequests: any[] = []
+
+export function setAccessRequests(entities: any[]) {
+  accessRequests = entities.map((e) => ({
+    entity: e,
+    date: new Date(),
+    status: UserRightStatus.Pending,
+  }))
+}
 
 export const okSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
   return res(
@@ -36,11 +42,7 @@ export const okEntitySearch = rest.get(
 export const okAccessRequest = rest.post(
   "/api/v3/settings/request-entity-access",
   (req, res, ctx) => {
-    accessRequests = [
-      ...accessRequests,
-      { entity: trader, date: new Date(), status: UserRightStatus.Pending },
-    ]
-
+    setAccessRequests([trader])
     return res(ctx.json({ status: "success" }))
   }
 )

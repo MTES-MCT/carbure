@@ -3,10 +3,14 @@ import userEvent from "@testing-library/user-event"
 
 import Account from "../index"
 import { useGetSettings } from "settings/hooks/use-get-settings"
-import server from "./api"
+import server, { setAccessRequests } from "./api"
+import { producer } from "common/__test__/data"
 
 beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
+afterEach(() => {
+  server.resetHandlers()
+  setAccessRequests([])
+})
 afterAll(() => server.close())
 
 // this component is only here for testing as otherwise we can't use the useGetSettingsHook
@@ -16,21 +20,26 @@ const AccountWithHooks = () => {
   return <Account settings={settings} />
 }
 
-test("load the account page", async () => {
+test("empty acces rights in account page", async () => {
   render(<AccountWithHooks />)
 
   screen.getByText("Demande d'accès")
-  screen.getByText("Identifiants")
+  screen.getByText("Aucune autorisation pour ce compte, ajoutez une organisation pour continuer.") // prettier-ignore
+})
+
+test("populated acces rights in account page", async () => {
+  setAccessRequests([producer])
+
+  render(<AccountWithHooks />)
+
+  screen.getByText("Demande d'accès")
 
   // wait for fake api to load
   await waitFor(() => {
     // check the first row of request access
-    screen.getByText("Accepté")
+    screen.getByText("En attente")
     screen.getByText("Producteur Test")
     screen.getByText("Producteur")
-
-    // check the displayed email
-    screen.getByDisplayValue("producer@test.com")
   })
 })
 
