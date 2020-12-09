@@ -50,7 +50,7 @@ export default function useTransactionDetails(
   const status = tx && entity ? api.getStatus(tx, entity.id) : LotStatus.Weird
 
   function refreshDetails() {
-    if (entityID) {
+    if (typeof entityID !== "undefined") {
       resolveDetails(entityID, txID)
     }
   }
@@ -77,14 +77,14 @@ export default function useTransactionDetails(
   }
 
   async function addComment(message: string) {
-    if (entityID) {
+    if (typeof entityID !== "undefined") {
       await resolveComment(entityID, txID, message, "both")
       await resolveDetails(entityID, txID)
     }
   }
 
   useEffect(() => {
-    if (entityID) {
+    if (typeof entityID !== "undefined") {
       return resolveDetails(entityID, txID).cancel
     }
   }, [resolveDetails, entityID, txID])

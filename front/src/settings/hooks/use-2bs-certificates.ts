@@ -40,7 +40,7 @@ export default function use2BSCertificates(
   const isEmpty = certificates.length === 0
 
   function refresh() {
-    if (entityID) {
+    if (typeof entityID !== "undefined") {
       resolveGet2BS(entityID)
       productionSites.refresh()
     }
@@ -71,7 +71,7 @@ export default function use2BSCertificates(
       DBSPrompt
     )
 
-    if (entityID && data) {
+    if (typeof entityID !== "undefined" && data) {
       notifyCertificate(resolveAdd2BS(entityID, data.certificate_id), "ajouté")
     }
   }
@@ -95,7 +95,7 @@ export default function use2BSCertificates(
       DBSPrompt
     )
 
-    if (entityID && data) {
+    if (typeof entityID !== "undefined" && data) {
       notifyCertificate(
         resolveUpdate2BS(entityID, dbs.certificate_id, data.certificate_id),
         "mis à jour"
@@ -104,7 +104,7 @@ export default function use2BSCertificates(
   }
 
   useEffect(() => {
-    if (entityID) {
+    if (typeof entityID !== "undefined") {
       resolveGet2BS(entityID)
     }
   }, [entityID, resolveGet2BS])
