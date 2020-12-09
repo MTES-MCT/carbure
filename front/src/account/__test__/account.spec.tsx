@@ -1,97 +1,26 @@
-import { rest } from "msw"
 import { setupServer } from "msw/node"
 import { render, waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
-import { Entity, EntityType, UserRightStatus } from "common/types"
-
 import Account from "../index"
-import { useGetSettings } from "carbure/hooks/use-app"
+import { useGetSettings } from "settings/hooks/use-get-settings"
+import { okAccessRequest, okEntitySearch, okSettings } from "./api"
 
-const modal = document.createElement("div")
-modal.setAttribute("id", "modal")
-
-const dropdown = document.createElement("div")
-dropdown.setAttribute("id", "dropdown")
-
-document.body.append(modal, dropdown)
-
-const producer: Entity = {
-  id: 0,
-  name: "Producteur Test",
-  entity_type: EntityType.Producer,
-  has_mac: true,
-  has_trading: true,
-  national_system_certificate: "",
-}
-
-const trader: Entity = {
-  id: 1,
-  name: "Trader Test",
-  entity_type: EntityType.Trader,
-  has_mac: true,
-  has_trading: true,
-  national_system_certificate: "",
-}
-
-let requests = [
-  { entity: producer, date: new Date(), status: UserRightStatus.Accepted },
-]
-
-const server = setupServer(
-  rest.get("/api/v3/settings", (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: {
-          email: "producer@test.com",
-          rights: [{ entity: producer, rights: "rw" }],
-          requests,
-        },
-      })
-    )
-  }),
-  rest.get("/api/v3/common/entities", (req, res, ctx) => {
-    return res(
-      ctx.json({
-        status: "success",
-        data: [producer, trader],
-      })
-    )
-  }),
-  rest.post("/api/v3/settings/request-entity-access", (req, res, ctx) => {
-    requests = [
-      ...requests,
-      { entity: trader, date: new Date(), status: UserRightStatus.Pending },
-    ]
-    // console.log("cuicui", requests)
-    return res(ctx.json({ status: "success" }))
-  })
-)
+const server = setupServer(okSettings, okEntitySearch, okAccessRequest)
 
 beforeAll(() => server.listen())
-
-afterEach(() => {
-  server.resetHandlers()
-  modal.textContent = ""
-  dropdown.textContent = ""
-
-  requests = [
-    { entity: producer, date: new Date(), status: UserRightStatus.Accepted },
-  ]
-})
-
+afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 // this component is only here for testing as otherwise we can't use the useGetSettingsHook
 // because hooks can only work inside components
-const AccountWithSettings = () => {
+const AccountWithHooks = () => {
   const settings = useGetSettings()
   return <Account settings={settings} />
 }
 
 test("load the account page", async () => {
-  render(<AccountWithSettings />)
+  render(<AccountWithHooks />)
 
   screen.getByText("Demande d'accès")
   screen.getByText("Identifiants")
@@ -109,7 +38,7 @@ test("load the account page", async () => {
 })
 
 test("use the access request menu", async () => {
-  render(<AccountWithSettings />)
+  render(<AccountWithHooks />)
 
   const button = screen.getByText("Ajouter une organisation")
   userEvent.click(button)
