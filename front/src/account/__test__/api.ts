@@ -1,6 +1,8 @@
+import { rest } from "msw"
+import { setupServer } from "msw/node"
+
 import { UserRightStatus } from "common/types"
 import { producer, trader } from "common/__test__/data"
-import { rest } from "msw"
 
 let accessRequests = [
   { entity: producer, date: new Date(), status: UserRightStatus.Accepted },
@@ -42,3 +44,5 @@ export const okAccessRequest = rest.post(
     return res(ctx.json({ status: "success" }))
   }
 )
+
+export default setupServer(okSettings, okEntitySearch, okAccessRequest)

@@ -1,4 +1,6 @@
-import { Entity, EntityType } from "common/types"
+import { DepotType, Entity, EntityType } from "common/types"
+
+// ENTITIES
 
 export const producer: Entity = {
   id: 0,
@@ -19,7 +21,7 @@ export const trader: Entity = {
 }
 
 export const operator: Entity = {
-  id: 1,
+  id: 2,
   name: "Opérateur Test",
   entity_type: EntityType.Operator,
   has_mac: true,
@@ -28,10 +30,31 @@ export const operator: Entity = {
 }
 
 export const admin: Entity = {
-  id: 1,
+  id: 3,
   name: "Admin Test",
   entity_type: EntityType.Administration,
   has_mac: false,
   has_trading: false,
   national_system_certificate: "",
+}
+
+// COUNTRIES
+
+export const country = {
+  code_pays: "FR",
+  name: "France",
+  name_en: "France",
+  is_in_europe: true,
+}
+
+// DELIVERY SITES
+
+export const deliverySite = {
+  depot_id: "10",
+  name: "Test Delivery Site",
+  city: "Test City",
+  country: country,
+  depot_type: DepotType.Other,
+  address: "Test Address",
+  postal_code: "64430",
 }
