@@ -110,7 +110,7 @@ export default function useISCCCertificates(
 
   useEffect(() => {
     if (typeof entityID !== "undefined") {
-      resolveGetISCC(entityID)
+      return resolveGetISCC(entityID).cancel
     }
   }, [entityID, resolveGetISCC])
 

@@ -105,7 +105,7 @@ export default function use2BSCertificates(
 
   useEffect(() => {
     if (typeof entityID !== "undefined") {
-      resolveGet2BS(entityID)
+      return resolveGet2BS(entityID).cancel
     }
   }, [entityID, resolveGet2BS])
 

@@ -115,7 +115,7 @@ export default function useDeliverySites(
 
   useEffect(() => {
     if (typeof entityID !== "undefined") {
-      resolveGetDeliverySites(entityID)
+      return resolveGetDeliverySites(entityID).cancel
     }
   }, [entityID, resolveGetDeliverySites])
 
