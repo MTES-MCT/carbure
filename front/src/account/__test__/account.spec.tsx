@@ -1,12 +1,9 @@
-import { setupServer } from "msw/node"
 import { render, waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import Account from "../index"
 import { useGetSettings } from "settings/hooks/use-get-settings"
-import { okAccessRequest, okEntitySearch, okSettings } from "./api"
-
-const server = setupServer(okSettings, okEntitySearch, okAccessRequest)
+import server from "./api"
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
