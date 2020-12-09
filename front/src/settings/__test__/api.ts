@@ -4,6 +4,15 @@ import { setupServer } from "msw/node"
 import { OwnershipType } from "common/types"
 import { deliverySite, producer } from "common/__test__/data"
 
+let deliverySites: any[] = []
+
+export function setDeliverySites(nextDeliverySites: any[]) {
+  deliverySites = nextDeliverySites.map((ds) => ({
+    depot: ds,
+    ownership_type: OwnershipType.ThirdParty,
+  }))
+}
+
 export const okSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
   return res(
     ctx.json({
@@ -16,8 +25,6 @@ export const okSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
     })
   )
 })
-
-let deliverySites: any[] = []
 
 export const okDeliverySites = rest.get(
   "/api/v3/settings/get-delivery-sites",
@@ -82,14 +89,15 @@ export const okDeliverySitesSearch = rest.get(
 export const okAddDeliverySites = rest.post(
   "/api/v3/settings/add-delivery-site",
   (req, res, ctx) => {
-    deliverySites = [
-      ...deliverySites,
-      {
-        depot: deliverySite,
-        ownership_type: OwnershipType.ThirdParty,
-      },
-    ]
+    setDeliverySites([deliverySite])
+    return res(ctx.json({ status: "success" }))
+  }
+)
 
+export const okDeleteDeliverySites = rest.post(
+  "/api/v3/settings/delete-delivery-site",
+  (req, res, ctx) => {
+    setDeliverySites([])
     return res(ctx.json({ status: "success" }))
   }
 )
@@ -97,6 +105,7 @@ export const okAddDeliverySites = rest.post(
 export default setupServer(
   okSettings,
   okAddDeliverySites,
+  okDeleteDeliverySites,
   okDeliverySites,
   okDeliverySitesSearch,
   ok2BS,
