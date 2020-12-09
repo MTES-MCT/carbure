@@ -1,4 +1,3 @@
-import { setupServer } from "msw/node"
 import { render, waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
@@ -6,14 +5,12 @@ import { Entity } from "common/types"
 import { admin, operator, producer, trader } from "common/__test__/data"
 import { useGetSettings } from "settings/hooks/use-get-settings"
 import Settings from "../index"
-import { okSettings } from "./api"
+import server from "./api"
 
 const SettingsWithHooks = ({ entity }: { entity: Entity }) => {
   const settings = useGetSettings()
   return <Settings entity={entity} settings={settings} />
 }
-
-const server = setupServer(okSettings)
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
