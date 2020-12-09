@@ -48,7 +48,7 @@ export function useGetStocks(
   }
 
   function getStock() {
-    if (entityID !== null) {
+    if (typeof entityID !== "undefined") {
       return resolveStocks(
         entityID,
         filters.selected,

@@ -45,7 +45,7 @@ export default function useDeliverySites(
     requestDeleteDeliverySite.loading
 
   function refresh() {
-    if (entityID) {
+    if (typeof entityID !== "undefined") {
       resolveGetDeliverySites(entityID)
     }
   }
@@ -57,7 +57,7 @@ export default function useDeliverySites(
       DeliverySiteFinderPromptFactory(entityID)
     )
 
-    if (entityID && data && data.depot) {
+    if (typeof entityID !== "undefined" && data && data.depot) {
       const res = await resolveAddDeliverySite(
         entityID,
         data.depot.depot_id,
@@ -94,7 +94,7 @@ export default function useDeliverySites(
       `Voulez-vous supprimer le dépôt "${ds.depot!.name}" de votre liste ?`
     )
 
-    if (entityID && shouldDelete) {
+    if (typeof entityID !== "undefined" && shouldDelete) {
       const res = await resolveDeleteDeliverySite(entityID, ds.depot!.depot_id)
 
       if (res) {
@@ -114,7 +114,7 @@ export default function useDeliverySites(
   }
 
   useEffect(() => {
-    if (entityID) {
+    if (typeof entityID !== "undefined") {
       resolveGetDeliverySites(entityID)
     }
   }, [entityID, resolveGetDeliverySites])
