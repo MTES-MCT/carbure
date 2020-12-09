@@ -1,11 +1,11 @@
 import { EntitySelection } from "carbure/hooks/use-entity"
+import { SettingsGetter } from "./use-get-settings"
 
 import useAPI from "common/hooks/use-api"
 import * as api from "../api"
 
 import { NationalSystemCertificatesPromptFactory } from "../components/national-system-certificates"
 import { prompt } from "common/components/dialog"
-import { SettingsGetter } from "carbure/hooks/use-app"
 import { useNotificationContext } from "common/components/notifications"
 
 export interface NationalSystemCertificatesSettingsHook {

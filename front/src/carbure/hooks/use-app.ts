@@ -1,29 +1,5 @@
-import { useEffect } from "react"
-
-import { Entity, Settings } from "common/types"
-
-import useAPI from "common/hooks/use-api"
-import * as api from "settings/api"
-
-export type SettingsGetter = {
-  loading: boolean
-  error: string | null
-  data: Settings | null
-  resolve: () => void
-}
-
-// fetches current snapshot when parameters change
-export function useGetSettings(): SettingsGetter {
-  const [settings, resolveSettings] = useAPI(api.getSettings)
-
-  function resolve() {
-    return resolveSettings().cancel
-  }
-
-  useEffect(resolve, [resolveSettings])
-
-  return { ...settings, resolve }
-}
+import { Entity } from "common/types"
+import { useGetSettings, SettingsGetter } from "settings/hooks/use-get-settings"
 
 export type AppHook = {
   settings: SettingsGetter
