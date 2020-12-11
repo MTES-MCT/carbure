@@ -330,3 +330,13 @@ export type Certificate = {
   holder: string
   type: "2BS" | "ISCC"
 }
+
+export type StockDraft = {
+  tx_id: number,
+  volume: number,
+  dae: string,
+  delivery_date: string,
+  client: string,
+  delivery_site: string,
+  delivery_site_country?: string
+}
