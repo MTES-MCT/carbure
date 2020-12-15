@@ -1,5 +1,5 @@
 import { FilterSelection } from "transactions/hooks/query/use-filters"
-import { Lots, LotStatus, StockSnapshot, Transaction } from "common/types"
+import { Lots, LotStatus, StockDraft, StockSnapshot, Transaction } from "common/types"
 
 import api from "common/services/api"
 import { toOption } from "transactions/api"
@@ -66,23 +66,11 @@ export function getStocks(
 
 export function createDraftsFromStock(
   entity_id: number,
-  tx_id: number,
-  volume: number,
-  dae: string,
-  delivery_date: string,
-  client_id: string,
-  delivery_site: string,
-  delivery_site_country?: string
+  drafts: StockDraft[]
 ) {
   return api.post("/stocks/create-drafts", {
     entity_id,
-    tx_id,
-    volume,
-    dae,
-    delivery_date,
-    client: client_id,
-    delivery_site,
-    delivery_site_country,
+    drafts: JSON.stringify(drafts)
   })
 }
 

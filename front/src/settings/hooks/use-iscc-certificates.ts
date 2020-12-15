@@ -42,7 +42,7 @@ export default function useISCCCertificates(
   const isEmpty = certificates.length === 0
 
   function refresh() {
-    if (entityID) {
+    if (typeof entityID !== "undefined") {
       resolveGetISCC(entityID)
       productionSites.refresh()
     }
@@ -73,14 +73,14 @@ export default function useISCCCertificates(
       ISCCPrompt
     )
 
-    if (entityID && data) {
+    if (typeof entityID !== "undefined" && data) {
       notifyCertificate(resolveAddISCC(entityID, data.certificate_id), "ajouté")
     }
   }
 
   async function deleteISCCCertificate(iscc: ISCCCertificate) {
     if (
-      entityID &&
+      typeof entityID !== "undefined" &&
       (await confirm(
         "Suppression certificat",
         `Voulez-vous vraiment supprimer le certificat ISCC "${iscc.certificate_id}" ?`
@@ -100,7 +100,7 @@ export default function useISCCCertificates(
       ISCCPrompt
     )
 
-    if (entityID && data) {
+    if (typeof entityID !== "undefined" && data) {
       notifyCertificate(
         resolveUpdateISCC(entityID, iscc.certificate_id, data.certificate_id),
         "mis à jour"
@@ -109,8 +109,8 @@ export default function useISCCCertificates(
   }
 
   useEffect(() => {
-    if (entityID) {
-      resolveGetISCC(entityID)
+    if (typeof entityID !== "undefined") {
+      return resolveGetISCC(entityID).cancel
     }
   }, [entityID, resolveGetISCC])
 

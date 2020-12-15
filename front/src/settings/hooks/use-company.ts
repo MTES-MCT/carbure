@@ -1,5 +1,5 @@
 import { EntitySelection } from "carbure/hooks/use-entity"
-import { SettingsGetter } from "carbure/hooks/use-app"
+import { SettingsGetter } from "./use-get-settings"
 
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"

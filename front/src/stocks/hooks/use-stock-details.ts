@@ -37,7 +37,7 @@ export default function useStockDetails(
   const status = tx && entity ? getStockStatus(tx) : LotStatus.Weird
 
   function refreshDetails() {
-    if (entityID) {
+    if (typeof entityID !== "undefined") {
       resolveDetails(entityID, txID)
     }
   }
@@ -64,7 +64,7 @@ export default function useStockDetails(
   }
 
   useEffect(() => {
-    if (entityID) {
+    if (typeof entityID !== "undefined") {
       return resolveDetails(entityID, txID).cancel
     }
   }, [resolveDetails, entityID, txID])
