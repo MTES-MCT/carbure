@@ -802,7 +802,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
     prefetched_data = get_prefetched_data(entity)
 
     try:
-        df = pd.read_excel(file)
+        df = pd.read_excel(file, engine='openpyxl')
         df.fillna('', inplace=True)
         total_lots = len(df)
         lots_loaded = 0
@@ -819,7 +819,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
                 else:
                     lot, tx, l_errors, t_errors = load_lot(prefetched_data, entity, user, lot_row, 'EXCEL')
                 if lot is None:
-                    #print('Error loading line %s' % (lot_row))
+                    print('Error loading line %s' % (lot_row))
                     print(l_errors)
                     continue
                 lots_loaded += 1

@@ -2,6 +2,7 @@ aiohttp==3.6.2
 ansible==2.9.3
 appdirs==1.4.3
 asgiref==3.2.3
+astroid==2.4.2
 async-timeout==3.0.1
 attrs==19.3.0
 beautifulsoup4==4.9.3
@@ -30,9 +31,11 @@ html5lib==1.0.1
 idna==2.9
 idna-ssl==1.1.0
 ipaddr==2.2.0
+isort==5.6.4
 jdcal==1.4.1
 Jinja2==2.10.3
 jmespath==0.9.5
+lazy-object-proxy==1.4.3
 lockfile==0.12.2
 lxml==4.6.1
 MarkupSafe==1.1.1
@@ -50,6 +53,7 @@ pyasn1==0.4.8
 pycodestyle==2.5.0
 pycparser==2.19
 pyflakes==2.1.1
+pylint==2.6.0
 pyparsing==2.4.6
 python-dateutil==2.8.1
 pytoml==0.1.21
@@ -63,8 +67,10 @@ sentry-sdk==0.14.2
 six==1.14.0
 soupsieve==2.0.1
 sqlparse==0.3.0
+toml==0.10.2
 typing-extensions==3.7.4.1
 urllib3==1.25.7
 webencodings==0.5.1
+wrapt==1.12.1
 XlsxWriter==1.2.8
 yarl==1.4.2
