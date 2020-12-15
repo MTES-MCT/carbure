@@ -74,9 +74,11 @@ def save_certificate_scope(certificate, scopes):
         if scope in existing_scopes:
             del existing_scopes[scope]
         else:
+            print('Creating new scope for certificate %s' % (certificate.certificate_id))
             ISCCCertificateScope.objects.update_or_create(certificate=certificate, scope=VALID_SCOPES[scope])
     if len(existing_scopes):
         for k, v in existing_scopes.items():
+            print('deleting scope %s for certificate %s' % (v, certificate.certificate_id))
             v.delete()
             deletions.append(v)
     return deletions
