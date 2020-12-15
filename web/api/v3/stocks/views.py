@@ -1,3 +1,4 @@
+import json
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from core.models import LotTransaction
@@ -169,37 +170,57 @@ def get_snapshot(request):
 @check_rights('entity_id')
 def create_drafts(request, *args, **kwargs):
     context = kwargs['context']
-    tx_id = request.POST.get('tx_id', False)
     entity_id = request.POST.get('entity_id', False)
-    volume = request.POST.get('volume', False)
-    client = request.POST.get('client', False)
-    delivery_site = request.POST.get('delivery_site', False)
-    delivery_date = request.POST.get('delivery_date', False)
-    dae = request.POST.get('dae', False)
-
-    if not tx_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_id"}, status=400)
+    drafts = request.POST.get('drafts', False)
     if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
-    if not volume:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing volume"}, status=400)
-    if not client:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing client"}, status=400)
-    if not delivery_site:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing delivery_site"}, status=400)
-    if not delivery_date:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing delivery_date"}, status=400)
-    if not dae:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing dae"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
+    if not drafts:
+        return JsonResponse({'status': 'error', 'message': "Missing drafts"}, status=400)
 
-    # found the stock line
     # prefetch some data
     d = get_prefetched_data(context['entity'])
-    # create sub-transaction
-    lot, tx, lot_errors, tx_errors = load_mb_lot(d, context['entity'], request.user, request.POST.dict(), 'MANUAL')
-    if not tx:
-        return JsonResponse({'status': 'error', 'message': 'Could not add lot to database: %s' % (lot_errors)}, status=400)
-    new_lots, new_txs = bulk_insert(context['entity'], [lot], [tx], [lot_errors], [tx_errors])
+    lots = []
+    txs = []
+    lot_errors = []
+    tx_errors = []
+    try:
+        print(drafts)
+        drafts = json.loads(drafts)
+    except Exception as e:
+        print(e)
+        return JsonResponse({'status': 'error', 'message': "Drafts is invalid json"}, status=400)
+
+    for i, draft in enumerate(drafts):
+        lot_dict = {}
+        if not 'tx_id' in draft:
+            return JsonResponse({'status': 'error', 'message': "Missing tx_id in draft %d" % (i)}, status=400)
+        lot_dict['tx_id'] = draft['tx_id']
+        if not 'volume' in draft:
+            return JsonResponse({'status': 'error', 'message': "Missing volume in draft %d" % (i)}, status=400)
+        lot_dict['volume'] = draft['volume']
+        if 'client' not in draft:
+            return JsonResponse({'status': 'error', 'message': "Missing client in draft %d" % (i)}, status=400)
+        lot_dict['client'] = draft['client']
+        if 'delivery_site' not in draft:
+            return JsonResponse({'status': 'error', 'message': "Missing delivery_site in draft %d" % (i)}, status=400)
+        lot_dict['delivery_site'] = draft['delivery_site']
+        if 'delivery_date' not in draft:
+            return JsonResponse({'status': 'error', 'message': "Missing delivery_date in draft %d" % (i)}, status=400)
+        lot_dict['delivery_date'] = draft['delivery_date']
+        if 'dae' not in draft:
+            return JsonResponse({'status': 'error', 'message': "Missing dae in draft %d" % (i)}, status=400)
+        lot_dict['dae'] = draft['dae']
+        if 'delivery_site_country' in draft:
+            lot_dict['delivery_site_country'] = draft['delivery_site_country']
+        # create sub-transaction
+        lot, tx, lot_errors, tx_errors = load_mb_lot(d, context['entity'], request.user, lot_dict, 'MANUAL')
+        if not tx:
+            return JsonResponse({'status': 'error', 'message': 'Could not add lot %d to database: %s' % (i, lot_errors)}, status=400)
+        lots.append(lot)
+        txs.append(tx)
+        lot_errors += lot_errors
+        tx_errors += tx_errors
+    new_lots, new_txs = bulk_insert(context['entity'], lots, txs, lot_errors, tx_errors)
     return JsonResponse({'status': 'success'})
 
 

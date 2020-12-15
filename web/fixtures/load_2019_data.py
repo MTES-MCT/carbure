@@ -75,7 +75,10 @@ for i, lot in enumerate(lots):
             print('Could not find country %s' % (lc))
             print(lot['dae'])
             continue
-    upsc = countries[lc]
+    if lc != '':
+        upsc = countries[lc]
+    else:
+        print('Could not load lot %s' % (lot))
     lupscd = lot['production_site_commissioning_date']
     if type(lupscd) != type(today) and type(lupscd) != type(now):
         if lupscd == None:
@@ -119,11 +122,18 @@ for i, lot in enumerate(lots):
     }
     vol = lot['volume']
     lbc = lot['biocarburant_code']
+    if lbc == 'ET':
+        lbc = 'ETH'
     if lbc not in bcs:
         print('Could not find biocarburant %s' % (lbc))
         continue
     bc = bcs[lbc]
-    lmp = lot['matiere_premiere_code'].upper()
+    lmp = lot['matiere_premiere_code']
+    if lmp:
+        lmp = lmp.upper()
+    else:
+        print('Missing matiere premiere:')
+        print('Could not load lot %s' % (lot))
     if lmp not in mps:
         print('Could not find matiere_premiere %s' % (lmp))
         continue
@@ -135,7 +145,7 @@ for i, lot in enumerate(lots):
     d['pays_origine'] = countries[lpo]
     d['ep'] = lot['ep'] if type(lot['ep']) == 'float' else 0
     d['etd'] = lot['etd'] if type(lot['etd']) == 'float' else 0
-    d['ghg_total'] = lot['Total des émissions de GES']
+    d['ghg_total'] = lot['GES TOTAL']
     d['ghg_reference'] = 83.8
     if d['ghg_total'] is None:
         if d['ep'] + d['etd'] > 0:

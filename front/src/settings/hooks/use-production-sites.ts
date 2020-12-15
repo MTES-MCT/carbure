@@ -51,7 +51,7 @@ export default function useProductionSites(
   const isEmpty = productionSites.length === 0
 
   function refresh() {
-    if (entityID) {
+    if (typeof entityID !== "undefined") {
       resolveGetProductionSites(entityID)
     }
   }
@@ -63,7 +63,7 @@ export default function useProductionSites(
       ProductionSitePromptFactory(entity)
     )
 
-    if (entityID && data && data.country) {
+    if (typeof entityID !== "undefined" && data && data.country) {
       const ps = await resolveAddProductionSite(
         entityID,
         data.name,
@@ -112,7 +112,7 @@ export default function useProductionSites(
       ProductionSitePromptFactory(entity, ps)
     )
 
-    if (entityID && data && data.country) {
+    if (typeof entityID !== "undefined" && data && data.country) {
       const res = await resolveUpdateProductionSite(
         entityID,
         ps.id,
@@ -181,8 +181,8 @@ export default function useProductionSites(
   }
 
   useEffect(() => {
-    if (entityID) {
-      resolveGetProductionSites(entityID)
+    if (typeof entityID !== "undefined") {
+      return resolveGetProductionSites(entityID).cancel
     }
   }, [entityID, resolveGetProductionSites])
 

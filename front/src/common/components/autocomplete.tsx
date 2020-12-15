@@ -118,6 +118,7 @@ export function AutoComplete<T>({
         onChange={onQuery}
         innerRef={target}
         onClick={onQuery}
+        autoComplete="off"
         onBlur={() => dd.toggle(false)}
       />
 

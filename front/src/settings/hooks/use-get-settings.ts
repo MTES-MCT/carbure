@@ -1,7 +1,5 @@
 import { useEffect } from "react"
 
-import { EntitySelection } from "carbure/hooks/use-entity"
-
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
 import { Settings } from "common/types"
@@ -14,14 +12,14 @@ export type SettingsGetter = {
 }
 
 // fetches current snapshot when parameters change
-export function useGetSettings(entity: EntitySelection): SettingsGetter {
+export function useGetSettings(): SettingsGetter {
   const [settings, resolveSettings] = useAPI(api.getSettings)
 
   function resolve() {
     return resolveSettings().cancel
   }
 
-  useEffect(resolve, [resolveSettings, entity])
+  useEffect(resolve, [resolveSettings])
 
   return { ...settings, resolve }
 }

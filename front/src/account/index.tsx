@@ -58,4 +58,5 @@ const Account = ({ settings }: AccountProps) => {
     </Main>
   )
 }
+
 export default Account

@@ -9,8 +9,6 @@ import { Cross } from "./icons"
 
 const DEFAULT_TIMEOUT = 5000
 
-const portal = document.getElementById("notifications")!
-
 interface Notification {
   key: string
   level: "default" | "success" | "error" | "warning"
@@ -95,7 +93,7 @@ const Notifications = ({ notifications }: NotificationsProps) => {
         </Box>
       ))}
     </Box>,
-    portal
+    document.getElementById("notifications")!
   )
 }
 
