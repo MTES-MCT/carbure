@@ -26,6 +26,7 @@ countries = {c.code_pays:c for c in Pays.objects.all()}
 today = datetime.date.today()
 now = datetime.datetime.now()
 mtes = Entity.objects.get(name='MTES - DGEC')
+usermodel.objects.create_user(name='MTES Robot', email='robot@carbure.beta.gouv.fr')
 robot = usermodel.objects.get(name='MTES Robot')
 france = Pays.objects.get(code_pays='FR')
 
