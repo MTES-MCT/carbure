@@ -914,10 +914,8 @@ def validate_lots(user, tx_ids):
             tx.lot.carbure_id = generate_carbure_id(tx.lot)
             tx.lot.status = "Validated"
 
-            # when the lot is added to mass balance, auto-accept
-            if tx.carbure_client == tx.carbure_vendor:
-                tx.delivery_status = 'A'
-            elif tx.carbure_client and tx.carbure_client.entity_type == 'Opérateur':
+            # if we create a lot for ourselves
+            if tx.carbure_client and tx.lot.added_by == tx.carbure_client:
                 tx.delivery_status = 'A'
             # if the client is not in carbure, auto-accept
             elif not tx.client_is_in_carbure:
