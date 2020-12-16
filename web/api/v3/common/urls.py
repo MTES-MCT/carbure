@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # GET
     path('matieres-premieres', views.get_matieres_premieres, name='api-v3-public-matieres-premieres'),
     path('biocarburants', views.get_biocarburants, name='api-v3-public-biocarburants'),
     path('countries', views.get_countries, name='api-v3-public-countries'),
@@ -14,5 +15,7 @@ urlpatterns = [
     path('production-sites', views.get_production_sites, name='api-v3-public-get-production-sites'),
     path('iscc-certificates', views.get_iscc_certificates, name='api-v3-public-search-iscc-certificates'),
     path('2bs-certificates', views.get_2bs_certificates, name='api-v3-public-search-2bs-certificates'),
+
+    # POST
     path('create-delivery-site', views.create_delivery_site, name='api-v3-public-create-delivery-site'),
 ]
