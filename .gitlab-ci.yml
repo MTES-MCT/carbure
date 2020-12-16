@@ -54,7 +54,7 @@ test:
     - export CARBURE_HOME=/builds/la-fabrique-numerique/biocarburants/
     - export TEST=1
     - echo "Testing..."
-    - coverage run --source='/app/web' /app/web/manage.py test --keepdb
+    - coverage run --source='/app/web' /app/web/manage.py test
     - coverage report
     
 dev_push_django:
