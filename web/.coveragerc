@@ -1,4 +1,5 @@
 [run]
+include = /app/web/*
 omit =
     # omit migration directories
     */migrations/*
