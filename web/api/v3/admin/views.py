@@ -86,6 +86,9 @@ def add_entity(request):
     if not entity_type:
         return JsonResponse({'status': 'error', 'message': "Please provide a value in field Category"}, status=400)
 
+    if entity_type not in [c[0] for c in Entity.ENTITY_TYPES]:
+        return JsonResponse({'status': 'error', 'message': "Unknown Category"}, status=400)
+
     try:
         obj, created = Entity.objects.update_or_create(name=name, entity_type=entity_type)
     except Exception as e:

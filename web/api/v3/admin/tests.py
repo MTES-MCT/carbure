@@ -150,12 +150,13 @@ class AdminAPITest(TestCase):
         self.assertTrue(loggedin)
         response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Société Test', 'category': 'Producteur'})
         self.assertEquals(response.status_code, 200)
-        # check if user actually exists
-        response = self.client.get(reverse('api-v3-admin-get-users') + '?q=jc.test@pouet.net')
+        # check if entity has been created actually exists
+        response = self.client.get(reverse('api-v3-admin-get-entities') + '?q=Test')
         self.assertEqual(response.status_code, 200)
-        # and returns 1 user
+        # and returns 1 entity
         jc = response.json()['data'][0]
-        self.assertEqual(jc['email'], 'jc.test@pouet.net')
+        self.assertEqual(jc['name'], 'Société Test')
+        self.assertEqual(jc['entity_type'], 'Producteur')
 
         # make sure all categories are supported
         response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Opérateur Test', 'category': 'Opérateur'})
@@ -164,17 +165,21 @@ class AdminAPITest(TestCase):
         response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Trader Test', 'category': 'Trader'})
         obj = Entity.objects.get(name='Trader Test')
         self.assertEquals(obj.entity_type, 'Trader')        
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Admin Test', 'category': 'Administrateur'})
+        response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Admin Test', 'category': 'Administration'})
         obj = Entity.objects.get(name='Admin Test')
-        self.assertEquals(obj.entity_type, 'Administrateur')
+        self.assertEquals(obj.entity_type, 'Administration')
 
 
-        # try to enter incorrect data
-        response = self.client.post(reverse('api-v3-admin-add-user'))
+        # try to create with missing data
+        response = self.client.post(reverse('api-v3-admin-add-entity'))
         self.assertEqual(response.status_code, 400)
-        response = self.client.post(reverse('api-v3-admin-add-user'), {'email': 'jc.test@pouet.net'})
+        response = self.client.post(reverse('api-v3-admin-add-entity'), {'category': 'Producteur'})
         self.assertEqual(response.status_code, 400)
-        response = self.client.post(reverse('api-v3-admin-add-user'), {'name': 'Jean-Claude Test'})
+        response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Jean-Claude Test'})
+        self.assertEqual(response.status_code, 400)
+
+        # try to enter wrong data
+        response = self.client.post(reverse('api-v3-admin-add-entity'), {'category': 'Boucher', 'name': 'Boucherie du Marais'})
         self.assertEqual(response.status_code, 400)
 
 
@@ -203,9 +208,9 @@ class AdminAPITest(TestCase):
         self.assertGreater(new_len, prev_len)
 
         # check if search function works
-        response = self.client.get(reverse('api-v3-admin-get-rights') + '?q=Admin%20Test')
+        response = self.client.get(reverse('api-v3-admin-get-rights') + '?q=%s' % (self.user3.name))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()['data']), 1)
+        self.assertGreater(len(response.json()['data']), 0)
 
         # try to enter incorrect data
         response = self.client.post(reverse('api-v3-admin-add-rights'), {'user_id': "pouet pouet", 'entity_id': self.entity5.id})
@@ -231,7 +236,7 @@ class AdminAPITest(TestCase):
         user_id = response.json()['data'][0]['id']
 
         # delete user
-        response = self.client.post(reverse('api-v3-admin-delete-users'), {'user_id': user_id})
+        response = self.client.post(reverse('api-v3-admin-delete-user'), {'user_id': user_id})
         self.assertEqual(response.status_code, 200)        
 
         # check if user is deleted
@@ -241,10 +246,49 @@ class AdminAPITest(TestCase):
 
 
     def test_delete_entity(self):
-        pass
+        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
+        self.assertTrue(loggedin)
+
+        response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Société Test', 'category': 'Producteur'})
+        self.assertEquals(response.status_code, 200)
+
+        # check if entity has been created
+        response = self.client.get(reverse('api-v3-admin-get-entities') + '?q=Test')
+        self.assertEqual(response.status_code, 200)
+        # and returns 1 entity
+        jc = response.json()['data'][0]
+        self.assertEqual(jc['name'], 'Société Test')
+        entity_id = jc['id']
+
+        # delete entity
+        response = self.client.post(reverse('api-v3-admin-delete-entity'), {'entity_id': entity_id})
+        self.assertEqual(response.status_code, 200)        
+
+        # check if entity is deleted
+        response = self.client.get(reverse('api-v3-admin-get-entities') + '?q=Test')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['data']), 0)
     
+
     def test_delete_right(self):
-        pass
+        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
+        self.assertTrue(loggedin)
+
+        # create right
+        response = self.client.post(reverse('api-v3-admin-add-rights'), {'user_id': self.user3.id, 'entity_id': self.entity5.id})
+        self.assertEquals(response.status_code, 200)
+
+        # check if right has been created
+        obj = UserRights.objects.get(user=self.user3, entity=self.entity5)
+
+        # delete right
+        response = self.client.post(reverse('api-v3-admin-delete-rights'), {'right_id': obj.id})
+        self.assertEqual(response.status_code, 200)
+
+        # check if right has been deleted
+        obj = UserRights.objects.filter(user=self.user3, entity=self.entity5)
+        self.assertEqual(len(obj), 0)
+
 
     def test_reset_password(self):
         pass
