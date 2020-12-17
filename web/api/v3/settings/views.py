@@ -49,13 +49,13 @@ def get_production_sites(request, *args, **kwargs):
 
     return JsonResponse({'status': 'success', 'data': data})
 
-
-def add_production_site(request):
+@check_rights('entity_id')
+def add_production_site(request, *args, **kwargs):
     country = request.POST.get('country_code')
     name = request.POST.get('name')
     date_mise_en_service = request.POST.get('date_mise_en_service')
     ges_option = request.POST.get('ges_option')
-    producer = request.POST.get('producer_id')
+    producer = request.POST.get('entity_id')
 
     eligible_dc = request.POST.get('eligible_dc')
     eligible_dc = eligible_dc == 'true'

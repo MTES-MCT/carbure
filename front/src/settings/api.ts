@@ -38,7 +38,7 @@ export function addProductionSite(
   manager_email: string
 ): Promise<ProductionSite> {
   return api.post("/settings/add-production-site", {
-    producer_id: producerID,
+    entity_id: producerID,
     name: name,
     date_mise_en_service: date_mise_en_service,
     ges_option: ges_option,

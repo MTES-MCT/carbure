@@ -14,7 +14,7 @@ urlpatterns = [
      path('get-production-sites', views.get_production_sites, name='api-v3-settings-get-production-sites'),
      path('add-production-site', views.add_production_site, name='api-v3-settings-add-production-site'),
      path('delete-production-site', views.delete_production_site, name='api-v3-settings-delete-production-site'),
-     path('update-production-site', views.update_production_site, name='api-v3-settings-update-production_site'),
+     path('update-production-site', views.update_production_site, name='api-v3-settings-update-production-site'),
 
      path('set-production-site-matieres-premieres', views.set_production_site_mp,
           name='api-v3-settings-set-production-site-matieres-premieres'),
