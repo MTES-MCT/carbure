@@ -34,9 +34,11 @@ COPY web/traders /app/web/traders
 COPY web/fixtures /app/web/fixtures
 COPY web/api /app/web/api
 COPY web/run.sh /app/web/run.sh
+COPY web/.coveragerc /app/web
 
 COPY scripts /app/scripts
 COPY cron /app/cron
+
 
 
 
