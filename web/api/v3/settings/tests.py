@@ -6,289 +6,117 @@ from core.models import Entity, UserRights
 from api.v3.admin.urls import urlpatterns
 
 
-class AdminAPITest(TestCase):
+class SettingsAPITest(TestCase):
     def setUp(self):
         user_model = get_user_model()
-        self.admin_email = 'superadmin@carbure.beta.gouv.fr'
-        self.admin_password = 'toto'
-        self.fake_admin_email = 'fakeadmin@carbure.beta.gouv.fr'
-        self.fake_admin_password = 'toto'
-
-        self.admin_user = user_model.objects.create_user(email=self.admin_email, name='Super Admin', password=self.admin_password, is_staff=True)
-        self.fake_admin_user = user_model.objects.create_user(email=self.fake_admin_email, name='Super Admin', password=self.fake_admin_password)
-
-        # let's create a few users
-        self.user1 = user_model.objects.create_user(email='testuser1@toto.com', name='Le Super Testeur 1', password=self.fake_admin_password)
-        self.user2 = user_model.objects.create_user(email='testuser2@toto.com', name='Le Super Testeur 2', password=self.fake_admin_password)
-        self.user3 = user_model.objects.create_user(email='testuser3@toto.com', name='Testeur 3', password=self.fake_admin_password)
+        self.user_email = 'testuser1@toto.com'
+        self.user_password = 'totopouet'
+        self.user1 = user_model.objects.create_user(email=self.user_email, name='Le Super Testeur 1', password=self.user_password)
 
         # a few entities
         self.entity1, _ = Entity.objects.update_or_create(name='Le Super Producteur 1', entity_type='Producteur')
-        self.entity2, _ = Entity.objects.update_or_create(name='Le Super Producteur 2', entity_type='Producteur')
-        self.entity3, _ = Entity.objects.update_or_create(name='Le Super Administrateur 1', entity_type='Administrateur')
-        self.entity4, _ = Entity.objects.update_or_create(name='Le Super Operateur 1', entity_type='Opérateur')
-        self.entity5, _ = Entity.objects.update_or_create(name='Le Super Trader 1', entity_type='Trader')        
+        self.entity2, _ = Entity.objects.update_or_create(name='Le Super Operateur 1', entity_type='Opérateur')
+        self.entity3, _ = Entity.objects.update_or_create(name='Le Super Trader 1', entity_type='Trader')
 
         # some rights
         UserRights.objects.update_or_create(user=self.user1, entity=self.entity1)
-        UserRights.objects.update_or_create(user=self.user1, entity=self.entity2)
-        UserRights.objects.update_or_create(user=self.user1, entity=self.entity3)
-        UserRights.objects.update_or_create(user=self.user2, entity=self.entity2)
-        UserRights.objects.update_or_create(user=self.user3, entity=self.entity4)
+        UserRights.objects.update_or_create(user=self.user1, entity=self.entity2)         
 
-    def test_accessrights(self):
-        loggedin = self.client.login(username=self.fake_admin_email, password=self.fake_admin_password)
-        self.assertTrue(loggedin)
-        for url in urlpatterns:
-            response = self.client.get(reverse(url.name))
-            self.assertEqual(response.status_code, 403)
-        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
-        self.assertTrue(loggedin)
-        for url in urlpatterns:
-            response = self.client.get(reverse(url.name))
-            self.assertNotEqual(response.status_code, 403)
-            
-
-    def test_get_users(self):
-        # login as an admin
-        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
+        loggedin = self.client.login(username=self.user_email, password=self.user_password)
         self.assertTrue(loggedin)
 
-        response = self.client.get(reverse('api-v3-admin-get-users'))
+    def test_get_settings(self):
+        url = 'api-v3-settings-get'
+        response = self.client.get(reverse(url))
         # api works
         self.assertEqual(response.status_code, 200)
-        # and returns at least 3 users
-        self.assertGreaterEqual(len(response.json()['data']), 3)
-        # check if querying works
-        response = self.client.get(reverse('api-v3-admin-get-users') + '?q=super')
-        # works
-        self.assertEqual(response.status_code, 200)
-        # and returns at least 2 users
         data = response.json()['data']
-        self.assertGreaterEqual(len(data), 2)
-        # check if the content is correct
-        random_user = data[0]
-        self.assertIn('email', random_user)
-        self.assertIn('name', random_user)
+        self.assertIn('rights', data)
+        self.assertIn('email', data)
+        self.assertIn('requests', data)
 
+    def test_mac_option(self):
+        url_enable = 'api-v3-settings-enable-mac'
+        url_disable = 'api-v3-settings-disable-mac'
 
-    def test_get_entities(self):
-        # login as an admin
-        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
-        self.assertTrue(loggedin)
-
-        response = self.client.get(reverse('api-v3-admin-get-entities'))
-        # api works
-        self.assertEqual(response.status_code, 200)
-        # and returns at least 5 entities
-        self.assertGreaterEqual(len(response.json()['data']), 5)
-        # check if querying works
-        response = self.client.get(reverse('api-v3-admin-get-entities') + '?q=prod')
-        # works
-        self.assertEqual(response.status_code, 200)
-        # and returns at least 2 entities
-        data = response.json()['data']
-        self.assertGreaterEqual(len(data), 2)
-        # check if the content is correct
-        random_entity = data[0]
-        self.assertIn('entity_type', random_entity)
-        self.assertIn('name', random_entity)
-
-
-    def test_get_rights(self):
-        # login as an admin
-        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
-        self.assertTrue(loggedin)
-
-        response = self.client.get(reverse('api-v3-admin-get-rights'))
-        # api works
-        self.assertEqual(response.status_code, 200)
-        # and returns at least 5 rights
-        lenallrights = len(response.json()['data'])
-        self.assertGreaterEqual(lenallrights, 5)
-        # check if querying works
-        response = self.client.get(reverse('api-v3-admin-get-rights') + '?q=prod')
-        # works
-        self.assertEqual(response.status_code, 200)
-        # and returns less rights than before
-        filtered_rights = response.json()['data']
-        lenfilteredrights = len(filtered_rights)
-        self.assertGreater(lenallrights, lenfilteredrights)
-        # check if the content is correct
-        random_right = filtered_rights[0]
-        self.assertIn('entity_type', random_right)
-        self.assertIn('entity', random_right)
-        self.assertIn('name', random_right)
-        self.assertIn('email', random_right)
-
-
-    def test_create_user(self):
-        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
-        self.assertTrue(loggedin)
-        response = self.client.post(reverse('api-v3-admin-add-user'), {'name': 'Jean-Claude Test', 'email': 'jc.test@pouet.net'})
-        self.assertEquals(response.status_code, 200)
-
-        # check if user actually exists
-        response = self.client.get(reverse('api-v3-admin-get-users') + '?q=jc.test@pouet.net')
-        self.assertEqual(response.status_code, 200)
-        # and returns 1 user
-        jc = response.json()['data'][0]
-        self.assertEqual(jc['email'], 'jc.test@pouet.net')
-
-        # try to enter incorrect data
-        response = self.client.post(reverse('api-v3-admin-add-user'))
+        # wrongly formatted
+        response = self.client.post(reverse(url_enable), {'entity_id':'blablabla'})
         self.assertEqual(response.status_code, 400)
-        response = self.client.post(reverse('api-v3-admin-add-user'), {'email': 'jc.test@pouet.net'})
+        # no entity_id
+        response = self.client.post(reverse(url_enable))
         self.assertEqual(response.status_code, 400)
-        response = self.client.post(reverse('api-v3-admin-add-user'), {'name': 'Jean-Claude Test'})
-        self.assertEqual(response.status_code, 400)
-
-
-
-    def test_create_entity(self):
-        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
-        self.assertTrue(loggedin)
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Société Test', 'category': 'Producteur'})
-        self.assertEquals(response.status_code, 200)
-        # check if entity has been created actually exists
-        response = self.client.get(reverse('api-v3-admin-get-entities') + '?q=Test')
+        # entity I do not belong to
+        response = self.client.post(reverse(url_enable), {'entity_id': self.entity3.id})
+        self.assertEqual(response.status_code, 403)
+        # should pass
+        response = self.client.post(reverse(url_enable), {'entity_id': self.entity2.id})
         self.assertEqual(response.status_code, 200)
-        # and returns 1 entity
-        jc = response.json()['data'][0]
-        self.assertEqual(jc['name'], 'Société Test')
-        self.assertEqual(jc['entity_type'], 'Producteur')
+        entity = Entity.objects.get(id=self.entity2.id)
+        self.assertEqual(entity.has_mac, True)
 
-        # make sure all categories are supported
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Opérateur Test', 'category': 'Opérateur'})
-        obj = Entity.objects.get(name='Opérateur Test')
-        self.assertEquals(obj.entity_type, 'Opérateur')
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Trader Test', 'category': 'Trader'})
-        obj = Entity.objects.get(name='Trader Test')
-        self.assertEquals(obj.entity_type, 'Trader')        
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Admin Test', 'category': 'Administration'})
-        obj = Entity.objects.get(name='Admin Test')
-        self.assertEquals(obj.entity_type, 'Administration')
-
-
-        # try to create with missing data
-        response = self.client.post(reverse('api-v3-admin-add-entity'))
+        # disable:
+        # wrongly formatted
+        response = self.client.post(reverse(url_disable), {'entity_id':'blablabla'})
         self.assertEqual(response.status_code, 400)
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'category': 'Producteur'})
+        # no entity_id
+        response = self.client.post(reverse(url_disable))
         self.assertEqual(response.status_code, 400)
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Jean-Claude Test'})
-        self.assertEqual(response.status_code, 400)
-
-        # try to enter wrong data
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'category': 'Boucher', 'name': 'Boucherie du Marais'})
-        self.assertEqual(response.status_code, 400)
-
-
-    def test_create_right(self):
-        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
-        self.assertTrue(loggedin)
-
-        # first RO call to api:
-        response = self.client.get(reverse('api-v3-admin-get-rights'))
-        self.assertEqual(response.status_code, 200)        
-        prev_len = len(response.json()['data'])
-
-        # create right
-        response = self.client.post(reverse('api-v3-admin-add-rights'), {'user_id': self.user3.id, 'entity_id': self.entity5.id})
-        self.assertEquals(response.status_code, 200)
-
-        # check if right has been created
-        obj = UserRights.objects.get(user=self.user3, entity=self.entity5)
-        self.assertEquals(obj.user.id, self.user3.id)
-        self.assertEquals(obj.entity.id, self.entity5.id)
-
-        # check than api get-rights len has increased
-        response = self.client.get(reverse('api-v3-admin-get-rights'))
+        # entity I do not belong to
+        response = self.client.post(reverse(url_disable), {'entity_id': self.entity3.id})
+        self.assertEqual(response.status_code, 403)
+        # should pass
+        response = self.client.post(reverse(url_disable), {'entity_id': self.entity2.id})
         self.assertEqual(response.status_code, 200)
-        new_len = len(response.json()['data'])
-        self.assertGreater(new_len, prev_len)
+        entity = Entity.objects.get(id=self.entity2.id)
+        self.assertEqual(entity.has_mac, False)        
 
-        # check if search function works
-        response = self.client.get(reverse('api-v3-admin-get-rights') + '?q=%s' % (self.user3.name))
+        # revert
+        response = self.client.post(reverse(url_enable), {'entity_id': self.entity2.id})
         self.assertEqual(response.status_code, 200)
-        self.assertGreater(len(response.json()['data']), 0)
+        entity = Entity.objects.get(id=self.entity2.id)
+        self.assertEqual(entity.has_mac, True)
 
-        # try to enter incorrect data
-        response = self.client.post(reverse('api-v3-admin-add-rights'), {'user_id': "pouet pouet", 'entity_id': self.entity5.id})
+    def test_trading_option(self):
+        url_enable = 'api-v3-settings-enable-trading'
+        url_disable = 'api-v3-settings-disable-trading'
+
+        # wrongly formatted
+        response = self.client.post(reverse(url_enable), {'entity_id':'blablabla'})
         self.assertEqual(response.status_code, 400)
-        response = self.client.post(reverse('api-v3-admin-add-rights'), {'user_id': self.user3.id, 'entity_id': "pouet pouet"})
+        # no entity_id
+        response = self.client.post(reverse(url_enable))
         self.assertEqual(response.status_code, 400)
-        response = self.client.post(reverse('api-v3-admin-add-rights'), {'user_id': self.user3.id})
+        # entity I do not belong to
+        response = self.client.post(reverse(url_enable), {'entity_id': self.entity3.id})
+        self.assertEqual(response.status_code, 403)
+        # should pass
+        response = self.client.post(reverse(url_enable), {'entity_id': self.entity1.id})
+        self.assertEqual(response.status_code, 200)
+        entity = Entity.objects.get(id=self.entity1.id)
+        self.assertEqual(entity.has_trading, True)
+
+        # disable:
+        # wrongly formatted
+        response = self.client.post(reverse(url_disable), {'entity_id':'blablabla'})
         self.assertEqual(response.status_code, 400)
-        response = self.client.post(reverse('api-v3-admin-add-rights'), {'entity_id': self.entity5.id})
+        # no entity_id
+        response = self.client.post(reverse(url_disable))
         self.assertEqual(response.status_code, 400)
-
-
-    def test_delete_user(self):
-        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
-        self.assertTrue(loggedin)
-
-        response = self.client.post(reverse('api-v3-admin-add-user'), {'name': 'Jean-Claude Test', 'email': 'jc.test@pouet.net'})
-        self.assertEquals(response.status_code, 200)
-
-        # check if user is created
-        response = self.client.get(reverse('api-v3-admin-get-users') + '?q=jc.test@pouet.net')
+        # entity I do not belong to
+        response = self.client.post(reverse(url_disable), {'entity_id': self.entity3.id})
+        self.assertEqual(response.status_code, 403)
+        # should pass
+        response = self.client.post(reverse(url_disable), {'entity_id': self.entity1.id})
         self.assertEqual(response.status_code, 200)
-        user_id = response.json()['data'][0]['id']
+        entity = Entity.objects.get(id=self.entity1.id)
+        self.assertEqual(entity.has_trading, False)        
 
-        # delete user
-        response = self.client.post(reverse('api-v3-admin-delete-user'), {'user_id': user_id})
-        self.assertEqual(response.status_code, 200)        
-
-        # check if user is deleted
-        response = self.client.get(reverse('api-v3-admin-get-users') + '?q=jc.test@pouet.net')
+        # revert
+        response = self.client.post(reverse(url_enable), {'entity_id': self.entity1.id})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()['data']), 0)
+        entity = Entity.objects.get(id=self.entity1.id)
+        self.assertEqual(entity.has_trading, True)
 
-
-    def test_delete_entity(self):
-        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
-        self.assertTrue(loggedin)
-
-        response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Société Test', 'category': 'Producteur'})
-        self.assertEquals(response.status_code, 200)
-
-        # check if entity has been created
-        response = self.client.get(reverse('api-v3-admin-get-entities') + '?q=Test')
-        self.assertEqual(response.status_code, 200)
-        # and returns 1 entity
-        jc = response.json()['data'][0]
-        self.assertEqual(jc['name'], 'Société Test')
-        entity_id = jc['id']
-
-        # delete entity
-        response = self.client.post(reverse('api-v3-admin-delete-entity'), {'entity_id': entity_id})
-        self.assertEqual(response.status_code, 200)        
-
-        # check if entity is deleted
-        response = self.client.get(reverse('api-v3-admin-get-entities') + '?q=Test')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()['data']), 0)
-    
-
-    def test_delete_right(self):
-        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
-        self.assertTrue(loggedin)
-
-        # create right
-        response = self.client.post(reverse('api-v3-admin-add-rights'), {'user_id': self.user3.id, 'entity_id': self.entity5.id})
-        self.assertEquals(response.status_code, 200)
-
-        # check if right has been created
-        obj = UserRights.objects.get(user=self.user3, entity=self.entity5)
-
-        # delete right
-        response = self.client.post(reverse('api-v3-admin-delete-rights'), {'right_id': obj.id})
-        self.assertEqual(response.status_code, 200)
-
-        # check if right has been deleted
-        obj = UserRights.objects.filter(user=self.user3, entity=self.entity5)
-        self.assertEqual(len(obj), 0)
-
-
-    def test_reset_password(self):
-        pass
+        # should not work on Operator
+        response = self.client.post(reverse(url_enable), {'entity_id': self.entity2.id})
+        self.assertEqual(response.status_code, 400)        
