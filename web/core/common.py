@@ -877,9 +877,9 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
     TransactionError.objects.bulk_create(flat_tx_errors, batch_size=100)
     # 8 run sanity checks
     print('calling bulk_sanity_check in background %s' % (datetime.datetime.now()))
-    p = Process(target=bulk_sanity_checks, args=(new_txs))
+    p = Process(target=bulk_sanity_checks, args=[new_txs])
     p.start()
-    d = Process(target=check_duplicates, args=(new_txs))
+    d = Process(target=check_duplicates, args=[new_txs])
     d.start()
     return new_lots, new_txs
 
