@@ -487,12 +487,15 @@ const TransactionForm = ({
               label="Total"
               name="ghg_total"
               defaultValue={`${tx.ghg_total} gCO2eq/MJ`}
+              value={`${tx.ghg_total} gCO2eq/MJ`}
+
             />
             <LabelInput
               readOnly
               label="Réduction"
               name="ghg_reduction"
               defaultValue={`${tx.ghg_reduction}%`}
+              value={`${tx.ghg_reduction}%`}
             />
           </Box>
         </Box>
