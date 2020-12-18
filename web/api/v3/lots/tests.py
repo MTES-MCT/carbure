@@ -83,7 +83,21 @@ class LotsAPITest(TransactionTestCase):
         # update lots who do not have a dae
         for i, lot in enumerate(lots):
             if lot['dae'] == '':
-                postdata = {'tx_id': lot['id'], 'dae': 'DAEUPDATED%d' % (i)}
+                postdata = {
+                    'tx_id': lot['id'],
+                    'production_site': self.production_site.name,
+                    'biocarburant_code': 'ETH',
+                    'matiere_premiere_code': 'BT',
+                    'volume': 15000,
+                    'pays_origine_code': 'FR',
+                    'ep': 20,
+                    'etd': 12,
+                    'dae': 'DAEUPDATED%d' % (i),
+                    'delivery_date': '2020-12-31',
+                    'client': self.entity2.name,
+                    'delivery_site': '001',
+                    'entity_id': self.entity1.id,
+                }
                 response = self.client.post(reverse('api-v3-update-lot'), postdata)
                 self.assertEqual(response.status_code, 200)        
 
@@ -98,9 +112,6 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(response.status_code, 200)        
         data = response.json()['data']
         lots = data['lots']
-        for lot in lots:
-            print(lot)
-        print(data['errors'])
         self.assertEqual(len(lots), 0)
 
 
@@ -111,16 +122,17 @@ class LotsAPITest(TransactionTestCase):
         lots = response.json()['data']['lots']
         self.assertEqual(len(lots), 3)    
         # reject first
-        response = self.client.post(reverse('api-v3-reject-lot'), {'entity_id': self.entity2.id, 'tx_id': tx.id})
+        tx_id1 = lots[0]['id']
+        response = self.client.post(reverse('api-v3-reject-lot'), {'entity_id': self.entity2.id, 'tx_ids': [tx_id1], 'comment': 'auto-reject-test'})
         self.assertEqual(response.status_code, 200)        
         # accept-with-reserves second + add comment
         tx_id2 = lots[1]['id']
-        response = self.client.post(reverse('api-v3-accept-with-reserves'), {'entity_id': self.entity2.id, 'tx_id': tx_id2})
+        response = self.client.post(reverse('api-v3-accept-lot-with-reserves'), {'entity_id': self.entity2.id, 'tx_ids': [tx_id2]})
         self.assertEqual(response.status_code, 200)        
         # accept third
         tx_id3 = lots[2]['id']
-        response = self.client.post(reverse('api-v3-accept'), {'entity_id': self.entity2.id, 'tx_ids': [tx_id3]})
-        self.assertEqual(response.status_code, 200)        
+        response = self.client.post(reverse('api-v3-accept-lot'), {'entity_id': self.entity2.id, 'tx_ids': [tx_id3]})
+        self.assertEqual(response.status_code, 200)
 
 
     def test_producer_imports(self):

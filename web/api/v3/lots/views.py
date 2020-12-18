@@ -481,7 +481,7 @@ def update_lot(request):
         check_duplicates([tx], background=False)
         return JsonResponse({'status': 'success'})
     else:
-        return JsonResponse({'status': 'error', 'message': 'Could not save lot: %s' % (lot_errors)})
+        return JsonResponse({'status': 'error', 'message': 'Could not save lot: %s' % (lot_errors)}, status=400)
 
 
 def duplicate_lot(request):
