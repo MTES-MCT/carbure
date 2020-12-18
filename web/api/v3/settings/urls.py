@@ -21,15 +21,6 @@ urlpatterns = [
      path('set-production-site-biocarburants', views.set_production_site_bc,
           name='api-v3-settings-set-production-site-biocarburants'),
 
-     path('add-production-site-matiere-premiere', views.add_production_site_mp,
-          name='api-v3-settings-add-production-site-matiere-premiere'),
-     path('delete-production-site-matiere-premiere', views.delete_production_site_mp,
-          name='api-v3-settings-delete-production-site-matiere-premiere'),
-     path('add-production-site-biocarburant', views.add_production_site_bc,
-          name='api-v3-settings-add-production-site-biocarburant'),
-     path('delete-production-site-biocarburant', views.delete_production_site_bc,
-          name='api-v3-settings-delete-production-site-biocarburant'),
-
      path('get-delivery-sites', views.get_delivery_sites, name='api-v3-settings-get-delivery-sites'),
      path('add-delivery-site', views.add_delivery_site, name='api-v3-settings-add-delivery-site'),
      path('delete-delivery-site', views.delete_delivery_site, name='api-v3-settings-delete-delivery-site'),

@@ -2,7 +2,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from core.models import Entity, UserRights, Pays, ProductionSite
+from core.models import Entity, UserRights, Pays, MatierePremiere, Biocarburant
+from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 from api.v3.admin.urls import urlpatterns
 
 
@@ -151,6 +152,8 @@ class SettingsAPITest(TestCase):
         url_add = 'api-v3-settings-add-production-site'
         url_update = 'api-v3-settings-update-production-site'
         url_delete = 'api-v3-settings-delete-production-site'
+        url_set_mps = 'api-v3-settings-set-production-site-matieres-premieres'
+        url_set_bcs = 'api-v3-settings-set-production-site-biocarburants'
 
         # get - 0 sites
         response = self.client.get(reverse(url_get), {'entity_id': self.entity1.id})
@@ -177,6 +180,22 @@ class SettingsAPITest(TestCase):
         self.assertEqual(response.status_code, 200)   
         site = ProductionSite.objects.get(site_id='FR0001')
         self.assertEqual(site.postal_code, '75018')
+        # set mps/bcs
+        MatierePremiere.objects.update_or_create(code='COLZA', name='Colza')
+        MatierePremiere.objects.update_or_create(code='BEETROOT', name='Betterave')
+        Biocarburant.objects.update_or_create(code='ETH', name='Ethanol')
+        Biocarburant.objects.update_or_create(code='HVO', name='HVO')
+
+        response = self.client.post(reverse(url_set_mps), {'production_site_id': site.id, 'matiere_premiere_codes': ['COLZA', 'BEETROOT']})
+        self.assertEqual(response.status_code, 200)   
+        response = self.client.post(reverse(url_set_bcs), {'production_site_id': site.id, 'biocarburant_codes': ['ETH', 'HVO']})
+        self.assertEqual(response.status_code, 200)   
+        # check
+        inputs = ProductionSiteInput.objects.filter(production_site=site)
+        outputs = ProductionSiteOutput.objects.filter(production_site=site)
+        self.assertEqual(len(inputs), 2)
+        self.assertEqual(len(outputs), 2)
+
         # delete
         response = self.client.post(reverse(url_delete), psite)
         self.assertEqual(response.status_code, 200)   
@@ -186,4 +205,3 @@ class SettingsAPITest(TestCase):
         data = response.json()['data']
         self.assertEqual(len(data), 0)
 
-    
