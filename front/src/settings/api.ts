@@ -94,16 +94,6 @@ export function deleteProductionSite(productionSiteID: number) {
   })
 }
 
-export function addProductionSiteMP(
-  productionSiteID: number,
-  matiere_premiere_code: string
-) {
-  return api.post("/settings/add-production-site-matiere-premiere", {
-    production_site_id: productionSiteID,
-    matiere_premiere_code: matiere_premiere_code,
-  })
-}
-
 export function setProductionSiteMP(
   productionSiteID: number,
   matieresPremieres: string[]
@@ -121,16 +111,6 @@ export function setProductionSiteBC(
   return api.post("/settings/set-production-site-biocarburants", {
     production_site_id: productionSiteID,
     biocarburant_codes: biocarburants,
-  })
-}
-
-export function addProductionSiteBC(
-  productionSiteID: number,
-  biocarburant_code: string
-) {
-  return api.post("/settings/add-production-site-biocarburant", {
-    production_site_id: productionSiteID,
-    biocarburant_code: biocarburant_code,
   })
 }
 
