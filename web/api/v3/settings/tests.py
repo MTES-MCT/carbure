@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from core.models import Entity, UserRights, Pays, MatierePremiere, Biocarburant
+from core.models import Entity, UserRights, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 from api.v3.admin.urls import urlpatterns
 
@@ -205,3 +205,34 @@ class SettingsAPITest(TestCase):
         data = response.json()['data']
         self.assertEqual(len(data), 0)
 
+    def test_delivery_sites_settings(self):
+        url_get = 'api-v3-settings-get-delivery-sites'
+        url_add = 'api-v3-settings-add-delivery-site'
+        url_delete = 'api-v3-settings-delete-delivery-site'
+        # get 0
+        response = self.client.get(reverse(url_get), {'entity_id': self.entity1.id})
+        self.assertEqual(response.status_code, 200)
+        data = response.json()['data']
+        self.assertEqual(len(data), 0)
+        # add
+        france, _ = Pays.objects.update_or_create(code_pays='FR', name='France')
+        depot, _ = Depot.objects.update_or_create(depot_id='TEST', name='toto', city='paris', country=france)
+        postdata = {'entity_id': self.entity1.id, 'delivery_site_id': depot.depot_id, 'ownership_type': 'OWN'}
+        response = self.client.post(reverse(url_add), postdata)
+        self.assertEqual(response.status_code, 200)
+        # get 1
+        response = self.client.get(reverse(url_get), {'entity_id': self.entity1.id})
+        self.assertEqual(response.status_code, 200)
+        data = response.json()['data']
+        self.assertEqual(len(data), 1)
+        # delete
+        response = self.client.post(reverse(url_delete), {'entity_id': self.entity1.id, 'delivery_site_id':depot.depot_id})
+        self.assertEqual(response.status_code, 200)        
+        # get 0
+        response = self.client.get(reverse(url_get), {'entity_id': self.entity1.id})
+        self.assertEqual(response.status_code, 200)
+        data = response.json()['data']
+        self.assertEqual(len(data), 0)
+
+    def test_iscc_certificates(self):
+        pass
