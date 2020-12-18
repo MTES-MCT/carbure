@@ -505,47 +505,6 @@ def set_production_site_certificates(request, *args, **kwargs):
 
     return JsonResponse({'status': 'success'})
 
-@check_rights('entity_id')
-def add_production_site_certificate(request, *args, **kwargs):
-    context = kwargs['context']
-    certificate_id = request.POST.get('certificate_id', False)
-    certificate_type = request.POST.get('certificate_type', False)
-
-    certificate_iscc = None
-    certificate_2bs = None
-    try:
-        if certificate_type == 'ISCC':
-            certificate_iscc = EntityISCCTradingCertificate.objects.get(certificate_id=certificate_id)
-        else:
-            certificate_2bs = EntityDBSTradingCertificate.objects.get(certificate_id=certificate_id)
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
-
-    ProductionSiteCertificate.objects.update_or_create(entity=context['entity'], type=certificate_type, certificate_2bs=certificate_2bs, certificate_iscc=certificate_iscc)
-    return JsonResponse({'status': 'success'})
-
-
-@check_rights('entity_id')
-def delete_production_site_certificate(request, *args, **kwargs):
-    context = kwargs['context']
-    certificate_id = request.POST.get('certificate_id', False)
-    certificate_type = request.POST.get('certificate_type', False)
-
-    if not certificate_id:
-        return JsonResponse({'status': 'error', 'message': 'Please provide a certificate_id'}, status=400)
-    if not certificate_type:
-        return JsonResponse({'status': 'error', 'message': 'Please provide a certificate_type'}, status=400)
-
-    try:
-        if certificate_type == 'ISCC':
-            ProductionSiteCertificate.objects.get(entity=context['entity'], type=certificate_type, certificate_iscc__certificate_id=certificate_id).delete()
-        else:
-            ProductionSiteCertificate.objects.get(entity=context['entity'], type=certificate_type, certificate_2bs__certificate_id=certificate_id).delete()
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
-
-    return JsonResponse({'status': 'success'})
-
 
 @check_rights('entity_id')
 def update_iscc_certificate(request, *args, **kwargs):
