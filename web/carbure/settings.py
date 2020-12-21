@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_otp',
-    'django_otp.plugins.otp_hotp',
+    'django_otp.plugins.otp_email',
     'authtools',
     'core',
     'accounts',
@@ -144,12 +144,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-LOGIN_REDIRECT_URL = 'hotp-verify'
+LOGIN_REDIRECT_URL = 'otp-verify'
 LOGOUT_REDIRECT_URL = 'index'
 
 # OTP
 OTP_EMAIL_SUBJECT = "Carbure - Code d'accès"
-
 
 if env('TEST') is False:
     EMAIL_HOST = env('EMAIL_HOST')

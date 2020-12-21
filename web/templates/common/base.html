@@ -91,7 +91,7 @@
 
       <nav>
         <ul class="nav__links">
-          {% if user.is_authenticated %}
+          {% if user.is_verified %}
           <li class="nav__item"><a href="{% url 'logout' %}">Se Déconnecter</a></li>
           {% else %}
           <li class="nav__item"><a href="{% url 'login' %}">Connexion</a></li>

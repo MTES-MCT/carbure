@@ -1,15 +1,22 @@
-from django.shortcuts import render, redirect
+# django
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from core.decorators import enrich_with_user_details
 from django.contrib.auth import get_user_model
+from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth import login
+from django.shortcuts import render, redirect
+from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
+# plugins
+from django_otp.plugins.otp_email.models import EmailDevice
+from django_otp import user_has_device, devices_for_user
 from authtools.forms import UserCreationForm
+# app
+from core.decorators import enrich_with_user_details
 from accounts.tokens import account_activation_token
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.encoding import force_bytes, force_text
+from accounts.forms import UserResendActivationLinkForm, OTPForm
 
 @login_required
 @enrich_with_user_details
@@ -52,6 +59,12 @@ def register(request):
                 'token': account_activation_token.make_token(user),
             })
             user.email_user(subject, message)
+            email_otp = EmailDevice()
+            email_otp.user = user
+            email_otp.name = 'email'
+            email_otp.confirmed = True
+            email_otp.email = user.email
+            email_otp.save()
             return redirect('account_activation_sent')
     else:
         form = UserCreationForm()
@@ -65,13 +78,13 @@ def account_activation_sent(request):
 def activate(request, uidb64, token):
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
+        user_model = get_user_model()
+        user = user_model.objects.get(pk=uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
 
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
-        user.profile.email_confirmed = True
         user.save()
         login(request, user)
         return render(request, 'registration/account_activation_valid.html')
@@ -79,9 +92,57 @@ def activate(request, uidb64, token):
         return render(request, 'registration/account_activation_invalid.html')
 
 
-def hotp_verify(request):
-    pass
+@login_required
+def otp_verify(request):
+    # for old users that did not register when 2fa was introduced
+    if not user_has_device(request.user):
+        email_otp = EmailDevice()
+        email_otp.user = request.user
+        email_otp.name = 'email'
+        email_otp.confirmed = True
+        email_otp.email = request.user.email
+        email_otp.save()    
+
+    if request.method == 'POST':
+        form = OTPForm(request.user, request.POST)
+        if form.is_valid():
+            device = EmailDevice.objects.get(user=request.user)
+            print('user submitted token %s, model has %s' % (form.clean_otp_token(), device.token))
+            if device.verify_token(form.clean_otp_token()):
+                return redirect('/v2')
+            else:
+                return render(request, 'accounts/otp_verify.html', {'form': form})
+        else:
+            print('form is invalid')
+    else:
+        # send token by email and display form
+        device = EmailDevice.objects.get(user=request.user)
+        device.generate_token()
+        print(device.token, device.valid_until)
+        form = OTPForm(request.user)
+    return render(request, 'accounts/otp_verify.html', {'form': form})
 
 
 def resend_activation_link(request):
-    pass
+    if request.method == 'POST':
+        form = UserResendActivationLinkForm(request.POST)
+        if form.is_valid():
+            usermodel = get_user_model()
+            try:
+                user = usermodel.objects.get(email=form.clean_email())
+                current_site = get_current_site(request)
+                subject = 'Carbure - Activation de compte'
+                message = render_to_string('registration/account_activation_email.html', {
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': account_activation_token.make_token(user),
+                })
+                user.email_user(subject, message)
+                return render(request, 'registration/resend_activation_link_done.html', {'form': form})
+            except Exception as e:
+                print(e)
+                return render(request, 'registration/resend_activation_link.html', {'form': form})
+    else:
+        form = UserResendActivationLinkForm()
+    return render(request, 'registration/resend_activation_link.html', {'form': form})

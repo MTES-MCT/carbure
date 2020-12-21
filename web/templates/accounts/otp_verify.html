@@ -1,0 +1,23 @@
+{% extends "common/base.html" %}
+
+{% block content %}
+<div class="main">
+  <div class="panel">
+    <div class="panel__header">
+      <h3>Authentification double-facteur</h3>
+    </div>
+      <form method="post" id="otp_verify_form">
+        {% csrf_token %}
+        {{form.as_p}}
+        <div class="form-group">
+          <div class='col'></div>
+          <div class='col'>
+            <input type="submit" class="btn btn-primary btn-user btn-block" value="Envoyer">
+          </div>
+          <div class='col'></div>
+        </div>
+      </form>
+  </div>
+</div>
+{% endblock %}
+
