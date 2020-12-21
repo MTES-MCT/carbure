@@ -10,11 +10,8 @@ from core.decorators import check_rights
 from core.models import ISCCCertificate, DBSCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate
 from core.models import ProductionSiteCertificate, UserRightsRequests
 
-
+@otp_required
 def get_settings(request):
-    if not request.user.is_verified:
-        return JsonResponse({'status': 'error', 'message': "User is not authenticated"})
-
     # user-rights
     rights = UserRights.objects.filter(user=request.user)
     rights_sez = [{'entity': r.entity.natural_key(), 'rights': 'rw'} for r in rights]
