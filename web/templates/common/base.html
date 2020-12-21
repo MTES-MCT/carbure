@@ -94,7 +94,7 @@
           {% if user.is_authenticated %}
           <li class="nav__item"><a href="{% url 'logout' %}">Se Déconnecter</a></li>
           {% else %}
-          <li class="nav__item"><a href="{% url 'magicauth-login' %}">Connexion</a></li>
+          <li class="nav__item"><a href="{% url 'login' %}">Connexion</a></li>
           <li class="nav__item"><a href="{% url 'register' %}">Inscription</a></li>
           {% endif %}
           <li class="nav__item">

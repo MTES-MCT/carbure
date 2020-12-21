@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_otp',
+    'django_otp.plugins.otp_hotp',
     'authtools',
     'core',
     'accounts',
@@ -55,7 +57,6 @@ INSTALLED_APPS = [
     'administrators',
     'traders',
     'api',
-    'magicauth',
 ]
 
 AUTH_USER_MODEL = 'authtools.User'
@@ -66,6 +67,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -142,12 +144,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-LOGIN_REDIRECT_URL = 'index'
+LOGIN_REDIRECT_URL = 'hotp-verify'
 LOGOUT_REDIRECT_URL = 'index'
 
-MAGICAUTH_FROM_EMAIL = 'noreply@carbure.beta.gouv.fr'
-MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = 'index'
-MAGICAUTH_EMAIL_FIELD = 'email'
+# OTP
+OTP_EMAIL_SUBJECT = "Carbure - Code d'accès"
+
 
 if env('TEST') is False:
     EMAIL_HOST = env('EMAIL_HOST')

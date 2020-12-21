@@ -7,6 +7,7 @@ from core.decorators import check_rights
 from core.common import get_prefetched_data, load_mb_lot, bulk_insert
 from core.common import load_excel_file, send_lot_from_stock
 from core.xlsx_v3 import template_stock, template_stock_bcghg
+from django_otp.decorators import otp_required
 
 sort_key_to_django_field = {'period': 'lot__period',
                             'biocarburant': 'lot__biocarburant__name',
@@ -15,10 +16,12 @@ sort_key_to_django_field = {'period': 'lot__period',
                             'volume': 'lot__volume',
                             'pays_origine': 'lot__pays_origine__name'}
 
+@check_rights('entity_id')
+def get_stocks(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
 
-def get_stocks(request):
     status = request.GET.get('status', False)
-    entity = request.GET.get('entity_id', False)
     production_sites = request.GET.getlist('production_sites')
     matieres_premieres = request.GET.getlist('matieres_premieres')
     countries_of_origin = request.GET.getlist('countries_of_origin')
@@ -32,18 +35,7 @@ def get_stocks(request):
 
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
-    if entity is None:
-        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
-    try:
-        entity = Entity.objects.get(id=entity, entity_type__in=['Producteur', 'Opérateur', 'Trader'])
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown producer %s" % (entity), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-
+    
     if entity.entity_type in ['Producteur', 'Trader']:
         if status == "tosend":
             txs = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
@@ -107,22 +99,12 @@ def get_stocks(request):
     data['lots_errors'] = []
     return JsonResponse({'status': 'success', 'data': data})
 
+@check_rights('entity_id')
+def get_snapshot(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
 
-def get_snapshot(request):
     data = {}
-    entity = request.GET.get('entity_id', False)
-    if entity is None:
-        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
-    try:
-        entity = Entity.objects.get(id=entity, entity_type__in=['Producteur', 'Trader', 'Opérateur'])
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-
     if entity.entity_type in ['Producteur', 'Trader']:
         # drafts are lot that will be extracted from mass balance and sent to a client
         tx_drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
@@ -224,20 +206,10 @@ def create_drafts(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-def get_template_mass_balance(request):
-    entity_id = request.GET.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+@check_rights('entity_id')
+def get_template_mass_balance(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
 
     file_location = template_stock(entity)
     try:
@@ -250,22 +222,11 @@ def get_template_mass_balance(request):
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
 
-
-def get_template_mass_balance_bcghg(request):
-    entity_id = request.GET.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-
+@check_rights('entity_id')
+def get_template_mass_balance_bcghg(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    
     file_location = template_stock_bcghg(entity)
     try:
         with open(file_location, 'rb') as f:
@@ -277,24 +238,11 @@ def get_template_mass_balance_bcghg(request):
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
 
-
+@check_rights('entity_id')
 def upload_mass_balance(request):
     file = request.FILES.get('file')
-    entity_id = request.POST.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
     if file is None:
         return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     nb_loaded, nb_total = load_excel_file(entity, request.user, file, mass_balance=True)
     if nb_loaded is False:
@@ -350,7 +298,7 @@ def generate_batch(request, *args, **kwargs):
 
     return JsonResponse({'status': 'success', 'data': []})
 
-
+@otp_required
 def send_drafts(request):
     tx_ids = request.POST.getlist('tx_ids', False)
 
@@ -372,9 +320,11 @@ def send_drafts(request):
 
     return JsonResponse({'status': 'success', 'data': send_errors})
 
+@check_rights
+def send_all_drafts(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
 
-def send_all_drafts(request):
-    entity = request.POST.get('entity_id', False)
     dae = request.POST.get('dae', False)
     client = request.POST.get('client', False)
     delivery_site = request.POST.get('delivery_site', False)

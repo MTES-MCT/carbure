@@ -3,7 +3,7 @@ from dateutil.relativedelta import *
 
 from django.http import JsonResponse
 from django.db.models import Q
-from django.contrib.auth.decorators import login_required
+from django_otp.decorators import otp_required
 from core.models import Entity, UserRights, LotV2, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput, ProducerCertificate
 from core.decorators import check_rights
@@ -12,7 +12,7 @@ from core.models import ProductionSiteCertificate, UserRightsRequests
 
 
 def get_settings(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_verified:
         return JsonResponse({'status': 'error', 'message': "User is not authenticated"})
 
     # user-rights
@@ -182,6 +182,7 @@ def update_production_site(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
+@otp_required
 def delete_production_site(request):
     site = request.POST.get('production_site_id')
     try:
@@ -204,6 +205,7 @@ def delete_production_site(request):
     return JsonResponse({'status': 'success'})
 
 
+@otp_required
 def set_production_site_mp(request):
     site = request.POST.get('production_site_id')
     mp_list = request.POST.getlist('matiere_premiere_codes')
@@ -240,6 +242,7 @@ def set_production_site_mp(request):
     return JsonResponse({'status': 'success'})
 
 
+@otp_required
 def set_production_site_bc(request):
     site = request.POST.get('production_site_id')
     bc_list = request.POST.getlist('biocarburant_codes')
@@ -364,6 +367,7 @@ def disable_mac(request, *args, **kwargs):
     entity.save()
     return JsonResponse({'status': 'success'})
 
+
 @check_rights('entity_id')
 def enable_trading(request, *args, **kwargs):
     entity = kwargs['context']['entity']
@@ -374,6 +378,7 @@ def enable_trading(request, *args, **kwargs):
     entity.has_trading = True
     entity.save()
     return JsonResponse({'status': 'success'})
+
 
 @check_rights('entity_id')
 def disable_trading(request, *args, **kwargs):
@@ -570,7 +575,7 @@ def update_2bs_certificate(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@login_required
+@otp_required
 def request_entity_access(request):
     entity_id = request.POST.get('entity_id', False)
     comment = request.POST.get('comment', '')
