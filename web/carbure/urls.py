@@ -16,7 +16,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from public import views as public_views
-from magicauth.urls import urlpatterns as magicauth_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -35,5 +34,3 @@ urlpatterns = [
     path('core/', include('core.urls')),
     path('annuaire', public_views.annuaire, name='annuaire'),
 ]
-
-urlpatterns.extend(magicauth_urls)

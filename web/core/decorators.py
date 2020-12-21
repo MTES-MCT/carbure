@@ -126,6 +126,9 @@ def check_rights(entity_id_field):
     def actual_decorator(function):
         @wraps(function)
         def wrap(request, *args, **kwargs):
+            if not request.user.is_verified:
+                return JsonResponse({'status': 'forbidden', 'message': "User not verified"}, status=403)
+
             entity_id = request.POST.get(entity_id_field, request.GET.get(entity_id_field, False))
             if not entity_id:
                 return JsonResponse({'status': 'error', 'message': "Missing field %s" % (entity_id_field)}, status=400)
@@ -150,6 +153,8 @@ def is_admin(function):
     def wrap(request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'status': 'forbidden', 'message': "User not authenticated"}, status=403)
+        if not request.user.is_verified:
+            return JsonResponse({'status': 'forbidden', 'message': "User not verified"}, status=403)
         if not request.user.is_staff:
             return JsonResponse({'status': 'forbidden', 'message': "User not admin"}, status=403)
         return function(request, *args, **kwargs)

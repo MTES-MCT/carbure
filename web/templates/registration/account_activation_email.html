@@ -1,0 +1,7 @@
+{% autoescape off %}
+Bonjour {{ user.name }},
+
+Veuillez cliquer sur le lien suivant pour confirmer votre inscription sur CarbuRe:
+
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+{% endautoescape %}

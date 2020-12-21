@@ -13,6 +13,8 @@ from core.xlsx_v3 import template_producers_simple, template_producers_advanced,
 from core.xlsx_v3 import export_transactions
 from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates
 from api.v3.sanity_checks import bulk_sanity_checks
+from django_otp.decorators import otp_required
+from core.decorators import check_rights
 
 
 sort_key_to_django_field = {'period': 'lot__period',
@@ -37,9 +39,12 @@ def get_errors(tx):
 
     return grouped_errors
 
-def get_lots(request):
+@check_rights('entity_id')
+def get_lots(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+
     status = request.GET.get('status', False)
-    entity = request.GET.get('entity_id', False)
     year = request.GET.get('year', False)
     periods = request.GET.getlist('periods')
     production_sites = request.GET.getlist('production_sites')
@@ -61,18 +66,7 @@ def get_lots(request):
 
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
-    if entity is None:
-        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
-    try:
-        entity = Entity.objects.get(id=entity)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-
+   
     if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader':
         txs = LotTransaction.objects.select_related('lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
                                                              'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant',
@@ -224,25 +218,14 @@ def get_lots(request):
             response['Content-Disposition'] = 'attachment; filename="%s"' % (file_location)
         return response
 
-
-def get_details(request):
+@check_rights('entity_id')
+def get_details(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
     tx_id = request.GET.get('tx_id', False)
-    entity_id = request.GET.get('entity_id', False)
 
     if not tx_id:
         return JsonResponse({'status': 'error', 'message': 'Missing tx_id'}, status=400)
-    if not entity_id:
-        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity), 'extra': str(e)}, status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     tx = LotTransaction.objects.get(pk=tx_id)
 
@@ -261,8 +244,10 @@ def get_details(request):
 
     return JsonResponse({'status': 'success', 'data': data})
 
-
-def get_snapshot(request):
+@check_rights('entity_id')
+def get_snapshot(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
     data = {}
     year = request.GET.get('year', False)
     today = datetime.date.today()
@@ -275,18 +260,6 @@ def get_snapshot(request):
             date_until = datetime.date(year=year, month=12, day=31)
         except Exception:
             return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
-    entity = request.GET.get('entity_id', False)
-    if entity is None:
-        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
-    try:
-        entity = Entity.objects.get(id=entity)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader':
         txs = LotTransaction.objects.filter(lot__added_by=entity)
@@ -346,20 +319,10 @@ def get_snapshot(request):
 
     return JsonResponse({'status': 'success', 'data': data})
 
-
-def get_summary_in(request):
-    entity = request.GET.get('entity_id', False)
-    if entity is None:
-        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
-    try:
-        entity = Entity.objects.get(id=entity)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+@check_rights('entity_id')
+def get_summary_in(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
 
     # get my pending incoming lots
     txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AA', 'AC'])
@@ -380,20 +343,10 @@ def get_summary_in(request):
         line['volume'] += t.lot.volume
     return JsonResponse({'status': 'success', 'data': data})
 
-
-def get_summary_out(request):
-    entity = request.GET.get('entity_id', False)
-    if entity is None:
-        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
-    try:
-        entity = Entity.objects.get(id=entity)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+@check_rights('entity_id')
+def get_summary_out(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
 
     # get my pending sent lots
     txs = LotTransaction.objects.filter(carbure_vendor=entity, lot__status='Validated', delivery_status='N')
@@ -415,21 +368,10 @@ def get_summary_out(request):
         line['volume'] += t.lot.volume
     return JsonResponse({'status': 'success', 'data': data})
 
-
-def add_lot(request):
-    entity_id = request.POST.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+@check_rights('entity_id')
+def add_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
 
     # prefetch some data
     d = get_prefetched_data(entity)
@@ -441,21 +383,10 @@ def add_lot(request):
     lot_data = new_txs[0].natural_key()
     return JsonResponse({'status': 'success', 'data': lot_data})
 
-
-def update_lot(request):
-    entity_id = request.POST.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+@check_rights('entity_id')
+def update_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
 
     tx_id = request.POST.get('tx_id', False)
     if not tx_id:
@@ -483,7 +414,7 @@ def update_lot(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Could not save lot: %s' % (lot_errors)}, status=400)
 
-
+@otp_required
 def duplicate_lot(request):
     tx_id = request.POST.get('tx_id', None)
 
@@ -523,7 +454,7 @@ def duplicate_lot(request):
     tx.save()
     return JsonResponse({'status': 'success'})
 
-
+@otp_required
 def delete_lot(request):
     tx_ids = request.POST.getlist('tx_ids', False)
 
@@ -549,6 +480,7 @@ def delete_lot(request):
     return JsonResponse({'status': 'success'})
 
 
+@otp_required
 def validate_lot(request):
     tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
@@ -559,6 +491,7 @@ def validate_lot(request):
     return response
 
 
+@otp_required
 def accept_lot(request):
     tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
@@ -577,6 +510,7 @@ def accept_lot(request):
     return JsonResponse({'status': 'success'})
 
 
+@otp_required
 def accept_with_reserves(request):
     tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
@@ -595,6 +529,7 @@ def accept_with_reserves(request):
     return JsonResponse({'status': 'success'})
 
 
+@otp_required
 def reject_lot(request):
     tx_ids = request.POST.getlist('tx_ids', None)
     tx_comment = request.POST.get('comment', None)
@@ -624,25 +559,20 @@ def reject_lot(request):
         txerr.save()
     return JsonResponse({'status': 'success'})
 
+@check_rights('entity_id')
+def comment_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
 
-def comment_lot(request):
     tx_id = request.POST.get('tx_id', None)
-    entity_id = request.POST.get('entity_id', None)
     comment = request.POST.get('comment', None)
     comment_type = request.POST.get('comment_type', None)
     if tx_id is None:
         return JsonResponse({'status': 'error', 'message': "Missing TX ID"}, status=400)
-    if entity_id is None:
-        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
     if comment is None:
         return JsonResponse({'status': 'error', 'message': "Missing comment"}, status=400)
     if comment_type is None:
         return JsonResponse({'status': 'error', 'message': "Missing comment_type"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Entity not found", 'extra': str(e)}, status=400)
 
     try:
         tx = LotTransaction.objects.get(id=tx_id)
@@ -656,10 +586,6 @@ def comment_lot(request):
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed to comment on this transaction"},
                             status=403)
 
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to comment on behalf of this entity"},
-                            status=403)
-
     txc = TransactionComment()
     txc.entity = entity
     txc.tx = tx
@@ -668,21 +594,10 @@ def comment_lot(request):
     txc.save()
     return JsonResponse({'status': 'success'})
 
-
-def accept_all(request):
-    entity_id = request.POST.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+@check_rights('entity_id')
+def accept_all(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
 
     lots = LotTransaction.objects.filter(carbure_client=entity, delivery_status__in=[
         'N', 'AC', 'AA'])
@@ -699,23 +614,13 @@ def accept_all(request):
     lots.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until).update(delivery_status='A')
     return JsonResponse({'status': 'success'})
 
-
-def reject_all(request):
-    entity_id = request.POST.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
+@check_rights('entity_id')
+def reject_all(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
     tx_comment = request.POST.get('comment', None)
     if not tx_comment:
         return JsonResponse({'status': 'error', 'message': "Missing comment"}, status=400)
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     txs = LotTransaction.objects.filter(carbure_client=entity, delivery_status__in=[
         'N', 'AC', 'AA'])
@@ -739,21 +644,10 @@ def reject_all(request):
         txerr.save()
     return JsonResponse({'status': 'success'})
 
-
-def delete_all_drafts(request):
-    entity_id = request.POST.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+@check_rights('entity_id')
+def delete_all_drafts(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
 
     drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft')
     year = request.POST.get('year', False)
@@ -769,21 +663,10 @@ def delete_all_drafts(request):
     drafts.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until).delete()
     return JsonResponse({'status': 'success'})
 
-
-def validate_all_drafts(request):
-    entity_id = request.POST.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+@check_rights('entity_id')
+def validate_all_drafts(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
 
     drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft')
     year = request.POST.get('year', False)
@@ -803,22 +686,12 @@ def validate_all_drafts(request):
     check_duplicates(drafts, background=False)
     return response
 
-
-def get_template_producers_simple(request):
+@check_rights('entity_id')
+def get_template_producers_simple(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
     entity_id = request.GET.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-
+    
     file_location = template_producers_simple(entity)
     try:
         with open(file_location, 'rb') as f:
@@ -830,21 +703,10 @@ def get_template_producers_simple(request):
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
 
-
-def get_template_producers_advanced(request):
-    entity_id = request.GET.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+@check_rights('entity_id')
+def get_template_producers_advanced(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
 
     file_location = template_producers_advanced(entity)
     try:
@@ -857,22 +719,11 @@ def get_template_producers_advanced(request):
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
 
-
-def get_template_blend(request):
-    entity_id = request.GET.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-
+@check_rights('entity_id')
+def get_template_blend(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    
     file_location = template_operators(entity)
     try:
         with open(file_location, 'rb') as f:
@@ -884,22 +735,11 @@ def get_template_blend(request):
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
 
-
-def get_template_trader(request):
-    entity_id = request.GET.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-
+@check_rights('entity_id')
+def get_template_trader(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    
     file_location = template_traders(entity)
     try:
         with open(file_location, 'rb') as f:
@@ -911,24 +751,14 @@ def get_template_trader(request):
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
 
+@check_rights('entity_id')
+def upload(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
 
-def upload(request):
     file = request.FILES.get('file')
-    entity_id = request.POST.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
     if file is None:
         return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     nb_loaded, nb_total = load_excel_file(entity, request.user, file)
     if nb_loaded is False:
@@ -936,29 +766,16 @@ def upload(request):
     data = {'loaded': nb_loaded, 'total': nb_total}
     return JsonResponse({'status': 'success', 'data': data})
 
-
-def upload_blend(request):
+@check_rights('entity_id')
+def upload_blend(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
     file = request.FILES.get('file')
-    entity_id = request.POST.get('entity_id', False)
-    if not entity_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing entity_id"}, status=400)
     if file is None:
         return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity %s" % (entity_id), 'extra': str(e)},
-                            status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if entity not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     nb_loaded, nb_total = load_excel_file(entity, request.user, file)
     if nb_loaded is False:
         return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
     data = {'loaded': nb_loaded, 'total': nb_total}
     return JsonResponse({'status': 'success', 'data': data})
-
-

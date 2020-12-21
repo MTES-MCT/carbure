@@ -1,11 +1,10 @@
 import datetime
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.db.models import Q
 from core.models import Entity, Biocarburant, MatierePremiere, Depot, Pays
 from core.models import ISCCCertificate, DBSCertificate
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
-
+from django_otp.decorators import otp_required
 
 def get_matieres_premieres(request):
     q = request.GET.get('query', False)
@@ -160,7 +159,7 @@ def get_2bs_certificates(request):
     return JsonResponse({'status': 'success', 'data': sez})
 
 
-@login_required
+@otp_required
 def create_delivery_site(request):
     name = request.POST.get('name', False)
     city = request.POST.get('city', False)
