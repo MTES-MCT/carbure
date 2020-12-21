@@ -1,3 +1,5 @@
+import datetime
+import pytz
 # django
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
@@ -12,6 +14,7 @@ from django.template.loader import render_to_string
 # plugins
 from django_otp.plugins.otp_email.models import EmailDevice
 from django_otp import user_has_device, devices_for_user
+from django_otp import login as login_with_device
 from authtools.forms import UserCreationForm
 # app
 from core.decorators import enrich_with_user_details
@@ -109,6 +112,7 @@ def otp_verify(request):
             device = EmailDevice.objects.get(user=request.user)
             print('user submitted token %s, model has %s' % (form.clean_otp_token(), device.token))
             if device.verify_token(form.clean_otp_token()):
+                login_with_device(request, device)
                 return redirect('/v2')
             else:
                 return render(request, 'accounts/otp_verify.html', {'form': form})
@@ -117,8 +121,9 @@ def otp_verify(request):
     else:
         # send token by email and display form
         device = EmailDevice.objects.get(user=request.user)
-        device.generate_token()
-        print(device.token, device.valid_until)
+        #now = pytz.utc.localize(datetime.datetime.now())
+        #if not device.valid_until < now + datetime.timedelta(seconds=30):
+        device.generate_challenge()
         form = OTPForm(request.user)
     return render(request, 'accounts/otp_verify.html', {'form': form})
 
