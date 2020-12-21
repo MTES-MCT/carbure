@@ -22,6 +22,7 @@ distro==1.4.0
 Django==3.0.7
 django-environ==0.4.5
 django-magicauth==0.5
+django-otp==1.0.2
 django-storages==1.9.1
 docutils==0.15.2
 entrypoints==0.3
