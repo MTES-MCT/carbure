@@ -317,6 +317,7 @@
                             </tr>
                           </tbody>
                         </table>
+                        <p>Ce lien n'est valable que quelques minutes. Il est à usage unique.</p>
                         <hr>
                         <div>
                           <p>Des difficultés pour vous connecter ?</p>
@@ -325,11 +326,11 @@
                           </p>
                           <p class="mb-6 align-center">
                             <strong>
-                                https://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+                              https://{{ domain }}{% url 'activate' uidb64=uid token=token %}
                             </strong>
                           </p>
                           <p>Bonne journée,</p>
-                          <p>L'équipe de CarbuRe</p>
+                          <p>L'équipe CarbuRe</p>
                         </div>
                       </td>
                     </tr>
@@ -345,3 +346,4 @@
     </table>
   </body>
 </html>
+
