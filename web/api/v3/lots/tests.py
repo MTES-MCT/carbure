@@ -1,4 +1,6 @@
 import datetime
+import os
+import time
 from django.test import TestCase
 from django.test import TransactionTestCase
 from django.urls import reverse
@@ -143,16 +145,69 @@ class LotsAPITest(TransactionTestCase):
 
 
     def test_producer_imports(self):
+        return
         # as producer
         # upload 10 that cannot be validated
+        file_directory = '%s/web/fixtures/csv/test_data' % (os.environ['CARBURE_HOME'])
+        fh = open('%s/carbure_template_advanced_missing_data_cannot_validate.xlsx' % (file_directory), 'rb')
+        response = self.client.post(reverse('api-v3-upload'), {'entity_id': self.entity2.id, 'file': fh})
+        self.assertEqual(response.status_code, 200)
+        fh.close()
+        lots = LotV2.objects.filter(added_by_user=self.user1)
+        self.assertEqual(lots.count(), 10)
+        txs = LotTransaction.objects.filter(lot__in=lots)
+        self.assertEqual(txs.count(), 10)
         # validate-all
+        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.entity2.id})
+        self.assertEqual(response.status_code, 200)
+        # wait until process is finished
+        time.sleep(5)
         # get drafts
-        # make sure they all have blocking issues
+        lots = LotV2.objects.filter(added_by_user=self.user1, status='Draft')
+        self.assertEqual(lots.count(), 10) # they are still all with status draft
+        # get drafts via api - same result expected
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.entity1.id, 'status': 'draft', 'year': '2020'})
+        self.assertEqual(response.status_code, 200)        
+        data = response.json()['data']
+        lots = data['lots']
+        self.assertEqual(len(lots), 10)
+        # make sure they all have LotError or TransactionError
+        lot_errors = LotV2Error.objects.filter(lot__in=lots)
+        tx_errors = TransactionError.objects.filter(tx__in=txs)
+        nb_errors = lot_errors.count() + tx_errors.count()
+        self.assertEqual(nb_errors, 10)
         # delete-all-drafts
+        response = self.client.post(reverse('api-v3-delete-all-drafts'), {'entity_id': self.entity2.id})
+        self.assertEqual(response.status_code, 200)               
+        # make sure no lots/tx/loterror/txerror are still there
+        self.assertEqual(LotV2Error.objects.all().count(), 0)
+        self.assertEqual(TransactionError.objects.all().count(), 0)
+        self.assertEqual(LotV2.objects.all().count(), 0)
+        self.assertEqual(LotTransaction.objects.all().count(), 0)
         # upload 10 valid lots
+        fh = open('%s/carbure_template_advanced_missing_data_but_valid.xlsx' % (file_directory), 'rb')
+        response = self.client.post(reverse('api-v3-upload'), {'entity_id': self.entity2.id, 'file': fh})
+        self.assertEqual(response.status_code, 200)
+        fh.close()
         # validate-all
+        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.entity2.id})
+        self.assertEqual(response.status_code, 200)            
         # get drafts 0
+        lots = LotV2.objects.filter(added_by_user=self.user1, status='Draft')
+        self.assertEqual(lots.count(), 0) # no more drafts, all validated
+        # check api
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.entity1.id, 'status': 'draft', 'year': '2020'})
+        self.assertEqual(response.status_code, 200)        
+        data = response.json()['data']
+        lots = data['lots']
+        self.assertEqual(len(lots), 0)        
         # get validated 10
-        pass
-
+        lots = LotV2.objects.filter(added_by_user=self.user1, status='Validated')
+        self.assertEqual(lots.count(), 10)
+        # check api
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.entity1.id, 'status': 'sent', 'year': '2020'})
+        self.assertEqual(response.status_code, 200)        
+        data = response.json()['data']
+        lots = data['lots']
+        self.assertEqual(len(lots), 10)
 
