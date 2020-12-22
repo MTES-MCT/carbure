@@ -134,9 +134,24 @@ def otp_verify(request):
     else:
         # send token by email and display form
         device = EmailDevice.objects.get(user=request.user)
-        #now = pytz.utc.localize(datetime.datetime.now())
-        #if not device.valid_until < now + datetime.timedelta(seconds=30):
-        device.generate_challenge()
+        current_site = get_current_site(request)
+        device.generate_token()
+        email_subject = 'Carbure - Code de Sécurité'
+        email_context = {
+            'user': request.user,
+            'domain': current_site.domain,
+            'token': device.token,
+        }
+        html_message = loader.render_to_string('accounts/otp_token_email.html', email_context)
+        text_message = loader.render_to_string('accounts/otp_token_email.txt', email_context)
+        send_mail(
+            subject=email_subject,
+            message=text_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            html_message=html_message,
+            recipient_list=[request.user.email],
+            fail_silently=False,
+        )
         form = OTPForm(request.user)
     return render(request, 'accounts/otp_verify.html', {'form': form})
 
