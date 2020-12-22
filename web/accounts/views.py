@@ -35,7 +35,7 @@ def custom_password_change(request, *args, **kwargs):
     if request.method == 'POST':
         request.user.set_password(request.POST['new_password1'])
         request.user.save()
-        redirect('custom_password_change_success')
+        redirect('custom-password-change-success')
     return render(request, "accounts/password_change.html", context)
 
 
@@ -68,7 +68,7 @@ def register(request):
             email_otp.confirmed = True
             email_otp.email = user.email
             email_otp.save()
-            return redirect('account_activation_sent')
+            return redirect('account-activation-sent')
     else:
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
