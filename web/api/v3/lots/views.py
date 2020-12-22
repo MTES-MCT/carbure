@@ -690,7 +690,6 @@ def validate_all_drafts(request, *args, **kwargs):
 def get_template_producers_simple(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
-    entity_id = request.GET.get('entity_id', False)
     
     file_location = template_producers_simple(entity)
     try:
