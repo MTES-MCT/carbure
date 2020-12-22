@@ -104,7 +104,7 @@ def otp_verify(request):
         email_otp.name = 'email'
         email_otp.confirmed = True
         email_otp.email = request.user.email
-        email_otp.save()    
+        email_otp.save()
 
     if request.method == 'POST':
         form = OTPForm(request.user, request.POST)
