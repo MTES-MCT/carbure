@@ -301,36 +301,12 @@
                     <tr>
                       <td>
                         <p>Bonjour {{user.name}},</p>
-                        <p>Veuillez cliquer sur le lien suivant pour confirmer votre inscription sur CarbuRe :</p>
-                        <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
-                          <tbody>
-                            <tr>
-                              <td align="center">
-                                <table border="0" cellpadding="0" cellspacing="0">
-                                  <tbody>
-                                    <tr>
-                                      <td align="center"> <a href="https://{{ domain }}{% url 'activate' uidb64=uid token=token %}">Activer Mon Compte</a> </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                        <hr>
-                        <div>
-                          <p>Des difficultés pour vous connecter ?</p>
-                          <p>
-                            Nous vous recommandons de copier-coller ce lien dans un navigateur :
-                          </p>
-                          <p class="mb-6 align-center">
-                            <strong>
-                                https://{{ domain }}{% url 'activate' uidb64=uid token=token %}
-                            </strong>
-                          </p>
-                          <p>Bonne journée,</p>
-                          <p>L'équipe de CarbuRe</p>
-                        </div>
+                        <p>Voici votre code de sécurité pour vous connecter à CarbuRe :</p>
+                        <p class="mb-6 align-center">
+                          <strong>
+                          {{ token }}
+                          </strong>
+                        </p>                        
                       </td>
                     </tr>
                   </table>

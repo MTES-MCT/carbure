@@ -149,6 +149,7 @@ LOGOUT_REDIRECT_URL = 'index'
 
 # OTP
 OTP_EMAIL_SUBJECT = "Carbure - Code d'accès"
+OTP_EMAIL_BODY_TEMPLATE_PATH = "accounts/otp_email.html"
 
 if env('TEST') is False:
     EMAIL_HOST = env('EMAIL_HOST')
