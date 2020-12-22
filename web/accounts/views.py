@@ -11,6 +11,10 @@ from django.shortcuts import render, redirect
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
+from django.core.mail import send_mail
+from django.template import loader
+from django.conf import settings
+
 # plugins
 from django_otp.plugins.otp_email.models import EmailDevice
 from django_otp import user_has_device, devices_for_user
@@ -54,14 +58,24 @@ def register(request):
             user.is_active = False
             user.save()
             current_site = get_current_site(request)
-            subject = 'Carbure - Activation de compte'
-            message = render_to_string('registration/account_activation_email.html', {
+            # send email
+            email_subject = 'Carbure - Activation de compte'
+            email_context = {
                 'user': user,
                 'domain': current_site.domain,
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                 'token': account_activation_token.make_token(user),
-            })
-            user.email_user(subject, message)
+            }
+            html_message = loader.render_to_string('registration/account_activation_email.html', email_context)
+            text_message = loader.render_to_string('registration/account_activation_email.txt', email_context)
+            send_mail(
+                subject=email_subject,
+                message=text_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                html_message=html_message,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
             email_otp = EmailDevice()
             email_otp.user = user
             email_otp.name = 'email'
