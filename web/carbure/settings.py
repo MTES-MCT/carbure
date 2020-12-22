@@ -167,3 +167,6 @@ if env('TEST') is False:
     AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME")
     AWS_S3_USE_SSL = 1
     AWS_DEFAULT_ACL = None
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    

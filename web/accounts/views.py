@@ -110,7 +110,6 @@ def otp_verify(request):
         form = OTPForm(request.user, request.POST)
         if form.is_valid():
             device = EmailDevice.objects.get(user=request.user)
-            print('user submitted token %s, model has %s' % (form.clean_otp_token(), device.token))
             if device.verify_token(form.clean_otp_token()):
                 login_with_device(request, device)
                 return redirect('/v2')

@@ -7,6 +7,7 @@ from core.models import Entity, UserRights, Pays, MatierePremiere, Biocarburant,
 from core.models import ISCCCertificate, DBSCertificate
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 from api.v3.admin.urls import urlpatterns
+from django_otp.plugins.otp_email.models import EmailDevice
 
 
 class SettingsAPITest(TestCase):
@@ -27,6 +28,13 @@ class SettingsAPITest(TestCase):
 
         loggedin = self.client.login(username=self.user_email, password=self.user_password)
         self.assertTrue(loggedin)
+        # pass otp verification
+        response = self.client.get(reverse('otp-verify'))
+        self.assertEqual(response.status_code, 200)
+        device = EmailDevice.objects.get(user=self.user1)
+        response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
+        self.assertEqual(response.status_code, 302)
+
 
     def test_get_settings(self):
         url = 'api-v3-settings-get'
