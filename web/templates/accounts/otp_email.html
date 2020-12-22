@@ -302,11 +302,27 @@
                       <td>
                         <p>Bonjour {{user.name}},</p>
                         <p>Voici votre code de sécurité pour vous connecter à CarbuRe :</p>
-                        <p class="mb-6 align-center">
-                          <strong>
-                          {{ token }}
-                          </strong>
-                        </p>                        
+                        <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
+                          <tbody>
+                            <tr>
+                              <td align="center">
+                                <table border="0" cellpadding="0" cellspacing="0">
+                                  <tbody>
+                                    <tr>
+                                      <td align="center"> {{ token }} </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <p>Ce code n'est valable que quelques minutes. Il est à usage unique.</p>
+                        <hr>
+                        <div>
+                          <p>Bonne journée,</p>
+                          <p>L'équipe CarbuRe</p>
+                        </div>
                       </td>
                     </tr>
                   </table>
