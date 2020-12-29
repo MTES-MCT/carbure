@@ -1,4 +1,4 @@
-import { useCallback, useReducer } from "react"
+import { useCallback, useEffect, useReducer, useRef } from "react"
 
 enum ApiStatus {
   Pending = "pending",
@@ -44,16 +44,16 @@ type ApiHook<T extends any[], U> = [ApiState<U>, Resolver<T, U>]
 function useAPI<T extends any[], U>(
   createPromise: (...args: T) => Promise<U>
 ): ApiHook<T, U> {
-  // const resolveRef = useRef<Resolver<T> | null>(null)
+  const cancelled = useRef(false)
   const [state, dispatch] = useReducer<ApiReducer<U>>(reducer, initialState)
 
   const resolve = useCallback(
     (...args: T) => {
-      let cancelled = false
+      cancelled.current = false
 
       // returns true if it was a success, false otherwise
       async function resolve() {
-        if (!cancelled) {
+        if (!cancelled.current) {
           // signal that the request process started
           dispatch({ type: ApiStatus.Pending })
         }
@@ -63,24 +63,32 @@ function useAPI<T extends any[], U>(
           const res = await createPromise(...args)
 
           // dispatch the data if it was a success
-          if (!cancelled) {
+          if (!cancelled.current) {
             dispatch({ type: ApiStatus.Success, payload: res })
             return res
           }
         } catch (err) {
           // otherwise save the error
-          if (!cancelled) {
+          if (!cancelled.current) {
             dispatch({ type: ApiStatus.Error, payload: err.message })
           }
         }
       }
 
       const promise: CancelablePromise<U> = resolve()
-      promise.cancel = () => { cancelled = true } // prettier-ignore
+      promise.cancel = () => { cancelled.current = true } // prettier-ignore
 
       return promise
     },
     [dispatch, createPromise]
+  )
+
+  // cancel the request if the component is unmounted
+  useEffect(
+    () => () => {
+      cancelled.current = true
+    },
+    []
   )
 
   return [state, resolve]
