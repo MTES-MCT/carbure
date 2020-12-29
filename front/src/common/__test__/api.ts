@@ -3,8 +3,10 @@ import { rest } from "msw"
 import {
   country,
   deliverySite,
-  expiredISCCCertificate,
   isccCertificate,
+  expiredISCCCertificate,
+  dbsCertificate,
+  expired2BSCertificate,
   producer,
   trader,
 } from "common/__test__/data"
@@ -52,6 +54,18 @@ export const okISCCSearch = rest.get(
       ctx.json({
         status: "success",
         data: [isccCertificate, expiredISCCCertificate],
+      })
+    )
+  }
+)
+
+export const ok2BSSearch = rest.get(
+  "/api/v3/common/2bs-certificates",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: [dbsCertificate, expired2BSCertificate],
       })
     )
   }
