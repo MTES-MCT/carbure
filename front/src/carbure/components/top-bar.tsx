@@ -111,7 +111,7 @@ const Topbar = ({ entity, settings }: TopbarProps) => (
     <UserMenu settings={settings} entity={entity} />
 
     <a
-      href="/"
+      href="https://carbure-1.gitbook.io/faq/"
       target="_blank"
       rel="noreferrer"
       title="FAQ"
