@@ -75,6 +75,7 @@ export const LabelInput = ({
     <Input {...props} disabled={disabled} />
   </Label>
 )
+
 // TEXT AREA COMPONENT
 type LabelTextAreaProps = SystemProps &
   React.HTMLProps<HTMLTextAreaElement> & {

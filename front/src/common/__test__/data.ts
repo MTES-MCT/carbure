@@ -125,3 +125,77 @@ export const expired2BSCertificate = {
   scope: ["Expired Scope Test"],
   has_been_updated: false,
 }
+
+// MATIERE PREMIERE
+
+export const matierePremiere = {
+  code: "COLZA",
+  name: "Colza",
+}
+
+// BIOCARBURANT
+
+export const biocarburant = {
+  code: "EMHV",
+  name: "EMHV",
+}
+
+// LOT
+
+export const lot = {
+  lot: {
+    id: 0,
+    period: "2020-12",
+    carbure_id: "",
+    producer_is_in_carbure: true,
+    carbure_producer: producer,
+    unknown_producer: "",
+    production_site_is_in_carbure: true,
+    carbure_production_site: productionSite,
+    unknown_production_site: "",
+    unknown_production_country: null,
+    unknown_production_site_com_date: null,
+    unknown_production_site_reference: "",
+    unknown_production_site_dbl_counting: "",
+    volume: 12345,
+    matiere_premiere: matierePremiere,
+    biocarburant: biocarburant,
+    pays_origine: country,
+    eec: 12,
+    el: 0,
+    ep: 0,
+    etd: 0,
+    eu: 0,
+    esca: 1,
+    eccs: 0,
+    eccr: 0,
+    eee: 0,
+    ghg_total: 11,
+    ghg_reference: 83.8,
+    ghg_reduction: 86.87,
+    status: "Draft",
+    source: "MANUAL",
+    parent_lot: null,
+    is_split: false,
+    is_fused: false,
+    fused_with: null,
+    data_origin_entity: producer,
+  },
+  vendor_is_in_carbure: true,
+  carbure_vendor: producer,
+  unknown_vendor: null,
+  dae: "DAETEST",
+  client_is_in_carbure: true,
+  carbure_client: operator,
+  unknown_client: "",
+  delivery_date: "2020-12-31",
+  delivery_site_is_in_carbure: true,
+  carbure_delivery_site: deliverySite,
+  unknown_delivery_site: "",
+  unknown_delivery_site_country: null,
+  delivery_status: "N",
+  champ_libre: "",
+  is_mac: false,
+  is_batch: false,
+  id: 11823,
+}

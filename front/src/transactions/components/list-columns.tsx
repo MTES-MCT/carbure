@@ -143,6 +143,7 @@ export const selector: Selector = (selection) => ({
   header: (
     <input
       type="checkbox"
+      title="Sélectionner toute la page"
       checked={selection.isAllSelected()}
       onChange={(e) => selection.toggleSelectAll(e.target.checked)}
     />
@@ -152,6 +153,7 @@ export const selector: Selector = (selection) => ({
     <Box className={styles.checkboxWrapper}>
       <input
         type="checkbox"
+        title="Sélectionner le lot"
         checked={selection.has(tx.id)}
         onChange={() => selection.toggleSelect(tx.id)}
         onClick={(e) => e.stopPropagation()}

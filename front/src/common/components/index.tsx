@@ -52,6 +52,6 @@ export const Title = ({ children, className, ...props }: TitleProps) => (
 
 export const LoaderOverlay = () => (
   <Box className={styles.loaderOverlay}>
-    <Loader color="var(--black)" size={48} />
+    <Loader color="var(--black)" size={48} title="Chargement..." />
   </Box>
 )

@@ -21,10 +21,10 @@ const FILTER_ORDER = [
 ]
 
 const FILTER_LABELS = {
-  [Filters.Periods]: "Période",
-  [Filters.ProductionSites]: "Site de production",
-  [Filters.MatieresPremieres]: "Matière Première",
-  [Filters.Biocarburants]: "Biocarburant",
+  [Filters.Periods]: "Périodes",
+  [Filters.ProductionSites]: "Sites de production",
+  [Filters.MatieresPremieres]: "Matières Premières",
+  [Filters.Biocarburants]: "Biocarburants",
   [Filters.CountriesOfOrigin]: "Pays d'origine",
   [Filters.DeliverySites]: "Sites de livraison",
   [Filters.Clients]: "Clients",
