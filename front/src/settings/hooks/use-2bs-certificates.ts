@@ -78,7 +78,7 @@ export default function use2BSCertificates(
 
   async function delete2BSCertificate(dbs: DBSCertificate) {
     if (
-      entityID &&
+      typeof entityID !== "undefined" &&
       (await confirm(
         "Suppression certificat",
         `Voulez-vous vraiment supprimer le certificat 2BS "${dbs.certificate_id}" ?`

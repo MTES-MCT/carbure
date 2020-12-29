@@ -82,6 +82,16 @@ export const productionSite = {
 
 // ISCC CERTIFICATES
 
+export const isccCertificate = {
+  certificate_id: "ISCC Test",
+  certificate_holder: "Holder Test",
+  valid_from: "2020-04-25",
+  valid_until: "2021-04-24",
+  issuing_cb: "Authority Test",
+  location: "",
+  scope: ["Scope Test"],
+}
+
 export const expiredISCCCertificate = {
   certificate_id: "Expired ISCC Test",
   certificate_holder: "Expired Holder Test",
@@ -92,12 +102,26 @@ export const expiredISCCCertificate = {
   scope: ["Expired Scope Test"],
 }
 
-export const isccCertificate = {
-  certificate_id: "ISCC Test",
+export const dbsCertificate = {
+  certificate_id: "2BS Test",
   certificate_holder: "Holder Test",
+  holder_address: "Address Test",
   valid_from: "2020-04-25",
   valid_until: "2021-04-24",
-  issuing_cb: "Authority Test",
-  location: "",
+  certification_type: "",
+  download_link: "",
   scope: ["Scope Test"],
+  has_been_updated: false,
+}
+
+export const expired2BSCertificate = {
+  certificate_id: "Expired 2BS Test",
+  certificate_holder: "Expired Holder Test",
+  holder_address: "Expired Address Test",
+  valid_from: "1990-01-01",
+  valid_until: "2000-01-01",
+  certification_type: "",
+  download_link: "",
+  scope: ["Expired Scope Test"],
+  has_been_updated: false,
 }

@@ -4,6 +4,7 @@ import { setupServer } from "msw/node"
 import { OwnershipType } from "common/types"
 
 import {
+  dbsCertificate,
   deliverySite,
   isccCertificate,
   producer,
@@ -13,11 +14,13 @@ import {
   okCountrySearch,
   okDeliverySitesSearch,
   okISCCSearch,
+  ok2BSSearch,
 } from "common/__test__/api"
 
 let deliverySites: any[] = []
 let productionSites: any[] = []
 let isccCertificates: any[] = []
+let dbsCertificates: any[] = []
 
 export function setDeliverySites(nextDeliverySites: any[]) {
   deliverySites = nextDeliverySites.map((ds) => ({
@@ -32,6 +35,10 @@ export function setProductionSites(nextProductionSites: any[]) {
 
 export function setISCCCertificates(nextISCCCertificates: any[]) {
   isccCertificates = nextISCCCertificates
+}
+
+export function set2BSCertificates(next2BSCertificates: any[]) {
+  dbsCertificates = next2BSCertificates
 }
 
 export const okSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
@@ -186,9 +193,33 @@ export const ok2BS = rest.get(
     return res(
       ctx.json({
         status: "success",
-        data: [],
+        data: dbsCertificates,
       })
     )
+  }
+)
+
+export const okAdd2BS = rest.post(
+  "/api/v3/settings/add-2bs-certificate",
+  (req, res, ctx) => {
+    set2BSCertificates([dbsCertificate])
+    return res(ctx.json({ status: "success" }))
+  }
+)
+
+export const okDelete2BS = rest.post(
+  "/api/v3/settings/delete-2bs-certificate",
+  (req, res, ctx) => {
+    set2BSCertificates([])
+    return res(ctx.json({ status: "success" }))
+  }
+)
+
+export const okUpdate2BS = rest.post(
+  "/api/v3/settings/update-2bs-certificate",
+  (req, res, ctx) => {
+    set2BSCertificates([dbsCertificate])
+    return res(ctx.json({ status: "success" }))
   }
 )
 
@@ -209,7 +240,11 @@ export default setupServer(
   okDeleteISCC,
   okUpdateISCC,
   ok2BS,
+  okAdd2BS,
+  okDelete2BS,
+  okUpdate2BS,
   okDeliverySitesSearch,
   okCountrySearch,
-  okISCCSearch
+  okISCCSearch,
+  ok2BSSearch
 )
