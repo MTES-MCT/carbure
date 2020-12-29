@@ -35,7 +35,12 @@ const Pending = () => (
           Vous avez des questions concernant le fonctionnement de CarbuRe ?
         </span>
         <span>
-          <a href="/" target="_blank" rel="noreferrer" className={styles.link}>
+          <a
+            href="https://carbure-1.gitbook.io/faq/"
+            target="_blank"
+            rel="noreferrer"
+            className={styles.link}
+          >
             Notre FAQ
           </a>{" "}
           contient de nombreuses ressources pouvant vous aider dans votre
