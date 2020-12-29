@@ -154,7 +154,7 @@ const TransactionForm = ({
           />
 
           {tx.producer_is_in_carbure ? (
-            <React.Fragment>
+            <React.Fragment key="in_carbure">
               <LabelAutoComplete
                 readOnly={readOnly || isProducer}
                 label="Producteur"
@@ -210,7 +210,7 @@ const TransactionForm = ({
               />
             </React.Fragment>
           ) : (
-            <React.Fragment>
+            <React.Fragment key="not_in_carbure">
               <LabelInput
                 readOnly={readOnly}
                 label="Producteur"
@@ -228,7 +228,6 @@ const TransactionForm = ({
                 onChange={onChange}
               />
               <LabelAutoComplete
-                disabled={tx.producer_is_in_carbure}
                 readOnly={readOnly}
                 label="Pays de production"
                 placeholder="Rechercher un pays..."
@@ -242,7 +241,6 @@ const TransactionForm = ({
               />
               <LabelInput
                 readOnly={readOnly}
-                disabled={tx.producer_is_in_carbure}
                 type="date"
                 label="Date de mise en service"
                 name="unknown_production_site_com_date"
@@ -252,7 +250,6 @@ const TransactionForm = ({
               />
               <LabelInput
                 readOnly={readOnly}
-                disabled={tx.producer_is_in_carbure}
                 label="N° d'enregistrement double-compte"
                 name="unknown_production_site_dbl_counting"
                 value={tx.unknown_production_site_dbl_counting}
@@ -261,7 +258,6 @@ const TransactionForm = ({
               />
               <LabelInput
                 readOnly={readOnly}
-                disabled={tx.producer_is_in_carbure}
                 label="Référence Système Fournisseur"
                 name="unknown_production_site_reference"
                 value={tx.unknown_production_site_reference}
@@ -343,7 +339,7 @@ const TransactionForm = ({
             <LabelInput
               disabled
               label="Pays de livraison"
-              name="delivery_site_country"
+              name="carbure_delivery_site_country"
               defaultValue={tx.carbure_delivery_site?.country?.name ?? ""}
             />
           ) : (
@@ -353,7 +349,7 @@ const TransactionForm = ({
               label="Pays de livraison"
               name="unknown_delivery_site_country"
               value={tx.unknown_delivery_site_country}
-              error={fieldErrors.delivery_site_country}
+              error={fieldErrors.carbure_delivery_site_country}
               getValue={getters.code_pays}
               getLabel={getters.name}
               getQuery={findCountries}
@@ -487,15 +483,12 @@ const TransactionForm = ({
               label="Total"
               name="ghg_total"
               defaultValue={`${tx.ghg_total} gCO2eq/MJ`}
-              value={`${tx.ghg_total} gCO2eq/MJ`}
-
             />
             <LabelInput
               readOnly
               label="Réduction"
               name="ghg_reduction"
               defaultValue={`${tx.ghg_reduction}%`}
-              value={`${tx.ghg_reduction}%`}
             />
           </Box>
         </Box>
