@@ -1,5 +1,15 @@
+import { lot } from "common/__test__/data"
 import { rest } from "msw"
 import { setupServer } from "msw/node"
+
+import {
+  okBiocarburantsSearch,
+  okCountrySearch,
+  okDeliverySitesSearch,
+  okEntitySearch,
+  okMatierePremiereSearch,
+  okProductionSitesSearch,
+} from "common/__test__/api"
 
 import * as data from "./data"
 
@@ -124,6 +134,10 @@ export const okRejectAll = rest.post(
   }
 )
 
+export const okAddLot = rest.post("/api/v3/lots/add", (req, res, ctx) => {
+  return res(ctx.json({ status: "success", data: lot }))
+})
+
 export default setupServer(
   okSnapshot,
   okLots,
@@ -137,5 +151,12 @@ export default setupServer(
   okAcceptWithReserve,
   okAcceptAll,
   okRejectLot,
-  okRejectAll
+  okRejectAll,
+  okAddLot,
+  okBiocarburantsSearch,
+  okCountrySearch,
+  okDeliverySitesSearch,
+  okEntitySearch,
+  okMatierePremiereSearch,
+  okProductionSitesSearch
 )

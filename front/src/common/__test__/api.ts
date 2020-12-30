@@ -9,6 +9,10 @@ import {
   expired2BSCertificate,
   producer,
   trader,
+  operator,
+  matierePremiere,
+  biocarburant,
+  productionSite,
 } from "common/__test__/data"
 
 export const okEntitySearch = rest.get(
@@ -17,7 +21,7 @@ export const okEntitySearch = rest.get(
     return res(
       ctx.json({
         status: "success",
-        data: [producer, trader],
+        data: [producer, trader, operator],
       })
     )
   }
@@ -30,6 +34,42 @@ export const okCountrySearch = rest.get(
       ctx.json({
         status: "success",
         data: [country],
+      })
+    )
+  }
+)
+
+export const okBiocarburantsSearch = rest.get(
+  "/api/v3/common/biocarburants",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: [biocarburant],
+      })
+    )
+  }
+)
+
+export const okMatierePremiereSearch = rest.get(
+  "/api/v3/common/matieres-premieres",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: [matierePremiere],
+      })
+    )
+  }
+)
+
+export const okProductionSitesSearch = rest.get(
+  "/api/v3/common/production-sites",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: [productionSite],
       })
     )
   }

@@ -81,7 +81,7 @@ test("operator: display a list of 1 transaction", async () => {
 
     // check lot columns
     screen.getByText("Brouillon")
-    screen.getByText("2020-12")
+    screen.getByText("2020-01")
     screen.getByText("EMHV")
     screen.getByText("12 345")
     screen.getByText("Colza")
@@ -158,7 +158,7 @@ test("operator: duplicate draft lot", async () => {
   await waitFor(() => {
     // new line was added
     expect(screen.getAllByText("Brouillon").length).toBe(2)
-    expect(screen.getAllByText("2020-12").length).toBe(2)
+    expect(screen.getAllByText("2020-01").length).toBe(2)
     expect(screen.getAllByText("EMHV").length).toBe(2)
     expect(screen.getAllByText("12 345").length).toBe(2)
     expect(screen.getAllByText("Colza").length).toBe(2)
