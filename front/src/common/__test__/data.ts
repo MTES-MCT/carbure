@@ -145,7 +145,7 @@ export const biocarburant = {
 export const lot = {
   lot: {
     id: 0,
-    period: "2020-12",
+    period: "2020-01",
     carbure_id: "",
     producer_is_in_carbure: true,
     carbure_producer: producer,
@@ -188,7 +188,7 @@ export const lot = {
   client_is_in_carbure: true,
   carbure_client: operator,
   unknown_client: "",
-  delivery_date: "2020-12-31",
+  delivery_date: "2020-01-31",
   delivery_site_is_in_carbure: true,
   carbure_delivery_site: deliverySite,
   unknown_delivery_site: "",
@@ -197,5 +197,5 @@ export const lot = {
   champ_libre: "",
   is_mac: false,
   is_batch: false,
-  id: 11823,
+  id: 0,
 }

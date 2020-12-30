@@ -8,7 +8,15 @@ import { MemoryRouter } from "react-router-dom"
 import Transactions from "../index"
 
 import server, { setLots, setSnapshot } from "./api"
-import { emptyLots, emptySnapshot, lots, snapshot } from "./data"
+import {
+  deadlineLots,
+  emptyLots,
+  emptySnapshot,
+  errorLots,
+  lots,
+  manyLots,
+  snapshot,
+} from "./data"
 
 const TransactionsWithRouter = ({
   entity,
@@ -86,7 +94,7 @@ test("producer/trader: display a list of 1 transaction", async () => {
 
     // check lot columns
     screen.getByText("Brouillon")
-    screen.getByText("2020-12")
+    screen.getByText("2020-01")
     screen.getByText("EMHV")
     screen.getByText("12 345")
     screen.getByText("Colza")
@@ -103,7 +111,7 @@ test("producer/trader: check filters", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
   const filters = [
-    { name: "Périodes", value: "2020-12" },
+    { name: "Périodes", value: "2020-01" },
     { name: "Biocarburants", value: "EMHV" },
     { name: "Matières Premières", value: "Colza" },
     { name: "Clients", value: "Opérateur Test" },
@@ -136,11 +144,124 @@ test("producer/trader: check filters", async () => {
   }
 })
 
-test.todo("check search filter")
-test.todo("check year filter")
-test.todo("check error filter")
-test.todo("check deadline filter")
-test.todo("check pagination")
+test("check search filter", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await screen.findByText("DAETEST")
+
+  userEvent.type(screen.getByPlaceholderText("Rechercher..."), "test")
+  await screen.findByTitle("Chargement...")
+})
+
+test("check year filter", async () => {
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await screen.findByText("DAETEST")
+
+  userEvent.click(screen.getByText("2020"))
+  userEvent.click(screen.getByText("2019"))
+
+  await screen.findByTitle("Chargement...")
+})
+
+test("check pagination", async () => {
+  setLots(manyLots)
+
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await screen.findAllByText("DAETEST")
+
+  const select = screen.getByText("1", { selector: ".selectValue" })
+  const prev: any = screen.getByTitle("Page précédente")
+  const next: any = screen.getByTitle("Page suivante")
+
+  screen.getByText("sur 20,")
+
+  expect(prev.disabled).toBe(true)
+
+  userEvent.click(select)
+  userEvent.click(screen.getByText("19"))
+
+  expect(prev.disabled).toBe(false)
+
+  await screen.findByTitle("Chargement...")
+
+  userEvent.click(next)
+
+  await screen.findByTitle("Chargement...")
+
+  screen.getByText("20", { selector: ".selectValue" })
+  expect(next.disabled).toBe(true)
+
+  userEvent.click(prev)
+
+  screen.getByText("19", { selector: ".selectValue" })
+  expect(next.disabled).toBe(false)
+})
+
+test("check error filter", async () => {
+  setLots(errorLots)
+
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  const dae = await screen.findByText("DAETEST")
+  const row = dae.closest("tr")
+
+  expect(row).toHaveClass("transactionRowError")
+
+  screen.getByText(
+    (content, node) =>
+      node.textContent ===
+      "Parmi ces résultats, 1 lot présente des incohérences"
+  )
+
+  userEvent.click(screen.getByText("Voir la liste"))
+
+  await screen.findByTitle("Chargement...")
+
+  await screen.findByText(
+    (content, node) => node.textContent === "1 lot présente des incohérences"
+  )
+
+  userEvent.click(screen.getByText("Revenir à la liste complète"))
+
+  await screen.findByTitle("Chargement...")
+
+  await screen.findByText("Voir la liste")
+})
+
+test("check deadline filter", async () => {
+  setLots(deadlineLots)
+
+  render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  const dae = await screen.findByText("DAETEST")
+  const row = dae.closest("tr")
+
+  expect(row).toHaveClass("transactionRowDeadline")
+
+  screen.getByText(
+    (content, node) =>
+      node.textContent ===
+      "Parmi ces résultats, 1 lot doit être validé et envoyé avant le 29 février"
+  )
+
+  userEvent.click(screen.getByText("Voir la liste"))
+
+  await screen.findByTitle("Chargement...")
+
+  await screen.findByText(
+    (content, node) =>
+      node.textContent ===
+      "1 lot doit être validé et envoyé avant le 29 février"
+  )
+
+  userEvent.click(screen.getByText("Revenir à la liste complète"))
+
+  await screen.findByTitle("Chargement...")
+
+  await screen.findByText("Voir la liste")
+})
 
 test("producer/trader: check draft actions", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
@@ -226,7 +347,7 @@ test("producer/trader: duplicate draft lot", async () => {
   await waitFor(() => {
     // new line was added
     expect(screen.getAllByText("Brouillon").length).toBe(2)
-    expect(screen.getAllByText("2020-12").length).toBe(2)
+    expect(screen.getAllByText("2020-01").length).toBe(2)
     expect(screen.getAllByText("EMHV").length).toBe(2)
     expect(screen.getAllByText("12 345").length).toBe(2)
     expect(screen.getAllByText("Colza").length).toBe(2)

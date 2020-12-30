@@ -33,7 +33,7 @@ export const emptyLots = {
 }
 
 export const snapshot = {
-  years: [2020],
+  years: [2020, 2019],
   lots: {
     draft: 40,
     validated: 30,
@@ -43,7 +43,7 @@ export const snapshot = {
   filters: {
     matieres_premieres: [{ value: "COLZA", label: "Colza" }],
     biocarburants: [{ value: "EMHV", label: "EMHV" }],
-    periods: ["2020-12"],
+    periods: ["2020-01"],
     countries_of_origin: [{ value: "FR", label: "France" }],
     production_sites: ["Test Production Site"],
     delivery_sites: ["Test Delivery Site"],
@@ -59,7 +59,7 @@ export const lots = {
   from: 0,
   errors: {},
   deadlines: {
-    date: "2021-12-31",
+    date: "2020-12-31",
     total: 0,
   },
 }
@@ -74,7 +74,7 @@ export const operatorSnapshot = {
   filters: {
     matieres_premieres: [{ value: "COLZA", label: "Colza" }],
     biocarburants: [{ value: "EMHV", label: "EMHV" }],
-    periods: ["2020-12"],
+    periods: ["2020-01"],
     countries_of_origin: [{ value: "FR", label: "France" }],
     production_sites: ["Test Production Site"],
     delivery_sites: ["Test Delivery Site"],
@@ -82,7 +82,61 @@ export const operatorSnapshot = {
   },
 }
 
-export const operatorLots = {
+export const manyLots = {
+  lots: [lot, lot, lot, lot, lot, lot, lot, lot, lot, lot],
+  total: 200,
+  total_errors: 0,
+  returned: 10,
+  from: 0,
+  errors: {},
+  deadlines: {
+    date: "2020-12-31",
+    total: 0,
+  },
+}
+
+export const errorLots = {
+  lots: [lot],
+  total: 1,
+  total_errors: 1,
+  returned: 1,
+  from: 0,
+  errors: {
+    0: {
+      validation_errors: [
+        {
+          lot_id: 0,
+          error: "Matière Première incohérente avec le Biocarburant",
+          details: "Biogaz de Blé",
+          is_blocking: true,
+          is_warning: true,
+        },
+      ],
+      tx_errors: [
+        {
+          tx_id: 0,
+          field: "dae",
+          value: "",
+          error: "DAE manquant",
+        },
+      ],
+      lots_errors: [
+        {
+          lot_id: 0,
+          field: "matiere_premiere_code",
+          value: null,
+          error: "Merci de préciser la matière première",
+        },
+      ],
+    },
+  },
+  deadlines: {
+    date: "2020-12-31",
+    total: 0,
+  },
+}
+
+export const deadlineLots = {
   lots: [lot],
   total: 1,
   total_errors: 0,
@@ -90,7 +144,7 @@ export const operatorLots = {
   from: 0,
   errors: {},
   deadlines: {
-    date: "2021-12-31",
-    total: 0,
+    date: "2020-02-29",
+    total: 1,
   },
 }

@@ -54,6 +54,7 @@ const Pagination = ({ pagination, total }: PaginationProps) => {
   return (
     <div className={styles.pagination}>
       <Button
+        title="Page précédente"
         disabled={pagination.page === 0}
         className={styles.paginationButton}
         onClick={() => pagination.setPage(pagination.page - 1)}
@@ -84,6 +85,7 @@ const Pagination = ({ pagination, total }: PaginationProps) => {
       <span className={styles.paginationText}>résultats</span>
 
       <Button
+        title="Page suivante"
         disabled={pagination.page === pageCount - 1}
         className={styles.paginationButton}
         onClick={() => pagination.setPage(pagination.page + 1)}
