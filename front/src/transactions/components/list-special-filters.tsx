@@ -54,17 +54,17 @@ export const DeadlineFilter = ({
       <span>
         {!special.deadline && "Parmi ces résultats, "}
         <b>1 lot</b> doit être{" "}
-        {entity?.entity_type === "Opérateur" && "accepté"}{" "}
-        {entity?.entity_type !== "Opérateur" && "validé et envoyé"} avant le{" "}
-        <b>{deadlineDate}</b>
+        {entity?.entity_type === "Opérateur" ? "accepté" : "validé et envoyé"}{" "}
+        avant le <b>{deadlineDate}</b>
       </span>
     ) : (
       <span>
         {!special.deadline && "Parmi ces résultats, "}
         <b>{deadlineCount} lots</b> doivent être{" "}
-        {entity?.entity_type === "Opérateur" && "acceptés"}{" "}
-        {entity?.entity_type !== "Opérateur" && "validés et envoyés"} avant le{" "}
-        <b>{deadlineDate ?? "N/A"}</b>
+        {entity?.entity_type === "Opérateur"
+          ? "acceptés"
+          : "validés et envoyés"}{" "}
+        avant le <b>{deadlineDate ?? "N/A"}</b>
       </span>
     )}
   </AlertFilter>
