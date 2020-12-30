@@ -1,4 +1,9 @@
-import { render, waitFor, screen } from "@testing-library/react"
+import {
+  render,
+  waitFor,
+  screen,
+  waitForElementToBeRemoved,
+} from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "common/components/relative-route"
 import { Entity, LotStatus } from "common/types"
@@ -136,18 +141,18 @@ test("operator: check accepted actions", async () => {
     <TransactionsWithRouter status={LotStatus.Accepted} entity={operator} />
   )
 
-  screen.findByText("Exporter")
+  screen.getByText("Exporter")
 })
 
 test("operator: duplicate draft lot", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={operator} />)
 
   // click on the duplicate action
-  const duplicate = await waitFor(() => screen.getByTitle("Dupliquer le lot"))
+  const duplicate = await screen.findByTitle("Dupliquer le lot")
   userEvent.click(duplicate)
 
   // confirm the duplication
-  screen.getByText("Dupliquer lot")
+  await screen.findByText("Dupliquer lot")
   userEvent.click(screen.getByText("OK"))
 
   await screen.findByTitle("Chargement...")
@@ -155,8 +160,8 @@ test("operator: duplicate draft lot", async () => {
   // number in snapshot was incremented
   await screen.findByText("31")
 
+  // new line was added
   await waitFor(() => {
-    // new line was added
     expect(screen.getAllByText("Brouillon").length).toBe(2)
     expect(screen.getAllByText("2020-01").length).toBe(2)
     expect(screen.getAllByText("EMHV").length).toBe(2)
