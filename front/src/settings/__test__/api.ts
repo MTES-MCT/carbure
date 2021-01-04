@@ -7,6 +7,7 @@ import {
   dbsCertificate,
   deliverySite,
   isccCertificate,
+  operator,
   producer,
   productionSite,
 } from "common/__test__/data"
@@ -47,7 +48,23 @@ export const okSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
       status: "success",
       data: {
         email: "producer@test.com",
-        rights: [{ entity: producer, rights: "rw" }],
+        rights: [
+          { entity: producer, rights: "rw" },
+          { entity: operator, rights: "rw" },
+        ],
+        requests: [],
+      },
+    })
+  )
+})
+
+export const okEmptySettings = rest.get("/api/v3/settings", (req, res, ctx) => {
+  return res(
+    ctx.json({
+      status: "success",
+      data: {
+        email: "producer@test.com",
+        rights: [],
         requests: [],
       },
     })
