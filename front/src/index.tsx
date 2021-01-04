@@ -3,11 +3,17 @@ import ReactDOM from "react-dom"
 
 import "./carbure/assets/css/index.css"
 import * as serviceWorker from "./serviceWorker"
-import CarbureApp from "./carbure"
+import Carbure from "./carbure"
+import { BrowserRouter } from "react-router-dom"
+import NotificationsProvider from "common/components/notifications"
 
 ReactDOM.render(
   <React.StrictMode>
-    <CarbureApp />
+    <BrowserRouter basename="/v2">
+      <NotificationsProvider>
+        <Carbure />
+      </NotificationsProvider>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")
 )
