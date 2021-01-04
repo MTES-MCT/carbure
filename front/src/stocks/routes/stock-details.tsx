@@ -6,7 +6,7 @@ import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
 import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
 import { LotRejector } from "transactions/hooks/actions/use-reject-lots"
 import { LotValidator } from "transactions/hooks/actions/use-validate-lots"
-import { LotSender } from "transactions/hooks/actions/use-send-lots"
+import { LotSender } from "stocks/hooks/use-send-lots"
 
 import styles from "transactions/components/form.module.css"
 
