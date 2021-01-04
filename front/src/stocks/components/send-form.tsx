@@ -138,7 +138,7 @@ export const StockSendLotPrompt = ({
         <LabelInput
           disabled
           label="Pays de livraison"
-          defaultValue={form.carbure_delivery_site?.country?.name}
+          value={form.carbure_delivery_site?.country?.name}
         />
       ) : (
         <LabelAutoComplete
