@@ -205,11 +205,10 @@ test("check error filter", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
   const dae = await screen.findByText("DAETEST")
-  const row = dae.closest("tr")
 
-  expect(row).toHaveClass("transactionRowError")
+  expect(dae.closest("tr")).toHaveClass("transactionRowError")
 
-  screen.getByText(
+  await screen.findByText(
     (content, node) =>
       node.textContent ===
       "Parmi ces résultats, 1 lot présente des incohérences"
@@ -236,11 +235,10 @@ test("check deadline filter", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
   const dae = await screen.findByText("DAETEST")
-  const row = dae.closest("tr")
 
-  expect(row).toHaveClass("transactionRowDeadline")
+  expect(dae.closest("tr")).toHaveClass("transactionRowDeadline")
 
-  screen.getByText(
+  await screen.findByText(
     (content, node) =>
       node.textContent ===
       "Parmi ces résultats, 1 lot doit être validé et envoyé avant le 29 février"

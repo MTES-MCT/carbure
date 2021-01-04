@@ -148,3 +148,10 @@ export const deadlineLots = {
     total: 1,
   },
 }
+
+export const lotDetails = {
+  transaction: lot,
+  errors: {},
+  deadline: "2021-01-31",
+  comments: [],
+}
