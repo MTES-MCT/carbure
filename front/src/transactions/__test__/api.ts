@@ -15,6 +15,7 @@ import * as data from "./data"
 
 let snapshot: any
 let lots: any
+let details: any
 
 export function setSnapshot(nextSnapshot: any) {
   snapshot = JSON.parse(JSON.stringify(nextSnapshot))
@@ -24,9 +25,14 @@ export function setLots(nextLots: any) {
   lots = JSON.parse(JSON.stringify(nextLots))
 }
 
+export function setDetails(nextDetails: any) {
+  details = JSON.parse(JSON.stringify(nextDetails))
+}
+
 // init data
 setSnapshot(data.snapshot)
-setSnapshot(data.lots)
+setLots(data.lots)
+setDetails(data.lotDetails)
 
 export const okSnapshot = rest.get("/api/v3/lots/snapshot", (req, res, ctx) => {
   return res(ctx.json({ status: "success", data: snapshot }))
@@ -138,6 +144,19 @@ export const okAddLot = rest.post("/api/v3/lots/add", (req, res, ctx) => {
   return res(ctx.json({ status: "success", data: lot }))
 })
 
+export const okLotDetails = rest.get(
+  "/api/v3/lots/details",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success", data: details }))
+  }
+)
+
+export const okLotUpdate = rest.post("/api/v3/lots/update", (req, res, ctx) => {
+  setDetails(data.lotDetails)
+  details.transaction.dae = "DAETESTUPDATE OK"
+  return res(ctx.json({ status: "success" }))
+})
+
 export default setupServer(
   okSnapshot,
   okLots,
@@ -158,5 +177,7 @@ export default setupServer(
   okDeliverySitesSearch,
   okEntitySearch,
   okMatierePremiereSearch,
-  okProductionSitesSearch
+  okProductionSitesSearch,
+  okLotDetails,
+  okLotUpdate
 )

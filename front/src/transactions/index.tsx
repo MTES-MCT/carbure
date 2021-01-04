@@ -64,7 +64,7 @@ const PRODUCER_TRADER_FILTERS = [
   Filters.DeliverySites,
 ]
 
-function useTransactions(entity: EntitySelection) {
+export function useTransactions(entity: EntitySelection) {
   const pagination = usePageSelection()
 
   const special = useSpecialSelection(pagination)
