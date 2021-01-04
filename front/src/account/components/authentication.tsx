@@ -26,7 +26,7 @@ export const AccountAuthentication = ({
         <LabelInput
           readOnly
           label="Addresse email"
-          defaultValue={settings.data?.email}
+          value={settings.data?.email ?? ""}
         />
       </SectionBody>
     </Section>
