@@ -7,6 +7,7 @@ import {
   expiredISCCCertificate,
   producer,
 } from "common/__test__/data"
+import { waitWhileLoading } from "common/__test__/helpers"
 import { useGetSettings } from "settings/hooks/use-get-settings"
 import Settings from "../index"
 
@@ -29,6 +30,8 @@ afterAll(() => server.close())
 test("check the iscc certificate section of the settings", async () => {
   render(<SettingsWithHooks entity={producer} />)
 
+  await waitWhileLoading()
+
   screen.getByText("Certificats ISCC")
   screen.getByText("Ajouter un certificat ISCC")
   screen.getByText("Aucun certificat ISCC trouvé")
@@ -37,31 +40,25 @@ test("check the iscc certificate section of the settings", async () => {
 test("add an iscc certificate in settings", async () => {
   render(<SettingsWithHooks entity={producer} />)
 
+  await waitWhileLoading()
+
   userEvent.click(screen.getByText("Ajouter un certificat ISCC"))
 
   // wait for dialog to open
-  const input = screen.getByLabelText("Certificat ISCC")
-
+  const input = await screen.findByLabelText("Certificat ISCC")
   userEvent.type(input, "Test")
 
-  const option = await waitFor(() =>
-    screen.getByText("ISCC Test - Holder Test")
-  )
-
+  const option = await screen.findByText("ISCC Test - Holder Test")
   userEvent.click(option)
-
-  await waitFor(() => {
-    expect(input.getAttribute("value")).toBe("ISCC Test - Holder Test")
-  })
 
   userEvent.click(screen.getByText("Ajouter"))
 
-  await waitFor(() => {
-    screen.getByText("ISCC Test")
-    screen.getByText("Holder Test")
-    screen.getByText("Scope Test")
-    screen.getByText("24/04/2021")
-  })
+  await waitWhileLoading()
+
+  await screen.findByText("ISCC Test")
+  screen.getByText("Holder Test")
+  screen.getByText("Scope Test")
+  screen.getByText("24/04/2021")
 })
 
 test("delete an iscc certificate in settings", async () => {
@@ -69,22 +66,22 @@ test("delete an iscc certificate in settings", async () => {
 
   render(<SettingsWithHooks entity={producer} />)
 
-  const deleteButton = await waitFor(() => {
-    screen.getByText("ISCC Test")
-    screen.getByText("Holder Test")
-    screen.getByText("Scope Test")
+  await waitWhileLoading()
 
-    return screen.getByTitle("Supprimer le certificat").closest("svg")!
-  })
+  const deleteButton = await screen.findByTitle("Supprimer le certificat")
+  screen.getByText("ISCC Test")
+  screen.getByText("Holder Test")
+  screen.getByText("Scope Test")
 
   // click on the delete button and then confirm the action on the popup
   userEvent.click(deleteButton)
+
   screen.getByText("Suppression certificat")
   userEvent.click(screen.getByText("OK"))
 
-  await waitFor(() => {
-    screen.getByText("Aucun certificat ISCC trouvé")
-  })
+  await waitWhileLoading()
+
+  await screen.findByText("Aucun certificat ISCC trouvé")
 })
 
 test("renew a certificate", async () => {
@@ -92,25 +89,24 @@ test("renew a certificate", async () => {
 
   render(<SettingsWithHooks entity={producer} />)
 
-  const updateButton = await waitFor(() => {
-    screen.getByText("Expired ISCC Test")
-    screen.getByText("Expired Holder Test")
-    screen.getByText("Expired Scope Test")
-    screen.getByText("Expiré (01/01/2000)")
+  await waitWhileLoading()
 
-    return screen.getByText("Mise à jour")
-  })
+  const updateButton = await screen.findByText("Mise à jour")
+  screen.getByText("Expired ISCC Test")
+  screen.getByText("Expired Holder Test")
+  screen.getByText("Expired Scope Test")
+  screen.getByText("Expiré (01/01/2000)")
 
   userEvent.click(updateButton)
   screen.getByText("Mise à jour certificat ISCC")
 
   userEvent.type(screen.getByLabelText("Certificat ISCC"), "Test")
-  const option = await waitFor(() => screen.getByText("ISCC Test - Holder Test")) // prettier-ignore
+  const option = await screen.findByText("ISCC Test - Holder Test")
   userEvent.click(option)
 
   userEvent.click(screen.getByText("Ajouter"))
 
-  await waitFor(() => {
-    screen.getByText("ISCC Test")
-  })
+  await waitWhileLoading()
+
+  await screen.findByText("ISCC Test")
 })
