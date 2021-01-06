@@ -4,6 +4,7 @@ import { Route } from "common/components/relative-route"
 import { Entity } from "common/types"
 
 import { producer } from "common/__test__/data"
+import { waitWhileLoading } from "common/__test__/helpers"
 import { MemoryRouter } from "react-router-dom"
 import TransactionAdd from "../routes/transaction-add"
 
@@ -79,8 +80,6 @@ test("display the transaction form", async () => {
 
   screen.getByText("Créer lot")
   screen.getByText("Retour")
-
-  userEvent.click(screen.getByText("Retour"))
 })
 
 test("check the form fields", async () => {
@@ -134,6 +133,14 @@ test("check the form fields", async () => {
 
   userEvent.click(screen.getByText("Créer lot"))
 
+  await waitWhileLoading()
+
+  // creation form disappears
+  expect(
+    screen.queryByText("Créer une nouvelle transaction")
+  ).not.toBeInTheDocument()
+
+  // page for the newly created lot appears
   await screen.findByText("LOT CREATED")
 
   expect(refresh).toHaveBeenCalledTimes(1)

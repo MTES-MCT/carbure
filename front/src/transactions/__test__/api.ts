@@ -11,6 +11,7 @@ import {
   okProductionSitesSearch,
 } from "common/__test__/api"
 
+import { clone } from "common/__test__/helpers"
 import * as data from "./data"
 
 let snapshot: any
@@ -18,15 +19,15 @@ let lots: any
 let details: any
 
 export function setSnapshot(nextSnapshot: any) {
-  snapshot = JSON.parse(JSON.stringify(nextSnapshot))
+  snapshot = clone(nextSnapshot)
 }
 
 export function setLots(nextLots: any) {
-  lots = JSON.parse(JSON.stringify(nextLots))
+  lots = clone(nextLots)
 }
 
 export function setDetails(nextDetails: any) {
-  details = JSON.parse(JSON.stringify(nextDetails))
+  details = clone(nextDetails)
 }
 
 // init data
@@ -46,9 +47,11 @@ export const okDuplicateLot = rest.post(
   "/api/v3/lots/duplicate",
   (req, res, ctx) => {
     snapshot.lots.draft++
+
     lots.lots = [lots.lots[0], lots.lots[0]]
     lots.total = 2
     lots.returned = 2
+
     return res(ctx.json({ status: "success" }))
   }
 )
@@ -60,7 +63,9 @@ export const okSendLots = rest.post(
     snapshot.lots.tofix--
     snapshot.lots.validated++
     snapshot.lots.in++
+
     lots.lots = []
+
     return res(ctx.json({ status: "success" }))
   }
 )
