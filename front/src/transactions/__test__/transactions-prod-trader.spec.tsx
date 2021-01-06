@@ -160,7 +160,7 @@ test("check search filter", async () => {
 
   userEvent.type(screen.getByPlaceholderText("Rechercher..."), "test")
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...")
 })
 
 test("check year filter", async () => {
@@ -173,7 +173,7 @@ test("check year filter", async () => {
   userEvent.click(screen.getByText("2020"))
   userEvent.click(screen.getByText("2019"))
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...")
 })
 
 test("check pagination", async () => {
