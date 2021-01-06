@@ -1,4 +1,4 @@
-import { lot, producer } from "common/__test__/data"
+import { lot, operator } from "common/__test__/data"
 
 export const emptySnapshot = {
   years: [2020],
@@ -167,6 +167,12 @@ export const errorDetails = {
         is_blocking: true,
         is_warning: true,
       },
+      {
+        lot_id: 0,
+        error: "Volume inhabituellement faible.",
+        is_blocking: false,
+        is_warning: true,
+      },
     ],
     tx_errors: [
       {
@@ -200,5 +206,5 @@ export const tofixDetails = {
   },
   errors: {},
   deadline: "2021-01-31",
-  comments: [{ entity: producer, comment: "ok" }],
+  comments: [{ entity: operator, comment: "not ok" }],
 }
