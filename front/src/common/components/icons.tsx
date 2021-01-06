@@ -118,7 +118,11 @@ export const Message = ({ className, ...props }: IconProps) => (
 )
 
 export const Loader = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("icon-loader", styles.loader, className)}>
+  <Icon
+    {...props}
+    className={cl("icon-loader", styles.loader, className)}
+    title="Chargement..."
+  >
     <line x1="12" y1="6" x2="12" y2="3" />
     <line x1="16.25" y1="7.75" x2="18.4" y2="5.6" />
     <line x1="18" y1="12" x2="21" y2="12" />
