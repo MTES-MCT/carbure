@@ -31,7 +31,7 @@ export function useGetSnapshot(entity: EntitySelection, year: YearSelection) {
 
   function getSnapshot() {
     if (typeof entityID !== "undefined") {
-      return resolveSnapshot(entityID, year.selected).cancel
+      resolveSnapshot(entityID, year.selected)
     }
   }
 
@@ -79,7 +79,7 @@ export function useGetLots(
 
   function getTransactions() {
     if (typeof entityID !== "undefined") {
-      return resolveLots(
+      resolveLots(
         status.active,
         entityID,
         filters.selected,
@@ -91,7 +91,7 @@ export function useGetLots(
         sorting.order,
         special.invalid,
         special.deadline
-      ).cancel
+      )
     }
   }
 
