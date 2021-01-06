@@ -154,7 +154,7 @@ test("operator: duplicate draft lot", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // number in snapshot was incremented
   await screen.findByText("31")
@@ -189,7 +189,7 @@ test("operator: sent draft lot", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of draft lots
   await screen.findByText("29")
@@ -222,7 +222,7 @@ test("operator: sent all draft lots", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of draft lots
   await screen.findByText("29")
@@ -253,7 +253,7 @@ test("operator: sent selected draft lots", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of draft lots
   await screen.findByText("29")
@@ -281,7 +281,7 @@ test("operator: delete draft lot", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of draft lots
   await screen.findByText("29")
@@ -312,7 +312,7 @@ test("operator: delete all draft lot", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of draft lots
   await screen.findByText("29")
@@ -341,7 +341,7 @@ test("operator: delete selected draft lot", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of draft lots
   await screen.findByText("29")
@@ -367,7 +367,7 @@ test("operator: accept inbox lot", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of inbox lots
   await screen.findByText("19")
@@ -395,7 +395,7 @@ test("operator: accept inbox lot (sous réserve)", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // lot status has changed
   await screen.findByText("À corriger")
@@ -423,7 +423,7 @@ test("operator: accept all inbox lots", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of draft lots
   await screen.findByText("19")
@@ -454,7 +454,7 @@ test("operator: accept selected inbox lots", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of draft lots
   await screen.findByText("19")
@@ -483,7 +483,7 @@ test("operator: reject inbox lot", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of inbox lots
   await screen.findByText("19")
@@ -515,7 +515,7 @@ test("operator: reject all inbox lots", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of draft lots
   await screen.findByText("19")
@@ -545,7 +545,7 @@ test("operator: reject selected inbox lots", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of draft lots
   await screen.findByText("19")

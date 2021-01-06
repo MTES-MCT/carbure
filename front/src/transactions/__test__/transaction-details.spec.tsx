@@ -368,7 +368,7 @@ test("accept sous reserve inbox lot from details", async () => {
 
   await waitWhileLoading()
 
-  await screen.findByText("À corriger")
+  const status = await screen.findByText("À corriger")
 
   userEvent.click(screen.getByText("Accepter sous réserve"))
 
@@ -377,12 +377,15 @@ test("accept sous reserve inbox lot from details", async () => {
   userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "test is incorrect") // prettier-ignore
   userEvent.click(screen.getByText("Accepter et demander une correction"))
 
-  await waitWhileLoading()
+  // await waitWhileLoading()
 
   await screen.findByText("Commentaires (2)")
   screen.getByText("test is incorrect")
 
   userEvent.click(screen.getByText("Retour"))
+
+  expect(status).not.toBeInTheDocument()
+  // await waitForElementToBeRemoved(status)
 })
 
 test("reject inbox lot from details", async () => {
