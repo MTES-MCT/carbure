@@ -16,7 +16,7 @@ export function useGetSettings(): SettingsGetter {
   const [settings, resolveSettings] = useAPI(api.getSettings)
 
   function resolve() {
-    return resolveSettings().cancel
+    resolveSettings()
   }
 
   useEffect(resolve, [resolveSettings])

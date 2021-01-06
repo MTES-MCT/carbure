@@ -36,8 +36,7 @@ const initialState = {
   data: null,
 }
 
-type CancelablePromise<T> = Promise<T | undefined> & { cancel?: () => void }
-type Resolver<T extends any[], U> = (...args: T) => CancelablePromise<U>
+type Resolver<T extends any[], U> = (...args: T) => Promise<U | undefined>
 type ApiReducer<T> = React.Reducer<ApiState<T>, ApiAction<T>>
 type ApiHook<T extends any[], U> = [ApiState<U>, Resolver<T, U>]
 
@@ -75,21 +74,17 @@ function useAPI<T extends any[], U>(
         }
       }
 
-      const promise: CancelablePromise<U> = resolve()
-      promise.cancel = () => { cancelled.current = true } // prettier-ignore
-
-      return promise
+      return resolve()
     },
     [dispatch, createPromise]
   )
 
   // cancel the request if the component is unmounted
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    return () => {
       cancelled.current = true
-    },
-    []
-  )
+    }
+  }, [])
 
   return [state, resolve]
 }

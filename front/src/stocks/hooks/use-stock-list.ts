@@ -22,7 +22,7 @@ export function useGetStockSnapshot(entity: EntitySelection) {
 
   function getSnapshot() {
     if (entity !== null) {
-      return resolveStockSnapshot(entity.id).cancel
+      resolveStockSnapshot(entity.id)
     }
   }
 
@@ -49,7 +49,7 @@ export function useGetStocks(
 
   function getStock() {
     if (typeof entityID !== "undefined") {
-      return resolveStocks(
+      resolveStocks(
         entityID,
         filters.selected,
         status.active,
@@ -58,7 +58,7 @@ export function useGetStocks(
         search.query,
         sorting.column,
         sorting.order
-      ).cancel
+      )
     }
   }
 
