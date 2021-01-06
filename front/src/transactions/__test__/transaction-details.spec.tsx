@@ -1,15 +1,19 @@
-import { render, screen } from "@testing-library/react"
+import {
+  render,
+  screen,
+  waitForElementToBeRemoved,
+} from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { MemoryRouter } from "react-router-dom"
 import { Route } from "common/components/relative-route"
 import { Entity } from "common/types"
 
-import { producer } from "common/__test__/data"
+import { operator, producer } from "common/__test__/data"
 import { useTransactions } from "../index"
 import TransactionDetails from "../routes/transaction-details"
 
 import server, { setDetails } from "./api"
-import { lotDetails } from "./data"
+import { lotDetails, errorDetails, tofixDetails } from "./data"
 
 beforeAll(() => server.listen())
 afterEach(() => {
@@ -181,16 +185,201 @@ test("edit transaction details", async () => {
 
   userEvent.click(screen.getByText("Retour"))
 })
+test("check transaction errors", async () => {
+  setDetails(errorDetails)
 
-test.todo("check transaction errors")
-test.todo("check transaction comments")
+  render(<TransactionWithRouter entity={producer} />)
 
-test.todo("send draft lot from details")
-test.todo("delete draft lot from details")
+  await screen.findByText(
+    (content, node) =>
+      node.textContent === "Ce lot doit être validé avant le 29 février 2020"
+  )
 
-test.todo("resend tofix lot from details")
-test.todo("delete tofix lot from details")
+  const dae = screen.getByTitle("DAE manquant")
+  expect(dae).toHaveClass("errorLabel")
 
-test.todo("accept inbox lot from details")
-test.todo("accept sous reserve inbox lot from details")
-test.todo("reject inbox lot from details")
+  const mp = screen.getByTitle("Merci de préciser la matière première")
+  expect(mp).toHaveClass("errorLabel")
+
+  screen.getByText("Erreurs bloquantes (1)")
+  screen.getByText("Matière Première incohérente avec le Biocarburant")
+
+  screen.getByText("Erreurs non-bloquantes (1)")
+  screen.getByText("Volume inhabituellement faible.")
+
+  userEvent.click(screen.getByText("Retour"))
+})
+
+test("check transaction comments", async () => {
+  setDetails(tofixDetails)
+
+  render(<TransactionWithRouter entity={producer} />)
+
+  await screen.findByText("À corriger")
+
+  screen.getByText("Commentaires (1)")
+  screen.getByText("Opérateur Test:")
+  screen.getByText("not ok")
+
+  userEvent.type(
+    screen.getByPlaceholderText("Entrez un commentaire..."),
+    "test ok"
+  )
+
+  userEvent.click(screen.getByText("Envoyer"))
+
+  await screen.findByTitle("Chargement...")
+
+  await screen.findByText("Commentaires (2)")
+  screen.getByText("Producteur Test:")
+  screen.getByText("test ok")
+
+  userEvent.click(screen.getByText("Retour"))
+})
+
+test("send draft lot from details", async () => {
+  render(<TransactionWithRouter entity={producer} />)
+
+  // click on the send action
+  const send = await screen.findByText("Envoyer")
+  userEvent.click(send)
+
+  // confirm the sending
+  screen.getByText("Envoyer lot")
+  userEvent.click(screen.getByText("OK"))
+
+  await screen.findByTitle("Chargement...")
+
+  await screen.findByText("En attente")
+
+  userEvent.click(screen.getByText("Retour"))
+})
+
+test("delete draft lot from details", async () => {
+  render(<TransactionWithRouter entity={producer} />)
+
+  // click on the send action
+  const send = await screen.findByText("Supprimer")
+  userEvent.click(send)
+
+  // confirm the sending
+  screen.getByText("Supprimer lot")
+  userEvent.click(screen.getByText("OK"))
+
+  await waitForElementToBeRemoved(() =>
+    screen.getByText("Détails de la transaction")
+  )
+})
+
+test("resend tofix lot from details", async () => {
+  setDetails(tofixDetails)
+
+  render(<TransactionWithRouter entity={producer} />)
+
+  // click on the send action
+  const send = await screen.findByText("Renvoyer")
+  userEvent.click(send)
+
+  // confirm the sending
+  screen.getByText("Envoyer lot")
+  userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "test is fixed") // prettier-ignore
+  userEvent.click(screen.getByText("OK"))
+
+  await screen.findByText("Corrigé")
+  screen.getByText("Commentaires (2)")
+  screen.getByText("test is fixed")
+
+  userEvent.click(screen.getByText("Retour"))
+})
+
+test("delete tofix lot from details", async () => {
+  setDetails(tofixDetails)
+
+  render(<TransactionWithRouter entity={producer} />)
+
+  // click on the send action
+  const send = await screen.findByText("Supprimer")
+  userEvent.click(send)
+
+  // confirm the sending
+  screen.getByText("Supprimer lot")
+  userEvent.click(screen.getByText("OK"))
+
+  await waitForElementToBeRemoved(() =>
+    screen.getByText("Détails de la transaction")
+  )
+})
+
+test("accept inbox lot from details", async () => {
+  setDetails(tofixDetails)
+
+  render(<TransactionWithRouter entity={operator} />)
+
+  await screen.findByText("À corriger")
+
+  userEvent.click(screen.getByText("Accepter"))
+
+  // confirm the transaction
+  screen.getByText("Accepter lot")
+  userEvent.click(screen.getByText("OK"))
+
+  await screen.findByTitle("Chargement...")
+
+  await screen.findByText("Accepté")
+
+  userEvent.click(screen.getByText("Retour"))
+
+  await waitForElementToBeRemoved(() =>
+    screen.getByText("Détails de la transaction")
+  )
+})
+
+test("accept sous reserve inbox lot from details", async () => {
+  setDetails(tofixDetails)
+
+  render(<TransactionWithRouter entity={operator} />)
+
+  await screen.findByText("À corriger")
+
+  userEvent.click(screen.getByText("Accepter sous réserve"))
+
+  screen.getByText("Accepter lot")
+  userEvent.click(screen.getByText("Les deux"))
+  userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "test is incorrect") // prettier-ignore
+  userEvent.click(screen.getByText("Accepter et demander une correction"))
+
+  await screen.findByTitle("Chargement...")
+
+  await screen.findByText("Commentaires (2)")
+  await screen.findByText("test is incorrect")
+
+  userEvent.click(screen.getByText("Retour"))
+
+  await waitForElementToBeRemoved(() =>
+    screen.getByText("Détails de la transaction")
+  )
+})
+
+test("reject inbox lot from details", async () => {
+  setDetails(tofixDetails)
+
+  render(<TransactionWithRouter entity={operator} />)
+
+  await screen.findByText("À corriger")
+
+  userEvent.click(screen.getByText("Accepter"))
+
+  // confirm the transaction
+  screen.getByText("Accepter lot")
+  userEvent.click(screen.getByText("OK"))
+
+  await screen.findByTitle("Chargement...")
+
+  await screen.findByText("Accepté")
+
+  userEvent.click(screen.getByText("Retour"))
+
+  await waitForElementToBeRemoved(() =>
+    screen.getByText("Détails de la transaction")
+  )
+})
