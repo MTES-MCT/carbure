@@ -138,7 +138,8 @@ test("producer/trader: check filters", async () => {
     const selection = await screen.findByText(value, { selector: "li span" }) // prettier-ignore
     userEvent.click(selection)
 
-    await waitWhileLoading()
+    // await waitWhileLoading()
+    await screen.findByTitle("Chargement...") // cool
 
     userEvent.type(filter, "{esc}")
 
@@ -146,7 +147,7 @@ test("producer/trader: check filters", async () => {
     expect(selection).not.toBeInTheDocument()
 
     // check that the right selection is displayed
-    screen.getByText(value, { selector: ".selectValue" })
+    await screen.findByText(value, { selector: ".selectValue" })
   }
 })
 
@@ -196,7 +197,7 @@ test("check pagination", async () => {
   userEvent.click(select)
   userEvent.click(screen.getByText("19"))
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   expect(select).toHaveTextContent("19")
   expect(prev).not.toBeDisabled()
@@ -204,17 +205,17 @@ test("check pagination", async () => {
   // click on the next button
   userEvent.click(next)
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
-  screen.getByText("20", { selector: ".selectValue" })
+  await screen.findByText("20", { selector: ".selectValue" })
   expect(next).toBeDisabled()
 
   // click on the prev button
   userEvent.click(prev)
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
-  screen.getByText("19", { selector: ".selectValue" })
+  await screen.findByText("19", { selector: ".selectValue" })
   expect(next).not.toBeDisabled()
 })
 
@@ -237,17 +238,17 @@ test("check error filter", async () => {
 
   userEvent.click(screen.getByText("Voir la liste"))
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
-  screen.getByText(
+  await screen.findByText(
     (content, node) => node.textContent === "1 lot présente des incohérences"
   )
 
   userEvent.click(screen.getByText("Revenir à la liste complète"))
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
-  screen.getByText("Voir la liste")
+  await screen.findByText("Voir la liste")
 })
 
 test("check deadline filter", async () => {
@@ -269,9 +270,9 @@ test("check deadline filter", async () => {
 
   userEvent.click(screen.getByText("Voir la liste"))
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
-  screen.getByText(
+  await screen.findByText(
     (content, node) =>
       node.textContent ===
       "1 lot doit être validé et envoyé avant le 29 février"
@@ -279,9 +280,9 @@ test("check deadline filter", async () => {
 
   userEvent.click(screen.getByText("Revenir à la liste complète"))
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
-  screen.getByText("Voir la liste")
+  await screen.findByText("Voir la liste")
 })
 
 test("producer/trader: check draft actions", async () => {
@@ -360,7 +361,7 @@ test("producer/trader: duplicate draft lot", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // number in snapshot was incremented
   await screen.findByText("41")
@@ -395,7 +396,7 @@ test("producer/trader: sent draft lot", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of draft lots
   await screen.findByText("39")
@@ -428,7 +429,7 @@ test("producer/trader: sent all draft lots", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of draft lots
   await screen.findByText("39")
@@ -459,7 +460,7 @@ test("producer/trader: sent selected draft lots", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of draft lots
   await screen.findByText("39")
@@ -487,7 +488,7 @@ test("producer/trader: delete draft lot", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of draft lots
   await screen.findByText("39")
@@ -518,7 +519,7 @@ test("producer/trader: delete all draft lot", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   await screen.findByText("39")
 
@@ -546,7 +547,7 @@ test("producer/trader: delete selected draft lot", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   await screen.findByText("39")
 
@@ -572,7 +573,7 @@ test("producer/trader: resend fixed lot", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of lots to fix
   await screen.findByText("19")
@@ -598,7 +599,7 @@ test("producer/trader: delete tofix lot", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitWhileLoading()
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of lots to fix
   await screen.findByText("19")
@@ -625,9 +626,9 @@ test("producer/trader: delete selected tofix lot", async () => {
   const title = screen.getByText("Supprimer lot")
   userEvent.click(screen.getByText("OK"))
 
-  await waitWhileLoading()
-
   expect(title).not.toBeInTheDocument()
+
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of tofix lots
   await screen.findByText("19")
