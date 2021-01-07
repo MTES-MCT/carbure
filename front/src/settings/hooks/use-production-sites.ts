@@ -182,7 +182,7 @@ export default function useProductionSites(
 
   useEffect(() => {
     if (typeof entityID !== "undefined") {
-      return resolveGetProductionSites(entityID).cancel
+      resolveGetProductionSites(entityID)
     }
   }, [entityID, resolveGetProductionSites])
 

@@ -1,12 +1,10 @@
 import React from "react"
-import { BrowserRouter } from "react-router-dom"
 
 import { AppHook, useApp } from "./hooks/use-app"
 import useEntity from "./hooks/use-entity"
 
 import { Alert } from "common/components/alert"
 import { AlertTriangle } from "common/components/icons"
-import NotificationsProvider from "common/components/notifications"
 
 import { Redirect, Route, Switch } from "common/components/relative-route"
 import Topbar from "./components/top-bar"
@@ -78,37 +76,33 @@ const Org = ({ app }: { app: AppHook }) => {
   )
 }
 
-const CarbureApp = () => {
+const Carbure = () => {
   const app = useApp()
   const { settings, getDefaultEntity } = app
 
   return (
-    <BrowserRouter basename="/v2">
-      <NotificationsProvider>
-        <div id="app">
-          {settings.error && (
-            <Alert level="error" icon={AlertTriangle}>
-              {settings.error}
-            </Alert>
-          )}
+    <div id="app">
+      {settings.error && (
+        <Alert level="error" icon={AlertTriangle}>
+          {settings.error}
+        </Alert>
+      )}
 
-          {!settings.error && settings.data && (
-            <Switch>
-              <Route path="/org/:entity">
-                <Org app={app} />
-              </Route>
+      {!settings.error && settings.data && (
+        <Switch>
+          <Route path="/org/:entity">
+            <Org app={app} />
+          </Route>
 
-              <Route path="/logout">
-                <Exit to="/accounts/logout" />
-              </Route>
+          <Route path="/logout">
+            <Exit to="/accounts/logout" />
+          </Route>
 
-              <Redirect to={`/org/${getDefaultEntity()}`} />
-            </Switch>
-          )}
-        </div>
-      </NotificationsProvider>
-    </BrowserRouter>
+          <Redirect to={`/org/${getDefaultEntity()}`} />
+        </Switch>
+      )}
+    </div>
   )
 }
 
-export default CarbureApp
+export default Carbure

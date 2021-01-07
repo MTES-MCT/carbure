@@ -198,7 +198,7 @@ export const ProductionSitePromptFactory = (
             disabled
             label="Référence double-comptage"
             name="dc_reference"
-            defaultValue={form.dc_reference}
+            value={form.dc_reference}
           />
         </Box>
 

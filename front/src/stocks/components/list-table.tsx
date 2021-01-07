@@ -10,7 +10,7 @@ import { useRelativePush } from "common/components/relative-route"
 import Table, { Actions, arrow, Column, Row } from "common/components/table"
 import * as C from "transactions/components/list-columns"
 import { Edit } from "common/components/icons"
-import { LotSender } from "transactions/hooks/actions/use-send-lots"
+import { LotSender } from "stocks/hooks/use-send-lots"
 
 type A = Record<string, (id: number) => void>
 type CT = Column<Transaction>

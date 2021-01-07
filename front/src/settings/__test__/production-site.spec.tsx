@@ -1,8 +1,9 @@
-import { render, waitFor, screen } from "@testing-library/react"
+import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import { Entity } from "common/types"
 import { producer, productionSite } from "common/__test__/data"
+import { waitWhileLoading } from "common/__test__/helpers"
 import { useGetSettings } from "settings/hooks/use-get-settings"
 import Settings from "../index"
 
@@ -26,6 +27,8 @@ afterAll(() => server.close())
 test("check the production site section of the settings", async () => {
   render(<SettingsWithHooks entity={producer} />)
 
+  await waitWhileLoading()
+
   screen.getByText("Sites de production")
   screen.getByText("Ajouter un site de production")
   screen.getByText("Aucun site de production trouvé")
@@ -34,6 +37,8 @@ test("check the production site section of the settings", async () => {
 test("add a production site in settings", async () => {
   render(<SettingsWithHooks entity={producer} />)
 
+  await waitWhileLoading()
+
   const button = screen.getByText("Ajouter un site de production")
 
   userEvent.click(button)
@@ -41,25 +46,26 @@ test("add a production site in settings", async () => {
   screen.getByText("Ajout site de production")
   const submit = screen.getByText("Sauvegarder")
 
-  expect(submit.hasAttribute("disabled")).toBe(true)
+  expect(submit).toBeDisabled()
 
   userEvent.type(screen.getByLabelText("N° d'identification (SIRET)"), "654321")
   userEvent.type(screen.getByLabelText("Nom du site"), "Other Production Site")
   userEvent.type(screen.getByLabelText("Date de mise en service"), "2010-01-31")
 
   userEvent.type(screen.getByLabelText("Pays"), "France")
-  await waitFor(() => userEvent.click(screen.getByText("France")))
+  const country = await screen.findByText("France")
+  userEvent.click(country)
 
-  expect(submit.hasAttribute("disabled")).toBe(false)
+  expect(submit).not.toBeDisabled()
 
   userEvent.click(submit)
 
-  await waitFor(() => {
-    screen.getByText("654321")
-    screen.getByText("Other Production Site")
-    screen.getByText("France")
-    screen.getByText("31/01/2010")
-  })
+  await waitWhileLoading()
+
+  await screen.findByText("654321")
+  screen.getByText("Other Production Site")
+  screen.getByText("France")
+  screen.getByText("31/01/2010")
 })
 
 test("update a production site details", async () => {
@@ -67,15 +73,17 @@ test("update a production site details", async () => {
 
   render(<SettingsWithHooks entity={producer} />)
 
+  await waitWhileLoading()
+
   // locate the psite row once it's loaded
-  const ps = await waitFor(() => screen.getByText("Test Production Site"))
+  const ps = screen.getByText("Test Production Site")
 
   // click it to open the details
   userEvent.click(ps)
 
   // check that the base values in the form are good
   const input = screen.getByLabelText("Nom du site")
-  expect(input.getAttribute("value")).toBe("Test Production Site")
+  expect(input).toHaveValue("Test Production Site")
 
   // clear the psite name and type a new one
   userEvent.clear(input)
@@ -84,14 +92,19 @@ test("update a production site details", async () => {
   // save the changes
   userEvent.click(screen.getByText("Sauvegarder"))
 
+  await waitWhileLoading()
+
+  // modal is closed
+  expect(screen.queryByLabelText("Nom du site")).not.toBeInTheDocument()
+
   // wait for the api to load the new data and check that it's actually changed
-  const row = await waitFor(() => screen.getByText("Other Production Site"))
+  const row = await screen.findByText("Other Production Site")
 
   // reopen the details
   userEvent.click(row)
 
   // verify that the inputs are fine as well
-  expect(screen.getByLabelText("Nom du site").getAttribute("value")).toBe(
+  expect(screen.getByLabelText("Nom du site")).toHaveValue(
     "Other Production Site"
   )
 })
@@ -101,21 +114,23 @@ test("remove a production site section in settings", async () => {
 
   render(<SettingsWithHooks entity={producer} />)
 
-  const deleteButton = await waitFor(() => {
-    screen.getByText("123456")
-    screen.getByText("Test Production Site")
-    screen.getByText("France")
-    screen.getByText("31/01/2000")
+  await waitWhileLoading()
 
-    return screen.getByTitle("Supprimer le site de production").closest("svg")!
-  })
+  const deleteButton = await screen.findByTitle(
+    "Supprimer le site de production"
+  )
+
+  screen.getByText("123456")
+  screen.getByText("Test Production Site")
+  screen.getByText("France")
+  screen.getByText("31/01/2000")
 
   // click on the delete button and then confirm the action on the popup
   userEvent.click(deleteButton)
   screen.getByText("Suppression site")
   userEvent.click(screen.getByText("OK"))
 
-  await waitFor(() => {
-    screen.getByText("Aucun site de production trouvé")
-  })
+  await waitWhileLoading()
+
+  await screen.findByText("Aucun site de production trouvé")
 })

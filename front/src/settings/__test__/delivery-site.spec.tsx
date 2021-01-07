@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 
 import { Entity } from "common/types"
 import { deliverySite, producer } from "common/__test__/data"
+import { waitWhileLoading } from "common/__test__/helpers"
 import { useGetSettings } from "settings/hooks/use-get-settings"
 import Settings from "../index"
 
@@ -25,6 +26,8 @@ afterAll(() => server.close())
 test("check the delivery site section of the settings", async () => {
   render(<SettingsWithHooks entity={producer} />)
 
+  await waitWhileLoading()
+
   screen.getByText("Dépôts")
   screen.getByText("Ajouter un dépôt")
   screen.getByText("Aucun dépôt trouvé")
@@ -33,33 +36,31 @@ test("check the delivery site section of the settings", async () => {
 test("add a delivery site in settings", async () => {
   render(<SettingsWithHooks entity={producer} />)
 
+  await waitWhileLoading()
+
   const button = screen.getByText("Ajouter un dépôt")
 
   userEvent.click(button)
 
   // wait for dialog to open
-  const input = await waitFor(() => screen.getByLabelText("Dépôt"))
-
+  const input = await screen.findByLabelText("Dépôt")
   userEvent.type(input, "Test")
 
-  const option = await waitFor(() =>
-    screen.getByText("Test Delivery Site", { selector: "li > *" })
-  )
-
+  const option = await screen.findByText("Test Delivery Site")
   userEvent.click(option)
 
   await waitFor(() => {
-    expect(input.getAttribute("value")).toBe("Test Delivery Site")
+    expect(input).toHaveValue("Test Delivery Site")
   })
 
   userEvent.click(screen.getByText("Ajouter"))
 
-  await waitFor(() => {
-    screen.getByText("10")
-    screen.getByText("Test Delivery Site")
-    screen.getByText("Autre")
-    screen.getByText("Test City, France")
-  })
+  await waitWhileLoading()
+
+  await screen.findByText("10")
+  screen.getByText("Test Delivery Site")
+  screen.getByText("Autre")
+  screen.getByText("Test City, France")
 })
 
 test("check a delivery site details", async () => {
@@ -67,13 +68,14 @@ test("check a delivery site details", async () => {
 
   render(<SettingsWithHooks entity={producer} />)
 
-  const ds = await waitFor(() => screen.getByText("Test Delivery Site"))
+  await waitWhileLoading()
 
+  const ds = screen.getByText("Test Delivery Site")
   userEvent.click(ds)
 
   const input = screen.getByLabelText("Nom du site")
 
-  expect(input.getAttribute("value")).toBe("Test Delivery Site")
+  expect(input).toHaveValue("Test Delivery Site")
 })
 
 test("remove a delivery site in settings", async () => {
@@ -81,22 +83,22 @@ test("remove a delivery site in settings", async () => {
 
   render(<SettingsWithHooks entity={producer} />)
 
+  await waitWhileLoading()
+
   screen.getByText("Dépôts")
 
-  const deleteButton = await waitFor(() => {
-    screen.getByText("10")
-    screen.getByText("Test Delivery Site")
-    screen.getByText("Autre")
-    screen.getByText("Test City, France")
+  const deleteButton = screen.getByTitle("Supprimer le dépôt")
 
-    return screen.getByTitle("Supprimer le dépôt").closest("svg")!
-  })
+  screen.getByText("10")
+  screen.getByText("Test Delivery Site")
+  screen.getByText("Autre")
+  screen.getByText("Test City, France")
 
   // click on the delete button and then confirm the action on the popup
   userEvent.click(deleteButton)
   userEvent.click(screen.getByText("OK"))
 
-  await waitFor(() => {
-    screen.getByText("Aucun dépôt trouvé")
-  })
+  await waitWhileLoading()
+
+  await screen.findByText("Aucun dépôt trouvé")
 })

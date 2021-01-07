@@ -1,13 +1,13 @@
 import { EntitySelection } from "carbure/hooks/use-entity"
 
 import * as api from "stocks/api"
-import useAPI from "../../../common/hooks/use-api"
-import { confirm } from "../../../common/components/dialog"
-import { prompt } from "../../../common/components/dialog"
+import useAPI from "../../common/hooks/use-api"
+import { confirm } from "../../common/components/dialog"
+import { prompt } from "../../common/components/dialog"
 import { StockSendLotPrompt } from "stocks/components/send-form"
-import { useNotificationContext } from "../../../common/components/notifications"
-import { TransactionSelection } from "../query/use-selection"
-import { StockDraft } from "../../../common/types"
+import { useNotificationContext } from "../../common/components/notifications"
+import { TransactionSelection } from "../../transactions/hooks/query/use-selection"
+import { StockDraft } from "../../common/types"
 import { StockDraftActions } from "stocks/components/list-actions"
 
 export interface LotSender {
@@ -73,7 +73,6 @@ export default function useSendLot(
   }
 
   async function createDrafts(txID: number) {
-
     const sent = await prompt(
       "Préparer lot",
       "Veuillez préciser les détails du lot à envoyer",
@@ -81,28 +80,22 @@ export default function useSendLot(
     )
 
     if (entity !== null && sent) {
-      const draft : StockDraft = {
+      const draft: StockDraft = {
         tx_id: txID,
         volume: sent.volume,
         dae: sent.dae,
         delivery_date: sent.delivery_date,
-        client: sent.client_is_in_carbure 
-        ? `${sent.carbure_client?.name ?? ""}`
-        : sent.unknown_client,
+        client: sent.client_is_in_carbure
+          ? `${sent.carbure_client?.name ?? ""}`
+          : sent.unknown_client,
         delivery_site: sent.delivery_site_is_in_carbure
-        ? sent.carbure_delivery_site?.depot_id ?? ""
-        : sent.unknown_delivery_site,
-        delivery_site_country: 
-        !sent.delivery_site_is_in_carbure
-        ? sent.unknown_delivery_site_country?.code_pays ?? ""
-        : ""
+          ? sent.carbure_delivery_site?.depot_id ?? ""
+          : sent.unknown_delivery_site,
+        delivery_site_country: !sent.delivery_site_is_in_carbure
+          ? sent.unknown_delivery_site_country?.code_pays ?? ""
+          : "",
       }
-      notifyCreated(
-        resolveCreate(
-          entity.id,
-          [draft]
-        )
-      )
+      notifyCreated(resolveCreate(entity.id, [draft]))
     }
 
     return Boolean(sent)

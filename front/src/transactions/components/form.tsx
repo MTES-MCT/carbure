@@ -185,28 +185,26 @@ const TransactionForm = ({
                 disabled
                 name="carbure_production_site_country"
                 label="Pays de production"
-                defaultValue={tx.carbure_production_site?.country?.name ?? ""}
+                value={tx.carbure_production_site?.country?.name ?? ""}
               />
               <LabelInput
                 disabled
                 name="carbure_production_site_date"
                 type="date"
                 label="Date de mise en service"
-                defaultValue={
-                  tx.carbure_production_site?.date_mise_en_service ?? ""
-                }
+                value={tx.carbure_production_site?.date_mise_en_service ?? ""}
               />
               <LabelInput
                 disabled
                 name="carbure_production_site_dbl_counting"
                 label="N° d'enregistrement double-compte"
-                defaultValue=""
+                value=""
               />
               <LabelInput
                 disabled
                 name="carbure_production_site_reference"
                 label="Référence Système Fournisseur"
-                defaultValue=""
+                value=""
               />
             </React.Fragment>
           ) : (
@@ -340,7 +338,7 @@ const TransactionForm = ({
               disabled
               label="Pays de livraison"
               name="carbure_delivery_site_country"
-              defaultValue={tx.carbure_delivery_site?.country?.name ?? ""}
+              value={tx.carbure_delivery_site?.country?.name ?? ""}
             />
           ) : (
             <LabelAutoComplete
@@ -482,13 +480,13 @@ const TransactionForm = ({
               readOnly
               label="Total"
               name="ghg_total"
-              defaultValue={`${tx.ghg_total} gCO2eq/MJ`}
+              value={`${tx.ghg_total} gCO2eq/MJ`}
             />
             <LabelInput
               readOnly
               label="Réduction"
               name="ghg_reduction"
-              defaultValue={`${tx.ghg_reduction}%`}
+              value={`${tx.ghg_reduction}%`}
             />
           </Box>
         </Box>

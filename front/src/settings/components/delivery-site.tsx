@@ -146,13 +146,13 @@ export const DeliverySitePromptFactory = (deliverySite?: EntityDeliverySite) =>
           readOnly
           label="Nom du site"
           name="name"
-          defaultValue={form.name}
+          value={form.name}
         />
         <LabelInput
           readOnly
           label="ID de douane"
           name="depot_id"
-          defaultValue={form.depot_id}
+          value={form.depot_id}
         />
 
         <hr />
@@ -173,21 +173,16 @@ export const DeliverySitePromptFactory = (deliverySite?: EntityDeliverySite) =>
           readOnly
           label="Adresse"
           name="address"
-          defaultValue={form.address}
+          value={form.address}
         />
 
         <Box row>
-          <LabelInput
-            readOnly
-            label="Ville"
-            name="city"
-            defaultValue={form.city}
-          />
+          <LabelInput readOnly label="Ville" name="city" value={form.city} />
           <LabelInput
             readOnly
             label="Code postal"
             name="postal_code"
-            defaultValue={form.postal_code}
+            value={form.postal_code}
           />
         </Box>
 
@@ -196,7 +191,7 @@ export const DeliverySitePromptFactory = (deliverySite?: EntityDeliverySite) =>
           label="Pays"
           placeholder="Rechercher un pays..."
           name="country"
-          defaultValue={form.country?.name}
+          value={form.country?.name}
         />
 
         <hr />

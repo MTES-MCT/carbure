@@ -7,7 +7,7 @@ import { prompt } from "common/components/dialog"
 import { StockImportPromptFactory } from "transactions/components/import"
 import { LotUploader } from "transactions/hooks/actions/use-upload-file"
 import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
-import { LotSender } from "transactions/hooks/actions/use-send-lots"
+import { LotSender } from "stocks/hooks/use-send-lots"
 
 type ImportActionsProps = {
   uploader: LotUploader

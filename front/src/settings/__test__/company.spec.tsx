@@ -1,80 +1,104 @@
 import { render, waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
-import { Entity } from "common/types"
 import { admin, operator, producer, trader } from "common/__test__/data"
+import { waitWhileLoading } from "common/__test__/helpers"
 import { useGetSettings } from "settings/hooks/use-get-settings"
 import Settings from "../index"
-import server from "./api"
+import server, { okDynamicSettings, setEntity } from "./api"
 
-const SettingsWithHooks = ({ entity }: { entity: Entity }) => {
+const SettingsWithHooks = () => {
   const settings = useGetSettings()
+  const entity = settings.data?.rights[0].entity ?? null
   return <Settings entity={entity} settings={settings} />
 }
 
 beforeAll(() => server.listen())
+beforeEach(() => server.use(okDynamicSettings))
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 test("check the company section of the settings for a producer", async () => {
-  render(<SettingsWithHooks entity={producer} />)
+  setEntity(producer)
+
+  render(<SettingsWithHooks />)
+
+  await waitWhileLoading()
 
   screen.getByText("Options")
 
   const mac = screen.getByLabelText("Ma société effectue des Mises à Consommation") // prettier-ignore
   const trading = screen.getByLabelText("Ma société a une activité de négoce")
 
-  expect(mac.hasAttribute("checked")).toBe(true)
-  expect(trading.hasAttribute("checked")).toBe(true)
+  expect(mac).toBeChecked()
+  expect(trading).toBeChecked()
 
   userEvent.click(mac)
   userEvent.click(trading)
 
-  waitFor(() => {
-    expect(mac.hasAttribute("checked")).toBe(false)
-    expect(trading.hasAttribute("checked")).toBe(false)
-  })
+  await waitWhileLoading()
+
+  await waitFor(() => expect(mac).not.toBeChecked())
+  expect(trading).not.toBeChecked()
+
+  userEvent.click(mac)
+  userEvent.click(trading)
+
+  await waitWhileLoading()
+
+  await waitFor(() => expect(mac).toBeChecked())
+  expect(trading).toBeChecked()
 })
 
 test("check the company section of the settings for a trader", async () => {
-  render(<SettingsWithHooks entity={trader} />)
+  setEntity(trader)
+
+  render(<SettingsWithHooks />)
+
+  await waitWhileLoading()
 
   screen.getByText("Options")
 
   const mac = screen.getByLabelText("Ma société effectue des Mises à Consommation") // prettier-ignore
   const trading = screen.getByLabelText("Ma société a une activité de négoce")
 
-  expect(mac.hasAttribute("checked")).toBe(true)
-  expect(trading.hasAttribute("checked")).toBe(true)
-  expect(trading.hasAttribute("disabled")).toBe(true)
+  expect(mac).toBeChecked()
+  expect(trading).toBeChecked()
+  expect(trading).toBeDisabled()
 
   userEvent.click(mac)
 
-  waitFor(() => {
-    expect(mac.hasAttribute("checked")).toBe(false)
-  })
+  await waitWhileLoading()
+  await waitFor(() => expect(mac).not.toBeChecked())
 })
 
 test("check the company section of the settings for an operator", async () => {
-  render(<SettingsWithHooks entity={operator} />)
+  setEntity(operator)
+
+  render(<SettingsWithHooks />)
+
+  await waitWhileLoading()
 
   screen.getByText("Options")
 
   const mac = screen.getByLabelText("Ma société effectue des Mises à Consommation") // prettier-ignore
   const trading = screen.getByLabelText("Ma société a une activité de négoce")
 
-  expect(mac.hasAttribute("checked")).toBe(true)
-  expect(trading.hasAttribute("checked")).toBe(false)
+  expect(mac).toBeChecked()
+  expect(trading).not.toBeChecked()
   expect(trading.hasAttribute("disabled")).toBe(true)
 
   userEvent.click(mac)
 
-  waitFor(() => {
-    expect(mac.hasAttribute("checked")).toBe(false)
+  await waitWhileLoading()
+
+  await waitFor(() => {
+    expect(mac).not.toBeChecked()
   })
 })
 
 test("check the company section of the settings for an admin", async () => {
-  render(<SettingsWithHooks entity={admin} />)
-  expect(screen.queryByText("Options")).toBeNull()
+  setEntity(admin)
+  render(<SettingsWithHooks />)
+  expect(screen.queryByText("Options")).not.toBeInTheDocument()
 })

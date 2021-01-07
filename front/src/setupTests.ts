@@ -15,7 +15,7 @@ notifications.setAttribute("id", "notifications")
 
 document.body.append(modal, dropdown, notifications)
 
-afterEach(() => {
+beforeEach(() => {
   modal.textContent = ""
   dropdown.textContent = ""
   notifications.textContent = ""
