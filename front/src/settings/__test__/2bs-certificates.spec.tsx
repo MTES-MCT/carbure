@@ -7,6 +7,7 @@ import {
   expired2BSCertificate,
   producer,
 } from "common/__test__/data"
+import { waitWhileLoading } from "common/__test__/helpers"
 import { useGetSettings } from "settings/hooks/use-get-settings"
 import Settings from "../index"
 
@@ -29,6 +30,8 @@ afterAll(() => server.close())
 test("check the 2bs certificate section of the settings", async () => {
   render(<SettingsWithHooks entity={producer} />)
 
+  await waitWhileLoading()
+
   screen.getByText("Certificats 2BS")
   screen.getByText("Ajouter un certificat 2BS")
   screen.getByText("Aucun certificat 2BS trouvé")
@@ -37,6 +40,8 @@ test("check the 2bs certificate section of the settings", async () => {
 test("add a 2bs certificate in settings", async () => {
   render(<SettingsWithHooks entity={producer} />)
 
+  await waitWhileLoading()
+
   userEvent.click(screen.getByText("Ajouter un certificat 2BS"))
 
   // wait for dialog to open
@@ -44,7 +49,7 @@ test("add a 2bs certificate in settings", async () => {
 
   userEvent.type(input, "Test")
 
-  const option = await waitFor(() => screen.getByText("2BS Test - Holder Test"))
+  const option = await screen.findByText("2BS Test - Holder Test")
 
   userEvent.click(option)
 
@@ -54,12 +59,12 @@ test("add a 2bs certificate in settings", async () => {
 
   userEvent.click(screen.getByText("Ajouter"))
 
-  await waitFor(() => {
-    screen.getByText("2BS Test")
-    screen.getByText("Holder Test")
-    screen.getByText("Scope Test")
-    screen.getByText("24/04/2021")
-  })
+  await waitWhileLoading()
+
+  await screen.findByText("2BS Test")
+  screen.getByText("Holder Test")
+  screen.getByText("Scope Test")
+  screen.getByText("24/04/2021")
 })
 
 test("delete a 2bs certificate in settings", async () => {
@@ -67,22 +72,22 @@ test("delete a 2bs certificate in settings", async () => {
 
   render(<SettingsWithHooks entity={producer} />)
 
-  const deleteButton = await waitFor(() => {
-    screen.getByText("2BS Test")
-    screen.getByText("Holder Test")
-    screen.getByText("Scope Test")
+  await waitWhileLoading()
 
-    return screen.getByTitle("Supprimer le certificat").closest("svg")!
-  })
+  const deleteButton = screen.getByTitle("Supprimer le certificat")
+
+  screen.getByText("2BS Test")
+  screen.getByText("Holder Test")
+  screen.getByText("Scope Test")
 
   // click on the delete button and then confirm the action on the popup
   userEvent.click(deleteButton)
   screen.getByText("Suppression certificat")
   userEvent.click(screen.getByText("OK"))
 
-  await waitFor(() => {
-    screen.getByText("Aucun certificat 2BS trouvé")
-  })
+  await waitWhileLoading()
+
+  await screen.findByText("Aucun certificat 2BS trouvé")
 })
 
 test("renew a certificate", async () => {
@@ -90,25 +95,25 @@ test("renew a certificate", async () => {
 
   render(<SettingsWithHooks entity={producer} />)
 
-  const updateButton = await waitFor(() => {
-    screen.getByText("Expired 2BS Test")
-    screen.getByText("Expired Holder Test")
-    screen.getByText("Expired Scope Test")
-    screen.getByText("Expiré (01/01/2000)")
+  await waitWhileLoading()
 
-    return screen.getByText("Mise à jour")
-  })
+  screen.getByText("Expired 2BS Test")
+  screen.getByText("Expired Holder Test")
+  screen.getByText("Expired Scope Test")
+  screen.getByText("Expiré (01/01/2000)")
+
+  const updateButton = screen.getByText("Mise à jour")
 
   userEvent.click(updateButton)
   screen.getByText("Mise à jour certificat 2BS")
 
   userEvent.type(screen.getByLabelText("Certificat 2BS"), "Test")
-  const option = await waitFor(() => screen.getByText("2BS Test - Holder Test")) // prettier-ignore
+  const option = await screen.findByText("2BS Test - Holder Test")
   userEvent.click(option)
 
   userEvent.click(screen.getByText("Ajouter"))
 
-  await waitFor(() => {
-    screen.getByText("2BS Test")
-  })
+  await waitWhileLoading()
+
+  await screen.findByText("2BS Test")
 })

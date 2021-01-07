@@ -1,4 +1,4 @@
-import { lot } from "common/__test__/data"
+import { lot, operator } from "common/__test__/data"
 
 export const emptySnapshot = {
   years: [2020],
@@ -147,4 +147,64 @@ export const deadlineLots = {
     date: "2020-02-29",
     total: 1,
   },
+}
+
+export const lotDetails = {
+  transaction: lot,
+  errors: {},
+  deadline: "2021-01-31",
+  comments: [],
+}
+
+export const errorDetails = {
+  transaction: lot,
+  errors: {
+    validation_errors: [
+      {
+        lot_id: 0,
+        error: "Matière Première incohérente avec le Biocarburant",
+        details: "Biogaz de Blé",
+        is_blocking: true,
+        is_warning: true,
+      },
+      {
+        lot_id: 0,
+        error: "Volume inhabituellement faible.",
+        is_blocking: false,
+        is_warning: true,
+      },
+    ],
+    tx_errors: [
+      {
+        tx_id: 0,
+        field: "dae",
+        value: "",
+        error: "DAE manquant",
+      },
+    ],
+    lots_errors: [
+      {
+        lot_id: 0,
+        field: "matiere_premiere_code",
+        value: null,
+        error: "Merci de préciser la matière première",
+      },
+    ],
+  },
+  deadline: "2020-02-29",
+  comments: [],
+}
+
+export const tofixDetails = {
+  transaction: {
+    ...lot,
+    delivery_status: "AC",
+    lot: {
+      ...lot.lot,
+      status: "Validated",
+    },
+  },
+  errors: {},
+  deadline: "2021-01-31",
+  comments: [{ entity: operator, comment: "not ok" }],
 }

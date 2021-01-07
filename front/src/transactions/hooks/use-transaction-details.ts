@@ -56,7 +56,7 @@ export default function useTransactionDetails(
   }
 
   async function submit() {
-    if (!entityID) return
+    if (typeof entityID === "undefined") return
 
     const res = await resolveUpdate(entityID, txID, toTransactionPostData(form))
 
@@ -85,7 +85,7 @@ export default function useTransactionDetails(
 
   useEffect(() => {
     if (typeof entityID !== "undefined") {
-      return resolveDetails(entityID, txID).cancel
+      resolveDetails(entityID, txID)
     }
   }, [resolveDetails, entityID, txID])
 

@@ -17,7 +17,7 @@ import useDeleteLots from "transactions/hooks/actions/use-delete-lots"
 import useValidateLots from "transactions/hooks/actions/use-validate-lots"
 import useAcceptLots from "transactions/hooks/actions/use-accept-lots"
 import useRejectLots from "transactions/hooks/actions/use-reject-lots"
-import useSendLot from "transactions/hooks/actions/use-send-lots"
+import useSendLot from "stocks/hooks/use-send-lots"
 import { useGetStocks, useGetStockSnapshot } from "./hooks/use-stock-list"
 
 import { Main } from "common/components"

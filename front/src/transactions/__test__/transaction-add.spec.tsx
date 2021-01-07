@@ -4,6 +4,7 @@ import { Route } from "common/components/relative-route"
 import { Entity } from "common/types"
 
 import { producer } from "common/__test__/data"
+import { waitWhileLoading } from "common/__test__/helpers"
 import { MemoryRouter } from "react-router-dom"
 import TransactionAdd from "../routes/transaction-add"
 
@@ -16,17 +17,17 @@ afterAll(() => server.close())
 const TransactionAddWithRouter = ({
   entity,
   refresh,
+  children,
 }: {
   entity: Entity
+  children?: React.ReactNode
   refresh: () => {}
 }) => (
   <MemoryRouter initialEntries={["/org/0/transactions/draft/add"]}>
     <Route path="/org/0/transactions/draft/add">
       <TransactionAdd entity={entity} refresh={refresh} />
     </Route>
-    <Route path="/org/0/transactions/draft/0">
-      <span>LOT CREATED</span>
-    </Route>
+    {children}
   </MemoryRouter>
 )
 
@@ -79,14 +80,18 @@ test("display the transaction form", async () => {
 
   screen.getByText("Créer lot")
   screen.getByText("Retour")
-
-  userEvent.click(screen.getByText("Retour"))
 })
 
 test("check the form fields", async () => {
   const refresh = jest.fn()
 
-  render(<TransactionAddWithRouter entity={producer} refresh={refresh} />)
+  render(
+    <TransactionAddWithRouter entity={producer} refresh={refresh}>
+      <Route path="/org/0/transactions/draft/0">
+        <span>LOT CREATED</span>
+      </Route>
+    </TransactionAddWithRouter>
+  )
 
   userEvent.click(screen.getByLabelText("Il s'agit d'une mise à consommation ?")) // prettier-ignore
   userEvent.type(screen.getByLabelText("Numéro douanier (DAE, DAA...)"), "DAETEST") // prettier-ignore
@@ -126,12 +131,20 @@ test("check the form fields", async () => {
   userEvent.type(screen.getByLabelText("ECCR"), "1.3")
   userEvent.type(screen.getByLabelText("EEE"), "1.4")
 
-  screen.getByLabelText("Total")
-  screen.getByLabelText("Réduction")
-
   userEvent.click(screen.getByText("Créer lot"))
 
+  await waitWhileLoading()
+
+  // creation form disappears
+  expect(
+    screen.queryByText("Créer une nouvelle transaction")
+  ).not.toBeInTheDocument()
+
+  // page for the newly created lot appears
   await screen.findByText("LOT CREATED")
 
   expect(refresh).toHaveBeenCalledTimes(1)
 })
+
+test.todo("check the transaction form with entities that are not on carbure")
+test.todo("check the transaction form defaults for operators")

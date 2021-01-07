@@ -1,9 +1,15 @@
-import { render, waitFor, screen } from "@testing-library/react"
+import {
+  render,
+  waitFor,
+  screen,
+  waitForElementToBeRemoved,
+} from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "common/components/relative-route"
 import { Entity, LotStatus } from "common/types"
 
 import { producer } from "common/__test__/data"
+import { waitWhileLoading } from "common/__test__/helpers"
 import { MemoryRouter } from "react-router-dom"
 import Transactions from "../index"
 
@@ -48,7 +54,9 @@ test("producer/trader: display an empty list of transactions", async () => {
 
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
-  screen.getByText("Brouillons")
+  await waitWhileLoading()
+
+  await screen.findByText("Brouillons")
   screen.getByText("Lots envoyés")
   screen.getByText("Lots à corriger")
   screen.getByText("Lots acceptés")
@@ -72,39 +80,36 @@ test("producer/trader: display an empty list of transactions", async () => {
 test("producer/trader: display a list of 1 transaction", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
-  await waitFor(() => {
-    screen.getByText("40")
-    screen.getByText("30")
-    screen.getByText("20")
-    screen.getByText("10")
-  })
+  await waitWhileLoading()
 
-  // wait for lots to be loaded
-  await waitFor(() => {
-    // check column headers
-    screen.getByText("Statut")
-    screen.getByText("Période")
-    screen.getByText("N° Douane")
-    screen.getByText("Biocarburant (litres)")
-    screen.getByText("Matiere premiere")
-    screen.getByText("Client")
-    screen.getByText("Site de production")
-    screen.getByText("Site de livraison")
-    screen.getByText("Réd. GES")
+  await screen.findByText("40")
+  screen.getByText("30")
+  screen.getByText("20")
+  screen.getAllByText("10")
 
-    // check lot columns
-    screen.getByText("Brouillon")
-    screen.getByText("2020-01")
-    screen.getByText("EMHV")
-    screen.getByText("12 345")
-    screen.getByText("Colza")
-    screen.getByText("Opérateur Test")
-    screen.getByText("Test Production Site")
-    screen.getByText("Test Delivery Site")
-    screen.getByText("France, Test City")
-    const countries = screen.getAllByText("France")
-    expect(countries.length).toBe(2)
-  })
+  // check column headers
+  screen.getByText("Statut")
+  screen.getByText("Période")
+  screen.getByText("N° Douane")
+  screen.getByText("Biocarburant (litres)")
+  screen.getByText("Matiere premiere")
+  screen.getByText("Client")
+  screen.getByText("Site de production")
+  screen.getByText("Site de livraison")
+  screen.getByText("Réd. GES")
+
+  // check lot columns
+  screen.getByText("Brouillon")
+  screen.getByText("2020-01")
+  screen.getByText("EMHV")
+  screen.getByText("12 345")
+  screen.getByText("Colza")
+  screen.getByText("Opérateur Test")
+  screen.getByText("Test Production Site")
+  screen.getByText("Test Delivery Site")
+  screen.getByText("France, Test City")
+  const countries = screen.getAllByText("France")
+  expect(countries.length).toBe(2)
 })
 
 test("producer/trader: check filters", async () => {
@@ -133,11 +138,13 @@ test("producer/trader: check filters", async () => {
     const selection = await screen.findByText(value, { selector: "li span" }) // prettier-ignore
     userEvent.click(selection)
 
-    // check that the lot list is refreshing
-    await screen.findByTitle("Chargement...")
+    // await waitWhileLoading()
+    await screen.findByTitle("Chargement...") // cool
+
+    userEvent.type(filter, "{esc}")
 
     // close the dropdown
-    userEvent.type(filter, "{esc}")
+    expect(selection).not.toBeInTheDocument()
 
     // check that the right selection is displayed
     await screen.findByText(value, { selector: ".selectValue" })
@@ -147,14 +154,19 @@ test("producer/trader: check filters", async () => {
 test("check search filter", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
+  await waitWhileLoading()
+
   await screen.findByText("DAETEST")
 
   userEvent.type(screen.getByPlaceholderText("Rechercher..."), "test")
+
   await screen.findByTitle("Chargement...")
 })
 
 test("check year filter", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
+
+  await waitWhileLoading()
 
   await screen.findByText("DAETEST")
 
@@ -169,34 +181,42 @@ test("check pagination", async () => {
 
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
+  await waitWhileLoading()
+
   await screen.findAllByText("DAETEST")
 
   const select = screen.getByText("1", { selector: ".selectValue" })
-  const prev: any = screen.getByTitle("Page précédente")
-  const next: any = screen.getByTitle("Page suivante")
+  const prev = screen.getByTitle("Page précédente")
+  const next = screen.getByTitle("Page suivante")
 
   screen.getByText("sur 20,")
 
-  expect(prev.disabled).toBe(true)
+  expect(prev).toBeDisabled()
 
+  // select a page from the dropdown
   userEvent.click(select)
   userEvent.click(screen.getByText("19"))
 
-  expect(prev.disabled).toBe(false)
+  await screen.findByTitle("Chargement...") // cool
 
-  await screen.findByTitle("Chargement...")
+  expect(select).toHaveTextContent("19")
+  expect(prev).not.toBeDisabled()
 
+  // click on the next button
   userEvent.click(next)
 
-  await screen.findByTitle("Chargement...")
+  await screen.findByTitle("Chargement...") // cool
 
-  screen.getByText("20", { selector: ".selectValue" })
-  expect(next.disabled).toBe(true)
+  await screen.findByText("20", { selector: ".selectValue" })
+  expect(next).toBeDisabled()
 
+  // click on the prev button
   userEvent.click(prev)
 
-  screen.getByText("19", { selector: ".selectValue" })
-  expect(next.disabled).toBe(false)
+  await screen.findByTitle("Chargement...") // cool
+
+  await screen.findByText("19", { selector: ".selectValue" })
+  expect(next).not.toBeDisabled()
 })
 
 test("check error filter", async () => {
@@ -204,12 +224,13 @@ test("check error filter", async () => {
 
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
+  await waitWhileLoading()
+
   const dae = await screen.findByText("DAETEST")
-  const row = dae.closest("tr")
 
-  expect(row).toHaveClass("transactionRowError")
+  expect(dae.closest("tr")).toHaveClass("transactionRowError")
 
-  screen.getByText(
+  await screen.findByText(
     (content, node) =>
       node.textContent ===
       "Parmi ces résultats, 1 lot présente des incohérences"
@@ -217,7 +238,7 @@ test("check error filter", async () => {
 
   userEvent.click(screen.getByText("Voir la liste"))
 
-  await screen.findByTitle("Chargement...")
+  await screen.findByTitle("Chargement...") // cool
 
   await screen.findByText(
     (content, node) => node.textContent === "1 lot présente des incohérences"
@@ -225,7 +246,7 @@ test("check error filter", async () => {
 
   userEvent.click(screen.getByText("Revenir à la liste complète"))
 
-  await screen.findByTitle("Chargement...")
+  await screen.findByTitle("Chargement...") // cool
 
   await screen.findByText("Voir la liste")
 })
@@ -235,12 +256,13 @@ test("check deadline filter", async () => {
 
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
+  await waitWhileLoading()
+
   const dae = await screen.findByText("DAETEST")
-  const row = dae.closest("tr")
 
-  expect(row).toHaveClass("transactionRowDeadline")
+  expect(dae.closest("tr")).toHaveClass("transactionRowDeadline")
 
-  screen.getByText(
+  await screen.findByText(
     (content, node) =>
       node.textContent ===
       "Parmi ces résultats, 1 lot doit être validé et envoyé avant le 29 février"
@@ -248,7 +270,7 @@ test("check deadline filter", async () => {
 
   userEvent.click(screen.getByText("Voir la liste"))
 
-  await screen.findByTitle("Chargement...")
+  await screen.findByTitle("Chargement...") // cool
 
   await screen.findByText(
     (content, node) =>
@@ -258,7 +280,7 @@ test("check deadline filter", async () => {
 
   userEvent.click(screen.getByText("Revenir à la liste complète"))
 
-  await screen.findByTitle("Chargement...")
+  await screen.findByTitle("Chargement...") // cool
 
   await screen.findByText("Voir la liste")
 })
@@ -266,20 +288,19 @@ test("check deadline filter", async () => {
 test("producer/trader: check draft actions", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
-  // wait for lots to be loaded
-  await waitFor(() => {
-    // check global actions
-    screen.getByText("Exporter")
-    screen.getByText("Importer lots")
-    screen.getByText("Créer lot")
-    screen.getByText("Envoyer tout")
-    screen.getByText("Supprimer tout")
+  await waitWhileLoading()
 
-    // check row actions
-    screen.getByTitle("Envoyer le lot")
-    screen.getByTitle("Dupliquer le lot")
-    screen.getByTitle("Supprimer le lot")
-  })
+  // check global actions
+  await screen.findByText("Exporter")
+  screen.getByText("Importer lots")
+  screen.getByText("Créer lot")
+  screen.getByText("Envoyer tout")
+  screen.getByText("Supprimer tout")
+
+  // check row actions
+  screen.getByTitle("Envoyer le lot")
+  screen.getByTitle("Dupliquer le lot")
+  screen.getByTitle("Supprimer le lot")
 })
 
 test("producer/trader: check sent actions", async () => {
@@ -287,30 +308,28 @@ test("producer/trader: check sent actions", async () => {
     <TransactionsWithRouter status={LotStatus.Validated} entity={producer} />
   )
 
-  // wait for lots to be loaded
-  await waitFor(() => {
-    // check global actions
-    screen.getByText("Exporter")
-    screen.getByText("Rapport de sorties")
+  await waitWhileLoading()
 
-    // check row actions
-    screen.getByTitle("Dupliquer le lot")
-  })
+  // check global actions
+  await screen.findByText("Exporter")
+  screen.getByText("Rapport de sorties")
+
+  // check row actions
+  screen.getByTitle("Dupliquer le lot")
 })
 
 test("producer/trader: check tofix actions", async () => {
   render(<TransactionsWithRouter status={LotStatus.ToFix} entity={producer} />)
 
-  // wait for lots to be loaded
-  await waitFor(() => {
-    // check global actions
-    screen.getByText("Exporter")
-    screen.getByText("Supprimer sélection")
+  await waitWhileLoading()
 
-    // check row actions
-    screen.getByTitle("Renvoyer le lot")
-    screen.getByTitle("Supprimer le lot")
-  })
+  // check global actions
+  await screen.findByText("Exporter")
+  screen.getByText("Supprimer sélection")
+
+  // check row actions
+  screen.getByTitle("Renvoyer le lot")
+  screen.getByTitle("Supprimer le lot")
 })
 
 test("producer/trader: check accepted actions", async () => {
@@ -318,45 +337,46 @@ test("producer/trader: check accepted actions", async () => {
     <TransactionsWithRouter status={LotStatus.Accepted} entity={producer} />
   )
 
-  // wait for lots to be loaded
-  await waitFor(() => {
-    // check global actions
-    screen.getByText("Exporter")
+  await waitWhileLoading()
 
-    // check row actions
-    screen.getByTitle("Dupliquer le lot")
-  })
+  // check global actions
+  await screen.findByText("Exporter")
+
+  // check row actions
+  screen.getByTitle("Dupliquer le lot")
 })
 
 test("producer/trader: duplicate draft lot", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
+  await waitWhileLoading()
+
   // click on the duplicate action
-  const duplicate = await waitFor(() => screen.getByTitle("Dupliquer le lot"))
+  const duplicate = await screen.findByTitle("Dupliquer le lot")
   userEvent.click(duplicate)
 
   // confirm the duplication
-  screen.getByText("Dupliquer lot")
+  const title = screen.getByText("Dupliquer lot")
   userEvent.click(screen.getByText("OK"))
 
-  await screen.findByTitle("Chargement...")
+  expect(title).not.toBeInTheDocument()
+
+  await screen.findByTitle("Chargement...") // cool
 
   // number in snapshot was incremented
   await screen.findByText("41")
 
-  await waitFor(() => {
-    // new line was added
-    expect(screen.getAllByText("Brouillon").length).toBe(2)
-    expect(screen.getAllByText("2020-01").length).toBe(2)
-    expect(screen.getAllByText("EMHV").length).toBe(2)
-    expect(screen.getAllByText("12 345").length).toBe(2)
-    expect(screen.getAllByText("Colza").length).toBe(2)
-    expect(screen.getAllByText("Opérateur Test").length).toBe(2)
-    expect(screen.getAllByText("Test Production Site").length).toBe(2)
-    expect(screen.getAllByText("Test Delivery Site").length).toBe(2)
-    expect(screen.getAllByText("France, Test City").length).toBe(2)
-    expect(screen.getAllByText("France").length).toBe(4)
-  })
+  // new line was added
+  await waitFor(() => expect(screen.getAllByText("Brouillon")).toHaveLength(2))
+  expect(screen.getAllByText("2020-01")).toHaveLength(2)
+  expect(screen.getAllByText("EMHV")).toHaveLength(2)
+  expect(screen.getAllByText("12 345")).toHaveLength(2)
+  expect(screen.getAllByText("Colza")).toHaveLength(2)
+  expect(screen.getAllByText("Opérateur Test")).toHaveLength(2)
+  expect(screen.getAllByText("Test Production Site")).toHaveLength(2)
+  expect(screen.getAllByText("Test Delivery Site")).toHaveLength(2)
+  expect(screen.getAllByText("France, Test City")).toHaveLength(2)
+  expect(screen.getAllByText("France")).toHaveLength(4)
 })
 
 // SEND DRAFT
@@ -364,22 +384,24 @@ test("producer/trader: duplicate draft lot", async () => {
 test("producer/trader: sent draft lot", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
+  await waitWhileLoading()
+
   // click on the send action
   const send = await screen.findByTitle("Envoyer le lot")
   userEvent.click(send)
 
   // confirm the sending
-  screen.getByText("Envoyer lot")
+  const title = screen.getByText("Envoyer lot")
   userEvent.click(screen.getByText("OK"))
 
-  await screen.findByTitle("Chargement...")
+  expect(title).not.toBeInTheDocument()
 
-  await waitFor(() => {
-    // decreased amount of draft lots
-    screen.getByText("39")
-    // increased amount of sent lots
-    screen.getByText("31")
-  })
+  await screen.findByTitle("Chargement...") // cool
+
+  // decreased amount of draft lots
+  await screen.findByText("39")
+  // increased amount of sent lots
+  screen.getByText("31")
 
   // no more drafts
   await screen.findByText("Aucune transaction trouvée pour ces paramètres")
@@ -389,29 +411,30 @@ test("producer/trader: sent all draft lots", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
   const button = screen.getByText("Envoyer tout").closest("button")!
+  expect(button).toBeDisabled()
 
-  expect(button.disabled).toBe(true)
+  await waitWhileLoading()
 
   // wait for the lot to be loaded
-  await waitFor(() => screen.getByText("DAETEST"))
+  await screen.findByText("DAETEST")
 
-  expect(button.disabled).toBe(false)
+  expect(button).not.toBeDisabled()
 
   // click on the send all button
   userEvent.click(button)
 
   // confirm the sending
-  screen.getByText("Envoyer tous les brouillons")
+  const title = screen.getByText("Envoyer tous les brouillons")
   userEvent.click(screen.getByText("OK"))
 
-  await screen.findByTitle("Chargement...")
+  expect(title).not.toBeInTheDocument()
 
-  await waitFor(() => {
-    // decreased amount of draft lots
-    screen.getByText("39")
-    // increased amount of sent lots
-    screen.getByText("31")
-  })
+  await screen.findByTitle("Chargement...") // cool
+
+  // decreased amount of draft lots
+  await screen.findByText("39")
+  // increased amount of sent lots
+  screen.getByText("31")
 
   // no more drafts
   await screen.findByText("Aucune transaction trouvée pour ces paramètres")
@@ -420,8 +443,10 @@ test("producer/trader: sent all draft lots", async () => {
 test("producer/trader: sent selected draft lots", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
+  await waitWhileLoading()
+
   // wait for the lot to be loaded
-  await waitFor(() => screen.getByText("DAETEST"))
+  await screen.findByText("DAETEST")
 
   // select the first lot
   userEvent.click(screen.getByTitle("Sélectionner le lot"))
@@ -430,17 +455,17 @@ test("producer/trader: sent selected draft lots", async () => {
   userEvent.click(screen.getByText("Envoyer sélection"))
 
   // confirm the sending
-  screen.getByText("Envoyer lot")
+  const title = screen.getByText("Envoyer lot")
   userEvent.click(screen.getByText("OK"))
 
-  await screen.findByTitle("Chargement...")
+  expect(title).not.toBeInTheDocument()
 
-  await waitFor(() => {
-    // decreased amount of draft lots
-    screen.getByText("39")
-    // increased amount of sent lots
-    screen.getByText("31")
-  })
+  await screen.findByTitle("Chargement...") // cool
+
+  // decreased amount of draft lots
+  await screen.findByText("39")
+  // increased amount of sent lots
+  screen.getByText("31")
 
   // no more drafts
   await screen.findByText("Aucune transaction trouvée pour ces paramètres")
@@ -451,20 +476,22 @@ test("producer/trader: sent selected draft lots", async () => {
 test("producer/trader: delete draft lot", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
+  await waitWhileLoading()
+
   // click on the send action
   const send = await screen.findByTitle("Supprimer le lot")
   userEvent.click(send)
 
   // confirm the sending
-  screen.getByText("Supprimer lot")
+  const title = screen.getByText("Supprimer lot")
   userEvent.click(screen.getByText("OK"))
 
-  await screen.findByTitle("Chargement...")
+  expect(title).not.toBeInTheDocument()
 
-  await waitFor(() => {
-    // decreased amount of draft lots
-    screen.getByText("39")
-  })
+  await screen.findByTitle("Chargement...") // cool
+
+  // decreased amount of draft lots
+  await screen.findByText("39")
 
   // no more drafts
   await screen.findByText("Aucune transaction trouvée pour ces paramètres")
@@ -474,27 +501,27 @@ test("producer/trader: delete all draft lot", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
   const button = screen.getByText("Supprimer tout").closest("button")!
+  expect(button).toBeDisabled()
 
-  expect(button.disabled).toBe(true)
+  await waitWhileLoading()
 
   // wait for the lot to be loaded
-  await waitFor(() => screen.getByText("DAETEST"))
+  await screen.findByText("DAETEST")
 
-  expect(button.disabled).toBe(false)
+  expect(button).not.toBeDisabled()
 
   // click on the send all button
   userEvent.click(button)
 
   // confirm the sending
-  screen.getByText("Supprimer lot")
+  const title = screen.getByText("Supprimer lot")
   userEvent.click(screen.getByText("OK"))
 
-  await screen.findByTitle("Chargement...")
+  expect(title).not.toBeInTheDocument()
 
-  await waitFor(() => {
-    // decreased amount of draft lots
-    screen.getByText("39")
-  })
+  await screen.findByTitle("Chargement...") // cool
+
+  await screen.findByText("39")
 
   // no more drafts
   await screen.findByText("Aucune transaction trouvée pour ces paramètres")
@@ -503,8 +530,10 @@ test("producer/trader: delete all draft lot", async () => {
 test("producer/trader: delete selected draft lot", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
+  await waitWhileLoading()
+
   // wait for the lot to be loaded
-  await waitFor(() => screen.getByText("DAETEST"))
+  await screen.findByText("DAETEST")
 
   // select the first lot
   userEvent.click(screen.getByTitle("Sélectionner le lot"))
@@ -513,15 +542,14 @@ test("producer/trader: delete selected draft lot", async () => {
   userEvent.click(screen.getByText("Supprimer sélection"))
 
   // confirm the sending
-  screen.getByText("Supprimer lot")
+  const title = screen.getByText("Supprimer lot")
   userEvent.click(screen.getByText("OK"))
 
-  await screen.findByTitle("Chargement...")
+  expect(title).not.toBeInTheDocument()
 
-  await waitFor(() => {
-    // decreased amount of draft lots
-    screen.getByText("39")
-  })
+  await screen.findByTitle("Chargement...") // cool
+
+  await screen.findByText("39")
 
   // no more drafts
   await screen.findByText("Aucune transaction trouvée pour ces paramètres")
@@ -532,16 +560,20 @@ test("producer/trader: delete selected draft lot", async () => {
 test("producer/trader: resend fixed lot", async () => {
   render(<TransactionsWithRouter status={LotStatus.ToFix} entity={producer} />)
 
+  await waitWhileLoading()
+
   // click on the send action
   const send = await screen.findByTitle("Renvoyer le lot")
   userEvent.click(send)
 
   // confirm the fix by adding a comment
-  screen.getByText("Envoyer lot")
+  const title = screen.getByText("Envoyer lot")
   userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "ok")
   userEvent.click(screen.getByText("OK"))
 
-  await screen.findByTitle("Chargement...")
+  expect(title).not.toBeInTheDocument()
+
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of lots to fix
   await screen.findByText("19")
@@ -555,15 +587,19 @@ test("producer/trader: resend fixed lot", async () => {
 test("producer/trader: delete tofix lot", async () => {
   render(<TransactionsWithRouter status={LotStatus.ToFix} entity={producer} />)
 
+  await waitWhileLoading()
+
   // click on the send action
   const send = await screen.findByTitle("Supprimer le lot")
   userEvent.click(send)
 
   // confirm the removal
-  screen.getByText("Supprimer lot")
+  const title = screen.getByText("Supprimer lot")
   userEvent.click(screen.getByText("OK"))
 
-  await screen.findByTitle("Chargement...")
+  expect(title).not.toBeInTheDocument()
+
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of lots to fix
   await screen.findByText("19")
@@ -575,8 +611,10 @@ test("producer/trader: delete tofix lot", async () => {
 test("producer/trader: delete selected tofix lot", async () => {
   render(<TransactionsWithRouter status={LotStatus.ToFix} entity={producer} />)
 
+  await waitWhileLoading()
+
   // wait for the lot to be loaded
-  await waitFor(() => screen.getByText("DAETEST"))
+  await screen.findByText("DAETEST")
 
   // select the first lot
   userEvent.click(screen.getByTitle("Sélectionner le lot"))
@@ -585,10 +623,12 @@ test("producer/trader: delete selected tofix lot", async () => {
   userEvent.click(screen.getByText("Supprimer sélection"))
 
   // confirm the sending
-  screen.getByText("Supprimer lot")
+  const title = screen.getByText("Supprimer lot")
   userEvent.click(screen.getByText("OK"))
 
-  await screen.findByTitle("Chargement...")
+  expect(title).not.toBeInTheDocument()
+
+  await screen.findByTitle("Chargement...") // cool
 
   // decreased amount of tofix lots
   await screen.findByText("19")

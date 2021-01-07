@@ -5,6 +5,7 @@ import Account from "../index"
 import { useGetSettings } from "settings/hooks/use-get-settings"
 import server, { setAccessRequests } from "./api"
 import { producer } from "common/__test__/data"
+import { waitWhileLoading } from "common/__test__/helpers"
 
 beforeAll(() => server.listen())
 afterEach(() => {
@@ -23,6 +24,8 @@ const AccountWithHooks = () => {
 test("empty acces rights in account page", async () => {
   render(<AccountWithHooks />)
 
+  await waitWhileLoading()
+
   screen.getByText("Demande d'accès")
   screen.getByText("Aucune autorisation pour ce compte, ajoutez une organisation pour continuer.") // prettier-ignore
 })
@@ -32,19 +35,21 @@ test("populated acces rights in account page", async () => {
 
   render(<AccountWithHooks />)
 
+  // wait for api to load
+  await waitWhileLoading()
+
   screen.getByText("Demande d'accès")
 
-  // wait for fake api to load
-  await waitFor(() => {
-    // check the first row of request access
-    screen.getByText("En attente")
-    screen.getByText("Producteur Test")
-    screen.getByText("Producteur")
-  })
+  // check the first row of request access
+  screen.getByText("En attente")
+  screen.getByText("Producteur Test")
+  screen.getByText("Producteur")
 })
 
 test("use the access request menu", async () => {
   render(<AccountWithHooks />)
+
+  await waitWhileLoading()
 
   const button = screen.getByText("Ajouter une organisation")
   userEvent.click(button)
@@ -55,28 +60,25 @@ test("use the access request menu", async () => {
 
   userEvent.type(input, "Test")
 
+  expect(input).toHaveValue("Test")
+
   // test that the autocomplete is working nicely
-  const traderOption = await waitFor(() => {
-    expect(input.getAttribute("value")).toBe("Test")
-    screen.getByText("Producteur Test", { selector: "li > *" })
-    return screen.getByText("Trader Test")
-  })
+  await screen.findByText("Producteur Test")
+  const trader = screen.getByText("Trader Test")
 
   // click an the Trader option to select it
-  userEvent.click(traderOption)
+  userEvent.click(trader)
 
-  await waitFor(() => {
-    // verify that the input has the selected value
-    expect(input.getAttribute("value")).toBe("Trader Test")
-  })
+  // check that the the input has the right selected value
+  expect(input.getAttribute("value")).toBe("Trader Test")
 
   // validate the choice by clicking the submit button
   userEvent.click(screen.getByText("Demander l'accès"))
 
+  await waitWhileLoading()
+
   // check that the new access request is listed in the table
-  await waitFor(() => {
-    screen.getByText("En attente")
-    screen.getByText("Trader Test")
-    screen.getByText("Trader")
-  })
+  await screen.findByText("En attente")
+  screen.getByText("Trader Test")
+  screen.getByText("Trader")
 })

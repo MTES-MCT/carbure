@@ -21,7 +21,7 @@ const Pending = () => (
         </span>
 
         <span>
-          Veuillez vous rendre vous sur la page
+          Veuillez vous rendre sur la page
           <Link relative to="account" className={styles.link}>
             Mon Compte
           </Link>

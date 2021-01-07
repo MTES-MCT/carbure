@@ -65,7 +65,7 @@ export default function useStockDetails(
 
   useEffect(() => {
     if (typeof entityID !== "undefined") {
-      return resolveDetails(entityID, txID).cancel
+      resolveDetails(entityID, txID)
     }
   }, [resolveDetails, entityID, txID])
 

@@ -7,6 +7,7 @@ import {
   dbsCertificate,
   deliverySite,
   isccCertificate,
+  operator,
   producer,
   productionSite,
 } from "common/__test__/data"
@@ -16,29 +17,35 @@ import {
   okISCCSearch,
   ok2BSSearch,
 } from "common/__test__/api"
+import { clone } from "common/__test__/helpers"
 
+let entity = producer
 let deliverySites: any[] = []
 let productionSites: any[] = []
 let isccCertificates: any[] = []
 let dbsCertificates: any[] = []
 
+export function setEntity(nextEntity: any) {
+  entity = clone(nextEntity)
+}
+
 export function setDeliverySites(nextDeliverySites: any[]) {
   deliverySites = nextDeliverySites.map((ds) => ({
-    depot: ds,
+    depot: clone(ds),
     ownership_type: OwnershipType.ThirdParty,
   }))
 }
 
 export function setProductionSites(nextProductionSites: any[]) {
-  productionSites = nextProductionSites
+  productionSites = clone(nextProductionSites)
 }
 
 export function setISCCCertificates(nextISCCCertificates: any[]) {
-  isccCertificates = nextISCCCertificates
+  isccCertificates = clone(nextISCCCertificates)
 }
 
 export function set2BSCertificates(next2BSCertificates: any[]) {
-  dbsCertificates = next2BSCertificates
+  dbsCertificates = clone(next2BSCertificates)
 }
 
 export const okSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
@@ -47,12 +54,92 @@ export const okSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
       status: "success",
       data: {
         email: "producer@test.com",
-        rights: [{ entity: producer, rights: "rw" }],
+        rights: [
+          { entity: producer, rights: "rw" },
+          { entity: operator, rights: "rw" },
+        ],
         requests: [],
       },
     })
   )
 })
+
+export const okEmptySettings = rest.get("/api/v3/settings", (req, res, ctx) => {
+  return res(
+    ctx.json({
+      status: "success",
+      data: {
+        email: "producer@test.com",
+        rights: [],
+        requests: [],
+      },
+    })
+  )
+})
+
+export const okDynamicSettings = rest.get(
+  "/api/v3/settings",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: {
+          email: "producer@test.com",
+          rights: [{ entity, rights: "rw" }],
+          requests: [],
+        },
+      })
+    )
+  }
+)
+
+export const okEnableMac = rest.post(
+  "/api/v3/settings/enable-mac",
+  (req, res, ctx) => {
+    setEntity({
+      ...entity,
+      has_mac: true,
+    })
+
+    return res(ctx.json({ status: "success" }))
+  }
+)
+
+export const okDisableMac = rest.post(
+  "/api/v3/settings/disable-mac",
+  (req, res, ctx) => {
+    setEntity({
+      ...entity,
+      has_mac: false,
+    })
+
+    return res(ctx.json({ status: "success" }))
+  }
+)
+
+export const okEnableTrading = rest.post(
+  "/api/v3/settings/enable-trading",
+  (req, res, ctx) => {
+    setEntity({
+      ...entity,
+      has_trading: true,
+    })
+
+    return res(ctx.json({ status: "success" }))
+  }
+)
+
+export const okDisableTrading = rest.post(
+  "/api/v3/settings/disable-trading",
+  (req, res, ctx) => {
+    setEntity({
+      ...entity,
+      has_trading: false,
+    })
+
+    return res(ctx.json({ status: "success" }))
+  }
+)
 
 export const okDeliverySites = rest.get(
   "/api/v3/settings/get-delivery-sites",
@@ -225,6 +312,10 @@ export const okUpdate2BS = rest.post(
 
 export default setupServer(
   okSettings,
+  okEnableMac,
+  okDisableMac,
+  okEnableTrading,
+  okDisableTrading,
   okDeliverySites,
   okAddDeliverySite,
   okDeleteDeliverySite,
