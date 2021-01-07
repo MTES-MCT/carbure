@@ -6,7 +6,7 @@ from django.test import TransactionTestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from core.models import Entity, UserRights, LotV2, LotTransaction, ProductionSite, Pays, Biocarburant, MatierePremiere, Depot
+from core.models import Entity, UserRights, LotV2, LotTransaction, ProductionSite, Pays, Biocarburant, MatierePremiere, Depot, LotValidationError
 from api.v3.admin.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
 
@@ -55,7 +55,7 @@ class LotsAPITest(TransactionTestCase):
             'matiere_premiere_code': 'BT',
             'volume': 15000,
             'pays_origine_code': 'FR',
-            'ep': 20,
+            'ep': 5,
             'etd': 12,
             'dae': dae,
             'delivery_date': '2020-12-31',
@@ -68,14 +68,14 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(response.status_code, 200)  
         # update it
         tx = LotTransaction.objects.get(dae=dae)
-        lot['ep'] = '21'
+        lot['ep'] = '6'
         lot['tx_id'] = tx.id
         response = self.client.post(reverse('api-v3-update-lot'), lot)
         self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('api-v3-lots-get-details'), {'entity_id': self.entity1.id, 'tx_id': tx.id})
         self.assertEqual(response.status_code, 200)        
         data = response.json()['data']
-        self.assertEqual(data['transaction']['lot']['ep'], 21)
+        self.assertEqual(data['transaction']['lot']['ep'], 6)
         # duplicate 3 times
         response = self.client.post(reverse('api-v3-duplicate-lot'), {'entity_id': self.entity1.id, 'tx_id': tx.id})
         response = self.client.post(reverse('api-v3-duplicate-lot'), {'entity_id': self.entity1.id, 'tx_id': tx.id})
@@ -89,7 +89,7 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(response.status_code, 200)        
         lots = response.json()['data']['lots']
         self.assertEqual(len(lots), 3)
-        # update lots who do not have a dae
+        # update lots that do not have a dae
         for i, lot in enumerate(lots):
             if lot['dae'] == '':
                 postdata = {
@@ -99,7 +99,7 @@ class LotsAPITest(TransactionTestCase):
                     'matiere_premiere_code': 'BT',
                     'volume': 15000,
                     'pays_origine_code': 'FR',
-                    'ep': 20,
+                    'ep': 5,
                     'etd': 12,
                     'dae': 'DAEUPDATED%d' % (i),
                     'delivery_date': '2020-12-31',
@@ -109,20 +109,36 @@ class LotsAPITest(TransactionTestCase):
                 }
                 response = self.client.post(reverse('api-v3-update-lot'), postdata)
                 self.assertEqual(response.status_code, 200)        
-
+        # get drafts, make sure we still have 3
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.entity1.id, 'status': 'draft', 'year': '2020'})
+        self.assertEqual(response.status_code, 200)        
+        lots = response.json()['data']['lots']
+        self.assertEqual(len(lots), 3)
         # validate first lot
         response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.entity1.id, 'tx_ids': [tx.id]})
+        self.assertEqual(response.status_code, 200)
+        print('validated?')
+        print(response.json())
+        errors = LotValidationError.objects.filter(lot=tx.lot)
+        for err in errors:
+            print(err)
+            print(err.message)
+            print(err.details)
+        # check that we have only two drafts remaining
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.entity1.id, 'status': 'draft', 'year': '2020'})
         self.assertEqual(response.status_code, 200)        
+        lots = response.json()['data']['lots']
+        self.assertEqual(len(lots), 2)
         # validate-all the rest
-        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.entity1.id})
-        self.assertEqual(response.status_code, 200)  
+        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.entity1.id, 'year': '2020'})
+        self.assertEqual(response.status_code, 200)
+        print(response.json())
         # get drafts, make sure we have 0 - all sent
         response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.entity1.id, 'status': 'draft', 'year': '2020'})
         self.assertEqual(response.status_code, 200)        
         data = response.json()['data']
         lots = data['lots']
         self.assertEqual(len(lots), 0)
-
 
         # as operator
         # make sure we received 3
@@ -211,3 +227,31 @@ class LotsAPITest(TransactionTestCase):
         lots = data['lots']
         self.assertEqual(len(lots), 10)
 
+
+    def test_duplicates(self):
+        pass
+        # as producer
+        # create lot
+        # validate
+        # create same lot
+        # validate again
+        # ensure lot was deleted
+        # as operator
+        # create same lot
+        # validate
+        # lot doesn't exist anymore
+
+         
+        # as operator
+        # create lot
+        # validate
+        # create same lot
+        # validate again
+        # ensure lot was deleted
+
+
+        # as producer
+        # create same lot
+        # validate
+        # validate returns "1 duplicate found"
+        # lot is deleted but transaction using existing lot is created

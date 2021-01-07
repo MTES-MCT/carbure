@@ -885,21 +885,29 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
 
 
 def validate_lots(user, tx_ids):
+    valid = 0
+    invalid = 0
+    submitted = len(tx_ids)
+    errors = []
     for tx_id in tx_ids:
         try:
             tx_id = int(tx_id)
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': "tx_id must be an integer", 'extra': str(e)}, status=400)
+            invalid += 1
+            errors.append({'tx_id': tx_id, 'message': "tx_id must be an integer"})
+            continue
         print('Trying to validate tx id %d' % (tx_id))
         try:
             tx = LotTransaction.objects.get(Q(id=tx_id), Q(lot__status='Draft') | Q(delivery_status__in=['AA', 'AC', 'R']))
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': "Draft not found", 'extra': str(e)}, status=400)
-
+            invalid += 1
+            errors.append({'tx_id': tx_id, 'message': "Draft not found"})
+            continue
         rights = [r.entity for r in UserRights.objects.filter(user=user)]
         if tx.lot.added_by not in rights:
-            return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-
+            invalid += 1
+            errors.append({'tx_id': tx_id, 'message': "User not allowed"})
+            continue
         # make sure all mandatory fields are set
         tx_valid = tx_is_valid(tx)
         lot_valid = lot_is_valid(tx.lot)
@@ -908,8 +916,11 @@ def validate_lots(user, tx_ids):
         print('tx valid %s lot valid %s is_sane %s' % (tx_valid, lot_valid, is_sane))
 
         if not is_sane or not lot_valid or not tx_valid:
+            invalid += 1
+            errors.append({'tx_id': tx_id, 'message': "Could not validate lot/tx/sanity %s/%s/%s" % (tx_valid, lot_valid, is_sane)})
             tx.lot.is_valid = False
         else:
+            valid += 1
             tx.lot.is_valid = True
             tx.lot.carbure_id = generate_carbure_id(tx.lot)
             tx.lot.status = "Validated"
@@ -927,5 +938,4 @@ def validate_lots(user, tx_ids):
                 pass
         tx.save()
         tx.lot.save()
-
-    return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'success', 'submitted': submitted, 'valid': valid, 'invalid': invalid, 'errors': errors})

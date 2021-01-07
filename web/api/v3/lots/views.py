@@ -598,7 +598,6 @@ def comment_lot(request, *args, **kwargs):
 def accept_all(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
-
     lots = LotTransaction.objects.filter(carbure_client=entity, delivery_status__in=[
         'N', 'AC', 'AA'])
     year = request.POST.get('year', False)
@@ -683,7 +682,7 @@ def validate_all_drafts(request, *args, **kwargs):
 
     tx_ids = [d.id for d in drafts]
     response = validate_lots(request.user, tx_ids)
-    check_duplicates(drafts, background=False)
+    duplicates = check_duplicates(drafts, background=False)
     return response
 
 @check_rights('entity_id')
