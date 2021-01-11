@@ -2,7 +2,7 @@ import datetime
 from django import db
 from django.db.models import Q, Count
 from multiprocessing import Process
-import pandas as pd
+import modin.pandas as pd
 
 from django.http import JsonResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
@@ -171,11 +171,11 @@ def lot_is_valid(lot):
     if not lot.parent_lot:
         if not lot.biocarburant:
             error = 'Veuillez renseigner le type de biocarburant'
-            LotV2Error.objects.update_or_create(lot=lot, field='biocarburant', value='', error=error)
+            LotV2Error.objects.update_or_create(lot=lot, field='biocarburant_code', value='', error=error)
             is_valid = False
         if not lot.matiere_premiere:
             error = 'Veuillez renseigner la matière première'
-            LotV2Error.objects.update_or_create(lot=lot, field='matiere_premiere', value='', error=error)
+            LotV2Error.objects.update_or_create(lot=lot, field='matiere_premiere_code', value='', error=error)
             is_valid = False
         if lot.producer_is_in_carbure and lot.carbure_production_site is None:
             error = 'Veuillez préciser le site de production'
@@ -360,23 +360,25 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
                     lot_errors.append(error)
         else:
             lot.unknown_production_country = None
-        if 'production_site_reference' in lot_row:
+        if 'production_site_reference' in lot_row and lot_row['production_site_reference'] != '' and lot_row['production_site_reference'] is not None:
             lot.unknown_production_site_reference = lot_row['production_site_reference']
         else:
             lot.unknown_production_site_reference = ''
+            msg = "Veuillez préciser une référence de certificat fournisseur/producteur"
+            error = LotV2Error(lot=lot, field='unknown_production_site_reference',
+                                error=msg,
+                                value=lot_row['production_site_reference'])
+            lot_errors.append(error)
         if 'production_site_commissioning_date' in lot_row:
             try:
                 com_date = lot_row['production_site_commissioning_date']
-                if isinstance(com_date, datetime.datetime) or isinstance(com_date, datetime.date):
-                    dd = com_date
+                if isinstance(com_date, str):
+                    dd = dateutil.parser.parse(com_date, dayfirst=True)
                 else:
-                    year = int(com_date[0:4])
-                    month = int(com_date[5:7])
-                    day = int(com_date[8:10])
-                    dd = datetime.date(year=year, month=month, day=day)
+                    dd = com_date
                 lot.unknown_production_site_com_date = dd
-            except Exception:
-                msg = "Veuillez entrer une date au format AAAA-MM-JJ"
+            except Exception as e:
+                msg = "Date de mise en service: veuillez entrer une date au format JJ/MM/AAAA"
                 error = LotV2Error(lot=lot, field='unknown_production_site_com_date',
                                     error=msg,
                                     value=lot_row['production_site_commissioning_date'])
@@ -418,7 +420,7 @@ def fill_matiere_premiere_info(lot_row, lot, prefetched_data):
         matiere_premiere = lot_row['matiere_premiere_code']
         if matiere_premiere in mps:
             lot.matiere_premiere = mps[matiere_premiere]
-        else:
+        else: 
             lot.matiere_premiere = None
             lot_errors.append(LotV2Error(lot=lot, field='matiere_premiere_code',
                                          error='Matière Première inconnue',
@@ -580,7 +582,7 @@ def fill_delivery_date(lot_row, lot, transaction):
             print(e)
             transaction.delivery_date = None
             lot.period = today.strftime('%Y-%m')
-            msg = "Format de date incorrect: veuillez entrer une date au format AAAA-MM-JJ (%s)" % (lot_row['delivery_date'])
+            msg = "Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA (%s)" % (lot_row['delivery_date'])
             tx_errors.append(TransactionError(tx=transaction, field='delivery_date', error=msg, value=delivery_date))
     return tx_errors
 
@@ -860,7 +862,6 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
         tx.lot_id = lot.id
     # 5: Batch insert transaction
     LotTransaction.objects.bulk_create(txs_to_insert, batch_size=100)
-
     # likewise, LotError and TransactionError require a foreign key
     # 6 assign lot.id to LotError
     for lot, errors in zip(sorted(new_lots, key=lambda x: x.id), lot_errors):
@@ -877,10 +878,12 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
     TransactionError.objects.bulk_create(flat_tx_errors, batch_size=100)
     # 8 run sanity checks
     print('calling bulk_sanity_check in background %s' % (datetime.datetime.now()))
-    p = Process(target=bulk_sanity_checks, args=[new_txs])
-    p.start()
-    d = Process(target=check_duplicates, args=[new_txs])
-    d.start()
+    #p = Process(target=bulk_sanity_checks, args=[new_txs])
+    #p.start()
+    #d = Process(target=check_duplicates, args=[new_txs])
+    #d.start()
+    bulk_sanity_checks(new_txs, background=False)
+    check_duplicates(new_txs, background=False)
     return new_lots, new_txs
 
 
@@ -917,7 +920,7 @@ def validate_lots(user, tx_ids):
 
         if not is_sane or not lot_valid or not tx_valid:
             invalid += 1
-            errors.append({'tx_id': tx_id, 'message': "Could not validate lot/tx/sanity %s/%s/%s" % (tx_valid, lot_valid, is_sane)})
+            errors.append({'tx_id': tx_id, 'message': "Could not validate tx/lot/sanity %s/%s/%s" % (tx_valid, lot_valid, is_sane)})
             tx.lot.is_valid = False
         else:
             valid += 1
@@ -927,9 +930,12 @@ def validate_lots(user, tx_ids):
 
             # if we create a lot for ourselves
             if tx.carbure_client and tx.lot.added_by == tx.carbure_client:
+                print('validating tx because lot added by recipient')
+                print(tx.carbure_client, tx.lot_added_by)
                 tx.delivery_status = 'A'
             # if the client is not in carbure, auto-accept
             elif not tx.client_is_in_carbure:
+                print('validating tx because client not in carbure')
                 tx.delivery_status = 'A'
             # if we save a lot that was requiring a fix, change status to 'AA'
             elif tx.delivery_status in ['AC', 'R']:
