@@ -647,6 +647,7 @@ def reject_all(request, *args, **kwargs):
 def delete_all_drafts(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
+    deleted = 0
 
     drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft')
     year = request.POST.get('year', False)
@@ -659,8 +660,12 @@ def delete_all_drafts(request, *args, **kwargs):
             date_until = datetime.date(year=year, month=12, day=31)
         except Exception:
             return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
-    drafts.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until).delete()
-    return JsonResponse({'status': 'success'})
+    filtered = drafts.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
+    lots = [d.lot for d in filtered]
+    for lot in lots:
+        lot.delete()
+        deleted += 1
+    return JsonResponse({'status': 'success', 'deleted': deleted})
 
 @check_rights('entity_id')
 def validate_all_drafts(request, *args, **kwargs):
@@ -679,7 +684,6 @@ def validate_all_drafts(request, *args, **kwargs):
         except Exception:
             return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
     drafts = drafts.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-
     tx_ids = [d.id for d in drafts]
     response = validate_lots(request.user, tx_ids)
     duplicates = check_duplicates(drafts, background=False)
