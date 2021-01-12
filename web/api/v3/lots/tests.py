@@ -39,7 +39,10 @@ def debug_errors():
 
 class LotsAPITest(TransactionTestCase):
     home = os.environ['CARBURE_HOME']
-    fixtures = ['{home}/web/fixtures/json/countries.json'.format(home=home), '{home}/web/fixtures/json/feedstock.json'.format(home=home), '{home}/web/fixtures/json/biofuels.json'.format(home=home)]
+    fixtures = ['{home}/web/fixtures/json/countries.json'.format(home=home), 
+    '{home}/web/fixtures/json/feedstock.json'.format(home=home), 
+    '{home}/web/fixtures/json/biofuels.json'.format(home=home),
+    '{home}/web/fixtures/json/depots.json'.format(home=home)]
 
     def setUp(self):
         user_model = get_user_model()
@@ -49,7 +52,7 @@ class LotsAPITest(TransactionTestCase):
 
         # a few entities
         self.test_producer, _ = Entity.objects.update_or_create(name='Le Super Producteur 1', entity_type='Producteur')
-        self.test_operator, _ = Entity.objects.update_or_create(name='Le Super Operateur 1', entity_type='Opérateur')
+        self.test_operator, _ = Entity.objects.update_or_create(name='OPERATEUR1', entity_type='Opérateur')
         self.entity3, _ = Entity.objects.update_or_create(name='Le Super Trader 1', entity_type='Trader')
 
         # some rights
@@ -61,7 +64,7 @@ class LotsAPITest(TransactionTestCase):
         d = {'country': france, 'date_mise_en_service': today, 'site_id':'SIRET XXX',
         'city': 'paris', 'postal_code': '75001', 'manager_name':'Guillaume Caillou', 
         'manager_phone':'0145247000', 'manager_email': 'test@test.net'}
-        self.production_site, _ = ProductionSite.objects.update_or_create(producer=self.test_producer, name='Usine 001', defaults=d)
+        self.production_site, _ = ProductionSite.objects.update_or_create(producer=self.test_producer, name='PSITE1', defaults=d)
         Depot.objects.update_or_create(name='Depot Test', depot_id='001', country=france)
 
         loggedin = self.client.login(username=self.user_email, password=self.user_password)
@@ -72,6 +75,40 @@ class LotsAPITest(TransactionTestCase):
         device = EmailDevice.objects.get(user=self.user1)
         response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
         self.assertEqual(response.status_code, 302)
+
+    def upload_file(self, filename, entity):
+        print('uploading file %s' % (filename))
+        file_directory = '%s/web/fixtures/csv/test_data' % (os.environ['CARBURE_HOME'])
+        filepath = '%s/%s' % (file_directory, filename)
+        fh = open(filepath, 'rb')
+        data = fh.read()
+        fh.close()
+        f = SimpleUploadedFile("lots.xlsx", data)
+        response = self.client.post(reverse('api-v3-upload'), {'entity_id': entity.id, 'file': f})
+        if response.status_code != 200:
+            print('Failed to upload %s' % (filename))
+        self.assertEqual(response.status_code, 200)
+        return response.json()
+
+    def ensure_nb_lots(self, nb_lots):
+        count = LotV2.objects.all().count()
+        self.assertEqual(count, nb_lots)
+    
+    def ensure_nb_txs(self, nb_txs):
+        count = LotTransaction.objects.all().count()
+        self.assertEqual(count, nb_txs)
+
+    def ensure_nb_lot_errors(self, nb):
+        count = LotV2Error.objects.all().count()
+        self.assertEqual(count, nb)
+
+    def ensure_nb_tx_errors(self, nb):
+        count = TransactionError.objects.all().count()
+        self.assertEqual(count, nb)
+
+    def ensure_nb_sanity_errors(self, nb):
+        count = LotValidationError.objects.all().count()
+        self.assertEqual(count, nb)
 
     def test_lot_actions(self):
         # as producer / trader
@@ -187,18 +224,149 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(response.status_code, 200)
 
 
-    def test_producer_imports(self):
+    def test_advanced_template_import_cannot_validate(self):
         # as producer
-        # upload 2 that cannot be validated
-        file_directory = '%s/web/fixtures/csv/test_data' % (os.environ['CARBURE_HOME'])
-        filepath = '%s/carbure_template_advanced_missing_data_cannot_validate.xlsx' % (file_directory)
-        fh = open(filepath, 'rb')
-        data = fh.read()
-        fh.close()
-        f = SimpleUploadedFile("lots.xlsx", data)
-        response = self.client.post(reverse('api-v3-upload'), {'entity_id': self.test_producer.id, 'file': f})
+        # upload lines that cannot be validated
+        jsoned = self.upload_file('carbure_template_advanced_missing_data_cannot_validate.xlsx', self.test_producer)
+        # get number of lots in excel file
+        nb_lots = jsoned['data']['total']
+        # make sure all lines were loaded
+        self.assertEqual(nb_lots, jsoned['data']['loaded'])
+        # make sure they were saved successfully
+        self.ensure_nb_lots(nb_lots)
+        self.ensure_nb_txs(nb_lots)
+
+        # validate-all
+        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id})
         self.assertEqual(response.status_code, 200)
-        jsoned = response.json()
+
+        # get drafts
+        lots = LotV2.objects.filter(added_by_user=self.user1, status='Draft')
+        self.assertEqual(lots.count(), nb_lots) # they are still all with status draft
+
+        # get drafts via api - same result expected
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
+        self.assertEqual(response.status_code, 200)        
+        data = response.json()['data']
+        lots = data['lots']
+        self.assertEqual(len(lots), nb_lots)
+
+        # make sure they all have LotError or TransactionError
+        lot_errors = LotV2Error.objects.filter(lot__in=[lot['lot']['id'] for lot in lots])
+        tx_errors = TransactionError.objects.filter(tx__in=[tx['id'] for tx in lots])
+        nb_errors = lot_errors.count() + tx_errors.count()
+        self.assertEqual(nb_errors, nb_lots)
+        
+        # delete-all-drafts
+        response = self.client.post(reverse('api-v3-delete-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
+        self.assertEqual(response.status_code, 200)
+        res = response.json()
+        self.assertEqual(res['deleted'], nb_lots)
+
+        # make sure no lots/tx/loterror/txerror are still there
+        self.ensure_nb_lots(0)
+        self.ensure_nb_txs(0)
+        self.ensure_nb_lot_errors(0)
+        self.ensure_nb_tx_errors(0)
+        self.ensure_nb_sanity_errors(0)
+
+
+    def test_advanced_template_import_can_validate(self):
+        # upload valid lots
+        jsoned = self.upload_file('carbure_template_advanced_missing_data_but_valid.xlsx', self.test_producer)
+        nb_lots = jsoned['data']['total']
+        self.assertEqual(jsoned['data']['loaded'], nb_lots)
+        # validate-all
+        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
+        self.assertEqual(response.status_code, 200)
+        res = response.json()
+        print('test_advanced_template_import_can_validate')
+        debug_errors()
+        print(res)
+        # make sure no lots/tx/loterror/txerror are still there
+        self.assertEqual(res['submitted'], nb_lots)
+        self.assertEqual(res['valid'], nb_lots)
+        self.assertEqual(LotV2.objects.all().count(), nb_lots)
+        self.assertEqual(LotTransaction.objects.all().count(), nb_lots)
+        # get drafts 0
+        lots = LotV2.objects.filter(added_by_user=self.user1, status='Draft')
+        self.assertEqual(lots.count(), 0) # no more drafts, all validated
+        # check api
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
+        self.assertEqual(response.status_code, 200)        
+        data = response.json()['data']
+        lots = data['lots']
+        self.assertEqual(len(lots), 0)        
+        # get validated nb_lots
+        lots = LotV2.objects.filter(added_by_user=self.user1, status='Validated')
+        self.assertEqual(lots.count(), nb_lots)
+        lots = LotV2.objects.all()
+        self.assertEqual(lots.count(), nb_lots)
+        txs = LotTransaction.objects.all()
+        self.assertEqual(txs.count(), nb_lots)
+
+        # check api
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'validated', 'year': '2020'})
+        self.assertEqual(response.status_code, 200)        
+        lots = response.json()['data']['lots']
+        self.assertEqual(len(lots), 0) # client is not in carbure, transactions are accepted automatically
+
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'accepted', 'year': '2020'})
+        self.assertEqual(response.status_code, 200)        
+        data = response.json()['data']
+        lots = data['lots']
+        all_lots = LotV2.objects.all().count()
+        print('all lots count: %d' % (all_lots))
+        self.assertEqual(len(lots), nb_lots)
+
+
+    def test_template_import_can_validate(self):
+        # upload valid lots
+        jsoned = self.upload_file('carbure_template_simple_missing_data_but_valid.xlsx', self.test_producer)
+        nb_lots = jsoned['data']['total']
+        self.assertEqual(jsoned['data']['loaded'], nb_lots)
+        # validate-all
+        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
+        self.assertEqual(response.status_code, 200)
+        res = response.json()
+        lots_in_batch = nb_lots - 1
+        self.assertEqual(res['submitted'], lots_in_batch)
+        self.assertEqual(res['valid'], lots_in_batch)
+
+        # get drafts 0
+        lots = LotV2.objects.filter(added_by_user=self.user1, status='Draft')
+        self.assertEqual(lots.count(), 0) # no more drafts, all validated
+        # check api
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
+        self.assertEqual(response.status_code, 200)        
+        data = response.json()['data']
+        lots = data['lots']
+        self.assertEqual(len(lots), 0)        
+        # get validated nb_lots
+        lots = LotV2.objects.filter(added_by_user=self.user1, status='Validated')
+        self.assertEqual(lots.count(), nb_lots)
+        lots = LotV2.objects.all()
+        self.assertEqual(lots.count(), nb_lots)
+        txs = LotTransaction.objects.all()
+        self.assertEqual(txs.count(), nb_lots)
+
+        # check api
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'validated', 'year': '2020'})
+        self.assertEqual(response.status_code, 200)        
+        lots = response.json()['data']['lots']
+        self.assertEqual(len(lots), 0) # client is not in carbure, transactions are accepted automatically
+
+        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'accepted', 'year': '2020'})
+        self.assertEqual(response.status_code, 200)        
+        data = response.json()['data']
+        lots = data['lots']
+        self.assertEqual(len(lots), nb_lots)
+
+    def test_simple_template_import_cannot_validate(self):
+        return
+        # as producer
+        # upload lines that cannot be validated
+        jsoned = self.upload_file('carbure_template_simple_missing_data_cannot_validate.xlsx', self.test_producer)
         # get number of lots in excel file
         nb_lots = jsoned['data']['total']
         # make sure all lines were loaded
@@ -247,53 +415,43 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(LotV2Error.objects.all().count(), 0)
         self.assertEqual(TransactionError.objects.all().count(), 0)
 
-        # upload valid lots
-        fh = open('%s/carbure_template_advanced_missing_data_but_valid.xlsx' % (file_directory), 'rb')
-        response = self.client.post(reverse('api-v3-upload'), {'entity_id': self.test_producer.id, 'file': fh})
-        self.assertEqual(response.status_code, 200)
-        fh.close()
-        jsoned = response.json()
+    def test_simple_template_import_sanity_checks(self):
+        return
+        # as producer
+        # upload lines that cannot be validated
+        jsoned = self.upload_file('carbure_template_simple_wrong_data_cannot_validate.xlsx', self.test_producer)
+        # get number of lots in excel file
         nb_lots = jsoned['data']['total']
-        self.assertEqual(jsoned['data']['loaded'], nb_lots)
+        # make sure all lines were loaded
+        self.assertEqual(nb_lots, jsoned['data']['loaded'])
+        # make sure they were saved successfully
+        lots = LotV2.objects.filter(added_by_user=self.user1)
+        self.assertEqual(lots.count(), nb_lots)
+        txs = LotTransaction.objects.filter(lot__in=lots)
+        self.assertEqual(txs.count(), nb_lots)
         # validate-all
-        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
+        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id})
         self.assertEqual(response.status_code, 200)
-        res = response.json()
-        print(res)
-        # make sure no lots/tx/loterror/txerror are still there
-        self.assertEqual(res['submitted'], nb_lots)
-        self.assertEqual(res['valid'], nb_lots)
-        self.assertEqual(LotV2.objects.all().count(), nb_lots)
-        self.assertEqual(LotTransaction.objects.all().count(), nb_lots)
-        # get drafts 0
+        # get drafts
         lots = LotV2.objects.filter(added_by_user=self.user1, status='Draft')
-        self.assertEqual(lots.count(), 0) # no more drafts, all validated
-        # check api
+        self.assertEqual(lots.count(), nb_lots) # they are still all with status draft
+        # get drafts via api - same result expected
         response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
         self.assertEqual(response.status_code, 200)        
         data = response.json()['data']
         lots = data['lots']
-        self.assertEqual(len(lots), 0)        
-        # get validated nb_lots
-        lots = LotV2.objects.filter(added_by_user=self.user1, status='Validated')
-        self.assertEqual(lots.count(), nb_lots)
-        lots = LotV2.objects.all()
-        self.assertEqual(lots.count(), nb_lots)
-        txs = LotTransaction.objects.all()
-        self.assertEqual(txs.count(), nb_lots)
-
-        # check api
-        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'validated', 'year': '2020'})
-        self.assertEqual(response.status_code, 200)        
-        lots = response.json()['data']['lots']
-        self.assertEqual(len(lots), 0) # client is not in carbure, transactions are accepted automatically
-
-        response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'accepted', 'year': '2020'})
-        self.assertEqual(response.status_code, 200)        
-        data = response.json()['data']
-        lots = data['lots']
         self.assertEqual(len(lots), nb_lots)
-
+        # make sure they all have LotError or TransactionError
+        lot_errors = LotV2Error.objects.filter(lot__in=[lot['lot']['id'] for lot in lots])
+        tx_errors = TransactionError.objects.filter(tx__in=[tx['id'] for tx in lots])
+        nb_errors = lot_errors.count() + tx_errors.count()
+        self.assertEqual(nb_errors, nb_lots)
+        
+        # delete-all-drafts
+        response = self.client.post(reverse('api-v3-delete-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
+        self.assertEqual(response.status_code, 200)
+        res = response.json()
+        self.assertEqual(res['deleted'], nb_lots)
 
     def test_duplicates(self):
         pass
