@@ -3,7 +3,7 @@ from django import db
 from django.db.models import Q, Count
 from multiprocessing import Process
 import os
-os.environ["MODIN_CPUS"] = "2" # max for the small development instance
+os.environ["MODIN_CPUS"] = "1" # max for the small development instance
 import modin.pandas as pd
 
 from django.http import JsonResponse
