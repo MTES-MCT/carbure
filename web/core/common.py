@@ -1,10 +1,8 @@
 import datetime
+import openpyxl
 from django import db
 from django.db.models import Q, Count
 from multiprocessing import Process
-#import os
-#os.environ["MODIN_CPUS"] = "1" # max for the small development instance
-#import modin.pandas as pd
 import pandas as pd
 
 from django.http import JsonResponse
@@ -643,7 +641,7 @@ def fill_delivery_site_data(lot_row, transaction, prefetched_data):
         if delivery_site in depots:
             transaction.delivery_site_is_in_carbure = True
             transaction.carbure_delivery_site = depots[delivery_site]
-            transaction.unknown_client = ''
+            transaction.unknown_delivery_site = ''
         else:
             transaction.delivery_site_is_in_carbure = False
             transaction.carbure_delivery_site = None
