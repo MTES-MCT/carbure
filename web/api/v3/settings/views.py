@@ -9,6 +9,9 @@ from producers.models import ProductionSite, ProductionSiteInput, ProductionSite
 from core.decorators import check_rights
 from core.models import ISCCCertificate, DBSCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate
 from core.models import ProductionSiteCertificate, UserRightsRequests
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
+from django.conf import settings
 
 @otp_required
 def get_settings(request):
@@ -586,4 +589,22 @@ def request_entity_access(request):
         return JsonResponse({'status': 'error', 'message': "Could not find entity"}, status=400)
 
     UserRightsRequests.objects.update_or_create(user=request.user, entity=entity, defaults={'comment': comment})
+
+    email_subject = "Carbure - Demande d'accès"
+    message = """ 
+    Bonjour,
+    Un utilisateur vient de faire une demande d'accès à CarbuRe
+
+    Utilisateur: %s
+    Société: %s
+    Commentaire: %s
+    """ % (request.user.email, entity.name, comment)
+
+    send_mail(
+        subject=email_subject,
+        message=message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=["carbure@beta.gouv.fr"],
+        fail_silently=False,
+    )
     return JsonResponse({'status': 'success'})
