@@ -229,7 +229,8 @@ def get_details(request, *args, **kwargs):
 
     tx = LotTransaction.objects.get(pk=tx_id)
 
-    if tx.carbure_client != entity or tx.carbure_vendor != entity:
+    if tx.carbure_client != entity and tx.carbure_vendor != entity:
+        print(tx.carbure_vendor)
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     now = datetime.datetime.now()
