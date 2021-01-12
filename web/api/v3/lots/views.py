@@ -229,7 +229,7 @@ def get_details(request, *args, **kwargs):
 
     tx = LotTransaction.objects.get(pk=tx_id)
 
-    if tx.carbure_client != entity and tx.carbure_vendor != entity:
+    if tx.carbure_client != entity or tx.carbure_vendor != entity:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     now = datetime.datetime.now()
@@ -758,11 +758,19 @@ def upload(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
 
-    file = request.FILES.get('file')
-    if file is None:
+    f = request.FILES.get('file')
+    if f is None:
         return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
 
-    nb_loaded, nb_total = load_excel_file(entity, request.user, file)
+    print(f)
+    # save file
+    now = datetime.datetime.now()
+    filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d'), entity.name.upper())
+    filepath = '/tmp/%s' % (filename)
+    with open(filepath, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+    nb_loaded, nb_total = load_excel_file(entity, request.user, filepath)
     if nb_loaded is False:
         return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
     data = {'loaded': nb_loaded, 'total': nb_total}
