@@ -280,9 +280,6 @@ class LotsAPITest(TransactionTestCase):
         response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
         self.assertEqual(response.status_code, 200)
         res = response.json()
-        print('test_advanced_template_import_can_validate')
-        debug_errors()
-        print(res)
         # make sure no lots/tx/loterror/txerror are still there
         self.assertEqual(res['submitted'], nb_lots)
         self.assertEqual(res['valid'], nb_lots)
@@ -325,6 +322,7 @@ class LotsAPITest(TransactionTestCase):
         jsoned = self.upload_file('carbure_template_simple_missing_data_but_valid.xlsx', self.test_producer)
         nb_lots = jsoned['data']['total']
         self.assertEqual(jsoned['data']['loaded'], nb_lots)
+        print('uploaded %d lots' % (nb_lots))
         # validate-all
         response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
         self.assertEqual(response.status_code, 200)
@@ -333,18 +331,18 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(res['submitted'], lots_in_batch)
         self.assertEqual(res['valid'], lots_in_batch)
 
-        # get drafts 0
+        # get drafts
         lots = LotV2.objects.filter(added_by_user=self.user1, status='Draft')
-        self.assertEqual(lots.count(), 0) # no more drafts, all validated
+        self.assertEqual(lots.count(), 1) # one draft left (line without delivery_date)
         # check api
         response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
         self.assertEqual(response.status_code, 200)        
         data = response.json()['data']
         lots = data['lots']
-        self.assertEqual(len(lots), 0)        
+        self.assertEqual(len(lots), 0)
         # get validated nb_lots
         lots = LotV2.objects.filter(added_by_user=self.user1, status='Validated')
-        self.assertEqual(lots.count(), nb_lots)
+        self.assertEqual(lots.count(), lots_in_batch)
         lots = LotV2.objects.all()
         self.assertEqual(lots.count(), nb_lots)
         txs = LotTransaction.objects.all()
@@ -360,7 +358,7 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(response.status_code, 200)        
         data = response.json()['data']
         lots = data['lots']
-        self.assertEqual(len(lots), nb_lots)
+        self.assertEqual(len(lots), lots_in_batch)
 
     def test_simple_template_import_cannot_validate(self):
         return
