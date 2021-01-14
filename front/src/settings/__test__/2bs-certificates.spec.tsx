@@ -116,4 +116,5 @@ test("renew a certificate", async () => {
   await waitWhileLoading()
 
   await screen.findByText("2BS Test")
+  expect(screen.queryByText("Expired 2BS Test")).not.toBeInTheDocument()
 })
