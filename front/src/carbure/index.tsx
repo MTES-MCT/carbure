@@ -1,6 +1,7 @@
 import React from "react"
 
 import { AppHook, useApp } from "./hooks/use-app"
+import { EntityType, LotStatus } from "common/types"
 import useEntity from "./hooks/use-entity"
 
 import { Alert } from "common/components/alert"
@@ -31,6 +32,8 @@ const Org = ({ app }: { app: AppHook }) => {
     return <Redirect to="/" />
   }
 
+  const isAdmin = entity?.entity_type === EntityType.Administration
+
   return (
     <React.Fragment>
       <Topbar entity={entity} settings={app.settings} />
@@ -57,7 +60,7 @@ const Org = ({ app }: { app: AppHook }) => {
         </Route>
 
         <Route relative exact path="transactions">
-          <Redirect relative to="draft" />
+          <Redirect relative to={isAdmin ? LotStatus.Alert : LotStatus.Draft} />
         </Route>
 
         <Route relative path="transactions/:status">

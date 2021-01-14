@@ -44,12 +44,18 @@ const PRODUCER_TRADER_STATUSES = [
   LotStatus.Accepted,
 ]
 
+const ADMIN_STATUSES = [
+  LotStatus.Alert,
+  LotStatus.Correction,
+  LotStatus.Declaration,
+]
+
 const OPERATOR_FILTERS = [
   Filters.Periods,
   Filters.Biocarburants,
   Filters.MatieresPremieres,
-  Filters.Vendors,
   Filters.CountriesOfOrigin,
+  Filters.Vendors,
   Filters.ProductionSites,
   Filters.DeliverySites,
 ]
@@ -58,8 +64,20 @@ const PRODUCER_TRADER_FILTERS = [
   Filters.Periods,
   Filters.Biocarburants,
   Filters.MatieresPremieres,
-  Filters.Clients,
   Filters.CountriesOfOrigin,
+  Filters.Clients,
+  Filters.ProductionSites,
+  Filters.DeliverySites,
+]
+
+const ADMIN_FILTERS = [
+  Filters.Periods,
+  Filters.Biocarburants,
+  Filters.MatieresPremieres,
+  Filters.CountriesOfOrigin,
+  Filters.Producers,
+  Filters.Traders,
+  Filters.Operators,
   Filters.ProductionSites,
   Filters.DeliverySites,
 ]
@@ -141,6 +159,11 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
   const isTrader = entity.entity_type === EntityType.Trader
   const isOperator = entity.entity_type === EntityType.Operator
   const isProducer = entity.entity_type === EntityType.Producer
+  const isAdmin = entity.entity_type === EntityType.Administration
+
+  if (isAdmin && !ADMIN_STATUSES.includes(status.active)) {
+    return <Redirect relative to=".." />
+  }
 
   if (isOperator && !OPERATOR_STATUSES.includes(status.active)) {
     return <Redirect relative to=".." />
@@ -155,10 +178,14 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
 
   const statusPlaceholder = isOperator
     ? OPERATOR_STATUSES
+    : isAdmin
+    ? ADMIN_STATUSES
     : PRODUCER_TRADER_STATUSES
 
   const filtersPlaceholder = isOperator
     ? OPERATOR_FILTERS
+    : isAdmin
+    ? ADMIN_FILTERS
     : PRODUCER_TRADER_FILTERS
 
   return (

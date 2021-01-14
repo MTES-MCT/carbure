@@ -19,19 +19,6 @@ export const emptySnapshot = {
   },
 }
 
-export const emptyLots = {
-  lots: [],
-  total: 0,
-  total_errors: 0,
-  returned: 0,
-  from: 0,
-  errors: {},
-  deadlines: {
-    date: "2020-12-31",
-    total: 0,
-  },
-}
-
 export const snapshot = {
   years: [2020, 2019],
   lots: {
@@ -71,7 +58,11 @@ export const operatorSnapshot = {
 
 export const adminSnapshot = {
   years: [2020],
-  lots: {},
+  lots: {
+    alert: 0,
+    correction: 0,
+    declaration: 0,
+  },
   filters: {
     matieres_premieres: [{ value: "COLZA", label: "Colza" }],
     biocarburants: [{ value: "EMHV", label: "EMHV" }],
@@ -79,7 +70,22 @@ export const adminSnapshot = {
     countries_of_origin: [{ value: "FR", label: "France" }],
     production_sites: ["Test Production Site"],
     delivery_sites: ["Test Delivery Site"],
-    actors: ["Producteur Test", "Opérateur Test"],
+    producers: ["Producteur Test"],
+    operators: ["Opérateur Test"],
+    traders: ["Trader Test"],
+  },
+}
+
+export const emptyLots = {
+  lots: [],
+  total: 0,
+  total_errors: 0,
+  returned: 0,
+  from: 0,
+  errors: {},
+  deadlines: {
+    date: "2020-12-31",
+    total: 0,
   },
 }
 

@@ -350,3 +350,42 @@ export function hasDeadline(tx: Transaction, deadline: string): boolean {
 
   return differenceInCalendarMonths(deadlineDate, deliveryDate) === 1
 }
+
+// ADMIN
+
+export function getAdminSnapshot(
+  entityID: number,
+  year: number
+): Promise<Snapshot> {
+  return api
+    .get("/admin/lots/snapshot", { entity_id: entityID, year })
+    .then(normalizeFilters)
+}
+
+export function getAdminLots(
+  status: LotStatus,
+  entityID: number,
+  filters: FilterSelection["selected"],
+  year: number,
+  page: number,
+  limit: number,
+  query: string,
+  sortBy: string,
+  order: string,
+  invalid: boolean,
+  deadline: boolean
+): Promise<Lots> {
+  const params = {
+    ...filters,
+    entity_id: entityID,
+    from_idx: page * limit,
+    sort_by: sortBy,
+    status,
+    year,
+    limit,
+    query,
+    order,
+  }
+
+  return api.get("/admin/lots", params)
+}
