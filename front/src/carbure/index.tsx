@@ -68,6 +68,18 @@ const Org = ({ app }: { app: AppHook }) => {
           <Settings entity={entity} settings={app.settings} />
         </Route>
 
+        <Route relative path="dashboard">
+          <h1>Tableau de bord</h1>
+        </Route>
+
+        <Route relative path="entities">
+          <h1>Sociétés</h1>
+        </Route>
+
+        <Route relative path="controls">
+          <h1>Contrôles</h1>
+        </Route>
+
         <Redirect relative to="transactions" />
       </Switch>
 

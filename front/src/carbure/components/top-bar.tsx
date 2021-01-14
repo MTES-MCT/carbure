@@ -96,17 +96,25 @@ const Topbar = ({ entity, settings }: TopbarProps) => (
   <header className={styles.topBar}>
     <Logo />
 
-    <nav className={styles.pageNav}>
-      {canTrade(entity) && <PageLink to="stocks">Stocks</PageLink>}
+    {entity && (
+      <nav className={styles.pageNav}>
+        {isAdmin(entity) && <PageLink to="dashboard">Accueil</PageLink>}
 
-      {entity && <PageLink to="transactions">Transactions</PageLink>}
+        {canTrade(entity) && <PageLink to="stocks">Stocks</PageLink>}
 
-      {isAdmin(entity) && (
-        <PageLink to="administration">Administration</PageLink>
-      )}
+        <PageLink to="transactions">Transactions</PageLink>
 
-      {entity && <PageLink to="settings">Société</PageLink>}
-    </nav>
+        {isAdmin(entity) && (
+          // <PageLink to="administration">Administration</PageLink>
+          <React.Fragment>
+            <PageLink to="entities">Sociétés</PageLink>
+            <PageLink to="controls">Contrôles</PageLink>
+          </React.Fragment>
+        )}
+
+        {!isAdmin(entity) && <PageLink to="settings">Société</PageLink>}
+      </nav>
+    )}
 
     <UserMenu settings={settings} entity={entity} />
 
