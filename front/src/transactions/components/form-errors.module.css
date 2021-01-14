@@ -6,3 +6,7 @@
   padding: 0 16px;
   margin: 0;
 }
+
+.transactionErrorExplanation {
+  margin-bottom: 8px;
+}
