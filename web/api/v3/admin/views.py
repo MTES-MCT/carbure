@@ -179,7 +179,8 @@ def get_lots(request):
     if not status:
         return JsonResponse({'status': 'error', 'message': "Please provide a status"}, status=400)
 
-    try:
+    # try:
+    if 1:
         txs = LotTransaction.objects.select_related(
             'lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
             'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
@@ -195,10 +196,10 @@ def get_lots(request):
         elif status == 'declaration':
             txs = txs.filter(delivery_status='A')
 
-        return get_lots_with_metadata(txs, request.GET)
+        return get_lots_with_metadata(txs, None, request.GET)
 
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    # except Exception as e:
+    #     return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 @is_admin
 def get_snapshot(request):

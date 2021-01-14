@@ -30,7 +30,7 @@ def get_lots(request, *args, **kwargs):
 
     try:
         txs = get_entity_lots_by_status(entity, status)
-        return get_lots_with_metadata(txs, request.GET)
+        return get_lots_with_metadata(txs, entity, request.GET)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
