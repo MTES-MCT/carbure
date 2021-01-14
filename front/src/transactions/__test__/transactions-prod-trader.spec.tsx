@@ -109,7 +109,7 @@ test("producer/trader: display a list of 1 transaction", async () => {
   screen.getByText("Test Delivery Site")
   screen.getByText("France, Test City")
   const countries = screen.getAllByText("France")
-  expect(countries.length).toBe(2)
+  expect(countries).toHaveLength(2)
 })
 
 test("producer/trader: check filters", async () => {
