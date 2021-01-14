@@ -74,7 +74,19 @@ export function useGetLots(
   const entityID = entity?.id
 
   function exportAllTransactions() {
-    if (entity !== null) {
+    if (entity === null) return
+
+    if (entity.entity_type === EntityType.Administration) {
+      api.downloadAdminLots(
+        status.active,
+        entity.id,
+        filters.selected,
+        year.selected,
+        search.query,
+        sorting.column,
+        sorting.order
+      )
+    } else {
       api.downloadLots(
         status.active,
         entity.id,
