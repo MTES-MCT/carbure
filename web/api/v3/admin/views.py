@@ -1,9 +1,13 @@
+import datetime
 from django.http import JsonResponse
 from core.decorators import is_admin
 from django.contrib.auth import get_user_model
 from core.models import Entity, UserRights
 from django.db.models import Q
 from django.contrib.auth.forms import PasswordResetForm
+
+from core.models import LotTransaction
+from api.v3.lots.helpers import get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters
 
 
 @is_admin
@@ -166,3 +170,74 @@ def delete_rights(request):
 
     right.delete()
     return JsonResponse({"status": "success", "data": "success"})
+
+
+@is_admin
+def get_lots(request):
+    status = request.GET.get('status', False)
+
+    if not status:
+        return JsonResponse({'status': 'error', 'message': "Please provide a status"}, status=400)
+
+    try:
+        txs = LotTransaction.objects.select_related(
+            'lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
+            'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
+            'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country'
+        )
+
+        txs = txs.filter(lot__status='Validated')
+
+        if status == 'alert':
+            txs, _ = get_lots_with_errors(txs)
+        elif status == 'correction':
+            txs = txs.filter(delivery_status__in=['AC', 'R', 'AA'])
+        elif status == 'declaration':
+            txs = txs.filter(delivery_status='A')
+
+        return get_lots_with_metadata(txs, request.GET)
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+@is_admin
+def get_snapshot(request):
+    year = request.GET.get('year', False)
+
+    today = datetime.date.today()
+    date_from = today.replace(month=1, day=1)
+    date_until = today.replace(month=12, day=31)
+
+    if year:
+        try:
+            year = int(year)
+            date_from = datetime.date(year=year, month=1, day=1)
+            date_until = datetime.date(year=year, month=12, day=31)
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
+
+    try:
+        data = {}
+        txs = LotTransaction.objects.all().filter(lot__status='Validated')
+        data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
+        txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
+        _, total_errors = get_lots_with_errors(txs)
+        correction = len(txs.filter(delivery_status__in=['AC', 'R', 'AA']))
+        declaration= len(txs.filter(delivery_status='A'))
+        data['lots'] = {'alert': total_errors, 'correction': correction, 'declaration': declaration}
+
+        filters = get_snapshot_filters(txs)
+        producers = Entity.objects.filter(entity_type='Producteur')
+        operators = Entity.objects.filter(entity_type='Opérateur')
+        traders = Entity.objects.filter(entity_type='Trader')
+
+        filters['producers'] = [p.name for p in producers]
+        filters['traders'] = [p.name for p in traders]
+        filters['operators'] = [p.name for p in operators]
+
+        data['filters'] = filters
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+    return JsonResponse({"status": "success", "data": data})
