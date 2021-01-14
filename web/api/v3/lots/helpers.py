@@ -211,7 +211,7 @@ def sort_lots(txs, sort_by, order):
     return txs
 
 
-def get_lots_with_metadata(txs, querySet):
+def get_lots_with_metadata(txs, entity, querySet):
     export = querySet.get('export', False)
 
     sort_by = querySet.get('sort_by', False)
