@@ -361,7 +361,6 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(len(lots), lots_in_batch)
 
     def test_simple_template_import_cannot_validate(self):
-        return
         # as producer
         # upload lines that cannot be validated
         jsoned = self.upload_file('carbure_template_simple_missing_data_cannot_validate.xlsx', self.test_producer)
@@ -387,10 +386,11 @@ class LotsAPITest(TransactionTestCase):
         lots = data['lots']
         self.assertEqual(len(lots), nb_lots)
         # make sure they all have LotError or TransactionError
-        lot_errors = LotV2Error.objects.filter(lot__in=[lot['lot']['id'] for lot in lots])
-        tx_errors = TransactionError.objects.filter(tx__in=[tx['id'] for tx in lots])
-        nb_errors = lot_errors.count() + tx_errors.count()
-        self.assertEqual(nb_errors, nb_lots)
+
+        lot_errors = [error.lot.id for error  in LotV2Error.objects.filter(lot__in=[lot['lot']['id'] for lot in lots])]
+        tx_errors = [error.tx.lot.id for error in TransactionError.objects.filter(tx__in=[tx['id'] for tx in lots])]
+        for lot in lots:
+            self.assertTrue(lot['id'] in lot_errors or lot['id'] in tx_errors)
         
         # delete-all-drafts
         response = self.client.post(reverse('api-v3-delete-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
@@ -398,23 +398,12 @@ class LotsAPITest(TransactionTestCase):
         res = response.json()
         self.assertEqual(res['deleted'], nb_lots)
 
-        # make sure no lots/tx/loterror/txerror are still there
-        lot_errors = LotV2Error.objects.all()
-        for error in lot_errors:
-            print(error.natural_key())
-        lots = LotV2.objects.all()
-        for l in lots:
-            print(l.natural_key())
-        txs = LotTransaction.objects.all()
-        for tx in txs:
-            print(tx.natural_key())
         self.assertEqual(LotV2.objects.all().count(), 0)
         self.assertEqual(LotTransaction.objects.all().count(), 0)
         self.assertEqual(LotV2Error.objects.all().count(), 0)
         self.assertEqual(TransactionError.objects.all().count(), 0)
 
     def test_simple_template_import_sanity_checks(self):
-        return
         # as producer
         # upload lines that cannot be validated
         jsoned = self.upload_file('carbure_template_simple_wrong_data_cannot_validate.xlsx', self.test_producer)
