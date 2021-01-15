@@ -39,7 +39,6 @@ test("operator: display an empty list of transactions", async () => {
   render(<TransactionsWithRouter status={LotStatus.Alert} entity={admin} />)
 
   await waitWhileLoading()
-  await waitWhileLoading()
 
   screen.getByText("Alertes")
   screen.getByText("Corrections")
