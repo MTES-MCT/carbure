@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { useParams } from "react-router-dom"
 
-import { Errors, LotStatus } from "common/types"
+import { EntityType, Errors, LotStatus } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
 import useTransactionForm, {
@@ -32,12 +32,17 @@ export default function useTransactionDetails(
   entity: EntitySelection,
   refresh: () => void
 ) {
+  const detailsGetter =
+    entity?.entity_type === EntityType.Administration
+      ? api.getAdminDetails
+      : api.getDetails
+
   const params: { id: string } = useParams()
   const notifications = useNotificationContext()
 
   const close = useClose("../")
   const [form, hasChange, change, setForm] = useTransactionForm(entity)
-  const [details, resolveDetails] = useAPI(api.getDetails)
+  const [details, resolveDetails] = useAPI(detailsGetter)
   const [request, resolveUpdate] = useAPI(api.updateLot)
   const [comment, resolveComment] = useAPI(api.commentLot)
 

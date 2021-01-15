@@ -125,27 +125,6 @@ export function downloadLots(
   })
 }
 
-export function downloadAdminLots(
-  status: LotStatus,
-  producerID: number,
-  filters: FilterSelection["selected"],
-  year: number,
-  query: string,
-  sortBy: string,
-  order: string
-) {
-  return api.download("/admin/lots", {
-    ...filters,
-    entity_id: producerID,
-    sort_by: sortBy,
-    status,
-    year,
-    query,
-    order,
-    export: true,
-  })
-}
-
 export function addLot(entityID: number, params: any): Promise<Transaction> {
   return api.post("/lots/add", {
     entity_id: entityID,
@@ -409,4 +388,35 @@ export function getAdminLots(
   }
 
   return api.get("/admin/lots", params)
+}
+
+export function downloadAdminLots(
+  status: LotStatus,
+  producerID: number,
+  filters: FilterSelection["selected"],
+  year: number,
+  query: string,
+  sortBy: string,
+  order: string
+) {
+  return api.download("/admin/lots", {
+    ...filters,
+    entity_id: producerID,
+    sort_by: sortBy,
+    status,
+    year,
+    query,
+    order,
+    export: true,
+  })
+}
+
+export function getAdminDetails(
+  entityID: number,
+  transactionID: number
+): Promise<LotDetails> {
+  return api.get("/admin/lots/details", {
+    entity_id: entityID,
+    tx_id: transactionID,
+  })
 }
