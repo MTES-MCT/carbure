@@ -14,6 +14,9 @@ export enum LotStatus {
   Stock = "stock",
   Inbox = "in",
   ToSend = "tosend",
+  Alert = "alert",
+  Correction = "correction",
+  Declaration = "declaration",
 }
 
 export enum GESOption {
@@ -255,6 +258,9 @@ export enum Filters {
   Clients = "clients",
   DeliverySites = "delivery_sites",
   Vendors = "vendors",
+  Producers = "producers",
+  Operators = "operators",
+  Traders = "traders",
 }
 
 export interface Snapshot {
@@ -332,11 +338,11 @@ export type Certificate = {
 }
 
 export type StockDraft = {
-  tx_id: number,
-  volume: number,
-  dae: string,
-  delivery_date: string,
-  client: string,
-  delivery_site: string,
+  tx_id: number
+  volume: number
+  dae: string
+  delivery_date: string
+  client: string
+  delivery_site: string
   delivery_site_country?: string
 }

@@ -208,10 +208,10 @@ test("check transaction errors", async () => {
   const mp = screen.getByTitle("Merci de préciser la matière première")
   expect(mp).toHaveClass("errorLabel")
 
-  screen.getByText("Erreurs bloquantes (1)")
+  screen.getByText("Erreurs (1)")
   screen.getByText("Matière Première incohérente avec le Biocarburant")
 
-  screen.getByText("Erreurs non-bloquantes (1)")
+  screen.getByText("Remarques (1)")
   screen.getByText("Volume inhabituellement faible.")
 
   userEvent.click(screen.getByText("Retour"))

@@ -21,9 +21,13 @@ const ValidationErrors = ({ validationErrors }: ValidationErrorsProps) => {
         <Collapsible
           icon={AlertOctagon}
           level="error"
-          title={`Erreurs bloquantes (${errors.length})`}
+          title={`Erreurs (${errors.length})`}
           className={styles.transactionError}
         >
+          <i className={styles.transactionErrorExplanation}>
+            Vous ne pouvez pas valider ce lot tant que les problèmes suivants
+            n'ont pas été adressés :
+          </i>
           <ul className={styles.validationErrors}>
             {errors.map((err, i) => (
               <li key={i}>{err.error || "Erreur de validation"}</li>
@@ -36,9 +40,13 @@ const ValidationErrors = ({ validationErrors }: ValidationErrorsProps) => {
         <Collapsible
           icon={AlertTriangle}
           level="warning"
-          title={`Erreurs non-bloquantes (${warnings.length})`}
+          title={`Remarques (${warnings.length})`}
           className={styles.transactionError}
         >
+          <i className={styles.transactionErrorExplanation}>
+            Des incohérences potentielles ont été détectées, elles n'empêchent
+            pas la validation du lot mais peuvent donner lieu à un contrôle :
+          </i>
           <ul className={styles.validationErrors}>
             {warnings.map((err, i) => (
               <li key={i}>{err.error || "Erreur de validation"}</li>
