@@ -16,6 +16,8 @@ import * as data from "./data"
 
 let snapshot: any
 let lots: any
+let adminLots: any
+let adminSnapshot: any
 let details: any
 
 export function setSnapshot(nextSnapshot: any) {
@@ -26,6 +28,14 @@ export function setLots(nextLots: any) {
   lots = clone(nextLots)
 }
 
+export function setAdminSnapshot(nextSnapshot: any) {
+  adminSnapshot = clone(nextSnapshot)
+}
+
+export function setAdminLots(nextLots: any) {
+  adminLots = clone(nextLots)
+}
+
 export function setDetails(nextDetails: any) {
   details = clone(nextDetails)
 }
@@ -34,6 +44,8 @@ export function setDetails(nextDetails: any) {
 setSnapshot(data.snapshot)
 setLots(data.lots)
 setDetails(data.lotDetails)
+setAdminSnapshot(data.adminSnapshot)
+setAdminLots(data.lots)
 
 export const okSnapshot = rest.get("/api/v3/lots/snapshot", (req, res, ctx) => {
   return res(ctx.json({ status: "success", data: snapshot }))
@@ -197,6 +209,17 @@ export const okLotUpdate = rest.post("/api/v3/lots/update", (req, res, ctx) => {
   return res(ctx.json({ status: "success" }))
 })
 
+export const okAdminLots = rest.get("/api/v3/admin/lots", (req, res, ctx) => {
+  return res(ctx.json({ status: "success", data: adminLots }))
+})
+
+export const okAdminSnapshot = rest.get(
+  "/api/v3/admin/lots/snapshot",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success", data: adminSnapshot }))
+  }
+)
+
 export default setupServer(
   okSnapshot,
   okLots,
@@ -219,5 +242,7 @@ export default setupServer(
   okMatierePremiereSearch,
   okProductionSitesSearch,
   okLotDetails,
-  okLotUpdate
+  okLotUpdate,
+  okAdminLots,
+  okAdminSnapshot
 )

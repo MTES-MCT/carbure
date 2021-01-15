@@ -8,8 +8,8 @@ import { waitWhileLoading } from "common/__test__/helpers"
 import { MemoryRouter } from "react-router-dom"
 import Transactions from "../index"
 
-import server, { setLots, setSnapshot } from "./api"
-import { emptyLots, adminSnapshot } from "./data"
+import server, { setAdminLots } from "./api"
+import { emptyLots } from "./data"
 
 const TransactionsWithRouter = ({
   entity,
@@ -34,23 +34,23 @@ afterEach(() => {
 afterAll(() => server.close())
 
 test("operator: display an empty list of transactions", async () => {
-  setSnapshot(adminSnapshot)
-  setLots(emptyLots)
+  setAdminLots(emptyLots)
 
-  render(<TransactionsWithRouter status={LotStatus.Draft} entity={admin} />)
+  render(<TransactionsWithRouter status={LotStatus.Alert} entity={admin} />)
 
   await waitWhileLoading()
+  await waitWhileLoading()
 
-  // screen.getByText("Alertes")
-  // screen.getByText("Corrections")
-  // screen.getByText("Déclarations")
+  screen.getByText("Alertes")
+  screen.getByText("Corrections")
+  screen.getByText("Déclarations")
 
   screen.getByText("Périodes")
   screen.getByText("Biocarburants")
   screen.getByText("Matières Premières")
-  // screen.getByText("Producteurs")
-  // screen.getByText("Trader")
-  // screen.getByText("Opérateur")
+  screen.getByText("Producteurs")
+  screen.getByText("Traders")
+  screen.getByText("Opérateurs")
   screen.getByText("Pays d'origine")
   screen.getByText("Sites de production")
   screen.getByText("Sites de livraison")
