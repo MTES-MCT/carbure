@@ -36,6 +36,7 @@ class AdminAPITest(TestCase):
         UserRights.objects.update_or_create(user=self.user2, entity=self.entity2)
         UserRights.objects.update_or_create(user=self.user3, entity=self.entity4)
 
+
     def test_accessrights(self):
         loggedin = self.client.login(username=self.fake_admin_email, password=self.fake_admin_password)
         self.assertTrue(loggedin)

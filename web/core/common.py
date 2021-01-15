@@ -636,8 +636,13 @@ def fill_delivery_site_data(lot_row, transaction, prefetched_data):
     tx_errors = []
     depots = prefetched_data['depots']
     countries = prefetched_data['countries']
-    if 'delivery_site' in lot_row and lot_row['delivery_site'] is not None:
-        delivery_site = str(lot_row['delivery_site'])
+    if 'delivery_site' in lot_row and lot_row['delivery_site'] is not None and lot_row['delivery_site'] != '':
+        delivery_site = lot_row['delivery_site']
+        if isinstance(delivery_site, float):
+            # sometimes excel will convert a columns of integers to float
+            delivery_site = int(delivery_site)
+        # convert to string 4.0 -> 4 -> '4'
+        delivery_site = str(delivery_site)
         if delivery_site in depots:
             transaction.delivery_site_is_in_carbure = True
             transaction.carbure_delivery_site = depots[delivery_site]
@@ -659,11 +664,11 @@ def fill_delivery_site_data(lot_row, transaction, prefetched_data):
                 transaction.unknown_delivery_site_country = country
             else:
                 tx_errors.append(TransactionError(tx=transaction, field='delivery_site_country',
-                                                  error='Champ production_site_country incorrect',
+                                                  error='Champ delivery_site_country incorrect',
                                                   value=lot_row['delivery_site_country']))
         else:
             tx_errors.append(TransactionError(tx=transaction, field='delivery_site_country',
-                                              error='Merci de préciser une valeur dans le champ production_site_country',
+                                              error='Merci de préciser une valeur dans le champ delivery_site_country',
                                               value=None))
     return tx_errors
 
@@ -931,12 +936,9 @@ def validate_lots(user, tx_ids):
 
             # if we create a lot for ourselves
             if tx.carbure_client and tx.lot.added_by == tx.carbure_client:
-                print('validating tx because lot added by recipient')
-                print(tx.carbure_client, tx.lot_added_by)
                 tx.delivery_status = 'A'
             # if the client is not in carbure, auto-accept
             elif not tx.client_is_in_carbure:
-                print('validating tx because client not in carbure')
                 tx.delivery_status = 'A'
             # if we save a lot that was requiring a fix, change status to 'AA'
             elif tx.delivery_status in ['AC', 'R']:

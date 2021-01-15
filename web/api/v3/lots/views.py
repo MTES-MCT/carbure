@@ -763,7 +763,6 @@ def upload(request, *args, **kwargs):
     if f is None:
         return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
 
-    print(f)
     # save file
     now = datetime.datetime.now()
     filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d'), entity.name.upper())
