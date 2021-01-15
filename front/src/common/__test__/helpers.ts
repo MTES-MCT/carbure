@@ -1,13 +1,8 @@
 import { screen, waitForElementToBeRemoved } from "@testing-library/react"
 
-const timing = {
-  timeout: 2000,
-  interval: 25,
-}
-
-export async function waitWhileLoading() {
-  const loaders = await screen.findAllByTitle('Chargement...', {}, timing) // prettier-ignore
-  await waitForElementToBeRemoved(loaders, timing)
+export async function waitWhileLoading(title = "Chargement...") {
+  await screen.findAllByTitle(title, {})
+  return waitForElementToBeRemoved(() => screen.getAllByTitle(title))
 }
 
 export function clone(data: any) {
