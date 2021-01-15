@@ -61,11 +61,14 @@ test:
 test_frontend:
   stage: test
   image: node:alpine
+  cache:
+    paths:
+      - front/node_modules
   script:
     - echo "Testing frontend..."
     - cd front
     - npm install --legacy-peer-deps
-    - CI=true npm test
+    - npm test -- --ci
 
 dev_push_django:
   stage: deploy

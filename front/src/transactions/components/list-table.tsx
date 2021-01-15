@@ -1,7 +1,7 @@
 import React from "react"
 import cl from "clsx"
 
-import { Entity, Lots, LotStatus, Transaction } from "common/types"
+import { Entity, EntityType, Lots, LotStatus, Transaction } from "common/types"
 import { SortingSelection } from "transactions/hooks/query/use-sort-by" // prettier-ignore
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { StatusSelection } from "transactions/hooks/query/use-status"
@@ -35,6 +35,19 @@ export const OPERATOR_COLUMNS = [
   C.matierePremiere,
   C.vendor,
   C.productionSite,
+  C.depot,
+  C.ghgReduction,
+]
+
+export const ADMIN_COLUMNS = [
+  C.status,
+  C.period,
+  C.dae,
+  C.biocarburant,
+  C.matierePremiere,
+  C.vendor,
+  C.productionSite,
+  C.client,
   C.depot,
   C.ghgReduction,
 ]
@@ -97,9 +110,10 @@ export const TransactionTable = ({
   const relativePush = useRelativePush()
   const deadline = transactions.deadlines.date
 
-  const isProducer = entity.entity_type === "Producteur"
-  const isOperator = entity.entity_type === "Opérateur"
-  const isTrader = entity.entity_type === "Trader"
+  const isProducer = entity.entity_type === EntityType.Producer
+  const isOperator = entity.entity_type === EntityType.Operator
+  const isTrader = entity.entity_type === EntityType.Trader
+  const isAdmin = entity.entity_type === EntityType.Administration
 
   let columns = []
 
@@ -117,6 +131,8 @@ export const TransactionTable = ({
     columns.push(...PRODUCER_COLUMNS)
   } else if (isOperator) {
     columns.push(...OPERATOR_COLUMNS)
+  } else if (isAdmin) {
+    columns.push(...ADMIN_COLUMNS)
   }
 
   if (status.is(LotStatus.Draft)) {

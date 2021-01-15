@@ -14,13 +14,16 @@ import styles from "./list-snapshot.module.css"
 
 const STATUS_ORDER = [
   LotStatus.Draft,
+  LotStatus.Alert,
   LotStatus.Validated,
   LotStatus.Inbox,
   LotStatus.ToFix,
+  LotStatus.Correction,
   LotStatus.Stock,
   LotStatus.Accepted,
   LotStatus.Weird,
   LotStatus.ToSend,
+  LotStatus.Declaration,
 ]
 
 const STATUS_LABEL = {
@@ -32,6 +35,9 @@ const STATUS_LABEL = {
   [LotStatus.Inbox]: { singular: "Lot reçu", plural: "Lots reçus" },
   [LotStatus.Stock]: { singular: "Lot en stock", plural: "Lots en stock" },
   [LotStatus.ToSend]: { singular: "Lot à envoyer", plural: "Lots à envoyer" },
+  [LotStatus.Alert]: { singular: "Alerte", plural: "Alertes" },
+  [LotStatus.Correction]: { singular: "Correction", plural: "Corrections" },
+  [LotStatus.Declaration]: { singular: "Déclaration", plural: "Déclarations" },
 }
 
 export function mapStatus(

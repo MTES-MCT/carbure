@@ -13,5 +13,9 @@ urlpatterns = [
     path('users/add', views.add_user, name='api-v3-admin-add-user'),
     path('users/reset-password', views.reset_user_password, name='api-v3-admin-reset-user-password'),
     path('users/del', views.delete_user, name='api-v3-admin-delete-user'),
+    
+    path('lots', views.get_lots, name='api-v3-admin-get-lots'),
+    path('lots/details', views.get_details, name='api-v3-admin-get-lot-details'),
+    path('lots/snapshot', views.get_snapshot, name='api-v3-admin-get-snapshot'),
 
 ]

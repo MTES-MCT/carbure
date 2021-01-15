@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 
-import { Lots } from "common/types"
+import { EntityType, Lots } from "common/types"
 import { PageSelection } from "common/components/pagination"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { FilterSelection } from "transactions/hooks/query/use-filters"
@@ -15,7 +15,12 @@ import useAPI from "common/hooks/use-api"
 
 // fetches current snapshot when parameters change
 export function useGetSnapshot(entity: EntitySelection, year: YearSelection) {
-  const [snapshot, resolveSnapshot] = useAPI(api.getSnapshot)
+  const snapshotGetter =
+    entity?.entity_type === EntityType.Administration
+      ? api.getAdminSnapshot
+      : api.getSnapshot
+
+  const [snapshot, resolveSnapshot] = useAPI(snapshotGetter)
 
   const entityID = entity?.id
   const years = snapshot.data?.years
@@ -59,12 +64,29 @@ export function useGetLots(
   sorting: SortingSelection,
   special: SpecialSelection
 ): LotGetter {
-  const [transactions, resolveLots] = useAPI(api.getLots)
+  const lotsGetter =
+    entity?.entity_type === EntityType.Administration
+      ? api.getAdminLots
+      : api.getLots
+
+  const [transactions, resolveLots] = useAPI(lotsGetter)
 
   const entityID = entity?.id
 
   function exportAllTransactions() {
-    if (entity !== null) {
+    if (entity === null) return
+
+    if (entity.entity_type === EntityType.Administration) {
+      api.downloadAdminLots(
+        status.active,
+        entity.id,
+        filters.selected,
+        year.selected,
+        search.query,
+        sorting.column,
+        sorting.order
+      )
+    } else {
       api.downloadLots(
         status.active,
         entity.id,
