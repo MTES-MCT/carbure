@@ -15,6 +15,7 @@ urlpatterns = [
     path('users/del', views.delete_user, name='api-v3-admin-delete-user'),
     
     path('lots', views.get_lots, name='api-v3-admin-get-lots'),
+    path('lots/details', views.get_details, name='api-v3-admin-get-lot-details'),
     path('lots/snapshot', views.get_snapshot, name='api-v3-admin-get-snapshot'),
 
 ]

@@ -1,4 +1,5 @@
 import datetime
+import calendar
 from django.http import JsonResponse
 from core.decorators import is_admin
 from django.contrib.auth import get_user_model
@@ -7,7 +8,7 @@ from django.db.models import Q
 from django.contrib.auth.forms import PasswordResetForm
 
 from core.models import LotTransaction
-from api.v3.lots.helpers import get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters
+from api.v3.lots.helpers import get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors
 
 
 @is_admin
@@ -179,8 +180,7 @@ def get_lots(request):
     if not status:
         return JsonResponse({'status': 'error', 'message': "Please provide a status"}, status=400)
 
-    # try:
-    if 1:
+    try:
         txs = LotTransaction.objects.select_related(
             'lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
             'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
@@ -198,8 +198,30 @@ def get_lots(request):
 
         return get_lots_with_metadata(txs, None, request.GET)
 
-    # except Exception as e:
-    #     return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+@is_admin
+def get_details(request, *args, **kwargs):
+    tx_id = request.GET.get('tx_id', False)
+
+    if not tx_id:
+        return JsonResponse({'status': 'error', 'message': 'Missing tx_id'}, status=400)
+
+    tx = LotTransaction.objects.get(pk=tx_id)
+
+    now = datetime.datetime.now()
+    (_, last_day) = calendar.monthrange(now.year, now.month)
+    deadline_date = now.replace(day=last_day)
+
+    data = {}
+    data['transaction'] = tx.natural_key()
+    data['errors'] = get_errors(tx)
+    data['deadline'] = deadline_date.strftime("%Y-%m-%d")
+    data['comments'] = [c.natural_key() for c in tx.transactioncomment_set.all()]
+
+    return JsonResponse({'status': 'success', 'data': data})
+
 
 @is_admin
 def get_snapshot(request):
