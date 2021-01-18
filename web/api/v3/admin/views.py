@@ -190,6 +190,11 @@ def update_right_request(request):
 
     request.status = status
     request.save()
+
+    if status == 'ACCEPTED':
+        UserRights.objects.update_or_create(entity=request.entity, user=request.user)
+    else:
+        UserRights.objects.filter(entity=request.entity, user=request.user).delete()
     return JsonResponse({"status": "success"})
 
 
@@ -197,33 +202,75 @@ def update_right_request(request):
 def get_certificates(request):
     pass
 
+
 @is_admin
 def update_certificate(request):
     pass
 
+
 @is_admin
 def get_controls(request):
-    pass
+    q = request.GET.get('q', False)
+    status = request.GET.get('status', False)
+
+    controls = Control.objects.all()
+    if q:
+        controls = controls.filter(Q(tx__lot__carbure_producer__name__icontains=q) |
+                                   Q(tx__carbure_client__name__icontains=q))
+    if status:
+        controls = controls.filter(status=status)
+    controls_sez = [r.natural_key() for r in controls]
+    return JsonResponse({"status": "success", "data": controls_sez})    
+
 
 @is_admin
 def open_control(request):
-    pass
+    tx_id = request.POST.get('tx_id', False)
+    if not tx_id:
+        return JsonResponse({'status': 'error', 'message': "Please provide a source tx_id"}, status=400)
+
+    try:
+        tx = LotTransaction.objects.get(id=tx_id)
+    except:
+        return JsonResponse({'status': 'error', 'message': "Could not find tx associated with tx_id"}, status=400)
+
+    ctrl = Control()
+    ctrl.tx = tx
+    ctrl.status = 'OPEN'
+    ctrl.save()
+    return JsonResponse({"status": "success"})
+
 
 @is_admin
 def close_control(request):
-    pass
+    ctrl_id = request.POST.get('id', False)
+    if not ctrl_id:
+        return JsonResponse({'status': 'error', 'message': "Please provide a control id"}, status=400)
+
+    try:
+        ctrl = Control.objects.get(id=ctrl_id)
+    except:
+        return JsonResponse({'status': 'error', 'message': "Could not find control"}, status=400)
+
+    ctrl.status = 'CLOSED'
+    ctrl.save()
+    return JsonResponse({"status": "success"})
+
 
 @is_admin
 def get_declarations(request):
     pass
 
+
 @is_admin
 def send_declaration_reminder(request):
     pass
 
+
 @is_admin
 def check_declaration(request):
     pass
+
 
 @is_admin
 def uncheck_declaration(request):
