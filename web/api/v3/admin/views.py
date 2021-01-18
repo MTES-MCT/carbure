@@ -259,7 +259,20 @@ def close_control(request):
 
 @is_admin
 def get_declarations(request):
-    pass
+    year = request.GET.get('year', False)
+
+    if not year:
+        year = 2021
+    else:
+        year = int(year)
+
+    declarations = SustainabilityDeclaration.objects.filter(year=year)
+
+    # query lots
+    # expected return {1: {'client1': {'drafts': 200, 'validated': 100}}}
+
+    declarations_sez = [d.natural_key() for d in declarations]
+    return JsonResponse({"status": "success", "data": declarations_sez})
 
 
 @is_admin
@@ -269,10 +282,32 @@ def send_declaration_reminder(request):
 
 @is_admin
 def check_declaration(request):
-    pass
+    id = request.POST.get('id', False)
+    if not id:
+        return JsonResponse({'status': 'error', 'message': "Please provide the declaration id"}, status=400)
+
+    try:
+        dec = SustainabilityDeclaration.objects.get(id=id)
+    except:
+        return JsonResponse({'status': 'error', 'message': "Could not find declaration"}, status=400)
+
+    dec.checked = True
+    dec.save()
+    return JsonResponse({"status": "success"})
 
 
 @is_admin
 def uncheck_declaration(request):
-    pass
+    id = request.POST.get('id', False)
+    if not id:
+        return JsonResponse({'status': 'error', 'message': "Please provide the declaration id"}, status=400)
+
+    try:
+        dec = SustainabilityDeclaration.objects.get(id=id)
+    except:
+        return JsonResponse({'status': 'error', 'message': "Could not find declaration"}, status=400)
+
+    dec.checked = False
+    dec.save()
+    return JsonResponse({"status": "success"})
 

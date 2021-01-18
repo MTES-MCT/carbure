@@ -693,3 +693,15 @@ class ControlFiles(models.Model):
         db_table = 'control_files'
         verbose_name = 'Contrôle - Justificatif'
         verbose_name_plural = 'Contrôles - Justificatifs'
+
+
+class SustainabilityDeclaration(models.Model):
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
+    year = models.IntegerField(blank=False, null=False)
+    month = models.IntegerField(blank=False, null=False)
+    checked = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'declarations'
+        verbose_name = ' Déclaration de Durabilité'
+        verbose_name_plural = ' Déclarations de Durabilité'
