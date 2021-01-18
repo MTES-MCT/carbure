@@ -7,7 +7,7 @@ from core.models import Entity, UserRights
 from django.db.models import Q
 from django.contrib.auth.forms import PasswordResetForm
 
-from core.models import LotTransaction
+from core.models import LotTransaction, UserRightsRequests, SustainabilityDeclaration, Control
 from api.v3.lots.helpers import get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors
 
 
