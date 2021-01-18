@@ -453,7 +453,7 @@ class LotsAPITest(TransactionTestCase):
         # validate
         # lot doesn't exist anymore
 
-         
+        
         # as operator
         # create lot
         # validate

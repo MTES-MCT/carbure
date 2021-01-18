@@ -33,55 +33,6 @@ def get_entities(request):
 
 
 @is_admin
-def get_rights(request):
-    q = request.GET.get('q', False)
-    rights = UserRights.objects.all()
-    if q:
-        rights = rights.filter(Q(user__email__icontains=q) | Q(user__name__icontains=q) | Q(entity__name__icontains=q))
-    rights_sez = [u.natural_key() for u in rights]
-    return JsonResponse({"status": "success", "data": rights_sez})
-
-
-@is_admin
-def add_user(request):
-    name = request.POST.get('name', False)
-    email = request.POST.get('email', False)
-
-    if not name:
-        return JsonResponse({'status': 'error', 'message': "Please provide a value in field name"}, status=400)
-    if not email:
-        return JsonResponse({'status': 'error', 'message': "Please provide a value in field Email"}, status=400)
-
-    try:
-        user_model = get_user_model()
-        obj, created = user_model.objects.update_or_create(name=name, email=email)
-        reset_password_form = PasswordResetForm(data={'email': email})
-        if reset_password_form.is_valid():
-            reset_password_form.save(request=request)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator", 'extra': str(e)}, status=400)
-    return JsonResponse({'status': 'success', 'data': 'User created'})
-
-
-@is_admin
-def reset_user_password(request):
-    uid = request.POST.get('user_id', False)
-
-    if not uid:
-        return JsonResponse({'status': 'error', 'message': "Please provide a user id"}, status=400)
-
-    try:
-        user_model = get_user_model()
-        obj = user_model.objects.get(id=uid)
-        reset_password_form = PasswordResetForm(data={'email': obj.email})
-        if reset_password_form.is_valid():
-            reset_password_form.save(request=request)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator", 'extra': str(e)}, status=400)
-    return JsonResponse({'status': 'success', 'data': 'Password reset'})
-
-
-@is_admin
 def add_entity(request):
     name = request.POST.get('name', False)
     entity_type = request.POST.get('category', False)
@@ -102,49 +53,6 @@ def add_entity(request):
 
 
 @is_admin
-def add_rights(request):
-    user_id = request.POST.get('user_id', False)
-    entity_id = request.POST.get('entity_id', False)
-
-    if not user_id:
-        return JsonResponse({'status': 'error', 'message': "Please provide a user_id"}, status=400)
-    if not entity_id:
-        return JsonResponse({'status': 'error', 'message': "Please provide an entity_id"}, status=400)
-
-    user_model = get_user_model()
-    try:
-        user = user_model.objects.get(id=user_id)
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not find user"}, status=400)
-
-    try:
-        entity = Entity.objects.get(id=entity_id)
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not find entity"}, status=400)
-
-    try:
-        obj, created = UserRights.objects.update_or_create(user=user, entity=entity)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator", 'extra': str(e)}, status=400)
-    return JsonResponse({'status': 'success', 'data': 'User Right created'})
-
-
-@is_admin
-def delete_user(request):
-    user_id = request.POST.get('user_id', False)
-
-    if not user_id:
-        return JsonResponse({'status': 'error', 'message': "Please provide a user_id"}, status=400)
-    user_model = get_user_model()
-    try:
-        user = user_model.objects.get(id=user_id)
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not find user"}, status=400)
-
-    user.delete()
-    return JsonResponse({"status": "success", "data": "success"})
-
-@is_admin
 def delete_entity(request):
     entity_id = request.POST.get('entity_id', False)
 
@@ -156,20 +64,6 @@ def delete_entity(request):
         return JsonResponse({'status': 'error', 'message': "Could not find entity"}, status=400)
 
     entity.delete()
-    return JsonResponse({"status": "success", "data": "success"})
-
-@is_admin
-def delete_rights(request):
-    right_id = request.POST.get('right_id', False)
-
-    if not right_id:
-        return JsonResponse({'status': 'error', 'message': "Please provide a right_id"}, status=400)
-    try:
-        right = UserRights.objects.get(id=right_id)
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not find right_id"}, status=400)
-
-    right.delete()
     return JsonResponse({"status": "success", "data": "success"})
 
 
@@ -200,6 +94,7 @@ def get_lots(request):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
 
 @is_admin
 def get_details(request, *args, **kwargs):
@@ -264,3 +159,73 @@ def get_snapshot(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
     return JsonResponse({"status": "success", "data": data})
+
+
+@is_admin
+def get_rights_requests(request):
+    q = request.GET.get('q', False)
+    status = request.GET.get('status', False)
+
+    requests = UserRightsRequests.objects.all()
+    if q:
+        requests = requests.filter(Q(user__email__icontains=q) | Q(entity__name__icontains=q))
+    if status:
+        requests = requests.filter(status=status)
+    requests_sez = [r.natural_key() for r in requests]
+    return JsonResponse({"status": "success", "data": requests_sez})
+
+@is_admin
+def update_right_request(request):
+    urr_id = request.POST.get('id', False)
+    status = request.POST.get('status', False)
+    if not urr_id:
+        return JsonResponse({'status': 'error', 'message': "Please provide an id"}, status=400)
+    if not status:
+        return JsonResponse({'status': 'error', 'message': "Please provide a status"}, status=400)
+
+    try:
+        request = UserRightsRequests.objects.get(id=urr_id)
+    except:
+        return JsonResponse({'status': 'error', 'message': "Could not find request"}, status=400)
+
+    request.status = status
+    request.save()
+    return JsonResponse({"status": "success"})
+
+
+@is_admin
+def get_certificates(request):
+    pass
+
+@is_admin
+def update_certificate(request):
+    pass
+
+@is_admin
+def get_controls(request):
+    pass
+
+@is_admin
+def open_control(request):
+    pass
+
+@is_admin
+def close_control(request):
+    pass
+
+@is_admin
+def get_declarations(request):
+    pass
+
+@is_admin
+def send_declaration_reminder(request):
+    pass
+
+@is_admin
+def check_declaration(request):
+    pass
+
+@is_admin
+def uncheck_declaration(request):
+    pass
+

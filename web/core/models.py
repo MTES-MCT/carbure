@@ -77,6 +77,10 @@ class UserRightsRequests(models.Model):
     status = models.CharField(max_length=32, choices=STATUS_TYPES, default='PENDING')
     comment = models.TextField(blank=True, null=True)
 
+    def natural_key(self):
+        return {'id': self.id, 'user': self.user.natural_key(), 'entity': self.entity.natural_key(), 
+                'date_requested': self.date_requested, 'status': self.status, 'comment': self.comment}
+
     class Meta:
         db_table = 'users_rights_requests'
         verbose_name = 'User Right Request'
