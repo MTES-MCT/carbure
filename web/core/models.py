@@ -669,3 +669,27 @@ class ProductionSiteCertificate(models.Model):
         verbose_name = 'Certificat de site de production'
         verbose_name_plural = 'Certificats de sites de productions'
 
+
+class Control(models.Model):
+    STATUS = [("OPEN", "Ouvert"), ("CLOSED", "Clôturé")]
+
+    tx = models.ForeignKey(LotTransaction, on_delete=models.CASCADE)
+    status = models.CharField(max_length=32, choices=STATUS, default="OPEN")
+    opened_at = models.DateTimeField(auto_now_add=True)
+    last_update = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'controls'
+        verbose_name = 'Contrôle Lot'
+        verbose_name_plural = 'Contrôles Lots'
+
+
+class ControlFiles(models.Model):
+    control = models.ForeignKey(Control, on_delete=models.CASCADE)
+    date_added = models.DateField(auto_now_add=True)
+    file = models.FileField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'control_files'
+        verbose_name = 'Contrôle - Justificatif'
+        verbose_name_plural = 'Contrôles - Justificatifs'
