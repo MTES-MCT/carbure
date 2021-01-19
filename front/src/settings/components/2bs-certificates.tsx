@@ -93,7 +93,7 @@ const DBSCertificateSettings = ({ settings }: DBSCertificateSettingsProps) => {
   }))
 
   return (
-    <Section>
+    <Section id="2bs">
       <SectionHeader>
         <Title>Certificats 2BS</Title>
         <Button

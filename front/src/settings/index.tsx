@@ -18,6 +18,7 @@ import DBSCertificateSettings from "./components/2bs-certificates"
 import ISCCCertificateSettings from "./components/iscc-certificates"
 import NationalSystemCertificatesSettings from "./components/national-system-certificates"
 import CompanySettings from "./components/company"
+import Sticky from "common/components/sticky"
 
 function useSettings(entity: EntitySelection, settings: SettingsGetter) {
   const company = useCompany(entity, settings)
@@ -57,6 +58,7 @@ const Settings = ({ entity, settings }: SettingsProps) => {
   const isOperator = entity?.entity_type === "Opérateur"
 
   const hasCertificates = isProducer || isTrader
+  const hasCSN = (isProducer && entity?.has_mac) || isOperator
 
   return (
     <Main>
@@ -64,14 +66,18 @@ const Settings = ({ entity, settings }: SettingsProps) => {
         <Title>{entity?.name}</Title>
       </SettingsHeader>
 
-      <SettingsBody>
-        {(isProducer || isTrader || isOperator) && (
-          <CompanySettings entity={entity} settings={company} />
-        )}
+      <Sticky>
+        <a href="#options">Options</a>
+        <a href="#depot">Dépôts</a>
+        {isProducer && <a href="#production">Sites de production</a>}
+        {hasCertificates && <a href="#iscc">Certificats ISCC</a>}
+        {hasCertificates && <a href="#2bs">Certificats 2BS</a>}
+        {hasCSN && <a href="#csn">Certificats système national</a>}
+      </Sticky>
 
-        {(isProducer || isTrader || isOperator) && (
-          <DeliverySitesSettings settings={deliverySites} />
-        )}
+      <SettingsBody>
+        <CompanySettings entity={entity} settings={company} />
+        <DeliverySitesSettings settings={deliverySites} />
 
         {isProducer && <ProductionSitesSettings settings={productionSites} />}
 
@@ -83,7 +89,7 @@ const Settings = ({ entity, settings }: SettingsProps) => {
           <DBSCertificateSettings settings={dbsCertificates} />
         )}
 
-        {((isProducer && entity?.has_mac) || isOperator) && (
+        {hasCSN && (
           <NationalSystemCertificatesSettings
             settings={nationalSystemCertificates}
           />

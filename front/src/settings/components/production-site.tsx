@@ -324,7 +324,7 @@ const ProductionSitesSettings = ({
   )
 
   return (
-    <Section>
+    <Section id="production">
       <SectionHeader>
         <Title>Sites de production</Title>
         <Button

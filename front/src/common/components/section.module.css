@@ -4,6 +4,12 @@
   margin-bottom: 24px;
 }
 
+.sectionAnchor {
+  height: 72px;
+  margin-top: -72px;
+  pointer-events: none;
+}
+
 .sectionHeader {
   justify-content: space-between;
   align-items: center;
