@@ -1,0 +1,19 @@
+.sticky {
+  display: flex;
+  width: 100%;
+  background-color: var(--gray-light);
+  padding: 16px;
+  padding-left: 120px;
+  z-index: 1;
+  box-shadow: 0px 1px 2px var(--gray-medium);
+}
+
+.sticky a {
+  margin-right: 16px;
+  text-decoration: underline;
+}
+
+.stickyFixed {
+  position: fixed;
+  top: 0;
+}
