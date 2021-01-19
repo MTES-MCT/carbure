@@ -1,6 +1,6 @@
 .table {
   width: 100%;
-  border-collapse: collapse;
+  border-spacing: 0;
   font-weight: 600;
   font-size: var(--font-size);
   table-layout: fixed;
