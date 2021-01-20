@@ -5,8 +5,12 @@ import styles from "./section.module.css"
 
 import { BoxProps, Box } from "."
 
-export const Section = ({ className, ...props }: BoxProps) => (
-  <Box {...props} as="section" className={cl(styles.section, className)} />
+export const Section = ({ id, className, children, ...props }: BoxProps) => (
+  <Box {...props} as="section" className={cl(styles.section, className)}>
+    {/* anchor with special positioning to avoid overlap with navbar */}
+    <div id={id} className={styles.sectionAnchor} />
+    {children}
+  </Box>
 )
 
 export const SectionHeader = (props: BoxProps) => (

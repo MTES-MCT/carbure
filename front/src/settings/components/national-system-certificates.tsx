@@ -50,7 +50,7 @@ const NationalSystemCertificatesSettings = ({
   settings,
 }: NationalSystemCertificatesSettingsProps) => {
   return (
-    <Section>
+    <Section id="csn">
       <SectionHeader>
         <Title>Certificat Système National</Title>
         <Button

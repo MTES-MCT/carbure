@@ -23,7 +23,7 @@ const CompanySettings = ({ entity, settings }: CompanySettingsProps) => {
   const isTrader = entity.entity_type === "Trader"
 
   return (
-    <Section>
+    <Section id="options">
       <SectionHeader>
         <Title>Options</Title>
       </SectionHeader>

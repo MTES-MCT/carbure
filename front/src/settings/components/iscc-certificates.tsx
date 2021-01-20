@@ -94,7 +94,7 @@ const ISCCCertificateSettings = ({
   }))
 
   return (
-    <Section>
+    <Section id="iscc">
       <SectionHeader>
         <Title>Certificats ISCC</Title>
         <Button
