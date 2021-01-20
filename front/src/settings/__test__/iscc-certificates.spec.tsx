@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react"
+import { render } from "setupTests"
+import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import { Entity } from "common/types"
@@ -32,7 +33,7 @@ test("check the iscc certificate section of the settings", async () => {
 
   await waitWhileLoading()
 
-  screen.getByText("Certificats ISCC")
+  expect(screen.getAllByText("Certificats ISCC")).toHaveLength(2)
   screen.getByText("Ajouter un certificat ISCC")
   screen.getByText("Aucun certificat ISCC trouvé")
 })

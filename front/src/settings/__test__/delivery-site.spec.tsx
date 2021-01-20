@@ -1,4 +1,5 @@
-import { render, waitFor, screen } from "@testing-library/react"
+import { render } from "setupTests"
+import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import { Entity } from "common/types"
@@ -28,7 +29,7 @@ test("check the delivery site section of the settings", async () => {
 
   await waitWhileLoading()
 
-  screen.getByText("Dépôts")
+  expect(screen.getAllByText("Dépôts")).toHaveLength(2)
   screen.getByText("Ajouter un dépôt")
   screen.getByText("Aucun dépôt trouvé")
 })
@@ -85,7 +86,7 @@ test("remove a delivery site in settings", async () => {
 
   await waitWhileLoading()
 
-  screen.getByText("Dépôts")
+  expect(screen.getAllByText("Dépôts")).toHaveLength(2)
 
   const deleteButton = screen.getByTitle("Supprimer le dépôt")
 

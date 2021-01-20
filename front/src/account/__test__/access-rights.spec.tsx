@@ -1,4 +1,5 @@
-import { render, waitFor, screen } from "@testing-library/react"
+import { render } from "setupTests"
+import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import Account from "../index"
