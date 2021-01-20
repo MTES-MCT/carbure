@@ -702,6 +702,9 @@ class SustainabilityDeclaration(models.Model):
     month = models.IntegerField(blank=False, null=False)
     checked = models.BooleanField(default=False)
 
+    def natural_key(self):
+        return {'entity': self.entity.natural_key(), 'year': self.year, 'month': self.month, 'checked': self.checked}
+
     class Meta:
         db_table = 'declarations'
         verbose_name = ' Déclaration de Durabilité'
