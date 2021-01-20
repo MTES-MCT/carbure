@@ -3,6 +3,7 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 import "@testing-library/jest-dom/extend-expect"
+import { render as baseRender } from "@testing-library/react"
 
 const modal = document.createElement("div")
 modal.setAttribute("id", "modal")
@@ -14,6 +15,13 @@ const notifications = document.createElement("div")
 notifications.setAttribute("id", "notifications")
 
 document.body.append(modal, dropdown, notifications)
+
+export function render(element: any) {
+  const root = document.createElement("div")
+  root.setAttribute("id", "root")
+  document.body.append(root)
+  return baseRender(element, { container: root })
+}
 
 beforeEach(() => {
   modal.textContent = ""

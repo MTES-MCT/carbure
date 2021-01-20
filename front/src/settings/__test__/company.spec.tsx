@@ -1,4 +1,5 @@
-import { render, waitFor, screen } from "@testing-library/react"
+import { render } from "setupTests"
+import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import { admin, operator, producer, trader } from "common/__test__/data"
@@ -25,7 +26,7 @@ test("check the company section of the settings for a producer", async () => {
 
   await waitWhileLoading()
 
-  screen.getByText("Options")
+  expect(screen.getAllByText("Options")).toHaveLength(2)
 
   const mac = screen.getByLabelText("Ma société effectue des Mises à Consommation") // prettier-ignore
   const trading = screen.getByLabelText("Ma société a une activité de négoce")
@@ -57,7 +58,7 @@ test("check the company section of the settings for a trader", async () => {
 
   await waitWhileLoading()
 
-  screen.getByText("Options")
+  expect(screen.getAllByText("Options")).toHaveLength(2)
 
   const mac = screen.getByLabelText("Ma société effectue des Mises à Consommation") // prettier-ignore
   const trading = screen.getByLabelText("Ma société a une activité de négoce")
@@ -79,7 +80,7 @@ test("check the company section of the settings for an operator", async () => {
 
   await waitWhileLoading()
 
-  screen.getByText("Options")
+  expect(screen.getAllByText("Options")).toHaveLength(2)
 
   const mac = screen.getByLabelText("Ma société effectue des Mises à Consommation") // prettier-ignore
   const trading = screen.getByLabelText("Ma société a une activité de négoce")
@@ -100,5 +101,7 @@ test("check the company section of the settings for an operator", async () => {
 test("check the company section of the settings for an admin", async () => {
   setEntity(admin)
   render(<SettingsWithHooks />)
-  expect(screen.queryByText("Options")).not.toBeInTheDocument()
+  expect(
+    screen.queryByText("Options", { selector: ":not(a)" })
+  ).not.toBeInTheDocument()
 })

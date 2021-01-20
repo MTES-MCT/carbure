@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react"
+import { render } from "setupTests"
+import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import { Entity } from "common/types"
@@ -29,7 +30,7 @@ test("check the production site section of the settings", async () => {
 
   await waitWhileLoading()
 
-  screen.getByText("Sites de production")
+  expect(screen.getAllByText("Sites de production")).toHaveLength(2)
   screen.getByText("Ajouter un site de production")
   screen.getByText("Aucun site de production trouvé")
 })

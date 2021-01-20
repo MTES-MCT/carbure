@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react"
+import { render } from "setupTests"
+import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "common/components/relative-route"
 import { Entity } from "common/types"

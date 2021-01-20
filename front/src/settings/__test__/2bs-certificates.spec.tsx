@@ -1,4 +1,5 @@
-import { render, waitFor, screen } from "@testing-library/react"
+import { render } from "setupTests"
+import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import { Entity } from "common/types"
@@ -32,7 +33,7 @@ test("check the 2bs certificate section of the settings", async () => {
 
   await waitWhileLoading()
 
-  screen.getByText("Certificats 2BS")
+  expect(screen.getAllByText("Certificats 2BS")).toHaveLength(2)
   screen.getByText("Ajouter un certificat 2BS")
   screen.getByText("Aucun certificat 2BS trouvé")
 })
