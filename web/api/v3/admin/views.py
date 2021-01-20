@@ -203,12 +203,12 @@ def update_right_request(request):
 
 @is_admin
 def get_certificates(request):
-    pass
+    return JsonResponse({"status": "success"})
 
 
 @is_admin
 def update_certificate(request):
-    pass
+    return JsonResponse({"status": "success"})
 
 
 @is_admin
@@ -329,7 +329,7 @@ def get_declarations(request):
 
 @is_admin
 def send_declaration_reminder(request):
-    pass
+    return JsonResponse({"status": "success"})
 
 
 @is_admin

@@ -11,14 +11,18 @@ from api.v3.admin.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
 
 
-def debug_lots():
+def debug_lots(valid=False):
     lots = LotV2.objects.all()
+    if valid:
+        lots = lots.filter(status='Validated')
     for lot in lots:
         print(lot.natural_key())
 
 
-def debug_transactions():
+def debug_transactions(valid=False):
     txs = LotTransaction.objects.all()
+    if valid:
+        txs = txs.filter(lot__status='Validated')
     for tx in txs:
         print(tx.natural_key())
 
@@ -417,8 +421,18 @@ class LotsAPITest(TransactionTestCase):
         txs = LotTransaction.objects.filter(lot__in=lots)
         self.assertEqual(txs.count(), nb_lots)
         # validate-all
-        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id})
+        debug_lots()
+
+        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
         self.assertEqual(response.status_code, 200)
+
+        nb_invalid_dates = 3
+        nb_okayish_lots = nb_lots - nb_invalid_dates
+        # expect (nb_lots - nb_invalid_dates) submitted and 0 valid (2 lots have a stupid date)
+        j = response.json()
+        self.assertEqual(j['submitted'], nb_okayish_lots)
+        self.assertEqual(j['valid'], 0)
+
         # get drafts
         lots = LotV2.objects.filter(added_by_user=self.user1, status='Draft')
         self.assertEqual(lots.count(), nb_lots) # they are still all with status draft
@@ -427,18 +441,19 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(response.status_code, 200)        
         data = response.json()['data']
         lots = data['lots']
-        self.assertEqual(len(lots), nb_lots)
-        # make sure they all have LotError or TransactionError
-        lot_errors = LotV2Error.objects.filter(lot__in=[lot['lot']['id'] for lot in lots])
-        tx_errors = TransactionError.objects.filter(tx__in=[tx['id'] for tx in lots])
-        nb_errors = lot_errors.count() + tx_errors.count()
-        self.assertEqual(nb_errors, nb_lots)
+        self.assertEqual(len(lots), nb_okayish_lots)
+
+        # make sure they all have an error
+        lot_errors = [error.lot.id for error  in LotV2Error.objects.filter(lot__in=[lot['lot']['id'] for lot in lots])]
+        tx_errors = [error.tx.lot.id for error in TransactionError.objects.filter(tx__in=[tx['id'] for tx in lots])]
+        for lot in lots:
+            self.assertTrue(lot['id'] in lot_errors or lot['id'] in tx_errors)
         
         # delete-all-drafts
         response = self.client.post(reverse('api-v3-delete-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
         self.assertEqual(response.status_code, 200)
         res = response.json()
-        self.assertEqual(res['deleted'], nb_lots)
+        self.assertEqual(res['deleted'], nb_okayish_lots)
 
     def test_duplicates(self):
         pass
