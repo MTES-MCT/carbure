@@ -92,7 +92,7 @@ const Org = ({ app }: { app: AppHook }) => {
           <Controls />
         </Route>
 
-        <Redirect relative to="transactions" />
+        <Redirect relative to={isAdmin ? "dashboard" : "transactions"} />
       </Switch>
 
       <Footer />
