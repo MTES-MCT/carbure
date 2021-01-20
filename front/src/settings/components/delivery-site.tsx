@@ -251,7 +251,7 @@ const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
   }))
 
   return (
-    <Section>
+    <Section id="depot">
       <SectionHeader>
         <Title>Dépôts</Title>
         <Button level="primary" icon={Plus} onClick={settings.addDeliverySite}>
