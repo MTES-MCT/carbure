@@ -296,6 +296,7 @@ class LotV2(models.Model):
         verbose_name_plural = 'LotsV2'
         indexes = [
             models.Index(fields=["status"]),
+            models.Index(fields=["added_by"]),
         ]
 
 
