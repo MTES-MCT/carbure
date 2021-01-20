@@ -17,6 +17,9 @@ import Transactions from "transactions"
 import Stocks from "stocks"
 import Settings from "settings"
 import Account from "account"
+import Entities from "../entities"
+import Controls from "controls"
+import Dashboard from "dashboard"
 
 // has to be nested in a route so we can get data from useParams()
 const Org = ({ app }: { app: AppHook }) => {
@@ -41,6 +44,10 @@ const Org = ({ app }: { app: AppHook }) => {
       <Switch>
         <Route relative exact path="account">
           <Account settings={app.settings} />
+        </Route>
+
+        <Route relative exact path="entities">
+          <Entities />
         </Route>
 
         <Route relative exact path="../pending">
@@ -72,15 +79,15 @@ const Org = ({ app }: { app: AppHook }) => {
         </Route>
 
         <Route relative path="dashboard">
-          <h1>Tableau de bord</h1>
+          <Dashboard />
         </Route>
 
         <Route relative path="entities">
-          <h1>Sociétés</h1>
+          <Entities />
         </Route>
 
         <Route relative path="controls">
-          <h1>Contrôles</h1>
+          <Controls />
         </Route>
 
         <Redirect relative to="transactions" />
