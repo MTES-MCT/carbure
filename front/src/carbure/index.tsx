@@ -46,16 +46,8 @@ const Org = ({ app }: { app: AppHook }) => {
           <Account settings={app.settings} />
         </Route>
 
-        <Route relative exact path="entities">
-          <Entities />
-        </Route>
-
         <Route relative exact path="../pending">
           <Pending />
-        </Route>
-
-        <Route relative exact path="administration">
-          <Exit to="/administrators/" />
         </Route>
 
         <Route relative exact path="stocks">
@@ -78,13 +70,23 @@ const Org = ({ app }: { app: AppHook }) => {
           <Settings entity={entity} settings={app.settings} />
         </Route>
 
-        <Route relative path="dashboard">
-          <Dashboard />
-        </Route>
+        {isAdmin && (
+          <Route relative exact path="administration">
+            <Exit to="/administrators/" />
+          </Route>
+        )}
 
-        <Route relative path="entities">
-          <Entities />
-        </Route>
+        {isAdmin && (
+          <Route relative path="dashboard">
+            <Dashboard />
+          </Route>
+        )}
+
+        {isAdmin && (
+          <Route relative path="entities">
+            <Entities />
+          </Route>
+        )}
 
         <Route relative path="controls">
           <Controls />
