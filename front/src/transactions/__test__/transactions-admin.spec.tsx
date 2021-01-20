@@ -42,7 +42,7 @@ test("operator: display an empty list of transactions", async () => {
 
   screen.getByText("Alertes")
   screen.getByText("Corrections")
-  screen.getByText("Déclarations")
+  screen.getByText("Lots déclarés")
 
   screen.getByText("Périodes")
   screen.getByText("Biocarburants")

@@ -37,7 +37,7 @@ const STATUS_LABEL = {
   [LotStatus.ToSend]: { singular: "Lot à envoyer", plural: "Lots à envoyer" },
   [LotStatus.Alert]: { singular: "Alerte", plural: "Alertes" },
   [LotStatus.Correction]: { singular: "Correction", plural: "Corrections" },
-  [LotStatus.Declaration]: { singular: "Déclaration", plural: "Déclarations" },
+  [LotStatus.Declaration]: { singular: "Lot déclaré", plural: "Lots déclarés" },
 }
 
 export function mapStatus(
