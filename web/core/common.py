@@ -577,8 +577,15 @@ def fill_delivery_date(lot_row, lot, transaction):
                 dd = delivery_date
             else:
                 dd = dateutil.parser.parse(delivery_date, dayfirst=True)
-            transaction.delivery_date = dd
-            lot.period = dd.strftime('%Y-%m')
+            diff = today - dd.date()
+            if diff > datetime.timedelta(days=365):
+                msg = "Date trop éloignée (%s)" % (lot_row['delivery_date'])
+                tx_errors.append(TransactionError(tx=transaction, field='delivery_date', error=msg, value=delivery_date))
+                lot.period = today.strftime('%Y-%m')
+                transaction.delivery_date = None
+            else:
+                transaction.delivery_date = dd
+                lot.period = dd.strftime('%Y-%m')
         except Exception as e:
             print(e)
             transaction.delivery_date = None

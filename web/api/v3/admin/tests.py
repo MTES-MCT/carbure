@@ -96,33 +96,6 @@ class AdminAPITest(TestCase):
         self.assertIn('name', random_entity)
 
 
-    def test_get_rights(self):
-        # login as an admin
-        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
-        self.assertTrue(loggedin)
-
-        response = self.client.get(reverse('api-v3-admin-get-rights'))
-        # api works
-        self.assertEqual(response.status_code, 200)
-        # and returns at least 5 rights
-        lenallrights = len(response.json()['data'])
-        self.assertGreaterEqual(lenallrights, 5)
-        # check if querying works
-        response = self.client.get(reverse('api-v3-admin-get-rights') + '?q=prod')
-        # works
-        self.assertEqual(response.status_code, 200)
-        # and returns less rights than before
-        filtered_rights = response.json()['data']
-        lenfilteredrights = len(filtered_rights)
-        self.assertGreater(lenallrights, lenfilteredrights)
-        # check if the content is correct
-        random_right = filtered_rights[0]
-        self.assertIn('entity_type', random_right)
-        self.assertIn('entity', random_right)
-        self.assertIn('name', random_right)
-        self.assertIn('email', random_right)
-
-
     def test_create_entity(self):
         loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
         self.assertTrue(loggedin)
