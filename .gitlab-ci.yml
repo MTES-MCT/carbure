@@ -68,7 +68,7 @@ test_frontend:
     - echo "Testing frontend..."
     - cd front
     - npm install --legacy-peer-deps
-    - npm test -- --ci
+    - CI=true npm test
 
 dev_push_django:
   stage: deploy
