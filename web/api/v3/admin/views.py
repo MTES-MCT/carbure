@@ -1,10 +1,13 @@
 import datetime
+import pytz
 import calendar
+from dateutil.rrule import rrule, MONTHLY
+
 from django.http import JsonResponse
 from core.decorators import is_admin
 from django.contrib.auth import get_user_model
 from core.models import Entity, UserRights
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.contrib.auth.forms import PasswordResetForm
 
 from core.models import LotTransaction, UserRightsRequests, SustainabilityDeclaration, Control
@@ -266,12 +269,61 @@ def get_declarations(request):
     else:
         year = int(year)
 
-    declarations = SustainabilityDeclaration.objects.filter(year=year)
+    # calculate the periods window
+    today = pytz.utc.localize(datetime.datetime.now())
+    start = today - datetime.timedelta(days=130)
+    nb_periods = 6
+    periods = [(d.month, d.year) for d in rrule(MONTHLY, dtstart=start, count=nb_periods)]
 
-    # query lots
-    # expected return {1: {'client1': {'drafts': 200, 'validated': 100}}}
+    # get entities that have posted at least one lot since the beginning of the period
+    entities_alive = [f['lot__added_by'] for f in LotTransaction.objects.filter(lot__added_time__gt=start).values('lot__added_by').annotate(count=Count('lot')).filter(count__gt=1)]
+    entities = Entity.objects.filter(id__in=entities_alive)
+    print('entities alive')
+    print(entities)
+    
+    # create the SustainabilityDeclaration objects in database
+    # 1) get existing objects
+    existing = {'%d.%d.%d' % (sd.entity.id, sd.year, sd.period): sd for sd in SustainabilityDeclaration.objects.filter(entity__in=entities, year__gt=start.year, month__gt=start.month)}
+    # 2) create target objects
+    targets = {'%d.%d.%d' % (e.id, year, month): SustainabilityDeclaration(entity=e, year=year, month=month) for e in entities for month, year in periods}
+    # 3) remove existing objects from targets
+    for key, sd in existing:
+        if key in targets:
+            del targets[key]
+    # 4) if any, bulk create the targets
+    if len(targets):
+        to_create = list(targets.values())
+        print('will create %d declarations' % (len(to_create)))
+        for t in to_create:
+            print(t.natural_key())
+        SustainabilityDeclaration.objects.bulk_create(to_create)
+    else:
+        print('no new declaration objects to create')
+        print(len(existing))
 
-    declarations_sez = [d.natural_key() for d in declarations]
+    # get the declarations objects from db
+    declarations = SustainabilityDeclaration.objects.filter(entity__in=entities, year__gte=start.year, month__gte=start.month)
+        
+
+    # query lots to enrich declarations on the frontend
+    # expected return ['client1': [{'period': '2020-01', 'drafts': 200, 'validated': 100, 'checked': True}, {'period': '2020-02', 'drafts': 50, 'validated': 10, 'checked': False}]]
+    # 1) get the lots grouped by added_by
+    drafts = Count('id', filter=Q(lot__status='Draft'))
+    validated = Count('id', filter=Q(lot__status='Validated'))
+    received = Count('id', filter=Q(delivery_status__in=['N', 'AA']))
+    corrections = Count('id', filter=Q(delivery_status__in=['R', 'AC']))
+    batches = {'%d.%s' % (batch['lot__added_by__id'], batch['lot__period']): batch for batch in LotTransaction.objects.values('lot__added_by__id', 'lot__added_by__name', 'lot__period').annotate(num_drafts=drafts, num_valid=validated, num_received=received, num_corrections=corrections)}
+    # 2) add batch info to each declarations
+    declarations_sez = []
+    for d in declarations:
+        key = '%d.%d-%d' % (d.entity.id, d.year, d.month)
+        if key in batches:
+            d.lots = batches[key]
+        else:
+            d.lots = {'drafts': 0, 'validated': 0, 'received': 0, 'corrections': 0}
+        sez_data = d.natural_key()
+        sez_data['lots'] = d.lots
+        declarations_sez.append(sez_data)
     return JsonResponse({"status": "success", "data": declarations_sez})
 
 
