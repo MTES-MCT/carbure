@@ -2,25 +2,19 @@ import cl from "clsx"
 import React, { useEffect, useRef, useState } from "react"
 import styles from "./sticky.module.css"
 
-const root = document.getElementById("root")!
-
 function getPosition(element: HTMLElement): number {
   const prev = element.previousElementSibling
   const rect = prev?.getBoundingClientRect()
   return rect ? rect.bottom : 0
 }
 
-const Sticky = ({
-  children,
-  container = root,
-}: {
-  children: React.ReactNode
-  container?: HTMLElement
-}) => {
+const Sticky = ({ children }: { children: React.ReactNode }) => {
   const [sticky, setSticky] = useState(false)
   const div = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    const container = document.getElementById("root")!
+
     function onScroll(e: Event) {
       if (!div.current) return
 
