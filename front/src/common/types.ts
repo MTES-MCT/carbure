@@ -294,9 +294,11 @@ export enum UserRightStatus {
 }
 
 export interface UserRightRequest {
+  user: [string]
   entity: Entity
   status: UserRightStatus
   date: Date
+  date_requested: string
 }
 
 export interface StockSnapshot {

@@ -17,9 +17,10 @@ import Transactions from "transactions"
 import Stocks from "stocks"
 import Settings from "settings"
 import Account from "account"
-import Entities from "../entities"
 import Controls from "controls"
 import Dashboard from "dashboard"
+import Entities from "../entities"
+import EntityDetails from "entities/routes/entity-details"
 
 // has to be nested in a route so we can get data from useParams()
 const Org = ({ app }: { app: AppHook }) => {
@@ -79,6 +80,12 @@ const Org = ({ app }: { app: AppHook }) => {
         {isAdmin && (
           <Route relative path="dashboard">
             <Dashboard />
+          </Route>
+        )}
+
+        {isAdmin && (
+          <Route relative path="entities/:id">
+            <EntityDetails />
           </Route>
         )}
 

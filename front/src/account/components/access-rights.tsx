@@ -71,7 +71,7 @@ const STATUS_LABEL = {
   [UserRightStatus.Revoked]: "Révoqué",
 }
 
-const Status = ({ status }: { status: UserRightStatus }) => (
+export const RightStatus = ({ status }: { status: UserRightStatus }) => (
   <span
     className={cl(
       statusStyles.status,
@@ -92,13 +92,15 @@ interface AccessRight {
   date: Date
 }
 
+export const statusColumn = {
+  header: "Statut",
+  className: colStyles.narrowColumn,
+  render: (r: AccessRight) => <RightStatus status={r.status} />,
+}
+
 const COLUMNS: Column<AccessRight>[] = [
   EMPTY_COLUMN,
-  {
-    header: "Statut",
-    className: colStyles.narrowColumn,
-    render: (r) => <Status status={r.status} />,
-  },
+  statusColumn,
   {
     header: "Organisation",
     render: (r) => <Line text={r.entity.name} />,
