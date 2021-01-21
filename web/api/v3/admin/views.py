@@ -191,14 +191,14 @@ def get_snapshot(request):
 @is_admin
 def get_rights_requests(request):
     q = request.GET.get('q', False)
-    status = request.GET.get('status', False)
+    statuses = request.GET.getlist('statuses', False)
     entity_id = request.GET.get('entity_id', False)
     requests = UserRightsRequests.objects.all()
 
     if entity_id:
         requests = requests.filter(entity__id=entity_id)
-    if status:
-        requests = requests.filter(status=status)
+    if statuses:
+        requests = requests.filter(status__in=statuses)
     if q:
         requests = requests.filter(Q(user__email__icontains=q) | Q(entity__name__icontains=q))
     
