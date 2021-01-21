@@ -206,7 +206,10 @@ def update_lot(request, *args, **kwargs):
         LotV2Error.objects.bulk_create(lot_errors)
         TransactionError.objects.bulk_create(tx_errors)
         bulk_sanity_checks([tx], background=False)
-        check_duplicates([tx], background=False)
+        # only if lot is already validated ?
+        if lot.status == 'Validated':
+            # make sure we do not create a duplicate
+            check_duplicates([tx], background=False)
         return JsonResponse({'status': 'success'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Could not save lot: %s' % (lot_errors)}, status=400)
@@ -282,10 +285,11 @@ def validate_lot(request):
     tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
-    response = validate_lots(request.user, tx_ids)
+    data = validate_lots(request.user, tx_ids)
     txs = LotTransaction.objects.filter(id__in=tx_ids)
-    check_duplicates(txs, background=False)
-    return response
+    nb_duplicates = check_duplicates(txs, background=False)
+    data['duplicates'] = nb_duplicates
+    return JsonResponse({'status': 'success', 'data': data})
 
 
 @otp_required
@@ -482,9 +486,10 @@ def validate_all_drafts(request, *args, **kwargs):
             return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
     drafts = drafts.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
     tx_ids = [d.id for d in drafts]
-    response = validate_lots(request.user, tx_ids)
+    data = validate_lots(request.user, tx_ids)
     duplicates = check_duplicates(drafts, background=False)
-    return response
+    data['duplicates'] = duplicates
+    return JsonResponse({'status': 'success', 'data': data})
 
 @check_rights('entity_id')
 def get_template_producers_simple(request, *args, **kwargs):

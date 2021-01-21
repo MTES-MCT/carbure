@@ -48,19 +48,22 @@ def check_duplicates(new_txs, background=True):
     if background:
         db.connections.close_all()
     new_daes = [t.dae for t in new_txs]
-    duplicates = LotTransaction.objects.filter(dae__in=new_daes, lot__status='Validated').values('dae', 'lot__biocarburant_id', 'lot__volume').annotate(count=Count('dae')).filter(count__gt=1)
+    nb_duplicates = 0
+    duplicates = LotTransaction.objects.filter(dae__in=new_daes, lot__status='Validated').values('dae', 'lot__biocarburant_id', 'lot__volume', 'lot__ghg_total').annotate(count=Count('dae')).filter(count__gt=1)
     if duplicates.count() > 0:
-        #print('Found duplicates')
-        #print(duplicates)
+        # print('Found duplicates')
+        # print(duplicates)
         # method:
         # when a duplicate exists, the first validated one is right
         for d in duplicates:
             dae = d['dae']
             biocarburant_id = d['lot__biocarburant_id']
             volume = d['lot__volume']
-            matches = LotTransaction.objects.filter(dae=dae, lot__biocarburant_id=biocarburant_id, lot__volume=volume, lot__status='Validated').order_by('id')
+            ghg_total = d['lot__ghg_total']
+            matches = LotTransaction.objects.filter(dae=dae, lot__biocarburant_id=biocarburant_id, lot__volume=volume, lot__ghg_total=ghg_total, lot__status='Validated').order_by('id')
             first_valid = matches[0]
             for m in matches[1:]:
+                nb_duplicates += 1
                 # there is already a tx with a valid lot and this DAE
                 # it can happen if the producer has already created the tx and the operator tries to upload it
                 # or the operator has created it and the producer is trying to upload it
@@ -91,9 +94,7 @@ def check_duplicates(new_txs, background=True):
             first_valid.save()
             matches.exclude(id=first_valid.id).delete()
         LotV2.objects.filter(tx_lot__isnull=True).delete()
-    else:
-        print('No duplicate DAE found')
-
+    return nb_duplicates
 
 def get_prefetched_data(entity):
     d = {}
@@ -185,11 +186,11 @@ def lot_is_valid(lot):
         if not lot.producer_is_in_carbure:
             if not lot.unknown_production_site_com_date:
                 error = "Veuillez renseigner la date de mise en service de l'usine"
-                LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_com_date', value='', error=error)
+                LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_com_date', defaults={'value':'', 'error':error})
                 is_valid = False
             if not lot.unknown_production_site_reference:
                 error = "Veuillez renseigner le certificat de l'usine de production ou du fournisseur"
-                LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_reference', value='', error=error)
+                LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_reference', defaults={'value':'', 'error':error})
                 is_valid = False
     return is_valid
 
@@ -368,7 +369,7 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
             msg = "Veuillez préciser une référence de certificat fournisseur/producteur"
             error = LotV2Error(lot=lot, field='unknown_production_site_reference',
                                 error=msg,
-                                value=lot_row['production_site_reference'])
+                                value='')
             lot_errors.append(error)
         if 'production_site_commissioning_date' in lot_row:
             try:
@@ -811,7 +812,7 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, transaction=None):
 
 
 def load_excel_file(entity, user, file, mass_balance=False):
-    print('File received %s' % (datetime.datetime.now()))
+    #print('File received %s' % (datetime.datetime.now()))
 
     # prefetch some data
     prefetched_data = get_prefetched_data(entity)
@@ -825,7 +826,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
         txs_to_insert = []
         lot_errors = []
         tx_errors = []
-        print('File read %s' % (datetime.datetime.now()))
+        #print('File read %s' % (datetime.datetime.now()))
         for row in df.iterrows():
             lot_row = row[1]
             try:
@@ -845,9 +846,9 @@ def load_excel_file(entity, user, file, mass_balance=False):
             except Exception as e:
                 print(e)
                 print(lot_row)
-        print('File processed %s' % (datetime.datetime.now()))
+        #print('File processed %s' % (datetime.datetime.now()))
         bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors)
-        print('Lots loaded in database %s' % (datetime.datetime.now()))
+        #print('Lots loaded in database %s' % (datetime.datetime.now()))
         return lots_loaded, total_lots
     except Exception as e:
         print(e)
@@ -855,7 +856,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
 
 
 def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
-    print('Starting bulk_insert %s' % (datetime.datetime.now()))
+    # print('Starting bulk_insert %s' % (datetime.datetime.now()))
     # below lines are for batch insert of Lots, Transactions and errors
     # it's a bit rough
     # with mysql, returned object from bulk_create do not contain ids
@@ -890,7 +891,6 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
     flat_tx_errors = [item for sublist in tx_errors for item in sublist]
     TransactionError.objects.bulk_create(flat_tx_errors, batch_size=100)
     # 8 run sanity checks
-    print('calling bulk_sanity_check in background %s' % (datetime.datetime.now()))
     #p = Process(target=bulk_sanity_checks, args=[new_txs])
     #p.start()
     #d = Process(target=check_duplicates, args=[new_txs])
@@ -912,7 +912,6 @@ def validate_lots(user, tx_ids):
             invalid += 1
             errors.append({'tx_id': tx_id, 'message': "tx_id must be an integer"})
             continue
-        print('Trying to validate tx id %d' % (tx_id))
         try:
             tx = LotTransaction.objects.get(Q(id=tx_id), Q(lot__status='Draft') | Q(delivery_status__in=['AA', 'AC', 'R']))
         except Exception as e:
@@ -929,7 +928,7 @@ def validate_lots(user, tx_ids):
         lot_valid = lot_is_valid(tx.lot)
         # run sanity_checks
         is_sane = bulk_sanity_checks([tx])[0]
-        print('tx valid %s lot valid %s is_sane %s' % (tx_valid, lot_valid, is_sane))
+        print('tx %d valid %s lot valid %s is_sane %s' % (tx_id, tx_valid, lot_valid, is_sane))
 
         if not is_sane or not lot_valid or not tx_valid:
             invalid += 1
@@ -954,4 +953,4 @@ def validate_lots(user, tx_ids):
                 pass
         tx.save()
         tx.lot.save()
-    return JsonResponse({'status': 'success', 'submitted': submitted, 'valid': valid, 'invalid': invalid, 'errors': errors})
+    return {'submitted': submitted, 'valid': valid, 'invalid': invalid, 'errors': errors}
