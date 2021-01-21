@@ -61,10 +61,16 @@ def check_duplicates(new_txs, background=True):
             volume = d['lot__volume']
             ghg_total = d['lot__ghg_total']
             matches = LotTransaction.objects.filter(dae=dae, lot__biocarburant_id=biocarburant_id, lot__volume=volume, lot__ghg_total=ghg_total, lot__status='Validated').order_by('id')
-            first_valid = matches[0]
+            # find the "best" lot
+            # the best source is the producer
+            best_matches = LotTransaction.objects.filter(dae=dae, lot__biocarburant_id=biocarburant_id, lot__volume=volume, lot__ghg_total=ghg_total, lot__status='Validated', lot__data_origin_entity__entity_type='Producteur').order_by('id')
+            if best_matches.count() > 0:
+                first_valid = best_matches[0]
+            else:
+                first_valid = matches[0]
             for m in matches[1:]:
                 nb_duplicates += 1
-                # there is already a tx with a valid lot and this DAE
+                # there is already a tx with a valid lot and this DAE/volume/biocarburant
                 # it can happen if the producer has already created the tx and the operator tries to upload it
                 # or the operator has created it and the producer is trying to upload it
                 # or a user has validated a duplicate
@@ -87,8 +93,7 @@ def check_duplicates(new_txs, background=True):
                     first_valid.lot.carbure_production_site = m.lot.carbure_production_site
                 else:
                     # assume it's just a duplicate, do nothing
-                    #print('this %d looks like a duplicate of %d' % (m.id, first_valid.id))
-                    #print('First: %s %s %s New %s %s %s' % (first_valid.dae, first_valid.lot.biocarburant.name, first_valid.lot.volume, m.dae, m.lot.biocarburant.name, m.lot.volume))
+                    # no need to update the original lot
                     pass
             first_valid.lot.save()
             first_valid.save()

@@ -509,20 +509,71 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(cnt, 0)
 
     def test_duplicates_operator(self):
-        # as operator
-        # create lot
+        # cleanup db
+        LotTransaction.objects.all().delete()
+        LotV2.objects.all().delete()
+        # as operator, create lot
+        dae = 'TEST2020FR00923-DUP-32094'
+        lot = {
+            'production_site_reference': 'ISCC-TOTO-02',
+            'production_site_commissioning_date': '11/12/1998',
+            'biocarburant_code': 'ETH',
+            'matiere_premiere_code': 'BLE',
+            'volume': 15000,
+            'pays_origine_code': 'FR',
+            'ep': 5,
+            'etd': 12,
+            'dae': dae,
+            'delivery_date': '2020-12-31',
+            'client': self.test_operator.name,
+            'delivery_site': '001',
+            'entity_id': self.test_operator.id,
+        }
+        response = self.client.post(reverse('api-v3-add-lot'), lot)
+        self.assertEqual(response.status_code, 200)  
         # validate
+        tx = LotTransaction.objects.get(dae=dae)
+        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id]})
+        self.assertEqual(response.status_code, 200)
         # create same lot
+        response = self.client.post(reverse('api-v3-add-lot'), lot)
+        self.assertEqual(response.status_code, 200)
         # validate again
+        tx = LotTransaction.objects.get(dae=dae, lot__status='Draft')
+        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id]})
+        self.assertEqual(response.status_code, 200)
+        j = response.json()['data']
+        self.assertEqual(j['duplicates'], 1)
         # ensure lot was deleted
+        nb_lots = LotV2.objects.all().count()
+        self.assertEqual(nb_lots, 1)
 
-
-        # as producer
-        # create same lot
+        # as producer, create same lot
+        lot['entity_id'] = self.test_producer.id
+        del lot['production_site_reference']
+        del lot['production_site_commissioning_date']
+        lot['production_site'] = self.production_site.name
+        response = self.client.post(reverse('api-v3-add-lot'), lot)
+        self.assertEqual(response.status_code, 200)
         # validate
-        # validate returns "1 duplicate found"
-        # lot is deleted but transaction using existing lot is created
-        pass
+        tx = LotTransaction.objects.get(dae=dae, lot__added_by=self.test_producer)
+        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id]})
+        self.assertEqual(response.status_code, 200)
+        j = response.json()
+        # lot has replaced the previous one
+        nb_lots = LotV2.objects.all().count()
+        self.assertEqual(nb_lots, 1)
+        nb_tx = LotTransaction.objects.all().count()
+        self.assertEqual(nb_tx, 1)
+        tx = LotTransaction.objects.get(dae=dae)
+        self.assertEqual(tx.lot.producer_is_in_carbure, True)
+        self.assertEqual(tx.lot.carbure_producer.id, self.test_producer.id)
+        self.assertEqual(tx.carbure_client.id, self.test_operator.id)
+        self.assertEqual(tx.lot.carbure_production_site.id, self.production_site.id)
+        self.assertEqual(tx.lot.production_site_is_in_carbure, True)
+
+
+
 
     def test_duplicates_upload(self):
         # upload excel file
