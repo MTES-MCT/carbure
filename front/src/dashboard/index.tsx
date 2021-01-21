@@ -6,6 +6,7 @@ import * as api from "./api"
 import { useEffect } from "react"
 import Table from "common/components/table"
 import { Entity } from "common/types"
+import { empty } from "transactions/components/list-columns"
 
 type RowData = { entity: Entity; declarations: api.DeclarationsByMonth }
 
@@ -53,7 +54,7 @@ const Dashboard = () => {
       </SettingsHeader>
 
       <SettingsBody>
-        <Table columns={[entityColumn, ...columns]} rows={rows} />
+        <Table columns={[empty, entityColumn, ...columns]} rows={rows} />
       </SettingsBody>
     </Main>
   )
