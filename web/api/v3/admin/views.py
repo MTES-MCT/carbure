@@ -17,21 +17,45 @@ from api.v3.lots.helpers import get_lots_with_metadata, get_lots_with_errors, ge
 @is_admin
 def get_users(request):
     q = request.GET.get('q', False)
+    entity_id = request.GET.get('entity_id', False)
     user_model = get_user_model()
     users = user_model.objects.all()
+    
     if q:
         users = users.filter(Q(email__icontains=q) | Q(name__icontains=q))
+    if entity_id:
+        users = users.filter(userrights__entity__id=entity_id)
+
     users_sez = [{'email': u.email, 'name': u.name, 'id': u.id} for u in users]
     return JsonResponse({"status": "success", "data": users_sez})
 
 
 @is_admin
+def get_entity_details(request):
+    entity_id = request.GET.get('entity_id', False)
+    entity = Entity.objects.get(pk=entity_id)
+    return JsonResponse({"status": "success", "data": entity.natural_key()})
+
+@is_admin
 def get_entities(request):
     q = request.GET.get('q', False)
     entities = Entity.objects.all()
+    
     if q:
         entities = entities.filter(name__icontains=q)
-    entities_sez = [u.natural_key() for u in entities]
+
+    entities_sez = []
+    for e in entities:
+        entities_sez.append({
+            'entity': e.natural_key(),
+            'users': e.userrights_set.count(), 
+            'requests': e.userrightsrequests_set.filter(status='PENDING').count(),
+            'depots': e.entitydepot_set.count(),
+            'production_sites': e.productionsite_set.count(),
+            'certificates_iscc': e.entityiscctradingcertificate_set.count(),
+            'certificates_2bs': e.entitydbstradingcertificate_set.count(),
+        })
+
     return JsonResponse({"status": "success", "data": entities_sez})
 
 
@@ -168,12 +192,16 @@ def get_snapshot(request):
 def get_rights_requests(request):
     q = request.GET.get('q', False)
     status = request.GET.get('status', False)
-
+    entity_id = request.GET.get('entity_id', False)
     requests = UserRightsRequests.objects.all()
-    if q:
-        requests = requests.filter(Q(user__email__icontains=q) | Q(entity__name__icontains=q))
+
+    if entity_id:
+        requests = requests.filter(entity__id=entity_id)
     if status:
         requests = requests.filter(status=status)
+    if q:
+        requests = requests.filter(Q(user__email__icontains=q) | Q(entity__name__icontains=q))
+    
     requests_sez = [r.natural_key() for r in requests]
     return JsonResponse({"status": "success", "data": requests_sez})
 
@@ -312,7 +340,7 @@ def get_declarations(request):
     validated = Count('id', filter=Q(lot__status='Validated'))
     received = Count('id', filter=Q(delivery_status__in=['N', 'AA']))
     corrections = Count('id', filter=Q(delivery_status__in=['R', 'AC']))
-    batches = {'%d.%s' % (batch['lot__added_by__id'], batch['lot__period']): batch for batch in LotTransaction.objects.values('lot__added_by__id', 'lot__added_by__name', 'lot__period').annotate(num_drafts=drafts, num_valid=validated, num_received=received, num_corrections=corrections)}
+    batches = {'%s.%s' % (batch['lot__added_by__id'], batch['lot__period']): batch for batch in LotTransaction.objects.values('lot__added_by__id', 'lot__added_by__name', 'lot__period').annotate(num_drafts=drafts, num_valid=validated, num_received=received, num_corrections=corrections)}
     # 2) add batch info to each declarations
     declarations_sez = []
     for d in declarations:
