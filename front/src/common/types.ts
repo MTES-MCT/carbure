@@ -294,6 +294,7 @@ export enum UserRightStatus {
 }
 
 export interface UserRightRequest {
+  id: number
   user: [string]
   entity: Entity
   status: UserRightStatus

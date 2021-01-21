@@ -21,6 +21,7 @@ import { statusColumn } from "account/components/access-rights"
 import { empty } from "transactions/components/list-columns"
 import Sticky from "common/components/sticky"
 import { Button } from "common/components/button"
+import { confirm } from "common/components/dialog"
 
 const RIGHTS_COLUMNS: Column<UserRightRequest>[] = [
   empty,
@@ -41,15 +42,45 @@ const RightsRequests = () => {
     api.getUsersRightRequests
   )
 
+  const [, updateRight] = useAPI(api.updateUsersRights)
+
+  async function updateRightRequest(user: number, status: UserRightStatus) {
+    const ok = await confirm(
+      "Modifier droits d'accès",
+      `Voulez vous changer les droits d'accès de cet utilisateur en: ${status} ?`
+    )
+
+    if (ok) {
+      await updateRight(user, status)
+      getUsersRightRequests("", parseInt(id, 10), [
+        UserRightStatus.Pending,
+        UserRightStatus.Rejected,
+        UserRightStatus.Revoked,
+      ])
+    }
+  }
+
   useEffect(() => {
-    getUsersRightRequests("", parseInt(id, 10), UserRightStatus.Pending)
+    getUsersRightRequests("", parseInt(id, 10), [
+      UserRightStatus.Pending,
+      UserRightStatus.Rejected,
+      UserRightStatus.Revoked,
+    ])
   }, [getUsersRightRequests, id])
 
   const rows = (rightsRequests.data ?? []).map((r) => ({ value: r }))
 
-  const actions = Actions([
-    { title: "Accepter", icon: Check, action: () => console.log("accepted") },
-    { title: "Refuser", icon: Cross, action: () => console.log("rejected") },
+  const actions = Actions<UserRightRequest>([
+    {
+      title: "Accepter",
+      icon: Check,
+      action: (r) => updateRightRequest(r.id, UserRightStatus.Accepted),
+    },
+    {
+      title: "Refuser",
+      icon: Cross,
+      action: (r) => updateRightRequest(r.id, UserRightStatus.Rejected),
+    },
   ])
 
   return (
@@ -79,14 +110,32 @@ const RightsGranted = () => {
     api.getUsersRightRequests
   )
 
+  const [, updateRight] = useAPI(api.updateUsersRights)
+
+  async function updateRightRequest(user: number, status: UserRightStatus) {
+    const ok = await confirm(
+      "Modifier droits d'accès",
+      `Voulez vous changer les droits d'accès de cet utilisateur en: ${status} ?`
+    )
+
+    if (ok) {
+      await updateRight(user, status)
+      getUsersRightRequests("", parseInt(id, 10), [UserRightStatus.Accepted])
+    }
+  }
+
   useEffect(() => {
-    getUsersRightRequests("", parseInt(id, 10), UserRightStatus.Accepted)
+    getUsersRightRequests("", parseInt(id, 10), [UserRightStatus.Accepted])
   }, [getUsersRightRequests, id])
 
   const rows = (rightsRequests.data ?? []).map((r) => ({ value: r }))
 
-  const actions = Actions([
-    { title: "Révoqer", icon: Cross, action: () => console.log("revoked") },
+  const actions = Actions<UserRightRequest>([
+    {
+      title: "Révoqer",
+      icon: Cross,
+      action: (r) => updateRightRequest(r.id, UserRightStatus.Revoked),
+    },
   ])
 
   return (
