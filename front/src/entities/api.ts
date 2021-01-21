@@ -26,11 +26,18 @@ export function getUsers(query: string, entity_id: number): Promise<any[]> {
 export function getUsersRightRequests(
   query: string,
   entity_id: number,
-  status?: UserRightStatus
+  statuses: UserRightStatus[]
 ): Promise<UserRightRequest[]> {
   return api.get("/admin/users/rights-requests", {
     q: query,
     entity_id,
+    statuses,
+  })
+}
+
+export function updateUsersRights(user_id: number, status?: UserRightStatus) {
+  return api.post("/admin/users/update-right-request", {
+    id: user_id,
     status,
   })
 }
