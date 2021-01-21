@@ -7,6 +7,7 @@ urlpatterns = [
     path('users/update-right-request', views.update_right_request, name='api-v3-admin-update-right-request'),
 
     path('entities', views.get_entities, name='api-v3-admin-get-entities'),
+    path('entities/details', views.get_entity_details, name='api-v3-admin-get-entity-details'),
     path('entities/add', views.add_entity, name='api-v3-admin-add-entity'),
     path('entities/del', views.delete_entity, name='api-v3-admin-delete-entity'),
 
