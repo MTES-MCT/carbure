@@ -185,7 +185,7 @@ class LotsAPITest(TransactionTestCase):
         # validate first lot
         response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id]})
         self.assertEqual(response.status_code, 200)
-        res = response.json()
+        res = response.json()['data']
         self.assertEqual(res['submitted'], 1)
         self.assertEqual(res['valid'], 1)
         self.assertEqual(res['invalid'], 0)
@@ -197,7 +197,7 @@ class LotsAPITest(TransactionTestCase):
         # validate-all the rest
         response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
         self.assertEqual(response.status_code, 200)
-        res = response.json()
+        res = response.json()['data']
         self.assertEqual(res['submitted'], 2)
         self.assertEqual(res['valid'], 2)
         self.assertEqual(res['invalid'], 0)
@@ -283,7 +283,7 @@ class LotsAPITest(TransactionTestCase):
         # validate-all
         response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
         self.assertEqual(response.status_code, 200)
-        res = response.json()
+        res = response.json()['data']
         # make sure no lots/tx/loterror/txerror are still there
         self.assertEqual(res['submitted'], nb_lots)
         self.assertEqual(res['valid'], nb_lots)
@@ -317,7 +317,6 @@ class LotsAPITest(TransactionTestCase):
         data = response.json()['data']
         lots = data['lots']
         all_lots = LotV2.objects.all().count()
-        print('all lots count: %d' % (all_lots))
         self.assertEqual(len(lots), nb_lots)
 
 
@@ -326,11 +325,10 @@ class LotsAPITest(TransactionTestCase):
         jsoned = self.upload_file('carbure_template_simple_missing_data_but_valid.xlsx', self.test_producer)
         nb_lots = jsoned['data']['total']
         self.assertEqual(jsoned['data']['loaded'], nb_lots)
-        print('uploaded %d lots' % (nb_lots))
         # validate-all
         response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
         self.assertEqual(response.status_code, 200)
-        res = response.json()
+        res = response.json()['data']
         lots_in_batch = nb_lots - 1
         self.assertEqual(res['submitted'], lots_in_batch)
         self.assertEqual(res['valid'], lots_in_batch)
@@ -364,7 +362,7 @@ class LotsAPITest(TransactionTestCase):
         lots = data['lots']
         self.assertEqual(len(lots), lots_in_batch)
 
-    def test_simple_template_import_cannot_validate(self):
+    def test_simple_template_import_missing_data_cannot_validate(self):
         # as producer
         # upload lines that cannot be validated
         jsoned = self.upload_file('carbure_template_simple_missing_data_cannot_validate.xlsx', self.test_producer)
@@ -407,7 +405,8 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(LotV2Error.objects.all().count(), 0)
         self.assertEqual(TransactionError.objects.all().count(), 0)
 
-    def test_simple_template_import_sanity_checks(self):
+
+    def test_simple_template_import_cannot_validate(self):
         # as producer
         # upload lines that cannot be validated
         jsoned = self.upload_file('carbure_template_simple_wrong_data_cannot_validate.xlsx', self.test_producer)
@@ -421,15 +420,13 @@ class LotsAPITest(TransactionTestCase):
         txs = LotTransaction.objects.filter(lot__in=lots)
         self.assertEqual(txs.count(), nb_lots)
         # validate-all
-        debug_lots()
-
         response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
         self.assertEqual(response.status_code, 200)
 
         nb_invalid_dates = 3
         nb_okayish_lots = nb_lots - nb_invalid_dates
         # expect (nb_lots - nb_invalid_dates) submitted and 0 valid (2 lots have a stupid date)
-        j = response.json()
+        j = response.json()['data']
         self.assertEqual(j['submitted'], nb_okayish_lots)
         self.assertEqual(j['valid'], 0)
 
@@ -455,20 +452,63 @@ class LotsAPITest(TransactionTestCase):
         res = response.json()
         self.assertEqual(res['deleted'], nb_okayish_lots)
 
-    def test_duplicates(self):
-        pass
-        # as producer
-        # create lot
+    def test_duplicates_producer(self):
+        # cleanup db
+        LotTransaction.objects.all().delete()
+        LotV2.objects.all().delete()
+        # as producer, create lot
+        dae = 'TEST2020FR00923-DUP-32094'
+        lot = {
+            'production_site': self.production_site.name,
+            'biocarburant_code': 'ETH',
+            'matiere_premiere_code': 'BLE',
+            'volume': 15000,
+            'pays_origine_code': 'FR',
+            'ep': 5,
+            'etd': 12,
+            'dae': dae,
+            'delivery_date': '2020-12-31',
+            'client': self.test_operator.name,
+            'delivery_site': '001',
+            'entity_id': self.test_producer.id,
+        }
+        response = self.client.post(reverse('api-v3-add-lot'), lot)
+        self.assertEqual(response.status_code, 200)  
         # validate
+        tx = LotTransaction.objects.get(dae=dae)
+        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id]})
+        self.assertEqual(response.status_code, 200)
         # create same lot
+        response = self.client.post(reverse('api-v3-add-lot'), lot)
+        self.assertEqual(response.status_code, 200)
         # validate again
+        tx = LotTransaction.objects.get(dae=dae, lot__status='Draft')
+        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id]})
+        self.assertEqual(response.status_code, 200)
+        j = response.json()['data']
+        self.assertEqual(j['duplicates'], 1)
         # ensure lot was deleted
-        # as operator
-        # create same lot
-        # validate
-        # lot doesn't exist anymore
+        nb_lots = LotV2.objects.all().count()
+        self.assertEqual(nb_lots, 1)
+        # as operator, create same lot
+        lot['production_site'] = ''
+        lot['production_site_reference'] = 'ISCC-TOTO-02'
+        lot['production_site_commissioning_date'] = '11/12/1998'
+        lot['producer_name'] = self.test_producer.name
+        lot['entity_id'] = self.test_operator.id
 
-        
+        response = self.client.post(reverse('api-v3-add-lot'), lot)
+        self.assertEqual(response.status_code, 200)
+        j = response.json()['data']
+        # validate
+        tx = LotTransaction.objects.get(dae=dae, lot__added_by=self.test_operator)
+        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id]})
+        self.assertEqual(response.status_code, 200)
+        # lot doesn't exist anymore
+        cnt = LotTransaction.objects.filter(dae=dae, lot__added_by=self.test_operator).count()
+        self.assertEqual(cnt, 0)
+
+    def test_duplicates_operator(self):
         # as operator
         # create lot
         # validate
@@ -482,7 +522,18 @@ class LotsAPITest(TransactionTestCase):
         # validate
         # validate returns "1 duplicate found"
         # lot is deleted but transaction using existing lot is created
+        pass
 
+    def test_duplicates_upload(self):
+        # upload excel file
+        # validate all
+        # get all (no drafts, all validated)
+        # upload same excel file
+        # validate-all (returns submitted 10, duplicates 10)
+        # get all (no drafts, all validated and same count as before)
+        pass
+
+    
 
     def test_real_behaviour(self):
         # download template without setting up parameters

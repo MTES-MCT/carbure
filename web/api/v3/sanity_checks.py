@@ -54,7 +54,7 @@ def bulk_sanity_checks(txs, background=True):
     errors = []
     if background == True:
         db.connections.close_all()
-    print('starting bulk_sanity_check %s' % (datetime.datetime.now()))
+    #print('starting bulk_sanity_check %s' % (datetime.datetime.now()))
     # cleanup previous errors
     lots = [t.lot for t in txs]
     LotValidationError.objects.filter(lot__in=lots).delete()
@@ -63,7 +63,7 @@ def bulk_sanity_checks(txs, background=True):
         errors += validation_errors
         results.append(is_sane)
     LotValidationError.objects.bulk_create(errors, batch_size=1000)
-    print('finished bulk_sanity_check %s' % (datetime.datetime.now()))
+    #print('finished bulk_sanity_check %s' % (datetime.datetime.now()))
     return results
 
 
