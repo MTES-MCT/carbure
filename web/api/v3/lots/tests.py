@@ -577,14 +577,22 @@ class LotsAPITest(TransactionTestCase):
 
     def test_duplicates_upload(self):
         # upload excel file
-        # validate all
-        # get all (no drafts, all validated)
-        # upload same excel file
-        # validate-all (returns submitted 10, duplicates 10)
-        # get all (no drafts, all validated and same count as before)
-        pass
-
-    
+        jsoned = self.upload_file('carbure_duplicates.xlsx', self.test_producer)
+        # get number of lots in excel file
+        nb_lots = jsoned['data']['total']
+        # make sure all lines were loaded
+        self.assertEqual(nb_lots, jsoned['data']['loaded'])
+        
+        # validate-all
+        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
+        self.assertEqual(response.status_code, 200)
+        j = response.json()
+        # duplicates > 0
+        self.assertGreater(j['data']['duplicates'], 0)
+        # no more drafts
+        nb_drafts = LotV2.objects.filter(status='Draft').count()
+        self.assertEqual(nb_drafts, 0)
+  
 
     def test_real_behaviour(self):
         # download template without setting up parameters
