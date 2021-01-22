@@ -53,9 +53,9 @@ INSTALLED_APPS = [
     'core',
     'accounts',
     'producers',
-    'operators',
-    'administrators',
-    'traders',
+    #'operators',
+    #'administrators',
+    #'traders',
     'api',
 ]
 

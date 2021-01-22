@@ -27,10 +27,10 @@ urlpatterns = [
     path('api/', include('api.urls')),
 
     # deprecated - will be removed soon
-    path('producers/', include('producers.urls')),
-    path('operators/', include('operators.urls')),
-    path('traders/', include('traders.urls')),
-    path('administrators/', include('administrators.urls')),
+    #path('producers/', include('producers.urls')),
+    #path('operators/', include('operators.urls')),
+    #path('traders/', include('traders.urls')),
+    #path('administrators/', include('administrators.urls')),
     path('core/', include('core.urls')),
     path('annuaire', public_views.annuaire, name='annuaire'),
 ]
