@@ -33,8 +33,12 @@ def get_users(request):
 @is_admin
 def get_entity_details(request):
     entity_id = request.GET.get('entity_id', False)
-    entity = Entity.objects.get(pk=entity_id)
-    return JsonResponse({"status": "success", "data": entity.natural_key()})
+    
+    try:
+        entity = Entity.objects.get(pk=entity_id)
+        return JsonResponse({"status": "success", "data": entity.natural_key()})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e) }, status=400)
 
 @is_admin
 def get_entities(request):
