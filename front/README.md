@@ -1,5 +1,11 @@
 # CarbuRe React frontend
 
+## Commands
+
+- `npm start`: start frontend development server
+- `npm run build`: bundle the dependencies together and prepare them for production
+- `npm test`: run integration tests
+
 ## Dependencies
 
 - `react-scripts` (create-react-app)
@@ -8,7 +14,6 @@
 - `react-router-dom` (client-side routing)
 - `clsx` (conditional css class selection)
 - `js-cookie`
-- `react-select` (custom dropdown + autocomplete)
 
 ## Structure
 
