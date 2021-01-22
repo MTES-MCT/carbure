@@ -91,7 +91,7 @@ class AdminAPITest(TestCase):
         data = response.json()['data']
         self.assertGreaterEqual(len(data), 2)
         # check if the content is correct
-        random_entity = data[0]
+        random_entity = data[0]['entity']
         self.assertIn('entity_type', random_entity)
         self.assertIn('name', random_entity)
 
@@ -105,7 +105,7 @@ class AdminAPITest(TestCase):
         response = self.client.get(reverse('api-v3-admin-get-entities') + '?q=Test')
         self.assertEqual(response.status_code, 200)
         # and returns 1 entity
-        jc = response.json()['data'][0]
+        jc = response.json()['data'][0]['entity']
         self.assertEqual(jc['name'], 'Société Test')
         self.assertEqual(jc['entity_type'], 'Producteur')
 
@@ -119,7 +119,6 @@ class AdminAPITest(TestCase):
         response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Admin Test', 'category': 'Administration'})
         obj = Entity.objects.get(name='Admin Test')
         self.assertEquals(obj.entity_type, 'Administration')
-
 
         # try to create with missing data
         response = self.client.post(reverse('api-v3-admin-add-entity'))
@@ -145,7 +144,7 @@ class AdminAPITest(TestCase):
         response = self.client.get(reverse('api-v3-admin-get-entities') + '?q=Test')
         self.assertEqual(response.status_code, 200)
         # and returns 1 entity
-        jc = response.json()['data'][0]
+        jc = response.json()['data'][0]['entity']
         self.assertEqual(jc['name'], 'Société Test')
         entity_id = jc['id']
 
