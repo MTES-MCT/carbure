@@ -48,7 +48,7 @@ export default function useUploadLotFile(
 
       notifications.push({
         level,
-        text: `${res.loaded} lots sur ${res.total} ont été importées depuis le fichier.`,
+        text: `${res.loaded} lots sur ${res.total} ont été importés depuis le fichier.`,
       })
 
       refresh()
