@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
@@ -698,12 +699,12 @@ class ControlFiles(models.Model):
 
 class SustainabilityDeclaration(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
-    year = models.IntegerField(blank=False, null=False)
-    month = models.IntegerField(blank=False, null=False)
     checked = models.BooleanField(default=False)
+    deadline = models.DateField(default=datetime.datetime.now, blank=True)
+    period = models.DateField(default=datetime.datetime.now, blank=True)
 
     def natural_key(self):
-        return {'entity': self.entity.natural_key(), 'year': self.year, 'month': self.month, 'checked': self.checked}
+        return {'entity': self.entity.natural_key(), 'period': self.period, 'deadline': self.deadline, 'checked': self.checked}
 
     class Meta:
         db_table = 'declarations'

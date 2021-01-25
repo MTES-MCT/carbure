@@ -299,17 +299,18 @@ def close_control(request):
 @is_admin
 def get_declarations(request):
     year = request.GET.get('year', False)
-
+    now = datetime.datetime.now()
     if not year:
-        year = 2021
+        year = now.year
     else:
         year = int(year)
 
     # calculate the periods window
-    today = pytz.utc.localize(datetime.datetime.now())
+    today = pytz.utc.localize(now)
     start = today - datetime.timedelta(days=130)
     nb_periods = 6
     periods = [(d.month, d.year) for d in rrule(MONTHLY, dtstart=start, count=nb_periods)]
+    print(periods)
 
     # get entities that have posted at least one lot since the beginning of the period
     entities_alive = [f['lot__added_by'] for f in LotTransaction.objects.filter(lot__added_time__gt=start).values('lot__added_by').annotate(count=Count('lot')).filter(count__gt=1)]
@@ -317,12 +318,23 @@ def get_declarations(request):
     logging.debug('{} entities alive'.format(len(entities)))
     
     # create the SustainabilityDeclaration objects in database
+    # 0) cleanup
+    # SustainabilityDeclaration.objects.filter(checked=False).delete()
     # 1) get existing objects
-    existing = {'%d.%d.%d' % (sd.entity.id, sd.year, sd.period): sd for sd in SustainabilityDeclaration.objects.filter(entity__in=entities, year__gt=start.year, month__gt=start.month)}
+    sds = SustainabilityDeclaration.objects.filter(entity__in=entities, year__gte=start.year, month__gte=start.month)
+    print('%d existing sds' % (len(sds)))
+    existing = {}
+    for sd in sds:
+        key = '%d.%d.%d' % (sd.entity.id, sd.year, sd.month)
+        existing[key] = sd
     # 2) create target objects
-    targets = {'%d.%d.%d' % (e.id, year, month): SustainabilityDeclaration(entity=e, year=year, month=month) for e in entities for month, year in periods}
+    targets = {}
+    for month, year in periods:
+        for e in entities:
+            key = '%d.%d.%d' % (e.id, year, month)
+            targets[key] =  SustainabilityDeclaration(entity=e, year=year, month=month)
     # 3) remove existing objects from targets
-    for key, sd in existing:
+    for key, sd in existing.items():
         if key in targets:
             del targets[key]
     # 4) if any, bulk create the targets
@@ -333,6 +345,8 @@ def get_declarations(request):
         for t in to_create:
             logging.debug(t.natural_key())
         SustainabilityDeclaration.objects.bulk_create(to_create)
+        sds = SustainabilityDeclaration.objects.filter(entity__in=entities, year__gte=start.year, month__gte=start.month)
+        print('%d now existing sds' % (len(sds)))
     else:
         logging.debug('no new declaration objects to create. Existing {}'.format(len(existing)))
 
