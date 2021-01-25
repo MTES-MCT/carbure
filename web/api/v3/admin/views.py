@@ -1,3 +1,4 @@
+import logging
 import datetime
 import pytz
 import calendar
@@ -13,6 +14,9 @@ from django.contrib.auth.forms import PasswordResetForm
 from core.models import LotTransaction, UserRightsRequests, SustainabilityDeclaration, Control
 from api.v3.lots.helpers import get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors
 
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 @is_admin
 def get_users(request):
@@ -310,8 +314,7 @@ def get_declarations(request):
     # get entities that have posted at least one lot since the beginning of the period
     entities_alive = [f['lot__added_by'] for f in LotTransaction.objects.filter(lot__added_time__gt=start).values('lot__added_by').annotate(count=Count('lot')).filter(count__gt=1)]
     entities = Entity.objects.filter(id__in=entities_alive)
-    print('entities alive')
-    print(entities)
+    logging.debug('{} entities alive'.format(len(entities)))
     
     # create the SustainabilityDeclaration objects in database
     # 1) get existing objects
@@ -325,13 +328,13 @@ def get_declarations(request):
     # 4) if any, bulk create the targets
     if len(targets):
         to_create = list(targets.values())
-        print('will create %d declarations' % (len(to_create)))
+        logging.debug('will create {} declarations'.format(len(to_create)))
+
         for t in to_create:
-            print(t.natural_key())
+            logging.debug(t.natural_key())
         SustainabilityDeclaration.objects.bulk_create(to_create)
     else:
-        print('no new declaration objects to create')
-        print(len(existing))
+        logging.debug('no new declaration objects to create. Existing {}'.format(len(existing)))
 
     # get the declarations objects from db
     declarations = SustainabilityDeclaration.objects.filter(entity__in=entities, year__gte=start.year, month__gte=start.month)
