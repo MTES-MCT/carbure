@@ -704,7 +704,7 @@ class SustainabilityDeclaration(models.Model):
     period = models.DateField(default=datetime.datetime.now, blank=True)
 
     def natural_key(self):
-        return {'entity': self.entity.natural_key(), 'period': self.period, 'deadline': self.deadline, 'checked': self.checked}
+        return {'entity': self.entity.natural_key(), 'period': self.period, 'deadline': self.deadline, 'checked': self.checked, 'month': self.period.month, 'year': self.period.year}
 
     class Meta:
         db_table = 'declarations'

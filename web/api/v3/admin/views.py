@@ -3,6 +3,7 @@ import datetime
 import pytz
 import calendar
 from dateutil.rrule import rrule, MONTHLY
+from dateutil.relativedelta import relativedelta
 
 from django.http import JsonResponse
 from core.decorators import is_admin
@@ -310,7 +311,7 @@ def get_declarations(request):
     start = today - datetime.timedelta(days=130)
     nb_periods = 6
     periods = [(d.month, d.year) for d in rrule(MONTHLY, dtstart=start, count=nb_periods)]
-    print(periods)
+    start = pytz.utc.localize(datetime.datetime(year=periods[0][1], month=periods[0][0], day=1))
 
     # get entities that have posted at least one lot since the beginning of the period
     entities_alive = [f['lot__added_by'] for f in LotTransaction.objects.filter(lot__added_time__gt=start).values('lot__added_by').annotate(count=Count('lot')).filter(count__gt=1)]
@@ -321,18 +322,23 @@ def get_declarations(request):
     # 0) cleanup
     # SustainabilityDeclaration.objects.filter(checked=False).delete()
     # 1) get existing objects
-    sds = SustainabilityDeclaration.objects.filter(entity__in=entities, year__gte=start.year, month__gte=start.month)
+    sds = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start)
     print('%d existing sds' % (len(sds)))
     existing = {}
     for sd in sds:
-        key = '%d.%d.%d' % (sd.entity.id, sd.year, sd.month)
+        key = '%d.%d.%d' % (sd.entity.id, sd.period.year, sd.period.month)
         existing[key] = sd
     # 2) create target objects
     targets = {}
     for month, year in periods:
+        period = datetime.date(year=year, month=month, day=1)
+        nextmonth = period + relativedelta(months=1)
+        (_, last_day) = calendar.monthrange(nextmonth.year, nextmonth.month)
+        deadline_date = nextmonth.replace(day=last_day)
         for e in entities:
             key = '%d.%d.%d' % (e.id, year, month)
-            targets[key] =  SustainabilityDeclaration(entity=e, year=year, month=month)
+            targets[key] =  SustainabilityDeclaration(entity=e, period=period, deadline=deadline_date)
+    print('%d targets' % len(targets))
     # 3) remove existing objects from targets
     for key, sd in existing.items():
         if key in targets:
@@ -345,13 +351,13 @@ def get_declarations(request):
         for t in to_create:
             logging.debug(t.natural_key())
         SustainabilityDeclaration.objects.bulk_create(to_create)
-        sds = SustainabilityDeclaration.objects.filter(entity__in=entities, year__gte=start.year, month__gte=start.month)
+        sds = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start)
         print('%d now existing sds' % (len(sds)))
     else:
         logging.debug('no new declaration objects to create. Existing {}'.format(len(existing)))
 
     # get the declarations objects from db
-    declarations = SustainabilityDeclaration.objects.filter(entity__in=entities, year__gte=start.year, month__gte=start.month)
+    declarations = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start)
         
 
     # query lots to enrich declarations on the frontend
@@ -365,7 +371,7 @@ def get_declarations(request):
     # 2) add batch info to each declarations
     declarations_sez = []
     for d in declarations:
-        key = '%d.%d-%d' % (d.entity.id, d.year, d.month)
+        key = '%d.%d-%d' % (d.entity.id, d.period.year, d.period.month)
         if key in batches:
             d.lots = batches[key]
         else:
