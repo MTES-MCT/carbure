@@ -832,7 +832,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
         txs_to_insert = []
         lot_errors = []
         tx_errors = []
-        #print('File read %s' % (datetime.datetime.now()))
+        print('File read %s' % (datetime.datetime.now()))
         for row in df.iterrows():
             lot_row = row[1]
             try:
@@ -841,8 +841,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
                 else:
                     lot, tx, l_errors, t_errors = load_lot(prefetched_data, entity, user, lot_row, 'EXCEL')
                 if lot is None:
-                    print('Error loading line %s' % (lot_row))
-                    print(l_errors)
+                    # could not load line. missing column biocaburant_code?
                     continue
                 lots_loaded += 1
                 lots_to_insert.append(lot)
@@ -852,9 +851,9 @@ def load_excel_file(entity, user, file, mass_balance=False):
             except Exception as e:
                 print(e)
                 print(lot_row)
-        #print('File processed %s' % (datetime.datetime.now()))
+        print('File processed %s' % (datetime.datetime.now()))
         bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors)
-        #print('Lots loaded in database %s' % (datetime.datetime.now()))
+        print('Lots loaded in database %s' % (datetime.datetime.now()))
         return lots_loaded, total_lots
     except Exception as e:
         print(e)
