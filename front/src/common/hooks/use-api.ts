@@ -50,10 +50,16 @@ function useAPI<T extends any[], U>(
     (...args: T) => {
       let cancelled = false
 
+      if (createPromise.name === "getLots") {
+        console.log("START REQUEST", [...args])
+      }
       // cancel the previous request if there was one
       cancel.current && cancel.current()
       // create the cancel function for this request
-      cancel.current = () => (cancelled = true)
+      cancel.current = () => {
+        console.log("CANCEL", [...args])
+        return (cancelled = true)
+      }
 
       // returns true if it was a success, false otherwise
       async function resolve() {
@@ -68,6 +74,9 @@ function useAPI<T extends any[], U>(
 
           // dispatch the data if it was a success
           if (!cancelled) {
+            if (createPromise.name === "getLots") {
+              console.log("FINAL", [...args])
+            }
             dispatch({ type: ApiStatus.Success, payload: res })
             return res
           }
