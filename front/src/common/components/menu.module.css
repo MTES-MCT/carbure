@@ -3,7 +3,7 @@
 }
 
 .menuLabel {
-  font-size: 18px;
+  font-size: 1.1em;
 }
 
 .menuGroup {
@@ -14,7 +14,7 @@
 }
 
 .menuGroup .menuGroupLabel {
-  font-size: 18px;
+  font-size: 1.1em;
   font-weight: bold;
   pointer-events: none;
   padding-left: 16px;

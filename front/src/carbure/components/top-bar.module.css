@@ -1,23 +1,24 @@
 .topBar {
   display: flex;
   background-color: var(--white);
-  padding-right: 120px;
+  padding: 0 120px;
   box-shadow: 0px 1px 2px var(--gray-medium);
 }
 
 .logo {
   display: flex;
   align-items: center;
-  margin: 12px 30px;
+  margin: 12px 0;
 }
 
 .marianne {
-  height: 46px;
+  height: 24px;
 }
 
 .carbure {
   margin-left: 16px;
-  font-family: Evolventa;
+  margin-top: -6px;
+  font-size: 18px;
   letter-spacing: 0.05em;
   color: var(--black);
 }
@@ -36,7 +37,7 @@
   position: relative;
   align-items: center;
   padding: 0 16px;
-  font-size: 18px;
+  font-size: 1.1em;
   color: var(--black);
 }
 
@@ -60,7 +61,7 @@
 
 .userMenu {
   display: flex;
-  font-size: 18px;
+  font-size: 1.1em;
   margin-left: auto;
 }
 

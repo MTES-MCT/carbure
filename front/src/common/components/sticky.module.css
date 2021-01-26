@@ -6,10 +6,11 @@
   padding-left: 120px;
   z-index: 1;
   box-shadow: 0px 1px 2px var(--gray-medium);
+  font-size: 1.1em;
 }
 
 .sticky a {
-  margin-right: 16px;
+  margin-right: 24px;
   text-decoration: underline;
 }
 

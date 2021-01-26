@@ -1,12 +1,17 @@
+import cl from "clsx"
 import styles from "./footer.module.css"
-import logoMTES from "../assets/images/logo-mtes.svg"
+import logoMTES from "../assets/images/MTE.svg"
 import logoFabNum from "../assets/images/logo-fabriquenumerique.svg"
 
 const Footer = () => (
   <footer className={styles.footerContainer}>
     <div className={styles.flexCell}>
       <div className={styles.centerImage}>
-        <img src={logoMTES} alt="Logo MTES" className={styles.footerImage} />
+        <img
+          src={logoMTES}
+          alt="Logo MTES"
+          className={cl(styles.footerImage, styles.footerMTES)}
+        />
       </div>
     </div>
 
