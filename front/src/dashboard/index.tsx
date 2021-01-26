@@ -16,7 +16,13 @@ const entityColumn = {
 
 function renderMonth(month: string) {
   return (v: RowData) => (
-    <ul>
+    <ul
+      style={{
+        margin: 0,
+        padding: 8,
+        fontWeight: "normal",
+      }}
+    >
       <li>{v.declarations[month]?.lots.num_drafts ?? 0} brouillons</li>
       <li>{v.declarations[month]?.lots.num_valid ?? 0} envoyés</li>
       <li>{v.declarations[month]?.lots.num_received ?? 0} reçus</li>
