@@ -778,7 +778,8 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, transaction=None):
     tx_errors = []
 
     # check for empty row
-    if lot_dict.get('biocarburant_code', None) is None:
+    biocarburant_code = lot_dict.get('biocarburant_code', None)
+    if biocarburant_code is None or biocarburant_code == '':
         return None, None, "Missing biocarburant_code", None
 
     if transaction is None:
