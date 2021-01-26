@@ -130,7 +130,7 @@ export const AccountAccesRights = ({
   return (
     <Section>
       <SectionHeader>
-        <Title>Demande d'accès</Title>
+        <Title>Demandes d'accès aux sociétés</Title>
         <Button level="primary" icon={Plus} onClick={account.askEntityAccess}>
           Ajouter une organisation
         </Button>
