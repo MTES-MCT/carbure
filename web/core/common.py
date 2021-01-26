@@ -4,12 +4,44 @@ from django import db
 from django.db.models import Q, Count
 from multiprocessing import Process
 import pandas as pd
+from typing import TYPE_CHECKING, Dict, List, Optional
+from pandas._typing import FilePathOrBuffer, Scalar
 
 from django.http import JsonResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
 import dateutil.parser
 from api.v3.sanity_checks import bulk_sanity_checks
+
+
+def convert_cell(cell, convert_float: bool) -> Scalar:
+    from openpyxl.cell.cell import TYPE_BOOL, TYPE_ERROR, TYPE_NUMERIC
+
+    if cell.is_date:
+        return cell.value
+    elif cell.data_type == TYPE_ERROR:
+        return np.nan
+    elif cell.data_type == TYPE_BOOL:
+        return bool(cell.value)
+    elif cell.value is None:
+        return ""  # compat with xlrd
+    elif cell.data_type == TYPE_NUMERIC:
+        # GH5394
+        if convert_float:
+            val = int(cell.value)
+            if val == cell.value:
+                return val
+        else:
+            return float(cell.value)
+
+    return cell.value
+
+
+def get_sheet_data(sheet, convert_float: bool) -> List[List[Scalar]]:
+    data: List[List[Scalar]] = []
+    for row in sheet.rows:
+        data.append([convert_cell(cell, convert_float) for cell in row])
+    return data
 
 
 def send_lot_from_stock(rights, tx):
@@ -824,7 +856,11 @@ def load_excel_file(entity, user, file, mass_balance=False):
     prefetched_data = get_prefetched_data(entity)
 
     try:
-        df = pd.read_excel(file, engine='openpyxl')
+        wb = openpyxl.load_workbook(file)
+        sheet = wb.worksheets[0]
+        data = get_sheet_data(sheet, convert_float=True)
+        df = pd.DataFrame(data)
+        df = df.rename(columns=df.iloc[0])
         df.fillna('', inplace=True)
         total_lots = len(df)
         lots_loaded = 0
@@ -842,6 +878,9 @@ def load_excel_file(entity, user, file, mass_balance=False):
                     lot, tx, l_errors, t_errors = load_lot(prefetched_data, entity, user, lot_row, 'EXCEL')
                 if lot is None:
                     # could not load line. missing column biocaburant_code?
+                    print(lot_row)
+                    print(l_errors)
+                    print(t_errors)
                     continue
                 lots_loaded += 1
                 lots_to_insert.append(lot)
@@ -853,7 +892,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
                 print(lot_row)
         print('File processed %s' % (datetime.datetime.now()))
         bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors)
-        print('Lots loaded in database %s' % (datetime.datetime.now()))
+        print('%d Lots out of %d lines loaded in database %s' % (lots_loaded, total_lots, datetime.datetime.now()))
         return lots_loaded, total_lots
     except Exception as e:
         print(e)
