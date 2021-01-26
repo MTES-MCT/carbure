@@ -28,7 +28,7 @@
   color: var(--blue-medium);
   text-transform: uppercase;
   text-align: left;
-  font-size: 12px;
+  font-size: 0.75em;
   padding: 8px;
   user-select: none;
   cursor: pointer;
@@ -54,7 +54,7 @@
 }
 
 .extraInfo {
-  font-size: 14px;
+  font-size: 0.87em;
   color: var(--gray-dark);
   font-style: italic;
 }

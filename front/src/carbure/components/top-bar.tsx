@@ -9,7 +9,7 @@ import Menu from "common/components/menu"
 import { Link, NavLink } from "common/components/relative-route"
 import { Question } from "common/components/icons"
 
-import logoMarianne from "../assets/images/logo-marianne.svg"
+import logoMarianne from "../assets/images/Marianne.svg"
 import logoBetaGouv from "../assets/images/betagouvfr.svg"
 import styles from "./top-bar.module.css"
 

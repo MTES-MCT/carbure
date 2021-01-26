@@ -44,7 +44,7 @@
 .labelWrapper {
   display: flex;
   flex-direction: column;
-  font-size: 15px;
+  font-size: 0.93em;
   font-style: italic;
   margin-bottom: 12px;
 }

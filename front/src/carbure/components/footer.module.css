@@ -28,6 +28,11 @@
   height: 200px;
 }
 
+.footerMTES {
+  background-color: var(--body);
+  padding: 8px;
+}
+
 .centerImage {
   text-align: center;
 }
@@ -54,7 +59,6 @@
 }
 
 .footerContainer h2 {
-  font-family: Evolventa, Trebuchet MS, sans-serif;
   font-size: 1.75em;
   line-height: 1.25em;
   margin-top: 0;
