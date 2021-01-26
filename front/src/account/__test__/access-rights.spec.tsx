@@ -27,7 +27,7 @@ test("empty acces rights in account page", async () => {
 
   await waitWhileLoading()
 
-  screen.getByText("Demande d'accès")
+  screen.getByText("Demandes d'accès aux sociétés")
   screen.getByText("Aucune autorisation pour ce compte, ajoutez une organisation pour continuer.") // prettier-ignore
 })
 
@@ -39,7 +39,7 @@ test("populated acces rights in account page", async () => {
   // wait for api to load
   await waitWhileLoading()
 
-  screen.getByText("Demande d'accès")
+  screen.getByText("Demandes d'accès aux sociétés")
 
   // check the first row of request access
   screen.getByText("En attente")

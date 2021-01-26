@@ -43,16 +43,21 @@ type ApiHook<T extends any[], U> = [ApiState<U>, Resolver<T, U>]
 function useAPI<T extends any[], U>(
   createPromise: (...args: T) => Promise<U>
 ): ApiHook<T, U> {
-  const cancelled = useRef(false)
+  const cancel = useRef<() => boolean>()
   const [state, dispatch] = useReducer<ApiReducer<U>>(reducer, initialState)
 
   const resolve = useCallback(
     (...args: T) => {
-      cancelled.current = false
+      let cancelled = false
+
+      // cancel the previous request if there was one
+      cancel.current && cancel.current()
+      // create the cancel function for this request
+      cancel.current = () => (cancelled = true)
 
       // returns true if it was a success, false otherwise
       async function resolve() {
-        if (!cancelled.current) {
+        if (!cancelled) {
           // signal that the request process started
           dispatch({ type: ApiStatus.Pending })
         }
@@ -62,13 +67,13 @@ function useAPI<T extends any[], U>(
           const res = await createPromise(...args)
 
           // dispatch the data if it was a success
-          if (!cancelled.current) {
+          if (!cancelled) {
             dispatch({ type: ApiStatus.Success, payload: res })
             return res
           }
         } catch (err) {
           // otherwise save the error
-          if (!cancelled.current) {
+          if (!cancelled) {
             dispatch({ type: ApiStatus.Error, payload: err.message })
           }
         }
@@ -79,10 +84,10 @@ function useAPI<T extends any[], U>(
     [dispatch, createPromise]
   )
 
-  // cancel the request if the component is unmounted
+  // cancel the last request if the component is unmounted
   useEffect(() => {
     return () => {
-      cancelled.current = true
+      cancel.current && cancel.current()
     }
   }, [])
 
