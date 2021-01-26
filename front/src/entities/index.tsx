@@ -18,7 +18,7 @@ const COLUMNS: Column<api.EntityDetails>[] = [
   {
     header: "Utilisateurs",
     render: (e) => (
-      <ul style={{ padding: 0, margin: 0 }}>
+      <ul style={{ fontWeight: "normal", padding: 0, margin: 0 }}>
         <li>{e.requests} demandes d'accès</li>
         <li>{e.users} autorisations</li>
       </ul>
@@ -27,7 +27,7 @@ const COLUMNS: Column<api.EntityDetails>[] = [
   {
     header: "Production/Stockage",
     render: (e) => (
-      <ul style={{ padding: 0, margin: 0 }}>
+      <ul style={{ fontWeight: "normal", padding: 0, margin: 0 }}>
         <li>{e.production_sites} sites de production</li>
         <li>{e.depots} dépôts</li>
       </ul>
@@ -36,7 +36,7 @@ const COLUMNS: Column<api.EntityDetails>[] = [
   {
     header: "Certificats",
     render: (e) => (
-      <ul style={{ padding: 0, margin: 0 }}>
+      <ul style={{ fontWeight: "normal", padding: 0, margin: 0 }}>
         <li>{e.certificates_iscc} certificats ISCC</li>
         <li>{e.certificates_2bs} certificats 2BS</li>
       </ul>
