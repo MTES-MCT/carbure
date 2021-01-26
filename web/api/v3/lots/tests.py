@@ -367,9 +367,10 @@ class LotsAPITest(TransactionTestCase):
         # upload lines that cannot be validated
         jsoned = self.upload_file('carbure_template_simple_missing_data_cannot_validate.xlsx', self.test_producer)
         # get number of lots in excel file
-        nb_lots = jsoned['data']['total']
-        # make sure all lines were loaded
-        self.assertEqual(nb_lots, jsoned['data']['loaded'])
+        total_lots = jsoned['data']['total']
+        nb_lots = jsoned['data']['loaded']
+        # make sure all lines were loaded minus the one missing biocarburant_code
+        self.assertEqual(nb_lots, total_lots - 1)
         # make sure they were saved successfully
         lots = LotV2.objects.filter(added_by_user=self.user1)
         self.assertEqual(lots.count(), nb_lots)
