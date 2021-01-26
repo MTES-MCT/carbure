@@ -98,7 +98,7 @@ const UserRights = () => {
   return (
     <Section id="users">
       <SectionHeader>
-        <Title>Utilistateurs</Title>
+        <Title>Utilisateurs</Title>
       </SectionHeader>
 
       <SectionBody>
