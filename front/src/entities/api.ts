@@ -26,7 +26,7 @@ export function getUsers(query: string, entity_id: number): Promise<any[]> {
 export function getUsersRightRequests(
   query: string,
   entity_id: number,
-  statuses: UserRightStatus[]
+  statuses?: UserRightStatus[]
 ): Promise<UserRightRequest[]> {
   return api.get("/admin/users/rights-requests", {
     q: query,
