@@ -7,15 +7,15 @@
 
 @font-face {
   font-family: "Marianne";
-  src: url("../fonts/Marianne/Marianne-Bold.woff2") format("woff2"),
-    url("../fonts/Marianne/Marianne-Bold.woff") format("woff");
+  src: url("../fonts/Marianne/Marianne-Medium.woff") format("woff2"),
+    url("../fonts/Marianne/Marianne-Medium.woff") format("woff");
   font-weight: 600;
 }
 
 @font-face {
   font-family: "Marianne";
-  src: url("../fonts/Marianne/Marianne-ExtraBold.woff2") format("woff2"),
-    url("../fonts/Marianne/Marianne-ExtraBold.woff") format("woff");
+  src: url("../fonts/Marianne/Marianne-Bold.woff2") format("woff2"),
+    url("../fonts/Marianne/Marianne-Bold.woff") format("woff");
   font-weight: 800;
 }
 
