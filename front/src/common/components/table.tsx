@@ -38,7 +38,9 @@ interface Action<T> {
   action: (i: T) => void
 }
 
-export function Actions<T>(actions: Action<T>[]): Column<T> {
+export function Actions<T>(
+  config: Action<T>[] | ((c: T) => Action<T>[])
+): Column<T> {
   return {
     className: styles.actionColumn,
 
@@ -47,16 +49,19 @@ export function Actions<T>(actions: Action<T>[]): Column<T> {
         <ChevronRight className={styles.actionArrow} />
 
         <Box row className={styles.actionList}>
-          {actions.map(({ icon: Icon, title, action }, i) => (
-            <Icon
-              key={i}
-              title={title}
-              onClick={(e) => {
-                e.stopPropagation()
-                action(cell)
-              }}
-            />
-          ))}
+          {/* if config is a function, create actions dynamically */}
+          {(typeof config === "function" ? config(cell) : config).map(
+            ({ icon: Icon, title, action }, i) => (
+              <Icon
+                key={i}
+                title={title}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  action(cell)
+                }}
+              />
+            )
+          )}
         </Box>
       </Box>
     ),
