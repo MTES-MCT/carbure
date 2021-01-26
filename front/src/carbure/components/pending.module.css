@@ -6,11 +6,11 @@
 }
 
 h1.welcome {
-  font-size: 48px;
+  font-size: 3em;
 }
 
 p.subtitle {
-  font-size: 24px;
+  font-size: 1.5em;
   color: var(--gray-dark);
   margin-top: 24px;
   margin-bottom: 0;
@@ -25,7 +25,7 @@ div.accountMessage span,
 div.pendingAlert span {
   display: inline-flex;
   align-items: center;
-  font-size: 18px;
+  font-size: 1.1em;
   margin-bottom: 8px;
   text-align: center;
 }

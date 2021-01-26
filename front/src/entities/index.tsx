@@ -1,6 +1,6 @@
-import { Main, Title } from "common/components"
-import { Alert } from "common/components/alert"
-import { AlertTriangle } from "common/components/icons"
+import { LoaderOverlay, Main, Title } from "common/components"
+import { Alert, AlertFilter } from "common/components/alert"
+import { AlertCircle, AlertTriangle } from "common/components/icons"
 import { LabelInput } from "common/components/input"
 import { useRelativePush } from "common/components/relative-route"
 import Table, { Column } from "common/components/table"
@@ -18,7 +18,7 @@ const COLUMNS: Column<api.EntityDetails>[] = [
   {
     header: "Utilisateurs",
     render: (e) => (
-      <ul style={{ padding: 0, margin: 0 }}>
+      <ul style={{ fontWeight: "normal", padding: 0, margin: 0 }}>
         <li>{e.requests} demandes d'accès</li>
         <li>{e.users} autorisations</li>
       </ul>
@@ -27,7 +27,7 @@ const COLUMNS: Column<api.EntityDetails>[] = [
   {
     header: "Production/Stockage",
     render: (e) => (
-      <ul style={{ padding: 0, margin: 0 }}>
+      <ul style={{ fontWeight: "normal", padding: 0, margin: 0 }}>
         <li>{e.production_sites} sites de production</li>
         <li>{e.depots} dépôts</li>
       </ul>
@@ -36,7 +36,7 @@ const COLUMNS: Column<api.EntityDetails>[] = [
   {
     header: "Certificats",
     render: (e) => (
-      <ul style={{ padding: 0, margin: 0 }}>
+      <ul style={{ fontWeight: "normal", padding: 0, margin: 0 }}>
         <li>{e.certificates_iscc} certificats ISCC</li>
         <li>{e.certificates_2bs} certificats 2BS</li>
       </ul>
@@ -46,7 +46,9 @@ const COLUMNS: Column<api.EntityDetails>[] = [
 
 const Entities = () => {
   const push = useRelativePush()
+
   const [query, setQuery] = useState("")
+  const [requestOnly, setRequestOnly] = useState(false)
   const [entities, getEntities] = useAPI(api.getEntities)
 
   useEffect(() => {
@@ -57,6 +59,8 @@ const Entities = () => {
     value: e,
     onClick: () => push(`${e.entity.id}`),
   }))
+
+  const requestCount = rows.filter((e) => e.value.requests > 0).length
 
   return (
     <Main>
@@ -76,7 +80,31 @@ const Entities = () => {
             Aucune société trouvée pour ces paramètres.
           </Alert>
         )}
+
+        {requestCount > 0 && (
+          <AlertFilter
+            level="warning"
+            icon={AlertCircle}
+            active={requestOnly}
+            onActivate={() => setRequestOnly(true)}
+            onDispose={() => setRequestOnly(false)}
+          >
+            {requestCount === 1 ? (
+              <span>
+                <b>1 société</b> a des utilisateurs en attente d'autorisation.
+              </span>
+            ) : (
+              <span>
+                <b>{requestCount} sociétés</b> ont des utilisateurs en attente
+                d'autorisation.
+              </span>
+            )}
+          </AlertFilter>
+        )}
+
         {rows.length > 0 && <Table columns={COLUMNS} rows={rows} />}
+
+        {entities.loading && <LoaderOverlay />}
       </SettingsBody>
     </Main>
   )
