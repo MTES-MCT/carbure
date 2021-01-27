@@ -230,7 +230,7 @@ def get_lots_with_metadata(txs, entity, querySet):
     if invalid == 'true':
         txs = tx_with_errors
     elif deadline == 'true':
-        txs = txs_with_deadline
+        txs = tx_with_deadline
 
     txs = sort_lots(txs, sort_by, order) 
    
