@@ -210,6 +210,7 @@ def lot_is_valid(lot):
 
 def tx_is_valid(tx):
     is_valid = True
+    today = datetime.date.today()
 
     # make sure all mandatory fields are set
     if not tx.dae:
@@ -224,16 +225,15 @@ def tx_is_valid(tx):
         error = 'Site de livraison manquant'
         TransactionError.objects.update_or_create(tx=tx, field='carbure_delivery_site', value='', error=error)
         is_valid = False
-    if not tx.delivery_date:
+    if not tx.delivery_date or tx.delivery_date is None:
         error = 'Date de livraison manquante'
         TransactionError.objects.update_or_create(tx=tx, field='delivery_date', value='', error=error)
         is_valid = False
-
-    today = datetime.date.today()
-    if (tx.delivery_date - today) > datetime.timedelta(days=3650) or (tx.delivery_date - today) < datetime.timedelta(days=-3650):
-        error = "Date incorrecte: veuillez entrer des données récentes (%s)" % (tx.delivery_date.strftime('%d/%m/%Y'))
-        TransactionError.objects.update_or_create(tx=tx, field='delivery_date', value='', error=error)
-        is_valid = False
+    else:
+        if (tx.delivery_date - today) > datetime.timedelta(days=3650) or (tx.delivery_date - today) < datetime.timedelta(days=-3650):
+            error = "Date incorrecte: veuillez entrer des données récentes (%s)" % (tx.delivery_date.strftime('%d/%m/%Y'))
+            TransactionError.objects.update_or_create(tx=tx, field='delivery_date', value='', error=error)
+            is_valid = False
 
     if tx.client_is_in_carbure and not tx.carbure_client:
         error = 'Veuillez renseigner un client'
