@@ -13,6 +13,7 @@ import { LotValidator } from "transactions/hooks/actions/use-validate-lots"
 import { LotDuplicator } from "transactions/hooks/actions/use-duplicate-lots"
 import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
 import { LotRejector } from "transactions/hooks/actions/use-reject-lots"
+import { LotDeclarator } from "transactions/hooks/actions/use-declare-lots"
 import { StatusSelection } from "transactions/hooks/query/use-status"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { SpecialSelection } from "transactions/hooks/query/use-special"
@@ -54,6 +55,7 @@ type TransactionListProps = {
   duplicator: LotDuplicator
   acceptor: LotAcceptor
   rejector: LotRejector
+  declarator: LotDeclarator
 }
 
 export const TransactionList = ({
@@ -70,6 +72,7 @@ export const TransactionList = ({
   duplicator,
   acceptor,
   rejector,
+  declarator,
 }: TransactionListProps) => {
   const txs = transactions.data
   const errorCount = txs?.total_errors ?? 0

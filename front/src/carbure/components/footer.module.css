@@ -1,9 +1,9 @@
 .footerContainer {
   display: flex;
-  height: 260px;
-  background: #1c1c1c;
-  color: #fff;
-  padding: 2em 0;
+  justify-content: space-between;
+  background: var(--footer);
+  color: var(--white);
+  padding: 32px 120px;
   font-size: var(--font-size);
   line-height: 1.5em;
   -webkit-font-smoothing: antialiased;
@@ -12,14 +12,10 @@
 }
 
 .flexCell {
-  flex-grow: 1;
-  flex-basis: 25%;
-  justify-content: space-evenly;
-  padding: 0;
+  display: flex;
   margin: 0;
   list-style: none;
-  display: flex;
-  height: 200px;
+  max-width: 25%;
   list-style: none !important;
   list-style-type: none !important;
 }
@@ -42,12 +38,16 @@
 .footerContainer a:focus,
 .footerContainer a:visited,
 .footerContainer a:active {
-  color: #0053b3;
+  color: var(--blue-medium);
 }
 
 .footerContainer ul {
+  display: flex;
+  flex-direction: column;
   list-style-type: none;
   padding: 0;
+  margin: 0;
+  justify-content: space-evenly;
 }
 
 .footerContainer p {
@@ -62,5 +62,5 @@
   font-size: 1.75em;
   line-height: 1.25em;
   margin-top: 0;
-  margin-bottom: 1em;
+  margin-bottom: 8px;
 }

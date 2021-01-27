@@ -6,11 +6,13 @@ import { StatusSelection } from "transactions/hooks/query/use-status"
 import { YearSelection } from "transactions/hooks/query/use-year"
 
 import { Title } from "common/components"
-import { StatusButton } from "common/components/button"
+import { Button, StatusButton } from "common/components/button"
 import Select from "common/components/select"
 import { Alert } from "common/components/alert"
 
 import styles from "./list-snapshot.module.css"
+import { Rapport } from "common/components/icons"
+import { LotDeclarator } from "transactions/hooks/actions/use-declare-lots"
 
 const STATUS_ORDER = [
   LotStatus.Draft,
@@ -67,6 +69,7 @@ type TransactionSnapshotProps = {
   snapshot: ApiState<Snapshot>
   status: StatusSelection
   year: YearSelection
+  declarator: LotDeclarator | null
 }
 
 export const TransactionSnapshot = ({
@@ -74,6 +77,7 @@ export const TransactionSnapshot = ({
   snapshot,
   status,
   year,
+  declarator,
 }: TransactionSnapshotProps) => (
   <div className={styles.transactionSnapshot}>
     {snapshot.error && <Alert level="error">{snapshot.error}</Alert>}
@@ -84,13 +88,24 @@ export const TransactionSnapshot = ({
           <Title>Transactions</Title>
 
           <Select
-            level="primary"
+            level="inline"
             className={styles.transactionYear}
             value={year.selected}
             placeholder={snapshot.loading ? "…" : "Choisir une année"}
             options={snapshot.data?.years ?? []}
             onChange={(value) => year.setYear(value as number)}
           />
+
+          {declarator && (
+            <Button
+              icon={Rapport}
+              level="primary"
+              className={styles.transactionDeclaration}
+              onClick={declarator.confirmDeclaration}
+            >
+              Voir ma déclaration
+            </Button>
+          )}
         </div>
 
         <div className={styles.transactionStatus}>
