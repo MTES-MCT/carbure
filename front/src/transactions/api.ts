@@ -15,6 +15,18 @@ export function toOption(value: string) {
   return { value, label: value }
 }
 
+export function hasDeadline(tx: Transaction, deadline: string): boolean {
+  if (!tx || tx.lot.status !== "Draft") return false
+
+  const deadlineDate = new Date(deadline)
+
+  const deliveryDate = tx?.delivery_date
+    ? new Date(tx.delivery_date)
+    : new Date()
+
+  return differenceInCalendarMonths(deadlineDate, deliveryDate) === 1
+}
+
 // give the same type to all filters in order to render them easily
 function normalizeFilters(snapshot: any): Snapshot {
   Object.values(Filters).forEach((key) => {
@@ -339,16 +351,8 @@ export function getLotsInSummary(entityID: number) {
   })
 }
 
-export function hasDeadline(tx: Transaction, deadline: string): boolean {
-  if (!tx || tx.lot.status !== "Draft") return false
-
-  const deadlineDate = new Date(deadline)
-
-  const deliveryDate = tx?.delivery_date
-    ? new Date(tx.delivery_date)
-    : new Date()
-
-  return differenceInCalendarMonths(deadlineDate, deliveryDate) === 1
+export function declareLots(entity_id: number, period: string) {
+  return api.post("/lots/declaration", { entity_id, period })
 }
 
 // ADMIN
