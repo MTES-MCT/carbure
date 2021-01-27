@@ -1,5 +1,6 @@
 import datetime
 import calendar
+import logging
 from dateutil.relativedelta import *
 from django.db.models import Q, F, Case, When, Count
 from django.db.models.functions import TruncMonth
@@ -16,6 +17,8 @@ from api.v3.sanity_checks import bulk_sanity_checks
 from django_otp.decorators import otp_required
 from core.decorators import check_rights
 from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors
+
+logger = logging.getLogger(__name__)
 
 
 @check_rights('entity_id')
@@ -281,12 +284,16 @@ def delete_lot(request):
 
 
 @otp_required
-def validate_lot(request):
+@check_rights('entity_id')
+def validate_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    
     tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
-    data = validate_lots(request.user, tx_ids)
-    txs = LotTransaction.objects.filter(id__in=tx_ids)
+    txs = LotTransaction.objects.filter(id__in=tx_ids, lot__added_by=entity, lot__status='Draft')
+    data = validate_lots(request.user, txs)
     nb_duplicates = check_duplicates(txs, background=False)
     data['duplicates'] = nb_duplicates
     return JsonResponse({'status': 'success', 'data': data})
@@ -485,9 +492,12 @@ def validate_all_drafts(request, *args, **kwargs):
         except Exception:
             return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
     drafts = drafts.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-    tx_ids = [d.id for d in drafts]
-    data = validate_lots(request.user, tx_ids)
+    logger.debug("Found {} transactions to validate".format(drafts.count()))
+    data = validate_lots(request.user, drafts)
+    logger.debug(data)
+    logger.debug("Checking duplicates")
     duplicates = check_duplicates(drafts, background=False)
+    logger.debug("{} duplicates found".format(duplicates))
     data['duplicates'] = duplicates
     return JsonResponse({'status': 'success', 'data': data})
 

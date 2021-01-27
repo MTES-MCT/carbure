@@ -6,6 +6,7 @@ from multiprocessing import Process
 import pandas as pd
 from typing import TYPE_CHECKING, Dict, List, Optional
 from pandas._typing import FilePathOrBuffer, Scalar
+from django.db import transaction
 
 from django.http import JsonResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
@@ -143,93 +144,6 @@ def get_prefetched_data(entity):
     d['depots'] = {d.depot_id: d for d in Depot.objects.all()}
     d['clients'] = {c.name: c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
     return d
-
-def tx_is_valid(tx):
-    is_valid = True
-
-    # make sure all mandatory fields are set
-    if not tx.dae:
-        error = 'DAE manquant'
-        TransactionError.objects.update_or_create(tx=tx, field='dae', value='', error=error)
-        is_valid = False
-    if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site:
-        error = 'Site de livraison manquant'
-        TransactionError.objects.update_or_create(tx=tx, field='unknown_delivery_site', value='', error=error)
-        is_valid = False
-    if tx.delivery_site_is_in_carbure and not tx.carbure_delivery_site:
-        error = 'Site de livraison manquant'
-        TransactionError.objects.update_or_create(tx=tx, field='carbure_delivery_site', value='', error=error)
-        is_valid = False
-    if not tx.delivery_date:
-        error = 'Date de livraison manquante'
-        TransactionError.objects.update_or_create(tx=tx, field='delivery_date', value='', error=error)
-        is_valid = False
-
-    today = datetime.date.today()
-    if (tx.delivery_date - today) > datetime.timedelta(days=3650) or (tx.delivery_date - today) < datetime.timedelta(days=-3650):
-        error = "Date incorrecte: veuillez entrer des données récentes (%s)" % (tx.delivery_date.strftime('%d/%m/%Y'))
-        TransactionError.objects.update_or_create(tx=tx, field='delivery_date', value='', error=error)
-        is_valid = False
-
-    if tx.client_is_in_carbure and not tx.carbure_client:
-        error = 'Veuillez renseigner un client'
-        TransactionError.objects.update_or_create(tx=tx, field='carbure_client', value='', error=error)
-        is_valid = False
-    if not tx.client_is_in_carbure and not tx.unknown_client:
-        error = 'Veuillez renseigner un client'
-        TransactionError.objects.update_or_create(tx=tx, field='unknown_client', value='', error=error)
-        is_valid = False
-
-    if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site:
-        error = 'Veuillez renseigner un site de livraison'
-        TransactionError.objects.update_or_create(tx=tx, field='unknown_delivery_site', value='', error=error)
-        is_valid = False
-
-    if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site_country:
-        error = 'Veuillez renseigner un pays de livraison'
-        TransactionError.objects.update_or_create(tx=tx, field='unknown_delivery_site_country', value='', error=error)
-        is_valid = False
-
-    if tx.unknown_delivery_site_country is not None and tx.unknown_delivery_site_country.is_in_europe and tx.lot.pays_origine is None:
-        error = "Veuillez renseigner le pays d'origine de la matière première - Marché européen"
-        TransactionError.objects.update_or_create(tx=tx, field='unknown_delivery_site_country', value='', error=error)
-        is_valid = False
-    if tx.carbure_delivery_site is not None and tx.carbure_delivery_site.country.is_in_europe and tx.lot.pays_origine is None:
-        error = "Veuillez renseigner le pays d'origine de la matière première - Marché européen"
-        TransactionError.objects.update_or_create(tx=tx, field='carbure_delivery_site', value='', error=error)
-        is_valid = False
-    return is_valid
-
-
-def lot_is_valid(lot):
-    is_valid = True
-    if not lot.volume:
-        LotV2Error.objects.update_or_create(lot=lot, field='volume', value='', error='Veuillez renseigner le volume')
-        is_valid = False
-
-    if not lot.parent_lot:
-        if not lot.biocarburant:
-            error = 'Veuillez renseigner le type de biocarburant'
-            LotV2Error.objects.update_or_create(lot=lot, field='biocarburant_code', value='', error=error)
-            is_valid = False
-        if not lot.matiere_premiere:
-            error = 'Veuillez renseigner la matière première'
-            LotV2Error.objects.update_or_create(lot=lot, field='matiere_premiere_code', value='', error=error)
-            is_valid = False
-        if lot.producer_is_in_carbure and lot.carbure_production_site is None:
-            error = 'Veuillez préciser le site de production'
-            LotV2Error.objects.update_or_create(lot=lot, field='carbure_production_site', value='', error=error)
-            is_valid = False
-        if not lot.producer_is_in_carbure:
-            if not lot.unknown_production_site_com_date:
-                error = "Veuillez renseigner la date de mise en service de l'usine"
-                LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_com_date', defaults={'value':'', 'error':error})
-                is_valid = False
-            if not lot.unknown_production_site_reference:
-                error = "Veuillez renseigner le certificat de l'usine de production ou du fournisseur"
-                LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_reference', defaults={'value':'', 'error':error})
-                is_valid = False
-    return is_valid
 
 
 def generate_carbure_id(lot):
@@ -611,11 +525,13 @@ def fill_delivery_date(lot_row, lot, transaction):
     else:
         try:
             delivery_date = lot_row['delivery_date']
-            if isinstance(delivery_date, datetime.datetime) or isinstance(delivery_date, datetime.date):
+            if isinstance(delivery_date, datetime.datetime):
+                dd = delivery_date.date()
+            elif isinstance(delivery_date, datetime.date):
                 dd = delivery_date
             else:
-                dd = dateutil.parser.parse(delivery_date, dayfirst=True)
-            diff = today - dd.date()
+                dd = dateutil.parser.parse(delivery_date, dayfirst=True).date()
+            diff = today - dd
             if diff > datetime.timedelta(days=365):
                 msg = "Date trop éloignée (%s)" % (lot_row['delivery_date'])
                 tx_errors.append(TransactionError(tx=transaction, field='delivery_date', error=msg, value=delivery_date))
@@ -941,61 +857,57 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
     #d = Process(target=check_duplicates, args=[new_txs])
     #d.start()
     bulk_sanity_checks(new_txs, background=False)
-    check_duplicates(new_txs, background=False)
+    #check_duplicates(new_txs, background=False)
     return new_lots, new_txs
 
 
-def validate_lots(user, tx_ids):
+def validate_lots(user, txs):
     valid = 0
     invalid = 0
-    submitted = len(tx_ids)
+    submitted = txs.count()
     errors = []
-    for tx_id in tx_ids:
-        try:
-            tx_id = int(tx_id)
-        except Exception as e:
-            invalid += 1
-            errors.append({'tx_id': tx_id, 'message': "tx_id must be an integer"})
-            continue
-        try:
-            tx = LotTransaction.objects.get(Q(id=tx_id), Q(lot__status='Draft') | Q(delivery_status__in=['AA', 'AC', 'R']))
-        except Exception as e:
-            invalid += 1
-            errors.append({'tx_id': tx_id, 'message': "Draft not found"})
-            continue
-        rights = [r.entity for r in UserRights.objects.filter(user=user)]
-        if tx.lot.added_by not in rights:
-            invalid += 1
-            errors.append({'tx_id': tx_id, 'message': "User not allowed"})
-            continue
-        # make sure all mandatory fields are set
-        tx_valid = tx_is_valid(tx)
-        lot_valid = lot_is_valid(tx.lot)
-        # run sanity_checks
-        is_sane = bulk_sanity_checks([tx])[0]
-        print('tx %d valid %s lot valid %s is_sane %s' % (tx_id, tx_valid, lot_valid, is_sane))
+    to_validate = []
+    for tx in txs:
+        if tx.lot.status != 'Draft':
+            # lot is not a draft: must be a request for correction
+            if tx.delivery_status not in ['AA', 'AC', 'R']:
+                # tx already validated and not pending correction. reject
+                invalid += 1
+                errors.append({'tx_id': tx.id, 'message': "Transaction already validated"})
+                continue
+        to_validate.append(tx)
 
-        if not is_sane or not lot_valid or not tx_valid:
-            invalid += 1
-            errors.append({'tx_id': tx_id, 'message': "Could not validate tx/lot/sanity %s/%s/%s" % (tx_valid, lot_valid, is_sane)})
-            tx.lot.is_valid = False
-        else:
-            valid += 1
-            tx.lot.is_valid = True
-            tx.lot.carbure_id = generate_carbure_id(tx.lot)
-            tx.lot.status = "Validated"
+    
+    # run sanity_checks
+    results = bulk_sanity_checks(to_validate, background=False)
 
-            # if we create a lot for ourselves
-            if tx.carbure_client and tx.lot.added_by == tx.carbure_client:
-                tx.delivery_status = 'A'
-            # if the client is not in carbure, auto-accept
-            elif not tx.client_is_in_carbure:
-                tx.delivery_status = 'A'
-            # if we save a lot that was requiring a fix, change status to 'AA'
-            elif tx.delivery_status in ['AC', 'R']:
-                tx.delivery_status = 'AA'
+    # disable autocommit
+    with transaction.atomic():
+        for sanity_result, tx in zip(results, to_validate):
+            lot_valid, tx_valid, is_sane = sanity_result
+            print('tx %d valid %s lot valid %s is_sane %s' % (tx.id, tx_valid, lot_valid, is_sane))
+
+            if not is_sane or not lot_valid or not tx_valid:
+                invalid += 1
+                errors.append({'tx_id': tx.id, 'message': "Could not validate tx/lot/sanity %s/%s/%s" % (tx_valid, lot_valid, is_sane)})
+                tx.lot.is_valid = False
             else:
-                pass
-        tx.save()
-        tx.lot.save()
+                valid += 1
+                tx.lot.is_valid = True
+                tx.lot.carbure_id = generate_carbure_id(tx.lot)
+                tx.lot.status = "Validated"
+
+                # if we create a lot for ourselves
+                if tx.carbure_client and tx.lot.added_by == tx.carbure_client:
+                    tx.delivery_status = 'A'
+                # if the client is not in carbure, auto-accept
+                elif not tx.client_is_in_carbure:
+                    tx.delivery_status = 'A'
+                # if we save a lot that was requiring a fix, change status to 'AA'
+                elif tx.delivery_status in ['AC', 'R']:
+                    tx.delivery_status = 'AA'
+                else:
+                    pass
+            tx.save()
+            tx.lot.save()
     return {'submitted': submitted, 'valid': valid, 'invalid': invalid, 'errors': errors}
