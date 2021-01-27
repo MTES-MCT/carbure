@@ -13,7 +13,7 @@ def get_random_dae():
     today = datetime.date.today()
     return 'TEST%dFR0000%d' % (today.year, random.randint(100000, 900000))
 
-def make_producers_lots_sheet_advanced(workbook, entity):
+def make_producers_lots_sheet_advanced(workbook, entity, nb_lots):
     worksheet_lots = workbook.add_worksheet("lots")
     psites = ProductionSite.objects.filter(producer=entity)
     clients = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur', 'Trader']).exclude(id=entity.id)
@@ -68,7 +68,7 @@ def make_producers_lots_sheet_advanced(workbook, entity):
 
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
     today = datetime.date.today().strftime('%d/%m/%Y')
-    for i in range(10):
+    for i in range(nb_lots):
         mp = random.choice(mps)
         client = random.choice(clients)
         bc = random.choice(bcs)
@@ -462,11 +462,11 @@ def template_producers_simple(entity):
     return location
 
 
-def template_producers_advanced(entity):
+def template_producers_advanced(entity, nb_lots=10):
     # Create an new Excel file and add a worksheet.
     location = '/tmp/carbure_template_advanced.xlsx'
     workbook = xlsxwriter.Workbook(location)
-    make_producers_lots_sheet_advanced(workbook, entity)
+    make_producers_lots_sheet_advanced(workbook, entity, nb_lots)
     make_mps_sheet(workbook)
     make_biofuels_sheet(workbook)
     make_countries_sheet(workbook)
