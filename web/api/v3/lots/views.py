@@ -523,6 +523,24 @@ def get_template_producers_advanced(request, *args, **kwargs):
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
 
+
+@check_rights('entity_id')
+def get_template_producers_advanced_10k(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+
+    file_location = template_producers_advanced(entity, nb_lots=10000)
+    try:
+        with open(file_location, 'rb') as f:
+            file_data = f.read()
+            # sending response
+            response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment; filename="carbure_template_advanced.xlsx"'
+            return response
+    except Exception as e:
+        return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
+
+
 @check_rights('entity_id')
 def get_template_blend(request, *args, **kwargs):
     context = kwargs['context']
