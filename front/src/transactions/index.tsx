@@ -4,19 +4,20 @@ import { EntitySelection } from "carbure/hooks/use-entity"
 import { EntityType, Filters, LotStatus } from "common/types"
 
 import { usePageSelection } from "common/components/pagination"
-import useSpecialSelection from "transactions/hooks/query/use-special"
-import useSortingSelection from "transactions/hooks/query/use-sort-by"
-import useSearchSelection from "transactions/hooks/query/use-search"
-import useFilterSelection from "transactions/hooks/query/use-filters"
-import useStatusSelection from "transactions/hooks/query/use-status"
-import useYearSelection from "transactions/hooks/query/use-year"
-import useTransactionSelection from "transactions/hooks/query/use-selection"
-import useUploadLotFile from "transactions/hooks/actions/use-upload-file"
-import useDuplicateLot from "transactions/hooks/actions/use-duplicate-lots"
-import useDeleteLots from "transactions/hooks/actions/use-delete-lots"
-import useValidateLots from "transactions/hooks/actions/use-validate-lots"
-import useAcceptLots from "transactions/hooks/actions/use-accept-lots"
-import useRejectLots from "transactions/hooks/actions/use-reject-lots"
+import useSpecialSelection from "./hooks/query/use-special"
+import useSortingSelection from "./hooks/query/use-sort-by"
+import useSearchSelection from "./hooks/query/use-search"
+import useFilterSelection from "./hooks/query/use-filters"
+import useStatusSelection from "./hooks/query/use-status"
+import useYearSelection from "./hooks/query/use-year"
+import useTransactionSelection from "./hooks/query/use-selection"
+import useUploadLotFile from "./hooks/actions/use-upload-file"
+import useDuplicateLot from "./hooks/actions/use-duplicate-lots"
+import useDeleteLots from "./hooks/actions/use-delete-lots"
+import useValidateLots from "./hooks/actions/use-validate-lots"
+import useAcceptLots from "./hooks/actions/use-accept-lots"
+import useRejectLots from "./hooks/actions/use-reject-lots"
+import useDeclareLots from "./hooks/actions/use-declare-lots"
 import { useGetLots, useGetSnapshot } from "./hooks/use-transaction-list"
 
 import { Main } from "common/components"
@@ -108,6 +109,7 @@ export function useTransactions(entity: EntitySelection) {
   const validator = useValidateLots(entity, selection, year, refresh)
   const acceptor = useAcceptLots(entity, selection, year, refresh)
   const rejector = useRejectLots(entity, selection, year, refresh)
+  const declarator = useDeclareLots(entity)
 
   return {
     entity,
@@ -127,6 +129,7 @@ export function useTransactions(entity: EntitySelection) {
     validator,
     acceptor,
     rejector,
+    declarator,
     refresh,
   }
 }
@@ -149,6 +152,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
     uploader,
     acceptor,
     rejector,
+    declarator,
     refresh,
   } = useTransactions(entity)
 
@@ -195,6 +199,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         status={status}
         year={year}
         placeholder={statusPlaceholder}
+        declarator={isAdmin ? null : declarator}
       />
 
       <TransactionFilters
@@ -218,6 +223,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         duplicator={duplicator}
         acceptor={acceptor}
         rejector={rejector}
+        declarator={declarator}
       />
 
       <Switch>
