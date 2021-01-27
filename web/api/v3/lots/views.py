@@ -288,7 +288,6 @@ def delete_lot(request):
 def validate_lot(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
-    
     tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)

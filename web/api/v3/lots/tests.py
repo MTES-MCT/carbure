@@ -279,13 +279,11 @@ class LotsAPITest(TransactionTestCase):
         # upload valid lots
         jsoned = self.upload_file('carbure_template_advanced_missing_data_but_valid.xlsx', self.test_producer)
         nb_lots = jsoned['data']['total']
-        print(jsoned)
         self.assertEqual(jsoned['data']['loaded'], nb_lots)
         # validate-all
         response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
         self.assertEqual(response.status_code, 200)
         res = response.json()['data']
-        print(res)
         # make sure no lots/tx/loterror/txerror are still there
         self.assertEqual(res['submitted'], nb_lots)
         self.assertEqual(res['valid'], nb_lots)
@@ -479,14 +477,14 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(response.status_code, 200)  
         # validate
         tx = LotTransaction.objects.get(dae=dae)
-        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id]})
+        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_producer.id})
         self.assertEqual(response.status_code, 200)
         # create same lot
         response = self.client.post(reverse('api-v3-add-lot'), lot)
         self.assertEqual(response.status_code, 200)
         # validate again
         tx = LotTransaction.objects.get(dae=dae, lot__status='Draft')
-        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id]})
+        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_producer.id})
         self.assertEqual(response.status_code, 200)
         j = response.json()['data']
         self.assertEqual(j['duplicates'], 1)
@@ -505,7 +503,7 @@ class LotsAPITest(TransactionTestCase):
         j = response.json()['data']
         # validate
         tx = LotTransaction.objects.get(dae=dae, lot__added_by=self.test_operator)
-        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id]})
+        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_operator.id})
         self.assertEqual(response.status_code, 200)
         # lot doesn't exist anymore
         cnt = LotTransaction.objects.filter(dae=dae, lot__added_by=self.test_operator).count()
@@ -536,14 +534,20 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(response.status_code, 200)  
         # validate
         tx = LotTransaction.objects.get(dae=dae)
-        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id]})
+        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_operator.id})
         self.assertEqual(response.status_code, 200)
+        drafts = LotTransaction.objects.filter(dae=dae, lot__status='Draft').count()
+        valid = LotTransaction.objects.filter(dae=dae, lot__status='Validated').count()
+        self.assertEqual(drafts, 0)
+        self.assertEqual(valid, 1)
+
+
         # create same lot
         response = self.client.post(reverse('api-v3-add-lot'), lot)
         self.assertEqual(response.status_code, 200)
         # validate again
         tx = LotTransaction.objects.get(dae=dae, lot__status='Draft')
-        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id]})
+        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_operator.id})
         self.assertEqual(response.status_code, 200)
         j = response.json()['data']
         self.assertEqual(j['duplicates'], 1)
@@ -560,7 +564,7 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(response.status_code, 200)
         # validate
         tx = LotTransaction.objects.get(dae=dae, lot__added_by=self.test_producer)
-        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id]})
+        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_producer.id})
         self.assertEqual(response.status_code, 200)
         j = response.json()
         # lot has replaced the previous one
