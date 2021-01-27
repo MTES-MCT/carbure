@@ -42,6 +42,15 @@ const Footer = () => (
           <a href="/">Conditions générales d'utilisation</a>
         </li>
         <li>
+          <a
+            href="https://carbure-1.gitbook.io/faq/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Guide d'utilisation de CarbuRe
+          </a>
+        </li>
+        <li>
           <a href="https://metabase.carbure.beta.gouv.fr/public/dashboard/a9c045a5-c2fb-481a-ab85-f55bce8ae3c0">
             Statistiques
           </a>
@@ -51,6 +60,7 @@ const Footer = () => (
             Slack - Discussions, Support et Annonces
           </a>
         </li>
+
         <li>
           <a href="/">Glossaire</a>
         </li>
