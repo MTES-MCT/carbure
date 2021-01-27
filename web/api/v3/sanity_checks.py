@@ -1,6 +1,6 @@
 import datetime
 from django import db
-from core.models import LotValidationError
+from core.models import LotValidationError, LotV2Error, TransactionError
 
 # init data cache
 # MPS = {m.code: m for m in MatierePremiere.objects.all()}
@@ -59,9 +59,9 @@ def bulk_sanity_checks(txs, background=True):
     lots = [t.lot for t in txs]
     LotValidationError.objects.filter(lot__in=lots).delete()
     for tx in txs:
-        is_sane, validation_errors = sanity_check(tx)
+        lot_ok, tx_ok, is_sane, validation_errors = sanity_check(tx)
         errors += validation_errors
-        results.append(is_sane)
+        results.append((lot_ok, tx_ok, is_sane))
     LotValidationError.objects.bulk_create(errors, batch_size=1000)
     #print('finished bulk_sanity_check %s' % (datetime.datetime.now()))
     return results
@@ -71,6 +71,14 @@ def sanity_check(tx):
     lot = tx.lot
     is_sane = True
     errors = []
+
+    # make sure all mandatory fields are set
+    tx_valid = tx_is_valid(tx)
+    lot_valid = lot_is_valid(tx.lot)
+    if not lot_valid or not tx_valid:
+        # without mandatory fields, we cannot start analyzing for sanity errors. return immediately
+        is_sane = False
+        return lot_valid, tx_valid, is_sane, errors
 
     if tx.is_mac and lot.biocarburant and lot.biocarburant.code not in ['ED95', 'B100']:
         errors.append(raise_error(lot, 'MAC_BC_WRONG'))
@@ -166,4 +174,93 @@ def sanity_check(tx):
         if not lot.matiere_premiere.is_huile_vegetale and lot.biocarburant.code in ['HVOE', 'HVOG']:
             is_sane = False
             errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
-    return is_sane, errors
+    return lot_valid, tx_valid, is_sane, errors
+
+
+def lot_is_valid(lot):
+    is_valid = True
+    if not lot.volume:
+        LotV2Error.objects.update_or_create(lot=lot, field='volume', value='', error='Veuillez renseigner le volume')
+        is_valid = False
+
+    if not lot.parent_lot:
+        if not lot.biocarburant:
+            error = 'Veuillez renseigner le type de biocarburant'
+            LotV2Error.objects.update_or_create(lot=lot, field='biocarburant_code', value='', error=error)
+            is_valid = False
+        if not lot.matiere_premiere:
+            error = 'Veuillez renseigner la matière première'
+            LotV2Error.objects.update_or_create(lot=lot, field='matiere_premiere_code', value='', error=error)
+            is_valid = False
+        if lot.producer_is_in_carbure and lot.carbure_production_site is None:
+            error = 'Veuillez préciser le site de production'
+            LotV2Error.objects.update_or_create(lot=lot, field='carbure_production_site', value='', error=error)
+            is_valid = False
+        if not lot.producer_is_in_carbure:
+            if not lot.unknown_production_site_com_date:
+                error = "Veuillez renseigner la date de mise en service de l'usine"
+                LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_com_date', defaults={'value':'', 'error':error})
+                is_valid = False
+            if not lot.unknown_production_site_reference:
+                error = "Veuillez renseigner le certificat de l'usine de production ou du fournisseur"
+                LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_reference', defaults={'value':'', 'error':error})
+                is_valid = False
+    return is_valid
+
+
+def tx_is_valid(tx):
+    is_valid = True
+
+    # make sure all mandatory fields are set
+    if not tx.dae:
+        error = 'DAE manquant'
+        TransactionError.objects.update_or_create(tx=tx, field='dae', value='', error=error)
+        is_valid = False
+    if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site:
+        error = 'Site de livraison manquant'
+        TransactionError.objects.update_or_create(tx=tx, field='unknown_delivery_site', value='', error=error)
+        is_valid = False
+    if tx.delivery_site_is_in_carbure and not tx.carbure_delivery_site:
+        error = 'Site de livraison manquant'
+        TransactionError.objects.update_or_create(tx=tx, field='carbure_delivery_site', value='', error=error)
+        is_valid = False
+    if not tx.delivery_date:
+        error = 'Date de livraison manquante'
+        TransactionError.objects.update_or_create(tx=tx, field='delivery_date', value='', error=error)
+        is_valid = False
+
+    today = datetime.date.today()
+    if (tx.delivery_date - today) > datetime.timedelta(days=3650) or (tx.delivery_date - today) < datetime.timedelta(days=-3650):
+        error = "Date incorrecte: veuillez entrer des données récentes (%s)" % (tx.delivery_date.strftime('%d/%m/%Y'))
+        TransactionError.objects.update_or_create(tx=tx, field='delivery_date', value='', error=error)
+        is_valid = False
+
+    if tx.client_is_in_carbure and not tx.carbure_client:
+        error = 'Veuillez renseigner un client'
+        TransactionError.objects.update_or_create(tx=tx, field='carbure_client', value='', error=error)
+        is_valid = False
+    if not tx.client_is_in_carbure and not tx.unknown_client:
+        error = 'Veuillez renseigner un client'
+        TransactionError.objects.update_or_create(tx=tx, field='unknown_client', value='', error=error)
+        is_valid = False
+
+    if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site:
+        error = 'Veuillez renseigner un site de livraison'
+        TransactionError.objects.update_or_create(tx=tx, field='unknown_delivery_site', value='', error=error)
+        is_valid = False
+
+    if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site_country:
+        error = 'Veuillez renseigner un pays de livraison'
+        TransactionError.objects.update_or_create(tx=tx, field='unknown_delivery_site_country', value='', error=error)
+        is_valid = False
+
+    if tx.unknown_delivery_site_country is not None and tx.unknown_delivery_site_country.is_in_europe and tx.lot.pays_origine is None:
+        error = "Veuillez renseigner le pays d'origine de la matière première - Marché européen"
+        TransactionError.objects.update_or_create(tx=tx, field='unknown_delivery_site_country', value='', error=error)
+        is_valid = False
+    if tx.carbure_delivery_site is not None and tx.carbure_delivery_site.country.is_in_europe and tx.lot.pays_origine is None:
+        error = "Veuillez renseigner le pays d'origine de la matière première - Marché européen"
+        TransactionError.objects.update_or_create(tx=tx, field='carbure_delivery_site', value='', error=error)
+        is_valid = False
+    return is_valid
+
