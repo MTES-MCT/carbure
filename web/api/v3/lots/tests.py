@@ -279,11 +279,13 @@ class LotsAPITest(TransactionTestCase):
         # upload valid lots
         jsoned = self.upload_file('carbure_template_advanced_missing_data_but_valid.xlsx', self.test_producer)
         nb_lots = jsoned['data']['total']
+        print(jsoned)
         self.assertEqual(jsoned['data']['loaded'], nb_lots)
         # validate-all
         response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
         self.assertEqual(response.status_code, 200)
         res = response.json()['data']
+        print(res)
         # make sure no lots/tx/loterror/txerror are still there
         self.assertEqual(res['submitted'], nb_lots)
         self.assertEqual(res['valid'], nb_lots)
