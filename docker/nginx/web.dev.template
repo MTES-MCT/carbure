@@ -12,6 +12,10 @@ server {
     charset     utf-8;
     client_max_body_size 5M;
 
+    proxy_read_timeout 300;
+    proxy_connect_timeout 300;
+    proxy_send_timeout 300; 
+
     root /var/www/html;
 
     # serve static files
