@@ -20,6 +20,10 @@ urlpatterns = [
     path('reject', views.reject_lot, name='api-v3-reject-lot'),
     path('comment', views.comment_lot, name='api-v3-comment-lot'),
 
+    # DECLARATION
+    path('validate-declaration', views.validate_declaration, name='api-v3-validate-declaration'),
+
+
     # SPECIAL
     path('delete-all-drafts', views.delete_all_drafts, name='api-v3-delete-all-drafts'),
     path('validate-all-drafts', views.validate_all_drafts, name='api-v3-validate-all-drafts'),

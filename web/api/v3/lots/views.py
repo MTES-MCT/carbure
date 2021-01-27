@@ -9,7 +9,7 @@ from django.db.models.fields import NOT_PROVIDED
 from django import db
 from django.http import JsonResponse, HttpResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError
-from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment
+from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment, SustainabilityDeclaration
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
 from core.xlsx_v3 import export_transactions
 from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates
@@ -617,3 +617,25 @@ def upload_blend(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
     data = {'loaded': nb_loaded, 'total': nb_total}
     return JsonResponse({'status': 'success', 'data': data})
+
+@otp_required
+@check_rights('entity_id')
+def validate_declaration(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    period_year = request.POST.get('period_year', None)
+    period_month = request.POST.get('period_month', None)
+
+    if period_month is None or period_year is None:
+        return JsonResponse({'status': "error", 'message': "Missing periods"}, status=400)
+    
+    try:
+        py = int(period_year)
+        pm = int(period_month)
+        period = datetime.date(year=py, month=pm)
+        declaration, created = SustainabilityDeclaration.objects.update_or_create(entity=entity, period=period, defaults={'declared': True})
+    except Exception as e:
+        print("Error while getting period")
+        print(e)
+        return JsonResponse({'status': "error", 'message': "Missing periods"}, status=400)
+    return JsonResponse({'status': 'success'})

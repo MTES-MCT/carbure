@@ -699,12 +699,13 @@ class ControlFiles(models.Model):
 
 class SustainabilityDeclaration(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
+    declared = models.BooleanField(default=False)
     checked = models.BooleanField(default=False)
     deadline = models.DateField(default=datetime.datetime.now, blank=True)
     period = models.DateField(default=datetime.datetime.now, blank=True)
 
     def natural_key(self):
-        return {'entity': self.entity.natural_key(), 'period': self.period, 'deadline': self.deadline, 'checked': self.checked, 'month': self.period.month, 'year': self.period.year}
+        return {'entity': self.entity.natural_key(), 'declared': self.declared, 'period': self.period, 'deadline': self.deadline, 'checked': self.checked, 'month': self.period.month, 'year': self.period.year}
 
     class Meta:
         db_table = 'declarations'
