@@ -21,6 +21,19 @@
   background-color: var(--blue-dark);
 }
 
+.selectInline {
+  color: #000;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid var(--gray-medium);
+}
+
+.selectInline:hover {
+  color: var(--blue-dark);
+  background-color: transparent;
+}
+
 .selectCross {
   width: 16px;
   flex-shrink: 0;

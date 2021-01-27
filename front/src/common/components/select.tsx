@@ -125,7 +125,7 @@ function useSelect(
 type SelectProps = SystemProps & {
   above?: boolean
   placeholder?: string
-  level?: "primary"
+  level?: "primary" | "inline"
   search?: boolean
   multiple?: boolean
   clear?: boolean
@@ -162,6 +162,7 @@ export const Select = ({
 
   const labelClassName = cl(styles.selectLabel, className, {
     [styles.selectPrimary]: level === "primary",
+    [styles.selectInline]: level === "inline",
   })
 
   return (
