@@ -185,7 +185,8 @@ def get_declaration_summary(request, *args, **kwargs):
     if period_month is None or period_year is None:
         return JsonResponse({'status': "error", 'message': "Missing periods"}, status=400)
 
-    period_str = '%s-%s' % (period_year, period_month)
+    period_date = datetime.date(year=int(period_year), month=int(period_month))
+    period_str = period_date.strftime('%Y-%m')
 
     # get declared lots 
     ## lots sent
