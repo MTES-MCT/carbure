@@ -1,14 +1,16 @@
 import React from "react"
 import ReactDOM from "react-dom"
+import cl from "clsx"
 
 import styles from "./dialog.module.css"
 
 import { Title, Box } from "."
 import { Button } from "./button"
 import Modal from "./modal"
+import NotificationsProvider from "./notifications"
 
 export const DialogButtons = (props: any) => (
-  <Box {...props} row className={styles.dialogButtons} />
+  <Box {...props} row className={cl(props.className, styles.dialogButtons)} />
 )
 
 export type PromptFormProps<T> = {
@@ -57,13 +59,15 @@ export function prompt<T>(
 
     // render component imperatively, outside of the regular react container
     ReactDOM.render(
-      <Prompt
-        title={title}
-        description={description}
-        form={form}
-        onConfirm={close}
-        onCancel={() => close(undefined)}
-      />,
+      <NotificationsProvider>
+        <Prompt
+          title={title}
+          description={description}
+          form={form}
+          onConfirm={close}
+          onCancel={() => close(undefined)}
+        />
+      </NotificationsProvider>,
       container
     )
   })

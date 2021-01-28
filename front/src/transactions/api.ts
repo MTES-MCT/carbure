@@ -277,17 +277,33 @@ export function rejectAllInboxLots(
 }
 
 export function getLotsOutSummary(entityID: number) {
-  return api
-    .get("/lots/summary-out", {
-      entity_id: entityID,
-    })
-    .then(flattenSummary)
+  return api.get("/lots/summary-out", {
+    entity_id: entityID,
+  })
 }
 
 export function getLotsInSummary(entityID: number) {
   return api.get("/lots/summary-in", {
     entity_id: entityID,
   })
+}
+
+export function getDeclarationSummary(
+  entity_id: number,
+  period_year: number,
+  period_month: number
+) {
+  return api
+    .post("/lots/declaration-summary", {
+      entity_id,
+      period_year,
+      period_month,
+    })
+    .then((res) => ({
+      declaration: res.declaration,
+      in: res.in ? flattenSummary(res.in) : null,
+      out: res.out ? flattenSummary(res.out) : null,
+    }))
 }
 
 export function validateDeclaration(

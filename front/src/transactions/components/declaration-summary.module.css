@@ -1,0 +1,42 @@
+.declarationPeriod {
+  align-items: center;
+  margin-top: 16px;
+  margin-bottom: 24px;
+}
+
+.declarationPrevPeriod,
+.declarationNextPeriod {
+  width: 32px;
+  height: 32px;
+  padding: 4px;
+}
+
+.declarationPrevPeriod :global(.icon),
+.declarationNextPeriod :global(.icon) {
+  margin: 0;
+}
+
+.declarationPeriodText {
+  margin: 0 16px;
+  color: var(--blue-dark);
+  font-size: 1.1em;
+}
+
+.declarationSection {
+  padding: 16px;
+  padding-left: 56px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--gray-medium);
+  font-size: 1.5em;
+}
+
+.declarationSummary {
+  width: auto;
+  margin-left: -24px;
+  margin-right: -24px;
+  margin-bottom: 16px;
+}
+
+.declarationControls {
+  margin-top: 24px;
+}

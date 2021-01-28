@@ -5,7 +5,7 @@ import {
   Snapshot,
   Transaction,
   LotStatus,
-  DeclarationSummary,
+  SummaryItem,
 } from "common/types"
 
 export function toOption(value: string) {
@@ -70,24 +70,19 @@ export function normalizeFilters(snapshot: any): Snapshot {
   return snapshot
 }
 
-export function flattenSummary(summary: any): DeclarationSummary[] {
+export function flattenSummary(summary: any): SummaryItem[] {
   const rows = []
 
-  for (const client in summary) {
-    const deliveries = summary[client]
-
+  for (const entity in summary) {
+    const deliveries = summary[entity]
     for (const depot in deliveries) {
       const biocarburants = deliveries[depot]
-
       for (const biocarburant in biocarburants) {
-        const { volume, avg_ghg_reduction } = biocarburants[biocarburant]
-
         rows.push({
-          client,
+          entity,
           depot,
           biocarburant,
-          volume,
-          avg_ghg_reduction,
+          ...biocarburants[biocarburant],
         })
       }
     }
