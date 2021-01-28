@@ -202,8 +202,9 @@ def get_declaration_summary(request, *args, **kwargs):
         if t.lot.biocarburant.name not in data_out[client_name][delivery_site]:
             data_out[client_name][delivery_site][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
         line = data_out[client_name][delivery_site][t.lot.biocarburant.name]
+        total = (line['volume'] + t.lot.volume)
         line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
-                                     t.lot.volume * t.lot.ghg_reduction) / (line['volume'] + t.lot.volume)
+                                     t.lot.volume * t.lot.ghg_reduction) / total if total != 0 else 0
         line['volume'] += t.lot.volume
         line['lots'] += 1
 
