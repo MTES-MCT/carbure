@@ -283,27 +283,27 @@ export function commentLot(
   })
 }
 
-export function validateAndCommentLot(
+export async function validateAndCommentLot(
   entityID: number,
   transactionID: number,
   comment: string
 ) {
-  const validating = validateLots(entityID, [transactionID])
-  const commenting = commentLot(entityID, transactionID, comment, "both")
+  const commenting = await commentLot(entityID, transactionID, comment, "both")
+  const validating = await validateLots(entityID, [transactionID])
 
-  return Promise.all([validating, commenting])
+  return [validating, commenting]
 }
 
-export function acceptAndCommentLot(
+export async function acceptAndCommentLot(
   entityID: number,
   transactionID: number,
   comment: string,
   topic: string
 ) {
-  const accepting = acceptLotsWithReserve(entityID, [transactionID])
-  const commenting = commentLot(entityID, transactionID, comment, topic)
+  const commenting = await commentLot(entityID, transactionID, comment, topic)
+  const accepting = await acceptLotsWithReserve(entityID, [transactionID])
 
-  return Promise.all([accepting, commenting])
+  return [accepting, commenting]
 }
 
 export function deleteAllDraftLots(entityID: number, year: number) {
