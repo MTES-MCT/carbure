@@ -173,6 +173,57 @@ def get_summary_out(request, *args, **kwargs):
         line['volume'] += t.lot.volume
     return JsonResponse({'status': 'success', 'data': data})
 
+
+@check_rights('entity_id')
+def get_declaration_summary(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+
+    period_year = request.POST.get('period_year', None)
+    period_month = request.POST.get('period_month', None)
+
+    if period_month is None or period_year is None:
+        return JsonResponse({'status': "error", 'message': "Missing periods"}, status=400)
+
+    period_str = '%s-%s' % (period_year, period_month)
+
+    # get declared lots 
+    ## lots sent
+    txs_out = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Validated', lot__period=period_str).exclude(carbure_client=entity)
+    data_out = {}
+    for t in txs_out:
+        client_name = t.carbure_client.name if t.client_is_in_carbure and t.carbure_client else t.unknown_client
+        if client_name not in data_out:
+            data_out[client_name] = {}
+        delivery_site = t.carbure_delivery_site.name if t.delivery_site_is_in_carbure and t.carbure_delivery_site else t.unknown_delivery_site
+        if delivery_site not in data_out[client_name]:
+            data_out[client_name][delivery_site] = {}
+        if t.lot.biocarburant.name not in data_out[client_name][delivery_site]:
+            data_out[client_name][delivery_site][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0}
+        line = data_out[client_name][delivery_site][t.lot.biocarburant.name]
+        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
+                                     t.lot.volume * t.lot.ghg_reduction) / (line['volume'] + t.lot.volume)
+        line['volume'] += t.lot.volume
+
+    ## lots received
+    txs_in = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Validated', lot__period=period_str, carbure_client=entity)
+    data_in = {}
+    for t in txs_in:
+        delivery_site = t.carbure_delivery_site.name if t.delivery_site_is_in_carbure and t.carbure_delivery_site else t.unknown_delivery_site
+        if delivery_site not in data_in:
+            data_in[delivery_site] = {}
+        if t.carbure_vendor.name not in data_in[delivery_site]:
+            data_in[delivery_site][t.carbure_vendor.name] = {}
+        if t.lot.biocarburant.name not in data_in[delivery_site][t.carbure_vendor.name]:
+            data_in[delivery_site][t.carbure_vendor.name][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0}
+        line = data_in[delivery_site][t.carbure_vendor.name][t.lot.biocarburant.name]
+        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
+                                     t.lot.volume * t.lot.ghg_reduction) / (line['volume'] + t.lot.volume)
+        line['volume'] += t.lot.volume    
+    data = {'in': data_in, 'out': data_out}
+    return JsonResponse({'status': 'success', 'data': data})
+
+
 @check_rights('entity_id')
 def add_lot(request, *args, **kwargs):
     context = kwargs['context']
