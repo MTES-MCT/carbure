@@ -61,7 +61,12 @@ def get_details(request, *args, **kwargs):
     data['transaction'] = tx.natural_key()
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
-    data['comments'] = [c.natural_key() for c in tx.transactioncomment_set.all()]
+    data['comments'] = []
+    for c in tx.transactioncomment_set.all():
+        comment = c.natural_key()
+        if c.entity not in [tx.lot.added_by, tx.carbure_client]:
+            comment['entity'] = {'name': 'Anonyme'}
+        data['comments'].append(comment)
 
     return JsonResponse({'status': 'success', 'data': data})
 
@@ -291,7 +296,7 @@ def validate_lot(request, *args, **kwargs):
     tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
-    txs = LotTransaction.objects.filter(id__in=tx_ids, lot__added_by=entity, lot__status='Draft')
+    txs = LotTransaction.objects.filter(id__in=tx_ids, lot__added_by=entity)
     data = validate_lots(request.user, txs)
     nb_duplicates = check_duplicates(txs, background=False)
     data['duplicates'] = nb_duplicates
