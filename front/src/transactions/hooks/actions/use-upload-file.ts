@@ -62,21 +62,21 @@ export default function useUploadLotFile(
     }
   }
 
-  function uploadFile(file: File) {
+  async function uploadFile(file: File) {
     if (entity !== null) {
-      notifyImport(resolveUpload(entity.id, file))
+      await notifyImport(resolveUpload(entity.id, file))
     }
   }
 
   async function uploadMassBalanceFile(file: File) {
     if (entity !== null) {
-      notifyImport(resolveUploadMassBalance(entity.id, file))
+      await notifyImport(resolveUploadMassBalance(entity.id, file))
     }
   }
 
   async function uploadOperatorFile(file: File) {
     if (entity !== null) {
-      notifyImport(resolveUploadOperator(entity.id, file))
+      await notifyImport(resolveUploadOperator(entity.id, file))
     }
   }
 
