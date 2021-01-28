@@ -58,7 +58,7 @@ export default function useAcceptLots(
     )
 
     if (entity !== null && shouldAccept) {
-      notifyAccept(resolveAccept(entity.id, [lotID]))
+      await notifyAccept(resolveAccept(entity.id, [lotID]))
     }
 
     return shouldAccept
@@ -72,7 +72,7 @@ export default function useAcceptLots(
     )
 
     if (entity !== null && result) {
-      notifyAccept(
+      await notifyAccept(
         resolveAcceptAndComment(entity.id, lotID, result.comment, result.topic)
       )
     }
@@ -87,7 +87,7 @@ export default function useAcceptLots(
     )
 
     if (entity !== null && shouldAccept) {
-      notifyAccept(resolveAccept(entity.id, selection.selected), true)
+      await notifyAccept(resolveAccept(entity.id, selection.selected), true)
     }
 
     return shouldAccept
@@ -100,7 +100,7 @@ export default function useAcceptLots(
     )
 
     if (entity !== null && shouldAccept) {
-      notifyAccept(resolveAcceptAll(entity.id, year.selected), true)
+      await notifyAccept(resolveAcceptAll(entity.id, year.selected), true)
     }
 
     return shouldAccept

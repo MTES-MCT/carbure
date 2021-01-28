@@ -70,7 +70,6 @@ const TransactionDetails = ({
     closeOnDone: boolean = false
   ) {
     if (await action(form.id)) {
-      refresh()
       refreshDetails()
 
       if (closeOnDone) {
