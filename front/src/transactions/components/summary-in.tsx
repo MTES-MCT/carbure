@@ -1,6 +1,7 @@
 import React from "react"
-import { TransactionOutSummaryFormState } from "../hooks/use-transaction-out-summary"
+// import { TransactionOutSummaryFormState } from "../hooks/use-transaction-out-summary"
 import { Box } from "common/components"
+import { TransactionOutSummaryFormState } from "stocks/components/send-complex-form"
 
 type TransactionOutSummaryProps = {
   data: TransactionOutSummaryFormState

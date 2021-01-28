@@ -28,7 +28,6 @@ import TransactionFilters from "./components/list-filters"
 
 import TransactionAdd from "./routes/transaction-add"
 import TransactionDetails from "./routes/transaction-details"
-import TransactionOutSummary from "./routes/transaction-out-summary"
 import TransactionInSummary from "./routes/transaction-in-summary"
 
 // prettier-ignore
@@ -229,10 +228,6 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
       <Switch>
         <Route relative path="add">
           <TransactionAdd entity={entity} refresh={refresh} />
-        </Route>
-
-        <Route relative path="show-summary-out">
-          <TransactionOutSummary entity={entity} />
         </Route>
 
         <Route relative path="show-summary-in">

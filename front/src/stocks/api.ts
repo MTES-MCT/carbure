@@ -1,8 +1,14 @@
 import { FilterSelection } from "transactions/hooks/query/use-filters"
-import { Lots, LotStatus, StockDraft, StockSnapshot, Transaction } from "common/types"
+import {
+  Lots,
+  LotStatus,
+  StockDraft,
+  StockSnapshot,
+  Transaction,
+} from "common/types"
 
 import api from "common/services/api"
-import { toOption } from "transactions/api"
+import { toOption } from "transactions/helpers"
 
 // give the same type to all filters in order to render them easily
 function normalizeStockSnapshotFilters(snapshot: any): StockSnapshot {
@@ -64,13 +70,10 @@ export function getStocks(
   })
 }
 
-export function createDraftsFromStock(
-  entity_id: number,
-  drafts: StockDraft[]
-) {
+export function createDraftsFromStock(entity_id: number, drafts: StockDraft[]) {
   return api.post("/stocks/create-drafts", {
     entity_id,
-    drafts: JSON.stringify(drafts)
+    drafts: JSON.stringify(drafts),
   })
 }
 

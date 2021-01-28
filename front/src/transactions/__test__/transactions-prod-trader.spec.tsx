@@ -307,7 +307,6 @@ test("producer/trader: check sent actions", async () => {
 
   // check global actions
   await screen.findByText("Exporter")
-  screen.getByText("Rapport de sorties")
 
   // check row actions
   screen.getByTitle("Dupliquer le lot")
