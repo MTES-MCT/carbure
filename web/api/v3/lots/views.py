@@ -211,15 +211,15 @@ def get_declaration_summary(request, *args, **kwargs):
     txs_in = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Validated', lot__period=period_str, carbure_client=entity)
     data_in = {}
     for t in txs_in:
-        delivery_site = t.carbure_delivery_site.name if t.delivery_site_is_in_carbure and t.carbure_delivery_site else t.unknown_delivery_site
-        if delivery_site not in data_in:
-            data_in[delivery_site] = {}
         vendor = t.carbure_vendor.name if t.carbure_vendor else t.unknown_vendor
-        if vendor not in data_in[delivery_site]:
-            data_in[delivery_site][vendor] = {}
-        if t.lot.biocarburant.name not in data_in[delivery_site][vendor]:
-            data_in[delivery_site][vendor][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
-        line = data_in[delivery_site][vendor][t.lot.biocarburant.name]
+        if vendor not in data_in:
+            data_in[vendor] = {}
+        delivery_site = t.carbure_delivery_site.name if t.delivery_site_is_in_carbure and t.carbure_delivery_site else t.unknown_delivery_site
+        if delivery_site not in data_in[vendor]:
+            data_in[vendor][delivery_site] = {}
+        if t.lot.biocarburant.name not in data_in[vendor][delivery_site]:
+            data_in[vendor][delivery_site][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
+        line = data_in[vendor][delivery_site][t.lot.biocarburant.name]
         line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
                                      t.lot.volume * t.lot.ghg_reduction) / (line['volume'] + t.lot.volume)
         line['volume'] += t.lot.volume    
