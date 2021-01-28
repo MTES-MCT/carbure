@@ -370,10 +370,11 @@ export interface Declaration {
   }
 }
 
-export interface DeclarationSummary {
-  client: string
+export interface SummaryItem {
+  entity: string
   depot: string
   biocarburant: string
+  lots: number
   volume: number
   avg_ghg_reduction: number
 }
