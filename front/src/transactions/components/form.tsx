@@ -458,7 +458,7 @@ const TransactionForm = ({
                 name="eccr"
                 value={tx.eccr}
                 error={fieldErrors.eccr}
-                tooltip="Réductions d\'émissions dues au piégeage et à la substitution du carbone"
+                tooltip="Réductions d'émissions dues au piégeage et à la substitution du carbone"
                 step={0.1}
                 onChange={onChange}
               />
