@@ -695,7 +695,7 @@ def validate_declaration(request, *args, **kwargs):
     try:
         py = int(period_year)
         pm = int(period_month)
-        period = datetime.date(year=py, month=pm)
+        period = datetime.date(year=py, month=pm, day=1)
         declaration, created = SustainabilityDeclaration.objects.update_or_create(entity=entity, period=period, defaults={'declared': True})
     except Exception as e:
         print("Error while getting period")
