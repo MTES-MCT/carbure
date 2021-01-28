@@ -185,7 +185,7 @@ def get_declaration_summary(request, *args, **kwargs):
     if period_month is None or period_year is None:
         return JsonResponse({'status': "error", 'message': "Missing periods"}, status=400)
 
-    period_date = datetime.date(year=int(period_year), month=int(period_month))
+    period_date = datetime.date(year=int(period_year), month=int(period_month), day=1)
     period_str = period_date.strftime('%Y-%m')
 
     # get declared lots 
@@ -224,7 +224,10 @@ def get_declaration_summary(request, *args, **kwargs):
                                      t.lot.volume * t.lot.ghg_reduction) / (line['volume'] + t.lot.volume)
         line['volume'] += t.lot.volume    
         line['lots'] += 1
-    data = {'in': data_in, 'out': data_out}
+
+    # get associated declaration
+    declaration, created = SustainabilityDeclaration.objects.get_or_create(entity=entity, period=period_date)
+    data = {'in': data_in, 'out': data_out, 'declaration': declaration.natural_key()}
     return JsonResponse({'status': 'success', 'data': data})
 
 
