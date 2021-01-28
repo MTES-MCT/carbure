@@ -32,7 +32,6 @@ import {
   ProducerImportActions,
   OperatorImportActions,
   ExportActions,
-  OutSummaryActions,
   InboxActions,
   InboxSummaryActions,
   ToFixActions,
@@ -105,8 +104,6 @@ export const TransactionList = ({
             isEmpty={isEmpty}
             onExportAll={transactions.exportAllTransactions}
           />
-
-          {status.is(LotStatus.Validated) && <OutSummaryActions />}
 
           {(isOperator || isTrader) && status.is(LotStatus.Inbox) && (
             <InboxSummaryActions />

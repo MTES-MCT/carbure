@@ -5,7 +5,7 @@ import fr from "date-fns/locale/fr"
 
 import { LotDetails, Transaction } from "common/types"
 import { Box, Title } from "common/components"
-import { hasDeadline } from "../api"
+import { hasDeadline } from "../helpers"
 
 import styles from "./status.module.css"
 

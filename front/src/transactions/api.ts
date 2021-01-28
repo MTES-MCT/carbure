@@ -3,75 +3,12 @@ import {
   Lots,
   LotStatus,
   Snapshot,
-  Filters,
   LotDetails,
 } from "common/types"
 import { FilterSelection } from "transactions/hooks/query/use-filters"
 
 import api from "common/services/api"
-import differenceInCalendarMonths from "date-fns/differenceInCalendarMonths"
-
-export function toOption(value: string) {
-  return { value, label: value }
-}
-
-export function hasDeadline(tx: Transaction, deadline: string): boolean {
-  if (!tx || tx.lot.status !== "Draft") return false
-
-  const deadlineDate = new Date(deadline)
-
-  const deliveryDate = tx?.delivery_date
-    ? new Date(tx.delivery_date)
-    : new Date()
-
-  return differenceInCalendarMonths(deadlineDate, deliveryDate) === 1
-}
-
-// give the same type to all filters in order to render them easily
-function normalizeFilters(snapshot: any): Snapshot {
-  Object.values(Filters).forEach((key) => {
-    const filter = snapshot.filters[key]
-
-    if (filter && typeof filter[0] === "string") {
-      snapshot.filters[key] = filter.map(toOption)
-    }
-  })
-
-  snapshot.years = snapshot.years.map(toOption)
-
-  return snapshot
-}
-
-// extract the status name from the lot details
-export function getStatus(transaction: Transaction, entity: number): LotStatus {
-  const status = transaction.lot.status.toLowerCase()
-  const delivery = transaction.delivery_status
-
-  const isVendor = transaction.carbure_vendor?.id === entity
-  const isClient = transaction.carbure_client?.id === entity
-
-  if (status === "draft") {
-    return LotStatus.Draft
-  } else if (status === "validated") {
-    if (delivery === "A") {
-      return LotStatus.Accepted
-    }
-    // OPERATEUR
-    else if (isClient && ["N", "AA", "AC"].includes(delivery)) {
-      return LotStatus.Inbox
-    }
-    // PRODUCTEUR
-    else if (isVendor) {
-      if (["N", "AA"].includes(delivery)) {
-        return LotStatus.Validated
-      } else if (["AC", "R"].includes(delivery)) {
-        return LotStatus.ToFix
-      }
-    }
-  }
-
-  return LotStatus.Weird
-}
+import { flattenSummary, normalizeFilters } from "./helpers"
 
 export function getSnapshot(entityID: number, year: number): Promise<Snapshot> {
   return api
@@ -340,9 +277,11 @@ export function rejectAllInboxLots(
 }
 
 export function getLotsOutSummary(entityID: number) {
-  return api.get("/lots/summary-out", {
-    entity_id: entityID,
-  })
+  return api
+    .get("/lots/summary-out", {
+      entity_id: entityID,
+    })
+    .then(flattenSummary)
 }
 
 export function getLotsInSummary(entityID: number) {
@@ -351,8 +290,16 @@ export function getLotsInSummary(entityID: number) {
   })
 }
 
-export function declareLots(entity_id: number, period: string) {
-  return api.post("/lots/declaration", { entity_id, period })
+export function validateDeclaration(
+  entity_id: number,
+  period_year: number,
+  period_month: number
+) {
+  return api.post("/lots/validate-declaration", {
+    entity_id,
+    period_year,
+    period_month,
+  })
 }
 
 // ADMIN

@@ -1,6 +1,16 @@
 import React from "react"
-import { TransactionOutSummaryFormState } from "transactions/hooks/use-transaction-out-summary"
 import { Box } from "common/components"
+
+export interface TransactionOutSummaryFormState {
+  [client: string]: {
+    [delivery_site: string]: {
+      [biocarburant: string]: {
+        volume: number
+        avg_ghg_reduction: number
+      }
+    }
+  }
+}
 
 type StockSendComplexFormProps = {
   data: TransactionOutSummaryFormState

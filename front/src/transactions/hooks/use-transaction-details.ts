@@ -13,6 +13,7 @@ import useAPI from "common/hooks/use-api"
 import useClose from "common/hooks/use-close"
 import { useNotificationContext } from "common/components/notifications"
 import * as api from "../api"
+import { getStatus } from "transactions/helpers"
 
 export function getFieldErrors(errors: Errors) {
   const fieldErrors: { [k: string]: string } = {}
@@ -52,7 +53,7 @@ export default function useTransactionDetails(
 
   const fieldErrors = details.data ? getFieldErrors(details.data.errors) : {}
   const validationErrors = details.data?.errors.validation_errors ?? []
-  const status = tx && entity ? api.getStatus(tx, entity.id) : LotStatus.Weird
+  const status = tx && entity ? getStatus(tx, entity.id) : LotStatus.Weird
 
   function refreshDetails() {
     if (typeof entityID !== "undefined") {

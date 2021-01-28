@@ -6,7 +6,7 @@ import { SortingSelection } from "transactions/hooks/query/use-sort-by" // prett
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { StatusSelection } from "transactions/hooks/query/use-status"
 
-import { hasDeadline } from "../api"
+import { hasDeadline } from "../helpers"
 import { useRelativePush } from "common/components/relative-route"
 
 import { AlertTriangle, Check, Copy, Cross } from "common/components/icons"

@@ -369,3 +369,11 @@ export interface Declaration {
     corrections: number
   }
 }
+
+export interface DeclarationSummary {
+  client: string
+  depot: string
+  biocarburant: string
+  volume: number
+  avg_ghg_reduction: number
+}
