@@ -484,6 +484,7 @@ def template_operators(entity):
     make_mps_sheet(workbook)
     make_biofuels_sheet(workbook)
     make_countries_sheet(workbook)
+    make_deliverysites_sheet(workbook)
     workbook.close()
     return location
 
