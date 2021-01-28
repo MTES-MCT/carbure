@@ -57,7 +57,7 @@ export default function useRejectLots(
     )
 
     if (entity !== null && comment) {
-      notifyReject(resolveReject(entity.id, [lotID], comment))
+      await notifyReject(resolveReject(entity.id, [lotID], comment))
     }
 
     return Boolean(comment)
@@ -71,7 +71,10 @@ export default function useRejectLots(
     )
 
     if (entity !== null && comment) {
-      notifyReject(resolveReject(entity.id, selection.selected, comment), true)
+      await notifyReject(
+        resolveReject(entity.id, selection.selected, comment),
+        true
+      )
     }
 
     return Boolean(comment)
@@ -85,7 +88,10 @@ export default function useRejectLots(
     )
 
     if (entity !== null && comment) {
-      notifyReject(resolveRejectAll(entity.id, year.selected, comment), true)
+      await notifyReject(
+        resolveRejectAll(entity.id, year.selected, comment),
+        true
+      )
     }
 
     return Boolean(comment)

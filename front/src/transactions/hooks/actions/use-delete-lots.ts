@@ -55,7 +55,7 @@ export default function useDeleteLots(
     )
 
     if (entity !== null && shouldDelete) {
-      notifyDelete(resolveDelete(entity.id, [lotID]))
+      await notifyDelete(resolveDelete(entity.id, [lotID]))
     }
 
     return shouldDelete
@@ -68,7 +68,7 @@ export default function useDeleteLots(
     )
 
     if (entity !== null && shouldDelete) {
-      notifyDelete(resolveDelete(entity.id, selection.selected), true)
+      await notifyDelete(resolveDelete(entity.id, selection.selected), true)
     }
 
     return shouldDelete
@@ -81,7 +81,7 @@ export default function useDeleteLots(
     )
 
     if (entity !== null && shouldDelete) {
-      notifyDelete(resolveDeleteAll(entity.id, year.selected), true)
+      await notifyDelete(resolveDeleteAll(entity.id, year.selected), true)
     }
 
     return shouldDelete
