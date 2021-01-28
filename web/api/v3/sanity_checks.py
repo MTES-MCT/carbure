@@ -88,7 +88,7 @@ def sanity_check(tx):
         errors.append(raise_warning(lot, 'VOLUME_FAIBLE'))
 
     # réduction de GES
-    if lot.ghg_reduction > 100:
+    if lot.ghg_reduction >= 100:
         is_sane = False
         errors.append(raise_error(lot, 'GHG_REDUC_SUP_100', details="GES reduction %f%%" % (lot.ghg_reduction)))
     if lot.ghg_reduction > 99:
