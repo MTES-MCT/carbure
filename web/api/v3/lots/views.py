@@ -199,11 +199,12 @@ def get_declaration_summary(request, *args, **kwargs):
         if delivery_site not in data_out[client_name]:
             data_out[client_name][delivery_site] = {}
         if t.lot.biocarburant.name not in data_out[client_name][delivery_site]:
-            data_out[client_name][delivery_site][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0}
+            data_out[client_name][delivery_site][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
         line = data_out[client_name][delivery_site][t.lot.biocarburant.name]
         line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
                                      t.lot.volume * t.lot.ghg_reduction) / (line['volume'] + t.lot.volume)
         line['volume'] += t.lot.volume
+        line['lots'] += 1
 
     ## lots received
     txs_in = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Validated', lot__period=period_str, carbure_client=entity)
@@ -215,11 +216,12 @@ def get_declaration_summary(request, *args, **kwargs):
         if t.carbure_vendor.name not in data_in[delivery_site]:
             data_in[delivery_site][t.carbure_vendor.name] = {}
         if t.lot.biocarburant.name not in data_in[delivery_site][t.carbure_vendor.name]:
-            data_in[delivery_site][t.carbure_vendor.name][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0}
+            data_in[delivery_site][t.carbure_vendor.name][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
         line = data_in[delivery_site][t.carbure_vendor.name][t.lot.biocarburant.name]
         line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
                                      t.lot.volume * t.lot.ghg_reduction) / (line['volume'] + t.lot.volume)
         line['volume'] += t.lot.volume    
+        line['lots'] += 1
     data = {'in': data_in, 'out': data_out}
     return JsonResponse({'status': 'success', 'data': data})
 
