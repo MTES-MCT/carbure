@@ -58,7 +58,7 @@ export default function useValidateLots(
     )
 
     if (entity !== null && shouldValidate) {
-      notifyValidate(resolveValidate(entity.id, [lotID]))
+      await notifyValidate(resolveValidate(entity.id, [lotID]))
     }
 
     return shouldValidate
@@ -72,7 +72,7 @@ export default function useValidateLots(
     )
 
     if (entity !== null && comment) {
-      notifyValidate(resolveValidateAndComment(entity.id, lotID, comment))
+      await notifyValidate(resolveValidateAndComment(entity.id, lotID, comment))
     }
 
     return Boolean(comment)
@@ -85,7 +85,7 @@ export default function useValidateLots(
     )
 
     if (entity !== null && shouldValidate) {
-      notifyValidate(resolveValidate(entity.id, selection.selected), true)
+      await notifyValidate(resolveValidate(entity.id, selection.selected), true)
     }
 
     return shouldValidate
@@ -98,7 +98,7 @@ export default function useValidateLots(
     )
 
     if (entity !== null && shouldValidate) {
-      notifyValidate(resolveValidateAll(entity.id, year.selected), true)
+      await notifyValidate(resolveValidateAll(entity.id, year.selected), true)
     }
 
     return shouldValidate
