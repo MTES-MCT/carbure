@@ -326,9 +326,9 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
             try:
                 com_date = lot_row['production_site_commissioning_date']
                 if isinstance(com_date, datetime.datetime):
-                    dd = delivery_date.date()
+                    dd = com_date.date()
                 elif isinstance(com_date, datetime.date):
-                    dd = delivery_date
+                    dd = com_date
                 else:
                     dd = dateutil.parser.parse(com_date, dayfirst=True).date()
                 lot.unknown_production_site_com_date = dd
