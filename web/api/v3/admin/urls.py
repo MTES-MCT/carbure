@@ -18,6 +18,7 @@ urlpatterns = [
     path('controls', views.get_controls, name='api-v3-admin-get-controls'),
     path('controls/open', views.open_control, name='api-v3-admin-open-control'),
     path('controls/close', views.close_control, name='api-v3-admin-close-control'),
+    path('controls/add-message', views.controls_add_message, name='api-v3-admin-control-add-message'),
 
     path('dashboard/declarations', views.get_declarations, name='api-v3-admin-get-declarations'),
     path('dashboard/declaration/send-reminder', views.send_declaration_reminder, name='api-v3-admin-send-declaration-reminder'),
