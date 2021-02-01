@@ -325,10 +325,12 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
         if 'production_site_commissioning_date' in lot_row:
             try:
                 com_date = lot_row['production_site_commissioning_date']
-                if isinstance(com_date, str):
-                    dd = dateutil.parser.parse(com_date, dayfirst=True)
+                if isinstance(com_date, datetime.datetime):
+                    dd = delivery_date.date()
+                elif isinstance(com_date, datetime.date):
+                    dd = delivery_date
                 else:
-                    dd = com_date
+                    dd = dateutil.parser.parse(com_date, dayfirst=True).date()
                 lot.unknown_production_site_com_date = dd
             except Exception as e:
                 msg = "Date de mise en service: veuillez entrer une date au format JJ/MM/AAAA"
