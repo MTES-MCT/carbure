@@ -702,8 +702,8 @@ class ControlFiles(models.Model):
 
 class ControlMessages(models.Model):
     control = models.ForeignKey(Control, on_delete=models.CASCADE)
-    entity = models.ForeignKey(Entity, on_delete=models.SET_NULL)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL)
+    entity = models.ForeignKey(Entity, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     message = models.TextField(blank=False, null=False)
     dt_added = models.DateTimeField(auto_now_add=True)
 

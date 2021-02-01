@@ -8,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
 from core.decorators import is_admin
 from django.contrib.auth import get_user_model
-from core.models import Entity, UserRights
+from core.models import Entity, UserRights, Control, ControlMessages
 from django.db.models import Q, Count
 from django.contrib.auth.forms import PasswordResetForm
 
@@ -418,3 +418,26 @@ def uncheck_declaration(request):
     dec.save()
     return JsonResponse({"status": "success"})
 
+@is_admin
+def controls_add_message(request):
+    control_id = request.POST.get('control_id', False)
+    message = request.POST.get('message', False)
+
+    if not control_id:
+        return JsonResponse({'status': 'error', 'message': 'Please submit a control_id'}, status=400)
+    if not message:
+        return JsonResponse({'status': 'error', 'message': 'Please submit a message'}, status=400)
+
+    try:
+        control = Control.objects.get(id=control_id)
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Could not find control'}, status=400)
+
+    # all good
+    msg = ControlMessages()
+    msg.control = control
+    msg.user = request.user
+    msg.entity = Entity.objects.filter(entity_type='Administrateur')[0]
+    msg.message = message
+    msg.save()
+    return JsonResponse({'status': 'success'})

@@ -3,7 +3,9 @@ from django.http import JsonResponse
 from django.db.models import Q
 from core.models import Entity, Biocarburant, MatierePremiere, Depot, Pays
 from core.models import ISCCCertificate, DBSCertificate
+from core.models import Control, ControlMessages, UserRights
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
+from core.decorators import check_rights
 from django_otp.decorators import otp_required
 
 def get_matieres_premieres(request):
