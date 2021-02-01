@@ -18,4 +18,10 @@ urlpatterns = [
 
     # POST
     path('create-delivery-site', views.create_delivery_site, name='api-v3-public-create-delivery-site'),
+
+    # CONTROLS
+    path('controls/get', views.get_controls, name='api-v3-public-controls-get'),
+    path('controls/upload-document', views.controls_upload_file, name='api-v3-public-controls-upload'),
+    path('controls/add-message', views.controls_add_message, name='api-v3-public-controls-add-message'),
+
 ]

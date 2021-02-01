@@ -680,6 +680,9 @@ class Control(models.Model):
     opened_at = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
 
+    def natural_key(self):
+        return {'tx': self.tx.natural_key(), 'status': self.status, 'opened_at': self.opened_at, 'last_update': self.last_update}
+
     class Meta:
         db_table = 'controls'
         verbose_name = 'Contrôle Lot'
@@ -696,6 +699,21 @@ class ControlFiles(models.Model):
         verbose_name = 'Contrôle - Justificatif'
         verbose_name_plural = 'Contrôles - Justificatifs'
 
+
+class ControlMessages(models.Model):
+    control = models.ForeignKey(Control, on_delete=models.CASCADE)
+    entity = models.ForeignKey(Entity, on_delete=models.SET_NULL)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL)
+    message = models.TextField(blank=False, null=False)
+    dt_added = models.DateTimeField(auto_now_add=True)
+
+    def natural_key(self):
+        return {'entity': self.entity.natural_key(), 'message': self.message, 'dt_addded': self.dt_added}
+
+    class Meta:
+        db_table = 'control_messages'
+        verbose_name = 'Contrôle - Message'
+        verbose_name_plural = 'Contrôles - Messages'
 
 class SustainabilityDeclaration(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)

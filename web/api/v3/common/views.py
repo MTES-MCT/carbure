@@ -203,3 +203,45 @@ def create_delivery_site(request):
         print(e)
         return JsonResponse({'status': 'error', 'message': 'Server error'}, status=500)
     return JsonResponse({'status': 'success'})
+
+
+@otp_required
+@check_rights('entity_id')
+def get_controls(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    controls = Control.objects.filter(tx__lot__data_origin_entity=entity)
+    sez = [c.natural_key() for c in controls]
+    return JsonResponse({'status': 'success', 'data': sez})
+
+@otp_required
+def controls_upload_file(request):
+    return JsonResponse({'status': 'success'})
+
+@otp_required
+def controls_add_message(request):
+    control_id = request.POST.get('control_id', False)
+    message = request.POST.get('message', False)
+
+    if not control_id:
+        return JsonResponse({'status': 'error', 'message': 'Please submit a control_id'}, status=400)
+    if not message:
+        return JsonResponse({'status': 'error', 'message': 'Please submit a message'}, status=400)
+
+    try:
+        control = Control.objects.get(id=control_id)
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Could not find control'}, status=400)
+
+    rights = {r.entity for r in UserRights.objects.filter(user=request.user)}
+    if control.tx.lot.data_origin_entity not in rights:
+        return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
+
+    # all good
+    msg = ControlMessages()
+    msg.control = control
+    msg.user = request.user
+    msg.entity = control.tx.lot.data_origin_entity
+    msg.message = message
+    msg.save()
+    return JsonResponse({'status': 'success'})
