@@ -147,7 +147,7 @@ export const TransactionList = ({
         </ActionBar>
       )}
 
-      {!isLoading && !special.deadline && errorCount > 0 && (
+      {!isLoading && !special.deadline && errorCount > 0 && !status.is(LotStatus.Accepted) && (
         <InvalidFilter errorCount={errorCount} special={special} />
       )}
 
