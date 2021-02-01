@@ -795,7 +795,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
                     lot, tx, l_errors, t_errors = load_lot(prefetched_data, entity, user, lot_row, 'EXCEL')
                 if lot is None:
                     # could not load line. missing column biocaburant_code?
-                    print(lot_row)
+                    #print(lot_row)
                     print(l_errors)
                     print(t_errors)
                     continue
@@ -806,7 +806,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
                 tx_errors.append(t_errors)
             except Exception as e:
                 print(e)
-                print(lot_row)
+                #print(lot_row)
         print('File processed %s' % (datetime.datetime.now()))
         bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors)
         print('%d Lots out of %d lines loaded in database %s' % (lots_loaded, total_lots, datetime.datetime.now()))
