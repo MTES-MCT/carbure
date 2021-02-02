@@ -153,7 +153,7 @@ def is_admin(function):
     def wrap(request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'status': 'forbidden', 'message': "User not authenticated"}, status=403)
-        if not request.user.is_verified:
+        if not request.user.is_verified():
             return JsonResponse({'status': 'forbidden', 'message': "User not verified"}, status=403)
         if not request.user.is_staff:
             return JsonResponse({'status': 'forbidden', 'message': "User not admin"}, status=403)
@@ -164,7 +164,7 @@ def is_admin(function):
 def otp_or_403(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):
-        if not request.user.is_verified:
+        if not request.user.is_verified():
             return JsonResponse({'status': 'forbidden', 'message': "User not verified"}, status=403)
         return function(request, *args, **kwargs)
     return wrap
