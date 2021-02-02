@@ -119,6 +119,8 @@ class Biocarburant(models.Model):
 
 
 class MatierePremiere(models.Model):
+    MP_CATEGORIES = (('CONV', 'Conventionnel'), ('ANN-IX-A', 'ANNEXE IX-A'), ('ANN-IX-B', 'ANNEXE IX-B'), ('OTHER', 'Autre'))
+
     name = models.CharField(max_length=128)
     description = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
@@ -128,6 +130,7 @@ class MatierePremiere(models.Model):
     is_double_compte = models.BooleanField(default=False)
     is_huile_vegetale = models.BooleanField(default=False)
     is_displayed = models.BooleanField(default=True)
+    category = models.CharField(max_length=32, choices=MP_CATEGORIES, default='CONV')
 
 
     def __str__(self):
