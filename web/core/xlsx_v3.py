@@ -380,11 +380,13 @@ def make_mps_sheet(workbook):
     bold = workbook.add_format({'bold': True})
     worksheet_mps.write('A1', 'code', bold)
     worksheet_mps.write('B1', 'name', bold)
+    worksheet_mps.write('C1', 'category', bold)
     # content
     row = 1
     for m in mps:
         worksheet_mps.write(row, 0, m.code)
         worksheet_mps.write(row, 1, m.name)
+        worksheet_mps.write(row, 2, m.category)
         row += 1
 
 
