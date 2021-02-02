@@ -12,7 +12,12 @@ export type InputProps = SystemProps &
   }
 
 export const Input = ({ className, innerRef, ...props }: InputProps) => (
-  <input {...props} ref={innerRef} className={cl(styles.input, className)} />
+  <input
+    {...props}
+    type={props.readOnly ? "text" : props.type}
+    ref={innerRef}
+    className={cl(styles.input, className)}
+  />
 )
 // LABEL COMPONENT
 
@@ -29,6 +34,7 @@ export const Label = ({
   error,
   tooltip,
   label,
+  readOnly,
   children,
   ...props
 }: LabelProps) => (
@@ -37,7 +43,7 @@ export const Label = ({
     title={error ? error : tooltip}
     className={cl(
       styles.labelWrapper,
-      disabled && styles.disabledLabel,
+      !readOnly && disabled && styles.disabledLabel,
       error && styles.errorLabel,
       className
     )}
