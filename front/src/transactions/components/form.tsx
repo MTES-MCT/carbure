@@ -183,12 +183,14 @@ const TransactionForm = ({
               />
               <LabelInput
                 disabled
+                readOnly={readOnly}
                 name="carbure_production_site_country"
                 label="Pays de production"
                 value={tx.carbure_production_site?.country?.name ?? ""}
               />
               <LabelInput
                 disabled
+                readOnly={readOnly}
                 name="carbure_production_site_date"
                 type="date"
                 label="Date de mise en service"
@@ -196,12 +198,14 @@ const TransactionForm = ({
               />
               <LabelInput
                 disabled
+                readOnly={readOnly}
                 name="carbure_production_site_dbl_counting"
                 label="N° d'enregistrement double-compte"
                 value=""
               />
               <LabelInput
                 disabled
+                readOnly={readOnly}
                 name="carbure_production_site_reference"
                 label="Référence Système Fournisseur"
                 value=""
@@ -336,6 +340,7 @@ const TransactionForm = ({
           {tx.delivery_site_is_in_carbure ? (
             <LabelInput
               disabled
+              readOnly={readOnly}
               label="Pays de livraison"
               name="carbure_delivery_site_country"
               value={tx.carbure_delivery_site?.country?.name ?? ""}

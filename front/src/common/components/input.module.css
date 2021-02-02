@@ -26,13 +26,13 @@
   border-color: var(--blue-medium);
 }
 
-.input:read-only,
-.textarea:read-only {
+.input:read-only:not(:disabled),
+.textarea:read-only:not(:disabled) {
   color: initial;
   border: none;
   border: 1px solid transparent;
   border-top-color: var(--gray-medium);
-  background-color: transparent !important;
+  background-color: transparent;
 }
 
 .input:disabled,
