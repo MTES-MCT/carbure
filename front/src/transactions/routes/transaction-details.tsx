@@ -80,7 +80,7 @@ const TransactionDetails = ({
 
   return (
     <Modal onClose={close}>
-      <StatusTitle editable={isEditable} details={details.data}>
+      <StatusTitle editable={isEditable} details={details.data} entity={entity}>
         Détails de la transaction
       </StatusTitle>
 

@@ -8,17 +8,20 @@ import { Box } from "common/components"
 import Status from "./status"
 
 import styles from "./list-columns.module.css"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
 export const empty: Column<any> = {
   className: styles.checkboxColumn,
   render: () => null,
 }
 
-export const status: Column<Transaction> = {
+export const status: (e: EntitySelection) => Column<Transaction> = (
+  entity
+) => ({
   header: "Statut",
-  className: styles.narrowColumn,
-  render: (tx) => <Status small transaction={tx} />,
-}
+  className: styles.statusColumn,
+  render: (tx) => <Status small transaction={tx} entity={entity} />,
+})
 
 export const carbureID: Column<Transaction> = {
   header: "ID",

@@ -16,7 +16,6 @@ import * as C from "./list-columns"
 import styles from "./list-table.module.css"
 
 export const PRODUCER_COLUMNS = [
-  C.status,
   C.period,
   C.dae,
   C.biocarburant,
@@ -28,7 +27,6 @@ export const PRODUCER_COLUMNS = [
 ]
 
 export const OPERATOR_COLUMNS = [
-  C.status,
   C.period,
   C.dae,
   C.biocarburant,
@@ -40,7 +38,6 @@ export const OPERATOR_COLUMNS = [
 ]
 
 export const ADMIN_COLUMNS = [
-  C.status,
   C.period,
   C.dae,
   C.biocarburant,
@@ -126,6 +123,8 @@ export const TransactionTable = ({
   } else {
     columns.push(C.empty)
   }
+
+  columns.push(C.status(entity))
 
   if (isProducer || isTrader) {
     columns.push(...PRODUCER_COLUMNS)

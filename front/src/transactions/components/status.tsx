@@ -8,14 +8,18 @@ import { Box, Title } from "common/components"
 import { hasDeadline } from "../helpers"
 
 import styles from "./status.module.css"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
 function getStatusText(
   tx: Transaction | undefined,
+  entity?: EntitySelection,
   isStock: boolean = false
 ): string {
   if (!tx || tx.lot.status === "Draft") {
     return isStock ? "À envoyer" : "Brouillon"
   }
+
+  const isVendor = tx.carbure_vendor?.id === entity?.id
 
   switch (tx.delivery_status) {
     case "N":
@@ -25,7 +29,7 @@ function getStatusText(
     case "R":
       return "Refusé"
     case "AC":
-      return "À corriger"
+      return isVendor ? "À corriger" : "En correction"
     case "AA":
       return "Corrigé"
   }
@@ -33,7 +37,8 @@ function getStatusText(
 
 function getStatusClass(
   tx: Transaction | undefined,
-  isStock?: boolean
+  entity?: EntitySelection,
+  isStock: boolean = false
 ): string {
   if (!tx || tx.lot.status === "Draft") {
     return isStock ? styles.statusWaiting : ""
@@ -55,18 +60,19 @@ function getStatusClass(
 type StatusProps = {
   stock?: boolean
   small?: boolean
+  entity?: EntitySelection
   transaction: Transaction | undefined
 }
 
-const Status = ({ stock, small, transaction }: StatusProps) => (
+const Status = ({ stock, small, transaction, entity }: StatusProps) => (
   <span
     className={cl(
       styles.status,
       small && styles.smallStatus,
-      getStatusClass(transaction, stock)
+      getStatusClass(transaction, entity, stock)
     )}
   >
-    {getStatusText(transaction, stock)}
+    {getStatusText(transaction, entity, stock)}
   </span>
 )
 
@@ -74,6 +80,7 @@ type StatusTitleProps = {
   stock?: boolean
   editable?: boolean
   details?: LotDetails | null
+  entity?: EntitySelection
   children: React.ReactNode
 }
 
@@ -81,6 +88,7 @@ export const StatusTitle = ({
   stock,
   editable,
   details,
+  entity,
   children,
 }: StatusTitleProps) => {
   const deadlineDate = details
@@ -90,7 +98,12 @@ export const StatusTitle = ({
   return (
     <Box row className={styles.statusTitle}>
       <Title>{children}</Title>
-      <Status stock={stock} transaction={details?.transaction} />
+
+      <Status
+        stock={stock}
+        transaction={details?.transaction}
+        entity={entity}
+      />
 
       {details && hasDeadline(details.transaction, details.deadline) && (
         <span className={styles.transactionDeadline}>
