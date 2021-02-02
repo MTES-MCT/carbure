@@ -4,16 +4,18 @@ from dateutil.relativedelta import *
 from django.http import JsonResponse
 from django.db.models import Q
 from django_otp.decorators import otp_required
-from core.models import Entity, UserRights, LotV2, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
-from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput, ProducerCertificate
-from core.decorators import check_rights
-from core.models import ISCCCertificate, DBSCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate
-from core.models import ProductionSiteCertificate, UserRightsRequests
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.conf import settings
 
-@otp_required
+from core.models import Entity, UserRights, LotV2, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
+from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput, ProducerCertificate
+from core.decorators import check_rights, otp_or_403
+from core.models import ISCCCertificate, DBSCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate
+from core.models import ProductionSiteCertificate, UserRightsRequests
+
+
+@otp_or_403
 def get_settings(request):
     # user-rights
     rights = UserRights.objects.filter(user=request.user)
@@ -182,7 +184,7 @@ def update_production_site(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@otp_required
+@otp_or_403
 def delete_production_site(request):
     site = request.POST.get('production_site_id')
     try:
@@ -205,7 +207,7 @@ def delete_production_site(request):
     return JsonResponse({'status': 'success'})
 
 
-@otp_required
+@otp_or_403
 def set_production_site_mp(request):
     site = request.POST.get('production_site_id')
     mp_list = request.POST.getlist('matiere_premiere_codes')
@@ -242,7 +244,7 @@ def set_production_site_mp(request):
     return JsonResponse({'status': 'success'})
 
 
-@otp_required
+@otp_or_403
 def set_production_site_bc(request):
     site = request.POST.get('production_site_id')
     bc_list = request.POST.getlist('biocarburant_codes')
@@ -575,7 +577,7 @@ def update_2bs_certificate(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@otp_required
+@otp_or_403
 def request_entity_access(request):
     entity_id = request.POST.get('entity_id', False)
     comment = request.POST.get('comment', '')

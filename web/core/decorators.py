@@ -159,3 +159,12 @@ def is_admin(function):
             return JsonResponse({'status': 'forbidden', 'message': "User not admin"}, status=403)
         return function(request, *args, **kwargs)
     return wrap
+
+
+def otp_or_403(function):
+    @wraps(function)
+    def wrap(request, *args, **kwargs):
+        if not request.user.is_verified:
+            return JsonResponse({'status': 'forbidden', 'message': "User not verified"}, status=403)
+        return function(request, *args, **kwargs)
+    return wrap
