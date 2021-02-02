@@ -196,12 +196,9 @@ def get_declaration_summary(request, *args, **kwargs):
         client_name = t.carbure_client.name if t.client_is_in_carbure and t.carbure_client else t.unknown_client
         if client_name not in data_out:
             data_out[client_name] = {}
-        delivery_site = t.carbure_delivery_site.name if t.delivery_site_is_in_carbure and t.carbure_delivery_site else t.unknown_delivery_site
-        if delivery_site not in data_out[client_name]:
-            data_out[client_name][delivery_site] = {}
-        if t.lot.biocarburant.name not in data_out[client_name][delivery_site]:
-            data_out[client_name][delivery_site][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
-        line = data_out[client_name][delivery_site][t.lot.biocarburant.name]
+        if t.lot.biocarburant.name not in data_out[client_name]:
+            data_out[client_name][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
+        line = data_out[client_name][t.lot.biocarburant.name]
         total = (line['volume'] + t.lot.volume)
         line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
                                      t.lot.volume * t.lot.ghg_reduction) / total if total != 0 else 0
@@ -215,12 +212,9 @@ def get_declaration_summary(request, *args, **kwargs):
         vendor = t.carbure_vendor.name if t.carbure_vendor else t.unknown_vendor
         if vendor not in data_in:
             data_in[vendor] = {}
-        delivery_site = t.carbure_delivery_site.name if t.delivery_site_is_in_carbure and t.carbure_delivery_site else t.unknown_delivery_site
-        if delivery_site not in data_in[vendor]:
-            data_in[vendor][delivery_site] = {}
-        if t.lot.biocarburant.name not in data_in[vendor][delivery_site]:
-            data_in[vendor][delivery_site][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
-        line = data_in[vendor][delivery_site][t.lot.biocarburant.name]
+        if t.lot.biocarburant.name not in data_in[vendor]:
+            data_in[vendor][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
+        line = data_in[vendor][t.lot.biocarburant.name]
         line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
                                      t.lot.volume * t.lot.ghg_reduction) / (line['volume'] + t.lot.volume)
         line['volume'] += t.lot.volume    

@@ -25,10 +25,6 @@ import { useNotificationContext } from "common/components/notifications"
 
 const COLUMNS: Column<SummaryItem>[] = [
   {
-    header: "Site de livraison",
-    render: (d) => <Line text={d.depot} />,
-  },
-  {
     header: "Biocarburant",
     render: (d) => <Line text={d.biocarburant} />,
   },
