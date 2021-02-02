@@ -111,6 +111,10 @@ const Carbure = () => {
   const app = useApp()
   const { settings, getDefaultEntity } = app
 
+  if (settings.error === "User not verified") {
+    return <Exit to="/accounts/login" />
+  }
+
   return (
     <div id="app">
       {settings.error && (
