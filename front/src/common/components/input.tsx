@@ -14,8 +14,10 @@ export type InputProps = SystemProps &
 export const Input = ({ className, innerRef, ...props }: InputProps) => (
   <input
     {...props}
+    disabled={!props.readOnly && props.disabled}
     type={props.readOnly ? "text" : props.type}
     ref={innerRef}
+    placeholder={props.readOnly ? "N/A" : props.placeholder}
     className={cl(styles.input, className)}
   />
 )
@@ -77,6 +79,7 @@ export const LabelInput = ({
     tooltip={tooltip}
     label={label}
     className={className}
+    readOnly={props.readOnly}
   >
     <Input {...props} disabled={disabled} />
   </Label>
@@ -94,8 +97,16 @@ export const LabelTextArea = ({
   className,
   ...props
 }: LabelTextAreaProps) => (
-  <Label label={label} className={cl(styles.labelTextArea, className)}>
-    <textarea {...props} className={styles.textarea} />
+  <Label
+    label={label}
+    readOnly={props.readOnly}
+    className={cl(styles.labelTextArea, className)}
+  >
+    <textarea
+      {...props}
+      className={styles.textarea}
+      placeholder={props.readOnly ? "N/A" : props.placeholder}
+    />
   </Label>
 )
 // LABEL CHECKBOX COMPONENT
