@@ -91,11 +91,13 @@ def sanity_check(tx):
     if lot.ghg_reduction >= 100:
         is_sane = False
         errors.append(raise_error(lot, 'GHG_REDUC_SUP_100', details="GES reduction %f%%" % (lot.ghg_reduction)))
-    if lot.ghg_reduction > 99:
+    elif lot.ghg_reduction > 99:
         errors.append(raise_warning(lot, 'GHG_REDUC_SUP_99', details="GES reduction %f%%" % (lot.ghg_reduction)))
-    if lot.ghg_reduction < 50:
+    elif lot.ghg_reduction < 50:
         is_sane = False
         errors.append(raise_error(lot, 'GHG_REDUC_INF_50', details="GES reduction %f%%" % (lot.ghg_reduction)))
+    else:
+        pass
 
     commissioning_date = lot.carbure_production_site.date_mise_en_service if lot.carbure_production_site else lot.unknown_production_site_com_date
     if commissioning_date and isinstance(commissioning_date, datetime.datetime) or isinstance(commissioning_date, datetime.date):
