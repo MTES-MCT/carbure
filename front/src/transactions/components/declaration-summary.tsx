@@ -40,7 +40,7 @@ const COLUMNS: Column<SummaryItem>[] = [
   {
     header: "Réd. GES",
     className: colStyles.narrowColumn,
-    render: (d) => <Line text={`${d.avg_ghg_reduction}%`} />,
+    render: (d) => <Line text={`${d.avg_ghg_reduction.toFixed(2)}%`} />,
   },
   empty,
 ]
