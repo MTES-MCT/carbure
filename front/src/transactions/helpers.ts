@@ -74,17 +74,13 @@ export function flattenSummary(summary: any): SummaryItem[] {
   const rows = []
 
   for (const entity in summary) {
-    const deliveries = summary[entity]
-    for (const depot in deliveries) {
-      const biocarburants = deliveries[depot]
-      for (const biocarburant in biocarburants) {
-        rows.push({
-          entity,
-          depot,
-          biocarburant,
-          ...biocarburants[biocarburant],
-        })
-      }
+    const biocarburants = summary[entity]
+    for (const biocarburant in biocarburants) {
+      rows.push({
+        entity,
+        biocarburant,
+        ...biocarburants[biocarburant],
+      })
     }
   }
 
