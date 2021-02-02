@@ -399,7 +399,7 @@ test("operator: accept inbox lot (sous réserve)", async () => {
   await waitWhileLoading()
 
   // lot status has changed
-  await screen.findByText("À corriger")
+  await screen.findByText("En correction")
 })
 
 test("operator: accept all inbox lots", async () => {

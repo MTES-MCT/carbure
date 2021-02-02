@@ -339,7 +339,7 @@ test("accept inbox lot from details", async () => {
 
   await waitWhileLoading()
 
-  await screen.findByText("À corriger")
+  await screen.findByText("En correction")
 
   userEvent.click(screen.getByText("Accepter"))
 
@@ -365,7 +365,7 @@ test("accept sous reserve inbox lot from details", async () => {
 
   await waitWhileLoading()
 
-  const status = await screen.findByText("À corriger")
+  const status = await screen.findByText("En correction")
 
   userEvent.click(screen.getByText("Accepter sous réserve"))
 
@@ -392,7 +392,7 @@ test("reject inbox lot from details", async () => {
 
   await waitWhileLoading()
 
-  await screen.findByText("À corriger")
+  await screen.findByText("En correction")
 
   userEvent.click(screen.getByText("Refuser"))
 
