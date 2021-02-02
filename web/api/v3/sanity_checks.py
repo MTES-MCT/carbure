@@ -23,6 +23,8 @@ rules['GHG_REDUC_INF_65'] = "La réduction de gaz à effet de serre est inférie
 rules['MISSING_REF_DBL_COUNTING'] = "Numéro d'enregistrement Double Compte manquant"
 rules['VOLUME_FAIBLE'] = "Volume inhabituellement faible."
 rules['MAC_BC_WRONG'] = "Biocarburant incompatible avec un mise à consommation (seuls ED95 ou B100 sont autorisés)"
+rules['GHG_ETD_0'] = "Émissions GES liées au Transport et à la Distribution nulles"
+rules['GHG_EP_0'] = "Émissions GES liées à la Transformation de la matière première nulles"
 
 
 def raise_warning(lot, rule_triggered, details=''):
@@ -98,6 +100,13 @@ def sanity_check(tx):
         errors.append(raise_error(lot, 'GHG_REDUC_INF_50', details="GES reduction %f%%" % (lot.ghg_reduction)))
     else:
         pass
+
+    if lot.etd == 0:
+        is_sane = False
+        errors.append(raise_error(lot, 'GHG_ETD_0', details="GES Transport et Distribution nuls"))
+    if lot.ep == 0:
+        is_sane = False
+        errors.append(raise_error(lot, 'GHG_EP_0', details="GES Transformation/Production"))
 
     commissioning_date = lot.carbure_production_site.date_mise_en_service if lot.carbure_production_site else lot.unknown_production_site_com_date
     if commissioning_date and isinstance(commissioning_date, datetime.datetime) or isinstance(commissioning_date, datetime.date):
