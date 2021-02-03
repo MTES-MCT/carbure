@@ -71,13 +71,14 @@ const Entities = () => {
       <SettingsBody>
         <LabelInput
           label="Rechercher..."
+          placeholder="Entrez le nom d'une société..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
 
         {rows.length === 0 && (
           <Alert icon={AlertTriangle} level="warning">
-            Aucune société trouvée pour ces paramètres.
+            Aucune société trouvée pour cette recherche.
           </Alert>
         )}
 
