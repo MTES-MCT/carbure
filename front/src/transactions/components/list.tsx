@@ -54,7 +54,6 @@ type TransactionListProps = {
   duplicator: LotDuplicator
   acceptor: LotAcceptor
   rejector: LotRejector
-  declarator: LotDeclarator
 }
 
 export const TransactionList = ({
@@ -71,7 +70,6 @@ export const TransactionList = ({
   duplicator,
   acceptor,
   rejector,
-  declarator,
 }: TransactionListProps) => {
   const txs = transactions.data
   const errorCount = txs?.total_errors ?? 0
@@ -147,9 +145,12 @@ export const TransactionList = ({
         </ActionBar>
       )}
 
-      {!isLoading && !special.deadline && errorCount > 0 && !status.is(LotStatus.Accepted) && (
-        <InvalidFilter errorCount={errorCount} special={special} />
-      )}
+      {!isLoading &&
+        !special.deadline &&
+        errorCount > 0 &&
+        !status.is(LotStatus.Accepted) && (
+          <InvalidFilter errorCount={errorCount} special={special} />
+        )}
 
       {!isLoading && !special.invalid && deadlineCount > 0 && (
         <DeadlineFilter

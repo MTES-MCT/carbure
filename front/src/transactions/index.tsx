@@ -222,7 +222,6 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         duplicator={duplicator}
         acceptor={acceptor}
         rejector={rejector}
-        declarator={declarator}
       />
 
       <Switch>
