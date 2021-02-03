@@ -84,7 +84,7 @@ class DepotAdmin(admin.ModelAdmin):
 
 
 class LotV2Admin(admin.ModelAdmin):
-    list_display = ('period', 'carbure_id', 'carbure_producer', 'carbure_production_site', 'biocarburant', 'matiere_premiere', 'status',)
+    list_display = ('period', 'data_origin_entity', 'biocarburant', 'matiere_premiere', 'volume', 'status',)
     search_fields = ('carbure_producer__name', 'biocarburant__name', 'matiere_premiere__name', 'carbure_id', 'period',)
     list_filter = ('period', 'carbure_producer', 'is_split', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused', 'blocking_sanity_checked_passed', 'nonblocking_sanity_checked_passed', 'is_valid', 'added_by', 'added_by_user')
     raw_id_fields = ('fused_with', 'parent_lot', )
