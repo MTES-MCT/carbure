@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django_otp.plugins.otp_email.models import EmailDevice
 
 from core.models import Entity, UserRights
 from api.v3.admin.urls import urlpatterns
@@ -16,6 +17,15 @@ class AdminAPITest(TestCase):
 
         self.admin_user = user_model.objects.create_user(email=self.admin_email, name='Super Admin', password=self.admin_password, is_staff=True)
         self.fake_admin_user = user_model.objects.create_user(email=self.fake_admin_email, name='Super Admin', password=self.fake_admin_password)
+
+        # create OTP devices
+        for user in [self.admin_user, self.fake_admin_user]:
+            email_otp = EmailDevice()
+            email_otp.user = user
+            email_otp.name = 'email'
+            email_otp.confirmed = True
+            email_otp.email = user.email
+            email_otp.save()
 
         # let's create a few users
         self.user1 = user_model.objects.create_user(email='testuser1@toto.com', name='Le Super Testeur 1', password=self.fake_admin_password)
@@ -36,25 +46,42 @@ class AdminAPITest(TestCase):
         UserRights.objects.update_or_create(user=self.user2, entity=self.entity2)
         UserRights.objects.update_or_create(user=self.user3, entity=self.entity4)
 
+        # login as an admin
+        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
+        self.assertTrue(loggedin)
+        # pass otp        
+        usermodel = get_user_model()
+        user = usermodel.objects.get(email=self.admin_email)
+        device = EmailDevice.objects.get(user=user)
+        device.generate_token()
+        response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
+        self.assertEqual(response.status_code, 302) #  redirected to home page
+
+
+    def test_accessrights_as_admin(self):
+        for url in urlpatterns:
+            response = self.client.get(reverse(url.name))
+            self.assertNotEqual(response.status_code, 403)
+
 
     def test_accessrights(self):
         loggedin = self.client.login(username=self.fake_admin_email, password=self.fake_admin_password)
         self.assertTrue(loggedin)
+        # pass otp        
+        usermodel = get_user_model()
+        user = usermodel.objects.get(email=self.fake_admin_email)
+        device = EmailDevice.objects.get(user=user)
+        device.generate_token()
+        response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
+        self.assertEqual(response.status_code, 302) #  redirected to home page
         for url in urlpatterns:
             response = self.client.get(reverse(url.name))
             self.assertEqual(response.status_code, 403)
-        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
-        self.assertTrue(loggedin)
-        for url in urlpatterns:
-            response = self.client.get(reverse(url.name))
-            self.assertNotEqual(response.status_code, 403)
+
+
             
 
     def test_get_users(self):
-        # login as an admin
-        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
-        self.assertTrue(loggedin)
-
         response = self.client.get(reverse('api-v3-admin-get-users'))
         # api works
         self.assertEqual(response.status_code, 200)
@@ -74,10 +101,6 @@ class AdminAPITest(TestCase):
 
 
     def test_get_entities(self):
-        # login as an admin
-        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
-        self.assertTrue(loggedin)
-
         response = self.client.get(reverse('api-v3-admin-get-entities'))
         # api works
         self.assertEqual(response.status_code, 200)
@@ -97,8 +120,6 @@ class AdminAPITest(TestCase):
 
 
     def test_create_entity(self):
-        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
-        self.assertTrue(loggedin)
         response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Société Test', 'category': 'Producteur'})
         self.assertEquals(response.status_code, 200)
         # check if entity has been created actually exists
@@ -134,9 +155,6 @@ class AdminAPITest(TestCase):
 
 
     def test_delete_entity(self):
-        loggedin = self.client.login(username=self.admin_email, password=self.admin_password)
-        self.assertTrue(loggedin)
-
         response = self.client.post(reverse('api-v3-admin-add-entity'), {'name': 'Société Test', 'category': 'Producteur'})
         self.assertEquals(response.status_code, 200)
 
