@@ -58,7 +58,7 @@ test("operator: display an empty list of transactions", async () => {
 
   screen.getByPlaceholderText("Rechercher...")
 
-  screen.getByText("Aucune transaction trouvée pour ces paramètres")
+  screen.getByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("operator: display a list of 1 transaction", async () => {
@@ -198,7 +198,7 @@ test("operator: sent draft lot", async () => {
   screen.getByText("21")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("operator: sent all draft lots", async () => {
@@ -231,7 +231,7 @@ test("operator: sent all draft lots", async () => {
   screen.getByText("21")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("operator: sent selected draft lots", async () => {
@@ -262,7 +262,7 @@ test("operator: sent selected draft lots", async () => {
   screen.getByText("21")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 // DELETE DRAFT
@@ -288,7 +288,7 @@ test("operator: delete draft lot", async () => {
   await screen.findByText("29")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("operator: delete all draft lot", async () => {
@@ -319,7 +319,7 @@ test("operator: delete all draft lot", async () => {
   await screen.findByText("29")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("operator: delete selected draft lot", async () => {
@@ -348,7 +348,7 @@ test("operator: delete selected draft lot", async () => {
   await screen.findByText("29")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 // ACCEPT INBOX
@@ -376,7 +376,7 @@ test("operator: accept inbox lot", async () => {
   screen.getByText("11")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("operator: accept inbox lot (sous réserve)", async () => {
@@ -432,7 +432,7 @@ test("operator: accept all inbox lots", async () => {
   screen.getByText("11")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("operator: accept selected inbox lots", async () => {
@@ -463,7 +463,7 @@ test("operator: accept selected inbox lots", async () => {
   screen.getByText("11")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 // REJECT INBOX
@@ -490,7 +490,7 @@ test("operator: reject inbox lot", async () => {
   await screen.findByText("19")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("operator: reject all inbox lots", async () => {
@@ -522,7 +522,7 @@ test("operator: reject all inbox lots", async () => {
   await screen.findByText("19")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("operator: reject selected inbox lots", async () => {
@@ -552,5 +552,5 @@ test("operator: reject selected inbox lots", async () => {
   await screen.findByText("19")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
