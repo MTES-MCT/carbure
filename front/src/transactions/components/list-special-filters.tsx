@@ -1,7 +1,11 @@
+import cl from "clsx"
+
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { SpecialSelection } from "transactions/hooks/query/use-special"
-import { AlertFilter } from "common/components/alert"
-import { AlertCircle, Calendar, Filter } from "common/components/icons"
+import { Alert, AlertFilter } from "common/components/alert"
+import { AlertCircle, Calendar, Filter, Loader } from "common/components/icons"
+
+import styles from "common/components/alert.module.css"
 
 type InvalidFilterProps = {
   loading: boolean
@@ -82,10 +86,19 @@ export const DeadlineFilter = ({
 type SummaryFilterProps = {
   loading: boolean
   txCount: number
+  onReset: () => void
 }
 
-export const SummaryFilter = ({ loading, txCount }: SummaryFilterProps) => (
-  <AlertFilter loading={loading} level="info" icon={Filter}>
+export const SummaryFilter = ({
+  loading,
+  txCount,
+  onReset,
+}: SummaryFilterProps) => (
+  <Alert
+    level="info"
+    icon={loading ? Loader : Filter}
+    className={cl(styles.alertFilter, loading && styles.alertLoading)}
+  >
     {txCount === 1 ? (
       <span>
         <b>Un seul lot</b> a été trouvé pour cette recherche
@@ -95,5 +108,9 @@ export const SummaryFilter = ({ loading, txCount }: SummaryFilterProps) => (
         Un total de <b>{txCount} lots</b> ont été trouvés pour cette recherche
       </span>
     )}
-  </AlertFilter>
+
+    <span className={cl(styles.alertLink, styles.alertClose)} onClick={onReset}>
+      Réinitialiser les filtres
+    </span>
+  </Alert>
 )
