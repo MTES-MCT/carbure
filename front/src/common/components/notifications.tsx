@@ -7,7 +7,7 @@ import styles from "./notifications.module.css"
 import { Box } from "."
 import { Cross } from "./icons"
 
-const DEFAULT_TIMEOUT = 5000
+const DEFAULT_TIMEOUT = 10000
 
 interface Notification {
   key: string
