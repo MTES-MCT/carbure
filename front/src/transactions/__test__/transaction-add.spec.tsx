@@ -42,7 +42,7 @@ test("display the transaction form", async () => {
 
   screen.getByLabelText("Il s'agit d'une mise à consommation ?")
   screen.getByLabelText("Numéro douanier (DAE, DAA...)")
-  screen.getByLabelText("Volume à 20°C en Litres")
+  screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°)")
   screen.getByLabelText("Biocarburant")
   screen.getByLabelText("Matiere Premiere")
   screen.getByLabelText("Pays d'origine")
@@ -96,7 +96,10 @@ test("check the form fields", async () => {
 
   userEvent.click(screen.getByLabelText("Il s'agit d'une mise à consommation ?")) // prettier-ignore
   userEvent.type(screen.getByLabelText("Numéro douanier (DAE, DAA...)"), "DAETEST") // prettier-ignore
-  userEvent.type(screen.getByLabelText("Volume à 20°C en Litres"), "10000")
+  userEvent.type(
+    screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°)"),
+    "10000"
+  )
 
   userEvent.type(screen.getByLabelText("Biocarburant"), "EM")
   userEvent.click(await screen.findByText("EMHV"))

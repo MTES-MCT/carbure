@@ -96,7 +96,9 @@ test("edit transaction details", async () => {
   userEvent.clear(dae)
   userEvent.type(dae, "DAETESTUPDATE")
 
-  const vol = screen.getByLabelText("Volume à 20°C en Litres")
+  const vol = screen.getByLabelText(
+    "Volume en litres (Ethanol à 20°, autres à 15°)"
+  )
   userEvent.clear(vol)
   userEvent.type(vol, "20000")
 
