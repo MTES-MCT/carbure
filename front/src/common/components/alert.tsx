@@ -73,7 +73,7 @@ export const AlertFilter = ({
       <span
         className={cl(styles.alertLink, styles.alertClose)}
         onClick={() => {
-          onDispose && onDispose()
+          active && onDispose && onDispose()
           setOpen(false)
         }}
       >
