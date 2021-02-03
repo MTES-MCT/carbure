@@ -600,6 +600,21 @@ class LotsAPITest(TransactionTestCase):
         # no more drafts
         nb_drafts = LotV2.objects.filter(status='Draft').count()
         self.assertEqual(nb_drafts, 0)
+        nb_lots = LotV2.objects.all().count()
+
+        # upload same file again and validate
+        jsoned = self.upload_file('carbure_duplicates.xlsx', self.test_producer)
+        nb_lots_uploaded = jsoned['data']['loaded']
+        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
+        jsoned = response.json()
+        self.assertEqual(jsoned['data']['duplicates'], nb_lots_uploaded)
+        nb_drafts = LotV2.objects.filter(status='Draft').count()
+        # all drafts have been considered as duplicates
+        self.assertEqual(nb_drafts, 0)
+        # no additional lot created
+        total_lots = LotV2.objects.all().count()
+        self.assertEqual(nb_lots, total_lots)
+
   
 
     def test_real_behaviour(self):
