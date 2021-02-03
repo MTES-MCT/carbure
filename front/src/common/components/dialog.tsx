@@ -37,7 +37,9 @@ export function Prompt<T>({
   return (
     <Modal className={styles.dialog} onClose={onCancel}>
       <Title>{title}</Title>
-      <span className={styles.dialogMessage}>{description}</span>
+      {description && (
+        <span className={styles.dialogMessage}>{description}</span>
+      )}
       <Form onConfirm={onConfirm} onCancel={onCancel} />
     </Modal>
   )

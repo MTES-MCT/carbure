@@ -12,7 +12,7 @@ export default function useDeclareLots(entity: EntitySelection): LotDeclarator {
 
     await prompt(
       "Déclaration de durabilité",
-      "Veuillez vérifier ces informations avant de valider votre déclaration :",
+      "",
       SummaryPromptFactory(entity.id)
     )
   }

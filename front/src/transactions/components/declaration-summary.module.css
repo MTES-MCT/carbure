@@ -1,3 +1,8 @@
+.declarationExplanation {
+  margin-top: 16px;
+  max-width: 1080px;
+}
+
 .declarationPeriod {
   align-items: center;
   margin-top: 16px;
@@ -39,4 +44,8 @@
 
 .declarationControls {
   margin-top: 24px;
+}
+
+.declarationTable {
+  max-width: 1080px;
 }
