@@ -125,7 +125,7 @@ export const SummaryPromptFactory = (entityID: number) =>
     ]
 
     return (
-      <Box>
+      <Box className={styles.declarationContent}>
         <span className={styles.declarationExplanation}>
           Vous avez jusqu'à la fin du mois pour valider l'ensemble de vos lots
           pour le mois précédent. Une fois que vous aurez validé la totalité de
