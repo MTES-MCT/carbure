@@ -93,19 +93,19 @@ class AccountTest(TestCase):
         # load otp-verify page to generate token
         response = self.client.get(reverse('otp-verify'))
         self.assertEqual(response.status_code, 200)              
-        # try to access another page -> redirect to otp_verify
+        # try to access another page -> 403
         response = self.client.get(reverse('api-v3-settings-get'))
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 403)
         # ensure an otp token has been generated
         usermodel = get_user_model()
         user = usermodel.objects.get(email=self.user_email)
         device = EmailDevice.objects.get(user=user)
         self.assertIsNotNone(device.token)
-        # submit wrong otp -> try to access another page -> redirect to otp_verify
+        # submit wrong otp -> try to access another page -> 403
         response = self.client.post(reverse('otp-verify'), {'otp_token': '111111'})
         self.assertEqual(response.status_code, 200)        
         response = self.client.get(reverse('api-v3-settings-get'))
-        self.assertEqual(response.status_code, 302)        
+        self.assertEqual(response.status_code, 403)        
         # submit good otp
         # wait (otp wait time 1,2,4,8 seconds etc..)
         time.sleep(1.5)

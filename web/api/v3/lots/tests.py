@@ -331,6 +331,7 @@ class LotsAPITest(TransactionTestCase):
         res = response.json()['data']
         lots_in_batch = nb_lots - 1
         self.assertEqual(res['submitted'], lots_in_batch)
+        debug_errors()
         self.assertEqual(res['valid'], lots_in_batch)
 
         # get drafts
@@ -389,11 +390,11 @@ class LotsAPITest(TransactionTestCase):
         lots = data['lots']
         self.assertEqual(len(lots), nb_lots)
         # make sure they all have LotError or TransactionError
-
         lot_errors = [error.lot.id for error  in LotV2Error.objects.filter(lot__in=[lot['lot']['id'] for lot in lots])]
         tx_errors = [error.tx.lot.id for error in TransactionError.objects.filter(tx__in=[tx['id'] for tx in lots])]
+        validation_errors = [error.lot.id for error in LotValidationError.objects.filter(lot__in=[tx['lot']['id'] for tx in lots])]
         for lot in lots:
-            self.assertTrue(lot['id'] in lot_errors or lot['id'] in tx_errors)
+            self.assertTrue(lot['id'] in lot_errors or lot['id'] in tx_errors or lot['id'] in validation_errors)
         
         # delete-all-drafts
         response = self.client.post(reverse('api-v3-delete-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
