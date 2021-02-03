@@ -4,12 +4,18 @@ import { AlertFilter } from "common/components/alert"
 import { AlertCircle, Calendar, Filter } from "common/components/icons"
 
 type InvalidFilterProps = {
+  loading: boolean
   errorCount: number
   special: SpecialSelection
 }
 
-export const InvalidFilter = ({ errorCount, special }: InvalidFilterProps) => (
+export const InvalidFilter = ({
+  loading,
+  errorCount,
+  special,
+}: InvalidFilterProps) => (
   <AlertFilter
+    loading={loading}
     level="error"
     icon={AlertCircle}
     active={special.invalid}
@@ -31,6 +37,7 @@ export const InvalidFilter = ({ errorCount, special }: InvalidFilterProps) => (
 )
 
 type DeadlineFilterProps = {
+  loading: boolean
   deadlineCount: number
   deadlineDate: string | null
   special: SpecialSelection
@@ -38,12 +45,14 @@ type DeadlineFilterProps = {
 }
 
 export const DeadlineFilter = ({
+  loading,
   deadlineCount,
   deadlineDate,
   special,
   entity,
 }: DeadlineFilterProps) => (
   <AlertFilter
+    loading={loading}
     level="warning"
     icon={Calendar}
     active={special.deadline}
@@ -71,11 +80,12 @@ export const DeadlineFilter = ({
 )
 
 type SummaryFilterProps = {
+  loading: boolean
   txCount: number
 }
 
-export const SummaryFilter = ({ txCount }: SummaryFilterProps) => (
-  <AlertFilter level="info" icon={Filter}>
+export const SummaryFilter = ({ loading, txCount }: SummaryFilterProps) => (
+  <AlertFilter loading={loading} level="info" icon={Filter}>
     {txCount === 1 ? (
       <span>
         <b>Un seul lot</b> a été trouvé pour cette recherche

@@ -153,20 +153,25 @@ export const TransactionList = ({
       )}
 
       {!isEmpty &&
-        !isLoading &&
         !special.deadline &&
         !special.invalid &&
-        filters.isFiltered() && <SummaryFilter txCount={txCount} />}
-
-      {!isLoading &&
-        !special.deadline &&
-        errorCount > 0 &&
-        !status.is(LotStatus.Accepted) && (
-          <InvalidFilter errorCount={errorCount} special={special} />
+        filters.isFiltered() && (
+          <SummaryFilter loading={isLoading} txCount={txCount} />
         )}
 
-      {!isLoading && !special.invalid && deadlineCount > 0 && (
+      {!special.deadline &&
+        errorCount > 0 &&
+        !status.is(LotStatus.Accepted) && (
+          <InvalidFilter
+            loading={isLoading}
+            errorCount={errorCount}
+            special={special}
+          />
+        )}
+
+      {!special.invalid && deadlineCount > 0 && (
         <DeadlineFilter
+          loading={isLoading}
           deadlineCount={deadlineCount}
           deadlineDate={deadlineDate}
           special={special}
