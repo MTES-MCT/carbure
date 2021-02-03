@@ -114,7 +114,7 @@ export const StockList = ({
 
       {!isError && isEmpty && (
         <Alert level="warning" icon={AlertCircle}>
-          Aucune transaction trouvée pour ces paramètres
+          Aucune transaction trouvée pour cette recherche
         </Alert>
       )}
 

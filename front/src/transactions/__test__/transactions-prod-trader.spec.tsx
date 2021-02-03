@@ -70,7 +70,7 @@ test("producer/trader: display an empty list of transactions", async () => {
 
   screen.getByPlaceholderText("Rechercher...")
 
-  screen.getByText("Aucune transaction trouvée pour ces paramètres")
+  screen.getByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("producer/trader: display a list of 1 transaction", async () => {
@@ -398,7 +398,7 @@ test("producer/trader: sent draft lot", async () => {
   screen.getByText("31")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("producer/trader: sent all draft lots", async () => {
@@ -431,7 +431,7 @@ test("producer/trader: sent all draft lots", async () => {
   screen.getByText("31")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("producer/trader: sent selected draft lots", async () => {
@@ -462,7 +462,7 @@ test("producer/trader: sent selected draft lots", async () => {
   screen.getByText("31")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 // DELETE DRAFT
@@ -488,7 +488,7 @@ test("producer/trader: delete draft lot", async () => {
   await screen.findByText("39")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("producer/trader: delete all draft lot", async () => {
@@ -518,7 +518,7 @@ test("producer/trader: delete all draft lot", async () => {
   await screen.findByText("39")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("producer/trader: delete selected draft lot", async () => {
@@ -546,7 +546,7 @@ test("producer/trader: delete selected draft lot", async () => {
   await screen.findByText("39")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 // RESEND TOFIX
@@ -573,7 +573,7 @@ test("producer/trader: resend fixed lot", async () => {
   await screen.findByText("19")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 // DELETE TOFIX
@@ -599,7 +599,7 @@ test("producer/trader: delete tofix lot", async () => {
   await screen.findByText("19")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("producer/trader: delete selected tofix lot", async () => {
@@ -628,5 +628,5 @@ test("producer/trader: delete selected tofix lot", async () => {
   await screen.findByText("19")
 
   // no more tofix lots
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
