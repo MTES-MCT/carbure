@@ -37,7 +37,7 @@ export const ValidationPrompt = ({
           icon={Check}
           onClick={() => onConfirm(checked.infos && checked.terres)}
         >
-          Envoyer
+          Confirmer
         </Button>
         <Button onClick={onCancel}>Annuler</Button>
       </DialogButtons>

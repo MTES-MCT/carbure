@@ -8,6 +8,7 @@ import { producer } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
 import { MemoryRouter } from "react-router-dom"
 import Transactions from "../index"
+import { clickOnCheckboxesAndConfirm } from "./helpers"
 
 import server, { setLots, setSnapshot } from "./api"
 import {
@@ -386,7 +387,7 @@ test("producer/trader: sent draft lot", async () => {
 
   // confirm the sending
   const title = screen.getByText("Envoyer lot")
-  userEvent.click(screen.getByText("OK"))
+  clickOnCheckboxesAndConfirm()
 
   expect(title).not.toBeInTheDocument()
 
@@ -419,7 +420,7 @@ test("producer/trader: sent all draft lots", async () => {
 
   // confirm the sending
   const title = screen.getByText("Envoyer tous les brouillons")
-  userEvent.click(screen.getByText("OK"))
+  clickOnCheckboxesAndConfirm()
 
   expect(title).not.toBeInTheDocument()
 
@@ -449,8 +450,8 @@ test("producer/trader: sent selected draft lots", async () => {
   userEvent.click(screen.getByText("Envoyer sélection"))
 
   // confirm the sending
-  const title = screen.getByText("Envoyer lot")
-  userEvent.click(screen.getByText("OK"))
+  const title = screen.getByText("Envoyer la sélection")
+  clickOnCheckboxesAndConfirm()
 
   expect(title).not.toBeInTheDocument()
 
