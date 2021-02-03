@@ -1,7 +1,7 @@
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { SpecialSelection } from "transactions/hooks/query/use-special"
 import { AlertFilter } from "common/components/alert"
-import { AlertCircle, Calendar } from "common/components/icons"
+import { AlertCircle, Calendar, Filter } from "common/components/icons"
 
 type InvalidFilterProps = {
   errorCount: number
@@ -65,6 +65,24 @@ export const DeadlineFilter = ({
           ? "acceptés"
           : "validés et envoyés"}{" "}
         avant le <b>{deadlineDate ?? "N/A"}</b>
+      </span>
+    )}
+  </AlertFilter>
+)
+
+type SummaryFilterProps = {
+  txCount: number
+}
+
+export const SummaryFilter = ({ txCount }: SummaryFilterProps) => (
+  <AlertFilter level="info" icon={Filter}>
+    {txCount === 1 ? (
+      <span>
+        <b>Un seul lot</b> a été trouvé pour cette recherche
+      </span>
+    ) : (
+      <span>
+        Un total de <b>{txCount} lots</b> ont été trouvés pour cette recherche
       </span>
     )}
   </AlertFilter>
