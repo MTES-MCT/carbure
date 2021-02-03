@@ -13,10 +13,10 @@ import { LotValidator } from "transactions/hooks/actions/use-validate-lots"
 import { LotDuplicator } from "transactions/hooks/actions/use-duplicate-lots"
 import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
 import { LotRejector } from "transactions/hooks/actions/use-reject-lots"
-import { LotDeclarator } from "transactions/hooks/actions/use-declare-lots"
 import { StatusSelection } from "transactions/hooks/query/use-status"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { SpecialSelection } from "transactions/hooks/query/use-special"
+import { FilterSelection } from "transactions/hooks/query/use-filters"
 
 import { AlertCircle } from "common/components/icons"
 import { Box, LoaderOverlay } from "common/components"
@@ -38,11 +38,16 @@ import {
   TraderImportActions,
   CreateActions,
 } from "./list-actions"
-import { DeadlineFilter, InvalidFilter } from "./list-special-filters"
+import {
+  DeadlineFilter,
+  InvalidFilter,
+  SummaryFilter,
+} from "./list-special-filters"
 
 type TransactionListProps = {
   entity: Entity
   transactions: LotGetter
+  filters: FilterSelection
   status: StatusSelection
   sorting: SortingSelection
   special: SpecialSelection
@@ -59,6 +64,7 @@ type TransactionListProps = {
 export const TransactionList = ({
   entity,
   transactions,
+  filters,
   status,
   sorting,
   special,
@@ -72,6 +78,7 @@ export const TransactionList = ({
   rejector,
 }: TransactionListProps) => {
   const txs = transactions.data
+  const txCount = txs?.total ?? 0
   const errorCount = txs?.total_errors ?? 0
   const deadlineCount = txs?.deadlines.total ?? 0
 
@@ -145,6 +152,12 @@ export const TransactionList = ({
         </ActionBar>
       )}
 
+      {!isEmpty &&
+        !isLoading &&
+        !special.deadline &&
+        !special.invalid &&
+        filters.isFiltered() && <SummaryFilter txCount={txCount} />}
+
       {!isLoading &&
         !special.deadline &&
         errorCount > 0 &&
@@ -163,7 +176,7 @@ export const TransactionList = ({
 
       {!isError && isEmpty && (
         <Alert level="warning" icon={AlertCircle}>
-          Aucune transaction trouvée pour ces paramètres
+          Aucune transaction trouvée pour cette recherche
           {isLoading && <LoaderOverlay />}
         </Alert>
       )}

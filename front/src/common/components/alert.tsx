@@ -36,9 +36,9 @@ export const Alert = ({
 }
 
 type AlertFilterProps = AlertProps & {
-  active: boolean
-  onActivate: () => void
-  onDispose: () => void
+  active?: boolean
+  onActivate?: () => void
+  onDispose?: () => void
 }
 
 export const AlertFilter = ({
@@ -58,20 +58,22 @@ export const AlertFilter = ({
     <Alert {...props} className={styles.alertFilter}>
       {children}
 
-      {active ? (
-        <span className={styles.alertLink} onClick={onDispose}>
-          Revenir à la liste complète
-        </span>
-      ) : (
-        <span className={styles.alertLink} onClick={onActivate}>
-          Voir la liste
-        </span>
-      )}
+      {onActivate &&
+        onDispose &&
+        (active ? (
+          <span className={styles.alertLink} onClick={onDispose}>
+            Revenir à la liste complète
+          </span>
+        ) : (
+          <span className={styles.alertLink} onClick={onActivate}>
+            Voir la liste
+          </span>
+        ))}
 
       <span
         className={cl(styles.alertLink, styles.alertClose)}
         onClick={() => {
-          onDispose()
+          onDispose && onDispose()
           setOpen(false)
         }}
       >
