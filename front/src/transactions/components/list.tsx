@@ -156,7 +156,11 @@ export const TransactionList = ({
         !special.deadline &&
         !special.invalid &&
         filters.isFiltered() && (
-          <SummaryFilter loading={isLoading} txCount={txCount} />
+          <SummaryFilter
+            loading={isLoading}
+            txCount={txCount}
+            onReset={filters.reset}
+          />
         )}
 
       {!special.deadline &&

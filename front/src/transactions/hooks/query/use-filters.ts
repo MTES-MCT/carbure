@@ -27,6 +27,7 @@ export default function useFilterSelection(
   }
 
   function reset() {
+    pagination.setPage(0)
     setFilters(defaultState)
   }
 
