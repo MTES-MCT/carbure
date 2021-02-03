@@ -90,7 +90,7 @@ const TransactionForm = ({
           <LabelInput
             readOnly={readOnly}
             type="number"
-            label="Volume à 20°C en Litres"
+            label="Volume en litres (Ethanol à 20°, autres à 15°)"
             name="volume"
             value={tx.volume}
             error={fieldErrors.volume}
