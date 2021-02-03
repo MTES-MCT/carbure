@@ -8,6 +8,7 @@ import { operator } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
 import { MemoryRouter } from "react-router-dom"
 import Transactions from "../index"
+import { clickOnCheckboxesAndConfirm } from "./helpers"
 
 import server, { setLots, setSnapshot } from "./api"
 import { emptyLots, lots, operatorSnapshot } from "./data"
@@ -186,7 +187,7 @@ test("operator: sent draft lot", async () => {
 
   // confirm the sending
   const title = screen.getByText("Envoyer lot")
-  userEvent.click(screen.getByText("OK"))
+  clickOnCheckboxesAndConfirm()
 
   expect(title).not.toBeInTheDocument()
 
@@ -219,7 +220,7 @@ test("operator: sent all draft lots", async () => {
 
   // confirm the sending
   const title = screen.getByText("Envoyer tous les brouillons")
-  userEvent.click(screen.getByText("OK"))
+  clickOnCheckboxesAndConfirm()
 
   expect(title).not.toBeInTheDocument()
 
@@ -249,8 +250,8 @@ test("operator: sent selected draft lots", async () => {
   userEvent.click(screen.getByText("Envoyer sélection"))
 
   // confirm the sending
-  const title = screen.getByText("Envoyer lot")
-  userEvent.click(screen.getByText("OK"))
+  const title = screen.getByText("Envoyer la sélection")
+  clickOnCheckboxesAndConfirm()
 
   expect(title).not.toBeInTheDocument()
 

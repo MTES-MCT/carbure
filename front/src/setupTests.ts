@@ -3,7 +3,6 @@ import { render as baseRender } from "@testing-library/react"
 import { configure } from "@testing-library/dom"
 
 configure({
-  testIdAttribute: "data-my-test-id",
   getElementError(message, container) {
     const error = new Error(message)
     error.name = "TestingLibraryElementError"

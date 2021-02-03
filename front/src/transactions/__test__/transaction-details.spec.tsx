@@ -12,6 +12,7 @@ import TransactionDetails from "../routes/transaction-details"
 import server, { setDetails } from "./api"
 import { lotDetails, errorDetails, tofixDetails } from "./data"
 import { waitWhileLoading } from "common/__test__/helpers"
+import { clickOnCheckboxesAndConfirm } from "./helpers"
 
 beforeAll(() => server.listen())
 afterEach(() => {
@@ -256,7 +257,7 @@ test("send draft lot from details", async () => {
 
   // confirm the sending
   const title = screen.getByText("Envoyer lot")
-  userEvent.click(screen.getByText("OK"))
+  clickOnCheckboxesAndConfirm()
 
   expect(title).not.toBeInTheDocument()
 
@@ -376,7 +377,7 @@ test("accept sous reserve inbox lot from details", async () => {
   userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "test is incorrect") // prettier-ignore
   userEvent.click(screen.getByText("Accepter et demander une correction"))
 
-  // await waitWhileLoading()
+  await waitWhileLoading()
 
   await screen.findByText("Commentaires (2)")
   screen.getByText("test is incorrect")
@@ -384,7 +385,6 @@ test("accept sous reserve inbox lot from details", async () => {
   userEvent.click(screen.getByText("Retour"))
 
   expect(status).not.toBeInTheDocument()
-  // await waitForElementToBeRemoved(status)
 })
 
 test("reject inbox lot from details", async () => {
