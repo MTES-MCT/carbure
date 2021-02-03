@@ -8,6 +8,7 @@ import useAPI from "../../../common/hooks/use-api"
 import { confirm, prompt } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
 import { CommentPrompt } from "transactions/components/form-comments"
+import { ValidationPrompt } from "transactions/components/validation"
 
 export interface LotValidator {
   loading: boolean
@@ -60,8 +61,8 @@ export default function useValidateLots(
           level: "warning",
           text:
             res.submitted === 1
-              ? "Un double du lot a été détecté dans la base de données !"
-              : `${res.duplicates} sont des doubles de lots existants !`,
+              ? "Un lot identique a été détecté dans la base de données !"
+              : `${res.duplicates} lots sont des doublons de lots existants !`,
         })
       }
     } else {
@@ -73,16 +74,17 @@ export default function useValidateLots(
   }
 
   async function validateLot(lotID: number) {
-    const shouldValidate = await confirm(
+    const shouldValidate = await prompt(
       "Envoyer lot",
-      "En envoyant ce lot, je certifie qu'il respecte les critères du durabilité liés aux terres et que les informations renseignées sont réelles et valides"
+      "Vous vous apprêtez à envoyer ce lot à son destinataire, assurez-vous que les conditions ci-dessous sont respectées :",
+      ValidationPrompt
     )
 
     if (entity !== null && shouldValidate) {
       await notifyValidate(resolveValidate(entity.id, [lotID]))
     }
 
-    return shouldValidate
+    return shouldValidate ?? false
   }
 
   async function validateAndCommentLot(lotID: number) {
@@ -100,29 +102,31 @@ export default function useValidateLots(
   }
 
   async function validateSelection() {
-    const shouldValidate = await confirm(
-      "Envoyer lot",
-      "En envoyant les lots suivants, je certifie qu'ils respectent les critères de durabilité liés aux terres et que les informations renseignées sont réelles et valides"
+    const shouldValidate = await prompt(
+      "Envoyer la sélection",
+      "Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :",
+      ValidationPrompt
     )
 
     if (entity !== null && shouldValidate) {
       await notifyValidate(resolveValidate(entity.id, selection.selected), true)
     }
 
-    return shouldValidate
+    return shouldValidate ?? false
   }
 
   async function validateAllDrafts() {
-    const shouldValidate = await confirm(
+    const shouldValidate = await prompt(
       "Envoyer tous les brouillons",
-      "En envoyant ces lots, je certifie qu'ils respectent les critères du durabilité liés aux terres et que les informations renseignées sont réelles et valides"
+      "Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :",
+      ValidationPrompt
     )
 
     if (entity !== null && shouldValidate) {
       await notifyValidate(resolveValidateAll(entity.id, year.selected), true)
     }
 
-    return shouldValidate
+    return shouldValidate ?? false
   }
 
   return {
