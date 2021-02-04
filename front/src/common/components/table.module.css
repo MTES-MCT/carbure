@@ -96,7 +96,11 @@
 .actionList {
   align-self: stretch;
   align-items: center;
-  justify-content: space-around;
+  justify-content: center;
+}
+
+.actionList :global(.icon):not(:last-child) {
+  margin-right: 8px;
 }
 
 .actionList,
