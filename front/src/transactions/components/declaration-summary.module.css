@@ -4,6 +4,7 @@
 
 .declarationExplanation {
   margin-top: 16px;
+  font-size: 1.1em;
 }
 
 .declarationPeriod {
@@ -46,4 +47,11 @@
 
 .declarationControls {
   margin-top: 24px;
+}
+
+.declarationDeadline {
+  align-self: center;
+  color: var(--blue-dark);
+  font-size: 1.1em;
+  margin-right: 8px;
 }
