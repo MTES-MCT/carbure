@@ -16,13 +16,3 @@
 .transactionRowError::after {
   border-color: var(--red-dark);
 }
-
-/* .transactionRowDeadline::before {
-  content: "";
-  position: absolute;
-  background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZT0iI2U2NTEwMCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEzIiByPSI3Ii8+PHBhdGggZD0iTTEyIDEwdjNoMk03IDRMNC4yNSA2TTE3IDRsMi43NSAyIi8+PC9zdmc+);
-  width: 24px;
-  height: 24px;
-  left: -48px;
-  align-self: center;
-} */

@@ -1,0 +1,10 @@
+.entityRequests::after {
+  border-left: 4px solid;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 1px;
+  width: 4px;
+  border-color: var(--orange-medium);
+}

@@ -2,65 +2,24 @@ import { LoaderOverlay, Main, Title } from "common/components"
 import { Alert, AlertFilter } from "common/components/alert"
 import { AlertCircle, AlertTriangle } from "common/components/icons"
 import { LabelInput } from "common/components/input"
-import { useRelativePush } from "common/components/relative-route"
-import Table, { Column } from "common/components/table"
 import useAPI from "common/hooks/use-api"
 import { useEffect, useState } from "react"
 import { SettingsBody, SettingsHeader } from "settings/components/common"
-import { padding } from "transactions/components/list-columns"
 
 import * as api from "./api"
-
-const COLUMNS: Column<api.EntityDetails>[] = [
-  padding,
-  { header: "Société", render: (e) => e.entity.name },
-  { header: "Activité", render: (e) => e.entity.entity_type },
-  {
-    header: "Utilisateurs",
-    render: (e) => (
-      <ul style={{ fontWeight: "normal", padding: 0, margin: 0 }}>
-        <li>{e.requests} demandes d'accès</li>
-        <li>{e.users} autorisations</li>
-      </ul>
-    ),
-  },
-  {
-    header: "Production/Stockage",
-    render: (e) => (
-      <ul style={{ fontWeight: "normal", padding: 0, margin: 0 }}>
-        <li>{e.production_sites} sites de production</li>
-        <li>{e.depots} dépôts</li>
-      </ul>
-    ),
-  },
-  {
-    header: "Certificats",
-    render: (e) => (
-      <ul style={{ fontWeight: "normal", padding: 0, margin: 0 }}>
-        <li>{e.certificates_iscc} certificats ISCC</li>
-        <li>{e.certificates_2bs} certificats 2BS</li>
-      </ul>
-    ),
-  },
-]
+import EntityList from "./components/entity-list"
 
 const Entities = () => {
-  const push = useRelativePush()
-
   const [query, setQuery] = useState("")
   const [requestOnly, setRequestOnly] = useState(false)
   const [entities, getEntities] = useAPI(api.getEntities)
 
   useEffect(() => {
-    getEntities(query)
-  }, [getEntities, query])
+    getEntities(query, requestOnly)
+  }, [getEntities, query, requestOnly])
 
-  const rows = (entities.data ?? []).map((e) => ({
-    value: e,
-    onClick: () => push(`${e.entity.id}`),
-  }))
-
-  const requestCount = rows.filter((e) => e.value.requests > 0).length
+  const isEmpty = entities.data ? entities.data.length === 0 : true
+  const requestCount = entities.data?.filter((e) => e.requests > 0).length ?? 0
 
   return (
     <Main>
@@ -76,7 +35,7 @@ const Entities = () => {
           onChange={(e) => setQuery(e.target.value)}
         />
 
-        {rows.length === 0 && (
+        {isEmpty && (
           <Alert icon={AlertTriangle} level="warning">
             Aucune société trouvée pour cette recherche.
           </Alert>
@@ -103,7 +62,7 @@ const Entities = () => {
           </AlertFilter>
         )}
 
-        {rows.length > 0 && <Table columns={COLUMNS} rows={rows} />}
+        {!isEmpty && <EntityList entities={entities.data!} />}
 
         {entities.loading && <LoaderOverlay />}
       </SettingsBody>
