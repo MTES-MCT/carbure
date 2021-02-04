@@ -11,7 +11,7 @@ import { UserRightRequest, UserRightStatus } from "common/types"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { formatDate } from "settings/components/common"
-import { empty } from "transactions/components/list-columns"
+import { padding } from "transactions/components/list-columns"
 import * as api from "../api"
 
 const RIGHTS_ORDER = {
@@ -22,7 +22,7 @@ const RIGHTS_ORDER = {
 }
 
 const RIGHTS_COLUMNS: Column<UserRightRequest>[] = [
-  empty,
+  padding,
   statusColumn,
   {
     header: "Utilisateur",

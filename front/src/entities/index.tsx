@@ -7,12 +7,12 @@ import Table, { Column } from "common/components/table"
 import useAPI from "common/hooks/use-api"
 import { useEffect, useState } from "react"
 import { SettingsBody, SettingsHeader } from "settings/components/common"
-import { empty } from "transactions/components/list-columns"
+import { padding } from "transactions/components/list-columns"
 
 import * as api from "./api"
 
 const COLUMNS: Column<api.EntityDetails>[] = [
-  empty,
+  padding,
   { header: "Société", render: (e) => e.entity.name },
   { header: "Activité", render: (e) => e.entity.entity_type },
   {

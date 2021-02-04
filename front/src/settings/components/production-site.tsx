@@ -30,7 +30,8 @@ import {
   MultiAutocomplete,
 } from "common/components/autocomplete"
 import RadioGroup from "common/components/radio-group"
-import { EMPTY_COLUMN, formatDate, SettingsForm } from "./common"
+import { formatDate, SettingsForm } from "./common"
+import { padding } from "transactions/components/list-columns"
 import { findCertificates } from "../api"
 
 export type ProductionSiteState = {
@@ -275,7 +276,7 @@ export const ProductionSitePromptFactory = (
   }
 
 const PRODUCTION_SITE_COLUMNS: Column<ProductionSiteDetails>[] = [
-  EMPTY_COLUMN,
+  padding,
   {
     header: "ID",
     className: styles.settingsTableColumn,

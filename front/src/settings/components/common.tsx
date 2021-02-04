@@ -74,8 +74,3 @@ export const ExpirationDate = ({
     </span>
   )
 }
-
-export const EMPTY_COLUMN = {
-  className: styles.settingsTableEmptyColumn,
-  render: () => null,
-}

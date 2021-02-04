@@ -6,38 +6,47 @@
   table-layout: fixed;
 }
 
+.tableRow,
 .table tbody tr {
-  border-bottom: 1px solid var(--gray-highlight);
   cursor: pointer;
 }
 
+.table .tableRow:nth-child(even),
 .table tbody tr:nth-child(even) {
-  background-color: var(--gray-light);
-}
-
-.table tbody tr:nth-child(odd) {
   background-color: var(--white);
 }
 
+.table .tableRow:nth-child(odd),
+.table tbody tr:nth-child(odd) {
+  background-color: var(--gray-light);
+}
+
+.table .tableRow:hover,
 .table tbody tr:hover {
   background-color: var(--gray-highlight);
   z-index: 1;
 }
 
+.tableHeader,
 .table th {
+  flex: 1;
+  align-items: flex-end;
   color: var(--blue-medium);
   text-transform: uppercase;
-  text-align: left;
   font-size: 0.75em;
+  font-weight: bold;
   padding: 8px;
   user-select: none;
   cursor: pointer;
 }
 
-.table tbody tr td {
+.tableCell,
+.table .table tbody tr td {
+  flex: 1;
+  align-items: center;
   font-weight: 600;
   padding: 16px 8px;
-  overflow-x: hidden;
+  overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -45,10 +54,11 @@
 .dualRow {
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .rowLine {
-  overflow-x: hidden;
+  overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -60,7 +70,8 @@
 }
 
 .actionColumn {
-  width: 88px;
+  flex: 0.6;
+  justify-content: center;
 }
 
 .actionCell {
@@ -84,10 +95,10 @@
 }
 
 .actionList,
-tr:hover .actionArrow {
+.tableRow:hover .actionArrow {
   display: none;
 }
 
-tr:hover .actionList {
+.tableRow:hover .actionList {
   display: flex;
 }

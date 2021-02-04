@@ -106,35 +106,37 @@ export default function Table<T>({
   ...props
 }: TableProps<T>) {
   return (
-    <table {...props} className={cl(styles.table, className)}>
-      <thead>
-        <tr>
-          {columns.map((column, c) => (
-            <th
-              key={c}
-              className={column.className}
-              onClick={() => column.sortBy && onSort && onSort(column.sortBy)}
-            >
-              {column.header ?? null}
-              {sortBy && sortBy === column.sortBy && (
-                <span>{order === "asc" ? " ▲" : " ▼"}</span>
-              )}
-            </th>
-          ))}
-        </tr>
-      </thead>
-
-      <tbody>
-        {rows.map((row, r) => (
-          <tr key={r} className={row.className} onClick={row.onClick}>
-            {columns.map((column, c) => (
-              <td key={c} className={column.className}>
-                {column.render(row.value)}
-              </td>
-            ))}
-          </tr>
+    <Box {...props} className={cl(styles.table, className)}>
+      <Box row>
+        {columns.map((column, c) => (
+          <Box
+            row
+            key={c}
+            className={cl(styles.tableHeader, column.className)}
+            onClick={() => column.sortBy && onSort && onSort(column.sortBy)}
+          >
+            {column.header ?? null}
+            {sortBy && sortBy === column.sortBy && (
+              <span>{order === "asc" ? " ▲" : " ▼"}</span>
+            )}
+          </Box>
         ))}
-      </tbody>
-    </table>
+      </Box>
+
+      {rows.map((row, r) => (
+        <Box
+          row
+          key={r}
+          className={cl(styles.tableRow, row.className)}
+          onClick={row.onClick}
+        >
+          {columns.map((column, c) => (
+            <Box row key={c} className={cl(styles.tableCell, column.className)}>
+              {column.render(row.value)}
+            </Box>
+          ))}
+        </Box>
+      ))}
+    </Box>
   )
 }

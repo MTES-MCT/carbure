@@ -224,7 +224,7 @@ test("check error filter", async () => {
 
   const dae = await screen.findByText("DAETEST")
 
-  expect(dae.closest("tr")).toHaveClass("transactionRowError")
+  expect(dae.closest(".tableRow")).toHaveClass("transactionRowError")
 
   await screen.findByText(
     (content, node) =>
@@ -256,7 +256,7 @@ test("check deadline filter", async () => {
 
   const dae = await screen.findByText("DAETEST")
 
-  expect(dae.closest("tr")).toHaveClass("transactionRowDeadline")
+  expect(dae.closest(".tableRow")).toHaveClass("transactionRowDeadline")
 
   await screen.findByText(
     (content, node) =>
