@@ -13,16 +13,20 @@ const COLUMNS: Column<api.EntityDetails>[] = [
   {
     header: "Utilisateurs",
     render: (e) => (
-      <ul style={{ fontWeight: "normal", padding: 0, margin: 0 }}>
-        <li>{e.requests} demandes d'accès</li>
-        <li>{e.users} autorisations</li>
+      <ul className={styles.tableList}>
+        <li className={cl(e.requests > 0 && styles.entityRequestsCount)}>
+          {e.requests === 1
+            ? `1 demande d'accès`
+            : `${e.requests} demandes d'accès`}
+        </li>
+        <li>{e.users === 1 ? `1 utilisateur` : `${e.users} utilisateurs`}</li>
       </ul>
     ),
   },
   {
     header: "Production/Stockage",
     render: (e) => (
-      <ul style={{ fontWeight: "normal", padding: 0, margin: 0 }}>
+      <ul className={styles.tableList}>
         <li>{e.production_sites} sites de production</li>
         <li>{e.depots} dépôts</li>
       </ul>
@@ -31,7 +35,7 @@ const COLUMNS: Column<api.EntityDetails>[] = [
   {
     header: "Certificats",
     render: (e) => (
-      <ul style={{ fontWeight: "normal", padding: 0, margin: 0 }}>
+      <ul className={styles.tableList}>
         <li>{e.certificates_iscc} certificats ISCC</li>
         <li>{e.certificates_2bs} certificats 2BS</li>
       </ul>

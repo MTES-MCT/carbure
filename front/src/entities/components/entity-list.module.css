@@ -8,3 +8,13 @@
   width: 4px;
   border-color: var(--orange-medium);
 }
+
+.entityRequestsCount {
+  color: var(--orange-dark);
+}
+
+.tableList {
+  font-weight: normal;
+  padding: 0 8px;
+  margin: 0;
+}
