@@ -1,23 +1,28 @@
-.transactionRowError > td:first-child,
-.transactionRowDeadline > td:first-child {
-  position: relative;
-}
-
-.transactionRowError > td:first-child::after,
-.transactionRowDeadline > td:first-child::after {
+.transactionRowError::after,
+.transactionRowWarning::after {
   border-left: 4px solid;
   content: "";
   position: absolute;
   top: 0;
   left: 0;
-  bottom: 0;
+  bottom: 1px;
   width: 4px;
 }
 
-.transactionRowDeadline > td:first-child::after {
+.transactionRowWarning::after {
   border-color: var(--orange-medium);
 }
 
-.transactionRowError > td:first-child::after {
+.transactionRowError::after {
   border-color: var(--red-dark);
 }
+
+/* .transactionRowDeadline::before {
+  content: "";
+  position: absolute;
+  background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZT0iI2U2NTEwMCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEzIiByPSI3Ii8+PHBhdGggZD0iTTEyIDEwdjNoMk03IDRMNC4yNSA2TTE3IDRsMi43NSAyIi8+PC9zdmc+);
+  width: 24px;
+  height: 24px;
+  left: -48px;
+  align-self: center;
+} */

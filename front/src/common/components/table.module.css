@@ -63,6 +63,10 @@
   text-overflow: ellipsis;
 }
 
+.lineWarning {
+  color: var(--orange-dark);
+}
+
 .extraInfo {
   font-size: 0.87em;
   color: var(--gray-dark);
@@ -70,11 +74,12 @@
 }
 
 .actionColumn {
-  flex: 0.6;
+  flex: 0.5;
   justify-content: center;
 }
 
 .actionCell {
+  flex: 1;
   align-items: center;
   justify-content: center;
   color: var(--gray-dark);

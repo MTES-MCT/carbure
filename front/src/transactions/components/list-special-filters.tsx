@@ -3,7 +3,7 @@ import cl from "clsx"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { SpecialSelection } from "transactions/hooks/query/use-special"
 import { Alert, AlertFilter } from "common/components/alert"
-import { AlertCircle, Calendar, Filter, Loader } from "common/components/icons"
+import { Alarm, AlertCircle, Filter, Loader } from "common/components/icons"
 
 import styles from "common/components/alert.module.css"
 
@@ -58,7 +58,7 @@ export const DeadlineFilter = ({
   <AlertFilter
     loading={loading}
     level="warning"
-    icon={Calendar}
+    icon={Alarm}
     active={special.deadline}
     onActivate={() => special.setDeadline(true)}
     onDispose={() => special.setDeadline(false)}

@@ -6,7 +6,7 @@ import { SortingSelection } from "transactions/hooks/query/use-sort-by" // prett
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { StatusSelection } from "transactions/hooks/query/use-status"
 
-import { hasDeadline } from "../helpers"
+import { hasDeadline, hasErrors, hasWarnings } from "../helpers"
 import { useRelativePush } from "common/components/relative-route"
 
 import { AlertTriangle, Check, Copy, Cross } from "common/components/icons"
@@ -16,7 +16,6 @@ import * as C from "./list-columns"
 import styles from "./list-table.module.css"
 
 export const PRODUCER_COLUMNS = [
-  C.period,
   C.dae,
   C.biocarburant,
   C.matierePremiere,
@@ -27,7 +26,6 @@ export const PRODUCER_COLUMNS = [
 ]
 
 export const OPERATOR_COLUMNS = [
-  C.period,
   C.dae,
   C.biocarburant,
   C.matierePremiere,
@@ -38,7 +36,6 @@ export const OPERATOR_COLUMNS = [
 ]
 
 export const ADMIN_COLUMNS = [
-  C.period,
   C.dae,
   C.biocarburant,
   C.matierePremiere,
@@ -125,6 +122,7 @@ export const TransactionTable = ({
   }
 
   columns.push(C.status(entity))
+  columns.push(C.period(transactions.deadlines.date))
 
   if (isProducer || isTrader) {
     columns.push(...PRODUCER_COLUMNS)
@@ -150,7 +148,8 @@ export const TransactionTable = ({
     value: tx,
     onClick: () => relativePush(`${tx.id}`),
     className: cl({
-      [styles.transactionRowError]: tx.id in transactions.errors,
+      [styles.transactionRowError]: hasErrors(tx, transactions.errors),
+      [styles.transactionRowWarning]: hasWarnings(tx, transactions.errors),
       [styles.transactionRowDeadline]: hasDeadline(tx, deadline),
     }),
   }))

@@ -6,10 +6,17 @@ import { Box, SystemProps } from "."
 import styles from "./table.module.css"
 import { ChevronRight, IconProps } from "./icons"
 
-type LineProps = { text: string; small?: boolean }
+type LineProps = { text: string; small?: boolean; level?: "warning" }
 
-export const Line = ({ text, small = false }: LineProps) => (
-  <span title={text} className={cl(styles.rowLine, small && styles.extraInfo)}>
+export const Line = ({ text, small = false, level }: LineProps) => (
+  <span
+    title={text}
+    className={cl(
+      styles.rowLine,
+      small && styles.extraInfo,
+      level === "warning" && styles.lineWarning
+    )}
+  >
     {text}
   </span>
 )
