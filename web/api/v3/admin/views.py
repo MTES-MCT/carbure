@@ -50,7 +50,7 @@ def get_entities(request):
     q = request.GET.get('q', False)
     has_requests = request.GET.get('has_requests', None)
     
-    entities = Entity.objects.all()
+    entities = Entity.objects.all().order_by('name')
 
     if q:
         entities = entities.filter(name__icontains=q)
