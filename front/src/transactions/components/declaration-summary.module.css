@@ -8,8 +8,8 @@
 
 .declarationPeriod {
   align-items: center;
-  margin-top: 16px;
-  margin-bottom: 24px;
+  margin-top: 24px;
+  margin-bottom: 12px;
 }
 
 .declarationPrevPeriod,
@@ -31,8 +31,7 @@
 }
 
 .declarationSection {
-  padding: 16px;
-  padding-left: 56px;
+  padding: 16px 24px;
   margin-bottom: 8px;
   border-bottom: 1px solid var(--gray-medium);
   font-size: 1.5em;

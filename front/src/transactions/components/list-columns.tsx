@@ -15,6 +15,11 @@ export const empty: Column<any> = {
   render: () => null,
 }
 
+export const padding: Column<any> = {
+  className: styles.paddingColumn,
+  render: () => null,
+}
+
 export const status: (e: EntitySelection) => Column<Transaction> = (
   entity
 ) => ({

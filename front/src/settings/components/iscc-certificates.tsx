@@ -14,8 +14,9 @@ import { Alert } from "common/components/alert"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import { DialogButtons, PromptFormProps } from "common/components/dialog"
 import { LabelAutoComplete } from "common/components/autocomplete"
-import { EMPTY_COLUMN, ExpirationDate, SettingsForm } from "./common"
+import { ExpirationDate, SettingsForm } from "./common"
 import Table, { Actions, Column, Line } from "common/components/table"
+import { padding } from "transactions/components/list-columns"
 
 export const ISCCPrompt = ({
   onConfirm,
@@ -54,7 +55,7 @@ export const ISCCPrompt = ({
 }
 
 const COLUMNS: Column<ISCCCertificate>[] = [
-  EMPTY_COLUMN,
+  padding,
   { header: "ID", render: (c) => <Line text={c.certificate_id} /> },
   { header: "Détenteur", render: (c) => <Line text={c.certificate_holder} /> },
   { header: "Périmètre", render: (c) => <Line text={c.scope.join(", ")} /> },

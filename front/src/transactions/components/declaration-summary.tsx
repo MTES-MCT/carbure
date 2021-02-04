@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import Table, { Column, Line } from "common/components/table"
 import useAPI from "common/hooks/use-api"
 import { SummaryItem } from "common/types"
-import { empty } from "./list-columns"
+import { padding } from "./list-columns"
 import * as api from "../api"
 import { Alert } from "common/components/alert"
 import {
@@ -42,7 +42,7 @@ const COLUMNS: Column<SummaryItem>[] = [
     className: colStyles.narrowColumn,
     render: (d) => <Line text={`${d.avg_ghg_reduction.toFixed(2)}%`} />,
   },
-  empty,
+  padding,
 ]
 
 const now = new Date()
@@ -107,7 +107,7 @@ export const SummaryPromptFactory = (entityID: number) =>
     const isOutEmpty = summaryOutRows.length === 0
 
     const inColumns: Column<SummaryItem>[] = [
-      empty,
+      padding,
       {
         header: "Fournisseur",
         render: (d) => <Line text={d.entity} />,
@@ -116,7 +116,7 @@ export const SummaryPromptFactory = (entityID: number) =>
     ]
 
     const outColumns: Column<SummaryItem>[] = [
-      empty,
+      padding,
       {
         header: "Client",
         render: (d) => <Line text={d.entity} />,
