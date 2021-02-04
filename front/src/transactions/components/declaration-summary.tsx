@@ -139,7 +139,7 @@ export const SummaryPromptFactory = (entityID: number) =>
           Afin d'être comptabilisés, les brouillons que vous avez créé pour
           cette période devront être envoyés avant la fin du mois suivant ladite
           période. Une fois la totalité de ces lots validés, vous pourrez
-          vérifier globalement l'état de vos transactions et finalement procéder
+          vérifier ici l'état global de vos transactions et finalement procéder
           à la déclaration.
         </span>
 
