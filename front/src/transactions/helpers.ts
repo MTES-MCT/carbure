@@ -6,6 +6,7 @@ import {
   Transaction,
   LotStatus,
   SummaryItem,
+  Errors,
 } from "common/types"
 
 export function toOption(value: string) {
@@ -22,6 +23,32 @@ export function hasDeadline(tx: Transaction, deadline: string): boolean {
     : new Date()
 
   return differenceInCalendarMonths(deadlineDate, deliveryDate) === 1
+}
+
+export function hasWarnings(
+  tx: Transaction,
+  errors: Record<number, Errors>
+): boolean {
+  if (!tx || !errors[tx.id]) return false
+
+  return (
+    errors[tx.id].validation_errors?.some(
+      (e) => e.is_warning && !e.is_blocking
+    ) ?? false
+  )
+}
+
+export function hasErrors(
+  tx: Transaction,
+  errors: Record<number, Errors>
+): boolean {
+  if (!tx || !errors[tx.id]) return false
+
+  const hasTxErrors = Boolean(errors[tx.id].tx_errors)
+  const hasLotErrors = Boolean(errors[tx.id].lots_errors)
+  const hasBlockingErrors = errors[tx.id].validation_errors?.some((e) => e.is_blocking) ?? false // prettier-ignore
+
+  return hasTxErrors || hasLotErrors || hasBlockingErrors
 }
 
 // extract the status name from the lot details
