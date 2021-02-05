@@ -11,6 +11,8 @@ from django.contrib.auth import get_user_model
 from core.models import Entity, UserRights, Control, ControlMessages
 from django.db.models import Q, Count
 from django.contrib.auth.forms import PasswordResetForm
+from django.core.mail import send_mail
+from django.conf import settings
 
 from core.models import LotTransaction, UserRightsRequests, SustainabilityDeclaration, Control
 from api.v3.lots.helpers import get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors
@@ -233,6 +235,22 @@ def update_right_request(request):
 
     if status == 'ACCEPTED':
         UserRights.objects.update_or_create(entity=request.entity, user=request.user)
+        # send_mail
+        email_subject = "Carbure - Demande acceptée"
+        message = """ 
+        Bonjour,
+        
+        Votre demande d'accès à la Société %s vient d'être validée par l'administration.
+
+        """ % (request.entity.name)
+
+        send_mail(
+            subject=email_subject,
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[request.user.email],
+            fail_silently=False,
+        )
     else:
         UserRights.objects.filter(entity=request.entity, user=request.user).delete()
     return JsonResponse({"status": "success"})
