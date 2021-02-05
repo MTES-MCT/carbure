@@ -9,9 +9,16 @@ import Status from "./status"
 
 import styles from "./list-columns.module.css"
 import { EntitySelection } from "carbure/hooks/use-entity"
+import { hasDeadline } from "transactions/helpers"
+import { Alarm } from "common/components/icons"
 
 export const empty: Column<any> = {
   className: styles.checkboxColumn,
+  render: () => null,
+}
+
+export const padding: Column<any> = {
+  className: styles.paddingColumn,
   render: () => null,
 }
 
@@ -28,12 +35,26 @@ export const carbureID: Column<Transaction> = {
   render: (tx) => <Line text={tx.lot.carbure_id} />,
 }
 
-export const period: Column<Transaction> = {
+export const period: (d: string) => Column<Transaction> = (deadline) => ({
   header: "Période",
   sortBy: "period",
   className: styles.dateColumn,
-  render: (tx) => <Line text={tx.lot.period} />,
-}
+  render: (tx) => (
+    <>
+      <Line
+        text={tx.lot.period}
+        level={hasDeadline(tx, deadline) ? "warning" : undefined}
+      />
+      {hasDeadline(tx, deadline) && (
+        <Alarm
+          color="var(--orange-dark)"
+          size={20}
+          style={{ marginLeft: 4, marginTop: 2 }}
+        />
+      )}
+    </>
+  ),
+})
 
 export const dae: Column<Transaction> = {
   header: "N° Douane",

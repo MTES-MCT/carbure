@@ -14,10 +14,11 @@ import * as common from "common/api"
 import { LoaderOverlay, Title } from "common/components"
 import { Button } from "common/components/button"
 import { AlertTriangle, Plus } from "common/components/icons"
-import { EMPTY_COLUMN, SettingsForm } from "settings/components/common"
+import { SettingsForm } from "settings/components/common"
 import { LabelAutoComplete } from "common/components/autocomplete"
 import { Alert } from "common/components/alert"
 import Table, { Column, Line, Row } from "common/components/table"
+import { padding } from "transactions/components/list-columns"
 import { Section, SectionBody, SectionHeader } from "common/components/section"
 import { DialogButtons, PromptFormProps } from "common/components/dialog"
 
@@ -99,7 +100,7 @@ export const statusColumn = {
 }
 
 const COLUMNS: Column<AccessRight>[] = [
-  EMPTY_COLUMN,
+  padding,
   statusColumn,
   {
     header: "Organisation",
@@ -109,7 +110,7 @@ const COLUMNS: Column<AccessRight>[] = [
     header: "Type",
     render: (r) => <Line text={r.entity.entity_type} />,
   },
-  EMPTY_COLUMN,
+  padding,
 ]
 
 type AccountAccesRightsProps = {

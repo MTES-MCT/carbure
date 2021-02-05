@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import Table, { Column, Line } from "common/components/table"
 import useAPI from "common/hooks/use-api"
 import { SummaryItem } from "common/types"
-import { empty } from "./list-columns"
+import { padding } from "./list-columns"
 import * as api from "../api"
 import { Alert } from "common/components/alert"
 import {
@@ -42,7 +42,7 @@ const COLUMNS: Column<SummaryItem>[] = [
     className: colStyles.narrowColumn,
     render: (d) => <Line text={`${d.avg_ghg_reduction.toFixed(2)}%`} />,
   },
-  empty,
+  padding,
 ]
 
 const now = new Date()
@@ -66,10 +66,14 @@ export const SummaryPromptFactory = (entityID: number) =>
     const [summary, getSummary] = useAPI(api.getDeclarationSummary)
     const [validating, validateDeclaration] = useAPI(api.validateDeclaration)
 
-    const [period, setPeriod] = useState({
-      year: now.getFullYear(),
-      month: now.getMonth() + 1,
-    })
+    const [period, setPeriod] = useState(
+      prevPeriod({
+        year: now.getFullYear(),
+        month: now.getMonth() + 1,
+      })
+    )
+
+    const next = nextPeriod(period)
 
     async function askValidateDeclaration() {
       const ok = await confirm(
@@ -107,7 +111,7 @@ export const SummaryPromptFactory = (entityID: number) =>
     const isOutEmpty = summaryOutRows.length === 0
 
     const inColumns: Column<SummaryItem>[] = [
-      empty,
+      padding,
       {
         header: "Fournisseur",
         render: (d) => <Line text={d.entity} />,
@@ -116,7 +120,7 @@ export const SummaryPromptFactory = (entityID: number) =>
     ]
 
     const outColumns: Column<SummaryItem>[] = [
-      empty,
+      padding,
       {
         header: "Client",
         render: (d) => <Line text={d.entity} />,
@@ -125,11 +129,18 @@ export const SummaryPromptFactory = (entityID: number) =>
     ]
 
     return (
-      <Box>
+      <Box className={styles.declarationContent}>
         <span className={styles.declarationExplanation}>
-          Vous avez jusqu'à la fin du mois pour valider l'ensemble de vos lots
-          pour le mois précédent. Une fois que vous aurez validé la totalité de
-          vos lots pour le mois précédent, vous pourrez les déclarer.
+          Les tableaux suivants vous montrent un récapitulatif de vos entrées et
+          sorties pour la période sélectionnée.
+        </span>
+
+        <span className={styles.declarationExplanation}>
+          Afin d'être comptabilisés, les brouillons que vous avez créé pour
+          cette période devront être envoyés avant la fin du mois suivant ladite
+          période. Une fois la totalité de ces lots validés, vous pourrez
+          vérifier ici l'état global de vos transactions et finalement procéder
+          à la déclaration.
         </span>
 
         <Box row className={styles.declarationPeriod}>
@@ -185,6 +196,13 @@ export const SummaryPromptFactory = (entityID: number) =>
         )}
 
         <DialogButtons className={styles.declarationControls}>
+          <span className={styles.declarationDeadline}>
+            à valider avant la fin du mois de{" "}
+            <b>
+              {("0" + next.month).slice(-2)} / {next.year}
+            </b>
+          </span>
+
           {declaration?.declared ? (
             <Button disabled level="success" icon={Check}>
               Déclaration validée !

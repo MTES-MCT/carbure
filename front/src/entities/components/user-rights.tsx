@@ -2,7 +2,7 @@ import { statusColumn } from "account/components/access-rights"
 import { Title } from "common/components"
 import { Alert } from "common/components/alert"
 import { confirm } from "common/components/dialog"
-import { Check, Cross } from "common/components/icons"
+import { AlertCircle, Check, Cross } from "common/components/icons"
 import { Input } from "common/components/input"
 import { Section, SectionBody, SectionHeader } from "common/components/section"
 import Table, { Actions, Column } from "common/components/table"
@@ -11,8 +11,9 @@ import { UserRightRequest, UserRightStatus } from "common/types"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { formatDate } from "settings/components/common"
-import { empty } from "transactions/components/list-columns"
+import { padding } from "transactions/components/list-columns"
 import * as api from "../api"
+import styles from "./user-rights.module.css"
 
 const RIGHTS_ORDER = {
   [UserRightStatus.Pending]: 0,
@@ -22,7 +23,7 @@ const RIGHTS_ORDER = {
 }
 
 const RIGHTS_COLUMNS: Column<UserRightRequest>[] = [
-  empty,
+  padding,
   statusColumn,
   {
     header: "Utilisateur",
@@ -102,14 +103,20 @@ const UserRights = () => {
       </SectionHeader>
 
       <SectionBody>
-        <Input
-          placeholder="Rechercher utilisateur..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+        {(query.length > 0 || rows.length > 0) && (
+          <Input
+            placeholder="Rechercher utilisateur..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        )}
         {rows.length === 0 && (
-          <Alert icon={Check} level="info">
-            Aucune demande d'accès en cours pour cette société.
+          <Alert
+            icon={AlertCircle}
+            level="warning"
+            className={styles.emptyUserRights}
+          >
+            Aucun utilisateur associé à cette entité
           </Alert>
         )}
       </SectionBody>

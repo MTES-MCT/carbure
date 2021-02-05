@@ -19,8 +19,9 @@ import Table, { Actions, Column, Line, Row } from "common/components/table"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import { DialogButtons, PromptFormProps } from "common/components/dialog"
 import { LabelAutoComplete } from "common/components/autocomplete"
+import { padding } from "transactions/components/list-columns"
 import RadioGroup from "common/components/radio-group"
-import { EMPTY_COLUMN, SettingsForm } from "./common"
+import { SettingsForm } from "./common"
 import useForm from "common/hooks/use-form"
 
 const DEPOT_TYPE_LABELS = {
@@ -206,7 +207,7 @@ export const DeliverySitePromptFactory = (deliverySite?: EntityDeliverySite) =>
   }
 
 const DELIVERY_SITE_COLUMNS: Column<EntityDeliverySite>[] = [
-  EMPTY_COLUMN,
+  padding,
   {
     header: "ID",
     render: (ds) => <Line text={ds.depot!.depot_id} />,

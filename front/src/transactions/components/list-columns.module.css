@@ -1,15 +1,19 @@
-table .checkboxColumn {
-  width: 52px;
-  text-align: center;
+.checkboxColumn {
+  flex: 0.2;
+  justify-content: center;
+}
+
+.paddingColumn {
+  flex: 0 0 24px;
 }
 
 .narrowColumn {
-  width: 88px;
+  flex: 0.4;
 }
 
 .statusColumn,
 .dateColumn {
-  width: 108px;
+  flex: 0.5;
 }
 
 .checkboxWrapper {

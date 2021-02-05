@@ -50,10 +50,16 @@ def get_entity_details(request):
 @is_admin
 def get_entities(request):
     q = request.GET.get('q', False)
-    entities = Entity.objects.all()
+    has_requests = request.GET.get('has_requests', None)
     
+    entities = Entity.objects.all().order_by('name')
+
     if q:
         entities = entities.filter(name__icontains=q)
+    if has_requests == "true":
+        requests = Count('userrightsrequests', filter=Q(userrightsrequests__status='PENDING'))
+        entities = entities.annotate(requests=requests)
+        entities = entities.filter(requests__gt=0)
 
     entities_sez = []
     for e in entities:
