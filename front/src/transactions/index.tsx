@@ -211,6 +211,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
       <TransactionList
         entity={entity}
         transactions={transactions}
+        filters={filters}
         status={status}
         sorting={sorting}
         selection={selection}
@@ -222,7 +223,6 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         duplicator={duplicator}
         acceptor={acceptor}
         rejector={rejector}
-        declarator={declarator}
       />
 
       <Switch>

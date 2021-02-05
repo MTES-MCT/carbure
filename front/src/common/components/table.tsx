@@ -6,10 +6,17 @@ import { Box, SystemProps } from "."
 import styles from "./table.module.css"
 import { ChevronRight, IconProps } from "./icons"
 
-type LineProps = { text: string; small?: boolean }
+type LineProps = { text: string; small?: boolean; level?: "warning" }
 
-export const Line = ({ text, small = false }: LineProps) => (
-  <span title={text} className={cl(styles.rowLine, small && styles.extraInfo)}>
+export const Line = ({ text, small = false, level }: LineProps) => (
+  <span
+    title={text}
+    className={cl(
+      styles.rowLine,
+      small && styles.extraInfo,
+      level === "warning" && styles.lineWarning
+    )}
+  >
     {text}
   </span>
 )
@@ -106,35 +113,37 @@ export default function Table<T>({
   ...props
 }: TableProps<T>) {
   return (
-    <table {...props} className={cl(styles.table, className)}>
-      <thead>
-        <tr>
-          {columns.map((column, c) => (
-            <th
-              key={c}
-              className={column.className}
-              onClick={() => column.sortBy && onSort && onSort(column.sortBy)}
-            >
-              {column.header ?? null}
-              {sortBy && sortBy === column.sortBy && (
-                <span>{order === "asc" ? " ▲" : " ▼"}</span>
-              )}
-            </th>
-          ))}
-        </tr>
-      </thead>
-
-      <tbody>
-        {rows.map((row, r) => (
-          <tr key={r} className={row.className} onClick={row.onClick}>
-            {columns.map((column, c) => (
-              <td key={c} className={column.className}>
-                {column.render(row.value)}
-              </td>
-            ))}
-          </tr>
+    <Box {...props} className={cl(styles.table, className)}>
+      <Box row>
+        {columns.map((column, c) => (
+          <Box
+            row
+            key={c}
+            className={cl(styles.tableHeader, column.className)}
+            onClick={() => column.sortBy && onSort && onSort(column.sortBy)}
+          >
+            {column.header ?? null}
+            {sortBy && sortBy === column.sortBy && (
+              <span>{order === "asc" ? " ▲" : " ▼"}</span>
+            )}
+          </Box>
         ))}
-      </tbody>
-    </table>
+      </Box>
+
+      {rows.map((row, r) => (
+        <Box
+          row
+          key={r}
+          className={cl(styles.tableRow, row.className)}
+          onClick={row.onClick}
+        >
+          {columns.map((column, c) => (
+            <Box row key={c} className={cl(styles.tableCell, column.className)}>
+              {column.render(row.value)}
+            </Box>
+          ))}
+        </Box>
+      ))}
+    </Box>
   )
 }

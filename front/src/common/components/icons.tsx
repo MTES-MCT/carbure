@@ -221,3 +221,18 @@ export const Question = ({ className, ...props }: IconProps) => (
     <line x1="12" y1="19" x2="12" y2="19.01" />
   </Icon>
 )
+
+export const Filter = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-filter", className)}>
+    <path d="M5.5 5h13a1 1 0 0 1 .5 1.5l-5 5.5l0 7l-4 -3l0 -4l-5 -5.5a1 1 0 0 1 .5 -1.5" />
+  </Icon>
+)
+
+export const Alarm = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-alarm", className)}>
+    <circle cx="12" cy="13" r="7" />
+    <polyline points="12 10 12 13 14 13" />
+    <line x1="7" y1="4" x2="4.25" y2="6" />
+    <line x1="17" y1="4" x2="19.75" y2="6" />
+  </Icon>
+)

@@ -11,8 +11,11 @@ export interface EntityDetails {
   certificates_iscc: number
 }
 
-export function getEntities(query: string): Promise<EntityDetails[]> {
-  return api.get("/admin/entities", { q: query })
+export function getEntities(
+  query: string,
+  has_requests?: boolean
+): Promise<EntityDetails[]> {
+  return api.get("/admin/entities", { q: query, has_requests })
 }
 
 export function getEntityDetails(entity_id: number): Promise<Entity> {

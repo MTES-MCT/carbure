@@ -57,5 +57,5 @@ test("operator: display an empty list of transactions", async () => {
 
   screen.getByPlaceholderText("Rechercher...")
 
-  screen.getByText("Aucune transaction trouvée pour ces paramètres")
+  screen.getByText("Aucune transaction trouvée pour cette recherche")
 })

@@ -1,23 +1,18 @@
-.transactionRowError > td:first-child,
-.transactionRowDeadline > td:first-child {
-  position: relative;
-}
-
-.transactionRowError > td:first-child::after,
-.transactionRowDeadline > td:first-child::after {
+.transactionRowError::after,
+.transactionRowWarning::after {
   border-left: 4px solid;
   content: "";
   position: absolute;
   top: 0;
   left: 0;
-  bottom: 0;
+  bottom: 1px;
   width: 4px;
 }
 
-.transactionRowDeadline > td:first-child::after {
+.transactionRowWarning::after {
   border-color: var(--orange-medium);
 }
 
-.transactionRowError > td:first-child::after {
+.transactionRowError::after {
   border-color: var(--red-dark);
 }

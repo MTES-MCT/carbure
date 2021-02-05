@@ -3,7 +3,7 @@ import cl from "clsx"
 
 import styles from "./alert.module.css"
 import { Box, SystemProps, Title } from "./index"
-import { ChevronDown } from "./icons"
+import { ChevronDown, Loader } from "./icons"
 
 // ALERT COMPONENT
 
@@ -36,14 +36,17 @@ export const Alert = ({
 }
 
 type AlertFilterProps = AlertProps & {
-  active: boolean
-  onActivate: () => void
-  onDispose: () => void
+  loading?: boolean
+  active?: boolean
+  onActivate?: () => void
+  onDispose?: () => void
 }
 
 export const AlertFilter = ({
+  loading,
   children,
   active,
+  icon,
   onActivate,
   onDispose,
   ...props
@@ -55,23 +58,29 @@ export const AlertFilter = ({
   }
 
   return (
-    <Alert {...props} className={styles.alertFilter}>
+    <Alert
+      {...props}
+      icon={loading ? Loader : icon}
+      className={cl(styles.alertFilter, loading && styles.alertLoading)}
+    >
       {children}
 
-      {active ? (
-        <span className={styles.alertLink} onClick={onDispose}>
-          Revenir à la liste complète
-        </span>
-      ) : (
-        <span className={styles.alertLink} onClick={onActivate}>
-          Voir la liste
-        </span>
-      )}
+      {onActivate &&
+        onDispose &&
+        (active ? (
+          <span className={styles.alertLink} onClick={onDispose}>
+            Revenir à la liste complète
+          </span>
+        ) : (
+          <span className={styles.alertLink} onClick={onActivate}>
+            Voir la liste
+          </span>
+        ))}
 
       <span
         className={cl(styles.alertLink, styles.alertClose)}
         onClick={() => {
-          onDispose()
+          active && onDispose && onDispose()
           setOpen(false)
         }}
       >

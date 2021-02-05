@@ -59,6 +59,10 @@
   margin-left: auto;
 }
 
+.alertLoading {
+  opacity: 0.5;
+}
+
 .collapsibleAlert {
   flex-direction: column;
   align-items: stretch;

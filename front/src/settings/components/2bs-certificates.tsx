@@ -16,7 +16,8 @@ import { SectionHeader, SectionBody, Section } from "common/components/section"
 import { DialogButtons, PromptFormProps } from "common/components/dialog"
 import { LabelAutoComplete } from "common/components/autocomplete"
 import Table, { Actions, Column, Line } from "common/components/table"
-import { EMPTY_COLUMN, ExpirationDate, SettingsForm } from "./common"
+import { ExpirationDate, SettingsForm } from "./common"
+import { padding } from "transactions/components/list-columns"
 
 export const DBSPrompt = ({
   onConfirm,
@@ -55,7 +56,7 @@ export const DBSPrompt = ({
 }
 
 const COLUMNS: Column<DBSCertificate>[] = [
-  EMPTY_COLUMN,
+  padding,
   { header: "ID", render: (c) => <Line text={c.certificate_id} /> },
   { header: "Détenteur", render: (c) => <Line text={c.certificate_holder} /> },
   { header: "Périmètre", render: (c) => <Line text={c.scope.join(", ")} /> },

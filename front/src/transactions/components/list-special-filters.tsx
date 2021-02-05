@@ -1,15 +1,25 @@
+import cl from "clsx"
+
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { SpecialSelection } from "transactions/hooks/query/use-special"
-import { AlertFilter } from "common/components/alert"
-import { AlertCircle, Calendar } from "common/components/icons"
+import { Alert, AlertFilter } from "common/components/alert"
+import { Alarm, AlertCircle, Filter, Loader } from "common/components/icons"
+
+import styles from "common/components/alert.module.css"
 
 type InvalidFilterProps = {
+  loading: boolean
   errorCount: number
   special: SpecialSelection
 }
 
-export const InvalidFilter = ({ errorCount, special }: InvalidFilterProps) => (
+export const InvalidFilter = ({
+  loading,
+  errorCount,
+  special,
+}: InvalidFilterProps) => (
   <AlertFilter
+    loading={loading}
     level="error"
     icon={AlertCircle}
     active={special.invalid}
@@ -31,6 +41,7 @@ export const InvalidFilter = ({ errorCount, special }: InvalidFilterProps) => (
 )
 
 type DeadlineFilterProps = {
+  loading: boolean
   deadlineCount: number
   deadlineDate: string | null
   special: SpecialSelection
@@ -38,14 +49,16 @@ type DeadlineFilterProps = {
 }
 
 export const DeadlineFilter = ({
+  loading,
   deadlineCount,
   deadlineDate,
   special,
   entity,
 }: DeadlineFilterProps) => (
   <AlertFilter
+    loading={loading}
     level="warning"
-    icon={Calendar}
+    icon={Alarm}
     active={special.deadline}
     onActivate={() => special.setDeadline(true)}
     onDispose={() => special.setDeadline(false)}
@@ -68,4 +81,36 @@ export const DeadlineFilter = ({
       </span>
     )}
   </AlertFilter>
+)
+
+type SummaryFilterProps = {
+  loading: boolean
+  txCount: number
+  onReset: () => void
+}
+
+export const SummaryFilter = ({
+  loading,
+  txCount,
+  onReset,
+}: SummaryFilterProps) => (
+  <Alert
+    level="info"
+    icon={loading ? Loader : Filter}
+    className={cl(styles.alertFilter, loading && styles.alertLoading)}
+  >
+    {txCount === 1 ? (
+      <span>
+        <b>Un seul lot</b> a été trouvé pour cette recherche
+      </span>
+    ) : (
+      <span>
+        Un total de <b>{txCount} lots</b> ont été trouvés pour cette recherche
+      </span>
+    )}
+
+    <span className={cl(styles.alertLink, styles.alertClose)} onClick={onReset}>
+      Réinitialiser les filtres
+    </span>
+  </Alert>
 )

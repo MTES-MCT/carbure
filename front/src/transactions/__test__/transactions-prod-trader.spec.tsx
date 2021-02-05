@@ -8,6 +8,7 @@ import { producer } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
 import { MemoryRouter } from "react-router-dom"
 import Transactions from "../index"
+import { clickOnCheckboxesAndConfirm } from "./helpers"
 
 import server, { setLots, setSnapshot } from "./api"
 import {
@@ -70,7 +71,7 @@ test("producer/trader: display an empty list of transactions", async () => {
 
   screen.getByPlaceholderText("Rechercher...")
 
-  screen.getByText("Aucune transaction trouvée pour ces paramètres")
+  screen.getByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("producer/trader: display a list of 1 transaction", async () => {
@@ -223,7 +224,7 @@ test("check error filter", async () => {
 
   const dae = await screen.findByText("DAETEST")
 
-  expect(dae.closest("tr")).toHaveClass("transactionRowError")
+  expect(dae.closest(".tableRow")).toHaveClass("transactionRowError")
 
   await screen.findByText(
     (content, node) =>
@@ -255,7 +256,7 @@ test("check deadline filter", async () => {
 
   const dae = await screen.findByText("DAETEST")
 
-  expect(dae.closest("tr")).toHaveClass("transactionRowDeadline")
+  expect(dae.closest(".tableRow")).toHaveClass("transactionRowDeadline")
 
   await screen.findByText(
     (content, node) =>
@@ -386,7 +387,7 @@ test("producer/trader: sent draft lot", async () => {
 
   // confirm the sending
   const title = screen.getByText("Envoyer lot")
-  userEvent.click(screen.getByText("OK"))
+  clickOnCheckboxesAndConfirm()
 
   expect(title).not.toBeInTheDocument()
 
@@ -398,7 +399,7 @@ test("producer/trader: sent draft lot", async () => {
   screen.getByText("31")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("producer/trader: sent all draft lots", async () => {
@@ -419,7 +420,7 @@ test("producer/trader: sent all draft lots", async () => {
 
   // confirm the sending
   const title = screen.getByText("Envoyer tous les brouillons")
-  userEvent.click(screen.getByText("OK"))
+  clickOnCheckboxesAndConfirm()
 
   expect(title).not.toBeInTheDocument()
 
@@ -431,7 +432,7 @@ test("producer/trader: sent all draft lots", async () => {
   screen.getByText("31")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("producer/trader: sent selected draft lots", async () => {
@@ -449,8 +450,8 @@ test("producer/trader: sent selected draft lots", async () => {
   userEvent.click(screen.getByText("Envoyer sélection"))
 
   // confirm the sending
-  const title = screen.getByText("Envoyer lot")
-  userEvent.click(screen.getByText("OK"))
+  const title = screen.getByText("Envoyer la sélection")
+  clickOnCheckboxesAndConfirm()
 
   expect(title).not.toBeInTheDocument()
 
@@ -462,7 +463,7 @@ test("producer/trader: sent selected draft lots", async () => {
   screen.getByText("31")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 // DELETE DRAFT
@@ -488,7 +489,7 @@ test("producer/trader: delete draft lot", async () => {
   await screen.findByText("39")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("producer/trader: delete all draft lot", async () => {
@@ -518,7 +519,7 @@ test("producer/trader: delete all draft lot", async () => {
   await screen.findByText("39")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("producer/trader: delete selected draft lot", async () => {
@@ -546,7 +547,7 @@ test("producer/trader: delete selected draft lot", async () => {
   await screen.findByText("39")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 // RESEND TOFIX
@@ -573,7 +574,7 @@ test("producer/trader: resend fixed lot", async () => {
   await screen.findByText("19")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 // DELETE TOFIX
@@ -599,7 +600,7 @@ test("producer/trader: delete tofix lot", async () => {
   await screen.findByText("19")
 
   // no more drafts
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
 test("producer/trader: delete selected tofix lot", async () => {
@@ -628,5 +629,5 @@ test("producer/trader: delete selected tofix lot", async () => {
   await screen.findByText("19")
 
   // no more tofix lots
-  await screen.findByText("Aucune transaction trouvée pour ces paramètres")
+  await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })

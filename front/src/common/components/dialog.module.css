@@ -21,3 +21,12 @@ div.dialog {
 .dialogButtons button {
   margin-left: 12px;
 }
+
+.dialogCheckboxes {
+  margin-bottom: 16px;
+}
+
+.dialogCheckboxes label {
+  height: auto;
+  margin-bottom: 8px;
+}
