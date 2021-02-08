@@ -61,7 +61,7 @@ def make_producers_lots_sheet_advanced(workbook, entity, nb_lots):
                'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
                'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
                'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
-    if entity.producer_with_mac:
+    if entity.has_mac:
         columns.append('mac')
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
@@ -99,7 +99,7 @@ def make_producers_lots_sheet_advanced(workbook, entity, nb_lots):
             # regular transaction. sell to someone else
             row += [client.name, today, site.depot_id, 'FR']
 
-        if entity.producer_with_mac:
+        if entity.has_mac:
             row += [0]
 
         colid = 0
