@@ -209,7 +209,7 @@ test("check transaction errors", async () => {
   expect(mp).toHaveClass("errorLabel")
 
   screen.getByText("Erreurs (1)")
-  screen.getByText("Matière Première incohérente avec le Biocarburant")
+  screen.getByText("Matière Première incohérente avec le Biocarburant - Biogaz de Blé")
 
   screen.getByText("Remarques (1)")
   screen.getByText("Volume inhabituellement faible.")
