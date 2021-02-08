@@ -164,9 +164,9 @@ def sanity_check(tx):
             if lot.biocarburant.code == 'EMHU' and lot.matiere_premiere.code != 'HUILE_ALIMENTAIRE_USAGEE':
                 is_sane = False
                 errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s doit être à base d'huiles alimentaires usagées" % (lot.biocarburant.name)))
-            if lot.biocarburant.code == 'EMHV' and lot.matiere_premiere.code not in ['COLZA', 'TOURNESOL', 'SOJA', 'HUILE_PALME', 'EFFLUENTS_HUILERIES_PALME_RAFLE']:
+            if lot.biocarburant.code == 'EMHV' and lot.matiere_premiere.code not in ['COLZA', 'TOURNESOL', 'SOJA', 'HUILE_PALME']:
                 is_sane = False
-                errors.append(raise_error(lot, 'MP_BC_INCOHERENT',  details="%s doit être à base de végétaux (Colza, Tournesol, Soja, Huile de Palme ou POME)" % (lot.biocarburant.name)))
+                errors.append(raise_error(lot, 'MP_BC_INCOHERENT',  details="%s doit être à base de végétaux (Colza, Tournesol, Soja, Huile de Palme)" % (lot.biocarburant.name)))
             if lot.biocarburant.code == 'EMHA' and lot.matiere_premiere.code not in ['HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2', 'HUILES_OU_GRAISSES_ANIMALES_CAT3']:
                 is_sane = False
                 errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s doit être à base d'huiles ou graisses animales" % (lot.biocarburant.name)))
