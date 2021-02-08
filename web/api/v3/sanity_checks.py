@@ -147,7 +147,7 @@ def sanity_check(tx):
             errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s issu de fermentation et %s n'est pas fermentescible" % (lot.biocarburant.name, lot.matiere_premiere.name)))
         if lot.biocarburant.is_graisse and lot.matiere_premiere.compatible_graisse is False:
             is_sane = False
-            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s incompatible avec Esther Méthylique %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
+            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="Matière première (%s) incompatible avec Esthers Méthyliques" % (lot.matiere_premiere.name)))
 
         # double comptage, cas specifiques
         if lot.matiere_premiere.is_double_compte:
