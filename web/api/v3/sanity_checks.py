@@ -144,10 +144,10 @@ def sanity_check(tx):
         # consistence des matieres premieres avec biocarburant
         if lot.biocarburant.is_alcool and lot.matiere_premiere.compatible_alcool is False:
             is_sane = False
-            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
+            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s issu de fermentation et %s n'est pas fermentescible" % (lot.biocarburant.name, lot.matiere_premiere.name)))
         if lot.biocarburant.is_graisse and lot.matiere_premiere.compatible_graisse is False:
             is_sane = False
-            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
+            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s incompatible avec Esther Méthylique %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
 
         # double comptage, cas specifiques
         if lot.matiere_premiere.is_double_compte:
@@ -163,28 +163,28 @@ def sanity_check(tx):
         if lot.biocarburant.is_graisse:
             if lot.biocarburant.code == 'EMHU' and lot.matiere_premiere.code != 'HUILE_ALIMENTAIRE_USAGEE':
                 is_sane = False
-                errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
+                errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s doit être à base d'huiles alimentaires usagées" % (lot.biocarburant.name)))
             if lot.biocarburant.code == 'EMHV' and lot.matiere_premiere.code not in ['COLZA', 'TOURNESOL', 'SOJA', 'HUILE_PALME', 'EFFLUENTS_HUILERIES_PALME_RAFLE']:
                 is_sane = False
-                errors.append(raise_error(lot, 'MP_BC_INCOHERENT',  details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
+                errors.append(raise_error(lot, 'MP_BC_INCOHERENT',  details="%s doit être à base de végétaux (Colza, Tournesol, Soja, Huile de Palme ou POME)" % (lot.biocarburant.name)))
             if lot.biocarburant.code == 'EMHA' and lot.matiere_premiere.code not in ['HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2', 'HUILES_OU_GRAISSES_ANIMALES_CAT3']:
                 is_sane = False
-                errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
+                errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s doit être à base d'huiles ou graisses animales" % (lot.biocarburant.name)))
 
         if lot.matiere_premiere.code in ['HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2', 'HUILES_OU_GRAISSES_ANIMALES_CAT3'] and lot.biocarburant.code not in ['EMHA', 'HOE', 'HOG']:
             is_sane = False
-            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
+            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="Des huiles ou graisses animales ne peuvent donner que des EMHA ou HOG/HOE"))
         if lot.matiere_premiere.code == 'HUILE_ALIMENTAIRE_USAGEE' and lot.biocarburant.code not in ['EMHU', 'HOE', 'HOG']:
             is_sane = False
-            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
+            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="Des huiles alimentaires usagées ne peuvent donner que des EMHU ou HOG/HOE"))
 
         if lot.matiere_premiere.code in ['MAIS', 'BLE', 'BETTERAVE', 'CANNE_A_SUCRE', 'RESIDUS_VINIQUES'] and lot.biocarburant.code not in ['ETH', 'ETBE']:
             is_sane = False
-            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
+            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="Éthanol ou ETBE doivent être à base de Maïs, Blé, Betterave, Canne à Sucre ou Résidus Viniques"))
 
         if not lot.matiere_premiere.is_huile_vegetale and lot.biocarburant.code in ['HVOE', 'HVOG']:
             is_sane = False
-            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
+            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="Un HVO doit provenir d'huiles végétales uniquement. Pour les autres huiles hydrotraitées, voir la nomenclature HOE/HOG"))
     return lot_valid, tx_valid, is_sane, errors
 
 

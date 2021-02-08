@@ -30,7 +30,7 @@ const ValidationErrors = ({ validationErrors }: ValidationErrorsProps) => {
           </i>
           <ul className={styles.validationErrors}>
             {errors.map((err, i) => (
-              <li key={i}>{err.error || "Erreur de validation"}</li>
+              <li key={i}>{err.error || "Erreur de validation"} { err.details && ` - ${err.details}` }</li>
             ))}
           </ul>
         </Collapsible>
@@ -49,7 +49,7 @@ const ValidationErrors = ({ validationErrors }: ValidationErrorsProps) => {
           </i>
           <ul className={styles.validationErrors}>
             {warnings.map((err, i) => (
-              <li key={i}>{err.error || "Erreur de validation"}</li>
+              <li key={i}>{err.error || "Erreur de validation"} { err.details && ` - ${err.details}` }</li>
             ))}
           </ul>
         </Collapsible>
