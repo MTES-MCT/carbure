@@ -65,7 +65,7 @@
   <!-- End Matomo Code -->
 
   <style>
-    
+
 @font-face {
   font-family: "Marianne";
   src: url("/static/fonts/Marianne/Marianne-Regular.woff2") format("woff2"),
@@ -121,13 +121,17 @@
   --font-family: Marianne,arial,sans-serif;
 }
 
+* {
+  font-family: var(--font-family) !important; 
+}
+
 .footer_footerContainer {
   display: flex;
   justify-content: space-between;
   background: var(--footer);
   color: var(--white);
   padding: 32px 120px;
-  font-size: var(--font-size);
+  font-size: 16px;
   line-height: 1.5em;
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
