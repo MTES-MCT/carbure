@@ -132,7 +132,7 @@ def get_lots(request):
         elif status == 'correction':
             txs = txs.filter(delivery_status__in=['AC', 'R', 'AA'])
         elif status == 'declaration':
-            txs = txs.filter(delivery_status='A')
+            txs = txs.filter(delivery_status__in=['A', 'N'])
 
         return get_lots_with_metadata(txs, None, request.GET)
 
