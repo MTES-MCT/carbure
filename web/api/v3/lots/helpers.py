@@ -110,6 +110,7 @@ def filter_lots(txs, querySet):
     producers = querySet.getlist('producers')
     traders = querySet.getlist('traders')
     operators = querySet.getlist('operators')
+    delivery_status = querySet.getlist('delivery_status')
     query = querySet.get('query', False)
 
     date_from = datetime.date.today().replace(month=1, day=1)
@@ -141,7 +142,9 @@ def filter_lots(txs, querySet):
         txs = txs.filter(Q(carbure_client__name__in=clients) | Q(unknown_client__in=clients))
     if vendors:
         txs = txs.filter(Q(carbure_vendor__name__in=vendors) | Q(unknown_vendor__in=vendors))
-    
+    if delivery_status:
+        txs = txs.filter(delivery_status__in=delivery_status)
+
     if producers:
         print(producers)
         txs = filter_by_entities(txs, producers)
