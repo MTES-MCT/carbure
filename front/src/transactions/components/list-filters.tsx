@@ -10,6 +10,7 @@ import Select, { Option, SelectValue } from "common/components/select"
 import styles from "./list-filters.module.css"
 
 const FILTER_ORDER = [
+  Filters.DeliveryStatus,
   Filters.Periods,
   Filters.Biocarburants,
   Filters.MatieresPremieres,
@@ -24,6 +25,7 @@ const FILTER_ORDER = [
 ]
 
 const FILTER_LABELS = {
+  [Filters.DeliveryStatus]: "Livraison",
   [Filters.Periods]: "Périodes",
   [Filters.ProductionSites]: "Sites de production",
   [Filters.MatieresPremieres]: "Matières Premières",

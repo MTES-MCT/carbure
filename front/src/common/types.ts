@@ -250,6 +250,7 @@ export interface LotDetails {
 }
 
 export enum Filters {
+  DeliveryStatus = "delivery_status",
   MatieresPremieres = "matieres_premieres",
   Biocarburants = "biocarburants",
   Periods = "periods",

@@ -196,6 +196,7 @@ def get_snapshot(request):
         filters['producers'] = [p.name for p in producers]
         filters['traders'] = [p.name for p in traders]
         filters['operators'] = [p.name for p in operators]
+        filters['delivery_status'] = [s[0] for s in LotTransaction.DELIVERY_STATUS]
 
         data['filters'] = filters
 
