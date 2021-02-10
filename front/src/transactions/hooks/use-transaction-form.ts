@@ -48,6 +48,10 @@ export interface TransactionFormState {
   unknown_production_site_reference: string
   unknown_production_site_dbl_counting: string
 
+  vendor_is_in_carbure: boolean
+  carbure_vendor: Entity | null
+  unknown_vendor: string
+
   client_is_in_carbure: boolean
   carbure_client: Entity | null
   unknown_client: string
@@ -97,6 +101,10 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
       tx.lot.unknown_production_site_com_date ?? "",
     unknown_production_site_dbl_counting:
       tx.lot.unknown_production_site_dbl_counting,
+
+    vendor_is_in_carbure: tx.vendor_is_in_carbure,
+    carbure_vendor: tx.carbure_vendor,
+    unknown_vendor: tx.unknown_vendor,
 
     client_is_in_carbure: tx.client_is_in_carbure,
     carbure_client: tx.carbure_client,
@@ -173,6 +181,10 @@ export function toTransactionPostData(tx: TransactionFormState) {
     delivery_site_country: !tx.delivery_site_is_in_carbure
       ? tx.unknown_delivery_site_country?.code_pays
       : "",
+
+    vendor: tx.vendor_is_in_carbure
+      ? tx.carbure_vendor?.name
+      : tx.unknown_vendor,
   }
 }
 
@@ -213,6 +225,10 @@ const initialState: TransactionFormState = {
   unknown_production_site_com_date: "",
   unknown_production_site_reference: "",
   unknown_production_site_dbl_counting: "",
+
+  vendor_is_in_carbure: true,
+  carbure_vendor: null,
+  unknown_vendor: "",
 
   client_is_in_carbure: true,
   carbure_client: null,
