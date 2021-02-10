@@ -236,3 +236,4 @@ export const Alarm = ({ className, ...props }: IconProps) => (
     <line x1="17" y1="4" x2="19.75" y2="6" />
   </Icon>
 )
+
