@@ -184,8 +184,8 @@ def get_snapshot(request):
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
         txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
         _, total_errors = get_lots_with_errors(txs)
-        correction = len(txs.filter(delivery_status__in=['AC', 'R', 'AA']))
-        declaration= len(txs.filter(delivery_status='A'))
+        correction = txs.filter(delivery_status__in=['AC', 'R', 'AA']).count()
+        declaration = txs.filter(delivery_status='A').count()
         data['lots'] = {'alert': total_errors, 'correction': correction, 'declaration': declaration}
 
         filters = get_snapshot_filters(txs)
@@ -341,14 +341,14 @@ def get_declarations(request):
     # get entities that have posted at least one lot since the beginning of the period
     entities_alive = [f['lot__added_by'] for f in LotTransaction.objects.filter(lot__added_time__gt=start).values('lot__added_by').annotate(count=Count('lot')).filter(count__gt=1)]
     entities = Entity.objects.filter(id__in=entities_alive)
-    logging.debug('{} entities alive'.format(len(entities)))
+    logging.debug('{} entities alive'.format(entities.count()))
     
     # create the SustainabilityDeclaration objects in database
     # 0) cleanup
     # SustainabilityDeclaration.objects.filter(checked=False).delete()
     # 1) get existing objects
     sds = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start)
-    print('%d existing sds' % (len(sds)))
+    print('%d existing sds' % (sds.count()))
     existing = {}
     for sd in sds:
         key = '%d.%d.%d' % (sd.entity.id, sd.period.year, sd.period.month)
@@ -377,7 +377,7 @@ def get_declarations(request):
             logging.debug(t.natural_key())
         SustainabilityDeclaration.objects.bulk_create(to_create)
         sds = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start)
-        print('%d now existing sds' % (len(sds)))
+        print('%d now existing sds' % (sds.count()))
     else:
         logging.debug('no new declaration objects to create. Existing {}'.format(len(existing)))
 
