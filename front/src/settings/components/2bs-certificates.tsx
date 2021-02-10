@@ -15,7 +15,7 @@ import { Alert } from "common/components/alert"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import { DialogButtons, PromptFormProps } from "common/components/dialog"
 import { LabelAutoComplete } from "common/components/autocomplete"
-import Table, { Actions, Column, Line } from "common/components/table"
+import Table, { Actions, Column, Line, DownloadLink } from "common/components/table"
 import { ExpirationDate, SettingsForm } from "./common"
 import { padding } from "transactions/components/list-columns"
 
@@ -60,6 +60,8 @@ const COLUMNS: Column<DBSCertificate>[] = [
   { header: "ID", render: (c) => <Line text={c.certificate_id} /> },
   { header: "Détenteur", render: (c) => <Line text={c.certificate_holder} /> },
   { header: "Périmètre", render: (c) => <Line text={c.scope.join(", ")} /> },
+  { header: "Téléchargement", render: (c) => <DownloadLink url={c.download_link} /> },
+
 ]
 
 type DBSCertificateSettingsProps = {
