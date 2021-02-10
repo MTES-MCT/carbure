@@ -10,7 +10,7 @@ from core.models import Depot, Pays
 filename = '%s/web/fixtures/csv/depots.csv' % (os.environ['CARBURE_HOME'])
 
 with open(filename) as csvfile:
-    reader = csv.reader(csvfile, delimiter=';', quotechar='"')
+    reader = csv.reader(csvfile, quotechar='"')
     for row in reader:
         name = row[0]
         depot_id = row[1]
