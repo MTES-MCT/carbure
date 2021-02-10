@@ -16,12 +16,12 @@ class Entity(models.Model):
     entity_type = models.CharField(max_length=64, choices=ENTITY_TYPES, default='Unknown')
     parent_entity = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
 
-    producer_with_mac = models.BooleanField(default=False)
-    producer_with_trading = models.BooleanField(default=False)
     trading_certificate = models.FileField(null=True, blank=True)
     has_mac = models.BooleanField(default=False)
     has_trading = models.BooleanField(default=False)
     national_system_certificate = models.CharField(max_length=64, null=True, blank=True)
+
+
 
     def __str__(self):
         return self.name

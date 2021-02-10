@@ -541,7 +541,7 @@ def make_dump_lots_sheet(workbook, entity, transactions):
                'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
                'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total',
                'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
-    if entity is not None and entity.producer_with_mac:
+    if entity is not None and entity.has_mac:
         columns.append('mac')
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
@@ -564,7 +564,7 @@ def make_dump_lots_sheet(workbook, entity, transactions):
                tx.carbure_delivery_site.depot_id if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site,
                tx.carbure_delivery_site.country.code_pays if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site_country.code_pays if tx.unknown_delivery_site_country else ''
                ]
-        if entity is not None and entity.producer_with_mac:
+        if entity is not None and entity.has_mac:
             row += [tx.is_mac]
 
         colid = 0
