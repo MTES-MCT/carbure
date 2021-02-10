@@ -10,13 +10,12 @@ import { Link, NavLink } from "common/components/relative-route"
 import { Question } from "common/components/icons"
 
 import logoMarianne from "../assets/images/Marianne.svg"
-import logoBetaGouv from "../assets/images/betagouvfr.svg"
+import logoBetaGouv from "../assets/images/carbure.svg"
 import styles from "./top-bar.module.css"
 
 const Logo = () => (
   <Link to="/" className={styles.logo}>
     <img src={logoMarianne} alt="marianne logo" className={styles.marianne} />
-    <span className={styles.carbure}>carbure.</span>
     <img
       src={logoBetaGouv}
       alt="beta.gouv.fr logo"

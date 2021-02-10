@@ -125,6 +125,20 @@
   font-family: var(--font-family) !important; 
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+img.navbar__gouvfr {
+  height: 28px;
+  margin-left: 8px;
+}
+
+.section-grey {
+  min-height: 100%;
+}
+
 .footer_footerContainer {
   display: flex;
   justify-content: space-between;
@@ -215,8 +229,8 @@
   <header class="navbar" role="navigation">
     <div class="navbar__container">
       <a class="navbar__home" href="{% url 'index' %}">
-        <img class="navbar__logo" src="/static/images/logo-marianne.svg"
-          alt="carbure.beta.gouv.fr" /><span class="navbar__domain">carbure</span><img src="/static/images/pointbetagouvfr.svg" class="navbar__gouvfr" alt="beta.gouv.fr" />
+        <img class="navbar__logo" src="/static/images/Marianne.svg" alt="carbure.beta.gouv.fr" />
+        <img src="/static/images/carbure.svg" class="navbar__gouvfr" alt="beta.gouv.fr" />
       </a>
 
       <nav>
