@@ -15,16 +15,9 @@
   height: 24px;
 }
 
-.carbure {
-  margin-left: 16px;
-  margin-top: -6px;
-  font-size: 18px;
-  letter-spacing: 0.05em;
-  color: var(--black);
-}
-
 .betagouv {
-  height: 40px;
+  height: 20px;
+  margin: 8px 16px;
 }
 
 .pageNav {
