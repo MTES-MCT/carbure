@@ -15,7 +15,7 @@ import { SectionHeader, SectionBody, Section } from "common/components/section"
 import { DialogButtons, PromptFormProps } from "common/components/dialog"
 import { LabelAutoComplete } from "common/components/autocomplete"
 import { ExpirationDate, SettingsForm } from "./common"
-import Table, { Actions, Column, Line } from "common/components/table"
+import Table, { Actions, Column, Line, DownloadLink } from "common/components/table"
 import { padding } from "transactions/components/list-columns"
 
 export const ISCCPrompt = ({
@@ -59,6 +59,7 @@ const COLUMNS: Column<ISCCCertificate>[] = [
   { header: "ID", render: (c) => <Line text={c.certificate_id} /> },
   { header: "Détenteur", render: (c) => <Line text={c.certificate_holder} /> },
   { header: "Périmètre", render: (c) => <Line text={c.scope.join(", ")} /> },
+  { header: "Téléchargement", render: (c) => <DownloadLink url={c.download_link} /> },
 ]
 
 type ISCCCertificateSettingsProps = {

@@ -322,6 +322,7 @@ export type DBSCertificate = {
   certification_type: string
   scope: string[]
   has_been_updated: boolean
+  download_link: string
 }
 
 export type ISCCCertificate = {
@@ -333,6 +334,7 @@ export type ISCCCertificate = {
   issuing_cb: string
   scope: string[]
   has_been_updated: boolean
+  download_link: string
 }
 
 export type Certificate = {
