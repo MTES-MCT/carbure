@@ -2,25 +2,30 @@
   display: flex;
   justify-content: space-between;
   padding: 16px 120px;
+  padding-top: 8px;
   background-color: var(--white);
   box-shadow: 0px 1px 2px var(--gray-medium);
 }
 
 .filterGroup {
   display: flex;
+  flex-wrap: wrap;
 }
 
 .filterGroup > div {
+  width: 200px;
   margin-right: 8px;
+  margin-top: 8px;
 }
 
-.filterGroup > div {
-  width: 155px;
+.searchInput {
+  margin-top: 8px;
+  margin-left: 12px;
+  align-self: center;
 }
 
 .searchInput input {
   width: 165px;
-  height: 100%;
   background-color: var(--gray-light);
 }
 
