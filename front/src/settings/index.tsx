@@ -58,7 +58,7 @@ const Settings = ({ entity, settings }: SettingsProps) => {
   const isOperator = entity?.entity_type === "Opérateur"
 
   const hasCertificates = isProducer || isTrader
-  const hasCSN = (isProducer && entity?.has_mac) || isOperator
+  const hasCSN = isProducer || isOperator
 
   return (
     <Main>
