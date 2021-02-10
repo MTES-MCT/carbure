@@ -26,8 +26,6 @@ test("display alert message when connected without access rights", async () => {
 
   render(<CarbureWithRouter />)
 
-  await screen.findByText("carbure.")
-
   await screen.findByText("🌻 Bienvenue sur CarbuRe")
 
   screen.getByText("Menu")
