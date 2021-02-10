@@ -92,8 +92,8 @@ def get_stocks(request, *args, **kwargs):
 
     data = {}
     data['lots'] = [t.natural_key() for t in returned]
-    data['total'] = len(txs)
-    data['returned'] = len(returned)
+    data['total'] = txs.count()
+    data['returned'] = returned.count()
     data['from'] = from_idx
     data['tx_errors'] = []
     data['lots_errors'] = []
@@ -108,11 +108,11 @@ def get_snapshot(request, *args, **kwargs):
     if entity.entity_type in ['Producteur', 'Trader']:
         # drafts are lot that will be extracted from mass balance and sent to a client
         tx_drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
-        draft = len(tx_drafts)
+        draft = tx_drafts.count()
         tx_inbox = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AC', 'AA'])
-        inbox = len(tx_inbox)
+        inbox = tx_inbox.count()
         tx_stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0)
-        stock = len(tx_stock)
+        stock = tx_stock.count()
         data['lots'] = {'in': inbox,  'stock': stock, 'tosend': draft}
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)

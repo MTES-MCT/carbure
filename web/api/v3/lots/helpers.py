@@ -146,7 +146,6 @@ def filter_lots(txs, querySet):
         txs = txs.filter(delivery_status__in=delivery_status)
 
     if producers:
-        print(producers)
         txs = filter_by_entities(txs, producers)
     if operators:
         txs = filter_by_entities(txs, operators)
@@ -175,7 +174,7 @@ def get_lots_with_errors(txs):
     tx_with_errors = txs.annotate(Count('transactionerror'), Count('lot__lotv2error'), Count('lot__lotvalidationerror'))
     tx_with_errors = tx_with_errors.filter(Q(transactionerror__count__gt=0) | Q(lot__lotv2error__count__gt=0) | Q(lot__lotvalidationerror__count__gt=0))
 
-    return tx_with_errors, len(tx_with_errors)
+    return tx_with_errors, tx_with_errors.count()
 
 
 def get_lots_with_deadline(txs):
@@ -186,7 +185,7 @@ def get_lots_with_deadline(txs):
     txs_with_deadline = txs.filter(lot__status='Draft', delivery_date__year=affected_date.year, delivery_date__month=affected_date.month)
     deadline_str = deadline_date.strftime("%Y-%m-%d")
 
-    return txs_with_deadline, deadline_str, len(txs_with_deadline)
+    return txs_with_deadline, deadline_str, txs_with_deadline.count()
 
 
 def sort_lots(txs, sort_by, order):
@@ -253,9 +252,9 @@ def get_lots_with_metadata(txs, entity, querySet):
 
     data = {}
     data['lots'] = [t.natural_key() for t in returned]
-    data['total'] = len(txs)
+    data['total'] = txs.count()
     data['total_errors'] = total_errors
-    data['returned'] = len(returned)
+    data['returned'] = returned.count()
     data['from'] = from_idx
     data['errors'] = errors
     data['deadlines'] = {'date': deadline_str, 'total': total_deadline}
