@@ -91,18 +91,18 @@ def get_snapshot(request, *args, **kwargs):
         txs = LotTransaction.objects.filter(lot__added_by=entity)
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
         txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-        draft = len(txs.filter(lot__status='Draft'))
-        validated = len(txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA']))
-        tofix = len(txs.filter(lot__status='Validated', delivery_status__in=['AC', 'R']))
-        accepted = len(txs.filter(lot__status='Validated', delivery_status='A'))
+        draft = txs.filter(lot__status='Draft').count()
+        validated = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA']).count()
+        tofix = txs.filter(lot__status='Validated', delivery_status__in=['AC', 'R']).count()
+        accepted = txs.filter(lot__status='Validated', delivery_status='A').count()
         data['lots'] = {'draft': draft, 'validated': validated, 'tofix': tofix, 'accepted': accepted}
     elif entity.entity_type == 'Opérateur':
         txs = LotTransaction.objects.filter(carbure_client=entity)
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
         txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-        draft = len(txs.filter(lot__added_by=entity, lot__status='Draft'))
-        ins = len(txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA', 'AC']))
-        accepted = len(txs.filter(lot__status='Validated', delivery_status='A'))
+        draft = txs.filter(lot__added_by=entity, lot__status='Draft').count()
+        ins = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA', 'AC']).count()
+        accepted = txs.filter(lot__status='Validated', delivery_status='A').count()
         data['lots'] = {'draft': draft, 'accepted': accepted, 'in': ins}
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
