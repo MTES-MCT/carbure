@@ -240,45 +240,93 @@ const initialState: TransactionFormState = {
   unknown_delivery_site_country: null,
 }
 
+function producerSettings(
+  entity: EntitySelection,
+  tx: TransactionFormState,
+  setForm: (s: TransactionFormState) => void
+) {
+  // checking "producer is in carbure" forces producer field to be current entity
+  if (tx.producer_is_in_carbure && tx.carbure_producer?.id !== entity?.id) {
+    setForm({ ...tx, carbure_producer: entity })
+  }
+
+  // empty vendor field to avoid replacing it when calling the api
+  if (!tx.vendor_is_in_carbure || tx.carbure_vendor) {
+    setForm({ ...tx, vendor_is_in_carbure: true, carbure_vendor: null })
+  }
+}
+
+function operatorSettings(
+  entity: EntitySelection,
+  tx: TransactionFormState,
+  setForm: (s: TransactionFormState) => void
+) {
+  // for operators, force client field to be current entity and "producer is in carbure" to be unchecked
+  if (!tx.client_is_in_carbure || tx.carbure_client?.id !== entity?.id) {
+    setForm({
+      ...tx,
+      client_is_in_carbure: true,
+      carbure_client: entity,
+    })
+  }
+
+  if (tx.producer_is_in_carbure && !tx.carbure_producer) {
+    setForm({
+      ...tx,
+      producer_is_in_carbure: false,
+    })
+  }
+
+  if (tx.vendor_is_in_carbure && !tx.carbure_vendor) {
+    setForm({
+      ...tx,
+      vendor_is_in_carbure: false,
+    })
+  }
+}
+
+function traderSettings(
+  entity: EntitySelection,
+  tx: TransactionFormState,
+  setForm: (s: TransactionFormState) => void
+) {
+  // for traders, force "producer is in carbure" to be unchecked
+  if (tx.producer_is_in_carbure && !tx.carbure_producer) {
+    setForm({
+      ...tx,
+      producer_is_in_carbure: false,
+    })
+  }
+
+  if (tx.vendor_is_in_carbure && !tx.carbure_vendor) {
+    setForm({
+      ...tx,
+      vendor_is_in_carbure: false,
+    })
+  }
+}
+
 export default function useTransactionForm(
   entity: EntitySelection,
   isStock: boolean = false
 ): FormHook<TransactionFormState> {
-  const [form, hasChange, onChange, setForm] = useForm<TransactionFormState>(
-    initialState
-  )
+  const [form, hasChange, onChange, setForm] = useForm<TransactionFormState>(initialState) // prettier-ignore
 
   const isProducer = entity?.entity_type === "Producteur"
   const isOperator = entity?.entity_type === "Opérateur"
   const isTrader = entity?.entity_type === "Trader"
 
   if (!isStock) {
-    if (
-      isProducer &&
-      form.producer_is_in_carbure &&
-      form.carbure_producer?.id !== entity?.id
-    ) {
-      setForm({
-        ...form,
-        producer_is_in_carbure: true,
-        carbure_producer: entity,
-      })
+    if (isProducer) {
+      producerSettings(entity, form, setForm)
     }
 
-    if (isOperator && form.carbure_client?.id !== entity?.id) {
-      setForm({
-        ...form,
-        client_is_in_carbure: true,
-        carbure_client: entity,
-        producer_is_in_carbure: false,
-      })
+    if (isOperator) {
+      operatorSettings(entity, form, setForm)
     }
 
-    if (isTrader && form.producer_is_in_carbure) {
-      setForm({
-        ...form,
-        producer_is_in_carbure: false,
-      })
+    if (isTrader) {
+      traderSettings(entity, form, setForm)
     }
   }
 
