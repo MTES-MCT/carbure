@@ -52,12 +52,16 @@ export function hasErrors(
 }
 
 // extract the status name from the lot details
-export function getStatus(transaction: Transaction, entity: number): LotStatus {
+export function getStatus(
+  transaction: Transaction,
+  entityID: number
+): LotStatus {
   const status = transaction.lot.status.toLowerCase()
   const delivery = transaction.delivery_status
 
-  const isVendor = transaction.carbure_vendor?.id === entity
-  const isClient = transaction.carbure_client?.id === entity
+  const isAuthor = transaction.lot.added_by?.id === entityID
+  const isVendor = transaction.carbure_vendor?.id === entityID
+  const isClient = transaction.carbure_client?.id === entityID
 
   if (status === "draft") {
     return LotStatus.Draft
@@ -70,7 +74,7 @@ export function getStatus(transaction: Transaction, entity: number): LotStatus {
       return LotStatus.Inbox
     }
     // PRODUCTEUR
-    else if (isVendor) {
+    else if (isVendor || isAuthor) {
       if (["N", "AA"].includes(delivery)) {
         return LotStatus.Validated
       } else if (["AC", "R"].includes(delivery)) {
