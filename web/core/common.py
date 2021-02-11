@@ -12,7 +12,7 @@ from django.http import JsonResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
 import dateutil.parser
-from api.v3.sanity_checks import bulk_sanity_checks
+from api.v3.sanity_checks import bulk_sanity_checks, tx_is_valid, lot_is_valid
 
 
 def convert_cell(cell, convert_float: bool) -> Scalar:
