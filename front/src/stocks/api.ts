@@ -9,6 +9,7 @@ import {
 
 import api from "common/services/api"
 import { toOption } from "transactions/helpers"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
 // give the same type to all filters in order to render them easily
 function normalizeStockSnapshotFilters(snapshot: any): StockSnapshot {
@@ -23,15 +24,22 @@ function normalizeStockSnapshotFilters(snapshot: any): StockSnapshot {
 }
 
 // extract the status name from the lot details
-export function getStockStatus(transaction: Transaction): LotStatus {
-  const status = transaction.lot.status.toLowerCase()
-  const delivery = transaction.delivery_status
+export function getStockStatus(
+  tx: Transaction,
+  entity: EntitySelection
+): LotStatus {
+  const status = tx.lot.status.toLowerCase()
+  const delivery = tx.delivery_status
 
-  if (status === "draft") {
+  const isAuthor = tx.lot.added_by?.id === entity?.id
+  const isVendor = tx.carbure_vendor?.id === entity?.id
+  const isClient = tx.carbure_client?.id === entity?.id
+
+  if ((isVendor || isAuthor) && status === "draft") {
     if (["A", "N"].includes(delivery)) {
       return LotStatus.ToSend
     }
-  } else if (status === "validated") {
+  } else if (isClient && status === "validated") {
     if (["N"].includes(delivery)) {
       return LotStatus.Inbox
     } else if (["A"].includes(delivery)) {
