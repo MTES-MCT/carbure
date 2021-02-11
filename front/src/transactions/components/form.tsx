@@ -271,36 +271,76 @@ const TransactionForm = ({
         </Box>
 
         <Box className={styles.middleColumn}>
-          <LabelCheckbox
-            disabled={readOnly || isOperator}
-            name="client_is_in_carbure"
-            label="Client enregistré sur Carbure ?"
-            checked={tx.client_is_in_carbure}
-            onChange={onChange}
-          />
+          {(isOperator || isTrader) && (
+            <React.Fragment>
+              <LabelCheckbox
+                disabled
+                name="vendor_is_in_carbure"
+                label="Fournisseur enregistré sur Carbure ?"
+                checked={tx.vendor_is_in_carbure}
+                onChange={onChange}
+              />
 
-          {tx.client_is_in_carbure ? (
-            <LabelAutoComplete
-              readOnly={readOnly || isOperator}
-              label="Client"
-              placeholder="Rechercher un client..."
-              name="carbure_client"
-              value={tx.carbure_client}
-              error={fieldErrors.client}
-              getValue={getters.id}
-              getLabel={getters.name}
-              getQuery={findEntities}
-              onChange={onChange}
-            />
-          ) : (
-            <LabelInput
-              readOnly={readOnly}
-              label="Client"
-              name="unknown_client"
-              value={tx.unknown_client}
-              error={fieldErrors.client}
-              onChange={onChange}
-            />
+              {tx.vendor_is_in_carbure ? (
+                <LabelAutoComplete
+                  readOnly={readOnly}
+                  label="Fournisseur"
+                  placeholder="Rechercher un fournisseur..."
+                  name="carbure_vendor"
+                  value={tx.carbure_vendor}
+                  error={fieldErrors.vendor}
+                  getValue={getters.id}
+                  getLabel={getters.name}
+                  getQuery={findEntities}
+                  onChange={onChange}
+                />
+              ) : (
+                <LabelInput
+                  readOnly={readOnly}
+                  label="Fournisseur"
+                  name="unknown_vendor"
+                  value={tx.unknown_vendor}
+                  error={fieldErrors.vendor}
+                  onChange={onChange}
+                />
+              )}
+            </React.Fragment>
+          )}
+
+          {!isOperator && (
+            <React.Fragment>
+              <LabelCheckbox
+                disabled={readOnly}
+                name="client_is_in_carbure"
+                label="Client enregistré sur Carbure ?"
+                checked={tx.client_is_in_carbure}
+                onChange={onChange}
+              />
+
+              {tx.client_is_in_carbure ? (
+                <LabelAutoComplete
+                  readOnly={readOnly}
+                  label="Client"
+                  placeholder="Rechercher un client..."
+                  name="carbure_client"
+                  value={tx.carbure_client}
+                  error={fieldErrors.client}
+                  getValue={getters.id}
+                  getLabel={getters.name}
+                  getQuery={findEntities}
+                  onChange={onChange}
+                />
+              ) : (
+                <LabelInput
+                  readOnly={readOnly}
+                  label="Client"
+                  name="unknown_client"
+                  value={tx.unknown_client}
+                  error={fieldErrors.client}
+                  onChange={onChange}
+                />
+              )}
+            </React.Fragment>
           )}
 
           <LabelCheckbox
@@ -360,14 +400,16 @@ const TransactionForm = ({
             />
           )}
 
-          <LabelTextArea
-            readOnly={readOnly}
-            label="Champ Libre"
-            name="champ_libre"
-            value={tx.champ_libre}
-            error={fieldErrors.champ_libre}
-            onChange={onChange}
-          />
+          {!isTrader && (
+            <LabelTextArea
+              readOnly={readOnly}
+              label="Champ Libre"
+              name="champ_libre"
+              value={tx.champ_libre}
+              error={fieldErrors.champ_libre}
+              onChange={onChange}
+            />
+          )}
         </Box>
 
         <Box>
