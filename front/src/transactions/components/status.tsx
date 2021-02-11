@@ -19,7 +19,7 @@ function getStatusText(
     return isStock ? "À envoyer" : "Brouillon"
   }
 
-  const isVendor = tx.carbure_vendor?.id === entity?.id
+  const isClient = tx.carbure_client?.id === entity?.id
 
   switch (tx.delivery_status) {
     case "N":
@@ -29,7 +29,7 @@ function getStatusText(
     case "R":
       return "Refusé"
     case "AC":
-      return isVendor ? "À corriger" : "En correction"
+      return isClient ? "En correction" : "À corriger"
     case "AA":
       return "Corrigé"
   }

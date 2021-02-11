@@ -126,6 +126,7 @@ export interface Lot {
   source: string
   status: "Draft" | "Validated"
   data_origin_entity: Entity | null
+  added_by: Entity | null
   eccr: number
   eccs: number
   eec: number
