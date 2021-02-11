@@ -554,7 +554,7 @@ def fill_delivery_date(lot_row, lot, transaction):
 def fill_client_data(entity, lot_row, transaction, prefetched_data):
     # if lot has already been validated and is currently in correction, we cannot change the client
     if transaction.delivery_status == 'AC':
-        return
+        return []
 
     tx_errors = []
     clients = prefetched_data['clients']
