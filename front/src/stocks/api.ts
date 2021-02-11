@@ -40,7 +40,7 @@ export function getStockStatus(
       return LotStatus.ToSend
     }
   } else if (isClient && status === "validated") {
-    if (["N"].includes(delivery)) {
+    if (["N", "AC", "AA"].includes(delivery)) {
       return LotStatus.Inbox
     } else if (["A"].includes(delivery)) {
       return LotStatus.Stock
