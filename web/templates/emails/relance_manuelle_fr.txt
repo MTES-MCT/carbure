@@ -1,0 +1,13 @@
+Bonjour,
+
+Il semblerait qu'à ce jour, vous n'ayez toujours pas validé votre déclaration de durabilité pour la période {{PERIOD}}
+Actuellement, {% if lots_validated == 0 %}vous n'avez aucun lot validé{% else %}vous avez {{lots_validated}} lots validés{% endif %}.
+
+Cliquez ici pour accéder à votre déclaration: https://carbure.beta.gouv.fr/v2/org/{{entity_id}}/transactions/draft
+
+Vous avez une question ? Vous avez besoin d'aide pour faire votre déclaration ? Contactez-nous : contact@carbure.beta.gouv.fr
+
+Bonne journée,
+L'équipe CarbuRe
+
+
