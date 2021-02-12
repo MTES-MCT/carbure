@@ -453,11 +453,21 @@ def send_declaration_reminder(request):
     year = request.POST.get('period_month', False)
     month = request.POST.get('period_month', False)
 
-    period = datetime.date(year=year, month=month, day=1)
+    if not entity_id:
+        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
+
+    if not year:
+        return JsonResponse({'status': 'error', 'message': "Missing year"}, status=400)
+
+    if not month:
+        return JsonResponse({'status': 'error', 'message': "Missing month"}, status=400)
+
+
     try:
+        period = datetime.date(year=int(year), month=int(month), day=1)
         declaration = SustainabilityDeclaration.objects.get(entity__id=entity_id, period=period, declared=False)
-    except:
-        return JsonResponse({'status': 'error', 'message': "Could not find declaration"}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Could not find declaration", 'details': str(e)}, status=400)
 
     context = {}
     context['entity_id'] = entity_id
