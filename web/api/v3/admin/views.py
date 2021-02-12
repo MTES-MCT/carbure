@@ -8,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
 from core.decorators import is_admin
 from django.contrib.auth import get_user_model
-from core.models import Entity, UserRights, Control, ControlMessages
+from core.models import Entity, UserRights, Control, ControlMessages, ProductionSite
 from django.db.models import Q, Count
 from django.contrib.auth.forms import PasswordResetForm
 from django.core.mail import send_mail
@@ -42,8 +42,47 @@ def get_entity_details(request):
     entity_id = request.GET.get('entity_id', False)
     
     try:
-        entity = Entity.objects.get(pk=entity_id)
-        return JsonResponse({"status": "success", "data": entity.natural_key()})
+        e = Entity.objects.get(pk=entity_id)
+        return JsonResponse({"status": "success", "data": e.natural_key()})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e) }, status=400)
+
+@is_admin
+def get_entity_production_sites(request):
+    entity_id = request.GET.get('entity_id', False)
+
+    try:
+        psites = ProductionSite.objects.filter(producer__id=entity_id)
+        psitesbyid = {p.id: p for p in psites}
+        for k, v in psitesbyid.items():
+            v.inputs = []
+            v.outputs = []
+
+        data = []
+
+        for ps in psites:
+            psite_data = ps.natural_key()
+            psite_data['inputs'] = [i.natural_key() for i in ps.productionsiteinput_set.all()]
+            psite_data['outputs'] = [o.natural_key() for o in ps.productionsiteoutput_set.all()]
+            certificates = []
+            for pc in ps.productionsitecertificate_set.all():
+                c = pc.certificate_iscc.certificate if pc.type == 'ISCC' else pc.certificate_2bs.certificate
+                certificates.append({'certificate_id': c.certificate_id, 'holder': c.certificate_holder, 'type': pc.type})
+            psite_data['certificates'] = certificates
+            data.append(psite_data)
+
+        return JsonResponse({'status': 'success', 'data': data})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e) }, status=400)
+
+@is_admin
+def get_entity_depots(request):
+    entity_id = request.GET.get('entity_id', False)
+    
+    try:
+        e = Entity.objects.get(pk=entity_id)
+        data = [ps.natural_key() for ps in e.entitydepot_set.all()]
+        return JsonResponse({"status": "success", "data": data})
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e) }, status=400)
 

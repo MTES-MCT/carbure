@@ -10,7 +10,8 @@ urlpatterns = [
     path('entities/details', views.get_entity_details, name='api-v3-admin-get-entity-details'),
     path('entities/add', views.add_entity, name='api-v3-admin-add-entity'),
     path('entities/del', views.delete_entity, name='api-v3-admin-delete-entity'),
-
+    path('entities/depots', views.get_entity_depots, name='api-v3-admin-get-entity-depots'),
+    path('entities/production_sites', views.get_entity_production_sites, name='api-v3-admin-get-entity-production-sites'),
 
     path('certificates', views.get_certificates, name='api-v3-admin-get-certificates'),
     path('certificates/update-certificate', views.update_certificate, name='api-v3-admin-update-certificate'),
@@ -24,8 +25,6 @@ urlpatterns = [
     path('dashboard/declaration/send-reminder', views.send_declaration_reminder, name='api-v3-admin-send-declaration-reminder'),
     path('dashboard/declaration/check', views.check_declaration, name='api-v3-admin-check-declaration'),
     path('dashboard/declaration/uncheck', views.uncheck_declaration, name='api-v3-admin-uncheck-declaration'),
-
-
     
     path('lots', views.get_lots, name='api-v3-admin-get-lots'),
     path('lots/details', views.get_details, name='api-v3-admin-get-lot-details'),
