@@ -5,6 +5,8 @@ Actuellement, {% if lots_validated == 0 %}vous n'avez aucun lot validé{% else %
 
 Cliquez ici pour accéder à votre déclaration: https://carbure.beta.gouv.fr/v2/org/{{entity_id}}/transactions/draft
 
+Ce message n'est pas une relance automatique - Il est envoyé manuellement par un agent de la DGEC
+
 Vous avez une question ? Vous avez besoin d'aide pour faire votre déclaration ? Contactez-nous : contact@carbure.beta.gouv.fr
 
 Bonne journée,
