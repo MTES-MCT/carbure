@@ -533,7 +533,7 @@ const TransactionForm = ({
               readOnly
               label="Réduction"
               name="ghg_reduction"
-              value={`${tx.ghg_reduction}%`}
+              value={`${tx.ghg_reduction.toFixed(2)}%`}
             />
           </Box>
         </Box>

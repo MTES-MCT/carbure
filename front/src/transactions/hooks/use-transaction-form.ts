@@ -318,7 +318,8 @@ export default function useTransactionForm(
 
   const total = form.eec + form.el + form.ep + form.etd + form.eu - form.esca - form.eccs - form.eccr - form.eee
   if (form.ghg_total != total) {
-    setForm({...form, ghg_total: total})
+    const ghg_reduction = (1.0 - (total / form.ghg_reference)) * 100.0
+    setForm({...form, ghg_total: total, ghg_reduction: ghg_reduction })
   }
 
   if (!isStock) {
