@@ -21,9 +21,9 @@ export interface DeliverySiteSettingsHook {
   isEmpty: boolean
   isLoading: boolean
   deliverySites: EntityDeliverySite[]
-  addDeliverySite: () => void
   showDeliverySite: (d: EntityDeliverySite) => void
-  deleteDeliverySite: (d: EntityDeliverySite) => void
+  addDeliverySite?: () => void
+  deleteDeliverySite?: (d: EntityDeliverySite) => void
 }
 
 export default function useDeliverySites(

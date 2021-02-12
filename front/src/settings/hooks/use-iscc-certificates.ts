@@ -44,7 +44,7 @@ export default function useISCCCertificates(
   function refresh() {
     if (typeof entityID !== "undefined") {
       resolveGetISCC(entityID)
-      productionSites.refresh()
+      productionSites.refresh && productionSites.refresh()
     }
   }
 

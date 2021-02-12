@@ -20,9 +20,15 @@ import useForm from "common/hooks/use-form"
 import { Title, Box, LoaderOverlay } from "common/components"
 import { LabelInput, Label, LabelCheckbox } from "common/components/input"
 import { Button } from "common/components/button"
-import { AlertCircle, Cross, Plus, Save } from "common/components/icons"
+import { AlertCircle, Cross, Plus, Return, Save } from "common/components/icons"
 import { Alert } from "common/components/alert"
-import Table, { Actions, Column, Line, Row } from "common/components/table"
+import Table, {
+  Actions,
+  arrow,
+  Column,
+  Line,
+  Row,
+} from "common/components/table"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import { DialogButtons, PromptFormProps } from "common/components/dialog"
 import {
@@ -75,7 +81,8 @@ type ProductionSitePromptProps = PromptFormProps<ProductionSiteState>
 
 export const ProductionSitePromptFactory = (
   entity: EntitySelection,
-  productionSite?: ProductionSiteDetails
+  productionSite?: ProductionSiteDetails,
+  readOnly?: boolean
 ) =>
   function ProductionSitePrompt({
     onConfirm,
@@ -113,6 +120,7 @@ export const ProductionSitePromptFactory = (
         <hr />
 
         <LabelInput
+          readOnly={readOnly}
           label="Nom du site"
           name="name"
           value={form.name}
@@ -121,12 +129,14 @@ export const ProductionSitePromptFactory = (
 
         <Box row>
           <LabelInput
+            readOnly={readOnly}
             label="N° d'identification (SIRET)"
             name="site_id"
             value={form.site_id}
             onChange={onChange}
           />
           <LabelInput
+            readOnly={readOnly}
             type="date"
             label="Date de mise en service"
             name="date_mise_en_service"
@@ -139,12 +149,14 @@ export const ProductionSitePromptFactory = (
 
         <Box row>
           <LabelInput
+            readOnly={readOnly}
             label="Ville"
             name="city"
             value={form.city}
             onChange={onChange}
           />
           <LabelInput
+            readOnly={readOnly}
             label="Code postal"
             name="postal_code"
             value={form.postal_code}
@@ -153,6 +165,7 @@ export const ProductionSitePromptFactory = (
         </Box>
 
         <LabelAutoComplete
+          readOnly={readOnly}
           label="Pays"
           placeholder="Rechercher un pays..."
           name="country"
@@ -166,6 +179,7 @@ export const ProductionSitePromptFactory = (
         <hr />
 
         <LabelInput
+          readOnly={readOnly}
           label="Nom du gérant"
           name="manager_name"
           value={form.manager_name}
@@ -173,12 +187,14 @@ export const ProductionSitePromptFactory = (
         />
         <Box row>
           <LabelInput
+            readOnly={readOnly}
             label="N° de téléphone du gérant"
             name="manager_phone"
             value={form.manager_phone}
             onChange={onChange}
           />
           <LabelInput
+            readOnly={readOnly}
             label="Addresse email du gérant"
             name="manager_email"
             value={form.manager_email}
@@ -207,6 +223,7 @@ export const ProductionSitePromptFactory = (
 
         <Label label="Options GES">
           <RadioGroup
+            readOnly={readOnly}
             row
             value={form.ges_option}
             name="ges_option"
@@ -219,6 +236,7 @@ export const ProductionSitePromptFactory = (
 
         <Label label="Matieres premieres">
           <MultiAutocomplete
+            readOnly={readOnly}
             value={form.matieres_premieres}
             name="matieres_premieres"
             placeholder="Ajouter matières premières..."
@@ -231,6 +249,7 @@ export const ProductionSitePromptFactory = (
         </Label>
         <Label label="Biocarburants">
           <MultiAutocomplete
+            readOnly={readOnly}
             value={form.biocarburants}
             name="biocarburants"
             placeholder="Ajouter biocarburants..."
@@ -246,6 +265,7 @@ export const ProductionSitePromptFactory = (
 
         <Label label="Certificats (2BS, ISCC)">
           <MultiAutocomplete
+            readOnly={readOnly}
             name="certificates"
             placeholder="Rechercher des certificats..."
             value={form.certificates}
@@ -261,15 +281,19 @@ export const ProductionSitePromptFactory = (
         <hr />
 
         <DialogButtons>
-          <Button
-            level="primary"
-            icon={Save}
-            disabled={!canSave}
-            onClick={() => form && onConfirm(form)}
-          >
-            Sauvegarder
+          {!readOnly && (
+            <Button
+              level="primary"
+              icon={Save}
+              disabled={!canSave}
+              onClick={() => form && onConfirm(form)}
+            >
+              Sauvegarder
+            </Button>
+          )}
+          <Button icon={Return} onClick={onCancel}>
+            Retour
           </Button>
-          <Button onClick={onCancel}>Annuler</Button>
         </DialogButtons>
       </SettingsForm>
     )
@@ -306,16 +330,17 @@ type ProductionSitesSettingsProps = {
 const ProductionSitesSettings = ({
   settings,
 }: ProductionSitesSettingsProps) => {
-  const columns = [
-    ...PRODUCTION_SITE_COLUMNS,
-    Actions([
-      {
-        icon: Cross,
-        title: "Supprimer le site de production",
-        action: settings.removeProductionSite,
-      },
-    ]),
-  ]
+  const actions = settings.removeProductionSite
+    ? Actions([
+        {
+          icon: Cross,
+          title: "Supprimer le site de production",
+          action: settings.removeProductionSite,
+        },
+      ])
+    : arrow
+
+  const columns = [...PRODUCTION_SITE_COLUMNS, actions]
 
   const rows: Row<ProductionSiteDetails>[] = settings.productionSites.map(
     (ps) => ({
@@ -328,13 +353,15 @@ const ProductionSitesSettings = ({
     <Section id="production">
       <SectionHeader>
         <Title>Sites de production</Title>
-        <Button
-          level="primary"
-          icon={Plus}
-          onClick={settings.createProductionSite}
-        >
-          Ajouter un site de production
-        </Button>
+        {settings.createProductionSite && (
+          <Button
+            level="primary"
+            icon={Plus}
+            onClick={settings.createProductionSite}
+          >
+            Ajouter un site de production
+          </Button>
+        )}
       </SectionHeader>
 
       {settings.isEmpty && (

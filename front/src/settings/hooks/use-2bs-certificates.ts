@@ -42,7 +42,7 @@ export default function use2BSCertificates(
   function refresh() {
     if (typeof entityID !== "undefined") {
       resolveGet2BS(entityID)
-      productionSites.refresh()
+      productionSites.refresh && productionSites.refresh()
     }
   }
 
