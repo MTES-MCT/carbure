@@ -13,6 +13,7 @@ from django.db.models import Q, Count
 from django.contrib.auth.forms import PasswordResetForm
 from django.core.mail import send_mail
 from django.conf import settings
+from django.template.loader import render_to_string
 
 from core.models import LotTransaction, UserRightsRequests, SustainabilityDeclaration, Control
 from api.v3.lots.helpers import get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors
@@ -224,7 +225,7 @@ def get_snapshot(request):
         txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
         _, total_errors = get_lots_with_errors(txs)
         correction = txs.filter(delivery_status__in=['AC', 'R', 'AA']).count()
-        declaration = txs.filter(delivery_status='A').count()
+        declaration = txs.filter(delivery_status__in=['A', 'N']).count()
         data['lots'] = {'alert': total_errors, 'correction': correction, 'declaration': declaration}
 
         filters = get_snapshot_filters(txs)
@@ -448,6 +449,35 @@ def get_declarations(request):
 
 @is_admin
 def send_declaration_reminder(request):
+    entity_id = request.POST.get('entity_id', False)
+    year = request.POST.get('period_month', False)
+    month = request.POST.get('period_month', False)
+
+    period = datetime.date(year=year, month=month, day=1)
+    try:
+        declaration = SustainabilityDeclaration.objects.get(entity__id=entity_id, period=period, declared=False)
+    except:
+        return JsonResponse({'status': 'error', 'message': "Could not find declaration"}, status=400)
+
+    context = {}
+    context['entity_id'] = entity_id
+    context['lots_validated'] = LotV2.objects.filter(added_by=declaration.entity, status='Validated').count()
+    period = declaration.period.strftime('%Y-%m')
+    context['PERIOD'] = period
+    email_subject = 'Carbure - Déclaration %s' % (period)
+    html_message = render_to_string('emails/relance_manuelle_fr.html', context)
+    text_message = render_to_string('emails/relance_manuelle_fr.txt', context)
+    rights = UserRights.objects.filter(entity__id=entity_id)
+    recipients = [r.user.email for r in rights]
+    send_mail(
+        subject=email_subject,
+        message=text_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        html_message=html_message,
+        recipient_list=recipients,
+        fail_silently=False,
+    )
+
     return JsonResponse({"status": "success"})
 
 

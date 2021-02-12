@@ -14,6 +14,7 @@ from core.models import LotValidationError
 from core.models import ISCCScope, ISCCCertificate, ISCCCertificateRawMaterial, ISCCCertificateScope
 from core.models import DBSCertificate, DBSScope, DBSCertificateScope
 from core.models import EntityISCCTradingCertificate, EntityDBSTradingCertificate, ProductionSiteCertificate
+from core.models import SustainabilityDeclaration
 
 
 class EntityAdmin(admin.ModelAdmin):
@@ -165,6 +166,12 @@ class ProductionSiteCertificateAdmin(admin.ModelAdmin):
     list_filter = ('type',)
 
 
+class SustainabilityDeclarationAdmin(admin.ModelAdmin):
+    list_display = ('entity', 'period', 'declared', 'checked', 'deadline')
+    search_fields = ('entity', )
+    list_filter = ('entity', 'period', 'declared', 'checked')
+
+
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
 admin.site.register(UserRightsRequests, UserRightsRequestsAdmin)
@@ -190,6 +197,7 @@ admin.site.register(DBSCertificateScope, DBSCertificateScopeAdmin)
 admin.site.register(EntityISCCTradingCertificate, EntityISCCTradingCertificateAdmin)
 admin.site.register(EntityDBSTradingCertificate, EntityDBSTradingCertificateAdmin)
 admin.site.register(ProductionSiteCertificate, ProductionSiteCertificateAdmin)
+admin.site.register(SustainabilityDeclaration, SustainabilityDeclarationAdmin)
 
 
 # authtool custom user model
