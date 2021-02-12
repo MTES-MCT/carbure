@@ -316,6 +316,11 @@ export default function useTransactionForm(
   const isOperator = entity?.entity_type === "Opérateur"
   const isTrader = entity?.entity_type === "Trader"
 
+  const total = form.eec + form.el + form.ep + form.etd + form.eu - form.esca - form.eccs - form.eccr - form.eee
+  if (form.ghg_total != total) {
+    setForm({...form, ghg_total: total})
+  }
+
   if (!isStock) {
     if (isProducer) {
       producerSettings(entity, form, setForm)
