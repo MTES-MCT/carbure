@@ -16,10 +16,10 @@ export interface ProductionSiteSettingsHook {
   isEmpty: boolean
   isLoading: boolean
   productionSites: ProductionSiteDetails[]
-  createProductionSite: () => void
   editProductionSite: (p: ProductionSiteDetails) => void
-  removeProductionSite: (p: ProductionSiteDetails) => void
-  refresh: () => void
+  createProductionSite?: () => void
+  removeProductionSite?: (p: ProductionSiteDetails) => void
+  refresh?: () => void
 }
 
 export default function useProductionSites(

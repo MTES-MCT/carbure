@@ -1,5 +1,11 @@
 import api from "common/services/api"
-import { Entity, UserRightRequest, UserRightStatus } from "common/types"
+import {
+  Entity,
+  ProductionSiteDetails,
+  UserRightRequest,
+  UserRightStatus,
+} from "common/types"
+import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 
 export interface EntityDetails {
   entity: Entity
@@ -20,6 +26,18 @@ export function getEntities(
 
 export function getEntityDetails(entity_id: number): Promise<Entity> {
   return api.get("/admin/entities/details", { entity_id })
+}
+
+export function getEntityDepots(
+  entity_id: number
+): Promise<EntityDeliverySite[]> {
+  return api.get("/admin/entities/depots", { entity_id })
+}
+
+export function getEntityProductionSites(
+  entity_id: number
+): Promise<ProductionSiteDetails[]> {
+  return api.get("/admin/entities/production_sites", { entity_id })
 }
 
 export function getUsers(query: string, entity_id: number): Promise<any[]> {

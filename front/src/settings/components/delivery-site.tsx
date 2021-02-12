@@ -15,7 +15,13 @@ import { LabelInput, Label } from "common/components/input"
 import { Button } from "common/components/button"
 import { AlertCircle, Cross, Plus, Return } from "common/components/icons"
 import { Alert } from "common/components/alert"
-import Table, { Actions, Column, Line, Row } from "common/components/table"
+import Table, {
+  Actions,
+  arrow,
+  Column,
+  Line,
+  Row,
+} from "common/components/table"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import { DialogButtons, PromptFormProps } from "common/components/dialog"
 import { LabelAutoComplete } from "common/components/autocomplete"
@@ -235,15 +241,19 @@ type DeliverySitesSettingsProps = {
 }
 
 const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
+  const actions = settings.deleteDeliverySite
+    ? Actions([
+        {
+          icon: Cross,
+          title: "Supprimer le dépôt",
+          action: (ds: EntityDeliverySite) => settings.deleteDeliverySite!(ds),
+        },
+      ])
+    : arrow
+
   const columns: Column<EntityDeliverySite>[] = [
     ...DELIVERY_SITE_COLUMNS,
-    Actions([
-      {
-        icon: Cross,
-        title: "Supprimer le dépôt",
-        action: (ds) => settings.deleteDeliverySite(ds),
-      },
-    ]),
+    actions,
   ]
 
   const rows: Row<EntityDeliverySite>[] = settings.deliverySites.map((ds) => ({
@@ -255,9 +265,15 @@ const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
     <Section id="depot">
       <SectionHeader>
         <Title>Dépôts</Title>
-        <Button level="primary" icon={Plus} onClick={settings.addDeliverySite}>
-          Ajouter un dépôt
-        </Button>
+        {settings.addDeliverySite && (
+          <Button
+            level="primary"
+            icon={Plus}
+            onClick={settings.addDeliverySite}
+          >
+            Ajouter un dépôt
+          </Button>
+        )}
       </SectionHeader>
 
       {settings.isEmpty && (
