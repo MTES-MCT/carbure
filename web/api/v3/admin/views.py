@@ -185,7 +185,7 @@ def get_snapshot(request):
         txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
         _, total_errors = get_lots_with_errors(txs)
         correction = txs.filter(delivery_status__in=['AC', 'R', 'AA']).count()
-        declaration = txs.filter(delivery_status='A').count()
+        declaration = txs.filter(delivery_status__in=['A', 'N']).count()
         data['lots'] = {'alert': total_errors, 'correction': correction, 'declaration': declaration}
 
         filters = get_snapshot_filters(txs)
