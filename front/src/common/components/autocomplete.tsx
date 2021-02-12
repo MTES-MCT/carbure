@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
+import cl from "clsx"
 
 import styles from "./autocomplete.module.css"
 
@@ -173,6 +174,7 @@ export function MultiAutocomplete<T>({
   onChange,
   getLabel,
   getValue,
+  readOnly,
   ...props
 }: MultiAutocompleteProps<T>) {
   function addValue(e: any) {
@@ -192,28 +194,38 @@ export function MultiAutocomplete<T>({
   }
 
   return (
-    <div className={styles.multiWrapper}>
+    <div
+      className={cl(
+        styles.multiWrapper,
+        readOnly && styles.multiWrapperReadOnly
+      )}
+    >
       {value.map((v) => (
         <span key={getValue(v)} className={styles.multiValue}>
           {getLabel(v)}
-          <Cross
-            className={styles.multiValueDelete}
-            onClick={(e) => {
-              e.preventDefault()
-              removeValue(v)
-            }}
-          />
+          {!readOnly && (
+            <Cross
+              className={styles.multiValueDelete}
+              onClick={(e) => {
+                e.preventDefault()
+                removeValue(v)
+              }}
+            />
+          )}
         </span>
       ))}
-      <AutoComplete<T>
-        {...props}
-        value={null}
-        name={name}
-        onChange={addValue}
-        getValue={getValue}
-        getLabel={getLabel}
-        className={styles.multiInput}
-      />
+      {!readOnly && (
+        <AutoComplete<T>
+          {...props}
+          value={null}
+          name={name}
+          readOnly={readOnly}
+          onChange={addValue}
+          getValue={getValue}
+          getLabel={getLabel}
+          className={styles.multiInput}
+        />
+      )}
     </div>
   )
 }

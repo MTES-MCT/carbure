@@ -38,3 +38,13 @@
   width: auto;
   padding: 7px;
 }
+
+.multiWrapper input.multiInput:read-only {
+  border: none;
+}
+
+.multiWrapper.multiWrapperReadOnly {
+  background-color: transparent;
+  border: none;
+  border-top: 1px solid var(--gray-medium);
+}
