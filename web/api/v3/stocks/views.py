@@ -239,7 +239,9 @@ def get_template_mass_balance_bcghg(request, *args, **kwargs):
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
 
 @check_rights('entity_id')
-def upload_mass_balance(request):
+def upload_mass_balance(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
     file = request.FILES.get('file')
     if file is None:
         return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)

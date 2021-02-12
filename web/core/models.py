@@ -472,11 +472,14 @@ class LotValidationError(models.Model):
     message = models.TextField(blank=True, null=True, default='')
     details = models.TextField(blank=True, null=True, default='')
 
+    acked_by_admin = models.BooleanField(default=False)
+    highlighted_by_admin = models.BooleanField(default=False)
+
     def __str__(self):
         return self.rule_triggered
 
     def natural_key(self):
-        return {'lot_id': self.lot.id, 'error': self.message, 'details': self.details, 'is_blocking': self.block_validation, 'is_warning': self.warning_to_user}
+        return {'lot_id': self.lot.id, 'error': self.message, 'details': self.details, 'is_blocking': self.block_validation, 'is_warning': self.warning_to_user, 'acked_by_admin': self.acked_by_admin, 'highlighted_by_admin': self.highlighted_by_admin}
 
     class Meta:
         db_table = 'validation_errors'
