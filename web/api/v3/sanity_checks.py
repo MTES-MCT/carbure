@@ -25,6 +25,7 @@ rules['VOLUME_FAIBLE'] = "Volume inhabituellement faible."
 rules['MAC_BC_WRONG'] = "Biocarburant incompatible avec un mise à consommation (seuls ED95 ou B100 sont autorisés)"
 rules['GHG_ETD_0'] = "Émissions GES liées au Transport et à la Distribution nulles"
 rules['GHG_EP_0'] = "Émissions GES liées à la Transformation de la matière première nulles"
+rules['GHG_EEC_0'] = "Émissions GES liées à l'Extraction et la Culture nulles"
 
 
 def raise_warning(lot, rule_triggered, details=''):
@@ -119,6 +120,10 @@ def sanity_check(tx):
 
     # provenance des matieres premieres
     if lot.matiere_premiere and lot.pays_origine:
+        if lot.matiere_premiere.category == 'CONV' and lot.eec == 0:
+            is_sane = False
+            errors.append(raise_error(lot, 'GHG_EEC_0', details="GES Culture 0 pour MP conventionnelle"))
+
         if lot.matiere_premiere.code == 'SOJA':
             if lot.pays_origine.code_pays not in ['US', 'AR', 'BR', 'UY', 'PY']:
                 errors.append(raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
