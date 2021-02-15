@@ -545,3 +545,14 @@ def controls_add_message(request):
     msg.message = message
     msg.save()
     return JsonResponse({'status': 'success'})
+
+
+
+@is_admin
+def ack_alerts(request):
+    return JsonResponse({'status': 'success'})    
+
+
+@is_admin
+def highlight_alerts(request):
+    return JsonResponse({'status': 'success'})
