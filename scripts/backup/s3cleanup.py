@@ -17,7 +17,7 @@ def cleanup_s3db(args):
     client = boto3.client('s3')
     deleted = 0
     for o in to_delete:
-        logger.debug('Delete object %s' % o)
+        print('Delete object %s' % o)
         deleted += 1
         o.delete()
 
