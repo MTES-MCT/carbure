@@ -81,7 +81,7 @@ const EntityDetails = () => {
       <Sticky>
         <a href="#users">Utilisateurs</a>
         <a href="#depot">Dépots</a>
-        <a href="#production">Sites de production</a>
+        {isProducer && <a href="#production">Sites de production</a>}
         <a href="#iscc">Certificats ISCC</a>
         <a href="#2bs">Certificats 2BS</a>
         <a href="#csn">Certificats système national</a>
