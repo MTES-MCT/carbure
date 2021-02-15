@@ -25,25 +25,17 @@ export type FormHook<T> = [
 ]
 
 export default function useForm<T>(initialState: T): FormHook<T> {
-  const [form, setFormState] = useState<T>(initialState)
+  const [form, setForm] = useState<T>(initialState)
   const hasChange = useRef(false)
 
   function change<U extends FormFields>(e: React.ChangeEvent<U>) {
     hasChange.current = true
 
-    setFormState({
+    setForm({
       ...form,
       [e.target.name]: parseValue(e.target),
     })
   }
-
-  const setForm = useCallback(
-    (state: T) => {
-      hasChange.current = false
-      setFormState(state)
-    },
-    [setFormState]
-  )
 
   return [form, hasChange.current, change, setForm]
 }
