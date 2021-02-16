@@ -24,7 +24,7 @@ export default function useStockDetails(
   const notifications = useNotificationContext()
 
   const close = useClose("../")
-  const [form, hasChange, change, setForm] = useTransactionForm(entity, true)
+  const { data, hasChange, reset, onChange } = useTransactionForm(entity, true)
   const [details, resolveDetails] = useAPI(api.getDetails)
   const [request, resolveUpdate] = useAPI(api.updateLot)
 
@@ -45,7 +45,7 @@ export default function useStockDetails(
   async function submit() {
     if (!entityID) return
 
-    const res = await resolveUpdate(entityID, txID, toTransactionPostData(form))
+    const res = await resolveUpdate(entityID, txID, toTransactionPostData(data))
 
     if (res) {
       refresh()
@@ -71,19 +71,19 @@ export default function useStockDetails(
 
   useEffect(() => {
     if (tx) {
-      setForm(toTransactionFormState(tx))
+      reset(toTransactionFormState(tx))
     }
-  }, [tx, setForm])
+  }, [tx, reset])
 
   return {
-    form,
+    form: data,
     hasChange,
     details,
     fieldErrors,
     validationErrors,
     status,
     request,
-    change,
+    change: onChange,
     submit,
     close,
     refreshDetails,

@@ -527,7 +527,7 @@ const TransactionForm = ({
               readOnly
               label="Total"
               name="ghg_total"
-              value={`${tx.ghg_total} gCO2eq/MJ`}
+              value={`${tx.ghg_total.toFixed(2)} gCO2eq/MJ`}
             />
             <LabelInput
               readOnly

@@ -54,7 +54,7 @@ export const DeliverySiteFinderPromptFactory = (entityID?: number) =>
     onConfirm,
     onCancel,
   }: PromptFormProps<EntityDeliverySite>) {
-    const [form, hasChange, onChange] = useForm<EntityDeliverySite>({
+    const { data, hasChange, onChange } = useForm<EntityDeliverySite>({
       depot: null,
       ownership_type: OwnershipType.ThirdParty,
     })
@@ -65,7 +65,7 @@ export const DeliverySiteFinderPromptFactory = (entityID?: number) =>
           label="Dépôt"
           placeholder="Rechercher un dépôt..."
           name="depot"
-          value={form.depot}
+          value={data.depot}
           getQuery={common.findDeliverySites}
           onChange={onChange}
           getValue={(d) => d.depot_id}
@@ -76,7 +76,7 @@ export const DeliverySiteFinderPromptFactory = (entityID?: number) =>
         <Label label="Propriété">
           <RadioGroup
             row
-            value={form.ownership_type}
+            value={data.ownership_type}
             name="ownership_type"
             options={OWNERSHIP_TYPES}
             onChange={onChange}
@@ -97,7 +97,7 @@ export const DeliverySiteFinderPromptFactory = (entityID?: number) =>
             level="primary"
             icon={Plus}
             disabled={!hasChange}
-            onClick={() => onConfirm(form)}
+            onClick={() => onConfirm(data)}
           >
             Ajouter
           </Button>

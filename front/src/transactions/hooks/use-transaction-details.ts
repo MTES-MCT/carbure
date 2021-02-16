@@ -40,9 +40,10 @@ export default function useTransactionDetails(
 
   const params: { id: string } = useParams()
   const notifications = useNotificationContext()
-
   const close = useClose("../")
-  const [form, hasChange, change, setForm] = useTransactionForm(entity)
+
+  const { data, hasChange, onChange, reset } = useTransactionForm(entity)
+
   const [details, resolveDetails] = useAPI(detailsGetter)
   const [request, resolveUpdate] = useAPI(api.updateLot)
   const [comment, resolveComment] = useAPI(api.commentLot)
@@ -64,7 +65,7 @@ export default function useTransactionDetails(
   async function submit() {
     if (typeof entityID === "undefined") return
 
-    const res = await resolveUpdate(entityID, txID, toTransactionPostData(form))
+    const res = await resolveUpdate(entityID, txID, toTransactionPostData(data))
 
     if (res) {
       refresh()
@@ -97,12 +98,12 @@ export default function useTransactionDetails(
 
   useEffect(() => {
     if (tx) {
-      setForm(toTransactionFormState(tx))
+      reset(toTransactionFormState(tx))
     }
-  }, [tx, setForm])
+  }, [tx, reset])
 
   return {
-    form,
+    form: data,
     hasChange,
     details,
     comment,
@@ -110,7 +111,7 @@ export default function useTransactionDetails(
     validationErrors,
     status,
     request,
-    change,
+    change: onChange,
     submit,
     close,
     addComment,
