@@ -29,7 +29,7 @@ export const StockSendLotPrompt = ({
   onConfirm,
   onCancel,
 }: PromptFormProps<StockSendDetails>) => {
-  const [form, hasChange, onChange] = useForm<StockSendDetails>({
+  const { data, hasChange, onChange } = useForm<StockSendDetails>({
     volume: 0,
     dae: "",
     delivery_date: "",
@@ -46,16 +46,16 @@ export const StockSendLotPrompt = ({
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault()
-    onConfirm(form)
+    onConfirm(data)
   }
 
   const canSave = Boolean(
     hasChange &&
-      (form.carbure_client || form.unknown_client) &&
-      form.dae &&
-      form.delivery_date &&
-      (form.carbure_delivery_site || form.unknown_delivery_site) &&
-      form.volume
+      (data.carbure_client || data.unknown_client) &&
+      data.dae &&
+      data.delivery_date &&
+      (data.carbure_delivery_site || data.unknown_delivery_site) &&
+      data.volume
   )
 
   return (
@@ -64,33 +64,33 @@ export const StockSendLotPrompt = ({
         type="number"
         label="Volume"
         name="volume"
-        value={form.volume}
+        value={data.volume}
         onChange={onChange}
       />
 
-      <LabelInput label="DAE" name="dae" value={form.dae} onChange={onChange} />
+      <LabelInput label="DAE" name="dae" value={data.dae} onChange={onChange} />
 
       <LabelInput
         type="date"
         label="Date de livraison"
         name="delivery_date"
-        value={form.delivery_date}
+        value={data.delivery_date}
         onChange={onChange}
       />
 
       <LabelCheckbox
         name="client_is_in_carbure"
         label="Client enregistré sur Carbure ?"
-        checked={form.client_is_in_carbure}
+        checked={data.client_is_in_carbure}
         onChange={onChange}
       />
 
-      {form.client_is_in_carbure ? (
+      {data.client_is_in_carbure ? (
         <LabelAutoComplete
           label="Client"
           placeholder="Rechercher un client..."
           name="carbure_client"
-          value={form.carbure_client}
+          value={data.carbure_client}
           getValue={(c) => `${c.id}`}
           getLabel={(c) => c.name}
           getQuery={findEntities}
@@ -100,7 +100,7 @@ export const StockSendLotPrompt = ({
         <LabelInput
           label="Client"
           name="unknown_client"
-          value={form.unknown_client}
+          value={data.unknown_client}
           onChange={onChange}
         />
       )}
@@ -108,16 +108,16 @@ export const StockSendLotPrompt = ({
       <LabelCheckbox
         name="delivery_site_is_in_carbure"
         label="Site de livraison enregistré sur Carbure ?"
-        checked={form.delivery_site_is_in_carbure}
+        checked={data.delivery_site_is_in_carbure}
         onChange={onChange}
       />
 
-      {form.delivery_site_is_in_carbure ? (
+      {data.delivery_site_is_in_carbure ? (
         <LabelAutoComplete
           label="Site de livraison"
           placeholder="Rechercher un site de livraison..."
           name="carbure_delivery_site"
-          value={form.carbure_delivery_site}
+          value={data.carbure_delivery_site}
           getValue={(d) => d.depot_id}
           getLabel={(d) => d.name}
           getQuery={findDeliverySites}
@@ -128,24 +128,24 @@ export const StockSendLotPrompt = ({
           <LabelInput
             label="Site de livraison"
             name="unknown_delivery_site"
-            value={form.unknown_delivery_site}
+            value={data.unknown_delivery_site}
             onChange={onChange}
           />
         </React.Fragment>
       )}
 
-      {form.delivery_site_is_in_carbure ? (
+      {data.delivery_site_is_in_carbure ? (
         <LabelInput
           disabled
           label="Pays de livraison"
-          value={form.carbure_delivery_site?.country?.name}
+          value={data.carbure_delivery_site?.country?.name}
         />
       ) : (
         <LabelAutoComplete
           disabled={true}
           label="Pays de livraison"
           name="unknown_delivery_site_country"
-          value={form.unknown_delivery_site_country}
+          value={data.unknown_delivery_site_country}
           getValue={(c) => c.code_pays}
           getLabel={(c) => c.name}
           getQuery={findCountries}
@@ -158,7 +158,7 @@ export const StockSendLotPrompt = ({
           level="primary"
           disabled={!canSave}
           icon={Check}
-          onClick={() => onConfirm(form)}
+          onClick={() => onConfirm(data)}
         >
           Valider
         </Button>

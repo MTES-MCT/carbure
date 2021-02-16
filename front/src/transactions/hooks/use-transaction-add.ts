@@ -18,13 +18,13 @@ export default function useTransactionAdd(
 
   const close = useClose("../")
   const relativePush = useRelativePush()
-  const [form, hasChange, change] = useTransactionForm(entity)
+  const { data, hasChange, onChange } = useTransactionForm(entity)
   const [request, resolveAddLot] = useAPI(addLot)
 
   async function submit() {
     if (entity === null) return
 
-    const res = await resolveAddLot(entity.id, toTransactionPostData(form))
+    const res = await resolveAddLot(entity.id, toTransactionPostData(data))
 
     if (res) {
       refresh()
@@ -43,10 +43,10 @@ export default function useTransactionAdd(
   }
 
   return {
-    form,
+    form: data,
     hasChange,
     request,
-    change,
+    change: onChange,
     submit,
     close,
   }

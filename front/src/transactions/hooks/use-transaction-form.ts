@@ -243,66 +243,50 @@ const initialState: TransactionFormState = {
 function producerSettings(
   entity: EntitySelection,
   tx: TransactionFormState,
-  setForm: (s: TransactionFormState) => void
+  patch: (p: any, s?: boolean) => void
 ) {
   // checking "producer is in carbure" forces producer field to be current entity
   if (tx.producer_is_in_carbure && tx.carbure_producer?.id !== entity?.id) {
-    setForm({ ...tx, carbure_producer: entity })
+    patch({ carbure_producer: entity }, true)
   }
 
   // empty vendor field to avoid replacing it when calling the api
   if (!tx.vendor_is_in_carbure || tx.carbure_vendor) {
-    setForm({ ...tx, vendor_is_in_carbure: true, carbure_vendor: null })
+    patch({ vendor_is_in_carbure: true, carbure_vendor: null }, true)
   }
 }
 
 function operatorSettings(
   entity: EntitySelection,
   tx: TransactionFormState,
-  setForm: (s: TransactionFormState) => void
+  patch: (p: any, s?: boolean) => void
 ) {
   // for operators, force client field to be current entity and "producer is in carbure" to be unchecked
   if (!tx.client_is_in_carbure || tx.carbure_client?.id !== entity?.id) {
-    setForm({
-      ...tx,
-      client_is_in_carbure: true,
-      carbure_client: entity,
-    })
+    patch({ client_is_in_carbure: true, carbure_client: entity }, true)
   }
 
   if (tx.producer_is_in_carbure && !tx.carbure_producer) {
-    setForm({
-      ...tx,
-      producer_is_in_carbure: false,
-    })
+    patch({ producer_is_in_carbure: false }, true)
   }
 
   if (tx.vendor_is_in_carbure && !tx.carbure_vendor) {
-    setForm({
-      ...tx,
-      vendor_is_in_carbure: false,
-    })
+    patch({ vendor_is_in_carbure: false }, true)
   }
 }
 
 function traderSettings(
   entity: EntitySelection,
   tx: TransactionFormState,
-  setForm: (s: TransactionFormState) => void
+  patch: (p: any, s?: boolean) => void
 ) {
   // for traders, force "producer is in carbure" to be unchecked
   if (tx.producer_is_in_carbure && !tx.carbure_producer) {
-    setForm({
-      ...tx,
-      producer_is_in_carbure: false,
-    })
+    patch({ producer_is_in_carbure: false }, true)
   }
 
   if (tx.vendor_is_in_carbure && !tx.carbure_vendor) {
-    setForm({
-      ...tx,
-      vendor_is_in_carbure: false,
-    })
+    patch({ vendor_is_in_carbure: false }, true)
   }
 }
 
@@ -310,31 +294,34 @@ export default function useTransactionForm(
   entity: EntitySelection,
   isStock: boolean = false
 ): FormHook<TransactionFormState> {
-  const [form, hasChange, onChange, setForm] = useForm<TransactionFormState>(initialState) // prettier-ignore
+  const form = useForm<TransactionFormState>(initialState) // prettier-ignore
+  const { data, patch } = form
 
   const isProducer = entity?.entity_type === "Producteur"
   const isOperator = entity?.entity_type === "Opérateur"
   const isTrader = entity?.entity_type === "Trader"
 
-  const total = form.eec + form.el + form.ep + form.etd + form.eu - form.esca - form.eccs - form.eccr - form.eee
-  if (form.ghg_total != total) {
-    const ghg_reduction = (1.0 - (total / form.ghg_reference)) * 100.0
-    setForm({...form, ghg_total: total, ghg_reduction: ghg_reduction })
+  const ghg_total = data.eec + data.el + data.ep + data.etd + data.eu - data.esca - data.eccs - data.eccr - data.eee // prettier-ignore
+
+  // ignore float imprecision by just checking if the difference is of at least 0.001
+  if (Math.abs(form.data.ghg_total - ghg_total) > 1e-3) {
+    const ghg_reduction = (1.0 - ghg_total / data.ghg_reference) * 100.0
+    patch({ ghg_total, ghg_reduction })
   }
 
   if (!isStock) {
     if (isProducer) {
-      producerSettings(entity, form, setForm)
+      producerSettings(entity, data, patch)
     }
 
     if (isOperator) {
-      operatorSettings(entity, form, setForm)
+      operatorSettings(entity, data, patch)
     }
 
     if (isTrader) {
-      traderSettings(entity, form, setForm)
+      traderSettings(entity, data, patch)
     }
   }
 
-  return [form, hasChange, onChange, setForm]
+  return form
 }

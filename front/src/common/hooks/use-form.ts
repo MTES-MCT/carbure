@@ -17,25 +17,40 @@ function parseValue(element: FormFields) {
   }
 }
 
-export type FormHook<T> = [
-  T,
-  boolean,
-  <T extends FormFields>(e: React.ChangeEvent<T>) => void,
-  (s: T) => void
-]
+export type FormHook<T> = {
+  data: T
+  hasChange: boolean
+  reset: (s: T) => void
+  patch: (p: any, s?: boolean) => void
+  onChange: <T extends FormFields>(e: React.ChangeEvent<T>) => void
+}
 
 export default function useForm<T>(initialState: T): FormHook<T> {
-  const [form, setForm] = useState<T>(initialState)
+  const [data, setData] = useState<T>(initialState)
   const hasChange = useRef(false)
 
-  function change<U extends FormFields>(e: React.ChangeEvent<U>) {
-    hasChange.current = true
+  const patch = useCallback(
+    (patch: any, silent: boolean = false) => {
+      if (!silent) hasChange.current = true
+      setData({ ...data, ...patch })
+    },
+    [data]
+  )
 
-    setForm({
-      ...form,
-      [e.target.name]: parseValue(e.target),
-    })
+  const reset = useCallback((form: T) => {
+    hasChange.current = false
+    setData(form)
+  }, [])
+
+  function onChange<U extends FormFields>(e: React.ChangeEvent<U>) {
+    patch({ [e.target.name]: parseValue(e.target) })
   }
 
-  return [form, hasChange.current, change, setForm]
+  return {
+    data,
+    hasChange: hasChange.current,
+    patch,
+    reset,
+    onChange,
+  }
 }

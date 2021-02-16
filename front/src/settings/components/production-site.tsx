@@ -88,7 +88,7 @@ export const ProductionSitePromptFactory = (
     onConfirm,
     onCancel,
   }: ProductionSitePromptProps) {
-    const [form, hasChanged, onChange] = useForm<ProductionSiteState>({
+    const { data, hasChange, onChange } = useForm<ProductionSiteState>({
       site_id: productionSite?.site_id ?? "",
       name: productionSite?.name ?? "",
       date_mise_en_service: productionSite?.date_mise_en_service ?? "",
@@ -112,7 +112,7 @@ export const ProductionSitePromptFactory = (
     })
 
     const canSave = Boolean(
-      hasChanged && form.country && form.date_mise_en_service && form.name
+      hasChange && data.country && data.date_mise_en_service && data.name
     )
 
     return (
@@ -123,7 +123,7 @@ export const ProductionSitePromptFactory = (
           readOnly={readOnly}
           label="Nom du site"
           name="name"
-          value={form.name}
+          value={data.name}
           onChange={onChange}
         />
 
@@ -132,7 +132,7 @@ export const ProductionSitePromptFactory = (
             readOnly={readOnly}
             label="N° d'identification (SIRET)"
             name="site_id"
-            value={form.site_id}
+            value={data.site_id}
             onChange={onChange}
           />
           <LabelInput
@@ -140,7 +140,7 @@ export const ProductionSitePromptFactory = (
             type="date"
             label="Date de mise en service"
             name="date_mise_en_service"
-            value={form.date_mise_en_service}
+            value={data.date_mise_en_service}
             onChange={onChange}
           />
         </Box>
@@ -152,14 +152,14 @@ export const ProductionSitePromptFactory = (
             readOnly={readOnly}
             label="Ville"
             name="city"
-            value={form.city}
+            value={data.city}
             onChange={onChange}
           />
           <LabelInput
             readOnly={readOnly}
             label="Code postal"
             name="postal_code"
-            value={form.postal_code}
+            value={data.postal_code}
             onChange={onChange}
           />
         </Box>
@@ -169,7 +169,7 @@ export const ProductionSitePromptFactory = (
           label="Pays"
           placeholder="Rechercher un pays..."
           name="country"
-          value={form.country}
+          value={data.country}
           getValue={(c) => c?.code_pays ?? ""}
           getLabel={(c) => c?.name ?? ""}
           getQuery={common.findCountries}
@@ -182,7 +182,7 @@ export const ProductionSitePromptFactory = (
           readOnly={readOnly}
           label="Nom du gérant"
           name="manager_name"
-          value={form.manager_name}
+          value={data.manager_name}
           onChange={onChange}
         />
         <Box row>
@@ -190,14 +190,14 @@ export const ProductionSitePromptFactory = (
             readOnly={readOnly}
             label="N° de téléphone du gérant"
             name="manager_phone"
-            value={form.manager_phone}
+            value={data.manager_phone}
             onChange={onChange}
           />
           <LabelInput
             readOnly={readOnly}
             label="Addresse email du gérant"
             name="manager_email"
-            value={form.manager_email}
+            value={data.manager_email}
             onChange={onChange}
           />
         </Box>
@@ -209,13 +209,13 @@ export const ProductionSitePromptFactory = (
             disabled
             label="Éligible au double-comptage ?"
             name="eligible_dc"
-            defaultChecked={form.eligible_dc}
+            defaultChecked={data.eligible_dc}
           />
           <LabelInput
             disabled
             label="Référence double-comptage"
             name="dc_reference"
-            value={form.dc_reference}
+            value={data.dc_reference}
           />
         </Box>
 
@@ -225,7 +225,7 @@ export const ProductionSitePromptFactory = (
           <RadioGroup
             readOnly={readOnly}
             row
-            value={form.ges_option}
+            value={data.ges_option}
             name="ges_option"
             options={GES_OPTIONS}
             onChange={onChange}
@@ -237,7 +237,7 @@ export const ProductionSitePromptFactory = (
         <Label label="Matieres premieres">
           <MultiAutocomplete
             readOnly={readOnly}
-            value={form.matieres_premieres}
+            value={data.matieres_premieres}
             name="matieres_premieres"
             placeholder="Ajouter matières premières..."
             getValue={(o) => o?.code ?? ""}
@@ -250,7 +250,7 @@ export const ProductionSitePromptFactory = (
         <Label label="Biocarburants">
           <MultiAutocomplete
             readOnly={readOnly}
-            value={form.biocarburants}
+            value={data.biocarburants}
             name="biocarburants"
             placeholder="Ajouter biocarburants..."
             getValue={(o) => o.code}
@@ -268,7 +268,7 @@ export const ProductionSitePromptFactory = (
             readOnly={readOnly}
             name="certificates"
             placeholder="Rechercher des certificats..."
-            value={form.certificates}
+            value={data.certificates}
             getValue={(c) => c.certificate_id}
             getLabel={(c) => c.certificate_id + " - " + c.holder}
             minLength={0}
@@ -286,7 +286,7 @@ export const ProductionSitePromptFactory = (
               level="primary"
               icon={Save}
               disabled={!canSave}
-              onClick={() => form && onConfirm(form)}
+              onClick={() => data && onConfirm(data)}
             >
               Sauvegarder
             </Button>

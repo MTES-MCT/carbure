@@ -68,7 +68,7 @@ test("display transaction details", async () => {
   screen.getByDisplayValue("Test Delivery Site")
   screen.getByDisplayValue("12")
   screen.getByDisplayValue("1")
-  screen.getByDisplayValue("11 gCO2eq/MJ")
+  screen.getByDisplayValue("11.00 gCO2eq/MJ")
   screen.getByDisplayValue("86.87%")
 
   const countries = screen.getAllByDisplayValue("France")
