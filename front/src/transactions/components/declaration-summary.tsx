@@ -210,7 +210,6 @@ export const SummaryPromptFactory = (entityID: number) =>
           ) : (
             <AsyncButton
               loading={validating.loading}
-              disabled={isInEmpty && isOutEmpty}
               level="primary"
               icon={Check}
               onClick={askValidateDeclaration}
