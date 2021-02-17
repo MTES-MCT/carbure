@@ -44,8 +44,8 @@ function renderMonthSummary(month: string) {
 
     const pushToTransactions = () =>
       relativePush(`../transactions/declaration`, {
-        entity: v.entity.name,
-        period: month,
+        entity: v.entity,
+        period: month.replace("/", "-"),
       })
 
     return (
