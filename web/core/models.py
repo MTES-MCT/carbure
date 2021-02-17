@@ -21,14 +21,20 @@ class Entity(models.Model):
     has_trading = models.BooleanField(default=False)
     national_system_certificate = models.CharField(max_length=64, null=True, blank=True)
 
-
+    legal_name = models.CharField(max_length=128, null=True, blank=True)
+    registration_id = models.CharField(max_length=64, null=True, blank=True)
+    sustainability_officer_phone_number = models.CharField(max_length=32, null=True, blank=True)
+    sustainability_officer = models.CharField(max_length=32, null=True, blank=True)
+    registered_address = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.name
 
     def natural_key(self):
         return {'name': self.name, 'id': self.id, 'entity_type': self.entity_type, 'has_mac': self.has_mac, 'has_trading': self.has_trading,
-            'national_system_certificate': self.national_system_certificate}
+            'national_system_certificate': self.national_system_certificate, 'legal_name': self.legal_name, 'registration_id': self.registration_id,
+            'sustainability_officer': self.sustainability_officer, 'sustainability_officer_phone_number': self.sustainability_officer_phone_number,
+            'registered_address': self.registered_address}
 
     def url_friendly_name(self):
         return self.name.replace(' ', '').upper()
