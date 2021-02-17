@@ -242,6 +242,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
             validator={validator}
             acceptor={acceptor}
             rejector={rejector}
+            transactions={transactions}
           />
         </Route>
       </Switch>
