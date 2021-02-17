@@ -430,13 +430,14 @@ def get_declarations(request):
     # 1) get the lots grouped by added_by
     drafts = Count('id', filter=Q(lot__status='Draft'))
     validated = Count('id', filter=Q(lot__status='Validated'))
-    received = Count('id', filter=Q(delivery_status__in=['N', 'AA']))
+    received = Count('id', filter=Q(delivery_status__in=['N', 'A', 'AA']))
     corrections = Count('id', filter=Q(delivery_status__in=['R', 'AC']))
-    batches = {'%s.%s' % (batch['lot__added_by__id'], batch['lot__period']): batch for batch in LotTransaction.objects.values('lot__added_by__id', 'lot__added_by__name', 'lot__period').annotate(num_drafts=drafts, num_valid=validated, num_received=received, num_corrections=corrections)}
+    lots = LotTransaction.objects.values('lot__added_by__id', 'lot__added_by__name', 'lot__period').annotate(drafts=drafts, validated=validated, received=received, corrections=corrections)
+    batches = {'%s.%s' % (batch['lot__added_by__id'], batch['lot__period']): batch for batch in lots }
     # 2) add batch info to each declarations
     declarations_sez = []
     for d in declarations:
-        key = '%d.%d-%d' % (d.entity.id, d.period.year, d.period.month)
+        key = '%d.%d-%02d' % (d.entity.id, d.period.year, d.period.month)
         if key in batches:
             d.lots = batches[key]
         else:
