@@ -373,8 +373,8 @@ def get_declarations(request):
 
     # calculate the periods window
     today = pytz.utc.localize(now)
-    start = today - datetime.timedelta(days=130)
-    nb_periods = 6
+    start = today - datetime.timedelta(days=45)
+    nb_periods = 3
     periods = [(d.month, d.year) for d in rrule(MONTHLY, dtstart=start, count=nb_periods)]
     start = pytz.utc.localize(datetime.datetime(year=periods[0][1], month=periods[0][0], day=1))
 
