@@ -122,7 +122,7 @@ def sanity_check(tx):
     if lot.matiere_premiere and lot.pays_origine:
         if lot.matiere_premiere.category == 'CONV' and lot.eec == 0:
             is_sane = False
-            errors.append(raise_error(lot, 'GHG_EEC_0', details="GES Culture 0 pour MP conventionnelle (%s)" % (lot.matiere_premiere.name)))
+            errors.append(raise_warning(lot, 'GHG_EEC_0', details="GES Culture 0 pour MP conventionnelle (%s)" % (lot.matiere_premiere.name)))
 
         if lot.matiere_premiere.code == 'SOJA':
             if lot.pays_origine.code_pays not in ['US', 'AR', 'BR', 'UY', 'PY']:
