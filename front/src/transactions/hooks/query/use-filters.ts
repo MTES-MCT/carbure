@@ -1,10 +1,45 @@
 import { useState } from "react"
+import { useLocation } from "react-router-dom"
 
-import { PageSelection } from "../../../common/components/pagination"
-import { SelectValue } from "../../../common/components/select"
-import { Filters } from "../../../common/types"
+import { PageSelection } from "common/components/pagination"
+import { SelectValue } from "common/components/select"
+import { Filters, Entity, EntityType } from "common/types"
 
 const defaultState = {}
+
+// useful for admins who want to get directly on a filtered page
+// when doing a history.push, you can specify a state
+// it will be accessible from history.location.state on the new page
+function useLocationStateFilters(
+  selected: FilterSelection["selected"],
+  select: FilterSelection["select"]
+) {
+  const { state: loc } = useLocation<{ entity?: Entity; period?: string }>()
+
+  if (!loc) return
+
+  if (loc.entity) {
+    const t = loc.entity.entity_type
+    const prods = (selected.producers as Array<string>) ?? []
+    const traders = (selected.traders as Array<string>) ?? []
+    const ops = (selected.operators as Array<string>) ?? []
+
+    if (t === EntityType.Producer && !prods.includes(loc.entity.name)) {
+      select(Filters.Producers, [...prods, loc.entity.name])
+    } else if (t === EntityType.Trader && !traders.includes(loc.entity.name)) {
+      select(Filters.Traders, [...traders, loc.entity.name])
+    } else if (t === EntityType.Operator && !ops.includes(loc.entity.name)) {
+      select(Filters.Operators, [...ops, loc.entity.name])
+    }
+  }
+
+  if (loc.period) {
+    const periods = (selected.periods as Array<string>) ?? []
+    if (!periods.includes(loc.period)) {
+      select(Filters.Periods, [...periods, loc.period])
+    }
+  }
+}
 
 export interface FilterSelection {
   selected: { [k in Filters]?: SelectValue }
@@ -40,6 +75,8 @@ export default function useFilterSelection(
       }
     })
   }
+
+  useLocationStateFilters(selected, select)
 
   return { selected, select, reset, isFiltered }
 }
