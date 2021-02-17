@@ -49,16 +49,10 @@
   margin-right: 0;
 }
 
-.transactionCloseButton {
+.transactionNavButtons {
   margin-left: auto;
 }
 
 .transactionError {
   margin-top: 16px;
-}
-
-.previousTransactionButton {
-}
-
-.nextTransactionButton {
 }
