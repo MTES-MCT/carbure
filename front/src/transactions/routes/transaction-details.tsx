@@ -6,6 +6,7 @@ import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
 import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
 import { LotRejector } from "transactions/hooks/actions/use-reject-lots"
 import { LotValidator } from "transactions/hooks/actions/use-validate-lots"
+import { useRelativePush } from "common/components/relative-route"
 
 import styles from "../components/form.module.css"
 
@@ -17,6 +18,8 @@ import {
   Cross,
   Return,
   Save,
+  ChevronLeft,
+  ChevronRight,
 } from "common/components/icons"
 import { LoaderOverlay } from "common/components"
 import { AsyncButton, Button } from "common/components/button"
@@ -25,6 +28,7 @@ import TransactionForm from "../components/form"
 import { StatusTitle } from "../components/status"
 import Comments from "../components/form-comments"
 import ValidationErrors from "../components/form-errors"
+import { LotGetter } from "transactions/hooks/use-transaction-list"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]
@@ -36,6 +40,7 @@ type TransactionDetailsProps = {
   acceptor: LotAcceptor
   rejector: LotRejector
   refresh: () => void
+  transactions: LotGetter
 }
 
 const TransactionDetails = ({
@@ -45,6 +50,7 @@ const TransactionDetails = ({
   acceptor,
   rejector,
   refresh,
+  transactions,
 }: TransactionDetailsProps) => {
   const {
     form,
@@ -61,6 +67,7 @@ const TransactionDetails = ({
     addComment,
     refreshDetails,
   } = useTransactionDetails(entity, refresh)
+  const relativePush = useRelativePush()
 
   const isEditable = EDITABLE.includes(status)
   const isCommentable = COMMENTABLE.includes(status)
@@ -74,6 +81,19 @@ const TransactionDetails = ({
 
       if (closeOnDone) {
         close()
+      }
+    }
+  }
+
+  let previousTransactionId: number | null = null
+  let nextTransactionId: number | null = null
+
+  if (transactions.data) {
+    for (let i = 0; i < transactions.data.lots.length; i++) {
+      let lot = transactions.data.lots[i]
+      if (lot.id == details.data?.transaction.id) {
+        previousTransactionId = i > 0 ? transactions.data.lots[i - 1].lot.id : null
+        nextTransactionId = i + 1 < transactions.data.lots.length ? transactions.data.lots[i + 1].lot.id : null
       }
     }
   }
@@ -183,6 +203,26 @@ const TransactionDetails = ({
               Refuser
             </AsyncButton>
           </React.Fragment>
+        )}
+
+        {previousTransactionId && (
+        <Button
+          icon={ChevronLeft}
+          className={styles.previousTransactionButton}
+          onClick={() => relativePush(`../${previousTransactionId}`)}
+        >
+          Lot Précédent
+        </Button>
+        )}
+
+        {nextTransactionId && (
+        <Button
+          icon={ChevronRight}
+          className={styles.nextTransactionButton}
+          onClick={() => relativePush(`../${nextTransactionId}`)}
+        >
+          Lot Suivant
+        </Button>
         )}
 
         <Button
