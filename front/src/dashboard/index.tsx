@@ -20,7 +20,7 @@ const Dashboard = () => {
       </SettingsHeader>
 
       <SettingsBody>
-        <Declarations declarations={declarations.data ?? [[], [], {}]} />
+        <Declarations declarations={declarations} />
       </SettingsBody>
     </Main>
   )

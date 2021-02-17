@@ -1,12 +1,13 @@
 import cl from "clsx"
 import { DeclarationsByMonth } from "../api"
 import { Declaration, Entity } from "common/types"
-import { Title } from "common/components"
+import { LoaderOverlay, Title } from "common/components"
 import Table, { Row } from "common/components/table"
 import { Section, SectionHeader } from "common/components/section"
 import { padding } from "transactions/components/list-columns"
 import styles from "./declarations.module.css"
 import { useRelativePush } from "common/components/relative-route"
+import { ApiState } from "common/hooks/use-api"
 
 type RowData = { entity: Entity; declarations: DeclarationsByMonth }
 
@@ -69,16 +70,14 @@ function renderMonthSummary(month: string) {
 }
 
 type DeclarationsProps = {
-  declarations: [
-    Entity[],
-    string[],
-    Record<number, Record<string, Declaration>>
-  ]
+  declarations: ApiState<
+    [Entity[], string[], Record<number, Record<string, Declaration>>]
+  >
 }
 
 const Declarations = ({ declarations }: DeclarationsProps) => {
   const [entities = [], months = [], declarationsByEntites = {}] =
-    declarations ?? []
+    declarations.data ?? []
 
   const columns = months?.map((month) => ({
     header: month,
@@ -102,6 +101,7 @@ const Declarations = ({ declarations }: DeclarationsProps) => {
         columns={[padding, entityColumn, ...columns]}
         rows={rows}
       />
+      {declarations.loading && <LoaderOverlay />}
     </Section>
   )
 }
