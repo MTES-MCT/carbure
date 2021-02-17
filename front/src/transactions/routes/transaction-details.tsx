@@ -88,7 +88,7 @@ const TransactionDetails = ({
   let previousTransactionId: number | null = null
   let nextTransactionId: number | null = null
 
-  if (transactions.data) {
+  if (transactions?.data) {
     for (let i = 0; i < transactions.data.lots.length; i++) {
       let lot = transactions.data.lots[i]
       if (lot.id == details.data?.transaction.id) {
