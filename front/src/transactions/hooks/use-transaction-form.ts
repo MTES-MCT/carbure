@@ -46,7 +46,7 @@ export interface TransactionFormState {
   unknown_production_country: Country | null
   unknown_production_site_com_date: string
   unknown_production_site_reference: string
-  unknown_production_site_dbl_counting: string
+  unknown_production_site_dbl_counting: string | null
 
   vendor_is_in_carbure: boolean
   carbure_vendor: Entity | null

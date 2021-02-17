@@ -154,7 +154,7 @@ export interface Lot {
   unknown_production_site: string
   unknown_production_country: Country | null
   unknown_production_site_com_date: string | null
-  unknown_production_site_dbl_counting: string
+  unknown_production_site_dbl_counting: string | null
   unknown_production_site_reference: string
 
   parent_lot: null // @TODO
