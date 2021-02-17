@@ -302,7 +302,10 @@
                       <td>
                         <p>Bonjour,</p>
                         <p>Il vous reste environ 15 jours pour déclarer la durabilité de vos lots sur CarbuRe pour la période {{PERIOD}}.
-Actuellement, {% if lots_validated == 0 %}vous n'avez aucun lot validé{% else %}vous avez {{lots_validated}} lots validés{% endif %}.</p>
+Actuellement, {% if lots_validated == 0 %}vous n'avez aucun lot validé{% else %}vous avez {{lots_validated}} lots validés{% endif %}.<br />
+
+                        Cliquez ici pour accéder à votre déclaration:
+                        </p>
                         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
                             <tr>
@@ -310,7 +313,7 @@ Actuellement, {% if lots_validated == 0 %}vous n'avez aucun lot validé{% else %
                                 <table border="0" cellpadding="0" cellspacing="0">
                                   <tbody>
                                     <tr>
-                                      <td align="center"> Cliquez ici pour accéder à votre déclaration: <a href="https://{{ domain }}/v2/org/{{entity_id}}/transactions/draft">Je Déclare</a> </td>
+                                      <td align="center"><a href="https://{{ domain }}/v2/org/{{entity_id}}/transactions/draft">Je Déclare</a> </td>
                                     </tr>
                                   </tbody>
                                 </table>
