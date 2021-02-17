@@ -16,7 +16,7 @@ function groupDeclarationsByEntities(
     const { entity, month, year } = declaration
 
     entities[entity.id] = entity
-    const period = `${month}/${year}`
+    const period = `${year}/${("0" + month).slice(-2)}`
     months[period] = null
 
     if (!declarationsByEntities[entity.id]) {
@@ -28,7 +28,11 @@ function groupDeclarationsByEntities(
     }
   })
 
-  return [Object.values(entities), Object.keys(months), declarationsByEntities]
+  return [
+    Object.values(entities),
+    Object.keys(months).sort(),
+    declarationsByEntities,
+  ]
 }
 
 export function getDeclarations(): Promise<
