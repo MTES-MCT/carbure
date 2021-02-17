@@ -23,9 +23,7 @@ function groupDeclarationsByEntities(
       declarationsByEntities[entity.id] = {}
     }
 
-    if (Object.values(declaration.lots).some((n) => n > 0)) {
-      declarationsByEntities[entity.id][period] = declaration
-    }
+    declarationsByEntities[entity.id][period] = declaration
   })
 
   return [
