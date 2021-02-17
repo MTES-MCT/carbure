@@ -49,7 +49,7 @@ def main():
         else:
             # otherwise, hardcore recipients to us
             print('DEV - sending only to us')
-            recipients = ['carbure@beta.gouv.fr']
+            recipients = ['martin.planes@beta.gouv.fr']
             send_mail(
                 subject=email_subject,
                 message=text_message,
@@ -59,6 +59,7 @@ def main():
                 fail_silently=False,
             )
             # and limit to a single email
+            print('Sent reminder to %s' % (recipients))
             break
 
 if __name__ == '__main__':
