@@ -27,6 +27,31 @@ def get_settings(request):
 
 
 @check_rights('entity_id')
+def update_entity(request, *args, **kwargs):
+    context = kwargs['context']
+
+    legal_name = request.POST.get('legal_name', False)
+    registration_id = request.POST.get('registration_id', False)
+    sustainability_officer_phone_number = request.POST.get('sustainability_officer_phone_number', False)
+    sustainability_officer = request.POST.get('sustainability_officer', False)
+    registered_address = request.POST.get('registered_address', False)
+
+    entity = context['entity']
+    if legal_name:
+        entity.legal_name = legal_name
+    if registration_id:
+        entity.registration_id = registration_id
+    if sustainability_officer_phone_number:
+        entity.sustainability_officer_phone_number = sustainability_officer_phone_number
+    if sustainability_officer:
+        entity.sustainability_officer = sustainability_officer
+    if registered_address:
+        entity.registered_address = registered_address
+    entity.save()
+    return JsonResponse({'status': 'success'})
+
+
+@check_rights('entity_id')
 def get_production_sites(request, *args, **kwargs):
     context = kwargs['context']
     psites = ProductionSite.objects.filter(producer=context['entity'])

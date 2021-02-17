@@ -4,6 +4,9 @@ from . import views
 urlpatterns = [
      path('', views.get_settings, name='api-v3-settings-get'),
 
+     path('update-entity', views.update_entity, name='api-v3-settings-update-entity'),
+
+
      path('enable-mac', views.enable_mac, name='api-v3-settings-enable-mac'),
      path('disable-mac', views.disable_mac, name='api-v3-settings-disable-mac'),
      path('enable-trading', views.enable_trading, name='api-v3-settings-enable-trading'),
