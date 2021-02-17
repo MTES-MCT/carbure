@@ -358,6 +358,7 @@ export interface Declaration {
   entity: Entity
   year: number
   month: number
+  declared: false
   checked: false
   lots: {
     lot__added_by__id: number
