@@ -3,15 +3,16 @@
 }
 
 .declarationCell {
+  display: flex;
+  align-items: center;
   flex: 1;
-  margin: 0;
-  padding: 8px;
   font-weight: normal;
-  list-style: none;
+  padding: 8px;
 }
 
 .declarationChecked {
-  background-color: var(--green-medium);
+  background-color: var(--green-dark);
+  color: var(--white);
 }
 
 .declarationDeclared {
@@ -26,4 +27,22 @@
 .declarationIdle {
   background-color: var(--red-dark);
   color: var(--white);
+}
+
+.declarationSummary {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.declarationValidation {
+  display: none;
+  margin-left: auto;
+  margin-right: 16px;
+  width: 36px;
+  height: 36px;
+}
+
+.declarationCell:hover .declarationValidation {
+  display: flex;
 }

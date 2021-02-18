@@ -355,6 +355,7 @@ export type StockDraft = {
 }
 
 export interface Declaration {
+  id: number
   entity: Entity
   year: number
   month: number
