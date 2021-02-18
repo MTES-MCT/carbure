@@ -365,10 +365,6 @@ export interface Declaration {
     lot__added_by__id: number
     lot__added_by__name: string
     lot__period: string
-    num_drafts: number
-    num_valid: number
-    num_received: number
-    num_corrections: number
     drafts: number
     validated: number
     received: number

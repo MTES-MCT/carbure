@@ -24,7 +24,7 @@
   background-color: var(--orange-medium);
 }
 
-.declarationIdle {
+.declarationReminded {
   background-color: var(--red-dark);
   color: var(--white);
 }
