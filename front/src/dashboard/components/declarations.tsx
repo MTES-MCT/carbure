@@ -163,6 +163,8 @@ const Declarations = () => {
         declaration.month,
         declaration.year
       )
+
+      await getDeclarations()
     }
   }
 
