@@ -140,7 +140,7 @@ def get_prefetched_data(entity):
     d['countries'] = {p.code_pays: p for p in Pays.objects.all()}
     d['biocarburants'] = {b.code: b for b in Biocarburant.objects.all()}
     d['matieres_premieres'] = {m.code: m for m in MatierePremiere.objects.all()}
-    d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.filter(producer=entity)}
+    d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
     d['depots'] = {d.depot_id: d for d in Depot.objects.all()}
     d['clients'] = {c.name: c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
     return d
