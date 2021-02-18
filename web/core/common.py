@@ -141,7 +141,7 @@ def get_prefetched_data(entity):
     d['biocarburants'] = {b.code: b for b in Biocarburant.objects.all()}
     d['matieres_premieres'] = {m.code: m for m in MatierePremiere.objects.all()}
     d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
-    d['depots'] = {d.depot_id: d for d in Depot.objects.all()}
+    d['depots'] = {d.depot_id.lstrip('0'): d for d in Depot.objects.all()}
     d['clients'] = {c.name: c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
     return d
 
@@ -609,10 +609,14 @@ def fill_delivery_site_data(lot_row, transaction, prefetched_data):
             # sometimes excel will convert a columns of integers to float
             delivery_site = int(delivery_site)
         # convert to string 4.0 -> 4 -> '4' and remove leading 0
-        delivery_site = str(delivery_site).lstrip('0')
-        if delivery_site in depots:
+        delivery_site = str(delivery_site)
+        stripped_delivery_site = str(delivery_site).lstrip('0')
+        if delivery_site in depots or stripped_delivery_site in depots:
             transaction.delivery_site_is_in_carbure = True
-            transaction.carbure_delivery_site = depots[delivery_site]
+            if delivery_site in depots:
+                transaction.carbure_delivery_site = depots[delivery_site]
+            else:
+                transaction.carbure_delivery_site = depots[stripped_delivery_site]
             transaction.unknown_delivery_site = ''
         else:
             transaction.delivery_site_is_in_carbure = False

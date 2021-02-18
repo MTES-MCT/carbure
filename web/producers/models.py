@@ -13,12 +13,12 @@ class ProductionSite(models.Model):
     eligible_dc = models.BooleanField(default=False)
     dc_reference = models.CharField(max_length=64, null=True, blank=True, default='')
 
-    site_id = models.CharField(max_length=64, blank=False, null=False)
-    city = models.CharField(max_length=64, blank=False, null=False)
-    postal_code = models.CharField(max_length=64, blank=False, null=False)
-    manager_name = models.CharField(max_length=64, blank=False, null=False)
-    manager_phone = models.CharField(max_length=64, blank=False, null=False)
-    manager_email = models.CharField(max_length=64, blank=False, null=False)
+    site_id = models.CharField(max_length=64, blank=True)
+    city = models.CharField(max_length=64, blank=True)
+    postal_code = models.CharField(max_length=64, blank=True)
+    manager_name = models.CharField(max_length=64, blank=True)
+    manager_phone = models.CharField(max_length=64, blank=True)
+    manager_email = models.CharField(max_length=64, blank=True)
 
     def __str__(self):
         return self.name
