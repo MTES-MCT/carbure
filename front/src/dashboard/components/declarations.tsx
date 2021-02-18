@@ -53,6 +53,7 @@ function renderMonthSummary(
 
     if (!decl) return "N/A"
 
+    const { drafts, validated, received, corrections } = decl.lots
     const ev = evaluateDeclaration(decl)
 
     const pushToTransactions = () =>
@@ -74,10 +75,18 @@ function renderMonthSummary(
         )}
       >
         <ul className={styles.declarationSummary}>
-          <li>{v.declarations[month]?.lots.drafts ?? 0} brouillons</li>
-          <li>{v.declarations[month]?.lots.validated ?? 0} envoyés</li>
-          <li>{v.declarations[month]?.lots.received ?? 0} reçus</li>
-          <li>{v.declarations[month]?.lots.corrections ?? 0} corrections</li>
+          <li>
+            {drafts ?? 0} brouillon{drafts !== 1 && "s"}
+          </li>
+          <li>
+            {validated ?? 0} envoyé{validated !== 1 && "s"}
+          </li>
+          <li>
+            {received ?? 0} reçu{received !== 1 && "s"}
+          </li>
+          <li>
+            {corrections ?? 0} correction{corrections !== 1 && "s"}
+          </li>
         </ul>
 
         {[Evaluation.InProgress, Evaluation.Reminded].includes(ev) && (
