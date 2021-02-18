@@ -14,7 +14,7 @@ def get_matieres_premieres(request):
     if q:
         mps = mps.filter(Q(name__icontains=q) | Q(code__icontains=q))
     sez = [{'code': m.code, 'name': m.name, 'description': m.description, 'compatible_alcool': m.compatible_alcool,
-            'compatible_graisse': m.compatible_graisse} for m in mps]
+            'compatible_graisse': m.compatible_graisse, 'is_double_compte': m.is_double_compte} for m in mps]
     return JsonResponse({'status': 'success', 'data': sez})
 
 
