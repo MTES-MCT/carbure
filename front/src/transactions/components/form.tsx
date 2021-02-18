@@ -42,6 +42,7 @@ type TransactionFormProps = {
   id?: string
   entity: EntitySelection
   readOnly?: boolean
+  stock?: boolean
   transaction: TransactionFormState
   error: string | null
   fieldErrors?: { [k: string]: string }
@@ -52,6 +53,7 @@ type TransactionFormProps = {
 const TransactionForm = ({
   id,
   entity,
+  stock = false,
   readOnly = false,
   transaction: tx,
   error,
@@ -254,7 +256,7 @@ const TransactionForm = ({
                 readOnly={readOnly}
                 label="N° d'enregistrement double-compte"
                 name="unknown_production_site_dbl_counting"
-                value={tx.unknown_production_site_dbl_counting}
+                value={tx.unknown_production_site_dbl_counting ?? ""}
                 error={fieldErrors.production_site_dbl_counting}
                 onChange={onChange}
               />
@@ -271,7 +273,7 @@ const TransactionForm = ({
         </Box>
 
         <Box className={styles.middleColumn}>
-          {(isOperator || isTrader) && (
+          {(isOperator || isTrader || stock) && (
             <React.Fragment>
               <LabelCheckbox
                 disabled
@@ -365,16 +367,14 @@ const TransactionForm = ({
               onChange={onChange}
             />
           ) : (
-            <React.Fragment>
-              <LabelInput
-                readOnly={readOnly}
-                label="Site de livraison"
-                name="unknown_delivery_site"
-                value={tx.unknown_delivery_site}
-                error={fieldErrors.delivery_site}
-                onChange={onChange}
-              />
-            </React.Fragment>
+            <LabelInput
+              readOnly={readOnly}
+              label="Site de livraison"
+              name="unknown_delivery_site"
+              value={tx.unknown_delivery_site}
+              error={fieldErrors.delivery_site}
+              onChange={onChange}
+            />
           )}
 
           {tx.delivery_site_is_in_carbure ? (
@@ -400,7 +400,7 @@ const TransactionForm = ({
             />
           )}
 
-          {!isTrader && (
+          {!isTrader && !stock && (
             <LabelTextArea
               readOnly={readOnly}
               label="Champ Libre"

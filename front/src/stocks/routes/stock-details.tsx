@@ -77,6 +77,7 @@ const StockDetails = ({
       </StatusTitle>
 
       <TransactionForm
+        stock
         id="stock-details"
         entity={entity}
         readOnly={!isEditable}
