@@ -361,6 +361,7 @@ export interface Declaration {
   month: number
   declared: false
   checked: false
+  reminder_count: number
   lots: {
     lot__added_by__id: number
     lot__added_by__name: string
