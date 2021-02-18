@@ -32,11 +32,10 @@ function evaluateDeclaration(declaration: Declaration) {
     return Evaluation.Checked
   } else if (declaration.declared) {
     return Evaluation.Declared
+  } else if (declaration.reminder_count > 0) {
+    return Evaluation.Reminded
   } else if (Object.values(declaration.lots).some((v) => v > 0)) {
     return Evaluation.InProgress
-  } else if (0) {
-    // @TODO check number of times this declaration was reminded
-    return Evaluation.Reminded
   } else {
     return Evaluation.Idle
   }
@@ -81,10 +80,10 @@ function renderMonthSummary(
           <li>{v.declarations[month]?.lots.corrections ?? 0} corrections</li>
         </ul>
 
-        {ev === Evaluation.InProgress && (
+        {[Evaluation.InProgress, Evaluation.Reminded].includes(ev) && (
           <Bell
             className={styles.declarationValidation}
-            title="Relancer l'utilisateur"
+            title={`Relancer l'utilisateur (fait ${decl.reminder_count} fois)`}
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
@@ -160,8 +159,8 @@ const Declarations = () => {
     if (ok) {
       await sendReminder(
         declaration.entity.id,
-        declaration.month,
-        declaration.year
+        declaration.year,
+        declaration.month
       )
 
       await getDeclarations()
