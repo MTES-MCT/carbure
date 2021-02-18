@@ -21,11 +21,11 @@ class Entity(models.Model):
     has_trading = models.BooleanField(default=False)
     national_system_certificate = models.CharField(max_length=64, null=True, blank=True)
 
-    legal_name = models.CharField(max_length=128, null=True, blank=True)
-    registration_id = models.CharField(max_length=64, null=True, blank=True)
-    sustainability_officer_phone_number = models.CharField(max_length=32, null=True, blank=True)
-    sustainability_officer = models.CharField(max_length=32, null=True, blank=True)
-    registered_address = models.TextField(null=True, blank=True)
+    legal_name = models.CharField(max_length=128, blank=True, default='')
+    registration_id = models.CharField(max_length=64, blank=True, default='')
+    sustainability_officer_phone_number = models.CharField(max_length=32, blank=True, default='')
+    sustainability_officer = models.CharField(max_length=32, blank=True, default='')
+    registered_address = models.TextField(blank=True, default='')
 
     def __str__(self):
         return self.name
