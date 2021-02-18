@@ -147,16 +147,21 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 LOGIN_REDIRECT_URL = 'otp-verify'
 LOGOUT_REDIRECT_URL = 'index'
 
-if env('TEST') is False:
+
+DEFAULT_FROM_EMAIL = "carbure@beta.gouv.fr"
+if env('IMAGE_TAG') in ['dev', 'staging', 'prod']:
     EMAIL_HOST = env('EMAIL_HOST')
     EMAIL_PORT = env('EMAIL_PORT')
     EMAIL_HOST_USER = env('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
     EMAIL_USE_TLS = env('EMAIL_USE_TLS')
-    DEFAULT_FROM_EMAIL = "carbure@beta.gouv.fr"
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-    # file storage
-    DEFAULT_FILE_STORAGE = 'carbure.storage_backends.MediaStorage'
+
+# file storage
+DEFAULT_FILE_STORAGE = 'carbure.storage_backends.MediaStorage'
+if env('TEST') is False:
     AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
     AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
@@ -164,9 +169,8 @@ if env('TEST') is False:
     AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME")
     AWS_S3_USE_SSL = 1
     AWS_DEFAULT_ACL = None
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    
+
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
