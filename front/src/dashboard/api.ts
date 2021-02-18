@@ -40,3 +40,23 @@ export function getDeclarations(): Promise<
     .get("/admin/dashboard/declarations")
     .then(groupDeclarationsByEntities)
 }
+
+export function checkDeclaration(id: number): Promise<any> {
+  return api.post("/admin/dashboard/declaration/check", { id })
+}
+
+export function uncheckDeclaration(id: number): Promise<any> {
+  return api.post("/admin/dashboard/declaration/uncheck", { id })
+}
+
+export function sendDeclarationReminder(
+  entity_id: number,
+  year: number,
+  month: number
+): Promise<any> {
+  return api.post("/admin/dashboard/declaration/send-reminder", {
+    entity_id,
+    year,
+    month,
+  })
+}
