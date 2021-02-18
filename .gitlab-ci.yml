@@ -53,6 +53,7 @@ test:
     - export ALLOWED_HOSTS="carbure.local"
     - export CARBURE_HOME=/builds/la-fabrique-numerique/biocarburants/
     - export TEST=1
+    - exoirt IMAGE_TAG=ci
     - echo "Testing..."
     - cd /app/web
     - coverage run ./manage.py test
