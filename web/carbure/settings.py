@@ -148,7 +148,7 @@ LOGIN_REDIRECT_URL = 'otp-verify'
 LOGOUT_REDIRECT_URL = 'index'
 
 
-DEFAULT_FROM_EMAIL = "carbure@beta.gouv.fr"
+DEFAULT_FROM_EMAIL = "contact@carbure.beta.gouv.fr"
 if env('IMAGE_TAG') in ['dev', 'staging', 'prod']:
     EMAIL_HOST = env('EMAIL_HOST')
     EMAIL_PORT = env('EMAIL_PORT')
