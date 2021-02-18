@@ -150,7 +150,7 @@ export interface Lot {
   unknown_producer: string
 
   production_site_is_in_carbure: boolean
-  carbure_production_site: ProductionSite | null
+  carbure_production_site: ProductionSiteDetails | null
   unknown_production_site: string
   unknown_production_country: Country | null
   unknown_production_site_com_date: string | null
