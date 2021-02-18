@@ -235,7 +235,7 @@ def add_lot(request, *args, **kwargs):
     lot, tx, lot_errors, tx_errors = load_lot(d, entity, request.user, request.POST.dict(), 'MANUAL')
     if not tx:
         return JsonResponse({'status': 'error', 'message': 'Could not add lot to database'}, status=400)
-    new_lots, new_txs = bulk_insert(entity, [lot], [tx], [lot_errors], [tx_errors])
+    new_lots, new_txs = bulk_insert(entity, [lot], [tx], [lot_errors], [tx_errors], d)
     db.connections.close_all()
     lot_data = new_txs[0].natural_key()
     return JsonResponse({'status': 'success', 'data': lot_data})
@@ -265,7 +265,7 @@ def update_lot(request, *args, **kwargs):
         tx.save()
         LotV2Error.objects.bulk_create(lot_errors)
         TransactionError.objects.bulk_create(tx_errors)
-        bulk_sanity_checks([tx], background=False)
+        bulk_sanity_checks([tx], d, background=False)
         # only if lot is already validated ?
         if lot.status == 'Validated':
             # make sure we do not create a duplicate
@@ -349,7 +349,7 @@ def validate_lot(request, *args, **kwargs):
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
     txs = LotTransaction.objects.filter(id__in=tx_ids, lot__added_by=entity)
-    data = validate_lots(request.user, txs)
+    data = validate_lots(request.user, entity, txs)
     nb_duplicates = check_duplicates(txs, background=False)
     data['duplicates'] = nb_duplicates
     return JsonResponse({'status': 'success', 'data': data})
@@ -549,7 +549,7 @@ def validate_all_drafts(request, *args, **kwargs):
             return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
     drafts = drafts.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
     logger.debug("Found {} transactions to validate".format(drafts.count()))
-    data = validate_lots(request.user, drafts)
+    data = validate_lots(request.user, entity, drafts)
     logger.debug(data)
     logger.debug("Checking duplicates")
     duplicates = check_duplicates(drafts, background=False)

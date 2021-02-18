@@ -26,6 +26,8 @@ rules['MAC_BC_WRONG'] = "Biocarburant incompatible avec un mise à consommation 
 rules['GHG_ETD_0'] = "Émissions GES liées au Transport et à la Distribution nulles"
 rules['GHG_EP_0'] = "Émissions GES liées à la Transformation de la matière première nulles"
 rules['GHG_EEC_0'] = "Émissions GES liées à l'Extraction et la Culture nulles"
+rules['MP_NOT_CONFIGURED'] = "Matière Première non enregistrée sur votre Site de Production"
+rules['BC_NOT_CONFIGURED'] = "Biocarburant non enregistré sur votre Site de Production"
 
 
 def raise_warning(lot, rule_triggered, details=''):
@@ -121,7 +123,6 @@ def sanity_check(tx):
     # provenance des matieres premieres
     if lot.matiere_premiere and lot.pays_origine:
         if lot.matiere_premiere.category == 'CONV' and lot.eec == 0:
-            is_sane = False
             errors.append(raise_warning(lot, 'GHG_EEC_0', details="GES Culture 0 pour MP conventionnelle (%s)" % (lot.matiere_premiere.name)))
 
         if lot.matiere_premiere.code == 'SOJA':
@@ -160,11 +161,6 @@ def sanity_check(tx):
                 is_sane = False
                 errors.append(raise_error(lot, 'MISSING_REF_DBL_COUNTING', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
 
-        if lot.biocarburant.code in ['ETH'] and lot.matiere_premiere.code in ['RESIDUS_VINIQUES']:
-            if lot.unknown_production_site_dbl_counting is None or (lot.carbure_production_site and not lot.carbure_production_site.dc_reference):
-                is_sane = False
-                errors.append(raise_error(lot, 'MISSING_REF_DBL_COUNTING', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
-
         if lot.biocarburant.is_graisse:
             if lot.biocarburant.code == 'EMHU' and lot.matiere_premiere.code != 'HUILE_ALIMENTAIRE_USAGEE':
                 is_sane = False
@@ -190,6 +186,18 @@ def sanity_check(tx):
         if not lot.matiere_premiere.is_huile_vegetale and lot.biocarburant.code in ['HVOE', 'HVOG']:
             is_sane = False
             errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="Un HVO doit provenir d'huiles végétales uniquement. Pour les autres huiles hydrotraitées, voir la nomenclature HOE/HOG"))
+
+
+    # configuration
+    #if lot.matiere_premiere and lot.carbure_production_site:
+    #    mps = lot.carbure_production_site.productionsiteinput_set.all()
+    #    if lot.matiere_premiere not in mps:
+    #        errors.append(raise_warning(lot, 'MP_NOT_CONFIGURED'))
+    #if lot.biocarburant and lot.carbure_production_site:
+    #    bcs = lot.carbure_production_site.productionsiteoutput_set.all()
+    #    if lot.biocarburant not in bcs:
+    #        errors.append(raise_warning(lot, 'BC_NOT_CONFIGURED'))
+
     return lot_valid, tx_valid, is_sane, errors
 
 
