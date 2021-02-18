@@ -36,3 +36,5 @@ SEIGLE,Seigle,1,0,0,0,1,CONV
 ORGE,Orge,1,0,0,0,1,CONV
 TRITICALE,Triticale,1,0,0,0,1,CONV
 RESIDUS_DE_BIERE,Résidus de bière,1,0,0,0,1,OTHER
+MARC_DE_RAISIN,Marc de raisin,1,0,1,0,1,ANN-IX-A
+LIES_DE_VIN,Lies de vin,1,0,1,0,1,ANN-IX-A
