@@ -733,9 +733,10 @@ class SustainabilityDeclaration(models.Model):
     checked = models.BooleanField(default=False)
     deadline = models.DateField(default=datetime.datetime.now, blank=True)
     period = models.DateField(default=datetime.datetime.now, blank=True)
+    reminder_count = models.IntegerField(default=0)
 
     def natural_key(self):
-        return {'id': self.id,'entity': self.entity.natural_key(), 'declared': self.declared, 'period': self.period, 'deadline': self.deadline, 'checked': self.checked, 'month': self.period.month, 'year': self.period.year}
+        return {'id': self.id,'entity': self.entity.natural_key(), 'declared': self.declared, 'period': self.period, 'deadline': self.deadline, 'checked': self.checked, 'month': self.period.month, 'year': self.period.year, 'reminder_count': self.reminder_count}
 
     class Meta:
         db_table = 'declarations'
