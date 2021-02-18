@@ -7,7 +7,7 @@ import {
   Entity,
   Transaction,
   MatierePremiere,
-  ProductionSite,
+  ProductionSiteDetails,
 } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import useForm, { FormHook } from "common/hooks/use-form"
@@ -41,7 +41,7 @@ export interface TransactionFormState {
   producer_is_in_carbure: boolean
   carbure_producer: Entity | null
   unknown_producer: string
-  carbure_production_site: ProductionSite | null
+  carbure_production_site: ProductionSiteDetails | null
   unknown_production_site: string
   unknown_production_country: Country | null
   unknown_production_site_com_date: string

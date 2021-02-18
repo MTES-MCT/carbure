@@ -201,7 +201,7 @@ const TransactionForm = ({
                 readOnly={readOnly}
                 name="carbure_production_site_dbl_counting"
                 label="N° d'enregistrement double-compte"
-                value=""
+                value={tx.matiere_premiere?.is_double_compte && (tx.carbure_production_site?.dc_reference ?? "") || ""}
               />
               <LabelInput
                 disabled
