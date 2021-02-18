@@ -54,7 +54,7 @@ def raise_error(lot, rule_triggered, details=''):
     return LotValidationError(**d)
 
 
-def bulk_sanity_checks(txs, background=True):
+def bulk_sanity_checks(txs, prefetched_data, background=True):
     results = []
     errors = []
     if background == True:
@@ -64,7 +64,7 @@ def bulk_sanity_checks(txs, background=True):
     lots = [t.lot for t in txs]
     LotValidationError.objects.filter(lot__in=lots).delete()
     for tx in txs:
-        lot_ok, tx_ok, is_sane, validation_errors = sanity_check(tx)
+        lot_ok, tx_ok, is_sane, validation_errors = sanity_check(tx, prefetched_data)
         errors += validation_errors
         results.append((lot_ok, tx_ok, is_sane))
     LotValidationError.objects.bulk_create(errors, batch_size=1000)
@@ -72,7 +72,7 @@ def bulk_sanity_checks(txs, background=True):
     return results
 
 
-def sanity_check(tx):
+def sanity_check(tx, prefetched_data):
     lot = tx.lot
     is_sane = True
     errors = []
@@ -189,15 +189,16 @@ def sanity_check(tx):
 
 
     # configuration
-    #if lot.matiere_premiere and lot.carbure_production_site:
-    #    mps = lot.carbure_production_site.productionsiteinput_set.all()
-    #    if lot.matiere_premiere not in mps:
-    #        errors.append(raise_warning(lot, 'MP_NOT_CONFIGURED'))
-    #if lot.biocarburant and lot.carbure_production_site:
-    #    bcs = lot.carbure_production_site.productionsiteoutput_set.all()
-    #    if lot.biocarburant not in bcs:
-    #        errors.append(raise_warning(lot, 'BC_NOT_CONFIGURED'))
-
+    if lot.matiere_premiere and lot.carbure_production_site:
+        if lot.carbure_production_site.name in prefetched_data['production_sites']:
+            mps = [psi.matiere_premiere for psi in prefetched_data['production_sites'][lot.carbure_production_site.name].productionsiteinput_set.all()]
+            if lot.matiere_premiere not in mps:
+                errors.append(raise_warning(lot, 'MP_NOT_CONFIGURED'))
+    if lot.biocarburant and lot.carbure_production_site:
+        if lot.carbure_production_site.name in prefetched_data['production_sites']:
+            bcs = [pso.biocarburant for pso in prefetched_data['production_sites'][lot.carbure_production_site.name].productionsiteoutput_set.all()]
+            if lot.biocarburant not in bcs:
+                errors.append(raise_warning(lot, 'BC_NOT_CONFIGURED'))
     return lot_valid, tx_valid, is_sane, errors
 
 
