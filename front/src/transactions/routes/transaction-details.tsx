@@ -21,7 +21,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "common/components/icons"
-import { LoaderOverlay } from "common/components"
+import { Box, LoaderOverlay } from "common/components"
 import { AsyncButton, Button } from "common/components/button"
 import Modal from "common/components/modal"
 import TransactionForm from "../components/form"
@@ -91,9 +91,9 @@ const TransactionDetails = ({
   if (transactions?.data) {
     for (let i = 0; i < transactions.data.lots.length; i++) {
       let lot = transactions.data.lots[i]
-      if (lot.id == details.data?.transaction.id) {
-        previousTransactionId = i > 0 ? transactions.data.lots[i - 1].lot.id : null
-        nextTransactionId = i + 1 < transactions.data.lots.length ? transactions.data.lots[i + 1].lot.id : null
+      if (lot.id === details.data?.transaction.id) {
+        previousTransactionId = i > 0 ? transactions.data.lots[i - 1].id : null // prettier-ignore
+        nextTransactionId = i + 1 < transactions.data.lots.length ? transactions.data.lots[i + 1].id : null // prettier-ignore
       }
     }
   }
@@ -205,33 +205,27 @@ const TransactionDetails = ({
           </React.Fragment>
         )}
 
-        {previousTransactionId && (
-        <Button
-          icon={ChevronLeft}
-          className={styles.previousTransactionButton}
-          onClick={() => relativePush(`../${previousTransactionId}`)}
-        >
-          Lot Précédent
-        </Button>
-        )}
+        <Box row className={styles.transactionNavButtons}>
+          <Button
+            icon={ChevronLeft}
+            disabled={!previousTransactionId}
+            onClick={() => relativePush(`../${previousTransactionId}`)}
+          >
+            Lot Précédent
+          </Button>
 
-        {nextTransactionId && (
-        <Button
-          icon={ChevronRight}
-          className={styles.nextTransactionButton}
-          onClick={() => relativePush(`../${nextTransactionId}`)}
-        >
-          Lot Suivant
-        </Button>
-        )}
+          <Button
+            icon={ChevronRight}
+            disabled={!nextTransactionId}
+            onClick={() => relativePush(`../${nextTransactionId}`)}
+          >
+            Lot Suivant
+          </Button>
 
-        <Button
-          icon={Return}
-          className={styles.transactionCloseButton}
-          onClick={close}
-        >
-          Retour
-        </Button>
+          <Button icon={Return} onClick={close}>
+            Retour
+          </Button>
+        </Box>
       </div>
 
       {details.loading && <LoaderOverlay />}

@@ -1,0 +1,29 @@
+.declarationTable > div > div {
+  padding: 2px;
+}
+
+.declarationCell {
+  flex: 1;
+  margin: 0;
+  padding: 8px;
+  font-weight: normal;
+  list-style: none;
+}
+
+.declarationChecked {
+  background-color: var(--green-medium);
+}
+
+.declarationDeclared {
+  background-color: var(--blue-medium);
+  color: var(--white);
+}
+
+.declarationInProgress {
+  background-color: var(--orange-medium);
+}
+
+.declarationIdle {
+  background-color: var(--red-dark);
+  color: var(--white);
+}

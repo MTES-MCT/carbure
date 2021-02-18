@@ -4,32 +4,7 @@ import { SettingsBody, SettingsHeader } from "settings/components/common"
 
 import * as api from "./api"
 import { useEffect } from "react"
-import Table from "common/components/table"
-import { Entity } from "common/types"
-import { padding } from "transactions/components/list-columns"
-
-type RowData = { entity: Entity; declarations: api.DeclarationsByMonth }
-
-const entityColumn = {
-  render: (v: RowData) => v.entity.name,
-}
-
-function renderMonth(month: string) {
-  return (v: RowData) => (
-    <ul
-      style={{
-        margin: 0,
-        padding: 8,
-        fontWeight: "normal",
-      }}
-    >
-      <li>{v.declarations[month]?.lots.num_drafts ?? 0} brouillons</li>
-      <li>{v.declarations[month]?.lots.num_valid ?? 0} envoyés</li>
-      <li>{v.declarations[month]?.lots.num_received ?? 0} reçus</li>
-      <li>{v.declarations[month]?.lots.num_corrections ?? 0} corrections</li>
-    </ul>
-  )
-}
+import Declarations from "./components/declarations"
 
 const Dashboard = () => {
   const [declarations, getDeclarations] = useAPI(api.getDeclarations)
@@ -38,21 +13,6 @@ const Dashboard = () => {
     getDeclarations()
   }, [getDeclarations])
 
-  const [entities = [], months = [], declarationsByEntites = {}] =
-    declarations.data ?? []
-
-  const columns = months?.map((month) => ({
-    header: month,
-    render: renderMonth(month),
-  }))
-
-  const rows = entities?.map((e) => ({
-    value: {
-      entity: e,
-      declarations: declarationsByEntites[e.id],
-    } as RowData,
-  }))
-
   return (
     <Main>
       <SettingsHeader>
@@ -60,7 +20,7 @@ const Dashboard = () => {
       </SettingsHeader>
 
       <SettingsBody>
-        <Table columns={[padding, entityColumn, ...columns]} rows={rows} />
+        <Declarations declarations={declarations} />
       </SettingsBody>
     </Main>
   )

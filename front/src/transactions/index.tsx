@@ -71,6 +71,7 @@ const PRODUCER_TRADER_FILTERS = [
 ]
 
 const ADMIN_FILTERS = [
+  Filters.DeliveryStatus,
   Filters.Periods,
   Filters.Biocarburants,
   Filters.MatieresPremieres,
