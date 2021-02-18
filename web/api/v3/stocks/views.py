@@ -202,7 +202,7 @@ def create_drafts(request, *args, **kwargs):
         txs.append(tx)
         lot_errors += lot_errors
         tx_errors += tx_errors
-    new_lots, new_txs = bulk_insert(context['entity'], lots, txs, lot_errors, tx_errors)
+    new_lots, new_txs = bulk_insert(context['entity'], lots, txs, lot_errors, tx_errors, d)
     return JsonResponse({'status': 'success'})
 
 

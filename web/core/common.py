@@ -814,7 +814,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
                 print(e)
                 #print(lot_row)
         print('File processed %s' % (datetime.datetime.now()))
-        bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors)
+        bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors, prefetched_data)
         print('%d Lots out of %d lines loaded in database %s' % (lots_loaded, total_lots, datetime.datetime.now()))
         return lots_loaded, total_lots
     except Exception as e:
@@ -822,7 +822,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
         return False, False
 
 
-def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
+def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors, prefetched_data):
     # print('Starting bulk_insert %s' % (datetime.datetime.now()))
     # below lines are for batch insert of Lots, Transactions and errors
     # it's a bit rough
@@ -857,17 +857,11 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors):
             e.tx_id = tx.id
     flat_tx_errors = [item for sublist in tx_errors for item in sublist]
     TransactionError.objects.bulk_create(flat_tx_errors, batch_size=100)
-    # 8 run sanity checks
-    #p = Process(target=bulk_sanity_checks, args=[new_txs])
-    #p.start()
-    #d = Process(target=check_duplicates, args=[new_txs])
-    #d.start()
-    bulk_sanity_checks(new_txs, background=False)
-    #check_duplicates(new_txs, background=False)
+    bulk_sanity_checks(new_txs, prefetched_data, background=False)
     return new_lots, new_txs
 
 
-def validate_lots(user, txs):
+def validate_lots(user, entity, txs):
     valid = 0
     invalid = 0
     submitted = txs.count()
@@ -883,9 +877,9 @@ def validate_lots(user, txs):
                 continue
         to_validate.append(tx)
 
-    
+    prefetched_data = get_prefetched_data(entity)
     # run sanity_checks
-    results = bulk_sanity_checks(to_validate, background=False)
+    results = bulk_sanity_checks(to_validate, prefetched_data, background=False)
 
     # disable autocommit
     with transaction.atomic():
