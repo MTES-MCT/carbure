@@ -129,7 +129,7 @@ class LotsAPITest(TransactionTestCase):
             'dae': dae,
             'delivery_date': '2020-12-31',
             'client': self.test_operator.name,
-            'delivery_site': '001',
+            'delivery_site': '1',
             'entity_id': self.test_producer.id,
         }
         # add manual lot
@@ -174,7 +174,7 @@ class LotsAPITest(TransactionTestCase):
                     'dae': 'DAEUPDATED%d' % (i),
                     'delivery_date': '2020-12-31',
                     'client': self.test_operator.name,
-                    'delivery_site': '001',
+                    'delivery_site': '01',
                     'entity_id': self.test_producer.id,
                 }
                 response = self.client.post(reverse('api-v3-update-lot'), postdata)
