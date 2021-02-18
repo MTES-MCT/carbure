@@ -19,6 +19,29 @@ const entityColumn = {
   render: (v: RowData) => v.entity.name,
 }
 
+enum Evaluation {
+  Checked,
+  Declared,
+  InProgress,
+  Reminded,
+  Idle,
+}
+
+function evaluateDeclaration(declaration: Declaration) {
+  if (declaration.checked) {
+    return Evaluation.Checked
+  } else if (declaration.declared) {
+    return Evaluation.Declared
+  } else if (Object.values(declaration.lots).some((v) => v > 0)) {
+    return Evaluation.InProgress
+  } else if (0) {
+    // @TODO check number of times this declaration was reminded
+    return Evaluation.Reminded
+  } else {
+    return Evaluation.Idle
+  }
+}
+
 function renderMonthSummary(
   month: string,
   askCheck: (d: Declaration, t: boolean) => Promise<any>,
@@ -26,16 +49,12 @@ function renderMonthSummary(
 ) {
   return (v: RowData) => {
     const relativePush = useRelativePush()
+
     const decl = v.declarations[month]
 
-    // has some lots in transit but nothing declared or approved by admin
-    const isInProgress =
-      Object.values(decl.lots).some((v) => v > 0) &&
-      !decl.checked &&
-      !decl.declared
+    if (!decl) return "N/A"
 
-    // no lots at all for the given period
-    const isIdle = !Object.values(decl.lots).some((v) => v === 0)
+    const ev = evaluateDeclaration(decl)
 
     const pushToTransactions = () =>
       relativePush(`../transactions/declaration`, {
@@ -49,10 +68,10 @@ function renderMonthSummary(
         onClick={pushToTransactions}
         className={cl(
           styles.declarationCell,
-          decl.checked && styles.declarationChecked,
-          !decl.checked && decl.declared && styles.declarationDeclared,
-          isInProgress && styles.declarationInProgress,
-          isIdle && styles.declarationIdle
+          ev === Evaluation.Checked && styles.declarationChecked,
+          ev === Evaluation.Declared && styles.declarationDeclared,
+          ev === Evaluation.InProgress && styles.declarationInProgress,
+          ev === Evaluation.Reminded && styles.declarationReminded
         )}
       >
         <ul className={styles.declarationSummary}>
@@ -62,7 +81,7 @@ function renderMonthSummary(
           <li>{v.declarations[month]?.lots.corrections ?? 0} corrections</li>
         </ul>
 
-        {!decl.declared && (
+        {ev === Evaluation.InProgress && (
           <Bell
             className={styles.declarationValidation}
             title="Relancer l'utilisateur"
@@ -74,7 +93,7 @@ function renderMonthSummary(
           />
         )}
 
-        {!decl.checked && decl.declared && (
+        {ev === Evaluation.Declared && (
           <Check
             className={styles.declarationValidation}
             title="Valider la déclaration"
@@ -86,7 +105,7 @@ function renderMonthSummary(
           />
         )}
 
-        {decl.checked && (
+        {ev === Evaluation.Checked && (
           <Cross
             className={styles.declarationValidation}
             title="Annuler la déclaration"
