@@ -25,6 +25,7 @@ import {
 import { Alert } from "common/components/alert"
 import { LabelAutoComplete } from "common/components/autocomplete"
 import { AlertTriangle } from "common/components/icons"
+import { EntityType } from "common/types"
 
 // shorthand to build autocomplete value & label getters
 const get = (key: string) => (obj: { [k: string]: any } | null) =>
@@ -61,9 +62,10 @@ const TransactionForm = ({
   onChange,
   onSubmit,
 }: TransactionFormProps) => {
-  const isProducer = entity?.entity_type === "Producteur"
-  const isOperator = entity?.entity_type === "Opérateur"
-  const isTrader = entity?.entity_type === "Trader"
+  const isProducer = entity?.entity_type === EntityType.Producer
+  const isOperator = entity?.entity_type === EntityType.Operator
+  const isTrader = entity?.entity_type === EntityType.Trader
+  const isAdmin = entity?.entity_type === EntityType.Administration
 
   function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -273,7 +275,7 @@ const TransactionForm = ({
         </Box>
 
         <Box className={styles.middleColumn}>
-          {(isOperator || isTrader || stock) && (
+          {(isOperator || isTrader || isAdmin || stock) && (
             <React.Fragment>
               <LabelCheckbox
                 disabled
@@ -400,7 +402,7 @@ const TransactionForm = ({
             />
           )}
 
-          {!isTrader && !stock && (
+          {!isAdmin && !isTrader && !stock && (
             <LabelTextArea
               readOnly={readOnly}
               label="Champ Libre"
