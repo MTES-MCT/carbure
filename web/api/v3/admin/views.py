@@ -371,12 +371,16 @@ def get_declarations(request):
     else:
         year = int(year)
 
-    # calculate the periods window
-    today = pytz.utc.localize(now)
-    start = today - datetime.timedelta(days=45)
+    # we are in month N, we want to see period N-2, N-1 and N
+    current_period = datetime.date.today().replace(day=1)
     nb_periods = 3
-    periods = [(d.month, d.year) for d in rrule(MONTHLY, dtstart=start, count=nb_periods)]
+    declaration_periods = []
+    for i in range(nb_periods):
+        declaration_periods.append(current_period - relativedelta(months=1 * i))
+    periods = [(d.month, d.year) for d in declaration_periods]
+    periods.reverse()
     start = pytz.utc.localize(datetime.datetime(year=periods[0][1], month=periods[0][0], day=1))
+    end = pytz.utc.localize(datetime.datetime(year=periods[-1][1], month=periods[-1][0], day=1))
 
     # get entities that have posted at least one lot since the beginning of the period
     entities_alive = [f['lot__added_by'] for f in LotTransaction.objects.filter(lot__added_time__gt=start).values('lot__added_by').annotate(count=Count('lot')).filter(count__gt=1)]
@@ -387,8 +391,7 @@ def get_declarations(request):
     # 0) cleanup
     # SustainabilityDeclaration.objects.filter(checked=False).delete()
     # 1) get existing objects
-    sds = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start)
-    print('%d existing sds' % (sds.count()))
+    sds = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start, period__lte=end)
     existing = {}
     for sd in sds:
         key = '%d.%d.%d' % (sd.entity.id, sd.period.year, sd.period.month)
@@ -403,7 +406,6 @@ def get_declarations(request):
         for e in entities:
             key = '%d.%d.%d' % (e.id, year, month)
             targets[key] =  SustainabilityDeclaration(entity=e, period=period, deadline=deadline_date)
-    print('%d targets' % len(targets))
     # 3) remove existing objects from targets
     for key, sd in existing.items():
         if key in targets:
@@ -416,13 +418,12 @@ def get_declarations(request):
         for t in to_create:
             logging.debug(t.natural_key())
         SustainabilityDeclaration.objects.bulk_create(to_create)
-        sds = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start)
-        print('%d now existing sds' % (sds.count()))
+        sds = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start, period__lte=end)
     else:
         logging.debug('no new declaration objects to create. Existing {}'.format(len(existing)))
 
     # get the declarations objects from db
-    declarations = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start)
+    declarations = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start, period__lte=end)
         
 
     # query lots to enrich declarations on the frontend
