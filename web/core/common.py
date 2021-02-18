@@ -608,8 +608,8 @@ def fill_delivery_site_data(lot_row, transaction, prefetched_data):
         if isinstance(delivery_site, float):
             # sometimes excel will convert a columns of integers to float
             delivery_site = int(delivery_site)
-        # convert to string 4.0 -> 4 -> '4'
-        delivery_site = str(delivery_site)
+        # convert to string 4.0 -> 4 -> '4' and remove leading 0
+        delivery_site = str(delivery_site).lstrip('0')
         if delivery_site in depots:
             transaction.delivery_site_is_in_carbure = True
             transaction.carbure_delivery_site = depots[delivery_site]
@@ -630,11 +630,11 @@ def fill_delivery_site_data(lot_row, transaction, prefetched_data):
                 country = countries[country_code]
                 transaction.unknown_delivery_site_country = country
             else:
-                tx_errors.append(TransactionError(tx=transaction, field='delivery_site_country',
+                tx_errors.append(TransactionError(tx=transaction, field='unknown_delivery_site_country',
                                                   error='Champ delivery_site_country incorrect',
                                                   value=lot_row['delivery_site_country']))
         else:
-            tx_errors.append(TransactionError(tx=transaction, field='delivery_site_country',
+            tx_errors.append(TransactionError(tx=transaction, field='unknown_delivery_site_country',
                                               error='Merci de préciser une valeur dans le champ delivery_site_country',
                                               value=None))
     return tx_errors
