@@ -138,7 +138,7 @@ def sanity_check(tx, prefetched_data):
             if lot.pays_origine.code_pays not in ['BR', 'BO']:
                 errors.append(raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
         elif lot.matiere_premiere.code == 'MAIS':
-            if not lot.pays_origine.is_in_europe and lot.pays_origine.code_pays != 'US':
+            if not lot.pays_origine.is_in_europe and lot.pays_origine.code_pays not in ['US', 'UA']:
                 errors.append(raise_warning(lot, 'PROVENANCE_MP', details="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
         elif lot.matiere_premiere.code == 'BETTERAVE':
             if not lot.pays_origine.is_in_europe:
