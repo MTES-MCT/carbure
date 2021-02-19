@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { Lots } from "common/types"
+import * as api from "../api"
 import useAPI from "common/hooks/use-api"
 import { getStocks, getStockSnapshot } from "../api"
 import { EntitySelection } from "carbure/hooks/use-entity"
@@ -44,7 +45,16 @@ export function useGetStocks(
   const entityID = entity?.id
 
   function exportAllTransactions() {
-    return null
+    if (entity === null) return
+
+    api.downloadStocks(
+      status.active,
+      entity.id,
+      filters.selected,
+      search.query,
+      sorting.column,
+      sorting.order
+    )
   }
 
   function getStock() {

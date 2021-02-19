@@ -7,6 +7,7 @@ from core.decorators import check_rights
 from core.common import get_prefetched_data, load_mb_lot, bulk_insert
 from core.common import load_excel_file, send_lot_from_stock
 from core.xlsx_v3 import template_stock, template_stock_bcghg
+from core.xlsx_v3 import export_stocks
 from django_otp.decorators import otp_required
 
 sort_key_to_django_field = {'period': 'lot__period',
@@ -32,6 +33,7 @@ def get_stocks(request, *args, **kwargs):
     query = request.GET.get('query', False)
     sort_by = request.GET.get('sort_by', False)
     order = request.GET.get('order', False)
+    export = request.GET.get('export', False)
 
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
@@ -97,7 +99,17 @@ def get_stocks(request, *args, **kwargs):
     data['from'] = from_idx
     data['tx_errors'] = []
     data['lots_errors'] = []
-    return JsonResponse({'status': 'success', 'data': data})
+
+    if not export:
+        return JsonResponse({'status': 'success', 'data': data})
+    else:
+        file_location = export_stocks(entity, returned)
+        with open(file_location, "rb") as excel:
+            data = excel.read()
+            ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            response = HttpResponse(content=data, content_type=ctype)
+            response['Content-Disposition'] = 'attachment; filename="%s"' % (file_location)
+        return response
 
 @check_rights('entity_id')
 def get_snapshot(request, *args, **kwargs):

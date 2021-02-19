@@ -10,6 +10,7 @@ import {
 import api from "common/services/api"
 import { toOption } from "transactions/helpers"
 import { EntitySelection } from "carbure/hooks/use-entity"
+import { StatusSelection } from "transactions/hooks/query/use-status"
 
 // give the same type to all filters in order to render them easily
 function normalizeStockSnapshotFilters(snapshot: any): StockSnapshot {
@@ -77,6 +78,26 @@ export function getStocks(
     order,
   })
 }
+
+export function downloadStocks(
+  status: LotStatus,
+  entityID: number | undefined,
+  filters: FilterSelection["selected"],
+  query: string,
+  sortBy: string,
+  order: string
+) {
+  return api.download("/stocks", {
+    ...filters,
+    status,
+    entity_id: entityID ?? null,
+    sort_by: sortBy,
+    query,
+    order,
+    export: true,
+  })
+}
+
 
 export function createDraftsFromStock(entity_id: number, drafts: StockDraft[]) {
   return api.post("/stocks/create-drafts", {
