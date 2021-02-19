@@ -788,6 +788,8 @@ def load_excel_file(entity, user, file, mass_balance=False):
         column_names = data[0]
         data = data[1:]
         df = pd.DataFrame(data, columns=column_names)
+        df_obj = df.select_dtypes(['object'])
+        df[df_obj.columns] = df_obj.apply(lambda x: x.str.strip())
         df.fillna('', inplace=True)
         total_lots = len(df)
         lots_loaded = 0
