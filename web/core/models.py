@@ -178,8 +178,8 @@ class Depot(models.Model):
     country = models.ForeignKey(Pays, null=True, blank=False, on_delete=models.SET_NULL)
     depot_type = models.CharField(max_length=32, choices=TYPE_DEPOT, default='OTHER')
 
-    address = models.CharField(max_length=128, null=False, blank=False)
-    postal_code = models.CharField(max_length=32, null=False, blank=False)
+    address = models.CharField(max_length=128, blank=True)
+    postal_code = models.CharField(max_length=32, blank=True)
 
     def __str__(self):
         return self.name
