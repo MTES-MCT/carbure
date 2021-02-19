@@ -175,12 +175,12 @@ def make_mb_extract_sheet_bcghg(workbook, entity):
 
     # header
     bold = workbook.add_format({'bold': True})
-    columns = ['biocarburant', 'matiere_premiere', 'ghg_total', 'depot', 'volume', 'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
+    columns = ['biocarburant_code', 'matiere_premiere_code', 'ghg_total', 'depot', 'volume', 'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
 
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
-    today = datetime.date.today().strftime('%Y-%m-%d')
+    today = datetime.date.today().strftime('%d/%m/%Y')
     if not len(mb_lots):
         return
     for i in range(10):
@@ -289,7 +289,7 @@ def make_traders_lots_sheet(workbook, entity):
         worksheet_lots.write(0, i, c, bold)
 
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
-    today = datetime.date.today().strftime('%Y-%m-%d')
+    today = datetime.date.today().strftime('%d/%m/%Y')
     for i in range(10):
         mp = random.choice(mps)
         vendor = random.choice(vendors)
