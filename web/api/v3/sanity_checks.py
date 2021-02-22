@@ -28,6 +28,7 @@ rules['GHG_EP_0'] = "Émissions GES liées à la Transformation de la matière p
 rules['GHG_EEC_0'] = "Émissions GES liées à l'Extraction et la Culture nulles"
 rules['MP_NOT_CONFIGURED'] = "Matière Première non enregistrée sur votre Site de Production"
 rules['BC_NOT_CONFIGURED'] = "Biocarburant non enregistré sur votre Site de Production"
+rules['MISSING_PRODSITE_CERTIFICATE'] = "Aucun certificat n'est associé à ce site de Production"
 
 
 def raise_warning(lot, rule_triggered, details=''):
@@ -199,6 +200,12 @@ def sanity_check(tx, prefetched_data):
             bcs = [pso.biocarburant for pso in prefetched_data['production_sites'][lot.carbure_production_site.name].productionsiteoutput_set.all()]
             if lot.biocarburant not in bcs:
                 errors.append(raise_warning(lot, 'BC_NOT_CONFIGURED'))
+
+    if lot.carbure_production_site:
+        # certificates
+        certificates = lot.carbure_production_site.productionsitecertificate_set.all()
+        if certificates.count() == 0:
+            errors.append(raise_warning(lot, 'MISSING_PRODSITE_CERTIFICATE'))
     return lot_valid, tx_valid, is_sane, errors
 
 
