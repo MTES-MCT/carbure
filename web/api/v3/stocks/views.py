@@ -334,15 +334,16 @@ def send_drafts(request):
 
     return JsonResponse({'status': 'success', 'data': send_errors})
 
-@check_rights
+@check_rights('entity_id')
 def send_all_drafts(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
 
-    dae = request.POST.get('dae', False)
-    client = request.POST.get('client', False)
-    delivery_site = request.POST.get('delivery_site', False)
-    unknown_delivery_site_country_code = request.POST.get('unknown_delivery_site_country_code', False)
-    actual_data = request.POST.getlist('transactions', False)
-
-    return JsonResponse({'status': 'success'})
+    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    stock_transactions_drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot__isnull=True)
+    send_errors = []
+    for tx in stock_transactions_drafts:
+        sent, errors = send_lot_from_stock(rights, tx)
+        if not sent:
+            send_errors.append(errors)
+    return JsonResponse({'status': 'success', 'data': send_errors})
