@@ -164,7 +164,7 @@ export function toTransactionPostData(tx: TransactionFormState) {
       ? tx.unknown_production_site_reference
       : "",
     production_site_commissioning_date: !tx.producer_is_in_carbure
-      ? tx.unknown_production_site_com_date
+      ? excelDate(tx.unknown_production_site_com_date)
       : "",
     double_counting_registration: !tx.producer_is_in_carbure
       ? tx.unknown_production_site_dbl_counting
