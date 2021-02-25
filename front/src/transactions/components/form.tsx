@@ -212,7 +212,7 @@ const TransactionForm = ({
                 readOnly={readOnly}
                 name="carbure_production_site_reference"
                 label="Référence Système Fournisseur"
-                value=""
+                value={tx.unknown_production_site_reference}
               />
             </React.Fragment>
           ) : (
