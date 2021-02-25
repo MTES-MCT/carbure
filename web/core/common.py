@@ -136,13 +136,16 @@ def check_duplicates(new_txs, background=True):
         LotV2.objects.filter(tx_lot__isnull=True).delete()
     return nb_duplicates
 
-def get_prefetched_data(entity):
+def get_prefetched_data(entity=None):
     d = {}
     d['producers'] = {p.name: p for p in Entity.objects.filter(entity_type='Producteur')}
     d['countries'] = {p.code_pays: p for p in Pays.objects.all()}
     d['biocarburants'] = {b.code: b for b in Biocarburant.objects.all()}
     d['matieres_premieres'] = {m.code: m for m in MatierePremiere.objects.all()}
-    d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
+    if entity:
+        d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
+    else:
+        d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
     d['depots'] = {d.depot_id.lstrip('0'): d for d in Depot.objects.all()}
     d['clients'] = {c.name: c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
     return d
@@ -433,7 +436,7 @@ def fill_ghg_info(lot_row, lot):
     if 'eec' in lot_row and lot_row['eec'] is not None and lot_row['eec'] != '':
         eec = lot_row['eec']
         try:
-            lot.eec = float(eec)
+            lot.eec = abs(float(eec))
         except Exception:
             lot_errors.append(LotV2Error(lot=lot, field='eec', error='Format non reconnu', value=eec))
 
@@ -441,7 +444,7 @@ def fill_ghg_info(lot_row, lot):
     if 'el' in lot_row and lot_row['el'] is not None and lot_row['el'] != '':
         el = lot_row['el']
         try:
-            lot.el = float(el)
+            lot.el = abs(float(el))
         except Exception:
             lot_errors.append(LotV2Error(lot=lot, field='el', error='Format non reconnu', value=el))
 
@@ -449,7 +452,7 @@ def fill_ghg_info(lot_row, lot):
     if 'ep' in lot_row and lot_row['ep'] is not None and lot_row['ep'] != '':
         ep = lot_row['ep']
         try:
-            lot.ep = float(ep)
+            lot.ep = abs(float(ep))
         except Exception:
             lot_errors.append(LotV2Error(lot=lot, field='ep', error='Format non reconnu', value=ep))
 
@@ -457,7 +460,7 @@ def fill_ghg_info(lot_row, lot):
     if 'etd' in lot_row and lot_row['etd'] is not None and lot_row['etd'] != '':
         etd = lot_row['etd']
         try:
-            lot.etd = float(etd)
+            lot.etd = abs(float(etd))
         except Exception:
             lot_errors.append(LotV2Error(lot=lot, field='etd', error='Format non reconnu', value=etd))
 
@@ -465,7 +468,7 @@ def fill_ghg_info(lot_row, lot):
     if 'eu' in lot_row and lot_row['eu'] is not None and lot_row['eu'] != '':
         eu = lot_row['eu']
         try:
-            lot.eu = float(eu)
+            lot.eu = abs(float(eu))
         except Exception:
             lot_errors.append(LotV2Error(lot=lot, field='eu', error='Format non reconnu', value=eu))
 
@@ -473,7 +476,7 @@ def fill_ghg_info(lot_row, lot):
     if 'esca' in lot_row and lot_row['esca'] is not None and lot_row['esca'] != '':
         esca = lot_row['esca']
         try:
-            lot.esca = float(esca)
+            lot.esca = abs(float(esca))
         except Exception:
             lot_errors.append(LotV2Error(lot=lot, field='esca', error='Format non reconnu', value=esca))
 
@@ -481,7 +484,7 @@ def fill_ghg_info(lot_row, lot):
     if 'eccs' in lot_row and lot_row['eccs'] is not None and lot_row['eccs'] != '':
         eccs = lot_row['eccs']
         try:
-            lot.eccs = float(eccs)
+            lot.eccs = abs(float(eccs))
         except Exception:
             lot_errors.append(LotV2Error(lot=lot, field='eccs', error='Format non reconnu', value=eccs))
 
@@ -489,7 +492,7 @@ def fill_ghg_info(lot_row, lot):
     if 'eccr' in lot_row and lot_row['eccr'] is not None and lot_row['eccr'] != '':
         eccr = lot_row['eccr']
         try:
-            lot.eccr = float(eccr)
+            lot.eccr = abs(float(eccr))
         except Exception:
             lot_errors.append(LotV2Error(lot=lot, field='eccr', error='Format non reconnu', value=eccr))
 
@@ -497,7 +500,7 @@ def fill_ghg_info(lot_row, lot):
     if 'eee' in lot_row and lot_row['eee'] is not None and lot_row['eee'] != '':
         eee = lot_row['eee']
         try:
-            lot.eee = float(eee)
+            lot.eee = abs(float(eee))
         except Exception:
             lot_errors.append(LotV2Error(lot=lot, field='eee', error='Format non reconnu', value=eee))
 
@@ -779,7 +782,7 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, transaction=None):
 
 def load_excel_file(entity, user, file, mass_balance=False):
     #print('File received %s' % (datetime.datetime.now()))
-
+    errors = []
     # prefetch some data
     prefetched_data = get_prefetched_data(entity)
 
@@ -822,10 +825,10 @@ def load_excel_file(entity, user, file, mass_balance=False):
         print('File processed %s' % (datetime.datetime.now()))
         bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors, prefetched_data)
         print('%d Lots out of %d lines loaded in database %s' % (lots_loaded, total_lots, datetime.datetime.now()))
-        return lots_loaded, total_lots
+        return lots_loaded, total_lots, errors
     except Exception as e:
         print(e)
-        return False, False
+        return False, False, errors
 
 
 def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors, prefetched_data):

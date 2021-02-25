@@ -15,7 +15,8 @@ from core.models import ISCCScope, ISCCCertificate, ISCCCertificateRawMaterial, 
 from core.models import DBSCertificate, DBSScope, DBSCertificateScope
 from core.models import EntityISCCTradingCertificate, EntityDBSTradingCertificate, ProductionSiteCertificate
 from core.models import SustainabilityDeclaration
-
+from api.v3.sanity_checks import bulk_sanity_checks
+from core.common import get_prefetched_data
 
 class EntityAdmin(admin.ModelAdmin):
     list_display = ('entity_type', 'name', 'parent_entity')
@@ -91,11 +92,18 @@ class LotV2Admin(admin.ModelAdmin):
     raw_id_fields = ('fused_with', 'parent_lot', )
 
 
+def rerun_sanity_checks(modeladmin, request, queryset):
+    d = get_prefetched_data()
+    bulk_sanity_checks(queryset, d, background=False)
+rerun_sanity_checks.short_description = "Moulinette Règles Métiers"
+
+
 class TransactionAdmin(admin.ModelAdmin):
     list_display = ('carbure_vendor', 'carbure_client', 'dae', 'carbure_delivery_site', 'delivery_date', 'delivery_status')
     search_fields = ('lot__id', 'dae', 'champ_libre')
     list_filter = ('carbure_vendor', 'carbure_client', 'delivery_status', 'is_mac', 'is_batch')
     raw_id_fields = ('lot',)
+    actions = [rerun_sanity_checks]
 
 
 class TransactionErrorAdmin(admin.ModelAdmin):
