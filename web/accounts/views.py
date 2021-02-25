@@ -161,7 +161,7 @@ def otp_verify(request):
                     form.add_error('otp_token', "Code Invalide. Le dernier code envoyé est valide jusqu'à %s %s" % (dt.strftime('%H:%M'), dt.tzname()))
                 elif not is_allowed:
                     delay_required = device.get_throttle_factor() * (2 ** (device.throttling_failure_count - 1))
-                    form.add_error('otp_token', "Rate limiter. Please try again in %d seconds" % (delay_required))
+                    form.add_error('otp_token', "Rate limited. Please try again in %d seconds" % (delay_required))
                 else:
                     # unknown error
                     form.add_error('otp_token', "Erreur serveur")
