@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.template import loader
 from django.conf import settings
+from django.utils import timezone
 
 # plugins
 from django_otp.plugins.otp_email.models import EmailDevice
@@ -108,6 +109,27 @@ def activate(request, uidb64, token):
     else:
         return render(request, 'registration/account_activation_invalid.html')
 
+# static - not an endpoint
+def send_new_token(request):
+    device = EmailDevice.objects.get(user=request.user)
+    current_site = get_current_site(request)
+    device.generate_token()
+    email_subject = 'Carbure - Code de Sécurité'
+    email_context = {
+        'user': request.user,
+        'domain': current_site.domain,
+        'token': device.token,
+    }
+    html_message = loader.render_to_string('accounts/otp_token_email.html', email_context)
+    text_message = loader.render_to_string('accounts/otp_token_email.txt', email_context)
+    send_mail(
+        subject=email_subject,
+        message=text_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        html_message=html_message,
+        recipient_list=[request.user.email],
+        fail_silently=False,
+    )
 
 @login_required
 def otp_verify(request):
@@ -129,31 +151,19 @@ def otp_verify(request):
                 return redirect('/v2')
             else:
                 #print('invalid token. expected %s got %s' % (device.token, form.clean_otp_token()))
-                form.add_error('otp_token', 'Code Invalide')
+                now = timezone.now()
+                if now > device.valid_until:
+                    form.add_error('otp_token', "Code Expiré. Un nouveau code vient d'être envoyé")
+                    send_new_token(request)
+                else:
+                    dt = device.valid_until.astimezone(pytz.timezone('Europe/Paris'))
+                    form.add_error('otp_token', "Code Invalide. Le dernier code envoyé est valide jusqu'à %s %s" % (dt.strftime('%H:%M'), dt.tzname()))
                 return render(request, 'accounts/otp_verify.html', {'form': form})
         else:
             print('form is invalid')
     else:
         # send token by email and display form
-        device = EmailDevice.objects.get(user=request.user)
-        current_site = get_current_site(request)
-        device.generate_token()
-        email_subject = 'Carbure - Code de Sécurité'
-        email_context = {
-            'user': request.user,
-            'domain': current_site.domain,
-            'token': device.token,
-        }
-        html_message = loader.render_to_string('accounts/otp_token_email.html', email_context)
-        text_message = loader.render_to_string('accounts/otp_token_email.txt', email_context)
-        send_mail(
-            subject=email_subject,
-            message=text_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            html_message=html_message,
-            recipient_list=[request.user.email],
-            fail_silently=False,
-        )
+        send_new_token(request)
         form = OTPForm(request.user)
     return render(request, 'accounts/otp_verify.html', {'form': form})
 
