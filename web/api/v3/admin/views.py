@@ -88,6 +88,18 @@ def get_entity_depots(request):
         return JsonResponse({"status": "error", "message": str(e) }, status=400)
 
 @is_admin
+def get_entity_certificates(request):
+    entity_id = request.GET.get('entity_id', False)
+    
+    try:
+        e = Entity.objects.get(pk=entity_id)
+        iscc = [ps.natural_key() for ps in e.entityiscctradingcertificate_set.all()]
+        dbs = [ps.natural_key() for ps in e.entitydbstradingcertificate_set.all()]
+        return JsonResponse({"status": "success", "data": iscc + dbs})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e) }, status=400)
+
+@is_admin
 def get_entities(request):
     q = request.GET.get('q', False)
     has_requests = request.GET.get('has_requests', None)
