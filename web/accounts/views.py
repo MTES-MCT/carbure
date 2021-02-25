@@ -128,7 +128,8 @@ def otp_verify(request):
                 login_with_device(request, device)
                 return redirect('/v2')
             else:
-                print('invalid token. expected %s got %s' % (device.token, form.clean_otp_token()))
+                #print('invalid token. expected %s got %s' % (device.token, form.clean_otp_token()))
+                form.add_error('otp_token', 'Code Invalide')
                 return render(request, 'accounts/otp_verify.html', {'form': form})
         else:
             print('form is invalid')
