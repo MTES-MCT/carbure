@@ -655,10 +655,10 @@ def upload(request, *args, **kwargs):
     with open(filepath, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
-    nb_loaded, nb_total = load_excel_file(entity, request.user, filepath)
+    nb_loaded, nb_total, errors = load_excel_file(entity, request.user, filepath)
     if nb_loaded is False:
         return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
-    data = {'loaded': nb_loaded, 'total': nb_total}
+    data = {'loaded': nb_loaded, 'total': nb_total, 'errors': errors}
     return JsonResponse({'status': 'success', 'data': data})
 
 @check_rights('entity_id')
@@ -669,7 +669,15 @@ def upload_blend(request, *args, **kwargs):
     if file is None:
         return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
 
-    nb_loaded, nb_total = load_excel_file(entity, request.user, file)
+    # save file
+    now = datetime.datetime.now()
+    filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d'), entity.name.upper())
+    filepath = '/tmp/%s' % (filename)
+    with open(filepath, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+
+    nb_loaded, nb_total, errors = load_excel_file(entity, request.user, file)
     if nb_loaded is False:
         return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
     data = {'loaded': nb_loaded, 'total': nb_total}

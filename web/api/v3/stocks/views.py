@@ -1,4 +1,5 @@
 import json
+import datetime
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from core.models import LotTransaction
@@ -257,8 +258,16 @@ def upload_mass_balance(request, *args, **kwargs):
     file = request.FILES.get('file')
     if file is None:
         return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
+    
+    # save file
+    now = datetime.datetime.now()
+    filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d'), entity.name.upper())
+    filepath = '/tmp/%s' % (filename)
+    with open(filepath, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
 
-    nb_loaded, nb_total = load_excel_file(entity, request.user, file, mass_balance=True)
+    nb_loaded, nb_total, errors = load_excel_file(entity, request.user, file, mass_balance=True)
     if nb_loaded is False:
         return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
     data = {'loaded': nb_loaded, 'total': nb_total}

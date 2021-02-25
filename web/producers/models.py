@@ -27,7 +27,7 @@ class ProductionSite(models.Model):
         return {'name': self.name, 'country': self.country.natural_key(), 'id': self.id, 'date_mise_en_service': self.date_mise_en_service,
             'site_id': self.site_id, 'postal_code': self.postal_code, 'manager_name': self.manager_name, 'manager_phone': self.manager_phone, 
             'manager_email': self.manager_email, 'ges_option': self.ges_option, 'eligible_dc': self.eligible_dc, 
-            'dc_reference': self.dc_reference, 'city': self.city}
+            'dc_reference': self.dc_reference, 'city': self.city, 'certificates': [c.natural_key() for c in self.productionsitecertificate_set.all()]}
 
     class Meta:
         db_table = 'producer_sites'
