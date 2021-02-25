@@ -99,12 +99,27 @@ rerun_sanity_checks.short_description = "Moulinette Règles Métiers"
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('carbure_vendor', 'carbure_client', 'dae', 'carbure_delivery_site', 'delivery_date', 'delivery_status')
+    list_display = ('get_lot_mp', 'get_lot_bc', 'get_lot_volume', 'carbure_vendor', 'carbure_client', 'dae', 'carbure_delivery_site', 'delivery_date', 'delivery_status', 'unknown_client')
     search_fields = ('lot__id', 'dae', 'champ_libre')
-    list_filter = ('carbure_vendor', 'carbure_client', 'delivery_status', 'is_mac', 'is_batch')
+    list_filter = ('carbure_vendor', 'carbure_client', 'delivery_status', 'is_mac', 'is_batch', 'carbure_client', 'unknown_client', 'client_is_in_carbure', 'delivery_site_is_in_carbure')
     raw_id_fields = ('lot',)
     actions = [rerun_sanity_checks]
 
+    def get_lot_mp(self, obj):
+        return obj.lot.matiere_premiere
+    get_lot_mp.admin_order_field  = 'FeedStock'
+    get_lot_mp.short_description = 'FeedStock'
+
+
+    def get_lot_bc(self, obj):
+        return obj.lot.biocarburant
+    get_lot_bc.admin_order_field  = 'BioFuel'
+    get_lot_bc.short_description = 'BioFuel'
+
+    def get_lot_volume(self, obj):
+        return obj.lot.volume
+    get_lot_volume.admin_order_field  = 'Volume'
+    get_lot_volume.short_description = 'Volume'    
 
 class TransactionErrorAdmin(admin.ModelAdmin):
     list_display = ('tx', 'field', 'error', 'value')
