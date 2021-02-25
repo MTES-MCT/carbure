@@ -119,11 +119,14 @@ class LotsAPITest(TransactionTestCase):
         dae = 'TEST2020FR00923-094-32094'
         lot = {
             'production_site': self.production_site.name,
+            'production_site_commissioning_date': '01/12/2002',
+            'production_site_reference': 'PRODSITEREFERENCE',
+            'double_counting_registration': 'NUMDOUBLECOMPTE',
             'biocarburant_code': 'ETH',
             'matiere_premiere_code': 'BLE',
             'volume': 15000,
             'pays_origine_code': 'FR',
-            'eec': 1,
+            'eec': 1.5,
             'ep': 5,
             'etd': 12,
             'dae': dae,
@@ -144,7 +147,17 @@ class LotsAPITest(TransactionTestCase):
         response = self.client.get(reverse('api-v3-lots-get-details'), {'entity_id': self.test_producer.id, 'tx_id': tx.id})
         self.assertEqual(response.status_code, 200)        
         data = response.json()['data']
+        #print(data['transaction']['lot'])
+        # make sure all data is correct
         self.assertEqual(data['transaction']['lot']['ep'], 6)
+        self.assertEqual(data['transaction']['lot']['eec'], 1.5)
+        self.assertEqual(data['transaction']['lot']['volume'], 15000)
+        self.assertEqual(data['transaction']['lot']['pays_origine']['code_pays'], 'FR')
+        self.assertEqual(data['transaction']['lot']['etd'], 12)
+        self.assertEqual(data['transaction']['lot']['unknown_production_site_reference'], 'PRODSITEREFERENCE')
+        self.assertEqual(data['transaction']['lot']['unknown_production_site_com_date'], '2002-12-01')
+        self.assertEqual(data['transaction']['lot']['unknown_production_site_dbl_counting'], 'NUMDOUBLECOMPTE')
+
         # duplicate 3 times
         response = self.client.post(reverse('api-v3-duplicate-lot'), {'entity_id': self.test_producer.id, 'tx_id': tx.id})
         response = self.client.post(reverse('api-v3-duplicate-lot'), {'entity_id': self.test_producer.id, 'tx_id': tx.id})

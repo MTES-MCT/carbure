@@ -303,52 +303,51 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
         lot.production_site_is_in_carbure = False
         lot.carbure_production_site = None
         lot.unknown_production_site = ''
-    if lot.producer_is_in_carbure is False:
-        if 'production_site_country' in lot_row:
-            production_site_country = lot_row['production_site_country']
-            if production_site_country is None:
-                lot.unknown_production_country = None
-            else:
-                if production_site_country in countries:
-                    lot.unknown_production_country = countries[production_site_country]
-                else:
-                    error = LotV2Error(lot=lot, field='unknown_production_country',
-                                       error='Champ production_site_country incorrect',
-                                       value=production_site_country)
-                    lot_errors.append(error)
-        else:
+    if 'production_site_country' in lot_row:
+        production_site_country = lot_row['production_site_country']
+        if production_site_country is None:
             lot.unknown_production_country = None
-        if 'production_site_reference' in lot_row and lot_row['production_site_reference'] != '' and lot_row['production_site_reference'] is not None:
-            lot.unknown_production_site_reference = lot_row['production_site_reference']
         else:
-            lot.unknown_production_site_reference = ''
-            msg = "Veuillez préciser une référence de certificat fournisseur/producteur"
-            error = LotV2Error(lot=lot, field='unknown_production_site_reference',
-                                error=msg,
-                                value='')
-            lot_errors.append(error)
-        if 'production_site_commissioning_date' in lot_row:
-            try:
-                com_date = lot_row['production_site_commissioning_date']
-                if isinstance(com_date, datetime.datetime):
-                    dd = com_date.date()
-                elif isinstance(com_date, datetime.date):
-                    dd = com_date
-                else:
-                    dd = dateutil.parser.parse(com_date, dayfirst=True).date()
-                lot.unknown_production_site_com_date = dd
-            except Exception as e:
-                msg = "Date de mise en service: veuillez entrer une date au format JJ/MM/AAAA"
-                error = LotV2Error(lot=lot, field='unknown_production_site_com_date',
-                                    error=msg,
-                                    value=lot_row['production_site_commissioning_date'])
+            if production_site_country in countries:
+                lot.unknown_production_country = countries[production_site_country]
+            else:
+                error = LotV2Error(lot=lot, field='unknown_production_country',
+                                    error='Champ production_site_country incorrect',
+                                    value=production_site_country)
                 lot_errors.append(error)
-        else:
-            lot.unknown_production_site_com_date = None
-        if 'double_counting_registration' in lot_row:
-            lot.unknown_production_site_dbl_counting = lot_row['double_counting_registration']
-        else:
-            lot.unknown_production_site_dbl_counting = ''
+    else:
+        lot.unknown_production_country = None
+    if 'production_site_reference' in lot_row and lot_row['production_site_reference'] != '' and lot_row['production_site_reference'] is not None:
+        lot.unknown_production_site_reference = lot_row['production_site_reference']
+    else:
+        lot.unknown_production_site_reference = ''
+        msg = "Veuillez préciser une référence de certificat fournisseur/producteur"
+        error = LotV2Error(lot=lot, field='unknown_production_site_reference',
+                            error=msg,
+                            value='')
+        lot_errors.append(error)
+    if 'production_site_commissioning_date' in lot_row:
+        try:
+            com_date = lot_row['production_site_commissioning_date']
+            if isinstance(com_date, datetime.datetime):
+                dd = com_date.date()
+            elif isinstance(com_date, datetime.date):
+                dd = com_date
+            else:
+                dd = dateutil.parser.parse(com_date, dayfirst=True).date()
+            lot.unknown_production_site_com_date = dd
+        except Exception as e:
+            msg = "Date de mise en service: veuillez entrer une date au format JJ/MM/AAAA"
+            error = LotV2Error(lot=lot, field='unknown_production_site_com_date',
+                                error=msg,
+                                value=lot_row['production_site_commissioning_date'])
+            lot_errors.append(error)
+    else:
+        lot.unknown_production_site_com_date = None
+    if 'double_counting_registration' in lot_row:
+        lot.unknown_production_site_dbl_counting = lot_row['double_counting_registration']
+    else:
+        lot.unknown_production_site_dbl_counting = ''
     return lot_errors
 
 
