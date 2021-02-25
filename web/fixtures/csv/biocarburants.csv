@@ -15,7 +15,7 @@ MTBE,MTBE,35,26,0.743,1,0,1
 MT,Méthanol,20,16,0.8,1,0,0
 TAEE,TAEE,38,29,0.763,0,0,1
 HVP,Huile végétale pure,37,34,0.919,0,1,0
-HCU,Huile provenant d'huiles de cuisson usagées,0,0,0,0,1,1
+HCU,Huile provenant d'huiles de cuisson usagées,0,0,0,0,1,0
 EMAG,EMAG,0,0,0,0,1,1
 ED95,Éthanol pour ED95,0,0,0,1,0,1
 B100,B100,0,0,0,0,1,0
