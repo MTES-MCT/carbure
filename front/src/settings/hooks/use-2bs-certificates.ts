@@ -1,20 +1,23 @@
 import { useEffect } from "react"
-import { DBSPrompt } from "../components/2bs-certificates"
+import { CertificatePromptFactory } from "../components/certificates"
 import { confirm, prompt } from "common/components/dialog"
 import { useNotificationContext } from "common/components/notifications"
 import * as api from "../api"
-import { DBSCertificate } from "common/types"
+import { Certificate } from "common/types"
 import useAPI from "common/hooks/use-api"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { ProductionSiteSettingsHook } from "./use-production-sites"
+import { find2BSCertificates } from "common/api"
+
+const DBSPrompt = CertificatePromptFactory("2BS", find2BSCertificates)
 
 export interface DBSCertificateSettingsHook {
   isEmpty: boolean
   isLoading: boolean
-  certificates: DBSCertificate[]
+  certificates: Certificate[]
   add2BSCertificate: () => void
-  delete2BSCertificate: (d: DBSCertificate) => void
-  update2BSCertificate: (d: DBSCertificate) => void
+  delete2BSCertificate: (d: Certificate) => void
+  update2BSCertificate: (d: Certificate) => void
 }
 
 export default function use2BSCertificates(
@@ -76,7 +79,7 @@ export default function use2BSCertificates(
     }
   }
 
-  async function delete2BSCertificate(dbs: DBSCertificate) {
+  async function delete2BSCertificate(dbs: Certificate) {
     if (
       typeof entityID !== "undefined" &&
       (await confirm(
@@ -88,7 +91,7 @@ export default function use2BSCertificates(
     }
   }
 
-  async function update2BSCertificate(dbs: DBSCertificate) {
+  async function update2BSCertificate(dbs: Certificate) {
     const data = await prompt(
       "Mise à jour certificat 2BS",
       "Veuillez sélectionner un nouveau certificat pour remplacer l'ancien.",

@@ -46,7 +46,7 @@ export const SettingsForm = (props: BoxProps) => (
 type ExpirationDateProps = {
   date: string
   updated: boolean
-  onUpdate: () => void
+  onUpdate?: () => void
 }
 
 export const ExpirationDate = ({
@@ -62,9 +62,11 @@ export const ExpirationDate = ({
       {expired && !updated && (
         <React.Fragment>
           Expiré ({formatted})
-          <Button icon={Refresh} onClick={onUpdate}>
-            Mise à jour
-          </Button>
+          {onUpdate && (
+            <Button icon={Refresh} onClick={onUpdate}>
+              Mise à jour
+            </Button>
+          )}
         </React.Fragment>
       )}
 

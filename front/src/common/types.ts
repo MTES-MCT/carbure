@@ -115,7 +115,7 @@ export interface ProductionSiteDetails extends ProductionSite {
   manager_name: string
   manager_phone: string
   manager_email: string
-  certificates: Certificate[]
+  certificates: ProductionCertificate[]
 }
 
 export interface Lot {
@@ -315,6 +315,7 @@ export interface StockSnapshot {
 }
 
 export type DBSCertificate = {
+  type: string
   certificate_id: string
   certificate_holder: string
   holder_address: string
@@ -327,6 +328,7 @@ export type DBSCertificate = {
 }
 
 export type ISCCCertificate = {
+  type: string
   certificate_id: string
   certificate_holder: string
   location: string
@@ -338,7 +340,9 @@ export type ISCCCertificate = {
   download_link: string
 }
 
-export type Certificate = {
+export type Certificate = ISCCCertificate | DBSCertificate
+
+export type ProductionCertificate = {
   certificate_id: string
   holder: string
   type: "2BS" | "ISCC"

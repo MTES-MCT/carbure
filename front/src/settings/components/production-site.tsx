@@ -2,7 +2,7 @@ import React from "react"
 
 import {
   Biocarburant,
-  Certificate,
+  ProductionCertificate,
   Country,
   GESOption,
   MatierePremiere,
@@ -66,7 +66,7 @@ export type ProductionSiteState = {
   biocarburants: Biocarburant[]
 
   // certificates
-  certificates: Certificate[]
+  certificates: ProductionCertificate[]
 }
 
 const GES_OPTIONS = [

@@ -1,22 +1,25 @@
 import { useEffect } from "react"
 
 import { EntitySelection } from "carbure/hooks/use-entity"
-import { ISCCCertificate } from "common/types"
+import { Certificate } from "common/types"
 
 import { confirm, prompt } from "common/components/dialog"
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
-import { ISCCPrompt } from "../components/iscc-certificates"
+import { CertificatePromptFactory } from "../components/certificates"
 import { ProductionSiteSettingsHook } from "./use-production-sites"
 import { useNotificationContext } from "common/components/notifications"
+import { findISCCCertificates } from "common/api"
+
+const ISCCPrompt = CertificatePromptFactory("ISCC", findISCCCertificates)
 
 export interface ISCCCertificateSettingsHook {
   isEmpty: boolean
   isLoading: boolean
-  certificates: ISCCCertificate[]
+  certificates: Certificate[]
   addISCCCertificate: () => void
-  deleteISCCCertificate: (d: ISCCCertificate) => void
-  updateISCCCertificate: (d: ISCCCertificate) => void
+  deleteISCCCertificate: (d: Certificate) => void
+  updateISCCCertificate: (d: Certificate) => void
 }
 
 export default function useISCCCertificates(
@@ -78,7 +81,7 @@ export default function useISCCCertificates(
     }
   }
 
-  async function deleteISCCCertificate(iscc: ISCCCertificate) {
+  async function deleteISCCCertificate(iscc: Certificate) {
     if (
       typeof entityID !== "undefined" &&
       (await confirm(
@@ -93,7 +96,7 @@ export default function useISCCCertificates(
     }
   }
 
-  async function updateISCCCertificate(iscc: ISCCCertificate) {
+  async function updateISCCCertificate(iscc: Certificate) {
     const data = await prompt(
       "Mise à jour certificat ISCC",
       "Veuillez sélectionner un nouveau certificat pour remplacer l'ancien.",
