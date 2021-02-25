@@ -638,6 +638,7 @@ class EntityISCCTradingCertificate(models.Model):
 
     def natural_key(self):
         data = self.certificate.natural_key()
+        data['type'] = "ISCC"
         data['has_been_updated'] = self.has_been_updated
         return data
 
@@ -657,6 +658,7 @@ class EntityDBSTradingCertificate(models.Model):
 
     def natural_key(self):
         data = self.certificate.natural_key()
+        data['type'] = "2BS"
         data['has_been_updated'] = self.has_been_updated
         return data
 

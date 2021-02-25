@@ -1,5 +1,3 @@
-import React from "react"
-
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { SettingsGetter } from "./hooks/use-get-settings"
 
@@ -14,8 +12,10 @@ import { Main, Title } from "common/components"
 import { SettingsHeader, SettingsBody } from "./components/common"
 import DeliverySitesSettings from "./components/delivery-site"
 import ProductionSitesSettings from "./components/production-site"
-import DBSCertificateSettings from "./components/2bs-certificates"
-import ISCCCertificateSettings from "./components/iscc-certificates"
+import {
+  DBSCertificateSettings,
+  ISCCCertificateSettings,
+} from "./components/certificates"
 import NationalSystemCertificatesSettings from "./components/national-system-certificates"
 import CompanySettings from "./components/company"
 import Sticky from "common/components/sticky"

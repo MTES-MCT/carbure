@@ -12,6 +12,7 @@ urlpatterns = [
     path('entities/del', views.delete_entity, name='api-v3-admin-delete-entity'),
     path('entities/depots', views.get_entity_depots, name='api-v3-admin-get-entity-depots'),
     path('entities/production_sites', views.get_entity_production_sites, name='api-v3-admin-get-entity-production-sites'),
+    path('entities/certificates', views.get_entity_certificates, name='api-v3-admin-get-entity-certificates'),
 
     path('certificates', views.get_certificates, name='api-v3-admin-get-certificates'),
     path('certificates/update-certificate', views.update_certificate, name='api-v3-admin-update-certificate'),
