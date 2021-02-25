@@ -131,8 +131,8 @@ def get_production_sites(request):
 
 def get_iscc_certificates(request):
     q = request.GET.get('query', False)
-    today = datetime.date.today()
-    cert = ISCCCertificate.objects.filter(valid_until__gte=today)
+    lastyear = datetime.date.today() - datetime.timedelta(days=365)
+    cert = ISCCCertificate.objects.filter(valid_until__gte=lastyear)
     if q:
         cert = cert.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
 
@@ -147,8 +147,8 @@ def get_iscc_certificates(request):
 
 def get_2bs_certificates(request):
     q = request.GET.get('query', False)
-    today = datetime.date.today()
-    cert = DBSCertificate.objects.filter(valid_until__gte=today)
+    lastyear = datetime.date.today() - datetime.timedelta(days=365)
+    cert = DBSCertificate.objects.filter(valid_until__gte=lastyear)
     if q:
         cert = cert.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
 
