@@ -147,7 +147,7 @@ def get_prefetched_data(entity=None):
     else:
         d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
     d['depots'] = {d.depot_id.lstrip('0'): d for d in Depot.objects.all()}
-    d['clients'] = {c.name: c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
+    d['clients'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
     return d
 
 
@@ -568,7 +568,7 @@ def fill_client_data(entity, lot_row, transaction, prefetched_data):
         transaction.carbure_client = entity
         transaction.unknown_client = ''
     elif 'client' in lot_row and lot_row['client'] is not None and lot_row['client'] != '':
-        client = lot_row['client']
+        client = lot_row['client'].upper()
         if client in clients:
             transaction.client_is_in_carbure = True
             transaction.carbure_client = clients[client]
