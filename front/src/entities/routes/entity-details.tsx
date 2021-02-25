@@ -26,6 +26,7 @@ import {
   ProductionSitePromptFactory,
   ProductionSiteState,
 } from "settings/components/production-site"
+import Certificates from "entities/components/certificates"
 
 const EntityDetails = () => {
   const close = useClose("..")
@@ -33,6 +34,7 @@ const EntityDetails = () => {
   const [entity, getEntity] = useAPI(api.getEntityDetails)
   const [depots, getDepots] = useAPI(api.getEntityDepots)
   const [productionSites, getProductionSites] = useAPI(api.getEntityProductionSites) // prettier-ignore
+  const [certificates, getCertificates] = useAPI(api.getEntityCertificates)
 
   const isProducer = entity.data?.entity_type === EntityType.Producer
 
@@ -67,7 +69,8 @@ const EntityDetails = () => {
     getEntity(entityID)
     getDepots(entityID)
     getProductionSites(entityID)
-  }, [getEntity, getDepots, getProductionSites, id])
+    getCertificates(entityID)
+  }, [getEntity, getDepots, getProductionSites, getCertificates, id])
 
   return (
     <Main>
@@ -93,6 +96,7 @@ const EntityDetails = () => {
         {isProducer && (
           <ProductionSitesSettings settings={productionSiteSettings} />
         )}
+        <Certificates certificates={certificates} />
       </SettingsBody>
     </Main>
   )

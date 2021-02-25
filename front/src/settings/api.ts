@@ -6,7 +6,7 @@ import {
   ISCCCertificate,
   ProductionSite,
   ProductionSiteDetails,
-  Certificate,
+  ProductionCertificate,
   OwnershipType,
 } from "common/types"
 
@@ -137,7 +137,7 @@ export function deleteProductionSiteBC(
 export function findCertificates(
   query: string,
   entity_id: number
-): Promise<Certificate[]> {
+): Promise<ProductionCertificate[]> {
   return api.get("/settings/get-my-certificates", {
     entity_id,
     query,
