@@ -147,6 +147,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 LOGIN_REDIRECT_URL = 'otp-verify'
 LOGOUT_REDIRECT_URL = 'index'
 
+OTP_EMAIL_TOKEN_VALIDITY = 900 # 15 minutes
 
 DEFAULT_FROM_EMAIL = "contact@carbure.beta.gouv.fr"
 if env('IMAGE_TAG') in ['dev', 'staging', 'prod']:
