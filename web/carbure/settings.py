@@ -146,7 +146,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 LOGIN_REDIRECT_URL = 'otp-verify'
 LOGOUT_REDIRECT_URL = 'index'
-
+SESSION_COOKIE_AGE = 60*60*24*30 # 30 days
 OTP_EMAIL_TOKEN_VALIDITY = 900 # 15 minutes
 
 DEFAULT_FROM_EMAIL = "contact@carbure.beta.gouv.fr"
