@@ -155,9 +155,12 @@ def otp_verify(request):
                 if now > device.valid_until:
                     form.add_error('otp_token', "Code Expiré. Un nouveau code vient d'être envoyé")
                     send_new_token(request)
-                else:
+                elif device.token != form.clean_otp_token():
                     dt = device.valid_until.astimezone(pytz.timezone('Europe/Paris'))
                     form.add_error('otp_token', "Code Invalide. Le dernier code envoyé est valide jusqu'à %s %s" % (dt.strftime('%H:%M'), dt.tzname()))
+                else:
+                    # unknown error
+                    pass
                 return render(request, 'accounts/otp_verify.html', {'form': form})
         else:
             print('form is invalid')
