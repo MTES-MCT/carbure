@@ -647,3 +647,35 @@ class LotsAPITest(TransactionTestCase):
         # validate-all
 
         pass
+
+
+    def test_client_case_sensitiveness(self):
+        # as producer / trader
+        dae = 'TEST2020FR00923-094-32094'
+        lot = {
+            'production_site': self.production_site.name,
+            'production_site_commissioning_date': '01/12/2002',
+            'production_site_reference': 'PRODSITEREFERENCE',
+            'double_counting_registration': 'NUMDOUBLECOMPTE',
+            'biocarburant_code': 'ETH',
+            'matiere_premiere_code': 'BLE',
+            'volume': 15000,
+            'pays_origine_code': 'FR',
+            'eec': 1.5,
+            'ep': 5,
+            'etd': 12,
+            'dae': dae,
+            'delivery_date': '2020-12-31',
+            'client': self.test_operator.name.lower(),
+            'delivery_site': '1',
+            'entity_id': self.test_producer.id,
+        }
+        # add manual lot
+        response = self.client.post(reverse('api-v3-add-lot'), lot)
+        self.assertEqual(response.status_code, 200)  
+        tx = LotTransaction.objects.get(dae=dae)
+        response = self.client.get(reverse('api-v3-lots-get-details'), {'entity_id': self.test_producer.id, 'tx_id': tx.id})
+        self.assertEqual(response.status_code, 200)        
+        data = response.json()['data']
+        self.assertEqual(data['transaction']['client_is_in_carbure'], True)
+        
