@@ -474,6 +474,7 @@ class LotValidationError(models.Model):
     rule_triggered = models.CharField(max_length=64, blank=True, null=True, default='')
 
     warning_to_user = models.BooleanField(default=False)
+    warning_to_recipient = models.BooleanField(default=False)
     warning_to_admin = models.BooleanField(default=False)
     block_validation = models.BooleanField(default=False)
     message = models.TextField(blank=True, null=True, default='')
