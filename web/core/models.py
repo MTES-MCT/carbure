@@ -470,6 +470,7 @@ class CheckRule(models.Model):
 
 class LotValidationError(models.Model):
     lot = models.ForeignKey(LotV2, null=False, blank=False, on_delete=models.CASCADE)
+    tx = models.ForeignKey(LotTransaction, null=True, on_delete=models.SET_NULL)
     rule_triggered = models.CharField(max_length=64, blank=True, null=True, default='')
 
     warning_to_user = models.BooleanField(default=False)
