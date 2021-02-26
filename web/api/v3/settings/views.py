@@ -369,7 +369,7 @@ def set_national_system_certificate(request, *args, **kwargs):
     national_system_certificate = request.POST.get('national_system_certificate', False)
 
     if entity.entity_type == 'Trader' or (entity.entity_type == 'Producteur' and not entity.has_mac):
-        return JsonResponse({'status': 'error', 'message': "This entity cannot have a national system certificate"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Entity not eligible to national system certificate"}, status=400)
 
     if not national_system_certificate:
         return JsonResponse({'status': 'error', 'message': "Missing national system certificate"}, status=400)

@@ -30,7 +30,7 @@ export default function useNationalSystemCertificates(
   async function editNationalSystemCertificates() {
     const certificate = await prompt(
       "Modifier n° de certificat",
-      "Entrez votre numéro de certificat du Système National",
+      "Entrez votre numéro de certificat du Système National.",
       NationalSystemCertificatesPromptFactory(certificateNumber)
     )
 
@@ -47,7 +47,7 @@ export default function useNationalSystemCertificates(
       } else {
         notifications.push({
           level: "error",
-          text: "Impossible de modifier le n° de certificat.",
+          text: `Impossible de modifier le n° de certificat - société non éligible`,
         })
       }
     }
