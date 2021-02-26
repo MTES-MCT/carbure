@@ -242,7 +242,7 @@ class LotV2(models.Model):
     unknown_production_site_dbl_counting = models.CharField(max_length=64, blank=True, null=True, default='')
 
     # lot details
-    volume = models.IntegerField(default=0)
+    volume = models.FloatField(default=0.0)
     matiere_premiere = models.ForeignKey(MatierePremiere, null=True, on_delete=models.SET_NULL)
     biocarburant = models.ForeignKey(Biocarburant, null=True, on_delete=models.SET_NULL)
     pays_origine = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL)
