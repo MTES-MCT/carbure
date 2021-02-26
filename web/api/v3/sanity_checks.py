@@ -29,16 +29,19 @@ rules['GHG_EEC_0'] = "Émissions GES liées à l'Extraction et la Culture nulles
 rules['MP_NOT_CONFIGURED'] = "Matière Première non enregistrée sur votre Site de Production"
 rules['BC_NOT_CONFIGURED'] = "Biocarburant non enregistré sur votre Site de Production"
 rules['MISSING_PRODSITE_CERTIFICATE'] = "Aucun certificat n'est associé à ce site de Production"
+rules['UNKNOWN_CLIENT'] = "Le client n'est pas enregistré sur Carbure"
 
 
-def raise_warning(lot, rule_triggered, details=''):
+def raise_warning(lot, rule_triggered, details='', tx=None, show_recipient=True):
     d = {'warning_to_user': True,
+         'warning_to_recipient': show_recipient,
          'warning_to_admin': True,
          'block_validation': False,
          'message': rules[rule_triggered],
          'details': details,
          'lot': lot,
          'rule_triggered': rule_triggered,
+         'tx': tx,
          }
     return LotValidationError(**d)
 
@@ -180,9 +183,9 @@ def sanity_check(tx, prefetched_data):
             is_sane = False
             errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="Des huiles alimentaires usagées ne peuvent donner que des EMHU ou HOG/HOE"))
 
-        if lot.matiere_premiere.code in ['MAIS', 'BLE', 'BETTERAVE', 'CANNE_A_SUCRE', 'RESIDUS_VINIQUES'] and lot.biocarburant.code not in ['ETH', 'ETBE']:
+        if lot.matiere_premiere.code in ['MAIS', 'BLE', 'BETTERAVE', 'CANNE_A_SUCRE', 'RESIDUS_VINIQUES', 'LIES_DE_VIN', 'MARC_DE_RAISIN'] and lot.biocarburant.code not in ['ETH', 'ETBE', 'ED95']:
             is_sane = False
-            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="Éthanol ou ETBE doivent être à base de Maïs, Blé, Betterave, Canne à Sucre ou Résidus Viniques"))
+            errors.append(raise_error(lot, 'MP_BC_INCOHERENT', details="Maïs, Blé, Betterave, Canne à Sucre ou Résidus Viniques ne peuvent créer que de l'Éthanol ou ETBE"))
 
         if not lot.matiere_premiere.is_huile_vegetale and lot.biocarburant.code in ['HVOE', 'HVOG']:
             is_sane = False
@@ -194,18 +197,21 @@ def sanity_check(tx, prefetched_data):
         if lot.carbure_production_site.name in prefetched_data['production_sites']:
             mps = [psi.matiere_premiere for psi in prefetched_data['production_sites'][lot.carbure_production_site.name].productionsiteinput_set.all()]
             if lot.matiere_premiere not in mps:
-                errors.append(raise_warning(lot, 'MP_NOT_CONFIGURED'))
+                errors.append(raise_warning(lot, 'MP_NOT_CONFIGURED', show_recipient=False))
     if lot.biocarburant and lot.carbure_production_site:
         if lot.carbure_production_site.name in prefetched_data['production_sites']:
             bcs = [pso.biocarburant for pso in prefetched_data['production_sites'][lot.carbure_production_site.name].productionsiteoutput_set.all()]
             if lot.biocarburant not in bcs:
-                errors.append(raise_warning(lot, 'BC_NOT_CONFIGURED'))
+                errors.append(raise_warning(lot, 'BC_NOT_CONFIGURED', show_recipient=False))
 
     if lot.carbure_production_site:
         # certificates
         certificates = lot.carbure_production_site.productionsitecertificate_set.all()
         if certificates.count() == 0:
             errors.append(raise_warning(lot, 'MISSING_PRODSITE_CERTIFICATE'))
+
+    if not tx.client_is_in_carbure:
+        errors.append(raise_warning(lot, 'UNKNOWN_CLIENT', tx=tx))
     return lot_valid, tx_valid, is_sane, errors
 
 
