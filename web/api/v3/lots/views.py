@@ -665,8 +665,8 @@ def upload(request, *args, **kwargs):
 def upload_blend(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
-    file = request.FILES.get('file')
-    if file is None:
+    f = request.FILES.get('file')
+    if f is None:
         return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
 
     # save file
@@ -677,7 +677,7 @@ def upload_blend(request, *args, **kwargs):
         for chunk in f.chunks():
             destination.write(chunk)
 
-    nb_loaded, nb_total, errors = load_excel_file(entity, request.user, file)
+    nb_loaded, nb_total, errors = load_excel_file(entity, request.user, f)
     if nb_loaded is False:
         return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
     data = {'loaded': nb_loaded, 'total': nb_total}

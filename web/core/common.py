@@ -417,7 +417,7 @@ def fill_pays_origine_info(lot_row, lot, prefetched_data):
     lot_errors = []
     countries = prefetched_data['countries']
     if 'pays_origine_code' in lot_row:
-        pays_origine = lot_row['pays_origine_code']
+        pays_origine = lot_row['pays_origine_code'].upper()
         if pays_origine in countries:
             lot.pays_origine = countries[pays_origine]
         else:
