@@ -318,6 +318,7 @@ class LotTransaction(models.Model):
     vendor_is_in_carbure = models.BooleanField(default=True)
     carbure_vendor = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='vendor_transaction')
     unknown_vendor = models.CharField(max_length=64, blank=True, null=True, default='')
+    vendor_certificate = models.CharField(max_length=64, blank=True, null=True, default='')
 
     # client / delivery
     dae = models.CharField(max_length=128, blank=True, default='')
@@ -354,7 +355,7 @@ class LotTransaction(models.Model):
         'carbure_delivery_site': self.carbure_delivery_site.natural_key() if self.carbure_delivery_site else None, 'unknown_delivery_site': self.unknown_delivery_site,
         'unknown_delivery_site_country': self.unknown_delivery_site_country.natural_key() if self.unknown_delivery_site_country else None, 'delivery_status': self.delivery_status,
         'champ_libre': self.champ_libre, 'is_mac': self.is_mac, 'is_batch': self.is_batch,
-        'id': self.id}
+        'id': self.id, 'certificate': self.vendor_certificate}
 
     class Meta:
         db_table = 'transactions'
