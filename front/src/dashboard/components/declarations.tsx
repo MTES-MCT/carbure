@@ -50,6 +50,7 @@ function renderMonthSummary(
     const relativePush = useRelativePush()
 
     const decl = v.declarations[month]
+    const isVendor = [EntityType.Producer, EntityType.Trader].includes(v.entity.entity_type) // prettier-ignore
 
     if (!decl) return "N/A"
 
@@ -78,15 +79,19 @@ function renderMonthSummary(
           <li>
             {drafts ?? 0} brouillon{drafts !== 1 && "s"}
           </li>
-          <li>
-            {validated ?? 0} envoyé{validated !== 1 && "s"}
-          </li>
+          {isVendor && (
+            <li>
+              {validated ?? 0} envoyé{validated !== 1 && "s"}
+            </li>
+          )}
           <li>
             {received ?? 0} reçu{received !== 1 && "s"}
           </li>
-          <li>
-            {corrections ?? 0} correction{corrections !== 1 && "s"}
-          </li>
+          {isVendor && (
+            <li>
+              {corrections ?? 0} correction{corrections !== 1 && "s"}
+            </li>
+          )}
         </ul>
 
         {[Evaluation.InProgress, Evaluation.Reminded].includes(ev) && (
