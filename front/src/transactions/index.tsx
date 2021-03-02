@@ -76,9 +76,8 @@ const ADMIN_FILTERS = [
   Filters.Biocarburants,
   Filters.MatieresPremieres,
   Filters.CountriesOfOrigin,
-  Filters.Producers,
-  Filters.Traders,
-  Filters.Operators,
+  Filters.Vendors,
+  Filters.Clients,
   Filters.ProductionSites,
   Filters.DeliverySites,
 ]

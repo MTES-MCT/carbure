@@ -19,17 +19,21 @@ function useLocationStateFilters(
   if (!loc) return
 
   if (loc.entity) {
-    const t = loc.entity.entity_type
-    const prods = (selected.producers as Array<string>) ?? []
-    const traders = (selected.traders as Array<string>) ?? []
-    const ops = (selected.operators as Array<string>) ?? []
+    const entity = loc.entity.name
+    const type = loc.entity.entity_type
 
-    if (t === EntityType.Producer && !prods.includes(loc.entity.name)) {
-      select(Filters.Producers, [...prods, loc.entity.name])
-    } else if (t === EntityType.Trader && !traders.includes(loc.entity.name)) {
-      select(Filters.Traders, [...traders, loc.entity.name])
-    } else if (t === EntityType.Operator && !ops.includes(loc.entity.name)) {
-      select(Filters.Operators, [...ops, loc.entity.name])
+    const isVendor = [EntityType.Producer, EntityType.Trader].includes(type)
+    const isClient = type === EntityType.Operator
+
+    const vendors = (selected.vendors as Array<string>) ?? []
+    const clients = (selected.clients as Array<string>) ?? []
+
+    if (isVendor && !vendors.includes(entity)) {
+      select(Filters.Vendors, [...vendors, entity])
+    }
+
+    if (isClient && !clients.includes(entity)) {
+      select(Filters.Clients, [...clients, entity])
     }
   }
 

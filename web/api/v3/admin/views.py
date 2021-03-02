@@ -241,13 +241,15 @@ def get_snapshot(request):
         data['lots'] = {'alert': total_errors, 'correction': correction, 'declaration': declaration}
 
         filters = get_snapshot_filters(txs)
-        producers = Entity.objects.filter(entity_type='Producteur')
-        operators = Entity.objects.filter(entity_type='Opérateur')
-        traders = Entity.objects.filter(entity_type='Trader')
 
-        filters['producers'] = [p.name for p in producers]
-        filters['traders'] = [p.name for p in traders]
-        filters['operators'] = [p.name for p in operators]
+        c1 = [c['carbure_client__name'] for c in txs.values('carbure_client__name').distinct()]
+        c2 = [c['unknown_client'] for c in txs.values('unknown_client').distinct()]
+        filters['clients'] = sorted([c for c in set(c1 + c2) if c])
+
+        v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
+        v2 = [v['unknown_vendor'] for v in txs.values('unknown_vendor').distinct()]
+        filters['vendors'] = sorted([v for v in set(v1 + v2) if v])
+
         filters['delivery_status'] = [{'value':s[0], 'label': s[1]} for s in LotTransaction.DELIVERY_STATUS]
 
         data['filters'] = filters
