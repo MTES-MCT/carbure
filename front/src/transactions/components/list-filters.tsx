@@ -15,11 +15,8 @@ const FILTER_ORDER = [
   Filters.Biocarburants,
   Filters.MatieresPremieres,
   Filters.CountriesOfOrigin,
-  Filters.Clients,
   Filters.Vendors,
-  Filters.Producers,
-  Filters.Traders,
-  Filters.Operators,
+  Filters.Clients,
   Filters.ProductionSites,
   Filters.DeliverySites,
 ]
@@ -34,9 +31,6 @@ const FILTER_LABELS = {
   [Filters.DeliverySites]: "Sites de livraison",
   [Filters.Clients]: "Clients",
   [Filters.Vendors]: "Fournisseurs",
-  [Filters.Producers]: "Producteurs",
-  [Filters.Traders]: "Traders",
-  [Filters.Operators]: "Opérateurs",
 }
 
 export function mapFilters(
