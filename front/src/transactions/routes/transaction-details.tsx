@@ -49,8 +49,8 @@ const TransactionDetails = ({
   validator,
   acceptor,
   rejector,
-  refresh,
   transactions,
+  refresh,
 }: TransactionDetailsProps) => {
   const {
     form,
@@ -101,7 +101,7 @@ const TransactionDetails = ({
   return (
     <Modal onClose={close}>
       <StatusTitle editable={isEditable} details={details.data} entity={entity}>
-        Détails de la transaction
+        Détails de la transaction {form.carbure_id}
       </StatusTitle>
 
       <TransactionForm
