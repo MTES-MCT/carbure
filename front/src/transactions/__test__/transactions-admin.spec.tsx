@@ -1,6 +1,5 @@
 import { render } from "setupTests"
-import { waitFor, screen } from "@testing-library/react"
-import userEvent from "@testing-library/user-event"
+import { screen } from "@testing-library/react"
 import { Route } from "common/components/relative-route"
 import { Entity, LotStatus } from "common/types"
 
@@ -48,9 +47,8 @@ test("operator: display an empty list of transactions", async () => {
   screen.getByText("Périodes")
   screen.getByText("Biocarburants")
   screen.getByText("Matières Premières")
-  screen.getByText("Producteurs")
-  screen.getByText("Traders")
-  screen.getByText("Opérateurs")
+  screen.getByText("Fournisseurs")
+  screen.getByText("Clients")
   screen.getByText("Pays d'origine")
   screen.getByText("Sites de production")
   screen.getByText("Sites de livraison")
