@@ -327,16 +327,10 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
                                 error=msg,
                                 value='')
             lot_errors.append(error)
-    if 'production_site_commissioning_date' in lot_row:
+    if 'production_site_commissioning_date' in lot_row and lot_row['production_site_commissioning_date'] != '' and lot_row['production_site_commissioning_date'] is not None:
         try:
-            com_date = lot_row['production_site_commissioning_date']
-            if isinstance(com_date, datetime.datetime):
-                dd = com_date.date()
-            elif isinstance(com_date, datetime.date):
-                dd = com_date
-            else:
-                dd = dateutil.parser.parse(com_date, dayfirst=True).date()
-            lot.unknown_production_site_com_date = dd
+            com_date = try_get_date(lot_row['production_site_commissioning_date'])
+            lot.unknown_production_site_com_date = com_date
         except Exception as e:
             msg = "Date de mise en service: veuillez entrer une date au format JJ/MM/AAAA"
             error = LotV2Error(lot=lot, field='unknown_production_site_com_date',
@@ -523,6 +517,18 @@ def fill_dae_data(lot_row, transaction):
     return tx_errors
 
 
+def try_get_date(dd):
+    if isinstance(dd, datetime.datetime):
+        return dd.date()
+    if isinstance(dd, datetime.date):
+        return dd
+    try:
+        return datetime.datetime.strptime(dd, "%Y-%m-%d")
+    except:
+        pass
+    return dateutil.parser.parse(dd, dayfirst=True).date()
+
+
 def fill_delivery_date(lot_row, lot, transaction):
     today = datetime.date.today()
     tx_errors = []
@@ -531,28 +537,21 @@ def fill_delivery_date(lot_row, lot, transaction):
         lot.period = today.strftime('%Y-%m')
     else:
         try:
-            delivery_date = lot_row['delivery_date']
-            if isinstance(delivery_date, datetime.datetime):
-                dd = delivery_date.date()
-            elif isinstance(delivery_date, datetime.date):
-                dd = delivery_date
-            else:
-                dd = dateutil.parser.parse(delivery_date, dayfirst=True).date()
+            dd = try_get_date(lot_row['delivery_date'])
             diff = today - dd
             if diff > datetime.timedelta(days=365):
                 msg = "Date trop éloignée (%s)" % (lot_row['delivery_date'])
-                tx_errors.append(TransactionError(tx=transaction, field='delivery_date', error=msg, value=delivery_date))
+                tx_errors.append(TransactionError(tx=transaction, field='delivery_date', error=msg, value=lot_row['delivery_date']))
                 lot.period = today.strftime('%Y-%m')
                 transaction.delivery_date = None
             else:
                 transaction.delivery_date = dd
                 lot.period = dd.strftime('%Y-%m')
         except Exception as e:
-            print(e)
             transaction.delivery_date = None
             lot.period = today.strftime('%Y-%m')
             msg = "Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA (%s)" % (lot_row['delivery_date'])
-            tx_errors.append(TransactionError(tx=transaction, field='delivery_date', error=msg, value=delivery_date))
+            tx_errors.append(TransactionError(tx=transaction, field='delivery_date', error=msg, value=lot_row['delivery_date']))
     return tx_errors
 
 

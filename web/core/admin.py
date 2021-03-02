@@ -85,11 +85,29 @@ class DepotAdmin(admin.ModelAdmin):
     list_filter = ('depot_type',)
 
 
+def try_attach_certificate(modeladmin, request, queryset):
+    d = get_prefetched_data()
+    for lot in queryset:
+        if lot.producer_is_in_carbure and lot.production_site_is_in_carbure:
+            # we know the producer but the certificate is not attached
+            certificates = d['production_sites'][lot.carbure_production_site.name].productionsitecertificate_set.all()
+            count = certificates.count()
+            if count >= 1:
+                # take the first one
+                # if more than one is available, it has to be set in the excel file
+                lot.unknown_production_site_reference = certificates[0].natural_key()['certificate_id']
+            else:
+                continue
+            lot.save()
+try_attach_certificate.short_description = "Essayer d'attacher certficat"
+
+
 class LotV2Admin(admin.ModelAdmin):
-    list_display = ('period', 'data_origin_entity', 'biocarburant', 'matiere_premiere', 'volume', 'status',)
+    list_display = ('period', 'data_origin_entity', 'biocarburant', 'matiere_premiere', 'volume', 'status', 'carbure_production_site', 'unknown_production_site', 'unknown_production_site_reference')
     search_fields = ('carbure_producer__name', 'biocarburant__name', 'matiere_premiere__name', 'carbure_id', 'period',)
-    list_filter = ('period', 'carbure_producer', 'is_split', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused', 'blocking_sanity_checked_passed', 'nonblocking_sanity_checked_passed', 'is_valid', 'added_by', 'added_by_user')
+    list_filter = ('period', 'production_site_is_in_carbure', 'carbure_producer', 'is_split', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused', 'added_by', 'added_by_user')
     raw_id_fields = ('fused_with', 'parent_lot', )
+    actions = [try_attach_certificate]
 
 
 def rerun_sanity_checks(modeladmin, request, queryset):
