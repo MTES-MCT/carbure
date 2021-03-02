@@ -46,3 +46,15 @@
 .declarationCell:hover .declarationValidation {
   display: flex;
 }
+
+.declarationFocus {
+  margin-left: 24px;
+  margin-bottom: 16px;
+  font-size: 1.1em;
+  cursor: pointer;
+}
+
+.declarationCurrentFocus {
+  font-weight: bold;
+  text-decoration: underline;
+}

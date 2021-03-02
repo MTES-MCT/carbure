@@ -1,7 +1,7 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import cl from "clsx"
 import { DeclarationsByMonth } from "../api"
-import { Declaration, Entity } from "common/types"
+import { Declaration, Entity, EntityType } from "common/types"
 import { Box, LoaderOverlay, Title } from "common/components"
 import Table, { Row } from "common/components/table"
 import { Section, SectionHeader } from "common/components/section"
@@ -129,7 +129,46 @@ function renderMonthSummary(
   }
 }
 
+type DeclarationTableProps = {
+  declarations: api.DeclarationsByEntities
+  months: string[]
+  entities: Entity[]
+  onCheck: (d: Declaration, t: boolean) => Promise<any>
+  onRemind: (d: Declaration) => Promise<any>
+}
+
+const DeclarationTable = ({
+  declarations,
+  months,
+  entities,
+  onCheck,
+  onRemind,
+}: DeclarationTableProps) => {
+  const columns = months?.map((month) => ({
+    header: month,
+    render: renderMonthSummary(month, onCheck, onRemind),
+  }))
+
+  const rows: Row<RowData>[] = entities
+    .filter((e) => e.id in declarations)
+    .map((e) => ({
+      value: {
+        entity: e,
+        declarations: declarations[e.id],
+      },
+    }))
+
+  return (
+    <Table
+      className={styles.declarationTable}
+      columns={[padding, entityColumn, ...columns]}
+      rows={rows}
+    />
+  )
+}
+
 const Declarations = () => {
+  const [focus, setFocus] = useState(EntityType.Producer)
   const [declarations, getDeclarations] = useAPI(api.getDeclarations)
   const [, checkDeclaration] = useAPI(api.checkDeclaration)
   const [, uncheckDeclaration] = useAPI(api.uncheckDeclaration)
@@ -180,31 +219,62 @@ const Declarations = () => {
     getDeclarations()
   }, [getDeclarations])
 
-  const [entities = [], months = [], declarationsByEntites = {}] =
+  const [entities = [], months = [], byEntityType = {}] =
     declarations.data ?? []
-
-  const columns = months?.map((month) => ({
-    header: month,
-    render: renderMonthSummary(month, askDeclarationCheck, askSendReminder),
-  }))
-
-  const rows: Row<RowData>[] = entities?.map((e) => ({
-    value: {
-      entity: e,
-      declarations: declarationsByEntites[e.id],
-    },
-  }))
 
   return (
     <Section>
       <SectionHeader>
         <Title>Résumé des déclarations</Title>
       </SectionHeader>
-      <Table
-        className={styles.declarationTable}
-        columns={[padding, entityColumn, ...columns]}
-        rows={rows}
-      />
+
+      <Box row>
+        {[EntityType.Producer, EntityType.Trader, EntityType.Operator].map(
+          (type) => (
+            <span
+              key={type}
+              onClick={() => setFocus(type)}
+              className={cl(
+                styles.declarationFocus,
+                type === focus && styles.declarationCurrentFocus
+              )}
+            >
+              {type}s
+            </span>
+          )
+        )}
+      </Box>
+
+      {focus === EntityType.Producer && (
+        <DeclarationTable
+          entities={entities}
+          months={months}
+          declarations={byEntityType[EntityType.Producer]}
+          onCheck={askDeclarationCheck}
+          onRemind={askSendReminder}
+        />
+      )}
+
+      {focus === EntityType.Trader && (
+        <DeclarationTable
+          entities={entities}
+          months={months}
+          declarations={byEntityType[EntityType.Trader]}
+          onCheck={askDeclarationCheck}
+          onRemind={askSendReminder}
+        />
+      )}
+
+      {focus === EntityType.Operator && (
+        <DeclarationTable
+          entities={entities}
+          months={months}
+          declarations={byEntityType[EntityType.Operator]}
+          onCheck={askDeclarationCheck}
+          onRemind={askSendReminder}
+        />
+      )}
+
       {declarations.loading && <LoaderOverlay />}
     </Section>
   )
