@@ -105,7 +105,7 @@ try_attach_certificate.short_description = "Essayer d'attacher certficat"
 class LotV2Admin(admin.ModelAdmin):
     list_display = ('period', 'data_origin_entity', 'biocarburant', 'matiere_premiere', 'volume', 'status', 'carbure_production_site', 'unknown_production_site', 'unknown_production_site_reference')
     search_fields = ('carbure_producer__name', 'biocarburant__name', 'matiere_premiere__name', 'carbure_id', 'period',)
-    list_filter = ('period', 'production_site_is_in_carbure', 'carbure_producer', 'is_split', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused', 'added_by', 'added_by_user')
+    list_filter = ('period', 'production_site_is_in_carbure', 'carbure_producer', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused', 'is_transformed', 'added_by', 'added_by_user')
     raw_id_fields = ('fused_with', 'parent_lot', )
     actions = [try_attach_certificate]
 
