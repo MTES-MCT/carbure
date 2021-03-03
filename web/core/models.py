@@ -199,6 +199,8 @@ class EntityDepot(models.Model):
     entity = models.ForeignKey(Entity, null=False, blank=False, on_delete=models.CASCADE)
     depot = models.ForeignKey(Depot, null=False, blank=False, on_delete=models.CASCADE)
     ownership_type = models.CharField(max_length=32, choices=TYPE_OWNERSHIP, default='THIRD_PARTY')
+    blending_is_outsourced = models.BooleanField(default=False)
+    blender = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE, related_name='blender')
 
     def __str__(self):
         return str(self.id)
