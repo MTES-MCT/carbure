@@ -256,6 +256,8 @@ def get_snapshot(request):
         v2 = [v['unknown_vendor'] for v in txs.values('unknown_vendor').distinct()]
         filters['vendors'] = sorted([v for v in set(v1 + v2) if v])
 
+        filters['added_by'] = [e['lot__added_by__name'] for e in txs.values('lot__added_by__name').distinct()]
+
         filters['delivery_status'] = [{'value':s[0], 'label': s[1]} for s in LotTransaction.DELIVERY_STATUS]
 
         data['filters'] = filters

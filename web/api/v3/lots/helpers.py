@@ -23,7 +23,8 @@ sort_key_to_django_field = {'period': 'lot__period',
                             'matiere_premiere': 'lot__matiere_premiere__name',
                             'ghg_reduction': 'lot__ghg_reduction',
                             'volume': 'lot__volume',
-                            'pays_origine': 'lot__pays_origine__name'}
+                            'pays_origine': 'lot__pays_origine__name',
+                            'added_by': 'lot__added_by__name'}
 
 def get_errors(tx):
     grouped_errors = {}
@@ -111,6 +112,7 @@ def filter_lots(txs, querySet):
     traders = querySet.getlist('traders')
     operators = querySet.getlist('operators')
     delivery_status = querySet.getlist('delivery_status')
+    added_by = querySet.getlist('added_by')
     errors = querySet.getlist('errors')
     query = querySet.get('query', False)
 
@@ -152,6 +154,9 @@ def filter_lots(txs, querySet):
         txs = filter_by_entities(txs, operators)
     if traders:
         txs = filter_by_entities(txs, traders)
+
+    if added_by:
+        txs = txs.filter(lot__added_by__name__in=added_by)
 
     if errors:
         txs = txs.filter(Q(transactionerror__error__in=errors) | Q(lot__lotv2error__error__in=errors) | Q(lot__lotvalidationerror__message__in=errors))
@@ -211,8 +216,6 @@ def sort_lots(txs, sort_by, order):
             txs = txs.order_by('-client')
         else:
             txs = txs.order_by('client')
-    else:  
-        raise Exception('Unknown key to sort by')
 
     return txs
 
