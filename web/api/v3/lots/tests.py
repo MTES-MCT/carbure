@@ -496,6 +496,10 @@ class LotsAPITest(TransactionTestCase):
         tx = LotTransaction.objects.get(dae=dae)
         response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_producer.id})
         self.assertEqual(response.status_code, 200)
+        debug_errors()
+        debug_lots()
+        debug_transactions()
+
         # create same lot
         response = self.client.post(reverse('api-v3-add-lot'), lot)
         self.assertEqual(response.status_code, 200)
@@ -525,6 +529,66 @@ class LotsAPITest(TransactionTestCase):
         # lot doesn't exist anymore
         cnt = LotTransaction.objects.filter(dae=dae, lot__added_by=self.test_operator).count()
         self.assertEqual(cnt, 0)
+
+    def test_dates_format(self):
+        # cleanup db
+        LotTransaction.objects.all().delete()
+        LotV2.objects.all().delete()
+        # as producer, create lot
+        dae = 'TEST2020FR00923-DUP-32094'
+        lot = {
+            'production_site': "unknown production site",
+            'production_site_commissioning_date': '2001-12-01',
+            'biocarburant_code': 'ETH',
+            'matiere_premiere_code': 'BLE',
+            'volume': 15000,
+            'pays_origine_code': 'FR',
+            'eec': 1,
+            'ep': 5,
+            'etd': 12,
+            'dae': dae,
+            'delivery_date': '2020-12-01',
+            'client': self.test_operator.name,
+            'delivery_site': '001',
+            'entity_id': self.test_producer.id,
+        }
+        response = self.client.post(reverse('api-v3-add-lot'), lot)
+        self.assertEqual(response.status_code, 200)  
+        # check
+        tx = LotTransaction.objects.get(dae=dae)
+        dt1 = datetime.date(2001, 12, 1)
+        dt2 = datetime.date(2020, 12, 1)
+        self.assertEqual(tx.lot.unknown_production_site_com_date, dt1)
+        self.assertEqual(tx.delivery_date, dt2)
+
+        LotTransaction.objects.all().delete()
+        LotV2.objects.all().delete()
+        # as producer, create lot
+        dae = 'TEST2020FR00923-DUP-32094'
+        lot = {
+            'production_site': "unknown production site",
+            'production_site_commissioning_date': '01/12/2001',
+            'biocarburant_code': 'ETH',
+            'matiere_premiere_code': 'BLE',
+            'volume': 15000,
+            'pays_origine_code': 'FR',
+            'eec': 1,
+            'ep': 5,
+            'etd': 12,
+            'dae': dae,
+            'delivery_date': '01/12/2020',
+            'client': self.test_operator.name,
+            'delivery_site': '001',
+            'entity_id': self.test_producer.id,
+        }
+        response = self.client.post(reverse('api-v3-add-lot'), lot)
+        self.assertEqual(response.status_code, 200)  
+        # check
+        tx = LotTransaction.objects.get(dae=dae)
+        dt1 = datetime.date(2001, 12, 1)
+        dt2 = datetime.date(2020, 12, 1)
+        self.assertEqual(tx.lot.unknown_production_site_com_date, dt1)
+        self.assertEqual(tx.delivery_date, dt2)
 
     def test_duplicates_operator(self):
         # cleanup db

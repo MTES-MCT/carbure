@@ -523,8 +523,8 @@ def try_get_date(dd):
     if isinstance(dd, datetime.date):
         return dd
     try:
-        return datetime.datetime.strptime(dd, "%Y-%m-%d")
-    except:
+        return datetime.datetime.strptime(dd, "%Y-%m-%d").date()
+    except Exception as e:
         pass
     return dateutil.parser.parse(dd, dayfirst=True).date()
 
