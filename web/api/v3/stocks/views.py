@@ -356,3 +356,75 @@ def send_all_drafts(request, *args, **kwargs):
         if not sent:
             send_errors.append(errors)
     return JsonResponse({'status': 'success', 'data': send_errors})
+
+
+@check_rights('entity_id')
+def convert_to_etbe(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+
+    source_tx = request.POST.get('tx_id', False)
+    volume = request.POST.get('volume', False)
+    volume_fossile = request.POST.get('volume_fossile', False)
+    volume_denaturant = request.POST.get('volume_denaturant', False)
+    volume_pertes = request.POST.get('volume_pertes', 0)
+
+    if not source_tx:
+        return JsonResponse({'status': 'error', 'message': 'Missing source_tx id'}, status=400)
+    if not volume:
+        return JsonResponse({'status': 'error', 'message': 'Missing volume'}, status=400)
+    if not volume_fossile:
+        return JsonResponse({'status': 'error', 'message': 'Missing volume_fossile'}, status=400)
+    if not volume_denaturant:
+        return JsonResponse({'status': 'error', 'message': 'Missing volume_denaturant'}, status=400)
+    if not volume_pertes:
+        return JsonResponse({'status': 'error', 'message': 'Missing volume_pertes'}, status=400)
+
+    # retrieve stock line
+    source_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status='A', id=tx_id)
+    # check if source TX is Ethanol
+    if source_tx.lot.matiere_premiere.code != 'ETH':
+        return JsonResponse({'status': 'error', 'message': 'Only ETH can be converted to ETBE'}, status=400)
+
+
+    source_lot = source_tx.lot
+    lot = source_tx.lot
+    # let's create a new lot and transaction
+    lot.pk = None
+    lot.parent_lot = source_lot
+    lot.added_by = entity
+    lot.data_origin_entity = lot.parent_lot.data_origin_entity
+    lot.added_by_user = request.user
+    lot.status = 'Draft'
+    lot.carbure_id = ''
+    lot.is_transformed = True
+    lot.source = 'MANUAL'
+
+    try:
+        volume = float(volume)
+        volume_denaturant = float(volume_denaturant)
+        volume_fossile = float(volume_fossile)
+        volume_pertes = float(volume_pertes)
+        lot.volume = volume
+        lot.volume_denaturant = volume_denaturant
+        lot.volume_fossile = volume_fossile
+        lot.volume_pertes = volume_pertes
+    except Exception as e:
+        print(e)
+        return JsonResponse({'status': 'error', 'message': 'Volumes: format incorrect'}, status=400)
+
+    transaction = source_tx
+    transaction.pk = None
+    transaction.lot = lot
+    transaction.vendor_is_in_carbure = True
+    transaction.carbure_vendor = entity
+    transaction.dae = 'CONVERSION-ETBE'
+    transaction.champ_libre = 'CONVERSION-ETBE'
+
+    # check available volume
+    if source_lot.volume > volume:
+        return JsonResponse({'status': 'error', 'message': 'Cannot convert more ETH than stock'}, status=400)
+
+    lot.save()
+    transaction.save()
+    return JsonResponse({'status': 'success'})
