@@ -14,6 +14,7 @@ import useForm, { FormHook } from "common/hooks/use-form"
 
 export interface TransactionFormState {
   id: number
+  carbure_id: string
   dae: string
   volume: number
   champ_libre: string
@@ -65,6 +66,7 @@ export interface TransactionFormState {
 export function toTransactionFormState(tx: Transaction): TransactionFormState {
   return {
     id: tx.id,
+    carbure_id: tx.lot.carbure_id,
     dae: tx.dae,
     volume: tx.lot.volume,
     champ_libre: tx.champ_libre,
@@ -191,6 +193,7 @@ export function toTransactionPostData(tx: TransactionFormState) {
 // empty form state
 const initialState: TransactionFormState = {
   id: -1,
+  carbure_id: "",
   dae: "",
   volume: 0,
   champ_libre: "",
