@@ -183,14 +183,23 @@ def resend_activation_link(request):
             try:
                 user = usermodel.objects.get(email=form.clean_email())
                 current_site = get_current_site(request)
-                subject = 'Carbure - Activation de compte'
-                message = render_to_string('registration/account_activation_email.html', {
+                email_subject = 'Carbure - Activation de compte'
+                email_context = {
                     'user': user,
                     'domain': current_site.domain,
                     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                     'token': account_activation_token.make_token(user),
-                })
-                user.email_user(subject, message)
+                }
+                html_message = render_to_string('registration/account_activation_email.html', email_context)
+                text_message = render_to_string('registration/account_activation_email.txt', email_context)
+                send_mail(
+                    subject=email_subject,
+                    message=text_message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    html_message=html_message,
+                    recipient_list=[user.email],
+                    fail_silently=False,
+                )
                 return render(request, 'registration/resend_activation_link_done.html', {'form': form})
             except Exception as e:
                 print(e)
