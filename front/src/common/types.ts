@@ -260,6 +260,7 @@ export enum Filters {
   Clients = "clients",
   ProductionSites = "production_sites",
   DeliverySites = "delivery_sites",
+  Errors = "errors",
 }
 
 export interface Snapshot {
