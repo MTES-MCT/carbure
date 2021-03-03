@@ -496,9 +496,6 @@ class LotsAPITest(TransactionTestCase):
         tx = LotTransaction.objects.get(dae=dae)
         response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_producer.id})
         self.assertEqual(response.status_code, 200)
-        debug_errors()
-        debug_lots()
-        debug_transactions()
 
         # create same lot
         response = self.client.post(reverse('api-v3-add-lot'), lot)
