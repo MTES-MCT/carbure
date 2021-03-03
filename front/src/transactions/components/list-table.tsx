@@ -43,6 +43,7 @@ export const ADMIN_COLUMNS = [
   C.productionSite,
   C.client,
   C.depot,
+  C.addedBy,
   C.ghgReduction,
 ]
 
