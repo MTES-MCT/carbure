@@ -424,7 +424,8 @@ def convert_to_etbe(request, *args, **kwargs):
     # check available volume
     if source_lot.volume > volume:
         return JsonResponse({'status': 'error', 'message': 'Cannot convert more ETH than stock'}, status=400)
-
+    source_lot.volume -= volume
+    source_lot.save()
     lot.save()
     transaction.save()
     return JsonResponse({'status': 'success'})
