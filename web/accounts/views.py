@@ -113,7 +113,10 @@ def activate(request, uidb64, token):
 def send_new_token(request):
     device = EmailDevice.objects.get(user=request.user)
     current_site = get_current_site(request)
-    device.generate_token()
+    # if current token is expired, generate a new one
+    now = timezone.now()
+    if now > device.valid_until:
+        device.generate_token()
     email_subject = 'Carbure - Code de Sécurité'
     email_context = {
         'user': request.user,
