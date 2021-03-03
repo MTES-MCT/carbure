@@ -19,6 +19,7 @@ const FILTER_ORDER = [
   Filters.Clients,
   Filters.ProductionSites,
   Filters.DeliverySites,
+  Filters.AddedBy,
   Filters.Errors,
 ]
 
@@ -32,6 +33,7 @@ const FILTER_LABELS = {
   [Filters.DeliverySites]: "Sites de livraison",
   [Filters.Clients]: "Clients",
   [Filters.Vendors]: "Fournisseurs",
+  [Filters.AddedBy]: "Ajouté par",
   [Filters.Errors]: "Incohérences",
 }
 

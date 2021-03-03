@@ -80,6 +80,12 @@ export const vendor: Column<Transaction> = {
   render: (tx) => <Line text={tx.carbure_vendor?.name ?? tx.unknown_vendor} />,
 }
 
+export const addedBy: Column<Transaction> = {
+  header: "Ajouté par",
+  sortBy: "added_by",
+  render: (tx) => <Line text={tx.lot.added_by?.name ?? ""} />,
+}
+
 export const biocarburant: Column<Transaction> = {
   header: "Biocarburant (litres)",
   sortBy: "biocarburant",
