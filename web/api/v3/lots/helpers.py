@@ -111,6 +111,7 @@ def filter_lots(txs, querySet):
     traders = querySet.getlist('traders')
     operators = querySet.getlist('operators')
     delivery_status = querySet.getlist('delivery_status')
+    errors = querySet.getlist('errors')
     query = querySet.get('query', False)
 
     date_from = datetime.date.today().replace(month=1, day=1)
@@ -151,6 +152,9 @@ def filter_lots(txs, querySet):
         txs = filter_by_entities(txs, operators)
     if traders:
         txs = filter_by_entities(txs, traders)
+
+    if errors:
+        txs = txs.filter(Q(transactionerror__error__in=errors) | Q(lot__lotv2error__error__in=errors) | Q(lot__lotvalidationerror__message__in=errors))
 
     if query:
         txs = txs.filter(
