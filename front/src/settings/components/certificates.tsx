@@ -113,7 +113,7 @@ export const CertificateSettings = ({
   const rows = certificates.map((c) => ({
     value: c,
     className: cl(c.has_been_updated && styles.expiredRow),
-    onClick: () => window.open(c.download_link),
+    onClick: () => window.open && window.open(c.download_link),
   }))
 
   return (
