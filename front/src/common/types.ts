@@ -255,14 +255,11 @@ export enum Filters {
   MatieresPremieres = "matieres_premieres",
   Biocarburants = "biocarburants",
   Periods = "periods",
-  ProductionSites = "production_sites",
   CountriesOfOrigin = "countries_of_origin",
-  Clients = "clients",
-  DeliverySites = "delivery_sites",
   Vendors = "vendors",
-  Producers = "producers",
-  Operators = "operators",
-  Traders = "traders",
+  Clients = "clients",
+  ProductionSites = "production_sites",
+  DeliverySites = "delivery_sites",
 }
 
 export interface Snapshot {

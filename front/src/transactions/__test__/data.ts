@@ -70,9 +70,8 @@ export const adminSnapshot = {
     countries_of_origin: [{ value: "FR", label: "France" }],
     production_sites: ["Test Production Site"],
     delivery_sites: ["Test Delivery Site"],
-    producers: ["Producteur Test"],
-    operators: ["Opérateur Test"],
-    traders: ["Trader Test"],
+    vendors: ["Producteur Test", "Trader Test"],
+    clients: ["Opérateur Test"],
   },
 }
 

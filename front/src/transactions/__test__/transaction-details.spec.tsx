@@ -22,9 +22,14 @@ afterEach(() => {
 afterAll(() => server.close())
 
 const TransactionWithHook = ({ entity }: { entity: Entity }) => {
-  const { deleter, validator, acceptor, rejector, refresh } = useTransactions(
-    entity
-  )
+  const {
+    transactions,
+    deleter,
+    validator,
+    acceptor,
+    rejector,
+    refresh,
+  } = useTransactions(entity)
 
   return (
     <Route relative path=":id">
@@ -35,6 +40,7 @@ const TransactionWithHook = ({ entity }: { entity: Entity }) => {
         validator={validator}
         acceptor={acceptor}
         rejector={rejector}
+        transactions={transactions}
       />
     </Route>
   )
@@ -199,7 +205,7 @@ test("check transaction errors", async () => {
 
   await screen.findByText(
     (content, node) =>
-      node.textContent === "Ce lot doit être validé avant le 29 février 2020"
+      node?.textContent === "Ce lot doit être validé avant le 29 février 2020"
   )
 
   const dae = screen.getByTitle("DAE manquant")
@@ -209,7 +215,9 @@ test("check transaction errors", async () => {
   expect(mp).toHaveClass("errorLabel")
 
   screen.getByText("Erreurs (1)")
-  screen.getByText("Matière Première incohérente avec le Biocarburant - Biogaz de Blé")
+  screen.getByText(
+    "Matière Première incohérente avec le Biocarburant - Biogaz de Blé"
+  )
 
   screen.getByText("Remarques (1)")
   screen.getByText("Volume inhabituellement faible.")

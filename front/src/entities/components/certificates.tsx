@@ -1,4 +1,3 @@
-import Table from "common/components/table"
 import { ApiState } from "common/hooks/use-api"
 import { Certificate } from "common/types"
 import { CertificateSettings } from "settings/components/certificates"

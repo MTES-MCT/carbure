@@ -1,16 +1,22 @@
 import api from "common/services/api"
-import { Declaration, Entity } from "common/types"
+import { Declaration, Entity, EntityType } from "common/types"
 
 export type Entities = Record<number, Entity>
-export type DeclarationsByMonth = Record<string, Declaration>
-export type DeclarationsByEntities = Record<number, DeclarationsByMonth>
+export type DeclarationsByMonth = { [k: string]: Declaration }
+export type DeclarationsByEntities = { [k: number]: DeclarationsByMonth }
+export type DeclarationsByEntityType = { [k: string]: DeclarationsByEntities }
 
 function groupDeclarationsByEntities(
   declarations: Declaration[]
-): [Entity[], string[], DeclarationsByEntities] {
+): [Entity[], string[], DeclarationsByEntityType] {
   const entities: Entities = {}
   const months: Record<string, null> = {}
-  const declarationsByEntities: DeclarationsByEntities = {}
+
+  const declarationsByEntities: DeclarationsByEntityType = {
+    [EntityType.Producer]: {},
+    [EntityType.Trader]: {},
+    [EntityType.Operator]: {},
+  }
 
   declarations.forEach((declaration) => {
     const { entity, month, year } = declaration
@@ -19,11 +25,11 @@ function groupDeclarationsByEntities(
     const period = `${year}/${("0" + month).slice(-2)}`
     months[period] = null
 
-    if (!declarationsByEntities[entity.id]) {
-      declarationsByEntities[entity.id] = {}
+    if (!declarationsByEntities[entity.entity_type][entity.id]) {
+      declarationsByEntities[entity.entity_type][entity.id] = {}
     }
 
-    declarationsByEntities[entity.id][period] = declaration
+    declarationsByEntities[entity.entity_type][entity.id][period] = declaration
   })
 
   return [
@@ -34,7 +40,7 @@ function groupDeclarationsByEntities(
 }
 
 export function getDeclarations(): Promise<
-  [Entity[], string[], DeclarationsByEntities]
+  [Entity[], string[], DeclarationsByEntityType]
 > {
   return api
     .get("/admin/dashboard/declarations")

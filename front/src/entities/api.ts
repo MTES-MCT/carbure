@@ -1,6 +1,5 @@
 import api from "common/services/api"
 import {
-  ProductionCertificate,
   DBSCertificate,
   Entity,
   ISCCCertificate,
