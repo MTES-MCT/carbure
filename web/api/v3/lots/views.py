@@ -704,3 +704,44 @@ def validate_declaration(request, *args, **kwargs):
         print(e)
         return JsonResponse({'status': "error", 'message': "Missing periods"}, status=400)
     return JsonResponse({'status': 'success'})
+
+
+@check_rights('entity_id')
+def forward_lots(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+
+    tx_ids = request.POST.getlist('tx_ids', None)
+    comment = request.POST.get('comment', '')
+    depots = EntityDepot.objects.filter(entity=entity, outsourced_blending=True)
+
+    if not entity.entity_type == 'Opérateur':
+        return JsonResponse({'status': 'forbidden', 'message': "Feature only available to Operators"}, status=403)
+    if not tx_ids:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
+
+    for tx_id in tx_ids:
+        # for each tx, make sure we are the client, status accepted, and it has been delivered to a Depot with outsourced_blending
+        try:
+            tx = LotTransaction.objects.get(delivery_status='A', id=tx_id, carbure_client=entity)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': "TX not found", 'extra': str(e)}, status=400)
+
+        if tx.carbure_delivery_site in depots:
+            # it has been delivered to a Depot with outsourced blending
+            # we should forward the lot to the blender
+            new_tx = tx
+            new_tx.pk = None
+
+            new_tx.vendor_is_in_carbure = True
+            new_tx.carbure_vendor = entity
+            new_tx.unknown_vendor = ''
+            new_tx.vendor_certificate = ''
+
+            new_tx.client_is_in_carbure = True
+            new_tx.carbure_client = depots[tx.carbure_delivery_site].blender
+            new_tx.unknown_client = ''
+            new_tx.delivery_status = 'N'
+            new_tx.champ_libre = comment
+            new_tx.save()
+    return JsonResponse({'status': 'success'})    

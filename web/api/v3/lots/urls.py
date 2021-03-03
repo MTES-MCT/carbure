@@ -21,6 +21,7 @@ urlpatterns = [
     path('reject', views.reject_lot, name='api-v3-reject-lot'),
     path('comment', views.comment_lot, name='api-v3-comment-lot'),
 
+
     # DECLARATION
     path('validate-declaration', views.validate_declaration, name='api-v3-validate-declaration'),
 
@@ -30,6 +31,8 @@ urlpatterns = [
     path('validate-all-drafts', views.validate_all_drafts, name='api-v3-validate-all-drafts'),
     path('accept-all', views.accept_all, name='api-v3-accept-all'),
     path('reject-all', views.reject_all, name='api-v3-reject-all'),
+    path('forward', views.forward_lots, name='api-v3-forward-lot'),
+
 
     # IMPORT/FILES
     path('upload', views.upload, name='api-v3-upload'),
