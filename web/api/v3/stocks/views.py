@@ -2,7 +2,7 @@ import json
 import datetime
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
-from core.models import LotTransaction
+from core.models import LotTransaction, ETBETransformation
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, LotV2, Depot
 from core.decorators import check_rights
 from core.common import get_prefetched_data, load_mb_lot, bulk_insert
@@ -362,72 +362,95 @@ def send_all_drafts(request, *args, **kwargs):
 def convert_to_etbe(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
-
-    source_tx_id = request.POST.get('tx_id', False)
-    volume = request.POST.get('volume', False)
-    volume_fossile = request.POST.get('volume_fossile', False)
-    volume_denaturant = request.POST.get('volume_denaturant', False)
-    volume_pertes = request.POST.get('volume_pertes', 0)
-
-    if not source_tx_id:
-        return JsonResponse({'status': 'error', 'message': 'Missing source_tx id'}, status=400)
-    if not volume:
-        return JsonResponse({'status': 'error', 'message': 'Missing volume'}, status=400)
-    if not volume_fossile:
-        return JsonResponse({'status': 'error', 'message': 'Missing volume_fossile'}, status=400)
-    if not volume_denaturant:
-        return JsonResponse({'status': 'error', 'message': 'Missing volume_denaturant'}, status=400)
-    if not volume_pertes:
-        return JsonResponse({'status': 'error', 'message': 'Missing volume_pertes'}, status=400)
-
-    # retrieve stock line
-    source_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status='A', id=source_tx_id)
-    # check if source TX is Ethanol
-    if source_tx.lot.matiere_premiere.code != 'ETH':
-        return JsonResponse({'status': 'error', 'message': 'Only ETH can be converted to ETBE'}, status=400)
-
     etbe = Biocarburant.objects.get(code='ETBE')
 
-    source_lot = source_tx.lot
-    lot = source_tx.lot
-    # let's create a new lot and transaction
-    lot.pk = None
-    lot.parent_lot = source_lot
-    lot.added_by = entity
-    lot.data_origin_entity = lot.parent_lot.data_origin_entity
-    lot.added_by_user = request.user
-    lot.status = 'Draft'
-    lot.carbure_id = ''
-    lot.is_transformed = True
-    lot.source = 'MANUAL'
-    lot.biocarburant = etbe
+    previous_stock_tx_id = request.POST.get('previous_stock_tx_id', False)
+    volume_ethanol = request.POST.get('volume_ethanol', False)
+    volume_etbe = request.POST.get('volume_etbe', False)
+    volume_fossile = request.POST.get('volume_fossile', 0)
+    volume_denaturant = request.POST.get('volume_denaturant', 0)
+    volume_pertes = request.POST.get('volume_pertes', 0)
+
+    if not previous_stock_tx_id:
+        return JsonResponse({'status': 'error', 'message': 'Missing source_tx id'}, status=400)
+    if not volume_ethanol:
+        return JsonResponse({'status': 'error', 'message': 'Missing volume_ethanol'}, status=400)
+    if not volume_etbe:
+        return JsonResponse({'status': 'error', 'message': 'Missing volume_etbe'}, status=400)
+
+    # retrieve stock line
+    previous_stock_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status='A', id=previous_stock_tx_id)
+    # check if source TX is Ethanol
+    if previous_stock_tx.lot.matiere_premiere.code != 'ETH':
+        return JsonResponse({'status': 'error', 'message': 'Only ETH can be converted to ETBE'}, status=400)
+
+
+    source_lot = previous_stock_tx.lot
+    new_lot = previous_stock_tx.lot
+
+
+    # create the new lot
+    new_lot.pk = None
+    new_lot.parent_lot = source_lot
+    new_lot.added_by = entity
+    new_lot.data_origin_entity = source_lot.parent_lot.data_origin_entity
+    new_lot.added_by_user = request.user
+    new_lot.status = 'Draft'
+    new_lot.carbure_id = ''
+    new_lot.is_transformed = True
+    new_lot.source = 'MANUAL'
+    new_lot.biocarburant = etbe
 
     try:
-        volume = float(volume)
+        volume_ethanol = float(volume_ethanol)
+        volume_etbe = float(volume_etbe)
         volume_denaturant = float(volume_denaturant)
         volume_fossile = float(volume_fossile)
         volume_pertes = float(volume_pertes)
-        lot.volume = volume
-        lot.volume_denaturant = volume_denaturant
-        lot.volume_fossile = volume_fossile
-        lot.volume_pertes = volume_pertes
     except Exception as e:
         print(e)
         return JsonResponse({'status': 'error', 'message': 'Volumes: format incorrect'}, status=400)
 
-    transaction = source_tx
+
+
+    # ensure volume etbe = volume ethanol - pertes
+    if volume_etbe + volume_pertes != volume_ethanol:
+        return JsonResponse({'status': 'error', 'message': 'Volumes ETBE != Volume Ethanol + Pertes'}, status=400)
+
+    # check available volume
+    if source_lot.volume < volume_ethanol:
+        return JsonResponse({'status': 'error', 'message': 'Cannot convert more ETH than stock'}, status=400)
+
+    new_lot.volume = volume_etbe
+    new_lot.save()
+    source_lot.volume -= volume_ethanol
+    source_lot.save()
+
+    # create transaction
+    transaction = previous_stock_tx
     transaction.pk = None
-    transaction.lot = lot
+    transaction.lot = new_lot
     transaction.vendor_is_in_carbure = True
     transaction.carbure_vendor = entity
     transaction.dae = 'CONVERSION-ETBE'
     transaction.champ_libre = 'CONVERSION-ETBE'
-
-    # check available volume
-    if source_lot.volume > volume:
-        return JsonResponse({'status': 'error', 'message': 'Cannot convert more ETH than stock'}, status=400)
-    source_lot.volume -= (volume + volume_pertes)
-    source_lot.save()
-    lot.save()
     transaction.save()
+
+    # save ETBE Transformation
+    t = ETBETransformation()
+    t.previous_stock = previous_stock_tx
+    t.new_stock = transaction
+    t.volume_ethanol = volume_ethanol
+    t.volume_etbe = volume_etbe
+    t.volume_denaturant = volume_denaturant
+    t.volume_fossile = volume_fossile
+    t.volume_pertes = volume_pertes
+    t.added_by = entity
+    t.added_by_user = request.user
+    t.save()
     return JsonResponse({'status': 'success'})
+
+
+
+
+
