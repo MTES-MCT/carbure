@@ -336,6 +336,11 @@ def delete_lot(request):
         if tx.delivery_status not in ['N', 'R']:
             return JsonResponse({'status': 'forbidden', 'message': "Transaction already accepted by client"},
                                 status=403)
+
+        if tx.delivery_status == 'R' and tx.lot.parent_lot != None:
+            # credit volume back to stock
+            tx.lot.parent_lot.volume += tx.lot.volume
+            tx.lot.parent_lot.save()
         tx.lot.delete()
     return JsonResponse({'status': 'success'})
 
