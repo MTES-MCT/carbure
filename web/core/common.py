@@ -13,6 +13,7 @@ from django.db import transaction
 from django.http import JsonResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
+from core.models import ISCCCertificate, DBSCertificate
 import dateutil.parser
 from api.v3.sanity_checks import bulk_sanity_checks, tx_is_valid, lot_is_valid
 
@@ -137,6 +138,7 @@ def check_duplicates(new_txs, background=True):
     return nb_duplicates
 
 def get_prefetched_data(entity=None):
+    lastyear = datetime.date.today() - datetime.timedelta(days=365)
     d = {}
     d['producers'] = {p.name: p for p in Entity.objects.filter(entity_type='Producteur')}
     d['countries'] = {p.code_pays: p for p in Pays.objects.all()}
@@ -148,6 +150,8 @@ def get_prefetched_data(entity=None):
         d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
     d['depots'] = {d.depot_id.lstrip('0'): d for d in Depot.objects.all()}
     d['clients'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
+    d['iscc_certificates'] = {c.certificate_id: c for c in ISCCCertificate.objects.filter(valid_until__gte=lastyear)}
+    d['2bs_certificates'] = {c.certificate_id: c for c in DBSCertificate.objects.filter(valid_until__gte=lastyear)}
     return d
 
 
