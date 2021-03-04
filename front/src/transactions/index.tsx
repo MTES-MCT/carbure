@@ -80,6 +80,7 @@ const ADMIN_FILTERS = [
   Filters.Clients,
   Filters.ProductionSites,
   Filters.DeliverySites,
+  Filters.Errors,
 ]
 
 export function useTransactions(entity: EntitySelection) {

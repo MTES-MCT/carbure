@@ -242,6 +242,12 @@ def get_snapshot(request):
 
         filters = get_snapshot_filters(txs)
 
+        lot_errors = [e['lot__lotv2error__error'] for e in txs.values('lot__lotv2error__error').distinct()]
+        tx_errors = [e['transactionerror__error'] for e in txs.values('transactionerror__error').distinct()]
+        validation_errors = [e['lot__lotvalidationerror__message'] for e in txs.values('lot__lotvalidationerror__message').distinct()]
+
+        filters['errors'] = [e for e in lot_errors + tx_errors + validation_errors if e]
+
         c1 = [c['carbure_client__name'] for c in txs.values('carbure_client__name').distinct()]
         c2 = [c['unknown_client'] for c in txs.values('unknown_client').distinct()]
         filters['clients'] = sorted([c for c in set(c1 + c2) if c])
@@ -249,6 +255,8 @@ def get_snapshot(request):
         v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
         v2 = [v['unknown_vendor'] for v in txs.values('unknown_vendor').distinct()]
         filters['vendors'] = sorted([v for v in set(v1 + v2) if v])
+
+        filters['added_by'] = [e['lot__added_by__name'] for e in txs.values('lot__added_by__name').distinct()]
 
         filters['delivery_status'] = [{'value':s[0], 'label': s[1]} for s in LotTransaction.DELIVERY_STATUS]
 

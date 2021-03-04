@@ -3,13 +3,7 @@ import cl from "clsx"
 
 import { Box, SystemProps } from "."
 import styles from "./table.module.css"
-import { ChevronRight, IconProps, Upload } from "./icons"
-
-type DownloadLinkProps = { url: string }
-
-export const DownloadLink = ({url}: DownloadLinkProps) => (
-  <span><a href={url}><Upload /></a></span>
-)
+import { ChevronRight, IconProps } from "./icons"
 
 type LineProps = { text: string; small?: boolean; level?: "warning" }
 

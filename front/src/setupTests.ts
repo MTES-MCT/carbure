@@ -3,8 +3,8 @@ import { render as baseRender } from "@testing-library/react"
 import { configure } from "@testing-library/dom"
 
 configure({
-  getElementError(message, container) {
-    const error = new Error(message)
+  getElementError(message) {
+    const error = new Error(message ?? "Error")
     error.name = "TestingLibraryElementError"
     return error
   },
@@ -20,6 +20,9 @@ const notifications = document.createElement("div")
 notifications.setAttribute("id", "notifications")
 
 document.body.append(modal, dropdown, notifications)
+
+// mock window.open (jsdom does not implement it)
+window.open = jest.fn()
 
 export function render(element: any) {
   const root = document.createElement("div")
