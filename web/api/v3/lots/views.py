@@ -8,6 +8,8 @@ from django.db.models.functions import Extract
 from django.db.models.fields import NOT_PROVIDED
 from django import db
 from django.http import JsonResponse, HttpResponse
+from django.db import transaction
+
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment, SustainabilityDeclaration
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
@@ -531,9 +533,10 @@ def delete_all_drafts(request, *args, **kwargs):
             return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
     filtered = drafts.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
     lots = [d.lot for d in filtered]
-    for lot in lots:
-        lot.delete()
-        deleted += 1
+    with transaction.atomic():
+        for lot in lots:
+            lot.delete()
+            deleted += 1
     return JsonResponse({'status': 'success', 'deleted': deleted})
 
 @check_rights('entity_id')
