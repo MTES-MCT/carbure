@@ -31,6 +31,7 @@ rules['BC_NOT_CONFIGURED'] = "Biocarburant non enregistré sur votre Site de Pro
 rules['MISSING_PRODSITE_CERTIFICATE'] = "Aucun certificat n'est associé à ce site de Production"
 rules['UNKNOWN_CLIENT'] = "Le client n'est pas enregistré sur Carbure"
 rules['UNKNOWN_CERTIFICATE'] = "Certificat fournisseur inconnu"
+rules['NOT_ALLOWED'] = "Vous ne pouvez pas ajouter les lots d'un producteur inscrit sur CarbuRe"
 
 
 def raise_warning(lot, rule_triggered, details='', tx=None, show_recipient=True):
@@ -221,6 +222,12 @@ def sanity_check(tx, prefetched_data):
         print(certificate_id in prefetched_data['iscc_certificates'])
         if certificate_id not in prefetched_data['iscc_certificates'] and certificate_id not in prefetched_data['2bs_certificates']:
             errors.append(raise_warning(lot, 'UNKNOWN_CERTIFICATE'))
+
+
+    # check rights
+    if tx.lot.producer_is_in_carbure and tx.lot.added_by != tx.lot.carbure_producer:
+        is_sane = False
+        errors.append(raise_error(lot, 'NOT_ALLOWED'))
     return lot_valid, tx_valid, is_sane, errors
 
 
@@ -240,7 +247,7 @@ def lot_is_valid(lot):
             LotV2Error.objects.update_or_create(lot=lot, field='matiere_premiere_code', value='', error=error)
             is_valid = False
         if lot.producer_is_in_carbure and lot.carbure_production_site is None:
-            error = 'Veuillez préciser le site de production'
+            error = 'Site de production %s inconnu pour %s' % (lot.unknown_production_site, lot.carbure_producer.name)
             LotV2Error.objects.update_or_create(lot=lot, field='carbure_production_site', value='', error=error)
             is_valid = False
         if not lot.producer_is_in_carbure:
