@@ -309,13 +309,13 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
         lot.unknown_production_site = ''
     if 'production_site_country' in lot_row:
         production_site_country = lot_row['production_site_country']
-        if production_site_country is None:
+        if production_site_country is None or production_site_country == '':
             lot.unknown_production_country = None
         else:
             if production_site_country in countries:
                 lot.unknown_production_country = countries[production_site_country]
             else:
-                error = LotV2Error(lot=lot, field='unknown_production_country',
+                error = LotV2Error(lot=lot, field='production_site_country',
                                     error='Champ production_site_country incorrect',
                                     value=production_site_country)
                 lot_errors.append(error)
@@ -327,7 +327,7 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
         lot.unknown_production_site_reference = ''
         if not lot.production_site_is_in_carbure:
             msg = "Veuillez préciser une référence de certificat fournisseur/producteur"
-            error = LotV2Error(lot=lot, field='unknown_production_site_reference',
+            error = LotV2Error(lot=lot, field='production_site_reference',
                                 error=msg,
                                 value='')
             lot_errors.append(error)
@@ -337,7 +337,7 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
             lot.unknown_production_site_com_date = com_date
         except Exception as e:
             msg = "Date de mise en service: veuillez entrer une date au format JJ/MM/AAAA"
-            error = LotV2Error(lot=lot, field='unknown_production_site_com_date',
+            error = LotV2Error(lot=lot, field='production_site_commissioning_date',
                                 error=msg,
                                 value=lot_row['production_site_commissioning_date'])
             lot_errors.append(error)
@@ -522,7 +522,6 @@ def fill_dae_data(lot_row, transaction):
 
 
 def try_get_date(dd):
-    print(dd, type(dd))
     if isinstance(dd, int):
         return datetime.datetime.fromordinal(datetime.datetime(1900, 1, 1).toordinal() + dd - 2)
     if isinstance(dd, datetime.datetime):
