@@ -30,6 +30,7 @@ rules['MP_NOT_CONFIGURED'] = "Matière Première non enregistrée sur votre Site
 rules['BC_NOT_CONFIGURED'] = "Biocarburant non enregistré sur votre Site de Production"
 rules['MISSING_PRODSITE_CERTIFICATE'] = "Aucun certificat n'est associé à ce site de Production"
 rules['UNKNOWN_CLIENT'] = "Le client n'est pas enregistré sur Carbure"
+rules['UNKNOWN_CERTIFICATE'] = "Certificat fournisseur inconnu"
 
 
 def raise_warning(lot, rule_triggered, details='', tx=None, show_recipient=True):
@@ -211,6 +212,13 @@ def sanity_check(tx, prefetched_data):
 
     if not tx.client_is_in_carbure:
         errors.append(raise_warning(lot, 'UNKNOWN_CLIENT', tx=tx))
+
+    # check certificate
+    if not tx.lot.producer_is_in_carbure:
+        # certificate association has not been checked manually by our admins. make sure the certificate exists
+        certificate_id = tx.lot.unknown_production_site_reference
+        if certificate_id not in prefetched_data['iscc_certificates'] or certificate_id not in prefetched_data['2bs_certificates']:
+            errors.append(raise_warning(lot, 'UNKNOWN_CERTIFICATE'))
     return lot_valid, tx_valid, is_sane, errors
 
 
