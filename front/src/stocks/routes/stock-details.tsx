@@ -87,8 +87,11 @@ const StockDetails = ({
         onChange={change}
       />
 
-      {validationErrors.length > 0 && (
-        <ValidationErrors validationErrors={validationErrors} />
+      {(validationErrors.length > 0 || Object.keys(fieldErrors).length > 0) && (
+        <ValidationErrors
+          validationErrors={validationErrors}
+          fieldErrors={fieldErrors}
+        />
       )}
 
       <div className={styles.transactionFormButtons}>

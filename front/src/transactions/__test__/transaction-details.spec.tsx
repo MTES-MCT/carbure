@@ -214,10 +214,12 @@ test("check transaction errors", async () => {
   const mp = screen.getByTitle("Merci de préciser la matière première")
   expect(mp).toHaveClass("errorLabel")
 
-  screen.getByText("Erreurs (1)")
+  screen.getByText("Erreurs (3)")
   screen.getByText(
     "Matière Première incohérente avec le Biocarburant - Biogaz de Blé"
   )
+  screen.getByText("DAE manquant")
+  screen.getByText("Merci de préciser la matière première")
 
   screen.getByText("Remarques (1)")
   screen.getByText("Volume inhabituellement faible.")

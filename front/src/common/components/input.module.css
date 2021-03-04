@@ -85,6 +85,12 @@
   border-color: var(--red-dark);
 }
 
+.errorLabel .input:read-only:not(:disabled),
+.errorLabel .textarea:read-only:not(:disabled) {
+  color: var(--red-dark);
+  border-top-color: var(--red-dark);
+}
+
 /* SEARCH INPUT COMPONENT */
 
 .searchInputWrapper {

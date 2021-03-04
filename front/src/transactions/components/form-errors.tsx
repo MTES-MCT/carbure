@@ -9,19 +9,24 @@ import styles from "./form-errors.module.css"
 
 type ValidationErrorsProps = {
   validationErrors: ValidationError[]
+  fieldErrors: Record<string, string>
 }
 
-const ValidationErrors = ({ validationErrors }: ValidationErrorsProps) => {
+const ValidationErrors = ({
+  validationErrors,
+  fieldErrors,
+}: ValidationErrorsProps) => {
   const errors = validationErrors.filter((e) => e.is_blocking)
+  const ferrors = Object.values(fieldErrors)
   const warnings = validationErrors.filter((e) => e.is_warning && !e.is_blocking) // prettier-ignore
 
   return (
     <React.Fragment>
-      {errors.length > 0 && (
+      {(errors.length > 0 || ferrors.length > 0) && (
         <Collapsible
           icon={AlertOctagon}
           level="error"
-          title={`Erreurs (${errors.length})`}
+          title={`Erreurs (${errors.length + ferrors.length})`}
           className={styles.transactionError}
         >
           <i className={styles.transactionErrorExplanation}>
@@ -30,7 +35,14 @@ const ValidationErrors = ({ validationErrors }: ValidationErrorsProps) => {
           </i>
           <ul className={styles.validationErrors}>
             {errors.map((err, i) => (
-              <li key={i}>{err.error || "Erreur de validation"} { err.details && ` - ${err.details}` }</li>
+              <li key={i}>
+                {err.error || "Erreur de validation"}{" "}
+                {err.details && ` - ${err.details}`}
+              </li>
+            ))}
+
+            {ferrors.map((message) => (
+              <li key={message}>{message}</li>
             ))}
           </ul>
         </Collapsible>
@@ -49,7 +61,10 @@ const ValidationErrors = ({ validationErrors }: ValidationErrorsProps) => {
           </i>
           <ul className={styles.validationErrors}>
             {warnings.map((err, i) => (
-              <li key={i}>{err.error || "Erreur de validation"} { err.details && ` - ${err.details}` }</li>
+              <li key={i}>
+                {err.error || "Erreur de validation"}{" "}
+                {err.details && ` - ${err.details}`}
+              </li>
             ))}
           </ul>
         </Collapsible>
