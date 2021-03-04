@@ -738,6 +738,7 @@ class ControlMessages(models.Model):
         verbose_name = 'Contrôle - Message'
         verbose_name_plural = 'Contrôles - Messages'
 
+
 class SustainabilityDeclaration(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     declared = models.BooleanField(default=False)
@@ -753,3 +754,28 @@ class SustainabilityDeclaration(models.Model):
         db_table = 'declarations'
         verbose_name = ' Déclaration de Durabilité'
         verbose_name_plural = ' Déclarations de Durabilité'
+
+
+class ETBETransformation(models.Model):
+    previous_stock = models.ForeignKey(LotTransaction, null=False, blank=False, on_delete=models.CASCADE, related_name='previous_stock')
+    new_stock = models.ForeignKey(LotTransaction, null=False, blank=False, on_delete=models.CASCADE, related_name='new_stock')
+
+    volume_ethanol = models.FloatField(null=False, blank=False, default=0.0)
+    volume_etbe = models.FloatField(null=False, blank=False, default=0.0)
+    volume_denaturant = models.FloatField(null=False, blank=False, default=0.0)
+    volume_fossile = models.FloatField(null=False, blank=False, default=0.0)
+    volume_pertes = models.FloatField(null=False, blank=False, default=0.0)
+
+    added_by = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
+    added_by_user = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
+    added_time = models.DateTimeField(auto_now_add=True)
+
+
+    def natural_key(self):
+        return {'previous': self.previous_stock.natural_key(), 'new': self.new_stock.natural_key(), 'volume_ethanol': self.volume_ethanol, 'volume_etbe': self.volume_etbe, 'volume_denaturant': self.volume_denaturant, 'volume_fossile': self.volume_pertes, 
+                'added_by': self.added_by.natural_key(), 'added_by_user': self.added_by_user.natural_key(), 'added_time': self.added_time}
+
+    class Meta:
+        db_table = 'etbe_transformations'
+        verbose_name = 'Transformation ETBE'
+        verbose_name_plural = 'Transformations ETBE'
