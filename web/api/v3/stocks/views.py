@@ -2,11 +2,11 @@ import json
 import datetime
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
-from core.models import LotTransaction, ETBETransformation
+from core.models import LotV2, LotTransaction, ETBETransformation
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, LotV2, Depot
 from core.decorators import check_rights
 from core.common import get_prefetched_data, load_mb_lot, bulk_insert
-from core.common import load_excel_file, send_lot_from_stock
+from core.common import load_excel_file, send_lot_from_stock, generate_carbure_id
 from core.xlsx_v3 import template_stock, template_stock_bcghg
 from core.xlsx_v3 import export_stocks
 from django_otp.decorators import otp_required
@@ -381,22 +381,19 @@ def convert_to_etbe(request, *args, **kwargs):
     # retrieve stock line
     previous_stock_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status='A', id=previous_stock_tx_id)
     # check if source TX is Ethanol
-    if previous_stock_tx.lot.matiere_premiere.code != 'ETH':
+    if previous_stock_tx.lot.biocarburant.code != 'ETH':   
         return JsonResponse({'status': 'error', 'message': 'Only ETH can be converted to ETBE'}, status=400)
 
 
-    source_lot = previous_stock_tx.lot
-    new_lot = previous_stock_tx.lot
-
-
-    # create the new lot
+    previous_lot_id = previous_stock_tx.lot.pk
+    new_lot = LotV2.objects.get(pk=previous_lot_id)
+    # new_lot = previous_stock_tx.lot
     new_lot.pk = None
-    new_lot.parent_lot = source_lot
     new_lot.added_by = entity
-    new_lot.data_origin_entity = source_lot.parent_lot.data_origin_entity
+    new_lot.data_origin_entity    
     new_lot.added_by_user = request.user
-    new_lot.status = 'Draft'
-    new_lot.carbure_id = ''
+    new_lot.save()
+    new_lot.carbure_id = generate_carbure_id(new_lot)
     new_lot.is_transformed = True
     new_lot.source = 'MANUAL'
     new_lot.biocarburant = etbe
@@ -413,18 +410,20 @@ def convert_to_etbe(request, *args, **kwargs):
 
 
 
-    # ensure volume etbe = volume ethanol - pertes
-    if volume_etbe + volume_pertes != volume_ethanol:
+    # ensure volume etbe = sum of other volume
+    if volume_etbe != volume_ethanol + volume_fossile + volume_denaturant + volume_pertes:
         return JsonResponse({'status': 'error', 'message': 'Volumes ETBE != Volume Ethanol + Pertes'}, status=400)
 
     # check available volume
-    if source_lot.volume < volume_ethanol:
+    if previous_stock_tx.lot.volume < volume_ethanol:
         return JsonResponse({'status': 'error', 'message': 'Cannot convert more ETH than stock'}, status=400)
 
+    previous_stock_tx.lot.volume -= volume_ethanol
+    previous_stock_tx.lot.save()
+
     new_lot.volume = volume_etbe
+    new_lot.parent_lot = LotV2.objects.get(pk=previous_lot_id)
     new_lot.save()
-    source_lot.volume -= volume_ethanol
-    source_lot.save()
 
     # create transaction
     transaction = previous_stock_tx

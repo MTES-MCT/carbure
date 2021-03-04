@@ -9,20 +9,32 @@ import { useRelativePush } from "common/components/relative-route"
 
 import Table, { Actions, arrow, Column, Row } from "common/components/table"
 import * as C from "transactions/components/list-columns"
-import { Edit } from "common/components/icons"
+import { Edit, Flask } from "common/components/icons"
 import { LotSender } from "stocks/hooks/use-send-lots"
 
 type A = Record<string, (id: number) => void>
 type CT = Column<Transaction>
 
-const getStockActions = ({ createDrafts }: A): CT =>
-  Actions([
-    {
-      icon: Edit,
-      title: "Préparer l'envoi",
-      action: (tx) => createDrafts(tx.id),
-    },
-  ])
+const getStockActions = ({ createDrafts, convertETBE }: A): CT =>
+  Actions((tx: Transaction) => {
+    const actions = [
+      {
+        icon: Edit,
+        title: "Préparer l'envoi",
+        action: (tx: Transaction) => createDrafts(tx.id),
+      }
+    ]
+
+    if (tx.lot.biocarburant.code === 'ETH') {
+      actions.push({
+        icon: Flask,
+        title: "Convertir en ETBE",
+        action: (tx: Transaction) => convertETBE(tx.id),
+      })
+    }
+    return actions
+  })
+
 
 type StockTableProps = {
   stock: Lots | null
@@ -43,6 +55,7 @@ export const StockTable = ({
 }: StockTableProps) => {
   const relativePush = useRelativePush()
   const createDrafts = sender.createDrafts
+  const convertETBE = sender.convertETBE
 
   const columns = []
 
@@ -77,7 +90,7 @@ export const StockTable = ({
   }
 
   if (status.is(LotStatus.Stock)) {
-    columns.push(getStockActions({ createDrafts }))
+    columns.push(getStockActions({ createDrafts, convertETBE }))
   }
 
   if (stock === null) {

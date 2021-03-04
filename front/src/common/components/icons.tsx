@@ -252,3 +252,11 @@ export const Bell = ({ className, ...props }: IconProps) => (
     <path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727" />
   </Icon>
 )
+
+export const Flask = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-bell", className)}>
+    <line x1="9" y1="3" x2="15" y2="3" />
+    <line x1="10" y1="9" x2="14" y2="9" />
+    <path d="M10 3v6l-4 11a0.7 .7 0 0 0 .5 1h11a0.7 .7 0 0 0 .5 -1l-4 -11v-6" />
+  </Icon>
+)
