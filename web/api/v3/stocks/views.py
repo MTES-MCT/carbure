@@ -363,13 +363,13 @@ def convert_to_etbe(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
 
-    source_tx = request.POST.get('tx_id', False)
+    source_tx_id = request.POST.get('tx_id', False)
     volume = request.POST.get('volume', False)
     volume_fossile = request.POST.get('volume_fossile', False)
     volume_denaturant = request.POST.get('volume_denaturant', False)
     volume_pertes = request.POST.get('volume_pertes', 0)
 
-    if not source_tx:
+    if not source_tx_id:
         return JsonResponse({'status': 'error', 'message': 'Missing source_tx id'}, status=400)
     if not volume:
         return JsonResponse({'status': 'error', 'message': 'Missing volume'}, status=400)
@@ -381,11 +381,12 @@ def convert_to_etbe(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Missing volume_pertes'}, status=400)
 
     # retrieve stock line
-    source_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status='A', id=tx_id)
+    source_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status='A', id=source_tx_id)
     # check if source TX is Ethanol
     if source_tx.lot.matiere_premiere.code != 'ETH':
         return JsonResponse({'status': 'error', 'message': 'Only ETH can be converted to ETBE'}, status=400)
 
+    etbe = Biocarburant.objects.get(code='ETBE')
 
     source_lot = source_tx.lot
     lot = source_tx.lot
@@ -399,6 +400,7 @@ def convert_to_etbe(request, *args, **kwargs):
     lot.carbure_id = ''
     lot.is_transformed = True
     lot.source = 'MANUAL'
+    lot.biocarburant = etbe
 
     try:
         volume = float(volume)
@@ -424,7 +426,7 @@ def convert_to_etbe(request, *args, **kwargs):
     # check available volume
     if source_lot.volume > volume:
         return JsonResponse({'status': 'error', 'message': 'Cannot convert more ETH than stock'}, status=400)
-    source_lot.volume -= volume
+    source_lot.volume -= (volume + volume_pertes)
     source_lot.save()
     lot.save()
     transaction.save()
