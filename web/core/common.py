@@ -240,16 +240,9 @@ def fill_producer_info(entity, lot_row, lot, prefetched_data):
         else:
             # it's not me. do we know this producer ?
             if lot_row['producer'] in all_producers:
-                # yes we do
-                # in this case, the producer should declare its production directly in Carbure
-                # we cannot allow someone else to declare for them
-                lot.producer_is_in_carbure = False
-                lot.carbure_producer = None
+                lot.producer_is_in_carbure = True
+                lot.carbure_producer = all_producers[lot_row['producer']]
                 lot.unknown_producer = ''
-                error = LotV2Error(lot=lot, field='carbure_producer',
-                                   error="Vous ne pouvez pas déclarer des lots d'un producteur déjà inscrit sur Carbure",
-                                   value=lot_row['producer'])
-                lot_errors.append(error)
             else:
                 # ok, unknown producer. allow importation
                 lot.producer_is_in_carbure = False
@@ -280,29 +273,15 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
     countries = prefetched_data['countries']
     if 'production_site' in lot_row:
         production_site = lot_row['production_site']
-        if lot.producer_is_in_carbure:
-            if production_site in my_production_sites:
-                lot.carbure_production_site = my_production_sites[production_site]
-                lot.production_site_is_in_carbure = True
-                lot.unknown_production_site = ''
-            else:
-                # do not allow the use of an unknown production site if the producer is registered in Carbure
-                lot.carbure_production_site = None
-                lot.production_site_is_in_carbure = False
-                lot.unknown_production_site = ''
-                error = LotV2Error(lot=lot, field='production_site',
-                                   error='Site de production %s inconnu pour %s' % (production_site, lot.carbure_producer.name),
-                                   value=production_site)
-                lot_errors.append(error)
+        if production_site in my_production_sites:
+            lot.production_site_is_in_carbure = True
+            lot.carbure_production_site = my_production_sites[production_site]
+            lot.unknown_production_site = ''
         else:
-            # producer not in carbure
-            # accept any value
+            # do not allow the use of an unknown production site if the producer is registered in Carbure
             lot.production_site_is_in_carbure = False
             lot.carbure_production_site = None
-            if production_site is not None:
-                lot.unknown_production_site = production_site
-            else:
-                lot.unknown_production_site = ''
+            lot.unknown_production_site = production_site
     else:
         lot.production_site_is_in_carbure = False
         lot.carbure_production_site = None
