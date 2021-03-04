@@ -150,8 +150,8 @@ def get_prefetched_data(entity=None):
         d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
     d['depots'] = {d.depot_id.lstrip('0'): d for d in Depot.objects.all()}
     d['clients'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
-    d['iscc_certificates'] = {c.certificate_id: c for c in ISCCCertificate.objects.filter(valid_until__gte=lastyear)}
-    d['2bs_certificates'] = {c.certificate_id: c for c in DBSCertificate.objects.filter(valid_until__gte=lastyear)}
+    d['iscc_certificates'] = {c.certificate_id.upper(): c for c in ISCCCertificate.objects.filter(valid_until__gte=lastyear)}
+    d['2bs_certificates'] = {c.certificate_id.upper(): c for c in DBSCertificate.objects.filter(valid_until__gte=lastyear)}
     return d
 
 
@@ -522,6 +522,9 @@ def fill_dae_data(lot_row, transaction):
 
 
 def try_get_date(dd):
+    print(dd, type(dd))
+    if isinstance(dd, int):
+        return datetime.datetime.fromordinal(datetime.datetime(1900, 1, 1).toordinal() + dd - 2)
     if isinstance(dd, datetime.datetime):
         return dd.date()
     if isinstance(dd, datetime.date):
