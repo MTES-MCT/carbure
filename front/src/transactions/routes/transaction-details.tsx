@@ -72,6 +72,9 @@ const TransactionDetails = ({
   const isEditable = EDITABLE.includes(status)
   const isCommentable = COMMENTABLE.includes(status)
 
+  const hasErrors =
+    validationErrors.length > 0 || Object.keys(fieldErrors).length > 0
+
   async function run(
     action: (i: number) => Promise<boolean>,
     closeOnDone: boolean = false
@@ -114,8 +117,11 @@ const TransactionDetails = ({
         onChange={change}
       />
 
-      {validationErrors.length > 0 && (
-        <ValidationErrors validationErrors={validationErrors} />
+      {hasErrors && (
+        <ValidationErrors
+          validationErrors={validationErrors}
+          fieldErrors={fieldErrors}
+        />
       )}
 
       {details.data && details.data.comments.length > 0 && (
