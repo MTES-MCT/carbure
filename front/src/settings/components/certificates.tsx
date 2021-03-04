@@ -12,13 +12,7 @@ import { Alert } from "common/components/alert"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import { DialogButtons, PromptFormProps } from "common/components/dialog"
 import { LabelAutoComplete } from "common/components/autocomplete"
-import Table, {
-  Actions,
-  Column,
-  Line,
-  DownloadLink,
-  arrow,
-} from "common/components/table"
+import Table, { Actions, Column, Line, arrow } from "common/components/table"
 import { ExpirationDate, SettingsForm } from "./common"
 import { padding } from "transactions/components/list-columns"
 import { DBSCertificateSettingsHook } from "settings/hooks/use-2bs-certificates"
@@ -69,10 +63,6 @@ const COLUMNS: Column<Certificate>[] = [
   { header: "ID", render: (c) => <Line text={c.certificate_id} /> },
   { header: "Détenteur", render: (c) => <Line text={c.certificate_holder} /> },
   { header: "Périmètre", render: (c) => <Line text={c.scope.join(", ")} /> },
-  {
-    header: "Téléchargement",
-    render: (c) => <DownloadLink url={c.download_link} />,
-  },
 ]
 
 type CertificateSettingsProps = {
@@ -123,6 +113,7 @@ export const CertificateSettings = ({
   const rows = certificates.map((c) => ({
     value: c,
     className: cl(c.has_been_updated && styles.expiredRow),
+    onClick: () => window.open && window.open(c.download_link),
   }))
 
   return (
