@@ -548,7 +548,7 @@ def fill_delivery_date(lot_row, lot, transaction):
                 transaction.delivery_date = dd
                 lot.period = dd.strftime('%Y-%m')
         except Exception as e:
-            transaction.delivery_date = None
+            transaction.delivery_date = today
             lot.period = today.strftime('%Y-%m')
             msg = "Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA (%s)" % (lot_row['delivery_date'])
             tx_errors.append(TransactionError(tx=transaction, field='delivery_date', error=msg, value=lot_row['delivery_date']))
