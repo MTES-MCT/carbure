@@ -121,3 +121,15 @@ export function sendAllDraftFromStock(entityID: number) {
     entity_id: entityID,
   })
 }
+
+export function convertToETBE(entityID: number, previous_stock_tx_id: number, volume_ethanol: number, volume_etbe: number, volume_fossile: number, volume_denaturant: number, volume_pertes: number) {
+  return api.post("/stocks/convert-to-etbe", {
+    entity_id: entityID,
+    previous_stock_tx_id,
+    volume_ethanol,
+    volume_etbe,
+    volume_fossile,
+    volume_denaturant,
+    volume_pertes
+  })
+}

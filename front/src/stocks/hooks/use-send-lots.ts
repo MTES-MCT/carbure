@@ -1,13 +1,14 @@
 import { EntitySelection } from "carbure/hooks/use-entity"
 
 import * as api from "stocks/api"
-import useAPI from "../../common/hooks/use-api"
-import { confirm } from "../../common/components/dialog"
-import { prompt } from "../../common/components/dialog"
+import useAPI from "common/hooks/use-api"
+import { confirm } from "common/components/dialog"
+import { prompt } from "common/components/dialog"
 import { StockSendLotPrompt } from "stocks/components/send-form"
-import { useNotificationContext } from "../../common/components/notifications"
-import { TransactionSelection } from "../../transactions/hooks/query/use-selection"
-import { StockDraft } from "../../common/types"
+import { ConvertETBEPrompt } from 'stocks/components/convert-etbe-form'
+import { useNotificationContext } from "common/components/notifications"
+import { TransactionSelection } from "transactions/hooks/query/use-selection"
+import { StockDraft } from "common/types"
 import { StockDraftActions } from "stocks/components/list-actions"
 
 export interface LotSender {
@@ -16,6 +17,7 @@ export interface LotSender {
   sendAllDrafts: () => Promise<boolean>
   sendSelection: () => Promise<boolean>
   sendLot: (l: number) => Promise<boolean>
+  convertETBE: (l: number) => Promise<boolean>
 }
 
 export default function useSendLot(
@@ -27,6 +29,7 @@ export default function useSendLot(
   const [requestCreate, resolveCreate] = useAPI(api.createDraftsFromStock)
   const [requestSend, resolveSend] = useAPI(api.sendDraftsFromStock)
   const [requestSendAll, resolveSendAll] = useAPI(api.sendAllDraftFromStock)
+  const [requestETBE, resolveETBE] = useAPI(api.convertToETBE)
 
   async function notifyCreated(promise: Promise<any>, many: boolean = false) {
     const res = await promise
@@ -140,12 +143,35 @@ export default function useSendLot(
     return shouldSend
   }
 
+  async function convertETBE(txID: number) {
+    const sent = await prompt(
+      "Conversion ETBE",
+      "Veuillez préciser les détails du lot transformé",
+      ConvertETBEPrompt
+    )
+
+    if (entity !== null && sent) {
+      notifyCreated(resolveETBE(
+        entity.id, 
+        txID, 
+        sent.volume_ethanol, 
+        sent.volume_etbe, 
+        sent.volume_fossile, 
+        sent.volume_denaturant, 
+        sent.volume_pertes
+      ))
+    }
+
+    return Boolean(sent)
+  }
+
   return {
     loading:
-      requestCreate.loading || requestSend.loading || requestSendAll.loading,
+      requestCreate.loading || requestSend.loading || requestSendAll.loading || requestETBE.loading,
     createDrafts,
     sendSelection,
     sendAllDrafts,
     sendLot,
+    convertETBE
   }
 }

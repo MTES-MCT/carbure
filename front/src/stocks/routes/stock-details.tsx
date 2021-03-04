@@ -12,7 +12,7 @@ import styles from "transactions/components/form.module.css"
 
 import useStockDetails from "../hooks/use-stock-details"
 import Modal from "common/components/modal"
-import { Check, Cross, Edit, Return, Save } from "common/components/icons"
+import { Check, Cross, Edit, Return, Save, Flask } from "common/components/icons"
 import { LoaderOverlay } from "common/components"
 import { AsyncButton, Button } from "common/components/button"
 import TransactionForm from "transactions/components/form"
@@ -136,6 +136,16 @@ const StockDetails = ({
             >
               Préparer l'envoi
             </AsyncButton>
+            {form.biocarburant?.code === 'ETH' && (
+              <AsyncButton
+                icon={Flask}
+                level="danger"
+                loading={acceptor.loading}
+                onClick={() => run(sender.convertETBE, true)}
+              >
+                Convertir en ETBE
+              </AsyncButton>
+            )}
           </React.Fragment>
         )}
 
