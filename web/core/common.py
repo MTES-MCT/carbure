@@ -786,7 +786,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
     prefetched_data = get_prefetched_data(entity)
 
     try:
-        wb = openpyxl.load_workbook(file)
+        wb = openpyxl.load_workbook(file, data_only=True)
         sheet = wb.worksheets[0]
         data = get_sheet_data(sheet, convert_float=True)
         column_names = data[0]
