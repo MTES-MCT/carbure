@@ -149,7 +149,7 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
         </Route>
 
         <Route relative path="show-summary-out-drafts">
-          <TransactionOutSummary entity={entity} lot_status={LotStatus.Draft} period={null} delivery_status={['N']} stock='true' />
+          <TransactionOutSummary entity={entity} lot_status={LotStatus.Draft} period={null} delivery_status={['N']} stock={true} />
         </Route>
 
         <Route relative path="send-complex">
