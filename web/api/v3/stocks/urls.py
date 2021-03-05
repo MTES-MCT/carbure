@@ -5,6 +5,7 @@ urlpatterns = [
     # GET
     path('', views.get_stocks, name='api-v3-stocks-get'),
     path('snapshot', views.get_snapshot, name='api-v3-stocks-get-snapshot'),
+    path('depots', views.get_depots, name='api-v3-stocks-get-depots'),
 
     # POST
     path('generate-batch', views.generate_batch, name='api-v3-stocks-generate-batch'),

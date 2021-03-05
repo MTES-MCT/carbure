@@ -163,6 +163,21 @@ def get_snapshot(request, *args, **kwargs):
 
 
 @check_rights('entity_id')
+def get_depots(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    biocarburant_code = request.GET.get('biocarburant_code', False)
+
+    # return list of depots that have a stock
+    stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0)
+    if biocarburant_code:
+        stock = stock.filter(lot__biocarburant__code=biocarburant_code)
+
+    depots = sorted(list(set([s.carbure_delivery_site.name if s.carbure_delivery_site else s.unknown_delivery_site for s in stock])))
+    return JsonResponse({'status': 'success', 'data': depots})
+
+
+@check_rights('entity_id')
 def create_drafts(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = request.POST.get('entity_id', False)
@@ -357,32 +372,20 @@ def send_all_drafts(request, *args, **kwargs):
             send_errors.append(errors)
     return JsonResponse({'status': 'success', 'data': send_errors})
 
-
-@check_rights('entity_id')
-def convert_to_etbe(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
+def convert_eth_stock_to_etbe(request, entity, c):
+    previous_stock_tx_id = c['previous_stock_tx_id']
+    volume_ethanol = c['volume_ethanol']
+    volume_etbe = c['volume_etbe']
+    volume_fossile = c['volume_fossile']
+    volume_denaturant = c['volume_denaturant']
+    volume_pertes = c['volume_pertes']
     etbe = Biocarburant.objects.get(code='ETBE')
-
-    previous_stock_tx_id = request.POST.get('previous_stock_tx_id', False)
-    volume_ethanol = request.POST.get('volume_ethanol', False)
-    volume_etbe = request.POST.get('volume_etbe', False)
-    volume_fossile = request.POST.get('volume_fossile', 0)
-    volume_denaturant = request.POST.get('volume_denaturant', 0)
-    volume_pertes = request.POST.get('volume_pertes', 0)
-
-    if not previous_stock_tx_id:
-        return JsonResponse({'status': 'error', 'message': 'Missing source_tx id'}, status=400)
-    if not volume_ethanol:
-        return JsonResponse({'status': 'error', 'message': 'Missing volume_ethanol'}, status=400)
-    if not volume_etbe:
-        return JsonResponse({'status': 'error', 'message': 'Missing volume_etbe'}, status=400)
 
     # retrieve stock line
     previous_stock_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status='A', id=previous_stock_tx_id)
     # check if source TX is Ethanol
-    if previous_stock_tx.lot.biocarburant.code != 'ETH':   
-        return JsonResponse({'status': 'error', 'message': 'Only ETH can be converted to ETBE'}, status=400)
+    if previous_stock_tx.lot.biocarburant.code != 'ETH': 
+        raise Exception("Only ETH can be converted to ETBE") 
 
 
     previous_lot_id = previous_stock_tx.lot.pk
@@ -398,25 +401,20 @@ def convert_to_etbe(request, *args, **kwargs):
     new_lot.source = 'MANUAL'
     new_lot.biocarburant = etbe
 
-    try:
-        volume_ethanol = float(volume_ethanol)
-        volume_etbe = float(volume_etbe)
-        volume_denaturant = float(volume_denaturant)
-        volume_fossile = float(volume_fossile)
-        volume_pertes = float(volume_pertes)
-    except Exception as e:
-        print(e)
-        return JsonResponse({'status': 'error', 'message': 'Volumes: format incorrect'}, status=400)
-
-
+    volume_ethanol = float(volume_ethanol)
+    volume_etbe = float(volume_etbe)
+    volume_denaturant = float(volume_denaturant)
+    volume_fossile = float(volume_fossile)
+    volume_pertes = float(volume_pertes)
+    
 
     # ensure volume etbe = sum of other volume
     if volume_etbe != volume_ethanol + volume_fossile + volume_denaturant + volume_pertes:
-        return JsonResponse({'status': 'error', 'message': 'Volumes ETBE != Volume Ethanol + Pertes'}, status=400)
+        raise Exception("Volumes ETBE != Volume Ethanol + Pertes")
 
     # check available volume
     if previous_stock_tx.lot.volume < volume_ethanol:
-        return JsonResponse({'status': 'error', 'message': 'Cannot convert more ETH than stock'}, status=400)
+        raise Exception("Cannot convert more ETH than stock") 
 
     previous_stock_tx.lot.volume -= volume_ethanol
     previous_stock_tx.lot.save()
@@ -446,7 +444,29 @@ def convert_to_etbe(request, *args, **kwargs):
     t.volume_pertes = volume_pertes
     t.added_by = entity
     t.added_by_user = request.user
-    t.save()
+    t.save()    
+
+
+@check_rights('entity_id')
+def convert_to_etbe(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+
+    conversions = request.POST.get('conversions', False)
+    if not conversions:
+        return JsonResponse({'status': 'error', 'message': 'Missing conversions'}, status=400)
+
+    try:
+        cs = json.loads(conversions)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': 'Could not deserialize POST data'}, status=400)
+
+    for c in cs:
+        try:
+            convert_eth_stock_to_etbe(request, entity, c)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
     return JsonResponse({'status': 'success'})
 
 
