@@ -11,7 +11,7 @@ import { LotStatus } from "common/types"
 type TransactionInSummaryProps = {
   entity: EntitySelection
   lot_status: LotStatus
-  period: string
+  period: string | null
   delivery_status: string[]
 }
 
