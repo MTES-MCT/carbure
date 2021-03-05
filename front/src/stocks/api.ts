@@ -1,5 +1,6 @@
 import { FilterSelection } from "transactions/hooks/query/use-filters"
 import {
+  ConvertETBE,
   Lots,
   LotStatus,
   StockDraft,
@@ -61,17 +62,17 @@ export function getStocks(
   entityID: number | undefined,
   filters: FilterSelection["selected"],
   status: string,
-  page: number,
-  limit: number,
-  query: string,
-  sortBy: string,
-  order: string
+  page: number = 0,
+  limit: number | null = null,
+  query: string = "",
+  sortBy: string = "",
+  order: string = ""
 ): Promise<Lots> {
   return api.get("/stocks", {
     ...filters,
     status,
     entity_id: entityID ?? null,
-    from_idx: page * limit,
+    from_idx: page * (limit ?? 1),
     sort_by: sortBy,
     limit,
     query,
@@ -98,7 +99,6 @@ export function downloadStocks(
   })
 }
 
-
 export function createDraftsFromStock(entity_id: number, drafts: StockDraft[]) {
   return api.post("/stocks/create-drafts", {
     entity_id,
@@ -122,15 +122,10 @@ export function sendAllDraftFromStock(entityID: number) {
   })
 }
 
-export function convertToETBE(entityID: number, previous_stock_tx_id: number, volume_ethanol: number, volume_etbe: number, volume_fossile: number, volume_denaturant: number, volume_pertes: number) {
+export function convertToETBE(entityID: number, conversions: ConvertETBE[]) {
   return api.post("/stocks/convert-to-etbe", {
     entity_id: entityID,
-    previous_stock_tx_id,
-    volume_ethanol,
-    volume_etbe,
-    volume_fossile,
-    volume_denaturant,
-    volume_pertes
+    conversions: JSON.stringify(conversions),
   })
 }
 
@@ -138,4 +133,13 @@ export function sendStockComplex(entityID: number) {
   return api.post("/stocks/send-complex", {
     entity_id: entityID,
   })
+}
+
+export function getDepots(
+  entity_id: number,
+  biocarburant_code: string
+): Promise<string[]> {
+  return api
+    .get("/stocks/depots", { entity_id, biocarburant_code })
+    .then((depots) => depots.map(toOption))
 }

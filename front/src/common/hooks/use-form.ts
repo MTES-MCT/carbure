@@ -11,7 +11,7 @@ function parseValue(element: FormFields) {
     return element.checked
   } else if (element.type === "number") {
     const parsed = parseFloat(element.value)
-    return isNaN(parsed) ? "" : parsed
+    return isNaN(parsed) ? 0 : parsed
   } else {
     return element.value
   }
