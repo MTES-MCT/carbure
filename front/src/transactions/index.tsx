@@ -245,15 +245,15 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         </Route>
 
         <Route relative path="show-summary-out">
-          <TransactionOutSummary entity={entity} lot_status={LotStatus.Validated} period={null} delivery_status={['A']} />
+          <TransactionOutSummary entity={entity} lot_status={LotStatus.Validated} period={null} delivery_status={['A']} stock={false} />
         </Route>
 
         <Route relative path="show-summary-out-pending">
-          <TransactionOutSummary entity={entity} lot_status={LotStatus.Validated} period={null} delivery_status={['AC', 'AA', 'N']} />
+          <TransactionOutSummary entity={entity} lot_status={LotStatus.Validated} period={null} delivery_status={['AC', 'AA', 'N']} stock={false} />
         </Route>
 
         <Route relative path="show-summary-out-drafts">
-          <TransactionOutSummary entity={entity} lot_status={LotStatus.Draft} period={null} delivery_status={['N']} />
+          <TransactionOutSummary entity={entity} lot_status={LotStatus.Draft} period={null} delivery_status={['N']} stock={false} />
         </Route>
 
         <Route relative path=":id">

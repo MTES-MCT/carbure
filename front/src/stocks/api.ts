@@ -133,3 +133,9 @@ export function convertToETBE(entityID: number, previous_stock_tx_id: number, vo
     volume_pertes
   })
 }
+
+export function sendStockComplex(entityID: number) {
+  return api.post("/stocks/send-complex", {
+    entity_id: entityID,
+  })
+}
