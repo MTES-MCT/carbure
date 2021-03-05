@@ -56,6 +56,11 @@ export const period: (d: string) => Column<Transaction> = (deadline) => ({
   ),
 })
 
+export const periodSimple: Column<Transaction> = {
+  header: "Période",
+  render: (tx) => <Line text={tx.lot.period} />,
+}
+
 export const dae: Column<Transaction> = {
   header: "N° Douane",
   render: (tx) => <Line text={tx.dae} />,

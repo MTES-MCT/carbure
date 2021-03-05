@@ -13,10 +13,11 @@ type TransactionOutSummaryProps = {
   lot_status: LotStatus
   period: string
   delivery_status: string[]
+  stock: boolean
 }
 
-const TransactionOutSummary = ({ entity, lot_status, period, delivery_status }: TransactionOutSummaryProps) => {
-  const { request, close } = useTransactionOutSummary(entity, lot_status, period, delivery_status)
+const TransactionOutSummary = ({ entity, lot_status, period, delivery_status, stock }: TransactionOutSummaryProps) => {
+  const { request, close } = useTransactionOutSummary(entity, lot_status, period, delivery_status, stock)
 
   return (
     <Modal onClose={close}>

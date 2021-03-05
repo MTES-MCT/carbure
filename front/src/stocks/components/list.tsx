@@ -33,6 +33,8 @@ import {
 import { StockTable } from "./list-table"
 
 import styles from "./list.module.css"
+import { OutDraftsSummaryActions } from "transactions/components/list-actions"
+import { InboxPendingSummaryActions } from "transactions/components/list-actions"
 
 type StockListProps = {
   stock: StockHook
@@ -81,6 +83,15 @@ export const StockList = ({
             isEmpty={isEmpty}
             onExportAll={stock.exportAllTransactions}
           />
+
+
+          {status.is(LotStatus.ToSend) && (
+            <OutDraftsSummaryActions />
+          )}
+
+          {status.is(LotStatus.Inbox) && (
+            <InboxPendingSummaryActions />
+          )}
 
           {status.is(LotStatus.ToSend) && (
             <StockImportActions uploader={uploader} />
