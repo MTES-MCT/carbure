@@ -29,6 +29,7 @@ import TransactionFilters from "transactions/components/list-filters"
 
 import StockDetails from "./routes/stock-details"
 import StockInSummary from "./routes/stock-in-summary"
+import StockOutSummary from "./routes/stock-in-summary"
 import StockSendComplex from "./routes/stock-send-complex"
 
 const FILTERS = [
@@ -144,6 +145,10 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
       <Switch>
         <Route relative path="show-summary-in">
           <StockInSummary entity={entity} />
+        </Route>
+
+        <Route relative path="show-summary-out">
+          <StockOutSummary entity={entity} />
         </Route>
 
         <Route relative path="send-complex">

@@ -276,9 +276,12 @@ export function rejectAllInboxLots(
   })
 }
 
-export function getLotsOutSummary(entityID: number) {
+export function getLotsOutSummary(entityID: number, lot_status: LotStatus, period: string, delivery_status: string[]) {
   return api.get("/lots/summary-out", {
     entity_id: entityID,
+    lot_status,
+    period,
+    delivery_status,
   })
 }
 
