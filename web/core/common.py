@@ -586,6 +586,12 @@ def fill_vendor_data(entity, lot_row, transaction):
             transaction.vendor_is_in_carbure = False
             transaction.carbure_vendor = None
             transaction.unknown_vendor = ''
+    if 'supplier_reference' in lot_row:
+        transaction.vendor_certificate = lot_row['supplier_reference']
+    elif 'production_site_reference' in lot_row:
+        transaction.vendor_certificate = lot_row['production_site_reference']
+    else:
+        pass
     return tx_errors
 
 def fill_delivery_site_data(lot_row, transaction, prefetched_data):

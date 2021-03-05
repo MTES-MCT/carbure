@@ -33,7 +33,8 @@ import {
   OperatorImportActions,
   ExportActions,
   InboxActions,
-  InboxSummaryActions,
+  InboxPendingSummaryActions,
+  InboxValidatedSummaryActions,
   InboxDraftsSummaryActions,
   OutPendingSummaryActions,
   OutValidatedSummaryActions,
@@ -114,8 +115,16 @@ export const TransactionList = ({
             onExportAll={transactions.exportAllTransactions}
           />
 
-          {status.is(LotStatus.Inbox) && (
-            <InboxSummaryActions />
+          {isOperator && status.is(LotStatus.Draft) && (
+            <InboxDraftsSummaryActions />
+          )}
+
+          {isOperator && status.is(LotStatus.Inbox) && (
+            <InboxPendingSummaryActions />
+          )}
+
+          {isOperator && status.is(LotStatus.Accepted) && (
+            <InboxValidatedSummaryActions />
           )}
 
           {(isProducer || isTrader) && status.is(LotStatus.Draft) && (

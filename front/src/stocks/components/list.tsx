@@ -23,7 +23,6 @@ import {
   ActionBar,
   ExportActions,
   InboxActions,
-  InboxSummaryActions,
 } from "transactions/components/list-actions"
 
 import {
@@ -82,8 +81,6 @@ export const StockList = ({
             isEmpty={isEmpty}
             onExportAll={stock.exportAllTransactions}
           />
-
-          {status.is(LotStatus.Inbox) && <InboxSummaryActions />}
 
           {status.is(LotStatus.ToSend) && (
             <StockImportActions uploader={uploader} />
