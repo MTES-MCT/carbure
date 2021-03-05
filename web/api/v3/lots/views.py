@@ -130,8 +130,21 @@ def get_summary_in(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
     
+    period = request.GET.get('period', False)
+    lot_status = request.GET.get('lot_status', False)
+    delivery_status = request.GET.getlist('delivery_status', False)
+
+    if not period:
+        period = datetime.date.today().strftime('%Y-%m')
+
+    if not lot_status:
+        return JsonResponse({'status': 'error', 'message': "Missing lot status"}, status=400)
+
+    if not delivery_status:
+        return JsonResponse({'status': 'error', 'message': "Missing delivery status"}, status=400)
+
     # get my pending incoming lots
-    txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AA', 'AC'])
+    txs = LotTransaction.objects.filter(carbure_client=entity, lot__status=lot_status, lot__period=period, delivery_status__in=delivery_status)
 
     # group / summary
     data = {}
@@ -139,13 +152,18 @@ def get_summary_in(request, *args, **kwargs):
         delivery_site = t.carbure_delivery_site.name if t.delivery_site_is_in_carbure and t.carbure_delivery_site else t.unknown_delivery_site
         if delivery_site not in data:
             data[delivery_site] = {}
-        if t.carbure_vendor.name not in data[delivery_site]:
-            data[delivery_site][t.carbure_vendor.name] = {}
-        if t.lot.biocarburant.name not in data[delivery_site][t.carbure_vendor.name]:
-            data[delivery_site][t.carbure_vendor.name][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0}
-        line = data[delivery_site][t.carbure_vendor.name][t.lot.biocarburant.name]
-        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
-                                     t.lot.volume * t.lot.ghg_reduction) / (line['volume'] + t.lot.volume)
+        supplier = t.carbure_vendor.name if t.carbure_vendor else t.unknown_vendor
+        if supplier == '':
+            supplier = t.vendor_certificate
+        if supplier not in data[delivery_site]:
+            data[delivery_site][supplier] = {}
+        if t.lot.biocarburant.name not in data[delivery_site][supplier]:
+            data[delivery_site][supplier][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0}
+        line = data[delivery_site][supplier][t.lot.biocarburant.name]
+        total_volume = line['volume'] + t.lot.volume
+        current_avg_ghg = line['volume'] * line['avg_ghg_reduction']
+        lot_avg_ghg = t.lot.volume * t.lot.ghg_reduction
+        line['avg_ghg_reduction'] = (current_avg_ghg + lot_avg_ghg) / (total_volume)
         line['volume'] += t.lot.volume
     return JsonResponse({'status': 'success', 'data': data})
 

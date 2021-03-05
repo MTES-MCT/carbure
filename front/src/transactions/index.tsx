@@ -233,7 +233,15 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         </Route>
 
         <Route relative path="show-summary-in">
-          <TransactionInSummary entity={entity} />
+          <TransactionInSummary entity={entity} lot_status='Validated' delivery_status={['A']} />
+        </Route>
+
+        <Route relative path="show-summary-in-pending">
+          <TransactionInSummary entity={entity} lot_status='Validated' delivery_status={['AC', 'AA', 'N']} />
+        </Route>
+
+        <Route relative path="show-summary-in-drafts">
+          <TransactionInSummary entity={entity} lot_status='Draft' delivery_status={['N']} />
         </Route>
 
         <Route relative path="show-summary-out">

@@ -285,9 +285,12 @@ export function getLotsOutSummary(entityID: number, lot_status: LotStatus, perio
   })
 }
 
-export function getLotsInSummary(entityID: number) {
+export function getLotsInSummary(entityID: number, lot_status: LotStatus, period: string, delivery_status: string[]) {
   return api.get("/lots/summary-in", {
     entity_id: entityID,
+    lot_status,
+    period,
+    delivery_status,
   })
 }
 

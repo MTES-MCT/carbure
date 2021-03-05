@@ -262,14 +262,6 @@ export const OutValidatedSummaryActions = () => (
   </Link>
 )
 
-export const InboxSummaryActions = () => (
-  <Link relative to="show-summary-in">
-    <Button level="primary" icon={Rapport}>
-      Rapport d'entrées
-    </Button>
-  </Link>
-)
-
 export const InboxDraftsSummaryActions = () => (
   <Link relative to="show-summary-in-drafts">
     <Button level="primary" icon={Rapport}>
@@ -277,6 +269,24 @@ export const InboxDraftsSummaryActions = () => (
     </Button>
   </Link>
 )
+
+export const InboxPendingSummaryActions = () => (
+  <Link relative to="show-summary-in-pending">
+    <Button level="primary" icon={Rapport}>
+      Rapport d'entrées
+    </Button>
+  </Link>
+)
+
+export const InboxValidatedSummaryActions = () => (
+  <Link relative to="show-summary-in">
+    <Button level="primary" icon={Rapport}>
+      Rapport d'entrées
+    </Button>
+  </Link>
+)
+
+
 
 export const ActionBar = ({ children }: { children: React.ReactNode }) => (
   <Box row className={cl(styles.actionBar)}>

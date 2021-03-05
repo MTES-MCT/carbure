@@ -4,6 +4,7 @@ import { EntitySelection } from "carbure/hooks/use-entity"
 import useAPI from "common/hooks/use-api"
 import useClose from "common/hooks/use-close"
 import { getLotsInSummary } from "../api"
+import { LotStatus } from "common/types"
 
 export interface TransactionInSummaryFormState {
   [vendor: string]: {
@@ -16,13 +17,13 @@ export interface TransactionInSummaryFormState {
   }
 }
 
-export default function useTransactionInSummary(entity: EntitySelection) {
+export default function useTransactionInSummary(entity: EntitySelection, lot_status: LotStatus, period: string, delivery_status: string) {
   const close = useClose("..")
   const [request, resolve] = useAPI(getLotsInSummary)
 
   useEffect(() => {
     if (entity !== null) {
-      resolve(entity.id)
+      resolve(entity.id, lot_status, period, delivery_status)
     }
   }, [resolve, entity])
 
