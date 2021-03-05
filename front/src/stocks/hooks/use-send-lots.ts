@@ -5,11 +5,13 @@ import useAPI from "common/hooks/use-api"
 import { confirm } from "common/components/dialog"
 import { prompt } from "common/components/dialog"
 import { StockSendLotPrompt } from "stocks/components/send-form"
-import { ConvertETBEPrompt } from 'stocks/components/convert-etbe-form'
+import {
+  ConvertETBEComplexPromptFactory,
+  ConvertETBEPrompt,
+} from "stocks/components/convert-etbe-form"
 import { useNotificationContext } from "common/components/notifications"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { StockDraft } from "common/types"
-import { StockDraftActions } from "stocks/components/list-actions"
 
 export interface LotSender {
   loading: boolean
@@ -18,6 +20,7 @@ export interface LotSender {
   sendSelection: () => Promise<boolean>
   sendLot: (l: number) => Promise<boolean>
   convertETBE: (l: number) => Promise<boolean>
+  convertETBEComplex: () => Promise<boolean>
 }
 
 export default function useSendLot(
@@ -151,27 +154,40 @@ export default function useSendLot(
     )
 
     if (entity !== null && sent) {
-      notifyCreated(resolveETBE(
-        entity.id, 
-        txID, 
-        sent.volume_ethanol, 
-        sent.volume_etbe, 
-        sent.volume_fossile, 
-        sent.volume_denaturant, 
-        sent.volume_pertes
-      ))
+      sent.previous_stock_tx_id = txID
+      notifyCreated(resolveETBE(entity.id, [sent]))
     }
 
     return Boolean(sent)
   }
 
+  async function convertETBEComplex() {
+    if (entity === null) return false
+
+    const conversions = await prompt(
+      "Conversion ETBE",
+      "",
+      ConvertETBEComplexPromptFactory(entity.id)
+    )
+
+    if (conversions) {
+      notifyCreated(resolveETBE(entity.id, conversions))
+    }
+
+    return Boolean(conversions)
+  }
+
   return {
     loading:
-      requestCreate.loading || requestSend.loading || requestSendAll.loading || requestETBE.loading,
+      requestCreate.loading ||
+      requestSend.loading ||
+      requestSendAll.loading ||
+      requestETBE.loading,
     createDrafts,
     sendSelection,
     sendAllDrafts,
     sendLot,
-    convertETBE
+    convertETBE,
+    convertETBEComplex,
   }
 }

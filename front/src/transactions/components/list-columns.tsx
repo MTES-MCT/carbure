@@ -102,6 +102,12 @@ export const biocarburant: Column<Transaction> = {
   ),
 }
 
+export const volume: Column<Transaction> = {
+  header: "Volume",
+  sortBy: "volume",
+  render: (tx) => <Line text={`${tx.lot.volume}` ?? ""} />,
+}
+
 export const matierePremiere: Column<Transaction> = {
   header: "Matiere premiere",
   sortBy: "matiere_premiere",

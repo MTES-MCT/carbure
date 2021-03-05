@@ -84,14 +84,9 @@ export const StockList = ({
             onExportAll={stock.exportAllTransactions}
           />
 
+          {status.is(LotStatus.ToSend) && <OutDraftsSummaryActions />}
 
-          {status.is(LotStatus.ToSend) && (
-            <OutDraftsSummaryActions />
-          )}
-
-          {status.is(LotStatus.Inbox) && (
-            <InboxPendingSummaryActions />
-          )}
+          {status.is(LotStatus.Inbox) && <InboxPendingSummaryActions />}
 
           {status.is(LotStatus.ToSend) && (
             <StockImportActions uploader={uploader} />
@@ -116,7 +111,9 @@ export const StockList = ({
             />
           )}
 
-          {status.is(LotStatus.Stock) && <StockActions />}
+          {status.is(LotStatus.Stock) && (
+            <StockActions onConvertETBE={sender.convertETBEComplex} />
+          )}
         </ActionBar>
       )}
 

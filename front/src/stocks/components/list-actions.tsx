@@ -1,7 +1,7 @@
-import React from "react"
+import React, { Fragment } from "react"
 
 import { Link } from "common/components/relative-route"
-import { Check, Cross, Rapport, Upload } from "common/components/icons"
+import { Check, Cross, Flask, Rapport, Upload } from "common/components/icons"
 import { AsyncButton, Button } from "common/components/button"
 import { prompt } from "common/components/dialog"
 import { StockImportPromptFactory } from "transactions/components/import"
@@ -33,12 +33,22 @@ export const StockImportActions = ({ uploader }: ImportActionsProps) => {
   )
 }
 
-export const StockActions = () => (
-  <Link relative to="send-complex">
-    <Button level="primary" icon={Rapport}>
-      Envoi complexe
+type StockActionsProps = {
+  onConvertETBE: () => void
+}
+
+export const StockActions = ({ onConvertETBE }: StockActionsProps) => (
+  <Fragment>
+    <Link relative to="send-complex">
+      <Button level="primary" icon={Rapport}>
+        Envoi complexe
+      </Button>
+    </Link>
+
+    <Button level="primary" icon={Flask} onClick={onConvertETBE}>
+      Convertir ETBE
     </Button>
-  </Link>
+  </Fragment>
 )
 
 type StockDraftActionsProps = {
