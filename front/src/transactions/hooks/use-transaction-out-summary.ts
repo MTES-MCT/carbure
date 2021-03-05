@@ -17,13 +17,13 @@ export interface TransactionOutSummaryFormState {
   }
 }
 
-export default function useTransactionOutSummary(entity: EntitySelection, lot_status: LotStatus, period: string, delivery_status: string[]) {
+export default function useTransactionOutSummary(entity: EntitySelection, lot_status: LotStatus, period: string, delivery_status: string[], stock: boolean) {
   const close = useClose("..")
   const [request, resolve] = useAPI(getLotsOutSummary)
 
   useEffect(() => {
     if (entity !== null) {
-      resolve(entity.id, lot_status, period, delivery_status)
+      resolve(entity.id, lot_status, period, delivery_status, stock)
     }
   }, [resolve, entity])
 

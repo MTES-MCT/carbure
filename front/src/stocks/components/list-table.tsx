@@ -65,6 +65,7 @@ export const StockTable = ({
 
   if (status.is(LotStatus.Inbox)) {
     columns.push(C.selector(selection))
+    columns.push(C.periodSimple)
     columns.push(C.depot)
     columns.push(C.vendor)
     columns.push(C.dae)

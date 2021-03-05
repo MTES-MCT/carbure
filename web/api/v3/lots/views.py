@@ -174,6 +174,8 @@ def get_summary_out(request, *args, **kwargs):
     period = request.GET.get('period', False)
     lot_status = request.GET.get('lot_status', False)
     delivery_status = request.GET.getlist('delivery_status', False)
+    stock = request.GET.get('stock', False)
+    is_stock = True if stock == 'true' else False
 
     if not period:
         period = datetime.date.today().strftime('%Y-%m')
@@ -184,8 +186,12 @@ def get_summary_out(request, *args, **kwargs):
     if not delivery_status:
         return JsonResponse({'status': 'error', 'message': "Missing delivery status"}, status=400)
 
+
+
     # get my pending sent lots
     txs = LotTransaction.objects.filter(carbure_vendor=entity, lot__status=lot_status, lot__period=period, delivery_status__in=delivery_status)
+    if is_stock:
+        txs = txs.exclude(lot__parent_lot=None)
 
     # group / summary
     data = {}

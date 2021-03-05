@@ -264,7 +264,7 @@ def upload_mass_balance(request, *args, **kwargs):
     filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d'), entity.name.upper())
     filepath = '/tmp/%s' % (filename)
     with open(filepath, 'wb+') as destination:
-        for chunk in f.chunks():
+        for chunk in file.chunks():
             destination.write(chunk)
 
     nb_loaded, nb_total, errors = load_excel_file(entity, request.user, file, mass_balance=True)

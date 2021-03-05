@@ -28,9 +28,9 @@ import { StockList } from "./components/list"
 import TransactionFilters from "transactions/components/list-filters"
 
 import StockDetails from "./routes/stock-details"
-import StockInSummary from "./routes/stock-in-summary"
-import StockOutSummary from "./routes/stock-in-summary"
 import StockSendComplex from "./routes/stock-send-complex"
+import TransactionInSummary from "transactions/routes/transaction-in-summary"
+import TransactionOutSummary from "transactions/routes/transaction-out-summary"
 
 const FILTERS = [
   Filters.Biocarburants,
@@ -143,12 +143,13 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
       />
 
       <Switch>
-        <Route relative path="show-summary-in">
-          <StockInSummary entity={entity} />
+
+        <Route relative path="show-summary-in-pending">
+          <TransactionInSummary entity={entity} lot_status='Validated' delivery_status={['AC', 'AA', 'N']} />
         </Route>
 
-        <Route relative path="show-summary-out">
-          <StockOutSummary entity={entity} />
+        <Route relative path="show-summary-out-drafts">
+          <TransactionOutSummary entity={entity} lot_status='Draft' delivery_status={['N']} stock='true' />
         </Route>
 
         <Route relative path="send-complex">
