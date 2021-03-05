@@ -17,7 +17,7 @@ export interface TransactionInSummaryFormState {
   }
 }
 
-export default function useTransactionInSummary(entity: EntitySelection, lot_status: LotStatus, period: string | null, delivery_status: string) {
+export default function useTransactionInSummary(entity: EntitySelection, lot_status: LotStatus, period: string | null, delivery_status: string[]) {
   const close = useClose("..")
   const [request, resolve] = useAPI(getLotsInSummary)
 
