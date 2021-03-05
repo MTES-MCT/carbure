@@ -304,12 +304,6 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
         lot.unknown_production_site_reference = lot_row['production_site_reference']
     else:
         lot.unknown_production_site_reference = ''
-        if not lot.production_site_is_in_carbure:
-            msg = "Veuillez préciser une référence de certificat fournisseur/producteur"
-            error = LotV2Error(lot=lot, field='production_site_reference',
-                                error=msg,
-                                value='')
-            lot_errors.append(error)
     if 'production_site_commissioning_date' in lot_row and lot_row['production_site_commissioning_date'] != '' and lot_row['production_site_commissioning_date'] is not None:
         try:
             com_date = try_get_date(lot_row['production_site_commissioning_date'])
