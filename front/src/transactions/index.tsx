@@ -29,6 +29,7 @@ import TransactionFilters from "./components/list-filters"
 import TransactionAdd from "./routes/transaction-add"
 import TransactionDetails from "./routes/transaction-details"
 import TransactionInSummary from "./routes/transaction-in-summary"
+import TransactionOutSummary from "./routes/transaction-out-summary"
 
 // prettier-ignore
 const OPERATOR_STATUSES = [
@@ -233,6 +234,18 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
 
         <Route relative path="show-summary-in">
           <TransactionInSummary entity={entity} />
+        </Route>
+
+        <Route relative path="show-summary-out">
+          <TransactionOutSummary entity={entity} lot_status='Validated' delivery_status={['A']} />
+        </Route>
+
+        <Route relative path="show-summary-out-pending">
+          <TransactionOutSummary entity={entity} lot_status='Validated' delivery_status={['AC', 'AA', 'N']} />
+        </Route>
+
+        <Route relative path="show-summary-out-drafts">
+          <TransactionOutSummary entity={entity} lot_status='Draft' delivery_status={['N']} />
         </Route>
 
         <Route relative path=":id">
