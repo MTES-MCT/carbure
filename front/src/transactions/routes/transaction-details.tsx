@@ -88,16 +88,27 @@ const TransactionDetails = ({
     }
   }
 
-  let previousTransactionId: number | null = null
-  let nextTransactionId: number | null = null
+  let previousTxId: number | null = null
+  let nextTxId: number | null = null
 
   if (transactions?.data) {
-    for (let i = 0; i < transactions.data.lots.length; i++) {
-      let lot = transactions.data.lots[i]
-      if (lot.id === details.data?.transaction.id) {
-        previousTransactionId = i > 0 ? transactions.data.lots[i - 1].id : null // prettier-ignore
-        nextTransactionId = i + 1 < transactions.data.lots.length ? transactions.data.lots[i + 1].id : null // prettier-ignore
-      }
+    const txIds = transactions.data.lots.map((tx) => tx.id)
+    const currentTxId = details.data?.transaction.id ?? -1
+
+    const index = txIds.indexOf(currentTxId)
+
+    if (index === -1) {
+      previousTxId = null
+      nextTxId = txIds[0]
+    } else if (index === 0) {
+      previousTxId = null
+      nextTxId = txIds[1]
+    } else if (index === txIds.length - 1) {
+      previousTxId = txIds[txIds.length - 2]
+      nextTxId = null
+    } else {
+      previousTxId = txIds[index - 1]
+      nextTxId = txIds[index + 1]
     }
   }
 
@@ -214,16 +225,16 @@ const TransactionDetails = ({
         <Box row className={styles.transactionNavButtons}>
           <Button
             icon={ChevronLeft}
-            disabled={!previousTransactionId}
-            onClick={() => relativePush(`../${previousTransactionId}`)}
+            disabled={!previousTxId}
+            onClick={() => relativePush(`../${previousTxId}`)}
           >
             Lot Précédent
           </Button>
 
           <Button
             icon={ChevronRight}
-            disabled={!nextTransactionId}
-            onClick={() => relativePush(`../${nextTransactionId}`)}
+            disabled={!nextTxId}
+            onClick={() => relativePush(`../${nextTxId}`)}
           >
             Lot Suivant
           </Button>
