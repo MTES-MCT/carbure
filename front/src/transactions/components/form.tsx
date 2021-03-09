@@ -85,7 +85,7 @@ const TransactionForm = ({
           />
           <LabelInput
             readOnly={readOnly}
-            label="Numéro douanier (DAE, DAA...)"
+            label="Numéro douanier (DAE, DAA...) *"
             name="dae"
             value={tx.dae}
             error={fieldErrors.dae}
@@ -94,7 +94,7 @@ const TransactionForm = ({
           <LabelInput
             readOnly={readOnly}
             type="number"
-            label="Volume en litres (Ethanol à 20°, autres à 15°)"
+            label="Volume en litres (Ethanol à 20°, autres à 15°) *"
             name="volume"
             value={tx.volume}
             error={fieldErrors.volume}
@@ -102,7 +102,7 @@ const TransactionForm = ({
           />
           <LabelAutoComplete
             readOnly={readOnly}
-            label="Biocarburant"
+            label="Biocarburant *"
             placeholder="Rechercher un biocarburant..."
             name="biocarburant"
             value={tx.biocarburant}
@@ -115,7 +115,7 @@ const TransactionForm = ({
           />
           <LabelAutoComplete
             readOnly={readOnly}
-            label="Matiere Premiere"
+            label="Matiere Premiere *"
             placeholder="Rechercher une matière première..."
             name="matiere_premiere"
             value={tx.matiere_premiere}
@@ -128,7 +128,7 @@ const TransactionForm = ({
           />
           <LabelAutoComplete
             readOnly={readOnly}
-            label="Pays d'origine"
+            label="Pays d'origine *"
             placeholder="Rechercher un pays..."
             name="pays_origine"
             value={tx.pays_origine}
@@ -248,7 +248,7 @@ const TransactionForm = ({
               <LabelInput
                 readOnly={readOnly}
                 type="date"
-                label="Date de mise en service"
+                label="Date de mise en service *"
                 name="unknown_production_site_com_date"
                 value={tx.unknown_production_site_com_date}
                 error={fieldErrors.unknown_production_site_com_date}
@@ -264,7 +264,7 @@ const TransactionForm = ({
               />
               <LabelInput
                 readOnly={readOnly}
-                label="Référence Système Fournisseur"
+                label="Référence Système Fournisseur *"
                 name="unknown_production_site_reference"
                 value={tx.unknown_production_site_reference}
                 error={fieldErrors.unknown_production_site_reference}
@@ -358,7 +358,7 @@ const TransactionForm = ({
           {tx.delivery_site_is_in_carbure ? (
             <LabelAutoComplete
               readOnly={readOnly}
-              label="Site de livraison"
+              label="Site de livraison *"
               placeholder="Rechercher un site de livraison..."
               name="carbure_delivery_site"
               value={tx.carbure_delivery_site}
@@ -371,7 +371,7 @@ const TransactionForm = ({
           ) : (
             <LabelInput
               readOnly={readOnly}
-              label="Site de livraison"
+              label="Site de livraison *"
               name="unknown_delivery_site"
               value={tx.unknown_delivery_site}
               error={fieldErrors.delivery_site}
@@ -391,7 +391,7 @@ const TransactionForm = ({
             <LabelAutoComplete
               disabled={tx.delivery_site_is_in_carbure}
               readOnly={readOnly}
-              label="Pays de livraison"
+              label="Pays de livraison *"
               name="unknown_delivery_site_country"
               value={tx.unknown_delivery_site_country}
               error={fieldErrors.unknown_delivery_site_country}
@@ -443,7 +443,7 @@ const TransactionForm = ({
               <LabelInput
                 readOnly={readOnly}
                 type="number"
-                label="EP"
+                label="EP *"
                 name="ep"
                 value={tx.ep}
                 error={fieldErrors.ep}
@@ -454,7 +454,7 @@ const TransactionForm = ({
               <LabelInput
                 readOnly={readOnly}
                 type="number"
-                label="ETD"
+                label="ETD *"
                 name="etd"
                 value={tx.etd}
                 error={fieldErrors.etd}
