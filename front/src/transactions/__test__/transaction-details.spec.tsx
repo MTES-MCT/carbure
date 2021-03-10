@@ -99,27 +99,27 @@ test("edit transaction details", async () => {
   expect(save.disabled).toBe(true)
 
   userEvent.click(screen.getByLabelText("Il s'agit d'une mise à consommation ?")) // prettier-ignore
-  const dae = screen.getByLabelText("Numéro douanier (DAE, DAA...)")
+  const dae = screen.getByLabelText("Numéro douanier (DAE, DAA...) *")
   userEvent.clear(dae)
   userEvent.type(dae, "DAETESTUPDATE")
 
   const vol = screen.getByLabelText(
-    "Volume en litres (Ethanol à 20°, autres à 15°)"
+    "Volume en litres (Ethanol à 20°, autres à 15°) *"
   )
   userEvent.clear(vol)
   userEvent.type(vol, "20000")
 
-  const bio = screen.getByLabelText("Biocarburant")
+  const bio = screen.getByLabelText("Biocarburant *")
   userEvent.clear(bio)
   userEvent.type(bio, "EM")
   userEvent.click(await screen.findByText("EMHV"))
 
-  const mp = screen.getByLabelText("Matiere Premiere")
+  const mp = screen.getByLabelText("Matiere Premiere *")
   userEvent.clear(mp)
   userEvent.type(mp, "Co")
   userEvent.click(await screen.findByText("Colza"))
 
-  const ct = screen.getByLabelText("Pays d'origine")
+  const ct = screen.getByLabelText("Pays d'origine *")
   userEvent.clear(ct)
   userEvent.type(ct, "France")
 
@@ -139,7 +139,7 @@ test("edit transaction details", async () => {
   userEvent.type(cli, "Test")
   userEvent.click(await screen.findByText("Opérateur Test"))
 
-  const ds = screen.getByLabelText("Site de livraison")
+  const ds = screen.getByLabelText("Site de livraison *")
   userEvent.clear(ds)
   userEvent.type(ds, "Test")
   userEvent.click(await screen.findByText("Test Delivery Site"))
@@ -156,11 +156,11 @@ test("edit transaction details", async () => {
   userEvent.clear(el)
   userEvent.type(el, "1.1")
 
-  const ep = screen.getByLabelText("EP")
+  const ep = screen.getByLabelText("EP *")
   userEvent.clear(ep)
   userEvent.type(ep, "1.2")
 
-  const etd = screen.getByLabelText("ETD")
+  const etd = screen.getByLabelText("ETD *")
   userEvent.clear(etd)
   userEvent.type(etd, "1.3")
 

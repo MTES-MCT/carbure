@@ -41,11 +41,11 @@ test("display the transaction form", async () => {
   screen.getByText("Brouillon")
 
   screen.getByLabelText("Il s'agit d'une mise à consommation ?")
-  screen.getByLabelText("Numéro douanier (DAE, DAA...)")
-  screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°)")
-  screen.getByLabelText("Biocarburant")
-  screen.getByLabelText("Matiere Premiere")
-  screen.getByLabelText("Pays d'origine")
+  screen.getByLabelText("Numéro douanier (DAE, DAA...) *")
+  screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°) *")
+  screen.getByLabelText("Biocarburant *")
+  screen.getByLabelText("Matiere Premiere *")
+  screen.getByLabelText("Pays d'origine *")
   screen.getByLabelText("Date de livraison")
 
   screen.getByLabelText("Producteur enregistré sur Carbure ?")
@@ -59,15 +59,15 @@ test("display the transaction form", async () => {
   screen.getByLabelText("Client enregistré sur Carbure ?")
   screen.getByLabelText("Client")
   screen.getByLabelText("Site de livraison enregistré sur Carbure ?")
-  screen.getByLabelText("Site de livraison")
+  screen.getByLabelText("Site de livraison *")
   screen.getByLabelText("Pays de livraison")
   screen.getByLabelText("Champ Libre")
 
   screen.getByText("Émissions")
   screen.getByLabelText("EEC")
   screen.getByLabelText("EL")
-  screen.getByLabelText("EP")
-  screen.getByLabelText("ETD")
+  screen.getByLabelText("EP *")
+  screen.getByLabelText("ETD *")
   screen.getByLabelText("EU")
 
   screen.getByText("Réductions")
@@ -95,19 +95,19 @@ test("check the form fields", async () => {
   )
 
   userEvent.click(screen.getByLabelText("Il s'agit d'une mise à consommation ?")) // prettier-ignore
-  userEvent.type(screen.getByLabelText("Numéro douanier (DAE, DAA...)"), "DAETEST") // prettier-ignore
+  userEvent.type(screen.getByLabelText("Numéro douanier (DAE, DAA...) *"), "DAETEST") // prettier-ignore
   userEvent.type(
-    screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°)"),
+    screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°) *"),
     "10000"
   )
 
-  userEvent.type(screen.getByLabelText("Biocarburant"), "EM")
+  userEvent.type(screen.getByLabelText("Biocarburant *"), "EM")
   userEvent.click(await screen.findByText("EMHV"))
 
-  userEvent.type(screen.getByLabelText("Matiere Premiere"), "Co")
+  userEvent.type(screen.getByLabelText("Matiere Premiere *"), "Co")
   userEvent.click(await screen.findByText("Colza"))
 
-  userEvent.type(screen.getByLabelText("Pays d'origine"), "France")
+  userEvent.type(screen.getByLabelText("Pays d'origine *"), "France")
 
   userEvent.type(screen.getByLabelText("Date de livraison"), "2020-31-12")
 
@@ -119,15 +119,15 @@ test("check the form fields", async () => {
   userEvent.type(screen.getByLabelText("Client"), "Test")
   userEvent.click(await screen.findByText("Opérateur Test"))
 
-  userEvent.type(screen.getByLabelText("Site de livraison"), "Test") // prettier-ignore
+  userEvent.type(screen.getByLabelText("Site de livraison *"), "Test") // prettier-ignore
   userEvent.click(await screen.findByText("Test Delivery Site"))
 
   userEvent.type(screen.getByLabelText("Champ Libre"), "blabla")
 
   userEvent.type(screen.getByLabelText("EEC"), "10")
   userEvent.type(screen.getByLabelText("EL"), "1.1")
-  userEvent.type(screen.getByLabelText("EP"), "1.2")
-  userEvent.type(screen.getByLabelText("ETD"), "1.3")
+  userEvent.type(screen.getByLabelText("EP *"), "1.2")
+  userEvent.type(screen.getByLabelText("ETD *"), "1.3")
   userEvent.type(screen.getByLabelText("EU"), "1.4")
 
   userEvent.type(screen.getByLabelText("ESCA"), "1.1")
