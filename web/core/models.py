@@ -301,7 +301,7 @@ class LotV2(models.Model):
         'eec': self.eec, 'el': self.el, 'ep': self.ep, 'etd': self.etd, 'eu': self.eu, 'esca': self.esca, 'eccs': self.eccs, 'eccr': self.eccr, 'eee': self.eee,
         'ghg_total': self.ghg_total, 'ghg_reference': self.ghg_reference, 'ghg_reduction': self.ghg_reduction, 'status': self.status, 'source': self.source,
         'parent_lot': self.parent_lot.natural_key() if self.parent_lot else None, 'is_split': self.is_split, 'is_fused': self.is_fused, 'fused_with': self.fused_with.natural_key() if self.fused_with else None,
-        'data_origin_entity': self.data_origin_entity.natural_key() if self.data_origin_entity else None, 'added_by': self.added_by.natural_key(), 'is_transformed': self.is_transformed}
+        'data_origin_entity': self.data_origin_entity.natural_key() if self.data_origin_entity else None, 'added_by': self.added_by.natural_key() if self.added_by else None, 'is_transformed': self.is_transformed}
 
     def __str__(self):
         return str(self.id)
