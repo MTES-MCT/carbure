@@ -21,7 +21,7 @@ function filterParams(params: Params) {
 
   for (const key in params) {
     if (!isEmpty(params[key])) {
-      okParams[key] = params[key]
+      okParams[key] = String(params[key]).trim()
     }
   }
 
@@ -34,9 +34,11 @@ function toFormData(obj: any): FormData {
 
   for (const key in obj) {
     if (Array.isArray(obj[key])) {
-      obj[key].forEach((value: any) => formData.append(key, value.toString()))
+      obj[key].forEach((value: any) =>
+        formData.append(key, String(value).trim())
+      )
     } else if (!isEmpty(obj[key])) {
-      formData.append(key, obj[key])
+      formData.append(key, String(obj[key]).trim())
     }
   }
 
