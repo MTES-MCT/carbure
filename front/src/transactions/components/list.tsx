@@ -115,6 +115,16 @@ export const TransactionList = ({
             onExportAll={transactions.exportAllTransactions}
           />
 
+          {status.is(LotStatus.Draft) && (
+            <React.Fragment>
+              {isProducer && <ProducerImportActions uploader={uploader} />}
+
+              {isTrader && <TraderImportActions uploader={uploader} />}
+
+              {isOperator && <OperatorImportActions uploader={uploader} />}
+            </React.Fragment>
+          )}
+
           {isOperator && status.is(LotStatus.Draft) && (
             <InboxDraftsSummaryActions />
           )}
@@ -131,22 +141,16 @@ export const TransactionList = ({
             <OutDraftsSummaryActions />
           )}
 
-          {(isProducer || isTrader) && (status.is(LotStatus.Validated)) && (
+          {(isProducer || isTrader) && status.is(LotStatus.Validated) && (
             <OutPendingSummaryActions />
           )}
 
-          {(isProducer || isTrader) && (status.is(LotStatus.Accepted)) && (
+          {(isProducer || isTrader) && status.is(LotStatus.Accepted) && (
             <OutValidatedSummaryActions />
           )}
 
           {status.is(LotStatus.Draft) && (
             <React.Fragment>
-              {isProducer && <ProducerImportActions uploader={uploader} />}
-
-              {isTrader && <TraderImportActions uploader={uploader} />}
-
-              {isOperator && <OperatorImportActions uploader={uploader} />}
-
               <CreateActions />
 
               <DraftActions
