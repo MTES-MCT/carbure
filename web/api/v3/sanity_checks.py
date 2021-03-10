@@ -162,7 +162,9 @@ def sanity_check(tx, prefetched_data):
 
         # double comptage, cas specifiques
         if lot.matiere_premiere.is_double_compte:
-            if lot.unknown_production_site_dbl_counting is None or (lot.carbure_production_site and not lot.carbure_production_site.dc_reference):
+            in_carbure_without_dc = lot.production_site_is_in_carbure and lot.carbure_production_site and not lot.carbure_production_site.dc_reference
+            not_in_carbure_without_dc = not lot.production_site_is_in_carbure and not lot.unknown_production_site_dbl_counting
+            if in_carbure_without_dc or not_in_carbure_without_dc:
                 is_sane = False
                 errors.append(raise_error(lot, 'MISSING_REF_DBL_COUNTING', details="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
 
