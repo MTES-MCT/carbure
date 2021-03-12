@@ -9,7 +9,7 @@ from django.http import JsonResponse
 from core.decorators import is_admin
 from django.contrib.auth import get_user_model
 from core.models import Entity, UserRights, Control, ControlMessages, ProductionSite, LotV2
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Subquery, OuterRef, Value, IntegerField
 from django.contrib.auth.forms import PasswordResetForm
 from django.core.mail import send_mail
 from django.conf import settings
@@ -383,6 +383,33 @@ def close_control(request):
     ctrl.save()
     return JsonResponse({"status": "success"})
 
+def get_period_declarations(period):
+    txs = LotTransaction.objects.filter(lot__period=period)
+
+    txs_drafts = txs.filter(lot__added_by=OuterRef('pk'), lot__status='Draft').values('lot__added_by').annotate(total=Count(Value(1)))
+    txs_output = txs.filter(carbure_vendor=OuterRef('pk'), lot__status='Validated').values('carbure_vendor').annotate(total=Count(Value(1)))
+    txs_input = txs.filter(carbure_client=OuterRef('pk'), lot__status='Validated').values('carbure_client').annotate(total=Count(Value(1)))
+    txs_corrections = txs.filter(lot__added_by=OuterRef('pk'), lot__status='Validated', delivery_status__in=['AC', 'R', 'AA']).values('lot__added_by').annotate(total=Count(Value(1)))
+
+    # for each entity, run a subquery to count the number of tx depending on their status 
+    tx_counts = Entity.objects.annotate(
+            drafts=Subquery(txs_drafts.values('total')),
+            output=Subquery(txs_output.values('total')),
+            input=Subquery(txs_input.values('total')),
+            corrections=Subquery(txs_corrections.values('total'))
+        ).values('id', 'drafts', 'output', 'input', 'corrections')
+
+    by_entity = {}
+
+    for c in tx_counts:
+        by_entity[c['id']] = {
+            'drafts': c['drafts'] if c['drafts'] else 0,
+            'output': c['output'] if c['output'] else 0,
+            'input': c['input'] if c['input'] else 0,
+            'corrections': c['corrections'] if c['corrections'] else 0
+        }
+
+    return by_entity
 
 @is_admin
 def get_declarations(request):
@@ -446,25 +473,32 @@ def get_declarations(request):
 
     # get the declarations objects from db
     declarations = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start, period__lte=end)
-        
+     
+    tx_counts = {}
+
+    for month, year in periods:
+        period = "%d-%02d" % (year, month)
+        tx_counts[period] = get_period_declarations(period)
 
     # query lots to enrich declarations on the frontend
     # expected return ['client1': [{'period': '2020-01', 'drafts': 200, 'validated': 100, 'checked': True}, {'period': '2020-02', 'drafts': 50, 'validated': 10, 'checked': False}]]
     # 1) get the lots grouped by added_by
-    drafts = Count('id', filter=Q(lot__status='Draft'))
-    validated = Count('id', filter=Q(lot__status='Validated'))
-    received = Count('id', filter=Q(delivery_status__in=['N', 'A', 'AA']))
-    corrections = Count('id', filter=Q(delivery_status__in=['R', 'AC']))
-    lots = LotTransaction.objects.values('lot__added_by__id', 'lot__added_by__name', 'lot__period').annotate(drafts=drafts, validated=validated, received=received, corrections=corrections)
-    batches = {'%s.%s' % (batch['lot__added_by__id'], batch['lot__period']): batch for batch in lots }
+    # drafts = Count('id', filter=Q(lot__status='Draft'))
+    # validated = Count('id', filter=Q(lot__status='Validated', delivery_status__in=['N'] ))
+    # received = Count('id', filter=Q(lot__status='Validated', delivery_status__in=['A']))
+    # corrections = Count('id', filter=Q(lot__status='Validated', delivery_status__in=['R', 'AC', 'AA']))
+    # lots = LotTransaction.objects.values('lot__added_by__id', 'lot__added_by__name', 'lot__period').annotate(drafts=drafts, validated=validated, received=received, corrections=corrections)
+    # batches = {'%s.%s' % (batch['lot__added_by__id'], batch['lot__period']): batch for batch in lots }
+    
     # 2) add batch info to each declarations
     declarations_sez = []
     for d in declarations:
-        key = '%d.%d-%02d' % (d.entity.id, d.period.year, d.period.month)
-        if key in batches:
-            d.lots = batches[key]
+        period = "%d-%02d" % (d.period.year, d.period.month)
+
+        if d.entity.id in tx_counts[period]:
+            d.lots = tx_counts[period][d.entity.id]
         else:
-            d.lots = {'drafts': 0, 'validated': 0, 'received': 0, 'corrections': 0}
+            d.lots = {'drafts': 0, 'output': 0, 'input': 0, 'corrections': 0}
         sez_data = d.natural_key()
         sez_data['lots'] = d.lots
         declarations_sez.append(sez_data)
