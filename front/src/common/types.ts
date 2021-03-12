@@ -366,12 +366,9 @@ export interface Declaration {
   checked: false
   reminder_count: number
   lots: {
-    lot__added_by__id: number
-    lot__added_by__name: string
-    lot__period: string
     drafts: number
-    validated: number
-    received: number
+    output: number
+    input: number
     corrections: number
   }
 }

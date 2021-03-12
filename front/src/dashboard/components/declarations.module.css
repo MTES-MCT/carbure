@@ -1,5 +1,6 @@
 .declarationTable > div > div {
   padding: 2px;
+  align-items: stretch;
 }
 
 .declarationCell {
