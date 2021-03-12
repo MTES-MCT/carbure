@@ -11,7 +11,7 @@ function parseValue(element: FormFields) {
     return element.checked
   } else if (element.type === "number") {
     const parsed = parseFloat(element.value)
-    return isNaN(parsed) ? 0 : parsed
+    return isNaN(parsed) ? "" : parsed
   } else {
     return element.value
   }
@@ -21,7 +21,7 @@ export type FormHook<T> = {
   data: T
   hasChange: boolean
   reset: (s: T) => void
-  patch: (p: any, s?: boolean) => void
+  patch: (update: any, silent?: boolean) => void
   onChange: <T extends FormFields>(e: React.ChangeEvent<T>) => void
 }
 
@@ -29,13 +29,10 @@ export default function useForm<T>(initialState: T): FormHook<T> {
   const [data, setData] = useState<T>(initialState)
   const hasChange = useRef(false)
 
-  const patch = useCallback(
-    (patch: any, silent: boolean = false) => {
-      if (!silent) hasChange.current = true
-      setData({ ...data, ...patch })
-    },
-    [data]
-  )
+  const patch = useCallback((patch: any, silent: boolean = false) => {
+    if (!silent) hasChange.current = true
+    setData((data) => ({ ...data, ...patch }))
+  }, [])
 
   const reset = useCallback((form: T) => {
     hasChange.current = false

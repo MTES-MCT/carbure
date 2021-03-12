@@ -7,7 +7,7 @@ import { prompt } from "common/components/dialog"
 import { StockSendLotPrompt } from "stocks/components/send-form"
 import {
   ConvertETBEComplexPromptFactory,
-  ConvertETBEPrompt,
+  // ConvertETBEPrompt,
 } from "stocks/components/convert-etbe-form"
 import { useNotificationContext } from "common/components/notifications"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
@@ -19,7 +19,7 @@ export interface LotSender {
   sendAllDrafts: () => Promise<boolean>
   sendSelection: () => Promise<boolean>
   sendLot: (l: number) => Promise<boolean>
-  convertETBE: (l: number) => Promise<boolean>
+  // convertETBE: (l: number) => Promise<boolean>
   convertETBEComplex: () => Promise<boolean>
 }
 
@@ -146,20 +146,20 @@ export default function useSendLot(
     return shouldSend
   }
 
-  async function convertETBE(txID: number) {
-    const sent = await prompt(
-      "Conversion ETBE",
-      "Veuillez préciser les détails du lot transformé",
-      ConvertETBEPrompt
-    )
+  // async function convertETBE(txID: number) {
+  //   const sent = await prompt(
+  //     "Conversion ETBE",
+  //     "Veuillez préciser les détails du lot transformé",
+  //     ConvertETBEPrompt
+  //   )
 
-    if (entity !== null && sent) {
-      sent.previous_stock_tx_id = txID
-      notifyCreated(resolveETBE(entity.id, [sent]))
-    }
+  //   if (entity !== null && sent) {
+  //     sent.previous_stock_tx_id = txID
+  //     notifyCreated(resolveETBE(entity.id, [sent]))
+  //   }
 
-    return Boolean(sent)
-  }
+  //   return Boolean(sent)
+  // }
 
   async function convertETBEComplex() {
     if (entity === null) return false
@@ -187,7 +187,7 @@ export default function useSendLot(
     sendSelection,
     sendAllDrafts,
     sendLot,
-    convertETBE,
+    // convertETBE,
     convertETBEComplex,
   }
 }
