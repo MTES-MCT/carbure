@@ -22,19 +22,19 @@ const getStockActions = ({ createDrafts, convertETBE }: A): CT =>
         icon: Edit,
         title: "Préparer l'envoi",
         action: (tx: Transaction) => createDrafts(tx.id),
-      }
+      },
     ]
 
-    if (tx.lot.biocarburant.code === 'ETH') {
-      actions.push({
-        icon: Flask,
-        title: "Convertir en ETBE",
-        action: (tx: Transaction) => convertETBE(tx.id),
-      })
-    }
+    // if (tx.lot.biocarburant.code === "ETH") {
+    //   actions.push({
+    //     icon: Flask,
+    //     title: "Convertir en ETBE",
+    //     action: (tx: Transaction) => convertETBE(tx.id),
+    //   })
+    // }
+
     return actions
   })
-
 
 type StockTableProps = {
   stock: Lots | null
@@ -55,7 +55,7 @@ export const StockTable = ({
 }: StockTableProps) => {
   const relativePush = useRelativePush()
   const createDrafts = sender.createDrafts
-  const convertETBE = sender.convertETBE
+  // const convertETBE = sender.convertETBE
 
   const columns = []
 
@@ -91,7 +91,7 @@ export const StockTable = ({
   }
 
   if (status.is(LotStatus.Stock)) {
-    columns.push(getStockActions({ createDrafts, convertETBE }))
+    columns.push(getStockActions({ createDrafts /*, convertETBE */ }))
   }
 
   if (stock === null) {

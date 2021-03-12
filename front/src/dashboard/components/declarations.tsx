@@ -166,6 +166,10 @@ const DeclarationTable = ({
       },
     }))
 
+  if (rows.length === 0) {
+    return null
+  }
+
   return (
     <Table
       className={styles.declarationTable}

@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react"
 
-import { LotStatus, Transaction, ConvertETBE, Lots } from "common/types"
+import { LotStatus, Transaction, ConvertETBE } from "common/types"
 
 import useForm from "common/hooks/use-form"
 
@@ -8,12 +8,7 @@ import { Box } from "common/components"
 import { Input, LabelInput } from "common/components/input"
 import { Button } from "common/components/button"
 import { Alert } from "common/components/alert"
-import {
-  Check,
-  AlertCircle,
-  AlertTriangle,
-  Filter,
-} from "common/components/icons"
+import { Check, AlertCircle } from "common/components/icons"
 import { DialogButtons, PromptFormProps } from "common/components/dialog"
 import Select from "common/components/select"
 import useAPI from "common/hooks/use-api"
@@ -24,27 +19,39 @@ import * as api from "../api"
 const PCI_ETHANOL = 21
 const PCI_ETBE = 27
 const ETHANOL_PCI_RATIO_IN_ETBE = 0.37
-const MIN_ETHANOL_AFTER = 98
-const MAX_ETHANOL_AFTER = 100
+// const MIN_ETHANOL_AFTER = 98
+// const MAX_ETHANOL_AFTER = 100
 
-function checkPCIRatio(data: ConvertETBE) {
-  const RealPCIEthanol: number = data.volume_ethanol * PCI_ETHANOL
-  const TheoPCIEthanol: number =
-    data.volume_etbe * ETHANOL_PCI_RATIO_IN_ETBE * PCI_ETBE
-  const RealVsTheoPCI: number = (RealPCIEthanol / TheoPCIEthanol) * 100
-  const isOdd: boolean =
-    RealVsTheoPCI > MAX_ETHANOL_AFTER || RealVsTheoPCI < MIN_ETHANOL_AFTER
-  return { isOdd, RealVsTheoPCI }
-}
+// function checkPCIRatio(data: ConvertETBE) {
+//   const RealPCIEthanol: number = data.volume_ethanol * PCI_ETHANOL
+//   const TheoPCIEthanol: number =
+//     data.volume_etbe * ETHANOL_PCI_RATIO_IN_ETBE * PCI_ETBE
+//   const RealVsTheoPCI: number = (RealPCIEthanol / TheoPCIEthanol) * 100
+//   const isOdd: boolean =
+//     RealVsTheoPCI > MAX_ETHANOL_AFTER || RealVsTheoPCI < MIN_ETHANOL_AFTER
+//   return { isOdd, RealVsTheoPCI }
+// }
 
-function checkVolumeDiff(data: ConvertETBE) {
-  return (
-    data.volume_etbe -
-    (data.volume_ethanol +
-      data.volume_fossile +
-      data.volume_pertes +
-      data.volume_denaturant)
+// function checkVolumeDiff(data: ConvertETBE) {
+//   return (
+//     data.volume_etbe -
+//     (data.volume_ethanol +
+//       data.volume_fossile +
+//       data.volume_pertes +
+//       data.volume_denaturant)
+//   )
+// }
+
+function compareVolumes(
+  volume_ethanol: number,
+  attributions: { [k: string]: number }
+) {
+  const total_attributions = Object.values(attributions).reduce(
+    (total, vol) => total + vol,
+    0
   )
+
+  return volume_ethanol - total_attributions
 }
 
 function getVolumeAttributions(stocks: Transaction[], volume: number) {
@@ -63,94 +70,94 @@ function getVolumeAttributions(stocks: Transaction[], volume: number) {
   return attributions
 }
 
-export const ConvertETBEPrompt = ({
-  onConfirm,
-  onCancel,
-}: PromptFormProps<ConvertETBE>) => {
-  const { data, hasChange, onChange } = useForm<ConvertETBE>({
-    volume_ethanol: 0,
-    volume_etbe: 0,
-    volume_fossile: 0,
-    volume_denaturant: 0,
-    volume_pertes: 0,
-  })
+// export const ConvertETBEPrompt = ({
+//   onConfirm,
+//   onCancel,
+// }: PromptFormProps<ConvertETBE>) => {
+//   const { data, hasChange, onChange } = useForm<ConvertETBE>({
+//     volume_ethanol: 0,
+//     volume_etbe: 0,
+//     volume_fossile: 0,
+//     volume_denaturant: 0,
+//     volume_pertes: 0,
+//   })
 
-  function onSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    onConfirm(data)
-  }
+//   function onSubmit(e: React.FormEvent) {
+//     e.preventDefault()
+//     onConfirm(data)
+//   }
 
-  const { isOdd, RealVsTheoPCI } = checkPCIRatio(data)
-  const volumeDiff: number = checkVolumeDiff(data)
+//   const { isOdd, RealVsTheoPCI } = checkPCIRatio(data)
+//   const volumeDiff: number = checkVolumeDiff(data)
 
-  const canSave = Boolean(hasChange && volumeDiff === 0)
+//   const canSave = Boolean(hasChange && volumeDiff === 0)
 
-  return (
-    <Box as="form" onSubmit={onSubmit}>
-      <LabelInput
-        type="number"
-        label="Volume d'ethanol"
-        name="volume_ethanol"
-        value={data.volume_ethanol}
-        onChange={onChange}
-      />
-      <LabelInput
-        type="number"
-        label="Volume d'ETBE"
-        name="volume_etbe"
-        value={data.volume_etbe}
-        onChange={onChange}
-      />
-      <LabelInput
-        type="number"
-        label="Volume fossile"
-        name="volume_fossile"
-        value={data.volume_fossile}
-        onChange={onChange}
-      />
-      <LabelInput
-        type="number"
-        label="Volume dénaturant"
-        name="volume_denaturant"
-        value={data.volume_denaturant}
-        onChange={onChange}
-      />
-      <LabelInput
-        type="number"
-        label="Volume pertes"
-        name="volume_pertes"
-        value={data.volume_pertes}
-        onChange={onChange}
-      />
+//   return (
+//     <Box as="form" onSubmit={onSubmit}>
+//       <LabelInput
+//         type="number"
+//         label="Volume d'ethanol"
+//         name="volume_ethanol"
+//         value={data.volume_ethanol}
+//         onChange={onChange}
+//       />
+//       <LabelInput
+//         type="number"
+//         label="Volume d'ETBE"
+//         name="volume_etbe"
+//         value={data.volume_etbe}
+//         onChange={onChange}
+//       />
+//       <LabelInput
+//         type="number"
+//         label="Volume fossile"
+//         name="volume_fossile"
+//         value={data.volume_fossile}
+//         onChange={onChange}
+//       />
+//       <LabelInput
+//         type="number"
+//         label="Volume dénaturant"
+//         name="volume_denaturant"
+//         value={data.volume_denaturant}
+//         onChange={onChange}
+//       />
+//       <LabelInput
+//         type="number"
+//         label="Volume pertes"
+//         name="volume_pertes"
+//         value={data.volume_pertes}
+//         onChange={onChange}
+//       />
 
-      {isOdd && (
-        <Alert level="warning" icon={AlertTriangle}>
-          Le rapport de PCI Ethanol dans ce lot d'ETBE est de{" "}
-          {RealVsTheoPCI.toFixed(2)}% (Taux habituel entre {MIN_ETHANOL_AFTER}%
-          et {MAX_ETHANOL_AFTER}%){" "}
-        </Alert>
-      )}
+//       {isOdd && (
+//         <Alert level="warning" icon={AlertTriangle}>
+//           Le rapport de PCI Ethanol dans ce lot d'ETBE est de{" "}
+//           {RealVsTheoPCI.toFixed(2)}% (Taux habituel entre {MIN_ETHANOL_AFTER}%
+//           et {MAX_ETHANOL_AFTER}%){" "}
+//         </Alert>
+//       )}
 
-      {volumeDiff !== 0 && (
-        <Alert level="error" icon={AlertCircle}>
-          Les volumes ne correspondent pas ({volumeDiff})
-        </Alert>
-      )}
+//       {volumeDiff !== 0 && (
+//         <Alert level="error" icon={AlertCircle}>
+//           Les volumes ne correspondent pas ({volumeDiff})
+//         </Alert>
+//       )}
 
-      <DialogButtons>
-        <Button
-          level="primary"
-          disabled={!canSave}
-          icon={Check}
-          onClick={() => onConfirm(data)}
-        >
-          Valider
-        </Button>
-        <Button onClick={onCancel}>Annuler</Button>
-      </DialogButtons>
-    </Box>
-  )
-}
+//       <DialogButtons>
+//         <Button
+//           level="primary"
+//           disabled={!canSave}
+//           icon={Check}
+//           onClick={() => onConfirm(data)}
+//         >
+//           Valider
+//         </Button>
+//         <Button onClick={onCancel}>Annuler</Button>
+//       </DialogButtons>
+//     </Box>
+//   )
+// }
 
 export const ConvertETBEComplexPromptFactory = (entityID: number) =>
   function ConvertETBEComplexPrompt({
@@ -159,7 +166,7 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
   }: PromptFormProps<ConvertETBE[]>) {
     const [depot, setDepot] = useState<string | null>(null)
 
-    const { data, hasChange, onChange } = useForm<ConvertETBE>({
+    const { data, hasChange, onChange, patch } = useForm<ConvertETBE>({
       volume_etbe: 0,
       volume_ethanol: 0,
       volume_pertes: 0,
@@ -174,7 +181,7 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
 
     useEffect(() => {
       getDepots(entityID, "ETH")
-    }, [])
+    }, [getDepots])
 
     useEffect(() => {
       if (depot) {
@@ -184,7 +191,17 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
           LotStatus.Stock
         )
       }
-    }, [depot])
+    }, [depot, getStocks])
+
+    useEffect(() => {
+      const volume_ethanol = Math.trunc(
+        (data.volume_etbe * ETHANOL_PCI_RATIO_IN_ETBE * PCI_ETBE) / PCI_ETHANOL
+      )
+
+      const volume_fossile = data.volume_etbe - volume_ethanol
+
+      patch({ volume_ethanol, volume_fossile })
+    }, [patch, data.volume_etbe])
 
     useEffect(() => {
       const attributions = getVolumeAttributions(
@@ -200,7 +217,7 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
       render: (tx) => (
         <Input
           type="number"
-          value={conversions[tx.id]}
+          value={conversions[tx.id] ?? 0}
           onChange={(e) =>
             setConversions({
               ...conversions,
@@ -214,17 +231,18 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
     const lots = stocks.data?.lots ?? []
 
     const availableETH = lots.reduce((t, tx) => t + tx.lot.volume, 0)
-    const usedETH = Object.values(conversions).reduce((t, c) => t + c, 0)
+    // const usedETH = Object.values(conversions).reduce((t, c) => t + c, 0)
 
-    const theoVolumeEth =
-      (data.volume_etbe * ETHANOL_PCI_RATIO_IN_ETBE * PCI_ETBE) / PCI_ETHANOL
-    const theoVolumeFossile = data.volume_etbe - theoVolumeEth
+    // const theoVolumeEth =
+    //   (data.volume_etbe * ETHANOL_PCI_RATIO_IN_ETBE * PCI_ETBE) / PCI_ETHANOL
 
-    const currentETBEETHPciRatio =
-      (data.volume_ethanol * PCI_ETHANOL) / (data.volume_etbe * PCI_ETBE)
+    // const currentETBEETHPciRatio =
+    //   (data.volume_ethanol * PCI_ETHANOL) / (data.volume_etbe * PCI_ETBE)
 
-    const volumeDiff = checkVolumeDiff(data)
-    const { isOdd, RealVsTheoPCI } = checkPCIRatio(data)
+    // const volumeDiff = checkVolumeDiff(data)
+    // const { isOdd, RealVsTheoPCI } = checkPCIRatio(data)
+
+    const volumeDiff = compareVolumes(data.volume_ethanol, conversions)
 
     const canSave = hasChange && volumeDiff === 0
 
@@ -269,60 +287,60 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
             />
 
             <LabelInput
+              disabled
               type="number"
               label={`Volume d'Éthanol à convertir (${availableETH} litres disponibles)`}
               name="volume_ethanol"
               value={data.volume_ethanol}
-              onChange={onChange}
             />
 
             <LabelInput
+              disabled
               type="number"
               label="Volume Fossile"
               name="volume_fossile"
               value={data.volume_fossile}
-              onChange={onChange}
             />
 
-            <LabelInput
+            {/* <LabelInput
               type="number"
               label="Volume de Dénaturant"
               name="volume_denaturant"
               value={data.volume_denaturant}
               onChange={onChange}
-            />
+            /> */}
 
-            <LabelInput
+            {/* <LabelInput
               type="number"
               label="Pertes"
               name="volume_pertes"
               value={data.volume_pertes}
               onChange={onChange}
-            />
+            /> */}
           </Fragment>
         )}
 
         {volumeDiff !== 0 && (
           <Alert level="error" icon={AlertCircle}>
-            Les volumes ne correspondent pas ({volumeDiff})
+            Les volumes ne correspondent pas ({volumeDiff} litres)
           </Alert>
         )}
 
-        {usedETH != data.volume_ethanol && (
+        {/* {usedETH !== data.volume_ethanol && (
           <Alert level="error" icon={AlertCircle}>
             La somme des volumes à convertir ne correspond pas au volume total
             d'éthanol ({usedETH - data.volume_ethanol} litres)
           </Alert>
-        )}
+        )} */}
 
-        {!isNaN(currentETBEETHPciRatio) && (
+        {/* {!isNaN(currentETBEETHPciRatio) && (
           <Alert level={isOdd ? "warning" : "info"} icon={Filter}>
             Part PCI Ethanol de l'ETBE:{" "}
             {(currentETBEETHPciRatio * 100).toFixed(2)}% (
             {RealVsTheoPCI.toFixed(2)}% du ratio théorique de{" "}
             {(ETHANOL_PCI_RATIO_IN_ETBE * 100).toFixed()}%)
           </Alert>
-        )}
+        )} */}
 
         {rows.length > 0 && <Table columns={columns} rows={rows} />}
 
