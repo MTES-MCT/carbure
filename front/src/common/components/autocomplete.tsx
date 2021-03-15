@@ -14,6 +14,7 @@ function useAutoComplete<T>(
   queryArgs: any[],
   minLength: number,
   target: Element | null,
+  loose: boolean,
   onChange: (e: any) => void,
   getLabel: (option: T) => string,
   getQuery: (q: string, ...a: any[]) => Promise<T[]>
@@ -40,6 +41,10 @@ function useAutoComplete<T>(
       onChange({ target: { name, value: null } })
     }
 
+    if (loose) {
+      onChange({ target: { name, value: query } })
+    }
+
     if (query.length < minLength) {
       dd.toggle(false)
     } else {
@@ -50,10 +55,10 @@ function useAutoComplete<T>(
       // check if the typed value matches a result from the api
       // if so, trigger the onChange callback
       if (results && results.length > 0 && query.length > 0) {
-        const compare = query.toLowerCase()
+        const compared = query.toLowerCase()
 
         const suggestion = results.find((suggestion) => {
-          return compare === getLabel(suggestion).toLowerCase()
+          return compared === getLabel(suggestion).toLowerCase()
         })
 
         if (suggestion) {
@@ -76,6 +81,7 @@ type AutoCompleteProps<T> = Omit<InputProps, "value"> & {
   options?: T[]
   queryArgs?: any[]
   minLength?: number
+  loose?: boolean
   getValue: (option: T) => string
   getLabel: (option: T) => string
   onChange: (e: any) => void
@@ -88,6 +94,7 @@ export function AutoComplete<T>({
   queryArgs = [],
   readOnly,
   minLength = 1,
+  loose = false,
   onChange,
   getValue,
   getLabel,
@@ -102,6 +109,7 @@ export function AutoComplete<T>({
     queryArgs,
     minLength,
     target.current,
+    loose,
     onChange,
     getLabel,
     getQuery

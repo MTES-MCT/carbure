@@ -6,15 +6,7 @@ import { EntitySelection } from "carbure/hooks/use-entity"
 
 import styles from "./form.module.css"
 
-import {
-  findBiocarburants,
-  findCountries,
-  findEntities,
-  findMatieresPremieres,
-  findProducers,
-  findProductionSites,
-  findDeliverySites,
-} from "common/api"
+import * as api from "common/api"
 
 import { Box } from "common/components"
 import {
@@ -37,6 +29,7 @@ const getters = {
   code_pays: get("code_pays"),
   id: get("id"),
   depot_id: get("depot_id"),
+  raw: (v: string) => v,
 }
 
 type TransactionFormProps = {
@@ -110,7 +103,7 @@ const TransactionForm = ({
             getValue={getters.code}
             getLabel={getters.name}
             minLength={0}
-            getQuery={findBiocarburants}
+            getQuery={api.findBiocarburants}
             onChange={onChange}
           />
           <LabelAutoComplete
@@ -123,7 +116,7 @@ const TransactionForm = ({
             getValue={getters.code}
             getLabel={getters.name}
             minLength={0}
-            getQuery={findMatieresPremieres}
+            getQuery={api.findMatieresPremieres}
             onChange={onChange}
           />
           <LabelAutoComplete
@@ -135,7 +128,7 @@ const TransactionForm = ({
             error={fieldErrors.pays_origine_code}
             getValue={getters.code_pays}
             getLabel={getters.name}
-            getQuery={findCountries}
+            getQuery={api.findCountries}
             onChange={onChange}
           />
           <LabelInput
@@ -168,7 +161,7 @@ const TransactionForm = ({
                 error={fieldErrors.carbure_producer}
                 getValue={getters.id}
                 getLabel={getters.name}
-                getQuery={findProducers}
+                getQuery={api.findProducers}
                 onChange={onChange}
               />
               <LabelAutoComplete
@@ -181,8 +174,23 @@ const TransactionForm = ({
                 getValue={getters.id}
                 getLabel={getters.name}
                 minLength={0}
-                getQuery={findProductionSites}
+                getQuery={api.findProductionSites}
                 queryArgs={[tx.carbure_producer?.id]}
+                onChange={onChange}
+              />
+              <LabelAutoComplete
+                loose
+                readOnly={readOnly}
+                name="carbure_production_site_reference"
+                label="Référence Système Fournisseur"
+                placeholder="Rechercher un certificat..."
+                value={tx.carbure_production_site_reference}
+                error={fieldErrors.carbure_production_site_reference}
+                getValue={getters.raw}
+                getLabel={getters.raw}
+                getQuery={api.findCertificates}
+                queryArgs={[tx.carbure_production_site?.id]}
+                minLength={0}
                 onChange={onChange}
               />
               <LabelInput
@@ -207,13 +215,6 @@ const TransactionForm = ({
                 label="N° d'enregistrement double-compte"
                 value={tx.matiere_premiere?.is_double_compte ? (tx.carbure_production_site?.dc_reference ?? "") : ""} // prettier-ignore
               />
-              <LabelInput
-                disabled
-                readOnly={readOnly}
-                name="carbure_production_site_reference"
-                label="Référence Système Fournisseur"
-                value={tx.unknown_production_site_reference}
-              />
             </React.Fragment>
           ) : (
             <React.Fragment key="not_in_carbure">
@@ -234,6 +235,20 @@ const TransactionForm = ({
                 onChange={onChange}
               />
               <LabelAutoComplete
+                loose
+                readOnly={readOnly}
+                name="unknown_production_site_reference"
+                label="Référence Système Fournisseur"
+                placeholder="Rechercher un certificat..."
+                value={tx.unknown_production_site_reference}
+                error={fieldErrors.unknown_production_site_reference}
+                getValue={getters.raw}
+                getLabel={getters.raw}
+                minLength={0}
+                getQuery={api.findCertificates}
+                onChange={onChange}
+              />
+              <LabelAutoComplete
                 readOnly={readOnly}
                 label="Pays de production"
                 placeholder="Rechercher un pays..."
@@ -242,7 +257,7 @@ const TransactionForm = ({
                 error={fieldErrors.unknown_production_country}
                 getValue={getters.code_pays}
                 getLabel={getters.name}
-                getQuery={findCountries}
+                getQuery={api.findCountries}
                 onChange={onChange}
               />
               <LabelInput
@@ -260,14 +275,6 @@ const TransactionForm = ({
                 name="unknown_production_site_dbl_counting"
                 value={tx.unknown_production_site_dbl_counting ?? ""}
                 error={fieldErrors.production_site_dbl_counting}
-                onChange={onChange}
-              />
-              <LabelInput
-                readOnly={readOnly}
-                label="Référence Système Fournisseur *"
-                name="unknown_production_site_reference"
-                value={tx.unknown_production_site_reference}
-                error={fieldErrors.unknown_production_site_reference}
                 onChange={onChange}
               />
             </React.Fragment>
@@ -295,7 +302,7 @@ const TransactionForm = ({
                   error={fieldErrors.vendor}
                   getValue={getters.id}
                   getLabel={getters.name}
-                  getQuery={findEntities}
+                  getQuery={api.findEntities}
                   onChange={onChange}
                 />
               ) : (
@@ -331,7 +338,7 @@ const TransactionForm = ({
                   error={fieldErrors.client}
                   getValue={getters.id}
                   getLabel={getters.name}
-                  getQuery={findEntities}
+                  getQuery={api.findEntities}
                   onChange={onChange}
                 />
               ) : (
@@ -365,7 +372,7 @@ const TransactionForm = ({
               error={fieldErrors.delivery_site}
               getValue={getters.depot_id}
               getLabel={getters.name}
-              getQuery={findDeliverySites}
+              getQuery={api.findDeliverySites}
               onChange={onChange}
             />
           ) : (
@@ -397,7 +404,7 @@ const TransactionForm = ({
               error={fieldErrors.unknown_delivery_site_country}
               getValue={getters.code_pays}
               getLabel={getters.name}
-              getQuery={findCountries}
+              getQuery={api.findCountries}
               onChange={onChange}
             />
           )}

@@ -160,6 +160,30 @@ def get_2bs_certificates(request):
             'certification_type': c.certification_type} for c in cert]
     return JsonResponse({'status': 'success', 'data': sez})
 
+def get_certificates(request):
+    q = request.GET.get('query', False)
+    production_site = request.GET.get('production_site', None)
+
+    lastyear = datetime.date.today() - datetime.timedelta(days=365)
+    
+    iscc = ISCCCertificate.objects.filter(valid_until__gte=lastyear)
+    dbs = DBSCertificate.objects.filter(valid_until__gte=lastyear)
+    
+    if q:
+        iscc = iscc.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
+        dbs = dbs.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
+    if production_site:
+        iscc = iscc.filter(entityiscctradingcertificate__productionsitecertificate__production_site__id=production_site)
+        dbs = dbs.filter(entitydbstradingcertificate__productionsitecertificate__production_site__id=production_site)
+
+    iscc = iscc[0:100]
+    dbs = dbs[0:100]
+    
+    sez = [c.certificate_id for c in iscc]
+    sez += [c.certificate_id for c in dbs]
+
+    return JsonResponse({'status': 'success', 'data': sez})
+
 
 @otp_required
 def create_delivery_site(request):
