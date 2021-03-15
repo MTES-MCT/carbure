@@ -72,9 +72,14 @@ export function findISCCCertificates(
 }
 
 export function find2BSCertificates(query: string): Promise<DBSCertificate[]> {
-  return api.get("/common/2bs-certificates", {
-    query: query,
-  })
+  return api.get("/common/2bs-certificates", { query })
+}
+
+export function findCertificates(
+  query: string,
+  production_site: number
+): Promise<string[]> {
+  return api.get("/common/certificates", { query, production_site })
 }
 
 export function addDeliverySite(
