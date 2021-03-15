@@ -43,6 +43,7 @@ export interface TransactionFormState {
   carbure_producer: Entity | null
   unknown_producer: string
   carbure_production_site: ProductionSiteDetails | null
+  carbure_production_site_reference: string
   unknown_production_site: string
   unknown_production_country: Country | null
   unknown_production_site_com_date: string
@@ -97,6 +98,8 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
     unknown_production_country: tx.lot.unknown_production_country,
 
     carbure_production_site: tx.lot.carbure_production_site,
+    carbure_production_site_reference:
+      tx.lot.carbure_production_site?.dc_reference ?? "",
     unknown_production_site: tx.lot.unknown_production_site,
     unknown_production_site_reference: tx.lot.unknown_production_site_reference,
     unknown_production_site_com_date:
@@ -162,12 +165,15 @@ export function toTransactionPostData(tx: TransactionFormState) {
     production_site_country: !tx.producer_is_in_carbure
       ? tx.unknown_production_country?.code_pays
       : "",
-    production_site_reference: !tx.producer_is_in_carbure
-      ? tx.unknown_production_site_reference
-      : "",
+
+    production_site_reference: tx.producer_is_in_carbure
+      ? tx.carbure_production_site_reference
+      : tx.unknown_production_site_reference,
+
     production_site_commissioning_date: !tx.producer_is_in_carbure
       ? excelDate(tx.unknown_production_site_com_date)
       : "",
+
     double_counting_registration: !tx.producer_is_in_carbure
       ? tx.unknown_production_site_dbl_counting
       : "",
@@ -223,6 +229,7 @@ const initialState: TransactionFormState = {
   unknown_producer: "",
 
   carbure_production_site: null,
+  carbure_production_site_reference: "",
   unknown_production_site: "",
   unknown_production_country: null,
   unknown_production_site_com_date: "",

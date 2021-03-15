@@ -15,6 +15,7 @@ urlpatterns = [
     path('production-sites', views.get_production_sites, name='api-v3-public-get-production-sites'),
     path('iscc-certificates', views.get_iscc_certificates, name='api-v3-public-search-iscc-certificates'),
     path('2bs-certificates', views.get_2bs_certificates, name='api-v3-public-search-2bs-certificates'),
+    path('certificates', views.get_certificates, name='api-v3-public-search-certificates'),
 
     # POST
     path('create-delivery-site', views.create_delivery_site, name='api-v3-public-create-delivery-site'),
