@@ -181,11 +181,11 @@ const TransactionForm = ({
               <LabelAutoComplete
                 loose
                 readOnly={readOnly}
-                name="carbure_production_site_reference"
+                name="unknown_production_site_reference"
                 label="Référence Système Fournisseur"
                 placeholder="Rechercher un certificat..."
-                value={tx.carbure_production_site_reference}
-                error={fieldErrors.carbure_production_site_reference}
+                value={tx.unknown_production_site_reference}
+                error={fieldErrors.unknown_production_site_reference}
                 getValue={getters.raw}
                 getLabel={getters.raw}
                 getQuery={api.findCertificates}
