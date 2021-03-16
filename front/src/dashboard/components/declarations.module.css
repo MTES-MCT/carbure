@@ -1,6 +1,39 @@
+.declarationLegend {
+  margin-left: auto;
+}
+
+.declarationColorCode {
+  display: flex;
+  align-items: center;
+  margin-left: 16px;
+}
+
+.declarationColor {
+  display: block;
+  /* border: 1px solid var(--black); */
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+}
+
+.declarationColorInProgress {
+  background-color: var(--orange-medium);
+}
+
+.declarationColorReminded {
+  background-color: var(--red-dark);
+}
+
+.declarationColorDeclared {
+  background-color: var(--blue-medium);
+}
+
+.declarationColorChecked {
+  background-color: var(--green-dark);
+}
+
 .declarationTable > div > div {
   padding: 2px;
-  align-items: stretch;
 }
 
 .declarationCell {
@@ -8,7 +41,16 @@
   align-items: center;
   flex: 1;
   font-weight: normal;
-  padding: 8px;
+  /* height: 64px; */
+  padding: 8px 12px;
+}
+
+.declarationEntity {
+  align-items: center;
+}
+
+.declarationPeriod {
+  justify-content: center;
 }
 
 .declarationChecked {
@@ -31,21 +73,27 @@
 }
 
 .declarationSummary {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  display: flex;
+  visibility: hidden;
+  flex: 1;
+  flex-direction: column;
+  margin-right: 16px;
 }
 
 .declarationValidation {
   display: none;
   margin-left: auto;
   margin-right: 16px;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
 }
 
 .declarationCell:hover .declarationValidation {
   display: flex;
+}
+
+.declarationTable > div:hover .declarationSummary {
+  visibility: visible;
 }
 
 .declarationFocus {

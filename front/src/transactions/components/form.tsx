@@ -190,7 +190,7 @@ const TransactionForm = ({
                 getLabel={getters.raw}
                 getQuery={api.findCertificates}
                 queryArgs={[tx.carbure_production_site?.id]}
-                minLength={0}
+                minLength={tx.carbure_production_site ? 0 : undefined}
                 onChange={onChange}
               />
               <LabelInput
@@ -244,7 +244,6 @@ const TransactionForm = ({
                 error={fieldErrors.unknown_production_site_reference}
                 getValue={getters.raw}
                 getLabel={getters.raw}
-                minLength={0}
                 getQuery={api.findCertificates}
                 onChange={onChange}
               />
