@@ -10,7 +10,6 @@
 
 .declarationColor {
   display: block;
-  /* border: 1px solid var(--black); */
   width: 16px;
   height: 16px;
   margin-right: 8px;
@@ -41,7 +40,7 @@
   align-items: center;
   flex: 1;
   font-weight: normal;
-  /* height: 64px; */
+  min-height: 48px;
   padding: 8px 12px;
 }
 
@@ -51,6 +50,7 @@
 
 .declarationPeriod {
   justify-content: center;
+  font-size: 1em;
 }
 
 .declarationChecked {
@@ -73,7 +73,7 @@
 }
 
 .declarationSummary {
-  display: flex;
+  display: none;
   visibility: hidden;
   flex: 1;
   flex-direction: column;
@@ -94,6 +94,7 @@
 
 .declarationTable > div:hover .declarationSummary {
   visibility: visible;
+  display: flex;
 }
 
 .declarationFocus {

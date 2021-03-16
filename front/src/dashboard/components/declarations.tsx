@@ -110,14 +110,6 @@ function renderMonthSummary(
           </span>
 
           <span>
-            {corrections === 0
-              ? "∅"
-              : corrections === 1
-              ? "1 correction"
-              : `${corrections} corrections`}
-          </span>
-
-          <span>
             {output === 0
               ? "∅"
               : output === 1
@@ -127,6 +119,14 @@ function renderMonthSummary(
 
           <span>
             {input === 0 ? "∅" : input === 1 ? "1 reçu" : `${input} reçus`}
+          </span>
+
+          <span>
+            {corrections === 0
+              ? "∅"
+              : corrections === 1
+              ? "1 correction"
+              : `${corrections} corrections`}
           </span>
         </div>
 
