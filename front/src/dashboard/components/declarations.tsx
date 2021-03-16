@@ -16,6 +16,7 @@ import { confirm } from "common/components/dialog"
 type RowData = { entity: Entity; declarations: DeclarationsByMonth }
 
 const entityColumn = {
+  className: styles.declarationEntity,
   render: (v: RowData) => v.entity.name,
 }
 
@@ -62,6 +63,31 @@ function renderMonthSummary(
         period: month.replace("/", "-"),
       })
 
+    // prettier-ignore
+    const summary = [
+      drafts === 0
+        ? null
+        : drafts === 1
+        ? "1 brouillon"
+        : `${drafts} brouillons`,
+      output === 0 
+        ? null 
+        : output === 1 
+        ? "1 envoyé" 
+        : `${output} envoyés`,
+      input === 0 
+        ? null 
+        : input === 1 
+        ? "1 reçu" 
+        : `${input} reçus`,
+      corrections === 0
+        ? null
+        : corrections === 1
+        ? "1 correction"
+        : `${corrections} corrections`,
+    ]
+      .filter(Boolean)
+
     return (
       <Box
         row
@@ -74,28 +100,35 @@ function renderMonthSummary(
           ev === Evaluation.Reminded && styles.declarationReminded
         )}
       >
-        <ul className={styles.declarationSummary}>
-          {drafts > 0 && (
-            <li>
-              {drafts} brouillon{drafts !== 1 && "s"}
-            </li>
-          )}
-          {output > 0 && (
-            <li>
-              {output} envoyé{output !== 1 && "s"}
-            </li>
-          )}
-          {input > 0 && (
-            <li>
-              {input} reçu{input !== 1 && "s"}
-            </li>
-          )}
-          {corrections > 0 && (
-            <li>
-              {corrections} correction{corrections !== 1 && "s"}
-            </li>
-          )}
-        </ul>
+        <div className={styles.declarationSummary}>
+          <span>
+            {drafts === 0
+              ? "∅"
+              : drafts === 1
+              ? "1 brouillon"
+              : `${drafts} brouillons`}
+          </span>
+
+          <span>
+            {corrections === 0
+              ? "∅"
+              : corrections === 1
+              ? "1 correction"
+              : `${corrections} corrections`}
+          </span>
+
+          <span>
+            {output === 0
+              ? "∅"
+              : output === 1
+              ? "1 envoyé"
+              : `${output} envoyés`}
+          </span>
+
+          <span>
+            {input === 0 ? "∅" : input === 1 ? "1 reçu" : `${input} reçus`}
+          </span>
+        </div>
 
         {[Evaluation.InProgress, Evaluation.Reminded].includes(ev) && (
           <Bell
@@ -154,6 +187,7 @@ const DeclarationTable = ({
 }: DeclarationTableProps) => {
   const columns = months?.map((month) => ({
     header: month,
+    className: styles.declarationPeriod,
     render: renderMonthSummary(month, onCheck, onRemind),
   }))
 
@@ -238,6 +272,48 @@ const Declarations = () => {
     <Section>
       <SectionHeader>
         <Title>Résumé des déclarations</Title>
+
+        <Box row className={styles.declarationLegend}>
+          <span className={styles.declarationColorCode}>
+            <i
+              className={cl(
+                styles.declarationColor,
+                styles.declarationColorInProgress
+              )}
+            />
+            En cours
+          </span>
+
+          <span className={styles.declarationColorCode}>
+            <i
+              className={cl(
+                styles.declarationColor,
+                styles.declarationColorReminded
+              )}
+            />
+            Relancé
+          </span>
+
+          <span className={styles.declarationColorCode}>
+            <i
+              className={cl(
+                styles.declarationColor,
+                styles.declarationColorDeclared
+              )}
+            />
+            Déclaré par l'entité
+          </span>
+
+          <span className={styles.declarationColorCode}>
+            <i
+              className={cl(
+                styles.declarationColor,
+                styles.declarationColorChecked
+              )}
+            />
+            Approuvé par l'administration
+          </span>
+        </Box>
       </SectionHeader>
 
       <Box row>

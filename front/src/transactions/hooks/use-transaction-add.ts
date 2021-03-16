@@ -32,7 +32,7 @@ export default function useTransactionAdd(
 
       notifications.push({
         level: "success",
-        text: "Le lot a bien été créée !",
+        text: "Le lot a bien été créé !",
       })
     } else {
       notifications.push({
