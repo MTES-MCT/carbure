@@ -2,10 +2,12 @@
 # allows a manual user creation by an admin, without setting a password
 
 from django.contrib import admin
+from django.contrib import messages
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
 from django.utils.crypto import get_random_string
+from django.db.models import Count
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
 from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
@@ -107,13 +109,16 @@ class LotV2Admin(admin.ModelAdmin):
     search_fields = ('carbure_producer__name', 'biocarburant__name', 'matiere_premiere__name', 'carbure_id', 'period',)
     list_filter = ('period', 'production_site_is_in_carbure', 'carbure_producer', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused', 'is_transformed', 'added_by', 'added_by_user')
     raw_id_fields = ('fused_with', 'parent_lot', )
-    actions = [try_attach_certificate]
+    readonly_fields = ('added_time',)
+    actions = [try_attach_certificate, 'delete_orphans']
 
 
-def rerun_sanity_checks(modeladmin, request, queryset):
-    d = get_prefetched_data()
-    bulk_sanity_checks(queryset, d, background=False)
-rerun_sanity_checks.short_description = "Moulinette Règles Métiers"
+    def delete_orphans(self, request, queryset):
+        annotated = queryset.annotate(nb_tx=Count('tx_lot'))
+        zeros = annotated.filter(nb_tx=0)
+        deleted, _ = zeros.delete()
+        self.message_user(request, '%d lots deleted.' % deleted, messages.SUCCESS)
+    delete_orphans.short_description = "Supprimer Lots Orphelins"
 
 
 class TransactionAdmin(admin.ModelAdmin):
@@ -121,7 +126,7 @@ class TransactionAdmin(admin.ModelAdmin):
     search_fields = ('lot__id', 'dae', 'champ_libre')
     list_filter = ('carbure_vendor', 'carbure_client', 'delivery_status', 'is_mac', 'is_batch', 'carbure_client', 'unknown_client', 'client_is_in_carbure', 'delivery_site_is_in_carbure')
     raw_id_fields = ('lot',)
-    actions = [rerun_sanity_checks]
+    actions = ['rerun_sanity_checks', 'delete_ghosts']
 
     def get_lot_mp(self, obj):
         return obj.lot.matiere_premiere
@@ -138,6 +143,19 @@ class TransactionAdmin(admin.ModelAdmin):
         return obj.lot.volume
     get_lot_volume.admin_order_field  = 'Volume'
     get_lot_volume.short_description = 'Volume'    
+
+
+
+    def rerun_sanity_checks(self, request, queryset):
+        d = get_prefetched_data()
+        bulk_sanity_checks(queryset, d, background=False)
+    rerun_sanity_checks.short_description = "Moulinette Règles Métiers"
+
+
+    def delete_ghosts(self, request, queryset):
+        nb_deleted, _ = queryset.filter(delivery_date=None).delete()
+        self.message_user(request, '%d transactions deleted.' % nb_deleted, messages.SUCCESS)
+    delete_ghosts.short_description = "Supprimer Transactions Fantômes"
 
 class TransactionErrorAdmin(admin.ModelAdmin):
     list_display = ('tx', 'field', 'error', 'value')
