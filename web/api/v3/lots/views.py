@@ -10,7 +10,7 @@ from django import db
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 
-from core.models import LotV2, LotTransaction, LotV2Error, TransactionError
+from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, EntityDepot
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment, SustainabilityDeclaration
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
 from core.xlsx_v3 import export_transactions
@@ -122,6 +122,9 @@ def get_snapshot(request, *args, **kwargs):
         filters['vendors'] = vendors
 
     data['filters'] = filters
+
+    depots = [d.natural_key() for d in EntityDepot.objects.filter(entity=entity)]
+    data['depots'] = depots
 
     return JsonResponse({'status': 'success', 'data': data})
 
