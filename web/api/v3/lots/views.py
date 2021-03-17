@@ -232,7 +232,7 @@ def get_declaration_summary(request, *args, **kwargs):
 
     # get declared lots 
     ## lots sent
-    txs_out = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Validated', lot__period=period_str).exclude(carbure_client=entity)
+    txs_out = LotTransaction.objects.filter(lot__status='Validated', lot__period=period_str, carbure_vendor=entity).exclude(carbure_client=entity)
     data_out = {}
     for t in txs_out:
         client_name = t.carbure_client.name if t.client_is_in_carbure and t.carbure_client else t.unknown_client
@@ -248,7 +248,7 @@ def get_declaration_summary(request, *args, **kwargs):
         line['lots'] += 1
 
     ## lots received
-    txs_in = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Validated', lot__period=period_str, carbure_client=entity)
+    txs_in = LotTransaction.objects.filter(lot__status='Validated', lot__period=period_str, carbure_client=entity)
     data_in = {}
     for t in txs_in:
         vendor = t.carbure_vendor.name if t.carbure_vendor else t.unknown_vendor
