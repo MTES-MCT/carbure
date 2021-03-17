@@ -326,8 +326,10 @@ def add_delivery_site(request, *args, **kwargs):
     delivery_site_id = request.POST.get('delivery_site_id', False)
     ownership_type = request.POST.get('ownership_type', False)
 
-    blending_is_outsourced = request.POST.get('blending_is_outsourced', False)
-    blender_entity_id = request.POST.get('blender_entity_id', False)
+    blending_is_outsourced = request.POST.get('blending_outsourced', False)
+    if blending_is_outsourced == "true":
+        blending_is_outsourced = True
+    blending_entity_id = request.POST.get('blending_entity_id', False)
 
     if not delivery_site_id:
         return JsonResponse({'status': 'error', 'message': "Missing delivery site id"}, status=400)
@@ -346,7 +348,7 @@ def add_delivery_site(request, *args, **kwargs):
     blender = None
     if blending_is_outsourced:
         try:
-            blender = Entity.objects.get(id=blender_entity_id, entity_type='Opérateur')
+            blender = Entity.objects.get(id=blending_entity_id, entity_type='Opérateur')
         except:
             return JsonResponse({'status': 'error', 'message': "Could not find outsourcing blender"}, status=400)
 

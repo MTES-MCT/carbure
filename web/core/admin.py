@@ -14,7 +14,7 @@ from core.models import Entity, UserRights, UserPreferences, Biocarburant, Matie
 from core.models import GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
 from core.models import LotValidationError
 from core.models import ISCCScope, ISCCCertificate, ISCCCertificateRawMaterial, ISCCCertificateScope
-from core.models import DBSCertificate, DBSScope, DBSCertificateScope
+from core.models import DBSCertificate, DBSScope, DBSCertificateScope, EntityDepot
 from core.models import EntityISCCTradingCertificate, EntityDBSTradingCertificate, ProductionSiteCertificate
 from core.models import SustainabilityDeclaration
 from api.v3.sanity_checks import bulk_sanity_checks
@@ -231,6 +231,11 @@ class SustainabilityDeclarationAdmin(admin.ModelAdmin):
     list_filter = ('entity', 'period', 'declared', 'checked')
 
 
+class EntityDepotAdmin(admin.ModelAdmin):
+    list_display = ('entity', 'depot', 'blending_is_outsourced',)
+    search_fields = ('entity', 'depot', )
+    list_filter = ('blending_is_outsourced', )
+
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
 admin.site.register(UserRightsRequests, UserRightsRequestsAdmin)
@@ -257,6 +262,7 @@ admin.site.register(EntityISCCTradingCertificate, EntityISCCTradingCertificateAd
 admin.site.register(EntityDBSTradingCertificate, EntityDBSTradingCertificateAdmin)
 admin.site.register(ProductionSiteCertificate, ProductionSiteCertificateAdmin)
 admin.site.register(SustainabilityDeclaration, SustainabilityDeclarationAdmin)
+admin.site.register(EntityDepot, EntityDepotAdmin)
 
 
 # authtool custom user model
