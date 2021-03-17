@@ -46,8 +46,9 @@ function useKeyboardControls<T>(
   list: Element | null,
   focused: number,
   options: T[],
+  liveUpdate: boolean,
   setFocus: (i: number) => void,
-  onChange: (e: T) => void,
+  onChange: (e: T, c?: boolean) => void,
   onFocus?: (e: T) => void
 ) {
   useEffect(() => {
@@ -60,6 +61,7 @@ function useKeyboardControls<T>(
         onFocus && onFocus(options[prev])
         scrollToIndex(list, prev)
         setFocus(prev)
+        liveUpdate && onChange(options[prev])
       }
       // move down
       else if (e.key === "ArrowDown") {
@@ -69,11 +71,12 @@ function useKeyboardControls<T>(
         onFocus && onFocus(options[next])
         scrollToIndex(list, next)
         setFocus(next)
+        liveUpdate && onChange(options[next])
       }
       // select focused option
       else if (e.key === "Enter") {
         e.preventDefault()
-        onChange(options[focused])
+        onChange(options[focused], liveUpdate)
       }
     }
 
@@ -258,6 +261,7 @@ type DropdownOptionsProps<T> = {
   parent: Element
   className?: string
   options: T[]
+  liveUpdate?: boolean
   children: (s: T[], f: number) => React.ReactNode
   onChange: (option: T) => void
   onFocus?: (option: T) => void
@@ -268,6 +272,7 @@ export function DropdownOptions<T>({
   parent,
   options,
   className,
+  liveUpdate = false,
   children,
   onChange,
   onFocus,
@@ -280,6 +285,7 @@ export function DropdownOptions<T>({
     list.current,
     focused,
     options,
+    liveUpdate,
     setFocus,
     onChange,
     onFocus
