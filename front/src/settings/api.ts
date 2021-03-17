@@ -9,6 +9,7 @@ import {
   ProductionCertificate,
   OwnershipType,
 } from "common/types"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
 export function getSettings(): Promise<Settings> {
   return api.get("/settings/")
@@ -165,12 +166,16 @@ export function getDeliverySites(entity_id: number) {
 export function addDeliverySite(
   entity_id: number,
   delivery_site_id: string,
-  ownership_type: OwnershipType
+  ownership_type: OwnershipType,
+  blending_outsourced: boolean,
+  blending_entity_id: EntitySelection
 ) {
   return api.post("/settings/add-delivery-site", {
     entity_id,
     delivery_site_id,
     ownership_type,
+    blending_outsourced,
+    blending_entity_id: blending_entity_id?.id ?? null,
   })
 }
 

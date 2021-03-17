@@ -1,6 +1,6 @@
 import React from "react"
 
-import { Country, DepotType, OwnershipType } from "common/types"
+import { Country, DepotType, OwnershipType, Entity, EntityType } from "common/types"
 import {
   DeliverySiteSettingsHook,
   EntityDeliverySite,
@@ -11,7 +11,7 @@ import styles from "./settings.module.css"
 import * as common from "common/api"
 
 import { Title, Box, LoaderOverlay } from "common/components"
-import { LabelInput, Label } from "common/components/input"
+import { LabelInput, Label, LabelCheckbox } from "common/components/input"
 import { Button } from "common/components/button"
 import { AlertCircle, Cross, Plus, Return } from "common/components/icons"
 import { Alert } from "common/components/alert"
@@ -29,6 +29,7 @@ import { padding } from "transactions/components/list-columns"
 import RadioGroup from "common/components/radio-group"
 import { SettingsForm } from "./common"
 import useForm from "common/hooks/use-form"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
 const DEPOT_TYPE_LABELS = {
   [DepotType.EFS]: "EFS",
@@ -49,7 +50,7 @@ const DEPOT_TYPES = Object.entries(DEPOT_TYPE_LABELS)
 const OWNERSHIP_TYPES = Object.entries(OWNERSHIP_LABELS)
   .map(([value, label]) => ({ value, label }))
 
-export const DeliverySiteFinderPromptFactory = (entityID?: number) =>
+export const DeliverySiteFinderPromptFactory = (entity: EntitySelection) =>
   function DeliverySiteFinderPrompt({
     onConfirm,
     onCancel,
@@ -57,6 +58,8 @@ export const DeliverySiteFinderPromptFactory = (entityID?: number) =>
     const { data, hasChange, onChange } = useForm<EntityDeliverySite>({
       depot: null,
       ownership_type: OwnershipType.ThirdParty,
+      blending_outsourced: false,
+      blender_entity_id: null
     })
 
     return (
@@ -70,7 +73,7 @@ export const DeliverySiteFinderPromptFactory = (entityID?: number) =>
           onChange={onChange}
           getValue={(d) => d.depot_id}
           getLabel={(d) => d.name}
-          queryArgs={[entityID]}
+          queryArgs={[entity?.id]}
         />
 
         <Label label="Propriété">
@@ -82,6 +85,26 @@ export const DeliverySiteFinderPromptFactory = (entityID?: number) =>
             onChange={onChange}
           />
         </Label>
+
+        {entity && entity.entity_type == EntityType.Operator && (
+        <LabelCheckbox
+          name="blending_outsourced"
+          label="Incorporation potentiellement effectuée par un tiers"
+          checked={data.blending_outsourced}
+          onChange={onChange}
+        />)}
+        {data.blending_outsourced && (
+        <LabelAutoComplete
+          label="Incorporateur Tiers"
+          placeholder="Rechercher un opérateur pétrolier..."
+          name="blender_entity_id"
+          value={data.blender_entity_id}
+          getQuery={common.findOperators}
+          onChange={onChange}
+          getValue={(c) => c.id.toString()}
+          getLabel={(c) => c.name}
+        />
+        )}
 
         <a
           href="mailto:carbure@beta.gouv.fr"

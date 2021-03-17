@@ -15,6 +15,8 @@ import { useNotificationContext } from "common/components/notifications"
 export interface EntityDeliverySite {
   depot: DeliverySite | null
   ownership_type: OwnershipType
+  blending_outsourced: boolean
+  blender_entity_id: EntitySelection
 }
 
 export interface DeliverySiteSettingsHook {
@@ -54,14 +56,16 @@ export default function useDeliverySites(
     const data = await prompt(
       "Ajouter dépôt",
       "Veuillez rechercher un dépôt que vous utilisez.",
-      DeliverySiteFinderPromptFactory(entityID)
+      DeliverySiteFinderPromptFactory(entity)
     )
 
     if (typeof entityID !== "undefined" && data && data.depot) {
       const res = await resolveAddDeliverySite(
         entityID,
         data.depot.depot_id,
-        data.ownership_type
+        data.ownership_type,
+        data.blending_outsourced,
+        data.blender_entity_id
       )
 
       if (res) {
