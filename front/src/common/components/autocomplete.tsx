@@ -25,10 +25,10 @@ function useAutoComplete<T>(
   const [suggestions, resolveQuery] = useAPI(getQuery)
 
   // on change, modify the query to match selection and send event to parent
-  function change(value: T) {
+  function change(value: T, close?: boolean) {
     setQuery(getLabel(value))
     onChange({ target: { name, value } })
-    dd.toggle(false)
+    close && dd.toggle(false)
   }
 
   async function onQuery(
@@ -133,6 +133,7 @@ export function AutoComplete<T>({
 
       {!readOnly && !isEmpty && dd.isOpen && target.current && (
         <DropdownOptions
+          liveUpdate
           parent={target.current}
           options={suggestions.data!}
           onChange={change}
