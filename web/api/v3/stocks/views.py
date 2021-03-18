@@ -427,7 +427,6 @@ def convert_eth_stock_to_etbe(request, entity, c):
     transaction = previous_stock_tx
     transaction.pk = None
     transaction.lot = new_lot
-    transaction.vendor_is_in_carbure = True
     transaction.carbure_vendor = entity
     transaction.dae = 'CONVERSION-ETBE'
     transaction.champ_libre = 'CONVERSION-ETBE'

@@ -253,7 +253,7 @@ def get_snapshot(request):
         filters['clients'] = sorted([c for c in set(c1 + c2) if c])
 
         v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
-        v2 = [v['unknown_vendor'] for v in txs.values('unknown_vendor').distinct()]
+        v2 = [v['lot__unknown_supplier'] for v in txs.values('lot__unknown_supplier').distinct()]
         filters['vendors'] = sorted([v for v in set(v1 + v2) if v])
 
         filters['added_by'] = [e['lot__added_by__name'] for e in txs.values('lot__added_by__name').distinct()]
