@@ -4,20 +4,23 @@
   margin-top: 8px;
 }
 
-.transactionFields > div {
-  flex: 3;
-}
-
-.transactionFields > div:last-child {
-  flex: 2;
-}
-
-.transactionFields > div {
+.transactionFields > div > div {
   margin-right: 32px;
 }
 
-.transactionFields > div:last-child {
-  margin-right: 0;
+.transactionFields {
+  flex-shrink: 0;
+}
+
+.transactionRequiredInfo {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.transactionGESFields {
+  flex: 1;
+  max-width: 240px;
 }
 
 .transactionGES > *:first-child {

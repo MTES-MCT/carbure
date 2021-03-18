@@ -64,10 +64,7 @@ export const periodSimple: Column<Transaction> = {
 export const dae: Column<Transaction> = {
   header: "N° Douane",
   sortBy: "delivery_date",
-  render: (tx) => <TwoLines
-                    text={tx.dae}
-                    sub={tx?.delivery_date ?? ""}
-                 />
+  render: (tx) => <TwoLines text={tx.dae} sub={tx?.delivery_date ?? ""} />,
 }
 
 export const ghgReduction: Column<Transaction> = {
@@ -86,12 +83,15 @@ export const client: Column<Transaction> = {
 export const vendor: Column<Transaction> = {
   header: "Fournisseur",
   sortBy: "vendor",
-  render: (tx) => 
+  render: (tx) => (
     <TwoLines
-    text={tx.carbure_vendor?.name ?? tx.unknown_vendor}
-    sub={tx.lot.unknown_production_site_reference}
-    />,
-
+      text={tx.carbure_vendor?.name ?? tx.lot.unknown_supplier ?? ""}
+      sub={
+        tx.lot.carbure_production_site_reference ??
+        tx.lot.unknown_production_site_reference
+      }
+    />
+  ),
 }
 
 export const addedBy: Column<Transaction> = {

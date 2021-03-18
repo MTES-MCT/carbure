@@ -77,9 +77,10 @@ export function find2BSCertificates(query: string): Promise<DBSCertificate[]> {
 
 export function findCertificates(
   query: string,
-  production_site: number
+  entity_id: number | null,
+  production_site: number | null | undefined
 ): Promise<string[]> {
-  return api.get("/common/certificates", { query, production_site })
+  return api.get("/common/certificates", { query, entity_id, production_site })
 }
 
 export function addDeliverySite(

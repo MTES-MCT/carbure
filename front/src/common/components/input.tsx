@@ -28,6 +28,7 @@ export type LabelProps = SystemProps &
     error?: string | null
     tooltip?: string
     label: string
+    required?: boolean
   }
 
 export const Label = ({
@@ -37,6 +38,7 @@ export const Label = ({
   tooltip,
   label,
   readOnly,
+  required = false,
   children,
   ...props
 }: LabelProps) => (
@@ -52,6 +54,7 @@ export const Label = ({
   >
     <span className={styles.labelText}>
       {label}
+      {!readOnly && required && " *"}
       {error && <AlertTriangle size={16} />}
     </span>
     {children}
@@ -71,9 +74,11 @@ export const LabelInput = ({
   error,
   tooltip,
   className,
+  required,
   ...props
 }: LabelInputProps) => (
   <Label
+    required={required}
     disabled={disabled}
     error={error}
     tooltip={tooltip}
