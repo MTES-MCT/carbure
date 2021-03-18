@@ -86,7 +86,12 @@ export const client: Column<Transaction> = {
 export const vendor: Column<Transaction> = {
   header: "Fournisseur",
   sortBy: "vendor",
-  render: (tx) => <Line text={tx.carbure_vendor?.name ?? tx.unknown_vendor} />,
+  render: (tx) => 
+    <TwoLines
+    text={tx.carbure_vendor?.name ?? tx.unknown_vendor}
+    sub={tx.lot.unknown_production_site_reference}
+    />,
+
 }
 
 export const addedBy: Column<Transaction> = {
