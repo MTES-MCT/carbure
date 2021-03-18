@@ -154,7 +154,7 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(data['transaction']['lot']['volume'], 15000)
         self.assertEqual(data['transaction']['lot']['pays_origine']['code_pays'], 'FR')
         self.assertEqual(data['transaction']['lot']['etd'], 12)
-        self.assertEqual(data['transaction']['lot']['unknown_production_site_reference'], 'PRODSITEREFERENCE')
+        self.assertEqual(data['transaction']['lot']['carbure_production_site_reference'], 'PRODSITEREFERENCE')
         self.assertEqual(data['transaction']['lot']['unknown_production_site_com_date'], '2002-12-01')
         self.assertEqual(data['transaction']['lot']['unknown_production_site_dbl_counting'], 'NUMDOUBLECOMPTE')
 

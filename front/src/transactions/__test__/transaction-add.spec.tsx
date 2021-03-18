@@ -44,7 +44,7 @@ test("display the transaction form", async () => {
   screen.getByLabelText("Numéro douanier (DAE, DAA...) *")
   screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°) *")
   screen.getByLabelText("Biocarburant *")
-  screen.getByLabelText("Matiere Premiere *")
+  screen.getByLabelText("Matiere premiere *")
   screen.getByLabelText("Pays d'origine *")
   screen.getByLabelText("Date de livraison")
 
@@ -54,14 +54,14 @@ test("display the transaction form", async () => {
   screen.getByLabelText("Pays de production")
   screen.getByLabelText("Date de mise en service")
   screen.getByLabelText("N° d'enregistrement double-compte")
-  screen.getByLabelText("Référence Système Fournisseur")
+  screen.getByLabelText("Certificat du producteur *")
 
   screen.getByLabelText("Client enregistré sur Carbure ?")
   screen.getByLabelText("Client")
   screen.getByLabelText("Site de livraison enregistré sur Carbure ?")
   screen.getByLabelText("Site de livraison *")
   screen.getByLabelText("Pays de livraison")
-  screen.getByLabelText("Champ Libre")
+  screen.getByLabelText("Champ libre")
 
   screen.getByText("Émissions")
   screen.getByLabelText("EEC")
@@ -104,7 +104,7 @@ test("check the form fields", async () => {
   userEvent.type(screen.getByLabelText("Biocarburant *"), "EM")
   userEvent.click(await screen.findByText("EMHV"))
 
-  userEvent.type(screen.getByLabelText("Matiere Premiere *"), "Co")
+  userEvent.type(screen.getByLabelText("Matiere premiere *"), "Co")
   userEvent.click(await screen.findByText("Colza"))
 
   userEvent.type(screen.getByLabelText("Pays d'origine *"), "France")
@@ -122,7 +122,7 @@ test("check the form fields", async () => {
   userEvent.type(screen.getByLabelText("Site de livraison *"), "Test") // prettier-ignore
   userEvent.click(await screen.findByText("Test Delivery Site"))
 
-  userEvent.type(screen.getByLabelText("Champ Libre"), "blabla")
+  userEvent.type(screen.getByLabelText("Champ libre"), "blabla")
 
   userEvent.type(screen.getByLabelText("EEC"), "10")
   userEvent.type(screen.getByLabelText("EL"), "1.1")
