@@ -540,7 +540,7 @@ def make_dump_lots_sheet(workbook, entity, transactions):
                'production_site_commissioning_date', 'double_counting_registration',
                'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
                'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total',
-               'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
+               'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country', 'delivery_site_name']
     if entity is not None and entity.has_mac:
         columns.append('mac')
     for i, c in enumerate(columns):
@@ -562,7 +562,8 @@ def make_dump_lots_sheet(workbook, entity, transactions):
                tx.dae, tx.champ_libre, tx.carbure_client.name if tx.client_is_in_carbure and tx.carbure_client else tx.unknown_client, 
                tx.delivery_date.strftime('%d/%m/%Y') if tx.delivery_date else '',
                tx.carbure_delivery_site.depot_id if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site,
-               tx.carbure_delivery_site.country.code_pays if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site_country.code_pays if tx.unknown_delivery_site_country else ''
+               tx.carbure_delivery_site.country.code_pays if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site_country.code_pays if tx.unknown_delivery_site_country else '',
+               tx.carbure_delivery_site.name if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site,
                ]
         if entity is not None and entity.has_mac:
             row += [tx.is_mac]
