@@ -10,7 +10,7 @@ from django_otp.decorators import otp_required
 
 def get_matieres_premieres(request):
     q = request.GET.get('query', False)
-    mps = MatierePremiere.objects.filter(is_displayed=True)
+    mps = MatierePremiere.objects.filter(is_displayed=True).order_by('name')
     if q:
         mps = mps.filter(Q(name__icontains=q) | Q(code__icontains=q))
     sez = [{'code': m.code, 'name': m.name, 'description': m.description, 'compatible_alcool': m.compatible_alcool,
@@ -20,7 +20,7 @@ def get_matieres_premieres(request):
 
 def get_biocarburants(request):
     q = request.GET.get('query', False)
-    bcs = Biocarburant.objects.filter(is_displayed=True)
+    bcs = Biocarburant.objects.filter(is_displayed=True).order_by('name')
     if q:
         bcs = bcs.filter(Q(name__icontains=q) | Q(code__icontains=q))
     sez = [{'code': b.code, 'name': b.name, 'description': b.description, 'pci_kg': b.pci_kg, 'pci_litre': b.pci_litre,
@@ -30,7 +30,7 @@ def get_biocarburants(request):
 
 def get_countries(request):
     q = request.GET.get('query', False)
-    countries = Pays.objects.all()
+    countries = Pays.objects.all().order_by('name')
     if q:
         countries = countries.filter(Q(name__icontains=q) | Q(code_pays__icontains=q))
     sez = [c.natural_key() for c in countries]
@@ -48,7 +48,7 @@ def get_ges(request):
 
 def get_entities(request):
     q = request.GET.get('query', False)
-    entities = Entity.objects.all()
+    entities = Entity.objects.all().order_by('name')
     if q:
         entities = entities.filter(name__icontains=q)
     sez = [{'entity_type': e.entity_type, 'name': e.name, 'id': e.id} for e in entities]
@@ -57,7 +57,7 @@ def get_entities(request):
 
 def get_producers(request):
     q = request.GET.get('query', False)
-    entities = Entity.objects.filter(entity_type='Producteur')
+    entities = Entity.objects.filter(entity_type='Producteur').order_by('name')
     if q:
         entities = entities.filter(name__icontains=q)
     sez = [{'entity_type': e.entity_type, 'name': e.name, 'id': e.id} for e in entities]
@@ -66,7 +66,7 @@ def get_producers(request):
 
 def get_traders(request):
     q = request.GET.get('query', False)
-    entities = Entity.objects.filter(entity_type='Trader')
+    entities = Entity.objects.filter(entity_type='Trader').order_by('name')
     if q:
         entities = entities.filter(name__icontains=q)
     sez = [{'entity_type': e.entity_type, 'name': e.name, 'id': e.id} for e in entities]
@@ -75,7 +75,7 @@ def get_traders(request):
 
 def get_operators(request):
     q = request.GET.get('query', False)
-    entities = Entity.objects.filter(entity_type='Opérateur')
+    entities = Entity.objects.filter(entity_type='Opérateur').order_by('name')
     if q:
         entities = entities.filter(name__icontains=q)
     sez = [{'entity_type': e.entity_type, 'name': e.name, 'id': e.id} for e in entities]
@@ -87,7 +87,7 @@ def get_delivery_sites(request):
     entity_id = request.GET.get('entity_id', False)
 
     try:
-        dsites = Depot.objects.all()
+        dsites = Depot.objects.all().order_by('name')
         if q:
             dsites = dsites.filter(Q(name__icontains=q) | Q(depot_id__icontains=q) | Q(city__icontains=q))
         if entity_id:
@@ -104,7 +104,7 @@ def get_delivery_sites(request):
 def get_production_sites(request):
     q = request.GET.get('query', False)
     pid = request.GET.get('producer_id', False)
-    psites = ProductionSite.objects.all()
+    psites = ProductionSite.objects.all().order_by('name')
     if q:
         psites = psites.filter(name__icontains=q)
     if pid:
