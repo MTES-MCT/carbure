@@ -1,4 +1,5 @@
 import { Option } from "./components/select"
+import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 
 export type Pagination = {
   from?: number
@@ -274,6 +275,8 @@ export interface Snapshot {
   }
 
   years: Option[]
+
+  depots: EntityDeliverySite[]
 }
 
 export interface Settings {

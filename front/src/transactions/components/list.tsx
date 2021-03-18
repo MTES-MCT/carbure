@@ -48,6 +48,9 @@ import {
   InvalidFilter,
   SummaryFilter,
 } from "./list-special-filters"
+import { OperatorOutsourcedBlendingActions } from "./list-actions"
+import { LotForwarder } from "transactions/hooks/actions/use-forward-lots"
+import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 
 type TransactionListProps = {
   entity: Entity
@@ -64,6 +67,8 @@ type TransactionListProps = {
   duplicator: LotDuplicator
   acceptor: LotAcceptor
   rejector: LotRejector
+  outsourceddepots: EntityDeliverySite[] | undefined
+  forwarder: LotForwarder
 }
 
 export const TransactionList = ({
@@ -81,6 +86,8 @@ export const TransactionList = ({
   duplicator,
   acceptor,
   rejector,
+  outsourceddepots,
+  forwarder
 }: TransactionListProps) => {
   const txs = transactions.data
   const txCount = txs?.total ?? 0
@@ -98,7 +105,7 @@ export const TransactionList = ({
   const isLoading = transactions.loading
   const isError = transactions.error !== null
   const isEmpty = txs === null || txs.lots.length === 0
-
+  
   return (
     <Box className={styles.transactionList}>
       {isError && (
@@ -164,18 +171,28 @@ export const TransactionList = ({
           )}
 
           {status.is(LotStatus.Inbox) && (
-            <InboxActions
-              disabled={isEmpty}
-              hasSelection={selection.selected.length > 0}
-              acceptor={acceptor}
-              rejector={rejector}
-            />
+            <React.Fragment>
+              <InboxActions
+                disabled={isEmpty}
+                hasSelection={selection.selected.length > 0}
+                acceptor={acceptor}
+                rejector={rejector}
+              />
+            </React.Fragment>
           )}
 
           {status.is(LotStatus.ToFix) && (
             <ToFixActions
               disabled={selection.selected.length === 0}
               deleter={deleter}
+            />
+          )}
+
+          {isOperator && (status.is(LotStatus.Inbox) || status.is(LotStatus.Accepted)) && (
+            <OperatorOutsourcedBlendingActions 
+              forwarder={forwarder}
+              outsourceddepots={outsourceddepots}
+              disabled={selection.selected.length === 0 ? true : false}
             />
           )}
         </ActionBar>
@@ -226,8 +243,9 @@ export const TransactionList = ({
               entity={entity}
               status={status}
               transactions={txs!}
-              selection={selection}
               sorting={sorting}
+              outsourceddepots={outsourceddepots}
+              selection={selection}
               onDuplicate={duplicator.duplicateLot}
               onValidate={validator.validateLot}
               onDelete={deleter.deleteLot}

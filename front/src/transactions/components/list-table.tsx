@@ -14,6 +14,7 @@ import Table, { Actions, arrow, Column, Row } from "common/components/table"
 import * as C from "./list-columns"
 
 import styles from "./list-table.module.css"
+import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 
 export const PRODUCER_COLUMNS = [
   C.dae,
@@ -78,6 +79,8 @@ type TransactionTableProps = {
   transactions: Lots
   status: StatusSelection
   sorting: SortingSelection
+  outsourceddepots: EntityDeliverySite[] | undefined
+
   selection: TransactionSelection
   onDelete: (id: number) => void
   onValidate: (id: number) => void
@@ -93,6 +96,7 @@ export const TransactionTable = ({
   transactions,
   status,
   sorting,
+  outsourceddepots,
   selection,
   onDelete,
   onDuplicate,

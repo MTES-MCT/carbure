@@ -17,6 +17,8 @@ import {
   Plus,
   Rapport,
   Upload,
+  Forward,
+
 } from "common/components/icons"
 import { prompt } from "common/components/dialog"
 
@@ -26,7 +28,11 @@ import {
   TraderImportPromptFactory,
 } from "./import"
 
+import { OperatorForwardPromptFactory } from "./forward"
+
 import styles from "./list-actions.module.css"
+import { LotForwarder } from "transactions/hooks/actions/use-forward-lots"
+import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 
 type ExportActionsProps = {
   isEmpty: boolean
@@ -286,7 +292,34 @@ export const InboxValidatedSummaryActions = () => (
   </Link>
 )
 
+type OperatorOutsourcedBlendingProps = {
+  disabled: boolean
+  forwarder: LotForwarder
+  outsourceddepots: EntityDeliverySite[] | undefined
+}
 
+
+export const OperatorOutsourcedBlendingActions = ({disabled, forwarder, outsourceddepots}: OperatorOutsourcedBlendingProps) => {
+  async function onForward() {
+    const recipient = await prompt(
+      "Transfert de lots",
+      "Vous pouvez transférer vos lots reçus dans un dépôt pour lequel l'incorporation peut être effectuée par une société tierce.",
+      OperatorForwardPromptFactory(forwarder, outsourceddepots)
+    )
+    if (recipient) {
+      forwarder.forwardSelection(recipient)
+    }
+  }
+  return (
+    <Button 
+      disabled={disabled} 
+      level="primary" 
+      icon={Forward}
+      onClick={onForward}>
+      Forward
+    </Button>
+  )
+}
 
 export const ActionBar = ({ children }: { children: React.ReactNode }) => (
   <Box row className={cl(styles.actionBar)}>

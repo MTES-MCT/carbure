@@ -30,6 +30,7 @@ import TransactionAdd from "./routes/transaction-add"
 import TransactionDetails from "./routes/transaction-details"
 import TransactionInSummary from "./routes/transaction-in-summary"
 import TransactionOutSummary from "./routes/transaction-out-summary"
+import useForwardLots from "./hooks/actions/use-forward-lots"
 
 // prettier-ignore
 const OPERATOR_STATUSES = [
@@ -112,6 +113,7 @@ export function useTransactions(entity: EntitySelection) {
   const acceptor = useAcceptLots(entity, selection, year, refresh)
   const rejector = useRejectLots(entity, selection, year, refresh)
   const declarator = useDeclareLots(entity)
+  const forwarder = useForwardLots(entity, selection, refresh)
 
   return {
     entity,
@@ -132,6 +134,7 @@ export function useTransactions(entity: EntitySelection) {
     acceptor,
     rejector,
     declarator,
+    forwarder,
     refresh,
   }
 }
@@ -155,6 +158,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
     acceptor,
     rejector,
     declarator,
+    forwarder,
     refresh,
   } = useTransactions(entity)
 
@@ -226,6 +230,8 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         duplicator={duplicator}
         acceptor={acceptor}
         rejector={rejector}
+        outsourceddepots={snapshot.data?.depots}
+        forwarder={forwarder}
       />
 
       <Switch>
@@ -299,7 +305,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
             acceptor={acceptor}
             rejector={rejector}
             transactions={transactions}
-          />
+        />
         </Route>
       </Switch>
     </Main>

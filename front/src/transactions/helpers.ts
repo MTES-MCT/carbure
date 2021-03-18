@@ -8,6 +8,7 @@ import {
   SummaryItem,
   Errors,
 } from "common/types"
+import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 
 export function toOption(value: string) {
   return { value, label: value }
@@ -98,6 +99,17 @@ export function normalizeFilters(snapshot: any): Snapshot {
 
   snapshot.years = snapshot.years.map(toOption)
 
+  return snapshot
+}
+
+export function filterOutsourcedDepots(snapshot: any): Snapshot {
+  const filteredDepots: EntityDeliverySite[] = []
+  snapshot.depots.forEach((d: any) => {
+    if (d.blending_is_outsourced) {
+      filteredDepots.push(d)
+    }
+  })
+  snapshot.depots = filteredDepots
   return snapshot
 }
 
