@@ -236,12 +236,15 @@ class LotV2(models.Model):
 
     production_site_is_in_carbure = models.BooleanField(default=True)
     carbure_production_site = models.ForeignKey(ProductionSite, null=True, blank=True, on_delete=models.SET_NULL)
+    carbure_production_site_reference = models.CharField(max_length=64, blank=True, null=True, default='')
     unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default='')
     unknown_production_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.SET_NULL, related_name='unknown_production_site_country')
-
     unknown_production_site_com_date = models.DateField(blank=True, null=True)
     unknown_production_site_reference = models.CharField(max_length=64, blank=True, null=True, default='')
     unknown_production_site_dbl_counting = models.CharField(max_length=64, blank=True, null=True, default='')
+
+    unknown_supplier = models.CharField(max_length=64, blank=True, null=True, default='')
+    unknown_supplier_certificate = models.CharField(max_length=64, blank=True, null=True, default='')
 
     # lot details
     volume = models.FloatField(default=0.0)
@@ -301,7 +304,8 @@ class LotV2(models.Model):
         'eec': self.eec, 'el': self.el, 'ep': self.ep, 'etd': self.etd, 'eu': self.eu, 'esca': self.esca, 'eccs': self.eccs, 'eccr': self.eccr, 'eee': self.eee,
         'ghg_total': self.ghg_total, 'ghg_reference': self.ghg_reference, 'ghg_reduction': self.ghg_reduction, 'status': self.status, 'source': self.source,
         'parent_lot': self.parent_lot.natural_key() if self.parent_lot else None, 'is_split': self.is_split, 'is_fused': self.is_fused, 'fused_with': self.fused_with.natural_key() if self.fused_with else None,
-        'data_origin_entity': self.data_origin_entity.natural_key() if self.data_origin_entity else None, 'added_by': self.added_by.natural_key() if self.added_by else None, 'is_transformed': self.is_transformed}
+        'data_origin_entity': self.data_origin_entity.natural_key() if self.data_origin_entity else None, 'added_by': self.added_by.natural_key() if self.added_by else None, 'is_transformed': self.is_transformed,
+        'unknown_supplier': self.unknown_supplier, 'unknown_supplier_certificate': self.unknown_supplier_certificate, 'carbure_production_site_reference': self.carbure_production_site_reference}
 
     def __str__(self):
         return str(self.id)
@@ -321,10 +325,8 @@ class LotTransaction(models.Model):
     lot = models.ForeignKey(LotV2, null=False, blank=False, on_delete=models.CASCADE, related_name='tx_lot')
 
     # vendor / producer
-    vendor_is_in_carbure = models.BooleanField(default=True)
     carbure_vendor = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='vendor_transaction')
-    unknown_vendor = models.CharField(max_length=64, blank=True, null=True, default='')
-    vendor_certificate = models.CharField(max_length=64, blank=True, null=True, default='')
+    carbure_vendor_certificate = models.CharField(max_length=64, blank=True, null=True, default='')
 
     # client / delivery
     dae = models.CharField(max_length=128, blank=True, default='')
@@ -354,14 +356,13 @@ class LotTransaction(models.Model):
         return str(self.id)
 
     def natural_key(self):
-        return {'lot': self.lot.natural_key(), 'vendor_is_in_carbure': self.vendor_is_in_carbure, 'carbure_vendor': self.carbure_vendor.natural_key() if self.carbure_vendor else None,
-        'unknown_vendor': self.unknown_vendor, 'dae': self.dae, 'client_is_in_carbure': self.client_is_in_carbure,
-        'carbure_client': self.carbure_client.natural_key() if self.carbure_client else None,
+        return {'lot': self.lot.natural_key(), 'carbure_vendor': self.carbure_vendor.natural_key() if self.carbure_vendor else None, 'carbure_vendor_certificate': self.carbure_vendor_certificate,
+        'dae': self.dae, 'client_is_in_carbure': self.client_is_in_carbure, 'carbure_client': self.carbure_client.natural_key() if self.carbure_client else None,
         'unknown_client': self.unknown_client, 'delivery_date': self.delivery_date, 'delivery_site_is_in_carbure': self.delivery_site_is_in_carbure,
         'carbure_delivery_site': self.carbure_delivery_site.natural_key() if self.carbure_delivery_site else None, 'unknown_delivery_site': self.unknown_delivery_site,
         'unknown_delivery_site_country': self.unknown_delivery_site_country.natural_key() if self.unknown_delivery_site_country else None, 'delivery_status': self.delivery_status,
         'champ_libre': self.champ_libre, 'is_mac': self.is_mac, 'is_batch': self.is_batch,
-        'id': self.id, 'certificate': self.vendor_certificate}
+        'id': self.id}
 
     class Meta:
         db_table = 'transactions'
