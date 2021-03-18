@@ -117,7 +117,7 @@ def get_snapshot(request, *args, **kwargs):
         filters['clients'] = clients
     elif entity.entity_type == 'Opérateur':
         v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
-        v2 = [v['unknown_vendor'] for v in txs.values('unknown_vendor').distinct()]
+        v2 = [v['lot__unknown_supplier'] for v in txs.values('lot__unknown_supplier').distinct()]
         vendors = [v for v in v1 + v2 if v]
         filters['vendors'] = vendors
 
@@ -155,7 +155,7 @@ def get_summary_in(request, *args, **kwargs):
         delivery_site = t.carbure_delivery_site.name if t.delivery_site_is_in_carbure and t.carbure_delivery_site else t.unknown_delivery_site
         if delivery_site not in data:
             data[delivery_site] = {}
-        supplier = t.carbure_vendor.name if t.carbure_vendor else t.unknown_vendor
+        supplier = t.carbure_vendor.name if t.carbure_vendor else t.lot.unknown_supplier
         if supplier == '':
             supplier = t.vendor_certificate
         if supplier not in data[delivery_site]:
@@ -251,7 +251,7 @@ def get_declaration_summary(request, *args, **kwargs):
     txs_in = LotTransaction.objects.filter(lot__status='Validated', lot__period=period_str, carbure_client=entity)
     data_in = {}
     for t in txs_in:
-        vendor = t.carbure_vendor.name if t.carbure_vendor else t.unknown_vendor
+        vendor = t.carbure_vendor.name if t.carbure_vendor else t.lot.unknown_supplier
         if vendor not in data_in:
             data_in[vendor] = {}
         if t.lot.biocarburant.name not in data_in[vendor]:
@@ -782,10 +782,8 @@ def forward_lots(request, *args, **kwargs):
             new_tx = tx
             new_tx.pk = None
 
-            new_tx.vendor_is_in_carbure = True
             new_tx.carbure_vendor = entity
-            new_tx.unknown_vendor = ''
-            new_tx.vendor_certificate = ''
+            new_tx.carbure_vendor_certificate = ''
 
             new_tx.client_is_in_carbure = True
             new_tx.carbure_client = depots[tx.carbure_delivery_site].blender

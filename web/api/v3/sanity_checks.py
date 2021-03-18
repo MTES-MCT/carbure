@@ -255,10 +255,16 @@ def lot_is_valid(lot):
                 error = "Veuillez renseigner la date de mise en service de l'usine"
                 LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_com_date', defaults={'value':'', 'error':error})
                 is_valid = False
-            if not lot.unknown_production_site_reference:
+            if not lot.unknown_production_site_reference: # and not lot.unknown_supplier_certificate:
                 error = "Veuillez renseigner le certificat de l'usine de production ou du fournisseur"
                 LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_reference', defaults={'value':'', 'error':error})
+                # LotV2Error.objects.update_or_create(lot=lot, field='unknown_supplier_certificate', defaults={'value':'', 'error':error})
                 is_valid = False
+        # else:
+        #     if not lot.carbure_production_site_reference:
+        #         error = "Veuillez renseigner le certificat de l'usine de production"
+        #         LotV2Error.objects.update_or_create(lot=lot, field='carbure_production_site_reference', defaults={'value':'', 'error':error})
+        #         is_valid = False
     return is_valid
 
 
@@ -316,5 +322,11 @@ def tx_is_valid(tx):
         error = "Veuillez renseigner le pays d'origine de la matière première - Marché européen"
         TransactionError.objects.update_or_create(tx=tx, field='carbure_delivery_site', value='', error=error)
         is_valid = False
+
+    # if not tx.lot.producer_is_in_carbure and not tx.carbure_vendor_certificate:
+    #     error = "Veuillez renseigner votre certificat de trading"
+    #     TransactionError.objects.update_or_create(tx=tx, field='carbure_vendor_certificate', value='', error=error)
+    #     is_valid = False
+
     return is_valid
 

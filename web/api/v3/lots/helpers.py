@@ -93,7 +93,7 @@ def filter_by_entities(txs, entities):
         Q(carbure_client__name__in=entities) | 
         Q(unknown_client__in=entities) |
         Q(carbure_vendor__name__in=entities) | 
-        Q(unknown_vendor__in=entities) |
+        Q(lot__unknown_supplier__in=entities) |
         Q(lot__added_by__name__in=entities)
     )
 
@@ -144,7 +144,7 @@ def filter_lots(txs, querySet):
     if clients:
         txs = txs.filter(Q(carbure_client__name__in=clients) | Q(unknown_client__in=clients))
     if vendors:
-        txs = txs.filter(Q(carbure_vendor__name__in=vendors) | Q(unknown_vendor__in=vendors))
+        txs = txs.filter(Q(carbure_vendor__name__in=vendors) | Q(lot__unknown_supplier__in=vendors))
     if delivery_status:
         txs = txs.filter(delivery_status__in=delivery_status)
 

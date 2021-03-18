@@ -301,7 +301,10 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
     else:
         lot.unknown_production_country = None
     if 'production_site_reference' in lot_row and lot_row['production_site_reference'] != '' and lot_row['production_site_reference'] is not None:
-        lot.unknown_production_site_reference = lot_row['production_site_reference']
+        if lot.production_site_is_in_carbure:
+            lot.carbure_production_site_reference = lot_row['production_site_reference']
+        else:
+            lot.unknown_production_site_reference = lot_row['production_site_reference']
     else:
         lot.unknown_production_site_reference = ''
     if 'production_site_commissioning_date' in lot_row and lot_row['production_site_commissioning_date'] != '' and lot_row['production_site_commissioning_date'] is not None:
@@ -321,6 +324,18 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
     else:
         lot.unknown_production_site_dbl_counting = ''
     return lot_errors
+
+
+def fill_supplier_info(entity, lot_row, lot):
+    tx_errors = []
+
+    if 'supplier' in lot_row and lot_row['supplier'] != '' and lot_row['supplier'] != None:
+        lot.unknown_supplier = lot_row['supplier']
+    if 'supplier_certificate' in lot_row:
+        lot.unknown_supplier_certificate = lot_row['supplier_certificate']
+        transaction.carbure_vendor_certificate = lot_row['vendor_certificate']
+    
+    return tx_errors
 
 
 def fill_biocarburant_info(lot_row, lot, prefetched_data):
@@ -565,27 +580,13 @@ def fill_client_data(entity, lot_row, transaction, prefetched_data):
 def fill_vendor_data(entity, lot_row, transaction):
     tx_errors = []
     # by default, assume we are the vendor / supplier
-    transaction.vendor_is_in_carbure = True
     transaction.carbure_vendor = entity
-    transaction.unknown_vendor = None
-    if 'vendor' in lot_row:
-        transaction.vendor_is_in_carbure = False
-        transaction.carbure_vendor = None
-        transaction.unknown_vendor = lot_row['vendor']
-    else:
-        # do nothing unless we are Operator
-        if entity.entity_type == 'Opérateur':
-            # as an operator, I am saving lots in Carbure but not specifying who sold them to me.
-            # so be it
-            transaction.vendor_is_in_carbure = False
-            transaction.carbure_vendor = None
-            transaction.unknown_vendor = ''
-    if 'supplier_reference' in lot_row:
-        transaction.vendor_certificate = lot_row['supplier_reference']
-    elif 'production_site_reference' in lot_row:
-        transaction.vendor_certificate = lot_row['production_site_reference']
-    else:
-        pass
+
+    if 'vendor' in lot_row and lot_row['vendor'] != '' and lot_row['vendor'] != None:
+        transaction.carbure_vendor = Entity.objects.get(name=lot_row['vendor'])
+    if 'vendor_certificate' in lot_row:
+        transaction.carbure_vendor_certificate = lot_row['vendor_certificate']
+    
     return tx_errors
 
 def fill_delivery_site_data(lot_row, transaction, prefetched_data):
@@ -706,7 +707,6 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
     lot_errors.append(fill_volume_info(lot_dict, lot))
 
     transaction = LotTransaction()
-    transaction.vendor_is_in_carbure = True
     transaction.carbure_vendor = entity
 
     tx_errors.append(fill_dae_data(lot_dict, transaction))
@@ -740,6 +740,7 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, transaction=None):
 
     lot_errors += fill_producer_info(entity, lot_dict, lot, prefetched_data)
     lot_errors += fill_production_site_info(entity, lot_dict, lot, prefetched_data)
+    lot_errors += fill_supplier_info(entity, lot_dict, lot)
     lot_errors += fill_biocarburant_info(lot_dict, lot, prefetched_data)
     lot_errors += fill_matiere_premiere_info(lot_dict, lot, prefetched_data)
     lot_errors += fill_volume_info(lot_dict, lot)

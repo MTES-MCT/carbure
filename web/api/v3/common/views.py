@@ -162,6 +162,7 @@ def get_2bs_certificates(request):
 
 def get_certificates(request):
     q = request.GET.get('query', False)
+    entity_id = request.GET.get('entity_id', None)
     production_site = request.GET.get('production_site', None)
 
     lastyear = datetime.date.today() - datetime.timedelta(days=365)
@@ -172,6 +173,9 @@ def get_certificates(request):
     if q:
         iscc = iscc.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
         dbs = dbs.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
+    if entity_id:
+        iscc = iscc.filter(entityiscctradingcertificate__entity__id=entity_id)
+        dbs = dbs.filter(entitydbstradingcertificate__entity__id=entity_id)
     if production_site:
         iscc = iscc.filter(entityiscctradingcertificate__productionsitecertificate__production_site__id=production_site)
         dbs = dbs.filter(entitydbstradingcertificate__productionsitecertificate__production_site__id=production_site)
