@@ -160,11 +160,21 @@ export function LabelAutoComplete<T>({
   label,
   error,
   tooltip,
+  required,
+  disabled,
+  readOnly,
   ...props
 }: AutoCompleteProps<T> & LabelProps) {
   return (
-    <Label label={label} error={error} tooltip={tooltip}>
-      <AutoComplete {...props} />
+    <Label
+      label={label}
+      error={error}
+      tooltip={tooltip}
+      required={required}
+      disabled={disabled}
+      readOnly={readOnly}
+    >
+      <AutoComplete {...props} readOnly={readOnly} disabled={disabled} />
     </Label>
   )
 }

@@ -146,12 +146,16 @@ export interface Lot {
   matiere_premiere: MatierePremiere
   pays_origine: Country
 
+  unknown_supplier: string | null
+  unknown_supplier_certificate: string
+
   producer_is_in_carbure: boolean
   carbure_producer: Entity | null
   unknown_producer: string
 
   production_site_is_in_carbure: boolean
   carbure_production_site: ProductionSiteDetails | null
+  carbure_production_site_reference: string
   unknown_production_site: string
   unknown_production_country: Country | null
   unknown_production_site_com_date: string | null
@@ -171,9 +175,8 @@ export interface Transaction {
   champ_libre: string
   is_mac: boolean
 
-  vendor_is_in_carbure: boolean
   carbure_vendor: Entity | null
-  unknown_vendor: string
+  carbure_vendor_certificate: string
 
   client_is_in_carbure: boolean
   carbure_client: Entity | null

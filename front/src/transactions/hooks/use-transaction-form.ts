@@ -43,15 +43,17 @@ export interface TransactionFormState {
   carbure_producer: Entity | null
   unknown_producer: string
   carbure_production_site: ProductionSiteDetails | null
+  carbure_production_site_reference: string
   unknown_production_site: string
   unknown_production_country: Country | null
   unknown_production_site_com_date: string
   unknown_production_site_reference: string
   unknown_production_site_dbl_counting: string | null
 
-  vendor_is_in_carbure: boolean
   carbure_vendor: Entity | null
-  unknown_vendor: string
+  carbure_vendor_certificate: string
+  unknown_supplier: string
+  unknown_supplier_certificate: string
 
   client_is_in_carbure: boolean
   carbure_client: Entity | null
@@ -61,6 +63,8 @@ export interface TransactionFormState {
   carbure_delivery_site: DeliverySite | null
   unknown_delivery_site: string
   unknown_delivery_site_country: Country | null
+
+  added_by: Entity | null
 }
 
 export function toTransactionFormState(tx: Transaction): TransactionFormState {
@@ -97,6 +101,7 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
     unknown_production_country: tx.lot.unknown_production_country,
 
     carbure_production_site: tx.lot.carbure_production_site,
+    carbure_production_site_reference: tx.lot.carbure_production_site_reference,
     unknown_production_site: tx.lot.unknown_production_site,
     unknown_production_site_reference: tx.lot.unknown_production_site_reference,
     unknown_production_site_com_date:
@@ -104,9 +109,11 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
     unknown_production_site_dbl_counting:
       tx.lot.unknown_production_site_dbl_counting,
 
-    vendor_is_in_carbure: tx.vendor_is_in_carbure,
     carbure_vendor: tx.carbure_vendor,
-    unknown_vendor: tx.unknown_vendor,
+    carbure_vendor_certificate: tx.carbure_vendor_certificate,
+
+    unknown_supplier: tx.lot.unknown_supplier ?? "",
+    unknown_supplier_certificate: tx.lot.unknown_supplier_certificate,
 
     client_is_in_carbure: tx.client_is_in_carbure,
     carbure_client: tx.carbure_client,
@@ -116,6 +123,8 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
     carbure_delivery_site: tx.carbure_delivery_site,
     unknown_delivery_site: tx.unknown_delivery_site,
     unknown_delivery_site_country: tx.unknown_delivery_site_country,
+
+    added_by: tx.lot.added_by,
   }
 }
 
@@ -163,7 +172,9 @@ export function toTransactionPostData(tx: TransactionFormState) {
       ? tx.unknown_production_country?.code_pays
       : "",
 
-    production_site_reference: tx.unknown_production_site_reference,
+    production_site_reference: tx.producer_is_in_carbure
+      ? tx.carbure_production_site_reference
+      : tx.unknown_production_site_reference,
 
     production_site_commissioning_date: !tx.producer_is_in_carbure
       ? excelDate(tx.unknown_production_site_com_date)
@@ -185,9 +196,11 @@ export function toTransactionPostData(tx: TransactionFormState) {
       ? tx.unknown_delivery_site_country?.code_pays
       : "",
 
-    vendor: tx.vendor_is_in_carbure
-      ? tx.carbure_vendor?.name
-      : tx.unknown_vendor,
+    vendor: tx.carbure_vendor?.name ?? "",
+    vendor_certificate: tx.carbure_vendor_certificate,
+
+    supplier: tx.unknown_supplier,
+    supplier_certificate: tx.unknown_supplier_certificate,
   }
 }
 
@@ -224,15 +237,18 @@ const initialState: TransactionFormState = {
   unknown_producer: "",
 
   carbure_production_site: null,
+  carbure_production_site_reference: "",
   unknown_production_site: "",
   unknown_production_country: null,
   unknown_production_site_com_date: "",
   unknown_production_site_reference: "",
   unknown_production_site_dbl_counting: "",
 
-  vendor_is_in_carbure: true,
   carbure_vendor: null,
-  unknown_vendor: "",
+  carbure_vendor_certificate: "",
+
+  unknown_supplier: "",
+  unknown_supplier_certificate: "",
 
   client_is_in_carbure: true,
   carbure_client: null,
@@ -242,6 +258,8 @@ const initialState: TransactionFormState = {
   carbure_delivery_site: null,
   unknown_delivery_site: "",
   unknown_delivery_site_country: null,
+
+  added_by: null,
 }
 
 function producerSettings(
@@ -252,11 +270,6 @@ function producerSettings(
   // checking "producer is in carbure" forces producer field to be current entity
   if (tx.producer_is_in_carbure && tx.carbure_producer?.id !== entity?.id) {
     patch({ carbure_producer: entity }, true)
-  }
-
-  // empty vendor field to avoid replacing it when calling the api
-  if (!tx.vendor_is_in_carbure || tx.carbure_vendor) {
-    patch({ vendor_is_in_carbure: true, carbure_vendor: null }, true)
   }
 }
 
@@ -273,10 +286,6 @@ function operatorSettings(
   if (tx.producer_is_in_carbure && !tx.carbure_producer) {
     patch({ producer_is_in_carbure: false }, true)
   }
-
-  if (tx.vendor_is_in_carbure && !tx.carbure_vendor) {
-    patch({ vendor_is_in_carbure: false }, true)
-  }
 }
 
 function traderSettings(
@@ -287,10 +296,6 @@ function traderSettings(
   // for traders, force "producer is in carbure" to be unchecked
   if (tx.producer_is_in_carbure && !tx.carbure_producer) {
     patch({ producer_is_in_carbure: false }, true)
-  }
-
-  if (tx.vendor_is_in_carbure && !tx.carbure_vendor) {
-    patch({ vendor_is_in_carbure: false }, true)
   }
 }
 
