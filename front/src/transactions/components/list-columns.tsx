@@ -63,6 +63,7 @@ export const periodSimple: Column<Transaction> = {
 
 export const dae: Column<Transaction> = {
   header: "N° Douane",
+  sortBy: "delivery_date",
   render: (tx) => <TwoLines
                     text={tx.dae}
                     sub={tx?.delivery_date ?? ""}
