@@ -8,12 +8,12 @@ import {
 import { FilterSelection } from "transactions/hooks/query/use-filters"
 
 import api from "common/services/api"
-import { flattenSummary, normalizeFilters } from "./helpers"
+import { flattenSummary, normalizeFilters, filterOutsourcedDepots } from "./helpers"
 
 export function getSnapshot(entityID: number, year: number): Promise<Snapshot> {
   return api
     .get("/lots/snapshot", { entity_id: entityID, year })
-    .then(normalizeFilters)
+    .then(normalizeFilters).then(filterOutsourcedDepots)
 }
 
 export function getLots(
@@ -324,6 +324,19 @@ export function validateDeclaration(
     period_month,
   })
 }
+
+
+export function forwardLots(
+  entityID: number,
+  transactionIDs: number[]
+): Promise<any> {
+  return api.post("/lots/forward", {
+    entity_id: entityID,
+    tx_ids: transactionIDs,
+  })
+}
+
+
 
 // ADMIN
 

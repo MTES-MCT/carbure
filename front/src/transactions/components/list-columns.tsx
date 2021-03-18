@@ -63,7 +63,10 @@ export const periodSimple: Column<Transaction> = {
 
 export const dae: Column<Transaction> = {
   header: "N° Douane",
-  render: (tx) => <Line text={tx.dae} />,
+  render: (tx) => <TwoLines
+                    text={tx.dae}
+                    sub={tx?.delivery_date ?? ""}
+                 />
 }
 
 export const ghgReduction: Column<Transaction> = {
