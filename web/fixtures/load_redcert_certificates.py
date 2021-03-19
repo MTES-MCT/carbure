@@ -16,7 +16,7 @@ from django.db import transaction
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import REDCertScope, REDCertBiomassType, REDCertCertificate, REDCertCertificateScope
+from core.models import REDCertScope, REDCertBiomassType, REDCertCertificate, REDCertCertificateScope, REDCertCertificateBioMass
 
 today = datetime.date.today()
 CSV_FOLDER = os.environ['CARBURE_HOME'] + '/web/fixtures/csv/'
@@ -95,10 +95,16 @@ def load_scopes(existing_scopes):
             print('failed')
     return i, new
 
-def load_certificates(existing_certificates):
+def load_certificates(existing_certificates, scopes, biomass):
     new = []
     invalidated = []
     failed = []
+
+    added_scopes = []
+    removed_scopes = []
+    added_biomass = []
+    removed_biomass = []
+
     filename = '%s/REDcert-certificates.xlsx' % (CSV_FOLDER)
     wb = openpyxl.load_workbook(filename, data_only=True)
     sheet = wb.worksheets[0]
@@ -110,6 +116,7 @@ def load_certificates(existing_certificates):
     total_certs = len(df)    
     print(total_certs)
     i = 0
+    transaction.set_autocommit(False)
     for row in df.iterrows():
         i += 1
         cert = row[1]
@@ -150,7 +157,50 @@ def load_certificates(existing_certificates):
             print('failed')
             print(e)
             failed.append(cert)
-    return i, new, invalidated, failed
+        # scopes
+        existing_scopes = {s.scope.code: s for f in o.redcertcertificatescope_set.all()}
+        cert_scopes = cert['Certified as'].split(',')
+        for s in cert_scopes:
+            s = s.trim()
+            if s not in scopes:
+                print('Could not find scope [%s] in REDCert scopes' % (s))
+            else:
+                s, c = REDCertCertificateScope.objects.update_or_create(certificate=o, scope=scopes[s])
+                # did we already have it
+                if scopes[s] in existing_scopes:
+                    del existing_scopes[scopes[s]]
+                else:
+                    added_scopes.append((cert, scopes[s]))
+        if len(existing_scopes) != 0:
+            for es in existing_scopes.values():
+                removed_scopes.append((cert, es))
+                es.delete()
+
+        # biomasses
+        existing_biomasses = {s.biomass.code: s for f in o.redcertcertificatebiomass_set.all()}
+        cert_biomass = cert['Type of biomass'].replace('/', ',').split()
+        for b in cert_biomass:
+            b = b.trim()
+            if b not in biomass:
+                print('Could not find scope [%s] in REDCert biomass' % (s))
+            else:
+                # did we already have it
+                if biomass[b] in existing_biomasses:
+                    del existing_biomasses[biomass[b]]
+                else:
+                    s, c = REDCertCertificateBioMass.objects.update_or_create(certificate=o, biomass=biomass[b])
+                    added_biomass.append((cert, biomass[b]))
+        if len(existing_biomasses) != 0:
+            for es in existing_biomasses.values():
+                removed_biomass.append((cert, es))
+                es.delete()
+
+        if i % 250 == 0:
+            print(i)
+            transaction.commit()
+    transaction.commit()
+    transaction.set_autocommit(True)
+    return i, new, invalidated, failed, added_scopes, removed_scopes, added_biomass, removed_biomass
 
 def summary(args, new_biomass, new_scopes, new_certificates, newly_invalidated_certificates, failed, nb_certificates):
     mail_content = "Hallo, <br />\n"
@@ -168,20 +218,26 @@ def summary(args, new_biomass, new_scopes, new_certificates, newly_invalidated_c
     if len(new_certificates):
         for nc in new_certificates:
             mail_content += "Nouveau certificat enregistré<br />\n"
-            mail_content += nc
+            mail_content += str(nc)
+            mail_content += '<br />'
 
     if len(failed):
         for nc in failed:
             mail_content += "Impossible d'enregistrer le certificat suivante:<br />\n"
-            mail_content += nc
+            mail_content += str(nc)
+            mail_content += '<br />'
 
     fraud = False
     if len(newly_invalidated_certificates):
         fraud = True
         for (nic, previous) in newly_invalidated_certificates:
             mail_content += "**** ACHTUNG certificat invalidé *****<br />\n"
-            mail_content += nic
-            mail_content += "Date de validité précédent: %s" % (previous.valid_until)
+            mail_content += str(nic)
+            mail_content += '<br />'
+            mail_content += "Date de validité précédente: %s<br />" % (previous.valid_until)
+            mail_content += str(previous.natural_key())
+            mail_content += '<br />'
+
 
     subject = "Certificats REDCert"
     if fraud:
@@ -202,8 +258,8 @@ def main(args):
     scopes = {s.scope: s for s in REDCertScope.objects.all()}
     nb_scopes, new_scopes = load_scopes(scopes)
 
-    certificates = {c.certificate_id: c for c in REDCertCertificate.objects.all()}
-    nb_certificates, new_certificates, newly_invalidated_certificates, failed = load_certificates(certificates)
+    certificates = {c.certificate_id: c for c in REDCertCertificate.objects.prefetch_related('redcertcertificatescope_set', 'redcertcertificatebiomass_set').all()}
+    nb_certificates, new_certificates, newly_invalidated_certificates, failed = load_certificates(certificates, scopes, biomasses)
 
     summary(args, new_biomass, new_scopes, new_certificates, newly_invalidated_certificates, failed, nb_certificates)
 

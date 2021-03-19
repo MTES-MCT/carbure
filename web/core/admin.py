@@ -15,7 +15,7 @@ from core.models import GHGValues, Depot, LotV2, LotTransaction, TransactionErro
 from core.models import LotValidationError
 from core.models import ISCCScope, ISCCCertificate, ISCCCertificateRawMaterial, ISCCCertificateScope, EntityISCCTradingCertificate
 from core.models import DBSCertificate, DBSScope, DBSCertificateScope, EntityDBSTradingCertificate
-from core.models import REDCertScope, REDCertBiomassType, REDCertCertificate, REDCertCertificateScope, EntityREDCertTradingCertificate
+from core.models import REDCertScope, REDCertBiomassType, REDCertCertificate, REDCertCertificateScope, REDCertCertificateBiomass, EntityREDCertTradingCertificate
 from core.models import ProductionSiteCertificate, EntityDepot
 from core.models import SustainabilityDeclaration
 from api.v3.sanity_checks import bulk_sanity_checks
@@ -232,6 +232,12 @@ class REDCertCertificateScopeAdmin(admin.ModelAdmin):
     list_filter = ('scope', )
 
 
+class REDCertCertificateBiomassAdmin(admin.ModelAdmin):
+    list_display = ('certificate', 'biomass')
+    search_fields = ('certificate', 'biomass')
+    list_filter = ('biomass', )
+
+
 class EntityISCCTradingCertificateAdmin(admin.ModelAdmin):
     list_display = ('entity', 'certificate',)
     search_fields = ('entity', 'certificate',)
@@ -291,6 +297,7 @@ admin.site.register(REDCertCertificate, REDCertCertificateAdmin)
 admin.site.register(REDCertScope, REDCertScopeAdmin)
 admin.site.register(REDCertBiomassType, REDCertBiomassTypeAdmin)
 admin.site.register(REDCertCertificateScope, REDCertCertificateScopeAdmin)
+admin.site.register(REDCertCertificateBiomass, REDCertCertificateBiomassAdmin)
 admin.site.register(EntityISCCTradingCertificate, EntityISCCTradingCertificateAdmin)
 admin.site.register(EntityDBSTradingCertificate, EntityDBSTradingCertificateAdmin)
 admin.site.register(EntityREDCertTradingCertificate, EntityREDCertTradingCertificateAdmin)

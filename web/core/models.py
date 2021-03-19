@@ -690,7 +690,8 @@ class REDCertCertificate(models.Model):
                 'certificate_holder': self.certificate_holder,
                 'city': self.city,
                 'zip_code': self.zip_code,
-                'country': self.country.natural_key(),
+                'country': self.country.natural_key() if self.country else '',
+                'country_raw': self.country_raw,
                 'valid_from': self.valid_from,
                 'valid_until': self.valid_until,
                 'certificator': self.certificator,
@@ -718,6 +719,18 @@ class REDCertCertificateScope(models.Model):
         verbose_name = 'REDCert Certificate Scope'
         verbose_name_plural = 'REDCert Certificate Scopes'
 
+
+class REDCertCertificateBiomass(models.Model):
+    certificate = models.ForeignKey(REDCertCertificate, blank=False, null=False, on_delete=models.CASCADE)
+    biomass = models.ForeignKey(REDCertBiomassType, blank=False, null=False, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.biomass.code
+
+    class Meta:
+        db_table = 'redcert_certificates_biomass'
+        verbose_name = 'REDCert Certificate Biomass'
+        verbose_name_plural = 'REDCert Certificate Biomass'
 
 
 class EntityISCCTradingCertificate(models.Model):
