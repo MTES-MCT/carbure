@@ -1,6 +1,12 @@
 import React from "react"
 
-import { Country, DepotType, OwnershipType, Entity, EntityType } from "common/types"
+import {
+  Country,
+  DepotType,
+  OwnershipType,
+  Entity,
+  EntityType,
+} from "common/types"
 import {
   DeliverySiteSettingsHook,
   EntityDeliverySite,
@@ -58,8 +64,8 @@ export const DeliverySiteFinderPromptFactory = (entity: EntitySelection) =>
     const { data, hasChange, onChange } = useForm<EntityDeliverySite>({
       depot: null,
       ownership_type: OwnershipType.ThirdParty,
-      blending_outsourced: false,
-      blender_entity_id: null
+      blending_is_outsourced: false,
+      blender_entity_id: null,
     })
 
     return (
@@ -87,23 +93,24 @@ export const DeliverySiteFinderPromptFactory = (entity: EntitySelection) =>
         </Label>
 
         {entity && entity.entity_type == EntityType.Operator && (
-        <LabelCheckbox
-          name="blending_outsourced"
-          label="Incorporation potentiellement effectuée par un tiers"
-          checked={data.blending_outsourced}
-          onChange={onChange}
-        />)}
-        {data.blending_outsourced && (
-        <LabelAutoComplete
-          label="Incorporateur Tiers"
-          placeholder="Rechercher un opérateur pétrolier..."
-          name="blender_entity_id"
-          value={data.blender_entity_id}
-          getQuery={common.findOperators}
-          onChange={onChange}
-          getValue={(c) => c.id.toString()}
-          getLabel={(c) => c.name}
-        />
+          <LabelCheckbox
+            name="blending_outsourced"
+            label="Incorporation potentiellement effectuée par un tiers"
+            checked={data.blending_is_outsourced}
+            onChange={onChange}
+          />
+        )}
+        {data.blending_is_outsourced && (
+          <LabelAutoComplete
+            label="Incorporateur Tiers"
+            placeholder="Rechercher un opérateur pétrolier..."
+            name="blender_entity_id"
+            value={data.blender_entity_id}
+            getQuery={common.findOperators}
+            onChange={onChange}
+            getValue={(c) => c.id.toString()}
+            getLabel={(c) => c.name}
+          />
         )}
 
         <a
