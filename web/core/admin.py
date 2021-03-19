@@ -13,9 +13,10 @@ from authtools.forms import UserCreationForm
 from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
 from core.models import GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
 from core.models import LotValidationError
-from core.models import ISCCScope, ISCCCertificate, ISCCCertificateRawMaterial, ISCCCertificateScope
-from core.models import DBSCertificate, DBSScope, DBSCertificateScope, EntityDepot
-from core.models import EntityISCCTradingCertificate, EntityDBSTradingCertificate, ProductionSiteCertificate
+from core.models import ISCCScope, ISCCCertificate, ISCCCertificateRawMaterial, ISCCCertificateScope, EntityISCCTradingCertificate
+from core.models import DBSCertificate, DBSScope, DBSCertificateScope, EntityDBSTradingCertificate
+from core.models import REDCertScope, REDCertBiomassType, REDCertCertificate, REDCertCertificateScope, EntityREDCertTradingCertificate
+from core.models import ProductionSiteCertificate, EntityDepot
 from core.models import SustainabilityDeclaration
 from api.v3.sanity_checks import bulk_sanity_checks
 from core.common import get_prefetched_data
@@ -209,6 +210,28 @@ class DBSCertificateAdmin(admin.ModelAdmin):
     search_fields = ('certificate_id', 'certificate_holder', 'holder_address')
 
 
+class REDCertScopeAdmin(admin.ModelAdmin):
+    list_display = ('scope', 'description_fr', 'description_de', 'description_en')
+    search_fields = ('scope', 'description_fr', 'description_de', 'description_en')
+
+
+class REDCertBiomassTypeAdmin(admin.ModelAdmin):
+    list_display = ('code', 'description_fr', 'description_de', 'description_en')
+    search_fields = ('code', 'description_fr', 'description_de', 'description_en')
+
+
+class REDCertCertificateAdmin(admin.ModelAdmin):
+    list_display = ('certificate_id', 'certificate_holder', 'city', 'country', 'valid_from', 'valid_until', 'certificator', 'certificate_type', 'status')
+    search_fields = ('certificate_id', 'certificate_holder', 'city', 'certificator', 'certificate_type')
+    list_filter = ('country', 'status', 'certificate_type')
+
+
+class REDCertCertificateScopeAdmin(admin.ModelAdmin):
+    list_display = ('certificate', 'scope')
+    search_fields = ('certificate', 'scope')
+    list_filter = ('scope', )
+
+
 class EntityISCCTradingCertificateAdmin(admin.ModelAdmin):
     list_display = ('entity', 'certificate',)
     search_fields = ('entity', 'certificate',)
@@ -219,9 +242,14 @@ class EntityDBSTradingCertificateAdmin(admin.ModelAdmin):
     search_fields = ('entity', 'certificate',)
 
 
+class EntityREDCertTradingCertificateAdmin(admin.ModelAdmin):
+    list_display = ('entity', 'certificate',)
+    search_fields = ('entity', 'certificate',)
+
+
 class ProductionSiteCertificateAdmin(admin.ModelAdmin):
-    list_display = ('production_site', 'type', 'certificate_iscc', 'certificate_2bs')
-    search_fields = ('production_site', 'certificate_iscc', 'certificate_2bs',)
+    list_display = ('production_site', 'type', 'certificate_iscc', 'certificate_2bs', 'certificate_redcert')
+    search_fields = ('production_site', 'certificate_iscc', 'certificate_2bs', 'certificate_redcert')
     list_filter = ('type',)
 
 
@@ -235,6 +263,7 @@ class EntityDepotAdmin(admin.ModelAdmin):
     list_display = ('entity', 'depot', 'blending_is_outsourced',)
     search_fields = ('entity', 'depot', )
     list_filter = ('blending_is_outsourced', )
+
 
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
@@ -258,8 +287,13 @@ admin.site.register(ISCCCertificateScope, ISCCCertificateScopeAdmin)
 admin.site.register(DBSCertificate, DBSCertificateAdmin)
 admin.site.register(DBSScope, DBSScopeAdmin)
 admin.site.register(DBSCertificateScope, DBSCertificateScopeAdmin)
+admin.site.register(REDCertCertificate, REDCertCertificateAdmin)
+admin.site.register(REDCertScope, REDCertScopeAdmin)
+admin.site.register(REDCertBiomassType, REDCertBiomassTypeAdmin)
+admin.site.register(REDCertCertificateScope, REDCertCertificateScopeAdmin)
 admin.site.register(EntityISCCTradingCertificate, EntityISCCTradingCertificateAdmin)
 admin.site.register(EntityDBSTradingCertificate, EntityDBSTradingCertificateAdmin)
+admin.site.register(EntityREDCertTradingCertificate, EntityREDCertTradingCertificateAdmin)
 admin.site.register(ProductionSiteCertificate, ProductionSiteCertificateAdmin)
 admin.site.register(SustainabilityDeclaration, SustainabilityDeclarationAdmin)
 admin.site.register(EntityDepot, EntityDepotAdmin)
