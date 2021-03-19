@@ -50,6 +50,7 @@ export const ProducerImportPromptFactory = (uploader: LotUploader) => ({
       >
         Télécharger le modèle simplifié
       </span>
+      <a className={styles.downloadLink} href="https://carbure-1.gitbook.io/faq/gerer-mes-lots-1/producteur-trader-ajouter-des-lots/ajout-de-lot-via-fichier-excel/modele-simplifie">Guide du modèle simplifié</a>
     </Box>
 
     <Box className={styles.importExplanation}>
@@ -63,6 +64,7 @@ export const ProducerImportPromptFactory = (uploader: LotUploader) => ({
       >
         Télécharger le modèle avancé
       </span>
+      <a className={styles.downloadLink} href="https://carbure-1.gitbook.io/faq/gerer-mes-lots-1/producteur-trader-ajouter-des-lots/ajout-de-lot-via-fichier-excel/modele-complexe">Guide du modèle avancé</a>
     </Box>
   </ImportPrompt>
 )

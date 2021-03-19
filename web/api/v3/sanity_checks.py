@@ -255,16 +255,10 @@ def lot_is_valid(lot):
                 error = "Veuillez renseigner la date de mise en service de l'usine"
                 LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_com_date', defaults={'value':'', 'error':error})
                 is_valid = False
-            if not lot.unknown_production_site_reference: # and not lot.unknown_supplier_certificate:
-                error = "Veuillez renseigner le certificat de l'usine de production ou du fournisseur"
-                LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_reference', defaults={'value':'', 'error':error})
-                # LotV2Error.objects.update_or_create(lot=lot, field='unknown_supplier_certificate', defaults={'value':'', 'error':error})
+            if not lot.unknown_supplier_certificate:
+                error = "Veuillez renseigner le certificat du fournisseur"
+                LotV2Error.objects.update_or_create(lot=lot, field='unknown_supplier_certificate', defaults={'value':'', 'error':error})
                 is_valid = False
-        # else:
-        #     if not lot.carbure_production_site_reference:
-        #         error = "Veuillez renseigner le certificat de l'usine de production"
-        #         LotV2Error.objects.update_or_create(lot=lot, field='carbure_production_site_reference', defaults={'value':'', 'error':error})
-        #         is_valid = False
     return is_valid
 
 
