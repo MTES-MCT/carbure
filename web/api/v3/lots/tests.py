@@ -121,6 +121,7 @@ class LotsAPITest(TransactionTestCase):
             'production_site': self.production_site.name,
             'production_site_commissioning_date': '01/12/2002',
             'production_site_reference': 'PRODSITEREFERENCE',
+            'supplier_certificate': 'PRODSITEREFERENCE',
             'double_counting_registration': 'NUMDOUBLECOMPTE',
             'biocarburant_code': 'ETH',
             'matiere_premiere_code': 'BLE',
@@ -511,7 +512,7 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(nb_lots, 1)
         # as operator, create same lot
         lot['production_site'] = ''
-        lot['production_site_reference'] = 'ISCC-TOTO-02'
+        lot['supplier_certificate'] = 'ISCC-TOTO-02'
         lot['production_site_commissioning_date'] = '11/12/1998'
         lot['producer_name'] = self.test_producer.name
         lot['entity_id'] = self.test_operator.id
@@ -594,7 +595,7 @@ class LotsAPITest(TransactionTestCase):
         # as operator, create lot
         dae = 'TEST2020FR00923-DUP-32094'
         lot = {
-            'production_site_reference': 'ISCC-TOTO-02',
+            'supplier_certificate': 'ISCC-TOTO-02',
             'production_site_commissioning_date': '11/12/1998',
             'biocarburant_code': 'ETH',
             'matiere_premiere_code': 'BLE',
@@ -636,7 +637,7 @@ class LotsAPITest(TransactionTestCase):
 
         # as producer, create same lot
         lot['entity_id'] = self.test_producer.id
-        del lot['production_site_reference']
+        del lot['supplier_certificate']
         del lot['production_site_commissioning_date']
         lot['production_site'] = self.production_site.name
         response = self.client.post(reverse('api-v3-add-lot'), lot)
@@ -716,7 +717,7 @@ class LotsAPITest(TransactionTestCase):
         lot = {
             'production_site': self.production_site.name,
             'production_site_commissioning_date': '01/12/2002',
-            'production_site_reference': 'PRODSITEREFERENCE',
+            'supplier_reference': 'PRODSITEREFERENCE',
             'double_counting_registration': 'NUMDOUBLECOMPTE',
             'biocarburant_code': 'ETH',
             'matiere_premiere_code': 'BLE',
