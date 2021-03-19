@@ -7,57 +7,78 @@ import random
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import MatierePremiere, Biocarburant, Pays, Depot, Entity, ProductionSite, LotTransaction
+from core.models import MatierePremiere, Biocarburant, Pays, Depot, Entity, ProductionSite, LotTransaction, EntityISCCTradingCertificate, EntityDBSTradingCertificate
+
+
+UNKNOWN_PRODUCERS = [{'name': 'ITANOL', 'country': 'IT', 'production_site': 'BERGAMO', 'ref': 'ISCC-IT-100001010', 'date':'2017-12-01', 'dc':'IT_001_2020'},
+                    {'name': 'ITANOL', 'country': 'IT', 'production_site': 'FIRENZE', 'ref': '', 'date':'2014-03-01', 'dc':''},
+                    {'name': 'PORTUGASOIL', 'country': 'PT', 'production_site': 'LISBOA', 'ref': 'ISCC-PT-100001110', 'date':'2011-10-01', 'dc':''},
+                    {'name': 'PORTUGASOIL', 'country': 'PT', 'production_site': 'PORTO', 'ref': '', 'date':'2013-07-01', 'dc':''},
+                    {'name': 'BIOCATALAN', 'country': 'ES', 'production_site': 'EL MASNOU', 'ref': '', 'date':'2016-02-01', 'dc':'ES_012_2016'},
+                    {'name': 'BIOCATALAN', 'country': 'ES', 'production_site': 'TARRAGONA', 'ref': 'ISCC-ES-100005010', 'date':'2019-12-01', 'dc':''},
+                    {'name': 'BIOBAO', 'country': 'ES', 'production_site': 'HONDARRIBIA', 'ref': 'ISCC-ES-100004010', 'date':'2007-11-01', 'dc':'ES_011_2018'},
+                    {'name': 'BONDUELLE', 'country': 'FR', 'production_site': 'TOURS', 'ref': 'ISCC-FR-100001011', 'date':'2001-01-01', 'dc':''},
+                    {'name': 'BONDUELLE', 'country': 'FR', 'production_site': 'NUEIL LES AUBIERS', 'ref': '', 'date':'2004-06-01', 'dc':'FR_042_2016'},
+                    {'name': 'GEANTVERT', 'country': 'FR', 'production_site': 'BRUZAC', 'ref': 'ISCC-FR-100001013', 'date':'2005-04-01', 'dc':''},
+                    {'name': 'GEANTVERT', 'country': 'FR', 'production_site': 'NIMES', 'ref': '', 'date':'1997-07-01', 'dc':'FR_002_2017'},
+                    {'name': '', 'country': '', 'production_site': '', 'ref': '', 'date':'2016-02-01', 'dc':'ES_012_2016'},
+                    {'name': '', 'country': '', 'production_site': '', 'ref': '', 'date':'2019-12-01', 'dc':''},
+                    {'name': '', 'country': '', 'production_site': '', 'ref': '', 'date':'2007-11-01', 'dc':'ES_011_2018'},
+                    {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001011', 'date':'2001-01-01', 'dc':''},
+                    {'name': '', 'country': '', 'production_site': '', 'ref': '', 'date':'2004-06-01', 'dc':'FR_042_2016'},
+                    {'name': '', 'country': '', 'production_site': '', 'ref': '', 'date':'2005-04-01', 'dc':''},
+                    {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001014', 'date':'1997-07-01', 'dc':'FR_002_2017'},
+                    ]
+
+FOREIGN_CLIENTS = [{'name': 'BP', 'country': 'GB', 'delivery_site': 'DOVER'},
+                    {'name': 'BP', 'country': 'GB', 'delivery_site': 'LIVERPOOL'},
+                    {'name': 'BP', 'country': 'GB', 'delivery_site': 'MANCHESTER'},
+                    {'name': 'EXXON', 'country': 'US', 'delivery_site': 'BOSTON'},
+                    {'name': 'EXXON', 'country': 'US', 'delivery_site': 'HOBOKEN'},
+                    {'name': 'IBERDROLA', 'country': 'ES', 'delivery_site': 'BCN'},
+                    {'name': 'IBERDROLA', 'country': 'ES', 'delivery_site': 'BILBAO'},
+                    ]
+
+
+SUPPLIERS = [{'name': 'LUR BERRI', 'sref': 'ISCC-FR-200000042'}, 
+    {'name': 'ITANOL', 'sref': 'ISCC-IT-200000014'},
+    {'name': 'FINNHUB', 'sref': 'ISCC-FI-200000078'},
+    {'name': 'DEUTSCHE BIOFUELS GMBH', 'sref': 'ISCC-DE-200000001'},
+    {'name': 'NL OIL ', 'sref': 'ISCC-NL-200000001'},
+    {'name':'', 'sref': 'ISCC-DE-200000002'},
+    {'name':'', 'sref': 'ISCC-BE-200000001'},
+    {'name':'', 'sref': 'ISCC-ES-200000001'},
+    {'name':'', 'sref': 'ISCC-NL-200000002'},
+]
 
 def get_random_dae():
     today = datetime.date.today()
     return 'TEST%dFR0000%d' % (today.year, random.randint(100000, 900000))
 
-def make_producers_lots_sheet_advanced(workbook, entity, nb_lots):
+def make_producers_or_traders_lots_sheet_advanced(workbook, entity, nb_lots, is_producer=True):
     worksheet_lots = workbook.add_worksheet("lots")
     psites = ProductionSite.objects.filter(producer=entity)
-    clients = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur', 'Trader']).exclude(id=entity.id)
+    clients = Entity.objects.filter(entity_type__in=['Opérateur', 'Trader']).exclude(id=entity.id)
     mps = MatierePremiere.objects.all()
     bcs = Biocarburant.objects.all()
     delivery_sites = Depot.objects.all()
     countries = Pays.objects.all()
 
-    # 3/10 chances of having an imported lot
-    imported_lots = [1, 1, 1, 0, 0, 0, 0, 0, 0, 0]
-    exported_lots = [1, 1, 1, 0, 0, 0, 0, -1, -1, -1]
-    unknown_producers = [{'name': 'ITANOL', 'country': 'IT', 'production_site': 'BERGAMO', 'ref': 'ISCC-IT-100001010', 'date':'2017-12-01', 'dc':'IT_001_2020'},
-                         {'name': 'ITANOL', 'country': 'IT', 'production_site': 'FIRENZE', 'ref': 'ISCC-IT-100001011', 'date':'2014-03-01', 'dc':''},
-                         {'name': 'PORTUGASOIL', 'country': 'PT', 'production_site': 'LISBOA', 'ref': 'ISCC-PT-100001110', 'date':'2011-10-01', 'dc':''},
-                         {'name': 'PORTUGASOIL', 'country': 'PT', 'production_site': 'PORTO', 'ref': 'ISCC-PT-100001080', 'date':'2013-07-01', 'dc':''},
-                         {'name': 'BIOCATALAN', 'country': 'ES', 'production_site': 'EL MASNOU', 'ref': 'ISCC-ES-100002010', 'date':'2016-02-01', 'dc':'ES_012_2016'},
-                         {'name': 'BIOCATALAN', 'country': 'ES', 'production_site': 'TARRAGONA', 'ref': 'ISCC-ES-100005010', 'date':'2019-12-01', 'dc':''},
-                         {'name': 'BIOBAO', 'country': 'ES', 'production_site': 'HONDARRIBIA', 'ref': 'ISCC-ES-100004010', 'date':'2007-11-01', 'dc':'ES_011_2018'},
-                         {'name': 'BONDUELLE', 'country': 'FR', 'production_site': 'TOURS', 'ref': 'ISCC-FR-100001011', 'date':'2001-01-01', 'dc':''},
-                         {'name': 'BONDUELLE', 'country': 'FR', 'production_site': 'NUEIL LES AUBIERS', 'ref': 'ISCC-FR-100001012', 'date':'2004-06-01', 'dc':'FR_042_2016'},
-                         {'name': 'GEANTVERT', 'country': 'FR', 'production_site': 'BRUZAC', 'ref': 'ISCC-FR-100001013', 'date':'2005-04-01', 'dc':''},
-                         {'name': 'GEANTVERT', 'country': 'FR', 'production_site': 'NIMES', 'ref': 'ISCC-FR-100001014', 'date':'1997-07-01', 'dc':'FR_002_2017'},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-ES-100002010', 'date':'2016-02-01', 'dc':'ES_012_2016'},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-ES-100005010', 'date':'2019-12-01', 'dc':''},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-ES-100004010', 'date':'2007-11-01', 'dc':'ES_011_2018'},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001011', 'date':'2001-01-01', 'dc':''},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001012', 'date':'2004-06-01', 'dc':'FR_042_2016'},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001013', 'date':'2005-04-01', 'dc':''},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001014', 'date':'1997-07-01', 'dc':'FR_002_2017'},
-                         ]
-
-    foreign_clients = [{'name': 'BP', 'country': 'GB', 'delivery_site': 'DOVER'},
-                       {'name': 'BP', 'country': 'GB', 'delivery_site': 'LIVERPOOL'},
-                       {'name': 'BP', 'country': 'GB', 'delivery_site': 'MANCHESTER'},
-                       {'name': 'EXXON', 'country': 'US', 'delivery_site': 'BOSTON'},
-                       {'name': 'EXXON', 'country': 'US', 'delivery_site': 'HOBOKEN'},
-                       {'name': 'IBERDROLA', 'country': 'ES', 'delivery_site': 'BCN'},
-                       {'name': 'IBERDROLA', 'country': 'ES', 'delivery_site': 'BILBAO'},
-                       ]
+    # certificates
+    iscc_certificates = EntityISCCTradingCertificate.objects.filter(entity=entity)
+    dbs_certificates = EntityDBSTradingCertificate.objects.filter(entity=entity)
+    if iscc_certificates.count() > 0:
+        my_vendor_certificate = iscc_certificates[0].certificate.certificate_id
+    elif dbs_certificates.count() > 0:
+        my_vendor_certificate = dbs_certificates[0].certificate.certificate_id
+    else:
+        my_vendor_certificate = ''
 
     # header
     bold = workbook.add_format({'bold': True})
     columns = ['producer', 'production_site', 'production_site_country', 'production_site_reference',
                'production_site_commissioning_date', 'double_counting_registration',
+               'supplier', 'supplier_certificate', 'vendor_certificate',
                'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
                'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
                'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
@@ -66,6 +87,7 @@ def make_producers_lots_sheet_advanced(workbook, entity, nb_lots):
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
 
+    # rows
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
     today = datetime.date.today().strftime('%d/%m/%Y')
     for i in range(nb_lots):
@@ -75,24 +97,43 @@ def make_producers_lots_sheet_advanced(workbook, entity, nb_lots):
         country = random.choice(countries)
         site = random.choice(delivery_sites)
         volume = random.randint(34000, 36000)
-        imported = random.choice(imported_lots)
-        exported = random.choice(exported_lots)
+
+        is_imported = random.random() < 0.3
+        if not is_producer:
+            is_imported = True
+        supplier_is_not_the_producer = random.random() < 0.5
+        destination = random.choice([1, 0, -1])
 
         row = []
-        if imported:
-            p = random.choice(unknown_producers)
+        # production site
+        if is_imported:
+            p = random.choice(UNKNOWN_PRODUCERS)
             row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc']]
+            if supplier_is_not_the_producer:
+                supplier = random.choice(SUPPLIERS)
+                row += [supplier['name'], supplier['sref']]
+            else:
+                row += [p['name'], p['ref']]
         else:
             if not len(psites):
                 continue
             p = random.choice(psites)
-            row += [p.producer.name, p.name, p.country.code_pays, '', '', '']
-        row += [volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(0, 3), random.randint(0, 1), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), clientid]
-        if exported == 1:
+            production_certifs = p.productionsitecertificate_set.all()
+            if production_certifs.count() > 0:
+                production_certif = production_certifs[0].natural_key()['certificate_id']
+            else:
+                production_certif = ''
+            row += [p.producer.name, p.name, p.country.code_pays, production_certif, '', '', '', '']
+
+        # vendor (me)
+        row += [my_vendor_certificate]
+        # lot details
+        row += [volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), clientid]
+        if destination == 1:
             # client is not in carbure
-            c = random.choice(foreign_clients)
+            c = random.choice(FOREIGN_CLIENTS)
             row += [c['name'], today, c['delivery_site'], c['country']]
-        elif exported == -1:
+        elif destination == -1:
             # into mass balance (i am the client)
             row += ['', today, site.depot_id, 'FR']
         else:
@@ -116,15 +157,6 @@ def make_mb_extract_sheet(workbook, entity):
 
     # 4/10 chances of having an exported lot
     exported_lots = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
-    foreign_clients = [{'name': 'BP', 'country': 'GB', 'delivery_site': 'DOVER'},
-                       {'name': 'BP', 'country': 'GB', 'delivery_site': 'LIVERPOOL'},
-                       {'name': 'BP', 'country': 'GB', 'delivery_site': 'MANCHESTER'},
-                       {'name': 'EXXON', 'country': 'US', 'delivery_site': 'BOSTON'},
-                       {'name': 'EXXON', 'country': 'US', 'delivery_site': 'HOBOKEN'},
-                       {'name': 'IBERDROLA', 'country': 'ES', 'delivery_site': 'BCN'},
-                       {'name': 'IBERDROLA', 'country': 'ES', 'delivery_site': 'BILBAO'},
-                       ]
-
     # header
     bold = workbook.add_format({'bold': True})
     columns = ['carbure_id', 'volume', 'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
@@ -144,7 +176,7 @@ def make_mb_extract_sheet(workbook, entity):
         row = [lot_source.lot.carbure_id, int(lot_source.lot.volume / 2), get_random_dae(), clientid]
         if exported == 1:
             # client is not in carbure
-            c = random.choice(foreign_clients)
+            c = random.choice(FOREIGN_CLIENTS)
             row += [c['name'], today, c['delivery_site'], c['country']]
         else:
             # regular transaction. sell to someone else
@@ -164,15 +196,6 @@ def make_mb_extract_sheet_bcghg(workbook, entity):
 
     # 4/10 chances of having an exported lot
     exported_lots = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
-    foreign_clients = [{'name': 'BP', 'country': 'GB', 'delivery_site': 'DOVER'},
-                       {'name': 'BP', 'country': 'GB', 'delivery_site': 'LIVERPOOL'},
-                       {'name': 'BP', 'country': 'GB', 'delivery_site': 'MANCHESTER'},
-                       {'name': 'EXXON', 'country': 'US', 'delivery_site': 'BOSTON'},
-                       {'name': 'EXXON', 'country': 'US', 'delivery_site': 'HOBOKEN'},
-                       {'name': 'IBERDROLA', 'country': 'ES', 'delivery_site': 'BCN'},
-                       {'name': 'IBERDROLA', 'country': 'ES', 'delivery_site': 'BILBAO'},
-                       ]
-
     # header
     bold = workbook.add_format({'bold': True})
     columns = ['biocarburant_code', 'matiere_premiere_code', 'ghg_total', 'depot', 'volume', 'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
@@ -194,7 +217,7 @@ def make_mb_extract_sheet_bcghg(workbook, entity):
                int(lot_source.lot.volume / 2), get_random_dae(), clientid]
         if exported == 1:
             # client is not in carbure
-            c = random.choice(foreign_clients)
+            c = random.choice(FOREIGN_CLIENTS)
             row += [c['name'], today, c['delivery_site'], c['country']]
         else:
             # regular transaction. sell to someone else
@@ -239,73 +262,8 @@ def make_producers_lots_sheet_simple(workbook, entity):
         volume = random.randint(34000, 36000)
 
         p = random.choice(psites)
-        row = [p.name, volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(0, 3), random.randint(0, 1), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), clientid]
+        row = [p.name, volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), clientid]
         row += [client.name, today, site.depot_id]
-
-        colid = 0
-        for elem in row:
-            worksheet_lots.write(i+1, colid, elem)
-            colid += 1
-
-
-def make_traders_lots_sheet(workbook, entity):
-    worksheet_lots = workbook.add_worksheet("lots")
-    mps = MatierePremiere.objects.all()
-    bcs = Biocarburant.objects.all()
-    delivery_sites = Depot.objects.all()
-    countries = Pays.objects.all()
-    clients = Entity.objects.filter(entity_type__in=['Opérateur', 'Trader'])
-
-    unknown_producers = [{'name': 'ITANOL', 'country': 'IT', 'production_site': 'BERGAMO', 'ref': 'ISCC-IT-100001010', 'date':'2017-12-01', 'dc':'IT_001_2020'},
-                         {'name': 'ITANOL', 'country': 'IT', 'production_site': 'FIRENZE', 'ref': 'ISCC-IT-100001011', 'date':'2014-03-01', 'dc':''},
-                         {'name': 'PORTUGASOIL', 'country': 'PT', 'production_site': 'LISBOA', 'ref': 'ISCC-PT-100001110', 'date':'2011-10-01', 'dc':''},
-                         {'name': 'PORTUGASOIL', 'country': 'PT', 'production_site': 'PORTO', 'ref': 'ISCC-PT-100001080', 'date':'2013-07-01', 'dc':''},
-                         {'name': 'BIOCATALAN', 'country': 'ES', 'production_site': 'EL MASNOU', 'ref': 'ISCC-ES-100002010', 'date':'2016-02-01', 'dc':'ES_012_2016'},
-                         {'name': 'BIOCATALAN', 'country': 'ES', 'production_site': 'TARRAGONA', 'ref': 'ISCC-ES-100005010', 'date':'2019-12-01', 'dc':''},
-                         {'name': 'BIOBAO', 'country': 'ES', 'production_site': 'HONDARRIBIA', 'ref': 'ISCC-ES-100004010', 'date':'2007-11-01', 'dc':'ES_011_2018'},
-                         {'name': 'BONDUELLE', 'country': 'FR', 'production_site': 'TOURS', 'ref': 'ISCC-FR-100001011', 'date':'2001-01-01', 'dc':''},
-                         {'name': 'BONDUELLE', 'country': 'FR', 'production_site': 'NUEIL LES AUBIERS', 'ref': 'ISCC-FR-100001012', 'date':'2004-06-01', 'dc':'FR_042_2016'},
-                         {'name': 'GEANTVERT', 'country': 'FR', 'production_site': 'BRUZAC', 'ref': 'ISCC-FR-100001013', 'date':'2005-04-01', 'dc':''},
-                         {'name': 'GEANTVERT', 'country': 'FR', 'production_site': 'NIMES', 'ref': 'ISCC-FR-100001014', 'date':'1997-07-01', 'dc':'FR_002_2017'},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-ES-100002010', 'date':'2016-02-01', 'dc':'ES_012_2016'},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-ES-100005010', 'date':'2019-12-01', 'dc':''},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-ES-100004010', 'date':'2007-11-01', 'dc':'ES_011_2018'},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001011', 'date':'2001-01-01', 'dc':''},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001012', 'date':'2004-06-01', 'dc':'FR_042_2016'},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001013', 'date':'2005-04-01', 'dc':''},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001014', 'date':'1997-07-01', 'dc':'FR_002_2017'},
-                         ]
-
-    vendors = ['LUR BERRI', 'ITANOL', 'FINNHUB', 'DEUTSCHE BIOFUELS GMBH', 'SUCRERIE HARIBO', '', '', '', '', '']
-
-    # header
-    bold = workbook.add_format({'bold': True})
-    columns = ['producer', 'production_site', 'production_site_country', 'production_site_reference',
-               'production_site_commissioning_date', 'double_counting_registration',
-               'vendor', 'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
-               'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
-               'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
-    for i, c in enumerate(columns):
-        worksheet_lots.write(0, i, c, bold)
-
-    clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
-    today = datetime.date.today().strftime('%d/%m/%Y')
-    for i in range(10):
-        mp = random.choice(mps)
-        vendor = random.choice(vendors)
-        bc = random.choice(bcs)
-        country = random.choice(countries)
-        site = random.choice(delivery_sites)
-        volume = random.randint(34000, 36000)
-        client = None
-        if i % 3 == 1:
-            client = random.choice(clients)
-
-        row = []
-        p = random.choice(unknown_producers)
-        row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc']]
-        row += [vendor, volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(0, 3), random.randint(0, 1), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), clientid]
-        row += [client.name if client else '', today, site.depot_id, 'FR']
 
         colid = 0
         for elem in row:
@@ -320,25 +278,6 @@ def make_operators_lots_sheet(workbook, entity):
     delivery_sites = Depot.objects.all()
     countries = Pays.objects.all()
 
-    unknown_producers = [{'name': 'ITANOL', 'country': 'IT', 'production_site': 'BERGAMO', 'ref': 'ISCC-IT-100001010', 'date':'2017-12-01', 'dc':'IT_001_2020'},
-                         {'name': 'ITANOL', 'country': 'IT', 'production_site': 'FIRENZE', 'ref': 'ISCC-IT-100001011', 'date':'2014-03-01', 'dc':''},
-                         {'name': 'PORTUGASOIL', 'country': 'PT', 'production_site': 'LISBOA', 'ref': 'ISCC-PT-100001110', 'date':'2011-10-01', 'dc':''},
-                         {'name': 'PORTUGASOIL', 'country': 'PT', 'production_site': 'PORTO', 'ref': 'ISCC-PT-100001080', 'date':'2013-07-01', 'dc':''},
-                         {'name': 'BIOCATALAN', 'country': 'ES', 'production_site': 'EL MASNOU', 'ref': 'ISCC-ES-100002010', 'date':'2016-02-01', 'dc':'ES_012_2016'},
-                         {'name': 'BIOCATALAN', 'country': 'ES', 'production_site': 'TARRAGONA', 'ref': 'ISCC-ES-100005010', 'date':'2019-12-01', 'dc':''},
-                         {'name': 'BIOBAO', 'country': 'ES', 'production_site': 'HONDARRIBIA', 'ref': 'ISCC-ES-100004010', 'date':'2007-11-01', 'dc':'ES_011_2018'},
-                         {'name': 'BONDUELLE', 'country': 'FR', 'production_site': 'TOURS', 'ref': 'ISCC-FR-100001011', 'date':'2001-01-01', 'dc':''},
-                         {'name': 'BONDUELLE', 'country': 'FR', 'production_site': 'NUEIL LES AUBIERS', 'ref': 'ISCC-FR-100001012', 'date':'2004-06-01', 'dc':'FR_042_2016'},
-                         {'name': 'GEANTVERT', 'country': 'FR', 'production_site': 'BRUZAC', 'ref': 'ISCC-FR-100001013', 'date':'2005-04-01', 'dc':''},
-                         {'name': 'GEANTVERT', 'country': 'FR', 'production_site': 'NIMES', 'ref': 'ISCC-FR-100001014', 'date':'1997-07-01', 'dc':'FR_002_2017'},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-ES-100002010', 'date':'2016-02-01', 'dc':'ES_012_2016'},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-ES-100005010', 'date':'2019-12-01', 'dc':''},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-ES-100004010', 'date':'2007-11-01', 'dc':'ES_011_2018'},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001011', 'date':'2001-01-01', 'dc':''},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001012', 'date':'2004-06-01', 'dc':'FR_042_2016'},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001013', 'date':'2005-04-01', 'dc':''},
-                         {'name': '', 'country': '', 'production_site': '', 'ref': 'ISCC-FR-100001014', 'date':'1997-07-01', 'dc':'FR_002_2017'},
-                         ]
 
     vendors = ['LUR BERRI', 'ITANOL', 'FINNHUB', 'DEUTSCHE BIOFUELS GMBH', 'SUCRERIE HARIBO', '', '', '', '', '']
 
@@ -362,7 +301,7 @@ def make_operators_lots_sheet(workbook, entity):
         site = random.choice(delivery_sites)
         volume = random.randint(34000, 36000)
         row = []
-        p = random.choice(unknown_producers)
+        p = random.choice(UNKNOWN_PRODUCERS)
         row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc']]
         row += [vendor, volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(0, 3), random.randint(0, 1), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), clientid]
         row += [today, site.depot_id]
@@ -468,7 +407,7 @@ def template_producers_advanced(entity, nb_lots=10):
     # Create an new Excel file and add a worksheet.
     location = '/tmp/carbure_template_advanced.xlsx'
     workbook = xlsxwriter.Workbook(location)
-    make_producers_lots_sheet_advanced(workbook, entity, nb_lots)
+    make_producers_or_traders_lots_sheet_advanced(workbook, entity, nb_lots, is_producer=True)
     make_mps_sheet(workbook)
     make_biofuels_sheet(workbook)
     make_countries_sheet(workbook)
@@ -495,7 +434,7 @@ def template_traders(entity):
     # Create an new Excel file and add a worksheet.
     location = '/tmp/carbure_template_traders.xlsx'
     workbook = xlsxwriter.Workbook(location)
-    make_traders_lots_sheet(workbook, entity)
+    make_producers_or_traders_lots_sheet_advanced(workbook, entity, nb_lots=10, is_producer=False)
     make_mps_sheet(workbook)
     make_biofuels_sheet(workbook)
     make_countries_sheet(workbook)

@@ -13,7 +13,7 @@ from django.db import transaction
 from django.http import JsonResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
-from core.models import ISCCCertificate, DBSCertificate
+from core.models import ISCCCertificate, DBSCertificate, EntityDBSTradingCertificate, EntityISCCTradingCertificate
 import dateutil.parser
 from api.v3.sanity_checks import bulk_sanity_checks, tx_is_valid, lot_is_valid
 
@@ -145,7 +145,13 @@ def get_prefetched_data(entity=None):
     d['biocarburants'] = {b.code: b for b in Biocarburant.objects.all()}
     d['matieres_premieres'] = {m.code: m for m in MatierePremiere.objects.all()}
     if entity:
+        # get only my production sites
         d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').filter(producer=entity)}
+        # get all my linked certificates
+        my_vendor_certificates = []
+        my_vendor_certificates += [c.certificate.certificate_id for c in EntityISCCTradingCertificate.objects.filter(entity=entity)]
+        my_vendor_certificates += [c.certificate.certificate_id for c in EntityDBSTradingCertificate.objects.filter(entity=entity)]
+        d['my_vendor_certificates'] = my_vendor_certificates
     else:
         d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
     d['depots'] = {d.depot_id.lstrip('0'): d for d in Depot.objects.all()}
@@ -306,7 +312,15 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
         else:
             lot.unknown_production_site_reference = lot_row['production_site_reference']
     else:
-        lot.unknown_production_site_reference = ''
+        # try to find it automatically
+        if lot.production_site_is_in_carbure:
+            certificates = lot.carbure_production_site.productionsitecertificate_set.all()
+            if certificates.count() > 0:
+                lot.carbure_production_site_reference = certificates[0].natural_key()['certificate_id']
+            else:
+                lot.carbure_production_site_reference = 'NOT FOUND'
+        else:
+            lot.unknown_production_site_reference = ''
     if 'production_site_commissioning_date' in lot_row and lot_row['production_site_commissioning_date'] != '' and lot_row['production_site_commissioning_date'] is not None:
         try:
             com_date = try_get_date(lot_row['production_site_commissioning_date'])
@@ -328,12 +342,10 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
 
 def fill_supplier_info(entity, lot_row, lot):
     tx_errors = []
-
     if 'supplier' in lot_row and lot_row['supplier'] != '' and lot_row['supplier'] != None:
         lot.unknown_supplier = lot_row['supplier']
     if 'supplier_certificate' in lot_row:
         lot.unknown_supplier_certificate = lot_row['supplier_certificate']
-        transaction.carbure_vendor_certificate = lot_row['vendor_certificate']
     
     return tx_errors
 
@@ -577,16 +589,19 @@ def fill_client_data(entity, lot_row, transaction, prefetched_data):
     return tx_errors
 
 
-def fill_vendor_data(entity, lot_row, transaction):
+def fill_vendor_data(entity, lot_row, transaction, prefetched_data):
     tx_errors = []
     # by default, assume we are the vendor / supplier
     transaction.carbure_vendor = entity
-
-    if 'vendor' in lot_row and lot_row['vendor'] != '' and lot_row['vendor'] != None:
-        transaction.carbure_vendor = Entity.objects.get(name=lot_row['vendor'])
+    # try to find automatically the vendor trading certificate
+    # but for now, use what is provided in the excel file
     if 'vendor_certificate' in lot_row:
         transaction.carbure_vendor_certificate = lot_row['vendor_certificate']
-    
+    else:
+        if len(prefetched_data['my_vendor_certificates']) > 0:
+            transaction.carbure_vendor_certificate = prefetched_data['my_vendor_certificates'][0]
+        else:
+            transaction.carbure_vendor_certificate = ''
     return tx_errors
 
 def fill_delivery_site_data(lot_row, transaction, prefetched_data):
@@ -757,7 +772,7 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, transaction=None):
     tx_errors += fill_dae_data(lot_dict, transaction)
     tx_errors += fill_delivery_date(lot_dict, lot, transaction)
     tx_errors += fill_client_data(entity, lot_dict, transaction, prefetched_data)
-    tx_errors += fill_vendor_data(entity, lot_dict, transaction)
+    tx_errors += fill_vendor_data(entity, lot_dict, transaction, prefetched_data)
     tx_errors += fill_delivery_site_data(lot_dict, transaction, prefetched_data)
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
