@@ -208,7 +208,7 @@ def load_certificates(existing_certificates, scopes, biomass):
     transaction.set_autocommit(True)
     return i, new, invalidated, failed, added_scopes, removed_scopes, added_biomass, removed_biomass
 
-def summary(args, new_biomass, new_scopes, new_certificates, newly_invalidated_certificates, failed, nb_certificates):
+def summary(args, new_biomass, new_scopes, new_certificates, newly_invalidated_certificates, failed, nb_certificates, added_scopes, removed_scopes, added_biomass, removed_biomass):
     mail_content = "Hallo, <br />\n"
     mail_content += "Das Kärgement für zertificaten REDCert ist gut.<br />\n"
     mail_content += "%d zertificaten loaded<br />\n" % (nb_certificates)
@@ -244,6 +244,21 @@ def summary(args, new_biomass, new_scopes, new_certificates, newly_invalidated_c
             mail_content += str(previous.natural_key())
             mail_content += '<br />'
 
+    if len(added_scopes):
+        for ads in added_scopes:
+            mail_content += "Nouveau Scope pour le Certificat [%s] - %s: %s<br />\n" % (ads.certificate.certificate_id, ads.certificate.certificate_holder, ads.scope.scope)
+
+    if len(removed_scopes):
+        for rs in removed_scopes:
+            mail_content += "Retrait de Scope pour le Certificat [%s] - %s: %s<br />\n" % (rs.certificate.certificate_id, rs.certificate.certificate_holder, rs.scope.scope)
+
+    if len(added_biomass):
+        for ab in added_biomass:
+            mail_content += "Nouvelle MP pour le Certificat [%s] - %s: %s<br />\n" % (ab.certificate.certificate_id, ab.certificate.certificate_holder, ab.biomass.code)
+
+    if len(removed_biomass):
+        for rb in removed_biomass:
+            mail_content += "Retrait de MP pour le Certificat [%s] - %s: %s<br />\n" % (rb.certificate.certificate_id, rb.certificate.certificate_holder, rb.biomass.code)
 
     subject = "Certificats REDCert"
     if fraud:
@@ -269,9 +284,9 @@ def main(args):
         scopes = {s.scope: s for s in REDCertScope.objects.all()}
 
     certificates = {c.certificate_id: c for c in REDCertCertificate.objects.prefetch_related('redcertcertificatescope_set', 'redcertcertificatebiomass_set').all()}
-    nb_certificates, new_certificates, newly_invalidated_certificates, failed = load_certificates(certificates, scopes, biomasses)
+    nb_certificates, new_certificates, newly_invalidated_certificates, failed, added_scopes, removed_scopes, added_biomass, removed_biomass = load_certificates(certificates, scopes, biomasses)
 
-    summary(args, new_biomass, new_scopes, new_certificates, newly_invalidated_certificates, failed, nb_certificates)
+    summary(args, new_biomass, new_scopes, new_certificates, newly_invalidated_certificates, failed, nb_certificates, added_scopes, removed_scopes, added_biomass, removed_biomass)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Load REDCert certificates in database')

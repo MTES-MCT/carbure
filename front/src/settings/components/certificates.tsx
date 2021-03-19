@@ -66,7 +66,7 @@ const COLUMNS: Column<Certificate>[] = [
 ]
 
 type CertificateSettingsProps = {
-  type: "2BS" | "ISCC" | "2BS & ISCC"
+  type: "2BS" | "ISCC" | "REDCERT" | "2BS & ISCC & REDCERT"
   loading: boolean
   certificates: Certificate[]
   onAdd?: () => void
@@ -173,5 +173,22 @@ export const ISCCCertificateSettings = ({
     onAdd={settings.addISCCCertificate}
     onUpdate={settings.updateISCCCertificate}
     onDelete={settings.deleteISCCCertificate}
+  />
+)
+
+type REDCertCertificateSettingsProps = {
+  settings: REDCertCertificateSettingsHook
+}
+
+export const REDCertCertificateSettings = ({
+  settings,
+}: REDCertCertificateSettingsProps) => (
+  <CertificateSettings
+    type="REDCERT"
+    loading={settings.isLoading}
+    certificates={settings.certificates}
+    onAdd={settings.addREDCertCertificate}
+    onUpdate={settings.updateREDCertCertificate}
+    onDelete={settings.deleteREDCertCertificate}
   />
 )
