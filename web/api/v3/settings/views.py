@@ -11,7 +11,7 @@ from django.conf import settings
 from core.models import Entity, UserRights, LotV2, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput, ProducerCertificate
 from core.decorators import check_rights, otp_or_403
-from core.models import ISCCCertificate, DBSCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate
+from core.models import ISCCCertificate, DBSCertificate, REDCertCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate, EntityREDCertTradingCertificate
 from core.models import ProductionSiteCertificate, UserRightsRequests
 
 
@@ -490,7 +490,8 @@ def add_redcert_certificate(request, *args, **kwargs):
     certificate_id = request.POST.get('certificate_id', False)
     try:
         certificate = REDCertCertificate.objects.get(certificate_id=certificate_id)
-    except Exception:
+    except Exception as e:
+        print(e)
         return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
 
     EntityREDCertTradingCertificate.objects.update_or_create(entity=context['entity'], certificate=certificate)

@@ -168,15 +168,15 @@ def load_certificates(existing_certificates, scopes, biomass):
                 print('Could not find scope [%s] in REDCert scopes' % (s))
                 print(scopes)
             else:
-                certscope, c = REDCertCertificateScope.objects.update_or_create(certificate=o, scope=scopes[s])
                 # did we already have it
-                if scopes[s] in existing_scopes:
-                    del existing_scopes[scopes[s]]
+                if s in existing_scopes:
+                    del existing_scopes[s]
                 else:
-                    added_scopes.append((cert, scopes[s]))
+                    certscope, c = REDCertCertificateScope.objects.update_or_create(certificate=o, scope=scopes[s])
+                    added_scopes.append((o, certscope))
         if len(existing_scopes) != 0:
             for es in existing_scopes.values():
-                removed_scopes.append((cert, es))
+                removed_scopes.append((o, es))
                 es.delete()
 
         # biomasses
@@ -191,14 +191,14 @@ def load_certificates(existing_certificates, scopes, biomass):
                 print(biomass)
             else:
                 # did we already have it
-                if biomass[b] in existing_biomasses:
-                    del existing_biomasses[biomass[b]]
+                if b in existing_biomasses:
+                    del existing_biomasses[b]
                 else:
                     certbiomass, c = REDCertCertificateBiomass.objects.update_or_create(certificate=o, biomass=biomass[b])
-                    added_biomass.append((cert, biomass[b]))
+                    added_biomass.append((o, certbiomass))
         if len(existing_biomasses) != 0:
             for es in existing_biomasses.values():
-                removed_biomass.append((cert, es))
+                removed_biomass.append((o, es))
                 es.delete()
 
         if i % 250 == 0:
@@ -245,20 +245,20 @@ def summary(args, new_biomass, new_scopes, new_certificates, newly_invalidated_c
             mail_content += '<br />'
 
     if len(added_scopes):
-        for ads in added_scopes:
-            mail_content += "Nouveau Scope pour le Certificat [%s] - %s: %s<br />\n" % (ads.certificate.certificate_id, ads.certificate.certificate_holder, ads.scope.scope)
+        for cert, ads in added_scopes:
+            mail_content += "Nouveau Scope pour le Certificat [%s] - %s: %s<br />\n" % (cert.certificate_id, cert.certificate_holder, ads.scope.scope)
 
     if len(removed_scopes):
-        for rs in removed_scopes:
-            mail_content += "Retrait de Scope pour le Certificat [%s] - %s: %s<br />\n" % (rs.certificate.certificate_id, rs.certificate.certificate_holder, rs.scope.scope)
+        for cert, rs in removed_scopes:
+            mail_content += "Retrait de Scope pour le Certificat [%s] - %s: %s<br />\n" % (cert.certificate_id, cert.certificate_holder, rs.scope.scope)
 
     if len(added_biomass):
-        for ab in added_biomass:
-            mail_content += "Nouvelle MP pour le Certificat [%s] - %s: %s<br />\n" % (ab.certificate.certificate_id, ab.certificate.certificate_holder, ab.biomass.code)
+        for cert, ab in added_biomass:
+            mail_content += "Nouvelle MP pour le Certificat [%s] - %s: %s<br />\n" % (cert.certificate_id, cert.certificate_holder, ab.biomass.code)
 
     if len(removed_biomass):
-        for rb in removed_biomass:
-            mail_content += "Retrait de MP pour le Certificat [%s] - %s: %s<br />\n" % (rb.certificate.certificate_id, rb.certificate.certificate_holder, rb.biomass.code)
+        for cert, rb in removed_biomass:
+            mail_content += "Retrait de MP pour le Certificat [%s] - %s: %s<br />\n" % (cert.certificate_id, cert.certificate_holder, rb.biomass.code)
 
     subject = "Certificats REDCert"
     if fraud:

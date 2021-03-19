@@ -15,10 +15,12 @@ import ProductionSitesSettings from "./components/production-site"
 import {
   DBSCertificateSettings,
   ISCCCertificateSettings,
+  REDCertCertificateSettings,
 } from "./components/certificates"
 import NationalSystemCertificatesSettings from "./components/national-system-certificates"
 import CompanySettings from "./components/company"
 import Sticky from "common/components/sticky"
+import useREDCertCertificates from "./hooks/use-redcert-certificates"
 
 function useSettings(entity: EntitySelection, settings: SettingsGetter) {
   const company = useCompany(entity, settings)
@@ -26,6 +28,7 @@ function useSettings(entity: EntitySelection, settings: SettingsGetter) {
   const deliverySites = useDeliverySites(entity)
   const dbsCertificates = use2BSCertificates(entity, productionSites)
   const isccCertificates = useISCCCertificates(entity, productionSites)
+  const redcertCertificates = useREDCertCertificates(entity, productionSites)
   const nationalSystemCertificates = useNationalSystemCertificates(entity, settings) // prettier-ignore
 
   return {
@@ -33,6 +36,7 @@ function useSettings(entity: EntitySelection, settings: SettingsGetter) {
     deliverySites,
     dbsCertificates,
     isccCertificates,
+    redcertCertificates,
     nationalSystemCertificates,
     company,
   }
@@ -50,6 +54,7 @@ const Settings = ({ entity, settings }: SettingsProps) => {
     deliverySites,
     dbsCertificates,
     isccCertificates,
+    redcertCertificates,
     nationalSystemCertificates,
   } = useSettings(entity, settings)
 
@@ -72,6 +77,7 @@ const Settings = ({ entity, settings }: SettingsProps) => {
         {isProducer && <a href="#production">Sites de production</a>}
         {hasCertificates && <a href="#iscc">Certificats ISCC</a>}
         {hasCertificates && <a href="#2bs">Certificats 2BS</a>}
+        {hasCertificates && <a href="#red">Certificats REDCert</a>}
         {hasCSN && <a href="#csn">Certificats système national</a>}
       </Sticky>
 
@@ -87,6 +93,10 @@ const Settings = ({ entity, settings }: SettingsProps) => {
 
         {hasCertificates && (
           <DBSCertificateSettings settings={dbsCertificates} />
+        )}
+
+        {hasCertificates && (
+          <REDCertCertificateSettings settings={redcertCertificates} />
         )}
 
         {hasCSN && (
