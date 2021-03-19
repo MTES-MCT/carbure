@@ -450,6 +450,15 @@ def get_2bs_certificates(request, *args, **kwargs):
 
 
 @check_rights('entity_id')
+def get_redcert_certificates(request, *args, **kwargs):
+    context = kwargs['context']
+    one_year_ago = datetime.datetime.now() - relativedelta(years=1)
+    objects = EntityREDCertTradingCertificate.objects.filter(entity=context['entity'], certificate__valid_until__gte=one_year_ago)[:100]
+    sez = [o.natural_key() for o in objects]
+    return JsonResponse({'status': 'success', 'data': sez})
+
+
+@check_rights('entity_id')
 def add_iscc_certificate(request, *args, **kwargs):
     context = kwargs['context']
     certificate_id = request.POST.get('certificate_id', False)
@@ -472,6 +481,19 @@ def add_2bs_certificate(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
 
     EntityDBSTradingCertificate.objects.update_or_create(entity=context['entity'], certificate=certificate)
+    return JsonResponse({'status': 'success'})
+
+
+@check_rights('entity_id')
+def add_redcert_certificate(request, *args, **kwargs):
+    context = kwargs['context']
+    certificate_id = request.POST.get('certificate_id', False)
+    try:
+        certificate = REDCertCertificate.objects.get(certificate_id=certificate_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
+
+    EntityREDCertTradingCertificate.objects.update_or_create(entity=context['entity'], certificate=certificate)
     return JsonResponse({'status': 'success'})
 
 
@@ -499,6 +521,21 @@ def delete_2bs_certificate(request, *args, **kwargs):
         certificate = DBSCertificate.objects.get(certificate_id=certificate_id)
         EntityDBSTradingCertificate.objects.get(entity=entity, certificate=certificate).delete()
         ProductionSiteCertificate.objects.filter(entity=entity, certificate_2bs__certificate=certificate).delete()
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not delete requested certificate"}, status=400)
+
+    return JsonResponse({'status': 'success'})
+
+
+@check_rights('entity_id')
+def delete_redcert_certificate(request, *args, **kwargs):
+    entity = kwargs['context']['entity']
+    certificate_id = request.POST.get('certificate_id', False)
+
+    try:
+        certificate = REDCertCertificate.objects.get(certificate_id=certificate_id)
+        EntityREDCertTradingCertificate.objects.get(entity=entity, certificate=certificate).delete()
+        ProductionSiteCertificate.objects.filter(entity=entity, certificate_redcert__certificate=certificate).delete()
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not delete requested certificate"}, status=400)
 
@@ -611,6 +648,38 @@ def update_2bs_certificate(request, *args, **kwargs):
     old_certificate.has_been_updated = True
     old_certificate.save()
     ProductionSiteCertificate.objects.filter(entity=entity, type='2BS', certificate_2bs=old_certificate).update(certificate_2bs=new_certificate)
+    return JsonResponse({'status': 'success'})
+
+
+@check_rights('entity_id')
+def update_redcert_certificate(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    old_certificate_id = request.POST.get('old_certificate_id', False)
+    new_certificate_id = request.POST.get('new_certificate_id', False)
+
+    if not old_certificate_id:
+        return JsonResponse({'status': 'error', 'message': 'Please provide an old_certificate_id'}, status=400)
+    if not new_certificate_id:
+        return JsonResponse({'status': 'error', 'message': 'Please provide an new_certificate_id'}, status=400)
+
+    # first, add the new certificate to the account
+    try:
+        new_certificate = REDCertCertificate.objects.get(certificate_id=new_certificate_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find new requested certificate"}, status=400)
+    new_certificate, _ = EntityREDCertTradingCertificate.objects.update_or_create(entity=entity, certificate=new_certificate)
+
+    # find old certificate
+    try:
+        old_certificate = EntityREDCertTradingCertificate.objects.get(certificate__certificate_id=old_certificate_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find old requested certificate"}, status=400)
+
+    # then update previously linked certificates
+    old_certificate.has_been_updated = True
+    old_certificate.save()
+    ProductionSiteCertificate.objects.filter(entity=entity, type='REDCERT', certificate_redcert=old_certificate).update(certificate_redcert=new_certificate)
     return JsonResponse({'status': 'success'})
 
 

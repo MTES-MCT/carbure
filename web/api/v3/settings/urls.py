@@ -26,17 +26,26 @@ urlpatterns = [
      path('add-delivery-site', views.add_delivery_site, name='api-v3-settings-add-delivery-site'),
      path('delete-delivery-site', views.delete_delivery_site, name='api-v3-settings-delete-delivery-site'),
 
+     # ISCC
      path('get-iscc-certificates', views.get_iscc_certificates, name='api-v3-settings-get-iscc-certificates'),
      path('add-iscc-certificate', views.add_iscc_certificate, name='api-v3-settings-add-iscc-certificate'),
      path('delete-iscc-certificate', views.delete_iscc_certificate, name='api-v3-settings-delete-iscc-certificate'),
+     path('update-iscc-certificate', views.update_iscc_certificate, name='api-v3-settings-update-iscc-certificate'),
+
+     # 2BS
      path('get-2bs-certificates', views.get_2bs_certificates, name='api-v3-settings-get-2bs-certificates'),
      path('add-2bs-certificate', views.add_2bs_certificate, name='api-v3-settings-add-2bs-certificate'),
      path('delete-2bs-certificate', views.delete_2bs_certificate, name='api-v3-settings-delete-2bs-certificate'),
+     path('update-2bs-certificate', views.update_2bs_certificate, name='api-v3-settings-update-2bs-certificate'),
+
+     # REDCert
+     path('get-redcert-certificates', views.get_redcert_certificates, name='api-v3-settings-get-redcert-certificates'),
+     path('add-redcert-certificate', views.add_redcert_certificate, name='api-v3-settings-add-redcert-certificate'),
+     path('delete-redcert-certificate', views.delete_redcert_certificate, name='api-v3-settings-delete-redcert-certificate'),
+     path('update-redcert-certificate', views.update_redcert_certificate, name='api-v3-settings-update-redcert-certificate'),
 
      path('get-my-certificates', views.get_my_certificates, name='api-v3-settings-get-my-certificates'),
      path('set-production-site-certificates', views.set_production_site_certificates, name='api-v3-settings-set-production-site-certificates'),
-     path('update-iscc-certificate', views.update_iscc_certificate, name='api-v3-settings-update-iscc-certificate'),
-     path('update-2bs-certificate', views.update_2bs_certificate, name='api-v3-settings-update-2bs-certificate'),
 
      path('request-entity-access', views.request_entity_access, name='api-v3-settings-request-entity-access'),
 ]
