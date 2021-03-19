@@ -345,12 +345,29 @@ export type ISCCCertificate = {
   download_link: string
 }
 
-export type Certificate = ISCCCertificate | DBSCertificate
+export type REDCertCertificate = {
+  type: string
+  certificate_id: string
+  certificate_holder: string
+  city: string
+  zip_code: string
+  country_raw: string
+  valid_from: string
+  valid_until: string
+  certificator: string
+  certificate_type: string
+  status: string
+  scope: string[]
+  has_been_updated: boolean
+  download_link: string
+}
+
+export type Certificate = ISCCCertificate | DBSCertificate | REDCertCertificate
 
 export type ProductionCertificate = {
   certificate_id: string
   holder: string
-  type: "2BS" | "ISCC"
+  type: "2BS" | "ISCC" | "REDCERT"
 }
 
 export type StockDraft = {

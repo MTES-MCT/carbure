@@ -8,6 +8,7 @@ import {
   MatierePremiere,
   OwnershipType,
   ProductionSiteDetails,
+  REDCertCertificate,
 } from "./types"
 
 import api from "./services/api"
@@ -73,6 +74,10 @@ export function findISCCCertificates(
 
 export function find2BSCertificates(query: string): Promise<DBSCertificate[]> {
   return api.get("/common/2bs-certificates", { query })
+}
+
+export function findREDCertCertificates(query: string): Promise<REDCertCertificate[]> {
+  return api.get("/common/redcert-certificates", { query })
 }
 
 export function findCertificates(
