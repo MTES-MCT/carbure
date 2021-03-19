@@ -103,13 +103,9 @@ export function normalizeFilters(snapshot: any): Snapshot {
 }
 
 export function filterOutsourcedDepots(snapshot: any): Snapshot {
-  const filteredDepots: EntityDeliverySite[] = []
-  snapshot.depots.forEach((d: any) => {
-    if (d.blending_is_outsourced) {
-      filteredDepots.push(d)
-    }
-  })
-  snapshot.depots = filteredDepots
+  snapshot.depots = snapshot.depots.filter(
+    (d: EntityDeliverySite) => d.blending_is_outsourced
+  )
   return snapshot
 }
 

@@ -15,7 +15,7 @@ import { useNotificationContext } from "common/components/notifications"
 export interface EntityDeliverySite {
   depot: DeliverySite | null
   ownership_type: OwnershipType
-  blending_outsourced: boolean
+  blending_is_outsourced: boolean
   blender_entity_id: EntitySelection
 }
 
@@ -64,7 +64,7 @@ export default function useDeliverySites(
         entityID,
         data.depot.depot_id,
         data.ownership_type,
-        data.blending_outsourced,
+        data.blending_is_outsourced,
         data.blender_entity_id
       )
 
