@@ -84,6 +84,8 @@ export const OperatorImportPromptFactory = (uploader: LotUploader) => ({
       >
         Télécharger le modèle
       </span>
+      <a className={styles.downloadLink} href="https://carbure-1.gitbook.io/faq/gerer-mes-lots-1/operateur-petrolier/ajouter-des-lots/importer-un-fichier-excel">Guide de l'import Excel</a>
+
     </Box>
   </ImportPrompt>
 )
