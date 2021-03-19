@@ -16,7 +16,7 @@ from django.db import transaction
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import REDCertScope, REDCertBiomassType, REDCertCertificate, REDCertCertificateScope, REDCertCertificateBioMass
+from core.models import REDCertScope, REDCertBiomassType, REDCertCertificate, REDCertCertificateScope, REDCertCertificateBiomass
 
 today = datetime.date.today()
 CSV_FOLDER = os.environ['CARBURE_HOME'] + '/web/fixtures/csv/'
@@ -158,14 +158,17 @@ def load_certificates(existing_certificates, scopes, biomass):
             print(e)
             failed.append(cert)
         # scopes
-        existing_scopes = {s.scope.code: s for f in o.redcertcertificatescope_set.all()}
-        cert_scopes = cert['Certified as'].split(',')
+        existing_scopes = {s.scope.scope: s for s in o.redcertcertificatescope_set.all()}
+        cert_scopes = str(cert['Certified as']).split(',')
         for s in cert_scopes:
-            s = s.trim()
+            s = s.strip()
+            if s == '':
+                continue            
             if s not in scopes:
                 print('Could not find scope [%s] in REDCert scopes' % (s))
+                print(scopes)
             else:
-                s, c = REDCertCertificateScope.objects.update_or_create(certificate=o, scope=scopes[s])
+                certscope, c = REDCertCertificateScope.objects.update_or_create(certificate=o, scope=scopes[s])
                 # did we already have it
                 if scopes[s] in existing_scopes:
                     del existing_scopes[scopes[s]]
@@ -177,18 +180,21 @@ def load_certificates(existing_certificates, scopes, biomass):
                 es.delete()
 
         # biomasses
-        existing_biomasses = {s.biomass.code: s for f in o.redcertcertificatebiomass_set.all()}
-        cert_biomass = cert['Type of biomass'].replace('/', ',').split()
+        existing_biomasses = {s.biomass.code: s for s in o.redcertcertificatebiomass_set.all()}
+        cert_biomass = cert['Type of biomass'].replace('/', ',').split(',')
         for b in cert_biomass:
-            b = b.trim()
+            b = b.strip()
+            if b == '':
+                continue
             if b not in biomass:
-                print('Could not find scope [%s] in REDCert biomass' % (s))
+                print('Could not find biomass [%s] in REDCert biomass' % (b))
+                print(biomass)
             else:
                 # did we already have it
                 if biomass[b] in existing_biomasses:
                     del existing_biomasses[biomass[b]]
                 else:
-                    s, c = REDCertCertificateBioMass.objects.update_or_create(certificate=o, biomass=biomass[b])
+                    certbiomass, c = REDCertCertificateBiomass.objects.update_or_create(certificate=o, biomass=biomass[b])
                     added_biomass.append((cert, biomass[b]))
         if len(existing_biomasses) != 0:
             for es in existing_biomasses.values():
@@ -254,9 +260,13 @@ def summary(args, new_biomass, new_scopes, new_certificates, newly_invalidated_c
 def main(args):
     biomasses = {b.code: b for b in REDCertBiomassType.objects.all()}
     nb_biomass, new_biomass = load_biomass_types(biomasses)
+    if len(new_biomass):
+        biomasses = {b.code: b for b in REDCertBiomassType.objects.all()}
 
     scopes = {s.scope: s for s in REDCertScope.objects.all()}
     nb_scopes, new_scopes = load_scopes(scopes)
+    if len(new_scopes):
+        scopes = {s.scope: s for s in REDCertScope.objects.all()}
 
     certificates = {c.certificate_id: c for c in REDCertCertificate.objects.prefetch_related('redcertcertificatescope_set', 'redcertcertificatebiomass_set').all()}
     nb_certificates, new_certificates, newly_invalidated_certificates, failed = load_certificates(certificates, scopes, biomasses)
