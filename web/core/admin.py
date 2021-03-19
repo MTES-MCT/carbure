@@ -228,7 +228,7 @@ class REDCertCertificateAdmin(admin.ModelAdmin):
 
 class REDCertCertificateScopeAdmin(admin.ModelAdmin):
     list_display = ('certificate', 'scope')
-    search_fields = ('certificate', 'scope')
+    search_fields = ('certificate__certificate_id',)
     list_filter = ('scope', )
 
 

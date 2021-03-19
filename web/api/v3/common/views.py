@@ -173,7 +173,7 @@ def get_redcert_certificates(request):
     sez = [{'certificate_id': c.certificate_id, 'certificate_holder': c.certificate_holder,
             'valid_from': c.valid_from.strftime('%y-%m-%d'),
             'valid_until': c.valid_until.strftime('%y-%m-%d'), 'city': c.city, 'zip_code': c.zip_code,
-            'certification_type': c.certification_type} for c in cert]
+            'certification_type': c.certificate_type} for c in cert]
     return JsonResponse({'status': 'success', 'data': sez})
 
 

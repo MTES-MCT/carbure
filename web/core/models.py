@@ -686,6 +686,7 @@ class REDCertCertificate(models.Model):
     status = models.CharField(max_length=32, default='')
 
     def natural_key(self):
+        scope = [s.scope.scope for s in self.redcertcertificatescope_set.all()]
         return {'certificate_id': self.certificate_id,
                 'certificate_holder': self.certificate_holder,
                 'city': self.city,
@@ -696,6 +697,7 @@ class REDCertCertificate(models.Model):
                 'valid_until': self.valid_until,
                 'certificator': self.certificator,
                 'certificate_type': self.certificate_type,
+                'scope': scope,
                 'status': self.status}
 
     def __str__(self):
