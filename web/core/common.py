@@ -591,13 +591,20 @@ def fill_client_data(entity, lot_row, transaction, prefetched_data):
 
 def fill_vendor_data(entity, lot_row, transaction, prefetched_data):
     tx_errors = []
-    # by default, assume we are the vendor / supplier
+    # supplier is who we get the lot from
+    # vendor is the one who adds the lot in the database      
     transaction.carbure_vendor = entity
-    # try to find automatically the vendor trading certificate
-    # but for now, use what is provided in the excel file
-    if 'vendor_certificate' in lot_row:
+
+    if entity.entity_type == Entity.OPERATOR:
+        # the lot is added in db by an Operator. no certificate needed
+        return tx_errors
+
+    # if the lot is added by a Producer or Trader, try to attach the trading certificate
+    # first, use what is provided in the excel file
+    if 'vendor_certificate' in lot_row and lot_row['vendor_certificate'] != '' and lot_row['vendor_certificate'] is not None:
         transaction.carbure_vendor_certificate = lot_row['vendor_certificate']
     else:
+        # no certificate provided. get it from database
         if len(prefetched_data['my_vendor_certificates']) > 0:
             transaction.carbure_vendor_certificate = prefetched_data['my_vendor_certificates'][0]
         else:

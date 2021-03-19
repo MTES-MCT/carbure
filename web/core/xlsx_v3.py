@@ -278,34 +278,42 @@ def make_operators_lots_sheet(workbook, entity):
     delivery_sites = Depot.objects.all()
     countries = Pays.objects.all()
 
-
-    vendors = ['LUR BERRI', 'ITANOL', 'FINNHUB', 'DEUTSCHE BIOFUELS GMBH', 'SUCRERIE HARIBO', '', '', '', '', '']
-
     # header
     bold = workbook.add_format({'bold': True})
+    # difference with producer/trader: no 'client' column and no 'vendor_certificate' column
     columns = ['producer', 'production_site', 'production_site_country', 'production_site_reference',
                'production_site_commissioning_date', 'double_counting_registration',
-               'vendor', 'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
+               'supplier', 'supplier_certificate',
+               'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
                'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
-               'dae', 'champ_libre', 'delivery_date', 'delivery_site']
+               'dae', 'champ_libre', 'delivery_date', 'delivery_site', 'delivery_site_country']
+
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
 
+    # rows
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
     today = datetime.date.today().strftime('%Y-%m-%d')
     for i in range(10):
         mp = random.choice(mps)
-        vendor = random.choice(vendors)
         bc = random.choice(bcs)
         country = random.choice(countries)
         site = random.choice(delivery_sites)
         volume = random.randint(34000, 36000)
         row = []
+        # producer
         p = random.choice(UNKNOWN_PRODUCERS)
         row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc']]
-        row += [vendor, volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(0, 3), random.randint(0, 1), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), clientid]
-        row += [today, site.depot_id]
-
+        # supplier
+        supplier_is_not_the_producer = random.random() < 0.5
+        if supplier_is_not_the_producer:
+            supplier = random.choice(SUPPLIERS)
+            row += [supplier['name'], supplier['sref']]
+        else:
+            row += [p['name'], p['ref']]
+        # lot
+        row += [volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), clientid]
+        row += [today, site.depot_id, site.country.code_pays]
         colid = 0
         for elem in row:
             worksheet_lots.write(i+1, colid, elem)
