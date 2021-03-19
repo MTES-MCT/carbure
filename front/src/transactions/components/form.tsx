@@ -253,6 +253,7 @@ const CertificateFields = ({
 }: FieldsProps) => {
   const isProducer = entity?.entity_type === EntityType.Producer
   const isOperator = entity?.entity_type === EntityType.Operator
+  const isAdmin = entity?.entity_type === EntityType.Administration
 
   const isAuthor =
     tx.id === -1 || Boolean(tx.added_by && tx.added_by.id === entity?.id)
@@ -270,7 +271,7 @@ const CertificateFields = ({
         checked={isVendorInCarbure}
       />
 
-      {isAuthor ? (
+      {isAuthor || isAdmin ? (
         <React.Fragment>
           <LabelInput
             readOnly={readOnly}
@@ -355,39 +356,46 @@ const CertificateFields = ({
       )}
 
       {isAuthor ? (
-        <LabelAutoComplete
-          loose
-          readOnly={readOnly}
-          disabled={isVendorDisabled || isOperator}
-          required={!(isVendorDisabled || isOperator)}
-          name="carbure_vendor_certificate"
-          label="Certificat du vendeur"
-          placeholder="Rechercher un certificat..."
-          value={tx.carbure_vendor_certificate}
-          error={fieldErrors.carbure_vendor_certificate}
-          getValue={getters.raw}
-          getLabel={getters.raw}
-          getQuery={api.findCertificates}
-          queryArgs={[entity?.id]}
-          minLength={0}
-          onChange={onChange}
-        />
-      ) : (
-        <LabelInput
-          readOnly
-          disabled
-          label="Certificat du fournisseur original"
-        />
-      )}
+        <React.Fragment>
+          <LabelAutoComplete
+            loose
+            readOnly={readOnly}
+            disabled={isVendorDisabled || isOperator}
+            required={!(isVendorDisabled || isOperator)}
+            name="carbure_vendor_certificate"
+            label="Certificat du vendeur"
+            placeholder="Rechercher un certificat..."
+            value={tx.carbure_vendor_certificate}
+            error={fieldErrors.carbure_vendor_certificate}
+            getValue={getters.raw}
+            getLabel={getters.raw}
+            getQuery={api.findCertificates}
+            queryArgs={[entity?.id]}
+            minLength={0}
+            onChange={onChange}
+          />
 
-      <LabelInput
-        readOnly={readOnly}
-        label="Champ libre"
-        name="champ_libre"
-        value={tx.champ_libre}
-        error={fieldErrors.champ_libre}
-        onChange={onChange}
-      />
+          <LabelInput
+            readOnly={readOnly}
+            label="Champ libre"
+            name="champ_libre"
+            value={tx.champ_libre}
+            error={fieldErrors.champ_libre}
+            onChange={onChange}
+          />
+        </React.Fragment>
+      ) : (
+        <React.Fragment>
+          <LabelTextArea
+            readOnly={readOnly}
+            label="Champ libre"
+            name="champ_libre"
+            value={tx.champ_libre}
+            error={fieldErrors.champ_libre}
+            onChange={onChange}
+          />
+        </React.Fragment>
+      )}
     </Box>
   )
 }
