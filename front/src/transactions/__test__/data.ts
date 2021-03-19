@@ -17,6 +17,7 @@ export const emptySnapshot = {
     delivery_sites: [],
     clients: [],
   },
+  depots: [],
 }
 
 export const snapshot = {
@@ -36,6 +37,7 @@ export const snapshot = {
     delivery_sites: ["Test Delivery Site"],
     clients: ["Opérateur Test"],
   },
+  depots: [],
 }
 
 export const operatorSnapshot = {
@@ -54,6 +56,7 @@ export const operatorSnapshot = {
     delivery_sites: ["Test Delivery Site"],
     vendors: ["Producteur Test"],
   },
+  depots: [],
 }
 
 export const adminSnapshot = {
@@ -73,6 +76,7 @@ export const adminSnapshot = {
     vendors: ["Producteur Test", "Trader Test"],
     clients: ["Opérateur Test"],
   },
+  depots: [],
 }
 
 export const emptyLots = {
