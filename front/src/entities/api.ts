@@ -6,6 +6,7 @@ import {
   ProductionSiteDetails,
   UserRightRequest,
   UserRightStatus,
+  REDCertCertificate,
 } from "common/types"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 
@@ -44,7 +45,7 @@ export function getEntityProductionSites(
 
 export function getEntityCertificates(
   entity_id: number
-): Promise<(ISCCCertificate | DBSCertificate)[]> {
+): Promise<(ISCCCertificate | DBSCertificate | REDCertCertificate)[]> {
   return api.get("/admin/entities/certificates", { entity_id })
 }
 

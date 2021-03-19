@@ -2,7 +2,7 @@ import datetime
 from django.http import JsonResponse
 from django.db.models import Q
 from core.models import Entity, Biocarburant, MatierePremiere, Depot, Pays
-from core.models import ISCCCertificate, DBSCertificate
+from core.models import ISCCCertificate, DBSCertificate, REDCertCertificate
 from core.models import Control, ControlMessages, UserRights
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 from core.decorators import check_rights
@@ -160,6 +160,23 @@ def get_2bs_certificates(request):
             'certification_type': c.certification_type} for c in cert]
     return JsonResponse({'status': 'success', 'data': sez})
 
+
+def get_redcert_certificates(request):
+    q = request.GET.get('query', False)
+    lastyear = datetime.date.today() - datetime.timedelta(days=365)
+    cert = REDCertCertificate.objects.filter(valid_until__gte=lastyear)
+    if q:
+        cert = cert.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
+
+    cert = cert[0:100]
+
+    sez = [{'certificate_id': c.certificate_id, 'certificate_holder': c.certificate_holder,
+            'valid_from': c.valid_from.strftime('%y-%m-%d'),
+            'valid_until': c.valid_until.strftime('%y-%m-%d'), 'city': c.city, 'zip_code': c.zip_code,
+            'certification_type': c.certification_type} for c in cert]
+    return JsonResponse({'status': 'success', 'data': sez})
+
+
 def get_certificates(request):
     q = request.GET.get('query', False)
     entity_id = request.GET.get('entity_id', None)
@@ -169,22 +186,28 @@ def get_certificates(request):
     
     iscc = ISCCCertificate.objects.filter(valid_until__gte=lastyear)
     dbs = DBSCertificate.objects.filter(valid_until__gte=lastyear)
+    red = REDCertCertificate.objects.filter(valid_until__gte=lastyear)
     
     if q:
         iscc = iscc.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
         dbs = dbs.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
+        red = red.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
     if entity_id:
         iscc = iscc.filter(entityiscctradingcertificate__entity__id=entity_id)
         dbs = dbs.filter(entitydbstradingcertificate__entity__id=entity_id)
+        red = red.filter(entityredcerttradingcertificate__entity__id=entity_id)
     if production_site:
         iscc = iscc.filter(entityiscctradingcertificate__productionsitecertificate__production_site__id=production_site)
         dbs = dbs.filter(entitydbstradingcertificate__productionsitecertificate__production_site__id=production_site)
+        red = red.filter(entityredcerttradingcertificate__productionsitecertificate__production_site__id=production_site)
 
     iscc = iscc[0:100]
     dbs = dbs[0:100]
+    red = red[0:100]
     
     sez = [c.certificate_id for c in iscc]
     sez += [c.certificate_id for c in dbs]
+    sez += [c.certificate_id for c in red]
 
     return JsonResponse({'status': 'success', 'data': sez})
 

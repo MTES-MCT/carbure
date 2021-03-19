@@ -175,7 +175,7 @@ class Pays(models.Model):
 
 
 class Depot(models.Model):
-    TYPE_DEPOT = (('EFS', 'EFS'), ('EFPE', 'EFPE'), ('OTHER', 'Autre'),)
+    TYPE_DEPOT = (('EFS', 'EFS'), ('EFPE', 'EFPE'), ("OIL DEPOT", "OIL DEPOT"), ("BIOFUEL DEPOT", "BIOFUEL DEPOT"), ('OTHER', 'Autre'),)
     name = models.CharField(max_length=128, null=False, blank=False)
     city = models.CharField(max_length=128, null=True, blank=True)
     depot_id = models.CharField(max_length=32, null=False, blank=False)

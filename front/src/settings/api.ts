@@ -8,6 +8,7 @@ import {
   ProductionSiteDetails,
   ProductionCertificate,
   OwnershipType,
+  REDCertCertificate,
 } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
@@ -300,6 +301,41 @@ export function update2BSCertificate(
   new_certificate_id: string
 ) {
   return api.post("/settings/update-2bs-certificate", {
+    entity_id,
+    old_certificate_id,
+    new_certificate_id,
+  })
+}
+
+
+export function getREDCertCertificates(
+  entityID: number
+): Promise<REDCertCertificate[]> {
+  return api.get("/settings/get-redcert-certificates", {
+    entity_id: entityID,
+  })
+}
+
+export function addREDCertCertificate(entityID: number, certificate_id: string) {
+  return api.post("/settings/add-redcert-certificate", {
+    entity_id: entityID,
+    certificate_id: certificate_id,
+  })
+}
+
+export function deleteREDCertCertificate(entityID: number, certificate_id: string) {
+  return api.post("/settings/delete-redcert-certificate", {
+    entity_id: entityID,
+    certificate_id: certificate_id,
+  })
+}
+
+export function updateREDCertCertificate(
+  entity_id: number,
+  old_certificate_id: string,
+  new_certificate_id: string
+) {
+  return api.post("/settings/update-redcert-certificate", {
     entity_id,
     old_certificate_id,
     new_certificate_id,

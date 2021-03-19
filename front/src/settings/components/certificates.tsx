@@ -17,9 +17,10 @@ import { ExpirationDate, SettingsForm } from "./common"
 import { padding } from "transactions/components/list-columns"
 import { DBSCertificateSettingsHook } from "settings/hooks/use-2bs-certificates"
 import { ISCCCertificateSettingsHook } from "settings/hooks/use-iscc-certificates"
+import { REDCertCertificateSettingsHook } from "settings/hooks/use-redcert-certificates"
 
 export const CertificatePromptFactory = (
-  type: "2BS" | "ISCC",
+  type: "2BS" | "ISCC" | "REDCERT",
   findCertificates: (q: string) => Promise<Certificate[]>
 ) =>
   function CertificatePrompt({
