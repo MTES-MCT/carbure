@@ -4,7 +4,6 @@ import {
   Country,
   DepotType,
   OwnershipType,
-  Entity,
   EntityType,
 } from "common/types"
 import {
@@ -92,7 +91,7 @@ export const DeliverySiteFinderPromptFactory = (entity: EntitySelection) =>
           />
         </Label>
 
-        {entity && entity.entity_type == EntityType.Operator && (
+        {entity && entity.entity_type === EntityType.Operator && (
           <LabelCheckbox
             name="blending_is_outsourced"
             label="Incorporation potentiellement effectuée par un tiers"
