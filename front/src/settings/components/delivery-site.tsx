@@ -94,7 +94,7 @@ export const DeliverySiteFinderPromptFactory = (entity: EntitySelection) =>
 
         {entity && entity.entity_type == EntityType.Operator && (
           <LabelCheckbox
-            name="blending_outsourced"
+            name="blending_is_outsourced"
             label="Incorporation potentiellement effectuée par un tiers"
             checked={data.blending_is_outsourced}
             onChange={onChange}
@@ -104,7 +104,7 @@ export const DeliverySiteFinderPromptFactory = (entity: EntitySelection) =>
           <LabelAutoComplete
             label="Incorporateur Tiers"
             placeholder="Rechercher un opérateur pétrolier..."
-            name="blender_entity_id"
+            name="blender"
             value={data.blender}
             getQuery={common.findOperators}
             onChange={onChange}
