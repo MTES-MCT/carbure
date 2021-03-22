@@ -106,6 +106,9 @@ export const TransactionList = ({
   const isError = transactions.error !== null
   const isEmpty = txs === null || txs.lots.length === 0
   
+  const hasOutsourcedBlendingDepot = outsourceddepots && outsourceddepots.length > 0
+
+
   return (
     <Box className={styles.transactionList}>
       {isError && (
@@ -188,7 +191,7 @@ export const TransactionList = ({
             />
           )}
 
-          {isOperator && (status.is(LotStatus.Inbox) || status.is(LotStatus.Accepted)) && (
+          {isOperator && hasOutsourcedBlendingDepot && (status.is(LotStatus.Inbox) || status.is(LotStatus.Accepted)) && (
             <OperatorOutsourcedBlendingActions 
               forwarder={forwarder}
               outsourceddepots={outsourceddepots}
