@@ -16,7 +16,7 @@ export interface EntityDeliverySite {
   depot: DeliverySite | null
   ownership_type: OwnershipType
   blending_is_outsourced: boolean
-  blender_entity_id: EntitySelection
+  blender: EntitySelection
 }
 
 export interface DeliverySiteSettingsHook {
@@ -65,7 +65,7 @@ export default function useDeliverySites(
         data.depot.depot_id,
         data.ownership_type,
         data.blending_is_outsourced,
-        data.blender_entity_id
+        data.blender
       )
 
       if (res) {

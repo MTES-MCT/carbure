@@ -15,7 +15,7 @@ export const OperatorForwardPromptFactory = (forwarder: LotForwarder, outsourced
           Voici vers quels opérateurs les lots seront transférés:
           <p>{outsourceddepots}</p>
           {outsourceddepots?.forEach((d) => (
-            <span>{d.depot?.name} : {d.blender_entity_id?.name}</span>
+            <span>{d.depot?.name} : {d.blender?.name}</span>
           ))}
       </Box>
   )

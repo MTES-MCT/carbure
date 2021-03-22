@@ -65,7 +65,7 @@ export const DeliverySiteFinderPromptFactory = (entity: EntitySelection) =>
       depot: null,
       ownership_type: OwnershipType.ThirdParty,
       blending_is_outsourced: false,
-      blender_entity_id: null,
+      blender: null,
     })
 
     return (
@@ -105,7 +105,7 @@ export const DeliverySiteFinderPromptFactory = (entity: EntitySelection) =>
             label="Incorporateur Tiers"
             placeholder="Rechercher un opérateur pétrolier..."
             name="blender_entity_id"
-            value={data.blender_entity_id}
+            value={data.blender}
             getQuery={common.findOperators}
             onChange={onChange}
             getValue={(c) => c.id.toString()}
@@ -146,6 +146,8 @@ type DeliverySiteState = {
   address: string
   postal_code: string
   ownership_type: OwnershipType
+  blending_is_outsourced: boolean
+  blender: string
 }
 
 export const DeliverySitePromptFactory = (deliverySite?: EntityDeliverySite) =>
@@ -161,6 +163,8 @@ export const DeliverySitePromptFactory = (deliverySite?: EntityDeliverySite) =>
       address: deliverySite?.depot?.address ?? "",
       postal_code: deliverySite?.depot?.postal_code ?? "",
       ownership_type: deliverySite?.ownership_type ?? OwnershipType.Own,
+      blending_is_outsourced: deliverySite?.blending_is_outsourced ?? false,
+      blender: deliverySite?.blender?.name ?? "",
     }
 
     return (
@@ -177,6 +181,22 @@ export const DeliverySitePromptFactory = (deliverySite?: EntityDeliverySite) =>
           />
         </Label>
 
+        <hr />
+
+        <Label label="Incorporation tierce">
+          <LabelCheckbox
+            disabled
+            label="L'incorporation est effectuée par un tiers"
+            name="blending_is_outsourced"
+            defaultChecked={form.blending_is_outsourced}
+          />
+          <LabelInput
+            readOnly
+            label="Incorporateur"
+            name="blender"
+            value={form.blender}
+          />
+        </Label>
         <hr />
 
         <LabelInput
