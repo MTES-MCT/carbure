@@ -196,6 +196,7 @@ export const TransactionList = ({
               forwarder={forwarder}
               outsourceddepots={outsourceddepots}
               disabled={selection.selected.length === 0 ? true : false}
+              selection={selection}
             />
           )}
         </ActionBar>

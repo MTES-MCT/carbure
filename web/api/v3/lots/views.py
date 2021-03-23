@@ -763,28 +763,30 @@ def forward_lots(request, *args, **kwargs):
 
     tx_ids = request.POST.getlist('tx_ids', None)
     comment = request.POST.get('comment', '')
-    depots = EntityDepot.objects.filter(entity=entity, outsourced_blending=True)
+    depots = {ed.depot: ed for ed in EntityDepot.objects.filter(entity=entity, blending_is_outsourced=True)}
 
-    if not entity.entity_type == 'Opérateur':
+    if not entity.entity_type == Entity.OPERATOR:
         return JsonResponse({'status': 'forbidden', 'message': "Feature only available to Operators"}, status=403)
     if not tx_ids:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
+        return JsonResponse({'status': 'error', 'message': "Missing tx_ids"}, status=400)
 
     for tx_id in tx_ids:
-        # for each tx, make sure we are the client, status accepted, and it has been delivered to a Depot with outsourced_blending
+        # for each tx, make sure we are the client, status accepted, and it has been delivered to a Depot with blending_is_outsourced
         try:
-            tx = LotTransaction.objects.get(delivery_status='A', id=tx_id, carbure_client=entity)
+            tx = LotTransaction.objects.get(delivery_status__in=['A', 'N'], id=tx_id, carbure_client=entity)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': "TX not found", 'extra': str(e)}, status=400)
 
         if tx.carbure_delivery_site in depots:
             # it has been delivered to a Depot with outsourced blending
             # we should forward the lot to the blender
+            tx.delivery_status = 'A'
+            tx.is_forwarded = True
+            tx.save()
             new_tx = tx
             new_tx.pk = None
 
             new_tx.carbure_vendor = entity
-            new_tx.carbure_vendor_certificate = ''
 
             new_tx.client_is_in_carbure = True
             new_tx.carbure_client = depots[tx.carbure_delivery_site].blender
@@ -792,4 +794,7 @@ def forward_lots(request, *args, **kwargs):
             new_tx.delivery_status = 'N'
             new_tx.champ_libre = comment
             new_tx.save()
+        else:
+            return JsonResponse({'status': 'error', 'message': "Delivery site not registered for outsourcing"}, status=400)
+
     return JsonResponse({'status': 'success'})    

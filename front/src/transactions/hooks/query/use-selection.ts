@@ -7,6 +7,7 @@ export interface TransactionSelection {
   toggleSelect: (id: number) => void
   toggleSelectAll: (t: boolean) => void
   isAllSelected: () => boolean
+  getTransactions: () => Transaction[]
   reset: () => void
 }
 
@@ -57,12 +58,17 @@ export default function useTransactionSelection(
     )
   }
 
+  function getTransactions() {
+    return transactions?.filter(t => selected.includes(t.id)) ?? []
+  }
+
   return {
     selected,
     has,
     toggleSelect,
     toggleSelectAll,
     isAllSelected,
+    getTransactions,
     reset,
   }
 }

@@ -119,7 +119,8 @@ export const TransactionTable = ({
   if (
     status.is(LotStatus.Draft) ||
     status.is(LotStatus.Inbox) ||
-    status.is(LotStatus.ToFix)
+    status.is(LotStatus.ToFix) ||
+    (status.is(LotStatus.Accepted) && outsourceddepots?.length)
   ) {
     columns.push(C.selector(selection))
   } else {
