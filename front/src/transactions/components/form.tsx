@@ -286,7 +286,7 @@ const CertificateFields = ({
             loose
             readOnly={readOnly}
             disabled={isVendorDisabled}
-            required={!isVendorDisabled}
+            required={isOperator}
             name="unknown_supplier_certificate"
             label="Certificat du fournisseur"
             placeholder="Rechercher un certificat..."
@@ -325,10 +325,9 @@ const CertificateFields = ({
       {tx.producer_is_in_carbure ? (
         <LabelAutoComplete
           loose
-          required
           readOnly={readOnly}
           name="carbure_production_site_reference"
-          label="Certificat du producteur"
+          label="Certificat du site de production"
           placeholder="Rechercher un certificat..."
           value={tx.carbure_production_site_reference}
           error={fieldErrors.carbure_production_site_reference}
@@ -344,7 +343,7 @@ const CertificateFields = ({
           loose
           readOnly={readOnly}
           name="unknown_production_site_reference"
-          label="Certificat du producteur"
+          label="Certificat du site de production"
           placeholder="Rechercher un certificat..."
           value={tx.unknown_production_site_reference}
           error={fieldErrors.unknown_production_site_reference}
@@ -360,10 +359,10 @@ const CertificateFields = ({
           <LabelAutoComplete
             loose
             readOnly={readOnly}
-            disabled={isVendorDisabled || isOperator}
-            required={!(isVendorDisabled || isOperator)}
+            disabled={isOperator}
+            required={!isOperator}
             name="carbure_vendor_certificate"
-            label="Certificat du vendeur"
+            label="Votre certificat"
             placeholder="Rechercher un certificat..."
             value={tx.carbure_vendor_certificate}
             error={fieldErrors.carbure_vendor_certificate}
