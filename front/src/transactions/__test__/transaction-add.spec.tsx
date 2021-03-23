@@ -54,7 +54,7 @@ test("display the transaction form", async () => {
   screen.getByLabelText("Pays de production")
   screen.getByLabelText("Date de mise en service")
   screen.getByLabelText("N° d'enregistrement double-compte")
-  screen.getByLabelText("Certificat du producteur *")
+  screen.getByLabelText("Certificat du site de production")
 
   screen.getByLabelText("Client enregistré sur Carbure ?")
   screen.getByLabelText("Client")
