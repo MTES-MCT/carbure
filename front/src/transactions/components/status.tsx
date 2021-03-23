@@ -21,6 +21,10 @@ function getStatusText(
 
   const isClient = tx.carbure_client?.id === entity?.id
 
+  if (tx.is_forwarded) {
+    return 'Transféré'
+  }
+
   switch (tx.delivery_status) {
     case "N":
       return "En attente"
@@ -42,6 +46,10 @@ function getStatusClass(
 ): string {
   if (!tx || tx.lot.status === "Draft") {
     return isStock ? styles.statusWaiting : ""
+  }
+
+  if (tx.is_forwarded) {
+    return styles.statusWaiting
   }
 
   switch (tx.delivery_status) {
