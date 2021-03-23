@@ -355,6 +355,8 @@ class LotTransaction(models.Model):
     is_mac = models.BooleanField(default=False)
     # this PoS is part of a multiple PoS batch
     is_batch = models.BooleanField(default=False)
+    # this PoS has been forwarded by an Operator to another Operator (outsourced blending)
+    is_forwarded = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.id)
