@@ -2,14 +2,16 @@ import { EntitySelection } from "carbure/hooks/use-entity"
 import { TransactionSelection } from "../query/use-selection"
 
 import * as api from "transactions/api"
-import useAPI from "../../../common/hooks/use-api"
+import useAPI from "common/hooks/use-api"
 
-import { confirm, prompt } from "../../../common/components/dialog"
-import { useNotificationContext } from "../../../common/components/notifications"
+import { prompt } from "common/components/dialog"
+import { useNotificationContext } from "common/components/notifications"
+import { OperatorTransactionsToForwardPromptFactory } from "transactions/components/forward"
+import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 
 export interface LotForwarder {
   loading: boolean
-  forwardSelection: (l: EntitySelection) => Promise<boolean>
+  forwardSelection: (s: TransactionSelection, od?: EntityDeliverySite[]) => Promise<void>
 }
 
 export default function useForwardLots(
@@ -43,17 +45,16 @@ export default function useForwardLots(
     }
   }
 
-  async function forwardSelection() {
-    const shouldAccept = await confirm(
+  async function forwardSelection(s: TransactionSelection, outsourceddepots?: EntityDeliverySite[]) {
+    const txToTransfer = await prompt(
       "Transférer lot",
-      "Voulez vous transférer les lots sélectionnés ?"
+      "Voulez vous transférer les lots sélectionnés ?",
+      OperatorTransactionsToForwardPromptFactory(s, outsourceddepots)
     )
 
-    if (entity !== null && shouldAccept) {
-      await notifyForward(resolveForward(entity.id, selection.selected), true)
+    if (entity !== null && txToTransfer) {
+      await notifyForward(resolveForward(entity.id, txToTransfer.map(t => t.id)), true)
     }
-
-    return shouldAccept
   }
 
   return {

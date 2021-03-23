@@ -368,7 +368,7 @@ class LotTransaction(models.Model):
         'carbure_delivery_site': self.carbure_delivery_site.natural_key() if self.carbure_delivery_site else None, 'unknown_delivery_site': self.unknown_delivery_site,
         'unknown_delivery_site_country': self.unknown_delivery_site_country.natural_key() if self.unknown_delivery_site_country else None, 'delivery_status': self.delivery_status,
         'champ_libre': self.champ_libre, 'is_mac': self.is_mac, 'is_batch': self.is_batch,
-        'id': self.id}
+        'id': self.id, 'is_forwarded': self.is_forwarded}
 
     class Meta:
         db_table = 'transactions'

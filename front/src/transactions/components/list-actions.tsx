@@ -33,6 +33,8 @@ import { OperatorForwardPromptFactory } from "./forward"
 import styles from "./list-actions.module.css"
 import { LotForwarder } from "transactions/hooks/actions/use-forward-lots"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
+import { Transaction } from "common/types"
+import { TransactionSelection } from "transactions/hooks/query/use-selection"
 
 type ExportActionsProps = {
   isEmpty: boolean
@@ -296,18 +298,20 @@ type OperatorOutsourcedBlendingProps = {
   disabled: boolean
   forwarder: LotForwarder
   outsourceddepots: EntityDeliverySite[] | undefined
+  selection: TransactionSelection
 }
 
 
-export const OperatorOutsourcedBlendingActions = ({disabled, forwarder, outsourceddepots}: OperatorOutsourcedBlendingProps) => {
+export const OperatorOutsourcedBlendingActions = ({disabled, forwarder, outsourceddepots, selection}: OperatorOutsourcedBlendingProps) => {
   async function onForward() {
-    const recipient = await prompt(
+    const validated = await prompt(
       "Transfert de lots",
       "Vous pouvez transférer vos lots reçus dans un dépôt pour lequel l'incorporation peut être effectuée par une société tierce.",
       OperatorForwardPromptFactory(forwarder, outsourceddepots)
     )
-    if (recipient) {
-      forwarder.forwardSelection(recipient)
+    
+    if (validated) {
+      forwarder.forwardSelection(selection, outsourceddepots)
     }
   }
   return (
