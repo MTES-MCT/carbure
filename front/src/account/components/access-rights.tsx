@@ -18,7 +18,7 @@ import { SettingsForm } from "settings/components/common"
 import { LabelAutoComplete } from "common/components/autocomplete"
 import { Alert } from "common/components/alert"
 import Table, { Column, Line, Row } from "common/components/table"
-import { padding } from "transactions/components/list-columns"
+import {padding} from "transactions/components/list-columns"
 import { Section, SectionBody, SectionHeader } from "common/components/section"
 import { DialogButtons, PromptFormProps } from "common/components/dialog"
 
