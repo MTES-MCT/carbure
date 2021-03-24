@@ -1,6 +1,6 @@
 import datetime
 from django import db
-from core.models import LotValidationError, LotV2Error, TransactionError
+from core.models import LotValidationError, LotV2Error, TransactionError, Entity
 
 # init data cache
 # MPS = {m.code: m for m in MatierePremiere.objects.all()}
@@ -247,10 +247,6 @@ def lot_is_valid(lot):
                 error = "Veuillez renseigner la date de mise en service de l'usine"
                 LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_com_date', defaults={'value':'', 'error':error})
                 is_valid = False
-            if not lot.unknown_supplier_certificate:
-                error = "Veuillez renseigner le certificat du fournisseur"
-                LotV2Error.objects.update_or_create(lot=lot, field='unknown_supplier_certificate', defaults={'value':'', 'error':error})
-                is_valid = False
     return is_valid
 
 
@@ -307,6 +303,11 @@ def tx_is_valid(tx):
     if tx.carbure_delivery_site is not None and tx.carbure_delivery_site.country.is_in_europe and tx.lot.pays_origine is None:
         error = "Veuillez renseigner le pays d'origine de la matière première - Marché européen"
         TransactionError.objects.update_or_create(tx=tx, field='carbure_delivery_site', value='', error=error)
+        is_valid = False
+
+    if not tx.lot.unknown_supplier_certificate and tx.carbure_client.entity_type == Entity.OPERATOR:
+        error = "Veuillez renseigner le certificat du fournisseur"
+        TransactionError.objects.update_or_create(tx=tx, field='unknown_supplier_certificate', defaults={'value':'', 'error':error})
         is_valid = False
 
     # if not tx.lot.producer_is_in_carbure and not tx.carbure_vendor_certificate:
