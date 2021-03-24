@@ -84,7 +84,7 @@ def sanity_check(tx, prefetched_data):
     errors = []
 
     # make sure all mandatory fields are set
-    tx_valid = tx_is_valid(tx)
+    tx_valid = tx_is_valid(tx, prefetched_data)
     lot_valid = lot_is_valid(tx.lot)
     if not lot_valid or not tx_valid:
         # without mandatory fields, we cannot start analyzing for sanity errors. return immediately
@@ -250,7 +250,7 @@ def lot_is_valid(lot):
     return is_valid
 
 
-def tx_is_valid(tx):
+def tx_is_valid(tx, prefetched_data):
     is_valid = True
     today = datetime.date.today()
 
@@ -305,15 +305,20 @@ def tx_is_valid(tx):
         TransactionError.objects.update_or_create(tx=tx, field='carbure_delivery_site', value='', error=error)
         is_valid = False
 
-    if not tx.lot.unknown_supplier_certificate and tx.carbure_client.entity_type == Entity.OPERATOR:
-        error = "Veuillez renseigner le certificat du fournisseur"
-        TransactionError.objects.update_or_create(tx=tx, field='unknown_supplier_certificate', defaults={'value':'', 'error':error})
-        is_valid = False
-
-    # if not tx.lot.producer_is_in_carbure and not tx.carbure_vendor_certificate:
-    #     error = "Veuillez renseigner votre certificat de trading"
-    #     TransactionError.objects.update_or_create(tx=tx, field='carbure_vendor_certificate', value='', error=error)
-    #     is_valid = False
-
+    if tx.carbure_client and tx.carbure_client.entity_type == Entity.OPERATOR:
+        # client is an operator
+        # make sure we have a certificate
+        if not tx.carbure_vendor_certificate and not tx.lot.unknown_supplier_certificate:
+            # if I am an operator, I am the one who uploaded the file. request the certificate in excel file
+            if tx.lot.added_by.entity_type == Entity.OPERATOR:
+                error = "Veuillez renseigner le certificat du fournisseur"
+                TransactionError.objects.update_or_create(tx=tx, field='unknown_supplier_certificate', defaults={'value':'', 'error':error})
+                is_valid = False                
+            else: 
+                # I am a producer or trader
+                # I need to either set the certificate in the file or add them in my account
+                error = "Veuillez renseigner votre certificat de fournisseur ou ajouter un certificat sur votre compte"
+                TransactionError.objects.update_or_create(tx=tx, field='unknown_supplier_certificate', defaults={'value':'', 'error':error})
+                is_valid = False
     return is_valid
 

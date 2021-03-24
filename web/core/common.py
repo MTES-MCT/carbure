@@ -345,13 +345,12 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
     return lot_errors
 
 
-def fill_supplier_info(entity, lot_row, lot):
+def fill_supplier_info(entity, lot_row, lot, prefetched_data):
     tx_errors = []
     if 'supplier' in lot_row and lot_row['supplier'] != '' and lot_row['supplier'] != None:
         lot.unknown_supplier = lot_row['supplier']
     if 'supplier_certificate' in lot_row:
         lot.unknown_supplier_certificate = lot_row['supplier_certificate']
-    
     return tx_errors
 
 
@@ -768,7 +767,7 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, transaction=None):
 
     lot_errors += fill_producer_info(entity, lot_dict, lot, prefetched_data)
     lot_errors += fill_production_site_info(entity, lot_dict, lot, prefetched_data)
-    lot_errors += fill_supplier_info(entity, lot_dict, lot)
+    lot_errors += fill_supplier_info(entity, lot_dict, lot, prefetched_data)
     lot_errors += fill_biocarburant_info(lot_dict, lot, prefetched_data)
     lot_errors += fill_matiere_premiere_info(lot_dict, lot, prefetched_data)
     lot_errors += fill_volume_info(lot_dict, lot)

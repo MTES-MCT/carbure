@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from core.models import Entity, UserRights, LotV2, LotTransaction, ProductionSite, Pays, Biocarburant, MatierePremiere, Depot, LotValidationError, LotV2Error, TransactionError
+from core.models import ISCCCertificate, EntityISCCTradingCertificate
 from api.v3.admin.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
 
@@ -275,6 +276,7 @@ class LotsAPITest(TransactionTestCase):
         lot_errors = LotV2Error.objects.filter(lot__in=[lot['lot']['id'] for lot in lots])
         tx_errors = TransactionError.objects.filter(tx__in=[tx['id'] for tx in lots])
         nb_errors = lot_errors.count() + tx_errors.count()
+        debug_errors()
         self.assertEqual(nb_errors, nb_lots)
         
         # delete-all-drafts
@@ -347,7 +349,6 @@ class LotsAPITest(TransactionTestCase):
         res = response.json()['data']
         lots_in_batch = nb_lots - 1
         self.assertEqual(res['submitted'], lots_in_batch)
-        debug_errors()
         self.assertEqual(res['valid'], lots_in_batch)
 
         # get drafts
@@ -482,6 +483,7 @@ class LotsAPITest(TransactionTestCase):
             'matiere_premiere_code': 'BLE',
             'volume': 15000,
             'pays_origine_code': 'FR',
+            'supplier_certificate': 'ISCC-TOTO-02',
             'eec': 1,
             'ep': 5,
             'etd': 12,
@@ -637,7 +639,6 @@ class LotsAPITest(TransactionTestCase):
 
         # as producer, create same lot
         lot['entity_id'] = self.test_producer.id
-        del lot['supplier_certificate']
         del lot['production_site_commissioning_date']
         lot['production_site'] = self.production_site.name
         response = self.client.post(reverse('api-v3-add-lot'), lot)
@@ -663,6 +664,11 @@ class LotsAPITest(TransactionTestCase):
 
 
     def test_duplicates_upload(self):
+        today = datetime.date.today()
+        # add certificate to test_producer
+        crt, created = ISCCCertificate.objects.update_or_create(certificate_id='ISCC-TOTO-02', certificate_holder='das super producteur test', addons='TRS', valid_from=today, valid_until=today)
+        EntityISCCTradingCertificate.objects.update_or_create(entity=self.test_producer, certificate=crt)
+
         # upload excel file
         jsoned = self.upload_file('carbure_duplicates.xlsx', self.test_producer)
         # get number of lots in excel file
