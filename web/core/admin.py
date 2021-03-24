@@ -132,7 +132,7 @@ class TransactionAdmin(admin.ModelAdmin):
     search_fields = ('lot__id', 'dae', 'champ_libre')
     list_filter = ('delivery_status', 'lot__period', 'client_is_in_carbure', 'carbure_vendor', 'carbure_client',  'is_mac', 'is_batch', 'delivery_site_is_in_carbure')
     raw_id_fields = ('lot',)
-    actions = ['rerun_sanity_checks', 'delete_ghosts', 'change_transaction_delivery_site', 'change_transaction_client']
+    actions = ['rerun_sanity_checks', 'delete_ghosts', 'change_transaction_delivery_site', 'change_transaction_client', 'delete_errors']
 
     def get_lot_mp(self, obj):
         return obj.lot.matiere_premiere
@@ -162,6 +162,13 @@ class TransactionAdmin(admin.ModelAdmin):
         nb_deleted, _ = queryset.filter(delivery_date=None).delete()
         self.message_user(request, '%d transactions deleted.' % nb_deleted, messages.SUCCESS)
     delete_ghosts.short_description = "Supprimer Transactions Fantômes"
+
+
+    def delete_errors(self, request, queryset):
+        lots = [tx.lot for tx in queryset]
+        nb_deleted, _ = LotValidationError.objects.filter(lot__in=lots).delete()
+        self.message_user(request, '%d errors deleted.' % nb_deleted, messages.SUCCESS)
+    delete_errors.short_description = "Supprimer Erreurs"
 
 
     class ChangeTransactionClientForm(forms.Form):
