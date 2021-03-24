@@ -329,6 +329,8 @@ def add_delivery_site(request, *args, **kwargs):
     blending_is_outsourced = request.POST.get('blending_outsourced', False)
     if blending_is_outsourced == "true":
         blending_is_outsourced = True
+    else:
+        blending_is_outsourced = False
     blending_entity_id = request.POST.get('blending_entity_id', False)
 
     if not delivery_site_id:

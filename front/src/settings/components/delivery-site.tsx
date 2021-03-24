@@ -40,11 +40,14 @@ const DEPOT_TYPE_LABELS = {
   [DepotType.EFS]: "EFS",
   [DepotType.EFPE]: "EFPE",
   [DepotType.Other]: "Autre",
+  [DepotType.BiofuelDepot]: "Biofuel Depot",
+  [DepotType.OilDepot]: "Oil Depot",
 }
 
 const OWNERSHIP_LABELS = {
   [OwnershipType.Own]: "Propre",
   [OwnershipType.ThirdParty]: "Tiers",
+  [OwnershipType.Processing]: "Processing",
 }
 
 // prettier-ignore

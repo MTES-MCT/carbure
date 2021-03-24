@@ -79,11 +79,14 @@ export enum DepotType {
   EFS = "EFS",
   EFPE = "EFPE",
   Other = "OTHER",
+  BiofuelDepot = "BIOFUEL DEPOT",
+  OilDepot = "OIL DEPOT",
 }
 
 export enum OwnershipType {
   Own = "OWN",
   ThirdParty = "THIRD_PARTY",
+  Processing = "PROCESSING",
 }
 
 export interface DeliverySite {
