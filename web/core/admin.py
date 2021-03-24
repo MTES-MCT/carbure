@@ -130,9 +130,9 @@ class LotV2Admin(admin.ModelAdmin):
 class TransactionAdmin(admin.ModelAdmin):
     list_display = ('get_lot_mp', 'get_lot_bc', 'get_lot_volume', 'carbure_vendor', 'carbure_client', 'dae', 'carbure_delivery_site', 'delivery_date', 'delivery_status', 'unknown_client')
     search_fields = ('lot__id', 'dae', 'champ_libre')
-    list_filter = ('carbure_vendor', 'carbure_client', 'delivery_status', 'is_mac', 'is_batch', 'carbure_client', 'unknown_client', 'client_is_in_carbure', 'delivery_site_is_in_carbure')
+    list_filter = ('delivery_status', 'lot__period', 'client_is_in_carbure', 'carbure_vendor', 'carbure_client',  'is_mac', 'is_batch', 'delivery_site_is_in_carbure')
     raw_id_fields = ('lot',)
-    actions = ['rerun_sanity_checks', 'delete_ghosts', 'change_transaction_client']
+    actions = ['rerun_sanity_checks', 'delete_ghosts', 'change_transaction_delivery_site', 'change_transaction_client']
 
     def get_lot_mp(self, obj):
         return obj.lot.matiere_premiere
@@ -180,6 +180,7 @@ class TransactionAdmin(admin.ModelAdmin):
                     tx.unknown_client = ''
                     tx.delivery_status = 'N'
                     tx.save()
+                    TransactionError.objects.filter(tx=tx, field='unknown_client').delete()
                     count += 1
                 self.message_user(request, "Successfully reassigned %d transactions to %s." % (count, new_client))
                 return HttpResponseRedirect(request.get_full_path())
@@ -188,6 +189,29 @@ class TransactionAdmin(admin.ModelAdmin):
         return render(request, 'admin/change_transaction_client.html', {'transactions': queryset, 'change_client_form': form})
     change_transaction_client.short_description = "Changer le client"
 
+
+    class ChangeTransactionDeliverySiteForm(forms.Form):
+        _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)
+        new_delivery_site = forms.ModelChoiceField(Depot.objects.all())
+
+    def change_transaction_delivery_site(self, request, queryset):
+        form = None
+        if 'apply' in request.POST:
+            form = self.ChangeTransactionDeliverySiteForm(request.POST)
+            if form.is_valid():
+                new_delivery_site = form.cleaned_data['new_delivery_site']
+                count = 0
+                for tx in queryset:
+                    tx.carbure_delivery_site = new_delivery_site
+                    tx.unknown_delivery_site = ''
+                    tx.save()
+                    count += 1
+                self.message_user(request, "Successfully reassigned %d transactions to %s." % (count, new_delivery_site))
+                return HttpResponseRedirect(request.get_full_path())
+        if not form:
+            form = self.ChangeTransactionDeliverySiteForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+        return render(request, 'admin/change_transaction_delivery_site.html', {'transactions': queryset, 'change_delivery_site_form': form})
+    change_transaction_delivery_site.short_description = "Changer le site de livraison"
 
 class TransactionErrorAdmin(admin.ModelAdmin):
     list_display = ('tx', 'field', 'error', 'value')
