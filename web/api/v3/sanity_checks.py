@@ -216,14 +216,6 @@ def sanity_check(tx, prefetched_data):
     if not tx.client_is_in_carbure:
         errors.append(raise_warning(lot, 'UNKNOWN_CLIENT', tx=tx))
 
-    # check certificate
-    if not tx.lot.producer_is_in_carbure:
-        # certificate association has not been checked manually by our admins. make sure the certificate exists
-        certificate_id = tx.lot.unknown_production_site_reference.upper()
-        if certificate_id not in prefetched_data['iscc_certificates'] and certificate_id not in prefetched_data['2bs_certificates'] and not in prefetched_data['redcert_certificates']:
-            errors.append(raise_warning(lot, 'UNKNOWN_CERTIFICATE'))
-
-
     # check rights
     if tx.lot.producer_is_in_carbure and tx.lot.added_by != tx.lot.carbure_producer:
         is_sane = False
