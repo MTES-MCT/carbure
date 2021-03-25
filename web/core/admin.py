@@ -91,30 +91,13 @@ class DepotAdmin(admin.ModelAdmin):
     list_filter = ('depot_type',)
 
 
-def try_attach_certificate(modeladmin, request, queryset):
-    d = get_prefetched_data()
-    for lot in queryset:
-        if lot.producer_is_in_carbure and lot.production_site_is_in_carbure:
-            # we know the producer but the certificate is not attached
-            certificates = d['production_sites'][lot.carbure_production_site.name].productionsitecertificate_set.all()
-            count = certificates.count()
-            if count >= 1:
-                # take the first one
-                # if more than one is available, it has to be set in the excel file
-                lot.unknown_production_site_reference = certificates[0].natural_key()['certificate_id']
-            else:
-                continue
-            lot.save()
-try_attach_certificate.short_description = "Essayer d'attacher certficat"
-
-
 class LotV2Admin(admin.ModelAdmin):
     list_display = ('period', 'data_origin_entity', 'biocarburant', 'matiere_premiere', 'volume', 'status', 'carbure_production_site', 'unknown_production_site', 'unknown_production_site_reference')
     search_fields = ('carbure_producer__name', 'biocarburant__name', 'matiere_premiere__name', 'carbure_id', 'period',)
     list_filter = ('period', 'production_site_is_in_carbure', 'carbure_producer', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused', 'is_transformed', 'added_by', 'added_by_user')
     raw_id_fields = ('fused_with', 'parent_lot', )
     readonly_fields = ('added_time',)
-    actions = [try_attach_certificate, 'delete_orphans']
+    actions = ['delete_orphans']
 
 
     def delete_orphans(self, request, queryset):
@@ -128,11 +111,12 @@ class LotV2Admin(admin.ModelAdmin):
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('get_lot_mp', 'get_lot_bc', 'get_lot_volume', 'carbure_vendor', 'carbure_client', 'dae', 'carbure_delivery_site', 'delivery_date', 'delivery_status', 'unknown_client')
+    list_display = ('get_lot_mp', 'get_lot_bc', 'get_lot_volume', 'carbure_vendor', 'carbure_client', 'dae', 'carbure_delivery_site', 'delivery_date', 'delivery_status', 'unknown_client', 'carbure_vendor_certificate', 'get_lot_unknown_vendor_certificate')
     search_fields = ('lot__id', 'dae', 'champ_libre')
-    list_filter = ('delivery_status', 'lot__period', 'client_is_in_carbure', 'carbure_vendor', 'carbure_client',  'is_mac', 'is_batch', 'delivery_site_is_in_carbure')
+    list_filter = ('lot__status', 'delivery_status', 'lot__period', 'client_is_in_carbure', 'carbure_vendor', 'carbure_client',  'is_mac', 'is_batch', 'delivery_site_is_in_carbure')
     raw_id_fields = ('lot',)
-    actions = ['rerun_sanity_checks', 'delete_ghosts', 'change_transaction_delivery_site', 'change_transaction_client', 'delete_errors']
+    actions = ['rerun_sanity_checks', 'delete_ghosts', 'change_transaction_delivery_site', 'change_transaction_client', 'delete_errors', 'assign_transaction_certificate']
+
 
     def get_lot_mp(self, obj):
         return obj.lot.matiere_premiere
@@ -152,6 +136,12 @@ class TransactionAdmin(admin.ModelAdmin):
     get_lot_volume.short_description = 'Volume'    
 
 
+    def get_lot_unknown_vendor_certificate(self, obj):
+        return obj.lot.unknown_supplier_certificate
+    get_lot_unknown_vendor_certificate.admin_order_field  = 'Cert. Fournisseur'
+    get_lot_unknown_vendor_certificate.short_description = 'Cert. Fournisseur'    
+
+
     def rerun_sanity_checks(self, request, queryset):
         d = get_prefetched_data()
         bulk_sanity_checks(queryset, d, background=False)
@@ -169,6 +159,31 @@ class TransactionAdmin(admin.ModelAdmin):
         nb_deleted, _ = LotValidationError.objects.filter(lot__in=lots).delete()
         self.message_user(request, '%d errors deleted.' % nb_deleted, messages.SUCCESS)
     delete_errors.short_description = "Supprimer Erreurs"
+
+
+    class AssignSupplierCertificateTransactionForm(forms.Form):
+        _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)
+        certificates = [(c.certificate.certificate_id, '%s - %s' % (c.entity.name, c.certificate.certificate_id)) for c in EntityISCCTradingCertificate.objects.all()]
+        certificate = forms.ChoiceField(choices=certificates)
+
+    def assign_transaction_certificate(self, request, queryset):
+        form = None
+        if 'apply' in request.POST:
+            form = self.AssignSupplierCertificateTransactionForm(request.POST)
+            if form.is_valid():
+                certificate = form.cleaned_data['certificate']
+                count = 0
+                for tx in queryset:
+                    tx.carbure_vendor_certificate = certificate
+                    tx.save()
+                    TransactionError.objects.filter(tx=tx, field='unknown_supplier_certificate').delete()
+                    count += 1
+                self.message_user(request, "Successfully assigned certificate to %d." % (count))
+                return HttpResponseRedirect(request.get_full_path())
+        if not form:
+            form = self.AssignSupplierCertificateTransactionForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+        return render(request, 'admin/assign_supplier_certificate_to_transaction.html', {'transactions': queryset, 'change_certificate_form': form})
+    assign_transaction_certificate.short_description = "Ajouter Certificat du Fournisseur"
 
 
     class ChangeTransactionClientForm(forms.Form):
