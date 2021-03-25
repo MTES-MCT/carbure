@@ -42,16 +42,13 @@ const ETHANOL_PCI_RATIO_IN_ETBE = 0.37
 //   )
 // }
 
-function compareVolumes(
-  volume_ethanol: number,
-  attributions: { [k: string]: number }
-) {
+function compareVolumes(volume: number, attributions: { [k: string]: number }) {
   const total_attributions = Object.values(attributions).reduce(
     (total, vol) => total + vol,
     0
   )
 
-  return volume_ethanol - total_attributions
+  return volume - total_attributions
 }
 
 function getVolumeAttributions(stocks: Transaction[], volume: number) {
@@ -194,23 +191,23 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
     }, [depot, getStocks])
 
     useEffect(() => {
-      const volume_ethanol = Math.trunc(
-        (data.volume_etbe * ETHANOL_PCI_RATIO_IN_ETBE * PCI_ETBE) / PCI_ETHANOL
-      )
+      const volume = (data.volume_etbe * ETHANOL_PCI_RATIO_IN_ETBE * PCI_ETBE) / PCI_ETHANOL // prettier-ignore
+      const volume_ethanol = Math.trunc(volume)
 
-      const volume_fossile = data.volume_etbe - volume_ethanol
+      const volume_fossile =
+        data.volume_etbe - volume_ethanol - data.volume_denaturant
 
       patch({ volume_ethanol, volume_fossile })
-    }, [patch, data.volume_etbe])
+    }, [patch, data.volume_etbe, data.volume_denaturant])
 
     useEffect(() => {
       const attributions = getVolumeAttributions(
         stocks.data?.lots ?? [],
-        data.volume_ethanol
+        data.volume_ethanol + data.volume_denaturant
       )
 
       setConversions(attributions)
-    }, [stocks.data?.lots, data.volume_ethanol])
+    }, [stocks.data?.lots, data.volume_ethanol, data.volume_denaturant])
 
     const convertedVolume: Column<Transaction> = {
       header: "Volume à convertir",
@@ -242,7 +239,10 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
     // const volumeDiff = checkVolumeDiff(data)
     // const { isOdd, RealVsTheoPCI } = checkPCIRatio(data)
 
-    const volumeDiff = compareVolumes(data.volume_ethanol, conversions)
+    const volumeDiff = compareVolumes(
+      data.volume_ethanol + data.volume_denaturant,
+      conversions
+    )
 
     const canSave = hasChange && volumeDiff === 0
 
@@ -287,6 +287,14 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
             />
 
             <LabelInput
+              type="number"
+              label="Volume de Dénaturant"
+              name="volume_denaturant"
+              value={data.volume_denaturant}
+              onChange={onChange}
+            />
+
+            <LabelInput
               disabled
               type="number"
               label={`Volume d'Éthanol à convertir (${availableETH} litres disponibles)`}
@@ -301,14 +309,6 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
               name="volume_fossile"
               value={data.volume_fossile}
             />
-
-            {/* <LabelInput
-              type="number"
-              label="Volume de Dénaturant"
-              name="volume_denaturant"
-              value={data.volume_denaturant}
-              onChange={onChange}
-            /> */}
 
             {/* <LabelInput
               type="number"
