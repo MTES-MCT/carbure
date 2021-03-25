@@ -41,6 +41,8 @@ export const ProducerImportPromptFactory = (uploader: LotUploader) => ({
 }: PromptFormProps<File>) => (
   <ImportPrompt onConfirm={onConfirm} onCancel={onCancel}>
     <Box className={styles.importExplanation}>
+      <span className={styles.note}>Note: Le modèle a été mis à jour le 24/03/2021. La colonne production_site_reference n'est plus obligatoire. Votre certificat de fournisseur doit désormais figurer dans la colonne 'vendor_certificate'. Veuillez vous référer au guide pour plus d'informations.</span>
+
       Le modèle simplifié vous permet de créer des lots provenant de vos propres
       usines. Vous pouvez les affilier immédiatement à des clients enregistrés
       sur Carbure ou simplement les ajouter à votre Stock.
@@ -78,6 +80,7 @@ export const OperatorImportPromptFactory = (uploader: LotUploader) => ({
       Le modèle Excel vous permet d'importer des lots provenant de fournisseurs
       qui ne sont pas inscrits sur Carbure. Il peut s'agir de lots importés
       depuis l'étranger ou de producteurs captifs.
+      <span className={styles.note}>Note: Le modèle a été mis à jour le 24/03/2021. La colonne production_site_reference n'est plus obligatoire. Le certificat de votre fournisseur doit désormais figurer dans la colonne 'supplier_certificate' Veuillez vous référer au guide pour plus d'informations.</span>
       <span
         className={styles.downloadLink}
         onClick={uploader.downloadTemplateOperator}
@@ -85,7 +88,6 @@ export const OperatorImportPromptFactory = (uploader: LotUploader) => ({
         Télécharger le modèle
       </span>
       <a className={styles.downloadLink} href="https://carbure-1.gitbook.io/faq/gerer-mes-lots-1/operateur-petrolier/ajouter-des-lots/importer-un-fichier-excel">Guide de l'import Excel</a>
-
     </Box>
   </ImportPrompt>
 )
