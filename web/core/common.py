@@ -577,7 +577,7 @@ def fill_client_data(entity, lot_row, transaction, prefetched_data):
         transaction.carbure_client = entity
         transaction.unknown_client = ''
     elif 'client' in lot_row and lot_row['client'] is not None and lot_row['client'] != '':
-        client = lot_row['client'].upper()
+        client = lot_row['client'].upper().strip()
         if client in clients:
             transaction.client_is_in_carbure = True
             transaction.carbure_client = clients[client]
