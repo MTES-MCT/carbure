@@ -163,9 +163,15 @@ class TransactionAdmin(admin.ModelAdmin):
 
     class AssignSupplierCertificateTransactionForm(forms.Form):
         _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)
-        certificates = [(c.certificate.certificate_id, '%s - %s' % (c.entity.name, c.certificate.certificate_id)) for c in EntityISCCTradingCertificate.objects.all()]
+        certificates = []
         certificate = forms.ChoiceField(choices=certificates)
-
+        
+        def __init__(self, *args, **kwargs):
+            super(TransactionAdmin.AssignSupplierCertificateTransactionForm, self).__init__(*args, **kwargs)
+            certificates = [(c.certificate.certificate_id, '%s - %s' % (c.entity.name, c.certificate.certificate_id)) for c in EntityISCCTradingCertificate.objects.all()]
+            self.fields['certificate'].choices = certificates
+            
+            
     def assign_transaction_certificate(self, request, queryset):
         form = None
         if 'apply' in request.POST:
