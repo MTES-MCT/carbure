@@ -613,6 +613,7 @@ def fill_vendor_data(entity, lot_row, transaction, prefetched_data):
         if len(prefetched_data['my_vendor_certificates']) > 0:
             transaction.carbure_vendor_certificate = prefetched_data['my_vendor_certificates'][0]
         else:
+            print('Could not find vendor certificate in account')
             transaction.carbure_vendor_certificate = ''
     return tx_errors
 
@@ -738,8 +739,11 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
 
     tx_errors.append(fill_dae_data(lot_dict, transaction))
     tx_errors.append(fill_delivery_date(lot_dict, lot, transaction))
-    tx_errors.append(fill_client_data(entity, lot_dict, transaction, prefetched_data, ))
-    tx_errors.append(fill_delivery_site_data(lot_dict, transaction, prefetched_data, ))
+    tx_errors.append(fill_client_data(entity, lot_dict, transaction, prefetched_data))
+    tx_errors.append(fill_vendor_data(entity, lot_dict, transaction, prefetched_data))
+    tx_errors.append(fill_delivery_site_data(lot_dict, transaction, prefetched_data))
+
+
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
     transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
