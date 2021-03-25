@@ -186,6 +186,7 @@ class TransactionAdmin(admin.ModelAdmin):
                     tx.carbure_client = new_client
                     tx.unknown_client = ''
                     tx.delivery_status = 'N'
+                    tx.client_is_in_carbure = True
                     tx.save()
                     TransactionError.objects.filter(tx=tx, field='unknown_client').delete()
                     count += 1
@@ -209,6 +210,7 @@ class TransactionAdmin(admin.ModelAdmin):
                 new_delivery_site = form.cleaned_data['new_delivery_site']
                 count = 0
                 for tx in queryset:
+                    tx.delivery_site_is_in_carbure = True
                     tx.carbure_delivery_site = new_delivery_site
                     tx.unknown_delivery_site = ''
                     tx.save()
