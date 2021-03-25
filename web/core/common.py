@@ -507,9 +507,10 @@ def fill_ghg_info(lot_row, lot):
             lot_errors.append(LotV2Error(lot=lot, field='eee', error='Format non reconnu', value=eee))
 
     # calculs ghg
-    lot.ghg_total = round(lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee, 2)
+    lot.ghg_total = lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee
     lot.ghg_reference = 83.8
     lot.ghg_reduction = round((1.0 - (lot.ghg_total / lot.ghg_reference)) * 100.0, 2)
+    lot.ghg_total = round(lot.ghg_total, 2)
     return lot_errors
 
 
