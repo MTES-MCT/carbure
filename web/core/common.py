@@ -51,7 +51,7 @@ def get_sheet_data(sheet, convert_float: bool) -> List[List[Scalar]]:
     return data
 
 
-def send_lot_from_stock(rights, tx):
+def send_lot_from_stock(rights, tx, prefetched_data):
     lot = tx.lot
     if tx.lot.added_by not in rights:
         return False, "User not allowed to send this tx"
@@ -61,7 +61,7 @@ def send_lot_from_stock(rights, tx):
         return False, "Tx already sent"
 
     # make sure all mandatory fields are set
-    tx_valid = tx_is_valid(tx)
+    tx_valid = tx_is_valid(tx, prefetched_data)
     if not tx_valid:
         return False, 'Transaction invalide'
     lot_valid = lot_is_valid(lot)
