@@ -216,10 +216,6 @@ def sanity_check(tx, prefetched_data):
     if not tx.client_is_in_carbure:
         errors.append(raise_warning(lot, 'UNKNOWN_CLIENT', tx=tx))
 
-    # check rights
-    if tx.lot.producer_is_in_carbure and tx.lot.added_by != tx.lot.carbure_producer:
-        is_sane = False
-        errors.append(raise_error(lot, 'NOT_ALLOWED'))
     return lot_valid, tx_valid, is_sane, errors
 
 
