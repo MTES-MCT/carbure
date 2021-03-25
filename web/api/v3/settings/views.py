@@ -465,7 +465,7 @@ def add_iscc_certificate(request, *args, **kwargs):
     context = kwargs['context']
     certificate_id = request.POST.get('certificate_id', False)
     try:
-        certificate = ISCCCertificate.objects.get(certificate_id=certificate_id)
+        certificate = ISCCCertificate.objects.filter(certificate_id=certificate_id)[0]
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
 
