@@ -336,13 +336,15 @@ def generate_batch(request, *args, **kwargs):
 
     return JsonResponse({'status': 'success', 'data': []})
 
-@otp_required
-def send_drafts(request):
+@check_rights('entity_id')
+def send_drafts(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
     tx_ids = request.POST.getlist('tx_ids', False)
-
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
 
+    prefetched_data = get_prefetched_data(entity)
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     send_errors = []
     for tx_id in tx_ids:
@@ -351,23 +353,22 @@ def send_drafts(request):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id), 'extra': str(e)},
                                 status=400)
-
-        sent, errors = send_lot_from_stock(rights, tx)
+        sent, errors = send_lot_from_stock(rights, tx, prefetched_data)
         if not sent:
             send_errors.append(errors)
-
     return JsonResponse({'status': 'success', 'data': send_errors})
 
 @check_rights('entity_id')
 def send_all_drafts(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
+    prefetched_data = get_prefetched_data(entity)
 
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     stock_transactions_drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot__isnull=True)
     send_errors = []
     for tx in stock_transactions_drafts:
-        sent, errors = send_lot_from_stock(rights, tx)
+        sent, errors = send_lot_from_stock(rights, tx, prefetched_data)
         if not sent:
             send_errors.append(errors)
     return JsonResponse({'status': 'success', 'data': send_errors})
