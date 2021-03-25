@@ -237,7 +237,10 @@ class Lot(models.Model):
 
 
 class LotV2(models.Model):
-    LOT_STATUS = (('Draft', 'Brouillon'), ('Validated', 'Validé'))
+    DRAFT = 'Draft'
+    VALIDATED = 'Validated'
+
+    LOT_STATUS = ((DRAFT, 'Brouillon'), (VALIDATED, 'Validé'))
     SOURCE_CHOICES = (('EXCEL', 'Excel'), ('MANUAL', 'Manual'))
 
     period = models.CharField(max_length=64, blank=True, default='')
@@ -752,7 +755,7 @@ class EntityISCCTradingCertificate(models.Model):
     has_been_updated = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.certificate.certificate_id
+        return '%s - %s' % (self.entity.name, self.certificate.certificate_id)
 
     def natural_key(self):
         data = self.certificate.natural_key()
@@ -772,7 +775,7 @@ class EntityDBSTradingCertificate(models.Model):
     has_been_updated = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.certificate.certificate_id
+        return '%s - %s' % (self.entity.name, self.certificate.certificate_id)
 
     def natural_key(self):
         data = self.certificate.natural_key()
@@ -792,7 +795,7 @@ class EntityREDCertTradingCertificate(models.Model):
     has_been_updated = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.certificate.certificate_id
+        return '%s - %s' % (self.entity.name, self.certificate.certificate_id)
 
     def natural_key(self):
         data = self.certificate.natural_key()

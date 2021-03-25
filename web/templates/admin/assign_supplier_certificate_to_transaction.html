@@ -1,0 +1,35 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+<p>Select certificate to link to the below transactions: </p>
+
+<form action="" method="post">
+    {% csrf_token %}
+    {{ change_certificate_form }}
+
+    <p>The changes will be applied to:</p>
+
+    <table>
+      <tbody>
+	{% for item in transactions %}
+	<tr>
+	  <td>{{ item.lot.period }}</td>
+	  <td>{{ item.carbure_vendor.name }}</td>
+	  <td>{{ item.dae }}</td>
+	  <td>{{ item.carbure_client }}</td>
+	  <td>{{ item.unknown_client }}</td>
+	  <td>{{ item.carbure_delivery_site }}</td>
+	  <td>{{ item.unknown_delivery_site }}</td>
+	</tr>
+	{% endfor %}
+      </tbody>
+    </table>
+    
+
+    <input type="hidden" name="action" value="assign_transaction_certificate" />
+    <input type="submit" name="apply" value="Set supplier certificate" />
+</form>
+
+{% endblock %}
+
