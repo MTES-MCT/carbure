@@ -16,3 +16,9 @@
   cursor: pointer;
   margin-top: 8px;
 }
+
+.note {
+  color: var(--red-dark);
+  font-size: small;
+  font-style: italic;
+}
