@@ -15,14 +15,25 @@ server {
 }
 
 server {
+    listen 80;
+    server_name ${METABASE_HOST};
+    location / {
+        return 301 https://$host$request_uri;
+    }
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+}
+
+
+server {
     listen 80 default_server;
     server_name _;
     location / {
       return 404;
     }
 }
-
-
 
 server {
     listen 443 ssl;
@@ -88,9 +99,4 @@ server {
     location / {
         return 404;
     }
-
-    location /.well-known/acme-challenge/ {
-        root /var/www/certbot;
-    }
-
 }
