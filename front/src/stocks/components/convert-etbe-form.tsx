@@ -176,6 +176,9 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
     const [depots, getDepots] = useAPI(api.getDepots)
     const [stocks, getStocks] = useAPI(api.getStocks)
 
+    const lots = stocks.data?.lots ?? []
+    const vEthanolInStock = lots.reduce((t, tx) => t + tx.lot.volume, 0)
+
     useEffect(() => {
       getDepots(entityID, "ETH")
     }, [getDepots])
@@ -191,19 +194,43 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
     }, [depot, getStocks])
 
     useEffect(() => {
-      const volume = (data.volume_etbe * ETHANOL_PCI_RATIO_IN_ETBE * PCI_ETBE) / PCI_ETHANOL // prettier-ignore
-      const volume_ethanol = Math.trunc(volume)
+      /*
+        ratio_pci_eth_in_etbe = 0.37
+        pci_etbe = 27
+        pci_ethanol = 21
 
-      const volume_fossile =
-        data.volume_etbe - volume_ethanol - data.volume_denaturant
+        vol_eth_en_stock = stocks.total
+        vol_etbe_a_produire = formulaire.volume_etbe
+        vol_denaturant_dans_stocks = formulaire.volume_denaturant
 
-      patch({ volume_ethanol, volume_fossile })
-    }, [patch, data.volume_etbe, data.volume_denaturant])
+        vol_eth_pour_etbe = (vol_etbe_a_produire * ratio_pci_eth_in_etbe * pci_etbe) / pci_ethanol
+        vol_denaturant_pour_etbe = vol_denaturant_dans_stocks * (vol_eth_pour_etbe / vol_eth_en_stock)
+
+        vol_eth_a_deduire = vol_eth_pour_etbe - vol_denaturant_pour_etbe
+        vol_fossile_pour_etbe = vol_etbe_a_produire - vol_eth_pour_etbe
+
+        formulaire.volume_eth = vol_eth_a_deduire
+        formulaire.volume_fossile = vol_fossile_pour_etbe
+
+        et dispatcher vol_eth_a_deduire sur les stocks disponibles
+      */
+
+      const vETBE = data.volume_etbe
+      const vDenaturantTotal = data.volume_denaturant
+      const vEthanolForETBE = Math.trunc((vETBE * ETHANOL_PCI_RATIO_IN_ETBE * PCI_ETBE) / PCI_ETHANOL) // prettier-ignore
+      const vEthanolFromStock = vEthanolForETBE - Math.trunc(vDenaturantTotal * (vEthanolForETBE / vEthanolInStock)) // prettier-ignore
+      const vFossile = vETBE - vEthanolFromStock
+
+      patch({
+        volume_ethanol: vEthanolFromStock || 0,
+        volume_fossile: vFossile || 0,
+      })
+    }, [patch, data.volume_etbe, data.volume_denaturant, vEthanolInStock])
 
     useEffect(() => {
       const attributions = getVolumeAttributions(
         stocks.data?.lots ?? [],
-        data.volume_ethanol + data.volume_denaturant
+        data.volume_ethanol
       )
 
       setConversions(attributions)
@@ -225,33 +252,18 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
       ),
     }
 
-    const lots = stocks.data?.lots ?? []
-
-    const availableETH = lots.reduce((t, tx) => t + tx.lot.volume, 0)
-    // const usedETH = Object.values(conversions).reduce((t, c) => t + c, 0)
-
-    // const theoVolumeEth =
-    //   (data.volume_etbe * ETHANOL_PCI_RATIO_IN_ETBE * PCI_ETBE) / PCI_ETHANOL
-
-    // const currentETBEETHPciRatio =
-    //   (data.volume_ethanol * PCI_ETHANOL) / (data.volume_etbe * PCI_ETBE)
-
-    // const volumeDiff = checkVolumeDiff(data)
-    // const { isOdd, RealVsTheoPCI } = checkPCIRatio(data)
-
-    const volumeDiff = compareVolumes(
-      data.volume_ethanol + data.volume_denaturant,
-      conversions
-    )
+    const volumeDiff = compareVolumes(data.volume_ethanol, conversions)
 
     const canSave = hasChange && volumeDiff === 0
 
     const columns = [
+      C.padding,
       C.carbureID,
       C.biocarburant,
       C.matierePremiere,
       convertedVolume,
       C.ghgReduction,
+      C.padding,
     ]
 
     const rows = lots.map((stock) => ({ value: stock }))
@@ -274,13 +286,14 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
           options={(depots.data as any) ?? []}
           placeholder="Choisir un dépôt"
           onChange={setDepot as any}
+          style={{ marginTop: 24, marginBottom: 16 }}
         />
 
         {depot && (
           <Fragment>
             <LabelInput
               type="number"
-              label="Volume d'ETBE"
+              label="Volume d'ETBE à produire"
               name="volume_etbe"
               value={data.volume_etbe}
               onChange={onChange}
@@ -288,61 +301,41 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
 
             <LabelInput
               type="number"
-              label="Volume de Dénaturant"
+              label="Volume total de dénaturant dans vos stocks"
               name="volume_denaturant"
               value={data.volume_denaturant}
               onChange={onChange}
             />
 
             <LabelInput
-              disabled
+              readOnly
               type="number"
-              label={`Volume d'Éthanol à convertir (${availableETH} litres disponibles)`}
+              label={`Volume d'Éthanol à convertir (${vEthanolInStock} litres disponibles)`}
               name="volume_ethanol"
               value={data.volume_ethanol}
             />
 
-            <LabelInput
-              disabled
+            {/* <LabelInput
+              readOnly
               type="number"
               label="Volume Fossile"
               name="volume_fossile"
               value={data.volume_fossile}
-            />
-
-            {/* <LabelInput
-              type="number"
-              label="Pertes"
-              name="volume_pertes"
-              value={data.volume_pertes}
-              onChange={onChange}
             /> */}
           </Fragment>
         )}
 
-        {volumeDiff !== 0 && (
+        {!isNaN(volumeDiff) && volumeDiff !== 0 && (
           <Alert level="error" icon={AlertCircle}>
             Les volumes ne correspondent pas ({volumeDiff} litres)
           </Alert>
         )}
 
-        {/* {usedETH !== data.volume_ethanol && (
-          <Alert level="error" icon={AlertCircle}>
-            La somme des volumes à convertir ne correspond pas au volume total
-            d'éthanol ({usedETH - data.volume_ethanol} litres)
-          </Alert>
-        )} */}
-
-        {/* {!isNaN(currentETBEETHPciRatio) && (
-          <Alert level={isOdd ? "warning" : "info"} icon={Filter}>
-            Part PCI Ethanol de l'ETBE:{" "}
-            {(currentETBEETHPciRatio * 100).toFixed(2)}% (
-            {RealVsTheoPCI.toFixed(2)}% du ratio théorique de{" "}
-            {(ETHANOL_PCI_RATIO_IN_ETBE * 100).toFixed()}%)
-          </Alert>
-        )} */}
-
-        {rows.length > 0 && <Table columns={columns} rows={rows} />}
+        {rows.length > 0 && (
+          <div style={{ marginLeft: -24, marginRight: -24 }}>
+            <Table columns={columns} rows={rows} />
+          </div>
+        )}
 
         <DialogButtons>
           <Button
