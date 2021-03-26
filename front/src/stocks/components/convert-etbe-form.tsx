@@ -19,28 +19,6 @@ import * as api from "../api"
 const PCI_ETHANOL = 21
 const PCI_ETBE = 27
 const ETHANOL_PCI_RATIO_IN_ETBE = 0.37
-// const MIN_ETHANOL_AFTER = 98
-// const MAX_ETHANOL_AFTER = 100
-
-// function checkPCIRatio(data: ConvertETBE) {
-//   const RealPCIEthanol: number = data.volume_ethanol * PCI_ETHANOL
-//   const TheoPCIEthanol: number =
-//     data.volume_etbe * ETHANOL_PCI_RATIO_IN_ETBE * PCI_ETBE
-//   const RealVsTheoPCI: number = (RealPCIEthanol / TheoPCIEthanol) * 100
-//   const isOdd: boolean =
-//     RealVsTheoPCI > MAX_ETHANOL_AFTER || RealVsTheoPCI < MIN_ETHANOL_AFTER
-//   return { isOdd, RealVsTheoPCI }
-// }
-
-// function checkVolumeDiff(data: ConvertETBE) {
-//   return (
-//     data.volume_etbe -
-//     (data.volume_ethanol +
-//       data.volume_fossile +
-//       data.volume_pertes +
-//       data.volume_denaturant)
-//   )
-// }
 
 function compareVolumes(volume: number, attributions: { [k: string]: number }) {
   const total_attributions = Object.values(attributions).reduce(
@@ -66,95 +44,6 @@ function getVolumeAttributions(stocks: Transaction[], volume: number) {
 
   return attributions
 }
-
-// export const ConvertETBEPrompt = ({
-//   onConfirm,
-//   onCancel,
-// }: PromptFormProps<ConvertETBE>) => {
-//   const { data, hasChange, onChange } = useForm<ConvertETBE>({
-//     volume_ethanol: 0,
-//     volume_etbe: 0,
-//     volume_fossile: 0,
-//     volume_denaturant: 0,
-//     volume_pertes: 0,
-//   })
-
-//   function onSubmit(e: React.FormEvent) {
-//     e.preventDefault()
-//     onConfirm(data)
-//   }
-
-//   const { isOdd, RealVsTheoPCI } = checkPCIRatio(data)
-//   const volumeDiff: number = checkVolumeDiff(data)
-
-//   const canSave = Boolean(hasChange && volumeDiff === 0)
-
-//   return (
-//     <Box as="form" onSubmit={onSubmit}>
-//       <LabelInput
-//         type="number"
-//         label="Volume d'ethanol"
-//         name="volume_ethanol"
-//         value={data.volume_ethanol}
-//         onChange={onChange}
-//       />
-//       <LabelInput
-//         type="number"
-//         label="Volume d'ETBE"
-//         name="volume_etbe"
-//         value={data.volume_etbe}
-//         onChange={onChange}
-//       />
-//       <LabelInput
-//         type="number"
-//         label="Volume fossile"
-//         name="volume_fossile"
-//         value={data.volume_fossile}
-//         onChange={onChange}
-//       />
-//       <LabelInput
-//         type="number"
-//         label="Volume dénaturant"
-//         name="volume_denaturant"
-//         value={data.volume_denaturant}
-//         onChange={onChange}
-//       />
-//       <LabelInput
-//         type="number"
-//         label="Volume pertes"
-//         name="volume_pertes"
-//         value={data.volume_pertes}
-//         onChange={onChange}
-//       />
-
-//       {isOdd && (
-//         <Alert level="warning" icon={AlertTriangle}>
-//           Le rapport de PCI Ethanol dans ce lot d'ETBE est de{" "}
-//           {RealVsTheoPCI.toFixed(2)}% (Taux habituel entre {MIN_ETHANOL_AFTER}%
-//           et {MAX_ETHANOL_AFTER}%){" "}
-//         </Alert>
-//       )}
-
-//       {volumeDiff !== 0 && (
-//         <Alert level="error" icon={AlertCircle}>
-//           Les volumes ne correspondent pas ({volumeDiff})
-//         </Alert>
-//       )}
-
-//       <DialogButtons>
-//         <Button
-//           level="primary"
-//           disabled={!canSave}
-//           icon={Check}
-//           onClick={() => onConfirm(data)}
-//         >
-//           Valider
-//         </Button>
-//         <Button onClick={onCancel}>Annuler</Button>
-//       </DialogButtons>
-//     </Box>
-//   )
-// }
 
 export const ConvertETBEComplexPromptFactory = (entityID: number) =>
   function ConvertETBEComplexPrompt({
@@ -216,10 +105,10 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
       */
 
       const vETBE = data.volume_etbe
-      const vDenaturantTotal = data.volume_denaturant
-      const vEthanolForETBE = Math.trunc((vETBE * ETHANOL_PCI_RATIO_IN_ETBE * PCI_ETBE) / PCI_ETHANOL) // prettier-ignore
-      const vEthanolFromStock = vEthanolForETBE - Math.trunc(vDenaturantTotal * (vEthanolForETBE / vEthanolInStock)) // prettier-ignore
-      const vFossile = vETBE - vEthanolFromStock
+      const vDenaturantInStock = data.volume_denaturant
+      const vEthanolForETBE = (vETBE * ETHANOL_PCI_RATIO_IN_ETBE * PCI_ETBE) / PCI_ETHANOL // prettier-ignore
+      const vEthanolFromStock = vEthanolForETBE - (vEthanolForETBE * (vDenaturantInStock / vEthanolInStock)) // prettier-ignore
+      const vFossile = vETBE - vEthanolForETBE
 
       patch({
         volume_ethanol: vEthanolFromStock || 0,
@@ -268,15 +157,22 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
 
     const rows = lots.map((stock) => ({ value: stock }))
 
+    const vEthanolForETBE = (data.volume_etbe * ETHANOL_PCI_RATIO_IN_ETBE * PCI_ETBE) / PCI_ETHANOL // prettier-ignore
+    const vDenaturantUsed = vEthanolForETBE * (data.volume_denaturant / vEthanolInStock) // prettier-ignore
+
     const conversionDetails = Object.keys(conversions).map<ConvertETBE>(
-      (txID) => ({
-        previous_stock_tx_id: parseInt(txID, 10),
-        volume_ethanol: conversions[txID],
-        volume_denaturant: data.volume_denaturant,
-        volume_etbe: data.volume_etbe,
-        volume_fossile: data.volume_fossile,
-        volume_pertes: data.volume_pertes,
-      })
+      (txID) => {
+        const ratioOfTotal = conversions[txID] / data.volume_ethanol
+
+        return {
+          previous_stock_tx_id: parseInt(txID, 10),
+          volume_ethanol: conversions[txID],
+          volume_denaturant: vDenaturantUsed * ratioOfTotal,
+          volume_etbe: data.volume_etbe * ratioOfTotal,
+          volume_fossile: data.volume_fossile * ratioOfTotal,
+          volume_pertes: data.volume_pertes * ratioOfTotal,
+        }
+      }
     )
 
     return (
@@ -314,14 +210,6 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
               name="volume_ethanol"
               value={data.volume_ethanol}
             />
-
-            {/* <LabelInput
-              readOnly
-              type="number"
-              label="Volume Fossile"
-              name="volume_fossile"
-              value={data.volume_fossile}
-            /> */}
           </Fragment>
         )}
 

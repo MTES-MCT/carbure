@@ -268,7 +268,7 @@ const CertificateFields = ({
         readOnly
         name="vendor_is_in_carbure"
         label="Fournisseur enregistré sur Carbure ?"
-        checked={isVendorInCarbure}
+        checked={!(isAuthor || isAdmin) && isVendorInCarbure}
       />
 
       {isAuthor || isAdmin ? (
