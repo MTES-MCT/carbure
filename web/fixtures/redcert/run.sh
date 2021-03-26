@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker run -it redcert_downloader index.js
+docker run -v "/tmp/redcert":"/app/downloads" -it redcert_downloader node index.js
