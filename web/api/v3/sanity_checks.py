@@ -30,7 +30,6 @@ rules['MP_NOT_CONFIGURED'] = "Matière Première non enregistrée sur votre Site
 rules['BC_NOT_CONFIGURED'] = "Biocarburant non enregistré sur votre Site de Production"
 rules['MISSING_PRODSITE_CERTIFICATE'] = "Aucun certificat n'est associé à ce site de Production"
 rules['UNKNOWN_CLIENT'] = "Le client n'est pas enregistré sur Carbure"
-rules['UNKNOWN_CERTIFICATE'] = "Certificat fournisseur inconnu"
 rules['NOT_ALLOWED'] = "Vous ne pouvez pas ajouter les lots d'un producteur inscrit sur CarbuRe"
 
 
