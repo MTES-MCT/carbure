@@ -130,7 +130,7 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
       render: (tx) => (
         <Input
           type="number"
-          value={conversions[tx.id] ?? 0}
+          value={conversions[tx.id]?.toFixed(2) ?? 0}
           onChange={(e) =>
             setConversions({
               ...conversions,
@@ -206,16 +206,18 @@ export const ConvertETBEComplexPromptFactory = (entityID: number) =>
             <LabelInput
               readOnly
               type="number"
-              label={`Volume d'Éthanol à convertir (${vEthanolInStock} litres disponibles)`}
+              label={`Volume d'Éthanol à convertir (${vEthanolInStock.toFixed(
+                2
+              )} litres disponibles)`}
               name="volume_ethanol"
-              value={data.volume_ethanol}
+              value={data.volume_ethanol.toFixed(2)}
             />
           </Fragment>
         )}
 
         {!isNaN(volumeDiff) && volumeDiff !== 0 && (
           <Alert level="error" icon={AlertCircle}>
-            Les volumes ne correspondent pas ({volumeDiff} litres)
+            Les volumes ne correspondent pas ({volumeDiff.toFixed(2)} litres)
           </Alert>
         )}
 
