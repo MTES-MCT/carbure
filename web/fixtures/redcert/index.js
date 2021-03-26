@@ -6,7 +6,18 @@ const fs = require("fs/promises");
 
   console.log("Start loading REDCERT website");
 
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: "/usr/bin/chromium-browser",
+    args: [
+      "--no-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+      "--single-process",
+      "--no-zygote",
+    ],
+  });
+
   const page = await browser.newPage();
 
   page.setDefaultNavigationTimeout(60000);
@@ -33,13 +44,17 @@ const fs = require("fs/promises");
   console.log("Start downloading REDCERT certificates");
 
   // reset download dir
-  await fs.rm("./downloads", { recursive: true, force: true });
-  await fs.mkdir("./downloads");
+  await fs.mkdir("./downloads", { recursive: true });
+
+  const dir = await fs.readdir("./downloads");
+  for (const file of dir) {
+    await fs.rm(`./downloads/${file}`);
+  }
 
   let file = null;
   while (file === null) {
     const dir = await fs.readdir("./downloads");
-    c;
+
     // check if the file is there yet
     if (dir.length > 0) {
       file = dir[0];
