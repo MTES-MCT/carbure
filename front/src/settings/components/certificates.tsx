@@ -117,8 +117,6 @@ export const CertificateSettings = ({
     onClick: () => window.open && window.open(c.download_link),
   }))
 
-  console.log(type)
-
   return (
     <Section id={type.toLowerCase()}>
       <SectionHeader>
