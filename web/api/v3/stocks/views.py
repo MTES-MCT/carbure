@@ -410,6 +410,7 @@ def convert_eth_stock_to_etbe(request, entity, c):
     
 
     # ensure volume etbe = sum of other volume
+    # if abs(volume_etbe - (volume_ethanol + volume_fossile + volume_denaturant + volume_pertes)) > 2:
     if volume_etbe != volume_ethanol + volume_fossile + volume_denaturant + volume_pertes:
         raise Exception("Volumes ETBE != Volume Ethanol + Pertes")
 
