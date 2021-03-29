@@ -169,6 +169,8 @@ class TransactionAdmin(admin.ModelAdmin):
         def __init__(self, *args, **kwargs):
             super(TransactionAdmin.AssignSupplierCertificateTransactionForm, self).__init__(*args, **kwargs)
             certificates = [(c.certificate.certificate_id, '%s - %s' % (c.entity.name, c.certificate.certificate_id)) for c in EntityISCCTradingCertificate.objects.all()]
+            certificates += [(c.certificate.certificate_id, '%s - %s' % (c.entity.name, c.certificate.certificate_id)) for c in EntityDBSTradingCertificate.objects.all()]
+            certificates += [(c.certificate.certificate_id, '%s - %s' % (c.entity.name, c.certificate.certificate_id)) for c in EntityREDCertTradingCertificate.objects.all()]            
             self.fields['certificate'].choices = certificates
             
             
