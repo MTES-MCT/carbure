@@ -10,7 +10,7 @@ def index(request):
 
 
 def stats(request):
-    return redirect('https://metabase.carbure.beta.gouv.fr/public/dashboard/a9c045a5-c2fb-481a-ab85-f55bce8ae3c0')
+    return redirect('https://metabase.carbure.beta.gouv.fr/public/dashboard/d2da144c-9674-41bd-83e5-4bc9cbb98b50')
 
 
 def annuaire(request):
