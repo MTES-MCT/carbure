@@ -141,3 +141,5 @@ export const SearchInput = ({ className, ...props }: InputProps) => (
     <Input {...props} className={styles.searchInput} />
   </div>
 )
+
+export const Placeholder = () => <div className={styles.inputPlaceholder} />

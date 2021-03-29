@@ -265,10 +265,12 @@ const initialState: TransactionFormState = {
 function producerSettings(
   entity: EntitySelection,
   tx: TransactionFormState,
-  patch: (p: any, s?: boolean) => void
+  patch: (p: any, silent?: boolean) => void
 ) {
+  const isProducer = tx.carbure_producer?.id === entity?.id
+
   // checking "producer is in carbure" forces producer field to be current entity
-  if (tx.producer_is_in_carbure && tx.carbure_producer?.id !== entity?.id) {
+  if (tx.producer_is_in_carbure && !isProducer) {
     patch({ carbure_producer: entity }, true)
   }
 }
@@ -278,8 +280,11 @@ function operatorSettings(
   tx: TransactionFormState,
   patch: (p: any, s?: boolean) => void
 ) {
+  const isMAC = entity?.has_mac && tx.mac
+  const isClient = tx.carbure_client?.id === entity?.id
+
   // for operators, force client field to be current entity and "producer is in carbure" to be unchecked
-  if (!tx.client_is_in_carbure || tx.carbure_client?.id !== entity?.id) {
+  if (!isMAC && (!tx.client_is_in_carbure || !isClient)) {
     patch({ client_is_in_carbure: true, carbure_client: entity }, true)
   }
 
@@ -309,6 +314,7 @@ export default function useTransactionForm(
   const isProducer = entity?.entity_type === "Producteur"
   const isOperator = entity?.entity_type === "Opérateur"
   const isTrader = entity?.entity_type === "Trader"
+  const isMAC = entity?.has_mac && data.mac
 
   const ghg_total = data.eec + data.el + data.ep + data.etd + data.eu - data.esca - data.eccs - data.eccr - data.eee // prettier-ignore
 
@@ -319,6 +325,16 @@ export default function useTransactionForm(
   }
 
   if (!isStock) {
+    if (
+      isMAC &&
+      (data.client_is_in_carbure || data.delivery_site_is_in_carbure)
+    ) {
+      patch(
+        { client_is_in_carbure: false, delivery_site_is_in_carbure: false },
+        true
+      )
+    }
+
     if (isProducer) {
       producerSettings(entity, data, patch)
     }
