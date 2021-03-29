@@ -94,12 +94,8 @@ test("check the form fields", async () => {
     </TransactionAddWithRouter>
   )
 
-  userEvent.click(screen.getByLabelText("Il s'agit d'une mise à consommation ?")) // prettier-ignore
   userEvent.type(screen.getByLabelText("Numéro douanier (DAE, DAA...) *"), "DAETEST") // prettier-ignore
-  userEvent.type(
-    screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°) *"),
-    "10000"
-  )
+  userEvent.type(screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°) *"), "10000") // prettier-ignore
 
   userEvent.type(screen.getByLabelText("Biocarburant *"), "EM")
   userEvent.click(await screen.findByText("EMHV"))
