@@ -131,3 +131,8 @@
   margin-right: 12px;
   cursor: pointer;
 }
+
+.inputPlaceholder {
+  height: 66px;
+  margin-top: 12px;
+}

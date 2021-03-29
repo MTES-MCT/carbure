@@ -13,6 +13,7 @@ import {
   LabelCheckbox,
   LabelInput,
   LabelTextArea,
+  Placeholder,
 } from "common/components/input"
 import { Alert } from "common/components/alert"
 import { LabelAutoComplete } from "common/components/autocomplete"
@@ -48,13 +49,18 @@ const LotFields = ({
   onChange,
 }: FieldsProps) => (
   <Box>
-    <LabelCheckbox
-      disabled={readOnly || !entity?.has_mac}
-      name="mac"
-      label="Il s'agit d'une mise à consommation ?"
-      checked={tx.mac}
-      onChange={onChange}
-    />
+    {entity?.entity_type === EntityType.Administration || entity?.has_mac ? (
+      <LabelCheckbox
+        disabled={readOnly}
+        name="mac"
+        label="Il s'agit d'une mise à consommation ?"
+        checked={tx.mac}
+        onChange={onChange}
+      />
+    ) : (
+      <Placeholder />
+    )}
+
     <LabelInput
       required
       readOnly={readOnly}
@@ -78,7 +84,7 @@ const LotFields = ({
       required
       readOnly={readOnly}
       label="Biocarburant"
-      placeholder="Rechercher un biocarburant..."
+      // placeholder="Rechercher un biocarburant..."
       name="biocarburant"
       value={tx.biocarburant}
       error={fieldErrors.biocarburant_code}
@@ -92,7 +98,7 @@ const LotFields = ({
       required
       readOnly={readOnly}
       label="Matiere premiere"
-      placeholder="Rechercher une matière première..."
+      // placeholder="Rechercher une matière première..."
       name="matiere_premiere"
       value={tx.matiere_premiere}
       error={fieldErrors.matiere_premiere_code}
@@ -106,7 +112,7 @@ const LotFields = ({
       required
       readOnly={readOnly}
       label="Pays d'origine"
-      placeholder="Rechercher un pays..."
+      // placeholder="Rechercher un pays..."
       name="pays_origine"
       value={tx.pays_origine}
       error={fieldErrors.pays_origine_code}
@@ -144,7 +150,7 @@ const ProducerFields = ({
           <LabelAutoComplete
             readOnly={readOnly || isProducer}
             label="Producteur"
-            placeholder="Rechercher un producteur..."
+            // placeholder="Rechercher un producteur..."
             name="carbure_producer"
             value={tx.carbure_producer}
             error={fieldErrors.carbure_producer}
@@ -156,7 +162,7 @@ const ProducerFields = ({
           <LabelAutoComplete
             readOnly={readOnly}
             label="Site de production"
-            placeholder="Rechercher un site de production..."
+            // placeholder="Rechercher un site de production..."
             name="carbure_production_site"
             value={tx.carbure_production_site}
             error={fieldErrors.carbure_production_site}
@@ -211,7 +217,7 @@ const ProducerFields = ({
           <LabelAutoComplete
             readOnly={readOnly}
             label="Pays de production"
-            placeholder="Rechercher un pays..."
+            // placeholder="Rechercher un pays..."
             name="unknown_production_country"
             value={tx.unknown_production_country}
             error={fieldErrors.unknown_production_country}
@@ -268,43 +274,16 @@ const CertificateFields = ({
         readOnly
         name="vendor_is_in_carbure"
         label="Fournisseur enregistré sur Carbure ?"
-        checked={!(isAuthor || isAdmin) && isVendorInCarbure}
+        checked={isVendorInCarbure}
       />
 
-      {isAuthor || isAdmin ? (
-        <React.Fragment>
-          <LabelInput
-            readOnly={readOnly}
-            disabled={isVendorDisabled}
-            label="Fournisseur"
-            name="unknown_supplier"
-            value={tx.unknown_supplier}
-            error={fieldErrors.unknown_supplier}
-            onChange={onChange}
-          />
-          <LabelAutoComplete
-            loose
-            readOnly={readOnly}
-            disabled={isVendorDisabled}
-            required={isOperator}
-            name="unknown_supplier_certificate"
-            label="Certificat du fournisseur"
-            placeholder="Rechercher un certificat..."
-            value={(isAuthor || isAdmin) ? tx.unknown_supplier_certificate : "N/A"}
-            error={fieldErrors.unknown_supplier_certificate}
-            getValue={getters.raw}
-            getLabel={getters.raw}
-            getQuery={api.findCertificates}
-            onChange={onChange}
-          />
-        </React.Fragment>
-      ) : (
+      {!isAuthor && (
         <React.Fragment>
           <LabelAutoComplete
             readOnly={readOnly}
             disabled={isVendorDisabled}
             label="Fournisseur"
-            placeholder="Rechercher un fournisseur..."
+            // placeholder="Rechercher un fournisseur..."
             name="carbure_vendor"
             value={tx.carbure_vendor}
             error={fieldErrors.vendor}
@@ -322,13 +301,62 @@ const CertificateFields = ({
         </React.Fragment>
       )}
 
+      {(isAuthor || isAdmin) && (
+        <React.Fragment>
+          <LabelInput
+            readOnly={readOnly}
+            disabled={isVendorDisabled}
+            label="Fournisseur original"
+            name="unknown_supplier"
+            value={tx.unknown_supplier}
+            error={fieldErrors.unknown_supplier}
+            onChange={onChange}
+          />
+          <LabelAutoComplete
+            loose
+            readOnly={readOnly}
+            disabled={isVendorDisabled}
+            required={isOperator}
+            name="unknown_supplier_certificate"
+            label="Certificat du fournisseur original"
+            // placeholder="Rechercher un certificat..."
+            value={tx.unknown_supplier_certificate}
+            error={fieldErrors.unknown_supplier_certificate}
+            getValue={getters.raw}
+            getLabel={getters.raw}
+            getQuery={api.findCertificates}
+            onChange={onChange}
+          />
+        </React.Fragment>
+      )}
+
+      {isAuthor && (
+        <LabelAutoComplete
+          loose
+          readOnly={readOnly}
+          disabled={isOperator}
+          required={!isOperator}
+          name="carbure_vendor_certificate"
+          label="Votre certificat"
+          // placeholder="Rechercher un certificat..."
+          value={tx.carbure_vendor_certificate}
+          error={fieldErrors.carbure_vendor_certificate}
+          getValue={getters.raw}
+          getLabel={getters.raw}
+          getQuery={api.findCertificates}
+          queryArgs={[entity?.id]}
+          minLength={0}
+          onChange={onChange}
+        />
+      )}
+
       {tx.producer_is_in_carbure ? (
         <LabelAutoComplete
           loose
           readOnly={readOnly}
           name="carbure_production_site_reference"
           label="Certificat du site de production"
-          placeholder="Rechercher un certificat..."
+          // placeholder="Rechercher un certificat..."
           value={tx.carbure_production_site_reference}
           error={fieldErrors.carbure_production_site_reference}
           getValue={getters.raw}
@@ -344,7 +372,7 @@ const CertificateFields = ({
           readOnly={readOnly}
           name="unknown_production_site_reference"
           label="Certificat du site de production"
-          placeholder="Rechercher un certificat..."
+          // placeholder="Rechercher un certificat..."
           value={tx.unknown_production_site_reference}
           error={fieldErrors.unknown_production_site_reference}
           getValue={getters.raw}
@@ -354,46 +382,15 @@ const CertificateFields = ({
         />
       )}
 
-      {isAuthor ? (
-        <React.Fragment>
-          <LabelAutoComplete
-            loose
-            readOnly={readOnly}
-            disabled={isOperator}
-            required={!isOperator}
-            name="carbure_vendor_certificate"
-            label="Votre certificat"
-            placeholder="Rechercher un certificat..."
-            value={tx.carbure_vendor_certificate}
-            error={fieldErrors.carbure_vendor_certificate}
-            getValue={getters.raw}
-            getLabel={getters.raw}
-            getQuery={api.findCertificates}
-            queryArgs={[entity?.id]}
-            minLength={0}
-            onChange={onChange}
-          />
-
-          <LabelInput
-            readOnly={readOnly}
-            label="Champ libre"
-            name="champ_libre"
-            value={tx.champ_libre}
-            error={fieldErrors.champ_libre}
-            onChange={onChange}
-          />
-        </React.Fragment>
-      ) : (
-        <React.Fragment>
-          <LabelTextArea
-            readOnly={readOnly}
-            label="Champ libre"
-            name="champ_libre"
-            value={tx.champ_libre}
-            error={fieldErrors.champ_libre}
-            onChange={onChange}
-          />
-        </React.Fragment>
+      {!isAdmin && (
+        <LabelInput
+          readOnly={readOnly}
+          label="Champ libre"
+          name="champ_libre"
+          value={tx.champ_libre}
+          error={fieldErrors.champ_libre}
+          onChange={onChange}
+        />
       )}
     </Box>
   )
@@ -407,11 +404,12 @@ const ClientFields = ({
   onChange,
 }: FieldsProps) => {
   const isOperator = entity?.entity_type === EntityType.Operator
+  const isMAC = entity?.has_mac && tx.mac
 
   return (
     <Box className={styles.middleColumn}>
       <LabelCheckbox
-        disabled={readOnly || isOperator}
+        disabled={readOnly || isOperator || isMAC}
         name="client_is_in_carbure"
         label="Client enregistré sur Carbure ?"
         checked={tx.client_is_in_carbure}
@@ -422,7 +420,7 @@ const ClientFields = ({
         <LabelAutoComplete
           readOnly={readOnly || isOperator}
           label="Client"
-          placeholder="Rechercher un client..."
+          // placeholder="Rechercher un client..."
           name="carbure_client"
           value={tx.carbure_client}
           error={fieldErrors.client}
@@ -443,7 +441,7 @@ const ClientFields = ({
       )}
 
       <LabelCheckbox
-        disabled={readOnly}
+        disabled={readOnly || isMAC}
         name="delivery_site_is_in_carbure"
         label="Site de livraison enregistré sur Carbure ?"
         checked={tx.delivery_site_is_in_carbure}
@@ -452,10 +450,11 @@ const ClientFields = ({
 
       {tx.delivery_site_is_in_carbure ? (
         <LabelAutoComplete
-          required
+          required={!isMAC}
+          disabled={isMAC}
           readOnly={readOnly}
           label="Site de livraison"
-          placeholder="Rechercher un site de livraison..."
+          // placeholder="Rechercher un site de livraison..."
           name="carbure_delivery_site"
           value={tx.carbure_delivery_site}
           error={fieldErrors.delivery_site}
@@ -466,7 +465,8 @@ const ClientFields = ({
         />
       ) : (
         <LabelInput
-          required
+          required={!isMAC}
+          disabled={isMAC}
           readOnly={readOnly}
           label="Site de livraison"
           name="unknown_delivery_site"
@@ -486,7 +486,8 @@ const ClientFields = ({
         />
       ) : (
         <LabelAutoComplete
-          required
+          required={!isMAC}
+          disabled={isMAC}
           readOnly={readOnly}
           label="Pays de livraison"
           name="unknown_delivery_site_country"
