@@ -16,7 +16,7 @@ from os.path import isfile
 import shutil
 import re
 
-rootUrl = 'https://www.iscc-system.org/wp-admin/admin-ajax.php?action=get_wdtable&table_id=1'
+rootUrl = 'https://www.iscc-system.org/wp-admin/admin-ajax.php?action=get_wdtable&table_id=9'
 DESTINATION_FOLDER = '/tmp/'
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
 PAGELENGTH = 3000
@@ -24,7 +24,7 @@ PAGELENGTH = 3000
 def get_wdtNonce():
     html_content = requests.get('https://www.iscc-system.org/certificates/all-certificates/', headers=HEADERS).text
     soup = BeautifulSoup(html_content, "lxml")
-    wdtNonceTag = soup.find("input", attrs={"name": "wdtNonceFrontendEdit"}).attrs
+    wdtNonceTag = soup.find("input", attrs={"name": "wdtNonceFrontendEdit_9"}).attrs
     wdtNonce = wdtNonceTag['value']
     print('wdtNonce:', wdtNonce)
     return wdtNonce
@@ -39,7 +39,7 @@ def get_certificateData(nonce, recordsTotal, test):
     while start < recordsTotal:
         print(start)
         r = requests.post(rootUrl, data ={'length': PAGELENGTH, 'start': start, 'draw': 1, 'wdtNonce': nonce}, headers=HEADERS)
-        certificates = json.loads(r.content.decode('utf-8')) 
+        certificates = json.loads(r.content.decode('utf-8'))
         data = pd.DataFrame.from_dict(certificates['data'])
         allData.append(data)
         start = start + PAGELENGTH
@@ -47,8 +47,8 @@ def get_certificateData(nonce, recordsTotal, test):
 
 def cleanCertificateData(data):
     allData = pd.concat(data)
-    allData.columns = ['index', 'certificate', 'certificate_holder', 'scope', 'raw_material',
-                        'addons', 'valid_from', 'valid_until', 'issuing_cb', 'map', 'certificate_report', 'audit_report', 'col_13', 'col_14', 'col_15']
+    allData.columns = ['certificate', 'certificate_holder', 'scope', 'raw_material',
+                        'addons', 'valid_from', 'valid_until', 'issuing_cb', 'map', 'certificate_report', 'audit_report']
 
     # extraction de la balise HTML
     allData['certificate_holder'] = allData['certificate_holder'].str.replace('.*title="(.*)">.*', '\\1')
