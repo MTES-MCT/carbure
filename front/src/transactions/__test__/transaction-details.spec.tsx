@@ -99,7 +99,6 @@ test("edit transaction details", async () => {
   const save: any = await screen.findByText("Sauvegarder")
   expect(save.disabled).toBe(true)
 
-  userEvent.click(screen.getByLabelText("Il s'agit d'une mise à consommation ?")) // prettier-ignore
   const dae = screen.getByLabelText("Numéro douanier (DAE, DAA...) *")
   userEvent.clear(dae)
   userEvent.type(dae, "DAETESTUPDATE")
