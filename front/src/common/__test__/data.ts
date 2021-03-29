@@ -126,6 +126,30 @@ export const expired2BSCertificate = {
   has_been_updated: false,
 }
 
+export const redcertCertificate = {
+  certificate_id: "REDCERT Test",
+  certificate_holder: "Holder Test",
+  holder_address: "Address Test",
+  valid_from: "2020-04-25",
+  valid_until: "2021-04-24",
+  certification_type: "",
+  download_link: "",
+  scope: ["Scope Test"],
+  has_been_updated: false,
+}
+
+export const expiredRedcertCertificate = {
+  certificate_id: "Expired REDCERT Test",
+  certificate_holder: "Expired Holder Test",
+  holder_address: "Expired Address Test",
+  valid_from: "1990-01-01",
+  valid_until: "2000-01-01",
+  certification_type: "",
+  download_link: "",
+  scope: ["Expired Scope Test"],
+  has_been_updated: false,
+}
+
 // MATIERE PREMIERE
 
 export const matierePremiere = {
