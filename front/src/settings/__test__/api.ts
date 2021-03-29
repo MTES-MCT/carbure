@@ -10,12 +10,14 @@ import {
   operator,
   producer,
   productionSite,
+  redcertCertificate,
 } from "common/__test__/data"
 import {
   okCountrySearch,
   okDeliverySitesSearch,
   okISCCSearch,
   ok2BSSearch,
+  okRedcertSearch,
 } from "common/__test__/api"
 import { clone } from "common/__test__/helpers"
 
@@ -24,6 +26,7 @@ let deliverySites: any[] = []
 let productionSites: any[] = []
 let isccCertificates: any[] = []
 let dbsCertificates: any[] = []
+let redcertCertificates: any[] = []
 
 export function setEntity(nextEntity: any) {
   entity = clone(nextEntity)
@@ -46,6 +49,10 @@ export function setISCCCertificates(nextISCCCertificates: any[]) {
 
 export function set2BSCertificates(next2BSCertificates: any[]) {
   dbsCertificates = clone(next2BSCertificates)
+}
+
+export function setRedcertCertificates(nextRedcertCertificates: any[]) {
+  redcertCertificates = clone(nextRedcertCertificates)
 }
 
 export const okSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
@@ -310,6 +317,42 @@ export const okUpdate2BS = rest.post(
   }
 )
 
+export const okRedcert = rest.get(
+  "/api/v3/settings/get-redcert-certificates",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: redcertCertificates,
+      })
+    )
+  }
+)
+
+export const okAddRedcert = rest.post(
+  "/api/v3/settings/add-redcert-certificate",
+  (req, res, ctx) => {
+    setRedcertCertificates([redcertCertificate])
+    return res(ctx.json({ status: "success" }))
+  }
+)
+
+export const okDeleteRedcert = rest.post(
+  "/api/v3/settings/delete-redcert-certificate",
+  (req, res, ctx) => {
+    setRedcertCertificates([])
+    return res(ctx.json({ status: "success" }))
+  }
+)
+
+export const okUpdateRedcert = rest.post(
+  "/api/v3/settings/update-redcert-certificate",
+  (req, res, ctx) => {
+    setRedcertCertificates([redcertCertificate])
+    return res(ctx.json({ status: "success" }))
+  }
+)
+
 export default setupServer(
   okSettings,
   okEnableMac,
@@ -337,5 +380,10 @@ export default setupServer(
   okDeliverySitesSearch,
   okCountrySearch,
   okISCCSearch,
-  ok2BSSearch
+  ok2BSSearch,
+  okRedcertSearch,
+  okRedcert,
+  okAddRedcert,
+  okDeleteRedcert,
+  okUpdateRedcert
 )

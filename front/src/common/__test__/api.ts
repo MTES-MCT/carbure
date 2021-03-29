@@ -13,6 +13,8 @@ import {
   matierePremiere,
   biocarburant,
   productionSite,
+  redcertCertificate,
+  expiredRedcertCertificate,
 } from "common/__test__/data"
 
 export const okEntitySearch = rest.get(
@@ -106,6 +108,18 @@ export const ok2BSSearch = rest.get(
       ctx.json({
         status: "success",
         data: [dbsCertificate, expired2BSCertificate],
+      })
+    )
+  }
+)
+
+export const okRedcertSearch = rest.get(
+  "/api/v3/common/redcert-certificates",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: [redcertCertificate, expiredRedcertCertificate],
       })
     )
   }
