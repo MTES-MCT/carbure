@@ -99,7 +99,7 @@ def sanity_check(tx, prefetched_data):
 
     # réduction de GES
     if lot.ghg_reduction >= 100:
-        errors.append(raise_error(lot, 'GHG_REDUC_SUP_100', details="GES reduction %f%%" % (lot.ghg_reduction)))
+        errors.append(raise_warning(lot, 'GHG_REDUC_SUP_100', details="GES reduction %f%%" % (lot.ghg_reduction)))
     elif lot.ghg_reduction > 99:
         errors.append(raise_warning(lot, 'GHG_REDUC_SUP_99', details="GES reduction %f%%" % (lot.ghg_reduction)))
     elif lot.ghg_reduction < 50:
