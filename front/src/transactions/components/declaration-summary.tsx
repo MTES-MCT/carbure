@@ -114,7 +114,7 @@ export const SummaryPromptFactory = (entityID: number) =>
       padding,
       {
         header: "Fournisseur",
-        render: (d) => <Line text={d.entity} />,
+        render: (d) => <Line text={d.entity || "N/A"} />,
       },
       ...COLUMNS,
     ]
@@ -123,7 +123,7 @@ export const SummaryPromptFactory = (entityID: number) =>
       padding,
       {
         header: "Client",
-        render: (d) => <Line text={d.entity} />,
+        render: (d) => <Line text={d.entity || "N/A"} />,
       },
       ...COLUMNS,
     ]
