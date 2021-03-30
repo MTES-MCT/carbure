@@ -249,10 +249,15 @@ def get_declaration_summary(request, *args, **kwargs):
         line['lots'] += 1
 
     ## lots received
-    txs_in = LotTransaction.objects.filter(lot__status='Validated', lot__period=period_str, carbure_client=entity).exclude(carbure_vendor=entity)
+    txs_in = LotTransaction.objects.filter(lot__status='Validated', lot__period=period_str, carbure_client=entity)
     data_in = {}
     for t in txs_in:
-        vendor = t.carbure_vendor.name if t.carbure_vendor else t.lot.unknown_supplier
+        vendor = ''
+        if t.lot.added_by == entity:
+            vendor = t.lot.unknown_supplier if t.lot.unknown_supplier else t.lot.unknown_supplier_certificate
+        else:
+            vendor = t.carbure_vendor.name if t.carbure_vendor else t.carbure_vendor_certificate
+
         if vendor not in data_in:
             data_in[vendor] = {}
         if t.lot.biocarburant.name not in data_in[vendor]:
