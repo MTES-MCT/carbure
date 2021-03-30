@@ -57,13 +57,18 @@ export const ExpirationDate = ({
   const expired = isExpired(date)
   const formatted = formatDate(date)
 
+  function onClick(e: React.MouseEvent) {
+    e.stopPropagation()
+    onUpdate && onUpdate()
+  }
+
   return (
     <span className={cl(styles.expirationDate, expired && styles.expired)}>
       {expired && !updated && (
         <React.Fragment>
           Expiré ({formatted})
           {onUpdate && (
-            <Button icon={Refresh} onClick={onUpdate}>
+            <Button icon={Refresh} onClick={onClick}>
               Mise à jour
             </Button>
           )}
