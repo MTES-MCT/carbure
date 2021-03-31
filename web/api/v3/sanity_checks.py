@@ -288,12 +288,12 @@ def tx_is_valid(tx, prefetched_data):
         TransactionError.objects.update_or_create(tx=tx, field='unknown_client', value='', error=error)
         is_valid = False
 
-    if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site:
+    if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site and not tx.is_mac:
         error = 'Veuillez renseigner un site de livraison'
         TransactionError.objects.update_or_create(tx=tx, field='unknown_delivery_site', value='', error=error)
         is_valid = False
 
-    if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site_country:
+    if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site_country and not tx.is_mac:
         error = 'Veuillez renseigner un pays de livraison'
         TransactionError.objects.update_or_create(tx=tx, field='unknown_delivery_site_country', value='', error=error)
         is_valid = False
