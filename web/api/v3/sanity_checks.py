@@ -31,7 +31,7 @@ rules['BC_NOT_CONFIGURED'] = "Biocarburant non enregistré sur votre Site de Pro
 rules['MISSING_PRODSITE_CERTIFICATE'] = "Aucun certificat n'est associé à ce site de Production"
 rules['UNKNOWN_CLIENT'] = "Le client n'est pas enregistré sur Carbure"
 rules['NOT_ALLOWED'] = "Vous ne pouvez pas ajouter les lots d'un producteur inscrit sur CarbuRe"
-rules['DEPRECATED_MP'] = "Les résidus viniques vont disparaître au profit de deux nouvelles matières premières: Marc de raison et Lies de vin. Merci de mettre à jour vos déclarations en conséquence."
+rules['DEPRECATED_MP'] = "Les résidus viniques vont disparaître au profit de deux nouvelles matières premières: Marc de raisin et Lies de vin. Merci de mettre à jour vos déclarations en conséquence."
 
 
 def raise_warning(lot, rule_triggered, details='', tx=None, show_recipient=True):
