@@ -111,7 +111,7 @@ class LotV2Admin(admin.ModelAdmin):
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('get_lot_mp', 'get_lot_bc', 'get_lot_volume', 'carbure_vendor', 'carbure_client', 'dae', 'carbure_delivery_site', 'delivery_date', 'delivery_status', 'unknown_client', 'carbure_vendor_certificate', 'get_lot_unknown_vendor_certificate')
+    list_display = ('get_lot_mp', 'get_lot_bc', 'get_lot_volume', 'get_lot_supplier', 'carbure_vendor', 'carbure_client', 'dae', 'carbure_delivery_site', 'delivery_date', 'delivery_status', 'unknown_client', 'carbure_vendor_certificate', 'get_lot_unknown_vendor_certificate')
     search_fields = ('lot__id', 'dae', 'champ_libre')
     list_filter = ('lot__status', 'delivery_status', 'lot__period', 'client_is_in_carbure', 'carbure_vendor', 'carbure_client',  'is_mac', 'is_batch', 'delivery_site_is_in_carbure')
     raw_id_fields = ('lot',)
@@ -134,6 +134,12 @@ class TransactionAdmin(admin.ModelAdmin):
         return obj.lot.volume
     get_lot_volume.admin_order_field  = 'Volume'
     get_lot_volume.short_description = 'Volume'    
+
+
+    def get_lot_supplier(self, obj):
+        return '%s - %s' % (obj.lot.unknown_supplier, obj.lot.unknown_supplier_certificate)
+    get_lot_supplier.admin_order_field  = 'Unknown Supplier'
+    get_lot_supplier.short_description = 'Unknown Supplier'
 
 
     def get_lot_unknown_vendor_certificate(self, obj):
