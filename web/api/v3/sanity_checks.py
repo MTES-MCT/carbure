@@ -90,7 +90,7 @@ def sanity_check(tx, prefetched_data):
         is_sane = False
         return lot_valid, tx_valid, is_sane, errors
 
-    if tx.is_mac and lot.biocarburant and lot.biocarburant.code not in ['ED95', 'B100']:
+    if tx.is_mac and lot.biocarburant and lot.biocarburant.code not in ['ED95', 'B100', 'EMHV', 'EMHU']:
         errors.append(raise_error(lot, 'MAC_BC_WRONG'))
 
     # check volume
