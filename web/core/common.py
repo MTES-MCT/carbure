@@ -570,6 +570,13 @@ def fill_client_data(entity, lot_row, transaction, prefetched_data):
     if transaction.delivery_status == 'AC':
         return []
 
+    if transaction.is_mac:
+        transaction.client_is_in_carbure = False
+        transaction.carbure_client = None
+        transaction.unknown_client = ''
+        if 'client' in lot_row:
+            transaction.unknown_client = lot_row['client']
+
     tx_errors = []
     clients = prefetched_data['clients']
     if entity.entity_type == 'Opérateur':
@@ -782,8 +789,9 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, transaction=None):
     if transaction is None:
         transaction = LotTransaction()
     transaction.is_mac = False
-    if 'mac' in lot_dict and lot_dict['mac'] == 1:
-        transaction.is_mac = True
+    if 'mac' in lot_dict:
+        if lot_dict['mac'] == 1 or lot_dict['mac'] == 'true':
+            transaction.is_mac = True
 
     tx_errors += fill_dae_data(lot_dict, transaction)
     tx_errors += fill_delivery_date(lot_dict, lot, transaction)
