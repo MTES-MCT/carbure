@@ -653,7 +653,7 @@ def fill_delivery_site_data(lot_row, transaction, prefetched_data):
         transaction.unknown_delivery_site = ''
         if not transaction.is_mac:
             tx_errors.append(TransactionError(tx=transaction, field='delivery_site', value=None, error="Merci de préciser un site de livraison"))
-    if transaction.delivery_site_is_in_carbure is False:
+    if transaction.delivery_site_is_in_carbure is False and not transaction.is_mac:
         if 'delivery_site_country' in lot_row:
             country_code = lot_row['delivery_site_country']
             if country_code in countries:
