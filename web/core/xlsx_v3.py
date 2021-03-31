@@ -484,7 +484,7 @@ def make_dump_lots_sheet(workbook, entity, transactions):
     # header
     bold = workbook.add_format({'bold': True})
     columns = ['carbure_id', 'producer', 'production_site', 'production_site_country', 'production_site_reference',
-               'production_site_commissioning_date', 'double_counting_registration',
+               'production_site_commissioning_date', 'double_counting_registration', 'supplier_certificate',
                'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
                'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total',
                'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country', 'delivery_site_name']
@@ -495,13 +495,21 @@ def make_dump_lots_sheet(workbook, entity, transactions):
 
     for i, tx in enumerate(transactions):
         lot = tx.lot
+        com_date = ''
+        if lot.carbure_production_site:
+            com_date = lot.carbure_production_site.date_mise_en_service.strftime('%d/%m/%Y') 
+        elif lot.unknown_production_site_com_date:
+            com_date = lot.unknown_production_site_com_date.strftime('%d/%m/%Y')
+        else:
+            com_date = ''
         row = [lot.carbure_id,
                lot.carbure_producer.name if lot.carbure_producer else lot.unknown_producer,
                lot.carbure_production_site.name if lot.carbure_production_site else lot.unknown_production_site,
                lot.carbure_production_site.country.code_pays if lot.carbure_production_site and lot.carbure_production_site.country else lot.unknown_production_country.code_pays if lot.unknown_production_country else '',
                lot.unknown_production_site_reference, 
-               lot.unknown_production_site_com_date.strftime('%d/%m/%Y') if lot.unknown_production_site_com_date else '',
+               com_date,
                lot.unknown_production_site_dbl_counting,
+               tx.carbure_vendor_certificate if tx.carbure_vendor else tx.lot.unknown_supplier_certificate,
                lot.volume, lot.biocarburant.code if lot.biocarburant else '',
                lot.matiere_premiere.code if lot.matiere_premiere else '',
                lot.pays_origine.code_pays if lot.pays_origine else '',
