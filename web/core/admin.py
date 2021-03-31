@@ -74,7 +74,7 @@ class LotV2ErrorAdmin(admin.ModelAdmin):
 
 class LotValidationErrorAdmin(admin.ModelAdmin):
     list_display = ('lot', 'rule_triggered', 'warning_to_user', 'warning_to_admin', 'block_validation')
-    list_filter = ('warning_to_admin', 'warning_to_user', 'block_validation')
+    list_filter = ('warning_to_admin', 'warning_to_user', 'block_validation', 'rule_triggered')
     search_fields = ('rule_triggered', 'message')
     raw_id_fields = ('lot', )
 
