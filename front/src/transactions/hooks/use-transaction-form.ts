@@ -329,10 +329,14 @@ export default function useTransactionForm(
       isMAC &&
       (data.client_is_in_carbure || data.delivery_site_is_in_carbure)
     ) {
-      patch(
-        { client_is_in_carbure: false, delivery_site_is_in_carbure: false },
-        true
-      )
+      const p = {
+        client_is_in_carbure: false,
+        delivery_site_is_in_carbure: false,
+        unknown_delivery_site: "",
+        unknown_delivery_site_country: null,
+      }
+
+      patch(p, true)
     }
 
     if (isProducer) {
