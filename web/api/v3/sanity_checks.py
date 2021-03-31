@@ -261,14 +261,15 @@ def tx_is_valid(tx, prefetched_data):
         error = 'DAE manquant'
         TransactionError.objects.update_or_create(tx=tx, field='dae', value='', error=error)
         is_valid = False
-    if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site:
-        error = 'Site de livraison manquant'
-        TransactionError.objects.update_or_create(tx=tx, field='unknown_delivery_site', value='', error=error)
-        is_valid = False
-    if tx.delivery_site_is_in_carbure and not tx.carbure_delivery_site:
-        error = 'Site de livraison manquant'
-        TransactionError.objects.update_or_create(tx=tx, field='carbure_delivery_site', value='', error=error)
-        is_valid = False
+    if not tx.is_mac:
+        if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site:
+            error = 'Site de livraison manquant'
+            TransactionError.objects.update_or_create(tx=tx, field='unknown_delivery_site', value='', error=error)
+            is_valid = False
+        if tx.delivery_site_is_in_carbure and not tx.carbure_delivery_site:
+            error = 'Site de livraison manquant'
+            TransactionError.objects.update_or_create(tx=tx, field='carbure_delivery_site', value='', error=error)
+            is_valid = False
     if not tx.delivery_date or tx.delivery_date is None:
         error = 'Date de livraison manquante'
         TransactionError.objects.update_or_create(tx=tx, field='delivery_date', value='', error=error)
