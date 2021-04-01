@@ -39,7 +39,22 @@ const Footer = () => (
           <h2>carbure.beta.gouv.fr</h2>
         </li>
         <li>
-          <a href="/">Conditions générales d'utilisation</a>
+          <a
+            target="_blank"
+            href="https://carbure-1.gitbook.io/faq/mentions-legales-et-cgu/mentions-legales-et-conditions-generales-dutilisation#cookies"
+            rel="noreferrer"
+          >
+            Cookies
+          </a>
+        </li>
+        <li>
+          <a
+            target="_blank"
+            href="https://carbure-1.gitbook.io/faq/mentions-legales-et-cgu/mentions-legales-et-conditions-generales-dutilisation"
+            rel="noreferrer"
+          >
+            Conditions générales d'utilisation
+          </a>
         </li>
         <li>
           <a
