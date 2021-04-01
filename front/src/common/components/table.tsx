@@ -16,7 +16,7 @@ export const Line = ({ text, small = false, level }: LineProps) => (
       level === "warning" && styles.lineWarning
     )}
   >
-    {text}
+    {small ? text : text || "N/A"}
   </span>
 )
 
