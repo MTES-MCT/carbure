@@ -88,7 +88,7 @@ def check_duplicates(new_txs, background=True):
         db.connections.close_all()
     new_daes = [t.dae for t in new_txs]
     nb_duplicates = 0
-    duplicates = LotTransaction.objects.filter(dae__in=new_daes, lot__status='Validated').values('dae', 'lot__biocarburant_id', 'lot__volume', 'lot__ghg_total').annotate(count=Count('dae')).filter(count__gt=1)
+    duplicates = LotTransaction.objects.filter(dae__in=new_daes, lot__status='Validated', is_forwarded=False).values('dae', 'lot__biocarburant_id', 'lot__volume', 'lot__ghg_total').annotate(count=Count('dae')).filter(count__gt=1)
     if duplicates.count() > 0:
         # print('Found duplicates')
         # print(duplicates)

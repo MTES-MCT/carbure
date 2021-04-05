@@ -9,6 +9,8 @@ import {
   ConvertETBEComplexPromptFactory,
   // ConvertETBEPrompt,
 } from "stocks/components/convert-etbe-form"
+
+import { ForwardLotsClientSelectionPromptFactory } from "stocks/components/forward-lots-form"
 import { useNotificationContext } from "common/components/notifications"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { StockDraft } from "common/types"
@@ -21,6 +23,7 @@ export interface LotSender {
   sendLot: (l: number) => Promise<boolean>
   // convertETBE: (l: number) => Promise<boolean>
   convertETBEComplex: () => Promise<boolean>
+  forwardLots: () => Promise<boolean>
 }
 
 export default function useSendLot(
@@ -33,6 +36,7 @@ export default function useSendLot(
   const [requestSend, resolveSend] = useAPI(api.sendDraftsFromStock)
   const [requestSendAll, resolveSendAll] = useAPI(api.sendAllDraftFromStock)
   const [requestETBE, resolveETBE] = useAPI(api.convertToETBE)
+  const [requestForward, resolveForward] = useAPI(api.forwardLots)
 
   async function notifyCreated(promise: Promise<any>, many: boolean = false) {
     const res = await promise
@@ -177,17 +181,35 @@ export default function useSendLot(
     return Boolean(conversions)
   }
 
+  async function forwardLots() {
+    if (entity === null) return false
+
+    const data = await prompt(
+      "Forward Lots",
+      "Vous pouvez utiliser cette interface pour transférer les lots dans le cadre d'une activité d'intermédiaire sans stockage.",
+      ForwardLotsClientSelectionPromptFactory(entity.id)
+    )
+
+    if (data) {
+      notifyCreated(resolveForward(entity.id, selection.selected, data?.carbure_client?.id, data?.certificate?.certificate_id))
+    }
+
+    return Boolean(data)
+  }
+
   return {
     loading:
       requestCreate.loading ||
       requestSend.loading ||
       requestSendAll.loading ||
-      requestETBE.loading,
+      requestETBE.loading ||
+      requestForward.loading,
     createDrafts,
     sendSelection,
     sendAllDrafts,
     sendLot,
     // convertETBE,
     convertETBEComplex,
+    forwardLots
   }
 }

@@ -72,6 +72,7 @@ export const StockTable = ({
   }
 
   if (status.is(LotStatus.Stock)) {
+    columns.push(C.selector(selection))
     columns.push(C.empty)
     columns.push(C.carbureID)
     columns.push(C.depot)

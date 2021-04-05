@@ -143,3 +143,12 @@ export function getDepots(
     .get("/stocks/depots", { entity_id, biocarburant_code })
     .then((depots) => depots.map(toOption))
 }
+
+export function forwardLots(entityID: number, transactionIDs: number[], clientId: number | undefined, certificateID: string | undefined) {
+  return api.post("/stocks/forward", {
+    entity_id: entityID,
+    tx_ids: transactionIDs,
+    recipient: clientId,
+    certificate_id: certificateID,
+  })
+}
