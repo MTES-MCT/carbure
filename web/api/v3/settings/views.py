@@ -557,8 +557,12 @@ def get_my_certificates(request, *args, **kwargs):
     certificates_2bs = EntityDBSTradingCertificate.objects.filter(Q(entity=context['entity']), Q(certificate__valid_until__gte=today),
         Q(certificate__certificate_id__icontains=query) | Q(certificate__certificate_holder__icontains=query))
 
+    certificates_redcert = EntityREDCertTradingCertificate.objects.filter(Q(entity=context['entity']), Q(certificate__valid_until__gte=today),
+        Q(certificate__certificate_id__icontains=query) | Q(certificate__certificate_holder__icontains=query))
+
     sez_data = [{'certificate_id': c.certificate.certificate_id, 'holder': c.certificate.certificate_holder, 'type': 'ISCC'} for c in certificates_iscc]
     sez_data += [{'certificate_id': c.certificate.certificate_id, 'holder': c.certificate.certificate_holder, 'type': '2BS'} for c in certificates_2bs]
+    sez_data += [{'certificate_id': c.certificate.certificate_id, 'holder': c.certificate.certificate_holder, 'type': 'REDcert'} for c in certificates_redcert]
     return JsonResponse({'status': 'success', 'data': sez_data})
 
 

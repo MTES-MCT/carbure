@@ -112,7 +112,7 @@ export const StockList = ({
           )}
 
           {status.is(LotStatus.Stock) && (
-            <StockActions onConvertETBE={sender.convertETBEComplex} />
+            <StockActions onForward={sender.forwardLots} onConvertETBE={sender.convertETBEComplex} />
           )}
         </ActionBar>
       )}

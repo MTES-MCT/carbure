@@ -45,7 +45,7 @@ def get_stocks(request, *args, **kwargs):
         elif status == "in":
             txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AC', 'AA'])
         elif status == "stock":
-            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0)
+            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0, is_forwarded=False)
         else:
             return JsonResponse({'status': 'error', 'message': "Unknown status"}, status=400)
     else:
@@ -124,7 +124,7 @@ def get_snapshot(request, *args, **kwargs):
         draft = tx_drafts.count()
         tx_inbox = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AC', 'AA'])
         inbox = tx_inbox.count()
-        tx_stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0)
+        tx_stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0, is_forwarded=False)
         stock = tx_stock.count()
         data['lots'] = {'in': inbox,  'stock': stock, 'tosend': draft}
     else:
@@ -471,6 +471,51 @@ def convert_to_etbe(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
+@check_rights('entity_id')
+def forward(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    tx_ids = request.POST.getlist('tx_ids', None)
+    recipient = request.POST.get('recipient', None)
+    certificate_id = request.POST.get('certificate_id', None)
 
+    prefetched_data = get_prefetched_data(entity)
+    if not tx_ids:
+        return JsonResponse({'status': 'error', 'message': "Missing tx_ids"}, status=400)
+    if not recipient:
+        return JsonResponse({'status': 'error', 'message': "Missing recipient"}, status=400)
 
+    if certificate_id not in prefetched_data['my_vendor_certificates']:
+        return JsonResponse({'status': 'error', 'message': "Unknown certificate"}, status=400)
 
+    # make some checks on the client
+    try:
+        client = Entity.objects.get(id=recipient)
+    except:
+        return JsonResponse({'status': 'error', 'message': "Unknown recipient"}, status=400)
+
+    for tx_id in tx_ids:
+        # for each tx, make sure we are the client, status accepted, and it has not been already forwarded
+        try:
+            tx = LotTransaction.objects.get(delivery_status__in=['A', 'N'], id=tx_id, carbure_client=entity, is_forwarded=False)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': "TX not found", 'extra': str(e)}, status=400)
+
+        # all good
+        # make current tx as "is_forwarded" and create the next tx
+        tx.delivery_status = 'A'
+        tx.is_forwarded = True
+        tx.save()
+
+        new_tx = tx
+        new_tx.pk = None
+        new_tx.carbure_vendor = entity
+        new_tx.carbure_vendor_certificate = certificate_id
+        new_tx.client_is_in_carbure = True
+        new_tx.carbure_client = client
+        new_tx.unknown_client = ''
+        new_tx.delivery_status = 'N'
+        new_tx.is_forwarded = False
+        new_tx.save()
+
+    return JsonResponse({'status': 'success'})    
