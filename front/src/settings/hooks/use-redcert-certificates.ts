@@ -11,7 +11,10 @@ import { ProductionSiteSettingsHook } from "./use-production-sites"
 import { useNotificationContext } from "common/components/notifications"
 import { findREDCertCertificates } from "common/api"
 
-const REDCertPrompt = CertificatePromptFactory("REDCERT", findREDCertCertificates)
+const REDCertPrompt = CertificatePromptFactory(
+  "REDcert",
+  findREDCertCertificates
+)
 
 export interface REDCertCertificateSettingsHook {
   isEmpty: boolean
@@ -28,9 +31,15 @@ export default function useREDCertCertificates(
 ): REDCertCertificateSettingsHook {
   const notifications = useNotificationContext()
 
-  const [requestGetREDCert, resolveGetREDCert] = useAPI(api.getREDCertCertificates)
-  const [requestAddREDCert, resolveAddREDCert] = useAPI(api.addREDCertCertificate)
-  const [requestDelREDCert, resolveDelREDCert] = useAPI(api.deleteREDCertCertificate)
+  const [requestGetREDCert, resolveGetREDCert] = useAPI(
+    api.getREDCertCertificates
+  )
+  const [requestAddREDCert, resolveAddREDCert] = useAPI(
+    api.addREDCertCertificate
+  )
+  const [requestDelREDCert, resolveDelREDCert] = useAPI(
+    api.deleteREDCertCertificate
+  )
   const [requestUpdateREDCert, resolveUpdateREDCert] = useAPI(api.updateREDCertCertificate) // prettier-ignore
 
   const entityID = entity?.id
@@ -71,13 +80,16 @@ export default function useREDCertCertificates(
 
   async function addREDCertCertificate() {
     const data = await prompt(
-      "Ajout certificat REDCert",
+      "Ajout certificat REDcert",
       "Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond.",
       REDCertPrompt
     )
 
     if (typeof entityID !== "undefined" && data) {
-      notifyCertificate(resolveAddREDCert(entityID, data.certificate_id), "ajouté")
+      notifyCertificate(
+        resolveAddREDCert(entityID, data.certificate_id),
+        "ajouté"
+      )
     }
   }
 
@@ -86,7 +98,7 @@ export default function useREDCertCertificates(
       typeof entityID !== "undefined" &&
       (await confirm(
         "Suppression certificat",
-        `Voulez-vous vraiment supprimer le certificat REDCert "${redcert.certificate_id}" ?`
+        `Voulez-vous vraiment supprimer le certificat REDcert "${redcert.certificate_id}" ?`
       ))
     ) {
       notifyCertificate(
@@ -98,14 +110,18 @@ export default function useREDCertCertificates(
 
   async function updateREDCertCertificate(iscc: Certificate) {
     const data = await prompt(
-      "Mise à jour certificat REDCert",
+      "Mise à jour certificat REDcert",
       "Veuillez sélectionner un nouveau certificat pour remplacer l'ancien.",
       REDCertPrompt
     )
 
     if (typeof entityID !== "undefined" && data) {
       notifyCertificate(
-        resolveUpdateREDCert(entityID, iscc.certificate_id, data.certificate_id),
+        resolveUpdateREDCert(
+          entityID,
+          iscc.certificate_id,
+          data.certificate_id
+        ),
         "mis à jour"
       )
     }

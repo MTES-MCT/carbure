@@ -20,7 +20,7 @@ import { ISCCCertificateSettingsHook } from "settings/hooks/use-iscc-certificate
 import { REDCertCertificateSettingsHook } from "settings/hooks/use-redcert-certificates"
 
 export const CertificatePromptFactory = (
-  type: "2BS" | "ISCC" | "REDCERT",
+  type: "2BS" | "ISCC" | "REDcert",
   findCertificates: (q: string) => Promise<Certificate[]>
 ) =>
   function CertificatePrompt({
@@ -67,7 +67,7 @@ const COLUMNS: Column<Certificate>[] = [
 ]
 
 type CertificateSettingsProps = {
-  type: "2BS" | "ISCC" | "REDCERT" | "2BS & ISCC & REDCERT"
+  type: "2BS" | "ISCC" | "REDcert" | "2BS & ISCC & REDcert"
   loading: boolean
   certificates: Certificate[]
   onAdd?: () => void
@@ -185,7 +185,7 @@ export const REDCertCertificateSettings = ({
   settings,
 }: REDCertCertificateSettingsProps) => (
   <CertificateSettings
-    type="REDCERT"
+    type="REDcert"
     loading={settings.isLoading}
     certificates={settings.certificates}
     onAdd={settings.addREDCertCertificate}
