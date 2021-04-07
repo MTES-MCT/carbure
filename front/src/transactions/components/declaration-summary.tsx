@@ -9,8 +9,10 @@ import {
 } from "common/components/icons"
 import {
   confirm,
+  Dialog,
   DialogButtons,
-  PromptFormProps,
+  DialogTitle,
+  PromptProps,
 } from "common/components/dialog"
 import { AsyncButton, Button } from "common/components/button"
 import { Box, LoaderOverlay } from "common/components"
@@ -32,53 +34,59 @@ function nextPeriod(period: { year: number; month: number }) {
   return { year, month }
 }
 
-export const SummaryPromptFactory = (entityID: number) =>
-  function SummaryPrompt({ onCancel }: PromptFormProps<any>) {
-    const notifications = useNotificationContext()
+type SummaryPromptProps = PromptProps<any> & {
+  entityID: number
+}
 
-    const [summary, getSummary] = useAPI(api.getDeclarationSummary)
-    const [validating, validateDeclaration] = useAPI(api.validateDeclaration)
+export const SummaryPrompt = ({ entityID, onResolve }: SummaryPromptProps) => {
+  const notifications = useNotificationContext()
 
-    const [period, setPeriod] = useState(
-      prevPeriod({
-        year: now.getFullYear(),
-        month: now.getMonth() + 1,
-      })
+  const [summary, getSummary] = useAPI(api.getDeclarationSummary)
+  const [validating, validateDeclaration] = useAPI(api.validateDeclaration)
+
+  const [period, setPeriod] = useState(
+    prevPeriod({
+      year: now.getFullYear(),
+      month: now.getMonth() + 1,
+    })
+  )
+
+  const next = nextPeriod(period)
+
+  async function askValidateDeclaration() {
+    const ok = await confirm(
+      "Validation déclaration",
+      "Confirmez-vous que les informations fournies sont valides ? Vous ne pourrez plus modifier votre déclaration ultérieurement."
     )
 
-    const next = nextPeriod(period)
+    if (ok) {
+      try {
+        await validateDeclaration(entityID, period.year, period.month)
+        await getSummary(entityID, period.year, period.month)
 
-    async function askValidateDeclaration() {
-      const ok = await confirm(
-        "Validation déclaration",
-        "Confirmez-vous que les informations fournies sont valides ? Vous ne pourrez plus modifier votre déclaration ultérieurement."
-      )
-
-      if (ok) {
-        try {
-          await validateDeclaration(entityID, period.year, period.month)
-          await getSummary(entityID, period.year, period.month)
-
-          notifications.push({
-            level: "success",
-            text: "Votre déclaration a bien été validée !",
-          })
-        } catch (e) {
-          notifications.push({
-            level: "error",
-            text: "Votre déclaration n'a pas pu être validée !",
-          })
-        }
+        notifications.push({
+          level: "success",
+          text: "Votre déclaration a bien été validée !",
+        })
+      } catch (e) {
+        notifications.push({
+          level: "error",
+          text: "Votre déclaration n'a pas pu être validée !",
+        })
       }
     }
+  }
 
-    useEffect(() => {
-      getSummary(entityID, period.year, period.month)
-    }, [getSummary, period])
+  useEffect(() => {
+    getSummary(entityID, period.year, period.month)
+  }, [getSummary, period])
 
-    const declaration = summary.data?.declaration
+  const declaration = summary.data?.declaration
 
-    return (
+  return (
+    <Dialog onResolve={onResolve}>
+      <DialogTitle text="Déclaration de durabilité" />
+
       <Box className={styles.declarationContent}>
         <span className={styles.declarationExplanation}>
           Les tableaux suivants vous montrent un récapitulatif de vos entrées et
@@ -142,12 +150,13 @@ export const SummaryPromptFactory = (entityID: number) =>
               Valider ma déclaration
             </AsyncButton>
           )}
-          <Button icon={Return} onClick={onCancel}>
+          <Button icon={Return} onClick={() => onResolve()}>
             Retour
           </Button>
         </DialogButtons>
 
         {summary.loading && <LoaderOverlay />}
       </Box>
-    )
-  }
+    </Dialog>
+  )
+}

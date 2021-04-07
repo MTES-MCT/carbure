@@ -1,11 +1,6 @@
 import React from "react"
 
-import {
-  Country,
-  DepotType,
-  OwnershipType,
-  EntityType,
-} from "common/types"
+import { Country, DepotType, OwnershipType, EntityType } from "common/types"
 import {
   DeliverySiteSettingsHook,
   EntityDeliverySite,
@@ -28,7 +23,13 @@ import Table, {
   Row,
 } from "common/components/table"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
-import { DialogButtons, PromptFormProps } from "common/components/dialog"
+import {
+  Dialog,
+  DialogButtons,
+  DialogText,
+  DialogTitle,
+  PromptProps,
+} from "common/components/dialog"
 import { LabelAutoComplete } from "common/components/autocomplete"
 import { padding } from "transactions/components/list-columns"
 import RadioGroup from "common/components/radio-group"
@@ -58,19 +59,26 @@ const DEPOT_TYPES = Object.entries(DEPOT_TYPE_LABELS)
 const OWNERSHIP_TYPES = Object.entries(OWNERSHIP_LABELS)
   .map(([value, label]) => ({ value, label }))
 
-export const DeliverySiteFinderPromptFactory = (entity: EntitySelection) =>
-  function DeliverySiteFinderPrompt({
-    onConfirm,
-    onCancel,
-  }: PromptFormProps<EntityDeliverySite>) {
-    const { data, hasChange, onChange } = useForm<EntityDeliverySite>({
-      depot: null,
-      ownership_type: OwnershipType.ThirdParty,
-      blending_is_outsourced: false,
-      blender: null,
-    })
+type DeliverySiteFinderPromptProps = PromptProps<EntityDeliverySite> & {
+  entity: EntitySelection
+}
 
-    return (
+export const DeliverySiteFinderPrompt = ({
+  entity,
+  onResolve,
+}: DeliverySiteFinderPromptProps) => {
+  const { data, hasChange, onChange } = useForm<EntityDeliverySite>({
+    depot: null,
+    ownership_type: OwnershipType.ThirdParty,
+    blending_is_outsourced: false,
+    blender: null,
+  })
+
+  return (
+    <Dialog onResolve={onResolve}>
+      <DialogTitle text="Ajouter dépôt" />
+      <DialogText text="Veuillez rechercher un dépôt que vous utilisez." />
+
       <SettingsForm>
         <LabelAutoComplete
           label="Dépôt"
@@ -129,15 +137,16 @@ export const DeliverySiteFinderPromptFactory = (entity: EntitySelection) =>
             level="primary"
             icon={Plus}
             disabled={!hasChange}
-            onClick={() => onConfirm(data)}
+            onClick={() => onResolve(data)}
           >
             Ajouter
           </Button>
-          <Button onClick={onCancel}>Annuler</Button>
+          <Button onClick={() => onResolve()}>Annuler</Button>
         </DialogButtons>
       </SettingsForm>
-    )
-  }
+    </Dialog>
+  )
+}
 
 type DeliverySiteState = {
   name: string
@@ -152,24 +161,36 @@ type DeliverySiteState = {
   blender: string
 }
 
-export const DeliverySitePromptFactory = (deliverySite?: EntityDeliverySite) =>
-  function DeliverySitePrompt({
-    onCancel,
-  }: PromptFormProps<DeliverySiteState>) {
-    const form: DeliverySiteState = {
-      name: deliverySite?.depot?.name ?? "",
-      city: deliverySite?.depot?.city ?? "",
-      country: deliverySite?.depot?.country ?? null,
-      depot_id: deliverySite?.depot?.depot_id ?? "",
-      depot_type: deliverySite?.depot?.depot_type ?? DepotType.Other,
-      address: deliverySite?.depot?.address ?? "",
-      postal_code: deliverySite?.depot?.postal_code ?? "",
-      ownership_type: deliverySite?.ownership_type ?? OwnershipType.Own,
-      blending_is_outsourced: deliverySite?.blending_is_outsourced ?? false,
-      blender: deliverySite?.blender?.name ?? "",
-    }
+type DeliverySitePromptProps = PromptProps<EntityDeliverySite> & {
+  title: string
+  description?: string
+  deliverySite?: EntityDeliverySite
+}
 
-    return (
+export const DeliverySitePrompt = ({
+  title,
+  description,
+  deliverySite,
+  onResolve,
+}: DeliverySitePromptProps) => {
+  const form: DeliverySiteState = {
+    name: deliverySite?.depot?.name ?? "",
+    city: deliverySite?.depot?.city ?? "",
+    country: deliverySite?.depot?.country ?? null,
+    depot_id: deliverySite?.depot?.depot_id ?? "",
+    depot_type: deliverySite?.depot?.depot_type ?? DepotType.Other,
+    address: deliverySite?.depot?.address ?? "",
+    postal_code: deliverySite?.depot?.postal_code ?? "",
+    ownership_type: deliverySite?.ownership_type ?? OwnershipType.Own,
+    blending_is_outsourced: deliverySite?.blending_is_outsourced ?? false,
+    blender: deliverySite?.blender?.name ?? "",
+  }
+
+  return (
+    <Dialog onResolve={onResolve}>
+      <DialogTitle text={title} />
+      {description && <DialogText text={description} />}
+
       <SettingsForm>
         <hr />
 
@@ -256,13 +277,14 @@ export const DeliverySitePromptFactory = (deliverySite?: EntityDeliverySite) =>
         <hr />
 
         <DialogButtons>
-          <Button icon={Return} onClick={onCancel}>
+          <Button icon={Return} onClick={() => onResolve()}>
             Retour
           </Button>
         </DialogButtons>
       </SettingsForm>
-    )
-  }
+    </Dialog>
+  )
+}
 
 const DELIVERY_SITE_COLUMNS: Column<EntityDeliverySite>[] = [
   padding,
