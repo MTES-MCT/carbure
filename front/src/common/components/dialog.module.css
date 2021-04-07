@@ -12,6 +12,10 @@ div.dialog {
   max-width: 600px;
 }
 
+.dialogWide .dialogMessage {
+  max-width: unset;
+}
+
 .dialogButtons {
   margin-top: 16px;
   justify-content: flex-end;

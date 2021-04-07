@@ -329,11 +329,16 @@ export function getDeclarationSummary(
     }))
 }
 
-export function getDraftSummary(entity_id: number, tx_ids?: number[]) {
+export function getDraftSummary(
+  entity_id: number,
+  tx_ids?: number[],
+  is_stock?: boolean
+) {
   return api
     .get("/lots/draft-summary", {
       entity_id,
       tx_ids,
+      is_stock,
     })
     .then((res) => ({
       in: res.in ? flattenSummary(res.in) : null,

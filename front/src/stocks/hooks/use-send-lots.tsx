@@ -17,6 +17,7 @@ import {
 import { useNotificationContext } from "common/components/notifications"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { ConvertETBE, StockDraft } from "common/types"
+import { ValidationPrompt } from "transactions/components/validation"
 
 export interface LotSender {
   loading: boolean
@@ -126,29 +127,44 @@ export default function useSendLot(
   }
 
   async function sendSelection() {
-    const shouldSend = await confirm(
-      "Envoyer lots",
-      "Voulez vous envoyer les lots sélectionnés ?"
-    )
+    if (entity === null) return false
 
-    if (entity !== null && shouldSend) {
+    const shouldSend = await prompt<boolean>((resolve) => (
+      <ValidationPrompt
+        stock
+        title="Envoyer la sélection"
+        description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
+        entityID={entity.id}
+        selection={selection.selected}
+        onResolve={resolve}
+      />
+    ))
+
+    if (shouldSend) {
       notifySend(resolveSend(entity.id, selection.selected), true)
     }
 
-    return shouldSend
+    return Boolean(shouldSend)
   }
 
   async function sendAllDrafts() {
-    const shouldSend = await confirm(
-      "Envoyer lots",
-      "Voulez vous envoyer tous ces lots ?"
-    )
+    if (entity === null) return false
+
+    const shouldSend = await prompt<boolean>((resolve) => (
+      <ValidationPrompt
+        stock
+        title="Envoyer la sélection"
+        description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
+        entityID={entity.id}
+        onResolve={resolve}
+      />
+    ))
 
     if (entity !== null && shouldSend) {
       notifySend(resolveSendAll(entity.id), true)
     }
 
-    return shouldSend
+    return Boolean(shouldSend)
   }
 
   // async function convertETBE(txID: number) {

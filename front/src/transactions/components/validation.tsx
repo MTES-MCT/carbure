@@ -21,6 +21,7 @@ import * as api from "../api"
 type ValidationPromptProps = PromptProps<boolean> & {
   title: string
   description: string
+  stock?: boolean
   entityID?: number
   selection?: number[]
 }
@@ -28,6 +29,7 @@ type ValidationPromptProps = PromptProps<boolean> & {
 export const ValidationPrompt = ({
   title,
   description,
+  stock,
   entityID,
   selection,
   onResolve,
@@ -37,7 +39,7 @@ export const ValidationPrompt = ({
 
   useEffect(() => {
     if (typeof entityID !== "undefined") {
-      getDraftSummary(entityID, selection)
+      getDraftSummary(entityID, selection, stock)
     }
   }, [getDraftSummary, entityID, selection])
 
