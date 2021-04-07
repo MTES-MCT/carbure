@@ -222,9 +222,12 @@ def get_draft_summary(request, *args, **kwargs):
     entity = context['entity']
 
     tx_ids = request.GET.getlist('tx_ids')
+    is_stock = request.GET.get('is_stock', False)
     
     try:
         txs = LotTransaction.objects.filter(Q(lot__status="Draft") & (Q(carbure_vendor=entity) | Q(carbure_client=entity) | Q(lot__added_by=entity)))
+        if is_stock:
+            txs = txs.exclude(lot__parent_lot=None)
         if len(tx_ids) > 0:
             txs = txs.filter(pk__in=tx_ids)
         data = get_summary(txs, entity)
