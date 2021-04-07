@@ -29,20 +29,6 @@
   color: var(--blue-dark);
 }
 
-.declarationSection {
-  padding: 16px 24px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid var(--gray-medium);
-  font-size: 1.5em;
-}
-
-.declarationSummary {
-  width: auto;
-  margin-left: -24px;
-  margin-right: -24px;
-  margin-bottom: 16px;
-}
-
 .declarationControls {
   margin-top: 24px;
 }
