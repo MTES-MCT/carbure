@@ -237,30 +237,6 @@ export const InboxActions = ({
   )
 }
 
-export const InboxDraftsSummaryActions = () => (
-  <Link relative to="show-summary-in-drafts">
-    <Button level="primary" icon={Rapport}>
-      Rapport d'entrées
-    </Button>
-  </Link>
-)
-
-export const InboxPendingSummaryActions = () => (
-  <Link relative to="show-summary-in-pending">
-    <Button level="primary" icon={Rapport}>
-      Rapport d'entrées
-    </Button>
-  </Link>
-)
-
-export const InboxValidatedSummaryActions = () => (
-  <Link relative to="show-summary-in">
-    <Button level="primary" icon={Rapport}>
-      Rapport d'entrées
-    </Button>
-  </Link>
-)
-
 type OperatorOutsourcedBlendingProps = {
   disabled: boolean
   forwarder: LotForwarder

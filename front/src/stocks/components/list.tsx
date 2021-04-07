@@ -33,7 +33,6 @@ import {
 import { StockTable } from "./list-table"
 
 import styles from "./list.module.css"
-import { InboxPendingSummaryActions } from "transactions/components/list-actions"
 
 type StockListProps = {
   stock: StockHook
@@ -86,8 +85,6 @@ export const StockList = ({
           {status.is(LotStatus.ToSend) && (
             <StockImportActions uploader={uploader} />
           )}
-
-          {status.is(LotStatus.Inbox) && <InboxPendingSummaryActions />}
 
           {status.is(LotStatus.ToSend) && (
             <StockDraftActions
