@@ -220,6 +220,13 @@ export const okAdminSnapshot = rest.get(
   }
 )
 
+export const okDraftSummary = rest.get(
+  "/api/v3/lots/draft-summary",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success", data: { in: [], out: [] } }))
+  }
+)
+
 export default setupServer(
   okSnapshot,
   okLots,
@@ -244,5 +251,6 @@ export default setupServer(
   okLotDetails,
   okLotUpdate,
   okAdminLots,
-  okAdminSnapshot
+  okAdminSnapshot,
+  okDraftSummary
 )
