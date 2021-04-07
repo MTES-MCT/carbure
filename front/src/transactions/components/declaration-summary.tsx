@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react"
-import Table, { Column, Line } from "common/components/table"
 import useAPI from "common/hooks/use-api"
-import { SummaryItem } from "common/types"
-import { padding } from "./list-columns"
 import * as api from "../api"
-import { Alert } from "common/components/alert"
 import {
-  AlertCircle,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -18,32 +13,10 @@ import {
   PromptFormProps,
 } from "common/components/dialog"
 import { AsyncButton, Button } from "common/components/button"
-import { Box, LoaderOverlay, Title } from "common/components"
+import { Box, LoaderOverlay } from "common/components"
 import styles from "./declaration-summary.module.css"
-import colStyles from "./list-columns.module.css"
 import { useNotificationContext } from "common/components/notifications"
-
-const COLUMNS: Column<SummaryItem>[] = [
-  {
-    header: "Biocarburant",
-    render: (d) => <Line text={d.biocarburant} />,
-  },
-  {
-    header: "Volume (litres)",
-    render: (d) => <Line text={`${d.volume}`} />,
-  },
-  {
-    header: "Lots",
-    className: colStyles.narrowColumn,
-    render: (d) => <Line text={`${d.lots}`} />,
-  },
-  {
-    header: "Réd. GES",
-    className: colStyles.narrowColumn,
-    render: (d) => <Line text={`${d.avg_ghg_reduction.toFixed(2)}%`} />,
-  },
-  padding,
-]
+import TransactionSummary from "./transaction-summary"
 
 const now = new Date()
 
@@ -104,29 +77,6 @@ export const SummaryPromptFactory = (entityID: number) =>
     }, [getSummary, period])
 
     const declaration = summary.data?.declaration
-    const summaryInRows = (summary.data?.in ?? []).map((v) => ({ value: v }))
-    const summaryOutRows = (summary.data?.out ?? []).map((v) => ({ value: v }))
-
-    const isInEmpty = summaryInRows.length === 0
-    const isOutEmpty = summaryOutRows.length === 0
-
-    const inColumns: Column<SummaryItem>[] = [
-      padding,
-      {
-        header: "Fournisseur",
-        render: (d) => <Line text={d.entity || "N/A"} />,
-      },
-      ...COLUMNS,
-    ]
-
-    const outColumns: Column<SummaryItem>[] = [
-      padding,
-      {
-        header: "Client",
-        render: (d) => <Line text={d.entity || "N/A"} />,
-      },
-      ...COLUMNS,
-    ]
 
     return (
       <Box className={styles.declarationContent}>
@@ -165,35 +115,10 @@ export const SummaryPromptFactory = (entityID: number) =>
           </Button>
         </Box>
 
-        {isInEmpty && isOutEmpty && (
-          <Alert level="warning" icon={AlertCircle}>
-            Aucune information trouvée pour la période donnée.
-          </Alert>
-        )}
-
-        {!isInEmpty && (
-          <Box className={styles.declarationSummary}>
-            <Title className={styles.declarationSection}>Entrées</Title>
-            <Table
-              columns={inColumns}
-              rows={summaryInRows}
-              className={styles.declarationTable}
-            />
-          </Box>
-        )}
-
-        <br />
-
-        {!isOutEmpty && (
-          <Box className={styles.declarationSummary}>
-            <Title className={styles.declarationSection}>Sorties</Title>
-            <Table
-              columns={outColumns}
-              rows={summaryOutRows}
-              className={styles.declarationTable}
-            />
-          </Box>
-        )}
+        <TransactionSummary
+          in={summary.data?.in ?? []}
+          out={summary.data?.out ?? []}
+        />
 
         <DialogButtons className={styles.declarationControls}>
           <span className={styles.declarationDeadline}>

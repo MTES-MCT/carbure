@@ -1,0 +1,13 @@
+.transactionSummary {
+  width: auto;
+  margin-left: -24px;
+  margin-right: -24px;
+  margin-bottom: 16px;
+}
+
+.transactionSummarySection {
+  padding: 16px 24px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--gray-medium);
+  font-size: 1.5em;
+}
