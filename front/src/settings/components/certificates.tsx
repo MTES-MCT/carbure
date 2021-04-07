@@ -10,7 +10,13 @@ import { Button } from "common/components/button"
 import { AlertCircle, Cross, Plus } from "common/components/icons"
 import { Alert } from "common/components/alert"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
-import { DialogButtons, PromptFormProps } from "common/components/dialog"
+import {
+  Dialog,
+  DialogButtons,
+  DialogText,
+  DialogTitle,
+  PromptProps,
+} from "common/components/dialog"
 import { LabelAutoComplete } from "common/components/autocomplete"
 import Table, { Actions, Column, Line, arrow } from "common/components/table"
 import { ExpirationDate, SettingsForm } from "./common"
@@ -19,17 +25,27 @@ import { DBSCertificateSettingsHook } from "settings/hooks/use-2bs-certificates"
 import { ISCCCertificateSettingsHook } from "settings/hooks/use-iscc-certificates"
 import { REDCertCertificateSettingsHook } from "settings/hooks/use-redcert-certificates"
 
-export const CertificatePromptFactory = (
-  type: "2BS" | "ISCC" | "REDcert",
+type CertificatePromptProps = PromptProps<Certificate> & {
+  type: "2BS" | "ISCC" | "REDcert"
+  title: string
+  description: string
   findCertificates: (q: string) => Promise<Certificate[]>
-) =>
-  function CertificatePrompt({
-    onConfirm,
-    onCancel,
-  }: PromptFormProps<Certificate>) {
-    const [certificate, setCertificate] = useState<Certificate | null>(null)
+}
 
-    return (
+export const CertificatePrompt = ({
+  type,
+  title,
+  description,
+  findCertificates,
+  onResolve,
+}: CertificatePromptProps) => {
+  const [certificate, setCertificate] = useState<Certificate | null>(null)
+
+  return (
+    <Dialog onResolve={onResolve}>
+      <DialogTitle text={title} />
+      <DialogText text={description} />
+
       <SettingsForm>
         <LabelAutoComplete
           label={`Certificat ${type}`}
@@ -49,15 +65,16 @@ export const CertificatePromptFactory = (
             level="primary"
             icon={Plus}
             disabled={!certificate}
-            onClick={() => certificate && onConfirm(certificate)}
+            onClick={() => certificate && onResolve(certificate)}
           >
             Ajouter
           </Button>
-          <Button onClick={onCancel}>Annuler</Button>
+          <Button onClick={() => onResolve()}>Annuler</Button>
         </DialogButtons>
       </SettingsForm>
-    )
-  }
+    </Dialog>
+  )
+}
 
 const COLUMNS: Column<Certificate>[] = [
   padding,

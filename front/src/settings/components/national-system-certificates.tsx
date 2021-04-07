@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { SettingsForm } from "./common"
 
 import { NationalSystemCertificatesSettingsHook } from "../hooks/use-national-system-certificates"
@@ -6,20 +6,31 @@ import { NationalSystemCertificatesSettingsHook } from "../hooks/use-national-sy
 import { Title, LoaderOverlay } from "common/components"
 import { LabelInput } from "common/components/input"
 import { Button } from "common/components/button"
-import { PromptFormProps, DialogButtons } from "common/components/dialog"
+import {
+  PromptProps,
+  Dialog,
+  DialogButtons,
+  DialogTitle,
+  DialogText,
+} from "common/components/dialog"
 import { Edit, Save } from "common/components/icons"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 
-export const NationalSystemCertificatesPromptFactory = (
-  currentCertificate: string = ""
-) =>
-  function NationalSystemCertificatesPrompt({
-    onConfirm,
-    onCancel,
-  }: PromptFormProps<string>) {
-    const [certificate, setCertificate] = useState<string>(currentCertificate)
+type NationalSystemCertificatesPromptProps = PromptProps<string> & {
+  currentCertificate?: string
+}
 
-    return (
+export const NationalSystemCertificatePrompt = ({
+  currentCertificate = "",
+  onResolve,
+}: NationalSystemCertificatesPromptProps) => {
+  const [certificate, setCertificate] = useState<string>(currentCertificate)
+
+  return (
+    <Dialog onResolve={onResolve}>
+      <DialogTitle text="Modifier n° de certificat" />
+      <DialogText text="Entrez votre numéro de certificat du Système National." />
+
       <SettingsForm>
         <LabelInput
           label="Certificat Système National"
@@ -32,15 +43,16 @@ export const NationalSystemCertificatesPromptFactory = (
             level="primary"
             icon={Save}
             disabled={!certificate}
-            onClick={() => certificate && onConfirm(certificate)}
+            onClick={() => certificate && onResolve(certificate)}
           >
             Sauvegarder
           </Button>
-          <Button onClick={onCancel}>Annuler</Button>
+          <Button onClick={() => onResolve()}>Annuler</Button>
         </DialogButtons>
       </SettingsForm>
-    )
-  }
+    </Dialog>
+  )
+}
 
 type NationalSystemCertificatesSettingsProps = {
   settings: NationalSystemCertificatesSettingsHook

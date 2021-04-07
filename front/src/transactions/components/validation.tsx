@@ -1,6 +1,12 @@
-import React, { useState } from "react"
+import { useState } from "react"
 
-import { DialogButtons, PromptFormProps } from "common/components/dialog"
+import {
+  Dialog,
+  DialogButtons,
+  DialogText,
+  DialogTitle,
+  PromptProps,
+} from "common/components/dialog"
 
 import { Check } from "common/components/icons"
 import { Box } from "common/components"
@@ -9,14 +15,23 @@ import { Button } from "common/components/button"
 import styles from "common/components/dialog.module.css"
 import { LabelCheckbox } from "common/components/input"
 
+type ValidationPromptProps = PromptProps<boolean> & {
+  title: string
+  description: string
+}
+
 export const ValidationPrompt = ({
-  onConfirm,
-  onCancel,
-}: PromptFormProps<boolean>) => {
+  title,
+  description,
+  onResolve,
+}: ValidationPromptProps) => {
   const [checked, setChecked] = useState({ terres: false, infos: false })
 
   return (
-    <>
+    <Dialog onResolve={onResolve}>
+      <DialogTitle text={title} />
+      <DialogText text={description} />
+
       <Box className={styles.dialogCheckboxes}>
         <LabelCheckbox
           label="Je certifie que cette déclaration respecte les critères de durabilité liés aux terres"
@@ -35,12 +50,12 @@ export const ValidationPrompt = ({
           disabled={!checked.infos || !checked.terres}
           level="primary"
           icon={Check}
-          onClick={() => onConfirm(checked.infos && checked.terres)}
+          onClick={() => onResolve(checked.infos && checked.terres)}
         >
           Confirmer
         </Button>
-        <Button onClick={onCancel}>Annuler</Button>
+        <Button onClick={() => onResolve()}>Annuler</Button>
       </DialogButtons>
-    </>
+    </Dialog>
   )
 }

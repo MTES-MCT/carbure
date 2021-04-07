@@ -9,81 +9,81 @@ import { Button } from "./button"
 import Modal from "./modal"
 import NotificationsProvider from "./notifications"
 
+type DialogProps = PromptProps<any> & {
+  children: React.ReactNode
+}
+
+export const Dialog = ({ children, onResolve }: DialogProps) => (
+  <Modal className={styles.dialog} onClose={() => onResolve()}>
+    {children}
+  </Modal>
+)
+
+export const DialogTitle = ({ text }: { text: string }) => <Title>{text}</Title>
+
+export const DialogText = ({ text }: { text: string }) => (
+  <span className={styles.dialogMessage}>{text}</span>
+)
+
 export const DialogButtons = (props: any) => (
   <Box {...props} row className={cl(props.className, styles.dialogButtons)} />
 )
 
-export type PromptFormProps<T> = {
-  children?: React.ReactNode
-  onConfirm: (c: T) => void
-  onCancel: () => void
-}
-
-type PromptProps<T> = {
-  title: string
-  description: string
-  form: React.ComponentType<PromptFormProps<T>>
-  onConfirm: (c: T) => void
-  onCancel: () => void
-}
-
-export function Prompt<T>({
-  title,
-  description,
-  form: Form,
-  onConfirm,
-  onCancel,
-}: PromptProps<T>) {
-  return (
-    <Modal className={styles.dialog} onClose={onCancel}>
-      <Title>{title}</Title>
-      {description && (
-        <span className={styles.dialogMessage}>{description}</span>
-      )}
-      <Form onConfirm={onConfirm} onCancel={onCancel} />
-    </Modal>
-  )
+export type PromptProps<T> = {
+  onResolve: (result?: T) => void
 }
 
 // return a promise that resolves only when the confirm or cancel button is clicked
 export function prompt<T>(
-  title: string,
-  description: string,
-  form: React.ComponentType<PromptFormProps<T>>
+  render: (resolve: (result?: T) => void) => React.ReactNode
+  // form: React.ComponentType<PromptFormProps<T>>
 ): Promise<T | undefined> {
   return new Promise((resolve) => {
     const container = document.createElement("tmp")
 
-    function close(result?: T) {
+    function onResolve(result?: T) {
       resolve(result)
       ReactDOM.unmountComponentAtNode(container)
     }
 
     // render component imperatively, outside of the regular react container
     ReactDOM.render(
-      <NotificationsProvider>
-        <Prompt
-          title={title}
-          description={description}
-          form={form}
-          onConfirm={close}
-          onCancel={() => close(undefined)}
-        />
-      </NotificationsProvider>,
+      <NotificationsProvider>{render(onResolve)}</NotificationsProvider>,
       container
     )
   })
 }
 
-const ConfirmPrompt = ({ onConfirm, onCancel }: PromptFormProps<boolean>) => (
-  <DialogButtons>
-    <Button level="primary" onClick={() => onConfirm(true)}>
-      OK
-    </Button>
-    <Button onClick={onCancel}>Annuler</Button>
-  </DialogButtons>
+type ConfirmPromptProps = {
+  title: string
+  description: string
+  onResolve: (result?: boolean) => void
+}
+
+const ConfirmPrompt = ({
+  title,
+  description,
+  onResolve,
+}: ConfirmPromptProps) => (
+  <Dialog onResolve={onResolve}>
+    <DialogTitle text={title} />
+    <DialogText text={description} />
+
+    <DialogButtons>
+      <Button level="primary" onClick={() => onResolve(true)}>
+        OK
+      </Button>
+      <Button onClick={() => onResolve(false)}>Annuler</Button>
+    </DialogButtons>
+  </Dialog>
 )
 
 export function confirm(title: string, description: string) {
-  return prompt(title, description, ConfirmPrompt).then(Boolean)
+  return prompt((resolve) => (
+    <ConfirmPrompt
+      title={title}
+      description={description}
+      onResolve={resolve}
+    />
+  )).then(Boolean)
 }

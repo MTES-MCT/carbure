@@ -12,7 +12,7 @@ import { SettingsBody, SettingsHeader } from "settings/components/common"
 import UserRights from "../components/user-rights"
 import * as api from "../api"
 import DeliverySitesSettings, {
-  DeliverySitePromptFactory,
+  DeliverySitePrompt,
 } from "settings/components/delivery-site"
 import {
   DeliverySiteSettingsHook,
@@ -23,7 +23,7 @@ import ProductionSitesSettings from "settings/components/production-site"
 import { prompt } from "common/components/dialog"
 import { EntityType, ProductionSiteDetails } from "common/types"
 import {
-  ProductionSitePromptFactory,
+  ProductionSitePrompt,
   ProductionSiteState,
 } from "settings/components/production-site"
 import Certificates from "entities/components/certificates"
@@ -39,15 +39,26 @@ const EntityDetails = () => {
   const isProducer = entity.data?.entity_type === EntityType.Producer
 
   async function showDeliverySite(ds: EntityDeliverySite) {
-    prompt("Détails du dépôt", "", DeliverySitePromptFactory(ds))
+    prompt((resolve) => (
+      <DeliverySitePrompt
+        title="Détails du dépôt"
+        deliverySite={ds}
+        onResolve={resolve}
+      />
+    ))
   }
 
   async function editProductionSite(ps: ProductionSiteDetails) {
-    prompt<ProductionSiteState>(
-      "Détails du site de production",
-      "",
-      ProductionSitePromptFactory(entity.data, ps, true)
-    )
+    // "Détails du site de production",
+    prompt<ProductionSiteState>((resolve) => (
+      <ProductionSitePrompt
+        readOnly
+        title="Détails du site de production"
+        entity={entity.data}
+        productionSite={ps}
+        onResolve={resolve}
+      />
+    ))
   }
 
   const depotSettings: DeliverySiteSettingsHook = {

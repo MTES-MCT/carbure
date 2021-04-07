@@ -74,11 +74,13 @@ export default function useValidateLots(
   }
 
   async function validateLot(lotID: number) {
-    const shouldValidate = await prompt(
-      "Envoyer lot",
-      "Vous vous apprêtez à envoyer ce lot à son destinataire, assurez-vous que les conditions ci-dessous sont respectées :",
-      ValidationPrompt
-    )
+    const shouldValidate = await prompt<boolean>((resolve) => (
+      <ValidationPrompt
+        title="Envoyer lot"
+        description="Vous vous apprêtez à envoyer ce lot à son destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
+        onResolve={resolve}
+      />
+    ))
 
     if (entity !== null && shouldValidate) {
       await notifyValidate(resolveValidate(entity.id, [lotID]))
@@ -88,11 +90,13 @@ export default function useValidateLots(
   }
 
   async function validateAndCommentLot(lotID: number) {
-    const comment = await prompt(
-      "Envoyer lot",
-      "Voulez vous renvoyer ce lot corrigé ?",
-      CommentPrompt
-    )
+    const comment = await prompt<string>((resolve) => (
+      <CommentPrompt
+        title="Envoyer lot"
+        description="Voulez vous renvoyer ce lot corrigé ?"
+        onResolve={resolve}
+      />
+    ))
 
     if (entity !== null && comment) {
       await notifyValidate(resolveValidateAndComment(entity.id, lotID, comment))
@@ -102,11 +106,13 @@ export default function useValidateLots(
   }
 
   async function validateSelection() {
-    const shouldValidate = await prompt(
-      "Envoyer la sélection",
-      "Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :",
-      ValidationPrompt
-    )
+    const shouldValidate = await prompt<boolean>((resolve) => (
+      <ValidationPrompt
+        title="Envoyer la sélection"
+        description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
+        onResolve={resolve}
+      />
+    ))
 
     if (entity !== null && shouldValidate) {
       await notifyValidate(resolveValidate(entity.id, selection.selected), true)
@@ -116,11 +122,13 @@ export default function useValidateLots(
   }
 
   async function validateAllDrafts() {
-    const shouldValidate = await prompt(
-      "Envoyer tous les brouillons",
-      "Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :",
-      ValidationPrompt
-    )
+    const shouldValidate = await prompt<boolean>((resolve) => (
+      <ValidationPrompt
+        title="Envoyer tous les brouillons"
+        description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
+        onResolve={resolve}
+      />
+    ))
 
     if (entity !== null && shouldValidate) {
       await notifyValidate(resolveValidateAll(entity.id, year.selected), true)

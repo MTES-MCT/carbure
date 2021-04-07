@@ -6,15 +6,10 @@ import { Certificate } from "common/types"
 import { confirm, prompt } from "common/components/dialog"
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
-import { CertificatePromptFactory } from "../components/certificates"
+import { CertificatePrompt } from "../components/certificates"
 import { ProductionSiteSettingsHook } from "./use-production-sites"
 import { useNotificationContext } from "common/components/notifications"
 import { findREDCertCertificates } from "common/api"
-
-const REDCertPrompt = CertificatePromptFactory(
-  "REDcert",
-  findREDCertCertificates
-)
 
 export interface REDCertCertificateSettingsHook {
   isEmpty: boolean
@@ -79,11 +74,15 @@ export default function useREDCertCertificates(
   }
 
   async function addREDCertCertificate() {
-    const data = await prompt(
-      "Ajout certificat REDcert",
-      "Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond.",
-      REDCertPrompt
-    )
+    const data = await prompt<Certificate>((resolve) => (
+      <CertificatePrompt
+        type="REDcert"
+        title="Ajout certificat REDcert"
+        description="Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond."
+        findCertificates={findREDCertCertificates}
+        onResolve={resolve}
+      />
+    ))
 
     if (typeof entityID !== "undefined" && data) {
       notifyCertificate(
@@ -109,11 +108,15 @@ export default function useREDCertCertificates(
   }
 
   async function updateREDCertCertificate(iscc: Certificate) {
-    const data = await prompt(
-      "Mise à jour certificat REDcert",
-      "Veuillez sélectionner un nouveau certificat pour remplacer l'ancien.",
-      REDCertPrompt
-    )
+    const data = await prompt<Certificate>((resolve) => (
+      <CertificatePrompt
+        type="REDcert"
+        title="Mise à jour certificat REDcert"
+        description="Veuillez sélectionner un nouveau certificat pour remplacer l'ancien."
+        findCertificates={findREDCertCertificates}
+        onResolve={resolve}
+      />
+    ))
 
     if (typeof entityID !== "undefined" && data) {
       notifyCertificate(
