@@ -36,9 +36,6 @@ import {
   InboxPendingSummaryActions,
   InboxValidatedSummaryActions,
   InboxDraftsSummaryActions,
-  OutPendingSummaryActions,
-  OutValidatedSummaryActions,
-  OutDraftsSummaryActions,
   ToFixActions,
   TraderImportActions,
   CreateActions,
@@ -87,7 +84,7 @@ export const TransactionList = ({
   acceptor,
   rejector,
   outsourceddepots,
-  forwarder
+  forwarder,
 }: TransactionListProps) => {
   const txs = transactions.data
   const txCount = txs?.total ?? 0
@@ -105,9 +102,9 @@ export const TransactionList = ({
   const isLoading = transactions.loading
   const isError = transactions.error !== null
   const isEmpty = txs === null || txs.lots.length === 0
-  
-  const hasOutsourcedBlendingDepot = outsourceddepots && outsourceddepots.length > 0
 
+  const hasOutsourcedBlendingDepot =
+    outsourceddepots && outsourceddepots.length > 0
 
   return (
     <Box className={styles.transactionList}>
@@ -147,18 +144,6 @@ export const TransactionList = ({
             <InboxValidatedSummaryActions />
           )}
 
-          {(isProducer || isTrader) && status.is(LotStatus.Draft) && (
-            <OutDraftsSummaryActions />
-          )}
-
-          {(isProducer || isTrader) && status.is(LotStatus.Validated) && (
-            <OutPendingSummaryActions />
-          )}
-
-          {(isProducer || isTrader) && status.is(LotStatus.Accepted) && (
-            <OutValidatedSummaryActions />
-          )}
-
           {status.is(LotStatus.Draft) && (
             <React.Fragment>
               <CreateActions />
@@ -191,14 +176,16 @@ export const TransactionList = ({
             />
           )}
 
-          {isOperator && hasOutsourcedBlendingDepot && (status.is(LotStatus.Inbox) || status.is(LotStatus.Accepted)) && (
-            <OperatorOutsourcedBlendingActions 
-              forwarder={forwarder}
-              outsourceddepots={outsourceddepots}
-              disabled={selection.selected.length === 0 ? true : false}
-              selection={selection}
-            />
-          )}
+          {isOperator &&
+            hasOutsourcedBlendingDepot &&
+            (status.is(LotStatus.Inbox) || status.is(LotStatus.Accepted)) && (
+              <OperatorOutsourcedBlendingActions
+                forwarder={forwarder}
+                outsourceddepots={outsourceddepots}
+                disabled={selection.selected.length === 0 ? true : false}
+                selection={selection}
+              />
+            )}
         </ActionBar>
       )}
 
