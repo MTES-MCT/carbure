@@ -17,6 +17,7 @@ import {
 import { AsyncButton, Button } from "common/components/button"
 import { Box, LoaderOverlay } from "common/components"
 import styles from "./declaration-summary.module.css"
+import dialogStyles from "common/components/dialog.module.css"
 import { useNotificationContext } from "common/components/notifications"
 import TransactionSummary from "./transaction-summary"
 
@@ -84,79 +85,77 @@ export const SummaryPrompt = ({ entityID, onResolve }: SummaryPromptProps) => {
   const declaration = summary.data?.declaration
 
   return (
-    <Dialog onResolve={onResolve}>
+    <Dialog onResolve={onResolve} className={dialogStyles.dialogWide}>
       <DialogTitle text="Déclaration de durabilité" />
 
-      <Box className={styles.declarationContent}>
-        <span className={styles.declarationExplanation}>
-          Les tableaux suivants vous montrent un récapitulatif de vos entrées et
-          sorties pour la période sélectionnée.
+      <span className={styles.declarationExplanation}>
+        Les tableaux suivants vous montrent un récapitulatif de vos entrées et
+        sorties pour la période sélectionnée.
+      </span>
+
+      <span className={styles.declarationExplanation}>
+        Afin d'être comptabilisés, les brouillons que vous avez créé pour cette
+        période devront être envoyés avant la fin du mois suivant ladite
+        période. Une fois la totalité de ces lots validés, vous pourrez vérifier
+        ici l'état global de vos transactions et finalement procéder à la
+        déclaration.
+      </span>
+
+      <Box row className={styles.declarationPeriod}>
+        <Button
+          onClick={() => setPeriod(prevPeriod)}
+          className={styles.declarationPrevPeriod}
+        >
+          <ChevronLeft />
+        </Button>
+        <span className={styles.declarationPeriodText}>
+          Pour la période{" "}
+          <b>
+            {/* pad month with leading 0 */}
+            {("0" + period.month).slice(-2)} / {period.year}
+          </b>
         </span>
-
-        <span className={styles.declarationExplanation}>
-          Afin d'être comptabilisés, les brouillons que vous avez créé pour
-          cette période devront être envoyés avant la fin du mois suivant ladite
-          période. Une fois la totalité de ces lots validés, vous pourrez
-          vérifier ici l'état global de vos transactions et finalement procéder
-          à la déclaration.
-        </span>
-
-        <Box row className={styles.declarationPeriod}>
-          <Button
-            onClick={() => setPeriod(prevPeriod)}
-            className={styles.declarationPrevPeriod}
-          >
-            <ChevronLeft />
-          </Button>
-          <span className={styles.declarationPeriodText}>
-            Pour la période{" "}
-            <b>
-              {/* pad month with leading 0 */}
-              {("0" + period.month).slice(-2)} / {period.year}
-            </b>
-          </span>
-          <Button
-            onClick={() => setPeriod(nextPeriod)}
-            className={styles.declarationNextPeriod}
-          >
-            <ChevronRight />
-          </Button>
-        </Box>
-
-        <TransactionSummary
-          in={summary.data?.in ?? []}
-          out={summary.data?.out ?? []}
-        />
-
-        <DialogButtons className={styles.declarationControls}>
-          <span className={styles.declarationDeadline}>
-            à valider avant la fin du mois de{" "}
-            <b>
-              {("0" + next.month).slice(-2)} / {next.year}
-            </b>
-          </span>
-
-          {declaration?.declared ? (
-            <Button disabled level="success" icon={Check}>
-              Déclaration validée !
-            </Button>
-          ) : (
-            <AsyncButton
-              loading={validating.loading}
-              level="primary"
-              icon={Check}
-              onClick={askValidateDeclaration}
-            >
-              Valider ma déclaration
-            </AsyncButton>
-          )}
-          <Button icon={Return} onClick={() => onResolve()}>
-            Retour
-          </Button>
-        </DialogButtons>
-
-        {summary.loading && <LoaderOverlay />}
+        <Button
+          onClick={() => setPeriod(nextPeriod)}
+          className={styles.declarationNextPeriod}
+        >
+          <ChevronRight />
+        </Button>
       </Box>
+
+      <TransactionSummary
+        in={summary.data?.in ?? []}
+        out={summary.data?.out ?? []}
+      />
+
+      <DialogButtons className={styles.declarationControls}>
+        <span className={styles.declarationDeadline}>
+          à valider avant la fin du mois de{" "}
+          <b>
+            {("0" + next.month).slice(-2)} / {next.year}
+          </b>
+        </span>
+
+        {declaration?.declared ? (
+          <Button disabled level="success" icon={Check}>
+            Déclaration validée !
+          </Button>
+        ) : (
+          <AsyncButton
+            loading={validating.loading}
+            level="primary"
+            icon={Check}
+            onClick={askValidateDeclaration}
+          >
+            Valider ma déclaration
+          </AsyncButton>
+        )}
+        <Button icon={Return} onClick={() => onResolve()}>
+          Retour
+        </Button>
+      </DialogButtons>
+
+      {summary.loading && <LoaderOverlay />}
     </Dialog>
   )
 }

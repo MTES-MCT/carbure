@@ -11,10 +11,11 @@ import NotificationsProvider from "./notifications"
 
 type DialogProps = PromptProps<any> & {
   children: React.ReactNode
+  className?: string
 }
 
-export const Dialog = ({ children, onResolve }: DialogProps) => (
-  <Modal className={styles.dialog} onClose={() => onResolve()}>
+export const Dialog = ({ children, className, onResolve }: DialogProps) => (
+  <Modal className={cl(styles.dialog, className)} onClose={() => onResolve()}>
     {children}
   </Modal>
 )
