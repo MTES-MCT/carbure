@@ -15,7 +15,7 @@ div.dialog {
 .dialogButtons {
   margin-top: 16px;
   justify-content: flex-end;
-  margin-bottom: 20px;
+  padding-bottom: 20px;
 }
 
 .dialogButtons button {
@@ -29,4 +29,8 @@ div.dialog {
 .dialogCheckboxes label {
   height: auto;
   margin-bottom: 8px;
+}
+
+.dialogWide {
+  width: 1080px;
 }
