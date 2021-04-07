@@ -33,9 +33,6 @@ import {
   OperatorImportActions,
   ExportActions,
   InboxActions,
-  InboxPendingSummaryActions,
-  InboxValidatedSummaryActions,
-  InboxDraftsSummaryActions,
   ToFixActions,
   TraderImportActions,
   CreateActions,
@@ -130,18 +127,6 @@ export const TransactionList = ({
 
               {isOperator && <OperatorImportActions uploader={uploader} />}
             </React.Fragment>
-          )}
-
-          {isOperator && status.is(LotStatus.Draft) && (
-            <InboxDraftsSummaryActions />
-          )}
-
-          {isOperator && status.is(LotStatus.Inbox) && (
-            <InboxPendingSummaryActions />
-          )}
-
-          {isOperator && status.is(LotStatus.Accepted) && (
-            <InboxValidatedSummaryActions />
           )}
 
           {status.is(LotStatus.Draft) && (
