@@ -237,30 +237,6 @@ export const InboxActions = ({
   )
 }
 
-export const OutDraftsSummaryActions = () => (
-  <Link relative to="show-summary-out-drafts">
-    <Button level="primary" icon={Rapport}>
-      Rapport de sorties
-    </Button>
-  </Link>
-)
-
-export const OutPendingSummaryActions = () => (
-  <Link relative to="show-summary-out-pending">
-    <Button level="primary" icon={Rapport}>
-      Rapport de sorties
-    </Button>
-  </Link>
-)
-
-export const OutValidatedSummaryActions = () => (
-  <Link relative to="show-summary-out">
-    <Button level="primary" icon={Rapport}>
-      Rapport de sorties
-    </Button>
-  </Link>
-)
-
 export const InboxDraftsSummaryActions = () => (
   <Link relative to="show-summary-in-drafts">
     <Button level="primary" icon={Rapport}>
