@@ -9,6 +9,7 @@ urlpatterns = [
     path('summary-in', views.get_summary_in, name='api-v3-lots-get-summary-in'),
     path('summary-out', views.get_summary_out, name='api-v3-lots-get-summary-out'),
     path('declaration-summary', views.get_declaration_summary, name='api-v3-lots-get-declaration-summary'),
+    path('draft-summary', views.get_draft_summary, name='api-v3-lots-get-draft-summary'),
 
     # POST
     path('add', views.add_lot, name='api-v3-add-lot'),
