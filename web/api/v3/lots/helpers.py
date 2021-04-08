@@ -50,7 +50,7 @@ def get_entity_lots_by_status(entity, status):
             'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country'
         )
 
-        txs = txs.filter(lot__added_by=entity)
+        txs = txs.filter(Q(lot__added_by=entity) | Q(carbure_vendor=entity))
 
         # filter by status
         if status == 'draft':
