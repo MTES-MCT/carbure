@@ -120,25 +120,25 @@ class TransactionAdmin(admin.ModelAdmin):
 
     def get_lot_mp(self, obj):
         return obj.lot.matiere_premiere
-    get_lot_mp.admin_order_field  = 'FeedStock'
+    get_lot_mp.admin_order_field  = 'lot__matiere_premiere__name'
     get_lot_mp.short_description = 'FeedStock'
 
 
     def get_lot_bc(self, obj):
         return obj.lot.biocarburant
-    get_lot_bc.admin_order_field  = 'BioFuel'
+    get_lot_bc.admin_order_field  = 'lot__biocarburant__name'
     get_lot_bc.short_description = 'BioFuel'
 
 
     def get_lot_volume(self, obj):
         return obj.lot.volume
-    get_lot_volume.admin_order_field  = 'Volume'
+    get_lot_volume.admin_order_field  = 'lot__volume'
     get_lot_volume.short_description = 'Volume'    
 
 
     def get_lot_supplier(self, obj):
         return '%s - %s' % (obj.lot.unknown_supplier, obj.lot.unknown_supplier_certificate)
-    get_lot_supplier.admin_order_field  = 'Unknown Supplier'
+    get_lot_supplier.admin_order_field  = 'lot__unknown_supplier_certificate'
     get_lot_supplier.short_description = 'Unknown Supplier'
 
 
@@ -151,13 +151,13 @@ class TransactionAdmin(admin.ModelAdmin):
         else:
             psite = obj.lot.unknown_production_site_reference
         return psite
-    get_production_site.admin_order_field  = 'Production Site'
+    get_production_site.admin_order_field  = 'lot__carbure_production_site__name'
     get_production_site.short_description = 'Production Site'
 
 
     def get_lot_unknown_vendor_certificate(self, obj):
         return obj.lot.unknown_supplier_certificate
-    get_lot_unknown_vendor_certificate.admin_order_field  = 'Cert. Fournisseur'
+    get_lot_unknown_vendor_certificate.admin_order_field  = 'lot__unknown_supplier_certificate'
     get_lot_unknown_vendor_certificate.short_description = 'Cert. Fournisseur'    
 
 
