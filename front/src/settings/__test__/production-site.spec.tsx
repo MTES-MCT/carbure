@@ -47,7 +47,7 @@ test("add a production site in settings", async () => {
   screen.getByText("Ajout site de production")
   const submit = screen.getByText("Sauvegarder")
 
-  expect(submit).toBeDisabled()
+  expect(submit.closest("button")).toBeDisabled()
 
   userEvent.type(screen.getByLabelText("N° d'identification (SIRET)"), "654321")
   userEvent.type(screen.getByLabelText("Nom du site"), "Other Production Site")
