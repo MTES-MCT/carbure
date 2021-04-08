@@ -38,7 +38,7 @@ export const Button = ({
       className={btnClassName}
     >
       {Icon && <Icon />}
-      {children}
+      <span>{children}</span>
     </Tag>
   )
 }
