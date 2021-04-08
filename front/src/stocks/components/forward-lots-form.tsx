@@ -41,7 +41,7 @@ export const ForwardLotsClientSelectionPrompt = ({
 
   return (
     <Dialog onResolve={onResolve}>
-      <DialogTitle text="Forward Lots" />
+      <DialogTitle text="Transférer des lots" />
       <DialogText text="Vous pouvez utiliser cette interface pour transférer les lots dans le cadre d'une activité d'intermédiaire sans stockage." />
 
       <Box>

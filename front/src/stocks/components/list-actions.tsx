@@ -55,7 +55,7 @@ export const StockActions = ({
     </Link>
 
     <Button level="primary" icon={Forward} onClick={onForward}>
-      Forward
+      Transférer
     </Button>
 
     <Button level="primary" icon={Flask} onClick={onConvertETBE}>
