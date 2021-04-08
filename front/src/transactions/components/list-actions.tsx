@@ -18,22 +18,19 @@ import {
   Rapport,
   Upload,
   Forward,
-
 } from "common/components/icons"
 import { prompt } from "common/components/dialog"
 
 import {
-  ProducerImportPromptFactory,
-  OperatorImportPromptFactory,
-  TraderImportPromptFactory,
+  TraderImportPrompt,
+  OperatorImportPrompt,
+  ProducerImportPrompt,
 } from "./import"
-
-import { OperatorForwardPromptFactory } from "./forward"
+import { OperatorForwardPrompt } from "./forward"
 
 import styles from "./list-actions.module.css"
 import { LotForwarder } from "transactions/hooks/actions/use-forward-lots"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
-import { Transaction } from "common/types"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 
 type ExportActionsProps = {
@@ -53,11 +50,9 @@ type ImportActionsProps = {
 
 export const ProducerImportActions = ({ uploader }: ImportActionsProps) => {
   async function onUpload() {
-    const file = await prompt(
-      "Import Excel",
-      "Importer un fichier Excel standardisé.",
-      ProducerImportPromptFactory(uploader)
-    )
+    const file = await prompt<File>((resolve) => (
+      <ProducerImportPrompt uploader={uploader} onResolve={resolve} />
+    ))
 
     if (file) {
       uploader.uploadFile(file)
@@ -72,11 +67,9 @@ export const ProducerImportActions = ({ uploader }: ImportActionsProps) => {
 }
 export const TraderImportActions = ({ uploader }: ImportActionsProps) => {
   async function onUpload() {
-    const file = await prompt(
-      "Import Excel",
-      "Importer un fichier Excel standardisé.",
-      TraderImportPromptFactory(uploader)
-    )
+    const file = await prompt<File>((resolve) => (
+      <TraderImportPrompt uploader={uploader} onResolve={resolve} />
+    ))
 
     if (file) {
       uploader.uploadFile(file)
@@ -92,11 +85,9 @@ export const TraderImportActions = ({ uploader }: ImportActionsProps) => {
 
 export const OperatorImportActions = ({ uploader }: ImportActionsProps) => {
   async function onUpload() {
-    const file = await prompt(
-      "Import Excel",
-      "Importer un fichier Excel standardisé.",
-      OperatorImportPromptFactory(uploader)
-    )
+    const file = await prompt<File>((resolve) => (
+      <OperatorImportPrompt uploader={uploader} onResolve={resolve} />
+    ))
 
     if (file) {
       uploader.uploadOperatorFile(file)
@@ -246,54 +237,6 @@ export const InboxActions = ({
   )
 }
 
-export const OutDraftsSummaryActions = () => (
-  <Link relative to="show-summary-out-drafts">
-    <Button level="primary" icon={Rapport}>
-      Rapport de sorties
-    </Button>
-  </Link>
-)
-
-export const OutPendingSummaryActions = () => (
-  <Link relative to="show-summary-out-pending">
-    <Button level="primary" icon={Rapport}>
-      Rapport de sorties
-    </Button>
-  </Link>
-)
-
-export const OutValidatedSummaryActions = () => (
-  <Link relative to="show-summary-out">
-    <Button level="primary" icon={Rapport}>
-      Rapport de sorties
-    </Button>
-  </Link>
-)
-
-export const InboxDraftsSummaryActions = () => (
-  <Link relative to="show-summary-in-drafts">
-    <Button level="primary" icon={Rapport}>
-      Rapport d'entrées
-    </Button>
-  </Link>
-)
-
-export const InboxPendingSummaryActions = () => (
-  <Link relative to="show-summary-in-pending">
-    <Button level="primary" icon={Rapport}>
-      Rapport d'entrées
-    </Button>
-  </Link>
-)
-
-export const InboxValidatedSummaryActions = () => (
-  <Link relative to="show-summary-in">
-    <Button level="primary" icon={Rapport}>
-      Rapport d'entrées
-    </Button>
-  </Link>
-)
-
 type OperatorOutsourcedBlendingProps = {
   disabled: boolean
   forwarder: LotForwarder
@@ -301,25 +244,31 @@ type OperatorOutsourcedBlendingProps = {
   selection: TransactionSelection
 }
 
-
-export const OperatorOutsourcedBlendingActions = ({disabled, forwarder, outsourceddepots, selection}: OperatorOutsourcedBlendingProps) => {
+export const OperatorOutsourcedBlendingActions = ({
+  disabled,
+  forwarder,
+  outsourceddepots,
+  selection,
+}: OperatorOutsourcedBlendingProps) => {
   async function onForward() {
-    const validated = await prompt(
-      "Transfert de lots",
-      "Vous pouvez transférer vos lots reçus dans un dépôt pour lequel l'incorporation peut être effectuée par une société tierce.",
-      OperatorForwardPromptFactory(forwarder, outsourceddepots)
-    )
-    
+    const validated = await prompt<boolean>((resolve) => (
+      <OperatorForwardPrompt
+        outsourceddepots={outsourceddepots}
+        onResolve={resolve}
+      />
+    ))
+
     if (validated) {
       forwarder.forwardSelection(selection, outsourceddepots)
     }
   }
   return (
-    <Button 
-      disabled={disabled} 
-      level="primary" 
+    <Button
+      disabled={disabled}
+      level="primary"
       icon={Forward}
-      onClick={onForward}>
+      onClick={onForward}
+    >
       Forward
     </Button>
   )

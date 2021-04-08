@@ -5,7 +5,13 @@ import { Box } from "common/components"
 import { Input, LabelInput } from "common/components/input"
 import { AsyncButton, Button } from "common/components/button"
 import { Collapsible } from "common/components/alert"
-import { DialogButtons, PromptFormProps } from "common/components/dialog"
+import {
+  Dialog,
+  DialogButtons,
+  DialogText,
+  DialogTitle,
+  PromptProps,
+} from "common/components/dialog"
 import { Message } from "common/components/icons"
 import RadioGroup from "common/components/radio-group"
 
@@ -69,41 +75,52 @@ const Comments = ({
   )
 }
 
+type CommentPromptProps = PromptProps<string> & {
+  title: string
+  description: string
+}
+
 export const CommentPrompt = ({
-  onConfirm,
-  onCancel,
-}: PromptFormProps<string>) => {
+  title,
+  description,
+  onResolve,
+}: CommentPromptProps) => {
   const [comment, setComment] = useState("")
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault()
-    onConfirm(comment)
+    onResolve(comment)
   }
 
   return (
-    <Box as="form" onSubmit={onSubmit}>
-      <LabelInput
-        label="Commentaire (obligatoire)"
-        value={comment}
-        className={styles.commentInput}
-        onChange={(e) => setComment(e.target.value)}
-      />
+    <Dialog onResolve={onResolve}>
+      <DialogTitle text={title} />
+      <DialogText text={description} />
 
-      <DialogButtons>
-        <Button
-          level="primary"
-          disabled={!comment}
-          onClick={() => onConfirm(comment)}
-        >
-          OK
-        </Button>
-        <Button onClick={onCancel}>Annuler</Button>
-      </DialogButtons>
-    </Box>
+      <Box as="form" onSubmit={onSubmit}>
+        <LabelInput
+          label="Commentaire (obligatoire)"
+          value={comment}
+          className={styles.commentInput}
+          onChange={(e) => setComment(e.target.value)}
+        />
+
+        <DialogButtons>
+          <Button
+            level="primary"
+            disabled={!comment}
+            onClick={() => onResolve(comment)}
+          >
+            OK
+          </Button>
+          <Button onClick={() => onResolve()}>Annuler</Button>
+        </DialogButtons>
+      </Box>
+    </Dialog>
   )
 }
 
-interface CommentWithType {
+export interface CommentWithType {
   comment: string
   topic: string
 }
@@ -116,9 +133,8 @@ const TOPICS = [
 ]
 
 export const CommentWithTypePrompt = ({
-  onConfirm,
-  onCancel,
-}: PromptFormProps<CommentWithType>) => {
+  onResolve,
+}: PromptProps<CommentWithType>) => {
   const [comment, setComment] = useState("")
   const [topic, setTopic] = useState("")
 
@@ -130,32 +146,37 @@ export const CommentWithTypePrompt = ({
     e.preventDefault()
 
     if (comment && topic) {
-      onConfirm({ comment, topic })
+      onResolve({ comment, topic })
     }
   }
 
   return (
-    <Box as="form" onSubmit={onSubmit}>
-      <RadioGroup value={topic} options={TOPICS} onChange={onChangeTopic} />
+    <Dialog onResolve={onResolve}>
+      <DialogTitle text="Accepter lot" />
+      <DialogText text="Voulez vous accepter ce lot sous réserve ?" />
 
-      <LabelInput
-        label="Commentaire (obligatoire)"
-        value={comment}
-        className={styles.commentInput}
-        onChange={(e) => setComment(e.target.value)}
-      />
+      <Box as="form" onSubmit={onSubmit}>
+        <RadioGroup value={topic} options={TOPICS} onChange={onChangeTopic} />
 
-      <DialogButtons>
-        <Button
-          level="primary"
-          disabled={!comment || !topic}
-          onClick={() => onConfirm({ comment, topic })}
-        >
-          Accepter et demander une correction
-        </Button>
-        <Button onClick={onCancel}>Annuler</Button>
-      </DialogButtons>
-    </Box>
+        <LabelInput
+          label="Commentaire (obligatoire)"
+          value={comment}
+          className={styles.commentInput}
+          onChange={(e) => setComment(e.target.value)}
+        />
+
+        <DialogButtons>
+          <Button
+            level="primary"
+            disabled={!comment || !topic}
+            onClick={() => onResolve({ comment, topic })}
+          >
+            Accepter et demander une correction
+          </Button>
+          <Button onClick={() => onResolve()}>Annuler</Button>
+        </DialogButtons>
+      </Box>
+    </Dialog>
   )
 }
 

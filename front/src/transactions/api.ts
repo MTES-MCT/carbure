@@ -8,12 +8,17 @@ import {
 import { FilterSelection } from "transactions/hooks/query/use-filters"
 
 import api from "common/services/api"
-import { flattenSummary, normalizeFilters, filterOutsourcedDepots } from "./helpers"
+import {
+  flattenSummary,
+  normalizeFilters,
+  filterOutsourcedDepots,
+} from "./helpers"
 
 export function getSnapshot(entityID: number, year: number): Promise<Snapshot> {
   return api
     .get("/lots/snapshot", { entity_id: entityID, year })
-    .then(normalizeFilters).then(filterOutsourcedDepots)
+    .then(normalizeFilters)
+    .then(filterOutsourcedDepots)
 }
 
 export function getLots(
@@ -276,17 +281,28 @@ export function rejectAllInboxLots(
   })
 }
 
-export function getLotsOutSummary(entityID: number, lot_status: LotStatus, period: string | null, delivery_status: string[], stock: boolean) {
+export function getLotsOutSummary(
+  entityID: number,
+  lot_status: LotStatus,
+  period: string | null,
+  delivery_status: string[],
+  stock: boolean
+) {
   return api.get("/lots/summary-out", {
     entity_id: entityID,
     lot_status,
     period,
     delivery_status,
-    stock
+    stock,
   })
 }
 
-export function getLotsInSummary(entityID: number, lot_status: LotStatus, period: string | null, delivery_status: string[]) {
+export function getLotsInSummary(
+  entityID: number,
+  lot_status: LotStatus,
+  period: string | null,
+  delivery_status: string[]
+) {
   return api.get("/lots/summary-in", {
     entity_id: entityID,
     lot_status,
@@ -313,6 +329,23 @@ export function getDeclarationSummary(
     }))
 }
 
+export function getDraftSummary(
+  entity_id: number,
+  tx_ids?: number[],
+  is_stock?: boolean
+) {
+  return api
+    .get("/lots/draft-summary", {
+      entity_id,
+      tx_ids,
+      is_stock,
+    })
+    .then((res) => ({
+      in: res.in ? flattenSummary(res.in) : null,
+      out: res.out ? flattenSummary(res.out) : null,
+    }))
+}
+
 export function validateDeclaration(
   entity_id: number,
   period_year: number,
@@ -325,7 +358,6 @@ export function validateDeclaration(
   })
 }
 
-
 export function forwardLots(
   entityID: number,
   transactionIDs: number[]
@@ -335,8 +367,6 @@ export function forwardLots(
     tx_ids: transactionIDs,
   })
 }
-
-
 
 // ADMIN
 

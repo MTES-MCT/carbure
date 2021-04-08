@@ -4,7 +4,7 @@ import { SettingsGetter } from "./use-get-settings"
 import useAPI from "common/hooks/use-api"
 import * as api from "../api"
 
-import { NationalSystemCertificatesPromptFactory } from "../components/national-system-certificates"
+import { NationalSystemCertificatePrompt } from "../components/national-system-certificates"
 import { prompt } from "common/components/dialog"
 import { useNotificationContext } from "common/components/notifications"
 
@@ -28,11 +28,12 @@ export default function useNationalSystemCertificates(
   const certificateNumber = entity?.national_system_certificate ?? ""
 
   async function editNationalSystemCertificates() {
-    const certificate = await prompt(
-      "Modifier n° de certificat",
-      "Entrez votre numéro de certificat du Système National.",
-      NationalSystemCertificatesPromptFactory(certificateNumber)
-    )
+    const certificate = await prompt<string>((resolve) => (
+      <NationalSystemCertificatePrompt
+        currentCertificate={certificateNumber}
+        onResolve={resolve}
+      />
+    ))
 
     if (entity && certificate) {
       const res = await resolveSetNSC(entity.id, certificate)

@@ -6,12 +6,10 @@ import { Certificate } from "common/types"
 import { confirm, prompt } from "common/components/dialog"
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
-import { CertificatePromptFactory } from "../components/certificates"
+import { CertificatePrompt } from "../components/certificates"
 import { ProductionSiteSettingsHook } from "./use-production-sites"
 import { useNotificationContext } from "common/components/notifications"
 import { findISCCCertificates } from "common/api"
-
-const ISCCPrompt = CertificatePromptFactory("ISCC", findISCCCertificates)
 
 export interface ISCCCertificateSettingsHook {
   isEmpty: boolean
@@ -70,11 +68,15 @@ export default function useISCCCertificates(
   }
 
   async function addISCCCertificate() {
-    const data = await prompt(
-      "Ajout certificat ISCC",
-      "Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond.",
-      ISCCPrompt
-    )
+    const data = await prompt<Certificate>((resolve) => (
+      <CertificatePrompt
+        type="ISCC"
+        title="Ajout certificat ISCC"
+        description="Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond."
+        findCertificates={findISCCCertificates}
+        onResolve={resolve}
+      />
+    ))
 
     if (typeof entityID !== "undefined" && data) {
       notifyCertificate(resolveAddISCC(entityID, data.certificate_id), "ajouté")
@@ -97,11 +99,15 @@ export default function useISCCCertificates(
   }
 
   async function updateISCCCertificate(iscc: Certificate) {
-    const data = await prompt(
-      "Mise à jour certificat ISCC",
-      "Veuillez sélectionner un nouveau certificat pour remplacer l'ancien.",
-      ISCCPrompt
-    )
+    const data = await prompt<Certificate>((resolve) => (
+      <CertificatePrompt
+        type="ISCC"
+        title="Mise à jour certificat ISCC"
+        description="Veuillez sélectionner un nouveau certificat pour remplacer l'ancien."
+        findCertificates={findISCCCertificates}
+        onResolve={resolve}
+      />
+    ))
 
     if (typeof entityID !== "undefined" && data) {
       notifyCertificate(
