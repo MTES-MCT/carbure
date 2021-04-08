@@ -226,10 +226,12 @@ def get_draft_summary(request, *args, **kwargs):
     
     try:
         txs = LotTransaction.objects.filter(Q(lot__status="Draft") & (Q(carbure_vendor=entity) | Q(carbure_client=entity) | Q(lot__added_by=entity)))
-        if is_stock:
-            txs = txs.exclude(lot__parent_lot=None)
         if len(tx_ids) > 0:
             txs = txs.filter(pk__in=tx_ids)
+        elif is_stock:
+            txs = txs.exclude(lot__parent_lot=None)
+        else:
+            txs = txs.filter(lot__parent_lot=None)
         data = get_summary(txs, entity)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
