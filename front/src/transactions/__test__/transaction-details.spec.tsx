@@ -97,7 +97,7 @@ test("edit transaction details", async () => {
   await waitWhileLoading()
 
   const save: any = await screen.findByText("Sauvegarder")
-  expect(save.disabled).toBe(true)
+  expect(save.closest("button")).toBeDisabled()
 
   const dae = screen.getByLabelText("Numéro douanier (DAE, DAA...) *")
   userEvent.clear(dae)
@@ -184,7 +184,8 @@ test("edit transaction details", async () => {
   userEvent.clear(eee)
   userEvent.type(eee, "1.4")
 
-  expect(save.disabled).toBe(false)
+  expect(save.closest("button")).not.toBeDisabled()
+  // expect(save.disabled).toBe(false)
 
   userEvent.click(save)
 
