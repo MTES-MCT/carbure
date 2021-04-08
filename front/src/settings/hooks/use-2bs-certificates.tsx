@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { CertificatePromptFactory } from "../components/certificates"
+import { CertificatePrompt } from "../components/certificates"
 import { confirm, prompt } from "common/components/dialog"
 import { useNotificationContext } from "common/components/notifications"
 import * as api from "../api"
@@ -8,8 +8,6 @@ import useAPI from "common/hooks/use-api"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { ProductionSiteSettingsHook } from "./use-production-sites"
 import { find2BSCertificates } from "common/api"
-
-const DBSPrompt = CertificatePromptFactory("2BS", find2BSCertificates)
 
 export interface DBSCertificateSettingsHook {
   isEmpty: boolean
@@ -68,11 +66,15 @@ export default function use2BSCertificates(
   }
 
   async function add2BSCertificate() {
-    const data = await prompt(
-      "Ajout certificat 2BS",
-      "Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond.",
-      DBSPrompt
-    )
+    const data = await prompt<Certificate>((resolve) => (
+      <CertificatePrompt
+        type="2BS"
+        title="Ajout certificat 2BS"
+        description="Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond."
+        findCertificates={find2BSCertificates}
+        onResolve={resolve}
+      />
+    ))
 
     if (typeof entityID !== "undefined" && data) {
       notifyCertificate(resolveAdd2BS(entityID, data.certificate_id), "ajouté")
@@ -92,11 +94,15 @@ export default function use2BSCertificates(
   }
 
   async function update2BSCertificate(dbs: Certificate) {
-    const data = await prompt(
-      "Mise à jour certificat 2BS",
-      "Veuillez sélectionner un nouveau certificat pour remplacer l'ancien.",
-      DBSPrompt
-    )
+    const data = await prompt<Certificate>((resolve) => (
+      <CertificatePrompt
+        type="2BS"
+        title="Mise à jour certificat 2BS"
+        description="Veuillez sélectionner un nouveau certificat pour remplacer l'ancien."
+        findCertificates={find2BSCertificates}
+        onResolve={resolve}
+      />
+    ))
 
     if (typeof entityID !== "undefined" && data) {
       notifyCertificate(

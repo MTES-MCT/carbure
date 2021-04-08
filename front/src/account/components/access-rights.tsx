@@ -18,50 +18,56 @@ import { SettingsForm } from "settings/components/common"
 import { LabelAutoComplete } from "common/components/autocomplete"
 import { Alert } from "common/components/alert"
 import Table, { Column, Line, Row } from "common/components/table"
-import {padding} from "transactions/components/list-columns"
+import { padding } from "transactions/components/list-columns"
 import { Section, SectionBody, SectionHeader } from "common/components/section"
-import { DialogButtons, PromptFormProps } from "common/components/dialog"
+import {
+  Dialog,
+  DialogButtons,
+  DialogText,
+  DialogTitle,
+  PromptProps,
+} from "common/components/dialog"
 
-export const EntityPrompt = ({
-  onConfirm,
-  onCancel,
-}: PromptFormProps<Entity>) => {
+export const EntityPrompt = ({ onResolve }: PromptProps<Entity>) => {
   const [entity, setEntity] = useState<Entity | null>(null)
 
   return (
-    <SettingsForm>
-      <LabelAutoComplete
-        label="Organisation"
-        placeholder="Rechercher une société..."
-        name="entity"
-        value={entity}
-        getQuery={common.findEntities}
-        onChange={(e: any) => setEntity(e.target.value)}
-        getValue={(e) => `${e.id}`}
-        getLabel={(e) => e.name}
-      />
+    <Dialog onResolve={onResolve}>
+      <SettingsForm>
+        <DialogTitle text="Ajout organisation" />
+        <DialogText text="Recherchez la société qui vous emploie pour pouvoir accéder à ses données." />
 
-      <a
-        href="mailto:carbure@beta.gouv.fr"
-        target="_blank"
-        rel="noreferrer"
-        className={pendingStyles.link}
-      >
-        Ma société n'est pas enregistrée sur CarbuRe.
-      </a>
-
-      <DialogButtons>
-        <Button
-          level="primary"
-          icon={Plus}
-          disabled={!entity}
-          onClick={() => entity && onConfirm(entity)}
+        <LabelAutoComplete
+          label="Organisation"
+          placeholder="Rechercher une société..."
+          name="entity"
+          value={entity}
+          getQuery={common.findEntities}
+          onChange={(e: any) => setEntity(e.target.value)}
+          getValue={(e) => `${e.id}`}
+          getLabel={(e) => e.name}
+        />
+        <a
+          href="mailto:carbure@beta.gouv.fr"
+          target="_blank"
+          rel="noreferrer"
+          className={pendingStyles.link}
         >
-          Demander l'accès
-        </Button>
-        <Button onClick={onCancel}>Annuler</Button>
-      </DialogButtons>
-    </SettingsForm>
+          Ma société n'est pas enregistrée sur CarbuRe.
+        </a>
+        <DialogButtons>
+          <Button
+            level="primary"
+            icon={Plus}
+            disabled={!entity}
+            onClick={() => entity && onResolve(entity)}
+          >
+            Demander l'accès
+          </Button>
+          <Button onClick={() => onResolve()}>Annuler</Button>
+        </DialogButtons>
+      </SettingsForm>
+    </Dialog>
   )
 }
 

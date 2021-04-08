@@ -303,3 +303,41 @@ def get_snapshot_filters(txs):
                        'production_sites': psites, 'countries_of_origin': countries, 'delivery_sites': dsites}
 
     return filters
+
+
+def get_summary(txs, entity):
+    txs_in = txs.filter(carbure_client=entity)
+    data_in = {}
+    for t in txs_in:
+        vendor = ''
+        if t.lot.added_by == entity:
+            vendor = t.lot.unknown_supplier if t.lot.unknown_supplier else t.lot.unknown_supplier_certificate
+        else:
+            vendor = t.carbure_vendor.name if t.carbure_vendor else t.carbure_vendor_certificate
+        if vendor not in data_in:
+            data_in[vendor] = {}
+        if t.lot.biocarburant.name not in data_in[vendor]:
+            data_in[vendor][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
+        line = data_in[vendor][t.lot.biocarburant.name]
+        total = (line['volume'] + t.lot.volume)
+        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
+                                     t.lot.volume * t.lot.ghg_reduction) / total if total != 0 else 0
+        line['volume'] += t.lot.volume    
+        line['lots'] += 1
+
+    txs_out = txs.filter(carbure_vendor=entity).exclude(carbure_client=entity)
+    data_out = {}
+    for t in txs_out:
+        client_name = t.carbure_client.name if t.client_is_in_carbure and t.carbure_client else t.unknown_client
+        if client_name not in data_out:
+            data_out[client_name] = {}
+        if t.lot.biocarburant.name not in data_out[client_name]:
+            data_out[client_name][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
+        line = data_out[client_name][t.lot.biocarburant.name]
+        total = (line['volume'] + t.lot.volume)
+        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
+                                     t.lot.volume * t.lot.ghg_reduction) / total if total != 0 else 0
+        line['volume'] += t.lot.volume
+        line['lots'] += 1
+
+    return { 'in': data_in, 'out': data_out}

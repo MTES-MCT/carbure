@@ -19,7 +19,7 @@ from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, g
 from api.v3.sanity_checks import bulk_sanity_checks
 from django_otp.decorators import otp_required
 from core.decorators import check_rights
-from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors
+from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary
 
 logger = logging.getLogger(__name__)
 
@@ -216,6 +216,26 @@ def get_summary_out(request, *args, **kwargs):
         line['volume'] += t.lot.volume
     return JsonResponse({'status': 'success', 'data': data})
 
+@check_rights('entity_id')
+def get_draft_summary(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+
+    tx_ids = request.GET.getlist('tx_ids')
+    is_stock = request.GET.get('is_stock', False)
+    
+    try:
+        txs = LotTransaction.objects.filter(Q(lot__status="Draft") & (Q(carbure_vendor=entity) | Q(carbure_client=entity) | Q(lot__added_by=entity)))
+        if is_stock:
+            txs = txs.exclude(lot__parent_lot=None)
+        if len(tx_ids) > 0:
+            txs = txs.filter(pk__in=tx_ids)
+        data = get_summary(txs, entity)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
+
+    return JsonResponse({'status': 'success', 'data': data})
+
 
 @check_rights('entity_id')
 def get_declaration_summary(request, *args, **kwargs):
@@ -231,47 +251,12 @@ def get_declaration_summary(request, *args, **kwargs):
     period_date = datetime.date(year=int(period_year), month=int(period_month), day=1)
     period_str = period_date.strftime('%Y-%m')
 
-    # get declared lots 
-    ## lots sent
-    txs_out = LotTransaction.objects.filter(lot__status='Validated', lot__period=period_str, carbure_vendor=entity).exclude(carbure_client=entity)
-    data_out = {}
-    for t in txs_out:
-        client_name = t.carbure_client.name if t.client_is_in_carbure and t.carbure_client else t.unknown_client
-        if client_name not in data_out:
-            data_out[client_name] = {}
-        if t.lot.biocarburant.name not in data_out[client_name]:
-            data_out[client_name][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
-        line = data_out[client_name][t.lot.biocarburant.name]
-        total = (line['volume'] + t.lot.volume)
-        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
-                                     t.lot.volume * t.lot.ghg_reduction) / total if total != 0 else 0
-        line['volume'] += t.lot.volume
-        line['lots'] += 1
-
-    ## lots received
-    txs_in = LotTransaction.objects.filter(lot__status='Validated', lot__period=period_str, carbure_client=entity)
-    data_in = {}
-    for t in txs_in:
-        vendor = ''
-        if t.lot.added_by == entity:
-            vendor = t.lot.unknown_supplier if t.lot.unknown_supplier else t.lot.unknown_supplier_certificate
-        else:
-            vendor = t.carbure_vendor.name if t.carbure_vendor else t.carbure_vendor_certificate
-
-        if vendor not in data_in:
-            data_in[vendor] = {}
-        if t.lot.biocarburant.name not in data_in[vendor]:
-            data_in[vendor][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
-        line = data_in[vendor][t.lot.biocarburant.name]
-        total = (line['volume'] + t.lot.volume)
-        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
-                                     t.lot.volume * t.lot.ghg_reduction) / total if total != 0 else 0
-        line['volume'] += t.lot.volume    
-        line['lots'] += 1
+    txs = LotTransaction.objects.filter(lot__status='Validated', lot__period=period_str)
+    data = get_summary(txs, entity)
 
     # get associated declaration
     declaration, created = SustainabilityDeclaration.objects.get_or_create(entity=entity, period=period_date)
-    data = {'in': data_in, 'out': data_out, 'declaration': declaration.natural_key()}
+    data['declaration'] = declaration.natural_key()
     return JsonResponse({'status': 'success', 'data': data})
 
 

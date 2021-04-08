@@ -50,11 +50,13 @@ export default function useRejectLots(
   }
 
   async function rejectLot(lotID: number) {
-    const comment = await prompt(
-      "Refuser lot",
-      "Voulez vous refuser ce lot ?",
-      CommentPrompt
-    )
+    const comment = await prompt<string>((resolve) => (
+      <CommentPrompt
+        title="Refuser lot"
+        description="Voulez vous refuser ce lot ?"
+        onResolve={resolve}
+      />
+    ))
 
     if (entity !== null && comment) {
       await notifyReject(resolveReject(entity.id, [lotID], comment))
@@ -64,11 +66,13 @@ export default function useRejectLots(
   }
 
   async function rejectSelection() {
-    const comment = await prompt(
-      "Refuser lot",
-      "Voulez vous refuser les lots sélectionnés ?",
-      CommentPrompt
-    )
+    const comment = await prompt<string>((resolve) => (
+      <CommentPrompt
+        title="Refuser lot"
+        description="Voulez vous refuser les lots sélectionnés ?"
+        onResolve={resolve}
+      />
+    ))
 
     if (entity !== null && comment) {
       await notifyReject(
@@ -81,11 +85,13 @@ export default function useRejectLots(
   }
 
   async function rejectAllInbox() {
-    const comment = await prompt(
-      "Refuser lot",
-      "Voulez vous refuser tous ces lots ?",
-      CommentPrompt
-    )
+    const comment = await prompt<string>((resolve) => (
+      <CommentPrompt
+        title="Refuser lot"
+        description="Voulez vous refuser tous ces lots ?"
+        onResolve={resolve}
+      />
+    ))
 
     if (entity !== null && comment) {
       await notifyReject(

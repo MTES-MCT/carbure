@@ -7,7 +7,10 @@ import useAPI from "../../../common/hooks/use-api"
 
 import { confirm, prompt } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
-import { CommentWithTypePrompt } from "transactions/components/form-comments"
+import {
+  CommentWithTypePrompt,
+  CommentWithType,
+} from "transactions/components/form-comments"
 
 export interface LotAcceptor {
   loading: boolean
@@ -65,11 +68,9 @@ export default function useAcceptLots(
   }
 
   async function acceptAndCommentLot(lotID: number) {
-    const result = await prompt(
-      "Accepter lot",
-      "Voulez vous accepter ce lot sous réserve ?",
-      CommentWithTypePrompt
-    )
+    const result = await prompt<CommentWithType>((resolve) => (
+      <CommentWithTypePrompt onResolve={resolve} />
+    ))
 
     if (entity !== null && result) {
       await notifyAccept(

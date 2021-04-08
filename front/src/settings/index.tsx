@@ -77,7 +77,7 @@ const Settings = ({ entity, settings }: SettingsProps) => {
         {isProducer && <a href="#production">Sites de production</a>}
         {hasCertificates && <a href="#iscc">Certificats ISCC</a>}
         {hasCertificates && <a href="#2bs">Certificats 2BS</a>}
-        {hasCertificates && <a href="#red">Certificats REDCert</a>}
+        {hasCertificates && <a href="#red">Certificats REDcert</a>}
         {hasCSN && <a href="#csn">Certificats système national</a>}
       </Sticky>
 

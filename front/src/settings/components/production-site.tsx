@@ -30,7 +30,13 @@ import Table, {
   Row,
 } from "common/components/table"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
-import { DialogButtons, PromptFormProps } from "common/components/dialog"
+import {
+  Dialog,
+  DialogButtons,
+  DialogText,
+  DialogTitle,
+  PromptProps,
+} from "common/components/dialog"
 import {
   LabelAutoComplete,
   MultiAutocomplete,
@@ -75,47 +81,56 @@ const GES_OPTIONS = [
   { value: GESOption.Actual, label: "Valeurs réelles" },
 ]
 
-type ProductionSitePromptProps = PromptFormProps<ProductionSiteState>
+type ProductionSitePromptProps = PromptProps<ProductionSiteState> & {
+  title: string
+  description?: string
+  entity: EntitySelection
+  productionSite?: ProductionSiteDetails
+  readOnly?: boolean
+}
 
 // ville/code postal/addresse/pays numéro d'identification (SIRET), nom/prénom/téléphone/mail du gérant
 
-export const ProductionSitePromptFactory = (
-  entity: EntitySelection,
-  productionSite?: ProductionSiteDetails,
-  readOnly?: boolean
-) =>
-  function ProductionSitePrompt({
-    onConfirm,
-    onCancel,
-  }: ProductionSitePromptProps) {
-    const { data, hasChange, onChange } = useForm<ProductionSiteState>({
-      site_id: productionSite?.site_id ?? "",
-      name: productionSite?.name ?? "",
-      date_mise_en_service: productionSite?.date_mise_en_service ?? "",
-      ges_option: productionSite?.ges_option ?? GESOption.Default,
+export const ProductionSitePrompt = ({
+  title,
+  description,
+  entity,
+  productionSite,
+  readOnly,
+  onResolve,
+}: ProductionSitePromptProps) => {
+  const { data, hasChange, onChange } = useForm<ProductionSiteState>({
+    site_id: productionSite?.site_id ?? "",
+    name: productionSite?.name ?? "",
+    date_mise_en_service: productionSite?.date_mise_en_service ?? "",
+    ges_option: productionSite?.ges_option ?? GESOption.Default,
 
-      eligible_dc: productionSite?.eligible_dc ?? false,
-      dc_reference: productionSite?.dc_reference ?? "",
+    eligible_dc: productionSite?.eligible_dc ?? false,
+    dc_reference: productionSite?.dc_reference ?? "",
 
-      city: productionSite?.city ?? "",
-      postal_code: productionSite?.postal_code ?? "",
-      country: productionSite?.country ?? null,
+    city: productionSite?.city ?? "",
+    postal_code: productionSite?.postal_code ?? "",
+    country: productionSite?.country ?? null,
 
-      manager_name: productionSite?.manager_name ?? "",
-      manager_phone: productionSite?.manager_phone ?? "",
-      manager_email: productionSite?.manager_email ?? "",
+    manager_name: productionSite?.manager_name ?? "",
+    manager_phone: productionSite?.manager_phone ?? "",
+    manager_email: productionSite?.manager_email ?? "",
 
-      matieres_premieres: productionSite?.inputs ?? [],
-      biocarburants: productionSite?.outputs ?? [],
+    matieres_premieres: productionSite?.inputs ?? [],
+    biocarburants: productionSite?.outputs ?? [],
 
-      certificates: productionSite?.certificates ?? [],
-    })
+    certificates: productionSite?.certificates ?? [],
+  })
 
-    const canSave = Boolean(
-      hasChange && data.country && data.date_mise_en_service && data.name
-    )
+  const canSave = Boolean(
+    hasChange && data.country && data.date_mise_en_service && data.name
+  )
 
-    return (
+  return (
+    <Dialog onResolve={onResolve}>
+      <DialogTitle text={title} />
+      {description && <DialogText text={description} />}
+
       <SettingsForm>
         <hr />
 
@@ -286,18 +301,19 @@ export const ProductionSitePromptFactory = (
               level="primary"
               icon={Save}
               disabled={!canSave}
-              onClick={() => data && onConfirm(data)}
+              onClick={() => data && onResolve(data)}
             >
               Sauvegarder
             </Button>
           )}
-          <Button icon={Return} onClick={onCancel}>
+          <Button icon={Return} onClick={() => onResolve()}>
             Retour
           </Button>
         </DialogButtons>
       </SettingsForm>
-    )
-  }
+    </Dialog>
+  )
+}
 
 const PRODUCTION_SITE_COLUMNS: Column<ProductionSiteDetails>[] = [
   padding,

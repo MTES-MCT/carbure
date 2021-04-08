@@ -4,16 +4,20 @@ import * as api from "stocks/api"
 import useAPI from "common/hooks/use-api"
 import { confirm } from "common/components/dialog"
 import { prompt } from "common/components/dialog"
-import { StockSendLotPrompt } from "stocks/components/send-form"
 import {
-  ConvertETBEComplexPromptFactory,
-  // ConvertETBEPrompt,
-} from "stocks/components/convert-etbe-form"
+  StockSendDetails,
+  StockSendLotPrompt,
+} from "stocks/components/send-form"
+import { ConvertETBEComplexPrompt } from "stocks/components/convert-etbe-form"
 
-import { ForwardLotsClientSelectionPromptFactory } from "stocks/components/forward-lots-form"
+import {
+  ForwardClientFormState,
+  ForwardLotsClientSelectionPrompt,
+} from "stocks/components/forward-lots-form"
 import { useNotificationContext } from "common/components/notifications"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
-import { StockDraft } from "common/types"
+import { ConvertETBE, StockDraft } from "common/types"
+import { ValidationPrompt } from "transactions/components/validation"
 
 export interface LotSender {
   loading: boolean
@@ -83,11 +87,9 @@ export default function useSendLot(
   }
 
   async function createDrafts(txID: number) {
-    const sent = await prompt(
-      "Préparer lot",
-      "Veuillez préciser les détails du lot à envoyer",
-      StockSendLotPrompt
-    )
+    const sent = await prompt<StockSendDetails>((resolve) => (
+      <StockSendLotPrompt onResolve={resolve} />
+    ))
 
     if (entity !== null && sent) {
       const draft: StockDraft = {
@@ -125,29 +127,44 @@ export default function useSendLot(
   }
 
   async function sendSelection() {
-    const shouldSend = await confirm(
-      "Envoyer lots",
-      "Voulez vous envoyer les lots sélectionnés ?"
-    )
+    if (entity === null) return false
 
-    if (entity !== null && shouldSend) {
+    const shouldSend = await prompt<boolean>((resolve) => (
+      <ValidationPrompt
+        stock
+        title="Envoyer la sélection"
+        description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
+        entityID={entity.id}
+        selection={selection.selected}
+        onResolve={resolve}
+      />
+    ))
+
+    if (shouldSend) {
       notifySend(resolveSend(entity.id, selection.selected), true)
     }
 
-    return shouldSend
+    return Boolean(shouldSend)
   }
 
   async function sendAllDrafts() {
-    const shouldSend = await confirm(
-      "Envoyer lots",
-      "Voulez vous envoyer tous ces lots ?"
-    )
+    if (entity === null) return false
+
+    const shouldSend = await prompt<boolean>((resolve) => (
+      <ValidationPrompt
+        stock
+        title="Envoyer la sélection"
+        description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
+        entityID={entity.id}
+        onResolve={resolve}
+      />
+    ))
 
     if (entity !== null && shouldSend) {
       notifySend(resolveSendAll(entity.id), true)
     }
 
-    return shouldSend
+    return Boolean(shouldSend)
   }
 
   // async function convertETBE(txID: number) {
@@ -168,11 +185,9 @@ export default function useSendLot(
   async function convertETBEComplex() {
     if (entity === null) return false
 
-    const conversions = await prompt(
-      "Conversion ETBE",
-      "",
-      ConvertETBEComplexPromptFactory(entity.id)
-    )
+    const conversions = await prompt<ConvertETBE[]>((resolve) => (
+      <ConvertETBEComplexPrompt entityID={entity.id} onResolve={resolve} />
+    ))
 
     if (conversions) {
       notifyCreated(resolveETBE(entity.id, conversions))
@@ -184,14 +199,22 @@ export default function useSendLot(
   async function forwardLots() {
     if (entity === null) return false
 
-    const data = await prompt(
-      "Forward Lots",
-      "Vous pouvez utiliser cette interface pour transférer les lots dans le cadre d'une activité d'intermédiaire sans stockage.",
-      ForwardLotsClientSelectionPromptFactory(entity.id)
-    )
+    const data = await prompt<ForwardClientFormState>((resolve) => (
+      <ForwardLotsClientSelectionPrompt
+        entityID={entity.id}
+        onResolve={resolve}
+      />
+    ))
 
     if (data) {
-      notifyCreated(resolveForward(entity.id, selection.selected, data?.carbure_client?.id, data?.certificate?.certificate_id))
+      notifyCreated(
+        resolveForward(
+          entity.id,
+          selection.selected,
+          data?.carbure_client?.id,
+          data?.certificate?.certificate_id
+        )
+      )
     }
 
     return Boolean(data)
@@ -210,6 +233,6 @@ export default function useSendLot(
     sendLot,
     // convertETBE,
     convertETBEComplex,
-    forwardLots
+    forwardLots,
   }
 }

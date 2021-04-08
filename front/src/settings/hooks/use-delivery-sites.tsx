@@ -7,8 +7,8 @@ import useAPI from "common/hooks/use-api"
 import * as api from "../api"
 import { confirm, prompt } from "common/components/dialog"
 import {
-  DeliverySitePromptFactory,
-  DeliverySiteFinderPromptFactory,
+  DeliverySitePrompt,
+  DeliverySiteFinderPrompt,
 } from "../components/delivery-site"
 import { useNotificationContext } from "common/components/notifications"
 
@@ -53,11 +53,9 @@ export default function useDeliverySites(
   }
 
   async function addDeliverySite() {
-    const data = await prompt(
-      "Ajouter dépôt",
-      "Veuillez rechercher un dépôt que vous utilisez.",
-      DeliverySiteFinderPromptFactory(entity)
-    )
+    const data = await prompt<EntityDeliverySite>((resolve) => (
+      <DeliverySiteFinderPrompt entity={entity} onResolve={resolve} />
+    ))
 
     if (typeof entityID !== "undefined" && data && data.depot) {
       const res = await resolveAddDeliverySite(
@@ -85,11 +83,14 @@ export default function useDeliverySites(
   }
 
   async function showDeliverySite(ds: EntityDeliverySite) {
-    prompt(
-      "Détails du dépôt",
-      `Informations concernant le dépôt ${ds.depot!.name} (non modifiable)`,
-      DeliverySitePromptFactory(ds)
-    )
+    prompt((resolve) => (
+      <DeliverySitePrompt
+        title="Ajouter dépôt"
+        description="Veuillez rechercher un dépôt que vous utilisez."
+        deliverySite={ds}
+        onResolve={resolve}
+      />
+    ))
   }
 
   async function deleteDeliverySite(ds: EntityDeliverySite) {

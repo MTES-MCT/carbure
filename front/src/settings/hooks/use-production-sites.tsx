@@ -6,7 +6,7 @@ import { ProductionSiteDetails } from "common/types"
 import useAPI from "common/hooks/use-api"
 import * as api from "../api"
 import {
-  ProductionSitePromptFactory,
+  ProductionSitePrompt,
   ProductionSiteState,
 } from "../components/production-site"
 import { confirm, prompt } from "common/components/dialog"
@@ -57,11 +57,14 @@ export default function useProductionSites(
   }
 
   async function createProductionSite() {
-    const data = await prompt(
-      "Ajout site de production",
-      "Veuillez entrer les informations de votre nouveau site de production.",
-      ProductionSitePromptFactory(entity)
-    )
+    const data = await prompt<ProductionSiteState>((resolve) => (
+      <ProductionSitePrompt
+        entity={entity}
+        title="Ajout site de production"
+        description="Veuillez entrer les informations de votre nouveau site de production."
+        onResolve={resolve}
+      />
+    ))
 
     if (typeof entityID !== "undefined" && data && data.country) {
       const ps = await resolveAddProductionSite(
@@ -106,11 +109,15 @@ export default function useProductionSites(
   }
 
   async function editProductionSite(ps: ProductionSiteDetails) {
-    const data = await prompt<ProductionSiteState>(
-      "Modification site de production",
-      "Veuillez entrer les nouvelles informations de votre site de production.",
-      ProductionSitePromptFactory(entity, ps)
-    )
+    const data = await prompt<ProductionSiteState>((resolve) => (
+      <ProductionSitePrompt
+        title="Modification site de production"
+        description="Veuillez entrer les nouvelles informations de votre site de production."
+        entity={entity}
+        productionSite={ps}
+        onResolve={resolve}
+      />
+    ))
 
     if (typeof entityID !== "undefined" && data && data.country) {
       const res = await resolveUpdateProductionSite(

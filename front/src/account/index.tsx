@@ -3,6 +3,7 @@ import { SettingsGetter } from "settings/hooks/use-get-settings"
 import { Main, Title } from "common/components"
 import { SettingsHeader, SettingsBody } from "settings/components/common"
 
+import { Entity } from "common/types"
 import { prompt } from "common/components/dialog"
 import { AccountAccesRights, EntityPrompt } from "./components/access-rights"
 import { AccountAuthentication } from "./components/authentication"
@@ -20,11 +21,9 @@ function useAccount(settings: SettingsGetter): AccountHook {
   const isLoading = settings.loading || requestAccess.loading
 
   async function askEntityAccess() {
-    const entity = await prompt(
-      "Ajout organisation",
-      "Recherchez la société qui vous emploie pour pouvoir accéder à ses données.",
-      EntityPrompt
-    )
+    const entity = await prompt<Entity>((resolve) => (
+      <EntityPrompt onResolve={resolve} />
+    ))
 
     if (entity) {
       await resolveAccess(entity.id, "")

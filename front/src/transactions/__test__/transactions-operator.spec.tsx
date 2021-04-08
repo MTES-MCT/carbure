@@ -121,7 +121,6 @@ test("operator: check inbox actions", async () => {
 
   // check global actions
   await screen.findByText("Exporter")
-  screen.getByText("Rapport d'entrées")
   screen.getByText("Accepter tout")
   screen.getByText("Refuser tout")
 
