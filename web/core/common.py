@@ -240,6 +240,7 @@ def fuse_lots(txs):
 
 def fill_producer_info(entity, lot_row, lot, prefetched_data):
     lot_errors = []
+
     all_producers = prefetched_data['producers']
     if 'producer' in lot_row and lot_row['producer'] is not None:
         # check if we know the producer
@@ -280,6 +281,7 @@ def fill_producer_info(entity, lot_row, lot, prefetched_data):
 
 def fill_production_site_info(entity, lot_row, lot, prefetched_data):
     lot_errors = []
+
     my_production_sites = prefetched_data['production_sites']
     countries = prefetched_data['countries']
     if 'production_site' in lot_row:
@@ -777,14 +779,16 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, transaction=None):
     else:
         lot = transaction.lot
 
-    lot_errors += fill_producer_info(entity, lot_dict, lot, prefetched_data)
-    lot_errors += fill_production_site_info(entity, lot_dict, lot, prefetched_data)
-    lot_errors += fill_supplier_info(entity, lot_dict, lot, prefetched_data)
-    lot_errors += fill_biocarburant_info(lot_dict, lot, prefetched_data)
-    lot_errors += fill_matiere_premiere_info(lot_dict, lot, prefetched_data)
+    # do not allow to modify production data for stock-lots
+    if lot.parent_lot == None:
+        lot_errors += fill_producer_info(entity, lot_dict, lot, prefetched_data)
+        lot_errors += fill_production_site_info(entity, lot_dict, lot, prefetched_data)
+        lot_errors += fill_supplier_info(entity, lot_dict, lot, prefetched_data)
+        lot_errors += fill_biocarburant_info(lot_dict, lot, prefetched_data)
+        lot_errors += fill_matiere_premiere_info(lot_dict, lot, prefetched_data)
+        lot_errors += fill_pays_origine_info(lot_dict, lot, prefetched_data)
+        lot_errors += fill_ghg_info(lot_dict, lot)
     lot_errors += fill_volume_info(lot_dict, lot)
-    lot_errors += fill_pays_origine_info(lot_dict, lot, prefetched_data)
-    lot_errors += fill_ghg_info(lot_dict, lot)
     lot.is_valid = False
 
     if transaction is None:
