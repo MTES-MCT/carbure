@@ -8,7 +8,7 @@ export interface SortingSelection {
 }
 
 export default function useSortingSelection(
-  pagination: PageSelection
+  pagination?: PageSelection
 ): SortingSelection {
   const [current, setCurrent] = useState<{
     column: string
@@ -16,7 +16,7 @@ export default function useSortingSelection(
   }>({ column: "", order: "asc" })
 
   function sortBy(column: string) {
-    pagination.setPage(0)
+    pagination?.setPage(0)
 
     if (current.column !== column) {
       return setCurrent({ column, order: "asc" })
