@@ -27,7 +27,7 @@ export function findCountries(query: string): Promise<Country[]> {
   return api.get("/common/countries", { query })
 }
 
-export function findEntities(query: string): Promise<Entity[]> {
+export function findEntities(query?: string): Promise<Entity[]> {
   return api.get("/common/entities", { query })
 }
 
@@ -76,7 +76,9 @@ export function find2BSCertificates(query: string): Promise<DBSCertificate[]> {
   return api.get("/common/2bs-certificates", { query })
 }
 
-export function findREDCertCertificates(query: string): Promise<REDCertCertificate[]> {
+export function findREDCertCertificates(
+  query: string
+): Promise<REDCertCertificate[]> {
   return api.get("/common/redcert-certificates", { query })
 }
 

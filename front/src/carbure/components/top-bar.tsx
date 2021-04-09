@@ -104,14 +104,18 @@ const Topbar = ({ entity, settings }: TopbarProps) => (
         <PageLink to="transactions">Transactions</PageLink>
 
         {isAdmin(entity) && (
-          // <PageLink to="administration">Administration</PageLink>
           <React.Fragment>
             <PageLink to="entities">Sociétés</PageLink>
             <PageLink to="controls">Contrôles</PageLink>
           </React.Fragment>
         )}
 
-        {!isAdmin(entity) && <PageLink to="settings">Société</PageLink>}
+        {!isAdmin(entity) && (
+          <React.Fragment>
+            <PageLink to="settings">Société</PageLink>
+            <PageLink to="registry">Annuaire</PageLink>
+          </React.Fragment>
+        )}
       </nav>
     )}
 

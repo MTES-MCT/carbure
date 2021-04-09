@@ -21,6 +21,7 @@ import Controls from "controls"
 import Dashboard from "dashboard"
 import Entities from "../entities"
 import EntityDetails from "entities/routes/entity-details"
+import Registry from "./components/registry"
 
 // has to be nested in a route so we can get data from useParams()
 const Org = ({ app }: { app: AppHook }) => {
@@ -69,6 +70,10 @@ const Org = ({ app }: { app: AppHook }) => {
 
         <Route relative path="settings">
           <Settings entity={entity} settings={app.settings} />
+        </Route>
+
+        <Route relative path="registry">
+          <Registry />
         </Route>
 
         {isAdmin && (
