@@ -46,14 +46,16 @@ export const OperatorForwardPrompt = ({
 
       <Box className={styles.importExplanation}>
         Voici vers quels opérateurs les lots seront transférés:
-        <Table columns={COLUMNS} rows={rows} />
-        <DialogButtons>
-          <Button level="primary" onClick={() => onResolve(true)}>
-            Transférer
-          </Button>
-          <Button onClick={() => onResolve(false)}>Annuler</Button>
-        </DialogButtons>
       </Box>
+
+      <Table columns={COLUMNS} rows={rows} className={styles.forwardTable} />
+
+      <DialogButtons>
+        <Button level="primary" onClick={() => onResolve(true)}>
+          Transférer
+        </Button>
+        <Button onClick={() => onResolve(false)}>Annuler</Button>
+      </DialogButtons>
     </Dialog>
   )
 }
@@ -93,14 +95,20 @@ export const OperatorTransactionsToForwardPrompt = ({
 
       <Box className={styles.importExplanation}>
         Voici les lots qui seront transférés:
-        <Table columns={TX_TO_TRANSFER_COLUMNS} rows={rows} />
-        <DialogButtons>
-          <Button level="primary" onClick={() => onResolve(txs)}>
-            Transférer
-          </Button>
-          <Button onClick={() => onResolve()}>Annuler</Button>
-        </DialogButtons>
       </Box>
+
+      <Table
+        columns={TX_TO_TRANSFER_COLUMNS}
+        rows={rows}
+        className={styles.forwardTable}
+      />
+
+      <DialogButtons>
+        <Button level="primary" onClick={() => onResolve(txs)}>
+          Transférer
+        </Button>
+        <Button onClick={() => onResolve()}>Annuler</Button>
+      </DialogButtons>
     </Dialog>
   )
 }
