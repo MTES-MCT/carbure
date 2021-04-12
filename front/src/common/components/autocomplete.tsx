@@ -32,7 +32,7 @@ function useAutoComplete<T>(
   }
 
   async function onQuery(
-    e: React.ChangeEvent<HTMLInputElement> | React.MouseEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>
   ) {
     const query = "value" in e.target ? e.target.value : ""
     setQuery(query)
@@ -126,7 +126,7 @@ export function AutoComplete<T>({
         readOnly={readOnly}
         onChange={onQuery}
         innerRef={target}
-        onClick={onQuery}
+        onFocus={onQuery}
         autoComplete="off"
         onBlur={() => dd.toggle(false)}
       />
