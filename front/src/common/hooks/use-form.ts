@@ -1,52 +1,73 @@
 import { useCallback, useRef, useState } from "react"
 
-export type FormFields = HTMLInputElement | HTMLTextAreaElement
-
-function isCheckbox(element: FormFields): element is HTMLInputElement {
-  return element.tagName === "INPUT" && element.type === "checkbox"
+type FormOptions<T> = {
+  onChange?: (nextState: T, prevState?: T) => T
 }
 
-function parseValue(element: FormFields) {
-  if (isCheckbox(element)) {
+export type FormState = Record<string, any>
+
+export type FormTarget<T = any> = {
+  type?: string
+  value?: T[keyof T] | string | number | boolean
+  name?: keyof T | string
+  checked?: boolean
+}
+
+export type FormChangeHandler<T> = (e: { target: FormTarget<T> }) => void
+
+function parseValue<T>(element: FormTarget<T>) {
+  if (element.type === "checkbox") {
     return element.checked
   } else if (element.type === "number") {
-    const parsed = parseFloat(element.value)
+    const parsed = parseFloat(`${element.value}`)
     return isNaN(parsed) ? "" : parsed
   } else {
     return element.value
   }
 }
 
-export type FormHook<T> = {
+function transform<T extends FormState>(
+  onChange: FormOptions<T>["onChange"] | undefined,
+  nextState: T,
+  prevState?: T
+): T {
+  if (!onChange) return nextState
+  else return onChange(nextState, prevState)
+}
+
+export type FormHook<T extends FormState> = {
   data: T
   hasChange: boolean
   reset: (s: T) => void
-  patch: (update: any, silent?: boolean) => void
-  onChange: <T extends FormFields>(e: React.ChangeEvent<T>) => void
+  onChange: FormChangeHandler<T>
 }
 
-export default function useForm<T>(initialState: T): FormHook<T> {
-  const [data, setData] = useState<T>(initialState)
+export default function useForm<T extends FormState>(
+  initialState: T,
+  options?: FormOptions<T>
+): FormHook<T> {
   const hasChange = useRef(false)
+  const [data, setState] = useState<T>(() =>
+    transform(options?.onChange, initialState)
+  )
 
-  const patch = useCallback((patch: any, silent: boolean = false) => {
-    if (!silent) hasChange.current = true
-    setData((data) => ({ ...data, ...patch }))
-  }, [])
+  const reset = useCallback(
+    (form: T) => {
+      hasChange.current = false
+      setState(transform(options?.onChange, form))
+    },
+    [options?.onChange]
+  )
 
-  const reset = useCallback((form: T) => {
-    hasChange.current = false
-    setData(form)
-  }, [])
-
-  function onChange<U extends FormFields>(e: React.ChangeEvent<U>) {
-    patch({ [e.target.name]: parseValue(e.target) })
+  const onChange: FormChangeHandler<T> = (e) => {
+    hasChange.current = true
+    const nextState = { ...data, [`${e.target.name}`]: parseValue(e.target) }
+    setState(transform(options?.onChange, nextState, data))
   }
 
   return {
     data,
     hasChange: hasChange.current,
-    patch,
     reset,
     onChange,
   }

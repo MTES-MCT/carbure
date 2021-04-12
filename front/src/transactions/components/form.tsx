@@ -1,7 +1,7 @@
 import React from "react"
 
 import { TransactionFormState } from "../hooks/use-transaction-form"
-import { FormFields } from "common/hooks/use-form"
+import { FormChangeHandler } from "common/hooks/use-form"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
 import styles from "./form.module.css"
@@ -9,12 +9,7 @@ import styles from "./form.module.css"
 import * as api from "common/api"
 
 import { Box } from "common/components"
-import {
-  LabelCheckbox,
-  LabelInput,
-  LabelTextArea,
-  Placeholder,
-} from "common/components/input"
+import { LabelCheckbox, LabelInput, Placeholder } from "common/components/input"
 import { Alert } from "common/components/alert"
 import { LabelAutoComplete } from "common/components/autocomplete"
 import { AlertTriangle } from "common/components/icons"
@@ -38,7 +33,7 @@ type FieldsProps = {
   readOnly: boolean
   transaction: TransactionFormState
   fieldErrors: { [k: string]: string }
-  onChange: <T extends FormFields>(e: React.ChangeEvent<T>) => void
+  onChange: FormChangeHandler<TransactionFormState>
 }
 
 const LotFields = ({
@@ -656,7 +651,7 @@ type TransactionFormProps = {
   transaction: TransactionFormState
   error: string | null
   fieldErrors?: { [k: string]: string }
-  onChange: <T extends FormFields>(e: React.ChangeEvent<T>) => void
+  onChange: FormChangeHandler<TransactionFormState>
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
 }
 
