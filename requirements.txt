@@ -28,7 +28,6 @@ distro==1.4.0
 Django==3.2
 django-environ==0.4.5
 django-otp==1.0.2
-django-request-logging==0.7.2
 django-storages==1.9.1
 docutils==0.15.2
 entrypoints==0.3
@@ -102,3 +101,4 @@ wrapt==1.12.1
 XlsxWriter==1.2.8
 yarl==1.4.2
 git+git://github.com/mplanes/django-authtools
+git+git://github.com/Rhumbix/django-request-logging
