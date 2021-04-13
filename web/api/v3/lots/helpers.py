@@ -50,11 +50,11 @@ def get_entity_lots_by_status(entity, status):
             'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country'
         )
 
-        txs = txs.filter(Q(lot__added_by=entity) | Q(carbure_vendor=entity), lot__parent_lot=None)
+        txs = txs.filter(Q(lot__added_by=entity) | Q(carbure_vendor=entity))
 
         # filter by status
         if status == 'draft':
-            txs = txs.filter(lot__status='Draft')
+            txs = txs.filter(lot__status='Draft', lot__parent_lot=None)
         elif status == 'validated':
             txs = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA'])
         elif status == 'tofix':

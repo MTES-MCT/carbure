@@ -90,10 +90,10 @@ def get_snapshot(request, *args, **kwargs):
             return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
 
     if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader':
-        txs = LotTransaction.objects.filter(Q(lot__added_by=entity) | Q(carbure_vendor=entity), lot__parent_lot=None)
+        txs = LotTransaction.objects.filter(Q(lot__added_by=entity) | Q(carbure_vendor=entity))
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
         txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-        draft = txs.filter(lot__status='Draft').count()
+        draft = txs.filter(lot__status='Draft', lot__parent_lot=None).count()
         validated = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA']).count()
         tofix = txs.filter(lot__status='Validated', delivery_status__in=['AC', 'R']).count()
         accepted = txs.filter(lot__status='Validated', delivery_status='A').count()
