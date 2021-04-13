@@ -194,7 +194,7 @@ const TransactionDetails = ({
           </AsyncButton>
         )}
 
-        {status === LotStatus.Inbox && (
+        {status === LotStatus.Inbox && transaction?.delivery_status !== "AC" && (
           <React.Fragment>
             <AsyncButton
               icon={Check}
