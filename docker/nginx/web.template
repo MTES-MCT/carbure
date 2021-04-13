@@ -43,7 +43,7 @@ server {
     client_body_buffer_size 128k;
 
     add_header Content-Security-Policy "default-src 'self';";
-    add_header Strict-Transport-Security 'max-age=300; includeSubDomains; preload; always;' 
+    add_header Strict-Transport-Security "max-age=300; includeSubDomains; preload; always;";
     add_header X-XSS-Protection "1; mode=block";
 
     ssl_certificate /etc/letsencrypt/live/${NGINX_SSL_FOLDER}/fullchain.pem;
