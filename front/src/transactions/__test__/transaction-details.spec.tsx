@@ -10,7 +10,7 @@ import { useTransactions } from "../index"
 import TransactionDetails from "../routes/transaction-details"
 
 import server, { setDetails } from "./api"
-import { lotDetails, errorDetails, tofixDetails } from "./data"
+import { lotDetails, errorDetails, sentDetails, tofixDetails } from "./data"
 import { waitWhileLoading } from "common/__test__/helpers"
 import { clickOnCheckboxesAndConfirm } from "./helpers"
 
@@ -347,13 +347,13 @@ test("delete tofix lot from details", async () => {
 })
 
 test("accept inbox lot from details", async () => {
-  setDetails(tofixDetails)
+  setDetails(sentDetails)
 
   render(<TransactionWithRouter entity={operator} />)
 
   await waitWhileLoading()
 
-  await screen.findByText("En correction")
+  await screen.findByText("En attente")
 
   userEvent.click(screen.getByText("Accepter"))
 
@@ -373,13 +373,13 @@ test("accept inbox lot from details", async () => {
 })
 
 test("accept sous reserve inbox lot from details", async () => {
-  setDetails(tofixDetails)
+  setDetails(sentDetails)
 
   render(<TransactionWithRouter entity={operator} />)
 
   await waitWhileLoading()
 
-  const status = await screen.findByText("En correction")
+  const status = await screen.findByText("En attente")
 
   userEvent.click(screen.getByText("Accepter sous réserve"))
 
@@ -390,22 +390,19 @@ test("accept sous reserve inbox lot from details", async () => {
 
   await waitWhileLoading()
 
-  await screen.findByText("Commentaires (2)")
-  screen.getByText("test is incorrect")
-
   userEvent.click(screen.getByText("Retour"))
 
   expect(status).not.toBeInTheDocument()
 })
 
 test("reject inbox lot from details", async () => {
-  setDetails(tofixDetails)
+  setDetails(sentDetails)
 
   render(<TransactionWithRouter entity={operator} />)
 
   await waitWhileLoading()
 
-  await screen.findByText("En correction")
+  await screen.findByText("En attente")
 
   userEvent.click(screen.getByText("Refuser"))
 
