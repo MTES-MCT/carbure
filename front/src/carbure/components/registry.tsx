@@ -54,7 +54,7 @@ const Registry = () => {
   return (
     <Fragment>
       <SettingsHeader>
-        <Title>Annuaire des sociétés</Title>
+        <Title>Annuaire des sociétés enregistrées sur CarbuRe</Title>
       </SettingsHeader>
 
       <SettingsBody>
