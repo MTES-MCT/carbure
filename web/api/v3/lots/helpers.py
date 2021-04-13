@@ -54,7 +54,7 @@ def get_entity_lots_by_status(entity, status):
 
         # filter by status
         if status == 'draft':
-            txs = txs.filter(lot__status='Draft')
+            txs = txs.filter(lot__status='Draft', lot__parent_lot=None)
         elif status == 'validated':
             txs = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA'])
         elif status == 'tofix':

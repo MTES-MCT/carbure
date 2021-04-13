@@ -46,7 +46,7 @@ const TransactionAdd = ({ entity, refresh }: TransactionAddProps) => {
         </AsyncButton>
         <Button
           icon={Return}
-          className={styles.transactionCloseButton}
+          className={styles.transactionNavButtons}
           onClick={close}
         >
           Retour

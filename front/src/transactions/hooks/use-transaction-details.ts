@@ -111,6 +111,7 @@ export default function useTransactionDetails(
     validationErrors,
     status,
     request,
+    transaction: tx,
     change: onChange,
     submit,
     close,

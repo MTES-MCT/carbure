@@ -93,7 +93,7 @@ def get_snapshot(request, *args, **kwargs):
         txs = LotTransaction.objects.filter(Q(lot__added_by=entity) | Q(carbure_vendor=entity))
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
         txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-        draft = txs.filter(lot__status='Draft').count()
+        draft = txs.filter(lot__status='Draft', lot__parent_lot=None).count()
         validated = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA']).count()
         tofix = txs.filter(lot__status='Validated', delivery_status__in=['AC', 'R']).count()
         accepted = txs.filter(lot__status='Validated', delivery_status='A').count()
@@ -504,8 +504,7 @@ def comment_lot(request, *args, **kwargs):
 def accept_all(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
-    lots = LotTransaction.objects.filter(carbure_client=entity, delivery_status__in=[
-        'N', 'AC', 'AA'])
+    lots = LotTransaction.objects.filter(carbure_client=entity, delivery_status__in=['N', 'AC', 'AA'])
     year = request.POST.get('year', False)
     date_from = datetime.date.today().replace(month=1, day=1)
     date_until = datetime.date.today().replace(month=12, day=31)
@@ -555,7 +554,7 @@ def delete_all_drafts(request, *args, **kwargs):
     entity = context['entity']
     deleted = 0
 
-    drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft')
+    drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft', lot__parent_lot=None)
     year = request.POST.get('year', False)
     date_from = datetime.date.today().replace(month=1, day=1)
     date_until = datetime.date.today().replace(month=12, day=31)
@@ -579,7 +578,7 @@ def validate_all_drafts(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
 
-    drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft')
+    drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft', lot__parent_lot=None)
     year = request.POST.get('year', False)
     date_from = datetime.date.today().replace(month=1, day=1)
     date_until = datetime.date.today().replace(month=12, day=31)
