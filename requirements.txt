@@ -101,4 +101,4 @@ wrapt==1.12.1
 XlsxWriter==1.2.8
 yarl==1.4.2
 git+git://github.com/mplanes/django-authtools
-git+git://github.com/Rhumbix/django-request-logging
+

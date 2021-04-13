@@ -70,7 +70,6 @@ MIDDLEWARE = [
     'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'request_logging.middleware.LoggingMiddleware',
 ]
 
 ROOT_URLCONF = 'carbure.urls'
@@ -148,7 +147,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 LOGIN_REDIRECT_URL = 'otp-verify'
 LOGOUT_REDIRECT_URL = 'index'
 SESSION_COOKIE_AGE = 60*60*24*30 # 30 days
-OTP_EMAIL_TOKEN_VALIDITY = 900 # 15 minutes
+OTP_EMAIL_TOKEN_VALIDITY = 1800 # 30 minutes
 
 DEFAULT_FROM_EMAIL = "contact@carbure.beta.gouv.fr"
 if env('IMAGE_TAG') in ['dev', 'staging', 'prod']:
@@ -181,11 +180,8 @@ LOGGING = {
             'class': 'logging.StreamHandler',
         },
     },
-    'loggers': {
-        'django.request': {
-            'handlers': ['console'],
-            'level': 'DEBUG',  # change debug level as appropiate
-            'propagate': False,
-        },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
     },
 }
