@@ -231,3 +231,17 @@ export const tofixDetails = {
   deadline: "2021-01-31",
   comments: [{ entity: operator, comment: "not ok" }],
 }
+
+export const sentDetails = {
+  transaction: {
+    ...lot,
+    delivery_status: "N",
+    lot: {
+      ...lot.lot,
+      status: "Validated",
+    },
+  },
+  errors: {},
+  deadline: "2021-01-31",
+  comments: [],
+}
