@@ -17,6 +17,16 @@ prune_images:
     - docker rm -v ${CONTAINERS}
     - docker image prune -a --force --filter "until=240h"
 
+build_redcert_downloader:
+  stage: build
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - echo "Building redcert downloader"
+    - docker build -t registry.gitlab.com/la-fabrique-numerique/biocarburants/redcert_downloader:latest -f web/fixtures/redcert/Dockerfile .
+    - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/redcert_downloader:latest
+  when: manual
+
 build_django:
   stage: build
   before_script:
@@ -121,3 +131,5 @@ prod:
   when: manual
   only:
     - master
+
+
