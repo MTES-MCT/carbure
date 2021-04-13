@@ -269,7 +269,7 @@ export const OperatorOutsourcedBlendingActions = ({
       icon={Forward}
       onClick={onForward}
     >
-      Forward
+      Transférer
     </Button>
   )
 }
