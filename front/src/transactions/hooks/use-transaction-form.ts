@@ -270,10 +270,8 @@ const initialState: TransactionFormState = {
 // fixed values (only for drafts)
 function fixedValues(
   tx: TransactionFormState,
-  entity: EntitySelection
+  entity: Entity
 ): TransactionFormState {
-  if (entity === null) return tx
-
   // for producers
   if (entity.entity_type === EntityType.Producer) {
     tx.carbure_producer = entity
