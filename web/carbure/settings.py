@@ -70,6 +70,7 @@ MIDDLEWARE = [
     'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'request_logging.middleware.LoggingMiddleware',
 ]
 
 ROOT_URLCONF = 'carbure.urls'
@@ -180,8 +181,11 @@ LOGGING = {
             'class': 'logging.StreamHandler',
         },
     },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',  # change debug level as appropiate
+            'propagate': False,
+        },
     },
 }
