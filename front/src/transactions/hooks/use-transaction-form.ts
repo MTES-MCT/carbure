@@ -1,3 +1,4 @@
+import { useCallback } from "react"
 import format from "date-fns/format"
 
 import {
@@ -8,6 +9,7 @@ import {
   Transaction,
   MatierePremiere,
   ProductionSiteDetails,
+  EntityType,
 } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import useForm, { FormHook } from "common/hooks/use-form"
@@ -20,6 +22,7 @@ export interface TransactionFormState {
   champ_libre: string
   delivery_date: string
   mac: boolean
+  status: string
 
   eec: number
   el: number
@@ -70,6 +73,7 @@ export interface TransactionFormState {
 export function toTransactionFormState(tx: Transaction): TransactionFormState {
   return {
     id: tx.id,
+    status: tx.lot.status,
     carbure_id: tx.lot.carbure_id,
     dae: tx.dae,
     volume: tx.lot.volume,
@@ -214,6 +218,7 @@ const initialState: TransactionFormState = {
   delivery_date: "",
   mac: false,
   pays_origine: null,
+  status: "Draft",
 
   eec: 0,
   el: 0,
@@ -262,95 +267,63 @@ const initialState: TransactionFormState = {
   added_by: null,
 }
 
-function producerSettings(
-  entity: EntitySelection,
+// fixed values (only for drafts)
+function fixedValues(
   tx: TransactionFormState,
-  patch: (p: any, silent?: boolean) => void
-) {
-  const isProducer = tx.carbure_producer?.id === entity?.id
+  entity: Entity
+): TransactionFormState {
+  // for producers
+  if (entity.entity_type === EntityType.Producer) {
+    tx.carbure_producer = entity
+    tx.carbure_vendor = entity
 
-  // checking "producer is in carbure" forces producer field to be current entity
-  if (tx.producer_is_in_carbure && !isProducer) {
-    patch({ carbure_producer: entity }, true)
-  }
-}
-
-function operatorSettings(
-  entity: EntitySelection,
-  tx: TransactionFormState,
-  patch: (p: any, s?: boolean) => void
-) {
-  const isMAC = entity?.has_mac && tx.mac
-  const isClient = tx.carbure_client?.id === entity?.id
-
-  // for operators, force client field to be current entity and "producer is in carbure" to be unchecked
-  if (!isMAC && (!tx.client_is_in_carbure || !isClient)) {
-    patch({ client_is_in_carbure: true, carbure_client: entity }, true)
+    // no trading => producer can only be entity
+    if (!entity.has_trading) {
+      tx.producer_is_in_carbure = true
+    }
   }
 
-  if (tx.producer_is_in_carbure && !tx.carbure_producer) {
-    patch({ producer_is_in_carbure: false }, true)
-  }
-}
+  // for operators
+  if (entity.entity_type === EntityType.Operator) {
+    tx.client_is_in_carbure = true
+    tx.carbure_client = entity
 
-function traderSettings(
-  entity: EntitySelection,
-  tx: TransactionFormState,
-  patch: (p: any, s?: boolean) => void
-) {
-  // for traders, force "producer is in carbure" to be unchecked
-  if (tx.producer_is_in_carbure && !tx.carbure_producer) {
-    patch({ producer_is_in_carbure: false }, true)
+    // no mac => client can only be entity
+    if (!entity.has_mac) {
+      tx.client_is_in_carbure = true
+    }
   }
+
+  // for traders
+  if (entity.entity_type === EntityType.Trader) {
+    tx.producer_is_in_carbure = false
+    tx.carbure_vendor = entity
+  }
+
+  // if transaction is mac
+  if (tx.mac) {
+    tx.client_is_in_carbure = false
+    tx.delivery_site_is_in_carbure = false
+  }
+
+  // update GES summary
+  tx.ghg_total = tx.eec + tx.el + tx.ep + tx.etd + tx.eu - tx.esca - tx.eccs - tx.eccr - tx.eee // prettier-ignore
+  tx.ghg_reduction = (1.0 - tx.ghg_total / tx.ghg_reference) * 100.0
+
+  return tx
 }
 
 export default function useTransactionForm(
   entity: EntitySelection,
   isStock: boolean = false
 ): FormHook<TransactionFormState> {
-  const form = useForm<TransactionFormState>(initialState) // prettier-ignore
-  const { data, patch } = form
+  const onChange = useCallback(
+    (state: TransactionFormState) => {
+      if (isStock || entity === null || state.status !== "Draft") return state
+      else return fixedValues(state, entity)
+    },
+    [isStock, entity]
+  )
 
-  const isProducer = entity?.entity_type === "Producteur"
-  const isOperator = entity?.entity_type === "Opérateur"
-  const isTrader = entity?.entity_type === "Trader"
-  const isMAC = entity?.has_mac && data.mac
-
-  const ghg_total = data.eec + data.el + data.ep + data.etd + data.eu - data.esca - data.eccs - data.eccr - data.eee // prettier-ignore
-
-  // ignore float imprecision by just checking if the difference is of at least 0.001
-  if (Math.abs(form.data.ghg_total - ghg_total) > 1e-3) {
-    const ghg_reduction = (1.0 - ghg_total / data.ghg_reference) * 100.0
-    patch({ ghg_total, ghg_reduction })
-  }
-
-  if (!isStock) {
-    if (
-      isMAC &&
-      (data.client_is_in_carbure || data.delivery_site_is_in_carbure)
-    ) {
-      const p = {
-        client_is_in_carbure: false,
-        delivery_site_is_in_carbure: false,
-        unknown_delivery_site: "",
-        unknown_delivery_site_country: null,
-      }
-
-      patch(p, true)
-    }
-
-    if (isProducer) {
-      producerSettings(entity, data, patch)
-    }
-
-    if (isOperator) {
-      operatorSettings(entity, data, patch)
-    }
-
-    if (isTrader) {
-      traderSettings(entity, data, patch)
-    }
-  }
-
-  return form
+  return useForm<TransactionFormState>(initialState, { onChange })
 }

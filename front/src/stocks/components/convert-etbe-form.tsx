@@ -48,6 +48,48 @@ function getVolumeAttributions(stocks: Transaction[], volume: number) {
   return attributions
 }
 
+function computeRelativeVolumes(volumes: ConvertETBE, vEthanolInStock: number) {
+  /*
+    ratio_pci_eth_in_etbe = 0.37
+    pci_etbe = 27
+    pci_ethanol = 21
+
+    vol_eth_en_stock = stocks.total
+    vol_etbe_a_produire = formulaire.volume_etbe
+    vol_denaturant_dans_stocks = formulaire.volume_denaturant
+
+    vol_eth_pour_etbe = (vol_etbe_a_produire * ratio_pci_eth_in_etbe * pci_etbe) / pci_ethanol
+    vol_denaturant_pour_etbe = vol_denaturant_dans_stocks * (vol_eth_pour_etbe / vol_eth_en_stock)
+
+    vol_eth_a_deduire = vol_eth_pour_etbe - vol_denaturant_pour_etbe
+    vol_fossile_pour_etbe = vol_etbe_a_produire - vol_eth_pour_etbe
+
+    formulaire.volume_eth = vol_eth_a_deduire
+    formulaire.volume_fossile = vol_fossile_pour_etbe
+
+    et dispatcher vol_eth_a_deduire sur les stocks disponibles
+  */
+
+  const vETBE = volumes.volume_etbe
+  const vDenaturantInStock = volumes.volume_denaturant
+  const vEthanolForETBE = (vETBE * ETHANOL_PCI_RATIO_IN_ETBE * PCI_ETBE) / PCI_ETHANOL // prettier-ignore
+  const vEthanolFromStock = vEthanolForETBE - (vEthanolForETBE * (vDenaturantInStock / vEthanolInStock)) // prettier-ignore
+  const vFossile = vETBE - vEthanolForETBE
+
+  volumes.volume_ethanol = vEthanolFromStock || 0
+  volumes.volume_fossile = vFossile || 0
+
+  return volumes
+}
+
+const initialState: ConvertETBE = {
+  volume_etbe: 0,
+  volume_ethanol: 0,
+  volume_pertes: 0,
+  volume_denaturant: 0,
+  volume_fossile: 0,
+}
+
 type ConvertETBEPromptProps = PromptProps<ConvertETBE[]> & {
   entityID: number
 }
@@ -57,15 +99,6 @@ export const ConvertETBEComplexPrompt = ({
   onResolve,
 }: ConvertETBEPromptProps) => {
   const [depot, setDepot] = useState<string | null>(null)
-
-  const { data, hasChange, onChange, patch } = useForm<ConvertETBE>({
-    volume_etbe: 0,
-    volume_ethanol: 0,
-    volume_pertes: 0,
-    volume_denaturant: 0,
-    volume_fossile: 0,
-  })
-
   const [conversions, setConversions] = useState<{ [key: string]: number }>({}) // prettier-ignore
 
   const [depots, getDepots] = useAPI(api.getDepots)
@@ -73,6 +106,16 @@ export const ConvertETBEComplexPrompt = ({
 
   const lots = stocks.data?.lots ?? []
   const vEthanolInStock = lots.reduce((t, tx) => t + tx.lot.volume, 0)
+
+  const { data, hasChange, onChange } = useForm<ConvertETBE>(initialState, {
+    onChange: (state) => {
+      const nextState = computeRelativeVolumes(state, vEthanolInStock)
+      const attributions = getVolumeAttributions(stocks.data?.lots ?? [], nextState.volume_ethanol) // prettier-ignore
+
+      setConversions(attributions)
+      return nextState
+    },
+  })
 
   useEffect(() => {
     getDepots(entityID, "ETH")
@@ -88,48 +131,8 @@ export const ConvertETBEComplexPrompt = ({
     }
   }, [depot, getStocks])
 
-  useEffect(() => {
-    /*
-        ratio_pci_eth_in_etbe = 0.37
-        pci_etbe = 27
-        pci_ethanol = 21
-
-        vol_eth_en_stock = stocks.total
-        vol_etbe_a_produire = formulaire.volume_etbe
-        vol_denaturant_dans_stocks = formulaire.volume_denaturant
-
-        vol_eth_pour_etbe = (vol_etbe_a_produire * ratio_pci_eth_in_etbe * pci_etbe) / pci_ethanol
-        vol_denaturant_pour_etbe = vol_denaturant_dans_stocks * (vol_eth_pour_etbe / vol_eth_en_stock)
-
-        vol_eth_a_deduire = vol_eth_pour_etbe - vol_denaturant_pour_etbe
-        vol_fossile_pour_etbe = vol_etbe_a_produire - vol_eth_pour_etbe
-
-        formulaire.volume_eth = vol_eth_a_deduire
-        formulaire.volume_fossile = vol_fossile_pour_etbe
-
-        et dispatcher vol_eth_a_deduire sur les stocks disponibles
-      */
-
-    const vETBE = data.volume_etbe
-    const vDenaturantInStock = data.volume_denaturant
-    const vEthanolForETBE = (vETBE * ETHANOL_PCI_RATIO_IN_ETBE * PCI_ETBE) / PCI_ETHANOL // prettier-ignore
-    const vEthanolFromStock = vEthanolForETBE - (vEthanolForETBE * (vDenaturantInStock / vEthanolInStock)) // prettier-ignore
-    const vFossile = vETBE - vEthanolForETBE
-
-    patch({
-      volume_ethanol: vEthanolFromStock || 0,
-      volume_fossile: vFossile || 0,
-    })
-  }, [patch, data.volume_etbe, data.volume_denaturant, vEthanolInStock])
-
-  useEffect(() => {
-    const attributions = getVolumeAttributions(
-      stocks.data?.lots ?? [],
-      data.volume_ethanol
-    )
-
-    setConversions(attributions)
-  }, [stocks.data?.lots, data.volume_ethanol, data.volume_denaturant])
+  const volumeDiff = compareVolumes(data.volume_ethanol, conversions)
+  const canSave = hasChange && volumeDiff === 0
 
   const convertedVolume: Column<Transaction> = {
     header: "Volume à convertir",
@@ -140,16 +143,12 @@ export const ConvertETBEComplexPrompt = ({
         onChange={(e) =>
           setConversions({
             ...conversions,
-            [tx.id]: parseInt(e.target.value, 10),
+            [tx.id]: parseFloat(e.target.value),
           })
         }
       />
     ),
   }
-
-  const volumeDiff = compareVolumes(data.volume_ethanol, conversions)
-
-  const canSave = hasChange && volumeDiff === 0
 
   const columns = [
     C.padding,
@@ -215,9 +214,7 @@ export const ConvertETBEComplexPrompt = ({
             <LabelInput
               readOnly
               type="number"
-              label={`Volume d'Éthanol à convertir (${vEthanolInStock.toFixed(
-                2
-              )} litres disponibles)`}
+              label={`Volume d'Éthanol à convertir (${vEthanolInStock.toFixed(2)} litres disponibles)`} // prettier-ignore
               name="volume_ethanol"
               value={data.volume_ethanol.toFixed(2)}
             />
