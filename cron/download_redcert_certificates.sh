@@ -1,11 +1,13 @@
 #!/bin/bash
 
-python3 /app/web/fixtures/fetch_redcert_certificates.py
+# IMPORTANT NOTE: this script is NOT run in carbure_app docker (unlike ISCC and 2BS certificate fetchers)
+
+docker cp carbure_app:/app/web/fixtures/redcert/cron.sh /tmp
+bash /tmp/cron.sh # pulls docker image, then fetches certificates, and pushes certificates to carbure_app:/app/web/fixtures/csv/
 
 if [ "$IMAGE_TAG" = "prod" ]; then
-    python3 /app/web/fixtures/load_redcert_certificates.py --email
+    docker exec carbure_app python3 /app/web/fixtures/load_redcert_certificates.py --email
 else
-    python3 /app/web/fixtures/load_redcert_certificates.py --email --test
+    docker exec carbure_app python3 /app/web/fixtures/load_redcert_certificates.py --email --test
 fi    
-
 
