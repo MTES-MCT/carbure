@@ -61,6 +61,7 @@ const TransactionDetails = ({
     status,
     fieldErrors,
     validationErrors,
+    transaction,
     change,
     submit,
     close,
@@ -203,14 +204,18 @@ const TransactionDetails = ({
             >
               Accepter
             </AsyncButton>
-            <AsyncButton
-              icon={AlertTriangle}
-              level="warning"
-              loading={acceptor.loading}
-              onClick={() => run(acceptor.acceptAndCommentLot)}
-            >
-              Accepter sous réserve
-            </AsyncButton>
+
+            {!transaction?.lot.parent_lot && (
+              <AsyncButton
+                icon={AlertTriangle}
+                level="warning"
+                loading={acceptor.loading}
+                onClick={() => run(acceptor.acceptAndCommentLot)}
+              >
+                Accepter sous réserve
+              </AsyncButton>
+            )}
+
             <AsyncButton
               icon={Cross}
               level="danger"
