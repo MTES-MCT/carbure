@@ -125,10 +125,9 @@ const Topbar = ({ entity, settings }: TopbarProps) => (
       href="https://carbure-1.gitbook.io/faq/"
       target="_blank"
       rel="noreferrer"
-      title="FAQ"
       className={styles.faq}
     >
-      <Question />
+      <Question title="Guide d'utilisation" />
     </a>
   </header>
 )
