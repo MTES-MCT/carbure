@@ -11,7 +11,7 @@ import Select from "common/components/select"
 import { Alert } from "common/components/alert"
 
 import styles from "./list-snapshot.module.css"
-import { Rapport } from "common/components/icons"
+import { Certificate } from "common/components/icons"
 import { LotDeclarator } from "transactions/hooks/actions/use-declare-lots"
 
 const STATUS_ORDER = [
@@ -98,12 +98,12 @@ export const TransactionSnapshot = ({
 
           {declarator && (
             <Button
-              icon={Rapport}
+              icon={Certificate}
               level="primary"
               className={styles.transactionDeclaration}
               onClick={declarator.confirmDeclaration}
             >
-              Voir ma déclaration
+              Valider ma déclaration
             </Button>
           )}
         </div>
