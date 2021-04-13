@@ -182,7 +182,7 @@ const StockDetails = ({
 
         <Button
           icon={Return}
-          className={styles.transactionCloseButton}
+          className={styles.transactionNavButtons}
           onClick={close}
         >
           Retour
