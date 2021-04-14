@@ -157,8 +157,9 @@ def otp_verify(request):
                 is_allowed, _ = device.verify_is_allowed()
                 now = timezone.now()
                 if now > device.valid_until:
-                    form.add_error('otp_token', "Code Expiré. Un nouveau code vient d'être envoyé")
                     send_new_token(request)
+                    dt = device.valid_until.astimezone(pytz.timezone('Europe/Paris'))
+                    form.add_error('otp_token', "Code Expiré. Un nouveau code vient d'être envoyé. Il sera valide jusqu'à %s %s" % (dt.strftime('%H:%M'), dt.tzname()))
                 elif device.token != form.clean_otp_token():
                     dt = device.valid_until.astimezone(pytz.timezone('Europe/Paris'))
                     form.add_error('otp_token', "Code Invalide. Le dernier code envoyé est valide jusqu'à %s %s" % (dt.strftime('%H:%M'), dt.tzname()))
