@@ -182,7 +182,6 @@ def otp_verify(request):
         form = OTPForm(request.user)
         context['code_expiry'] = dt
     context['form'] = form
-    context['validity'] = django_otp.plugins.otp_email.conf.settings.OTP_EMAIL_TOKEN_VALIDITY
     return render(request, 'accounts/otp_verify.html', context=context)
 
 
