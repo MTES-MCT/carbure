@@ -17,6 +17,7 @@ from django.conf import settings
 from django.utils import timezone
 
 # plugins
+import django_otp
 from django_otp.plugins.otp_email.models import EmailDevice
 from django_otp import user_has_device, devices_for_user
 from django_otp import login as login_with_device
@@ -116,7 +117,7 @@ def send_new_token(request):
     # if current token is expired, generate a new one
     now = timezone.now()
     if now > device.valid_until:
-        device.generate_token()
+        device.generate_token(valid_secs=settings.OTP_EMAIL_TOKEN_VALIDITY)
     email_subject = 'Carbure - Code de Sécurité'
     email_context = {
         'user': request.user,
@@ -136,6 +137,7 @@ def send_new_token(request):
 
 @login_required
 def otp_verify(request):
+    context = {}
     # for old users that did not register when 2fa was introduced
     if not user_has_device(request.user):
         email_otp = EmailDevice()
@@ -175,8 +177,13 @@ def otp_verify(request):
     else:
         # send token by email and display form
         send_new_token(request)
+        device = EmailDevice.objects.get(user=request.user)
+        dt = device.valid_until.astimezone(pytz.timezone('Europe/Paris'))
         form = OTPForm(request.user)
-    return render(request, 'accounts/otp_verify.html', {'form': form})
+        context['code_expiry'] = dt
+    context['form'] = form
+    context['validity'] = django_otp.plugins.otp_email.conf.settings.OTP_EMAIL_TOKEN_VALIDITY
+    return render(request, 'accounts/otp_verify.html', context=context)
 
 
 def resend_activation_link(request):
