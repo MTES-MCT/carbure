@@ -48,7 +48,7 @@ export default function useForm<T extends FormState>(
 ): FormHook<T> {
   const hasChange = useRef(false)
   const [data, setState] = useState<T>(() =>
-    transform(options?.onChange, initialState)
+    transform(options?.onChange, { ...initialState })
   )
 
   const reset = useCallback(
