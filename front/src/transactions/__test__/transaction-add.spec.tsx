@@ -40,27 +40,24 @@ test("display the transaction form", async () => {
   screen.getByText("Créer une nouvelle transaction")
   screen.getByText("Brouillon")
 
-  screen.getByLabelText("Il s'agit d'une mise à consommation ?")
+  screen.getByText("Il s'agit d'une mise à consommation ?")
   screen.getByLabelText("Numéro douanier (DAE, DAA...) *")
   screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°) *")
   screen.getByLabelText("Biocarburant *")
   screen.getByLabelText("Matiere premiere *")
-  screen.getByLabelText("Pays d'origine *")
+  screen.getByLabelText("Pays d'origine de la matière première *")
   screen.getByLabelText("Date de livraison")
 
-  screen.getByLabelText("Producteur enregistré sur Carbure ?")
   screen.getByLabelText("Producteur")
   screen.getByLabelText("Site de production")
   screen.getByLabelText("Pays de production")
-  screen.getByLabelText("Date de mise en service")
+  screen.getByLabelText("Date de mise en service *")
   screen.getByLabelText("N° d'enregistrement double-compte")
   screen.getByLabelText("Certificat du site de production")
 
-  screen.getByLabelText("Client enregistré sur Carbure ?")
   screen.getByLabelText("Client")
-  screen.getByLabelText("Site de livraison enregistré sur Carbure ?")
   screen.getByLabelText("Site de livraison *")
-  screen.getByLabelText("Pays de livraison")
+  screen.getByLabelText("Pays de livraison *")
   screen.getByLabelText("Champ libre")
 
   screen.getByText("Émissions")
@@ -103,11 +100,15 @@ test("check the form fields", async () => {
   userEvent.type(screen.getByLabelText("Matiere premiere *"), "Co")
   userEvent.click(await screen.findByText("Colza"))
 
-  userEvent.type(screen.getByLabelText("Pays d'origine *"), "France")
+  userEvent.type(
+    screen.getByLabelText("Pays d'origine de la matière première *"),
+    "France"
+  )
 
   userEvent.type(screen.getByLabelText("Date de livraison"), "2020-31-12")
 
-  screen.getByDisplayValue("Producteur Test")
+  userEvent.type(screen.getByLabelText("Producteur"), "Pr")
+  userEvent.click(await screen.findByText("Producteur Test"))
 
   userEvent.type(screen.getByLabelText("Site de production"), "Test") // prettier-ignore
   userEvent.click(await screen.findByText("Test Production Site"))

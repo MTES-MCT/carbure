@@ -67,6 +67,7 @@ test("display transaction details", async () => {
   screen.getByDisplayValue("EMHV")
   screen.getByDisplayValue("Colza")
   screen.getByDisplayValue("2020-01-31")
+  screen.getByDisplayValue("Producteur Test")
   screen.getByDisplayValue("Test Production Site")
   screen.getByDisplayValue("2000-01-31")
   screen.getByDisplayValue("Opérateur Test")
@@ -76,11 +77,9 @@ test("display transaction details", async () => {
   screen.getByDisplayValue("11.00 gCO2eq/MJ")
   screen.getByDisplayValue("86.87%")
 
-  const prod = screen.getAllByDisplayValue("Producteur Test")
   const countries = screen.getAllByDisplayValue("France")
   const zeros = screen.getAllByDisplayValue("0")
 
-  expect(prod).toHaveLength(2)
   expect(countries.length).toBe(3)
   expect(zeros.length).toBe(7)
 
@@ -119,7 +118,7 @@ test("edit transaction details", async () => {
   userEvent.type(mp, "Co")
   userEvent.click(await screen.findByText("Colza"))
 
-  const ct = screen.getByLabelText("Pays d'origine *")
+  const ct = screen.getByLabelText("Pays d'origine de la matière première *")
   userEvent.clear(ct)
   userEvent.type(ct, "France")
 
@@ -127,7 +126,7 @@ test("edit transaction details", async () => {
   userEvent.clear(dd)
   userEvent.type(dd, "2021-31-01")
 
-  expect(screen.getAllByDisplayValue("Producteur Test")).toHaveLength(2)
+  const prod = screen.getByDisplayValue("Producteur Test")
 
   const ps = screen.getByLabelText("Site de production")
   userEvent.clear(ps)
