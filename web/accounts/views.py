@@ -185,6 +185,21 @@ def otp_verify(request):
     return render(request, 'accounts/otp_verify.html', context=context)
 
 
+@login_required
+def resend_otp_code(request):
+    context = {}
+
+    # send token by email and display form
+    send_new_token(request)
+    device = EmailDevice.objects.get(user=request.user)
+    dt = device.valid_until.astimezone(pytz.timezone('Europe/Paris'))
+    form = OTPForm(request.user)
+    context['code_expiry'] = dt
+    context['msg'] = "Code renvoyé"
+    context['form'] = form
+    return render(request, 'accounts/otp_verify.html', context=context)
+
+
 def resend_activation_link(request):
     if request.method == 'POST':
         form = UserResendActivationLinkForm(request.POST)
