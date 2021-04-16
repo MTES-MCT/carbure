@@ -10,6 +10,9 @@ from django.utils.crypto import get_random_string
 from django.db.models import Count
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedOnlyDropdownFilter, ChoiceDropdownFilter
+from django.utils.translation import gettext_lazy as _
+
 
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
@@ -108,12 +111,25 @@ class LotV2Admin(admin.ModelAdmin):
     delete_orphans.short_description = "Supprimer Lots Orphelins"
 
 
+class NameSortedRelatedOnlyDropdownFilter(RelatedOnlyDropdownFilter):
+    template = 'django_admin_listfilter_dropdown/dropdown_filter.html'
+
+    def choices(self, changelist):
+        data = list(super(RelatedOnlyDropdownFilter, self).choices(changelist))
+        # all elements except select-all
+        tosort = [x for x in data if x['display'] != _('All')]
+        sortedlist = sorted(tosort, key=lambda x: x['display'])
+        selectall = data[0]
+        sortedlist.insert(0, selectall)
+        return sortedlist
+
 
 
 class TransactionAdmin(admin.ModelAdmin):
     list_display = ('get_lot_mp', 'get_lot_bc', 'get_lot_volume', 'get_lot_supplier', 'carbure_vendor', 'get_production_site', 'carbure_client', 'dae', 'carbure_delivery_site', 'delivery_date', 'delivery_status', 'unknown_client', 'carbure_vendor_certificate', 'get_lot_unknown_vendor_certificate')
     search_fields = ('lot__id', 'dae', 'champ_libre')
-    list_filter = ('lot__status', 'delivery_status', 'lot__period', 'client_is_in_carbure', 'carbure_vendor', 'carbure_client',  'is_mac', 'is_batch', 'delivery_site_is_in_carbure')
+    list_filter = ('lot__status', 'delivery_status', ('lot__period', DropdownFilter), 'client_is_in_carbure', ('carbure_vendor', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
+                   'is_mac', 'is_batch', 'delivery_site_is_in_carbure', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter), ('lot__carbure_production_site', NameSortedRelatedOnlyDropdownFilter))
     raw_id_fields = ('lot',)
     actions = ['rerun_sanity_checks', 'delete_ghosts', 'change_transaction_delivery_site', 'change_transaction_client', 'delete_errors', 'assign_transaction_certificate']
 

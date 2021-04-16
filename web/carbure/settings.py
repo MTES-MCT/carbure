@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_otp',
     'django_otp.plugins.otp_email',
+    'django_admin_listfilter_dropdown',
     'authtools',
     'core',
     'accounts',
