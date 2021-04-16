@@ -8,20 +8,26 @@ import { Input, InputProps, Label, LabelProps } from "./input"
 import { DropdownItem, DropdownOptions, useDropdown } from "./dropdown"
 import { Cross } from "./icons"
 
+const rawGetLabel = (v: any) => `${v}`
+const rawGetValue = (v: any) => `${v}`
+
 function useAutoComplete<T>(
-  value: T | null,
+  value: T | string | null,
   name: string,
   queryArgs: any[],
   minLength: number,
   target: Element | null,
   loose: boolean,
+  search: boolean,
   onChange: (e: any) => void,
   getLabel: (option: T) => string,
   getQuery: (q: string, ...a: any[]) => Promise<T[]>
 ) {
   const dd = useDropdown(target)
 
-  const [query, setQuery] = useState(value ? getLabel(value) : "")
+  // prettier-ignore
+  const label = value === null ? "" : typeof value === "string" ? value : getLabel(value)
+  const [query, setQuery] = useState(label)
   const [suggestions, resolveQuery] = useAPI(getQuery)
 
   // on change, modify the query to match selection and send event to parent
@@ -41,51 +47,49 @@ function useAutoComplete<T>(
       onChange({ target: { name, value: null } })
     }
 
-    if (loose) {
-      onChange({ target: { name, value: query } })
-    }
-
     if (query.length < minLength) {
       dd.toggle(false)
-    } else {
+    } else if (search) {
       dd.toggle(true)
 
-      const results = await resolveQuery(query, ...queryArgs)
+      const results = (await resolveQuery(query, ...queryArgs)) ?? []
 
       // check if the typed value matches a result from the api
       // if so, trigger the onChange callback
-      if (results && results.length > 0 && query.length > 0) {
-        const compared = query.toLowerCase()
+      const compared = query.toLowerCase()
+      const suggestion = results.find((suggestion) => {
+        return compared === getLabel(suggestion).toLowerCase()
+      })
 
-        const suggestion = results.find((suggestion) => {
-          return compared === getLabel(suggestion).toLowerCase()
-        })
-
-        if (suggestion) {
-          onChange({ target: { name, value: suggestion } })
-        }
+      if (suggestion) {
+        onChange({ target: { name, value: suggestion } })
+      } else if (loose) {
+        onChange({ target: { name, value: query } })
       }
+    } else if (loose) {
+      onChange({ target: { name, value: query } })
     }
   }
 
   // modify input content when passed value is changed
   useEffect(() => {
-    setQuery(value ? getLabel(value) : "")
-  }, [value, getLabel])
+    setQuery(label)
+  }, [label, getLabel])
 
   return { dd, query, suggestions, onQuery, change }
 }
 
-type AutoCompleteProps<T> = Omit<InputProps, "value"> & {
-  value: T | null
+export type AutoCompleteProps<T> = Omit<InputProps, "value"> & {
+  value: T | string | null
   options?: T[]
   queryArgs?: any[]
   minLength?: number
   loose?: boolean
-  getValue: (option: T) => string
-  getLabel: (option: T) => string
-  onChange: (e: any) => void
-  getQuery: (q: string, ...a: any[]) => Promise<T[]>
+  search?: boolean
+  getValue?: (option: T) => string
+  getLabel?: (option: T) => string
+  onChange?: (e: any) => void
+  getQuery?: (q: string, ...a: any[]) => Promise<T[]>
 }
 
 export function AutoComplete<T>({
@@ -95,10 +99,11 @@ export function AutoComplete<T>({
   readOnly,
   minLength = 1,
   loose = false,
-  onChange,
-  getValue,
-  getLabel,
-  getQuery,
+  search = true,
+  onChange = () => {},
+  getValue = rawGetValue,
+  getLabel = rawGetLabel,
+  getQuery = async () => [],
   ...props
 }: AutoCompleteProps<T>) {
   const target = useRef<HTMLInputElement>(null)
@@ -110,6 +115,7 @@ export function AutoComplete<T>({
     minLength,
     target.current,
     loose,
+    search,
     onChange,
     getLabel,
     getQuery
@@ -131,7 +137,7 @@ export function AutoComplete<T>({
         onBlur={() => dd.toggle(false)}
       />
 
-      {!readOnly && !isEmpty && dd.isOpen && target.current && (
+      {search && !readOnly && !isEmpty && dd.isOpen && target.current && (
         <DropdownOptions
           liveUpdate
           parent={target.current}
@@ -156,6 +162,8 @@ export function AutoComplete<T>({
   )
 }
 
+export type LabelAutoCompleteProps<T> = AutoCompleteProps<T> & LabelProps
+
 export function LabelAutoComplete<T>({
   label,
   error,
@@ -164,7 +172,7 @@ export function LabelAutoComplete<T>({
   disabled,
   readOnly,
   ...props
-}: AutoCompleteProps<T> & LabelProps) {
+}: LabelAutoCompleteProps<T>) {
   return (
     <Label
       label={label}
@@ -191,8 +199,8 @@ export function MultiAutocomplete<T>({
   value,
   name,
   onChange,
-  getLabel,
-  getValue,
+  getValue = rawGetValue,
+  getLabel = rawGetLabel,
   readOnly,
   ...props
 }: MultiAutocompleteProps<T>) {
