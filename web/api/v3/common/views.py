@@ -205,7 +205,12 @@ def get_certificates(request):
     dbs = dbs[0:100]
     red = red[0:100]
     
-    sez = [c.certificate_id for c in iscc]
+    sez = []
+    if entity_id:
+        sncrt = Entity.objects.get(id=entity_id).national_system_certificate
+        if sncrt != '' and sncrt is not None:
+            sez += [crt]
+    sez += [c.certificate_id for c in iscc]
     sez += [c.certificate_id for c in dbs]
     sez += [c.certificate_id for c in red]
 
