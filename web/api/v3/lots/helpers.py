@@ -173,6 +173,7 @@ def filter_lots(txs, querySet):
             Q(unknown_client__icontains=query) |
             Q(carbure_delivery_site__name__icontains=query) |
             Q(unknown_delivery_site__icontains=query) |
+            Q(champ_libre__icontains=query) |
             Q(dae__icontains=query)
         )
 
