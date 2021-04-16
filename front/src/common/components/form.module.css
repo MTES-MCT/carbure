@@ -1,0 +1,14 @@
+.formGroup {
+  flex: 1 0;
+  width: 320px;
+  margin-right: 24px;
+}
+
+.formGroup.narrow {
+  max-width: 96px;
+}
+
+.formGroupTitle {
+  margin-top: 12px;
+  margin-bottom: 16px;
+}
