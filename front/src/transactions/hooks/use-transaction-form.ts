@@ -10,6 +10,7 @@ import {
   MatierePremiere,
   ProductionSiteDetails,
   EntityType,
+  Lot,
 } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import useForm, { FormHook } from "common/hooks/use-form"
@@ -17,12 +18,16 @@ import useForm, { FormHook } from "common/hooks/use-form"
 export interface TransactionFormState {
   id: number
   carbure_id: string
+  status: string
+  delivery_status: string
+  added_by: Entity | null
+  parent_lot: Lot | null
+
   dae: string
   volume: number
   champ_libre: string
   delivery_date: string
   mac: boolean
-  status: string
 
   eec: number
   el: number
@@ -42,40 +47,29 @@ export interface TransactionFormState {
   matiere_premiere: MatierePremiere | null
   pays_origine: Country | null
 
-  producer_is_in_carbure: boolean
-  carbure_producer: Entity | null
-  unknown_producer: string
-
-  production_site_is_in_carbure: boolean
-  carbure_production_site: ProductionSiteDetails | null
-  carbure_production_site_reference: string
-  unknown_production_site: string
-  unknown_production_country: Country | null
-  unknown_production_site_com_date: string
-  unknown_production_site_reference: string
-  unknown_production_site_dbl_counting: string | null
+  producer: Entity | string | null
+  unknown_supplier: string | null
+  unknown_supplier_certificate: string | null
+  production_site: ProductionSiteDetails | string | null
+  production_site_reference: string
+  production_country: Country | null
+  production_site_com_date: string
+  production_site_dbl_counting: string | null
 
   carbure_vendor: Entity | null
   carbure_vendor_certificate: string
-  unknown_supplier: string
-  unknown_supplier_certificate: string
 
-  client_is_in_carbure: boolean
-  carbure_client: Entity | null
-  unknown_client: string
+  client: Entity | string | null
 
-  delivery_site_is_in_carbure: boolean
-  carbure_delivery_site: DeliverySite | null
-  unknown_delivery_site: string
-  unknown_delivery_site_country: Country | null
-
-  added_by: Entity | null
+  delivery_site: DeliverySite | string | null
+  delivery_site_country: Country | null
 }
 
 export function toTransactionFormState(tx: Transaction): TransactionFormState {
   return {
     id: tx.id,
     status: tx.lot.status,
+    delivery_status: tx.delivery_status,
     carbure_id: tx.lot.carbure_id,
     dae: tx.dae,
     volume: tx.lot.volume,
@@ -101,20 +95,29 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
     matiere_premiere: tx.lot.matiere_premiere,
     pays_origine: tx.lot.pays_origine,
 
-    producer_is_in_carbure: tx.lot.producer_is_in_carbure,
-    carbure_producer: tx.lot.carbure_producer,
-    unknown_producer: tx.lot.unknown_producer,
-    unknown_production_country: tx.lot.unknown_production_country,
+    producer: tx.lot.producer_is_in_carbure
+      ? tx.lot.carbure_producer
+      : tx.lot.unknown_producer,
 
-    production_site_is_in_carbure: tx.lot.production_site_is_in_carbure,
-    carbure_production_site: tx.lot.carbure_production_site,
-    carbure_production_site_reference: tx.lot.carbure_production_site_reference,
-    unknown_production_site: tx.lot.unknown_production_site,
-    unknown_production_site_reference: tx.lot.unknown_production_site_reference,
-    unknown_production_site_com_date:
-      tx.lot.unknown_production_site_com_date ?? "",
-    unknown_production_site_dbl_counting:
-      tx.lot.unknown_production_site_dbl_counting,
+    production_country: tx.lot.producer_is_in_carbure
+      ? tx.lot.carbure_production_site?.country ?? null
+      : tx.lot.unknown_production_country,
+
+    production_site: tx.lot.producer_is_in_carbure
+      ? tx.lot.carbure_production_site
+      : tx.lot.unknown_production_site,
+
+    production_site_reference: tx.lot.producer_is_in_carbure
+      ? tx.lot.carbure_production_site_reference
+      : tx.lot.unknown_production_site_reference,
+
+    production_site_com_date: tx.lot.producer_is_in_carbure
+      ? tx.lot.carbure_production_site?.date_mise_en_service ?? ""
+      : tx.lot.unknown_production_site_com_date ?? "",
+
+    production_site_dbl_counting: tx.lot.producer_is_in_carbure
+      ? tx.lot.carbure_production_site?.dc_reference ?? null
+      : tx.lot.unknown_production_site_dbl_counting,
 
     carbure_vendor: tx.carbure_vendor,
     carbure_vendor_certificate: tx.carbure_vendor_certificate,
@@ -122,16 +125,18 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
     unknown_supplier: tx.lot.unknown_supplier ?? "",
     unknown_supplier_certificate: tx.lot.unknown_supplier_certificate,
 
-    client_is_in_carbure: tx.client_is_in_carbure,
-    carbure_client: tx.carbure_client,
-    unknown_client: tx.unknown_client,
+    client: tx.client_is_in_carbure ? tx.carbure_client : tx.unknown_client,
 
-    delivery_site_is_in_carbure: tx.delivery_site_is_in_carbure,
-    carbure_delivery_site: tx.carbure_delivery_site,
-    unknown_delivery_site: tx.unknown_delivery_site,
-    unknown_delivery_site_country: tx.unknown_delivery_site_country,
+    delivery_site: tx.delivery_site_is_in_carbure
+      ? tx.carbure_delivery_site
+      : tx.unknown_delivery_site,
+
+    delivery_site_country: tx.delivery_site_is_in_carbure
+      ? tx.carbure_delivery_site?.country ?? null
+      : tx.unknown_delivery_site_country,
 
     added_by: tx.lot.added_by,
+    parent_lot: tx.lot.parent_lot,
   }
 }
 
@@ -167,41 +172,41 @@ export function toTransactionPostData(tx: TransactionFormState) {
     matiere_premiere_code: tx.matiere_premiere?.code,
     pays_origine_code: tx.pays_origine?.code_pays,
 
-    producer: tx.producer_is_in_carbure
-      ? tx.carbure_producer?.name
-      : tx.unknown_producer,
+    producer: typeof tx.producer === "string" ? tx.producer : tx.producer?.name,
 
-    production_site: tx.production_site_is_in_carbure
-      ? tx.carbure_production_site?.name
-      : tx.unknown_production_site,
+    production_site:
+      typeof tx.production_site === "string"
+        ? tx.production_site
+        : tx.production_site?.name,
 
-    production_site_country: !tx.production_site_is_in_carbure
-      ? tx.unknown_production_country?.code_pays
-      : "",
+    production_site_country:
+      typeof tx.production_site === "string"
+        ? tx.production_country?.code_pays
+        : "",
 
-    production_site_reference: tx.production_site_is_in_carbure
-      ? tx.carbure_production_site_reference
-      : tx.unknown_production_site_reference,
+    production_site_reference: tx.production_site_reference,
 
-    production_site_commissioning_date: !tx.production_site_is_in_carbure
-      ? excelDate(tx.unknown_production_site_com_date)
-      : "",
+    production_site_commissioning_date:
+      typeof tx.production_site === "string"
+        ? excelDate(tx.production_site_com_date)
+        : "",
 
-    double_counting_registration: !tx.production_site_is_in_carbure
-      ? tx.unknown_production_site_dbl_counting
-      : "",
+    double_counting_registration:
+      typeof tx.production_site === "string"
+        ? tx.production_site_dbl_counting
+        : "",
 
-    client: tx.client_is_in_carbure
-      ? tx.carbure_client?.name
-      : tx.unknown_client,
+    client: typeof tx.client === "string" ? tx.client : tx.client?.name,
 
-    delivery_site: tx.delivery_site_is_in_carbure
-      ? tx.carbure_delivery_site?.depot_id
-      : tx.unknown_delivery_site,
+    delivery_site:
+      typeof tx.delivery_site === "string"
+        ? tx.delivery_site
+        : tx.delivery_site?.depot_id,
 
-    delivery_site_country: !tx.delivery_site_is_in_carbure
-      ? tx.unknown_delivery_site_country?.code_pays
-      : "",
+    delivery_site_country:
+      typeof tx.delivery_site === "string"
+        ? tx.delivery_site_country?.code_pays
+        : "",
 
     vendor: tx.carbure_vendor?.name ?? "",
     vendor_certificate: tx.carbure_vendor_certificate,
@@ -215,13 +220,17 @@ export function toTransactionPostData(tx: TransactionFormState) {
 const initialState: TransactionFormState = {
   id: -1,
   carbure_id: "",
+  added_by: null,
+  parent_lot: null,
+  status: "Draft",
+  delivery_status: "N",
+
   dae: "",
   volume: 0,
   champ_libre: "",
   delivery_date: "",
   mac: false,
   pays_origine: null,
-  status: "Draft",
 
   eec: 0,
   el: 0,
@@ -240,18 +249,13 @@ const initialState: TransactionFormState = {
   biocarburant: null,
   matiere_premiere: null,
 
-  producer_is_in_carbure: true,
-  carbure_producer: null,
-  unknown_producer: "",
+  producer: null,
 
-  production_site_is_in_carbure: true,
-  carbure_production_site: null,
-  carbure_production_site_reference: "",
-  unknown_production_site: "",
-  unknown_production_country: null,
-  unknown_production_site_com_date: "",
-  unknown_production_site_reference: "",
-  unknown_production_site_dbl_counting: "",
+  production_site: null,
+  production_site_reference: "",
+  production_country: null,
+  production_site_com_date: "",
+  production_site_dbl_counting: "",
 
   carbure_vendor: null,
   carbure_vendor_certificate: "",
@@ -259,74 +263,65 @@ const initialState: TransactionFormState = {
   unknown_supplier: "",
   unknown_supplier_certificate: "",
 
-  client_is_in_carbure: true,
-  carbure_client: null,
-  unknown_client: "",
+  client: null,
 
-  delivery_site_is_in_carbure: true,
-  carbure_delivery_site: null,
-  unknown_delivery_site: "",
-  unknown_delivery_site_country: null,
-
-  added_by: null,
+  delivery_site: null,
+  delivery_site_country: null,
 }
 
 // fixed values (only for drafts)
 function fixedValues(
   tx: TransactionFormState,
+  prevTx: TransactionFormState | undefined,
   entity: Entity
 ): TransactionFormState {
+  if (entity === null) return tx
+  if (tx.status !== "Draft") return tx
+
   // for producers
   if (entity.entity_type === EntityType.Producer) {
-    tx.carbure_producer = entity
     tx.carbure_vendor = entity
 
-    // no trading => producer can only be entity
     if (!entity.has_trading) {
-      tx.producer_is_in_carbure = true
-      tx.production_site_is_in_carbure = true
+      tx.producer = entity
     }
   }
 
   // for operators
-  if (entity.entity_type === EntityType.Operator) {
-    tx.client_is_in_carbure = true
-    tx.carbure_client = entity
-
-    // no mac => client can only be entity
-    if (!entity.has_mac) {
-      tx.client_is_in_carbure = true
-    }
+  if (entity.entity_type === EntityType.Operator && !tx.mac) {
+    tx.client = entity
   }
 
   // for traders
   if (entity.entity_type === EntityType.Trader) {
-    tx.producer_is_in_carbure = false
-    tx.production_site_is_in_carbure = false
     tx.carbure_vendor = entity
   }
 
-  // if transaction is mac
-  if (tx.mac) {
-    tx.client_is_in_carbure = false
-    tx.delivery_site_is_in_carbure = false
+  if (!prevTx?.mac && tx.mac) {
+    tx.delivery_site = ""
+    tx.delivery_site_country = null
   }
 
   // update GES summary
   tx.ghg_total = tx.eec + tx.el + tx.ep + tx.etd + tx.eu - tx.esca - tx.eccs - tx.eccr - tx.eee // prettier-ignore
   tx.ghg_reduction = (1.0 - tx.ghg_total / tx.ghg_reference) * 100.0
 
+  // REMOVEME
+  // tx.producer_is_in_carbure = false
+
   return tx
 }
+
+export type TransactionFields = Record<string, boolean>
 
 export default function useTransactionForm(
   entity: EntitySelection,
   isStock: boolean = false
 ): FormHook<TransactionFormState> {
   const onChange = useCallback(
-    (state: TransactionFormState) => {
+    (state, prevState) => {
       if (isStock || entity === null || state.status !== "Draft") return state
-      else return fixedValues(state, entity)
+      else return fixedValues(state, prevState, entity)
     },
     [isStock, entity]
   )
