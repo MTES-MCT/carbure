@@ -13,7 +13,9 @@ from producers.models import ProductionSite, ProductionSiteInput, ProductionSite
 from core.decorators import check_rights, otp_or_403
 from core.models import ISCCCertificate, DBSCertificate, REDCertCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate, EntityREDCertTradingCertificate
 from core.models import ProductionSiteCertificate, UserRightsRequests
-
+from api.v3.lots.views import get_entity_lots_by_status
+from core.common import get_prefetched_data
+from api.v3.sanity_checks import bulk_sanity_checks
 
 @otp_or_403
 def get_settings(request):
@@ -266,6 +268,11 @@ def set_production_site_mp(request):
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
                              'extra': str(e)}, status=400)
 
+    # re-run sanity_checks on drafts
+    entity = ps.producer
+    drafts = get_entity_lots_by_status(entity, 'draft')
+    prefetched_data = get_prefetched_data(entity)
+    bulk_sanity_checks(drafts, prefetched_data, background=False)
     return JsonResponse({'status': 'success'})
 
 
@@ -302,7 +309,11 @@ def set_production_site_bc(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
                              'extra': str(e)}, status=400)
-
+    # re-run sanity_checks on drafts
+    entity = ps.producer
+    drafts = get_entity_lots_by_status(entity, 'draft')
+    prefetched_data = get_prefetched_data(entity)
+    bulk_sanity_checks(drafts, prefetched_data, background=False)
     return JsonResponse({'status': 'success'})
 
 
