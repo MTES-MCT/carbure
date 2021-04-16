@@ -31,7 +31,7 @@
   color: initial;
   border: none;
   border: 1px solid transparent;
-  border-top-color: var(--gray-medium);
+  border-top-color: var(--gray-highlight);
   background-color: transparent;
 }
 
@@ -49,6 +49,7 @@
   font-size: 0.93em;
   font-style: italic;
   margin-bottom: 12px;
+  min-height: 66px;
 }
 
 .labelWrapper .labelText {
@@ -56,6 +57,7 @@
   align-items: center;
   margin-left: 4px;
   color: var(--gray-dark);
+  white-space: nowrap;
 }
 
 .labelWrapper .labelText :global(.icon) {
@@ -133,6 +135,6 @@
 }
 
 .inputPlaceholder {
-  height: 66px;
+  height: 91px;
   margin-top: 12px;
 }
