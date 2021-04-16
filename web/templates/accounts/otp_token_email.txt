@@ -4,7 +4,7 @@ Voici votre code de sécurité pour vous connecter à CarbuRe :
 
 {{ token }}
 
-Ce code n'est valable que quelques minutes. Il est à usage unique.
+Ce code est valable jusqu'à {{token_expiry}}. Il est à usage unique.
 
 Bonne journée,
 
