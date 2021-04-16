@@ -27,7 +27,7 @@ export type LabelProps = SystemProps &
   Omit<React.HTMLProps<HTMLLabelElement>, "value" | "onChange"> & {
     error?: string | null
     tooltip?: string
-    label: string
+    label?: string
     required?: boolean
   }
 
@@ -63,7 +63,7 @@ export const Label = ({
 // FORM INPUT COMPONENT
 
 export type LabelInputProps = InputProps & {
-  label: string
+  label?: string
   error?: string
   tooltip?: string
 }
@@ -75,6 +75,7 @@ export const LabelInput = ({
   tooltip,
   className,
   required,
+  style,
   ...props
 }: LabelInputProps) => (
   <Label
@@ -85,15 +86,16 @@ export const LabelInput = ({
     label={label}
     className={className}
     readOnly={props.readOnly}
+    style={style}
   >
     <Input {...props} disabled={disabled} />
   </Label>
 )
 
 // TEXT AREA COMPONENT
-type LabelTextAreaProps = SystemProps &
+export type LabelTextAreaProps = SystemProps &
   React.HTMLProps<HTMLTextAreaElement> & {
-    label: string
+    label?: string
     error?: string
   }
 
@@ -114,22 +116,35 @@ export const LabelTextArea = ({
     />
   </Label>
 )
+
 // LABEL CHECKBOX COMPONENT
+
+type LabelCheckboxProps = Omit<LabelInputProps, "value"> & {
+  value?: boolean
+}
 
 export const LabelCheckbox = ({
   label,
   className,
   disabled,
+  readOnly,
+  value,
+  checked,
   ...props
-}: LabelInputProps) => (
+}: LabelCheckboxProps) => (
   <label
     className={cl(
       styles.labelCheckbox,
-      disabled && styles.disabledLabel,
+      (readOnly || disabled) && styles.disabledLabel,
       className
     )}
   >
-    <input type="checkbox" disabled={disabled} {...props} />
+    <input
+      {...props}
+      type="checkbox"
+      disabled={disabled}
+      checked={checked ?? value}
+    />
     {label}
   </label>
 )
