@@ -12,6 +12,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedOnlyDropdownFilter, ChoiceDropdownFilter
 from django.utils.translation import gettext_lazy as _
+from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 
 
 from authtools.admin import NamedUserAdmin
@@ -131,7 +132,7 @@ class TransactionAdmin(admin.ModelAdmin):
     list_filter = ('lot__status', 'delivery_status', ('lot__period', DropdownFilter), 'client_is_in_carbure', ('carbure_vendor', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
                    'is_mac', 'is_batch', 'delivery_site_is_in_carbure', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter), ('lot__carbure_production_site', NameSortedRelatedOnlyDropdownFilter))
     raw_id_fields = ('lot',)
-    actions = ['rerun_sanity_checks', 'delete_ghosts', 'change_transaction_delivery_site', 'change_transaction_client', 'delete_errors', 'assign_transaction_certificate']
+    actions = ['rerun_sanity_checks', 'delete_ghosts', 'change_transaction_delivery_site', 'change_transaction_client', 'delete_errors', 'assign_transaction_certificate', 'change_transaction_delivery_status']
 
 
     def get_lot_mp(self, obj):
@@ -224,7 +225,7 @@ class TransactionAdmin(admin.ModelAdmin):
                 self.message_user(request, "Successfully assigned certificate to %d." % (count))
                 return HttpResponseRedirect(request.get_full_path())
         if not form:
-            form = self.AssignSupplierCertificateTransactionForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+            form = self.AssignSupplierCertificateTransactionForm(initial={'_selected_action': request.POST.getlist(ACTION_CHECKBOX_NAME)})
         return render(request, 'admin/assign_supplier_certificate_to_transaction.html', {'transactions': queryset, 'change_certificate_form': form})
     assign_transaction_certificate.short_description = "Ajouter Certificat du Fournisseur"
 
@@ -251,7 +252,7 @@ class TransactionAdmin(admin.ModelAdmin):
                 self.message_user(request, "Successfully reassigned %d transactions to %s." % (count, new_client))
                 return HttpResponseRedirect(request.get_full_path())
         if not form:
-            form = self.ChangeTransactionClientForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+            form = self.ChangeTransactionClientForm(initial={'_selected_action': request.POST.getlist(ACTION_CHECKBOX_NAME)})
         return render(request, 'admin/change_transaction_client.html', {'transactions': queryset, 'change_client_form': form})
     change_transaction_client.short_description = "Changer le client"
 
@@ -276,9 +277,28 @@ class TransactionAdmin(admin.ModelAdmin):
                 self.message_user(request, "Successfully reassigned %d transactions to %s." % (count, new_delivery_site))
                 return HttpResponseRedirect(request.get_full_path())
         if not form:
-            form = self.ChangeTransactionDeliverySiteForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
+            form = self.ChangeTransactionDeliverySiteForm(initial={'_selected_action': request.POST.getlist(ACTION_CHECKBOX_NAME)})
         return render(request, 'admin/change_transaction_delivery_site.html', {'transactions': queryset, 'change_delivery_site_form': form})
     change_transaction_delivery_site.short_description = "Changer le site de livraison"
+
+
+    class ChangeTransactionStatusForm(forms.Form):
+        _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)
+        new_status = forms.ChoiceField(choices=LotTransaction.DELIVERY_STATUS)
+
+    def change_transaction_delivery_status(self, request, queryset):
+        form = None
+        if 'apply' in request.POST:
+            form = self.ChangeTransactionStatusForm(request.POST)
+            if form.is_valid():
+                new_status = form.cleaned_data['new_status']
+                count = queryset.update(delivery_status=new_status)
+                self.message_user(request, "Successfully updated %d transactions to %s." % (count, new_status))
+                return HttpResponseRedirect(request.get_full_path())
+        if not form:
+            form = self.ChangeTransactionStatusForm(initial={'_selected_action': request.POST.getlist(ACTION_CHECKBOX_NAME)})
+        return render(request, 'admin/change_transaction_delivery_status.html', {'transactions': queryset, 'change_delivery_status_form': form})
+    change_transaction_delivery_status.short_description = "Changer le statut de la livraison"
 
 class TransactionErrorAdmin(admin.ModelAdmin):
     list_display = ('tx', 'field', 'error', 'value')
