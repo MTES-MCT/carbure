@@ -165,7 +165,7 @@ export interface Lot {
   unknown_production_site_dbl_counting: string | null
   unknown_production_site_reference: string
 
-  parent_lot: null // @TODO
+  parent_lot: Lot | null
   fused_with: null // @TODO
 }
 
