@@ -22,7 +22,7 @@ function getStatusText(
   const isClient = tx.carbure_client?.id === entity?.id
 
   if (tx.is_forwarded) {
-    return 'Transféré'
+    return "Transféré"
   }
 
   switch (tx.delivery_status) {
@@ -119,11 +119,11 @@ export const StatusTitle = ({
         </span>
       )}
 
-      {!editable && (
+      {/* {!editable && (
         <span className={styles.transactionEditable}>
           (Ce lot ne peut pas être modifié)
         </span>
-      )}
+      )} */}
     </Box>
   )
 }
