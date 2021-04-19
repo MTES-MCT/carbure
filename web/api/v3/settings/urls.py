@@ -44,6 +44,15 @@ urlpatterns = [
      path('delete-redcert-certificate', views.delete_redcert_certificate, name='api-v3-settings-delete-redcert-certificate'),
      path('update-redcert-certificate', views.update_redcert_certificate, name='api-v3-settings-update-redcert-certificate'),
 
+
+     # SN / Systeme National
+     path('get-sn-certificates', views.get_sn_certificates, name='api-v3-settings-get-sn-certificates'),
+     path('add-sn-certificate', views.add_sn_certificate, name='api-v3-settings-add-sn-certificate'),
+     path('delete-sn-certificate', views.delete_sn_certificate, name='api-v3-settings-delete-sn-certificate'),
+     path('update-sn-certificate', views.update_sn_certificate, name='api-v3-settings-update-sn-certificate'),
+
+
+
      path('get-my-certificates', views.get_my_certificates, name='api-v3-settings-get-my-certificates'),
      path('set-production-site-certificates', views.set_production_site_certificates, name='api-v3-settings-set-production-site-certificates'),
 

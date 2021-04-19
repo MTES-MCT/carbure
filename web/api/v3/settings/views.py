@@ -13,6 +13,7 @@ from producers.models import ProductionSite, ProductionSiteInput, ProductionSite
 from core.decorators import check_rights, otp_or_403
 from core.models import ISCCCertificate, DBSCertificate, REDCertCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate, EntityREDCertTradingCertificate
 from core.models import ProductionSiteCertificate, UserRightsRequests
+from certificates.models import SNCertificateCategory, EntitySNTradingCertificate
 from api.v3.lots.views import get_entity_lots_by_status
 from core.common import get_prefetched_data
 from api.v3.sanity_checks import bulk_sanity_checks
@@ -472,6 +473,15 @@ def get_redcert_certificates(request, *args, **kwargs):
 
 
 @check_rights('entity_id')
+def get_sn_certificates(request, *args, **kwargs):
+    context = kwargs['context']
+    one_year_ago = datetime.datetime.now() - relativedelta(years=1)
+    objects = EntitySNTradingCertificate.objects.filter(entity=context['entity'], certificate__valid_until__gte=one_year_ago)[:100]
+    sez = [o.natural_key() for o in objects]
+    return JsonResponse({'status': 'success', 'data': sez})
+
+
+@check_rights('entity_id')
 def add_iscc_certificate(request, *args, **kwargs):
     context = kwargs['context']
     certificate_id = request.POST.get('certificate_id', False)
@@ -508,6 +518,20 @@ def add_redcert_certificate(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
 
     EntityREDCertTradingCertificate.objects.update_or_create(entity=context['entity'], certificate=certificate)
+    return JsonResponse({'status': 'success'})
+
+
+@check_rights('entity_id')
+def add_sn_certificate(request, *args, **kwargs):
+    context = kwargs['context']
+    certificate_id = request.POST.get('certificate_id', False)
+    try:
+        certificate = SNCertificate.objects.get(certificate_id=certificate_id)
+    except Exception as e:
+        print(e)
+        return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
+
+    EntitySNTradingCertificate.objects.update_or_create(entity=context['entity'], certificate=certificate)
     return JsonResponse({'status': 'success'})
 
 
@@ -550,6 +574,21 @@ def delete_redcert_certificate(request, *args, **kwargs):
         certificate = REDCertCertificate.objects.get(certificate_id=certificate_id)
         EntityREDCertTradingCertificate.objects.get(entity=entity, certificate=certificate).delete()
         ProductionSiteCertificate.objects.filter(entity=entity, certificate_redcert__certificate=certificate).delete()
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not delete requested certificate"}, status=400)
+
+    return JsonResponse({'status': 'success'})
+
+
+@check_rights('entity_id')
+def delete_sn_certificate(request, *args, **kwargs):
+    entity = kwargs['context']['entity']
+    certificate_id = request.POST.get('certificate_id', False)
+
+    try:
+        certificate = SNCertificate.objects.get(certificate_id=certificate_id)
+        EntitySNTradingCertificate.objects.get(entity=entity, certificate=certificate).delete()
+        ProductionSiteCertificate.objects.filter(entity=entity, certificate_sn__certificate=certificate).delete()
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not delete requested certificate"}, status=400)
 
@@ -698,6 +737,38 @@ def update_redcert_certificate(request, *args, **kwargs):
     old_certificate.has_been_updated = True
     old_certificate.save()
     ProductionSiteCertificate.objects.filter(entity=entity, type='REDCERT', certificate_redcert=old_certificate).update(certificate_redcert=new_certificate)
+    return JsonResponse({'status': 'success'})
+
+
+@check_rights('entity_id')
+def update_sn_certificate(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    old_certificate_id = request.POST.get('old_certificate_id', False)
+    new_certificate_id = request.POST.get('new_certificate_id', False)
+
+    if not old_certificate_id:
+        return JsonResponse({'status': 'error', 'message': 'Please provide an old_certificate_id'}, status=400)
+    if not new_certificate_id:
+        return JsonResponse({'status': 'error', 'message': 'Please provide an new_certificate_id'}, status=400)
+
+    # first, add the new certificate to the account
+    try:
+        new_certificate = SNCertificate.objects.get(certificate_id=new_certificate_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find new requested certificate"}, status=400)
+    new_certificate, _ = EntitySNTradingCertificate.objects.update_or_create(entity=entity, certificate=new_certificate)
+
+    # find old certificate
+    try:
+        old_certificate = EntitySNTradingCertificate.objects.get(certificate__certificate_id=old_certificate_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find old requested certificate"}, status=400)
+
+    # then update previously linked certificates
+    old_certificate.has_been_updated = True
+    old_certificate.save()
+    ProductionSiteCertificate.objects.filter(entity=entity, type='SN', certificate_sn=old_certificate).update(certificate_sn=new_certificate)
     return JsonResponse({'status': 'success'})
 
 

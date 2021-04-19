@@ -810,7 +810,7 @@ class EntityREDCertTradingCertificate(models.Model):
 
 
 class ProductionSiteCertificate(models.Model):
-    CERTIFICATE_TYPE = [("ISCC", "ISCC"), ("2BS", "2BS"), ('REDCERT', 'REDCERT')]
+    CERTIFICATE_TYPE = [("ISCC", "ISCC"), ("2BS", "2BS"), ('REDCERT', 'REDCERT'), ('SN', 'SN')]
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     production_site = models.ForeignKey(ProductionSite, null=True, on_delete=models.CASCADE)
     type = models.CharField(max_length=32, choices=CERTIFICATE_TYPE, default="Pending")
@@ -818,14 +818,17 @@ class ProductionSiteCertificate(models.Model):
     certificate_iscc = models.ForeignKey(EntityISCCTradingCertificate, null=True, blank=True, on_delete=models.CASCADE)
     certificate_2bs = models.ForeignKey(EntityDBSTradingCertificate, null=True, blank=True, on_delete=models.CASCADE)
     certificate_redcert = models.ForeignKey(EntityREDCertTradingCertificate, null=True, blank=True, on_delete=models.CASCADE)
+    certificate_sn = models.ForeignKey("certificates.EntitySNTradingCertificate", null=True, blank=True, on_delete=models.CASCADE)
 
     def natural_key(self):
         if self.type == 'ISCC':
             cert = self.certificate_iscc
         elif self.type == '2BS':
             cert = self.certificate_2bs
-        else:
+        elif self.type == 'REDCERT':
             cert = self.certificate_redcert
+        else:
+            cert = self.certificate_sn
         return {'type': self.type, 'certificate_id': cert.certificate.certificate_id}
 
     class Meta:
