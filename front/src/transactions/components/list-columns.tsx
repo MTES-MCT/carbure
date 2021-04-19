@@ -85,7 +85,7 @@ export const vendor: Column<Transaction> = {
   sortBy: "vendor",
   render: (tx) => (
     <TwoLines
-      text={tx.carbure_vendor?.name ?? tx.lot.unknown_supplier ?? ""}
+      text={tx.carbure_vendor?.name ?? (tx.lot.unknown_supplier != '' ? tx.lot.unknown_supplier : tx.lot.unknown_supplier_certificate) ?? "N/A"}
       sub={
         tx.lot.carbure_production_site_reference ??
         tx.lot.unknown_production_site_reference
