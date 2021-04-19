@@ -3,6 +3,7 @@ import { TransactionSelection } from "../query/use-selection"
 import { YearSelection } from "../query/use-year"
 
 import * as api from "transactions/api"
+import {getStocks} from "stocks/api"
 import useAPI from "../../../common/hooks/use-api"
 
 import { confirm, prompt } from "../../../common/components/dialog"
@@ -14,7 +15,7 @@ import {
 import { SpecialSelection } from "../query/use-special"
 import { FilterSelection } from "../query/use-filters"
 import { SearchSelection } from "../query/use-search"
-import { LotStatus } from "common/types"
+import { EntityType, Lots, LotStatus, Transaction } from "common/types"
 
 export interface LotAcceptor {
   loading: boolean
@@ -105,7 +106,13 @@ export default function useAcceptLots(
       // getLots with current filters but no limit
       // display summary (number of lots, number of suppliers
       // call AcceptLots with all the tx_ids
-      const allInboxLots = await api.getLots(LotStatus.Inbox, entity.id, filters["selected"], year.selected, 0, null, search.query, 'id', 'asc', special.invalid, special.deadline)
+      var allInboxLots
+      if (entity.entity_type == EntityType.Operator) {
+        allInboxLots = await api.getLots(LotStatus.Inbox, entity.id, filters["selected"], year.selected, 0, null, search.query, 'id', 'asc', special.invalid, special.deadline)
+      } else {
+        allInboxLots = await getStocks(entity.id, filters["selected"], "in", 0, null, search.query)
+      }
+
       const nbSuppliers = new Set(allInboxLots.lots.map(o => o.carbure_vendor?.name)).size
       const totalVolume = allInboxLots.lots.map(o => o.lot.volume).reduce((sum, vol) => sum + vol)
       const supplierStr = nbSuppliers > 1 ? "fournisseurs" : "fournisseur"
