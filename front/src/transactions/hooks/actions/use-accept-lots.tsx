@@ -3,7 +3,7 @@ import { TransactionSelection } from "../query/use-selection"
 import { YearSelection } from "../query/use-year"
 
 import * as api from "transactions/api"
-import {getStocks} from "stocks/api"
+import { getStocks } from "stocks/api"
 import useAPI from "../../../common/hooks/use-api"
 
 import { confirm, prompt } from "../../../common/components/dialog"
@@ -107,22 +107,28 @@ export default function useAcceptLots(
       // display summary (number of lots, number of suppliers
       // call AcceptLots with all the tx_ids
       var allInboxLots
+
+      // prettier-ignore
       if (entity.entity_type == EntityType.Operator) {
         allInboxLots = await api.getLots(LotStatus.Inbox, entity.id, filters["selected"], year.selected, 0, null, search.query, 'id', 'asc', special.invalid, special.deadline)
       } else {
         allInboxLots = await getStocks(entity.id, filters["selected"], "in", 0, null, search.query)
       }
 
-      const nbSuppliers = new Set(allInboxLots.lots.map(o => o.carbure_vendor?.name)).size
-      const totalVolume = allInboxLots.lots.map(o => o.lot.volume).reduce((sum, vol) => sum + vol)
+      const nbSuppliers = new Set(
+        allInboxLots.lots.map((o) => o.carbure_vendor?.name)
+      ).size
+      const totalVolume = allInboxLots.lots
+        .map((o) => o.lot.volume)
+        .reduce((sum, vol) => sum + vol)
       const supplierStr = nbSuppliers > 1 ? "fournisseurs" : "fournisseur"
-      const allTxids = allInboxLots.lots.map(o => o.id)
+      const allTxids = allInboxLots.lots.map((o) => o.id)
 
       const shouldAccept = await confirm(
-        "Accepter Tout",
+        "Accepter tout",
         `Voulez êtes sur le point d'accepter ${allInboxLots.lots.length} lots de ${nbSuppliers} ${supplierStr} représentant un total de ${totalVolume} litres ?`
       )
-   
+
       if (entity !== null && shouldAccept) {
         await notifyAccept(resolveAccept(entity.id, allTxids), true)
       }

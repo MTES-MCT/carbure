@@ -11,6 +11,7 @@ import {
   producer,
   productionSite,
   redcertCertificate,
+  snCertificate,
 } from "common/__test__/data"
 import {
   okCountrySearch,
@@ -27,6 +28,7 @@ let productionSites: any[] = []
 let isccCertificates: any[] = []
 let dbsCertificates: any[] = []
 let redcertCertificates: any[] = []
+let snCertificates: any[] = []
 
 export function setEntity(nextEntity: any) {
   entity = clone(nextEntity)
@@ -53,6 +55,10 @@ export function set2BSCertificates(next2BSCertificates: any[]) {
 
 export function setRedcertCertificates(nextRedcertCertificates: any[]) {
   redcertCertificates = clone(nextRedcertCertificates)
+}
+
+export function setSNCertificates(nextSNCertificates: any[]) {
+  snCertificates = clone(nextSNCertificates)
 }
 
 export const okSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
@@ -353,6 +359,42 @@ export const okUpdateRedcert = rest.post(
   }
 )
 
+export const okSN = rest.get(
+  "/api/v3/settings/get-sn-certificates",
+  (req, res, ctx) => {
+    return res(
+      ctx.json({
+        status: "success",
+        data: snCertificates,
+      })
+    )
+  }
+)
+
+export const okAddSN = rest.post(
+  "/api/v3/settings/add-sn-certificate",
+  (req, res, ctx) => {
+    setSNCertificates([snCertificate])
+    return res(ctx.json({ status: "success" }))
+  }
+)
+
+export const okDeleteSN = rest.post(
+  "/api/v3/settings/delete-sn-certificate",
+  (req, res, ctx) => {
+    setSNCertificates([])
+    return res(ctx.json({ status: "success" }))
+  }
+)
+
+export const okUpdateSN = rest.post(
+  "/api/v3/settings/update-sn-certificate",
+  (req, res, ctx) => {
+    setSNCertificates([snCertificate])
+    return res(ctx.json({ status: "success" }))
+  }
+)
+
 export default setupServer(
   okSettings,
   okEnableMac,
@@ -385,5 +427,9 @@ export default setupServer(
   okRedcert,
   okAddRedcert,
   okDeleteRedcert,
-  okUpdateRedcert
+  okUpdateRedcert,
+  okSN,
+  okAddSN,
+  okDeleteSN,
+  okUpdateSN
 )
