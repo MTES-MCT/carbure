@@ -146,6 +146,28 @@ export const expiredRedcertCertificate = {
   has_been_updated: false,
 }
 
+export const snCertificate = {
+  certificate_id: "SN_UN_2020_0108",
+  certificate_holder: "PMSE",
+  valid_from: null,
+  valid_until: "2025-09-30",
+  download_link: "",
+  scope: ["6b"],
+  type: "SN",
+  has_been_updated: false,
+}
+
+export const expiredSNCertificate = {
+  certificate_id: "Expired SN_UN_2020_0108",
+  certificate_holder: "PMSE",
+  valid_from: null,
+  valid_until: "2020-09-30",
+  download_link: "",
+  scope: ["6b"],
+  type: "SN",
+  has_been_updated: false,
+}
+
 // MATIERE PREMIERE
 
 export const matierePremiere = {

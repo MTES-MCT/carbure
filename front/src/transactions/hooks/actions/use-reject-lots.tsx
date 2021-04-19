@@ -110,7 +110,7 @@ export default function useRejectLots(
 
       const comment = await prompt<string>((resolve) => (
         <CommentPrompt
-          title="Refuser Tout"
+          title="Refuser tout"
           description={description}
           onResolve={resolve}
         />
