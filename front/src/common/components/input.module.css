@@ -46,6 +46,7 @@
 .labelWrapper {
   display: flex;
   flex-direction: column;
+  position: relative;
   font-size: 0.93em;
   font-style: italic;
   margin-bottom: 12px;
@@ -63,6 +64,13 @@
 .labelWrapper .labelText :global(.icon) {
   margin-top: 2px;
   margin-left: 4px;
+}
+
+.labelWrapper :global(.icon) {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  color: var(--gray-medium);
 }
 
 .disabledLabel {

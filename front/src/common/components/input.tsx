@@ -29,6 +29,7 @@ export type LabelProps = SystemProps &
     tooltip?: string
     label?: string
     required?: boolean
+    icon?: React.ComponentType
   }
 
 export const Label = ({
@@ -39,6 +40,7 @@ export const Label = ({
   label,
   readOnly,
   required = false,
+  icon: Icon,
   children,
   ...props
 }: LabelProps) => (
@@ -58,6 +60,7 @@ export const Label = ({
       {error && <AlertTriangle size={16} />}
     </span>
     {children}
+    {Icon && <Icon />}
   </label>
 )
 // FORM INPUT COMPONENT

@@ -75,9 +75,11 @@ const TransactionForm = ({
             />
           </Box>
 
-          <span className={styles.transactionRequiredInfo}>
-            * Les champs marqués d'une étoile sont obligatoires
-          </span>
+          {!readOnly && (
+            <span className={styles.transactionRequiredInfo}>
+              * Les champs marqués d'une étoile sont obligatoires
+            </span>
+          )}
         </Box>
 
         <GESFields readOnly={readOnly} data={transaction} onChange={onChange} />
