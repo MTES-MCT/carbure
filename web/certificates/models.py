@@ -1,14 +1,15 @@
 from django.db import models
 from core.models import Entity
 
-class SNCertificateCategory(models.Model):
-    category = models.CharField(max_length=512, default='')
+class SNCategory(models.Model):
+    category_id = models.CharField(max_length=6, default='')
+    description = models.CharField(max_length=512, default='')
 
     def natural_key(self):
-        return {'category': self.category}
+        return {'category_id': self.category_id}
 
     def __str__(self):
-        return self.category
+        return self.category_id
 
     class Meta:
         db_table = 'sn_categories'
@@ -19,18 +20,19 @@ class SNCertificateCategory(models.Model):
 class SNCertificate(models.Model):
     certificate_id = models.CharField(max_length=64, null=False, blank=False)
     certificate_holder = models.CharField(max_length=256, null=False, blank=False)
-    scope = models.ForeignKey(SNCertificateCategory, null=False, blank=False, on_delete=models.CASCADE)
-    valid_from = models.DateField()
+    valid_from = models.DateField(null=True, blank=True)
     valid_until = models.DateField()
-    download_link = models.CharField(max_length=512, default='')
+    download_link = models.CharField(max_length=512, default='', blank=True)
 
     def natural_key(self):
+        scope = [s.scope.category_id for s in self.sncertificatescope_set.all()]
+
         return {'certificate_id': self.certificate_id,
                 'certificate_holder': self.certificate_holder,
                 'valid_from': self.valid_from,
                 'valid_until': self.valid_until,
-                'scope': self.scope,
                 'download_link': self.download_link,
+                'scope': scope,
                 }
 
     def __str__(self):
@@ -41,6 +43,20 @@ class SNCertificate(models.Model):
         verbose_name = 'SN Certificate'
         verbose_name_plural = 'SN Certificates'
 
+
+class SNCertificateScope(models.Model):
+    certificate = models.ForeignKey(SNCertificate, blank=False, null=False, on_delete=models.CASCADE)
+    scope = models.ForeignKey(SNCategory, blank=False, null=False, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.scope.category_id
+
+    class Meta:
+        db_table = 'sn_certificates_scopes'
+        verbose_name = 'SN Certificate Scope'
+        verbose_name_plural = 'SN Certificate Scopes'
+
+        
 
 class EntitySNTradingCertificate(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)

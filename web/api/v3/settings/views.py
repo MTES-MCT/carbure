@@ -13,7 +13,7 @@ from producers.models import ProductionSite, ProductionSiteInput, ProductionSite
 from core.decorators import check_rights, otp_or_403
 from core.models import ISCCCertificate, DBSCertificate, REDCertCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate, EntityREDCertTradingCertificate
 from core.models import ProductionSiteCertificate, UserRightsRequests
-from certificates.models import SNCertificateCategory, EntitySNTradingCertificate
+from certificates.models import SNCategory, EntitySNTradingCertificate, SNCertificate
 from api.v3.lots.views import get_entity_lots_by_status
 from core.common import get_prefetched_data
 from api.v3.sanity_checks import bulk_sanity_checks
@@ -386,22 +386,6 @@ def delete_delivery_site(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Could not delete entity's delivery site",
                              'extra': str(e)}, status=400)
 
-    return JsonResponse({'status': 'success'})
-
-
-@check_rights('entity_id')
-def set_national_system_certificate(request, *args, **kwargs):
-    entity = kwargs['context']['entity']
-    national_system_certificate = request.POST.get('national_system_certificate', False)
-
-    if entity.entity_type == 'Trader' or (entity.entity_type == 'Producteur' and not entity.has_mac):
-        return JsonResponse({'status': 'error', 'message': "Entity not eligible to national system certificate"}, status=400)
-
-    if not national_system_certificate:
-        return JsonResponse({'status': 'error', 'message': "Missing national system certificate"}, status=400)
-
-    entity.national_system_certificate = national_system_certificate
-    entity.save()
     return JsonResponse({'status': 'success'})
 
 

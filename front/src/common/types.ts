@@ -39,7 +39,6 @@ export interface Entity {
   entity_type: EntityType
   has_mac: boolean
   has_trading: boolean
-  national_system_certificate: string
 }
 
 export interface Country {
@@ -366,12 +365,23 @@ export type REDCertCertificate = {
   download_link: string
 }
 
-export type Certificate = ISCCCertificate | DBSCertificate | REDCertCertificate
+export type SNCertificate = {
+  type: string
+  certificate_id: string
+  certificate_holder: string
+  valid_from: string
+  valid_until: string
+  scope: string[]
+  has_been_updated: boolean
+  download_link: string
+}
+
+export type Certificate = ISCCCertificate | DBSCertificate | REDCertCertificate | SNCertificate
 
 export type ProductionCertificate = {
   certificate_id: string
   holder: string
-  type: "2BS" | "ISCC" | "REDCERT"
+  type: "2BS" | "ISCC" | "REDCERT" | "SN"
 }
 
 export type StockDraft = {

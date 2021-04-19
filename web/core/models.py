@@ -23,7 +23,6 @@ class Entity(models.Model):
     trading_certificate = models.FileField(null=True, blank=True)
     has_mac = models.BooleanField(default=False)
     has_trading = models.BooleanField(default=False)
-    national_system_certificate = models.CharField(max_length=64, null=True, blank=True)
 
     legal_name = models.CharField(max_length=128, blank=True, default='')
     registration_id = models.CharField(max_length=64, blank=True, default='')
@@ -36,7 +35,7 @@ class Entity(models.Model):
 
     def natural_key(self):
         return {'name': self.name, 'id': self.id, 'entity_type': self.entity_type, 'has_mac': self.has_mac, 'has_trading': self.has_trading,
-            'national_system_certificate': self.national_system_certificate, 'legal_name': self.legal_name, 'registration_id': self.registration_id,
+            'legal_name': self.legal_name, 'registration_id': self.registration_id,
             'sustainability_officer': self.sustainability_officer, 'sustainability_officer_phone_number': self.sustainability_officer_phone_number,
             'registered_address': self.registered_address}
 

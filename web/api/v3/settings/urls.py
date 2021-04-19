@@ -11,7 +11,6 @@ urlpatterns = [
      path('disable-mac', views.disable_mac, name='api-v3-settings-disable-mac'),
      path('enable-trading', views.enable_trading, name='api-v3-settings-enable-trading'),
      path('disable-trading', views.disable_trading, name='api-v3-settings-disable-trading'),
-     path('set-national-system-certificate', views.set_national_system_certificate, name='api-v3-settings-set-national-system-certificate'),
 
      path('get-production-sites', views.get_production_sites, name='api-v3-settings-get-production-sites'),
      path('add-production-site', views.add_production_site, name='api-v3-settings-add-production-site'),
