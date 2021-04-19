@@ -52,7 +52,7 @@ export interface TransactionFormState {
   unknown_supplier_certificate: string | null
   production_site: ProductionSiteDetails | string | null
   production_site_reference: string
-  production_country: Country | null
+  production_site_country: Country | null
   production_site_com_date: string
   production_site_dbl_counting: string | null
 
@@ -99,23 +99,23 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
       ? tx.lot.carbure_producer
       : tx.lot.unknown_producer,
 
-    production_country: tx.lot.producer_is_in_carbure
-      ? tx.lot.carbure_production_site?.country ?? null
-      : tx.lot.unknown_production_country,
-
-    production_site: tx.lot.producer_is_in_carbure
+    production_site: tx.lot.production_site_is_in_carbure
       ? tx.lot.carbure_production_site
       : tx.lot.unknown_production_site,
 
-    production_site_reference: tx.lot.producer_is_in_carbure
+    production_site_country: tx.lot.production_site_is_in_carbure
+      ? tx.lot.carbure_production_site?.country ?? null
+      : tx.lot.unknown_production_country,
+
+    production_site_reference: tx.lot.production_site_is_in_carbure
       ? tx.lot.carbure_production_site_reference
       : tx.lot.unknown_production_site_reference,
 
-    production_site_com_date: tx.lot.producer_is_in_carbure
+    production_site_com_date: tx.lot.production_site_is_in_carbure
       ? tx.lot.carbure_production_site?.date_mise_en_service ?? ""
       : tx.lot.unknown_production_site_com_date ?? "",
 
-    production_site_dbl_counting: tx.lot.producer_is_in_carbure
+    production_site_dbl_counting: tx.lot.production_site_is_in_carbure
       ? tx.lot.carbure_production_site?.dc_reference ?? null
       : tx.lot.unknown_production_site_dbl_counting,
 
@@ -179,10 +179,7 @@ export function toTransactionPostData(tx: TransactionFormState) {
         ? tx.production_site
         : tx.production_site?.name,
 
-    production_site_country:
-      typeof tx.production_site === "string"
-        ? tx.production_country?.code_pays
-        : "",
+    production_site_country: tx.production_site_country?.code_pays,
 
     production_site_reference: tx.production_site_reference,
 
@@ -253,7 +250,7 @@ const initialState: TransactionFormState = {
 
   production_site: null,
   production_site_reference: "",
-  production_country: null,
+  production_site_country: null,
   production_site_com_date: "",
   production_site_dbl_counting: "",
 
@@ -305,9 +302,6 @@ function fixedValues(
   // update GES summary
   tx.ghg_total = tx.eec + tx.el + tx.ep + tx.etd + tx.eu - tx.esca - tx.eccs - tx.eccr - tx.eee // prettier-ignore
   tx.ghg_reduction = (1.0 - tx.ghg_total / tx.ghg_reference) * 100.0
-
-  // REMOVEME
-  // tx.producer_is_in_carbure = false
 
   return tx
 }

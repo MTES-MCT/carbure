@@ -82,7 +82,7 @@ const StockDetails = ({
         readOnly={!isEditable}
         transaction={form}
         error={details.error ?? request.error}
-        fieldErrors={fieldErrors}
+        errors={fieldErrors}
         onChange={change}
       />
 

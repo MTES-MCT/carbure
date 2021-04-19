@@ -1,49 +1,105 @@
+import { EntitySelection } from "carbure/hooks/use-entity"
 import { FormGroup } from "common/components/form"
+import { EntityType } from "common/types"
+import { TransactionFormState } from "transactions/hooks/use-transaction-form"
 import * as Fields from "./fields"
 import { FieldsProps, isKnown } from "./fields"
 
-const DeliveryFields = ({
-  readOnly,
-  entity,
-  data,
-  errors,
-  onChange,
-}: FieldsProps) => {
-  const dsCountry = isKnown(data.delivery_site)
-    ? data.delivery_site.country
-    : data.delivery_site_country
+function showMAC(data: TransactionFormState, entity?: EntitySelection) {
+  return (data.status === "Draft" && entity?.has_mac) || data.mac
+}
 
-  const isLotClient = isKnown(data.client) && entity?.id === data.client.id
-  const showClient = !isLotClient || data.mac
-  const showMAC = (readOnly && data.mac) || (!readOnly && entity?.has_mac)
-
+const AllDeliveryFields = ({ data, errors, onChange }: FieldsProps) => {
   return (
-    <FormGroup readOnly={readOnly} title="Livraison" onChange={onChange}>
-      {showMAC && <Fields.Mac value={`${data.mac}`} />}
-      {showClient && (
-        <Fields.Client
-          search={!data.mac}
-          value={data.client}
-          error={errors?.client}
-        />
-      )}
-      <Fields.DeliverySite
-        search={!data.mac}
-        disabled={data.mac}
-        value={data.delivery_site}
-        error={errors?.delivery_site}
-      />
-      <Fields.DeliverySiteCountry
-        disabled={isKnown(data.delivery_site) || data.mac}
-        value={dsCountry}
-        error={errors?.unknown_delivery_site_country}
-      />
-      <Fields.DeliveryDate
-        value={data.delivery_date}
-        error={errors?.delivery_date}
-      />
+    <FormGroup
+      readOnly
+      title="Livraison"
+      data={data}
+      errors={errors}
+      onChange={onChange}
+    >
+      {data.mac && <Fields.Mac />}
+      <Fields.CarbureVendor />
+      <Fields.CarbureVendorCertificate />
+      <Fields.Client />
+      <Fields.DeliverySite />
+      <Fields.DeliverySiteCountry />
+      <Fields.DeliveryDate />
     </FormGroup>
   )
 }
 
-export default DeliveryFields
+const VendorDeliveryFields = ({
+  data,
+  errors,
+  entity,
+  readOnly,
+  onChange,
+}: FieldsProps) => {
+  return (
+    <FormGroup
+      readOnly={readOnly}
+      title="Livraison"
+      data={data}
+      errors={errors}
+      onChange={onChange}
+    >
+      {showMAC(data, entity) && <Fields.Mac />}
+      <Fields.CarbureSelfCertificate />
+      <Fields.Client />
+      <Fields.DeliverySite />
+      <Fields.DeliverySiteCountry />
+      <Fields.DeliveryDate />
+    </FormGroup>
+  )
+}
+
+const ClientDeliveryFields = ({
+  data,
+  errors,
+  entity,
+  readOnly,
+  onChange,
+}: FieldsProps) => {
+  const isOperator = entity?.entity_type === EntityType.Operator
+
+  return (
+    <FormGroup
+      readOnly={readOnly}
+      title="Livraison"
+      data={data}
+      errors={errors}
+      onChange={onChange}
+    >
+      {showMAC(data, entity) && <Fields.Mac />}
+      <Fields.Client disabled={isOperator && !data.mac} />
+      <Fields.DeliverySite />
+      <Fields.DeliverySiteCountry />
+      <Fields.DeliveryDate />
+    </FormGroup>
+  )
+}
+
+export default function DeliveryFields(props: FieldsProps) {
+  const { entity, data } = props
+
+  const isOperator = entity?.entity_type === EntityType.Operator
+  const isAdmin = entity?.entity_type === EntityType.Administration
+
+  const isAuthor = entity?.id === data.added_by?.id
+  const isClient = isKnown(data.client) && entity?.id === data.client.id // prettier-ignore
+  const isVendor = isKnown(data.carbure_vendor) && entity?.id === data.carbure_vendor.id // prettier-ignore
+
+  if (isAdmin) {
+    return <AllDeliveryFields {...props} />
+  } else if (isClient || isOperator) {
+    return <ClientDeliveryFields {...props} />
+  } else if (isVendor) {
+    return <VendorDeliveryFields {...props} />
+  } else if (isAuthor) {
+    // this is for original authors of lots that were forwarded by their client
+    return <AllDeliveryFields {...props} />
+  }
+
+  return null
+}
