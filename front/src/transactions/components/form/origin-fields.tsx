@@ -148,9 +148,9 @@ export default function OriginFields(props: FieldsProps) {
       return <VendorOriginFields {...props} />
     }
   } else {
-    if (isAuthor && isOperator) {
+    if (isOperator && isAuthor) {
       return <OperatorOriginFields {...props} />
-    } else if (isVendor) {
+    } else if (isVendor || isAuthor) {
       return <VendorOriginFields {...props} />
     } else if (isClient) {
       return <ClientOriginFields {...props} />
