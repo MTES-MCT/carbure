@@ -16,6 +16,7 @@ urlpatterns = [
     path('iscc-certificates', views.get_iscc_certificates, name='api-v3-public-search-iscc-certificates'),
     path('2bs-certificates', views.get_2bs_certificates, name='api-v3-public-search-2bs-certificates'),
     path('redcert-certificates', views.get_redcert_certificates, name='api-v3-public-search-redcert-certificates'),
+    path('sn-certificates', views.get_sn_certificates, name='api-v3-public-search-sn-certificates'),
     path('certificates', views.get_certificates, name='api-v3-public-search-certificates'),
 
     # POST

@@ -16,8 +16,8 @@ import {
   DBSCertificateSettings,
   ISCCCertificateSettings,
   REDCertCertificateSettings,
+  SNCertificateSettings,
 } from "./components/certificates"
-import NationalSystemCertificatesSettings from "./components/national-system-certificates"
 import CompanySettings from "./components/company"
 import Sticky from "common/components/sticky"
 import useREDCertCertificates from "./hooks/use-redcert-certificates"
@@ -29,7 +29,7 @@ function useSettings(entity: EntitySelection, settings: SettingsGetter) {
   const dbsCertificates = use2BSCertificates(entity, productionSites)
   const isccCertificates = useISCCCertificates(entity, productionSites)
   const redcertCertificates = useREDCertCertificates(entity, productionSites)
-  const nationalSystemCertificates = useNationalSystemCertificates(entity, settings) // prettier-ignore
+  const nationalSystemCertificates = useNationalSystemCertificates(entity, productionSites) // prettier-ignore
 
   return {
     productionSites,
@@ -78,7 +78,7 @@ const Settings = ({ entity, settings }: SettingsProps) => {
         {hasCertificates && <a href="#iscc">Certificats ISCC</a>}
         {hasCertificates && <a href="#2bs">Certificats 2BS</a>}
         {hasCertificates && <a href="#red">Certificats REDcert</a>}
-        {hasCSN && <a href="#csn">Certificats système national</a>}
+        {hasCertificates && <a href="#sn">Certificats Système National</a>}
       </Sticky>
 
       <SettingsBody>
@@ -99,10 +99,8 @@ const Settings = ({ entity, settings }: SettingsProps) => {
           <REDCertCertificateSettings settings={redcertCertificates} />
         )}
 
-        {hasCSN && (
-          <NationalSystemCertificatesSettings
-            settings={nationalSystemCertificates}
-          />
+        {hasCertificates && (
+          <SNCertificateSettings settings={nationalSystemCertificates} />
         )}
       </SettingsBody>
     </Main>

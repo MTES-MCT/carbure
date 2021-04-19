@@ -9,6 +9,7 @@ import {
   ProductionCertificate,
   OwnershipType,
   REDCertCertificate,
+  SNCertificate,
 } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
@@ -202,16 +203,6 @@ export function disablePublicDirectory(entityID: number) {
   })
 }
 
-export function setNationalSystemCertificate(
-  entity_id: number,
-  national_system_certificate: string
-) {
-  return api.post("/settings/set-national-system-certificate", {
-    entity_id,
-    national_system_certificate,
-  })
-}
-
 export function enableMAC(entityID: number) {
   return api.post("/settings/enable-mac", {
     entity_id: entityID,
@@ -336,6 +327,41 @@ export function updateREDCertCertificate(
   new_certificate_id: string
 ) {
   return api.post("/settings/update-redcert-certificate", {
+    entity_id,
+    old_certificate_id,
+    new_certificate_id,
+  })
+}
+
+
+export function getSNCertificates(
+  entityID: number
+): Promise<SNCertificate[]> {
+  return api.get("/settings/get-sn-certificates", {
+    entity_id: entityID,
+  })
+}
+
+export function addSNCertificate(entityID: number, certificate_id: string) {
+  return api.post("/settings/add-sn-certificate", {
+    entity_id: entityID,
+    certificate_id: certificate_id,
+  })
+}
+
+export function deleteSNCertificate(entityID: number, certificate_id: string) {
+  return api.post("/settings/delete-sn-certificate", {
+    entity_id: entityID,
+    certificate_id: certificate_id,
+  })
+}
+
+export function updateSNCertificate(
+  entity_id: number,
+  old_certificate_id: string,
+  new_certificate_id: string
+) {
+  return api.post("/settings/update-sn-certificate", {
     entity_id,
     old_certificate_id,
     new_certificate_id,

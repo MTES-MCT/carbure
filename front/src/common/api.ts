@@ -9,6 +9,7 @@ import {
   OwnershipType,
   ProductionSiteDetails,
   REDCertCertificate,
+  SNCertificate,
 } from "./types"
 
 import api from "./services/api"
@@ -80,6 +81,12 @@ export function findREDCertCertificates(
   query: string
 ): Promise<REDCertCertificate[]> {
   return api.get("/common/redcert-certificates", { query })
+}
+
+export function findSNCertificates(
+  query: string
+): Promise<SNCertificate[]> {
+  return api.get("/common/sn-certificates", { query })
 }
 
 export function findCertificates(
