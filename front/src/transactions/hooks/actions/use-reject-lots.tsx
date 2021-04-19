@@ -8,6 +8,10 @@ import useAPI from "../../../common/hooks/use-api"
 import { prompt } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
 import { CommentPrompt } from "transactions/components/form-comments"
+import { LotStatus } from "common/types"
+import { FilterSelection } from "../query/use-filters"
+import { SearchSelection } from "../query/use-search"
+import { SpecialSelection } from "../query/use-special"
 
 export interface LotRejector {
   loading: boolean
@@ -19,13 +23,15 @@ export interface LotRejector {
 export default function useRejectLots(
   entity: EntitySelection,
   selection: TransactionSelection,
+  filters: FilterSelection,
   year: YearSelection,
+  search: SearchSelection,
+  special: SpecialSelection,
   refresh: () => void
 ): LotRejector {
   const notifications = useNotificationContext()
 
   const [request, resolveReject] = useAPI(api.rejectLots)
-  const [requestAll, resolveRejectAll] = useAPI(api.rejectAllInboxLots)
 
   async function notifyReject(promise: Promise<any>, many: boolean = false) {
     const res = await promise
@@ -85,26 +91,39 @@ export default function useRejectLots(
   }
 
   async function rejectAllInbox() {
-    const comment = await prompt<string>((resolve) => (
-      <CommentPrompt
-        title="Refuser lot"
-        description="Voulez vous refuser tous ces lots ?"
-        onResolve={resolve}
-      />
-    ))
+    if (entity !== null) {
+      // getLots with current filters but no limit
+      // display summary (number of lots, number of suppliers
+      // call AcceptLots with all the tx_ids
+      const allInboxLots = await api.getLots(LotStatus.Inbox, entity.id, filters["selected"], year.selected, 0, null, search.query, 'id', 'asc', special.invalid, special.deadline)
+      const nbSuppliers = new Set(allInboxLots.lots.map(o => o.carbure_vendor?.name)).size
+      const totalVolume = allInboxLots.lots.map(o => o.lot.volume).reduce((sum, vol) => sum + vol)
+      const supplierStr = nbSuppliers > 1 ? "fournisseurs" : "fournisseur"
+      const allTxids = allInboxLots.lots.map(o => o.id)
+      const description = `Vous êtes sur le point de refuser ${allInboxLots.lots.length} lots de ${nbSuppliers} ${supplierStr} représentant un total de ${totalVolume} litres`
 
-    if (entity !== null && comment) {
-      await notifyReject(
-        resolveRejectAll(entity.id, year.selected, comment),
-        true
-      )
+      const comment = await prompt<string>((resolve) => (
+        <CommentPrompt
+          title="Refuser Tout"
+          description={description}
+          onResolve={resolve}
+        />
+      ))
+
+      if (comment) {
+        await notifyReject(
+          resolveReject(entity.id, allTxids, comment),
+          true
+        )
+      }
+
+      return Boolean(comment)
     }
-
-    return Boolean(comment)
+    return false
   }
 
   return {
-    loading: request.loading || requestAll.loading,
+    loading: request.loading,
     rejectLot,
     rejectSelection,
     rejectAllInbox,
