@@ -1,7 +1,7 @@
 import React from "react"
 import cl from "clsx"
 import styles from "./input.module.css"
-import { AlertTriangle, Search } from "./icons"
+import { AlertTriangle, IconProps, Search } from "./icons"
 import { SystemProps } from "./index"
 
 // INPUT COMPONENT
@@ -29,7 +29,7 @@ export type LabelProps = SystemProps &
     tooltip?: string
     label?: string
     required?: boolean
-    icon?: React.ComponentType
+    icon?: React.ComponentType<IconProps>
   }
 
 export const Label = ({
@@ -60,7 +60,7 @@ export const Label = ({
       {error && <AlertTriangle size={16} />}
     </span>
     {children}
-    {Icon && <Icon />}
+    {Icon && <Icon className={styles.labelIcon} />}
   </label>
 )
 // FORM INPUT COMPONENT
