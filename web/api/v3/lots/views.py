@@ -500,53 +500,6 @@ def comment_lot(request, *args, **kwargs):
     txc.save()
     return JsonResponse({'status': 'success'})
 
-@check_rights('entity_id')
-def accept_all(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
-    lots = LotTransaction.objects.filter(carbure_client=entity, delivery_status__in=['N', 'AC', 'AA'])
-    year = request.POST.get('year', False)
-    date_from = datetime.date.today().replace(month=1, day=1)
-    date_until = datetime.date.today().replace(month=12, day=31)
-    if year:
-        try:
-            year = int(year)
-            date_from = datetime.date(year=year, month=1, day=1)
-            date_until = datetime.date(year=year, month=12, day=31)
-        except Exception:
-            return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
-    lots.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until).update(delivery_status='A')
-    return JsonResponse({'status': 'success'})
-
-@check_rights('entity_id')
-def reject_all(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
-    tx_comment = request.POST.get('comment', None)
-    if not tx_comment:
-        return JsonResponse({'status': 'error', 'message': "Missing comment"}, status=400)
-
-    txs = LotTransaction.objects.filter(carbure_client=entity, delivery_status__in=[
-        'N', 'AC', 'AA'])
-    year = request.POST.get('year', False)
-    date_from = datetime.date.today().replace(month=1, day=1)
-    date_until = datetime.date.today().replace(month=12, day=31)
-    if year:
-        try:
-            year = int(year)
-            date_from = datetime.date(year=year, month=1, day=1)
-            date_until = datetime.date(year=year, month=12, day=31)
-        except Exception:
-            return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
-    txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-    txs.update(delivery_status='R')
-    for tx in txs:
-        txerr = TransactionComment()
-        txerr.entity = tx.carbure_client
-        txerr.tx = tx
-        txerr.comment = tx_comment
-        txerr.save()
-    return JsonResponse({'status': 'success'})
 
 @check_rights('entity_id')
 def delete_all_drafts(request, *args, **kwargs):
