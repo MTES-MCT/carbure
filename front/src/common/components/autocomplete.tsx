@@ -80,7 +80,7 @@ function useAutoComplete<T>(
 }
 
 export type AutoCompleteProps<T> = Omit<InputProps, "value"> & {
-  value: T | string | null
+  value?: T | string | null
   options?: T[]
   queryArgs?: any[]
   minLength?: number
@@ -93,7 +93,7 @@ export type AutoCompleteProps<T> = Omit<InputProps, "value"> & {
 }
 
 export function AutoComplete<T>({
-  value,
+  value = null,
   name,
   queryArgs = [],
   readOnly,

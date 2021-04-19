@@ -4,7 +4,7 @@ import { Box } from "."
 import styles from "./radio-group.module.css"
 
 export type RadioGroupProps = {
-  value: string
+  value?: string
   name?: string
   row?: boolean
   readOnly?: boolean

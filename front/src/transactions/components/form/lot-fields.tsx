@@ -6,23 +6,21 @@ export const LotFields = ({
   readOnly,
   data,
   errors,
+  stock,
   onChange,
 }: FieldsProps) => (
-  <FormGroup readOnly={readOnly} title="Lot" onChange={onChange}>
-    <Fields.Dae value={data.dae} error={errors?.dae} />
-    <Fields.Volume value={data.volume} error={errors?.volume} />
-    <Fields.Biocarburant
-      value={data.biocarburant}
-      error={errors?.biocarburant_code}
-    />
-    <Fields.MatierePremiere
-      value={data.matiere_premiere}
-      error={errors?.matiere_premiere_code}
-    />
-    <Fields.PaysOrigine
-      value={data.pays_origine}
-      error={errors?.pays_origine_code}
-    />
+  <FormGroup
+    readOnly={stock || readOnly}
+    title="Lot"
+    data={data}
+    errors={errors}
+    onChange={onChange}
+  >
+    <Fields.Dae readOnly={readOnly} />
+    <Fields.Volume readOnly={readOnly} />
+    <Fields.Biocarburant />
+    <Fields.MatierePremiere />
+    <Fields.PaysOrigine />
   </FormGroup>
 )
 

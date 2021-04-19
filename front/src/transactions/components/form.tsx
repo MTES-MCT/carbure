@@ -23,7 +23,7 @@ type TransactionFormProps = {
   readOnly?: boolean
   transaction: TransactionFormState
   error: string | null
-  fieldErrors?: { [k: string]: string }
+  errors?: { [k: string]: string }
   onChange: FormChangeHandler<TransactionFormState>
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void
 }
@@ -34,55 +34,54 @@ const TransactionForm = ({
   readOnly = false,
   transaction,
   error,
-  fieldErrors = {},
+  errors = {},
   onChange,
   onSubmit,
 }: TransactionFormProps) => {
+  const isStock = Boolean(transaction.parent_lot)
+
   return (
     <Form id={id} className={styles.transactionForm} onSubmit={onSubmit}>
       <Box row>
-        <Box>
-          <Box row>
-            <LotFields
-              readOnly={readOnly}
-              data={transaction}
-              errors={fieldErrors}
-              onChange={onChange}
-            />
+        <LotFields
+          stock={isStock}
+          readOnly={readOnly}
+          data={transaction}
+          errors={errors}
+          onChange={onChange}
+        />
 
-            <OriginFields
-              readOnly={readOnly}
-              entity={entity}
-              data={transaction}
-              errors={fieldErrors}
-              onChange={onChange}
-            />
+        <OriginFields
+          stock={isStock}
+          readOnly={readOnly}
+          entity={entity}
+          data={transaction}
+          errors={errors}
+          onChange={onChange}
+        />
 
-            <ProductionFields
-              readOnly={readOnly}
-              entity={entity}
-              data={transaction}
-              errors={fieldErrors}
-              onChange={onChange}
-            />
+        <ProductionFields
+          readOnly={isStock || readOnly}
+          entity={entity}
+          data={transaction}
+          errors={errors}
+          onChange={onChange}
+        />
 
-            <DeliveryFields
-              readOnly={readOnly}
-              entity={entity}
-              data={transaction}
-              errors={fieldErrors}
-              onChange={onChange}
-            />
-          </Box>
+        <DeliveryFields
+          readOnly={readOnly}
+          entity={entity}
+          data={transaction}
+          errors={errors}
+          onChange={onChange}
+        />
 
-          {!readOnly && (
-            <span className={styles.transactionRequiredInfo}>
-              * Les champs marqués d'une étoile sont obligatoires
-            </span>
-          )}
-        </Box>
-
-        <GESFields readOnly={readOnly} data={transaction} onChange={onChange} />
+        <GESFields
+          readOnly={isStock || readOnly}
+          data={transaction}
+          errors={errors}
+          onChange={onChange}
+        />
       </Box>
 
       {error && (

@@ -22,24 +22,26 @@ export const FormField = ({ render: Render, ...props }: FormFieldProps) => {
   return <Render {...props} />
 }
 
-type FormGroupProps = SystemProps & {
+type FormGroupProps<T> = SystemProps & {
   readOnly?: boolean
   title?: string
-  disabled?: boolean
   narrow?: boolean
-  fieldErrors?: Record<string, any>
+  data: T
+  errors: Record<string, string>
   children: React.ReactNode
   onChange: FormChangeHandler<any>
 }
 
-export const FormGroup = ({
+export function FormGroup<T>({
   narrow,
   readOnly,
   title,
   children,
+  data,
+  errors,
   onChange,
   ...props
-}: FormGroupProps) => {
+}: FormGroupProps<T>) {
   return (
     <Box
       {...props}
@@ -53,7 +55,9 @@ export const FormGroup = ({
           child &&
           React.cloneElement(child, {
             readOnly: child.props.readOnly ?? readOnly,
-            onChange: onChange,
+            data,
+            errors,
+            onChange,
           })
       )}
     </Box>
