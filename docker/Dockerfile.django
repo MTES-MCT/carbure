@@ -26,6 +26,7 @@ COPY web/public /app/web/public
 COPY web/core /app/web/core
 COPY web/accounts /app/web/accounts
 COPY web/producers /app/web/producers
+COPY web/certificates /app/web/certificates
 COPY web/fixtures /app/web/fixtures
 COPY web/api /app/web/api
 COPY web/run.sh /app/web/run.sh
