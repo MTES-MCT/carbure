@@ -171,6 +171,7 @@ export function LabelAutoComplete<T>({
   required,
   disabled,
   readOnly,
+  icon,
   ...props
 }: LabelAutoCompleteProps<T>) {
   return (
@@ -181,6 +182,7 @@ export function LabelAutoComplete<T>({
       required={required}
       disabled={disabled}
       readOnly={readOnly}
+      icon={icon}
     >
       <AutoComplete {...props} readOnly={readOnly} disabled={disabled} />
     </Label>

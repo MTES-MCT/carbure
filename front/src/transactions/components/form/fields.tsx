@@ -21,6 +21,7 @@ import {
   MatierePremiere as MP,
   ProductionSiteDetails,
 } from "common/types"
+import { UserCheck } from "common/components/icons"
 
 type LIP = LabelInputProps
 type LACP<T> = LabelAutoCompleteProps<T>
@@ -132,12 +133,9 @@ export const Producer = (props: LACP<Entity>) => (
     getValue={getters.id}
     getLabel={getters.name}
     getQuery={api.findProducers}
+    icon={isKnown(props.value) ? UserCheck : undefined}
     {...props}
   />
-)
-
-export const UnknownProducer = (props: LIP) => (
-  <LabelInput name="producer" label="Producteur" {...props} />
 )
 
 export const ProductionSite = (props: LACP<ProductionSiteDetails>) => (
@@ -149,12 +147,9 @@ export const ProductionSite = (props: LACP<ProductionSiteDetails>) => (
     getValue={getters.id}
     getLabel={getters.name}
     getQuery={api.findProductionSites}
+    // icon={isKnown(props.value) ? UserCheck : undefined}
     {...props}
   />
-)
-
-export const UnknownProductionSite = (props: LIP) => (
-  <LabelInput {...props} name="production_site" label="Site de production" />
 )
 
 export const ProductionSiteCountry = (props: LACP<Country>) => (
@@ -205,6 +200,7 @@ export const CarbureVendor = (props: LACP<Entity>) => (
     getValue={getters.id}
     getLabel={getters.name}
     getQuery={api.findEntities}
+    icon={isKnown(props.value) ? UserCheck : undefined}
     {...props}
   />
 )
@@ -259,6 +255,7 @@ export const Client = (props: LACP<Entity>) => (
     getValue={getters.id}
     getLabel={getters.name}
     getQuery={api.findEntities}
+    icon={isKnown(props.value) ? UserCheck : undefined}
     {...props}
   />
 )
@@ -272,6 +269,7 @@ export const DeliverySite = (props: LACP<DS>) => (
     getValue={getters.depot_id}
     getLabel={getters.name}
     getQuery={api.findDeliverySites}
+    // icon={isKnown(props.value) ? UserCheck : undefined}
     {...props}
   />
 )

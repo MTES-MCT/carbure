@@ -14,7 +14,6 @@ const DeliveryFields = ({
     : data.delivery_site_country
 
   const isLotClient = isKnown(data.client) && entity?.id === data.client.id
-
   const showClient = !isLotClient || data.mac
   const showMAC = (readOnly && data.mac) || (!readOnly && entity?.has_mac)
 
