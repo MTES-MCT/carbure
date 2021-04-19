@@ -105,13 +105,13 @@ export const StatusTitle = ({
 
   return (
     <Box row className={styles.statusTitle}>
-      <Title>{children}</Title>
-
       <Status
         stock={stock}
         transaction={details?.transaction}
         entity={entity}
       />
+
+      <Title>{children}</Title>
 
       {details && hasDeadline(details.transaction, details.deadline) && (
         <span className={styles.transactionDeadline}>
@@ -119,11 +119,11 @@ export const StatusTitle = ({
         </span>
       )}
 
-      {/* {!editable && (
+      {editable && (
         <span className={styles.transactionEditable}>
-          (Ce lot ne peut pas être modifié)
+          * Les champs marqués d'une étoile sont obligatoires
         </span>
-      )} */}
+      )}
     </Box>
   )
 }
