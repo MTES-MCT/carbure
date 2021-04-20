@@ -31,7 +31,7 @@ const DevBanner = () => (
     }}
   >
     <b>Version de développement de CarbuRe :</b> les manipulations effectuées
-    ici n'ont pas de répercussion et les déclarations de sont pas prises en
+    ici n'ont pas de répercussion et les déclarations ne sont pas prises en
     compte.
   </div>
 )
