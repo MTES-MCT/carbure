@@ -1,3 +1,4 @@
+import merge from "merge"
 import { render } from "setupTests"
 import { screen, waitForElementToBeRemoved } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
@@ -10,7 +11,18 @@ import { useTransactions } from "../index"
 import TransactionDetails from "../routes/transaction-details"
 
 import server, { setDetails } from "./api"
-import { lotDetails, errorDetails, sentDetails, tofixDetails } from "./data"
+import {
+  lotDetails,
+  errorDetails,
+  sentDetails,
+  tofixDetails,
+  unknownProducerPartial,
+  unknownProdSitePartial,
+  noVendorPartial,
+  operatorAuthorPartial,
+  traderVendorPartial,
+  stockPartial,
+} from "./data"
 import { waitWhileLoading } from "common/__test__/helpers"
 import { clickOnCheckboxesAndConfirm } from "./helpers"
 
@@ -53,6 +65,54 @@ const TransactionWithRouter = ({ entity }: { entity: Entity }) => (
     </Route>
   </MemoryRouter>
 )
+
+function checkLotFields() {
+  screen.getByLabelText("Numéro douanier (DAE, DAA...)")
+  screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°)")
+  screen.getByLabelText("Biocarburant")
+  screen.getByLabelText("Matiere premiere")
+  screen.getByLabelText("Pays d'origine de la matière première")
+}
+
+function checkProductionFields() {
+  screen.getByLabelText("Site de production")
+  screen.getByLabelText("Certificat du site de production")
+  screen.getByLabelText("Pays de production")
+  screen.getByLabelText("Date de mise en service")
+  screen.getByLabelText("N° d'enregistrement double-compte")
+}
+
+function checkOriginFields() {
+  screen.getByLabelText("Producteur")
+  screen.getAllByLabelText("Fournisseur")
+  screen.getAllByLabelText("Certificat du fournisseur")
+  screen.getByLabelText("Champ libre")
+}
+
+function checkDeliveryFields() {
+  screen.getByLabelText("Client")
+  screen.getByLabelText("Site de livraison")
+  screen.getByLabelText("Pays de livraison")
+  screen.getByLabelText("Date de livraison")
+}
+
+function checkGESFields() {
+  screen.getByText("Émissions")
+  screen.getByLabelText("EEC")
+  screen.getByLabelText("EL")
+  screen.getByLabelText("EP")
+  screen.getByLabelText("ETD")
+  screen.getByLabelText("EU")
+
+  screen.getByText("Réductions")
+  screen.getByLabelText("ESCA")
+  screen.getByLabelText("ECCS")
+  screen.getByLabelText("ECCR")
+  screen.getByLabelText("EEE")
+
+  screen.getByLabelText("Total")
+  screen.getByLabelText("Réduction")
+}
 
 test("display transaction details", async () => {
   render(<TransactionWithRouter entity={producer} />)
@@ -413,4 +473,151 @@ test("reject inbox lot from details", async () => {
   await waitForElementToBeRemoved(() =>
     screen.queryByText("Détails de la transaction")
   )
+})
+
+test("transaction details form as producer - producer trades unknown producer lot to operator", async () => {
+  setDetails(
+    merge.recursive(
+      true,
+      sentDetails,
+      unknownProducerPartial,
+      unknownProdSitePartial
+    )
+  )
+
+  render(<TransactionWithRouter entity={producer} />)
+
+  await waitWhileLoading()
+  await screen.findByText("En attente")
+
+  checkLotFields()
+  checkOriginFields()
+  checkProductionFields()
+  checkDeliveryFields()
+
+  expect(screen.getByLabelText("Producteur")).toHaveValue("Unknown Producer")
+
+  const supplier = screen.getByLabelText("Fournisseur")
+  expect(supplier).toHaveValue("Unknown Supplier")
+
+  const supplierCertif = screen.getByLabelText("Certificat du fournisseur")
+  expect(supplierCertif).toHaveValue("ISCC2000 - Supplier")
+
+  expect(screen.getByLabelText("Site de production")).toHaveValue(
+    "Unknown Production Site"
+  )
+
+  const certif = screen.getByLabelText("Certificat du site de production")
+  expect(certif).toHaveValue("2BS - PSITE")
+
+  const psiteCountry = screen.getByLabelText("Pays de production")
+  expect(psiteCountry).toHaveValue("France")
+
+  expect(screen.getByLabelText("Votre certificat")).toHaveValue(
+    "ISCC1000 - Vendor"
+  )
+})
+
+test("transaction details form as operator - producer trades unknown producer lot to operator", async () => {
+  setDetails(
+    merge.recursive(
+      true,
+      sentDetails,
+      unknownProducerPartial,
+      unknownProdSitePartial
+    )
+  )
+
+  render(<TransactionWithRouter entity={operator} />)
+
+  await waitWhileLoading()
+  await screen.findByText("En attente")
+
+  checkLotFields()
+  checkOriginFields()
+  checkProductionFields()
+  checkDeliveryFields()
+
+  expect(screen.getByLabelText("Producteur")).toHaveValue("Unknown Producer")
+  expect(screen.getByLabelText("Fournisseur")).toHaveValue("Producteur Test")
+  expect(screen.getByLabelText("Certificat du fournisseur")).toHaveValue(
+    "ISCC1000 - Vendor"
+  )
+  expect(screen.getByLabelText("Site de production")).toHaveValue(
+    "Unknown Production Site"
+  )
+  expect(screen.getByLabelText("Certificat du site de production")).toHaveValue(
+    "2BS - PSITE"
+  )
+  expect(screen.getByLabelText("Pays de production")).toHaveValue("France")
+})
+
+test("transaction details form as operator - operator self accepts lot", async () => {
+  setDetails(
+    merge.recursive(
+      true,
+      sentDetails,
+      unknownProducerPartial,
+      unknownProdSitePartial,
+      noVendorPartial,
+      operatorAuthorPartial
+    )
+  )
+
+  render(<TransactionWithRouter entity={operator} />)
+
+  await waitWhileLoading()
+  await screen.findByText("En attente")
+
+  checkLotFields()
+  checkOriginFields()
+  checkProductionFields()
+  checkDeliveryFields()
+
+  expect(screen.getByLabelText("Producteur")).toHaveValue("Unknown Producer")
+  expect(screen.getByLabelText("Fournisseur")).toHaveValue("Unknown Supplier")
+  expect(screen.getByLabelText("Certificat du fournisseur")).toHaveValue(
+    "ISCC2000 - Supplier"
+  )
+  expect(screen.getByLabelText("Site de production")).toHaveValue(
+    "Unknown Production Site"
+  )
+  expect(screen.getByLabelText("Certificat du site de production")).toHaveValue(
+    "2BS - PSITE"
+  )
+  expect(screen.getByLabelText("Pays de production")).toHaveValue("France")
+})
+
+test("transaction details form as producer - lot sold by trader after buying from producer", async () => {
+  setDetails(
+    merge.recursive(true, sentDetails, traderVendorPartial, stockPartial)
+  )
+
+  render(<TransactionWithRouter entity={producer} />)
+
+  await waitWhileLoading()
+  await screen.findByText("En attente")
+
+  checkLotFields()
+  checkOriginFields()
+  checkProductionFields()
+  checkDeliveryFields()
+
+  expect(screen.getByLabelText("Producteur")).toHaveValue("Producteur Test")
+
+  const vendors = screen.getAllByLabelText("Fournisseur")
+  expect(vendors[0]).toHaveValue("Unknown Supplier")
+  expect(vendors[1]).toHaveValue("Trader Test")
+
+  const certificates = screen.getAllByLabelText("Certificat du fournisseur")
+  expect(certificates[0]).toHaveValue("ISCC2000 - Supplier")
+  expect(certificates[1]).toHaveValue("ISCC1000 - Vendor")
+
+  expect(screen.getByLabelText("Site de production")).toHaveValue(
+    "Test Production Site"
+  )
+  expect(screen.getByLabelText("Certificat du site de production")).toHaveValue(
+    "2BS - KNOWN PSITE"
+  )
+  expect(screen.getByLabelText("Pays de production")).toHaveValue("France")
 })

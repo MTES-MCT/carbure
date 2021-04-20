@@ -38,7 +38,6 @@ function checkLotFields() {
   screen.getByLabelText("Biocarburant *")
   screen.getByLabelText("Matiere premiere *")
   screen.getByLabelText("Pays d'origine de la matière première *")
-  screen.getByLabelText("Date de livraison")
 }
 
 function checkProductionFields() {
@@ -60,6 +59,7 @@ function checkDeliveryFields() {
   screen.getByLabelText("Client")
   screen.getByLabelText("Site de livraison *")
   screen.getByLabelText("Pays de livraison *")
+  screen.getByLabelText("Date de livraison")
 }
 
 function checkGESFields() {
