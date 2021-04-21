@@ -153,7 +153,7 @@ test("display transaction details", async () => {
 })
 
 test.only("edit transaction details", async () => {
-  jest.setTimeout(10)
+  jest.setTimeout(10000)
 
   render(<TransactionWithRouter entity={producer} />)
 
