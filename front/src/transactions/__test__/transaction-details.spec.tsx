@@ -152,9 +152,7 @@ test("display transaction details", async () => {
   expect(title).not.toBeInTheDocument()
 })
 
-test.only("edit transaction details", async () => {
-  jest.setTimeout(10000)
-
+test("edit transaction details", async () => {
   render(<TransactionWithRouter entity={producer} />)
 
   const title = screen.getByText("Détails de la transaction")

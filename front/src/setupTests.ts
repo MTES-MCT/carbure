@@ -24,6 +24,8 @@ document.body.append(modal, dropdown, notifications)
 // mock window.open (jsdom does not implement it)
 window.open = jest.fn()
 
+jest.setTimeout(10000)
+
 export function render(element: any) {
   const root = document.createElement("div")
   root.setAttribute("id", "root")
