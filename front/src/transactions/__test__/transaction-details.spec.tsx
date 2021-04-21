@@ -1,6 +1,10 @@
 import merge from "merge"
 import { render } from "setupTests"
-import { screen, waitForElementToBeRemoved } from "@testing-library/react"
+import {
+  screen,
+  waitFor,
+  waitForElementToBeRemoved,
+} from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { MemoryRouter } from "react-router-dom"
 import { Route } from "common/components/relative-route"
@@ -148,7 +152,9 @@ test("display transaction details", async () => {
   expect(title).not.toBeInTheDocument()
 })
 
-test("edit transaction details", async () => {
+test.only("edit transaction details", async () => {
+  jest.setTimeout(10)
+
   render(<TransactionWithRouter entity={producer} />)
 
   const title = screen.getByText("Détails de la transaction")
@@ -178,9 +184,12 @@ test("edit transaction details", async () => {
   userEvent.type(mp, "Co")
   userEvent.click(await screen.findByText("Colza"))
 
-  const ct = screen.getByLabelText("Pays d'origine de la matière première *")
+  const ct: any = screen.getByLabelText(
+    "Pays d'origine de la matière première *"
+  )
   userEvent.clear(ct)
-  userEvent.type(ct, "France")
+  userEvent.type(ct, "Fra")
+  userEvent.click(await screen.findByText("France"))
 
   const dd = screen.getByLabelText("Date de livraison")
   userEvent.clear(dd)
@@ -253,7 +262,7 @@ test("edit transaction details", async () => {
   await screen.findByDisplayValue("DAETESTUPDATE OK")
 
   userEvent.click(screen.getByText("Retour"))
-  expect(title).not.toBeInTheDocument()
+  await waitFor(() => expect(title).not.toBeInTheDocument())
 })
 
 test("check transaction errors", async () => {
@@ -488,7 +497,7 @@ test("transaction details form as producer - producer trades unknown producer lo
   render(<TransactionWithRouter entity={producer} />)
 
   await waitWhileLoading()
-  await screen.findByText("En attente")
+  await screen.findByDisplayValue("DAETEST")
 
   checkLotFields()
   checkOriginFields()
@@ -531,7 +540,7 @@ test("transaction details form as operator - producer trades unknown producer lo
   render(<TransactionWithRouter entity={operator} />)
 
   await waitWhileLoading()
-  await screen.findByText("En attente")
+  await screen.findByDisplayValue("DAETEST")
 
   checkLotFields()
   checkOriginFields()
@@ -567,7 +576,7 @@ test("transaction details form as operator - operator self accepts lot", async (
   render(<TransactionWithRouter entity={operator} />)
 
   await waitWhileLoading()
-  await screen.findByText("En attente")
+  await screen.findByDisplayValue("DAETEST")
 
   checkLotFields()
   checkOriginFields()
@@ -596,7 +605,7 @@ test("transaction details form as producer - lot sold by trader after buying fro
   render(<TransactionWithRouter entity={producer} />)
 
   await waitWhileLoading()
-  await screen.findByText("En attente")
+  await screen.findByDisplayValue("DAETEST")
 
   checkLotFields()
   checkOriginFields()
