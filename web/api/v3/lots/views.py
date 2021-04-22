@@ -704,6 +704,7 @@ def validate_declaration(request, *args, **kwargs):
 
 @check_rights('entity_id')
 def forward_lots(request, *args, **kwargs):
+    # note: this is the "Forward" feature for Operators (Processing done by someone else)
     context = kwargs['context']
     entity = context['entity']
 
