@@ -212,7 +212,7 @@ export default function useSendLot(
           entity.id,
           selection.selected,
           data?.carbure_client?.id,
-          data?.certificate?.certificate_id
+          data?.certificate ?? ""
         )
       )
     }
