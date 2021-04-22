@@ -16,6 +16,8 @@ from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionS
 from core.models import ISCCCertificate, EntityISCCTradingCertificate
 from core.models import DBSCertificate, EntityDBSTradingCertificate
 from core.models import REDCertCertificate, EntityREDCertTradingCertificate
+from certificates.models import EntitySNTradingCertificate, SNCertificate
+
 
 import dateutil.parser
 from api.v3.sanity_checks import bulk_sanity_checks, tx_is_valid, lot_is_valid
@@ -155,6 +157,7 @@ def get_prefetched_data(entity=None):
         my_vendor_certificates += [c.certificate.certificate_id for c in EntityISCCTradingCertificate.objects.filter(entity=entity)]
         my_vendor_certificates += [c.certificate.certificate_id for c in EntityDBSTradingCertificate.objects.filter(entity=entity)]
         my_vendor_certificates += [c.certificate.certificate_id for c in EntityREDCertTradingCertificate.objects.filter(entity=entity)]
+        my_vendor_certificates += [c.certificate.certificate_id for c in EntitySNTradingCertificate.objects.filter(entity=entity)]
         d['my_vendor_certificates'] = my_vendor_certificates
     else:
         d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
@@ -163,6 +166,7 @@ def get_prefetched_data(entity=None):
     d['iscc_certificates'] = {c.certificate_id.upper(): c for c in ISCCCertificate.objects.filter(valid_until__gte=lastyear)}
     d['2bs_certificates'] = {c.certificate_id.upper(): c for c in DBSCertificate.objects.filter(valid_until__gte=lastyear)}
     d['redcert_certificates'] = {c.certificate_id.upper(): c for c in REDCertCertificate.objects.filter(valid_until__gte=lastyear)}
+    d['sn_certificates'] = [c.certificate_id.upper() for c in SNCertificate.objects.filter(valid_until__gte=lastyear)]
     return d
 
 
