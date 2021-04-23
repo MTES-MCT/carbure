@@ -525,7 +525,7 @@ def make_dump_lots_sheet(workbook, entity, transactions):
                lot.carbure_producer.name if lot.carbure_producer else lot.unknown_producer,
                lot.carbure_production_site.name if lot.carbure_production_site else lot.unknown_production_site,
                lot.carbure_production_site.country.code_pays if lot.carbure_production_site and lot.carbure_production_site.country else lot.unknown_production_country.code_pays if lot.unknown_production_country else '',
-               lot.unknown_production_site_reference, 
+               lot.carbure_production_site_reference if lot.carbure_production_site else lot.unknown_production_site_reference, 
                com_date,
                lot.carbure_production_site.dc_reference if lot.carbure_production_site and lot.matiere_premiere.is_double_compte else lot.unknown_production_site_dbl_counting,
                tx.carbure_vendor.name if tx.carbure_vendor else tx.lot.unknown_supplier,

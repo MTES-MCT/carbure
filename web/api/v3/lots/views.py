@@ -358,6 +358,7 @@ def delete_lot(request):
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
 
+    deleted = 0
     for tx_id in tx_ids:
         try:
             tx = LotTransaction.objects.get(id=tx_id)
@@ -376,10 +377,11 @@ def delete_lot(request):
 
         if tx.delivery_status == 'R' and tx.lot.parent_lot != None:
             # credit volume back to stock
-            tx.lot.parent_lot.volume += tx.lot.volume
+            tx.lot.parent_lot.remaining_volume += tx.lot.volume
             tx.lot.parent_lot.save()
         tx.lot.delete()
-    return JsonResponse({'status': 'success'})
+        deleted += 1
+    return JsonResponse({'status': 'success', 'deleted': deleted})
 
 
 @otp_required
