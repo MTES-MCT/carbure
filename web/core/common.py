@@ -74,13 +74,13 @@ def send_lot_from_stock(rights, tx, prefetched_data):
     if not lot.parent_lot:
         return False, 'Tx does not have parent'
 
-    if lot.volume > lot.parent_lot.volume:
-        return False, 'Quantité disponible dans la mass balance insuffisante: Dispo %d litres, lot %d litres' % (lot.parent_lot.volume, lot.volume)
+    if lot.volume > lot.parent_lot.remaining_volume:
+        return False, 'Quantité disponible dans la mass balance insuffisante: Dispo %d litres, lot %d litres' % (lot.parent_lot.remaining_volume, lot.volume)
 
     lot.carbure_id = generate_carbure_id(lot) + 'S'
     lot.status = "Validated"
     lot.save()
-    lot.parent_lot.volume -= lot.volume
+    lot.parent_lot.remaining_volume -= lot.volume
     lot.parent_lot.save()
     return True, ''
 

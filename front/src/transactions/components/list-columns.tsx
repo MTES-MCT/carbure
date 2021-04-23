@@ -111,6 +111,17 @@ export const biocarburant: Column<Transaction> = {
   ),
 }
 
+export const biocarburantInStock: Column<Transaction> = {
+  header: "Biocarburant (litres)",
+  sortBy: "biocarburant",
+  render: (tx) => (
+    <TwoLines
+      text={tx.lot.biocarburant?.name}
+      sub={`${tx.lot.remaining_volume.toLocaleString("fr-FR")} / ${tx.lot.volume.toLocaleString("fr-FR")}`}
+    />
+  ),
+}
+
 export const volume: Column<Transaction> = {
   header: "Volume",
   sortBy: "volume",

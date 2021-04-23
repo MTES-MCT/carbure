@@ -125,6 +125,7 @@ export interface Lot {
   id: number
   carbure_id: string
   volume: number
+  remaining_volume: number
   period: string
   source: string
   status: "Draft" | "Validated"
