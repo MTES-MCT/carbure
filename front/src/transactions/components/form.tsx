@@ -141,7 +141,7 @@ const ProducerFields = ({
       />
 
       {tx.producer_is_in_carbure ? (
-        <React.Fragment key="in_carbure">
+        <React.Fragment key="producer_in_carbure">
           <LabelAutoComplete
             readOnly={readOnly || isProducer}
             label="Producteur"
@@ -153,7 +153,22 @@ const ProducerFields = ({
             getLabel={getters.name}
             getQuery={api.findProducers}
             onChange={onChange}
+          /> 
+        </React.Fragment>) : (
+        <React.Fragment key="producer_not_in_carbure">
+          <LabelInput
+            readOnly={readOnly}
+            label="Producteur"
+            name="unknown_producer"
+            value={tx.unknown_producer}
+            error={fieldErrors.producer}
+            onChange={onChange}
           />
+        </React.Fragment>
+      )}
+
+      {tx.production_site_is_in_carbure ? (
+        <React.Fragment key="production_site_in_carbure">
           <LabelAutoComplete
             readOnly={readOnly}
             label="Site de production"
@@ -192,15 +207,7 @@ const ProducerFields = ({
           />
         </React.Fragment>
       ) : (
-        <React.Fragment key="not_in_carbure">
-          <LabelInput
-            readOnly={readOnly}
-            label="Producteur"
-            name="unknown_producer"
-            value={tx.unknown_producer}
-            error={fieldErrors.producer}
-            onChange={onChange}
-          />
+        <React.Fragment key="production_site_not_in_carbure">
           <LabelInput
             readOnly={readOnly}
             label="Site de production"
