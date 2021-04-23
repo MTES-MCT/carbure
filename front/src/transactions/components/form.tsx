@@ -345,7 +345,7 @@ const CertificateFields = ({
         />
       )}
 
-      {tx.producer_is_in_carbure ? (
+      {tx.production_site_is_in_carbure ? (
         <LabelAutoComplete
           loose
           readOnly={readOnly}
