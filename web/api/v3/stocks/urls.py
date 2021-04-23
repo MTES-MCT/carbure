@@ -11,7 +11,6 @@ urlpatterns = [
     path('generate-batch', views.generate_batch, name='api-v3-stocks-generate-batch'),
     path('create-drafts', views.create_drafts, name='api-v3-stocks-create-drafts'),
     path('send-drafts', views.send_drafts, name='api-v3-stocks-send-drafts'),
-    path('send-all-drafts', views.send_all_drafts, name='api-v3-stocks-send-all-drafts'),
     path('convert-to-etbe', views.convert_to_etbe, name='api-v3-stocks-convert-to-etbe'),
     path('forward', views.forward, name='api-v3-stocks-forward'),
 

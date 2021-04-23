@@ -90,7 +90,7 @@ export const StockDraftActions = ({
     if (hasSelection) {
       deleter.deleteSelection()
     } else {
-      deleter.deleteAllDrafts()
+      deleter.deleteAll()
     }
   }
 

@@ -7,24 +7,30 @@ import useAPI from "../../../common/hooks/use-api"
 
 import { confirm } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
+import { FilterSelection } from "../query/use-filters"
+import { SpecialSelection } from "../query/use-special"
+import { SearchSelection } from "../query/use-search"
+import { LotStatus } from "common/types"
 
 export interface LotDeleter {
   loading: boolean
   deleteLot: (l: number) => Promise<boolean>
   deleteSelection: () => Promise<boolean>
-  deleteAllDrafts: () => Promise<boolean>
+  deleteAll: () => Promise<boolean>
 }
 
 export default function useDeleteLots(
   entity: EntitySelection,
   selection: TransactionSelection,
+  filters: FilterSelection,
   year: YearSelection,
+  search: SearchSelection,
+  special: SpecialSelection,
   refresh: () => void
 ): LotDeleter {
   const notifications = useNotificationContext()
 
   const [request, resolveDelete] = useAPI(api.deleteLots)
-  const [requestAll, resolveDeleteAll] = useAPI(api.deleteAllDraftLots)
 
   async function notifyDelete(promise: Promise<any>, many: boolean = false) {
     const res = await promise
@@ -74,23 +80,35 @@ export default function useDeleteLots(
     return shouldDelete
   }
 
-  async function deleteAllDrafts() {
-    const shouldDelete = await confirm(
-      "Supprimer lot",
-      "Voulez vous supprimer tous ces lots ?"
-    )
+  async function deleteAll() {
+    if (entity !== null) {
+      const filteredDrafts = await api.getLots(LotStatus.Draft, entity.id, filters["selected"], year.selected, 0, null, search.query, 'id', 'asc', special.invalid, special.deadline) // prettier-ignore
+      const nbClients = new Set(
+        filteredDrafts.lots.map((o) => o.carbure_client ? o.carbure_client.name : o.unknown_client)
+      ).size
+      const totalVolume = filteredDrafts.lots
+        .map((o) => o.lot.volume)
+        .reduce((sum, vol) => sum + vol)
+      const clientsStr = nbClients > 1 ? "clients" : "client"
+      const allTxids = filteredDrafts.lots.map((o) => o.id)
 
-    if (entity !== null && shouldDelete) {
-      await notifyDelete(resolveDeleteAll(entity.id, year.selected), true)
+      const shouldDelete = await confirm(
+        "Supprimer tous ces brouillons",
+        `Voulez êtes sur le point de supprimer ${filteredDrafts.lots.length} lots concernant ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres`
+      )
+
+      if (entity !== null && shouldDelete) {
+        await notifyDelete(resolveDelete(entity.id, allTxids), true)
+      }
+      return shouldDelete
     }
-
-    return shouldDelete
+    return false
   }
 
   return {
-    loading: request.loading || requestAll.loading,
+    loading: request.loading,
     deleteLot,
     deleteSelection,
-    deleteAllDrafts,
+    deleteAll,
   }
 }
