@@ -1,6 +1,7 @@
 import * as Fields from "./fields"
-import { FieldsProps, isKnown } from "./fields"
+import { FieldsProps } from "./fields"
 import { FormGroup } from "common/components/form"
+import { EntityType } from "common/types"
 
 const ProductionFields = ({
   readOnly,
@@ -9,7 +10,7 @@ const ProductionFields = ({
   errors,
   onChange,
 }: FieldsProps) => {
-  const isLotProducer = isKnown(data.producer) && data.producer.id === entity?.id // prettier-ignore
+  const isProducer = entity?.entity_type === EntityType.Producer // prettier-ignore
 
   return (
     <FormGroup
@@ -19,7 +20,7 @@ const ProductionFields = ({
       errors={errors}
       onChange={onChange}
     >
-      <Fields.ProductionSite search={isLotProducer} />
+      <Fields.ProductionSite search={isProducer} />
       <Fields.ProductionSiteReference />
       <Fields.ProductionSiteCountry />
       <Fields.ProductionSiteDblCounting />
