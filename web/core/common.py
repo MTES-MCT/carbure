@@ -407,6 +407,7 @@ def fill_volume_info(lot_row, lot):
         volume = lot_row['volume']
         try:
             lot.volume = float(volume)
+            lot.remaining_volume = lot.volume
             if lot.volume <= 0:
                 lot_errors.append(LotV2Error(lot=lot, field='volume',
                                             error='Le volume doit être supérieur à 0', value=volume))
