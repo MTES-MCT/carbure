@@ -155,7 +155,7 @@ export default function useSendLot(
 
   async function sendAllDrafts() {
     if (entity !== null) {
-      const filteredDrafts = await api.getStocks(entity.id, filters["selected"], "in", 0, null, search.query)
+      const filteredDrafts = await api.getStocks(entity.id, filters["selected"], "tosend", 0, null, search.query)
       const nbClients = new Set(
         filteredDrafts.lots.map((o) => o.carbure_client ? o.carbure_client.name : o.unknown_client)
       ).size
@@ -165,15 +165,21 @@ export default function useSendLot(
       const clientsStr = nbClients > 1 ? "clients" : "client"
       const allTxids = filteredDrafts.lots.map((o) => o.id)
 
-      const shouldSend = await confirm(
-        "Envoyer tous ces brouillons",
-        `Voulez êtes sur le point d'envoyer ${filteredDrafts.lots.length} lots à ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres ?`
-      )
+      const shouldSend = await prompt<boolean>((resolve) => (
+        <ValidationPrompt
+          stock
+          title="Envoyer tous ces brouillons"
+          description={`Voulez êtes sur le point d'envoyer ${filteredDrafts.lots.length} lots à ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres ?`}
+          entityID={entity.id}
+          selection={allTxids}
+          onResolve={resolve}
+        />
+      ))
 
       if (entity !== null && shouldSend) {
         await notifySend(resolveSend(entity.id, allTxids), true)
       }
-      return shouldSend
+      return Boolean(shouldSend)
     }
     return false
   }

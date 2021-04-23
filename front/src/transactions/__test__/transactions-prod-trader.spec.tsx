@@ -419,7 +419,7 @@ test("producer/trader: send all draft lots", async () => {
   userEvent.click(button)
 
   // confirm the sending
-  const title = screen.getByText("Envoyer tous ces brouillons")
+  const title = await screen.findByText("Envoyer tous ces brouillons")
   clickOnCheckboxesAndConfirm()
 
   expect(title).not.toBeInTheDocument()
@@ -509,7 +509,7 @@ test("producer/trader: delete all draft lot", async () => {
   userEvent.click(button)
 
   // confirm the sending
-  const title = screen.getByText("Supprimer tous ces brouillons")
+  const title = await screen.findByText("Supprimer tous ces brouillons")
   userEvent.click(screen.getByText("OK"))
 
   expect(title).not.toBeInTheDocument()
