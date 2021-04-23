@@ -143,15 +143,21 @@ export default function useValidateLots(
       const clientsStr = nbClients > 1 ? "clients" : "client"
       const allTxids = filteredDrafts.lots.map((o) => o.id)
 
-      const shouldValidate = await confirm(
-        "Envoyer tous ces brouillons",
-        `Voulez êtes sur le point d'envoyer ${filteredDrafts.lots.length} lots à ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres ?`
-      )
+      const shouldValidate = await prompt<boolean>((resolve) => (
+        <ValidationPrompt
+          stock
+          title="Envoyer tous ces brouillons"
+          description={`Voulez êtes sur le point d'envoyer ${filteredDrafts.lots.length} lots à ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres ?`}
+          entityID={entity.id}
+          selection={allTxids}
+          onResolve={resolve}
+        />
+      ))
 
       if (entity !== null && shouldValidate) {
         await notifyValidate(resolveValidate(entity.id, allTxids), true)
       }
-      return shouldValidate
+      return Boolean(shouldValidate)
     }
     return false
   }
