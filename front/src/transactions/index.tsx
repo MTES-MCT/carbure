@@ -108,8 +108,8 @@ export function useTransactions(entity: EntitySelection) {
 
   const uploader = useUploadLotFile(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
-  const deleter = useDeleteLots(entity, selection, year, refresh)
-  const validator = useValidateLots(entity, selection, year, refresh)
+  const deleter = useDeleteLots(entity, selection, filters, year, search, special, refresh)
+  const validator = useValidateLots(entity, selection, filters, year, search, special, refresh)
   const acceptor = useAcceptLots(entity, selection, filters, year, search, special, refresh)
   const rejector = useRejectLots(entity, selection, filters, year, search, special, refresh)
   const declarator = useDeclareLots(entity)

@@ -1,6 +1,7 @@
 import { EntitySelection } from "carbure/hooks/use-entity"
 
 import * as api from "stocks/api"
+
 import useAPI from "common/hooks/use-api"
 import { confirm } from "common/components/dialog"
 import { prompt } from "common/components/dialog"
@@ -18,6 +19,10 @@ import { useNotificationContext } from "common/components/notifications"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { ConvertETBE, StockDraft } from "common/types"
 import { ValidationPrompt } from "transactions/components/validation"
+import { YearSelection } from "transactions/hooks/query/use-year"
+import { FilterSelection } from "transactions/hooks/query/use-filters"
+import { SearchSelection } from "transactions/hooks/query/use-search"
+import { SpecialSelection } from "transactions/hooks/query/use-special"
 
 export interface LotSender {
   loading: boolean
@@ -33,12 +38,13 @@ export interface LotSender {
 export default function useSendLot(
   entity: EntitySelection,
   selection: TransactionSelection,
+  filters: FilterSelection,
+  search: SearchSelection,
   refresh: () => void
 ): LotSender {
   const notifications = useNotificationContext()
   const [requestCreate, resolveCreate] = useAPI(api.createDraftsFromStock)
   const [requestSend, resolveSend] = useAPI(api.sendDraftsFromStock)
-  const [requestSendAll, resolveSendAll] = useAPI(api.sendAllDraftFromStock)
   const [requestETBE, resolveETBE] = useAPI(api.convertToETBE)
   const [requestForward, resolveForward] = useAPI(api.forwardLots)
 
@@ -148,23 +154,28 @@ export default function useSendLot(
   }
 
   async function sendAllDrafts() {
-    if (entity === null) return false
+    if (entity !== null) {
+      const filteredDrafts = await api.getStocks(entity.id, filters["selected"], "in", 0, null, search.query)
+      const nbClients = new Set(
+        filteredDrafts.lots.map((o) => o.carbure_client ? o.carbure_client.name : o.unknown_client)
+      ).size
+      const totalVolume = filteredDrafts.lots
+        .map((o) => o.lot.volume)
+        .reduce((sum, vol) => sum + vol)
+      const clientsStr = nbClients > 1 ? "clients" : "client"
+      const allTxids = filteredDrafts.lots.map((o) => o.id)
 
-    const shouldSend = await prompt<boolean>((resolve) => (
-      <ValidationPrompt
-        stock
-        title="Envoyer la sélection"
-        description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
-        entityID={entity.id}
-        onResolve={resolve}
-      />
-    ))
+      const shouldSend = await confirm(
+        "Envoyer tous ces brouillons",
+        `Voulez êtes sur le point d'envoyer ${filteredDrafts.lots.length} lots à ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres ?`
+      )
 
-    if (entity !== null && shouldSend) {
-      notifySend(resolveSendAll(entity.id), true)
+      if (entity !== null && shouldSend) {
+        await notifySend(resolveSend(entity.id, allTxids), true)
+      }
+      return shouldSend
     }
-
-    return Boolean(shouldSend)
+    return false
   }
 
   // async function convertETBE(txID: number) {
@@ -224,13 +235,12 @@ export default function useSendLot(
     loading:
       requestCreate.loading ||
       requestSend.loading ||
-      requestSendAll.loading ||
       requestETBE.loading ||
       requestForward.loading,
     createDrafts,
     sendSelection,
-    sendAllDrafts,
     sendLot,
+    sendAllDrafts,
     // convertETBE,
     convertETBEComplex,
     forwardLots,

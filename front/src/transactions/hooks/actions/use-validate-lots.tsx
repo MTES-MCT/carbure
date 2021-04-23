@@ -9,26 +9,32 @@ import { confirm, prompt } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
 import { CommentPrompt } from "transactions/components/form-comments"
 import { ValidationPrompt } from "transactions/components/validation"
+import { LotStatus } from "common/types"
+import { FilterSelection } from "../query/use-filters"
+import { SearchSelection } from "../query/use-search"
+import { SpecialSelection } from "../query/use-special"
 
 export interface LotValidator {
   loading: boolean
   validateLot: (l: number) => Promise<boolean>
   validateAndCommentLot: (l: number) => Promise<boolean>
   validateSelection: () => Promise<boolean>
-  validateAllDrafts: () => Promise<boolean>
+  validateAll: () => Promise<boolean>
 }
 
 export default function useValidateLots(
   entity: EntitySelection,
   selection: TransactionSelection,
+  filters: FilterSelection,
   year: YearSelection,
+  search: SearchSelection,
+  special: SpecialSelection,  
   refresh: () => void
 ): LotValidator {
   const notifications = useNotificationContext()
 
   const [request, resolveValidate] = useAPI(api.validateLots)
   const [requestComment, resolveValidateAndComment] = useAPI(api.validateAndCommentLot) // prettier-ignore
-  const [requestAll, resolveValidateAll] = useAPI(api.validateAllDraftLots)
 
   async function notifyValidate(promise: Promise<any>, many: boolean = false) {
     const res = await promise
@@ -125,30 +131,37 @@ export default function useValidateLots(
     return shouldValidate ?? false
   }
 
-  async function validateAllDrafts() {
-    if (entity === null) return false
+  async function validateAll() {
+    if (entity !== null) {
+      const filteredDrafts = await api.getLots(LotStatus.Draft, entity.id, filters["selected"], year.selected, 0, null, search.query, 'id', 'asc', special.invalid, special.deadline) // prettier-ignore
+      const nbClients = new Set(
+        filteredDrafts.lots.map((o) => o.carbure_client ? o.carbure_client.name : o.unknown_client)
+      ).size
+      const totalVolume = filteredDrafts.lots
+        .map((o) => o.lot.volume)
+        .reduce((sum, vol) => sum + vol)
+      const clientsStr = nbClients > 1 ? "clients" : "client"
+      const allTxids = filteredDrafts.lots.map((o) => o.id)
 
-    const shouldValidate = await prompt<boolean>((resolve) => (
-      <ValidationPrompt
-        title="Envoyer tous les brouillons"
-        description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
-        entityID={entity.id}
-        onResolve={resolve}
-      />
-    ))
+      const shouldValidate = await confirm(
+        "Envoyer tous ces brouillons",
+        `Voulez êtes sur le point d'envoyer ${filteredDrafts.lots.length} lots à ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres ?`
+      )
 
-    if (shouldValidate) {
-      await notifyValidate(resolveValidateAll(entity.id, year.selected), true)
+      if (entity !== null && shouldValidate) {
+        await notifyValidate(resolveValidate(entity.id, allTxids), true)
+      }
+      return shouldValidate
     }
-
-    return shouldValidate ?? false
+    return false
   }
 
+
   return {
-    loading: request.loading || requestAll.loading || requestComment.loading,
+    loading: request.loading || requestComment.loading,
     validateLot,
     validateAndCommentLot,
     validateSelection,
-    validateAllDrafts,
+    validateAll,
   }
 }
