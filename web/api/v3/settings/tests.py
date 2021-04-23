@@ -132,30 +132,6 @@ class SettingsAPITest(TestCase):
         response = self.client.post(reverse(url_enable), {'entity_id': self.entity2.id})
         self.assertEqual(response.status_code, 400)
 
-    def test_set_national_system_certificate(self):
-        url = 'api-v3-settings-set-national-system-certificate'
-        certificate_id = 'SV-BLABLABLA'
-
-        # wrongly formatted arg
-        response = self.client.post(reverse(url), {'entity_id': 'TOTO', 'national_system_certificate': certificate_id})
-        self.assertEqual(response.status_code, 400)        
-        # missing arguments
-        response = self.client.post(reverse(url), {'entity_id': self.entity2.id})
-        self.assertEqual(response.status_code, 400)
-        response = self.client.post(reverse(url), {'national_system_certificate': certificate_id})
-        self.assertEqual(response.status_code, 400)
-
-        # reject if trader
-        response = self.client.post(reverse(url), {'entity_id': self.entity3.id, 'national_system_certificate': certificate_id})
-        self.assertEqual(response.status_code, 403)        
-
-        # should pass
-        response = self.client.post(reverse(url), {'entity_id': self.entity2.id, 'national_system_certificate': certificate_id})
-        self.assertEqual(response.status_code, 200)
-        # check
-        entity = Entity.objects.get(id=self.entity2.id)
-        self.assertEqual(entity.national_system_certificate, certificate_id)
-
 
     def test_production_sites_settings(self):
         url_get = 'api-v3-settings-get-production-sites'

@@ -24,9 +24,10 @@ import { padding } from "transactions/components/list-columns"
 import { DBSCertificateSettingsHook } from "settings/hooks/use-2bs-certificates"
 import { ISCCCertificateSettingsHook } from "settings/hooks/use-iscc-certificates"
 import { REDCertCertificateSettingsHook } from "settings/hooks/use-redcert-certificates"
+import { SNCertificateSettingsHook } from "settings/hooks/use-national-system-certificates"
 
 type CertificatePromptProps = PromptProps<Certificate> & {
-  type: "2BS" | "ISCC" | "REDcert"
+  type: "2BS" | "ISCC" | "REDcert" | "SN"
   title: string
   description: string
   findCertificates: (q: string) => Promise<Certificate[]>
@@ -84,7 +85,7 @@ const COLUMNS: Column<Certificate>[] = [
 ]
 
 type CertificateSettingsProps = {
-  type: "2BS" | "ISCC" | "REDcert" | "2BS & ISCC & REDcert"
+  type: "2BS" | "ISCC" | "REDcert" | "SN" | "2BS & ISCC & REDcert & SN"
   loading: boolean
   certificates: Certificate[]
   onAdd?: () => void
@@ -208,5 +209,23 @@ export const REDCertCertificateSettings = ({
     onAdd={settings.addREDCertCertificate}
     onUpdate={settings.updateREDCertCertificate}
     onDelete={settings.deleteREDCertCertificate}
+  />
+)
+
+
+type SNCertificateSettingsProps = {
+  settings: SNCertificateSettingsHook
+}
+
+export const SNCertificateSettings = ({
+  settings,
+}: SNCertificateSettingsProps) => (
+  <CertificateSettings
+    type="SN"
+    loading={settings.isLoading}
+    certificates={settings.certificates}
+    onAdd={settings.addSNCertificate}
+    onUpdate={settings.updateSNCertificate}
+    onDelete={settings.deleteSNCertificate}
   />
 )

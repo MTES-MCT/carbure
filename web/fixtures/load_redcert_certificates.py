@@ -139,7 +139,7 @@ def load_certificates(existing_certificates, scopes, biomass):
         else:
             # existing certificate, check if valid_until has changed
             existingcert = existing_certificates[cert['Identifier']]
-            if valid_until != existingcert.valid_until:
+            if valid_until <= existingcert.valid_until:
                 invalidated.append((cert, existingcert))
         d = {'certificate_holder': cert['Name of the certificate holder'],
              'city': cert['City'],
@@ -222,9 +222,9 @@ def summary(args, new_biomass, new_scopes, new_certificates, newly_invalidated_c
             mail_content += "Nouveau scope enregistré: %s - %s<br />\n" % (ns[0], ns[1])
 
     if len(new_certificates):
+        mail_content += "Nouveaux certificats enregistrés:<br />\n"
         for nc in new_certificates:
-            mail_content += "Nouveau certificat enregistré<br />\n"
-            mail_content += str(nc)
+            mail_content += '%s - %s' % (nc['Identifier'], nc['Name of the certificate holder'])
             mail_content += '<br />'
 
     if len(failed):
@@ -235,30 +235,15 @@ def summary(args, new_biomass, new_scopes, new_certificates, newly_invalidated_c
 
     fraud = False
     if len(newly_invalidated_certificates):
-        fraud = True
         for (nic, previous) in newly_invalidated_certificates:
-            mail_content += "**** ACHTUNG certificat invalidé *****<br />\n"
-            mail_content += str(nic)
-            mail_content += '<br />'
-            mail_content += "Date de validité précédente: %s<br />" % (previous.valid_until)
-            mail_content += str(previous.natural_key())
-            mail_content += '<br />'
-
-    if len(added_scopes):
-        for cert, ads in added_scopes:
-            mail_content += "Nouveau Scope pour le Certificat [%s] - %s: %s<br />\n" % (cert.certificate_id, cert.certificate_holder, ads.scope.scope)
-
-    if len(removed_scopes):
-        for cert, rs in removed_scopes:
-            mail_content += "Retrait de Scope pour le Certificat [%s] - %s: %s<br />\n" % (cert.certificate_id, cert.certificate_holder, rs.scope.scope)
-
-    if len(added_biomass):
-        for cert, ab in added_biomass:
-            mail_content += "Nouvelle MP pour le Certificat [%s] - %s: %s<br />\n" % (cert.certificate_id, cert.certificate_holder, ab.biomass.code)
-
-    if len(removed_biomass):
-        for cert, rb in removed_biomass:
-            mail_content += "Retrait de MP pour le Certificat [%s] - %s: %s<br />\n" % (cert.certificate_id, cert.certificate_holder, rb.biomass.code)
+            if nic['Name of the certificate holder'] == previous['certificate_holder']:
+                fraud = True
+                mail_content += "**** ACHTUNG certificat invalidé *****<br />"
+                mail_content += str(nic)
+                mail_content += '<br />'
+                mail_content += "Date de validité précédente: %s<br />" % (previous.valid_until)
+                mail_content += str(previous.natural_key())
+                mail_content += '<br />'
 
     subject = "Certificats REDCert"
     if fraud:

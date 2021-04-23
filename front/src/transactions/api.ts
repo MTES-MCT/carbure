@@ -27,7 +27,7 @@ export function getLots(
   filters: FilterSelection["selected"],
   year: number,
   page: number,
-  limit: number,
+  limit: number | null,
   query: string,
   sortBy: string,
   order: string,
@@ -37,7 +37,7 @@ export function getLots(
   const params = {
     ...filters,
     entity_id: entityID,
-    from_idx: page * limit,
+    from_idx: limit ? page * limit : 0,
     sort_by: sortBy,
     status,
     year,
@@ -262,25 +262,6 @@ export function validateAllDraftLots(entityID: number, year: number) {
   })
 }
 
-export function acceptAllInboxLots(entityID: number, year: number) {
-  return api.post("/lots/accept-all", {
-    entity_id: entityID,
-    year,
-  })
-}
-
-export function rejectAllInboxLots(
-  entityID: number,
-  year: number,
-  comment: string
-) {
-  return api.post("/lots/reject-all", {
-    entity_id: entityID,
-    year,
-    comment,
-  })
-}
-
 export function getLotsOutSummary(
   entityID: number,
   lot_status: LotStatus,
@@ -385,7 +366,7 @@ export function getAdminLots(
   filters: FilterSelection["selected"],
   year: number,
   page: number,
-  limit: number,
+  limit: number | null,
   query: string,
   sortBy: string,
   order: string,
@@ -395,7 +376,7 @@ export function getAdminLots(
   const params = {
     ...filters,
     entity_id: entityID,
-    from_idx: page * limit,
+    from_idx: limit ? page * limit : 0,
     sort_by: sortBy,
     status,
     year,

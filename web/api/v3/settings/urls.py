@@ -11,7 +11,6 @@ urlpatterns = [
      path('disable-mac', views.disable_mac, name='api-v3-settings-disable-mac'),
      path('enable-trading', views.enable_trading, name='api-v3-settings-enable-trading'),
      path('disable-trading', views.disable_trading, name='api-v3-settings-disable-trading'),
-     path('set-national-system-certificate', views.set_national_system_certificate, name='api-v3-settings-set-national-system-certificate'),
 
      path('get-production-sites', views.get_production_sites, name='api-v3-settings-get-production-sites'),
      path('add-production-site', views.add_production_site, name='api-v3-settings-add-production-site'),
@@ -43,6 +42,15 @@ urlpatterns = [
      path('add-redcert-certificate', views.add_redcert_certificate, name='api-v3-settings-add-redcert-certificate'),
      path('delete-redcert-certificate', views.delete_redcert_certificate, name='api-v3-settings-delete-redcert-certificate'),
      path('update-redcert-certificate', views.update_redcert_certificate, name='api-v3-settings-update-redcert-certificate'),
+
+
+     # SN / Systeme National
+     path('get-sn-certificates', views.get_sn_certificates, name='api-v3-settings-get-sn-certificates'),
+     path('add-sn-certificate', views.add_sn_certificate, name='api-v3-settings-add-sn-certificate'),
+     path('delete-sn-certificate', views.delete_sn_certificate, name='api-v3-settings-delete-sn-certificate'),
+     path('update-sn-certificate', views.update_sn_certificate, name='api-v3-settings-update-sn-certificate'),
+
+
 
      path('get-my-certificates', views.get_my_certificates, name='api-v3-settings-get-my-certificates'),
      path('set-production-site-certificates', views.set_production_site_certificates, name='api-v3-settings-set-production-site-certificates'),

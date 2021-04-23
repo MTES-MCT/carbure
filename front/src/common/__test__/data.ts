@@ -8,7 +8,6 @@ export const producer: Entity = {
   entity_type: EntityType.Producer,
   has_mac: true,
   has_trading: true,
-  national_system_certificate: "",
 }
 
 export const trader: Entity = {
@@ -17,7 +16,6 @@ export const trader: Entity = {
   entity_type: EntityType.Trader,
   has_mac: true,
   has_trading: true,
-  national_system_certificate: "",
 }
 
 export const operator: Entity = {
@@ -26,7 +24,6 @@ export const operator: Entity = {
   entity_type: EntityType.Operator,
   has_mac: true,
   has_trading: false,
-  national_system_certificate: "",
 }
 
 export const admin: Entity = {
@@ -35,7 +32,6 @@ export const admin: Entity = {
   entity_type: EntityType.Administration,
   has_mac: false,
   has_trading: false,
-  national_system_certificate: "",
 }
 
 // COUNTRIES
@@ -147,6 +143,28 @@ export const expiredRedcertCertificate = {
   certification_type: "",
   download_link: "",
   scope: ["Expired Scope Test"],
+  has_been_updated: false,
+}
+
+export const snCertificate = {
+  certificate_id: "SN_UN_2020_0108",
+  certificate_holder: "PMSE",
+  valid_from: null,
+  valid_until: "2025-09-30",
+  download_link: "",
+  scope: ["6b"],
+  type: "SN",
+  has_been_updated: false,
+}
+
+export const expiredSNCertificate = {
+  certificate_id: "Expired SN_UN_2020_0108",
+  certificate_holder: "PMSE",
+  valid_from: null,
+  valid_until: "2020-09-30",
+  download_link: "",
+  scope: ["6b"],
+  type: "SN",
   has_been_updated: false,
 }
 

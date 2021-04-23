@@ -1,0 +1,35 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+<p>Select new delivery_status: </p>
+
+<form action="" method="post">
+    {% csrf_token %}
+    {{ change_delivery_status_form }}
+
+    <p>The changes will be applied to:</p>
+
+    <table>
+      <tbody>
+	{% for item in transactions %}
+	<tr>
+	  <td>{{ item.lot.period }}</td>
+	  <td>{{ item.carbure_vendor.name }}</td>
+	  <td>{{ item.dae }}</td>
+	  <td>{{ item.carbure_client }}</td>
+	  <td>{{ item.unknown_client }}</td>
+	  <td>{{ item.carbure_delivery_site }}</td>
+	  <td>{{ item.unknown_delivery_site }}</td>
+	</tr>
+	{% endfor %}
+      </tbody>
+    </table>
+    
+
+    <input type="hidden" name="action" value="change_transaction_delivery_status" />
+    <input type="submit" name="apply" value="Change Delivery Status" />
+</form>
+
+{% endblock %}
+

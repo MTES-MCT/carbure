@@ -85,7 +85,7 @@ export const vendor: Column<Transaction> = {
   sortBy: "vendor",
   render: (tx) => (
     <TwoLines
-      text={tx.carbure_vendor?.name ?? tx.lot.unknown_supplier ?? ""}
+      text={tx.carbure_vendor?.name ?? (tx.lot.unknown_supplier != '' ? tx.lot.unknown_supplier : tx.lot.unknown_supplier_certificate) ?? "N/A"}
       sub={
         tx.lot.carbure_production_site_reference ??
         tx.lot.unknown_production_site_reference
@@ -107,6 +107,17 @@ export const biocarburant: Column<Transaction> = {
     <TwoLines
       text={tx.lot.biocarburant?.name}
       sub={tx.lot.volume.toLocaleString("fr-FR")}
+    />
+  ),
+}
+
+export const biocarburantInStock: Column<Transaction> = {
+  header: "Biocarburant (litres)",
+  sortBy: "biocarburant",
+  render: (tx) => (
+    <TwoLines
+      text={tx.lot.biocarburant?.name}
+      sub={`${tx.lot.remaining_volume.toLocaleString("fr-FR")} / ${tx.lot.volume.toLocaleString("fr-FR")}`}
     />
   ),
 }

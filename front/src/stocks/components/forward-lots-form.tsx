@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react"
 
-import { Entity, ProductionCertificate } from "common/types"
+import { Certificate, Entity, ProductionCertificate } from "common/types"
 
 import useForm from "common/hooks/use-form"
 
@@ -14,13 +14,12 @@ import {
   DialogTitle,
   PromptProps,
 } from "common/components/dialog"
-import { findEntities } from "common/api"
-import { findCertificates } from "settings/api"
+import { findEntities, findCertificates } from "common/api"
 import { LabelAutoComplete } from "common/components/autocomplete"
 
 export interface ForwardClientFormState {
   carbure_client: Entity | null
-  certificate: ProductionCertificate | null
+  certificate: string | null
 }
 
 const initialState: ForwardClientFormState = {
@@ -60,8 +59,8 @@ export const ForwardLotsClientSelectionPrompt = ({
           label="Certificat"
           name="certificate"
           value={data.certificate}
-          getValue={(c) => c.certificate_id}
-          getLabel={(c) => `${c.type} - ${c.holder} - ${c.certificate_id}`}
+          getValue={(v) => v}
+          getLabel={(v) => v}
           getQuery={findCertificates}
           queryArgs={[entityID]}
           onChange={onChange}

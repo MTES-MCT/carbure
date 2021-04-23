@@ -44,7 +44,7 @@ type StockTableProps = {
   sender: LotSender
 }
 
-const COLUMNS = [C.origine, C.biocarburant, C.matierePremiere, C.ghgReduction]
+const COLUMNS = [C.origine, C.biocarburantInStock, C.matierePremiere, C.ghgReduction]
 
 export const StockTable = ({
   stock,

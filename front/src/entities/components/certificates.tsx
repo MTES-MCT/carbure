@@ -10,7 +10,7 @@ const Certificates = ({ certificates }: CertificatesProps) => {
   return (
     <CertificateSettings
       loading={certificates.loading}
-      type="2BS & ISCC & REDcert"
+      type="2BS & ISCC & REDcert & SN"
       certificates={certificates.data ?? []}
     />
   )
