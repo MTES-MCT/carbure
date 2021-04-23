@@ -71,6 +71,7 @@ MIDDLEWARE = [
     'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'core.logging_middleware.LoggingMiddleware',
 ]
 
 ROOT_URLCONF = 'carbure.urls'
@@ -180,13 +181,24 @@ if env('TEST') is False:
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format' : "[%(asctime)s] %(levelname)s %(message)s",
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        },
+    },  
+
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
         },
     },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',
-    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',  # change debug level as appropiate
+            'propagate': False,
+        },
+    },  
 }
