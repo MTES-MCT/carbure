@@ -119,10 +119,13 @@ def send_new_token(request):
     if now > device.valid_until:
         device.generate_token(valid_secs=settings.OTP_EMAIL_TOKEN_VALIDITY)
     email_subject = 'Carbure - Code de Sécurité'
+    dt = device.valid_until.astimezone(pytz.timezone('Europe/Paris'))
+    expiry = "%s %s" % (dt.strftime('%H:%M'), dt.tzname())
     email_context = {
         'user': request.user,
         'domain': current_site.domain,
         'token': device.token,
+        'token_expiry': expiry,
     }
     html_message = loader.render_to_string('accounts/otp_token_email.html', email_context)
     text_message = loader.render_to_string('accounts/otp_token_email.txt', email_context)
@@ -181,6 +184,21 @@ def otp_verify(request):
         dt = device.valid_until.astimezone(pytz.timezone('Europe/Paris'))
         form = OTPForm(request.user)
         context['code_expiry'] = dt
+    context['form'] = form
+    return render(request, 'accounts/otp_verify.html', context=context)
+
+
+@login_required
+def resend_otp_code(request):
+    context = {}
+
+    # send token by email and display form
+    send_new_token(request)
+    device = EmailDevice.objects.get(user=request.user)
+    dt = device.valid_until.astimezone(pytz.timezone('Europe/Paris'))
+    form = OTPForm(request.user)
+    context['code_expiry'] = dt
+    context['msg'] = "Code renvoyé"
     context['form'] = form
     return render(request, 'accounts/otp_verify.html', context=context)
 

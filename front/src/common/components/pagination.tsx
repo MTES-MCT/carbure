@@ -24,7 +24,7 @@ const limits = [
 
 export type PageSelection = {
   page: number
-  limit: number
+  limit: number | null
   setPage: (p: number) => void
   setLimit: (l: number) => void
 }
@@ -32,7 +32,7 @@ export type PageSelection = {
 // manage pagination state
 export function usePageSelection(): PageSelection {
   const [page, setPage] = useState(0)
-  const [limit, setLimitState] = useState(10)
+  const [limit, setLimitState] = useState<number | null>(10)
 
   function setLimit(limit: number) {
     setPage(0)

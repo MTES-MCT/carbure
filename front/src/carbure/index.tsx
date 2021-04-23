@@ -23,6 +23,19 @@ import Entities from "../entities"
 import EntityDetails from "entities/routes/entity-details"
 import Registry from "./components/registry"
 
+const DevBanner = () => (
+  <div
+    style={{
+      backgroundColor: "var(--orange-medium)",
+      padding: "8px 120px",
+    }}
+  >
+    <b>Version de développement de CarbuRe :</b> les manipulations effectuées
+    ici n'ont pas de répercussion et les déclarations ne sont pas prises en
+    compte.
+  </div>
+)
+
 // has to be nested in a route so we can get data from useParams()
 const Org = ({ app }: { app: AppHook }) => {
   const { entity, pending } = useEntity(app)
@@ -38,9 +51,12 @@ const Org = ({ app }: { app: AppHook }) => {
   }
 
   const isAdmin = entity?.entity_type === EntityType.Administration
+  const isProd = window.location.hostname === "carbure.beta.gouv.fr"
 
   return (
     <React.Fragment>
+      {!isProd && <DevBanner />}
+
       <Topbar entity={entity} settings={app.settings} />
 
       <Switch>

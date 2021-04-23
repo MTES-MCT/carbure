@@ -91,9 +91,15 @@ def make_producers_or_traders_lots_sheet_advanced(workbook, entity, nb_lots, is_
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
     today = datetime.date.today().strftime('%d/%m/%Y')
     for i in range(nb_lots):
-        mp = random.choice(mps)
         client = random.choice(clients)
         bc = random.choice(bcs)
+        if bc.is_alcool:
+            mp = random.choice([mp for mp in mps if mp.compatible_alcool])
+        elif bc.is_graisse:
+            mp = random.choice([mp for mp in mps if mp.compatible_graisse])
+        else:
+            mp = random.choice(mps)
+
         country = random.choice(countries)
         site = random.choice(delivery_sites)
         volume = random.randint(34000, 36000)
@@ -108,7 +114,7 @@ def make_producers_or_traders_lots_sheet_advanced(workbook, entity, nb_lots, is_
         # production site
         if is_imported:
             p = random.choice(UNKNOWN_PRODUCERS)
-            row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc']]
+            row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc'] if mp.is_double_compte else '']
             if supplier_is_not_the_producer:
                 supplier = random.choice(SUPPLIERS)
                 row += [supplier['name'], supplier['sref']]
@@ -254,9 +260,15 @@ def make_producers_lots_sheet_simple(workbook, entity):
         return
 
     for i in range(10):
-        mp = random.choice(mps)
         client = random.choice(clients)
         bc = random.choice(bcs)
+        if bc.is_alcool:
+            mp = random.choice([mp for mp in mps if mp.compatible_alcool])
+        elif bc.is_graisse:
+            mp = random.choice([mp for mp in mps if mp.compatible_graisse])
+        else:
+            mp = random.choice(mps)
+
         country = random.choice(countries)
         site = random.choice(delivery_sites)
         volume = random.randint(34000, 36000)
@@ -295,15 +307,20 @@ def make_operators_lots_sheet(workbook, entity):
     clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
     today = datetime.date.today().strftime('%Y-%m-%d')
     for i in range(10):
-        mp = random.choice(mps)
         bc = random.choice(bcs)
+        if bc.is_alcool:
+            mp = random.choice([mp for mp in mps if mp.compatible_alcool])
+        elif bc.is_graisse:
+            mp = random.choice([mp for mp in mps if mp.compatible_graisse])
+        else:
+            mp = random.choice(mps)
         country = random.choice(countries)
         site = random.choice(delivery_sites)
         volume = random.randint(34000, 36000)
         row = []
         # producer
         p = random.choice(UNKNOWN_PRODUCERS)
-        row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc']]
+        row += [p['name'], p['production_site'], p['country'], p['ref'], p['date'], p['dc'] if mp.is_double_compte else '']
         # supplier
         supplier_is_not_the_producer = random.random() < 0.5
         if supplier_is_not_the_producer:

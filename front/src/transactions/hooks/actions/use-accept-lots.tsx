@@ -3,6 +3,7 @@ import { TransactionSelection } from "../query/use-selection"
 import { YearSelection } from "../query/use-year"
 
 import * as api from "transactions/api"
+import { getStocks } from "stocks/api"
 import useAPI from "../../../common/hooks/use-api"
 
 import { confirm, prompt } from "../../../common/components/dialog"
@@ -11,6 +12,10 @@ import {
   CommentWithTypePrompt,
   CommentWithType,
 } from "transactions/components/form-comments"
+import { SpecialSelection } from "../query/use-special"
+import { FilterSelection } from "../query/use-filters"
+import { SearchSelection } from "../query/use-search"
+import { EntityType, Lots, LotStatus, Transaction } from "common/types"
 
 export interface LotAcceptor {
   loading: boolean
@@ -23,14 +28,16 @@ export interface LotAcceptor {
 export default function useAcceptLots(
   entity: EntitySelection,
   selection: TransactionSelection,
+  filters: FilterSelection,
   year: YearSelection,
+  search: SearchSelection,
+  special: SpecialSelection,
   refresh: () => void
 ): LotAcceptor {
   const notifications = useNotificationContext()
 
   const [request, resolveAccept] = useAPI(api.acceptLots)
   const [requestComment, resolveAcceptAndComment] = useAPI(api.acceptAndCommentLot) // prettier-ignore
-  const [requestAll, resolveAcceptAll] = useAPI(api.acceptAllInboxLots)
 
   async function notifyAccept(promise: Promise<any>, many: boolean = false) {
     const res = await promise
@@ -95,20 +102,43 @@ export default function useAcceptLots(
   }
 
   async function acceptAllInbox() {
-    const shouldAccept = await confirm(
-      "Accepter lot",
-      "Voulez vous accepter tous ces lots ?"
-    )
+    if (entity !== null) {
+      // getLots with current filters but no limit
+      // display summary (number of lots, number of suppliers
+      // call AcceptLots with all the tx_ids
+      var allInboxLots
 
-    if (entity !== null && shouldAccept) {
-      await notifyAccept(resolveAcceptAll(entity.id, year.selected), true)
+      // prettier-ignore
+      if (entity.entity_type == EntityType.Operator) {
+        allInboxLots = await api.getLots(LotStatus.Inbox, entity.id, filters["selected"], year.selected, 0, null, search.query, 'id', 'asc', special.invalid, special.deadline)
+      } else {
+        allInboxLots = await getStocks(entity.id, filters["selected"], "in", 0, null, search.query)
+      }
+
+      const nbSuppliers = new Set(
+        allInboxLots.lots.map((o) => o.carbure_vendor?.name)
+      ).size
+      const totalVolume = allInboxLots.lots
+        .map((o) => o.lot.volume)
+        .reduce((sum, vol) => sum + vol)
+      const supplierStr = nbSuppliers > 1 ? "fournisseurs" : "fournisseur"
+      const allTxids = allInboxLots.lots.map((o) => o.id)
+
+      const shouldAccept = await confirm(
+        "Accepter tout",
+        `Voulez êtes sur le point d'accepter ${allInboxLots.lots.length} lots de ${nbSuppliers} ${supplierStr} représentant un total de ${totalVolume} litres ?`
+      )
+
+      if (entity !== null && shouldAccept) {
+        await notifyAccept(resolveAccept(entity.id, allTxids), true)
+      }
+      return shouldAccept
     }
-
-    return shouldAccept
+    return false
   }
 
   return {
-    loading: request.loading || requestAll.loading || requestComment.loading,
+    loading: request.loading || requestComment.loading,
     acceptLot,
     acceptAndCommentLot,
     acceptSelection,

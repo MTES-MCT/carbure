@@ -51,10 +51,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_otp',
     'django_otp.plugins.otp_email',
+    'django_admin_listfilter_dropdown',
     'authtools',
     'core',
     'accounts',
     'producers',
+    'certificates',
     'api',
 ]
 
@@ -90,6 +92,11 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'carbure.wsgi.application'
+
+# new in django 3.2, define default type for 'id' primary key
+# can also be done in each model with
+# id = models.AutoField(primary_key=True)
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 
 if env('TEST') is False:
     DATABASES = {'default': {

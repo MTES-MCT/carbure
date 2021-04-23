@@ -419,10 +419,10 @@ test("operator: accept all inbox lots", async () => {
   userEvent.click(button)
 
   // confirm the sending
-  const title = screen.getByText("Accepter lot")
-  userEvent.click(screen.getByText("OK"))
+  const okButton = await screen.findByText("OK")
+  userEvent.click(okButton)
 
-  expect(title).not.toBeInTheDocument()
+  expect(okButton).not.toBeInTheDocument()
 
   await waitWhileLoading()
 
@@ -506,15 +506,15 @@ test("operator: reject all inbox lots", async () => {
 
   expect(button).not.toBeDisabled()
 
-  // click on the send all button
+  // click on the reject all button
   userEvent.click(button)
 
   // confirm the sending
-  const title = screen.getByText("Refuser lot")
+  const okButton = await screen.findByText("OK")
   userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "not ok")
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(okButton)
 
-  expect(title).not.toBeInTheDocument()
+  expect(okButton).not.toBeInTheDocument()
 
   await waitWhileLoading()
 
@@ -540,7 +540,7 @@ test("operator: reject selected inbox lots", async () => {
   userEvent.click(screen.getByText("Refuser sélection"))
 
   // confirm the sending
-  const title = screen.getByText("Refuser lot")
+  const title = await screen.findByText("Refuser lot")
   userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "not ok")
   userEvent.click(screen.getByText("OK"))
 
