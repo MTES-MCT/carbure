@@ -24,11 +24,11 @@ function useAutoComplete<T>(
   getQuery: (q: string, ...a: any[]) => Promise<T[]>
 ) {
   const dd = useDropdown(target)
-
-  // prettier-ignore
-  const label = value === null ? "" : typeof value === "string" ? value : getLabel(value)
-  const [query, setQuery] = useState(label)
   const [suggestions, resolveQuery] = useAPI(getQuery)
+
+  const [query, setQuery] = useState(() =>
+    value === null ? "" : typeof value === "string" ? value : getLabel(value)
+  )
 
   // on change, modify the query to match selection and send event to parent
   function change(value: T, close?: boolean) {
@@ -73,8 +73,10 @@ function useAutoComplete<T>(
 
   // modify input content when passed value is changed
   useEffect(() => {
-    setQuery(label)
-  }, [label, getLabel])
+    if (typeof value !== "string") {
+      setQuery(value ? getLabel(value) : "")
+    }
+  }, [value, getLabel])
 
   return { dd, query, suggestions, onQuery, change }
 }
