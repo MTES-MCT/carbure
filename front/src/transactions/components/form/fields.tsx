@@ -165,6 +165,11 @@ export const Producer = ({ data, value, errors, ...props }: LACP<Entity>) => {
   const producer = value ?? data?.producer ?? null
   const error = errors?.carbure_producer ?? errors?.producer
 
+  // prettier-ignore
+  const icon = isKnown(producer)
+    ? (props: any) => <UserCheck {...props} title="Ce producteur est enregistré dans CarbuRe" />
+    : undefined
+
   return (
     <LabelAutoComplete
       loose
@@ -176,7 +181,7 @@ export const Producer = ({ data, value, errors, ...props }: LACP<Entity>) => {
       getValue={getters.id}
       getLabel={getters.name}
       getQuery={api.findProducers}
-      icon={isKnown(producer) ? UserCheck : undefined}
+      icon={icon}
       {...props}
     />
   )
@@ -312,6 +317,12 @@ export const CarbureVendor = ({
   ...props
 }: LACP<Entity>) => {
   const vendor = value ?? data?.carbure_vendor
+
+  // prettier-ignore
+  const icon = isKnown(vendor)
+    ? (props: any) => <UserCheck {...props} title="Ce fournisseur est enregistré dans CarbuRe" />
+    : undefined
+
   return (
     <LabelAutoComplete
       name="carbure_vendor"
@@ -321,7 +332,7 @@ export const CarbureVendor = ({
       getValue={getters.id}
       getLabel={getters.name}
       getQuery={api.findEntities}
-      icon={isKnown(vendor) ? UserCheck : undefined}
+      icon={icon}
       {...props}
     />
   )
@@ -409,6 +420,11 @@ export const ChampLibre = ({ data, value, errors, ...props }: LTAP) => (
 export const Client = ({ data, value, errors, ...props }: LACP<Entity>) => {
   const client = value ?? data?.client
 
+  // prettier-ignore
+  const icon = isKnown(client)
+    ? (props: any) => <UserCheck {...props} title="Ce client est enregistré dans CarbuRe" />
+    : undefined
+
   return (
     <LabelAutoComplete
       loose
@@ -419,7 +435,7 @@ export const Client = ({ data, value, errors, ...props }: LACP<Entity>) => {
       getValue={getters.id}
       getLabel={getters.name}
       getQuery={api.findEntities}
-      icon={isKnown(client) ? UserCheck : undefined}
+      icon={icon}
       {...props}
     />
   )
