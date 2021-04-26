@@ -27,7 +27,7 @@ type FormGroupProps<T> = SystemProps & {
   title?: string
   narrow?: boolean
   data: T
-  errors: Record<string, string>
+  errors?: Record<string, string>
   children: React.ReactNode
   onChange: FormChangeHandler<any>
 }
@@ -38,7 +38,7 @@ export function FormGroup<T>({
   title,
   children,
   data,
-  errors,
+  errors = {},
   onChange,
   ...props
 }: FormGroupProps<T>) {

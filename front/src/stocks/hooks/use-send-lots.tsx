@@ -19,10 +19,9 @@ import { useNotificationContext } from "common/components/notifications"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { ConvertETBE, StockDraft } from "common/types"
 import { ValidationPrompt } from "transactions/components/validation"
-import { YearSelection } from "transactions/hooks/query/use-year"
 import { FilterSelection } from "transactions/hooks/query/use-filters"
 import { SearchSelection } from "transactions/hooks/query/use-search"
-import { SpecialSelection } from "transactions/hooks/query/use-special"
+import { isKnown } from "transactions/components/form/fields"
 
 export interface LotSender {
   loading: boolean
@@ -94,7 +93,7 @@ export default function useSendLot(
 
   async function createDrafts(txID: number) {
     const sent = await prompt<StockSendDetails>((resolve) => (
-      <StockSendLotPrompt onResolve={resolve} />
+      <StockSendLotPrompt entity={entity} onResolve={resolve} />
     ))
 
     if (entity !== null && sent) {
@@ -103,16 +102,14 @@ export default function useSendLot(
         volume: sent.volume,
         dae: sent.dae,
         delivery_date: sent.delivery_date,
-        client: sent.client_is_in_carbure
-          ? `${sent.carbure_client?.name ?? ""}`
-          : sent.unknown_client,
-        delivery_site: sent.delivery_site_is_in_carbure
-          ? sent.carbure_delivery_site?.depot_id ?? ""
-          : sent.unknown_delivery_site,
-        delivery_site_country: !sent.delivery_site_is_in_carbure
-          ? sent.unknown_delivery_site_country?.code_pays ?? ""
-          : "",
+        mac: sent.mac,
+        client: isKnown(sent.client) ? sent.client.name : sent.client ?? "",
+        delivery_site: isKnown(sent.delivery_site)
+          ? sent.delivery_site.depot_id
+          : sent.delivery_site ?? "",
+        delivery_site_country: sent.delivery_site_country?.code_pays,
       }
+
       notifyCreated(resolveCreate(entity.id, [draft]))
     }
 
@@ -155,9 +152,18 @@ export default function useSendLot(
 
   async function sendAllDrafts() {
     if (entity !== null) {
-      const filteredDrafts = await api.getStocks(entity.id, filters["selected"], "tosend", 0, null, search.query)
+      const filteredDrafts = await api.getStocks(
+        entity.id,
+        filters["selected"],
+        "tosend",
+        0,
+        null,
+        search.query
+      )
       const nbClients = new Set(
-        filteredDrafts.lots.map((o) => o.carbure_client ? o.carbure_client.name : o.unknown_client)
+        filteredDrafts.lots.map((o) =>
+          o.carbure_client ? o.carbure_client.name : o.unknown_client
+        )
       ).size
       const totalVolume = filteredDrafts.lots
         .map((o) => o.lot.volume)

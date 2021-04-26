@@ -1,10 +1,14 @@
 .formGroup {
   flex: 1 0;
-  width: 320px;
-  margin-right: 24px;
+  min-width: 320px;
+}
+
+.formGroup ~ .formGroup {
+  margin-left: 24px;
 }
 
 .formGroup.narrow {
+  min-width: unset;
   max-width: 96px;
 }
 
