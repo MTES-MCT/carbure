@@ -193,7 +193,6 @@ export const ProductionSite = ({
   errors,
   ...props
 }: LACP<ProductionSiteDetails>) => {
-  const queryArgs = data && isKnown(data.producer) ? [data.producer.id] : []
   const error = errors?.carbure_production_site ?? errors?.production_site
 
   return (
@@ -207,7 +206,6 @@ export const ProductionSite = ({
       getValue={getters.id}
       getLabel={getters.name}
       getQuery={api.findProductionSites}
-      queryArgs={queryArgs}
       {...props}
     />
   )
