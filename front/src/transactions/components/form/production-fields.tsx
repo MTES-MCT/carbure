@@ -20,7 +20,7 @@ const ProductionFields = ({
       errors={errors}
       onChange={onChange}
     >
-      <Fields.ProductionSite search={isProducer} />
+      <Fields.ProductionSite search={isProducer} queryArgs={[entity?.id]} />
       <Fields.ProductionSiteReference />
       <Fields.ProductionSiteCountry />
       <Fields.ProductionSiteDblCounting />
