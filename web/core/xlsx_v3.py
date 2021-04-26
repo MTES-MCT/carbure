@@ -250,6 +250,8 @@ def make_producers_lots_sheet_simple(workbook, entity):
     columns = ['production_site', 'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
                'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
                'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site']
+    if entity.has_mac:
+        columns.append('mac')               
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
 
@@ -276,6 +278,9 @@ def make_producers_lots_sheet_simple(workbook, entity):
         p = random.choice(psites)
         row = [p.name, volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), clientid]
         row += [client.name, today, site.depot_id]
+
+        if entity.has_mac:
+            row += [0]
 
         colid = 0
         for elem in row:
