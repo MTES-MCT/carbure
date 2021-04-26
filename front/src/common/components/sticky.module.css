@@ -1,5 +1,7 @@
 .sticky {
+  position: sticky;
   display: flex;
+  top: 0;
   width: 100%;
   background-color: var(--gray-light);
   padding: 16px;
@@ -12,9 +14,4 @@
 .sticky a {
   margin-right: 24px;
   text-decoration: underline;
-}
-
-.stickyFixed {
-  position: fixed;
-  top: 0;
 }

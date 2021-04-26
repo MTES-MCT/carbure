@@ -59,7 +59,7 @@ test("add an iscc certificate in settings", async () => {
   await screen.findByText("ISCC Test")
   screen.getByText("Holder Test")
   screen.getByText("Scope Test")
-  screen.getByText("24/04/2021")
+  screen.getByText("24/04/2121")
 })
 
 test("delete an iscc certificate in settings", async () => {
