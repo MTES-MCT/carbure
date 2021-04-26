@@ -65,7 +65,7 @@ test("add a 2bs certificate in settings", async () => {
   await screen.findByText("2BS Test")
   screen.getByText("Holder Test")
   screen.getByText("Scope Test")
-  screen.getByText("24/04/2021")
+  screen.getByText("24/04/2121")
 })
 
 test("delete a 2bs certificate in settings", async () => {
