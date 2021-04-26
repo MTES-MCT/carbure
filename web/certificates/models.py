@@ -75,4 +75,4 @@ class EntitySNTradingCertificate(models.Model):
     class Meta:
         db_table = 'entity_sn_certificates'
         verbose_name = 'Certificat Système National'
-        verbose_name_plural = 'Certificats Système National'
+        verbose_name_plural = 'Certificats Système National liés à des sociétés'
