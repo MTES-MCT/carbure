@@ -87,14 +87,14 @@ function checkProductionFields() {
 }
 
 function checkOriginFields() {
-  screen.getByLabelText("Producteur")
-  screen.getAllByLabelText("Fournisseur")
+  screen.getByLabelText(/Producteur/)
+  screen.getAllByLabelText(/Fournisseur/)
   screen.getAllByLabelText("Certificat du fournisseur")
   screen.getByLabelText("Champ libre")
 }
 
 function checkDeliveryFields() {
-  screen.getByLabelText("Client")
+  screen.getByLabelText(/Client/)
   screen.getByLabelText("Site de livraison")
   screen.getByLabelText("Pays de livraison")
   screen.getByLabelText("Date de livraison")
@@ -200,7 +200,7 @@ test("edit transaction details", async () => {
   userEvent.type(ps, "Test")
   userEvent.click(await screen.findByText("Test Production Site"))
 
-  const cli = screen.getByLabelText("Client")
+  const cli = screen.getByLabelText(/Client/)
   userEvent.clear(cli)
   userEvent.type(cli, "Test")
   userEvent.click(await screen.findByText("Opérateur Test"))
@@ -502,9 +502,9 @@ test("transaction details form as producer - producer trades unknown producer lo
   checkProductionFields()
   checkDeliveryFields()
 
-  expect(screen.getByLabelText("Producteur")).toHaveValue("Unknown Producer")
+  expect(screen.getByLabelText(/Producteur/)).toHaveValue("Unknown Producer")
 
-  const supplier = screen.getByLabelText("Fournisseur")
+  const supplier = screen.getByLabelText(/Fournisseur/)
   expect(supplier).toHaveValue("Unknown Supplier")
 
   const supplierCertif = screen.getByLabelText("Certificat du fournisseur")
@@ -545,8 +545,8 @@ test("transaction details form as operator - producer trades unknown producer lo
   checkProductionFields()
   checkDeliveryFields()
 
-  expect(screen.getByLabelText("Producteur")).toHaveValue("Unknown Producer")
-  expect(screen.getByLabelText("Fournisseur")).toHaveValue("Producteur Test")
+  expect(screen.getByLabelText(/Producteur/)).toHaveValue("Unknown Producer")
+  expect(screen.getByLabelText(/Fournisseur/)).toHaveValue("Producteur Test")
   expect(screen.getByLabelText("Certificat du fournisseur")).toHaveValue(
     "ISCC1000 - Vendor"
   )
@@ -581,8 +581,8 @@ test("transaction details form as operator - operator self accepts lot", async (
   checkProductionFields()
   checkDeliveryFields()
 
-  expect(screen.getByLabelText("Producteur")).toHaveValue("Unknown Producer")
-  expect(screen.getByLabelText("Fournisseur")).toHaveValue("Unknown Supplier")
+  expect(screen.getByLabelText(/Producteur/)).toHaveValue("Unknown Producer")
+  expect(screen.getByLabelText(/Fournisseur/)).toHaveValue("Unknown Supplier")
   expect(screen.getByLabelText("Certificat du fournisseur")).toHaveValue(
     "ISCC2000 - Supplier"
   )
@@ -610,9 +610,9 @@ test("transaction details form as producer - lot sold by trader after buying fro
   checkProductionFields()
   checkDeliveryFields()
 
-  expect(screen.getByLabelText("Producteur")).toHaveValue("Producteur Test")
+  expect(screen.getByLabelText(/Producteur/)).toHaveValue("Producteur Test")
 
-  const vendors = screen.getAllByLabelText("Fournisseur")
+  const vendors = screen.getAllByLabelText(/Fournisseur/)
   expect(vendors[0]).toHaveValue("Unknown Supplier")
   expect(vendors[1]).toHaveValue("Trader Test")
 
