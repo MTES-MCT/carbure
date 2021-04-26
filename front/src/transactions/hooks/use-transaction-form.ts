@@ -45,6 +45,8 @@ export interface TransactionFormState {
   producer_is_in_carbure: boolean
   carbure_producer: Entity | null
   unknown_producer: string
+
+  production_site_is_in_carbure: boolean
   carbure_production_site: ProductionSiteDetails | null
   carbure_production_site_reference: string
   unknown_production_site: string
@@ -104,6 +106,7 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
     unknown_producer: tx.lot.unknown_producer,
     unknown_production_country: tx.lot.unknown_production_country,
 
+    production_site_is_in_carbure: tx.lot.production_site_is_in_carbure,
     carbure_production_site: tx.lot.carbure_production_site,
     carbure_production_site_reference: tx.lot.carbure_production_site_reference,
     unknown_production_site: tx.lot.unknown_production_site,
@@ -168,23 +171,23 @@ export function toTransactionPostData(tx: TransactionFormState) {
       ? tx.carbure_producer?.name
       : tx.unknown_producer,
 
-    production_site: tx.producer_is_in_carbure
+    production_site: tx.production_site_is_in_carbure
       ? tx.carbure_production_site?.name
       : tx.unknown_production_site,
 
-    production_site_country: !tx.producer_is_in_carbure
+    production_site_country: !tx.production_site_is_in_carbure
       ? tx.unknown_production_country?.code_pays
       : "",
 
-    production_site_reference: tx.producer_is_in_carbure
+    production_site_reference: tx.production_site_is_in_carbure
       ? tx.carbure_production_site_reference
       : tx.unknown_production_site_reference,
 
-    production_site_commissioning_date: !tx.producer_is_in_carbure
+    production_site_commissioning_date: !tx.production_site_is_in_carbure
       ? excelDate(tx.unknown_production_site_com_date)
       : "",
 
-    double_counting_registration: !tx.producer_is_in_carbure
+    double_counting_registration: !tx.production_site_is_in_carbure
       ? tx.unknown_production_site_dbl_counting
       : "",
 
@@ -241,6 +244,7 @@ const initialState: TransactionFormState = {
   carbure_producer: null,
   unknown_producer: "",
 
+  production_site_is_in_carbure: true,
   carbure_production_site: null,
   carbure_production_site_reference: "",
   unknown_production_site: "",
@@ -280,6 +284,7 @@ function fixedValues(
     // no trading => producer can only be entity
     if (!entity.has_trading) {
       tx.producer_is_in_carbure = true
+      tx.production_site_is_in_carbure = true
     }
   }
 
@@ -297,6 +302,7 @@ function fixedValues(
   // for traders
   if (entity.entity_type === EntityType.Trader) {
     tx.producer_is_in_carbure = false
+    tx.production_site_is_in_carbure = false
     tx.carbure_vendor = entity
   }
 

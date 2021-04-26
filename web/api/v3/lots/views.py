@@ -358,6 +358,7 @@ def delete_lot(request):
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
 
+    deleted = 0
     for tx_id in tx_ids:
         try:
             tx = LotTransaction.objects.get(id=tx_id)
@@ -376,10 +377,11 @@ def delete_lot(request):
 
         if tx.delivery_status == 'R' and tx.lot.parent_lot != None:
             # credit volume back to stock
-            tx.lot.parent_lot.volume += tx.lot.volume
+            tx.lot.parent_lot.remaining_volume += tx.lot.volume
             tx.lot.parent_lot.save()
         tx.lot.delete()
-    return JsonResponse({'status': 'success'})
+        deleted += 1
+    return JsonResponse({'status': 'success', 'deleted': deleted})
 
 
 @otp_required
@@ -502,57 +504,6 @@ def comment_lot(request, *args, **kwargs):
 
 
 @check_rights('entity_id')
-def delete_all_drafts(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
-    deleted = 0
-
-    drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft', lot__parent_lot=None)
-    year = request.POST.get('year', False)
-    date_from = datetime.date.today().replace(month=1, day=1)
-    date_until = datetime.date.today().replace(month=12, day=31)
-    if year:
-        try:
-            year = int(year)
-            date_from = datetime.date(year=year, month=1, day=1)
-            date_until = datetime.date(year=year, month=12, day=31)
-        except Exception:
-            return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
-    filtered = drafts.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-    lots = [d.lot for d in filtered]
-    with transaction.atomic():
-        for lot in lots:
-            lot.delete()
-            deleted += 1
-    return JsonResponse({'status': 'success', 'deleted': deleted})
-
-@check_rights('entity_id')
-def validate_all_drafts(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
-
-    drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft', lot__parent_lot=None)
-    year = request.POST.get('year', False)
-    date_from = datetime.date.today().replace(month=1, day=1)
-    date_until = datetime.date.today().replace(month=12, day=31)
-    if year:
-        try:
-            year = int(year)
-            date_from = datetime.date(year=year, month=1, day=1)
-            date_until = datetime.date(year=year, month=12, day=31)
-        except Exception:
-            return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
-    drafts = drafts.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-    logger.debug("Found {} transactions to validate".format(drafts.count()))
-    data = validate_lots(request.user, entity, drafts)
-    logger.debug(data)
-    logger.debug("Checking duplicates")
-    duplicates = check_duplicates(drafts, background=False)
-    logger.debug("{} duplicates found".format(duplicates))
-    data['duplicates'] = duplicates
-    return JsonResponse({'status': 'success', 'data': data})
-
-@check_rights('entity_id')
 def get_template_producers_simple(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -567,6 +518,7 @@ def get_template_producers_simple(request, *args, **kwargs):
             return response
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
+
 
 @check_rights('entity_id')
 def get_template_producers_advanced(request, *args, **kwargs):

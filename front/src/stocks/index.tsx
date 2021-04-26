@@ -59,11 +59,11 @@ function useStocks(entity: EntitySelection) {
   const selection = useTransactionSelection(stock.data?.lots)
   const uploader = useUploadLotFile(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
-  const deleter = useDeleteLots(entity, selection, year, refresh)
-  const validator = useValidateLots(entity, selection, year, refresh)
+  const deleter = useDeleteLots(entity, selection, filters, year, search, special, refresh)
+  const validator = useValidateLots(entity, selection, filters, year, search, special, refresh)
   const acceptor = useAcceptLots(entity, selection, filters, year, search, special, refresh)
   const rejector = useRejectLots(entity, selection, filters, year, search, special, refresh)
-  const sender = useSendLot(entity, selection, refresh)
+  const sender = useSendLot(entity, selection, filters, search, refresh)
 
   return {
     filters,

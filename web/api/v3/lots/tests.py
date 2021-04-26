@@ -212,7 +212,8 @@ class LotsAPITest(TransactionTestCase):
         lots = response.json()['data']['lots']
         self.assertEqual(len(lots), 2)
         # validate-all the rest
-        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
+        txs = LotTransaction.objects.filter(lot__status='Draft')
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})
         self.assertEqual(response.status_code, 200)
         res = response.json()['data']
         self.assertEqual(res['submitted'], 2)
@@ -258,7 +259,8 @@ class LotsAPITest(TransactionTestCase):
         self.ensure_nb_txs(nb_lots)
 
         # validate-all
-        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id})
+        txs = LotTransaction.objects.filter(lot__status='Draft')
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})
         self.assertEqual(response.status_code, 200)
 
         # get drafts
@@ -280,7 +282,8 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(nb_errors, nb_lots)
         
         # delete-all-drafts
-        response = self.client.post(reverse('api-v3-delete-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
+        txs = LotTransaction.objects.filter(lot__status='Draft')
+        response = self.client.post(reverse('api-v3-delete-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})      
         self.assertEqual(response.status_code, 200)
         res = response.json()
         self.assertEqual(res['deleted'], nb_lots)
@@ -299,7 +302,8 @@ class LotsAPITest(TransactionTestCase):
         nb_lots = jsoned['data']['total']
         self.assertEqual(jsoned['data']['loaded'], nb_lots)
         # validate-all
-        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
+        txs = LotTransaction.objects.filter(lot__status='Draft')
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})        
         self.assertEqual(response.status_code, 200)
         res = response.json()['data']
         # make sure no lots/tx/loterror/txerror are still there
@@ -344,16 +348,17 @@ class LotsAPITest(TransactionTestCase):
         nb_lots = jsoned['data']['total']
         self.assertEqual(jsoned['data']['loaded'], nb_lots)
         # validate-all
-        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
+        txs = LotTransaction.objects.filter(lot__status='Draft', lot__period__startswith='2020')
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})          
         self.assertEqual(response.status_code, 200)
         res = response.json()['data']
-        lots_in_batch = nb_lots - 1
+        lots_in_batch = nb_lots - 2 # two wrong dates set to current year, everything else in 2020
         self.assertEqual(res['submitted'], lots_in_batch)
         self.assertEqual(res['valid'], lots_in_batch)
 
         # get drafts
         lots = LotV2.objects.filter(added_by_user=self.user1, status='Draft')
-        self.assertEqual(lots.count(), 1) # one draft left (line without delivery_date)
+        self.assertEqual(lots.count(), 2) # one draft left (line without delivery_date)
         # check api
         response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
         self.assertEqual(response.status_code, 200)        
@@ -395,7 +400,8 @@ class LotsAPITest(TransactionTestCase):
         txs = LotTransaction.objects.filter(lot__in=lots)
         self.assertEqual(txs.count(), nb_lots)
         # validate-all
-        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id})
+        txs = LotTransaction.objects.filter(lot__status='Draft')
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})      
         self.assertEqual(response.status_code, 200)
         # get drafts
         lots = LotV2.objects.filter(added_by_user=self.user1, status='Draft')
@@ -414,7 +420,8 @@ class LotsAPITest(TransactionTestCase):
             self.assertTrue(lot['id'] in lot_errors or lot['id'] in tx_errors or lot['id'] in validation_errors)
         
         # delete-all-drafts
-        response = self.client.post(reverse('api-v3-delete-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
+        txs = LotTransaction.objects.filter(lot__status='Draft')
+        response = self.client.post(reverse('api-v3-delete-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})    
         self.assertEqual(response.status_code, 200)
         res = response.json()
         self.assertEqual(res['deleted'], nb_lots)
@@ -439,14 +446,12 @@ class LotsAPITest(TransactionTestCase):
         txs = LotTransaction.objects.filter(lot__in=lots)
         self.assertEqual(txs.count(), nb_lots)
         # validate-all
-        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
+        txs = LotTransaction.objects.filter(lot__status='Draft')
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})              
         self.assertEqual(response.status_code, 200)
-
-        nb_invalid_dates = 3
-        nb_okayish_lots = nb_lots - nb_invalid_dates
         # expect (nb_lots - nb_invalid_dates) submitted and 0 valid (2 lots have a stupid date)
         j = response.json()['data']
-        self.assertEqual(j['submitted'], nb_okayish_lots)
+        self.assertEqual(j['submitted'], nb_lots)
         self.assertEqual(j['valid'], 0)
 
         # get drafts
@@ -457,7 +462,7 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(response.status_code, 200)        
         data = response.json()['data']
         lots = data['lots']
-        self.assertEqual(len(lots), nb_okayish_lots)
+        self.assertEqual(len(lots), nb_lots - 2) # 3 lots have a stupid date that won't be counted in 2020
 
         # make sure they all have an error
         lot_errors = [error.lot.id for error  in LotV2Error.objects.filter(lot__in=[lot['lot']['id'] for lot in lots])]
@@ -466,10 +471,11 @@ class LotsAPITest(TransactionTestCase):
             self.assertTrue(lot['id'] in lot_errors or lot['id'] in tx_errors)
         
         # delete-all-drafts
-        response = self.client.post(reverse('api-v3-delete-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
+        txs = LotTransaction.objects.filter(lot__status='Draft')
+        response = self.client.post(reverse('api-v3-delete-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})    
         self.assertEqual(response.status_code, 200)
         res = response.json()
-        self.assertEqual(res['deleted'], nb_okayish_lots)
+        self.assertEqual(res['deleted'], nb_lots)
 
     def test_duplicates_producer(self):
         # cleanup db
@@ -677,7 +683,8 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(nb_lots, jsoned['data']['loaded'])
         
         # validate-all
-        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
+        txs = LotTransaction.objects.filter(lot__status='Draft')
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})              
         self.assertEqual(response.status_code, 200)
         j = response.json()
         # duplicates > 0
@@ -690,7 +697,9 @@ class LotsAPITest(TransactionTestCase):
         # upload same file again and validate
         jsoned = self.upload_file('carbure_duplicates.xlsx', self.test_producer)
         nb_lots_uploaded = jsoned['data']['loaded']
-        response = self.client.post(reverse('api-v3-validate-all-drafts'), {'entity_id': self.test_producer.id, 'year': '2020'})
+
+        txs = LotTransaction.objects.filter(lot__status='Draft')
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})  
         jsoned = response.json()
         self.assertEqual(jsoned['data']['duplicates'], nb_lots_uploaded)
         nb_drafts = LotV2.objects.filter(status='Draft').count()

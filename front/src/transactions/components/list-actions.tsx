@@ -127,7 +127,7 @@ export const DraftActions = ({
     if (hasSelection) {
       validator.validateSelection()
     } else {
-      validator.validateAllDrafts()
+      validator.validateAll()
     }
   }
 
@@ -135,7 +135,7 @@ export const DraftActions = ({
     if (hasSelection) {
       deleter.deleteSelection()
     } else {
-      deleter.deleteAllDrafts()
+      deleter.deleteAll()
     }
   }
 
