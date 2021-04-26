@@ -79,6 +79,7 @@ const Settings = ({ entity, settings }: SettingsProps) => {
         {hasCertificates && <a href="#2bs">Certificats 2BS</a>}
         {hasCertificates && <a href="#red">Certificats REDcert</a>}
         {hasCertificates && <a href="#sn">Certificats Système National</a>}
+        {!hasCertificates && hasCSN && <a href="#sn">Certificats Système National</a>}
       </Sticky>
 
       <SettingsBody>
@@ -99,7 +100,7 @@ const Settings = ({ entity, settings }: SettingsProps) => {
           <REDCertCertificateSettings settings={redcertCertificates} />
         )}
 
-        {hasCertificates && (
+        {(hasCertificates || hasCSN) && (
           <SNCertificateSettings settings={nationalSystemCertificates} />
         )}
       </SettingsBody>
