@@ -377,7 +377,11 @@ export type SNCertificate = {
   download_link: string
 }
 
-export type Certificate = ISCCCertificate | DBSCertificate | REDCertCertificate | SNCertificate
+export type Certificate =
+  | ISCCCertificate
+  | DBSCertificate
+  | REDCertCertificate
+  | SNCertificate
 
 export type ProductionCertificate = {
   certificate_id: string
@@ -393,6 +397,7 @@ export type StockDraft = {
   client: string
   delivery_site: string
   delivery_site_country?: string
+  mac: boolean
 }
 
 export interface Declaration {

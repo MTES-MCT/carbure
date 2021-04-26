@@ -84,11 +84,13 @@ export default function useDeleteLots(
     if (entity !== null) {
       const filteredDrafts = await api.getLots(LotStatus.Draft, entity.id, filters["selected"], year.selected, 0, null, search.query, 'id', 'asc', special.invalid, special.deadline) // prettier-ignore
       const nbClients = new Set(
-        filteredDrafts.lots.map((o) => o.carbure_client ? o.carbure_client.name : o.unknown_client)
+        filteredDrafts.lots.map((o) =>
+          o.carbure_client ? o.carbure_client.name : o.unknown_client
+        )
       ).size
       const totalVolume = filteredDrafts.lots
         .map((o) => o.lot.volume)
-        .reduce((sum, vol) => sum + vol)
+        .reduce((sum, vol) => sum + vol, 0)
       const clientsStr = nbClients > 1 ? "clients" : "client"
       const allTxids = filteredDrafts.lots.map((o) => o.id)
 
