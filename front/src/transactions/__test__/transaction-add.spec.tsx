@@ -56,7 +56,7 @@ function checkOriginFields() {
 }
 
 function checkDeliveryFields() {
-  screen.getByLabelText("Client")
+  screen.getByLabelText(/Client/)
   screen.getByLabelText("Site de livraison *")
   screen.getByLabelText("Pays de livraison *")
   screen.getByLabelText("Date de livraison")
@@ -108,11 +108,11 @@ test("display the transaction form - pure producer", async () => {
   checkDeliveryFields()
   checkGESFields()
 
-  const prodField = screen.getByLabelText("Producteur")
+  const prodField = screen.getByLabelText(/Producteur/)
   expect(prodField).toBeDisabled()
   expect(prodField).toHaveValue(entity.name)
 
-  expect(screen.getByLabelText("Fournisseur")).toBeDisabled()
+  expect(screen.getByLabelText(/Fournisseur/)).toBeDisabled()
   expect(screen.getByLabelText("Certificat du fournisseur")).toBeDisabled()
 })
 
@@ -125,7 +125,7 @@ test("display the transaction form - operator", async () => {
   checkDeliveryFields()
   checkGESFields()
 
-  const client = screen.getByLabelText("Client")
+  const client = screen.getByLabelText(/Client/)
   expect(client).toBeDisabled()
   expect(client).toHaveValue(operator.name)
 })
@@ -189,7 +189,7 @@ test("check the form fields are working", async () => {
   expect(psiteComDate).toBeDisabled()
   expect(psiteComDate).toHaveValue("2000-01-31")
 
-  userEvent.type(screen.getByLabelText("Client"), "Test")
+  userEvent.type(screen.getByLabelText(/Client/), "Test")
   userEvent.click(await screen.findByText("Opérateur Test"))
 
   const dsite = screen.getByLabelText("Site de livraison *")
