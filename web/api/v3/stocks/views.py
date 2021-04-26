@@ -358,20 +358,6 @@ def send_drafts(request, *args, **kwargs):
             send_errors.append(errors)
     return JsonResponse({'status': 'success', 'data': send_errors})
 
-@check_rights('entity_id')
-def send_all_drafts(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
-    prefetched_data = get_prefetched_data(entity)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    stock_transactions_drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot__isnull=True)
-    send_errors = []
-    for tx in stock_transactions_drafts:
-        sent, errors = send_lot_from_stock(rights, tx, prefetched_data)
-        if not sent:
-            send_errors.append(errors)
-    return JsonResponse({'status': 'success', 'data': send_errors})
 
 def convert_eth_stock_to_etbe(request, entity, c):
     previous_stock_tx_id = c['previous_stock_tx_id']

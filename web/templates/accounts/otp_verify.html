@@ -10,7 +10,10 @@
         {% csrf_token %}
         {{form.as_p}}
         {% if code_expiry %}
-        <span>Le code expirera le {{code_expiry}}</span>
+        <p>
+          Le code expirera le <b>{{code_expiry}}</b><br/>
+          Il peut mettre quelques minutes à arriver. N'oubliez pas de vérifier votre dossier Spam
+        </p>
         {% endif %}
         {% if msg %}
         <span>{{msg}}</span>

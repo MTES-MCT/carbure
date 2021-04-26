@@ -201,7 +201,7 @@ test("operator: sent draft lot", async () => {
   await screen.findByText("Aucune transaction trouvée pour cette recherche")
 })
 
-test("operator: sent all draft lots", async () => {
+test("operator: send all draft lots", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={operator} />)
 
   const button = screen.getByText("Envoyer tout").closest("button")!
@@ -218,7 +218,8 @@ test("operator: sent all draft lots", async () => {
   userEvent.click(button)
 
   // confirm the sending
-  const title = screen.getByText("Envoyer tous les brouillons")
+  //const title = screen.getByText("Envoyer tous les brouillons")
+  const title = await screen.findByText("Envoyer tous ces brouillons")
   clickOnCheckboxesAndConfirm()
 
   expect(title).not.toBeInTheDocument()
@@ -308,7 +309,7 @@ test("operator: delete all draft lot", async () => {
   userEvent.click(button)
 
   // confirm the sending
-  const title = screen.getByText("Supprimer lot")
+  const title = await screen.findByText("Supprimer tous ces brouillons")
   userEvent.click(screen.getByText("OK"))
 
   expect(title).not.toBeInTheDocument()

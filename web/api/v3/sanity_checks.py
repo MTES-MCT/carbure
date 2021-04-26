@@ -244,7 +244,7 @@ def lot_is_valid(lot):
             error = 'Site de production %s inconnu pour %s' % (lot.unknown_production_site, lot.carbure_producer.name)
             LotV2Error.objects.update_or_create(lot=lot, field='carbure_production_site', value='', error=error)
             is_valid = False
-        if not lot.producer_is_in_carbure:
+        if not lot.production_site_is_in_carbure:
             if not lot.unknown_production_site_com_date:
                 error = "Veuillez renseigner la date de mise en service de l'usine"
                 LotV2Error.objects.update_or_create(lot=lot, field='unknown_production_site_com_date', defaults={'value':'', 'error':error})

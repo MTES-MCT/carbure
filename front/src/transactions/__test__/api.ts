@@ -90,31 +90,11 @@ export const okSendLots = rest.post(
   }
 )
 
-export const okSendAll = rest.post(
-  "/api/v3/lots/validate-all-drafts",
-  (req, res, ctx) => {
-    snapshot.lots.draft--
-    snapshot.lots.validated++
-    snapshot.lots.in++
-    lots.lots = []
-    return res(ctx.json({ status: "success" }))
-  }
-)
-
 export const okDeleteLots = rest.post(
   "/api/v3/lots/delete",
   (req, res, ctx) => {
     snapshot.lots.draft--
     snapshot.lots.tofix--
-    lots.lots = []
-    return res(ctx.json({ status: "success" }))
-  }
-)
-
-export const okDeleteAll = rest.post(
-  "/api/v3/lots/delete-all-drafts",
-  (req, res, ctx) => {
-    snapshot.lots.draft--
     lots.lots = []
     return res(ctx.json({ status: "success" }))
   }
@@ -159,31 +139,12 @@ export const okAcceptWithReserve = rest.post(
   }
 )
 
-export const okAcceptAll = rest.post(
-  "/api/v3/lots/accept-all",
-  (req, res, ctx) => {
-    snapshot.lots.in--
-    snapshot.lots.accepted++
-    lots.lots = []
-    return res(ctx.json({ status: "success" }))
-  }
-)
-
 export const okRejectLot = rest.post("/api/v3/lots/reject", (req, res, ctx) => {
   snapshot.lots.in--
   lots.lots = []
   details = null
   return res(ctx.json({ status: "success" }))
 })
-
-export const okRejectAll = rest.post(
-  "/api/v3/lots/reject-all",
-  (req, res, ctx) => {
-    snapshot.lots.in--
-    lots.lots = []
-    return res(ctx.json({ status: "success" }))
-  }
-)
 
 export const okAddLot = rest.post("/api/v3/lots/add", (req, res, ctx) => {
   return res(ctx.json({ status: "success", data: lot }))
@@ -232,15 +193,11 @@ export default setupServer(
   okLots,
   okDuplicateLot,
   okSendLots,
-  okSendAll,
   okDeleteLots,
-  okDeleteAll,
   okComment,
   okAcceptLot,
   okAcceptWithReserve,
-  okAcceptAll,
   okRejectLot,
-  okRejectAll,
   okAddLot,
   okBiocarburantsSearch,
   okCountrySearch,

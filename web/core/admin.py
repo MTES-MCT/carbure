@@ -26,7 +26,7 @@ from core.models import REDCertScope, REDCertBiomassType, REDCertCertificate, RE
 from core.models import ProductionSiteCertificate, EntityDepot
 from core.models import SustainabilityDeclaration
 from api.v3.sanity_checks import bulk_sanity_checks
-from core.common import get_prefetched_data
+from core.common import get_prefetched_data, calculate_ghg
 
 class EntityAdmin(admin.ModelAdmin):
     list_display = ('entity_type', 'name', 'parent_entity')
@@ -101,7 +101,7 @@ class LotV2Admin(admin.ModelAdmin):
     list_filter = ('period', 'production_site_is_in_carbure', 'carbure_producer', 'status', 'source', 'biocarburant', 'matiere_premiere', 'is_split', 'is_fused', 'is_transformed', 'added_by', 'added_by_user')
     raw_id_fields = ('fused_with', 'parent_lot', )
     readonly_fields = ('added_time',)
-    actions = ['delete_orphans']
+    actions = ['delete_orphans', 'recalc_ges']
 
 
     def delete_orphans(self, request, queryset):
@@ -110,6 +110,13 @@ class LotV2Admin(admin.ModelAdmin):
         deleted, _ = zeros.delete()
         self.message_user(request, '%d lots deleted.' % deleted, messages.SUCCESS)
     delete_orphans.short_description = "Supprimer Lots Orphelins"
+
+    def recalc_ges(self, request, queryset):
+        for lot in queryset:
+            calculate_ghg(lot)
+            lot.save()
+        self.message_user(request, '%d lots updated.' % queryset.count(), messages.SUCCESS)
+    recalc_ges.short_description = "Recalculer GES"
 
 
 class NameSortedRelatedOnlyDropdownFilter(RelatedOnlyDropdownFilter):
