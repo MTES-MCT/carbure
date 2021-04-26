@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from certificates.models import SNCategory, SNCertificate, SNCertificateScope
-
+from certificates.models import SNCategory, SNCertificate, SNCertificateScope, EntitySNTradingCertificate
 
 
 class SNCategoryAdmin(admin.ModelAdmin):
@@ -31,3 +30,10 @@ class SNCertificateScopeAdmin(admin.ModelAdmin):
     list_display = ('certificate', 'scope',)
 
 admin.site.register(SNCertificateScope, SNCertificateScopeAdmin)
+
+
+class EntitySNTradingCertificateAdmin(admin.ModelAdmin):
+    list_display = ('entity', 'certificate',)
+    search_fields = ('entity', 'certificate',)
+
+admin.site.register(EntitySNTradingCertificate, EntitySNTradingCertificateAdmin)
