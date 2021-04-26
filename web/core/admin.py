@@ -25,6 +25,7 @@ from core.models import DBSCertificate, DBSScope, DBSCertificateScope, EntityDBS
 from core.models import REDCertScope, REDCertBiomassType, REDCertCertificate, REDCertCertificateScope, REDCertCertificateBiomass, EntityREDCertTradingCertificate
 from core.models import ProductionSiteCertificate, EntityDepot
 from core.models import SustainabilityDeclaration
+from certificates.models import EntitySNTradingCertificate
 from api.v3.sanity_checks import bulk_sanity_checks
 from core.common import get_prefetched_data, calculate_ghg
 
@@ -213,7 +214,8 @@ class TransactionAdmin(admin.ModelAdmin):
             super(TransactionAdmin.AssignSupplierCertificateTransactionForm, self).__init__(*args, **kwargs)
             certificates = [(c.certificate.certificate_id, '%s - %s' % (c.entity.name, c.certificate.certificate_id)) for c in EntityISCCTradingCertificate.objects.all()]
             certificates += [(c.certificate.certificate_id, '%s - %s' % (c.entity.name, c.certificate.certificate_id)) for c in EntityDBSTradingCertificate.objects.all()]
-            certificates += [(c.certificate.certificate_id, '%s - %s' % (c.entity.name, c.certificate.certificate_id)) for c in EntityREDCertTradingCertificate.objects.all()]            
+            certificates += [(c.certificate.certificate_id, '%s - %s' % (c.entity.name, c.certificate.certificate_id)) for c in EntityREDCertTradingCertificate.objects.all()]
+            certificates += [(c.certificate.certificate_id, '%s - %s' % (c.entity.name, c.certificate.certificate_id)) for c in EntitySNTradingCertificate.objects.all()]
             self.fields['certificate'].choices = certificates
             
             
