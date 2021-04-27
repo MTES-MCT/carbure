@@ -78,7 +78,7 @@ test_frontend:
   script:
     - echo "Testing frontend..."
     - cd front
-    - npm install --legacy-peer-deps
+    - npm install
     - CI=true npm test
 
 dev_push_django:

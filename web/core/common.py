@@ -750,23 +750,22 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
     lot.carbure_id = ''
     lot.is_fused = False
     lot.source = 'EXCEL'
-    lot_errors.append(fill_volume_info(lot_dict, lot))
+    lot_errors += fill_volume_info(lot_dict, lot)
 
     transaction = LotTransaction()
     transaction.carbure_vendor = entity
+    transaction.is_mac = lot_dict['mac']
 
-    tx_errors.append(fill_dae_data(lot_dict, transaction))
-    tx_errors.append(fill_delivery_date(lot_dict, lot, transaction))
-    tx_errors.append(fill_client_data(entity, lot_dict, transaction, prefetched_data))
-    tx_errors.append(fill_vendor_data(entity, lot_dict, transaction, prefetched_data))
-    tx_errors.append(fill_delivery_site_data(lot_dict, transaction, prefetched_data))
+    tx_errors += fill_dae_data(lot_dict, transaction)
+    tx_errors += fill_delivery_date(lot_dict, lot, transaction)
+    tx_errors += fill_client_data(entity, lot_dict, transaction, prefetched_data)
+    tx_errors += fill_vendor_data(entity, lot_dict, transaction, prefetched_data)
+    tx_errors += fill_delivery_site_data(lot_dict, transaction, prefetched_data)
 
 
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
     transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
-    lot_errors = [item for sublist in lot_errors for item in sublist]
-    tx_errors = [item for sublist in tx_errors for item in sublist]
     return lot, transaction, lot_errors, tx_errors
 
 def load_lot(prefetched_data, entity, user, lot_dict, source, transaction=None):

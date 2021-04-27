@@ -31,7 +31,7 @@
   color: initial;
   border: none;
   border: 1px solid transparent;
-  border-top-color: var(--gray-medium);
+  border-top-color: var(--gray-highlight);
   background-color: transparent;
 }
 
@@ -46,9 +46,11 @@
 .labelWrapper {
   display: flex;
   flex-direction: column;
+  position: relative;
   font-size: 0.93em;
   font-style: italic;
   margin-bottom: 12px;
+  min-height: 66px;
 }
 
 .labelWrapper .labelText {
@@ -56,11 +58,19 @@
   align-items: center;
   margin-left: 4px;
   color: var(--gray-dark);
+  white-space: nowrap;
 }
 
 .labelWrapper .labelText :global(.icon) {
   margin-top: 2px;
   margin-left: 4px;
+}
+
+.labelWrapper .labelIcon {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  color: var(--gray-medium);
 }
 
 .disabledLabel {
@@ -70,7 +80,8 @@
 
 .labelTextArea,
 .textarea {
-  flex: 1;
+  height: 144px;
+  margin-top: 0;
 }
 
 .errorLabel .labelText,
@@ -133,6 +144,6 @@
 }
 
 .inputPlaceholder {
-  height: 66px;
+  height: 91px;
   margin-top: 12px;
 }

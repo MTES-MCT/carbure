@@ -165,7 +165,7 @@ export interface Lot {
   unknown_production_site_dbl_counting: string | null
   unknown_production_site_reference: string
 
-  parent_lot: null // @TODO
+  parent_lot: Lot | null
   fused_with: null // @TODO
 }
 
@@ -270,6 +270,7 @@ export enum Filters {
   DeliverySites = "delivery_sites",
   AddedBy = "added_by",
   Errors = "errors",
+  Forwarded = "is_forwarded",
 }
 
 export interface Snapshot {
@@ -377,7 +378,11 @@ export type SNCertificate = {
   download_link: string
 }
 
-export type Certificate = ISCCCertificate | DBSCertificate | REDCertCertificate | SNCertificate
+export type Certificate =
+  | ISCCCertificate
+  | DBSCertificate
+  | REDCertCertificate
+  | SNCertificate
 
 export type ProductionCertificate = {
   certificate_id: string
@@ -393,6 +398,7 @@ export type StockDraft = {
   client: string
   delivery_site: string
   delivery_site_country?: string
+  mac: boolean
 }
 
 export interface Declaration {

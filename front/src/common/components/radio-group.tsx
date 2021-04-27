@@ -3,8 +3,8 @@ import React from "react"
 import { Box } from "."
 import styles from "./radio-group.module.css"
 
-type RadioGroupProps = {
-  value: string
+export type RadioGroupProps = {
+  value?: string
   name?: string
   row?: boolean
   readOnly?: boolean

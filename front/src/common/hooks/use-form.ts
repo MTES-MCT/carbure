@@ -15,14 +15,19 @@ export type FormTarget<T = any> = {
 
 export type FormChangeHandler<T> = (e: { target: FormTarget<T> }) => void
 
-function parseValue<T>(element: FormTarget<T>) {
-  if (element.type === "checkbox") {
-    return element.checked
-  } else if (element.type === "number") {
-    const parsed = parseFloat(`${element.value}`)
+function parseValue<T>(el: FormTarget<T>) {
+  if (el.type === "checkbox") {
+    return el.checked
+  } else if (el.type === "radio") {
+    // if there are only two boolean-like options, convert to boolean
+    return el.value === "true" || el.value === "false"
+      ? el.value === "true"
+      : el.value
+  } else if (el.type === "number") {
+    const parsed = parseFloat(`${el.value}`)
     return isNaN(parsed) ? "" : parsed
   } else {
-    return element.value
+    return el.value
   }
 }
 
@@ -54,7 +59,7 @@ export default function useForm<T extends FormState>(
   const reset = useCallback(
     (form: T) => {
       hasChange.current = false
-      setState(transform(options?.onChange, form))
+      setState(transform(options?.onChange, form, data))
     },
     [options?.onChange]
   )
