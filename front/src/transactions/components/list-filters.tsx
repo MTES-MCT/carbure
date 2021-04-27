@@ -21,6 +21,7 @@ const FILTER_ORDER = [
   Filters.DeliverySites,
   Filters.AddedBy,
   Filters.Errors,
+  Filters.Forwarded,
 ]
 
 const FILTER_LABELS = {
@@ -35,6 +36,7 @@ const FILTER_LABELS = {
   [Filters.Vendors]: "Fournisseurs",
   [Filters.AddedBy]: "Ajouté par",
   [Filters.Errors]: "Incohérences",
+  [Filters.Forwarded]: "Lots Transférés",
 }
 
 export function mapFilters(
