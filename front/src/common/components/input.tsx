@@ -1,7 +1,7 @@
 import React from "react"
 import cl from "clsx"
 import styles from "./input.module.css"
-import { AlertTriangle, Search } from "./icons"
+import { AlertTriangle, IconProps, Search } from "./icons"
 import { SystemProps } from "./index"
 
 // INPUT COMPONENT
@@ -27,8 +27,9 @@ export type LabelProps = SystemProps &
   Omit<React.HTMLProps<HTMLLabelElement>, "value" | "onChange"> & {
     error?: string | null
     tooltip?: string
-    label: string
+    label?: string
     required?: boolean
+    icon?: React.ComponentType<IconProps>
   }
 
 export const Label = ({
@@ -39,6 +40,7 @@ export const Label = ({
   label,
   readOnly,
   required = false,
+  icon: Icon,
   children,
   ...props
 }: LabelProps) => (
@@ -58,12 +60,13 @@ export const Label = ({
       {error && <AlertTriangle size={16} />}
     </span>
     {children}
+    {Icon && <Icon className={styles.labelIcon} />}
   </label>
 )
 // FORM INPUT COMPONENT
 
 export type LabelInputProps = InputProps & {
-  label: string
+  label?: string
   error?: string
   tooltip?: string
 }
@@ -75,6 +78,7 @@ export const LabelInput = ({
   tooltip,
   className,
   required,
+  style,
   ...props
 }: LabelInputProps) => (
   <Label
@@ -85,15 +89,16 @@ export const LabelInput = ({
     label={label}
     className={className}
     readOnly={props.readOnly}
+    style={style}
   >
     <Input {...props} disabled={disabled} />
   </Label>
 )
 
 // TEXT AREA COMPONENT
-type LabelTextAreaProps = SystemProps &
+export type LabelTextAreaProps = SystemProps &
   React.HTMLProps<HTMLTextAreaElement> & {
-    label: string
+    label?: string
     error?: string
   }
 
@@ -114,22 +119,35 @@ export const LabelTextArea = ({
     />
   </Label>
 )
+
 // LABEL CHECKBOX COMPONENT
+
+type LabelCheckboxProps = Omit<LabelInputProps, "value"> & {
+  value?: boolean
+}
 
 export const LabelCheckbox = ({
   label,
   className,
   disabled,
+  readOnly,
+  value,
+  checked,
   ...props
-}: LabelInputProps) => (
+}: LabelCheckboxProps) => (
   <label
     className={cl(
       styles.labelCheckbox,
-      disabled && styles.disabledLabel,
+      (readOnly || disabled) && styles.disabledLabel,
       className
     )}
   >
-    <input type="checkbox" disabled={disabled} {...props} />
+    <input
+      {...props}
+      type="checkbox"
+      disabled={disabled}
+      checked={checked ?? value}
+    />
     {label}
   </label>
 )

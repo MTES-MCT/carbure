@@ -1,4 +1,4 @@
-import { lot, operator } from "common/__test__/data"
+import { country, lot, producer, operator, trader } from "common/__test__/data"
 
 export const emptySnapshot = {
   years: [2020],
@@ -244,4 +244,99 @@ export const sentDetails = {
   errors: {},
   deadline: "2021-01-31",
   comments: [],
+}
+
+export const unknownProducerPartial = {
+  transaction: {
+    lot: {
+      producer_is_in_carbure: false,
+      carbure_producer: null,
+      unknown_producer: "Unknown Producer",
+    },
+  },
+}
+
+export const unknownProdSitePartial = {
+  transaction: {
+    lot: {
+      production_site_is_in_carbure: false,
+      carbure_production_site: null,
+      unknown_production_site: "Unknown Production Site",
+      unknown_production_country: country,
+      unknown_production_site_com_date: "2000-01-01",
+      unknown_production_site_reference: "2BS - PSITE",
+      unknown_production_site_dbl_counting: "ABCDE",
+    },
+  },
+}
+
+export const prodClientPartial = {
+  transaction: {
+    carbure_client: producer,
+  },
+}
+
+export const traderClientPartial = {
+  transaction: {
+    carbure_client: trader,
+  },
+}
+
+export const unknownClientPartial = {
+  transaction: {
+    client_is_in_carbure: false,
+    carbure_client: null,
+    unknown_client: "Unknown Client",
+  },
+}
+
+export const unknwonDSiteParital = {
+  transaction: {
+    delivery_site_is_in_carbure: true,
+    carbure_delivery_site: null,
+    unknown_delivery_site: "Unknown Delivery Site",
+    unknown_delivery_site_country: country,
+  },
+}
+
+export const traderVendorPartial = {
+  transaction: {
+    carbure_vendor: trader,
+  },
+}
+
+export const operatorVendorPartial = {
+  transaction: {
+    carbure_vendor: operator,
+  },
+}
+
+export const noVendorPartial = {
+  transaction: {
+    carbure_vendor: null,
+  },
+}
+
+export const traderAuthorPartial = {
+  transaction: {
+    lot: {
+      added_by: trader,
+    },
+  },
+}
+
+export const operatorAuthorPartial = {
+  transaction: {
+    lot: {
+      added_by: operator,
+    },
+  },
+}
+
+export const stockPartial = {
+  transaction: {
+    lot: {
+      parent_lot: lot,
+    },
+  },
 }

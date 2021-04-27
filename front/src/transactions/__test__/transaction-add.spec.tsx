@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event"
 import { Route } from "common/components/relative-route"
 import { Entity } from "common/types"
 
-import { producer } from "common/__test__/data"
+import { operator, producer, trader } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
 import { MemoryRouter } from "react-router-dom"
 import TransactionAdd from "../routes/transaction-add"
@@ -17,12 +17,12 @@ afterAll(() => server.close())
 
 const TransactionAddWithRouter = ({
   entity,
-  refresh,
   children,
+  refresh = () => {},
 }: {
   entity: Entity
   children?: React.ReactNode
-  refresh: () => {}
+  refresh?: () => void
 }) => (
   <MemoryRouter initialEntries={["/org/0/transactions/draft/add"]}>
     <Route path="/org/0/transactions/draft/add">
@@ -32,37 +32,37 @@ const TransactionAddWithRouter = ({
   </MemoryRouter>
 )
 
-test("display the transaction form", async () => {
-  const refresh = jest.fn()
-
-  render(<TransactionAddWithRouter entity={producer} refresh={refresh} />)
-
-  screen.getByText("Créer une nouvelle transaction")
-  screen.getByText("Brouillon")
-
-  screen.getByLabelText("Il s'agit d'une mise à consommation ?")
+function checkLotFields() {
   screen.getByLabelText("Numéro douanier (DAE, DAA...) *")
   screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°) *")
   screen.getByLabelText("Biocarburant *")
   screen.getByLabelText("Matiere premiere *")
-  screen.getByLabelText("Pays d'origine *")
-  screen.getByLabelText("Date de livraison")
+  screen.getByLabelText("Pays d'origine de la matière première *")
+}
 
-  screen.getByLabelText("Producteur enregistré sur Carbure ?")
-  screen.getByLabelText("Producteur")
+function checkProductionFields() {
   screen.getByLabelText("Site de production")
-  screen.getByLabelText("Pays de production")
-  screen.getByLabelText("Date de mise en service")
-  screen.getByLabelText("N° d'enregistrement double-compte")
   screen.getByLabelText("Certificat du site de production")
+  screen.getByLabelText("Pays de production")
+  screen.getByLabelText("Date de mise en service *")
+  screen.getByLabelText("N° d'enregistrement double-compte")
+}
 
-  screen.getByLabelText("Client enregistré sur Carbure ?")
-  screen.getByLabelText("Client")
-  screen.getByLabelText("Site de livraison enregistré sur Carbure ?")
-  screen.getByLabelText("Site de livraison *")
-  screen.getByLabelText("Pays de livraison")
+function checkOriginFields() {
+  screen.getByLabelText("Producteur")
+  screen.getByLabelText("Fournisseur")
+  screen.getByLabelText("Certificat du fournisseur")
   screen.getByLabelText("Champ libre")
+}
 
+function checkDeliveryFields() {
+  screen.getByLabelText(/Client/)
+  screen.getByLabelText("Site de livraison *")
+  screen.getByLabelText("Pays de livraison *")
+  screen.getByLabelText("Date de livraison")
+}
+
+function checkGESFields() {
   screen.getByText("Émissions")
   screen.getByLabelText("EEC")
   screen.getByLabelText("EL")
@@ -78,12 +78,72 @@ test("display the transaction form", async () => {
 
   screen.getByLabelText("Total")
   screen.getByLabelText("Réduction")
+}
+
+test("display the transaction form - producer with trading and mac", async () => {
+  render(<TransactionAddWithRouter entity={producer} />)
+
+  screen.getByText("Créer une nouvelle transaction")
+  screen.getByText("Brouillon")
+
+  checkLotFields()
+  checkOriginFields()
+  checkProductionFields()
+  checkDeliveryFields()
+  checkGESFields()
+
+  screen.getByText("Il s'agit d'une mise à consommation ?")
+  screen.getByLabelText("Votre certificat *")
 
   screen.getByText("Créer lot")
   screen.getByText("Retour")
 })
 
-test("check the form fields", async () => {
+test("display the transaction form - pure producer", async () => {
+  const entity = { ...producer, has_trading: false, has_mac: false }
+  render(<TransactionAddWithRouter entity={entity} />)
+
+  checkLotFields()
+  checkProductionFields()
+  checkDeliveryFields()
+  checkGESFields()
+
+  const prodField = screen.getByLabelText(/Producteur/)
+  expect(prodField).toBeDisabled()
+  expect(prodField).toHaveValue(entity.name)
+
+  expect(screen.getByLabelText(/Fournisseur/)).toBeDisabled()
+  expect(screen.getByLabelText("Certificat du fournisseur")).toBeDisabled()
+})
+
+test("display the transaction form - operator", async () => {
+  render(<TransactionAddWithRouter entity={operator} />)
+
+  checkLotFields()
+  checkOriginFields()
+  checkProductionFields()
+  checkDeliveryFields()
+  checkGESFields()
+
+  const client = screen.getByLabelText(/Client/)
+  expect(client).toBeDisabled()
+  expect(client).toHaveValue(operator.name)
+})
+
+test("display the transaction form - trader", async () => {
+  render(<TransactionAddWithRouter entity={trader} />)
+
+  checkLotFields()
+  checkOriginFields()
+  checkProductionFields()
+  checkDeliveryFields()
+  checkGESFields()
+
+  screen.getByText("Il s'agit d'une mise à consommation ?")
+  screen.getByLabelText("Votre certificat *")
+})
+
+test("check the form fields are working", async () => {
   const refresh = jest.fn()
 
   render(
@@ -103,22 +163,49 @@ test("check the form fields", async () => {
   userEvent.type(screen.getByLabelText("Matiere premiere *"), "Co")
   userEvent.click(await screen.findByText("Colza"))
 
-  userEvent.type(screen.getByLabelText("Pays d'origine *"), "France")
+  userEvent.type(
+    screen.getByLabelText("Pays d'origine de la matière première *"),
+    "France"
+  )
 
   userEvent.type(screen.getByLabelText("Date de livraison"), "2020-31-12")
 
-  screen.getByDisplayValue("Producteur Test")
+  userEvent.type(screen.getByLabelText("Producteur"), "Pr")
+  userEvent.click(await screen.findByText("Producteur Test"))
+
+  expect(screen.getByLabelText("Fournisseur")).toBeDisabled()
+  expect(screen.getByLabelText("Certificat du fournisseur")).toBeDisabled()
 
   userEvent.type(screen.getByLabelText("Site de production"), "Test") // prettier-ignore
   userEvent.click(await screen.findByText("Test Production Site"))
 
-  userEvent.type(screen.getByLabelText("Client"), "Test")
+  const psiteCountry = screen.getByLabelText("Pays de production")
+  const psiteComDate = screen.getByLabelText("Date de mise en service *")
+  const psiteDC = screen.getByLabelText("N° d'enregistrement double-compte")
+
+  expect(psiteCountry).toBeDisabled()
+  expect(psiteCountry).toHaveValue("France")
+  expect(psiteDC).toBeDisabled()
+  expect(psiteComDate).toBeDisabled()
+  expect(psiteComDate).toHaveValue("2000-01-31")
+
+  userEvent.type(screen.getByLabelText(/Client/), "Test")
   userEvent.click(await screen.findByText("Opérateur Test"))
 
-  userEvent.type(screen.getByLabelText("Site de livraison *"), "Test") // prettier-ignore
+  const dsite = screen.getByLabelText("Site de livraison *")
+  const dsiteCountry = screen.getByLabelText("Pays de livraison *")
+
+  expect(dsiteCountry).not.toBeDisabled()
+
+  userEvent.type(dsite, "Test") // prettier-ignore
   userEvent.click(await screen.findByText("Test Delivery Site"))
 
+  expect(dsiteCountry).toBeDisabled()
+
   userEvent.type(screen.getByLabelText("Champ libre"), "blabla")
+
+  userEvent.click(screen.getByText("Oui"))
+  expect(dsite).toBeDisabled()
 
   userEvent.type(screen.getByLabelText("EEC"), "10")
   userEvent.type(screen.getByLabelText("EL"), "1.1")
@@ -145,6 +232,3 @@ test("check the form fields", async () => {
 
   expect(refresh).toHaveBeenCalledTimes(1)
 })
-
-test.todo("check the transaction form with entities that are not on carbure")
-test.todo("check the transaction form defaults for operators")

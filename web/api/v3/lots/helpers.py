@@ -99,6 +99,7 @@ def filter_by_entities(txs, entities):
 
 
 def filter_lots(txs, querySet):
+    is_forwarded = querySet.get('is_forwarded', None)
     year = querySet.get('year', False)
     periods = querySet.getlist('periods')
     production_sites = querySet.getlist('production_sites')
@@ -157,6 +158,12 @@ def filter_lots(txs, querySet):
 
     if added_by:
         txs = txs.filter(lot__added_by__name__in=added_by)
+
+    if is_forwarded is not None:
+        if is_forwarded == 'true':
+            txs = txs.filter(is_forwarded=True)
+        else:
+            txs = txs.filter(is_forwarded=False)
 
     if errors:
         txs = txs.filter(Q(transactionerror__error__in=errors) | Q(lot__lotv2error__error__in=errors) | Q(lot__lotvalidationerror__message__in=errors))

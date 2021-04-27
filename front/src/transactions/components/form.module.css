@@ -4,37 +4,10 @@
   margin-top: 8px;
 }
 
-.transactionFields > div > div {
-  margin-right: 32px;
-}
-
-.transactionFields {
-  flex-shrink: 0;
-}
-
 .transactionRequiredInfo {
   display: flex;
   align-items: center;
   flex: 1;
-}
-
-.transactionGESFields {
-  flex: 1;
-  max-width: 240px;
-}
-
-.transactionGES > *:first-child {
-  margin-right: 8px;
-}
-
-.transactionGESHeader {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
-  font-size: var(--font-size);
-  height: 66px;
-  margin-top: 12px;
 }
 
 .transactionFormButtons {

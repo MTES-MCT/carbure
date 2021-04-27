@@ -259,7 +259,7 @@ def get_snapshot(request):
         filters['added_by'] = [e['lot__added_by__name'] for e in txs.values('lot__added_by__name').distinct()]
 
         filters['delivery_status'] = [{'value':s[0], 'label': s[1]} for s in LotTransaction.DELIVERY_STATUS]
-
+        filters['is_forwarded'] = [{'value':True, 'label': 'Oui'}, {'value':False, 'label': 'Non'}]
         data['filters'] = filters
 
     except Exception as e:
