@@ -422,6 +422,7 @@ class EntityDepotAdmin(admin.ModelAdmin):
     list_filter = ('blending_is_outsourced', )
 
 
+admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
 admin.site.register(UserRightsRequests, UserRightsRequestsAdmin)
 admin.site.register(UserPreferences, UserPreferencesAdmin)
