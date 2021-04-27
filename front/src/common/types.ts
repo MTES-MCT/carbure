@@ -270,6 +270,7 @@ export enum Filters {
   DeliverySites = "delivery_sites",
   AddedBy = "added_by",
   Errors = "errors",
+  Forwarded = "is_forwarded",
 }
 
 export interface Snapshot {
