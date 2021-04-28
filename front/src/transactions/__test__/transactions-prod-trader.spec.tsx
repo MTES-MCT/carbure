@@ -420,6 +420,7 @@ test("producer/trader: send all draft lots", async () => {
 
   // confirm the sending
   const title = await screen.findByText("Envoyer tous ces brouillons")
+  await waitWhileLoading()
   clickOnCheckboxesAndConfirm()
 
   expect(title).not.toBeInTheDocument()
@@ -451,6 +452,7 @@ test("producer/trader: sent selected draft lots", async () => {
 
   // confirm the sending
   const title = screen.getByText("Envoyer la sélection")
+  await waitWhileLoading()
   clickOnCheckboxesAndConfirm()
 
   expect(title).not.toBeInTheDocument()
@@ -510,6 +512,7 @@ test("producer/trader: delete all draft lot", async () => {
 
   // confirm the sending
   const title = await screen.findByText("Supprimer tous ces brouillons")
+  await waitWhileLoading()
   userEvent.click(screen.getByText("OK"))
 
   expect(title).not.toBeInTheDocument()
@@ -538,6 +541,7 @@ test("producer/trader: delete selected draft lot", async () => {
 
   // confirm the sending
   const title = screen.getByText("Supprimer lot")
+  await waitWhileLoading()
   userEvent.click(screen.getByText("OK"))
 
   expect(title).not.toBeInTheDocument()
@@ -619,6 +623,7 @@ test("producer/trader: delete selected tofix lot", async () => {
 
   // confirm the sending
   const title = screen.getByText("Supprimer lot")
+  await waitWhileLoading()
   userEvent.click(screen.getByText("OK"))
 
   expect(title).not.toBeInTheDocument()

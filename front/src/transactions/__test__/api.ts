@@ -55,6 +55,13 @@ export const okLots = rest.get("/api/v3/lots", (req, res, ctx) => {
   return res(ctx.json({ status: "success", data: lots }))
 })
 
+export const okLotsSummary = rest.get(
+  "/api/v3/lots/summary",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success", data: data.lotsSummary }))
+  }
+)
+
 export const okDuplicateLot = rest.post(
   "/api/v3/lots/duplicate",
   (req, res, ctx) => {
@@ -181,13 +188,6 @@ export const okAdminSnapshot = rest.get(
   }
 )
 
-export const okDraftSummary = rest.get(
-  "/api/v3/lots/draft-summary",
-  (req, res, ctx) => {
-    return res(ctx.json({ status: "success", data: { in: [], out: [] } }))
-  }
-)
-
 export default setupServer(
   okSnapshot,
   okLots,
@@ -209,5 +209,5 @@ export default setupServer(
   okLotUpdate,
   okAdminLots,
   okAdminSnapshot,
-  okDraftSummary
+  okLotsSummary
 )
