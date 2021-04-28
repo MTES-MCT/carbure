@@ -1,6 +1,5 @@
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { TransactionSelection } from "../query/use-selection"
-import { YearSelection } from "../query/use-year"
 
 import * as api from "transactions/api"
 import useAPI from "../../../common/hooks/use-api"
@@ -9,7 +8,7 @@ import { prompt } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
 import { CommentPrompt } from "transactions/components/form-comments"
 import { ValidationPrompt } from "transactions/components/validation"
-import { LotStatus, TransactionQuery } from "common/types"
+import { TransactionQuery } from "common/types"
 
 export interface LotValidator {
   loading: boolean
@@ -22,7 +21,7 @@ export interface LotValidator {
 export default function useValidateLots(
   entity: EntitySelection,
   selection: TransactionSelection,
-  filters: TransactionQuery,
+  query: TransactionQuery,
   refresh: () => void
 ): LotValidator {
   const notifications = useNotificationContext()
@@ -127,7 +126,7 @@ export default function useValidateLots(
 
   async function validateAll() {
     if (entity !== null) {
-      const filteredDrafts = await api.getLots(filters)
+      const filteredDrafts = await api.getLots(query)
       const nbClients = new Set(
         filteredDrafts.lots.map((o) =>
           o.carbure_client ? o.carbure_client.name : o.unknown_client
@@ -144,7 +143,7 @@ export default function useValidateLots(
           stock
           title="Envoyer tous ces brouillons"
           description={`Voulez êtes sur le point d'envoyer ${filteredDrafts.lots.length} lots à ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres ?`}
-          filters={filters}
+          query={query}
           onResolve={resolve}
         />
       ))

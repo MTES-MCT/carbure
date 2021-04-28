@@ -12,7 +12,7 @@ import {
   CommentWithType,
 } from "transactions/components/form-comments"
 import { EntityType, TransactionQuery } from "common/types"
-import { ValidationPrompt } from "transactions/components/validation"
+import { SummaryPrompt } from "transactions/components/summary"
 
 export interface LotAcceptor {
   loading: boolean
@@ -84,7 +84,7 @@ export default function useAcceptLots(
 
   async function acceptSelection() {
     const shouldAccept = await prompt<boolean>((resolve) => (
-      <ValidationPrompt
+      <SummaryPrompt
         title="Accepter lot"
         description="Voulez vous accepter les lots sélectionnés ?"
         filters={filters}

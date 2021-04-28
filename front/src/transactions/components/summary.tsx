@@ -1,13 +1,23 @@
-import { Fragment } from "react"
+import { Fragment, useEffect } from "react"
 import Table, { Column, Line } from "common/components/table"
-import { SummaryItem } from "common/types"
+import { SummaryItem, TransactionQuery } from "common/types"
 import { padding, prettyVolume } from "./list-columns"
 import { Alert } from "common/components/alert"
-import { AlertCircle } from "common/components/icons"
+import { AlertCircle, Check } from "common/components/icons"
 
-import { Box, Title } from "common/components"
-import styles from "./transaction-summary.module.css"
+import { Box, LoaderOverlay, Title } from "common/components"
+import styles from "./summary.module.css"
 import colStyles from "./list-columns.module.css"
+import {
+  Dialog,
+  DialogButtons,
+  DialogText,
+  DialogTitle,
+  PromptProps,
+} from "common/components/dialog"
+import useAPI from "common/hooks/use-api"
+import * as api from "../api"
+import { Button } from "common/components/button"
 
 const COLUMNS: Column<SummaryItem>[] = [
   {
@@ -109,6 +119,63 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
         </Box>
       )}
     </Fragment>
+  )
+}
+
+export function useSummary(
+  filters: TransactionQuery | undefined,
+  selection: number[] | undefined
+) {
+  const [summary, getSummary] = useAPI(api.getLotsSummary)
+
+  useEffect(() => {
+    if (typeof filters !== "undefined") {
+      getSummary(filters, selection ?? [])
+    }
+  }, [getSummary, filters, selection])
+
+  return summary
+}
+
+type SummaryPromptProps = PromptProps<boolean> & {
+  title: string
+  description: string
+  stock?: boolean
+  entityID?: number
+  selection?: number[]
+  filters?: TransactionQuery
+}
+
+export const SummaryPrompt = ({
+  title,
+  description,
+  filters,
+  selection,
+  onResolve,
+}: SummaryPromptProps) => {
+  const summary = useSummary(filters, selection)
+
+  return (
+    <Dialog
+      onResolve={onResolve}
+      className={summary.data ? styles.dialogWide : undefined}
+    >
+      <DialogTitle text={title} />
+      <DialogText text={description} />
+
+      {summary.data && (
+        <TransactionSummary in={summary.data.in} out={summary.data.out} />
+      )}
+
+      <DialogButtons>
+        <Button level="primary" icon={Check} onClick={() => onResolve(true)}>
+          OK
+        </Button>
+        <Button onClick={() => onResolve()}>Annuler</Button>
+      </DialogButtons>
+
+      {summary.loading && <LoaderOverlay />}
+    </Dialog>
   )
 }
 

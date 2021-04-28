@@ -1,7 +1,6 @@
 import {
   Transaction,
   Lots,
-  LotStatus,
   Snapshot,
   LotDetails,
   TransactionQuery,
@@ -27,9 +26,10 @@ export function getLots(params: TransactionQuery): Promise<Lots> {
 }
 
 export function getLotsSummary(
-  params: TransactionQuery
+  query: TransactionQuery,
+  selection: number[]
 ): Promise<TransactionSummary> {
-  return api.get("/lots/summary", params).then((res) => ({
+  return api.get("/lots/summary", { ...query, selection }).then((res) => ({
     in: flattenSummary(res.in),
     out: flattenSummary(res.out),
   }))
@@ -229,36 +229,6 @@ export function validateAllDraftLots(entityID: number, year: number) {
   return api.post("/lots/validate-all-drafts", {
     entity_id: entityID,
     year,
-  })
-}
-
-export function getLotsOutSummary(
-  entityID: number,
-  lot_status: LotStatus,
-  period: string | null,
-  delivery_status: string[],
-  stock: boolean
-) {
-  return api.get("/lots/summary-out", {
-    entity_id: entityID,
-    lot_status,
-    period,
-    delivery_status,
-    stock,
-  })
-}
-
-export function getLotsInSummary(
-  entityID: number,
-  lot_status: LotStatus,
-  period: string | null,
-  delivery_status: string[]
-) {
-  return api.get("/lots/summary-in", {
-    entity_id: entityID,
-    lot_status,
-    period,
-    delivery_status,
   })
 }
 
