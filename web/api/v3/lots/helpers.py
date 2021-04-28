@@ -347,7 +347,7 @@ def get_summary(txs, entity):
     txs_out = txs.filter(carbure_vendor=entity).exclude(carbure_client=entity)
     data_out = {}
     for t in txs_out:
-        tx_ids.add(t.id)
+        tx_ids.append(t.id)
         client_name = t.carbure_client.name if t.client_is_in_carbure and t.carbure_client else t.unknown_client
         if client_name not in data_out:
             data_out[client_name] = {}

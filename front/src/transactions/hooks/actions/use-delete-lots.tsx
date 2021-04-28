@@ -20,7 +20,8 @@ export default function useDeleteLots(
   entity: EntitySelection,
   selection: TransactionSelection,
   query: TransactionQuery,
-  refresh: () => void
+  refresh: () => void,
+  stock?: boolean
 ): LotDeleter {
   const notifications = useNotificationContext()
 
@@ -64,6 +65,7 @@ export default function useDeleteLots(
   async function deleteSelection() {
     const shouldDelete = await prompt<number[]>((resolve) => (
       <SummaryPrompt
+        stock={stock}
         title="Supprimer lot"
         description="Voulez vous supprimer les lots sélectionnés ?"
         query={query}
@@ -83,6 +85,7 @@ export default function useDeleteLots(
     if (entity !== null) {
       const allTxids = await prompt<number[]>((resolve) => (
         <SummaryPrompt
+          stock={stock}
           title="Supprimer tous ces brouillons"
           description="Voulez vous supprimer tous ces lots ?"
           query={query}

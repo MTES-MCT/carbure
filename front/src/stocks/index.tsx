@@ -48,12 +48,6 @@ function useStocks(entity: EntitySelection) {
   const snapshot = useGetStockSnapshot(entity)
   const special = useSpecialSelection(pagination)
   const year = useYearSelection(pagination, filters, special)
-  const stock = useGetStocks(entity, filters, status, pagination, search, sorting) // prettier-ignore
-
-  function refresh() {
-    snapshot.getSnapshot()
-    stock.getStock()
-  }
 
   const stockQuery = useTransactionQuery(
     status.active,
@@ -69,14 +63,21 @@ function useStocks(entity: EntitySelection) {
     special.deadline
   )
 
+  const stock = useGetStocks(stockQuery)
+
+  function refresh() {
+    snapshot.getSnapshot()
+    stock.getStock()
+  }
+
   const selection = useTransactionSelection(stock.data?.lots)
   const uploader = useUploadLotFile(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
-  const deleter = useDeleteLots(entity, selection, stockQuery, refresh)
-  const validator = useValidateLots(entity, selection, stockQuery, refresh)
-  const acceptor = useAcceptLots(entity, selection, stockQuery, refresh)
-  const rejector = useRejectLots(entity, selection, stockQuery, refresh)
-  const sender = useSendLot(entity, selection, filters, search, refresh)
+  const deleter = useDeleteLots(entity, selection, stockQuery, refresh, true)
+  const validator = useValidateLots(entity, selection, stockQuery, refresh, true) // prettier-ignore
+  const acceptor = useAcceptLots(entity, selection, stockQuery, refresh, true)
+  const rejector = useRejectLots(entity, selection, stockQuery, refresh, true)
+  const sender = useSendLot(entity, selection, stockQuery, refresh)
 
   return {
     filters,

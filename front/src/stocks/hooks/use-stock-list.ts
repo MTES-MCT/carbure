@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { Lots } from "common/types"
+import { Lots, TransactionQuery } from "common/types"
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
 import { getStocks, getStockSnapshot } from "../api"
@@ -33,56 +33,22 @@ export function useGetStockSnapshot(entity: EntitySelection) {
 }
 
 // fetches current transaction list when parameters change
-export function useGetStocks(
-  entity: EntitySelection,
-  filters: FilterSelection,
-  status: StatusSelection,
-  pagination: PageSelection,
-  search: SearchSelection,
-  sorting: SortingSelection
-): StockHook {
+export function useGetStocks(query: TransactionQuery): StockHook {
   const [stock, resolveStocks] = useAPI(getStocks)
-  const entityID = entity?.id
 
   function exportAllTransactions() {
-    if (entity === null) return
-
-    api.downloadStocks(
-      status.active,
-      entity.id,
-      filters.selected,
-      search.query,
-      sorting.column,
-      sorting.order
-    )
-  }
-
-  function getStock() {
-    if (typeof entityID !== "undefined") {
-      resolveStocks(
-        entityID,
-        filters.selected,
-        status.active,
-        pagination.page,
-        pagination.limit,
-        search.query,
-        sorting.column,
-        sorting.order
-      )
+    if (query.entity_id >= 0) {
+      api.downloadStocks(query)
     }
   }
 
-  useEffect(getStock, [
-    resolveStocks,
-    entityID,
-    filters.selected,
-    status.active,
-    pagination.page,
-    pagination.limit,
-    search.query,
-    sorting.column,
-    sorting.order,
-  ])
+  function getStock() {
+    if (query.entity_id >= 0) {
+      resolveStocks(query)
+    }
+  }
+
+  useEffect(getStock, [query])
 
   return { ...stock, getStock, exportAllTransactions }
 }

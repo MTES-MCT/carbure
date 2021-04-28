@@ -10,6 +10,8 @@ from core.common import load_excel_file, send_lot_from_stock, generate_carbure_i
 from core.xlsx_v3 import template_stock, template_stock_bcghg
 from core.xlsx_v3 import export_stocks
 from django_otp.decorators import otp_required
+from api.v3.lots.helpers import get_summary, filter_lots
+
 
 sort_key_to_django_field = {'period': 'lot__period',
                             'biocarburant': 'lot__biocarburant__name',
@@ -111,6 +113,38 @@ def get_stocks(request, *args, **kwargs):
             response = HttpResponse(content=data, content_type=ctype)
             response['Content-Disposition'] = 'attachment; filename="%s"' % (file_location)
         return response
+
+
+@check_rights('entity_id')
+def get_stocks_summary(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+
+    status = request.GET.get('status', False)
+    selection = request.GET.getlist('selection')
+
+    if entity.entity_type in ['Producteur', 'Trader']:
+        if status == "tosend":
+            txs = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
+        elif status == "in":
+            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AC', 'AA'])
+        elif status == "stock":
+            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0, is_forwarded=False)
+        else:
+            return JsonResponse({'status': 'error', 'message': "Unknown status"}, status=400)
+    else:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
+
+    # try:
+    if len(selection) > 0:
+        txs = LotTransaction.objects.filter(pk__in=selection)
+    else:
+        txs, _, _, _ = filter_lots(txs, request.GET)
+    data = get_summary(txs, entity)
+    return JsonResponse({'status': 'success', 'data': data})
+    # except Exception as e:
+        # return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
 
 @check_rights('entity_id')
 def get_snapshot(request, *args, **kwargs):

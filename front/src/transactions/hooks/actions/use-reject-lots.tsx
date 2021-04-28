@@ -23,7 +23,8 @@ export default function useRejectLots(
   entity: EntitySelection,
   selection: TransactionSelection,
   query: TransactionQuery,
-  refresh: () => void
+  refresh: () => void,
+  stock?: boolean
 ): LotRejector {
   const notifications = useNotificationContext()
 
@@ -70,6 +71,7 @@ export default function useRejectLots(
   async function rejectSelection() {
     const res = await prompt<[string, number[]]>((resolve) => (
       <CommentWithSummaryPrompt
+        stock={stock}
         title="Refuser lot"
         description="Voulez vous refuser les lots sélectionnés ?"
         query={query}
@@ -92,6 +94,7 @@ export default function useRejectLots(
     if (entity !== null) {
       const res = await prompt<[string, number[]]>((resolve) => (
         <CommentWithSummaryPrompt
+          stock={stock}
           title="Refuser tout"
           description="Voulez vous refuser tous ces lots ?"
           query={query}
