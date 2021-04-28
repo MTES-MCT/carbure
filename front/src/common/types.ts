@@ -273,6 +273,31 @@ export enum Filters {
   Forwarded = "is_forwarded",
 }
 
+export interface TransactionQuery {
+  entity_id: number
+  from_idx: number
+  sort_by: string
+  status: LotStatus
+  year: number
+  limit: number | null
+  query: string
+  order: string
+  invalid: boolean
+  deadline: boolean
+  [Filters.DeliveryStatus]?: any
+  [Filters.MatieresPremieres]?: any
+  [Filters.Biocarburants]?: any
+  [Filters.Periods]?: any
+  [Filters.CountriesOfOrigin]?: any
+  [Filters.Vendors]?: any
+  [Filters.Clients]?: any
+  [Filters.ProductionSites]?: any
+  [Filters.DeliverySites]?: any
+  [Filters.AddedBy]?: any
+  [Filters.Errors]?: any
+  [Filters.Forwarded]?: any
+}
+
 export interface Snapshot {
   lots: {
     [key in LotStatus]: number
@@ -424,6 +449,11 @@ export interface SummaryItem {
   lots: number
   volume: number
   avg_ghg_reduction: number
+}
+
+export interface TransactionSummary {
+  in: SummaryItem[]
+  out: SummaryItem[]
 }
 
 export interface ConvertETBE {

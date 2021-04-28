@@ -1,14 +1,8 @@
 import { useEffect } from "react"
 
-import { EntityType, Lots } from "common/types"
-import { PageSelection } from "common/components/pagination"
+import { EntityType, Lots, TransactionQuery } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
-import { FilterSelection } from "transactions/hooks/query/use-filters"
-import { SearchSelection } from "transactions/hooks/query/use-search"
-import { SortingSelection } from "transactions/hooks/query/use-sort-by"
-import { StatusSelection } from "transactions/hooks/query/use-status"
 import { YearSelection } from "transactions/hooks/query/use-year"
-import { SpecialSelection } from "transactions/hooks/query/use-special"
 
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
@@ -56,13 +50,7 @@ export interface LotGetter {
 // fetches current transaction list when parameters change
 export function useGetLots(
   entity: EntitySelection,
-  status: StatusSelection,
-  filters: FilterSelection,
-  year: YearSelection,
-  pagination: PageSelection,
-  search: SearchSelection,
-  sorting: SortingSelection,
-  special: SpecialSelection
+  filters: TransactionQuery
 ): LotGetter {
   const lotsGetter =
     entity?.entity_type === EntityType.Administration
@@ -71,66 +59,23 @@ export function useGetLots(
 
   const [transactions, resolveLots] = useAPI(lotsGetter)
 
-  const entityID = entity?.id
-
   function exportAllTransactions() {
     if (entity === null) return
 
     if (entity.entity_type === EntityType.Administration) {
-      api.downloadAdminLots(
-        status.active,
-        entity.id,
-        filters.selected,
-        year.selected,
-        search.query,
-        sorting.column,
-        sorting.order
-      )
+      api.downloadAdminLots(filters)
     } else {
-      api.downloadLots(
-        status.active,
-        entity.id,
-        filters.selected,
-        year.selected,
-        search.query,
-        sorting.column,
-        sorting.order
-      )
+      api.downloadLots(filters)
     }
   }
 
   function getTransactions() {
-    if (typeof entityID !== "undefined") {
-      resolveLots(
-        status.active,
-        entityID,
-        filters.selected,
-        year.selected,
-        pagination.page,
-        pagination.limit,
-        search.query,
-        sorting.column,
-        sorting.order,
-        special.invalid,
-        special.deadline
-      )
+    if (filters.entity_id >= 0) {
+      resolveLots(filters)
     }
   }
 
-  useEffect(getTransactions, [
-    resolveLots,
-    status.active,
-    entityID,
-    filters.selected,
-    year.selected,
-    pagination.page,
-    pagination.limit,
-    search.query,
-    sorting.column,
-    sorting.order,
-    special.invalid,
-    special.deadline,
-  ])
+  useEffect(getTransactions, [resolveLots, filters])
 
   return { ...transactions, getTransactions, exportAllTransactions }
 }

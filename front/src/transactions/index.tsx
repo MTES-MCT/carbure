@@ -31,6 +31,7 @@ import TransactionDetails from "./routes/transaction-details"
 import TransactionInSummary from "./routes/transaction-in-summary"
 import TransactionOutSummary from "./routes/transaction-out-summary"
 import useForwardLots from "./hooks/actions/use-forward-lots"
+import { useTransactionQuery } from "./helpers"
 
 // prettier-ignore
 const OPERATOR_STATUSES = [
@@ -96,8 +97,22 @@ export function useTransactions(entity: EntitySelection) {
   const status = useStatusSelection(pagination, special)
   const year = useYearSelection(pagination, filters, special)
 
+  const txFilters = useTransactionQuery(
+    status.active,
+    entity?.id ?? -1,
+    filters.selected,
+    year.selected,
+    pagination.page,
+    pagination.limit,
+    search.query,
+    sorting.column,
+    sorting.order,
+    special.invalid,
+    special.deadline
+  )
+
   const snapshot = useGetSnapshot(entity, year)
-  const transactions = useGetLots(entity, status, filters, year, pagination, search, sorting, special) // prettier-ignore
+  const transactions = useGetLots(entity, txFilters)
 
   function refresh() {
     snapshot.getSnapshot()
@@ -108,10 +123,10 @@ export function useTransactions(entity: EntitySelection) {
 
   const uploader = useUploadLotFile(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
-  const deleter = useDeleteLots(entity, selection, filters, year, search, special, refresh)
-  const validator = useValidateLots(entity, selection, filters, year, search, special, refresh)
-  const acceptor = useAcceptLots(entity, selection, filters, year, search, special, refresh)
-  const rejector = useRejectLots(entity, selection, filters, year, search, special, refresh)
+  const deleter = useDeleteLots(entity, selection, txFilters, refresh)
+  const validator = useValidateLots(entity, selection, txFilters, refresh)
+  const acceptor = useAcceptLots(entity, selection, txFilters, refresh)
+  const rejector = useRejectLots(entity, selection, txFilters, refresh)
   const declarator = useDeclareLots(entity)
   const forwarder = useForwardLots(entity, selection, refresh)
 
@@ -305,7 +320,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
             acceptor={acceptor}
             rejector={rejector}
             transactions={transactions}
-        />
+          />
         </Route>
       </Switch>
     </Main>

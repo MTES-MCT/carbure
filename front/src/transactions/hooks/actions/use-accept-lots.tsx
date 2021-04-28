@@ -1,6 +1,5 @@
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { TransactionSelection } from "../query/use-selection"
-import { YearSelection } from "../query/use-year"
 
 import * as api from "transactions/api"
 import { getStocks } from "stocks/api"
@@ -12,10 +11,8 @@ import {
   CommentWithTypePrompt,
   CommentWithType,
 } from "transactions/components/form-comments"
-import { SpecialSelection } from "../query/use-special"
-import { FilterSelection } from "../query/use-filters"
-import { SearchSelection } from "../query/use-search"
-import { EntityType, Lots, LotStatus, Transaction } from "common/types"
+import { EntityType, TransactionQuery } from "common/types"
+import { ValidationPrompt } from "transactions/components/validation"
 
 export interface LotAcceptor {
   loading: boolean
@@ -28,10 +25,7 @@ export interface LotAcceptor {
 export default function useAcceptLots(
   entity: EntitySelection,
   selection: TransactionSelection,
-  filters: FilterSelection,
-  year: YearSelection,
-  search: SearchSelection,
-  special: SpecialSelection,
+  filters: TransactionQuery,
   refresh: () => void
 ): LotAcceptor {
   const notifications = useNotificationContext()
@@ -89,16 +83,20 @@ export default function useAcceptLots(
   }
 
   async function acceptSelection() {
-    const shouldAccept = await confirm(
-      "Accepter lot",
-      "Voulez vous accepter les lots sélectionnés ?"
-    )
+    const shouldAccept = await prompt<boolean>((resolve) => (
+      <ValidationPrompt
+        title="Accepter lot"
+        description="Voulez vous accepter les lots sélectionnés ?"
+        filters={filters}
+        onResolve={resolve}
+      />
+    ))
 
     if (entity !== null && shouldAccept) {
       await notifyAccept(resolveAccept(entity.id, selection.selected), true)
     }
 
-    return shouldAccept
+    return Boolean(shouldAccept)
   }
 
   async function acceptAllInbox() {
@@ -107,14 +105,12 @@ export default function useAcceptLots(
       // display summary (number of lots, number of suppliers
       // call AcceptLots with all the tx_ids
       var allInboxLots
-
       // prettier-ignore
-      if (entity.entity_type == EntityType.Operator) {
-        allInboxLots = await api.getLots(LotStatus.Inbox, entity.id, filters["selected"], year.selected, 0, null, search.query, 'id', 'asc', special.invalid, special.deadline)
+      if (entity.entity_type === EntityType.Operator) {
+        allInboxLots = await api.getLots(filters)
       } else {
-        allInboxLots = await getStocks(entity.id, filters["selected"], "in", 0, null, search.query)
+        allInboxLots = await getStocks(entity.id, filters, "in", 0, null, filters.query)
       }
-
       const nbSuppliers = new Set(
         allInboxLots.lots.map((o) => o.carbure_vendor?.name)
       ).size
@@ -123,12 +119,10 @@ export default function useAcceptLots(
         .reduce((sum, vol) => sum + vol)
       const supplierStr = nbSuppliers > 1 ? "fournisseurs" : "fournisseur"
       const allTxids = allInboxLots.lots.map((o) => o.id)
-
       const shouldAccept = await confirm(
         "Accepter tout",
         `Voulez êtes sur le point d'accepter ${allInboxLots.lots.length} lots de ${nbSuppliers} ${supplierStr} représentant un total de ${totalVolume} litres ?`
       )
-
       if (entity !== null && shouldAccept) {
         await notifyAccept(resolveAccept(entity.id, allTxids), true)
       }
