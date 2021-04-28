@@ -11,3 +11,8 @@
   border-bottom: 1px solid var(--gray-medium);
   font-size: 1.5em;
 }
+
+.transactionSummaryTotal {
+  margin-left: 8px;
+  font-size: 0.8em;
+}
