@@ -3,7 +3,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot, ISCCCertificate, DBSCertificate
+from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
+from certificates.models import ISCCCertificate, DBSCertificate
 from api.v3.common.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
 

@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from core.models import Entity, UserRights, LotV2, LotTransaction, ProductionSite, Pays, Biocarburant, MatierePremiere, Depot, LotValidationError, LotV2Error, TransactionError
-from core.models import ISCCCertificate, EntityISCCTradingCertificate
+from certificates.models import ISCCCertificate, EntityISCCTradingCertificate
 from api.v3.admin.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
 
