@@ -136,7 +136,7 @@ export function useSummary(
   return summary
 }
 
-type SummaryPromptProps = PromptProps<boolean> & {
+type SummaryPromptProps = PromptProps<number[]> & {
   title: string
   description: string
   stock?: boolean
@@ -164,7 +164,11 @@ export const SummaryPrompt = ({
       )}
 
       <DialogButtons>
-        <Button level="primary" icon={Check} onClick={() => onResolve(true)}>
+        <Button
+          level="primary"
+          icon={Check}
+          onClick={() => onResolve(summary.data?.tx_ids)}
+        >
           OK
         </Button>
         <Button onClick={() => onResolve()}>Annuler</Button>

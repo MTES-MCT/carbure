@@ -110,7 +110,7 @@ export default function useValidateLots(
   async function validateSelection() {
     if (entity === null) return false
 
-    const shouldValidate = await prompt<boolean>((resolve) => (
+    const shouldValidate = await prompt<number[]>((resolve) => (
       <ValidationSummaryPrompt
         title="Envoyer la sélection"
         description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
@@ -129,31 +129,20 @@ export default function useValidateLots(
 
   async function validateAll() {
     if (entity !== null) {
-      const filteredDrafts = await api.getLots({ ...query, limit: null })
-      const nbClients = new Set(
-        filteredDrafts.lots.map((o) =>
-          o.carbure_client ? o.carbure_client.name : o.unknown_client
-        )
-      ).size
-      const totalVolume = filteredDrafts.lots
-        .map((o) => o.lot.volume)
-        .reduce((sum, vol) => sum + vol)
-      const clientsStr = nbClients > 1 ? "clients" : "client"
-      const allTxids = filteredDrafts.lots.map((o) => o.id)
-
-      const shouldValidate = await prompt<boolean>((resolve) => (
+      const allTxids = await prompt<number[]>((resolve) => (
         <ValidationSummaryPrompt
           title="Envoyer tous ces brouillons"
-          description={`Voulez êtes sur le point d'envoyer ${filteredDrafts.lots.length} lots à ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres ?`}
+          description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
           query={query}
           onResolve={resolve}
         />
       ))
 
-      if (entity !== null && shouldValidate) {
+      if (entity !== null && allTxids) {
         await notifyValidate(resolveValidate(entity.id, allTxids), true)
       }
-      return Boolean(shouldValidate)
+
+      return Boolean(allTxids)
     }
     return false
   }

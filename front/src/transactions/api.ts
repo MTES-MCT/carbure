@@ -32,6 +32,7 @@ export function getLotsSummary(
   return api.get("/lots/summary", { ...query, selection }).then((res) => ({
     in: flattenSummary(res.in),
     out: flattenSummary(res.out),
+    tx_ids: res.tx_ids,
   }))
 }
 
