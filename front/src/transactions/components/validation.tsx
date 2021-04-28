@@ -9,7 +9,7 @@ import {
 } from "common/components/dialog"
 
 import { Check } from "common/components/icons"
-import { Box, LoaderOverlay } from "common/components"
+import { Box, LoaderOverlay, SystemProps } from "common/components"
 import { Button } from "common/components/button"
 
 import styles from "common/components/dialog.module.css"
@@ -17,30 +17,24 @@ import { LabelCheckbox } from "common/components/input"
 import TransactionSummary, { useSummary } from "./summary"
 import { TransactionQuery } from "common/types"
 
-type ValidationPromptProps = PromptProps<boolean> & {
-  title: string
-  description: string
-  stock?: boolean
-  entityID?: number
-  selection?: number[]
-  query?: TransactionQuery
-}
+type ValidationPromptProps = SystemProps &
+  PromptProps<boolean> & {
+    wide?: boolean
+    title: string
+    description: string
+  }
 
 export const ValidationPrompt = ({
+  wide = false,
   title,
   description,
-  query,
-  selection,
+  children,
   onResolve,
 }: ValidationPromptProps) => {
-  const summary = useSummary(query, selection)
   const [checked, setChecked] = useState({ terres: false, infos: false })
 
   return (
-    <Dialog
-      onResolve={onResolve}
-      className={summary.data ? styles.dialogWide : undefined}
-    >
+    <Dialog wide={wide} onResolve={onResolve}>
       <DialogTitle text={title} />
       <DialogText text={description} />
 
@@ -57,9 +51,7 @@ export const ValidationPrompt = ({
         />
       </Box>
 
-      {summary.data && (
-        <TransactionSummary in={summary.data.in} out={summary.data.out} />
-      )}
+      {children}
 
       <DialogButtons>
         <Button
@@ -72,8 +64,36 @@ export const ValidationPrompt = ({
         </Button>
         <Button onClick={() => onResolve()}>Annuler</Button>
       </DialogButtons>
-
-      {summary.loading && <LoaderOverlay />}
     </Dialog>
+  )
+}
+
+type ValidationSummaryPromptProps = ValidationPromptProps & {
+  query: TransactionQuery
+  selection?: number[]
+}
+
+export const ValidationSummaryPrompt = ({
+  title,
+  description,
+  query,
+  selection,
+  onResolve,
+}: ValidationSummaryPromptProps) => {
+  const summary = useSummary(query, selection)
+
+  return (
+    <ValidationPrompt
+      wide
+      title={title}
+      description={description}
+      onResolve={onResolve}
+    >
+      <TransactionSummary
+        in={summary.data?.in ?? null}
+        out={summary.data?.out ?? null}
+      />
+      {summary.loading && <LoaderOverlay />}
+    </ValidationPrompt>
   )
 }

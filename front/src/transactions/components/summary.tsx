@@ -123,16 +123,14 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
 }
 
 export function useSummary(
-  filters: TransactionQuery | undefined,
+  query: TransactionQuery,
   selection: number[] | undefined
 ) {
   const [summary, getSummary] = useAPI(api.getLotsSummary)
 
   useEffect(() => {
-    if (typeof filters !== "undefined") {
-      getSummary(filters, selection ?? [])
-    }
-  }, [getSummary, filters, selection])
+    getSummary(query, selection ?? [])
+  }, [getSummary, query, selection])
 
   return summary
 }
@@ -143,23 +141,20 @@ type SummaryPromptProps = PromptProps<boolean> & {
   stock?: boolean
   entityID?: number
   selection?: number[]
-  filters?: TransactionQuery
+  query: TransactionQuery
 }
 
 export const SummaryPrompt = ({
   title,
   description,
-  filters,
+  query,
   selection,
   onResolve,
 }: SummaryPromptProps) => {
-  const summary = useSummary(filters, selection)
+  const summary = useSummary(query, selection)
 
   return (
-    <Dialog
-      onResolve={onResolve}
-      className={summary.data ? styles.dialogWide : undefined}
-    >
+    <Dialog wide onResolve={onResolve}>
       <DialogTitle text={title} />
       <DialogText text={description} />
 
