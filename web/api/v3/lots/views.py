@@ -46,8 +46,13 @@ def get_lots_summary(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
 
-    try: 
-        txs, _, _, _ = filter_entity_transactions(entity, request.GET)
+    selection = request.GET.getlist('selection')
+
+    try:
+        if len(selection) > 0:
+            txs = LotTransaction.objects.filter(pk__in=selection)
+        else:
+            txs, _, _, _ = filter_entity_transactions(entity, request.GET)
         data = get_summary(txs, entity)
         return JsonResponse({'status': 'success', 'data': data})
     except Exception as e:
