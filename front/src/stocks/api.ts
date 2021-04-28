@@ -1,4 +1,3 @@
-import { FilterSelection } from "transactions/hooks/query/use-filters"
 import {
   ConvertETBE,
   Lots,

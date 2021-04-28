@@ -2,7 +2,6 @@ import { EntitySelection } from "carbure/hooks/use-entity"
 import { TransactionSelection } from "../query/use-selection"
 
 import * as api from "transactions/api"
-import { getStocks } from "stocks/api"
 import useAPI from "../../../common/hooks/use-api"
 
 import { confirm, prompt } from "../../../common/components/dialog"
