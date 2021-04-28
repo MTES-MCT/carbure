@@ -68,10 +68,14 @@ export const ValidationPrompt = ({
   )
 }
 
-type ValidationSummaryPromptProps = ValidationPromptProps & {
-  query: TransactionQuery
-  selection?: number[]
-}
+type ValidationSummaryPromptProps = SystemProps &
+  PromptProps<number[]> & {
+    wide?: boolean
+    title: string
+    description: string
+    query: TransactionQuery
+    selection?: number[]
+  }
 
 export const ValidationSummaryPrompt = ({
   title,
@@ -82,12 +86,20 @@ export const ValidationSummaryPrompt = ({
 }: ValidationSummaryPromptProps) => {
   const summary = useSummary(query, selection)
 
+  function resolve(isConfirmed?: boolean) {
+    if (isConfirmed && summary.data) {
+      onResolve(summary.data.tx_ids)
+    } else {
+      onResolve()
+    }
+  }
+
   return (
     <ValidationPrompt
       wide
       title={title}
       description={description}
-      onResolve={onResolve}
+      onResolve={resolve}
     >
       <TransactionSummary
         in={summary.data?.in ?? null}

@@ -62,7 +62,7 @@ export default function useDeleteLots(
   }
 
   async function deleteSelection() {
-    const shouldDelete = await prompt<boolean>((resolve) => (
+    const shouldDelete = await prompt<number[]>((resolve) => (
       <SummaryPrompt
         title="Supprimer lot"
         description="Voulez vous supprimer les lots sélectionnés ?"
@@ -81,33 +81,21 @@ export default function useDeleteLots(
 
   async function deleteAll() {
     if (entity !== null) {
-      const filteredDrafts = await api.getLots(query)
-      const nbClients = new Set(
-        filteredDrafts.lots.map((o) =>
-          o.carbure_client ? o.carbure_client.name : o.unknown_client
-        )
-      ).size
-      const totalVolume = filteredDrafts.lots
-        .map((o) => o.lot.volume)
-        .reduce((sum, vol) => sum + vol, 0)
-      const clientsStr = nbClients > 1 ? "clients" : "client"
-      const allTxids = filteredDrafts.lots.map((o) => o.id)
-
-      const shouldDelete = await prompt<boolean>((resolve) => (
+      const allTxids = await prompt<number[]>((resolve) => (
         <SummaryPrompt
           title="Supprimer tous ces brouillons"
-          description={`Voulez êtes sur le point de supprimer ${filteredDrafts.lots.length} lots concernant ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres`}
+          description="Voulez vous supprimer tous ces lots ?"
           query={query}
           selection={selection.selected}
           onResolve={resolve}
         />
       ))
 
-      if (entity !== null && shouldDelete) {
+      if (entity !== null && allTxids) {
         await notifyDelete(resolveDelete(entity.id, allTxids), true)
       }
 
-      return Boolean(shouldDelete)
+      return Boolean(allTxids)
     }
 
     return false

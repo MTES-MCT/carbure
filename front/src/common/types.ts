@@ -454,6 +454,7 @@ export interface SummaryItem {
 export interface TransactionSummary {
   in: SummaryItem[]
   out: SummaryItem[]
+  tx_ids: number[]
 }
 
 export interface ConvertETBE {

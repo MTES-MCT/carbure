@@ -83,7 +83,7 @@ export default function useAcceptLots(
   }
 
   async function acceptSelection() {
-    const shouldAccept = await prompt<boolean>((resolve) => (
+    const shouldAccept = await prompt<number[]>((resolve) => (
       <SummaryPrompt
         title="Accepter lot"
         description="Voulez vous accepter les lots sélectionnés ?"
@@ -102,38 +102,21 @@ export default function useAcceptLots(
 
   async function acceptAllInbox() {
     if (entity !== null) {
-      // getLots with current filters but no limit
-      // display summary (number of lots, number of suppliers
-      // call AcceptLots with all the tx_ids
-      let allInboxLots =
-        entity.entity_type === EntityType.Operator
-          ? await api.getLots({ ...query, limit: null })
-          : await getStocks(entity.id, query, "in", 0, null, query.query)
-
-      const nbSuppliers = new Set(
-        allInboxLots.lots.map((o) => o.carbure_vendor?.name)
-      ).size
-      const totalVolume = allInboxLots.lots
-        .map((o) => o.lot.volume)
-        .reduce((sum, vol) => sum + vol)
-      const supplierStr = nbSuppliers > 1 ? "fournisseurs" : "fournisseur"
-      const allTxids = allInboxLots.lots.map((o) => o.id)
-
-      const shouldAccept = await prompt<boolean>((resolve) => (
+      const allTxids = await prompt<number[]>((resolve) => (
         <SummaryPrompt
           title="Accepter tout"
-          description={`Voulez êtes sur le point d'accepter ${allInboxLots.lots.length} lots de ${nbSuppliers} ${supplierStr} représentant un total de ${totalVolume} litres ?`}
+          description="Voulez vous accepter tous ces lots ?"
           query={query}
           selection={selection.selected}
           onResolve={resolve}
         />
       ))
 
-      if (entity !== null && shouldAccept) {
+      if (entity !== null && allTxids) {
         await notifyAccept(resolveAccept(entity.id, allTxids), true)
       }
 
-      return Boolean(shouldAccept)
+      return Boolean(allTxids)
     }
 
     return false

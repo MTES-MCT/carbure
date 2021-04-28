@@ -323,10 +323,12 @@ def filter_entity_transactions(entity, querySet):
     return filter_lots(txs, querySet)
 
 def get_summary(txs, entity):
+    tx_ids = []
     txs_in = txs.filter(carbure_client=entity)
     data_in = {}
     for t in txs_in:
         vendor = ''
+        tx_ids.append(t.id)
         if t.lot.added_by == entity:
             vendor = t.lot.unknown_supplier if t.lot.unknown_supplier else t.lot.unknown_supplier_certificate
         else:
@@ -345,6 +347,7 @@ def get_summary(txs, entity):
     txs_out = txs.filter(carbure_vendor=entity).exclude(carbure_client=entity)
     data_out = {}
     for t in txs_out:
+        tx_ids.add(t.id)
         client_name = t.carbure_client.name if t.client_is_in_carbure and t.carbure_client else t.unknown_client
         if client_name not in data_out:
             data_out[client_name] = {}
@@ -357,4 +360,4 @@ def get_summary(txs, entity):
         line['volume'] += t.lot.volume
         line['lots'] += 1
 
-    return { 'in': data_in, 'out': data_out}
+    return {'in': data_in, 'out': data_out, 'tx_ids': tx_ids}

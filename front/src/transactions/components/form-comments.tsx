@@ -181,7 +181,7 @@ export const CommentWithTypePrompt = ({
   )
 }
 
-type CommentWithSummaryPromptProps = PromptProps<string> & {
+type CommentWithSummaryPromptProps = PromptProps<[string, number[]]> & {
   title: string
   description: string
   query: TransactionQuery
@@ -200,7 +200,7 @@ export const CommentWithSummaryPrompt = ({
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault()
-    onResolve(comment)
+    onResolve([comment, summary.data?.tx_ids ?? []])
   }
 
   return (
@@ -225,7 +225,7 @@ export const CommentWithSummaryPrompt = ({
           <Button
             level="primary"
             disabled={!comment}
-            onClick={() => onResolve(comment)}
+            onClick={() => onResolve([comment, summary.data?.tx_ids ?? []])}
           >
             OK
           </Button>
