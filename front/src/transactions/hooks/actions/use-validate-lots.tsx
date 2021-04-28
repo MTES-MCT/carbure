@@ -7,7 +7,10 @@ import useAPI from "../../../common/hooks/use-api"
 import { prompt } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
 import { CommentPrompt } from "transactions/components/form-comments"
-import { ValidationPrompt } from "transactions/components/validation"
+import {
+  ValidationPrompt,
+  ValidationSummaryPrompt,
+} from "transactions/components/validation"
 import { TransactionQuery } from "common/types"
 
 export interface LotValidator {
@@ -108,10 +111,10 @@ export default function useValidateLots(
     if (entity === null) return false
 
     const shouldValidate = await prompt<boolean>((resolve) => (
-      <ValidationPrompt
+      <ValidationSummaryPrompt
         title="Envoyer la sélection"
         description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
-        entityID={entity.id}
+        query={query}
         selection={selection.selected}
         onResolve={resolve}
       />
@@ -121,12 +124,12 @@ export default function useValidateLots(
       await notifyValidate(resolveValidate(entity.id, selection.selected), true)
     }
 
-    return shouldValidate ?? false
+    return Boolean(shouldValidate)
   }
 
   async function validateAll() {
     if (entity !== null) {
-      const filteredDrafts = await api.getLots(query)
+      const filteredDrafts = await api.getLots({ ...query, limit: null })
       const nbClients = new Set(
         filteredDrafts.lots.map((o) =>
           o.carbure_client ? o.carbure_client.name : o.unknown_client
@@ -139,8 +142,7 @@ export default function useValidateLots(
       const allTxids = filteredDrafts.lots.map((o) => o.id)
 
       const shouldValidate = await prompt<boolean>((resolve) => (
-        <ValidationPrompt
-          stock
+        <ValidationSummaryPrompt
           title="Envoyer tous ces brouillons"
           description={`Voulez êtes sur le point d'envoyer ${filteredDrafts.lots.length} lots à ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres ?`}
           query={query}

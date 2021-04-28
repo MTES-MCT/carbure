@@ -134,11 +134,8 @@ export default function useSendLot(
 
     const shouldSend = await prompt<boolean>((resolve) => (
       <ValidationPrompt
-        stock
         title="Envoyer la sélection"
         description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
-        entityID={entity.id}
-        selection={selection.selected}
         onResolve={resolve}
       />
     ))
@@ -173,11 +170,8 @@ export default function useSendLot(
 
       const shouldSend = await prompt<boolean>((resolve) => (
         <ValidationPrompt
-          stock
           title="Envoyer tous ces brouillons"
           description={`Voulez êtes sur le point d'envoyer ${filteredDrafts.lots.length} lots à ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres ?`}
-          entityID={entity.id}
-          selection={allTxids}
           onResolve={resolve}
         />
       ))

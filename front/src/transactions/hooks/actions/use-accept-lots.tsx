@@ -25,7 +25,7 @@ export interface LotAcceptor {
 export default function useAcceptLots(
   entity: EntitySelection,
   selection: TransactionSelection,
-  filters: TransactionQuery,
+  query: TransactionQuery,
   refresh: () => void
 ): LotAcceptor {
   const notifications = useNotificationContext()
@@ -87,7 +87,7 @@ export default function useAcceptLots(
       <SummaryPrompt
         title="Accepter lot"
         description="Voulez vous accepter les lots sélectionnés ?"
-        filters={filters}
+        query={query}
         onResolve={resolve}
       />
     ))
@@ -107,9 +107,9 @@ export default function useAcceptLots(
       var allInboxLots
       // prettier-ignore
       if (entity.entity_type === EntityType.Operator) {
-        allInboxLots = await api.getLots(filters)
+        allInboxLots = await api.getLots({...query, limit: null})
       } else {
-        allInboxLots = await getStocks(entity.id, filters, "in", 0, null, filters.query)
+        allInboxLots = await getStocks(entity.id, query, "in", 0, null, query.query)
       }
       const nbSuppliers = new Set(
         allInboxLots.lots.map((o) => o.carbure_vendor?.name)
