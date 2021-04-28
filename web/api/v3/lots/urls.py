@@ -7,7 +7,6 @@ urlpatterns = [
     path('details', views.get_details, name='api-v3-lots-get-details'),
     path('snapshot', views.get_snapshot, name='api-v3-lots-get-snapshot'),
     path('declaration-summary', views.get_declaration_summary, name='api-v3-lots-get-declaration-summary'),
-    path('draft-summary', views.get_draft_summary, name='api-v3-lots-get-draft-summary'),
     path('summary', views.get_lots_summary, name='api-v3-lots-get-lots-summary'),
 
     # POST
