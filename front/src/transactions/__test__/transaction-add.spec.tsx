@@ -41,7 +41,7 @@ function checkLotFields() {
 }
 
 function checkProductionFields() {
-  screen.getByLabelText("Site de production")
+  screen.getByLabelText(/^Site de production/)
   screen.getByLabelText("Certificat du site de production")
   screen.getByLabelText("Pays de production")
   screen.getByLabelText("Date de mise en service *")
@@ -56,8 +56,8 @@ function checkOriginFields() {
 }
 
 function checkDeliveryFields() {
-  screen.getByLabelText(/Client/)
-  screen.getByLabelText("Site de livraison *")
+  screen.getByLabelText(/^Client/)
+  screen.getByLabelText(/^Site de livraison \*/)
   screen.getByLabelText("Pays de livraison *")
   screen.getByLabelText("Date de livraison")
 }
@@ -108,11 +108,11 @@ test("display the transaction form - pure producer", async () => {
   checkDeliveryFields()
   checkGESFields()
 
-  const prodField = screen.getByLabelText(/Producteur/)
+  const prodField = screen.getByLabelText(/^Producteur/)
   expect(prodField).toBeDisabled()
   expect(prodField).toHaveValue(entity.name)
 
-  expect(screen.getByLabelText(/Fournisseur/)).toBeDisabled()
+  expect(screen.getByLabelText(/^Fournisseur/)).toBeDisabled()
   expect(screen.getByLabelText("Certificat du fournisseur")).toBeDisabled()
 })
 
@@ -125,7 +125,7 @@ test("display the transaction form - operator", async () => {
   checkDeliveryFields()
   checkGESFields()
 
-  const client = screen.getByLabelText(/Client/)
+  const client = screen.getByLabelText(/^Client/)
   expect(client).toBeDisabled()
   expect(client).toHaveValue(operator.name)
 })
@@ -176,7 +176,7 @@ test("check the form fields are working", async () => {
   expect(screen.getByLabelText("Fournisseur")).toBeDisabled()
   expect(screen.getByLabelText("Certificat du fournisseur")).toBeDisabled()
 
-  userEvent.type(screen.getByLabelText("Site de production"), "Test") // prettier-ignore
+  userEvent.type(screen.getByLabelText(/^Site de production/), "Test") // prettier-ignore
   userEvent.click(await screen.findByText("Test Production Site"))
 
   const psiteCountry = screen.getByLabelText("Pays de production")
@@ -189,10 +189,10 @@ test("check the form fields are working", async () => {
   expect(psiteComDate).toBeDisabled()
   expect(psiteComDate).toHaveValue("2000-01-31")
 
-  userEvent.type(screen.getByLabelText(/Client/), "Test")
+  userEvent.type(screen.getByLabelText(/^Client/), "Test")
   userEvent.click(await screen.findByText("Opérateur Test"))
 
-  const dsite = screen.getByLabelText("Site de livraison *")
+  const dsite = screen.getByLabelText(/^Site de livraison \*/)
   const dsiteCountry = screen.getByLabelText("Pays de livraison *")
 
   expect(dsiteCountry).not.toBeDisabled()
