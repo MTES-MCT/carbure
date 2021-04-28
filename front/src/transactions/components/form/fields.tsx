@@ -167,7 +167,7 @@ export const Producer = ({ data, value, errors, ...props }: LACP<Entity>) => {
 
   // prettier-ignore
   const icon = isKnown(producer)
-    ? (props: any) => <UserCheck {...props} title="Ce producteur est enregistré dans CarbuRe" />
+    ? (props: any) => <UserCheck {...props} title="Ce producteur est enregistré sur CarbuRe" />
     : undefined
 
   return (
@@ -193,7 +193,13 @@ export const ProductionSite = ({
   errors,
   ...props
 }: LACP<ProductionSiteDetails>) => {
+  const psite = value ?? data?.production_site
   const error = errors?.carbure_production_site ?? errors?.production_site
+
+  // prettier-ignore
+  const icon = isKnown(psite)
+    ? (props: any) => <UserCheck {...props} title="Ce site de production est enregistré sur CarbuRe" />
+    : undefined
 
   return (
     <LabelAutoComplete
@@ -201,11 +207,12 @@ export const ProductionSite = ({
       name="production_site"
       label="Site de production"
       minLength={0}
-      value={value ?? data?.production_site}
+      value={psite}
       error={error}
       getValue={getters.id}
       getLabel={getters.name}
       getQuery={api.findProductionSites}
+      icon={icon}
       {...props}
     />
   )
@@ -318,7 +325,7 @@ export const CarbureVendor = ({
 
   // prettier-ignore
   const icon = isKnown(vendor)
-    ? (props: any) => <UserCheck {...props} title="Ce fournisseur est enregistré dans CarbuRe" />
+    ? (props: any) => <UserCheck {...props} title="Ce fournisseur est enregistré sur CarbuRe" />
     : undefined
 
   return (
@@ -420,7 +427,7 @@ export const Client = ({ data, value, errors, ...props }: LACP<Entity>) => {
 
   // prettier-ignore
   const icon = isKnown(client)
-    ? (props: any) => <UserCheck {...props} title="Ce client est enregistré dans CarbuRe" />
+    ? (props: any) => <UserCheck {...props} title="Ce client est enregistré sur CarbuRe" />
     : undefined
 
   return (
@@ -439,21 +446,31 @@ export const Client = ({ data, value, errors, ...props }: LACP<Entity>) => {
   )
 }
 
-export const DeliverySite = ({ data, value, errors, ...props }: LACP<DS>) => (
-  <LabelAutoComplete
-    loose
-    required
-    disabled={data?.mac}
-    name="delivery_site"
-    label="Site de livraison"
-    value={value ?? data?.delivery_site}
-    error={errors?.delivery_site}
-    getValue={getters.depot_id}
-    getLabel={getters.name}
-    getQuery={api.findDeliverySites}
-    {...props}
-  />
-)
+export const DeliverySite = ({ data, value, errors, ...props }: LACP<DS>) => {
+  const depot = value ?? data?.delivery_site
+
+  // prettier-ignore
+  const icon = isKnown(depot)
+    ? (props: any) => <UserCheck {...props} title="Ce site de livraison est enregistré sur CarbuRe" />
+    : undefined
+
+  return (
+    <LabelAutoComplete
+      loose
+      required
+      disabled={data?.mac}
+      name="delivery_site"
+      label="Site de livraison"
+      value={depot}
+      error={errors?.delivery_site}
+      getValue={getters.depot_id}
+      getLabel={getters.name}
+      getQuery={api.findDeliverySites}
+      icon={icon}
+      {...props}
+    />
+  )
+}
 
 export const DeliverySiteCountry = ({
   data,
