@@ -2,7 +2,7 @@ import datetime
 from django.http import JsonResponse
 from django.db.models import Q
 from core.models import Entity, Biocarburant, MatierePremiere, Depot, Pays
-from core.models import ISCCCertificate, DBSCertificate, REDCertCertificate
+from certificates.models import ISCCCertificate, DBSCertificate, REDCertCertificate
 from core.models import Control, ControlMessages, UserRights
 from certificates.models import SNCertificate
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput

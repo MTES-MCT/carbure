@@ -11,9 +11,13 @@ from django.conf import settings
 from core.models import Entity, UserRights, LotV2, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput, ProducerCertificate
 from core.decorators import check_rights, otp_or_403
-from core.models import ISCCCertificate, DBSCertificate, REDCertCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate, EntityREDCertTradingCertificate
-from core.models import ProductionSiteCertificate, UserRightsRequests
+
+from certificates.models import ISCCCertificate, DBSCertificate, REDCertCertificate
+from certificates.models import EntityISCCTradingCertificate, EntityDBSTradingCertificate, EntityREDCertTradingCertificate
+from certificates.models import ProductionSiteCertificate
 from certificates.models import SNCategory, EntitySNTradingCertificate, SNCertificate
+
+from core.models import UserRightsRequests
 from api.v3.lots.views import get_entity_lots_by_status
 from core.common import get_prefetched_data
 from api.v3.sanity_checks import bulk_sanity_checks
