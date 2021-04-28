@@ -165,7 +165,7 @@ export const SummaryPrompt = ({
           icon={Check}
           onClick={() => onResolve(summary.data?.tx_ids)}
         >
-          OK
+          Confirmer
         </Button>
         <Button onClick={() => onResolve()}>Annuler</Button>
       </DialogButtons>

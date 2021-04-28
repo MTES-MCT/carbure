@@ -151,7 +151,7 @@ test("operator: duplicate draft lot", async () => {
 
   // confirm the duplication
   const title = await screen.findByText("Dupliquer lot")
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 
@@ -281,7 +281,7 @@ test("operator: delete draft lot", async () => {
 
   // confirm the sending
   const title = screen.getByText("Supprimer lot")
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 
@@ -313,7 +313,7 @@ test("operator: delete all draft lot", async () => {
   // confirm the sending
   const title = await screen.findByText("Supprimer tous ces brouillons")
   await waitWhileLoading()
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 
@@ -343,7 +343,7 @@ test("operator: delete selected draft lot", async () => {
   // confirm the sending
   const title = screen.getByText("Supprimer lot")
   await waitWhileLoading()
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 
@@ -369,7 +369,7 @@ test("operator: accept inbox lot", async () => {
 
   // confirm the sending
   const title = screen.getByText("Accepter lot")
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 
@@ -427,7 +427,7 @@ test("operator: accept all inbox lots", async () => {
 
   // confirm the sending
   screen.getByText("Accepter tout", { selector: "h1" })
-  const okButton = await screen.findByText("OK")
+  const okButton = await screen.findByText("Confirmer")
   userEvent.click(okButton)
 
   expect(okButton).not.toBeInTheDocument()
@@ -460,7 +460,7 @@ test("operator: accept selected inbox lots", async () => {
   // confirm the sending
   const title = screen.getByText("Accepter lot")
   await waitWhileLoading()
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 
@@ -489,7 +489,7 @@ test("operator: reject inbox lot", async () => {
   // confirm the sending
   const title = screen.getByText("Refuser lot")
   userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "not ok")
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 
@@ -519,7 +519,7 @@ test("operator: reject all inbox lots", async () => {
   userEvent.click(button)
 
   // confirm the sending
-  const okButton = await screen.findByText("OK")
+  const okButton = await screen.findByText("Confirmer")
   userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "not ok")
   userEvent.click(okButton)
 
@@ -551,7 +551,7 @@ test("operator: reject selected inbox lots", async () => {
   // confirm the sending
   const title = await screen.findByText("Refuser lot")
   userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "not ok")
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 

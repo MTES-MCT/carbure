@@ -81,7 +81,7 @@ const ConfirmPrompt = ({
 
     <DialogButtons>
       <Button level="primary" onClick={() => onResolve(true)}>
-        OK
+        Confirmer
       </Button>
       <Button onClick={() => onResolve(false)}>Annuler</Button>
     </DialogButtons>
