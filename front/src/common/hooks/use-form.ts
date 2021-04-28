@@ -59,7 +59,7 @@ export default function useForm<T extends FormState>(
   const reset = useCallback(
     (form: T) => {
       hasChange.current = false
-      setState(transform(options?.onChange, form, data))
+      setState((data) => transform(options?.onChange, form, data))
     },
     [options?.onChange]
   )

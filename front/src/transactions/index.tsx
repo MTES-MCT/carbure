@@ -1,5 +1,3 @@
-import React from "react"
-
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { EntityType, Filters, LotStatus } from "common/types"
 
@@ -28,8 +26,6 @@ import TransactionFilters from "./components/list-filters"
 
 import TransactionAdd from "./routes/transaction-add"
 import TransactionDetails from "./routes/transaction-details"
-import TransactionInSummary from "./routes/transaction-in-summary"
-import TransactionOutSummary from "./routes/transaction-out-summary"
 import useForwardLots from "./hooks/actions/use-forward-lots"
 import { useTransactionQuery } from "./helpers"
 
@@ -252,63 +248,6 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
       <Switch>
         <Route relative path="add">
           <TransactionAdd entity={entity} refresh={refresh} />
-        </Route>
-
-        <Route relative path="show-summary-in">
-          <TransactionInSummary
-            entity={entity}
-            lot_status={LotStatus.Validated}
-            period={null}
-            delivery_status={["A"]}
-          />
-        </Route>
-
-        <Route relative path="show-summary-in-pending">
-          <TransactionInSummary
-            entity={entity}
-            lot_status={LotStatus.Validated}
-            period={null}
-            delivery_status={["AC", "AA", "N"]}
-          />
-        </Route>
-
-        <Route relative path="show-summary-in-drafts">
-          <TransactionInSummary
-            entity={entity}
-            lot_status={LotStatus.Draft}
-            period={null}
-            delivery_status={["N"]}
-          />
-        </Route>
-
-        <Route relative path="show-summary-out">
-          <TransactionOutSummary
-            entity={entity}
-            lot_status={LotStatus.Validated}
-            period={null}
-            delivery_status={["A"]}
-            stock={false}
-          />
-        </Route>
-
-        <Route relative path="show-summary-out-pending">
-          <TransactionOutSummary
-            entity={entity}
-            lot_status={LotStatus.Validated}
-            period={null}
-            delivery_status={["AC", "AA", "N"]}
-            stock={false}
-          />
-        </Route>
-
-        <Route relative path="show-summary-out-drafts">
-          <TransactionOutSummary
-            entity={entity}
-            lot_status={LotStatus.Draft}
-            period={null}
-            delivery_status={["N"]}
-            stock={false}
-          />
         </Route>
 
         <Route relative path=":id">

@@ -1,7 +1,7 @@
 import React from "react"
 
 import { EntitySelection } from "carbure/hooks/use-entity"
-import { EntityType, Filters, LotStatus } from "common/types"
+import { EntityType, Filters } from "common/types"
 
 import { usePageSelection } from "common/components/pagination"
 import useSortingSelection from "transactions/hooks/query/use-sort-by"
@@ -29,8 +29,6 @@ import TransactionFilters from "transactions/components/list-filters"
 
 import StockDetails from "./routes/stock-details"
 import StockSendComplex from "./routes/stock-send-complex"
-import TransactionInSummary from "transactions/routes/transaction-in-summary"
-import TransactionOutSummary from "transactions/routes/transaction-out-summary"
 import { useTransactionQuery } from "transactions/helpers"
 
 const FILTERS = [
@@ -158,25 +156,6 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
       />
 
       <Switch>
-        <Route relative path="show-summary-in-pending">
-          <TransactionInSummary
-            entity={entity}
-            lot_status={LotStatus.Validated}
-            period={null}
-            delivery_status={["AC", "AA", "N"]}
-          />
-        </Route>
-
-        <Route relative path="show-summary-out-drafts">
-          <TransactionOutSummary
-            entity={entity}
-            lot_status={LotStatus.Draft}
-            period={null}
-            delivery_status={["N"]}
-            stock={true}
-          />
-        </Route>
-
         <Route relative path="send-complex">
           <StockSendComplex entity={entity} />
         </Route>
