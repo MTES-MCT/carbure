@@ -29,11 +29,13 @@ export function getLotsSummary(
   query: TransactionQuery,
   selection: number[]
 ): Promise<TransactionSummary> {
-  return api.get("/lots/summary", { ...query, selection }).then((res) => ({
-    in: flattenSummary(res.in),
-    out: flattenSummary(res.out),
-    tx_ids: res.tx_ids,
-  }))
+  return api
+    .get("/lots/summary", { ...query, limit: null, page: 0, selection })
+    .then((res) => ({
+      in: flattenSummary(res.in),
+      out: flattenSummary(res.out),
+      tx_ids: res.tx_ids,
+    }))
 }
 
 export function getDetails(

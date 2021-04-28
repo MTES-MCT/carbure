@@ -173,7 +173,7 @@ export const okLotDetails = rest.get(
 
 export const okLotUpdate = rest.post("/api/v3/lots/update", (req, res, ctx) => {
   setDetails(data.lotDetails)
-  details.transaction.dae = "DAETESTUPDATE OK"
+  details.transaction.dae = "DAETESTUPDATE Confirmer"
   return res(ctx.json({ status: "success" }))
 })
 

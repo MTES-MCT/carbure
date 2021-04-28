@@ -78,7 +78,7 @@ test("delete an iscc certificate in settings", async () => {
   userEvent.click(deleteButton)
 
   screen.getByText("Suppression certificat")
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   await waitWhileLoading()
 

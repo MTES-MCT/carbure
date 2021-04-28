@@ -112,7 +112,7 @@ export const CommentPrompt = ({
             disabled={!comment}
             onClick={() => onResolve(comment)}
           >
-            OK
+            Confirmer
           </Button>
           <Button onClick={() => onResolve()}>Annuler</Button>
         </DialogButtons>
@@ -229,7 +229,7 @@ export const CommentWithSummaryPrompt = ({
             disabled={!comment}
             onClick={() => onResolve([comment, summary.data?.tx_ids ?? []])}
           >
-            OK
+            Confirmer
           </Button>
           <Button onClick={() => onResolve()}>Annuler</Button>
         </DialogButtons>

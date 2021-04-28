@@ -257,7 +257,7 @@ test("edit transaction details", async () => {
 
   await waitWhileLoading()
 
-  await screen.findByDisplayValue("DAETESTUPDATE OK")
+  await screen.findByDisplayValue("DAETESTUPDATE Confirmer")
 
   userEvent.click(screen.getByText("Retour"))
   await waitFor(() => expect(title).not.toBeInTheDocument())
@@ -356,7 +356,7 @@ test("delete draft lot from details", async () => {
 
   // confirm the sending
   const title = screen.getByText("Supprimer lot")
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 
@@ -379,7 +379,7 @@ test("resend tofix lot from details", async () => {
   // confirm the sending
   const title = screen.getByText("Envoyer lot")
   userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "test is fixed") // prettier-ignore
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 
@@ -405,7 +405,7 @@ test("delete tofix lot from details", async () => {
 
   // confirm the sending
   screen.getByText("Supprimer lot")
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   await waitForElementToBeRemoved(() =>
     screen.getByText("Détails de la transaction")
@@ -425,7 +425,7 @@ test("accept inbox lot from details", async () => {
 
   // confirm the transaction
   screen.getByText("Accepter lot")
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   await waitWhileLoading()
 
@@ -475,7 +475,7 @@ test("reject inbox lot from details", async () => {
   // confirm the transaction
   screen.getByText("Refuser lot")
   userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "not for me") // prettier-ignore
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   await waitForElementToBeRemoved(() =>
     screen.queryByText("Détails de la transaction")

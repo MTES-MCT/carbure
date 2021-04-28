@@ -352,7 +352,7 @@ test("producer/trader: duplicate draft lot", async () => {
 
   // confirm the duplication
   const title = screen.getByText("Dupliquer lot")
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 
@@ -481,7 +481,7 @@ test("producer/trader: delete draft lot", async () => {
 
   // confirm the sending
   const title = screen.getByText("Supprimer lot")
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 
@@ -513,7 +513,7 @@ test("producer/trader: delete all draft lot", async () => {
   // confirm the sending
   const title = await screen.findByText("Supprimer tous ces brouillons")
   await waitWhileLoading()
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 
@@ -542,7 +542,7 @@ test("producer/trader: delete selected draft lot", async () => {
   // confirm the sending
   const title = screen.getByText("Supprimer lot")
   await waitWhileLoading()
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 
@@ -568,7 +568,7 @@ test("producer/trader: resend fixed lot", async () => {
   // confirm the fix by adding a comment
   const title = screen.getByText("Envoyer lot")
   userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "ok")
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 
@@ -594,7 +594,7 @@ test("producer/trader: delete tofix lot", async () => {
 
   // confirm the removal
   const title = screen.getByText("Supprimer lot")
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 
@@ -624,7 +624,7 @@ test("producer/trader: delete selected tofix lot", async () => {
   // confirm the sending
   const title = screen.getByText("Supprimer lot")
   await waitWhileLoading()
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 
