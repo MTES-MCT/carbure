@@ -4,9 +4,10 @@ import { TransactionSelection } from "../query/use-selection"
 import * as api from "transactions/api"
 import useAPI from "../../../common/hooks/use-api"
 
-import { confirm } from "../../../common/components/dialog"
+import { confirm, prompt } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
 import { TransactionQuery } from "common/types"
+import { SummaryPrompt } from "transactions/components/summary"
 
 export interface LotDeleter {
   loading: boolean
@@ -18,7 +19,7 @@ export interface LotDeleter {
 export default function useDeleteLots(
   entity: EntitySelection,
   selection: TransactionSelection,
-  filters: TransactionQuery,
+  query: TransactionQuery,
   refresh: () => void
 ): LotDeleter {
   const notifications = useNotificationContext()
@@ -61,21 +62,26 @@ export default function useDeleteLots(
   }
 
   async function deleteSelection() {
-    const shouldDelete = await confirm(
-      "Supprimer lot",
-      "Voulez vous supprimer les lots sélectionnés ?"
-    )
+    const shouldDelete = await prompt<boolean>((resolve) => (
+      <SummaryPrompt
+        title="Supprimer lot"
+        description="Voulez vous supprimer les lots sélectionnés ?"
+        query={query}
+        selection={selection.selected}
+        onResolve={resolve}
+      />
+    ))
 
     if (entity !== null && shouldDelete) {
       await notifyDelete(resolveDelete(entity.id, selection.selected), true)
     }
 
-    return shouldDelete
+    return Boolean(shouldDelete)
   }
 
   async function deleteAll() {
     if (entity !== null) {
-      const filteredDrafts = await api.getLots(filters)
+      const filteredDrafts = await api.getLots(query)
       const nbClients = new Set(
         filteredDrafts.lots.map((o) =>
           o.carbure_client ? o.carbure_client.name : o.unknown_client
@@ -87,16 +93,23 @@ export default function useDeleteLots(
       const clientsStr = nbClients > 1 ? "clients" : "client"
       const allTxids = filteredDrafts.lots.map((o) => o.id)
 
-      const shouldDelete = await confirm(
-        "Supprimer tous ces brouillons",
-        `Voulez êtes sur le point de supprimer ${filteredDrafts.lots.length} lots concernant ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres`
-      )
+      const shouldDelete = await prompt<boolean>((resolve) => (
+        <SummaryPrompt
+          title="Supprimer tous ces brouillons"
+          description={`Voulez êtes sur le point de supprimer ${filteredDrafts.lots.length} lots concernant ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres`}
+          query={query}
+          selection={selection.selected}
+          onResolve={resolve}
+        />
+      ))
 
       if (entity !== null && shouldDelete) {
         await notifyDelete(resolveDelete(entity.id, allTxids), true)
       }
-      return shouldDelete
+
+      return Boolean(shouldDelete)
     }
+
     return false
   }
 

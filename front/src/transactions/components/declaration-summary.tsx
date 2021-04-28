@@ -39,7 +39,10 @@ type SummaryPromptProps = PromptProps<any> & {
   entityID: number
 }
 
-export const SummaryPrompt = ({ entityID, onResolve }: SummaryPromptProps) => {
+export const DeclarationSummaryPrompt = ({
+  entityID,
+  onResolve,
+}: SummaryPromptProps) => {
   const notifications = useNotificationContext()
 
   const [summary, getSummary] = useAPI(api.getDeclarationSummary)

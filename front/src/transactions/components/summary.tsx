@@ -1,7 +1,7 @@
 import { Fragment, useEffect } from "react"
 import Table, { Column, Line } from "common/components/table"
 import { SummaryItem, TransactionQuery } from "common/types"
-import { padding, prettyVolume } from "./list-columns"
+import { padding } from "./list-columns"
 import { Alert } from "common/components/alert"
 import { AlertCircle, Check } from "common/components/icons"
 
@@ -18,6 +18,7 @@ import {
 import useAPI from "common/hooks/use-api"
 import * as api from "../api"
 import { Button } from "common/components/button"
+import { prettyVolume } from "transactions/helpers"
 
 const COLUMNS: Column<SummaryItem>[] = [
   {

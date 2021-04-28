@@ -27,7 +27,7 @@ import TransactionFilters from "./components/list-filters"
 import TransactionAdd from "./routes/transaction-add"
 import TransactionDetails from "./routes/transaction-details"
 import useForwardLots from "./hooks/actions/use-forward-lots"
-import { useTransactionQuery } from "./helpers"
+import useTransactionQuery from "./hooks/query/use-transaction-query"
 
 // prettier-ignore
 const OPERATOR_STATUSES = [

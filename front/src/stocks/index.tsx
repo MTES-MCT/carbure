@@ -29,7 +29,7 @@ import TransactionFilters from "transactions/components/list-filters"
 
 import StockDetails from "./routes/stock-details"
 import StockSendComplex from "./routes/stock-send-complex"
-import { useTransactionQuery } from "transactions/helpers"
+import useTransactionQuery from "transactions/hooks/query/use-transaction-query"
 
 const FILTERS = [
   Filters.Biocarburants,
@@ -55,7 +55,7 @@ function useStocks(entity: EntitySelection) {
     stock.getStock()
   }
 
-  const stockFilters = useTransactionQuery(
+  const stockQuery = useTransactionQuery(
     status.active,
     entity?.id ?? -1,
     filters.selected,
@@ -72,10 +72,10 @@ function useStocks(entity: EntitySelection) {
   const selection = useTransactionSelection(stock.data?.lots)
   const uploader = useUploadLotFile(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
-  const deleter = useDeleteLots(entity, selection, stockFilters, refresh)
-  const validator = useValidateLots(entity, selection, stockFilters, refresh)
-  const acceptor = useAcceptLots(entity, selection, stockFilters, refresh)
-  const rejector = useRejectLots(entity, selection, stockFilters, refresh)
+  const deleter = useDeleteLots(entity, selection, stockQuery, refresh)
+  const validator = useValidateLots(entity, selection, stockQuery, refresh)
+  const acceptor = useAcceptLots(entity, selection, stockQuery, refresh)
+  const rejector = useRejectLots(entity, selection, stockQuery, refresh)
   const sender = useSendLot(entity, selection, filters, search, refresh)
 
   return {
