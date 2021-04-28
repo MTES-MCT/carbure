@@ -8,11 +8,11 @@ import { getStocks } from "stocks/api"
 
 import { prompt } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
-import { CommentPrompt } from "transactions/components/form-comments"
-import { EntityType, LotStatus, TransactionQuery } from "common/types"
-import { FilterSelection } from "../query/use-filters"
-import { SearchSelection } from "../query/use-search"
-import { SpecialSelection } from "../query/use-special"
+import {
+  CommentPrompt,
+  CommentWithSummaryPrompt,
+} from "transactions/components/form-comments"
+import { EntityType, TransactionQuery } from "common/types"
 
 export interface LotRejector {
   loading: boolean
@@ -24,7 +24,7 @@ export interface LotRejector {
 export default function useRejectLots(
   entity: EntitySelection,
   selection: TransactionSelection,
-  filters: TransactionQuery,
+  query: TransactionQuery,
   refresh: () => void
 ): LotRejector {
   const notifications = useNotificationContext()
@@ -71,9 +71,11 @@ export default function useRejectLots(
 
   async function rejectSelection() {
     const comment = await prompt<string>((resolve) => (
-      <CommentPrompt
+      <CommentWithSummaryPrompt
         title="Refuser lot"
         description="Voulez vous refuser les lots sélectionnés ?"
+        query={query}
+        selection={selection.selected}
         onResolve={resolve}
       />
     ))
@@ -94,16 +96,16 @@ export default function useRejectLots(
       // display summary (number of lots, number of suppliers
       // call AcceptLots with all the tx_ids
       var allInboxLots
-      if (entity.entity_type == EntityType.Operator) {
-        allInboxLots = await api.getLots(filters)
+      if (entity.entity_type === EntityType.Operator) {
+        allInboxLots = await api.getLots({ ...query, limit: null })
       } else {
         allInboxLots = await getStocks(
           entity.id,
-          filters,
+          query,
           "in",
           0,
           null,
-          filters.query
+          query.query
         )
       }
       const nbSuppliers = new Set(
@@ -117,9 +119,11 @@ export default function useRejectLots(
       const description = `Vous êtes sur le point de refuser ${allInboxLots.lots.length} lots de ${nbSuppliers} ${supplierStr} représentant un total de ${totalVolume} litres`
 
       const comment = await prompt<string>((resolve) => (
-        <CommentPrompt
+        <CommentWithSummaryPrompt
           title="Refuser tout"
           description={description}
+          query={query}
+          selection={selection.selected}
           onResolve={resolve}
         />
       ))
