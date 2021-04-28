@@ -6,12 +6,13 @@ import {
   StockDraft,
   StockSnapshot,
   Transaction,
+  TransactionQuery,
+  TransactionSummary,
 } from "common/types"
 
 import api from "common/services/api"
-import { toOption } from "transactions/helpers"
+import { flattenSummary, toOption } from "transactions/helpers"
 import { EntitySelection } from "carbure/hooks/use-entity"
-import { StatusSelection } from "transactions/hooks/query/use-status"
 
 // give the same type to all filters in order to render them easily
 function normalizeStockSnapshotFilters(snapshot: any): StockSnapshot {
@@ -58,43 +59,23 @@ export function getStockSnapshot(entity_id: number): Promise<StockSnapshot> {
     .then(normalizeStockSnapshotFilters)
 }
 
-export function getStocks(
-  entityID: number | undefined,
-  filters: FilterSelection["selected"],
-  status: string,
-  page: number = 0,
-  limit: number | null = null,
-  query: string = "",
-  sortBy: string = "",
-  order: string = ""
-): Promise<Lots> {
-  return api.get("/stocks", {
-    ...filters,
-    status,
-    entity_id: entityID ?? null,
-    from_idx: page * (limit ?? 1),
-    sort_by: sortBy,
-    limit,
-    query,
-    order,
-  })
+export function getStocks(query: TransactionQuery): Promise<Lots> {
+  return api.get("/stocks", query)
 }
 
-export function downloadStocks(
-  status: LotStatus,
-  entityID: number | undefined,
-  filters: FilterSelection["selected"],
-  query: string,
-  sortBy: string,
-  order: string
-) {
+export function getStocksSummary(
+  query: TransactionQuery
+): Promise<TransactionSummary> {
+  return api.get("/stocks/summary", query).then((res) => ({
+    in: flattenSummary(res.in),
+    out: flattenSummary(res.out),
+    tx_ids: res.tx_ids,
+  }))
+}
+
+export function downloadStocks(query: TransactionQuery) {
   return api.download("/stocks", {
-    ...filters,
-    status,
-    entity_id: entityID ?? null,
-    sort_by: sortBy,
-    query,
-    order,
+    ...query,
     export: true,
   })
 }
@@ -144,7 +125,12 @@ export function getDepots(
     .then((depots) => depots.map(toOption))
 }
 
-export function forwardLots(entityID: number, transactionIDs: number[], clientId: number | undefined, certificateID: string | undefined) {
+export function forwardLots(
+  entityID: number,
+  transactionIDs: number[],
+  clientId: number | undefined,
+  certificateID: string | undefined
+) {
   return api.post("/stocks/forward", {
     entity_id: entityID,
     tx_ids: transactionIDs,

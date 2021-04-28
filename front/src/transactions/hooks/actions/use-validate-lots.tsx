@@ -25,7 +25,8 @@ export default function useValidateLots(
   entity: EntitySelection,
   selection: TransactionSelection,
   query: TransactionQuery,
-  refresh: () => void
+  refresh: () => void,
+  stock?: boolean
 ): LotValidator {
   const notifications = useNotificationContext()
 
@@ -112,6 +113,7 @@ export default function useValidateLots(
 
     const shouldValidate = await prompt<number[]>((resolve) => (
       <ValidationSummaryPrompt
+        stock={stock}
         title="Envoyer la sélection"
         description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
         query={query}
@@ -131,6 +133,7 @@ export default function useValidateLots(
     if (entity !== null) {
       const allTxids = await prompt<number[]>((resolve) => (
         <ValidationSummaryPrompt
+          stock={stock}
           title="Envoyer tous ces brouillons"
           description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
           query={query}

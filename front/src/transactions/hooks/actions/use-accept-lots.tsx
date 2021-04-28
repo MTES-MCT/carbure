@@ -11,7 +11,7 @@ import {
   CommentWithTypePrompt,
   CommentWithType,
 } from "transactions/components/form-comments"
-import { EntityType, TransactionQuery } from "common/types"
+import { TransactionQuery } from "common/types"
 import { SummaryPrompt } from "transactions/components/summary"
 
 export interface LotAcceptor {
@@ -26,7 +26,8 @@ export default function useAcceptLots(
   entity: EntitySelection,
   selection: TransactionSelection,
   query: TransactionQuery,
-  refresh: () => void
+  refresh: () => void,
+  stock?: boolean
 ): LotAcceptor {
   const notifications = useNotificationContext()
 
@@ -85,6 +86,7 @@ export default function useAcceptLots(
   async function acceptSelection() {
     const shouldAccept = await prompt<number[]>((resolve) => (
       <SummaryPrompt
+        stock={stock}
         title="Accepter lot"
         description="Voulez vous accepter les lots sélectionnés ?"
         query={query}
@@ -104,6 +106,7 @@ export default function useAcceptLots(
     if (entity !== null) {
       const allTxids = await prompt<number[]>((resolve) => (
         <SummaryPrompt
+          stock={stock}
           title="Accepter tout"
           description="Voulez vous accepter tous ces lots ?"
           query={query}

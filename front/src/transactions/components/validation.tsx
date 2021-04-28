@@ -71,6 +71,7 @@ export const ValidationPrompt = ({
 type ValidationSummaryPromptProps = SystemProps &
   PromptProps<number[]> & {
     wide?: boolean
+    stock?: boolean
     title: string
     description: string
     query: TransactionQuery

@@ -182,6 +182,7 @@ export const CommentWithTypePrompt = ({
 }
 
 type CommentWithSummaryPromptProps = PromptProps<[string, number[]]> & {
+  stock?: boolean
   title: string
   description: string
   query: TransactionQuery
@@ -189,6 +190,7 @@ type CommentWithSummaryPromptProps = PromptProps<[string, number[]]> & {
 }
 
 export const CommentWithSummaryPrompt = ({
+  stock,
   title,
   description,
   query,
@@ -196,7 +198,7 @@ export const CommentWithSummaryPrompt = ({
   onResolve,
 }: CommentWithSummaryPromptProps) => {
   const [comment, setComment] = useState("")
-  const summary = useSummary(query, selection)
+  const summary = useSummary(query, selection, stock)
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault()

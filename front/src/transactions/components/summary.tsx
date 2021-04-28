@@ -16,9 +16,10 @@ import {
   PromptProps,
 } from "common/components/dialog"
 import useAPI from "common/hooks/use-api"
-import * as api from "../api"
 import { Button } from "common/components/button"
 import { prettyVolume } from "transactions/helpers"
+import { getStocksSummary } from "stocks/api"
+import { getLotsSummary } from "transactions/api"
 
 const COLUMNS: Column<SummaryItem>[] = [
   {
@@ -84,12 +85,6 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
 
   return (
     <Fragment>
-      {isInEmpty && isOutEmpty && (
-        <Alert level="warning" icon={AlertCircle}>
-          Aucune information trouvée pour la période donnée.
-        </Alert>
-      )}
-
       {!isInEmpty && (
         <Box className={styles.transactionSummary}>
           <Title className={styles.transactionSummarySection}>
@@ -103,8 +98,6 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
           <Table columns={inColumns} rows={summaryInRows} />
         </Box>
       )}
-
-      <br />
 
       {!isOutEmpty && (
         <Box className={styles.transactionSummary}>
@@ -125,9 +118,12 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
 
 export function useSummary(
   query: TransactionQuery,
-  selection: number[] | undefined
+  selection: number[] | undefined,
+  stock?: boolean
 ) {
-  const [summary, getSummary] = useAPI(api.getLotsSummary)
+  const [summary, getSummary] = useAPI(
+    stock ? getStocksSummary : getLotsSummary
+  )
 
   useEffect(() => {
     getSummary(query, selection ?? [])
@@ -146,13 +142,14 @@ type SummaryPromptProps = PromptProps<number[]> & {
 }
 
 export const SummaryPrompt = ({
+  stock,
   title,
   description,
   query,
   selection,
   onResolve,
 }: SummaryPromptProps) => {
-  const summary = useSummary(query, selection)
+  const summary = useSummary(query, selection, stock)
 
   return (
     <Dialog wide onResolve={onResolve}>

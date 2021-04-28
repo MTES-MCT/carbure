@@ -275,15 +275,15 @@ export enum Filters {
 
 export interface TransactionQuery {
   entity_id: number
-  from_idx: number
-  sort_by: string
   status: LotStatus
-  year: number
-  limit: number | null
-  query: string
-  order: string
-  invalid: boolean
-  deadline: boolean
+  from_idx?: number
+  sort_by?: string
+  year?: number
+  limit?: number | null
+  query?: string
+  order?: string
+  invalid?: boolean
+  deadline?: boolean
   [Filters.DeliveryStatus]?: any
   [Filters.MatieresPremieres]?: any
   [Filters.Biocarburants]?: any
