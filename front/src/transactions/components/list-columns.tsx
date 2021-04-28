@@ -12,6 +12,10 @@ import { EntitySelection } from "carbure/hooks/use-entity"
 import { hasDeadline } from "transactions/helpers"
 import { Alarm } from "common/components/icons"
 
+export function prettyVolume(volume: number) {
+  return parseFloat(volume.toFixed(2)).toLocaleString("fr-FR")
+}
+
 export const empty: Column<any> = {
   className: styles.checkboxColumn,
   render: () => null,
@@ -85,7 +89,13 @@ export const vendor: Column<Transaction> = {
   sortBy: "vendor",
   render: (tx) => (
     <TwoLines
-      text={tx.carbure_vendor?.name ?? (tx.lot.unknown_supplier != '' ? tx.lot.unknown_supplier : tx.lot.unknown_supplier_certificate) ?? "N/A"}
+      text={
+        tx.carbure_vendor?.name ??
+        (tx.lot.unknown_supplier != ""
+          ? tx.lot.unknown_supplier
+          : tx.lot.unknown_supplier_certificate) ??
+        "N/A"
+      }
       sub={
         tx.lot.carbure_production_site_reference ??
         tx.lot.unknown_production_site_reference
@@ -106,7 +116,7 @@ export const biocarburant: Column<Transaction> = {
   render: (tx) => (
     <TwoLines
       text={tx.lot.biocarburant?.name}
-      sub={tx.lot.volume.toLocaleString("fr-FR")}
+      sub={prettyVolume(tx.lot.volume)}
     />
   ),
 }
@@ -117,7 +127,9 @@ export const biocarburantInStock: Column<Transaction> = {
   render: (tx) => (
     <TwoLines
       text={tx.lot.biocarburant?.name}
-      sub={`${tx.lot.remaining_volume.toLocaleString("fr-FR")} / ${tx.lot.volume.toLocaleString("fr-FR")}`}
+      sub={`${prettyVolume(tx.lot.remaining_volume)} / ${prettyVolume(
+        tx.lot.volume
+      )}`}
     />
   ),
 }
