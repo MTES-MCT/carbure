@@ -88,6 +88,7 @@ export default function useAcceptLots(
         title="Accepter lot"
         description="Voulez vous accepter les lots sélectionnés ?"
         query={query}
+        selection={selection.selected}
         onResolve={resolve}
       />
     ))
@@ -104,13 +105,11 @@ export default function useAcceptLots(
       // getLots with current filters but no limit
       // display summary (number of lots, number of suppliers
       // call AcceptLots with all the tx_ids
-      var allInboxLots
-      // prettier-ignore
-      if (entity.entity_type === EntityType.Operator) {
-        allInboxLots = await api.getLots({...query, limit: null})
-      } else {
-        allInboxLots = await getStocks(entity.id, query, "in", 0, null, query.query)
-      }
+      let allInboxLots =
+        entity.entity_type === EntityType.Operator
+          ? await api.getLots({ ...query, limit: null })
+          : await getStocks(entity.id, query, "in", 0, null, query.query)
+
       const nbSuppliers = new Set(
         allInboxLots.lots.map((o) => o.carbure_vendor?.name)
       ).size
@@ -119,15 +118,24 @@ export default function useAcceptLots(
         .reduce((sum, vol) => sum + vol)
       const supplierStr = nbSuppliers > 1 ? "fournisseurs" : "fournisseur"
       const allTxids = allInboxLots.lots.map((o) => o.id)
-      const shouldAccept = await confirm(
-        "Accepter tout",
-        `Voulez êtes sur le point d'accepter ${allInboxLots.lots.length} lots de ${nbSuppliers} ${supplierStr} représentant un total de ${totalVolume} litres ?`
-      )
+
+      const shouldAccept = await prompt<boolean>((resolve) => (
+        <SummaryPrompt
+          title="Accepter tout"
+          description={`Voulez êtes sur le point d'accepter ${allInboxLots.lots.length} lots de ${nbSuppliers} ${supplierStr} représentant un total de ${totalVolume} litres ?`}
+          query={query}
+          selection={selection.selected}
+          onResolve={resolve}
+        />
+      ))
+
       if (entity !== null && shouldAccept) {
         await notifyAccept(resolveAccept(entity.id, allTxids), true)
       }
-      return shouldAccept
+
+      return Boolean(shouldAccept)
     }
+
     return false
   }
 
