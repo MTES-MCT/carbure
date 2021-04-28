@@ -13,9 +13,10 @@ from django.db import transaction
 from django.http import JsonResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
-from core.models import ISCCCertificate, EntityISCCTradingCertificate
-from core.models import DBSCertificate, EntityDBSTradingCertificate
-from core.models import REDCertCertificate, EntityREDCertTradingCertificate
+
+from certificates.models import ISCCCertificate, EntityISCCTradingCertificate
+from certificates.models import DBSCertificate, EntityDBSTradingCertificate
+from certificates.models import REDCertCertificate, EntityREDCertTradingCertificate
 from certificates.models import EntitySNTradingCertificate, SNCertificate
 
 
