@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import {
   Dialog,
@@ -14,9 +14,7 @@ import { Button } from "common/components/button"
 
 import styles from "common/components/dialog.module.css"
 import { LabelCheckbox } from "common/components/input"
-import TransactionSummary from "./transaction-summary"
-import useAPI from "common/hooks/use-api"
-import * as api from "../api"
+import TransactionSummary, { useSummary } from "./summary"
 import { TransactionQuery } from "common/types"
 
 type ValidationPromptProps = PromptProps<boolean> & {
@@ -25,28 +23,23 @@ type ValidationPromptProps = PromptProps<boolean> & {
   stock?: boolean
   entityID?: number
   selection?: number[]
-  filters?: TransactionQuery
+  query?: TransactionQuery
 }
 
 export const ValidationPrompt = ({
   title,
   description,
-  filters,
+  query,
+  selection,
   onResolve,
 }: ValidationPromptProps) => {
+  const summary = useSummary(query, selection)
   const [checked, setChecked] = useState({ terres: false, infos: false })
-  const [draftSummary, getSummary] = useAPI(api.getLotsSummary)
-
-  useEffect(() => {
-    if (typeof filters !== "undefined") {
-      getSummary(filters)
-    }
-  }, [getSummary, filters])
 
   return (
     <Dialog
       onResolve={onResolve}
-      className={draftSummary.data ? styles.dialogWide : undefined}
+      className={summary.data ? styles.dialogWide : undefined}
     >
       <DialogTitle text={title} />
       <DialogText text={description} />
@@ -64,11 +57,8 @@ export const ValidationPrompt = ({
         />
       </Box>
 
-      {draftSummary.data && (
-        <TransactionSummary
-          in={draftSummary.data.in}
-          out={draftSummary.data.out}
-        />
+      {summary.data && (
+        <TransactionSummary in={summary.data.in} out={summary.data.out} />
       )}
 
       <DialogButtons>
@@ -83,7 +73,7 @@ export const ValidationPrompt = ({
         <Button onClick={() => onResolve()}>Annuler</Button>
       </DialogButtons>
 
-      {draftSummary.loading && <LoaderOverlay />}
+      {summary.loading && <LoaderOverlay />}
     </Dialog>
   )
 }
