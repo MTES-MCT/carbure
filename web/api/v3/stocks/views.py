@@ -347,6 +347,8 @@ def send_drafts(request, *args, **kwargs):
 
     prefetched_data = get_prefetched_data(entity)
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    valid_counter = 0
+    invalid_counter = 0
     send_errors = []
     for tx_id in tx_ids:
         try:
@@ -355,9 +357,17 @@ def send_drafts(request, *args, **kwargs):
             return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id), 'extra': str(e)},
                                 status=400)
         sent, errors = send_lot_from_stock(rights, tx, prefetched_data)
-        if not sent:
+        if sent:
+            valid_counter += 1
+        else:
+            invalid_counter += 1
             send_errors.append(errors)
-    return JsonResponse({'status': 'success', 'data': send_errors})
+    
+    status_code = 200 if valid_counter > 0 else 400
+    status = 'success' if valid_counter > 0 else 'error'
+    total = valid_counter + invalid_counter
+    data = { 'valid': valid_counter, 'invalid': invalid_counter, 'total': total, 'errors': send_errors }
+    return JsonResponse({'status': status, 'data': data}, status=status_code)
 
 
 def convert_eth_stock_to_etbe(request, entity, c):
