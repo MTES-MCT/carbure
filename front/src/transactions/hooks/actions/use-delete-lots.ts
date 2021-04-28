@@ -1,16 +1,12 @@
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { TransactionSelection } from "../query/use-selection"
-import { YearSelection } from "../query/use-year"
 
 import * as api from "transactions/api"
 import useAPI from "../../../common/hooks/use-api"
 
 import { confirm } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
-import { FilterSelection } from "../query/use-filters"
-import { SpecialSelection } from "../query/use-special"
-import { SearchSelection } from "../query/use-search"
-import { LotStatus } from "common/types"
+import { TransactionQuery } from "common/types"
 
 export interface LotDeleter {
   loading: boolean
@@ -22,10 +18,7 @@ export interface LotDeleter {
 export default function useDeleteLots(
   entity: EntitySelection,
   selection: TransactionSelection,
-  filters: FilterSelection,
-  year: YearSelection,
-  search: SearchSelection,
-  special: SpecialSelection,
+  filters: TransactionQuery,
   refresh: () => void
 ): LotDeleter {
   const notifications = useNotificationContext()
@@ -82,7 +75,7 @@ export default function useDeleteLots(
 
   async function deleteAll() {
     if (entity !== null) {
-      const filteredDrafts = await api.getLots(LotStatus.Draft, entity.id, filters["selected"], year.selected, 0, null, search.query, 'id', 'asc', special.invalid, special.deadline) // prettier-ignore
+      const filteredDrafts = await api.getLots(filters)
       const nbClients = new Set(
         filteredDrafts.lots.map((o) =>
           o.carbure_client ? o.carbure_client.name : o.unknown_client

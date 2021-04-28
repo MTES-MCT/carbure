@@ -31,6 +31,7 @@ import StockDetails from "./routes/stock-details"
 import StockSendComplex from "./routes/stock-send-complex"
 import TransactionInSummary from "transactions/routes/transaction-in-summary"
 import TransactionOutSummary from "transactions/routes/transaction-out-summary"
+import { useTransactionQuery } from "transactions/helpers"
 
 const FILTERS = [
   Filters.Biocarburants,
@@ -56,13 +57,27 @@ function useStocks(entity: EntitySelection) {
     stock.getStock()
   }
 
+  const stockFilters = useTransactionQuery(
+    status.active,
+    entity?.id ?? -1,
+    filters.selected,
+    year.selected,
+    pagination.page,
+    pagination.limit,
+    search.query,
+    sorting.column,
+    sorting.order,
+    special.invalid,
+    special.deadline
+  )
+
   const selection = useTransactionSelection(stock.data?.lots)
   const uploader = useUploadLotFile(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
-  const deleter = useDeleteLots(entity, selection, filters, year, search, special, refresh)
-  const validator = useValidateLots(entity, selection, filters, year, search, special, refresh)
-  const acceptor = useAcceptLots(entity, selection, filters, year, search, special, refresh)
-  const rejector = useRejectLots(entity, selection, filters, year, search, special, refresh)
+  const deleter = useDeleteLots(entity, selection, stockFilters, refresh)
+  const validator = useValidateLots(entity, selection, stockFilters, refresh)
+  const acceptor = useAcceptLots(entity, selection, stockFilters, refresh)
+  const rejector = useRejectLots(entity, selection, stockFilters, refresh)
   const sender = useSendLot(entity, selection, filters, search, refresh)
 
   return {
@@ -143,13 +158,23 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
       />
 
       <Switch>
-
         <Route relative path="show-summary-in-pending">
-          <TransactionInSummary entity={entity} lot_status={LotStatus.Validated} period={null} delivery_status={['AC', 'AA', 'N']} />
+          <TransactionInSummary
+            entity={entity}
+            lot_status={LotStatus.Validated}
+            period={null}
+            delivery_status={["AC", "AA", "N"]}
+          />
         </Route>
 
         <Route relative path="show-summary-out-drafts">
-          <TransactionOutSummary entity={entity} lot_status={LotStatus.Draft} period={null} delivery_status={['N']} stock={true} />
+          <TransactionOutSummary
+            entity={entity}
+            lot_status={LotStatus.Draft}
+            period={null}
+            delivery_status={["N"]}
+            stock={true}
+          />
         </Route>
 
         <Route relative path="send-complex">

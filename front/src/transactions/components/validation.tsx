@@ -17,6 +17,7 @@ import { LabelCheckbox } from "common/components/input"
 import TransactionSummary from "./transaction-summary"
 import useAPI from "common/hooks/use-api"
 import * as api from "../api"
+import { TransactionQuery } from "common/types"
 
 type ValidationPromptProps = PromptProps<boolean> & {
   title: string
@@ -24,24 +25,23 @@ type ValidationPromptProps = PromptProps<boolean> & {
   stock?: boolean
   entityID?: number
   selection?: number[]
+  filters?: TransactionQuery
 }
 
 export const ValidationPrompt = ({
   title,
   description,
-  stock,
-  entityID,
-  selection,
+  filters,
   onResolve,
 }: ValidationPromptProps) => {
   const [checked, setChecked] = useState({ terres: false, infos: false })
-  const [draftSummary, getDraftSummary] = useAPI(api.getDraftSummary)
+  const [draftSummary, getSummary] = useAPI(api.getLotsSummary)
 
   useEffect(() => {
-    if (typeof entityID !== "undefined") {
-      getDraftSummary(entityID, selection, stock)
+    if (typeof filters !== "undefined") {
+      getSummary(filters)
     }
-  }, [getDraftSummary, entityID, selection])
+  }, [getSummary, filters])
 
   return (
     <Dialog
