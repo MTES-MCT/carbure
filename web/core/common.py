@@ -254,22 +254,24 @@ def fill_producer_info(entity, lot_row, lot, prefetched_data):
     all_producers = prefetched_data['producers']
     if 'producer' in lot_row and lot_row['producer'] is not None:
         # check if we know the producer
-        if lot_row['producer'].strip() == entity.name:
+        stripped_producer = lot_row['producer'].strip()
+
+        if stripped_producer == entity.name:
             # it's me
             lot.producer_is_in_carbure = True
             lot.carbure_producer = entity
             lot.unknown_producer = ''
         else:
             # it's not me. do we know this producer ?
-            if lot_row['producer'] in all_producers:
+            if stripped_producer in all_producers:
                 lot.producer_is_in_carbure = True
-                lot.carbure_producer = all_producers[lot_row['producer']]
+                lot.carbure_producer = all_producers[stripped_producer]
                 lot.unknown_producer = ''
             else:
                 # ok, unknown producer. allow importation
                 lot.producer_is_in_carbure = False
                 lot.carbure_producer = None
-                lot.unknown_producer = lot_row['producer']
+                lot.unknown_producer = stripped_producer
     elif 'producer' in lot_row and lot_row['producer'] is None:
         # producer is not in carbure and we don't even have his name. fine.
         lot.producer_is_in_carbure = False
@@ -294,8 +296,8 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
 
     my_production_sites = prefetched_data['production_sites']
     countries = prefetched_data['countries']
-    if 'production_site' in lot_row:
-        production_site = lot_row['production_site']
+    if 'production_site' in lot_row and lot_row['production_site'] is not None:
+        production_site = lot_row['production_site'].strip()
         if production_site in my_production_sites:
             lot.production_site_is_in_carbure = True
             lot.carbure_production_site = my_production_sites[production_site]
