@@ -9,12 +9,8 @@ import Status from "./status"
 
 import styles from "./list-columns.module.css"
 import { EntitySelection } from "carbure/hooks/use-entity"
-import { hasDeadline } from "transactions/helpers"
+import { hasDeadline, prettyVolume } from "transactions/helpers"
 import { Alarm } from "common/components/icons"
-
-export function prettyVolume(volume: number) {
-  return parseFloat(volume.toFixed(2)).toLocaleString("fr-FR")
-}
 
 export const empty: Column<any> = {
   className: styles.checkboxColumn,

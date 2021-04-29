@@ -119,17 +119,18 @@ export const ConvertETBEComplexPrompt = ({
 
   useEffect(() => {
     getDepots(entityID, "ETH")
-  }, [getDepots])
+  }, [getDepots, entityID])
 
   useEffect(() => {
     if (depot) {
-      getStocks(
-        entityID,
-        { delivery_sites: [depot], biocarburants: ["ETH"] },
-        LotStatus.Stock
-      )
+      getStocks({
+        status: LotStatus.Stock,
+        entity_id: entityID,
+        delivery_sites: [depot],
+        biocarburants: ["ETH"],
+      })
     }
-  }, [depot, getStocks])
+  }, [getStocks, entityID, depot])
 
   const volumeDiff = compareVolumes(data.volume_ethanol, conversions)
   const canSave = hasChange && volumeDiff === 0

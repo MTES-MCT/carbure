@@ -19,7 +19,7 @@ import { Box, LoaderOverlay } from "common/components"
 import styles from "./declaration-summary.module.css"
 import dialogStyles from "common/components/dialog.module.css"
 import { useNotificationContext } from "common/components/notifications"
-import TransactionSummary from "./transaction-summary"
+import TransactionSummary from "./summary"
 
 const now = new Date()
 
@@ -39,7 +39,10 @@ type SummaryPromptProps = PromptProps<any> & {
   entityID: number
 }
 
-export const SummaryPrompt = ({ entityID, onResolve }: SummaryPromptProps) => {
+export const DeclarationSummaryPrompt = ({
+  entityID,
+  onResolve,
+}: SummaryPromptProps) => {
   const notifications = useNotificationContext()
 
   const [summary, getSummary] = useAPI(api.getDeclarationSummary)
@@ -80,7 +83,7 @@ export const SummaryPrompt = ({ entityID, onResolve }: SummaryPromptProps) => {
 
   useEffect(() => {
     getSummary(entityID, period.year, period.month)
-  }, [getSummary, period])
+  }, [getSummary, entityID, period])
 
   const declaration = summary.data?.declaration
 

@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import differenceInCalendarMonths from "date-fns/differenceInCalendarMonths"
 
 import {
@@ -7,8 +8,10 @@ import {
   LotStatus,
   SummaryItem,
   Errors,
+  TransactionQuery,
 } from "common/types"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
+import { FilterSelection } from "./hooks/query/use-filters"
 
 export function toOption(value: string) {
   return { value, label: value }
@@ -124,4 +127,8 @@ export function flattenSummary(summary: any): SummaryItem[] {
   }
 
   return rows
+}
+
+export function prettyVolume(volume: number) {
+  return parseFloat(volume.toFixed(2)).toLocaleString("fr-FR")
 }

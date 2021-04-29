@@ -1,11 +1,11 @@
 import {
   Transaction,
   Lots,
-  LotStatus,
   Snapshot,
   LotDetails,
+  TransactionQuery,
+  TransactionSummary,
 } from "common/types"
-import { FilterSelection } from "transactions/hooks/query/use-filters"
 
 import api from "common/services/api"
 import {
@@ -21,34 +21,21 @@ export function getSnapshot(entityID: number, year: number): Promise<Snapshot> {
     .then(filterOutsourcedDepots)
 }
 
-export function getLots(
-  status: LotStatus,
-  entityID: number,
-  filters: FilterSelection["selected"],
-  year: number,
-  page: number,
-  limit: number | null,
-  query: string,
-  sortBy: string,
-  order: string,
-  invalid: boolean,
-  deadline: boolean
-): Promise<Lots> {
-  const params = {
-    ...filters,
-    entity_id: entityID,
-    from_idx: limit ? page * limit : 0,
-    sort_by: sortBy,
-    status,
-    year,
-    limit,
-    query,
-    order,
-    invalid,
-    deadline,
-  }
-
+export function getLots(params: TransactionQuery): Promise<Lots> {
   return api.get("/lots/", params)
+}
+
+export function getLotsSummary(
+  query: TransactionQuery,
+  selection: number[]
+): Promise<TransactionSummary> {
+  return api
+    .get("/lots/summary", { ...query, limit: null, page: 0, selection })
+    .then((res) => ({
+      in: flattenSummary(res.in),
+      out: flattenSummary(res.out),
+      tx_ids: res.tx_ids,
+    }))
 }
 
 export function getDetails(
@@ -58,23 +45,11 @@ export function getDetails(
   return api.get("/lots/details", { entity_id: entityID, tx_id: transactionID })
 }
 
-export function downloadLots(
-  status: LotStatus,
-  producerID: number,
-  filters: FilterSelection["selected"],
-  year: number,
-  query: string,
-  sortBy: string,
-  order: string
-) {
+export function downloadLots(filters: TransactionQuery) {
   return api.download("/lots", {
     ...filters,
-    entity_id: producerID,
-    sort_by: sortBy,
-    status,
-    year,
-    query,
-    order,
+    page: 0,
+    limit: null,
     export: true,
   })
 }
@@ -262,36 +237,6 @@ export function validateAllDraftLots(entityID: number, year: number) {
   })
 }
 
-export function getLotsOutSummary(
-  entityID: number,
-  lot_status: LotStatus,
-  period: string | null,
-  delivery_status: string[],
-  stock: boolean
-) {
-  return api.get("/lots/summary-out", {
-    entity_id: entityID,
-    lot_status,
-    period,
-    delivery_status,
-    stock,
-  })
-}
-
-export function getLotsInSummary(
-  entityID: number,
-  lot_status: LotStatus,
-  period: string | null,
-  delivery_status: string[]
-) {
-  return api.get("/lots/summary-in", {
-    entity_id: entityID,
-    lot_status,
-    period,
-    delivery_status,
-  })
-}
-
 export function getDeclarationSummary(
   entity_id: number,
   period_year: number,
@@ -305,23 +250,6 @@ export function getDeclarationSummary(
     })
     .then((res) => ({
       declaration: res.declaration,
-      in: res.in ? flattenSummary(res.in) : null,
-      out: res.out ? flattenSummary(res.out) : null,
-    }))
-}
-
-export function getDraftSummary(
-  entity_id: number,
-  tx_ids?: number[],
-  is_stock?: boolean
-) {
-  return api
-    .get("/lots/draft-summary", {
-      entity_id,
-      tx_ids,
-      is_stock,
-    })
-    .then((res) => ({
       in: res.in ? flattenSummary(res.in) : null,
       out: res.out ? flattenSummary(res.out) : null,
     }))
@@ -360,51 +288,15 @@ export function getAdminSnapshot(
     .then(normalizeFilters)
 }
 
-export function getAdminLots(
-  status: LotStatus,
-  entityID: number,
-  filters: FilterSelection["selected"],
-  year: number,
-  page: number,
-  limit: number | null,
-  query: string,
-  sortBy: string,
-  order: string,
-  invalid: boolean,
-  deadline: boolean
-): Promise<Lots> {
-  const params = {
-    ...filters,
-    entity_id: entityID,
-    from_idx: limit ? page * limit : 0,
-    sort_by: sortBy,
-    status,
-    year,
-    limit,
-    query,
-    order,
-  }
-
-  return api.get("/admin/lots", params)
+export function getAdminLots(filters: TransactionQuery): Promise<Lots> {
+  return api.get("/admin/lots", filters)
 }
 
-export function downloadAdminLots(
-  status: LotStatus,
-  producerID: number,
-  filters: FilterSelection["selected"],
-  year: number,
-  query: string,
-  sortBy: string,
-  order: string
-) {
+export function downloadAdminLots(filters: TransactionQuery) {
   return api.download("/admin/lots", {
     ...filters,
-    entity_id: producerID,
-    sort_by: sortBy,
-    status,
-    year,
-    query,
-    order,
+    page: 0,
+    limit: null,
     export: true,
   })
 }

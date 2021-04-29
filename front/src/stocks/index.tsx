@@ -1,7 +1,7 @@
 import React from "react"
 
 import { EntitySelection } from "carbure/hooks/use-entity"
-import { EntityType, Filters, LotStatus } from "common/types"
+import { EntityType, Filters } from "common/types"
 
 import { usePageSelection } from "common/components/pagination"
 import useSortingSelection from "transactions/hooks/query/use-sort-by"
@@ -29,8 +29,7 @@ import TransactionFilters from "transactions/components/list-filters"
 
 import StockDetails from "./routes/stock-details"
 import StockSendComplex from "./routes/stock-send-complex"
-import TransactionInSummary from "transactions/routes/transaction-in-summary"
-import TransactionOutSummary from "transactions/routes/transaction-out-summary"
+import useTransactionQuery from "transactions/hooks/query/use-transaction-query"
 
 const FILTERS = [
   Filters.Biocarburants,
@@ -49,7 +48,22 @@ function useStocks(entity: EntitySelection) {
   const snapshot = useGetStockSnapshot(entity)
   const special = useSpecialSelection(pagination)
   const year = useYearSelection(pagination, filters, special)
-  const stock = useGetStocks(entity, filters, status, pagination, search, sorting) // prettier-ignore
+
+  const stockQuery = useTransactionQuery(
+    status.active,
+    entity?.id ?? -1,
+    filters.selected,
+    year.selected,
+    pagination.page,
+    pagination.limit,
+    search.query,
+    sorting.column,
+    sorting.order,
+    special.invalid,
+    special.deadline
+  )
+
+  const stock = useGetStocks(stockQuery)
 
   function refresh() {
     snapshot.getSnapshot()
@@ -59,11 +73,11 @@ function useStocks(entity: EntitySelection) {
   const selection = useTransactionSelection(stock.data?.lots)
   const uploader = useUploadLotFile(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
-  const deleter = useDeleteLots(entity, selection, filters, year, search, special, refresh)
-  const validator = useValidateLots(entity, selection, filters, year, search, special, refresh)
-  const acceptor = useAcceptLots(entity, selection, filters, year, search, special, refresh)
-  const rejector = useRejectLots(entity, selection, filters, year, search, special, refresh)
-  const sender = useSendLot(entity, selection, filters, search, refresh)
+  const deleter = useDeleteLots(entity, selection, stockQuery, refresh, true)
+  const validator = useValidateLots(entity, selection, stockQuery, refresh, true) // prettier-ignore
+  const acceptor = useAcceptLots(entity, selection, stockQuery, refresh, true)
+  const rejector = useRejectLots(entity, selection, stockQuery, refresh, true)
+  const sender = useSendLot(entity, selection, stockQuery, refresh)
 
   return {
     filters,
@@ -143,15 +157,6 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
       />
 
       <Switch>
-
-        <Route relative path="show-summary-in-pending">
-          <TransactionInSummary entity={entity} lot_status={LotStatus.Validated} period={null} delivery_status={['AC', 'AA', 'N']} />
-        </Route>
-
-        <Route relative path="show-summary-out-drafts">
-          <TransactionOutSummary entity={entity} lot_status={LotStatus.Draft} period={null} delivery_status={['N']} stock={true} />
-        </Route>
-
         <Route relative path="send-complex">
           <StockSendComplex entity={entity} />
         </Route>
