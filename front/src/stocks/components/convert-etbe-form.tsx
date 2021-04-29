@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from "react"
 
 import { LotStatus, Transaction, ConvertETBE } from "common/types"
 import useForm from "common/hooks/use-form"
-import { Box } from "common/components"
+import { Box, LoaderOverlay } from "common/components"
 import { Input, LabelInput, Placeholder } from "common/components/input"
 import { Button } from "common/components/button"
 import { Alert } from "common/components/alert"
@@ -181,20 +181,6 @@ export const ConvertETBEComplexPrompt = ({
 
   const rows = lots.map((stock) => ({ value: stock }))
 
-  const conversionDetails = Object.entries({
-    ...autoAttributions,
-    ...attributions,
-  }).map<ConvertETBE>(([txID, volume]) => {
-    const ratio = volume / data.volume_ethanol
-    return {
-      volume_ethanol: volume,
-      volume_etbe: ratio * data.volume_etbe,
-      volume_etbe_eligible: ratio * data.volume_etbe_eligible,
-      volume_denaturant: ratio * data.volume_denaturant,
-      previous_stock_tx_id: parseInt(txID, 10),
-    }
-  })
-
   const usedVolume =
     data.volume_ethanol * CONVERT_20_TO_15 + data.volume_denaturant
   const ratio = usedVolume / data.volume_etbe
@@ -207,6 +193,22 @@ export const ConvertETBEComplexPrompt = ({
 
   const ratioStrDisplay = `Ratio d'Éthanol: ${ratioEthToETBE.toFixed(2)}%
     (${ratioEthToETBEWithDenaturant.toFixed(2)}% dénaturant inclus)` // prettier-ignore
+
+  const conversionDetails = Object.entries({
+    ...autoAttributions,
+    ...attributions,
+  })
+    .map<ConvertETBE>(([txID, volume]) => {
+      const ratio = volume / data.volume_ethanol
+      return {
+        volume_ethanol: volume,
+        volume_etbe: ratio * data.volume_etbe,
+        volume_etbe_eligible: ratio * volEligibleETBE,
+        volume_denaturant: ratio * data.volume_denaturant,
+        previous_stock_tx_id: parseInt(txID, 10),
+      }
+    })
+    .filter((d) => d.volume_ethanol > 0)
 
   return (
     <Dialog wide onResolve={onResolve}>
@@ -291,6 +293,8 @@ export const ConvertETBEComplexPrompt = ({
           <Button onClick={() => onResolve()}>Annuler</Button>
         </DialogButtons>
       </Box>
+
+      {stocks.loading && <LoaderOverlay />}
     </Dialog>
   )
 }

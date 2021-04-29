@@ -420,6 +420,7 @@ def convert_eth_stock_to_etbe(request, entity, c):
     previous_stock_tx.lot.save()
 
     new_lot.volume = volume_etbe
+    new_lot.remaining_volume = volume_etbe
     new_lot.parent_lot = LotV2.objects.get(pk=previous_lot_id)
     new_lot.save()
 
