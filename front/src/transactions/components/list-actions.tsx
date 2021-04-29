@@ -15,7 +15,6 @@ import {
   Cross,
   Download,
   Plus,
-  Rapport,
   Upload,
   Forward,
 } from "common/components/icons"
