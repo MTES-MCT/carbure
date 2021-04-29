@@ -593,9 +593,8 @@ class ETBETransformation(models.Model):
 
     volume_ethanol = models.FloatField(null=False, blank=False, default=0.0)
     volume_etbe = models.FloatField(null=False, blank=False, default=0.0)
+    volume_etbe_eligible = models.FloatField(null=False, blank=False, default=0.0)
     volume_denaturant = models.FloatField(null=False, blank=False, default=0.0)
-    volume_fossile = models.FloatField(null=False, blank=False, default=0.0)
-    volume_pertes = models.FloatField(null=False, blank=False, default=0.0)
 
     added_by = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
     added_by_user = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
@@ -603,7 +602,7 @@ class ETBETransformation(models.Model):
 
 
     def natural_key(self):
-        return {'previous': self.previous_stock.natural_key(), 'new': self.new_stock.natural_key(), 'volume_ethanol': self.volume_ethanol, 'volume_etbe': self.volume_etbe, 'volume_denaturant': self.volume_denaturant, 'volume_fossile': self.volume_pertes, 
+        return {'previous': self.previous_stock.natural_key(), 'new': self.new_stock.natural_key(), 'volume_ethanol': self.volume_ethanol, 'volume_etbe': self.volume_etbe, 'volume_denaturant': self.volume_denaturant, 'volume_etbe_eligible': self.volume_etbe_eligible, 
                 'added_by': self.added_by.natural_key(), 'added_by_user': self.added_by_user.natural_key(), 'added_time': self.added_time}
 
     class Meta:
