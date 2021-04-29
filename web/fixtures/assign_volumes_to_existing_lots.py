@@ -17,7 +17,7 @@ from core.models import LotV2, LotTransaction, Entity
 
 def try_assign_volumes():
     entities = Entity.objects.filter(entity_type__in=['Producteur', 'Trader'])
-    stock = LotTransaction.objects.filter(carbure_client__in=entities, lot__status='Validated', delivery_status__in=['N', 'AC', 'AA'])
+    stock = LotTransaction.objects.filter(carbure_client__in=entities, lot__status='Validated', delivery_status='A')
 
     for s in stock:
         # do we have children?
