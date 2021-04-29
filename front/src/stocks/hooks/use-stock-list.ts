@@ -4,11 +4,6 @@ import * as api from "../api"
 import useAPI from "common/hooks/use-api"
 import { getStocks, getStockSnapshot } from "../api"
 import { EntitySelection } from "carbure/hooks/use-entity"
-import { PageSelection } from "common/components/pagination"
-import { FilterSelection } from "transactions/hooks/query/use-filters"
-import { SearchSelection } from "transactions/hooks/query/use-search"
-import { SortingSelection } from "transactions/hooks/query/use-sort-by"
-import { StatusSelection } from "transactions/hooks/query/use-status"
 
 export interface StockHook {
   loading: boolean
@@ -48,7 +43,7 @@ export function useGetStocks(query: TransactionQuery): StockHook {
     }
   }
 
-  useEffect(getStock, [query])
+  useEffect(getStock, [resolveStocks, query])
 
   return { ...stock, getStock, exportAllTransactions }
 }
