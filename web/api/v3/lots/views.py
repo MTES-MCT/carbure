@@ -107,7 +107,7 @@ def get_snapshot(request, *args, **kwargs):
             return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
 
     if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader':
-        txs = LotTransaction.objects.filter(Q(lot__added_by=entity) | Q(carbure_vendor=entity))
+        txs = LotTransaction.objects.filter(carbure_vendor=entity)
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
         txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
         draft = txs.filter(lot__status='Draft', lot__parent_lot=None).count()
@@ -116,11 +116,11 @@ def get_snapshot(request, *args, **kwargs):
         accepted = txs.filter(lot__status='Validated', delivery_status='A').count()
         data['lots'] = {'draft': draft, 'validated': validated, 'tofix': tofix, 'accepted': accepted}
     elif entity.entity_type == 'Opérateur':
-        txs = LotTransaction.objects.filter(carbure_client=entity)
+        txs = LotTransaction.objects.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
         txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
         draft = txs.filter(lot__added_by=entity, lot__status='Draft').count()
-        ins = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA', 'AC']).count()
+        ins = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA', 'AC'], is_mac=False).count()
         accepted = txs.filter(lot__status='Validated', delivery_status='A').count()
         data['lots'] = {'draft': draft, 'accepted': accepted, 'in': ins}
     else:

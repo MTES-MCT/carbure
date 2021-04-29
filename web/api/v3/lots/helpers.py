@@ -50,7 +50,7 @@ def get_entity_lots_by_status(entity, status):
             'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country'
         )
 
-        txs = txs.filter(Q(lot__added_by=entity) | Q(carbure_vendor=entity))
+        txs = txs.filter(carbure_vendor=entity)
 
         # filter by status
         if status == 'draft':
@@ -71,13 +71,13 @@ def get_entity_lots_by_status(entity, status):
             'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country'
         )
 
-        txs = txs.filter(carbure_client=entity)
+        txs = txs.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
 
         # filter by status
         if status == 'draft':
-            txs = txs.filter(lot__added_by=entity, lot__status='Draft')
+            txs = txs.filter(lot__status='Draft')
         elif status == 'in':
-            txs = txs.filter(delivery_status__in=['N', 'AC', 'AA'], lot__status="Validated")
+            txs = txs.filter(delivery_status__in=['N', 'AC', 'AA'], lot__status="Validated", is_mac=False)
         elif status == 'accepted':
             txs = txs.filter(lot__status='Validated', delivery_status='A')
         else:
@@ -136,18 +136,15 @@ def filter_lots(txs, querySet):
     errors = querySet.getlist('errors')
     query = querySet.get('query', False)
 
-    date_from = datetime.date.today().replace(month=1, day=1)
-    date_until = datetime.date.today().replace(month=12, day=31)
-
     if year:
         try:
             year = int(year)
             date_from = datetime.date(year=year, month=1, day=1)
             date_until = datetime.date(year=year, month=12, day=31)
+            txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
         except Exception:
             raise Exception('Incorrect format for year. Expected YYYY.')
 
-    txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
 
     if periods:
         txs = txs.filter(lot__period__in=periods)
