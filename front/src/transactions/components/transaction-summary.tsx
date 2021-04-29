@@ -1,7 +1,7 @@
 import { Fragment } from "react"
 import Table, { Column, Line } from "common/components/table"
 import { SummaryItem } from "common/types"
-import { padding } from "./list-columns"
+import { padding, prettyVolume } from "./list-columns"
 import { Alert } from "common/components/alert"
 import { AlertCircle } from "common/components/icons"
 
@@ -16,7 +16,7 @@ const COLUMNS: Column<SummaryItem>[] = [
   },
   {
     header: "Volume (litres)",
-    render: (d) => <Line text={`${d.volume}`} />,
+    render: (d) => <Line text={`${prettyVolume(d.volume)}`} />,
   },
   {
     header: "Lots",
@@ -42,6 +42,16 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
 
   const isInEmpty = summaryInRows.length === 0
   const isOutEmpty = summaryOutRows.length === 0
+
+  const totalIn = {
+    volume: summaryInRows.reduce((t, r) => t + r.value.volume, 0),
+    lots: summaryInRows.reduce((t, r) => t + r.value.lots, 0),
+  }
+
+  const totalOut = {
+    volume: summaryOutRows.reduce((t, r) => t + r.value.volume, 0),
+    lots: summaryOutRows.reduce((t, r) => t + r.value.lots, 0),
+  }
 
   const inColumns: Column<SummaryItem>[] = [
     padding,
@@ -71,7 +81,14 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
 
       {!isInEmpty && (
         <Box className={styles.transactionSummary}>
-          <Title className={styles.transactionSummarySection}>Entrées</Title>
+          <Title className={styles.transactionSummarySection}>
+            Entrées
+            <span className={styles.transactionSummaryTotal}>
+              {"▸"} {totalIn.lots} lot{totalIn.lots !== 1 && "s"}
+              {" ▸ "}
+              {prettyVolume(totalIn.volume)} litres
+            </span>
+          </Title>
           <Table columns={inColumns} rows={summaryInRows} />
         </Box>
       )}
@@ -80,7 +97,14 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
 
       {!isOutEmpty && (
         <Box className={styles.transactionSummary}>
-          <Title className={styles.transactionSummarySection}>Sorties</Title>
+          <Title className={styles.transactionSummarySection}>
+            Sorties
+            <span className={styles.transactionSummaryTotal}>
+              {"▸"} {totalOut.lots} lot{totalOut.lots !== 1 && "s"}
+              {" ▸ "}
+              {prettyVolume(totalOut.volume)} litres
+            </span>
+          </Title>
           <Table columns={outColumns} rows={summaryOutRows} />
         </Box>
       )}
