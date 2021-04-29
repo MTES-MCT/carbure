@@ -24,19 +24,7 @@ sort_key_to_django_field = {'period': 'lot__period',
 def get_stocks(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
-
     status = request.GET.get('status', False)
-    production_sites = request.GET.getlist('production_sites')
-    matieres_premieres = request.GET.getlist('matieres_premieres')
-    countries_of_origin = request.GET.getlist('countries_of_origin')
-    biocarburants = request.GET.getlist('biocarburants')
-    delivery_sites = request.GET.getlist('delivery_sites')
-    limit = request.GET.get('limit', None)
-    from_idx = request.GET.get('from_idx', "0")
-    query = request.GET.get('query', False)
-    sort_by = request.GET.get('sort_by', False)
-    order = request.GET.get('order', False)
-    export = request.GET.get('export', False)
 
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
@@ -53,30 +41,13 @@ def get_stocks(request, *args, **kwargs):
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
 
-    # apply filters
-    if production_sites:
-        txs = txs.filter(Q(lot__carbure_production_site__name__in=production_sites) |
-                         Q(lot__unknown_production_site__in=production_sites))
-    if matieres_premieres:
-        txs = txs.filter(lot__matiere_premiere__code__in=matieres_premieres)
-    if biocarburants:
-        txs = txs.filter(lot__biocarburant__code__in=biocarburants)
-    if countries_of_origin:
-        txs = txs.filter(lot__pays_origine__code_pays__in=countries_of_origin)
-    if delivery_sites:
-        txs = txs.filter(Q(carbure_delivery_site__name__in=delivery_sites)
-                         | Q(unknown_delivery_site__in=delivery_sites))
-
-    if query:
-        txs = txs.filter(Q(lot__matiere_premiere__name__icontains=query) |
-                         Q(lot__biocarburant__name__icontains=query) |
-                         Q(lot__carbure_producer__name__icontains=query) |
-                         Q(lot__unknown_producer__icontains=query) |
-                         Q(lot__carbure_id__icontains=query) |
-                         Q(lot__pays_origine__name__icontains=query) |
-                         Q(carbure_delivery_site__name__icontains=query) |
-                         Q(unknown_delivery_site__icontains=query)
-                         )
+    txs, total_errors, total_deadline, deadline_str = filter_lots(txs, request.GET)
+    
+    limit = request.GET.get('limit', None)
+    from_idx = request.GET.get('from_idx', "0")
+    sort_by = request.GET.get('sort_by', False)
+    order = request.GET.get('order', False)
+    export = request.GET.get('export', False)
 
     if sort_by:
         if sort_by in sort_key_to_django_field:
@@ -190,8 +161,11 @@ def get_snapshot(request, *args, **kwargs):
     ps2 = [p['lot__unknown_production_site'] for p in txs.values('lot__unknown_production_site').distinct()]
     psites = list(set([p for p in ps1 + ps2 if p]))
 
+    periods = [p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']]
+
     data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs,
-                       'production_sites': psites, 'countries_of_origin': countries, 'delivery_sites': delivery_sites}
+                       'production_sites': psites, 'countries_of_origin': countries, 'delivery_sites': delivery_sites, 
+                       'periods': periods, }
 
     return JsonResponse({'status': 'success', 'data': data})
 
