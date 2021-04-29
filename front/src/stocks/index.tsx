@@ -32,6 +32,7 @@ import StockSendComplex from "./routes/stock-send-complex"
 import useTransactionQuery from "transactions/hooks/query/use-transaction-query"
 
 const FILTERS = [
+  Filters.Periods,
   Filters.Biocarburants,
   Filters.MatieresPremieres,
   Filters.CountriesOfOrigin,

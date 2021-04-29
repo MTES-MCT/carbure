@@ -39,6 +39,7 @@ export function useGetStocks(query: TransactionQuery): StockHook {
 
   function getStock() {
     if (query.entity_id >= 0) {
+      delete query.year
       resolveStocks(query)
     }
   }

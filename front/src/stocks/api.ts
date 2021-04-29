@@ -3,27 +3,19 @@ import {
   Lots,
   LotStatus,
   StockDraft,
-  StockSnapshot,
   Transaction,
   TransactionQuery,
   TransactionSummary,
+  Snapshot,
 } from "common/types"
 
 import api from "common/services/api"
-import { flattenSummary, toOption } from "transactions/helpers"
+import {
+  flattenSummary,
+  normalizeFilters,
+  toOption,
+} from "transactions/helpers"
 import { EntitySelection } from "carbure/hooks/use-entity"
-
-// give the same type to all filters in order to render them easily
-function normalizeStockSnapshotFilters(snapshot: any): StockSnapshot {
-  snapshot.filters = {
-    matieres_premieres: snapshot.filters.matieres_premieres,
-    biocarburants: snapshot.filters.biocarburants,
-    countries_of_origin: snapshot.filters.countries_of_origin,
-    production_sites: snapshot.filters.production_sites.map(toOption),
-    delivery_sites: snapshot.filters.delivery_sites.map(toOption),
-  }
-  return snapshot
-}
 
 // extract the status name from the lot details
 export function getStockStatus(
@@ -52,10 +44,8 @@ export function getStockStatus(
   return LotStatus.Weird
 }
 
-export function getStockSnapshot(entity_id: number): Promise<StockSnapshot> {
-  return api
-    .get("/stocks/snapshot", { entity_id })
-    .then(normalizeStockSnapshotFilters)
+export function getStockSnapshot(entity_id: number): Promise<Snapshot> {
+  return api.get("/stocks/snapshot", { entity_id }).then(normalizeFilters)
 }
 
 export function getStocks(query: TransactionQuery): Promise<Lots> {
