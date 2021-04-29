@@ -1,16 +1,13 @@
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { TransactionSelection } from "../query/use-selection"
-import { YearSelection } from "../query/use-year"
 
 import * as api from "transactions/api"
 import useAPI from "../../../common/hooks/use-api"
 
-import { confirm } from "../../../common/components/dialog"
+import { confirm, prompt } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
-import { FilterSelection } from "../query/use-filters"
-import { SpecialSelection } from "../query/use-special"
-import { SearchSelection } from "../query/use-search"
-import { LotStatus } from "common/types"
+import { TransactionQuery } from "common/types"
+import { SummaryPrompt } from "transactions/components/summary"
 
 export interface LotDeleter {
   loading: boolean
@@ -22,11 +19,9 @@ export interface LotDeleter {
 export default function useDeleteLots(
   entity: EntitySelection,
   selection: TransactionSelection,
-  filters: FilterSelection,
-  year: YearSelection,
-  search: SearchSelection,
-  special: SpecialSelection,
-  refresh: () => void
+  query: TransactionQuery,
+  refresh: () => void,
+  stock?: boolean
 ): LotDeleter {
   const notifications = useNotificationContext()
 
@@ -68,42 +63,44 @@ export default function useDeleteLots(
   }
 
   async function deleteSelection() {
-    const shouldDelete = await confirm(
-      "Supprimer lot",
-      "Voulez vous supprimer les lots sélectionnés ?"
-    )
+    const shouldDelete = await prompt<number[]>((resolve) => (
+      <SummaryPrompt
+        stock={stock}
+        title="Supprimer lot"
+        description="Voulez vous supprimer les lots sélectionnés ?"
+        query={query}
+        selection={selection.selected}
+        onResolve={resolve}
+      />
+    ))
 
     if (entity !== null && shouldDelete) {
       await notifyDelete(resolveDelete(entity.id, selection.selected), true)
     }
 
-    return shouldDelete
+    return Boolean(shouldDelete)
   }
 
   async function deleteAll() {
     if (entity !== null) {
-      const filteredDrafts = await api.getLots(LotStatus.Draft, entity.id, filters["selected"], year.selected, 0, null, search.query, 'id', 'asc', special.invalid, special.deadline) // prettier-ignore
-      const nbClients = new Set(
-        filteredDrafts.lots.map((o) =>
-          o.carbure_client ? o.carbure_client.name : o.unknown_client
-        )
-      ).size
-      const totalVolume = filteredDrafts.lots
-        .map((o) => o.lot.volume)
-        .reduce((sum, vol) => sum + vol, 0)
-      const clientsStr = nbClients > 1 ? "clients" : "client"
-      const allTxids = filteredDrafts.lots.map((o) => o.id)
+      const allTxids = await prompt<number[]>((resolve) => (
+        <SummaryPrompt
+          stock={stock}
+          title="Supprimer tous ces brouillons"
+          description="Voulez vous supprimer tous ces lots ?"
+          query={query}
+          selection={selection.selected}
+          onResolve={resolve}
+        />
+      ))
 
-      const shouldDelete = await confirm(
-        "Supprimer tous ces brouillons",
-        `Voulez êtes sur le point de supprimer ${filteredDrafts.lots.length} lots concernant ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres`
-      )
-
-      if (entity !== null && shouldDelete) {
+      if (entity !== null && allTxids) {
         await notifyDelete(resolveDelete(entity.id, allTxids), true)
       }
-      return shouldDelete
+
+      return Boolean(allTxids)
     }
+
     return false
   }
 

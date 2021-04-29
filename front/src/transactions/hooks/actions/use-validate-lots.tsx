@@ -1,18 +1,17 @@
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { TransactionSelection } from "../query/use-selection"
-import { YearSelection } from "../query/use-year"
 
 import * as api from "transactions/api"
 import useAPI from "../../../common/hooks/use-api"
 
-import { confirm, prompt } from "../../../common/components/dialog"
+import { prompt } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
 import { CommentPrompt } from "transactions/components/form-comments"
-import { ValidationPrompt } from "transactions/components/validation"
-import { LotStatus } from "common/types"
-import { FilterSelection } from "../query/use-filters"
-import { SearchSelection } from "../query/use-search"
-import { SpecialSelection } from "../query/use-special"
+import {
+  ValidationPrompt,
+  ValidationSummaryPrompt,
+} from "transactions/components/validation"
+import { TransactionQuery } from "common/types"
 
 export interface LotValidator {
   loading: boolean
@@ -25,11 +24,9 @@ export interface LotValidator {
 export default function useValidateLots(
   entity: EntitySelection,
   selection: TransactionSelection,
-  filters: FilterSelection,
-  year: YearSelection,
-  search: SearchSelection,
-  special: SpecialSelection,  
-  refresh: () => void
+  query: TransactionQuery,
+  refresh: () => void,
+  stock?: boolean
 ): LotValidator {
   const notifications = useNotificationContext()
 
@@ -114,11 +111,12 @@ export default function useValidateLots(
   async function validateSelection() {
     if (entity === null) return false
 
-    const shouldValidate = await prompt<boolean>((resolve) => (
-      <ValidationPrompt
+    const shouldValidate = await prompt<number[]>((resolve) => (
+      <ValidationSummaryPrompt
+        stock={stock}
         title="Envoyer la sélection"
         description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
-        entityID={entity.id}
+        query={query}
         selection={selection.selected}
         onResolve={resolve}
       />
@@ -128,40 +126,29 @@ export default function useValidateLots(
       await notifyValidate(resolveValidate(entity.id, selection.selected), true)
     }
 
-    return shouldValidate ?? false
+    return Boolean(shouldValidate)
   }
 
   async function validateAll() {
     if (entity !== null) {
-      const filteredDrafts = await api.getLots(LotStatus.Draft, entity.id, filters["selected"], year.selected, 0, null, search.query, 'id', 'asc', special.invalid, special.deadline) // prettier-ignore
-      const nbClients = new Set(
-        filteredDrafts.lots.map((o) => o.carbure_client ? o.carbure_client.name : o.unknown_client)
-      ).size
-      const totalVolume = filteredDrafts.lots
-        .map((o) => o.lot.volume)
-        .reduce((sum, vol) => sum + vol)
-      const clientsStr = nbClients > 1 ? "clients" : "client"
-      const allTxids = filteredDrafts.lots.map((o) => o.id)
-
-      const shouldValidate = await prompt<boolean>((resolve) => (
-        <ValidationPrompt
-          stock
+      const allTxids = await prompt<number[]>((resolve) => (
+        <ValidationSummaryPrompt
+          stock={stock}
           title="Envoyer tous ces brouillons"
-          description={`Voulez êtes sur le point d'envoyer ${filteredDrafts.lots.length} lots à ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres ?`}
-          entityID={entity.id}
-          selection={allTxids}
+          description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
+          query={query}
           onResolve={resolve}
         />
       ))
 
-      if (entity !== null && shouldValidate) {
+      if (entity !== null && allTxids) {
         await notifyValidate(resolveValidate(entity.id, allTxids), true)
       }
-      return Boolean(shouldValidate)
+
+      return Boolean(allTxids)
     }
     return false
   }
-
 
   return {
     loading: request.loading || requestComment.loading,

@@ -1,13 +1,24 @@
-import { Fragment } from "react"
+import { Fragment, useEffect } from "react"
 import Table, { Column, Line } from "common/components/table"
-import { SummaryItem } from "common/types"
-import { padding, prettyVolume } from "./list-columns"
-import { Alert } from "common/components/alert"
-import { AlertCircle } from "common/components/icons"
+import { SummaryItem, TransactionQuery } from "common/types"
+import { padding } from "./list-columns"
+import { Check } from "common/components/icons"
 
-import { Box, Title } from "common/components"
-import styles from "./transaction-summary.module.css"
+import { Box, LoaderOverlay, Title } from "common/components"
+import styles from "./summary.module.css"
 import colStyles from "./list-columns.module.css"
+import {
+  Dialog,
+  DialogButtons,
+  DialogText,
+  DialogTitle,
+  PromptProps,
+} from "common/components/dialog"
+import useAPI from "common/hooks/use-api"
+import { Button } from "common/components/button"
+import { prettyVolume } from "transactions/helpers"
+import { getStocksSummary } from "stocks/api"
+import { getLotsSummary } from "transactions/api"
 
 const COLUMNS: Column<SummaryItem>[] = [
   {
@@ -73,12 +84,6 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
 
   return (
     <Fragment>
-      {isInEmpty && isOutEmpty && (
-        <Alert level="warning" icon={AlertCircle}>
-          Aucune information trouvée pour la période donnée.
-        </Alert>
-      )}
-
       {!isInEmpty && (
         <Box className={styles.transactionSummary}>
           <Title className={styles.transactionSummarySection}>
@@ -92,8 +97,6 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
           <Table columns={inColumns} rows={summaryInRows} />
         </Box>
       )}
-
-      <br />
 
       {!isOutEmpty && (
         <Box className={styles.transactionSummary}>
@@ -109,6 +112,66 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
         </Box>
       )}
     </Fragment>
+  )
+}
+
+export function useSummary(
+  query: TransactionQuery,
+  selection: number[] | undefined,
+  stock?: boolean
+) {
+  const [summary, getSummary] = useAPI(
+    stock ? getStocksSummary : getLotsSummary
+  )
+
+  useEffect(() => {
+    getSummary(query, selection ?? [])
+  }, [getSummary, query, selection])
+
+  return summary
+}
+
+type SummaryPromptProps = PromptProps<number[]> & {
+  title: string
+  description: string
+  stock?: boolean
+  entityID?: number
+  selection?: number[]
+  query: TransactionQuery
+}
+
+export const SummaryPrompt = ({
+  stock,
+  title,
+  description,
+  query,
+  selection,
+  onResolve,
+}: SummaryPromptProps) => {
+  const summary = useSummary(query, selection, stock)
+
+  return (
+    <Dialog wide onResolve={onResolve}>
+      <DialogTitle text={title} />
+      <DialogText text={description} />
+
+      {summary.data && (
+        <TransactionSummary in={summary.data.in} out={summary.data.out} />
+      )}
+
+      <DialogButtons>
+        <Button
+          level="primary"
+          icon={Check}
+          onClick={() => onResolve(summary.data?.tx_ids)}
+        >
+          Confirmer
+        </Button>
+        <Button onClick={() => onResolve()}>Annuler</Button>
+      </DialogButtons>
+
+      {summary.loading && <LoaderOverlay />}
+    </Dialog>
   )
 }
 
