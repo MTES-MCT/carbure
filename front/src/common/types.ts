@@ -451,7 +451,6 @@ export interface ConvertETBE {
   previous_stock_tx_id?: number
   volume_ethanol: number
   volume_etbe: number
-  volume_fossile: number
+  volume_etbe_eligible: number
   volume_denaturant: number
-  volume_pertes: number
 }

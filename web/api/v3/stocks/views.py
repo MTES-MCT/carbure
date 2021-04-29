@@ -382,9 +382,8 @@ def convert_eth_stock_to_etbe(request, entity, c):
     previous_stock_tx_id = c['previous_stock_tx_id']
     volume_ethanol = c['volume_ethanol']
     volume_etbe = c['volume_etbe']
-    volume_fossile = c['volume_fossile']
     volume_denaturant = c['volume_denaturant']
-    volume_pertes = c['volume_pertes']
+    volume_etbe_eligible = c['volume_etbe_eligible']
     etbe = Biocarburant.objects.get(code='ETBE')
 
     # retrieve stock line
@@ -409,21 +408,15 @@ def convert_eth_stock_to_etbe(request, entity, c):
 
     volume_ethanol = float(volume_ethanol)
     volume_etbe = float(volume_etbe)
+    volume_etbe_eligible = float(volume_etbe_eligible)
     volume_denaturant = float(volume_denaturant)
-    volume_fossile = float(volume_fossile)
-    volume_pertes = float(volume_pertes)
     
 
-    # ensure volume etbe = sum of other volume
-    # if abs(volume_etbe - (volume_ethanol + volume_fossile + volume_denaturant + volume_pertes)) > 2:
-    if volume_etbe != volume_ethanol + volume_fossile + volume_denaturant + volume_pertes:
-        raise Exception("Volumes ETBE != Volume Ethanol + Pertes")
-
     # check available volume
-    if previous_stock_tx.lot.volume < volume_ethanol:
+    if previous_stock_tx.lot.remaining_volume < volume_ethanol:
         raise Exception("Cannot convert more ETH than stock") 
 
-    previous_stock_tx.lot.volume -= volume_ethanol
+    previous_stock_tx.lot.remaining_volume -= volume_ethanol
     previous_stock_tx.lot.save()
 
     new_lot.volume = volume_etbe
@@ -445,9 +438,8 @@ def convert_eth_stock_to_etbe(request, entity, c):
     t.new_stock = transaction
     t.volume_ethanol = volume_ethanol
     t.volume_etbe = volume_etbe
+    t.volume_etbe_eligible = volume_etbe_eligible
     t.volume_denaturant = volume_denaturant
-    t.volume_fossile = volume_fossile
-    t.volume_pertes = volume_pertes
     t.added_by = entity
     t.added_by_user = request.user
     t.save()    
