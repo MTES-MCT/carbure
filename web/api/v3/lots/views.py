@@ -670,9 +670,9 @@ def forward_lots(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Missing tx_ids"}, status=400)
 
     for tx_id in tx_ids:
-        # for each tx, make sure we are the client, status accepted, and it has been delivered to a Depot with blending_is_outsourced
+        # for each tx, make sure we are the client, status accepted, not already forwarded, and it has been delivered to a Depot with blending_is_outsourced
         try:
-            tx = LotTransaction.objects.get(delivery_status__in=['A', 'N'], id=tx_id, carbure_client=entity)
+            tx = LotTransaction.objects.get(delivery_status__in=['A', 'N'], id=tx_id, carbure_client=entity, is_forwarded=False)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': "TX not found", 'extra': str(e)}, status=400)
 
