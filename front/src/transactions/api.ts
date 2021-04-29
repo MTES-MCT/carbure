@@ -48,6 +48,8 @@ export function getDetails(
 export function downloadLots(filters: TransactionQuery) {
   return api.download("/lots", {
     ...filters,
+    page: 0,
+    limit: null,
     export: true,
   })
 }
@@ -293,6 +295,8 @@ export function getAdminLots(filters: TransactionQuery): Promise<Lots> {
 export function downloadAdminLots(filters: TransactionQuery) {
   return api.download("/admin/lots", {
     ...filters,
+    page: 0,
+    limit: null,
     export: true,
   })
 }
