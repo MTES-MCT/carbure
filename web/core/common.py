@@ -4,6 +4,7 @@ from django import db
 from django.db.models import Q, Count
 from multiprocessing import Process
 import numpy as np
+import traceback
 
 import pandas as pd
 from typing import TYPE_CHECKING, Dict, List, Optional
@@ -757,7 +758,9 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
 
     transaction = LotTransaction()
     transaction.carbure_vendor = entity
-    transaction.is_mac = lot_dict['mac']
+    transaction.is_mac = False
+    if 'mac' in lot_dict and int(lot_dict['mac']) == 1:
+        transaction.is_mac = True
 
     tx_errors += fill_dae_data(lot_dict, transaction)
     tx_errors += fill_delivery_date(lot_dict, lot, transaction)
@@ -860,6 +863,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
                 tx_errors.append(t_errors)
             except Exception as e:
                 print(e)
+                traceback.print_exc()
                 #print(lot_row)
         print('File processed %s' % (datetime.datetime.now()))
         bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors, prefetched_data)
