@@ -163,7 +163,7 @@ export const TransactionList = ({
 
           {isOperator &&
             hasOutsourcedBlendingDepot &&
-            (status.is(LotStatus.Inbox) || status.is(LotStatus.Accepted)) && (
+            status.is(LotStatus.Inbox) && (
               <OperatorOutsourcedBlendingActions
                 forwarder={forwarder}
                 outsourceddepots={outsourceddepots}
