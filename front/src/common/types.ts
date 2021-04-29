@@ -339,16 +339,6 @@ export interface UserRightRequest {
   date_requested: string
 }
 
-export interface StockSnapshot {
-  lots: {
-    [key in LotStatus]: number
-  }
-
-  filters: {
-    [key in Filters]: Option[]
-  }
-}
-
 export type DBSCertificate = {
   type: string
   certificate_id: string

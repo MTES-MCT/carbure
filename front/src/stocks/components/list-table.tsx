@@ -44,7 +44,12 @@ type StockTableProps = {
   sender: LotSender
 }
 
-const COLUMNS = [C.origine, C.biocarburantInStock, C.matierePremiere, C.ghgReduction]
+const COLUMNS = [
+  C.origine,
+  C.biocarburantInStock,
+  C.matierePremiere,
+  C.ghgReduction,
+]
 
 export const StockTable = ({
   stock,
@@ -74,6 +79,7 @@ export const StockTable = ({
   if (status.is(LotStatus.Stock)) {
     columns.push(C.selector(selection))
     columns.push(C.empty)
+    columns.push(C.periodSimple)
     columns.push(C.carbureID)
     columns.push(C.depot)
   }
