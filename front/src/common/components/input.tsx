@@ -160,4 +160,6 @@ export const SearchInput = ({ className, ...props }: InputProps) => (
   </div>
 )
 
-export const Placeholder = () => <div className={styles.inputPlaceholder} />
+export const Placeholder = (props: SystemProps) => (
+  <div {...props} className={cl(styles.inputPlaceholder, props.className)} />
+)
