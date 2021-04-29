@@ -75,6 +75,8 @@ export function getStocksSummary(
 export function downloadStocks(query: TransactionQuery) {
   return api.download("/stocks", {
     ...query,
+    page: 0,
+    limit: null,
     export: true,
   })
 }
