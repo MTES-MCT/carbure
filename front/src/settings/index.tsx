@@ -21,6 +21,7 @@ import {
 import CompanySettings from "./components/company"
 import Sticky from "common/components/sticky"
 import useREDCertCertificates from "./hooks/use-redcert-certificates"
+import UserRights from "./components/user-rights"
 
 function useSettings(entity: EntitySelection, settings: SettingsGetter) {
   const company = useCompany(entity, settings)
@@ -79,7 +80,10 @@ const Settings = ({ entity, settings }: SettingsProps) => {
         {hasCertificates && <a href="#2bs">Certificats 2BS</a>}
         {hasCertificates && <a href="#red">Certificats REDcert</a>}
         {hasCertificates && <a href="#sn">Certificats Système National</a>}
-        {!hasCertificates && hasCSN && <a href="#sn">Certificats Système National</a>}
+        {!hasCertificates && hasCSN && (
+          <a href="#sn">Certificats Système National</a>
+        )}
+        <a href="#users">Utilisateurs</a>
       </Sticky>
 
       <SettingsBody>
@@ -103,6 +107,8 @@ const Settings = ({ entity, settings }: SettingsProps) => {
         {(hasCertificates || hasCSN) && (
           <SNCertificateSettings settings={nationalSystemCertificates} />
         )}
+
+        <UserRights entity={entity} />
       </SettingsBody>
     </Main>
   )
