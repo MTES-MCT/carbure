@@ -96,7 +96,7 @@ soupsieve==2.0.1
 sqlparse==0.3.0
 toml==0.10.2
 typing-extensions==3.7.4.1
-urllib3==1.25.7
+urllib3==1.25.8
 webencodings==0.5.1
 wrapt==1.12.1
 XlsxWriter==1.2.8
