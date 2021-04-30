@@ -9,7 +9,7 @@ def send_reject_email(vendor, txs):
   email_subject = 'Carbure - Lots Refusés'
 
   recipients = UserRightsRequests.objects.filter(entity=vendor, status="ACCEPTED")
-  if os.getenv('CARBURE_ENV', 'dev') == 'prod':
+  if os.getenv('IMAGE_TAG', 'dev') == 'prod':
     recipients_emails = [r.user.email for r in recipients if not r.user.is_staff]
   else:
     # only staff in staging/dev/local
