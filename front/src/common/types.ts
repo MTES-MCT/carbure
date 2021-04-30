@@ -349,7 +349,6 @@ export interface UserRightRequest {
   user: [string]
   entity: Entity
   status: UserRightStatus
-  date: Date
   date_requested: string
   expiration_date: string
   comment: string

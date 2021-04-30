@@ -108,7 +108,7 @@ const Settings = ({ entity, settings }: SettingsProps) => {
           <SNCertificateSettings settings={nationalSystemCertificates} />
         )}
 
-        <UserRights entity={entity} />
+        <UserRights entity={entity} settings={settings} />
       </SettingsBody>
     </Main>
   )

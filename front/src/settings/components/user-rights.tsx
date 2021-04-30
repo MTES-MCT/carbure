@@ -12,21 +12,14 @@ import { formatDate } from "settings/components/common"
 import { padding } from "transactions/components/list-columns"
 import * as api from "../api"
 import styles from "entities/components/user-rights.module.css"
-import colStyles from "transactions/components/list-columns.module.css"
 import { EntitySelection } from "carbure/hooks/use-entity"
+import { SettingsGetter } from "settings/hooks/use-get-settings"
 
 const ROLE_LABELS = {
   [UserRole.ReadOnly]: "Lecture seule",
   [UserRole.ReadWrite]: "Lecture/écriture",
   [UserRole.Admin]: "Administration",
   [UserRole.Auditor]: "Audit",
-}
-
-const STATUS_LABELS = {
-  [UserRightStatus.Pending]: "En attente",
-  [UserRightStatus.Accepted]: "Accepté",
-  [UserRightStatus.Revoked]: "Révoqué",
-  [UserRightStatus.Rejected]: "Refusé",
 }
 
 const RIGHTS_ORDER = {
@@ -45,36 +38,33 @@ const RIGHTS_COLUMNS: Column<UserRightRequest>[] = [
   },
   {
     header: "Droits",
-    className: colStyles.narrowColumn,
     render: (r) => ROLE_LABELS[r.role],
   },
   {
     header: "Date",
-    className: colStyles.narrowColumn,
-    render: (r) => formatDate(r.date_requested),
+    render: (r) => {
+      const dateRequested = formatDate(r.date_requested)
+      const dateExpired = r.expiration_date ? formatDate(r.expiration_date) : null // prettier-ignore
+
+      return dateExpired
+        ? `${dateRequested} (expire le ${dateExpired})`
+        : dateRequested
+    },
   },
 ]
 
-const UserRights = ({ entity }: { entity: EntitySelection }) => {
+const UserRights = ({
+  entity,
+  settings,
+}: {
+  entity: EntitySelection
+  settings: SettingsGetter
+}) => {
   const [rights, getRights] = useAPI(api.getEntityRights)
-  // const [, updateRight] = useAPI(api.updateUsersRights)
+  const [, acceptRight] = useAPI(api.acceptUserRightsRequest)
+  const [, revokeRight] = useAPI(api.revokeUserRights)
 
   const entityID = entity?.id ?? -1
-
-  async function updateRightRequest(
-    request: UserRightRequest,
-    status: UserRightStatus
-  ) {
-    const ok = await confirm(
-      "Modifier droits d'accès",
-      `Voulez vous changer les droits d'accès de l'utilisateur ${request.user} en "${STATUS_LABELS[status]}" ?`
-    )
-
-    if (ok && entityID >= 0) {
-      // await updateRight(request.id, status)
-      await getRights(entityID)
-    }
-  }
 
   useEffect(() => {
     getRights(entityID)
@@ -90,9 +80,19 @@ const UserRights = ({ entity }: { entity: EntitySelection }) => {
       case UserRightStatus.Accepted:
         return [
           {
-            title: "Révoqer",
+            title: "Révoquer",
             icon: Cross,
-            action: (r) => updateRightRequest(r, UserRightStatus.Revoked),
+            action: async (r) => {
+              const shouldRevoke = await confirm(
+                "Révoquer les droits d'un utilisateur",
+                `Voulez vous révoquer les droits d'accès de "${r.user[0]}" à votre société ?`
+              )
+
+              if (shouldRevoke) {
+                await revokeRight(entityID, r.user[0])
+                getRights(entityID)
+              }
+            },
           },
         ]
 
@@ -103,12 +103,32 @@ const UserRights = ({ entity }: { entity: EntitySelection }) => {
           {
             title: "Accepter",
             icon: Check,
-            action: (r) => updateRightRequest(r, UserRightStatus.Accepted),
+            action: async (r) => {
+              const shouldAccept = await confirm(
+                "Accepter un utilisateur",
+                `Voulez vous donner des droits d'accès à votre société à "${r.user[0]}" ?`
+              )
+
+              if (shouldAccept) {
+                await acceptRight(entityID, r.id)
+                getRights(entityID)
+              }
+            },
           },
           {
             title: "Refuser",
             icon: Cross,
-            action: (r) => updateRightRequest(r, UserRightStatus.Rejected),
+            action: async (r) => {
+              const shouldReject = await confirm(
+                "Refuser un utilisateur",
+                `Voulez vous refuser l'accès à votre société à "${r.user[0]}" ?`
+              )
+
+              if (shouldReject) {
+                await revokeRight(entityID, r.user[0])
+                getRights(entityID)
+              }
+            },
           },
         ]
 
