@@ -1,7 +1,12 @@
 import { useState } from "react"
 import cl from "clsx"
 
-import { Entity, UserRightStatus } from "common/types"
+import {
+  Entity,
+  UserRightRequest,
+  UserRightStatus,
+  UserRole,
+} from "common/types"
 import { SettingsGetter } from "settings/hooks/use-get-settings"
 import { AccountHook } from "../index"
 
@@ -13,30 +18,68 @@ import * as common from "common/api"
 
 import { LoaderOverlay, Title } from "common/components"
 import { Button } from "common/components/button"
-import { AlertTriangle, Plus } from "common/components/icons"
-import { SettingsForm } from "settings/components/common"
+import { AlertTriangle, Cross, Plus } from "common/components/icons"
+import { formatDate, SettingsForm } from "settings/components/common"
 import { LabelAutoComplete } from "common/components/autocomplete"
 import { Alert } from "common/components/alert"
-import Table, { Column, Line, Row } from "common/components/table"
+import Table, { Actions, Column, Line, Row } from "common/components/table"
 import { padding } from "transactions/components/list-columns"
 import { Section, SectionBody, SectionHeader } from "common/components/section"
 import {
+  confirm,
   Dialog,
   DialogButtons,
   DialogText,
   DialogTitle,
   PromptProps,
 } from "common/components/dialog"
+import { Label } from "common/components/input"
+import RadioGroup from "common/components/radio-group"
+import * as api from "../api"
+import useAPI from "common/hooks/use-api"
 
-export const EntityPrompt = ({ onResolve }: PromptProps<Entity>) => {
+const STATUS_LABEL = {
+  [UserRightStatus.Pending]: "En attente",
+  [UserRightStatus.Accepted]: "Accepté",
+  [UserRightStatus.Rejected]: "Refusé",
+  [UserRightStatus.Revoked]: "Révoqué",
+}
+
+const ROLE_LABELS_DETAILS = {
+  [UserRole.ReadOnly]: "Lecture seule (consultation des lots uniquement)",
+  [UserRole.ReadWrite]: "Lecture/écriture (création et gestion des lots)",
+  [UserRole.Admin]:
+    "Administration (contrôle complet de la société sur CarbuRe)",
+  [UserRole.Auditor]: "Audit (accès spécial pour auditeurs)",
+}
+const ROLE_LABELS = {
+  [UserRole.ReadOnly]: "Lecture seule",
+  [UserRole.ReadWrite]: "Lecture/écriture",
+  [UserRole.Admin]: "Administration",
+  [UserRole.Auditor]: "Audit",
+}
+
+const ROLE_OPTIONS = Object.entries(ROLE_LABELS_DETAILS).map(
+  ([value, label]) => ({
+    value,
+    label,
+  })
+)
+
+export type AccessRequest = {
+  entity: Entity
+  role: UserRole
+}
+
+export const EntityPrompt = ({ onResolve }: PromptProps<AccessRequest>) => {
   const [entity, setEntity] = useState<Entity | null>(null)
+  const [role, setRole] = useState<UserRole>(UserRole.ReadOnly)
 
   return (
     <Dialog onResolve={onResolve}>
       <SettingsForm>
         <DialogTitle text="Ajout organisation" />
         <DialogText text="Recherchez la société qui vous emploie pour pouvoir accéder à ses données." />
-
         <LabelAutoComplete
           label="Organisation"
           placeholder="Rechercher une société..."
@@ -47,6 +90,14 @@ export const EntityPrompt = ({ onResolve }: PromptProps<Entity>) => {
           getValue={(e) => `${e.id}`}
           getLabel={(e) => e.name}
         />
+        <Label label="Rôle">
+          <RadioGroup
+            name="role"
+            options={ROLE_OPTIONS}
+            value={role}
+            onChange={(e) => setRole(e.target.value as UserRole)}
+          />
+        </Label>
         <a
           href="mailto:carbure@beta.gouv.fr"
           target="_blank"
@@ -60,7 +111,7 @@ export const EntityPrompt = ({ onResolve }: PromptProps<Entity>) => {
             level="primary"
             icon={Plus}
             disabled={!entity}
-            onClick={() => entity && onResolve(entity)}
+            onClick={() => entity && onResolve({ entity, role })}
           >
             Demander l'accès
           </Button>
@@ -69,13 +120,6 @@ export const EntityPrompt = ({ onResolve }: PromptProps<Entity>) => {
       </SettingsForm>
     </Dialog>
   )
-}
-
-const STATUS_LABEL = {
-  [UserRightStatus.Pending]: "En attente",
-  [UserRightStatus.Accepted]: "Accepté",
-  [UserRightStatus.Rejected]: "Refusé",
-  [UserRightStatus.Revoked]: "Révoqué",
 }
 
 export const RightStatus = ({ status }: { status: UserRightStatus }) => (
@@ -93,19 +137,13 @@ export const RightStatus = ({ status }: { status: UserRightStatus }) => (
   </span>
 )
 
-interface AccessRight {
-  status: UserRightStatus
-  entity: Entity
-  date: Date
-}
-
 export const statusColumn = {
   header: "Statut",
   className: colStyles.narrowColumn,
-  render: (r: AccessRight) => <RightStatus status={r.status} />,
+  render: (r: UserRightRequest) => <RightStatus status={r.status} />,
 }
 
-const COLUMNS: Column<AccessRight>[] = [
+const COLUMNS: Column<UserRightRequest>[] = [
   padding,
   statusColumn,
   {
@@ -115,6 +153,21 @@ const COLUMNS: Column<AccessRight>[] = [
   {
     header: "Type",
     render: (r) => <Line text={r.entity.entity_type} />,
+  },
+  {
+    header: "Droits",
+    render: (r) => <Line text={ROLE_LABELS[r.role]} />,
+  },
+  {
+    header: "Date",
+    render: (r) => {
+      const dateRequested = formatDate(r.date_requested)
+      const dateExpired = r.expiration_date ? formatDate(r.expiration_date) : null // prettier-ignore
+
+      return dateExpired
+        ? `${dateRequested} (expire le ${dateExpired})`
+        : dateRequested
+    },
   },
   padding,
 ]
@@ -129,9 +182,28 @@ export const AccountAccesRights = ({
   account,
 }: AccountAccesRightsProps) => {
   const requests = settings.data?.requests ?? []
+  const [, revokeMyself] = useAPI(api.revokeMyself)
 
-  const rows: Row<AccessRight>[] = requests.map((r) => ({
-    value: { status: r.status, entity: r.entity, date: r.date },
+  const actions = Actions<UserRightRequest>([
+    {
+      title: "Annuler",
+      icon: Cross,
+      action: async (r) => {
+        const shouldRevoke = await confirm(
+          "Annuler mes accès",
+          `Voulez vous annuler votre accès à ${r.entity.name} ?`
+        )
+
+        if (shouldRevoke) {
+          await revokeMyself(r.entity.id)
+          settings.resolve()
+        }
+      },
+    },
+  ])
+
+  const rows: Row<UserRightRequest>[] = requests.map((r) => ({
+    value: r,
   }))
 
   return (
@@ -152,7 +224,9 @@ export const AccountAccesRights = ({
         </SectionBody>
       )}
 
-      {requests.length > 0 && <Table columns={COLUMNS} rows={rows} />}
+      {requests.length > 0 && (
+        <Table columns={[...COLUMNS, actions]} rows={rows} />
+      )}
 
       {account.isLoading && <LoaderOverlay />}
     </Section>
