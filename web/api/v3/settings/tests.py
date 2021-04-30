@@ -441,7 +441,7 @@ class SettingsAPITest(TestCase):
         response = self.client.post(reverse(url), {'entity_id': self.entity1.id, 'email': self.user2.email, 'role': UserRights.AUDITOR})
         self.assertEqual(response.status_code, 400)
         #test_invite_auditor (with expiration date)
-        response = self.client.post(reverse(url), {'entity_id': self.entity1.id, 'email': self.user2.email, 'role': UserRights.AUDITOR, 'expiration'date}: '01/01/2021') 
+        response = self.client.post(reverse(url), {'entity_id': self.entity1.id, 'email': self.user2.email, 'role': UserRights.AUDITOR, 'expiration_date': '01/01/2021'}) 
         self.assertEqual(response.status_code, 200)
         right = UserRights.objects.get(entity=self.entity1, user=self.user2)
         self.assertEqual(right.role, UserRights.AUDITOR)        
