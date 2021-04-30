@@ -374,3 +374,25 @@ export function updateSNCertificate(
 export function getEntityRights(entity_id: number): Promise<EntityRights> {
   return api.get("/settings/get-entity-rights", { entity_id })
 }
+
+export function inviteUser(
+  entity_id: number,
+  role: string,
+  expiration_date: string,
+  email: string
+) {
+  return api.post("/settings/invite-user", {
+    entity_id,
+    role,
+    expiration_date,
+    email,
+  })
+}
+
+export function revokeUserRights(entity_id: number, email: string) {
+  return api.post("/settings/revoke-user", { entity_id, email })
+}
+
+export function acceptUserRightsRequest(entity_id: number, request_id: number) {
+  return api.post("/settings/accept-user", { entity_id, request_id })
+}
