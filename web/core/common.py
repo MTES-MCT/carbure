@@ -20,6 +20,7 @@ from certificates.models import DBSCertificate, EntityDBSTradingCertificate
 from certificates.models import REDCertCertificate, EntityREDCertTradingCertificate
 from certificates.models import EntitySNTradingCertificate, SNCertificate
 
+from core.emails import send_reject_email
 
 import dateutil.parser
 from api.v3.sanity_checks import bulk_sanity_checks, tx_is_valid, lot_is_valid
@@ -963,3 +964,16 @@ def validate_lots(user, entity, txs):
             tx.save()
             tx.lot.save()
     return {'submitted': submitted, 'valid': valid, 'invalid': invalid, 'errors': errors}
+
+
+
+def send_rejection_emails(rejected_txs):
+    # group by vendors
+    reject_by_vendors = {}
+    for tx in rejected_txs:
+        if tx.carbure_vendor not in reject_by_vendors:
+            reject_by_vendors[tx.carbure_vendor] = []
+        reject_by_vendors[tx.carbure_vendor].append(tx)
+
+    for vendor, txs in reject_by_vendors.items():
+        send_reject_email(vendor, txs)

@@ -1,0 +1,16 @@
+Bonjour,
+
+Pour information, les lots suivants viennent d'être refusés par votre client:
+
+
+DAE Biocarburant  Matière Première  Volume  Date de livraison Client  Site de livraison Motif
+{% for tx in txs %}
+{{tx.dae}}  {{tx.lot.biocarburant.name}}  {{tx.lot.matiere_premiere.name}}  {{tx.lot.volume}} {{tx.delivery_date}}  {{tx.carbure_client.name}}  {{tx.carbure_delivery_site.name}} {{tx.comment}}
+{% endfor %}
+
+Vous avez une question ? Vous avez besoin d'aide pour faire votre déclaration ? Contactez-nous : carbure@beta.gouv.fr
+
+Bonne journée,
+L'équipe CarbuRe
+
+

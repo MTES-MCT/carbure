@@ -15,7 +15,7 @@ from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, Ent
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment, SustainabilityDeclaration
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
 from core.xlsx_v3 import export_transactions
-from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates
+from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates, send_rejection_emails
 from api.v3.sanity_checks import bulk_sanity_checks
 from django_otp.decorators import otp_required
 from core.decorators import check_rights
@@ -354,6 +354,8 @@ def reject_lot(request):
     if not tx_comment:
         return JsonResponse({'status': 'error', 'message': "Missing comment"}, status=400)
 
+    tx_rejected = []
+
     for tx_id in tx_ids:
         if tx_id is None:
             return JsonResponse({'status': 'error', 'message': "Missing TX ID from POST data"}, status=400)
@@ -373,6 +375,19 @@ def reject_lot(request):
         txerr.tx = tx
         txerr.comment = tx_comment
         txerr.save()
+
+        # special case
+        # if the rejected lot has been forwarded by an operator, the operator has no way to see it
+        # so we actually delete the forwarded tx and send an email to the tx source
+        if tx.parent_tx != None and tx.carbure_vendor.entity_type == Entity.OPERATOR:
+            # cancel forward
+            tx.parent_tx.is_forwarded = False
+            tx.parent_tx.save()
+            # send an email
+        tx.comment = tx_comment
+        tx_rejected.append(tx)
+
+    send_rejection_emails(tx_rejected)
     return JsonResponse({'status': 'success'})
 
 @check_rights('entity_id')
