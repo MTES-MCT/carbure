@@ -318,9 +318,23 @@ export interface Settings {
   requests: UserRightRequest[]
 }
 
+export interface EntityRights {
+  rights: UserRight[]
+  requests: UserRightRequest[]
+}
+
+export enum UserRole {
+  ReadOnly = "RO",
+  ReadWrite = "RW",
+  Admin = "ADMIN",
+  Auditor = "AUDITOR",
+}
+
 export interface UserRight {
   entity: Entity
-  rights: string
+  date_added: string
+  expiration_date: string
+  role: UserRole
 }
 
 export enum UserRightStatus {
@@ -337,6 +351,9 @@ export interface UserRightRequest {
   status: UserRightStatus
   date: Date
   date_requested: string
+  expiration_date: string
+  comment: string
+  role: UserRole
 }
 
 export type DBSCertificate = {
