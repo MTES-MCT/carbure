@@ -294,7 +294,7 @@ def get_snapshot_filters(txs):
     countries = [{'value': c.code_pays, 'label': c.name}
                  for c in Pays.objects.filter(id__in=txs.values('lot__pays_origine').distinct())]
 
-    periods = [p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']]
+    periods = sorted([p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']])
 
 
     ps1 = [p['lot__carbure_production_site__name'] for p in txs.values('lot__carbure_production_site__name').distinct()]
