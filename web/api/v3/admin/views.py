@@ -260,6 +260,7 @@ def get_snapshot(request):
 
         filters['delivery_status'] = [{'value':s[0], 'label': s[1]} for s in LotTransaction.DELIVERY_STATUS]
         filters['is_forwarded'] = [{'value':True, 'label': 'Oui'}, {'value':False, 'label': 'Non'}]
+        filters['is_mac'] = [{'value':True, 'label': 'Oui'}, {'value':False, 'label': 'Non'}]
         data['filters'] = filters
 
     except Exception as e:

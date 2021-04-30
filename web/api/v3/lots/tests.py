@@ -1,5 +1,6 @@
 import datetime
 import os
+import random
 import time
 from django.test import TestCase
 from django.test import TransactionTestCase
@@ -40,6 +41,10 @@ def debug_errors():
     for error in val_errors:
         print(error.natural_key())            
     # debug end
+
+def get_random_dae():
+    today = datetime.date.today()
+    return 'TEST%dFR0000%d' % (today.year, random.randint(100000, 900000))
 
 
 class LotsAPITest(TransactionTestCase):
@@ -709,7 +714,46 @@ class LotsAPITest(TransactionTestCase):
         total_lots = LotV2.objects.all().count()
         self.assertEqual(nb_lots, total_lots)
 
+
+    def create_lot(self, **kwargs):
+        producer = self.test_producer
+        production_site = self.production_site
+        lot = {
+            'supplier_certificate': 'ISCC-TOTO-02',
+            'biocarburant_code': 'ETH',
+            'matiere_premiere_code': 'BLE',
+            'producer': producer.name,
+            'production_site': production_site.name,
+            'volume': 15000,
+            'pays_origine_code': 'FR',
+            'eec': 1,
+            'ep': 5,
+            'etd': 12,
+            'dae': get_random_dae(),
+            'delivery_date': '2020-12-31',
+            'client': self.test_operator.name,
+            'delivery_site': '001',
+            'entity_id': self.test_operator.id,
+        }
+        lot.update(kwargs)
+        response = self.client.post(reverse('api-v3-add-lot'), lot)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()['data']
+        tx_id = data['id']
+        lot_id = data['lot']['id']
+        return tx_id, lot_id
+
   
+    def test_production_site_strip(self):
+        psites = ProductionSite.objects.all()
+        for p in psites:
+            print(p.natural_key())
+        psitename = '   ' + self.production_site.name + '   '
+        tx_id, lot_id = self.create_lot(production_site=psitename)
+        lot = LotV2.objects.get(id=lot_id)
+        self.assertEqual(lot.production_site_is_in_carbure, True)
+        self.assertEqual(lot.carbure_production_site.name, self.production_site.name)
+
 
     def test_real_behaviour(self):
         # download template without setting up parameters

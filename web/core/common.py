@@ -301,6 +301,7 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
         return lot_errors
 
     my_production_sites = prefetched_data['production_sites']
+    print(my_production_sites)
     countries = prefetched_data['countries']
     if 'production_site' in lot_row and lot_row['production_site'] is not None:
         production_site = lot_row['production_site'].strip()
@@ -309,6 +310,7 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
             lot.carbure_production_site = my_production_sites[production_site]
             lot.unknown_production_site = ''
         else:
+            print('%s is not in carbure' % (production_site))
             # do not allow the use of an unknown production site if the producer is registered in Carbure
             lot.production_site_is_in_carbure = False
             lot.carbure_production_site = None
