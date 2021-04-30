@@ -592,7 +592,8 @@ def forward_lots(request, *args, **kwargs):
             tx.save()
             new_tx = tx
             new_tx.pk = None
-
+            new_tx.parent_tx_id = tx.id
+            new_tx.is_forwarded = False
             new_tx.carbure_vendor = entity
 
             new_tx.client_is_in_carbure = True

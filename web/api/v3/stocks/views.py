@@ -507,13 +507,14 @@ def forward(request, *args, **kwargs):
 
         new_tx = tx
         new_tx.pk = None
+        new_tx.parent_tx_id = tx.id
+        new_tx.is_forwarded = False        
         new_tx.carbure_vendor = entity
         new_tx.carbure_vendor_certificate = certificate_id
         new_tx.client_is_in_carbure = True
         new_tx.carbure_client = client
         new_tx.unknown_client = ''
         new_tx.delivery_status = 'N'
-        new_tx.is_forwarded = False
         new_tx.save()
 
     return JsonResponse({'status': 'success'})    

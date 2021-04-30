@@ -3,6 +3,7 @@
 
 from django.contrib import admin
 from django.contrib import messages
+from django.db.models import Q
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
@@ -129,13 +130,31 @@ class NameSortedRelatedOnlyDropdownFilter(RelatedOnlyDropdownFilter):
         sortedlist.insert(0, selectall)
         return sortedlist
 
+class TxPartOfForwardListFilter(admin.SimpleListFilter):
+    # Human-readable title which will be displayed in the
+    # right admin sidebar just above the filter options.
+    title = _('Forwarded')
 
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'part_of_forward'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('Yes', _('yes')),
+            ('No', _('no')),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'Yes':
+            return queryset.filter(Q(is_forwarded=True) | Q(parent_tx__isnull=False))
+        if self.value() == 'No':
+            return queryset.filter(Q(is_forwarded=False) | Q(parent_tx__isnull=True))
 
 class TransactionAdmin(admin.ModelAdmin):
     list_display = ('get_lot_mp', 'get_lot_bc', 'get_lot_volume', 'get_lot_supplier', 'carbure_vendor', 'get_production_site', 'carbure_client', 'dae', 'carbure_delivery_site', 'delivery_date', 'delivery_status', 'unknown_client', 'carbure_vendor_certificate', 'get_lot_unknown_vendor_certificate')
     search_fields = ('lot__id', 'dae', 'champ_libre')
-    list_filter = ('lot__status', 'delivery_status', ('lot__period', DropdownFilter), 'client_is_in_carbure', ('carbure_vendor', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
-                   'is_mac', 'is_batch', 'delivery_site_is_in_carbure', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter), ('lot__carbure_production_site', NameSortedRelatedOnlyDropdownFilter))
+    list_filter = ('lot__status', ('lot__biocarburant', NameSortedRelatedOnlyDropdownFilter), ('lot__matiere_premiere', NameSortedRelatedOnlyDropdownFilter), 'delivery_status', ('lot__period', DropdownFilter), 'client_is_in_carbure', ('carbure_vendor', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
+                   'is_mac', 'is_batch', 'delivery_site_is_in_carbure', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter), ('lot__carbure_production_site', NameSortedRelatedOnlyDropdownFilter), TxPartOfForwardListFilter)
     raw_id_fields = ('lot',)
     actions = ['rerun_sanity_checks', 'delete_ghosts', 'change_transaction_delivery_site', 'change_transaction_client', 'delete_errors', 'assign_transaction_certificate', 'change_transaction_delivery_status']
 
@@ -305,6 +324,7 @@ class TransactionAdmin(admin.ModelAdmin):
             form = self.ChangeTransactionStatusForm(initial={'_selected_action': request.POST.getlist(ACTION_CHECKBOX_NAME)})
         return render(request, 'admin/change_transaction_delivery_status.html', {'transactions': queryset, 'change_delivery_status_form': form})
     change_transaction_delivery_status.short_description = "Changer le statut de la livraison"
+
 
 class TransactionErrorAdmin(admin.ModelAdmin):
     list_display = ('tx', 'field', 'error', 'value')
