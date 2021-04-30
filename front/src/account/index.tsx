@@ -3,9 +3,12 @@ import { SettingsGetter } from "settings/hooks/use-get-settings"
 import { Main, Title } from "common/components"
 import { SettingsHeader, SettingsBody } from "settings/components/common"
 
-import { Entity } from "common/types"
 import { prompt } from "common/components/dialog"
-import { AccountAccesRights, EntityPrompt } from "./components/access-rights"
+import {
+  AccountAccesRights,
+  EntityPrompt,
+  AccessRequest,
+} from "./components/access-rights"
 import { AccountAuthentication } from "./components/authentication"
 import useAPI from "common/hooks/use-api"
 import * as api from "./api"
@@ -21,12 +24,13 @@ function useAccount(settings: SettingsGetter): AccountHook {
   const isLoading = settings.loading || requestAccess.loading
 
   async function askEntityAccess() {
-    const entity = await prompt<Entity>((resolve) => (
+    const res = await prompt<AccessRequest>((resolve) => (
       <EntityPrompt onResolve={resolve} />
     ))
 
-    if (entity) {
-      await resolveAccess(entity.id, "")
+    if (res) {
+      const { entity, role } = res
+      await resolveAccess(entity.id, "", role)
       settings.resolve()
     }
   }
