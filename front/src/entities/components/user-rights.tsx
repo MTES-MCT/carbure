@@ -7,13 +7,20 @@ import { Input } from "common/components/input"
 import { Section, SectionBody, SectionHeader } from "common/components/section"
 import Table, { Actions, Column } from "common/components/table"
 import useAPI from "common/hooks/use-api"
-import { UserRightRequest, UserRightStatus } from "common/types"
+import { UserRightRequest, UserRightStatus, UserRole } from "common/types"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { formatDate } from "settings/components/common"
 import { padding } from "transactions/components/list-columns"
 import * as api from "../api"
 import styles from "./user-rights.module.css"
+
+const ROLE_LABELS = {
+  [UserRole.ReadOnly]: "Lecture seule",
+  [UserRole.ReadWrite]: "Lecture/écriture",
+  [UserRole.Admin]: "Administration",
+  [UserRole.Auditor]: "Audit",
+}
 
 const RIGHTS_ORDER = {
   [UserRightStatus.Pending]: 0,
@@ -30,8 +37,19 @@ const RIGHTS_COLUMNS: Column<UserRightRequest>[] = [
     render: (r) => r.user[0] ?? "",
   },
   {
+    header: "Droits",
+    render: (r) => ROLE_LABELS[r.role],
+  },
+  {
     header: "Date",
-    render: (r) => formatDate(r.date_requested),
+    render: (r) => {
+      const dateRequested = formatDate(r.date_requested)
+      const dateExpired = r.expiration_date ? formatDate(r.expiration_date) : null // prettier-ignore
+
+      return dateExpired
+        ? `${dateRequested} (expire le ${dateExpired})`
+        : dateRequested
+    },
   },
 ]
 
