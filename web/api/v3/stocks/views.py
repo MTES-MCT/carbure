@@ -161,7 +161,7 @@ def get_snapshot(request, *args, **kwargs):
     ps2 = [p['lot__unknown_production_site'] for p in txs.values('lot__unknown_production_site').distinct()]
     psites = list(set([p for p in ps1 + ps2 if p]))
 
-    periods = [p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']]
+    periods = sorted([p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']])
 
     data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs,
                        'production_sites': psites, 'countries_of_origin': countries, 'delivery_sites': delivery_sites, 
