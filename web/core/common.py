@@ -296,6 +296,10 @@ def fill_producer_info(entity, lot_row, lot, prefetched_data):
 def fill_production_site_info(entity, lot_row, lot, prefetched_data):
     lot_errors = []
 
+    # only the data_origin_entity is allowed to change this
+    if lot.data_origin_entity != entity:
+        return lot_errors
+
     my_production_sites = prefetched_data['production_sites']
     countries = prefetched_data['countries']
     if 'production_site' in lot_row and lot_row['production_site'] is not None:
