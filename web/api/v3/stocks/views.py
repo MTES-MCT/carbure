@@ -497,7 +497,7 @@ def forward(request, *args, **kwargs):
         try:
             tx = LotTransaction.objects.get(delivery_status__in=['A', 'N'], id=tx_id, carbure_client=entity, is_forwarded=False)
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': "TX not found", 'extra': str(e)}, status=400)
+            return JsonResponse({'status': 'error', 'message': "Transaction already forwarded", 'extra': str(e)}, status=400)
 
         # all good
         # make current tx as "is_forwarded" and create the next tx
