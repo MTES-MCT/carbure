@@ -148,7 +148,13 @@ class Biocarburant(models.Model):
 
 
 class MatierePremiere(models.Model):
-    MP_CATEGORIES = (('CONV', 'Conventionnel'), ('ANN-IX-A', 'ANNEXE IX-A'), ('ANN-IX-B', 'ANNEXE IX-B'), ('OTHER', 'Autre'))
+    CONV = 'CONV'
+    IXA = 'ANN-IX-A'
+    IXB = 'ANN-IX-B'
+    TALLOL = 'TALLOL'
+    OTHER = 'OTHER'
+
+    MP_CATEGORIES = ((CONV, 'Conventionnel'), (IXA, 'ANNEXE IX-A'), (IXB, 'ANNEXE IX-B'), (TALLOL, 'Tallol'), (OTHER, 'Autre'))
 
     name = models.CharField(max_length=128)
     description = models.CharField(max_length=128)
