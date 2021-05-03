@@ -99,7 +99,7 @@ services:
     depends_on:
       - carbure-mariadb
     ports:
-      - 3000:3000
+      - 3000
     networks:
       - carbure
     volumes:
