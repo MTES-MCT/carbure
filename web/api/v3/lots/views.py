@@ -2,6 +2,7 @@ import datetime
 import calendar
 import logging
 import unicodedata
+import os
 from dateutil.relativedelta import *
 from django.db.models import Q, F, Case, When, Count
 from django.db.models.functions import TruncMonth
@@ -520,8 +521,12 @@ def upload(request, *args, **kwargs):
 
     # save file
     now = datetime.datetime.now()
+    directory = '/app/files'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
     filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d'), entity.name.upper())
-    filepath = '/tmp/%s' % (filename)
+    filename = ''.join((c for c in unicodedata.normalize('NFD', filename) if unicodedata.category(c) != 'Mn'))
+    filepath = '%s/%s' % (directory, filename)
     with open(filepath, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
@@ -541,9 +546,12 @@ def upload_blend(request, *args, **kwargs):
 
     # save file
     now = datetime.datetime.now()
+    directory = '/app/files'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
     filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d'), entity.name.upper())
     filename = ''.join((c for c in unicodedata.normalize('NFD', filename) if unicodedata.category(c) != 'Mn'))
-    filepath = '/tmp/%s' % (filename)
+    filepath = '%s/%s' % (directory, filename)
     with open(filepath, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
