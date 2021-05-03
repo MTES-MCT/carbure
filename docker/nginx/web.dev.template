@@ -41,6 +41,17 @@ server {
         proxy_pass  http://carbure-frontend:3000/v2/;
     }
 
+    # serve uploaded files to administrators
+    location /files {
+        alias /app/files;
+        autoindex on;
+        autoindex_format html;
+        autoindex_localtime on;
+        auth_basic "Administrator Login";
+        auth_basic_user_file /etc/nginx/conf.d/.htaccess_uploaded_files;	
+    }
+
+
     # frontend hot reloading websocket proxy pass
     location /sockjs-node {
         proxy_set_header X-Real-IP  $remote_addr;

@@ -524,7 +524,7 @@ def upload(request, *args, **kwargs):
     directory = '/app/files'
     if not os.path.exists(directory):
         os.makedirs(directory)
-    filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d'), entity.name.upper())
+    filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d.%H%M%S'), entity.name.upper())
     filename = ''.join((c for c in unicodedata.normalize('NFD', filename) if unicodedata.category(c) != 'Mn'))
     filepath = '%s/%s' % (directory, filename)
     with open(filepath, 'wb+') as destination:
@@ -549,7 +549,7 @@ def upload_blend(request, *args, **kwargs):
     directory = '/app/files'
     if not os.path.exists(directory):
         os.makedirs(directory)
-    filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d'), entity.name.upper())
+    filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d.%H%M%S'), entity.name.upper())
     filename = ''.join((c for c in unicodedata.normalize('NFD', filename) if unicodedata.category(c) != 'Mn'))
     filepath = '%s/%s' % (directory, filename)
     with open(filepath, 'wb+') as destination:
