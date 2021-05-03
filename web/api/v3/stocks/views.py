@@ -35,7 +35,7 @@ def get_stocks(request, *args, **kwargs):
         elif status == "in":
             txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AC', 'AA'])
         elif status == "stock":
-            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0, is_forwarded=False)
+            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0, is_forwarded=False, is_mac=False)
         else:
             return JsonResponse({'status': 'error', 'message': "Unknown status"}, status=400)
     else:
