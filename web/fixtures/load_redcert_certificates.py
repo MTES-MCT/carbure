@@ -16,7 +16,7 @@ from django.db import transaction
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import REDCertScope, REDCertBiomassType, REDCertCertificate, REDCertCertificateScope, REDCertCertificateBiomass
+from certificates.models import REDCertScope, REDCertBiomassType, REDCertCertificate, REDCertCertificateScope, REDCertCertificateBiomass
 
 today = datetime.date.today()
 CSV_FOLDER = os.environ['CARBURE_HOME'] + '/web/fixtures/csv/'
