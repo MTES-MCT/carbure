@@ -10,7 +10,7 @@ from django.core.mail import send_mail
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import DBSCertificate, DBSScope, DBSCertificateScope
+from certificates.models import DBSCertificate, DBSScope, DBSCertificateScope
 
 VALID_SCOPES = {}
 today = datetime.date.today()
