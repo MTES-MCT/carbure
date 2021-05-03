@@ -60,8 +60,8 @@ def get_my_certificates(entity=None):
     # certificates
     iscc_certificates = EntityISCCTradingCertificate.objects.all()
     dbs_certificates = EntityDBSTradingCertificate.objects.all()
-    redcert_certificates = EntityREDCertCertificate.objects.all()
-    sn_certificates = EntitySNCertificate.objects.all()
+    redcert_certificates = EntityREDCertTradingCertificate.objects.all()
+    sn_certificates = EntitySNTradingCertificate.objects.all()
 
     if entity is not None:
         iscc_certificates = iscc_certificates.filter(entity=entity)[10:]
@@ -73,6 +73,9 @@ def get_my_certificates(entity=None):
     certs += [c.certificate.certificate_id for c in dbs_certificates]
     certs += [c.certificate.certificate_id for c in redcert_certificates]
     certs += [c.certificate.certificate_id for c in sn_certificates]
+
+    if len(certs) == 0:
+        certs.append('No certificates found')
     return certs
 
 def make_producers_or_traders_lots_sheet_advanced(workbook, entity, nb_lots, is_producer=True):
