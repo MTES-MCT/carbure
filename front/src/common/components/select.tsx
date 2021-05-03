@@ -4,7 +4,7 @@ import cl from "clsx"
 import styles from "./select.module.css"
 
 import { SystemProps } from "."
-import { Input } from "./input"
+import { Checkbox, Input } from "./input"
 import { Cross } from "./icons"
 import {
   DropdownItem,
@@ -208,9 +208,8 @@ export const Select = ({
                   onClick={(e) => select(option, e)}
                 >
                   {multiple && (
-                    <input
+                    <Checkbox
                       readOnly
-                      type="checkbox"
                       checked={isSelected(value, option)}
                       className={styles.selectMultiple}
                     />
