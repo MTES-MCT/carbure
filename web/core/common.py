@@ -5,6 +5,7 @@ from django.db.models import Q, Count
 from multiprocessing import Process
 import numpy as np
 import traceback
+import os
 
 import pandas as pd
 from typing import TYPE_CHECKING, Dict, List, Optional
@@ -24,6 +25,15 @@ from core.emails import send_reject_email
 
 import dateutil.parser
 from api.v3.sanity_checks import bulk_sanity_checks, tx_is_valid, lot_is_valid
+
+def get_uploaded_files_directory():
+    directory = '/app/files'
+    if not os.path.exists(directory):
+        try:
+            os.makedirs(directory)    
+        except:
+            return '/tmp'
+    return directory
 
 def calculate_ghg(lot):
     lot.ghg_total = lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee
