@@ -16,8 +16,8 @@ export interface CompanySettingsHook {
   isLoading: boolean
   hasMAC: boolean
   hasTrading: boolean
-  onChangeMAC: (e: React.ChangeEvent<HTMLInputElement>) => void
-  onChangeTrading: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onChangeMAC: (checked: boolean) => void
+  onChangeTrading: (checked: boolean) => void
 }
 
 export default function useCompany(
@@ -33,15 +33,15 @@ export default function useCompany(
   const isLoading =
     settings.loading || requestMAC.loading || requestTrading.loading
 
-  function onChangeMAC(e: React.ChangeEvent<HTMLInputElement>): void {
+  function onChangeMAC(checked: boolean): void {
     if (entity !== null) {
-      resolveToggleMAC(e.target.checked, entity.id).then(settings.resolve)
+      resolveToggleMAC(checked, entity.id).then(settings.resolve)
     }
   }
 
-  function onChangeTrading(e: React.ChangeEvent<HTMLInputElement>): void {
+  function onChangeTrading(checked: boolean): void {
     if (entity !== null) {
-      resolveToggleTrading(e.target.checked, entity.id).then(settings.resolve)
+      resolveToggleTrading(checked, entity.id).then(settings.resolve)
     }
   }
 

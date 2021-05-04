@@ -32,7 +32,7 @@ const CompanySettings = ({ entity, settings }: CompanySettingsProps) => {
         <LabelCheckbox
           label="Ma société effectue des Mises à Consommation"
           checked={settings.hasMAC}
-          onChange={settings.onChangeMAC}
+          onChange={(e) => settings.onChangeMAC(e.target.checked)}
           className={styles.settingsCheckbox}
         />
 
@@ -40,7 +40,7 @@ const CompanySettings = ({ entity, settings }: CompanySettingsProps) => {
           disabled={isOperator || isTrader}
           label="Ma société a une activité de négoce"
           checked={settings.hasTrading || isTrader}
-          onChange={settings.onChangeTrading}
+          onChange={(e) => settings.onChangeTrading(e.target.checked)}
           className={styles.settingsCheckbox}
         />
       </SectionBody>

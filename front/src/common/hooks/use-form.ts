@@ -10,7 +10,7 @@ export type FormTarget<T = any> = {
   type?: string
   value?: T[keyof T] | string | number | boolean
   name?: keyof T | string
-  checked?: boolean
+  checked: boolean
 }
 
 export type FormChangeHandler<T> = (e: { target: FormTarget<T> }) => void
