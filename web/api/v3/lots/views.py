@@ -16,7 +16,7 @@ from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, Ent
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment, SustainabilityDeclaration
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
 from core.xlsx_v3 import export_transactions
-from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates, send_rejection_emails
+from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates, send_rejection_emails, get_uploaded_files_directory
 from api.v3.sanity_checks import bulk_sanity_checks
 from django_otp.decorators import otp_required
 from core.decorators import check_rights
@@ -520,10 +520,8 @@ def upload(request, *args, **kwargs):
         return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
 
     # save file
+    directory = get_uploaded_files_directory()
     now = datetime.datetime.now()
-    directory = '/app/files'
-    if not os.path.exists(directory):
-        os.makedirs(directory)
     filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d.%H%M%S'), entity.name.upper())
     filename = ''.join((c for c in unicodedata.normalize('NFD', filename) if unicodedata.category(c) != 'Mn'))
     filepath = '%s/%s' % (directory, filename)
@@ -546,9 +544,7 @@ def upload_blend(request, *args, **kwargs):
 
     # save file
     now = datetime.datetime.now()
-    directory = '/app/files'
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    directory = get_uploaded_files_directory()
     filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d.%H%M%S'), entity.name.upper())
     filename = ''.join((c for c in unicodedata.normalize('NFD', filename) if unicodedata.category(c) != 'Mn'))
     filepath = '%s/%s' % (directory, filename)
