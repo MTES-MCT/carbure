@@ -75,13 +75,11 @@ export const SearchInput = ({ className, ...props }: InputProps) => (
 
 type TransactionFiltersProps = {
   selection: FilterSelection
-  search: SearchSelection
   filters: Snapshot["filters"] | undefined
   placeholder: Filters[]
 }
 
 const TransactionFilters = ({
-  search,
   selection,
   filters,
   placeholder,
@@ -103,12 +101,6 @@ const TransactionFilters = ({
         )
       )}
     </div>
-
-    <SearchInput
-      placeholder="Rechercher..."
-      value={search.query}
-      onChange={(e) => search.setQuery(e.target.value)}
-    />
   </div>
 )
 
