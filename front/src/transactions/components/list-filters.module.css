@@ -23,12 +23,13 @@
 }
 
 .searchInput {
+  /* flex: 1; */
   position: relative;
 }
 
 .searchInput :global(.icon) {
   position: absolute;
-  left: 120px;
+  left: 8px;
   top: 11px;
 }
 
@@ -42,9 +43,9 @@
 
 .searchInput input {
   outline: none;
-  border-radius: 0;
-  border: none;
-  border-top: 1px solid var(--gray-highlight) !important;
-  padding: 12px 154px;
+  border-radius: 3px;
+  /* border: none; */
+  /* border-top: 1px solid var(--gray-highlight) !important; */
+  padding: 12px 36px;
   background-color: var(--gray-light);
 }

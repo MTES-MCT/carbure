@@ -33,11 +33,13 @@ import {
 import { StockTable } from "./list-table"
 
 import styles from "./list.module.css"
+import { SearchSelection } from "transactions/hooks/query/use-search"
 
 type StockListProps = {
   stock: StockHook
   sorting: SortingSelection
   pagination: PageSelection
+  search: SearchSelection
   status: StatusSelection
   selection: TransactionSelection
   deleter: LotDeleter
@@ -53,6 +55,7 @@ export const StockList = ({
   stock,
   sorting,
   pagination,
+  search,
   status,
   selection,
   deleter,
@@ -76,7 +79,7 @@ export const StockList = ({
       )}
 
       {!isError && (
-        <ActionBar>
+        <ActionBar search={search}>
           <ExportActions
             isEmpty={isEmpty}
             onExportAll={stock.exportAllTransactions}

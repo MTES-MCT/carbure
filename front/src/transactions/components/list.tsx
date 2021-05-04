@@ -118,7 +118,7 @@ export const TransactionList = ({
       )}
 
       {!isError && (
-        <ActionBar>
+        <ActionBar search={search}>
           <ExportActions
             isEmpty={isEmpty}
             onExportAll={transactions.exportAllTransactions}
