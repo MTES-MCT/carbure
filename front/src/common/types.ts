@@ -232,6 +232,7 @@ export interface Lots {
   returned: number
   total: number
   total_errors: number
+  total_volume: number
 
   lots: Transaction[]
 

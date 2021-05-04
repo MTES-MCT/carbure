@@ -2,7 +2,7 @@ import React from "react"
 import format from "date-fns/format"
 import fr from "date-fns/locale/fr"
 
-import { Entity, LotStatus } from "common/types"
+import { Entity, LotStatus, TransactionQuery } from "common/types"
 import { SortingSelection } from "transactions/hooks/query/use-sort-by" // prettier-ignore
 import { PageSelection } from "common/components/pagination"
 
@@ -45,6 +45,7 @@ import {
 import { OperatorOutsourcedBlendingActions } from "./list-actions"
 import { LotForwarder } from "transactions/hooks/actions/use-forward-lots"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
+import { SearchSelection } from "transactions/hooks/query/use-search"
 
 type TransactionListProps = {
   entity: Entity
@@ -55,6 +56,8 @@ type TransactionListProps = {
   special: SpecialSelection
   selection: TransactionSelection
   pagination: PageSelection
+  search: SearchSelection
+  query: TransactionQuery
   deleter: LotDeleter
   uploader: LotUploader
   validator: LotValidator
@@ -74,6 +77,8 @@ export const TransactionList = ({
   special,
   selection,
   pagination,
+  search,
+  query,
   deleter,
   uploader,
   validator,
@@ -177,11 +182,16 @@ export const TransactionList = ({
       {!isEmpty &&
         !special.deadline &&
         !special.invalid &&
-        filters.isFiltered() && (
+        (filters.isFiltered() || search.query) && (
           <SummaryFilter
             loading={isLoading}
             txCount={txCount}
-            onReset={filters.reset}
+            totalVolume={transactions.data?.total_volume ?? 0}
+            query={query}
+            onReset={() => {
+              filters.reset()
+              search.setQuery("")
+            }}
           />
         )}
 
