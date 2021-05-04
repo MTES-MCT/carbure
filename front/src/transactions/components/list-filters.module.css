@@ -1,34 +1,50 @@
 .transactionFilters {
   display: flex;
-  justify-content: space-between;
-  padding: 16px 120px;
-  padding-top: 8px;
-  background-color: var(--white);
+  flex-direction: column;
   box-shadow: 0px 1px 2px var(--gray-medium);
 }
 
 .filterGroup {
-  display: flex;
-  flex-wrap: wrap;
+  padding: 16px 120px;
+  background-color: var(--white);
+  display: grid;
+  counter-reset: grid-items;
+  grid-template-columns: repeat(auto-fit, minmax(186px, 1fr));
+  position: relative;
+  grid-gap: 8px;
 }
 
 .filterGroup > div {
-  width: 200px;
-  margin-right: 8px;
-  margin-top: 8px;
-}
-
-.searchInput {
-  margin-top: 8px;
-  margin-left: 12px;
-  align-self: center;
-}
-
-.searchInput input {
-  width: 165px;
-  background-color: var(--gray-light);
+  counter-increment: grid-item;
 }
 
 .transactionButtons {
   margin-left: 4px;
+}
+
+.searchInput {
+  position: relative;
+}
+
+.searchInput :global(.icon) {
+  position: absolute;
+  left: 120px;
+  top: 11px;
+}
+
+.searchInput :global(.icon) {
+  stroke: var(--gray-medium);
+}
+
+.searchInput input:hover ~ :global(.icon) {
+  stroke: var(--blue-light);
+}
+
+.searchInput input {
+  outline: none;
+  border-radius: 0;
+  border: none;
+  border-top: 1px solid var(--gray-highlight) !important;
+  padding: 12px 154px;
+  background-color: var(--gray-light);
 }

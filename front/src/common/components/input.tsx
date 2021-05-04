@@ -204,15 +204,6 @@ export const LabelCheckbox = ({
   )
 }
 
-// SEARCH INPUT COMPONENT
-
-export const SearchInput = ({ className, ...props }: InputProps) => (
-  <div className={cl(styles.searchInputWrapper, className)}>
-    <Search size={20} color="var(--gray-medium)" />
-    <Input {...props} className={styles.searchInput} />
-  </div>
-)
-
 export const Placeholder = (props: SystemProps) => (
   <div {...props} className={cl(styles.inputPlaceholder, props.className)} />
 )

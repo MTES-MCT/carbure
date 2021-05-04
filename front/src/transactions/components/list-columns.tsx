@@ -14,7 +14,7 @@ import { Alarm } from "common/components/icons"
 import { Checkbox } from "common/components/input"
 
 export const empty: Column<any> = {
-  className: styles.checkboxColumn,
+  className: styles.emptyColumn,
   render: () => null,
 }
 
