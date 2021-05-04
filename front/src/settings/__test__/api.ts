@@ -12,6 +12,7 @@ import {
   productionSite,
   redcertCertificate,
   snCertificate,
+  entityRights,
 } from "common/__test__/data"
 import {
   okCountrySearch,
@@ -395,6 +396,13 @@ export const okUpdateSN = rest.post(
   }
 )
 
+export const okEntityRights = rest.get(
+  "http://localhost/api/v3/settings/get-entity-rights",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success", data: entityRights }))
+  }
+)
+
 export default setupServer(
   okSettings,
   okEnableMac,
@@ -431,5 +439,6 @@ export default setupServer(
   okSN,
   okAddSN,
   okDeleteSN,
-  okUpdateSN
+  okUpdateSN,
+  okEntityRights
 )

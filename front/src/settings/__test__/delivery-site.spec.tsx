@@ -15,7 +15,7 @@ const SettingsWithHooks = ({ entity }: { entity: Entity }) => {
   return <Settings entity={entity} settings={settings} />
 }
 
-beforeAll(() => server.listen())
+beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
 afterEach(() => {
   server.resetHandlers()
