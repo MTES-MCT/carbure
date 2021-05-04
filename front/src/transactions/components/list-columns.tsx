@@ -11,6 +11,7 @@ import styles from "./list-columns.module.css"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { hasDeadline, prettyVolume } from "transactions/helpers"
 import { Alarm } from "common/components/icons"
+import { Checkbox } from "common/components/input"
 
 export const empty: Column<any> = {
   className: styles.checkboxColumn,
@@ -210,23 +211,24 @@ export const selector: Selector = (selection) => ({
   className: styles.checkboxColumn,
 
   header: (
-    <input
-      type="checkbox"
-      title="Sélectionner toute la page"
-      checked={selection.isAllSelected()}
-      onChange={(e) => selection.toggleSelectAll(e.target.checked)}
-    />
+    <Box className={styles.checkboxHeaderWrapper}>
+      <Checkbox
+        title="Sélectionner toute la page"
+        checked={selection.isAllSelected()}
+        onChange={(e) => selection.toggleSelectAll(e.target.checked)}
+      />
+    </Box>
   ),
 
   render: (tx) => (
-    <Box className={styles.checkboxWrapper}>
-      <input
-        type="checkbox"
-        title="Sélectionner le lot"
-        checked={selection.has(tx.id)}
-        onChange={() => selection.toggleSelect(tx.id)}
-        onClick={(e) => e.stopPropagation()}
-      />
+    <Box
+      className={styles.checkboxWrapper}
+      onClick={(e) => {
+        e.stopPropagation()
+        selection.toggleSelect(tx.id)
+      }}
+    >
+      <Checkbox title="Sélectionner le lot" checked={selection.has(tx.id)} />
     </Box>
   ),
 })

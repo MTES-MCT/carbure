@@ -1,8 +1,9 @@
 import React from "react"
 import cl from "clsx"
 import styles from "./input.module.css"
-import { AlertTriangle, IconProps, Search } from "./icons"
-import { SystemProps } from "./index"
+import { AlertTriangle, Check, IconProps, Search } from "./icons"
+import { Box, SystemProps } from "./index"
+import { FormChangeHandler } from "common/hooks/use-form"
 
 // INPUT COMPONENT
 
@@ -120,11 +121,47 @@ export const LabelTextArea = ({
   </Label>
 )
 
-// LABEL CHECKBOX COMPONENT
+// CHECKBOX COMPONENT
 
-type LabelCheckboxProps = Omit<LabelInputProps, "value"> & {
-  value?: boolean
+type CheckboxProps = Omit<React.HTMLProps<HTMLDivElement>, "onChange"> & {
+  checked?: boolean
+  disabled?: boolean
+  readOnly?: boolean
+  onChange?: FormChangeHandler<any>
 }
+
+export const Checkbox = ({
+  checked,
+  disabled,
+  readOnly,
+  className,
+  onChange,
+  ...props
+}: CheckboxProps) => {
+  const handleChange = onChange
+    ? () => onChange({ target: { type: "checkbox", checked: !checked } })
+    : undefined
+
+  return (
+    <Box
+      {...props}
+      className={cl(
+        styles.checkbox,
+        disabled && styles.checkboxDisabled,
+        readOnly && styles.checkboxReadOnly,
+        className
+      )}
+      onClick={handleChange}
+    >
+      {checked ? <Check /> : null}
+    </Box>
+  )
+}
+
+type LabelCheckboxProps = Omit<LabelProps, "onChange"> &
+  CheckboxProps & {
+    value?: boolean
+  }
 
 export const LabelCheckbox = ({
   label,
@@ -133,24 +170,33 @@ export const LabelCheckbox = ({
   readOnly,
   value,
   checked,
+  onChange,
   ...props
-}: LabelCheckboxProps) => (
-  <label
-    className={cl(
-      styles.labelCheckbox,
-      (readOnly || disabled) && styles.disabledLabel,
-      className
-    )}
-  >
-    <input
-      {...props}
-      type="checkbox"
-      disabled={disabled}
-      checked={checked ?? value}
-    />
-    {label}
-  </label>
-)
+}: LabelCheckboxProps) => {
+  const handleChange = onChange
+    ? () => onChange({ target: { type: "checkbox", checked: !checked } })
+    : undefined
+
+  return (
+    <label
+      className={cl(
+        styles.labelCheckbox,
+        (readOnly || disabled) && styles.disabledLabel,
+        className
+      )}
+      onClick={handleChange}
+    >
+      <Checkbox
+        {...props}
+        disabled={disabled}
+        checked={checked ?? value}
+        onChange={onChange}
+      />
+      {label}
+    </label>
+  )
+}
+
 // SEARCH INPUT COMPONENT
 
 export const SearchInput = ({ className, ...props }: InputProps) => (
