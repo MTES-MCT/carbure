@@ -25,7 +25,7 @@ const TransactionsWithRouter = ({
   </MemoryRouter>
 )
 
-beforeAll(() => server.listen())
+beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
 afterEach(() => {
   server.resetHandlers()
