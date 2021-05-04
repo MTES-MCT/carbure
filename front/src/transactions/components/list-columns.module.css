@@ -4,6 +4,10 @@
   padding: 0;
 }
 
+.emptyColumn {
+  width: 54px;
+}
+
 .paddingColumn {
   flex: 0 0 24px;
 }

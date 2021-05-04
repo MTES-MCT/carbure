@@ -1,13 +1,15 @@
 import React from "react"
+import cl from "clsx"
 
 import { Filters, Snapshot } from "common/types"
 import { FilterSelection } from "transactions/hooks/query/use-filters"
 import { SearchSelection } from "transactions/hooks/query/use-search"
 
-import { SearchInput } from "common/components/input"
 import Select, { Option, SelectValue } from "common/components/select"
 
 import styles from "./list-filters.module.css"
+import { Search } from "common/components/icons"
+import { Input, InputProps } from "common/components/input"
 
 const FILTER_ORDER = [
   Filters.DeliveryStatus,
@@ -62,6 +64,15 @@ export function mapFilters(
   })
 }
 
+// SEARCH INPUT COMPONENT
+
+export const SearchInput = ({ className, ...props }: InputProps) => (
+  <div className={cl(styles.searchInput, className)}>
+    <Input {...props} className={styles.searchInput} />
+    <Search size={24} />
+  </div>
+)
+
 type TransactionFiltersProps = {
   selection: FilterSelection
   search: SearchSelection
@@ -94,12 +105,9 @@ const TransactionFilters = ({
     </div>
 
     <SearchInput
-      className={styles.searchInput}
       placeholder="Rechercher..."
       value={search.query}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-        search.setQuery(e.target.value)
-      }
+      onChange={(e) => search.setQuery(e.target.value)}
     />
   </div>
 )
