@@ -2,7 +2,7 @@ import { Fragment, useEffect } from "react"
 import Table, { Column, Line } from "common/components/table"
 import { SummaryItem, TransactionQuery } from "common/types"
 import { padding } from "./list-columns"
-import { Check } from "common/components/icons"
+import { AlertCircle, Check } from "common/components/icons"
 
 import { Box, LoaderOverlay, Title } from "common/components"
 import styles from "./summary.module.css"
@@ -19,6 +19,7 @@ import { Button } from "common/components/button"
 import { prettyVolume } from "transactions/helpers"
 import { getStocksSummary } from "stocks/api"
 import { getLotsSummary } from "transactions/api"
+import { Alert } from "common/components/alert"
 
 const COLUMNS: Column<SummaryItem>[] = [
   {
@@ -84,6 +85,12 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
 
   return (
     <Fragment>
+      {isInEmpty && isOutEmpty && (
+        <Alert level="warning" icon={AlertCircle}>
+          Aucune transaction trouvée pour cette période
+        </Alert>
+      )}
+
       {!isInEmpty && (
         <Box className={styles.transactionSummary}>
           <Title className={styles.transactionSummarySection}>
