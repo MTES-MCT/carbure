@@ -8,11 +8,14 @@
 
 .searchInput {
   position: relative;
+  margin-left: auto;
+  margin-right: 0;
 }
 
 .searchInput :global(.icon) {
   position: absolute;
-  left: 8px;
+  pointer-events: none;
+  left: 12px;
   top: 11px;
 }
 
@@ -27,8 +30,7 @@
 .searchInput input {
   outline: none;
   border-radius: 3px;
-  /* border: none; */
-  /* border-top: 1px solid var(--gray-highlight) !important; */
-  padding: 12px 36px;
+  padding: 12px;
+  padding-left: 44px;
   background-color: var(--gray-light);
 }

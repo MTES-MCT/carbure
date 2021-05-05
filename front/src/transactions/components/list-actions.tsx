@@ -293,12 +293,12 @@ export const ActionBar = ({
   children: React.ReactNode
 }) => (
   <Box row className={cl(styles.actionBar)}>
+    {children}
     <SearchInput
       placeholder="Rechercher des lots..."
       value={search.query}
       onChange={(e) => search.setQuery(e.target.value)}
       style={{ marginLeft: "auto" }}
     />
-    {children}
   </Box>
 )
