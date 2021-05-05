@@ -400,6 +400,10 @@ class LotTransaction(models.Model):
     is_forwarded = models.BooleanField(default=False)
     parent_tx = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
 
+    # this PoS has been received by a producer with trading or a trader
+    # this flag will make it easier to find "stock" lots
+    is_stock = models.BooleanField(default=False)
+
     def __str__(self):
         return str(self.id)
 
