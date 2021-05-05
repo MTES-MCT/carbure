@@ -106,7 +106,7 @@ const Topbar = ({ entity, settings }: TopbarProps) => (
         {isAdmin(entity) && (
           <React.Fragment>
             <PageLink to="entities">Sociétés</PageLink>
-            <PageLink to="controls">Contrôles</PageLink>
+            {/* <PageLink to="controls">Contrôles</PageLink> */}
           </React.Fragment>
         )}
 
