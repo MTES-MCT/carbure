@@ -17,7 +17,7 @@ import Transactions from "transactions"
 import Stocks from "stocks"
 import Settings from "settings"
 import Account from "account"
-import Controls from "controls"
+// import Controls from "controls"
 import Dashboard from "dashboard"
 import Entities from "../entities"
 import EntityDetails from "entities/routes/entity-details"
@@ -116,9 +116,9 @@ const Org = ({ app }: { app: AppHook }) => {
           </Route>
         )}
 
-        <Route relative path="controls">
+        {/* <Route relative path="controls">
           <Controls />
-        </Route>
+        </Route> */}
 
         <Redirect relative to={isAdmin ? "dashboard" : "transactions"} />
       </Switch>

@@ -1,15 +1,9 @@
-import React from "react"
-import cl from "clsx"
-
 import { Filters, Snapshot } from "common/types"
 import { FilterSelection } from "transactions/hooks/query/use-filters"
-import { SearchSelection } from "transactions/hooks/query/use-search"
 
 import Select, { Option, SelectValue } from "common/components/select"
 
 import styles from "./list-filters.module.css"
-import { Search } from "common/components/icons"
-import { Input, InputProps } from "common/components/input"
 
 const FILTER_ORDER = [
   Filters.DeliveryStatus,
