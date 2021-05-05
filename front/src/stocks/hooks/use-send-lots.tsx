@@ -72,18 +72,40 @@ export default function useSendLot(
     if (res) {
       refresh()
 
-      notifications.push({
-        level: "success",
-        text: many
-          ? "Les lots ont bien été envoyés !"
-          : "Le lot a bien été envoyé !",
-      })
+      if (res.valid > 0) {
+        notifications.push({
+          level: "success",
+          text:
+            res.total === 1
+              ? "Le lot a bien été envoyé !"
+              : `${res.valid} lots sur ${res.total} ont bien été envoyés !`,
+        })
+      }
+
+      if (res.invalid > 0) {
+        notifications.push({
+          level: "error",
+          list: res.errors,
+          text:
+            res.total === 1
+              ? "Le lot n'a pas pu être validé !"
+              : `${res.invalid} lots sur ${res.total} n'ont pas pu être validés !`,
+        })
+      }
+
+      if (res.duplicates > 0) {
+        notifications.push({
+          level: "warning",
+          text:
+            res.total === 1
+              ? "Un lot identique a été détecté dans la base de données !"
+              : `${res.duplicates} lots sont des doublons de lots existants !`,
+        })
+      }
     } else {
       notifications.push({
         level: "error",
-        text: many
-          ? "Impossible d'envoyer les lots."
-          : "Impossible d'envoyer le lot.",
+        text: "Échec de la validation",
       })
     }
   }
