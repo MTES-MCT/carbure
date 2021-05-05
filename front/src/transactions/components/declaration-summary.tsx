@@ -106,11 +106,10 @@ export const DeclarationSummaryPrompt = ({
 
       <Box row className={styles.declarationPeriod}>
         <Button
+          icon={ChevronLeft}
           onClick={() => setPeriod(prevPeriod)}
           className={styles.declarationPrevPeriod}
-        >
-          <ChevronLeft />
-        </Button>
+        />
         <span className={styles.declarationPeriodText}>
           Pour la période{" "}
           <b>
@@ -119,11 +118,10 @@ export const DeclarationSummaryPrompt = ({
           </b>
         </span>
         <Button
+          icon={ChevronRight}
           onClick={() => setPeriod(nextPeriod)}
           className={styles.declarationNextPeriod}
-        >
-          <ChevronRight />
-        </Button>
+        />
       </Box>
 
       <TransactionSummary

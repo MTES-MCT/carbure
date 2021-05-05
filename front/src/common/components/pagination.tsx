@@ -57,10 +57,9 @@ const Pagination = ({ pagination, total }: PaginationProps) => {
         title="Page précédente"
         disabled={pagination.page === 0}
         className={styles.paginationButton}
+        icon={ChevronLeft}
         onClick={() => pagination.setPage(pagination.page - 1)}
-      >
-        <ChevronLeft />
-      </Button>
+      />
 
       <Select
         above
@@ -88,10 +87,9 @@ const Pagination = ({ pagination, total }: PaginationProps) => {
         title="Page suivante"
         disabled={pagination.page === pageCount - 1}
         className={styles.paginationButton}
+        icon={ChevronRight}
         onClick={() => pagination.setPage(pagination.page + 1)}
-      >
-        <ChevronRight />
-      </Button>
+      />
     </div>
   )
 }
