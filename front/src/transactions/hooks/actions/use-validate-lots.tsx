@@ -33,7 +33,7 @@ export default function useValidateLots(
   const [request, resolveValidate] = useAPI(api.validateLots)
   const [requestComment, resolveValidateAndComment] = useAPI(api.validateAndCommentLot) // prettier-ignore
 
-  async function notifyValidate(promise: Promise<any>) {
+  async function notifyValidate(promise: Promise<any>, many: boolean = false) {
     const res = await promise
 
     if (res) {
@@ -123,7 +123,7 @@ export default function useValidateLots(
     ))
 
     if (shouldValidate) {
-      await notifyValidate(resolveValidate(entity.id, selection.selected))
+      await notifyValidate(resolveValidate(entity.id, selection.selected), true)
     }
 
     return Boolean(shouldValidate)
@@ -142,7 +142,7 @@ export default function useValidateLots(
       ))
 
       if (entity !== null && allTxids) {
-        await notifyValidate(resolveValidate(entity.id, allTxids))
+        await notifyValidate(resolveValidate(entity.id, allTxids), true)
       }
 
       return Boolean(allTxids)

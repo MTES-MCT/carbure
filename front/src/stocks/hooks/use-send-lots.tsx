@@ -44,35 +44,24 @@ export default function useSendLot(
   const [requestETBE, resolveETBE] = useAPI(api.convertToETBE)
   const [requestForward, resolveForward] = useAPI(api.forwardLots)
 
-  async function notifyCreated(promise: Promise<any>) {
+  async function notifyCreated(promise: Promise<any>, many: boolean = false) {
     const res = await promise
 
     if (res) {
       refresh()
 
-      if (res.valid > 0) {
-        notifications.push({
-          level: "success",
-          text:
-            res.total === 1
-              ? "Le lot a bien été envoyé !"
-              : `${res.valid} lots sur ${res.total} ont bien été envoyés !`,
-        })
-      }
-
-      if (res.invalid > 0) {
-        notifications.push({
-          level: "error",
-          text:
-            res.total === 1
-              ? "Le lot n'a pas pu être validé !"
-              : `${res.invalid} lots sur ${res.total} n'ont pas pu être validés !`,
-        })
-      }
+      notifications.push({
+        level: "success",
+        text: many
+          ? "Les lots ont bien été créés !"
+          : "Le lot a bien été créé !",
+      })
     } else {
       notifications.push({
         level: "error",
-        text: "Échec de la validation",
+        text: many
+          ? "Impossible de créer les lots."
+          : "Impossible de créer le lot.",
       })
     }
   }
