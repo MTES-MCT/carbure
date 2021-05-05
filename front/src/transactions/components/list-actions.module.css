@@ -16,11 +16,11 @@
   position: absolute;
   pointer-events: none;
   left: 12px;
-  top: 11px;
 }
 
 .searchInput :global(.icon) {
   stroke: var(--gray-medium);
+  height: 100%;
 }
 
 .searchInput input:hover ~ :global(.icon) {
@@ -30,7 +30,8 @@
 .searchInput input {
   outline: none;
   border-radius: 3px;
-  padding: 12px;
+  padding: 0;
   padding-left: 44px;
+  height: 100%;
   background-color: var(--gray-light);
 }
