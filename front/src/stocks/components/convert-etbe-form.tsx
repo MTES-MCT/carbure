@@ -18,6 +18,7 @@ import useAPI from "common/hooks/use-api"
 import Table, { Column } from "common/components/table"
 import * as C from "transactions/components/list-columns"
 import * as api from "../api"
+import { prettyVolume } from "transactions/helpers"
 
 const PART_ETH_IN_ETBE = 0.47
 const CONVERT_20_TO_15 = 0.995
@@ -38,7 +39,8 @@ function compareVolumes(
 function getVolumeAttributions(
   stocks: Transaction[],
   attributions: VolumeAttributions,
-  volume: number
+  volume: number,
+  ignore?: number
 ): VolumeAttributions {
   let remainingVolume =
     volume - Object.values(attributions).reduce((t, v) => t + v, 0)
@@ -50,7 +52,7 @@ function getVolumeAttributions(
       break
     }
 
-    if (!(tx.id in attributions)) {
+    if (!(tx.id in attributions) && tx.id !== ignore) {
       autoAttributions[tx.id] = Math.min(
         remainingVolume,
         tx.lot.remaining_volume
@@ -144,7 +146,8 @@ export const ConvertETBEComplexPrompt = ({
       const autoAttributions = getVolumeAttributions(
         lots,
         nextAttributions,
-        data.volume_ethanol
+        data.volume_ethanol,
+        tx.id
       )
 
       setAttributions(nextAttributions)
@@ -162,7 +165,7 @@ export const ConvertETBEComplexPrompt = ({
         value={
           tx.id in attributions
             ? attributions[tx.id]
-            : autoAttributions[tx.id] ?? 0
+            : autoAttributions[tx.id] ?? ""
         }
         onChange={handleAttribution(tx)}
       />
@@ -225,52 +228,69 @@ export const ConvertETBEComplexPrompt = ({
 
         {depot && (
           <Fragment>
-            <LabelInput
-              type="number"
-              label="Volume d'ETBE produit"
-              name="volume_etbe"
-              value={data.volume_etbe}
-              onChange={onChange}
-            />
+            <Box row>
+              <LabelInput
+                type="number"
+                label="Volume d'ETBE produit"
+                name="volume_etbe"
+                value={data.volume_etbe}
+                onChange={onChange}
+                style={{ flex: 1, marginRight: 16 }}
+              />
 
-            <LabelInput
-              type="number"
-              label={`Volume d'Éthanol utilisé (${vEthanolInStock.toFixed(2)} litres disponibles)`} // prettier-ignore
-              name="volume_ethanol"
-              value={data.volume_ethanol}
-              onChange={onChange}
-            />
+              <LabelInput
+                readOnly
+                disabled
+                type="number"
+                label="Volume d'ETBE éligible (à titre informatif)"
+                name="volume_etbe"
+                value={isNaN(volEligibleETBE) ? 0 : volEligibleETBE.toFixed(2)}
+                style={{ flex: 1 }}
+              />
+            </Box>
 
-            <LabelInput
-              type="number"
-              label="Volume total de dénaturant"
-              name="volume_denaturant"
-              value={data.volume_denaturant}
-              onChange={onChange}
-            />
+            <Box row>
+              <LabelInput
+                type="number"
+                label={`Volume d'Éthanol utilisé (${vEthanolInStock.toFixed(2)} litres disponibles)`} // prettier-ignore
+                name="volume_ethanol"
+                value={data.volume_ethanol}
+                onChange={onChange}
+                style={{ flex: 1, marginRight: 16 }}
+              />
+
+              <LabelInput
+                type="number"
+                label="Volume total de dénaturant"
+                name="volume_denaturant"
+                value={data.volume_denaturant}
+                onChange={onChange}
+                style={{ flex: 1 }}
+              />
+            </Box>
 
             {!isNaN(ratioEthToETBE) && (
-              <Placeholder>{ratioStrDisplay}</Placeholder>
+              <Alert
+                level="info"
+                icon={AlertCircle}
+                style={{ marginTop: 8, marginBottom: 16 }}
+              >
+                Ratio d'Éthanol:
+                <b style={{ margin: "0 4px" }}>{ratioEthToETBE.toFixed(2)}%</b>(
+                {ratioEthToETBEWithDenaturant.toFixed(2)}% dénaturant inclus)
+              </Alert>
             )}
-
-            <LabelInput
-              readOnly
-              type="number"
-              label="Volume d'ETBE éligible (à titre informatif)"
-              name="volume_etbe"
-              value={isNaN(volEligibleETBE) ? 0 : volEligibleETBE.toFixed(2)}
-            />
           </Fragment>
         )}
 
         {!isNaN(volumeDiff) && volumeDiff !== 0 && (
-          <Alert level="error" icon={AlertCircle}>
-            Les volumes ne correspondent pas ({volumeDiff.toFixed(2)} litres)
+          <Alert level="error" icon={AlertCircle} style={{ marginBottom: 16 }}>
+            Les volumes ne correspondent pas ({prettyVolume(volumeDiff)} litres)
           </Alert>
         )}
 
         {data.volume_ethanol > data.volume_etbe && (
-          <Alert level="error" icon={AlertCircle}>
+          <Alert level="error" icon={AlertCircle} style={{ marginBottom: 16 }}>
             Le volume d'ETBE produit est inférieur au volume d'Éthanol
           </Alert>
         )}
