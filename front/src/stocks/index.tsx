@@ -37,6 +37,7 @@ const FILTERS = [
   Filters.MatieresPremieres,
   Filters.CountriesOfOrigin,
   Filters.ProductionSites,
+  Filters.Vendors,
   Filters.DeliverySites,
 ]
 
