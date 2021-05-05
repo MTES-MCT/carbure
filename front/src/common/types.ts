@@ -272,6 +272,7 @@ export enum Filters {
   AddedBy = "added_by",
   Errors = "errors",
   Forwarded = "is_forwarded",
+  Mac = "is_mac",
 }
 
 export interface TransactionQuery {

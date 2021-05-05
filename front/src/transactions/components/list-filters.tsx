@@ -18,6 +18,7 @@ const FILTER_ORDER = [
   Filters.AddedBy,
   Filters.Errors,
   Filters.Forwarded,
+  Filters.Mac,
 ]
 
 const FILTER_LABELS = {
@@ -33,6 +34,7 @@ const FILTER_LABELS = {
   [Filters.AddedBy]: "Ajouté par",
   [Filters.Errors]: "Incohérences",
   [Filters.Forwarded]: "Lots Transférés",
+  [Filters.Mac]: "Mises à consommation",
 }
 
 export function mapFilters(

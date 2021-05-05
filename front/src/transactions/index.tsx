@@ -70,6 +70,7 @@ const PRODUCER_TRADER_FILTERS = [
 ]
 
 const ADMIN_FILTERS = [
+  Filters.Mac,
   Filters.DeliveryStatus,
   Filters.Periods,
   Filters.Biocarburants,
@@ -80,6 +81,7 @@ const ADMIN_FILTERS = [
   Filters.ProductionSites,
   Filters.DeliverySites,
   Filters.AddedBy,
+  Filters.Forwarded,
   Filters.Errors,
 ]
 
