@@ -64,15 +64,6 @@ export function mapFilters(
   })
 }
 
-// SEARCH INPUT COMPONENT
-
-export const SearchInput = ({ className, ...props }: InputProps) => (
-  <div className={cl(styles.searchInput, className)}>
-    <Input {...props} className={styles.searchInput} />
-    <Search size={24} />
-  </div>
-)
-
 type TransactionFiltersProps = {
   selection: FilterSelection
   filters: Snapshot["filters"] | undefined
