@@ -18,7 +18,11 @@ sort_key_to_django_field = {'period': 'lot__period',
                             'matiere_premiere': 'lot__matiere_premiere__name',
                             'ghg_reduction': 'lot__ghg_reduction',
                             'volume': 'lot__volume',
-                            'pays_origine': 'lot__pays_origine__name'}
+                            'pays_origine': 'lot__pays_origine__name',
+                            'client': 'carbure_client__name',
+                            'vendor': 'carbure_vendor__name',
+                            'depot': 'carbure_delivery_site',
+                            }
 
 @check_rights('entity_id')
 def get_stocks(request, *args, **kwargs):
@@ -56,8 +60,6 @@ def get_stocks(request, *args, **kwargs):
                 txs = txs.order_by('-%s' % key)
             else:
                 txs = txs.order_by(key)
-        else:
-            return JsonResponse({'status': 'error', 'message': 'Unknown sort_by key'}, status=400)
 
     from_idx = int(from_idx)
     returned = txs[from_idx:]
