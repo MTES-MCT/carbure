@@ -53,7 +53,7 @@ test("operator: display an empty list of transactions", async () => {
   screen.getByText("Sites de production")
   screen.getByText("Sites de livraison")
 
-  screen.getByPlaceholderText("Rechercher...")
+  screen.getByPlaceholderText("Rechercher des lots...")
 
   screen.getByText("Aucune transaction trouvée pour cette recherche")
 })
