@@ -9,7 +9,7 @@ import { useRelativePush } from "common/components/relative-route"
 
 import Table, { Actions, arrow, Column, Row } from "common/components/table"
 import * as C from "transactions/components/list-columns"
-import { Edit, Flask } from "common/components/icons"
+import { Edit } from "common/components/icons"
 import { LotSender } from "stocks/hooks/use-send-lots"
 
 type A = Record<string, (id: number) => void>
@@ -25,14 +25,6 @@ const getStockActions = ({ createDrafts, convertETBE }: A): CT =>
       },
     ]
 
-    // if (tx.lot.biocarburant.code === "ETH") {
-    //   actions.push({
-    //     icon: Flask,
-    //     title: "Convertir en ETBE",
-    //     action: (tx: Transaction) => convertETBE(tx.id),
-    //   })
-    // }
-
     return actions
   })
 
@@ -44,13 +36,6 @@ type StockTableProps = {
   sender: LotSender
 }
 
-const COLUMNS = [
-  C.origine,
-  C.biocarburantInStock,
-  C.matierePremiere,
-  C.ghgReduction,
-]
-
 export const StockTable = ({
   stock,
   status,
@@ -60,44 +45,52 @@ export const StockTable = ({
 }: StockTableProps) => {
   const relativePush = useRelativePush()
   const createDrafts = sender.createDrafts
-  // const convertETBE = sender.convertETBE
 
   const columns = []
 
-  if (status.is(LotStatus.ToSend)) {
-    columns.push(C.selector(selection))
-  }
-
   if (status.is(LotStatus.Inbox)) {
-    columns.push(C.selector(selection))
-    columns.push(C.periodSimple)
-    columns.push(C.depot)
-    columns.push(C.vendor)
-    columns.push(C.dae)
+    columns.push(
+      C.selector(selection),
+      C.periodSimple,
+      C.dae,
+      C.biocarburant,
+      C.matierePremiere,
+      C.vendor,
+      C.origine,
+      C.depot,
+      C.ghgReduction,
+      arrow
+    )
   }
 
   if (status.is(LotStatus.Stock)) {
-    columns.push(C.selector(selection))
-    columns.push(C.periodSimple)
-    columns.push(C.carbureID)
-    columns.push(C.depot)
+    columns.push(
+      C.selector(selection),
+      C.periodSimple,
+      C.carbureID,
+      C.biocarburantInStock,
+      C.matierePremiere,
+      C.vendor,
+      C.origine,
+      C.depot,
+      C.ghgReduction,
+      getStockActions({ createDrafts })
+    )
   }
-
-  columns.push(...COLUMNS)
 
   if (status.is(LotStatus.ToSend)) {
-    columns.push(C.dae)
-    columns.push(C.client)
-    columns.push(C.destination)
-    columns.push(arrow)
-  }
-
-  if (status.is(LotStatus.Inbox)) {
-    columns.push(arrow)
-  }
-
-  if (status.is(LotStatus.Stock)) {
-    columns.push(getStockActions({ createDrafts /*, convertETBE */ }))
+    columns.push(
+      C.selector(selection),
+      C.periodSimple,
+      C.dae,
+      C.biocarburant,
+      C.matierePremiere,
+      C.client,
+      C.origine,
+      C.destination,
+      C.ghgReduction,
+      arrow
+    )
   }
 
   if (stock === null) {

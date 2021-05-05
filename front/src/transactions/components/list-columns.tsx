@@ -59,6 +59,8 @@ export const period: (d: string) => Column<Transaction> = (deadline) => ({
 
 export const periodSimple: Column<Transaction> = {
   header: "Période",
+  className: styles.dateColumn,
+  sortBy: "period",
   render: (tx) => <Line text={tx.lot.period} />,
 }
 
@@ -161,6 +163,7 @@ export const productionSite: Column<Transaction> = {
 
 export const origine: Column<Transaction> = {
   header: "Usine",
+  sortBy: "pays_origine",
   render: (tx) => (
     <TwoLines
       text={tx.lot.carbure_production_site?.name ?? tx.lot.unknown_production_site_reference} // prettier-ignore
@@ -171,6 +174,7 @@ export const origine: Column<Transaction> = {
 
 export const deliverySite: Column<Transaction> = {
   header: "Site de livraison",
+  sortBy: "depot",
   render: (tx) => {
     const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
     const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name ?? '' // prettier-ignore
@@ -183,6 +187,7 @@ export const deliverySite: Column<Transaction> = {
 
 export const depot: Column<Transaction> = {
   header: "Dépôt",
+  sortBy: "depot",
   render: (tx) => {
     const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
     const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name ?? '' // prettier-ignore
@@ -195,6 +200,7 @@ export const depot: Column<Transaction> = {
 
 export const destination: Column<Transaction> = {
   header: "Destination",
+  sortBy: "depot",
   render: (tx) => {
     const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
     const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name ?? '' // prettier-ignore
