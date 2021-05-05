@@ -156,7 +156,7 @@ test("check search filter", async () => {
 
   userEvent.type(screen.getByPlaceholderText("Rechercher..."), "test")
 
-  await screen.findByTitle("Chargement...")
+  await waitWhileLoading()
 })
 
 test("check year filter", async () => {
