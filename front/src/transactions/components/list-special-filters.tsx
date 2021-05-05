@@ -94,6 +94,7 @@ type SummaryFilterProps = {
   txCount: number
   totalVolume: number
   query: TransactionQuery
+  hideRecap?: boolean
   onReset: () => void
 }
 
@@ -102,6 +103,7 @@ export const SummaryFilter = ({
   txCount,
   totalVolume,
   query,
+  hideRecap = false,
   onReset,
 }: SummaryFilterProps) => {
   function showSummary() {
@@ -109,7 +111,7 @@ export const SummaryFilter = ({
       <SummaryPrompt
         readOnly
         title="Récapitulatif de la recherche"
-        description="Voici un résumé des lots correspondants aux filtres sélectionnés"
+        description="Voici un résumé des lots correspondant aux filtres sélectionnés"
         query={query}
         onResolve={resolve}
       />
@@ -134,9 +136,11 @@ export const SummaryFilter = ({
         </span>
       )}
 
-      <span className={styles.alertLink} onClick={showSummary}>
-        Voir le récapitulatif
-      </span>
+      {!hideRecap && (
+        <span className={styles.alertLink} onClick={showSummary}>
+          Voir le récapitulatif
+        </span>
+      )}
 
       <span
         className={cl(styles.alertLink, styles.alertClose)}

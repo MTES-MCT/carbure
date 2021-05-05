@@ -100,6 +100,7 @@ export const TransactionList = ({
   const isProducer = entity.entity_type === "Producteur"
   const isOperator = entity.entity_type === "Opérateur"
   const isTrader = entity.entity_type === "Trader"
+  const isAdmin = entity.entity_type === "Administration"
 
   const isLoading = transactions.loading
   const isError = transactions.error !== null
@@ -188,6 +189,7 @@ export const TransactionList = ({
             txCount={txCount}
             totalVolume={transactions.data?.total_volume ?? 0}
             query={query}
+            hideRecap={isAdmin}
             onReset={() => {
               filters.reset()
               search.setQuery("")
