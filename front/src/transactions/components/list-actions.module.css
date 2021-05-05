@@ -3,11 +3,10 @@
 }
 
 .actionBar > * {
-  margin-right: 16px;
+  margin-right: 8px;
 }
 
 .searchInput {
-  /* flex: 1; */
   position: relative;
 }
 
