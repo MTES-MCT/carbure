@@ -3,7 +3,7 @@ import React, { Fragment, useEffect, useState } from "react"
 import { LotStatus, Transaction, ConvertETBE } from "common/types"
 import useForm from "common/hooks/use-form"
 import { Box, LoaderOverlay } from "common/components"
-import { Input, LabelInput, Placeholder } from "common/components/input"
+import { Input, LabelInput } from "common/components/input"
 import { Button } from "common/components/button"
 import { Alert } from "common/components/alert"
 import { Check, AlertCircle } from "common/components/icons"
@@ -92,7 +92,7 @@ export const ConvertETBEComplexPrompt = ({
   const [stocks, getStocks] = useAPI(api.getStocks)
 
   const lots = stocks.data?.lots ?? []
-  const vEthanolInStock = lots.reduce((t, tx) => t + tx.lot.volume, 0)
+  const vEthanolInStock = lots.reduce((t, tx) => t + tx.lot.remaining_volume, 0)
 
   const { data, hasChange, onChange } = useForm<ConvertETBE>(initialState, {
     onChange: (state) => {
@@ -194,9 +194,6 @@ export const ConvertETBEComplexPrompt = ({
   const ratioEthToETBEWithDenaturant =
     ((data.volume_ethanol + data.volume_denaturant) / data.volume_etbe) * 100.0
 
-  const ratioStrDisplay = `Ratio d'Éthanol: ${ratioEthToETBE.toFixed(2)}%
-    (${ratioEthToETBEWithDenaturant.toFixed(2)}% dénaturant inclus)` // prettier-ignore
-
   const conversionDetails = Object.entries({
     ...autoAttributions,
     ...attributions,
@@ -252,7 +249,7 @@ export const ConvertETBEComplexPrompt = ({
             <Box row>
               <LabelInput
                 type="number"
-                label={`Volume d'Éthanol utilisé (${vEthanolInStock.toFixed(2)} litres disponibles)`} // prettier-ignore
+                label={`Volume d'Éthanol utilisé (${prettyVolume(vEthanolInStock)} litres disponibles)`} // prettier-ignore
                 name="volume_ethanol"
                 value={data.volume_ethanol}
                 onChange={onChange}
