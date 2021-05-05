@@ -94,7 +94,8 @@ export function normalizeFilters(snapshot: any): Snapshot {
     const filter = snapshot.filters[key]
 
     if (filter && typeof filter[0] === "string") {
-      snapshot.filters[key] = filter.map(toOption)
+      const set = new Set<string>(filter)
+      snapshot.filters[key] = Array.from(set).map(toOption)
     }
 
     if (key in snapshot.filters) {
