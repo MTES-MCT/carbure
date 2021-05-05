@@ -136,7 +136,7 @@ def check_rights(entity_id_field, role=None):
             try:
                 entity = Entity.objects.get(id=entity_id)
             except Exception:
-                return JsonResponse({'status': 'error', 'message': "Unknown Entity %s" % (entity_id)}, status=400)
+                return JsonResponse({'status': 'error', 'message': "Unknown Entity id %s" % (entity_id)}, status=400)
 
             try:
                 rights = UserRights.objects.get(user=request.user, entity=entity)

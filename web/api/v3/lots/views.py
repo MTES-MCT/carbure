@@ -182,9 +182,12 @@ def add_lot(request, *args, **kwargs):
     if not tx:
         return JsonResponse({'status': 'error', 'message': 'Could not add lot to database'}, status=400)
     new_lots, new_txs = bulk_insert(entity, [lot], [tx], [lot_errors], [tx_errors], d)
-    db.connections.close_all()
+    if len(new_txs) == 0:
+        print(request.POST)
+        return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=500)
     lot_data = new_txs[0].natural_key()
     return JsonResponse({'status': 'success', 'data': lot_data})
+
 
 @check_rights('entity_id')
 def update_lot(request, *args, **kwargs):
