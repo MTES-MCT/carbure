@@ -12,7 +12,7 @@ import {
   DialogTitle,
   PromptProps,
 } from "common/components/dialog"
-import { Message } from "common/components/icons"
+import { Check, Message, Return } from "common/components/icons"
 import RadioGroup from "common/components/radio-group"
 
 import styles from "./form-comments.module.css"
@@ -110,11 +110,14 @@ export const CommentPrompt = ({
           <Button
             level="primary"
             disabled={!comment}
+            icon={Check}
             onClick={() => onResolve(comment)}
           >
             Confirmer
           </Button>
-          <Button onClick={() => onResolve()}>Annuler</Button>
+          <Button icon={Return} onClick={() => onResolve()}>
+            Annuler
+          </Button>
         </DialogButtons>
       </Box>
     </Dialog>
@@ -169,12 +172,15 @@ export const CommentWithTypePrompt = ({
         <DialogButtons>
           <Button
             level="primary"
+            icon={Check}
             disabled={!comment || !topic}
             onClick={() => onResolve({ comment, topic })}
           >
             Accepter et demander une correction
           </Button>
-          <Button onClick={() => onResolve()}>Annuler</Button>
+          <Button icon={Return} onClick={() => onResolve()}>
+            Annuler
+          </Button>
         </DialogButtons>
       </Box>
     </Dialog>
@@ -227,11 +233,14 @@ export const CommentWithSummaryPrompt = ({
           <Button
             level="primary"
             disabled={!comment}
+            icon={Check}
             onClick={() => onResolve([comment, summary.data?.tx_ids ?? []])}
           >
             Confirmer
           </Button>
-          <Button onClick={() => onResolve()}>Annuler</Button>
+          <Button icon={Return} onClick={() => onResolve()}>
+            Annuler
+          </Button>
         </DialogButtons>
       </Box>
 

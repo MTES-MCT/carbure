@@ -107,6 +107,7 @@ export const SummaryFilter = ({
   function showSummary() {
     prompt((resolve) => (
       <SummaryPrompt
+        readOnly
         title="Récapitulatif de la recherche"
         description="Voici un résumé des lots correspondants aux filtres sélectionnés"
         query={query}
