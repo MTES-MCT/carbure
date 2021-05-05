@@ -5,3 +5,31 @@
 .actionBar > * {
   margin-right: 16px;
 }
+
+.searchInput {
+  /* flex: 1; */
+  position: relative;
+}
+
+.searchInput :global(.icon) {
+  position: absolute;
+  left: 8px;
+  top: 11px;
+}
+
+.searchInput :global(.icon) {
+  stroke: var(--gray-medium);
+}
+
+.searchInput input:hover ~ :global(.icon) {
+  stroke: var(--blue-light);
+}
+
+.searchInput input {
+  outline: none;
+  border-radius: 3px;
+  /* border: none; */
+  /* border-top: 1px solid var(--gray-highlight) !important; */
+  padding: 12px 36px;
+  background-color: var(--gray-light);
+}
