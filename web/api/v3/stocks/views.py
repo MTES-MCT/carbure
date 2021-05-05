@@ -163,11 +163,15 @@ def get_snapshot(request, *args, **kwargs):
     ps2 = [p['lot__unknown_production_site'] for p in txs.values('lot__unknown_production_site').distinct()]
     psites = list(set([p for p in ps1 + ps2 if p]))
 
+    v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
+    v2 = [v['lot__unknown_supplier'] for v in txs.values('lot__unknown_supplier').distinct()]
+    vendors = [v for v in v1 + v2 if v]
+
     periods = sorted([p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']])
 
     data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs,
                        'production_sites': psites, 'countries_of_origin': countries, 'delivery_sites': delivery_sites, 
-                       'periods': periods, }
+                       'periods': periods, 'vendors': vendors}
 
     return JsonResponse({'status': 'success', 'data': data})
 
