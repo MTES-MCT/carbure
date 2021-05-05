@@ -733,7 +733,7 @@ class LotsAPITest(TransactionTestCase):
             'delivery_date': '2020-12-31',
             'client': self.test_operator.name,
             'delivery_site': '001',
-            'entity_id': self.test_operator.id,
+            'entity_id': self.test_producer.id,
         }
         lot.update(kwargs)
         response = self.client.post(reverse('api-v3-add-lot'), lot)
@@ -745,30 +745,46 @@ class LotsAPITest(TransactionTestCase):
 
   
     def test_production_site_strip(self):
-        pass
-        #psites = ProductionSite.objects.all()
-        #for p in psites:
-        #    print(p.natural_key())
-        #psitename = '   ' + self.production_site.name + '   '
-        #tx_id, lot_id = self.create_lot(production_site=psitename)
-        #lot = LotV2.objects.get(id=lot_id)
-        #self.assertEqual(lot.production_site_is_in_carbure, True)
-        #self.assertEqual(lot.carbure_production_site.name, self.production_site.name)
+        psitename = '   ' + self.production_site.name + '   '
+        tx_id, lot_id = self.create_lot(production_site=psitename)
+        lot = LotV2.objects.get(id=lot_id)
+        self.assertEqual(lot.production_site_is_in_carbure, True)
+        self.assertEqual(lot.carbure_production_site.name, self.production_site.name)
+
+
+    def test_download_templates(self):
+        response = self.client.get(reverse('api-v3-template-simple'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('api-v3-template-advanced'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('api-v3-template-blend'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('api-v3-template-trader'))
+        self.assertEqual(response.status_code, 200)
 
 
     def test_real_behaviour(self):
-        # download template without setting up parameters
-        # download template after setup
-        # upload simple template
-        # upload advanced template
-        # upload 10k lines
-        # validate-all
-        # upload 10k lines
-        # delete-all
-        # upload 100k lines
-        # validate-all
+        # download simple template
+        response = self.client.get(reverse('api-v3-template-simple'), {'entity_id': self.test_producer.id})
+        self.assertEqual(response.status_code, 200)
+        filecontent = response.content
 
-        pass
+        # upload simple template
+        f = SimpleUploadedFile("template.xslx", filecontent)
+        response = self.client.post(reverse('api-v3-upload'), {'entity_id': self.test_producer.id, 'file': f})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(LotV2.objects.all().count(), 10)
+        self.assertEqual(LotTransaction.objects.all().count(), 10)
+
+        # download advanced template
+        response = self.client.get(reverse('api-v3-template-advanced'), {'entity_id': self.test_producer.id})
+        self.assertEqual(response.status_code, 200)
+        filecontent = response.content        
+        # upload advanced template
+        f = SimpleUploadedFile("templateadvanced.xslx", filecontent)
+        response = self.client.post(reverse('api-v3-upload'), {'entity_id': self.test_producer.id, 'file': f})
+        self.assertEqual(LotV2.objects.all().count(), 20)
+        self.assertEqual(LotTransaction.objects.all().count(), 20)
 
 
     def test_client_case_sensitiveness(self):

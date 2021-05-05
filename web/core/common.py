@@ -320,6 +320,7 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
             lot.unknown_production_site = ''
         else:
             # do not allow the use of an unknown production site if the producer is registered in Carbure
+            print('producer is in carbure and production site is not in carbure. NOT ALLOWED')
             lot.production_site_is_in_carbure = False
             lot.carbure_production_site = None
             lot.unknown_production_site = production_site
@@ -649,7 +650,6 @@ def fill_vendor_data(entity, lot_row, transaction, prefetched_data):
         if len(prefetched_data['my_vendor_certificates']) > 0:
             transaction.carbure_vendor_certificate = prefetched_data['my_vendor_certificates'][0]
         else:
-            print('Could not find vendor certificate in account')
             transaction.carbure_vendor_certificate = ''
     return tx_errors
 
@@ -782,7 +782,6 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
     tx_errors += fill_client_data(entity, lot_dict, transaction, prefetched_data)
     tx_errors += fill_vendor_data(entity, lot_dict, transaction, prefetched_data)
     tx_errors += fill_delivery_site_data(lot_dict, transaction, prefetched_data)
-
 
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
