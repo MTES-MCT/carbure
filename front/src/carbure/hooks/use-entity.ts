@@ -14,7 +14,8 @@ export default function useEntity(app: AppHook): EntityHook {
   const params: { entity: string } = useParams()
   const entityID = parseInt(params.entity, 10)
 
-  const entity = isNaN(entityID) ? null : app.getEntity(entityID)
+  const rights = isNaN(entityID) ? null : app.getRights(entityID)
+  const entity = rights?.entity ?? null
   const pending = params.entity === "pending"
 
   return { entity, pending }
