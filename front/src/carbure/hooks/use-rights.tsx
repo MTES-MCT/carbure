@@ -11,8 +11,8 @@ export const UserRightContext = React.createContext<UserRight | null>(null)
 export function useRights() {
   const selected = useContext(UserRightContext)
 
-  function is(role: UserRole) {
-    return selected?.role === role
+  function is(...roles: UserRole[]) {
+    return selected ? roles.includes(selected.role) : false
   }
 
   return { selected, is }
