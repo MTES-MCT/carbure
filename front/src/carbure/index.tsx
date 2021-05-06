@@ -1,27 +1,25 @@
-import React from "react"
-
 import { AppHook, useApp } from "./hooks/use-app"
 import { EntityType, LotStatus } from "common/types"
 import useEntity from "./hooks/use-entity"
+import { UserRightProvider } from "./hooks/use-rights"
 
 import { Alert } from "common/components/alert"
 import { AlertTriangle } from "common/components/icons"
-
 import { Redirect, Route, Switch } from "common/components/relative-route"
+
 import Topbar from "./components/top-bar"
 import Footer from "./components/footer"
 import Pending from "./components/pending"
 import Exit from "./components/exit"
+import Registry from "./components/registry"
 
 import Transactions from "transactions"
 import Stocks from "stocks"
 import Settings from "settings"
 import Account from "account"
-// import Controls from "controls"
-import Dashboard from "dashboard"
-import Entities from "../entities"
+import Entities from "entities"
 import EntityDetails from "entities/routes/entity-details"
-import Registry from "./components/registry"
+import Dashboard from "dashboard"
 
 const DevBanner = () => (
   <div
@@ -54,7 +52,7 @@ const Org = ({ app }: { app: AppHook }) => {
   const isProd = window.location.hostname === "carbure.beta.gouv.fr"
 
   return (
-    <React.Fragment>
+    <UserRightProvider app={app}>
       {!isProd && <DevBanner />}
 
       <Topbar entity={entity} settings={app.settings} />
@@ -116,15 +114,11 @@ const Org = ({ app }: { app: AppHook }) => {
           </Route>
         )}
 
-        {/* <Route relative path="controls">
-          <Controls />
-        </Route> */}
-
         <Redirect relative to={isAdmin ? "dashboard" : "transactions"} />
       </Switch>
 
       <Footer />
-    </React.Fragment>
+    </UserRightProvider>
   )
 }
 
