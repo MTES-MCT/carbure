@@ -7,8 +7,6 @@ import { Alarm, AlertCircle, Filter, Loader } from "common/components/icons"
 
 import styles from "common/components/alert.module.css"
 import { prettyVolume } from "transactions/helpers"
-import * as api from "../api"
-import useAPI from "common/hooks/use-api"
 import { TransactionQuery } from "common/types"
 import { prompt } from "common/components/dialog"
 import { SummaryPrompt } from "./summary"

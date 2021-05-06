@@ -90,7 +90,7 @@ export const vendor: Column<Transaction> = {
     <TwoLines
       text={
         tx.carbure_vendor?.name ??
-        (tx.lot.unknown_supplier != ""
+        (tx.lot.unknown_supplier !== ""
           ? tx.lot.unknown_supplier
           : tx.lot.unknown_supplier_certificate) ??
         "N/A"
