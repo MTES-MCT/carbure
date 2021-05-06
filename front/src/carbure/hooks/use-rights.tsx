@@ -1,7 +1,7 @@
 import React, { useContext } from "react"
 import { useParams } from "react-router-dom"
 
-import { UserRight } from "common/types"
+import { UserRight, UserRole } from "common/types"
 import { AppHook } from "./use-app"
 
 export type UserRightsSelection = UserRight | null
@@ -9,7 +9,13 @@ export type UserRightsSelection = UserRight | null
 export const UserRightContext = React.createContext<UserRight | null>(null)
 
 export function useRights() {
-  return useContext(UserRightContext)
+  const selected = useContext(UserRightContext)
+
+  function is(role: UserRole) {
+    return selected?.role === role
+  }
+
+  return { selected, is }
 }
 
 export function useRightSelection(app: AppHook): UserRightsSelection {
