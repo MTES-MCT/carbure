@@ -52,10 +52,17 @@
   background-color: var(--blue-medium);
 }
 
+.languageSelection {
+  margin-left: auto;
+  height: 100%;
+  font-size: 1.1em;
+  border: none !important;
+}
+
 .userMenu {
   display: flex;
   font-size: 1.1em;
-  margin-left: auto;
+  margin-left: 8px;
 }
 
 .faq {
