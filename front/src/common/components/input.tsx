@@ -1,7 +1,7 @@
 import React, { useRef } from "react"
 import cl from "clsx"
 import styles from "./input.module.css"
-import { AlertTriangle, Check, IconProps, Search } from "./icons"
+import { AlertTriangle, Check, IconProps } from "./icons"
 import { Box, SystemProps } from "./index"
 import { FormChangeHandler } from "common/hooks/use-form"
 
