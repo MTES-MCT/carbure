@@ -35,7 +35,7 @@ def get_stocks(request, *args, **kwargs):
         elif status == "in":
             txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AC', 'AA'])
         elif status == "stock":
-            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0, is_forwarded=False, is_mac=False)
+            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__remaining_volume__gt=0, is_forwarded=False, is_mac=False)
         else:
             return JsonResponse({'status': 'error', 'message': "Unknown status"}, status=400)
     else:
@@ -113,8 +113,6 @@ def get_stocks_summary(request, *args, **kwargs):
         txs, _, _, _ = filter_lots(txs, request.GET)
     data = get_summary(txs, entity)
     return JsonResponse({'status': 'success', 'data': data})
-    # except Exception as e:
-        # return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 
 @check_rights('entity_id')
@@ -240,7 +238,7 @@ def create_drafts(request, *args, **kwargs):
         all_lot_errors.append(lot_errors)
         all_tx_errors.append(tx_errors)
     new_lots, new_txs = bulk_insert(context['entity'], lots, txs, all_lot_errors, all_tx_errors, d)
-    return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'success', 'data': {'tx_ids': [tx.id for tx in new_txs]}})
 
 
 @check_rights('entity_id')

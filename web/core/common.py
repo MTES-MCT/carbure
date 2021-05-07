@@ -100,6 +100,9 @@ def send_lot_from_stock(rights, tx, prefetched_data):
     lot.save()
     lot.parent_lot.remaining_volume -= lot.volume
     lot.parent_lot.save()
+    if tx.is_mac:
+        tx.delivery_status = 'A'
+        tx.save()
     return True, ''
 
 
@@ -774,8 +777,9 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
     transaction = LotTransaction()
     transaction.carbure_vendor = entity
     transaction.is_mac = False
-    if 'mac' in lot_dict and int(lot_dict['mac']) == 1:
-        transaction.is_mac = True
+    if 'mac' in lot_dict:
+        if lot_dict['mac'] == 1 or lot_dict['mac'] == 'true':
+            transaction.is_mac = True
 
     tx_errors += fill_dae_data(lot_dict, transaction)
     tx_errors += fill_delivery_date(lot_dict, lot, transaction)
@@ -974,6 +978,10 @@ def validate_lots(user, entity, txs):
                     tx.delivery_status = 'AA'
                 else:
                     pass
+
+                # is this a Stock tx?
+                if tx.carbure_client and tx.carbure_client.entity_type in [Entity.PRODUCER, Entity.TRADER]:
+                    tx.is_stock = True
             tx.save()
             tx.lot.save()
     return {'submitted': submitted, 'valid': valid, 'invalid': invalid, 'errors': errors}
