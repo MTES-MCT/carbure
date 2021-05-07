@@ -55,5 +55,14 @@ urlpatterns = [
      path('get-my-certificates', views.get_my_certificates, name='api-v3-settings-get-my-certificates'),
      path('set-production-site-certificates', views.set_production_site_certificates, name='api-v3-settings-set-production-site-certificates'),
 
+
+
+     # rights
      path('request-entity-access', views.request_entity_access, name='api-v3-settings-request-entity-access'),
+     path('get-entity-rights', views.get_entity_rights, name='api-v3-settings-get-entity-rights'),
+     path('invite-user', views.invite_user, name='api-v3-settings-invite-user'),
+     path('accept-user', views.accept_user, name='api-v3-settings-access-user'),
+     path('revoke-user', views.revoke_user, name='api-v3-settings-revoke-user'),
+     path('revoke-myself', views.revoke_myself, name='api-v3-settings-revoke-myself'),
+
 ]

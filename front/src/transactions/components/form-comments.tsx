@@ -1,7 +1,7 @@
 import React, { useState } from "react"
-import { Comment } from "common/types"
+import { Comment, TransactionQuery } from "common/types"
 
-import { Box } from "common/components"
+import { Box, LoaderOverlay } from "common/components"
 import { Input, LabelInput } from "common/components/input"
 import { AsyncButton, Button } from "common/components/button"
 import { Collapsible } from "common/components/alert"
@@ -12,10 +12,11 @@ import {
   DialogTitle,
   PromptProps,
 } from "common/components/dialog"
-import { Message } from "common/components/icons"
+import { Check, Message, Return } from "common/components/icons"
 import RadioGroup from "common/components/radio-group"
 
 import styles from "./form-comments.module.css"
+import TransactionSummary, { useSummary } from "./summary"
 
 type CommentsProps = {
   readOnly: boolean
@@ -109,11 +110,14 @@ export const CommentPrompt = ({
           <Button
             level="primary"
             disabled={!comment}
+            icon={Check}
             onClick={() => onResolve(comment)}
           >
-            OK
+            Confirmer
           </Button>
-          <Button onClick={() => onResolve()}>Annuler</Button>
+          <Button icon={Return} onClick={() => onResolve()}>
+            Annuler
+          </Button>
         </DialogButtons>
       </Box>
     </Dialog>
@@ -168,14 +172,79 @@ export const CommentWithTypePrompt = ({
         <DialogButtons>
           <Button
             level="primary"
+            icon={Check}
             disabled={!comment || !topic}
             onClick={() => onResolve({ comment, topic })}
           >
             Accepter et demander une correction
           </Button>
-          <Button onClick={() => onResolve()}>Annuler</Button>
+          <Button icon={Return} onClick={() => onResolve()}>
+            Annuler
+          </Button>
         </DialogButtons>
       </Box>
+    </Dialog>
+  )
+}
+
+type CommentWithSummaryPromptProps = PromptProps<[string, number[]]> & {
+  stock?: boolean
+  title: string
+  description: string
+  query: TransactionQuery
+  selection?: number[]
+}
+
+export const CommentWithSummaryPrompt = ({
+  stock,
+  title,
+  description,
+  query,
+  selection,
+  onResolve,
+}: CommentWithSummaryPromptProps) => {
+  const [comment, setComment] = useState("")
+  const summary = useSummary(query, selection, stock)
+
+  function onSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    onResolve([comment, summary.data?.tx_ids ?? []])
+  }
+
+  return (
+    <Dialog wide onResolve={onResolve}>
+      <DialogTitle text={title} />
+      <DialogText text={description} />
+
+      <Box as="form" onSubmit={onSubmit}>
+        <LabelInput
+          label="Commentaire (obligatoire)"
+          value={comment}
+          className={styles.commentInput}
+          onChange={(e) => setComment(e.target.value)}
+        />
+
+        <TransactionSummary
+          in={summary.data?.in ?? null}
+          out={summary.data?.out ?? null}
+        />
+
+        <DialogButtons>
+          <Button
+            level="primary"
+            disabled={!comment}
+            icon={Check}
+            onClick={() => onResolve([comment, summary.data?.tx_ids ?? []])}
+          >
+            Confirmer
+          </Button>
+          <Button icon={Return} onClick={() => onResolve()}>
+            Annuler
+          </Button>
+        </DialogButtons>
+      </Box>
+
+      {summary.loading && <LoaderOverlay />}
     </Dialog>
   )
 }

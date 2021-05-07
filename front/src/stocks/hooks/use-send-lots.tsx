@@ -17,11 +17,9 @@ import {
 } from "stocks/components/forward-lots-form"
 import { useNotificationContext } from "common/components/notifications"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
-import { ConvertETBE, StockDraft } from "common/types"
-import { ValidationPrompt } from "transactions/components/validation"
-import { FilterSelection } from "transactions/hooks/query/use-filters"
-import { SearchSelection } from "transactions/hooks/query/use-search"
+import { ConvertETBE, StockDraft, TransactionQuery } from "common/types"
 import { isKnown } from "transactions/components/form/fields"
+import { SummaryPrompt } from "transactions/components/summary"
 
 export interface LotSender {
   loading: boolean
@@ -37,8 +35,7 @@ export interface LotSender {
 export default function useSendLot(
   entity: EntitySelection,
   selection: TransactionSelection,
-  filters: FilterSelection,
-  search: SearchSelection,
+  query: TransactionQuery,
   refresh: () => void
 ): LotSender {
   const notifications = useNotificationContext()
@@ -75,18 +72,40 @@ export default function useSendLot(
     if (res) {
       refresh()
 
-      notifications.push({
-        level: "success",
-        text: many
-          ? "Les lots ont bien été envoyés !"
-          : "Le lot a bien été envoyé !",
-      })
+      if (res.valid > 0) {
+        notifications.push({
+          level: "success",
+          text:
+            res.total === 1
+              ? "Le lot a bien été envoyé !"
+              : `${res.valid} lots sur ${res.total} ont bien été envoyés !`,
+        })
+      }
+
+      if (res.invalid > 0) {
+        notifications.push({
+          level: "error",
+          list: res.errors,
+          text:
+            res.total === 1
+              ? "Le lot n'a pas pu être validé !"
+              : `${res.invalid} lots sur ${res.total} n'ont pas pu être validés !`,
+        })
+      }
+
+      if (res.duplicates > 0) {
+        notifications.push({
+          level: "warning",
+          text:
+            res.total === 1
+              ? "Un lot identique a été détecté dans la base de données !"
+              : `${res.duplicates} lots sont des doublons de lots existants !`,
+        })
+      }
     } else {
       notifications.push({
         level: "error",
-        text: many
-          ? "Impossible d'envoyer les lots."
-          : "Impossible d'envoyer le lot.",
+        text: "Échec de la validation",
       })
     }
   }
@@ -132,13 +151,12 @@ export default function useSendLot(
   async function sendSelection() {
     if (entity === null) return false
 
-    const shouldSend = await prompt<boolean>((resolve) => (
-      <ValidationPrompt
+    const shouldSend = await prompt<number[]>((resolve) => (
+      <SummaryPrompt
         stock
         title="Envoyer la sélection"
         description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
-        entityID={entity.id}
-        selection={selection.selected}
+        query={query}
         onResolve={resolve}
       />
     ))
@@ -152,40 +170,20 @@ export default function useSendLot(
 
   async function sendAllDrafts() {
     if (entity !== null) {
-      const filteredDrafts = await api.getStocks(
-        entity.id,
-        filters["selected"],
-        "tosend",
-        0,
-        null,
-        search.query
-      )
-      const nbClients = new Set(
-        filteredDrafts.lots.map((o) =>
-          o.carbure_client ? o.carbure_client.name : o.unknown_client
-        )
-      ).size
-      const totalVolume = filteredDrafts.lots
-        .map((o) => o.lot.volume)
-        .reduce((sum, vol) => sum + vol)
-      const clientsStr = nbClients > 1 ? "clients" : "client"
-      const allTxids = filteredDrafts.lots.map((o) => o.id)
-
-      const shouldSend = await prompt<boolean>((resolve) => (
-        <ValidationPrompt
+      const allTxids = await prompt<number[]>((resolve) => (
+        <SummaryPrompt
           stock
-          title="Envoyer tous ces brouillons"
-          description={`Voulez êtes sur le point d'envoyer ${filteredDrafts.lots.length} lots à ${nbClients} ${clientsStr} pour un total de ${totalVolume} litres ?`}
-          entityID={entity.id}
-          selection={allTxids}
+          title="Envoyer tous ces lots"
+          description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
+          query={query}
           onResolve={resolve}
         />
       ))
 
-      if (entity !== null && shouldSend) {
+      if (entity !== null && allTxids) {
         await notifySend(resolveSend(entity.id, allTxids), true)
       }
-      return Boolean(shouldSend)
+      return Boolean(allTxids)
     }
     return false
   }

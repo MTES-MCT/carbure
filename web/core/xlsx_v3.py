@@ -7,7 +7,8 @@ import random
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
-from core.models import MatierePremiere, Biocarburant, Pays, Depot, Entity, ProductionSite, LotTransaction, EntityISCCTradingCertificate, EntityDBSTradingCertificate
+from core.models import MatierePremiere, Biocarburant, Pays, Depot, Entity, ProductionSite, LotTransaction
+from certificates.models import EntityISCCTradingCertificate, EntityDBSTradingCertificate, EntityREDCertTradingCertificate, EntitySNTradingCertificate
 
 
 UNKNOWN_PRODUCERS = [{'name': 'ITANOL', 'country': 'IT', 'production_site': 'BERGAMO', 'ref': 'ISCC-IT-100001010', 'date':'2017-12-01', 'dc':'IT_001_2020'},
@@ -55,6 +56,28 @@ def get_random_dae():
     today = datetime.date.today()
     return 'TEST%dFR0000%d' % (today.year, random.randint(100000, 900000))
 
+def get_my_certificates(entity=None):
+    # certificates
+    iscc_certificates = EntityISCCTradingCertificate.objects.all()
+    dbs_certificates = EntityDBSTradingCertificate.objects.all()
+    redcert_certificates = EntityREDCertTradingCertificate.objects.all()
+    sn_certificates = EntitySNTradingCertificate.objects.all()
+
+    if entity is not None:
+        iscc_certificates = iscc_certificates.filter(entity=entity)[10:]
+        dbs_certificates = dbs_certificates.filter(entity=entity)[10:]
+        redcert_certificates = redcert_certificates.filter(entity=entity)[10:]
+        sn_certificates = sn_certificates.filter(entity=entity)[10:]
+
+    certs = [c.certificate.certificate_id for c in iscc_certificates]
+    certs += [c.certificate.certificate_id for c in dbs_certificates]
+    certs += [c.certificate.certificate_id for c in redcert_certificates]
+    certs += [c.certificate.certificate_id for c in sn_certificates]
+
+    if len(certs) == 0:
+        certs.append('No certificates found')
+    return certs
+
 def make_producers_or_traders_lots_sheet_advanced(workbook, entity, nb_lots, is_producer=True):
     worksheet_lots = workbook.add_worksheet("lots")
     psites = ProductionSite.objects.filter(producer=entity)
@@ -64,15 +87,7 @@ def make_producers_or_traders_lots_sheet_advanced(workbook, entity, nb_lots, is_
     delivery_sites = Depot.objects.all()
     countries = Pays.objects.all()
 
-    # certificates
-    iscc_certificates = EntityISCCTradingCertificate.objects.filter(entity=entity)
-    dbs_certificates = EntityDBSTradingCertificate.objects.filter(entity=entity)
-    if iscc_certificates.count() > 0:
-        my_vendor_certificate = iscc_certificates[0].certificate.certificate_id
-    elif dbs_certificates.count() > 0:
-        my_vendor_certificate = dbs_certificates[0].certificate.certificate_id
-    else:
-        my_vendor_certificate = ''
+    my_vendor_certificates = get_my_certificates(entity=entity)
 
     # header
     bold = workbook.add_format({'bold': True})
@@ -93,6 +108,7 @@ def make_producers_or_traders_lots_sheet_advanced(workbook, entity, nb_lots, is_
     for i in range(nb_lots):
         client = random.choice(clients)
         bc = random.choice(bcs)
+        my_vendor_certificate = random.choice(my_vendor_certificates)
         if bc.is_alcool:
             mp = random.choice([mp for mp in mps if mp.compatible_alcool])
         elif bc.is_graisse:
@@ -245,9 +261,12 @@ def make_producers_lots_sheet_simple(workbook, entity):
     delivery_sites = Depot.objects.all()
     countries = Pays.objects.all()
 
+    my_vendor_certificates = get_my_certificates(entity=entity)
+
     # header
     bold = workbook.add_format({'bold': True})
     columns = ['production_site', 'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
+               'production_site_reference', 'vendor_certificate',
                'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
                'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site']
     if entity.has_mac:
@@ -264,6 +283,8 @@ def make_producers_lots_sheet_simple(workbook, entity):
     for i in range(10):
         client = random.choice(clients)
         bc = random.choice(bcs)
+        my_vendor_certificate = random.choice(my_vendor_certificates)
+
         if bc.is_alcool:
             mp = random.choice([mp for mp in mps if mp.compatible_alcool])
         elif bc.is_graisse:
@@ -276,7 +297,14 @@ def make_producers_lots_sheet_simple(workbook, entity):
         volume = random.randint(34000, 36000)
 
         p = random.choice(psites)
-        row = [p.name, volume, bc.code, mp.code, country.code_pays, random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), clientid]
+
+        production_certifs = p.productionsitecertificate_set.all()
+        if production_certifs.count() > 0:
+            production_certif = production_certifs[0].natural_key()['certificate_id']
+        else:
+            production_certif = ''
+
+        row = [p.name, volume, bc.code, mp.code, country.code_pays, production_certif, my_vendor_certificate, random.randint(8, 13), random.randint(2, 5), random.randint(1, 3), random.randint(1, 2), float(random.randint(5, 30)) / 10.0, 0, 0, 0, 0, get_random_dae(), clientid]
         row += [client.name, today, site.depot_id]
 
         if entity.has_mac:

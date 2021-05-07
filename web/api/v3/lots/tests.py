@@ -1,5 +1,6 @@
 import datetime
 import os
+import random
 import time
 from django.test import TestCase
 from django.test import TransactionTestCase
@@ -7,7 +8,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from core.models import Entity, UserRights, LotV2, LotTransaction, ProductionSite, Pays, Biocarburant, MatierePremiere, Depot, LotValidationError, LotV2Error, TransactionError
-from core.models import ISCCCertificate, EntityISCCTradingCertificate
+from certificates.models import ISCCCertificate, EntityISCCTradingCertificate
 from api.v3.admin.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
 
@@ -41,6 +42,10 @@ def debug_errors():
         print(error.natural_key())            
     # debug end
 
+def get_random_dae():
+    today = datetime.date.today()
+    return 'TEST%dFR0000%d' % (today.year, random.randint(100000, 900000))
+
 
 class LotsAPITest(TransactionTestCase):
     home = os.environ['CARBURE_HOME']
@@ -62,7 +67,8 @@ class LotsAPITest(TransactionTestCase):
 
         # some rights
         UserRights.objects.update_or_create(user=self.user1, entity=self.test_producer)
-        UserRights.objects.update_or_create(user=self.user1, entity=self.test_operator)         
+        UserRights.objects.update_or_create(user=self.user1, entity=self.test_operator)
+        UserRights.objects.update_or_create(user=self.user1, entity=self.entity3)
         # note: user1 does not have access to entity3
         france = Pays.objects.get(code_pays='FR')
         today = datetime.date.today()
@@ -413,12 +419,12 @@ class LotsAPITest(TransactionTestCase):
         lots = data['lots']
         self.assertEqual(len(lots), nb_lots)
         # make sure they all have LotError or TransactionError
-        lot_errors = [error.lot.id for error  in LotV2Error.objects.filter(lot__in=[lot['lot']['id'] for lot in lots])]
-        tx_errors = [error.tx.lot.id for error in TransactionError.objects.filter(tx__in=[tx['id'] for tx in lots])]
-        validation_errors = [error.lot.id for error in LotValidationError.objects.filter(lot__in=[tx['lot']['id'] for tx in lots])]
         for lot in lots:
-            self.assertTrue(lot['id'] in lot_errors or lot['id'] in tx_errors or lot['id'] in validation_errors)
-        
+            lot_errors = LotV2Error.objects.filter(lot=lot['lot']['id']).count()
+            tx_errors = TransactionError.objects.filter(tx=lot['id']).count()
+            validation_errors = LotValidationError.objects.filter(lot=lot['lot']['id']).count()
+            self.assertGreater(lot_errors + tx_errors + validation_errors, 0)
+
         # delete-all-drafts
         txs = LotTransaction.objects.filter(lot__status='Draft')
         response = self.client.post(reverse('api-v3-delete-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})    
@@ -465,10 +471,10 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(len(lots), nb_lots - 2) # 3 lots have a stupid date that won't be counted in 2020
 
         # make sure they all have an error
-        lot_errors = [error.lot.id for error  in LotV2Error.objects.filter(lot__in=[lot['lot']['id'] for lot in lots])]
-        tx_errors = [error.tx.lot.id for error in TransactionError.objects.filter(tx__in=[tx['id'] for tx in lots])]
         for lot in lots:
-            self.assertTrue(lot['id'] in lot_errors or lot['id'] in tx_errors)
+            lot_errors = LotV2Error.objects.filter(lot=lot['lot']['id']).count()
+            tx_errors = TransactionError.objects.filter(tx=lot['id']).count()
+            self.assertGreater(lot_errors + tx_errors, 0)
         
         # delete-all-drafts
         txs = LotTransaction.objects.filter(lot__status='Draft')
@@ -709,21 +715,77 @@ class LotsAPITest(TransactionTestCase):
         total_lots = LotV2.objects.all().count()
         self.assertEqual(nb_lots, total_lots)
 
+
+    def create_lot(self, **kwargs):
+        producer = self.test_producer
+        production_site = self.production_site
+        lot = {
+            'supplier_certificate': 'ISCC-TOTO-02',
+            'biocarburant_code': 'ETH',
+            'matiere_premiere_code': 'BLE',
+            'producer': producer.name,
+            'production_site': production_site.name,
+            'volume': 15000,
+            'pays_origine_code': 'FR',
+            'eec': 1,
+            'ep': 5,
+            'etd': 12,
+            'dae': get_random_dae(),
+            'delivery_date': '2020-12-31',
+            'client': self.test_operator.name,
+            'delivery_site': '001',
+            'entity_id': self.test_producer.id,
+        }
+        lot.update(kwargs)
+        response = self.client.post(reverse('api-v3-add-lot'), lot)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()['data']
+        tx_id = data['id']
+        lot_id = data['lot']['id']
+        return tx_id, lot_id
+
   
+    def test_production_site_strip(self):
+        psitename = '   ' + self.production_site.name + '   '
+        tx_id, lot_id = self.create_lot(production_site=psitename)
+        lot = LotV2.objects.get(id=lot_id)
+        self.assertEqual(lot.production_site_is_in_carbure, True)
+        self.assertEqual(lot.carbure_production_site.name, self.production_site.name)
+
+
+    def test_download_templates(self):
+        response = self.client.get(reverse('api-v3-template-simple'), {'entity_id': self.test_producer.id})
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('api-v3-template-advanced'), {'entity_id': self.test_producer.id})
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('api-v3-template-blend'), {'entity_id': self.test_operator.id})
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('api-v3-template-trader'), {'entity_id': self.entity3.id})
+        self.assertEqual(response.status_code, 200)
+
 
     def test_real_behaviour(self):
-        # download template without setting up parameters
-        # download template after setup
-        # upload simple template
-        # upload advanced template
-        # upload 10k lines
-        # validate-all
-        # upload 10k lines
-        # delete-all
-        # upload 100k lines
-        # validate-all
+        # download simple template
+        response = self.client.get(reverse('api-v3-template-simple'), {'entity_id': self.test_producer.id})
+        self.assertEqual(response.status_code, 200)
+        filecontent = response.content
 
-        pass
+        # upload simple template
+        f = SimpleUploadedFile("template.xslx", filecontent)
+        response = self.client.post(reverse('api-v3-upload'), {'entity_id': self.test_producer.id, 'file': f})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(LotV2.objects.all().count(), 10)
+        self.assertEqual(LotTransaction.objects.all().count(), 10)
+
+        # download advanced template
+        response = self.client.get(reverse('api-v3-template-advanced'), {'entity_id': self.test_producer.id})
+        self.assertEqual(response.status_code, 200)
+        filecontent = response.content        
+        # upload advanced template
+        f = SimpleUploadedFile("templateadvanced.xslx", filecontent)
+        response = self.client.post(reverse('api-v3-upload'), {'entity_id': self.test_producer.id, 'file': f})
+        self.assertEqual(LotV2.objects.all().count(), 20)
+        self.assertEqual(LotTransaction.objects.all().count(), 20)
 
 
     def test_client_case_sensitiveness(self):

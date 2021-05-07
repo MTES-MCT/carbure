@@ -12,6 +12,7 @@ import { padding } from "transactions/components/list-columns"
 import useSortingSelection, {
   SortingSelection,
 } from "transactions/hooks/query/use-sort-by"
+import { Trans, useTranslation } from "react-i18next"
 
 function sortEntities(entities: Entity[], sorter: SortingSelection) {
   const column = (sorter.column || "name") as "name" | "entity_type"
@@ -28,15 +29,9 @@ function sortEntities(entities: Entity[], sorter: SortingSelection) {
   })
 }
 
-const COLUMNS: Column<Entity>[] = [
-  padding,
-  { header: "Société", sortBy: "name", render: (e) => e.name },
-  { header: "Activité", sortBy: "entity_type", render: (e) => e.entity_type },
-  padding,
-]
-
 const Registry = () => {
   const sorter = useSortingSelection()
+  const { t } = useTranslation()
   const [query, setQuery] = useState("")
   const [entities, getEntities] = useAPI(findEntities)
 
@@ -48,32 +43,49 @@ const Registry = () => {
     sortEntities(entities.data, sorter)
   }
 
+  const columns: Column<Entity>[] = [
+    padding,
+    {
+      header: t("Société"),
+      sortBy: "name",
+      render: (e) => e.name,
+    },
+    {
+      header: t("Activité"),
+      sortBy: "entity_type",
+      render: (e) => e.entity_type,
+    },
+    padding,
+  ]
+
   const isEmpty = !Boolean(entities.data?.length)
   const rows = (entities.data ?? []).map((e) => ({ value: e }))
 
   return (
     <Fragment>
       <SettingsHeader>
-        <Title>Annuaire des sociétés enregistrées sur CarbuRe</Title>
+        <Title>
+          <Trans>Annuaire des sociétés enregistrées sur CarbuRe</Trans>
+        </Title>
       </SettingsHeader>
 
       <SettingsBody>
         <LabelInput
-          label="Rechercher une société"
+          label={t("Rechercher une société")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
 
         {isEmpty && (
           <Alert icon={AlertCircle} level="warning">
-            Aucune société trouvée pour cette recherche
+            <Trans>Aucune société trouvée pour cette recherche</Trans>
           </Alert>
         )}
 
         {!isEmpty && (
           <Table
             rows={rows}
-            columns={COLUMNS}
+            columns={columns}
             sortBy={sorter.column}
             order={sorter.order}
             onSort={sorter.sortBy}

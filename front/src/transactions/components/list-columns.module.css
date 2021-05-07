@@ -1,6 +1,11 @@
 .checkboxColumn {
-  flex: 0.2;
+  flex: unset;
   justify-content: center;
+  padding: 0;
+}
+
+.emptyColumn {
+  width: 54px;
 }
 
 .paddingColumn {
@@ -16,7 +21,15 @@
   flex: 0.5;
 }
 
+.checkboxHeaderWrapper {
+  padding: 8px 16px;
+  align-items: center;
+  justify-content: center;
+}
+
 .checkboxWrapper {
+  height: 100%;
+  padding: 0 16px;
   align-items: center;
   justify-content: center;
 }

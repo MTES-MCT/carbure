@@ -1,7 +1,7 @@
 import datetime
 import calendar
 from dateutil.relativedelta import *
-from django.db.models import Q, F, Case, When, Count
+from django.db.models import Q, F, Case, When, Count, Sum
 from django.db.models.functions import TruncMonth
 from django.db.models.functions import Extract
 from django.db.models.fields import NOT_PROVIDED
@@ -50,7 +50,7 @@ def get_entity_lots_by_status(entity, status):
             'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country'
         )
 
-        txs = txs.filter(Q(lot__added_by=entity) | Q(carbure_vendor=entity))
+        txs = txs.filter(carbure_vendor=entity)
 
         # filter by status
         if status == 'draft':
@@ -71,13 +71,13 @@ def get_entity_lots_by_status(entity, status):
             'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country'
         )
 
-        txs = txs.filter(carbure_client=entity)
+        txs = txs.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
 
         # filter by status
         if status == 'draft':
-            txs = txs.filter(lot__added_by=entity, lot__status='Draft')
+            txs = txs.filter(lot__status='Draft')
         elif status == 'in':
-            txs = txs.filter(delivery_status__in=['N', 'AC', 'AA'], lot__status="Validated")
+            txs = txs.filter(delivery_status__in=['N', 'AC', 'AA'], lot__status="Validated", is_mac=False)
         elif status == 'accepted':
             txs = txs.filter(lot__status='Validated', delivery_status='A')
         else:
@@ -87,6 +87,25 @@ def get_entity_lots_by_status(entity, status):
         raise Exception('Unknown entity type')
 
     return txs
+
+
+def get_lots_with_errors(txs):
+    tx_with_errors = txs.annotate(Count('transactionerror'), Count('lot__lotv2error'), Count('lot__lotvalidationerror'))
+    tx_with_errors = tx_with_errors.filter(Q(transactionerror__count__gt=0) | Q(lot__lotv2error__count__gt=0) | Q(lot__lotvalidationerror__count__gt=0))
+
+    return tx_with_errors, tx_with_errors.count()
+
+
+def get_lots_with_deadline(txs):
+    now = datetime.datetime.now()
+    (_, last_day) = calendar.monthrange(now.year, now.month)
+    deadline_date = now.replace(day=last_day)
+    affected_date = deadline_date - relativedelta(months=1)
+    txs_with_deadline = txs.filter(lot__status='Draft', delivery_date__year=affected_date.year, delivery_date__month=affected_date.month)
+    deadline_str = deadline_date.strftime("%Y-%m-%d")
+
+    return txs_with_deadline, deadline_str, txs_with_deadline.count()
+
 
 def filter_by_entities(txs, entities):
     return txs.filter(
@@ -100,6 +119,7 @@ def filter_by_entities(txs, entities):
 
 def filter_lots(txs, querySet):
     is_forwarded = querySet.get('is_forwarded', None)
+    is_mac = querySet.get('is_mac', None)
     year = querySet.get('year', False)
     periods = querySet.getlist('periods')
     production_sites = querySet.getlist('production_sites')
@@ -117,18 +137,15 @@ def filter_lots(txs, querySet):
     errors = querySet.getlist('errors')
     query = querySet.get('query', False)
 
-    date_from = datetime.date.today().replace(month=1, day=1)
-    date_until = datetime.date.today().replace(month=12, day=31)
-
     if year:
         try:
             year = int(year)
             date_from = datetime.date(year=year, month=1, day=1)
             date_until = datetime.date(year=year, month=12, day=31)
+            txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
         except Exception:
             raise Exception('Incorrect format for year. Expected YYYY.')
 
-    txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
 
     if periods:
         txs = txs.filter(lot__period__in=periods)
@@ -165,6 +182,12 @@ def filter_lots(txs, querySet):
         else:
             txs = txs.filter(is_forwarded=False)
 
+    if is_mac is not None:
+        if is_mac == 'true':
+            txs = txs.filter(is_mac=True)
+        else:
+            txs = txs.filter(is_mac=False)
+
     if errors:
         txs = txs.filter(Q(transactionerror__error__in=errors) | Q(lot__lotv2error__error__in=errors) | Q(lot__lotvalidationerror__message__in=errors))
 
@@ -184,25 +207,18 @@ def filter_lots(txs, querySet):
             Q(dae__icontains=query)
         )
 
-    return txs
+    invalid = querySet.get('invalid', False)
+    deadline = querySet.get('deadline', False)
 
+    tx_with_errors, total_errors = get_lots_with_errors(txs)
+    tx_with_deadline, deadline_str, total_deadline = get_lots_with_deadline(txs)
 
-def get_lots_with_errors(txs):
-    tx_with_errors = txs.annotate(Count('transactionerror'), Count('lot__lotv2error'), Count('lot__lotvalidationerror'))
-    tx_with_errors = tx_with_errors.filter(Q(transactionerror__count__gt=0) | Q(lot__lotv2error__count__gt=0) | Q(lot__lotvalidationerror__count__gt=0))
+    if invalid == 'true':
+        txs = tx_with_errors
+    elif deadline == 'true':
+        txs = tx_with_deadline
 
-    return tx_with_errors, tx_with_errors.count()
-
-
-def get_lots_with_deadline(txs):
-    now = datetime.datetime.now()
-    (_, last_day) = calendar.monthrange(now.year, now.month)
-    deadline_date = now.replace(day=last_day)
-    affected_date = deadline_date - relativedelta(months=1)
-    txs_with_deadline = txs.filter(lot__status='Draft', delivery_date__year=affected_date.year, delivery_date__month=affected_date.month)
-    deadline_str = deadline_date.strftime("%Y-%m-%d")
-
-    return txs_with_deadline, deadline_str, txs_with_deadline.count()
+    return txs, total_errors, total_deadline, deadline_str
 
 
 def sort_lots(txs, sort_by, order):
@@ -237,20 +253,9 @@ def get_lots_with_metadata(txs, entity, querySet):
     limit = querySet.get('limit', None)
     from_idx = querySet.get('from_idx', "0")
 
-    invalid = querySet.get('invalid', False)
-    deadline = querySet.get('deadline', False)
+    txs, total_errors, total_deadline, deadline_str = filter_lots(txs, querySet)
+    txs = sort_lots(txs, sort_by, order)
 
-    txs = filter_lots(txs, querySet)
-    tx_with_errors, total_errors = get_lots_with_errors(txs)
-    tx_with_deadline, deadline_str, total_deadline = get_lots_with_deadline(txs)
-
-    if invalid == 'true':
-        txs = tx_with_errors
-    elif deadline == 'true':
-        txs = tx_with_deadline
-
-    txs = sort_lots(txs, sort_by, order) 
-   
     from_idx = int(from_idx)
     returned = txs[from_idx:]
 
@@ -265,9 +270,12 @@ def get_lots_with_metadata(txs, entity, querySet):
         if len(grouped_errors) > 0:
             errors[tx.id] = grouped_errors
 
+    total_volume = txs.aggregate(Sum('lot__volume'))
+
     data = {}
     data['lots'] = [t.natural_key() for t in returned]
     data['total'] = txs.count()
+    data['total_volume'] = total_volume['lot__volume__sum']
     data['total_errors'] = total_errors
     data['returned'] = returned.count()
     data['from'] = from_idx
@@ -296,7 +304,7 @@ def get_snapshot_filters(txs):
     countries = [{'value': c.code_pays, 'label': c.name}
                  for c in Pays.objects.filter(id__in=txs.values('lot__pays_origine').distinct())]
 
-    periods = [p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']]
+    periods = sorted([p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']])
 
 
     ps1 = [p['lot__carbure_production_site__name'] for p in txs.values('lot__carbure_production_site__name').distinct()]
@@ -312,12 +320,22 @@ def get_snapshot_filters(txs):
 
     return filters
 
+def filter_entity_transactions(entity, querySet): 
+    status = querySet.get('status', False)
+
+    if not status:
+        raise Exception("Status is not specified")
+
+    txs = get_entity_lots_by_status(entity, status)
+    return filter_lots(txs, querySet)
 
 def get_summary(txs, entity):
+    tx_ids = []
     txs_in = txs.filter(carbure_client=entity)
     data_in = {}
     for t in txs_in:
         vendor = ''
+        tx_ids.append(t.id)
         if t.lot.added_by == entity:
             vendor = t.lot.unknown_supplier if t.lot.unknown_supplier else t.lot.unknown_supplier_certificate
         else:
@@ -336,6 +354,7 @@ def get_summary(txs, entity):
     txs_out = txs.filter(carbure_vendor=entity).exclude(carbure_client=entity)
     data_out = {}
     for t in txs_out:
+        tx_ids.append(t.id)
         client_name = t.carbure_client.name if t.client_is_in_carbure and t.carbure_client else t.unknown_client
         if client_name not in data_out:
             data_out[client_name] = {}
@@ -348,4 +367,4 @@ def get_summary(txs, entity):
         line['volume'] += t.lot.volume
         line['lots'] += 1
 
-    return { 'in': data_in, 'out': data_out}
+    return {'in': data_in, 'out': data_out, 'tx_ids': tx_ids}

@@ -122,7 +122,7 @@ def restrict_to_administrators(function):
 
 
 # check that request.POST contains an entity_id and request.user is allowed to make changes
-def check_rights(entity_id_field):
+def check_rights(entity_id_field, role=None):
     def actual_decorator(function):
         @wraps(function)
         def wrap(request, *args, **kwargs):
@@ -136,11 +136,21 @@ def check_rights(entity_id_field):
             try:
                 entity = Entity.objects.get(id=entity_id)
             except Exception:
-                return JsonResponse({'status': 'error', 'message': "Unknown Entity %s" % (entity_id)}, status=400)
+                return JsonResponse({'status': 'error', 'message': "Unknown Entity id %s" % (entity_id)}, status=400)
 
-            rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-            if entity not in rights:
-                return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit entity"}, status=403)
+            try:
+                rights = UserRights.objects.get(user=request.user, entity=entity)
+                if role is not None:
+                    if isinstance(role, list):
+                        if rights.role not in role:
+                            return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+                    elif role != rights.role:
+                        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+                    else:
+                        # all types of roles allowed
+                        pass
+            except:
+                return JsonResponse({'status': 'forbidden', 'message': "User does not belong to entity"}, status=403)
             context = {}
             context['entity'] = entity
             kwargs['context'] = context

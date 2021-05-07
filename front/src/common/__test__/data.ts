@@ -244,3 +244,30 @@ export const lot = {
   is_batch: false,
   id: 0,
 }
+
+export const entityRight = {
+  name: "User",
+  email: "user@company.com",
+  entity: producer,
+  role: "RO",
+  expiration_date: null,
+}
+
+export const entityRequest = {
+  id: 1,
+  user: ["user@company.com"],
+  entity: producer,
+  date_requested: "2020-12-22T16:18:27.233Z",
+  status: "ACCEPTED",
+  comment: "",
+  role: "RO",
+  expiration_date: null,
+}
+
+export const entityRights = {
+  status: "success",
+  data: {
+    rights: [entityRight],
+    requests: [entityRequest],
+  },
+}

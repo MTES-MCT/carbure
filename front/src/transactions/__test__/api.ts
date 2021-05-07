@@ -55,6 +55,13 @@ export const okLots = rest.get("/api/v3/lots", (req, res, ctx) => {
   return res(ctx.json({ status: "success", data: lots }))
 })
 
+export const okLotsSummary = rest.get(
+  "/api/v3/lots/summary",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success", data: data.lotsSummary }))
+  }
+)
+
 export const okDuplicateLot = rest.post(
   "/api/v3/lots/duplicate",
   (req, res, ctx) => {
@@ -166,7 +173,7 @@ export const okLotDetails = rest.get(
 
 export const okLotUpdate = rest.post("/api/v3/lots/update", (req, res, ctx) => {
   setDetails(data.lotDetails)
-  details.transaction.dae = "DAETESTUPDATE OK"
+  details.transaction.dae = "DAETESTUPDATE Confirmer"
   return res(ctx.json({ status: "success" }))
 })
 
@@ -178,13 +185,6 @@ export const okAdminSnapshot = rest.get(
   "/api/v3/admin/lots/snapshot",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: adminSnapshot }))
-  }
-)
-
-export const okDraftSummary = rest.get(
-  "/api/v3/lots/draft-summary",
-  (req, res, ctx) => {
-    return res(ctx.json({ status: "success", data: { in: [], out: [] } }))
   }
 )
 
@@ -209,5 +209,5 @@ export default setupServer(
   okLotUpdate,
   okAdminLots,
   okAdminSnapshot,
-  okDraftSummary
+  okLotsSummary
 )

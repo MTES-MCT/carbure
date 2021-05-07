@@ -1,14 +1,9 @@
 import { useEffect } from "react"
-import { Lots } from "common/types"
+import { Lots, TransactionQuery } from "common/types"
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
 import { getStocks, getStockSnapshot } from "../api"
 import { EntitySelection } from "carbure/hooks/use-entity"
-import { PageSelection } from "common/components/pagination"
-import { FilterSelection } from "transactions/hooks/query/use-filters"
-import { SearchSelection } from "transactions/hooks/query/use-search"
-import { SortingSelection } from "transactions/hooks/query/use-sort-by"
-import { StatusSelection } from "transactions/hooks/query/use-status"
 
 export interface StockHook {
   loading: boolean
@@ -33,56 +28,23 @@ export function useGetStockSnapshot(entity: EntitySelection) {
 }
 
 // fetches current transaction list when parameters change
-export function useGetStocks(
-  entity: EntitySelection,
-  filters: FilterSelection,
-  status: StatusSelection,
-  pagination: PageSelection,
-  search: SearchSelection,
-  sorting: SortingSelection
-): StockHook {
+export function useGetStocks(query: TransactionQuery): StockHook {
   const [stock, resolveStocks] = useAPI(getStocks)
-  const entityID = entity?.id
 
   function exportAllTransactions() {
-    if (entity === null) return
-
-    api.downloadStocks(
-      status.active,
-      entity.id,
-      filters.selected,
-      search.query,
-      sorting.column,
-      sorting.order
-    )
-  }
-
-  function getStock() {
-    if (typeof entityID !== "undefined") {
-      resolveStocks(
-        entityID,
-        filters.selected,
-        status.active,
-        pagination.page,
-        pagination.limit,
-        search.query,
-        sorting.column,
-        sorting.order
-      )
+    if (query.entity_id >= 0) {
+      api.downloadStocks(query)
     }
   }
 
-  useEffect(getStock, [
-    resolveStocks,
-    entityID,
-    filters.selected,
-    status.active,
-    pagination.page,
-    pagination.limit,
-    search.query,
-    sorting.column,
-    sorting.order,
-  ])
+  function getStock() {
+    if (query.entity_id >= 0) {
+      delete query.year
+      resolveStocks(query)
+    }
+  }
+
+  useEffect(getStock, [resolveStocks, query])
 
   return { ...stock, getStock, exportAllTransactions }
 }

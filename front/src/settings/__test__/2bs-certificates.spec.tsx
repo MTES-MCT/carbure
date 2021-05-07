@@ -19,7 +19,7 @@ const SettingsWithHooks = ({ entity }: { entity: Entity }) => {
   return <Settings entity={entity} settings={settings} />
 }
 
-beforeAll(() => server.listen())
+beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
 afterEach(() => {
   server.resetHandlers()
@@ -84,7 +84,7 @@ test("delete a 2bs certificate in settings", async () => {
   // click on the delete button and then confirm the action on the popup
   userEvent.click(deleteButton)
   screen.getByText("Suppression certificat")
-  userEvent.click(screen.getByText("OK"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   await waitWhileLoading()
 

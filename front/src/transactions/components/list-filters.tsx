@@ -1,10 +1,6 @@
-import React from "react"
-
 import { Filters, Snapshot } from "common/types"
 import { FilterSelection } from "transactions/hooks/query/use-filters"
-import { SearchSelection } from "transactions/hooks/query/use-search"
 
-import { SearchInput } from "common/components/input"
 import Select, { Option, SelectValue } from "common/components/select"
 
 import styles from "./list-filters.module.css"
@@ -22,6 +18,7 @@ const FILTER_ORDER = [
   Filters.AddedBy,
   Filters.Errors,
   Filters.Forwarded,
+  Filters.Mac,
 ]
 
 const FILTER_LABELS = {
@@ -37,6 +34,7 @@ const FILTER_LABELS = {
   [Filters.AddedBy]: "Ajouté par",
   [Filters.Errors]: "Incohérences",
   [Filters.Forwarded]: "Lots Transférés",
+  [Filters.Mac]: "Mises à consommation",
 }
 
 export function mapFilters(
@@ -64,13 +62,11 @@ export function mapFilters(
 
 type TransactionFiltersProps = {
   selection: FilterSelection
-  search: SearchSelection
   filters: Snapshot["filters"] | undefined
   placeholder: Filters[]
 }
 
 const TransactionFilters = ({
-  search,
   selection,
   filters,
   placeholder,
@@ -92,14 +88,6 @@ const TransactionFilters = ({
         )
       )}
     </div>
-
-    <SearchInput
-      className={styles.searchInput}
-      placeholder="Rechercher..."
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-        search.setQuery(e.target.value)
-      }
-    />
   </div>
 )
 

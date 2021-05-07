@@ -1,5 +1,3 @@
-import React from "react"
-
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { EntityType, Filters, LotStatus } from "common/types"
 
@@ -28,9 +26,8 @@ import TransactionFilters from "./components/list-filters"
 
 import TransactionAdd from "./routes/transaction-add"
 import TransactionDetails from "./routes/transaction-details"
-import TransactionInSummary from "./routes/transaction-in-summary"
-import TransactionOutSummary from "./routes/transaction-out-summary"
 import useForwardLots from "./hooks/actions/use-forward-lots"
+import useTransactionQuery from "./hooks/query/use-transaction-query"
 
 // prettier-ignore
 const OPERATOR_STATUSES = [
@@ -73,6 +70,7 @@ const PRODUCER_TRADER_FILTERS = [
 ]
 
 const ADMIN_FILTERS = [
+  Filters.Mac,
   Filters.DeliveryStatus,
   Filters.Periods,
   Filters.Biocarburants,
@@ -83,6 +81,7 @@ const ADMIN_FILTERS = [
   Filters.ProductionSites,
   Filters.DeliverySites,
   Filters.AddedBy,
+  Filters.Forwarded,
   Filters.Errors,
 ]
 
@@ -96,8 +95,22 @@ export function useTransactions(entity: EntitySelection) {
   const status = useStatusSelection(pagination, special)
   const year = useYearSelection(pagination, filters, special)
 
+  const query = useTransactionQuery(
+    status.active,
+    entity?.id ?? -1,
+    filters.selected,
+    year.selected,
+    pagination.page,
+    pagination.limit,
+    search.query,
+    sorting.column,
+    sorting.order,
+    special.invalid,
+    special.deadline
+  )
+
   const snapshot = useGetSnapshot(entity, year)
-  const transactions = useGetLots(entity, status, filters, year, pagination, search, sorting, special) // prettier-ignore
+  const transactions = useGetLots(entity, query)
 
   function refresh() {
     snapshot.getSnapshot()
@@ -108,10 +121,10 @@ export function useTransactions(entity: EntitySelection) {
 
   const uploader = useUploadLotFile(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
-  const deleter = useDeleteLots(entity, selection, filters, year, search, special, refresh)
-  const validator = useValidateLots(entity, selection, filters, year, search, special, refresh)
-  const acceptor = useAcceptLots(entity, selection, filters, year, search, special, refresh)
-  const rejector = useRejectLots(entity, selection, filters, year, search, special, refresh)
+  const deleter = useDeleteLots(entity, selection, query, refresh)
+  const validator = useValidateLots(entity, selection, query, refresh)
+  const acceptor = useAcceptLots(entity, selection, query, refresh)
+  const rejector = useRejectLots(entity, selection, query, refresh)
   const declarator = useDeclareLots(entity)
   const forwarder = useForwardLots(entity, selection, refresh)
 
@@ -135,6 +148,7 @@ export function useTransactions(entity: EntitySelection) {
     rejector,
     declarator,
     forwarder,
+    query,
     refresh,
   }
 }
@@ -150,6 +164,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
     transactions,
     selection,
     search,
+    query,
     sorting,
     deleter,
     duplicator,
@@ -209,7 +224,6 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
       />
 
       <TransactionFilters
-        search={search}
         selection={filters}
         filters={snapshot.data?.filters}
         placeholder={filtersPlaceholder}
@@ -223,6 +237,8 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         sorting={sorting}
         selection={selection}
         pagination={pagination}
+        search={search}
+        query={query}
         special={special}
         uploader={uploader}
         deleter={deleter}
@@ -239,63 +255,6 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
           <TransactionAdd entity={entity} refresh={refresh} />
         </Route>
 
-        <Route relative path="show-summary-in">
-          <TransactionInSummary
-            entity={entity}
-            lot_status={LotStatus.Validated}
-            period={null}
-            delivery_status={["A"]}
-          />
-        </Route>
-
-        <Route relative path="show-summary-in-pending">
-          <TransactionInSummary
-            entity={entity}
-            lot_status={LotStatus.Validated}
-            period={null}
-            delivery_status={["AC", "AA", "N"]}
-          />
-        </Route>
-
-        <Route relative path="show-summary-in-drafts">
-          <TransactionInSummary
-            entity={entity}
-            lot_status={LotStatus.Draft}
-            period={null}
-            delivery_status={["N"]}
-          />
-        </Route>
-
-        <Route relative path="show-summary-out">
-          <TransactionOutSummary
-            entity={entity}
-            lot_status={LotStatus.Validated}
-            period={null}
-            delivery_status={["A"]}
-            stock={false}
-          />
-        </Route>
-
-        <Route relative path="show-summary-out-pending">
-          <TransactionOutSummary
-            entity={entity}
-            lot_status={LotStatus.Validated}
-            period={null}
-            delivery_status={["AC", "AA", "N"]}
-            stock={false}
-          />
-        </Route>
-
-        <Route relative path="show-summary-out-drafts">
-          <TransactionOutSummary
-            entity={entity}
-            lot_status={LotStatus.Draft}
-            period={null}
-            delivery_status={["N"]}
-            stock={false}
-          />
-        </Route>
-
         <Route relative path=":id">
           <TransactionDetails
             entity={entity}
@@ -305,7 +264,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
             acceptor={acceptor}
             rejector={rejector}
             transactions={transactions}
-        />
+          />
         </Route>
       </Switch>
     </Main>

@@ -7,13 +7,18 @@ from django_otp.decorators import otp_required
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
 from core.models import Entity, UserRights, LotV2, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput, ProducerCertificate
 from core.decorators import check_rights, otp_or_403
-from core.models import ISCCCertificate, DBSCertificate, REDCertCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate, EntityREDCertTradingCertificate
-from core.models import ProductionSiteCertificate, UserRightsRequests
+
+from certificates.models import ISCCCertificate, DBSCertificate, REDCertCertificate
+from certificates.models import EntityISCCTradingCertificate, EntityDBSTradingCertificate, EntityREDCertTradingCertificate
+from certificates.models import ProductionSiteCertificate
 from certificates.models import SNCategory, EntitySNTradingCertificate, SNCertificate
+
+from core.models import UserRightsRequests, UserRights
 from api.v3.lots.views import get_entity_lots_by_status
 from core.common import get_prefetched_data
 from api.v3.sanity_checks import bulk_sanity_checks
@@ -22,10 +27,12 @@ from api.v3.sanity_checks import bulk_sanity_checks
 def get_settings(request):
     # user-rights
     rights = UserRights.objects.filter(user=request.user)
-    rights_sez = [{'entity': r.entity.natural_key(), 'rights': 'rw'} for r in rights]
+    # rights_sez = [{'entity': r.entity.natural_key(), 'rights': 'rw'} for r in rights]
+    rights_sez = [r.natural_key() for r in rights]
     # requests
     requests = UserRightsRequests.objects.filter(user=request.user)
-    requests_sez = [{'entity': r.entity.natural_key(), 'date': r.date_requested, 'status': r.status} for r in requests]
+    requests_sez = [r.natural_key() for r in requests]
+    # requests_sez = [{'entity': r.entity.natural_key(), 'date': r.date_requested, 'status': r.status} for r in requests]
     return JsonResponse({'status': 'success', 'data': {'rights': rights_sez, 'email': request.user.email, 'requests': requests_sez}})
 
 
@@ -760,16 +767,20 @@ def update_sn_certificate(request, *args, **kwargs):
 def request_entity_access(request):
     entity_id = request.POST.get('entity_id', False)
     comment = request.POST.get('comment', '')
+    role = request.POST.get('role', False)
 
     if not entity_id:
         return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
+
+    if not role:
+        return JsonResponse({'status': 'error', 'message': "Please specify a role"}, status=400)
 
     try:
         entity = Entity.objects.get(id=entity_id)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find entity"}, status=400)
 
-    UserRightsRequests.objects.update_or_create(user=request.user, entity=entity, defaults={'comment': comment})
+    UserRightsRequests.objects.update_or_create(user=request.user, entity=entity, defaults={'comment': comment, 'role': role, 'status':'PENDING'})
 
     email_subject = "Carbure - Demande d'accès"
     message = """ 
@@ -788,4 +799,120 @@ def request_entity_access(request):
         recipient_list=["carbure@beta.gouv.fr"],
         fail_silently=False,
     )
+    return JsonResponse({'status': 'success'})
+
+
+@otp_or_403
+@check_rights('entity_id')
+def get_entity_rights(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+
+    rights = UserRights.objects.filter(entity=entity)
+    requests = UserRightsRequests.objects.filter(entity=entity, status__in=['PENDING', 'ACCEPTED'])
+
+    data = {}
+    data['rights'] = [r.natural_key() for r in rights]
+    data['requests'] = [r.natural_key() for r in requests]
+    return JsonResponse({'status': 'success', 'data': data})
+
+
+@otp_or_403
+@check_rights('entity_id', UserRights.ADMIN)
+def invite_user(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+
+    email = request.POST.get('email', None)
+    role = request.POST.get('role', None)
+    expiration_date = request.POST.get('expiration_date', None)
+
+    if email is None:
+        return JsonResponse({'status': 'error', 'message': 'Missing user email'}, status=400)
+
+    if role not in [UserRights.RO, UserRights.RW, UserRights.ADMIN, UserRights.AUDITOR]:
+        return JsonResponse({'status': 'error', 'message': 'Unknown right'}, status=400)
+
+    if role == UserRights.AUDITOR and not expiration_date:
+        return JsonResponse({'status': 'error', 'message': 'Please specify an expiration date for Auditor Role'}, status=400)
+
+    user_model = get_user_model()
+    try:
+        user = user_model.objects.get(email=email)
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Unknown user'}, status=400)
+
+    try:
+        UserRightsRequests.objects.update_or_create(user=user, entity=entity, defaults={'role': role, 'expiration_date': expiration_date})
+        UserRights.objects.update_or_create(user=user, entity=entity, defaults={'role': role, 'expiration_date': expiration_date})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': 'Could not create rights', 'error': str(e)}, status=400)
+
+    return JsonResponse({'status': 'success'})
+
+
+@otp_or_403
+@check_rights('entity_id', UserRights.ADMIN)
+def revoke_user(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    email = request.POST.get('email', None)
+    user_model = get_user_model()
+
+    try:
+        user = user_model.objects.get(email=email)
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Could not find user'}, status=400)
+
+    try:
+        rr = UserRightsRequests.objects.get(user=user, entity=entity)
+        rr.status = 'REVOKED'
+        UserRights.objects.filter(user=user, entity=entity).delete()
+        rr.save()
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
+    return JsonResponse({'status': 'success'})
+
+
+
+@otp_or_403
+@check_rights('entity_id', UserRights.ADMIN)
+def accept_user(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+
+    request_id = request.POST.get('request_id', None)
+
+    if request_id is None:
+        return JsonResponse({'status': 'error', 'message': 'Missing request_id'}, status=400)
+
+    try:
+        right_request = UserRightsRequests.objects.get(id=request_id, entity=entity)
+        right_request.status = 'ACCEPTED'
+        UserRights.objects.update_or_create(user=right_request.user, entity=entity, defaults={'role': right_request.role, 'expiration_date': right_request.expiration_date})
+        right_request.save()
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': 'Could not create rights', 'error': str(e)}, status=400)
+    return JsonResponse({'status': 'success'})
+
+
+@otp_or_403
+# @check_rights('entity_id')
+def revoke_myself(request, *args, **kwargs):
+    entity_id = request.POST.get('entity_id', False)
+
+    if not entity_id:
+        return JsonResponse({'status': 'error', 'message': 'Missing entity ID'})
+
+    try:
+        right = UserRights.objects.get(user=request.user, entity_id=entity_id)
+        right.delete()
+    except:
+        pass
+    
+    try:
+        rr = UserRightsRequests.objects.get(user=request.user, entity_id=entity_id)
+        rr.delete()
+    except Exception as e:
+        pass
     return JsonResponse({'status': 'success'})

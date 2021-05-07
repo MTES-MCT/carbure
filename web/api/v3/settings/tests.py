@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 
 from core.models import Entity, UserRights, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
-from core.models import ISCCCertificate, DBSCertificate
+from certificates.models import ISCCCertificate, DBSCertificate
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 from api.v3.admin.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
@@ -16,6 +16,7 @@ class SettingsAPITest(TestCase):
         self.user_email = 'testuser1@toto.com'
         self.user_password = 'totopouet'
         self.user1 = user_model.objects.create_user(email=self.user_email, name='Le Super Testeur 1', password=self.user_password)
+        self.user2 = user_model.objects.create_user(email="testuser2@toto.com", name='Le Super Testeur 2', password=self.user_password)
 
         # a few entities
         self.entity1, _ = Entity.objects.update_or_create(name='Le Super Producteur 1', entity_type='Producteur')
@@ -392,7 +393,7 @@ class SettingsAPITest(TestCase):
         prev_len = len(data['requests'])
 
         e, _ = Entity.objects.update_or_create(name='Entity test', entity_type='Producteur')
-        postdata = {'entity_id': e.id, 'comment': ''}
+        postdata = {'entity_id': e.id, 'comment': '', 'role': 'RO'}
         response = self.client.post(reverse('api-v3-settings-request-entity-access'), postdata)
         self.assertEqual(response.status_code, 200)
 
@@ -402,3 +403,49 @@ class SettingsAPITest(TestCase):
         new_len = len(data['requests'])
         self.assertEqual(prev_len + 1, new_len)
 
+
+    def test_invites(self):
+        # try invite/revoke as non-admin
+        right = UserRights.objects.get(entity=self.entity1, user=self.user1)
+        right.role = UserRights.RO
+        right.save()
+
+        url = 'api-v3-settings-invite-user'
+        response = self.client.post(reverse(url), {'entity_id': self.entity1.id, 'email': self.user2.email, 'role': UserRights.RO})
+        self.assertEqual(response.status_code, 403)        
+        url = 'api-v3-settings-revoke-user'
+        response = self.client.post(reverse(url), {'entity_id': self.entity1.id, 'email': self.user2.email})
+        self.assertEqual(response.status_code, 403)
+
+        UserRights.objects.filter(entity=self.entity1, user=self.user1).update(role=UserRights.ADMIN)
+        #invite_nonexisting_user
+        url = 'api-v3-settings-invite-user'
+        response = self.client.post(reverse(url), {'entity_id': self.entity1.id, 'email': "totopouet@gmail.com", 'role': UserRights.RO})
+        self.assertEqual(response.status_code, 400)          
+        #test_invite_ro
+        url = 'api-v3-settings-invite-user'
+        response = self.client.post(reverse(url), {'entity_id': self.entity1.id, 'email': self.user2.email, 'role': UserRights.RO})
+        self.assertEqual(response.status_code, 200)
+        right = UserRights.objects.get(entity=self.entity1, user=self.user2)
+        self.assertEqual(right.role, UserRights.RO)
+        #test_invite_rw
+        response = self.client.post(reverse(url), {'entity_id': self.entity1.id, 'email': self.user2.email, 'role': UserRights.RW})
+        self.assertEqual(response.status_code, 200)
+        right = UserRights.objects.get(entity=self.entity1, user=self.user2)
+        self.assertEqual(right.role, UserRights.RW)
+        #test_invite_admin
+        response = self.client.post(reverse(url), {'entity_id': self.entity1.id, 'email': self.user2.email, 'role': UserRights.ADMIN})
+        self.assertEqual(response.status_code, 200)
+        right = UserRights.objects.get(entity=self.entity1, user=self.user2)
+        self.assertEqual(right.role, UserRights.ADMIN)
+        #test_invite_auditor (without expiration date)
+        response = self.client.post(reverse(url), {'entity_id': self.entity1.id, 'email': self.user2.email, 'role': UserRights.AUDITOR})
+        self.assertEqual(response.status_code, 400)
+        #test_invite_auditor (with expiration date)
+        response = self.client.post(reverse(url), {'entity_id': self.entity1.id, 'email': self.user2.email, 'role': UserRights.AUDITOR, 'expiration_date': '2021-12-01'}) 
+        self.assertEqual(response.status_code, 200)
+        right = UserRights.objects.get(entity=self.entity1, user=self.user2)
+        self.assertEqual(right.role, UserRights.AUDITOR)        
+        #test_invite_unknown_role
+        response = self.client.post(reverse(url), {'entity_id': self.entity1.id, 'email': self.user2.email, 'role': "tougoudou"})
+        self.assertEqual(response.status_code, 400)
