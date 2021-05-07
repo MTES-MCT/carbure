@@ -102,30 +102,6 @@
   border-top-color: var(--red-dark);
 }
 
-/* SEARCH INPUT COMPONENT */
-
-.searchInputWrapper {
-  display: flex;
-  position: relative;
-}
-
-.searchInputWrapper:hover svg {
-  stroke: var(--blue-medium);
-}
-
-.searchInput {
-  border-radius: 45px;
-  padding-left: 40px;
-  padding-right: 16px;
-}
-
-.searchInputWrapper svg {
-  position: absolute;
-  left: 12px;
-  align-self: center;
-  pointer-events: none;
-}
-
 /* LABEL CHECKBOX COMPONENT */
 
 .labelCheckbox {
@@ -150,10 +126,11 @@
 
 .checkbox {
   display: flex;
+  flex-shrink: 0;
   justify-content: center;
   align-items: center;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border: 1px solid var(--gray-medium);
   background-color: var(--white);
   border-radius: 4px;

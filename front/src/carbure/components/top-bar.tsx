@@ -1,4 +1,5 @@
 import React from "react"
+import { Trans, useTranslation } from "react-i18next"
 import { useLocation } from "react-router-dom"
 
 import { ApiState } from "common/hooks/use-api"
@@ -12,6 +13,8 @@ import { Question } from "common/components/icons"
 import logoMarianne from "../assets/images/Marianne.svg"
 import logoBetaGouv from "../assets/images/carbure.svg"
 import styles from "./top-bar.module.css"
+import Select from "common/components/select"
+import { Box } from "common/components"
 
 const Logo = () => (
   <Link to="/" className={styles.logo}>
@@ -50,13 +53,15 @@ type UserMenuProps = {
 }
 
 const UserMenu = ({ settings, entity }: UserMenuProps) => {
+  const { t } = useTranslation()
   const location = useLocation()
+
   const hasRights = settings.data && settings.data.rights.length > 0
 
   return (
     <Menu className={styles.userMenu} label={entity?.name ?? "Menu"}>
       {hasRights && (
-        <Menu.Group label="Organisations">
+        <Menu.Group label={t("Organisations")}>
           {settings.data?.rights.map((right) => (
             <Menu.ItemLink
               key={right.entity.id}
@@ -68,13 +73,35 @@ const UserMenu = ({ settings, entity }: UserMenuProps) => {
         </Menu.Group>
       )}
 
-      <Menu.Group label={settings.data?.email ?? "Utilisateur"}>
+      <Menu.Group label={settings.data?.email ?? t("Utilisateur")}>
         <Menu.ItemLink relative to="account">
-          Mon compte
+          <Trans>Mon compte</Trans>
         </Menu.ItemLink>
-        <Menu.ItemLink to="/logout">Se déconnecter</Menu.ItemLink>
+        <Menu.ItemLink to="/logout">
+          <Trans>Se déconnecter</Trans>
+        </Menu.ItemLink>
       </Menu.Group>
     </Menu>
+  )
+}
+
+const langOptions = [
+  { value: "fr", label: "FR" },
+  { value: "en", label: "EN" },
+]
+
+const LanguageSelection = () => {
+  const { i18n } = useTranslation()
+
+  return (
+    <Select
+      level="inline"
+      value={i18n.language}
+      options={langOptions}
+      className={styles.languageSelection}
+      style={{ marginLeft: "auto", height: "100%" }}
+      onChange={(lang) => i18n.changeLanguage(lang as string)}
+    />
   )
 }
 
@@ -91,45 +118,68 @@ type TopbarProps = {
   settings: ApiState<Settings>
 }
 
-const Topbar = ({ entity, settings }: TopbarProps) => (
-  <header className={styles.topBar}>
-    <Logo />
+const Topbar = ({ entity, settings }: TopbarProps) => {
+  const { t } = useTranslation()
 
-    {entity && (
-      <nav className={styles.pageNav}>
-        {isAdmin(entity) && <PageLink to="dashboard">Accueil</PageLink>}
+  return (
+    <header className={styles.topBar}>
+      <Logo />
 
-        {canTrade(entity) && <PageLink to="stocks">Stocks</PageLink>}
+      {entity && (
+        <nav className={styles.pageNav}>
+          {isAdmin(entity) && (
+            <PageLink to="dashboard">
+              <Trans>Accueil</Trans>
+            </PageLink>
+          )}
 
-        <PageLink to="transactions">Transactions</PageLink>
+          {canTrade(entity) && (
+            <PageLink to="stocks">
+              <Trans>Stocks</Trans>
+            </PageLink>
+          )}
 
-        {isAdmin(entity) && (
-          <React.Fragment>
-            <PageLink to="entities">Sociétés</PageLink>
-            <PageLink to="controls">Contrôles</PageLink>
-          </React.Fragment>
-        )}
+          <PageLink to="transactions">
+            <Trans>Transactions</Trans>
+          </PageLink>
 
-        {!isAdmin(entity) && (
-          <React.Fragment>
-            <PageLink to="settings">Société</PageLink>
-            <PageLink to="registry">Annuaire</PageLink>
-          </React.Fragment>
-        )}
-      </nav>
-    )}
+          {isAdmin(entity) && (
+            <React.Fragment>
+              <PageLink to="entities">
+                <Trans>Sociétés</Trans>
+              </PageLink>
+            </React.Fragment>
+          )}
 
-    <UserMenu settings={settings} entity={entity} />
+          {!isAdmin(entity) && (
+            <React.Fragment>
+              <PageLink to="settings">
+                <Trans>Société</Trans>
+              </PageLink>
+              <PageLink to="registry">
+                <Trans>Annuaire</Trans>
+              </PageLink>
+            </React.Fragment>
+          )}
+        </nav>
+      )}
 
-    <a
-      href="https://carbure-1.gitbook.io/faq/"
-      target="_blank"
-      rel="noreferrer"
-      className={styles.faq}
-    >
-      <Question title="Guide d'utilisation" />
-    </a>
-  </header>
-)
+      <Box row className={styles.topRight}>
+        {/* <LanguageSelection /> */}
+
+        <UserMenu settings={settings} entity={entity} />
+
+        <a
+          href="https://carbure-1.gitbook.io/faq/"
+          target="_blank"
+          rel="noreferrer"
+          className={styles.faq}
+        >
+          <Question title={t("Guide d'utilisation")} />
+        </a>
+      </Box>
+    </header>
+  )
+}
 
 export default Topbar

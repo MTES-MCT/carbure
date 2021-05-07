@@ -7,7 +7,8 @@ import Carbure from "../index"
 
 import server from "./api"
 
-beforeAll(() => server.listen())
+beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
+
 afterEach(() => {
   server.resetHandlers()
 })

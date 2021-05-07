@@ -232,6 +232,7 @@ export interface Lots {
   returned: number
   total: number
   total_errors: number
+  total_volume: number
 
   lots: Transaction[]
 
@@ -271,6 +272,7 @@ export enum Filters {
   AddedBy = "added_by",
   Errors = "errors",
   Forwarded = "is_forwarded",
+  Mac = "is_mac",
 }
 
 export interface TransactionQuery {

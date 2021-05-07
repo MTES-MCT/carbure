@@ -35,7 +35,7 @@ const TransactionsWithRouter = ({
   </MemoryRouter>
 )
 
-beforeAll(() => server.listen())
+beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
 afterEach(() => {
   server.resetHandlers()
@@ -69,7 +69,7 @@ test("producer/trader: display an empty list of transactions", async () => {
   screen.getByText("Sites de production")
   screen.getByText("Sites de livraison")
 
-  screen.getByPlaceholderText("Rechercher...")
+  screen.getByPlaceholderText("Rechercher des lots...")
 
   screen.getByText("Aucune transaction trouvée pour cette recherche")
 })
@@ -154,9 +154,9 @@ test("check search filter", async () => {
 
   await screen.findByText("DAETEST")
 
-  userEvent.type(screen.getByPlaceholderText("Rechercher..."), "test")
+  userEvent.type(screen.getByPlaceholderText("Rechercher des lots..."), "test")
 
-  await screen.findByTitle("Chargement...")
+  await waitWhileLoading()
 })
 
 test("check year filter", async () => {

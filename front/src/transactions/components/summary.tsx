@@ -2,7 +2,7 @@ import { Fragment, useEffect } from "react"
 import Table, { Column, Line } from "common/components/table"
 import { SummaryItem, TransactionQuery } from "common/types"
 import { padding } from "./list-columns"
-import { Check } from "common/components/icons"
+import { AlertCircle, Check, Return } from "common/components/icons"
 
 import { Box, LoaderOverlay, Title } from "common/components"
 import styles from "./summary.module.css"
@@ -19,6 +19,7 @@ import { Button } from "common/components/button"
 import { prettyVolume } from "transactions/helpers"
 import { getStocksSummary } from "stocks/api"
 import { getLotsSummary } from "transactions/api"
+import { Alert } from "common/components/alert"
 
 const COLUMNS: Column<SummaryItem>[] = [
   {
@@ -84,6 +85,12 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
 
   return (
     <Fragment>
+      {isInEmpty && isOutEmpty && (
+        <Alert level="warning" icon={AlertCircle}>
+          Aucune transaction trouvée pour cette période
+        </Alert>
+      )}
+
       {!isInEmpty && (
         <Box className={styles.transactionSummary}>
           <Title className={styles.transactionSummarySection}>
@@ -134,6 +141,7 @@ export function useSummary(
 type SummaryPromptProps = PromptProps<number[]> & {
   title: string
   description: string
+  readOnly?: boolean
   stock?: boolean
   entityID?: number
   selection?: number[]
@@ -146,6 +154,7 @@ export const SummaryPrompt = ({
   description,
   query,
   selection,
+  readOnly,
   onResolve,
 }: SummaryPromptProps) => {
   const summary = useSummary(query, selection, stock)
@@ -160,14 +169,18 @@ export const SummaryPrompt = ({
       )}
 
       <DialogButtons>
-        <Button
-          level="primary"
-          icon={Check}
-          onClick={() => onResolve(summary.data?.tx_ids)}
-        >
-          Confirmer
+        {!readOnly && (
+          <Button
+            level="primary"
+            icon={Check}
+            onClick={() => onResolve(summary.data?.tx_ids)}
+          >
+            Confirmer
+          </Button>
+        )}
+        <Button icon={Return} onClick={() => onResolve()}>
+          {readOnly ? "Retour" : "Annuler"}
         </Button>
-        <Button onClick={() => onResolve()}>Annuler</Button>
       </DialogButtons>
 
       {summary.loading && <LoaderOverlay />}

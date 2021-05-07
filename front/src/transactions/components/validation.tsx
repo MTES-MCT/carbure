@@ -8,7 +8,7 @@ import {
   PromptProps,
 } from "common/components/dialog"
 
-import { Check } from "common/components/icons"
+import { Check, Return } from "common/components/icons"
 import { Box, LoaderOverlay, SystemProps } from "common/components"
 import { Button } from "common/components/button"
 
@@ -62,7 +62,9 @@ export const ValidationPrompt = ({
         >
           Confirmer
         </Button>
-        <Button onClick={() => onResolve()}>Annuler</Button>
+        <Button icon={Return} onClick={() => onResolve()}>
+          Annuler
+        </Button>
       </DialogButtons>
     </Dialog>
   )

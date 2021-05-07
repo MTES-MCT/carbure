@@ -27,7 +27,7 @@ const TransactionsWithRouter = ({
   </MemoryRouter>
 )
 
-beforeAll(() => server.listen())
+beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
 afterEach(() => {
   server.resetHandlers()
@@ -57,7 +57,7 @@ test("operator: display an empty list of transactions", async () => {
   screen.getByText("Sites de production")
   screen.getByText("Sites de livraison")
 
-  screen.getByPlaceholderText("Rechercher...")
+  screen.getByPlaceholderText("Rechercher des lots...")
 
   screen.getByText("Aucune transaction trouvée pour cette recherche")
 })

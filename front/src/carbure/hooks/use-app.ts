@@ -1,24 +1,24 @@
-import { Entity } from "common/types"
+import { UserRight } from "common/types"
 import { useGetSettings, SettingsGetter } from "settings/hooks/use-get-settings"
 
 export type AppHook = {
   settings: SettingsGetter
   hasEntity: (e: number) => boolean
   hasEntities: () => boolean
-  getEntity: (id: number) => Entity | null
+  getRights: (id: number) => UserRight | null
   getDefaultEntity: () => string
 }
 
 export function useApp(): AppHook {
   const settings = useGetSettings()
 
-  function getEntity(entity: number) {
+  function getRights(entity: number) {
     const rights = settings.data?.rights
-    return rights?.find((r) => r.entity.id === entity)?.entity ?? null
+    return rights?.find((r) => r.entity.id === entity) ?? null
   }
 
   function hasEntity(entity: number) {
-    return Boolean(getEntity(entity))
+    return Boolean(getRights(entity))
   }
 
   function hasEntities() {
@@ -33,5 +33,5 @@ export function useApp(): AppHook {
     }
   }
 
-  return { settings, hasEntity, hasEntities, getEntity, getDefaultEntity }
+  return { settings, hasEntity, hasEntities, getRights, getDefaultEntity }
 }

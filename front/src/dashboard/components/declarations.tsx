@@ -63,31 +63,6 @@ function renderMonthSummary(
         period: month.replace("/", "-"),
       })
 
-    // prettier-ignore
-    const summary = [
-      drafts === 0
-        ? null
-        : drafts === 1
-        ? "1 brouillon"
-        : `${drafts} brouillons`,
-      output === 0 
-        ? null 
-        : output === 1 
-        ? "1 envoyé" 
-        : `${output} envoyés`,
-      input === 0 
-        ? null 
-        : input === 1 
-        ? "1 reçu" 
-        : `${input} reçus`,
-      corrections === 0
-        ? null
-        : corrections === 1
-        ? "1 correction"
-        : `${corrections} corrections`,
-    ]
-      .filter(Boolean)
-
     return (
       <Box
         row

@@ -1,27 +1,27 @@
-import React from "react"
+import { Trans, useTranslation } from "react-i18next"
 
 import { AppHook, useApp } from "./hooks/use-app"
 import { EntityType, LotStatus } from "common/types"
 import useEntity from "./hooks/use-entity"
+import { UserRightProvider } from "./hooks/use-rights"
 
 import { Alert } from "common/components/alert"
 import { AlertTriangle } from "common/components/icons"
-
 import { Redirect, Route, Switch } from "common/components/relative-route"
+
 import Topbar from "./components/top-bar"
 import Footer from "./components/footer"
 import Pending from "./components/pending"
 import Exit from "./components/exit"
+import Registry from "./components/registry"
 
 import Transactions from "transactions"
 import Stocks from "stocks"
 import Settings from "settings"
 import Account from "account"
-import Controls from "controls"
+import Entities from "../entities" // not using relative path prevents import
+import EntityDetails from "../entities/routes/entity-details"
 import Dashboard from "dashboard"
-import Entities from "../entities"
-import EntityDetails from "entities/routes/entity-details"
-import Registry from "./components/registry"
 
 const DevBanner = () => (
   <div
@@ -30,9 +30,11 @@ const DevBanner = () => (
       padding: "8px 120px",
     }}
   >
-    <b>Version de développement de CarbuRe :</b> les manipulations effectuées
-    ici n'ont pas de répercussion et les déclarations ne sont pas prises en
-    compte.
+    <Trans>
+      <b>Version de développement de CarbuRe :</b> les manipulations effectuées
+      ici n'ont pas de répercussion et les déclarations ne sont pas prises en
+      compte.
+    </Trans>
   </div>
 )
 
@@ -54,7 +56,7 @@ const Org = ({ app }: { app: AppHook }) => {
   const isProd = window.location.hostname === "carbure.beta.gouv.fr"
 
   return (
-    <React.Fragment>
+    <UserRightProvider app={app}>
       {!isProd && <DevBanner />}
 
       <Topbar entity={entity} settings={app.settings} />
@@ -116,21 +118,19 @@ const Org = ({ app }: { app: AppHook }) => {
           </Route>
         )}
 
-        <Route relative path="controls">
-          <Controls />
-        </Route>
-
         <Redirect relative to={isAdmin ? "dashboard" : "transactions"} />
       </Switch>
 
       <Footer />
-    </React.Fragment>
+    </UserRightProvider>
   )
 }
 
 const Carbure = () => {
   const app = useApp()
   const { settings, getDefaultEntity } = app
+
+  useTranslation() // simple call so we rerender the whole app when the selected language changes
 
   if (settings.error === "User not verified") {
     return <Exit to="/accounts/login" />

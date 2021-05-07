@@ -1,7 +1,7 @@
 import datetime
 import calendar
 from dateutil.relativedelta import *
-from django.db.models import Q, F, Case, When, Count
+from django.db.models import Q, F, Case, When, Count, Sum
 from django.db.models.functions import TruncMonth
 from django.db.models.functions import Extract
 from django.db.models.fields import NOT_PROVIDED
@@ -254,8 +254,8 @@ def get_lots_with_metadata(txs, entity, querySet):
     from_idx = querySet.get('from_idx', "0")
 
     txs, total_errors, total_deadline, deadline_str = filter_lots(txs, querySet)
-    txs = sort_lots(txs, sort_by, order) 
-   
+    txs = sort_lots(txs, sort_by, order)
+
     from_idx = int(from_idx)
     returned = txs[from_idx:]
 
@@ -270,9 +270,12 @@ def get_lots_with_metadata(txs, entity, querySet):
         if len(grouped_errors) > 0:
             errors[tx.id] = grouped_errors
 
+    total_volume = txs.aggregate(Sum('lot__volume'))
+
     data = {}
     data['lots'] = [t.natural_key() for t in returned]
     data['total'] = txs.count()
+    data['total_volume'] = total_volume['lot__volume__sum']
     data['total_errors'] = total_errors
     data['returned'] = returned.count()
     data['from'] = from_idx
