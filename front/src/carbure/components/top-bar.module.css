@@ -52,8 +52,11 @@
   background-color: var(--blue-medium);
 }
 
-.languageSelection {
+.topRight {
   margin-left: auto;
+}
+
+.languageSelection {
   height: 100%;
   font-size: 1.1em;
   border: none !important;
