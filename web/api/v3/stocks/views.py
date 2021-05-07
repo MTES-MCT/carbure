@@ -207,9 +207,6 @@ def create_drafts(request, *args, **kwargs):
 
     for i, draft in enumerate(drafts):
         lot_dict = {}
-        if not 'tx_id' in draft:
-            return JsonResponse({'status': 'error', 'message': "Missing tx_id in draft %d" % (i)}, status=400)
-        lot_dict['tx_id'] = draft['tx_id']
         if not 'volume' in draft:
             return JsonResponse({'status': 'error', 'message': "Missing volume in draft %d" % (i)}, status=400)
         lot_dict['volume'] = draft['volume']
@@ -229,6 +226,12 @@ def create_drafts(request, *args, **kwargs):
             lot_dict['mac'] = draft['mac']
         if 'delivery_site_country' in draft:
             lot_dict['delivery_site_country'] = draft['delivery_site_country']
+
+
+        # matching engine keys
+        for key in ['tx_id', 'biocarburant_code', 'matiere_premiere_code', 'depot', 'pays_origine_code', 'ghg_total']:
+            if key in draft:
+                lot_dict[key] = draft[key]
         # create sub-transaction
         lot, tx, lot_errors, tx_errors = load_mb_lot(d, context['entity'], request.user, lot_dict, 'MANUAL')
         if tx is None or not tx:
@@ -490,10 +493,12 @@ def forward(request, *args, **kwargs):
     except:
         return JsonResponse({'status': 'error', 'message': "Unknown recipient"}, status=400)
 
+    nbforwarded = 0
     for tx_id in tx_ids:
         # for each tx, make sure we are the client, status accepted, and it has not been already forwarded
         try:
             tx = LotTransaction.objects.get(delivery_status__in=['A', 'N'], id=tx_id, carbure_client=entity, is_forwarded=False)
+            parent_tx_id = tx.id
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': "Transaction already forwarded", 'extra': str(e)}, status=400)
 
@@ -505,7 +510,7 @@ def forward(request, *args, **kwargs):
 
         new_tx = tx
         new_tx.pk = None
-        new_tx.parent_tx_id = tx.id
+        new_tx.parent_tx = LotTransaction.objects.get(id=parent_tx_id)
         new_tx.is_forwarded = False        
         new_tx.carbure_vendor = entity
         new_tx.carbure_vendor_certificate = certificate_id
@@ -514,5 +519,6 @@ def forward(request, *args, **kwargs):
         new_tx.unknown_client = ''
         new_tx.delivery_status = 'N'
         new_tx.save()
+        nbforwarded += 1
 
-    return JsonResponse({'status': 'success'})    
+    return JsonResponse({'status': 'success', 'data': {'forwarded': nbforwarded}})

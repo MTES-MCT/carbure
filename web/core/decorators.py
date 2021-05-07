@@ -150,7 +150,7 @@ def check_rights(entity_id_field, role=None):
                         # all types of roles allowed
                         pass
             except:
-                return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit entity"}, status=403)
+                return JsonResponse({'status': 'forbidden', 'message': "User does not belong to entity"}, status=403)
             context = {}
             context['entity'] = entity
             kwargs['context'] = context
