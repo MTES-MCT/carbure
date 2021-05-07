@@ -260,6 +260,7 @@ def get_snapshot(request):
 
         filters['delivery_status'] = [{'value':s[0], 'label': s[1]} for s in LotTransaction.DELIVERY_STATUS]
         filters['is_forwarded'] = [{'value':True, 'label': 'Oui'}, {'value':False, 'label': 'Non'}]
+        filters['is_mac'] = [{'value':True, 'label': 'Oui'}, {'value':False, 'label': 'Non'}]
         data['filters'] = filters
 
     except Exception as e:
@@ -295,15 +296,15 @@ def update_right_request(request):
         return JsonResponse({'status': 'error', 'message': "Please provide a status"}, status=400)
 
     try:
-        request = UserRightsRequests.objects.get(id=urr_id)
+        right_request = UserRightsRequests.objects.get(id=urr_id)
     except:
         return JsonResponse({'status': 'error', 'message': "Could not find request"}, status=400)
 
-    request.status = status
-    request.save()
+    right_request.status = status
+    right_request.save()
 
     if status == 'ACCEPTED':
-        UserRights.objects.update_or_create(entity=request.entity, user=request.user)
+        UserRights.objects.update_or_create(entity=right_request.entity, user=right_request.user, defaults={'role': right_request.role, 'expiration_date': right_request.expiration_date})
         # send_mail
         email_subject = "Carbure - Demande acceptée"
         message = """ 

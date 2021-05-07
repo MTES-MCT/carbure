@@ -6,6 +6,10 @@ import { Alert, AlertFilter } from "common/components/alert"
 import { Alarm, AlertCircle, Filter, Loader } from "common/components/icons"
 
 import styles from "common/components/alert.module.css"
+import { prettyVolume } from "transactions/helpers"
+import { TransactionQuery } from "common/types"
+import { prompt } from "common/components/dialog"
+import { SummaryPrompt } from "./summary"
 
 type InvalidFilterProps = {
   loading: boolean
@@ -86,31 +90,62 @@ export const DeadlineFilter = ({
 type SummaryFilterProps = {
   loading: boolean
   txCount: number
+  totalVolume: number
+  query: TransactionQuery
+  hideRecap?: boolean
   onReset: () => void
 }
 
 export const SummaryFilter = ({
   loading,
   txCount,
+  totalVolume,
+  query,
+  hideRecap = false,
   onReset,
-}: SummaryFilterProps) => (
-  <Alert
-    level="info"
-    icon={loading ? Loader : Filter}
-    className={cl(styles.alertFilter, loading && styles.alertLoading)}
-  >
-    {txCount === 1 ? (
-      <span>
-        <b>Un seul lot</b> a été trouvé pour cette recherche
-      </span>
-    ) : (
-      <span>
-        Un total de <b>{txCount} lots</b> ont été trouvés pour cette recherche
-      </span>
-    )}
+}: SummaryFilterProps) => {
+  function showSummary() {
+    prompt((resolve) => (
+      <SummaryPrompt
+        readOnly
+        title="Récapitulatif de la recherche"
+        description="Voici un résumé des lots correspondant aux filtres sélectionnés"
+        query={query}
+        onResolve={resolve}
+      />
+    ))
+  }
 
-    <span className={cl(styles.alertLink, styles.alertClose)} onClick={onReset}>
-      Réinitialiser les filtres
-    </span>
-  </Alert>
-)
+  return (
+    <Alert
+      level="info"
+      icon={loading ? Loader : Filter}
+      className={cl(styles.alertFilter, loading && styles.alertLoading)}
+    >
+      {txCount === 1 ? (
+        <span>
+          <b>Un seul lot</b> a été trouvé, pour un total de{" "}
+          <b>{prettyVolume(totalVolume)} litres</b>
+        </span>
+      ) : (
+        <span>
+          <b>{txCount} lots</b> ont été trouvés, pour un total de{" "}
+          <b>{prettyVolume(totalVolume)} litres</b>
+        </span>
+      )}
+
+      {!hideRecap && (
+        <span className={styles.alertLink} onClick={showSummary}>
+          Voir le récapitulatif
+        </span>
+      )}
+
+      <span
+        className={cl(styles.alertLink, styles.alertClose)}
+        onClick={onReset}
+      >
+        Réinitialiser les filtres
+      </span>
+    </Alert>
+  )
+}

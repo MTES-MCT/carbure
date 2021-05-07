@@ -1,6 +1,6 @@
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { prompt } from "common/components/dialog"
-import { SummaryPrompt } from "../../components/declaration-summary"
+import { DeclarationSummaryPrompt } from "../../components/declaration-summary"
 
 export interface LotDeclarator {
   confirmDeclaration: () => Promise<any>
@@ -11,7 +11,7 @@ export default function useDeclareLots(entity: EntitySelection): LotDeclarator {
     if (!entity) return
 
     await prompt((resolve) => (
-      <SummaryPrompt entityID={entity.id} onResolve={resolve} />
+      <DeclarationSummaryPrompt entityID={entity.id} onResolve={resolve} />
     ))
   }
 

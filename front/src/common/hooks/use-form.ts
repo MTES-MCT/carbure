@@ -10,7 +10,7 @@ export type FormTarget<T = any> = {
   type?: string
   value?: T[keyof T] | string | number | boolean
   name?: keyof T | string
-  checked?: boolean
+  checked: boolean
 }
 
 export type FormChangeHandler<T> = (e: { target: FormTarget<T> }) => void
@@ -59,7 +59,7 @@ export default function useForm<T extends FormState>(
   const reset = useCallback(
     (form: T) => {
       hasChange.current = false
-      setState(transform(options?.onChange, form, data))
+      setState((data) => transform(options?.onChange, form, data))
     },
     [options?.onChange]
   )

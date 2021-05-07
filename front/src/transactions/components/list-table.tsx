@@ -124,7 +124,7 @@ export const TransactionTable = ({
   ) {
     columns.push(C.selector(selection))
   } else {
-    columns.push(C.empty)
+    columns.push(C.padding)
   }
 
   columns.push(C.status(entity))

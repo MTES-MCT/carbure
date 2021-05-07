@@ -1,6 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react"
-
-import { Certificate, Entity, ProductionCertificate } from "common/types"
+import { Entity } from "common/types"
 
 import useForm from "common/hooks/use-form"
 
@@ -27,14 +25,14 @@ const initialState: ForwardClientFormState = {
   certificate: null,
 }
 
-type ForwardLotsClientSelectionPrompt = PromptProps<ForwardClientFormState> & {
+type ForwardLotsClientSelectionPromptProps = PromptProps<ForwardClientFormState> & {
   entityID: number
 }
 
 export const ForwardLotsClientSelectionPrompt = ({
   entityID,
   onResolve,
-}: ForwardLotsClientSelectionPrompt) => {
+}: ForwardLotsClientSelectionPromptProps) => {
   const { data, onChange} = useForm<ForwardClientFormState>(initialState) // prettier-ignore
   const canSave = data?.carbure_client !== null && data?.certificate !== null
 

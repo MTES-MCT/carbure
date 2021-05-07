@@ -4,6 +4,8 @@ from django import db
 from django.db.models import Q, Count
 from multiprocessing import Process
 import numpy as np
+import traceback
+import os
 
 import pandas as pd
 from typing import TYPE_CHECKING, Dict, List, Optional
@@ -13,14 +15,25 @@ from django.db import transaction
 from django.http import JsonResponse
 from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
-from core.models import ISCCCertificate, EntityISCCTradingCertificate
-from core.models import DBSCertificate, EntityDBSTradingCertificate
-from core.models import REDCertCertificate, EntityREDCertTradingCertificate
+
+from certificates.models import ISCCCertificate, EntityISCCTradingCertificate
+from certificates.models import DBSCertificate, EntityDBSTradingCertificate
+from certificates.models import REDCertCertificate, EntityREDCertTradingCertificate
 from certificates.models import EntitySNTradingCertificate, SNCertificate
 
+from core.emails import send_reject_email
 
 import dateutil.parser
 from api.v3.sanity_checks import bulk_sanity_checks, tx_is_valid, lot_is_valid
+
+def get_uploaded_files_directory():
+    directory = '/app/files'
+    if not os.path.exists(directory):
+        try:
+            os.makedirs(directory)    
+        except:
+            return '/tmp'
+    return directory
 
 def calculate_ghg(lot):
     lot.ghg_total = lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee
@@ -87,6 +100,9 @@ def send_lot_from_stock(rights, tx, prefetched_data):
     lot.save()
     lot.parent_lot.remaining_volume -= lot.volume
     lot.parent_lot.save()
+    if tx.is_mac:
+        tx.delivery_status = 'A'
+        tx.save()
     return True, ''
 
 
@@ -253,22 +269,24 @@ def fill_producer_info(entity, lot_row, lot, prefetched_data):
     all_producers = prefetched_data['producers']
     if 'producer' in lot_row and lot_row['producer'] is not None:
         # check if we know the producer
-        if lot_row['producer'].strip() == entity.name:
+        stripped_producer = lot_row['producer'].strip()
+
+        if stripped_producer == entity.name:
             # it's me
             lot.producer_is_in_carbure = True
             lot.carbure_producer = entity
             lot.unknown_producer = ''
         else:
             # it's not me. do we know this producer ?
-            if lot_row['producer'] in all_producers:
+            if stripped_producer in all_producers:
                 lot.producer_is_in_carbure = True
-                lot.carbure_producer = all_producers[lot_row['producer']]
+                lot.carbure_producer = all_producers[stripped_producer]
                 lot.unknown_producer = ''
             else:
                 # ok, unknown producer. allow importation
                 lot.producer_is_in_carbure = False
                 lot.carbure_producer = None
-                lot.unknown_producer = lot_row['producer']
+                lot.unknown_producer = stripped_producer
     elif 'producer' in lot_row and lot_row['producer'] is None:
         # producer is not in carbure and we don't even have his name. fine.
         lot.producer_is_in_carbure = False
@@ -291,16 +309,21 @@ def fill_producer_info(entity, lot_row, lot, prefetched_data):
 def fill_production_site_info(entity, lot_row, lot, prefetched_data):
     lot_errors = []
 
+    # only the data_origin_entity is allowed to change this
+    if lot.data_origin_entity != entity:
+        return lot_errors
+
     my_production_sites = prefetched_data['production_sites']
     countries = prefetched_data['countries']
-    if 'production_site' in lot_row:
-        production_site = lot_row['production_site']
+    if 'production_site' in lot_row and lot_row['production_site'] is not None:
+        production_site = lot_row['production_site'].strip()
         if production_site in my_production_sites:
             lot.production_site_is_in_carbure = True
             lot.carbure_production_site = my_production_sites[production_site]
             lot.unknown_production_site = ''
         else:
             # do not allow the use of an unknown production site if the producer is registered in Carbure
+            print('producer is in carbure and production site is not in carbure. NOT ALLOWED')
             lot.production_site_is_in_carbure = False
             lot.carbure_production_site = None
             lot.unknown_production_site = production_site
@@ -630,7 +653,6 @@ def fill_vendor_data(entity, lot_row, transaction, prefetched_data):
         if len(prefetched_data['my_vendor_certificates']) > 0:
             transaction.carbure_vendor_certificate = prefetched_data['my_vendor_certificates'][0]
         else:
-            print('Could not find vendor certificate in account')
             transaction.carbure_vendor_certificate = ''
     return tx_errors
 
@@ -689,10 +711,13 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
 
     carbure_id = lot_dict.get('carbure_id', False)
     tx_id = lot_dict.get('tx_id', False)
-    biocarburant = lot_dict.get('biocarburant', False)
+    biocarburant = lot_dict.get('biocarburant_code', False)
     depot = lot_dict.get('depot', False)
-    matiere_premiere = lot_dict.get('matiere_premiere', False)
+    matiere_premiere = lot_dict.get('matiere_premiere_code', False)
+    pays_origine = lot_dict.get('pays_origine_code', False)
     ghg_reduction = lot_dict.get('ghg_reduction', False)
+
+
 
     if tx_id:
         try:
@@ -725,11 +750,14 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
             matching_txs = matching_txs.filter(lot__ghg_reduction=ghg_reduction)
         if depot:
             matching_txs = matching_txs.filter(Q(carbure_delivery_site__depot_id=depot) | Q(unknown_delivery_site=depot))
+        if pays_origine:
+            matching_txs = matching_txs.filter(lot__pays_origine__code_pays=pays_origine)
         if matching_txs.count() == 1:
             source_tx = matching_txs[0]
             source_lot = LotV2.objects.get(id=source_tx.lot.id)
         else:
-            return None, None, "Could not find mass balance line", None
+            nb_matches = matching_txs.count()
+            return None, None, "Could not find mass balance line. %d matches" % (nb_matches), None
 
     lot = source_tx.lot
 
@@ -754,14 +782,17 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
 
     transaction = LotTransaction()
     transaction.carbure_vendor = entity
-    transaction.is_mac = lot_dict['mac']
+    transaction.parent_tx = source_tx
+    transaction.is_mac = False
+    if 'mac' in lot_dict:
+        if lot_dict['mac'] == 1 or lot_dict['mac'] == 'true':
+            transaction.is_mac = True
 
     tx_errors += fill_dae_data(lot_dict, transaction)
     tx_errors += fill_delivery_date(lot_dict, lot, transaction)
     tx_errors += fill_client_data(entity, lot_dict, transaction, prefetched_data)
     tx_errors += fill_vendor_data(entity, lot_dict, transaction, prefetched_data)
     tx_errors += fill_delivery_site_data(lot_dict, transaction, prefetched_data)
-
 
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
@@ -857,6 +888,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
                 tx_errors.append(t_errors)
             except Exception as e:
                 print(e)
+                traceback.print_exc()
                 #print(lot_row)
         print('File processed %s' % (datetime.datetime.now()))
         bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors, prefetched_data)
@@ -953,6 +985,23 @@ def validate_lots(user, entity, txs):
                     tx.delivery_status = 'AA'
                 else:
                     pass
+
+                # is this a Stock tx?
+                if tx.carbure_client and tx.carbure_client.entity_type in [Entity.PRODUCER, Entity.TRADER]:
+                    tx.is_stock = True
             tx.save()
             tx.lot.save()
     return {'submitted': submitted, 'valid': valid, 'invalid': invalid, 'errors': errors}
+
+
+
+def send_rejection_emails(rejected_txs):
+    # group by vendors
+    reject_by_vendors = {}
+    for tx in rejected_txs:
+        if tx.carbure_vendor not in reject_by_vendors:
+            reject_by_vendors[tx.carbure_vendor] = []
+        reject_by_vendors[tx.carbure_vendor].append(tx)
+
+    for vendor, txs in reject_by_vendors.items():
+        send_reject_email(vendor, txs)

@@ -65,6 +65,17 @@ server {
         alias /var/www/html_v2;
         try_files $uri $uri/ /v2/index.html;
     }
+
+    # serve uploaded files to administrators
+    location /files {
+        alias /app/files;
+        autoindex on;
+        autoindex_format html;
+        autoindex_localtime on;
+        auth_basic "Administrator Login";
+        auth_basic_user_file /etc/nginx/conf.d/.htaccess_uploaded_files;	
+    }
+
     # uwsgi
     location / {
         uwsgi_pass  django;

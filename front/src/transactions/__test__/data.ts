@@ -340,3 +340,25 @@ export const stockPartial = {
     },
   },
 }
+
+export const lotsSummary = {
+  in: {
+    [trader.name]: {
+      [lot.lot.biocarburant.name]: {
+        volume: lot.lot.volume,
+        avg_ghg_reduction: lot.lot.ghg_reduction,
+        lots: 1,
+      },
+    },
+  },
+  out: {
+    [operator.name]: {
+      [lot.lot.biocarburant.name]: {
+        volume: lot.lot.volume,
+        avg_ghg_reduction: lot.lot.ghg_reduction,
+        lots: 1,
+      },
+    },
+  },
+  tx_ids: [lot.id],
+}

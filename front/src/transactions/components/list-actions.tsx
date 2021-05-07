@@ -15,9 +15,9 @@ import {
   Cross,
   Download,
   Plus,
-  Rapport,
   Upload,
   Forward,
+  Search,
 } from "common/components/icons"
 import { prompt } from "common/components/dialog"
 
@@ -32,6 +32,8 @@ import styles from "./list-actions.module.css"
 import { LotForwarder } from "transactions/hooks/actions/use-forward-lots"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
+import { SearchSelection } from "transactions/hooks/query/use-search"
+import { Input, InputProps } from "common/components/input"
 
 type ExportActionsProps = {
   isEmpty: boolean
@@ -274,8 +276,29 @@ export const OperatorOutsourcedBlendingActions = ({
   )
 }
 
-export const ActionBar = ({ children }: { children: React.ReactNode }) => (
+// SEARCH INPUT COMPONENT
+
+export const SearchInput = ({ className, ...props }: InputProps) => (
+  <div className={cl(styles.searchInput, className)}>
+    <Input {...props} className={styles.searchInput} />
+    <Search size={24} />
+  </div>
+)
+
+export const ActionBar = ({
+  search,
+  children,
+}: {
+  search: SearchSelection
+  children: React.ReactNode
+}) => (
   <Box row className={cl(styles.actionBar)}>
     {children}
+    <SearchInput
+      placeholder="Rechercher des lots..."
+      value={search.query}
+      onChange={(e) => search.setQuery(e.target.value)}
+      style={{ marginLeft: "auto" }}
+    />
   </Box>
 )

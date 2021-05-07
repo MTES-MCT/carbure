@@ -10,31 +10,25 @@ from core.common import load_excel_file, send_lot_from_stock, generate_carbure_i
 from core.xlsx_v3 import template_stock, template_stock_bcghg
 from core.xlsx_v3 import export_stocks
 from django_otp.decorators import otp_required
+from api.v3.lots.helpers import get_summary, filter_lots
+
 
 sort_key_to_django_field = {'period': 'lot__period',
                             'biocarburant': 'lot__biocarburant__name',
                             'matiere_premiere': 'lot__matiere_premiere__name',
                             'ghg_reduction': 'lot__ghg_reduction',
                             'volume': 'lot__volume',
-                            'pays_origine': 'lot__pays_origine__name'}
+                            'pays_origine': 'lot__pays_origine__name',
+                            'client': 'carbure_client__name',
+                            'vendor': 'carbure_vendor__name',
+                            'depot': 'carbure_delivery_site',
+                            }
 
 @check_rights('entity_id')
 def get_stocks(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
-
     status = request.GET.get('status', False)
-    production_sites = request.GET.getlist('production_sites')
-    matieres_premieres = request.GET.getlist('matieres_premieres')
-    countries_of_origin = request.GET.getlist('countries_of_origin')
-    biocarburants = request.GET.getlist('biocarburants')
-    delivery_sites = request.GET.getlist('delivery_sites')
-    limit = request.GET.get('limit', None)
-    from_idx = request.GET.get('from_idx', "0")
-    query = request.GET.get('query', False)
-    sort_by = request.GET.get('sort_by', False)
-    order = request.GET.get('order', False)
-    export = request.GET.get('export', False)
 
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
@@ -45,36 +39,19 @@ def get_stocks(request, *args, **kwargs):
         elif status == "in":
             txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AC', 'AA'])
         elif status == "stock":
-            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0, is_forwarded=False)
+            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__remaining_volume__gt=0, is_forwarded=False, is_mac=False)
         else:
             return JsonResponse({'status': 'error', 'message': "Unknown status"}, status=400)
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
 
-    # apply filters
-    if production_sites:
-        txs = txs.filter(Q(lot__carbure_production_site__name__in=production_sites) |
-                         Q(lot__unknown_production_site__in=production_sites))
-    if matieres_premieres:
-        txs = txs.filter(lot__matiere_premiere__code__in=matieres_premieres)
-    if biocarburants:
-        txs = txs.filter(lot__biocarburant__code__in=biocarburants)
-    if countries_of_origin:
-        txs = txs.filter(lot__pays_origine__code_pays__in=countries_of_origin)
-    if delivery_sites:
-        txs = txs.filter(Q(carbure_delivery_site__name__in=delivery_sites)
-                         | Q(unknown_delivery_site__in=delivery_sites))
-
-    if query:
-        txs = txs.filter(Q(lot__matiere_premiere__name__icontains=query) |
-                         Q(lot__biocarburant__name__icontains=query) |
-                         Q(lot__carbure_producer__name__icontains=query) |
-                         Q(lot__unknown_producer__icontains=query) |
-                         Q(lot__carbure_id__icontains=query) |
-                         Q(lot__pays_origine__name__icontains=query) |
-                         Q(carbure_delivery_site__name__icontains=query) |
-                         Q(unknown_delivery_site__icontains=query)
-                         )
+    txs, total_errors, total_deadline, deadline_str = filter_lots(txs, request.GET)
+    
+    limit = request.GET.get('limit', None)
+    from_idx = request.GET.get('from_idx', "0")
+    sort_by = request.GET.get('sort_by', False)
+    order = request.GET.get('order', False)
+    export = request.GET.get('export', False)
 
     if sort_by:
         if sort_by in sort_key_to_django_field:
@@ -83,8 +60,6 @@ def get_stocks(request, *args, **kwargs):
                 txs = txs.order_by('-%s' % key)
             else:
                 txs = txs.order_by(key)
-        else:
-            return JsonResponse({'status': 'error', 'message': 'Unknown sort_by key'}, status=400)
 
     from_idx = int(from_idx)
     returned = txs[from_idx:]
@@ -111,6 +86,36 @@ def get_stocks(request, *args, **kwargs):
             response = HttpResponse(content=data, content_type=ctype)
             response['Content-Disposition'] = 'attachment; filename="%s"' % (file_location)
         return response
+
+
+@check_rights('entity_id')
+def get_stocks_summary(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+
+    status = request.GET.get('status', False)
+    selection = request.GET.getlist('selection')
+
+    if entity.entity_type in ['Producteur', 'Trader']:
+        if status == "tosend":
+            txs = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
+        elif status == "in":
+            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AC', 'AA'])
+        elif status == "stock":
+            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0, is_forwarded=False)
+        else:
+            return JsonResponse({'status': 'error', 'message': "Unknown status"}, status=400)
+    else:
+        return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
+
+    # try:
+    if len(selection) > 0:
+        txs = LotTransaction.objects.filter(pk__in=selection)
+    else:
+        txs, _, _, _ = filter_lots(txs, request.GET)
+    data = get_summary(txs, entity)
+    return JsonResponse({'status': 'success', 'data': data})
+
 
 @check_rights('entity_id')
 def get_snapshot(request, *args, **kwargs):
@@ -156,8 +161,15 @@ def get_snapshot(request, *args, **kwargs):
     ps2 = [p['lot__unknown_production_site'] for p in txs.values('lot__unknown_production_site').distinct()]
     psites = list(set([p for p in ps1 + ps2 if p]))
 
+    v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
+    v2 = [v['lot__unknown_supplier'] for v in txs.values('lot__unknown_supplier').distinct()]
+    vendors = [v for v in v1 + v2 if v]
+
+    periods = sorted([p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']])
+
     data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs,
-                       'production_sites': psites, 'countries_of_origin': countries, 'delivery_sites': delivery_sites}
+                       'production_sites': psites, 'countries_of_origin': countries, 'delivery_sites': delivery_sites, 
+                       'periods': periods, 'vendors': vendors}
 
     return JsonResponse({'status': 'success', 'data': data})
 
@@ -201,9 +213,6 @@ def create_drafts(request, *args, **kwargs):
 
     for i, draft in enumerate(drafts):
         lot_dict = {}
-        if not 'tx_id' in draft:
-            return JsonResponse({'status': 'error', 'message': "Missing tx_id in draft %d" % (i)}, status=400)
-        lot_dict['tx_id'] = draft['tx_id']
         if not 'volume' in draft:
             return JsonResponse({'status': 'error', 'message': "Missing volume in draft %d" % (i)}, status=400)
         lot_dict['volume'] = draft['volume']
@@ -223,6 +232,12 @@ def create_drafts(request, *args, **kwargs):
             lot_dict['mac'] = draft['mac']
         if 'delivery_site_country' in draft:
             lot_dict['delivery_site_country'] = draft['delivery_site_country']
+
+
+        # matching engine keys
+        for key in ['tx_id', 'biocarburant_code', 'matiere_premiere_code', 'depot', 'pays_origine_code', 'ghg_total']:
+            if key in draft:
+                lot_dict[key] = draft[key]
         # create sub-transaction
         lot, tx, lot_errors, tx_errors = load_mb_lot(d, context['entity'], request.user, lot_dict, 'MANUAL')
         if tx is None or not tx:
@@ -232,7 +247,7 @@ def create_drafts(request, *args, **kwargs):
         all_lot_errors.append(lot_errors)
         all_tx_errors.append(tx_errors)
     new_lots, new_txs = bulk_insert(context['entity'], lots, txs, all_lot_errors, all_tx_errors, d)
-    return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'success', 'data': {'tx_ids': [tx.id for tx in new_txs]}})
 
 
 @check_rights('entity_id')
@@ -347,6 +362,8 @@ def send_drafts(request, *args, **kwargs):
 
     prefetched_data = get_prefetched_data(entity)
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
+    valid_counter = 0
+    invalid_counter = 0
     send_errors = []
     for tx_id in tx_ids:
         try:
@@ -355,18 +372,25 @@ def send_drafts(request, *args, **kwargs):
             return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id), 'extra': str(e)},
                                 status=400)
         sent, errors = send_lot_from_stock(rights, tx, prefetched_data)
-        if not sent:
+        if sent:
+            valid_counter += 1
+        else:
+            invalid_counter += 1
             send_errors.append(errors)
-    return JsonResponse({'status': 'success', 'data': send_errors})
+    
+    status_code = 200 if valid_counter > 0 else 400
+    status = 'success' if valid_counter > 0 else 'error'
+    total = valid_counter + invalid_counter
+    data = { 'valid': valid_counter, 'invalid': invalid_counter, 'total': total, 'errors': send_errors }
+    return JsonResponse({'status': status, 'data': data}, status=status_code)
 
 
 def convert_eth_stock_to_etbe(request, entity, c):
     previous_stock_tx_id = c['previous_stock_tx_id']
     volume_ethanol = c['volume_ethanol']
     volume_etbe = c['volume_etbe']
-    volume_fossile = c['volume_fossile']
     volume_denaturant = c['volume_denaturant']
-    volume_pertes = c['volume_pertes']
+    volume_etbe_eligible = c['volume_etbe_eligible']
     etbe = Biocarburant.objects.get(code='ETBE')
 
     # retrieve stock line
@@ -391,24 +415,19 @@ def convert_eth_stock_to_etbe(request, entity, c):
 
     volume_ethanol = float(volume_ethanol)
     volume_etbe = float(volume_etbe)
+    volume_etbe_eligible = float(volume_etbe_eligible)
     volume_denaturant = float(volume_denaturant)
-    volume_fossile = float(volume_fossile)
-    volume_pertes = float(volume_pertes)
     
 
-    # ensure volume etbe = sum of other volume
-    # if abs(volume_etbe - (volume_ethanol + volume_fossile + volume_denaturant + volume_pertes)) > 2:
-    if volume_etbe != volume_ethanol + volume_fossile + volume_denaturant + volume_pertes:
-        raise Exception("Volumes ETBE != Volume Ethanol + Pertes")
-
     # check available volume
-    if previous_stock_tx.lot.volume < volume_ethanol:
+    if previous_stock_tx.lot.remaining_volume < volume_ethanol:
         raise Exception("Cannot convert more ETH than stock") 
 
-    previous_stock_tx.lot.volume -= volume_ethanol
+    previous_stock_tx.lot.remaining_volume -= volume_ethanol
     previous_stock_tx.lot.save()
 
     new_lot.volume = volume_etbe
+    new_lot.remaining_volume = volume_etbe
     new_lot.parent_lot = LotV2.objects.get(pk=previous_lot_id)
     new_lot.save()
 
@@ -427,9 +446,8 @@ def convert_eth_stock_to_etbe(request, entity, c):
     t.new_stock = transaction
     t.volume_ethanol = volume_ethanol
     t.volume_etbe = volume_etbe
+    t.volume_etbe_eligible = volume_etbe_eligible
     t.volume_denaturant = volume_denaturant
-    t.volume_fossile = volume_fossile
-    t.volume_pertes = volume_pertes
     t.added_by = entity
     t.added_by_user = request.user
     t.save()    
@@ -481,12 +499,14 @@ def forward(request, *args, **kwargs):
     except:
         return JsonResponse({'status': 'error', 'message': "Unknown recipient"}, status=400)
 
+    nbforwarded = 0
     for tx_id in tx_ids:
         # for each tx, make sure we are the client, status accepted, and it has not been already forwarded
         try:
             tx = LotTransaction.objects.get(delivery_status__in=['A', 'N'], id=tx_id, carbure_client=entity, is_forwarded=False)
+            parent_tx_id = tx.id
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': "TX not found", 'extra': str(e)}, status=400)
+            return JsonResponse({'status': 'error', 'message': "Transaction already forwarded", 'extra': str(e)}, status=400)
 
         # all good
         # make current tx as "is_forwarded" and create the next tx
@@ -496,13 +516,15 @@ def forward(request, *args, **kwargs):
 
         new_tx = tx
         new_tx.pk = None
+        new_tx.parent_tx = LotTransaction.objects.get(id=parent_tx_id)
+        new_tx.is_forwarded = False        
         new_tx.carbure_vendor = entity
         new_tx.carbure_vendor_certificate = certificate_id
         new_tx.client_is_in_carbure = True
         new_tx.carbure_client = client
         new_tx.unknown_client = ''
         new_tx.delivery_status = 'N'
-        new_tx.is_forwarded = False
         new_tx.save()
+        nbforwarded += 1
 
-    return JsonResponse({'status': 'success'})    
+    return JsonResponse({'status': 'success', 'data': {'forwarded': nbforwarded}})

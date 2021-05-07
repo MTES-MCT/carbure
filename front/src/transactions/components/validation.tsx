@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import {
   Dialog,
@@ -8,46 +8,33 @@ import {
   PromptProps,
 } from "common/components/dialog"
 
-import { Check } from "common/components/icons"
-import { Box, LoaderOverlay } from "common/components"
+import { Check, Return } from "common/components/icons"
+import { Box, LoaderOverlay, SystemProps } from "common/components"
 import { Button } from "common/components/button"
 
 import styles from "common/components/dialog.module.css"
 import { LabelCheckbox } from "common/components/input"
-import TransactionSummary from "./transaction-summary"
-import useAPI from "common/hooks/use-api"
-import * as api from "../api"
+import TransactionSummary, { useSummary } from "./summary"
+import { TransactionQuery } from "common/types"
 
-type ValidationPromptProps = PromptProps<boolean> & {
-  title: string
-  description: string
-  stock?: boolean
-  entityID?: number
-  selection?: number[]
-}
+type ValidationPromptProps = SystemProps &
+  PromptProps<boolean> & {
+    wide?: boolean
+    title: string
+    description: string
+  }
 
 export const ValidationPrompt = ({
+  wide = false,
   title,
   description,
-  stock,
-  entityID,
-  selection,
+  children,
   onResolve,
 }: ValidationPromptProps) => {
   const [checked, setChecked] = useState({ terres: false, infos: false })
-  const [draftSummary, getDraftSummary] = useAPI(api.getDraftSummary)
-
-  useEffect(() => {
-    if (typeof entityID !== "undefined") {
-      getDraftSummary(entityID, selection, stock)
-    }
-  }, [getDraftSummary, entityID, selection])
 
   return (
-    <Dialog
-      onResolve={onResolve}
-      className={draftSummary.data ? styles.dialogWide : undefined}
-    >
+    <Dialog wide={wide} onResolve={onResolve}>
       <DialogTitle text={title} />
       <DialogText text={description} />
 
@@ -64,12 +51,7 @@ export const ValidationPrompt = ({
         />
       </Box>
 
-      {draftSummary.data && (
-        <TransactionSummary
-          in={draftSummary.data.in}
-          out={draftSummary.data.out}
-        />
-      )}
+      {children}
 
       <DialogButtons>
         <Button
@@ -80,10 +62,53 @@ export const ValidationPrompt = ({
         >
           Confirmer
         </Button>
-        <Button onClick={() => onResolve()}>Annuler</Button>
+        <Button icon={Return} onClick={() => onResolve()}>
+          Annuler
+        </Button>
       </DialogButtons>
-
-      {draftSummary.loading && <LoaderOverlay />}
     </Dialog>
+  )
+}
+
+type ValidationSummaryPromptProps = SystemProps &
+  PromptProps<number[]> & {
+    wide?: boolean
+    stock?: boolean
+    title: string
+    description: string
+    query: TransactionQuery
+    selection?: number[]
+  }
+
+export const ValidationSummaryPrompt = ({
+  title,
+  description,
+  query,
+  selection,
+  onResolve,
+}: ValidationSummaryPromptProps) => {
+  const summary = useSummary(query, selection)
+
+  function resolve(isConfirmed?: boolean) {
+    if (isConfirmed && summary.data) {
+      onResolve(summary.data.tx_ids)
+    } else {
+      onResolve()
+    }
+  }
+
+  return (
+    <ValidationPrompt
+      wide
+      title={title}
+      description={description}
+      onResolve={resolve}
+    >
+      <TransactionSummary
+        in={summary.data?.in ?? null}
+        out={summary.data?.out ?? null}
+      />
+      {summary.loading && <LoaderOverlay />}
+    </ValidationPrompt>
   )
 }

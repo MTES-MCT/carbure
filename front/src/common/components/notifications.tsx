@@ -13,6 +13,7 @@ interface Notification {
   key: string
   level: "default" | "success" | "error" | "warning"
   text: string
+  list?: string[]
   timeout: NodeJS.Timeout | null
 }
 
@@ -22,6 +23,7 @@ interface NotificationsHook {
     text: string
     duration?: number
     level?: Notification["level"]
+    list?: string[]
   }) => Notification
   dispose: (k: string) => void
 }
@@ -30,7 +32,7 @@ function useNotifications(): NotificationsHook {
   const [notifications, setNotifications] = useState<Notification[]>([])
 
   const push: NotificationsHook["push"] = useCallback(
-    ({ text, duration = DEFAULT_TIMEOUT, level = "default" }) => {
+    ({ text, duration = DEFAULT_TIMEOUT, list, level = "default" }) => {
       const key = `${text}-${Date.now()}`
 
       // set auto close with timeout
@@ -38,7 +40,7 @@ function useNotifications(): NotificationsHook {
         setNotifications((list) => list.filter((n) => n.key !== key))
       }, duration)
 
-      const notification = { key, text, timeout, level }
+      const notification = { key, text, timeout, level, list }
       setNotifications((list) => [...list, notification])
 
       return notification
@@ -86,8 +88,16 @@ const Notifications = ({ notifications }: NotificationsProps) => {
           )}
         >
           {n.text}
+          {n.list && (
+            <ul className={styles.notificationList}>
+              {n.list.map((l) => (
+                <li key={l}>{l}</li>
+              ))}
+            </ul>
+          )}
           <Cross
             title="Fermer la notification"
+            size={32}
             onClick={() => notifications.dispose(n.key)}
           />
         </Box>

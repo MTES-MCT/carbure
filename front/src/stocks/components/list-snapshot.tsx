@@ -1,7 +1,7 @@
 import React from "react"
 
 import { ApiState } from "common/hooks/use-api"
-import { LotStatus, StockSnapshot } from "common/types"
+import { LotStatus, Snapshot } from "common/types"
 import { StatusSelection } from "transactions/hooks/query/use-status"
 
 import { Title } from "common/components"
@@ -15,7 +15,7 @@ import styles from "./list-snapshot.module.css"
 const STOCK_STATUSES = [LotStatus.Inbox, LotStatus.Stock, LotStatus.ToSend]
 
 type StockSnapshotProps = {
-  snapshot: ApiState<StockSnapshot>
+  snapshot: ApiState<Snapshot>
   status: StatusSelection
 }
 

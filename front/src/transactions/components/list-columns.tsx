@@ -9,11 +9,12 @@ import Status from "./status"
 
 import styles from "./list-columns.module.css"
 import { EntitySelection } from "carbure/hooks/use-entity"
-import { hasDeadline } from "transactions/helpers"
+import { hasDeadline, prettyVolume } from "transactions/helpers"
 import { Alarm } from "common/components/icons"
+import { Checkbox } from "common/components/input"
 
 export const empty: Column<any> = {
-  className: styles.checkboxColumn,
+  className: styles.emptyColumn,
   render: () => null,
 }
 
@@ -58,6 +59,8 @@ export const period: (d: string) => Column<Transaction> = (deadline) => ({
 
 export const periodSimple: Column<Transaction> = {
   header: "Période",
+  className: styles.dateColumn,
+  sortBy: "period",
   render: (tx) => <Line text={tx.lot.period} />,
 }
 
@@ -85,7 +88,13 @@ export const vendor: Column<Transaction> = {
   sortBy: "vendor",
   render: (tx) => (
     <TwoLines
-      text={tx.carbure_vendor?.name ?? (tx.lot.unknown_supplier != '' ? tx.lot.unknown_supplier : tx.lot.unknown_supplier_certificate) ?? "N/A"}
+      text={
+        tx.carbure_vendor?.name ??
+        (tx.lot.unknown_supplier !== ""
+          ? tx.lot.unknown_supplier
+          : tx.lot.unknown_supplier_certificate) ??
+        "N/A"
+      }
       sub={
         tx.lot.carbure_production_site_reference ??
         tx.lot.unknown_production_site_reference
@@ -106,7 +115,7 @@ export const biocarburant: Column<Transaction> = {
   render: (tx) => (
     <TwoLines
       text={tx.lot.biocarburant?.name}
-      sub={tx.lot.volume.toLocaleString("fr-FR")}
+      sub={prettyVolume(tx.lot.volume)}
     />
   ),
 }
@@ -117,7 +126,9 @@ export const biocarburantInStock: Column<Transaction> = {
   render: (tx) => (
     <TwoLines
       text={tx.lot.biocarburant?.name}
-      sub={`${tx.lot.remaining_volume.toLocaleString("fr-FR")} / ${tx.lot.volume.toLocaleString("fr-FR")}`}
+      sub={`${prettyVolume(tx.lot.remaining_volume)} / ${prettyVolume(
+        tx.lot.volume
+      )}`}
     />
   ),
 }
@@ -152,6 +163,7 @@ export const productionSite: Column<Transaction> = {
 
 export const origine: Column<Transaction> = {
   header: "Usine",
+  sortBy: "pays_origine",
   render: (tx) => (
     <TwoLines
       text={tx.lot.carbure_production_site?.name ?? tx.lot.unknown_production_site_reference} // prettier-ignore
@@ -162,6 +174,7 @@ export const origine: Column<Transaction> = {
 
 export const deliverySite: Column<Transaction> = {
   header: "Site de livraison",
+  sortBy: "depot",
   render: (tx) => {
     const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
     const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name ?? '' // prettier-ignore
@@ -174,6 +187,7 @@ export const deliverySite: Column<Transaction> = {
 
 export const depot: Column<Transaction> = {
   header: "Dépôt",
+  sortBy: "depot",
   render: (tx) => {
     const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
     const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name ?? '' // prettier-ignore
@@ -186,6 +200,7 @@ export const depot: Column<Transaction> = {
 
 export const destination: Column<Transaction> = {
   header: "Destination",
+  sortBy: "depot",
   render: (tx) => {
     const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
     const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name ?? '' // prettier-ignore
@@ -202,23 +217,24 @@ export const selector: Selector = (selection) => ({
   className: styles.checkboxColumn,
 
   header: (
-    <input
-      type="checkbox"
-      title="Sélectionner toute la page"
-      checked={selection.isAllSelected()}
-      onChange={(e) => selection.toggleSelectAll(e.target.checked)}
-    />
+    <Box className={styles.checkboxHeaderWrapper}>
+      <Checkbox
+        title="Sélectionner toute la page"
+        checked={selection.isAllSelected()}
+        onChange={(e) => selection.toggleSelectAll(e.target.checked)}
+      />
+    </Box>
   ),
 
   render: (tx) => (
-    <Box className={styles.checkboxWrapper}>
-      <input
-        type="checkbox"
-        title="Sélectionner le lot"
-        checked={selection.has(tx.id)}
-        onChange={() => selection.toggleSelect(tx.id)}
-        onClick={(e) => e.stopPropagation()}
-      />
+    <Box
+      className={styles.checkboxWrapper}
+      onClick={(e) => {
+        e.stopPropagation()
+        selection.toggleSelect(tx.id)
+      }}
+    >
+      <Checkbox title="Sélectionner le lot" checked={selection.has(tx.id)} />
     </Box>
   ),
 })

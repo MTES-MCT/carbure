@@ -10,6 +10,7 @@ import {
   OwnershipType,
   REDCertCertificate,
   SNCertificate,
+  EntityRights,
 } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
@@ -298,7 +299,6 @@ export function update2BSCertificate(
   })
 }
 
-
 export function getREDCertCertificates(
   entityID: number
 ): Promise<REDCertCertificate[]> {
@@ -307,14 +307,20 @@ export function getREDCertCertificates(
   })
 }
 
-export function addREDCertCertificate(entityID: number, certificate_id: string) {
+export function addREDCertCertificate(
+  entityID: number,
+  certificate_id: string
+) {
   return api.post("/settings/add-redcert-certificate", {
     entity_id: entityID,
     certificate_id: certificate_id,
   })
 }
 
-export function deleteREDCertCertificate(entityID: number, certificate_id: string) {
+export function deleteREDCertCertificate(
+  entityID: number,
+  certificate_id: string
+) {
   return api.post("/settings/delete-redcert-certificate", {
     entity_id: entityID,
     certificate_id: certificate_id,
@@ -333,10 +339,7 @@ export function updateREDCertCertificate(
   })
 }
 
-
-export function getSNCertificates(
-  entityID: number
-): Promise<SNCertificate[]> {
+export function getSNCertificates(entityID: number): Promise<SNCertificate[]> {
   return api.get("/settings/get-sn-certificates", {
     entity_id: entityID,
   })
@@ -366,4 +369,30 @@ export function updateSNCertificate(
     old_certificate_id,
     new_certificate_id,
   })
+}
+
+export function getEntityRights(entity_id: number): Promise<EntityRights> {
+  return api.get("/settings/get-entity-rights", { entity_id })
+}
+
+export function inviteUser(
+  entity_id: number,
+  role: string,
+  expiration_date: string,
+  email: string
+) {
+  return api.post("/settings/invite-user", {
+    entity_id,
+    role,
+    expiration_date,
+    email,
+  })
+}
+
+export function revokeUserRights(entity_id: number, email: string) {
+  return api.post("/settings/revoke-user", { entity_id, email })
+}
+
+export function acceptUserRightsRequest(entity_id: number, request_id: number) {
+  return api.post("/settings/accept-user", { entity_id, request_id })
 }

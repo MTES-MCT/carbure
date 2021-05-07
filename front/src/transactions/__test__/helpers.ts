@@ -14,5 +14,7 @@ export function clickOnCheckboxesAndConfirm() {
     )
   )
 
-  userEvent.click(screen.getByText("Confirmer"))
+  const confirm = screen.getByText("Confirmer")
+  expect(confirm).not.toBeDisabled()
+  userEvent.click(confirm)
 }

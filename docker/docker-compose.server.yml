@@ -52,6 +52,8 @@ services:
       - carbure-mariadb
     networks:
       - carbure
+    volumes:
+      - uploadedfiles:/app/files
 
   carbure-web-proxy:
     restart: always
@@ -73,6 +75,7 @@ services:
     volumes:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
+      - uploadedfiles:/app/files
 
   watchtower:
     restart: always
@@ -96,7 +99,7 @@ services:
     depends_on:
       - carbure-mariadb
     ports:
-      - 3000:3000
+      - 3000
     networks:
       - carbure
     volumes:
@@ -107,6 +110,8 @@ services:
 volumes:
   carburedb:
     name: carbure_carburedb
+  uploadedfiles:
+    name: carbure_uploadedfiles
 
 networks:
   carbure:

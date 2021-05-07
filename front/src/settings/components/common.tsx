@@ -9,7 +9,10 @@ import { Box, BoxProps } from "common/components"
 import { Button } from "common/components/button"
 import { Refresh } from "common/components/icons"
 
-export function formatDate(str: string) {
+export function formatDate(str: string | null) {
+  if (str === null) {
+    return "N/A"
+  }
   try {
     const date = new Date(str)
     const formatted = format(date, "dd/MM/y", { locale: fr })

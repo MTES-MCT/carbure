@@ -232,6 +232,7 @@ export interface Lots {
   returned: number
   total: number
   total_errors: number
+  total_volume: number
 
   lots: Transaction[]
 
@@ -271,6 +272,32 @@ export enum Filters {
   AddedBy = "added_by",
   Errors = "errors",
   Forwarded = "is_forwarded",
+  Mac = "is_mac",
+}
+
+export interface TransactionQuery {
+  entity_id: number
+  status: LotStatus
+  from_idx?: number
+  sort_by?: string
+  year?: number
+  limit?: number | null
+  query?: string
+  order?: string
+  invalid?: boolean
+  deadline?: boolean
+  [Filters.DeliveryStatus]?: any
+  [Filters.MatieresPremieres]?: any
+  [Filters.Biocarburants]?: any
+  [Filters.Periods]?: any
+  [Filters.CountriesOfOrigin]?: any
+  [Filters.Vendors]?: any
+  [Filters.Clients]?: any
+  [Filters.ProductionSites]?: any
+  [Filters.DeliverySites]?: any
+  [Filters.AddedBy]?: any
+  [Filters.Errors]?: any
+  [Filters.Forwarded]?: any
 }
 
 export interface Snapshot {
@@ -293,9 +320,23 @@ export interface Settings {
   requests: UserRightRequest[]
 }
 
+export interface EntityRights {
+  rights: UserRight[]
+  requests: UserRightRequest[]
+}
+
+export enum UserRole {
+  ReadOnly = "RO",
+  ReadWrite = "RW",
+  Admin = "ADMIN",
+  Auditor = "AUDITOR",
+}
+
 export interface UserRight {
   entity: Entity
-  rights: string
+  date_added: string
+  expiration_date: string
+  role: UserRole
 }
 
 export enum UserRightStatus {
@@ -310,18 +351,10 @@ export interface UserRightRequest {
   user: [string]
   entity: Entity
   status: UserRightStatus
-  date: Date
   date_requested: string
-}
-
-export interface StockSnapshot {
-  lots: {
-    [key in LotStatus]: number
-  }
-
-  filters: {
-    [key in Filters]: Option[]
-  }
+  expiration_date: string
+  comment: string
+  role: UserRole
 }
 
 export type DBSCertificate = {
@@ -426,11 +459,16 @@ export interface SummaryItem {
   avg_ghg_reduction: number
 }
 
+export interface TransactionSummary {
+  in: SummaryItem[]
+  out: SummaryItem[]
+  tx_ids: number[]
+}
+
 export interface ConvertETBE {
   previous_stock_tx_id?: number
   volume_ethanol: number
   volume_etbe: number
-  volume_fossile: number
+  volume_etbe_eligible: number
   volume_denaturant: number
-  volume_pertes: number
 }

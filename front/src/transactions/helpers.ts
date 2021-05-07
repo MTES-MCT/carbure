@@ -9,8 +9,9 @@ import {
   Errors,
 } from "common/types"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
+import { Option } from "common/components/select"
 
-export function toOption(value: string) {
+export function toOption(value: string): Option {
   return { value, label: value }
 }
 
@@ -93,11 +94,20 @@ export function normalizeFilters(snapshot: any): Snapshot {
     const filter = snapshot.filters[key]
 
     if (filter && typeof filter[0] === "string") {
-      snapshot.filters[key] = filter.map(toOption)
+      const set = new Set<string>(filter)
+      snapshot.filters[key] = Array.from(set).map(toOption)
+    }
+
+    if (key in snapshot.filters) {
+      snapshot.filters[key].sort((a: Option, b: Option) =>
+        a.label.localeCompare(b.label, "fr")
+      )
     }
   })
 
-  snapshot.years = snapshot.years.map(toOption)
+  if (snapshot.years) {
+    snapshot.years = snapshot.years.map(toOption)
+  }
 
   return snapshot
 }
@@ -124,4 +134,8 @@ export function flattenSummary(summary: any): SummaryItem[] {
   }
 
   return rows
+}
+
+export function prettyVolume(volume: number) {
+  return parseFloat(volume.toFixed(2)).toLocaleString("fr-FR")
 }
