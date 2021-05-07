@@ -14,6 +14,7 @@ import logoMarianne from "../assets/images/Marianne.svg"
 import logoBetaGouv from "../assets/images/carbure.svg"
 import styles from "./top-bar.module.css"
 import Select from "common/components/select"
+import { Box } from "common/components"
 
 const Logo = () => (
   <Link to="/" className={styles.logo}>
@@ -163,17 +164,20 @@ const Topbar = ({ entity, settings }: TopbarProps) => {
         </nav>
       )}
 
-      <LanguageSelection />
-      <UserMenu settings={settings} entity={entity} />
+      <Box row className={styles.topRight}>
+        {/* <LanguageSelection /> */}
 
-      <a
-        href="https://carbure-1.gitbook.io/faq/"
-        target="_blank"
-        rel="noreferrer"
-        className={styles.faq}
-      >
-        <Question title={t("Guide d'utilisation")} />
-      </a>
+        <UserMenu settings={settings} entity={entity} />
+
+        <a
+          href="https://carbure-1.gitbook.io/faq/"
+          target="_blank"
+          rel="noreferrer"
+          className={styles.faq}
+        >
+          <Question title={t("Guide d'utilisation")} />
+        </a>
+      </Box>
     </header>
   )
 }
