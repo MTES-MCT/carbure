@@ -640,3 +640,33 @@ class ETBETransformation(models.Model):
         db_table = 'etbe_transformations'
         verbose_name = 'Transformation ETBE'
         verbose_name_plural = 'Transformations ETBE'
+
+
+class GenericError(models.Model):
+    display_to_creator = models.BooleanField(default=False)
+    display_to_recipient = models.BooleanField(default=False)
+    display_to_admin = models.BooleanField(default=False)
+    display_to_auditor = models.BooleanField(default=False)
+
+    acked_by_creator = models.BooleanField(default=False)
+    acked_by_recipient = models.BooleanField(default=False)
+    acked_by_admin = models.BooleanField(default=False)
+    acked_by_auditor = models.BooleanField(default=False)
+
+    highlighted_by_admin = models.BooleanField(default=False)
+    highlighted_by_auditor = models.BooleanField(default=False)
+
+    is_blocking = models.BooleanField(default=False)
+
+    tx = models.ForeignKey(LotTransaction, null=True, blank=True, on_delete=models.CASCADE)
+    lot = models.ForeignKey(LotV2, null=True, blank=True, on_delete=models.CASCADE)
+
+    field = models.CharField(max_length=64, null=False, blank=False)
+    value = models.CharField(max_length=128, null=True, blank=True)
+    error = models.CharField(max_length=256, null=False, blank=False)
+    extra = models.CharField(max_length=256, null=False, blank=False)
+
+    class Meta:
+        db_table = 'generic_errors'
+        verbose_name = 'Generic Error'
+        verbose_name_plural = 'Generic Errors'
