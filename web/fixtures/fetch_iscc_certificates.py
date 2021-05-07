@@ -29,11 +29,13 @@ def get_wdtNonce():
     print('wdtNonce:', wdtNonce)
     return wdtNonce
 
-def get_certificateData(nonce, recordsTotal, test):
+def get_certificateData(nonce, recordsTotal, test, latest):
     # On parcourt le tableau de résultats, en incrémentant de 1000 à chaque fois.
     # On stocke le tableau dans une liste de tableau
     allData = []
     start = 0
+    if latest:
+        start = recordsTotal - PAGELENGTH
     if test:
         recordsTotal = PAGELENGTH
     while start < recordsTotal:
@@ -69,7 +71,7 @@ def download_certificates(args):
     print('# of certificates: ' + str(recordsTotal))
 
     # Récupération du contenu
-    data = get_certificateData(nonce, recordsTotal, args.test)
+    data = get_certificateData(nonce, recordsTotal, args.test, args.latest)
     # On retire les balises html pour ne garder que le contenu
     cleaned_data = cleanCertificateData(data)
     # Sauvegarde
@@ -113,7 +115,8 @@ def download_certificates(args):
 
 def main():
     parser = argparse.ArgumentParser(description='Delete old database backups')
-    parser.add_argument('--test', dest='test', action='store_true', default=False, help='test mode')    
+    parser.add_argument('--test', dest='test', action='store_true', default=False, help='test mode')
+    parser.add_argument('--latest', dest='latest', action='store_true', default=False, help='only fetch latest certificates')        
     args = parser.parse_args()
     download_certificates(args)
     
