@@ -67,7 +67,8 @@ class LotsAPITest(TransactionTestCase):
 
         # some rights
         UserRights.objects.update_or_create(user=self.user1, entity=self.test_producer)
-        UserRights.objects.update_or_create(user=self.user1, entity=self.test_operator)         
+        UserRights.objects.update_or_create(user=self.user1, entity=self.test_operator)
+        UserRights.objects.update_or_create(user=self.user1, entity=self.entity3)
         # note: user1 does not have access to entity3
         france = Pays.objects.get(code_pays='FR')
         today = datetime.date.today()
@@ -418,12 +419,12 @@ class LotsAPITest(TransactionTestCase):
         lots = data['lots']
         self.assertEqual(len(lots), nb_lots)
         # make sure they all have LotError or TransactionError
-        lot_errors = [error.lot.id for error  in LotV2Error.objects.filter(lot__in=[lot['lot']['id'] for lot in lots])]
-        tx_errors = [error.tx.lot.id for error in TransactionError.objects.filter(tx__in=[tx['id'] for tx in lots])]
-        validation_errors = [error.lot.id for error in LotValidationError.objects.filter(lot__in=[tx['lot']['id'] for tx in lots])]
         for lot in lots:
-            self.assertTrue(lot['id'] in lot_errors or lot['id'] in tx_errors or lot['id'] in validation_errors)
-        
+            lot_errors = LotV2Error.objects.filter(lot=lot['lot']['id']).count()
+            tx_errors = TransactionError.objects.filter(tx=lot['id']).count()
+            validation_errors = LotValidationError.objects.filter(lot=lot['lot']['id']).count()
+            self.assertGreater(lot_errors + tx_errors + validation_errors, 0)
+
         # delete-all-drafts
         txs = LotTransaction.objects.filter(lot__status='Draft')
         response = self.client.post(reverse('api-v3-delete-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})    
@@ -470,10 +471,10 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(len(lots), nb_lots - 2) # 3 lots have a stupid date that won't be counted in 2020
 
         # make sure they all have an error
-        lot_errors = [error.lot.id for error  in LotV2Error.objects.filter(lot__in=[lot['lot']['id'] for lot in lots])]
-        tx_errors = [error.tx.lot.id for error in TransactionError.objects.filter(tx__in=[tx['id'] for tx in lots])]
         for lot in lots:
-            self.assertTrue(lot['id'] in lot_errors or lot['id'] in tx_errors)
+            lot_errors = LotV2Error.objects.filter(lot=lot['lot']['id']).count()
+            tx_errors = TransactionError.objects.filter(tx=lot['id']).count()
+            self.assertGreater(lot_errors + tx_errors, 0)
         
         # delete-all-drafts
         txs = LotTransaction.objects.filter(lot__status='Draft')
@@ -753,13 +754,13 @@ class LotsAPITest(TransactionTestCase):
 
 
     def test_download_templates(self):
-        response = self.client.get(reverse('api-v3-template-simple'))
+        response = self.client.get(reverse('api-v3-template-simple'), {'entity_id': self.test_producer.id})
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('api-v3-template-advanced'))
+        response = self.client.get(reverse('api-v3-template-advanced'), {'entity_id': self.test_producer.id})
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('api-v3-template-blend'))
+        response = self.client.get(reverse('api-v3-template-blend'), {'entity_id': self.test_operator.id})
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('api-v3-template-trader'))
+        response = self.client.get(reverse('api-v3-template-trader'), {'entity_id': self.entity3.id})
         self.assertEqual(response.status_code, 200)
 
 

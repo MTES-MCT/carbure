@@ -12,7 +12,10 @@ from core.models import LotV2, LotV2Error
 from core.models import LotTransaction, TransactionError
 from core.models import LotValidationError
 
+from certificates.models import ISCCCertificate, EntityISCCTradingCertificate
+
 from producers.models import ProductionSite
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django_otp.plugins.otp_email.models import EmailDevice
 
 
@@ -105,6 +108,25 @@ class StockAPITest(TestCase):
         response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
         self.assertEqual(response.status_code, 302)        
 
+    def login_as(self, entity):
+        # get user with rights to entity
+        rights = UserRights.objects.filter(entity=entity)
+        if rights.count() > 0:
+            right = rights[0]
+            # login + otp verify
+            loggedin = self.client.login(username=right.user.email, password=self.fake_admin_password)
+            self.assertTrue(loggedin)          
+            # pass otp verification
+            response = self.client.get(reverse('otp-verify'))
+            self.assertEqual(response.status_code, 200)
+            device = EmailDevice.objects.get(user=right.user)
+            response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
+            self.assertEqual(response.status_code, 302)                  
+            return True
+        else:
+            return False
+          
+
     def create_lot(self, **kwargs):
         lot = {
             'supplier_certificate': 'ISCC-TOTO-02',
@@ -131,8 +153,8 @@ class StockAPITest(TestCase):
         lot_id = data['lot']['id']
         return tx_id, lot_id
 
-    def get_stock(self, entity_id):
-        response = self.client.get(reverse('api-v3-stocks-get'), {'entity_id': entity_id, 'status': 'stock'})
+    def get_stock(self, entity_id, status='stock'):
+        response = self.client.get(reverse('api-v3-stocks-get'), {'entity_id': entity_id, 'status': status})
         self.assertEqual(response.status_code, 200)
         return response.json()['data']
 
@@ -158,20 +180,57 @@ class StockAPITest(TestCase):
             'entity_id': self.entity1.id,
         }
         draft.update(kwargs)
-        print(draft)
         drafts = [draft]
         response = self.client.post(reverse('api-v3-stocks-create-drafts'), {'entity_id': self.entity1.id, 'drafts': json.dumps(drafts)})
         self.assertEqual(response.status_code, 200)
         data = response.json()
         return data
 
-    def send_stock_drafts(self, entity_id, txids):
-        response = self.client.post(reverse('api-v3-stocks-send-drafts'), {'entity_id': self.entity1.id, 'tx_ids': txids})
+    def create_draft_from_match(self, **kwargs):
+        draft = {
+            'volume': None,
+            'dae': 'blablabla',
+            'client': self.entity2.name,
+            'delivery_site_country': '',
+            'dae': get_random_dae(),
+            'delivery_date': '2020-12-31',
+            'delivery_site': self.depot.depot_id,
+            'entity_id': self.entity1.id,
+        }
+        draft.update(kwargs)
+        drafts = [draft]
+        response = self.client.post(reverse('api-v3-stocks-create-drafts'), {'entity_id': self.entity1.id, 'drafts': json.dumps(drafts)})
         self.assertEqual(response.status_code, 200)
+        data = response.json()
+        return data
+
+    def send_stock_drafts(self, entity_id, txids, expectedstatus=200):
+        response = self.client.post(reverse('api-v3-stocks-send-drafts'), {'entity_id': entity_id, 'tx_ids': txids})
+        self.assertEqual(response.status_code, expectedstatus)
+        return response.json()
+
+    def accept_pending_lots(self, entity_id, txids, expectedstatus=200):
+        response = self.client.post(reverse('api-v3-accept-lot'), {'entity_id': entity_id, 'tx_ids': txids})
+        self.assertEqual(response.status_code, expectedstatus)
+        return response.json()
+
+    def forward_stock_tx(self, entity_id, txids, recipient, expectedstatus=200):
+        entity = Entity.objects.get(id=entity_id)
+        today = datetime.date.today()
+        certificate, _ = ISCCCertificate.objects.get_or_create(certificate_id='CERTIF', certificate_holder='Das Zuper Produktor', addons='was is das', valid_from=today, valid_until=today)
+        EntityISCCTradingCertificate.objects.update_or_create(certificate=certificate, entity=entity)
+        response = self.client.post(reverse('api-v3-stocks-forward'), {'entity_id': entity_id, 'tx_ids': txids, 'recipient': recipient, 'certificate_id': certificate.certificate_id})
+        self.assertEqual(response.status_code, expectedstatus)
         return response.json()
 
     def test_stock_rights(self):
-        pass
+        self.login_as(self.entity1)
+        # create a lot as entity1 with client entity2
+        txid, lotid = self.create_lot(client=self.entity5)
+        # validate lot
+        self.validate_lots(self.entity1.id, [txid])
+        # accept it (logged in as entity1)
+        self.accept_pending_lots(self.entity5.id, [txid], 403)
 
     def test_extract(self):
         # create a lot where I am the client
@@ -179,9 +238,9 @@ class StockAPITest(TestCase):
         # validate lot
         self.validate_lots(self.entity1.id, [txid])
 
-        # create draft (extract)
         tx = LotTransaction.objects.get(id=txid)
         self.assertEqual(tx.lot.remaining_volume, tx.lot.volume)
+        # create draft (extract)
         volume = round(tx.lot.volume / 4, 2)
         draft = self.create_draft(tx_id=tx.id, volume=volume, client=self.entity2.name, delivery_site=self.depot2.depot_id)
         draft_tx = LotTransaction.objects.get(parent_tx=tx)
@@ -279,16 +338,44 @@ class StockAPITest(TestCase):
         stock = self.get_stock(self.entity1.id)
         lots_in_stock = stock['lots']
         # 0 lots in stock (mac is not coming back to stock and source_tx entirely consumed)
-        print(lots_in_stock)
         self.assertEqual(len(lots_in_stock), 0)
 
 
     def test_forward(self):
         # trading without storage
+        # create a lot as entity1 (producer) and send it to entity2 (trader)
+        txid, lotid = self.create_lot(client=self.entity2)
+        # validate lot
+        self.validate_lots(self.entity1.id, [txid])
+
+        # it should now be pending acceptation by entity2
+        self.login_as(self.entity2)
+        stock = self.get_stock(self.entity2.id, status='in')
+        pending_txs = stock['lots']
+        self.assertEqual(len(pending_txs), 1)
+
+        # accept it
+        txid = pending_txs[0]['id']
+        self.accept_pending_lots(self.entity2.id, [txid])
+        tx = LotTransaction.objects.get(id=txid)
+        # check status has changed
+        self.assertEqual(tx.delivery_status, 'A')
+        self.assertEqual(tx.is_stock, True)
+
         # test forward once. OK
+        forwarded = self.forward_stock_tx(self.entity2.id, [txid], self.entity3.id)
         # not in stock anymore
+        stock = self.get_stock(self.entity2.id)
+        self.assertEqual(len(stock['lots']), 0)
+
+        # 
+        nbchild = LotTransaction.objects.filter(parent_tx_id=txid).count()
+        self.assertEqual(nbchild, 1)
         # try forward again. KO
-        pass
+        self.forward_stock_tx(self.entity3.id, [txid], self.entity3.id, 400)
+        nbchild = LotTransaction.objects.filter(parent_tx_id=txid).count()
+        self.assertEqual(nbchild, 1)
+
 
     def test_add_my_lot_to_my_stock(self):
         # create a lot where I am the client
@@ -312,14 +399,90 @@ class StockAPITest(TestCase):
         lots_in_stock = stock['lots']
         self.assertEqual(len(lots_in_stock), 0)
 
+    def test_extract_more_than_stock(self):
+        # create a lot where I am the client AND is_mac
+        txid, lotid = self.create_lot(client=self.entity1, mac="true")
+        # validate lot
+        self.validate_lots(self.entity1.id, [txid])
+
+        tx = LotTransaction.objects.get(id=txid)
+        
+        # extract 
+        drafts = self.create_draft(tx_id=tx.id, volume=tx.lot.volume + 1, client=self.entity2.name, delivery_site="osef")
+        new_draft_id = drafts['data']['tx_ids'][0]
+        draft_tx = LotTransaction.objects.get(id=new_draft_id)
+        self.send_stock_drafts(self.entity1.id, [draft_tx.id], expectedstatus=400)
 
     def test_stock_matching_engine(self):
         # check MP rule
-        # create 2 ethanol lots, one from sugarcane and one from Corn
-        # create draft matchin with "corn ethanol" and ensure it works properly
+        # create many lots
 
-        # check BC rule
-        # one Ethanol lot, one EMHV, send EMHV draft
+        france, _ = Pays.objects.get_or_create(code_pays='FR')
+        germanie, _ = Pays.objects.get_or_create(code_pays='DE')
 
-        # check other rules...
-        pass
+        eth, _ = Biocarburant.objects.get_or_create(code='ETH', name='Ethanol')
+        ed95, _ = Biocarburant.objects.get_or_create(code='ED95', name='Ethanol pour ED95')
+        emhv, _ = Biocarburant.objects.get_or_create(code='EMHV', name='EMHV')
+
+        ble, _ = MatierePremiere.objects.get_or_create(code='BLE', name='Blay')
+        mais, _ = MatierePremiere.objects.get_or_create(code='MAIS', name='Corn')
+        colza, _ = MatierePremiere.objects.get_or_create(code='COLZA', name='Colza')
+
+        txid, lotid = self.create_lot(client=self.entity1, biocarburant_code='ETH', matiere_premiere_code='BLE', pays_origine_code='FR')
+        txid2, lotid = self.create_lot(client=self.entity1, biocarburant_code='ETH', matiere_premiere_code='MAIS', pays_origine_code='FR')
+        txid3, lotid = self.create_lot(client=self.entity1, biocarburant_code='ETH', matiere_premiere_code='BLE', pays_origine_code='DE')
+        txid4, lotid = self.create_lot(client=self.entity1, biocarburant_code='ED95', matiere_premiere_code='BLE', pays_origine_code='FR')
+
+        txid5, lotid = self.create_lot(client=self.entity1, biocarburant_code='EMHV', matiere_premiere_code='COLZA', pays_origine_code='FR', delivery_site='001')
+        txid6, lotid = self.create_lot(client=self.entity1, biocarburant_code='EMHV', matiere_premiere_code='COLZA', pays_origine_code='FR', delivery_site='002')
+        self.validate_lots(self.entity1.id, [txid, txid2, txid3, txid4, txid5, txid6])
+
+        # create draft matching with various matching rules
+        drafts = self.create_draft_from_match(biocarburant_code='ED95', volume=1000, client=self.entity2.name, delivery_site="osef")
+        drafts = self.create_draft_from_match(biocarburant_code='ETH', matiere_premiere_code='MAIS', volume=1000, client=self.entity2.name, delivery_site="osef")
+        drafts = self.create_draft_from_match(pays_origine_code='DE', volume=1000, client=self.entity2.name, delivery_site="osef")
+        drafts = self.create_draft_from_match(biocarburant_code='EMHV', depot='001', volume=1000, client=self.entity2.name, delivery_site="osef")
+
+
+    def test_upload_template(self):
+        # create a few lots
+        france, _ = Pays.objects.get_or_create(code_pays='FR')
+        germanie, _ = Pays.objects.get_or_create(code_pays='DE')
+
+        eth, _ = Biocarburant.objects.get_or_create(code='ETH', name='Ethanol')
+        ed95, _ = Biocarburant.objects.get_or_create(code='ED95', name='Ethanol pour ED95')
+        emhv, _ = Biocarburant.objects.get_or_create(code='EMHV', name='EMHV')
+
+        ble, _ = MatierePremiere.objects.get_or_create(code='BLE', name='Blay')
+        mais, _ = MatierePremiere.objects.get_or_create(code='MAIS', name='Corn')
+        colza, _ = MatierePremiere.objects.get_or_create(code='COLZA', name='Colza')
+
+        txid, lotid = self.create_lot(client=self.entity1, biocarburant_code='ETH', matiere_premiere_code='BLE', pays_origine_code='FR')
+        txid2, lotid = self.create_lot(client=self.entity1, biocarburant_code='ETH', matiere_premiere_code='MAIS', pays_origine_code='FR')
+        txid3, lotid = self.create_lot(client=self.entity1, biocarburant_code='ETH', matiere_premiere_code='BLE', pays_origine_code='DE')
+        txid4, lotid = self.create_lot(client=self.entity1, biocarburant_code='ED95', matiere_premiere_code='BLE', pays_origine_code='FR')
+
+        txid5, lotid = self.create_lot(client=self.entity1, biocarburant_code='EMHV', matiere_premiere_code='COLZA', pays_origine_code='FR', delivery_site='001')
+        txid6, lotid = self.create_lot(client=self.entity1, biocarburant_code='EMHV', matiere_premiere_code='COLZA', pays_origine_code='FR', delivery_site='002')
+        self.validate_lots(self.entity1.id, [txid, txid2, txid3, txid4, txid5, txid6])
+        # download template-stock
+        response = self.client.get(reverse('api-v3-template-mass-balance'), {'entity_id': self.entity1.id})
+        self.assertEqual(response.status_code, 200)
+        filecontent = response.content
+        # upload simple template
+        f = SimpleUploadedFile("template.xslx", filecontent)
+        response = self.client.post(reverse('api-v3-upload-mass-balance'), {'entity_id': self.entity1.id, 'file': f})
+        self.assertEqual(response.status_code, 200)
+
+        # download model 2
+        response = self.client.get(reverse('api-v3-template-mass-balance-bcghg'), {'entity_id': self.entity3.id})
+        self.assertEqual(response.status_code, 200)
+
+        # upload model 2 template
+        f = SimpleUploadedFile("template.xslx", filecontent)
+        response = self.client.post(reverse('api-v3-upload-mass-balance'), {'entity_id': self.entity1.id, 'file': f})
+        self.assertEqual(response.status_code, 200)
+
+        # we should have a few drafts
+        stock_drafts = self.get_stock(self.entity1.id, status='tosend')
+        self.assertEqual(len(stock_drafts['lots']), 20)

@@ -711,10 +711,13 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
 
     carbure_id = lot_dict.get('carbure_id', False)
     tx_id = lot_dict.get('tx_id', False)
-    biocarburant = lot_dict.get('biocarburant', False)
+    biocarburant = lot_dict.get('biocarburant_code', False)
     depot = lot_dict.get('depot', False)
-    matiere_premiere = lot_dict.get('matiere_premiere', False)
+    matiere_premiere = lot_dict.get('matiere_premiere_code', False)
+    pays_origine = lot_dict.get('pays_origine_code', False)
     ghg_reduction = lot_dict.get('ghg_reduction', False)
+
+
 
     if tx_id:
         try:
@@ -747,11 +750,14 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
             matching_txs = matching_txs.filter(lot__ghg_reduction=ghg_reduction)
         if depot:
             matching_txs = matching_txs.filter(Q(carbure_delivery_site__depot_id=depot) | Q(unknown_delivery_site=depot))
+        if pays_origine:
+            matching_txs = matching_txs.filter(lot__pays_origine__code_pays=pays_origine)
         if matching_txs.count() == 1:
             source_tx = matching_txs[0]
             source_lot = LotV2.objects.get(id=source_tx.lot.id)
         else:
-            return None, None, "Could not find mass balance line", None
+            nb_matches = matching_txs.count()
+            return None, None, "Could not find mass balance line. %d matches" % (nb_matches), None
 
     lot = source_tx.lot
 
@@ -776,6 +782,7 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
 
     transaction = LotTransaction()
     transaction.carbure_vendor = entity
+    transaction.parent_tx = source_tx
     transaction.is_mac = False
     if 'mac' in lot_dict:
         if lot_dict['mac'] == 1 or lot_dict['mac'] == 'true':
