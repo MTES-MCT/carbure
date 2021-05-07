@@ -30,7 +30,8 @@ import {
 import { waitWhileLoading } from "common/__test__/helpers"
 import { clickOnCheckboxesAndConfirm } from "./helpers"
 
-beforeAll(() => server.listen())
+beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
+
 afterEach(() => {
   server.resetHandlers()
   setDetails(lotDetails)

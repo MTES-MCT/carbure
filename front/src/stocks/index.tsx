@@ -37,6 +37,7 @@ const FILTERS = [
   Filters.MatieresPremieres,
   Filters.CountriesOfOrigin,
   Filters.ProductionSites,
+  Filters.Vendors,
   Filters.DeliverySites,
 ]
 
@@ -136,7 +137,6 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
       <StocksSnapshot snapshot={snapshot} status={status} />
 
       <TransactionFilters
-        search={search}
         selection={filters}
         filters={snapshot.data?.filters}
         placeholder={FILTERS}
@@ -146,6 +146,7 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
         stock={stock}
         sorting={sorting}
         pagination={pagination}
+        search={search}
         status={status}
         selection={selection}
         deleter={deleter}

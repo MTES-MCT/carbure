@@ -18,7 +18,11 @@ sort_key_to_django_field = {'period': 'lot__period',
                             'matiere_premiere': 'lot__matiere_premiere__name',
                             'ghg_reduction': 'lot__ghg_reduction',
                             'volume': 'lot__volume',
-                            'pays_origine': 'lot__pays_origine__name'}
+                            'pays_origine': 'lot__pays_origine__name',
+                            'client': 'carbure_client__name',
+                            'vendor': 'carbure_vendor__name',
+                            'depot': 'carbure_delivery_site',
+                            }
 
 @check_rights('entity_id')
 def get_stocks(request, *args, **kwargs):
@@ -56,8 +60,6 @@ def get_stocks(request, *args, **kwargs):
                 txs = txs.order_by('-%s' % key)
             else:
                 txs = txs.order_by(key)
-        else:
-            return JsonResponse({'status': 'error', 'message': 'Unknown sort_by key'}, status=400)
 
     from_idx = int(from_idx)
     returned = txs[from_idx:]
@@ -159,11 +161,15 @@ def get_snapshot(request, *args, **kwargs):
     ps2 = [p['lot__unknown_production_site'] for p in txs.values('lot__unknown_production_site').distinct()]
     psites = list(set([p for p in ps1 + ps2 if p]))
 
+    v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
+    v2 = [v['lot__unknown_supplier'] for v in txs.values('lot__unknown_supplier').distinct()]
+    vendors = [v for v in v1 + v2 if v]
+
     periods = sorted([p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']])
 
     data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs,
                        'production_sites': psites, 'countries_of_origin': countries, 'delivery_sites': delivery_sites, 
-                       'periods': periods, }
+                       'periods': periods, 'vendors': vendors}
 
     return JsonResponse({'status': 'success', 'data': data})
 

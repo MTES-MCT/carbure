@@ -70,6 +70,7 @@ const PRODUCER_TRADER_FILTERS = [
 ]
 
 const ADMIN_FILTERS = [
+  Filters.Mac,
   Filters.DeliveryStatus,
   Filters.Periods,
   Filters.Biocarburants,
@@ -80,6 +81,7 @@ const ADMIN_FILTERS = [
   Filters.ProductionSites,
   Filters.DeliverySites,
   Filters.AddedBy,
+  Filters.Forwarded,
   Filters.Errors,
 ]
 
@@ -93,7 +95,7 @@ export function useTransactions(entity: EntitySelection) {
   const status = useStatusSelection(pagination, special)
   const year = useYearSelection(pagination, filters, special)
 
-  const txFilters = useTransactionQuery(
+  const query = useTransactionQuery(
     status.active,
     entity?.id ?? -1,
     filters.selected,
@@ -108,7 +110,7 @@ export function useTransactions(entity: EntitySelection) {
   )
 
   const snapshot = useGetSnapshot(entity, year)
-  const transactions = useGetLots(entity, txFilters)
+  const transactions = useGetLots(entity, query)
 
   function refresh() {
     snapshot.getSnapshot()
@@ -119,10 +121,10 @@ export function useTransactions(entity: EntitySelection) {
 
   const uploader = useUploadLotFile(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
-  const deleter = useDeleteLots(entity, selection, txFilters, refresh)
-  const validator = useValidateLots(entity, selection, txFilters, refresh)
-  const acceptor = useAcceptLots(entity, selection, txFilters, refresh)
-  const rejector = useRejectLots(entity, selection, txFilters, refresh)
+  const deleter = useDeleteLots(entity, selection, query, refresh)
+  const validator = useValidateLots(entity, selection, query, refresh)
+  const acceptor = useAcceptLots(entity, selection, query, refresh)
+  const rejector = useRejectLots(entity, selection, query, refresh)
   const declarator = useDeclareLots(entity)
   const forwarder = useForwardLots(entity, selection, refresh)
 
@@ -146,6 +148,7 @@ export function useTransactions(entity: EntitySelection) {
     rejector,
     declarator,
     forwarder,
+    query,
     refresh,
   }
 }
@@ -161,6 +164,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
     transactions,
     selection,
     search,
+    query,
     sorting,
     deleter,
     duplicator,
@@ -220,7 +224,6 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
       />
 
       <TransactionFilters
-        search={search}
         selection={filters}
         filters={snapshot.data?.filters}
         placeholder={filtersPlaceholder}
@@ -234,6 +237,8 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         sorting={sorting}
         selection={selection}
         pagination={pagination}
+        search={search}
+        query={query}
         special={special}
         uploader={uploader}
         deleter={deleter}

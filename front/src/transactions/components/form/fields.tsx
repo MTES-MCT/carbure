@@ -270,19 +270,15 @@ export const ProductionSiteDblCounting = ({
   errors,
   ...props
 }: LIP) => {
-  const dcReference =
-    data &&
-    isKnown(data.production_site) &&
-    data.matiere_premiere?.is_double_compte
-      ? data.production_site.dc_reference ?? ""
-      : data?.production_site_dbl_counting ?? ""
+  const hasDC = Boolean(data?.matiere_premiere?.is_double_compte)
+  const dcReference = value ?? data?.production_site_dbl_counting ?? ""
 
   return (
     <LabelInput
-      disabled={isKnown(data?.production_site)}
+      disabled={isKnown(data?.production_site) || !hasDC}
       name="production_site_dbl_counting"
       label="N° d'enregistrement double-compte"
-      value={value ?? dcReference}
+      value={hasDC ? dcReference : ""}
       error={errors?.production_site_dbl_counting}
       {...props}
     />

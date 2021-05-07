@@ -1,7 +1,7 @@
-import React from "react"
+import React, { useRef } from "react"
 import cl from "clsx"
 import styles from "./input.module.css"
-import { AlertTriangle, Check, IconProps, Search } from "./icons"
+import { AlertTriangle, Check, IconProps } from "./icons"
 import { Box, SystemProps } from "./index"
 import { FormChangeHandler } from "common/hooks/use-form"
 
@@ -151,6 +151,8 @@ export const Checkbox = ({
         readOnly && styles.checkboxReadOnly,
         className
       )}
+      aria-checked={checked}
+      aria-disabled={disabled}
       onClick={handleChange}
     >
       {checked ? <Check /> : null}
@@ -173,12 +175,15 @@ export const LabelCheckbox = ({
   onChange,
   ...props
 }: LabelCheckboxProps) => {
+  const id = useRef(Math.random().toString(36).slice(2))
+
   const handleChange = onChange
     ? () => onChange({ target: { type: "checkbox", checked: !checked } })
     : undefined
 
   return (
     <label
+      id={id.current}
       className={cl(
         styles.labelCheckbox,
         (readOnly || disabled) && styles.disabledLabel,
@@ -191,20 +196,13 @@ export const LabelCheckbox = ({
         disabled={disabled}
         checked={checked ?? value}
         onChange={onChange}
+        role="checkbox"
+        aria-labelledby={id.current}
       />
       {label}
     </label>
   )
 }
-
-// SEARCH INPUT COMPONENT
-
-export const SearchInput = ({ className, ...props }: InputProps) => (
-  <div className={cl(styles.searchInputWrapper, className)}>
-    <Search size={20} color="var(--gray-medium)" />
-    <Input {...props} className={styles.searchInput} />
-  </div>
-)
 
 export const Placeholder = (props: SystemProps) => (
   <div {...props} className={cl(styles.inputPlaceholder, props.className)} />

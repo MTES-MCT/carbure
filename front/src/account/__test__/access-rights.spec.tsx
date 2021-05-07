@@ -8,7 +8,8 @@ import server, { setAccessRequests } from "./api"
 import { producer } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
 
-beforeAll(() => server.listen())
+beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
+
 afterEach(() => {
   server.resetHandlers()
   setAccessRequests([])

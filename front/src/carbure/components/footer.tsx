@@ -1,4 +1,6 @@
 import cl from "clsx"
+import { Trans } from "react-i18next"
+
 import styles from "./footer.module.css"
 import logoMTES from "../assets/images/MTE.svg"
 import logoFabNum from "../assets/images/logo-fabriquenumerique.svg"
@@ -27,9 +29,11 @@ const Footer = () => (
 
     <div className={styles.flexCell}>
       <p>
-        CarbuRe est un service numérique de l’État incubé à la Fabrique
-        numérique du Ministère de la Transition Écologique et Solidaire, membre
-        du réseau d’incubateurs <a href="http://beta.gouv.fr"> beta.gouv.fr </a>
+        <Trans>
+          CarbuRe est un service numérique de l’État incubé à la Fabrique
+          numérique du Ministère de la Transition Écologique, membre du réseau
+          d’incubateurs <a href="http://beta.gouv.fr">beta.gouv.fr</a>
+        </Trans>
       </p>
     </div>
 
@@ -44,7 +48,7 @@ const Footer = () => (
             href="https://carbure-1.gitbook.io/faq/mentions-legales-et-cgu/mentions-legales-et-conditions-generales-dutilisation#cookies"
             rel="noreferrer"
           >
-            Cookies
+            <Trans>Cookies</Trans>
           </a>
         </li>
         <li>
@@ -53,7 +57,7 @@ const Footer = () => (
             href="https://carbure-1.gitbook.io/faq/mentions-legales-et-cgu/mentions-legales-et-conditions-generales-dutilisation"
             rel="noreferrer"
           >
-            Conditions générales d'utilisation
+            <Trans>Conditions générales d'utilisation</Trans>
           </a>
         </li>
         <li>
@@ -62,22 +66,24 @@ const Footer = () => (
             target="_blank"
             rel="noreferrer"
           >
-            Guide d'utilisation de CarbuRe
+            <Trans>Guide d'utilisation de CarbuRe</Trans>
           </a>
         </li>
         <li>
           <a href="https://metabase.carbure.beta.gouv.fr/public/dashboard/a9c045a5-c2fb-481a-ab85-f55bce8ae3c0">
-            Statistiques
+            <Trans>Statistiques</Trans>
           </a>
         </li>
         <li>
           <a href="https://carbure-beta-gouv.slack.com/">
-            Slack - Discussions, Support et Annonces
+            <Trans>Slack - Discussions, Support et Annonces</Trans>
           </a>
         </li>
 
         <li>
-          <a href="/">Glossaire</a>
+          <a href="/">
+            <Trans>Glossaire</Trans>
+          </a>
         </li>
       </ul>
     </div>

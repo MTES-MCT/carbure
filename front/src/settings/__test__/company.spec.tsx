@@ -14,7 +14,8 @@ const SettingsWithHooks = () => {
   return <Settings entity={entity} settings={settings} />
 }
 
-beforeAll(() => server.listen())
+beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
+
 beforeEach(() => server.use(okDynamicSettings))
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
@@ -65,7 +66,7 @@ test("check the company section of the settings for a trader", async () => {
 
   expect(mac).toBeChecked()
   expect(trading).toBeChecked()
-  expect(trading).toBeDisabled()
+  expect(trading).toHaveAttribute("aria-disabled", "true")
 
   userEvent.click(mac)
 
@@ -87,7 +88,7 @@ test("check the company section of the settings for an operator", async () => {
 
   expect(mac).toBeChecked()
   expect(trading).not.toBeChecked()
-  expect(trading.hasAttribute("disabled")).toBe(true)
+  expect(trading).toHaveAttribute("aria-disabled", "true")
 
   userEvent.click(mac)
 
