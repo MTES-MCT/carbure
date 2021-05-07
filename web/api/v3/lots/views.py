@@ -387,7 +387,6 @@ def reject_lot(request):
             # cancel forward
             tx.parent_tx.is_forwarded = False
             tx.parent_tx.save()
-            # send an email
         tx.comment = tx_comment
         tx_rejected.append(tx)
 
