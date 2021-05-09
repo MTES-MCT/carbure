@@ -99,12 +99,12 @@ class ISCCCertificate(models.Model):
     # command: ALTER TABLE iscc_certificates CHANGE certificate_holder certificate_holder VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
     # do not change anything
     certificate_holder = models.CharField(max_length=256, null=False, blank=False)
-    addons = models.CharField(max_length=256, null=False, blank=False)
+    addons = models.CharField(max_length=256, null=True, blank=True)
     valid_from = models.DateField(null=False)
     valid_until = models.DateField(null=False)
-    issuing_cb = models.CharField(max_length=256, default='')
-    location = models.CharField(max_length=256, default='')
-    download_link = models.CharField(max_length=512, default='')
+    issuing_cb = models.CharField(max_length=256, null=True, default='')
+    location = models.CharField(max_length=256, null=True, default='')
+    download_link = models.CharField(max_length=512, null=True, default='')
 
     def natural_key(self):
         scope = [s.scope.scope for s in self.iscccertificatescope_set.all()]
