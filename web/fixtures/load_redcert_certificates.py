@@ -236,7 +236,7 @@ def summary(args, new_biomass, new_scopes, new_certificates, newly_invalidated_c
     fraud = False
     if len(newly_invalidated_certificates):
         for (nic, previous) in newly_invalidated_certificates:
-            if nic['Name of the certificate holder'] == previous['certificate_holder']:
+            if nic['Name of the certificate holder'] == previous.certificate_holder:
                 fraud = True
                 mail_content += "**** ACHTUNG certificat invalidé *****<br />"
                 mail_content += str(nic)
