@@ -5,6 +5,7 @@ import calendar
 import datetime
 import argparse
 from django.core.mail import send_mail
+from django.db import transaction
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -32,34 +33,28 @@ def save_certificate(certificate_id, holder, valid_from, valid_until, details):
         until = valid_until.date()
     else:
         until = valid_until
-    if until <= today:
-        # the certificate is invalid, do not try to update its valid_until date
-        try:
-            certificate, created = ISCCCertificate.objects.update_or_create(certificate_id=certificate_id, valid_from=valid_from, valid_until=valid_until, certificate_holder=holder, defaults=details)
-            return certificate
-        except Exception as e:
-            print('')
-            print(e)
-            print(certificate_id)
-            print(ISCCCertificate.objects.filter(certificate_id=certificate_id, valid_from=valid_from, valid_until=valid_until))
-    else:
-        # the certificate is valid, try to update its valid_until date
-        try:
-            details['valid_until'] = valid_until
-            certificate, created = ISCCCertificate.objects.update_or_create(certificate_id=certificate_id, valid_from=valid_from, certificate_holder=holder, defaults=details)
-            return certificate
-        except Exception as e:
-            print('')
-            print(e)
-            print(certificate_id)
-            print(ISCCCertificate.objects.filter(certificate_id=certificate_id, valid_from=valid_from))
+
+    count = ISCCCertificate.objects.filter(certificate_id=certificate_id, certificate_holder=holder).count()
+    if count > 1:
+        ISCCCertificate.objects.filter(certificate_id=certificate_id, certificate_holder=holder).delete()
+    try:
+        details['valid_until'] = valid_until
+        details['valid_from'] = valid_from
+        certificate, created = ISCCCertificate.objects.update_or_create(certificate_id=certificate_id, certificate_holder=holder, defaults=details)
+        return certificate
+    except Exception as e:
+        print('')
+        print(e)
+        print(certificate_id)
     return None
 
+@transaction.atomic
 def save_certificate_raw_materials(certificate, raw_materials):
     ISCCCertificateRawMaterial.objects.filter(certificate=certificate).delete()
     for raw_material in raw_materials.split(','):
         ISCCCertificateRawMaterial.objects.update_or_create(certificate=certificate, raw_material=raw_material.strip())
 
+@transaction.atomic
 def save_certificate_scope(certificate, scopes):
     deletions = []
     existing_scopes = {cs.scope.scope: cs for cs in ISCCCertificateScope.objects.filter(certificate=certificate)}
@@ -96,14 +91,27 @@ def load_certificates():
         i += 1
         # create certificate
         try:
-            vf = row['valid_from'].split('.')
-            valid_from = datetime.date(year=2000 + int(vf[2]), month=int(vf[1]), day=int(vf[0]))
+            if '.' in row['valid_from']:
+                vf = row['valid_from'].split('.')
+            elif '-' in row['valid_from']:
+                valid_from = datetime.datetime.strptime(row['valid_from'], '%Y-%m-%d').date()
+            else:
+                print("Unrecognized date format [%s]" % (row['valid_from']))
+                print(row)
+                valid_from = datetime.date(year=1970, month=1, day=1)
         except:
             valid_from = datetime.date(year=1970, month=1, day=1)
 
         try:
-            vu = row['valid_until'].split('.')
-            valid_until = datetime.date(year=2000 + int(vu[2]), month=int(vu[1]), day=int(vu[0]))
+            if '.' in row['valid_until']:
+                vu = row['valid_until'].split('.')
+                valid_until = datetime.date(year=2000 + int(vu[2]), month=int(vu[1]), day=int(vu[0]))                
+            elif '-' in row['valid_until']:
+                valid_until = datetime.datetime.strptime(row['valid_until'], '%Y-%m-%d').date()
+            else:
+                print("Unrecognized date format [%s]" % (row['valid_until']))
+                print(row)
+                valid_until = datetime.date(year=1970, month=1, day=1)
         except:
             valid_until = datetime.date(year=1970, month=1, day=1)            
         d = {'addons': row['addons'],
@@ -112,6 +120,8 @@ def load_certificates():
              'download_link': row['certificate_report'],
         }
         # save certificate
+        print('Saving certificate %s valid_from [%s] valid_until [%s]' % (row['certificate'], valid_from, valid_until))
+        #print(row)
         certificate = save_certificate(row['certificate'], row['certificate_holder'], valid_from, valid_until, d)
         if not certificate:
             continue
