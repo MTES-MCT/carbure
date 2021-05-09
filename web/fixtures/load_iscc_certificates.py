@@ -96,14 +96,26 @@ def load_certificates():
         i += 1
         # create certificate
         try:
-            vf = row['valid_from'].split('.')
+            if '.' in row['valid_from']:
+                vf = row['valid_from'].split('.')
+            elif '-' in row['valid_from']:
+                valid_from = datetime.datetime.strptime(row['valid_from'], '%Y-%m-%d').date()
+            else:
+                print("Unrecognized date format %s" % (row['valid_from']))
+                valid_from = datetime.date(year=1970, month=1, day=1)
             valid_from = datetime.date(year=2000 + int(vf[2]), month=int(vf[1]), day=int(vf[0]))
         except:
             valid_from = datetime.date(year=1970, month=1, day=1)
 
         try:
-            vu = row['valid_until'].split('.')
-            valid_until = datetime.date(year=2000 + int(vu[2]), month=int(vu[1]), day=int(vu[0]))
+            if '.' in row['valid_until']:
+                vu = row['valid_until'].split('.')
+                valid_until = datetime.date(year=2000 + int(vu[2]), month=int(vu[1]), day=int(vu[0]))                
+            elif '-' in row['valid_until']:
+                valid_until = datetime.datetime.strptime(row['valid_until'], '%Y-%m-%d').date()
+            else:
+                print("Unrecognized date format %s" % (row['valid_until']))
+                valid_until = datetime.date(year=1970, month=1, day=1)
         except:
             valid_until = datetime.date(year=1970, month=1, day=1)            
         d = {'addons': row['addons'],
@@ -112,6 +124,8 @@ def load_certificates():
              'download_link': row['certificate_report'],
         }
         # save certificate
+        #print('Saving certificate %s valid_until %s' % (row['certificate'], valid_until))
+        #print(row)
         certificate = save_certificate(row['certificate'], row['certificate_holder'], valid_from, valid_until, d)
         if not certificate:
             continue
