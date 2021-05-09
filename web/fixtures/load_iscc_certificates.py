@@ -6,6 +6,7 @@ import datetime
 import argparse
 from django.core.mail import send_mail
 from django.db import transaction
+import pandas as pd
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -69,7 +70,7 @@ def save_certificate_scope(certificate, scopes):
         if scope in existing_scopes:
             del existing_scopes[scope]
         else:
-            print('Creating new scope for certificate %s' % (certificate.certificate_id))
+            print('Creating new scope %s for certificate %s existing [%s]' % (scope, certificate.certificate_id, existing_scopes))
             ISCCCertificateScope.objects.update_or_create(certificate=certificate, scope=VALID_SCOPES[scope])
     if len(existing_scopes):
         for k, v in existing_scopes.items():
@@ -78,17 +79,16 @@ def save_certificate_scope(certificate, scopes):
             deletions.append(v)
     return deletions
 
+@transaction.atomic
 def load_certificates():
     nb_valid = 0
     nb_expired = 0
-    certificate_deletions = []
     certificate_scopes_deletions = []
     filename = '%s/Certificates_%s.csv' % (CSV_FOLDER, today.strftime('%Y-%m-%d'))
-    csvfile = open(filename, 'r')
-    reader = csv.DictReader(fix_nulls(csvfile), delimiter=',', quotechar='"')
-    i = 0
-    for row in reader:
-        i += 1
+    df = pd.read_csv(filename, sep=',', quotechar='"', lineterminator="\n")
+    df.fillna('', inplace=True)    
+    for i, row in df.iterrows():
+        # print(i, row)
         # create certificate
         try:
             if '.' in row['valid_from']:
@@ -120,7 +120,7 @@ def load_certificates():
              'download_link': row['certificate_report'],
         }
         # save certificate
-        print('Saving certificate %s valid_from [%s] valid_until [%s]' % (row['certificate'], valid_from, valid_until))
+        #print('Saving certificate %s valid_from [%s] valid_until [%s]' % (row['certificate'], valid_from, valid_until))
         #print(row)
         certificate = save_certificate(row['certificate'], row['certificate_holder'], valid_from, valid_until, d)
         if not certificate:
@@ -134,7 +134,6 @@ def load_certificates():
             nb_valid += 1
         else:
             nb_expired += 1
-    csvfile.close()
     return nb_valid, nb_expired, certificate_scopes_deletions
 
 
