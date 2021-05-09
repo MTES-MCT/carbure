@@ -157,6 +157,7 @@ def load_certificates(existing_certificates, scopes, biomass):
             print('failed')
             print(e)
             failed.append(cert)
+            continue
         # scopes
         existing_scopes = {s.scope.scope: s for s in o.redcertcertificatescope_set.all()}
         cert_scopes = str(cert['Certified as']).split(',')
