@@ -157,6 +157,7 @@ def load_certificates(existing_certificates, scopes, biomass):
             print('failed')
             print(e)
             failed.append(cert)
+            continue
         # scopes
         existing_scopes = {s.scope.scope: s for s in o.redcertcertificatescope_set.all()}
         cert_scopes = str(cert['Certified as']).split(',')
@@ -236,7 +237,7 @@ def summary(args, new_biomass, new_scopes, new_certificates, newly_invalidated_c
     fraud = False
     if len(newly_invalidated_certificates):
         for (nic, previous) in newly_invalidated_certificates:
-            if nic['Name of the certificate holder'] == previous['certificate_holder']:
+            if nic['Name of the certificate holder'] == previous.certificate_holder:
                 fraud = True
                 mail_content += "**** ACHTUNG certificat invalidé *****<br />"
                 mail_content += str(nic)
