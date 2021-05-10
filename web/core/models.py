@@ -264,8 +264,9 @@ class Lot(models.Model):
 class LotV2(models.Model):
     DRAFT = 'Draft'
     VALIDATED = 'Validated'
+    DECLARED = 'Declared'
 
-    LOT_STATUS = ((DRAFT, 'Brouillon'), (VALIDATED, 'Validé'))
+    LOT_STATUS = ((DRAFT, 'Brouillon'), (VALIDATED, 'Validé'), (DECLARED, 'Déclaré'))
     SOURCE_CHOICES = (('EXCEL', 'Excel'), ('MANUAL', 'Manual'))
 
     period = models.CharField(max_length=64, blank=True, default='')
@@ -363,7 +364,14 @@ class LotV2(models.Model):
 
 
 class LotTransaction(models.Model):
-    DELIVERY_STATUS = (('N', 'En Attente'), ('A', 'Accepté'), ('R', 'Refusé'), ('AC', 'À corriger'), ('AA', 'Corrigé'))
+    PENDING = 'N'
+    ACCEPTED = 'A'
+    REJECTED = 'R'
+    TOFIX = 'AC'
+    FIXED = 'AA'
+    FROZEN = 'F'
+
+    DELIVERY_STATUS = ((PENDING, 'En Attente'), (ACCEPTED, 'Accepté'), (REJECTED, 'Refusé'), (TOFIX, 'À corriger'), (FIXED, 'Corrigé'), (FROZEN, 'Déclaré'))
     lot = models.ForeignKey(LotV2, null=False, blank=False, on_delete=models.CASCADE, related_name='tx_lot')
 
     # vendor / producer
