@@ -7,12 +7,12 @@ EMHU,EMHU,37,33,0.892,0,1,1
 EMHV,EMHV,37,33,0.892,0,1,1
 ETBE,ETBE,36,27,0.75,1,0,1
 ETH,Éthanol,27,21,0.778,1,0,1
-HOG,Autres Huiles Hydrotraitées - Gazole,0,42,0.845,0,1,1
-HOE,Autres Huiles Hydrotraitées - Essence,0,44,0.755,0,1,1
-HOJ,Autres Huiles Hydrotraitées - Kérosène,0,44,0.800,0,1,1
-HVOG,Huiles Végétales Hydrotraitées - Gazole,0,42,0.845,0,1,1
-HVOE,Huiles Végétales Hydrotraitées - Essence,0,44,0.755,0,1,1
-HVOJ,Huiles Végétales Hydrotraitées - Kérosène,0,44,0.800,0,1,1
+HOG,Autres Huiles Hydrotraitées - Gazole,44,34,0.845,0,1,1
+HOE,Autres Huiles Hydrotraitées - Essence,45,30,0.755,0,1,1
+HOJ,Autres Huiles Hydrotraitées - Kérosène,44,34,0.800,0,1,1
+HVOG,Huiles Végétales Hydrotraitées - Gazole,44,34,0.845,0,1,1
+HVOE,Huiles Végétales Hydrotraitées - Essence,45,30,0.755,0,1,1
+HVOJ,Huiles Végétales Hydrotraitées - Kérosène,44,34,0.800,0,1,1
 MTBE,MTBE,35,26,0.743,1,0,1
 MT,Méthanol,20,16,0.8,1,0,0
 TAEE,TAEE,38,29,0.763,0,0,1
