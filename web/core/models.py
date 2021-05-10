@@ -481,53 +481,6 @@ class TransactionComment(models.Model):
         verbose_name_plural = 'TransactionComments'
 
 
-class GHGValues(models.Model):
-    matiere_premiere = models.ForeignKey(MatierePremiere, blank=True, null=True, on_delete=models.CASCADE)
-    biocarburant = models.ForeignKey(Biocarburant, on_delete=models.CASCADE)
-    condition = models.CharField(max_length=256, null=True, blank=True)
-    eec_default = models.FloatField(default=0.0)
-    eec_typical = models.FloatField(default=0.0)
-    ep_default = models.FloatField(default=0.0)
-    ep_typical = models.FloatField(default=0.0)
-    etd_default = models.FloatField(default=0.0)
-    etd_typical = models.FloatField(default=0.0)
-
-    def __str__(self):
-        return '%s - %s - %f -  %f - %f' % (self.biocarburant, self.matiere_premiere,
-                                            self.eec_default, self.ep_default, self.etd_default)
-
-    class Meta:
-        db_table = 'ghg_values'
-        verbose_name = 'Valeur GES de référence'
-        verbose_name_plural = 'Valeurs GES de référence'
-
-
-# deprecated, to delete
-class CheckRule(models.Model):
-    CONDITIONS = (('EQ', 'Equals'), ('GT', 'Greater Than'), ('GTE', 'Greater Than or Equal'), ('LT', 'Less Than'), ('LTE', 'Less Than or Equal'), ('DIFF', 'Is Different than'), ('IN', 'Is In'), ('NIN', 'Is Not In'))
-
-    condition_col = models.CharField(max_length=32, null=True, blank=True)
-    condition = models.CharField(max_length=64, choices=CONDITIONS, default='EQ')
-    condition_value = models.CharField(max_length=256, null=True, blank=True)
-
-    check_col = models.CharField(max_length=32, null=True, blank=True)
-    check = models.CharField(max_length=64, choices=CONDITIONS, default='EQ')
-    check_value = models.CharField(max_length=256, null=True, blank=True)
-
-    warning_to_user = models.BooleanField(default=False)
-    warning_to_admin = models.BooleanField(default=False)
-    block_validation = models.BooleanField(default=False)
-    message = models.CharField(max_length=256, blank=True, null=True, default='')
-
-    def __str__(self):
-        return self.message
-
-    class Meta:
-        db_table = 'check_rules'
-        verbose_name = 'Règle Métier'
-        verbose_name_plural = 'Règles Métier'
-
-
 class LotValidationError(models.Model):
     lot = models.ForeignKey(LotV2, null=False, blank=False, on_delete=models.CASCADE)
     tx = models.ForeignKey(LotTransaction, null=True, on_delete=models.SET_NULL)
