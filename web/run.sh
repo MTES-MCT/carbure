@@ -8,7 +8,6 @@ python3 /app/web/manage.py migrate --noinput
 python3 /app/web/fixtures/load_biocarburants.py
 python3 /app/web/fixtures/load_countries.py
 python3 /app/web/fixtures/load_matierespremieres.py
-python3 /app/web/fixtures/load_ghg_values.py
 python3 /app/web/fixtures/load_sn_certificates.py
 
 if [ "$IMAGE_TAG" = "local" ] ; then
