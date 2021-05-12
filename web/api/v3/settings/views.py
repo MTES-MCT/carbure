@@ -601,9 +601,13 @@ def get_my_certificates(request, *args, **kwargs):
     certificates_redcert = EntityREDCertTradingCertificate.objects.filter(Q(entity=context['entity']), Q(certificate__valid_until__gte=today),
         Q(certificate__certificate_id__icontains=query) | Q(certificate__certificate_holder__icontains=query))
 
+    certificates_sn = EntitySNTradingCertificate.objects.filter(Q(entity=context['entity']), Q(certificate__valid_until__gte=today),
+        Q(certificate__certificate_id__icontains=query) | Q(certificate__certificate_holder__icontains=query))
+
     sez_data = [{'certificate_id': c.certificate.certificate_id, 'holder': c.certificate.certificate_holder, 'type': 'ISCC'} for c in certificates_iscc]
     sez_data += [{'certificate_id': c.certificate.certificate_id, 'holder': c.certificate.certificate_holder, 'type': '2BS'} for c in certificates_2bs]
     sez_data += [{'certificate_id': c.certificate.certificate_id, 'holder': c.certificate.certificate_holder, 'type': 'REDcert'} for c in certificates_redcert]
+    sez_data += [{'certificate_id': c.certificate.certificate_id, 'holder': c.certificate.certificate_holder, 'type': 'SN'} for c in certificates_sn]
     return JsonResponse({'status': 'success', 'data': sez_data})
 
 
@@ -621,6 +625,8 @@ def set_production_site_certificates(request, *args, **kwargs):
     try:
         certificates_iscc = EntityISCCTradingCertificate.objects.filter(certificate__certificate_id__in=certificate_ids)
         certificate_2bs = EntityDBSTradingCertificate.objects.filter(certificate__certificate_id__in=certificate_ids)
+        certificate_red = EntityREDcertTradingCertificate.objects.filter(certificate__certificate_id__in=certificate_ids)
+        certificate_sn = EntitySNTradingCertificate.objects.filter(certificate__certificate_id__in=certificate_ids)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find requested certificates"}, status=400)
 
@@ -628,7 +634,9 @@ def set_production_site_certificates(request, *args, **kwargs):
         ProductionSiteCertificate.objects.filter(entity=context['entity'], production_site=psite).delete()
         psc_iscc = [ProductionSiteCertificate(entity=context['entity'], production_site=psite, type='ISCC', certificate_2bs=None, certificate_iscc=c) for c in certificates_iscc]
         psc_2bs = [ProductionSiteCertificate(entity=context['entity'], production_site=psite, type='2BS', certificate_2bs=c, certificate_iscc=None) for c in certificate_2bs]
-        ProductionSiteCertificate.objects.bulk_create(psc_iscc + psc_2bs)
+        psc_red = [ProductionSiteCertificate(entity=context['entity'], production_site=psite, type='REDCERT', certificate_redcert=c, ) for c in certificate_red]
+        psc_sn = [ProductionSiteCertificate(entity=context['entity'], production_site=psite, type='SN', certificate_sn=c) for c in certificate_sn]
+        ProductionSiteCertificate.objects.bulk_create(psc_iscc + psc_2bs + psc_red + psc_sn)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not update production site certificates"}, status=400)
 
