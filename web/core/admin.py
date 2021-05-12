@@ -19,7 +19,7 @@ from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
 from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
-from core.models import GHGValues, Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
+from core.models import Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
 from core.models import LotValidationError
 
 from core.models import SustainabilityDeclaration, EntityDepot
@@ -80,12 +80,6 @@ class LotValidationErrorAdmin(admin.ModelAdmin):
     list_filter = ('warning_to_admin', 'warning_to_user', 'block_validation', 'rule_triggered')
     search_fields = ('rule_triggered', 'message')
     raw_id_fields = ('lot', )
-
-
-class GHGValuesAdmin(admin.ModelAdmin):
-    list_display = ('matiere_premiere', 'biocarburant', 'condition', 'eec_default', 'ep_default', 'etd_default')
-    search_fields = ('matiere_premiere', 'biocarburant')
-    list_filter = ('biocarburant',)
 
 
 class DepotAdmin(admin.ModelAdmin):
@@ -362,7 +356,6 @@ admin.site.register(UserPreferences, UserPreferencesAdmin)
 admin.site.register(Biocarburant, BiocarburantAdmin)
 admin.site.register(MatierePremiere, MatierePremiereAdmin)
 admin.site.register(Pays, PaysAdmin)
-admin.site.register(GHGValues, GHGValuesAdmin)
 admin.site.register(Depot, DepotAdmin)
 admin.site.register(LotV2, LotV2Admin)
 admin.site.register(LotTransaction, TransactionAdmin)
