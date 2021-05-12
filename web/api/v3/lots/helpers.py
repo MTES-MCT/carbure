@@ -71,14 +71,14 @@ def get_entity_lots_by_status(entity, status):
             'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country'
         )
 
-        txs = txs.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
-
         # filter by status
         if status == 'draft':
-            txs = txs.filter(lot__status='Draft')
+            txs = txs.filter(Q(lot__added_by=entity, lot__status='Draft')
         elif status == 'in':
+            txs = txs.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
             txs = txs.filter(delivery_status__in=['N', 'AC', 'AA'], lot__status="Validated", is_mac=False)
         elif status == 'accepted':
+            txs = txs.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
             txs = txs.filter(lot__status='Validated', delivery_status='A')
         else:
             raise Exception('Unknown status')
