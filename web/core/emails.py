@@ -25,7 +25,7 @@ def send_reject_email(vendor, txs):
       message=text_message,
       from_email=settings.DEFAULT_FROM_EMAIL,
       html_message=html_message,
-      recipient_list=[recipients_emails],
+      recipient_list=recipients_emails,
       fail_silently=False,
   )
 
