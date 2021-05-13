@@ -129,7 +129,7 @@ def get_snapshot(request, *args, **kwargs):
         draft = tx_drafts.count()
         tx_inbox = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AC', 'AA'])
         inbox = tx_inbox.count()
-        tx_stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0, is_forwarded=False)
+        tx_stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__remaining_volume__gt=0, is_forwarded=False)
         stock = tx_stock.count()
         data['lots'] = {'in': inbox,  'stock': stock, 'tosend': draft}
     else:
