@@ -38,15 +38,6 @@ def get_countries(request):
     return JsonResponse({'status': 'success', 'data': sez})
 
 
-def get_ges(request):
-    # TODO
-    return JsonResponse({
-        'status': 'success',
-        'data': {'eec': 0.0, 'el': 0.0, 'ep': 0.0, 'etd': 0.0, 'eu': 0.0,
-                 'esca': 0.0, 'eccs': 0.0, 'eccr': 0.0, 'eee': 0.0}
-    })
-
-
 def get_entities(request):
     q = request.GET.get('query', False)
     entities = Entity.objects.all().order_by('name')

@@ -24,8 +24,8 @@ class SettingsAPITest(TestCase):
         self.entity3, _ = Entity.objects.update_or_create(name='Le Super Trader 1', entity_type='Trader')
 
         # some rights
-        UserRights.objects.update_or_create(user=self.user1, entity=self.entity1)
-        UserRights.objects.update_or_create(user=self.user1, entity=self.entity2)         
+        UserRights.objects.update_or_create(user=self.user1, entity=self.entity1, defaults={'role': UserRights.ADMIN})
+        UserRights.objects.update_or_create(user=self.user1, entity=self.entity2, defaults={'role': UserRights.RW})
 
         loggedin = self.client.login(username=self.user_email, password=self.user_password)
         self.assertTrue(loggedin)
@@ -36,6 +36,8 @@ class SettingsAPITest(TestCase):
         response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
         self.assertEqual(response.status_code, 302)
 
+        # some data
+        fr, _ = Pays.objects.get_or_create(code_pays='FR', name='France')
 
     def test_get_settings(self):
         url = 'api-v3-settings-get'
@@ -60,10 +62,15 @@ class SettingsAPITest(TestCase):
         # entity I do not belong to
         response = self.client.post(reverse(url_enable), {'entity_id': self.entity3.id})
         self.assertEqual(response.status_code, 403)
-        # should pass
+        # should not pass (not admin)
         response = self.client.post(reverse(url_enable), {'entity_id': self.entity2.id})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 403)
         entity = Entity.objects.get(id=self.entity2.id)
+        self.assertEqual(entity.has_mac, False)        
+        # should pass
+        response = self.client.post(reverse(url_enable), {'entity_id': self.entity1.id})
+        self.assertEqual(response.status_code, 200)        
+        entity = Entity.objects.get(id=self.entity1.id)
         self.assertEqual(entity.has_mac, True)
 
         # disable:
@@ -77,15 +84,15 @@ class SettingsAPITest(TestCase):
         response = self.client.post(reverse(url_disable), {'entity_id': self.entity3.id})
         self.assertEqual(response.status_code, 403)
         # should pass
-        response = self.client.post(reverse(url_disable), {'entity_id': self.entity2.id})
+        response = self.client.post(reverse(url_disable), {'entity_id': self.entity1.id})
         self.assertEqual(response.status_code, 200)
-        entity = Entity.objects.get(id=self.entity2.id)
+        entity = Entity.objects.get(id=self.entity1.id)
         self.assertEqual(entity.has_mac, False)        
 
         # revert
-        response = self.client.post(reverse(url_enable), {'entity_id': self.entity2.id})
+        response = self.client.post(reverse(url_enable), {'entity_id': self.entity1.id})
         self.assertEqual(response.status_code, 200)
-        entity = Entity.objects.get(id=self.entity2.id)
+        entity = Entity.objects.get(id=self.entity1.id)
         self.assertEqual(entity.has_mac, True)
 
     def test_trading_option(self):
@@ -130,8 +137,13 @@ class SettingsAPITest(TestCase):
         self.assertEqual(entity.has_trading, True)
 
         # should not work on Operator
+        # first because we don't have the rights
         response = self.client.post(reverse(url_enable), {'entity_id': self.entity2.id})
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 403)
+        UserRights.objects.update_or_create(user=self.user1, entity=self.entity2, defaults={'role': UserRights.ADMIN})
+        # then because operators cannot trade
+        response = self.client.post(reverse(url_enable), {'entity_id': self.entity2.id})
+        self.assertEqual(response.status_code, 400)        
 
 
     def test_production_sites_settings(self):
@@ -162,20 +174,27 @@ class SettingsAPITest(TestCase):
         site = ProductionSite.objects.get(site_id='FR0001')
         # update 
         psite['postal_code'] = '75018'
-        psite['production_site_id'] = site.id
         response = self.client.post(reverse(url_update), psite)
-        self.assertEqual(response.status_code, 200)   
+        self.assertEqual(response.status_code, 400) # update without specifying site_id
+        psite['production_site_id'] = site.id
+        psite['country_code'] = 'WW'
+        response = self.client.post(reverse(url_update), psite)
+        self.assertEqual(response.status_code, 400) # unknown country code WW
+        psite['country_code'] = 'FR'
+        response = self.client.post(reverse(url_update), psite)
+        self.assertEqual(response.status_code, 200)
         site = ProductionSite.objects.get(site_id='FR0001')
         self.assertEqual(site.postal_code, '75018')
+
         # set mps/bcs
         MatierePremiere.objects.update_or_create(code='COLZA', name='Colza')
         MatierePremiere.objects.update_or_create(code='BEETROOT', name='Betterave')
         Biocarburant.objects.update_or_create(code='ETH', name='Ethanol')
         Biocarburant.objects.update_or_create(code='HVO', name='HVO')
 
-        response = self.client.post(reverse(url_set_mps), {'production_site_id': site.id, 'matiere_premiere_codes': ['COLZA', 'BEETROOT']})
-        self.assertEqual(response.status_code, 200)   
-        response = self.client.post(reverse(url_set_bcs), {'production_site_id': site.id, 'biocarburant_codes': ['ETH', 'HVO']})
+        response = self.client.post(reverse(url_set_mps), {'entity_id': self.entity1.id, 'production_site_id': site.id, 'matiere_premiere_codes': ['COLZA', 'BEETROOT']})
+        self.assertEqual(response.status_code, 200)
+        response = self.client.post(reverse(url_set_bcs), {'entity_id': self.entity1.id, 'production_site_id': site.id, 'biocarburant_codes': ['ETH', 'HVO']})
         self.assertEqual(response.status_code, 200)   
         # check
         inputs = ProductionSiteInput.objects.filter(production_site=site)
@@ -184,8 +203,13 @@ class SettingsAPITest(TestCase):
         self.assertEqual(len(outputs), 2)
 
         # delete
-        response = self.client.post(reverse(url_delete), psite)
-        self.assertEqual(response.status_code, 200)   
+        post = {'entity_id': self.entity1.id}
+        response = self.client.post(reverse(url_delete), post)
+        self.assertEqual(response.status_code, 400)   # missing production_site_id
+
+        post['production_site_id'] = site.id
+        response = self.client.post(reverse(url_delete), post)
+        self.assertEqual(response.status_code, 200)
         # get - 0 sites
         response = self.client.get(reverse(url_get), {'entity_id': self.entity1.id})
         self.assertEqual(response.status_code, 200)
@@ -449,3 +473,68 @@ class SettingsAPITest(TestCase):
         #test_invite_unknown_role
         response = self.client.post(reverse(url), {'entity_id': self.entity1.id, 'email': self.user2.email, 'role': "tougoudou"})
         self.assertEqual(response.status_code, 400)
+
+
+    def test_update_entity(self):
+        url = 'api-v3-settings-update-entity'
+        response = self.client.post(reverse(url), {'entity_id': self.entity1.id, 'legal_name': "MA SOCIETE", "registration_id": "pouet", 
+        "sustainability_officer_phone_number": "0147247000", "sustainability_officer": "Jules Antoine Martin de la Porte Villardière", "registered_address": "24 avenue des Champs Élysées, 2ème étage gauche, 75000 Paris CEDEX 12, France"})
+        self.assertEqual(response.status_code, 200)
+
+    def test_add_production_site(self):
+        postdata = {'entity_id': self.entity2.id}
+        url = 'api-v3-settings-add-production-site'
+        response = self.client.post(reverse(url), postdata)
+        self.assertEqual(response.status_code, 400) 
+        self.assertEqual(response.json()['message'], "SETTINGS_ADD_PRODUCTION_SITE_MISSING_COUNTRY_CODE")
+        postdata['country_code'] = 'ZZ'
+        response = self.client.post(reverse(url), postdata)
+        self.assertEqual(response.status_code, 400) 
+        self.assertEqual(response.json()['message'], "SETTINGS_ADD_PRODUCTION_SITE_MISSING_NAME")
+        postdata['name'] = 'Site de production 007'
+        response = self.client.post(reverse(url), postdata)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()['message'], "SETTINGS_ADD_PRODUCTION_SITE_MISSING_COM_DATE")
+        postdata['date_mise_en_service'] = '12/05/2007'
+        response = self.client.post(reverse(url), postdata)
+        self.assertEqual(response.status_code, 400) 
+        self.assertEqual(response.json()['message'], "SETTINGS_ADD_PRODUCTION_SITE_MISSING_GHG_OPTION")        
+        postdata['ges_option'] = 'DEFAULT'
+        response = self.client.post(reverse(url), postdata)
+        self.assertEqual(response.status_code, 400) 
+        self.assertEqual(response.json()['message'], "SETTINGS_ADD_PRODUCTION_SITE_MISSING_ID")
+        postdata['site_id'] = 'FR78895468'
+        response = self.client.post(reverse(url), postdata)
+        self.assertEqual(response.status_code, 400) 
+        self.assertEqual(response.json()['message'], "SETTINGS_ADD_PRODUCTION_SITE_MISSING_ZIP_CODE")        
+        postdata['postal_code'] = '64430'
+        response = self.client.post(reverse(url), postdata)
+        self.assertEqual(response.status_code, 400) 
+        self.assertEqual(response.json()['message'], "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_NAME")   
+        postdata['manager_name'] = 'William Rock'
+        response = self.client.post(reverse(url), postdata)
+        self.assertEqual(response.status_code, 400) 
+        self.assertEqual(response.json()['message'], "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_PHONE")   
+        postdata['manager_phone'] = '0145247000'
+        response = self.client.post(reverse(url), postdata)
+        self.assertEqual(response.status_code, 400) 
+        self.assertEqual(response.json()['message'], "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_EMAIL")   
+        postdata['manager_email'] = 'will.rock@example.com'
+        response = self.client.post(reverse(url), postdata)
+        self.assertEqual(response.status_code, 400) 
+        self.assertEqual(response.json()['message'], "SETTINGS_ADD_PRODUCTION_SITE_MISSING_CITY")
+        postdata['city'] = 'Guermiette'
+        response = self.client.post(reverse(url), postdata)
+        self.assertEqual(response.status_code, 400) 
+        self.assertEqual(response.json()['message'], "SETTINGS_ADD_PRODUCTION_SITE_COM_DATE_WRONG_FORMAT")
+        postdata['date_mise_en_service'] = '2007-05-12'
+        response = self.client.post(reverse(url), postdata)
+        self.assertEqual(response.status_code, 400) 
+        self.assertEqual(response.json()['message'], "SETTINGS_ADD_PRODUCTION_SITE_UNKNOWN_COUNTRY_CODE")
+        postdata['country_code'] = 'FR'
+        response = self.client.post(reverse(url), postdata)
+        self.assertEqual(response.status_code, 400) 
+        self.assertEqual(response.json()['message'], "SETTINGS_ADD_PRODUCTION_SITE_UNKNOWN_PRODUCER")
+        postdata['entity_id'] = self.entity1.id
+        response = self.client.post(reverse(url), postdata)
+        self.assertEqual(response.status_code, 200)
