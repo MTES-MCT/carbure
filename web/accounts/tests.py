@@ -141,11 +141,8 @@ class AccountTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-    def submit_otp(self, user_email=None):
+    def submit_otp(self, user_email):
         usermodel = get_user_model()
-        if user_email is None:
-            user_email = self.user_email
-
         response = self.client.get(reverse('otp-verify'))
         self.assertEqual(response.status_code, 200) 
 
@@ -171,3 +168,7 @@ class AccountTest(TestCase):
         self.client.logout()
         loggedin = self.client.login(username='testuser1@toto.com', password='totopouet02')
         self.assertTrue(loggedin)
+        self.submit_otp(user_email='testuser1@toto.com')
+
+        response = self.client.get(reverse('custom-password-change-success'))
+        self.assertEqual(response.status_code, 200)
