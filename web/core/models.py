@@ -28,7 +28,7 @@ class Entity(models.Model):
     legal_name = models.CharField(max_length=128, blank=True, default='')
     registration_id = models.CharField(max_length=64, blank=True, default='')
     sustainability_officer_phone_number = models.CharField(max_length=32, blank=True, default='')
-    sustainability_officer = models.CharField(max_length=32, blank=True, default='')
+    sustainability_officer = models.CharField(max_length=256, blank=True, default='')
     registered_address = models.TextField(blank=True, default='')
 
     def __str__(self):
