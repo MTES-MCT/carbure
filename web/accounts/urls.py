@@ -9,7 +9,6 @@ urlpatterns = [
     path('activate/<str:uidb64>/<str:token>', views.activate, name='activate'),
     path('otp_verify', views.otp_verify, name='otp-verify'),
     path('resend_otp_code', views.resend_otp_code, name='resend-otp-code'),
-    path('profile', views.profile, name='profile'),
     path('password-change', views.custom_password_change, name='custom-password-change'),
     path('password-change-success', views.custom_password_change_success, name='custom-password-change-success'),
 ]

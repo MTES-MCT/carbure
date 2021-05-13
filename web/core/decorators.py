@@ -20,31 +20,6 @@ def get_producer_corrections(entity):
     return transactions, comments
 
 
-def enrich_with_user_details(function):
-    def wrap(request, *args, **kwargs):
-        user_rights = UserRights.objects.filter(user=request.user)
-        user_preferences, created = UserPreferences.objects.get_or_create(user=request.user)
-        if user_preferences.default_entity == None:
-            if len(user_rights) == 0:
-                return render(request, 'public/blank_user.html', {})
-            default_right = user_rights[0]
-            user_preferences.default_entity = default_right.entity
-            user_preferences.save()
-        context = {}
-        context['user_name'] = request.user.name
-        context['user'] = request.user
-        context['nb_entities'] = len(user_rights)
-        context['entities'] = [u.entity for u in user_rights]
-        context['user_entity'] = user_preferences.default_entity
-        context['user_entity_name'] = user_preferences.default_entity.name
-        context['url_friendly_name'] = context['user_entity'].url_friendly_name()
-        kwargs['context'] = context
-        return function(request, *args, **kwargs)
-    wrap.__doc__ = function.__doc__
-    wrap.__name__ = function.__name__
-    return wrap
-
-
 def restrict_to_producers(function):
     def wrap(request, *args, **kwargs):
         context = kwargs['context']
@@ -126,8 +101,8 @@ def check_rights(entity_id_field, role=None):
     def actual_decorator(function):
         @wraps(function)
         def wrap(request, *args, **kwargs):
-            if not request.user.is_verified:
-                return JsonResponse({'status': 'forbidden', 'message': "User not verified"}, status=403)
+            if not request.user.is_verified():
+                return JsonResponse({'status': 'forbidden', 'message': "User not OTP verified"}, status=403)
 
             entity_id = request.POST.get(entity_id_field, request.GET.get(entity_id_field, False))
             if not entity_id:

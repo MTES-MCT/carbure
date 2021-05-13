@@ -86,7 +86,7 @@ def get_production_sites(request, *args, **kwargs):
 
     return JsonResponse({'status': 'success', 'data': data})
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def add_production_site(request, *args, **kwargs):
     country = request.POST.get('country_code')
     name = request.POST.get('name')
@@ -106,48 +106,42 @@ def add_production_site(request, *args, **kwargs):
     manager_email = request.POST.get('manager_email')
 
     if country is None:
-        return JsonResponse({'status': 'error', 'message': "Missing country_code"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "SETTINGS_ADD_PRODUCTION_SITE_MISSING_COUNTRY_CODE"}, status=400)
     if name is None:
-        return JsonResponse({'status': 'error', 'message': "Missing name"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "SETTINGS_ADD_PRODUCTION_SITE_MISSING_NAME"}, status=400)
     if date_mise_en_service is None:
-        return JsonResponse({'status': 'error', 'message': "Missing date_mise_en_service"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "SETTINGS_ADD_PRODUCTION_SITE_MISSING_COM_DATE"}, status=400)
     if ges_option is None:
-        return JsonResponse({'status': 'error', 'message': "Missing ges_option"}, status=400)
-    if producer is None:
-        return JsonResponse({'status': 'error', 'message': "Missing producer"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "SETTINGS_ADD_PRODUCTION_SITE_MISSING_GHG_OPTION"}, status=400)
     if site_id is None:
-        return JsonResponse({'status': 'error', 'message': "Missing site id"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "SETTINGS_ADD_PRODUCTION_SITE_MISSING_ID"}, status=400)
     if postal_code is None:
-        return JsonResponse({'status': 'error', 'message': "Missing postal code"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "SETTINGS_ADD_PRODUCTION_SITE_MISSING_ZIP_CODE"}, status=400)
     if manager_name is None:
-        return JsonResponse({'status': 'error', 'message': "Missing manager name"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_NAME"}, status=400)
     if manager_phone is None:
-        return JsonResponse({'status': 'error', 'message': "Missing manager phone"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_PHONE"}, status=400)
     if manager_email is None:
-        return JsonResponse({'status': 'error', 'message': "Missing manager email"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "SETTINGS_ADD_PRODUCTION_SITE_MISSING_MANAGER_EMAIL"}, status=400)
     if city is None:
-        return JsonResponse({'status': 'error', 'message': "Missing city"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "SETTINGS_ADD_PRODUCTION_SITE_MISSING_CITY"}, status=400)
 
     try:
         date_mise_en_service = datetime.datetime.strptime(date_mise_en_service, '%Y-%m-%d')
     except Exception:
-        return JsonResponse({'status': 'error', 'message': "Date format should be YYYY-MM-DD"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "SETTINGS_ADD_PRODUCTION_SITE_COM_DATE_WRONG_FORMAT"}, status=400)
 
     try:
         country = Pays.objects.get(code_pays=country)
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown country_code %s" % (country), 'extra': str(e)},
+        return JsonResponse({'status': 'error', 'message': "SETTINGS_ADD_PRODUCTION_SITE_UNKNOWN_COUNTRY_CODE", 'extra': country},
                             status=400)
 
     try:
         producer = Entity.objects.get(id=producer, entity_type='Producteur')
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown producer %s" % (producer), 'extra': str(e)},
+        return JsonResponse({'status': 'error', 'message': "SETTINGS_ADD_PRODUCTION_SITE_UNKNOWN_PRODUCER", 'extra': producer},
                             status=400)
-
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if producer not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit producer"}, status=403)
 
     try:
         obj, created = ProductionSite.objects.update_or_create(producer=producer, country=country, name=name, city=city,
@@ -161,7 +155,7 @@ def add_production_site(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': obj.natural_key() })
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN])
 def update_production_site(request, *args, **kwargs):
     production_site_id = request.POST.get('production_site_id', False)
 
@@ -219,19 +213,13 @@ def update_production_site(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@otp_or_403
-def delete_production_site(request):
+@check_rights('entity_id', role=[UserRights.ADMIN])
+def delete_production_site(request, *args, **kwargs):
     site = request.POST.get('production_site_id')
     try:
         ps = ProductionSite.objects.get(id=site)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': "Unknown Production Site", 'extra': str(e)}, status=400)
-
-    # we have all the data, make sure we are allowed to delete it
-    rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-    if ps.producer not in rights:
-        return JsonResponse({'status': 'forbidden', 'message': "User not allowed to edit production site %s" % (site)},
-                            status=403)
 
     # make sure there is no impact by deleting this
     lots = LotV2.objects.filter(carbure_production_site=ps, status='Validated')
@@ -242,8 +230,8 @@ def delete_production_site(request):
     return JsonResponse({'status': 'success'})
 
 
-@otp_or_403
-def set_production_site_mp(request):
+@check_rights('entity_id', role=[UserRights.ADMIN])
+def set_production_site_mp(request, *args, **kwargs):
     site = request.POST.get('production_site_id')
     mp_list = request.POST.getlist('matiere_premiere_codes')
 
@@ -284,8 +272,8 @@ def set_production_site_mp(request):
     return JsonResponse({'status': 'success'})
 
 
-@otp_or_403
-def set_production_site_bc(request):
+@check_rights('entity_id', role=[UserRights.ADMIN])
+def set_production_site_bc(request, *args, **kwargs):
     site = request.POST.get('production_site_id')
     bc_list = request.POST.getlist('biocarburant_codes')
 
@@ -339,7 +327,7 @@ def get_delivery_sites(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': ds})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN])
 def add_delivery_site(request, *args, **kwargs):
     entity = kwargs['context']['entity']
     delivery_site_id = request.POST.get('delivery_site_id', False)
@@ -382,7 +370,7 @@ def add_delivery_site(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN])
 def delete_delivery_site(request, *args, **kwargs):
     entity = kwargs['context']['entity']
     delivery_site_id = request.POST.get('delivery_site_id', False)
@@ -396,7 +384,7 @@ def delete_delivery_site(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN])
 def enable_mac(request, *args, **kwargs):
     entity = kwargs['context']['entity']
     entity.has_mac = True
@@ -404,7 +392,7 @@ def enable_mac(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN])
 def disable_mac(request, *args, **kwargs):
     entity = kwargs['context']['entity']
     entity.has_mac = False
@@ -412,7 +400,7 @@ def disable_mac(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN])
 def enable_trading(request, *args, **kwargs):
     entity = kwargs['context']['entity']
 
@@ -424,7 +412,7 @@ def enable_trading(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN])
 def disable_trading(request, *args, **kwargs):
     entity = kwargs['context']['entity']
 
@@ -625,10 +613,10 @@ def set_production_site_certificates(request, *args, **kwargs):
     try:
         certificates_iscc = EntityISCCTradingCertificate.objects.filter(certificate__certificate_id__in=certificate_ids)
         certificate_2bs = EntityDBSTradingCertificate.objects.filter(certificate__certificate_id__in=certificate_ids)
-        certificate_red = EntityREDcertTradingCertificate.objects.filter(certificate__certificate_id__in=certificate_ids)
+        certificate_red = EntityREDCertTradingCertificate.objects.filter(certificate__certificate_id__in=certificate_ids)
         certificate_sn = EntitySNTradingCertificate.objects.filter(certificate__certificate_id__in=certificate_ids)
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not find requested certificates"}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': "Could not find requested certificates", 'error': str(e)}, status=400)
 
     try:
         ProductionSiteCertificate.objects.filter(entity=context['entity'], production_site=psite).delete()

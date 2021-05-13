@@ -23,32 +23,24 @@ from django_otp import user_has_device, devices_for_user
 from django_otp import login as login_with_device
 from authtools.forms import UserCreationForm
 # app
-from core.decorators import enrich_with_user_details
 from accounts.tokens import account_activation_token
 from accounts.forms import UserResendActivationLinkForm, OTPForm
-
-@login_required
-@enrich_with_user_details
-def profile(request, *args, **kwargs):
-    context = kwargs['context']
-    return render(request, "accounts/profile.html", context)
+from django_otp.decorators import otp_required
 
 
-@login_required
-@enrich_with_user_details
+@otp_required
 def custom_password_change(request, *args, **kwargs):
-    context = kwargs['context']
+    context = {}
     if request.method == 'POST':
         request.user.set_password(request.POST['new_password1'])
         request.user.save()
-        redirect('custom-password-change-success')
+        return redirect('custom-password-change-success')
     return render(request, "accounts/password_change.html", context)
 
 
-@login_required
-@enrich_with_user_details
+@otp_required
 def custom_password_change_success(request, *args, **kwargs):
-    context = kwargs['context']
+    context = {}
     return render(request, "accounts/password_change_done.html", context)
 
 
@@ -158,7 +150,6 @@ def otp_verify(request):
                 login_with_device(request, device)
                 return redirect('/v2')
             else:
-                print('invalid token. expected %s got %s' % (device.token, form.clean_otp_token()))
                 is_allowed, _ = device.verify_is_allowed()
                 now = timezone.now()
                 if now > device.valid_until:
