@@ -221,7 +221,6 @@ def resend_activation_link(request):
                 )
                 return render(request, 'registration/resend_activation_link_done.html', {'form': form})
             except Exception as e:
-                print(e)
                 return render(request, 'registration/resend_activation_link.html', {'form': form})
     else:
         form = UserResendActivationLinkForm()
