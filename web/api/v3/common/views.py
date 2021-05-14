@@ -2,9 +2,8 @@ import datetime
 from django.http import JsonResponse
 from django.db.models import Q
 from core.models import Entity, Biocarburant, MatierePremiere, Depot, Pays
-from certificates.models import ISCCCertificate, DBSCertificate, REDCertCertificate
+from certificates.models import ISCCCertificate, DBSCertificate, REDCertCertificate, SNCertificate
 from core.models import Control, ControlMessages, UserRights
-from certificates.models import SNCertificate
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 from core.decorators import check_rights
 from django_otp.decorators import otp_required
@@ -223,6 +222,31 @@ def get_certificates(request):
 
     return JsonResponse({'status': 'success', 'data': sez})
 
+
+def get_certificate(request):
+    q = request.GET.get('query', False)
+
+    iscc = ISCCCertificate.objects.filter(certificate_id__icontains=q)
+    if iscc.count():
+        match = iscc[0]
+        return JsonResponse({'status': 'success', 'certificate_id': match.certificate_id, 'certificate_holder': match.certificate_holder})
+
+    dbs = DBSCertificate.objects.filter(certificate_id__icontains=q)
+    if dbs.count():
+        match = dbs[0]
+        return JsonResponse({'status': 'success', 'certificate_id': match.certificate_id, 'certificate_holder': match.certificate_holder})
+
+    red = REDCertCertificate.objects.filter(certificate_id__icontains=q)
+    if red.count():
+        match = red[0]
+        return JsonResponse({'status': 'success', 'certificate_id': match.certificate_id, 'certificate_holder': match.certificate_holder})
+
+    sn = SNCertificate.objects.filter(certificate_id__icontains=q)
+    if sn.count():
+        match = sn[0]
+        return JsonResponse({'status': 'success', 'certificate_id': match.certificate_id, 'certificate_holder': match.certificate_holder})
+
+    return JsonResponse({'status': 'error', 'message': 'COMMON_GET_CERTIFICATE_NOT_FOUND'}, status=400)
 
 @otp_required
 def create_delivery_site(request):
