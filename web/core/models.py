@@ -434,42 +434,6 @@ class LotTransaction(models.Model):
         ]
 
 
-class LotV2Error(models.Model):
-    lot = models.ForeignKey(LotV2, null=False, blank=False, on_delete=models.CASCADE)
-    field = models.CharField(max_length=64, null=False, blank=False)
-    value = models.CharField(max_length=128, null=True, blank=True)
-    error = models.CharField(max_length=256, null=False, blank=False)
-
-    def __str__(self):
-        return self.error
-
-    def natural_key(self):
-        return {'lot_id': self.lot.id, 'field': self.field, 'value': self.value, 'error': self.error}
-
-    class Meta:
-        db_table = 'lotsv2_errors'
-        verbose_name = 'LotV2Error'
-        verbose_name_plural = 'LotV2Errors'
-
-
-class TransactionError(models.Model):
-    tx = models.ForeignKey(LotTransaction, null=False, blank=False, on_delete=models.CASCADE)
-    field = models.CharField(max_length=64, null=False, blank=False)
-    value = models.CharField(max_length=128, null=True, blank=True)
-    error = models.CharField(max_length=256, null=False, blank=False)
-
-    def __str__(self):
-        return self.error
-
-    def natural_key(self):
-        return {'tx_id': self.tx.id, 'field': self.field, 'value': self.value, 'error': self.error}
-
-    class Meta:
-        db_table = 'tx_errors'
-        verbose_name = 'TransactionError'
-        verbose_name_plural = 'TransactionsErrors'
-
-
 class TransactionComment(models.Model):
     COMMENT_TOPIC = (('SUSTAINABILITY', 'Durabilité'), ('TX', 'Transaction'), ('BOTH', 'Les deux'))
     entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
@@ -487,35 +451,6 @@ class TransactionComment(models.Model):
         db_table = 'tx_comments'
         verbose_name = 'TransactionComment'
         verbose_name_plural = 'TransactionComments'
-
-
-class LotValidationError(models.Model):
-    lot = models.ForeignKey(LotV2, null=False, blank=False, on_delete=models.CASCADE)
-    tx = models.ForeignKey(LotTransaction, null=True, on_delete=models.SET_NULL)
-    rule_triggered = models.CharField(max_length=64, blank=True, null=True, default='')
-
-    warning_to_user = models.BooleanField(default=False)
-    warning_to_recipient = models.BooleanField(default=False)
-    warning_to_admin = models.BooleanField(default=False)
-    block_validation = models.BooleanField(default=False)
-    message = models.TextField(blank=True, null=True, default='')
-    details = models.TextField(blank=True, null=True, default='')
-
-    acked_by_admin = models.BooleanField(default=False)
-    highlighted_by_admin = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.rule_triggered
-
-    def natural_key(self):
-        return {'lot_id': self.lot.id, 'error': self.message, 'details': self.details, 'is_blocking': self.block_validation, 'is_warning': self.warning_to_user, 'acked_by_admin': self.acked_by_admin, 'highlighted_by_admin': self.highlighted_by_admin}
-
-    class Meta:
-        db_table = 'validation_errors'
-        verbose_name = 'LotValidationError'
-        verbose_name_plural = 'LotValidationErrors'
-
-
 
 
 class Control(models.Model):
