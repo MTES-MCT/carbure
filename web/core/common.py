@@ -84,7 +84,7 @@ def send_lot_from_stock(rights, tx, prefetched_data):
     tx_valid = tx_is_valid(tx, prefetched_data)
     if not tx_valid:
         return False, 'Transaction invalide'
-    lot_valid = lot_is_valid(lot)
+    lot_valid = lot_is_valid(tx)
     if not lot_valid:
         return False, 'Lot invalide'
 
