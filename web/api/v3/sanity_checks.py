@@ -190,7 +190,7 @@ def sanity_check(tx, prefetched_data):
         # certificates
         certificates = lot.carbure_production_site.productionsitecertificate_set.all()
         if certificates.count() == 0:
-            errors.append(generic_error(error='MISSING_PRODSITE_CERTIFICATE'))
+            errors.append(generic_error(error='MISSING_PRODSITE_CERTIFICATE', tx=tx))
 
     if not tx.client_is_in_carbure and not tx.is_mac:
         errors.append(generic_error(error='UNKNOWN_CLIENT', tx=tx, display_to_recipient=False))

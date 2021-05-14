@@ -178,10 +178,10 @@ def add_lot(request, *args, **kwargs):
 
     # prefetch some data
     d = get_prefetched_data(entity)
-    lot, tx, lot_errors, tx_errors = load_lot(d, entity, request.user, request.POST.dict(), 'MANUAL')
+    lot, tx, errors = load_lot(d, entity, request.user, request.POST.dict(), 'MANUAL')
     if not tx:
         return JsonResponse({'status': 'error', 'message': 'Could not add lot to database'}, status=400)
-    new_lots, new_txs = bulk_insert(entity, [lot], [tx], [lot_errors], [tx_errors], d)
+    new_lots, new_txs = bulk_insert(entity, [lot], [tx], [errors], d)
     if len(new_txs) == 0:
         print(request.POST)
         return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=500)
