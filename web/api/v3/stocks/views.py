@@ -203,8 +203,7 @@ def create_drafts(request, *args, **kwargs):
     d = get_prefetched_data(context['entity'])
     lots = []
     txs = []
-    all_lot_errors = []
-    all_tx_errors = []
+    all_errors = []
     try:
         drafts = json.loads(drafts)
     except Exception as e:
@@ -239,14 +238,13 @@ def create_drafts(request, *args, **kwargs):
             if key in draft:
                 lot_dict[key] = draft[key]
         # create sub-transaction
-        lot, tx, lot_errors, tx_errors = load_mb_lot(d, context['entity'], request.user, lot_dict, 'MANUAL')
+        lot, tx, errors = load_mb_lot(d, context['entity'], request.user, lot_dict, 'MANUAL')
         if tx is None or not tx:
-            return JsonResponse({'status': 'error', 'message': 'Could not add lot %d to database: %s' % (i, lot_errors)}, status=400)
+            return JsonResponse({'status': 'error', 'message': 'Could not add lot %d to database: %s' % (i, errors)}, status=400)
         lots.append(lot)
         txs.append(tx)
-        all_lot_errors.append(lot_errors)
-        all_tx_errors.append(tx_errors)
-    new_lots, new_txs = bulk_insert(context['entity'], lots, txs, all_lot_errors, all_tx_errors, d)
+        all_errors.append(errors)
+    new_lots, new_txs = bulk_insert(context['entity'], lots, txs, all_errors, d)
     return JsonResponse({'status': 'success', 'data': {'tx_ids': [tx.id for tx in new_txs]}})
 
 

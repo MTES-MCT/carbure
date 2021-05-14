@@ -625,38 +625,38 @@ def fill_delivery_date(lot_row, lot, transaction):
     return tx_errors
 
 
-def fill_client_data(entity, lot_row, transaction, prefetched_data):
+def fill_client_data(entity, lot_row, tx, prefetched_data):
     # if lot has already been validated and is currently in correction, we cannot change the client
-    if transaction.delivery_status == 'AC':
+    if tx.delivery_status == 'AC':
         return []
 
-    if transaction.is_mac:
-        transaction.client_is_in_carbure = False
-        transaction.carbure_client = None
-        transaction.unknown_client = ''
+    if tx.is_mac:
+        tx.client_is_in_carbure = False
+        tx.carbure_client = None
+        tx.unknown_client = ''
         if 'client' in lot_row:
-            transaction.unknown_client = lot_row['client']
+            tx.unknown_client = lot_row['client']
 
     tx_errors = []
     clients = prefetched_data['clients']
     if entity.entity_type == 'Opérateur':
-        transaction.client_is_in_carbure = True
-        transaction.carbure_client = entity
-        transaction.unknown_client = ''
+        tx.client_is_in_carbure = True
+        tx.carbure_client = entity
+        tx.unknown_client = ''
     elif 'client' in lot_row and lot_row['client'] is not None and lot_row['client'] != '':
         client = lot_row['client'].upper().strip()
         if client in clients:
-            transaction.client_is_in_carbure = True
-            transaction.carbure_client = clients[client]
-            transaction.unknown_client = ''
+            tx.client_is_in_carbure = True
+            tx.carbure_client = clients[client]
+            tx.unknown_client = ''
         else:
-            transaction.client_is_in_carbure = False
-            transaction.carbure_client = None
-            transaction.unknown_client = client
+            tx.client_is_in_carbure = False
+            tx.carbure_client = None
+            tx.unknown_client = client
     else:
-        transaction.client_is_in_carbure = True
-        transaction.carbure_client = entity
-        transaction.unknown_client = ''
+        tx.client_is_in_carbure = True
+        tx.carbure_client = entity
+        tx.unknown_client = ''
     return tx_errors
 
 
@@ -733,12 +733,11 @@ def fill_delivery_site_data(lot_row, transaction, prefetched_data):
     return tx_errors
 
 def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
-    lot_errors = []
-    tx_errors = []
+    errors = []
 
     # check for empty row
     if lot_dict.get('volume', None) is None:
-        return None, None, "Missing volume", None
+        return None, None, "Missing volume"
 
     carbure_id = lot_dict.get('carbure_id', False)
     tx_id = lot_dict.get('tx_id', False)
@@ -755,13 +754,13 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
             source_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status='A', id=tx_id)
             source_lot = LotV2.objects.get(id=source_tx.lot.id)
         except Exception as e:
-            return None, None, "TX not found", None
+            return None, None, "TX not found"
     elif carbure_id:
         try:
             source_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status='A', lot__carbure_id=carbure_id)
             source_lot = LotV2.objects.get(id=source_tx.lot.id)
         except Exception as e:
-            return None, None, "TX not found", None
+            return None, None, "TX not found"
     else:
         # try to find it via filters
         matching_txs = LotTransaction.objects.filter(carbure_client=entity, delivery_status='A')
@@ -769,13 +768,13 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
             try:
                 bc = Biocarburant.objects.get(code=biocarburant)
             except:
-                return None, None, "Unknown biocarburant", None
+                return None, None, "Unknown biocarburant"
             matching_txs = matching_txs.filter(lot__biocarburant=bc)
         if matiere_premiere:
             try:
                 mp = MatierePremiere.objects.get(code=matiere_premiere)
             except:
-                return None, None, "Unknown matiere premiere", None
+                return None, None, "Unknown matiere premiere"
             matching_txs = matching_txs.filter(lot__matiere_premiere=mp)
         if ghg_reduction:
             matching_txs = matching_txs.filter(lot__ghg_reduction=ghg_reduction)
@@ -788,7 +787,7 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
             source_lot = LotV2.objects.get(id=source_tx.lot.id)
         else:
             nb_matches = matching_txs.count()
-            return None, None, "Could not find mass balance line. %d matches" % (nb_matches), None
+            return None, None, "Could not find mass balance line. %d matches" % (nb_matches)
 
     lot = source_tx.lot
 
@@ -797,7 +796,7 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
         # this lot is currently in my mass balance
         pass
     else:
-        return None, None, "Cannot extract from this lot", None
+        return None, None, "Cannot extract from this lot"
 
     # let's create a new lot and transaction
     lot.pk = None
@@ -813,18 +812,18 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
     transaction = LotTransaction()
     transaction.carbure_vendor = entity
     transaction.parent_tx = source_tx
-    lot_errors += fill_volume_info(lot_dict, lot, transaction)
-    tx_errors += fill_mac_data(lot_errors, transaction)
-    tx_errors += fill_dae_data(lot_dict, transaction)
-    tx_errors += fill_delivery_date(lot_dict, lot, transaction)
-    tx_errors += fill_client_data(entity, lot_dict, transaction, prefetched_data)
-    tx_errors += fill_vendor_data(entity, lot_dict, transaction, prefetched_data)
-    tx_errors += fill_delivery_site_data(lot_dict, transaction, prefetched_data)
+    errors += fill_volume_info(lot_dict, lot, transaction)
+    fill_mac_data(lot_dict, transaction) # does not return errors
+    errors += fill_dae_data(lot_dict, transaction)
+    errors += fill_delivery_date(lot_dict, lot, transaction)
+    errors += fill_client_data(entity, lot_dict, transaction, prefetched_data)
+    errors += fill_vendor_data(entity, lot_dict, transaction, prefetched_data)
+    errors += fill_delivery_site_data(lot_dict, transaction, prefetched_data)
 
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
     transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
-    return lot, transaction, lot_errors, tx_errors
+    return lot, transaction, errors
 
 def fill_mac_data(lot_dict, transaction):
     transaction.is_mac = False
@@ -838,7 +837,7 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, tx=None):
     # check for empty row
     biocarburant_code = lot_dict.get('biocarburant_code', None)
     if biocarburant_code is None or biocarburant_code == '':
-        return None, None, "Missing biocarburant_code", None
+        return None, None, "Missing biocarburant_code"
 
     if tx is None:
         lot = LotV2()
@@ -863,16 +862,16 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, tx=None):
         errors += fill_ghg_info(lot_dict, lot, tx)
     errors += fill_volume_info(lot_dict, lot, tx)
 
-    errors += fill_mac_data(lot_dict, transaction)
-    errors += fill_dae_data(lot_dict, transaction)
-    errors += fill_delivery_date(lot_dict, lot, transaction)
-    errors += fill_client_data(entity, lot_dict, transaction, prefetched_data)
-    errors += fill_vendor_data(entity, lot_dict, transaction, prefetched_data)
-    errors += fill_delivery_site_data(lot_dict, transaction, prefetched_data)
-    transaction.ghg_total = lot.ghg_total
-    transaction.ghg_reduction = lot.ghg_reduction
-    transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
-    return lot, transaction, errors
+    fill_mac_data(lot_dict, tx) # does not return anything
+    errors += fill_dae_data(lot_dict, tx)
+    errors += fill_delivery_date(lot_dict, lot, tx)
+    errors += fill_client_data(entity, lot_dict, tx, prefetched_data)
+    errors += fill_vendor_data(entity, lot_dict, tx, prefetched_data)
+    errors += fill_delivery_site_data(lot_dict, tx, prefetched_data)
+    tx.ghg_total = lot.ghg_total
+    tx.ghg_reduction = lot.ghg_reduction
+    tx.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
+    return lot, tx, errors
 
 
 def load_excel_file(entity, user, file, mass_balance=False):
@@ -893,33 +892,30 @@ def load_excel_file(entity, user, file, mass_balance=False):
         lots_loaded = 0
         lots_to_insert = []
         txs_to_insert = []
-        lot_errors = []
-        tx_errors = []
+        generic_errors = []
         print('File read %s' % (datetime.datetime.now()))
         for row in df.iterrows():
             lot_row = row[1]
             try:
                 if mass_balance:
-                    lot, tx, l_errors, t_errors = load_mb_lot(prefetched_data, entity, user, lot_row, 'EXCEL')
+                    lot, tx, errors = load_mb_lot(prefetched_data, entity, user, lot_row, 'EXCEL')
                 else:
-                    lot, tx, l_errors, t_errors = load_lot(prefetched_data, entity, user, lot_row, 'EXCEL')
+                    lot, tx, errors = load_lot(prefetched_data, entity, user, lot_row, 'EXCEL')
                 if lot is None:
                     # could not load line. missing column biocaburant_code?
                     #print(lot_row)
-                    print(l_errors)
-                    print(t_errors)
+                    print(errors)
                     continue
                 lots_loaded += 1
                 lots_to_insert.append(lot)
                 txs_to_insert.append(tx)
-                lot_errors.append(l_errors)
-                tx_errors.append(t_errors)
+                generic_errors.append(errors)
             except Exception as e:
                 print(e)
                 traceback.print_exc()
                 #print(lot_row)
         print('File processed %s' % (datetime.datetime.now()))
-        bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors, prefetched_data)
+        bulk_insert(entity, lots_to_insert, txs_to_insert, generic_errors, prefetched_data)
         print('%d Lots out of %d lines loaded in database %s' % (lots_loaded, total_lots, datetime.datetime.now()))
         return lots_loaded, total_lots, errors
     except Exception as e:
