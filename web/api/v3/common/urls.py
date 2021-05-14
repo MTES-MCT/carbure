@@ -17,6 +17,7 @@ urlpatterns = [
     path('redcert-certificates', views.get_redcert_certificates, name='api-v3-public-search-redcert-certificates'),
     path('sn-certificates', views.get_sn_certificates, name='api-v3-public-search-sn-certificates'),
     path('certificates', views.get_certificates, name='api-v3-public-search-certificates'),
+    path('certificate', views.get_certificate, name='api-v3-public-get-certificate'),
 
     # POST
     path('create-delivery-site', views.create_delivery_site, name='api-v3-public-create-delivery-site'),

@@ -2,11 +2,6 @@ import datetime
 from django import db
 from core.models import LotValidationError, LotV2Error, TransactionError, Entity
 
-# init data cache
-# MPS = {m.code: m for m in MatierePremiere.objects.all()}
-# BCS = {b.code: b for b in Biocarburant.objects.all()}
-# COUNTRIES = {p.code_pays: p for p in Pays.objects.all()}
-
 # definitions
 
 oct2015 = datetime.date(year=2015, month=10, day=5)
