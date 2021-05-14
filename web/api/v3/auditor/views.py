@@ -11,7 +11,7 @@ from django import db
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 
-from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, EntityDepot
+from core.models import LotV2, LotTransaction, EntityDepot
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment, SustainabilityDeclaration
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
 from core.xlsx_v3 import export_transactions

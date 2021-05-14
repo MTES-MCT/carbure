@@ -7,7 +7,7 @@ from django.db.models.functions import Extract
 from django.db.models.fields import NOT_PROVIDED
 from django import db
 from django.http import JsonResponse, HttpResponse
-from core.models import LotV2, LotTransaction, LotV2Error, TransactionError
+from core.models import LotV2, LotTransaction
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
 from core.xlsx_v3 import export_transactions
@@ -27,19 +27,7 @@ sort_key_to_django_field = {'period': 'lot__period',
                             'added_by': 'lot__added_by__name'}
 
 def get_errors(tx):
-    grouped_errors = {}
-    tx_errors = [err.natural_key() for err in tx.transactionerror_set.all()]
-    lots_errors = [err.natural_key() for err in tx.lot.lotv2error_set.all()]
-    validation_errors = [err.natural_key() for err in tx.lot.lotvalidationerror_set.all()]
-
-    if len(tx_errors) > 0:
-        grouped_errors['tx_errors'] = tx_errors
-    if len(lots_errors) > 0:
-        grouped_errors['lots_errors'] = lots_errors
-    if len(validation_errors) > 0:
-        grouped_errors['validation_errors'] = validation_errors
-
-    return grouped_errors
+    return [e.natural_key() for e in tx.genericerror_set.all()]
 
 
 def get_entity_lots_by_status(entity, status):
@@ -90,9 +78,7 @@ def get_entity_lots_by_status(entity, status):
 
 
 def get_lots_with_errors(txs):
-    tx_with_errors = txs.annotate(Count('transactionerror'), Count('lot__lotv2error'), Count('lot__lotvalidationerror'))
-    tx_with_errors = tx_with_errors.filter(Q(transactionerror__count__gt=0) | Q(lot__lotv2error__count__gt=0) | Q(lot__lotvalidationerror__count__gt=0))
-
+    tx_with_errors = txs.annotate(Count('genericerror')).filter(genericerror__count__gt=0)
     return tx_with_errors, tx_with_errors.count()
 
 
@@ -189,7 +175,7 @@ def filter_lots(txs, querySet):
             txs = txs.filter(is_mac=False)
 
     if errors:
-        txs = txs.filter(Q(transactionerror__error__in=errors) | Q(lot__lotv2error__error__in=errors) | Q(lot__lotvalidationerror__message__in=errors))
+        txs = txs.filter(genericerror__error__in=errors)
 
     if query:
         txs = txs.filter(

@@ -8,9 +8,7 @@ import random
 
 from core.models import Entity, UserRights
 from core.models import Pays, Depot, Biocarburant, MatierePremiere
-from core.models import LotV2, LotV2Error
-from core.models import LotTransaction, TransactionError
-from core.models import LotValidationError
+from core.models import LotV2, LotTransaction, GenericError
 
 from certificates.models import ISCCCertificate, EntityISCCTradingCertificate
 
@@ -43,15 +41,9 @@ def debug_transactions(valid=False):
 
 def debug_errors():
     # debug start
-    lot_errors = LotV2Error.objects.all()
+    lot_errors = GenericError.objects.all()
     for error in lot_errors:
-        print(error.natural_key())
-    tx_errors = TransactionError.objects.all()
-    for error in tx_errors:
-        print(error.natural_key())            
-    val_errors = LotValidationError.objects.all()
-    for error in val_errors:
-        print(error.natural_key())            
+        print(error.natural_key())         
     # debug end
 
 

@@ -7,7 +7,7 @@ from django.test import TransactionTestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from core.models import Entity, UserRights, LotV2, LotTransaction, ProductionSite, Pays, Biocarburant, MatierePremiere, Depot, LotValidationError, LotV2Error, TransactionError
+from core.models import Entity, UserRights, LotV2, LotTransaction, ProductionSite, Pays, Biocarburant, MatierePremiere, Depot, GenericError
 from certificates.models import ISCCCertificate, EntityISCCTradingCertificate
 from api.v3.admin.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
@@ -30,17 +30,9 @@ def debug_transactions(valid=False):
 
 
 def debug_errors():
-    # debug start
-    lot_errors = LotV2Error.objects.all()
-    for error in lot_errors:
-        print(error.natural_key())
-    tx_errors = TransactionError.objects.all()
-    for error in tx_errors:
-        print(error.natural_key())            
-    val_errors = LotValidationError.objects.all()
-    for error in val_errors:
-        print(error.natural_key())            
-    # debug end
+    errors = GenericError.objects.all()
+    for error in errors:
+        print(error.natural_key())         
 
 def get_random_dae():
     today = datetime.date.today()
@@ -109,16 +101,8 @@ class LotsAPITest(TransactionTestCase):
         count = LotTransaction.objects.all().count()
         self.assertEqual(count, nb_txs)
 
-    def ensure_nb_lot_errors(self, nb):
-        count = LotV2Error.objects.all().count()
-        self.assertEqual(count, nb)
-
-    def ensure_nb_tx_errors(self, nb):
-        count = TransactionError.objects.all().count()
-        self.assertEqual(count, nb)
-
-    def ensure_nb_sanity_errors(self, nb):
-        count = LotValidationError.objects.all().count()
+    def ensure_nb_errors(self, nb):
+        count = GenericError.objects.all().count()
         self.assertEqual(count, nb)
 
     def test_lot_actions(self):
@@ -280,12 +264,9 @@ class LotsAPITest(TransactionTestCase):
         lots = data['lots']
         self.assertEqual(len(lots), nb_lots)
 
-        # make sure they all have LotError or TransactionError
-        lot_errors = LotV2Error.objects.filter(lot__in=[lot['lot']['id'] for lot in lots])
-        tx_errors = TransactionError.objects.filter(tx__in=[tx['id'] for tx in lots])
-        nb_errors = lot_errors.count() + tx_errors.count()
-        debug_errors()
-        self.assertEqual(nb_errors, nb_lots)
+        # make sure they all have a GenericError
+        errors = GenericError.objects.filter(tx__in=[tx['id'] for tx in lots])
+        self.assertEqual(errors.count(), nb_lots)
         
         # delete-all-drafts
         txs = LotTransaction.objects.filter(lot__status='Draft')
@@ -418,12 +399,10 @@ class LotsAPITest(TransactionTestCase):
         data = response.json()['data']
         lots = data['lots']
         self.assertEqual(len(lots), nb_lots)
-        # make sure they all have LotError or TransactionError
+        # make sure they all have a GenericError
         for lot in lots:
-            lot_errors = LotV2Error.objects.filter(lot=lot['lot']['id']).count()
-            tx_errors = TransactionError.objects.filter(tx=lot['id']).count()
-            validation_errors = LotValidationError.objects.filter(lot=lot['lot']['id']).count()
-            self.assertGreater(lot_errors + tx_errors + validation_errors, 0)
+            errors = GenericError.objects.filter(tx=lot['id']).count()
+            self.assertGreater(errors, 0)
 
         # delete-all-drafts
         txs = LotTransaction.objects.filter(lot__status='Draft')
@@ -434,8 +413,7 @@ class LotsAPITest(TransactionTestCase):
 
         self.assertEqual(LotV2.objects.all().count(), 0)
         self.assertEqual(LotTransaction.objects.all().count(), 0)
-        self.assertEqual(LotV2Error.objects.all().count(), 0)
-        self.assertEqual(TransactionError.objects.all().count(), 0)
+        self.assertEqual(GenericError.objects.all().count(), 0)
 
 
     def test_simple_template_import_cannot_validate(self):
@@ -472,9 +450,8 @@ class LotsAPITest(TransactionTestCase):
 
         # make sure they all have an error
         for lot in lots:
-            lot_errors = LotV2Error.objects.filter(lot=lot['lot']['id']).count()
-            tx_errors = TransactionError.objects.filter(tx=lot['id']).count()
-            self.assertGreater(lot_errors + tx_errors, 0)
+            errors = GenericError.objects.filter(tx=lot['id']).count()
+            self.assertGreater(errors, 0)
         
         # delete-all-drafts
         txs = LotTransaction.objects.filter(lot__status='Draft')

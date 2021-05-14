@@ -12,7 +12,7 @@ from django import db
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 
-from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, EntityDepot
+from core.models import LotV2, LotTransaction, EntityDepot, GenericError
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment, SustainabilityDeclaration
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
 from core.xlsx_v3 import export_transactions
@@ -205,15 +205,13 @@ def update_lot(request, *args, **kwargs):
                             status=400)
     if tx.delivery_status == 'A':
         return JsonResponse({'status': 'forbidden', 'message': "Tx already validated and accepted %d" % (tx.id)}, status=400)
-    LotV2Error.objects.filter(lot_id=tx.lot.id).delete()
-    TransactionError.objects.filter(tx_id=tx.id).delete()
+    GenericError.objects.filter(tx_id=tx.id).delete()
     d = get_prefetched_data(entity)
-    lot, tx, lot_errors, tx_errors = load_lot(d, entity, request.user, request.POST.dict(), 'MANUAL', tx)
+    lot, tx, errors = load_lot(d, entity, request.user, request.POST.dict(), 'MANUAL', tx)
     if lot:
         lot.save()
         tx.save()
-        LotV2Error.objects.bulk_create(lot_errors)
-        TransactionError.objects.bulk_create(tx_errors)
+        GenericError.objects.bulk_create(errors)
         bulk_sanity_checks([tx], d, background=False)
         # only if lot is already validated ?
         if lot.status == 'Validated':
@@ -221,7 +219,7 @@ def update_lot(request, *args, **kwargs):
             check_duplicates([tx], background=False)
         return JsonResponse({'status': 'success'})
     else:
-        return JsonResponse({'status': 'error', 'message': 'Could not save lot: %s' % (lot_errors)}, status=400)
+        return JsonResponse({'status': 'error', 'message': 'Could not save lot: %s' % (errors)}, status=400)
 
 @otp_required
 def duplicate_lot(request):
