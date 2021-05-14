@@ -278,9 +278,7 @@ class LotsAPITest(TransactionTestCase):
         # make sure no lots/tx/loterror/txerror are still there
         self.ensure_nb_lots(0)
         self.ensure_nb_txs(0)
-        self.ensure_nb_lot_errors(0)
-        self.ensure_nb_tx_errors(0)
-        self.ensure_nb_sanity_errors(0)
+        self.ensure_nb_errors(0)
 
 
     def test_advanced_template_import_can_validate(self):

@@ -531,7 +531,7 @@ def upload(request, *args, **kwargs):
     nb_loaded, nb_total, errors = load_excel_file(entity, request.user, filepath)
     if nb_loaded is False:
         return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
-    data = {'loaded': nb_loaded, 'total': nb_total, 'errors': errors}
+    data = {'loaded': nb_loaded, 'total': nb_total, 'errors': [e.natural_key() for e in errors]}
     return JsonResponse({'status': 'success', 'data': data})
 
 @check_rights('entity_id')
