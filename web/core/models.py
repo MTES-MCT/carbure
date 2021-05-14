@@ -604,6 +604,8 @@ class ETBETransformation(models.Model):
 
 
 class GenericError(models.Model):
+    error = models.CharField(max_length=256, null=False, blank=False)
+
     display_to_creator = models.BooleanField(default=False)
     display_to_recipient = models.BooleanField(default=False)
     display_to_admin = models.BooleanField(default=False)
@@ -619,13 +621,15 @@ class GenericError(models.Model):
 
     is_blocking = models.BooleanField(default=False)
 
-    tx = models.ForeignKey(LotTransaction, null=True, blank=True, on_delete=models.CASCADE)
-    lot = models.ForeignKey(LotV2, null=True, blank=True, on_delete=models.CASCADE)
+    tx = models.ForeignKey(LotTransaction, null=False, blank=False, on_delete=models.CASCADE)
 
-    field = models.CharField(max_length=64, null=False, blank=False)
+    field = models.CharField(max_length=64, null=True, blank=True)
     value = models.CharField(max_length=128, null=True, blank=True)
-    error = models.CharField(max_length=256, null=False, blank=False)
-    extra = models.CharField(max_length=256, null=False, blank=False)
+    extra = models.CharField(max_length=256, null=True, blank=True)
+
+    def natural_key(self):
+        return {'error': self.error, 'extra': self.extra, 'is_blocking': self.is_blocking, 'display_to_creator': self.display_to_creator, 'display_to_recipient': self.display_to_recipient, 
+                'acked_by_creator': self.acked_by_creator, 'acked_by_recipient': self.acked_by_recipient}
 
     class Meta:
         db_table = 'generic_errors'

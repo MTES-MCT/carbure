@@ -19,8 +19,7 @@ from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
 from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
-from core.models import Depot, LotV2, LotTransaction, TransactionError, LotV2Error, TransactionComment
-from core.models import LotValidationError
+from core.models import Depot, LotV2, LotTransaction, TransactionComment, GenericError
 
 from core.models import SustainabilityDeclaration, EntityDepot
 from certificates.models import EntitySNTradingCertificate
@@ -66,20 +65,6 @@ class PaysAdmin(admin.ModelAdmin):
     list_display = ('name', 'code_pays', 'is_in_europe')
     search_fields = ('name', 'code_pays', )
     list_filter = ('is_in_europe', )
-
-
-class LotV2ErrorAdmin(admin.ModelAdmin):
-    list_display = ('lot', 'field', 'value', 'error')
-    search_fields = ('lot__id', 'field', 'value', 'error')
-    list_filter = ('field', )
-    raw_id_fields = ('lot', )
-
-
-class LotValidationErrorAdmin(admin.ModelAdmin):
-    list_display = ('lot', 'rule_triggered', 'warning_to_user', 'warning_to_admin', 'block_validation')
-    list_filter = ('warning_to_admin', 'warning_to_user', 'block_validation', 'rule_triggered')
-    search_fields = ('rule_triggered', 'message')
-    raw_id_fields = ('lot', )
 
 
 class DepotAdmin(admin.ModelAdmin):
@@ -239,7 +224,7 @@ class TransactionAdmin(admin.ModelAdmin):
                 for tx in queryset:
                     tx.carbure_vendor_certificate = certificate
                     tx.save()
-                    TransactionError.objects.filter(tx=tx, field='unknown_supplier_certificate').delete()
+                    GenericError.objects.filter(tx=tx, field='unknown_supplier_certificate').delete()
                     count += 1
                 self.message_user(request, "Successfully assigned certificate to %d." % (count))
                 return HttpResponseRedirect(request.get_full_path())
@@ -266,7 +251,7 @@ class TransactionAdmin(admin.ModelAdmin):
                     tx.delivery_status = 'N'
                     tx.client_is_in_carbure = True
                     tx.save()
-                    TransactionError.objects.filter(tx=tx, field='unknown_client').delete()
+                    GenericError.objects.filter(tx=tx, field='unknown_client').delete()
                     count += 1
                 self.message_user(request, "Successfully reassigned %d transactions to %s." % (count, new_client))
                 return HttpResponseRedirect(request.get_full_path())
@@ -320,13 +305,6 @@ class TransactionAdmin(admin.ModelAdmin):
     change_transaction_delivery_status.short_description = "Changer le statut de la livraison"
 
 
-class TransactionErrorAdmin(admin.ModelAdmin):
-    list_display = ('tx', 'field', 'error', 'value')
-    search_fields = ('field', 'error', 'value')
-    list_filter = ('field',)
-    raw_id_fields = ('tx', )
-
-
 class TransactionCommentAdmin(admin.ModelAdmin):
     list_display = ('entity', 'tx', 'comment', 'topic')
     search_fields = ('entity', 'tx', 'comment')
@@ -334,7 +312,11 @@ class TransactionCommentAdmin(admin.ModelAdmin):
     raw_id_fields = ('tx', )
 
 
-
+class GenericErrorAdmin(admin.ModelAdmin):
+    list_display = ('tx', 'error', 'is_blocking', 'display_to_creator', 'display_to_recipient')
+    search_fields = ('tx', 'error', 'extra')
+    list_filter = ('error', 'is_blocking', )
+    raw_id_fields = ('tx', )
 
 
 class SustainabilityDeclarationAdmin(admin.ModelAdmin):
@@ -359,10 +341,8 @@ admin.site.register(Pays, PaysAdmin)
 admin.site.register(Depot, DepotAdmin)
 admin.site.register(LotV2, LotV2Admin)
 admin.site.register(LotTransaction, TransactionAdmin)
-admin.site.register(TransactionError, TransactionErrorAdmin)
 admin.site.register(TransactionComment, TransactionCommentAdmin)
-admin.site.register(LotV2Error, LotV2ErrorAdmin)
-admin.site.register(LotValidationError, LotValidationErrorAdmin)
+admin.site.register(GenericError, GenericErrorAdmin)
 admin.site.register(SustainabilityDeclaration, SustainabilityDeclarationAdmin)
 admin.site.register(EntityDepot, EntityDepotAdmin)
 

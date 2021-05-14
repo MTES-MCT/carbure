@@ -13,7 +13,7 @@ from pandas._typing import FilePathOrBuffer, Scalar
 from django.db import transaction
 
 from django.http import JsonResponse
-from core.models import LotV2, LotTransaction, LotV2Error, TransactionError, UserRights
+from core.models import LotV2, LotTransaction, UserRights, GenericError
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
 
 from certificates.models import ISCCCertificate, EntityISCCTradingCertificate
@@ -306,7 +306,7 @@ def fill_producer_info(entity, lot_row, lot, prefetched_data):
     return lot_errors
 
 
-def fill_production_site_info(entity, lot_row, lot, prefetched_data):
+def fill_production_site_info(entity, lot_row, lot, tx, prefetched_data):
     lot_errors = []
 
     # only the data_origin_entity is allowed to change this
@@ -339,8 +339,10 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
             if production_site_country in countries:
                 lot.unknown_production_country = countries[production_site_country]
             else:
-                error = LotV2Error(lot=lot, field='production_site_country',
-                                    error='Champ production_site_country incorrect',
+                error = GenericError(tx=tx, field='production_site_country',
+                                    error='WRONG_PRODUCTION_SITE_COUNTRY',
+                                    extra='Champ production_site_country incorrect',
+                                    display_to_creator=True, is_blocking=True,
                                     value=production_site_country)
                 lot_errors.append(error)
     else:
@@ -366,8 +368,10 @@ def fill_production_site_info(entity, lot_row, lot, prefetched_data):
             lot.unknown_production_site_com_date = com_date
         except Exception as e:
             msg = "Date de mise en service: veuillez entrer une date au format JJ/MM/AAAA"
-            error = LotV2Error(lot=lot, field='production_site_commissioning_date',
-                                error=msg,
+            error = GenericError(tx=tx, field='production_site_commissioning_date',
+                                error='PRODUCTION_SITE_COMDATE_FORMAT_INCORRECT',
+                                display_to_creator=True, is_blocking=True,
+                                extra=msg,
                                 value=lot_row['production_site_commissioning_date'])
             lot_errors.append(error)
     else:
@@ -388,7 +392,7 @@ def fill_supplier_info(entity, lot_row, lot, prefetched_data):
     return tx_errors
 
 
-def fill_biocarburant_info(lot_row, lot, prefetched_data):
+def fill_biocarburant_info(lot_row, lot, tx, prefetched_data):
     lot_errors = []
     biocarburants = prefetched_data['biocarburants']
     if 'biocarburant_code' in lot_row:
@@ -397,19 +401,23 @@ def fill_biocarburant_info(lot_row, lot, prefetched_data):
             lot.biocarburant = biocarburants[biocarburant]
         else:
             lot.biocarburant = None
-            lot_errors.append(LotV2Error(lot=lot, field='biocarburant_code',
-                                         error='Biocarburant inconnu',
+            lot_errors.append(GenericError(tx=tx, field='biocarburant_code',
+                                         error='UNKNOWN_BIOFUEL',
+                                         extra='Biocarburant inconnu',
+                                         display_to_creator=True, is_blocking=True,
                                          value=biocarburant))
     else:
         biocarburant = None
         lot.biocarburant = None
-        lot_errors.append(LotV2Error(lot=lot, field='biocarburant_code',
-                                     error='Merci de préciser le Biocarburant',
+        lot_errors.append(GenericError(tx=tx, field='biocarburant_code',
+                                     error='MISSING_BIOFUEL',
+                                     extra='Merci de préciser le Biocarburant',
+                                     display_to_creator=True, is_blocking=True,
                                      value=biocarburant))
     return lot_errors
 
 
-def fill_matiere_premiere_info(lot_row, lot, prefetched_data):
+def fill_matiere_premiere_info(lot_row, lot, tx, prefetched_data):
     lot_errors = []
     mps = prefetched_data['matieres_premieres']
     if 'matiere_premiere_code' in lot_row:
@@ -418,18 +426,19 @@ def fill_matiere_premiere_info(lot_row, lot, prefetched_data):
             lot.matiere_premiere = mps[matiere_premiere]
         else: 
             lot.matiere_premiere = None
-            lot_errors.append(LotV2Error(lot=lot, field='matiere_premiere_code',
-                                         error='Matière Première inconnue',
+            lot_errors.append(GenericError(tx=tx, field='matiere_premiere_code', error='UNKNOWN_FEEDSTOCK',
+                                         extra='Matière Première inconnue', display_to_creator=True, is_blocking=True,
                                          value=matiere_premiere))
     else:
         lot.matiere_premiere = None
-        lot_errors.append(LotV2Error(lot=lot, field='matiere_premiere_code',
-                                     error='Merci de préciser la matière première',
+        lot_errors.append(GenericError(tx=tx, field='matiere_premiere_code', error='MISSING_FEEDSTOCK',
+                                     extra='Merci de préciser la matière première',
+                                     display_to_creator=True, is_blocking=True,
                                      value=None))
     return lot_errors
 
 
-def fill_volume_info(lot_row, lot):
+def fill_volume_info(lot_row, lot, tx):
     lot_errors = []
     if 'volume' in lot_row:
         volume = lot_row['volume']
@@ -437,20 +446,26 @@ def fill_volume_info(lot_row, lot):
             lot.volume = float(volume)
             lot.remaining_volume = lot.volume
             if lot.volume <= 0:
-                lot_errors.append(LotV2Error(lot=lot, field='volume',
-                                            error='Le volume doit être supérieur à 0', value=volume))
+                lot_errors.append(GenericError(tx=tx, field='volume',
+                                            display_to_creator=True, is_blocking=True,
+                                            error='VOLUME_LTE_0',
+                                            extra='Le volume doit être supérieur à 0', value=volume))
         except Exception:
             lot.volume = 0
-            lot_errors.append(LotV2Error(lot=lot, field='volume',
-                                         error='Format du volume incorrect', value=volume))
+            lot_errors.append(GenericError(tx=tx, field='volume',
+                                           display_to_creator=True, is_blocking=True,
+                                           error='VOLUME_FORMAT_INCORRECT',
+                                           extra='Format du volume incorrect', value=volume))
     else:
         lot.volume = 0
-        lot_errors.append(LotV2Error(lot=lot, field='volume',
-                                     error='Merci de préciser un volume', value=''))
+        lot_errors.append(GenericError(tx=tx, field='volume',
+                                     display_to_creator=True, is_blocking=True,
+                                     error='MISSING_VOLUME',
+                                     extra='Merci de préciser un volume', value=''))
     return lot_errors
 
 
-def fill_pays_origine_info(lot_row, lot, prefetched_data):
+def fill_pays_origine_info(lot_row, lot, tx, prefetched_data):
     lot_errors = []
     countries = prefetched_data['countries']
     if 'pays_origine_code' in lot_row:
@@ -459,15 +474,19 @@ def fill_pays_origine_info(lot_row, lot, prefetched_data):
             lot.pays_origine = countries[pays_origine]
         else:
             lot.pays_origine = None
-            lot_errors.append(LotV2Error(lot=lot, field='pays_origine_code', error='Pays inconnu', value=pays_origine))
+            lot_errors.append(GenericError(tx=tx, field='pays_origine_code', error='UNKNOWN_COUNTRY', extra='Pays inconnu', 
+                                         display_to_creator=True, is_blocking=True,
+                                         value=pays_origine))
     else:
         pays_origine = None
         lot.pays_origine = None
-        lot_errors.append(LotV2Error(lot=lot, field='pays_origine_code', error='Merci de préciser le pays', value=pays_origine))
+        lot_errors.append(GenericError(tx=tx, field='pays_origine_code', error='MISSING_COUNTRY', extra='Merci de préciser le pays', 
+                                       display_to_creator=True, is_blocking=True,
+                                       value=pays_origine))
     return lot_errors
 
 
-def fill_ghg_info(lot_row, lot):
+def fill_ghg_info(lot_row, lot, tx):
     lot_errors = []
     lot.eec = 0
     if 'eec' in lot_row and lot_row['eec'] is not None and lot_row['eec'] != '':
@@ -475,7 +494,8 @@ def fill_ghg_info(lot_row, lot):
         try:
             lot.eec = abs(float(eec))
         except Exception:
-            lot_errors.append(LotV2Error(lot=lot, field='eec', error='Format non reconnu', value=eec))
+            lot_errors.append(GenericError(tx=tx, field='eec', error='WRONG_FORMAT', extra='Format non reconnu', 
+                                           display_to_creator=True, is_blocking=True, value=eec))
 
     lot.el = 0
     if 'el' in lot_row and lot_row['el'] is not None and lot_row['el'] != '':
@@ -483,7 +503,8 @@ def fill_ghg_info(lot_row, lot):
         try:
             lot.el = abs(float(el))
         except Exception:
-            lot_errors.append(LotV2Error(lot=lot, field='el', error='Format non reconnu', value=el))
+             lot_errors.append(GenericError(tx=tx, field='el', error='WRONG_FORMAT', extra='Format non reconnu', 
+                                           display_to_creator=True, is_blocking=True, value=el))
 
     lot.ep = 0
     if 'ep' in lot_row and lot_row['ep'] is not None and lot_row['ep'] != '':
@@ -491,7 +512,8 @@ def fill_ghg_info(lot_row, lot):
         try:
             lot.ep = abs(float(ep))
         except Exception:
-            lot_errors.append(LotV2Error(lot=lot, field='ep', error='Format non reconnu', value=ep))
+             lot_errors.append(GenericError(tx=tx, field='ep', error='WRONG_FORMAT', extra='Format non reconnu', 
+                                           display_to_creator=True, is_blocking=True, value=ep))
 
     lot.etd = 0
     if 'etd' in lot_row and lot_row['etd'] is not None and lot_row['etd'] != '':
@@ -499,7 +521,8 @@ def fill_ghg_info(lot_row, lot):
         try:
             lot.etd = abs(float(etd))
         except Exception:
-            lot_errors.append(LotV2Error(lot=lot, field='etd', error='Format non reconnu', value=etd))
+             lot_errors.append(GenericError(tx=tx, field='etd', error='WRONG_FORMAT', extra='Format non reconnu', 
+                                           display_to_creator=True, is_blocking=True, value=etd))
 
     lot.eu = 0
     if 'eu' in lot_row and lot_row['eu'] is not None and lot_row['eu'] != '':
@@ -507,7 +530,8 @@ def fill_ghg_info(lot_row, lot):
         try:
             lot.eu = abs(float(eu))
         except Exception:
-            lot_errors.append(LotV2Error(lot=lot, field='eu', error='Format non reconnu', value=eu))
+             lot_errors.append(GenericError(tx=tx, field='eu', error='WRONG_FORMAT', extra='Format non reconnu', 
+                                           display_to_creator=True, is_blocking=True, value=eu))
 
     lot.esca = 0
     if 'esca' in lot_row and lot_row['esca'] is not None and lot_row['esca'] != '':
@@ -515,7 +539,8 @@ def fill_ghg_info(lot_row, lot):
         try:
             lot.esca = abs(float(esca))
         except Exception:
-            lot_errors.append(LotV2Error(lot=lot, field='esca', error='Format non reconnu', value=esca))
+             lot_errors.append(GenericError(tx=tx, field='esca', error='WRONG_FORMAT', extra='Format non reconnu', 
+                                           display_to_creator=True, is_blocking=True, value=esca))
 
     lot.eccs = 0
     if 'eccs' in lot_row and lot_row['eccs'] is not None and lot_row['eccs'] != '':
@@ -523,7 +548,8 @@ def fill_ghg_info(lot_row, lot):
         try:
             lot.eccs = abs(float(eccs))
         except Exception:
-            lot_errors.append(LotV2Error(lot=lot, field='eccs', error='Format non reconnu', value=eccs))
+             lot_errors.append(GenericError(tx=tx, field='eccs', error='WRONG_FORMAT', extra='Format non reconnu', 
+                                           display_to_creator=True, is_blocking=True, value=eccs))
 
     lot.eccr = 0
     if 'eccr' in lot_row and lot_row['eccr'] is not None and lot_row['eccr'] != '':
@@ -531,7 +557,8 @@ def fill_ghg_info(lot_row, lot):
         try:
             lot.eccr = abs(float(eccr))
         except Exception:
-            lot_errors.append(LotV2Error(lot=lot, field='eccr', error='Format non reconnu', value=eccr))
+             lot_errors.append(GenericError(tx=tx, field='eccr', error='WRONG_FORMAT', extra='Format non reconnu', 
+                                           display_to_creator=True, is_blocking=True, value=eccr))
 
     lot.eee = 0
     if 'eee' in lot_row and lot_row['eee'] is not None and lot_row['eee'] != '':
@@ -539,8 +566,8 @@ def fill_ghg_info(lot_row, lot):
         try:
             lot.eee = abs(float(eee))
         except Exception:
-            lot_errors.append(LotV2Error(lot=lot, field='eee', error='Format non reconnu', value=eee))
-
+             lot_errors.append(GenericError(tx=tx, field='eee', error='WRONG_FORMAT', extra='Format non reconnu', 
+                                           display_to_creator=True, is_blocking=True, value=eee))
     # calculs ghg
     calculate_ghg(lot)
     return lot_errors
@@ -554,7 +581,7 @@ def fill_dae_data(lot_row, transaction):
         if dae is not None:
             transaction.dae = dae
     if transaction.dae == '' and transaction.is_mac is False:
-        tx_errors.append(TransactionError(tx=transaction, field='dae', error="Merci de préciser le numéro de DAE/DAU", value=None))
+        tx_errors.append(GenericError(tx=transaction, field='dae', error="MISSING_DAE", extra="Merci de préciser le numéro de DAE/DAU", value=None, display_to_creator=True, is_blocking=True))
     return tx_errors
 
 
@@ -584,7 +611,7 @@ def fill_delivery_date(lot_row, lot, transaction):
             diff = today - dd
             if diff > datetime.timedelta(days=365):
                 msg = "Date trop éloignée (%s)" % (lot_row['delivery_date'])
-                tx_errors.append(TransactionError(tx=transaction, field='delivery_date', error=msg, value=lot_row['delivery_date']))
+                tx_errors.append(GenericError(tx=transaction, field='delivery_date', error="INCORRECT_DELIVERY_DATE", extra=msg, value=lot_row['delivery_date'], display_to_creator=True, is_blocking=True))
                 lot.period = today.strftime('%Y-%m')
                 transaction.delivery_date = None
             else:
@@ -594,7 +621,7 @@ def fill_delivery_date(lot_row, lot, transaction):
             transaction.delivery_date = today
             lot.period = today.strftime('%Y-%m')
             msg = "Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA (%s)" % (lot_row['delivery_date'])
-            tx_errors.append(TransactionError(tx=transaction, field='delivery_date', error=msg, value=lot_row['delivery_date']))
+            tx_errors.append(GenericError(tx=transaction, field='delivery_date', error="INCORRECT_FORMAT_DELIVERY_DATE", extra=msg, value=lot_row['delivery_date'], display_to_creator=True, is_blocking=True))
     return tx_errors
 
 
@@ -684,7 +711,7 @@ def fill_delivery_site_data(lot_row, transaction, prefetched_data):
         transaction.carbure_delivery_site = None
         transaction.unknown_delivery_site = ''
         if not transaction.is_mac:
-            tx_errors.append(TransactionError(tx=transaction, field='delivery_site', value=None, error="Merci de préciser un site de livraison"))
+            tx_errors.append(GenericError(tx=transaction, field='delivery_site', value=None, error="MISSING_DELIVERY_SITE", extra="Merci de préciser un site de livraison", is_blocking=True, display_to_creator=True))
     if transaction.delivery_site_is_in_carbure is False and not transaction.is_mac:
         if 'delivery_site_country' in lot_row:
             country_code = lot_row['delivery_site_country']
@@ -692,12 +719,16 @@ def fill_delivery_site_data(lot_row, transaction, prefetched_data):
                 country = countries[country_code]
                 transaction.unknown_delivery_site_country = country
             else:
-                tx_errors.append(TransactionError(tx=transaction, field='unknown_delivery_site_country',
-                                                  error='Champ delivery_site_country incorrect',
-                                                  value=lot_row['delivery_site_country']))
+                tx_errors.append(GenericError(tx=transaction, field='unknown_delivery_site_country',
+                                                  error="INCORRECT_DELIVERY_SITE_COUNTRY",
+                                                  extra='Champ delivery_site_country incorrect',
+                                                  value=lot_row['delivery_site_country'],
+                                                  is_blocking=True, display_to_creator=True))
         else:
-            tx_errors.append(TransactionError(tx=transaction, field='unknown_delivery_site_country',
-                                              error='Merci de préciser une valeur dans le champ delivery_site_country',
+            tx_errors.append(GenericError(tx=transaction, field='unknown_delivery_site_country',
+                                              error="MISSING_UNKNOWN_DELIVERY_SITE_COUNTRY",
+                                              extra='Merci de préciser une valeur dans le champ delivery_site_country',
+                                              is_blocking=True, display_to_creator=True,
                                               value=None))
     return tx_errors
 
@@ -778,16 +809,12 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
     lot.carbure_id = ''
     lot.is_fused = False
     lot.source = 'EXCEL'
-    lot_errors += fill_volume_info(lot_dict, lot)
 
     transaction = LotTransaction()
     transaction.carbure_vendor = entity
     transaction.parent_tx = source_tx
-    transaction.is_mac = False
-    if 'mac' in lot_dict:
-        if lot_dict['mac'] == 1 or lot_dict['mac'] == 'true':
-            transaction.is_mac = True
-
+    lot_errors += fill_volume_info(lot_dict, lot, transaction)
+    tx_errors += fill_mac_data(lot_errors, transaction)
     tx_errors += fill_dae_data(lot_dict, transaction)
     tx_errors += fill_delivery_date(lot_dict, lot, transaction)
     tx_errors += fill_client_data(entity, lot_dict, transaction, prefetched_data)
@@ -799,52 +826,53 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
     transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
     return lot, transaction, lot_errors, tx_errors
 
-def load_lot(prefetched_data, entity, user, lot_dict, source, transaction=None):
-    lot_errors = []
-    tx_errors = []
+def fill_mac_data(lot_dict, transaction):
+    transaction.is_mac = False
+    if 'mac' in lot_dict:
+        if lot_dict['mac'] == 1 or lot_dict['mac'] == 'true':
+            transaction.is_mac = True
+
+def load_lot(prefetched_data, entity, user, lot_dict, source, tx=None):
+    errors = []
 
     # check for empty row
     biocarburant_code = lot_dict.get('biocarburant_code', None)
     if biocarburant_code is None or biocarburant_code == '':
         return None, None, "Missing biocarburant_code", None
 
-    if transaction is None:
+    if tx is None:
         lot = LotV2()
         lot.added_by = entity
         lot.data_origin_entity = entity
         lot.added_by_user = user
         lot.source = source
+        tx = LotTransaction()
     else:
-        lot = transaction.lot
+        lot = tx.lot
+
+    lot.is_valid = False # I don't think we need this. validity is checked everytime we re-submit transactions
 
     # do not allow to modify production data for stock-lots
     if lot.parent_lot == None:
-        lot_errors += fill_producer_info(entity, lot_dict, lot, prefetched_data)
-        lot_errors += fill_production_site_info(entity, lot_dict, lot, prefetched_data)
-        lot_errors += fill_supplier_info(entity, lot_dict, lot, prefetched_data)
-        lot_errors += fill_biocarburant_info(lot_dict, lot, prefetched_data)
-        lot_errors += fill_matiere_premiere_info(lot_dict, lot, prefetched_data)
-        lot_errors += fill_pays_origine_info(lot_dict, lot, prefetched_data)
-        lot_errors += fill_ghg_info(lot_dict, lot)
-    lot_errors += fill_volume_info(lot_dict, lot)
-    lot.is_valid = False
+        errors += fill_producer_info(entity, lot_dict, lot, prefetched_data)
+        errors += fill_production_site_info(entity, lot_dict, lot, tx, prefetched_data)
+        errors += fill_supplier_info(entity, lot_dict, lot, prefetched_data)
+        errors += fill_biocarburant_info(lot_dict, lot, tx, prefetched_data)
+        errors += fill_matiere_premiere_info(lot_dict, lot, tx, prefetched_data)
+        errors += fill_pays_origine_info(lot_dict, lot, tx, prefetched_data)
+        errors += fill_ghg_info(lot_dict, lot, tx)
+    errors += fill_volume_info(lot_dict, lot, tx)
 
-    if transaction is None:
-        transaction = LotTransaction()
-    transaction.is_mac = False
-    if 'mac' in lot_dict:
-        if lot_dict['mac'] == 1 or lot_dict['mac'] == 'true':
-            transaction.is_mac = True
-
-    tx_errors += fill_dae_data(lot_dict, transaction)
-    tx_errors += fill_delivery_date(lot_dict, lot, transaction)
-    tx_errors += fill_client_data(entity, lot_dict, transaction, prefetched_data)
-    tx_errors += fill_vendor_data(entity, lot_dict, transaction, prefetched_data)
-    tx_errors += fill_delivery_site_data(lot_dict, transaction, prefetched_data)
+    errors += fill_mac_data(lot_dict, transaction)
+    errors += fill_dae_data(lot_dict, transaction)
+    errors += fill_delivery_date(lot_dict, lot, transaction)
+    errors += fill_client_data(entity, lot_dict, transaction, prefetched_data)
+    errors += fill_vendor_data(entity, lot_dict, transaction, prefetched_data)
+    errors += fill_delivery_site_data(lot_dict, transaction, prefetched_data)
     transaction.ghg_total = lot.ghg_total
     transaction.ghg_reduction = lot.ghg_reduction
     transaction.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
-    return lot, transaction, lot_errors, tx_errors
+    return lot, transaction, errors
 
 
 def load_excel_file(entity, user, file, mass_balance=False):
@@ -899,7 +927,7 @@ def load_excel_file(entity, user, file, mass_balance=False):
         return False, False, errors
 
 
-def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors, prefetched_data):
+def bulk_insert(entity, lots_to_insert, txs_to_insert, generic_errors, prefetched_data):
     # print('Starting bulk_insert %s' % (datetime.datetime.now()))
     # below lines are for batch insert of Lots, Transactions and errors
     # it's a bit rough
@@ -920,20 +948,14 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, lot_errors, tx_errors, pr
         tx.lot_id = lot.id
     # 5: Batch insert transaction
     LotTransaction.objects.bulk_create(txs_to_insert, batch_size=100)
-    # likewise, LotError and TransactionError require a foreign key
-    # 6 assign lot.id to LotError
-    for lot, errors in zip(sorted(new_lots, key=lambda x: x.id), lot_errors):
-        for e in errors:
-            e.lot_id = lot.id
-    flat_errors = [item for sublist in lot_errors for item in sublist]
-    LotV2Error.objects.bulk_create(flat_errors, batch_size=100)
-    # 7 assign tx.id to TransactionError
+    # likewise, GenericError requires a foreign key
+    # 6 assign tx.id to GenericError
     new_txs = [t for t in LotTransaction.objects.filter(lot__added_by=entity).order_by('-id')[0:len(lots_to_insert)]]
-    for tx, errors in zip(sorted(new_txs, key=lambda x: x.id), tx_errors):
+    for tx, errors in zip(sorted(new_txs, key=lambda x: x.id), generic_errors):
         for e in errors:
             e.tx_id = tx.id
-    flat_tx_errors = [item for sublist in tx_errors for item in sublist]
-    TransactionError.objects.bulk_create(flat_tx_errors, batch_size=100)
+    flat_generic_errors = [item for sublist in generic_errors for item in sublist]
+    GenericError.objects.bulk_create(flat_generic_errors, batch_size=100)
     bulk_sanity_checks(new_txs, prefetched_data, background=False)
     return new_lots, new_txs
 
