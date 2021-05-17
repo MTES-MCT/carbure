@@ -14,17 +14,19 @@ import useClose from "common/hooks/use-close"
 import { useNotificationContext } from "common/components/notifications"
 import * as api from "../api"
 import { getStatus } from "transactions/helpers"
+import { useTranslation } from "react-i18next"
 
-export function getFieldErrors(errors: GenericError[]) {
+export function useFieldErrors(errors: GenericError[]) {
+  const { t } = useTranslation("errors")
   const fieldErrors: { [k: string]: string } = {}
 
   errors.forEach((err) => {
     if (err.field) {
-      fieldErrors[err.field] = err.error
+      fieldErrors[err.field] = t(err.error)
     }
 
     if (err.fields) {
-      err.fields?.forEach((field) => (fieldErrors[field] = err.error))
+      err.fields?.forEach((field) => (fieldErrors[field] = t(err.error)))
     }
   })
 
@@ -50,11 +52,12 @@ export default function useTransactionDetails(
   const [request, resolveUpdate] = useAPI(api.updateLot)
   const [comment, resolveComment] = useAPI(api.commentLot)
 
+  const fieldErrors = useFieldErrors(details.data?.errors ?? [])
+
   const entityID = entity?.id
   const txID = parseInt(params.id, 10)
   const tx = details.data?.transaction
 
-  const fieldErrors = details.data ? getFieldErrors(details.data.errors) : {}
   const validationErrors = details.data?.errors ?? []
   const status = tx && entity ? getStatus(tx, entity.id) : LotStatus.Weird
 

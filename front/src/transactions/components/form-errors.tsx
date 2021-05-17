@@ -56,7 +56,7 @@ const ValidationErrors = ({ errors }: ValidationErrorsProps) => {
           <ul className={styles.validationErrors}>
             {warnings.map((err, i) => (
               <li key={i}>
-                {t(err.error) || "Erreur de validation"}{" "}
+                {t(err.error) || "Erreur de validation"}
                 {err.extra && err.extra !== t(err.error) && ` - ${err.extra}`}
               </li>
             ))}
