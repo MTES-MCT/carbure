@@ -6,11 +6,11 @@ import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
 import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
 import { LotRejector } from "transactions/hooks/actions/use-reject-lots"
 import { LotValidator } from "transactions/hooks/actions/use-validate-lots"
-import { useRelativePush } from "common/components/relative-route"
 
 import styles from "../components/form.module.css"
 
 import useTransactionDetails from "../hooks/use-transaction-details"
+import useNavigate from "../hooks/query/use-navigate"
 
 import {
   AlertTriangle,
@@ -28,7 +28,6 @@ import TransactionForm from "../components/form"
 import { StatusTitle } from "../components/status"
 import Comments from "../components/form-comments"
 import ValidationErrors from "../components/form-errors"
-import { LotGetter } from "transactions/hooks/use-transaction-list"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]
@@ -39,8 +38,8 @@ type TransactionDetailsProps = {
   validator: LotValidator
   acceptor: LotAcceptor
   rejector: LotRejector
+  transactions: number[]
   refresh: () => void
-  transactions: LotGetter
 }
 
 const TransactionDetails = ({
@@ -68,7 +67,8 @@ const TransactionDetails = ({
     addComment,
     refreshDetails,
   } = useTransactionDetails(entity, refresh)
-  const relativePush = useRelativePush()
+
+  const navigator = useNavigate(transactions)
 
   const isEditable = EDITABLE.includes(status)
   const isCommentable = COMMENTABLE.includes(status)
@@ -86,30 +86,6 @@ const TransactionDetails = ({
       if (closeOnDone) {
         close()
       }
-    }
-  }
-
-  let previousTxId: number | null = null
-  let nextTxId: number | null = null
-
-  if (transactions?.data) {
-    const txIds = transactions.data.lots.map((tx) => tx.id)
-    const currentTxId = details.data?.transaction.id ?? -1
-
-    const index = txIds.indexOf(currentTxId)
-
-    if (index === -1) {
-      previousTxId = null
-      nextTxId = txIds[0]
-    } else if (index === 0) {
-      previousTxId = null
-      nextTxId = txIds[1]
-    } else if (index === txIds.length - 1) {
-      previousTxId = txIds[txIds.length - 2]
-      nextTxId = null
-    } else {
-      previousTxId = txIds[index - 1]
-      nextTxId = txIds[index + 1]
     }
   }
 
@@ -225,16 +201,16 @@ const TransactionDetails = ({
         <Box row className={styles.transactionNavButtons}>
           <Button
             icon={ChevronLeft}
-            disabled={!previousTxId}
-            onClick={() => relativePush(`../${previousTxId}`)}
+            disabled={!navigator.hasPrev}
+            onClick={navigator.prev}
           >
             Lot Précédent
           </Button>
 
           <Button
             icon={ChevronRight}
-            disabled={!nextTxId}
-            onClick={() => relativePush(`../${nextTxId}`)}
+            disabled={!navigator.hasNext}
+            onClick={navigator.next}
           >
             Lot Suivant
           </Button>
