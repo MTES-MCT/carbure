@@ -217,11 +217,13 @@ export const selector: Selector = (selection) => ({
   className: styles.checkboxColumn,
 
   header: (
-    <Box className={styles.checkboxHeaderWrapper}>
+    <Box
+      className={styles.checkboxHeaderWrapper}
+      onClick={() => selection.toggleSelectAll()}
+    >
       <Checkbox
         title="Sélectionner toute la page"
         checked={selection.isAllSelected()}
-        onChange={(e) => selection.toggleSelectAll(e.target.checked)}
       />
     </Box>
   ),
