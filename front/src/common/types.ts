@@ -223,7 +223,6 @@ export interface Lots {
   returned: number
   total: number
   total_errors: number
-  total_volume: number
 
   lots: Transaction[]
 
@@ -454,6 +453,9 @@ export interface TransactionSummary {
   in: SummaryItem[]
   out: SummaryItem[]
   tx_ids: number[]
+  total_volume: number
+  total_volume_in: number
+  total_volume_out: number
 }
 
 export interface ConvertETBE {
