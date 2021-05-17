@@ -212,7 +212,8 @@ export interface GenericError {
 
   tx: number
 
-  field: string
+  field: string | null
+  fields: string[] | null
   value: string
   extra: string
 }

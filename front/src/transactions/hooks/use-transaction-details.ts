@@ -19,7 +19,13 @@ export function getFieldErrors(errors: GenericError[]) {
   const fieldErrors: { [k: string]: string } = {}
 
   errors.forEach((err) => {
-    fieldErrors[err.field] = err.error
+    if (err.field) {
+      fieldErrors[err.field] = err.error
+    }
+
+    if (err.fields) {
+      err.fields?.forEach((field) => (fieldErrors[field] = err.error))
+    }
   })
 
   return fieldErrors
