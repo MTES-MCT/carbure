@@ -10,6 +10,7 @@ import { MemoryRouter } from "react-router-dom"
 import TransactionAdd from "../routes/transaction-add"
 
 import server from "./api"
+import { Suspense } from "react"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
@@ -25,12 +26,14 @@ const TransactionAddWithRouter = ({
   children?: React.ReactNode
   refresh?: () => void
 }) => (
-  <MemoryRouter initialEntries={["/org/0/transactions/draft/add"]}>
-    <Route path="/org/0/transactions/draft/add">
-      <TransactionAdd entity={entity} refresh={refresh} />
-    </Route>
-    {children}
-  </MemoryRouter>
+  <Suspense fallback="...">
+    <MemoryRouter initialEntries={["/org/0/transactions/draft/add"]}>
+      <Route path="/org/0/transactions/draft/add">
+        <TransactionAdd entity={entity} refresh={refresh} />
+      </Route>
+      {children}
+    </MemoryRouter>
+  </Suspense>
 )
 
 function checkLotFields() {

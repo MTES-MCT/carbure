@@ -1,4 +1,6 @@
 import { rest } from "msw"
+import translations from "../../../public/locales/fr/translation.json"
+import errors from "../../../public/locales/fr/errors.json"
 
 import {
   country,
@@ -122,5 +124,19 @@ export const okRedcertSearch = rest.get(
         data: [redcertCertificate, expiredRedcertCertificate],
       })
     )
+  }
+)
+
+export const okTranslations = rest.get(
+  "/v2/locales/fr/translation.json",
+  (req, res, ctx) => {
+    return res(ctx.json(translations))
+  }
+)
+
+export const okErrors = rest.get(
+  "/v2/locales/fr/errors.json",
+  (req, res, ctx) => {
+    return res(ctx.json(errors))
   }
 )

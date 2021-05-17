@@ -1,4 +1,13 @@
-import { DepotType, Entity, EntityType } from "common/types"
+import {
+  DepotType,
+  Entity,
+  EntityType,
+  GESOption,
+  Lot,
+  ProductionSite,
+  ProductionSiteDetails,
+  Transaction,
+} from "common/types"
 
 // ENTITIES
 
@@ -57,7 +66,7 @@ export const deliverySite = {
 
 // PRODUCTION SITES
 
-export const productionSite = {
+export const productionSite: ProductionSiteDetails = {
   name: "Test Production Site",
   country: country,
   id: 2,
@@ -67,7 +76,7 @@ export const productionSite = {
   manager_name: "Bob",
   manager_phone: "012345678",
   manager_email: "bob@bobby.bob",
-  ges_option: "Actual",
+  ges_option: GESOption.Actual,
   eligible_dc: true,
   dc_reference: "bobobobobob",
   city: "Baigorri",
@@ -184,7 +193,7 @@ export const biocarburant = {
 
 // LOT
 
-export const lot = {
+export const lot: Transaction = {
   lot: {
     id: 0,
     period: "2020-01",
@@ -201,6 +210,7 @@ export const lot = {
     unknown_production_site_reference: "",
     unknown_production_site_dbl_counting: "",
     volume: 12345,
+    remaining_volume: 12345,
     matiere_premiere: matierePremiere,
     biocarburant: biocarburant,
     pays_origine: country,
@@ -240,8 +250,8 @@ export const lot = {
   unknown_delivery_site_country: null,
   delivery_status: "N",
   champ_libre: "",
+  is_forwarded: false,
   is_mac: false,
-  is_batch: false,
   id: 0,
 }
 
