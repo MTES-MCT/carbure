@@ -1,5 +1,6 @@
 import { useParams } from "react-router"
 import { useRelativePush } from "common/components/relative-route"
+import { useCallback, useEffect } from "react"
 
 export default function useNavigate(transactions: number[]) {
   const push = useRelativePush()
@@ -12,17 +13,30 @@ export default function useNavigate(transactions: number[]) {
   const hasPrev = index > 0
   const hasNext = 0 <= index && index < transactions.length - 1
 
-  function prev() {
+  const prev = useCallback(() => {
     if (hasPrev) {
       push(`../${transactions[index - 1]}`)
     }
-  }
+  }, [transactions, hasPrev, index, push])
 
-  function next() {
+  const next = useCallback(() => {
     if (hasNext) {
       push(`../${transactions[index + 1]}`)
     }
-  }
+  }, [transactions, hasNext, index, push])
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "ArrowLeft") {
+        prev()
+      } else if (e.key === "ArrowRight") {
+        next()
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [prev, next])
 
   return {
     index,
