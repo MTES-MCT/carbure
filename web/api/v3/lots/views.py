@@ -31,7 +31,7 @@ def get_lots(request, *args, **kwargs):
     entity = context['entity']
 
     status = request.GET.get('status', False)
-    
+
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
 
@@ -431,7 +431,7 @@ def comment_lot(request, *args, **kwargs):
 def get_template_producers_simple(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
-    
+
     file_location = template_producers_simple(entity)
     try:
         with open(file_location, 'rb') as f:
@@ -482,7 +482,7 @@ def get_template_producers_advanced_10k(request, *args, **kwargs):
 def get_template_blend(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
-    
+
     file_location = template_operators(entity)
     try:
         with open(file_location, 'rb') as f:
@@ -498,7 +498,7 @@ def get_template_blend(request, *args, **kwargs):
 def get_template_trader(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
-    
+
     file_location = template_traders(entity)
     try:
         with open(file_location, 'rb') as f:
@@ -568,7 +568,7 @@ def validate_declaration(request, *args, **kwargs):
 
     if period_month is None or period_year is None:
         return JsonResponse({'status': "error", 'message': "Missing periods"}, status=400)
-    
+
     try:
         py = int(period_year)
         pm = int(period_month)
@@ -624,4 +624,4 @@ def forward_lots(request, *args, **kwargs):
         else:
             return JsonResponse({'status': 'error', 'message': "Delivery site not registered for outsourcing"}, status=400)
 
-    return JsonResponse({'status': 'success'})    
+    return JsonResponse({'status': 'success'})
