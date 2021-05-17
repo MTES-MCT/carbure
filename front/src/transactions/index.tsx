@@ -268,7 +268,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
             validator={validator}
             acceptor={acceptor}
             rejector={rejector}
-            transactions={transactions}
+            transactions={summary.data?.tx_ids ?? []}
           />
         </Route>
       </Switch>
