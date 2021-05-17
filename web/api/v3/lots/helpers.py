@@ -204,6 +204,11 @@ def filter_lots(txs, querySet):
     elif deadline == 'true':
         txs = tx_with_deadline
 
+    sort_by = querySet.get('sort_by', False)
+    order = querySet.get('order', False)
+
+    txs = sort_lots(txs, sort_by, order)
+
     return txs, total_errors, total_deadline, deadline_str
 
 
@@ -233,14 +238,10 @@ def sort_lots(txs, sort_by, order):
 def get_lots_with_metadata(txs, entity, querySet):
     export = querySet.get('export', False)
 
-    sort_by = querySet.get('sort_by', False)
-    order = querySet.get('order', False)
-
     limit = querySet.get('limit', None)
     from_idx = querySet.get('from_idx', "0")
 
     txs, total_errors, total_deadline, deadline_str = filter_lots(txs, querySet)
-    txs = sort_lots(txs, sort_by, order)
 
     from_idx = int(from_idx)
     returned = txs[from_idx:]
@@ -313,14 +314,13 @@ def filter_entity_transactions(entity, querySet):
     return filter_lots(txs, querySet)
 
 def get_summary(txs, entity):
-    tx_ids = []
+    tx_ids = [t['id'] for t in txs.values('id')]
     total_volume = 0
     txs_in = txs.filter(carbure_client=entity)
     total_volume_in = 0
     data_in = {}
     for t in txs_in:
         vendor = ''
-        tx_ids.append(t.id)
         if t.lot.added_by == entity:
             vendor = t.lot.unknown_supplier if t.lot.unknown_supplier else t.lot.unknown_supplier_certificate
         else:
@@ -342,7 +342,6 @@ def get_summary(txs, entity):
     total_volume_out = 0
     data_out = {}
     for t in txs_out:
-        tx_ids.append(t.id)
         client_name = t.carbure_client.name if t.client_is_in_carbure and t.carbure_client else t.unknown_client
         if client_name not in data_out:
             data_out[client_name] = {}
