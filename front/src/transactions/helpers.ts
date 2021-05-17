@@ -7,6 +7,7 @@ import {
   LotStatus,
   SummaryItem,
   GenericError,
+  TransactionSummary,
 } from "common/types"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 import { Option } from "common/components/select"
@@ -124,6 +125,17 @@ export function flattenSummary(summary: any): SummaryItem[] {
   }
 
   return rows
+}
+
+export function normalizeSummary(summary: any): TransactionSummary {
+  return {
+    in: flattenSummary(summary.in),
+    out: flattenSummary(summary.out),
+    tx_ids: summary.tx_ids,
+    total_volume: summary.total_volume,
+    total_volume_in: summary.total_volume_in,
+    total_volume_out: summary.total_volume_out,
+  }
 }
 
 export function prettyVolume(volume: number) {
