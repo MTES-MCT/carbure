@@ -1,7 +1,7 @@
 import { screen, waitForElementToBeRemoved } from "@testing-library/react"
 
 export async function waitWhileLoading(title = "Chargement...") {
-  await screen.findAllByTitle(title, {})
+  await screen.findAllByTitle(title)
   return waitForElementToBeRemoved(() => screen.getAllByTitle(title))
 }
 

@@ -6,6 +6,7 @@ import { okEmptySettings } from "settings/__test__/api"
 import Carbure from "../index"
 
 import server from "./api"
+import { Suspense } from "react"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
@@ -17,7 +18,9 @@ afterAll(() => server.close())
 const CarbureWithRouter = () => {
   return (
     <MemoryRouter>
-      <Carbure />
+      <Suspense fallback="Loading...">
+        <Carbure />
+      </Suspense>
     </MemoryRouter>
   )
 }
