@@ -30,7 +30,7 @@ def get_uploaded_files_directory():
     directory = '/app/files'
     if not os.path.exists(directory):
         try:
-            os.makedirs(directory)    
+            os.makedirs(directory)
         except:
             return '/tmp'
     return directory
@@ -39,7 +39,7 @@ def calculate_ghg(lot):
     lot.ghg_total = lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee
     lot.ghg_reference = 83.8
     lot.ghg_reduction = round((1.0 - (lot.ghg_total / lot.ghg_reference)) * 100.0, 2)
-    
+
 
 def convert_cell(cell, convert_float: bool) -> Scalar:
     from openpyxl.cell.cell import TYPE_BOOL, TYPE_ERROR, TYPE_NUMERIC
@@ -424,7 +424,7 @@ def fill_matiere_premiere_info(lot_row, lot, tx, prefetched_data):
         matiere_premiere = lot_row['matiere_premiere_code']
         if matiere_premiere in mps:
             lot.matiere_premiere = mps[matiere_premiere]
-        else: 
+        else:
             lot.matiere_premiere = None
             lot_errors.append(GenericError(tx=tx, field='matiere_premiere_code', error='UNKNOWN_FEEDSTOCK',
                                          extra='Matière Première inconnue', display_to_creator=True, is_blocking=True,
@@ -474,15 +474,14 @@ def fill_pays_origine_info(lot_row, lot, tx, prefetched_data):
             lot.pays_origine = countries[pays_origine]
         else:
             lot.pays_origine = None
-            lot_errors.append(GenericError(tx=tx, field='pays_origine_code', error='UNKNOWN_COUNTRY', extra='Pays inconnu', 
+            lot_errors.append(GenericError(tx=tx, field='pays_origine_code', error='UNKNOWN_COUNTRY', extra='Pays inconnu',
                                          display_to_creator=True, is_blocking=True,
                                          value=pays_origine))
     else:
-        pays_origine = None
         lot.pays_origine = None
-        lot_errors.append(GenericError(tx=tx, field='pays_origine_code', error='MISSING_COUNTRY', extra='Merci de préciser le pays', 
+        lot_errors.append(GenericError(tx=tx, field='pays_origine_code', error='MISSING_COUNTRY', extra='Merci de préciser le pays',
                                        display_to_creator=True, is_blocking=True,
-                                       value=pays_origine))
+                                       value=''))
     return lot_errors
 
 
@@ -494,7 +493,7 @@ def fill_ghg_info(lot_row, lot, tx):
         try:
             lot.eec = abs(float(eec))
         except Exception:
-            lot_errors.append(GenericError(tx=tx, field='eec', error='WRONG_FORMAT', extra='Format non reconnu', 
+            lot_errors.append(GenericError(tx=tx, field='eec', error='WRONG_FORMAT', extra='Format non reconnu',
                                            display_to_creator=True, is_blocking=True, value=eec))
 
     lot.el = 0
@@ -503,7 +502,7 @@ def fill_ghg_info(lot_row, lot, tx):
         try:
             lot.el = abs(float(el))
         except Exception:
-             lot_errors.append(GenericError(tx=tx, field='el', error='WRONG_FORMAT', extra='Format non reconnu', 
+             lot_errors.append(GenericError(tx=tx, field='el', error='WRONG_FORMAT', extra='Format non reconnu',
                                            display_to_creator=True, is_blocking=True, value=el))
 
     lot.ep = 0
@@ -512,7 +511,7 @@ def fill_ghg_info(lot_row, lot, tx):
         try:
             lot.ep = abs(float(ep))
         except Exception:
-             lot_errors.append(GenericError(tx=tx, field='ep', error='WRONG_FORMAT', extra='Format non reconnu', 
+             lot_errors.append(GenericError(tx=tx, field='ep', error='WRONG_FORMAT', extra='Format non reconnu',
                                            display_to_creator=True, is_blocking=True, value=ep))
 
     lot.etd = 0
@@ -521,7 +520,7 @@ def fill_ghg_info(lot_row, lot, tx):
         try:
             lot.etd = abs(float(etd))
         except Exception:
-             lot_errors.append(GenericError(tx=tx, field='etd', error='WRONG_FORMAT', extra='Format non reconnu', 
+             lot_errors.append(GenericError(tx=tx, field='etd', error='WRONG_FORMAT', extra='Format non reconnu',
                                            display_to_creator=True, is_blocking=True, value=etd))
 
     lot.eu = 0
@@ -530,7 +529,7 @@ def fill_ghg_info(lot_row, lot, tx):
         try:
             lot.eu = abs(float(eu))
         except Exception:
-             lot_errors.append(GenericError(tx=tx, field='eu', error='WRONG_FORMAT', extra='Format non reconnu', 
+             lot_errors.append(GenericError(tx=tx, field='eu', error='WRONG_FORMAT', extra='Format non reconnu',
                                            display_to_creator=True, is_blocking=True, value=eu))
 
     lot.esca = 0
@@ -539,7 +538,7 @@ def fill_ghg_info(lot_row, lot, tx):
         try:
             lot.esca = abs(float(esca))
         except Exception:
-             lot_errors.append(GenericError(tx=tx, field='esca', error='WRONG_FORMAT', extra='Format non reconnu', 
+             lot_errors.append(GenericError(tx=tx, field='esca', error='WRONG_FORMAT', extra='Format non reconnu',
                                            display_to_creator=True, is_blocking=True, value=esca))
 
     lot.eccs = 0
@@ -548,7 +547,7 @@ def fill_ghg_info(lot_row, lot, tx):
         try:
             lot.eccs = abs(float(eccs))
         except Exception:
-             lot_errors.append(GenericError(tx=tx, field='eccs', error='WRONG_FORMAT', extra='Format non reconnu', 
+             lot_errors.append(GenericError(tx=tx, field='eccs', error='WRONG_FORMAT', extra='Format non reconnu',
                                            display_to_creator=True, is_blocking=True, value=eccs))
 
     lot.eccr = 0
@@ -557,7 +556,7 @@ def fill_ghg_info(lot_row, lot, tx):
         try:
             lot.eccr = abs(float(eccr))
         except Exception:
-             lot_errors.append(GenericError(tx=tx, field='eccr', error='WRONG_FORMAT', extra='Format non reconnu', 
+             lot_errors.append(GenericError(tx=tx, field='eccr', error='WRONG_FORMAT', extra='Format non reconnu',
                                            display_to_creator=True, is_blocking=True, value=eccr))
 
     lot.eee = 0
@@ -566,7 +565,7 @@ def fill_ghg_info(lot_row, lot, tx):
         try:
             lot.eee = abs(float(eee))
         except Exception:
-             lot_errors.append(GenericError(tx=tx, field='eee', error='WRONG_FORMAT', extra='Format non reconnu', 
+             lot_errors.append(GenericError(tx=tx, field='eee', error='WRONG_FORMAT', extra='Format non reconnu',
                                            display_to_creator=True, is_blocking=True, value=eee))
     # calculs ghg
     calculate_ghg(lot)
@@ -668,7 +667,7 @@ def fill_vendor_data(entity, lot_row, transaction, prefetched_data):
 
     # supplier is who we get the lot from
     # vendor is the one who adds the lot in the database
-    if not transaction.carbure_vendor:   
+    if not transaction.carbure_vendor:
         transaction.carbure_vendor = entity
 
     # if the lot is added by a Producer or Trader, try to attach the trading certificate
