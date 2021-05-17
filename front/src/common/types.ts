@@ -190,41 +190,31 @@ export interface Transaction {
   carbure_delivery_site: DeliverySite | null
   unknown_delivery_site: string
   unknown_delivery_site_country: Country | null
-
-  errors: {
-    field: string
-    value: string
-    error: string
-  }[]
 }
 
-export interface TransactionError {
-  tx_id: number
-  field: string
-  value: string
+export interface GenericError {
   error: string
-}
 
-export interface LotError {
-  lot_id: number
-  field: string
-  value: string
-  error: string
-}
+  display_to_creator: boolean
+  display_to_recipient: boolean
+  display_to_admin: boolean
+  display_to_auditor: boolean
 
-export interface Errors {
-  tx_errors?: TransactionError[]
-  lots_errors?: LotError[]
-  validation_errors?: ValidationError[]
-}
+  acked_by_creator: boolean
+  acked_by_recipient: boolean
+  acked_by_admin: boolean
+  acked_by_auditor: boolean
 
-export interface ValidationError {
-  lot_id: number
-  error: string
-  details: string
-  fields: string[]
-  is_warning: boolean
+  highlighted_by_admin: boolean
+  highlighted_by_auditor: boolean
+
   is_blocking: boolean
+
+  tx: number
+
+  field: string
+  value: string
+  extra: string
 }
 
 export interface Lots {
@@ -242,7 +232,7 @@ export interface Lots {
   }
 
   errors: {
-    [id: string]: Errors
+    [id: string]: GenericError[]
   }
 }
 
@@ -256,7 +246,7 @@ export interface LotDetails {
   transaction: Transaction
   comments: Comment[]
   deadline: string
-  errors: Errors
+  errors: GenericError[]
 }
 
 export enum Filters {

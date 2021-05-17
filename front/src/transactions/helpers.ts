@@ -6,7 +6,7 @@ import {
   Transaction,
   LotStatus,
   SummaryItem,
-  Errors,
+  GenericError,
 } from "common/types"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 import { Option } from "common/components/select"
@@ -29,28 +29,18 @@ export function hasDeadline(tx: Transaction, deadline: string): boolean {
 
 export function hasWarnings(
   tx: Transaction,
-  errors: Record<number, Errors>
+  errors: Record<number, GenericError[]>
 ): boolean {
   if (!tx || !errors[tx.id]) return false
-
-  return (
-    errors[tx.id].validation_errors?.some(
-      (e) => e.is_warning && !e.is_blocking
-    ) ?? false
-  )
+  return errors[tx.id].every((e) => !e.is_blocking)
 }
 
 export function hasErrors(
   tx: Transaction,
-  errors: Record<number, Errors>
+  errors: Record<number, GenericError[]>
 ): boolean {
   if (!tx || !errors[tx.id]) return false
-
-  const hasTxErrors = Boolean(errors[tx.id].tx_errors)
-  const hasLotErrors = Boolean(errors[tx.id].lots_errors)
-  const hasBlockingErrors = errors[tx.id].validation_errors?.some((e) => e.is_blocking) ?? false // prettier-ignore
-
-  return hasTxErrors || hasLotErrors || hasBlockingErrors
+  return errors[tx.id].some((e) => e.is_blocking)
 }
 
 // extract the status name from the lot details
@@ -99,9 +89,9 @@ export function normalizeFilters(snapshot: any): Snapshot {
     }
 
     if (key in snapshot.filters) {
-      snapshot.filters[key].sort((a: Option, b: Option) =>
-        a.label.localeCompare(b.label, "fr")
-      )
+      snapshot.filters[key] = snapshot.filters[key]
+        .filter(Boolean)
+        .sort((a: Option, b: Option) => a.label.localeCompare(b.label, "fr"))
     }
   })
 
