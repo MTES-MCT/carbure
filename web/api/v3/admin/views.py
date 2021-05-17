@@ -28,7 +28,7 @@ def get_users(request):
     entity_id = request.GET.get('entity_id', False)
     user_model = get_user_model()
     users = user_model.objects.all()
-    
+
     if q:
         users = users.filter(Q(email__icontains=q) | Q(name__icontains=q))
     if entity_id:
@@ -41,7 +41,7 @@ def get_users(request):
 @is_admin
 def get_entity_details(request):
     entity_id = request.GET.get('entity_id', False)
-    
+
     try:
         e = Entity.objects.get(pk=entity_id)
         return JsonResponse({"status": "success", "data": e.natural_key()})
@@ -79,7 +79,7 @@ def get_entity_production_sites(request):
 @is_admin
 def get_entity_depots(request):
     entity_id = request.GET.get('entity_id', False)
-    
+
     try:
         e = Entity.objects.get(pk=entity_id)
         data = [ps.natural_key() for ps in e.entitydepot_set.all()]
@@ -90,7 +90,7 @@ def get_entity_depots(request):
 @is_admin
 def get_entity_certificates(request):
     entity_id = request.GET.get('entity_id', False)
-    
+
     try:
         e = Entity.objects.get(pk=entity_id)
         iscc = [ps.natural_key() for ps in e.entityiscctradingcertificate_set.all()]
@@ -103,7 +103,7 @@ def get_entity_certificates(request):
 def get_entities(request):
     q = request.GET.get('q', False)
     has_requests = request.GET.get('has_requests', None)
-    
+
     entities = Entity.objects.all().order_by('name')
 
     if q:
@@ -117,7 +117,7 @@ def get_entities(request):
     for e in entities:
         entities_sez.append({
             'entity': e.natural_key(),
-            'users': e.userrights_set.count(), 
+            'users': e.userrights_set.count(),
             'requests': e.userrightsrequests_set.filter(status='PENDING').count(),
             'depots': e.entitydepot_set.count(),
             'production_sites': e.productionsite_set.count(),
@@ -242,9 +242,8 @@ def get_snapshot(request):
 
         filters = get_snapshot_filters(txs)
 
-        generic_errors = [e['genericerror__error'] for e in txs.values('genericerror__error').distinct()]
+        generic_errors = [e['genericerror__error'] for e in txs.values('genericerror__error').distinct() if e['genericerror__error']]
         filters['errors'] = generic_errors
-
 
         c1 = [c['carbure_client__name'] for c in txs.values('carbure_client__name').distinct()]
         c2 = [c['unknown_client'] for c in txs.values('unknown_client').distinct()]
@@ -280,7 +279,7 @@ def get_rights_requests(request):
         requests = requests.filter(status__in=statuses)
     if q:
         requests = requests.filter(Q(user__email__icontains=q) | Q(entity__name__icontains=q))
-    
+
     requests_sez = [r.natural_key() for r in requests]
     return JsonResponse({"status": "success", "data": requests_sez})
 
@@ -305,9 +304,9 @@ def update_right_request(request):
         UserRights.objects.update_or_create(entity=right_request.entity, user=right_request.user, defaults={'role': right_request.role, 'expiration_date': right_request.expiration_date})
         # send_mail
         email_subject = "Carbure - Demande acceptée"
-        message = """ 
+        message = """
         Bonjour,
-        
+
         Votre demande d'accès à la Société %s vient d'être validée par l'administration.
 
         """ % (request.entity.name)
@@ -346,7 +345,7 @@ def get_controls(request):
     if status:
         controls = controls.filter(status=status)
     controls_sez = [r.natural_key() for r in controls]
-    return JsonResponse({"status": "success", "data": controls_sez})    
+    return JsonResponse({"status": "success", "data": controls_sez})
 
 
 @is_admin
@@ -390,7 +389,7 @@ def get_period_declarations(period):
     txs_input = txs.filter(carbure_client=OuterRef('pk'), lot__status='Validated').values('carbure_client').annotate(total=Count(Value(1)))
     txs_corrections = txs.filter(lot__added_by=OuterRef('pk'), lot__status='Validated', delivery_status__in=['AC', 'R', 'AA']).values('lot__added_by').annotate(total=Count(Value(1)))
 
-    # for each entity, run a subquery to count the number of tx depending on their status 
+    # for each entity, run a subquery to count the number of tx depending on their status
     tx_counts = Entity.objects.annotate(
             drafts=Subquery(txs_drafts.values('total')),
             output=Subquery(txs_output.values('total')),
@@ -434,7 +433,7 @@ def get_declarations(request):
     entities_alive = [f['lot__added_by'] for f in LotTransaction.objects.filter(lot__added_time__gt=start).values('lot__added_by').annotate(count=Count('lot')).filter(count__gt=1)]
     entities = Entity.objects.filter(id__in=entities_alive)
     logging.debug('{} entities alive'.format(entities.count()))
-    
+
     # create the SustainabilityDeclaration objects in database
     # 0) cleanup
     # SustainabilityDeclaration.objects.filter(checked=False).delete()
@@ -472,7 +471,7 @@ def get_declarations(request):
 
     # get the declarations objects from db
     declarations = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start, period__lte=end)
-     
+
     tx_counts = {}
 
     for month, year in periods:
@@ -488,7 +487,7 @@ def get_declarations(request):
     # corrections = Count('id', filter=Q(lot__status='Validated', delivery_status__in=['R', 'AC', 'AA']))
     # lots = LotTransaction.objects.values('lot__added_by__id', 'lot__added_by__name', 'lot__period').annotate(drafts=drafts, validated=validated, received=received, corrections=corrections)
     # batches = {'%s.%s' % (batch['lot__added_by__id'], batch['lot__period']): batch for batch in lots }
-    
+
     # 2) add batch info to each declarations
     declarations_sez = []
     for d in declarations:
@@ -539,7 +538,7 @@ def send_declaration_reminder(request):
     text_message = render_to_string('emails/relance_manuelle_fr.txt', context)
     rights = UserRights.objects.filter(entity__id=entity_id)
     recipients = [r.user.email for r in rights]
-    
+
     send_mail(
         subject=email_subject,
         message=text_message,
@@ -611,7 +610,7 @@ def controls_add_message(request):
 
 @is_admin
 def ack_alerts(request):
-    return JsonResponse({'status': 'success'})    
+    return JsonResponse({'status': 'success'})
 
 
 @is_admin
