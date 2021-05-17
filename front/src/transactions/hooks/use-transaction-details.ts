@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { useParams } from "react-router-dom"
 
-import { EntityType, Errors, LotStatus } from "common/types"
+import { EntityType, GenericError, LotStatus } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
 import useTransactionForm, {
@@ -15,14 +15,10 @@ import { useNotificationContext } from "common/components/notifications"
 import * as api from "../api"
 import { getStatus } from "transactions/helpers"
 
-export function getFieldErrors(errors: Errors) {
+export function getFieldErrors(errors: GenericError[]) {
   const fieldErrors: { [k: string]: string } = {}
 
-  errors.lots_errors?.forEach((err) => {
-    fieldErrors[err.field] = err.error
-  })
-
-  errors.tx_errors?.forEach((err) => {
+  errors.forEach((err) => {
     fieldErrors[err.field] = err.error
   })
 
@@ -53,7 +49,7 @@ export default function useTransactionDetails(
   const tx = details.data?.transaction
 
   const fieldErrors = details.data ? getFieldErrors(details.data.errors) : {}
-  const validationErrors = details.data?.errors.validation_errors ?? []
+  const validationErrors = details.data?.errors ?? []
   const status = tx && entity ? getStatus(tx, entity.id) : LotStatus.Weird
 
   function refreshDetails() {

@@ -129,12 +129,7 @@ const TransactionDetails = ({
         onChange={change}
       />
 
-      {hasErrors && (
-        <ValidationErrors
-          validationErrors={validationErrors}
-          fieldErrors={fieldErrors}
-        />
-      )}
+      {hasErrors && <ValidationErrors errors={validationErrors} />}
 
       {details.data && details.data.comments.length > 0 && (
         <Comments

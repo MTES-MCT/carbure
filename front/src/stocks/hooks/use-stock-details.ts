@@ -33,7 +33,7 @@ export default function useStockDetails(
   const tx = details.data?.transaction
 
   const fieldErrors = details.data ? getFieldErrors(details.data.errors) : {}
-  const validationErrors = details.data?.errors.validation_errors ?? []
+  const validationErrors = details.data?.errors ?? []
   const status = tx && entity ? getStockStatus(tx, entity) : LotStatus.Weird
 
   function refreshDetails() {
