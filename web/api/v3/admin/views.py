@@ -412,22 +412,29 @@ def get_period_declarations(period):
 @is_admin
 def get_declarations(request):
     year = request.GET.get('year', False)
+    month = request.GET.get('month', False)
     now = datetime.datetime.now()
+
+    if not month:
+        month = now.month
+    else:
+        month = int(month)
+
     if not year:
         year = now.year
     else:
         year = int(year)
 
     # we are in month N, we want to see period N-2, N-1 and N
-    current_period = datetime.date.today().replace(day=1)
+    ref_period = datetime.datetime(year=year, month=month, day=1)
     nb_periods = 3
     declaration_periods = []
     for i in range(nb_periods):
-        declaration_periods.append(current_period - relativedelta(months=1 * i))
+        declaration_periods.append(ref_period - relativedelta(months=1 * i))
     periods = [(d.month, d.year) for d in declaration_periods]
     periods.reverse()
-    start = pytz.utc.localize(datetime.datetime(year=periods[0][1], month=periods[0][0], day=1))
-    end = pytz.utc.localize(datetime.datetime(year=periods[-1][1], month=periods[-1][0], day=1))
+    start = declaration_periods[-1]
+    end = ref_period + relativedelta(months=1) - relativedelta(days=1)
 
     # get entities that have posted at least one lot since the beginning of the period
     entities_alive = [f['lot__added_by'] for f in LotTransaction.objects.filter(lot__added_time__gt=start).values('lot__added_by').annotate(count=Count('lot')).filter(count__gt=1)]
