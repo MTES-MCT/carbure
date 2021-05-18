@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import useAPI from "common/hooks/use-api"
 import * as api from "../api"
 import {
@@ -20,20 +20,7 @@ import styles from "./declaration-summary.module.css"
 import dialogStyles from "common/components/dialog.module.css"
 import { useNotificationContext } from "common/components/notifications"
 import TransactionSummary from "./summary"
-
-const now = new Date()
-
-function prevPeriod(period: { year: number; month: number }) {
-  const month = period.month === 1 ? 12 : period.month - 1
-  const year = period.month === 1 ? period.year - 1 : period.year
-  return { year, month }
-}
-
-function nextPeriod(period: { year: number; month: number }) {
-  const month = period.month === 12 ? 1 : period.month + 1
-  const year = period.month === 12 ? period.year + 1 : period.year
-  return { year, month }
-}
+import usePeriod, { nextPeriod, prettyPeriod } from "common/hooks/use-period"
 
 type SummaryPromptProps = PromptProps<any> & {
   entityID: number
@@ -48,13 +35,7 @@ export const DeclarationSummaryPrompt = ({
   const [summary, getSummary] = useAPI(api.getDeclarationSummary)
   const [validating, validateDeclaration] = useAPI(api.validateDeclaration)
 
-  const [period, setPeriod] = useState(
-    prevPeriod({
-      year: now.getFullYear(),
-      month: now.getMonth() + 1,
-    })
-  )
-
+  const period = usePeriod()
   const next = nextPeriod(period)
 
   async function askValidateDeclaration() {
@@ -83,7 +64,7 @@ export const DeclarationSummaryPrompt = ({
 
   useEffect(() => {
     getSummary(entityID, period.year, period.month)
-  }, [getSummary, entityID, period])
+  }, [getSummary, entityID, period.year, period.month])
 
   const declaration = summary.data?.declaration
 
@@ -105,23 +86,11 @@ export const DeclarationSummaryPrompt = ({
       </span>
 
       <Box row className={styles.declarationPeriod}>
-        <Button
-          icon={ChevronLeft}
-          onClick={() => setPeriod(prevPeriod)}
-          className={styles.declarationPrevPeriod}
-        />
+        <Button icon={ChevronLeft} onClick={period.prev} />
         <span className={styles.declarationPeriodText}>
-          Pour la période{" "}
-          <b>
-            {/* pad month with leading 0 */}
-            {("0" + period.month).slice(-2)} / {period.year}
-          </b>
+          Pour la période <b>{prettyPeriod(period)}</b>
         </span>
-        <Button
-          icon={ChevronRight}
-          onClick={() => setPeriod(nextPeriod)}
-          className={styles.declarationNextPeriod}
-        />
+        <Button icon={ChevronRight} onClick={period.next} />
       </Box>
 
       <TransactionSummary
@@ -131,10 +100,7 @@ export const DeclarationSummaryPrompt = ({
 
       <DialogButtons className={styles.declarationControls}>
         <span className={styles.declarationDeadline}>
-          à valider avant la fin du mois de{" "}
-          <b>
-            {("0" + next.month).slice(-2)} / {next.year}
-          </b>
+          à valider avant la fin du mois de <b>{prettyPeriod(next)}</b>
         </span>
 
         {declaration?.declared ? (
