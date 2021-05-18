@@ -12,18 +12,6 @@
   margin-bottom: 12px;
 }
 
-.declarationPrevPeriod,
-.declarationNextPeriod {
-  width: 32px;
-  height: 32px;
-  padding: 4px;
-}
-
-.declarationPrevPeriod :global(.icon),
-.declarationNextPeriod :global(.icon) {
-  margin: 0;
-}
-
 .declarationPeriodText {
   margin: 0 16px;
   color: var(--blue-dark);
