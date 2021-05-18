@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 import cl from "clsx"
-import { DeclarationsByMonth } from "../api"
+
 import { Declaration, Entity, EntityType } from "common/types"
 import { Box, LoaderOverlay, Title } from "common/components"
 import Table, { Row } from "common/components/table"
@@ -9,15 +9,60 @@ import { padding } from "transactions/components/list-columns"
 import styles from "./declarations.module.css"
 import { useRelativePush } from "common/components/relative-route"
 import useAPI from "common/hooks/use-api"
-import { Bell, Check, Cross } from "common/components/icons"
-import * as api from "../api"
+import {
+  AlertCircle,
+  Bell,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Cross,
+} from "common/components/icons"
 import { confirm } from "common/components/dialog"
+import { Button } from "common/components/button"
+import usePeriod, {
+  prettyPeriod,
+  PeriodHook,
+  stdPeriod,
+} from "common/hooks/use-period"
+import { Alert, AlertLink } from "common/components/alert"
+import * as api from "../api"
+import { DeclarationsByEntities, DeclarationsByMonth } from "../helpers"
 
 type RowData = { entity: Entity; declarations: DeclarationsByMonth }
 
 const entityColumn = {
   className: styles.declarationEntity,
   render: (v: RowData) => v.entity.name,
+}
+
+function renderMonthHeader(
+  month: string,
+  period: PeriodHook,
+  index: number,
+  total: number
+) {
+  const isFirst = index === 0
+  const isLast = index === total - 1
+
+  return (
+    <Fragment>
+      {isFirst && (
+        <Button
+          icon={ChevronLeft}
+          onClick={period.prev}
+          className={styles.declarationPeriodPrev}
+        />
+      )}
+      <span>{month}</span>
+      {isLast && (
+        <Button
+          icon={ChevronRight}
+          onClick={period.next}
+          className={styles.declarationPeriodNext}
+        />
+      )}
+    </Fragment>
+  )
 }
 
 enum Evaluation {
@@ -60,7 +105,7 @@ function renderMonthSummary(
     const pushToTransactions = () =>
       relativePush(`../transactions/declaration`, {
         entity: v.entity,
-        period: month.replace("/", "-"),
+        period: stdPeriod(decl),
       })
 
     return (
@@ -78,7 +123,7 @@ function renderMonthSummary(
         <div className={styles.declarationSummary}>
           <span>
             {drafts === 0
-              ? "∅"
+              ? "-"
               : drafts === 1
               ? "1 brouillon"
               : `${drafts} brouillons`}
@@ -86,19 +131,19 @@ function renderMonthSummary(
 
           <span>
             {output === 0
-              ? "∅"
+              ? "-"
               : output === 1
               ? "1 envoyé"
               : `${output} envoyés`}
           </span>
 
           <span>
-            {input === 0 ? "∅" : input === 1 ? "1 reçu" : `${input} reçus`}
+            {input === 0 ? "-" : input === 1 ? "1 reçu" : `${input} reçus`}
           </span>
 
           <span>
             {corrections === 0
-              ? "∅"
+              ? "-"
               : corrections === 1
               ? "1 correction"
               : `${corrections} corrections`}
@@ -146,9 +191,10 @@ function renderMonthSummary(
 }
 
 type DeclarationTableProps = {
-  declarations: api.DeclarationsByEntities
+  declarations: DeclarationsByEntities
   months: string[]
   entities: Entity[]
+  period: PeriodHook
   onCheck: (d: Declaration, t: boolean) => Promise<any>
   onRemind: (d: Declaration) => Promise<any>
 }
@@ -157,11 +203,12 @@ const DeclarationTable = ({
   declarations,
   months,
   entities,
+  period,
   onCheck,
   onRemind,
 }: DeclarationTableProps) => {
-  const columns = months?.map((month) => ({
-    header: month,
+  const columns = months?.map((month, i) => ({
+    header: renderMonthHeader(month, period, i, months.length),
     className: styles.declarationPeriod,
     render: renderMonthSummary(month, onCheck, onRemind),
   }))
@@ -176,7 +223,20 @@ const DeclarationTable = ({
     }))
 
   if (rows.length === 0) {
-    return null
+    return (
+      <Alert
+        level="warning"
+        icon={AlertCircle}
+        className={styles.declarationEmpty}
+      >
+        <span>
+          Aucun résultat autour de la période <b>{prettyPeriod(period)}</b>
+        </span>
+        <AlertLink onClick={period.reset} className={styles.declarationReset}>
+          Retourner à la période actuelle
+        </AlertLink>
+      </Alert>
+    )
   }
 
   return (
@@ -189,40 +249,56 @@ const DeclarationTable = ({
 }
 
 const Declarations = () => {
-  const [focus, setFocus] = useState(EntityType.Producer)
   const [declarations, getDeclarations] = useAPI(api.getDeclarations)
   const [, checkDeclaration] = useAPI(api.checkDeclaration)
   const [, uncheckDeclaration] = useAPI(api.uncheckDeclaration)
   const [, sendReminder] = useAPI(api.sendDeclarationReminder)
 
+  const [focus, setFocus] = useState(EntityType.Producer)
+  const period = usePeriod()
+
+  const [entities = [], months = [], byEntityType = {}] =
+    declarations.data ?? []
+
+  async function confirmDeclarationCheck(declaration: Declaration) {
+    const ok = await confirm(
+      "Validation déclaration",
+      "Voulez-vous valider cette déclaration ?"
+    )
+
+    if (ok) {
+      await checkDeclaration(declaration.id)
+      await getDeclarations(period.year, period.month)
+    }
+  }
+
+  async function cancelDeclarationCheck(declaration: Declaration) {
+    const ok = await confirm(
+      "Annulation déclaration",
+      "Voulez-vous annuler la validation de cette déclaration ?"
+    )
+
+    if (ok) {
+      await uncheckDeclaration(declaration.id)
+      await getDeclarations(period.year, period.month)
+    }
+  }
+
   async function askDeclarationCheck(
     declaration: Declaration,
     toggle: boolean
   ) {
-    const ok = await confirm(
-      toggle ? "Validation déclaration" : "Annulation déclaration",
-      toggle
-        ? "Voulez-vous valider cette déclaration ?"
-        : "Voulez-vous annuler la validation de cette déclaration ?"
-    )
-
-    if (ok) {
-      if (toggle) {
-        await checkDeclaration(declaration.id)
-      } else {
-        await uncheckDeclaration(declaration.id)
-      }
-
-      await getDeclarations()
+    if (toggle) {
+      await confirmDeclarationCheck(declaration)
+    } else {
+      await cancelDeclarationCheck(declaration)
     }
   }
 
   async function askSendReminder(declaration: Declaration) {
-    const period = `${declaration.year}/${("0" + declaration.month).slice(-2)}`
-
     const ok = await confirm(
       "Relance déclaration",
-      `Voulez-vous relancer ${declaration.entity.name} pour la période du ${period} ?`
+      `Voulez-vous relancer ${declaration.entity.name} pour la période du ${prettyPeriod(period)} ?` // prettier-ignore
     )
 
     if (ok) {
@@ -232,16 +308,13 @@ const Declarations = () => {
         declaration.month
       )
 
-      await getDeclarations()
+      await getDeclarations(period.year, period.month)
     }
   }
 
   useEffect(() => {
-    getDeclarations()
-  }, [getDeclarations])
-
-  const [entities = [], months = [], byEntityType = {}] =
-    declarations.data ?? []
+    getDeclarations(period.year, period.month)
+  }, [getDeclarations, period.year, period.month])
 
   return (
     <Section>
@@ -308,10 +381,21 @@ const Declarations = () => {
         )}
       </Box>
 
+      {declarations.error && (
+        <Alert
+          level="error"
+          icon={AlertCircle}
+          className={styles.declarationEmpty}
+        >
+          {declarations.error}
+        </Alert>
+      )}
+
       {focus === EntityType.Producer && (
         <DeclarationTable
           entities={entities}
           months={months}
+          period={period}
           declarations={byEntityType[EntityType.Producer]}
           onCheck={askDeclarationCheck}
           onRemind={askSendReminder}
@@ -322,6 +406,7 @@ const Declarations = () => {
         <DeclarationTable
           entities={entities}
           months={months}
+          period={period}
           declarations={byEntityType[EntityType.Trader]}
           onCheck={askDeclarationCheck}
           onRemind={askSendReminder}
@@ -332,6 +417,7 @@ const Declarations = () => {
         <DeclarationTable
           entities={entities}
           months={months}
+          period={period}
           declarations={byEntityType[EntityType.Operator]}
           onCheck={askDeclarationCheck}
           onRemind={askSendReminder}
