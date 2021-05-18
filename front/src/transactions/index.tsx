@@ -128,7 +128,8 @@ export function useTransactions(entity: EntitySelection) {
   const rejector = useRejectLots(entity, selection, query, refresh)
   const declarator = useDeclareLots(entity)
   const forwarder = useForwardLots(entity, selection, refresh)
-  const summary = useSummary(query, selection.selected)
+
+  const summary = useSummary(query, selection.selected, false, entity)
 
   return {
     entity,
