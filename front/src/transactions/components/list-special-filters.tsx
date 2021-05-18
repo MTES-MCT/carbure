@@ -110,8 +110,8 @@ export const SummaryFilter = ({
     prompt((resolve) => (
       <SummaryPrompt
         readOnly
-        title="Récapitulatif de la recherche"
-        description="Voici un résumé des lots correspondant aux filtres sélectionnés"
+        title="Récapitulatif des lots"
+        description="Ce tableau résume les informations principales des lots correspondant à votre recherche ou sélection."
         query={query}
         selection={selection}
         onResolve={resolve}
