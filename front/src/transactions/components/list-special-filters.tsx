@@ -127,12 +127,11 @@ export const SummaryFilter = ({
     >
       {txCount === 1 ? (
         <span>
-          <b>Un seul lot</b> sélectionné, pour un total de{" "}
-          <b>{prettyVolume(totalVolume)} litres</b>
+          <b>Un lot</b> de <b>{prettyVolume(totalVolume)} litres</b>
         </span>
       ) : (
         <span>
-          <b>{txCount} lots</b> sélectionnés, pour un total de{" "}
+          <b>{txCount} lots</b> pour un total de{" "}
           <b>{prettyVolume(totalVolume)} litres</b>
         </span>
       )}
