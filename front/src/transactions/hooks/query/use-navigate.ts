@@ -10,8 +10,9 @@ export default function useNavigate(transactions: number[]) {
   const index = transactions.indexOf(current)
   const total = transactions.length
 
+  const isOut = index < 0
   const hasPrev = index > 0
-  const hasNext = 0 <= index && index < transactions.length - 1
+  const hasNext = index < transactions.length - 1
 
   const prev = useCallback(() => {
     if (hasPrev) {
@@ -20,10 +21,12 @@ export default function useNavigate(transactions: number[]) {
   }, [transactions, hasPrev, index, push])
 
   const next = useCallback(() => {
-    if (hasNext) {
+    if (isOut) {
+      push(`../${transactions[0]}`)
+    } else if (hasNext) {
       push(`../${transactions[index + 1]}`)
     }
-  }, [transactions, hasNext, index, push])
+  }, [transactions, hasNext, isOut, index, push])
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -41,6 +44,7 @@ export default function useNavigate(transactions: number[]) {
   return {
     index,
     total,
+    isOut,
     hasPrev,
     hasNext,
     prev,
