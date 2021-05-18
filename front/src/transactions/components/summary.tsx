@@ -1,6 +1,6 @@
 import { Fragment, useEffect } from "react"
 import Table, { Column, Line } from "common/components/table"
-import { SummaryItem, TransactionQuery } from "common/types"
+import { EntityType, SummaryItem, TransactionQuery } from "common/types"
 import { padding } from "./list-columns"
 import { AlertCircle, Check, Return } from "common/components/icons"
 
@@ -20,6 +20,7 @@ import { prettyVolume } from "transactions/helpers"
 import { getStocksSummary } from "stocks/api"
 import { getLotsSummary } from "transactions/api"
 import { Alert } from "common/components/alert"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
 const COLUMNS: Column<SummaryItem>[] = [
   {
@@ -125,15 +126,17 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
 export function useSummary(
   query: TransactionQuery,
   selection: number[] | undefined,
-  stock?: boolean
+  stock?: boolean,
+  entity?: EntitySelection
 ) {
   const [summary, getSummary] = useAPI(
     stock ? getStocksSummary : getLotsSummary
   )
 
   useEffect(() => {
+    if (entity && entity.entity_type === EntityType.Administration) return
     getSummary(query, selection ?? [])
-  }, [getSummary, query, selection])
+  }, [getSummary, query, selection, entity])
 
   return summary
 }

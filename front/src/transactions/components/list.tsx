@@ -135,9 +135,7 @@ export const TransactionList = ({
           {status.is(LotStatus.Draft) && (
             <React.Fragment>
               {isProducer && <ProducerImportActions uploader={uploader} />}
-
               {isTrader && <TraderImportActions uploader={uploader} />}
-
               {isOperator && <OperatorImportActions uploader={uploader} />}
             </React.Fragment>
           )}
@@ -187,7 +185,7 @@ export const TransactionList = ({
         </ActionBar>
       )}
 
-      {!isEmpty && (
+      {!isEmpty && !isAdmin && (
         <SummaryFilter
           loading={summary.loading}
           txCount={summary.data?.tx_ids.length ?? 0}
