@@ -5,7 +5,15 @@ import styles from "./alert.module.css"
 import { Box, SystemProps, Title } from "./index"
 import { ChevronDown, Loader } from "./icons"
 
-// ALERT COMPONENT
+export const AlertLink = ({
+  children,
+  className,
+  ...props
+}: React.HTMLProps<HTMLSpanElement>) => (
+  <span {...props} className={cl(styles.alertLink, className)}>
+    {children}
+  </span>
+)
 
 export type AlertProps = SystemProps &
   React.HTMLProps<HTMLDivElement> & {
@@ -68,13 +76,9 @@ export const AlertFilter = ({
       {onActivate &&
         onDispose &&
         (active ? (
-          <span className={styles.alertLink} onClick={onDispose}>
-            Revenir à la liste complète
-          </span>
+          <AlertLink onClick={onDispose}>Revenir à la liste complète</AlertLink>
         ) : (
-          <span className={styles.alertLink} onClick={onActivate}>
-            Voir la liste
-          </span>
+          <AlertLink onClick={onActivate}>Voir la liste</AlertLink>
         ))}
 
       <span
