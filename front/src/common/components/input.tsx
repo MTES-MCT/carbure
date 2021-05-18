@@ -147,6 +147,7 @@ export const Checkbox = ({
       {...props}
       className={cl(
         styles.checkbox,
+        checked && styles.checkboxChecked,
         disabled && styles.checkboxDisabled,
         readOnly && styles.checkboxReadOnly,
         className
@@ -155,7 +156,7 @@ export const Checkbox = ({
       aria-disabled={disabled}
       onClick={handleChange}
     >
-      {checked ? <Check /> : null}
+      {checked ? <Check stroke={3} /> : null}
     </Box>
   )
 }

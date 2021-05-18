@@ -129,11 +129,17 @@
   flex-shrink: 0;
   justify-content: center;
   align-items: center;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border: 1px solid var(--gray-medium);
   background-color: var(--white);
   border-radius: 3px;
+}
+
+.checkboxChecked {
+  border-color: var(--blue-dark);
+  background-color: var(--blue-medium);
+  color: var(--white);
 }
 
 .checkbox:hover {
