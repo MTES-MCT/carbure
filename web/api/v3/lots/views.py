@@ -20,7 +20,7 @@ from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, g
 from api.v3.sanity_checks import bulk_sanity_checks
 from django_otp.decorators import otp_required
 from core.decorators import check_rights
-from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, filter_entity_transactions
+from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, filter_entity_transactions, sort_lots
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +54,7 @@ def get_lots_summary(request, *args, **kwargs):
             txs = LotTransaction.objects.filter(pk__in=selection)
         else:
             txs, _, _, _ = filter_entity_transactions(entity, request.GET)
+        txs = sort_lots(txs, request.GET)
         data = get_summary(txs, entity)
         return JsonResponse({'status': 'success', 'data': data})
     except Exception as e:

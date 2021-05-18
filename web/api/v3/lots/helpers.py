@@ -204,15 +204,13 @@ def filter_lots(txs, querySet):
     elif deadline == 'true':
         txs = tx_with_deadline
 
-    sort_by = querySet.get('sort_by', False)
-    order = querySet.get('order', False)
-
-    txs = sort_lots(txs, sort_by, order)
-
     return txs, total_errors, total_deadline, deadline_str
 
 
-def sort_lots(txs, sort_by, order):
+def sort_lots(txs, querySet):
+    sort_by = querySet.get('sort_by', False)
+    order = querySet.get('order', False)
+
     if not sort_by:
         txs = txs.order_by('-id')
     elif sort_by in sort_key_to_django_field:
@@ -242,6 +240,7 @@ def get_lots_with_metadata(txs, entity, querySet):
     from_idx = querySet.get('from_idx', "0")
 
     txs, total_errors, total_deadline, deadline_str = filter_lots(txs, querySet)
+    txs = sort_lots(txs, querySet)
 
     from_idx = int(from_idx)
     returned = txs[from_idx:]
