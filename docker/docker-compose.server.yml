@@ -12,6 +12,8 @@ services:
       MYSQL_PASSWORD: ${DJANGO_DB_PASSWORD}
     volumes:
       - carburedb:/var/lib/mysql
+    ports:
+      - 3306:3306
     networks:
       - carbure
 
