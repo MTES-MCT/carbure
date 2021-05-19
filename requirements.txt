@@ -1,7 +1,8 @@
 aiohttp==3.7.4.post0
 aiohttp-cors==0.7.0
 aioredis==1.3.1
-ansible==2.9.3
+ansible==4.0.0
+ansible-core==2.11.0
 appdirs==1.4.3
 asgiref==3.3.4
 astroid==2.4.2
@@ -35,6 +36,7 @@ entrypoints==0.3
 et-xmlfile==1.0.1
 filelock==3.0.12
 flake8==3.7.9
+fsspec==2021.4.0
 google-api-core==1.24.1
 google-auth==1.24.0
 googleapis-common-protos==1.52.0
@@ -87,6 +89,7 @@ pytz==2019.3
 PyYAML==5.4.1
 redis==3.5.3
 requests==2.23.0
+resolvelib==0.5.4
 retrying==1.3.3
 rsa==4.7.2
 s3transfer==0.3.3
