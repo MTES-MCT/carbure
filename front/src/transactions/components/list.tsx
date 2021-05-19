@@ -2,7 +2,12 @@ import React from "react"
 import format from "date-fns/format"
 import fr from "date-fns/locale/fr"
 
-import { Entity, LotStatus, TransactionQuery } from "common/types"
+import {
+  Entity,
+  LotStatus,
+  TransactionQuery,
+  TransactionSummary,
+} from "common/types"
 import { SortingSelection } from "transactions/hooks/query/use-sort-by" // prettier-ignore
 import { PageSelection } from "common/components/pagination"
 
@@ -46,6 +51,7 @@ import { OperatorOutsourcedBlendingActions } from "./list-actions"
 import { LotForwarder } from "transactions/hooks/actions/use-forward-lots"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 import { SearchSelection } from "transactions/hooks/query/use-search"
+import { ApiState } from "common/hooks/use-api"
 
 type TransactionListProps = {
   entity: Entity
@@ -66,6 +72,7 @@ type TransactionListProps = {
   rejector: LotRejector
   outsourceddepots: EntityDeliverySite[] | undefined
   forwarder: LotForwarder
+  summary: ApiState<TransactionSummary>
 }
 
 export const TransactionList = ({
@@ -87,9 +94,9 @@ export const TransactionList = ({
   rejector,
   outsourceddepots,
   forwarder,
+  summary,
 }: TransactionListProps) => {
   const txs = transactions.data
-  const txCount = txs?.total ?? 0
   const errorCount = txs?.total_errors ?? 0
   const deadlineCount = txs?.deadlines.total ?? 0
 
@@ -128,9 +135,7 @@ export const TransactionList = ({
           {status.is(LotStatus.Draft) && (
             <React.Fragment>
               {isProducer && <ProducerImportActions uploader={uploader} />}
-
               {isTrader && <TraderImportActions uploader={uploader} />}
-
               {isOperator && <OperatorImportActions uploader={uploader} />}
             </React.Fragment>
           )}
@@ -180,22 +185,21 @@ export const TransactionList = ({
         </ActionBar>
       )}
 
-      {!isEmpty &&
-        !special.deadline &&
-        !special.invalid &&
-        (filters.isFiltered() || search.query) && (
-          <SummaryFilter
-            loading={isLoading}
-            txCount={txCount}
-            totalVolume={transactions.data?.total_volume ?? 0}
-            query={query}
-            hideRecap={isAdmin}
-            onReset={() => {
-              filters.reset()
-              search.setQuery("")
-            }}
-          />
-        )}
+      {!isEmpty && !isAdmin && (
+        <SummaryFilter
+          loading={summary.loading}
+          txCount={summary.data?.tx_ids.length ?? 0}
+          totalVolume={summary.data?.total_volume ?? 0}
+          query={query}
+          selection={selection.selected}
+          hideRecap={isAdmin}
+          onReset={() => {
+            filters.reset()
+            selection.reset()
+            search.setQuery("")
+          }}
+        />
+      )}
 
       {!special.deadline &&
         errorCount > 0 &&

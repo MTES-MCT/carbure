@@ -95,9 +95,9 @@ def get_lots_with_deadline(txs):
 
 def filter_by_entities(txs, entities):
     return txs.filter(
-        Q(carbure_client__name__in=entities) | 
+        Q(carbure_client__name__in=entities) |
         Q(unknown_client__in=entities) |
-        Q(carbure_vendor__name__in=entities) | 
+        Q(carbure_vendor__name__in=entities) |
         Q(lot__unknown_supplier__in=entities) |
         Q(lot__added_by__name__in=entities)
     )
@@ -207,7 +207,10 @@ def filter_lots(txs, querySet):
     return txs, total_errors, total_deadline, deadline_str
 
 
-def sort_lots(txs, sort_by, order):
+def sort_lots(txs, querySet):
+    sort_by = querySet.get('sort_by', False)
+    order = querySet.get('order', False)
+
     if not sort_by:
         txs = txs.order_by('-id')
     elif sort_by in sort_key_to_django_field:
@@ -218,7 +221,7 @@ def sort_lots(txs, sort_by, order):
             txs = txs.order_by(key)
     elif sort_by == 'client':
         txs = txs.annotate(client=Case(
-            When(client_is_in_carbure=True, then=F('carbure_client__name')), 
+            When(client_is_in_carbure=True, then=F('carbure_client__name')),
             default=F('unknown_client')
         ))
 
@@ -233,14 +236,11 @@ def sort_lots(txs, sort_by, order):
 def get_lots_with_metadata(txs, entity, querySet):
     export = querySet.get('export', False)
 
-    sort_by = querySet.get('sort_by', False)
-    order = querySet.get('order', False)
-
     limit = querySet.get('limit', None)
     from_idx = querySet.get('from_idx', "0")
 
     txs, total_errors, total_deadline, deadline_str = filter_lots(txs, querySet)
-    txs = sort_lots(txs, sort_by, order)
+    txs = sort_lots(txs, querySet)
 
     from_idx = int(from_idx)
     returned = txs[from_idx:]
@@ -256,12 +256,9 @@ def get_lots_with_metadata(txs, entity, querySet):
         if len(grouped_errors) > 0:
             errors[tx.id] = grouped_errors
 
-    total_volume = txs.aggregate(Sum('lot__volume'))
-
     data = {}
     data['lots'] = [t.natural_key() for t in returned]
     data['total'] = txs.count()
-    data['total_volume'] = total_volume['lot__volume__sum']
     data['total_errors'] = total_errors
     data['returned'] = returned.count()
     data['from'] = from_idx
@@ -306,7 +303,7 @@ def get_snapshot_filters(txs):
 
     return filters
 
-def filter_entity_transactions(entity, querySet): 
+def filter_entity_transactions(entity, querySet):
     status = querySet.get('status', False)
 
     if not status:
@@ -316,12 +313,13 @@ def filter_entity_transactions(entity, querySet):
     return filter_lots(txs, querySet)
 
 def get_summary(txs, entity):
-    tx_ids = []
+    tx_ids = [t['id'] for t in txs.values('id')]
+    total_volume = 0
     txs_in = txs.filter(carbure_client=entity)
+    total_volume_in = 0
     data_in = {}
     for t in txs_in:
         vendor = ''
-        tx_ids.append(t.id)
         if t.lot.added_by == entity:
             vendor = t.lot.unknown_supplier if t.lot.unknown_supplier else t.lot.unknown_supplier_certificate
         else:
@@ -334,13 +332,15 @@ def get_summary(txs, entity):
         total = (line['volume'] + t.lot.volume)
         line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
                                      t.lot.volume * t.lot.ghg_reduction) / total if total != 0 else 0
-        line['volume'] += t.lot.volume    
+        line['volume'] += t.lot.volume
+        total_volume_in += t.lot.volume
+        total_volume += t.lot.volume
         line['lots'] += 1
 
     txs_out = txs.filter(carbure_vendor=entity).exclude(carbure_client=entity)
+    total_volume_out = 0
     data_out = {}
     for t in txs_out:
-        tx_ids.append(t.id)
         client_name = t.carbure_client.name if t.client_is_in_carbure and t.carbure_client else t.unknown_client
         if client_name not in data_out:
             data_out[client_name] = {}
@@ -351,6 +351,9 @@ def get_summary(txs, entity):
         line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
                                      t.lot.volume * t.lot.ghg_reduction) / total if total != 0 else 0
         line['volume'] += t.lot.volume
+        total_volume_out += t.lot.volume
+        total_volume += t.lot.volume
         line['lots'] += 1
 
-    return {'in': data_in, 'out': data_out, 'tx_ids': tx_ids}
+    return {'in': data_in, 'out': data_out, 'tx_ids': tx_ids,
+            'total_volume': total_volume, 'total_volume_in': total_volume_in, 'total_volume_out': total_volume_out}

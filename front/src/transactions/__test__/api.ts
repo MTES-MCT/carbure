@@ -7,8 +7,10 @@ import {
   okCountrySearch,
   okDeliverySitesSearch,
   okEntitySearch,
+  okErrors,
   okMatierePremiereSearch,
   okProductionSitesSearch,
+  okTranslations,
 } from "common/__test__/api"
 
 import { clone } from "common/__test__/helpers"
@@ -209,5 +211,7 @@ export default setupServer(
   okLotUpdate,
   okAdminLots,
   okAdminSnapshot,
-  okLotsSummary
+  okLotsSummary,
+  okTranslations,
+  okErrors
 )

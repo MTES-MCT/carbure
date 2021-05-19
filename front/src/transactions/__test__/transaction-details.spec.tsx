@@ -29,6 +29,7 @@ import {
 } from "./data"
 import { waitWhileLoading } from "common/__test__/helpers"
 import { clickOnCheckboxesAndConfirm } from "./helpers"
+import { Suspense } from "react"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
@@ -39,26 +40,22 @@ afterEach(() => {
 afterAll(() => server.close())
 
 const TransactionWithHook = ({ entity }: { entity: Entity }) => {
-  const {
-    transactions,
-    deleter,
-    validator,
-    acceptor,
-    rejector,
-    refresh,
-  } = useTransactions(entity)
+  const { transactions, deleter, validator, acceptor, rejector, refresh } =
+    useTransactions(entity)
 
   return (
     <Route relative path=":id">
-      <TransactionDetails
-        entity={entity}
-        refresh={refresh}
-        deleter={deleter}
-        validator={validator}
-        acceptor={acceptor}
-        rejector={rejector}
-        transactions={transactions}
-      />
+      <Suspense fallback="...">
+        <TransactionDetails
+          entity={entity}
+          refresh={refresh}
+          deleter={deleter}
+          validator={validator}
+          acceptor={acceptor}
+          rejector={rejector}
+          transactions={transactions?.data?.lots.map((l) => l.id) ?? []}
+        />
+      </Suspense>
     </Route>
   )
 }
@@ -194,7 +191,7 @@ test("edit transaction details", async () => {
   userEvent.clear(dd)
   userEvent.type(dd, "2021-31-01")
 
-  const prod = screen.getByDisplayValue("Producteur Test")
+  screen.getByDisplayValue("Producteur Test")
 
   const ps = screen.getByLabelText(/^Site de production/)
   userEvent.clear(ps)
@@ -276,21 +273,21 @@ test("check transaction errors", async () => {
       node?.textContent === "Ce lot doit être validé avant le 29 février 2020"
   )
 
-  const dae = screen.getByTitle("DAE manquant")
+  const dae = screen.getByTitle("MISSING_DAE")
   expect(dae).toHaveClass("errorLabel")
 
-  const mp = screen.getByTitle("Merci de préciser la matière première")
+  const mp = screen.getByTitle("MISSING_FEEDSTOCK")
   expect(mp).toHaveClass("errorLabel")
 
-  screen.getByText("Erreurs (3)")
-  screen.getByText(
-    "Matière Première incohérente avec le Biocarburant - Biogaz de Blé"
-  )
-  screen.getByText("DAE manquant")
-  screen.getByText("Merci de préciser la matière première")
+  const bc = screen.getByTitle("MP_BC_INCOHERENT")
+  expect(bc).toHaveClass("errorLabel")
+
+  screen.getByText("Erreurs (2)")
+  screen.getByText("MISSING_DAE")
+  screen.getByText("MISSING_FEEDSTOCK")
 
   screen.getByText("Remarques (1)")
-  screen.getByText("Volume inhabituellement faible.")
+  screen.getByText("MP_BC_INCOHERENT - Biogaz de blé")
 
   userEvent.click(screen.getByText("Retour"))
 })
@@ -502,6 +499,7 @@ test("transaction details form as producer - producer trades unknown producer lo
   checkOriginFields()
   checkProductionFields()
   checkDeliveryFields()
+  checkGESFields()
 
   expect(screen.getByLabelText(/^Producteur/)).toHaveValue("Unknown Producer")
 
@@ -545,6 +543,7 @@ test("transaction details form as operator - producer trades unknown producer lo
   checkOriginFields()
   checkProductionFields()
   checkDeliveryFields()
+  checkGESFields()
 
   expect(screen.getByLabelText(/^Producteur/)).toHaveValue("Unknown Producer")
   expect(screen.getByLabelText(/^Fournisseur/)).toHaveValue("Producteur Test")
@@ -581,6 +580,7 @@ test("transaction details form as operator - operator self accepts lot", async (
   checkOriginFields()
   checkProductionFields()
   checkDeliveryFields()
+  checkGESFields()
 
   expect(screen.getByLabelText(/^Producteur/)).toHaveValue("Unknown Producer")
   expect(screen.getByLabelText(/^Fournisseur/)).toHaveValue("Unknown Supplier")
@@ -610,6 +610,7 @@ test("transaction details form as producer - lot sold by trader after buying fro
   checkOriginFields()
   checkProductionFields()
   checkDeliveryFields()
+  checkGESFields()
 
   expect(screen.getByLabelText(/^Producteur/)).toHaveValue("Producteur Test")
 

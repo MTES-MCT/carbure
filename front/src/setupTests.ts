@@ -26,6 +26,19 @@ window.open = jest.fn()
 
 jest.setTimeout(10000)
 
+jest.mock("react-i18next", () => ({
+  // this mock makes sure any components using the translate hook can use it without a warning being shown
+  useTranslation: () => {
+    return {
+      t: (str: string) => str,
+      i18n: {
+        changeLanguage: () => new Promise(() => {}),
+      },
+    }
+  },
+  Trans: ({ children }: any) => children,
+}))
+
 export function render(element: any) {
   const root = document.createElement("div")
   root.setAttribute("id", "root")

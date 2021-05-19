@@ -9,7 +9,7 @@ import {
 
 import api from "common/services/api"
 import {
-  flattenSummary,
+  normalizeSummary,
   normalizeFilters,
   filterOutsourcedDepots,
 } from "./helpers"
@@ -31,11 +31,7 @@ export function getLotsSummary(
 ): Promise<TransactionSummary> {
   return api
     .get("/lots/summary", { ...query, limit: null, page: 0, selection })
-    .then((res) => ({
-      in: flattenSummary(res.in),
-      out: flattenSummary(res.out),
-      tx_ids: res.tx_ids,
-    }))
+    .then(normalizeSummary)
 }
 
 export function getDetails(
@@ -249,9 +245,8 @@ export function getDeclarationSummary(
       period_month,
     })
     .then((res) => ({
+      ...normalizeSummary(res),
       declaration: res.declaration,
-      in: res.in ? flattenSummary(res.in) : null,
-      out: res.out ? flattenSummary(res.out) : null,
     }))
 }
 

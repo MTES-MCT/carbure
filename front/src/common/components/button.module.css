@@ -16,7 +16,16 @@
 
 .button :global(.icon) {
   width: 20px;
+  height: 20px;
   margin-right: 8px;
+}
+
+.buttonIcon {
+  padding: 4px;
+}
+
+.buttonIcon :global(.icon) {
+  margin-right: 0;
 }
 
 .button:hover {

@@ -22,7 +22,7 @@
 }
 
 .alertInfo {
-  border-color: var(--blue-medium);
+  border-color: var(--blue-highlight);
   background-color: var(--blue-light);
 }
 
