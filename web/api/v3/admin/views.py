@@ -45,8 +45,8 @@ def get_entity_details(request):
     try:
         e = Entity.objects.get(pk=entity_id)
         return JsonResponse({"status": "success", "data": e.natural_key()})
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e) }, status=400)
+    except Exception:
+        return JsonResponse({"status": "error", "message": "Could not find entity" }, status=400)
 
 @is_admin
 def get_entity_production_sites(request):
@@ -73,8 +73,8 @@ def get_entity_production_sites(request):
             data.append(psite_data)
 
         return JsonResponse({'status': 'success', 'data': data})
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e) }, status=400)
+    except Exception:
+        return JsonResponse({"status": "error", "message": "Could not find production sites" }, status=400)
 
 @is_admin
 def get_entity_depots(request):
@@ -84,8 +84,8 @@ def get_entity_depots(request):
         e = Entity.objects.get(pk=entity_id)
         data = [ps.natural_key() for ps in e.entitydepot_set.all()]
         return JsonResponse({"status": "success", "data": data})
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e) }, status=400)
+    except Exception:
+        return JsonResponse({"status": "error", "message": "Could not find Entity Depots" }, status=400)
 
 @is_admin
 def get_entity_certificates(request):
@@ -96,8 +96,8 @@ def get_entity_certificates(request):
         iscc = [ps.natural_key() for ps in e.entityiscctradingcertificate_set.all()]
         dbs = [ps.natural_key() for ps in e.entitydbstradingcertificate_set.all()]
         return JsonResponse({"status": "success", "data": iscc + dbs})
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e) }, status=400)
+    except Exception:
+        return JsonResponse({"status": "error", "message": "Could not find entity certificates" }, status=400)
 
 @is_admin
 def get_entities(request):
@@ -143,8 +143,8 @@ def add_entity(request):
 
     try:
         obj, created = Entity.objects.update_or_create(name=name, entity_type=entity_type)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator", 'extra': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator"}, status=400)
     return JsonResponse({'status': 'success', 'data': 'Entity created'})
 
 
@@ -188,8 +188,8 @@ def get_lots(request):
 
         return get_lots_with_metadata(txs, None, request.GET)
 
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
 
 
 @is_admin
@@ -260,8 +260,8 @@ def get_snapshot(request):
         filters['is_mac'] = [{'value':True, 'label': 'Oui'}, {'value':False, 'label': 'Non'}]
         data['filters'] = filters
 
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Exception"}, status=400)
 
     return JsonResponse({"status": "success", "data": data})
 
@@ -529,8 +529,8 @@ def send_declaration_reminder(request):
     try:
         period = datetime.date(year=int(year), month=int(month), day=1)
         declaration = SustainabilityDeclaration.objects.get(entity__id=entity_id, period=period, declared=False)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Could not find declaration", 'details': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find declaration"}, status=400)
 
     declaration.reminder_count += 1
     declaration.save()

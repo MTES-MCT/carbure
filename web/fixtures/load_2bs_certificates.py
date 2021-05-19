@@ -36,9 +36,8 @@ def save_certificate(certificate_id, scopes, details):
                 print(v.scope.certification_type)
                 v.delete()
         return certificate
-    except Exception as e:
+    except Exception:
         print('')
-        print(e)
         print(certificate_id)
     return None
 

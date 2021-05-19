@@ -75,9 +75,8 @@ def load_certificates():
         }
         try:
             o, c = SNCertificate.objects.update_or_create(certificate_id=cert['Numéro SN'], defaults=d)
-        except Exception as e:
+        except Exception:
             print('failed')
-            print(e)
 
         # scopes
         scopes = str(cert['Catégorie opérateur']).split('&')

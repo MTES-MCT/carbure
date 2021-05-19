@@ -206,8 +206,7 @@ def create_drafts(request, *args, **kwargs):
     all_errors = []
     try:
         drafts = json.loads(drafts)
-    except Exception as e:
-        print(e)
+    except Exception:
         return JsonResponse({'status': 'error', 'message': "Drafts is invalid json"}, status=400)
 
     for i, draft in enumerate(drafts):
@@ -261,8 +260,8 @@ def get_template_mass_balance(request, *args, **kwargs):
             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename="carbure_template_mass_balance.xlsx"'
             return response
-    except Exception as e:
-        return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
+    except Exception:
+        return JsonResponse({'status': "error", 'message': "Error creating template file"}, status=500)
 
 @check_rights('entity_id')
 def get_template_mass_balance_bcghg(request, *args, **kwargs):
@@ -277,8 +276,8 @@ def get_template_mass_balance_bcghg(request, *args, **kwargs):
             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename="carbure_template_mass_balance.xlsx"'
             return response
-    except Exception as e:
-        return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
+    except Exception:
+        return JsonResponse({'status': "error", 'message': "Error creating template file"}, status=500)
 
 @check_rights('entity_id')
 def upload_mass_balance(request, *args, **kwargs):
@@ -366,8 +365,8 @@ def send_drafts(request, *args, **kwargs):
     for tx_id in tx_ids:
         try:
             tx = LotTransaction.objects.get(id=tx_id)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id), 'extra': str(e)},
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id)},
                                 status=400)
         sent, errors = send_lot_from_stock(rights, tx, prefetched_data)
         if sent:
@@ -462,14 +461,14 @@ def convert_to_etbe(request, *args, **kwargs):
 
     try:
         cs = json.loads(conversions)
-    except Exception as e:
+    except Exception:
         return JsonResponse({'status': 'error', 'message': 'Could not deserialize POST data'}, status=400)
 
     for c in cs:
         try:
             convert_eth_stock_to_etbe(request, entity, c)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+        except Exception:
+            return JsonResponse({'status': 'error'}, status=400)
 
     return JsonResponse({'status': 'success'})
 
@@ -503,8 +502,8 @@ def forward(request, *args, **kwargs):
         try:
             tx = LotTransaction.objects.get(delivery_status__in=['A', 'N'], id=tx_id, carbure_client=entity, is_forwarded=False)
             parent_tx_id = tx.id
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': "Transaction already forwarded", 'extra': str(e)}, status=400)
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': "Transaction already forwarded"}, status=400)
 
         # all good
         # make current tx as "is_forwarded" and create the next tx

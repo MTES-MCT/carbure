@@ -133,13 +133,13 @@ def add_production_site(request, *args, **kwargs):
 
     try:
         country = Pays.objects.get(code_pays=country)
-    except Exception as e:
+    except Exception:
         return JsonResponse({'status': 'error', 'message': "SETTINGS_ADD_PRODUCTION_SITE_UNKNOWN_COUNTRY_CODE", 'extra': country},
                             status=400)
 
     try:
         producer = Entity.objects.get(id=producer, entity_type='Producteur')
-    except Exception as e:
+    except Exception:
         return JsonResponse({'status': 'error', 'message': "SETTINGS_ADD_PRODUCTION_SITE_UNKNOWN_PRODUCER", 'extra': producer},
                             status=400)
 
@@ -149,9 +149,9 @@ def add_production_site(request, *args, **kwargs):
             manager_name=manager_name, manager_phone=manager_phone, manager_email=manager_email,
             date_mise_en_service=date_mise_en_service, ges_option=ges_option)
 
-    except Exception as e:
+    except Exception:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
-                             'extra': str(e)}, status=400)
+                             }, status=400)
     return JsonResponse({'status': 'success', 'data': obj.natural_key() })
 
 
@@ -218,8 +218,8 @@ def delete_production_site(request, *args, **kwargs):
     site = request.POST.get('production_site_id')
     try:
         ps = ProductionSite.objects.get(id=site)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown Production Site", 'extra': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Unknown Production Site"}, status=400)
 
     # make sure there is no impact by deleting this
     lots = LotV2.objects.filter(carbure_production_site=ps, status='Validated')
@@ -242,13 +242,13 @@ def set_production_site_mp(request, *args, **kwargs):
 
     try:
         mp_list = MatierePremiere.objects.filter(code__in=mp_list)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown MP_list %s" % (mp_list), 'extra': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Unknown MP in list %s" % (mp_list)}, status=400)
 
     try:
         ps = ProductionSite.objects.get(id=site)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown Production Site", 'extra': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Unknown Production Site"}, status=400)
 
     # we have all the data, make sure we are allowed to delete it
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
@@ -260,9 +260,9 @@ def set_production_site_mp(request, *args, **kwargs):
         ProductionSiteInput.objects.filter(production_site=ps).delete()
         for mp in mp_list:
             obj, created = ProductionSiteInput.objects.update_or_create(production_site=ps, matiere_premiere=mp)
-    except Exception as e:
+    except Exception:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
-                             'extra': str(e)}, status=400)
+                            }, status=400)
 
     # re-run sanity_checks on drafts
     entity = ps.producer
@@ -284,13 +284,13 @@ def set_production_site_bc(request, *args, **kwargs):
 
     try:
         bc_list = Biocarburant.objects.filter(code__in=bc_list)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown BC_list %s" % (bc_list), 'extra': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Unknown BC in list %s" % (bc_list)}, status=400)
 
     try:
         ps = ProductionSite.objects.get(id=site)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown Production Site", 'extra': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Unknown Production Site"}, status=400)
 
     # we have all the data, make sure we are allowed to delete it
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
@@ -302,9 +302,9 @@ def set_production_site_bc(request, *args, **kwargs):
         ProductionSiteOutput.objects.filter(production_site=ps).delete()
         for bc in bc_list:
             obj, created = ProductionSiteOutput.objects.update_or_create(production_site=ps, biocarburant=bc)
-    except Exception as e:
+    except Exception:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
-                             'extra': str(e)}, status=400)
+                            }, status=400)
     # re-run sanity_checks on drafts
     entity = ps.producer
     drafts = get_entity_lots_by_status(entity, 'draft')
@@ -320,9 +320,9 @@ def get_delivery_sites(request, *args, **kwargs):
     try:
         ds = EntityDepot.objects.filter(entity=entity)
         ds = [d.natural_key() for d in ds]
-    except Exception as e:
+    except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find entity's delivery sites",
-                             'extra': str(e)}, status=400)
+                            }, status=400)
 
     return JsonResponse({'status': 'success', 'data': ds})
 
@@ -347,9 +347,9 @@ def add_delivery_site(request, *args, **kwargs):
 
     try:
         ds = Depot.objects.get(depot_id=delivery_site_id)
-    except Exception as e:
+    except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find delivery site",
-                             'extra': str(e)}, status=400)
+                            }, status=400)
 
     if entity.entity_type != 'Opérateur' and ds.depot_type == 'EFS':
         return JsonResponse({'status': 'error', 'message': "Only operators can register an EFS site"}, status=400)
@@ -363,9 +363,9 @@ def add_delivery_site(request, *args, **kwargs):
 
     try:
         EntityDepot.objects.update_or_create(entity=entity, depot=ds, defaults={'ownership_type': ownership_type, 'blending_is_outsourced': blending_is_outsourced, 'blender': blender})
-    except Exception as e:
+    except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not link entity to delivery site",
-                             'extra': str(e)}, status=400)
+                            }, status=400)
 
     return JsonResponse({'status': 'success'})
 
@@ -377,9 +377,9 @@ def delete_delivery_site(request, *args, **kwargs):
 
     try:
         EntityDepot.objects.filter(entity=entity, depot__depot_id=delivery_site_id).delete()
-    except Exception as e:
+    except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not delete entity's delivery site",
-                             'extra': str(e)}, status=400)
+                            }, status=400)
 
     return JsonResponse({'status': 'success'})
 
@@ -492,8 +492,7 @@ def add_redcert_certificate(request, *args, **kwargs):
     certificate_id = request.POST.get('certificate_id', False)
     try:
         certificate = REDCertCertificate.objects.get(certificate_id=certificate_id)
-    except Exception as e:
-        print(e)
+    except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
 
     EntityREDCertTradingCertificate.objects.update_or_create(entity=context['entity'], certificate=certificate)
@@ -506,8 +505,7 @@ def add_sn_certificate(request, *args, **kwargs):
     certificate_id = request.POST.get('certificate_id', False)
     try:
         certificate = SNCertificate.objects.get(certificate_id=certificate_id)
-    except Exception as e:
-        print(e)
+    except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find requested certificate"}, status=400)
 
     EntitySNTradingCertificate.objects.update_or_create(entity=context['entity'], certificate=certificate)
@@ -615,8 +613,8 @@ def set_production_site_certificates(request, *args, **kwargs):
         certificate_2bs = EntityDBSTradingCertificate.objects.filter(certificate__certificate_id__in=certificate_ids)
         certificate_red = EntityREDCertTradingCertificate.objects.filter(certificate__certificate_id__in=certificate_ids)
         certificate_sn = EntitySNTradingCertificate.objects.filter(certificate__certificate_id__in=certificate_ids)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Could not find requested certificates", 'error': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find requested certificates"}, status=400)
 
     try:
         ProductionSiteCertificate.objects.filter(entity=context['entity'], production_site=psite).delete()
@@ -841,8 +839,8 @@ def invite_user(request, *args, **kwargs):
     try:
         UserRightsRequests.objects.update_or_create(user=user, entity=entity, defaults={'role': role, 'expiration_date': expiration_date})
         UserRights.objects.update_or_create(user=user, entity=entity, defaults={'role': role, 'expiration_date': expiration_date})
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': 'Could not create rights', 'error': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': 'Could not create rights'}, status=400)
 
     return JsonResponse({'status': 'success'})
 
@@ -887,8 +885,8 @@ def accept_user(request, *args, **kwargs):
         right_request.status = 'ACCEPTED'
         UserRights.objects.update_or_create(user=right_request.user, entity=entity, defaults={'role': right_request.role, 'expiration_date': right_request.expiration_date})
         right_request.save()
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': 'Could not create rights', 'error': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': 'Could not create rights'}, status=400)
     return JsonResponse({'status': 'success'})
 
 
@@ -909,6 +907,6 @@ def revoke_myself(request, *args, **kwargs):
     try:
         rr = UserRightsRequests.objects.get(user=request.user, entity_id=entity_id)
         rr.delete()
-    except Exception as e:
+    except Exception:
         pass
     return JsonResponse({'status': 'success'})

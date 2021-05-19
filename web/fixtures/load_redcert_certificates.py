@@ -153,9 +153,8 @@ def load_certificates(existing_certificates, scopes, biomass):
         }
         try:
             o, c = REDCertCertificate.objects.update_or_create(certificate_id=cert['Identifier'], defaults=d)
-        except Exception as e:
+        except Exception:
             print('failed')
-            print(e)
             failed.append(cert)
             continue
         # scopes
