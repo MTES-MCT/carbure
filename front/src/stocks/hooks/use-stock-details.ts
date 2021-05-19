@@ -13,7 +13,7 @@ import useAPI from "common/hooks/use-api"
 import useClose from "common/hooks/use-close"
 import * as api from "transactions/api"
 import { useNotificationContext } from "common/components/notifications"
-import { getFieldErrors } from "transactions/hooks/use-transaction-details"
+import { useFieldErrors } from "transactions/hooks/use-transaction-details"
 import { getStockStatus } from "../api"
 
 export default function useStockDetails(
@@ -28,12 +28,13 @@ export default function useStockDetails(
   const [details, resolveDetails] = useAPI(api.getDetails)
   const [request, resolveUpdate] = useAPI(api.updateLot)
 
+  const fieldErrors = useFieldErrors(details.data?.errors ?? [])
+
   const entityID = entity?.id
   const txID = parseInt(params.id, 10)
   const tx = details.data?.transaction
 
-  const fieldErrors = details.data ? getFieldErrors(details.data.errors) : {}
-  const validationErrors = details.data?.errors.validation_errors ?? []
+  const validationErrors = details.data?.errors ?? []
   const status = tx && entity ? getStockStatus(tx, entity) : LotStatus.Weird
 
   function refreshDetails() {

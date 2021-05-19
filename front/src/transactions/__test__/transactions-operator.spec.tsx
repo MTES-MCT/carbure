@@ -12,6 +12,7 @@ import { clickOnCheckboxesAndConfirm } from "./helpers"
 
 import server, { setLots, setSnapshot } from "./api"
 import { emptyLots, lots, operatorSnapshot } from "./data"
+import { Suspense } from "react"
 
 const TransactionsWithRouter = ({
   entity,
@@ -21,9 +22,11 @@ const TransactionsWithRouter = ({
   status: LotStatus
 }) => (
   <MemoryRouter initialEntries={[`/org/0/transactions/${status}`]}>
-    <Route path="/org/0/transactions/:status">
-      <Transactions entity={entity} />
-    </Route>
+    <Suspense fallback="...">
+      <Route path="/org/0/transactions/:status">
+        <Transactions entity={entity} />
+      </Route>
+    </Suspense>
   </MemoryRouter>
 )
 

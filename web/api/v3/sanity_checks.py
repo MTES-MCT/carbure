@@ -280,11 +280,11 @@ def tx_is_valid(tx, prefetched_data):
 
     if tx.unknown_delivery_site_country and tx.unknown_delivery_site_country.is_in_europe and tx.lot.pays_origine is None:
         extra = "Veuillez renseigner le pays d'origine de la matière première - Marché européen"
-        errors.append(generic_error(error='MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN', tx=tx, field='pays_origine', extra=extra, is_blocking=True))
+        errors.append(generic_error(error='MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN', tx=tx, field='pays_origine_code', extra=extra, is_blocking=True))
         is_valid = False
     if tx.carbure_delivery_site and tx.carbure_delivery_site.country.is_in_europe and tx.lot.pays_origine is None:
         extra = "Veuillez renseigner le pays d'origine de la matière première - Marché européen"
-        errors.append(generic_error(error='MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN', tx=tx, field='pays_origine', extra=extra, is_blocking=True))
+        errors.append(generic_error(error='MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN', tx=tx, field='pays_origine_code', extra=extra, is_blocking=True))
         is_valid = False
 
     if tx.carbure_client and tx.carbure_client.entity_type == Entity.OPERATOR:
@@ -295,14 +295,14 @@ def tx_is_valid(tx, prefetched_data):
             if tx.lot.added_by.entity_type == Entity.OPERATOR:
                 extra = "Veuillez renseigner le certificat du fournisseur"
                 errors.append(generic_error(error='MISSING_SUPPLIER_CERTIFICATE', tx=tx, field='unknown_supplier_certificate', extra=extra, is_blocking=True))
-                is_valid = False                
-            else: 
+                is_valid = False
+            else:
                 # I am a producer or trader
                 # I need to either set the certificate in the file or add them in my account
                 extra = "Veuillez renseigner votre certificat de fournisseur ou ajouter un certificat sur votre compte"
                 errors.append(generic_error(error='MISSING_SUPPLIER_CERTIFICATE', tx=tx, field='carbure_vendor_certificate', extra=extra, is_blocking=True))
                 is_valid = False
     if len(errors):
-        GenericError.objects.bulk_create(errors)                
+        GenericError.objects.bulk_create(errors)
     return is_valid
 

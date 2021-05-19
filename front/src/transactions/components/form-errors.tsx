@@ -1,32 +1,30 @@
 import React from "react"
 
-import { ValidationError } from "common/types"
+import { GenericError } from "common/types"
 
 import { Collapsible } from "common/components/alert"
 import { AlertTriangle, AlertOctagon } from "common/components/icons"
 
 import styles from "./form-errors.module.css"
+import { useTranslation } from "react-i18next"
 
 type ValidationErrorsProps = {
-  validationErrors: ValidationError[]
-  fieldErrors: Record<string, string>
+  errors: GenericError[]
 }
 
-const ValidationErrors = ({
-  validationErrors,
-  fieldErrors,
-}: ValidationErrorsProps) => {
-  const errors = validationErrors.filter((e) => e.is_blocking)
-  const ferrors = Object.values(fieldErrors)
-  const warnings = validationErrors.filter((e) => e.is_warning && !e.is_blocking) // prettier-ignore
+const ValidationErrors = ({ errors }: ValidationErrorsProps) => {
+  const { t } = useTranslation("errors")
+
+  const blocking = errors.filter((e) => e.is_blocking)
+  const warnings = errors.filter((e) => !e.is_blocking)
 
   return (
     <React.Fragment>
-      {(errors.length > 0 || ferrors.length > 0) && (
+      {blocking.length > 0 && (
         <Collapsible
           icon={AlertOctagon}
           level="error"
-          title={`Erreurs (${errors.length + ferrors.length})`}
+          title={`Erreurs (${blocking.length})`}
           className={styles.transactionError}
         >
           <i className={styles.transactionErrorExplanation}>
@@ -34,15 +32,11 @@ const ValidationErrors = ({
             n'ont pas été adressés :
           </i>
           <ul className={styles.validationErrors}>
-            {errors.map((err, i) => (
+            {blocking.map((err, i) => (
               <li key={i}>
-                {err.error || "Erreur de validation"}{" "}
-                {err.details && ` - ${err.details}`}
+                {t(err.error) || "Erreur de validation"}{" "}
+                {err.extra && err.extra !== t(err.error) && ` - ${err.extra}`}
               </li>
-            ))}
-
-            {ferrors.map((message) => (
-              <li key={message}>{message}</li>
             ))}
           </ul>
         </Collapsible>
@@ -62,8 +56,8 @@ const ValidationErrors = ({
           <ul className={styles.validationErrors}>
             {warnings.map((err, i) => (
               <li key={i}>
-                {err.error || "Erreur de validation"}{" "}
-                {err.details && ` - ${err.details}`}
+                {t(err.error) || "Erreur de validation"}
+                {err.extra && err.extra !== t(err.error) && ` - ${err.extra}`}
               </li>
             ))}
           </ul>

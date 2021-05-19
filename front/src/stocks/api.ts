@@ -11,7 +11,7 @@ import {
 
 import api from "common/services/api"
 import {
-  flattenSummary,
+  normalizeSummary,
   normalizeFilters,
   toOption,
 } from "transactions/helpers"
@@ -55,11 +55,7 @@ export function getStocks(query: TransactionQuery): Promise<Lots> {
 export function getStocksSummary(
   query: TransactionQuery
 ): Promise<TransactionSummary> {
-  return api.get("/stocks/summary", query).then((res) => ({
-    in: flattenSummary(res.in),
-    out: flattenSummary(res.out),
-    tx_ids: res.tx_ids,
-  }))
+  return api.get("/stocks/summary", query).then(normalizeSummary)
 }
 
 export function downloadStocks(query: TransactionQuery) {

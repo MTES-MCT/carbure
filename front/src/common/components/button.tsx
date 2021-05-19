@@ -23,6 +23,7 @@ export const Button = ({
   ...props
 }: ButtonProps) => {
   const btnClassName = cl(styles.button, className, {
+    [styles.buttonIcon]: Boolean(Icon) && !children,
     [styles.buttonPrimary]: level === "primary",
     [styles.buttonWarning]: level === "warning",
     [styles.buttonDanger]: level === "danger",
@@ -38,7 +39,7 @@ export const Button = ({
       className={btnClassName}
     >
       {Icon && <Icon />}
-      <span>{children}</span>
+      {children && <span>{children}</span>}
     </Tag>
   )
 }

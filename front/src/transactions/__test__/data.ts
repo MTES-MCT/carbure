@@ -1,3 +1,4 @@
+import { GenericError, LotDetails, Lots } from "common/types"
 import { country, lot, producer, operator, trader } from "common/__test__/data"
 
 export const emptySnapshot = {
@@ -79,7 +80,7 @@ export const adminSnapshot = {
   depots: [],
 }
 
-export const emptyLots = {
+export const emptyLots: Lots = {
   lots: [],
   total: 0,
   total_errors: 0,
@@ -92,7 +93,7 @@ export const emptyLots = {
   },
 }
 
-export const lots = {
+export const lots: Lots = {
   lots: [lot],
   total: 1,
   total_errors: 0,
@@ -105,7 +106,7 @@ export const lots = {
   },
 }
 
-export const manyLots = {
+export const manyLots: Lots = {
   lots: [lot, lot, lot, lot, lot, lot, lot, lot, lot, lot],
   total: 200,
   total_errors: 0,
@@ -118,40 +119,59 @@ export const manyLots = {
   },
 }
 
-export const errorLots = {
+export const baseError = {
+  display_to_creator: false,
+  display_to_recipient: false,
+  display_to_admin: false,
+  display_to_auditor: false,
+
+  acked_by_creator: false,
+  acked_by_recipient: false,
+  acked_by_admin: false,
+  acked_by_auditor: false,
+
+  highlighted_by_admin: false,
+  highlighted_by_auditor: false,
+
+  is_blocking: false,
+
+  tx: 0,
+
+  field: null,
+  fields: null,
+  value: "",
+  extra: "",
+}
+
+const genericErrors: GenericError[] = [
+  {
+    ...baseError,
+    error: "MP_BC_INCOHERENT",
+    extra: "Biogaz de blé",
+    fields: ["matiere_premiere_code", "biocarburant_code"],
+  },
+  {
+    ...baseError,
+    field: "dae",
+    error: "MISSING_DAE",
+    is_blocking: true,
+  },
+  {
+    ...baseError,
+    field: "matiere_premiere_code",
+    error: "MISSING_FEEDSTOCK",
+    is_blocking: true,
+  },
+]
+
+export const errorLots: Lots = {
   lots: [lot],
   total: 1,
   total_errors: 1,
   returned: 1,
   from: 0,
   errors: {
-    0: {
-      validation_errors: [
-        {
-          lot_id: 0,
-          error: "Matière Première incohérente avec le Biocarburant",
-          details: "Biogaz de Blé",
-          is_blocking: true,
-          is_warning: true,
-        },
-      ],
-      tx_errors: [
-        {
-          tx_id: 0,
-          field: "dae",
-          value: "",
-          error: "DAE manquant",
-        },
-      ],
-      lots_errors: [
-        {
-          lot_id: 0,
-          field: "matiere_premiere_code",
-          value: null,
-          error: "Merci de préciser la matière première",
-        },
-      ],
-    },
+    0: genericErrors,
   },
   deadlines: {
     date: "2020-12-31",
@@ -159,7 +179,7 @@ export const errorLots = {
   },
 }
 
-export const deadlineLots = {
+export const deadlineLots: Lots = {
   lots: [lot],
   total: 1,
   total_errors: 0,
@@ -172,48 +192,16 @@ export const deadlineLots = {
   },
 }
 
-export const lotDetails = {
+export const lotDetails: LotDetails = {
   transaction: lot,
-  errors: {},
+  errors: [],
   deadline: "2021-01-31",
   comments: [],
 }
 
-export const errorDetails = {
+export const errorDetails: LotDetails = {
   transaction: lot,
-  errors: {
-    validation_errors: [
-      {
-        lot_id: 0,
-        error: "Matière Première incohérente avec le Biocarburant",
-        details: "Biogaz de Blé",
-        is_blocking: true,
-        is_warning: true,
-      },
-      {
-        lot_id: 0,
-        error: "Volume inhabituellement faible.",
-        is_blocking: false,
-        is_warning: true,
-      },
-    ],
-    tx_errors: [
-      {
-        tx_id: 0,
-        field: "dae",
-        value: "",
-        error: "DAE manquant",
-      },
-    ],
-    lots_errors: [
-      {
-        lot_id: 0,
-        field: "matiere_premiere_code",
-        value: null,
-        error: "Merci de préciser la matière première",
-      },
-    ],
-  },
+  errors: genericErrors,
   deadline: "2020-02-29",
   comments: [],
 }
@@ -227,7 +215,7 @@ export const tofixDetails = {
       status: "Validated",
     },
   },
-  errors: {},
+  errors: [],
   deadline: "2021-01-31",
   comments: [{ entity: operator, comment: "not ok" }],
 }
@@ -241,7 +229,7 @@ export const sentDetails = {
       status: "Validated",
     },
   },
-  errors: {},
+  errors: [],
   deadline: "2021-01-31",
   comments: [],
 }

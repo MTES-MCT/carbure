@@ -3,7 +3,7 @@ import { setupServer } from "msw/node"
 
 import { UserRightStatus } from "common/types"
 import { producer, trader } from "common/__test__/data"
-import { okEntitySearch } from "common/__test__/api"
+import { okEntitySearch, okErrors, okTranslations } from "common/__test__/api"
 import { clone } from "common/__test__/helpers"
 
 let accessRequests: any[] = []
@@ -37,4 +37,10 @@ export const okAccessRequest = rest.post(
   }
 )
 
-export default setupServer(okSettings, okAccessRequest, okEntitySearch)
+export default setupServer(
+  okSettings,
+  okAccessRequest,
+  okEntitySearch,
+  okTranslations,
+  okErrors
+)

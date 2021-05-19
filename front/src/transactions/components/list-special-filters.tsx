@@ -93,6 +93,7 @@ type SummaryFilterProps = {
   totalVolume: number
   query: TransactionQuery
   hideRecap?: boolean
+  selection: number[]
   onReset: () => void
 }
 
@@ -101,6 +102,7 @@ export const SummaryFilter = ({
   txCount,
   totalVolume,
   query,
+  selection,
   hideRecap = false,
   onReset,
 }: SummaryFilterProps) => {
@@ -108,9 +110,10 @@ export const SummaryFilter = ({
     prompt((resolve) => (
       <SummaryPrompt
         readOnly
-        title="Récapitulatif de la recherche"
-        description="Voici un résumé des lots correspondant aux filtres sélectionnés"
+        title="Récapitulatif des lots"
+        description="Ce tableau résume les informations principales des lots correspondant à votre recherche ou sélection."
         query={query}
+        selection={selection}
         onResolve={resolve}
       />
     ))
@@ -124,12 +127,11 @@ export const SummaryFilter = ({
     >
       {txCount === 1 ? (
         <span>
-          <b>Un seul lot</b> a été trouvé, pour un total de{" "}
-          <b>{prettyVolume(totalVolume)} litres</b>
+          <b>Un lot</b> de <b>{prettyVolume(totalVolume)} litres</b>
         </span>
       ) : (
         <span>
-          <b>{txCount} lots</b> ont été trouvés, pour un total de{" "}
+          <b>{txCount} lots</b> pour un total de{" "}
           <b>{prettyVolume(totalVolume)} litres</b>
         </span>
       )}

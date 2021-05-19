@@ -6,7 +6,8 @@ import {
   Transaction,
   LotStatus,
   SummaryItem,
-  Errors,
+  GenericError,
+  TransactionSummary,
 } from "common/types"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 import { Option } from "common/components/select"
@@ -29,28 +30,18 @@ export function hasDeadline(tx: Transaction, deadline: string): boolean {
 
 export function hasWarnings(
   tx: Transaction,
-  errors: Record<number, Errors>
+  errors: Record<number, GenericError[]>
 ): boolean {
   if (!tx || !errors[tx.id]) return false
-
-  return (
-    errors[tx.id].validation_errors?.some(
-      (e) => e.is_warning && !e.is_blocking
-    ) ?? false
-  )
+  return errors[tx.id].every((e) => !e.is_blocking)
 }
 
 export function hasErrors(
   tx: Transaction,
-  errors: Record<number, Errors>
+  errors: Record<number, GenericError[]>
 ): boolean {
   if (!tx || !errors[tx.id]) return false
-
-  const hasTxErrors = Boolean(errors[tx.id].tx_errors)
-  const hasLotErrors = Boolean(errors[tx.id].lots_errors)
-  const hasBlockingErrors = errors[tx.id].validation_errors?.some((e) => e.is_blocking) ?? false // prettier-ignore
-
-  return hasTxErrors || hasLotErrors || hasBlockingErrors
+  return errors[tx.id].some((e) => e.is_blocking)
 }
 
 // extract the status name from the lot details
@@ -99,9 +90,9 @@ export function normalizeFilters(snapshot: any): Snapshot {
     }
 
     if (key in snapshot.filters) {
-      snapshot.filters[key].sort((a: Option, b: Option) =>
-        a.label.localeCompare(b.label, "fr")
-      )
+      snapshot.filters[key] = snapshot.filters[key]
+        .filter(Boolean)
+        .sort((a: Option, b: Option) => a.label.localeCompare(b.label, "fr"))
     }
   })
 
@@ -134,6 +125,17 @@ export function flattenSummary(summary: any): SummaryItem[] {
   }
 
   return rows
+}
+
+export function normalizeSummary(summary: any): TransactionSummary {
+  return {
+    in: flattenSummary(summary.in),
+    out: flattenSummary(summary.out),
+    tx_ids: summary.tx_ids,
+    total_volume: summary.total_volume,
+    total_volume_in: summary.total_volume_in,
+    total_volume_out: summary.total_volume_out,
+  }
 }
 
 export function prettyVolume(volume: number) {

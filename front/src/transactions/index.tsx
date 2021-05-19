@@ -17,6 +17,7 @@ import useAcceptLots from "./hooks/actions/use-accept-lots"
 import useRejectLots from "./hooks/actions/use-reject-lots"
 import useDeclareLots from "./hooks/actions/use-declare-lots"
 import { useGetLots, useGetSnapshot } from "./hooks/use-transaction-list"
+import { useSummary } from "./components/summary"
 
 import { Main } from "common/components"
 import { Redirect, Route, Switch } from "common/components/relative-route"
@@ -128,6 +129,8 @@ export function useTransactions(entity: EntitySelection) {
   const declarator = useDeclareLots(entity)
   const forwarder = useForwardLots(entity, selection, refresh)
 
+  const summary = useSummary(query, selection.selected, false, entity)
+
   return {
     entity,
     status,
@@ -149,6 +152,7 @@ export function useTransactions(entity: EntitySelection) {
     declarator,
     forwarder,
     query,
+    summary,
     refresh,
   }
 }
@@ -174,6 +178,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
     rejector,
     declarator,
     forwarder,
+    summary,
     refresh,
   } = useTransactions(entity)
 
@@ -248,6 +253,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         rejector={rejector}
         outsourceddepots={snapshot.data?.depots}
         forwarder={forwarder}
+        summary={summary}
       />
 
       <Switch>
@@ -263,7 +269,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
             validator={validator}
             acceptor={acceptor}
             rejector={rejector}
-            transactions={transactions}
+            transactions={summary.data?.tx_ids ?? []}
           />
         </Route>
       </Switch>

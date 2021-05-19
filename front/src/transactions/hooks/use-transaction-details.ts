@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { useParams } from "react-router-dom"
 
-import { EntityType, Errors, LotStatus } from "common/types"
+import { EntityType, GenericError, LotStatus } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
 import useTransactionForm, {
@@ -14,16 +14,20 @@ import useClose from "common/hooks/use-close"
 import { useNotificationContext } from "common/components/notifications"
 import * as api from "../api"
 import { getStatus } from "transactions/helpers"
+import { useTranslation } from "react-i18next"
 
-export function getFieldErrors(errors: Errors) {
+export function useFieldErrors(errors: GenericError[]) {
+  const { t } = useTranslation("errors")
   const fieldErrors: { [k: string]: string } = {}
 
-  errors.lots_errors?.forEach((err) => {
-    fieldErrors[err.field] = err.error
-  })
+  errors.forEach((err) => {
+    if (err.field) {
+      fieldErrors[err.field] = t(err.error)
+    }
 
-  errors.tx_errors?.forEach((err) => {
-    fieldErrors[err.field] = err.error
+    if (err.fields) {
+      err.fields?.forEach((field) => (fieldErrors[field] = t(err.error)))
+    }
   })
 
   return fieldErrors
@@ -48,12 +52,13 @@ export default function useTransactionDetails(
   const [request, resolveUpdate] = useAPI(api.updateLot)
   const [comment, resolveComment] = useAPI(api.commentLot)
 
+  const fieldErrors = useFieldErrors(details.data?.errors ?? [])
+
   const entityID = entity?.id
   const txID = parseInt(params.id, 10)
   const tx = details.data?.transaction
 
-  const fieldErrors = details.data ? getFieldErrors(details.data.errors) : {}
-  const validationErrors = details.data?.errors.validation_errors ?? []
+  const validationErrors = details.data?.errors ?? []
   const status = tx && entity ? getStatus(tx, entity.id) : LotStatus.Weird
 
   function refreshDetails() {

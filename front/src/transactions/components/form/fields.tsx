@@ -458,7 +458,7 @@ export const DeliverySite = ({ data, value, errors, ...props }: LACP<DS>) => {
       name="delivery_site"
       label="Site de livraison"
       value={depot}
-      error={errors?.delivery_site}
+      error={errors?.delivery_site ?? errors?.unknown_delivery_site}
       getValue={getters.depot_id}
       getLabel={getters.name}
       getQuery={api.findDeliverySites}

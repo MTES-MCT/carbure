@@ -10,6 +10,7 @@ import Transactions from "../index"
 
 import server, { setAdminLots } from "./api"
 import { emptyLots } from "./data"
+import { Suspense } from "react"
 
 const TransactionsWithRouter = ({
   entity,
@@ -20,7 +21,9 @@ const TransactionsWithRouter = ({
 }) => (
   <MemoryRouter initialEntries={[`/org/0/transactions/${status}`]}>
     <Route path="/org/0/transactions/:status">
-      <Transactions entity={entity} />
+      <Suspense fallback="...">
+        <Transactions entity={entity} />
+      </Suspense>
     </Route>
   </MemoryRouter>
 )

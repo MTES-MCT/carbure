@@ -529,7 +529,7 @@ class ETBETransformation(models.Model):
 
 
     def natural_key(self):
-        return {'previous': self.previous_stock.natural_key(), 'new': self.new_stock.natural_key(), 'volume_ethanol': self.volume_ethanol, 'volume_etbe': self.volume_etbe, 'volume_denaturant': self.volume_denaturant, 'volume_etbe_eligible': self.volume_etbe_eligible, 
+        return {'previous': self.previous_stock.natural_key(), 'new': self.new_stock.natural_key(), 'volume_ethanol': self.volume_ethanol, 'volume_etbe': self.volume_etbe, 'volume_denaturant': self.volume_denaturant, 'volume_etbe_eligible': self.volume_etbe_eligible,
                 'added_by': self.added_by.natural_key(), 'added_by_user': self.added_by_user.natural_key(), 'added_time': self.added_time}
 
     class Meta:
@@ -559,12 +559,19 @@ class GenericError(models.Model):
     tx = models.ForeignKey(LotTransaction, null=False, blank=False, on_delete=models.CASCADE)
 
     field = models.CharField(max_length=64, null=True, blank=True)
+    fields = models.TextField(null=True, blank=True)
     value = models.CharField(max_length=128, null=True, blank=True)
     extra = models.CharField(max_length=256, null=True, blank=True)
 
     def natural_key(self):
-        return {'error': self.error, 'extra': self.extra, 'is_blocking': self.is_blocking, 'display_to_creator': self.display_to_creator, 'display_to_recipient': self.display_to_recipient, 
-                'acked_by_creator': self.acked_by_creator, 'acked_by_recipient': self.acked_by_recipient}
+        return {'error': self.error,
+        'display_to_creator': self.display_to_creator, 'display_to_recipient': self.display_to_recipient,
+        'display_to_admin': self.display_to_admin, 'display_to_auditor': self.display_to_auditor,
+        'acked_by_creator': self.acked_by_creator, 'acked_by_recipient': self.acked_by_recipient,
+        'acked_by_admin': self.acked_by_admin, 'acked_by_auditor': self.acked_by_auditor,
+        'highlighted_by_admin': self.highlighted_by_admin, 'highlighted_by_auditor': self.highlighted_by_auditor,
+        'is_blocking': self.is_blocking, 'tx_id': self.tx_id, 'field': self.field, 'fields': self.fields,
+        'value': self.value, 'extra': self.extra, }
 
     class Meta:
         db_table = 'generic_errors'
