@@ -38,8 +38,8 @@ def get_lots(request, *args, **kwargs):
     try:
         txs = get_entity_lots_by_status(entity, status)
         return get_lots_with_metadata(txs, entity, request.GET)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not get lots"}, status=400)
 
 
 @check_rights('entity_id')
@@ -57,8 +57,8 @@ def get_lots_summary(request, *args, **kwargs):
         txs = sort_lots(txs, request.GET)
         data = get_summary(txs, entity)
         return JsonResponse({'status': 'success', 'data': data})
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
 
 @check_rights('entity_id')
 def get_details(request, *args, **kwargs):
@@ -201,9 +201,8 @@ def update_lot(request, *args, **kwargs):
 
     try:
         tx = LotTransaction.objects.get(id=tx_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown transaction %s" % (tx_id), 'extra': str(e)},
-                            status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Unknown transaction %s" % (tx_id)}, status=400)
     if tx.delivery_status == 'A':
         return JsonResponse({'status': 'forbidden', 'message': "Tx already validated and accepted %d" % (tx.id)}, status=400)
     GenericError.objects.filter(tx_id=tx.id).delete()
@@ -228,9 +227,8 @@ def duplicate_lot(request):
 
     try:
         tx = LotTransaction.objects.get(id=tx_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id), 'extra': str(e)},
-                            status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id)}, status=400)
 
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
     if tx.lot.added_by not in rights:
@@ -273,9 +271,8 @@ def delete_lot(request):
     for tx_id in tx_ids:
         try:
             tx = LotTransaction.objects.get(id=tx_id)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id), 'extra': str(e)},
-                                status=400)
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id)}, status=400)
 
         rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
         if tx.lot.added_by not in rights:
@@ -318,8 +315,8 @@ def accept_lot(request):
     for tx_id in tx_ids:
         try:
             tx = LotTransaction.objects.get(delivery_status__in=['N', 'AC', 'AA'], id=tx_id)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': "TX not found", 'extra': str(e)}, status=400)
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
 
         rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
         if tx.carbure_client not in rights:
@@ -337,8 +334,8 @@ def accept_with_reserves(request):
     for tx_id in tx_ids:
         try:
             tx = LotTransaction.objects.get(delivery_status__in=['N', 'AC', 'AA'], id=tx_id)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': "TX not found", 'extra': str(e)}, status=400)
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
 
         rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
         if tx.carbure_client not in rights:
@@ -365,8 +362,8 @@ def reject_lot(request):
 
         try:
             tx = LotTransaction.objects.get(delivery_status__in=['N', 'AC', 'AA'], id=tx_id)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': "TX not found", 'extra': str(e)}, status=400)
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
 
         rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
         if tx.carbure_client not in rights:
@@ -409,8 +406,8 @@ def comment_lot(request, *args, **kwargs):
 
     try:
         tx = LotTransaction.objects.get(id=tx_id)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "TX not found", 'extra': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
 
     rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
 
@@ -441,8 +438,8 @@ def get_template_producers_simple(request, *args, **kwargs):
             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename="carbure_template_simple.xlsx"'
             return response
-    except Exception as e:
-        return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
+    except Exception:
+        return JsonResponse({'status': "error", 'message': "Error creating template file"}, status=500)
 
 
 @check_rights('entity_id')
@@ -458,8 +455,8 @@ def get_template_producers_advanced(request, *args, **kwargs):
             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename="carbure_template_advanced.xlsx"'
             return response
-    except Exception as e:
-        return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
+    except Exception:
+        return JsonResponse({'status': "error", 'message': "Error creating template file"}, status=500)
 
 
 @check_rights('entity_id')
@@ -475,8 +472,8 @@ def get_template_producers_advanced_10k(request, *args, **kwargs):
             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename="carbure_template_advanced.xlsx"'
             return response
-    except Exception as e:
-        return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
+    except Exception:
+        return JsonResponse({'status': "error", 'message': "Error creating template file"}, status=500)
 
 
 @check_rights('entity_id')
@@ -492,8 +489,8 @@ def get_template_blend(request, *args, **kwargs):
             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename="carbure_template_operator.xlsx"'
             return response
-    except Exception as e:
-        return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
+    except Exception:
+        return JsonResponse({'status': "error", 'message': "Error creating template file"}, status=500)
 
 @check_rights('entity_id')
 def get_template_trader(request, *args, **kwargs):
@@ -508,8 +505,8 @@ def get_template_trader(request, *args, **kwargs):
             response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
             response['Content-Disposition'] = 'attachment; filename="carbure_template_trader.xlsx"'
             return response
-    except Exception as e:
-        return JsonResponse({'status': "error", 'message': "Error creating template file", 'error': str(e)}, status=500)
+    except Exception:
+        return JsonResponse({'status': "error", 'message': "Error creating template file"}, status=500)
 
 @check_rights('entity_id')
 def upload(request, *args, **kwargs):
@@ -575,9 +572,7 @@ def validate_declaration(request, *args, **kwargs):
         pm = int(period_month)
         period = datetime.date(year=py, month=pm, day=1)
         declaration, created = SustainabilityDeclaration.objects.update_or_create(entity=entity, period=period, defaults={'declared': True})
-    except Exception as e:
-        print("Error while getting period")
-        print(e)
+    except Exception:
         return JsonResponse({'status': "error", 'message': "Missing periods"}, status=400)
     return JsonResponse({'status': 'success'})
 
@@ -601,8 +596,8 @@ def forward_lots(request, *args, **kwargs):
         # for each tx, make sure we are the client, status accepted, not already forwarded, and it has been delivered to a Depot with blending_is_outsourced
         try:
             tx = LotTransaction.objects.get(delivery_status__in=['A', 'N'], id=tx_id, carbure_client=entity, is_forwarded=False)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': "TX not found", 'extra': str(e)}, status=400)
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
 
         if tx.carbure_delivery_site in depots:
             # it has been delivered to a Depot with outsourced blending

@@ -37,8 +37,8 @@ def get_lots(request, *args, **kwargs):
     try:
         txs = get_entity_lots_by_status(entity, status)
         return get_lots_with_metadata(txs, entity, request.GET)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not get lots"}, status=400)
 
 
 @check_rights('entity_id')
@@ -55,8 +55,8 @@ def get_lots_summary(request, *args, **kwargs):
             txs, _, _, _ = filter_entity_transactions(entity, request.GET)
         data = get_summary(txs, entity)
         return JsonResponse({'status': 'success', 'data': data})
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
 
 @check_rights('entity_id')
 def get_details(request, *args, **kwargs):

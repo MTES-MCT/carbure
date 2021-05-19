@@ -85,8 +85,8 @@ def get_delivery_sites(request):
             entity = Entity.objects.get(pk=entity_id)
             if entity.entity_type in ['Producteur', 'Trader']:
                 dsites = dsites.filter(Q(depot_type__in=[Depot.EFPE, Depot.OTHER, Depot.OILDEPOT, Depot.BIOFUELDEPOT]))
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': "Could not find delivery sites", 'extra': str(e)}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not find delivery sites"}, status=400)
     
     sez = [d.natural_key() for d in dsites]
     return JsonResponse({'status': 'success', 'data': sez})
@@ -276,8 +276,7 @@ def create_delivery_site(request):
 
     try:
         country = Pays.objects.get(code_pays=country)
-    except Exception as e:
-        print(e)
+    except Exception:
         return JsonResponse({'status': 'error', 'message': 'Unknown country_code %s' % (country)}, status=400)                        
 
     if depot_type not in [Depot.EFS, Depot.EFPE, Depot.OTHER, Depot.BIOFUELDEPOT, Depot.OILDEPOT]:
@@ -288,8 +287,7 @@ def create_delivery_site(request):
 
     try:
         Depot.objects.update_or_create(depot_id=depot_id, country=country, defaults=d)
-    except Exception as e:
-        print(e)
+    except Exception:
         return JsonResponse({'status': 'error', 'message': 'Server error'}, status=500)
     return JsonResponse({'status': 'success'})
 

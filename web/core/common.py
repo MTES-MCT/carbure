@@ -366,7 +366,7 @@ def fill_production_site_info(entity, lot_row, lot, tx, prefetched_data):
         try:
             com_date = try_get_date(lot_row['production_site_commissioning_date'])
             lot.unknown_production_site_com_date = com_date
-        except Exception as e:
+        except Exception:
             msg = "Date de mise en service: veuillez entrer une date au format JJ/MM/AAAA"
             error = GenericError(tx=tx, field='production_site_commissioning_date',
                                 error='PRODUCTION_SITE_COMDATE_FORMAT_INCORRECT',
@@ -593,7 +593,7 @@ def try_get_date(dd):
         return dd
     try:
         return datetime.datetime.strptime(dd, "%Y-%m-%d").date()
-    except Exception as e:
+    except Exception:
         pass
     return dateutil.parser.parse(dd, dayfirst=True).date()
 
@@ -616,7 +616,7 @@ def fill_delivery_date(lot_row, lot, transaction):
             else:
                 transaction.delivery_date = dd
                 lot.period = dd.strftime('%Y-%m')
-        except Exception as e:
+        except Exception:
             transaction.delivery_date = today
             lot.period = today.strftime('%Y-%m')
             msg = "Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA (%s)" % (lot_row['delivery_date'])
@@ -752,13 +752,13 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
         try:
             source_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status='A', id=tx_id)
             source_lot = LotV2.objects.get(id=source_tx.lot.id)
-        except Exception as e:
+        except Exception:
             return None, None, "TX not found"
     elif carbure_id:
         try:
             source_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status='A', lot__carbure_id=carbure_id)
             source_lot = LotV2.objects.get(id=source_tx.lot.id)
-        except Exception as e:
+        except Exception:
             return None, None, "TX not found"
     else:
         # try to find it via filters
@@ -909,16 +909,13 @@ def load_excel_file(entity, user, file, mass_balance=False):
                 lots_to_insert.append(lot)
                 txs_to_insert.append(tx)
                 generic_errors.append(errors)
-            except Exception as e:
-                print(e)
+            except Exception:
                 traceback.print_exc()
-                #print(lot_row)
         print('File processed %s' % (datetime.datetime.now()))
         bulk_insert(entity, lots_to_insert, txs_to_insert, generic_errors, prefetched_data)
         print('%d Lots out of %d lines loaded in database %s' % (lots_loaded, total_lots, datetime.datetime.now()))
         return lots_loaded, total_lots, errors
-    except Exception as e:
-        print(e)
+    except Exception:
         return False, False, errors
 
 

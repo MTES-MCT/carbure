@@ -43,9 +43,8 @@ def save_certificate(certificate_id, holder, valid_from, valid_until, details):
         details['valid_from'] = valid_from
         certificate, created = ISCCCertificate.objects.update_or_create(certificate_id=certificate_id, certificate_holder=holder, defaults=details)
         return certificate
-    except Exception as e:
+    except Exception:
         print('')
-        print(e)
         print(certificate_id)
     return None
 
