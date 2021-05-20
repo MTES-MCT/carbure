@@ -595,7 +595,7 @@ class TransactionUpdateHistory(models.Model):
     modified_by = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
 
     def natural_key(self):
-        return {'tx_id': self.tx.id, 'update_type': self.update_type,  'datetime': self.datetime, 'field': self.field, 'value_before': self.value_before, 'value_after': self.value_after, 'modified_by': self.modified_by.email if self.modified_by}
+        return {'tx_id': self.tx.id, 'update_type': self.update_type,  'datetime': self.datetime, 'field': self.field, 'value_before': self.value_before, 'value_after': self.value_after, 'modified_by': self.modified_by.email if self.modified_by else ''}
 
     class Meta:
         db_table = 'transactions_updates'
