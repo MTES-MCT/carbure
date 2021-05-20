@@ -3,6 +3,8 @@ import calendar
 import logging
 import unicodedata
 import os
+
+import dictdiffer
 from dateutil.relativedelta import *
 from django.db.models import Q, F, Case, When, Count
 from django.db.models.functions import TruncMonth
@@ -12,6 +14,7 @@ from django import db
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 
+from core.models import TransactionUpdateHistory
 from core.models import LotV2, LotTransaction, EntityDepot, GenericError
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment, SustainabilityDeclaration
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
@@ -201,25 +204,62 @@ def update_lot(request, *args, **kwargs):
 
     try:
         tx = LotTransaction.objects.get(id=tx_id)
+        before_update = tx.natural_key()
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Unknown transaction %s" % (tx_id)}, status=400)
-    if tx.delivery_status == 'A':
-        return JsonResponse({'status': 'forbidden', 'message': "Tx already validated and accepted %d" % (tx.id)}, status=400)
-    GenericError.objects.filter(tx_id=tx.id).delete()
+
+    if tx.delivery_status == LotTransaction.FROZEN:
+        return JsonResponse({'status': 'forbidden', 'message': "Tx already declared - please amend the declaration to unlock this line"}, status=400)
+
+    GenericError.objects.filter(tx=tx).delete()
     d = get_prefetched_data(entity)
     lot, tx, errors = load_lot(d, entity, request.user, request.POST.dict(), 'MANUAL', tx)
-    if lot:
-        lot.save()
-        tx.save()
-        GenericError.objects.bulk_create(errors)
-        bulk_sanity_checks([tx], d, background=False)
-        # only if lot is already validated ?
-        if lot.status == 'Validated':
-            # make sure we do not create a duplicate
-            check_duplicates([tx], background=False)
-        return JsonResponse({'status': 'success'})
-    else:
+
+    if not lot:
         return JsonResponse({'status': 'error', 'message': 'Could not save lot: %s' % (errors)}, status=400)
+
+    lot.save()
+    tx.save()
+    GenericError.objects.bulk_create(errors)
+    bulk_sanity_checks([tx], d, background=False)
+
+    if lot.status != LotV2.DRAFT:
+        # make sure we do not create a duplicate
+        # only if lot is already validated ?
+        check_duplicates([tx], background=False)
+
+        # save the changes
+        after_update = tx.natural_key()
+        diff = dictdiffer.diff(before_update, after_update)
+        with transaction.atomic():
+            for d in diff:
+                action, field, data = d
+                if action == 'change':
+                    if isinstance(data, tuple):
+                        TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field=field, value_before=d[0], value_after=d[1])
+                    else:
+                        print('change not tuple %s' % (d))
+                if action == 'add':
+                    if isinstance(data, list):
+                        for (subfield, value) in data:
+                            if field != '':
+                                full_field_name = '%s.%s' % (field, subfield)
+                            else:
+                                full_field_name = subfield
+                            TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.ADD, field=full_field_name, value_before='', value_after=value)
+                    else:
+                        print('add not list %s' % (d))                   
+                if action == 'remove':
+                    if isinstance(data, list):
+                        for (subfield, value) in data:
+                            if field != '':
+                                full_field_name = '%s.%s' % (field, subfield)
+                            else:
+                                full_field_name = subfield
+                            TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.REMOVE, field=full_field_name, value_before=value, value_after='')
+                    else:
+                        print('remove not list %s' % (d))
+    return JsonResponse({'status': 'success'})
 
 @otp_required
 def duplicate_lot(request):

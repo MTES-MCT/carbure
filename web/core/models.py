@@ -577,3 +577,26 @@ class GenericError(models.Model):
         db_table = 'generic_errors'
         verbose_name = 'Generic Error'
         verbose_name_plural = 'Generic Errors'
+
+
+class TransactionUpdateHistory(models.Model):
+    ADD = "ADD"
+    REMOVE = "REMOVE"
+    UPDATE = "UPDATE"
+
+    TX_HISTORY_TYPES = ((ADD, ADD), (REMOVE, REMOVE), (UPDATE, UPDATE))
+
+    tx = models.ForeignKey(LotTransaction, null=False, blank=False, on_delete=models.CASCADE)
+    datetime = models.DateTimeField(auto_now_add=True)
+    update_type = models.CharField(max_length=32, null=False, blank=False, choices=TX_HISTORY_TYPES, default=ADD)
+    field = models.CharField(max_length=64, null=False, blank=False)
+    value_before = models.TextField()
+    value_after = models.TextField()
+
+    def natural_key(self):
+        return {'tx_id': self.tx.id, 'update_type': self.update_type,  'datetime': self.datetime, 'field': self.field, 'value_before': self.value_before, 'value_after': self.value_after}
+
+    class Meta:
+        db_table = 'transactions_updates'
+        verbose_name = 'Transaction Update'
+        verbose_name_plural = 'Transaction Updates'
