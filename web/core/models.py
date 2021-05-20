@@ -590,11 +590,12 @@ class TransactionUpdateHistory(models.Model):
     datetime = models.DateTimeField(auto_now_add=True)
     update_type = models.CharField(max_length=32, null=False, blank=False, choices=TX_HISTORY_TYPES, default=ADD)
     field = models.CharField(max_length=64, null=False, blank=False)
-    value_before = models.TextField()
-    value_after = models.TextField()
+    value_before = models.TextField(null=True)
+    value_after = models.TextField(null=True)
+    modified_by = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
 
     def natural_key(self):
-        return {'tx_id': self.tx.id, 'update_type': self.update_type,  'datetime': self.datetime, 'field': self.field, 'value_before': self.value_before, 'value_after': self.value_after}
+        return {'tx_id': self.tx.id, 'update_type': self.update_type,  'datetime': self.datetime, 'field': self.field, 'value_before': self.value_before, 'value_after': self.value_after, 'modified_by': self.modified_by.email if self.modified_by}
 
     class Meta:
         db_table = 'transactions_updates'

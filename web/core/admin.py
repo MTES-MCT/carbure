@@ -20,8 +20,8 @@ from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
 from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
 from core.models import Depot, LotV2, LotTransaction, TransactionComment, GenericError
-
 from core.models import SustainabilityDeclaration, EntityDepot
+from core.models import TransactionUpdateHistory
 from certificates.models import EntitySNTradingCertificate
 from api.v3.sanity_checks import bulk_sanity_checks
 from core.common import get_prefetched_data, calculate_ghg
@@ -331,6 +331,12 @@ class EntityDepotAdmin(admin.ModelAdmin):
     list_filter = ('blending_is_outsourced', )
 
 
+class TransactionUpdateHistoryAdmin(admin.ModelAdmin):
+    list_display = ('tx', 'update_type', 'datetime', 'field', 'value_before', 'value_after')
+    search_fields = ('field', 'value_before', 'value_after', )
+    list_filter = ('update_type', 'field', )
+
+
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
 admin.site.register(UserRightsRequests, UserRightsRequestsAdmin)
@@ -345,6 +351,7 @@ admin.site.register(TransactionComment, TransactionCommentAdmin)
 admin.site.register(GenericError, GenericErrorAdmin)
 admin.site.register(SustainabilityDeclaration, SustainabilityDeclarationAdmin)
 admin.site.register(EntityDepot, EntityDepotAdmin)
+admin.site.register(TransactionUpdateHistory, TransactionUpdateHistoryAdmin)
 
 
 # authtool custom user model

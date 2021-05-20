@@ -347,7 +347,7 @@ def fill_production_site_info(entity, lot_row, lot, tx, prefetched_data):
                 lot_errors.append(error)
     else:
         lot.unknown_production_country = None
-    if 'production_site_reference' in lot_row and lot_row['production_site_reference'] != '' and lot_row['production_site_reference'] is not None:
+    if 'production_site_reference' in lot_row:
         if lot.production_site_is_in_carbure:
             lot.carbure_production_site_reference = lot_row['production_site_reference']
         else:
