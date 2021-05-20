@@ -66,11 +66,13 @@
 .collapsibleAlert {
   flex-direction: column;
   align-items: stretch;
+  padding: 0;
 }
 
 .collapsibleBar {
   cursor: pointer;
   align-items: center;
+  padding: 8px 16px;
 }
 
 .collapsibleBar > :global(.icon):first-child {
@@ -87,5 +89,6 @@
 }
 
 .collapsibleDetails {
-  margin: 8px 0;
+  padding: 16px;
+  padding-top: 8px;
 }
