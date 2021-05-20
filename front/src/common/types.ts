@@ -242,12 +242,25 @@ export interface Comment {
   comment: string
 }
 
+export interface LotUpdate {
+  tx_id: number,
+  update_type: 'ADD' | 'UPDATE' | 'REMOVE', 
+  datetime: string, 
+  field: string,
+  label?: string,
+  value_before: string | null,
+  value_after: string | null,
+  modified_by: string
+}
+
 export interface LotDetails {
   transaction: Transaction
   comments: Comment[]
   deadline: string
   errors: GenericError[]
+  updates?: LotUpdate[]
 }
+
 
 export enum Filters {
   DeliveryStatus = "delivery_status",

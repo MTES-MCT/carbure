@@ -1,6 +1,6 @@
 import React from "react"
 
-import { LotStatus } from "common/types"
+import { LotStatus, EntityType } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
 import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
@@ -28,6 +28,7 @@ import TransactionForm from "../components/form"
 import { StatusTitle } from "../components/status"
 import Comments from "../components/form-comments"
 import ValidationErrors from "../components/form-errors"
+import TransactionHistory from '../components/history'
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]
@@ -70,6 +71,7 @@ const TransactionDetails = ({
 
   const navigator = useNavigate(transactions)
 
+  const isAdmin = entity?.entity_type === EntityType.Administration
   const isEditable = EDITABLE.includes(status)
   const isCommentable = COMMENTABLE.includes(status)
 
@@ -115,6 +117,8 @@ const TransactionDetails = ({
           onComment={addComment}
         />
       )}
+
+      {isAdmin && Boolean(details.data?.updates?.length) && <TransactionHistory history={details.data?.updates} />}
 
       <div className={styles.transactionFormButtons}>
         {isEditable && (
