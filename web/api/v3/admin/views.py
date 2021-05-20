@@ -175,7 +175,7 @@ def get_lots(request):
             'lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
             'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
             'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country'
-        )
+        ).prefetch_related('genericerror_set', 'lot__carbure_production_site__productionsitecertificate_set')
 
         txs = txs.filter(lot__status='Validated')
 
@@ -210,7 +210,7 @@ def get_details(request, *args, **kwargs):
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['comments'] = [c.natural_key() for c in tx.transactioncomment_set.all()]
-    data['updates'] = [c.natural_key() for c in tx.transactionupdatehistory_set.all()]
+    data['updates'] = [c.natural_key() for c in tx.transactionupdatehistory_set.all().order_by('-datetime')]
     return JsonResponse({'status': 'success', 'data': data})
 
 
