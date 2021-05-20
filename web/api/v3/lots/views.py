@@ -231,12 +231,14 @@ def update_lot(request, *args, **kwargs):
         # save the changes
         after_update = tx.natural_key()
         diff = dictdiffer.diff(before_update, after_update)
+
         with transaction.atomic():
             for d in diff:
+                print(d)
                 action, field, data = d
                 if action == 'change':
                     if isinstance(data, tuple):
-                        TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field=field, value_before=d[0], value_after=d[1])
+                        TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field=field, value_before=data[0], value_after=data[1], modified_by=request.user)
                     else:
                         print('change not tuple %s' % (d))
                 if action == 'add':
@@ -246,7 +248,7 @@ def update_lot(request, *args, **kwargs):
                                 full_field_name = '%s.%s' % (field, subfield)
                             else:
                                 full_field_name = subfield
-                            TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.ADD, field=full_field_name, value_before='', value_after=value)
+                            TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.ADD, field=full_field_name, value_before='', value_after=value, modified_by=request.user)
                     else:
                         print('add not list %s' % (d))                   
                 if action == 'remove':
@@ -256,7 +258,7 @@ def update_lot(request, *args, **kwargs):
                                 full_field_name = '%s.%s' % (field, subfield)
                             else:
                                 full_field_name = subfield
-                            TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.REMOVE, field=full_field_name, value_before=value, value_after='')
+                            TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.REMOVE, field=full_field_name, value_before=value, value_after='', modified_by=request.user)
                     else:
                         print('remove not list %s' % (d))
     return JsonResponse({'status': 'success'})

@@ -210,7 +210,7 @@ def get_details(request, *args, **kwargs):
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['comments'] = [c.natural_key() for c in tx.transactioncomment_set.all()]
-
+    data['updates'] = [c.natural_key() for c in tx.transactionupdatehistory_set.all()]
     return JsonResponse({'status': 'success', 'data': data})
 
 
