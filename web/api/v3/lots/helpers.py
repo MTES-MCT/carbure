@@ -33,10 +33,10 @@ def get_errors(tx):
 def get_entity_lots_by_status(entity, status):
     if entity.entity_type in ('Producteur', 'Trader'):
         txs = LotTransaction.objects.select_related(
-            'lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
+            'lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country', 
             'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
-            'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country'
-        )
+            'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country', 
+        ).prefetch_related('genericerror_set', 'lot__carbure_production_site__productionsitecertificate_set')
 
         txs = txs.filter(carbure_vendor=entity)
 
@@ -57,7 +57,7 @@ def get_entity_lots_by_status(entity, status):
             'lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
             'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
             'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country'
-        )
+        ).prefetch_related('genericerror_set', 'lot__carbure_production_site__productionsitecertificate_set')
 
         # filter by status
         if status == 'draft':
