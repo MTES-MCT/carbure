@@ -264,9 +264,8 @@ class Lot(models.Model):
 class LotV2(models.Model):
     DRAFT = 'Draft'
     VALIDATED = 'Validated'
-    DECLARED = 'Declared'
 
-    LOT_STATUS = ((DRAFT, 'Brouillon'), (VALIDATED, 'Validé'), (DECLARED, 'Déclaré'))
+    LOT_STATUS = ((DRAFT, 'Brouillon'), (VALIDATED, 'Validé'))
     SOURCE_CHOICES = (('EXCEL', 'Excel'), ('MANUAL', 'Manual'))
 
     period = models.CharField(max_length=64, blank=True, default='')

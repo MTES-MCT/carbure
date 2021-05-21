@@ -2,6 +2,7 @@ import datetime
 import calendar
 import logging
 import unicodedata
+import traceback
 import os
 
 import dictdiffer
@@ -613,9 +614,16 @@ def validate_declaration(request, *args, **kwargs):
         py = int(period_year)
         pm = int(period_month)
         period = datetime.date(year=py, month=pm, day=1)
+        # check if we have pending transactions (received or sent)
+        txs = LotTransaction.objects.filter(lot__period=period.strftime('%Y-%m')).filter(Q(carbure_client=entity) | Q(carbure_vendor=entity)).exclude(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
+        if txs > 0:
+            return JsonResponse({'status': "error", 'message': "PENDING_TRANSACTIONS_CANNOT_DECLARE", 'data': {'pending_txs': txs}}, status=400)
         declaration, created = SustainabilityDeclaration.objects.update_or_create(entity=entity, period=period, defaults={'declared': True})
+        # freeze transactions
+        LotTransaction.objects.filter(lot__period=period.strftime('%Y-%m')).filter(Q(carbure_client=entity) | Q(carbure_vendor=entity)).exclude(delivery_status__in=[LotTransaction.FROZEN]).update(delivery_status=LotTransaction.FROZEN)
     except Exception:
-        return JsonResponse({'status': "error", 'message': "Missing periods"}, status=400)
+        traceback.print_exc()
+        return JsonResponse({'status': "error", 'message': "server error"}, status=500)
     return JsonResponse({'status': 'success'})
 
 
