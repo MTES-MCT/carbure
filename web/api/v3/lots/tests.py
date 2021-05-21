@@ -793,3 +793,87 @@ class LotsAPITest(TransactionTestCase):
         data = response.json()['data']
         self.assertEqual(data['transaction']['client_is_in_carbure'], True)
         
+
+class DeclarationTests(TransactionTestCase):
+    home = os.environ['CARBURE_HOME']
+    fixtures = ['{home}/web/fixtures/json/countries.json'.format(home=home), 
+    '{home}/web/fixtures/json/feedstock.json'.format(home=home), 
+    '{home}/web/fixtures/json/biofuels.json'.format(home=home),
+    '{home}/web/fixtures/json/depots.json'.format(home=home)]
+
+    def setUp(self):
+        user_model = get_user_model()
+        self.user_email = 'testuser1@toto.com'
+        self.user_password = 'totopouet'
+        self.user1 = user_model.objects.create_user(email=self.user_email, name='Le Super Testeur 1', password=self.user_password)
+
+        # a few entities
+        self.test_producer, _ = Entity.objects.update_or_create(name='Le Super Producteur 1', entity_type='Producteur')
+        self.test_operator, _ = Entity.objects.update_or_create(name='OPERATEUR1', entity_type='Opérateur')
+
+        # some rights
+        UserRights.objects.update_or_create(user=self.user1, entity=self.test_producer)
+        UserRights.objects.update_or_create(user=self.user1, entity=self.test_operator)
+
+        loggedin = self.client.login(username=self.user_email, password=self.user_password)
+        self.assertTrue(loggedin)          
+        # pass otp verification
+        response = self.client.get(reverse('otp-verify'))
+        self.assertEqual(response.status_code, 200)
+        device = EmailDevice.objects.get(user=self.user1)
+        response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
+        self.assertEqual(response.status_code, 302)        
+
+    def create_lot(self, **kwargs):
+        producer = self.test_producer
+        lot = {
+            'supplier_certificate': 'ISCC-TOTO-02',
+            'biocarburant_code': 'ETH',
+            'matiere_premiere_code': 'BLE',
+            'producer': producer.name,
+            'production_site': "usine non repertoriee",
+            'volume': 15000,
+            'pays_origine_code': 'FR',
+            'eec': 1,
+            'ep': 5,
+            'etd': 12,
+            'dae': get_random_dae(),
+            'delivery_date': '2020-12-31',
+            'client': self.test_operator.name,
+            'delivery_site': '001',
+            'entity_id': self.test_producer.id,
+        }
+        lot.update(kwargs)
+        response = self.client.post(reverse('api-v3-add-lot'), lot)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()['data']
+        tx_id = data['id']
+        lot_id = data['lot']['id']
+        return tx_id, lot_id
+
+
+    def test_declare(self):
+        today = datetime.date.today()
+        # create lots for client
+        tx_id, lot_id = self.create_lot(delivery_date=today.strftime('%Y-%m-%d'))
+        # validate
+        tx = LotTransaction.objects.get(id=tx_id)
+        tx.delivery_status = LotTransaction.PENDING
+        tx.save()
+        tx.lot.status = LotV2.VALIDATED
+        tx.lot.save()        
+        # try validate declaration (doesnt work)
+        response = self.client.post(reverse('api-v3-validate-declaration'), {'entity_id': self.test_producer.id, 'period_year': today.year, 'period_month': today.strftime('%m')})
+        self.assertEqual(response.status_code, 400)
+        jsoned = response.json()
+        self.assertEqual(jsoned['message'], "PENDING_TRANSACTIONS_CANNOT_DECLARE")
+
+        # as client, accept lots
+        tx.delivery_status = LotTransaction.ACCEPTED
+        tx.save()
+
+        # try validate declaration (ok)
+        response = self.client.post(reverse('api-v3-validate-declaration'), {'entity_id': self.test_producer.id, 'period_year': today.year, 'period_month': today.strftime('%m')})
+        self.assertEqual(response.status_code, 200)
+        tx = LotTransaction.objects.get(id=tx_id)
+        self.assertEqual(tx.delivery_status, LotTransaction.FROZEN)
