@@ -4,7 +4,7 @@ Pour information, le fournisseur du lot suivant vient de le passer en correction
 
 
 DAE Biocarburant  Matière Première  Volume  Date de livraison Client  Site de livraison Motif
-{{tx.dae}}  {{tx.lot.biocarburant.name}}  {{tx.lot.matiere_premiere.name}}  {{tx.lot.volume}} {{tx.delivery_date}}  {{tx.carbure_client.name}}  {{tx.carbure_delivery_site.name}} {{tx.comment}}
+{{tx.dae}}  {{tx.lot.biocarburant.name}}  {{tx.lot.matiere_premiere.name}}  {{tx.lot.volume}} {{tx.delivery_date}}  {{tx.carbure_client.name}}  {{tx.carbure_delivery_site.name}}
 
 
 Bonne journée,

@@ -14,7 +14,7 @@ from django.db import transaction
 
 
 from core.models import LotV2, LotTransaction, UserRights, GenericError
-from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
+from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot, SustainabilityDeclaration
 
 from certificates.models import ISCCCertificate, EntityISCCTradingCertificate
 from certificates.models import DBSCertificate, EntityDBSTradingCertificate
@@ -1036,3 +1036,12 @@ def notify_accepted_lot_change(tx):
 
 def invalidate_declaration(tx, entity):
     year, month = tx.lot.period.split('-')
+    period = datetime.date(year=year, month=int(month), day=1)
+    try:
+        sd = SustainabilityDeclaration.objects.filter(entity=entity, period=period)
+        sd.declared = False
+        sd.checked = False
+        sd.save()
+    except:
+        # declaration doesn't exist ?
+        pass
