@@ -1,6 +1,7 @@
 import { rest } from "msw"
 import translations from "../../../public/locales/fr/translation.json"
 import errors from "../../../public/locales/fr/errors.json"
+import fields from "../../../public/locales/fr/fields.json"
 
 import {
   country,
@@ -128,15 +129,22 @@ export const okRedcertSearch = rest.get(
 )
 
 export const okTranslations = rest.get(
-  "/v2/locales/fr/translation.json",
+  "/v2/locales/fr/translations.json",
   (req, res, ctx) => {
     return res(ctx.json(translations))
   }
 )
 
-export const okErrors = rest.get(
+export const okErrorsTranslations = rest.get(
   "/v2/locales/fr/errors.json",
   (req, res, ctx) => {
     return res(ctx.json(errors))
+  }
+)
+
+export const okFieldsTranslations = rest.get(
+  "/v2/locales/fr/fields.json",
+  (req, res, ctx) => {
+    return res(ctx.json(fields))
   }
 )

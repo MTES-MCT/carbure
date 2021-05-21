@@ -25,12 +25,12 @@ const columns: Column<LotUpdate>[] = [
     header: 'Valeur',
     render: u => (
       <div>
-        {u.value_after && <span style={{ marginRight: 12}}>{u.value_after}</span>}
-        <span style={{fontWeight: 'normal', textDecoration: 'line-through'}}>{u.value_before}</span>
+        {u.value_after && <span style={{ marginRight: 12 }}>{u.value_after}</span>}
+        <span style={{ fontWeight: 'normal', textDecoration: 'line-through' }}>{u.value_before}</span>
       </div>
     )
   },
-  
+
   {
     header: 'Modifié par',
     render: u => u.modified_by
@@ -40,15 +40,14 @@ const columns: Column<LotUpdate>[] = [
 
 const TransactionHistory = ({ history = [] }: TransactionHistoryProps) => {
   const { t } = useTranslation()
-  const { t:tFields } = useTranslation('fields')
 
   const rows = history
-    .filter(h => tFields(h.field) != h.field) // ignore fields that have no translation
-    .map(value => ({ value: { ...value, label: tFields(value.field) } }))
-  
-  return ( 
+    .filter(h => t(h.field, { ns: 'fields' }) != h.field) // ignore fields that have no translation
+    .map(value => ({ value: { ...value, label: t(value.field, { ns: 'fields' }) } }))
+
+  return (
     <Collapsible icon={Edit} title={t("Historique des corrections")} className={styles.history}>
-      <Table 
+      <Table
         columns={columns}
         rows={rows}
         className={styles.historyTable}

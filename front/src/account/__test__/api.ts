@@ -3,8 +3,8 @@ import { setupServer } from "msw/node"
 
 import { UserRightStatus } from "common/types"
 import { producer, trader } from "common/__test__/data"
-import { okEntitySearch, okErrors, okTranslations } from "common/__test__/api"
 import { clone } from "common/__test__/helpers"
+import { okEntitySearch, okErrorsTranslations, okFieldsTranslations, okTranslations } from "common/__test__/api"
 
 let accessRequests: any[] = []
 
@@ -42,5 +42,6 @@ export default setupServer(
   okAccessRequest,
   okEntitySearch,
   okTranslations,
-  okErrors
+  okErrorsTranslations,
+  okFieldsTranslations
 )

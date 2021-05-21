@@ -1,4 +1,5 @@
 import { useEffect } from "react"
+import { Trans, useTranslation } from 'react-i18next'
 import useAPI from "common/hooks/use-api"
 import * as api from "../api"
 import {
@@ -30,6 +31,7 @@ export const DeclarationSummaryPrompt = ({
   entityID,
   onResolve,
 }: SummaryPromptProps) => {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
 
   const [summary, getSummary] = useAPI(api.getDeclarationSummary)
@@ -40,23 +42,24 @@ export const DeclarationSummaryPrompt = ({
 
   async function askValidateDeclaration() {
     const ok = await confirm(
-      "Validation déclaration",
-      "Confirmez-vous que les informations fournies sont valides ? Vous ne pourrez plus modifier votre déclaration ultérieurement."
+      t("Validation déclaration"),
+      t("Confirmez-vous que les informations fournies sont valides ? Vous ne pourrez plus modifier votre déclaration ultérieurement.")
     )
 
     if (ok) {
-      try {
-        await validateDeclaration(entityID, period.year, period.month)
+      const res = await validateDeclaration(entityID, period.year, period.month)
+
+      if (res) {
         await getSummary(entityID, period.year, period.month)
 
         notifications.push({
           level: "success",
-          text: "Votre déclaration a bien été validée !",
+          text: t("Votre déclaration a bien été validée !"),
         })
-      } catch (e) {
+      } else {
         notifications.push({
           level: "error",
-          text: "Votre déclaration n'a pas pu être validée !",
+          text: t("Votre déclaration n'a pas pu être validée !"),
         })
       }
     }
@@ -67,28 +70,38 @@ export const DeclarationSummaryPrompt = ({
   }, [getSummary, entityID, period.year, period.month])
 
   const declaration = summary.data?.declaration
+  const remaining = summary?.data?.remaining ?? 0
+
+  const currentMonth = prettyPeriod(period)
+  const nextMonth = prettyPeriod(next)
 
   return (
     <Dialog onResolve={onResolve} className={dialogStyles.dialogWide}>
-      <DialogTitle text="Déclaration de durabilité" />
+      <DialogTitle text={t("Déclaration de durabilité")} />
 
       <span className={styles.declarationExplanation}>
-        Les tableaux suivants vous montrent un récapitulatif de vos entrées et
-        sorties pour la période sélectionnée.
+        <Trans>
+          Les tableaux suivants vous montrent un récapitulatif de vos entrées et
+          sorties pour la période sélectionnée.
+        </Trans>
       </span>
 
       <span className={styles.declarationExplanation}>
-        Afin d'être comptabilisés, les brouillons que vous avez créé pour cette
-        période devront être envoyés avant la fin du mois suivant ladite
-        période. Une fois la totalité de ces lots validés, vous pourrez vérifier
-        ici l'état global de vos transactions et finalement procéder à la
-        déclaration.
+        <Trans>
+          Afin d'être comptabilisés, les brouillons que vous avez créé pour cette
+          période devront être envoyés avant la fin du mois suivant ladite
+          période. Une fois la totalité de ces lots validés, vous pourrez vérifier
+          ici l'état global de vos transactions et finalement procéder à la
+          déclaration.
+        </Trans>
       </span>
 
       <Box row className={styles.declarationPeriod}>
         <Button icon={ChevronLeft} onClick={period.prev} />
         <span className={styles.declarationPeriodText}>
-          Pour la période <b>{prettyPeriod(period)}</b>
+          <Trans>
+            Pour la période <b>{{ currentMonth }}</b>
+          </Trans>
         </span>
         <Button icon={ChevronRight} onClick={period.next} />
       </Box>
@@ -99,30 +112,46 @@ export const DeclarationSummaryPrompt = ({
       />
 
       <DialogButtons className={styles.declarationControls}>
-        <span className={styles.declarationDeadline}>
-          à valider avant la fin du mois de <b>{prettyPeriod(next)}</b>
-        </span>
+        {!(declaration?.declared) && (
+          <span className={styles.declarationDeadline}>
+            {remaining === 0 && (
+              <Trans>
+                à valider avant la fin du mois de <b>{{ nextMonth }}</b>
+              </Trans>
+            )}
+            {remaining > 0 && (
+              <Trans count={remaining}>
+                Encore <b>{{ remaining }} lots</b> en attente de validation pour cette période
+              </Trans>
+            )}
+          </span>
+        )}
 
         {declaration?.declared ? (
           <Button disabled level="success" icon={Check}>
-            Déclaration validée !
+            <Trans>
+              Déclaration validée !
+            </Trans>
           </Button>
         ) : (
           <AsyncButton
+            disabled={summary?.data?.remaining !== 0}
             loading={validating.loading}
             level="primary"
             icon={Check}
             onClick={askValidateDeclaration}
           >
-            Valider ma déclaration
+            <Trans>
+              Valider ma déclaration
+            </Trans>
           </AsyncButton>
         )}
         <Button icon={Return} onClick={() => onResolve()}>
-          Retour
+          <Trans>Retour</Trans>
         </Button>
       </DialogButtons>
 
-      {summary.loading && <LoaderOverlay />}
-    </Dialog>
+      { summary.loading && <LoaderOverlay />}
+    </Dialog >
   )
 }

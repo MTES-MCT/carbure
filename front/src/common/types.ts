@@ -169,11 +169,20 @@ export interface Lot {
   fused_with: null // @TODO
 }
 
+export enum DeliveryStatus {
+  Pending = "N",
+  ToFix = 'AC',
+  Fixed = 'AA',
+  Accepted = 'A',
+  Rejected = "R",
+  Frozen = "F"
+}
+
 export interface Transaction {
   id: number
   lot: Lot
   dae: string
-  delivery_status: "N" | "AC" | "AA" | "A" | "R"
+  delivery_status: DeliveryStatus,
   delivery_date: string | null
   champ_libre: string
   is_mac: boolean

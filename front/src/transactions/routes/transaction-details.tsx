@@ -1,4 +1,5 @@
 import React from "react"
+import { Trans } from 'react-i18next'
 
 import { LotStatus, EntityType } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
@@ -20,6 +21,7 @@ import {
   Save,
   ChevronLeft,
   ChevronRight,
+  Edit,
 } from "common/components/icons"
 import { Box, LoaderOverlay } from "common/components"
 import { AsyncButton, Button } from "common/components/button"
@@ -72,6 +74,8 @@ const TransactionDetails = ({
   const navigator = useNavigate(transactions)
 
   const isAdmin = entity?.entity_type === EntityType.Administration
+  const isOperator = entity?.entity_type === EntityType.Operator
+
   const isEditable = EDITABLE.includes(status)
   const isCommentable = COMMENTABLE.includes(status)
 
@@ -200,6 +204,28 @@ const TransactionDetails = ({
               Refuser
             </AsyncButton>
           </React.Fragment>
+        )}
+
+        {!isOperator && !isAdmin && status === LotStatus.Accepted && (
+          <AsyncButton
+            icon={Edit}
+            level="warning"
+            loading={acceptor.loading}
+            onClick={() => run(acceptor.amendLot)}
+          >
+            Corriger
+          </AsyncButton>
+        )}
+
+        {isOperator && status === LotStatus.Accepted && (
+          <AsyncButton
+            icon={Edit}
+            level="warning"
+            loading={acceptor.loading}
+            onClick={() => run(acceptor.askForCorrection)}
+          >
+            Demander une correction
+          </AsyncButton>
         )}
 
         <Box row className={styles.transactionNavButtons}>

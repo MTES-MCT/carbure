@@ -246,6 +246,7 @@ export function getDeclarationSummary(
     })
     .then((res) => ({
       ...normalizeSummary(res),
+      remaining: res.remaining,
       declaration: res.declaration,
     }))
 }
@@ -304,4 +305,14 @@ export function getAdminDetails(
     entity_id: entityID,
     tx_id: transactionID,
   })
+}
+
+export function amendLot(entity_id: number, tx_id: number) {
+  return api.post('/lots/amend-lot', { entity_id, tx_id })
+}
+
+export async function amendAndCommentLot(entity_id: number, tx_id: number, comment: string) {
+  const commenting = await commentLot(entity_id, tx_id, comment, "both")
+  const amending = await amendLot(entity_id, tx_id)
+  return [amending, commenting]
 }

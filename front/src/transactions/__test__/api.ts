@@ -7,10 +7,11 @@ import {
   okCountrySearch,
   okDeliverySitesSearch,
   okEntitySearch,
-  okErrors,
   okMatierePremiereSearch,
   okProductionSitesSearch,
   okTranslations,
+  okFieldsTranslations,
+  okErrorsTranslations,
 } from "common/__test__/api"
 
 import { clone } from "common/__test__/helpers"
@@ -61,6 +62,20 @@ export const okLotsSummary = rest.get(
   "/api/v3/lots/summary",
   (req, res, ctx) => {
     return res(ctx.json({ status: "success", data: data.lotsSummary }))
+  }
+)
+
+export const okDeclarationSummary = rest.post(
+  "/api/v3/lots/declaration-summary",
+  (req, res, ctx) => {
+    return res(ctx.json({ 
+      status: "success", 
+      data: { 
+        ...data.lotsSummary, 
+        declaration: data.declaration,
+        remaining: 2
+      }
+    }))
   }
 )
 
@@ -212,6 +227,8 @@ export default setupServer(
   okAdminLots,
   okAdminSnapshot,
   okLotsSummary,
+  okDeclarationSummary,
   okTranslations,
-  okErrors
+  okErrorsTranslations,
+  okFieldsTranslations,
 )
