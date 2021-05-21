@@ -45,17 +45,15 @@ const TransactionWithHook = ({ entity }: { entity: Entity }) => {
 
   return (
     <Route relative path=":id">
-      <Suspense fallback="...">
-        <TransactionDetails
-          entity={entity}
-          refresh={refresh}
-          deleter={deleter}
-          validator={validator}
-          acceptor={acceptor}
-          rejector={rejector}
-          transactions={transactions?.data?.lots.map((l) => l.id) ?? []}
-        />
-      </Suspense>
+      <TransactionDetails
+        entity={entity}
+        refresh={refresh}
+        deleter={deleter}
+        validator={validator}
+        acceptor={acceptor}
+        rejector={rejector}
+        transactions={transactions?.data?.lots.map((l) => l.id) ?? []}
+      />
     </Route>
   )
 }
@@ -119,7 +117,7 @@ function checkGESFields() {
 test("display transaction details", async () => {
   render(<TransactionWithRouter entity={producer} />)
 
-  const title = screen.getByText("Détails de la transaction")
+  const title = await screen.findByText("Détails de la transaction")
 
   await waitWhileLoading()
 
@@ -273,21 +271,21 @@ test("check transaction errors", async () => {
       node?.textContent === "Ce lot doit être validé avant le 29 février 2020"
   )
 
-  const dae = screen.getByTitle("MISSING_DAE")
+  const dae = screen.getByTitle("Le DAE (ou équivalent) est manquant")
   expect(dae).toHaveClass("errorLabel")
 
-  const mp = screen.getByTitle("MISSING_FEEDSTOCK")
+  const mp = screen.getByTitle("La matière première est manquante")
   expect(mp).toHaveClass("errorLabel")
 
-  const bc = screen.getByTitle("MP_BC_INCOHERENT")
+  const bc = screen.getByTitle("La matière première est incohérente avec le biocarburant")
   expect(bc).toHaveClass("errorLabel")
 
   screen.getByText("Erreurs (2)")
-  screen.getByText("MISSING_DAE")
-  screen.getByText("MISSING_FEEDSTOCK")
+  screen.getByText("Le DAE (ou équivalent) est manquant")
+  screen.getByText("La matière première est manquante")
 
   screen.getByText("Remarques (1)")
-  screen.getByText("MP_BC_INCOHERENT - Biogaz de blé")
+  screen.getByText("La matière première est incohérente avec le biocarburant - Biogaz de blé")
 
   userEvent.click(screen.getByText("Retour"))
 })
@@ -450,7 +448,7 @@ test("accept sous reserve inbox lot from details", async () => {
   screen.getByText("Accepter lot")
   userEvent.click(screen.getByText("Les deux"))
   userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "test is incorrect") // prettier-ignore
-  userEvent.click(screen.getByText("Accepter et demander une correction"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   await waitWhileLoading()
 

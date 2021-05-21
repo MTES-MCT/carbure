@@ -28,5 +28,20 @@
   "Sociétés": "Sociétés",
   "Annuaire": "Annuaire",
   "Guide d'utilisation": "Guide d'utilisation",
-  "<0>Version de développement de CarbuRe :</0> les manipulations effectuées ici n'ont pas de répercussion et les déclarations ne sont pas prises en compte.": "<0>Version de développement de CarbuRe :</0> les manipulations effectuées ici n'ont pas de répercussion et les déclarations ne sont pas prises en compte."
+  "<0>Version de développement de CarbuRe :</0> les manipulations effectuées ici n'ont pas de répercussion et les déclarations ne sont pas prises en compte.": "<0>Version de développement de CarbuRe :</0> les manipulations effectuées ici n'ont pas de répercussion et les déclarations ne sont pas prises en compte.",
+  "Validation déclaration": "Validation déclaration",
+  "Confirmez-vous que les informations fournies sont valides ? Vous ne pourrez plus modifier votre déclaration ultérieurement.": "Confirmez-vous que les informations fournies sont valides ? Vous ne pourrez plus modifier votre déclaration ultérieurement.",
+  "Votre déclaration a bien été validée !": "Votre déclaration a bien été validée !",
+  "Votre déclaration n'a pas pu être validée !": "Votre déclaration n'a pas pu être validée !",
+  "Déclaration de durabilité": "Déclaration de durabilité",
+  "Les tableaux suivants vous montrent un récapitulatif de vos entrées et sorties pour la période sélectionnée.": "Les tableaux suivants vous montrent un récapitulatif de vos entrées et sorties pour la période sélectionnée.",
+  "Afin d'être comptabilisés, les brouillons que vous avez créé pour cette période devront être envoyés avant la fin du mois suivant ladite période. Une fois la totalité de ces lots validés, vous pourrez vérifier ici l'état global de vos transactions et finalement procéder à la déclaration.": "Afin d'être comptabilisés, les brouillons que vous avez créé pour cette période devront être envoyés avant la fin du mois suivant ladite période. Une fois la totalité de ces lots validés, vous pourrez vérifier ici l'état global de vos transactions et finalement procéder à la déclaration.",
+  "Pour la période <1>{{currentMonth}}</1>": "Pour la période <1>{{currentMonth}}</1>",
+  "à valider avant la fin du mois de <1>{{nextMonth}}</1>": "à valider avant la fin du mois de <1>{{nextMonth}}</1>",
+  "Encore <1>{{remaining}} lots</1> en attente de validation pour cette période": "Encore <1>1 lot</1> en attente de validation pour cette période",
+  "Encore <1>{{remaining}} lots</1> en attente de validation pour cette période_plural": "Encore <1>{{remaining}} lots</1> en attente de validation pour cette période",
+  "Déclaration validée !": "Déclaration validée !",
+  "Valider ma déclaration": "Valider ma déclaration",
+  "Retour": "Retour",
+  "Historique des corrections": "Historique des corrections"
 }

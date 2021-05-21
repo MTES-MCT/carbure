@@ -3,10 +3,9 @@ import {
   Entity,
   EntityType,
   GESOption,
-  Lot,
-  ProductionSite,
   ProductionSiteDetails,
   Transaction,
+  DeliveryStatus,
 } from "common/types"
 
 // ENTITIES
@@ -248,7 +247,7 @@ export const lot: Transaction = {
   carbure_delivery_site: deliverySite,
   unknown_delivery_site: "",
   unknown_delivery_site_country: null,
-  delivery_status: "N",
+  delivery_status: DeliveryStatus.Pending,
   champ_libre: "",
   is_forwarded: false,
   is_mac: false,

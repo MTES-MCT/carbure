@@ -21,7 +21,8 @@ import {
   ok2BSSearch,
   okRedcertSearch,
   okTranslations,
-  okErrors,
+  okErrorsTranslations,
+  okFieldsTranslations,
 } from "common/__test__/api"
 import { clone } from "common/__test__/helpers"
 
@@ -444,5 +445,6 @@ export default setupServer(
   okUpdateSN,
   okEntityRights,
   okTranslations,
-  okErrors
+  okErrorsTranslations,
+  okFieldsTranslations,
 )

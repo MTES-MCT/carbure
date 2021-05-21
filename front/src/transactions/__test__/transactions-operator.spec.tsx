@@ -400,7 +400,7 @@ test("operator: accept inbox lot (sous réserve)", async () => {
   const title = screen.getByText("Accepter lot")
   userEvent.click(screen.getByLabelText("Les deux"))
   userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "not ok")
-  userEvent.click(screen.getByText("Accepter et demander une correction"))
+  userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
 

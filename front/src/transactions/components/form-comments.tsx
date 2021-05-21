@@ -136,9 +136,16 @@ const TOPICS = [
   { value: "both", label: "Les deux" },
 ]
 
+type CommentWithTypeProps = PromptProps<CommentWithType> & {
+  title?: string,
+  description?: string
+}
+
 export const CommentWithTypePrompt = ({
+  title = "Accepter lot",
+  description = "Voulez vous accepter ce lot sous réserve ?",
   onResolve,
-}: PromptProps<CommentWithType>) => {
+}: CommentWithTypeProps) => {
   const [comment, setComment] = useState("")
   const [topic, setTopic] = useState("")
 
@@ -156,8 +163,8 @@ export const CommentWithTypePrompt = ({
 
   return (
     <Dialog onResolve={onResolve}>
-      <DialogTitle text="Accepter lot" />
-      <DialogText text="Voulez vous accepter ce lot sous réserve ?" />
+      <DialogTitle text={title} />
+      <DialogText text={description} />
 
       <Box as="form" onSubmit={onSubmit}>
         <RadioGroup value={topic} options={TOPICS} onChange={onChangeTopic} />
@@ -176,7 +183,7 @@ export const CommentWithTypePrompt = ({
             disabled={!comment || !topic}
             onClick={() => onResolve({ comment, topic })}
           >
-            Accepter et demander une correction
+            Confirmer
           </Button>
           <Button icon={Return} onClick={() => onResolve()}>
             Annuler

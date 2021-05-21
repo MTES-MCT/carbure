@@ -3,7 +3,7 @@ import cl from "clsx"
 import format from "date-fns/format"
 import fr from "date-fns/locale/fr"
 
-import { LotDetails, Transaction } from "common/types"
+import { LotDetails, Transaction, DeliveryStatus } from "common/types"
 import { Box, Title } from "common/components"
 import { hasDeadline } from "../helpers"
 
@@ -26,16 +26,18 @@ function getStatusText(
   }
 
   switch (tx.delivery_status) {
-    case "N":
+    case DeliveryStatus.Pending:
       return "En attente"
-    case "A":
+    case DeliveryStatus.Accepted:
       return isStock ? "En stock" : "Accepté"
-    case "R":
+    case DeliveryStatus.Rejected:
       return "Refusé"
-    case "AC":
+    case DeliveryStatus.ToFix:
       return isClient ? "En correction" : "À corriger"
-    case "AA":
+    case DeliveryStatus.Fixed:
       return "Corrigé"
+    case DeliveryStatus.Frozen:
+      return 'Déclaré'
   }
 }
 
@@ -52,15 +54,17 @@ function getStatusClass(
     return styles.statusWaiting
   }
 
+
   switch (tx.delivery_status) {
-    case "N":
+    case DeliveryStatus.Pending:
+    case DeliveryStatus.Fixed:
       return styles.statusWaiting
-    case "R":
+    case DeliveryStatus.Rejected:
       return styles.statusRejected
-    case "AC":
+    case DeliveryStatus.ToFix:
       return styles.statusToFix
-    case "A":
-    case "AA":
+    case DeliveryStatus.Accepted:
+    case DeliveryStatus.Frozen:
       return styles.statusAccepted
   }
 }

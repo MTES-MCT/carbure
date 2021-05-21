@@ -1,6 +1,11 @@
 import "@testing-library/jest-dom/extend-expect"
+import i18n from 'i18next';
+import { Suspense } from 'react'
 import { render as baseRender } from "@testing-library/react"
 import { configure } from "@testing-library/dom"
+import { I18nextProvider, initReactI18next } from 'react-i18next';
+import Backend from "i18next-http-backend"
+
 
 configure({
   getElementError(message) {
@@ -26,24 +31,39 @@ window.open = jest.fn()
 
 jest.setTimeout(10000)
 
-jest.mock("react-i18next", () => ({
-  // this mock makes sure any components using the translate hook can use it without a warning being shown
-  useTranslation: () => {
-    return {
-      t: (str: string) => str,
-      i18n: {
-        changeLanguage: () => new Promise(() => {}),
-      },
-    }
-  },
-  Trans: ({ children }: any) => children,
-}))
+i18n
+  .use(Backend)
+  .use(initReactI18next)
+  .init({
+    ns: ['translations', 'fields', 'errors'],
+    defaultNS: 'translations',
+    supportedLngs: ["fr"],
+    fallbackLng: "fr",
+    lng: "fr",
+    keySeparator: false,
+    nsSeparator: false,
+    react: {
+      useSuspense: true,
+    },
+    backend: {
+      loadPath: "/v2/locales/{{lng}}/{{ns}}.json",
+    },
+  });
 
 export function render(element: any) {
   const root = document.createElement("div")
   root.setAttribute("id", "root")
   document.body.append(root)
-  return baseRender(element, { container: root })
+
+  const jsx = (
+    <I18nextProvider i18n={i18n}>
+      <Suspense fallback="...">
+        {element}
+      </Suspense>
+    </I18nextProvider>
+  )
+
+  return baseRender(jsx, { container: root })
 }
 
 beforeEach(() => {

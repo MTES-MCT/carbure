@@ -350,3 +350,15 @@ export const lotsSummary = {
   },
   tx_ids: [lot.id],
 }
+
+export const declaration = {
+  id: 435,
+  entity: producer,
+  declared: false,
+  period: "2021-05-01",
+  deadline: "2021-06-30",
+  checked: false,
+  month: 5,
+  year: 2021,
+  reminder_count: 0
+}

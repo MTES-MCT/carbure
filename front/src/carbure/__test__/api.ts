@@ -1,4 +1,4 @@
-import { okErrors, okTranslations } from "common/__test__/api"
+import { okErrorsTranslations, okFieldsTranslations, okTranslations } from "common/__test__/api"
 import { setupServer } from "msw/node"
 import { okSettings } from "settings/__test__/api"
 import { okLots, okLotsSummary, okSnapshot } from "transactions/__test__/api"
@@ -9,5 +9,6 @@ export default setupServer(
   okLots,
   okLotsSummary,
   okTranslations,
-  okErrors
+  okErrorsTranslations,
+  okFieldsTranslations,
 )
