@@ -21,6 +21,7 @@ from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays,
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
 from core.xlsx_v3 import export_transactions
 from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates, send_rejection_emails, get_uploaded_files_directory
+from core.common import notify_accepted_lot_change, invalidate_declaration
 from api.v3.sanity_checks import bulk_sanity_checks
 from django_otp.decorators import otp_required
 from core.decorators import check_rights
@@ -170,9 +171,12 @@ def get_declaration_summary(request, *args, **kwargs):
     txs = LotTransaction.objects.filter(lot__status='Validated', lot__period=period_str)
     data = get_summary(txs, entity)
 
+    remaining = txs.filter(Q(carbure_client=entity) | Q(carbure_vendor=entity)).exclude(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
+
     # get associated declaration
     declaration, created = SustainabilityDeclaration.objects.get_or_create(entity=entity, period=period_date)
     data['declaration'] = declaration.natural_key()
+    data['remaining'] = remaining
     return JsonResponse({'status': 'success', 'data': data})
 
 
@@ -371,6 +375,7 @@ def accept_lot(request):
 
 @otp_required
 def accept_with_reserves(request):
+    # I want my supplier to fix something
     tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
@@ -383,6 +388,30 @@ def accept_with_reserves(request):
         rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
         if tx.carbure_client not in rights:
             return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+        tx.delivery_status = 'AC'
+        tx.save()
+    return JsonResponse({'status': 'success'})
+
+
+@check_rights('entity_id')
+def amend_lot(request, *args, **kwargs):
+    # I want to fix one of my own transaction
+    context = kwargs['context']
+    entity = context['entity']    
+    tx_ids = request.POST.getlist('tx_ids', None)
+    if not tx_ids:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
+    for tx_id in tx_ids:
+        try:
+            tx = LotTransaction.objects.get(carbure_vendor=entity, id=tx_id)
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
+        if tx.delivery_status in [LotTransaction.ACCEPTED, LotTransaction.FROZEN]:
+            # create notification / alert
+            notify_accepted_lot_change(tx)
+        if tx.delivery_status == LotTransaction.FROZEN:
+            # get period declaration and invalidate it
+            invalidate_declaration(tx, entity)
         tx.delivery_status = 'AC'
         tx.save()
     return JsonResponse({'status': 'success'})
@@ -615,12 +644,12 @@ def validate_declaration(request, *args, **kwargs):
         pm = int(period_month)
         period = datetime.date(year=py, month=pm, day=1)
         # check if we have pending transactions (received or sent)
-        txs = LotTransaction.objects.filter(lot__period=period.strftime('%Y-%m')).filter(Q(carbure_client=entity) | Q(carbure_vendor=entity)).exclude(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
+        txs = LotTransaction.objects.filter(lot__period=period.strftime('%Y-%m')).filter(Q(carbure_client=entity) | Q(carbure_vendor=entity)).exclude(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__status=LotV2.DRAFT).count()
         if txs > 0:
             return JsonResponse({'status': "error", 'message': "PENDING_TRANSACTIONS_CANNOT_DECLARE", 'data': {'pending_txs': txs}}, status=400)
         declaration, created = SustainabilityDeclaration.objects.update_or_create(entity=entity, period=period, defaults={'declared': True})
         # freeze transactions
-        LotTransaction.objects.filter(lot__period=period.strftime('%Y-%m')).filter(Q(carbure_client=entity) | Q(carbure_vendor=entity)).exclude(delivery_status__in=[LotTransaction.FROZEN]).update(delivery_status=LotTransaction.FROZEN)
+        LotTransaction.objects.filter(lot__period=period.strftime('%Y-%m')).filter(Q(carbure_client=entity) | Q(carbure_vendor=entity)).exclude(delivery_status__in=[LotTransaction.FROZEN], lot__status=LotV2.DRAFT).update(delivery_status=LotTransaction.FROZEN)
     except Exception:
         traceback.print_exc()
         return JsonResponse({'status': "error", 'message': "server error"}, status=500)

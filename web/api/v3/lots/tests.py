@@ -794,6 +794,22 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(data['transaction']['client_is_in_carbure'], True)
         
 
+    def test_corrections(self):
+        # 1 producer creates lot
+        tx_id, lot_id = self.create_lot()
+        # 2 client accepts
+        tx = LotTransaction.objects.get(id=tx_id)
+        tx.delivery_status = LotTransaction.ACCEPTED
+        tx.save()
+        tx.lot.status = LotV2.VALIDATED
+        tx.lot.save()
+
+        # 3 client requests a correction
+        
+        pass
+        
+
+
 class DeclarationTests(TransactionTestCase):
     home = os.environ['CARBURE_HOME']
     fixtures = ['{home}/web/fixtures/json/countries.json'.format(home=home), 

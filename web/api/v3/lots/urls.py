@@ -17,6 +17,7 @@ urlpatterns = [
     path('validate', views.validate_lot, name='api-v3-validate-lot'),
     path('accept', views.accept_lot, name='api-v3-accept-lot'),
     path('accept-with-reserves', views.accept_with_reserves, name='api-v3-accept-lot-with-reserves'),
+    path('amend-lot', views.amend_lot, name='api-v3-amend-lot'),
     path('reject', views.reject_lot, name='api-v3-reject-lot'),
     path('comment', views.comment_lot, name='api-v3-comment-lot'),
 
