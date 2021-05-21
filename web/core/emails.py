@@ -40,8 +40,8 @@ def send_accepted_lot_in_correction_email(tx, recipients, cc):
     email_subject = 'Carbure - Correction %s - %s - %.2f%%' % (tx.dae, tx.lot.biocarburant.name, tx.lot.ghg_reduction)
 
     if os.getenv('IMAGE_TAG', 'dev') != 'prod':
-        recipients = [r.user.email for r in UserRights.objects.filter(entity=tx.carbure_supplier, user__is_staff=True)]
-        cc = []
+        recipients = [r.user.email for r in UserRights.objects.filter(entity=tx.carbure_vendor, user__is_staff=True)]
+        cc = None
 
     email_context = {
         'tx': tx,

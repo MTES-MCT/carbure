@@ -48,7 +48,7 @@ def get_entity_lots_by_status(entity, status):
         elif status == 'tofix':
             txs = txs.filter(lot__status='Validated', delivery_status__in=['AC', 'R'])
         elif status == 'accepted':
-            txs = txs.filter(lot__status='Validated', delivery_status='A')
+            txs = txs.filter(lot__status='Validated', delivery_status__in=['A', 'F'])
         else:
             raise Exception('Unknown status')
 
@@ -67,7 +67,7 @@ def get_entity_lots_by_status(entity, status):
             txs = txs.filter(delivery_status__in=['N', 'AC', 'AA'], lot__status="Validated", is_mac=False)
         elif status == 'accepted':
             txs = txs.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
-            txs = txs.filter(lot__status='Validated', delivery_status='A')
+            txs = txs.filter(lot__status='Validated', delivery_status__in=['A', 'F'])
         else:
             raise Exception('Unknown status')
 

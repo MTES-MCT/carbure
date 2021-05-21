@@ -14,18 +14,20 @@ from django.db.models.fields import NOT_PROVIDED
 from django import db
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
+from django_otp.decorators import otp_required
 
-from core.models import TransactionUpdateHistory
-from core.models import LotV2, LotTransaction, EntityDepot, GenericError
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment, SustainabilityDeclaration
+from core.models import LotV2, LotTransaction, EntityDepot, GenericError
+from core.models import TransactionUpdateHistory
+
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
 from core.xlsx_v3 import export_transactions
 from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates, send_rejection_emails, get_uploaded_files_directory
 from core.common import notify_accepted_lot_change, invalidate_declaration
-from api.v3.sanity_checks import bulk_sanity_checks
-from django_otp.decorators import otp_required
 from core.decorators import check_rights
+from api.v3.sanity_checks import bulk_sanity_checks
 from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, filter_entity_transactions, sort_lots
+
 
 logger = logging.getLogger(__name__)
 
@@ -120,7 +122,7 @@ def get_snapshot(request, *args, **kwargs):
         draft = txs.filter(lot__status='Draft', lot__parent_lot=None).count()
         validated = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA']).count()
         tofix = txs.filter(lot__status='Validated', delivery_status__in=['AC', 'R']).count()
-        accepted = txs.filter(lot__status='Validated', delivery_status='A').count()
+        accepted = txs.filter(lot__status='Validated', delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
         data['lots'] = {'draft': draft, 'validated': validated, 'tofix': tofix, 'accepted': accepted}
     elif entity.entity_type == 'Opérateur':
         txs = LotTransaction.objects.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
@@ -128,7 +130,7 @@ def get_snapshot(request, *args, **kwargs):
         txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
         draft = txs.filter(lot__added_by=entity, lot__status='Draft').count()
         ins = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA', 'AC'], is_mac=False).count()
-        accepted = txs.filter(lot__status='Validated', delivery_status='A').count()
+        accepted = txs.filter(lot__status='Validated', delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
         data['lots'] = {'draft': draft, 'accepted': accepted, 'in': ins}
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
@@ -381,14 +383,18 @@ def accept_with_reserves(request):
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
     for tx_id in tx_ids:
         try:
-            tx = LotTransaction.objects.get(delivery_status__in=['N', 'AC', 'AA'], id=tx_id)
+            tx = LotTransaction.objects.get(id=tx_id)
         except Exception:
             return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
 
         rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
         if tx.carbure_client not in rights:
             return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-        tx.delivery_status = 'AC'
+        if tx.delivery_status == LotTransaction.FROZEN:
+            # 
+            # send email
+            pass
+        tx.delivery_status = LotTransaction.TOFIX
         tx.save()
     return JsonResponse({'status': 'success'})
 
@@ -643,12 +649,12 @@ def validate_declaration(request, *args, **kwargs):
         pm = int(period_month)
         period = datetime.date(year=py, month=pm, day=1)
         # check if we have pending transactions (received or sent)
-        txs = LotTransaction.objects.filter(lot__period=period.strftime('%Y-%m')).filter(Q(carbure_client=entity) | Q(carbure_vendor=entity)).exclude(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__status=LotV2.DRAFT).count()
-        if txs > 0:
-            return JsonResponse({'status': "error", 'message': "PENDING_TRANSACTIONS_CANNOT_DECLARE", 'data': {'pending_txs': txs}}, status=400)
+        txs = LotTransaction.objects.filter(lot__period=period.strftime('%Y-%m')).filter(Q(carbure_client=entity) | Q(carbure_vendor=entity)).exclude(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).exclude(lot__status=LotV2.DRAFT)
+        if txs.count() > 0:
+            return JsonResponse({'status': "error", 'message': "PENDING_TRANSACTIONS_CANNOT_DECLARE", 'data': {'pending_txs': txs.count(), 'ids': [t.id for t in txs]}}, status=400)
         declaration, created = SustainabilityDeclaration.objects.update_or_create(entity=entity, period=period, defaults={'declared': True})
         # freeze transactions
-        LotTransaction.objects.filter(lot__period=period.strftime('%Y-%m')).filter(Q(carbure_client=entity) | Q(carbure_vendor=entity)).exclude(delivery_status__in=[LotTransaction.FROZEN], lot__status=LotV2.DRAFT).update(delivery_status=LotTransaction.FROZEN)
+        LotTransaction.objects.filter(lot__period=period.strftime('%Y-%m')).filter(Q(carbure_client=entity) | Q(carbure_vendor=entity)).exclude(delivery_status__in=[LotTransaction.FROZEN]).exclude(lot__status=LotV2.DRAFT).update(delivery_status=LotTransaction.FROZEN)
     except Exception:
         traceback.print_exc()
         return JsonResponse({'status': "error", 'message': "server error"}, status=500)
