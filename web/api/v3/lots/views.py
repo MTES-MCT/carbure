@@ -398,22 +398,21 @@ def amend_lot(request, *args, **kwargs):
     # I want to fix one of my own transaction
     context = kwargs['context']
     entity = context['entity']    
-    tx_ids = request.POST.getlist('tx_ids', None)
-    if not tx_ids:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
-    for tx_id in tx_ids:
-        try:
-            tx = LotTransaction.objects.get(carbure_vendor=entity, id=tx_id)
-        except Exception:
-            return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
-        if tx.delivery_status in [LotTransaction.ACCEPTED, LotTransaction.FROZEN]:
-            # create notification / alert
-            notify_accepted_lot_change(tx)
-        if tx.delivery_status == LotTransaction.FROZEN:
-            # get period declaration and invalidate it
-            invalidate_declaration(tx, entity)
-        tx.delivery_status = 'AC'
-        tx.save()
+    tx_id = request.POST.get('tx_id', None)
+    if not tx_id:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_id"}, status=403)
+    try:
+        tx = LotTransaction.objects.get(carbure_vendor=entity, id=tx_id)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
+    if tx.delivery_status in [LotTransaction.ACCEPTED, LotTransaction.FROZEN]:
+        # create notification / alert
+        notify_accepted_lot_change(tx)
+    if tx.delivery_status == LotTransaction.FROZEN:
+        # get period declaration and invalidate it
+        invalidate_declaration(tx, entity)
+    tx.delivery_status = LotTransaction.TOFIX
+    tx.save()
     return JsonResponse({'status': 'success'})
 
 

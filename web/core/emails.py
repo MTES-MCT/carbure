@@ -5,7 +5,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template import loader
 from django.conf import settings
 import os
-from core.models import UserRightsRequests, Entity
+from core.models import UserRightsRequests, Entity, UserRights
 
 def send_reject_email(vendor, txs):
     email_subject = 'Carbure - Lots Refusés'
@@ -38,6 +38,10 @@ def send_reject_email(vendor, txs):
 
 def send_accepted_lot_in_correction_email(tx, recipients, cc):
     email_subject = 'Carbure - Correction %s - %s - %.2f%%' % (tx.dae, tx.lot.biocarburant.name, tx.lot.ghg_reduction)
+
+    if os.getenv('IMAGE_TAG', 'dev') != 'prod':
+        recipients = [r.user.email for r in UserRights.objects.filter(entity=tx.carbure_supplier, user__is_staff=True)]
+        cc = []
 
     email_context = {
         'tx': tx,
