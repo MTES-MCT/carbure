@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Dict, List, Optional
 from pandas._typing import FilePathOrBuffer, Scalar
 from django.db import transaction
 
-from django.http import JsonResponse
+
 from core.models import LotV2, LotTransaction, UserRights, GenericError
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
 
@@ -21,7 +21,7 @@ from certificates.models import DBSCertificate, EntityDBSTradingCertificate
 from certificates.models import REDCertCertificate, EntityREDCertTradingCertificate
 from certificates.models import EntitySNTradingCertificate, SNCertificate
 
-from core.emails import send_reject_email
+from core.emails import send_reject_email, send_accepted_lot_in_correction_email
 
 import dateutil.parser
 from api.v3.sanity_checks import bulk_sanity_checks, tx_is_valid, lot_is_valid
@@ -1019,3 +1019,20 @@ def send_rejection_emails(rejected_txs):
 
     for vendor, txs in reject_by_vendors.items():
         send_reject_email(vendor, txs)
+
+
+def notify_accepted_lot_change(tx):
+    recipients = [ur.user.email for ur in UserRights.objects.filter(entity=tx.carbure_vendor, user__is_staff=False)]
+    cc = []
+    if tx.carbure_client:
+        cc += [ur.user.email for ur in UserRights.objects.filter(entity=tx.carbure_client, user__is_staff=False)]
+
+    if tx.delivery_status == LotTransaction.FROZEN:
+        # add administration in copy
+        cc += 'carbure@beta.gouv.fr'
+
+    send_accepted_lot_in_correction_email(tx, recipients, cc)
+
+
+def invalidate_declaration(tx, entity):
+    year, month = tx.lot.period.split('-')
