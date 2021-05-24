@@ -65,7 +65,6 @@ services:
       dockerfile: docker/Dockerfile.frontend
     volumes:
       - ./front:/app # needed for hot-reloading
-      - node_modules:/app/node_modules
     networks:
       - carbure
 
@@ -96,8 +95,6 @@ services:
 volumes:
   carburedb:
     name: carbure_carburedb
-  node_modules:
-    name: carbure_nodemodules
   uploadedfiles:
     name: carbure_uploadedfiles
 
