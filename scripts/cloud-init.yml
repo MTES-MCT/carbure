@@ -1,0 +1,76 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+
+manage-resolv-conf: true
+resolv_conf:
+  nameservers:
+    - '8.8.8.8'
+    - '8.8.4.4'
+
+packages:
+  - python3-minimal
+  - sudo
+  - ufw
+  - fail2ban
+  - unattended-upgrades
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg-agent
+  - software-properties-common
+  - python3-pip
+  - libpam-google-authenticator
+
+groups:
+  - deploy
+  - wheel
+  - docker
+
+users:
+  - name: deploy
+    shell: /bin/bash
+    primary_group: deploy
+    groups: [wheel, docker]
+    lock_passwd: true
+    passwd: $6$g7u1OVAIIn$OXUg68fKHEBAR2uHMcbAfOrmu1efGAm4A8YARjWucSvi7iTLaRmT2ZzXX3aFg1KCmPSp/rzWZYYmxF/7Swyeq.
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDmkIutQiRkWayA+GH01UghNgjrzeUp63mTejBEQDPUUVyREF9T80O5csEVAHY0atoCMrstOTBVXgknfQ4NntnQguRqp+ouEx1ZomGGxN9eiibGT5A89N9cU4zxlW6Kn/YseTOVvhXsUDYiKr6wvjiXg4SvvyuRnwXSw1+NTtoVqofglmuTPZBvDio9KIL7MPm7W64IGXSy+GiwNWcPoRu1ON/Y20/L4iAyCoYIU7tBlieDcqZEyrGlJIcvaLKS8v23wXWozBXkqxcPgFFFGe/KAj3Y9EhGopZc/3wtUg32B5i8cDonGwnz0ZCjmmZZQES1qS6wzAhvTOcZ7jEWFPFl martin@martin-desktop
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/oG5yoLcR2bfQuR0N7BexWR78jsqJWaIBj9PbSfQA/cabuHym2jkT4OUBlZaDMCFmxSb8aUKe0/JF5XJyrbHhhgrRc4uOynIsw6tXi0ExXLjzqg2JeXwgWyeiMOoFTvVHW9vOvjuMXDOnWSLRAzoBtXVG83bUJ22bpTikxlFibx/hS1K5VrHxbwt0JeCbH85ToHgje81vRdY5E5Qstt3mVGRrzU/65eulXXZtsJ9b3ve1oxzSnQ8ywgV9UbQAlt042oNSNB41pic2Q58laVIgBjA5ifcCHlURXF83CnUaLDvaSAyjhlsiuOxuPk/CcSfsD7Bd6McSvIWB6mpfZrCB mplanes@mplanes-ThinkPad-E480
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDliSR/UiRhpPdHsP/QW6yepVknmUuDaK5CytCq8JNuEHnNqfzvmfCXzrovP4pUv7S4HlLtH91WlBX1A3FHC5fyjuBuFPO88QaJaZqMkw+2eH3vVyZnjFmD8yNHAISLs1Bim+xSEwPKxp6D8figomF7XWS4+F6uioLb1ZtTzVgAlXUv2W2oZ0hAIrTAZhaRuM9oZVgzoV6a003qeGYJXvmSTosOABQi5q0A8qYiPvpjTh8tHe9r4c+Vu3Hi2OIrtC7WKUZ7J8m7XzCdQngg1e9+C9v3SF+97rvqnSQOkfVfLM3qJpWRTs9EAe4/2rYWZVaXOGgpnNMquqomrQJeEX3aEP3HfCY2cytOu8wa02gBZISHtjTfSgsO9eet41lpPS17U407VADN9N8yfidDVzKVy4P4Djh2mgAg1fSqpQa4swlNt2eazhCNdpIgebeBJROa8+hneAnoiTYrUPYm+mDRnbKfAA0Ib2PmQPHUW0E2yHUNxMtZq0niXfLOTqWZvH4vGaIAFMJYRfQIoLEYUXutWNBHr4anbkU+78c+6+FMG4Pew/T/+6VQGdmlaQJHA27GRL9gekVdbyU0ZJF9waqQy8BjV03VvbxUeq9HKccXq3H2smRHh8q9ZUyRQqLuQdu/hEp5LRykRKO7eHHLXbi3861y5WkCTq2mUj96PQqw6w== jfalxa.sta@gmail.com
+
+
+runcmd:
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+  - add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - apt-get update -y
+  - apt-get install docker-ce docker-ce-cli containerd.io -y
+  - systemctl start docker
+  - systemctl enable docker
+  - pip3 install docker-compose
+  - sed -i -e '/^PermitRootLogin/s/^.*$/PermitRootLogin no/' /etc/ssh/sshd_config
+  - sed -i -e '/^#?PasswordAuthentication/s/^.*$/PasswordAuthentication no/' /etc/ssh/sshd_config
+  - sed -i -e '/^#?AllowUsers/s/^.*$/AllowUsers deploy/' /etc/ssh/sshd_config  
+  - ufw allow 22/tcp
+  - ufw allow 80/tcp
+  - ufw allow 443/tcp
+  - ufw enable
+  - echo "auth required pam_google_authenticator.so nullok" >> /etc/pam.d/sshd
+  - sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/g' /etc/ssh/sshd_config
+  - echo "AuthenticationMethods publickey,password publickey,keyboard-interactive" >> /etc/ssh/sshd_config
+  - sed -i 's/@include common-auth/#@include common-auth/g' /etc/pam.d/sshd
+  - systemctl restart sshd.service
+  # todo manually:
+  # push ~/.google-authenticator and .env
+  # push docker-compose.yml, crontabs
+  # load db backup and run
+
+power_state:
+  delay: "+30"
+  mode: reboot
+  message: Bye Bye
+  timeout: 30
+  condition: True
