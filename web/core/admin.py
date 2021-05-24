@@ -135,7 +135,7 @@ class TransactionAdmin(admin.ModelAdmin):
     list_filter = ('lot__status', ('lot__biocarburant', NameSortedRelatedOnlyDropdownFilter), ('lot__matiere_premiere', NameSortedRelatedOnlyDropdownFilter), 'delivery_status', ('lot__period', DropdownFilter), 'client_is_in_carbure', ('carbure_vendor', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
                    'is_mac', 'is_batch', 'delivery_site_is_in_carbure', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter), ('lot__carbure_production_site', NameSortedRelatedOnlyDropdownFilter), TxPartOfForwardListFilter)
     raw_id_fields = ('lot', 'parent_tx')
-    actions = ['rerun_sanity_checks', 'delete_ghosts', 'change_transaction_delivery_site', 'change_transaction_client', 'delete_errors', 'assign_transaction_certificate', 'change_transaction_delivery_status']
+    actions = ['rerun_sanity_checks', 'delete_ghosts', 'change_transaction_delivery_site', 'change_transaction_client', 'assign_transaction_certificate', 'change_transaction_delivery_status']
 
 
     def get_lot_mp(self, obj):
@@ -193,13 +193,6 @@ class TransactionAdmin(admin.ModelAdmin):
     delete_ghosts.short_description = "Supprimer Transactions Fantômes"
 
 
-    def delete_errors(self, request, queryset):
-        lots = [tx.lot for tx in queryset]
-        nb_deleted, _ = LotValidationError.objects.filter(lot__in=lots).delete()
-        self.message_user(request, '%d errors deleted.' % nb_deleted, messages.SUCCESS)
-    delete_errors.short_description = "Supprimer Erreurs"
-
-
     class AssignSupplierCertificateTransactionForm(forms.Form):
         _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)
         certificates = []
@@ -236,7 +229,9 @@ class TransactionAdmin(admin.ModelAdmin):
 
     class ChangeTransactionClientForm(forms.Form):
         _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)
-        new_client = forms.ModelChoiceField(Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER]))
+        new_client = forms.ModelChoiceField(Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER]), required=False)
+        unknown_client = forms.CharField(required=False)
+        is_unknown_client = forms.BooleanField(initial=False)
 
     def change_transaction_client(self, request, queryset):
         form = None
@@ -244,14 +239,22 @@ class TransactionAdmin(admin.ModelAdmin):
             form = self.ChangeTransactionClientForm(request.POST)
             if form.is_valid():
                 new_client = form.cleaned_data['new_client']
+                unknown_client = form.cleaned_data['unknown_client']
+                is_unknown_client = form.cleaned_data['is_unknown_client']
                 count = 0
                 for tx in queryset:
-                    tx.carbure_client = new_client
-                    tx.unknown_client = ''
-                    tx.delivery_status = 'N'
-                    tx.client_is_in_carbure = True
+                    if is_unknown_client:
+                        tx.unknown_client = unknown_client
+                        tx.carbure_client = None
+                        tx.client_is_in_carbure = False
+                        tx.delivery_status = LotTransaction.ACCEPTED
+                    else:
+                        tx.carbure_client = new_client
+                        tx.unknown_client = ''
+                        tx.client_is_in_carbure = True
+                        tx.delivery_status = LotTransaction.PENDING
+                        GenericError.objects.filter(tx=tx, field='unknown_client').delete()
                     tx.save()
-                    GenericError.objects.filter(tx=tx, field='unknown_client').delete()
                     count += 1
                 self.message_user(request, "Successfully reassigned %d transactions to %s." % (count, new_client))
                 return HttpResponseRedirect(request.get_full_path())
