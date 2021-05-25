@@ -100,8 +100,6 @@ services:
     image: metabase/metabase
     depends_on:
       - carbure-mariadb
-    ports:
-      - 127.0.0.1:3000:3000
     networks:
       - carbure
     volumes:
