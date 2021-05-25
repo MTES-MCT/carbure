@@ -1,6 +1,6 @@
 .formGroup {
   flex: 1 0;
-  min-width: 320px;
+  min-width: 0;
 }
 
 .formGroup ~ .formGroup {
@@ -8,8 +8,7 @@
 }
 
 .formGroup.narrow {
-  min-width: unset;
-  max-width: 96px;
+  flex: 0.3 0;
 }
 
 .formGroupTitle {
