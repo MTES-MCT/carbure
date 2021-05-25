@@ -57,12 +57,12 @@ function getStatusClass(
 
   switch (tx.delivery_status) {
     case DeliveryStatus.Pending:
-    case DeliveryStatus.Fixed:
       return styles.statusWaiting
     case DeliveryStatus.Rejected:
       return styles.statusRejected
     case DeliveryStatus.ToFix:
-      return styles.statusToFix
+        return styles.statusToFix
+    case DeliveryStatus.Fixed:
     case DeliveryStatus.Accepted:
     case DeliveryStatus.Frozen:
       return styles.statusAccepted
