@@ -70,7 +70,7 @@ function checkLotFields() {
   screen.getByLabelText("Numéro douanier (DAE, DAA...)")
   screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°)")
   screen.getByLabelText("Biocarburant")
-  screen.getByLabelText("Matiere premiere")
+  screen.getByLabelText("Matière première")
   screen.getByLabelText("Pays d'origine de la matière première")
 }
 
@@ -173,7 +173,7 @@ test("edit transaction details", async () => {
   userEvent.type(bio, "EM")
   userEvent.click(await screen.findByText("EMHV"))
 
-  const mp = screen.getByLabelText("Matiere premiere *")
+  const mp = screen.getByLabelText("Matière première *")
   userEvent.clear(mp)
   userEvent.type(mp, "Co")
   userEvent.click(await screen.findByText("Colza"))
@@ -271,14 +271,11 @@ test("check transaction errors", async () => {
       node?.textContent === "Ce lot doit être validé avant le 29 février 2020"
   )
 
-  const dae = screen.getByTitle("Le DAE (ou équivalent) est manquant")
+  const dae = screen.getByTitle("Numéro douanier (DAE, DAA...) - Le DAE (ou équivalent) est manquant")
   expect(dae).toHaveClass("errorLabel")
 
-  const mp = screen.getByTitle("La matière première est manquante")
+  const mp = screen.getByTitle("Matière première - La matière première est manquante")
   expect(mp).toHaveClass("errorLabel")
-
-  const bc = screen.getByTitle("La matière première est incohérente avec le biocarburant")
-  expect(bc).toHaveClass("errorLabel")
 
   screen.getByText("Erreurs (2)")
   screen.getByText("Le DAE (ou équivalent) est manquant")

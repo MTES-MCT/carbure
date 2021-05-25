@@ -238,7 +238,7 @@ def tx_is_valid(tx, prefetched_data):
     # make sure all mandatory fields are set
     if not tx.dae:
         extra = 'DAE manquant'
-        errors.append(generic_error(error='MISSING_DAE', tx=tx, field='dae', extra=extra))
+        errors.append(generic_error(error='MISSING_DAE', tx=tx, field='dae', extra=extra, is_blocking=True))
         is_valid = False
     if not tx.is_mac:
         if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site:

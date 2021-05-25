@@ -92,7 +92,7 @@ test("producer/trader: display a list of 1 transaction", async () => {
   screen.getByText("Période")
   screen.getByText("N° Douane")
   screen.getByText("Biocarburant (litres)")
-  screen.getByText("Matiere premiere")
+  screen.getByText("Matière première")
   screen.getByText("Client")
   screen.getByText("Site de production")
   screen.getByText("Site de livraison")
