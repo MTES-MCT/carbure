@@ -21,6 +21,8 @@ export function useFieldErrors(errors: GenericError[]) {
   const fieldErrors: { [k: string]: string } = {}
 
   errors.forEach((err) => {
+    if (!err.is_blocking) return
+
     if (err.field) {
       fieldErrors[err.field] = t(err.error)
     }
