@@ -40,7 +40,7 @@ function checkLotFields() {
   screen.getByLabelText("Numéro douanier (DAE, DAA...) *")
   screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°) *")
   screen.getByLabelText("Biocarburant *")
-  screen.getByLabelText("Matiere premiere *")
+  screen.getByLabelText("Matière première *")
   screen.getByLabelText("Pays d'origine de la matière première *")
 }
 
@@ -164,7 +164,7 @@ test("check the form fields are working", async () => {
   userEvent.type(screen.getByLabelText("Biocarburant *"), "EM")
   userEvent.click(await screen.findByText("EMHV"))
 
-  userEvent.type(screen.getByLabelText("Matiere premiere *"), "Co")
+  userEvent.type(screen.getByLabelText("Matière première *"), "Co")
   userEvent.click(await screen.findByText("Colza"))
 
   userEvent.type(
