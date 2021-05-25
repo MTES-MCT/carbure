@@ -137,11 +137,7 @@ export const TransactionList = ({
               {isProducer && <ProducerImportActions uploader={uploader} />}
               {isTrader && <TraderImportActions uploader={uploader} />}
               {isOperator && <OperatorImportActions uploader={uploader} />}
-            </React.Fragment>
-          )}
 
-          {status.is(LotStatus.Draft) && (
-            <React.Fragment>
               <CreateActions />
 
               <DraftActions

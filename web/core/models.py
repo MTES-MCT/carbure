@@ -13,8 +13,10 @@ class Entity(models.Model):
     OPERATOR = 'Opérateur'
     TRADER = 'Trader'
     ADMIN = 'Administration'
+    AUDITOR = 'Auditor'
     ENTITY_TYPES = ((PRODUCER, 'Producteur'), (OPERATOR, 'Opérateur'),
-                    (ADMIN, 'Administration'), (TRADER, 'Trader'), ('Unknown', 'Unknown'))
+                    (ADMIN, 'Administration'), (TRADER, 'Trader'),
+                    (AUDITOR, 'Auditeur'), ('Unknown', 'Unknown'))
 
     name = models.CharField(max_length=64, unique=True)
     date_added = models.DateTimeField(auto_now_add=True)
@@ -595,7 +597,7 @@ class TransactionUpdateHistory(models.Model):
     modified_by_entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
 
     def natural_key(self):
-        return {'tx_id': self.tx.id, 'update_type': self.update_type,  'datetime': self.datetime, 'field': self.field, 'value_before': self.value_before, 'value_after': self.value_after, 
+        return {'tx_id': self.tx.id, 'update_type': self.update_type,  'datetime': self.datetime, 'field': self.field, 'value_before': self.value_before, 'value_after': self.value_after,
         'modified_by': self.modified_by.email if self.modified_by else '', 'entity': self.modified_by_entity.name if self.modified_by_entity else ''}
 
     class Meta:
