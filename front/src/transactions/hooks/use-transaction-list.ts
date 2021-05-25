@@ -7,14 +7,20 @@ import { YearSelection } from "transactions/hooks/query/use-year"
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
 
+function snapshotGetter(entity: EntitySelection) {
+  switch (entity?.entity_type) {
+    case EntityType.Administration:
+      return api.getAdminSnapshot
+    case EntityType.Auditor:
+      return api.getAuditorSnapshot
+    default:
+      return api.getSnapshot
+  }
+}
+
 // fetches current snapshot when parameters change
 export function useGetSnapshot(entity: EntitySelection, year: YearSelection) {
-  const snapshotGetter =
-    entity?.entity_type === EntityType.Administration
-      ? api.getAdminSnapshot
-      : api.getSnapshot
-
-  const [snapshot, resolveSnapshot] = useAPI(snapshotGetter)
+  const [snapshot, resolveSnapshot] = useAPI(snapshotGetter(entity))
 
   const entityID = entity?.id
   const years = snapshot.data?.years
@@ -39,6 +45,17 @@ export function useGetSnapshot(entity: EntitySelection, year: YearSelection) {
   return { ...snapshot, getSnapshot }
 }
 
+function lotsGetter(entity: EntitySelection) {
+  switch (entity?.entity_type) {
+    case EntityType.Administration:
+      return api.getAdminLots
+    case EntityType.Auditor:
+      return api.getAuditorLots
+    default:
+      return api.getLots
+  }
+}
+
 export interface LotGetter {
   loading: boolean
   error: string | null
@@ -52,12 +69,7 @@ export function useGetLots(
   entity: EntitySelection,
   filters: TransactionQuery
 ): LotGetter {
-  const lotsGetter =
-    entity?.entity_type === EntityType.Administration
-      ? api.getAdminLots
-      : api.getLots
-
-  const [transactions, resolveLots] = useAPI(lotsGetter)
+  const [transactions, resolveLots] = useAPI(lotsGetter(entity))
 
   function exportAllTransactions() {
     if (entity === null) return

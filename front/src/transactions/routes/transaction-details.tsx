@@ -1,5 +1,4 @@
 import React from "react"
-import { Trans } from 'react-i18next'
 
 import { LotStatus, EntityType } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
