@@ -350,7 +350,7 @@ def validate_lot(request, *args, **kwargs):
     tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
-    txs = LotTransaction.objects.filter(id__in=tx_ids, lot__added_by=entity)
+    txs = LotTransaction.objects.filter(Q(id__in=tx_ids) & (Q(lot__added_by=entity) | Q(carbure_vendor=entity)))
     data = validate_lots(request.user, entity, txs)
     nb_duplicates = check_duplicates(txs, background=False)
     data['duplicates'] = nb_duplicates
