@@ -257,7 +257,7 @@ def update_lot(request, *args, **kwargs):
                                 full_field_name = subfield
                             TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.ADD, field=full_field_name, value_before='', value_after=value, modified_by=request.user, modified_by_entity=entity)
                     else:
-                        print('add not list %s' % (d))                   
+                        print('add not list %s' % (d))
                 if action == 'remove':
                     if isinstance(data, list):
                         for (subfield, value) in data:
@@ -392,7 +392,7 @@ def accept_with_reserves(request):
         if tx.carbure_client not in rights:
             return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
         if tx.delivery_status == LotTransaction.FROZEN:
-            # 
+            #
             # send email
             pass
         tx.delivery_status = LotTransaction.TOFIX
@@ -404,7 +404,7 @@ def accept_with_reserves(request):
 def amend_lot(request, *args, **kwargs):
     # I want to fix one of my own transaction
     context = kwargs['context']
-    entity = context['entity']    
+    entity = context['entity']
     tx_id = request.POST.get('tx_id', None)
     if not tx_id:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_id"}, status=403)
@@ -454,13 +454,27 @@ def reject_lot(request):
         txerr.comment = tx_comment
         txerr.save()
 
-        # special case
+        # special case 1
         # if the rejected lot has been forwarded by an operator, the operator has no way to see it
         # so we actually delete the forwarded tx and send an email to the tx source
-        if tx.parent_tx != None and tx.carbure_vendor.entity_type == Entity.OPERATOR:
+        if tx.parent_tx is not None and tx.carbure_vendor.entity_type == Entity.OPERATOR:
             # cancel forward
             tx.parent_tx.is_forwarded = False
             tx.parent_tx.save()
+            tx.delete()
+        # special case 2
+        # if the rejected transaction came from stocks, move this transaction back to drafts
+        # and recredit the parent lot with the corresponding volume
+        elif tx.lot.parent_lot is not None:
+            tx.delivery_status = 'N'
+            tx.lot.status = 'Draft'
+            tx.lot.parent_lot.remaining_volume += tx.lot.volume
+            tx.lot.parent_lot.save()
+            tx.lot.save()
+            tx.save()
+
+            # if tx.carbure_vendor.entity_type == Entity.OPERATOR:
+
         tx.comment = tx_comment
         tx_rejected.append(tx)
 
@@ -687,12 +701,13 @@ def forward_lots(request, *args, **kwargs):
         if tx.carbure_delivery_site in depots:
             # it has been delivered to a Depot with outsourced blending
             # we should forward the lot to the blender
+            parent_tx_id = tx.id
             tx.delivery_status = 'A'
             tx.is_forwarded = True
             tx.save()
             new_tx = tx
             new_tx.pk = None
-            new_tx.parent_tx_id = tx.id
+            new_tx.parent_tx_id = parent_tx_id
             new_tx.is_forwarded = False
             new_tx.carbure_vendor = entity
 
