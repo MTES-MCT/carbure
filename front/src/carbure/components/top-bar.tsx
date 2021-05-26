@@ -90,6 +90,7 @@ const langOptions = [
   { value: "en", label: "EN" },
 ]
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const LanguageSelection = () => {
   const { i18n } = useTranslation()
 
