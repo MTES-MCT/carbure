@@ -6,11 +6,11 @@ export const LotFields = ({
   readOnly,
   data,
   errors,
-  stock,
+  editable,
   onChange,
 }: FieldsProps) => (
   <FormGroup
-    readOnly={stock || readOnly}
+    readOnly={readOnly || !editable}
     title="Lot"
     data={data}
     errors={errors}
