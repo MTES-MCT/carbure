@@ -77,6 +77,7 @@ const TransactionDetails = ({
 
   const isEditable = EDITABLE.includes(status)
   const isCommentable = COMMENTABLE.includes(status)
+  const isVendorOperator = transaction?.carbure_vendor?.entity_type === EntityType.Operator
 
   const hasErrors =
     validationErrors.length > 0 || Object.keys(fieldErrors).length > 0
@@ -183,7 +184,7 @@ const TransactionDetails = ({
               Accepter
             </AsyncButton>
 
-            {!transaction?.lot.parent_lot && (
+            {(!transaction?.lot.parent_lot && !isVendorOperator) && (
               <AsyncButton
                 icon={AlertTriangle}
                 level="warning"
@@ -216,7 +217,7 @@ const TransactionDetails = ({
           </AsyncButton>
         )}
 
-        {isOperator && status === LotStatus.Accepted && (
+        {isOperator && !isVendorOperator && status === LotStatus.Accepted && (
           <AsyncButton
             icon={Edit}
             level="warning"
