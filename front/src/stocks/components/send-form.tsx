@@ -26,6 +26,8 @@ export interface StockSendDetails {
   delivery_site: DeliverySite | string | null
   delivery_site_country: Country | null
   mac: boolean
+  carbure_vendor_certificate: string
+  carbure_vendor: EntitySelection
 }
 
 type StockSendLotPromptProps = {
@@ -44,6 +46,8 @@ export const StockSendLotPrompt = ({
     delivery_site: null,
     delivery_site_country: null,
     mac: false,
+    carbure_vendor_certificate: '',
+    carbure_vendor: entity
   })
 
   function onSubmit(e: React.FormEvent) {
@@ -65,6 +69,7 @@ export const StockSendLotPrompt = ({
           <Fields.Volume />
           <Fields.Dae />
           <Fields.DeliveryDate required />
+          <Fields.CarbureSelfCertificate />
           {entity?.has_mac && <Fields.Mac />}
           <Fields.Client required search={!data.mac} />
           <Fields.DeliverySite />

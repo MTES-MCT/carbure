@@ -444,6 +444,7 @@ export type StockDraft = {
   delivery_site: string
   delivery_site_country?: string
   mac: boolean
+  vendor_certificate: string
 }
 
 export interface Declaration {
