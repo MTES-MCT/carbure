@@ -134,11 +134,12 @@ export const Checkbox = ({
   disabled,
   readOnly,
   className,
+  name,
   onChange,
   ...props
 }: CheckboxProps) => {
   const handleChange = onChange
-    ? () => onChange({ target: { type: "checkbox", checked: !checked } })
+    ? () => onChange({ target: { type: "checkbox", checked: !checked, name } })
     : undefined
 
   return (
@@ -172,13 +173,14 @@ export const LabelCheckbox = ({
   readOnly,
   value,
   checked,
+  name,
   onChange,
   ...props
 }: LabelCheckboxProps) => {
   const id = useRef(Math.random().toString(36).slice(2))
 
   const handleChange = onChange
-    ? () => onChange({ target: { type: "checkbox", checked: !checked } })
+    ? () => onChange({ target: { type: "checkbox", checked: !checked, name } })
     : undefined
 
   return (
@@ -193,6 +195,7 @@ export const LabelCheckbox = ({
     >
       <Checkbox
         {...props}
+        name={name}
         disabled={disabled}
         checked={checked ?? value}
         onChange={onChange}
