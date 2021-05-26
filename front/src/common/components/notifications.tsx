@@ -6,6 +6,7 @@ import styles from "./notifications.module.css"
 
 import { Box } from "."
 import { Cross } from "./icons"
+import { useTranslation } from "react-i18next"
 
 const DEFAULT_TIMEOUT = 10000
 
@@ -69,6 +70,8 @@ type NotificationsProps = {
 }
 
 const Notifications = ({ notifications }: NotificationsProps) => {
+  const { t } = useTranslation()
+
   if (notifications.list.length === 0) {
     return null
   }
@@ -96,7 +99,7 @@ const Notifications = ({ notifications }: NotificationsProps) => {
             </ul>
           )}
           <Cross
-            title="Fermer la notification"
+            title={t("Fermer la notification")}
             size={32}
             onClick={() => notifications.dispose(n.key)}
           />
