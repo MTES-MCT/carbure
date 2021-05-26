@@ -1,3 +1,4 @@
+import { Trans } from "react-i18next"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { SettingsGetter } from "./hooks/use-get-settings"
 
@@ -77,17 +78,47 @@ const Settings = ({ entity, settings }: SettingsProps) => {
       </SettingsHeader>
 
       <Sticky>
-        <a href="#options">Options</a>
-        <a href="#depot">Dépôts</a>
-        {isProducer && <a href="#production">Sites de production</a>}
-        {hasCertificates && <a href="#iscc">Certificats ISCC</a>}
-        {hasCertificates && <a href="#2bs">Certificats 2BS</a>}
-        {hasCertificates && <a href="#red">Certificats REDcert</a>}
-        {hasCertificates && <a href="#sn">Certificats Système National</a>}
-        {!hasCertificates && hasCSN && (
-          <a href="#sn">Certificats Système National</a>
+        <a href="#options">
+          <Trans>Options</Trans>
+        </a>
+        <a href="#depot">
+          <Trans>Dépôts</Trans>
+        </a>
+        {isProducer && (
+          <a href="#production">
+            <Trans>Sites de production</Trans>
+          </a>
         )}
-        {rights.is(UserRole.Admin) && <a href="#users">Utilisateurs</a>}
+        {hasCertificates && (
+          <a href="#iscc">
+            <Trans>Certificats ISCC</Trans>
+          </a>
+        )}
+        {hasCertificates && (
+          <a href="#2bs">
+            <Trans>Certificats 2BS</Trans>
+          </a>
+        )}
+        {hasCertificates && (
+          <a href="#red">
+            <Trans>Certificats REDcert</Trans>
+          </a>
+        )}
+        {hasCertificates && (
+          <a href="#sn">
+            <Trans>Certificats Système National</Trans>
+          </a>
+        )}
+        {!hasCertificates && hasCSN && (
+          <a href="#sn">
+            <Trans>Certificats Système National</Trans>
+          </a>
+        )}
+        {rights.is(UserRole.Admin) && (
+          <a href="#users">
+            <Trans>Utilisateurs</Trans>
+          </a>
+        )}
       </Sticky>
 
       <SettingsBody>

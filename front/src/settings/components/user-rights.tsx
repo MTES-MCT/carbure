@@ -1,3 +1,5 @@
+import { Trans, useTranslation } from "react-i18next"
+
 import { statusColumn } from "account/components/access-rights"
 import { Title } from "common/components"
 import { Alert } from "common/components/alert"
@@ -15,43 +17,12 @@ import styles from "entities/components/user-rights.module.css"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { SettingsGetter } from "settings/hooks/use-get-settings"
 
-const ROLE_LABELS = {
-  [UserRole.ReadOnly]: "Lecture seule",
-  [UserRole.ReadWrite]: "Lecture/écriture",
-  [UserRole.Admin]: "Administration",
-  [UserRole.Auditor]: "Audit",
-}
-
 const RIGHTS_ORDER = {
   [UserRightStatus.Pending]: 0,
   [UserRightStatus.Accepted]: 1,
   [UserRightStatus.Revoked]: 2,
   [UserRightStatus.Rejected]: 3,
 }
-
-const RIGHTS_COLUMNS: Column<UserRightRequest>[] = [
-  padding,
-  statusColumn,
-  {
-    header: "Utilisateur",
-    render: (r) => r.user[0] ?? "",
-  },
-  {
-    header: "Droits",
-    render: (r) => ROLE_LABELS[r.role],
-  },
-  {
-    header: "Date",
-    render: (r) => {
-      const dateRequested = formatDate(r.date_requested)
-      const dateExpired = r.expiration_date ? formatDate(r.expiration_date) : null // prettier-ignore
-
-      return dateExpired
-        ? `${dateRequested} (expire le ${dateExpired})`
-        : dateRequested
-    },
-  },
-]
 
 const UserRights = ({
   entity,
@@ -60,6 +31,8 @@ const UserRights = ({
   entity: EntitySelection
   settings: SettingsGetter
 }) => {
+  const { t } = useTranslation()
+
   const [rights, getRights] = useAPI(api.getEntityRights)
   const [, acceptRight] = useAPI(api.acceptUserRightsRequest)
   const [, revokeRight] = useAPI(api.revokeUserRights)
@@ -80,12 +53,12 @@ const UserRights = ({
       case UserRightStatus.Accepted:
         return [
           {
-            title: "Révoquer",
+            title: t("Révoquer"),
             icon: Cross,
             action: async (r) => {
               const shouldRevoke = await confirm(
-                "Révoquer les droits d'un utilisateur",
-                `Voulez vous révoquer les droits d'accès de "${r.user[0]}" à votre société ?`
+                t("Révoquer les droits d'un utilisateur"),
+                t("Voulez vous révoquer les droits d'accès de {{user}} à votre société ?", { user: r.user[0] }) // prettier-ignore
               )
 
               if (shouldRevoke) {
@@ -101,12 +74,12 @@ const UserRights = ({
       case UserRightStatus.Revoked:
         return [
           {
-            title: "Accepter",
+            title: t("Accepter"),
             icon: Check,
             action: async (r) => {
               const shouldAccept = await confirm(
-                "Accepter un utilisateur",
-                `Voulez vous donner des droits d'accès à votre société à "${r.user[0]}" ?`
+                t("Accepter un utilisateur"),
+                t("Voulez vous donner des droits d'accès à votre société à {{user}} ? ", { user: r.user[0] }) // prettier-ignore
               )
 
               if (shouldAccept) {
@@ -116,12 +89,12 @@ const UserRights = ({
             },
           },
           {
-            title: "Refuser",
+            title: t("Refuser"),
             icon: Cross,
             action: async (r) => {
               const shouldReject = await confirm(
-                "Refuser un utilisateur",
-                `Voulez vous refuser l'accès à votre société à "${r.user[0]}" ?`
+                t("Refuser un utilisateur"),
+                t("Voulez vous refuser l'accès à votre société à {{user}} ?", { user: r.user[0] }) // prettier-ignore
               )
 
               if (shouldReject) {
@@ -137,10 +110,44 @@ const UserRights = ({
     }
   })
 
+  const roleLabels = {
+    [UserRole.ReadOnly]: t("Lecture seule"),
+    [UserRole.ReadWrite]: t("Lecture/écriture"),
+    [UserRole.Admin]: t("Administration"),
+    [UserRole.Auditor]: t("Audit"),
+  }
+
+  const columns: Column<UserRightRequest>[] = [
+    padding,
+    statusColumn,
+    {
+      header: t("Utilisateur"),
+      render: (r) => r.user[0] ?? "",
+    },
+    {
+      header: t("Droits"),
+      render: (r) => roleLabels[r.role],
+    },
+    {
+      header: t("Date"),
+      render: (r) => {
+        const dateRequested = formatDate(r.date_requested)
+        const dateExpired = r.expiration_date ? formatDate(r.expiration_date) : null // prettier-ignore
+
+        return dateExpired
+          ? t("{{dateRequested}} (expire le {{dateExpired}})", { dateRequested, dateExpired }) // prettier-ignore
+          : dateRequested
+      },
+    },
+    actions,
+  ]
+
   return (
     <Section id="users">
       <SectionHeader>
-        <Title>Utilisateurs</Title>
+        <Title>
+          <Trans>Utilisateurs</Trans>
+        </Title>
       </SectionHeader>
 
       <SectionBody>
@@ -150,14 +157,12 @@ const UserRights = ({
             level="warning"
             className={styles.emptyUserRights}
           >
-            Aucun utilisateur associé à cette entité
+            <Trans>Aucun utilisateur associé à cette entité</Trans>
           </Alert>
         )}
       </SectionBody>
 
-      {rows.length > 0 && (
-        <Table columns={[...RIGHTS_COLUMNS, actions]} rows={rows} />
-      )}
+      {rows.length > 0 && <Table columns={columns} rows={rows} />}
     </Section>
   )
 }

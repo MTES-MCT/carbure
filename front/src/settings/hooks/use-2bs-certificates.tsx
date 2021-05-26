@@ -1,4 +1,5 @@
 import { useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { CertificatePrompt } from "../components/certificates"
 import { confirm, prompt } from "common/components/dialog"
 import { useNotificationContext } from "common/components/notifications"
@@ -22,6 +23,7 @@ export default function use2BSCertificates(
   entity: EntitySelection,
   productionSites: ProductionSiteSettingsHook
 ): DBSCertificateSettingsHook {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
 
   const [requestGet2BS, resolveGet2BS] = useAPI(api.get2BSCertificates)
@@ -55,12 +57,12 @@ export default function use2BSCertificates(
 
       notifications.push({
         level: "success",
-        text: `Le certificat a bien été ${action} !`,
+        text: t("Le certificat a bien été {{action} !", { action }),
       })
     } else {
       notifications.push({
         level: "error",
-        text: `Le certificat n'a pas pu être ${action}.`,
+        text: t("Le certificat n'a pas pu être {{action}}.", { action }),
       })
     }
   }
@@ -69,8 +71,8 @@ export default function use2BSCertificates(
     const data = await prompt<Certificate>((resolve) => (
       <CertificatePrompt
         type="2BS"
-        title="Ajout certificat 2BS"
-        description="Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond."
+        title={t("Ajout certificat 2BS")}
+        description={t("Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond.")} // prettier-ignore
         findCertificates={find2BSCertificates}
         onResolve={resolve}
       />
@@ -85,11 +87,14 @@ export default function use2BSCertificates(
     if (
       typeof entityID !== "undefined" &&
       (await confirm(
-        "Suppression certificat",
-        `Voulez-vous vraiment supprimer le certificat 2BS "${dbs.certificate_id}" ?`
+        t("Suppression certificat"),
+        t("Voulez-vous vraiment supprimer le certificat 2BS {{cert}} ?", { cert: dbs.certificate_id}) // prettier-ignore
       ))
     ) {
-      notifyCertificate(resolveDel2BS(entityID, dbs.certificate_id), "supprimé")
+      notifyCertificate(
+        resolveDel2BS(entityID, dbs.certificate_id),
+        t("supprimé")
+      )
     }
   }
 
@@ -97,8 +102,8 @@ export default function use2BSCertificates(
     const data = await prompt<Certificate>((resolve) => (
       <CertificatePrompt
         type="2BS"
-        title="Mise à jour certificat 2BS"
-        description="Veuillez sélectionner un nouveau certificat pour remplacer l'ancien."
+        title={t("Mise à jour certificat 2BS")}
+        description={t("Veuillez sélectionner un nouveau certificat pour remplacer l'ancien.")} // prettier-ignore
         findCertificates={find2BSCertificates}
         onResolve={resolve}
       />
@@ -107,7 +112,7 @@ export default function use2BSCertificates(
     if (typeof entityID !== "undefined" && data) {
       notifyCertificate(
         resolveUpdate2BS(entityID, dbs.certificate_id, data.certificate_id),
-        "mis à jour"
+        t("mis à jour")
       )
     }
   }
