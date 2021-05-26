@@ -1,4 +1,5 @@
 import { useEffect } from "react"
+import { useTranslation } from "react-i18next"
 
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { ProductionSiteDetails } from "common/types"
@@ -25,6 +26,7 @@ export interface ProductionSiteSettingsHook {
 export default function useProductionSites(
   entity: EntitySelection
 ): ProductionSiteSettingsHook {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
 
   const [requestGetProductionSites, resolveGetProductionSites] = useAPI(api.getProductionSites) // prettier-ignore
@@ -60,8 +62,8 @@ export default function useProductionSites(
     const data = await prompt<ProductionSiteState>((resolve) => (
       <ProductionSitePrompt
         entity={entity}
-        title="Ajout site de production"
-        description="Veuillez entrer les informations de votre nouveau site de production."
+        title={t("Ajout site de production")}
+        description={t("Veuillez entrer les informations de votre nouveau site de production.")} // prettier-ignore
         onResolve={resolve}
       />
     ))
@@ -95,14 +97,14 @@ export default function useProductionSites(
 
         notifications.push({
           level: "success",
-          text: "Le site de production a bien été créé !",
+          text: t("Le site de production a bien été créé !"),
         })
 
         refresh()
       } else {
         notifications.push({
           level: "error",
-          text: "Impossible de créer le site de production.",
+          text: t("Impossible de créer le site de production."),
         })
       }
     }
@@ -111,8 +113,8 @@ export default function useProductionSites(
   async function editProductionSite(ps: ProductionSiteDetails) {
     const data = await prompt<ProductionSiteState>((resolve) => (
       <ProductionSitePrompt
-        title="Modification site de production"
-        description="Veuillez entrer les nouvelles informations de votre site de production."
+        title={t("Modification site de production")}
+        description={t("Veuillez entrer les nouvelles informations de votre site de production.")} // prettier-ignore
         entity={entity}
         productionSite={ps}
         onResolve={resolve}
@@ -151,12 +153,12 @@ export default function useProductionSites(
 
         notifications.push({
           level: "success",
-          text: "Le site de production a bien été modifié !",
+          text: t("Le site de production a bien été modifié !"),
         })
       } else {
         notifications.push({
           level: "error",
-          text: "Impossible de modifier le site de production.",
+          text: t("Impossible de modifier le site de production."),
         })
       }
     }
@@ -165,8 +167,8 @@ export default function useProductionSites(
   async function removeProductionSite(ps: ProductionSiteDetails) {
     if (
       await confirm(
-        "Suppression site",
-        `Voulez-vous vraiment supprimer le site de production "${ps.name}" ?`
+        t("Suppression site"),
+        t("Voulez-vous vraiment supprimer le site de production {{site}} ?", { site: ps.name }) // prettier-ignore
       )
     ) {
       const res = resolveDelProductionSite(ps.id)
@@ -176,12 +178,12 @@ export default function useProductionSites(
 
         notifications.push({
           level: "success",
-          text: "Le site de production a bien été supprimé !",
+          text: t("Le site de production a bien été supprimé !"),
         })
       } else {
         notifications.push({
           level: "error",
-          text: "Impossible de supprimer le site de production",
+          text: t("Impossible de supprimer le site de production"),
         })
       }
     }

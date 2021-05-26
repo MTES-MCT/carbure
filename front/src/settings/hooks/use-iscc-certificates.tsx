@@ -1,4 +1,5 @@
 import { useEffect } from "react"
+import { useTranslation } from "react-i18next"
 
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { Certificate } from "common/types"
@@ -24,6 +25,7 @@ export default function useISCCCertificates(
   entity: EntitySelection,
   productionSites: ProductionSiteSettingsHook
 ): ISCCCertificateSettingsHook {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
 
   const [requestGetISCC, resolveGetISCC] = useAPI(api.getISCCCertificates)
@@ -57,12 +59,12 @@ export default function useISCCCertificates(
 
       notifications.push({
         level: "success",
-        text: `Le certificat a bien été ${action} !`,
+        text: t("Le certificat a bien été {{action}} !", { action }),
       })
     } else {
       notifications.push({
         level: "error",
-        text: `Le certificat n'a pas pu être ${action}.`,
+        text: t("Le certificat n'a pas pu être {{action}}.", { action }),
       })
     }
   }
@@ -71,15 +73,18 @@ export default function useISCCCertificates(
     const data = await prompt<Certificate>((resolve) => (
       <CertificatePrompt
         type="ISCC"
-        title="Ajout certificat ISCC"
-        description="Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond."
+        title={t("Ajout certificat ISCC")}
+        description={t("Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond.")} // prettier-ignore
         findCertificates={findISCCCertificates}
         onResolve={resolve}
       />
     ))
 
     if (typeof entityID !== "undefined" && data) {
-      notifyCertificate(resolveAddISCC(entityID, data.certificate_id), "ajouté")
+      notifyCertificate(
+        resolveAddISCC(entityID, data.certificate_id),
+        t("ajouté")
+      )
     }
   }
 
@@ -87,13 +92,13 @@ export default function useISCCCertificates(
     if (
       typeof entityID !== "undefined" &&
       (await confirm(
-        "Suppression certificat",
-        `Voulez-vous vraiment supprimer le certificat ISCC "${iscc.certificate_id}" ?`
+        t("Suppression certificat"),
+        t("Voulez-vous vraiment supprimer le certificat ISCC {{cert}} ?", { cert: iscc.certificate_id }) // prettier-ignore
       ))
     ) {
       notifyCertificate(
         resolveDelISCC(entityID, iscc.certificate_id),
-        "supprimé"
+        t("supprimé")
       )
     }
   }
@@ -102,8 +107,8 @@ export default function useISCCCertificates(
     const data = await prompt<Certificate>((resolve) => (
       <CertificatePrompt
         type="ISCC"
-        title="Mise à jour certificat ISCC"
-        description="Veuillez sélectionner un nouveau certificat pour remplacer l'ancien."
+        title={t("Mise à jour certificat ISCC")}
+        description={t("Veuillez sélectionner un nouveau certificat pour remplacer l'ancien.")} // prettier-ignore
         findCertificates={findISCCCertificates}
         onResolve={resolve}
       />
@@ -112,7 +117,7 @@ export default function useISCCCertificates(
     if (typeof entityID !== "undefined" && data) {
       notifyCertificate(
         resolveUpdateISCC(entityID, iscc.certificate_id, data.certificate_id),
-        "mis à jour"
+        t("mis à jour")
       )
     }
   }

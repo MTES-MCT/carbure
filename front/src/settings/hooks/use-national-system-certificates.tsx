@@ -1,4 +1,5 @@
 import { useEffect } from "react"
+import { useTranslation } from "react-i18next"
 
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { Certificate } from "common/types"
@@ -24,17 +25,12 @@ export default function useSNCertificates(
   entity: EntitySelection,
   productionSites: ProductionSiteSettingsHook
 ): SNCertificateSettingsHook {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
 
-  const [requestGetSN, resolveGetSN] = useAPI(
-    api.getSNCertificates
-  )
-  const [requestAddSN, resolveAddSN] = useAPI(
-    api.addSNCertificate
-  )
-  const [requestDelSN, resolveDelSN] = useAPI(
-    api.deleteSNCertificate
-  )
+  const [requestGetSN, resolveGetSN] = useAPI(api.getSNCertificates)
+  const [requestAddSN, resolveAddSN] = useAPI(api.addSNCertificate)
+  const [requestDelSN, resolveDelSN] = useAPI(api.deleteSNCertificate)
   const [requestUpdateSN, resolveUpdateSN] = useAPI(api.updateSNCertificate) // prettier-ignore
 
   const entityID = entity?.id
@@ -63,12 +59,12 @@ export default function useSNCertificates(
 
       notifications.push({
         level: "success",
-        text: `Le certificat a bien été ${action} !`,
+        text: t("Le certificat a bien été {{action}} !", { action }),
       })
     } else {
       notifications.push({
         level: "error",
-        text: `Le certificat n'a pas pu être ${action}.`,
+        text: t("Le certificat n'a pas pu être {{action}}.", { action }),
       })
     }
   }
@@ -77,8 +73,8 @@ export default function useSNCertificates(
     const data = await prompt<Certificate>((resolve) => (
       <CertificatePrompt
         type="SN"
-        title="Ajout certificat Système National"
-        description="Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond."
+        title={t("Ajout certificat Système National")}
+        description={t("Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond.")} // prettier-ignore
         findCertificates={findSNCertificates}
         onResolve={resolve}
       />
@@ -87,7 +83,7 @@ export default function useSNCertificates(
     if (typeof entityID !== "undefined" && data) {
       notifyCertificate(
         resolveAddSN(entityID, data.certificate_id),
-        "ajouté"
+        t("ajouté")
       )
     }
   }
@@ -96,13 +92,13 @@ export default function useSNCertificates(
     if (
       typeof entityID !== "undefined" &&
       (await confirm(
-        "Suppression certificat",
-        `Voulez-vous vraiment supprimer le certificat Système National "${sn.certificate_id}" ?`
+        t("Suppression certificat"),
+        t("Voulez-vous vraiment supprimer le certificat Système National {{cert}} ?", { cert: sn.certificate_id }) // prettier-ignore
       ))
     ) {
       notifyCertificate(
         resolveDelSN(entityID, sn.certificate_id),
-        "supprimé"
+        t("supprimé")
       )
     }
   }
@@ -111,8 +107,8 @@ export default function useSNCertificates(
     const data = await prompt<Certificate>((resolve) => (
       <CertificatePrompt
         type="SN"
-        title="Mise à jour certificat Système National"
-        description="Veuillez sélectionner un nouveau certificat pour remplacer l'ancien."
+        title={t("Mise à jour certificat Système National")}
+        description={t("Veuillez sélectionner un nouveau certificat pour remplacer l'ancien.")} // prettier-ignore
         findCertificates={findSNCertificates}
         onResolve={resolve}
       />
@@ -120,12 +116,8 @@ export default function useSNCertificates(
 
     if (typeof entityID !== "undefined" && data) {
       notifyCertificate(
-        resolveUpdateSN(
-          entityID,
-          sn.certificate_id,
-          data.certificate_id
-        ),
-        "mis à jour"
+        resolveUpdateSN(entityID, sn.certificate_id, data.certificate_id),
+        t("mis à jour")
       )
     }
   }
