@@ -332,7 +332,7 @@ def delete_lot(request):
             return JsonResponse({'status': 'forbidden', 'message': "Transaction already accepted by client"},
                                 status=403)
 
-        if tx.delivery_status == 'R' and tx.lot.parent_lot != None:
+        if tx.delivery_status == LotTransaction.REJECTED and tx.lot.parent_lot != None:
             # credit volume back to stock
             tx.lot.parent_lot.remaining_volume += tx.lot.volume
             tx.lot.parent_lot.save()
@@ -356,8 +356,10 @@ def validate_lot(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': data})
 
 
-@otp_required
-def accept_lot(request):
+@check_rights('entity_id')
+def accept_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']   
     tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
@@ -370,14 +372,18 @@ def accept_lot(request):
         rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
         if tx.carbure_client not in rights:
             return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-        tx.delivery_status = 'A'
+        TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field='status', value_before=tx.delivery_status, value_after=LotTransaction.ACCEPTED, modified_by=request.user, modified_by_entity=entity)
+        tx.delivery_status = LotTransaction.ACCEPTED
         tx.save()
     return JsonResponse({'status': 'success'})
 
 
-@otp_required
-def accept_with_reserves(request):
+
+@check_rights('entity_id')
+def accept_with_reserves(request, *args, **kwargs):
     # I want my supplier to fix something
+    context = kwargs['context']
+    entity = context['entity']    
     tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
@@ -387,21 +393,28 @@ def accept_with_reserves(request):
         except Exception:
             return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
 
-        rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-        if tx.carbure_client not in rights:
+        if not tx.carbure_vendor == entity and not tx.carbure_client == entity:
             return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
         if tx.delivery_status == LotTransaction.FROZEN:
             # 
             # send email
-            pass
+            # invalidate declaration for both
+            if tx.carbure_client:
+                invalidate_declaration(tx, tx.carbure_client)
+            if tx.carbure_vendor:
+                invalidate_declaration(tx, tx.carbure_vendor)
+        TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field='status', value_before=tx.delivery_status, value_after=LotTransaction.TOFIX, modified_by=request.user, modified_by_entity=entity)
         tx.delivery_status = LotTransaction.TOFIX
         tx.save()
+
     return JsonResponse({'status': 'success'})
 
 
 @check_rights('entity_id')
 def amend_lot(request, *args, **kwargs):
     # I want to fix one of my own transaction
+    # This only changes the status to TOFIX
     context = kwargs['context']
     entity = context['entity']    
     tx_id = request.POST.get('tx_id', None)
@@ -417,13 +430,15 @@ def amend_lot(request, *args, **kwargs):
     if tx.delivery_status == LotTransaction.FROZEN:
         # get period declaration and invalidate it
         invalidate_declaration(tx, entity)
+    TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field='status', value_before=tx.delivery_status, value_after=LotTransaction.TOFIX, modified_by=request.user, modified_by_entity=entity)
     tx.delivery_status = LotTransaction.TOFIX
     tx.save()
     return JsonResponse({'status': 'success'})
 
-
-@otp_required
-def reject_lot(request):
+@check_rights('entity_id')
+def reject_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
     tx_ids = request.POST.getlist('tx_ids', None)
     tx_comment = request.POST.get('comment', None)
     if not tx_ids:
@@ -442,10 +457,11 @@ def reject_lot(request):
         except Exception:
             return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
 
-        rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-        if tx.carbure_client not in rights:
+
+        if tx.carbure_client != entity:
             return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-        tx.delivery_status = 'R'
+        TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field='status', value_before=tx.delivery_status, value_after=LotTransaction.REJECTED, modified_by=request.user, modified_by_entity=entity)
+        tx.delivery_status = LotTransaction.REJECTED
         tx.save()
         txerr = TransactionComment()
         txerr.entity = tx.carbure_client
