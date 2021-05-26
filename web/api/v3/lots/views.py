@@ -89,6 +89,7 @@ def get_details(request, *args, **kwargs):
     data['transaction'] = tx.natural_key()
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
+    data['updates'] = [c.natural_key() for c in tx.transactionupdatehistory_set.all().order_by('-datetime')]
     data['comments'] = []
     for c in tx.transactioncomment_set.all():
         comment = c.natural_key()
