@@ -299,6 +299,7 @@ def duplicate_lot(request):
     tx_meta_fields = {f.name: f for f in LotTransaction._meta.get_fields()}
     tx.pk = None
     tx.lot = lot
+    tx.is_forwarded = False
     for f in tx_fields_to_remove:
         if f in tx_meta_fields:
             meta_field = tx_meta_fields[f]
