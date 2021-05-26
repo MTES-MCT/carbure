@@ -13,7 +13,7 @@ from pandas._typing import FilePathOrBuffer, Scalar
 from django.db import transaction
 
 
-from core.models import LotV2, LotTransaction, UserRights, GenericError
+from core.models import LotV2, LotTransaction, UserRights, GenericError, TransactionUpdateHistory
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot, SustainabilityDeclaration
 
 from certificates.models import ISCCCertificate, EntityISCCTradingCertificate
@@ -987,19 +987,20 @@ def validate_lots(user, entity, txs):
                 tx.lot.is_valid = True
                 tx.lot.carbure_id = generate_carbure_id(tx.lot)
                 tx.lot.status = "Validated"
+                previous_status = tx.delivery_status
 
                 # if we create a lot for ourselves
                 if tx.carbure_client and tx.lot.added_by == tx.carbure_client:
-                    tx.delivery_status = 'A'
+                    tx.delivery_status = LotTransaction.ACCEPTED
                 # if the client is not in carbure, auto-accept
                 elif not tx.client_is_in_carbure:
-                    tx.delivery_status = 'A'
+                    tx.delivery_status = LotTransaction.ACCEPTED
                 # if we save a lot that was requiring a fix, change status to 'AA'
-                elif tx.delivery_status in ['AC', 'R']:
-                    tx.delivery_status = 'AA'
+                elif tx.delivery_status in [LotTransaction.TOFIX, LotTransaction.REJECETD]:
+                    tx.delivery_status = LotTransaction.FIXED
                 else:
                     pass
-
+                TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field='status', value_before=previous_status, value_after=tx.delivery_status, modified_by=user, modified_by_entity=entity)
                 # is this a Stock tx?
                 if tx.carbure_client and tx.carbure_client.entity_type in [Entity.PRODUCER, Entity.TRADER]:
                     tx.is_stock = True
