@@ -22,14 +22,14 @@ def send_reject_email(vendor, txs):
     }
     html_message = loader.render_to_string('emails/rejected_lots.html', email_context)
     text_message = loader.render_to_string('emails/rejected_lots.txt', email_context)
-    send_mail(
-        subject=email_subject,
-        message=text_message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        html_message=html_message,
-        recipient_list=recipients_emails,
-        fail_silently=False,
-    )
+    #send_mail(
+    #    subject=email_subject,
+    #    message=text_message,
+    #    from_email=settings.DEFAULT_FROM_EMAIL,
+    #    html_message=html_message,
+    #    recipient_list=recipients_emails,
+    #    fail_silently=False,
+    #)
 
     # transactions forwarded and rejected disappear from the UI. Delete them
     for tx in txs:
