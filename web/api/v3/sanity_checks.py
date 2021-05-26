@@ -68,11 +68,11 @@ def sanity_check(tx, prefetched_data):
         return lot_valid, tx_valid, is_sane, errors
 
     if tx.is_mac and lot.biocarburant and lot.biocarburant.code not in ['ED95', 'B100', 'ETH', 'EMHV', 'EMHU']:
-        errors.append(generic_error(error='MAC_BC_WRONG', tx=tx, is_blocking=True))
+        errors.append(generic_error(error='MAC_BC_WRONG', tx=tx, is_blocking=True, fields=['biocarburant_code', 'mac']))
 
     # check volume
     if lot.volume < 2000:
-        errors.append(generic_error(error='VOLUME_FAIBLE', tx=tx))
+        errors.append(generic_error(error='VOLUME_FAIBLE', tx=tx, field='volume'))
 
     # réduction de GES
     if lot.ghg_reduction >= 100:
@@ -87,10 +87,10 @@ def sanity_check(tx, prefetched_data):
 
     if lot.etd == 0:
         is_sane = False
-        errors.append(generic_error(error='GHG_ETD_0', tx=tx, is_blocking=True))
+        errors.append(generic_error(error='GHG_ETD_0', tx=tx, is_blocking=True, field='etd'))
     if lot.ep == 0:
         is_sane = False
-        errors.append(generic_error(error='GHG_EP_0', tx=tx, is_blocking=True))
+        errors.append(generic_error(error='GHG_EP_0', tx=tx, is_blocking=True, field='ep'))
 
     commissioning_date = lot.carbure_production_site.date_mise_en_service if lot.carbure_production_site else lot.unknown_production_site_com_date
     if commissioning_date and isinstance(commissioning_date, datetime.datetime) or isinstance(commissioning_date, datetime.date):
@@ -104,29 +104,29 @@ def sanity_check(tx, prefetched_data):
     # provenance des matieres premieres
     if lot.matiere_premiere and lot.pays_origine:
         if lot.matiere_premiere.code == "RESIDUS_VINIQUES":
-            errors.append(generic_error(error='DEPRECATED_MP', tx=tx))
+            errors.append(generic_error(error='DEPRECATED_MP', tx=tx, field='matiere_premiere'))
 
         if lot.matiere_premiere.category == 'CONV' and lot.eec == 0:
-            errors.append(generic_error(error='GHG_EEC_0', tx=tx, extra="GES Culture 0 pour MP conventionnelle (%s)" % (lot.matiere_premiere.name)))
+            errors.append(generic_error(error='GHG_EEC_0', tx=tx, extra="GES Culture 0 pour MP conventionnelle (%s)" % (lot.matiere_premiere.name), field='eec'))
 
         if lot.matiere_premiere.code == 'SOJA':
             if lot.pays_origine.code_pays not in ['US', 'AR', 'BR', 'UY', 'PY']:
-                errors.append(generic_error(error='PROVENANCE_MP', tx=tx, extra="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
+                errors.append(generic_error(error='PROVENANCE_MP', tx=tx, extra="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name), field='pays_origine_code'))
         elif lot.matiere_premiere.code == 'HUILE_PALME':
             if lot.pays_origine.code_pays not in ['ID', 'MY', 'HN']:
-                errors.append(generic_error(error='PROVENANCE_MP', tx=tx, extra="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
+                errors.append(generic_error(error='PROVENANCE_MP', tx=tx, extra="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name), field='pays_origine_code'))
         elif lot.matiere_premiere.code == 'COLZA':
             if lot.pays_origine.code_pays not in ['US', 'CA', 'AU', 'UA', 'CN', 'IN', 'DE', 'FR', 'PL', 'UK'] and not lot.pays_origine.is_in_europe:
-                errors.append(generic_error(error='PROVENANCE_MP', tx=tx, extra="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
+                errors.append(generic_error(error='PROVENANCE_MP', tx=tx, extra="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name), field='pays_origine_code'))
         elif lot.matiere_premiere.code == 'CANNE_A_SUCRE':
             if lot.pays_origine.code_pays not in ['BR', 'BO']:
-                errors.append(generic_error(error='PROVENANCE_MP', tx=tx, extra="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
+                errors.append(generic_error(error='PROVENANCE_MP', tx=tx, extra="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name), field='pays_origine_code'))
         elif lot.matiere_premiere.code == 'MAIS':
             if not lot.pays_origine.is_in_europe and lot.pays_origine.code_pays not in ['US', 'UA']:
-                errors.append(generic_error(error='PROVENANCE_MP', tx=tx, extra="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
+                errors.append(generic_error(error='PROVENANCE_MP', tx=tx, extra="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name), field='pays_origine_code'))
         elif lot.matiere_premiere.code == 'BETTERAVE':
             if not lot.pays_origine.is_in_europe:
-                errors.append(generic_error(error='PROVENANCE_MP', tx=tx, extra="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name)))
+                errors.append(generic_error(error='PROVENANCE_MP', tx=tx, extra="%s de %s" % (lot.matiere_premiere.name, lot.pays_origine.name), field='pays_origine_code'))
         else:
             pass
 
@@ -134,10 +134,10 @@ def sanity_check(tx, prefetched_data):
         # consistence des matieres premieres avec biocarburant
         if lot.biocarburant.is_alcool and lot.matiere_premiere.compatible_alcool is False:
             is_sane = False
-            errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="%s issu de fermentation et %s n'est pas fermentescible" % (lot.biocarburant.name, lot.matiere_premiere.name)))
+            errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="%s issu de fermentation et %s n'est pas fermentescible" % (lot.biocarburant.name, lot.matiere_premiere.name), fields=['biocarburant_code', 'matiere_premiere_code']))
         if lot.biocarburant.is_graisse and lot.matiere_premiere.compatible_graisse is False:
             is_sane = False
-            errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="Matière première (%s) incompatible avec Esthers Méthyliques" % (lot.matiere_premiere.name)))
+            errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="Matière première (%s) incompatible avec Esthers Méthyliques" % (lot.matiere_premiere.name), fields=['biocarburant_code', 'matiere_premiere_code']))
 
         # double comptage, cas specifiques
         if lot.matiere_premiere.is_double_compte:
@@ -145,33 +145,33 @@ def sanity_check(tx, prefetched_data):
             not_in_carbure_without_dc = not lot.production_site_is_in_carbure and not lot.unknown_production_site_dbl_counting
             if in_carbure_without_dc or not_in_carbure_without_dc:
                 is_sane = False
-                errors.append(generic_error(error='MISSING_REF_DBL_COUNTING', tx=tx, is_blocking=True, extra="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name)))
+                errors.append(generic_error(error='MISSING_REF_DBL_COUNTING', tx=tx, is_blocking=True, extra="%s de %s" % (lot.biocarburant.name, lot.matiere_premiere.name), field='production_site_dbl_counting'))
 
         if lot.biocarburant.is_graisse:
             if lot.biocarburant.code == 'EMHU' and lot.matiere_premiere.code != 'HUILE_ALIMENTAIRE_USAGEE':
                 is_sane = False
-                errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="%s doit être à base d'huiles alimentaires usagées" % (lot.biocarburant.name)))
+                errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="%s doit être à base d'huiles alimentaires usagées" % (lot.biocarburant.name), fields=['biocarburant_code', 'matiere_premiere_code']))
             if lot.biocarburant.code == 'EMHV' and lot.matiere_premiere.code not in ['COLZA', 'TOURNESOL', 'SOJA', 'HUILE_PALME']:
                 is_sane = False
-                errors.append(generic_error(error='MP_BC_INCOHERENT',  tx=tx, is_blocking=True, extra="%s doit être à base de végétaux (Colza, Tournesol, Soja, Huile de Palme)" % (lot.biocarburant.name)))
+                errors.append(generic_error(error='MP_BC_INCOHERENT',  tx=tx, is_blocking=True, extra="%s doit être à base de végétaux (Colza, Tournesol, Soja, Huile de Palme)" % (lot.biocarburant.name), fields=['biocarburant_code', 'matiere_premiere_code']))
             if lot.biocarburant.code == 'EMHA' and lot.matiere_premiere.code not in ['HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2', 'HUILES_OU_GRAISSES_ANIMALES_CAT3']:
                 is_sane = False
-                errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="%s doit être à base d'huiles ou graisses animales" % (lot.biocarburant.name)))
+                errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="%s doit être à base d'huiles ou graisses animales" % (lot.biocarburant.name), fields=['biocarburant_code', 'matiere_premiere_code']))
 
         if lot.matiere_premiere.code in ['HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2', 'HUILES_OU_GRAISSES_ANIMALES_CAT3'] and lot.biocarburant.code not in ['EMHA', 'HOE', 'HOG']:
             is_sane = False
-            errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="Des huiles ou graisses animales ne peuvent donner que des EMHA ou HOG/HOE"))
+            errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="Des huiles ou graisses animales ne peuvent donner que des EMHA ou HOG/HOE", fields=['biocarburant_code', 'matiere_premiere_code']))
         if lot.matiere_premiere.code == 'HUILE_ALIMENTAIRE_USAGEE' and lot.biocarburant.code not in ['EMHU', 'HOE', 'HOG']:
             is_sane = False
-            errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="Des huiles alimentaires usagées ne peuvent donner que des EMHU ou HOG/HOE"))
+            errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="Des huiles alimentaires usagées ne peuvent donner que des EMHU ou HOG/HOE", fields=['biocarburant_code', 'matiere_premiere_code']))
 
         if lot.matiere_premiere.code in ['MAIS', 'BLE', 'BETTERAVE', 'CANNE_A_SUCRE', 'RESIDUS_VINIQUES', 'LIES_DE_VIN', 'MARC_DE_RAISIN'] and lot.biocarburant.code not in ['ETH', 'ETBE', 'ED95']:
             is_sane = False
-            errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="Maïs, Blé, Betterave, Canne à Sucre ou Résidus Viniques ne peuvent créer que de l'Éthanol ou ETBE"))
+            errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="Maïs, Blé, Betterave, Canne à Sucre ou Résidus Viniques ne peuvent créer que de l'Éthanol ou ETBE", fields=['biocarburant_code', 'matiere_premiere_code']))
 
         if not lot.matiere_premiere.is_huile_vegetale and lot.biocarburant.code in ['HVOE', 'HVOG']:
             is_sane = False
-            errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="Un HVO doit provenir d'huiles végétales uniquement. Pour les autres huiles hydrotraitées, voir la nomenclature HOE/HOG"))
+            errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="Un HVO doit provenir d'huiles végétales uniquement. Pour les autres huiles hydrotraitées, voir la nomenclature HOE/HOG", fields=['biocarburant_code', 'matiere_premiere_code']))
 
 
     # configuration
@@ -179,21 +179,21 @@ def sanity_check(tx, prefetched_data):
         if lot.carbure_production_site.name in prefetched_data['production_sites']:
             mps = [psi.matiere_premiere for psi in prefetched_data['production_sites'][lot.carbure_production_site.name].productionsiteinput_set.all()]
             if lot.matiere_premiere not in mps:
-                errors.append(generic_error(error='MP_NOT_CONFIGURED', tx=tx, display_to_recipient=False))
+                errors.append(generic_error(error='MP_NOT_CONFIGURED', tx=tx, display_to_recipient=False, field='matiere_premiere_code'))
     if lot.biocarburant and lot.carbure_production_site:
         if lot.carbure_production_site.name in prefetched_data['production_sites']:
             bcs = [pso.biocarburant for pso in prefetched_data['production_sites'][lot.carbure_production_site.name].productionsiteoutput_set.all()]
             if lot.biocarburant not in bcs:
-                errors.append(generic_error(error='BC_NOT_CONFIGURED', tx=tx, display_to_recipient=False))
+                errors.append(generic_error(error='BC_NOT_CONFIGURED', tx=tx, display_to_recipient=False, field='biocarburant_code'))
 
     if lot.carbure_production_site:
         # certificates
         certificates = lot.carbure_production_site.productionsitecertificate_set.all()
         if certificates.count() == 0:
-            errors.append(generic_error(error='MISSING_PRODSITE_CERTIFICATE', tx=tx))
+            errors.append(generic_error(error='MISSING_PRODSITE_CERTIFICATE', tx=tx, field='carbure_production_site_reference'))
 
     if not tx.client_is_in_carbure and not tx.is_mac:
-        errors.append(generic_error(error='UNKNOWN_CLIENT', tx=tx, display_to_recipient=False))
+        errors.append(generic_error(error='UNKNOWN_CLIENT', tx=tx, display_to_recipient=False, field="client"))
 
     if tx.lot.producer_is_in_carbure and tx.lot.added_by != tx.lot.carbure_producer and not tx.lot.parent_lot:
         is_sane = False
@@ -238,7 +238,7 @@ def tx_is_valid(tx, prefetched_data):
     # make sure all mandatory fields are set
     if not tx.dae:
         extra = 'DAE manquant'
-        errors.append(generic_error(error='MISSING_DAE', tx=tx, field='dae', extra=extra))
+        errors.append(generic_error(error='MISSING_DAE', tx=tx, field='dae', extra=extra, is_blocking=True))
         is_valid = False
     if not tx.is_mac:
         if not tx.delivery_site_is_in_carbure and not tx.unknown_delivery_site:

@@ -140,7 +140,7 @@ export const volume: Column<Transaction> = {
 }
 
 export const matierePremiere: Column<Transaction> = {
-  header: "Matiere premiere",
+  header: "Matière première",
   sortBy: "matiere_premiere",
   render: (tx) => (
     <TwoLines

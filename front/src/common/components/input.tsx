@@ -47,7 +47,7 @@ export const Label = ({
 }: LabelProps) => (
   <label
     {...props}
-    title={error ? error : tooltip}
+    title={[label, tooltip, error].filter(Boolean).join(' - ')}
     className={cl(
       styles.labelWrapper,
       !readOnly && disabled && styles.disabledLabel,
@@ -55,11 +55,10 @@ export const Label = ({
       className
     )}
   >
-    <span className={styles.labelText}>
-      {label}
-      {!readOnly && required && " *"}
+    <div className={styles.labelText}>
       {error && <AlertTriangle size={16} />}
-    </span>
+      <span>{!readOnly && required ? `${label} *` : label}</span>
+    </div>
     {children}
     {Icon && <Icon className={styles.labelIcon} />}
   </label>

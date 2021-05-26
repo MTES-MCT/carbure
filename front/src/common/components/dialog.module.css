@@ -4,11 +4,10 @@ div.dialog {
   min-height: 0;
   padding: 24px;
   padding-bottom: 0;
-  max-width: 600px;
 }
 
 .dialogMessage {
-  flex-shrink: 1;
+  max-width: 600px;
   margin-top: 32px;
   margin-bottom: 16px;
 }

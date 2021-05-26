@@ -308,11 +308,27 @@ export function getAdminDetails(
 }
 
 export function amendLot(entity_id: number, tx_id: number) {
-  return api.post('/lots/amend-lot', { entity_id, tx_id })
+  return api.post("/lots/amend-lot", { entity_id, tx_id })
 }
 
-export async function amendAndCommentLot(entity_id: number, tx_id: number, comment: string) {
+export async function amendAndCommentLot(
+  entity_id: number,
+  tx_id: number,
+  comment: string
+) {
   const commenting = await commentLot(entity_id, tx_id, comment, "both")
   const amending = await amendLot(entity_id, tx_id)
   return [amending, commenting]
+}
+
+export function getAuditorSnapshot(entity_id: number, year: number) {
+  return api.get<Snapshot>("/auditor/snapshot", { entity_id, year })
+}
+
+export function getAuditorLots(params: TransactionQuery) {
+  return api.get<Lots>("/auditor", params)
+}
+
+export function getAuditorDetails(entity_id: number, tx_id: number) {
+  return api.get<LotDetails>("/auditor/details", { entity_id, tx_id })
 }

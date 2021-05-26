@@ -31,6 +31,7 @@ export enum EntityType {
   Operator = "Opérateur",
   Trader = "Trader",
   Administration = "Administration",
+  Auditor = "Auditor",
 }
 
 export interface Entity {
@@ -171,18 +172,18 @@ export interface Lot {
 
 export enum DeliveryStatus {
   Pending = "N",
-  ToFix = 'AC',
-  Fixed = 'AA',
-  Accepted = 'A',
+  ToFix = "AC",
+  Fixed = "AA",
+  Accepted = "A",
   Rejected = "R",
-  Frozen = "F"
+  Frozen = "F",
 }
 
 export interface Transaction {
   id: number
   lot: Lot
   dae: string
-  delivery_status: DeliveryStatus,
+  delivery_status: DeliveryStatus
   delivery_date: string | null
   champ_libre: string
   is_mac: boolean
@@ -252,13 +253,13 @@ export interface Comment {
 }
 
 export interface LotUpdate {
-  tx_id: number,
-  update_type: 'ADD' | 'UPDATE' | 'REMOVE', 
-  datetime: string, 
-  field: string,
-  label?: string,
-  value_before: string | null,
-  value_after: string | null,
+  tx_id: number
+  update_type: "ADD" | "UPDATE" | "REMOVE"
+  datetime: string
+  field: string
+  label?: string
+  value_before: string | null
+  value_after: string | null
   modified_by: string
 }
 
@@ -269,7 +270,6 @@ export interface LotDetails {
   errors: GenericError[]
   updates?: LotUpdate[]
 }
-
 
 export enum Filters {
   DeliveryStatus = "delivery_status",
