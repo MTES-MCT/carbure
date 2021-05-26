@@ -14,6 +14,7 @@ afterEach(() => {
   server.resetHandlers()
   setAccessRequests([])
 })
+
 afterAll(() => server.close())
 
 // this component is only here for testing as otherwise we can't use the useGetSettingsHook
@@ -25,7 +26,7 @@ const AccountWithHooks = () => {
 
 test("empty acces rights in account page", async () => {
   render(<AccountWithHooks />)
-
+  screen.debug()
   await waitWhileLoading()
 
   screen.getByText("Demandes d'accès aux sociétés")
