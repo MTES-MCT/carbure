@@ -25,7 +25,7 @@ export const ProducerOriginFields = ({
   readOnly,
   data,
   errors,
-  stock,
+  editable,
   onChange,
 }: FieldsProps) => {
   async function listOnlyThisProducer(query: string) {
@@ -36,7 +36,7 @@ export const ProducerOriginFields = ({
 
   return (
     <FormGroup
-      readOnly={stock || readOnly}
+      readOnly={readOnly || !editable}
       title="Provenance"
       data={data}
       errors={errors}
@@ -57,12 +57,12 @@ export const AuthorOriginFields = ({
   readOnly,
   data,
   errors,
-  stock,
+  editable,
   onChange,
 }: FieldsProps) => {
   return (
     <FormGroup
-      readOnly={stock || readOnly}
+      readOnly={readOnly || !editable}
       title="Provenance"
       data={data}
       errors={errors}

@@ -39,12 +39,13 @@ const TransactionForm = ({
   onSubmit,
 }: TransactionFormProps) => {
   const isStock = Boolean(transaction.parent_lot)
+  const isOwner = Boolean(entity) && entity?.id === transaction.data_origin_entity?.id
 
   return (
     <Form id={id} className={styles.transactionForm} onSubmit={onSubmit}>
       <Box row>
         <LotFields
-          stock={isStock}
+          editable={isOwner && !isStock}
           readOnly={readOnly}
           data={transaction}
           errors={errors}
@@ -52,7 +53,7 @@ const TransactionForm = ({
         />
 
         <OriginFields
-          stock={isStock}
+          editable={isOwner && !isStock}
           readOnly={readOnly}
           entity={entity}
           data={transaction}
@@ -61,7 +62,7 @@ const TransactionForm = ({
         />
 
         <ProductionFields
-          readOnly={isStock || readOnly}
+          readOnly={!isOwner || isStock || readOnly}
           entity={entity}
           data={transaction}
           errors={errors}
@@ -77,7 +78,7 @@ const TransactionForm = ({
         />
 
         <GESFields
-          readOnly={isStock || readOnly}
+          readOnly={!isOwner || isStock || readOnly}
           data={transaction}
           errors={errors}
           onChange={onChange}

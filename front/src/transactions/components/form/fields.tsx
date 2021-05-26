@@ -43,7 +43,7 @@ export function isKnown<T>(value: T | string | undefined | null): value is T {
 export type FieldsProps = {
   disabled?: boolean
   readOnly?: boolean
-  stock?: boolean
+  editable?: boolean
   data: TransactionFormState
   errors: Record<string, string>
   entity?: EntitySelection
