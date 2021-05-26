@@ -122,7 +122,7 @@ const TransactionDetails = ({
         />
       )}
 
-      {isAdmin && Boolean(details.data?.updates?.length) && <TransactionHistory history={details.data?.updates} />}
+      {Boolean(details.data?.updates?.length) && <TransactionHistory history={details.data?.updates} />}
 
       <div className={styles.transactionFormButtons}>
         {isEditable && (
