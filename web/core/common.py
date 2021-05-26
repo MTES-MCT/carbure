@@ -385,7 +385,7 @@ def fill_production_site_info(entity, lot_row, lot, tx, prefetched_data):
 
 def fill_supplier_info(entity, lot_row, lot, prefetched_data):
     tx_errors = []
-    if 'supplier' in lot_row and lot_row['supplier'] != '' and lot_row['supplier'] != None:
+    if 'supplier' in lot_row:
         lot.unknown_supplier = lot_row['supplier']
     if 'supplier_certificate' in lot_row:
         lot.unknown_supplier_certificate = lot_row['supplier_certificate']
