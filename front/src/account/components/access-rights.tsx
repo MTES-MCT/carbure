@@ -37,34 +37,7 @@ import { Label } from "common/components/input"
 import RadioGroup from "common/components/radio-group"
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
-
-const STATUS_LABEL = {
-  [UserRightStatus.Pending]: "En attente",
-  [UserRightStatus.Accepted]: "Accepté",
-  [UserRightStatus.Rejected]: "Refusé",
-  [UserRightStatus.Revoked]: "Révoqué",
-}
-
-const ROLE_LABELS_DETAILS = {
-  [UserRole.ReadOnly]: "Lecture seule (consultation des lots uniquement)",
-  [UserRole.ReadWrite]: "Lecture/écriture (création et gestion des lots)",
-  [UserRole.Admin]:
-    "Administration (contrôle complet de la société sur CarbuRe)",
-  [UserRole.Auditor]: "Audit (accès spécial pour auditeurs)",
-}
-const ROLE_LABELS = {
-  [UserRole.ReadOnly]: "Lecture seule",
-  [UserRole.ReadWrite]: "Lecture/écriture",
-  [UserRole.Admin]: "Administration",
-  [UserRole.Auditor]: "Audit",
-}
-
-const ROLE_OPTIONS = Object.entries(ROLE_LABELS_DETAILS).map(
-  ([value, label]) => ({
-    value,
-    label,
-  })
-)
+import { Trans, useTranslation } from "react-i18next"
 
 export type AccessRequest = {
   entity: Entity
@@ -72,17 +45,28 @@ export type AccessRequest = {
 }
 
 export const EntityPrompt = ({ onResolve }: PromptProps<AccessRequest>) => {
+  const { t } = useTranslation()
+
   const [entity, setEntity] = useState<Entity | null>(null)
   const [role, setRole] = useState<UserRole>(UserRole.ReadOnly)
+
+  const roleDetails = {
+    [UserRole.ReadOnly]: t("Lecture seule (consultation des lots uniquement)"),
+    [UserRole.ReadWrite]: t("Lecture/écriture (création et gestion des lots)"),
+    [UserRole.Admin]: t("Administration (contrôle complet de la société sur CarbuRe)"), // prettier-ignore
+    [UserRole.Auditor]: t("Audit (accès spécial pour auditeurs)"),
+  }
 
   return (
     <Dialog onResolve={onResolve}>
       <SettingsForm>
-        <DialogTitle text="Ajout organisation" />
-        <DialogText text="Recherchez la société qui vous emploie pour pouvoir accéder à ses données." />
+        <DialogTitle text={t("Ajout organisation")} />
+        <DialogText
+          text={t("Recherchez la société qui vous emploie pour pouvoir accéder à ses données.")} // prettier-ignore
+        />
         <LabelAutoComplete
-          label="Organisation"
-          placeholder="Rechercher une société..."
+          label={t("Organisation")}
+          placeholder={t("Rechercher une société...")}
           name="entity"
           value={entity}
           getQuery={common.findEntities}
@@ -90,10 +74,13 @@ export const EntityPrompt = ({ onResolve }: PromptProps<AccessRequest>) => {
           getValue={(e) => `${e.id}`}
           getLabel={(e) => e.name}
         />
-        <Label label="Rôle">
+        <Label label={t("Rôle")}>
           <RadioGroup
             name="role"
-            options={ROLE_OPTIONS}
+            options={Object.entries(roleDetails).map(([v, l]) => ({
+              value: v,
+              label: l,
+            }))}
             value={role}
             onChange={(e) => setRole(e.target.value as UserRole)}
           />
@@ -104,7 +91,7 @@ export const EntityPrompt = ({ onResolve }: PromptProps<AccessRequest>) => {
           rel="noreferrer"
           className={pendingStyles.link}
         >
-          Ma société n'est pas enregistrée sur CarbuRe.
+          <Trans>Ma société n'est pas enregistrée sur CarbuRe.</Trans>
         </a>
         <DialogButtons>
           <Button
@@ -113,64 +100,48 @@ export const EntityPrompt = ({ onResolve }: PromptProps<AccessRequest>) => {
             disabled={!entity}
             onClick={() => entity && onResolve({ entity, role })}
           >
-            Demander l'accès
+            <Trans>Demander l'accès</Trans>
           </Button>
-          <Button onClick={() => onResolve()}>Annuler</Button>
+          <Button onClick={() => onResolve()}>
+            <Trans>Annuler</Trans>
+          </Button>
         </DialogButtons>
       </SettingsForm>
     </Dialog>
   )
 }
 
-export const RightStatus = ({ status }: { status: UserRightStatus }) => (
-  <span
-    className={cl(
-      statusStyles.status,
-      statusStyles.smallStatus,
-      status === UserRightStatus.Accepted && statusStyles.statusAccepted,
-      status === UserRightStatus.Pending && statusStyles.statusWaiting,
-      status === UserRightStatus.Rejected && statusStyles.statusRejected,
-      status === UserRightStatus.Revoked && statusStyles.statusToFix
-    )}
-  >
-    {STATUS_LABEL[status]}
-  </span>
-)
+export const RightStatus = ({ status }: { status: UserRightStatus }) => {
+  const { t } = useTranslation()
+
+  const statusLabels = {
+    [UserRightStatus.Pending]: t("En attente"),
+    [UserRightStatus.Accepted]: t("Accepté"),
+    [UserRightStatus.Rejected]: t("Refusé"),
+    [UserRightStatus.Revoked]: t("Révoqué"),
+  }
+
+  return (
+    <span
+      className={cl(
+        statusStyles.status,
+        statusStyles.smallStatus,
+        status === UserRightStatus.Accepted && statusStyles.statusAccepted,
+        status === UserRightStatus.Pending && statusStyles.statusWaiting,
+        status === UserRightStatus.Rejected && statusStyles.statusRejected,
+        status === UserRightStatus.Revoked && statusStyles.statusToFix
+      )}
+    >
+      {statusLabels[status]}
+    </span>
+  )
+}
 
 export const statusColumn = {
   header: "Statut",
   className: colStyles.narrowColumn,
   render: (r: UserRightRequest) => <RightStatus status={r.status} />,
 }
-
-const COLUMNS: Column<UserRightRequest>[] = [
-  padding,
-  statusColumn,
-  {
-    header: "Organisation",
-    render: (r) => <Line text={r.entity.name} />,
-  },
-  {
-    header: "Type",
-    render: (r) => <Line text={r.entity.entity_type} />,
-  },
-  {
-    header: "Droits",
-    render: (r) => <Line text={ROLE_LABELS[r.role]} />,
-  },
-  {
-    header: "Date",
-    render: (r) => {
-      const dateRequested = formatDate(r.date_requested)
-      const dateExpired = r.expiration_date ? formatDate(r.expiration_date) : null // prettier-ignore
-
-      return dateExpired
-        ? `${dateRequested} (expire le ${dateExpired})`
-        : dateRequested
-    },
-  },
-  padding,
-]
 
 type AccountAccesRightsProps = {
   settings: SettingsGetter
@@ -181,17 +152,55 @@ export const AccountAccesRights = ({
   settings,
   account,
 }: AccountAccesRightsProps) => {
+  const { t } = useTranslation()
+
   const requests = settings.data?.requests ?? []
   const [, revokeMyself] = useAPI(api.revokeMyself)
 
+  const roleLabels = {
+    [UserRole.ReadOnly]: t("Lecture seule"),
+    [UserRole.ReadWrite]: t("Lecture/écriture"),
+    [UserRole.Admin]: t("Administration"),
+    [UserRole.Auditor]: t("Audit"),
+  }
+
+  const columns: Column<UserRightRequest>[] = [
+    padding,
+    statusColumn,
+    {
+      header: t("Organisation"),
+      render: (r) => <Line text={r.entity.name} />,
+    },
+    {
+      header: t("Type"),
+      render: (r) => <Line text={r.entity.entity_type} />,
+    },
+    {
+      header: t("Droits"),
+      render: (r) => <Line text={roleLabels[r.role]} />,
+    },
+    {
+      header: t("Date"),
+      render: (r) => {
+        const dateRequested = formatDate(r.date_requested)
+        const dateExpired = r.expiration_date ? formatDate(r.expiration_date) : null // prettier-ignore
+
+        return dateExpired
+          ? t(`{{dateRequested}} (expire le {{dateExpired}})`, { dateRequested, dateExpired }) // prettier-ignore
+          : dateRequested
+      },
+    },
+    padding,
+  ]
+
   const actions = Actions<UserRightRequest>([
     {
-      title: "Annuler",
+      title: t("Annuler"),
       icon: Cross,
       action: async (r) => {
         const shouldRevoke = await confirm(
-          "Annuler mes accès",
-          `Voulez vous annuler votre accès à ${r.entity.name} ?`
+          t("Annuler mes accès"),
+          t(`Voulez vous annuler votre accès à {{entity}} ?`, { entity: r.entity.name }) // prettier-ignore
         )
 
         if (shouldRevoke) {
@@ -202,30 +211,32 @@ export const AccountAccesRights = ({
     },
   ])
 
-  const rows: Row<UserRightRequest>[] = requests.map((r) => ({
-    value: r,
-  }))
+  const rows: Row<UserRightRequest>[] = requests.map((r) => ({ value: r }))
 
   return (
     <Section>
       <SectionHeader>
-        <Title>Demandes d'accès aux sociétés</Title>
+        <Title>
+          <Trans>Demandes d'accès aux sociétés</Trans>
+        </Title>
         <Button level="primary" icon={Plus} onClick={account.askEntityAccess}>
-          Ajouter une organisation
+          <Trans>Ajouter une organisation</Trans>
         </Button>
       </SectionHeader>
 
       {requests.length === 0 && (
         <SectionBody>
           <Alert level="warning" icon={AlertTriangle}>
-            Aucune autorisation pour ce compte, ajoutez une organisation pour
-            continuer.
+            <Trans>
+              Aucune autorisation pour ce compte, ajoutez une organisation pour
+              continuer.
+            </Trans>
           </Alert>
         </SectionBody>
       )}
 
       {requests.length > 0 && (
-        <Table columns={[...COLUMNS, actions]} rows={rows} />
+        <Table columns={[...columns, actions]} rows={rows} />
       )}
 
       {account.isLoading && <LoaderOverlay />}
