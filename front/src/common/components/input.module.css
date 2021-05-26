@@ -54,16 +54,19 @@
 }
 
 .labelWrapper .labelText {
-  display: flex;
+  display: inline-block;
   align-items: center;
   margin-left: 4px;
   color: var(--gray-dark);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .labelWrapper .labelText :global(.icon) {
   margin-top: 2px;
-  margin-left: 4px;
+  margin-right: 4px;
+  margin-bottom: -4px;
 }
 
 .labelWrapper .labelIcon {

@@ -131,7 +131,7 @@ export const MatierePremiere = ({
   <LabelAutoComplete
     required
     name="matiere_premiere"
-    label="Matiere premiere"
+    label="Matière première"
     minLength={0}
     value={value ?? data?.matiere_premiere ?? null}
     error={errors?.matiere_premiere_code}

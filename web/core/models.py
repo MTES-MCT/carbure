@@ -13,8 +13,10 @@ class Entity(models.Model):
     OPERATOR = 'Opérateur'
     TRADER = 'Trader'
     ADMIN = 'Administration'
+    AUDITOR = 'Auditor'
     ENTITY_TYPES = ((PRODUCER, 'Producteur'), (OPERATOR, 'Opérateur'),
-                    (ADMIN, 'Administration'), (TRADER, 'Trader'), ('Unknown', 'Unknown'))
+                    (ADMIN, 'Administration'), (TRADER, 'Trader'),
+                    (AUDITOR, 'Auditeur'), ('Unknown', 'Unknown'))
 
     name = models.CharField(max_length=64, unique=True)
     date_added = models.DateTimeField(auto_now_add=True)
@@ -558,19 +560,19 @@ class GenericError(models.Model):
     tx = models.ForeignKey(LotTransaction, null=False, blank=False, on_delete=models.CASCADE)
 
     field = models.CharField(max_length=64, null=True, blank=True)
-    fields = models.TextField(null=True, blank=True)
+    fields = models.JSONField(null=True, blank=True)
     value = models.CharField(max_length=128, null=True, blank=True)
     extra = models.CharField(max_length=256, null=True, blank=True)
 
     def natural_key(self):
         return {'error': self.error,
-        'display_to_creator': self.display_to_creator, 'display_to_recipient': self.display_to_recipient,
-        'display_to_admin': self.display_to_admin, 'display_to_auditor': self.display_to_auditor,
-        'acked_by_creator': self.acked_by_creator, 'acked_by_recipient': self.acked_by_recipient,
-        'acked_by_admin': self.acked_by_admin, 'acked_by_auditor': self.acked_by_auditor,
-        'highlighted_by_admin': self.highlighted_by_admin, 'highlighted_by_auditor': self.highlighted_by_auditor,
-        'is_blocking': self.is_blocking, 'tx_id': self.tx_id, 'field': self.field, 'fields': self.fields,
-        'value': self.value, 'extra': self.extra, }
+                'display_to_creator': self.display_to_creator, 'display_to_recipient': self.display_to_recipient,
+                'display_to_admin': self.display_to_admin, 'display_to_auditor': self.display_to_auditor,
+                'acked_by_creator': self.acked_by_creator, 'acked_by_recipient': self.acked_by_recipient,
+                'acked_by_admin': self.acked_by_admin, 'acked_by_auditor': self.acked_by_auditor,
+                'highlighted_by_admin': self.highlighted_by_admin, 'highlighted_by_auditor': self.highlighted_by_auditor,
+                'is_blocking': self.is_blocking, 'tx_id': self.tx_id, 'field': self.field, 'fields': self.fields,
+                'value': self.value, 'extra': self.extra}
 
     class Meta:
         db_table = 'generic_errors'
@@ -595,7 +597,7 @@ class TransactionUpdateHistory(models.Model):
     modified_by_entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
 
     def natural_key(self):
-        return {'tx_id': self.tx.id, 'update_type': self.update_type,  'datetime': self.datetime, 'field': self.field, 'value_before': self.value_before, 'value_after': self.value_after, 
+        return {'tx_id': self.tx.id, 'update_type': self.update_type,  'datetime': self.datetime, 'field': self.field, 'value_before': self.value_before, 'value_after': self.value_after,
         'modified_by': self.modified_by.email if self.modified_by else '', 'entity': self.modified_by_entity.name if self.modified_by_entity else ''}
 
     class Meta:

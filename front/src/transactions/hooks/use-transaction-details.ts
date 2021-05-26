@@ -21,6 +21,8 @@ export function useFieldErrors(errors: GenericError[]) {
   const fieldErrors: { [k: string]: string } = {}
 
   errors.forEach((err) => {
+    if (!err.is_blocking) return
+
     if (err.field) {
       fieldErrors[err.field] = t(err.error)
     }
@@ -33,22 +35,27 @@ export function useFieldErrors(errors: GenericError[]) {
   return fieldErrors
 }
 
+function detailsGetter(entity: EntitySelection) {
+  switch (entity?.entity_type) {
+    case EntityType.Administration:
+      return api.getAdminDetails
+    case EntityType.Auditor:
+      return api.getAuditorDetails
+    default:
+      return api.getDetails
+  }
+}
 export default function useTransactionDetails(
   entity: EntitySelection,
   refresh: () => void
 ) {
-  const detailsGetter =
-    entity?.entity_type === EntityType.Administration
-      ? api.getAdminDetails
-      : api.getDetails
-
   const params: { id: string } = useParams()
   const notifications = useNotificationContext()
   const close = useClose("../")
 
   const { data, hasChange, onChange, reset } = useTransactionForm(entity)
 
-  const [details, resolveDetails] = useAPI(detailsGetter)
+  const [details, resolveDetails] = useAPI(detailsGetter(entity))
   const [request, resolveUpdate] = useAPI(api.updateLot)
   const [comment, resolveComment] = useAPI(api.commentLot)
 
