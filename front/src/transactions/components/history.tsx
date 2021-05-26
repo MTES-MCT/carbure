@@ -42,7 +42,7 @@ const TransactionHistory = ({ history = [] }: TransactionHistoryProps) => {
   const { t } = useTranslation()
 
   const rows = history
-    .filter(h => t(h.field, { ns: 'fields' }) != h.field) // ignore fields that have no translation
+    .filter(h => t(h.field, { ns: 'fields' }) !== h.field) // ignore fields that have no translation
     .map(value => ({ value: { ...value, label: t(value.field, { ns: 'fields' }) } }))
 
   return (
