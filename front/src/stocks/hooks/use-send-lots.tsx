@@ -27,7 +27,6 @@ export interface LotSender {
   sendAllDrafts: () => Promise<boolean>
   sendSelection: () => Promise<boolean>
   sendLot: (l: number) => Promise<boolean>
-  // convertETBE: (l: number) => Promise<boolean>
   convertETBEComplex: () => Promise<boolean>
   forwardLots: () => Promise<boolean>
 }
@@ -127,6 +126,7 @@ export default function useSendLot(
           ? sent.delivery_site.depot_id
           : sent.delivery_site ?? "",
         delivery_site_country: sent.delivery_site_country?.code_pays,
+        vendor_certificate: sent.carbure_vendor_certificate
       }
 
       notifyCreated(resolveCreate(entity.id, [draft]))
@@ -187,21 +187,6 @@ export default function useSendLot(
     }
     return false
   }
-
-  // async function convertETBE(txID: number) {
-  //   const sent = await prompt(
-  //     "Conversion ETBE",
-  //     "Veuillez préciser les détails du lot transformé",
-  //     ConvertETBEPrompt
-  //   )
-
-  //   if (entity !== null && sent) {
-  //     sent.previous_stock_tx_id = txID
-  //     notifyCreated(resolveETBE(entity.id, [sent]))
-  //   }
-
-  //   return Boolean(sent)
-  // }
 
   async function convertETBEComplex() {
     if (entity === null) return false
