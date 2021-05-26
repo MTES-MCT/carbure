@@ -72,11 +72,10 @@ const TransactionDetails = ({
 
   const navigator = useNavigate(transactions)
 
-  const isAdmin = entity?.entity_type === EntityType.Administration
-  const isOperator = entity?.entity_type === EntityType.Operator
-
   const isEditable = EDITABLE.includes(status)
   const isCommentable = COMMENTABLE.includes(status)
+
+  const isVendor = Boolean(entity) && transaction?.carbure_vendor?.id === entity!.id
   const isVendorOperator = transaction?.carbure_vendor?.entity_type === EntityType.Operator
 
   const hasErrors =
@@ -206,7 +205,7 @@ const TransactionDetails = ({
           </React.Fragment>
         )}
 
-        {!isOperator && !isAdmin && status === LotStatus.Accepted && (
+        {isVendor && status === LotStatus.Accepted && (
           <AsyncButton
             icon={Edit}
             level="warning"
@@ -217,7 +216,7 @@ const TransactionDetails = ({
           </AsyncButton>
         )}
 
-        {isOperator && !isVendorOperator && status === LotStatus.Accepted && (
+        {!isVendorOperator && !isVendor && status === LotStatus.Accepted && (
           <AsyncButton
             icon={Edit}
             level="warning"
