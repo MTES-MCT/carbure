@@ -96,7 +96,7 @@ test("renew a certificate", async () => {
   screen.getByText("Expired ISCC Test")
   screen.getByText("Expired Holder Test")
   screen.getByText("Expired Scope Test")
-  screen.getByText("Expiré (01/01/2000)")
+  screen.getByText(/Expiré \(01.+01.+2000\)/)
 
   userEvent.click(updateButton)
   screen.getByText("Mise à jour certificat ISCC")

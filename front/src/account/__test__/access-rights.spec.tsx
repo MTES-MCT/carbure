@@ -26,7 +26,7 @@ const AccountWithHooks = () => {
 
 test("empty acces rights in account page", async () => {
   render(<AccountWithHooks />)
-  screen.debug()
+
   await waitWhileLoading()
 
   screen.getByText("Demandes d'accès aux sociétés")
