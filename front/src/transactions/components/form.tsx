@@ -39,7 +39,10 @@ const TransactionForm = ({
   onSubmit,
 }: TransactionFormProps) => {
   const isStock = Boolean(transaction.parent_lot)
-  const isOwner = Boolean(entity) && entity?.id === transaction.data_origin_entity?.id
+
+  const isOwner =
+    !transaction.data_origin_entity ||
+    (Boolean(entity) && entity?.id === transaction.data_origin_entity?.id)
 
   return (
     <Form id={id} className={styles.transactionForm} onSubmit={onSubmit}>
