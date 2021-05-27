@@ -10,7 +10,7 @@ from core.common import load_excel_file, send_lot_from_stock, generate_carbure_i
 from core.xlsx_v3 import template_stock, template_stock_bcghg
 from core.xlsx_v3 import export_stocks
 from django_otp.decorators import otp_required
-from api.v3.lots.helpers import get_summary, filter_lots
+from api.v3.lots.helpers import get_snapshot_filters, get_summary, filter_lots
 
 
 sort_key_to_django_field = {'period': 'lot__period',
@@ -123,6 +123,7 @@ def get_snapshot(request, *args, **kwargs):
     entity = context['entity']
 
     data = {}
+
     if entity.entity_type in ['Producteur', 'Trader']:
         # drafts are lot that will be extracted from mass balance and sent to a client
         tx_drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
@@ -135,41 +136,17 @@ def get_snapshot(request, *args, **kwargs):
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
 
-    # create union of querysets just to create filters
-    # txs = tx_drafts.union(tx_inbox, tx_stock)
-    # txids = txs.values('id').distinct()
-    # problem with using above code calling union, doing it manually
-    txids = []
-    txids += [t['id'] for t in tx_drafts.values('id').distinct()]
-    txids += [t['id'] for t in tx_inbox.values('id').distinct()]
-    txids += [t['id'] for t in tx_stock.values('id').distinct()]
-    txs = LotTransaction.objects.filter(id__in=txids)
-    mps = [{'value': m.code, 'label': m.name}
-           for m in MatierePremiere.objects.filter(id__in=txs.values('lot__matiere_premiere').distinct())]
+    txs = tx_drafts | tx_inbox | tx_stock
 
-    bcs = [{'value': b.code, 'label': b.name}
-           for b in Biocarburant.objects.filter(id__in=txs.values('lot__biocarburant').distinct())]
-
-    countries = [{'value': c.code_pays, 'label': c.name}
-                 for c in Pays.objects.filter(id__in=txs.values('lot__pays_origine').distinct())]
-
-    ds1 = [c['carbure_delivery_site__name'] for c in txs.values('carbure_delivery_site__name').distinct()]
-    ds2 = [c['unknown_delivery_site'] for c in txs.values('unknown_delivery_site').distinct()]
-    delivery_sites = list(set([s for s in ds1 + ds2 if s]))
-
-    ps1 = [p['lot__carbure_production_site__name'] for p in txs.values('lot__carbure_production_site__name').distinct()]
-    ps2 = [p['lot__unknown_production_site'] for p in txs.values('lot__unknown_production_site').distinct()]
-    psites = list(set([p for p in ps1 + ps2 if p]))
-
-    v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
-    v2 = [v['lot__unknown_supplier'] for v in txs.values('lot__unknown_supplier').distinct()]
-    vendors = [v for v in v1 + v2 if v]
-
-    periods = sorted([p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']])
-
-    data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs,
-                       'production_sites': psites, 'countries_of_origin': countries, 'delivery_sites': delivery_sites,
-                       'periods': periods, 'vendors': vendors}
+    data['filters'] = get_snapshot_filters(txs, [
+        'periods',
+        'biocarburants',
+        'matieres_premieres',
+        'countries_of_origin',
+        'vendors',
+        'production_sites',
+        'delivery_sites'
+    ])
 
     return JsonResponse({'status': 'success', 'data': data})
 

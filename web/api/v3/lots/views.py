@@ -133,20 +133,19 @@ def get_snapshot(request, *args, **kwargs):
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
 
-    filters = get_snapshot_filters(txs)
+    base_filters = [
+        'periods',
+        'biocarburants',
+        'matieres_premieres',
+        'countries_of_origin',
+        'production_sites',
+        'delivery_sites',
+    ]
 
-    if entity.entity_type == 'Producteur':
-        c1 = [c['carbure_client__name'] for c in txs.values('carbure_client__name').distinct()]
-        c2 = [c['unknown_client'] for c in txs.values('unknown_client').distinct()]
-        clients = [c for c in c1 + c2 if c]
-        filters['clients'] = clients
-    elif entity.entity_type == 'Opérateur':
-        v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
-        v2 = [v['lot__unknown_supplier'] for v in txs.values('lot__unknown_supplier').distinct()]
-        vendors = [v for v in v1 + v2 if v]
-        filters['vendors'] = vendors
-
-    data['filters'] = filters
+    if entity.entity_type == Entity.OPERATOR:
+        data['filters'] = get_snapshot_filters(txs, base_filters + ['vendors'])
+    else:
+        data['filters'] = get_snapshot_filters(txs, base_filters + ['clients'])
 
     depots = [d.natural_key() for d in EntityDepot.objects.filter(entity=entity)]
     data['depots'] = depots

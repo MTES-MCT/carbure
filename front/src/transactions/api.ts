@@ -322,7 +322,9 @@ export async function amendAndCommentLot(
 }
 
 export function getAuditorSnapshot(entity_id: number, year: number) {
-  return api.get<Snapshot>("/auditor/snapshot", { entity_id, year })
+  return api
+    .get<Snapshot>("/auditor/snapshot", { entity_id, year })
+    .then(normalizeFilters)
 }
 
 export function getAuditorLots(params: TransactionQuery) {
