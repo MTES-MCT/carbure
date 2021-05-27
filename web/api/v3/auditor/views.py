@@ -16,7 +16,7 @@ from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays,
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
 from core.xlsx_v3 import export_transactions
 from core.common import validate_lots, load_excel_file, get_prefetched_data, check_duplicates, send_rejection_emails
-from api.v3.sanity_checks import bulk_sanity_checks
+from api.v3.sanity_checks import bulk_sanity_checks, generic_error
 from django_otp.decorators import otp_required
 from core.decorators import check_rights
 from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, filter_entity_transactions
@@ -30,7 +30,7 @@ def get_lots(request, *args, **kwargs):
     entity = context['entity']
 
     status = request.GET.get('status', False)
-    
+
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
 
@@ -89,59 +89,53 @@ def get_details(request, *args, **kwargs):
 
     return JsonResponse({'status': 'success', 'data': data})
 
+
 @check_rights('entity_id')
 def get_snapshot(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
-    data = {}
     year = request.GET.get('year', False)
-    today = datetime.date.today()
-    date_from = today.replace(month=1, day=1)
-    date_until = today.replace(month=12, day=31)
-    if year:
-        try:
+
+    try:
+        if year:
             year = int(year)
             date_from = datetime.date(year=year, month=1, day=1)
             date_until = datetime.date(year=year, month=12, day=31)
-        except Exception:
-            return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
+        else:
+            today = datetime.date.today()
+            date_from = today.replace(month=1, day=1)
+            date_until = today.replace(month=12, day=31)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
 
-    if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader':
-        txs = LotTransaction.objects.filter(carbure_vendor=entity)
-        data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
-        txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-        draft = txs.filter(lot__status='Draft', lot__parent_lot=None).count()
-        validated = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA']).count()
-        tofix = txs.filter(lot__status='Validated', delivery_status__in=['AC', 'R']).count()
-        accepted = txs.filter(lot__status='Validated', delivery_status='A').count()
-        data['lots'] = {'draft': draft, 'validated': validated, 'tofix': tofix, 'accepted': accepted}
-    elif entity.entity_type == 'Opérateur':
-        txs = LotTransaction.objects.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
-        data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
-        txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-        draft = txs.filter(lot__added_by=entity, lot__status='Draft').count()
-        ins = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA', 'AC'], is_mac=False).count()
-        accepted = txs.filter(lot__status='Validated', delivery_status='A').count()
-        data['lots'] = {'draft': draft, 'accepted': accepted, 'in': ins}
-    else:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
+    try:
+        auditees = UserRights.objects.filter(user=request.user, role=UserRights.AUDITOR).values_list('entity')
 
-    filters = get_snapshot_filters(txs)
+        txs = LotTransaction.objects.filter(delivery_date__gte=date_from, delivery_date__lte=date_until).filter(
+            Q(carbure_vendor__id__in=auditees) | Q(carbure_client__id__in=auditees))
 
-    if entity.entity_type == 'Producteur':
-        c1 = [c['carbure_client__name'] for c in txs.values('carbure_client__name').distinct()]
-        c2 = [c['unknown_client'] for c in txs.values('unknown_client').distinct()]
-        clients = [c for c in c1 + c2 if c]
-        filters['clients'] = clients
-    elif entity.entity_type == 'Opérateur':
-        v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
-        v2 = [v['lot__unknown_supplier'] for v in txs.values('lot__unknown_supplier').distinct()]
-        vendors = [v for v in v1 + v2 if v]
-        filters['vendors'] = vendors
+        years = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
 
-    data['filters'] = filters
+        lots = {}
+        lots['alert'] = txs.annotate(Count('genericerror')).filter(genericerror__count__gt=0).count()
+        lots['correction'] = txs.filter(delivery_status__in=['AC', 'AA', 'R']).count()
+        lots['declaration'] = txs.filter(delivery_status__in=['A', 'N']).count()
 
-    depots = [d.natural_key() for d in EntityDepot.objects.filter(entity=entity)]
-    data['depots'] = depots
+        filters = get_snapshot_filters(txs, [
+            'delivery_status',
+            'periods',
+            'biocarburants',
+            'matieres_premieres',
+            'countries_of_origin',
+            'vendors',
+            'clients',
+            'production_sites',
+            'delivery_sites',
+            'added_by',
+            'errors',
+            'is_forwarded',
+            'is_mac'
+        ])
 
-    return JsonResponse({'status': 'success', 'data': data})
+        data = {'lots': lots, 'filters': filters, 'years': years}
+        return JsonResponse({'status': 'success', 'data': data})
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': 'Failed building snapshot'}, status=400)

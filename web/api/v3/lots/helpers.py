@@ -1,5 +1,6 @@
 import datetime
 import calendar
+from time import perf_counter
 from dateutil.relativedelta import *
 from django.db.models import Q, F, Case, When, Count, Sum
 from django.db.models.functions import TruncMonth
@@ -33,9 +34,9 @@ def get_errors(tx):
 def get_entity_lots_by_status(entity, status):
     if entity.entity_type in ('Producteur', 'Trader'):
         txs = LotTransaction.objects.select_related(
-            'lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country', 
+            'lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
             'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
-            'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country', 
+            'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country',
         ).prefetch_related('genericerror_set', 'lot__carbure_production_site__productionsitecertificate_set')
 
         txs = txs.filter(carbure_vendor=entity)
@@ -277,31 +278,78 @@ def get_lots_with_metadata(txs, entity, querySet):
         return response
 
 
-def get_snapshot_filters(txs):
-    mps = [{'value': m.code, 'label': m.name}
-           for m in MatierePremiere.objects.filter(id__in=txs.values('lot__matiere_premiere').distinct())]
+def get_snapshot_filters(txs, whitelist):
+    filters = {}
 
-    bcs = [{'value': b.code, 'label': b.name}
-           for b in Biocarburant.objects.filter(id__in=txs.values('lot__biocarburant').distinct())]
+    # prefetch related lots and txs to speed up queries
+    ids = txs.values('id', 'lot__id').distinct()
+    lot_ids = set([tx['lot__id'] for tx in ids])
+    tx_ids = set([tx['id'] for tx in ids])
+    lots = LotV2.objects.filter(id__in=lot_ids)
+    txs = LotTransaction.objects.filter(id__in=tx_ids)
 
-    countries = [{'value': c.code_pays, 'label': c.name}
-                 for c in Pays.objects.filter(id__in=txs.values('lot__pays_origine').distinct())]
+    if 'matieres_premieres' in whitelist:
+        mps = MatierePremiere.objects.filter(id__in=lots.values('matiere_premiere__id').distinct()).values('code', 'name')
+        filters['matieres_premieres'] = [{'value': mp['code'], 'label': mp['name']} for mp in mps]
 
-    periods = sorted([p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']])
+    if 'biocarburants' in whitelist:
+        bcs = Biocarburant.objects.filter(id__in=lots.values('biocarburant__id').distinct()).values('code', 'name')
+        filters['biocarburants'] = [{'value': b['code'], 'label': b['name']} for b in bcs]
 
+    if 'countries_of_origin' in whitelist:
+        countries = Pays.objects.filter(id__in=lots.values('pays_origine').distinct()).values('code_pays', 'name')
+        filters['countries_of_origin'] = [{'value': c['code_pays'], 'label': c['name']} for c in countries]
 
-    ps1 = [p['lot__carbure_production_site__name'] for p in txs.values('lot__carbure_production_site__name').distinct()]
-    ps2 = [p['lot__unknown_production_site'] for p in txs.values('lot__unknown_production_site').distinct()]
-    psites = list(set([p for p in ps1 + ps2 if p]))
+    if 'periods' in whitelist:
+        filters['periods'] = [p['period'] for p in lots.values('period').distinct() if p['period']]
 
-    ds1 = [p['carbure_delivery_site__name'] for p in txs.values('carbure_delivery_site__name').distinct()]
-    ds2 = [p['unknown_delivery_site'] for p in txs.values('unknown_delivery_site').distinct()]
-    dsites = list(set([d for d in ds1 + ds2 if d]))
+    if 'production_sites' in whitelist:
+        filters['production_sites'] = []
+        for ps in lots.values('carbure_production_site__name', 'unknown_production_site').distinct():
+            if ps['carbure_production_site__name'] not in ('', None):
+                filters['production_sites'].append(ps['carbure_production_site__name'])
+            elif ps['unknown_production_site'] not in ('', None):
+                filters['production_sites'].append(ps['unknown_production_site'])
 
-    filters = {'matieres_premieres': mps, 'biocarburants': bcs, 'periods': periods,
-                       'production_sites': psites, 'countries_of_origin': countries, 'delivery_sites': dsites}
+    if 'delivery_sites' in whitelist:
+        filters['delivery_sites'] = []
+        for ps in txs.values('carbure_delivery_site__name', 'unknown_delivery_site').distinct():
+            if ps['carbure_delivery_site__name'] not in ('', None):
+                filters['delivery_sites'].append(ps['carbure_delivery_site__name'])
+            elif ps['unknown_delivery_site'] not in ('', None):
+                filters['delivery_sites'].append(ps['unknown_delivery_site'])
+
+    if 'errors' in whitelist:
+        generic_errors = [e['genericerror__error'] for e in txs.values('genericerror__error').distinct() if e['genericerror__error']]
+        filters['errors'] = generic_errors
+
+    if 'clients' in whitelist:
+        filters['clients'] = []
+        for ps in txs.values('carbure_client__name', 'unknown_client').distinct():
+            if ps['carbure_client__name'] not in ('', None):
+                filters['clients'].append(ps['carbure_client__name'])
+            elif ps['unknown_client'] not in ('', None):
+                filters['clients'].append(ps['unknown_client'])
+
+    if 'vendors' in whitelist:
+        v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
+        v2 = [v['unknown_supplier'] for v in lots.values('unknown_supplier').distinct()]
+        filters['vendors'] = [v for v in set(v1 + v2) if v]
+
+    if 'added_by' in whitelist:
+        filters['added_by'] = [e['added_by__name'] for e in lots.values('added_by__name').distinct()]
+
+    if 'delivery_status' in whitelist:
+        filters['delivery_status'] = [{'value': s[0], 'label': s[1]} for s in LotTransaction.DELIVERY_STATUS]
+
+    if 'is_forwarded' in whitelist:
+        filters['is_forwarded'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
+
+    if 'is_mac' in whitelist:
+        filters['is_mac'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
 
     return filters
+
 
 def filter_entity_transactions(entity, querySet):
     status = querySet.get('status', False)
@@ -357,3 +405,22 @@ def get_summary(txs, entity):
 
     return {'in': data_in, 'out': data_out, 'tx_ids': tx_ids,
             'total_volume': total_volume, 'total_volume_in': total_volume_in, 'total_volume_out': total_volume_out}
+
+
+# little helper to help measure elapsed time
+class Perf:
+    steps = []
+
+    def __init__(self):
+        t0 = perf_counter()
+        self.steps.append(t0)
+
+    def step(self, message):
+        t = perf_counter()
+        dt = t - self.steps[-1]
+        self.steps.append(t)
+        print("[%f] %s" % (dt, message))
+
+    def total(self, message):
+        dt = self.steps[-1] - self.steps[0]
+        print("[%f] %s" % (dt, message))

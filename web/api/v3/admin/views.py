@@ -232,33 +232,30 @@ def get_snapshot(request):
 
     try:
         data = {}
-        txs = LotTransaction.objects.all().filter(lot__status='Validated')
-        data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
-        txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-        _, total_errors = get_lots_with_errors(txs)
+        txs = LotTransaction.objects.all()
+        data['years'] = [t.year for t in txs.dates('delivery_date', 'year')]
+        txs = txs.filter(lot__status='Validated', delivery_date__gte=date_from, delivery_date__lte=date_until)
+
+        alerts = txs.annotate(Count('genericerror')).filter(genericerror__count__gt=0).count()
         correction = txs.filter(delivery_status__in=['AC', 'R', 'AA']).count()
         declaration = txs.filter(delivery_status__in=['A', 'N']).count()
-        data['lots'] = {'alert': total_errors, 'correction': correction, 'declaration': declaration}
+        data['lots'] = {'alert': alerts, 'correction': correction, 'declaration': declaration}
 
-        filters = get_snapshot_filters(txs)
-
-        generic_errors = [e['genericerror__error'] for e in txs.values('genericerror__error').distinct() if e['genericerror__error']]
-        filters['errors'] = generic_errors
-
-        c1 = [c['carbure_client__name'] for c in txs.values('carbure_client__name').distinct()]
-        c2 = [c['unknown_client'] for c in txs.values('unknown_client').distinct()]
-        filters['clients'] = sorted([c for c in set(c1 + c2) if c])
-
-        v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
-        v2 = [v['lot__unknown_supplier'] for v in txs.values('lot__unknown_supplier').distinct()]
-        filters['vendors'] = sorted([v for v in set(v1 + v2) if v])
-
-        filters['added_by'] = [e['lot__added_by__name'] for e in txs.values('lot__added_by__name').distinct()]
-
-        filters['delivery_status'] = [{'value':s[0], 'label': s[1]} for s in LotTransaction.DELIVERY_STATUS]
-        filters['is_forwarded'] = [{'value':True, 'label': 'Oui'}, {'value':False, 'label': 'Non'}]
-        filters['is_mac'] = [{'value':True, 'label': 'Oui'}, {'value':False, 'label': 'Non'}]
-        data['filters'] = filters
+        data['filters'] = get_snapshot_filters(txs, [
+            'delivery_status',
+            'periods',
+            'biocarburants',
+            'matieres_premieres',
+            'countries_of_origin',
+            'vendors',
+            'clients',
+            'production_sites',
+            'delivery_sites',
+            'added_by',
+            'errors',
+            'is_forwarded',
+            'is_mac'
+        ])
 
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Exception"}, status=400)
