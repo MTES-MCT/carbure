@@ -361,6 +361,7 @@ class LotV2(models.Model):
         indexes = [
             models.Index(fields=["status"]),
             models.Index(fields=["added_by"]),
+            models.Index(fields=["period"]),
         ]
 
 
@@ -432,6 +433,7 @@ class LotTransaction(models.Model):
         indexes = [
             models.Index(fields=["carbure_vendor"]),
             models.Index(fields=["carbure_client"]),
+            models.Index(fields=["delivery_status"]),
         ]
 
 
