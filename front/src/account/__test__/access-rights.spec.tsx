@@ -14,6 +14,7 @@ afterEach(() => {
   server.resetHandlers()
   setAccessRequests([])
 })
+
 afterAll(() => server.close())
 
 // this component is only here for testing as otherwise we can't use the useGetSettingsHook

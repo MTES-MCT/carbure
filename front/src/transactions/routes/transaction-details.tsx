@@ -72,11 +72,11 @@ const TransactionDetails = ({
 
   const navigator = useNavigate(transactions)
 
-  const isAdmin = entity?.entity_type === EntityType.Administration
-  const isOperator = entity?.entity_type === EntityType.Operator
-
   const isEditable = EDITABLE.includes(status)
   const isCommentable = COMMENTABLE.includes(status)
+
+  const isVendor = Boolean(entity) && transaction?.carbure_vendor?.id === entity!.id
+  const isVendorOperator = transaction?.carbure_vendor?.entity_type === EntityType.Operator
 
   const hasErrors =
     validationErrors.length > 0 || Object.keys(fieldErrors).length > 0
@@ -121,7 +121,7 @@ const TransactionDetails = ({
         />
       )}
 
-      {isAdmin && Boolean(details.data?.updates?.length) && <TransactionHistory history={details.data?.updates} />}
+      {Boolean(details.data?.updates?.length) && <TransactionHistory history={details.data?.updates} />}
 
       <div className={styles.transactionFormButtons}>
         {isEditable && (
@@ -183,7 +183,7 @@ const TransactionDetails = ({
               Accepter
             </AsyncButton>
 
-            {!transaction?.lot.parent_lot && (
+            {(!transaction?.lot.parent_lot && !isVendorOperator) && (
               <AsyncButton
                 icon={AlertTriangle}
                 level="warning"
@@ -205,7 +205,7 @@ const TransactionDetails = ({
           </React.Fragment>
         )}
 
-        {!isOperator && !isAdmin && status === LotStatus.Accepted && (
+        {isVendor && status === LotStatus.Accepted && (
           <AsyncButton
             icon={Edit}
             level="warning"
@@ -216,7 +216,7 @@ const TransactionDetails = ({
           </AsyncButton>
         )}
 
-        {isOperator && status === LotStatus.Accepted && (
+        {!isVendorOperator && !isVendor && status === LotStatus.Accepted && (
           <AsyncButton
             icon={Edit}
             level="warning"

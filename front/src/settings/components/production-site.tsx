@@ -1,4 +1,4 @@
-import React from "react"
+import { Trans, useTranslation } from "react-i18next"
 
 import {
   Biocarburant,
@@ -75,12 +75,6 @@ export type ProductionSiteState = {
   certificates: ProductionCertificate[]
 }
 
-const GES_OPTIONS = [
-  { value: GESOption.Default, label: "Valeurs par défaut" },
-  { value: GESOption.NUTS2, label: "Valeurs NUTS2" },
-  { value: GESOption.Actual, label: "Valeurs réelles" },
-]
-
 type ProductionSitePromptProps = PromptProps<ProductionSiteState> & {
   title: string
   description?: string
@@ -99,6 +93,8 @@ export const ProductionSitePrompt = ({
   readOnly,
   onResolve,
 }: ProductionSitePromptProps) => {
+  const { t } = useTranslation()
+
   const { data, hasChange, onChange } = useForm<ProductionSiteState>({
     site_id: productionSite?.site_id ?? "",
     name: productionSite?.name ?? "",
@@ -122,6 +118,12 @@ export const ProductionSitePrompt = ({
     certificates: productionSite?.certificates ?? [],
   })
 
+  const gesOptions = [
+    { value: GESOption.Default, label: t("Valeurs par défaut") },
+    { value: GESOption.NUTS2, label: t("Valeurs NUTS2") },
+    { value: GESOption.Actual, label: t("Valeurs réelles") },
+  ]
+
   const canSave = Boolean(
     hasChange && data.country && data.date_mise_en_service && data.name
   )
@@ -136,7 +138,7 @@ export const ProductionSitePrompt = ({
 
         <LabelInput
           readOnly={readOnly}
-          label="Nom du site"
+          label={t("Nom du site")}
           name="name"
           value={data.name}
           onChange={onChange}
@@ -145,7 +147,7 @@ export const ProductionSitePrompt = ({
         <Box row>
           <LabelInput
             readOnly={readOnly}
-            label="N° d'identification (SIRET)"
+            label={t("N° d'identification (SIRET)")}
             name="site_id"
             value={data.site_id}
             onChange={onChange}
@@ -153,7 +155,7 @@ export const ProductionSitePrompt = ({
           <LabelInput
             readOnly={readOnly}
             type="date"
-            label="Date de mise en service"
+            label={t("Date de mise en service")}
             name="date_mise_en_service"
             value={data.date_mise_en_service}
             onChange={onChange}
@@ -165,14 +167,14 @@ export const ProductionSitePrompt = ({
         <Box row>
           <LabelInput
             readOnly={readOnly}
-            label="Ville"
+            label={t("Ville")}
             name="city"
             value={data.city}
             onChange={onChange}
           />
           <LabelInput
             readOnly={readOnly}
-            label="Code postal"
+            label={t("Code postal")}
             name="postal_code"
             value={data.postal_code}
             onChange={onChange}
@@ -181,8 +183,8 @@ export const ProductionSitePrompt = ({
 
         <LabelAutoComplete
           readOnly={readOnly}
-          label="Pays"
-          placeholder="Rechercher un pays..."
+          label={t("Pays")}
+          placeholder={t("Rechercher un pays...")}
           name="country"
           value={data.country}
           getValue={(c) => c?.code_pays ?? ""}
@@ -195,7 +197,7 @@ export const ProductionSitePrompt = ({
 
         <LabelInput
           readOnly={readOnly}
-          label="Nom du gérant"
+          label={t("Nom du gérant")}
           name="manager_name"
           value={data.manager_name}
           onChange={onChange}
@@ -203,14 +205,14 @@ export const ProductionSitePrompt = ({
         <Box row>
           <LabelInput
             readOnly={readOnly}
-            label="N° de téléphone du gérant"
+            label={t("N° de téléphone du gérant")}
             name="manager_phone"
             value={data.manager_phone}
             onChange={onChange}
           />
           <LabelInput
             readOnly={readOnly}
-            label="Addresse email du gérant"
+            label={t("Addresse email du gérant")}
             name="manager_email"
             value={data.manager_email}
             onChange={onChange}
@@ -222,13 +224,13 @@ export const ProductionSitePrompt = ({
         <Box row>
           <LabelCheckbox
             disabled
-            label="Éligible au double-comptage ?"
+            label={t("Éligible au double-comptage ?")}
             name="eligible_dc"
             defaultChecked={data.eligible_dc}
           />
           <LabelInput
             disabled
-            label="Référence double-comptage"
+            label={t("Référence double-comptage")}
             name="dc_reference"
             value={data.dc_reference}
           />
@@ -236,25 +238,25 @@ export const ProductionSitePrompt = ({
 
         <hr />
 
-        <Label label="Options GES">
+        <Label label={t("Options GES")}>
           <RadioGroup
             readOnly={readOnly}
             row
             value={data.ges_option}
             name="ges_option"
-            options={GES_OPTIONS}
+            options={gesOptions}
             onChange={onChange}
           />
         </Label>
 
         <hr />
 
-        <Label label="Matieres premieres">
+        <Label label={t("Matieres premieres")}>
           <MultiAutocomplete
             readOnly={readOnly}
             value={data.matieres_premieres}
             name="matieres_premieres"
-            placeholder="Ajouter matières premières..."
+            placeholder={t("Ajouter matières premières...")}
             getValue={(o) => o?.code ?? ""}
             getLabel={(o) => o?.name ?? ""}
             minLength={0}
@@ -262,12 +264,12 @@ export const ProductionSitePrompt = ({
             onChange={onChange}
           />
         </Label>
-        <Label label="Biocarburants">
+        <Label label={t("Biocarburants")}>
           <MultiAutocomplete
             readOnly={readOnly}
             value={data.biocarburants}
             name="biocarburants"
-            placeholder="Ajouter biocarburants..."
+            placeholder={t("Ajouter biocarburants...")}
             getValue={(o) => o.code}
             getLabel={(o) => o.name}
             minLength={0}
@@ -278,11 +280,11 @@ export const ProductionSitePrompt = ({
 
         <hr />
 
-        <Label label="Certificats (2BS, ISCC)">
+        <Label label={t("Certificats (2BS, ISCC)")}>
           <MultiAutocomplete
             readOnly={readOnly}
             name="certificates"
-            placeholder="Rechercher des certificats..."
+            placeholder={t("Rechercher des certificats...")}
             value={data.certificates}
             getValue={(c) => c.certificate_id}
             getLabel={(c) => c.certificate_id + " - " + c.holder}
@@ -303,41 +305,17 @@ export const ProductionSitePrompt = ({
               disabled={!canSave}
               onClick={() => data && onResolve(data)}
             >
-              Sauvegarder
+              <Trans>Sauvegarder</Trans>
             </Button>
           )}
           <Button icon={Return} onClick={() => onResolve()}>
-            Retour
+            <Trans>Retour</Trans>
           </Button>
         </DialogButtons>
       </SettingsForm>
     </Dialog>
   )
 }
-
-const PRODUCTION_SITE_COLUMNS: Column<ProductionSiteDetails>[] = [
-  padding,
-  {
-    header: "ID",
-    className: styles.settingsTableColumn,
-    render: (ps) => <Line text={`${ps.site_id}`} />,
-  },
-  {
-    header: "Nom",
-    className: styles.settingsTableColumn,
-    render: (ps) => <Line text={ps.name} />,
-  },
-  {
-    header: "Pays",
-    className: styles.settingsTableColumn,
-    render: (ps) => <Line text={ps.country?.name} />,
-  },
-  {
-    header: "Date de mise en service",
-    className: styles.settingsTableColumn,
-    render: (ps) => <Line text={formatDate(ps.date_mise_en_service)} />,
-  },
-]
 
 type ProductionSitesSettingsProps = {
   settings: ProductionSiteSettingsHook
@@ -346,17 +324,42 @@ type ProductionSitesSettingsProps = {
 const ProductionSitesSettings = ({
   settings,
 }: ProductionSitesSettingsProps) => {
+  const { t } = useTranslation()
+
   const actions = settings.removeProductionSite
     ? Actions([
         {
           icon: Cross,
-          title: "Supprimer le site de production",
+          title: t("Supprimer le site de production"),
           action: settings.removeProductionSite,
         },
       ])
     : arrow
 
-  const columns = [...PRODUCTION_SITE_COLUMNS, actions]
+  const columns: Column<ProductionSiteDetails>[] = [
+    padding,
+    {
+      header: t("ID"),
+      className: styles.settingsTableColumn,
+      render: (ps) => <Line text={`${ps.site_id}`} />,
+    },
+    {
+      header: t("Nom"),
+      className: styles.settingsTableColumn,
+      render: (ps) => <Line text={ps.name} />,
+    },
+    {
+      header: t("Pays"),
+      className: styles.settingsTableColumn,
+      render: (ps) => <Line text={ps.country?.name} />,
+    },
+    {
+      header: t("Date de mise en service"),
+      className: styles.settingsTableColumn,
+      render: (ps) => <Line text={formatDate(ps.date_mise_en_service)} />,
+    },
+    actions,
+  ]
 
   const rows: Row<ProductionSiteDetails>[] = settings.productionSites.map(
     (ps) => ({
@@ -368,14 +371,16 @@ const ProductionSitesSettings = ({
   return (
     <Section id="production">
       <SectionHeader>
-        <Title>Sites de production</Title>
+        <Title>
+          <Trans>Sites de production</Trans>
+        </Title>
         {settings.createProductionSite && (
           <Button
             level="primary"
             icon={Plus}
             onClick={settings.createProductionSite}
           >
-            Ajouter un site de production
+            <Trans>Ajouter un site de production</Trans>
           </Button>
         )}
       </SectionHeader>
@@ -383,7 +388,7 @@ const ProductionSitesSettings = ({
       {settings.isEmpty && (
         <SectionBody>
           <Alert icon={AlertCircle} level="warning">
-            Aucun site de production trouvé
+            <Trans>Aucun site de production trouvé</Trans>
           </Alert>
         </SectionBody>
       )}

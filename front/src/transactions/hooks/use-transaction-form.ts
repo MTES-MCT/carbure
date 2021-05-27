@@ -21,6 +21,7 @@ export interface TransactionFormState {
   status: string
   delivery_status: string
   added_by: Entity | null
+  data_origin_entity: Entity | null
   parent_lot: Lot | null
 
   dae: string
@@ -136,6 +137,7 @@ export function toTransactionFormState(tx: Transaction): TransactionFormState {
       : tx.unknown_delivery_site_country,
 
     added_by: tx.lot.added_by,
+    data_origin_entity: tx.lot.data_origin_entity,
     parent_lot: tx.lot.parent_lot,
   }
 }
@@ -218,6 +220,7 @@ const initialState: TransactionFormState = {
   id: -1,
   carbure_id: "",
   added_by: null,
+  data_origin_entity: null,
   parent_lot: null,
   status: "Draft",
   delivery_status: "N",

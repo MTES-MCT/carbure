@@ -1,4 +1,5 @@
 import { useEffect } from "react"
+import { useTranslation } from "react-i18next"
 
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { DeliverySite, OwnershipType } from "common/types"
@@ -31,6 +32,7 @@ export interface DeliverySiteSettingsHook {
 export default function useDeliverySites(
   entity: EntitySelection
 ): DeliverySiteSettingsHook {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
 
   const [requestGetDeliverySites, resolveGetDeliverySites] = useAPI(api.getDeliverySites); // prettier-ignore
@@ -71,12 +73,12 @@ export default function useDeliverySites(
 
         notifications.push({
           level: "success",
-          text: "Le dépôt a bien été ajouté !",
+          text: t("Le dépôt a bien été ajouté !"),
         })
       } else {
         notifications.push({
           level: "error",
-          text: "Impossible d'ajouter le dépôt.",
+          text: t("Impossible d'ajouter le dépôt."),
         })
       }
     }
@@ -85,8 +87,8 @@ export default function useDeliverySites(
   async function showDeliverySite(ds: EntityDeliverySite) {
     prompt((resolve) => (
       <DeliverySitePrompt
-        title="Ajouter dépôt"
-        description="Veuillez rechercher un dépôt que vous utilisez."
+        title={t("Ajouter dépôt")}
+        description={t("Veuillez rechercher un dépôt que vous utilisez.")}
         deliverySite={ds}
         onResolve={resolve}
       />
@@ -95,8 +97,8 @@ export default function useDeliverySites(
 
   async function deleteDeliverySite(ds: EntityDeliverySite) {
     const shouldDelete = await confirm(
-      "Supprimer dépôt",
-      `Voulez-vous supprimer le dépôt "${ds.depot!.name}" de votre liste ?`
+      t("Supprimer dépôt"),
+      t("Voulez-vous supprimer le dépôt {{depot}} de votre liste ?", { depot: ds.depot!.name }) // prettier-ignore
     )
 
     if (typeof entityID !== "undefined" && shouldDelete) {
@@ -107,12 +109,12 @@ export default function useDeliverySites(
 
         notifications.push({
           level: "success",
-          text: "Le dépôt a bien été supprimé !",
+          text: t("Le dépôt a bien été supprimé !"),
         })
       } else {
         notifications.push({
           level: "error",
-          text: "Impossible de supprimer le dépôt.",
+          text: t("Impossible de supprimer le dépôt."),
         })
       }
     }

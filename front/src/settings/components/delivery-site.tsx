@@ -1,4 +1,4 @@
-import React from "react"
+import { Trans, useTranslation } from "react-i18next"
 
 import { Country, DepotType, OwnershipType, EntityType } from "common/types"
 import {
@@ -37,28 +37,6 @@ import { SettingsForm } from "./common"
 import useForm from "common/hooks/use-form"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
-const DEPOT_TYPE_LABELS = {
-  [DepotType.EFS]: "EFS",
-  [DepotType.EFPE]: "EFPE",
-  [DepotType.Other]: "Autre",
-  [DepotType.BiofuelDepot]: "Biofuel Depot",
-  [DepotType.OilDepot]: "Oil Depot",
-}
-
-const OWNERSHIP_LABELS = {
-  [OwnershipType.Own]: "Propre",
-  [OwnershipType.ThirdParty]: "Tiers",
-  [OwnershipType.Processing]: "Processing",
-}
-
-// prettier-ignore
-const DEPOT_TYPES = Object.entries(DEPOT_TYPE_LABELS)
-  .map(([value, label]) => ({ value, label }))
-
-// prettier-ignore
-const OWNERSHIP_TYPES = Object.entries(OWNERSHIP_LABELS)
-  .map(([value, label]) => ({ value, label }))
-
 type DeliverySiteFinderPromptProps = PromptProps<EntityDeliverySite> & {
   entity: EntitySelection
 }
@@ -67,6 +45,8 @@ export const DeliverySiteFinderPrompt = ({
   entity,
   onResolve,
 }: DeliverySiteFinderPromptProps) => {
+  const { t } = useTranslation()
+
   const { data, hasChange, onChange } = useForm<EntityDeliverySite>({
     depot: null,
     ownership_type: OwnershipType.ThirdParty,
@@ -74,15 +54,21 @@ export const DeliverySiteFinderPrompt = ({
     blender: null,
   })
 
+  const ownerShipTypes = [
+    { value: OwnershipType.Own, label: "Propre" },
+    { value: OwnershipType.ThirdParty, label: "Tiers" },
+    { value: OwnershipType.Processing, label: "Processing" },
+  ]
+
   return (
     <Dialog onResolve={onResolve}>
-      <DialogTitle text="Ajouter dépôt" />
-      <DialogText text="Veuillez rechercher un dépôt que vous utilisez." />
+      <DialogTitle text={t("Ajouter dépôt")} />
+      <DialogText text={t("Veuillez rechercher un dépôt que vous utilisez.")} />
 
       <SettingsForm>
         <LabelAutoComplete
-          label="Dépôt"
-          placeholder="Rechercher un dépôt..."
+          label={t("Dépôt")}
+          placeholder={t("Rechercher un dépôt...")}
           name="depot"
           value={data.depot}
           getQuery={common.findDeliverySites}
@@ -97,7 +83,7 @@ export const DeliverySiteFinderPrompt = ({
             row
             value={data.ownership_type}
             name="ownership_type"
-            options={OWNERSHIP_TYPES}
+            options={ownerShipTypes}
             onChange={onChange}
           />
         </Label>
@@ -105,15 +91,15 @@ export const DeliverySiteFinderPrompt = ({
         {entity && entity.entity_type === EntityType.Operator && (
           <LabelCheckbox
             name="blending_is_outsourced"
-            label="Incorporation potentiellement effectuée par un tiers"
+            label={t("Incorporation potentiellement effectuée par un tiers")}
             checked={data.blending_is_outsourced}
             onChange={onChange}
           />
         )}
         {data.blending_is_outsourced && (
           <LabelAutoComplete
-            label="Incorporateur Tiers"
-            placeholder="Rechercher un opérateur pétrolier..."
+            label={t("Incorporateur Tiers")}
+            placeholder={t("Rechercher un opérateur pétrolier...")}
             name="blender"
             value={data.blender}
             getQuery={common.findOperators}
@@ -129,7 +115,9 @@ export const DeliverySiteFinderPrompt = ({
           rel="noreferrer"
           className={styles.settingsLink}
         >
-          Le dépôt que je recherche n'est pas enregistré sur CarbuRe.
+          <Trans>
+            Le dépôt que je recherche n'est pas enregistré sur CarbuRe.
+          </Trans>
         </a>
 
         <DialogButtons>
@@ -139,9 +127,11 @@ export const DeliverySiteFinderPrompt = ({
             disabled={!hasChange}
             onClick={() => onResolve(data)}
           >
-            Ajouter
+            <Trans>Ajouter</Trans>
           </Button>
-          <Button onClick={() => onResolve()}>Annuler</Button>
+          <Button onClick={() => onResolve()}>
+            <Trans>Annuler</Trans>
+          </Button>
         </DialogButtons>
       </SettingsForm>
     </Dialog>
@@ -173,6 +163,8 @@ export const DeliverySitePrompt = ({
   deliverySite,
   onResolve,
 }: DeliverySitePromptProps) => {
+  const { t } = useTranslation()
+
   const form: DeliverySiteState = {
     name: deliverySite?.depot?.name ?? "",
     city: deliverySite?.depot?.city ?? "",
@@ -186,6 +178,20 @@ export const DeliverySitePrompt = ({
     blender: deliverySite?.blender?.name ?? "",
   }
 
+  const depotTypes = [
+    { value: DepotType.EFS, label: t("EFS") },
+    { value: DepotType.EFPE, label: t("EFPE") },
+    { value: DepotType.Other, label: t("Autre") },
+    { value: DepotType.BiofuelDepot, label: t("Biofuel Depot") },
+    { value: DepotType.OilDepot, label: t("Oil Depot") },
+  ]
+
+  const ownerShipTypes = [
+    { value: OwnershipType.Own, label: t("Propre") },
+    { value: OwnershipType.ThirdParty, label: t("Tiers") },
+    { value: OwnershipType.Processing, label: t("Processing") },
+  ]
+
   return (
     <Dialog onResolve={onResolve}>
       <DialogTitle text={title} />
@@ -194,28 +200,28 @@ export const DeliverySitePrompt = ({
       <SettingsForm>
         <hr />
 
-        <Label label="Propriété">
+        <Label label={t("Propriété")}>
           <RadioGroup
             row
             readOnly
             value={form.ownership_type}
             name="ownership_type"
-            options={OWNERSHIP_TYPES}
+            options={ownerShipTypes}
           />
         </Label>
 
         <hr />
 
-        <Label label="Incorporation tierce">
+        <Label label={t("Incorporation tierce")}>
           <LabelCheckbox
             disabled
-            label="L'incorporation est effectuée par un tiers"
+            label={t("L'incorporation est effectuée par un tiers")}
             name="blending_is_outsourced"
             defaultChecked={form.blending_is_outsourced}
           />
           <LabelInput
             readOnly
-            label="Incorporateur"
+            label={t("Incorporateur")}
             name="blender"
             value={form.blender}
           />
@@ -224,26 +230,26 @@ export const DeliverySitePrompt = ({
 
         <LabelInput
           readOnly
-          label="Nom du site"
+          label={t("Nom du site")}
           name="name"
           value={form.name}
         />
         <LabelInput
           readOnly
-          label="ID de douane"
+          label={t("ID de douane")}
           name="depot_id"
           value={form.depot_id}
         />
 
         <hr />
 
-        <Label label="Type de dépôt">
+        <Label label={t("Type de dépôt")}>
           <RadioGroup
             row
             readOnly
             value={form.depot_type}
             name="depot_type"
-            options={DEPOT_TYPES}
+            options={depotTypes}
           />
         </Label>
 
@@ -251,16 +257,21 @@ export const DeliverySitePrompt = ({
 
         <LabelInput
           readOnly
-          label="Adresse"
+          label={t("Adresse")}
           name="address"
           value={form.address}
         />
 
         <Box row>
-          <LabelInput readOnly label="Ville" name="city" value={form.city} />
           <LabelInput
             readOnly
-            label="Code postal"
+            label={t("Ville")}
+            name="city"
+            value={form.city}
+          />
+          <LabelInput
+            readOnly
+            label={t("Code postal")}
             name="postal_code"
             value={form.postal_code}
           />
@@ -268,8 +279,8 @@ export const DeliverySitePrompt = ({
 
         <LabelInput
           readOnly
-          label="Pays"
-          placeholder="Rechercher un pays..."
+          label={t("Pays")}
+          placeholder={t("Rechercher un pays...")}
           name="country"
           value={form.country?.name}
         />
@@ -278,7 +289,7 @@ export const DeliverySitePrompt = ({
 
         <DialogButtons>
           <Button icon={Return} onClick={() => onResolve()}>
-            Retour
+            <Trans>Retour</Trans>
           </Button>
         </DialogButtons>
       </SettingsForm>
@@ -286,47 +297,53 @@ export const DeliverySitePrompt = ({
   )
 }
 
-const DELIVERY_SITE_COLUMNS: Column<EntityDeliverySite>[] = [
-  padding,
-  {
-    header: "ID",
-    render: (ds) => <Line text={ds.depot!.depot_id} />,
-  },
-  {
-    header: "Nom",
-    className: styles.settingsTableColumn,
-    render: (ds) => <Line text={ds.depot!.name} />,
-  },
-  {
-    header: "Type",
-    render: (ds) => <Line text={DEPOT_TYPE_LABELS[ds.depot!.depot_type]} />,
-  },
-  {
-    header: "Ville",
-    className: styles.settingsTableColumn,
-    render: (ds) => (
-      <Line text={`${ds.depot!.city}, ${ds.depot!.country.name}`} />
-    ),
-  },
-]
-
 type DeliverySitesSettingsProps = {
   settings: DeliverySiteSettingsHook
 }
 
 const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
+  const { t } = useTranslation()
+
+  const depotTypeLabels = {
+    [DepotType.EFS]: t("EFS"),
+    [DepotType.EFPE]: t("EFPE"),
+    [DepotType.Other]: t("Autre"),
+    [DepotType.BiofuelDepot]: t("Biofuel Depot"),
+    [DepotType.OilDepot]: t("Oil Depot"),
+  }
+
   const actions = settings.deleteDeliverySite
     ? Actions([
         {
           icon: Cross,
-          title: "Supprimer le dépôt",
+          title: t("Supprimer le dépôt"),
           action: (ds: EntityDeliverySite) => settings.deleteDeliverySite!(ds),
         },
       ])
     : arrow
 
   const columns: Column<EntityDeliverySite>[] = [
-    ...DELIVERY_SITE_COLUMNS,
+    padding,
+    {
+      header: t("ID"),
+      render: (ds) => <Line text={ds.depot!.depot_id} />,
+    },
+    {
+      header: t("Nom"),
+      className: styles.settingsTableColumn,
+      render: (ds) => <Line text={ds.depot!.name} />,
+    },
+    {
+      header: t("Type"),
+      render: (ds) => <Line text={depotTypeLabels[ds.depot!.depot_type]} />,
+    },
+    {
+      header: t("Ville"),
+      className: styles.settingsTableColumn,
+      render: (ds) => (
+        <Line text={`${ds.depot!.city}, ${ds.depot!.country.name}`} />
+      ),
+    },
     actions,
   ]
 
@@ -345,7 +362,7 @@ const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
             icon={Plus}
             onClick={settings.addDeliverySite}
           >
-            Ajouter un dépôt
+            <Trans>Ajouter un dépôt</Trans>
           </Button>
         )}
       </SectionHeader>
@@ -353,7 +370,7 @@ const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
       {settings.isEmpty && (
         <SectionBody>
           <Alert icon={AlertCircle} level="warning">
-            Aucun dépôt trouvé
+            <Trans>Aucun dépôt trouvé</Trans>
           </Alert>
         </SectionBody>
       )}

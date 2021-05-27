@@ -13,11 +13,11 @@ import { LoaderOverlay } from "common/components"
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter basename="/v2">
-      <NotificationsProvider>
-        <Suspense fallback={<LoaderOverlay />}>
+      <Suspense fallback={<LoaderOverlay />}>
+        <NotificationsProvider>
           <Carbure />
-        </Suspense>
-      </NotificationsProvider>
+        </NotificationsProvider>
+      </Suspense>
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")

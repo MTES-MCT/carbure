@@ -1,11 +1,11 @@
 import "@testing-library/jest-dom/extend-expect"
-import i18n from 'i18next';
-import { Suspense } from 'react'
+import i18n from "i18next"
+import { Suspense } from "react"
 import { render as baseRender } from "@testing-library/react"
 import { configure } from "@testing-library/dom"
-import { I18nextProvider, initReactI18next } from 'react-i18next';
+import { I18nextProvider, initReactI18next } from "react-i18next"
 import Backend from "i18next-http-backend"
-
+import { LoaderOverlay } from "common/components"
 
 configure({
   getElementError(message) {
@@ -35,8 +35,8 @@ i18n
   .use(Backend)
   .use(initReactI18next)
   .init({
-    ns: ['translations', 'fields', 'errors'],
-    defaultNS: 'translations',
+    ns: ["translations", "fields", "errors"],
+    defaultNS: "translations",
     supportedLngs: ["fr"],
     fallbackLng: "fr",
     lng: "fr",
@@ -48,7 +48,7 @@ i18n
     backend: {
       loadPath: "/v2/locales/{{lng}}/{{ns}}.json",
     },
-  });
+  })
 
 export function render(element: any) {
   const root = document.createElement("div")
@@ -57,9 +57,7 @@ export function render(element: any) {
 
   const jsx = (
     <I18nextProvider i18n={i18n}>
-      <Suspense fallback="...">
-        {element}
-      </Suspense>
+      <Suspense fallback={<LoaderOverlay />}>{element}</Suspense>
     </I18nextProvider>
   )
 

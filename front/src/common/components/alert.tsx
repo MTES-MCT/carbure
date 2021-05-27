@@ -4,6 +4,7 @@ import cl from "clsx"
 import styles from "./alert.module.css"
 import { Box, SystemProps, Title } from "./index"
 import { ChevronDown, Loader } from "./icons"
+import { Trans } from "react-i18next"
 
 export const AlertLink = ({
   children,
@@ -76,9 +77,13 @@ export const AlertFilter = ({
       {onActivate &&
         onDispose &&
         (active ? (
-          <AlertLink onClick={onDispose}>Revenir à la liste complète</AlertLink>
+          <AlertLink onClick={onDispose}>
+            <Trans>Revenir à la liste complète</Trans>
+          </AlertLink>
         ) : (
-          <AlertLink onClick={onActivate}>Voir la liste</AlertLink>
+          <AlertLink onClick={onActivate}>
+            <Trans>Voir la liste</Trans>
+          </AlertLink>
         ))}
 
       <span
@@ -88,7 +93,7 @@ export const AlertFilter = ({
           setOpen(false)
         }}
       >
-        Masquer ce message
+        <Trans>Masquer ce message</Trans>
       </span>
     </Alert>
   )

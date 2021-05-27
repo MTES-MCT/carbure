@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Trans, useTranslation } from "react-i18next"
 import cl from "clsx"
 
 import { Certificate } from "common/types"
@@ -40,6 +41,7 @@ export const CertificatePrompt = ({
   findCertificates,
   onResolve,
 }: CertificatePromptProps) => {
+  const { t } = useTranslation()
   const [certificate, setCertificate] = useState<Certificate | null>(null)
 
   return (
@@ -49,8 +51,8 @@ export const CertificatePrompt = ({
 
       <SettingsForm>
         <LabelAutoComplete
-          label={`Certificat ${type}`}
-          placeholder={`Rechercher un certificat ${type}...`}
+          label={t("Certificat {{type}}", { type })}
+          placeholder={t("Rechercher un certificat {{type}}...", { type })}
           name="dbs_certificate"
           value={certificate}
           getQuery={findCertificates}
@@ -68,21 +70,16 @@ export const CertificatePrompt = ({
             disabled={!certificate}
             onClick={() => certificate && onResolve(certificate)}
           >
-            Ajouter
+            <Trans>Ajouter</Trans>
           </Button>
-          <Button onClick={() => onResolve()}>Annuler</Button>
+          <Button onClick={() => onResolve()}>
+            <Trans>Annuler</Trans>
+          </Button>
         </DialogButtons>
       </SettingsForm>
     </Dialog>
   )
 }
-
-const COLUMNS: Column<Certificate>[] = [
-  padding,
-  { header: "ID", render: (c) => <Line text={c.certificate_id} /> },
-  { header: "Détenteur", render: (c) => <Line text={c.certificate_holder} /> },
-  { header: "Périmètre", render: (c) => <Line text={c.scope.join(", ")} /> },
-]
 
 type CertificateSettingsProps = {
   type: "2BS" | "ISCC" | "REDcert" | "SN" | "2BS & ISCC & REDcert & SN"
@@ -101,10 +98,21 @@ export const CertificateSettings = ({
   onUpdate,
   onDelete,
 }: CertificateSettingsProps) => {
+  const { t } = useTranslation()
+
   const columns: Column<Certificate>[] = [
-    ...COLUMNS,
+    padding,
+    { header: t("ID"), render: (c) => <Line text={c.certificate_id} /> },
     {
-      header: "Valide jusqu'au",
+      header: t("Détenteur"),
+      render: (c) => <Line text={c.certificate_holder} />,
+    },
+    {
+      header: t("Périmètre"),
+      render: (c) => <Line text={c.scope.join(", ")} />,
+    },
+    {
+      header: t("Valide jusqu'au"),
       render: (c) => (
         <ExpirationDate
           date={c.valid_until}
@@ -120,7 +128,7 @@ export const CertificateSettings = ({
       Actions([
         {
           icon: Cross,
-          title: "Supprimer le certificat",
+          title: t("Supprimer le certificat"),
           action: onDelete,
         },
       ])
@@ -138,10 +146,12 @@ export const CertificateSettings = ({
   return (
     <Section id={type.toLowerCase()}>
       <SectionHeader>
-        <Title>Certificats {type}</Title>
+        <Title>
+          <Trans>Certificats {{ type }}</Trans>
+        </Title>
         {onAdd && (
           <Button level="primary" icon={Plus} onClick={onAdd}>
-            Ajouter un certificat {type}
+            <Trans>Ajouter un certificat {{ type }}</Trans>
           </Button>
         )}
       </SectionHeader>
@@ -149,7 +159,7 @@ export const CertificateSettings = ({
       {certificates.length === 0 && (
         <SectionBody>
           <Alert icon={AlertCircle} level="warning">
-            Aucun certificat {type} trouvé
+            <Trans>Aucun certificat {{ type }} trouvé</Trans>
           </Alert>
         </SectionBody>
       )}
@@ -211,7 +221,6 @@ export const REDCertCertificateSettings = ({
     onDelete={settings.deleteREDCertCertificate}
   />
 )
-
 
 type SNCertificateSettingsProps = {
   settings: SNCertificateSettingsHook

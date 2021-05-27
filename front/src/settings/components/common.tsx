@@ -3,6 +3,7 @@ import format from "date-fns/format"
 import isBefore from "date-fns/isBefore"
 import fr from "date-fns/locale/fr"
 import cl from "clsx"
+import { Trans } from "react-i18next"
 
 import styles from "./settings.module.css"
 import { Box, BoxProps } from "common/components"
@@ -71,16 +72,16 @@ export const ExpirationDate = ({
     <span className={cl(styles.expirationDate, expired && styles.expired)}>
       {expired && !updated && (
         <React.Fragment>
-          Expiré ({formatted})
+          <Trans>Expiré ({{ formatted }})</Trans>
           {onUpdate && (
             <Button icon={Refresh} onClick={onClick}>
-              Mise à jour
+              <Trans>Mise à jour</Trans>
             </Button>
           )}
         </React.Fragment>
       )}
 
-      {expired && updated && `Mis à jour (${formatted})`}
+      {expired && updated && <Trans>Mis à jour ({{ formatted }})</Trans>}
 
       {!expired && formatted}
     </span>

@@ -181,7 +181,7 @@ export default function useAcceptLots(
   }
 
   return {
-    loading: request.loading || requestComment.loading,
+    loading: request.loading || requestComment.loading || requestAmend.loading,
     acceptLot,
     acceptAndCommentLot,
     acceptSelection,

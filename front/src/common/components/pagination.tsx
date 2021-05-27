@@ -6,6 +6,7 @@ import styles from "./pagination.module.css"
 import { ChevronLeft, ChevronRight } from "./icons"
 import { Button } from "./button"
 import Select from "./select"
+import { Trans, useTranslation } from "react-i18next"
 
 // generate a list of numbers from 0 to size-1
 const list = (size: number) =>
@@ -13,14 +14,6 @@ const list = (size: number) =>
     value: i,
     label: `${i + 1}`,
   }))
-
-const limits = [
-  { value: 10, label: "10" },
-  { value: 25, label: "25" },
-  { value: 50, label: "50" },
-  { value: 100, label: "100" },
-  { value: null, label: "Tous" },
-]
 
 export type PageSelection = {
   page: number
@@ -48,13 +41,22 @@ type PaginationProps = {
 }
 
 const Pagination = ({ pagination, total }: PaginationProps) => {
+  const { t } = useTranslation()
   const pageCount = pagination.limit ? Math.ceil(total / pagination.limit) : 1
   const pages = list(pageCount)
+
+  const limits = [
+    { value: 10, label: "10" },
+    { value: 25, label: "25" },
+    { value: 50, label: "50" },
+    { value: 100, label: "100" },
+    { value: null, label: t("Tous") },
+  ]
 
   return (
     <div className={styles.pagination}>
       <Button
-        title="Page précédente"
+        title={t("Page précédente")}
         disabled={pagination.page === 0}
         className={styles.paginationButton}
         icon={ChevronLeft}
@@ -70,7 +72,7 @@ const Pagination = ({ pagination, total }: PaginationProps) => {
       />
 
       <span className={cl(styles.paginationText, styles.paginationTotal)}>
-        sur {pageCount},
+        <Trans>sur {{ pageCount }},</Trans>
       </span>
 
       <Select
@@ -81,10 +83,12 @@ const Pagination = ({ pagination, total }: PaginationProps) => {
         onChange={(value) => pagination.setLimit(value as number)}
       />
 
-      <span className={styles.paginationText}>résultats</span>
+      <span className={styles.paginationText}>
+        <Trans>résultats</Trans>
+      </span>
 
       <Button
-        title="Page suivante"
+        title={t("Page suivante")}
         disabled={pagination.page === pageCount - 1}
         className={styles.paginationButton}
         icon={ChevronRight}
