@@ -24,6 +24,7 @@ from core.xlsx_v3 import template_producers_simple, template_producers_advanced,
 from core.xlsx_v3 import export_transactions
 from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates, send_rejection_emails, get_uploaded_files_directory
 from core.common import notify_accepted_lot_change, invalidate_declaration
+from core.common import check_certificates
 from core.decorators import check_rights
 from api.v3.sanity_checks import bulk_sanity_checks
 from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, filter_entity_transactions, sort_lots
@@ -89,6 +90,7 @@ def get_details(request, *args, **kwargs):
     data['transaction'] = tx.natural_key()
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
+    data['certificates'] = check_certificates(tx)
     data['comments'] = []
     for c in tx.transactioncomment_set.all():
         comment = c.natural_key()
@@ -241,7 +243,6 @@ def update_lot(request, *args, **kwargs):
 
         with transaction.atomic():
             for d in diff:
-                print(d)
                 action, field, data = d
                 if action == 'change':
                     if isinstance(data, tuple):
