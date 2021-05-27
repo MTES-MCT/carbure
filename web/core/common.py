@@ -26,6 +26,61 @@ from core.emails import send_reject_email, send_accepted_lot_in_correction_email
 import dateutil.parser
 from api.v3.sanity_checks import bulk_sanity_checks, tx_is_valid, lot_is_valid
 
+
+def try_get_certificate(certificate):
+    d = {'holder': '',
+         'valid_until': '',
+         'valid_from': '',
+         'matches': 0,
+         'found': False,
+         }
+    iscc = ISCCCertificate.objects.filter(certificate_id=certificate)
+    dbs = DBSCertificate.objects.filter(certificate_id=certificate)
+    red = REDCertCertificate.objects.filter(certificate_id=certificate)
+    sn = SNCertificate.objects.filter(certificate_id=certificate)
+    count = iscc.count() + dbs.count() + red.count() + sn.count()
+    if count == 0:
+        return d
+    if count > 1:
+        d['matches'] = count
+        return d
+    d['matches'] = 1
+    if iscc.count() == 1:
+        d['holder'] = iscc[0].certificate_holder
+        d['valid_until'] = iscc[0].valid_until
+        d['valid_from'] = iscc[0].valid_from
+    if dbs.count() == 1:
+        d['holder'] = dbs[0].certificate_holder
+        d['valid_until'] = dbs[0].valid_until
+        d['valid_from'] = dbs[0].valid_from
+    if red.count() == 1:
+        d['holder'] = red[0].certificate_holder
+        d['valid_until'] = red[0].valid_until
+        d['valid_from'] = red[0].valid_from
+    if sn.count() == 1:
+        d['holder'] = sn[0].certificate_holder
+        d['valid_until'] = sn[0].valid_until
+        d['valid_from'] = sn[0].valid_from
+    return d
+
+
+def check_certificates(tx):
+    d = {
+         'production_site_certificate': None,
+         'supplier_certificate': None,
+         'vendor_certificate': None
+        }
+    # production site certificate
+    if tx.lot.carbure_production_site_reference:
+        d['production_site_certificate'] = try_get_certificate(tx.lot.carbure_production_site_reference)
+    if tx.lot.unknown_production_site_reference:
+        d['production_site_certificate'] = try_get_certificate(tx.lot.unknown_production_site_reference)
+    if tx.lot.unknown_supplier_certificate:
+        d['supplier_certificate'] = try_get_certificate(tx.lot.unknown_supplier_certificate)
+    if tx.carbure_vendor_certificate:
+        d['vendor_certificate'] = try_get_certificate(tx.carbure_vendor_certificate)
+    return d
+
 def get_uploaded_files_directory():
     directory = '/app/files'
     if not os.path.exists(directory):
