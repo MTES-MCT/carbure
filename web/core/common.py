@@ -1051,7 +1051,7 @@ def validate_lots(user, entity, txs):
                 elif not tx.client_is_in_carbure:
                     tx.delivery_status = LotTransaction.ACCEPTED
                 # if we save a lot that was requiring a fix, change status to 'AA'
-                elif tx.delivery_status in [LotTransaction.TOFIX, LotTransaction.REJECETD]:
+                elif tx.delivery_status in [LotTransaction.TOFIX, LotTransaction.REJECTED]:
                     tx.delivery_status = LotTransaction.FIXED
                 else:
                     pass
