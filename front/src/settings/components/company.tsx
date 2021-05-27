@@ -1,4 +1,4 @@
-import React from "react"
+import { Trans, useTranslation } from "react-i18next"
 
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { CompanySettingsHook } from "../hooks/use-company"
@@ -15,6 +15,8 @@ type CompanySettingsProps = {
 }
 
 const CompanySettings = ({ entity, settings }: CompanySettingsProps) => {
+  const { t } = useTranslation()
+
   if (entity === null) {
     return null
   }
@@ -25,12 +27,14 @@ const CompanySettings = ({ entity, settings }: CompanySettingsProps) => {
   return (
     <Section id="options">
       <SectionHeader>
-        <Title>Options</Title>
+        <Title>
+          <Trans>Options</Trans>
+        </Title>
       </SectionHeader>
 
       <SectionBody>
         <LabelCheckbox
-          label="Ma société effectue des Mises à Consommation"
+          label={t("Ma société effectue des Mises à Consommation")}
           checked={settings.hasMAC}
           onChange={(e) => settings.onChangeMAC(e.target.checked)}
           className={styles.settingsCheckbox}
@@ -38,7 +42,7 @@ const CompanySettings = ({ entity, settings }: CompanySettingsProps) => {
 
         <LabelCheckbox
           disabled={isOperator || isTrader}
-          label="Ma société a une activité de négoce"
+          label={t("Ma société a une activité de négoce")}
           checked={settings.hasTrading || isTrader}
           onChange={(e) => settings.onChangeTrading(e.target.checked)}
           className={styles.settingsCheckbox}

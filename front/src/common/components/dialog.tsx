@@ -8,6 +8,7 @@ import { Title, Box } from "."
 import { Button } from "./button"
 import Modal from "./modal"
 import NotificationsProvider from "./notifications"
+import { Trans } from "react-i18next"
 
 type DialogProps = PromptProps<any> & {
   children: React.ReactNode
@@ -81,9 +82,11 @@ const ConfirmPrompt = ({
 
     <DialogButtons>
       <Button level="primary" onClick={() => onResolve(true)}>
-        Confirmer
+        <Trans>Confirmer</Trans>
       </Button>
-      <Button onClick={() => onResolve(false)}>Annuler</Button>
+      <Button onClick={() => onResolve(false)}>
+        <Trans>Annuler</Trans>
+      </Button>
     </DialogButtons>
   </Dialog>
 )

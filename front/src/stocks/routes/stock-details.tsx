@@ -18,6 +18,7 @@ import { AsyncButton, Button } from "common/components/button"
 import TransactionForm from "transactions/components/form"
 import ValidationErrors from "transactions/components/form-errors"
 import { StatusTitle } from "transactions/components/status"
+import Comments from "transactions/components/form-comments"
 
 const EDITABLE = [LotStatus.ToSend]
 
@@ -90,6 +91,14 @@ const StockDetails = ({
         <ValidationErrors errors={validationErrors} />
       )}
 
+      {details.data && details.data.comments.length > 0 && (
+        <Comments
+          readOnly
+          loading={details.loading}
+          comments={details.data.comments}
+        />
+      )}
+
       <div className={styles.transactionFormButtons}>
         {isEditable && (
           <AsyncButton
@@ -135,16 +144,6 @@ const StockDetails = ({
             >
               Préparer l'envoi
             </AsyncButton>
-            {/* {form.biocarburant?.code === 'ETH' && (
-              <AsyncButton
-                icon={Flask}
-                level="danger"
-                loading={acceptor.loading}
-                onClick={() => run(sender.convertETBE, true)}
-              >
-                Convertir en ETBE
-              </AsyncButton>
-            )} */}
           </React.Fragment>
         )}
 

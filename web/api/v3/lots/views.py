@@ -3,25 +3,20 @@ import calendar
 import logging
 import unicodedata
 import traceback
-import os
 
 import dictdiffer
 from dateutil.relativedelta import *
-from django.db.models import Q, F, Case, When, Count
-from django.db.models.functions import TruncMonth
-from django.db.models.functions import Extract
+from django.db.models import Q
 from django.db.models.fields import NOT_PROVIDED
-from django import db
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 from django_otp.decorators import otp_required
 
-from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment, SustainabilityDeclaration
+from core.models import Entity, UserRights, TransactionComment, SustainabilityDeclaration
 from core.models import LotV2, LotTransaction, EntityDepot, GenericError
 from core.models import TransactionUpdateHistory
 
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
-from core.xlsx_v3 import export_transactions
 from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates, send_rejection_emails, get_uploaded_files_directory
 from core.common import notify_accepted_lot_change, invalidate_declaration
 from core.common import check_certificates
@@ -91,6 +86,7 @@ def get_details(request, *args, **kwargs):
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['certificates'] = check_certificates(tx)
+    data['updates'] = [c.natural_key() for c in tx.transactionupdatehistory_set.all().order_by('-datetime')]
     data['comments'] = []
     for c in tx.transactioncomment_set.all():
         comment = c.natural_key()
@@ -258,7 +254,7 @@ def update_lot(request, *args, **kwargs):
                                 full_field_name = subfield
                             TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.ADD, field=full_field_name, value_before='', value_after=value, modified_by=request.user, modified_by_entity=entity)
                     else:
-                        print('add not list %s' % (d))                   
+                        print('add not list %s' % (d))
                 if action == 'remove':
                     if isinstance(data, list):
                         for (subfield, value) in data:
@@ -300,6 +296,7 @@ def duplicate_lot(request):
     tx_meta_fields = {f.name: f for f in LotTransaction._meta.get_fields()}
     tx.pk = None
     tx.lot = lot
+    tx.is_forwarded = False
     for f in tx_fields_to_remove:
         if f in tx_meta_fields:
             meta_field = tx_meta_fields[f]
@@ -350,7 +347,7 @@ def validate_lot(request, *args, **kwargs):
     tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
-    txs = LotTransaction.objects.filter(id__in=tx_ids, lot__added_by=entity)
+    txs = LotTransaction.objects.filter(Q(id__in=tx_ids) & (Q(lot__added_by=entity) | Q(carbure_vendor=entity)))
     data = validate_lots(request.user, entity, txs)
     nb_duplicates = check_duplicates(txs, background=False)
     data['duplicates'] = nb_duplicates
@@ -398,7 +395,7 @@ def accept_with_reserves(request, *args, **kwargs):
             return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
         if tx.delivery_status == LotTransaction.FROZEN:
-            # 
+            #
             # send email
             # invalidate declaration for both
             if tx.carbure_client:
@@ -417,7 +414,7 @@ def amend_lot(request, *args, **kwargs):
     # I want to fix one of my own transaction
     # This only changes the status to TOFIX
     context = kwargs['context']
-    entity = context['entity']    
+    entity = context['entity']
     tx_id = request.POST.get('tx_id', None)
     if not tx_id:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_id"}, status=403)
@@ -470,13 +467,27 @@ def reject_lot(request, *args, **kwargs):
         txerr.comment = tx_comment
         txerr.save()
 
-        # special case
+        # special case 1
         # if the rejected lot has been forwarded by an operator, the operator has no way to see it
         # so we actually delete the forwarded tx and send an email to the tx source
-        if tx.parent_tx != None and tx.carbure_vendor.entity_type == Entity.OPERATOR:
+        if tx.parent_tx is not None and tx.carbure_vendor.entity_type == Entity.OPERATOR:
             # cancel forward
             tx.parent_tx.is_forwarded = False
             tx.parent_tx.save()
+            tx.delete()
+        # special case 2
+        # if the rejected transaction came from stocks, move this transaction back to drafts
+        # and recredit the parent lot with the corresponding volume
+        elif tx.lot.parent_lot is not None:
+            tx.delivery_status = 'N'
+            tx.lot.status = 'Draft'
+            tx.lot.parent_lot.remaining_volume += tx.lot.volume
+            tx.lot.parent_lot.save()
+            tx.lot.save()
+            tx.save()
+
+            # if tx.carbure_vendor.entity_type == Entity.OPERATOR:
+
         tx.comment = tx_comment
         tx_rejected.append(tx)
 
@@ -703,12 +714,13 @@ def forward_lots(request, *args, **kwargs):
         if tx.carbure_delivery_site in depots:
             # it has been delivered to a Depot with outsourced blending
             # we should forward the lot to the blender
+            parent_tx_id = tx.id
             tx.delivery_status = 'A'
             tx.is_forwarded = True
             tx.save()
             new_tx = tx
             new_tx.pk = None
-            new_tx.parent_tx_id = tx.id
+            new_tx.parent_tx_id = parent_tx_id
             new_tx.is_forwarded = False
             new_tx.carbure_vendor = entity
 

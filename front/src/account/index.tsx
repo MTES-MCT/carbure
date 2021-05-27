@@ -12,6 +12,7 @@ import {
 import { AccountAuthentication } from "./components/authentication"
 import useAPI from "common/hooks/use-api"
 import * as api from "./api"
+import { Trans } from "react-i18next"
 
 export interface AccountHook {
   isLoading: boolean
@@ -51,7 +52,9 @@ const Account = ({ settings }: AccountProps) => {
   return (
     <Main>
       <SettingsHeader>
-        <Title>Mon compte</Title>
+        <Title>
+          <Trans>Mon compte</Trans>
+        </Title>
       </SettingsHeader>
 
       <SettingsBody>

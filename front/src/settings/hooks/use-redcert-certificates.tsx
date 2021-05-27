@@ -1,4 +1,5 @@
 import { useEffect } from "react"
+import { useTranslation } from "react-i18next"
 
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { Certificate } from "common/types"
@@ -24,6 +25,7 @@ export default function useREDCertCertificates(
   entity: EntitySelection,
   productionSites: ProductionSiteSettingsHook
 ): REDCertCertificateSettingsHook {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
 
   const [requestGetREDCert, resolveGetREDCert] = useAPI(
@@ -63,12 +65,12 @@ export default function useREDCertCertificates(
 
       notifications.push({
         level: "success",
-        text: `Le certificat a bien été ${action} !`,
+        text: t("Le certificat a bien été {{action}} !", { action }),
       })
     } else {
       notifications.push({
         level: "error",
-        text: `Le certificat n'a pas pu être ${action}.`,
+        text: t("Le certificat n'a pas pu être {{action}}.", { action }),
       })
     }
   }
@@ -77,8 +79,8 @@ export default function useREDCertCertificates(
     const data = await prompt<Certificate>((resolve) => (
       <CertificatePrompt
         type="REDcert"
-        title="Ajout certificat REDcert"
-        description="Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond."
+        title={t("Ajout certificat REDcert")}
+        description={t("Vous pouvez rechercher parmi les certificats recensés sur Carbure et ajouter celui qui vous correspond.")} // prettier-ignore
         findCertificates={findREDCertCertificates}
         onResolve={resolve}
       />
@@ -87,7 +89,7 @@ export default function useREDCertCertificates(
     if (typeof entityID !== "undefined" && data) {
       notifyCertificate(
         resolveAddREDCert(entityID, data.certificate_id),
-        "ajouté"
+        t("ajouté")
       )
     }
   }
@@ -96,13 +98,13 @@ export default function useREDCertCertificates(
     if (
       typeof entityID !== "undefined" &&
       (await confirm(
-        "Suppression certificat",
-        `Voulez-vous vraiment supprimer le certificat REDcert "${redcert.certificate_id}" ?`
+        t("Suppression certificat"),
+        t("Voulez-vous vraiment supprimer le certificat REDcert {{cert}} ?", { cert: redcert.certificate_id }) // prettier-ignore
       ))
     ) {
       notifyCertificate(
         resolveDelREDCert(entityID, redcert.certificate_id),
-        "supprimé"
+        t("supprimé")
       )
     }
   }
@@ -111,8 +113,8 @@ export default function useREDCertCertificates(
     const data = await prompt<Certificate>((resolve) => (
       <CertificatePrompt
         type="REDcert"
-        title="Mise à jour certificat REDcert"
-        description="Veuillez sélectionner un nouveau certificat pour remplacer l'ancien."
+        title={t("Mise à jour certificat REDcert")}
+        description={t("Veuillez sélectionner un nouveau certificat pour remplacer l'ancien.")} // prettier-ignore
         findCertificates={findREDCertCertificates}
         onResolve={resolve}
       />
@@ -125,7 +127,7 @@ export default function useREDCertCertificates(
           iscc.certificate_id,
           data.certificate_id
         ),
-        "mis à jour"
+        t("mis à jour")
       )
     }
   }

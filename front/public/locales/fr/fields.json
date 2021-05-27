@@ -26,13 +26,13 @@
   "lot.eu": "EU",
   "lot.ghg_total": "Total GES",
   "lot.ghg_reduction": "Réduction GES",
-  "carbure_vendor": "Fournisseur",
+  "carbure_vendor.name": "Fournisseur",
   "carbure_vendor_certificate": "Certificat du fournisseur",
-  "carbure_client": "Client",
+  "carbure_client.name": "Client",
   "unknown_client": "Client (inconnu)",
-  "carbure_delivery_site": "Site de livraison",
+  "carbure_delivery_site.name": "Site de livraison",
   "unknown_delivery_site": "Site de livraison (inconnu)",
-  "unknown_delivery_site_country": "Pays de livraison",
+  "unknown_delivery_site_country.name": "Pays de livraison",
   "delivery_date": "Date de livraison",
   "champ_libre": "Champ libre"
 }

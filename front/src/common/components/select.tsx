@@ -12,6 +12,7 @@ import {
   DropdownOptions,
   useDropdown,
 } from "./dropdown"
+import { useTranslation } from "react-i18next"
 
 type Value = string | number | null
 export type Option = { value: Value; label: string }
@@ -39,7 +40,7 @@ function isSelected(value: SelectValue, option: Option) {
 function renderSelected(
   value: SelectValue,
   options: Option[],
-  placeholder: string = "Choisir une valeur"
+  placeholder: string
 ) {
   let selected
 
@@ -70,6 +71,8 @@ function useSelect(
   onChange: SelectProps["onChange"],
   multiple: boolean
 ) {
+  const { t } = useTranslation()
+
   const dd = useDropdown()
   const [query, setQuery] = useState("")
 
@@ -105,7 +108,11 @@ function useSelect(
   }
 
   // what to display in the dropdown label
-  const selected = renderSelected(value, options, placeholder)
+  const selected = renderSelected(
+    value,
+    options,
+    placeholder ?? t("Choisir une valeur")
+  )
 
   // filter options according to search query
   const queryOptions = filterOptions(options, query)
@@ -148,15 +155,10 @@ export const Select = ({
   clear = false,
   ...props
 }: SelectProps) => {
-  const {
-    dd,
-    query,
-    selected,
-    queryOptions,
-    reset,
-    select,
-    onQueryChange,
-  } = useSelect(value, placeholder, options, onChange, multiple)
+  const { t } = useTranslation()
+
+  const { dd, query, selected, queryOptions, reset, select, onQueryChange } =
+    useSelect(value, placeholder, options, onChange, multiple)
 
   const container = useRef<HTMLDivElement>(null)
 
@@ -190,7 +192,7 @@ export const Select = ({
                 <DropdownItem allowFocus>
                   <Input
                     type="text"
-                    placeholder="Rechercher..."
+                    placeholder={t("Rechercher...")}
                     className={styles.selectSearch}
                     value={query}
                     onChange={onQueryChange}

@@ -22,7 +22,7 @@ type CommentsProps = {
   readOnly: boolean
   loading: boolean
   comments: Comment[]
-  onComment: (c: string) => void
+  onComment?: (c: string) => void
 }
 
 const Comments = ({
@@ -35,7 +35,7 @@ const Comments = ({
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault()
-    onComment(comment)
+    onComment && onComment(comment)
     setComment("")
   }
 

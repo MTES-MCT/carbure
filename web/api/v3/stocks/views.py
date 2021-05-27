@@ -32,7 +32,7 @@ def get_stocks(request, *args, **kwargs):
 
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
-    
+
     if entity.entity_type in ['Producteur', 'Trader']:
         if status == "tosend":
             txs = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
@@ -46,7 +46,7 @@ def get_stocks(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
 
     txs, total_errors, total_deadline, deadline_str = filter_lots(txs, request.GET)
-    
+
     limit = request.GET.get('limit', None)
     from_idx = request.GET.get('from_idx', "0")
     sort_by = request.GET.get('sort_by', False)
@@ -168,7 +168,7 @@ def get_snapshot(request, *args, **kwargs):
     periods = sorted([p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']])
 
     data['filters'] = {'matieres_premieres': mps, 'biocarburants': bcs,
-                       'production_sites': psites, 'countries_of_origin': countries, 'delivery_sites': delivery_sites, 
+                       'production_sites': psites, 'countries_of_origin': countries, 'delivery_sites': delivery_sites,
                        'periods': periods, 'vendors': vendors}
 
     return JsonResponse({'status': 'success', 'data': data})
@@ -230,6 +230,8 @@ def create_drafts(request, *args, **kwargs):
             lot_dict['mac'] = draft['mac']
         if 'delivery_site_country' in draft:
             lot_dict['delivery_site_country'] = draft['delivery_site_country']
+        if 'vendor_certificate' in draft:
+            lot_dict['vendor_certificate'] = draft['vendor_certificate']
 
 
         # matching engine keys
@@ -267,7 +269,7 @@ def get_template_mass_balance(request, *args, **kwargs):
 def get_template_mass_balance_bcghg(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
-    
+
     file_location = template_stock_bcghg(entity)
     try:
         with open(file_location, 'rb') as f:
@@ -286,7 +288,7 @@ def upload_mass_balance(request, *args, **kwargs):
     file = request.FILES.get('file')
     if file is None:
         return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
-    
+
     # save file
     now = datetime.datetime.now()
     filename = '%s_%s.xlsx' % (now.strftime('%Y%m%d'), entity.name.upper())
@@ -374,7 +376,7 @@ def send_drafts(request, *args, **kwargs):
         else:
             invalid_counter += 1
             send_errors.append(errors)
-    
+
     status_code = 200 if valid_counter > 0 else 400
     status = 'success' if valid_counter > 0 else 'error'
     total = valid_counter + invalid_counter
@@ -393,8 +395,8 @@ def convert_eth_stock_to_etbe(request, entity, c):
     # retrieve stock line
     previous_stock_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status='A', id=previous_stock_tx_id)
     # check if source TX is Ethanol
-    if previous_stock_tx.lot.biocarburant.code != 'ETH': 
-        raise Exception("Only ETH can be converted to ETBE") 
+    if previous_stock_tx.lot.biocarburant.code != 'ETH':
+        raise Exception("Only ETH can be converted to ETBE")
 
 
     previous_lot_id = previous_stock_tx.lot.pk
@@ -402,7 +404,7 @@ def convert_eth_stock_to_etbe(request, entity, c):
     # new_lot = previous_stock_tx.lot
     new_lot.pk = None
     new_lot.added_by = entity
-    new_lot.data_origin_entity    
+    new_lot.data_origin_entity
     new_lot.added_by_user = request.user
     new_lot.save()
     new_lot.carbure_id = generate_carbure_id(new_lot)
@@ -414,11 +416,11 @@ def convert_eth_stock_to_etbe(request, entity, c):
     volume_etbe = float(volume_etbe)
     volume_etbe_eligible = float(volume_etbe_eligible)
     volume_denaturant = float(volume_denaturant)
-    
+
 
     # check available volume
     if previous_stock_tx.lot.remaining_volume < volume_ethanol:
-        raise Exception("Cannot convert more ETH than stock") 
+        raise Exception("Cannot convert more ETH than stock")
 
     previous_stock_tx.lot.remaining_volume -= volume_ethanol
     previous_stock_tx.lot.save()
@@ -447,7 +449,7 @@ def convert_eth_stock_to_etbe(request, entity, c):
     t.volume_denaturant = volume_denaturant
     t.added_by = entity
     t.added_by_user = request.user
-    t.save()    
+    t.save()
 
 
 @check_rights('entity_id')
@@ -514,7 +516,7 @@ def forward(request, *args, **kwargs):
         new_tx = tx
         new_tx.pk = None
         new_tx.parent_tx = LotTransaction.objects.get(id=parent_tx_id)
-        new_tx.is_forwarded = False        
+        new_tx.is_forwarded = False
         new_tx.carbure_vendor = entity
         new_tx.carbure_vendor_certificate = certificate_id
         new_tx.client_is_in_carbure = True

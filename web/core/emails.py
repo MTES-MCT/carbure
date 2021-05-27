@@ -31,10 +31,6 @@ def send_reject_email(vendor, txs):
     #    fail_silently=False,
     #)
 
-    # transactions forwarded and rejected disappear from the UI. Delete them
-    for tx in txs:
-        if tx.parent_tx is not None and tx.carbure_client.entity_type == Entity.OPERATOR:
-            tx.delete()
 
 def send_accepted_lot_in_correction_email(tx, recipients, cc):
     email_subject = 'Carbure - Correction %s - %s - %.2f%%' % (tx.dae, tx.lot.biocarburant.name, tx.lot.ghg_reduction)
