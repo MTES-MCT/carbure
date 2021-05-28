@@ -794,21 +794,6 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(data['transaction']['client_is_in_carbure'], True)
         
 
-    def test_corrections(self):
-        # 1 producer creates lot
-        tx_id, lot_id = self.create_lot()
-        # 2 client accepts
-        tx = LotTransaction.objects.get(id=tx_id)
-        tx.delivery_status = LotTransaction.ACCEPTED
-        tx.save()
-        tx.lot.status = LotV2.VALIDATED
-        tx.lot.save()
-
-        # 3 client requests a correction
-        
-        pass
-        
-
 
 class DeclarationTests(TransactionTestCase):
     home = os.environ['CARBURE_HOME']
@@ -893,3 +878,139 @@ class DeclarationTests(TransactionTestCase):
         self.assertEqual(response.status_code, 200)
         tx = LotTransaction.objects.get(id=tx_id)
         self.assertEqual(tx.delivery_status, LotTransaction.FROZEN)
+
+
+class CorrectionTests(TransactionTestCase):
+    home = os.environ['CARBURE_HOME']
+    fixtures = ['{home}/web/fixtures/json/countries.json'.format(home=home), 
+    '{home}/web/fixtures/json/feedstock.json'.format(home=home), 
+    '{home}/web/fixtures/json/biofuels.json'.format(home=home),
+    '{home}/web/fixtures/json/depots.json'.format(home=home)]
+
+    def setUp(self):
+        user_model = get_user_model()
+        self.user_email = 'testuser1@toto.com'
+        self.user_password = 'totopouet'
+        self.user1 = user_model.objects.create_user(email=self.user_email, name='Le Super Testeur 1', password=self.user_password)
+
+        # a few entities
+        self.test_producer, _ = Entity.objects.update_or_create(name='Le Super Producteur 1', entity_type='Producteur')
+        self.test_operator, _ = Entity.objects.update_or_create(name='OPERATEUR1', entity_type='Opérateur')
+        self.test_trader, _ = Entity.objects.update_or_create(name='Trader1', entity_type=Entity.TRADER)
+
+        # some rights
+        UserRights.objects.update_or_create(user=self.user1, entity=self.test_producer)
+        UserRights.objects.update_or_create(user=self.user1, entity=self.test_operator)
+        UserRights.objects.update_or_create(user=self.user1, entity=self.test_trader)
+
+        # a production site and delivery_site
+        france = Pays.objects.get(code_pays='FR')
+        Depot.objects.update_or_create(name='Depot Test', depot_id='001', country=france)
+        today = datetime.date.today()
+        d = {'country': france, 'date_mise_en_service': today, 'site_id':'SIRET XXX',
+        'city': 'paris', 'postal_code': '75001', 'manager_name':'Guillaume Caillou', 
+        'manager_phone':'0145247000', 'manager_email': 'test@test.net'}
+        self.production_site, _ = ProductionSite.objects.update_or_create(producer=self.test_producer, name='PSITE1', defaults=d)        
+
+        loggedin = self.client.login(username=self.user_email, password=self.user_password)
+        self.assertTrue(loggedin)          
+        # pass otp verification
+        response = self.client.get(reverse('otp-verify'))
+        self.assertEqual(response.status_code, 200)
+        device = EmailDevice.objects.get(user=self.user1)
+        response = self.client.post(reverse('otp-verify'), {'otp_token': device.token})
+        self.assertEqual(response.status_code, 302)        
+
+    def create_lot(self, **kwargs):
+        lot = {
+            'supplier_certificate': 'ISCC-TOTO-02',
+            'biocarburant_code': 'ETH',
+            'matiere_premiere_code': 'BLE',
+            'producer': self.test_producer.name,
+            'production_site': "PSITE1",
+            'volume': 15000,
+            'pays_origine_code': 'FR',
+            'eec': 1,
+            'ep': 5,
+            'etd': 12,
+            'dae': get_random_dae(),
+            'delivery_date': '2020-12-31',
+            'client': self.test_trader.name,
+            'delivery_site': '001',
+            'entity_id': self.test_producer.id,
+        }
+        lot.update(kwargs)
+        response = self.client.post(reverse('api-v3-add-lot'), lot)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()['data']
+        tx_id = data['id']
+        lot_id = data['lot']['id']
+        return tx_id, lot_id, lot
+
+
+    def test_corrections(self):
+        # 1 producer creates lot
+        tx_id, lot_id, j = self.create_lot()
+        # 2 validate
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 200)
+
+        debug_errors()
+
+        tx = LotTransaction.objects.get(id=tx_id)
+        self.assertEqual(tx.lot.status, LotV2.VALIDATED)
+        self.assertEqual(tx.delivery_status, LotTransaction.PENDING)
+
+        # 3 request a correction
+        # 3.1 the sender requests a correction - 403
+        response = self.client.post(reverse('api-v3-accept-lot-with-reserves'), {'entity_id': self.test_producer.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 403)
+
+        # 3.2 someone else requests a correction - 403
+        response = self.client.post(reverse('api-v3-accept-lot-with-reserves'), {'entity_id': self.test_operator.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 403)
+
+        # 3.3 the real client requests a correction - 200
+        response = self.client.post(reverse('api-v3-accept-lot-with-reserves'), {'entity_id': self.test_trader.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 200)
+        tx = LotTransaction.objects.get(id=tx_id)
+        self.assertEqual(tx.lot.status, LotV2.VALIDATED)
+        self.assertEqual(tx.delivery_status, LotTransaction.TOFIX)
+
+        # 4 producer can edit all parts of the lot
+        j['tx_id'] = tx_id
+        j['volume'] = 45000
+        j['delivery_date'] = '2021-01-15'
+
+        response = self.client.post(reverse('api-v3-update-lot'), j)
+        self.assertEqual(response.status_code, 200)
+        tx = LotTransaction.objects.get(id=tx_id)
+        # lot is corrected but has not been sent back
+        self.assertEqual(tx.lot.status, LotV2.VALIDATED)
+        self.assertEqual(tx.delivery_status, LotTransaction.TOFIX)
+
+        # try to send it back as someone else
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_trader.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 403)
+
+        # send it back
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 200)
+        tx = LotTransaction.objects.get(id=tx_id)
+        self.assertEqual(tx.lot.status, LotV2.VALIDATED)
+        self.assertEqual(tx.delivery_status, LotTransaction.FIXED)
+        # check that it indeed has been updated (on the lot and on the tx details)
+        self.assertEqual(tx.lot.volume, 45000)
+        self.assertEqual(tx.delivery_date, datetime.date(2021, 1, 15))
+
+        # try to edit as the client
+        #j['entity_id'] = self.test_trader.id
+        #j['tx_id'] = tx_id
+        #j['volume'] = 15000
+        #response = self.client.post(reverse('api-v3-update-lot'), j)
+        #self.assertEqual(response.status_code, 403)
+
+
+
+
+

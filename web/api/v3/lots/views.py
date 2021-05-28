@@ -348,6 +348,8 @@ def validate_lot(request, *args, **kwargs):
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
     txs = LotTransaction.objects.filter(Q(id__in=tx_ids) & (Q(lot__added_by=entity) | Q(carbure_vendor=entity)))
+    if txs.count() != len(tx_ids):
+        return JsonResponse({'status': 'forbidden', 'message': "Some transactions do not belong to you"}, status=403)
     data = validate_lots(request.user, entity, txs)
     nb_duplicates = check_duplicates(txs, background=False)
     data['duplicates'] = nb_duplicates
