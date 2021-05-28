@@ -391,7 +391,7 @@ def accept_with_reserves(request, *args, **kwargs):
         except Exception:
             return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
 
-        if not tx.carbure_vendor == entity and not tx.carbure_client == entity:
+        if not tx.carbure_client == entity:
             return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
         if tx.delivery_status == LotTransaction.FROZEN:
