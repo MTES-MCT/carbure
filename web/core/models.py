@@ -402,7 +402,7 @@ class LotTransaction(models.Model):
     ghg_reduction = models.FloatField(default=0.0)
 
     # other
-    champ_libre = models.CharField(max_length=128, blank=True, null=True, default='')
+    champ_libre = models.TextField(blank=True, null=True, default='')
     # mise a consommation?
     is_mac = models.BooleanField(default=False)
     # this PoS is part of a multiple PoS batch
