@@ -92,47 +92,59 @@ export function updateProductionSite(
   })
 }
 
-export function deleteProductionSite(productionSiteID: number) {
+export function deleteProductionSite(
+  entity_id: number | undefined,
+  productionSiteID: number
+  ) {
   return api.post("/settings/delete-production-site", {
-    production_site_id: productionSiteID,
+  entity_id: entity_id,
+  production_site_id: productionSiteID,
   })
 }
 
 export function setProductionSiteMP(
+  entity_id: number,
   productionSiteID: number,
   matieresPremieres: string[]
 ) {
   return api.post("/settings/set-production-site-matieres-premieres", {
+    entity_id: entity_id,
     production_site_id: productionSiteID,
     matiere_premiere_codes: matieresPremieres,
   })
 }
 
 export function setProductionSiteBC(
+  entity_id: number,
   productionSiteID: number,
   biocarburants: string[]
 ) {
   return api.post("/settings/set-production-site-biocarburants", {
+    entity_id: entity_id,
     production_site_id: productionSiteID,
     biocarburant_codes: biocarburants,
   })
 }
 
 export function deleteProductionSiteMP(
+  entity_id: number,
   productionSiteID: number,
   matiere_premiere_code: string
 ) {
   return api.post("/settings/delete-production-site-matiere-premiere", {
+    entity_id: entity_id,
     production_site_id: productionSiteID,
     matiere_premiere_code: matiere_premiere_code,
   })
 }
 
 export function deleteProductionSiteBC(
+  entity_id: number,
   productionSiteID: number,
   biocarburant_code: string
 ) {
   return api.post("/settings/delete-production-site-biocarburant", {
+    entity_id: entity_id,
     production_site_id: productionSiteID,
     biocarburant_code: biocarburant_code,
   })

@@ -157,12 +157,15 @@ def add_production_site(request, *args, **kwargs):
 
 @check_rights('entity_id', role=[UserRights.ADMIN])
 def update_production_site(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+
     production_site_id = request.POST.get('production_site_id', False)
 
     if not production_site_id:
         return JsonResponse({'status': 'error', 'message': "Missing field production_site_id"}, status=400)
 
-    psite = ProductionSite.objects.get(id=production_site_id)
+    psite = ProductionSite.objects.get(id=production_site_id, producer=entity)
 
     country_code = request.POST.get('country_code')
     name = request.POST.get('name')
@@ -216,9 +219,13 @@ def update_production_site(request, *args, **kwargs):
 @check_rights('entity_id', role=[UserRights.ADMIN])
 def delete_production_site(request, *args, **kwargs):
     site = request.POST.get('production_site_id')
+    context = kwargs['context']
+    entity = context['entity']
+
     try:
-        ps = ProductionSite.objects.get(id=site)
-    except Exception:
+        ps = ProductionSite.objects.get(id=site, producer=entity)
+    except Exception as e:
+        print(e)
         return JsonResponse({'status': 'error', 'message': "Unknown Production Site"}, status=400)
 
     # make sure there is no impact by deleting this
