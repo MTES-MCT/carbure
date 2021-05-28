@@ -22,7 +22,7 @@
   "MISSING_DELIVERY_SITE": "Le site de livraison est manquant",
   "MISSING_FEEDSTOCK": "La matière première est manquante",
   "MISSING_FEEDSTOCK_COUNTRY_OF_ORIGIN": "Le pays d'origine de la matière première est manquant",
-  "MISSING_PRODSITE_CERTIFICATE": "Le certificat du site de production est manquant",
+  "MISSING_PRODSITE_CERTIFICATE": "Aucun certificat n'est associé à ce site de Production dans vos paramètres",
   "MISSING_PRODUCTION_SITE_COMDATE": "La date de mise en service du site de production est manquante",
   "MISSING_REF_DBL_COUNTING": "La référence double-comptage est manquante",
   "MISSING_SUPPLIER_CERTIFICATE": "Le certificat du fournisseur est manquant",
