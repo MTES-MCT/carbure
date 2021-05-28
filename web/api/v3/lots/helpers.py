@@ -280,7 +280,6 @@ def get_lots_with_metadata(txs, entity, querySet):
 
 def get_snapshot_filters(txs, whitelist):
     filters = {}
-    p = Perf()
 
     # prefetch related lots and txs to speed up queries
     ids = txs.values('id', 'lot__id').distinct()
@@ -288,26 +287,21 @@ def get_snapshot_filters(txs, whitelist):
     tx_ids = set([tx['id'] for tx in ids])
     lots = LotV2.objects.filter(id__in=lot_ids)
     txs = LotTransaction.objects.filter(id__in=tx_ids)
-    p.step('init')
 
     if 'matieres_premieres' in whitelist:
         mps = MatierePremiere.objects.filter(id__in=lots.values('matiere_premiere__id').distinct()).values('code', 'name')
         filters['matieres_premieres'] = [{'value': mp['code'], 'label': mp['name']} for mp in mps]
-    p.step('matieres_premieres')
 
     if 'biocarburants' in whitelist:
         bcs = Biocarburant.objects.filter(id__in=lots.values('biocarburant__id').distinct()).values('code', 'name')
         filters['biocarburants'] = [{'value': b['code'], 'label': b['name']} for b in bcs]
-    p.step('biocarburants')
 
     if 'countries_of_origin' in whitelist:
         countries = Pays.objects.filter(id__in=lots.values('pays_origine').distinct()).values('code_pays', 'name')
         filters['countries_of_origin'] = [{'value': c['code_pays'], 'label': c['name']} for c in countries]
-    p.step('countries_of_origin')
 
     if 'periods' in whitelist:
         filters['periods'] = [p['period'] for p in lots.values('period').distinct() if p['period']]
-    p.step('periods')
 
     if 'production_sites' in whitelist:
         filters['production_sites'] = []
@@ -316,7 +310,6 @@ def get_snapshot_filters(txs, whitelist):
                 filters['production_sites'].append(ps['carbure_production_site__name'])
             elif ps['unknown_production_site'] not in ('', None):
                 filters['production_sites'].append(ps['unknown_production_site'])
-    p.step('production_sites')
 
     if 'delivery_sites' in whitelist:
         filters['delivery_sites'] = []
@@ -325,12 +318,10 @@ def get_snapshot_filters(txs, whitelist):
                 filters['delivery_sites'].append(ps['carbure_delivery_site__name'])
             elif ps['unknown_delivery_site'] not in ('', None):
                 filters['delivery_sites'].append(ps['unknown_delivery_site'])
-    p.step('delivery_sites')
 
     if 'errors' in whitelist:
         generic_errors = [e['genericerror__error'] for e in txs.values('genericerror__error').distinct() if e['genericerror__error']]
         filters['errors'] = generic_errors
-    p.step('errors')
 
     if 'clients' in whitelist:
         filters['clients'] = []
@@ -339,30 +330,23 @@ def get_snapshot_filters(txs, whitelist):
                 filters['clients'].append(ps['carbure_client__name'])
             elif ps['unknown_client'] not in ('', None):
                 filters['clients'].append(ps['unknown_client'])
-    p.step('clients')
 
     if 'vendors' in whitelist:
         v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
         v2 = [v['unknown_supplier'] for v in lots.values('unknown_supplier').distinct()]
         filters['vendors'] = [v for v in set(v1 + v2) if v]
-    p.step('vendors')
 
     if 'added_by' in whitelist:
         filters['added_by'] = [e['added_by__name'] for e in lots.values('added_by__name').distinct()]
-    p.step('added_by')
 
     if 'delivery_status' in whitelist:
         filters['delivery_status'] = [{'value': s[0], 'label': s[1]} for s in LotTransaction.DELIVERY_STATUS]
-    p.step('delivery_status')
 
     if 'is_forwarded' in whitelist:
         filters['is_forwarded'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
-    p.step('is_forwarded')
 
     if 'is_mac' in whitelist:
         filters['is_mac'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
-    p.step('is_mac')
-    p.total('end')
     return filters
 
 
