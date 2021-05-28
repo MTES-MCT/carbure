@@ -359,13 +359,13 @@ def filter_entity_transactions(entity, querySet):
     txs = get_entity_lots_by_status(entity, status)
     return filter_lots(txs, querySet)
 
+
 def get_summary(txs, entity):
-    tx_ids = [t['id'] for t in txs.values('id')]
     total_volume = 0
     txs_in = txs.filter(carbure_client=entity)
     total_volume_in = 0
     data_in = {}
-    for t in txs_in:
+    for t in txs_in.iterator():
         vendor = ''
         if t.lot.added_by == entity:
             vendor = t.lot.unknown_supplier if t.lot.unknown_supplier else t.lot.unknown_supplier_certificate
@@ -387,7 +387,7 @@ def get_summary(txs, entity):
     txs_out = txs.filter(carbure_vendor=entity).exclude(carbure_client=entity)
     total_volume_out = 0
     data_out = {}
-    for t in txs_out:
+    for t in txs_out.iterator():
         client_name = t.carbure_client.name if t.client_is_in_carbure and t.carbure_client else t.unknown_client
         if client_name not in data_out:
             data_out[client_name] = {}
@@ -402,17 +402,17 @@ def get_summary(txs, entity):
         total_volume += t.lot.volume
         line['lots'] += 1
 
+    tx_ids = [t['id'] for t in txs.values('id')]
+
     return {'in': data_in, 'out': data_out, 'tx_ids': tx_ids,
             'total_volume': total_volume, 'total_volume_in': total_volume_in, 'total_volume_out': total_volume_out}
 
 
 # little helper to help measure elapsed time
 class Perf:
-    steps = []
-
     def __init__(self):
         t0 = perf_counter()
-        self.steps.append(t0)
+        self.steps = [t0]
 
     def step(self, message):
         t = perf_counter()
