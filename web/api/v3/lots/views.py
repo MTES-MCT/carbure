@@ -11,6 +11,7 @@ from django.db.models.fields import NOT_PROVIDED
 from django.http import JsonResponse, HttpResponse
 from django.db import transaction
 from django_otp.decorators import otp_required
+from numpy.lib.arraysetops import isin
 
 from core.models import Entity, UserRights, TransactionComment, SustainabilityDeclaration
 from core.models import LotV2, LotTransaction, EntityDepot, GenericError
@@ -633,7 +634,7 @@ def upload(request, *args, **kwargs):
     nb_loaded, nb_total, errors = load_excel_file(entity, request.user, filepath)
     if nb_loaded is False:
         return JsonResponse({'status': 'error', 'message': 'Could not load Excel file'})
-    data = {'loaded': nb_loaded, 'total': nb_total, 'errors': [e.natural_key() for e in errors]}
+    data = {'loaded': nb_loaded, 'total': nb_total, 'errors': [e.natural_key() if isinstance(e, GenericError) else e for e in errors]}
     return JsonResponse({'status': 'success', 'data': data})
 
 @check_rights('entity_id')
