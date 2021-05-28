@@ -87,10 +87,10 @@ export default function useProductionSites(
 
       if (ps) {
         const mps = data.matieres_premieres.map((mp) => mp.code)
-        await resolveSetProductionSiteMP(ps.id, mps)
+        await resolveSetProductionSiteMP(entityID, ps.id, mps)
 
         const bcs = data.biocarburants.map((bc) => bc.code)
-        await resolveSetProductionSiteBC(ps.id, bcs)
+        await resolveSetProductionSiteBC(entityID, ps.id, bcs)
 
         const cs = data.certificates.map((c) => c.certificate_id)
         await resolveSetProductionSiteCertificates(entityID, ps.id, cs)
@@ -140,10 +140,10 @@ export default function useProductionSites(
       )
 
       const mps = data.matieres_premieres.map((mp) => mp.code)
-      await resolveSetProductionSiteMP(ps.id, mps)
+      await resolveSetProductionSiteMP(entityID, ps.id, mps)
 
       const bcs = data.biocarburants.map((bc) => bc.code)
-      await resolveSetProductionSiteBC(ps.id, bcs)
+      await resolveSetProductionSiteBC(entityID, ps.id, bcs)
 
       const cs = data.certificates.map((c) => c.certificate_id)
       await resolveSetProductionSiteCertificates(entityID, ps.id, cs)
@@ -171,7 +171,7 @@ export default function useProductionSites(
         t("Voulez-vous vraiment supprimer le site de production {{site}} ?", { site: ps.name }) // prettier-ignore
       )
     ) {
-      const res = resolveDelProductionSite(ps.id)
+      const res = resolveDelProductionSite(entityID, ps.id)
 
       if (res) {
         refresh()
