@@ -362,8 +362,12 @@ class LotV2(models.Model):
             models.Index(fields=["status"]),
             models.Index(fields=["added_by"]),
             models.Index(fields=["period"]),
+            models.Index(fields=["biocarburant"]),
+            models.Index(fields=["matiere_premiere"]),
+            models.Index(fields=["pays_origine"]),
+            models.Index(fields=["carbure_production_site"]),
+            models.Index(fields=["unknown_production_site"]),
         ]
-
 
 class LotTransaction(models.Model):
     PENDING = 'N'
@@ -434,6 +438,12 @@ class LotTransaction(models.Model):
             models.Index(fields=["carbure_vendor"]),
             models.Index(fields=["carbure_client"]),
             models.Index(fields=["delivery_status"]),
+            models.Index(fields=["unknown_client"]),
+            models.Index(fields=["is_forwarded"]),
+            models.Index(fields=["is_mac"]),
+            models.Index(fields=["carbure_delivery_site"]),
+            models.Index(fields=["unknown_delivery_site"]),
+            
         ]
 
 
