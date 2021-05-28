@@ -56,7 +56,7 @@ def get_lots_summary(request, *args, **kwargs):
         if len(selection) > 0:
             txs = LotTransaction.objects.filter(pk__in=selection)
         else:
-            txs, _, _, _ = filter_entity_transactions(entity, request.GET)
+            txs = filter_entity_transactions(entity, request.GET)[0]
         txs = sort_lots(txs, request.GET)
         data = get_summary(txs, entity)
         return JsonResponse({'status': 'success', 'data': data})
@@ -356,7 +356,7 @@ def validate_lot(request, *args, **kwargs):
 @check_rights('entity_id')
 def accept_lot(request, *args, **kwargs):
     context = kwargs['context']
-    entity = context['entity']   
+    entity = context['entity']
     tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
@@ -380,7 +380,7 @@ def accept_lot(request, *args, **kwargs):
 def accept_with_reserves(request, *args, **kwargs):
     # I want my supplier to fix something
     context = kwargs['context']
-    entity = context['entity']    
+    entity = context['entity']
     tx_ids = request.POST.getlist('tx_ids', None)
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
