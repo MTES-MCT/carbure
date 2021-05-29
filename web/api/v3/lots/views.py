@@ -213,6 +213,15 @@ def update_lot(request, *args, **kwargs):
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Unknown transaction %s" % (tx_id)}, status=400)
 
+    # am I allowed to update lot?
+    # you can update data if you are data_origin_entity or carbure_vendor
+    if entity != tx.carbure_vendor and entity != tx.lot.data_origin_entity:
+        return JsonResponse({'status': 'forbidden', 'message': "Not allowed. You are not the lot creator nor intermediary"}, status=403)
+
+    if tx.lot.status == LotV2.VALIDATED and tx.delivery_status != LotTransaction.TOFIX:
+        return JsonResponse({'status': 'forbidden', 'message': "Cannot update lot - please request a correction first"}, status=400)
+
+
     if tx.delivery_status == LotTransaction.FROZEN:
         return JsonResponse({'status': 'forbidden', 'message': "Tx already declared - please amend the declaration to unlock this line"}, status=400)
 

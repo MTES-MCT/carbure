@@ -1003,14 +1003,44 @@ class CorrectionTests(TransactionTestCase):
         self.assertEqual(tx.lot.volume, 45000)
         self.assertEqual(tx.delivery_date, datetime.date(2021, 1, 15))
 
-        # try to edit as the client
-        #j['entity_id'] = self.test_trader.id
-        #j['tx_id'] = tx_id
-        #j['volume'] = 15000
-        #response = self.client.post(reverse('api-v3-update-lot'), j)
-        #self.assertEqual(response.status_code, 403)
+        # lot is FIXED, try to edit as the client
+        j['entity_id'] = self.test_trader.id
+        j['tx_id'] = tx_id
+        j['volume'] = 15000
+        response = self.client.post(reverse('api-v3-update-lot'), j)
+        self.assertEqual(response.status_code, 403)
 
 
+        # lot is FIXED, try to edit as the sender
+        j['entity_id'] = self.test_producer.id
+        j['tx_id'] = tx_id
+        j['volume'] = 15000
+        response = self.client.post(reverse('api-v3-update-lot'), j)
+        self.assertEqual(response.status_code, 400) # lot should be in status TOFIX to allow update
+
+        response = self.client.post(reverse('api-v3-amend-lot'), {'entity_id': self.test_producer.id, 'tx_id': tx.id})
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(reverse('api-v3-update-lot'), j)
+        self.assertEqual(response.status_code, 200)
+        tx = LotTransaction.objects.get(id=tx_id)
+        self.assertEqual(tx.lot.volume, 15000)
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 200)
+
+        # all good. now accept lot as the client
+        response = self.client.post(reverse('api-v3-accept-lot'), {'entity_id': self.test_trader.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 200)
+        tx = LotTransaction.objects.get(id=tx_id)
+        self.assertEqual(tx.is_stock, True)
+        self.assertEqual(tx.delivery_status, LotTransaction.ACCEPTED)
 
 
-
+        # now start playing with fire
+        # 1 split lot, send to a client
+        # 2 as final client, request correction
+        # 3 as initial producer, try update lot and tx. only lot should work
+        # 3 as initial producer, send lot back to final client
+        # 4 as trader, re-open lot (amend-lot)
+        # 4 as trader, try update lot and tx, only tx should work
+        # 5 send the lot back, accept it
