@@ -32,6 +32,7 @@ class Entity(models.Model):
     sustainability_officer_phone_number = models.CharField(max_length=32, blank=True, default='')
     sustainability_officer = models.CharField(max_length=256, blank=True, default='')
     registered_address = models.TextField(blank=True, default='')
+    hash = models.CharField(max_length=32, null=True, blank=True, default='')
 
     def __str__(self):
         return self.name
