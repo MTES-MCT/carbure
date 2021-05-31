@@ -151,12 +151,12 @@ def send_lot_from_stock(rights, tx, prefetched_data):
         return False, 'Quantité disponible dans la mass balance insuffisante: Dispo %d litres, lot %d litres' % (lot.parent_lot.remaining_volume, lot.volume)
 
     lot.carbure_id = generate_carbure_id(lot) + 'S'
-    lot.status = "Validated"
+    lot.status = LotV2.VALIDATED
     lot.save()
     lot.parent_lot.remaining_volume -= lot.volume
     lot.parent_lot.save()
     if tx.is_mac:
-        tx.delivery_status = 'A'
+        tx.delivery_status = LotTransaction.ACCEPTED
         tx.save()
     return True, ''
 
@@ -861,6 +861,7 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
     lot.status = 'Draft'
     lot.carbure_id = ''
     lot.is_fused = False
+    lot.is_split = True
     lot.source = 'EXCEL'
 
     transaction = LotTransaction()
@@ -892,8 +893,10 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, tx=None):
     biocarburant_code = lot_dict.get('biocarburant_code', None)
     if biocarburant_code is None or biocarburant_code == '':
         return None, None, "Missing biocarburant_code"
-
+    
+    can_update_tx = False
     if tx is None:
+        can_update_tx = True
         lot = LotV2()
         lot.added_by = entity
         lot.data_origin_entity = entity
@@ -914,17 +917,40 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, tx=None):
         errors += fill_matiere_premiere_info(lot_dict, lot, tx, prefetched_data)
         errors += fill_pays_origine_info(lot_dict, lot, tx, prefetched_data)
         errors += fill_ghg_info(lot_dict, lot, tx)
-    errors += fill_volume_info(lot_dict, lot, tx)
+        errors += fill_volume_info(lot_dict, lot, tx)
+    else:
+        # STOCK// if someone updates the volume of a validated split-lot
+        # STOCK// we first recredit the volume back in stock
+        if lot.status == LotV2.VALIDATED and lot.is_split:
+            lot.parent_lot.remaining_volume += lot.volume
+            lot.parent_lot.save()
+        # STOCK// only the lot.added_by can update the volume of a split transaction
+        if lot.added_by == entity and lot.is_split:
+            errors += fill_volume_info(lot_dict, lot, tx)
+        # STOCK// and debit the stock back according to new volume 
+        if lot.status == LotV2.VALIDATED and lot.is_split:
+            lot.parent_lot.remaining_volume -= lot.volume
+            lot.parent_lot.save()
 
-    fill_mac_data(lot_dict, tx) # does not return anything
-    errors += fill_dae_data(lot_dict, tx)
-    errors += fill_delivery_date(lot_dict, lot, tx)
-    errors += fill_client_data(entity, lot_dict, tx, prefetched_data)
-    errors += fill_vendor_data(entity, lot_dict, tx, prefetched_data)
-    errors += fill_delivery_site_data(lot_dict, tx, prefetched_data)
-    tx.ghg_total = lot.ghg_total
-    tx.ghg_reduction = lot.ghg_reduction
-    tx.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
+    # data related to TRANSACTION
+
+    if tx.carbure_vendor and tx.carbure_vendor == entity:
+        # I am the seller
+        can_update_tx = True
+    if not tx.carbure_vendor and tx.carbure_client and tx.carbure_client == entity:
+        # lot added by client, he's allowed to update
+        can_update_tx = True
+    if can_update_tx:
+        fill_mac_data(lot_dict, tx) # does not return anything
+        errors += fill_dae_data(lot_dict, tx)
+        errors += fill_delivery_date(lot_dict, lot, tx)
+        errors += fill_client_data(entity, lot_dict, tx, prefetched_data)
+        errors += fill_vendor_data(entity, lot_dict, tx, prefetched_data)
+        errors += fill_delivery_site_data(lot_dict, tx, prefetched_data)
+        tx.ghg_total = lot.ghg_total
+        tx.ghg_reduction = lot.ghg_reduction
+        tx.champ_libre = lot_dict['champ_libre'] if 'champ_libre' in lot_dict else ''
+
     return lot, tx, errors
 
 

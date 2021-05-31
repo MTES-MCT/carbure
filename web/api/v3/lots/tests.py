@@ -2,6 +2,7 @@ import datetime
 import os
 import random
 import time
+import json
 from django.test import TestCase
 from django.test import TransactionTestCase
 from django.urls import reverse
@@ -58,9 +59,9 @@ class LotsAPITest(TransactionTestCase):
         self.entity3, _ = Entity.objects.update_or_create(name='Le Super Trader 1', entity_type='Trader')
 
         # some rights
-        UserRights.objects.update_or_create(user=self.user1, entity=self.test_producer)
-        UserRights.objects.update_or_create(user=self.user1, entity=self.test_operator)
-        UserRights.objects.update_or_create(user=self.user1, entity=self.entity3)
+        UserRights.objects.update_or_create(user=self.user1, entity=self.test_producer, role='RW')
+        UserRights.objects.update_or_create(user=self.user1, entity=self.test_operator, role='RW')
+        UserRights.objects.update_or_create(user=self.user1, entity=self.entity3, role='RW')
         # note: user1 does not have access to entity3
         france = Pays.objects.get(code_pays='FR')
         today = datetime.date.today()
@@ -225,7 +226,7 @@ class LotsAPITest(TransactionTestCase):
         # reject first
         tx_id1 = lots[0]['id']
         response = self.client.post(reverse('api-v3-reject-lot'), {'entity_id': self.test_operator.id, 'tx_ids': [tx_id1], 'comment': 'auto-reject-test'})
-        self.assertEqual(response.status_code, 200)        
+        self.assertEqual(response.status_code, 200)
         # accept-with-reserves second + add comment
         tx_id2 = lots[1]['id']
         response = self.client.post(reverse('api-v3-accept-lot-with-reserves'), {'entity_id': self.test_operator.id, 'tx_ids': [tx_id2]})
@@ -899,13 +900,14 @@ class CorrectionTests(TransactionTestCase):
         self.test_trader, _ = Entity.objects.update_or_create(name='Trader1', entity_type=Entity.TRADER)
 
         # some rights
-        UserRights.objects.update_or_create(user=self.user1, entity=self.test_producer)
-        UserRights.objects.update_or_create(user=self.user1, entity=self.test_operator)
-        UserRights.objects.update_or_create(user=self.user1, entity=self.test_trader)
+        UserRights.objects.update_or_create(user=self.user1, entity=self.test_producer, defaults={'role': 'RW'})
+        UserRights.objects.update_or_create(user=self.user1, entity=self.test_operator, defaults={'role': 'RW'})
+        UserRights.objects.update_or_create(user=self.user1, entity=self.test_trader, defaults={'role': 'RW'})
 
         # a production site and delivery_site
         france = Pays.objects.get(code_pays='FR')
         Depot.objects.update_or_create(name='Depot Test', depot_id='001', country=france)
+        Depot.objects.update_or_create(name='Depot Test 2', depot_id='002', country=france)
         today = datetime.date.today()
         d = {'country': france, 'date_mise_en_service': today, 'site_id':'SIRET XXX',
         'city': 'paris', 'postal_code': '75001', 'manager_name':'Guillaume Caillou', 
@@ -948,18 +950,101 @@ class CorrectionTests(TransactionTestCase):
         return tx_id, lot_id, lot
 
 
-    def test_corrections(self):
+    def test_only_creator_can_validate(self):
+        # 1 create lot as producer and send it
+        tx_id, lot_id, j = self.create_lot(client=self.test_operator.name)
+        # try validate as client
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_operator.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 403)              
+        # try validate as unknown
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_trader.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 403)              
+        # try validate as creator
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 200)        
+
+    def test_only_creator_can_validate__createdbyoperator(self):
+        # 1 create lot as producer and send it
+        tx_id, lot_id, j = self.create_lot(producer='unknownproducer', production_site_reference='psitereference', date_mise_en_service='12/12/2012', client=self.test_operator.name, entity_id=self.test_operator.id)
+        # try validate as unknown
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 403)              
+        # try validate as client
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_operator.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 200)
+
+    def test_only_client_can_accept(self):
+        # 1 create lot as producer and send it
+        tx_id, lot_id, j = self.create_lot(client=self.test_operator.name)
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 200)        
+        # 2 producer cannot accept
+        response = self.client.post(reverse('api-v3-accept-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 403)
+        # random cannot accept
+        response = self.client.post(reverse('api-v3-accept-lot'), {'entity_id': self.test_trader.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 403)        
+        # client can accept
+        response = self.client.post(reverse('api-v3-accept-lot'), {'entity_id': self.test_operator.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 200)           
+
+    def test_only_creator_can_update_lot__producer(self):
+        # 1 producer creates lot
+        tx_id, lot_id, j = self.create_lot()
+        # update some data
+        j['tx_id'] = tx_id
+        j['volume'] = 45000
+        j['delivery_date'] = '2021-01-15'
+        j['entity_id'] = self.test_operator.id
+        response = self.client.post(reverse('api-v3-update-lot'), j)
+        self.assertEqual(response.status_code, 403)
+        j['entity_id'] = self.test_trader.id
+        response = self.client.post(reverse('api-v3-update-lot'), j)
+        self.assertEqual(response.status_code, 403)
+        j['entity_id'] = self.test_producer.id
+        response = self.client.post(reverse('api-v3-update-lot'), j)
+        self.assertEqual(response.status_code, 200)
+
+    def test_only_creator_can_update_lot__trader(self):
+        # 1 operator creates lot
+        tx_id, lot_id, j = self.create_lot(producer='UNKNOWNPRODUCER', entity_id=self.test_trader.id)
+        # update some data
+        j['tx_id'] = tx_id
+        j['volume'] = 45000
+        j['delivery_date'] = '2021-01-15'
+        j['entity_id'] = self.test_producer.id
+        response = self.client.post(reverse('api-v3-update-lot'), j)
+        self.assertEqual(response.status_code, 403)
+        j['entity_id'] = self.test_trader.id
+        response = self.client.post(reverse('api-v3-update-lot'), j)
+        self.assertEqual(response.status_code, 200)
+        j['entity_id'] = self.test_operator.id
+        response = self.client.post(reverse('api-v3-update-lot'), j)
+        self.assertEqual(response.status_code, 403)
+
+    def test_only_creator_can_update_lot__operator(self):
+        # 1 operator creates lot
+        tx_id, lot_id, j = self.create_lot(producer='UNKNOWNPRODUCER', entity_id=self.test_operator.id)
+        # update some data
+        j['tx_id'] = tx_id
+        j['volume'] = 45000
+        j['delivery_date'] = '2021-01-15'
+        j['entity_id'] = self.test_producer.id
+        response = self.client.post(reverse('api-v3-update-lot'), j)
+        self.assertEqual(response.status_code, 403)
+        j['entity_id'] = self.test_trader.id
+        response = self.client.post(reverse('api-v3-update-lot'), j)
+        self.assertEqual(response.status_code, 403)
+        j['entity_id'] = self.test_operator.id
+        response = self.client.post(reverse('api-v3-update-lot'), j)
+        self.assertEqual(response.status_code, 200)
+
+    def test_only_client_can_request_correction(self):
         # 1 producer creates lot
         tx_id, lot_id, j = self.create_lot()
         # 2 validate
         response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx_id]})
         self.assertEqual(response.status_code, 200)
-
-        debug_errors()
-
-        tx = LotTransaction.objects.get(id=tx_id)
-        self.assertEqual(tx.lot.status, LotV2.VALIDATED)
-        self.assertEqual(tx.delivery_status, LotTransaction.PENDING)
 
         # 3 request a correction
         # 3.1 the sender requests a correction - 403
@@ -973,74 +1058,151 @@ class CorrectionTests(TransactionTestCase):
         # 3.3 the real client requests a correction - 200
         response = self.client.post(reverse('api-v3-accept-lot-with-reserves'), {'entity_id': self.test_trader.id, 'tx_ids': [tx_id]})
         self.assertEqual(response.status_code, 200)
-        tx = LotTransaction.objects.get(id=tx_id)
-        self.assertEqual(tx.lot.status, LotV2.VALIDATED)
-        self.assertEqual(tx.delivery_status, LotTransaction.TOFIX)
 
-        # 4 producer can edit all parts of the lot
+    def test_only_creator_can_amend(self):
+        # 1 producer creates lot
+        tx_id, lot_id, j = self.create_lot()
+        # 2 validate
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 200)
+
+        # 3 request to edit lot
+        # 3.1 the sender requests to amend - 200
+        response = self.client.post(reverse('api-v3-amend-lot'), {'entity_id': self.test_producer.id, 'tx_id': tx_id})
+        self.assertEqual(response.status_code, 200)
+
+        # 3.2 someone else requests to amend - 403
+        response = self.client.post(reverse('api-v3-amend-lot'), {'entity_id': self.test_operator.id, 'tx_id': tx_id})
+        self.assertEqual(response.status_code, 403)
+
+        # 3.3 the client requests to amend - 403
+        response = self.client.post(reverse('api-v3-amend-lot'), {'entity_id': self.test_trader.id, 'tx_id': tx_id})
+        self.assertEqual(response.status_code, 403)
+
+
+    def test_split_rights(self):
+        # producer creates lot and validates
+        tx_id, lot_id, j = self.create_lot()
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx_id]})
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(reverse('api-v3-amend-lot'), {'entity_id': self.test_producer.id, 'tx_id': tx_id})
+        self.assertEqual(response.status_code, 200)
+
+        # producer can edit all parts of the lot
         j['tx_id'] = tx_id
         j['volume'] = 45000
         j['delivery_date'] = '2021-01-15'
-
         response = self.client.post(reverse('api-v3-update-lot'), j)
         self.assertEqual(response.status_code, 200)
         tx = LotTransaction.objects.get(id=tx_id)
-        # lot is corrected but has not been sent back
-        self.assertEqual(tx.lot.status, LotV2.VALIDATED)
-        self.assertEqual(tx.delivery_status, LotTransaction.TOFIX)
-
-        # try to send it back as someone else
-        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_trader.id, 'tx_ids': [tx_id]})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(tx.lot.volume, 45000)
+        self.assertEqual(tx.delivery_date, datetime.date(2021,1,15))
+        self.assertEqual(tx.carbure_delivery_site.depot_id, '001')
 
         # send it back
         response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx_id]})
         self.assertEqual(response.status_code, 200)
-        tx = LotTransaction.objects.get(id=tx_id)
-        self.assertEqual(tx.lot.status, LotV2.VALIDATED)
-        self.assertEqual(tx.delivery_status, LotTransaction.FIXED)
-        # check that it indeed has been updated (on the lot and on the tx details)
-        self.assertEqual(tx.lot.volume, 45000)
-        self.assertEqual(tx.delivery_date, datetime.date(2021, 1, 15))
 
-        # lot is FIXED, try to edit as the client
-        j['entity_id'] = self.test_trader.id
-        j['tx_id'] = tx_id
-        j['volume'] = 15000
-        response = self.client.post(reverse('api-v3-update-lot'), j)
-        self.assertEqual(response.status_code, 403)
-
-
-        # lot is FIXED, try to edit as the sender
-        j['entity_id'] = self.test_producer.id
-        j['tx_id'] = tx_id
-        j['volume'] = 15000
-        response = self.client.post(reverse('api-v3-update-lot'), j)
-        self.assertEqual(response.status_code, 400) # lot should be in status TOFIX to allow update
-
-        response = self.client.post(reverse('api-v3-amend-lot'), {'entity_id': self.test_producer.id, 'tx_id': tx.id})
-        self.assertEqual(response.status_code, 200)
-
-        response = self.client.post(reverse('api-v3-update-lot'), j)
-        self.assertEqual(response.status_code, 200)
-        tx = LotTransaction.objects.get(id=tx_id)
-        self.assertEqual(tx.lot.volume, 15000)
-        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx_id]})
-        self.assertEqual(response.status_code, 200)
-
-        # all good. now accept lot as the client
+        # accept lot
         response = self.client.post(reverse('api-v3-accept-lot'), {'entity_id': self.test_trader.id, 'tx_ids': [tx_id]})
         self.assertEqual(response.status_code, 200)
-        tx = LotTransaction.objects.get(id=tx_id)
-        self.assertEqual(tx.is_stock, True)
-        self.assertEqual(tx.delivery_status, LotTransaction.ACCEPTED)
-
 
         # now start playing with fire
-        # 1 split lot, send to a client
-        # 2 as final client, request correction
-        # 3 as initial producer, try update lot and tx. only lot should work
+        # split lot, send it to a different client
+        drafts = json.dumps([{'volume':5000, 'client': self.test_operator.name, 'dae':'DAESPLIT01', 'delivery_site':'001', 'delivery_date': '12/05/2021'}])
+        response = self.client.post(reverse('api-v3-stocks-create-drafts'), {'entity_id': self.test_trader.id, 'drafts': drafts})
+        self.assertEqual(response.status_code, 200)
+        split_tx_id = response.json()['data']['tx_ids'][0]
+        # it's a draft so parent volumes are unaffected
+        split_tx = LotTransaction.objects.get(id=split_tx_id)
+        self.assertEqual(split_tx.lot.status, LotV2.DRAFT)
+        self.assertEqual(split_tx.delivery_status, LotTransaction.PENDING)
+        self.assertEqual(split_tx.lot.parent_lot.remaining_volume, 45000)
+        self.assertEqual(split_tx.lot.parent_lot.volume, 45000)
+
+        # validate draft
+        response = self.client.post(reverse('api-v3-stocks-send-drafts'), {'entity_id': self.test_trader.id, 'tx_ids':  [split_tx_id]})
+        self.assertEqual(response.status_code, 200)
+        # split is validated, stock is affected
+        split_tx = LotTransaction.objects.get(id=split_tx_id)
+        self.assertEqual(split_tx.lot.status, LotV2.VALIDATED)
+        self.assertEqual(split_tx.delivery_status, LotTransaction.PENDING)
+        self.assertEqual(split_tx.lot.parent_lot.remaining_volume, 40000)
+        self.assertEqual(split_tx.lot.parent_lot.volume, 45000)
+
+
+        # as final client, accept and request correction
+        response = self.client.post(reverse('api-v3-accept-lot-with-reserves'), {'entity_id': self.test_operator.id, 'tx_ids': [split_tx_id]})
+        self.assertEqual(response.status_code, 200)
+        split_tx = LotTransaction.objects.get(id=split_tx_id)
+        self.assertEqual(split_tx.lot.status, LotV2.VALIDATED)
+        self.assertEqual(split_tx.delivery_status, LotTransaction.TOFIX)
+        self.assertEqual(split_tx.lot.volume, 5000)
+        self.assertEqual(split_tx.lot.remaining_volume, 5000)
+        self.assertEqual(split_tx.lot.parent_lot.remaining_volume, 40000) # volume has not been re-credited because tx status is TOFIX
+        self.assertEqual(split_tx.lot.parent_lot.volume, 45000)
+
+        # as initial producer, try update lot and tx. nothing should work because it's a split. only the "master" or "parent" lot can be updated
+        j['entity_id'] = self.test_producer.id
+        j['tx_id'] = split_tx_id
+        j['volume'] = 15000 # lot is split - volume can only be updated by trader
+        j['pays_origine_code'] = 'DE'
+        j['delivery_site'] = '002' # should not change
+        response = self.client.post(reverse('api-v3-update-lot'), j)
+        self.assertEqual(response.status_code, 200)
+        split_tx = LotTransaction.objects.get(id=split_tx_id)
+        self.assertEqual(split_tx.lot.volume, 5000) # volume is unchanged
+        self.assertEqual(split_tx.lot.pays_origine.code_pays, 'FR') # pays_origine is unchanged
+        self.assertEqual(split_tx.carbure_delivery_site.depot_id, '001') # delivery_site is unchanged
+        
+        
         # 3 as initial producer, send lot back to final client
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [split_tx_id]})
+        self.assertEqual(response.status_code, 403) # only the intermediary can send it back
+        # as the trader, send split lot back to client
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_trader.id, 'tx_ids': [split_tx_id]})
+        self.assertEqual(response.status_code, 200)
+        split_tx = LotTransaction.objects.get(id=split_tx_id)
+        self.assertEqual(split_tx.lot.volume, 5000)
+        self.assertEqual(split_tx.lot.remaining_volume, 5000)
+        self.assertEqual(split_tx.lot.parent_lot.volume, 45000)
+        self.assertEqual(split_tx.lot.parent_lot.remaining_volume, 40000)
+        self.assertEqual(split_tx.delivery_status, LotTransaction.FIXED)
+
         # 4 as trader, re-open lot (amend-lot)
+        response = self.client.post(reverse('api-v3-amend-lot'), {'entity_id': self.test_trader.id, 'tx_id': split_tx_id})
+        self.assertEqual(response.status_code, 200)
+        split_tx = LotTransaction.objects.get(id=split_tx_id)
+        self.assertEqual(split_tx.lot.volume, 5000)
+        self.assertEqual(split_tx.lot.remaining_volume, 5000)
+        self.assertEqual(split_tx.lot.parent_lot.volume, 45000)
+        self.assertEqual(split_tx.lot.parent_lot.remaining_volume, 40000)
+        self.assertEqual(split_tx.delivery_status, LotTransaction.TOFIX)
+
+
         # 4 as trader, try update lot and tx, only tx should work
-        # 5 send the lot back, accept it
+        j['entity_id'] = self.test_trader.id
+        j['tx_id'] = split_tx_id
+        j['volume'] = 5001 # volume change by the trader
+        j['pays_origine_code'] = 'DE' # should not change
+        j['delivery_site'] = '002' # should change
+        response = self.client.post(reverse('api-v3-update-lot'), j)
+        self.assertEqual(response.status_code, 200)
+
+        split_tx = LotTransaction.objects.get(id=split_tx_id)
+        self.assertEqual(split_tx.lot.pays_origine.code_pays, 'FR') # pays_origine has NOT been updated
+        self.assertEqual(split_tx.carbure_delivery_site.depot_id, '002') # delivery_site has been updated
+        self.assertEqual(split_tx.lot.volume, 5001)
+        self.assertEqual(split_tx.lot.remaining_volume, 5001)
+        self.assertEqual(split_tx.lot.parent_lot.volume, 45000)
+        self.assertEqual(split_tx.lot.parent_lot.remaining_volume, 39999) # volume has been recredited when moved to "correction"
+        self.assertEqual(split_tx.delivery_status, LotTransaction.TOFIX)
+
+        # 5 send the lot back
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_trader.id, 'tx_ids': [split_tx_id]})
+        self.assertEqual(response.status_code, 200)        
+        split_tx = LotTransaction.objects.get(id=split_tx_id)
+        self.assertEqual(split_tx.delivery_status, LotTransaction.FIXED)
+        self.assertEqual(split_tx.lot.parent_lot.volume, 45000)
+        self.assertEqual(split_tx.lot.parent_lot.remaining_volume, 39999)
