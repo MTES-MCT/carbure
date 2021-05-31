@@ -120,7 +120,7 @@ const Org = ({ app }: { app: AppHook }) => {
         )}
 
         <Route relative path="stats">
-          <Stats />
+          <Stats entity={entity} />
         </Route>
 
         <Redirect relative to={isAdmin ? "dashboard" : "transactions"} />
