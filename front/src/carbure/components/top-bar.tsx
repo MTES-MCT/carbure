@@ -157,6 +157,9 @@ const Topbar = ({ entity, settings }: TopbarProps) => {
               <PageLink to="settings">
                 <Trans>Société</Trans>
               </PageLink>
+              <PageLink to="stats">
+                <Trans>Statistiques</Trans>
+              </PageLink>
               <PageLink to="registry">
                 <Trans>Annuaire</Trans>
               </PageLink>
