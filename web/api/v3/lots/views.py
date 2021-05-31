@@ -218,7 +218,7 @@ def update_lot(request, *args, **kwargs):
     if entity != tx.carbure_vendor and entity != tx.lot.data_origin_entity:
         return JsonResponse({'status': 'forbidden', 'message': "Not allowed. You are not the lot creator nor intermediary"}, status=403)
 
-    if tx.lot.status == LotV2.VALIDATED and tx.delivery_status != LotTransaction.TOFIX:
+    if tx.lot.status == LotV2.VALIDATED and tx.delivery_status not in (LotTransaction.TOFIX, LotTransaction.REJECTED):
         return JsonResponse({'status': 'forbidden', 'message': "Cannot update lot - please request a correction first"}, status=400)
 
 
