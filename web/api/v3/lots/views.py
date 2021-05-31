@@ -6,6 +6,7 @@ import traceback
 
 import dictdiffer
 from dateutil.relativedelta import *
+from django.contrib.auth.models import User
 from django.db.models import Q
 from django.db.models.fields import NOT_PROVIDED
 from django.http import JsonResponse, HttpResponse
@@ -365,7 +366,7 @@ def validate_lot(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': data})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 def accept_lot(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -374,12 +375,10 @@ def accept_lot(request, *args, **kwargs):
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
     for tx_id in tx_ids:
         try:
-            tx = LotTransaction.objects.get(delivery_status__in=['N', 'AC', 'AA'], id=tx_id)
+            tx = LotTransaction.objects.get(delivery_status__in=[LotTransaction.PENDING, LotTransaction.TOFIX, LotTransaction.FIXED], id=tx_id)
         except Exception:
             return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
-
-        rights = [r.entity for r in UserRights.objects.filter(user=request.user)]
-        if tx.carbure_client not in rights:
+        if tx.carbure_client != entity:
             return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
         TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field='status', value_before=tx.delivery_status, value_after=LotTransaction.ACCEPTED, modified_by=request.user, modified_by_entity=entity)
         tx.delivery_status = LotTransaction.ACCEPTED
@@ -388,7 +387,7 @@ def accept_lot(request, *args, **kwargs):
 
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 def accept_with_reserves(request, *args, **kwargs):
     # I want my supplier to fix something
     context = kwargs['context']
@@ -420,7 +419,7 @@ def accept_with_reserves(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 def amend_lot(request, *args, **kwargs):
     # I want to fix one of my own transaction
     # This only changes the status to TOFIX
@@ -428,11 +427,17 @@ def amend_lot(request, *args, **kwargs):
     entity = context['entity']
     tx_id = request.POST.get('tx_id', None)
     if not tx_id:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_id"}, status=403)
+        return JsonResponse({'status': 'error', 'message': "Missing tx_id"}, status=400)
     try:
-        tx = LotTransaction.objects.get(carbure_vendor=entity, id=tx_id)
+        tx = LotTransaction.objects.get(id=tx_id)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
+
+    if tx.carbure_vendor != entity:
+        print(tx.carbure_vendor)
+        print(entity)
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
     if tx.delivery_status in [LotTransaction.ACCEPTED, LotTransaction.FROZEN]:
         # create notification / alert
         notify_accepted_lot_change(tx)
@@ -444,7 +449,7 @@ def amend_lot(request, *args, **kwargs):
     tx.save()
     return JsonResponse({'status': 'success'})
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 def reject_lot(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -468,6 +473,8 @@ def reject_lot(request, *args, **kwargs):
 
 
         if tx.carbure_client != entity:
+            print(entity)
+            print(tx.carbure_client)
             return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
         TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field='status', value_before=tx.delivery_status, value_after=LotTransaction.REJECTED, modified_by=request.user, modified_by_entity=entity)
         tx.delivery_status = LotTransaction.REJECTED

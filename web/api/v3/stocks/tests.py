@@ -71,11 +71,11 @@ class StockAPITest(TestCase):
         self.entity5, _ = Entity.objects.update_or_create(name='Le Super Trader 1', entity_type='Trader')        
 
         # some rights
-        UserRights.objects.update_or_create(user=self.user1, entity=self.entity1)
-        UserRights.objects.update_or_create(user=self.user1, entity=self.entity2)
-        UserRights.objects.update_or_create(user=self.user1, entity=self.entity3)
-        UserRights.objects.update_or_create(user=self.user2, entity=self.entity2)
-        UserRights.objects.update_or_create(user=self.user3, entity=self.entity4)
+        UserRights.objects.update_or_create(user=self.user1, entity=self.entity1, role='RW')
+        UserRights.objects.update_or_create(user=self.user1, entity=self.entity2, role='RW')
+        UserRights.objects.update_or_create(user=self.user1, entity=self.entity3, role='RW')
+        UserRights.objects.update_or_create(user=self.user2, entity=self.entity2, role='RW')
+        UserRights.objects.update_or_create(user=self.user3, entity=self.entity4, role='RW')
 
         # other stuff (production sites, depots, certificates...)
         france, created = Pays.objects.get_or_create(code_pays='FR')
