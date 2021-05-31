@@ -22,6 +22,7 @@ import Account from "account"
 import Entities from "../entities" // not using relative path prevents import
 import EntityDetails from "../entities/routes/entity-details"
 import Dashboard from "dashboard"
+import Stats from "stats"
 
 const DevBanner = () => (
   <div
@@ -117,6 +118,10 @@ const Org = ({ app }: { app: AppHook }) => {
             <Entities />
           </Route>
         )}
+
+        <Route relative path="stats">
+          <Stats entity={entity} />
+        </Route>
 
         <Redirect relative to={isAdmin ? "dashboard" : "transactions"} />
       </Switch>

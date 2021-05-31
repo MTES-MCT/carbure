@@ -213,5 +213,8 @@
   "Encore <1>{{remaining}} lots</1> en attente de validation pour cette période_plural": "Encore <1>{{remaining}} lots</1> en attente de validation pour cette période",
   "Déclaration validée !": "Déclaration validée !",
   "Valider ma déclaration": "Valider ma déclaration",
+  "Correction": "Correction",
+  "Corrigé": "Corrigé",
+  "Déclaré": "Déclaré",
   "Historique des corrections": "Historique des corrections"
 }
