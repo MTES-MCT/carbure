@@ -219,9 +219,8 @@ def update_lot(request, *args, **kwargs):
     if entity != tx.carbure_vendor and entity != tx.lot.data_origin_entity:
         return JsonResponse({'status': 'forbidden', 'message': "Not allowed. You are not the lot creator nor intermediary"}, status=403)
 
-    if tx.lot.status == LotV2.VALIDATED and tx.delivery_status != LotTransaction.TOFIX:
+    if tx.lot.status == LotV2.VALIDATED and tx.delivery_status not in (LotTransaction.TOFIX, LotTransaction.REJECTED):
         return JsonResponse({'status': 'forbidden', 'message': "Cannot update lot - please request a correction first"}, status=400)
-
 
     if tx.delivery_status == LotTransaction.FROZEN:
         return JsonResponse({'status': 'forbidden', 'message': "Tx already declared - please amend the declaration to unlock this line"}, status=400)
@@ -245,6 +244,13 @@ def update_lot(request, *args, **kwargs):
 
         # save the changes
         after_update = tx.natural_key()
+
+        for key in before_update.keys():
+            if before_update[key] is None and isinstance(after_update[key], dict):
+                before_update[key] = {}
+            if after_update[key] is None and isinstance(before_update[key], dict):
+                after_update[key] = {}
+
         diff = dictdiffer.diff(before_update, after_update)
 
         with transaction.atomic():
