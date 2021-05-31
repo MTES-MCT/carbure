@@ -12,7 +12,7 @@ const Stats = ({ entity }: StatsProps) => {
       <Section>
         <iframe
           title="stats"
-          src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/e3e1e7e4-5b8b-4d0a-8df1-c6d02e8b0fc7?user=${entity?.name}`}
+          src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/e3e1e7e4-5b8b-4d0a-8df1-c6d02e8b0fc7?user=${entity?.name}#hide_parameters=user`}
           frameBorder="0"
           width="100%"
           height="600"
