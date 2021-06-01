@@ -231,7 +231,7 @@ class TransactionAdmin(admin.ModelAdmin):
         _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)
         new_client = forms.ModelChoiceField(Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.OPERATOR, Entity.TRADER]), required=False)
         unknown_client = forms.CharField(required=False)
-        is_unknown_client = forms.BooleanField(initial=False)
+        is_unknown_client = forms.BooleanField(initial=False, required=False)
 
     def change_transaction_client(self, request, queryset):
         form = None
