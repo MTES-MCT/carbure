@@ -176,6 +176,7 @@ class StockAPITest(TestCase):
         response = self.client.post(reverse('api-v3-stocks-create-drafts'), {'entity_id': self.entity1.id, 'drafts': json.dumps(drafts)})
         self.assertEqual(response.status_code, 200)
         data = response.json()
+        print(data)
         return data
 
     def create_draft_from_match(self, **kwargs):
@@ -392,15 +393,15 @@ class StockAPITest(TestCase):
         self.assertEqual(len(lots_in_stock), 0)
 
     def test_extract_more_than_stock(self):
-        # create a lot where I am the client AND is_mac
-        txid, lotid = self.create_lot(client=self.entity1, mac="true")
+        # create a lot where I am the client
+        txid, lotid = self.create_lot(client=self.entity1)
         # validate lot
         self.validate_lots(self.entity1.id, [txid])
-
         tx = LotTransaction.objects.get(id=txid)
-        
+        self.assertEqual(tx.lot.status, LotV2.VALIDATED)
+        self.assertEqual(tx.delivery_status, LotTransaction.ACCEPTED)
         # extract 
-        drafts = self.create_draft(tx_id=tx.id, volume=tx.lot.volume + 1, client=self.entity2.name, delivery_site="osef")
+        drafts = self.create_draft(tx_id=tx.id, volume=tx.lot.volume + 1, client=self.entity2.name, delivery_site="osef", delivery_site_country='DE')
         new_draft_id = drafts['data']['tx_ids'][0]
         draft_tx = LotTransaction.objects.get(id=new_draft_id)
         self.send_stock_drafts(self.entity1.id, [draft_tx.id], expectedstatus=400)

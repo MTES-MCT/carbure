@@ -333,43 +333,43 @@ class LotsAPITest(TransactionTestCase):
         jsoned = self.upload_file('carbure_template_simple_missing_data_but_valid.xlsx', self.test_producer)
         nb_lots = jsoned['data']['total']
         self.assertEqual(jsoned['data']['loaded'], nb_lots)
-        # validate-all
+        # validate all 2020 lots (6). two wrong dates set to current year, everything else in 2020
+        lots_2020 = nb_lots - 2
         txs = LotTransaction.objects.filter(lot__status='Draft', lot__period__startswith='2020')
         response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})          
         self.assertEqual(response.status_code, 200)
         res = response.json()['data']
-        lots_in_batch = nb_lots - 2 # two wrong dates set to current year, everything else in 2020
-        self.assertEqual(res['submitted'], lots_in_batch)
-        self.assertEqual(res['valid'], lots_in_batch)
+        self.assertEqual(res['submitted'], lots_2020)
+        self.assertEqual(res['valid'], lots_2020)
 
         # get drafts
-        lots = LotV2.objects.filter(added_by_user=self.user1, status='Draft')
-        self.assertEqual(lots.count(), 2) # one draft left (line without delivery_date)
+        txs = LotTransaction.objects.filter(lot__added_by_user=self.user1, lot__status='Draft')
+        self.assertEqual(txs.count(), 2) # two drafts left (line without delivery_date and line with far away date)
+
+        # validate them manually
+        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})          
+        self.assertEqual(response.status_code, 200)
+
         # check api
         response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
         self.assertEqual(response.status_code, 200)        
         data = response.json()['data']
         lots = data['lots']
         self.assertEqual(len(lots), 0)
-        # get validated nb_lots
-        lots = LotV2.objects.filter(added_by_user=self.user1, status='Validated')
-        self.assertEqual(lots.count(), lots_in_batch)
-        lots = LotV2.objects.all()
-        self.assertEqual(lots.count(), nb_lots)
-        txs = LotTransaction.objects.all()
-        self.assertEqual(txs.count(), nb_lots)
+
+        tx = LotTransaction.objects.filter(lot__added_by_user=self.user1, lot__status='Draft')
+        self.assertEqual(tx.count(), 0) # no more drafts, everything has been validated
 
         # check api
         response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'validated', 'year': '2020'})
         self.assertEqual(response.status_code, 200)        
         lots = response.json()['data']['lots']
-        self.assertEqual(len(lots), 0) # client is not in carbure, transactions are accepted automatically
-
+        self.assertEqual(len(lots), lots_2020 - 1) # 1 tx has an empty client (producer himself - automatically accepted). For other, client is in carbure so transactions are pending acceptation
         response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'accepted', 'year': '2020'})
-        self.assertEqual(response.status_code, 200)        
+        self.assertEqual(response.status_code, 200)
         data = response.json()['data']
         lots = data['lots']
-        self.assertEqual(len(lots), lots_in_batch)
+        self.assertEqual(len(lots), 1)
 
     def test_simple_template_import_missing_data_cannot_validate(self):
         # as producer
@@ -391,6 +391,7 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(response.status_code, 200)
         # get drafts
         lots = LotV2.objects.filter(added_by_user=self.user1, status='Draft')
+        debug_transactions()
         self.assertEqual(lots.count(), nb_lots) # they are still all with status draft
         # get drafts via api - same result expected
         response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_producer.id, 'status': 'draft', 'year': '2020'})
