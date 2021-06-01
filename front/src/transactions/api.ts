@@ -338,7 +338,7 @@ export function getAuditorSnapshot(entity_id: number, year: number) {
 }
 
 export function getAuditorLots(params: TransactionQuery) {
-  return api.get<Lots>("/auditor", params)
+  return api.get<Lots>("/auditor/lots", params)
 }
 
 export function getAuditorSummary(
@@ -352,4 +352,13 @@ export function getAuditorSummary(
 
 export function getAuditorDetails(entity_id: number, tx_id: number) {
   return api.get<LotDetails>("/auditor/details", { entity_id, tx_id })
+}
+
+export function downloadAuditorLots(filters: TransactionQuery) {
+  return api.download("/auditor/lots", {
+    ...filters,
+    page: 0,
+    limit: null,
+    export: true,
+  })
 }
