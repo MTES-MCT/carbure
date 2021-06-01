@@ -768,7 +768,6 @@ def fill_delivery_site_data(lot_row, transaction, prefetched_data):
             transaction.unknown_delivery_site = delivery_site
             if not transaction.is_mac:
                 tx_errors.append(GenericError(tx=transaction, field='delivery_site', value=None, error="UNKNOWN_DELIVERY_SITE", extra="Site de livraison inconnu", is_blocking=False, display_to_creator=True, display_to_recipient=True, display_to_admin=True))
-
     else:
         transaction.delivery_site_is_in_carbure = False
         transaction.carbure_delivery_site = None
@@ -781,6 +780,8 @@ def fill_delivery_site_data(lot_row, transaction, prefetched_data):
             if country_code in countries:
                 country = countries[country_code]
                 transaction.unknown_delivery_site_country = country
+                if country.code_pays == 'FR':
+                    tx_errors.append(GenericError(tx=transaction, field='delivery_site', value=None, error="UNKNOWN_FRENCH_DELIVERY_SITE", extra="Site de livraison Français inconnu", is_blocking=True, display_to_creator=True))
             else:
                 tx_errors.append(GenericError(tx=transaction, field='unknown_delivery_site_country',
                                                   error="INCORRECT_DELIVERY_SITE_COUNTRY",
