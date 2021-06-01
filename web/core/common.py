@@ -904,7 +904,7 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, tx=None):
     biocarburant_code = lot_dict.get('biocarburant_code', None)
     if biocarburant_code is None or biocarburant_code == '':
         return None, None, "Missing biocarburant_code"
-    
+
     can_update_tx = False
     if tx is None:
         can_update_tx = True
@@ -938,7 +938,7 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, tx=None):
         # STOCK// only the lot.added_by can update the volume of a split transaction
         if lot.added_by == entity and lot.is_split:
             errors += fill_volume_info(lot_dict, lot, tx)
-        # STOCK// and debit the stock back according to new volume 
+        # STOCK// and debit the stock back according to new volume
         if lot.status == LotV2.VALIDATED and lot.is_split:
             lot.parent_lot.remaining_volume -= lot.volume
             lot.parent_lot.save()
