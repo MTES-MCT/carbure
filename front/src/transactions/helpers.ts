@@ -138,6 +138,35 @@ export function normalizeSummary(summary: any): TransactionSummary {
   }
 }
 
+export function flattenGeneralSummary(summary: any): SummaryItem[] {
+  const rows = []
+
+  for (const vendor in summary) {
+    const clients = summary[vendor]
+    for (const client in clients) {
+      const biocarburants = clients[client]
+      for (const biocarburant in biocarburants) {
+        rows.push({
+          client,
+          vendor,
+          biocarburant,
+          ...biocarburants[biocarburant],
+        })
+      }
+    }
+  }
+
+  return rows
+}
+
+export function normalizeGeneralSummary(summary: any): TransactionSummary {
+  return {
+    transactions: flattenGeneralSummary(summary.transactions),
+    tx_ids: summary.tx_ids,
+    total_volume: summary.total_volume,
+  }
+}
+
 export function prettyVolume(volume: number) {
   return parseFloat(volume.toFixed(2)).toLocaleString("fr-FR")
 }

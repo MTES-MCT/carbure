@@ -17,10 +17,14 @@ import {
 import useAPI from "common/hooks/use-api"
 import { Button } from "common/components/button"
 import { prettyVolume } from "transactions/helpers"
-import { getStocksSummary } from "stocks/api"
-import { getLotsSummary } from "transactions/api"
 import { Alert } from "common/components/alert"
 import { EntitySelection } from "carbure/hooks/use-entity"
+import { getStocksSummary } from "stocks/api"
+import {
+  getLotsSummary,
+  getAuditorSummary,
+  getAdminSummary,
+} from "transactions/api"
 
 const COLUMNS: Column<SummaryItem>[] = [
   {
@@ -45,16 +49,19 @@ const COLUMNS: Column<SummaryItem>[] = [
 ]
 
 type TransactionSummaryProps = {
-  in: SummaryItem[] | null
-  out: SummaryItem[] | null
+  in?: SummaryItem[] | null
+  out?: SummaryItem[] | null
+  transactions?: SummaryItem[] | null
 }
 
 const TransactionSummary = (props: TransactionSummaryProps) => {
   const summaryInRows = (props.in ?? []).map((v) => ({ value: v }))
   const summaryOutRows = (props.out ?? []).map((v) => ({ value: v }))
+  const summaryAllRows = (props.transactions ?? []).map((v) => ({ value: v }))
 
   const isInEmpty = summaryInRows.length === 0
   const isOutEmpty = summaryOutRows.length === 0
+  const isAllEmpty = summaryAllRows.length === 0
 
   const totalIn = {
     volume: summaryInRows.reduce((t, r) => t + r.value.volume, 0),
@@ -64,6 +71,11 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
   const totalOut = {
     volume: summaryOutRows.reduce((t, r) => t + r.value.volume, 0),
     lots: summaryOutRows.reduce((t, r) => t + r.value.lots, 0),
+  }
+
+  const totalAll = {
+    volume: summaryAllRows.reduce((t, r) => t + r.value.volume, 0),
+    lots: summaryAllRows.reduce((t, r) => t + r.value.lots, 0),
   }
 
   const inColumns: Column<SummaryItem>[] = [
@@ -84,9 +96,22 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
     ...COLUMNS,
   ]
 
+  const allColumns: Column<SummaryItem>[] = [
+    padding,
+    {
+      header: "Fournisseur",
+      render: (d) => <Line text={d.vendor || "N/A"} />,
+    },
+    {
+      header: "Client",
+      render: (d) => <Line text={d.client || "N/A"} />,
+    },
+    ...COLUMNS,
+  ]
+
   return (
     <Fragment>
-      {isInEmpty && isOutEmpty && (
+      {isInEmpty && isOutEmpty && isAllEmpty && (
         <Alert level="warning" icon={AlertCircle}>
           Aucune transaction trouvée pour cette période
         </Alert>
@@ -119,8 +144,35 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
           <Table columns={outColumns} rows={summaryOutRows} />
         </Box>
       )}
+
+      {!isAllEmpty && (
+        <Box className={styles.transactionSummary}>
+          <Title className={styles.transactionSummarySection}>
+            Transactions
+            <span className={styles.transactionSummaryTotal}>
+              {"▸"} {totalAll.lots} lot{totalAll.lots !== 1 && "s"}
+              {" ▸ "}
+              {prettyVolume(totalAll.volume)} litres
+            </span>
+          </Title>
+          <Table columns={allColumns} rows={summaryAllRows} />
+        </Box>
+      )}
     </Fragment>
   )
+}
+
+function summaryGetter(entity?: EntitySelection, isStock?: boolean) {
+  if (isStock) return getStocksSummary
+
+  switch (entity?.entity_type) {
+    case EntityType.Administration:
+      return getAdminSummary
+    case EntityType.Auditor:
+      return getAuditorSummary
+    default:
+      return getLotsSummary
+  }
 }
 
 export function useSummary(
@@ -129,14 +181,11 @@ export function useSummary(
   stock?: boolean,
   entity?: EntitySelection
 ) {
-  const [summary, getSummary] = useAPI(
-    stock ? getStocksSummary : getLotsSummary
-  )
+  const [summary, getSummary] = useAPI(summaryGetter(entity, stock))
 
   useEffect(() => {
-    if (entity && entity.entity_type === EntityType.Administration) return
     getSummary(query, selection ?? [])
-  }, [getSummary, query, selection, entity])
+  }, [getSummary, query, selection])
 
   return summary
 }
@@ -148,6 +197,7 @@ type SummaryPromptProps = PromptProps<number[]> & {
   stock?: boolean
   entityID?: number
   selection?: number[]
+  entity?: EntitySelection
   query: TransactionQuery
 }
 
@@ -158,9 +208,10 @@ export const SummaryPrompt = ({
   query,
   selection,
   readOnly,
+  entity,
   onResolve,
 }: SummaryPromptProps) => {
-  const summary = useSummary(query, selection, stock)
+  const summary = useSummary(query, selection, stock, entity)
 
   return (
     <Dialog wide onResolve={onResolve}>
@@ -168,7 +219,11 @@ export const SummaryPrompt = ({
       <DialogText text={description} />
 
       {summary.data && (
-        <TransactionSummary in={summary.data.in} out={summary.data.out} />
+        <TransactionSummary
+          in={summary.data.in}
+          out={summary.data.out}
+          transactions={summary.data.transactions}
+        />
       )}
 
       <DialogButtons>

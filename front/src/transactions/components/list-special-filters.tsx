@@ -94,6 +94,7 @@ type SummaryFilterProps = {
   query: TransactionQuery
   hideRecap?: boolean
   selection: number[]
+  entity: EntitySelection
   onReset: () => void
 }
 
@@ -104,6 +105,7 @@ export const SummaryFilter = ({
   query,
   selection,
   hideRecap = false,
+  entity,
   onReset,
 }: SummaryFilterProps) => {
   function showSummary() {
@@ -113,6 +115,7 @@ export const SummaryFilter = ({
         title="Récapitulatif des lots"
         description="Ce tableau résume les informations principales des lots correspondant à votre recherche ou sélection."
         query={query}
+        entity={entity}
         selection={selection}
         onResolve={resolve}
       />

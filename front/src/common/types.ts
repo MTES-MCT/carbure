@@ -464,7 +464,9 @@ export interface Declaration {
 }
 
 export interface SummaryItem {
-  entity: string
+  entity?: string
+  vendor?: string
+  client?: string
   depot: string
   biocarburant: string
   lots: number
@@ -473,12 +475,13 @@ export interface SummaryItem {
 }
 
 export interface TransactionSummary {
-  in: SummaryItem[]
-  out: SummaryItem[]
+  in?: SummaryItem[]
+  out?: SummaryItem[]
+  transactions?: SummaryItem[]
   tx_ids: number[]
   total_volume: number
-  total_volume_in: number
-  total_volume_out: number
+  total_volume_in?: number
+  total_volume_out?: number
 }
 
 export interface ConvertETBE {
