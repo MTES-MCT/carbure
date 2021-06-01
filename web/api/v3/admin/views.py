@@ -177,15 +177,14 @@ def get_lots(request):
             'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country'
         ).prefetch_related('genericerror_set', 'lot__carbure_production_site__productionsitecertificate_set')
 
-        txs = txs.filter(lot__status='Validated')
+        txs = txs.filter(lot__status=LotV2.VALIDATED)
 
         if status == 'alert':
             txs, _ = get_lots_with_errors(txs)
         elif status == 'correction':
-            txs = txs.filter(delivery_status__in=['AC', 'R', 'AA'])
+            txs = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED])
         elif status == 'declaration':
-            txs = txs.filter(delivery_status__in=['A', 'N'])
-
+            txs = txs.filter(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.PENDING, LotTransaction.FROZEN])
         return get_lots_with_metadata(txs, None, request.GET)
 
     except Exception:
@@ -237,8 +236,8 @@ def get_snapshot(request):
         txs = txs.filter(lot__status='Validated', delivery_date__gte=date_from, delivery_date__lte=date_until)
 
         alerts = txs.annotate(Count('genericerror')).filter(genericerror__count__gt=0).count()
-        correction = txs.filter(delivery_status__in=['AC', 'R', 'AA']).count()
-        declaration = txs.filter(delivery_status__in=['A', 'N']).count()
+        correction = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED]).count()
+        declaration = txs.filter(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.PENDING, LotTransaction.FROZEN]).count()
         data['lots'] = {'alert': alerts, 'correction': correction, 'declaration': declaration}
 
         data['filters'] = get_snapshot_filters(txs, [
