@@ -74,10 +74,13 @@ export function useGetLots(
   function exportAllTransactions() {
     if (entity === null) return
 
-    if (entity.entity_type === EntityType.Administration) {
-      api.downloadAdminLots(filters)
-    } else {
-      api.downloadLots(filters)
+    switch (entity.entity_type) {
+      case EntityType.Administration:
+        return api.downloadAdminLots(filters)
+      case EntityType.Auditor:
+        return api.downloadAuditorLots(filters)
+      default:
+        return api.downloadLots(filters)
     }
   }
 
