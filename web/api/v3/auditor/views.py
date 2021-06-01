@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from core.models import LotTransaction
 from core.models import UserRights
 from core.decorators import check_rights
-from api.v3.lots.helpers import filter_lots, get_lots_with_metadata, get_snapshot_filters, get_errors, get_general_summary, get_comments, get_history, get_current_deadline, get_year_bounds, get_lots_with_errors
+from api.v3.lots.helpers import filter_lots, get_lots_with_metadata, get_snapshot_filters, get_errors, get_general_summary, get_comments, get_history, get_current_deadline, get_year_bounds, get_lots_with_errors, sort_lots
 
 
 logger = logging.getLogger(__name__)
@@ -63,6 +63,7 @@ def get_lots_summary(request, *args, **kwargs):
         else:
             txs = get_lots_by_status(txs, status)
             txs = filter_lots(txs, request.GET)[0]
+            txs = sort_lots(txs, request.GET)
 
         data = get_general_summary(txs)
         return JsonResponse({'status': 'success', 'data': data})
