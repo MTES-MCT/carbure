@@ -22,7 +22,7 @@ from core.models import Entity, UserRights, UserPreferences, Biocarburant, Matie
 from core.models import Depot, LotV2, LotTransaction, TransactionComment, GenericError
 from core.models import SustainabilityDeclaration, EntityDepot
 from core.models import TransactionUpdateHistory
-from certificates.models import EntitySNTradingCertificate
+from certificates.models import EntitySNTradingCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate, EntityREDCertTradingCertificate
 from api.v3.sanity_checks import bulk_sanity_checks
 from core.common import get_prefetched_data, calculate_ghg
 

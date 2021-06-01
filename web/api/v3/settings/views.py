@@ -1,5 +1,4 @@
 import datetime
-from web.core.admin import User
 from dateutil.relativedelta import *
 
 from django.http import JsonResponse
