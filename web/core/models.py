@@ -23,7 +23,6 @@ class Entity(models.Model):
     entity_type = models.CharField(max_length=64, choices=ENTITY_TYPES, default='Unknown')
     parent_entity = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
 
-    trading_certificate = models.FileField(null=True, blank=True)
     has_mac = models.BooleanField(default=False)
     has_trading = models.BooleanField(default=False)
 
@@ -33,6 +32,7 @@ class Entity(models.Model):
     sustainability_officer = models.CharField(max_length=256, blank=True, default='')
     registered_address = models.TextField(blank=True, default='')
     hash = models.CharField(max_length=32, null=True, blank=True, default='')
+    default_certificate = models.CharField(max_length=64, null=True, blank=True, default='')
 
     def __str__(self):
         return self.name
@@ -41,7 +41,7 @@ class Entity(models.Model):
         return {'name': self.name, 'id': self.id, 'entity_type': self.entity_type, 'has_mac': self.has_mac, 'has_trading': self.has_trading,
             'legal_name': self.legal_name, 'registration_id': self.registration_id,
             'sustainability_officer': self.sustainability_officer, 'sustainability_officer_phone_number': self.sustainability_officer_phone_number,
-            'registered_address': self.registered_address}
+            'registered_address': self.registered_address, 'default_certificate': self.default_certificate}
 
     def url_friendly_name(self):
         return self.name.replace(' ', '').upper()
