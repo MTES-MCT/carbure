@@ -16,7 +16,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 from core.models import LotTransaction, UserRightsRequests, SustainabilityDeclaration, Control
-from api.v3.lots.helpers import get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors
+from api.v3.lots.helpers import get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors, filter_lots, get_general_summary
 
 
 # Get an instance of a logger
@@ -189,6 +189,31 @@ def get_lots(request):
 
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
+
+
+@is_admin
+def get_lots_summary(request, *args, **kwargs):
+    status = request.GET.get('status')
+    selection = request.GET.getlist('selection')
+
+    try:
+        txs = LotTransaction.objects.filter(lot__status='Validated')
+
+        if len(selection) > 0:
+            txs = txs.filter(pk__in=selection)
+        else:
+            if status == 'alert':
+                txs = get_lots_with_errors(txs)
+            elif status == 'correction':
+                txs = txs.filter(delivery_status__in=['AC', 'R', 'AA'])
+            elif status == 'declaration':
+                txs = txs.filter(delivery_status__in=['A', 'N'])
+            txs = filter_lots(txs, request.GET)[0]
+
+        data = get_general_summary(txs)
+        return JsonResponse({'status': 'success', 'data': data})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'meta': str(e), 'message': "Could not get lots summary"}, status=400)
 
 
 @is_admin

@@ -182,7 +182,7 @@ export const TransactionList = ({
         </ActionBar>
       )}
 
-      {!isEmpty && !isAdmin && (
+      {!isEmpty && (
         <SummaryFilter
           loading={summary.loading}
           txCount={summary.data?.tx_ids.length ?? 0}
