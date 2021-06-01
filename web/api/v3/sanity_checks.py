@@ -198,6 +198,12 @@ def sanity_check(tx, prefetched_data):
     if tx.lot.producer_is_in_carbure and tx.lot.added_by != tx.lot.carbure_producer and not tx.lot.parent_lot:
         is_sane = False
         errors.append(generic_error(error='NOT_ALLOWED', tx=tx, is_blocking=True))
+
+
+    # transaction is not a MAC, is going to France and client is unknown
+    if not tx.is_mac and tx.carbure_delivery_site and tx.carbure_delivery_site.country.code_pays == 'FR' and not tx.carbure_client:
+        is_sane = False
+        errors.append(GenericError(tx=tx, field='client', error="UNKNOWN_CLIENT", extra="Client non reconnu", value=tx.unknown_client, display_to_creator=True, is_blocking=True))
     return lot_valid, tx_valid, is_sane, errors
 
 
