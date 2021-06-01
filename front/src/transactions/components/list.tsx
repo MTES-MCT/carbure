@@ -189,7 +189,7 @@ export const TransactionList = ({
           totalVolume={summary.data?.total_volume ?? 0}
           query={query}
           selection={selection.selected}
-          hideRecap={isAdmin}
+          entity={entity}
           onReset={() => {
             filters.reset()
             selection.reset()

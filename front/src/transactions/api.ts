@@ -12,6 +12,7 @@ import {
   normalizeSummary,
   normalizeFilters,
   filterOutsourcedDepots,
+  normalizeGeneralSummary,
 } from "./helpers"
 
 export function getSnapshot(entityID: number, year: number): Promise<Snapshot> {
@@ -321,6 +322,15 @@ export async function amendAndCommentLot(
   return [amending, commenting]
 }
 
+export function getAdminSummary(
+  query: TransactionQuery,
+  selection: number[]
+): Promise<TransactionSummary> {
+  return api
+    .get("/admin/summary", { ...query, limit: null, page: 0, selection })
+    .then(normalizeGeneralSummary)
+}
+
 export function getAuditorSnapshot(entity_id: number, year: number) {
   return api
     .get<Snapshot>("/auditor/snapshot", { entity_id, year })
@@ -329,6 +339,15 @@ export function getAuditorSnapshot(entity_id: number, year: number) {
 
 export function getAuditorLots(params: TransactionQuery) {
   return api.get<Lots>("/auditor", params)
+}
+
+export function getAuditorSummary(
+  query: TransactionQuery,
+  selection: number[]
+): Promise<TransactionSummary> {
+  return api
+    .get("/auditor/summary", { ...query, limit: null, page: 0, selection })
+    .then(normalizeGeneralSummary)
 }
 
 export function getAuditorDetails(entity_id: number, tx_id: number) {
