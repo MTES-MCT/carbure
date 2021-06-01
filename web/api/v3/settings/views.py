@@ -1,4 +1,5 @@
 import datetime
+from web.core.admin import User
 from dateutil.relativedelta import *
 
 from django.http import JsonResponse
@@ -634,6 +635,53 @@ def set_production_site_certificates(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Could not update production site certificates"}, status=400)
 
     return JsonResponse({'status': 'success'})
+
+@check_rights('entity_id', role=[UserRights.ADMIN])
+def set_default_certificate(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    certificate_id = request.POST.get('certificate_id', False)
+    certificate_type = request.POST.get('certificate_type', False)
+
+    if not certificate_id:
+        return JsonResponse({'status': 'error', 'message': "Please provide certificate_id"}, status=400)
+    if not certificate_type:
+        return JsonResponse({'status': 'error', 'message': "Please provide certificate_type"}, status=400)
+
+    if certificate_type == 'ISCC':
+        try:
+            certid = EntityISCCTradingCertificate.objects.get(entity=entity, certificate__certificate_id=certificate_id)
+            entity.default_certificate = certid
+            entity.save()
+            return JsonResponse({'status': 'success'})
+        except:
+            return JsonResponse({'status': 'error', 'message': "Could not find this certificate for your entity"}, status=400)
+    elif certificate_type == '2BS':
+        try:
+            certid = EntityDBSTradingCertificate.objects.get(entity=entity, certificate__certificate_id=certificate_id)
+            entity.default_certificate = certid
+            entity.save()
+            return JsonResponse({'status': 'success'})
+        except:
+            return JsonResponse({'status': 'error', 'message': "Could not find this certificate for your entity"}, status=400)
+    elif certificate_type == 'REDCERT':
+        try:
+            certid = EntityREDCertTradingCertificate.objects.get(entity=entity, certificate__certificate_id=certificate_id)
+            entity.default_certificate = certid
+            entity.save()
+            return JsonResponse({'status': 'success'})
+        except:
+            return JsonResponse({'status': 'error', 'message': "Could not find this certificate for your entity"}, status=400)
+    elif certificate_type == 'SN':
+        try:
+            certid = EntitySNTradingCertificate.objects.get(entity=entity, certificate__certificate_id=certificate_id)
+            entity.default_certificate = certid
+            entity.save()
+            return JsonResponse({'status': 'success'})
+        except:
+            return JsonResponse({'status': 'error', 'message': "Could not find this certificate for your entity"}, status=400)
+    else:
+        return JsonResponse({'status': 'error', 'message': "Unknown certificate_type"}, status=400)
 
 
 @check_rights('entity_id')
