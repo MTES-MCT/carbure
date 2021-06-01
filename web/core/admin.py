@@ -129,11 +129,51 @@ class TxPartOfForwardListFilter(admin.SimpleListFilter):
         if self.value() == 'No':
             return queryset.filter(Q(is_forwarded=False) | Q(parent_tx__isnull=True))
 
+class UnknownClientListFilter(admin.SimpleListFilter):
+    # Human-readable title which will be displayed in the
+    # right admin sidebar just above the filter options.
+    title = _('Unknown Client')
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'unknown_client'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('Yes', _('yes')),
+            ('No', _('no')),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'Yes':
+            return queryset.filter(carbure_client__isnull=True)
+        if self.value() == 'No':
+            return queryset.filter(carbure_client__isnull=False)
+
+class UnknownDeliverySiteListFilter(admin.SimpleListFilter):
+    # Human-readable title which will be displayed in the
+    # right admin sidebar just above the filter options.
+    title = _('Unknown Delivery Site')
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'unknown_delivery_site'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('Yes', _('yes')),
+            ('No', _('no')),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'Yes':
+            return queryset.filter(carbure_delivery_site__isnull=True)
+        if self.value() == 'No':
+            return queryset.filter(carbure_delivery_site__isnull=False)
+
 class TransactionAdmin(admin.ModelAdmin):
     list_display = ('get_lot_mp', 'get_lot_bc', 'get_lot_volume', 'get_lot_supplier', 'carbure_vendor', 'get_production_site', 'carbure_client', 'dae', 'carbure_delivery_site', 'delivery_date', 'delivery_status', 'unknown_client', 'carbure_vendor_certificate', 'get_lot_unknown_vendor_certificate')
     search_fields = ('lot__id', 'dae', 'champ_libre', 'lot__carbure_id', 'lot__volume')
     list_filter = ('lot__status', ('lot__biocarburant', NameSortedRelatedOnlyDropdownFilter), ('lot__matiere_premiere', NameSortedRelatedOnlyDropdownFilter), 'delivery_status', ('lot__period', DropdownFilter), 'client_is_in_carbure', ('carbure_vendor', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
-                   'is_mac', 'is_batch', 'delivery_site_is_in_carbure', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter), ('lot__carbure_production_site', NameSortedRelatedOnlyDropdownFilter), TxPartOfForwardListFilter)
+                   'is_mac', 'is_batch', 'delivery_site_is_in_carbure', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter), ('lot__carbure_production_site', NameSortedRelatedOnlyDropdownFilter), TxPartOfForwardListFilter, UnknownDeliverySiteListFilter, UnknownClientListFilter)
     raw_id_fields = ('lot', 'parent_tx')
     actions = ['rerun_sanity_checks', 'delete_ghosts', 'change_transaction_delivery_site', 'change_transaction_client', 'assign_transaction_certificate', 'change_transaction_delivery_status']
 
