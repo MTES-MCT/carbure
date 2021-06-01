@@ -131,7 +131,7 @@ class TxPartOfForwardListFilter(admin.SimpleListFilter):
 
 class TransactionAdmin(admin.ModelAdmin):
     list_display = ('get_lot_mp', 'get_lot_bc', 'get_lot_volume', 'get_lot_supplier', 'carbure_vendor', 'get_production_site', 'carbure_client', 'dae', 'carbure_delivery_site', 'delivery_date', 'delivery_status', 'unknown_client', 'carbure_vendor_certificate', 'get_lot_unknown_vendor_certificate')
-    search_fields = ('lot__id', 'dae', 'champ_libre')
+    search_fields = ('lot__id', 'dae', 'champ_libre', 'lot__carbure_id', 'lot__volume')
     list_filter = ('lot__status', ('lot__biocarburant', NameSortedRelatedOnlyDropdownFilter), ('lot__matiere_premiere', NameSortedRelatedOnlyDropdownFilter), 'delivery_status', ('lot__period', DropdownFilter), 'client_is_in_carbure', ('carbure_vendor', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
                    'is_mac', 'is_batch', 'delivery_site_is_in_carbure', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter), ('lot__carbure_production_site', NameSortedRelatedOnlyDropdownFilter), TxPartOfForwardListFilter)
     raw_id_fields = ('lot', 'parent_tx')
