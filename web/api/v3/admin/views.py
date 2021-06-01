@@ -180,7 +180,7 @@ def get_lots(request):
         txs = txs.filter(lot__status=LotV2.VALIDATED)
 
         if status == 'alert':
-            txs, _ = get_lots_with_errors(txs)
+            txs = get_lots_with_errors(txs)
         elif status == 'correction':
             txs = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED])
         elif status == 'declaration':
