@@ -54,6 +54,7 @@ urlpatterns = [
 
      path('get-my-certificates', views.get_my_certificates, name='api-v3-settings-get-my-certificates'),
      path('set-production-site-certificates', views.set_production_site_certificates, name='api-v3-settings-set-production-site-certificates'),
+     path('set-default-certificate', views.set_default_certificate, name='api-v3-settings-set-default-certificate'),
 
 
 
