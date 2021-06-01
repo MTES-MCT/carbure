@@ -682,7 +682,7 @@ def fill_delivery_date(lot_row, lot, transaction):
 
 def fill_client_data(entity, lot_row, tx, prefetched_data):
     # if lot has already been validated and is currently in correction, we cannot change the client
-    if tx.delivery_status == 'AC':
+    if tx.delivery_status == LotTransaction.TOFIX:
         return []
 
     if tx.is_mac:
@@ -691,10 +691,11 @@ def fill_client_data(entity, lot_row, tx, prefetched_data):
         tx.unknown_client = ''
         if 'client' in lot_row:
             tx.unknown_client = lot_row['client']
+        return []
 
     tx_errors = []
     clients = prefetched_data['clients']
-    if entity.entity_type == 'Opérateur':
+    if entity.entity_type == Entity.OPERATOR:
         tx.client_is_in_carbure = True
         tx.carbure_client = entity
         tx.unknown_client = ''
