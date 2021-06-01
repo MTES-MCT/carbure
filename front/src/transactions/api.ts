@@ -327,7 +327,7 @@ export function getAdminSummary(
   selection: number[]
 ): Promise<TransactionSummary> {
   return api
-    .get("/admin/summary", { ...query, limit: null, page: 0, selection })
+    .get("/admin/lots/summary", { ...query, limit: null, page: 0, selection })
     .then(normalizeGeneralSummary)
 }
 
