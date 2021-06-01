@@ -949,6 +949,16 @@ class CorrectionTests(TransactionTestCase):
         lot_id = data['lot']['id']
         return tx_id, lot_id, lot
 
+    def test_delivery_site_by_name(self):
+        # 1 create lot as producer and send it
+        tx_id, lot_id, j = self.create_lot(client=self.test_operator.name, delivery_site='depot test')
+        tx = LotTransaction.objects.get(id=tx_id)
+        self.assertEqual(tx.carbure_delivery_site.depot_id, '001')
+
+        tx_id, lot_id, j = self.create_lot(client=self.test_operator.name, delivery_site='001')
+        tx = LotTransaction.objects.get(id=tx_id)
+        self.assertEqual(tx.carbure_delivery_site.depot_id, '001')
+
 
     def test_only_creator_can_validate(self):
         # 1 create lot as producer and send it

@@ -237,7 +237,8 @@ def get_prefetched_data(entity=None):
         d['my_vendor_certificates'] = my_vendor_certificates
     else:
         d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
-    d['depots'] = {d.depot_id.lstrip('0'): d for d in Depot.objects.all()}
+    d['depots'] = {d.depot_id.lstrip('0').upper(): d for d in Depot.objects.all()}
+    d['depotsbyname'] = {d.name.upper(): d for d in Depot.objects.all()}
     d['clients'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
     d['iscc_certificates'] = {c.certificate_id.upper(): c for c in ISCCCertificate.objects.filter(valid_until__gte=lastyear)}
     d['2bs_certificates'] = {c.certificate_id.upper(): c for c in DBSCertificate.objects.filter(valid_until__gte=lastyear)}
@@ -740,6 +741,7 @@ def fill_vendor_data(entity, lot_row, transaction, prefetched_data):
 def fill_delivery_site_data(lot_row, transaction, prefetched_data):
     tx_errors = []
     depots = prefetched_data['depots']
+    depotsbyname = prefetched_data['depotsbyname']
     countries = prefetched_data['countries']
     if 'delivery_site' in lot_row and lot_row['delivery_site'] is not None and lot_row['delivery_site'] != '':
         delivery_site = lot_row['delivery_site']
@@ -748,7 +750,7 @@ def fill_delivery_site_data(lot_row, transaction, prefetched_data):
             delivery_site = int(delivery_site)
         # convert to string 4.0 -> 4 -> '4' and remove leading 0
         delivery_site = str(delivery_site)
-        stripped_delivery_site = str(delivery_site).lstrip('0')
+        stripped_delivery_site = str(delivery_site).lstrip('0').upper()
         if delivery_site in depots or stripped_delivery_site in depots:
             transaction.delivery_site_is_in_carbure = True
             if delivery_site in depots:
@@ -756,10 +758,17 @@ def fill_delivery_site_data(lot_row, transaction, prefetched_data):
             else:
                 transaction.carbure_delivery_site = depots[stripped_delivery_site]
             transaction.unknown_delivery_site = ''
+        elif stripped_delivery_site in depotsbyname:
+            transaction.delivery_site_is_in_carbure = True
+            transaction.carbure_delivery_site = depotsbyname[stripped_delivery_site]
+            transaction.unknown_delivery_site = ''
         else:
             transaction.delivery_site_is_in_carbure = False
             transaction.carbure_delivery_site = None
             transaction.unknown_delivery_site = delivery_site
+            if not transaction.is_mac:
+                tx_errors.append(GenericError(tx=transaction, field='delivery_site', value=None, error="UNKNOWN_DELIVERY_SITE", extra="Site de livraison inconnu", is_blocking=False, display_to_creator=True, display_to_recipient=True, display_to_admin=True))
+
     else:
         transaction.delivery_site_is_in_carbure = False
         transaction.carbure_delivery_site = None
