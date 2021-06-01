@@ -5,10 +5,28 @@ from django.http import JsonResponse
 from core.models import LotTransaction
 from core.models import UserRights
 from core.decorators import check_rights
-from api.v3.lots.helpers import get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, filter_entity_transactions, get_comments, get_history, get_current_deadline, get_year_bounds, get_lots_with_errors
+from api.v3.lots.helpers import filter_lots, get_lots_with_metadata, get_snapshot_filters, get_errors, get_general_summary, get_comments, get_history, get_current_deadline, get_year_bounds, get_lots_with_errors
 
 
 logger = logging.getLogger(__name__)
+
+
+def get_auditees(user):
+    return UserRights.objects.filter(user=user, role=UserRights.AUDITOR).values_list('entity')
+
+
+def get_lots_by_status(txs, status):
+    if status == 'alert':
+        txs = get_lots_with_errors(txs)
+    elif status == 'correction':
+        txs = txs.filter(delivery_status__in=['AC', 'R', 'AA'])
+    elif status == 'declaration':
+        txs = txs.filter(delivery_status__in=['A', 'N'])
+    return txs
+
+
+def get_audited_lots(auditees):
+    return LotTransaction.objects.filter(Q(carbure_vendor__id__in=auditees) | Q(carbure_client__id__in=auditees) | Q(lot__added_by__in=auditees))
 
 
 @check_rights('entity_id')
@@ -19,40 +37,37 @@ def get_lots(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Please provide a status"}, status=400)
 
     try:
-        auditees = UserRights.objects.filter(user=request.user, role=UserRights.AUDITOR).values_list('entity')
+        auditees = get_auditees(request.user)
 
-        txs = LotTransaction.objects.filter(Q(carbure_vendor__id__in=auditees) | Q(carbure_client__id__in=auditees) | Q(lot__added_by__in=auditees))
+        txs = get_audited_lots(auditees)
         txs = txs.filter(lot__status='Validated')
-
-        if status == 'alert':
-            txs = get_lots_with_errors(txs)
-        elif status == 'correction':
-            txs = txs.filter(delivery_status__in=['AC', 'R', 'AA'])
-        elif status == 'declaration':
-            txs = txs.filter(delivery_status__in=['A', 'N'])
+        txs = get_lots_by_status(txs, status)
+        txs = filter_lots(txs, request.GET)[0]
 
         return get_lots_with_metadata(txs, None, request.GET)
-
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
 
 
 @check_rights('entity_id')
 def get_lots_summary(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
-
+    status = request.GET.get('status')
     selection = request.GET.getlist('selection')
+
+    auditees = get_auditees(request.user)
+    txs = get_audited_lots(auditees)
 
     try:
         if len(selection) > 0:
-            txs = LotTransaction.objects.filter(pk__in=selection)
+            txs = txs.filter(pk__in=selection)
         else:
-            txs, _, _, _ = filter_entity_transactions(entity, request.GET)
-        data = get_summary(txs, entity)
+            txs = get_lots_by_status(txs, status)
+            txs = filter_lots(txs, request.GET)[0]
+
+        data = get_general_summary(txs)
         return JsonResponse({'status': 'success', 'data': data})
-    except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'meta': str(e), 'message': "Could not get lots summary"}, status=400)
 
 
 @check_rights('entity_id')
@@ -88,10 +103,10 @@ def get_snapshot(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
 
     try:
-        auditees = UserRights.objects.filter(user=request.user, role=UserRights.AUDITOR).values_list('entity')
+        auditees = get_auditees(request.user)
 
-        txs = LotTransaction.objects.filter(delivery_date__gte=date_from, delivery_date__lte=date_until).filter(
-            Q(carbure_vendor__id__in=auditees) | Q(carbure_client__id__in=auditees) | Q(lot__added_by__in=auditees))
+        txs = get_audited_lots(auditees)
+        txs = txs.filter(delivery_date__gte=date_from, delivery_date__lte=date_until)
 
         years = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
 

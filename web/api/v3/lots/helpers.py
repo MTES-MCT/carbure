@@ -397,8 +397,7 @@ def get_summary(txs, entity):
             data_in[vendor][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
         line = data_in[vendor][t.lot.biocarburant.name]
         total = (line['volume'] + t.lot.volume)
-        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
-                                     t.lot.volume * t.lot.ghg_reduction) / total if total != 0 else 0
+        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] + t.lot.volume * t.lot.ghg_reduction) / total if total != 0 else 0
         line['volume'] += t.lot.volume
         total_volume_in += t.lot.volume
         total_volume += t.lot.volume
@@ -408,15 +407,14 @@ def get_summary(txs, entity):
     total_volume_out = 0
     data_out = {}
     for t in txs_out.iterator():
-        client_name = t.carbure_client.name if t.client_is_in_carbure and t.carbure_client else t.unknown_client
-        if client_name not in data_out:
-            data_out[client_name] = {}
-        if t.lot.biocarburant.name not in data_out[client_name]:
-            data_out[client_name][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
-        line = data_out[client_name][t.lot.biocarburant.name]
+        client = t.carbure_client.name if t.client_is_in_carbure and t.carbure_client else t.unknown_client
+        if client not in data_out:
+            data_out[client] = {}
+        if t.lot.biocarburant.name not in data_out[client]:
+            data_out[client][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
+        line = data_out[client][t.lot.biocarburant.name]
         total = (line['volume'] + t.lot.volume)
-        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] +
-                                     t.lot.volume * t.lot.ghg_reduction) / total if total != 0 else 0
+        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] + t.lot.volume * t.lot.ghg_reduction) / total if total != 0 else 0
         line['volume'] += t.lot.volume
         total_volume_out += t.lot.volume
         total_volume += t.lot.volume
@@ -426,6 +424,30 @@ def get_summary(txs, entity):
 
     return {'in': data_in, 'out': data_out, 'tx_ids': tx_ids,
             'total_volume': total_volume, 'total_volume_in': total_volume_in, 'total_volume_out': total_volume_out}
+
+
+def get_general_summary(txs):
+    total_volume = 0
+    data = {}
+
+    for t in txs.iterator():
+        vendor = t.carbure_vendor.name if t.carbure_vendor else t.lot.unknown_supplier
+        if vendor not in data:
+            data[vendor] = {}
+        client = t.carbure_client.name if t.client_is_in_carbure and t.carbure_client else t.unknown_client
+        if client not in data[vendor]:
+            data[vendor][client] = {}
+        if t.lot.biocarburant.name not in data[vendor][client]:
+            data[vendor][client][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
+        line = data[vendor][client][t.lot.biocarburant.name]
+        total = (line['volume'] + t.lot.volume)
+        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] + t.lot.volume * t.lot.ghg_reduction) / total if total != 0 else 0
+        line['volume'] += t.lot.volume
+        line['lots'] += 1
+        total_volume += t.lot.volume
+
+    tx_ids = [t['id'] for t in txs.values('id')]
+    return {'transactions': data, 'tx_ids': tx_ids, 'total_volume': total_volume}
 
 
 # little helper to help measure elapsed time
