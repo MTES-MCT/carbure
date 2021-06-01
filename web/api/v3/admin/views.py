@@ -16,7 +16,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 from core.models import LotTransaction, UserRightsRequests, SustainabilityDeclaration, Control
-from api.v3.lots.helpers import get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors, filter_lots, get_general_summary
+from api.v3.lots.helpers import get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors, filter_lots, get_general_summary, sort_lots
 
 
 # Get an instance of a logger
@@ -209,6 +209,7 @@ def get_lots_summary(request, *args, **kwargs):
             elif status == 'declaration':
                 txs = txs.filter(delivery_status__in=['A', 'N'])
             txs = filter_lots(txs, request.GET)[0]
+            txs = sort_lots(txs, request.GET)
 
         data = get_general_summary(txs)
         return JsonResponse({'status': 'success', 'data': data})
