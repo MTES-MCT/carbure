@@ -29,7 +29,7 @@ import TransactionForm from "../components/form"
 import { StatusTitle } from "../components/status"
 import Comments from "../components/form-comments"
 import ValidationErrors from "../components/form-errors"
-import TransactionHistory from '../components/history'
+import TransactionHistory from "../components/history"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]
@@ -75,8 +75,13 @@ const TransactionDetails = ({
   const isEditable = EDITABLE.includes(status)
   const isCommentable = COMMENTABLE.includes(status)
 
-  const isVendor = Boolean(entity) && transaction?.carbure_vendor?.id === entity!.id
-  const isVendorOperator = transaction?.carbure_vendor?.entity_type === EntityType.Operator
+  const isAdmin = entity?.entity_type === EntityType.Administration
+  const isAuditor = entity?.entity_type === EntityType.Auditor
+
+  const isVendor =
+    Boolean(entity) && transaction?.carbure_vendor?.id === entity!.id
+  const isVendorOperator =
+    transaction?.carbure_vendor?.entity_type === EntityType.Operator
 
   const hasErrors =
     validationErrors.length > 0 || Object.keys(fieldErrors).length > 0
@@ -121,7 +126,9 @@ const TransactionDetails = ({
         />
       )}
 
-      {Boolean(details.data?.updates?.length) && <TransactionHistory history={details.data?.updates} />}
+      {Boolean(details.data?.updates?.length) && (
+        <TransactionHistory history={details.data?.updates} />
+      )}
 
       <div className={styles.transactionFormButtons}>
         {isEditable && (
@@ -183,7 +190,7 @@ const TransactionDetails = ({
               Accepter
             </AsyncButton>
 
-            {(!transaction?.lot.parent_lot && !isVendorOperator) && (
+            {!transaction?.lot.parent_lot && !isVendorOperator && (
               <AsyncButton
                 icon={AlertTriangle}
                 level="warning"
@@ -205,7 +212,7 @@ const TransactionDetails = ({
           </React.Fragment>
         )}
 
-        {isVendor && status === LotStatus.Accepted && (
+        {!isAdmin && !isAuditor && isVendor && status === LotStatus.Accepted && (
           <AsyncButton
             icon={Edit}
             level="warning"
@@ -216,16 +223,20 @@ const TransactionDetails = ({
           </AsyncButton>
         )}
 
-        {!isVendorOperator && !isVendor && status === LotStatus.Accepted && (
-          <AsyncButton
-            icon={Edit}
-            level="warning"
-            loading={acceptor.loading}
-            onClick={() => run(acceptor.askForCorrection)}
-          >
-            Demander une correction
-          </AsyncButton>
-        )}
+        {!isAdmin &&
+          !isAuditor &&
+          !isVendorOperator &&
+          !isVendor &&
+          status === LotStatus.Accepted && (
+            <AsyncButton
+              icon={Edit}
+              level="warning"
+              loading={acceptor.loading}
+              onClick={() => run(acceptor.askForCorrection)}
+            >
+              Demander une correction
+            </AsyncButton>
+          )}
 
         <Box row className={styles.transactionNavButtons}>
           <Button

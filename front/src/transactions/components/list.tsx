@@ -4,6 +4,7 @@ import fr from "date-fns/locale/fr"
 
 import {
   Entity,
+  EntityType,
   LotStatus,
   TransactionQuery,
   TransactionSummary,
@@ -104,10 +105,10 @@ export const TransactionList = ({
     ? format(new Date(txs.deadlines.date), "d MMMM", { locale: fr })
     : null
 
-  const isProducer = entity.entity_type === "Producteur"
-  const isOperator = entity.entity_type === "Opérateur"
-  const isTrader = entity.entity_type === "Trader"
-  const isAdmin = entity.entity_type === "Administration"
+  const isProducer = entity.entity_type === EntityType.Producer
+  const isOperator = entity.entity_type === EntityType.Operator
+  const isTrader = entity.entity_type === EntityType.Trader
+  const isAdmin = entity.entity_type === EntityType.Administration
 
   const isLoading = transactions.loading
   const isError = transactions.error !== null

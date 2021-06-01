@@ -113,6 +113,7 @@ export const TransactionTable = ({
   const isOperator = entity.entity_type === EntityType.Operator
   const isTrader = entity.entity_type === EntityType.Trader
   const isAdmin = entity.entity_type === EntityType.Administration
+  const isAuditor = entity.entity_type === EntityType.Auditor
 
   let columns = []
 
@@ -134,7 +135,7 @@ export const TransactionTable = ({
     columns.push(...PRODUCER_COLUMNS)
   } else if (isOperator) {
     columns.push(...OPERATOR_COLUMNS)
-  } else if (isAdmin) {
+  } else if (isAdmin || isAuditor) {
     columns.push(...ADMIN_COLUMNS)
   }
 

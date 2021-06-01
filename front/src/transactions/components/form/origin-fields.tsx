@@ -106,11 +106,12 @@ export default function OriginFields(props: FieldsProps) {
 
   const isProducer = entity?.entity_type === EntityType.Producer
   const isAdmin = entity?.entity_type === EntityType.Administration
+  const isAuditor = entity?.entity_type === EntityType.Auditor
 
   const isVendor = isKnown(data.carbure_vendor) && entity?.id === data.carbure_vendor.id // prettier-ignore
   const isClient = isKnown(data.client) && entity?.id === data.client.id
 
-  if (isAdmin) {
+  if (isAdmin || isAuditor) {
     return <AdminOriginFields {...props} />
   } else if (isProducer && canEdit) {
     return <ProducerOriginFields {...props} />

@@ -85,12 +85,13 @@ export default function DeliveryFields(props: FieldsProps) {
 
   const isOperator = entity?.entity_type === EntityType.Operator
   const isAdmin = entity?.entity_type === EntityType.Administration
+  const isAuditor = entity?.entity_type === EntityType.Auditor
 
   const isAuthor = entity?.id === data.added_by?.id
   const isClient = isKnown(data.client) && entity?.id === data.client.id // prettier-ignore
   const isVendor = isKnown(data.carbure_vendor) && entity?.id === data.carbure_vendor.id // prettier-ignore
 
-  if (isAdmin) {
+  if (isAdmin || isAuditor) {
     return <AllDeliveryFields {...props} />
   } else if (isClient || isOperator) {
     return <ClientDeliveryFields {...props} />

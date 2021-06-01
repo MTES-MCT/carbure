@@ -190,6 +190,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
   const isOperator = entity.entity_type === EntityType.Operator
   const isProducer = entity.entity_type === EntityType.Producer
   const isAdmin = entity.entity_type === EntityType.Administration
+  const isAuditor = entity.entity_type === EntityType.Auditor
 
   if (isAdmin && !ADMIN_STATUSES.includes(status.active)) {
     return <Redirect relative to=".." />
@@ -225,7 +226,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         status={status}
         year={year}
         placeholder={statusPlaceholder}
-        declarator={isAdmin ? null : declarator}
+        declarator={isAdmin || isAuditor ? null : declarator}
       />
 
       <TransactionFilters
