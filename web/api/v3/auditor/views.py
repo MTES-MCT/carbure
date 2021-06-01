@@ -1,44 +1,40 @@
-import datetime
-import calendar
 import logging
-import unicodedata
-from dateutil.relativedelta import *
-from django.db.models import Q, F, Case, When, Count
-from django.db.models.functions import TruncMonth
-from django.db.models.functions import Extract
-from django.db.models.fields import NOT_PROVIDED
-from django import db
-from django.http import JsonResponse, HttpResponse
-from django.db import transaction
+from django.db.models import Q, Count
+from django.http import JsonResponse
 
-from core.models import LotV2, LotTransaction, EntityDepot
-from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment, SustainabilityDeclaration
-from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
-from core.xlsx_v3 import export_transactions
-from core.common import validate_lots, load_excel_file, get_prefetched_data, check_duplicates, send_rejection_emails
-from api.v3.sanity_checks import bulk_sanity_checks, generic_error
-from django_otp.decorators import otp_required
+from core.models import LotTransaction
+from core.models import UserRights
 from core.decorators import check_rights
-from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, filter_entity_transactions
+from api.v3.lots.helpers import get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, filter_entity_transactions, get_comments, get_history, get_current_deadline, get_year_bounds, get_lots_with_errors
+
 
 logger = logging.getLogger(__name__)
 
 
 @check_rights('entity_id')
 def get_lots(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
-
     status = request.GET.get('status', False)
 
     if not status:
-        return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Please provide a status"}, status=400)
 
     try:
-        txs = get_entity_lots_by_status(entity, status)
-        return get_lots_with_metadata(txs, entity, request.GET)
+        auditees = UserRights.objects.filter(user=request.user, role=UserRights.AUDITOR).values_list('entity')
+
+        txs = LotTransaction.objects.filter(Q(carbure_vendor__id__in=auditees) | Q(carbure_client__id__in=auditees) | Q(lot__added_by__in=auditees))
+        txs = txs.filter(lot__status='Validated')
+
+        if status == 'alert':
+            txs = get_lots_with_errors(txs)
+        elif status == 'correction':
+            txs = txs.filter(delivery_status__in=['AC', 'R', 'AA'])
+        elif status == 'declaration':
+            txs = txs.filter(delivery_status__in=['A', 'N'])
+
+        return get_lots_with_metadata(txs, None, request.GET)
+
     except Exception:
-        return JsonResponse({'status': 'error', 'message': "Could not get lots"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
 
 
 @check_rights('entity_id')
@@ -58,34 +54,26 @@ def get_lots_summary(request, *args, **kwargs):
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
 
+
 @check_rights('entity_id')
 def get_details(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
     tx_id = request.GET.get('tx_id', False)
 
     if not tx_id:
         return JsonResponse({'status': 'error', 'message': 'Missing tx_id'}, status=400)
 
     tx = LotTransaction.objects.get(pk=tx_id)
+    rights = UserRights.objects.filter(user=request.user, role=UserRights.AUDITOR, entity__in=(tx.carbure_vendor, tx.carbure_client, tx.lot.added_by))
 
-    if tx.carbure_client != entity and tx.carbure_vendor != entity and tx.lot.added_by != entity:
+    if rights.count() == 0:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
-
-    now = datetime.datetime.now()
-    (_, last_day) = calendar.monthrange(now.year, now.month)
-    deadline_date = now.replace(day=last_day)
 
     data = {}
     data['transaction'] = tx.natural_key()
     data['errors'] = get_errors(tx)
-    data['deadline'] = deadline_date.strftime("%Y-%m-%d")
-    data['comments'] = []
-    for c in tx.transactioncomment_set.all():
-        comment = c.natural_key()
-        if c.entity not in [tx.lot.added_by, tx.carbure_client]:
-            comment['entity'] = {'name': 'Anonyme'}
-        data['comments'].append(comment)
+    data['comments'] = get_comments(tx)
+    data['updates'] = get_history(tx)
+    data['deadline'] = get_current_deadline()
 
     return JsonResponse({'status': 'success', 'data': data})
 
@@ -95,14 +83,7 @@ def get_snapshot(request, *args, **kwargs):
     year = request.GET.get('year', False)
 
     try:
-        if year:
-            year = int(year)
-            date_from = datetime.date(year=year, month=1, day=1)
-            date_until = datetime.date(year=year, month=12, day=31)
-        else:
-            today = datetime.date.today()
-            date_from = today.replace(month=1, day=1)
-            date_until = today.replace(month=12, day=31)
+        date_from, date_until = get_year_bounds(year)
     except Exception:
         return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
 
@@ -110,7 +91,7 @@ def get_snapshot(request, *args, **kwargs):
         auditees = UserRights.objects.filter(user=request.user, role=UserRights.AUDITOR).values_list('entity')
 
         txs = LotTransaction.objects.filter(delivery_date__gte=date_from, delivery_date__lte=date_until).filter(
-            Q(carbure_vendor__id__in=auditees) | Q(carbure_client__id__in=auditees))
+            Q(carbure_vendor__id__in=auditees) | Q(carbure_client__id__in=auditees) | Q(lot__added_by__in=auditees))
 
         years = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
 

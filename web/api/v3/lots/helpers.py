@@ -1,22 +1,12 @@
 import datetime
 import calendar
 from time import perf_counter
-from dateutil.relativedelta import *
-from django.db.models import Q, F, Case, When, Count, Sum
-from django.db.models.functions import TruncMonth
-from django.db.models.functions import Extract
-from django.db.models.fields import NOT_PROVIDED
-from django import db
+from dateutil.relativedelta import relativedelta
+from django.db.models import Q, F, Case, When, Count
 from django.http import JsonResponse, HttpResponse
 from core.models import LotV2, LotTransaction
-from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, TransactionComment
-from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
+from core.models import MatierePremiere, Biocarburant, Pays
 from core.xlsx_v3 import export_transactions
-from core.common import validate_lots, load_excel_file, get_prefetched_data, check_duplicates
-from api.v3.sanity_checks import bulk_sanity_checks
-from django_otp.decorators import otp_required
-from core.decorators import check_rights
-
 
 
 sort_key_to_django_field = {'period': 'lot__period',
@@ -27,8 +17,44 @@ sort_key_to_django_field = {'period': 'lot__period',
                             'pays_origine': 'lot__pays_origine__name',
                             'added_by': 'lot__added_by__name'}
 
+
 def get_errors(tx):
     return [e.natural_key() for e in tx.genericerror_set.all()]
+
+
+def get_current_deadline():
+    now = datetime.datetime.now()
+    (_, last_day) = calendar.monthrange(now.year, now.month)
+    deadline_date = now.replace(day=last_day)
+    return deadline_date
+
+
+def get_comments(tx):
+    comments = []
+    for c in tx.transactioncomment_set.all():
+        comment = c.natural_key()
+        if c.entity not in [tx.lot.added_by, tx.carbure_vendor, tx.carbure_client]:
+            comment['entity'] = {'name': 'Anonyme'}
+        comments.append(comment)
+
+    return comments
+
+
+def get_history(tx):
+    return [c.natural_key() for c in tx.transactionupdatehistory_set.all().order_by('-datetime')]
+
+
+def get_year_bounds(year):
+    if year:
+        year = int(year)
+        date_from = datetime.date(year=year, month=1, day=1)
+        date_until = datetime.date(year=year, month=12, day=31)
+    else:
+        today = datetime.date.today()
+        date_from = today.replace(month=1, day=1)
+        date_until = today.replace(month=12, day=31)
+
+    return date_from, date_until
 
 
 def get_entity_lots_by_status(entity, status):
@@ -79,19 +105,13 @@ def get_entity_lots_by_status(entity, status):
 
 
 def get_lots_with_errors(txs):
-    tx_with_errors = txs.annotate(Count('genericerror')).filter(genericerror__count__gt=0)
-    return tx_with_errors, tx_with_errors.count()
+    return txs.annotate(Count('genericerror')).filter(genericerror__count__gt=0)
 
 
-def get_lots_with_deadline(txs):
-    now = datetime.datetime.now()
-    (_, last_day) = calendar.monthrange(now.year, now.month)
-    deadline_date = now.replace(day=last_day)
-    affected_date = deadline_date - relativedelta(months=1)
+def get_lots_with_deadline(txs, deadline):
+    affected_date = deadline - relativedelta(months=1)
     txs_with_deadline = txs.filter(lot__status='Draft', delivery_date__year=affected_date.year, delivery_date__month=affected_date.month)
-    deadline_str = deadline_date.strftime("%Y-%m-%d")
-
-    return txs_with_deadline, deadline_str, txs_with_deadline.count()
+    return txs_with_deadline
 
 
 def filter_by_entities(txs, entities):
@@ -125,14 +145,8 @@ def filter_lots(txs, querySet):
     query = querySet.get('query', False)
 
     if year:
-        try:
-            year = int(year)
-            date_from = datetime.date(year=year, month=1, day=1)
-            date_until = datetime.date(year=year, month=12, day=31)
-            txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-        except Exception:
-            raise Exception('Incorrect format for year. Expected YYYY.')
-
+        date_from, date_until = get_year_bounds(year)
+        txs = txs.filter(delivery_date__gte=date_from, delivery_date__lte=date_until)
 
     if periods:
         txs = txs.filter(lot__period__in=periods)
@@ -197,8 +211,14 @@ def filter_lots(txs, querySet):
     invalid = querySet.get('invalid', False)
     deadline = querySet.get('deadline', False)
 
-    tx_with_errors, total_errors = get_lots_with_errors(txs)
-    tx_with_deadline, deadline_str, total_deadline = get_lots_with_deadline(txs)
+    deadline_date = get_current_deadline()
+    deadline_str = deadline_date.strftime("%Y-%m-%d")
+
+    tx_with_errors = get_lots_with_errors(txs)
+    tx_with_deadline = get_lots_with_deadline(txs, deadline_date)
+
+    total_errors = tx_with_errors.count()
+    total_deadline = tx_with_deadline.count()
 
     if invalid == 'true':
         txs = tx_with_errors
