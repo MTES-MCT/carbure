@@ -8,6 +8,8 @@ import styles from "./settings.module.css"
 import { Title, LoaderOverlay } from "common/components"
 import { LabelCheckbox } from "common/components/input"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
+import { useRights } from "carbure/hooks/use-rights"
+import { EntityType, UserRole } from "common/types"
 
 type CompanySettingsProps = {
   entity: EntitySelection
@@ -16,13 +18,15 @@ type CompanySettingsProps = {
 
 const CompanySettings = ({ entity, settings }: CompanySettingsProps) => {
   const { t } = useTranslation()
+  const rights = useRights()
 
   if (entity === null) {
     return null
   }
 
-  const isOperator = entity.entity_type === "Opérateur"
-  const isTrader = entity.entity_type === "Trader"
+  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
+  const isProducer = entity.entity_type === EntityType.Producer
+  const isTrader = entity.entity_type === EntityType.Trader
 
   return (
     <Section id="options">
@@ -34,19 +38,22 @@ const CompanySettings = ({ entity, settings }: CompanySettingsProps) => {
 
       <SectionBody>
         <LabelCheckbox
+          disabled={!canModify}
           label={t("Ma société effectue des Mises à Consommation")}
           checked={settings.hasMAC}
           onChange={(e) => settings.onChangeMAC(e.target.checked)}
           className={styles.settingsCheckbox}
         />
 
-        <LabelCheckbox
-          disabled={isOperator || isTrader}
-          label={t("Ma société a une activité de négoce")}
-          checked={settings.hasTrading || isTrader}
-          onChange={(e) => settings.onChangeTrading(e.target.checked)}
-          className={styles.settingsCheckbox}
-        />
+        {isProducer && (
+          <LabelCheckbox
+            disabled={!canModify}
+            label={t("Ma société a une activité de négoce")}
+            checked={settings.hasTrading || isTrader}
+            onChange={(e) => settings.onChangeTrading(e.target.checked)}
+            className={styles.settingsCheckbox}
+          />
+        )}
       </SectionBody>
 
       {settings.isLoading && <LoaderOverlay />}

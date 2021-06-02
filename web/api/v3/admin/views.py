@@ -213,8 +213,8 @@ def get_lots_summary(request, *args, **kwargs):
 
         data = get_general_summary(txs)
         return JsonResponse({'status': 'success', 'data': data})
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'meta': str(e), 'message': "Could not get lots summary"}, status=400)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
 
 
 @is_admin

@@ -1,5 +1,5 @@
 import { EntitySelection } from "carbure/hooks/use-entity"
-import { EntityType, Filters, LotStatus } from "common/types"
+import { EntityType, Filters, LotStatus, UserRole } from "common/types"
 
 import { usePageSelection } from "common/components/pagination"
 import useSpecialSelection from "./hooks/query/use-special"
@@ -29,6 +29,7 @@ import TransactionAdd from "./routes/transaction-add"
 import TransactionDetails from "./routes/transaction-details"
 import useForwardLots from "./hooks/actions/use-forward-lots"
 import useTransactionQuery from "./hooks/query/use-transaction-query"
+import { useRights } from "carbure/hooks/use-rights"
 
 // prettier-ignore
 const OPERATOR_STATUSES = [
@@ -182,6 +183,8 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
     refresh,
   } = useTransactions(entity)
 
+  const rights = useRights()
+
   if (entity === null) {
     return null
   }
@@ -192,7 +195,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
   const isAdmin = entity.entity_type === EntityType.Administration
   const isAuditor = entity.entity_type === EntityType.Auditor
 
-  if (isAdmin && !ADMIN_STATUSES.includes(status.active)) {
+  if ((isAdmin || isAuditor) && !ADMIN_STATUSES.includes(status.active)) {
     return <Redirect relative to=".." />
   }
 
@@ -207,15 +210,18 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
     return <Redirect relative to=".." />
   }
 
+  const canDeclare =
+    rights.is(UserRole.Admin, UserRole.ReadWrite) && !isAdmin && !isAuditor
+
   const statusPlaceholder = isOperator
     ? OPERATOR_STATUSES
-    : isAdmin
+    : isAdmin || isAuditor
     ? ADMIN_STATUSES
     : PRODUCER_TRADER_STATUSES
 
   const filtersPlaceholder = isOperator
     ? OPERATOR_FILTERS
-    : isAdmin
+    : isAdmin || isAuditor
     ? ADMIN_FILTERS
     : PRODUCER_TRADER_FILTERS
 
@@ -226,7 +232,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         status={status}
         year={year}
         placeholder={statusPlaceholder}
-        declarator={isAdmin || isAuditor ? null : declarator}
+        declarator={canDeclare ? declarator : null}
       />
 
       <TransactionFilters

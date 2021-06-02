@@ -54,6 +54,7 @@ const Org = ({ app }: { app: AppHook }) => {
   }
 
   const isAdmin = entity?.entity_type === EntityType.Administration
+  const isAuditor = entity?.entity_type === EntityType.Auditor
   const isProd = window.location.hostname === "carbure.beta.gouv.fr"
 
   return (
@@ -80,7 +81,10 @@ const Org = ({ app }: { app: AppHook }) => {
         </Route>
 
         <Route relative exact path="transactions">
-          <Redirect relative to={isAdmin ? LotStatus.Alert : LotStatus.Draft} />
+          <Redirect
+            relative
+            to={isAdmin || isAuditor ? LotStatus.Alert : LotStatus.Draft}
+          />
         </Route>
 
         <Route relative path="transactions/:status">

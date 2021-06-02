@@ -1,7 +1,14 @@
 import React from "react"
 import cl from "clsx"
 
-import { Entity, EntityType, Lots, LotStatus, Transaction } from "common/types"
+import {
+  Entity,
+  EntityType,
+  Lots,
+  LotStatus,
+  Transaction,
+  UserRole,
+} from "common/types"
 import { SortingSelection } from "transactions/hooks/query/use-sort-by" // prettier-ignore
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { StatusSelection } from "transactions/hooks/query/use-status"
@@ -15,6 +22,7 @@ import * as C from "./list-columns"
 
 import styles from "./list-table.module.css"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
+import { useRights } from "carbure/hooks/use-rights"
 
 export const PRODUCER_COLUMNS = [
   C.dae,
@@ -96,7 +104,6 @@ export const TransactionTable = ({
   transactions,
   status,
   sorting,
-  outsourceddepots,
   selection,
   onDelete,
   onDuplicate,
@@ -106,6 +113,7 @@ export const TransactionTable = ({
   onReject,
   onCorrect,
 }: TransactionTableProps) => {
+  const rights = useRights()
   const relativePush = useRelativePush()
   const deadline = transactions.deadlines.date
 
@@ -115,21 +123,11 @@ export const TransactionTable = ({
   const isAdmin = entity.entity_type === EntityType.Administration
   const isAuditor = entity.entity_type === EntityType.Auditor
 
-  let columns = []
-
-  if (
-    status.is(LotStatus.Draft) ||
-    status.is(LotStatus.Inbox) ||
-    status.is(LotStatus.ToFix) ||
-    (status.is(LotStatus.Accepted) && outsourceddepots?.length)
-  ) {
-    columns.push(C.selector(selection))
-  } else {
-    columns.push(C.padding)
-  }
-
-  columns.push(C.status(entity))
-  columns.push(C.period(transactions.deadlines.date))
+  let columns = [
+    C.selector(selection),
+    C.status(entity),
+    C.period(transactions.deadlines.date),
+  ]
 
   if (isProducer || isTrader) {
     columns.push(...PRODUCER_COLUMNS)
@@ -139,7 +137,9 @@ export const TransactionTable = ({
     columns.push(...ADMIN_COLUMNS)
   }
 
-  if (status.is(LotStatus.Draft)) {
+  if (rights.is(UserRole.Auditor, UserRole.ReadOnly)) {
+    columns.push(arrow)
+  } else if (status.is(LotStatus.Draft)) {
     columns.push(getDraftActions({ onValidate, onDuplicate, onDelete }))
   } else if (status.is(LotStatus.ToFix)) {
     columns.push(getToFixActions({ onCorrect, onDelete }))

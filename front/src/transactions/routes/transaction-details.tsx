@@ -1,6 +1,6 @@
 import React from "react"
 
-import { LotStatus, EntityType } from "common/types"
+import { LotStatus, EntityType, UserRole } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
 import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
@@ -30,6 +30,7 @@ import { StatusTitle } from "../components/status"
 import Comments from "../components/form-comments"
 import ValidationErrors from "../components/form-errors"
 import TransactionHistory from "../components/history"
+import { useRights } from "carbure/hooks/use-rights"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]
@@ -70,6 +71,7 @@ const TransactionDetails = ({
     refreshDetails,
   } = useTransactionDetails(entity, refresh)
 
+  const rights = useRights()
   const navigator = useNavigate(transactions)
 
   const isEditable = EDITABLE.includes(status)
@@ -85,6 +87,8 @@ const TransactionDetails = ({
 
   const hasErrors =
     validationErrors.length > 0 || Object.keys(fieldErrors).length > 0
+
+  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
   async function run(
     action: (i: number) => Promise<boolean>,
@@ -108,7 +112,7 @@ const TransactionDetails = ({
       <TransactionForm
         id="transaction-details"
         entity={entity}
-        readOnly={!isEditable}
+        readOnly={!isEditable || !canModify}
         transaction={form}
         error={details.error ?? request.error}
         errors={fieldErrors}
@@ -131,7 +135,7 @@ const TransactionDetails = ({
       )}
 
       <div className={styles.transactionFormButtons}>
-        {isEditable && (
+        {canModify && isEditable && (
           <AsyncButton
             disabled={!hasChange}
             submit="transaction-details"
@@ -144,7 +148,7 @@ const TransactionDetails = ({
           </AsyncButton>
         )}
 
-        {status === LotStatus.Draft && (
+        {canModify && status === LotStatus.Draft && (
           <AsyncButton
             disabled={hasChange}
             icon={Check}
@@ -156,7 +160,7 @@ const TransactionDetails = ({
           </AsyncButton>
         )}
 
-        {status === LotStatus.ToFix && (
+        {canModify && status === LotStatus.ToFix && (
           <AsyncButton
             disabled={hasChange}
             icon={Check}
@@ -168,7 +172,7 @@ const TransactionDetails = ({
           </AsyncButton>
         )}
 
-        {isEditable && (
+        {canModify && isEditable && (
           <AsyncButton
             icon={Cross}
             level="danger"
@@ -179,51 +183,58 @@ const TransactionDetails = ({
           </AsyncButton>
         )}
 
-        {status === LotStatus.Inbox && transaction?.delivery_status !== "AC" && (
-          <React.Fragment>
-            <AsyncButton
-              icon={Check}
-              level="success"
-              loading={acceptor.loading}
-              onClick={() => run(acceptor.acceptLot)}
-            >
-              Accepter
-            </AsyncButton>
-
-            {!transaction?.lot.parent_lot && !isVendorOperator && (
+        {canModify &&
+          status === LotStatus.Inbox &&
+          transaction?.delivery_status !== "AC" && (
+            <React.Fragment>
               <AsyncButton
-                icon={AlertTriangle}
-                level="warning"
+                icon={Check}
+                level="success"
                 loading={acceptor.loading}
-                onClick={() => run(acceptor.acceptAndCommentLot)}
+                onClick={() => run(acceptor.acceptLot)}
               >
-                Accepter sous réserve
+                Accepter
               </AsyncButton>
-            )}
 
+              {!transaction?.lot.parent_lot && !isVendorOperator && (
+                <AsyncButton
+                  icon={AlertTriangle}
+                  level="warning"
+                  loading={acceptor.loading}
+                  onClick={() => run(acceptor.acceptAndCommentLot)}
+                >
+                  Accepter sous réserve
+                </AsyncButton>
+              )}
+
+              <AsyncButton
+                icon={Cross}
+                level="danger"
+                loading={rejector.loading}
+                onClick={() => run(rejector.rejectLot, true)}
+              >
+                Refuser
+              </AsyncButton>
+            </React.Fragment>
+          )}
+
+        {canModify &&
+          !isAdmin &&
+          !isAuditor &&
+          isVendor &&
+          status === LotStatus.Accepted && (
             <AsyncButton
-              icon={Cross}
-              level="danger"
-              loading={rejector.loading}
-              onClick={() => run(rejector.rejectLot, true)}
+              icon={Edit}
+              level="warning"
+              loading={acceptor.loading}
+              onClick={() => run(acceptor.amendLot)}
             >
-              Refuser
+              Corriger
             </AsyncButton>
-          </React.Fragment>
-        )}
+          )}
 
-        {!isAdmin && !isAuditor && isVendor && status === LotStatus.Accepted && (
-          <AsyncButton
-            icon={Edit}
-            level="warning"
-            loading={acceptor.loading}
-            onClick={() => run(acceptor.amendLot)}
-          >
-            Corriger
-          </AsyncButton>
-        )}
-
-        {!isAdmin &&
+        {canModify &&
+          !isAdmin &&
           !isAuditor &&
           !isVendorOperator &&
           !isVendor &&
