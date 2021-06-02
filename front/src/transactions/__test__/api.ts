@@ -66,6 +66,20 @@ export const okLotsSummary = rest.get(
   }
 )
 
+export const okAdminSummary = rest.get(
+  "/api/v3/admin/lots/summary",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success", data: data.generalSummary }))
+  }
+)
+
+export const okAuditorSummary = rest.get(
+  "/api/v3/auditor/summary",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success", data: data.generalSummary }))
+  }
+)
+
 export const okDeclarationSummary = rest.post(
   "/api/v3/lots/declaration-summary",
   (req, res, ctx) => {
@@ -231,6 +245,8 @@ export default setupServer(
   okAdminLots,
   okAdminSnapshot,
   okLotsSummary,
+  okAdminSummary,
+  okAuditorSummary,
   okDeclarationSummary,
   okTranslations,
   okErrorsTranslations,

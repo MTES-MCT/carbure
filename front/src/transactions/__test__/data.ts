@@ -349,6 +349,23 @@ export const lotsSummary = {
     },
   },
   tx_ids: [lot.id],
+  total_volume: 1000,
+}
+
+export const generalSummary = {
+  transactions: {
+    [trader.name]: {
+      [operator.name]: {
+        [lot.lot.biocarburant.name]: {
+          volume: lot.lot.volume,
+          avg_ghg_reduction: lot.lot.ghg_reduction,
+          lots: 1,
+        },
+      },
+    },
+  },
+  total_volume: 1000,
+  tx_ids: [lot.id],
 }
 
 export const declaration = {
@@ -360,5 +377,5 @@ export const declaration = {
   checked: false,
   month: 5,
   year: 2021,
-  reminder_count: 0
+  reminder_count: 0,
 }
