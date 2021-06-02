@@ -339,12 +339,6 @@ class LotV2(models.Model):
 
     is_valid = models.BooleanField(default=False)
 
-    # admin / auditor checks & filters
-    hidden_by_admin = models.BooleanField(default=False)
-    hidden_by_auditor = models.BooleanField(default=False)
-    highlighted_by_admin = models.BooleanField(default=False)
-    highlighted_by_auditor = models.BooleanField(default=False)
-
 
     def natural_key(self):
         return {'id': self.id, 'period': self.period, 'carbure_id': self.carbure_id, 'producer_is_in_carbure': self.producer_is_in_carbure, 'carbure_producer': self.carbure_producer.natural_key() if self.carbure_producer else None,
@@ -426,6 +420,14 @@ class LotTransaction(models.Model):
     # this flag will make it easier to find "stock" lots
     is_stock = models.BooleanField(default=False)
 
+
+    # admin / auditor checks & filters
+    hidden_by_admin = models.BooleanField(default=False)
+    hidden_by_auditor = models.BooleanField(default=False)
+    highlighted_by_admin = models.BooleanField(default=False)
+    highlighted_by_auditor = models.BooleanField(default=False)
+
+    
     def __str__(self):
         return str(self.id)
 
