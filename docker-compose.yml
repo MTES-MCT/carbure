@@ -14,6 +14,8 @@ services:
       - carburedb:/var/lib/mysql
     networks:
       - carbure
+    ports:
+      - 3306:3306
 
   carbure-django:
     build:
@@ -86,7 +88,7 @@ services:
     volumes:
       # dev: mount static directory
       - ${CARBURE_HOME}/web/static:/var/www/html
-      - uploadedfiles:/app/files      
+      - uploadedfiles:/app/files
     ports:
       - 8090:80
     networks:
