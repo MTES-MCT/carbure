@@ -8,6 +8,7 @@ import {
   LotStatus,
   TransactionQuery,
   TransactionSummary,
+  UserRole,
 } from "common/types"
 import { SortingSelection } from "transactions/hooks/query/use-sort-by" // prettier-ignore
 import { PageSelection } from "common/components/pagination"
@@ -53,6 +54,7 @@ import { LotForwarder } from "transactions/hooks/actions/use-forward-lots"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 import { SearchSelection } from "transactions/hooks/query/use-search"
 import { ApiState } from "common/hooks/use-api"
+import { useRights } from "carbure/hooks/use-rights"
 
 type TransactionListProps = {
   entity: Entity
@@ -97,6 +99,8 @@ export const TransactionList = ({
   forwarder,
   summary,
 }: TransactionListProps) => {
+  const rights = useRights()
+
   const txs = transactions.data
   const errorCount = txs?.total_errors ?? 0
   const deadlineCount = txs?.deadlines.total ?? 0
@@ -108,7 +112,6 @@ export const TransactionList = ({
   const isProducer = entity.entity_type === EntityType.Producer
   const isOperator = entity.entity_type === EntityType.Operator
   const isTrader = entity.entity_type === EntityType.Trader
-  const isAdmin = entity.entity_type === EntityType.Administration
 
   const isLoading = transactions.loading
   const isError = transactions.error !== null
@@ -116,6 +119,8 @@ export const TransactionList = ({
 
   const hasOutsourcedBlendingDepot =
     outsourceddepots && outsourceddepots.length > 0
+
+  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
   return (
     <Box className={styles.transactionList}>
@@ -133,7 +138,7 @@ export const TransactionList = ({
             onExportAll={transactions.exportAllTransactions}
           />
 
-          {status.is(LotStatus.Draft) && (
+          {canModify && status.is(LotStatus.Draft) && (
             <React.Fragment>
               {isProducer && <ProducerImportActions uploader={uploader} />}
               {isTrader && <TraderImportActions uploader={uploader} />}
@@ -151,7 +156,7 @@ export const TransactionList = ({
             </React.Fragment>
           )}
 
-          {status.is(LotStatus.Inbox) && (
+          {canModify && status.is(LotStatus.Inbox) && (
             <React.Fragment>
               <InboxActions
                 disabled={isEmpty}
@@ -162,7 +167,7 @@ export const TransactionList = ({
             </React.Fragment>
           )}
 
-          {status.is(LotStatus.ToFix) && (
+          {canModify && status.is(LotStatus.ToFix) && (
             <ToFixActions
               disabled={selection.selected.length === 0}
               deleter={deleter}
@@ -171,6 +176,7 @@ export const TransactionList = ({
 
           {isOperator &&
             hasOutsourcedBlendingDepot &&
+            canModify &&
             status.is(LotStatus.Accepted) && (
               <OperatorOutsourcedBlendingActions
                 forwarder={forwarder}
