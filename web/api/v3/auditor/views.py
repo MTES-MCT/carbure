@@ -136,3 +136,28 @@ def get_snapshot(request, *args, **kwargs):
         return JsonResponse({'status': 'success', 'data': data})
     except Exception:
         return JsonResponse({'status': 'error', 'message': 'Failed building snapshot'}, status=400)
+
+
+@check_rights('entity_id', role=UserRights.AUDITOR)
+def highlight_transactions(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    tx_ids = request.POST.getlist('tx_ids', False)
+
+    if not tx_ids:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
+
+    LotTransaction.objects.filter(id__in=tx_ids).filter(Q(carbure_vendor=entity) | Q(carbure_client=entity)).update(highlighted_by_auditor=True)
+    return JsonResponse({'status': 'success'})
+
+@check_rights('entity_id', role=UserRights.AUDITOR)
+def hide_transactions(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    tx_ids = request.POST.getlist('tx_ids', False)
+
+    if not tx_ids:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
+
+    LotTransaction.objects.filter(id__in=tx_ids).filter(Q(carbure_vendor=entity) | Q(carbure_client=entity)).update(hidden_by_auditor=True)
+    return JsonResponse({'status': 'success'})
