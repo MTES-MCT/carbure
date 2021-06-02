@@ -656,7 +656,7 @@ def highlight_transactions(request):
     tx_ids = request.POST.getlist('tx_ids', False)
 
     if not tx_ids:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
+        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
 
     LotTransaction.objects.filter(id__in=tx_ids).update(highlighted_by_admin=True)
     return JsonResponse({'status': 'success'})
@@ -666,7 +666,7 @@ def hide_transactions(request):
     tx_ids = request.POST.getlist('tx_ids', False)
 
     if not tx_ids:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
+        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
 
     LotTransaction.objects.filter(id__in=tx_ids).update(hidden_by_admin=True)
     return JsonResponse({'status': 'success'})
