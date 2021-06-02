@@ -402,8 +402,8 @@ def get_summary(txs, entity):
             data_in[t['vendor']] = {}
 
         data_in[t['vendor']][t['lot__biocarburant__name']] = {
-            'volume': t['volume'],
-            'avg_ghg_reduction': t['avg_ghg_reduction'],
+            'volume': t['volume'] or 0,
+            'avg_ghg_reduction': t['avg_ghg_reduction'] or 0,
             'lots': t['lots']
         }
 
@@ -424,8 +424,8 @@ def get_summary(txs, entity):
             data_out[t['client']] = {}
 
         data_out[t['client']][t['lot__biocarburant__name']] = {
-            'volume': t['volume'],
-            'avg_ghg_reduction': t['avg_ghg_reduction'],
+            'volume': t['volume'] or 0,
+            'avg_ghg_reduction': t['avg_ghg_reduction'] or 0,
             'lots': t['lots']
         }
 
@@ -436,6 +436,8 @@ def get_summary(txs, entity):
 
 def get_general_summary(txs):
     data = {}
+
+    print(txs.query)
 
     txs_aggregation = txs.annotate(
         vendor=Coalesce('carbure_vendor__name', 'lot__unknown_supplier'),
@@ -457,8 +459,8 @@ def get_general_summary(txs):
             data[t['vendor']][t['client']] = {}
 
         data[t['vendor']][t['client']][t['lot__biocarburant__name']] = {
-            'volume': t['volume'],
-            'avg_ghg_reduction': t['avg_ghg_reduction'],
+            'volume': t['volume'] or 0,
+            'avg_ghg_reduction': t['avg_ghg_reduction'] or 0,
             'lots': t['lots']
         }
 
