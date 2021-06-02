@@ -1,16 +1,14 @@
-import { render } from "setupTests"
+import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
 import { Route } from "common/components/relative-route"
 import { Entity, LotStatus } from "common/types"
 
 import { admin } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
-import { MemoryRouter } from "react-router-dom"
 import Transactions from "../index"
 
 import server, { setAdminLots } from "./api"
 import { emptyLots } from "./data"
-import { Suspense } from "react"
 
 const TransactionsWithRouter = ({
   entity,
@@ -19,13 +17,11 @@ const TransactionsWithRouter = ({
   entity: Entity
   status: LotStatus
 }) => (
-  <MemoryRouter initialEntries={[`/org/0/transactions/${status}`]}>
+  <TestRoot url={`/org/0/transactions/${status}`}>
     <Route path="/org/0/transactions/:status">
-      <Suspense fallback="...">
-        <Transactions entity={entity} />
-      </Suspense>
+      <Transactions entity={entity} />
     </Route>
-  </MemoryRouter>
+  </TestRoot>
 )
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
