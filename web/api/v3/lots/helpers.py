@@ -2,9 +2,11 @@ import datetime
 import calendar
 from time import perf_counter
 from dateutil.relativedelta import relativedelta
-from django.db.models import Q, F, Case, When, Count
+from django.db.models import Q, F, Case, When, Count, Sum
+from django.db.models.expressions import OuterRef, Subquery, Value
+from django.db.models.functions import Coalesce
 from django.http import JsonResponse, HttpResponse
-from core.models import LotV2, LotTransaction
+from core.models import GenericError, LotV2, LotTransaction
 from core.models import MatierePremiere, Biocarburant, Pays
 from core.xlsx_v3 import export_transactions
 
@@ -105,7 +107,8 @@ def get_entity_lots_by_status(entity, status):
 
 
 def get_lots_with_errors(txs):
-    return txs.annotate(Count('genericerror')).filter(genericerror__count__gt=0)
+    tx_errors = GenericError.objects.filter(tx=OuterRef('pk')).values('tx').annotate(errors=Count(Value(1))).values('errors')
+    return txs.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
 
 
 def get_lots_with_deadline(txs, deadline):
@@ -427,26 +430,42 @@ def get_summary(txs, entity):
 
 
 def get_general_summary(txs):
-    total_volume = 0
     data = {}
 
-    for t in txs.iterator():
-        vendor = t.carbure_vendor.name if t.carbure_vendor else t.lot.unknown_supplier
+    txs_aggregation = txs.annotate(
+        vendor=Coalesce('carbure_vendor__name', 'lot__unknown_supplier'),
+        client=Coalesce('carbure_client__name', 'unknown_client'),
+    ).values(
+        'vendor',
+        'client',
+        'lot__biocarburant__name'
+    ).annotate(
+        volume=Sum('lot__volume'),
+        avg_ghg_reduction=Sum(F('lot__volume') * F('lot__ghg_reduction')) / Sum('lot__volume'),
+        lots=Count('id')
+    ).order_by()  # remove order by
+
+    for t in txs_aggregation.iterator():
+        vendor = t['vendor']
+        client = t['client']
+        volume = t['volume']
+        avg_ghg_reduction = t['avg_ghg_reduction']
+        biocarburant = t['lot__biocarburant__name']
+        lots = t['lots']
+
         if vendor not in data:
             data[vendor] = {}
-        client = t.carbure_client.name if t.client_is_in_carbure and t.carbure_client else t.unknown_client
         if client not in data[vendor]:
             data[vendor][client] = {}
-        if t.lot.biocarburant.name not in data[vendor][client]:
-            data[vendor][client][t.lot.biocarburant.name] = {'volume': 0, 'avg_ghg_reduction': 0, 'lots': 0}
-        line = data[vendor][client][t.lot.biocarburant.name]
-        total = (line['volume'] + t.lot.volume)
-        line['avg_ghg_reduction'] = (line['volume'] * line['avg_ghg_reduction'] + t.lot.volume * t.lot.ghg_reduction) / total if total != 0 else 0
-        line['volume'] += t.lot.volume
-        line['lots'] += 1
-        total_volume += t.lot.volume
+
+        data[vendor][client][biocarburant] = {
+            'volume': volume,
+            'avg_ghg_reduction': avg_ghg_reduction,
+            'lots': lots
+        }
 
     tx_ids = [t['id'] for t in txs.values('id')]
+    total_volume = txs.aggregate(Sum('lot__volume'))['lot__volume__sum']
     return {'transactions': data, 'tx_ids': tx_ids, 'total_volume': total_volume}
 
 
