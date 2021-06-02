@@ -7,6 +7,7 @@ import {
   GESOption,
   MatierePremiere,
   ProductionSiteDetails,
+  UserRole,
 } from "common/types"
 
 import { ProductionSiteSettingsHook } from "../hooks/use-production-sites"
@@ -45,6 +46,7 @@ import RadioGroup from "common/components/radio-group"
 import { formatDate, SettingsForm } from "./common"
 import { padding } from "transactions/components/list-columns"
 import { findCertificates } from "../api"
+import { useRights } from "carbure/hooks/use-rights"
 
 export type ProductionSiteState = {
   // site
@@ -94,6 +96,9 @@ export const ProductionSitePrompt = ({
   onResolve,
 }: ProductionSitePromptProps) => {
   const { t } = useTranslation()
+  const rights = useRights()
+
+  readOnly = readOnly || !rights.is(UserRole.Admin, UserRole.ReadWrite)
 
   const { data, hasChange, onChange } = useForm<ProductionSiteState>({
     site_id: productionSite?.site_id ?? "",
@@ -325,16 +330,20 @@ const ProductionSitesSettings = ({
   settings,
 }: ProductionSitesSettingsProps) => {
   const { t } = useTranslation()
+  const rights = useRights()
 
-  const actions = settings.removeProductionSite
-    ? Actions([
-        {
-          icon: Cross,
-          title: t("Supprimer le site de production"),
-          action: settings.removeProductionSite,
-        },
-      ])
-    : arrow
+  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
+
+  const actions =
+    canModify && settings.removeProductionSite
+      ? Actions([
+          {
+            icon: Cross,
+            title: t("Supprimer le site de production"),
+            action: settings.removeProductionSite,
+          },
+        ])
+      : arrow
 
   const columns: Column<ProductionSiteDetails>[] = [
     padding,
@@ -374,7 +383,7 @@ const ProductionSitesSettings = ({
         <Title>
           <Trans>Sites de production</Trans>
         </Title>
-        {settings.createProductionSite && (
+        {canModify && settings.createProductionSite && (
           <Button
             level="primary"
             icon={Plus}

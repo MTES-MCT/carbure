@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import cl from "clsx"
 
-import { Certificate } from "common/types"
+import { Certificate, UserRole } from "common/types"
 
 import styles from "./settings.module.css"
 
@@ -26,6 +26,7 @@ import { DBSCertificateSettingsHook } from "settings/hooks/use-2bs-certificates"
 import { ISCCCertificateSettingsHook } from "settings/hooks/use-iscc-certificates"
 import { REDCertCertificateSettingsHook } from "settings/hooks/use-redcert-certificates"
 import { SNCertificateSettingsHook } from "settings/hooks/use-national-system-certificates"
+import { useRights } from "carbure/hooks/use-rights"
 
 type CertificatePromptProps = PromptProps<Certificate> & {
   type: "2BS" | "ISCC" | "REDcert" | "SN"
@@ -99,6 +100,9 @@ export const CertificateSettings = ({
   onDelete,
 }: CertificateSettingsProps) => {
   const { t } = useTranslation()
+  const rights = useRights()
+
+  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
   const columns: Column<Certificate>[] = [
     padding,
@@ -123,7 +127,7 @@ export const CertificateSettings = ({
     },
   ]
 
-  if (onDelete) {
+  if (canModify && onDelete) {
     columns.push(
       Actions([
         {
@@ -149,7 +153,7 @@ export const CertificateSettings = ({
         <Title>
           <Trans>Certificats {{ type }}</Trans>
         </Title>
-        {onAdd && (
+        {onAdd && canModify && (
           <Button level="primary" icon={Plus} onClick={onAdd}>
             <Trans>Ajouter un certificat {{ type }}</Trans>
           </Button>

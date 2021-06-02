@@ -1,6 +1,6 @@
 import React from "react"
 
-import { Lots, LotStatus, Transaction } from "common/types"
+import { Lots, LotStatus, Transaction, UserRole } from "common/types"
 import { SortingSelection } from "transactions/hooks/query/use-sort-by" // prettier-ignore
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { StatusSelection } from "transactions/hooks/query/use-status"
@@ -11,6 +11,7 @@ import Table, { Actions, arrow, Column, Row } from "common/components/table"
 import * as C from "transactions/components/list-columns"
 import { Edit } from "common/components/icons"
 import { LotSender } from "stocks/hooks/use-send-lots"
+import { useRights } from "carbure/hooks/use-rights"
 
 type A = Record<string, (id: number) => void>
 type CT = Column<Transaction>
@@ -43,8 +44,11 @@ export const StockTable = ({
   selection,
   sender,
 }: StockTableProps) => {
+  const rights = useRights()
   const relativePush = useRelativePush()
   const createDrafts = sender.createDrafts
+
+  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
   const columns = []
 
@@ -74,7 +78,7 @@ export const StockTable = ({
       C.origine,
       C.depot,
       C.ghgReduction,
-      getStockActions({ createDrafts })
+      canModify ? getStockActions({ createDrafts }) : arrow
     )
   }
 
