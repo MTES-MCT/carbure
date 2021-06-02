@@ -1,6 +1,6 @@
 import React from "react"
 
-import { LotStatus } from "common/types"
+import { LotStatus, UserRole } from "common/types"
 import { SortingSelection } from "transactions/hooks/query/use-sort-by"
 import { PageSelection } from "common/components/pagination"
 import { LotUploader } from "transactions/hooks/actions/use-upload-file"
@@ -34,6 +34,7 @@ import { StockTable } from "./list-table"
 
 import styles from "./list.module.css"
 import { SearchSelection } from "transactions/hooks/query/use-search"
+import { useRights } from "carbure/hooks/use-rights"
 
 type StockListProps = {
   stock: StockHook
@@ -64,11 +65,14 @@ export const StockList = ({
   rejector,
   sender,
 }: StockListProps) => {
-  const txs = stock.data
+  const rights = useRights()
 
+  const txs = stock.data
   const isLoading = stock.loading
   const isError = typeof stock.error === "string"
   const isEmpty = txs === null || txs.lots.length === 0
+
+  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
   return (
     <Box className={styles.stockList}>
@@ -85,11 +89,11 @@ export const StockList = ({
             onExportAll={stock.exportAllTransactions}
           />
 
-          {status.is(LotStatus.ToSend) && (
+          {canModify && status.is(LotStatus.ToSend) && (
             <StockImportActions uploader={uploader} />
           )}
 
-          {status.is(LotStatus.ToSend) && (
+          {canModify && status.is(LotStatus.ToSend) && (
             <StockDraftActions
               disabled={isEmpty}
               hasSelection={selection.selected.length > 0}
@@ -99,7 +103,7 @@ export const StockList = ({
             />
           )}
 
-          {status.is(LotStatus.Inbox) && (
+          {canModify && status.is(LotStatus.Inbox) && (
             <InboxActions
               disabled={isEmpty}
               hasSelection={selection.selected.length > 0}
@@ -108,7 +112,7 @@ export const StockList = ({
             />
           )}
 
-          {status.is(LotStatus.Stock) && (
+          {canModify && status.is(LotStatus.Stock) && (
             <StockActions
               onForward={sender.forwardLots}
               onConvertETBE={sender.convertETBEComplex}

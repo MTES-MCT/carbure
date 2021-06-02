@@ -1,6 +1,6 @@
 import React from "react"
 
-import { LotStatus } from "common/types"
+import { LotStatus, UserRole } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
 import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
@@ -19,6 +19,7 @@ import TransactionForm from "transactions/components/form"
 import ValidationErrors from "transactions/components/form-errors"
 import { StatusTitle } from "transactions/components/status"
 import Comments from "transactions/components/form-comments"
+import { useRights } from "carbure/hooks/use-rights"
 
 const EDITABLE = [LotStatus.ToSend]
 
@@ -55,6 +56,9 @@ const StockDetails = ({
     refreshDetails,
   } = useStockDetails(entity, refresh)
 
+  const rights = useRights()
+
+  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
   const isEditable = EDITABLE.includes(status)
 
   async function run(
@@ -80,7 +84,7 @@ const StockDetails = ({
       <TransactionForm
         id="stock-details"
         entity={entity}
-        readOnly={!isEditable}
+        readOnly={!isEditable || !canModify}
         transaction={form}
         error={details.error ?? request.error}
         errors={fieldErrors}
@@ -100,7 +104,7 @@ const StockDetails = ({
       )}
 
       <div className={styles.transactionFormButtons}>
-        {isEditable && (
+        {canModify && isEditable && (
           <AsyncButton
             disabled={!hasChange}
             submit="stock-details"
@@ -113,7 +117,7 @@ const StockDetails = ({
           </AsyncButton>
         )}
 
-        {status === LotStatus.Inbox && (
+        {canModify && status === LotStatus.Inbox && (
           <React.Fragment>
             <AsyncButton
               icon={Check}
@@ -134,7 +138,7 @@ const StockDetails = ({
           </React.Fragment>
         )}
 
-        {status === LotStatus.Stock && (
+        {canModify && status === LotStatus.Stock && (
           <React.Fragment>
             <AsyncButton
               icon={Edit}
@@ -147,7 +151,7 @@ const StockDetails = ({
           </React.Fragment>
         )}
 
-        {status === LotStatus.ToSend && (
+        {canModify && status === LotStatus.ToSend && (
           <React.Fragment>
             <AsyncButton
               disabled={hasChange}
