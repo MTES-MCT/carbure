@@ -96,7 +96,6 @@ export const TransactionTable = ({
   transactions,
   status,
   sorting,
-  outsourceddepots,
   selection,
   onDelete,
   onDuplicate,
@@ -115,21 +114,11 @@ export const TransactionTable = ({
   const isAdmin = entity.entity_type === EntityType.Administration
   const isAuditor = entity.entity_type === EntityType.Auditor
 
-  let columns = []
-
-  if (
-    status.is(LotStatus.Draft) ||
-    status.is(LotStatus.Inbox) ||
-    status.is(LotStatus.ToFix) ||
-    (status.is(LotStatus.Accepted) && outsourceddepots?.length)
-  ) {
-    columns.push(C.selector(selection))
-  } else {
-    columns.push(C.padding)
-  }
-
-  columns.push(C.status(entity))
-  columns.push(C.period(transactions.deadlines.date))
+  let columns = [
+    C.selector(selection),
+    C.status(entity),
+    C.period(transactions.deadlines.date),
+  ]
 
   if (isProducer || isTrader) {
     columns.push(...PRODUCER_COLUMNS)
