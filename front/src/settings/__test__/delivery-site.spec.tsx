@@ -1,21 +1,31 @@
-import { render } from "setupTests"
+import { render, TestRoot } from "setupTests"
 import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import { Entity } from "common/types"
 import { deliverySite, producer } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
-import { useGetSettings } from "settings/hooks/use-get-settings"
 import Settings from "../index"
 
-import server, { setDeliverySites } from "./api"
+import server, { setDeliverySites, setEntity } from "./api"
 
-const SettingsWithHooks = ({ entity }: { entity: Entity }) => {
-  const settings = useGetSettings()
-  return <Settings entity={entity} settings={settings} />
+const SettingsWithHooks = () => {
+  return (
+    <TestRoot>
+      {(app) => (
+        <Settings
+          entity={app.settings.data?.rights[0].entity ?? null}
+          settings={app.settings}
+        />
+      )}
+    </TestRoot>
+  )
 }
 
-beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: "warn" })
+  setEntity(producer)
+})
 
 afterEach(() => {
   server.resetHandlers()
@@ -25,7 +35,7 @@ afterEach(() => {
 afterAll(() => server.close())
 
 test("check the delivery site section of the settings", async () => {
-  render(<SettingsWithHooks entity={producer} />)
+  render(<SettingsWithHooks />)
 
   await waitWhileLoading()
 
@@ -35,7 +45,7 @@ test("check the delivery site section of the settings", async () => {
 })
 
 test("add a delivery site in settings", async () => {
-  render(<SettingsWithHooks entity={producer} />)
+  render(<SettingsWithHooks />)
 
   await waitWhileLoading()
 
@@ -67,7 +77,7 @@ test("add a delivery site in settings", async () => {
 test("check a delivery site details", async () => {
   setDeliverySites([deliverySite])
 
-  render(<SettingsWithHooks entity={producer} />)
+  render(<SettingsWithHooks />)
 
   await waitWhileLoading()
 
@@ -82,7 +92,7 @@ test("check a delivery site details", async () => {
 test("remove a delivery site in settings", async () => {
   setDeliverySites([deliverySite])
 
-  render(<SettingsWithHooks entity={producer} />)
+  render(<SettingsWithHooks />)
 
   await waitWhileLoading()
 

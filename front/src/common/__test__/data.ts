@@ -6,6 +6,7 @@ import {
   ProductionSiteDetails,
   Transaction,
   DeliveryStatus,
+  UserRole,
 } from "common/types"
 
 // ENTITIES
@@ -258,7 +259,7 @@ export const entityRight = {
   name: "User",
   email: "user@company.com",
   entity: producer,
-  role: "RO",
+  role: UserRole.Admin,
   expiration_date: null,
 }
 
@@ -269,7 +270,7 @@ export const entityRequest = {
   date_requested: "2020-12-22T16:18:27.233Z",
   status: "ACCEPTED",
   comment: "",
-  role: "RO",
+  role: UserRole.Admin,
   expiration_date: null,
 }
 

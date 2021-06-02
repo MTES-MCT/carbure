@@ -1,12 +1,13 @@
-import { render } from "setupTests"
+import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { MemoryRouter } from "react-router-dom"
 import { okEmptySettings } from "settings/__test__/api"
 import Carbure from "../index"
 
 import server from "./api"
+import { MemoryRouter } from "react-router"
 import { Suspense } from "react"
+import { LoaderOverlay } from "common/components"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
@@ -18,7 +19,7 @@ afterAll(() => server.close())
 const CarbureWithRouter = () => {
   return (
     <MemoryRouter>
-      <Suspense fallback="Loading...">
+      <Suspense fallback={<LoaderOverlay />}>
         <Carbure />
       </Suspense>
     </MemoryRouter>

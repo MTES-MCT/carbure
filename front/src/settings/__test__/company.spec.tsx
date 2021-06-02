@@ -1,17 +1,23 @@
-import { render } from "setupTests"
+import { render, TestRoot } from "setupTests"
 import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import { admin, operator, producer, trader } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
-import { useGetSettings } from "settings/hooks/use-get-settings"
 import Settings from "../index"
 import server, { okDynamicSettings, setEntity } from "./api"
 
 const SettingsWithHooks = () => {
-  const settings = useGetSettings()
-  const entity = settings.data?.rights[0].entity ?? null
-  return <Settings entity={entity} settings={settings} />
+  return (
+    <TestRoot>
+      {(app) => (
+        <Settings
+          entity={app.settings.data?.rights[0].entity ?? null}
+          settings={app.settings}
+        />
+      )}
+    </TestRoot>
+  )
 }
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
@@ -62,11 +68,8 @@ test("check the company section of the settings for a trader", async () => {
   expect(screen.getAllByText("Options")).toHaveLength(2)
 
   const mac = screen.getByLabelText("Ma société effectue des Mises à Consommation") // prettier-ignore
-  const trading = screen.getByLabelText("Ma société a une activité de négoce")
 
   expect(mac).toBeChecked()
-  expect(trading).toBeChecked()
-  expect(trading).toHaveAttribute("aria-disabled", "true")
 
   userEvent.click(mac)
 
@@ -84,11 +87,8 @@ test("check the company section of the settings for an operator", async () => {
   expect(screen.getAllByText("Options")).toHaveLength(2)
 
   const mac = screen.getByLabelText("Ma société effectue des Mises à Consommation") // prettier-ignore
-  const trading = screen.getByLabelText("Ma société a une activité de négoce")
 
   expect(mac).toBeChecked()
-  expect(trading).not.toBeChecked()
-  expect(trading).toHaveAttribute("aria-disabled", "true")
 
   userEvent.click(mac)
 
