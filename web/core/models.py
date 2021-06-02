@@ -339,6 +339,13 @@ class LotV2(models.Model):
 
     is_valid = models.BooleanField(default=False)
 
+    # admin / auditor checks & filters
+    hidden_by_admin = models.BooleanField(default=False)
+    hidden_by_auditor = models.BooleanField(default=False)
+    highlighted_by_admin = models.BooleanField(default=False)
+    highlighted_by_auditor = models.BooleanField(default=False)
+
+
     def natural_key(self):
         return {'id': self.id, 'period': self.period, 'carbure_id': self.carbure_id, 'producer_is_in_carbure': self.producer_is_in_carbure, 'carbure_producer': self.carbure_producer.natural_key() if self.carbure_producer else None,
         'unknown_producer': self.unknown_producer, 'production_site_is_in_carbure': self.production_site_is_in_carbure, 'carbure_production_site': self.carbure_production_site.natural_key() if self.carbure_production_site else None,
