@@ -913,12 +913,16 @@ def revoke_user(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Could not find user'}, status=400)
 
     try:
+        UserRights.objects.filter(user=user, entity=entity).delete()
+    except:
+        pass
+    try:
         rr = UserRightsRequests.objects.get(user=user, entity=entity)
         rr.status = 'REVOKED'
-        UserRights.objects.filter(user=user, entity=entity).delete()
         rr.save()
     except:
-        return JsonResponse({'status': 'error', 'message': 'Something went wrong'}, status=400)
+        pass
+    
     return JsonResponse({'status': 'success'})
 
 

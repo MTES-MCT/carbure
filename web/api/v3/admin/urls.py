@@ -33,5 +33,8 @@ urlpatterns = [
     path('lots/ack-alerts', views.ack_alerts, name='api-v3-admin-ack-alerts'),
     path('lots/highlight-alerts', views.highlight_alerts, name='api-v3-admin-highlight-alerts'),
     path('lots/summary', views.get_lots_summary, name='api-v3-admin-get-lot-summary'),
+    
+    path('lots/hide-transactions', views.hide_transactions, name='api-v3-admin-hide-transactions'),
+    path('lots/highlight-transactions', views.highlight_transactions, name='api-v3-admin-highlight-transactions'),
 
 ]
