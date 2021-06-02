@@ -36,7 +36,7 @@ def get_settings(request):
     return JsonResponse({'status': 'success', 'data': {'rights': rights_sez, 'email': request.user.email, 'requests': requests_sez}})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def update_entity(request, *args, **kwargs):
     context = kwargs['context']
 
@@ -155,7 +155,7 @@ def add_production_site(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': obj.natural_key() })
 
 
-@check_rights('entity_id', role=[UserRights.ADMIN])
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def update_production_site(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -237,7 +237,7 @@ def delete_production_site(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id', role=[UserRights.ADMIN])
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def set_production_site_mp(request, *args, **kwargs):
     site = request.POST.get('production_site_id')
     mp_list = request.POST.getlist('matiere_premiere_codes')
@@ -279,7 +279,7 @@ def set_production_site_mp(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id', role=[UserRights.ADMIN])
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def set_production_site_bc(request, *args, **kwargs):
     site = request.POST.get('production_site_id')
     bc_list = request.POST.getlist('biocarburant_codes')
@@ -334,7 +334,7 @@ def get_delivery_sites(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': ds})
 
 
-@check_rights('entity_id', role=[UserRights.ADMIN])
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def add_delivery_site(request, *args, **kwargs):
     entity = kwargs['context']['entity']
     delivery_site_id = request.POST.get('delivery_site_id', False)
@@ -391,7 +391,7 @@ def delete_delivery_site(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id', role=[UserRights.ADMIN])
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def enable_mac(request, *args, **kwargs):
     entity = kwargs['context']['entity']
     entity.has_mac = True
@@ -399,7 +399,7 @@ def enable_mac(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id', role=[UserRights.ADMIN])
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def disable_mac(request, *args, **kwargs):
     entity = kwargs['context']['entity']
     entity.has_mac = False
@@ -407,7 +407,7 @@ def disable_mac(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id', role=[UserRights.ADMIN])
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def enable_trading(request, *args, **kwargs):
     entity = kwargs['context']['entity']
 
@@ -419,7 +419,7 @@ def enable_trading(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id', role=[UserRights.ADMIN])
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def disable_trading(request, *args, **kwargs):
     entity = kwargs['context']['entity']
 
@@ -467,7 +467,7 @@ def get_sn_certificates(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': sez})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def add_iscc_certificate(request, *args, **kwargs):
     context = kwargs['context']
     certificate_id = request.POST.get('certificate_id', False)
@@ -480,7 +480,7 @@ def add_iscc_certificate(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def add_2bs_certificate(request, *args, **kwargs):
     context = kwargs['context']
     certificate_id = request.POST.get('certificate_id', False)
@@ -493,7 +493,7 @@ def add_2bs_certificate(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def add_redcert_certificate(request, *args, **kwargs):
     context = kwargs['context']
     certificate_id = request.POST.get('certificate_id', False)
@@ -506,7 +506,7 @@ def add_redcert_certificate(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def add_sn_certificate(request, *args, **kwargs):
     context = kwargs['context']
     certificate_id = request.POST.get('certificate_id', False)
@@ -519,7 +519,7 @@ def add_sn_certificate(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def delete_iscc_certificate(request, *args, **kwargs):
     entity = kwargs['context']['entity']
     certificate_id = request.POST.get('certificate_id', False)
@@ -534,7 +534,7 @@ def delete_iscc_certificate(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def delete_2bs_certificate(request, *args, **kwargs):
     entity = kwargs['context']['entity']
     certificate_id = request.POST.get('certificate_id', False)
@@ -549,7 +549,7 @@ def delete_2bs_certificate(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def delete_redcert_certificate(request, *args, **kwargs):
     entity = kwargs['context']['entity']
     certificate_id = request.POST.get('certificate_id', False)
@@ -564,7 +564,7 @@ def delete_redcert_certificate(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def delete_sn_certificate(request, *args, **kwargs):
     entity = kwargs['context']['entity']
     certificate_id = request.POST.get('certificate_id', False)
@@ -604,7 +604,7 @@ def get_my_certificates(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': sez_data})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def set_production_site_certificates(request, *args, **kwargs):
     context = kwargs['context']
     certificate_ids = request.POST.getlist('certificate_ids')
@@ -635,7 +635,7 @@ def set_production_site_certificates(request, *args, **kwargs):
 
     return JsonResponse({'status': 'success'})
 
-@check_rights('entity_id', role=[UserRights.ADMIN])
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def set_default_certificate(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -683,7 +683,7 @@ def set_default_certificate(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Unknown certificate_type"}, status=400)
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def update_iscc_certificate(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -715,7 +715,7 @@ def update_iscc_certificate(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def update_2bs_certificate(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -747,7 +747,7 @@ def update_2bs_certificate(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def update_redcert_certificate(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -779,7 +779,7 @@ def update_redcert_certificate(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def update_sn_certificate(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -866,7 +866,7 @@ def get_entity_rights(request, *args, **kwargs):
 
 
 @otp_or_403
-@check_rights('entity_id', UserRights.ADMIN)
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def invite_user(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
