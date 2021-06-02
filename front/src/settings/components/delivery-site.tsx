@@ -1,6 +1,12 @@
 import { Trans, useTranslation } from "react-i18next"
 
-import { Country, DepotType, OwnershipType, EntityType } from "common/types"
+import {
+  Country,
+  DepotType,
+  OwnershipType,
+  EntityType,
+  UserRole,
+} from "common/types"
 import {
   DeliverySiteSettingsHook,
   EntityDeliverySite,
@@ -36,6 +42,7 @@ import RadioGroup from "common/components/radio-group"
 import { SettingsForm } from "./common"
 import useForm from "common/hooks/use-form"
 import { EntitySelection } from "carbure/hooks/use-entity"
+import { useRights } from "carbure/hooks/use-rights"
 
 type DeliverySiteFinderPromptProps = PromptProps<EntityDeliverySite> & {
   entity: EntitySelection
@@ -303,6 +310,9 @@ type DeliverySitesSettingsProps = {
 
 const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
   const { t } = useTranslation()
+  const rights = useRights()
+
+  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
   const depotTypeLabels = {
     [DepotType.EFS]: t("EFS"),
@@ -312,15 +322,17 @@ const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
     [DepotType.OilDepot]: t("Oil Depot"),
   }
 
-  const actions = settings.deleteDeliverySite
-    ? Actions([
-        {
-          icon: Cross,
-          title: t("Supprimer le dépôt"),
-          action: (ds: EntityDeliverySite) => settings.deleteDeliverySite!(ds),
-        },
-      ])
-    : arrow
+  const actions =
+    canModify && settings.deleteDeliverySite
+      ? Actions([
+          {
+            icon: Cross,
+            title: t("Supprimer le dépôt"),
+            action: (ds: EntityDeliverySite) =>
+              settings.deleteDeliverySite!(ds),
+          },
+        ])
+      : arrow
 
   const columns: Column<EntityDeliverySite>[] = [
     padding,
@@ -356,7 +368,7 @@ const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
     <Section id="depot">
       <SectionHeader>
         <Title>Dépôts</Title>
-        {settings.addDeliverySite && (
+        {canModify && settings.addDeliverySite && (
           <Button
             level="primary"
             icon={Plus}
