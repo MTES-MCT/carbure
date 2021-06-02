@@ -458,10 +458,14 @@ def get_declarations(request):
     start = declaration_periods[-1]
     end = ref_period + relativedelta(months=1) - relativedelta(days=1)
 
+    start = pytz.utc.localize(start)
+    end = pytz.utc.localize(end)
+
     # get entities that have posted at least one lot since the beginning of the period
+    operators = [e.id for e in Entity.objects.filter(entity_type=Entity.OPERATOR)]
     entities_alive = [f['lot__added_by'] for f in LotTransaction.objects.filter(lot__added_time__gt=start).values('lot__added_by').annotate(count=Count('lot')).filter(count__gt=1)]
-    entities = Entity.objects.filter(id__in=entities_alive)
-    logging.debug('{} entities alive'.format(entities.count()))
+    to_display = list(set(operators + entities_alive))
+    entities = Entity.objects.filter(id__in=to_display)
 
     # create the SustainabilityDeclaration objects in database
     # 0) cleanup
