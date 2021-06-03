@@ -20,8 +20,7 @@ export function useRelativePush() {
   const history = useHistory()
   const match = useRouteMatch()
 
-  return (to: string, state?: any) =>
-    history.push(pt.join(match.url, to), state)
+  return (to: string) => history.push(pt.join(match.url, to))
 }
 
 type Relative = {

@@ -102,11 +102,19 @@ function renderMonthSummary(
     const { drafts = 0, output = 0, input = 0, corrections = 0 } = decl.lots
     const ev = evaluateDeclaration(decl)
 
-    const pushToTransactions = () =>
-      relativePush(`../transactions/declaration`, {
-        entity: v.entity,
-        period: stdPeriod(decl),
-      })
+    const pushToTransactions = () => {
+      const queryParams = new URLSearchParams()
+
+      queryParams.append("periods", stdPeriod(decl))
+
+      if (v.entity.entity_type === EntityType.Operator) {
+        queryParams.append("clients", v.entity.name)
+      } else {
+        queryParams.append("vendors", v.entity.name)
+      }
+
+      relativePush(`../transactions/declaration?${queryParams}`)
+    }
 
     return (
       <Box

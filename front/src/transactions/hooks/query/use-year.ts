@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { Option } from "common/components/select"
+import { useCallback, useState } from "react"
 
 import { PageSelection } from "../../../common/components/pagination"
 import { FilterSelection } from "./use-filters"
@@ -7,6 +8,7 @@ import { SpecialSelection } from "./use-special"
 export interface YearSelection {
   selected: number
   setYear: (y: number) => void
+  checkYears: (years: Option[]) => void
 }
 
 export default function useYearSelection(
@@ -23,5 +25,19 @@ export default function useYearSelection(
     setSelected(year)
   }
 
-  return { selected, setYear }
+  const checkYears = useCallback(
+    (years: Option[]) => {
+      // if the currently selected year is not in the list of available years
+      // set it to the first available value
+      if (
+        years.length > 0 &&
+        !years.some((option) => option.value === selected)
+      ) {
+        setSelected(years[0].value as number)
+      }
+    },
+    [selected]
+  )
+
+  return { selected, setYear, checkYears }
 }

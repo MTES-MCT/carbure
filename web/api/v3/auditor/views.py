@@ -21,7 +21,7 @@ def get_lots_by_status(txs, status):
     elif status == 'correction':
         txs = txs.filter(delivery_status__in=['AC', 'R', 'AA'])
     elif status == 'declaration':
-        txs = txs.filter(delivery_status__in=['A', 'N'])
+        txs = txs.filter(delivery_status__in=['A', 'N', 'F'])
     return txs
 
 
