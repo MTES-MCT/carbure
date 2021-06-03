@@ -801,7 +801,8 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
     errors = []
 
     # check for empty row
-    if lot_dict.get('volume', None) is None:
+    volume = lot_dict.get('volume', None)
+    if volume is None or volume == '':
         return None, None, "Missing volume"
 
     carbure_id = lot_dict.get('carbure_id', False)
@@ -811,6 +812,7 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
     matiere_premiere = lot_dict.get('matiere_premiere_code', False)
     pays_origine = lot_dict.get('pays_origine_code', False)
     ghg_reduction = lot_dict.get('ghg_reduction', False)
+    ghg_total = lot_dict.get('ghg_total', False)
 
 
 
@@ -843,6 +845,8 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
             matching_txs = matching_txs.filter(lot__matiere_premiere=mp)
         if ghg_reduction:
             matching_txs = matching_txs.filter(lot__ghg_reduction=ghg_reduction)
+        if ghg_total:
+            matching_txs = matching_txs.filter(lot__ghg_total=ghg_total)
         if depot:
             matching_txs = matching_txs.filter(Q(carbure_delivery_site__depot_id=depot) | Q(unknown_delivery_site=depot))
         if pays_origine:

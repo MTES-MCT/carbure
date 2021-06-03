@@ -62,11 +62,11 @@ class SettingsAPITest(TestCase):
         # entity I do not belong to
         response = self.client.post(reverse(url_enable), {'entity_id': self.entity3.id})
         self.assertEqual(response.status_code, 403)
-        # should not pass (not admin)
+        # rights RW, mac option OK
         response = self.client.post(reverse(url_enable), {'entity_id': self.entity2.id})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
         entity = Entity.objects.get(id=self.entity2.id)
-        self.assertEqual(entity.has_mac, False)        
+        self.assertEqual(entity.has_mac, True)
         # should pass
         response = self.client.post(reverse(url_enable), {'entity_id': self.entity1.id})
         self.assertEqual(response.status_code, 200)        
@@ -137,11 +137,7 @@ class SettingsAPITest(TestCase):
         self.assertEqual(entity.has_trading, True)
 
         # should not work on Operator
-        # first because we don't have the rights
-        response = self.client.post(reverse(url_enable), {'entity_id': self.entity2.id})
-        self.assertEqual(response.status_code, 403)
-        UserRights.objects.update_or_create(user=self.user1, entity=self.entity2, defaults={'role': UserRights.ADMIN})
-        # then because operators cannot trade
+        # because operators cannot trade
         response = self.client.post(reverse(url_enable), {'entity_id': self.entity2.id})
         self.assertEqual(response.status_code, 400)        
 
