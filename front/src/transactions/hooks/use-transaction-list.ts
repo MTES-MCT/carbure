@@ -23,16 +23,7 @@ export function useGetSnapshot(entity: EntitySelection, year: YearSelection) {
   const [snapshot, resolveSnapshot] = useAPI(snapshotGetter(entity))
 
   const entityID = entity?.id
-  const years = snapshot.data?.years
-
-  // if the currently selected year is not in the list of available years
-  // set it to the first available value
-  if (
-    years?.length &&
-    !years.some((option) => option.value === year.selected)
-  ) {
-    year.setYear(years[0].value as number)
-  }
+  const checkYears = year.checkYears
 
   function getSnapshot() {
     if (typeof entityID !== "undefined") {
@@ -41,6 +32,12 @@ export function useGetSnapshot(entity: EntitySelection, year: YearSelection) {
   }
 
   useEffect(getSnapshot, [resolveSnapshot, entityID, year.selected])
+
+  useEffect(() => {
+    if (snapshot.data) {
+      checkYears(snapshot.data.years)
+    }
+  }, [snapshot, checkYears])
 
   return { ...snapshot, getSnapshot }
 }

@@ -26,10 +26,9 @@ test("display transaction details", async () => {
   screen.getByText("Déclaration de durabilité")
   screen.getByText("Pour la période")
 
-  await waitWhileLoading()
+  await screen.findByText("Sorties")
+  await screen.findByText("Entrées")
 
-  screen.getByText("Sorties")
-  screen.getByText("Entrées")
   expect(
     screen.getAllByText(
       (_, node) => node?.textContent === `▸ 1 lot ▸ 12 345 litres`
