@@ -207,7 +207,7 @@ def get_lots_summary(request, *args, **kwargs):
             elif status == 'correction':
                 txs = txs.filter(delivery_status__in=['AC', 'R', 'AA'])
             elif status == 'declaration':
-                txs = txs.filter(delivery_status__in=['A', 'N'])
+                txs = txs.filter(delivery_status__in=['A', 'N', 'F'])
             txs = filter_lots(txs, request.GET)[0]
             txs = sort_lots(txs, request.GET)
 
