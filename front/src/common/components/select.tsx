@@ -14,7 +14,7 @@ import {
 } from "./dropdown"
 import { useTranslation } from "react-i18next"
 
-type Value = string | number | null
+type Value = string | number | boolean | null
 export type Option = { value: Value; label: string }
 export type SelectValue = Value | Value[] | null
 
@@ -203,7 +203,7 @@ export const Select = ({
 
               {options.map((option, i) => (
                 <DropdownItem
-                  key={option.value}
+                  key={option.value?.toString() ?? i}
                   title={option.label}
                   focused={focused === i}
                   selected={isSelected(value, option)}

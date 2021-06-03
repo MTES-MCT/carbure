@@ -1,53 +1,37 @@
-import { useState } from "react"
+import { useLayoutEffect, useState } from "react"
 import { useHistory, useLocation } from "react-router-dom"
 
 import { PageSelection } from "common/components/pagination"
 import { SelectValue } from "common/components/select"
-import { Filters, Entity, EntityType } from "common/types"
+import { Filters } from "common/types"
 
-const defaultState = {}
+function useLocationFilters() {
+  const location = useLocation()
+  const [filters, setFilters] = useState<FilterSelection["selected"]>({})
 
-// useful for admins who want to get directly on a filtered page
-// when doing a history.push, you can specify a state
-// it will be accessible from history.location.state on the new page
-function useLocationStateFilters(
-  selected: FilterSelection["selected"],
-  select: FilterSelection["select"]
-) {
-  const { state: loc } = useLocation<{ entity?: Entity; period?: string }>()
+  useLayoutEffect(() => {
+    const queryParams = new URLSearchParams(location.search)
+    const queryFilters: FilterSelection["selected"] = {}
 
-  if (!loc) return
+    queryParams.forEach((value, filter) => {
+      let filterValue: SelectValue = value
+        .split(",")
+        .map((v) => (v === "true" || v === "false" ? v === "true" : v))
 
-  if (loc.entity) {
-    const entity = loc.entity.name
-    const type = loc.entity.entity_type
+      if (filterValue) {
+        queryFilters[filter as Filters] = filterValue
+      }
+    })
 
-    const isVendor = [EntityType.Producer, EntityType.Trader].includes(type)
-    const isClient = type === EntityType.Operator
+    setFilters(queryFilters)
+  }, [location.search])
 
-    const vendors = (selected.vendors as Array<string>) ?? []
-    const clients = (selected.clients as Array<string>) ?? []
-
-    if (isVendor && !vendors.includes(entity)) {
-      select(Filters.Vendors, [...vendors, entity], false)
-    }
-
-    if (isClient && !clients.includes(entity)) {
-      select(Filters.Clients, [...clients, entity], false)
-    }
-  }
-
-  if (loc.period) {
-    const periods = (selected.periods as Array<string>) ?? []
-    if (!periods.includes(loc.period)) {
-      select(Filters.Periods, [...periods, loc.period], false)
-    }
-  }
+  return filters
 }
 
 export interface FilterSelection {
   selected: { [k in Filters]?: SelectValue }
-  select: (type: Filters, value: SelectValue, resetHistory?: boolean) => void
+  select: (type: Filters, value: SelectValue) => void
   reset: () => void
   isFiltered: () => boolean
 }
@@ -57,24 +41,31 @@ export default function useFilterSelection(
   pagination: PageSelection
 ): FilterSelection {
   const history = useHistory()
+  const location = useLocation()
+  const selected = useLocationFilters()
 
-  const [selected, setFilters] =
-    useState<FilterSelection["selected"]>(defaultState)
+  function select(type: Filters, value: SelectValue) {
+    const queryParams = new URLSearchParams(location.search)
 
-  function select(
-    type: Filters,
-    value: SelectValue,
-    resetHistory: boolean = true
-  ) {
-    pagination.setPage(0)
-    setFilters({ ...selected, [type]: value })
-    resetHistory && history.replace({ state: null })
+    if (Array.isArray(value) && value.length > 0) {
+      queryParams.set(type, value.toString())
+    } else {
+      queryParams.delete(type)
+    }
+
+    const queryString = queryParams.toString().replaceAll("%2C", ",")
+
+    if (queryString) {
+      pagination.setPage(0)
+      history.push(`?${queryString}`)
+    } else {
+      reset()
+    }
   }
 
   function reset() {
     pagination.setPage(0)
-    setFilters(defaultState)
-    history.replace({ state: null })
+    // history.push({ search: "" })
   }
 
   function isFiltered() {
@@ -86,8 +77,6 @@ export default function useFilterSelection(
       }
     })
   }
-
-  useLocationStateFilters(selected, select)
 
   return { selected, select, reset, isFiltered }
 }
