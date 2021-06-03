@@ -1133,9 +1133,9 @@ def notify_accepted_lot_change(tx):
 
 def invalidate_declaration(tx, entity):
     year, month = tx.lot.period.split('-')
-    period = datetime.date(year=year, month=int(month), day=1)
+    period = datetime.date(year=int(year), month=int(month), day=1)
     try:
-        sd = SustainabilityDeclaration.objects.filter(entity=entity, period=period)
+        sd = SustainabilityDeclaration.objects.get(entity=entity, period=period)
         sd.declared = False
         sd.checked = False
         sd.save()
