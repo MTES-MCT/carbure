@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useLocation } from "react-router-dom"
+import { useHistory, useLocation } from "react-router-dom"
 
 import { PageSelection } from "common/components/pagination"
 import { SelectValue } from "common/components/select"
@@ -29,25 +29,25 @@ function useLocationStateFilters(
     const clients = (selected.clients as Array<string>) ?? []
 
     if (isVendor && !vendors.includes(entity)) {
-      select(Filters.Vendors, [...vendors, entity])
+      select(Filters.Vendors, [...vendors, entity], false)
     }
 
     if (isClient && !clients.includes(entity)) {
-      select(Filters.Clients, [...clients, entity])
+      select(Filters.Clients, [...clients, entity], false)
     }
   }
 
   if (loc.period) {
     const periods = (selected.periods as Array<string>) ?? []
     if (!periods.includes(loc.period)) {
-      select(Filters.Periods, [...periods, loc.period])
+      select(Filters.Periods, [...periods, loc.period], false)
     }
   }
 }
 
 export interface FilterSelection {
   selected: { [k in Filters]?: SelectValue }
-  select: (type: Filters, value: SelectValue) => void
+  select: (type: Filters, value: SelectValue, resetHistory?: boolean) => void
   reset: () => void
   isFiltered: () => boolean
 }
@@ -56,18 +56,25 @@ export interface FilterSelection {
 export default function useFilterSelection(
   pagination: PageSelection
 ): FilterSelection {
-  const [selected, setFilters] = useState<FilterSelection["selected"]>(
-    defaultState
-  )
+  const history = useHistory()
 
-  function select(type: Filters, value: SelectValue) {
+  const [selected, setFilters] =
+    useState<FilterSelection["selected"]>(defaultState)
+
+  function select(
+    type: Filters,
+    value: SelectValue,
+    resetHistory: boolean = true
+  ) {
     pagination.setPage(0)
     setFilters({ ...selected, [type]: value })
+    resetHistory && history.replace({ state: null })
   }
 
   function reset() {
     pagination.setPage(0)
     setFilters(defaultState)
+    history.replace({ state: null })
   }
 
   function isFiltered() {
