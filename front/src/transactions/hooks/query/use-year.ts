@@ -29,7 +29,10 @@ export default function useYearSelection(
     (years: Option[]) => {
       // if the currently selected year is not in the list of available years
       // set it to the first available value
-      if (!years.some((option) => option.value === selected)) {
+      if (
+        years.length > 0 &&
+        !years.some((option) => option.value === selected)
+      ) {
         setSelected(years[0].value as number)
       }
     },
