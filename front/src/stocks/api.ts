@@ -53,9 +53,12 @@ export function getStocks(query: TransactionQuery): Promise<Lots> {
 }
 
 export function getStocksSummary(
-  query: TransactionQuery
+  query: TransactionQuery,
+  selection: number[]
 ): Promise<TransactionSummary> {
-  return api.get("/stocks/summary", query).then(normalizeSummary)
+  return api
+    .get("/stocks/summary", { ...query, limit: null, page: 0, selection })
+    .then(normalizeSummary)
 }
 
 export function downloadStocks(query: TransactionQuery) {
