@@ -59,7 +59,9 @@ export function getStatus(
   if (status === "draft") {
     return LotStatus.Draft
   } else if (status === "validated") {
-    if (delivery === "A") {
+    if (delivery === "F") {
+      return LotStatus.Declaration
+    } else if (delivery === "A") {
       return LotStatus.Accepted
     }
     // OPERATEUR

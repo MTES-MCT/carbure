@@ -109,7 +109,8 @@ export default function useAcceptLots(
       <CommentWithTypePrompt
         title="Demander une correction"
         description="Voulez-vous renvoyer ce lot à son fournisseur pour correction ?"
-        onResolve={resolve} />
+        onResolve={resolve}
+      />
     ))
 
     if (entity !== null && result) {
@@ -126,13 +127,12 @@ export default function useAcceptLots(
       <CommentPrompt
         title="Corriger le lot"
         description="Voulez-vous modifier ce lot accepté ? Si la déclaration pour cette période a déjà été validée, il vous faudra la soumettre à nouveau une fois la correction acceptée par votre client."
-        onResolve={resolve} />
+        onResolve={resolve}
+      />
     ))
 
     if (entity !== null && comment) {
-      await notifyCorrection(
-        resolveAmendLot(entity.id, txID, comment)
-      )
+      await notifyCorrection(resolveAmendLot(entity.id, txID, comment))
     }
 
     return Boolean(comment)
@@ -187,6 +187,6 @@ export default function useAcceptLots(
     acceptSelection,
     acceptAllInbox,
     amendLot,
-    askForCorrection
+    askForCorrection,
   }
 }
