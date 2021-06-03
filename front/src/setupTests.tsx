@@ -6,6 +6,11 @@ import { configure } from "@testing-library/dom"
 import { I18nextProvider, initReactI18next } from "react-i18next"
 import Backend from "i18next-http-backend"
 import { LoaderOverlay } from "common/components"
+import { AppHook, useApp } from "carbure/hooks/use-app"
+import { MemoryRouter, Route } from "react-router"
+import { UserRightProvider } from "carbure/hooks/use-rights"
+import { Entity } from "common/types"
+import { producer } from "common/__test__/data"
 
 configure({
   getElementError(message) {
@@ -50,18 +55,33 @@ i18n
     },
   })
 
+type TestRootProps = {
+  url?: string
+  children: React.ReactNode | ((app: AppHook) => React.ReactNode)
+}
+
+export const TestRoot = ({ url = "/org/0", children }: TestRootProps) => {
+  const app = useApp()
+  const element = typeof children === "function" ? children(app) : children
+
+  return (
+    <MemoryRouter initialEntries={[url]}>
+      <I18nextProvider i18n={i18n}>
+        <Suspense fallback={<LoaderOverlay />}>
+          <Route path="/org/:entity">
+            <UserRightProvider app={app}>{element}</UserRightProvider>
+          </Route>
+        </Suspense>
+      </I18nextProvider>
+    </MemoryRouter>
+  )
+}
+
 export function render(element: any) {
   const root = document.createElement("div")
   root.setAttribute("id", "root")
   document.body.append(root)
-
-  const jsx = (
-    <I18nextProvider i18n={i18n}>
-      <Suspense fallback={<LoaderOverlay />}>{element}</Suspense>
-    </I18nextProvider>
-  )
-
-  return baseRender(jsx, { container: root })
+  return baseRender(element, { container: root })
 }
 
 beforeEach(() => {

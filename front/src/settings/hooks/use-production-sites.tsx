@@ -2,7 +2,7 @@ import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 
 import { EntitySelection } from "carbure/hooks/use-entity"
-import { ProductionSiteDetails } from "common/types"
+import { ProductionSiteDetails, UserRole } from "common/types"
 
 import useAPI from "common/hooks/use-api"
 import * as api from "../api"
@@ -12,6 +12,7 @@ import {
 } from "../components/production-site"
 import { confirm, prompt } from "common/components/dialog"
 import { useNotificationContext } from "common/components/notifications"
+import { useRights } from "carbure/hooks/use-rights"
 
 export interface ProductionSiteSettingsHook {
   isEmpty: boolean
@@ -27,7 +28,10 @@ export default function useProductionSites(
   entity: EntitySelection
 ): ProductionSiteSettingsHook {
   const { t } = useTranslation()
+  const rights = useRights()
   const notifications = useNotificationContext()
+
+  const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
   const [requestGetProductionSites, resolveGetProductionSites] = useAPI(api.getProductionSites) // prettier-ignore
   const [requestAddProductionSite, resolveAddProductionSite] = useAPI(api.addProductionSite) // prettier-ignore
@@ -118,6 +122,7 @@ export default function useProductionSites(
         entity={entity}
         productionSite={ps}
         onResolve={resolve}
+        readOnly={!canModify}
       />
     ))
 

@@ -1,4 +1,4 @@
-import { render } from "setupTests"
+import { render, TestRoot } from "setupTests"
 import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "common/components/relative-route"
@@ -6,7 +6,6 @@ import { Entity, LotStatus } from "common/types"
 
 import { producer } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
-import { MemoryRouter } from "react-router-dom"
 import Transactions from "../index"
 import { clickOnCheckboxesAndConfirm } from "./helpers"
 
@@ -20,7 +19,6 @@ import {
   manyLots,
   snapshot,
 } from "./data"
-import { Suspense } from "react"
 
 const TransactionsWithRouter = ({
   entity,
@@ -29,13 +27,11 @@ const TransactionsWithRouter = ({
   entity: Entity
   status: LotStatus
 }) => (
-  <MemoryRouter initialEntries={[`/org/0/transactions/${status}`]}>
-    <Suspense fallback="...">
-      <Route path="/org/0/transactions/:status">
-        <Transactions entity={entity} />
-      </Route>
-    </Suspense>
-  </MemoryRouter>
+  <TestRoot url={`/org/0/transactions/${status}`}>
+    <Route path="/org/0/transactions/:status">
+      <Transactions entity={entity} />
+    </Route>
+  </TestRoot>
 )
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
@@ -231,7 +227,7 @@ test("check error filter", async () => {
 
   await screen.findByText(
     (content, node) =>
-      node.textContent ===
+      node?.textContent ===
       "Parmi ces résultats, 1 lot présente des incohérences"
   )
 
@@ -240,7 +236,7 @@ test("check error filter", async () => {
   await waitWhileLoading()
 
   await screen.findByText(
-    (content, node) => node.textContent === "1 lot présente des incohérences"
+    (content, node) => node?.textContent === "1 lot présente des incohérences"
   )
 
   userEvent.click(screen.getByText("Revenir à la liste complète"))
@@ -263,7 +259,7 @@ test("check deadline filter", async () => {
 
   await screen.findByText(
     (content, node) =>
-      node.textContent ===
+      node?.textContent ===
       "Parmi ces résultats, 1 lot doit être validé et envoyé avant le 29 février"
   )
 
@@ -273,7 +269,7 @@ test("check deadline filter", async () => {
 
   await screen.findByText(
     (content, node) =>
-      node.textContent ===
+      node?.textContent ===
       "1 lot doit être validé et envoyé avant le 29 février"
   )
 
@@ -408,15 +404,13 @@ test("producer/trader: sent draft lot", async () => {
 test("producer/trader: send all draft lots", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
-  const button = screen.getByText("Envoyer tout").closest("button")!
-  expect(button).toBeDisabled()
-
   await waitWhileLoading()
+
+  const button = screen.getByText("Envoyer tout").closest("button")!
+  expect(button).not.toBeDisabled()
 
   // wait for the lot to be loaded
   await screen.findByText("DAETEST")
-
-  expect(button).not.toBeDisabled()
 
   // click on the send all button
   userEvent.click(button)
@@ -500,15 +494,12 @@ test("producer/trader: delete draft lot", async () => {
 test("producer/trader: delete all draft lot", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={producer} />)
 
-  const button = screen.getByText("Supprimer tout").closest("button")!
-  expect(button).toBeDisabled()
-
   await waitWhileLoading()
+
+  const button = screen.getByText("Supprimer tout").closest("button")!
 
   // wait for the lot to be loaded
   await screen.findByText("DAETEST")
-
-  expect(button).not.toBeDisabled()
 
   // click on the send all button
   userEvent.click(button)

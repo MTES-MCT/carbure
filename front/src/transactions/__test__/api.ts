@@ -16,6 +16,7 @@ import {
 
 import { clone } from "common/__test__/helpers"
 import * as data from "./data"
+import { okSettings } from "settings/__test__/api"
 
 let snapshot: any
 let lots: any
@@ -65,17 +66,33 @@ export const okLotsSummary = rest.get(
   }
 )
 
+export const okAdminSummary = rest.get(
+  "/api/v3/admin/lots/summary",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success", data: data.generalSummary }))
+  }
+)
+
+export const okAuditorSummary = rest.get(
+  "/api/v3/auditor/summary",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success", data: data.generalSummary }))
+  }
+)
+
 export const okDeclarationSummary = rest.post(
   "/api/v3/lots/declaration-summary",
   (req, res, ctx) => {
-    return res(ctx.json({ 
-      status: "success", 
-      data: { 
-        ...data.lotsSummary, 
-        declaration: data.declaration,
-        remaining: 2
-      }
-    }))
+    return res(
+      ctx.json({
+        status: "success",
+        data: {
+          ...data.lotsSummary,
+          declaration: data.declaration,
+          remaining: 2,
+        },
+      })
+    )
   }
 )
 
@@ -206,6 +223,7 @@ export const okAdminSnapshot = rest.get(
 )
 
 export default setupServer(
+  okSettings,
   okSnapshot,
   okLots,
   okDuplicateLot,
@@ -227,8 +245,10 @@ export default setupServer(
   okAdminLots,
   okAdminSnapshot,
   okLotsSummary,
+  okAdminSummary,
+  okAuditorSummary,
   okDeclarationSummary,
   okTranslations,
   okErrorsTranslations,
-  okFieldsTranslations,
+  okFieldsTranslations
 )

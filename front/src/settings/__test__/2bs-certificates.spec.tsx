@@ -1,4 +1,4 @@
-import { render } from "setupTests"
+import { render, TestRoot } from "setupTests"
 import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
@@ -9,14 +9,16 @@ import {
   producer,
 } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
-import { useGetSettings } from "settings/hooks/use-get-settings"
 import Settings from "../index"
 
 import server, { set2BSCertificates } from "./api"
 
 const SettingsWithHooks = ({ entity }: { entity: Entity }) => {
-  const settings = useGetSettings()
-  return <Settings entity={entity} settings={settings} />
+  return (
+    <TestRoot>
+      {(app) => <Settings entity={entity} settings={app.settings} />}
+    </TestRoot>
+  )
 }
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
