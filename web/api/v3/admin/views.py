@@ -8,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
 from core.decorators import is_admin
 from django.contrib.auth import get_user_model
-from core.models import Entity, UserRights, Control, ControlMessages, ProductionSite, LotV2
+from core.models import Entity, UserRights, Control, ControlMessages, ProductionSite, LotV2, GenericError
 from django.db.models import Q, Count, Subquery, OuterRef, Value, IntegerField
 from django.contrib.auth.forms import PasswordResetForm
 from django.core.mail import send_mail
@@ -197,7 +197,7 @@ def get_lots_summary(request, *args, **kwargs):
     selection = request.GET.getlist('selection')
 
     try:
-        txs = LotTransaction.objects.filter(lot__status='Validated')
+        txs = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED)
 
         if len(selection) > 0:
             txs = txs.filter(pk__in=selection)
@@ -205,9 +205,9 @@ def get_lots_summary(request, *args, **kwargs):
             if status == 'alert':
                 txs = get_lots_with_errors(txs)
             elif status == 'correction':
-                txs = txs.filter(delivery_status__in=['AC', 'R', 'AA'])
+                txs = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED])
             elif status == 'declaration':
-                txs = txs.filter(delivery_status__in=['A', 'N'])
+                txs = txs.filter(delivery_status__in=[LotTransaction.FROZEN, LotTransaction.ACCEPTED, LotTransaction.PENDING])
             txs = filter_lots(txs, request.GET)[0]
             txs = sort_lots(txs, request.GET)
 
@@ -643,11 +643,22 @@ def controls_add_message(request):
 
 @is_admin
 def ack_alerts(request):
+    error_ids = request.POST.getlist('error_ids', False)
+    if not error_ids:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing error_ids"}, status=400)
+
+    GenericError.objects.filter(id__in=error_ids).update(acked_by_admin=True)
     return JsonResponse({'status': 'success'})
+
 
 
 @is_admin
 def highlight_alerts(request):
+    error_ids = request.POST.getlist('error_ids', False)
+    if not error_ids:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing error_ids"}, status=400)
+
+    GenericError.objects.filter(id__in=error_ids).update(highlighted_by_admin=True)
     return JsonResponse({'status': 'success'})
 
 
