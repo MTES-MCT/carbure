@@ -114,7 +114,7 @@ def get_snapshot(request, *args, **kwargs):
         lots = {}
         lots['alert'] = txs.annotate(Count('genericerror')).filter(genericerror__count__gt=0).count()
         lots['correction'] = txs.filter(delivery_status__in=['AC', 'AA', 'R']).count()
-        lots['declaration'] = txs.filter(delivery_status__in=['A', 'N']).count()
+        lots['declaration'] = txs.filter(delivery_status__in=['A', 'N', 'F']).count()
 
         filters = get_snapshot_filters(txs, [
             'delivery_status',
