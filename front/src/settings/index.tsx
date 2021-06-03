@@ -24,7 +24,7 @@ import Sticky from "common/components/sticky"
 import useREDCertCertificates from "./hooks/use-redcert-certificates"
 import UserRights from "./components/user-rights"
 import { useRights } from "carbure/hooks/use-rights"
-import { UserRole } from "common/types"
+import { EntityType, UserRole } from "common/types"
 
 function useSettings(entity: EntitySelection, settings: SettingsGetter) {
   const company = useCompany(entity, settings)
@@ -64,9 +64,10 @@ const Settings = ({ entity, settings }: SettingsProps) => {
 
   const rights = useRights()
 
-  const isProducer = entity?.entity_type === "Producteur"
-  const isTrader = entity?.entity_type === "Trader"
-  const isOperator = entity?.entity_type === "Opérateur"
+  const isProducer = entity?.entity_type === EntityType.Producer
+  const isTrader = entity?.entity_type === EntityType.Trader
+  const isOperator = entity?.entity_type === EntityType.Operator
+  const isAuditor = entity?.entity_type === EntityType.Auditor
 
   const hasCertificates = isProducer || isTrader
   const hasCSN = isProducer || isOperator
@@ -78,12 +79,16 @@ const Settings = ({ entity, settings }: SettingsProps) => {
       </SettingsHeader>
 
       <Sticky>
-        <a href="#options">
-          <Trans>Options</Trans>
-        </a>
-        <a href="#depot">
-          <Trans>Dépôts</Trans>
-        </a>
+        {!isAuditor && (
+          <a href="#options">
+            <Trans>Options</Trans>
+          </a>
+        )}
+        {!isAuditor && (
+          <a href="#depot">
+            <Trans>Dépôts</Trans>
+          </a>
+        )}
         {isProducer && (
           <a href="#production">
             <Trans>Sites de production</Trans>
@@ -122,8 +127,8 @@ const Settings = ({ entity, settings }: SettingsProps) => {
       </Sticky>
 
       <SettingsBody>
-        <CompanySettings entity={entity} settings={company} />
-        <DeliverySitesSettings settings={deliverySites} />
+        {!isAuditor && <CompanySettings entity={entity} settings={company} />}
+        {!isAuditor && <DeliverySitesSettings settings={deliverySites} />}
 
         {isProducer && <ProductionSitesSettings settings={productionSites} />}
 
