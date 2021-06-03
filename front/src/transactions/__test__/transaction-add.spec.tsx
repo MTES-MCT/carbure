@@ -1,4 +1,4 @@
-import { render } from "setupTests"
+import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "common/components/relative-route"
@@ -6,11 +6,9 @@ import { Entity } from "common/types"
 
 import { operator, producer, trader } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
-import { MemoryRouter } from "react-router-dom"
 import TransactionAdd from "../routes/transaction-add"
 
 import server from "./api"
-import { Suspense } from "react"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
@@ -26,14 +24,12 @@ const TransactionAddWithRouter = ({
   children?: React.ReactNode
   refresh?: () => void
 }) => (
-  <Suspense fallback="...">
-    <MemoryRouter initialEntries={["/org/0/transactions/draft/add"]}>
-      <Route path="/org/0/transactions/draft/add">
-        <TransactionAdd entity={entity} refresh={refresh} />
-      </Route>
-      {children}
-    </MemoryRouter>
-  </Suspense>
+  <TestRoot url={"/org/0/transactions/draft/add"}>
+    <Route path="/org/0/transactions/draft/add">
+      <TransactionAdd entity={entity} refresh={refresh} />
+    </Route>
+    {children}
+  </TestRoot>
 )
 
 function checkLotFields() {

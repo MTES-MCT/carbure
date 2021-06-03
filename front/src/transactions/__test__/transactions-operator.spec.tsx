@@ -1,4 +1,4 @@
-import { render } from "setupTests"
+import { render, TestRoot } from "setupTests"
 import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "common/components/relative-route"
@@ -6,13 +6,11 @@ import { Entity, LotStatus } from "common/types"
 
 import { operator } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
-import { MemoryRouter } from "react-router-dom"
 import Transactions from "../index"
 import { clickOnCheckboxesAndConfirm } from "./helpers"
 
 import server, { setLots, setSnapshot } from "./api"
 import { emptyLots, lots, operatorSnapshot } from "./data"
-import { Suspense } from "react"
 
 const TransactionsWithRouter = ({
   entity,
@@ -21,13 +19,11 @@ const TransactionsWithRouter = ({
   entity: Entity
   status: LotStatus
 }) => (
-  <MemoryRouter initialEntries={[`/org/0/transactions/${status}`]}>
-    <Suspense fallback="...">
-      <Route path="/org/0/transactions/:status">
-        <Transactions entity={entity} />
-      </Route>
-    </Suspense>
-  </MemoryRouter>
+  <TestRoot url={`/org/0/transactions/${status}`}>
+    <Route path="/org/0/transactions/:status">
+      <Transactions entity={entity} />
+    </Route>
+  </TestRoot>
 )
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
@@ -207,10 +203,9 @@ test("operator: sent draft lot", async () => {
 test("operator: send all draft lots", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={operator} />)
 
-  const button = screen.getByText("Envoyer tout").closest("button")!
-  expect(button).toBeDisabled()
-
   await waitWhileLoading()
+
+  const button = screen.getByText("Envoyer tout").closest("button")!
 
   // wait for the lot to be loaded
   await screen.findByText("DAETEST")
@@ -300,10 +295,9 @@ test("operator: delete draft lot", async () => {
 test("operator: delete all draft lot", async () => {
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={operator} />)
 
-  const button = screen.getByText("Supprimer tout").closest("button")!
-  expect(button).toBeDisabled()
-
   await waitWhileLoading()
+
+  const button = screen.getByText("Supprimer tout").closest("button")!
 
   // wait for the lot to be loaded
   await screen.findByText("DAETEST")
@@ -413,10 +407,9 @@ test("operator: accept inbox lot (sous réserve)", async () => {
 test("operator: accept all inbox lots", async () => {
   render(<TransactionsWithRouter status={LotStatus.Inbox} entity={operator} />)
 
-  const button = screen.getByText("Accepter tout").closest("button")!
-  expect(button).toBeDisabled()
-
   await waitWhileLoading()
+
+  const button = screen.getByText("Accepter tout").closest("button")!
 
   // wait for the lot to be loaded
   await screen.findByText("DAETEST")
@@ -508,10 +501,9 @@ test("operator: reject inbox lot", async () => {
 test("operator: reject all inbox lots", async () => {
   render(<TransactionsWithRouter status={LotStatus.Inbox} entity={operator} />)
 
-  const button = screen.getByText("Refuser tout").closest("button")!
-  expect(button).toBeDisabled()
-
   await waitWhileLoading()
+
+  const button = screen.getByText("Refuser tout").closest("button")!
 
   // wait for the lot to be loaded
   await screen.findByText("DAETEST")

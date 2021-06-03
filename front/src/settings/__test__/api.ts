@@ -13,6 +13,8 @@ import {
   redcertCertificate,
   snCertificate,
   entityRights,
+  entityRight,
+  entityRequest,
 } from "common/__test__/data"
 import {
   okCountrySearch,
@@ -72,10 +74,13 @@ export const okSettings = rest.get("/api/v3/settings", (req, res, ctx) => {
       data: {
         email: "producer@test.com",
         rights: [
-          { entity: producer, rights: "rw" },
-          { entity: operator, rights: "rw" },
+          { ...entityRight, entity },
+          { ...entityRight, entity: operator },
         ],
-        requests: [],
+        requests: [
+          { ...entityRight, entity },
+          { ...entityRequest, entity: operator },
+        ],
       },
     })
   )
@@ -446,5 +451,5 @@ export default setupServer(
   okEntityRights,
   okTranslations,
   okErrorsTranslations,
-  okFieldsTranslations,
+  okFieldsTranslations
 )

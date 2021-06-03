@@ -1,21 +1,29 @@
-import { render } from "setupTests"
+import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
-import { Entity } from "common/types"
 import { producer, productionSite } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
-import { useGetSettings } from "settings/hooks/use-get-settings"
 import Settings from "../index"
 
-import server, { setDeliverySites, setProductionSites } from "./api"
+import server, { setDeliverySites, setEntity, setProductionSites } from "./api"
 
-const SettingsWithHooks = ({ entity }: { entity: Entity }) => {
-  const settings = useGetSettings()
-  return <Settings entity={entity} settings={settings} />
+const SettingsWithHooks = () => {
+  return (
+    <TestRoot url="/org/0/settings">
+      {(app) => (
+        <Settings
+          entity={app.settings.data?.rights[0].entity ?? null}
+          settings={app.settings}
+        />
+      )}
+    </TestRoot>
+  )
 }
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
+
+beforeEach(() => setEntity(producer))
 
 afterEach(() => {
   server.resetHandlers()
@@ -26,7 +34,7 @@ afterEach(() => {
 afterAll(() => server.close())
 
 test("check the production site section of the settings", async () => {
-  render(<SettingsWithHooks entity={producer} />)
+  render(<SettingsWithHooks />)
 
   await waitWhileLoading()
 
@@ -36,12 +44,11 @@ test("check the production site section of the settings", async () => {
 })
 
 test("add a production site in settings", async () => {
-  render(<SettingsWithHooks entity={producer} />)
+  render(<SettingsWithHooks />)
 
   await waitWhileLoading()
 
   const button = screen.getByText("Ajouter un site de production")
-
   userEvent.click(button)
 
   screen.getByText("Ajout site de production")
@@ -72,7 +79,7 @@ test("add a production site in settings", async () => {
 test("update a production site details", async () => {
   setProductionSites([productionSite])
 
-  render(<SettingsWithHooks entity={producer} />)
+  render(<SettingsWithHooks />)
 
   await waitWhileLoading()
 
@@ -113,7 +120,7 @@ test("update a production site details", async () => {
 test("remove a production site section in settings", async () => {
   setProductionSites([productionSite])
 
-  render(<SettingsWithHooks entity={producer} />)
+  render(<SettingsWithHooks />)
 
   await waitWhileLoading()
 

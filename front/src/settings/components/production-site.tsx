@@ -96,9 +96,6 @@ export const ProductionSitePrompt = ({
   onResolve,
 }: ProductionSitePromptProps) => {
   const { t } = useTranslation()
-  const rights = useRights()
-
-  readOnly = readOnly || !rights.is(UserRole.Admin, UserRole.ReadWrite)
 
   const { data, hasChange, onChange } = useForm<ProductionSiteState>({
     site_id: productionSite?.site_id ?? "",

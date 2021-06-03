@@ -1,12 +1,11 @@
 import merge from "merge"
-import { render } from "setupTests"
+import { render, TestRoot } from "setupTests"
 import {
   screen,
   waitFor,
   waitForElementToBeRemoved,
 } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { MemoryRouter } from "react-router-dom"
 import { Route } from "common/components/relative-route"
 import { Entity } from "common/types"
 
@@ -29,7 +28,6 @@ import {
 } from "./data"
 import { waitWhileLoading } from "common/__test__/helpers"
 import { clickOnCheckboxesAndConfirm } from "./helpers"
-import { Suspense } from "react"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
@@ -59,11 +57,11 @@ const TransactionWithHook = ({ entity }: { entity: Entity }) => {
 }
 
 const TransactionWithRouter = ({ entity }: { entity: Entity }) => (
-  <MemoryRouter initialEntries={["/org/0/transactions/draft/0"]}>
-    <Route path="/org/0/transactions/:status">
+  <TestRoot url={`/org/${entity.id}/transactions/draft/0`}>
+    <Route path={`/org/${entity.id}/transactions/:status`}>
       <TransactionWithHook entity={entity} />
     </Route>
-  </MemoryRouter>
+  </TestRoot>
 )
 
 function checkLotFields() {
@@ -271,10 +269,14 @@ test("check transaction errors", async () => {
       node?.textContent === "Ce lot doit être validé avant le 29 février 2020"
   )
 
-  const dae = screen.getByTitle("Numéro douanier (DAE, DAA...) - Le DAE (ou équivalent) est manquant")
+  const dae = screen.getByTitle(
+    "Numéro douanier (DAE, DAA...) - Le DAE (ou équivalent) est manquant"
+  )
   expect(dae).toHaveClass("errorLabel")
 
-  const mp = screen.getByTitle("Matière première - La matière première est manquante")
+  const mp = screen.getByTitle(
+    "Matière première - La matière première est manquante"
+  )
   expect(mp).toHaveClass("errorLabel")
 
   screen.getByText("Erreurs (2)")
@@ -282,7 +284,9 @@ test("check transaction errors", async () => {
   screen.getByText("La matière première est manquante")
 
   screen.getByText("Remarques (1)")
-  screen.getByText("La matière première est incohérente avec le biocarburant - Biogaz de blé")
+  screen.getByText(
+    "La matière première est incohérente avec le biocarburant - Biogaz de blé"
+  )
 
   userEvent.click(screen.getByText("Retour"))
 })
@@ -414,7 +418,7 @@ test("accept inbox lot from details", async () => {
 
   await screen.findByText("En attente")
 
-  userEvent.click(screen.getByText("Accepter"))
+  userEvent.click(await screen.findByText("Accepter"))
 
   // confirm the transaction
   screen.getByText("Accepter lot")
@@ -440,7 +444,7 @@ test("accept sous reserve inbox lot from details", async () => {
 
   const status = await screen.findByText("En attente")
 
-  userEvent.click(screen.getByText("Accepter sous réserve"))
+  userEvent.click(await screen.findByText("Accepter sous réserve"))
 
   screen.getByText("Accepter lot")
   userEvent.click(screen.getByText("Les deux"))
@@ -463,7 +467,7 @@ test("reject inbox lot from details", async () => {
 
   await screen.findByText("En attente")
 
-  userEvent.click(screen.getByText("Refuser"))
+  userEvent.click(await screen.findByText("Refuser"))
 
   // confirm the transaction
   screen.getByText("Refuser lot")
