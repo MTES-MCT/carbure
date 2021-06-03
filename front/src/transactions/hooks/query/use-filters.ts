@@ -65,7 +65,7 @@ export default function useFilterSelection(
 
   function reset() {
     pagination.setPage(0)
-    // history.push({ search: "" })
+    history.push({ search: "" })
   }
 
   function isFiltered() {
