@@ -126,7 +126,7 @@ export default function useSendLot(
           ? sent.delivery_site.depot_id
           : sent.delivery_site ?? "",
         delivery_site_country: sent.delivery_site_country?.code_pays,
-        vendor_certificate: sent.carbure_vendor_certificate
+        vendor_certificate: sent.carbure_vendor_certificate,
       }
 
       notifyCreated(resolveCreate(entity.id, [draft]))
@@ -157,6 +157,7 @@ export default function useSendLot(
         title="Envoyer la sélection"
         description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
         query={query}
+        selection={selection.selected}
         onResolve={resolve}
       />
     ))
