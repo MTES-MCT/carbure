@@ -626,3 +626,27 @@ class TransactionUpdateHistory(models.Model):
         db_table = 'transactions_updates'
         verbose_name = 'Transaction Update'
         verbose_name_plural = 'Transaction Updates'
+
+
+class EmailNotification(models.Model):
+    CORRECTION_REQUEST = "CORRECTION_REQUEST"
+    CORRECTION_DONE = "CORRECTION_DONE"
+    LOT_CHANGED = "LOT_CHANGED"
+    LOT_REJECTED = "LOT_REJECTED"
+    LOT_PENDING = "LOT_PENDING"
+    DEADLINE_APPROACHING = "DEADLINE_APPROACHING"
+    DOCUMENTATION_REQUESTED = "DOCUMENTATION_REQUESTED"
+    NOTIFICATION_TYPE = ((CORRECTION_REQUEST, CORRECTION_REQUEST), (CORRECTION_DONE, CORRECTION_DONE), (LOT_CHANGED, LOT_CHANGED), 
+                         (LOT_REJECTED, LOT_REJECTED), (LOT_PENDING, LOT_PENDING), (DEADLINE_APPROACHING, DEADLINE_APPROACHING),
+                         (DOCUMENTATION_REQUESTED, DOCUMENTATION_REQUESTED))
+
+    datetime = models.DateTimeField(auto_now_add=True)
+    linked_tx = models.ForeignKey(LotTransaction, null=True, blank=True, on_delete=models.CASCADE)
+    notif_type = models.CharField(max_length=32, null=False, blank=False, choices=NOTIFICATION_TYPE, default="")
+    entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE)
+    sent = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'email_notifications'
+        verbose_name = 'Email Notification'
+        verbose_name_plural = 'Email Notifications'
