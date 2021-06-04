@@ -1,21 +1,20 @@
 import datetime
-from web.core.models import EmailNotification
 import openpyxl
 from django import db
 from django.db.models import Q, Count
-from multiprocessing import Process
 import numpy as np
 import traceback
 import os
 
 import pandas as pd
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import TYPE_CHECKING, List
 from pandas._typing import FilePathOrBuffer, Scalar
 from django.db import transaction
 
 
-from core.models import LotV2, LotTransaction, UserRights, GenericError, TransactionUpdateHistory
-from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot, SustainabilityDeclaration
+from core.models import LotV2, LotTransaction, GenericError, TransactionUpdateHistory
+from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
+from core.models import EmailNotification
 
 from certificates.models import ISCCCertificate, EntityISCCTradingCertificate
 from certificates.models import DBSCertificate, EntityDBSTradingCertificate
