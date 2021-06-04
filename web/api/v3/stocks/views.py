@@ -166,7 +166,7 @@ def get_depots(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': depots})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 def create_drafts(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = request.POST.get('entity_id', False)
@@ -258,7 +258,7 @@ def get_template_mass_balance_bcghg(request, *args, **kwargs):
     except Exception:
         return JsonResponse({'status': "error", 'message': "Error creating template file"}, status=500)
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 def upload_mass_balance(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -282,7 +282,7 @@ def upload_mass_balance(request, *args, **kwargs):
 
 
 # given a set of objectives and constraints, outputs a list of lots/sublots that solves the problem
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 def generate_batch(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -328,7 +328,7 @@ def generate_batch(request, *args, **kwargs):
 
     return JsonResponse({'status': 'success', 'data': []})
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 def send_drafts(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -429,7 +429,7 @@ def convert_eth_stock_to_etbe(request, entity, c):
     t.save()
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 def convert_to_etbe(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -452,7 +452,7 @@ def convert_to_etbe(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 def forward(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
