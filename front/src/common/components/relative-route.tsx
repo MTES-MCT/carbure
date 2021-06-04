@@ -14,13 +14,15 @@ import {
   NavLinkProps,
   RedirectProps,
   SwitchProps,
+  useLocation,
 } from "react-router-dom"
 
 export function useRelativePush() {
   const history = useHistory()
   const match = useRouteMatch()
+  const location = useLocation()
 
-  return (to: string) => history.push(pt.join(match.url, to))
+  return (to: string) => history.push(pt.join(match.url, to + location.search))
 }
 
 type Relative = {
