@@ -88,7 +88,7 @@ const TransactionHistory = ({ history = [] }: TransactionHistoryProps) => {
   return (
     <Collapsible
       icon={Edit}
-      title={t("Historique des corrections")}
+      title={t("Historique des corrections ({{amount}})", { amount: rows.length })} // prettier-ignore
       className={styles.history}
     >
       <Table columns={columns} rows={rows} className={styles.historyTable} />

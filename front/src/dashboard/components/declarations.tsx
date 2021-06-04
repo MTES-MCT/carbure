@@ -229,6 +229,9 @@ const DeclarationTable = ({
         declarations: declarations[e.id],
       },
     }))
+    .sort((a, b) =>
+      a.value.entity.name.localeCompare(b.value.entity.name, "fr")
+    )
 
   if (rows.length === 0) {
     return (

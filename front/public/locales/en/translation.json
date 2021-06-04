@@ -216,5 +216,5 @@
   "Correction": "Correction",
   "Corrigé": "Corrigé",
   "Déclaré": "Déclaré",
-  "Historique des corrections": "Historique des corrections"
+  "Historique des corrections ({{amount}})": "Historique des corrections ({{amount}})"
 }

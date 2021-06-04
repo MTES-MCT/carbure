@@ -279,11 +279,15 @@ test("check transaction errors", async () => {
   )
   expect(mp).toHaveClass("errorLabel")
 
-  screen.getByText("Erreurs (2)")
+  const errors = screen.getByText("Erreurs (2)")
+  userEvent.click(errors)
+
   screen.getByText("Le DAE (ou équivalent) est manquant")
   screen.getByText("La matière première est manquante")
 
-  screen.getByText("Remarques (1)")
+  const warnings = screen.getByText("Remarques (1)")
+  userEvent.click(warnings)
+
   screen.getByText(
     "La matière première est incohérente avec le biocarburant - Biogaz de blé"
   )
@@ -300,7 +304,9 @@ test("check transaction comments", async () => {
 
   await screen.findByText("À corriger")
 
-  screen.getByText("Commentaires (1)")
+  const comments = screen.getByText("Commentaires (1)")
+  userEvent.click(comments)
+
   screen.getByText("Opérateur Test:")
   screen.getByText("not ok")
 
@@ -383,7 +389,9 @@ test("resend tofix lot from details", async () => {
   await waitWhileLoading()
 
   await screen.findByText("Corrigé")
-  screen.getByText("Commentaires (2)")
+
+  const comments = screen.getByText("Commentaires (2)")
+  userEvent.click(comments)
   screen.getByText("test is fixed")
 
   userEvent.click(screen.getByText("Retour"))

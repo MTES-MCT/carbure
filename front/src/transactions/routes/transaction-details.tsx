@@ -219,10 +219,10 @@ const TransactionDetails = ({
           )}
 
         {canModify &&
+          isVendor &&
           !isAdmin &&
           !isAuditor &&
-          isVendor &&
-          status === LotStatus.Accepted && (
+          [LotStatus.Accepted, LotStatus.Declaration].includes(status) && (
             <AsyncButton
               icon={Edit}
               level="warning"
@@ -234,11 +234,11 @@ const TransactionDetails = ({
           )}
 
         {canModify &&
+          !isVendor &&
           !isAdmin &&
           !isAuditor &&
           !isVendorOperator &&
-          !isVendor &&
-          status === LotStatus.Accepted && (
+          [LotStatus.Accepted, LotStatus.Declaration].includes(status) && (
             <AsyncButton
               icon={Edit}
               level="warning"
