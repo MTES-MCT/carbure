@@ -1102,6 +1102,3 @@ def validate_lots(user, entity, txs):
             tx.save()
             tx.lot.save()
     return {'submitted': submitted, 'valid': valid, 'invalid': invalid, 'errors': errors}
-
-
-

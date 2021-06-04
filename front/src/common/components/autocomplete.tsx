@@ -11,6 +11,14 @@ import { Cross } from "./icons"
 const rawGetLabel = (v: any) => `${v}`
 const rawGetValue = (v: any) => `${v}`
 
+// prepare string for comparison by putting it to lowercase and removing accents
+function normalize(str: string) {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+}
+
 function useAutoComplete<T>(
   value: T | string | null,
   name: string,
@@ -47,32 +55,41 @@ function useAutoComplete<T>(
 
     if (query.length < minLength) {
       dd.toggle(false)
-    } else if (search) {
+    } else {
       dd.toggle(true)
 
-      const results = (await resolveQuery(query, ...queryArgs)) ?? []
+      if (search) {
+        resolveQuery(query, ...queryArgs)
+      }
 
-      // check if the typed value matches a result from the api
-      // if so, trigger the onChange callback
-      const compared = query.toLowerCase()
-      const suggestion = results.find((suggestion) => {
-        return compared === getLabel(suggestion).toLowerCase()
-      })
-
-      if (suggestion) {
-        onChange({ target: { name, value: suggestion } })
-      } else if (loose) {
+      if (loose) {
         onChange({ target: { name, value: query } })
       }
-    } else if (loose) {
-      onChange({ target: { name, value: query } })
     }
   }
 
+  useEffect(() => {
+    // check if the typed value matches a result from the api
+    const compared = normalize(query)
+    const suggestion = suggestions.data?.find(
+      (suggestion) => compared === normalize(getLabel(suggestion))
+    )
+
+    // if so, trigger the onChange callback
+    if (suggestion && suggestion !== value) {
+      onChange({ target: { name, value: suggestion } })
+    }
+  }, [query, suggestions, name, value, getLabel, onChange])
+
   // modify input content when passed value is changed
   useEffect(() => {
-    const label = value === null ? "" : typeof value === "string" ? value : getLabel(value) // prettier-ignore
-    setQuery(label)
+    if (value === null) {
+      setQuery("")
+    } else if (typeof value === "string") {
+      setQuery(value)
+    } else {
+      setQuery(getLabel(value))
+    }
   }, [value, getLabel])
 
   return { dd, query, suggestions, onQuery, change }

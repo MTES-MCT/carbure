@@ -101,6 +101,7 @@ export const AlertFilter = ({
 
 type CollapsibleProps = AlertProps & {
   title: string
+  open?: boolean
 }
 
 export const Collapsible = ({
@@ -108,9 +109,10 @@ export const Collapsible = ({
   icon: CollapsibleIcon,
   children,
   className,
+  open = false,
   ...props
 }: CollapsibleProps) => {
-  const [collasped, setCollapsed] = useState(false)
+  const [collasped, setCollapsed] = useState(!open)
 
   return (
     <Alert {...props} className={cl(styles.collapsibleAlert, className)}>
