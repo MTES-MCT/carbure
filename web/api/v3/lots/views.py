@@ -19,10 +19,10 @@ from core.models import LotV2, LotTransaction, EntityDepot, GenericError
 from core.models import TransactionUpdateHistory
 
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
-from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates, send_rejection_emails, get_uploaded_files_directory
-from core.common import notify_accepted_lot_change, invalidate_declaration
+from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates, get_uploaded_files_directory
 from core.common import check_certificates
 from core.decorators import check_rights
+from core.notifications import notify_lots_rejected, notify_declaration_invalidated, notify_accepted_lot_in_correction
 from api.v3.sanity_checks import bulk_sanity_checks
 from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, filter_entity_transactions, sort_lots
 
@@ -415,9 +415,9 @@ def accept_with_reserves(request, *args, **kwargs):
             # send email
             # invalidate declaration for both
             if tx.carbure_client:
-                invalidate_declaration(tx, tx.carbure_client)
+                notify_declaration_invalidated(tx, tx.carbure_client)
             if tx.carbure_vendor:
-                invalidate_declaration(tx, tx.carbure_vendor)
+                notify_declaration_invalidated(tx, tx.carbure_vendor)
         TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field='status', value_before=tx.delivery_status, value_after=LotTransaction.TOFIX, modified_by=request.user, modified_by_entity=entity)
         tx.delivery_status = LotTransaction.TOFIX
         tx.save()
@@ -446,10 +446,10 @@ def amend_lot(request, *args, **kwargs):
 
     if tx.delivery_status in [LotTransaction.ACCEPTED, LotTransaction.FROZEN]:
         # create notification / alert
-        notify_accepted_lot_change(tx)
+        notify_accepted_lot_in_correction(tx)
     if tx.delivery_status == LotTransaction.FROZEN:
         # get period declaration and invalidate it
-        invalidate_declaration(tx, entity)
+        notify_declaration_invalidated(tx, entity)
     TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field='status', value_before=tx.delivery_status, value_after=LotTransaction.TOFIX, modified_by=request.user, modified_by_entity=entity)
     tx.delivery_status = LotTransaction.TOFIX
     tx.save()
@@ -515,7 +515,7 @@ def reject_lot(request, *args, **kwargs):
         tx.comment = tx_comment
         tx_rejected.append(tx)
 
-    send_rejection_emails(tx_rejected)
+    notify_lots_rejected(tx_rejected)
     return JsonResponse({'status': 'success'})
 
 @check_rights('entity_id')

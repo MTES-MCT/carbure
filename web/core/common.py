@@ -1,4 +1,5 @@
 import datetime
+from web.core.models import EmailNotification
 import openpyxl
 from django import db
 from django.db.models import Q, Count
@@ -20,8 +21,6 @@ from certificates.models import ISCCCertificate, EntityISCCTradingCertificate
 from certificates.models import DBSCertificate, EntityDBSTradingCertificate
 from certificates.models import REDCertCertificate, EntityREDCertTradingCertificate
 from certificates.models import EntitySNTradingCertificate, SNCertificate
-
-from core.emails import send_reject_email, send_accepted_lot_in_correction_email
 
 import dateutil.parser
 from api.v3.sanity_checks import bulk_sanity_checks, tx_is_valid, lot_is_valid
@@ -1106,39 +1105,3 @@ def validate_lots(user, entity, txs):
 
 
 
-def send_rejection_emails(rejected_txs):
-    # group by vendors
-    reject_by_vendors = {}
-    for tx in rejected_txs:
-        if tx.carbure_vendor not in reject_by_vendors:
-            reject_by_vendors[tx.carbure_vendor] = []
-        reject_by_vendors[tx.carbure_vendor].append(tx)
-
-    for vendor, txs in reject_by_vendors.items():
-        send_reject_email(vendor, txs)
-
-
-def notify_accepted_lot_change(tx):
-    recipients = [ur.user.email for ur in UserRights.objects.filter(entity=tx.carbure_vendor, user__is_staff=False)]
-    cc = []
-    if tx.carbure_client:
-        cc += [ur.user.email for ur in UserRights.objects.filter(entity=tx.carbure_client, user__is_staff=False)]
-
-    if tx.delivery_status == LotTransaction.FROZEN:
-        # add administration in copy
-        cc += 'carbure@beta.gouv.fr'
-
-    send_accepted_lot_in_correction_email(tx, recipients, cc)
-
-
-def invalidate_declaration(tx, entity):
-    year, month = tx.lot.period.split('-')
-    period = datetime.date(year=year, month=int(month), day=1)
-    try:
-        sd = SustainabilityDeclaration.objects.filter(entity=entity, period=period)
-        sd.declared = False
-        sd.checked = False
-        sd.save()
-    except:
-        # declaration doesn't exist ?
-        pass
