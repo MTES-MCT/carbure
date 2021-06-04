@@ -815,8 +815,8 @@ class DeclarationTests(TransactionTestCase):
         self.test_operator, _ = Entity.objects.update_or_create(name='OPERATEUR1', entity_type='Opérateur')
 
         # some rights
-        UserRights.objects.update_or_create(user=self.user1, entity=self.test_producer)
-        UserRights.objects.update_or_create(user=self.user1, entity=self.test_operator)
+        UserRights.objects.update_or_create(user=self.user1, entity=self.test_producer, role='RW')
+        UserRights.objects.update_or_create(user=self.user1, entity=self.test_operator, role='RW')
 
         loggedin = self.client.login(username=self.user_email, password=self.user_password)
         self.assertTrue(loggedin)          
