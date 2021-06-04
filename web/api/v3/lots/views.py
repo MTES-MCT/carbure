@@ -181,7 +181,7 @@ def get_declaration_summary(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': data})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def add_lot(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -199,7 +199,7 @@ def add_lot(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': lot_data})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def update_lot(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -283,8 +283,11 @@ def update_lot(request, *args, **kwargs):
                         print('remove not list %s' % (d))
     return JsonResponse({'status': 'success'})
 
-@otp_required
-def duplicate_lot(request):
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
+def duplicate_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+
     tx_id = request.POST.get('tx_id', None)
 
     try:
@@ -323,8 +326,11 @@ def duplicate_lot(request):
     tx.save()
     return JsonResponse({'status': 'success'})
 
-@otp_required
-def delete_lot(request):
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
+def delete_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+
     tx_ids = request.POST.getlist('tx_ids', False)
 
     if not tx_ids:
@@ -355,8 +361,7 @@ def delete_lot(request):
     return JsonResponse({'status': 'success', 'deleted': deleted})
 
 
-@otp_required
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def validate_lot(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -518,7 +523,7 @@ def reject_lot(request, *args, **kwargs):
     notify_lots_rejected(tx_rejected)
     return JsonResponse({'status': 'success'})
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 def comment_lot(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -637,7 +642,7 @@ def get_template_trader(request, *args, **kwargs):
     except Exception:
         return JsonResponse({'status': "error", 'message': "Error creating template file"}, status=500)
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 def upload(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -661,7 +666,7 @@ def upload(request, *args, **kwargs):
     data = {'loaded': nb_loaded, 'total': nb_total, 'errors': [e.natural_key() if isinstance(e, GenericError) else e for e in errors]}
     return JsonResponse({'status': 'success', 'data': data})
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 def upload_blend(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -685,8 +690,7 @@ def upload_blend(request, *args, **kwargs):
     data = {'loaded': nb_loaded, 'total': nb_total}
     return JsonResponse({'status': 'success', 'data': data})
 
-@otp_required
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 def validate_declaration(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -713,7 +717,7 @@ def validate_declaration(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id')
+@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 def forward_lots(request, *args, **kwargs):
     # note: this is the "Forward" feature for Operators (Processing done by someone else)
     context = kwargs['context']
