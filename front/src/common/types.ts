@@ -18,6 +18,7 @@ export enum LotStatus {
   Alert = "alert",
   Correction = "correction",
   Declaration = "declaration",
+  Highlight = "highlight",
 }
 
 export enum GESOption {

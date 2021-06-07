@@ -21,9 +21,9 @@ function hidePoster(entity: EntitySelection) {
 function highlightPoster(entity: EntitySelection) {
   switch (entity?.entity_type) {
     case EntityType.Administration:
-      return api.hideAdminLots
+      return api.highlightAdminLots
     case EntityType.Auditor:
-      return api.hideAuditorLots
+      return api.highlightAuditorLots
     default:
       return async () => {}
   }

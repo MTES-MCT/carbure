@@ -50,6 +50,7 @@ const ADMIN_STATUSES = [
   LotStatus.Alert,
   LotStatus.Correction,
   LotStatus.Declaration,
+  LotStatus.Highlight,
 ]
 
 const OPERATOR_FILTERS = [
