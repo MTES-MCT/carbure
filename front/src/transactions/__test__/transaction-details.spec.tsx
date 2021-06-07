@@ -149,9 +149,7 @@ test("display transaction details", async () => {
 test("edit transaction details", async () => {
   render(<TransactionWithRouter entity={producer} />)
 
-  const title = screen.getByText("Détails de la transaction")
-
-  await waitWhileLoading()
+  const title = await screen.findByText("Détails de la transaction")
 
   const save: any = await screen.findByText("Sauvegarder")
   expect(save.closest("button")).toBeDisabled()
