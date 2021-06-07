@@ -86,6 +86,7 @@ const ADMIN_FILTERS = [
   Filters.AddedBy,
   Filters.Forwarded,
   Filters.Errors,
+  Filters.AdminHidden,
 ]
 
 export function useTransactions(entity: EntitySelection) {
