@@ -186,7 +186,7 @@ LOGGING = {
             'format' : "[%(asctime)s] %(levelname)s %(message)s",
             'datefmt' : "%d/%b/%Y %H:%M:%S"
         },
-    },  
+    },
 
     'handlers': {
         'console': {
@@ -200,5 +200,25 @@ LOGGING = {
             'level': 'ERROR',  # change debug level as appropiate
             'propagate': False,
         },
-    },  
+    },
 }
+
+'''
+if DEBUG:
+    INTERNAL_IPS = [
+        env('DJANGO_NGINX_HOST')
+    ]
+
+    INSTALLED_APPS += [
+        'debug_toolbar'
+    ]
+
+    MIDDLEWARE += [
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+        'debug_toolbar_force.middleware.ForceDebugToolbarMiddleware',
+    ]
+
+    DEBUG_TOOLBAR_CONFIG = {
+        'PRETTIFY_SQL': False
+    }
+'''
