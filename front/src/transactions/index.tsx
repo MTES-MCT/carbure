@@ -16,6 +16,7 @@ import useValidateLots from "./hooks/actions/use-validate-lots"
 import useAcceptLots from "./hooks/actions/use-accept-lots"
 import useRejectLots from "./hooks/actions/use-reject-lots"
 import useDeclareLots from "./hooks/actions/use-declare-lots"
+import useControlLots from "./hooks/actions/use-controls"
 import { useGetLots, useGetSnapshot } from "./hooks/use-transaction-list"
 import { useSummary } from "./components/summary"
 
@@ -129,6 +130,7 @@ export function useTransactions(entity: EntitySelection) {
   const rejector = useRejectLots(entity, selection, query, refresh)
   const declarator = useDeclareLots(entity)
   const forwarder = useForwardLots(entity, selection, refresh)
+  const controller = useControlLots(entity, refresh)
 
   const summary = useSummary(query, selection.selected, false, entity)
 
@@ -154,6 +156,7 @@ export function useTransactions(entity: EntitySelection) {
     forwarder,
     query,
     summary,
+    controller,
     refresh,
   }
 }
@@ -180,6 +183,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
     declarator,
     forwarder,
     summary,
+    controller,
     refresh,
   } = useTransactions(entity)
 
@@ -261,6 +265,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         outsourceddepots={snapshot.data?.depots}
         forwarder={forwarder}
         summary={summary}
+        controller={controller}
       />
 
       <Switch>
