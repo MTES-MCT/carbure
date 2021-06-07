@@ -26,6 +26,7 @@ const STATUS_ORDER = [
   LotStatus.Weird,
   LotStatus.ToSend,
   LotStatus.Declaration,
+  LotStatus.Highlight,
 ]
 
 const STATUS_LABEL = {
@@ -40,6 +41,7 @@ const STATUS_LABEL = {
   [LotStatus.Alert]: { singular: "Alerte", plural: "Alertes" },
   [LotStatus.Correction]: { singular: "Correction", plural: "Corrections" },
   [LotStatus.Declaration]: { singular: "Lot déclaré", plural: "Lots déclarés" },
+  [LotStatus.Highlight]: { singular: "Lot marqué", plural: "Lots marqués" },
 }
 
 export function mapStatus(
