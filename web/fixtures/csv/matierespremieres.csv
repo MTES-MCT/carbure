@@ -22,7 +22,7 @@ PAILLE,Paille,1,0,1,0,1,ANN-IX-A
 BOUES_EPURATION,Boues d'épuration,1,1,1,0,1,ANN-IX-A
 EFFLUENTS_HUILERIES_PALME_RAFLE,Effluents d'huileries de palme et rafles,0,1,1,0,1,ANN-IX-A
 BRAI_TALLOL,Brai de tallol,0,1,1,0,1,ANN-IX-A
-TALLOL,Tallol,0,1,0,0,1,CONV
+TALLOL,Tallol,0,1,0,0,1,TALLOL
 BAGASSE,Bagasse,1,0,1,0,1,ANN-IX-A
 COQUES,Coques,1,0,1,0,0,ANN-IX-A
 BALLES,Balles (enveloppes),1,0,1,0,0,ANN-IX-A
