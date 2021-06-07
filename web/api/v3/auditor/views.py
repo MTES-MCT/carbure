@@ -25,6 +25,8 @@ def get_lots_by_status(txs, querySet):
         txs = txs.filter(delivery_status__in=['AC', 'R', 'AA'])
     elif status == 'declaration':
         txs = txs.filter(delivery_status__in=['A', 'N', 'F'])
+    elif status == 'highlight':
+        txs = txs.filter(highlighted_by_auditor=True)
 
     if hidden is None:
         txs = txs.filter(hidden_by_auditor=False)
@@ -120,6 +122,7 @@ def get_snapshot(request, *args, **kwargs):
         lots['alert'] = txs.annotate(Count('genericerror')).filter(genericerror__count__gt=0).count()
         lots['correction'] = txs.filter(delivery_status__in=['AC', 'AA', 'R']).count()
         lots['declaration'] = txs.filter(delivery_status__in=['A', 'N', 'F']).count()
+        lots['highlight'] = txs.filter(highlighted_by_auditor=True).count()
 
         filters = get_snapshot_filters(txs, [
             'delivery_status',

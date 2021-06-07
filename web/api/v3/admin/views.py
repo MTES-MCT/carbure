@@ -173,6 +173,8 @@ def get_lots_by_status(txs, querySet):
         txs = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED])
     elif status == 'declaration':
         txs = txs.filter(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.PENDING, LotTransaction.FROZEN])
+    elif status == 'highlight':
+        txs = txs.filter(highlighted_by_admin=True)
 
     if hidden is None:
         txs = txs.filter(hidden_by_admin=False)
@@ -269,7 +271,8 @@ def get_snapshot(request):
         alerts = txs.annotate(Count('genericerror')).filter(genericerror__count__gt=0).count()
         correction = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED]).count()
         declaration = txs.filter(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.PENDING, LotTransaction.FROZEN]).count()
-        data['lots'] = {'alert': alerts, 'correction': correction, 'declaration': declaration}
+        highlight = txs.filter(highlighted_by_admin=True).count()
+        data['lots'] = {'alert': alerts, 'correction': correction, 'declaration': declaration, 'highlight': highlight}
 
         data['filters'] = get_snapshot_filters(txs, [
             'delivery_status',
