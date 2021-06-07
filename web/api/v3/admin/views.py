@@ -163,6 +163,23 @@ def delete_entity(request):
     return JsonResponse({"status": "success", "data": "success"})
 
 
+def get_lots_by_status(txs, querySet):
+    status = querySet.get('status', False)
+    hidden = querySet.get('is_hidden_by_admin', None)
+
+    if status == 'alert':
+        txs = get_lots_with_errors(txs)
+    elif status == 'correction':
+        txs = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED])
+    elif status == 'declaration':
+        txs = txs.filter(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.PENDING, LotTransaction.FROZEN])
+
+    if hidden is None:
+        txs = txs.filter(hidden_by_admin=False)
+
+    return txs
+
+
 @is_admin
 def get_lots(request):
     status = request.GET.get('status', False)
@@ -178,13 +195,7 @@ def get_lots(request):
         ).prefetch_related('genericerror_set', 'lot__carbure_production_site__productionsitecertificate_set')
 
         txs = txs.filter(lot__status=LotV2.VALIDATED)
-
-        if status == 'alert':
-            txs = get_lots_with_errors(txs)
-        elif status == 'correction':
-            txs = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED])
-        elif status == 'declaration':
-            txs = txs.filter(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.PENDING, LotTransaction.FROZEN])
+        txs = get_lots_by_status(txs, request.GET)
         return get_lots_with_metadata(txs, None, request.GET)
 
     except Exception:
@@ -193,7 +204,6 @@ def get_lots(request):
 
 @is_admin
 def get_lots_summary(request, *args, **kwargs):
-    status = request.GET.get('status')
     selection = request.GET.getlist('selection')
 
     try:
@@ -202,12 +212,7 @@ def get_lots_summary(request, *args, **kwargs):
         if len(selection) > 0:
             txs = txs.filter(pk__in=selection)
         else:
-            if status == 'alert':
-                txs = get_lots_with_errors(txs)
-            elif status == 'correction':
-                txs = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED])
-            elif status == 'declaration':
-                txs = txs.filter(delivery_status__in=[LotTransaction.FROZEN, LotTransaction.ACCEPTED, LotTransaction.PENDING])
+            txs = get_lots_by_status(txs, request.GET)
             txs = filter_lots(txs, request.GET)[0]
             txs = sort_lots(txs, request.GET)
 
@@ -670,7 +675,12 @@ def highlight_transactions(request):
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
 
-    LotTransaction.objects.filter(id__in=tx_ids).update(highlighted_by_admin=True)
+    txs = LotTransaction.objects.filter(id__in=tx_ids)
+
+    for tx in txs.iterator():
+        tx.highlighted_by_admin = not tx.highlighted_by_admin
+        tx.save()
+
     return JsonResponse({'status': 'success'})
 
 @is_admin
@@ -680,5 +690,10 @@ def hide_transactions(request):
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
 
-    LotTransaction.objects.filter(id__in=tx_ids).update(hidden_by_admin=True)
+    txs = LotTransaction.objects.filter(id__in=tx_ids)
+
+    for tx in txs.iterator():
+        tx.hidden_by_admin = not tx.hidden_by_admin
+        tx.save()
+
     return JsonResponse({'status': 'success'})
