@@ -279,7 +279,8 @@ def get_snapshot(request):
             'added_by',
             'errors',
             'is_forwarded',
-            'is_mac'
+            'is_mac',
+            'is_hidden_by_admin'
         ])
 
     except Exception:

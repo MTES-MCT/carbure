@@ -129,7 +129,8 @@ def get_snapshot(request, *args, **kwargs):
             'added_by',
             'errors',
             'is_forwarded',
-            'is_mac'
+            'is_mac',
+            'is_hidden_by_auditor'
         ])
 
         data = {'lots': lots, 'filters': filters, 'years': years}
