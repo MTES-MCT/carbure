@@ -285,6 +285,8 @@ export enum Filters {
   Errors = "errors",
   Forwarded = "is_forwarded",
   Mac = "is_mac",
+  AdminHidden = "is_hidden_by_admin",
+  AuditorHidden = "is_hidden_by_auditor",
 }
 
 export interface TransactionQuery {
@@ -310,6 +312,9 @@ export interface TransactionQuery {
   [Filters.AddedBy]?: any
   [Filters.Errors]?: any
   [Filters.Forwarded]?: any
+  [Filters.Mac]?: any
+  [Filters.AdminHidden]?: any
+  [Filters.AuditorHidden]?: any
 }
 
 export interface Snapshot {
