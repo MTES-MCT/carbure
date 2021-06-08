@@ -71,8 +71,8 @@ export default function useStockDetails(
   }, [resolveDetails, entityID, txID])
 
   useEffect(() => {
-    if (tx) {
-      reset(toTransactionFormState(tx))
+    if (details.data) {
+      reset(toTransactionFormState(details.data))
     }
   }, [tx, reset])
 

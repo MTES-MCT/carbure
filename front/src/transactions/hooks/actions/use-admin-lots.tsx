@@ -5,6 +5,7 @@ import useAPI from "../../../common/hooks/use-api"
 
 import { useNotificationContext } from "../../../common/components/notifications"
 import { TransactionQuery } from "common/types"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
 export interface LotAdministrator {
   loading: boolean
@@ -15,14 +16,14 @@ export interface LotAdministrator {
 }
 
 export default function useAdministrateLots(
+  entity: EntitySelection,
   selection: TransactionSelection,
-  query: TransactionQuery,
   refresh: () => void,
 ): LotAdministrator {
   const notifications = useNotificationContext()
 
-  const [requestHide, resolveHideLots] = useAPI(api.postHideLots)
-  const [requestHighlight, resolveHighlightLots] = useAPI(api.postHighlightLots)
+  const [requestHide, resolveHideLots] = useAPI(api.hideAdminLots)
+  const [requestHighlight, resolveHighlightLots] = useAPI(api.highlightAdminLots)
   const [requestHideAlert, resolveHideAlerts] = useAPI(api.postHideAlerts)
   const [requestHighlightAlert, resolveHighlightAlerts] = useAPI(api.postHighlightAlerts)
 
@@ -45,13 +46,19 @@ export default function useAdministrateLots(
   }
 
   async function markAsRead(txID: number) {
-    await notify(resolveHideLots([txID]))
-    return true
+    if (entity) {
+      await notify(resolveHideLots(entity?.id, [txID]))
+      return true
+    }
+    return false
   }
 
   async function markForReview(txID: number) {
-    await notify(resolveHighlightLots([txID]))
-    return true
+    if (entity) {
+      await notify(resolveHighlightLots(entity?.id, [txID]))
+      return true
+    }
+    return false
   }
 
   async function hideAlerts(alertIDs: number[]) {

@@ -16,7 +16,7 @@ import useValidateLots from "./hooks/actions/use-validate-lots"
 import useAcceptLots from "./hooks/actions/use-accept-lots"
 import useRejectLots from "./hooks/actions/use-reject-lots"
 import useDeclareLots from "./hooks/actions/use-declare-lots"
-import useControlLots from "./hooks/actions/use-controls"
+import useAuditLots from "./hooks/actions/use-audits"
 import { useGetLots, useGetSnapshot } from "./hooks/use-transaction-list"
 import { useSummary } from "./components/summary"
 
@@ -90,7 +90,8 @@ const ADMIN_FILTERS = [
   Filters.Forwarded,
   Filters.Errors,
   Filters.HiddenByAdmin,
-  Filters.HighlightedByAdmin,
+  Filters.HiddenByAuditor
+  // Filters.HighlightedByAdmin,
 ]
 
 export function useTransactions(entity: EntitySelection) {
@@ -135,8 +136,8 @@ export function useTransactions(entity: EntitySelection) {
   const rejector = useRejectLots(entity, selection, query, refresh)
   const declarator = useDeclareLots(entity)
   const forwarder = useForwardLots(entity, selection, refresh)
-  const administrator = useAdministrateLots(selection, query, refresh)
-  const controller = useControlLots(entity, refresh)
+  const administrator = useAdministrateLots(entity, selection, refresh)
+  const auditor = useAuditLots(entity, refresh)
 
   const summary = useSummary(query, selection.selected, false, entity)
 
@@ -163,7 +164,7 @@ export function useTransactions(entity: EntitySelection) {
     administrator,
     query,
     summary,
-    controller,
+    auditor,
     refresh,
   }
 }
@@ -191,7 +192,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
     forwarder,
     administrator,
     summary,
-    controller,
+    auditor,
     refresh,
   } = useTransactions(entity)
 
@@ -273,7 +274,8 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         outsourceddepots={snapshot.data?.depots}
         forwarder={forwarder}
         summary={summary}
-        controller={controller}
+        auditor={auditor}
+        administrator={administrator}
       />
 
       <Switch>

@@ -407,7 +407,6 @@ def get_snapshot_filters(txs, whitelist):
     if 'is_hidden_by_auditor' in whitelist:
         filters['is_hidden_by_auditor'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
 
-
     if 'is_highlighted_by_admin' in whitelist:
         filters['is_highlighted_by_admin'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
 

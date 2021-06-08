@@ -7,41 +7,19 @@ import { confirm } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
 import { EntityType } from "common/types"
 
-function hidePoster(entity: EntitySelection) {
-  switch (entity?.entity_type) {
-    case EntityType.Administration:
-      return api.hideAdminLots
-    case EntityType.Auditor:
-      return api.hideAuditorLots
-    default:
-      return async () => {}
-  }
-}
-
-function highlightPoster(entity: EntitySelection) {
-  switch (entity?.entity_type) {
-    case EntityType.Administration:
-      return api.highlightAdminLots
-    case EntityType.Auditor:
-      return api.highlightAuditorLots
-    default:
-      return async () => {}
-  }
-}
-
-export interface LotController {
+export interface LotAuditor {
   loading: boolean
   hideLot: (i: number) => Promise<boolean>
   highlightLot: (i: number) => Promise<boolean>
 }
 
-export default function useControlLots(
+export default function useAuditLots(
   entity: EntitySelection,
   refresh: () => void
-): LotController {
+): LotAuditor {
   const notifications = useNotificationContext()
-  const [hideReq, resolveHideLot] = useAPI(hidePoster(entity))
-  const [highlightReq, resolveHighlightLot] = useAPI(highlightPoster(entity))
+  const [hideReq, resolveHideLot] = useAPI(api.hideAuditorLots)
+  const [highlightReq, resolveHighlightLot] = useAPI(api.highlightAuditorLots)
 
   async function hideLot(txID: number) {
     const shouldHide = await confirm(

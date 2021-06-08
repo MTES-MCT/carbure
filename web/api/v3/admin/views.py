@@ -17,6 +17,7 @@ from django.template.loader import render_to_string
 
 from core.models import LotTransaction, UserRightsRequests, SustainabilityDeclaration, Control
 from api.v3.lots.helpers import get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors, filter_lots, get_general_summary, sort_lots
+from core.common import check_certificates
 
 
 # Get an instance of a logger
@@ -241,6 +242,7 @@ def get_details(request, *args, **kwargs):
 
     data = {}
     data['transaction'] = tx.natural_key(admin=True)
+    data['certificates'] = check_certificates(tx)
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['comments'] = [c.natural_key() for c in tx.transactioncomment_set.all()]
@@ -685,6 +687,8 @@ def highlight_transactions(request):
 
     for tx in txs.iterator():
         tx.highlighted_by_admin = not tx.highlighted_by_admin
+        if tx.highlighted_by_admin:
+            tx.hidden_by_admin = False
         tx.save()
 
     return JsonResponse({'status': 'success'})
@@ -700,6 +704,8 @@ def hide_transactions(request):
 
     for tx in txs.iterator():
         tx.hidden_by_admin = not tx.hidden_by_admin
+        if tx.hidden_by_admin:
+            tx.highlighted_by_admin = False
         tx.save()
-
+        tx.genericerror_set.all().update(acked_by_admin=True)
     return JsonResponse({'status': 'success'})

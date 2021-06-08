@@ -95,13 +95,13 @@ const TransactionDetails = ({
 
   async function run(
     action: (i: number) => Promise<boolean>,
-    closeOnDone: boolean = false
+    nextOnDone: boolean = false
   ) {
     if (await action(form.id)) {
       refreshDetails()
 
-      if (closeOnDone) {
-        close()
+      if (nextOnDone) {
+        navigator.next()
       }
     }
   }
@@ -259,16 +259,16 @@ const TransactionDetails = ({
                 icon={Check}
                 level="success"
                 loading={administrator.loading}
-                onClick={() => run(administrator.markAsRead)}
+                onClick={() => run(administrator.markAsRead, true)}
               >
-                Marquer comme vu
+                Cacher Lot
               </AsyncButton>
               <AsyncButton
                 disabled={transaction?.highlighted_by_admin}
                 icon={Cross}
                 level="warning"
                 loading={administrator.loading}
-                onClick={() => run(administrator.markForReview)}
+                onClick={() => run(administrator.markForReview, true)}
               >
                 Mettre de côté
               </AsyncButton>
