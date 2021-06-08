@@ -36,7 +36,7 @@ function checkLotFields() {
   screen.getByLabelText("Numéro douanier (DAE, DAA...) *")
   screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°) *")
   screen.getByLabelText("Biocarburant *")
-  screen.getByLabelText("Matière première *")
+  screen.getByLabelText(/^Matière première */)
   screen.getByLabelText("Pays d'origine de la matière première *")
 }
 

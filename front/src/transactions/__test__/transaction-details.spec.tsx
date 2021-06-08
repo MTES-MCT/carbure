@@ -38,7 +38,7 @@ afterEach(() => {
 afterAll(() => server.close())
 
 const TransactionWithHook = ({ entity }: { entity: Entity }) => {
-  const { transactions, deleter, validator, acceptor, rejector, refresh } =
+  const { transactions, deleter, validator, acceptor, rejector, refresh, administrator } =
     useTransactions(entity)
 
   return (
@@ -50,6 +50,7 @@ const TransactionWithHook = ({ entity }: { entity: Entity }) => {
         validator={validator}
         acceptor={acceptor}
         rejector={rejector}
+        administrator={administrator}
         transactions={transactions?.data?.lots.map((l) => l.id) ?? []}
       />
     </Route>
@@ -68,13 +69,13 @@ function checkLotFields() {
   screen.getByLabelText("Numéro douanier (DAE, DAA...)")
   screen.getByLabelText("Volume en litres (Ethanol à 20°, autres à 15°)")
   screen.getByLabelText("Biocarburant")
-  screen.getByLabelText("Matière première")
+  screen.getByLabelText(/^Matière première/)
   screen.getByLabelText("Pays d'origine de la matière première")
 }
 
 function checkProductionFields() {
   screen.getByLabelText(/^Site de production/)
-  screen.getByLabelText("Certificat du site de production")
+  screen.getByLabelText(/^Certificat du site de production/)
   screen.getByLabelText("Pays de production")
   screen.getByLabelText("Date de mise en service")
   screen.getByLabelText("N° d'enregistrement double-compte")
@@ -82,8 +83,8 @@ function checkProductionFields() {
 
 function checkOriginFields() {
   screen.getByLabelText(/^Producteur/)
-  screen.getAllByLabelText(/Fournisseur/)
-  screen.getAllByLabelText("Certificat du fournisseur")
+  screen.getAllByLabelText(/^Fournisseur/)
+  screen.getAllByLabelText(/^Certificat du fournisseur/)
   screen.getByLabelText("Champ libre")
 }
 
@@ -169,7 +170,7 @@ test("edit transaction details", async () => {
   userEvent.type(bio, "EM")
   userEvent.click(await screen.findByText("EMHV"))
 
-  const mp = screen.getByLabelText("Matière première *")
+  const mp = screen.getByLabelText(/Matière première \*/)
   userEvent.clear(mp)
   userEvent.type(mp, "Co")
   userEvent.click(await screen.findByText("Colza"))
@@ -361,9 +362,7 @@ test("delete draft lot from details", async () => {
 
   expect(title).not.toBeInTheDocument()
 
-  await waitForElementToBeRemoved(() =>
-    screen.getByText("Détails de la transaction")
-  )
+  await waitWhileLoading()
 })
 
 test("resend tofix lot from details", async () => {
@@ -410,9 +409,7 @@ test("delete tofix lot from details", async () => {
   screen.getByText("Supprimer lot")
   userEvent.click(screen.getByText("Confirmer"))
 
-  await waitForElementToBeRemoved(() =>
-    screen.getByText("Détails de la transaction")
-  )
+  await waitWhileLoading()
 })
 
 test("accept inbox lot from details", async () => {
@@ -480,9 +477,7 @@ test("reject inbox lot from details", async () => {
   userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "not for me") // prettier-ignore
   userEvent.click(screen.getByText("Confirmer"))
 
-  await waitForElementToBeRemoved(() =>
-    screen.queryByText("Détails de la transaction")
-  )
+  await waitWhileLoading()
 })
 
 test("transaction details form as producer - producer trades unknown producer lot to operator", async () => {
