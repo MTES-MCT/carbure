@@ -46,40 +46,42 @@ function useAutoComplete<T>(
   async function onQuery(
     e: React.ChangeEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>
   ) {
-    const query = "value" in e.target ? e.target.value : ""
-    setQuery(query)
+    const queryLabel = "value" in e.target ? e.target.value : ""
+    const valueLabel = value === null ? '' : typeof value === "string" ? value : getLabel(value) // prettier-ignore
 
-    if (query.length === 0) {
-      onChange({ target: { name, value: null } })
+    if (queryLabel !== query) {
+      setQuery(queryLabel)
     }
 
-    if (query.length < minLength) {
+    if (queryLabel.length === 0) {
+      dd.toggle(false)
+      onChange({ target: { name, value: null } })
+    } else if (queryLabel.length <= minLength) {
       dd.toggle(false)
     } else {
       dd.toggle(true)
 
-      if (search) {
-        resolveQuery(query, ...queryArgs)
+      // only apply loose value if it doesn't match current value label
+      if (loose && queryLabel !== valueLabel) {
+        onChange({ target: { name, value: queryLabel } })
       }
 
-      if (loose) {
-        onChange({ target: { name, value: query } })
+      if (search) {
+        const suggestions = await resolveQuery(queryLabel, ...queryArgs)
+
+        if (suggestions) {
+          // compare query and suggestion by ignoring case and accents
+          const compared = normalize(queryLabel)
+          const suggestion = suggestions?.find((s) => compared === normalize(getLabel(s))) // prettier-ignore
+
+          // only apply new suggestion if it's not already selected
+          if (suggestion && suggestion !== value) {
+            onChange({ target: { name, value: suggestion } })
+          }
+        }
       }
     }
   }
-
-  useEffect(() => {
-    // check if the typed value matches a result from the api
-    const compared = normalize(query)
-    const suggestion = suggestions.data?.find(
-      (suggestion) => compared === normalize(getLabel(suggestion))
-    )
-
-    // if so, trigger the onChange callback
-    if (suggestion && suggestion !== value) {
-      onChange({ target: { name, value: suggestion } })
-    }
-  }, [query, suggestions, name, value, getLabel, onChange])
 
   // modify input content when passed value is changed
   useEffect(() => {
