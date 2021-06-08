@@ -19,8 +19,10 @@ const FILTER_ORDER = [
   Filters.Errors,
   Filters.Forwarded,
   Filters.Mac,
-  Filters.AckedByAdmin,
+  Filters.HiddenByAdmin,
   Filters.HighlightedByAdmin,
+  Filters.HiddenByAuditor,
+  Filters.HighlightedByAuditor,
 ]
 
 const FILTER_LABELS = {
@@ -37,8 +39,10 @@ const FILTER_LABELS = {
   [Filters.Errors]: "Incohérences",
   [Filters.Forwarded]: "Lots Transférés",
   [Filters.Mac]: "Mises à consommation",
-  [Filters.AckedByAdmin]: "Marqués comme vus",
+  [Filters.HiddenByAdmin]: "Marqués comme vus",
   [Filters.HighlightedByAdmin]: "Mis de côté",
+  [Filters.HiddenByAuditor]: "Marqués comme vus",
+  [Filters.HighlightedByAuditor]: "Mis de côté",  
 }
 
 export function mapFilters(

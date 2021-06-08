@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useHistory, useLocation } from "react-router-dom"
 
 import { PageSelection } from "common/components/pagination"
@@ -9,7 +9,7 @@ function useLocationFilters() {
   const location = useLocation()
   const [filters, setFilters] = useState<FilterSelection["selected"]>({})
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const queryParams = new URLSearchParams(location.search)
     const queryFilters: FilterSelection["selected"] = {}
 
@@ -23,8 +23,10 @@ function useLocationFilters() {
       }
     })
 
-    setFilters(queryFilters)
-  }, [location.search])
+    if (JSON.stringify(queryFilters) !== JSON.stringify(filters)) {
+      setFilters(queryFilters)
+    }
+  }, [location.search, filters])
 
   return filters
 }

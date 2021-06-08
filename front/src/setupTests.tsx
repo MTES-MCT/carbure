@@ -3,14 +3,12 @@ import i18n from "i18next"
 import { Suspense } from "react"
 import { render as baseRender } from "@testing-library/react"
 import { configure } from "@testing-library/dom"
-import { I18nextProvider, initReactI18next } from "react-i18next"
+import { initReactI18next } from "react-i18next"
 import Backend from "i18next-http-backend"
 import { LoaderOverlay } from "common/components"
 import { AppHook, useApp } from "carbure/hooks/use-app"
 import { MemoryRouter, Route } from "react-router"
 import { UserRightProvider } from "carbure/hooks/use-rights"
-import { Entity } from "common/types"
-import { producer } from "common/__test__/data"
 
 configure({
   getElementError(message) {
@@ -66,13 +64,11 @@ export const TestRoot = ({ url = "/org/0", children }: TestRootProps) => {
 
   return (
     <MemoryRouter initialEntries={[url]}>
-      <I18nextProvider i18n={i18n}>
-        <Suspense fallback={<LoaderOverlay />}>
-          <Route path="/org/:entity">
-            <UserRightProvider app={app}>{element}</UserRightProvider>
-          </Route>
-        </Suspense>
-      </I18nextProvider>
+      <Suspense fallback={<LoaderOverlay />}>
+        <Route path="/org/:entity">
+          <UserRightProvider app={app}>{element}</UserRightProvider>
+        </Route>
+      </Suspense>
     </MemoryRouter>
   )
 }
