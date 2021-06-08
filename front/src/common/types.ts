@@ -18,6 +18,7 @@ export enum LotStatus {
   Alert = "alert",
   Correction = "correction",
   Declaration = "declaration",
+  Highlight = "highlight",
 }
 
 export enum GESOption {
@@ -291,8 +292,10 @@ export enum Filters {
   Errors = "errors",
   Forwarded = "is_forwarded",
   Mac = "is_mac",
-  AckedByAdmin = "acked_by_admin",
-  HighlightedByAdmin = "highlighted_by_admin",
+  HiddenByAdmin = "is_hidden_by_admin",
+  HighlightedByAdmin = "is_highlighted_by_admin",
+  HiddenByAuditor = "is_hidden_by_auditor",
+  HighlightedByAuditor = "is_highlighted_by_auditor",
 }
 
 export interface TransactionQuery {
@@ -318,6 +321,11 @@ export interface TransactionQuery {
   [Filters.AddedBy]?: any
   [Filters.Errors]?: any
   [Filters.Forwarded]?: any
+  [Filters.Mac]?: any
+  [Filters.HiddenByAdmin]?: any
+  [Filters.HiddenByAuditor]?: any
+  [Filters.HighlightedByAdmin]?: any
+  [Filters.HighlightedByAuditor]?: any  
 }
 
 export interface Snapshot {

@@ -399,3 +399,19 @@ export function downloadAuditorLots(filters: TransactionQuery) {
     export: true,
   })
 }
+
+export function hideAuditorLots(entity_id: number, tx_ids: number[]) {
+  return api.post("/auditor/lots/hide-transactions", { entity_id, tx_ids })
+}
+
+export function highlightAuditorLots(entity_id: number, tx_ids: number[]) {
+  return api.post("/auditor/lots/highlight-transactions", { entity_id, tx_ids })
+}
+
+export function hideAdminLots(entity_id: number, tx_ids: number[]) {
+  return api.post("/admin/lots/hide-transactions", { entity_id, tx_ids })
+}
+
+export function highlightAdminLots(entity_id: number, tx_ids: number[]) {
+  return api.post("/admin/lots/highlight-transactions", { entity_id, tx_ids })
+}

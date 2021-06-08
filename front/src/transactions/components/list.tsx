@@ -55,6 +55,7 @@ import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 import { SearchSelection } from "transactions/hooks/query/use-search"
 import { ApiState } from "common/hooks/use-api"
 import { useRights } from "carbure/hooks/use-rights"
+import { LotController } from "transactions/hooks/actions/use-controls"
 
 type TransactionListProps = {
   entity: Entity
@@ -76,6 +77,7 @@ type TransactionListProps = {
   outsourceddepots: EntityDeliverySite[] | undefined
   forwarder: LotForwarder
   summary: ApiState<TransactionSummary>
+  controller: LotController
 }
 
 export const TransactionList = ({
@@ -98,6 +100,7 @@ export const TransactionList = ({
   outsourceddepots,
   forwarder,
   summary,
+  controller,
 }: TransactionListProps) => {
   const rights = useRights()
 
@@ -248,6 +251,8 @@ export const TransactionList = ({
               onComment={acceptor.acceptAndCommentLot}
               onReject={rejector.rejectLot}
               onCorrect={validator.validateAndCommentLot}
+              onHide={controller.hideLot}
+              onHighlight={controller.highlightLot}
             />
             {isLoading && <LoaderOverlay />}
           </Box>

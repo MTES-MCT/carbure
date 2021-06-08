@@ -146,8 +146,10 @@ def filter_lots(txs, querySet):
     added_by = querySet.getlist('added_by')
     errors = querySet.getlist('errors')
     query = querySet.get('query', False)
-    acked_by_admin = querySet.get('acked_by_admin', None)
-    highlighted_by_admin = querySet.get('highlighted_by_admin', None)
+    is_hidden_by_admin = querySet.get('is_hidden_by_admin', None)
+    is_hidden_by_auditor = querySet.get('is_hidden_by_auditor', None)
+    is_highlighted_by_admin = querySet.get('is_highlighted_by_admin', None)
+    is_highlighted_by_auditor = querySet.get('is_highlighted_by_auditor', None)
 
     if year:
         date_from, date_until = get_year_bounds(year)
@@ -194,6 +196,30 @@ def filter_lots(txs, querySet):
         else:
             txs = txs.filter(is_mac=False)
 
+    if is_hidden_by_admin is not None:
+        if is_hidden_by_admin == 'true':
+            txs = txs.filter(hidden_by_admin=True)
+        else:
+            txs = txs.filter(hidden_by_admin=False)
+
+    if is_hidden_by_auditor is not None:
+        if is_hidden_by_auditor == 'true':
+            txs = txs.filter(hidden_by_auditor=True)
+        else:
+            txs = txs.filter(hidden_by_auditor=False)
+  
+    if is_highlighted_by_admin is not None:
+        if is_highlighted_by_admin == 'true':
+            txs = txs.filter(highlighted_by_admin=True)
+        else:
+            txs = txs.filter(highlighted_by_admin=False)
+
+    if is_highlighted_by_auditor is not None:
+        if is_highlighted_by_auditor == 'true':
+            txs = txs.filter(is_highlighted_by_auditor=True)
+        else:
+            txs = txs.filter(is_highlighted_by_auditor=False)
+
     if errors:
         txs = txs.filter(genericerror__error__in=errors)
 
@@ -213,17 +239,7 @@ def filter_lots(txs, querySet):
             Q(dae__icontains=query)
         )
 
-    if acked_by_admin is not None:
-        if acked_by_admin == 'true':
-            txs = txs.filter(hidden_by_admin=True)
-        else:
-            txs = txs.filter(hidden_by_admin=False)
-   
-    if highlighted_by_admin is not None:
-        if highlighted_by_admin:
-            txs = txs.filter(highlighted_by_admin=True)
-        else:
-            txs = txs.filter(highlighted_by_admin=False)
+
 
     invalid = querySet.get('invalid', False)
     deadline = querySet.get('deadline', False)
@@ -385,11 +401,18 @@ def get_snapshot_filters(txs, whitelist):
     if 'is_mac' in whitelist:
         filters['is_mac'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
 
-    if 'acked_by_admin' in whitelist:
-        filters['acked_by_admin'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
+    if 'is_hidden_by_admin' in whitelist:
+        filters['is_hidden_by_admin'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
 
-    if 'highlighted_by_admin' in whitelist:
-        filters['highlighted_by_admin'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
+    if 'is_hidden_by_auditor' in whitelist:
+        filters['is_hidden_by_auditor'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
+
+
+    if 'is_highlighted_by_admin' in whitelist:
+        filters['is_highlighted_by_admin'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
+
+    if 'is_highlighted_by_auditor' in whitelist:
+        filters['is_highlighted_by_auditor'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
 
     return filters
 
@@ -457,8 +480,6 @@ def get_summary(txs, entity):
 
 def get_general_summary(txs):
     data = {}
-
-    print(txs.query)
 
     txs_aggregation = txs.annotate(
         vendor=Coalesce('carbure_vendor__name', 'lot__unknown_supplier'),
