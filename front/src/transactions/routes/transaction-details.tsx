@@ -6,6 +6,7 @@ import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
 import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
 import { LotRejector } from "transactions/hooks/actions/use-reject-lots"
 import { LotValidator } from "transactions/hooks/actions/use-validate-lots"
+import { LotAdministrator } from "transactions/hooks/actions/use-admin-lots"
 
 import styles from "../components/form.module.css"
 
@@ -41,6 +42,7 @@ type TransactionDetailsProps = {
   validator: LotValidator
   acceptor: LotAcceptor
   rejector: LotRejector
+  administrator: LotAdministrator
   transactions: number[]
   refresh: () => void
 }
@@ -51,6 +53,7 @@ const TransactionDetails = ({
   validator,
   acceptor,
   rejector,
+  administrator,
   transactions,
   refresh,
 }: TransactionDetailsProps) => {
@@ -247,6 +250,29 @@ const TransactionDetails = ({
             >
               Demander une correction
             </AsyncButton>
+          )}
+
+        {isAdmin && (
+            <React.Fragment>
+              <AsyncButton
+                disabled={transaction?.hidden_by_admin}
+                icon={Check}
+                level="success"
+                loading={administrator.loading}
+                onClick={() => run(administrator.markAsRead)}
+              >
+                Marquer comme vu
+              </AsyncButton>
+              <AsyncButton
+                disabled={transaction?.highlighted_by_admin}
+                icon={Cross}
+                level="warning"
+                loading={administrator.loading}
+                onClick={() => run(administrator.markForReview)}
+              >
+                Mettre de côté
+              </AsyncButton>
+            </React.Fragment>
           )}
 
         <Box row className={styles.transactionNavButtons}>

@@ -274,6 +274,21 @@ export function forwardLots(
   })
 }
 
+
+export function amendLot(entity_id: number, tx_id: number) {
+  return api.post("/lots/amend-lot", { entity_id, tx_id })
+}
+
+export async function amendAndCommentLot(
+  entity_id: number,
+  tx_id: number,
+  comment: string
+) {
+  const commenting = await commentLot(entity_id, tx_id, comment, "both")
+  const amending = await amendLot(entity_id, tx_id)
+  return [amending, commenting]
+}
+
 // ADMIN
 
 export function getAdminSnapshot(
@@ -308,20 +323,6 @@ export function getAdminDetails(
   })
 }
 
-export function amendLot(entity_id: number, tx_id: number) {
-  return api.post("/lots/amend-lot", { entity_id, tx_id })
-}
-
-export async function amendAndCommentLot(
-  entity_id: number,
-  tx_id: number,
-  comment: string
-) {
-  const commenting = await commentLot(entity_id, tx_id, comment, "both")
-  const amending = await amendLot(entity_id, tx_id)
-  return [amending, commenting]
-}
-
 export function getAdminSummary(
   query: TransactionQuery,
   selection: number[]
@@ -330,6 +331,42 @@ export function getAdminSummary(
     .get("/admin/lots/summary", { ...query, limit: null, page: 0, selection })
     .then(normalizeGeneralSummary)
 }
+
+export function postHideLots(
+  transactionIDs: number[]
+): Promise<any> {
+  return api.post("/admin/lots/hide-transactions", {
+    tx_ids: transactionIDs,
+  })
+}
+
+export function postHighlightLots(
+  transactionIDs: number[]
+): Promise<any> {
+  return api.post("/admin/lots/highlight-transactions", {
+    tx_ids: transactionIDs,
+  })
+}
+
+export function postHideAlerts(
+  alertIDs: number[]
+): Promise<any> {
+  return api.post("/admin/lots/ack-alerts", {
+    alert_ids: alertIDs,
+  })
+}
+
+export function postHighlightAlerts(
+  alertIDs: number[]
+): Promise<any> {
+  return api.post("/admin/lots/highlight-alerts", {
+    alert_ids: alertIDs,
+  })
+}
+
+
+
+// AUDITOR
 
 export function getAuditorSnapshot(entity_id: number, year: number) {
   return api

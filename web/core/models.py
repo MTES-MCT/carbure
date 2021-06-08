@@ -175,7 +175,7 @@ class MatierePremiere(models.Model):
         return self.name
 
     def natural_key(self):
-        return {'code': self.code, 'name': self.name, 'is_double_compte': self.is_double_compte}
+        return {'code': self.code, 'name': self.name, 'is_double_compte': self.is_double_compte, 'category': self.category}
 
     class Meta:
         db_table = 'matieres_premieres'
@@ -431,14 +431,20 @@ class LotTransaction(models.Model):
     def __str__(self):
         return str(self.id)
 
-    def natural_key(self):
-        return {'lot': self.lot.natural_key(), 'carbure_vendor': self.carbure_vendor.natural_key() if self.carbure_vendor else None, 'carbure_vendor_certificate': self.carbure_vendor_certificate,
+    def natural_key(self, admin=False):
+        d = {'lot': self.lot.natural_key(), 'carbure_vendor': self.carbure_vendor.natural_key() if self.carbure_vendor else None, 'carbure_vendor_certificate': self.carbure_vendor_certificate,
         'dae': self.dae, 'client_is_in_carbure': self.client_is_in_carbure, 'carbure_client': self.carbure_client.natural_key() if self.carbure_client else None,
         'unknown_client': self.unknown_client, 'delivery_date': self.delivery_date, 'delivery_site_is_in_carbure': self.delivery_site_is_in_carbure,
         'carbure_delivery_site': self.carbure_delivery_site.natural_key() if self.carbure_delivery_site else None, 'unknown_delivery_site': self.unknown_delivery_site,
         'unknown_delivery_site_country': self.unknown_delivery_site_country.natural_key() if self.unknown_delivery_site_country else None, 'delivery_status': self.delivery_status,
         'champ_libre': self.champ_libre, 'is_mac': self.is_mac, 'is_batch': self.is_batch,
         'id': self.id, 'is_forwarded': self.is_forwarded}
+        if admin:
+            d['hidden_by_admin'] = self.hidden_by_admin
+            d['highlighted_by_admin'] = self.highlighted_by_admin
+            d['hidden_by_auditor'] = self.hidden_by_auditor
+            d['highlighted_by_auditor'] = self.highlighted_by_auditor
+        return d
 
     class Meta:
         db_table = 'transactions'
