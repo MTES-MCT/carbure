@@ -276,6 +276,11 @@ export interface LotDetails {
   deadline: string
   errors: GenericError[]
   updates?: LotUpdate[]
+  certificates: {
+    production_site_certificate: CertificateInfo | null,
+    supplier_certificate: CertificateInfo | null,
+    vendor_certificate: CertificateInfo | null
+  }
 }
 
 export enum Filters {
@@ -293,9 +298,9 @@ export enum Filters {
   Forwarded = "is_forwarded",
   Mac = "is_mac",
   HiddenByAdmin = "is_hidden_by_admin",
-  HighlightedByAdmin = "is_highlighted_by_admin",
   HiddenByAuditor = "is_hidden_by_auditor",
-  HighlightedByAuditor = "is_highlighted_by_auditor",
+  // HighlightedByAdmin = "is_highlighted_by_admin",
+  // HighlightedByAuditor = "is_highlighted_by_auditor",
 }
 
 export interface TransactionQuery {
@@ -324,8 +329,8 @@ export interface TransactionQuery {
   [Filters.Mac]?: any
   [Filters.HiddenByAdmin]?: any
   [Filters.HiddenByAuditor]?: any
-  [Filters.HighlightedByAdmin]?: any
-  [Filters.HighlightedByAuditor]?: any  
+  // [Filters.HighlightedByAdmin]?: any
+  // [Filters.HighlightedByAuditor]?: any  
 }
 
 export interface Snapshot {
@@ -439,11 +444,24 @@ export type SNCertificate = {
   download_link: string
 }
 
+
 export type Certificate =
   | ISCCCertificate
   | DBSCertificate
   | REDCertCertificate
   | SNCertificate
+
+
+export interface CertificateInfo { 
+  certificate_id: string
+  certificate_type: "2BS" | "ISCC" | "REDCERT" | "SN"
+  holder: string
+  valid_from: string
+  valid_until: string
+  matches: number
+  found: boolean
+  scope: string[]
+}
 
 export type ProductionCertificate = {
   certificate_id: string

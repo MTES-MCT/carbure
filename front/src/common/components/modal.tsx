@@ -15,6 +15,7 @@ const Modal = ({ className, onClose, children, ...props }: ModalProps) => {
   useEffect(() => {
     function onEscape(e: KeyboardEvent) {
       if (e.key === "Escape") {
+        e.stopImmediatePropagation()
         onClose()
       }
     }

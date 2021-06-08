@@ -54,9 +54,10 @@ function useAutoComplete<T>(
     }
 
     if (queryLabel.length === 0) {
-      dd.toggle(false)
       onChange({ target: { name, value: null } })
-    } else if (queryLabel.length <= minLength) {
+    } 
+    
+    if (queryLabel.length < minLength) {
       dd.toggle(false)
     } else {
       dd.toggle(true)

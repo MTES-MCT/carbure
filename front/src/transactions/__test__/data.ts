@@ -197,6 +197,11 @@ export const lotDetails: LotDetails = {
   errors: [],
   deadline: "2021-01-31",
   comments: [],
+  certificates: {
+    production_site_certificate: null,
+    supplier_certificate: null,
+    vendor_certificate: null,
+  }
 }
 
 export const errorDetails: LotDetails = {
@@ -204,6 +209,11 @@ export const errorDetails: LotDetails = {
   errors: genericErrors,
   deadline: "2020-02-29",
   comments: [],
+  certificates: {
+    production_site_certificate: null,
+    supplier_certificate: null,
+    vendor_certificate: null,
+  }
 }
 
 export const tofixDetails = {
@@ -218,6 +228,11 @@ export const tofixDetails = {
   errors: [],
   deadline: "2021-01-31",
   comments: [{ entity: operator, comment: "not ok" }],
+  certificates: {
+    production_site_certificate: null,
+    supplier_certificate: null,
+    vendor_certificate: null,
+  }
 }
 
 export const sentDetails = {
@@ -232,6 +247,11 @@ export const sentDetails = {
   errors: [],
   deadline: "2021-01-31",
   comments: [],
+  certificates: {
+    production_site_certificate: null,
+    supplier_certificate: null,
+    vendor_certificate: null,
+  }
 }
 
 export const unknownProducerPartial = {

@@ -109,8 +109,10 @@ type TransactionTableProps = {
   onComment: (id: number) => void
   onReject: (id: number) => void
   onCorrect: (id: number) => void
-  onHide: (id: number) => void
-  onHighlight: (id: number) => void
+  onAuditorHide: (id: number) => void
+  onAuditorHighlight: (id: number) => void
+  onAdminHide: (id: number) => void
+  onAdminHighlight: (id: number) => void
 }
 
 export const TransactionTable = ({
@@ -126,8 +128,10 @@ export const TransactionTable = ({
   onComment,
   onReject,
   onCorrect,
-  onHide,
-  onHighlight,
+  onAuditorHide,
+  onAuditorHighlight,
+  onAdminHide,
+  onAdminHighlight,
 }: TransactionTableProps) => {
   const rights = useRights()
   const relativePush = useRelativePush()
@@ -155,8 +159,10 @@ export const TransactionTable = ({
 
   if (rights.is(UserRole.Auditor, UserRole.ReadOnly)) {
     columns.push(arrow)
+  } else if (isAdmin) {
+    columns.push(getControlActions({ onHide: onAdminHide, onHighlight: onAdminHighlight }))
   } else if (isAdmin || isAuditor) {
-    columns.push(getControlActions({ onHide, onHighlight }))
+    columns.push(getControlActions({ onHide: onAuditorHide, onHighlight: onAuditorHighlight }))
   } else if (status.is(LotStatus.Draft)) {
     columns.push(getDraftActions({ onValidate, onDuplicate, onDelete }))
   } else if (status.is(LotStatus.ToFix)) {

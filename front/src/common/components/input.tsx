@@ -52,6 +52,7 @@ export const Label = ({
       styles.labelWrapper,
       !readOnly && disabled && styles.disabledLabel,
       error && styles.errorLabel,
+      (disabled || readOnly) && styles.readonlyLabel,
       className
     )}
   >

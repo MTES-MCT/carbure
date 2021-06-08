@@ -332,22 +332,6 @@ export function getAdminSummary(
     .then(normalizeGeneralSummary)
 }
 
-export function postHideLots(
-  transactionIDs: number[]
-): Promise<any> {
-  return api.post("/admin/lots/hide-transactions", {
-    tx_ids: transactionIDs,
-  })
-}
-
-export function postHighlightLots(
-  transactionIDs: number[]
-): Promise<any> {
-  return api.post("/admin/lots/highlight-transactions", {
-    tx_ids: transactionIDs,
-  })
-}
-
 export function postHideAlerts(
   alertIDs: number[]
 ): Promise<any> {
@@ -364,6 +348,13 @@ export function postHighlightAlerts(
   })
 }
 
+export function hideAdminLots(entity_id: number, tx_ids: number[]) {
+  return api.post("/admin/lots/hide-transactions", { entity_id, tx_ids })
+}
+
+export function highlightAdminLots(entity_id: number, tx_ids: number[]) {
+  return api.post("/admin/lots/highlight-transactions", { entity_id, tx_ids })
+}
 
 
 // AUDITOR
@@ -408,10 +399,3 @@ export function highlightAuditorLots(entity_id: number, tx_ids: number[]) {
   return api.post("/auditor/lots/highlight-transactions", { entity_id, tx_ids })
 }
 
-export function hideAdminLots(entity_id: number, tx_ids: number[]) {
-  return api.post("/admin/lots/hide-transactions", { entity_id, tx_ids })
-}
-
-export function highlightAdminLots(entity_id: number, tx_ids: number[]) {
-  return api.post("/admin/lots/highlight-transactions", { entity_id, tx_ids })
-}

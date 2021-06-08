@@ -55,7 +55,8 @@ import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 import { SearchSelection } from "transactions/hooks/query/use-search"
 import { ApiState } from "common/hooks/use-api"
 import { useRights } from "carbure/hooks/use-rights"
-import { LotController } from "transactions/hooks/actions/use-controls"
+import { LotAuditor } from "transactions/hooks/actions/use-audits"
+import { LotAdministrator } from "transactions/hooks/actions/use-admin-lots"
 
 type TransactionListProps = {
   entity: Entity
@@ -77,7 +78,8 @@ type TransactionListProps = {
   outsourceddepots: EntityDeliverySite[] | undefined
   forwarder: LotForwarder
   summary: ApiState<TransactionSummary>
-  controller: LotController
+  auditor: LotAuditor
+  administrator: LotAdministrator
 }
 
 export const TransactionList = ({
@@ -100,7 +102,8 @@ export const TransactionList = ({
   outsourceddepots,
   forwarder,
   summary,
-  controller,
+  auditor,
+  administrator
 }: TransactionListProps) => {
   const rights = useRights()
 
@@ -251,8 +254,10 @@ export const TransactionList = ({
               onComment={acceptor.acceptAndCommentLot}
               onReject={rejector.rejectLot}
               onCorrect={validator.validateAndCommentLot}
-              onHide={controller.hideLot}
-              onHighlight={controller.highlightLot}
+              onAuditorHide={auditor.hideLot}
+              onAuditorHighlight={auditor.highlightLot}
+              onAdminHide={administrator.markAsRead}
+              onAdminHighlight={administrator.markForReview}
             />
             {isLoading && <LoaderOverlay />}
           </Box>
