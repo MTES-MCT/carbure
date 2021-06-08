@@ -30,6 +30,8 @@ import TransactionDetails from "./routes/transaction-details"
 import useForwardLots from "./hooks/actions/use-forward-lots"
 import useTransactionQuery from "./hooks/query/use-transaction-query"
 import { useRights } from "carbure/hooks/use-rights"
+import useAdministrateLots from "./hooks/actions/use-admin-lots"
+import { admin } from "common/__test__/data"
 
 // prettier-ignore
 const OPERATOR_STATUSES = [
@@ -129,6 +131,7 @@ export function useTransactions(entity: EntitySelection) {
   const rejector = useRejectLots(entity, selection, query, refresh)
   const declarator = useDeclareLots(entity)
   const forwarder = useForwardLots(entity, selection, refresh)
+  const administrator = useAdministrateLots(selection, query, refresh)
 
   const summary = useSummary(query, selection.selected, false, entity)
 
@@ -152,6 +155,7 @@ export function useTransactions(entity: EntitySelection) {
     rejector,
     declarator,
     forwarder,
+    administrator,
     query,
     summary,
     refresh,
@@ -179,6 +183,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
     rejector,
     declarator,
     forwarder,
+    administrator,
     summary,
     refresh,
   } = useTransactions(entity)
@@ -276,6 +281,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
             validator={validator}
             acceptor={acceptor}
             rejector={rejector}
+            administrator={administrator}
             transactions={summary.data?.tx_ids ?? []}
           />
         </Route>

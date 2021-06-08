@@ -127,7 +127,11 @@ export const MatierePremiere = ({
   value,
   errors,
   ...props
-}: LACP<MP>) => (
+}: LACP<MP>) => {
+
+  const category = data?.matiere_premiere?.category
+
+  return (
   <LabelAutoComplete
     required
     name="matiere_premiere"
@@ -140,7 +144,8 @@ export const MatierePremiere = ({
     getQuery={api.findMatieresPremieres}
     {...props}
   />
-)
+  )
+}
 
 export const PaysOrigine = ({
   data,

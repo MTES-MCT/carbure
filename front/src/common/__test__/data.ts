@@ -182,6 +182,7 @@ export const expiredSNCertificate = {
 export const matierePremiere = {
   code: "COLZA",
   name: "Colza",
+  category: "CONV",
 }
 
 // BIOCARBURANT
@@ -253,6 +254,10 @@ export const lot: Transaction = {
   is_forwarded: false,
   is_mac: false,
   id: 0,
+  hidden_by_admin: false,
+  hidden_by_auditor: false,
+  highlighted_by_admin: false,
+  highlighted_by_auditor: false,
 }
 
 export const entityRight = {

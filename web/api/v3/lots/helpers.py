@@ -146,6 +146,8 @@ def filter_lots(txs, querySet):
     added_by = querySet.getlist('added_by')
     errors = querySet.getlist('errors')
     query = querySet.get('query', False)
+    acked_by_admin = querySet.get('acked_by_admin', None)
+    highlighted_by_admin = querySet.get('highlighted_by_admin', None)
 
     if year:
         date_from, date_until = get_year_bounds(year)
@@ -210,6 +212,18 @@ def filter_lots(txs, querySet):
             Q(champ_libre__icontains=query) |
             Q(dae__icontains=query)
         )
+
+    if acked_by_admin is not None:
+        if acked_by_admin == 'true':
+            txs = txs.filter(hidden_by_admin=True)
+        else:
+            txs = txs.filter(hidden_by_admin=False)
+   
+    if highlighted_by_admin is not None:
+        if highlighted_by_admin:
+            txs = txs.filter(highlighted_by_admin=True)
+        else:
+            txs = txs.filter(highlighted_by_admin=False)
 
     invalid = querySet.get('invalid', False)
     deadline = querySet.get('deadline', False)
@@ -370,6 +384,13 @@ def get_snapshot_filters(txs, whitelist):
 
     if 'is_mac' in whitelist:
         filters['is_mac'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
+
+    if 'acked_by_admin' in whitelist:
+        filters['acked_by_admin'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
+
+    if 'highlighted_by_admin' in whitelist:
+        filters['highlighted_by_admin'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
+
     return filters
 
 

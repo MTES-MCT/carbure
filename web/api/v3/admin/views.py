@@ -188,6 +188,8 @@ def get_lots(request):
         return get_lots_with_metadata(txs, None, request.GET)
 
     except Exception:
+        import traceback
+        traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
 
 
@@ -231,7 +233,7 @@ def get_details(request, *args, **kwargs):
     deadline_date = now.replace(day=last_day)
 
     data = {}
-    data['transaction'] = tx.natural_key()
+    data['transaction'] = tx.natural_key(admin=True)
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['comments'] = [c.natural_key() for c in tx.transactioncomment_set.all()]
@@ -279,7 +281,9 @@ def get_snapshot(request):
             'added_by',
             'errors',
             'is_forwarded',
-            'is_mac'
+            'is_mac',
+            'acked_by_admin',
+            'highlighted_by_admin'
         ])
 
     except Exception:
@@ -643,22 +647,22 @@ def controls_add_message(request):
 
 @is_admin
 def ack_alerts(request):
-    error_ids = request.POST.getlist('error_ids', False)
-    if not error_ids:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing error_ids"}, status=400)
+    alert_ids = request.POST.getlist('alert_ids', False)
+    if not alert_ids:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing alert_ids"}, status=400)
 
-    GenericError.objects.filter(id__in=error_ids).update(acked_by_admin=True)
+    GenericError.objects.filter(id__in=alert_ids).update(acked_by_admin=True)
     return JsonResponse({'status': 'success'})
 
 
 
 @is_admin
 def highlight_alerts(request):
-    error_ids = request.POST.getlist('error_ids', False)
-    if not error_ids:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing error_ids"}, status=400)
+    alert_ids = request.POST.getlist('alert_ids', False)
+    if not alert_ids:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing alert_ids"}, status=400)
 
-    GenericError.objects.filter(id__in=error_ids).update(highlighted_by_admin=True)
+    GenericError.objects.filter(id__in=alert_ids).update(highlighted_by_admin=True)
     return JsonResponse({'status': 'success'})
 
 

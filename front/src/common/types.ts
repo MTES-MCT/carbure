@@ -53,6 +53,7 @@ export interface MatierePremiere {
   code: string
   name: string
   is_double_compte?: boolean
+  category: string
 }
 
 export interface MatierePremiereDetails extends MatierePremiere {
@@ -200,6 +201,11 @@ export interface Transaction {
   carbure_delivery_site: DeliverySite | null
   unknown_delivery_site: string
   unknown_delivery_site_country: Country | null
+
+  hidden_by_admin: boolean
+  hidden_by_auditor: boolean
+  highlighted_by_admin: boolean
+  highlighted_by_auditor: boolean
 }
 
 export interface GenericError {
@@ -285,6 +291,8 @@ export enum Filters {
   Errors = "errors",
   Forwarded = "is_forwarded",
   Mac = "is_mac",
+  AckedByAdmin = "acked_by_admin",
+  HighlightedByAdmin = "highlighted_by_admin",
 }
 
 export interface TransactionQuery {
