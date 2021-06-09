@@ -199,7 +199,7 @@ def get_lots(request):
 
         txs = txs.filter(lot__status=LotV2.VALIDATED)
         txs = get_lots_by_status(txs, request.GET)
-        return get_lots_with_metadata(txs, None, request.GET)
+        return get_lots_with_metadata(txs, None, request.GET, admin=True)
 
     except Exception:
         import traceback

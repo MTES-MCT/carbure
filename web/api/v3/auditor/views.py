@@ -1,6 +1,7 @@
 import logging
 from django.db.models import Q, Count
 from django.http import JsonResponse
+from core.common import check_certificates
 
 from core.models import LotTransaction
 from core.models import UserRights
@@ -52,7 +53,7 @@ def get_lots(request, *args, **kwargs):
         txs = txs.filter(lot__status='Validated')
         txs = get_lots_by_status(txs, request.GET)
         txs = filter_lots(txs, request.GET)[0]
-        return get_lots_with_metadata(txs, None, request.GET)
+        return get_lots_with_metadata(txs, None, request.GET, admin=True)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
 
@@ -97,6 +98,7 @@ def get_details(request, *args, **kwargs):
     data['comments'] = get_comments(tx)
     data['updates'] = get_history(tx)
     data['deadline'] = get_current_deadline()
+    data['certificates'] = check_certificates(tx)
 
     return JsonResponse({'status': 'success', 'data': data})
 

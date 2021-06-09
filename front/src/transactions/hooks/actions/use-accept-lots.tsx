@@ -11,17 +11,17 @@ import {
   CommentWithTypePrompt,
   CommentWithType,
 } from "transactions/components/form-comments"
-import { TransactionQuery } from "common/types"
+import { Transaction, TransactionQuery } from "common/types"
 import { SummaryPrompt } from "transactions/components/summary"
 
 export interface LotAcceptor {
   loading: boolean
-  acceptLot: (txID: number) => Promise<boolean>
-  acceptAndCommentLot: (txID: number) => Promise<boolean>
+  acceptLot: (tx: Transaction) => Promise<boolean>
+  acceptAndCommentLot: (tx: Transaction) => Promise<boolean>
   acceptSelection: () => Promise<boolean>
   acceptAllInbox: () => Promise<boolean>
-  amendLot: (txID: number) => Promise<boolean>
-  askForCorrection: (txID: number) => Promise<boolean>
+  amendLot: (tx: Transaction) => Promise<boolean>
+  askForCorrection: (tx: Transaction) => Promise<boolean>
 }
 
 export default function useAcceptLots(
@@ -77,34 +77,34 @@ export default function useAcceptLots(
     }
   }
 
-  async function acceptLot(txID: number) {
+  async function acceptLot(tx: Transaction) {
     const shouldAccept = await confirm(
       "Accepter lot",
       "Voulez vous accepter ce lot ?"
     )
 
     if (entity !== null && shouldAccept) {
-      await notifyAccept(resolveAccept(entity.id, [txID]))
+      await notifyAccept(resolveAccept(entity.id, [tx.id]))
     }
 
     return shouldAccept
   }
 
-  async function acceptAndCommentLot(txID: number) {
+  async function acceptAndCommentLot(tx: Transaction) {
     const result = await prompt<CommentWithType>((resolve) => (
       <CommentWithTypePrompt onResolve={resolve} />
     ))
 
     if (entity !== null && result) {
       await notifyAccept(
-        resolveAcceptAndComment(entity.id, txID, result.comment, result.topic)
+        resolveAcceptAndComment(entity.id, tx.id, result.comment, result.topic)
       )
     }
 
     return Boolean(result)
   }
 
-  async function askForCorrection(txID: number) {
+  async function askForCorrection(tx: Transaction) {
     const result = await prompt<CommentWithType>((resolve) => (
       <CommentWithTypePrompt
         title="Demander une correction"
@@ -115,14 +115,14 @@ export default function useAcceptLots(
 
     if (entity !== null && result) {
       await notifyCorrection(
-        resolveAcceptAndComment(entity.id, txID, result.comment, result.topic)
+        resolveAcceptAndComment(entity.id, tx.id, result.comment, result.topic)
       )
     }
 
     return Boolean(result)
   }
 
-  async function amendLot(txID: number) {
+  async function amendLot(tx: Transaction) {
     const comment = await prompt<string>((resolve) => (
       <CommentPrompt
         title="Corriger le lot"
@@ -132,7 +132,7 @@ export default function useAcceptLots(
     ))
 
     if (entity !== null && comment) {
-      await notifyCorrection(resolveAmendLot(entity.id, txID, comment))
+      await notifyCorrection(resolveAmendLot(entity.id, tx.id, comment))
     }
 
     return Boolean(comment)

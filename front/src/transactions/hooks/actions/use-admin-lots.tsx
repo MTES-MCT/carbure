@@ -4,13 +4,13 @@ import * as api from "transactions/api"
 import useAPI from "../../../common/hooks/use-api"
 
 import { useNotificationContext } from "../../../common/components/notifications"
-import { TransactionQuery } from "common/types"
+import { Transaction } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
 export interface LotAdministrator {
   loading: boolean
-  markAsRead: (txID: number) => Promise<boolean>
-  markForReview: (txID: number) => Promise<boolean>
+  markAsRead: (tx: Transaction) => Promise<boolean>
+  markForReview: (tx: Transaction) => Promise<boolean>
   hideAlerts: (txIDs: number[]) => Promise<boolean>
   highlightAlerts: (txIDs: number[]) => Promise<boolean>
 }
@@ -18,14 +18,18 @@ export interface LotAdministrator {
 export default function useAdministrateLots(
   entity: EntitySelection,
   selection: TransactionSelection,
-  refresh: () => void,
+  refresh: () => void
 ): LotAdministrator {
   const notifications = useNotificationContext()
 
   const [requestHide, resolveHideLots] = useAPI(api.hideAdminLots)
-  const [requestHighlight, resolveHighlightLots] = useAPI(api.highlightAdminLots)
+  const [requestHighlight, resolveHighlightLots] = useAPI(
+    api.highlightAdminLots
+  )
   const [requestHideAlert, resolveHideAlerts] = useAPI(api.postHideAlerts)
-  const [requestHighlightAlert, resolveHighlightAlerts] = useAPI(api.postHighlightAlerts)
+  const [requestHighlightAlert, resolveHighlightAlerts] = useAPI(
+    api.postHighlightAlerts
+  )
 
   async function notify(promise: Promise<any>) {
     const res = await promise
@@ -35,27 +39,27 @@ export default function useAdministrateLots(
 
       notifications.push({
         level: "success",
-        text: "Succès"         
+        text: "Succès",
       })
     } else {
       notifications.push({
         level: "error",
-        text: "Erreur"
+        text: "Erreur",
       })
     }
   }
 
-  async function markAsRead(txID: number) {
+  async function markAsRead(tx: Transaction) {
     if (entity) {
-      await notify(resolveHideLots(entity?.id, [txID]))
+      await notify(resolveHideLots(entity?.id, [tx.id]))
       return true
     }
     return false
   }
 
-  async function markForReview(txID: number) {
+  async function markForReview(tx: Transaction) {
     if (entity) {
-      await notify(resolveHighlightLots(entity?.id, [txID]))
+      await notify(resolveHighlightLots(entity?.id, [tx.id]))
       return true
     }
     return false
@@ -72,7 +76,11 @@ export default function useAdministrateLots(
   }
 
   return {
-    loading: requestHide.loading || requestHideAlert.loading || requestHighlightAlert.loading || requestHighlight.loading,
+    loading:
+      requestHide.loading ||
+      requestHideAlert.loading ||
+      requestHighlightAlert.loading ||
+      requestHighlight.loading,
     markAsRead,
     markForReview,
     hideAlerts,

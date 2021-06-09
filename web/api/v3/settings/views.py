@@ -968,3 +968,9 @@ def revoke_myself(request, *args, **kwargs):
     except Exception:
         pass
     return JsonResponse({'status': 'success'})
+
+@otp_or_403
+@check_rights('entity_id')
+def get_entity_hash(request, *args, **kwargs):
+    entity = kwargs['context']['entity']
+    return JsonResponse({'status': 'success', 'data': {'hash':entity.hash}})

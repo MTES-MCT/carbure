@@ -13,21 +13,17 @@ import { Edit } from "common/components/icons"
 import { LotSender } from "stocks/hooks/use-send-lots"
 import { useRights } from "carbure/hooks/use-rights"
 
-type A = Record<string, (id: number) => void>
+type A = Record<string, (tx: Transaction) => void>
 type CT = Column<Transaction>
 
-const getStockActions = ({ createDrafts, convertETBE }: A): CT =>
-  Actions((tx: Transaction) => {
-    const actions = [
-      {
-        icon: Edit,
-        title: "Préparer l'envoi",
-        action: (tx: Transaction) => createDrafts(tx.id),
-      },
-    ]
-
-    return actions
-  })
+const getStockActions = ({ createDrafts }: A): CT =>
+  Actions([
+    {
+      icon: Edit,
+      title: "Préparer l'envoi",
+      action: createDrafts,
+    },
+  ])
 
 type StockTableProps = {
   stock: Lots | null

@@ -1,10 +1,6 @@
 import merge from "merge"
 import { render, TestRoot } from "setupTests"
-import {
-  screen,
-  waitFor,
-  waitForElementToBeRemoved,
-} from "@testing-library/react"
+import { screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { Route } from "common/components/relative-route"
 import { Entity } from "common/types"
@@ -38,8 +34,15 @@ afterEach(() => {
 afterAll(() => server.close())
 
 const TransactionWithHook = ({ entity }: { entity: Entity }) => {
-  const { transactions, deleter, validator, acceptor, rejector, refresh, administrator } =
-    useTransactions(entity)
+  const {
+    transactions,
+    deleter,
+    validator,
+    acceptor,
+    rejector,
+    refresh,
+    administrator,
+  } = useTransactions(entity)
 
   return (
     <Route relative path=":id">
