@@ -93,7 +93,7 @@ def get_details(request, *args, **kwargs):
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     data = {}
-    data['transaction'] = tx.natural_key()
+    data['transaction'] = tx.natural_key(admin=True)
     data['errors'] = get_errors(tx)
     data['comments'] = get_comments(tx)
     data['updates'] = get_history(tx)
