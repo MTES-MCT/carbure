@@ -176,7 +176,7 @@ export default function useProductionSites(
         t("Voulez-vous vraiment supprimer le site de production {{site}} ?", { site: ps.name }) // prettier-ignore
       )
     ) {
-      const res = resolveDelProductionSite(entityID, ps.id)
+      const res = await resolveDelProductionSite(entityID, ps.id)
 
       if (res) {
         refresh()
