@@ -236,10 +236,10 @@ def filter_lots(txs, querySet):
             Q(carbure_delivery_site__name__icontains=query) |
             Q(unknown_delivery_site__icontains=query) |
             Q(champ_libre__icontains=query) |
-            Q(dae__icontains=query)
+            Q(dae__icontains=query) |
+            Q(lot__carbure_production_site__dc_reference__icontains=query) |
+            Q(lot__unknown_production_site_dbl_counting__icontains=query)
         )
-
-
 
     invalid = querySet.get('invalid', False)
     deadline = querySet.get('deadline', False)
