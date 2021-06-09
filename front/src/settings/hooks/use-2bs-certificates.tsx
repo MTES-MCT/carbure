@@ -57,7 +57,7 @@ export default function use2BSCertificates(
 
       notifications.push({
         level: "success",
-        text: t("Le certificat a bien été {{action} !", { action }),
+        text: t("Le certificat a bien été {{action}} !", { action }),
       })
     } else {
       notifications.push({
