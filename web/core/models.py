@@ -132,6 +132,9 @@ class Biocarburant(models.Model):
     is_graisse = models.BooleanField(default=False)
     is_displayed = models.BooleanField(default=True)
 
+    compatible_essence = models.BooleanField(default=False)
+    compatible_diesel = models.BooleanField(default=False)
+
     def __str__(self):
         return self.name
 

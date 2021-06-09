@@ -48,7 +48,7 @@ class UserPreferencesAdmin(admin.ModelAdmin):
 
 
 class BiocarburantAdmin(admin.ModelAdmin):
-    list_display = ('code', 'name', 'description', 'is_alcool', 'is_graisse', 'is_displayed')
+    list_display = ('code', 'name', 'description', 'is_alcool', 'is_graisse', 'is_displayed', 'compatible_essence', 'compatible_diesel')
     search_fields = ('name', )
     readonly_fields = ('code', )
     list_filter = ('is_alcool', 'is_graisse', 'is_displayed')
