@@ -22,6 +22,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Edit,
+  EyeOff,
+  Pin,
 } from "common/components/icons"
 import { Box, LoaderOverlay } from "common/components"
 import { AsyncButton, Button } from "common/components/button"
@@ -32,6 +34,7 @@ import Comments from "../components/form-comments"
 import ValidationErrors from "../components/form-errors"
 import TransactionHistory from "../components/history"
 import { useRights } from "carbure/hooks/use-rights"
+import { LotAuditor } from "transactions/hooks/actions/use-audits"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]
@@ -43,6 +46,7 @@ type TransactionDetailsProps = {
   acceptor: LotAcceptor
   rejector: LotRejector
   administrator: LotAdministrator
+  auditor: LotAuditor
   transactions: number[]
   refresh: () => void
 }
@@ -54,6 +58,7 @@ const TransactionDetails = ({
   acceptor,
   rejector,
   administrator,
+  auditor,
   transactions,
   refresh,
 }: TransactionDetailsProps) => {
@@ -255,22 +260,49 @@ const TransactionDetails = ({
         {isAdmin && (
           <React.Fragment>
             <AsyncButton
-              disabled={transaction?.hidden_by_admin}
-              icon={Check}
+              icon={Pin}
               level="success"
-              loading={administrator.loading}
-              onClick={() => run(administrator.markAsRead, true)}
-            >
-              Cacher Lot
-            </AsyncButton>
-            <AsyncButton
-              disabled={transaction?.highlighted_by_admin}
-              icon={Cross}
-              level="warning"
               loading={administrator.loading}
               onClick={() => run(administrator.markForReview, true)}
             >
-              Mettre de côté
+              {transaction?.highlighted_by_admin
+                ? "Désépingler le lot"
+                : "Épingler le lot"}
+            </AsyncButton>
+            <AsyncButton
+              icon={EyeOff}
+              level="warning"
+              loading={administrator.loading}
+              onClick={() => run(administrator.markAsRead, true)}
+            >
+              {transaction?.hidden_by_admin
+                ? "Montrer le lot"
+                : "Ignorer le lot"}
+            </AsyncButton>
+          </React.Fragment>
+        )}
+
+        {isAuditor && (
+          <React.Fragment>
+            <AsyncButton
+              icon={Pin}
+              level="success"
+              loading={auditor.loading}
+              onClick={() => run(auditor.highlightLot, true)}
+            >
+              {transaction?.highlighted_by_auditor
+                ? "Désépingler le lot"
+                : "Épingler le lot"}
+            </AsyncButton>
+            <AsyncButton
+              icon={EyeOff}
+              level="warning"
+              loading={auditor.loading}
+              onClick={() => run(auditor.hideLot, true)}
+            >
+              {transaction?.hidden_by_auditor
+                ? "Montrer le lot"
+                : "Ignorer le lot"}
             </AsyncButton>
           </React.Fragment>
         )}

@@ -101,8 +101,8 @@ const getControlActions = ({
   onHighlight,
 }: TxActions): Column<Transaction> =>
   Actions([
-    { icon: Pin, title: "Marquer le lot", action: onHighlight },
-    { icon: EyeOff, title: "Cacher le lot", action: onHide },
+    { icon: Pin, title: "Épingler le lot", action: onHighlight },
+    { icon: EyeOff, title: "Ignorer le lot", action: onHide },
   ])
 
 type TransactionTableProps = {
