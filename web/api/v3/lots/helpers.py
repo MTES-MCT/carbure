@@ -207,7 +207,7 @@ def filter_lots(txs, querySet):
             txs = txs.filter(hidden_by_auditor=True)
         else:
             txs = txs.filter(hidden_by_auditor=False)
-  
+
     if is_highlighted_by_admin is not None:
         if is_highlighted_by_admin == 'true':
             txs = txs.filter(highlighted_by_admin=True)
@@ -287,7 +287,7 @@ def sort_lots(txs, querySet):
     return txs
 
 
-def get_lots_with_metadata(txs, entity, querySet):
+def get_lots_with_metadata(txs, entity, querySet, admin=False):
     export = querySet.get('export', False)
 
     limit = querySet.get('limit', None)
@@ -311,7 +311,7 @@ def get_lots_with_metadata(txs, entity, querySet):
             errors[tx.id] = grouped_errors
 
     data = {}
-    data['lots'] = [t.natural_key() for t in returned]
+    data['lots'] = [t.natural_key(admin) for t in returned]
     data['total'] = txs.count()
     data['total_errors'] = total_errors
     data['returned'] = returned.count()
