@@ -136,7 +136,7 @@ export function useTransactions(entity: EntitySelection) {
   const declarator = useDeclareLots(entity)
   const forwarder = useForwardLots(entity, selection, refresh)
   const administrator = useAdministrateLots(entity, selection, refresh)
-  const auditor = useAuditLots(entity, refresh)
+  const auditor = useAuditLots(entity, selection, refresh)
 
   const summary = useSummary(query, selection.selected, false, entity)
 

@@ -43,6 +43,7 @@ import {
   ToFixActions,
   TraderImportActions,
   CreateActions,
+  AuditorActions,
 } from "./list-actions"
 import {
   DeadlineFilter,
@@ -103,7 +104,7 @@ export const TransactionList = ({
   forwarder,
   summary,
   auditor,
-  administrator
+  administrator,
 }: TransactionListProps) => {
   const rights = useRights()
 
@@ -118,6 +119,7 @@ export const TransactionList = ({
   const isProducer = entity.entity_type === EntityType.Producer
   const isOperator = entity.entity_type === EntityType.Operator
   const isTrader = entity.entity_type === EntityType.Trader
+  const isAuditor = entity.entity_type === EntityType.Auditor
 
   const isLoading = transactions.loading
   const isError = transactions.error !== null
@@ -187,10 +189,17 @@ export const TransactionList = ({
               <OperatorOutsourcedBlendingActions
                 forwarder={forwarder}
                 outsourceddepots={outsourceddepots}
-                disabled={selection.selected.length === 0 ? true : false}
+                disabled={selection.selected.length === 0}
                 selection={selection}
               />
             )}
+
+          {isAuditor && (
+            <AuditorActions
+              disabled={selection.selected.length === 0}
+              auditor={auditor}
+            />
+          )}
         </ActionBar>
       )}
 
