@@ -35,6 +35,7 @@ import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { SearchSelection } from "transactions/hooks/query/use-search"
 import { Input, InputProps } from "common/components/input"
 import { LotAuditor } from "transactions/hooks/actions/use-audits"
+import { LotAdministrator } from "transactions/hooks/actions/use-admin-lots"
 
 type ExportActionsProps = {
   isEmpty: boolean
@@ -235,6 +236,40 @@ export const InboxActions = ({
         onClick={onReject}
       >
         Refuser {hasSelection ? `sélection` : "tout"}
+      </AsyncButton>
+    </React.Fragment>
+  )
+}
+
+type AdminActionsProps = {
+  disabled: boolean
+  administrator: LotAdministrator
+}
+
+export const AdminActions = ({
+  disabled,
+  administrator,
+}: AdminActionsProps) => {
+  return (
+    <React.Fragment>
+      <AsyncButton
+        icon={Check}
+        level="success"
+        loading={administrator.loading}
+        disabled={disabled}
+        onClick={administrator.markSelectionForReview}
+      >
+        Épingler sélection
+      </AsyncButton>
+
+      <AsyncButton
+        icon={Cross}
+        level="danger"
+        loading={administrator.loading}
+        disabled={disabled}
+        onClick={administrator.markSelectionAsRead}
+      >
+        Ignorer sélection
       </AsyncButton>
     </React.Fragment>
   )

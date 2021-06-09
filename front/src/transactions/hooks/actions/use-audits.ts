@@ -55,7 +55,7 @@ export default function useAuditLots(
         )
 
     if (entity !== null && shouldHide) {
-      notify(resolveHideLot(entity.id, [tx.id]))
+      await notify(resolveHideLot(entity.id, [tx.id]))
     }
 
     return shouldHide
@@ -68,7 +68,7 @@ export default function useAuditLots(
     )
 
     if (entity !== null && shouldHide) {
-      notify(resolveHideLot(entity.id, selection.selected))
+      await notify(resolveHideLot(entity.id, selection.selected))
     }
 
     return shouldHide
@@ -86,7 +86,7 @@ export default function useAuditLots(
         )
 
     if (entity !== null && shouldHighlight) {
-      notify(resolveHighlightLot(entity.id, [tx.id]))
+      await notify(resolveHighlightLot(entity.id, [tx.id]))
     }
 
     return shouldHighlight
@@ -99,7 +99,7 @@ export default function useAuditLots(
     )
 
     if (entity !== null && shouldHide) {
-      notify(resolveHighlightLot(entity.id, selection.selected))
+      await notify(resolveHighlightLot(entity.id, selection.selected))
     }
 
     return shouldHide
