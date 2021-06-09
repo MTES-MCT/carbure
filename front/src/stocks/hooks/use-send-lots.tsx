@@ -17,16 +17,21 @@ import {
 } from "stocks/components/forward-lots-form"
 import { useNotificationContext } from "common/components/notifications"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
-import { ConvertETBE, StockDraft, TransactionQuery } from "common/types"
+import {
+  ConvertETBE,
+  StockDraft,
+  Transaction,
+  TransactionQuery,
+} from "common/types"
 import { isKnown } from "transactions/components/form/fields"
 import { SummaryPrompt } from "transactions/components/summary"
 
 export interface LotSender {
   loading: boolean
-  createDrafts: (i: number) => Promise<boolean>
+  createDrafts: (tx: Transaction) => Promise<boolean>
   sendAllDrafts: () => Promise<boolean>
   sendSelection: () => Promise<boolean>
-  sendLot: (l: number) => Promise<boolean>
+  sendLot: (tx: Transaction) => Promise<boolean>
   convertETBEComplex: () => Promise<boolean>
   forwardLots: () => Promise<boolean>
 }
@@ -109,14 +114,14 @@ export default function useSendLot(
     }
   }
 
-  async function createDrafts(txID: number) {
+  async function createDrafts(tx: Transaction) {
     const sent = await prompt<StockSendDetails>((resolve) => (
       <StockSendLotPrompt entity={entity} onResolve={resolve} />
     ))
 
     if (entity !== null && sent) {
       const draft: StockDraft = {
-        tx_id: txID,
+        tx_id: tx.id,
         volume: sent.volume,
         dae: sent.dae,
         delivery_date: sent.delivery_date,
@@ -135,14 +140,14 @@ export default function useSendLot(
     return Boolean(sent)
   }
 
-  async function sendLot(lotID: number) {
+  async function sendLot(tx: Transaction) {
     const shouldSend = await confirm(
       "Envoyer lots",
       "Voulez vous envoyer ce lot ?"
     )
 
     if (entity !== null && shouldSend) {
-      notifySend(resolveSend(entity.id, [lotID]), true)
+      notifySend(resolveSend(entity.id, [tx.id]), true)
     }
 
     return shouldSend

@@ -1,6 +1,6 @@
 import React from "react"
 
-import { LotStatus, UserRole } from "common/types"
+import { LotStatus, Transaction, UserRole } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
 import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
@@ -60,12 +60,13 @@ const StockDetails = ({
 
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
   const isEditable = EDITABLE.includes(status)
+  const transaction = details.data?.transaction
 
   async function run(
-    action: (i: number) => Promise<boolean>,
+    action: (tx: Transaction) => Promise<boolean>,
     closeOnDone: boolean = false
   ) {
-    if (await action(form.id)) {
+    if (transaction && (await action(transaction))) {
       refresh()
       refreshDetails()
 

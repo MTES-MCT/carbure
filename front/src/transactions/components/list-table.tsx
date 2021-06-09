@@ -62,36 +62,47 @@ export const ADMIN_COLUMNS = [
   C.ghgReduction,
 ]
 
-type A = Record<string, (id: number) => void>
-type CT = Column<Transaction>
+type TxActions = Record<string, (tx: Transaction) => void>
+type TxColumn = Column<Transaction>
 
-const getDraftActions = ({ onValidate, onDuplicate, onDelete }: A): CT =>
+const getDraftActions = ({
+  onValidate,
+  onDuplicate,
+  onDelete,
+}: TxActions): TxColumn =>
   Actions([
-    { icon: Check, title: "Envoyer le lot", action: (tx) => onValidate(tx.id) },
-    { icon: Copy, title: "Dupliquer le lot", action: (tx) => onDuplicate(tx.id) }, // prettier-ignore
-    { icon: Cross, title: "Supprimer le lot", action: (tx) => onDelete(tx.id) },
+    { icon: Check, title: "Envoyer le lot", action: onValidate },
+    { icon: Copy, title: "Dupliquer le lot", action: onDuplicate },
+    { icon: Cross, title: "Supprimer le lot", action: onDelete },
   ])
 
-const getToFixActions = ({ onCorrect, onDelete }: A): CT =>
+const getToFixActions = ({ onCorrect, onDelete }: TxActions): TxColumn =>
   Actions([
-    { icon: Check, title: "Renvoyer le lot", action: (tx) => onCorrect(tx.id) },
-    { icon: Cross, title: "Supprimer le lot", action: (tx) => onDelete(tx.id) },
+    { icon: Check, title: "Renvoyer le lot", action: onCorrect },
+    { icon: Cross, title: "Supprimer le lot", action: onDelete },
   ])
 
-const getInboxActions = ({ onAccept, onComment, onReject }: A): CT =>
+const getInboxActions = ({
+  onAccept,
+  onComment,
+  onReject,
+}: TxActions): TxColumn =>
   Actions([
-    { icon: Check, title: "Accepter le lot", action: (tx) => onAccept(tx.id) },
-    { icon: AlertTriangle, title: "Accepter sous réserve", action: (tx) => onComment(tx.id) }, // prettier-ignore
-    { icon: Cross, title: "Refuser le lot", action: (tx) => onReject(tx.id) },
+    { icon: Check, title: "Accepter le lot", action: onAccept },
+    { icon: AlertTriangle, title: "Accepter sous réserve", action: onComment },
+    { icon: Cross, title: "Refuser le lot", action: onReject },
   ])
 
-const getDuplicateActions = ({ onDuplicate }: A): Column<Transaction> =>
-  Actions([{ icon: Copy, title: "Dupliquer le lot", action: (tx) => onDuplicate(tx.id) }]) // prettier-ignore
+const getDuplicateActions = ({ onDuplicate }: TxActions): Column<Transaction> =>
+  Actions([{ icon: Copy, title: "Dupliquer le lot", action: onDuplicate }])
 
-const getControlActions = ({ onHide, onHighlight }: A): Column<Transaction> =>
+const getControlActions = ({
+  onHide,
+  onHighlight,
+}: TxActions): Column<Transaction> =>
   Actions([
-    { icon: Pin, title: "Marquer le lot", action: (tx) => onHighlight(tx.id) }, // prettier-ignore
-    { icon: EyeOff, title: "Cacher le lot", action: (tx) => onHide(tx.id) },
+    { icon: Pin, title: "Marquer le lot", action: onHighlight },
+    { icon: EyeOff, title: "Cacher le lot", action: onHide },
   ])
 
 type TransactionTableProps = {
@@ -102,17 +113,17 @@ type TransactionTableProps = {
   outsourceddepots: EntityDeliverySite[] | undefined
 
   selection: TransactionSelection
-  onDelete: (id: number) => void
-  onValidate: (id: number) => void
-  onDuplicate: (id: number) => void
-  onAccept: (id: number) => void
-  onComment: (id: number) => void
-  onReject: (id: number) => void
-  onCorrect: (id: number) => void
-  onAuditorHide: (id: number) => void
-  onAuditorHighlight: (id: number) => void
-  onAdminHide: (id: number) => void
-  onAdminHighlight: (id: number) => void
+  onDelete: (tx: Transaction) => void
+  onValidate: (tx: Transaction) => void
+  onDuplicate: (tx: Transaction) => void
+  onAccept: (tx: Transaction) => void
+  onComment: (tx: Transaction) => void
+  onReject: (tx: Transaction) => void
+  onCorrect: (tx: Transaction) => void
+  onAuditorHide: (tx: Transaction) => void
+  onAuditorHighlight: (tx: Transaction) => void
+  onAdminHide: (tx: Transaction) => void
+  onAdminHighlight: (tx: Transaction) => void
 }
 
 export const TransactionTable = ({
@@ -160,9 +171,16 @@ export const TransactionTable = ({
   if (rights.is(UserRole.Auditor, UserRole.ReadOnly)) {
     columns.push(arrow)
   } else if (isAdmin) {
-    columns.push(getControlActions({ onHide: onAdminHide, onHighlight: onAdminHighlight }))
+    columns.push(
+      getControlActions({ onHide: onAdminHide, onHighlight: onAdminHighlight })
+    )
   } else if (isAdmin || isAuditor) {
-    columns.push(getControlActions({ onHide: onAuditorHide, onHighlight: onAuditorHighlight }))
+    columns.push(
+      getControlActions({
+        onHide: onAuditorHide,
+        onHighlight: onAuditorHighlight,
+      })
+    )
   } else if (status.is(LotStatus.Draft)) {
     columns.push(getDraftActions({ onValidate, onDuplicate, onDelete }))
   } else if (status.is(LotStatus.ToFix)) {

@@ -6,12 +6,12 @@ import useAPI from "../../../common/hooks/use-api"
 
 import { confirm, prompt } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
-import { TransactionQuery } from "common/types"
+import { Transaction, TransactionQuery } from "common/types"
 import { SummaryPrompt } from "transactions/components/summary"
 
 export interface LotDeleter {
   loading: boolean
-  deleteLot: (l: number) => Promise<boolean>
+  deleteLot: (tx: Transaction) => Promise<boolean>
   deleteSelection: () => Promise<boolean>
   deleteAll: () => Promise<boolean>
 }
@@ -49,14 +49,14 @@ export default function useDeleteLots(
     }
   }
 
-  async function deleteLot(lotID: number) {
+  async function deleteLot(tx: Transaction) {
     const shouldDelete = await confirm(
       "Supprimer lot",
       "Voulez vous supprimer ce lot ?"
     )
 
     if (entity !== null && shouldDelete) {
-      await notifyDelete(resolveDelete(entity.id, [lotID]))
+      await notifyDelete(resolveDelete(entity.id, [tx.id]))
     }
 
     return shouldDelete
