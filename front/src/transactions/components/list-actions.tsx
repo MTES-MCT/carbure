@@ -18,6 +18,8 @@ import {
   Upload,
   Forward,
   Search,
+  Pin,
+  EyeOff,
 } from "common/components/icons"
 import { prompt } from "common/components/dialog"
 
@@ -253,7 +255,7 @@ export const AdminActions = ({
   return (
     <React.Fragment>
       <AsyncButton
-        icon={Check}
+        icon={Pin}
         level="success"
         loading={administrator.loading}
         disabled={disabled}
@@ -263,8 +265,8 @@ export const AdminActions = ({
       </AsyncButton>
 
       <AsyncButton
-        icon={Cross}
-        level="danger"
+        icon={EyeOff}
+        level="warning"
         loading={administrator.loading}
         disabled={disabled}
         onClick={administrator.markSelectionAsRead}
@@ -284,7 +286,7 @@ export const AuditorActions = ({ disabled, auditor }: AuditorActionsProps) => {
   return (
     <React.Fragment>
       <AsyncButton
-        icon={Check}
+        icon={Pin}
         level="success"
         loading={auditor.loading}
         disabled={disabled}
@@ -294,7 +296,7 @@ export const AuditorActions = ({ disabled, auditor }: AuditorActionsProps) => {
       </AsyncButton>
 
       <AsyncButton
-        icon={Cross}
+        icon={EyeOff}
         level="danger"
         loading={auditor.loading}
         disabled={disabled}
