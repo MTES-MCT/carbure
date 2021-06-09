@@ -65,5 +65,6 @@ urlpatterns = [
      path('accept-user', views.accept_user, name='api-v3-settings-access-user'),
      path('revoke-user', views.revoke_user, name='api-v3-settings-revoke-user'),
      path('revoke-myself', views.revoke_myself, name='api-v3-settings-revoke-myself'),
+     path('entity-hash', views.get_entity_hash, name='api-v3-settings-entity-hash'),
 
 ]
