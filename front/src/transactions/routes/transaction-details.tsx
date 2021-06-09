@@ -1,6 +1,6 @@
 import React from "react"
 
-import { LotStatus, EntityType, UserRole } from "common/types"
+import { LotStatus, EntityType, UserRole, Transaction } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
 import { LotAcceptor } from "transactions/hooks/actions/use-accept-lots"
@@ -94,10 +94,10 @@ const TransactionDetails = ({
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
   async function run(
-    action: (i: number) => Promise<boolean>,
+    action: (tx: Transaction) => Promise<boolean>,
     nextOnDone: boolean = false
   ) {
-    if (await action(form.id)) {
+    if (transaction && (await action(transaction))) {
       refreshDetails()
 
       if (nextOnDone) {
@@ -253,27 +253,27 @@ const TransactionDetails = ({
           )}
 
         {isAdmin && (
-            <React.Fragment>
-              <AsyncButton
-                disabled={transaction?.hidden_by_admin}
-                icon={Check}
-                level="success"
-                loading={administrator.loading}
-                onClick={() => run(administrator.markAsRead, true)}
-              >
-                Cacher Lot
-              </AsyncButton>
-              <AsyncButton
-                disabled={transaction?.highlighted_by_admin}
-                icon={Cross}
-                level="warning"
-                loading={administrator.loading}
-                onClick={() => run(administrator.markForReview, true)}
-              >
-                Mettre de côté
-              </AsyncButton>
-            </React.Fragment>
-          )}
+          <React.Fragment>
+            <AsyncButton
+              disabled={transaction?.hidden_by_admin}
+              icon={Check}
+              level="success"
+              loading={administrator.loading}
+              onClick={() => run(administrator.markAsRead, true)}
+            >
+              Cacher Lot
+            </AsyncButton>
+            <AsyncButton
+              disabled={transaction?.highlighted_by_admin}
+              icon={Cross}
+              level="warning"
+              loading={administrator.loading}
+              onClick={() => run(administrator.markForReview, true)}
+            >
+              Mettre de côté
+            </AsyncButton>
+          </React.Fragment>
+        )}
 
         <Box row className={styles.transactionNavButtons}>
           <Button
