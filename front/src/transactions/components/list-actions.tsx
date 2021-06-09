@@ -297,7 +297,7 @@ export const AuditorActions = ({ disabled, auditor }: AuditorActionsProps) => {
 
       <AsyncButton
         icon={EyeOff}
-        level="danger"
+        level="warning"
         loading={auditor.loading}
         disabled={disabled}
         onClick={auditor.hideLotSelection}
