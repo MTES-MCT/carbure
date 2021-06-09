@@ -32,7 +32,6 @@ import useForwardLots from "./hooks/actions/use-forward-lots"
 import useTransactionQuery from "./hooks/query/use-transaction-query"
 import { useRights } from "carbure/hooks/use-rights"
 import useAdministrateLots from "./hooks/actions/use-admin-lots"
-import { admin } from "common/__test__/data"
 
 // prettier-ignore
 const OPERATOR_STATUSES = [
@@ -90,7 +89,7 @@ const ADMIN_FILTERS = [
   Filters.Forwarded,
   Filters.Errors,
   Filters.HiddenByAdmin,
-  Filters.HiddenByAuditor
+  Filters.HiddenByAuditor,
   // Filters.HighlightedByAdmin,
 ]
 
@@ -292,6 +291,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
             acceptor={acceptor}
             rejector={rejector}
             administrator={administrator}
+            auditor={auditor}
             transactions={summary.data?.tx_ids ?? []}
           />
         </Route>

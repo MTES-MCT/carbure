@@ -37,8 +37,8 @@ const FILTER_LABELS = {
   [Filters.Errors]: "Incohérences",
   [Filters.Forwarded]: "Lots Transférés",
   [Filters.Mac]: "Mises à consommation",
-  [Filters.HiddenByAdmin]: "Lots cachés",
-  [Filters.HiddenByAuditor]: "Lots cachés",
+  [Filters.HiddenByAdmin]: "Lots ignorés",
+  [Filters.HiddenByAuditor]: "Lots ignorés",
 }
 
 export function mapFilters(

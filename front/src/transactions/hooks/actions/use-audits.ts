@@ -22,14 +22,13 @@ export default function useAuditLots(
   const [highlightReq, resolveHighlightLot] = useAPI(api.highlightAuditorLots)
 
   async function hideLot(tx: Transaction) {
-    console.log(tx)
     const shouldHide = tx.hidden_by_auditor
       ? await confirm(
           "Montrer le lot",
           "Voulez-vous montrer à nouveau ce lot dans la liste ?"
         )
       : await confirm(
-          "Cacher le lot",
+          "Ignorer le lot",
           "Voulez-vous ne plus voir ce lot dans la liste ?"
         )
 
@@ -52,11 +51,11 @@ export default function useAuditLots(
   async function highlightLot(tx: Transaction) {
     const shouldHighlight = tx.highlighted_by_auditor
       ? await confirm(
-          "Annuler le marquage du lot",
-          "Confirmez-vous ne plus vouloir mettre ce lot de côté ?"
+          "Désépingler le lot",
+          "Voulez-vous retirer ce lot de la liste des lots mis de côté ?"
         )
       : await confirm(
-          "Marquer ce lot",
+          "Épingler ce lot",
           "Voulez-vous mettre ce lot de côté pour l'étudier plus tard ?"
         )
 
