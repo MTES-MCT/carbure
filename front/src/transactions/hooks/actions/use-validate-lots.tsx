@@ -11,12 +11,12 @@ import {
   ValidationPrompt,
   ValidationSummaryPrompt,
 } from "transactions/components/validation"
-import { TransactionQuery } from "common/types"
+import { Transaction, TransactionQuery } from "common/types"
 
 export interface LotValidator {
   loading: boolean
-  validateLot: (l: number) => Promise<boolean>
-  validateAndCommentLot: (l: number) => Promise<boolean>
+  validateLot: (tx: Transaction) => Promise<boolean>
+  validateAndCommentLot: (tx: Transaction) => Promise<boolean>
   validateSelection: () => Promise<boolean>
   validateAll: () => Promise<boolean>
 }
@@ -76,7 +76,7 @@ export default function useValidateLots(
     }
   }
 
-  async function validateLot(lotID: number) {
+  async function validateLot(tx: Transaction) {
     const shouldValidate = await prompt<boolean>((resolve) => (
       <ValidationPrompt
         title="Envoyer lot"
@@ -86,13 +86,13 @@ export default function useValidateLots(
     ))
 
     if (entity !== null && shouldValidate) {
-      await notifyValidate(resolveValidate(entity.id, [lotID]))
+      await notifyValidate(resolveValidate(entity.id, [tx.id]))
     }
 
     return shouldValidate ?? false
   }
 
-  async function validateAndCommentLot(lotID: number) {
+  async function validateAndCommentLot(tx: Transaction) {
     const comment = await prompt<string>((resolve) => (
       <CommentPrompt
         title="Envoyer lot"
@@ -102,7 +102,7 @@ export default function useValidateLots(
     ))
 
     if (entity !== null && comment) {
-      await notifyValidate(resolveValidateAndComment(entity.id, lotID, comment))
+      await notifyValidate(resolveValidateAndComment(entity.id, tx.id, comment))
     }
 
     return Boolean(comment)

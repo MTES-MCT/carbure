@@ -277,8 +277,8 @@ export interface LotDetails {
   errors: GenericError[]
   updates?: LotUpdate[]
   certificates: {
-    production_site_certificate: CertificateInfo | null,
-    supplier_certificate: CertificateInfo | null,
+    production_site_certificate: CertificateInfo | null
+    supplier_certificate: CertificateInfo | null
     vendor_certificate: CertificateInfo | null
   }
 }
@@ -330,7 +330,7 @@ export interface TransactionQuery {
   [Filters.HiddenByAdmin]?: any
   [Filters.HiddenByAuditor]?: any
   // [Filters.HighlightedByAdmin]?: any
-  // [Filters.HighlightedByAuditor]?: any  
+  // [Filters.HighlightedByAuditor]?: any
 }
 
 export interface Snapshot {
@@ -444,15 +444,13 @@ export type SNCertificate = {
   download_link: string
 }
 
-
 export type Certificate =
   | ISCCCertificate
   | DBSCertificate
   | REDCertCertificate
   | SNCertificate
 
-
-export interface CertificateInfo { 
+export interface CertificateInfo {
   certificate_id: string
   certificate_type: "2BS" | "ISCC" | "REDCERT" | "SN"
   holder: string

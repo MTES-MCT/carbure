@@ -10,11 +10,11 @@ import {
   CommentPrompt,
   CommentWithSummaryPrompt,
 } from "transactions/components/form-comments"
-import { TransactionQuery } from "common/types"
+import { Transaction, TransactionQuery } from "common/types"
 
 export interface LotRejector {
   loading: boolean
-  rejectLot: (l: number) => Promise<boolean>
+  rejectLot: (tx: Transaction) => Promise<boolean>
   rejectSelection: () => Promise<boolean>
   rejectAllInbox: () => Promise<boolean>
 }
@@ -52,7 +52,7 @@ export default function useRejectLots(
     }
   }
 
-  async function rejectLot(lotID: number) {
+  async function rejectLot(tx: Transaction) {
     const comment = await prompt<string>((resolve) => (
       <CommentPrompt
         title="Refuser lot"
@@ -62,7 +62,7 @@ export default function useRejectLots(
     ))
 
     if (entity !== null && comment) {
-      await notifyReject(resolveReject(entity.id, [lotID], comment))
+      await notifyReject(resolveReject(entity.id, [tx.id], comment))
     }
 
     return Boolean(comment)
