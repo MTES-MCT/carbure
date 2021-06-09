@@ -44,6 +44,7 @@ import {
   TraderImportActions,
   CreateActions,
   AuditorActions,
+  AdminActions,
 } from "./list-actions"
 import {
   DeadlineFilter,
@@ -120,6 +121,7 @@ export const TransactionList = ({
   const isOperator = entity.entity_type === EntityType.Operator
   const isTrader = entity.entity_type === EntityType.Trader
   const isAuditor = entity.entity_type === EntityType.Auditor
+  const isAdmin = entity.entity_type === EntityType.Administration
 
   const isLoading = transactions.loading
   const isError = transactions.error !== null
@@ -128,6 +130,7 @@ export const TransactionList = ({
   const hasOutsourcedBlendingDepot =
     outsourceddepots && outsourceddepots.length > 0
 
+  const hasSelection = selection.selected.length > 0
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
   return (
@@ -156,7 +159,7 @@ export const TransactionList = ({
 
               <DraftActions
                 disabled={isEmpty}
-                hasSelection={selection.selected.length > 0}
+                hasSelection={hasSelection}
                 uploader={uploader}
                 deleter={deleter}
                 validator={validator}
@@ -168,7 +171,7 @@ export const TransactionList = ({
             <React.Fragment>
               <InboxActions
                 disabled={isEmpty}
-                hasSelection={selection.selected.length > 0}
+                hasSelection={hasSelection}
                 acceptor={acceptor}
                 rejector={rejector}
               />
@@ -176,10 +179,7 @@ export const TransactionList = ({
           )}
 
           {canModify && status.is(LotStatus.ToFix) && (
-            <ToFixActions
-              disabled={selection.selected.length === 0}
-              deleter={deleter}
-            />
+            <ToFixActions disabled={!hasSelection} deleter={deleter} />
           )}
 
           {isOperator &&
@@ -189,16 +189,20 @@ export const TransactionList = ({
               <OperatorOutsourcedBlendingActions
                 forwarder={forwarder}
                 outsourceddepots={outsourceddepots}
-                disabled={selection.selected.length === 0}
+                disabled={!hasSelection}
                 selection={selection}
               />
             )}
 
-          {isAuditor && (
-            <AuditorActions
-              disabled={selection.selected.length === 0}
-              auditor={auditor}
+          {isAdmin && (
+            <AdminActions
+              disabled={!hasSelection}
+              administrator={administrator}
             />
+          )}
+
+          {isAuditor && (
+            <AuditorActions disabled={!hasSelection} auditor={auditor} />
           )}
         </ActionBar>
       )}

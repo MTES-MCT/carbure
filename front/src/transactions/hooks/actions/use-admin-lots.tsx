@@ -11,6 +11,8 @@ export interface LotAdministrator {
   loading: boolean
   markAsRead: (tx: Transaction) => Promise<boolean>
   markForReview: (tx: Transaction) => Promise<boolean>
+  markSelectionAsRead: () => Promise<boolean>
+  markSelectionForReview: () => Promise<boolean>
   hideAlerts: (txIDs: number[]) => Promise<boolean>
   highlightAlerts: (txIDs: number[]) => Promise<boolean>
 }
@@ -57,9 +59,25 @@ export default function useAdministrateLots(
     return false
   }
 
+  async function markSelectionAsRead() {
+    if (entity !== null) {
+      await notify(resolveHideLots(entity.id, selection.selected))
+      return true
+    }
+    return false
+  }
+
   async function markForReview(tx: Transaction) {
     if (entity) {
       await notify(resolveHighlightLots(entity?.id, [tx.id]))
+      return true
+    }
+    return false
+  }
+
+  async function markSelectionForReview() {
+    if (entity !== null) {
+      await notify(resolveHighlightLots(entity.id, selection.selected))
       return true
     }
     return false
@@ -82,7 +100,9 @@ export default function useAdministrateLots(
       requestHighlightAlert.loading ||
       requestHighlight.loading,
     markAsRead,
+    markSelectionAsRead,
     markForReview,
+    markSelectionForReview,
     hideAlerts,
     highlightAlerts,
   }
