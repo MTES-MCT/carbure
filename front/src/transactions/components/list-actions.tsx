@@ -34,6 +34,7 @@ import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { SearchSelection } from "transactions/hooks/query/use-search"
 import { Input, InputProps } from "common/components/input"
+import { LotAuditor } from "transactions/hooks/actions/use-audits"
 
 type ExportActionsProps = {
   isEmpty: boolean
@@ -234,6 +235,37 @@ export const InboxActions = ({
         onClick={onReject}
       >
         Refuser {hasSelection ? `sélection` : "tout"}
+      </AsyncButton>
+    </React.Fragment>
+  )
+}
+
+type AuditorActionsProps = {
+  disabled: boolean
+  auditor: LotAuditor
+}
+
+export const AuditorActions = ({ disabled, auditor }: AuditorActionsProps) => {
+  return (
+    <React.Fragment>
+      <AsyncButton
+        icon={Check}
+        level="success"
+        loading={auditor.loading}
+        disabled={disabled}
+        onClick={auditor.highlightLotSelection}
+      >
+        Épingler sélection
+      </AsyncButton>
+
+      <AsyncButton
+        icon={Cross}
+        level="danger"
+        loading={auditor.loading}
+        disabled={disabled}
+        onClick={auditor.hideLotSelection}
+      >
+        Ignorer sélection
       </AsyncButton>
     </React.Fragment>
   )
