@@ -537,7 +537,7 @@ def make_dump_lots_sheet(workbook, entity, transactions):
     bold = workbook.add_format({'bold': True})
     columns = ['carbure_id', 'producer', 'production_site', 'production_site_country', 'production_site_reference',
                'production_site_commissioning_date', 'double_counting_registration', 'supplier', 'supplier_certificate',
-               'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
+               'volume', 'biocarburant_code', 'matiere_premiere_code', 'categorie_matiere_premiere', 'pays_origine_code',
                'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total',
                'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country', 'delivery_site_name']
     if entity is not None and entity.has_mac:
@@ -565,6 +565,7 @@ def make_dump_lots_sheet(workbook, entity, transactions):
                tx.carbure_vendor_certificate if tx.carbure_vendor else tx.lot.unknown_supplier_certificate,
                lot.volume, lot.biocarburant.code if lot.biocarburant else '',
                lot.matiere_premiere.code if lot.matiere_premiere else '',
+               lot.matiere_premiere.category if lot.matiere_premiere else '',
                lot.pays_origine.code_pays if lot.pays_origine else '',
                lot.eec, lot.el, lot.ep, lot.etd, lot.eu, lot.esca, lot.eccs, lot.eccr, lot.eee, lot.ghg_total,
                tx.dae, tx.champ_libre, tx.carbure_client.name if tx.client_is_in_carbure and tx.carbure_client else tx.unknown_client, 

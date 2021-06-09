@@ -30,6 +30,10 @@ export default function useNavigate(transactions: number[]) {
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
+      if ((e.target as Element)?.matches("input")) {
+        return
+      }
+
       if (e.key === "ArrowLeft") {
         prev()
       } else if (e.key === "ArrowRight") {

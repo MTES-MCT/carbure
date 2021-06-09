@@ -74,6 +74,11 @@
   right: 10px;
   bottom: 10px;
   color: var(--gray-medium);
+  background-color: var(--white);
+}
+
+.readonlyLabel .labelIcon {
+  background-color: var(--gray-light)
 }
 
 .disabledLabel {

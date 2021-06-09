@@ -1,3 +1,5 @@
+import { Trans } from 'react-i18next'
+import cl from 'clsx'
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { TransactionFormState } from "transactions/hooks/use-transaction-form"
 import * as api from "common/api"
@@ -22,8 +24,12 @@ import {
   Entity,
   MatierePremiere as MP,
   ProductionSiteDetails,
+  CertificateInfo
 } from "common/types"
-import { UserCheck } from "common/components/icons"
+import { UserCheck, FileCheck, Return } from "common/components/icons"
+import { Button } from "common/components/button"
+import { prompt, Dialog, DialogTitle, DialogText, DialogButtons } from "common/components/dialog"
+import styles from './fields.module.css'
 
 type ContentProps = {
   data?: TransactionFormState
@@ -61,6 +67,57 @@ const getters = {
   id: get("id"),
   depot_id: get("depot_id"),
   raw: (v: string) => v,
+}
+
+const CertificateInfoPrompt = ({ certificate, onResolve }: { certificate: CertificateInfo, onResolve: () => void }) => (
+  <Dialog onResolve={onResolve} className={styles.certificateDialog}>
+    <DialogTitle text="Détails du certificat" />
+
+    <ul className={styles.certificateInfo}>
+      <li>
+        <b><Trans>ID du certificat</Trans>: </b>
+        <span>{certificate.certificate_id}</span>
+      </li>
+      <li>
+        <b><Trans>Société</Trans>: </b>
+        <span>{certificate.holder}</span>
+      </li>
+      <li>
+        <b><Trans>Périmètre du certificat</Trans>: </b>
+        <span>{certificate.scope.join(', ')}</span>
+      </li>
+      <li>
+        <b><Trans>Période de validité</Trans>: </b>
+        <span>{certificate.valid_from} → {certificate.valid_until}</span>
+      </li>
+    </ul>
+    
+
+    <DialogButtons>
+      <Button icon={Return} onClick={() => onResolve()}>Retour</Button>
+    </DialogButtons>
+  </Dialog>
+)
+
+const CertificateIcon = ({ certificate, ...props }: any) => {
+  function openCertificateInfo() {
+    prompt(resolve => (
+      <CertificateInfoPrompt 
+        certificate={certificate} 
+        onResolve={resolve} 
+      />
+    ))
+  }
+
+  return (
+    <FileCheck 
+      {...props} 
+      title="Voir le certificat" 
+      onClick={openCertificateInfo}
+      onMouseDown={(e: any) => e.stopPropagation()}
+      className={cl(props.className, styles.certificateIcon)}
+    />
+  )
 }
 
 const macOptions = [
@@ -122,12 +179,17 @@ export const Biocarburant = ({ data, value, errors, ...props }: LACP<BC>) => (
   />
 )
 
+
+
 export const MatierePremiere = ({
   data,
   value,
   errors,
   ...props
-}: LACP<MP>) => (
+}: LACP<MP>) => {
+  const category = data?.matiere_premiere?.category
+
+  return (
   <LabelAutoComplete
     required
     name="matiere_premiere"
@@ -138,9 +200,11 @@ export const MatierePremiere = ({
     getValue={getters.code}
     getLabel={getters.name}
     getQuery={api.findMatieresPremieres}
+    icon={(p: any) => <span {...p}>{category}</span>}
     {...props}
   />
-)
+  )
+}
 
 export const PaysOrigine = ({
   data,
@@ -294,13 +358,25 @@ export const ProductionSiteReference = ({
   const queryArgs = data && isKnown(data.production_site) ? [null, data.production_site.id] : [] // prettier-ignore
   const error = errors?.carbure_production_site_reference ?? errors?.unknown_production_site_reference // prettier-ignore
 
+  const certInfo = data?.certificates.production_site_certificate
+  const isKnownCert = Boolean(certInfo) && certInfo?.found
+
+  const icon = isKnownCert
+    ? (p: any) => <CertificateIcon {...p} certificate={certInfo} />
+    : undefined
+
+  const cert = isKnownCert
+    ? certInfo?.certificate_id
+    : data?.production_site_reference
+
   return (
     <LabelAutoComplete
       loose
       name="production_site_reference"
       label="Certificat du site de production"
       minLength={0}
-      value={value ?? data?.production_site_reference}
+      value={value ?? cert}
+      icon={icon}
       error={error}
       queryArgs={queryArgs}
       getValue={getters.raw}
@@ -344,14 +420,27 @@ export const CarbureSelfCertificate = ({
   value,
   errors,
   ...props
-}: LACP<string>) => (
+}: LACP<string>) => {
+  const certInfo = data?.certificates.vendor_certificate
+  const isKnownCert = Boolean(certInfo) && certInfo?.found
+
+  const icon = isKnownCert
+    ? (p: any) => <CertificateIcon {...p} certificate={certInfo} />
+    : undefined
+
+  const cert = isKnownCert
+    ? certInfo?.certificate_id
+    : data?.carbure_vendor_certificate
+
+  return (
   <LabelAutoComplete
     loose
     required
     name="carbure_vendor_certificate"
     label="Votre certificat"
     minLength={0}
-    value={value ?? data?.carbure_vendor_certificate}
+    value={value ?? cert}
+    icon={icon}
     error={errors?.carbure_vendor_certificate}
     queryArgs={[data?.carbure_vendor?.id]}
     getValue={getters.raw}
@@ -360,6 +449,7 @@ export const CarbureSelfCertificate = ({
     {...props}
   />
 )
+  }
 
 // readonly version of the above for clients
 export const CarbureVendorCertificate = ({
@@ -367,15 +457,30 @@ export const CarbureVendorCertificate = ({
   value,
   errors,
   ...props
-}: LIP) => (
-  <LabelInput
+}: LACP<string>) => {
+  const certInfo = data?.certificates.vendor_certificate
+  const isKnownCert = Boolean(certInfo) && certInfo?.found
+
+  const icon = isKnownCert
+    ? (p: any) => <CertificateIcon {...p} certificate={certInfo} />
+    : undefined
+
+  const cert = isKnownCert
+    ? certInfo?.certificate_id
+    : data?.carbure_vendor_certificate
+  
+  return (
+  <LabelAutoComplete
+    search={false}
     name="carbure_vendor_certificate"
     label="Certificat du fournisseur"
-    value={value ?? data?.carbure_vendor_certificate}
+    value={value ?? cert}
+    icon={icon}
     error={errors?.carbure_vendor_certificate}
     {...props}
   />
 )
+  }
 
 export const UnknownSupplier = ({ data, value, errors, ...props }: LIP) => (
   <LabelInput
@@ -393,21 +498,35 @@ export const UnknownSupplierCertificate = ({
   value,
   errors,
   ...props
-}: LACP<string>) => (
-  <LabelAutoComplete
-    loose
-    disabled={isKnown(data?.producer)}
-    name="unknown_supplier_certificate"
-    label="Certificat du fournisseur"
-    minLength={0}
-    value={value ?? data?.unknown_supplier_certificate}
-    error={errors?.unknown_supplier_certificate}
-    getValue={getters.raw}
-    getLabel={getters.raw}
-    getQuery={api.findCertificates}
-    {...props}
-  />
-)
+}: LACP<string>) => {
+  const certInfo = data?.certificates.supplier_certificate
+  const isKnownCert = Boolean(certInfo) && certInfo?.found
+
+  const icon = isKnownCert
+    ? (p: any) => <CertificateIcon {...p} certificate={certInfo} />
+    : undefined
+
+  const cert = isKnownCert
+    ? certInfo?.certificate_id
+    : data?.unknown_supplier_certificate
+  
+  return (
+    <LabelAutoComplete
+      loose
+      disabled={isKnown(data?.producer)}
+      name="unknown_supplier_certificate"
+      label="Certificat du fournisseur"
+      minLength={0}
+      value={value ?? cert}
+      icon={icon}
+      error={errors?.unknown_supplier_certificate}
+      getValue={getters.raw}
+      getLabel={getters.raw}
+      getQuery={api.findCertificates}
+      {...props}
+    />
+  )
+}
 
 export const ChampLibre = ({ data, value, errors, ...props }: LTAP) => (
   <LabelTextArea

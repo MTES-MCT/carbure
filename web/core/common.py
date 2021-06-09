@@ -26,11 +26,14 @@ from api.v3.sanity_checks import bulk_sanity_checks, tx_is_valid, lot_is_valid
 
 
 def try_get_certificate(certificate):
-    d = {'holder': '',
+    d = {
+         'holder': '',
          'valid_until': '',
          'valid_from': '',
          'matches': 0,
          'found': False,
+         'certificate_id': certificate,
+         'certificate_type': '',
          }
     iscc = ISCCCertificate.objects.filter(certificate_id=certificate)
     dbs = DBSCertificate.objects.filter(certificate_id=certificate)
@@ -43,22 +46,31 @@ def try_get_certificate(certificate):
         d['matches'] = count
         return d
     d['matches'] = 1
+    d['found'] = True
     if iscc.count() == 1:
         d['holder'] = iscc[0].certificate_holder
         d['valid_until'] = iscc[0].valid_until
         d['valid_from'] = iscc[0].valid_from
+        d['scope'] = [c.scope.scope for c in iscc[0].iscccertificatescope_set.all()]
+        d['certificate_type'] = 'ISCC'
     if dbs.count() == 1:
         d['holder'] = dbs[0].certificate_holder
         d['valid_until'] = dbs[0].valid_until
         d['valid_from'] = dbs[0].valid_from
+        d['scope'] = [c.scope.certification_type for c in dbs[0].dbscertificatescope_set.all()]
+        d['certificate_type'] = '2BS'
     if red.count() == 1:
         d['holder'] = red[0].certificate_holder
         d['valid_until'] = red[0].valid_until
         d['valid_from'] = red[0].valid_from
+        d['scope'] = [c.scope.scope for c in red[0].redcertcertificatescope_set.all()]
+        d['certificate_type'] = 'REDCERT'
     if sn.count() == 1:
         d['holder'] = sn[0].certificate_holder
         d['valid_until'] = sn[0].valid_until
         d['valid_from'] = sn[0].valid_from
+        d['scope'] = [c.scope.category_id for c in sn[0].sncertificatescope_set.all()]
+        d['certificate_type'] = 'SN'
     return d
 
 

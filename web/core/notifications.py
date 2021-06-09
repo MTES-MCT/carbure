@@ -1,4 +1,6 @@
-from core.models import LotTransaction, EmailNotification
+from core.models import LotTransaction, EmailNotification, UserRights, SustainabilityDeclaration
+import datetime
+
 
 def notify_lots_rejected(txs):
     for tx in txs:
@@ -32,8 +34,8 @@ def notify_declaration_invalidated(tx, entity):
     except:
         # declaration doesn't exist ?
         pass    
-    EmailNotification.objects.create()
-    EmailNotification.objects.create()    
+    #EmailNotification.objects.create()
+    #EmailNotification.objects.create()    
 
 def notify_declaration_validated(declaration):
     pass

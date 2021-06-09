@@ -109,8 +109,8 @@ export default function useTransactionDetails(
   }, [resolveDetails, entityID, txID])
 
   useEffect(() => {
-    if (tx) {
-      reset(toTransactionFormState(tx))
+    if (details.data) {
+      reset(toTransactionFormState(details.data))
     }
   }, [tx, reset])
 

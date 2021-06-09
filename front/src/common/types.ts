@@ -18,6 +18,7 @@ export enum LotStatus {
   Alert = "alert",
   Correction = "correction",
   Declaration = "declaration",
+  Highlight = "highlight",
 }
 
 export enum GESOption {
@@ -53,6 +54,7 @@ export interface MatierePremiere {
   code: string
   name: string
   is_double_compte?: boolean
+  category: string
 }
 
 export interface MatierePremiereDetails extends MatierePremiere {
@@ -200,6 +202,11 @@ export interface Transaction {
   carbure_delivery_site: DeliverySite | null
   unknown_delivery_site: string
   unknown_delivery_site_country: Country | null
+
+  hidden_by_admin: boolean
+  hidden_by_auditor: boolean
+  highlighted_by_admin: boolean
+  highlighted_by_auditor: boolean
 }
 
 export interface GenericError {
@@ -269,6 +276,11 @@ export interface LotDetails {
   deadline: string
   errors: GenericError[]
   updates?: LotUpdate[]
+  certificates: {
+    production_site_certificate: CertificateInfo | null,
+    supplier_certificate: CertificateInfo | null,
+    vendor_certificate: CertificateInfo | null
+  }
 }
 
 export enum Filters {
@@ -285,6 +297,10 @@ export enum Filters {
   Errors = "errors",
   Forwarded = "is_forwarded",
   Mac = "is_mac",
+  HiddenByAdmin = "is_hidden_by_admin",
+  HiddenByAuditor = "is_hidden_by_auditor",
+  // HighlightedByAdmin = "is_highlighted_by_admin",
+  // HighlightedByAuditor = "is_highlighted_by_auditor",
 }
 
 export interface TransactionQuery {
@@ -310,6 +326,11 @@ export interface TransactionQuery {
   [Filters.AddedBy]?: any
   [Filters.Errors]?: any
   [Filters.Forwarded]?: any
+  [Filters.Mac]?: any
+  [Filters.HiddenByAdmin]?: any
+  [Filters.HiddenByAuditor]?: any
+  // [Filters.HighlightedByAdmin]?: any
+  // [Filters.HighlightedByAuditor]?: any  
 }
 
 export interface Snapshot {
@@ -423,11 +444,24 @@ export type SNCertificate = {
   download_link: string
 }
 
+
 export type Certificate =
   | ISCCCertificate
   | DBSCertificate
   | REDCertCertificate
   | SNCertificate
+
+
+export interface CertificateInfo { 
+  certificate_id: string
+  certificate_type: "2BS" | "ISCC" | "REDCERT" | "SN"
+  holder: string
+  valid_from: string
+  valid_until: string
+  matches: number
+  found: boolean
+  scope: string[]
+}
 
 export type ProductionCertificate = {
   certificate_id: string
