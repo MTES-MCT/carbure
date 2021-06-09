@@ -1,4 +1,3 @@
-import React from "react"
 import cl from "clsx"
 
 import {
@@ -16,7 +15,14 @@ import { StatusSelection } from "transactions/hooks/query/use-status"
 import { hasDeadline, hasErrors, hasWarnings } from "../helpers"
 import { useRelativePush } from "common/components/relative-route"
 
-import { AlertTriangle, Check, Copy, Cross } from "common/components/icons"
+import {
+  AlertTriangle,
+  Check,
+  Copy,
+  Cross,
+  EyeOff,
+  Pin,
+} from "common/components/icons"
 import Table, { Actions, arrow, Column, Row } from "common/components/table"
 import * as C from "./list-columns"
 
@@ -82,6 +88,12 @@ const getInboxActions = ({ onAccept, onComment, onReject }: A): CT =>
 const getDuplicateActions = ({ onDuplicate }: A): Column<Transaction> =>
   Actions([{ icon: Copy, title: "Dupliquer le lot", action: (tx) => onDuplicate(tx.id) }]) // prettier-ignore
 
+const getControlActions = ({ onHide, onHighlight }: A): Column<Transaction> =>
+  Actions([
+    { icon: Pin, title: "Marquer le lot", action: (tx) => onHighlight(tx.id) }, // prettier-ignore
+    { icon: EyeOff, title: "Cacher le lot", action: (tx) => onHide(tx.id) },
+  ])
+
 type TransactionTableProps = {
   entity: Entity
   transactions: Lots
@@ -97,6 +109,10 @@ type TransactionTableProps = {
   onComment: (id: number) => void
   onReject: (id: number) => void
   onCorrect: (id: number) => void
+  onAuditorHide: (id: number) => void
+  onAuditorHighlight: (id: number) => void
+  onAdminHide: (id: number) => void
+  onAdminHighlight: (id: number) => void
 }
 
 export const TransactionTable = ({
@@ -112,6 +128,10 @@ export const TransactionTable = ({
   onComment,
   onReject,
   onCorrect,
+  onAuditorHide,
+  onAuditorHighlight,
+  onAdminHide,
+  onAdminHighlight,
 }: TransactionTableProps) => {
   const rights = useRights()
   const relativePush = useRelativePush()
@@ -139,6 +159,10 @@ export const TransactionTable = ({
 
   if (rights.is(UserRole.Auditor, UserRole.ReadOnly)) {
     columns.push(arrow)
+  } else if (isAdmin) {
+    columns.push(getControlActions({ onHide: onAdminHide, onHighlight: onAdminHighlight }))
+  } else if (isAdmin || isAuditor) {
+    columns.push(getControlActions({ onHide: onAuditorHide, onHighlight: onAuditorHighlight }))
   } else if (status.is(LotStatus.Draft)) {
     columns.push(getDraftActions({ onValidate, onDuplicate, onDelete }))
   } else if (status.is(LotStatus.ToFix)) {

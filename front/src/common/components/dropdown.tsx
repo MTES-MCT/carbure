@@ -115,7 +115,9 @@ export function useDropdown(target?: Element | null) {
 
   function toggle(value?: any) {
     if (typeof value === "boolean") {
-      setOpen(value)
+      if (value !== isOpen) {
+        setOpen(value)
+      }
     } else {
       setOpen(!isOpen)
     }

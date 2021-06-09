@@ -199,6 +199,10 @@ def sanity_check(tx, prefetched_data):
         is_sane = False
         errors.append(generic_error(error='NOT_ALLOWED', tx=tx, is_blocking=True))
 
+    if tx.carbure_client and tx.carbure_client.entity_type == Entity.OPERATOR:
+        # ensure certificate exists and is valid
+        pass
+
 
     # transaction is not a MAC, is going to France and client is unknown
     if not tx.is_mac and tx.carbure_delivery_site and tx.carbure_delivery_site.country.code_pays == 'FR' and not tx.carbure_client:

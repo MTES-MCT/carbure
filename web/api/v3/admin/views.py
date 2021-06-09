@@ -17,6 +17,7 @@ from django.template.loader import render_to_string
 
 from core.models import LotTransaction, UserRightsRequests, SustainabilityDeclaration, Control
 from api.v3.lots.helpers import get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors, filter_lots, get_general_summary, sort_lots
+from core.common import check_certificates
 
 
 # Get an instance of a logger
@@ -163,6 +164,25 @@ def delete_entity(request):
     return JsonResponse({"status": "success", "data": "success"})
 
 
+def get_lots_by_status(txs, querySet):
+    status = querySet.get('status', False)
+    hidden = querySet.get('is_hidden_by_admin', None)
+
+    if status == 'alert':
+        txs = get_lots_with_errors(txs)
+    elif status == 'correction':
+        txs = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED])
+    elif status == 'declaration':
+        txs = txs.filter(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.PENDING, LotTransaction.FROZEN])
+    elif status == 'highlight':
+        txs = txs.filter(highlighted_by_admin=True)
+
+    if hidden is None:
+        txs = txs.filter(hidden_by_admin=False)
+
+    return txs
+
+
 @is_admin
 def get_lots(request):
     status = request.GET.get('status', False)
@@ -178,22 +198,17 @@ def get_lots(request):
         ).prefetch_related('genericerror_set', 'lot__carbure_production_site__productionsitecertificate_set')
 
         txs = txs.filter(lot__status=LotV2.VALIDATED)
-
-        if status == 'alert':
-            txs = get_lots_with_errors(txs)
-        elif status == 'correction':
-            txs = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED])
-        elif status == 'declaration':
-            txs = txs.filter(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.PENDING, LotTransaction.FROZEN])
+        txs = get_lots_by_status(txs, request.GET)
         return get_lots_with_metadata(txs, None, request.GET)
 
     except Exception:
+        import traceback
+        traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
 
 
 @is_admin
 def get_lots_summary(request, *args, **kwargs):
-    status = request.GET.get('status')
     selection = request.GET.getlist('selection')
 
     try:
@@ -202,12 +217,7 @@ def get_lots_summary(request, *args, **kwargs):
         if len(selection) > 0:
             txs = txs.filter(pk__in=selection)
         else:
-            if status == 'alert':
-                txs = get_lots_with_errors(txs)
-            elif status == 'correction':
-                txs = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED])
-            elif status == 'declaration':
-                txs = txs.filter(delivery_status__in=[LotTransaction.FROZEN, LotTransaction.ACCEPTED, LotTransaction.PENDING])
+            txs = get_lots_by_status(txs, request.GET)
             txs = filter_lots(txs, request.GET)[0]
             txs = sort_lots(txs, request.GET)
 
@@ -231,7 +241,8 @@ def get_details(request, *args, **kwargs):
     deadline_date = now.replace(day=last_day)
 
     data = {}
-    data['transaction'] = tx.natural_key()
+    data['transaction'] = tx.natural_key(admin=True)
+    data['certificates'] = check_certificates(tx)
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['comments'] = [c.natural_key() for c in tx.transactioncomment_set.all()]
@@ -264,7 +275,8 @@ def get_snapshot(request):
         alerts = txs.annotate(Count('genericerror')).filter(genericerror__count__gt=0).count()
         correction = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED]).count()
         declaration = txs.filter(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.PENDING, LotTransaction.FROZEN]).count()
-        data['lots'] = {'alert': alerts, 'correction': correction, 'declaration': declaration}
+        highlight = txs.filter(highlighted_by_admin=True).count()
+        data['lots'] = {'alert': alerts, 'correction': correction, 'declaration': declaration, 'highlight': highlight}
 
         data['filters'] = get_snapshot_filters(txs, [
             'delivery_status',
@@ -279,7 +291,9 @@ def get_snapshot(request):
             'added_by',
             'errors',
             'is_forwarded',
-            'is_mac'
+            'is_mac',
+            'is_hidden_by_admin',
+            'is_highlighted_by_admin'
         ])
 
     except Exception:
@@ -643,22 +657,22 @@ def controls_add_message(request):
 
 @is_admin
 def ack_alerts(request):
-    error_ids = request.POST.getlist('error_ids', False)
-    if not error_ids:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing error_ids"}, status=400)
+    alert_ids = request.POST.getlist('alert_ids', False)
+    if not alert_ids:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing alert_ids"}, status=400)
 
-    GenericError.objects.filter(id__in=error_ids).update(acked_by_admin=True)
+    GenericError.objects.filter(id__in=alert_ids).update(acked_by_admin=True)
     return JsonResponse({'status': 'success'})
 
 
 
 @is_admin
 def highlight_alerts(request):
-    error_ids = request.POST.getlist('error_ids', False)
-    if not error_ids:
-        return JsonResponse({'status': 'forbidden', 'message': "Missing error_ids"}, status=400)
+    alert_ids = request.POST.getlist('alert_ids', False)
+    if not alert_ids:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing alert_ids"}, status=400)
 
-    GenericError.objects.filter(id__in=error_ids).update(highlighted_by_admin=True)
+    GenericError.objects.filter(id__in=alert_ids).update(highlighted_by_admin=True)
     return JsonResponse({'status': 'success'})
 
 
@@ -669,7 +683,14 @@ def highlight_transactions(request):
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
 
-    LotTransaction.objects.filter(id__in=tx_ids).update(highlighted_by_admin=True)
+    txs = LotTransaction.objects.filter(id__in=tx_ids)
+
+    for tx in txs.iterator():
+        tx.highlighted_by_admin = not tx.highlighted_by_admin
+        if tx.highlighted_by_admin:
+            tx.hidden_by_admin = False
+        tx.save()
+
     return JsonResponse({'status': 'success'})
 
 @is_admin
@@ -679,5 +700,12 @@ def hide_transactions(request):
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
 
-    LotTransaction.objects.filter(id__in=tx_ids).update(hidden_by_admin=True)
+    txs = LotTransaction.objects.filter(id__in=tx_ids)
+
+    for tx in txs.iterator():
+        tx.hidden_by_admin = not tx.hidden_by_admin
+        if tx.hidden_by_admin:
+            tx.highlighted_by_admin = False
+        tx.save()
+        tx.genericerror_set.all().update(acked_by_admin=True)
     return JsonResponse({'status': 'success'})

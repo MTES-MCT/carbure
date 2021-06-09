@@ -15,13 +15,22 @@ def get_auditees(user):
     return UserRights.objects.filter(user=user, role=UserRights.AUDITOR).values_list('entity')
 
 
-def get_lots_by_status(txs, status):
+def get_lots_by_status(txs, querySet):
+    status = querySet.get('status', None)
+    hidden = querySet.get('is_hidden_by_auditor', None)
+
     if status == 'alert':
         txs = get_lots_with_errors(txs)
     elif status == 'correction':
         txs = txs.filter(delivery_status__in=['AC', 'R', 'AA'])
     elif status == 'declaration':
         txs = txs.filter(delivery_status__in=['A', 'N', 'F'])
+    elif status == 'highlight':
+        txs = txs.filter(highlighted_by_auditor=True)
+
+    if hidden is None:
+        txs = txs.filter(hidden_by_auditor=False)
+
     return txs
 
 
@@ -41,9 +50,8 @@ def get_lots(request, *args, **kwargs):
 
         txs = get_audited_lots(auditees)
         txs = txs.filter(lot__status='Validated')
-        txs = get_lots_by_status(txs, status)
+        txs = get_lots_by_status(txs, request.GET)
         txs = filter_lots(txs, request.GET)[0]
-
         return get_lots_with_metadata(txs, None, request.GET)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
@@ -51,7 +59,6 @@ def get_lots(request, *args, **kwargs):
 
 @check_rights('entity_id')
 def get_lots_summary(request, *args, **kwargs):
-    status = request.GET.get('status')
     selection = request.GET.getlist('selection')
 
     auditees = get_auditees(request.user)
@@ -61,7 +68,7 @@ def get_lots_summary(request, *args, **kwargs):
         if len(selection) > 0:
             txs = txs.filter(pk__in=selection)
         else:
-            txs = get_lots_by_status(txs, status)
+            txs = get_lots_by_status(txs, request.GET)
             txs = filter_lots(txs, request.GET)[0]
             txs = sort_lots(txs, request.GET)
 
@@ -115,6 +122,7 @@ def get_snapshot(request, *args, **kwargs):
         lots['alert'] = txs.annotate(Count('genericerror')).filter(genericerror__count__gt=0).count()
         lots['correction'] = txs.filter(delivery_status__in=['AC', 'AA', 'R']).count()
         lots['declaration'] = txs.filter(delivery_status__in=['A', 'N', 'F']).count()
+        lots['highlight'] = txs.filter(highlighted_by_auditor=True).count()
 
         filters = get_snapshot_filters(txs, [
             'delivery_status',
@@ -129,7 +137,8 @@ def get_snapshot(request, *args, **kwargs):
             'added_by',
             'errors',
             'is_forwarded',
-            'is_mac'
+            'is_mac',
+            'is_hidden_by_auditor'
         ])
 
         data = {'lots': lots, 'filters': filters, 'years': years}
@@ -138,26 +147,32 @@ def get_snapshot(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Failed building snapshot'}, status=400)
 
 
-@check_rights('entity_id', role=UserRights.AUDITOR)
+@check_rights('entity_id')
 def highlight_transactions(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
     tx_ids = request.POST.getlist('tx_ids', False)
 
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
 
-    LotTransaction.objects.filter(id__in=tx_ids).filter(Q(carbure_vendor=entity) | Q(carbure_client=entity)).update(highlighted_by_auditor=True)
+    txs = LotTransaction.objects.filter(id__in=tx_ids)
+
+    for tx in txs.iterator():
+        tx.highlighted_by_auditor = not tx.highlighted_by_auditor
+        tx.save()
+
     return JsonResponse({'status': 'success'})
 
-@check_rights('entity_id', role=UserRights.AUDITOR)
+@check_rights('entity_id')
 def hide_transactions(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
     tx_ids = request.POST.getlist('tx_ids', False)
 
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
 
-    LotTransaction.objects.filter(id__in=tx_ids).filter(Q(carbure_vendor=entity) | Q(carbure_client=entity)).update(hidden_by_auditor=True)
+    txs = LotTransaction.objects.filter(id__in=tx_ids)
+
+    for tx in txs.iterator():
+        tx.hidden_by_auditor = not tx.hidden_by_auditor
+        tx.save()
+
     return JsonResponse({'status': 'success'})

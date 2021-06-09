@@ -289,3 +289,27 @@ export const UserCheck = ({ className, ...props }: IconProps) => (
     <path d="M16 11l2 2l4 -4" />
   </Icon>
 )
+
+export const EyeOff = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-eye-off", className)}>
+    <line x1="3" y1="3" x2="21" y2="21" />
+    <path d="M10.584 10.587a2 2 0 0 0 2.828 2.83" />
+    <path d="M9.363 5.365a9.466 9.466 0 0 1 2.637 -.365c4 0 7.333 2.333 10 7c-.778 1.361 -1.612 2.524 -2.503 3.488m-2.14 1.861c-1.631 1.1 -3.415 1.651 -5.357 1.651c-4 0 -7.333 -2.333 -10 -7c1.369 -2.395 2.913 -4.175 4.632 -5.341" />
+  </Icon>
+)
+
+export const Pin = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-pin", className)}>
+    <path d="M15 4.5l-4 4l-4 1.5l-1.5 1.5l7 7l1.5 -1.5l1.5 -4l4 -4" />
+    <line x1="9" y1="15" x2="4.5" y2="19.5" />
+    <line x1="14.5" y1="4" x2="20" y2="9.5" />
+  </Icon>
+)
+
+export const FileCheck = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-pin", className)}>
+    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+    <path d="M9 15l2 2l4 -4" />
+  </Icon>
+)
