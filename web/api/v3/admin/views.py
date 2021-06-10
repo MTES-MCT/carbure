@@ -293,7 +293,6 @@ def get_snapshot(request):
             'is_forwarded',
             'is_mac',
             'is_hidden_by_admin',
-            'is_highlighted_by_admin'
         ])
 
     except Exception:
