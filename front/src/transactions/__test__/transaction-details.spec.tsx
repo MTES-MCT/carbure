@@ -26,11 +26,10 @@ import { waitWhileLoading } from "common/__test__/helpers"
 import { clickOnCheckboxesAndConfirm } from "./helpers"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
-
-afterEach(() => {
-  server.resetHandlers()
+beforeEach(() => {
   setDetails(lotDetails)
 })
+afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 const TransactionWithHook = ({ entity }: { entity: Entity }) => {
@@ -152,7 +151,7 @@ test("display transaction details", async () => {
   expect(title).not.toBeInTheDocument()
 })
 
-test("edit transaction details", async () => {
+test.only("edit transaction details", async () => {
   render(<TransactionWithRouter entity={producer} />)
 
   const title = await screen.findByText("Détails de la transaction")
@@ -249,7 +248,6 @@ test("edit transaction details", async () => {
   userEvent.type(eee, "1.4")
 
   expect(save.closest("button")).not.toBeDisabled()
-  // expect(save.disabled).toBe(false)
 
   userEvent.click(save)
 
