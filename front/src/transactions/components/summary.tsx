@@ -62,7 +62,7 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
   const columns: Column<SummaryItem>[] = [
     {
       header: t("Biocarburant"),
-      render: (d) => <Line text={d.biocarburant} />,
+      render: (d) => <Line text={t(d.biocarburant, { ns: "biofuels" })} />,
     },
     {
       header: t("Volume (litres)"),
