@@ -107,7 +107,7 @@ export const StockDraftActions = ({
         onClick={onValidate}
       >
         <Trans>
-          Envoyer {{ what: hasSelection ? t("sélection") : "tout" }}
+          Envoyer {{ what: hasSelection ? t("sélection") : t("tout") }}
         </Trans>
       </AsyncButton>
 
@@ -119,7 +119,7 @@ export const StockDraftActions = ({
         onClick={onDelete}
       >
         <Trans>
-          Supprimer {{ what: hasSelection ? t("sélection") : "tout" }}
+          Supprimer {{ what: hasSelection ? t("sélection") : t("tout") }}
         </Trans>
       </AsyncButton>
     </React.Fragment>

@@ -1,4 +1,5 @@
 import { Fragment, useEffect } from "react"
+import { Trans, useTranslation } from "react-i18next"
 import Table, { Column, Line } from "common/components/table"
 import { EntityType, SummaryItem, TransactionQuery } from "common/types"
 import { padding } from "./list-columns"
@@ -26,28 +27,6 @@ import {
   getAdminSummary,
 } from "transactions/api"
 
-const COLUMNS: Column<SummaryItem>[] = [
-  {
-    header: "Biocarburant",
-    render: (d) => <Line text={d.biocarburant} />,
-  },
-  {
-    header: "Volume (litres)",
-    render: (d) => <Line text={`${prettyVolume(d.volume)}`} />,
-  },
-  {
-    header: "Lots",
-    className: colStyles.narrowColumn,
-    render: (d) => <Line text={`${d.lots}`} />,
-  },
-  {
-    header: "Réd. GES",
-    className: colStyles.narrowColumn,
-    render: (d) => <Line text={`${d.avg_ghg_reduction.toFixed(2)}%`} />,
-  },
-  padding,
-]
-
 type TransactionSummaryProps = {
   in?: SummaryItem[] | null
   out?: SummaryItem[] | null
@@ -55,6 +34,8 @@ type TransactionSummaryProps = {
 }
 
 const TransactionSummary = (props: TransactionSummaryProps) => {
+  const { t } = useTranslation()
+
   const summaryInRows = (props.in ?? []).map((v) => ({ value: v }))
   const summaryOutRows = (props.out ?? []).map((v) => ({ value: v }))
   const summaryAllRows = (props.transactions ?? []).map((v) => ({ value: v }))
@@ -78,53 +59,76 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
     lots: summaryAllRows.reduce((t, r) => t + r.value.lots, 0),
   }
 
+  const columns: Column<SummaryItem>[] = [
+    {
+      header: t("Biocarburant"),
+      render: (d) => <Line text={d.biocarburant} />,
+    },
+    {
+      header: t("Volume (litres)"),
+      render: (d) => <Line text={`${prettyVolume(d.volume)}`} />,
+    },
+    {
+      header: t("Lots"),
+      className: colStyles.narrowColumn,
+      render: (d) => <Line text={`${d.lots}`} />,
+    },
+    {
+      header: t("Réd. GES"),
+      className: colStyles.narrowColumn,
+      render: (d) => <Line text={`${d.avg_ghg_reduction.toFixed(2)}%`} />,
+    },
+    padding,
+  ]
+
   const inColumns: Column<SummaryItem>[] = [
     padding,
     {
-      header: "Fournisseur",
+      header: t("Fournisseur"),
       render: (d) => <Line text={d.entity || "N/A"} />,
     },
-    ...COLUMNS,
+    ...columns,
   ]
 
   const outColumns: Column<SummaryItem>[] = [
     padding,
     {
-      header: "Client",
+      header: t("Client"),
       render: (d) => <Line text={d.entity || "N/A"} />,
     },
-    ...COLUMNS,
+    ...columns,
   ]
 
   const allColumns: Column<SummaryItem>[] = [
     padding,
     {
-      header: "Fournisseur",
+      header: t("Fournisseur"),
       render: (d) => <Line text={d.vendor || "N/A"} />,
     },
     {
-      header: "Client",
+      header: t("Client"),
       render: (d) => <Line text={d.client || "N/A"} />,
     },
-    ...COLUMNS,
+    ...columns,
   ]
 
   return (
     <Fragment>
       {isInEmpty && isOutEmpty && isAllEmpty && (
         <Alert level="warning" icon={AlertCircle}>
-          Aucune transaction trouvée pour cette période
+          <Trans>Aucune transaction trouvée pour cette période</Trans>
         </Alert>
       )}
 
       {!isInEmpty && (
         <Box className={styles.transactionSummary}>
           <Title className={styles.transactionSummarySection}>
-            Entrées
+            <Trans>Entrées</Trans>
             <span className={styles.transactionSummaryTotal}>
-              {"▸"} {totalIn.lots} lot{totalIn.lots !== 1 && "s"}
-              {" ▸ "}
-              {prettyVolume(totalIn.volume)} litres
+              <Trans count={totalIn.lots}>
+                ▸ {{ count: totalIn.lots }} lots ▸{" "}
+                {{ volume: prettyVolume(totalIn.volume) }} litres
+              </Trans>
             </span>
           </Title>
           <Table columns={inColumns} rows={summaryInRows} />
@@ -134,11 +138,12 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
       {!isOutEmpty && (
         <Box className={styles.transactionSummary}>
           <Title className={styles.transactionSummarySection}>
-            Sorties
+            <Trans>Sorties</Trans>
             <span className={styles.transactionSummaryTotal}>
-              {"▸"} {totalOut.lots} lot{totalOut.lots !== 1 && "s"}
-              {" ▸ "}
-              {prettyVolume(totalOut.volume)} litres
+              <Trans count={totalOut.lots}>
+                ▸ {{ count: totalOut.lots }} lots ▸{" "}
+                {{ volume: prettyVolume(totalOut.volume) }} litres
+              </Trans>
             </span>
           </Title>
           <Table columns={outColumns} rows={summaryOutRows} />
@@ -148,11 +153,12 @@ const TransactionSummary = (props: TransactionSummaryProps) => {
       {!isAllEmpty && (
         <Box className={styles.transactionSummary}>
           <Title className={styles.transactionSummarySection}>
-            Transactions
+            <Trans>Transactions</Trans>
             <span className={styles.transactionSummaryTotal}>
-              {"▸"} {totalAll.lots} lot{totalAll.lots !== 1 && "s"}
-              {" ▸ "}
-              {prettyVolume(totalAll.volume)} litres
+              <Trans count={totalAll.lots}>
+                ▸ {{ count: totalAll.lots }} lots ▸{" "}
+                {{ volume: prettyVolume(totalAll.volume) }} litres
+              </Trans>
             </span>
           </Title>
           <Table columns={allColumns} rows={summaryAllRows} />
@@ -211,6 +217,7 @@ export const SummaryPrompt = ({
   entity,
   onResolve,
 }: SummaryPromptProps) => {
+  const { t } = useTranslation()
   const summary = useSummary(query, selection, stock, entity)
 
   return (
@@ -233,11 +240,11 @@ export const SummaryPrompt = ({
             icon={Check}
             onClick={() => onResolve(summary.data?.tx_ids)}
           >
-            Confirmer
+            <Trans>Confirmer</Trans>
           </Button>
         )}
         <Button icon={Return} onClick={() => onResolve()}>
-          {readOnly ? "Retour" : "Annuler"}
+          {readOnly ? t("Retour") : t("Annuler")}
         </Button>
       </DialogButtons>
 

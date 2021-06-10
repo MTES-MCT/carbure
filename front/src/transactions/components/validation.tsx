@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Trans, useTranslation } from "react-i18next"
 
 import {
   Dialog,
@@ -31,6 +32,7 @@ export const ValidationPrompt = ({
   children,
   onResolve,
 }: ValidationPromptProps) => {
+  const { t } = useTranslation()
   const [checked, setChecked] = useState({ terres: false, infos: false })
 
   return (
@@ -40,12 +42,16 @@ export const ValidationPrompt = ({
 
       <Box className={styles.dialogCheckboxes}>
         <LabelCheckbox
-          label="Je certifie que cette déclaration respecte les critères de durabilité liés aux terres"
+          label={t(
+            "Je certifie que cette déclaration respecte les critères de durabilité liés aux terres"
+          )}
           checked={checked.terres}
           onChange={(e) => setChecked({ ...checked, terres: e.target.checked })}
         />
         <LabelCheckbox
-          label="Je certifie que les informations renseignées sont réelles et valides"
+          label={t(
+            "Je certifie que les informations renseignées sont réelles et valides"
+          )}
           checked={checked.infos}
           onChange={(e) => setChecked({ ...checked, infos: e.target.checked })}
         />
@@ -60,10 +66,10 @@ export const ValidationPrompt = ({
           icon={Check}
           onClick={() => onResolve(checked.infos && checked.terres)}
         >
-          Confirmer
+          <Trans>Confirmer</Trans>
         </Button>
         <Button icon={Return} onClick={() => onResolve()}>
-          Annuler
+          <Trans>Annuler</Trans>
         </Button>
       </DialogButtons>
     </Dialog>

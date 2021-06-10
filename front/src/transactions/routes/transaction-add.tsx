@@ -1,4 +1,4 @@
-import React from "react"
+import { Trans } from "react-i18next"
 
 import { EntitySelection } from "carbure/hooks/use-entity"
 
@@ -24,7 +24,9 @@ const TransactionAdd = ({ entity, refresh }: TransactionAddProps) => {
 
   return (
     <Modal onClose={close}>
-      <StatusTitle editable>Créer une nouvelle transaction</StatusTitle>
+      <StatusTitle editable>
+        <Trans>Créer une nouvelle transaction</Trans>
+      </StatusTitle>
 
       <TransactionForm
         id="transaction-add"
@@ -42,14 +44,14 @@ const TransactionAdd = ({ entity, refresh }: TransactionAddProps) => {
           icon={Plus}
           loading={request.loading}
         >
-          Créer lot
+          <Trans>Créer lot</Trans>
         </AsyncButton>
         <Button
           icon={Return}
           className={styles.transactionNavButtons}
           onClick={close}
         >
-          Retour
+          <Trans>Retour</Trans>
         </Button>
       </div>
     </Modal>

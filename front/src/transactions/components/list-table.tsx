@@ -1,4 +1,5 @@
 import cl from "clsx"
+import { TFunction, useTranslation } from "react-i18next"
 
 import {
   Entity,
@@ -62,47 +63,59 @@ export const ADMIN_COLUMNS = [
   C.ghgReduction,
 ]
 
-type TxActions = Record<string, (tx: Transaction) => void>
+type TxActions = Record<string, (tx: Transaction) => void> & {
+  t: TFunction<"translation">
+}
 type TxColumn = Column<Transaction>
 
 const getDraftActions = ({
   onValidate,
   onDuplicate,
   onDelete,
+  t,
 }: TxActions): TxColumn =>
   Actions([
-    { icon: Check, title: "Envoyer le lot", action: onValidate },
-    { icon: Copy, title: "Dupliquer le lot", action: onDuplicate },
-    { icon: Cross, title: "Supprimer le lot", action: onDelete },
+    { icon: Check, title: t("Envoyer le lot"), action: onValidate },
+    { icon: Copy, title: t("Dupliquer le lot"), action: onDuplicate },
+    { icon: Cross, title: t("Supprimer le lot"), action: onDelete },
   ])
 
-const getToFixActions = ({ onCorrect, onDelete }: TxActions): TxColumn =>
+const getToFixActions = ({ onCorrect, onDelete, t }: TxActions): TxColumn =>
   Actions([
-    { icon: Check, title: "Renvoyer le lot", action: onCorrect },
-    { icon: Cross, title: "Supprimer le lot", action: onDelete },
+    { icon: Check, title: t("Renvoyer le lot"), action: onCorrect },
+    { icon: Cross, title: t("Supprimer le lot"), action: onDelete },
   ])
 
 const getInboxActions = ({
   onAccept,
   onComment,
   onReject,
+  t,
 }: TxActions): TxColumn =>
   Actions([
-    { icon: Check, title: "Accepter le lot", action: onAccept },
-    { icon: AlertTriangle, title: "Accepter sous réserve", action: onComment },
-    { icon: Cross, title: "Refuser le lot", action: onReject },
+    { icon: Check, title: t("Accepter le lot"), action: onAccept },
+    {
+      icon: AlertTriangle,
+      title: t("Accepter sous réserve"),
+      action: onComment,
+    },
+    { icon: Cross, title: t("Refuser le lot"), action: onReject },
   ])
 
-const getDuplicateActions = ({ onDuplicate }: TxActions): Column<Transaction> =>
-  Actions([{ icon: Copy, title: "Dupliquer le lot", action: onDuplicate }])
+const getDuplicateActions = ({
+  onDuplicate,
+  t,
+}: TxActions): Column<Transaction> =>
+  Actions([{ icon: Copy, title: t("Dupliquer le lot"), action: onDuplicate }])
 
 const getControlActions = ({
   onHide,
   onHighlight,
+  t,
 }: TxActions): Column<Transaction> =>
   Actions([
-    { icon: Pin, title: "Épingler le lot", action: onHighlight },
-    { icon: EyeOff, title: "Ignorer le lot", action: onHide },
+    { icon: Pin, title: t("Épingler le lot"), action: onHighlight },
+    { icon: EyeOff, title: t("Ignorer le lot"), action: onHide },
   ])
 
 type TransactionTableProps = {
@@ -144,6 +157,8 @@ export const TransactionTable = ({
   onAdminHide,
   onAdminHighlight,
 }: TransactionTableProps) => {
+  const { t } = useTranslation()
+
   const rights = useRights()
   const relativePush = useRelativePush()
   const deadline = transactions.deadlines.date
@@ -172,23 +187,28 @@ export const TransactionTable = ({
     columns.push(arrow)
   } else if (isAdmin) {
     columns.push(
-      getControlActions({ onHide: onAdminHide, onHighlight: onAdminHighlight })
+      getControlActions({
+        t,
+        onHide: onAdminHide,
+        onHighlight: onAdminHighlight,
+      })
     )
   } else if (isAdmin || isAuditor) {
     columns.push(
       getControlActions({
+        t,
         onHide: onAuditorHide,
         onHighlight: onAuditorHighlight,
       })
     )
   } else if (status.is(LotStatus.Draft)) {
-    columns.push(getDraftActions({ onValidate, onDuplicate, onDelete }))
+    columns.push(getDraftActions({ t, onValidate, onDuplicate, onDelete }))
   } else if (status.is(LotStatus.ToFix)) {
-    columns.push(getToFixActions({ onCorrect, onDelete }))
+    columns.push(getToFixActions({ t, onCorrect, onDelete }))
   } else if (status.is(LotStatus.Inbox)) {
-    columns.push(getInboxActions({ onAccept, onComment, onReject }))
+    columns.push(getInboxActions({ t, onAccept, onComment, onReject }))
   } else if (isProducer || isTrader) {
-    columns.push(getDuplicateActions({ onDuplicate }))
+    columns.push(getDuplicateActions({ t, onDuplicate }))
   } else {
     columns.push(arrow)
   }

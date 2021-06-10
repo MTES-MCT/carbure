@@ -1,4 +1,4 @@
-import { Trans } from "react-i18next"
+import { TFunction, Trans, useTranslation } from "react-i18next"
 import cl from "clsx"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { TransactionFormState } from "transactions/hooks/use-transaction-form"
@@ -36,9 +36,14 @@ import {
 } from "common/components/dialog"
 import styles from "./fields.module.css"
 
+function idt<T>(s: T) {
+  return s
+}
+
 type ContentProps = {
   data?: TransactionFormState
   errors?: Record<string, string>
+  t?: TFunction
 }
 
 type LIP = LabelInputProps & ContentProps
@@ -80,48 +85,53 @@ const CertificateInfoPrompt = ({
 }: {
   certificate: CertificateInfo
   onResolve: () => void
-}) => (
-  <Dialog onResolve={onResolve} className={styles.certificateDialog}>
-    <DialogTitle text="Détails du certificat" />
+}) => {
+  const { t } = useTranslation()
+  return (
+    <Dialog onResolve={onResolve} className={styles.certificateDialog}>
+      <DialogTitle text={t("Détails du certificat")} />
 
-    <ul className={styles.certificateInfo}>
-      <li>
-        <b>
-          <Trans>ID du certificat</Trans>:{" "}
-        </b>
-        <span>{certificate.certificate_id}</span>
-      </li>
-      <li>
-        <b>
-          <Trans>Société</Trans>:{" "}
-        </b>
-        <span>{certificate.holder}</span>
-      </li>
-      <li>
-        <b>
-          <Trans>Périmètre du certificat</Trans>:{" "}
-        </b>
-        <span>{certificate.scope.join(", ")}</span>
-      </li>
-      <li>
-        <b>
-          <Trans>Période de validité</Trans>:{" "}
-        </b>
-        <span>
-          {certificate.valid_from} → {certificate.valid_until}
-        </span>
-      </li>
-    </ul>
+      <ul className={styles.certificateInfo}>
+        <li>
+          <b>
+            <Trans>ID du certificat</Trans>:{" "}
+          </b>
+          <span>{certificate.certificate_id}</span>
+        </li>
+        <li>
+          <b>
+            <Trans>Société</Trans>:{" "}
+          </b>
+          <span>{certificate.holder}</span>
+        </li>
+        <li>
+          <b>
+            <Trans>Périmètre du certificat</Trans>:{" "}
+          </b>
+          <span>{certificate.scope.join(", ")}</span>
+        </li>
+        <li>
+          <b>
+            <Trans>Période de validité</Trans>:{" "}
+          </b>
+          <span>
+            {certificate.valid_from} → {certificate.valid_until}
+          </span>
+        </li>
+      </ul>
 
-    <DialogButtons>
-      <Button icon={Return} onClick={() => onResolve()}>
-        Retour
-      </Button>
-    </DialogButtons>
-  </Dialog>
-)
+      <DialogButtons>
+        <Button icon={Return} onClick={() => onResolve()}>
+          <Trans>Retour</Trans>
+        </Button>
+      </DialogButtons>
+    </Dialog>
+  )
+}
 
 const CertificateIcon = ({ certificate, ...props }: any) => {
+  const { t } = useTranslation()
+
   function openCertificateInfo() {
     prompt((resolve) => (
       <CertificateInfoPrompt certificate={certificate} onResolve={resolve} />
@@ -131,7 +141,7 @@ const CertificateIcon = ({ certificate, ...props }: any) => {
   return (
     <FileCheck
       {...props}
-      title="Voir le certificat"
+      title={t("Voir le certificat")}
       onClick={openCertificateInfo}
       onMouseDown={(e: any) => e.stopPropagation()}
       className={cl(props.className, styles.certificateIcon)}
@@ -139,43 +149,45 @@ const CertificateIcon = ({ certificate, ...props }: any) => {
   )
 }
 
-const macOptions = [
-  { value: "true", label: "Oui" },
-  { value: "false", label: "Non" },
-]
+export const Mac = ({ label, data, value, t = idt, ...props }: LRP) => {
+  const macOptions = [
+    { value: "true", label: t("Oui") },
+    { value: "false", label: t("Non") },
+  ]
 
-export const Mac = ({ label, data, value, ...props }: LRP) => (
-  <Label
-    label="Il s'agit d'une mise à consommation ?"
-    disabled={props.disabled}
-    readOnly={props.readOnly}
-  >
-    <RadioGroup
-      row
-      name="mac"
-      options={macOptions}
-      value={value ?? `${data?.mac ?? ""}`}
-      {...props}
-    />
-  </Label>
-)
+  return (
+    <Label
+      label={t("Il s'agit d'une mise à consommation ?")}
+      disabled={props.disabled}
+      readOnly={props.readOnly}
+    >
+      <RadioGroup
+        row
+        name="mac"
+        options={macOptions}
+        value={value ?? `${data?.mac ?? ""}`}
+        {...props}
+      />
+    </Label>
+  )
+}
 
-export const Dae = ({ data, value, errors, ...props }: LIP) => (
+export const Dae = ({ data, value, errors, t = idt, ...props }: LIP) => (
   <LabelInput
     required
     name="dae"
-    label="Numéro douanier (DAE, DAA...)"
+    label={t("Numéro douanier (DAE, DAA...)")}
     value={value ?? data?.dae}
     error={errors?.dae}
     {...props}
   />
 )
 
-export const Volume = ({ data, value, errors, ...props }: LIP) => (
+export const Volume = ({ data, value, errors, t = idt, ...props }: LIP) => (
   <LabelInput
     required
     name="volume"
-    label="Volume en litres (Ethanol à 20°, autres à 15°)"
+    label={t("Volume en litres (Ethanol à 20°, autres à 15°)")}
     type="number"
     value={value ?? data?.volume}
     error={errors?.volume}
@@ -183,11 +195,17 @@ export const Volume = ({ data, value, errors, ...props }: LIP) => (
   />
 )
 
-export const Biocarburant = ({ data, value, errors, ...props }: LACP<BC>) => (
+export const Biocarburant = ({
+  data,
+  value,
+  errors,
+  t = idt,
+  ...props
+}: LACP<BC>) => (
   <LabelAutoComplete
     required
     name="biocarburant"
-    label="Biocarburant"
+    label={t("Biocarburant")}
     minLength={0}
     value={value ?? data?.biocarburant ?? null}
     error={errors?.biocarburant_code}
@@ -202,6 +220,7 @@ export const MatierePremiere = ({
   data,
   value,
   errors,
+  t = idt,
   ...props
 }: LACP<MP>) => {
   const category = data?.matiere_premiere?.category
@@ -210,7 +229,7 @@ export const MatierePremiere = ({
     <LabelAutoComplete
       required
       name="matiere_premiere"
-      label="Matière première"
+      label={t("Matière première")}
       minLength={0}
       value={value ?? data?.matiere_premiere ?? null}
       error={errors?.matiere_premiere_code}
@@ -227,12 +246,13 @@ export const PaysOrigine = ({
   data,
   value,
   errors,
+  t = idt,
   ...props
 }: LACP<Country>) => (
   <LabelAutoComplete
     required
     name="pays_origine"
-    label="Pays d'origine de la matière première"
+    label={t("Pays d'origine de la matière première")}
     value={value ?? data?.pays_origine ?? null}
     error={errors?.pays_origine_code}
     getValue={getters.code_pays}
@@ -242,20 +262,26 @@ export const PaysOrigine = ({
   />
 )
 
-export const Producer = ({ data, value, errors, ...props }: LACP<Entity>) => {
+export const Producer = ({
+  data,
+  value,
+  errors,
+  t = idt,
+  ...props
+}: LACP<Entity>) => {
   const producer = value ?? data?.producer ?? null
   const error = errors?.carbure_producer ?? errors?.producer
 
   // prettier-ignore
   const icon = isKnown(producer)
-    ? (props: any) => <UserCheck {...props} title="Ce producteur est enregistré sur CarbuRe" />
+    ? (props: any) => <UserCheck {...props} title={t("Ce producteur est enregistré sur CarbuRe")} />
     : undefined
 
   return (
     <LabelAutoComplete
       loose
       name="producer"
-      label="Producteur"
+      label={t("Producteur")}
       minLength={0}
       value={producer}
       error={error}
@@ -272,6 +298,7 @@ export const ProductionSite = ({
   data,
   value,
   errors,
+  t = idt,
   ...props
 }: LACP<ProductionSiteDetails>) => {
   const psite = value ?? data?.production_site
@@ -279,14 +306,14 @@ export const ProductionSite = ({
 
   // prettier-ignore
   const icon = isKnown(psite)
-    ? (props: any) => <UserCheck {...props} title="Ce site de production est enregistré sur CarbuRe" />
+    ? (props: any) => <UserCheck {...props} title={t("Ce site de production est enregistré sur CarbuRe")} />
     : undefined
 
   return (
     <LabelAutoComplete
       loose
       name="production_site"
-      label="Site de production"
+      label={t("Site de production")}
       minLength={0}
       value={psite}
       error={error}
@@ -303,6 +330,7 @@ export const ProductionSiteCountry = ({
   data,
   value,
   errors,
+  t = idt,
   ...props
 }: LACP<Country>) => {
   const country =
@@ -314,7 +342,7 @@ export const ProductionSiteCountry = ({
     <LabelAutoComplete
       disabled={isKnown(data?.production_site)}
       name="production_site_country"
-      label="Pays de production"
+      label={t("Pays de production")}
       value={value ?? country}
       error={errors?.unknown_production_country}
       getValue={getters.code_pays}
@@ -325,7 +353,13 @@ export const ProductionSiteCountry = ({
   )
 }
 
-export const ProductionSiteDate = ({ data, value, errors, ...props }: LIP) => {
+export const ProductionSiteDate = ({
+  data,
+  value,
+  errors,
+  t = idt,
+  ...props
+}: LIP) => {
   const comDate =
     data && isKnown(data.production_site)
       ? data.production_site.date_mise_en_service
@@ -336,7 +370,7 @@ export const ProductionSiteDate = ({ data, value, errors, ...props }: LIP) => {
       required
       disabled={isKnown(data?.production_site)}
       name="production_site_com_date"
-      label="Date de mise en service"
+      label={t("Date de mise en service")}
       type="date"
       value={comDate}
       error={errors?.unknown_production_site_com_date}
@@ -349,6 +383,7 @@ export const ProductionSiteDblCounting = ({
   data,
   value,
   errors,
+  t = idt,
   ...props
 }: LIP) => {
   const hasDC = Boolean(data?.matiere_premiere?.is_double_compte)
@@ -358,7 +393,7 @@ export const ProductionSiteDblCounting = ({
     <LabelInput
       disabled={isKnown(data?.production_site) || !hasDC}
       name="production_site_dbl_counting"
-      label="N° d'enregistrement double-compte"
+      label={t("N° d'enregistrement double-compte")}
       value={hasDC ? dcReference : ""}
       error={errors?.production_site_dbl_counting}
       {...props}
@@ -370,6 +405,7 @@ export const ProductionSiteReference = ({
   data,
   value,
   errors,
+  t = idt,
   ...props
 }: LACP<string>) => {
   const queryArgs = data && isKnown(data.production_site) ? [null, data.production_site.id] : [] // prettier-ignore
@@ -390,7 +426,7 @@ export const ProductionSiteReference = ({
     <LabelAutoComplete
       loose
       name="production_site_reference"
-      label="Certificat du site de production"
+      label={t("Certificat du site de production")}
       minLength={0}
       value={value ?? cert}
       icon={icon}
@@ -408,19 +444,20 @@ export const CarbureVendor = ({
   data,
   value,
   errors,
+  t = idt,
   ...props
 }: LACP<Entity>) => {
   const vendor = value ?? data?.carbure_vendor
 
   // prettier-ignore
   const icon = isKnown(vendor)
-    ? (props: any) => <UserCheck {...props} title="Ce fournisseur est enregistré sur CarbuRe" />
+    ? (props: any) => <UserCheck {...props} title={t("Ce fournisseur est enregistré sur CarbuRe")} />
     : undefined
 
   return (
     <LabelAutoComplete
       name="carbure_vendor"
-      label="Fournisseur"
+      label={t("Fournisseur")}
       value={vendor}
       error={errors?.carbure_vendor}
       getValue={getters.id}
@@ -436,6 +473,7 @@ export const CarbureSelfCertificate = ({
   data,
   value,
   errors,
+  t = idt,
   ...props
 }: LACP<string>) => {
   const certInfo = data?.certificates?.vendor_certificate
@@ -454,7 +492,7 @@ export const CarbureSelfCertificate = ({
       loose
       required
       name="carbure_vendor_certificate"
-      label="Votre certificat"
+      label={t("Votre certificat")}
       minLength={0}
       value={value ?? cert}
       icon={icon}
@@ -473,6 +511,7 @@ export const CarbureVendorCertificate = ({
   data,
   value,
   errors,
+  t = idt,
   ...props
 }: LACP<string>) => {
   const certInfo = data?.certificates?.vendor_certificate
@@ -490,7 +529,7 @@ export const CarbureVendorCertificate = ({
     <LabelAutoComplete
       search={false}
       name="carbure_vendor_certificate"
-      label="Certificat du fournisseur"
+      label={t("Certificat du fournisseur")}
       value={value ?? cert}
       icon={icon}
       error={errors?.carbure_vendor_certificate}
@@ -499,11 +538,17 @@ export const CarbureVendorCertificate = ({
   )
 }
 
-export const UnknownSupplier = ({ data, value, errors, ...props }: LIP) => (
+export const UnknownSupplier = ({
+  data,
+  value,
+  errors,
+  t = idt,
+  ...props
+}: LIP) => (
   <LabelInput
     disabled={isKnown(data?.producer)}
     name="unknown_supplier"
-    label="Fournisseur"
+    label={t("Fournisseur")}
     value={value ?? data?.unknown_supplier ?? ""}
     error={errors?.unknown_supplier}
     {...props}
@@ -514,6 +559,7 @@ export const UnknownSupplierCertificate = ({
   data,
   value,
   errors,
+  t = idt,
   ...props
 }: LACP<string>) => {
   const certInfo = data?.certificates?.supplier_certificate
@@ -532,7 +578,7 @@ export const UnknownSupplierCertificate = ({
       loose
       disabled={isKnown(data?.producer)}
       name="unknown_supplier_certificate"
-      label="Certificat du fournisseur"
+      label={t("Certificat du fournisseur")}
       minLength={0}
       value={value ?? cert}
       icon={icon}
@@ -545,28 +591,40 @@ export const UnknownSupplierCertificate = ({
   )
 }
 
-export const ChampLibre = ({ data, value, errors, ...props }: LTAP) => (
+export const ChampLibre = ({
+  data,
+  value,
+  errors,
+  t = idt,
+  ...props
+}: LTAP) => (
   <LabelTextArea
     name="champ_libre"
-    label="Champ libre"
+    label={t("Champ libre")}
     value={value ?? data?.champ_libre}
     {...props}
   />
 )
 
-export const Client = ({ data, value, errors, ...props }: LACP<Entity>) => {
+export const Client = ({
+  data,
+  value,
+  errors,
+  t = idt,
+  ...props
+}: LACP<Entity>) => {
   const client = value ?? data?.client
 
   // prettier-ignore
   const icon = isKnown(client)
-    ? (props: any) => <UserCheck {...props} title="Ce client est enregistré sur CarbuRe" />
+    ? (props: any) => <UserCheck {...props} title={t("Ce client est enregistré sur CarbuRe")} />
     : undefined
 
   return (
     <LabelAutoComplete
       loose
       name="client"
-      label="Client"
+      label={t("Client")}
       value={client}
       error={errors?.client}
       getValue={getters.id}
@@ -578,12 +636,18 @@ export const Client = ({ data, value, errors, ...props }: LACP<Entity>) => {
   )
 }
 
-export const DeliverySite = ({ data, value, errors, ...props }: LACP<DS>) => {
+export const DeliverySite = ({
+  data,
+  value,
+  errors,
+  t = idt,
+  ...props
+}: LACP<DS>) => {
   const depot = value ?? data?.delivery_site
 
   // prettier-ignore
   const icon = isKnown(depot)
-    ? (props: any) => <UserCheck {...props} title="Ce site de livraison est enregistré sur CarbuRe" />
+    ? (props: any) => <UserCheck {...props} title={t("Ce site de livraison est enregistré sur CarbuRe")} />
     : undefined
 
   return (
@@ -592,7 +656,7 @@ export const DeliverySite = ({ data, value, errors, ...props }: LACP<DS>) => {
       required
       disabled={data?.mac}
       name="delivery_site"
-      label="Site de livraison"
+      label={t("Site de livraison")}
       value={depot}
       error={errors?.delivery_site ?? errors?.unknown_delivery_site}
       getValue={getters.depot_id}
@@ -608,6 +672,7 @@ export const DeliverySiteCountry = ({
   data,
   value,
   errors,
+  t = idt,
   ...props
 }: LACP<Country>) => {
   const disabled = isKnown(data?.delivery_site) || data?.mac
@@ -622,7 +687,7 @@ export const DeliverySiteCountry = ({
       required
       disabled={disabled}
       name="delivery_site_country"
-      label="Pays de livraison"
+      label={t("Pays de livraison")}
       value={value ?? dsCountry}
       error={errors?.unknown_delivery_site_country}
       getValue={getters.code_pays}
@@ -633,10 +698,16 @@ export const DeliverySiteCountry = ({
   )
 }
 
-export const DeliveryDate = ({ data, value, errors, ...props }: LIP) => (
+export const DeliveryDate = ({
+  data,
+  value,
+  errors,
+  t = idt,
+  ...props
+}: LIP) => (
   <LabelInput
     name="delivery_date"
-    label="Date de livraison"
+    label={t("Date de livraison")}
     type="date"
     value={value ?? data?.delivery_date}
     error={errors?.delivery_date}
@@ -644,25 +715,25 @@ export const DeliveryDate = ({ data, value, errors, ...props }: LIP) => (
   />
 )
 
-export const Eec = ({ data, value, errors, ...props }: LIP) => (
+export const Eec = ({ data, value, errors, t = idt, ...props }: LIP) => (
   <LabelInput
     name="eec"
-    label="EEC"
+    label={t("EEC")}
     type="number"
     step={0.1}
-    tooltip="Émissions résultant de l'extraction ou de la culture des matières premières" // prettier-ignore
+    tooltip={t("Émissions résultant de l'extraction ou de la culture des matières premières")} // prettier-ignore
     value={value ?? data?.eec}
     error={errors?.eec}
     {...props}
   />
 )
 
-export const El = ({ data, value, errors, ...props }: LIP) => (
+export const El = ({ data, value, errors, t = idt, ...props }: LIP) => (
   <LabelInput
     name="el"
-    label="EL"
+    label={t("EL")}
     type="number"
-    tooltip="Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols" // prettier-ignore
+    tooltip={t("Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols")} // prettier-ignore
     step={0.1}
     value={value ?? data?.el}
     error={errors?.el}
@@ -670,13 +741,13 @@ export const El = ({ data, value, errors, ...props }: LIP) => (
   />
 )
 
-export const Ep = ({ data, value, errors, ...props }: LIP) => (
+export const Ep = ({ data, value, errors, t = idt, ...props }: LIP) => (
   <LabelInput
     required
     name="ep"
-    label="EP"
+    label={t("EP")}
     type="number"
-    tooltip="Émissions résultant de la transformation"
+    tooltip={t("Émissions résultant dela transformation")}
     step={0.1}
     value={value ?? data?.ep}
     error={errors?.ep}
@@ -684,13 +755,13 @@ export const Ep = ({ data, value, errors, ...props }: LIP) => (
   />
 )
 
-export const Etd = ({ data, value, errors, ...props }: LIP) => (
+export const Etd = ({ data, value, errors, t = idt, ...props }: LIP) => (
   <LabelInput
     required
     name="etd"
-    label="ETD"
+    label={t("ETD")}
     type="number"
-    tooltip="Émissions résultant du transport et de la distribution"
+    tooltip={t("Émissions résultant du transport et de la distribution")}
     step={0.1}
     value={value ?? data?.etd}
     error={errors?.etd}
@@ -698,12 +769,12 @@ export const Etd = ({ data, value, errors, ...props }: LIP) => (
   />
 )
 
-export const Eu = ({ data, value, errors, ...props }: LIP) => (
+export const Eu = ({ data, value, errors, t = idt, ...props }: LIP) => (
   <LabelInput
     name="eu"
-    label="EU"
+    label={t("EU")}
     type="number"
-    tooltip="Émissions résultant du carburant à l'usage"
+    tooltip={t("Émissions résultant du carburant à l'usage")}
     step={0.1}
     value={value ?? data?.eu}
     error={errors?.eu}
@@ -711,12 +782,12 @@ export const Eu = ({ data, value, errors, ...props }: LIP) => (
   />
 )
 
-export const Esca = ({ data, value, errors, ...props }: LIP) => (
+export const Esca = ({ data, value, errors, t = idt, ...props }: LIP) => (
   <LabelInput
     name="esca"
-    label="ESCA"
+    label={t("ESCA")}
     type="number"
-    tooltip="Réductions d'émissions dues à l'accumulation du carbone dans les sols grâce à une meilleure gestion agricole" // prettier-ignore
+    tooltip={t("Réductions d'émissions dues à l'accumulation du carbone dans les sols grâce à une meilleure gestion agricole")} // prettier-ignore
     step={0.1}
     value={value ?? data?.esca}
     error={errors?.esca}
@@ -724,12 +795,12 @@ export const Esca = ({ data, value, errors, ...props }: LIP) => (
   />
 )
 
-export const Eccs = ({ data, value, errors, ...props }: LIP) => (
+export const Eccs = ({ data, value, errors, t = idt, ...props }: LIP) => (
   <LabelInput
     name="eccs"
-    label="ECCS"
+    label={t("ECCS")}
     type="number"
-    tooltip="Réductions d'émissions dues au piégeage et au stockage géologique du carbone" // prettier-ignore
+    tooltip={t("Réductions d'émissions dues au piégeage et au stockage géologique du carbone")} // prettier-ignore
     step={0.1}
     value={value ?? data?.eccs}
     error={errors?.eccs}
@@ -737,12 +808,14 @@ export const Eccs = ({ data, value, errors, ...props }: LIP) => (
   />
 )
 
-export const Eccr = ({ data, value, errors, ...props }: LIP) => (
+export const Eccr = ({ data, value, errors, t = idt, ...props }: LIP) => (
   <LabelInput
     name="eccr"
-    label="ECCR"
+    label={t("ECCR")}
     type="number"
-    tooltip="Réductions d'émissions dues au piégeage et à la substitution du carbone"
+    tooltip={t(
+      "Réductions d'émissions dues au piégeage et à la substitution du carbone"
+    )}
     step={0.1}
     value={value ?? data?.eccr}
     error={errors?.eccr}
@@ -750,12 +823,12 @@ export const Eccr = ({ data, value, errors, ...props }: LIP) => (
   />
 )
 
-export const Eee = ({ data, value, errors, ...props }: LIP) => (
+export const Eee = ({ data, value, errors, t = idt, ...props }: LIP) => (
   <LabelInput
     name="eee"
-    label="EEE"
+    label={t("EEE")}
     type="number"
-    tooltip="Réductions d'émissions dues à la production excédentaire d'électricité dans le cadre de la cogénération" // prettier-ignore
+    tooltip={t("Réductions d'émissions dues à la production excédentaire d'électricité dans le cadre de la cogénération")} // prettier-ignore
     step={0.1}
     value={value ?? data?.eee}
     error={errors?.eee}
@@ -763,12 +836,12 @@ export const Eee = ({ data, value, errors, ...props }: LIP) => (
   />
 )
 
-export const GhgTotal = ({ data, value, errors, ...props }: LIP) => {
+export const GhgTotal = ({ data, value, errors, t = idt, ...props }: LIP) => {
   const total = (value as number) ?? data?.ghg_total ?? 0
   return (
     <LabelInput
       name="ghg_total"
-      label="Total"
+      label={t("Total")}
       style={{ marginTop: "auto" }}
       {...props}
       readOnly
@@ -777,12 +850,18 @@ export const GhgTotal = ({ data, value, errors, ...props }: LIP) => {
   )
 }
 
-export const GhgReduction = ({ data, value, errors, ...props }: LIP) => {
+export const GhgReduction = ({
+  data,
+  value,
+  errors,
+  t = idt,
+  ...props
+}: LIP) => {
   const reduction = (value as number) ?? data?.ghg_reduction ?? 0
   return (
     <LabelInput
       name="ghg_reduction"
-      label="Réduction"
+      label={t("Réduction")}
       style={{ marginTop: "auto" }}
       {...props}
       readOnly

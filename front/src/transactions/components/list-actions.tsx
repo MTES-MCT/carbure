@@ -1,5 +1,6 @@
 import React from "react"
 import cl from "clsx"
+import { Trans, useTranslation } from "react-i18next"
 
 import { LotDeleter } from "transactions/hooks/actions/use-delete-lots"
 import { LotUploader } from "transactions/hooks/actions/use-upload-file"
@@ -46,7 +47,7 @@ type ExportActionsProps = {
 
 export const ExportActions = ({ isEmpty, onExportAll }: ExportActionsProps) => (
   <Button icon={Download} disabled={isEmpty} onClick={onExportAll}>
-    Exporter
+    <Trans>Exporter</Trans>
   </Button>
 )
 
@@ -67,7 +68,7 @@ export const ProducerImportActions = ({ uploader }: ImportActionsProps) => {
 
   return (
     <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
-      Importer lots
+      <Trans>Importer lots</Trans>
     </AsyncButton>
   )
 }
@@ -84,7 +85,7 @@ export const TraderImportActions = ({ uploader }: ImportActionsProps) => {
 
   return (
     <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
-      Importer lots
+      <Trans>Importer lots</Trans>
     </AsyncButton>
   )
 }
@@ -102,7 +103,7 @@ export const OperatorImportActions = ({ uploader }: ImportActionsProps) => {
 
   return (
     <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
-      Importer lots
+      <Trans>Importer lots</Trans>
     </AsyncButton>
   )
 }
@@ -110,7 +111,7 @@ export const OperatorImportActions = ({ uploader }: ImportActionsProps) => {
 export const CreateActions = () => (
   <Link relative to="add">
     <Button icon={Plus} level="primary">
-      Créer lot
+      <Trans>Créer lot</Trans>
     </Button>
   </Link>
 )
@@ -129,6 +130,8 @@ export const DraftActions = ({
   deleter,
   validator,
 }: DraftActionsProps) => {
+  const { t } = useTranslation()
+
   function onValidate() {
     if (hasSelection) {
       validator.validateSelection()
@@ -154,7 +157,9 @@ export const DraftActions = ({
         disabled={disabled}
         onClick={onValidate}
       >
-        Envoyer {hasSelection ? `sélection` : "tout"}
+        <Trans>
+          Envoyer {{ what: hasSelection ? t("sélection") : t("tout") }}
+        </Trans>
       </AsyncButton>
 
       <AsyncButton
@@ -164,7 +169,9 @@ export const DraftActions = ({
         disabled={disabled}
         onClick={onDelete}
       >
-        Supprimer {hasSelection ? `sélection` : "tout"}
+        <Trans>
+          Supprimer {{ what: hasSelection ? t("sélection") : t("tout") }}
+        </Trans>
       </AsyncButton>
     </React.Fragment>
   )
@@ -184,7 +191,7 @@ export const ToFixActions = ({ disabled, deleter }: ToFixActionsProps) => {
       disabled={disabled}
       onClick={deleter.deleteSelection}
     >
-      Supprimer sélection
+      <Trans>Supprimer sélection</Trans>
     </AsyncButton>
   )
 }
@@ -202,6 +209,8 @@ export const InboxActions = ({
   acceptor,
   rejector,
 }: InboxActionsProps) => {
+  const { t } = useTranslation()
+
   function onAccept() {
     if (hasSelection) {
       acceptor.acceptSelection()
@@ -227,7 +236,9 @@ export const InboxActions = ({
         disabled={disabled}
         onClick={onAccept}
       >
-        Accepter {hasSelection ? `sélection` : "tout"}
+        <Trans>
+          Accepter {{ what: hasSelection ? t("sélection") : t("tout") }}
+        </Trans>
       </AsyncButton>
 
       <AsyncButton
@@ -237,7 +248,9 @@ export const InboxActions = ({
         disabled={disabled}
         onClick={onReject}
       >
-        Refuser {hasSelection ? `sélection` : "tout"}
+        <Trans>
+          Refuser {{ what: hasSelection ? t("sélection") : t("tout") }}
+        </Trans>
       </AsyncButton>
     </React.Fragment>
   )
@@ -261,7 +274,7 @@ export const AdminActions = ({
         disabled={disabled}
         onClick={administrator.markSelectionForReview}
       >
-        Épingler sélection
+        <Trans>Épingler sélection</Trans>
       </AsyncButton>
 
       <AsyncButton
@@ -271,7 +284,7 @@ export const AdminActions = ({
         disabled={disabled}
         onClick={administrator.markSelectionAsRead}
       >
-        Ignorer sélection
+        <Trans>Ignorer sélection</Trans>
       </AsyncButton>
     </React.Fragment>
   )
@@ -292,7 +305,7 @@ export const AuditorActions = ({ disabled, auditor }: AuditorActionsProps) => {
         disabled={disabled}
         onClick={auditor.highlightLotSelection}
       >
-        Épingler sélection
+        <Trans>Épingler sélection</Trans>
       </AsyncButton>
 
       <AsyncButton
@@ -302,7 +315,7 @@ export const AuditorActions = ({ disabled, auditor }: AuditorActionsProps) => {
         disabled={disabled}
         onClick={auditor.hideLotSelection}
       >
-        Ignorer sélection
+        <Trans>Ignorer sélection</Trans>
       </AsyncButton>
     </React.Fragment>
   )
@@ -340,7 +353,7 @@ export const OperatorOutsourcedBlendingActions = ({
       icon={Forward}
       onClick={onForward}
     >
-      Transférer
+      <Trans>Transférer</Trans>
     </Button>
   )
 }
@@ -360,14 +373,18 @@ export const ActionBar = ({
 }: {
   search: SearchSelection
   children: React.ReactNode
-}) => (
-  <Box row className={cl(styles.actionBar)}>
-    {children}
-    <SearchInput
-      placeholder="Rechercher des lots..."
-      value={search.query}
-      onChange={(e) => search.setQuery(e.target.value)}
-      style={{ marginLeft: "auto" }}
-    />
-  </Box>
-)
+}) => {
+  const { t } = useTranslation()
+
+  return (
+    <Box row className={cl(styles.actionBar)}>
+      {children}
+      <SearchInput
+        placeholder={t("Rechercher des lots...")}
+        value={search.query}
+        onChange={(e) => search.setQuery(e.target.value)}
+        style={{ marginLeft: "auto" }}
+      />
+    </Box>
+  )
+}

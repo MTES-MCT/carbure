@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
 import useTransactionForm, {
@@ -14,6 +15,7 @@ export default function useTransactionAdd(
   entity: EntitySelection,
   refresh: () => void
 ) {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
 
   const close = useClose("../")
@@ -32,12 +34,12 @@ export default function useTransactionAdd(
 
       notifications.push({
         level: "success",
-        text: "Le lot a bien été créé !",
+        text: t("Le lot a bien été créé !"),
       })
     } else {
       notifications.push({
         level: "error",
-        text: "Impossible de créer ce lot.",
+        text: t("Impossible de créer ce lot."),
       })
     }
   }

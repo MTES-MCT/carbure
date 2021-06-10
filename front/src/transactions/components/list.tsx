@@ -1,6 +1,7 @@
 import React from "react"
 import format from "date-fns/format"
 import fr from "date-fns/locale/fr"
+import { Trans } from "react-i18next"
 
 import {
   Entity,
@@ -245,7 +246,7 @@ export const TransactionList = ({
 
       {!isError && isEmpty && (
         <Alert level="warning" icon={AlertCircle}>
-          Aucune transaction trouvée pour cette recherche
+          <Trans>Aucune transaction trouvée pour cette recherche</Trans>
           {isLoading && <LoaderOverlay />}
         </Alert>
       )}
