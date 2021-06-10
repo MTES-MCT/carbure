@@ -39,9 +39,9 @@ test("operator: display an empty list of transactions", async () => {
 
   await waitWhileLoading()
 
-  screen.getByText("Alertes")
-  screen.getByText("Corrections")
-  screen.getByText("Lots déclarés")
+  screen.getByText("Alerte")
+  screen.getByText("Correction")
+  screen.getByText("Lot déclaré")
 
   screen.getByText("Périodes")
   screen.getByText("Biocarburants")

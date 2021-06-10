@@ -17,18 +17,20 @@ import * as api from "../api"
 import { getStatus } from "transactions/helpers"
 
 export function useFieldErrors(errors: GenericError[]) {
-  const { t } = useTranslation("errors")
+  const { t } = useTranslation()
   const fieldErrors: { [k: string]: string } = {}
 
   errors.forEach((err) => {
     if (!err.is_blocking) return
 
     if (err.field) {
-      fieldErrors[err.field] = t(err.error)
+      fieldErrors[err.field] = t(err.error, { ns: "errors" })
     }
 
     if (err.fields) {
-      err.fields?.forEach((field) => (fieldErrors[field] = t(err.error)))
+      err.fields?.forEach(
+        (field) => (fieldErrors[field] = t(err.error, { ns: "errors" }))
+      )
     }
   })
 

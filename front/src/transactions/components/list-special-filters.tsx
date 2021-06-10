@@ -33,7 +33,7 @@ export const InvalidFilter = ({
       onDispose={() => special.setInvalid(false)}
     >
       <span>
-        {!special.invalid && <Trans>Parmi ces résultats,</Trans>}
+        {!special.invalid && <Trans>Parmi ces résultats, </Trans>}
         <Trans count={count}>
           <b>{{ count }} lots</b> présentent des <b>incohérences</b>
         </Trans>
@@ -66,12 +66,10 @@ export const DeadlineFilter = ({
     onDispose={() => special.setDeadline(false)}
   >
     <span>
-      <Trans>
-        {!special.deadline && <Trans>Parmi ces résultats, </Trans>}
-        <Trans count={count}>
-          <b>{{ count }} lots</b> doivent être déclarés avant le{" "}
-          <b>{{ date: deadlineDate ?? "N/A" }}</b>
-        </Trans>
+      {!special.deadline && <Trans>Parmi ces résultats, </Trans>}
+      <Trans count={count}>
+        <b>{{ count }} lots</b> doivent être déclarés avant le{" "}
+        <b>{{ date: deadlineDate ?? "N/A" }}</b>
       </Trans>
     </span>
   </AlertFilter>
@@ -122,12 +120,12 @@ export const SummaryFilter = ({
       icon={loading ? Loader : Filter}
       className={cl(styles.alertFilter, loading && styles.alertLoading)}
     >
-      <Trans count={count}>
-        <span>
+      <span>
+        <Trans count={count}>
           <b>{{ count }} lots</b> pour un total de{" "}
           <b>{{ volume: prettyVolume(totalVolume) }} litres</b>
-        </span>
-      </Trans>
+        </Trans>
+      </span>
 
       {!hideRecap && (
         <span className={styles.alertLink} onClick={showSummary}>

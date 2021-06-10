@@ -42,6 +42,7 @@ const TransactionWithHook = ({ entity }: { entity: Entity }) => {
     rejector,
     refresh,
     administrator,
+    auditor,
   } = useTransactions(entity)
 
   return (
@@ -54,6 +55,7 @@ const TransactionWithHook = ({ entity }: { entity: Entity }) => {
         acceptor={acceptor}
         rejector={rejector}
         administrator={administrator}
+        auditor={auditor}
         transactions={transactions?.data?.lots.map((l) => l.id) ?? []}
       />
     </Route>
@@ -270,6 +272,7 @@ test("check transaction errors", async () => {
     (content, node) =>
       node?.textContent === "Ce lot doit être validé avant le 29 février 2020"
   )
+  // screen.debug(undefined, Infinity)
 
   const dae = screen.getByTitle(
     "Numéro douanier (DAE, DAA...) - Le DAE (ou équivalent) est manquant"
@@ -280,6 +283,8 @@ test("check transaction errors", async () => {
     "Matière première - La matière première est manquante"
   )
   expect(mp).toHaveClass("errorLabel")
+
+  // screen.debug(undefined, Infinity)
 
   const errors = screen.getByText("Erreurs (2)")
   userEvent.click(errors)

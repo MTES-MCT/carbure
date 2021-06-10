@@ -83,7 +83,7 @@ function checkGESFields() {
 test("display the transaction form - producer with trading and mac", async () => {
   render(<TransactionAddWithRouter entity={producer} />)
 
-  screen.getByText("Créer une nouvelle transaction")
+  await screen.findByText("Créer une nouvelle transaction")
   screen.getByText("Brouillon")
 
   checkLotFields()
@@ -102,6 +102,8 @@ test("display the transaction form - producer with trading and mac", async () =>
 test("display the transaction form - pure producer", async () => {
   const entity = { ...producer, has_trading: false, has_mac: false }
   render(<TransactionAddWithRouter entity={entity} />)
+
+  await screen.findByText("Créer une nouvelle transaction")
 
   checkLotFields()
   checkProductionFields()
