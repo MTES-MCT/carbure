@@ -357,7 +357,11 @@ const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
       header: t("Ville"),
       className: styles.settingsTableColumn,
       render: (ds) => (
-        <Line text={`${ds.depot!.city}, ${ds.depot!.country.name}`} />
+        <Line
+          text={`${ds.depot!.city}, ${t(ds.depot!.country.code_pays, {
+            ns: "countries",
+          })}`}
+        />
       ),
     },
     actions,

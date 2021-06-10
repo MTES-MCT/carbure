@@ -16,6 +16,7 @@ import {
   toOption,
 } from "transactions/helpers"
 import { EntitySelection } from "carbure/hooks/use-entity"
+import { TFunction } from "react-i18next"
 
 // extract the status name from the lot details
 export function getStockStatus(
@@ -44,8 +45,13 @@ export function getStockStatus(
   return LotStatus.Weird
 }
 
-export function getStockSnapshot(entity_id: number): Promise<Snapshot> {
-  return api.get("/stocks/snapshot", { entity_id }).then(normalizeFilters)
+export function getStockSnapshot(
+  entity_id: number,
+  t: TFunction
+): Promise<Snapshot> {
+  return api
+    .get("/stocks/snapshot", { entity_id })
+    .then((s) => normalizeFilters(s, t))
 }
 
 export function getStocks(query: TransactionQuery): Promise<Lots> {
