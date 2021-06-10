@@ -50,5 +50,5 @@ Ensuite, setup normalement le projet:
 - `source venv/bin/activate`
 - `pip install -r requirements.txt`
 - `docker-compose up --build -d`
-- `bash loadenv.sh`
+- `source loadenv.sh`
 - `code .`
