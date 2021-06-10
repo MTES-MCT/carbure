@@ -90,7 +90,6 @@ const ADMIN_FILTERS = [
   Filters.Errors,
   Filters.HiddenByAdmin,
   Filters.HiddenByAuditor,
-  // Filters.HighlightedByAdmin,
 ]
 
 export function useTransactions(entity: EntitySelection) {

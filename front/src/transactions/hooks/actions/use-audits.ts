@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
 import * as api from "transactions/api"
@@ -21,6 +22,7 @@ export default function useAuditLots(
   selection: TransactionSelection,
   refresh: () => void
 ): LotAuditor {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
   const [hideReq, resolveHideLot] = useAPI(api.hideAuditorLots)
   const [highlightReq, resolveHighlightLot] = useAPI(api.highlightAuditorLots)
@@ -33,12 +35,12 @@ export default function useAuditLots(
 
       notifications.push({
         level: "success",
-        text: "Le lot a bien été mis à jour",
+        text: t("Le lot a bien été mis à jour"),
       })
     } else {
       notifications.push({
         level: "error",
-        text: "L'opération a échoué",
+        text: t("L'opération a échoué"),
       })
     }
   }
@@ -46,12 +48,12 @@ export default function useAuditLots(
   async function hideLot(tx: Transaction) {
     const shouldHide = tx.hidden_by_auditor
       ? await confirm(
-          "Montrer le lot",
-          "Voulez-vous montrer à nouveau ce lot dans la liste ?"
+          t("Montrer le lot"),
+          t("Voulez-vous montrer à nouveau ce lot dans la liste ?")
         )
       : await confirm(
-          "Ignorer le lot",
-          "Voulez-vous ne plus voir ce lot dans la liste ?"
+          t("Ignorer le lot"),
+          t("Voulez-vous ne plus voir ce lot dans la liste ?")
         )
 
     if (entity !== null && shouldHide) {
@@ -63,8 +65,8 @@ export default function useAuditLots(
 
   async function hideLotSelection() {
     const shouldHide = await confirm(
-      "Ignorer la sélection",
-      "Voulez-vous ne plus voir les lots sélectionnés dans la liste ?"
+      t("Ignorer la sélection"),
+      t("Voulez-vous ne plus voir les lots sélectionnés dans la liste ?")
     )
 
     if (entity !== null && shouldHide) {
@@ -77,12 +79,12 @@ export default function useAuditLots(
   async function highlightLot(tx: Transaction) {
     const shouldHighlight = tx.highlighted_by_auditor
       ? await confirm(
-          "Désépingler le lot",
-          "Voulez-vous retirer ce lot de la liste des lots mis de côté ?"
+          t("Désépingler le lot"),
+          t("Voulez-vous retirer ce lot de la liste des lots mis de côté ?")
         )
       : await confirm(
-          "Épingler ce lot",
-          "Voulez-vous mettre ce lot de côté pour l'étudier plus tard ?"
+          t("Épingler ce lot"),
+          t("Voulez-vous mettre ce lot de côté pour l'étudier plus tard ?")
         )
 
     if (entity !== null && shouldHighlight) {
@@ -94,8 +96,10 @@ export default function useAuditLots(
 
   async function highlightLotSelection() {
     const shouldHide = await confirm(
-      "Épingler la sélection",
-      "Voulez-vous mettre les lots sélectionnés de côté pour les étudier plus tard  ?"
+      t("Épingler la sélection"),
+      t(
+        "Voulez-vous mettre les lots sélectionnés de côté pour les étudier plus tard  ?"
+      )
     )
 
     if (entity !== null && shouldHide) {

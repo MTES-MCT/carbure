@@ -1,5 +1,6 @@
 import React from "react"
 import cl from "clsx"
+import { useTranslation } from "react-i18next"
 
 import { FormChangeHandler } from "common/hooks/use-form"
 import { Box, SystemProps } from "common/components"
@@ -42,6 +43,8 @@ export function FormGroup<T>({
   onChange,
   ...props
 }: FormGroupProps<T>) {
+  const { t } = useTranslation()
+
   return (
     <Box
       {...props}
@@ -58,6 +61,7 @@ export function FormGroup<T>({
             data,
             errors,
             onChange,
+            t,
           })
       )}
     </Box>

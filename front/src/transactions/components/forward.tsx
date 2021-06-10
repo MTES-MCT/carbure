@@ -1,3 +1,4 @@
+import { Trans, useTranslation } from "react-i18next"
 import {
   Dialog,
   DialogText,
@@ -16,19 +17,6 @@ import { TransactionSelection } from "transactions/hooks/query/use-selection"
 
 import * as C from "transactions/components/list-columns"
 
-const COLUMNS: Column<EntityDeliverySite>[] = [
-  C.padding,
-  {
-    header: "Depot",
-    render: (depot) => depot.depot?.name,
-  },
-  {
-    header: "Incorporateur",
-    render: (depot) => depot.blender?.name,
-  },
-  C.padding,
-]
-
 type OperatorForwardPromptProps = PromptProps<boolean> & {
   outsourceddepots: EntityDeliverySite[] | undefined
 }
@@ -37,24 +25,44 @@ export const OperatorForwardPrompt = ({
   outsourceddepots,
   onResolve,
 }: OperatorForwardPromptProps) => {
+  const { t } = useTranslation()
   const rows = outsourceddepots?.map((od) => ({ value: od })) ?? []
+
+  const columns: Column<EntityDeliverySite>[] = [
+    C.padding,
+    {
+      header: t("Depot"),
+      render: (depot) => depot.depot?.name,
+    },
+    {
+      header: t("Incorporateur"),
+      render: (depot) => depot.blender?.name,
+    },
+    C.padding,
+  ]
 
   return (
     <Dialog onResolve={onResolve}>
-      <DialogTitle text="Transfert de lots" />
-      <DialogText text="Vous pouvez transférer vos lots reçus dans un dépôt pour lequel l'incorporation peut être effectuée par une société tierce." />
+      <DialogTitle text={t("Transfert de lots")} />
+      <DialogText
+        text={t(
+          "Vous pouvez transférer vos lots reçus dans un dépôt pour lequel l'incorporation peut être effectuée par une société tierce."
+        )}
+      />
 
       <Box className={styles.importExplanation}>
-        Voici vers quels opérateurs les lots seront transférés:
+        <Trans>Voici vers quels opérateurs les lots seront transférés:</Trans>
       </Box>
 
-      <Table columns={COLUMNS} rows={rows} className={styles.forwardTable} />
+      <Table columns={columns} rows={rows} className={styles.forwardTable} />
 
       <DialogButtons>
         <Button level="primary" onClick={() => onResolve(true)}>
-          Transférer
+          <Trans>Transférer</Trans>
         </Button>
-        <Button onClick={() => onResolve(false)}>Annuler</Button>
+        <Button onClick={() => onResolve(false)}>
+          <Trans>Annuler</Trans>
+        </Button>
       </DialogButtons>
     </Dialog>
   )
@@ -80,6 +88,7 @@ export const OperatorTransactionsToForwardPrompt = ({
   outsourceddepots,
   onResolve,
 }: OperatorTransactionsToForwardPromptProps) => {
+  const { t } = useTranslation()
   const outsourceddepotsids = outsourceddepots?.map((d) => d.depot?.depot_id)
   const txs = selection
     .getTransactions()
@@ -90,11 +99,11 @@ export const OperatorTransactionsToForwardPrompt = ({
 
   return (
     <Dialog onResolve={onResolve}>
-      <DialogTitle text="Transférer lot" />
-      <DialogText text="Voulez vous transférer les lots sélectionnés ?" />
+      <DialogTitle text={t("Transférer lot")} />
+      <DialogText text={t("Voulez vous transférer les lots sélectionnés ?")} />
 
       <Box className={styles.importExplanation}>
-        Voici les lots qui seront transférés:
+        <Trans>Voici les lots qui seront transférés:</Trans>
       </Box>
 
       <Table
@@ -105,9 +114,11 @@ export const OperatorTransactionsToForwardPrompt = ({
 
       <DialogButtons>
         <Button level="primary" onClick={() => onResolve(txs)}>
-          Transférer
+          <Trans>Transférer</Trans>
         </Button>
-        <Button onClick={() => onResolve()}>Annuler</Button>
+        <Button onClick={() => onResolve()}>
+          <Trans>Annuler</Trans>
+        </Button>
       </DialogButtons>
     </Dialog>
   )

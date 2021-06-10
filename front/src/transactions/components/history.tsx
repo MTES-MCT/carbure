@@ -61,19 +61,19 @@ const TransactionHistory = ({ history = [] }: TransactionHistoryProps) => {
   const columns: Column<LotUpdate>[] = [
     padding,
     {
-      header: "Date",
+      header: t("Date"),
       render: (u) => formatDate(u.datetime, true),
     },
     {
-      header: "Champ modifié",
+      header: t("Champ modifié"),
       render: (u) => u.label ?? u.field,
     },
     {
-      header: "Valeur",
+      header: t("Valeur"),
       render: (u) => <HistoryValue update={u} />,
     },
     {
-      header: "Modifié par",
+      header: t("Modifié par"),
       render: (u) => u.modified_by,
     },
     padding,

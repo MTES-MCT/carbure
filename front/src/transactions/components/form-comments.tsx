@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { Trans, useTranslation } from "react-i18next"
 import { Comment, TransactionQuery } from "common/types"
 
 import { Box, LoaderOverlay } from "common/components"
@@ -31,6 +32,7 @@ const Comments = ({
   comments,
   onComment,
 }: CommentsProps) => {
+  const { t } = useTranslation()
   const [comment, setComment] = useState("")
 
   function onSubmit(e: React.FormEvent) {
@@ -63,12 +65,12 @@ const Comments = ({
         <Box row as="form" className={styles.commentsForm} onSubmit={onSubmit}>
           <Input
             type="text"
-            placeholder="Entrez un commentaire..."
+            placeholder={t("Entrez un commentaire...")}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
           />
           <AsyncButton submit loading={loading}>
-            Envoyer
+            <Trans>Envoyer</Trans>
           </AsyncButton>
         </Box>
       )}
@@ -86,6 +88,7 @@ export const CommentPrompt = ({
   description,
   onResolve,
 }: CommentPromptProps) => {
+  const { t } = useTranslation()
   const [comment, setComment] = useState("")
 
   function onSubmit(e: React.FormEvent) {
@@ -100,7 +103,7 @@ export const CommentPrompt = ({
 
       <Box as="form" onSubmit={onSubmit}>
         <LabelInput
-          label="Commentaire (obligatoire)"
+          label={t("Commentaire (obligatoire)")}
           value={comment}
           className={styles.commentInput}
           onChange={(e) => setComment(e.target.value)}
@@ -113,10 +116,10 @@ export const CommentPrompt = ({
             icon={Check}
             onClick={() => onResolve(comment)}
           >
-            Confirmer
+            <Trans>Confirmer</Trans>
           </Button>
           <Button icon={Return} onClick={() => onResolve()}>
-            Annuler
+            <Trans>Annuler</Trans>
           </Button>
         </DialogButtons>
       </Box>
@@ -129,15 +132,8 @@ export interface CommentWithType {
   topic: string
 }
 
-// prettier-ignore
-const TOPICS = [
-  { value: "sustainability", label: "Il y a un problème relatif à la durabilité ou aux caractéristiques du lot (provenance, volume, gaz à effet de serre)" },
-  { value: "tx", label: "Il y a un problème sur la transaction (numéro douanier, site de livraison, date)" },
-  { value: "both", label: "Les deux" },
-]
-
 type CommentWithTypeProps = PromptProps<CommentWithType> & {
-  title?: string,
+  title?: string
   description?: string
 }
 
@@ -146,6 +142,7 @@ export const CommentWithTypePrompt = ({
   description = "Voulez vous accepter ce lot sous réserve ?",
   onResolve,
 }: CommentWithTypeProps) => {
+  const { t } = useTranslation()
   const [comment, setComment] = useState("")
   const [topic, setTopic] = useState("")
 
@@ -161,6 +158,13 @@ export const CommentWithTypePrompt = ({
     }
   }
 
+  // prettier-ignore
+  const TOPICS = [
+  { value: "sustainability", label: t("Il y a un problème relatif à la durabilité ou aux caractéristiques du lot (provenance, volume, gaz à effet de serre)") },
+  { value: "tx", label: t("Il y a un problème sur la transaction (numéro douanier, site de livraison, date)") },
+  { value: "both", label: t("Les deux") },
+]
+
   return (
     <Dialog onResolve={onResolve}>
       <DialogTitle text={title} />
@@ -170,7 +174,7 @@ export const CommentWithTypePrompt = ({
         <RadioGroup value={topic} options={TOPICS} onChange={onChangeTopic} />
 
         <LabelInput
-          label="Commentaire (obligatoire)"
+          label={t("Commentaire (obligatoire)")}
           value={comment}
           className={styles.commentInput}
           onChange={(e) => setComment(e.target.value)}
@@ -183,10 +187,10 @@ export const CommentWithTypePrompt = ({
             disabled={!comment || !topic}
             onClick={() => onResolve({ comment, topic })}
           >
-            Confirmer
+            <Trans>Confirmer</Trans>
           </Button>
           <Button icon={Return} onClick={() => onResolve()}>
-            Annuler
+            <Trans>Annuler</Trans>
           </Button>
         </DialogButtons>
       </Box>
@@ -210,6 +214,7 @@ export const CommentWithSummaryPrompt = ({
   selection,
   onResolve,
 }: CommentWithSummaryPromptProps) => {
+  const { t } = useTranslation()
   const [comment, setComment] = useState("")
   const summary = useSummary(query, selection, stock)
 
@@ -225,7 +230,7 @@ export const CommentWithSummaryPrompt = ({
 
       <Box as="form" onSubmit={onSubmit}>
         <LabelInput
-          label="Commentaire (obligatoire)"
+          label={t("Commentaire (obligatoire)")}
           value={comment}
           className={styles.commentInput}
           onChange={(e) => setComment(e.target.value)}
@@ -243,10 +248,10 @@ export const CommentWithSummaryPrompt = ({
             icon={Check}
             onClick={() => onResolve([comment, summary.data?.tx_ids ?? []])}
           >
-            Confirmer
+            <Trans>Confirmer</Trans>
           </Button>
           <Button icon={Return} onClick={() => onResolve()}>
-            Annuler
+            <Trans>Annuler</Trans>
           </Button>
         </DialogButtons>
       </Box>

@@ -56,12 +56,12 @@ export default function useStockDetails(
 
       notifications.push({
         level: "success",
-        text: t("Le lot a bien été sauvegardé !"),
+        text: t("Le lot a bien été sauvegardé !", { ns: "translation" }),
       })
     } else {
       notifications.push({
         level: "error",
-        text: t("Impossible de sauvegarder ce lot."),
+        text: t("Impossible de sauvegarder ce lot.", { ns: "translation" }),
       })
     }
   }

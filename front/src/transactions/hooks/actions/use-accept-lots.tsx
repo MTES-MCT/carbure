@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { TransactionSelection } from "../query/use-selection"
 
@@ -31,6 +32,7 @@ export default function useAcceptLots(
   refresh: () => void,
   stock?: boolean
 ): LotAcceptor {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
 
   const [request, resolveAccept] = useAPI(api.acceptLots)
@@ -46,15 +48,15 @@ export default function useAcceptLots(
       notifications.push({
         level: "success",
         text: many
-          ? "Les lots ont bien été acceptés !"
-          : "Le lot a bien été accepté !",
+          ? t("Les lots ont bien été acceptés !")
+          : t("Le lot a bien été accepté !"),
       })
     } else {
       notifications.push({
         level: "error",
         text: many
-          ? "Impossible d'accepter les lots."
-          : "Impossible d'accepter le lot.",
+          ? t("Impossible d'accepter les lots.")
+          : t("Impossible d'accepter le lot."),
       })
     }
   }
@@ -67,20 +69,20 @@ export default function useAcceptLots(
 
       notifications.push({
         level: "success",
-        text: "Le lot a bien été envoyé en correction !",
+        text: t("Le lot a bien été envoyé en correction !"),
       })
     } else {
       notifications.push({
         level: "error",
-        text: "Impossible de corriger ce lot.",
+        text: t("Impossible de corriger ce lot."),
       })
     }
   }
 
   async function acceptLot(tx: Transaction) {
     const shouldAccept = await confirm(
-      "Accepter lot",
-      "Voulez vous accepter ce lot ?"
+      t("Accepter lot"),
+      t("Voulez vous accepter ce lot ?")
     )
 
     if (entity !== null && shouldAccept) {
@@ -107,8 +109,10 @@ export default function useAcceptLots(
   async function askForCorrection(tx: Transaction) {
     const result = await prompt<CommentWithType>((resolve) => (
       <CommentWithTypePrompt
-        title="Demander une correction"
-        description="Voulez-vous renvoyer ce lot à son fournisseur pour correction ?"
+        title={t("Demander une correction")}
+        description={t(
+          "Voulez-vous renvoyer ce lot à son fournisseur pour correction ?"
+        )}
         onResolve={resolve}
       />
     ))
@@ -125,8 +129,10 @@ export default function useAcceptLots(
   async function amendLot(tx: Transaction) {
     const comment = await prompt<string>((resolve) => (
       <CommentPrompt
-        title="Corriger le lot"
-        description="Voulez-vous modifier ce lot accepté ? Si la déclaration pour cette période a déjà été validée, il vous faudra la soumettre à nouveau une fois la correction acceptée par votre client."
+        title={t("Corriger le lot")}
+        description={t(
+          "Voulez-vous modifier ce lot accepté ? Si la déclaration pour cette période a déjà été validée, il vous faudra la soumettre à nouveau une fois la correction acceptée par votre client."
+        )}
         onResolve={resolve}
       />
     ))
@@ -142,8 +148,8 @@ export default function useAcceptLots(
     const shouldAccept = await prompt<number[]>((resolve) => (
       <SummaryPrompt
         stock={stock}
-        title="Accepter lot"
-        description="Voulez vous accepter les lots sélectionnés ?"
+        title={t("Accepter lot")}
+        description={t("Voulez vous accepter les lots sélectionnés ?")}
         query={query}
         selection={selection.selected}
         onResolve={resolve}
@@ -162,8 +168,8 @@ export default function useAcceptLots(
       const allTxids = await prompt<number[]>((resolve) => (
         <SummaryPrompt
           stock={stock}
-          title="Accepter tout"
-          description="Voulez vous accepter tous ces lots ?"
+          title={t("Accepter tout")}
+          description={t("Voulez vous accepter tous ces lots ?")}
           query={query}
           selection={selection.selected}
           onResolve={resolve}

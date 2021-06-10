@@ -1,4 +1,5 @@
 import cl from "clsx"
+import { Trans, useTranslation } from "react-i18next"
 
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { SpecialSelection } from "transactions/hooks/query/use-special"
@@ -19,30 +20,27 @@ type InvalidFilterProps = {
 
 export const InvalidFilter = ({
   loading,
-  errorCount,
+  errorCount: count,
   special,
-}: InvalidFilterProps) => (
-  <AlertFilter
-    loading={loading}
-    level="error"
-    icon={AlertCircle}
-    active={special.invalid}
-    onActivate={() => special.setInvalid(true)}
-    onDispose={() => special.setInvalid(false)}
-  >
-    {errorCount === 1 ? (
+}: InvalidFilterProps) => {
+  return (
+    <AlertFilter
+      loading={loading}
+      level="error"
+      icon={AlertCircle}
+      active={special.invalid}
+      onActivate={() => special.setInvalid(true)}
+      onDispose={() => special.setInvalid(false)}
+    >
       <span>
-        {!special.invalid && "Parmi ces résultats, "}
-        <b>1 lot</b> présente des <b>incohérences</b>
+        {!special.invalid && <Trans>Parmi ces résultats,</Trans>}
+        <Trans count={count}>
+          <b>{{ count }} lots</b> présentent des <b>incohérences</b>
+        </Trans>
       </span>
-    ) : (
-      <span>
-        {!special.invalid && "Parmi ces résultats, "}
-        <b>{errorCount} lots</b> présentent des <b>incohérences</b>
-      </span>
-    )}
-  </AlertFilter>
-)
+    </AlertFilter>
+  )
+}
 
 type DeadlineFilterProps = {
   loading: boolean
@@ -54,7 +52,7 @@ type DeadlineFilterProps = {
 
 export const DeadlineFilter = ({
   loading,
-  deadlineCount,
+  deadlineCount: count,
   deadlineDate,
   special,
   entity,
@@ -67,23 +65,15 @@ export const DeadlineFilter = ({
     onActivate={() => special.setDeadline(true)}
     onDispose={() => special.setDeadline(false)}
   >
-    {deadlineCount === 1 ? (
-      <span>
-        {!special.deadline && "Parmi ces résultats, "}
-        <b>1 lot</b> doit être{" "}
-        {entity?.entity_type === "Opérateur" ? "accepté" : "validé et envoyé"}{" "}
-        avant le <b>{deadlineDate}</b>
-      </span>
-    ) : (
-      <span>
-        {!special.deadline && "Parmi ces résultats, "}
-        <b>{deadlineCount} lots</b> doivent être{" "}
-        {entity?.entity_type === "Opérateur"
-          ? "acceptés"
-          : "validés et envoyés"}{" "}
-        avant le <b>{deadlineDate ?? "N/A"}</b>
-      </span>
-    )}
+    <span>
+      <Trans>
+        {!special.deadline && <Trans>Parmi ces résultats, </Trans>}
+        <Trans count={count}>
+          <b>{{ count }} lots</b> doivent être déclarés avant le{" "}
+          <b>{{ date: deadlineDate ?? "N/A" }}</b>
+        </Trans>
+      </Trans>
+    </span>
   </AlertFilter>
 )
 
@@ -100,7 +90,7 @@ type SummaryFilterProps = {
 
 export const SummaryFilter = ({
   loading,
-  txCount,
+  txCount: count,
   totalVolume,
   query,
   selection,
@@ -108,12 +98,16 @@ export const SummaryFilter = ({
   entity,
   onReset,
 }: SummaryFilterProps) => {
+  const { t } = useTranslation()
+
   function showSummary() {
     prompt((resolve) => (
       <SummaryPrompt
         readOnly
-        title="Récapitulatif des lots"
-        description="Ce tableau résume les informations principales des lots correspondant à votre recherche ou sélection."
+        title={t("Récapitulatif des lots")}
+        description={t(
+          "Ce tableau résume les informations principales des lots correspondant à votre recherche ou sélection."
+        )}
         query={query}
         entity={entity}
         selection={selection}
@@ -128,20 +122,16 @@ export const SummaryFilter = ({
       icon={loading ? Loader : Filter}
       className={cl(styles.alertFilter, loading && styles.alertLoading)}
     >
-      {txCount === 1 ? (
+      <Trans count={count}>
         <span>
-          <b>Un lot</b> de <b>{prettyVolume(totalVolume)} litres</b>
+          <b>{{ count }} lots</b> pour un total de{" "}
+          <b>{{ volume: prettyVolume(totalVolume) }} litres</b>
         </span>
-      ) : (
-        <span>
-          <b>{txCount} lots</b> pour un total de{" "}
-          <b>{prettyVolume(totalVolume)} litres</b>
-        </span>
-      )}
+      </Trans>
 
       {!hideRecap && (
         <span className={styles.alertLink} onClick={showSummary}>
-          Voir le récapitulatif
+          <Trans>Voir le récapitulatif</Trans>
         </span>
       )}
 
@@ -149,7 +139,7 @@ export const SummaryFilter = ({
         className={cl(styles.alertLink, styles.alertClose)}
         onClick={onReset}
       >
-        Réinitialiser les filtres
+        <Trans>Réinitialiser les filtres</Trans>
       </span>
     </Alert>
   )

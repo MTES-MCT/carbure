@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { TransactionSelection } from "../query/use-selection"
 
@@ -28,6 +29,7 @@ export default function useValidateLots(
   refresh: () => void,
   stock?: boolean
 ): LotValidator {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
 
   const [request, resolveValidate] = useAPI(api.validateLots)
@@ -44,8 +46,8 @@ export default function useValidateLots(
           level: "success",
           text:
             res.submitted === 1
-              ? "Le lot a bien été envoyé !"
-              : `${res.valid} lots sur ${res.submitted} ont bien été envoyés !`,
+              ? t("Le lot a bien été envoyé !")
+              : t("{{valid}} lots sur {{submitted}} ont bien été envoyés !", { res }), // prettier-ignore
         })
       }
 
@@ -54,8 +56,8 @@ export default function useValidateLots(
           level: "error",
           text:
             res.submitted === 1
-              ? "Le lot n'a pas pu être validé !"
-              : `${res.invalid} lots sur ${res.submitted} n'ont pas pu être validés !`,
+              ? t("Le lot n'a pas pu être validé !")
+              : t("{{invalid}} lots sur {{submitted}} n'ont pas pu être validés !", { res }), // prettier-ignore
         })
       }
 
@@ -64,14 +66,14 @@ export default function useValidateLots(
           level: "warning",
           text:
             res.submitted === 1
-              ? "Un lot identique a été détecté dans la base de données !"
-              : `${res.duplicates} lots sont des doublons de lots existants !`,
+              ? t("Un lot identique a été détecté dans la base de données !")
+              : t("{{duplicates}} lots sont des doublons de lots existants !", { res }), // prettier-ignore
         })
       }
     } else {
       notifications.push({
         level: "error",
-        text: "Échec de la validation",
+        text: t("Échec de la validation"),
       })
     }
   }
@@ -79,8 +81,10 @@ export default function useValidateLots(
   async function validateLot(tx: Transaction) {
     const shouldValidate = await prompt<boolean>((resolve) => (
       <ValidationPrompt
-        title="Envoyer lot"
-        description="Vous vous apprêtez à envoyer ce lot à son destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
+        title={t("Envoyer lot")}
+        description={t(
+          "Vous vous apprêtez à envoyer ce lot à son destinataire, assurez-vous que les conditions ci-dessous sont respectées"
+        )}
         onResolve={resolve}
       />
     ))
@@ -95,8 +99,8 @@ export default function useValidateLots(
   async function validateAndCommentLot(tx: Transaction) {
     const comment = await prompt<string>((resolve) => (
       <CommentPrompt
-        title="Envoyer lot"
-        description="Voulez vous renvoyer ce lot corrigé ?"
+        title={t("Envoyer lot")}
+        description={t("Voulez vous renvoyer ce lot corrigé ?")}
         onResolve={resolve}
       />
     ))
@@ -114,8 +118,10 @@ export default function useValidateLots(
     const shouldValidate = await prompt<number[]>((resolve) => (
       <ValidationSummaryPrompt
         stock={stock}
-        title="Envoyer la sélection"
-        description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
+        title={t("Envoyer la sélection")}
+        description={t(
+          "Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées"
+        )}
         query={query}
         selection={selection.selected}
         onResolve={resolve}
@@ -134,8 +140,10 @@ export default function useValidateLots(
       const allTxids = await prompt<number[]>((resolve) => (
         <ValidationSummaryPrompt
           stock={stock}
-          title="Envoyer tous ces brouillons"
-          description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
+          title={t("Envoyer tous ces brouillons")}
+          description={t(
+            "Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées"
+          )}
           query={query}
           onResolve={resolve}
         />
