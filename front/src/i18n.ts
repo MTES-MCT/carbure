@@ -8,7 +8,14 @@ i18n
   // .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    ns: ["translation", "errors", "fields"],
+    ns: [
+      "translation",
+      "errors",
+      "fields",
+      "feedstocks",
+      "biofuels",
+      "countries",
+    ],
     supportedLngs: ["fr", "en"],
     fallbackLng: "fr",
     lng: "fr",

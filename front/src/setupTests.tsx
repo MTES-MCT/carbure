@@ -12,6 +12,9 @@ import { UserRightProvider } from "carbure/hooks/use-rights"
 import translation from "../public/locales/fr/translation.json"
 import errors from "../public/locales/fr/errors.json"
 import fields from "../public/locales/fr/fields.json"
+import feedstocks from "../public/locales/fr/feedstocks.json"
+import biofuels from "../public/locales/fr/biofuels.json"
+import countries from "../public/locales/fr/countries.json"
 
 configure({
   getElementError(message) {
@@ -43,9 +46,19 @@ i18n.use(initReactI18next).init({
       translation,
       errors,
       fields,
+      feedstocks,
+      biofuels,
+      countries,
     },
   },
-  ns: ["translation", "fields", "errors"],
+  ns: [
+    "translation",
+    "fields",
+    "errors",
+    "feedstocks",
+    "biofuels",
+    "countries",
+  ],
   defaultNS: "translation",
   supportedLngs: ["fr"],
   fallbackLng: "fr",
