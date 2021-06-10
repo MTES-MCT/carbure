@@ -25,6 +25,7 @@ import {
 } from "common/types"
 import { isKnown } from "transactions/components/form/fields"
 import { SummaryPrompt } from "transactions/components/summary"
+import { useTranslation } from "react-i18next"
 
 export interface LotSender {
   loading: boolean
@@ -42,6 +43,7 @@ export default function useSendLot(
   query: TransactionQuery,
   refresh: () => void
 ): LotSender {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
   const [requestCreate, resolveCreate] = useAPI(api.createDraftsFromStock)
   const [requestSend, resolveSend] = useAPI(api.sendDraftsFromStock)
@@ -57,15 +59,15 @@ export default function useSendLot(
       notifications.push({
         level: "success",
         text: many
-          ? "Les lots ont bien été créés !"
-          : "Le lot a bien été créé !",
+          ? t("Les lots ont bien été créés !")
+          : t("Le lot a bien été créé !"),
       })
     } else {
       notifications.push({
         level: "error",
         text: many
-          ? "Impossible de créer les lots."
-          : "Impossible de créer le lot.",
+          ? t("Impossible de créer les lots.")
+          : t("Impossible de créer le lot."),
       })
     }
   }
@@ -81,8 +83,8 @@ export default function useSendLot(
           level: "success",
           text:
             res.total === 1
-              ? "Le lot a bien été envoyé !"
-              : `${res.valid} lots sur ${res.total} ont bien été envoyés !`,
+              ? t("Le lot a bien été envoyé !")
+              : t("{{valid}} lots sur {{total}} ont bien été envoyés !", res),
         })
       }
 
@@ -92,8 +94,8 @@ export default function useSendLot(
           list: res.errors,
           text:
             res.total === 1
-              ? "Le lot n'a pas pu être validé !"
-              : `${res.invalid} lots sur ${res.total} n'ont pas pu être validés !`,
+              ? t("Le lot n'a pas pu être validé !")
+              : t("{{invalid}} lots sur {{total}} n'ont pas pu être validés !", res), // prettier-ignore
         })
       }
 
@@ -102,14 +104,14 @@ export default function useSendLot(
           level: "warning",
           text:
             res.total === 1
-              ? "Un lot identique a été détecté dans la base de données !"
-              : `${res.duplicates} lots sont des doublons de lots existants !`,
+              ? t("Un lot identique a été détecté dans la base de données !")
+              : t("{{duplicates}} lots sont des doublons de lots existants !", res), // prettier-ignore
         })
       }
     } else {
       notifications.push({
         level: "error",
-        text: "Échec de la validation",
+        text: t("Échec de la validation"),
       })
     }
   }
@@ -142,8 +144,8 @@ export default function useSendLot(
 
   async function sendLot(tx: Transaction) {
     const shouldSend = await confirm(
-      "Envoyer lots",
-      "Voulez vous envoyer ce lot ?"
+      t("Envoyer lots"),
+      t("Voulez vous envoyer ce lot ?")
     )
 
     if (entity !== null && shouldSend) {
@@ -159,8 +161,8 @@ export default function useSendLot(
     const shouldSend = await prompt<number[]>((resolve) => (
       <SummaryPrompt
         stock
-        title="Envoyer la sélection"
-        description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
+        title={t("Envoyer la sélection")}
+        description={t("Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées")} // prettier-ignore
         query={query}
         selection={selection.selected}
         onResolve={resolve}
@@ -179,8 +181,8 @@ export default function useSendLot(
       const allTxids = await prompt<number[]>((resolve) => (
         <SummaryPrompt
           stock
-          title="Envoyer tous ces lots"
-          description="Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées :"
+          title={t("Envoyer tous ces lots")}
+          description={t("Vous vous apprêtez à envoyer ces lots à leur destinataire, assurez-vous que les conditions ci-dessous sont respectées")} // prettier-ignore
           query={query}
           onResolve={resolve}
         />

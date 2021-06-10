@@ -1,7 +1,7 @@
 import { Entity } from "common/types"
+import { Trans, useTranslation } from "react-i18next"
 
 import useForm from "common/hooks/use-form"
-
 import { Box } from "common/components"
 import { Button } from "common/components/button"
 import { Check } from "common/components/icons"
@@ -25,25 +25,31 @@ const initialState: ForwardClientFormState = {
   certificate: null,
 }
 
-type ForwardLotsClientSelectionPromptProps = PromptProps<ForwardClientFormState> & {
-  entityID: number
-}
+type ForwardLotsClientSelectionPromptProps =
+  PromptProps<ForwardClientFormState> & {
+    entityID: number
+  }
 
 export const ForwardLotsClientSelectionPrompt = ({
   entityID,
   onResolve,
 }: ForwardLotsClientSelectionPromptProps) => {
+  const { t } = useTranslation()
   const { data, onChange} = useForm<ForwardClientFormState>(initialState) // prettier-ignore
   const canSave = data?.carbure_client !== null && data?.certificate !== null
 
   return (
     <Dialog onResolve={onResolve}>
-      <DialogTitle text="Transférer des lots" />
-      <DialogText text="Vous pouvez utiliser cette interface pour transférer les lots dans le cadre d'une activité d'intermédiaire sans stockage." />
+      <DialogTitle text={t("Transférer des lots")} />
+      <DialogText
+        text={t(
+          "Vous pouvez utiliser cette interface pour transférer les lots dans le cadre d'une activité d'intermédiaire sans stockage."
+        )}
+      />
 
       <Box>
         <LabelAutoComplete
-          label="Client"
+          label={t("Client")}
           name="carbure_client"
           value={data.carbure_client}
           getValue={(c) => c.id.toString()}
@@ -54,7 +60,7 @@ export const ForwardLotsClientSelectionPrompt = ({
         />
 
         <LabelAutoComplete
-          label="Certificat"
+          label={t("Certificat")}
           name="certificate"
           value={data.certificate}
           getValue={(v) => v}
@@ -72,9 +78,11 @@ export const ForwardLotsClientSelectionPrompt = ({
             disabled={!canSave}
             onClick={() => onResolve(data)}
           >
-            Valider
+            <Trans>Valider</Trans>
           </Button>
-          <Button onClick={() => onResolve()}>Annuler</Button>
+          <Button onClick={() => onResolve()}>
+            <Trans>Annuler</Trans>
+          </Button>
         </DialogButtons>
       </Box>
     </Dialog>

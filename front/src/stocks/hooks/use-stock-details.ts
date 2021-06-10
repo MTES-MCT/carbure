@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { useParams } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 import { LotStatus } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
@@ -20,6 +21,7 @@ export default function useStockDetails(
   entity: EntitySelection,
   refresh: () => void
 ) {
+  const { t } = useTranslation()
   const params: { id: string } = useParams()
   const notifications = useNotificationContext()
 
@@ -54,12 +56,12 @@ export default function useStockDetails(
 
       notifications.push({
         level: "success",
-        text: "Le lot a bien été sauvegardé !",
+        text: t("Le lot a bien été sauvegardé !"),
       })
     } else {
       notifications.push({
         level: "error",
-        text: "Impossible de sauvegarder ce lot.",
+        text: t("Impossible de sauvegarder ce lot."),
       })
     }
   }
@@ -74,7 +76,7 @@ export default function useStockDetails(
     if (details.data) {
       reset(toTransactionFormState(details.data))
     }
-  }, [tx, reset])
+  }, [tx, details.data, reset])
 
   return {
     form: data,
