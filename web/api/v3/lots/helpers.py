@@ -432,7 +432,7 @@ def get_summary(txs, entity):
         vendor=Coalesce('carbure_vendor__name', 'lot__unknown_supplier'),
     ).values(
         'vendor',
-        'lot__biocarburant__name'
+        'lot__biocarburant__code'
     ).annotate(
         volume=Sum('lot__volume'),
         avg_ghg_reduction=Sum(F('lot__volume') * F('lot__ghg_reduction')) / Sum('lot__volume'),
@@ -444,7 +444,7 @@ def get_summary(txs, entity):
         if t['vendor'] not in data_in:
             data_in[t['vendor']] = {}
 
-        data_in[t['vendor']][t['lot__biocarburant__name']] = {
+        data_in[t['vendor']][t['lot__biocarburant__code']] = {
             'volume': t['volume'] or 0,
             'avg_ghg_reduction': t['avg_ghg_reduction'] or 0,
             'lots': t['lots']
@@ -454,7 +454,7 @@ def get_summary(txs, entity):
         client=Coalesce('carbure_client__name', 'unknown_client'),
     ).values(
         'client',
-        'lot__biocarburant__name'
+        'lot__biocarburant__code'
     ).annotate(
         volume=Sum('lot__volume'),
         avg_ghg_reduction=Sum(F('lot__volume') * F('lot__ghg_reduction')) / Sum('lot__volume'),
@@ -466,7 +466,7 @@ def get_summary(txs, entity):
         if t['client'] not in data_out:
             data_out[t['client']] = {}
 
-        data_out[t['client']][t['lot__biocarburant__name']] = {
+        data_out[t['client']][t['lot__biocarburant__code']] = {
             'volume': t['volume'] or 0,
             'avg_ghg_reduction': t['avg_ghg_reduction'] or 0,
             'lots': t['lots']
@@ -486,7 +486,7 @@ def get_general_summary(txs):
     ).values(
         'vendor',
         'client',
-        'lot__biocarburant__name'
+        'lot__biocarburant__code'
     ).annotate(
         volume=Sum('lot__volume'),
         avg_ghg_reduction=Sum(F('lot__volume') * F('lot__ghg_reduction')) / Sum('lot__volume'),
@@ -499,7 +499,7 @@ def get_general_summary(txs):
         if t['client'] not in data[t['vendor']]:
             data[t['vendor']][t['client']] = {}
 
-        data[t['vendor']][t['client']][t['lot__biocarburant__name']] = {
+        data[t['vendor']][t['client']][t['lot__biocarburant__code']] = {
             'volume': t['volume'] or 0,
             'avg_ghg_reduction': t['avg_ghg_reduction'] or 0,
             'lots': t['lots']
