@@ -16,9 +16,9 @@ from core.models import MatierePremiere, Biocarburant, Pays
 
 
 queries = {
-    'feedstocks.json': MatierePremiere.objects.all().annotate(value=F('code'), label=F('name')).values('value', 'label'),
-    'biofuels.json': Biocarburant.objects.all().annotate(value=F('code'), label=F('name')).values('value', 'label'),
-    'countries.json': Pays.objects.all().annotate(value=F('code_pays'), label=F('name')).values('value', 'label')
+    'feedstocks.json': MatierePremiere.objects.all().annotate(value=F('code'), label=F('name')).values('value', 'label').order_by('value'),
+    'biofuels.json': Biocarburant.objects.all().annotate(value=F('code'), label=F('name')).values('value', 'label').order_by('value'),
+    'countries.json': Pays.objects.all().annotate(value=F('code_pays'), label=F('name')).values('value', 'label').order_by('value')
 }
 
 
