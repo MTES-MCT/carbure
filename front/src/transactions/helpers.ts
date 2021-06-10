@@ -11,6 +11,7 @@ import {
 } from "common/types"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 import { Option } from "common/components/select"
+import { TFunction } from "react-i18next"
 
 export function toOption(value: string): Option {
   return { value, label: value }
@@ -82,7 +83,7 @@ export function getStatus(
 }
 
 // give the same type to all filters in order to render them easily
-export function normalizeFilters(snapshot: any): Snapshot {
+export function normalizeFilters(snapshot: any, t: TFunction): Snapshot {
   Object.values(Filters).forEach((key) => {
     const filter = snapshot.filters[key]
 
@@ -95,6 +96,27 @@ export function normalizeFilters(snapshot: any): Snapshot {
       snapshot.filters[key] = snapshot.filters[key]
         .filter(Boolean)
         .sort((a: Option, b: Option) => a.label.localeCompare(b.label, "fr"))
+
+      if (key === Filters.Biocarburants) {
+        snapshot.filters[key] = snapshot.filters[key].map((bc: any) => ({
+          value: bc.value,
+          label: t(bc.value, { ns: "biofuels" }),
+        }))
+      }
+
+      if (key === Filters.MatieresPremieres) {
+        snapshot.filters[key] = snapshot.filters[key].map((mp: any) => ({
+          value: mp.value,
+          label: t(mp.value, { ns: "feedstocks" }),
+        }))
+      }
+
+      if (key === Filters.CountriesOfOrigin) {
+        snapshot.filters[key] = snapshot.filters[key].map((ct: any) => ({
+          value: ct.value,
+          label: t(ct.value, { ns: "countries" }),
+        }))
+      }
     }
   })
 
