@@ -254,9 +254,6 @@ test.only("edit transaction details", async () => {
   await waitWhileLoading()
 
   await screen.findByDisplayValue("DAETESTUPDATE Confirmer")
-
-  userEvent.click(screen.getByText("Retour"))
-  await waitFor(() => expect(title).not.toBeInTheDocument())
 })
 
 test("check transaction errors", async () => {
