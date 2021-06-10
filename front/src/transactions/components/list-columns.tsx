@@ -1,4 +1,4 @@
-import React from "react"
+import { TFunction } from "react-i18next"
 
 import { Transaction } from "common/types"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
@@ -13,6 +13,8 @@ import { hasDeadline, prettyVolume } from "transactions/helpers"
 import { Alarm } from "common/components/icons"
 import { Checkbox } from "common/components/input"
 
+type TxCol = (t: TFunction) => Column<Transaction>
+
 export const empty: Column<any> = {
   className: styles.emptyColumn,
   render: () => null,
@@ -23,21 +25,23 @@ export const padding: Column<any> = {
   render: () => null,
 }
 
-export const status: (e: EntitySelection) => Column<Transaction> = (
-  entity
-) => ({
-  header: "Statut",
-  className: styles.statusColumn,
-  render: (tx) => <Status small transaction={tx} entity={entity} />,
+export const status: (e: EntitySelection, t: TFunction) => Column<Transaction> =
+  (entity, t) => ({
+    header: t("Statut"),
+    className: styles.statusColumn,
+    render: (tx) => <Status small transaction={tx} entity={entity} />,
+  })
+
+export const carbureID: TxCol = (t) => ({
+  header: t("ID"),
+  render: (tx) => <Line text={tx.lot.carbure_id} />,
 })
 
-export const carbureID: Column<Transaction> = {
-  header: "ID",
-  render: (tx) => <Line text={tx.lot.carbure_id} />,
-}
-
-export const period: (d: string) => Column<Transaction> = (deadline) => ({
-  header: "Période",
+export const period: (
+  d: string,
+  t: TFunction<"translation">
+) => Column<Transaction> = (deadline, t) => ({
+  header: t("Période"),
   sortBy: "period",
   className: styles.dateColumn,
   render: (tx) => (
@@ -57,34 +61,34 @@ export const period: (d: string) => Column<Transaction> = (deadline) => ({
   ),
 })
 
-export const periodSimple: Column<Transaction> = {
-  header: "Période",
+export const periodSimple: TxCol = (t) => ({
+  header: t("Période"),
   className: styles.dateColumn,
   sortBy: "period",
   render: (tx) => <Line text={tx.lot.period} />,
-}
+})
 
-export const dae: Column<Transaction> = {
-  header: "N° Douane",
+export const dae: TxCol = (t) => ({
+  header: t("N° Douane"),
   sortBy: "delivery_date",
   render: (tx) => <TwoLines text={tx.dae} sub={tx?.delivery_date ?? ""} />,
-}
+})
 
-export const ghgReduction: Column<Transaction> = {
-  header: "Réd. GES",
+export const ghgReduction: TxCol = (t) => ({
+  header: t("Réd. GES"),
   sortBy: "ghg_reduction",
   className: styles.narrowColumn,
   render: (tx) => <Line text={`${tx.lot.ghg_reduction}%`} />,
-}
+})
 
-export const client: Column<Transaction> = {
-  header: "Client",
+export const client: TxCol = (t) => ({
+  header: t("Client"),
   sortBy: "client",
   render: (tx) => <Line text={tx.carbure_client?.name ?? tx.unknown_client} />,
-}
+})
 
-export const vendor: Column<Transaction> = {
-  header: "Fournisseur",
+export const vendor: TxCol = (t) => ({
+  header: t("Fournisseur"),
   sortBy: "vendor",
   render: (tx) => (
     <TwoLines
@@ -101,16 +105,16 @@ export const vendor: Column<Transaction> = {
       }
     />
   ),
-}
+})
 
-export const addedBy: Column<Transaction> = {
-  header: "Ajouté par",
+export const addedBy: TxCol = (t) => ({
+  header: t("Ajouté par"),
   sortBy: "added_by",
   render: (tx) => <Line text={tx.lot.added_by?.name ?? ""} />,
-}
+})
 
-export const biocarburant: Column<Transaction> = {
-  header: "Biocarburant (litres)",
+export const biocarburant: TxCol = (t) => ({
+  header: t("Biocarburant (litres)"),
   sortBy: "biocarburant",
   render: (tx) => (
     <TwoLines
@@ -118,10 +122,10 @@ export const biocarburant: Column<Transaction> = {
       sub={prettyVolume(tx.lot.volume)}
     />
   ),
-}
+})
 
-export const biocarburantInStock: Column<Transaction> = {
-  header: "Biocarburant (litres)",
+export const biocarburantInStock: TxCol = (t) => ({
+  header: t("Biocarburant (litres)"),
   sortBy: "biocarburant",
   render: (tx) => (
     <TwoLines
@@ -131,16 +135,16 @@ export const biocarburantInStock: Column<Transaction> = {
       )}`}
     />
   ),
-}
+})
 
-export const volume: Column<Transaction> = {
-  header: "Volume",
+export const volume: TxCol = (t) => ({
+  header: t("Volume"),
   sortBy: "volume",
   render: (tx) => <Line text={`${tx.lot.volume}` ?? ""} />,
-}
+})
 
-export const matierePremiere: Column<Transaction> = {
-  header: "Matière première",
+export const matierePremiere: TxCol = (t) => ({
+  header: t("Matière première"),
   sortBy: "matiere_premiere",
   render: (tx) => (
     <TwoLines
@@ -148,10 +152,10 @@ export const matierePremiere: Column<Transaction> = {
       sub={tx.lot.pays_origine?.name}
     />
   ),
-}
+})
 
-export const productionSite: Column<Transaction> = {
-  header: "Site de production",
+export const productionSite: TxCol = (t) => ({
+  header: t("Site de production"),
   sortBy: "pays_origine",
   render: (tx) => (
     <TwoLines
@@ -159,10 +163,10 @@ export const productionSite: Column<Transaction> = {
       sub={tx.lot.carbure_production_site?.country.name ?? tx.lot.unknown_production_country?.name ?? ''} // prettier-ignore
     />
   ),
-}
+})
 
-export const origine: Column<Transaction> = {
-  header: "Usine",
+export const origine: TxCol = (t) => ({
+  header: t("Usine"),
   sortBy: "pays_origine",
   render: (tx) => (
     <TwoLines
@@ -170,10 +174,10 @@ export const origine: Column<Transaction> = {
       sub={tx.lot.carbure_production_site?.country.name ?? tx.lot.unknown_production_country?.name ?? ''} // prettier-ignore
     />
   ),
-}
+})
 
-export const deliverySite: Column<Transaction> = {
-  header: "Site de livraison",
+export const deliverySite: TxCol = (t) => ({
+  header: t("Site de livraison"),
   sortBy: "depot",
   render: (tx) => {
     const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
@@ -183,10 +187,10 @@ export const deliverySite: Column<Transaction> = {
 
     return <TwoLines text={name} sub={location} />
   },
-}
+})
 
-export const depot: Column<Transaction> = {
-  header: "Dépôt",
+export const depot: TxCol = (t) => ({
+  header: t("Dépôt"),
   sortBy: "depot",
   render: (tx) => {
     const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
@@ -196,10 +200,10 @@ export const depot: Column<Transaction> = {
 
     return <TwoLines text={name} sub={location} />
   },
-}
+})
 
-export const destination: Column<Transaction> = {
-  header: "Destination",
+export const destination: TxCol = (t) => ({
+  header: t("Destination"),
   sortBy: "depot",
   render: (tx) => {
     const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
@@ -209,7 +213,7 @@ export const destination: Column<Transaction> = {
 
     return <TwoLines text={name} sub={location} />
   },
-}
+})
 
 type Selector = (s: TransactionSelection) => Column<Transaction>
 
