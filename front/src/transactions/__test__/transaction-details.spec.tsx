@@ -151,7 +151,7 @@ test("display transaction details", async () => {
   expect(title).not.toBeInTheDocument()
 })
 
-test.only("edit transaction details", async () => {
+test("edit transaction details", async () => {
   render(<TransactionWithRouter entity={producer} />)
 
   const title = await screen.findByText("Détails de la transaction")
