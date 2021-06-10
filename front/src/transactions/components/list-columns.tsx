@@ -116,25 +116,32 @@ export const addedBy: TxCol = (t) => ({
 export const biocarburant: TxCol = (t) => ({
   header: t("Biocarburant (litres)"),
   sortBy: "biocarburant",
-  render: (tx) => (
-    <TwoLines
-      text={tx.lot.biocarburant?.name}
-      sub={prettyVolume(tx.lot.volume)}
-    />
-  ),
+  render: (tx) => {
+    const bc = tx.lot.biocarburant
+      ? t(tx.lot.biocarburant.code, { ns: "biofuels" })
+      : "N/A"
+
+    return <TwoLines text={bc} sub={prettyVolume(tx.lot.volume)} />
+  },
 })
 
 export const biocarburantInStock: TxCol = (t) => ({
   header: t("Biocarburant (litres)"),
   sortBy: "biocarburant",
-  render: (tx) => (
-    <TwoLines
-      text={tx.lot.biocarburant?.name}
-      sub={`${prettyVolume(tx.lot.remaining_volume)} / ${prettyVolume(
-        tx.lot.volume
-      )}`}
-    />
-  ),
+  render: (tx) => {
+    const bc = tx.lot.biocarburant
+      ? t(tx.lot.biocarburant.code, { ns: "biofuels" })
+      : "N/A"
+
+    return (
+      <TwoLines
+        text={bc}
+        sub={`${prettyVolume(tx.lot.remaining_volume)} / ${prettyVolume(
+          tx.lot.volume
+        )}`}
+      />
+    )
+  },
 })
 
 export const volume: TxCol = (t) => ({
@@ -146,34 +153,53 @@ export const volume: TxCol = (t) => ({
 export const matierePremiere: TxCol = (t) => ({
   header: t("Matière première"),
   sortBy: "matiere_premiere",
-  render: (tx) => (
-    <TwoLines
-      text={tx.lot.matiere_premiere?.name}
-      sub={tx.lot.pays_origine?.name}
-    />
-  ),
+  render: (tx) => {
+    const mp = tx.lot.matiere_premiere
+      ? t(tx.lot.matiere_premiere.code, { ns: "feedstocks" })
+      : "N/A"
+
+    const ct = tx.lot.pays_origine
+      ? t(tx.lot.pays_origine.code_pays, { ns: "countries" })
+      : "N/A"
+
+    return <TwoLines text={mp} sub={ct} />
+  },
 })
 
 export const productionSite: TxCol = (t) => ({
   header: t("Site de production"),
   sortBy: "pays_origine",
-  render: (tx) => (
-    <TwoLines
-      text={tx.lot.carbure_production_site?.name ?? tx.lot.unknown_production_site} // prettier-ignore
-      sub={tx.lot.carbure_production_site?.country.name ?? tx.lot.unknown_production_country?.name ?? ''} // prettier-ignore
-    />
-  ),
+  render: (tx) => {
+    const country = tx.carbure_delivery_site?.country ?? tx.unknown_delivery_site_country // prettier-ignore
+    const countryName = country
+      ? t(country?.code_pays, { ns: "countries" })
+      : ""
+
+    return (
+      <TwoLines
+        text={tx.lot.carbure_production_site?.name ?? tx.lot.unknown_production_site} // prettier-ignore
+        sub={countryName ?? ''} // prettier-ignore
+      />
+    )
+  },
 })
 
 export const origine: TxCol = (t) => ({
   header: t("Usine"),
   sortBy: "pays_origine",
-  render: (tx) => (
-    <TwoLines
-      text={tx.lot.carbure_production_site?.name ?? tx.lot.unknown_production_site_reference} // prettier-ignore
-      sub={tx.lot.carbure_production_site?.country.name ?? tx.lot.unknown_production_country?.name ?? ''} // prettier-ignore
-    />
-  ),
+  render: (tx) => {
+    const country = tx.carbure_delivery_site?.country ?? tx.unknown_delivery_site_country // prettier-ignore
+    const countryName = country
+      ? t(country?.code_pays, { ns: "countries" })
+      : ""
+
+    return (
+      <TwoLines
+        text={tx.lot.carbure_production_site?.name ?? tx.lot.unknown_production_site_reference} // prettier-ignore
+        sub={countryName ?? ''} // prettier-ignore
+      />
+    )
+  },
 })
 
 export const deliverySite: TxCol = (t) => ({
@@ -181,9 +207,14 @@ export const deliverySite: TxCol = (t) => ({
   sortBy: "depot",
   render: (tx) => {
     const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
-    const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name ?? '' // prettier-ignore
+    const country = tx.carbure_delivery_site?.country ?? tx.unknown_delivery_site_country // prettier-ignore
     const city = tx.carbure_delivery_site?.city
-    const location = city ? `${country}, ${city}` : country
+
+    const countryName = country
+      ? t(country?.code_pays, { ns: "countries" })
+      : ""
+
+    const location = city ? `${countryName}, ${city}` : countryName
 
     return <TwoLines text={name} sub={location} />
   },
@@ -194,9 +225,14 @@ export const depot: TxCol = (t) => ({
   sortBy: "depot",
   render: (tx) => {
     const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
-    const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name ?? '' // prettier-ignore
+    const country = tx.carbure_delivery_site?.country ?? tx.unknown_delivery_site_country // prettier-ignore
     const city = tx.carbure_delivery_site?.city
-    const location = city ? `${country}, ${city}` : country
+
+    const countryName = country
+      ? t(country?.code_pays, { ns: "countries" })
+      : ""
+
+    const location = city ? `${countryName}, ${city}` : countryName
 
     return <TwoLines text={name} sub={location} />
   },
@@ -207,9 +243,14 @@ export const destination: TxCol = (t) => ({
   sortBy: "depot",
   render: (tx) => {
     const name = tx.carbure_delivery_site?.name ?? tx.unknown_delivery_site
-    const country = tx.carbure_delivery_site?.country.name ?? tx.unknown_delivery_site_country?.name ?? '' // prettier-ignore
+    const country = tx.carbure_delivery_site?.country ?? tx.unknown_delivery_site_country // prettier-ignore
     const city = tx.carbure_delivery_site?.city
-    const location = city ? `${country}, ${city}` : country
+
+    const countryName = country
+      ? t(country?.code_pays, { ns: "countries" })
+      : ""
+
+    const location = city ? `${countryName}, ${city}` : countryName
 
     return <TwoLines text={name} sub={location} />
   },
