@@ -37,9 +37,9 @@ def get_stocks(request, *args, **kwargs):
         if status == "tosend":
             txs = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
         elif status == "in":
-            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AC', 'AA'])
+            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.PENIDNG, LotTransaction.TOFIX, LotTransaction.FIXED])
         elif status == "stock":
-            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__remaining_volume__gt=0, is_forwarded=False, is_mac=False)
+            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__remaining_volume__gt=0, is_forwarded=False, is_mac=False)
         else:
             return JsonResponse({'status': 'error', 'message': "Unknown status"}, status=400)
     else:
@@ -100,9 +100,9 @@ def get_stocks_summary(request, *args, **kwargs):
         if status == "tosend":
             txs = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
         elif status == "in":
-            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AC', 'AA'])
+            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.PENIDNG, LotTransaction.TOFIX, LotTransaction.FIXED])
         elif status == "stock":
-            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0, is_forwarded=False)
+            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__volume__gt=0, is_forwarded=False)
         else:
             return JsonResponse({'status': 'error', 'message': "Unknown status"}, status=400)
     else:
@@ -128,9 +128,9 @@ def get_snapshot(request, *args, **kwargs):
         # drafts are lot that will be extracted from mass balance and sent to a client
         tx_drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
         draft = tx_drafts.count()
-        tx_inbox = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=['N', 'AC', 'AA'])
+        tx_inbox = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.PENIDNG, LotTransaction.TOFIX, LotTransaction.FIXED])
         inbox = tx_inbox.count()
-        tx_stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__remaining_volume__gt=0, is_forwarded=False, is_mac=False)
+        tx_stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__remaining_volume__gt=0, is_forwarded=False, is_mac=False)
         stock = tx_stock.count()
         data['lots'] = {'in': inbox,  'stock': stock, 'tosend': draft}
     else:
@@ -158,7 +158,7 @@ def get_depots(request, *args, **kwargs):
     biocarburant_code = request.GET.get('biocarburant_code', False)
 
     # return list of depots that have a stock
-    stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0)
+    stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__volume__gt=0)
     if biocarburant_code:
         stock = stock.filter(lot__biocarburant__code=biocarburant_code)
 
@@ -299,7 +299,7 @@ def generate_batch(request, *args, **kwargs):
 
 
     # get current stock
-    txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status='A', lot__fused_with=None, lot__volume__gt=0)
+    txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__volume__gt=0)
     # filter by requested biofuel
     txs = txs.filter(lot__biocarburant__code=biocarburant)
 
@@ -370,7 +370,7 @@ def convert_eth_stock_to_etbe(request, entity, c):
     etbe = Biocarburant.objects.get(code='ETBE')
 
     # retrieve stock line
-    previous_stock_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status='A', id=previous_stock_tx_id)
+    previous_stock_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], id=previous_stock_tx_id)
     # check if source TX is Ethanol
     if previous_stock_tx.lot.biocarburant.code != 'ETH':
         raise Exception("Only ETH can be converted to ETBE")
@@ -479,14 +479,15 @@ def forward(request, *args, **kwargs):
     for tx_id in tx_ids:
         # for each tx, make sure we are the client, status accepted, and it has not been already forwarded
         try:
-            tx = LotTransaction.objects.get(delivery_status__in=['A', 'N'], id=tx_id, carbure_client=entity, is_forwarded=False)
+            tx = LotTransaction.objects.get(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN, LotTransaction.PENDING], id=tx_id, carbure_client=entity, is_forwarded=False)
             parent_tx_id = tx.id
         except Exception:
             return JsonResponse({'status': 'error', 'message': "Transaction already forwarded"}, status=400)
 
         # all good
         # make current tx as "is_forwarded" and create the next tx
-        tx.delivery_status = 'A'
+        if tx.delivery_status == LotTransaction.PENDING:
+            tx.delivery_status = LotTransaction.ACCEPTED
         tx.is_forwarded = True
         tx.save()
 
@@ -499,7 +500,7 @@ def forward(request, *args, **kwargs):
         new_tx.client_is_in_carbure = True
         new_tx.carbure_client = client
         new_tx.unknown_client = ''
-        new_tx.delivery_status = 'N'
+        new_tx.delivery_status = LotTransaction.PENDING
         new_tx.save()
         nbforwarded += 1
 
