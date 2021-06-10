@@ -1,4 +1,5 @@
 import React from "react"
+import { Trans } from "react-i18next"
 
 import { ApiState } from "common/hooks/use-api"
 import { LotStatus, Snapshot } from "common/types"
@@ -26,7 +27,9 @@ export const StocksSnapshot = ({ snapshot, status }: StockSnapshotProps) => (
     {!snapshot.error && (
       <React.Fragment>
         <div className={styles.stockHeader}>
-          <Title>Stock</Title>
+          <Title>
+            <Trans>Stock</Trans>
+          </Title>
         </div>
 
         <div className={styles.stockStatus}>

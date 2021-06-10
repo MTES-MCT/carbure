@@ -1,4 +1,5 @@
 import React, { Fragment } from "react"
+import { Trans, useTranslation } from "react-i18next"
 
 import { Link } from "common/components/relative-route"
 import {
@@ -33,7 +34,7 @@ export const StockImportActions = ({ uploader }: ImportActionsProps) => {
 
   return (
     <AsyncButton icon={Upload} loading={uploader.loading} onClick={onUpload}>
-      Importer lots
+      <Trans>Importer lots</Trans>
     </AsyncButton>
   )
 }
@@ -50,16 +51,16 @@ export const StockActions = ({
   <Fragment>
     <Link relative to="send-complex">
       <Button level="primary" icon={Rapport}>
-        Envoi complexe
+        <Trans>Envoi complexe</Trans>
       </Button>
     </Link>
 
     <Button level="primary" icon={Forward} onClick={onForward}>
-      Transférer
+      <Trans>Transférer</Trans>
     </Button>
 
     <Button level="primary" icon={Flask} onClick={onConvertETBE}>
-      Convertir ETBE
+      <Trans>Convertir ETBE</Trans>
     </Button>
   </Fragment>
 )
@@ -78,6 +79,8 @@ export const StockDraftActions = ({
   deleter,
   sender,
 }: StockDraftActionsProps) => {
+  const { t } = useTranslation()
+
   function onValidate() {
     if (hasSelection) {
       sender.sendSelection()
@@ -103,7 +106,9 @@ export const StockDraftActions = ({
         disabled={disabled}
         onClick={onValidate}
       >
-        Envoyer {hasSelection ? `sélection` : "tout"}
+        <Trans>
+          Envoyer {{ what: hasSelection ? t("sélection") : "tout" }}
+        </Trans>
       </AsyncButton>
 
       <AsyncButton
@@ -113,7 +118,9 @@ export const StockDraftActions = ({
         disabled={disabled}
         onClick={onDelete}
       >
-        Supprimer {hasSelection ? `sélection` : "tout"}
+        <Trans>
+          Supprimer {{ what: hasSelection ? t("sélection") : "tout" }}
+        </Trans>
       </AsyncButton>
     </React.Fragment>
   )

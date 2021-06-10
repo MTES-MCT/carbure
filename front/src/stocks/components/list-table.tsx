@@ -1,4 +1,4 @@
-import React from "react"
+import { useTranslation } from "react-i18next"
 
 import { Lots, LotStatus, Transaction, UserRole } from "common/types"
 import { SortingSelection } from "transactions/hooks/query/use-sort-by" // prettier-ignore
@@ -16,15 +16,6 @@ import { useRights } from "carbure/hooks/use-rights"
 type A = Record<string, (tx: Transaction) => void>
 type CT = Column<Transaction>
 
-const getStockActions = ({ createDrafts }: A): CT =>
-  Actions([
-    {
-      icon: Edit,
-      title: "Préparer l'envoi",
-      action: createDrafts,
-    },
-  ])
-
 type StockTableProps = {
   stock: Lots | null
   status: StatusSelection
@@ -40,6 +31,7 @@ export const StockTable = ({
   selection,
   sender,
 }: StockTableProps) => {
+  const { t } = useTranslation()
   const rights = useRights()
   const relativePush = useRelativePush()
   const createDrafts = sender.createDrafts
@@ -64,6 +56,14 @@ export const StockTable = ({
   }
 
   if (status.is(LotStatus.Stock)) {
+    const actions = Actions([
+      {
+        icon: Edit,
+        title: t("Préparer l'envoi"),
+        action: createDrafts,
+      },
+    ])
+
     columns.push(
       C.selector(selection),
       C.periodSimple,
@@ -74,7 +74,7 @@ export const StockTable = ({
       C.origine,
       C.depot,
       C.ghgReduction,
-      canModify ? getStockActions({ createDrafts }) : arrow
+      canModify ? actions : arrow
     )
   }
 
