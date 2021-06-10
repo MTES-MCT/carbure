@@ -154,7 +154,7 @@ test("display transaction details", async () => {
 test("edit transaction details", async () => {
   render(<TransactionWithRouter entity={producer} />)
 
-  const title = await screen.findByText("Détails de la transaction")
+  await screen.findByText("Détails de la transaction")
 
   const save: any = await screen.findByText("Sauvegarder")
   expect(save.closest("button")).toBeDisabled()
@@ -254,7 +254,9 @@ test("edit transaction details", async () => {
   await waitWhileLoading()
 
   await screen.findByDisplayValue("DAETESTUPDATE Confirmer")
-})
+
+  userEvent.click(screen.getByText("Retour"))
+}, 30000)
 
 test("check transaction errors", async () => {
   setDetails(errorDetails)
@@ -267,7 +269,6 @@ test("check transaction errors", async () => {
     (content, node) =>
       node?.textContent === "Ce lot doit être validé avant le 29 février 2020"
   )
-  // screen.debug(undefined, Infinity)
 
   const dae = screen.getByTitle(
     "Numéro douanier (DAE, DAA...) - Le DAE (ou équivalent) est manquant"
@@ -278,8 +279,6 @@ test("check transaction errors", async () => {
     "Matière première - La matière première est manquante"
   )
   expect(mp).toHaveClass("errorLabel")
-
-  // screen.debug(undefined, Infinity)
 
   const errors = screen.getByText("Erreurs (2)")
   userEvent.click(errors)
