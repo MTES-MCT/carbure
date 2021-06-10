@@ -201,20 +201,22 @@ export const Biocarburant = ({
   errors,
   t = idt,
   ...props
-}: LACP<BC>) => (
-  <LabelAutoComplete
-    required
-    name="biocarburant"
-    label={t("Biocarburant")}
-    minLength={0}
-    value={value ?? data?.biocarburant ?? null}
-    error={errors?.biocarburant_code}
-    getValue={getters.code}
-    getLabel={getters.name}
-    getQuery={api.findBiocarburants}
-    {...props}
-  />
-)
+}: LACP<BC>) => {
+  return (
+    <LabelAutoComplete
+      required
+      name="biocarburant"
+      label={t("Biocarburant")}
+      minLength={0}
+      value={value ?? data?.biocarburant}
+      error={errors?.biocarburant_code}
+      getValue={getters.code}
+      getLabel={(bc) => t(bc.code, { ns: "biofuels" })}
+      getQuery={api.findBiocarburants}
+      {...props}
+    />
+  )
+}
 
 export const MatierePremiere = ({
   data,
@@ -234,7 +236,7 @@ export const MatierePremiere = ({
       value={value ?? data?.matiere_premiere ?? null}
       error={errors?.matiere_premiere_code}
       getValue={getters.code}
-      getLabel={getters.name}
+      getLabel={(mp) => t(mp.code, { ns: "feedstocks" })}
       getQuery={api.findMatieresPremieres}
       icon={(p: any) => <span {...p}>{category}</span>}
       {...props}
@@ -256,7 +258,7 @@ export const PaysOrigine = ({
     value={value ?? data?.pays_origine ?? null}
     error={errors?.pays_origine_code}
     getValue={getters.code_pays}
-    getLabel={getters.name}
+    getLabel={(c) => t(c.code_pays, { ns: "countries" })}
     getQuery={api.findCountries}
     {...props}
   />
@@ -346,7 +348,7 @@ export const ProductionSiteCountry = ({
       value={value ?? country}
       error={errors?.unknown_production_country}
       getValue={getters.code_pays}
-      getLabel={getters.name}
+      getLabel={(c) => t(c.code_pays, { ns: "countries" })}
       getQuery={api.findCountries}
       {...props}
     />
@@ -691,7 +693,7 @@ export const DeliverySiteCountry = ({
       value={value ?? dsCountry}
       error={errors?.unknown_delivery_site_country}
       getValue={getters.code_pays}
-      getLabel={getters.name}
+      getLabel={(c) => t(c.code_pays, { ns: "countries" })}
       getQuery={api.findCountries}
       {...props}
     />

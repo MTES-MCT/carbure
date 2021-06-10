@@ -289,7 +289,11 @@ export const DeliverySitePrompt = ({
           label={t("Pays")}
           placeholder={t("Rechercher un pays...")}
           name="country"
-          value={form.country?.name}
+          value={
+            form.country
+              ? (t(form.country.code_pays, { ns: "countries" }) as string)
+              : ""
+          }
         />
 
         <hr />
