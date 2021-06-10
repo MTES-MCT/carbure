@@ -100,7 +100,7 @@ def get_stocks_summary(request, *args, **kwargs):
         if status == "tosend":
             txs = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
         elif status == "in":
-            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.PENIDNG, LotTransaction.TOFIX, LotTransaction.FIXED])
+            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.PENDING, LotTransaction.TOFIX, LotTransaction.FIXED])
         elif status == "stock":
             txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__volume__gt=0, is_forwarded=False)
         else:
@@ -128,7 +128,7 @@ def get_snapshot(request, *args, **kwargs):
         # drafts are lot that will be extracted from mass balance and sent to a client
         tx_drafts = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
         draft = tx_drafts.count()
-        tx_inbox = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.PENIDNG, LotTransaction.TOFIX, LotTransaction.FIXED])
+        tx_inbox = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.PENDING, LotTransaction.TOFIX, LotTransaction.FIXED])
         inbox = tx_inbox.count()
         tx_stock = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__remaining_volume__gt=0, is_forwarded=False, is_mac=False)
         stock = tx_stock.count()
