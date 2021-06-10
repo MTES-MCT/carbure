@@ -11,7 +11,7 @@ import {
   ProductionSiteDetails,
   EntityType,
   Lot,
-  LotDetails
+  LotDetails,
 } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import useForm, { FormHook } from "common/hooks/use-form"
@@ -66,10 +66,12 @@ export interface TransactionFormState {
   delivery_site: DeliverySite | string | null
   delivery_site_country: Country | null
 
-  certificates: LotDetails['certificates']
+  certificates?: LotDetails["certificates"]
 }
 
-export function toTransactionFormState(details: LotDetails): TransactionFormState {
+export function toTransactionFormState(
+  details: LotDetails
+): TransactionFormState {
   const tx = details.transaction
 
   return {
@@ -145,7 +147,7 @@ export function toTransactionFormState(details: LotDetails): TransactionFormStat
     data_origin_entity: tx.lot.data_origin_entity,
     parent_lot: tx.lot.parent_lot,
 
-    certificates: details.certificates
+    certificates: details.certificates,
   }
 }
 
@@ -190,7 +192,7 @@ export function toTransactionPostData(tx: TransactionFormState) {
 
     production_site_country: tx.production_site_country?.code_pays,
 
-    production_site_reference: tx.production_site_reference ?? '',
+    production_site_reference: tx.production_site_reference ?? "",
 
     production_site_commissioning_date:
       typeof tx.production_site === "string"
@@ -215,10 +217,10 @@ export function toTransactionPostData(tx: TransactionFormState) {
         : "",
 
     vendor: tx.carbure_vendor?.name ?? "",
-    vendor_certificate: tx.carbure_vendor_certificate ?? '',
+    vendor_certificate: tx.carbure_vendor_certificate ?? "",
 
     supplier: tx.unknown_supplier,
-    supplier_certificate: tx.unknown_supplier_certificate ?? '',
+    supplier_certificate: tx.unknown_supplier_certificate ?? "",
   }
 }
 
@@ -278,8 +280,8 @@ const initialState: TransactionFormState = {
   certificates: {
     production_site_certificate: null,
     supplier_certificate: null,
-    vendor_certificate: null
-  }
+    vendor_certificate: null,
+  },
 }
 
 // fixed values (only for drafts)
