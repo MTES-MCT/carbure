@@ -31,38 +31,6 @@ import styles from "./list-table.module.css"
 import { EntityDeliverySite } from "settings/hooks/use-delivery-sites"
 import { useRights } from "carbure/hooks/use-rights"
 
-export const PRODUCER_COLUMNS = [
-  C.dae,
-  C.biocarburant,
-  C.matierePremiere,
-  C.client,
-  C.productionSite,
-  C.deliverySite,
-  C.ghgReduction,
-]
-
-export const OPERATOR_COLUMNS = [
-  C.dae,
-  C.biocarburant,
-  C.matierePremiere,
-  C.vendor,
-  C.productionSite,
-  C.depot,
-  C.ghgReduction,
-]
-
-export const ADMIN_COLUMNS = [
-  C.dae,
-  C.biocarburant,
-  C.matierePremiere,
-  C.vendor,
-  C.productionSite,
-  C.client,
-  C.depot,
-  C.addedBy,
-  C.ghgReduction,
-]
-
 type TxActions = Record<string, (tx: Transaction) => void> & {
   t: TFunction<"translation">
 }
@@ -171,16 +139,42 @@ export const TransactionTable = ({
 
   let columns = [
     C.selector(selection),
-    C.status(entity),
-    C.period(transactions.deadlines.date),
+    C.status(entity, t),
+    C.period(transactions.deadlines.date, t),
   ]
 
   if (isProducer || isTrader) {
-    columns.push(...PRODUCER_COLUMNS)
+    columns.push(
+      C.dae(t),
+      C.biocarburant(t),
+      C.matierePremiere(t),
+      C.client(t),
+      C.productionSite(t),
+      C.deliverySite(t),
+      C.ghgReduction(t)
+    )
   } else if (isOperator) {
-    columns.push(...OPERATOR_COLUMNS)
+    columns.push(
+      C.dae(t),
+      C.biocarburant(t),
+      C.matierePremiere(t),
+      C.vendor(t),
+      C.productionSite(t),
+      C.depot(t),
+      C.ghgReduction(t)
+    )
   } else if (isAdmin || isAuditor) {
-    columns.push(...ADMIN_COLUMNS)
+    columns.push(
+      C.dae(t),
+      C.biocarburant(t),
+      C.matierePremiere(t),
+      C.vendor(t),
+      C.productionSite(t),
+      C.client(t),
+      C.depot(t),
+      C.addedBy(t),
+      C.ghgReduction(t)
+    )
   }
 
   if (rights.is(UserRole.Auditor, UserRole.ReadOnly)) {

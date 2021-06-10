@@ -68,16 +68,6 @@ export const OperatorForwardPrompt = ({
   )
 }
 
-const TX_TO_TRANSFER_COLUMNS: Column<Transaction>[] = [
-  C.padding,
-  C.dae,
-  C.matierePremiere,
-  C.biocarburant,
-  C.volume,
-  C.deliverySite,
-  C.padding,
-]
-
 type OperatorTransactionsToForwardPromptProps = PromptProps<Transaction[]> & {
   selection: TransactionSelection
   outsourceddepots?: EntityDeliverySite[]
@@ -95,6 +85,17 @@ export const OperatorTransactionsToForwardPrompt = ({
     .filter((t) =>
       outsourceddepotsids?.includes(t.carbure_delivery_site?.depot_id)
     )
+
+  const columns: Column<Transaction>[] = [
+    C.padding,
+    C.dae(t),
+    C.matierePremiere(t),
+    C.biocarburant(t),
+    C.volume(t),
+    C.deliverySite(t),
+    C.padding,
+  ]
+
   const rows = txs.map((t) => ({ value: t }))
 
   return (
@@ -106,11 +107,7 @@ export const OperatorTransactionsToForwardPrompt = ({
         <Trans>Voici les lots qui seront transférés:</Trans>
       </Box>
 
-      <Table
-        columns={TX_TO_TRANSFER_COLUMNS}
-        rows={rows}
-        className={styles.forwardTable}
-      />
+      <Table columns={columns} rows={rows} className={styles.forwardTable} />
 
       <DialogButtons>
         <Button level="primary" onClick={() => onResolve(txs)}>

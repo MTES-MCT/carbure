@@ -176,11 +176,11 @@ export const ConvertETBEComplexPrompt = ({
 
   const columns = [
     C.padding,
-    C.carbureID,
-    C.biocarburantInStock,
-    C.matierePremiere,
+    C.carbureID(t),
+    C.biocarburantInStock(t),
+    C.matierePremiere(t),
     convertedVolume,
-    C.ghgReduction,
+    C.ghgReduction(t),
     C.padding,
   ]
 
