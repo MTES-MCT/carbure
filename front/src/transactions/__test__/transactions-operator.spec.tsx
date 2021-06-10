@@ -10,7 +10,12 @@ import Transactions from "../index"
 import { clickOnCheckboxesAndConfirm } from "./helpers"
 
 import server, { setLots, setSnapshot } from "./api"
-import { emptyLots, lots, operatorSnapshot } from "./data"
+import {
+  emptyLots,
+  emptyOperatorSnapshot,
+  lots,
+  operatorSnapshot,
+} from "./data"
 
 const TransactionsWithRouter = ({
   entity,
@@ -37,16 +42,16 @@ afterEach(() => {
 afterAll(() => server.close())
 
 test("operator: display an empty list of transactions", async () => {
-  setSnapshot(operatorSnapshot)
+  setSnapshot(emptyOperatorSnapshot)
   setLots(emptyLots)
 
   render(<TransactionsWithRouter status={LotStatus.Draft} entity={operator} />)
 
   await waitWhileLoading()
 
-  screen.getByText("Brouillons")
-  screen.getByText("Lots reçus")
-  screen.getByText("Lots acceptés")
+  screen.getByText("Brouillon")
+  screen.getByText("Lot reçu")
+  screen.getByText("Lot accepté")
 
   screen.getByText("Périodes")
   screen.getByText("Biocarburants")
