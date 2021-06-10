@@ -36,7 +36,7 @@ export function getStockStatus(
   } else if (isClient && status === "validated") {
     if (["N", "AC", "AA"].includes(delivery)) {
       return LotStatus.Inbox
-    } else if (["A"].includes(delivery)) {
+    } else if (["A", "F"].includes(delivery)) {
       return LotStatus.Stock
     }
   }
