@@ -908,7 +908,7 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
 def fill_mac_data(lot_dict, transaction):
     transaction.is_mac = False
     if 'mac' in lot_dict:
-        if lot_dict['mac'] == 1 or lot_dict['mac'] == 'true':
+        if lot_dict['mac'] == 1 or lot_dict['mac'] == 'true' or lot_dict['mac'] == '1':
             transaction.is_mac = True
 
 def load_lot(prefetched_data, entity, user, lot_dict, source, tx=None):
