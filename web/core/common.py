@@ -7,7 +7,7 @@ import traceback
 import os
 
 import pandas as pd
-from typing import TYPE_CHECKING, List
+from typing import FrozenSet, TYPE_CHECKING, List
 from pandas._typing import FilePathOrBuffer, Scalar
 from django.db import transaction
 
@@ -828,19 +828,19 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
 
     if tx_id:
         try:
-            source_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status=LotTransaction.ACCEPTED, id=tx_id)
+            source_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], id=tx_id)
             source_lot = LotV2.objects.get(id=source_tx.lot.id)
         except Exception:
             return None, None, "TX not found"
     elif carbure_id:
         try:
-            source_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status=LotTransaction.ACCEPTED, lot__carbure_id=carbure_id)
+            source_tx = LotTransaction.objects.get(carbure_client=entity, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__carbure_id=carbure_id)
             source_lot = LotV2.objects.get(id=source_tx.lot.id)
         except Exception:
             return None, None, "TX not found"
     else:
         # try to find it via filters
-        matching_txs = LotTransaction.objects.filter(carbure_client=entity, delivery_status=LotTransaction.ACCEPTED)
+        matching_txs = LotTransaction.objects.filter(carbure_client=entity, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN])
         if biocarburant:
             try:
                 bc = Biocarburant.objects.get(code=biocarburant)
@@ -870,7 +870,7 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
 
     lot = source_tx.lot
 
-    if source_tx.carbure_client == entity and source_tx.delivery_status == 'A' and lot.fused_with is None:
+    if source_tx.carbure_client == entity and source_tx.delivery_status in [LotTransaction.ACCEPTED, LotTransaction.FROZEN] and lot.fused_with is None:
         # I am the client of this lot, I have accepted it and it's not fused with anything else
         # this lot is currently in my mass balance
         pass
