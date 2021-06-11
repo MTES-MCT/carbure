@@ -2,6 +2,7 @@ import React from "react"
 import cl from "clsx"
 import format from "date-fns/format"
 import fr from "date-fns/locale/fr"
+import { TFunction, Trans, useTranslation } from "react-i18next"
 
 import { LotDetails, Transaction, DeliveryStatus } from "common/types"
 import { Box, Title } from "common/components"
@@ -11,33 +12,34 @@ import styles from "./status.module.css"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
 function getStatusText(
+  t: TFunction<"translation">,
   tx: Transaction | undefined,
   entity?: EntitySelection,
   isStock: boolean = false
 ): string {
   if (!tx || tx.lot.status === "Draft") {
-    return isStock ? "À envoyer" : "Brouillon"
+    return isStock ? t("À envoyer") : t("Brouillon")
   }
 
   const isClient = tx.carbure_client?.id === entity?.id
 
   if (tx.is_forwarded) {
-    return "Transféré"
+    return t("Transféré")
   }
 
   switch (tx.delivery_status) {
     case DeliveryStatus.Pending:
-      return "En attente"
+      return t("En attente")
     case DeliveryStatus.Accepted:
-      return isStock ? "En stock" : "Accepté"
+      return isStock ? t("En stock") : t("Accepté")
     case DeliveryStatus.Rejected:
-      return "Refusé"
+      return t("Refusé")
     case DeliveryStatus.ToFix:
-      return isClient ? "En correction" : "À corriger"
+      return isClient ? t("En correction") : t("À corriger")
     case DeliveryStatus.Fixed:
-      return "Corrigé"
+      return t("Corrigé")
     case DeliveryStatus.Frozen:
-      return 'Déclaré'
+      return t("Déclaré")
   }
 }
 
@@ -54,14 +56,13 @@ function getStatusClass(
     return styles.statusWaiting
   }
 
-
   switch (tx.delivery_status) {
     case DeliveryStatus.Pending:
       return styles.statusWaiting
     case DeliveryStatus.Rejected:
       return styles.statusRejected
     case DeliveryStatus.ToFix:
-        return styles.statusToFix
+      return styles.statusToFix
     case DeliveryStatus.Fixed:
     case DeliveryStatus.Accepted:
     case DeliveryStatus.Frozen:
@@ -76,18 +77,21 @@ type StatusProps = {
   transaction: Transaction | undefined
 }
 
-const Status = ({ stock, small, transaction, entity }: StatusProps) => (
-  <span
-    className={cl(
-      styles.status,
-      small && styles.smallStatus,
-      getStatusClass(transaction, entity, stock)
-    )}
-  >
-    {getStatusText(transaction, entity, stock)}
-  </span>
-)
+const Status = ({ stock, small, transaction, entity }: StatusProps) => {
+  const { t } = useTranslation()
 
+  return (
+    <span
+      className={cl(
+        styles.status,
+        small && styles.smallStatus,
+        getStatusClass(transaction, entity, stock)
+      )}
+    >
+      {getStatusText(t, transaction, entity, stock)}
+    </span>
+  )
+}
 type StatusTitleProps = {
   stock?: boolean
   editable?: boolean
@@ -119,13 +123,15 @@ export const StatusTitle = ({
 
       {details && hasDeadline(details.transaction, details.deadline) && (
         <span className={styles.transactionDeadline}>
-          Ce lot doit être validé avant le <b>{deadlineDate}</b>
+          <Trans>
+            Ce lot doit être validé avant le <b>{{ deadlineDate }}</b>
+          </Trans>
         </span>
       )}
 
       {editable && (
         <span className={styles.transactionEditable}>
-          * Les champs marqués d'une étoile sont obligatoires
+          <Trans>* Les champs marqués d'une étoile sont obligatoires</Trans>
         </span>
       )}
     </Box>

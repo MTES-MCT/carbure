@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { FormGroup } from "common/components/form"
 import { EntityType } from "common/types"
@@ -10,10 +11,11 @@ function showMAC(data: TransactionFormState, entity?: EntitySelection) {
 }
 
 const AllDeliveryFields = ({ data, errors, onChange }: FieldsProps) => {
+  const { t } = useTranslation()
   return (
     <FormGroup
       readOnly
-      title="Livraison"
+      title={t("Livraison")}
       data={data}
       errors={errors}
       onChange={onChange}
@@ -36,10 +38,11 @@ const VendorDeliveryFields = ({
   readOnly,
   onChange,
 }: FieldsProps) => {
+  const { t } = useTranslation()
   return (
     <FormGroup
       readOnly={readOnly}
-      title="Livraison"
+      title={t("Livraison")}
       data={data}
       errors={errors}
       onChange={onChange}
@@ -61,12 +64,12 @@ const ClientDeliveryFields = ({
   readOnly,
   onChange,
 }: FieldsProps) => {
+  const { t } = useTranslation()
   const isOperator = entity?.entity_type === EntityType.Operator
-
   return (
     <FormGroup
       readOnly={readOnly}
-      title="Livraison"
+      title={t("Livraison")}
       data={data}
       errors={errors}
       onChange={onChange}

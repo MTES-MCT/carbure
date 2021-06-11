@@ -35,6 +35,7 @@ import { StockTable } from "./list-table"
 import styles from "./list.module.css"
 import { SearchSelection } from "transactions/hooks/query/use-search"
 import { useRights } from "carbure/hooks/use-rights"
+import { Trans } from "react-i18next"
 
 type StockListProps = {
   stock: StockHook
@@ -123,7 +124,7 @@ export const StockList = ({
 
       {!isError && isEmpty && (
         <Alert level="warning" icon={AlertCircle}>
-          Aucune transaction trouvée pour cette recherche
+          <Trans>Aucune transaction trouvée pour cette recherche</Trans>
         </Alert>
       )}
 

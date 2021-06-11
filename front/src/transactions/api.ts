@@ -14,11 +14,16 @@ import {
   filterOutsourcedDepots,
   normalizeGeneralSummary,
 } from "./helpers"
+import { TFunction } from "react-i18next"
 
-export function getSnapshot(entityID: number, year: number): Promise<Snapshot> {
+export function getSnapshot(
+  entityID: number,
+  year: number,
+  t: TFunction
+): Promise<Snapshot> {
   return api
     .get("/lots/snapshot", { entity_id: entityID, year })
-    .then(normalizeFilters)
+    .then((s) => normalizeFilters(s, t))
     .then(filterOutsourcedDepots)
 }
 
@@ -274,7 +279,6 @@ export function forwardLots(
   })
 }
 
-
 export function amendLot(entity_id: number, tx_id: number) {
   return api.post("/lots/amend-lot", { entity_id, tx_id })
 }
@@ -293,11 +297,12 @@ export async function amendAndCommentLot(
 
 export function getAdminSnapshot(
   entityID: number,
-  year: number
+  year: number,
+  t: TFunction
 ): Promise<Snapshot> {
   return api
     .get("/admin/lots/snapshot", { entity_id: entityID, year })
-    .then(normalizeFilters)
+    .then((s) => normalizeFilters(s, t))
 }
 
 export function getAdminLots(filters: TransactionQuery): Promise<Lots> {
@@ -332,17 +337,13 @@ export function getAdminSummary(
     .then(normalizeGeneralSummary)
 }
 
-export function postHideAlerts(
-  alertIDs: number[]
-): Promise<any> {
+export function postHideAlerts(alertIDs: number[]): Promise<any> {
   return api.post("/admin/lots/ack-alerts", {
     alert_ids: alertIDs,
   })
 }
 
-export function postHighlightAlerts(
-  alertIDs: number[]
-): Promise<any> {
+export function postHighlightAlerts(alertIDs: number[]): Promise<any> {
   return api.post("/admin/lots/highlight-alerts", {
     alert_ids: alertIDs,
   })
@@ -356,13 +357,16 @@ export function highlightAdminLots(entity_id: number, tx_ids: number[]) {
   return api.post("/admin/lots/highlight-transactions", { entity_id, tx_ids })
 }
 
-
 // AUDITOR
 
-export function getAuditorSnapshot(entity_id: number, year: number) {
+export function getAuditorSnapshot(
+  entity_id: number,
+  year: number,
+  t: TFunction
+) {
   return api
     .get<Snapshot>("/auditor/snapshot", { entity_id, year })
-    .then(normalizeFilters)
+    .then((s) => normalizeFilters(s, t))
 }
 
 export function getAuditorLots(params: TransactionQuery) {
@@ -398,4 +402,3 @@ export function hideAuditorLots(entity_id: number, tx_ids: number[]) {
 export function highlightAuditorLots(entity_id: number, tx_ids: number[]) {
   return api.post("/auditor/lots/highlight-transactions", { entity_id, tx_ids })
 }
-

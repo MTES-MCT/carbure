@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { TransactionSelection } from "../query/use-selection"
 
@@ -23,6 +24,7 @@ export default function useDeleteLots(
   refresh: () => void,
   stock?: boolean
 ): LotDeleter {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
 
   const [request, resolveDelete] = useAPI(api.deleteLots)
@@ -36,23 +38,23 @@ export default function useDeleteLots(
       notifications.push({
         level: "success",
         text: many
-          ? "Les lots ont bien été supprimés !"
-          : "Le lot a bien été supprimé !",
+          ? t("Les lots ont bien été supprimés !")
+          : t("Le lot a bien été supprimé !"),
       })
     } else {
       notifications.push({
         level: "error",
         text: many
-          ? "Impossible de supprimer les lots."
-          : "Impossible de supprimer le lot.",
+          ? t("Impossible de supprimer les lots.")
+          : t("Impossible de supprimer le lot."),
       })
     }
   }
 
   async function deleteLot(tx: Transaction) {
     const shouldDelete = await confirm(
-      "Supprimer lot",
-      "Voulez vous supprimer ce lot ?"
+      t("Supprimer lot"),
+      t("Voulez vous supprimer ce lot ?")
     )
 
     if (entity !== null && shouldDelete) {
@@ -66,8 +68,8 @@ export default function useDeleteLots(
     const shouldDelete = await prompt<number[]>((resolve) => (
       <SummaryPrompt
         stock={stock}
-        title="Supprimer lot"
-        description="Voulez vous supprimer les lots sélectionnés ?"
+        title={t("Supprimer lot")}
+        description={t("Voulez vous supprimer les lots sélectionnés ?")}
         query={query}
         selection={selection.selected}
         onResolve={resolve}
@@ -86,8 +88,8 @@ export default function useDeleteLots(
       const allTxids = await prompt<number[]>((resolve) => (
         <SummaryPrompt
           stock={stock}
-          title="Supprimer tous ces brouillons"
-          description="Voulez vous supprimer tous ces lots ?"
+          title={t("Supprimer tous ces brouillons")}
+          description={t("Voulez vous supprimer tous ces lots ?")}
           query={query}
           selection={selection.selected}
           onResolve={resolve}

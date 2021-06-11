@@ -41,6 +41,25 @@ export const snapshot = {
   depots: [],
 }
 
+export const emptyOperatorSnapshot = {
+  years: [2020],
+  lots: {
+    draft: 0,
+    in: 0,
+    accepted: 0,
+  },
+  filters: {
+    matieres_premieres: [],
+    biocarburants: [],
+    periods: [],
+    countries_of_origin: [],
+    production_sites: [],
+    delivery_sites: [],
+    vendors: [],
+  },
+  depots: [],
+}
+
 export const operatorSnapshot = {
   years: [2020],
   lots: {
@@ -201,7 +220,7 @@ export const lotDetails: LotDetails = {
     production_site_certificate: null,
     supplier_certificate: null,
     vendor_certificate: null,
-  }
+  },
 }
 
 export const errorDetails: LotDetails = {
@@ -213,7 +232,7 @@ export const errorDetails: LotDetails = {
     production_site_certificate: null,
     supplier_certificate: null,
     vendor_certificate: null,
-  }
+  },
 }
 
 export const tofixDetails = {
@@ -232,7 +251,7 @@ export const tofixDetails = {
     production_site_certificate: null,
     supplier_certificate: null,
     vendor_certificate: null,
-  }
+  },
 }
 
 export const sentDetails = {
@@ -251,7 +270,7 @@ export const sentDetails = {
     production_site_certificate: null,
     supplier_certificate: null,
     vendor_certificate: null,
-  }
+  },
 }
 
 export const unknownProducerPartial = {

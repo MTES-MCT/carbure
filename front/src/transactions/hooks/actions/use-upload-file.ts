@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
 import * as api from "transactions/api"
@@ -23,6 +24,7 @@ export default function useUploadLotFile(
   entity: EntitySelection,
   refresh: () => void
 ): LotUploader {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
 
   const [request, resolveUpload] = useAPI(api.uploadLotFile)
@@ -31,7 +33,7 @@ export default function useUploadLotFile(
 
   async function notifyImport(promise: Promise<any>) {
     const startNotif = notifications.push({
-      text: "L'importation a débuté, veuillez patienter.",
+      text: t("L'importation a débuté, veuillez patienter."),
     })
 
     const res: any = await promise
@@ -48,7 +50,10 @@ export default function useUploadLotFile(
 
       notifications.push({
         level,
-        text: `${res.loaded} lots sur ${res.total} ont été importés depuis le fichier.`,
+        text: t(
+          "{{loaded}} lots sur {{total}} ont été importés depuis le fichier.",
+          res
+        ),
       })
 
       refresh()
@@ -57,7 +62,7 @@ export default function useUploadLotFile(
 
       notifications.push({
         level: "error",
-        text: "Le fichier n'a pas pu être importé.",
+        text: t("Le fichier n'a pas pu être importé."),
       })
     }
   }

@@ -190,7 +190,7 @@ export const ProductionSitePrompt = ({
           name="country"
           value={data.country}
           getValue={(c) => c?.code_pays ?? ""}
-          getLabel={(c) => c?.name ?? ""}
+          getLabel={(c) => t(c.code_pays, { ns: "countries" })}
           getQuery={common.findCountries}
           onChange={onChange}
         />
@@ -260,7 +260,7 @@ export const ProductionSitePrompt = ({
             name="matieres_premieres"
             placeholder={t("Ajouter matières premières...")}
             getValue={(o) => o?.code ?? ""}
-            getLabel={(o) => o?.name ?? ""}
+            getLabel={(o) => t(o.code, { ns: "feedstocks" })}
             minLength={0}
             getQuery={common.findMatieresPremieres}
             onChange={onChange}
@@ -273,7 +273,7 @@ export const ProductionSitePrompt = ({
             name="biocarburants"
             placeholder={t("Ajouter biocarburants...")}
             getValue={(o) => o.code}
-            getLabel={(o) => o.name}
+            getLabel={(o) => t(o.code, { ns: "biofuels" })}
             minLength={0}
             getQuery={common.findBiocarburants}
             onChange={onChange}
@@ -357,7 +357,9 @@ const ProductionSitesSettings = ({
     {
       header: t("Pays"),
       className: styles.settingsTableColumn,
-      render: (ps) => <Line text={ps.country?.name} />,
+      render: (ps) => (
+        <Line text={t(ps.country?.code_pays, { ns: "countries" })} />
+      ),
     },
     {
       header: t("Date de mise en service"),

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
 import * as api from "transactions/api"
@@ -16,13 +17,14 @@ export default function useDuplicateLot(
   entity: EntitySelection,
   refresh: () => void
 ): LotDuplicator {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
   const [request, resolveDuplicate] = useAPI(api.duplicateLot)
 
   async function duplicateLot(tx: Transaction) {
     const shouldDuplicate = await confirm(
-      "Dupliquer lot",
-      "Voulez vous dupliquer ce lot ?"
+      t("Dupliquer lot"),
+      t("Voulez vous dupliquer ce lot ?")
     )
 
     if (entity !== null && shouldDuplicate) {
@@ -33,7 +35,7 @@ export default function useDuplicateLot(
 
         notifications.push({
           level: "success",
-          text: "Le lot a bien été dupliqué !",
+          text: t("Le lot a bien été dupliqué !"),
         })
       }
     }

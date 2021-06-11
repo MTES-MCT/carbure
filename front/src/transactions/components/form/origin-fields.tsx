@@ -1,13 +1,15 @@
+import { useTranslation } from "react-i18next"
 import { FormGroup } from "common/components/form"
 import { EntityType } from "common/types"
 import * as Fields from "./fields"
 import { FieldsProps, isKnown } from "./fields"
 
 export const AdminOriginFields = ({ data, errors, onChange }: FieldsProps) => {
+  const { t } = useTranslation()
   return (
     <FormGroup
       readOnly
-      title="Provenance"
+      title={t("Provenance")}
       data={data}
       errors={errors}
       onChange={onChange}
@@ -28,6 +30,8 @@ export const ProducerOriginFields = ({
   editable,
   onChange,
 }: FieldsProps) => {
+  const { t } = useTranslation()
+
   async function listOnlyThisProducer(query: string) {
     const entityLow = entity?.name.toLowerCase()
     const queryLow = query.toLowerCase()
@@ -37,7 +41,7 @@ export const ProducerOriginFields = ({
   return (
     <FormGroup
       readOnly={readOnly || !editable}
-      title="Provenance"
+      title={t("Provenance")}
       data={data}
       errors={errors}
       onChange={onChange}
@@ -60,10 +64,11 @@ export const AuthorOriginFields = ({
   editable,
   onChange,
 }: FieldsProps) => {
+  const { t } = useTranslation()
   return (
     <FormGroup
       readOnly={readOnly || !editable}
-      title="Provenance"
+      title={t("Provenance")}
       data={data}
       errors={errors}
       onChange={onChange}
@@ -82,10 +87,11 @@ export const ClientOriginFields = ({
   errors,
   onChange,
 }: FieldsProps) => {
+  const { t } = useTranslation()
   return (
     <FormGroup
       readOnly={readOnly}
-      title="Provenance"
+      title={t("Provenance")}
       data={data}
       errors={errors}
       onChange={onChange}

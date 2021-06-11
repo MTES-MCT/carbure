@@ -1,4 +1,5 @@
 import { useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { Lots, TransactionQuery } from "common/types"
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
@@ -14,15 +15,16 @@ export interface StockHook {
 }
 
 export function useGetStockSnapshot(entity: EntitySelection) {
+  const { t } = useTranslation()
   const [snapshot, resolveStockSnapshot] = useAPI(getStockSnapshot)
 
   function getSnapshot() {
     if (entity !== null) {
-      resolveStockSnapshot(entity.id)
+      resolveStockSnapshot(entity.id, t)
     }
   }
 
-  useEffect(getSnapshot, [resolveStockSnapshot, entity])
+  useEffect(getSnapshot, [resolveStockSnapshot, entity, t])
 
   return { ...snapshot, getSnapshot }
 }

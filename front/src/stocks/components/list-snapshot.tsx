@@ -1,4 +1,5 @@
 import React from "react"
+import { Trans, useTranslation } from "react-i18next"
 
 import { ApiState } from "common/hooks/use-api"
 import { LotStatus, Snapshot } from "common/types"
@@ -19,31 +20,37 @@ type StockSnapshotProps = {
   status: StatusSelection
 }
 
-export const StocksSnapshot = ({ snapshot, status }: StockSnapshotProps) => (
-  <div className={styles.stockSnapshot}>
-    {snapshot.error && <Alert level="error">{snapshot.error}</Alert>}
+export const StocksSnapshot = ({ snapshot, status }: StockSnapshotProps) => {
+  const { t } = useTranslation()
 
-    {!snapshot.error && (
-      <React.Fragment>
-        <div className={styles.stockHeader}>
-          <Title>Stock</Title>
-        </div>
+  return (
+    <div className={styles.stockSnapshot}>
+      {snapshot.error && <Alert level="error">{snapshot.error}</Alert>}
 
-        <div className={styles.stockStatus}>
-          {mapStatus(snapshot.data?.lots, STOCK_STATUSES).map(
-            ([key, label, amount]) => (
-              <StatusButton
-                key={key}
-                active={key === status.active}
-                loading={snapshot.loading}
-                amount={amount}
-                label={label}
-                onClick={() => status.setActive(key)}
-              />
-            )
-          )}
-        </div>
-      </React.Fragment>
-    )}
-  </div>
-)
+      {!snapshot.error && (
+        <React.Fragment>
+          <div className={styles.stockHeader}>
+            <Title>
+              <Trans>Stock</Trans>
+            </Title>
+          </div>
+
+          <div className={styles.stockStatus}>
+            {mapStatus(snapshot.data?.lots, STOCK_STATUSES, t).map(
+              ([key, label, amount]) => (
+                <StatusButton
+                  key={key}
+                  active={key === status.active}
+                  loading={snapshot.loading}
+                  amount={amount}
+                  label={label}
+                  onClick={() => status.setActive(key)}
+                />
+              )
+            )}
+          </div>
+        </React.Fragment>
+      )}
+    </div>
+  )
+}

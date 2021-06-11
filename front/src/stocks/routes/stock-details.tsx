@@ -20,6 +20,7 @@ import ValidationErrors from "transactions/components/form-errors"
 import { StatusTitle } from "transactions/components/status"
 import Comments from "transactions/components/form-comments"
 import { useRights } from "carbure/hooks/use-rights"
+import { Trans } from "react-i18next"
 
 const EDITABLE = [LotStatus.ToSend]
 
@@ -36,7 +37,6 @@ type StockDetailsProps = {
 const StockDetails = ({
   entity,
   deleter,
-  validator,
   acceptor,
   rejector,
   sender,
@@ -79,7 +79,7 @@ const StockDetails = ({
   return (
     <Modal onClose={close}>
       <StatusTitle stock editable={isEditable} details={details.data}>
-        Détails du stock
+        <Trans>Détails du stock</Trans>
       </StatusTitle>
 
       <TransactionForm
@@ -114,7 +114,7 @@ const StockDetails = ({
             loading={request.loading}
             onClick={submit}
           >
-            Sauvegarder
+            <Trans>Sauvegarder</Trans>
           </AsyncButton>
         )}
 
@@ -126,7 +126,7 @@ const StockDetails = ({
               loading={acceptor.loading}
               onClick={() => run(acceptor.acceptLot)}
             >
-              Accepter
+              <Trans>Accepter</Trans>
             </AsyncButton>
             <AsyncButton
               icon={Cross}
@@ -134,7 +134,7 @@ const StockDetails = ({
               loading={rejector.loading}
               onClick={() => run(rejector.rejectLot, true)}
             >
-              Refuser
+              <Trans>Refuser</Trans>
             </AsyncButton>
           </React.Fragment>
         )}
@@ -147,7 +147,7 @@ const StockDetails = ({
               loading={acceptor.loading}
               onClick={() => run(sender.createDrafts, true)}
             >
-              Préparer l'envoi
+              <Trans>Préparer l'envoi</Trans>
             </AsyncButton>
           </React.Fragment>
         )}
@@ -161,7 +161,7 @@ const StockDetails = ({
               loading={sender.loading}
               onClick={() => run(sender.sendLot)}
             >
-              Envoyer
+              <Trans>Envoyer</Trans>
             </AsyncButton>
             <AsyncButton
               icon={Cross}
@@ -169,7 +169,7 @@ const StockDetails = ({
               loading={deleter.loading}
               onClick={() => run(deleter.deleteLot, true)}
             >
-              Supprimer
+              <Trans>Supprimer</Trans>
             </AsyncButton>
           </React.Fragment>
         )}
@@ -179,7 +179,7 @@ const StockDetails = ({
           className={styles.transactionNavButtons}
           onClick={close}
         >
-          Retour
+          <Trans>Retour</Trans>
         </Button>
       </div>
 

@@ -17,6 +17,7 @@ import {
 import * as Fields from "transactions/components/form/fields"
 import { FormGroup } from "common/components/form"
 import { EntitySelection } from "carbure/hooks/use-entity"
+import { Trans, useTranslation } from "react-i18next"
 
 export interface StockSendDetails {
   volume: number
@@ -38,6 +39,8 @@ export const StockSendLotPrompt = ({
   entity,
   onResolve,
 }: StockSendLotPromptProps) => {
+  const { t } = useTranslation()
+
   const { data, hasChange, onChange } = useForm<StockSendDetails>({
     volume: 0,
     dae: "",
@@ -46,8 +49,8 @@ export const StockSendLotPrompt = ({
     delivery_site: null,
     delivery_site_country: null,
     mac: false,
-    carbure_vendor_certificate: '',
-    carbure_vendor: entity
+    carbure_vendor_certificate: "",
+    carbure_vendor: entity,
   })
 
   function onSubmit(e: React.FormEvent) {
@@ -61,8 +64,8 @@ export const StockSendLotPrompt = ({
 
   return (
     <Dialog onResolve={onResolve}>
-      <DialogTitle text="Préparer lot" />
-      <DialogText text="Veuillez préciser les détails du lot à envoyer" />
+      <DialogTitle text={t("Préparer lot")} />
+      <DialogText text={t("Veuillez préciser les détails du lot à envoyer")} />
 
       <Box as="form" onSubmit={onSubmit}>
         <FormGroup data={data} onChange={onChange}>
@@ -83,9 +86,11 @@ export const StockSendLotPrompt = ({
             icon={Check}
             onClick={() => onResolve(data)}
           >
-            Valider
+            <Trans>Valider</Trans>
           </Button>
-          <Button onClick={() => onResolve()}>Annuler</Button>
+          <Button onClick={() => onResolve()}>
+            <Trans>Annuler</Trans>
+          </Button>
         </DialogButtons>
       </Box>
     </Dialog>

@@ -26,11 +26,10 @@ import { waitWhileLoading } from "common/__test__/helpers"
 import { clickOnCheckboxesAndConfirm } from "./helpers"
 
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
-
-afterEach(() => {
-  server.resetHandlers()
+beforeEach(() => {
   setDetails(lotDetails)
 })
+afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 const TransactionWithHook = ({ entity }: { entity: Entity }) => {
@@ -42,6 +41,7 @@ const TransactionWithHook = ({ entity }: { entity: Entity }) => {
     rejector,
     refresh,
     administrator,
+    auditor,
   } = useTransactions(entity)
 
   return (
@@ -54,6 +54,7 @@ const TransactionWithHook = ({ entity }: { entity: Entity }) => {
         acceptor={acceptor}
         rejector={rejector}
         administrator={administrator}
+        auditor={auditor}
         transactions={transactions?.data?.lots.map((l) => l.id) ?? []}
       />
     </Route>
@@ -153,7 +154,7 @@ test("display transaction details", async () => {
 test("edit transaction details", async () => {
   render(<TransactionWithRouter entity={producer} />)
 
-  const title = await screen.findByText("Détails de la transaction")
+  await screen.findByText("Détails de la transaction")
 
   const save: any = await screen.findByText("Sauvegarder")
   expect(save.closest("button")).toBeDisabled()
@@ -247,7 +248,6 @@ test("edit transaction details", async () => {
   userEvent.type(eee, "1.4")
 
   expect(save.closest("button")).not.toBeDisabled()
-  // expect(save.disabled).toBe(false)
 
   userEvent.click(save)
 
@@ -256,8 +256,7 @@ test("edit transaction details", async () => {
   await screen.findByDisplayValue("DAETESTUPDATE Confirmer")
 
   userEvent.click(screen.getByText("Retour"))
-  await waitFor(() => expect(title).not.toBeInTheDocument())
-})
+}, 30000)
 
 test("check transaction errors", async () => {
   setDetails(errorDetails)
