@@ -1,4 +1,5 @@
 import React from "react"
+import { Trans, useTranslation } from "react-i18next"
 
 import { LotStatus, EntityType, UserRole, Transaction } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
@@ -79,6 +80,8 @@ const TransactionDetails = ({
     refreshDetails,
   } = useTransactionDetails(entity, refresh)
 
+  const { t } = useTranslation()
+
   const rights = useRights()
   const navigator = useNavigate(transactions)
 
@@ -114,7 +117,7 @@ const TransactionDetails = ({
   return (
     <Modal onClose={close}>
       <StatusTitle editable={isEditable} details={details.data} entity={entity}>
-        Détails de la transaction {form.carbure_id}
+        <Trans>Détails de la transaction {{ id: form.carbure_id }}</Trans>
       </StatusTitle>
 
       <TransactionForm
@@ -152,7 +155,7 @@ const TransactionDetails = ({
             loading={request.loading}
             onClick={submit}
           >
-            Sauvegarder
+            <Trans>Sauvegarder</Trans>
           </AsyncButton>
         )}
 
@@ -164,7 +167,7 @@ const TransactionDetails = ({
             loading={validator.loading}
             onClick={() => run(validator.validateLot)}
           >
-            Envoyer
+            <Trans>Envoyer</Trans>
           </AsyncButton>
         )}
 
@@ -176,7 +179,7 @@ const TransactionDetails = ({
             loading={validator.loading}
             onClick={() => run(validator.validateAndCommentLot)}
           >
-            Renvoyer
+            <Trans>Renvoyer</Trans>
           </AsyncButton>
         )}
 
@@ -187,7 +190,7 @@ const TransactionDetails = ({
             loading={deleter.loading}
             onClick={() => run(deleter.deleteLot, true)}
           >
-            Supprimer
+            <Trans>Supprimer</Trans>
           </AsyncButton>
         )}
 
@@ -201,7 +204,7 @@ const TransactionDetails = ({
                 loading={acceptor.loading}
                 onClick={() => run(acceptor.acceptLot)}
               >
-                Accepter
+                <Trans>Accepter</Trans>
               </AsyncButton>
 
               {!transaction?.lot.parent_lot && !isVendorOperator && (
@@ -211,7 +214,7 @@ const TransactionDetails = ({
                   loading={acceptor.loading}
                   onClick={() => run(acceptor.acceptAndCommentLot)}
                 >
-                  Accepter sous réserve
+                  <Trans>Accepter sous réserve</Trans>
                 </AsyncButton>
               )}
 
@@ -221,7 +224,7 @@ const TransactionDetails = ({
                 loading={rejector.loading}
                 onClick={() => run(rejector.rejectLot, true)}
               >
-                Refuser
+                <Trans>Refuser</Trans>
               </AsyncButton>
             </React.Fragment>
           )}
@@ -237,7 +240,7 @@ const TransactionDetails = ({
               loading={acceptor.loading}
               onClick={() => run(acceptor.amendLot)}
             >
-              Corriger
+              <Trans>Corriger</Trans>
             </AsyncButton>
           )}
 
@@ -253,7 +256,7 @@ const TransactionDetails = ({
               loading={acceptor.loading}
               onClick={() => run(acceptor.askForCorrection)}
             >
-              Demander une correction
+              <Trans>Demander une correction</Trans>
             </AsyncButton>
           )}
 
@@ -266,8 +269,8 @@ const TransactionDetails = ({
               onClick={() => run(administrator.markForReview, true)}
             >
               {transaction?.highlighted_by_admin
-                ? "Désépingler le lot"
-                : "Épingler le lot"}
+                ? t("Désépingler le lot")
+                : t("Épingler le lot")}
             </AsyncButton>
             <AsyncButton
               icon={EyeOff}
@@ -276,8 +279,8 @@ const TransactionDetails = ({
               onClick={() => run(administrator.markAsRead, true)}
             >
               {transaction?.hidden_by_admin
-                ? "Montrer le lot"
-                : "Ignorer le lot"}
+                ? t("Montrer le lot")
+                : t("Ignorer le lot")}
             </AsyncButton>
           </React.Fragment>
         )}
@@ -291,8 +294,8 @@ const TransactionDetails = ({
               onClick={() => run(auditor.highlightLot, true)}
             >
               {transaction?.highlighted_by_auditor
-                ? "Désépingler le lot"
-                : "Épingler le lot"}
+                ? t("Désépingler le lot")
+                : t("Épingler le lot")}
             </AsyncButton>
             <AsyncButton
               icon={EyeOff}
@@ -301,8 +304,8 @@ const TransactionDetails = ({
               onClick={() => run(auditor.hideLot, true)}
             >
               {transaction?.hidden_by_auditor
-                ? "Montrer le lot"
-                : "Ignorer le lot"}
+                ? t("Montrer le lot")
+                : t("Ignorer le lot")}
             </AsyncButton>
           </React.Fragment>
         )}
@@ -313,7 +316,7 @@ const TransactionDetails = ({
             disabled={!navigator.hasPrev}
             onClick={navigator.prev}
           >
-            Lot Précédent
+            <Trans>Lot Précédent</Trans>
           </Button>
 
           <Button
@@ -321,11 +324,11 @@ const TransactionDetails = ({
             disabled={!navigator.hasNext}
             onClick={navigator.next}
           >
-            Lot Suivant
+            <Trans>Lot Suivant</Trans>
           </Button>
 
           <Button icon={Return} onClick={close}>
-            Retour
+            <Trans>Retour</Trans>
           </Button>
         </Box>
       </div>

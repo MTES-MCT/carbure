@@ -1,4 +1,5 @@
 import React from "react"
+import { Trans, useTranslation } from "react-i18next"
 
 import { LotUploader } from "transactions/hooks/actions/use-upload-file"
 import {
@@ -23,28 +24,34 @@ type ImportPromptProps = PromptProps<File> & {
   uploader: LotUploader
 }
 
-const ImportWrapper = ({ children, onResolve }: ImportWrapperProps) => (
-  <Dialog onResolve={onResolve}>
-    <DialogTitle text="Import Excel" />
-    <DialogText text="Importer un fichier Excel standardisé." />
+const ImportWrapper = ({ children, onResolve }: ImportWrapperProps) => {
+  const { t } = useTranslation()
 
-    <Box className={styles.importPrompt}>
-      {children}
+  return (
+    <Dialog onResolve={onResolve}>
+      <DialogTitle text={t("Import Excel")} />
+      <DialogText text={t("Importer un fichier Excel standardisé.")} />
 
-      <DialogButtons>
-        <Button as="label" level="primary" icon={Upload}>
-          Importer lots
-          <input
-            type="file"
-            className={styles.importFileInput}
-            onChange={(e) => onResolve(e!.target.files![0])}
-          />
-        </Button>
-        <Button onClick={() => onResolve()}>Annuler</Button>
-      </DialogButtons>
-    </Box>
-  </Dialog>
-)
+      <Box className={styles.importPrompt}>
+        {children}
+
+        <DialogButtons>
+          <Button as="label" level="primary" icon={Upload}>
+            <Trans>Importer lots</Trans>
+            <input
+              type="file"
+              className={styles.importFileInput}
+              onChange={(e) => onResolve(e!.target.files![0])}
+            />
+          </Button>
+          <Button onClick={() => onResolve()}>
+            <Trans>Annuler</Trans>
+          </Button>
+        </DialogButtons>
+      </Box>
+    </Dialog>
+  )
+}
 
 export const ProducerImportPrompt = ({
   uploader,
@@ -53,14 +60,19 @@ export const ProducerImportPrompt = ({
   <ImportWrapper onResolve={onResolve}>
     <Box className={styles.importExplanation}>
       <span className={styles.note}>
-        Note: Le modèle a été mis à jour le 24/03/2021. La colonne
-        production_site_reference n'est plus obligatoire. Votre certificat de
-        fournisseur doit désormais figurer dans la colonne 'vendor_certificate'.
-        Veuillez vous référer au guide pour plus d'informations.
+        <Trans>
+          Note: Le modèle a été mis à jour le 24/03/2021. La colonne
+          production_site_reference n'est plus obligatoire. Votre certificat de
+          fournisseur doit désormais figurer dans la colonne
+          'vendor_certificate'. Veuillez vous référer au guide pour plus
+          d'informations.
+        </Trans>
       </span>
-      Le modèle simplifié vous permet de créer des lots provenant de vos propres
-      usines. Vous pouvez les affilier immédiatement à des clients enregistrés
-      sur Carbure ou simplement les ajouter à votre Stock.
+      <Trans>
+        Le modèle simplifié vous permet de créer des lots provenant de vos
+        propres usines. Vous pouvez les affilier immédiatement à des clients
+        enregistrés sur Carbure ou simplement les ajouter à votre Stock.
+      </Trans>
       <span
         className={styles.downloadLink}
         onClick={uploader.downloadTemplateSimple}
@@ -71,26 +83,28 @@ export const ProducerImportPrompt = ({
         className={styles.downloadLink}
         href="https://carbure-1.gitbook.io/faq/gerer-mes-lots-1/producteur-trader-ajouter-des-lots/ajout-de-lot-via-fichier-excel/modele-simplifie"
       >
-        Guide du modèle simplifié
+        <Trans>Guide du modèle simplifié</Trans>
       </a>
     </Box>
 
     <Box className={styles.importExplanation}>
-      Le modèle avancé permet d'importer dans Carbure des lots achetés auprès de
-      fournisseurs qui nous sont inconnus (fournisseurs étrangers ou producteurs
-      français captifs). Vous avez également la possibilité d'attribuer ces lots
-      à des clients étrangers.
+      <Trans>
+        Le modèle avancé permet d'importer dans Carbure des lots achetés auprès
+        de fournisseurs qui nous sont inconnus (fournisseurs étrangers ou
+        producteurs français captifs). Vous avez également la possibilité
+        d'attribuer ces lots à des clients étrangers.
+      </Trans>
       <span
         className={styles.downloadLink}
         onClick={uploader.downloadTemplateAdvanced}
       >
-        Télécharger le modèle avancé
+        <Trans>Télécharger le modèle avancé</Trans>
       </span>
       <a
         className={styles.downloadLink}
         href="https://carbure-1.gitbook.io/faq/gerer-mes-lots-1/producteur-trader-ajouter-des-lots/ajout-de-lot-via-fichier-excel/modele-complexe"
       >
-        Guide du modèle avancé
+        <Trans>Guide du modèle avancé</Trans>
       </a>
     </Box>
   </ImportWrapper>
@@ -102,27 +116,31 @@ export const OperatorImportPrompt = ({
 }: ImportPromptProps) => (
   <ImportWrapper onResolve={onResolve}>
     <Box className={styles.importExplanation}>
-      Le modèle Excel vous permet d'importer des lots provenant de fournisseurs
-      qui ne sont pas inscrits sur Carbure. Il peut s'agir de lots importés
-      depuis l'étranger ou de producteurs captifs.
+      <Trans>
+        Le modèle Excel vous permet d'importer des lots provenant de
+        fournisseurs qui ne sont pas inscrits sur Carbure. Il peut s'agir de
+        lots importés depuis l'étranger ou de producteurs captifs.
+      </Trans>
       <span className={styles.note}>
-        Note: Le modèle a été mis à jour le 24/03/2021. La colonne
-        production_site_reference n'est plus obligatoire. Le certificat de votre
-        fournisseur doit désormais figurer dans la colonne
-        'supplier_certificate' Veuillez vous référer au guide pour plus
-        d'informations.
+        <Trans>
+          Note: Le modèle a été mis à jour le 24/03/2021. La colonne
+          production_site_reference n'est plus obligatoire. Le certificat de
+          votre fournisseur doit désormais figurer dans la colonne
+          'supplier_certificate' Veuillez vous référer au guide pour plus
+          d'informations.
+        </Trans>
       </span>
       <span
         className={styles.downloadLink}
         onClick={uploader.downloadTemplateOperator}
       >
-        Télécharger le modèle
+        <Trans>Télécharger le modèle</Trans>
       </span>
       <a
         className={styles.downloadLink}
         href="https://carbure-1.gitbook.io/faq/gerer-mes-lots-1/operateur-petrolier/ajouter-des-lots/importer-un-fichier-excel"
       >
-        Guide de l'import Excel
+        <Trans>Guide de l'import Excel</Trans>
       </a>
     </Box>
   </ImportWrapper>
@@ -134,15 +152,17 @@ export const TraderImportPrompt = ({
 }: ImportPromptProps) => (
   <ImportWrapper onResolve={onResolve}>
     <Box className={styles.importExplanation}>
-      Le modèle Excel permet d'importer dans Carbure des lots achetés auprès de
-      fournisseurs qui nous sont inconnus (fournisseurs étrangers ou producteurs
-      français captifs). Vous avez également la possibilité d'attribuer ces lots
-      à des clients étrangers.
+      <Trans>
+        Le modèle Excel permet d'importer dans Carbure des lots achetés auprès
+        de fournisseurs qui nous sont inconnus (fournisseurs étrangers ou
+        producteurs français captifs). Vous avez également la possibilité
+        d'attribuer ces lots à des clients étrangers.
+      </Trans>
       <span
         className={styles.downloadLink}
         onClick={uploader.downloadTemplateTrader}
       >
-        Télécharger le modèle
+        <Trans>Télécharger le modèle</Trans>
       </span>
     </Box>
   </ImportWrapper>
@@ -154,18 +174,20 @@ export const StockImportPrompt = ({
 }: ImportPromptProps) => (
   <ImportWrapper onResolve={onResolve}>
     <Box className={styles.importExplanation}>
-      Ce modèle vous permet de créer des lots à partir de votre stock
+      <Trans>
+        Ce modèle vous permet de créer des lots à partir de votre stock
+      </Trans>
       <span
         className={styles.downloadLink}
         onClick={uploader.downloadTemplateMassBalanceCarbureID}
       >
-        Télécharger le modèle 1
+        <Trans>Télécharger le modèle 1</Trans>
       </span>
       <span
         className={styles.downloadLink}
         onClick={uploader.downloadTemplateMassBalanceBCGHG}
       >
-        Télécharger le modèle 2
+        <Trans>Télécharger le modèle 2</Trans>
       </span>
     </Box>
   </ImportWrapper>

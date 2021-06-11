@@ -4,11 +4,17 @@ import { Suspense } from "react"
 import { render as baseRender } from "@testing-library/react"
 import { configure } from "@testing-library/dom"
 import { initReactI18next } from "react-i18next"
-import Backend from "i18next-http-backend"
 import { LoaderOverlay } from "common/components"
 import { AppHook, useApp } from "carbure/hooks/use-app"
 import { MemoryRouter, Route } from "react-router"
 import { UserRightProvider } from "carbure/hooks/use-rights"
+
+import translation from "../public/locales/fr/translation.json"
+import errors from "../public/locales/fr/errors.json"
+import fields from "../public/locales/fr/fields.json"
+import feedstocks from "../public/locales/fr/feedstocks.json"
+import biofuels from "../public/locales/fr/biofuels.json"
+import countries from "../public/locales/fr/countries.json"
 
 configure({
   getElementError(message) {
@@ -34,24 +40,35 @@ window.open = jest.fn()
 
 jest.setTimeout(10000)
 
-i18n
-  .use(Backend)
-  .use(initReactI18next)
-  .init({
-    ns: ["translations", "fields", "errors"],
-    defaultNS: "translations",
-    supportedLngs: ["fr"],
-    fallbackLng: "fr",
-    lng: "fr",
-    keySeparator: false,
-    nsSeparator: false,
-    react: {
-      useSuspense: true,
+i18n.use(initReactI18next).init({
+  resources: {
+    fr: {
+      translation,
+      errors,
+      fields,
+      feedstocks,
+      biofuels,
+      countries,
     },
-    backend: {
-      loadPath: "/v2/locales/{{lng}}/{{ns}}.json",
-    },
-  })
+  },
+  ns: [
+    "translation",
+    "fields",
+    "errors",
+    "feedstocks",
+    "biofuels",
+    "countries",
+  ],
+  defaultNS: "translation",
+  supportedLngs: ["fr"],
+  fallbackLng: "fr",
+  lng: "fr",
+  keySeparator: false,
+  nsSeparator: false,
+  react: {
+    useSuspense: true,
+  },
+})
 
 type TestRootProps = {
   url?: string

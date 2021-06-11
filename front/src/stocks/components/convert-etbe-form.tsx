@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react"
+import { Trans, useTranslation } from "react-i18next"
 
 import { LotStatus, Transaction, ConvertETBE } from "common/types"
 import useForm from "common/hooks/use-form"
@@ -83,6 +84,7 @@ export const ConvertETBEComplexPrompt = ({
   entityID,
   onResolve,
 }: ConvertETBEPromptProps) => {
+  const { t } = useTranslation()
   const [depot, setDepot] = useState<string | null>(null)
 
   const [attributions, setAttributions] = useState<VolumeAttributions>({}) // prettier-ignore
@@ -156,7 +158,7 @@ export const ConvertETBEComplexPrompt = ({
   }
 
   const convertedVolume: Column<Transaction> = {
-    header: "Volume à convertir",
+    header: t("Volume à convertir"),
     render: (tx) => (
       <Input
         type="number"
@@ -174,11 +176,11 @@ export const ConvertETBEComplexPrompt = ({
 
   const columns = [
     C.padding,
-    C.carbureID,
-    C.biocarburantInStock,
-    C.matierePremiere,
+    C.carbureID(t),
+    C.biocarburantInStock(t),
+    C.matierePremiere(t),
     convertedVolume,
-    C.ghgReduction,
+    C.ghgReduction(t),
     C.padding,
   ]
 
@@ -212,13 +214,13 @@ export const ConvertETBEComplexPrompt = ({
 
   return (
     <Dialog wide onResolve={onResolve}>
-      <DialogTitle text="Conversion ETBE" />
+      <DialogTitle text={t("Conversion ETBE")} />
 
       <Box>
         <Select
           value={depot as any}
           options={(depots.data as any) ?? []}
-          placeholder="Choisir un dépôt"
+          placeholder={t("Choisir un dépôt")}
           onChange={setDepot as any}
           style={{ marginTop: 24, marginBottom: 16 }}
         />
@@ -228,7 +230,7 @@ export const ConvertETBEComplexPrompt = ({
             <Box row>
               <LabelInput
                 type="number"
-                label="Volume d'ETBE produit"
+                label={t("Volume d'ETBE produit")}
                 name="volume_etbe"
                 value={data.volume_etbe}
                 onChange={onChange}
@@ -239,7 +241,7 @@ export const ConvertETBEComplexPrompt = ({
                 readOnly
                 disabled
                 type="number"
-                label="Volume d'ETBE éligible (à titre informatif)"
+                label={t("Volume d'ETBE éligible (à titre informatif)")}
                 name="volume_etbe"
                 value={isNaN(volEligibleETBE) ? 0 : volEligibleETBE.toFixed(2)}
                 style={{ flex: 1 }}
@@ -249,7 +251,7 @@ export const ConvertETBEComplexPrompt = ({
             <Box row>
               <LabelInput
                 type="number"
-                label={`Volume d'Éthanol utilisé (${prettyVolume(vEthanolInStock)} litres disponibles)`} // prettier-ignore
+                label={t(`Volume d'Éthanol utilisé ({{remaining}} litres disponibles)`, { remaining: prettyVolume(vEthanolInStock) })} // prettier-ignore
                 name="volume_ethanol"
                 value={data.volume_ethanol}
                 onChange={onChange}
@@ -258,7 +260,7 @@ export const ConvertETBEComplexPrompt = ({
 
               <LabelInput
                 type="number"
-                label="Volume total de dénaturant"
+                label={t("Volume total de dénaturant")}
                 name="volume_denaturant"
                 value={data.volume_denaturant}
                 onChange={onChange}
@@ -272,9 +274,14 @@ export const ConvertETBEComplexPrompt = ({
                 icon={AlertCircle}
                 style={{ marginTop: 8, marginBottom: 16 }}
               >
-                Ratio d'Éthanol:
-                <b style={{ margin: "0 4px" }}>{ratioEthToETBE.toFixed(2)}%</b>(
-                {ratioEthToETBEWithDenaturant.toFixed(2)}% dénaturant inclus)
+                <Trans>
+                  Ratio d'Éthanol:
+                  <b style={{ margin: "0 4px" }}>
+                    {{ ratio: ratioEthToETBE.toFixed(2) }}%
+                  </b>
+                  ({{ fullRatio: ratioEthToETBEWithDenaturant.toFixed(2) }}%
+                  dénaturant inclus)
+                </Trans>
               </Alert>
             )}
           </Fragment>
@@ -282,13 +289,18 @@ export const ConvertETBEComplexPrompt = ({
 
         {!isNaN(volumeDiff) && volumeDiff !== 0 && (
           <Alert level="error" icon={AlertCircle} style={{ marginBottom: 16 }}>
-            Les volumes ne correspondent pas ({prettyVolume(volumeDiff)} litres)
+            <Trans>
+              Les volumes ne correspondent pas (
+              {{ volume: prettyVolume(volumeDiff) }} litres)
+            </Trans>
           </Alert>
         )}
 
         {data.volume_ethanol > data.volume_etbe && (
           <Alert level="error" icon={AlertCircle} style={{ marginBottom: 16 }}>
-            Le volume d'ETBE produit est inférieur au volume d'Éthanol
+            <Trans>
+              Le volume d'ETBE produit est inférieur au volume d'Éthanol
+            </Trans>
           </Alert>
         )}
 
@@ -305,9 +317,11 @@ export const ConvertETBEComplexPrompt = ({
             disabled={!canSave}
             onClick={() => onResolve(conversionDetails)}
           >
-            Valider
+            <Trans>Valider</Trans>
           </Button>
-          <Button onClick={() => onResolve()}>Annuler</Button>
+          <Button onClick={() => onResolve()}>
+            <Trans>Annuler</Trans>
+          </Button>
         </DialogButtons>
       </Box>
 

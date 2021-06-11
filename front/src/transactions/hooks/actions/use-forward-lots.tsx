@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { Transaction } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { TransactionSelection } from "../query/use-selection"
@@ -23,6 +24,7 @@ export default function useForwardLots(
   selection: TransactionSelection,
   refresh: () => void
 ): LotForwarder {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
 
   const [request, resolveForward] = useAPI(api.forwardLots)
@@ -36,15 +38,15 @@ export default function useForwardLots(
       notifications.push({
         level: "success",
         text: many
-          ? "Les lots ont bien été transférés !"
-          : "Le lot a bien été transféré !",
+          ? t("Les lots ont bien été transférés !")
+          : t("Le lot a bien été transféré !"),
       })
     } else {
       notifications.push({
         level: "error",
         text: many
-          ? "Impossible de transférer les lots."
-          : "Impossible de transférer le lot.",
+          ? t("Impossible de transférer les lots.")
+          : t("Impossible de transférer le lot."),
       })
     }
   }

@@ -289,7 +289,11 @@ export const DeliverySitePrompt = ({
           label={t("Pays")}
           placeholder={t("Rechercher un pays...")}
           name="country"
-          value={form.country?.name}
+          value={
+            form.country
+              ? (t(form.country.code_pays, { ns: "countries" }) as string)
+              : ""
+          }
         />
 
         <hr />
@@ -353,7 +357,11 @@ const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
       header: t("Ville"),
       className: styles.settingsTableColumn,
       render: (ds) => (
-        <Line text={`${ds.depot!.city}, ${ds.depot!.country.name}`} />
+        <Line
+          text={`${ds.depot!.city}, ${t(ds.depot!.country.code_pays, {
+            ns: "countries",
+          })}`}
+        />
       ),
     },
     actions,

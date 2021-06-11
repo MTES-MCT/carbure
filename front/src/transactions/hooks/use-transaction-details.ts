@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { useParams } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 import { EntityType, GenericError, LotStatus } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
@@ -14,21 +15,22 @@ import useClose from "common/hooks/use-close"
 import { useNotificationContext } from "common/components/notifications"
 import * as api from "../api"
 import { getStatus } from "transactions/helpers"
-import { useTranslation } from "react-i18next"
 
 export function useFieldErrors(errors: GenericError[]) {
-  const { t } = useTranslation("errors")
+  const { t } = useTranslation()
   const fieldErrors: { [k: string]: string } = {}
 
   errors.forEach((err) => {
     if (!err.is_blocking) return
 
     if (err.field) {
-      fieldErrors[err.field] = t(err.error)
+      fieldErrors[err.field] = t(err.error, { ns: "errors" })
     }
 
     if (err.fields) {
-      err.fields?.forEach((field) => (fieldErrors[field] = t(err.error)))
+      err.fields?.forEach(
+        (field) => (fieldErrors[field] = t(err.error, { ns: "errors" }))
+      )
     }
   })
 
@@ -49,6 +51,7 @@ export default function useTransactionDetails(
   entity: EntitySelection,
   refresh: () => void
 ) {
+  const { t } = useTranslation()
   const params: { id: string } = useParams()
   const notifications = useNotificationContext()
   const close = useClose("../")
@@ -85,12 +88,12 @@ export default function useTransactionDetails(
 
       notifications.push({
         level: "success",
-        text: "Le lot a bien été sauvegardé !",
+        text: t("Le lot a bien été sauvegardé !", { ns: "translation" }),
       })
     } else {
       notifications.push({
         level: "error",
-        text: "Impossible de sauvegarder ce lot.",
+        text: t("Impossible de sauvegarder ce lot.", { ns: "translation" }),
       })
     }
   }
@@ -112,7 +115,7 @@ export default function useTransactionDetails(
     if (details.data) {
       reset(toTransactionFormState(details.data))
     }
-  }, [tx, reset])
+  }, [tx, details.data, reset])
 
   return {
     form: data,

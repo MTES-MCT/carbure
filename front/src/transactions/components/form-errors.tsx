@@ -1,4 +1,5 @@
 import React from "react"
+import { Trans, useTranslation } from "react-i18next"
 
 import { GenericError } from "common/types"
 
@@ -6,14 +7,13 @@ import { Collapsible } from "common/components/alert"
 import { AlertTriangle, AlertOctagon } from "common/components/icons"
 
 import styles from "./form-errors.module.css"
-import { useTranslation } from "react-i18next"
 
 type ValidationErrorsProps = {
   errors: GenericError[]
 }
 
 const ValidationErrors = ({ errors }: ValidationErrorsProps) => {
-  const { t } = useTranslation("errors")
+  const { t } = useTranslation("translation")
 
   const blocking = errors.filter((e) => e.is_blocking)
   const warnings = errors.filter((e) => !e.is_blocking)
@@ -24,18 +24,22 @@ const ValidationErrors = ({ errors }: ValidationErrorsProps) => {
         <Collapsible
           icon={AlertOctagon}
           level="error"
-          title={`Erreurs (${blocking.length})`}
+          title={t("Erreurs ({{amount}})", { amount: blocking.length })}
           className={styles.transactionError}
         >
           <i className={styles.transactionErrorExplanation}>
-            Vous ne pouvez pas valider ce lot tant que les problèmes suivants
-            n'ont pas été adressés :
+            <Trans>
+              Vous ne pouvez pas valider ce lot tant que les problèmes suivants
+              n'ont pas été adressés :
+            </Trans>
           </i>
           <ul className={styles.validationErrors}>
             {blocking.map((err, i) => (
               <li key={i}>
-                {t(err.error) || "Erreur de validation"}{" "}
-                {err.extra && err.extra !== t(err.error) && ` - ${err.extra}`}
+                {t(err.error, { ns: "errors" }) || t("Erreur de validation")}{" "}
+                {err.extra &&
+                  err.extra !== t(err.error, { ns: "errors" }) &&
+                  ` - ${err.extra}`}
               </li>
             ))}
           </ul>
@@ -50,14 +54,18 @@ const ValidationErrors = ({ errors }: ValidationErrorsProps) => {
           className={styles.transactionError}
         >
           <i className={styles.transactionErrorExplanation}>
-            Des incohérences potentielles ont été détectées, elles n'empêchent
-            pas la validation du lot mais peuvent donner lieu à un contrôle :
+            <Trans>
+              Des incohérences potentielles ont été détectées, elles n'empêchent
+              pas la validation du lot mais peuvent donner lieu à un contrôle :
+            </Trans>
           </i>
           <ul className={styles.validationErrors}>
             {warnings.map((err, i) => (
               <li key={i}>
-                {t(err.error) || "Erreur de validation"}
-                {err.extra && err.extra !== t(err.error) && ` - ${err.extra}`}
+                {t(err.error, { ns: "errors" }) || t("Erreur de validation")}
+                {err.extra &&
+                  err.extra !== t(err.error, { ns: "errors" }) &&
+                  ` - ${err.extra}`}
               </li>
             ))}
           </ul>

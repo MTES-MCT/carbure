@@ -1,4 +1,4 @@
-import React from "react"
+import { useTranslation } from "react-i18next"
 
 import { Lots, LotStatus, Transaction, UserRole } from "common/types"
 import { SortingSelection } from "transactions/hooks/query/use-sort-by" // prettier-ignore
@@ -7,23 +7,11 @@ import { StatusSelection } from "transactions/hooks/query/use-status"
 
 import { useRelativePush } from "common/components/relative-route"
 
-import Table, { Actions, arrow, Column, Row } from "common/components/table"
+import Table, { Actions, arrow, Row } from "common/components/table"
 import * as C from "transactions/components/list-columns"
 import { Edit } from "common/components/icons"
 import { LotSender } from "stocks/hooks/use-send-lots"
 import { useRights } from "carbure/hooks/use-rights"
-
-type A = Record<string, (tx: Transaction) => void>
-type CT = Column<Transaction>
-
-const getStockActions = ({ createDrafts }: A): CT =>
-  Actions([
-    {
-      icon: Edit,
-      title: "Préparer l'envoi",
-      action: createDrafts,
-    },
-  ])
 
 type StockTableProps = {
   stock: Lots | null
@@ -40,6 +28,7 @@ export const StockTable = ({
   selection,
   sender,
 }: StockTableProps) => {
+  const { t } = useTranslation()
   const rights = useRights()
   const relativePush = useRelativePush()
   const createDrafts = sender.createDrafts
@@ -51,44 +40,52 @@ export const StockTable = ({
   if (status.is(LotStatus.Inbox)) {
     columns.push(
       C.selector(selection),
-      C.periodSimple,
-      C.dae,
-      C.biocarburant,
-      C.matierePremiere,
-      C.vendor,
-      C.origine,
-      C.depot,
-      C.ghgReduction,
+      C.periodSimple(t),
+      C.dae(t),
+      C.biocarburant(t),
+      C.matierePremiere(t),
+      C.vendor(t),
+      C.origine(t),
+      C.depot(t),
+      C.ghgReduction(t),
       arrow
     )
   }
 
   if (status.is(LotStatus.Stock)) {
+    const actions = Actions([
+      {
+        icon: Edit,
+        title: t("Préparer l'envoi"),
+        action: createDrafts,
+      },
+    ])
+
     columns.push(
       C.selector(selection),
-      C.periodSimple,
-      C.carbureID,
-      C.biocarburantInStock,
-      C.matierePremiere,
-      C.vendor,
-      C.origine,
-      C.depot,
-      C.ghgReduction,
-      canModify ? getStockActions({ createDrafts }) : arrow
+      C.periodSimple(t),
+      C.carbureID(t),
+      C.biocarburantInStock(t),
+      C.matierePremiere(t),
+      C.vendor(t),
+      C.origine(t),
+      C.depot(t),
+      C.ghgReduction(t),
+      canModify ? actions : arrow
     )
   }
 
   if (status.is(LotStatus.ToSend)) {
     columns.push(
       C.selector(selection),
-      C.periodSimple,
-      C.dae,
-      C.biocarburant,
-      C.matierePremiere,
-      C.client,
-      C.origine,
-      C.destination,
-      C.ghgReduction,
+      C.periodSimple(t),
+      C.dae(t),
+      C.biocarburant(t),
+      C.matierePremiere(t),
+      C.client(t),
+      C.origine(t),
+      C.destination(t),
+      C.ghgReduction(t),
       arrow
     )
   }

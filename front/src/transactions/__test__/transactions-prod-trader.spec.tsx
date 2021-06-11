@@ -52,10 +52,10 @@ test("producer/trader: display an empty list of transactions", async () => {
 
   await waitWhileLoading()
 
-  await screen.findByText("Brouillons")
-  screen.getByText("Lots envoyés")
-  screen.getByText("Lots à corriger")
-  screen.getByText("Lots acceptés")
+  await screen.findByText("Brouillon")
+  screen.getByText("Lot envoyé")
+  screen.getByText("Lot à corriger")
+  screen.getByText("Lot accepté")
 
   const quantities = await screen.findAllByText("0")
   expect(quantities.length).toBe(4)
@@ -260,7 +260,7 @@ test("check deadline filter", async () => {
   await screen.findByText(
     (content, node) =>
       node?.textContent ===
-      "Parmi ces résultats, 1 lot doit être validé et envoyé avant le 29 février"
+      "Parmi ces résultats, 1 lot doit être déclaré avant le 29 février"
   )
 
   userEvent.click(screen.getByText("Voir la liste"))
@@ -269,8 +269,7 @@ test("check deadline filter", async () => {
 
   await screen.findByText(
     (content, node) =>
-      node?.textContent ===
-      "1 lot doit être validé et envoyé avant le 29 février"
+      node?.textContent === "1 lot doit être déclaré avant le 29 février"
   )
 
   userEvent.click(screen.getByText("Revenir à la liste complète"))

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { TransactionSelection } from "../query/use-selection"
 
@@ -26,6 +27,7 @@ export default function useRejectLots(
   refresh: () => void,
   stock?: boolean
 ): LotRejector {
+  const { t } = useTranslation()
   const notifications = useNotificationContext()
 
   const [request, resolveReject] = useAPI(api.rejectLots)
@@ -39,15 +41,15 @@ export default function useRejectLots(
       notifications.push({
         level: "success",
         text: many
-          ? "Les lots ont bien été refusés !"
-          : "Le lot a bien été refusé !",
+          ? t("Les lots ont bien été refusés !")
+          : t("Le lot a bien été refusé !"),
       })
     } else {
       notifications.push({
         level: "error",
         text: many
-          ? "Impossible de refuser les lots."
-          : "Impossible de refuser le lot.",
+          ? t("Impossible de refuser les lots.")
+          : t("Impossible de refuser le lot."),
       })
     }
   }
@@ -55,8 +57,8 @@ export default function useRejectLots(
   async function rejectLot(tx: Transaction) {
     const comment = await prompt<string>((resolve) => (
       <CommentPrompt
-        title="Refuser lot"
-        description="Voulez vous refuser ce lot ?"
+        title={t("Refuser lot")}
+        description={t("Voulez vous refuser ce lot ?")}
         onResolve={resolve}
       />
     ))
@@ -72,8 +74,8 @@ export default function useRejectLots(
     const res = await prompt<[string, number[]]>((resolve) => (
       <CommentWithSummaryPrompt
         stock={stock}
-        title="Refuser lot"
-        description="Voulez vous refuser les lots sélectionnés ?"
+        title={t("Refuser lot")}
+        description={t("Voulez vous refuser les lots sélectionnés ?")}
         query={query}
         selection={selection.selected}
         onResolve={resolve}
@@ -95,8 +97,8 @@ export default function useRejectLots(
       const res = await prompt<[string, number[]]>((resolve) => (
         <CommentWithSummaryPrompt
           stock={stock}
-          title="Refuser tout"
-          description="Voulez vous refuser tous ces lots ?"
+          title={t("Refuser tout")}
+          description={t("Voulez vous refuser tous ces lots ?")}
           query={query}
           selection={selection.selected}
           onResolve={resolve}
