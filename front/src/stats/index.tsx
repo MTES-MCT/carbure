@@ -41,7 +41,7 @@ const Stats = ({ entity }: StatsProps) => {
         <div style={{ alignSelf: "center" }}>
             <h1>
               <a href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/7aa76cea-b60a-4e89-9bde-a116abd86018?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
-                &#x1F4D6; Vos stats &#x1F4D6;
+                &#x1F4D6; Vos stats principales &#x1F4D6;
               </a>
             </h1>
         </div>
@@ -89,7 +89,7 @@ const Stats = ({ entity }: StatsProps) => {
       </Section>
       <Section style={{background:"#d9edf7", borderColor:"#bce8f1"}}>
         <span style={{alignSelf: "center" }}>
-          <h3>Choisissez un biocarburant ou une matière première pour voir ses stats</h3>
+          <p><b>Choisissez</b> un biocarburant ou une matière première pour voir ses stats</p>
         </span>
       </Section>
       <Section style={{boxShadow: iframeShadow, height: screenHeight*1.7}}>
