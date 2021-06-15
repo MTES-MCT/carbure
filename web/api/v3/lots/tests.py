@@ -438,6 +438,7 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(j['submitted'], nb_lots)
         self.assertEqual(j['valid'], 0)
 
+
         # get drafts
         lots = LotV2.objects.filter(added_by_user=self.user1, status='Draft')
         self.assertEqual(lots.count(), nb_lots) # they are still all with status draft
