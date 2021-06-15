@@ -62,7 +62,8 @@ const TransactionHistory = ({ history = [] }: TransactionHistoryProps) => {
     padding,
     {
       header: t("Date"),
-      render: (u) => formatDate(u.datetime, true),
+      render: (u) =>
+        formatDate(u.datetime, { hour: "numeric", minute: "numeric" }),
     },
     {
       header: t("Champ modifié"),

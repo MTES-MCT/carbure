@@ -60,6 +60,7 @@ import { ApiState } from "common/hooks/use-api"
 import { useRights } from "carbure/hooks/use-rights"
 import { LotAuditor } from "transactions/hooks/actions/use-audits"
 import { LotAdministrator } from "transactions/hooks/actions/use-admin-lots"
+import { formatDate } from "settings/components/common"
 
 type TransactionListProps = {
   entity: Entity
@@ -115,7 +116,9 @@ export const TransactionList = ({
   const deadlineCount = txs?.deadlines.total ?? 0
 
   const deadlineDate = txs
-    ? format(new Date(txs.deadlines.date), "d MMMM", { locale: fr })
+    ? formatDate(txs.deadlines.date, {
+        month: "long",
+      })
     : null
 
   const isProducer = entity.entity_type === EntityType.Producer
