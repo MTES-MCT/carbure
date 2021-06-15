@@ -375,7 +375,9 @@ const DeliverySitesSettings = ({ settings }: DeliverySitesSettingsProps) => {
   return (
     <Section id="depot">
       <SectionHeader>
-        <Title>Dépôts</Title>
+        <Title>
+          <Trans>Dépôts</Trans>
+        </Title>
         {canModify && settings.addDeliverySite && (
           <Button
             level="primary"
