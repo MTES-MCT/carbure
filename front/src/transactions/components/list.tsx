@@ -118,6 +118,7 @@ export const TransactionList = ({
   const deadlineDate = txs
     ? formatDate(txs.deadlines.date, {
         month: "long",
+        year: undefined,
       })
     : null
 
