@@ -5,7 +5,7 @@ import { AlertCircle } from "common/components/icons"
 import { LabelInput } from "common/components/input"
 import Table, { Column } from "common/components/table"
 import useAPI from "common/hooks/use-api"
-import { Entity } from "common/types"
+import { Entity, EntityType } from "common/types"
 import { Fragment, useEffect, useState } from "react"
 import { SettingsBody, SettingsHeader } from "settings/components/common"
 import { padding } from "transactions/components/list-columns"
@@ -43,6 +43,14 @@ const Registry = () => {
     sortEntities(entities.data, sorter)
   }
 
+  const entityTypes = {
+    [EntityType.Administration]: t("Administration"),
+    [EntityType.Operator]: t("Opérateur"),
+    [EntityType.Producer]: t("Producteur"),
+    [EntityType.Auditor]: t("Auditeur"),
+    [EntityType.Trader]: t("Trader"),
+  }
+
   const columns: Column<Entity>[] = [
     padding,
     {
@@ -53,7 +61,7 @@ const Registry = () => {
     {
       header: t("Activité"),
       sortBy: "entity_type",
-      render: (e) => e.entity_type,
+      render: (e) => entityTypes[e.entity_type],
     },
     padding,
   ]

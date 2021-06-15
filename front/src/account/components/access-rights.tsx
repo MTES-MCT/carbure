@@ -3,6 +3,7 @@ import cl from "clsx"
 
 import {
   Entity,
+  EntityType,
   UserRightRequest,
   UserRightStatus,
   UserRole,
@@ -157,6 +158,14 @@ export const AccountAccesRights = ({
   const requests = settings.data?.requests ?? []
   const [, revokeMyself] = useAPI(api.revokeMyself)
 
+  const entityTypes = {
+    [EntityType.Administration]: t("Administration"),
+    [EntityType.Operator]: t("Opérateur"),
+    [EntityType.Producer]: t("Producteur"),
+    [EntityType.Auditor]: t("Auditeur"),
+    [EntityType.Trader]: t("Trader"),
+  }
+
   const roleLabels = {
     [UserRole.ReadOnly]: t("Lecture seule"),
     [UserRole.ReadWrite]: t("Lecture/écriture"),
@@ -173,7 +182,7 @@ export const AccountAccesRights = ({
     },
     {
       header: t("Type"),
-      render: (r) => <Line text={r.entity.entity_type} />,
+      render: (r) => <Line text={entityTypes[r.entity.entity_type]} />,
     },
     {
       header: t("Droits"),
