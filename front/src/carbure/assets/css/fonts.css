@@ -18,10 +18,3 @@
     url("../fonts/Marianne/Marianne-Bold.woff") format("woff");
   font-weight: 800;
 }
-
-@font-face {
-  font-family: "Marianne";
-  src: url("../fonts/Marianne/Marianne-Regular_Italic.woff2") format("woff2"),
-    url("../fonts/Marianne/Marianne-Regular_Italic.woff") format("woff");
-  font-style: italic;
-}
