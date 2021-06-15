@@ -10,7 +10,9 @@ import { Box, BoxProps } from "common/components"
 import { Button } from "common/components/button"
 import { Refresh } from "common/components/icons"
 
-export function formatDate(str: string | null, showTime: boolean = false) {
+type FormatOptions = Parameters<typeof format>[1]
+
+export function formatDate(str: string | null, options: FormatOptions = {}) {
   if (str === null) {
     return "N/A"
   }
@@ -22,8 +24,7 @@ export function formatDate(str: string | null, showTime: boolean = false) {
         year: "numeric",
         month: "numeric",
         day: "numeric",
-        hour: showTime ? "numeric" : undefined,
-        minute: showTime ? "numeric" : undefined,
+        ...options,
       },
       { locale: i18n.language === "en" ? "en-GB" : "fr" }
     )
