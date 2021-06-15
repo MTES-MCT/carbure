@@ -1,9 +1,9 @@
 import React from "react"
-import format from "date-fns/format"
-import isBefore from "date-fns/isBefore"
-import fr from "date-fns/locale/fr"
 import cl from "clsx"
+import format from "date-fns/intlFormat"
+import isBefore from "date-fns/isBefore"
 import { Trans } from "react-i18next"
+import i18n from "i18n"
 
 import styles from "./settings.module.css"
 import { Box, BoxProps } from "common/components"
@@ -16,9 +16,18 @@ export function formatDate(str: string | null, showTime: boolean = false) {
   }
 
   try {
-    const date = new Date(str)
-    const dateFormat = showTime ? "dd/MM/y HH'h'mm" : "dd/MM/y"
-    const formatted = format(date, dateFormat, { locale: fr })
+    const formatted = format(
+      new Date(str),
+      {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: showTime ? "numeric" : undefined,
+        minute: showTime ? "numeric" : undefined,
+      },
+      { locale: i18n.language === "en" ? "en-GB" : "fr" }
+    )
+
     return formatted
   } catch (e) {
     return "N/A"
