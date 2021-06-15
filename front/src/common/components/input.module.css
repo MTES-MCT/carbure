@@ -48,7 +48,6 @@
   flex-direction: column;
   position: relative;
   font-size: 0.93em;
-  font-style: italic;
   margin-bottom: 12px;
   min-height: 66px;
 }
@@ -78,7 +77,7 @@
 }
 
 .readonlyLabel .labelIcon {
-  background-color: var(--gray-light)
+  background-color: var(--gray-light);
 }
 
 .disabledLabel {
