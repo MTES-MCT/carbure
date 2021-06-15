@@ -32,7 +32,7 @@ const Stats = ({ entity }: StatsProps) => {
   const textBorderWidth = 2
   const screenHeight = document.body.clientHeight
   const textShadow = "6px 6px 3px grey"
-  const iframeShadow = "16px 16px 8px grey"
+  const iframeShadow = "1px 1px 6px grey"
 
   if(EntityType.Operator === "Opérateur"){
   return (
@@ -51,7 +51,6 @@ const Stats = ({ entity }: StatsProps) => {
           title="Stats1"
           src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/7aa76cea-b60a-4e89-9bde-a116abd86018?hash=${entityHash.data?.hash}#hide_parameters=hash`}
           frameBorder="0"
-          border-radius="100"
           width="100%"
           height="100%"
           allowTransparency
