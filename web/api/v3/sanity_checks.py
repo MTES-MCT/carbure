@@ -25,6 +25,7 @@ rules['MP_NOT_CONFIGURED'] = "Matière Première non enregistrée sur votre Site
 rules['BC_NOT_CONFIGURED'] = "Biocarburant non enregistré sur votre Site de Production"
 rules['MISSING_PRODSITE_CERTIFICATE'] = "Aucun certificat n'est associé à ce site de Production"
 rules['UNKNOWN_CLIENT'] = "Le client n'est pas enregistré sur Carbure"
+rules['UNKNOWN_DELIVERY_SITE'] = "Le site de livraison n'est pas enregistré sur Carbure"
 rules['NOT_ALLOWED'] = "Vous ne pouvez pas ajouter les lots d'un producteur inscrit sur CarbuRe"
 rules['DEPRECATED_MP'] = "Les résidus viniques vont disparaître au profit de deux nouvelles matières premières: Marc de raisin et Lies de vin. Merci de mettre à jour vos déclarations en conséquence."
 
@@ -203,6 +204,11 @@ def sanity_check(tx, prefetched_data):
         # ensure certificate exists and is valid
         pass
 
+
+    # transaction is not a MAC, is going to france, and delivery_site is unknown
+    if not tx.is_mac and tx.unknown_delivery_site_country and tx.unknown_delivery_site_country.code_pays == 'FR' and not tx.carbure_delivery_site:
+        is_sane = False
+        errors.append(GenericError(tx=tx, field='client', error="UNKNOWN_DELIVERY_SITE", extra="Site de livraison non reconnu", value=tx.unknown_delivery_site, display_to_creator=True, is_blocking=True))
 
     # transaction is not a MAC, is going to France and client is unknown
     if not tx.is_mac and tx.carbure_delivery_site and tx.carbure_delivery_site.country.code_pays == 'FR' and not tx.carbure_client:
