@@ -169,7 +169,7 @@ const Topbar = ({ entity, settings }: TopbarProps) => {
       )}
 
       <Box row className={styles.topRight}>
-        {/* <LanguageSelection /> */}
+        <LanguageSelection />
 
         <UserMenu settings={settings} entity={entity} />
 
