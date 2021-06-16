@@ -2,6 +2,7 @@ import { Route, Switch, Link } from "common/components/relative-route"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { Main } from "common/components"
 import { Section } from "common/components/section"
+import IframeResizer from "iframe-resizer-react"
 import useAPI from "common/hooks/use-api"
 import api from "common/services/api"
 import { useEffect } from "react"
@@ -30,7 +31,6 @@ const Stats = ({ entity }: StatsProps) => {
   const textWidth = 420
   const textAngle = 15
   const textBorderWidth = 2
-  const screenHeight = document.body.clientHeight
   const textShadow = "6px 6px 3px grey"
   const iframeShadow = "1px 1px 6px grey"
 
@@ -46,15 +46,12 @@ const Stats = ({ entity }: StatsProps) => {
             </h1>
         </div>
       </Section>
-      <Section style={{boxShadow: iframeShadow, height: screenHeight}}>
-        <iframe
+      <Section style={{boxShadow: iframeShadow}}>
+        <IframeResizer
           title="Stats1"
           src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/7aa76cea-b60a-4e89-9bde-a116abd86018?hash=${entityHash.data?.hash}#hide_parameters=hash`}
           frameBorder="0"
-          width="100%"
-          height="100%"
           allowTransparency
-          scrolling="no"
         />
       </Section>
       <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: "black", borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
@@ -66,15 +63,12 @@ const Stats = ({ entity }: StatsProps) => {
           </h1>
         </div>
       </Section>
-      <Section style={{boxShadow: iframeShadow, height: screenHeight}}>
-        <iframe
+      <Section style={{boxShadow: iframeShadow}}>
+        <IframeResizer
           title="Stats2"
           src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/11d88f12-22c4-467a-ad36-f6bf3a924717?hash=${entityHash.data?.hash}#hide_parameters=hash`}
           frameBorder="0"
-          width="100%"
-          height="100%"
           allowTransparency
-          scrolling="no"
         />
       </Section>
       <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: "black", borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
@@ -91,15 +85,12 @@ const Stats = ({ entity }: StatsProps) => {
           <p><b>Choisissez</b> un biocarburant ou une matière première pour voir ses stats</p>
         </span>
       </Section>
-      <Section style={{boxShadow: iframeShadow, height: screenHeight*1.7}}>
-        <iframe
+      <Section style={{boxShadow: iframeShadow}}>
+        <IframeResizer
           title="Stats3"
           src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/d3722672-2e9f-48ad-beb0-29c3864b61ab?hash=${entityHash.data?.hash}#hide_parameters=hash,biocarb,matprem`}
           frameBorder="0"
-          width="100%"
-          height="100%"
           allowTransparency
-          scrolling="no"
         />
       </Section>
       <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: "black", borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
@@ -111,15 +102,12 @@ const Stats = ({ entity }: StatsProps) => {
           </h1>
         </div>
       </Section>
-      <Section style={{boxShadow: iframeShadow, height: screenHeight*0.62}}>
-        <iframe
+      <Section style={{boxShadow: iframeShadow}}>
+        <IframeResizer
           title="Stats4"
           src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/a960a32f-c14f-4835-9f6f-2553e951620c?hash=${entityHash.data?.hash}#hide_parameters=hash`}
           frameBorder="0"
-          width="100%"
-          height="100%"
           allowTransparency
-          scrolling="no"
         />
       </Section>
     </Main>
@@ -158,12 +146,10 @@ const StatsRoutes = ({ entity }: StatsProps) => {
         <Main style={{ padding: "32px 160px" }}>
           <h1>{period}</h1>
           <Section style={{alignSelf: "center"}}>
-            <iframe
+            <IframeResizer
               title="period_details"
               src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/8d158d55-0adf-41e2-b711-6f8e0419b824?hash=${entityHash.data?.hash},period=${period}#hide_parameters=hash,period`}
               frameBorder="0"
-              width="100%"
-              height="2000"
               allowTransparency
             />
           </Section>
