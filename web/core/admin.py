@@ -1,6 +1,7 @@
 # https://django-authtools.readthedocs.io/en/latest/how-to/invitation-email.html
 # allows a manual user creation by an admin, without setting a password
 
+import datetime
 from django.contrib import admin
 from django.contrib import messages
 from django.db.models import Q
@@ -176,6 +177,16 @@ class TransactionAdmin(admin.ModelAdmin):
                    'is_mac', 'is_batch', 'delivery_site_is_in_carbure', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter), ('lot__carbure_production_site', NameSortedRelatedOnlyDropdownFilter), TxPartOfForwardListFilter, UnknownDeliverySiteListFilter, UnknownClientListFilter)
     raw_id_fields = ('lot', 'parent_tx')
     actions = ['rerun_sanity_checks', 'delete_ghosts', 'change_transaction_delivery_site', 'change_transaction_client', 'assign_transaction_certificate', 'change_transaction_delivery_status']
+
+    def get_search_results(self, request, queryset, search_term):
+        queryset, use_distinct = super(TransactionAdmin, self).get_search_results(request, queryset, search_term)
+        try:
+            date = datetime.datetime.strptime(search_term, '%d/%m/%Y').date()
+            queryset |= self.model.objects.filter(Q(lot__unknown_production_site_com_date=date) | Q(lot__carbure_production_site__date_mise_en_service=date))
+        except:
+            pass
+        return queryset, use_distinct
+
 
     def get_lot_period(self, obj):
         return obj.lot.period
