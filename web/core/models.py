@@ -275,6 +275,7 @@ class LotV2(models.Model):
     SOURCE_CHOICES = (('EXCEL', 'Excel'), ('MANUAL', 'Manual'))
 
     period = models.CharField(max_length=64, blank=True, default='')
+    year = models.IntegerField(blank=False, null=False, default=0)
     carbure_id = models.CharField(max_length=64, blank=True, default='')
     # producer
     producer_is_in_carbure = models.BooleanField(default=True)

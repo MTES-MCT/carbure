@@ -286,6 +286,7 @@ def fuse_lots(txs):
     lot = txs[0].lot
     new_lot.volume = total_volume
     new_lot.period = lot.period
+    new_lot.year = lot.year
     new_lot.producer_is_in_carbure = lot.producer_is_in_carbure
     new_lot.carbure_producer = lot.carbure_producer
     new_lot.unknown_producer = lot.unknown_producer
@@ -687,6 +688,7 @@ def fill_delivery_date(lot_row, lot, transaction):
             lot.period = today.strftime('%Y-%m')
             msg = "Format de date incorrect: veuillez entrer une date au format JJ/MM/AAAA (%s)" % (lot_row['delivery_date'])
             tx_errors.append(GenericError(tx=transaction, field='delivery_date', error="INCORRECT_FORMAT_DELIVERY_DATE", extra=msg, value=lot_row['delivery_date'], display_to_creator=True, is_blocking=True))
+    lot.year = int(lot.period[0:4])
     return tx_errors
 
 
