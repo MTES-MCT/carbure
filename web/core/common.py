@@ -250,10 +250,10 @@ def get_prefetched_data(entity=None):
     d['depots'] = {d.depot_id.lstrip('0').upper(): d for d in Depot.objects.all()}
     d['depotsbyname'] = {d.name.upper(): d for d in Depot.objects.all()}
     d['clients'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
-    d['iscc_certificates'] = {c.certificate_id.upper(): c for c in ISCCCertificate.objects.filter(valid_until__gte=lastyear)}
-    d['2bs_certificates'] = {c.certificate_id.upper(): c for c in DBSCertificate.objects.filter(valid_until__gte=lastyear)}
-    d['redcert_certificates'] = {c.certificate_id.upper(): c for c in REDCertCertificate.objects.filter(valid_until__gte=lastyear)}
-    d['sn_certificates'] = [c.certificate_id.upper() for c in SNCertificate.objects.filter(valid_until__gte=lastyear)]
+    d['certificates'] = {c.certificate_id.upper(): c for c in ISCCCertificate.objects.filter(valid_until__gte=lastyear)}
+    d['certificates'].update({c.certificate_id.upper(): c for c in DBSCertificate.objects.filter(valid_until__gte=lastyear)})
+    d['certificates'].update({c.certificate_id.upper(): c for c in REDCertCertificate.objects.filter(valid_until__gte=lastyear)})
+    d['certificates'].update({c.certificate_id.upper(): c for c in SNCertificate.objects.filter(valid_until__gte=lastyear)})
     return d
 
 
