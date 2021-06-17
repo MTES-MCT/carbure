@@ -1,11 +1,11 @@
 import datetime
 from django import db
 from core.models import GenericError, Entity
-
 # definitions
 
 oct2015 = datetime.date(year=2015, month=10, day=5)
 jan2021 = datetime.date(year=2021, month=1, day=1)
+future = datetime.date.today() + datetime.timedelta(days=15) # docker containers are restarted everyday - not an issue
 
 rules = {}
 rules['GHG_REDUC_INF_50'] = "La réduction de gaz à effet de serre est inférieure à 50%, il n'est pas possible d'enregistrer ce lot dans CarbuRe"
@@ -28,6 +28,16 @@ rules['UNKNOWN_CLIENT'] = "Le client n'est pas enregistré sur Carbure"
 rules['UNKNOWN_DELIVERY_SITE'] = "Le site de livraison n'est pas enregistré sur Carbure"
 rules['NOT_ALLOWED'] = "Vous ne pouvez pas ajouter les lots d'un producteur inscrit sur CarbuRe"
 rules['DEPRECATED_MP'] = "Les résidus viniques vont disparaître au profit de deux nouvelles matières premières: Marc de raisin et Lies de vin. Merci de mettre à jour vos déclarations en conséquence."
+
+rules['NO_PRODSITE_CERT'] = "Certificat du site de production absent"
+rules['UNKNOWN_PRODSITE_CERT'] = "Certificat de site de production inconnu"
+rules['EXPIRED_PRODSITE_CERT'] = "Certificat du site de production expiré"
+rules['NO_SUPPLIER_CERT'] = "Certificat du fournisseur original absent"
+rules['UNKNOWN_SUPPLIER_CERT'] = "Certificat de fournisseur inconnu"
+rules['EXPIRED_SUPPLIER_CERT'] = "Certificat du fournisseur expiré"
+rules['NO_VENDOR_CERT'] = "Certificat du fournisseur absent"
+rules['UNKNOWN_VENDOR_CERT'] = "Certificat inconnu"
+rules['EXPIRED_VENDOR_CERT'] = "Certificat du fournisseur expiré"
 
 
 def generic_error(error, **kwargs):
@@ -54,6 +64,61 @@ def bulk_sanity_checks(txs, prefetched_data, background=True):
     GenericError.objects.bulk_create(errors, batch_size=1000)
     return results
 
+
+def check_certificates(prefetched_data, tx, errors):
+    # PRODUCTION SITE CERTIFICATES
+    if tx.lot.production_site_is_in_carbure:
+        if not tx.lot.carbure_production_site_reference:
+            errors.append(generic_error(error='NO_PRODSITE_CERT', tx=tx, field='carbure_production_site_reference'))
+        else:
+            cert = tx.lot.carbure_production_site_reference
+            if cert not in prefetched_data['certificates']:
+                errors.append(generic_error(error='UNKNOWN_PRODSITE_CERT', tx=tx, field='carbure_production_site_reference'))
+            else:
+                # certificate is set and exists. is it valid?
+                c = prefetched_data['certificates'][cert]
+                if c.valid_until < tx.delivery_date:
+                    errors.append(generic_error(error='EXPIRED_PRODSITE_CERT', tx=tx, field='carbure_production_site_reference'))
+    else:
+        if not tx.lot.unknown_production_site_reference:
+            errors.append(generic_error(error='NO_PRODSITE_CERT', tx=tx, field='unknown_production_site_reference'))
+        else:
+            cert = tx.lot.unknown_production_site_reference
+            if cert not in prefetched_data['certificates']:
+                errors.append(generic_error(error='UNKNOWN_PRODSITE_CERT', tx=tx, field='unknown_production_site_reference'))
+            else:
+                # certificate is set and exists. is it valid?
+                c = prefetched_data['certificates'][cert]
+                if c.valid_until < tx.delivery_date:
+                    errors.append(generic_error(error='EXPIRED_PRODSITE_CERT', tx=tx, field='unknown_production_site_reference'))            
+
+    # SUPPLIER CERT
+    if not tx.lot.producer_is_in_carbure:
+        if not tx.lot.unknown_supplier_certificate:
+            errors.append(generic_error(error='NO_SUPPLIER_CERT', tx=tx, field='unknown_supplier_certificate'))
+        else:
+            cert = tx.lot.unknown_supplier_certificate
+            if cert not in prefetched_data['certificates']:
+                errors.append(generic_error(error='UNKNOWN_SUPPLIER_CERT', tx=tx, field='unknown_supplier_certificate'))
+            else:
+                # certificate is set and exists. is it valid?
+                c = prefetched_data['certificates'][cert]
+                if c.valid_until < tx.delivery_date:
+                    errors.append(generic_error(error='EXPIRED_SUPPLIER_CERT', tx=tx, field='unknown_supplier_certificate'))  
+
+    # VENDOR CERT
+    if not tx.carbure_vendor_certificate:
+        errors.append(generic_error(error='NO_VENDOR_CERT', tx=tx, field='carbure_vendor_certificate'))
+    else:
+        cert = tx.carbure_vendor_certificate
+        if cert not in prefetched_data['certificates']:
+            errors.append(generic_error(error='UNKNOWN_VENDOR_CERT', tx=tx, field='carbure_vendor_certificate'))
+        else:
+            # certificate is set and exists. is it valid?
+            c = prefetched_data['certificates'][cert]
+            if c.valid_until < tx.delivery_date:
+                errors.append(generic_error(error='EXPIRED_VENDOR_CERT', tx=tx, field='carbure_vendor_certificate'))  
+    return errors
 
 def sanity_check(tx, prefetched_data):
     lot = tx.lot
@@ -187,11 +252,8 @@ def sanity_check(tx, prefetched_data):
             if lot.biocarburant not in bcs:
                 errors.append(generic_error(error='BC_NOT_CONFIGURED', tx=tx, display_to_recipient=False, field='biocarburant_code'))
 
-    if lot.carbure_production_site:
-        # certificates
-        certificates = lot.carbure_production_site.productionsitecertificate_set.all()
-        if certificates.count() == 0:
-            errors.append(generic_error(error='MISSING_PRODSITE_CERTIFICATE', tx=tx, field='carbure_production_site_reference'))
+    # CERTIFICATES CHECK
+    check_certificates(prefetched_data, tx, errors)
 
     if not tx.client_is_in_carbure and not tx.is_mac:
         errors.append(generic_error(error='UNKNOWN_CLIENT', tx=tx, display_to_recipient=False, field="client"))
@@ -200,10 +262,7 @@ def sanity_check(tx, prefetched_data):
         is_sane = False
         errors.append(generic_error(error='NOT_ALLOWED', tx=tx, is_blocking=True))
 
-    if tx.carbure_client and tx.carbure_client.entity_type == Entity.OPERATOR:
-        # ensure certificate exists and is valid
-        pass
-
+        
 
     # transaction is not a MAC, is going to france, and delivery_site is unknown
     if not tx.is_mac and tx.unknown_delivery_site_country and tx.unknown_delivery_site_country.code_pays == 'FR' and not tx.carbure_delivery_site:
@@ -214,6 +273,12 @@ def sanity_check(tx, prefetched_data):
     if not tx.is_mac and tx.carbure_delivery_site and tx.carbure_delivery_site.country.code_pays == 'FR' and not tx.carbure_client:
         is_sane = False
         errors.append(GenericError(tx=tx, field='client', error="UNKNOWN_CLIENT", extra="Client non reconnu", value=tx.unknown_client, display_to_creator=True, is_blocking=True))
+
+    if tx.delivery_date > future:
+        is_sane = False
+        errors.append(GenericError(tx=tx, field='delivery_date', error="DELIVERY_IN_THE_FUTURE", extra="La date de livraison est dans le futur", value=tx.delivery_date, display_to_creator=True, is_blocking=True))
+
+
     return lot_valid, tx_valid, is_sane, errors
 
 
