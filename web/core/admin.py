@@ -355,27 +355,27 @@ class TransactionAdmin(admin.ModelAdmin):
 
 class TransactionCommentAdmin(admin.ModelAdmin):
     list_display = ('entity', 'tx', 'comment', 'topic')
-    search_fields = ('entity', 'tx', 'comment')
+    search_fields = ('entity__name', 'tx__lot__carbure_id', 'comment')
     list_filter = ('topic', )
     raw_id_fields = ('tx', )
 
 
 class GenericErrorAdmin(admin.ModelAdmin):
     list_display = ('tx', 'error', 'is_blocking', 'display_to_creator', 'display_to_recipient')
-    search_fields = ('tx', 'error', 'extra')
+    search_fields = ('tx__lot__carbure_id', 'error', 'extra')
     list_filter = ('error', 'is_blocking', )
     raw_id_fields = ('tx', )
 
 
 class SustainabilityDeclarationAdmin(admin.ModelAdmin):
     list_display = ('entity', 'period', 'declared', 'checked', 'deadline')
-    search_fields = ('entity', )
+    search_fields = ('entity__name', )
     list_filter = ('entity', 'period', 'declared', 'checked')
 
 
 class EntityDepotAdmin(admin.ModelAdmin):
     list_display = ('entity', 'depot', 'blending_is_outsourced',)
-    search_fields = ('entity', 'depot', )
+    search_fields = ('entity__name', 'depot__name', )
     list_filter = ('blending_is_outsourced', )
 
 

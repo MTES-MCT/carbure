@@ -25,11 +25,12 @@ class SNCertificateAdmin(admin.ModelAdmin):
 
 class SNCertificateScopeAdmin(admin.ModelAdmin):
     list_display = ('certificate', 'scope',)
+    search_fields = ('certificate__certificate_id', )
 
 
 class EntitySNTradingCertificateAdmin(admin.ModelAdmin):
     list_display = ('entity', 'certificate',)
-    search_fields = ('entity', 'certificate',)
+    search_fields = ('entity__name', 'certificate__certificate_id',)
 
 
 class ISCCScopeAdmin(admin.ModelAdmin):
@@ -61,7 +62,7 @@ class DBSScopeAdmin(admin.ModelAdmin):
 
 class DBSCertificateScopeAdmin(admin.ModelAdmin):
     list_display = ('certificate', 'scope')
-    search_fields = ('certificate', 'scope')
+    search_fields = ('certificate__certificate_id', )
     raw_id_fields = ('certificate', )
 
 
@@ -94,28 +95,28 @@ class REDCertCertificateScopeAdmin(admin.ModelAdmin):
 
 class REDCertCertificateBiomassAdmin(admin.ModelAdmin):
     list_display = ('certificate', 'biomass')
-    search_fields = ('certificate', 'biomass')
+    search_fields = ('certificate__certificate_id', 'biomass__code')
     list_filter = ('biomass', )
 
 
 class EntityISCCTradingCertificateAdmin(admin.ModelAdmin):
     list_display = ('entity', 'certificate',)
-    search_fields = ('entity', 'certificate',)
+    search_fields = ('entity__name', 'certificate__certificate_id',)
 
 
 class EntityDBSTradingCertificateAdmin(admin.ModelAdmin):
     list_display = ('entity', 'certificate',)
-    search_fields = ('entity', 'certificate',)
+    search_fields = ('entity__name', 'certificate__certificate_id',)
 
 
 class EntityREDCertTradingCertificateAdmin(admin.ModelAdmin):
     list_display = ('entity', 'certificate',)
-    search_fields = ('entity', 'certificate',)
+    search_fields = ('entity__name', 'certificate__certificate_id',)
 
 
 class ProductionSiteCertificateAdmin(admin.ModelAdmin):
-    list_display = ('production_site', 'type', 'certificate_iscc', 'certificate_2bs', 'certificate_redcert')
-    search_fields = ('production_site', 'certificate_iscc', 'certificate_2bs', 'certificate_redcert')
+    list_display = ('production_site', 'type', 'certificate_iscc', 'certificate_2bs', 'certificate_redcert', 'certificate_sn')
+    search_fields = ('production_site__name', )
     list_filter = ('type',)
     
 

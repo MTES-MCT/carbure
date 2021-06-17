@@ -72,22 +72,4 @@ class ProductionSiteOutput(models.Model):
         verbose_name = 'Site de Production - Biocarburant'
         verbose_name_plural = 'Sites de Production - Biocarburants'
 
-# deprecated
-class ProducerCertificate(models.Model):
-    CERTIF_STATUS_CHOICES = [("Pending", "En Attente de validation"), ("Valid", "Validé"), ("Expired", "Expiré")]
-    producer = models.ForeignKey(Entity, on_delete=models.CASCADE)
-    production_site = models.ForeignKey(ProductionSite, null=True, on_delete=models.CASCADE)
-    expiration = models.DateField()
-    date_added = models.DateField(auto_now_add=True)
-    certificate = models.FileField(null=True, blank=True)
-    status = models.CharField(max_length=32, choices=CERTIF_STATUS_CHOICES, default="Pending")
-    certificate_id = models.CharField(max_length=64, null=False, blank=False)
-
-    def __str__(self):
-        return self.certificate_id
-
-    class Meta:
-        db_table = 'producer_certificates'
-        verbose_name = 'Certificat'
-        verbose_name_plural = 'Certificats'
 
