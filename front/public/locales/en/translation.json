@@ -430,6 +430,8 @@
   "Refuser le lot": "Reject batch",
   "Épingler le lot": "Pin batch",
   "Ignorer le lot": "Ignore batch",
+  "Signaler ces lots aux auditeurs": "Notify these batches to auditors",
+  "Signaler ces lots à l'administration": "Notify these batches to the administration",
   "À envoyer": "To send",
   "Transféré": "Transferred",
   "En stock": "In stock",

@@ -35,8 +35,8 @@ export const PinPrompt = ({
 
   const label =
     role === "admin"
-      ? t("Signaler ce lot aux auditeurs")
-      : t("Signaler ce lot à l'administration")
+      ? t("Signaler ces lots aux auditeurs")
+      : t("Signaler ces lots à l'administration")
 
   return (
     <Dialog onResolve={onResolve}>
