@@ -112,18 +112,26 @@ export default function useAuditLots(
   }
 
   async function highlightLotSelection() {
-    const shouldHide = await confirm(
-      t("Épingler la sélection"),
-      t(
-        "Voulez-vous mettre les lots sélectionnés de côté pour les étudier plus tard  ?"
-      )
-    )
+    if (!entity) return false
 
-    if (entity !== null && shouldHide) {
-      await notify(resolveHighlightLot(entity.id, selection.selected))
+    const shouldHighlight = await prompt<boolean>((resolve) => (
+      <PinPrompt
+        role="auditor"
+        title={t("Épingler la sélection")}
+        description={t(
+          "Voulez-vous mettre les lots sélectionnés de côté pour les étudier plus tard  ?"
+        )}
+        onResolve={resolve}
+      />
+    ))
+
+    if (typeof shouldHighlight === "boolean") {
+      await notify(
+        resolveHighlightLot(entity.id, selection.selected, shouldHighlight)
+      )
     }
 
-    return shouldHide
+    return Boolean(shouldHighlight)
   }
 
   return {

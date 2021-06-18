@@ -678,6 +678,7 @@ def highlight_alerts(request):
 @is_admin
 def highlight_transactions(request):
     tx_ids = request.POST.getlist('tx_ids', False)
+    notify_auditor = request.POST.get('notify_auditor', False)
 
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
@@ -688,6 +689,8 @@ def highlight_transactions(request):
         tx.highlighted_by_admin = not tx.highlighted_by_admin
         if tx.highlighted_by_admin:
             tx.hidden_by_admin = False
+        if notify_auditor == 'true':
+            tx.highlighted_by_auditor = True
         tx.save()
 
     return JsonResponse({'status': 'success'})
