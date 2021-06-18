@@ -93,10 +93,6 @@ export function normalizeFilters(snapshot: any, t: TFunction): Snapshot {
     }
 
     if (key in snapshot.filters) {
-      snapshot.filters[key] = snapshot.filters[key]
-        .filter(Boolean)
-        .sort((a: Option, b: Option) => a.label.localeCompare(b.label, "fr"))
-
       if (key === Filters.Biocarburants) {
         snapshot.filters[key] = snapshot.filters[key].map((bc: any) => ({
           value: bc.value,
@@ -117,6 +113,10 @@ export function normalizeFilters(snapshot: any, t: TFunction): Snapshot {
           label: t(ct.value, { ns: "countries" }),
         }))
       }
+
+      snapshot.filters[key] = snapshot.filters[key]
+        .filter(Boolean)
+        .sort((a: Option, b: Option) => a.label.localeCompare(b.label, "fr"))
     }
   })
 
