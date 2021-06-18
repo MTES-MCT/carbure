@@ -114,6 +114,34 @@ export function normalizeFilters(snapshot: any, t: TFunction): Snapshot {
         }))
       }
 
+      if (key === Filters.DeliveryStatus) {
+        snapshot.filters[key] = snapshot.filters[key].map((ct: any) => ({
+          value: ct.value,
+          label: t(ct.label, { ns: "translation" }),
+        }))
+      }
+
+      if (key === Filters.Errors) {
+        snapshot.filters[key] = snapshot.filters[key].map((ct: any) => ({
+          value: ct.value,
+          label: t(ct.value, { ns: "errors" }),
+        }))
+      }
+
+      if (
+        [
+          Filters.Forwarded,
+          Filters.Mac,
+          Filters.HiddenByAdmin,
+          Filters.HiddenByAuditor,
+        ].includes(key)
+      ) {
+        snapshot.filters[key] = snapshot.filters[key].map((ct: any) => ({
+          value: ct.value,
+          label: t(ct.label, { ns: "translation" }),
+        }))
+      }
+
       snapshot.filters[key] = snapshot.filters[key]
         .filter(Boolean)
         .sort((a: Option, b: Option) => a.label.localeCompare(b.label, "fr"))
