@@ -383,7 +383,7 @@ class LotTransaction(models.Model):
     FIXED = 'AA'
     FROZEN = 'F'
 
-    DELIVERY_STATUS = ((PENDING, 'En Attente'), (ACCEPTED, 'Accepté'), (REJECTED, 'Refusé'), (TOFIX, 'À corriger'), (FIXED, 'Corrigé'), (FROZEN, 'Déclaré'))
+    DELIVERY_STATUS = ((PENDING, 'En attente'), (ACCEPTED, 'Accepté'), (REJECTED, 'Refusé'), (TOFIX, 'À corriger'), (FIXED, 'Corrigé'), (FROZEN, 'Déclaré'))
     lot = models.ForeignKey(LotV2, null=False, blank=False, on_delete=models.CASCADE, related_name='tx_lot')
 
     # vendor / producer
@@ -431,7 +431,7 @@ class LotTransaction(models.Model):
     highlighted_by_admin = models.BooleanField(default=False)
     highlighted_by_auditor = models.BooleanField(default=False)
 
-    
+
     def __str__(self):
         return str(self.id)
 
@@ -463,7 +463,7 @@ class LotTransaction(models.Model):
             models.Index(fields=["is_mac"]),
             models.Index(fields=["carbure_delivery_site"]),
             models.Index(fields=["unknown_delivery_site"]),
-            
+
         ]
 
 
@@ -646,7 +646,7 @@ class EmailNotification(models.Model):
     LOT_PENDING = "LOT_PENDING"
     DEADLINE_APPROACHING = "DEADLINE_APPROACHING"
     DOCUMENTATION_REQUESTED = "DOCUMENTATION_REQUESTED"
-    NOTIFICATION_TYPE = ((CORRECTION_REQUEST, CORRECTION_REQUEST), (CORRECTION_DONE, CORRECTION_DONE), (LOT_CHANGED, LOT_CHANGED), 
+    NOTIFICATION_TYPE = ((CORRECTION_REQUEST, CORRECTION_REQUEST), (CORRECTION_DONE, CORRECTION_DONE), (LOT_CHANGED, LOT_CHANGED),
                          (LOT_REJECTED, LOT_REJECTED), (LOT_PENDING, LOT_PENDING), (DEADLINE_APPROACHING, DEADLINE_APPROACHING),
                          (DOCUMENTATION_REQUESTED, DOCUMENTATION_REQUESTED))
 
