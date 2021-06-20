@@ -49,8 +49,9 @@ def get_certificateData(nonce, recordsTotal, test, latest):
 
 def cleanCertificateData(data):
     allData = pd.concat(data)
-    allData.columns = ['certificate', 'certificate_holder', 'scope', 'raw_material',
-                        'addons', 'valid_from', 'valid_until', 'issuing_cb', 'map', 'certificate_report', 'audit_report', 'cert_status']
+    allData.columns = ['cert_status', 'certificate', 'certificate_holder', 'scope',
+                       'raw_material', 'addons', 'valid_from', 'valid_until', 'issuing_cb',
+                       'map', 'certificate_report', 'audit_report', "unknown_column"]
 
     # extraction de la balise HTML
     allData['certificate_holder'] = allData['certificate_holder'].str.replace('.*title="(.*)">.*', '\\1')
