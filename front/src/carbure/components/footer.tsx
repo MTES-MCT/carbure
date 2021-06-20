@@ -70,7 +70,11 @@ const Footer = () => (
           </a>
         </li>
         <li>
-          <a href="https://metabase.carbure.beta.gouv.fr/public/dashboard/a9c045a5-c2fb-481a-ab85-f55bce8ae3c0">
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://metabase.carbure.beta.gouv.fr/public/dashboard/98aaecc5-4899-4f6f-8649-fa906977e73b"
+          >
             <Trans>Statistiques</Trans>
           </a>
         </li>

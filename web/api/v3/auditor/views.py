@@ -152,6 +152,7 @@ def get_snapshot(request, *args, **kwargs):
 @check_rights('entity_id')
 def highlight_transactions(request, *args, **kwargs):
     tx_ids = request.POST.getlist('tx_ids', False)
+    notify_admin = request.POST.get('notify_admin', False)
 
     if not tx_ids:
         return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=400)
@@ -160,6 +161,8 @@ def highlight_transactions(request, *args, **kwargs):
 
     for tx in txs.iterator():
         tx.highlighted_by_auditor = not tx.highlighted_by_auditor
+        if notify_admin == 'true':
+            tx.highlighted_by_admin = True
         tx.save()
 
     return JsonResponse({'status': 'success'})

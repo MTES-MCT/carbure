@@ -4,10 +4,11 @@ import { EntitySelection } from "carbure/hooks/use-entity"
 import * as api from "transactions/api"
 import useAPI from "common/hooks/use-api"
 
-import { confirm } from "common/components/dialog"
+import { confirm, prompt } from "common/components/dialog"
 import { useNotificationContext } from "common/components/notifications"
 import { Transaction } from "common/types"
 import { TransactionSelection } from "../query/use-selection"
+import { PinPrompt } from "transactions/components/pin"
 
 export interface LotAuditor {
   loading: boolean
@@ -77,36 +78,60 @@ export default function useAuditLots(
   }
 
   async function highlightLot(tx: Transaction) {
-    const shouldHighlight = tx.highlighted_by_auditor
-      ? await confirm(
-          t("Désépingler le lot"),
-          t("Voulez-vous retirer ce lot de la liste des lots mis de côté ?")
-        )
-      : await confirm(
-          t("Épingler ce lot"),
-          t("Voulez-vous mettre ce lot de côté pour l'étudier plus tard ?")
-        )
+    if (entity === null) return false
 
-    if (entity !== null && shouldHighlight) {
-      await notify(resolveHighlightLot(entity.id, [tx.id]))
+    if (tx.highlighted_by_auditor) {
+      const shouldHighlight = await confirm(
+        t("Désépingler le lot"),
+        t("Voulez-vous retirer ce lot de la liste des lots mis de côté ?")
+      )
+
+      if (shouldHighlight) {
+        await notify(resolveHighlightLot(entity.id, [tx.id]))
+      }
+
+      return Boolean(shouldHighlight)
+    } else {
+      const shouldHighlight = await prompt<boolean>((resolve) => (
+        <PinPrompt
+          role="auditor"
+          title={t("Épingler ce lot")}
+          description={t(
+            "Voulez-vous mettre ce lot de côté pour l'étudier plus tard ?"
+          )}
+          onResolve={resolve}
+        />
+      ))
+
+      if (typeof shouldHighlight === "boolean") {
+        await notify(resolveHighlightLot(entity.id, [tx.id], shouldHighlight))
+      }
+
+      return Boolean(shouldHighlight)
     }
-
-    return shouldHighlight
   }
 
   async function highlightLotSelection() {
-    const shouldHide = await confirm(
-      t("Épingler la sélection"),
-      t(
-        "Voulez-vous mettre les lots sélectionnés de côté pour les étudier plus tard  ?"
-      )
-    )
+    if (!entity) return false
 
-    if (entity !== null && shouldHide) {
-      await notify(resolveHighlightLot(entity.id, selection.selected))
+    const shouldHighlight = await prompt<boolean>((resolve) => (
+      <PinPrompt
+        role="auditor"
+        title={t("Épingler la sélection")}
+        description={t(
+          "Voulez-vous mettre les lots sélectionnés de côté pour les étudier plus tard  ?"
+        )}
+        onResolve={resolve}
+      />
+    ))
+
+    if (typeof shouldHighlight === "boolean") {
+      await notify(
+        resolveHighlightLot(entity.id, selection.selected, shouldHighlight)
+      )
     }
 
-    return shouldHide
+    return Boolean(shouldHighlight)
   }
 
   return {
