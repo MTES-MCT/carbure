@@ -118,6 +118,7 @@ const Stats = ({ entity }: StatsProps) => {
       return null
   }
 }
+
 const StatsRoutes = ({ entity }: StatsProps) => {
   const [entityHash, getEntityHash] = useAPI(getHash);
   useEffect (() => {
