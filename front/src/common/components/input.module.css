@@ -76,6 +76,10 @@
   background-color: var(--white);
 }
 
+.labelWrapper .labelIcon:not(svg) {
+  padding-left: 4px;
+}
+
 .readonlyLabel .labelIcon {
   background-color: var(--gray-light);
 }
