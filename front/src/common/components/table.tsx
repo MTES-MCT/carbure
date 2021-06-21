@@ -51,24 +51,20 @@ export function Actions<T>(
     className: styles.actionColumn,
 
     render: (cell) => (
-      <Box className={styles.actionCell}>
-        <ChevronRight className={styles.actionArrow} />
-
-        <Box row className={styles.actionList}>
-          {/* if config is a function, create actions dynamically */}
-          {(typeof config === "function" ? config(cell) : config).map(
-            ({ icon: Icon, title, action }, i) => (
-              <Icon
-                key={i}
-                title={title}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  action(cell)
-                }}
-              />
-            )
-          )}
-        </Box>
+      <Box row className={styles.actionCell}>
+        {/* if config is a function, create actions dynamically */}
+        {(typeof config === "function" ? config(cell) : config).map(
+          ({ icon: Icon, title, action }, i) => (
+            <Icon
+              key={i}
+              title={title}
+              onClick={(e) => {
+                e.stopPropagation()
+                action(cell)
+              }}
+            />
+          )
+        )}
       </Box>
     ),
   }
