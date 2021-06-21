@@ -139,8 +139,6 @@ const Carbure = () => {
   const app = useApp()
   const { settings, getDefaultEntity } = app
 
-  useTranslation() // simple call so we rerender the whole app when the selected language changes
-
   if (settings.error === "User not verified") {
     return <Exit to="/accounts/login" />
   }
