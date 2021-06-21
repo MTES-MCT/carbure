@@ -18,6 +18,9 @@ export const TrackerProvider = (props: any) => {
   const value = () => window._paq ?? []
 
   useLayoutEffect(() => {
+    // only track production
+    if (window.location.hostname !== "carbure.beta.gouv.fr") return
+
     const tracker = value()
     tracker.push(["setCustomUrl", window.location.href])
     tracker.push(["trackPageView"])
