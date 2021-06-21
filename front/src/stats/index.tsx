@@ -34,7 +34,7 @@ const Stats = ({ entity }: StatsProps) => {
   const textShadow = "6px 6px 3px grey"
   const iframeShadow = "1px 1px 6px grey"
 
-  if(EntityType.Operator === "Opérateur"){
+  if(entity?.entity_type === EntityType.Operator) {
   return (
     <Main style={{padding: "32px 120px"}}>
       <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: "black", borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
@@ -111,16 +111,13 @@ const Stats = ({ entity }: StatsProps) => {
         />
       </Section>
     </Main>
-  )}
-  else if(EntityType.Producer){
-    return (
-    <h1>JeSuisProcducteur</h1>
-  )}
-  else {
-    return null;
+  )
+  } else if(entity?.entity_type === EntityType.Producer) {
+      return <h1>JeSuisProducteur</h1>
+  } else {
+      return null
   }
 }
-
 const StatsRoutes = ({ entity }: StatsProps) => {
   const [entityHash, getEntityHash] = useAPI(getHash);
   useEffect (() => {
