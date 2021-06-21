@@ -1,23 +1,23 @@
-.checkboxColumn {
+div.checkboxColumn {
   flex: unset;
   justify-content: center;
   padding: 0;
 }
 
-.emptyColumn {
+div.emptyColumn {
   width: 54px;
 }
 
-.paddingColumn {
+div.paddingColumn {
   flex: 0 0 24px;
 }
 
-.narrowColumn {
+div.narrowColumn {
   flex: 0.4;
 }
 
-.statusColumn,
-.dateColumn {
+div.statusColumn,
+div.dateColumn {
   flex: 0.5;
 }
 
