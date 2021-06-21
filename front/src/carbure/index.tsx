@@ -1,4 +1,4 @@
-import { Trans, useTranslation } from "react-i18next"
+import { Trans } from "react-i18next"
 
 import { AppHook, useApp } from "./hooks/use-app"
 import { EntityType, LotStatus } from "common/types"

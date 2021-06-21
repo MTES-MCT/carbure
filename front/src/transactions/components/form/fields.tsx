@@ -35,6 +35,7 @@ import {
   DialogButtons,
 } from "common/components/dialog"
 import styles from "./fields.module.css"
+import { formatDate } from "settings/components/common"
 
 function idt<T>(s: T) {
   return s
@@ -115,7 +116,8 @@ const CertificateInfoPrompt = ({
             <Trans>Période de validité</Trans>:{" "}
           </b>
           <span>
-            {certificate.valid_from} → {certificate.valid_until}
+            {formatDate(certificate.valid_from)} →{" "}
+            {formatDate(certificate.valid_until)}
           </span>
         </li>
       </ul>
