@@ -95,10 +95,10 @@ export function updateProductionSite(
 export function deleteProductionSite(
   entity_id: number | undefined,
   productionSiteID: number
-  ) {
+) {
   return api.post("/settings/delete-production-site", {
-  entity_id: entity_id,
-  production_site_id: productionSiteID,
+    entity_id: entity_id,
+    production_site_id: productionSiteID,
   })
 }
 
@@ -407,4 +407,16 @@ export function revokeUserRights(entity_id: number, email: string) {
 
 export function acceptUserRightsRequest(entity_id: number, request_id: number) {
   return api.post("/settings/accept-user", { entity_id, request_id })
+}
+
+export function setDefaultCertificate(
+  entity_id: number,
+  certificate_id: string,
+  certificate_type: string
+) {
+  return api.post("/settings/set-default-certificate", {
+    entity_id,
+    certificate_id,
+    certificate_type,
+  })
 }
