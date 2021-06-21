@@ -9,6 +9,7 @@ import useAPI from "common/hooks/use-api"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { ProductionSiteSettingsHook } from "./use-production-sites"
 import { find2BSCertificates } from "common/api"
+import { CompanySettingsHook } from "./use-company"
 
 export interface DBSCertificateSettingsHook {
   isEmpty: boolean
@@ -21,7 +22,8 @@ export interface DBSCertificateSettingsHook {
 
 export default function use2BSCertificates(
   entity: EntitySelection,
-  productionSites: ProductionSiteSettingsHook
+  productionSites: ProductionSiteSettingsHook,
+  company: CompanySettingsHook
 ): DBSCertificateSettingsHook {
   const { t } = useTranslation()
   const notifications = useNotificationContext()
@@ -46,6 +48,7 @@ export default function use2BSCertificates(
     if (typeof entityID !== "undefined") {
       resolveGet2BS(entityID)
       productionSites.refresh && productionSites.refresh()
+      company.refresh && company.refresh()
     }
   }
 
