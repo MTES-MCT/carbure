@@ -411,6 +411,13 @@ export const okEntityRights = rest.get(
   }
 )
 
+export const okSelfCertificates = rest.get(
+  "http://localhost/api/v3/settings/get-my-certificates",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success", data: [] }))
+  }
+)
+
 export default setupServer(
   okSettings,
   okEnableMac,
@@ -451,5 +458,6 @@ export default setupServer(
   okEntityRights,
   okTranslations,
   okErrorsTranslations,
-  okFieldsTranslations
+  okFieldsTranslations,
+  okSelfCertificates
 )

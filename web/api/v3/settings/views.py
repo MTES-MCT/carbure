@@ -528,6 +528,9 @@ def delete_iscc_certificate(request, *args, **kwargs):
         certificate = ISCCCertificate.objects.get(certificate_id=certificate_id)
         EntityISCCTradingCertificate.objects.get(entity=entity, certificate=certificate).delete()
         ProductionSiteCertificate.objects.filter(entity=entity, certificate_iscc__certificate=certificate).delete()
+        if entity.default_certificate == certificate.certificate_id:
+            entity.default_certificate = ''
+            entity.save()
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not delete requested certificate"}, status=400)
 
@@ -543,6 +546,9 @@ def delete_2bs_certificate(request, *args, **kwargs):
         certificate = DBSCertificate.objects.get(certificate_id=certificate_id)
         EntityDBSTradingCertificate.objects.get(entity=entity, certificate=certificate).delete()
         ProductionSiteCertificate.objects.filter(entity=entity, certificate_2bs__certificate=certificate).delete()
+        if entity.default_certificate == certificate.certificate_id:
+            entity.default_certificate = ''
+            entity.save()
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not delete requested certificate"}, status=400)
 
@@ -558,6 +564,9 @@ def delete_redcert_certificate(request, *args, **kwargs):
         certificate = REDCertCertificate.objects.get(certificate_id=certificate_id)
         EntityREDCertTradingCertificate.objects.get(entity=entity, certificate=certificate).delete()
         ProductionSiteCertificate.objects.filter(entity=entity, certificate_redcert__certificate=certificate).delete()
+        if entity.default_certificate == certificate.certificate_id:
+            entity.default_certificate = ''
+            entity.save()
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not delete requested certificate"}, status=400)
 
@@ -573,6 +582,9 @@ def delete_sn_certificate(request, *args, **kwargs):
         certificate = SNCertificate.objects.get(certificate_id=certificate_id)
         EntitySNTradingCertificate.objects.get(entity=entity, certificate=certificate).delete()
         ProductionSiteCertificate.objects.filter(entity=entity, certificate_sn__certificate=certificate).delete()
+        if entity.default_certificate == certificate.certificate_id:
+            entity.default_certificate = ''
+            entity.save()
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not delete requested certificate"}, status=400)
 
@@ -650,7 +662,7 @@ def set_default_certificate(request, *args, **kwargs):
     if certificate_type == 'ISCC':
         try:
             certid = EntityISCCTradingCertificate.objects.get(entity=entity, certificate__certificate_id=certificate_id)
-            entity.default_certificate = certid
+            entity.default_certificate = certid.certificate.certificate_id
             entity.save()
             return JsonResponse({'status': 'success'})
         except:
@@ -658,7 +670,7 @@ def set_default_certificate(request, *args, **kwargs):
     elif certificate_type == '2BS':
         try:
             certid = EntityDBSTradingCertificate.objects.get(entity=entity, certificate__certificate_id=certificate_id)
-            entity.default_certificate = certid
+            entity.default_certificate = certid.certificate.certificate_id
             entity.save()
             return JsonResponse({'status': 'success'})
         except:
@@ -666,7 +678,7 @@ def set_default_certificate(request, *args, **kwargs):
     elif certificate_type == 'REDCERT':
         try:
             certid = EntityREDCertTradingCertificate.objects.get(entity=entity, certificate__certificate_id=certificate_id)
-            entity.default_certificate = certid
+            entity.default_certificate = certid.certificate.certificate_id
             entity.save()
             return JsonResponse({'status': 'success'})
         except:
@@ -674,7 +686,7 @@ def set_default_certificate(request, *args, **kwargs):
     elif certificate_type == 'SN':
         try:
             certid = EntitySNTradingCertificate.objects.get(entity=entity, certificate__certificate_id=certificate_id)
-            entity.default_certificate = certid
+            entity.default_certificate = certid.certificate.certificate_id
             entity.save()
             return JsonResponse({'status': 'success'})
         except:
@@ -831,7 +843,7 @@ def request_entity_access(request):
     UserRightsRequests.objects.update_or_create(user=request.user, entity=entity, defaults={'comment': comment, 'role': role, 'status':'PENDING'})
 
     email_subject = "Carbure - Demande d'accès"
-    message = """ 
+    message = """
     Bonjour,
     Un utilisateur vient de faire une demande d'accès à CarbuRe
 
@@ -922,7 +934,7 @@ def revoke_user(request, *args, **kwargs):
         rr.save()
     except:
         pass
-    
+
     return JsonResponse({'status': 'success'})
 
 
@@ -961,7 +973,7 @@ def revoke_myself(request, *args, **kwargs):
         right.delete()
     except:
         pass
-    
+
     try:
         rr = UserRightsRequests.objects.get(user=request.user, entity_id=entity_id)
         rr.delete()
