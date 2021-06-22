@@ -123,11 +123,13 @@ for i, lot in enumerate(lots):
     if isinstance(lot['delivery_date'], datetime.date) or isinstance(lot['delivery_date'], datetime.datetime):
         d['period'] = lot['delivery_date'].strftime('%Y-%m')
         delivery_date = lot['delivery_date']
+        d['year'] = lot['delivery_date'].year
     else:
         try:
             dd = datetime.datetime.strptime(lot['delivery_date'], '%d/%m/%Y').date()
             d['period'] = dd.strftime('%Y-%m')
             delivery_date = dd
+            d['year'] = dd.year
         except:
             print('unknown delivery_date type %s or format %s' % (lot['delivery_date'], type(lot['delivery_date'])))
             print(lot)
