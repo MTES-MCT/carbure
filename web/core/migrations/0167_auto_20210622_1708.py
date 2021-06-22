@@ -31,7 +31,7 @@ def save_bc_english_names(apps, schema_editor):
 
     Biocarburant = apps.get_model('core', 'Biocarburant')
     for bc in Biocarburant.objects.all():
-        bc.name_en = biofuels[bc.code]
+        bc.name_en = biofuels[bc.code] if bc.code in biofuels else bc.name
         bc.save()
 
 
@@ -80,7 +80,7 @@ def save_mp_english_names(apps, schema_editor):
 
     MatierePremiere = apps.get_model('core', 'MatierePremiere')
     for mp in MatierePremiere.objects.all():
-        mp.name_en = feedstocks[mp.code]
+        mp.name_en = feedstocks[mp.code] if mp.code in feedstocks else mp.name
         mp.save()
 
 
