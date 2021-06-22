@@ -2,14 +2,13 @@ import { Trans, useTranslation } from "react-i18next"
 
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { CompanySettingsHook } from "../hooks/use-company"
-
-import styles from "./settings.module.css"
-
+import { EntityType, UserRole } from "common/types"
 import { Title, LoaderOverlay } from "common/components"
-import { LabelCheckbox } from "common/components/input"
+import { Label, LabelCheckbox } from "common/components/input"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import { useRights } from "carbure/hooks/use-rights"
-import { EntityType, UserRole } from "common/types"
+import Select from "common/components/select"
+import styles from "./settings.module.css"
 
 type CompanySettingsProps = {
   entity: EntitySelection
@@ -53,6 +52,20 @@ const CompanySettings = ({ entity, settings }: CompanySettingsProps) => {
             onChange={(e) => settings.onChangeTrading(e.target.checked)}
             className={styles.settingsCheckbox}
           />
+        )}
+
+        {settings.certificates.length > 0 && (
+          <Label
+            label={t("Certificat par défaut")}
+            className={styles.settingsSelect}
+          >
+            <Select
+              placeholder={t("Sélectionner un certificat")}
+              value={entity.default_certificate}
+              onChange={settings.onChangeDefaultCertificate}
+              options={settings.certificates}
+            />
+          </Label>
         )}
       </SectionBody>
 

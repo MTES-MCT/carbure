@@ -1,4 +1,4 @@
-import { Trans, useTranslation } from "react-i18next"
+import { Trans } from "react-i18next"
 
 import { AppHook, useApp } from "./hooks/use-app"
 import { EntityType, LotStatus } from "common/types"
@@ -138,8 +138,6 @@ const Org = ({ app }: { app: AppHook }) => {
 const Carbure = () => {
   const app = useApp()
   const { settings, getDefaultEntity } = app
-
-  useTranslation() // simple call so we rerender the whole app when the selected language changes
 
   if (settings.error === "User not verified") {
     return <Exit to="/accounts/login" />

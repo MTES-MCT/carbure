@@ -8,11 +8,12 @@ from producers.models import ProductionSite, ProductionSiteInput, ProductionSite
 from core.decorators import check_rights
 from django_otp.decorators import otp_required
 
+
 def get_matieres_premieres(request):
     q = request.GET.get('query', False)
     mps = MatierePremiere.objects.filter(is_displayed=True).order_by('name')
     if q:
-        mps = mps.filter(Q(name__icontains=q) | Q(code__icontains=q))
+        mps = mps.filter(Q(name__icontains=q) | Q(name_en__icontains=q) | Q(code__icontains=q))
     sez = [{'code': m.code, 'name': m.name, 'description': m.description, 'compatible_alcool': m.compatible_alcool,
             'compatible_graisse': m.compatible_graisse, 'is_double_compte': m.is_double_compte, 'category': m.category} for m in mps]
     return JsonResponse({'status': 'success', 'data': sez})
@@ -22,7 +23,7 @@ def get_biocarburants(request):
     q = request.GET.get('query', False)
     bcs = Biocarburant.objects.filter(is_displayed=True).order_by('name')
     if q:
-        bcs = bcs.filter(Q(name__icontains=q) | Q(code__icontains=q))
+        bcs = bcs.filter(Q(name__icontains=q) | Q(name_en__icontains=q) | Q(code__icontains=q))
     sez = [{'code': b.code, 'name': b.name, 'description': b.description, 'pci_kg': b.pci_kg, 'pci_litre': b.pci_litre,
             'masse_volumique': b.masse_volumique, 'is_alcool': b.is_alcool, 'is_graisse': b.is_graisse} for b in bcs]
     return JsonResponse({'status': 'success', 'data': sez})
@@ -32,7 +33,7 @@ def get_countries(request):
     q = request.GET.get('query', False)
     countries = Pays.objects.all().order_by('name')
     if q:
-        countries = countries.filter(Q(name__icontains=q) | Q(code_pays__icontains=q))
+        countries = countries.filter(Q(name__icontains=q) | Q(name_en__icontains=q) | Q(code_pays__icontains=q))
     sez = [c.natural_key() for c in countries]
     return JsonResponse({'status': 'success', 'data': sez})
 
@@ -87,7 +88,7 @@ def get_delivery_sites(request):
                 dsites = dsites.filter(Q(depot_type__in=[Depot.EFPE, Depot.OTHER, Depot.OILDEPOT, Depot.BIOFUELDEPOT]))
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find delivery sites"}, status=400)
-    
+
     sez = [d.natural_key() for d in dsites]
     return JsonResponse({'status': 'success', 'data': sez})
 
@@ -128,7 +129,7 @@ def get_iscc_certificates(request):
         cert = cert.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
 
     cert = cert[0:100]
-    
+
     sez = [{'certificate_id': c.certificate_id, 'certificate_holder': c.certificate_holder,
             'valid_from': c.valid_from.strftime('%y-%m-%d'),
             'valid_until': c.valid_until.strftime('%y-%m-%d'),
@@ -188,12 +189,12 @@ def get_certificates(request):
     production_site = request.GET.get('production_site', None)
 
     lastyear = datetime.date.today() - datetime.timedelta(days=365)
-    
+
     iscc = ISCCCertificate.objects.filter(valid_until__gte=lastyear)
     dbs = DBSCertificate.objects.filter(valid_until__gte=lastyear)
     red = REDCertCertificate.objects.filter(valid_until__gte=lastyear)
     sn = SNCertificate.objects.filter(valid_until__gte=lastyear)
-    
+
     if q:
         iscc = iscc.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
         dbs = dbs.filter(Q(certificate_id__icontains=q) | Q(certificate_holder__icontains=q))
@@ -214,7 +215,7 @@ def get_certificates(request):
     dbs = dbs[0:100]
     red = red[0:100]
     sn = sn[0:100]
-    
+
     sez = [c.certificate_id for c in sn]
     sez += [c.certificate_id for c in iscc]
     sez += [c.certificate_id for c in dbs]
@@ -255,7 +256,7 @@ def create_delivery_site(request):
     country = request.POST.get('country_code', False)
     depot_id = request.POST.get('depot_id', False)
     depot_type = request.POST.get('depot_type', False)
-    
+
     address = request.POST.get('address', False)
     postal_code = request.POST.get('postal_code', False)
 
@@ -268,21 +269,21 @@ def create_delivery_site(request):
     if not depot_id:
         return JsonResponse({'status': 'error', 'message': 'Missing depot id'}, status=400)
     if not depot_type:
-        return JsonResponse({'status': 'error', 'message': 'Missing depot type'}, status=400)                        
+        return JsonResponse({'status': 'error', 'message': 'Missing depot type'}, status=400)
     if not address:
-        return JsonResponse({'status': 'error', 'message': 'Missing address'}, status=400)                        
+        return JsonResponse({'status': 'error', 'message': 'Missing address'}, status=400)
     if not postal_code:
-        return JsonResponse({'status': 'error', 'message': 'Missing postal code'}, status=400)                        
+        return JsonResponse({'status': 'error', 'message': 'Missing postal code'}, status=400)
 
     try:
         country = Pays.objects.get(code_pays=country)
     except Exception:
-        return JsonResponse({'status': 'error', 'message': 'Unknown country_code %s' % (country)}, status=400)                        
+        return JsonResponse({'status': 'error', 'message': 'Unknown country_code %s' % (country)}, status=400)
 
     if depot_type not in [Depot.EFS, Depot.EFPE, Depot.OTHER, Depot.BIOFUELDEPOT, Depot.OILDEPOT]:
-        return JsonResponse({'status': 'error', 'message': 'Unknown depot type %s' % (depot_type)}, status=400)                        
+        return JsonResponse({'status': 'error', 'message': 'Unknown depot type %s' % (depot_type)}, status=400)
 
-    d = {'name': name, 'city': city, 'depot_type': depot_type, 'address': address, 
+    d = {'name': name, 'city': city, 'depot_type': depot_type, 'address': address,
         'postal_code': postal_code}
 
     try:

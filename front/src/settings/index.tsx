@@ -30,10 +30,10 @@ function useSettings(entity: EntitySelection, settings: SettingsGetter) {
   const company = useCompany(entity, settings)
   const productionSites = useProductionSites(entity)
   const deliverySites = useDeliverySites(entity)
-  const dbsCertificates = use2BSCertificates(entity, productionSites)
-  const isccCertificates = useISCCCertificates(entity, productionSites)
-  const redcertCertificates = useREDCertCertificates(entity, productionSites)
-  const nationalSystemCertificates = useNationalSystemCertificates(entity, productionSites) // prettier-ignore
+  const dbsCertificates = use2BSCertificates(entity, productionSites, company)
+  const isccCertificates = useISCCCertificates(entity, productionSites, company)
+  const redcertCertificates = useREDCertCertificates(entity, productionSites, company) // prettier-ignore
+  const nationalSystemCertificates = useNationalSystemCertificates(entity, productionSites, company) // prettier-ignore
 
   return {
     productionSites,
