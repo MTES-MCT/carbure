@@ -25,7 +25,7 @@ rules['MP_NOT_CONFIGURED'] = "Matière Première non enregistrée sur votre Site
 rules['BC_NOT_CONFIGURED'] = "Biocarburant non enregistré sur votre Site de Production"
 rules['MISSING_PRODSITE_CERTIFICATE'] = "Aucun certificat n'est associé à ce site de Production"
 rules['UNKNOWN_CLIENT'] = "Le client n'est pas enregistré sur Carbure"
-rules['UNKNOWN_DELIVERY_SITE'] = "Le site de livraison n'est pas enregistré sur Carbure"
+rules['UNKNOWN_DELIVERY_SITE'] = "Livraison en France - Dépôt Inconnu"
 rules['NOT_ALLOWED'] = "Vous ne pouvez pas ajouter les lots d'un producteur inscrit sur CarbuRe"
 rules['DEPRECATED_MP'] = "Les résidus viniques vont disparaître au profit de deux nouvelles matières premières: Marc de raisin et Lies de vin. Merci de mettre à jour vos déclarations en conséquence."
 
@@ -255,8 +255,6 @@ def sanity_check(tx, prefetched_data):
     # CERTIFICATES CHECK
     check_certificates(prefetched_data, tx, errors)
 
-    if not tx.client_is_in_carbure and not tx.is_mac:
-        errors.append(generic_error(error='UNKNOWN_CLIENT', tx=tx, display_to_recipient=False, field="client"))
 
     if tx.lot.producer_is_in_carbure and tx.lot.added_by != tx.lot.carbure_producer and not tx.lot.parent_lot:
         is_sane = False
@@ -267,12 +265,17 @@ def sanity_check(tx, prefetched_data):
     # transaction is not a MAC, is going to france, and delivery_site is unknown
     if not tx.is_mac and tx.unknown_delivery_site_country and tx.unknown_delivery_site_country.code_pays == 'FR' and not tx.carbure_delivery_site:
         is_sane = False
-        errors.append(GenericError(tx=tx, field='client', error="UNKNOWN_DELIVERY_SITE", extra="Site de livraison non reconnu", value=tx.unknown_delivery_site, display_to_creator=True, is_blocking=True))
+        errors.append(GenericError(tx=tx, field='unknown_delivery_site', error="UNKNOWN_DELIVERY_SITE", extra="Site de livraison non reconnu", value=tx.unknown_delivery_site, display_to_creator=True, is_blocking=True))
 
-    # transaction is not a MAC, is going to France and client is unknown
-    if not tx.is_mac and tx.carbure_delivery_site and tx.carbure_delivery_site.country.code_pays == 'FR' and not tx.carbure_client:
-        is_sane = False
-        errors.append(GenericError(tx=tx, field='client', error="UNKNOWN_CLIENT", extra="Client non reconnu", value=tx.unknown_client, display_to_creator=True, is_blocking=True))
+    # transaction is not a MAC, client is unknown
+    if not tx.client_is_in_carbure and not tx.is_mac:
+        # destination FRANCE -> blocking
+        if (tx.carbure_delivery_site and tx.carbure_delivery_site.country.code_pays == 'FR') or (tx.unknown_delivery_site_country and tx.unknown_delivery_site_country.code_pays == 'FR'):
+            is_sane = False
+            errors.append(GenericError(tx=tx, field='client', error="UNKNOWN_CLIENT", extra="Livraison en France - Client inconnu", value=tx.unknown_client, display_to_creator=True, is_blocking=True))
+        # otherwise, simple warning
+        else:
+            errors.append(generic_error(error='UNKNOWN_CLIENT', tx=tx, extra="Client inconnu", display_to_recipient=False, field="unknown_client"))
 
     if tx.delivery_date > future:
         is_sane = False
