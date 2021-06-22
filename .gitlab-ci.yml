@@ -65,7 +65,8 @@ test:
     - export TEST=1
     - export IMAGE_TAG=ci
     - echo "Testing..."
-    - coverage run python ./web/manage.py test web
+    - cd /app/web
+    - coverage run ./manage.py test
     - coverage report
 
 test_frontend:
