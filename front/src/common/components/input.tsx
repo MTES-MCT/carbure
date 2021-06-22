@@ -47,7 +47,7 @@ export const Label = ({
 }: LabelProps) => (
   <label
     {...props}
-    title={[label, tooltip, error].filter(Boolean).join(' - ')}
+    title={[label, tooltip, error].filter(Boolean).join(" - ")}
     className={cl(
       styles.labelWrapper,
       !readOnly && disabled && styles.disabledLabel,

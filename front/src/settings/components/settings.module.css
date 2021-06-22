@@ -26,6 +26,11 @@
   margin: 8px 0;
 }
 
+div > .settingsSelect {
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+
 .settingsTable {
   margin-top: 8px;
 }

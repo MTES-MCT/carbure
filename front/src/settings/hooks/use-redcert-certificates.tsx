@@ -11,6 +11,7 @@ import { CertificatePrompt } from "../components/certificates"
 import { ProductionSiteSettingsHook } from "./use-production-sites"
 import { useNotificationContext } from "common/components/notifications"
 import { findREDCertCertificates } from "common/api"
+import { CompanySettingsHook } from "./use-company"
 
 export interface REDCertCertificateSettingsHook {
   isEmpty: boolean
@@ -23,7 +24,8 @@ export interface REDCertCertificateSettingsHook {
 
 export default function useREDCertCertificates(
   entity: EntitySelection,
-  productionSites: ProductionSiteSettingsHook
+  productionSites: ProductionSiteSettingsHook,
+  company: CompanySettingsHook
 ): REDCertCertificateSettingsHook {
   const { t } = useTranslation()
   const notifications = useNotificationContext()
@@ -54,6 +56,7 @@ export default function useREDCertCertificates(
     if (typeof entityID !== "undefined") {
       resolveGetREDCert(entityID)
       productionSites.refresh && productionSites.refresh()
+      company.refresh && company.refresh()
     }
   }
 

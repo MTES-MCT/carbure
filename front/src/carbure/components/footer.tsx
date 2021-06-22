@@ -73,7 +73,7 @@ const Footer = () => (
           <a
             target="_blank"
             rel="noreferrer"
-            href="https://metabase.carbure.beta.gouv.fr/public/dashboard/98aaecc5-4899-4f6f-8649-fa906977e73b"
+            href="https://metabase.carbure.beta.gouv.fr/public/dashboard/98aaecc5-4899-4f6f-8649-fa906977e73b#hide_parameters=annee"
           >
             <Trans>Statistiques</Trans>
           </a>

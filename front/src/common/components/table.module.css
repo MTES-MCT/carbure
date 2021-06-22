@@ -92,21 +92,6 @@
   stroke: var(--blue-medium);
 }
 
-.actionList {
-  align-self: stretch;
-  align-items: center;
-  justify-content: center;
-}
-
-.actionList :global(.icon):not(:last-child) {
-  margin-right: 8px;
-}
-
-.actionList,
-.tableRow:hover .actionArrow {
-  display: none;
-}
-
-.tableRow:hover .actionList {
-  display: flex;
+.actionCell :global(.icon):not(:last-child) {
+  margin-right: 4px;
 }

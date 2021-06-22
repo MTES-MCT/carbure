@@ -11,6 +11,7 @@ import { CertificatePrompt } from "../components/certificates"
 import { ProductionSiteSettingsHook } from "./use-production-sites"
 import { useNotificationContext } from "common/components/notifications"
 import { findSNCertificates } from "common/api"
+import { CompanySettingsHook } from "./use-company"
 
 export interface SNCertificateSettingsHook {
   isEmpty: boolean
@@ -23,7 +24,8 @@ export interface SNCertificateSettingsHook {
 
 export default function useSNCertificates(
   entity: EntitySelection,
-  productionSites: ProductionSiteSettingsHook
+  productionSites: ProductionSiteSettingsHook,
+  company: CompanySettingsHook
 ): SNCertificateSettingsHook {
   const { t } = useTranslation()
   const notifications = useNotificationContext()
@@ -48,6 +50,7 @@ export default function useSNCertificates(
     if (typeof entityID !== "undefined") {
       resolveGetSN(entityID)
       productionSites.refresh && productionSites.refresh()
+      company.refresh && company.refresh()
     }
   }
 
