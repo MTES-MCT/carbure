@@ -11,6 +11,7 @@ import { CertificatePrompt } from "../components/certificates"
 import { ProductionSiteSettingsHook } from "./use-production-sites"
 import { useNotificationContext } from "common/components/notifications"
 import { findISCCCertificates } from "common/api"
+import { CompanySettingsHook } from "./use-company"
 
 export interface ISCCCertificateSettingsHook {
   isEmpty: boolean
@@ -23,7 +24,8 @@ export interface ISCCCertificateSettingsHook {
 
 export default function useISCCCertificates(
   entity: EntitySelection,
-  productionSites: ProductionSiteSettingsHook
+  productionSites: ProductionSiteSettingsHook,
+  company: CompanySettingsHook
 ): ISCCCertificateSettingsHook {
   const { t } = useTranslation()
   const notifications = useNotificationContext()
@@ -48,6 +50,7 @@ export default function useISCCCertificates(
     if (typeof entityID !== "undefined") {
       resolveGetISCC(entityID)
       productionSites.refresh && productionSites.refresh()
+      company.refresh && company.refresh()
     }
   }
 

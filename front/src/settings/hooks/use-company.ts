@@ -3,6 +3,9 @@ import { SettingsGetter } from "./use-get-settings"
 
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
+import { Option, SelectValue } from "common/components/select"
+import { useEffect } from "react"
+import { ProductionCertificate } from "common/types"
 
 export function toggleMAC(toggle: boolean, entityID: number) {
   return toggle ? api.enableMAC(entityID) : api.disableMAC(entityID)
@@ -16,8 +19,12 @@ export interface CompanySettingsHook {
   isLoading: boolean
   hasMAC: boolean
   hasTrading: boolean
+  certificates: Option[]
+  defaultCertificate: ProductionCertificate | null
   onChangeMAC: (checked: boolean) => void
   onChangeTrading: (checked: boolean) => void
+  onChangeDefaultCertificate: (certificate: SelectValue) => void
+  refresh: () => void
 }
 
 export default function useCompany(
@@ -30,8 +37,37 @@ export default function useCompany(
   const [requestMAC, resolveToggleMAC] = useAPI(toggleMAC)
   const [requestTrading, resolveToggleTrading] = useAPI(toggleTrading)
 
+  const [requestDefaultCert, setDefaultCertificate] = useAPI(api.setDefaultCertificate) // prettier-ignore
+  const [certificates, findCertificates] = useAPI(api.findCertificates)
+
+  useEffect(() => {
+    if (entity) {
+      findCertificates("", entity.id)
+    }
+  }, [findCertificates, entity, settings])
+
   const isLoading =
-    settings.loading || requestMAC.loading || requestTrading.loading
+    settings.loading ||
+    certificates.loading ||
+    requestMAC.loading ||
+    requestTrading.loading ||
+    requestDefaultCert.loading
+
+  const defaultCertificate =
+    certificates.data?.find(
+      (c) => c.certificate_id === entity?.default_certificate
+    ) ?? null
+
+  const certificateOptions = certificates.data?.map((c) => ({
+    value: c.certificate_id,
+    label: `${c.certificate_id} - ${c.holder}`,
+  }))
+
+  function refresh() {
+    if (entity) {
+      findCertificates("", entity.id)
+    }
+  }
 
   function onChangeMAC(checked: boolean): void {
     if (entity !== null) {
@@ -45,11 +81,31 @@ export default function useCompany(
     }
   }
 
+  async function onChangeDefaultCertificate(certificateID: SelectValue) {
+    const certificate = certificates.data?.find(
+      (c) => c.certificate_id === certificateID
+    )
+
+    if (entity && certificate) {
+      await setDefaultCertificate(
+        entity.id,
+        certificate.certificate_id,
+        certificate.type.toUpperCase()
+      )
+
+      settings.resolve()
+    }
+  }
+
   return {
     isLoading,
     hasMAC,
     hasTrading,
+    certificates: certificateOptions ?? [],
+    defaultCertificate,
     onChangeMAC,
     onChangeTrading,
+    onChangeDefaultCertificate,
+    refresh,
   }
 }
