@@ -2,10 +2,15 @@
 
 from django.db import migrations, models
 import json
+import os
+import environ
+
+env = environ.Env()
+root_path = os.path.join(env('CARBURE_HOME'), 'front/public/locales/en')
 
 
 def save_bc_english_names(apps, schema_editor):
-    biofuels_json = open('front/public/locales/en/biofuels.json', 'r')
+    biofuels_json = open(os.path.join(root_path, 'biofuels.json'), 'r')
     biofuels = json.load(biofuels_json)
 
     Biocarburant = apps.get_model('core', 'Biocarburant')
@@ -16,7 +21,7 @@ def save_bc_english_names(apps, schema_editor):
 
 
 def save_mp_english_names(apps, schema_editor):
-    feedstocks_json = open('front/public/locales/en/feedstocks.json', 'r')
+    feedstocks_json = open(os.path.join(root_path, 'feedstocks.json'), 'r')
     feedstocks = json.load(feedstocks_json)
 
     MatierePremiere = apps.get_model('core', 'MatierePremiere')
