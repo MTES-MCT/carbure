@@ -122,6 +122,7 @@ class UserRightsRequests(models.Model):
 
 class Biocarburant(models.Model):
     name = models.CharField(max_length=64)
+    name_en = models.CharField(max_length=64)
     description = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
     code = models.CharField(max_length=16, unique=True)
@@ -163,6 +164,7 @@ class MatierePremiere(models.Model):
     MP_CATEGORIES = ((CONV, 'Conventionnel'), (IXA, 'ANNEXE IX-A'), (IXB, 'ANNEXE IX-B'), (TALLOL, 'Tallol'), (OTHER, 'Autre'))
 
     name = models.CharField(max_length=128)
+    name_en = models.CharField(max_length=128)
     description = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
     code = models.CharField(max_length=64, unique=True)
@@ -172,7 +174,6 @@ class MatierePremiere(models.Model):
     is_huile_vegetale = models.BooleanField(default=False)
     is_displayed = models.BooleanField(default=True)
     category = models.CharField(max_length=32, choices=MP_CATEGORIES, default='CONV')
-
 
     def __str__(self):
         return self.name
