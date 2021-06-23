@@ -5,6 +5,7 @@ from django.db.models import Count, Min, Max
 from django.template import loader
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
+import pytz
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -17,7 +18,7 @@ MAX_NOTIF_PER_HOUR = 10
 def main():
     entities = Entity.objects.annotate(num_notifs=Count('emailnotification')).order_by('-num_notifs')
 
-    one_hour_ago = datetime.datetime.now() - datetime.timedelta(hours=1)
+    one_hour_ago = pytz.utc.localize(datetime.datetime.now() - datetime.timedelta(hours=1))
     email_notif_sent = 0
 
     entity_oldest_notif = {}
@@ -39,6 +40,7 @@ def main():
             'entity': entity,
             'notif_txs': [n for n in notifs if n.linked_tx != None],
             'notif_declarations': [n for n in notifs if n.linked_declaration != None]
+            'nb_notifications': len(notifs)
         }
         html_message = loader.render_to_string('emails/notifications.html', email_context)
         text_message = loader.render_to_string('emails/notifications.txt', email_context)
@@ -59,7 +61,11 @@ def main():
         msg.attach_alternative(html_message, "text/html")
         msg.send()
 
-    
+        email_notif_sent += 1
+        notifs.delete()
+        if email_notif_sent >= MAX_NOTIF_PER_HOUR:
+            break
+
 if __name__ == '__main__':
     main()
     
