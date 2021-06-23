@@ -744,11 +744,8 @@ def fill_vendor_data(entity, lot_row, transaction, prefetched_data):
     if 'vendor_certificate' in lot_row and lot_row['vendor_certificate'] != '' and lot_row['vendor_certificate'] is not None:
         transaction.carbure_vendor_certificate = lot_row['vendor_certificate']
     else:
-        # no certificate provided. get it from database
-        if len(prefetched_data['my_vendor_certificates']) > 0:
-            transaction.carbure_vendor_certificate = prefetched_data['my_vendor_certificates'][0]
-        else:
-            transaction.carbure_vendor_certificate = ''
+        # no certificate provided. use default
+        transaction.carbure_vendor_certificate = entity.default_certificate
     return tx_errors
 
 def fill_delivery_site_data(lot_row, transaction, prefetched_data):
