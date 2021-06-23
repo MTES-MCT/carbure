@@ -16,15 +16,16 @@ operators = {p.name:p for p in Entity.objects.filter(entity_type='Opérateur')}
 operators['Shell Trading Rotterdam'] = operators['Societe des Petroles Shell (SPS)']
 operators['TEREOS Origny'] = Entity.objects.get(name='TEREOS Origny')
 operators['SAIPOL'] = Entity.objects.get(name='SAIPOL')
+operators['RAISINOR'] = Entity.objects.get(name='RAISINOR')
 
 mps = {mp.code:mp for mp in MatierePremiere.objects.all()}
 bcs = {bc.code:bc for bc in Biocarburant.objects.all()}
 countries = {c.code_pays:c for c in Pays.objects.all()}
 today = datetime.date.today()
 now = datetime.datetime.now()
-mtes = Entity.objects.get(name='MTES - DGEC')
-#usermodel.objects.create_user(name='MTES Robot 2020', email='robot2020@carbure.beta.gouv.fr')
-robot = usermodel.objects.get(name='MTES Robot 2020')
+mtes = Entity.objects.get(name='MTE - DGEC')
+#usermodel.objects.create_user(name='MTE Robot 2020', email='robot2020@carbure.beta.gouv.fr')
+robot = usermodel.objects.get(name='MTE Robot 2020')
 france = Pays.objects.get(code_pays='FR')
 
 r = LotV2.objects.filter(added_by_user=robot).delete()
@@ -123,13 +124,13 @@ for i, lot in enumerate(lots):
     if isinstance(lot['delivery_date'], datetime.date) or isinstance(lot['delivery_date'], datetime.datetime):
         d['period'] = lot['delivery_date'].strftime('%Y-%m')
         delivery_date = lot['delivery_date']
-        d['year'] = lot['delivery_date'].year
+        #d['year'] = lot['delivery_date'].year
     else:
         try:
             dd = datetime.datetime.strptime(lot['delivery_date'], '%d/%m/%Y').date()
             d['period'] = dd.strftime('%Y-%m')
             delivery_date = dd
-            d['year'] = dd.year
+            #d['year'] = dd.year
         except:
             print('unknown delivery_date type %s or format %s' % (lot['delivery_date'], type(lot['delivery_date'])))
             print(lot)
@@ -212,7 +213,9 @@ for i, lot in enumerate(lots):
     tx.carbure_delivery_site = None
     tx.unknown_delivery_site = ''
     tx.unknown_delivery_site_country = france
-    tx.delivery_status = 'A'
+    tx.delivery_status = 'F'
+    if tx.carbure_client.entity_type == 'Producteur':
+        tx.is_mac = True
     try:
         tx.save()
     except Exception as e:
