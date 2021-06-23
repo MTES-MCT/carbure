@@ -15,6 +15,7 @@ from django.db import transaction
 from core.models import LotV2, LotTransaction, GenericError, TransactionUpdateHistory
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
 from core.models import EmailNotification
+from core.notifications import notify_pending_lot
 
 from certificates.models import ISCCCertificate, EntityISCCTradingCertificate
 from certificates.models import DBSCertificate, EntityDBSTradingCertificate
@@ -1109,6 +1110,11 @@ def validate_lots(user, entity, txs):
                 # is this a Stock tx?
                 if tx.carbure_client and tx.carbure_client.entity_type in [Entity.PRODUCER, Entity.TRADER]:
                     tx.is_stock = True
+                #notifications
+                if tx.client_is_in_carbure and tx.carbure_client != tx.carbure_vendor:
+                    # notify client
+                    notify_pending_lot(tx)
             tx.save()
             tx.lot.save()
+    
     return {'submitted': submitted, 'valid': valid, 'invalid': invalid, 'errors': errors}
