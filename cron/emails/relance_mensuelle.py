@@ -47,7 +47,7 @@ def main():
                 fail_silently=False,
             )
         else:
-            # otherwise, hardcore recipients to us
+            # otherwise, hardcode recipients to us
             print('DEV - sending only to us')
             recipients = ['martin.planes@beta.gouv.fr']
             send_mail(

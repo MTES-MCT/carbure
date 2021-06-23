@@ -301,56 +301,63 @@
                     <tr>
                       <td>
                         <p>Bonjour,</p>
-                        <p>Pour information, les lots suivants viennent d'être refusés par votre client:
+                        <p>
+                          Vous avez {{nb_notifications}} nouvelles notifications sur CarbuRe:
                         </p>
-                        <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
+                        {% if notif_declarations %}
+                        <p>Changements de statut de vos Déclarations de Durabilité:</p>
+                        <table>
                           <thead>
                             <tr>
-                              <th>DAE</th>
+                              <th>Période</th>
+                              <th>Statut</th>
+                              <th>Date butoir théorique</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for ndec in notif_declarations %}
+                            <tr>
+                              <td align="center">{{ndec.linked_declaration.period}}</td>
+                              <td align="center">{% if ndec.linked_declaration.declared %}Déclarée{% else %}En Attente{% endif %}</td>
+                              <td align="center">{{ndec.linked_declaration.deadline}}</td>
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                        {% endif %}
+                        {% if notif_txs %}
+                        <p>Évènements liés à des transactions:</p>
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>DAE / DSAC</th>
                               <th>Biocarburant</th>
                               <th>Matière Première</th>
                               <th>Volume</th>
                               <th>Date de livraison</th>
                               <th>Client</th>
                               <th>Site de livraison</th>
-                              <th>Motif</th>
+                              <th>Notification</th>
                             </tr>
                           </thead>
                           <tbody>
-                            {% for tx in txs %}
+                            {% for ntx in notif_txs %}
                             <tr>
-                              <td align="center">
-                                {{tx.dae}}
-                              </td>
-                              <td align="center">
-                                {{tx.lot.biocarburant.name}}
-                              </td>
-                              <td align="center">
-                                {{tx.lot.matiere_premiere.name}}
-                              </td>
-                              <td align="center">
-                                {{tx.lot.volume}}
-                              </td>
-                              <td align="center">
-                                {{tx.delivery_date}}
-                              </td>
-                              <td align="center">
-                                {{tx.carbure_client.name}}
-                              </td>
-                              <td align="center">
-                                {{tx.carbure_delivery_site.name}}
-                              </td>                                                                                                                                                                                    
-                              <td align="center">
-                                {{tx.comment}}
-                              </td>                                
+                              <td align="center">{{ntx.linked_tx.dae}}</td>
+                              <td align="center">{{ntx.linked_tx.lot.biocarburant.name}}</td>
+                              <td align="center">{{ntx.linked_tx.lot.matiere_premiere.name}}</td>
+                              <td align="center">{{ntx.linked_tx.lot.volume}}</td>
+                              <td align="center">{{ntx.linked_tx.delivery_date}}</td>
+                              <td align="center">{% if ntx.linked_tx.carbure_client %} {{ntx.linked_tx.carbure_client.name}} {% else %} {{ntx.linked_tx.unknown_client}} {% endif %}</td>
+                              <td align="center">{% if ntx.linked_tx.carbure_delivery_site %} {{ntx.linked_tx.carbure_delivery_site.name}} {% else %} {{ntx.linked_tx.unknown_delivery_site}} {% endif %}</td>
+                              <td align="center">{{ntx.linked_tx.get_delivery_status_display}}</td>
                             </tr>
                             {% endfor %}
                           </tbody>
                         </table>
-                        <p>Vous avez une question ? Vous avez besoin d'aide pour faire votre déclaration ? Contactez-nous : carbure@beta.gouv.fr</p>
-                          <p>Bonne journée,</p>
-                          <p>L'équipe CarbuRe</p>
-                        </div>
+                        {% endif %}
+                        <p>Bonne journée,</p>
+                        <p>L'équipe CarbuRe</p>
                       </td>
                     </tr>
                   </table>

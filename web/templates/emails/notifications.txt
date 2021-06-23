@@ -1,0 +1,23 @@
+Bonjour,
+
+Vous avez {{nb_notifications}} nouvelles notifications sur CarbuRe:
+
+{% for ndec in notif_declarations %}
+Changements de statut de vos Déclarations de Durabilité:
+
+Période Statut  Date butoir théorique
+{{ndec.linked_declaration.period}}  {% if ndec.linked_declaration.declared %}Déclarée{% else %}En Attente{% endif %}    {{ndec.linked_declaration.deadline}}
+{% endfor %}
+
+{% for ntx in notif_txs %}
+Évènements liés à des transactions:
+
+DAE Biocarburant  Matière Première  Volume  Date de livraison Client  Site de livraison Notification
+{{ntx.linked_tx.dae}}  {{ntx.linked_tx.lot.biocarburant.name}}  {{ntx.linked_tx.lot.matiere_premiere.name}}  {{ntx.linked_tx.lot.volume}} {{ntx.linked_tx.delivery_date}}  {% if ntx.linked_tx.carbure_client %} {{ntx.linked_tx.carbure_client.name}} {% else %} {{ntx.linked_tx.unknown_client}} {% endif %}  {% if ntx.linked_tx.carbure_delivery_site %} {{ntx.linked_tx.carbure_delivery_site.name}} {% else %} {{ntx.linked_tx.unknown_delivery_site}} {% endif %}    {{ntx.notif_type}}
+{% endfor %}
+
+
+Bonne journée,
+L'équipe CarbuRe
+
+

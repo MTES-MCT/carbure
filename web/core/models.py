@@ -656,6 +656,7 @@ class EmailNotification(models.Model):
 
     datetime = models.DateTimeField(auto_now_add=True)
     linked_tx = models.ForeignKey(LotTransaction, null=True, blank=True, on_delete=models.CASCADE)
+    linked_declaration = models.ForeignKey(SustainabilityDeclaration, null=True, blank=True, on_delete=models.CASCADE)
     notif_type = models.CharField(max_length=32, null=False, blank=False, choices=NOTIFICATION_TYPE, default="")
     entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE)
     send_copy_to_admin = models.BooleanField(default=False)
