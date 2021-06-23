@@ -33,9 +33,9 @@ def notify_declaration_invalidated(tx, entity):
         sd.save()
     except:
         # declaration doesn't exist ?
-        pass    
+        sd = SustainabilityDeclaration.objects.create(entity=entity, period=period)
     n = EmailNotification()
-    n.linked_tx = tx
+    n.linked_declaration = sd
     n.notif_type = EmailNotification.DECLARATION_INVALIDATED
     n.entity = entity
     n.send_copy_to_admin = True
@@ -44,6 +44,7 @@ def notify_declaration_invalidated(tx, entity):
 def notify_declaration_validated(declaration):
     n = EmailNotification()
     n.notif_type = EmailNotification.DECLARATION_VALIDATED
+    n.linked_declaration = declaration
     n.entity = declaration.entity
     n.send_copy_to_admin = True
     n.save()
