@@ -11,17 +11,17 @@ def notify_lots_rejected(txs):
         n.entity = tx.carbure_vendor
         n.save()
 
+
+# demande de correction
 def notify_accepted_lot_in_correction(tx):
-    recipients = [ur.user.email for ur in UserRights.objects.filter(entity=tx.carbure_vendor, user__is_staff=False)]
-    cc = []
-    if tx.carbure_client:
-        cc += [ur.user.email for ur in UserRights.objects.filter(entity=tx.carbure_client, user__is_staff=False)]
-
+    n = EmailNotification()
+    n.linked_tx = tx
+    n.notif_type = EmailNotification.CORRECTION_REQUEST
+    n.entity = tx.carbure_vendor
+    n.save()
     if tx.delivery_status == LotTransaction.FROZEN:
-        # add administration in copy
-        cc += 'carbure@beta.gouv.fr'
-
-    #send_accepted_lot_in_correction_email(tx, recipients, cc)
+        n.send_copy_to_admin = True
+    n.save()
 
 def notify_declaration_invalidated(tx, entity):
     year, month = tx.lot.period.split('-')
@@ -34,8 +34,33 @@ def notify_declaration_invalidated(tx, entity):
     except:
         # declaration doesn't exist ?
         pass    
-    #EmailNotification.objects.create()
-    #EmailNotification.objects.create()    
+    n = EmailNotification()
+    n.linked_tx = tx
+    n.notif_type = EmailNotification.DECLARATION_INVALIDATED
+    n.entity = entity
+    n.send_copy_to_admin = True
+    n.save()
 
 def notify_declaration_validated(declaration):
-    pass
+    n = EmailNotification()
+    n.notif_type = EmailNotification.DECLARATION_VALIDATED
+    n.entity = declaration.entity
+    n.send_copy_to_admin = True
+    n.save()
+
+
+def notify_pending_lot(tx):
+    # create email notif to tx client
+    n = EmailNotification()
+    n.linked_tx = tx
+    n.notif_type = EmailNotification.LOT_PENDING
+    n.entity = tx.carbure_client
+    n.save()
+
+def notify_lot_fixed(tx):
+    # create email notif to tx client
+    n = EmailNotification()
+    n.linked_tx = tx
+    n.notif_type = EmailNotification.CORRECTION_DONE
+    n.entity = tx.carbure_client
+    n.save()

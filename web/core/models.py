@@ -647,14 +647,18 @@ class EmailNotification(models.Model):
     LOT_PENDING = "LOT_PENDING"
     DEADLINE_APPROACHING = "DEADLINE_APPROACHING"
     DOCUMENTATION_REQUESTED = "DOCUMENTATION_REQUESTED"
+    DECLARATION_INVALIDATED = "DECLARATION_INVALIDATED"
+    DECLARATION_VALIDATED = "DECLARATION_VALIDATED"
     NOTIFICATION_TYPE = ((CORRECTION_REQUEST, CORRECTION_REQUEST), (CORRECTION_DONE, CORRECTION_DONE), (LOT_CHANGED, LOT_CHANGED),
                          (LOT_REJECTED, LOT_REJECTED), (LOT_PENDING, LOT_PENDING), (DEADLINE_APPROACHING, DEADLINE_APPROACHING),
-                         (DOCUMENTATION_REQUESTED, DOCUMENTATION_REQUESTED))
+                         (DOCUMENTATION_REQUESTED, DOCUMENTATION_REQUESTED), (DECLARATION_INVALIDATED, DECLARATION_INVALIDATED),
+                         (DECLARATION_VALIDATED, DECLARATION_VALIDATED))
 
     datetime = models.DateTimeField(auto_now_add=True)
     linked_tx = models.ForeignKey(LotTransaction, null=True, blank=True, on_delete=models.CASCADE)
     notif_type = models.CharField(max_length=32, null=False, blank=False, choices=NOTIFICATION_TYPE, default="")
     entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE)
+    send_copy_to_admin = models.BooleanField(default=False)
     sent = models.BooleanField(default=False)
 
     class Meta:
