@@ -16,6 +16,7 @@ type StatsProps = {
   entity: EntitySelection
 }
 
+
 const Stats = ({ entity }: StatsProps) => {
   const [entityHash, getEntityHash] = useAPI(getHash);
   useEffect (() => {
@@ -33,17 +34,32 @@ const Stats = ({ entity }: StatsProps) => {
   const textBorderWidth = 2
   const textShadow = "6px 6px 3px grey"
   const iframeShadow = "1px 1px 6px grey"
-
+  let entityTypeLink = "NA"
+  let entityTypeTitle = ""
+  
   if(entity?.entity_type === EntityType.Operator) {
+
+    entityTypeLink = `https://metabase.carbure.beta.gouv.fr/public/dashboard/e7f0eacb-1034-4173-8634-ec4e000cd027?hash=${entityHash.data?.hash}#hide_parameters=hash`
+    entityTypeTitle = "Vos fournisseurs"
+
+  } else if(entity?.entity_type === EntityType.Producer) {
+
+    entityTypeLink = `https://metabase.carbure.beta.gouv.fr/public/dashboard/765ad219-d854-40e9-8f78-e32dedd28c54?hash=${entityHash.data?.hash}#hide_parameters=hash`
+    entityTypeTitle = "Vos stats clients"
+    
+  } else {
+    return null
+  }
+
   return (
     <Main style={{padding: "32px 120px"}}>
       <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: "black", borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
         <div style={{ alignSelf: "center" }}>
-            <h1>
-              <a href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/7aa76cea-b60a-4e89-9bde-a116abd86018?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
-                &#x1F4D6; Vos stats principales &#x1F4D6;
-              </a>
-            </h1>
+          <h1>
+            <a href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/7aa76cea-b60a-4e89-9bde-a116abd86018?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
+              &#x1F4D6; Vos stats principales &#x1F4D6;
+            </a>
+          </h1>
         </div>
       </Section>
       <Section style={{boxShadow: iframeShadow}}>
@@ -110,13 +126,25 @@ const Stats = ({ entity }: StatsProps) => {
           allowTransparency
         />
       </Section>
+      <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: "black", borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
+        <div style={{ alignSelf: "center" }}>
+          <h1>
+            <a href={entityTypeLink}>
+            &#9981; {entityTypeTitle} &#9981;
+            </a>
+          </h1>
+        </div>
+      </Section>
+      <Section style={{boxShadow: iframeShadow}}>
+        <IframeResizer
+          title = "Custom"
+          src={entityTypeLink}
+          frameBorder="0"
+          allowTransparency
+        />
+      </Section>
     </Main>
   )
-  } else if(entity?.entity_type === EntityType.Producer) {
-      return <h1>JeSuisProducteur</h1>
-  } else {
-      return null
-  }
 }
 
 const StatsRoutes = ({ entity }: StatsProps) => {
