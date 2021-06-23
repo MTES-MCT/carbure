@@ -3,12 +3,14 @@ import django
 import datetime
 from django.db.models import Count, Min, Max
 from django.template import loader
+from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 
-from core.models import EmailNotification, Entity
+from core.models import EmailNotification, Entity, UserRights
 
 MAX_NOTIF_PER_HOUR = 10
 
@@ -41,17 +43,22 @@ def main():
         html_message = loader.render_to_string('emails/notifications.html', email_context)
         text_message = loader.render_to_string('emails/notifications.txt', email_context)
 
-#    email_subject = 'Carbure - Correction %s - %s - %.2f%%' % (tx.dae, tx.lot.biocarburant.name, tx.lot.ghg_reduction)##
-#
-#    if os.getenv('IMAGE_TAG', 'dev') != 'prod':
-#        recipients = [r.user.email for r in UserRights.objects.filter(entity=tx.carbure_vendor, user__is_staff=True)]
-#        cc = None
-#
 
+        email_subject = 'Carbure - %s nouvelles notifications' % (len(notifs))
+        cc = None
+        if os.getenv('IMAGE_TAG', 'dev') != 'prod':
+            # send only to staff / superuser
+            recipients = [r.user.email for r in UserRights.objects.filter(entity=entity, user__is_staff=True)]
+        else:
+            # PROD
+            recipients = [r.user.email for r in UserRights.objects.filter(entity=entity, user__is_staff=False, user__is_superuser=False)]
+            if notifs.filter(send_copy_to_admin=True).count() > 0:
+                cc = "carbure@beta.gouv.fr" 
 
-#    msg = EmailMultiAlternatives(subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
-#    msg.attach_alternative(html_message, "text/html")
-#    msg.send()
+        msg = EmailMultiAlternatives(subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
+        msg.attach_alternative(html_message, "text/html")
+        msg.send()
+
     
 if __name__ == '__main__':
     main()
