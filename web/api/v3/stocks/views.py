@@ -92,7 +92,7 @@ def get_snapshot(request, *args, **kwargs):
 
     txs = tx_drafts | tx_inbox | tx_stock
 
-    data['filters'] = get_snapshot_filters(txs, [
+    data['filters'] = [
         'periods',
         'biocarburants',
         'matieres_premieres',
@@ -100,7 +100,7 @@ def get_snapshot(request, *args, **kwargs):
         'vendors',
         'production_sites',
         'delivery_sites'
-    ])
+    ]
 
     return JsonResponse({'status': 'success', 'data': data})
 
