@@ -1,9 +1,16 @@
 import { useTranslation, TFunction } from "react-i18next"
 import { Filters, Snapshot } from "common/types"
 import { FilterSelection } from "transactions/hooks/query/use-filters"
-import Select, { Option, SelectValue } from "common/components/select"
+import Select, {
+  MultipleSelect,
+  Option,
+  SelectValue,
+} from "common/components/select"
 
 import styles from "./list-filters.module.css"
+
+import { findBiocarburants } from "common/api"
+
 const FILTER_ORDER = [
   Filters.DeliveryStatus,
   Filters.Periods,
@@ -70,6 +77,15 @@ type TransactionFiltersProps = {
   placeholder: Filters[]
 }
 
+function findBC(query: string): Promise<Option[]> {
+  return findBiocarburants(query).then((bcs) =>
+    bcs.map((bc) => ({
+      value: bc.code,
+      label: bc.name,
+    }))
+  )
+}
+
 const TransactionFilters = ({
   selection,
   filters,
@@ -77,9 +93,13 @@ const TransactionFilters = ({
 }: TransactionFiltersProps) => {
   const { t } = useTranslation()
 
+  const filter = filters?.[Filters.Biocarburants]
+
   return (
     <div className={styles.transactionFilters}>
       <div className={styles.filterGroup}>
+        <MultipleSelect value={filter} getOptions={findBC} />
+
         {mapFilters(filters, selection.selected, placeholder, t).map(
           ([filter, label, selected, options]) => (
             <Select
