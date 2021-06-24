@@ -209,18 +209,11 @@ def get_lots(request):
 
 @is_admin
 def get_lots_summary(request, *args, **kwargs):
-    selection = request.GET.getlist('selection')
-
     try:
         txs = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED)
-
-        if len(selection) > 0:
-            txs = txs.filter(pk__in=selection)
-        else:
-            txs = get_lots_by_status(txs, request.GET)
-            txs = filter_lots(txs, request.GET)[0]
-            txs = sort_lots(txs, request.GET)
-
+        txs = get_lots_by_status(txs, request.GET)
+        txs = filter_lots(txs, request.GET)[0]
+        txs = sort_lots(txs, request.GET)
         data = get_general_summary(txs)
         return JsonResponse({'status': 'success', 'data': data})
     except Exception:

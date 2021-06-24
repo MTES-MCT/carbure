@@ -30,6 +30,7 @@ import TransactionFilters from "transactions/components/list-filters"
 import StockDetails from "./routes/stock-details"
 import StockSendComplex from "./routes/stock-send-complex"
 import useTransactionQuery from "transactions/hooks/query/use-transaction-query"
+import { useSummary } from "transactions/components/summary"
 
 const FILTERS = [
   Filters.Periods,
@@ -51,7 +52,7 @@ function useStocks(entity: EntitySelection) {
   const special = useSpecialSelection(pagination)
   const year = useYearSelection(pagination, filters, special)
 
-  const stockQuery = useTransactionQuery(
+  const query = useTransactionQuery(
     status.active,
     entity?.id ?? -1,
     filters.selected,
@@ -65,21 +66,22 @@ function useStocks(entity: EntitySelection) {
     special.deadline
   )
 
-  const stock = useGetStocks(stockQuery)
+  const stock = useGetStocks(query)
+  const selection = useTransactionSelection(stock.data?.lots)
+  const summary = useSummary(query, selection.selected, true)
 
   function refresh() {
     snapshot.getSnapshot()
     stock.getStock()
   }
 
-  const selection = useTransactionSelection(stock.data?.lots)
   const uploader = useUploadLotFile(entity, refresh)
   const duplicator = useDuplicateLot(entity, refresh)
-  const deleter = useDeleteLots(entity, selection, stockQuery, refresh, true)
-  const validator = useValidateLots(entity, selection, stockQuery, refresh, true) // prettier-ignore
-  const acceptor = useAcceptLots(entity, selection, stockQuery, refresh, true)
-  const rejector = useRejectLots(entity, selection, stockQuery, refresh, true)
-  const sender = useSendLot(entity, selection, stockQuery, refresh)
+  const deleter = useDeleteLots(entity, selection, query, refresh, true)
+  const validator = useValidateLots(entity, selection, query, refresh, true) // prettier-ignore
+  const acceptor = useAcceptLots(entity, selection, query, refresh, true)
+  const rejector = useRejectLots(entity, selection, query, refresh, true)
+  const sender = useSendLot(entity, selection, query, refresh)
 
   return {
     filters,
@@ -97,6 +99,8 @@ function useStocks(entity: EntitySelection) {
     acceptor,
     rejector,
     sender,
+    summary,
+    query,
     refresh,
   }
 }
@@ -118,6 +122,8 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
     acceptor,
     rejector,
     sender,
+    summary,
+    query,
     refresh,
   } = useStocks(entity)
 
@@ -147,6 +153,7 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
         sorting={sorting}
         pagination={pagination}
         search={search}
+        filters={filters}
         status={status}
         selection={selection}
         deleter={deleter}
@@ -156,6 +163,9 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
         rejector={rejector}
         duplicator={duplicator}
         sender={sender}
+        summary={summary}
+        query={query}
+        entity={entity}
       />
 
       <Switch>
@@ -172,6 +182,7 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
             rejector={rejector}
             sender={sender}
             refresh={refresh}
+            transactions={summary.data?.tx_ids ?? []}
           />
         </Route>
       </Switch>

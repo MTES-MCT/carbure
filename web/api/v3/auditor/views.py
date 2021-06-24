@@ -60,19 +60,13 @@ def get_lots(request, *args, **kwargs):
 
 @check_rights('entity_id')
 def get_lots_summary(request, *args, **kwargs):
-    selection = request.GET.getlist('selection')
-
     auditees = get_auditees(request.user)
     txs = get_audited_lots(auditees)
 
     try:
-        if len(selection) > 0:
-            txs = txs.filter(pk__in=selection)
-        else:
-            txs = get_lots_by_status(txs, request.GET)
-            txs = filter_lots(txs, request.GET)[0]
-            txs = sort_lots(txs, request.GET)
-
+        txs = get_lots_by_status(txs, request.GET)
+        txs = filter_lots(txs, request.GET)[0]
+        txs = sort_lots(txs, request.GET)
         data = get_general_summary(txs)
         return JsonResponse({'status': 'success', 'data': data})
     except Exception:

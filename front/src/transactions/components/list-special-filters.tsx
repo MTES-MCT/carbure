@@ -83,6 +83,7 @@ type SummaryFilterProps = {
   hideRecap?: boolean
   selection: number[]
   entity: EntitySelection
+  stock?: boolean
   onReset: () => void
 }
 
@@ -94,6 +95,7 @@ export const SummaryFilter = ({
   selection,
   hideRecap = false,
   entity,
+  stock = false,
   onReset,
 }: SummaryFilterProps) => {
   const { t } = useTranslation()
@@ -102,6 +104,7 @@ export const SummaryFilter = ({
     prompt((resolve) => (
       <SummaryPrompt
         readOnly
+        stock={stock}
         title={t("Récapitulatif des lots")}
         description={t(
           "Ce tableau résume les informations principales des lots correspondant à votre recherche ou sélection."

@@ -12,8 +12,16 @@ import styles from "transactions/components/form.module.css"
 
 import useStockDetails from "../hooks/use-stock-details"
 import Modal from "common/components/modal"
-import { Check, Cross, Edit, Return, Save } from "common/components/icons"
-import { LoaderOverlay } from "common/components"
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Cross,
+  Edit,
+  Return,
+  Save,
+} from "common/components/icons"
+import { Box, LoaderOverlay } from "common/components"
 import { AsyncButton, Button } from "common/components/button"
 import TransactionForm from "transactions/components/form"
 import ValidationErrors from "transactions/components/form-errors"
@@ -21,6 +29,7 @@ import { StatusTitle } from "transactions/components/status"
 import Comments from "transactions/components/form-comments"
 import { useRights } from "carbure/hooks/use-rights"
 import { Trans } from "react-i18next"
+import useNavigate from "transactions/hooks/query/use-navigate"
 
 const EDITABLE = [LotStatus.ToSend]
 
@@ -31,6 +40,7 @@ type StockDetailsProps = {
   acceptor: LotAcceptor
   rejector: LotRejector
   sender: LotSender
+  transactions: number[]
   refresh: () => void
 }
 
@@ -40,6 +50,7 @@ const StockDetails = ({
   acceptor,
   rejector,
   sender,
+  transactions,
   refresh,
 }: StockDetailsProps) => {
   const {
@@ -57,6 +68,7 @@ const StockDetails = ({
   } = useStockDetails(entity, refresh)
 
   const rights = useRights()
+  const navigator = useNavigate(transactions)
 
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
   const isEditable = EDITABLE.includes(status)
@@ -174,13 +186,27 @@ const StockDetails = ({
           </React.Fragment>
         )}
 
-        <Button
-          icon={Return}
-          className={styles.transactionNavButtons}
-          onClick={close}
-        >
-          <Trans>Retour</Trans>
-        </Button>
+        <Box row className={styles.transactionNavButtons}>
+          <Button
+            icon={ChevronLeft}
+            disabled={!navigator.hasPrev}
+            onClick={navigator.prev}
+          >
+            <Trans>Lot Précédent</Trans>
+          </Button>
+
+          <Button
+            icon={ChevronRight}
+            disabled={!navigator.hasNext}
+            onClick={navigator.next}
+          >
+            <Trans>Lot Suivant</Trans>
+          </Button>
+
+          <Button icon={Return} onClick={close}>
+            <Trans>Retour</Trans>
+          </Button>
+        </Box>
       </div>
 
       {details.loading && <LoaderOverlay />}

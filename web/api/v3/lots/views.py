@@ -24,7 +24,7 @@ from core.common import check_certificates, get_transaction_distance
 from core.decorators import check_rights
 from core.notifications import notify_lots_rejected, notify_declaration_invalidated, notify_accepted_lot_in_correction
 from api.v3.sanity_checks import bulk_sanity_checks
-from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, filter_entity_transactions, sort_lots
+from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, sort_lots, filter_lots
 
 
 logger = logging.getLogger(__name__)
@@ -52,18 +52,20 @@ def get_lots_summary(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
 
-    selection = request.GET.getlist('selection')
+    status = request.GET.get('status', False)
+
+    if not status:
+        raise Exception("Status is not specified")
 
     try:
-        if len(selection) > 0:
-            txs = LotTransaction.objects.filter(pk__in=selection)
-        else:
-            txs = filter_entity_transactions(entity, request.GET)[0]
+        txs = get_entity_lots_by_status(entity, status)
+        txs = filter_lots(txs, request.GET)[0]
         txs = sort_lots(txs, request.GET)
         data = get_summary(txs, entity)
         return JsonResponse({'status': 'success', 'data': data})
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
+
 
 @check_rights('entity_id')
 def get_details(request, *args, **kwargs):

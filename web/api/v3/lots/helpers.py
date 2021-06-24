@@ -150,10 +150,14 @@ def filter_lots(txs, querySet):
     is_hidden_by_auditor = querySet.get('is_hidden_by_auditor', None)
     is_highlighted_by_admin = querySet.get('is_highlighted_by_admin', None)
     is_highlighted_by_auditor = querySet.get('is_highlighted_by_auditor', None)
+    selection = querySet.getlist('selection', False)
 
     if year:
         date_from, date_until = get_year_bounds(year)
         txs = txs.filter(delivery_date__gte=date_from, delivery_date__lte=date_until)
+
+    if selection and len(selection) > 0:
+        txs = txs.filter(pk__in=selection)
 
     if periods:
         txs = txs.filter(lot__period__in=periods)
@@ -288,6 +292,9 @@ def sort_lots(txs, querySet):
 
 
 def get_lots_with_metadata(txs, entity, querySet, admin=False):
+    if txs is None:
+        return JsonResponse({'status': 'error', 'message': 'Could not fetch stock list'})
+
     export = querySet.get('export', False)
 
     limit = querySet.get('limit', None)
@@ -416,18 +423,7 @@ def get_snapshot_filters(txs, whitelist):
     return filters
 
 
-def filter_entity_transactions(entity, querySet):
-    status = querySet.get('status', False)
-
-    if not status:
-        raise Exception("Status is not specified")
-
-    txs = get_entity_lots_by_status(entity, status)
-    return filter_lots(txs, querySet)
-
-
 def get_summary(txs, entity):
-
     txs_in = txs.filter(carbure_client=entity).annotate(
         vendor=Coalesce('carbure_vendor__name', 'lot__unknown_supplier'),
     ).values(

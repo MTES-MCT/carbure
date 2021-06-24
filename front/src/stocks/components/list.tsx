@@ -1,6 +1,12 @@
 import React from "react"
+import { Trans } from "react-i18next"
 
-import { LotStatus, UserRole } from "common/types"
+import {
+  LotStatus,
+  TransactionQuery,
+  TransactionSummary,
+  UserRole,
+} from "common/types"
 import { SortingSelection } from "transactions/hooks/query/use-sort-by"
 import { PageSelection } from "common/components/pagination"
 import { LotUploader } from "transactions/hooks/actions/use-upload-file"
@@ -13,6 +19,7 @@ import { LotSender } from "stocks/hooks/use-send-lots"
 import { StatusSelection } from "transactions/hooks/query/use-status"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { StockHook } from "../hooks/use-stock-list"
+import { SummaryFilter } from "transactions/components/list-special-filters"
 
 import { AlertCircle } from "common/components/icons"
 import { Box, LoaderOverlay } from "common/components"
@@ -35,13 +42,16 @@ import { StockTable } from "./list-table"
 import styles from "./list.module.css"
 import { SearchSelection } from "transactions/hooks/query/use-search"
 import { useRights } from "carbure/hooks/use-rights"
-import { Trans } from "react-i18next"
+import { EntitySelection } from "carbure/hooks/use-entity"
+import { ApiState } from "common/hooks/use-api"
+import { FilterSelection } from "transactions/hooks/query/use-filters"
 
 type StockListProps = {
   stock: StockHook
   sorting: SortingSelection
   pagination: PageSelection
   search: SearchSelection
+  filters: FilterSelection
   status: StatusSelection
   selection: TransactionSelection
   deleter: LotDeleter
@@ -51,6 +61,9 @@ type StockListProps = {
   rejector: LotRejector
   duplicator: LotDuplicator
   sender: LotSender
+  summary: ApiState<TransactionSummary>
+  entity: EntitySelection
+  query: TransactionQuery
 }
 
 export const StockList = ({
@@ -58,6 +71,7 @@ export const StockList = ({
   sorting,
   pagination,
   search,
+  filters,
   status,
   selection,
   deleter,
@@ -65,6 +79,9 @@ export const StockList = ({
   acceptor,
   rejector,
   sender,
+  summary,
+  entity,
+  query,
 }: StockListProps) => {
   const rights = useRights()
 
@@ -120,6 +137,23 @@ export const StockList = ({
             />
           )}
         </ActionBar>
+      )}
+
+      {!isEmpty && (
+        <SummaryFilter
+          stock
+          loading={summary.loading}
+          txCount={summary.data?.tx_ids.length ?? 0}
+          totalVolume={summary.data?.total_volume ?? 0}
+          query={query}
+          selection={selection.selected}
+          entity={entity}
+          onReset={() => {
+            filters.reset()
+            selection.reset()
+            search.setQuery("")
+          }}
+        />
       )}
 
       {!isError && isEmpty && (
