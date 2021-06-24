@@ -71,7 +71,7 @@ def check_certificates(prefetched_data, tx, errors):
         if not tx.lot.carbure_production_site_reference:
             errors.append(generic_error(error='NO_PRODSITE_CERT', tx=tx, field='carbure_production_site_reference'))
         else:
-            cert = tx.lot.carbure_production_site_reference
+            cert = tx.lot.carbure_production_site_reference.upper()
             if cert not in prefetched_data['certificates']:
                 errors.append(generic_error(error='UNKNOWN_PRODSITE_CERT', tx=tx, field='carbure_production_site_reference'))
             else:
@@ -83,7 +83,7 @@ def check_certificates(prefetched_data, tx, errors):
         if not tx.lot.unknown_production_site_reference:
             errors.append(generic_error(error='NO_PRODSITE_CERT', tx=tx, field='unknown_production_site_reference'))
         else:
-            cert = tx.lot.unknown_production_site_reference
+            cert = tx.lot.unknown_production_site_reference.upper()
             if cert not in prefetched_data['certificates']:
                 errors.append(generic_error(error='UNKNOWN_PRODSITE_CERT', tx=tx, field='unknown_production_site_reference'))
             else:
@@ -97,7 +97,7 @@ def check_certificates(prefetched_data, tx, errors):
         if not tx.lot.unknown_supplier_certificate:
             errors.append(generic_error(error='NO_SUPPLIER_CERT', tx=tx, field='unknown_supplier_certificate'))
         else:
-            cert = tx.lot.unknown_supplier_certificate
+            cert = tx.lot.unknown_supplier_certificate.upper()
             if cert not in prefetched_data['certificates']:
                 errors.append(generic_error(error='UNKNOWN_SUPPLIER_CERT', tx=tx, field='unknown_supplier_certificate'))
             else:
@@ -110,7 +110,7 @@ def check_certificates(prefetched_data, tx, errors):
     if not tx.carbure_vendor_certificate:
         errors.append(generic_error(error='NO_VENDOR_CERT', tx=tx, field='carbure_vendor_certificate'))
     else:
-        cert = tx.carbure_vendor_certificate
+        cert = tx.carbure_vendor_certificate.upper()
         if cert not in prefetched_data['certificates']:
             errors.append(generic_error(error='UNKNOWN_VENDOR_CERT', tx=tx, field='carbure_vendor_certificate'))
         else:
