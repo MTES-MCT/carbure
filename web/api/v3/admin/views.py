@@ -270,8 +270,7 @@ def get_snapshot(request):
         declaration = txs.filter(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.PENDING, LotTransaction.FROZEN]).count()
         highlight = txs.filter(highlighted_by_admin=True).count()
         data['lots'] = {'alert': alerts, 'correction': correction, 'declaration': declaration, 'highlight': highlight}
-
-        data['filters'] = get_snapshot_filters(txs, [
+        data['filters'] = [
             'delivery_status',
             'periods',
             'biocarburants',
@@ -286,12 +285,26 @@ def get_snapshot(request):
             'is_forwarded',
             'is_mac',
             'is_hidden_by_admin',
-        ])
-
+        ]
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Exception"}, status=400)
-
     return JsonResponse({"status": "success", "data": data})
+
+@is_admin
+def get_filters(request, *args, **kwargs):
+    field = request.GET.get('field', False)
+    if not field:
+        return JsonResponse({'status': 'error', 'message': "Missing field"}, status=400)
+
+    txs = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED)
+    txs = get_lots_by_status(txs, request.GET)
+    txs = filter_lots(txs, request.GET)[0]
+    d = get_snapshot_filters(txs, [field])
+    if field in d:
+        values = d[field]
+    else:
+        return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
+    return JsonResponse({'status': 'success', 'data': values})
 
 
 @is_admin
