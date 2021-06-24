@@ -10,7 +10,7 @@ from core.common import load_excel_file, send_lot_from_stock, generate_carbure_i
 from core.xlsx_v3 import template_stock, template_stock_bcghg
 from core.xlsx_v3 import export_stocks
 from django_otp.decorators import otp_required
-from api.v3.lots.helpers import get_snapshot_filters, get_summary, filter_lots
+from api.v3.lots.helpers import get_snapshot_filters, get_summary, filter_lots, sort_lots, get_lots_with_metadata
 
 
 sort_key_to_django_field = {'period': 'lot__period',
@@ -24,68 +24,36 @@ sort_key_to_django_field = {'period': 'lot__period',
                             'depot': 'carbure_delivery_site',
                             }
 
+
+def filter_stock_transactions(entity, querySet):
+    status = querySet.get('status', False)
+
+    if not status:
+        raise Exception('Status is not specified')
+
+    if entity.entity_type not in (Entity.PRODUCER, Entity.TRADER):
+        raise Exception('Entity does not have stocks')
+
+    if status == 'tosend':
+        return LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
+    elif status == 'in':
+        return LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.PENDING, LotTransaction.TOFIX, LotTransaction.FIXED])
+    elif status == 'stock':
+        return LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__remaining_volume__gt=0, is_forwarded=False, is_mac=False)
+    else:
+        raise Exception('Unknown status')
+
+
 @check_rights('entity_id')
 def get_stocks(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
-    status = request.GET.get('status', False)
 
-    if not status:
-        return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
-
-    if entity.entity_type in ['Producteur', 'Trader']:
-        if status == "tosend":
-            txs = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
-        elif status == "in":
-            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.PENDING, LotTransaction.TOFIX, LotTransaction.FIXED])
-        elif status == "stock":
-            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__remaining_volume__gt=0, is_forwarded=False, is_mac=False)
-        else:
-            return JsonResponse({'status': 'error', 'message': "Unknown status"}, status=400)
-    else:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
-
-    txs, total_errors, total_deadline, deadline_str = filter_lots(txs, request.GET)
-
-    limit = request.GET.get('limit', None)
-    from_idx = request.GET.get('from_idx', "0")
-    sort_by = request.GET.get('sort_by', False)
-    order = request.GET.get('order', False)
-    export = request.GET.get('export', False)
-
-    if sort_by:
-        if sort_by in sort_key_to_django_field:
-            key = sort_key_to_django_field[sort_by]
-            if order == 'desc':
-                txs = txs.order_by('-%s' % key)
-            else:
-                txs = txs.order_by(key)
-
-    from_idx = int(from_idx)
-    returned = txs[from_idx:]
-
-    if limit is not None:
-        limit = int(limit)
-        returned = returned[:limit]
-
-    data = {}
-    data['lots'] = [t.natural_key() for t in returned]
-    data['total'] = txs.count()
-    data['returned'] = returned.count()
-    data['from'] = from_idx
-    data['tx_errors'] = []
-    data['lots_errors'] = []
-
-    if not export:
-        return JsonResponse({'status': 'success', 'data': data})
-    else:
-        file_location = export_stocks(entity, returned)
-        with open(file_location, "rb") as excel:
-            data = excel.read()
-            ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            response = HttpResponse(content=data, content_type=ctype)
-            response['Content-Disposition'] = 'attachment; filename="%s"' % (file_location)
-        return response
+    try:
+        txs = filter_stock_transactions(entity, request.GET)
+        return get_lots_with_metadata(txs, entity, request.GET)
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not get lots"}, status=400)
 
 
 @check_rights('entity_id')
@@ -93,28 +61,14 @@ def get_stocks_summary(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
 
-    status = request.GET.get('status', False)
-    selection = request.GET.getlist('selection')
-
-    if entity.entity_type in ['Producteur', 'Trader']:
-        if status == "tosend":
-            txs = LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
-        elif status == "in":
-            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.PENDING, LotTransaction.TOFIX, LotTransaction.FIXED])
-        elif status == "stock":
-            txs = LotTransaction.objects.filter(carbure_client=entity, lot__status="Validated", delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__volume__gt=0, is_forwarded=False)
-        else:
-            return JsonResponse({'status': 'error', 'message': "Unknown status"}, status=400)
-    else:
-        return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
-
-    # try:
-    if len(selection) > 0:
-        txs = LotTransaction.objects.filter(pk__in=selection)
-    else:
-        txs, _, _, _ = filter_lots(txs, request.GET)
-    data = get_summary(txs, entity)
-    return JsonResponse({'status': 'success', 'data': data})
+    try:
+        txs = filter_stock_transactions(entity, request.GET)
+        txs = filter_lots(txs, request.GET)[0]
+        txs = sort_lots(txs, request.GET)
+        data = get_summary(txs, entity)
+        return JsonResponse({'status': 'success', 'data': data})
+    except Exception:
+        return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
 
 
 @check_rights('entity_id')
