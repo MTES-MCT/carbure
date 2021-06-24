@@ -22,7 +22,7 @@ from authtools.forms import UserCreationForm
 from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
 from core.models import Depot, LotV2, LotTransaction, TransactionComment, GenericError
 from core.models import SustainabilityDeclaration, EntityDepot
-from core.models import TransactionUpdateHistory
+from core.models import TransactionUpdateHistory, TransactionDistance
 from certificates.models import EntitySNTradingCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate, EntityREDCertTradingCertificate
 from api.v3.sanity_checks import bulk_sanity_checks
 from core.common import get_prefetched_data, calculate_ghg
@@ -419,6 +419,11 @@ class TransactionUpdateHistoryAdmin(admin.ModelAdmin):
     list_filter = ('update_type', 'field', )
 
 
+class TransactionDistanceAdmin(admin.ModelAdmin):
+    list_display = ('starting_point', 'delivery_point', 'distance')
+    search_fields = ('starting_point', 'delivery_point', )
+
+
 admin.site.register(Entity, EntityAdmin)
 admin.site.register(UserRights, UserRightsAdmin)
 admin.site.register(UserRightsRequests, UserRightsRequestsAdmin)
@@ -434,6 +439,7 @@ admin.site.register(GenericError, GenericErrorAdmin)
 admin.site.register(SustainabilityDeclaration, SustainabilityDeclarationAdmin)
 admin.site.register(EntityDepot, EntityDepotAdmin)
 admin.site.register(TransactionUpdateHistory, TransactionUpdateHistoryAdmin)
+admin.site.register(TransactionDistance, TransactionDistanceAdmin)
 
 
 # authtool custom user model
