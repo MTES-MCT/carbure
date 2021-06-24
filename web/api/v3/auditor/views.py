@@ -59,6 +59,24 @@ def get_lots(request, *args, **kwargs):
 
 
 @check_rights('entity_id')
+def get_filters(request, *args, **kwargs):
+    field = request.GET.get('field', False)
+    if not field:
+        return JsonResponse({'status': 'error', 'message': "Missing field"}, status=400)
+
+    auditees = get_auditees(request.user)
+    txs = get_audited_lots(auditees)
+    txs = get_lots_by_status(txs, request.GET)
+    txs = filter_lots(txs, request.GET)[0]
+    d = get_snapshot_filters(txs, [field])
+    if field in d:
+        values = d[field]
+    else:
+        return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
+    return JsonResponse({'status': 'success', 'data': values})
+
+
+@check_rights('entity_id')
 def get_lots_summary(request, *args, **kwargs):
     auditees = get_auditees(request.user)
     txs = get_audited_lots(auditees)
@@ -120,7 +138,7 @@ def get_snapshot(request, *args, **kwargs):
         lots['declaration'] = txs.filter(delivery_status__in=['A', 'N', 'F']).count()
         lots['highlight'] = txs.filter(highlighted_by_auditor=True).count()
 
-        filters = get_snapshot_filters(txs, [
+        filters = [
             'delivery_status',
             'periods',
             'biocarburants',
@@ -135,8 +153,7 @@ def get_snapshot(request, *args, **kwargs):
             'is_forwarded',
             'is_mac',
             'is_hidden_by_auditor'
-        ])
-
+        ]
         data = {'lots': lots, 'filters': filters, 'years': years}
         return JsonResponse({'status': 'success', 'data': data})
     except Exception:

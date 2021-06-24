@@ -30,6 +30,7 @@ urlpatterns = [
     path('lots', views.get_lots, name='api-v3-admin-get-lots'),
     path('lots/details', views.get_details, name='api-v3-admin-get-lot-details'),
     path('lots/snapshot', views.get_snapshot, name='api-v3-admin-get-snapshot'),
+    path('lots/filters', views.get_filters, name='api-v3-admin-get-filters'),
     path('lots/ack-alerts', views.ack_alerts, name='api-v3-admin-ack-alerts'),
     path('lots/highlight-alerts', views.highlight_alerts, name='api-v3-admin-highlight-alerts'),
     path('lots/summary', views.get_lots_summary, name='api-v3-admin-get-lot-summary'),
