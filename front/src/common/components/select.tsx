@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import cl from "clsx"
 
 import styles from "./select.module.css"
@@ -13,6 +13,13 @@ import {
   useDropdown,
 } from "./dropdown"
 import { useTranslation } from "react-i18next"
+import {
+  MultipleSelect as BaseMultipleSelect,
+  MultipleSelectProps as BaseMultipleSelectProps,
+} from "../toolkit/multiple-select"
+import { CheckboxOption } from "../toolkit/checkbox"
+import useAPI from "common/hooks/use-api"
+import { Merge } from "common/toolkit/types"
 
 type Value = string | number | boolean | null
 export type Option = { value: Value; label: string }
@@ -225,6 +232,42 @@ export const Select = ({
         </DropdownOptions>
       )}
     </div>
+  )
+}
+
+type MultipleSelectProps<T> = Merge<
+  BaseMultipleSelectProps<T>,
+  {
+    getOptions: (query: string) => Promise<T[]>
+  }
+>
+
+export function MultipleSelect({
+  getOptions,
+  ...props
+}: MultipleSelectProps<Option>) {
+  const [search, setSearch] = useState("")
+  const [options, findOptions] = useAPI(getOptions)
+
+  useEffect(() => {
+    findOptions(search)
+  }, [search, findOptions])
+
+  return (
+    <BaseMultipleSelect {...props}>
+      <div style={{ background: "white", border: "1px solid black" }}>
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onMouseDown={(e) => e.preventDefault()}
+        />
+        {options.data?.map((option) => (
+          <CheckboxOption key={option.label} value={option.value}>
+            {option.label}
+          </CheckboxOption>
+        ))}
+      </div>
+    </BaseMultipleSelect>
   )
 }
 

@@ -45,5 +45,15 @@
   "VOLUME_LTE_0": "Volume is zero",
   "WRONG_DELIVERY_DATE": "Delivery date is incorrect",
   "WRONG_FORMAT": "Format is incorrect",
-  "WRONG_PRODUCTION_SITE_COUNTRY": "Production site country is incorrect"
+  "WRONG_PRODUCTION_SITE_COUNTRY": "Production site country is incorrect",
+
+  "NO_PRODSITE_CERT": "Missing production site certificate",
+  "NO_SUPPLIER_CERT": "Missing supplier certificate",
+  "NO_VENDOR_CERT": "Missing supplier certificate",
+  "UNKNOWN_PRODSITE_CERT": "Unknown production site certificate",
+  "UNKNOWN_SUPPLIER_CERT": "Unknown supplier certificate",
+  "UNKNOWN_VENDOR_CERT": "Unknown supplier certificate",
+  "EXPIRED_PRODSITE_CERT": "Production site certificate expired",
+  "EXPIRED_SUPPLIER_CERT": "Supplier certificate expired",
+  "EXPIRED_VENDOR_CERT": "Supplier certificate expired"
 }
