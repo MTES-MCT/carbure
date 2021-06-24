@@ -130,11 +130,11 @@ test("producer/trader: check filters", async () => {
     // open the filter list
     userEvent.click(filter)
 
-    // select a value from the list
-    const selection = await screen.findByText(value, { selector: "li span" }) // prettier-ignore
-    userEvent.click(selection)
-
     await waitWhileLoading()
+
+    // select a value from the list
+    const selection = screen.getByText(value, { selector: "li span" }) // prettier-ignore
+    userEvent.click(selection)
 
     userEvent.type(filter, "{esc}")
 

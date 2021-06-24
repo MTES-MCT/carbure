@@ -112,16 +112,16 @@ export function normalizeFilter(field: Filters, filter: string[] | Option[], t: 
   }
 
   if (field === Filters.DeliveryStatus) {
-    normalized = filter.map((ct: any) => ({
-      value: ct.value,
-      label: t(ct.label, { ns: "translation" }),
+    normalized = filter.map((status: any) => ({
+      value: status.value,
+      label: t(status.label, { ns: "translation" }),
     }))
   }
 
   if (field === Filters.Errors) {
-    normalized = filter.map((ct: any) => ({
-      value: ct.value,
-      label: t(ct.value, { ns: "errors" }),
+    normalized = filter.map((error: any) => ({
+      value: error,
+      label: t(error, { ns: "errors" }),
     }))
   }
 

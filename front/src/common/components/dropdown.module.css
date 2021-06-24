@@ -48,7 +48,10 @@
   overflow-x: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  text-transform: capitalize;
+}
+
+.dropdownItem span::first-letter {
+  text-transform: uppercase;
 }
 
 .dropdown .selectedOption {

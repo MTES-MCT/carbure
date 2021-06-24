@@ -251,6 +251,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         selection={filters}
         filters={snapshot.data?.filters}
         placeholder={filtersPlaceholder}
+        entity={entity}
       />
 
       <TransactionList

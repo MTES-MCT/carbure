@@ -187,6 +187,8 @@ export const Select = ({
     }
   }, [value, ...getArgs])
 
+  const isLoading = !Boolean(localOptions) && remoteOptions.loading
+
   const labelClassName = cl(styles.selectLabel, className, {
     [styles.selectPrimary]: level === "primary",
     [styles.selectInline]: level === "inline",
@@ -226,9 +228,9 @@ export const Select = ({
                 </DropdownItem>
               )}
 
-              {remoteOptions.loading && <LoaderOverlay />}
+              {isLoading && <LoaderOverlay />}
 
-              {!remoteOptions.loading && options.map((option, i) => (
+              {!isLoading && options.map((option, i) => (
                 <DropdownItem
                   key={option.value?.toString() ?? i}
                   title={option.label}

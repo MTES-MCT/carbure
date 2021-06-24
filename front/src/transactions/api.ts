@@ -317,6 +317,16 @@ export function getAdminSnapshot(
     .then((s) => normalizeFilters(s, t))
 }
 
+export function getAdminFilters(
+  field: Filters,
+  params: TransactionQuery,
+  t: TFunction
+): Promise<Option[]> {
+  return api
+    .get("/admin/lots/filters", {field, ...params})
+    .then(filter => normalizeFilter(field, filter, t))
+}
+
 export function getAdminLots(filters: TransactionQuery): Promise<Lots> {
   return api.get("/admin/lots", filters)
 }
@@ -387,6 +397,16 @@ export function getAuditorSnapshot(
   return api
     .get<Snapshot>("/auditor/snapshot", { entity_id, year })
     .then((s) => normalizeFilters(s, t))
+}
+
+export function getAuditorFilters(
+  field: Filters,
+  params: TransactionQuery,
+  t: TFunction
+): Promise<Option[]> {
+  return api
+    .get("/auditors/filters", {field, ...params})
+    .then(filter => normalizeFilter(field, filter, t))
 }
 
 export function getAuditorLots(params: TransactionQuery) {

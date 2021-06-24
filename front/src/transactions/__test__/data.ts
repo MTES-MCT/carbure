@@ -1,23 +1,23 @@
-import { GenericError, LotDetails, Lots } from "common/types"
+import { Snapshot, GenericError, LotDetails, Lots } from "common/types"
 import { country, lot, producer, operator, trader } from "common/__test__/data"
 
 export const emptySnapshot = {
-  years: [2020],
+  years: [2020, 2019],
   lots: {
     draft: 0,
     validated: 0,
     tofix: 0,
     accepted: 0,
   },
-  filters: {
-    matieres_premieres: [],
-    biocarburants: [],
-    periods: [],
-    production_sites: [],
-    countries_of_origin: [],
-    delivery_sites: [],
-    clients: [],
-  },
+  filters: [
+    'matieres_premieres',
+    'biocarburants',
+    'periods',
+    'production_sites',
+    'countries_of_origin',
+    'delivery_sites',
+    'clients',
+  ],
   depots: [],
 }
 
@@ -29,73 +29,73 @@ export const snapshot = {
     tofix: 20,
     accepted: 10,
   },
-  filters: {
-    matieres_premieres: [{ value: "COLZA", label: "Colza" }],
-    biocarburants: [{ value: "EMHV", label: "EMHV" }],
-    periods: ["2020-01"],
-    countries_of_origin: [{ value: "FR", label: "France" }],
-    production_sites: ["Test Production Site"],
-    delivery_sites: ["Test Delivery Site"],
-    clients: ["Opérateur Test"],
-  },
+  filters: [
+    'matieres_premieres',
+    'biocarburants',
+    'periods',
+    'countries_of_origin',
+    'production_sites',
+    'delivery_sites',
+    'clients',
+  ],
   depots: [],
 }
 
 export const emptyOperatorSnapshot = {
-  years: [2020],
+  years: [2020, 2019],
   lots: {
     draft: 0,
     in: 0,
     accepted: 0,
   },
-  filters: {
-    matieres_premieres: [],
-    biocarburants: [],
-    periods: [],
-    countries_of_origin: [],
-    production_sites: [],
-    delivery_sites: [],
-    vendors: [],
-  },
+  filters: [
+    'matieres_premieres',
+    'biocarburants',
+    'periods',
+    'countries_of_origin',
+    'production_sites',
+    'delivery_sites',
+    'vendors',
+  ],
   depots: [],
 }
 
 export const operatorSnapshot = {
-  years: [2020],
+  years: [2020, 2019],
   lots: {
     draft: 30,
     in: 20,
     accepted: 10,
   },
-  filters: {
-    matieres_premieres: [{ value: "COLZA", label: "Colza" }],
-    biocarburants: [{ value: "EMHV", label: "EMHV" }],
-    periods: ["2020-01"],
-    countries_of_origin: [{ value: "FR", label: "France" }],
-    production_sites: ["Test Production Site"],
-    delivery_sites: ["Test Delivery Site"],
-    vendors: ["Producteur Test"],
-  },
+  filters: [
+    'matieres_premieres',
+    'biocarburants',
+    'periods',
+    'countries_of_origin',
+    'production_sites',
+    'delivery_sites',
+    'vendors',
+  ],
   depots: [],
 }
 
 export const adminSnapshot = {
-  years: [2020],
+  years: [2020, 2019],
   lots: {
     alert: 0,
     correction: 0,
     declaration: 0,
   },
-  filters: {
-    matieres_premieres: [{ value: "COLZA", label: "Colza" }],
-    biocarburants: [{ value: "EMHV", label: "EMHV" }],
-    periods: ["2020-01"],
-    countries_of_origin: [{ value: "FR", label: "France" }],
-    production_sites: ["Test Production Site"],
-    delivery_sites: ["Test Delivery Site"],
-    vendors: ["Producteur Test", "Trader Test"],
-    clients: ["Opérateur Test"],
-  },
+  filters: [
+    'matieres_premieres',
+    'biocarburants',
+    'periods',
+    'countries_of_origin',
+    'production_sites',
+    'delivery_sites',
+    'vendors',
+    'clients',
+  ],
   depots: [],
 }
 
@@ -417,4 +417,25 @@ export const declaration = {
   month: 5,
   year: 2021,
   reminder_count: 0,
+}
+
+export function getFilter(field: string) {
+  switch (field) {
+    case 'matieres_premieres': 
+      return [{ value: "COLZA", label: "Colza" }]
+    case 'biocarburants': 
+      return [{ value: "EMHV", label: "EMHV" }]
+    case 'periods': 
+      return ["2020-01"]
+    case 'countries_of_origin': 
+      return [{ value: "FR", label: "France" }]
+    case 'production_sites': 
+      return ["Test Production Site"]
+    case 'delivery_sites': 
+      return ["Test Delivery Site"]
+    case 'clients': 
+      return ["Opérateur Test"]
+    case 'vendors': 
+      return ["Producteur Test", "Trader Test"]
+  }
 }

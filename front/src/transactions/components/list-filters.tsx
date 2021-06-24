@@ -1,10 +1,13 @@
 import { useTranslation, TFunction } from "react-i18next"
-import { Filters, Snapshot, TransactionQuery } from "common/types"
+import { EntityType, Filters, Snapshot, TransactionQuery } from "common/types"
 import { FilterSelection } from "transactions/hooks/query/use-filters"
 import Select, { Option, SelectValue } from "common/components/select"
 
 import styles from "./list-filters.module.css"
-import * as api from "../api"
+import {getFilters} from "../api"
+import {getAdminFilters} from "../api"
+import {getAuditorFilters} from "../api"
+import useEntity, { EntitySelection } from "carbure/hooks/use-entity"
 
 const FILTER_ORDER = [
   Filters.DeliveryStatus,
@@ -63,11 +66,24 @@ export function mapFilters(
   })
 }
 
+
+function filterGetter(entity?: EntitySelection) {
+  switch (entity?.entity_type) {
+    case EntityType.Administration:
+      return getAdminFilters
+    case EntityType.Auditor:
+      return getAuditorFilters
+    default:
+      return getFilters
+  }
+}
+        
 type TransactionFiltersProps = {
   selection: FilterSelection
   filters: Snapshot["filters"] | undefined
   query: TransactionQuery
   placeholder: Filters[]
+  entity: EntitySelection
 }
 
 const TransactionFilters = ({
@@ -75,6 +91,7 @@ const TransactionFilters = ({
   filters,
   query,
   placeholder,
+  entity,
 }: TransactionFiltersProps) => {
   const { t } = useTranslation()
 
@@ -91,7 +108,7 @@ const TransactionFilters = ({
               value={selected}
               placeholder={label}
               onChange={(value) => selection.select(filter, value)}
-              getOptions={api.getFilters}
+              getOptions={filterGetter(entity)}
               getArgs={[filter, query, t]}
             />
           )

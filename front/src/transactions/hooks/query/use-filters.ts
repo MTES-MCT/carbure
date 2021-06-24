@@ -55,7 +55,7 @@ export default function useFilterSelection(
       queryParams.delete(type)
     }
 
-    const queryString = queryParams.toString().replaceAll("%2C", ",")
+    const queryString = queryParams.toString().replace(/%2C/g, ",")
 
     if (queryString) {
       pagination.setPage(0)
