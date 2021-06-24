@@ -223,6 +223,8 @@ class Depot(models.Model):
     address = models.CharField(max_length=128, blank=True)
     postal_code = models.CharField(max_length=32, blank=True)
 
+    gps_coordinates = models.CharField(max_length=64, blank=True, null=True, default=None)
+
     def __str__(self):
         return self.name
 
@@ -666,3 +668,14 @@ class EmailNotification(models.Model):
         db_table = 'email_notifications'
         verbose_name = 'Email Notification'
         verbose_name_plural = 'Email Notifications'
+
+
+class TransactionDistance(models.Model):
+    starting_point = models.CharField(max_length=64, blank=True, null=True, default=None)
+    delivery_point = models.CharField(max_length=64, blank=True, null=True, default=None)
+    distance = models.FloatField(default=0.0)
+
+    class Meta:
+        db_table = 'transaction_distances'
+        verbose_name = 'Distance'
+        verbose_name_plural = 'Distances'
