@@ -6,6 +6,7 @@ import styles from "./select.module.css"
 import { SystemProps } from "."
 import { Checkbox, Input } from "./input"
 import { Cross } from "./icons"
+import { LoaderOverlay } from 'common/components'
 import {
   DropdownItem,
   DropdownLabel,
@@ -13,13 +14,7 @@ import {
   useDropdown,
 } from "./dropdown"
 import { useTranslation } from "react-i18next"
-import {
-  MultipleSelect as BaseMultipleSelect,
-  MultipleSelectProps as BaseMultipleSelectProps,
-} from "../toolkit/multiple-select"
-import { CheckboxOption } from "../toolkit/checkbox"
 import useAPI from "common/hooks/use-api"
-import { Merge } from "common/toolkit/types"
 
 type Value = string | number | boolean | null
 export type Option = { value: Value; label: string }
@@ -136,6 +131,8 @@ function useSelect(
   }
 }
 
+const asycNoop = () => Promise.resolve([])
+
 type SelectProps = SystemProps & {
   above?: boolean
   placeholder?: string
@@ -144,7 +141,9 @@ type SelectProps = SystemProps & {
   multiple?: boolean
   clear?: boolean
   value: SelectValue
-  options: Option[]
+  options?: Option[]
+  getOptions?: (...a: any[]) => Promise<Option[]>
+  getArgs?: any[]
   onChange: (value: SelectValue) => void
 }
 
@@ -152,7 +151,7 @@ export const Select = ({
   above,
   value,
   placeholder,
-  options,
+  options: localOptions,
   level,
   className,
   children,
@@ -160,14 +159,33 @@ export const Select = ({
   search = false,
   multiple = false,
   clear = false,
+  getOptions = asycNoop,
+  getArgs = [],
   ...props
 }: SelectProps) => {
   const { t } = useTranslation()
+
+  const [remoteOptions, getRemoteOptions] = useAPI(getOptions)
+  const options = localOptions ?? remoteOptions.data ?? []
 
   const { dd, query, selected, queryOptions, reset, select, onQueryChange } =
     useSelect(value, placeholder, options, onChange, multiple)
 
   const container = useRef<HTMLDivElement>(null)
+
+  // refresh select option when opened
+  useEffect(() => {
+    if (dd.isOpen) {
+      getRemoteOptions(...getArgs)
+    }
+  }, [dd.isOpen, , ...getArgs])
+
+  // load select options if value is defined but options are not loaded yet
+  useEffect(() => {
+    if (Array.isArray(value) && value.length > 0 && options.length === 0) {
+      getRemoteOptions(...getArgs)
+    }
+  }, [value, ...getArgs])
 
   const labelClassName = cl(styles.selectLabel, className, {
     [styles.selectPrimary]: level === "primary",
@@ -208,7 +226,9 @@ export const Select = ({
                 </DropdownItem>
               )}
 
-              {options.map((option, i) => (
+              {remoteOptions.loading && <LoaderOverlay />}
+
+              {!remoteOptions.loading && options.map((option, i) => (
                 <DropdownItem
                   key={option.value?.toString() ?? i}
                   title={option.label}
@@ -235,40 +255,5 @@ export const Select = ({
   )
 }
 
-type MultipleSelectProps<T> = Merge<
-  BaseMultipleSelectProps<T>,
-  {
-    getOptions: (query: string) => Promise<T[]>
-  }
->
-
-export function MultipleSelect({
-  getOptions,
-  ...props
-}: MultipleSelectProps<Option>) {
-  const [search, setSearch] = useState("")
-  const [options, findOptions] = useAPI(getOptions)
-
-  useEffect(() => {
-    findOptions(search)
-  }, [search, findOptions])
-
-  return (
-    <BaseMultipleSelect {...props}>
-      <div style={{ background: "white", border: "1px solid black" }}>
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onMouseDown={(e) => e.preventDefault()}
-        />
-        {options.data?.map((option) => (
-          <CheckboxOption key={option.label} value={option.value}>
-            {option.label}
-          </CheckboxOption>
-        ))}
-      </div>
-    </BaseMultipleSelect>
-  )
-}
 
 export default Select

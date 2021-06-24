@@ -1,15 +1,10 @@
 import { useTranslation, TFunction } from "react-i18next"
-import { Filters, Snapshot } from "common/types"
+import { Filters, Snapshot, TransactionQuery } from "common/types"
 import { FilterSelection } from "transactions/hooks/query/use-filters"
-import Select, {
-  MultipleSelect,
-  Option,
-  SelectValue,
-} from "common/components/select"
+import Select, { Option, SelectValue } from "common/components/select"
 
 import styles from "./list-filters.module.css"
-
-import { findBiocarburants } from "common/api"
+import * as api from "../api"
 
 const FILTER_ORDER = [
   Filters.DeliveryStatus,
@@ -34,16 +29,13 @@ export function mapFilters(
   selected: FilterSelection["selected"],
   placeholder: Filters[],
   t: TFunction<"translation">
-): [Filters, string, SelectValue, Option[]][] {
-  const filterList: [string, Option[]?][] =
-    typeof filters === "undefined"
-      ? placeholder.map((f) => [f, []])
-      : Object.entries(filters)
-
+): [Filters, string, SelectValue][] {
+  const filterList = filters ?? []
+  
   filterList.sort(
     (a, b) =>
-      FILTER_ORDER.indexOf(a[0] as Filters) -
-      FILTER_ORDER.indexOf(b[0] as Filters)
+      FILTER_ORDER.indexOf(a as Filters) -
+      FILTER_ORDER.indexOf(b as Filters)
   )
 
   const FILTER_LABELS = {
@@ -64,53 +56,43 @@ export function mapFilters(
     [Filters.HiddenByAuditor]: t("Lots ignorés"),
   }
 
-  return filterList.map(([key, options]) => {
-    const filter = key as Filters
+  return filterList.map((field) => {
+    const filter = field as Filters
     const value = selected[filter] ?? null
-    return [filter, FILTER_LABELS[filter], value, options ?? []]
+    return [filter, FILTER_LABELS[filter], value]
   })
 }
 
 type TransactionFiltersProps = {
   selection: FilterSelection
   filters: Snapshot["filters"] | undefined
+  query: TransactionQuery
   placeholder: Filters[]
-}
-
-function findBC(query: string): Promise<Option[]> {
-  return findBiocarburants(query).then((bcs) =>
-    bcs.map((bc) => ({
-      value: bc.code,
-      label: bc.name,
-    }))
-  )
 }
 
 const TransactionFilters = ({
   selection,
   filters,
+  query,
   placeholder,
 }: TransactionFiltersProps) => {
   const { t } = useTranslation()
 
-  const filter = filters?.[Filters.Biocarburants]
-
   return (
     <div className={styles.transactionFilters}>
       <div className={styles.filterGroup}>
-        <MultipleSelect value={filter} getOptions={findBC} />
-
         {mapFilters(filters, selection.selected, placeholder, t).map(
-          ([filter, label, selected, options]) => (
-            <Select
+          ([filter, label, selected]) => (
+            <Select 
               clear
               search
               multiple
               key={filter}
               value={selected}
               placeholder={label}
-              options={options}
               onChange={(value) => selection.select(filter, value)}
+              getOptions={api.getFilters}
+              getArgs={[filter, query, t]}
             />
           )
         )}

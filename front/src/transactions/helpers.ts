@@ -82,6 +82,67 @@ export function getStatus(
   return LotStatus.Weird
 }
 
+export function normalizeFilter(field: Filters, filter: string[] | Option[], t: TFunction): Option[] {
+  let normalized: Option[] = []
+
+  if (filter && typeof filter[0] === "string") {
+    const set = new Set<string>(filter as string[])
+    normalized = Array.from(set).map(toOption)
+  } 
+  
+  if (field === Filters.Biocarburants) {
+    normalized = filter.map((bc: any) => ({
+      value: bc.value,
+      label: t(bc.value, { ns: "biofuels" }),
+    }))
+  }
+
+  if (field === Filters.MatieresPremieres) {
+    normalized = filter.map((mp: any) => ({
+      value: mp.value,
+      label: t(mp.value, { ns: "feedstocks" }),
+    }))
+  }
+
+  if (field === Filters.CountriesOfOrigin) {
+    normalized = filter.map((ct: any) => ({
+      value: ct.value,
+      label: t(ct.value, { ns: "countries" }),
+    }))
+  }
+
+  if (field === Filters.DeliveryStatus) {
+    normalized = filter.map((ct: any) => ({
+      value: ct.value,
+      label: t(ct.label, { ns: "translation" }),
+    }))
+  }
+
+  if (field === Filters.Errors) {
+    normalized = filter.map((ct: any) => ({
+      value: ct.value,
+      label: t(ct.value, { ns: "errors" }),
+    }))
+  }
+
+  if (
+    [
+      Filters.Forwarded,
+      Filters.Mac,
+      Filters.HiddenByAdmin,
+      Filters.HiddenByAuditor,
+    ].includes(field)
+  ) {
+    normalized = filter.map((ct: any) => ({
+      value: ct.value,
+      label: t(ct.label, { ns: "translation" }),
+    }))
+  }
+
+  return normalized.filter(Boolean)
+    .sort((a: Option, b: Option) => a.label.localeCompare(b.label, "fr"))
+}
+
 // give the same type to all filters in order to render them easily
 export function normalizeFilters(snapshot: any, t: TFunction): Snapshot {
   Object.values(Filters).forEach((key) => {
