@@ -16,6 +16,8 @@ class ProductionSite(models.Model):
     site_id = models.CharField(max_length=64, blank=True)
     city = models.CharField(max_length=64, blank=True)
     postal_code = models.CharField(max_length=64, blank=True)
+    gps_coordinates = models.CharField(max_length=64, blank=True, null=True, default=None)
+
     manager_name = models.CharField(max_length=64, blank=True)
     manager_phone = models.CharField(max_length=64, blank=True)
     manager_email = models.CharField(max_length=64, blank=True)
