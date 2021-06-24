@@ -222,6 +222,27 @@ export const okAdminSnapshot = rest.get(
   }
 )
 
+export const okFilters = rest.get(
+  "/api/v3/lots/filters",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success", data: data.getFilter(req.url.searchParams.get('field') ?? '') }))
+  }
+)
+
+export const okAdminFilters = rest.get(
+  "/api/v3/admin/lots/filters",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success", data: data.getFilter(req.url.searchParams.get('field') ?? '') }))
+  }
+)
+
+export const okAuditorFilters = rest.get(
+  "/api/v3/auditor/filters",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success", data: data.getFilter(req.url.searchParams.get('field') ?? '') }))
+  }
+)
+
 export default setupServer(
   okSettings,
   okSnapshot,
@@ -250,5 +271,8 @@ export default setupServer(
   okDeclarationSummary,
   okTranslations,
   okErrorsTranslations,
-  okFieldsTranslations
+  okFieldsTranslations,
+  okFilters,
+  okAdminFilters,
+  okAuditorFilters
 )

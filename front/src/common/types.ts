@@ -336,7 +336,7 @@ export interface TransactionQuery {
 
 export interface Snapshot {
   lots: {
-    [key in LotStatus]: number
+    [key in LotStatus]?: number
   }
 
   filters: Filters[]

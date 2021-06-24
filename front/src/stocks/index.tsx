@@ -147,6 +147,7 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
         selection={filters}
         filters={snapshot.data?.filters}
         placeholder={FILTERS}
+        entity={entity}
       />
 
       <StockList
