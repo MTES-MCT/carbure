@@ -182,6 +182,7 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
             rejector={rejector}
             sender={sender}
             refresh={refresh}
+            transactions={summary.data?.tx_ids ?? []}
           />
         </Route>
       </Switch>
