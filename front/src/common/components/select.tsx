@@ -6,7 +6,7 @@ import styles from "./select.module.css"
 import { SystemProps } from "."
 import { Checkbox, Input } from "./input"
 import { Cross } from "./icons"
-import { LoaderOverlay } from 'common/components'
+import { LoaderOverlay } from "common/components"
 import {
   DropdownItem,
   DropdownLabel,
@@ -230,25 +230,26 @@ export const Select = ({
 
               {isLoading && <LoaderOverlay />}
 
-              {!isLoading && options.map((option, i) => (
-                <DropdownItem
-                  key={option.value?.toString() ?? i}
-                  title={option.label}
-                  focused={focused === i}
-                  selected={isSelected(value, option)}
-                  onClick={(e) => select(option, e)}
-                >
-                  {multiple && (
-                    <Checkbox
-                      readOnly
-                      checked={isSelected(value, option)}
-                      className={styles.selectMultiple}
-                    />
-                  )}
+              {!isLoading &&
+                options.map((option, i) => (
+                  <DropdownItem
+                    key={option.value?.toString() ?? i}
+                    title={option.label}
+                    focused={focused === i}
+                    selected={isSelected(value, option)}
+                    onClick={(e) => select(option, e)}
+                  >
+                    {multiple && (
+                      <Checkbox
+                        readOnly
+                        checked={isSelected(value, option)}
+                        className={styles.selectMultiple}
+                      />
+                    )}
 
-                  <span>{option.label}</span>
-                </DropdownItem>
-              ))}
+                    <span>{option.label}</span>
+                  </DropdownItem>
+                ))}
             </React.Fragment>
           )}
         </DropdownOptions>
@@ -256,6 +257,5 @@ export const Select = ({
     </div>
   )
 }
-
 
 export default Select

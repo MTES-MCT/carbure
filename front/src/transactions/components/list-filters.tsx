@@ -1,13 +1,12 @@
 import { useTranslation, TFunction } from "react-i18next"
 import { EntityType, Filters, Snapshot, TransactionQuery } from "common/types"
 import { FilterSelection } from "transactions/hooks/query/use-filters"
-import Select, { Option, SelectValue } from "common/components/select"
+import Select, { SelectValue } from "common/components/select"
 
 import styles from "./list-filters.module.css"
-import {getFilters} from "../api"
-import {getAdminFilters} from "../api"
-import {getAuditorFilters} from "../api"
-import useEntity, { EntitySelection } from "carbure/hooks/use-entity"
+import { getFilters, getAdminFilters, getAuditorFilters } from "../api"
+import { getStockFilters } from "stocks/api"
+import { EntitySelection } from "carbure/hooks/use-entity"
 
 const FILTER_ORDER = [
   Filters.DeliveryStatus,
@@ -34,11 +33,10 @@ export function mapFilters(
   t: TFunction<"translation">
 ): [Filters, string, SelectValue][] {
   const filterList = filters ?? []
-  
+
   filterList.sort(
     (a, b) =>
-      FILTER_ORDER.indexOf(a as Filters) -
-      FILTER_ORDER.indexOf(b as Filters)
+      FILTER_ORDER.indexOf(a as Filters) - FILTER_ORDER.indexOf(b as Filters)
   )
 
   const FILTER_LABELS = {
@@ -66,8 +64,9 @@ export function mapFilters(
   })
 }
 
+function filterGetter(entity?: EntitySelection, stock?: boolean) {
+  if (stock) return getStockFilters
 
-function filterGetter(entity?: EntitySelection) {
   switch (entity?.entity_type) {
     case EntityType.Administration:
       return getAdminFilters
@@ -77,13 +76,14 @@ function filterGetter(entity?: EntitySelection) {
       return getFilters
   }
 }
-        
+
 type TransactionFiltersProps = {
   selection: FilterSelection
   filters: Snapshot["filters"] | undefined
   query: TransactionQuery
   placeholder: Filters[]
   entity: EntitySelection
+  stock?: boolean
 }
 
 const TransactionFilters = ({
@@ -92,6 +92,7 @@ const TransactionFilters = ({
   query,
   placeholder,
   entity,
+  stock,
 }: TransactionFiltersProps) => {
   const { t } = useTranslation()
 
@@ -100,7 +101,7 @@ const TransactionFilters = ({
       <div className={styles.filterGroup}>
         {mapFilters(filters, selection.selected, placeholder, t).map(
           ([filter, label, selected]) => (
-            <Select 
+            <Select
               clear
               search
               multiple
@@ -108,7 +109,7 @@ const TransactionFilters = ({
               value={selected}
               placeholder={label}
               onChange={(value) => selection.select(filter, value)}
-              getOptions={filterGetter(entity)}
+              getOptions={filterGetter(entity, stock)}
               getArgs={[filter, query, t]}
             />
           )

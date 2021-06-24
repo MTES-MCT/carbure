@@ -7,6 +7,7 @@ import {
   TransactionQuery,
   TransactionSummary,
   Snapshot,
+  Filters,
 } from "common/types"
 
 import api from "common/services/api"
@@ -14,9 +15,11 @@ import {
   normalizeSummary,
   normalizeFilters,
   toOption,
+  normalizeFilter,
 } from "transactions/helpers"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { TFunction } from "react-i18next"
+import { Option } from "common/components/select"
 
 // extract the status name from the lot details
 export function getStockStatus(
@@ -63,15 +66,38 @@ export function getStocksSummary(
   selection: number[]
 ): Promise<TransactionSummary> {
   return api
-    .get("/stocks/summary", { ...query, limit: null, page: 0, selection })
+    .get("/stocks/summary", {
+      ...query,
+      limit: null,
+      from_idx: 0,
+      selection,
+      year: null,
+    })
     .then(normalizeSummary)
+}
+
+export function getStockFilters(
+  field: Filters,
+  params: TransactionQuery,
+  t: TFunction
+): Promise<Option[]> {
+  return api
+    .get("/stocks/filters", {
+      field,
+      ...params,
+      limit: null,
+      from_idx: 0,
+      year: null,
+    })
+    .then((filter) => normalizeFilter(field, filter, t))
 }
 
 export function downloadStocks(query: TransactionQuery) {
   return api.download("/stocks", {
     ...query,
-    page: 0,
+    from_idx: 0,
     limit: null,
+    year: null,
     export: true,
   })
 }
