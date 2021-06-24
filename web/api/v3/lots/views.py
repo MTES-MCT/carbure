@@ -20,7 +20,7 @@ from core.models import TransactionUpdateHistory
 
 from core.xlsx_v3 import template_producers_simple, template_producers_advanced, template_operators, template_traders
 from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates, get_uploaded_files_directory
-from core.common import check_certificates
+from core.common import check_certificates, get_transaction_distance
 from core.decorators import check_rights
 from core.notifications import notify_lots_rejected, notify_declaration_invalidated, notify_accepted_lot_in_correction
 from api.v3.sanity_checks import bulk_sanity_checks
@@ -85,6 +85,7 @@ def get_details(request, *args, **kwargs):
 
     data = {}
     data['transaction'] = tx.natural_key()
+    data['distance'] = get_transaction_distance(tx)
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['certificates'] = check_certificates(tx)

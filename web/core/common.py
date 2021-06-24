@@ -14,7 +14,7 @@ from django.db import transaction
 
 from core.models import LotV2, LotTransaction, GenericError, TransactionUpdateHistory
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
-from core.models import EmailNotification
+from core.models import TransactionDistance
 from core.notifications import notify_pending_lot
 
 from certificates.models import ISCCCertificate, EntityISCCTradingCertificate
@@ -1118,3 +1118,29 @@ def validate_lots(user, entity, txs):
             tx.lot.save()
     
     return {'submitted': submitted, 'valid': valid, 'invalid': invalid, 'errors': errors}
+
+
+def get_transaction_distance(tx):
+    if not tx.lot.production_site_is_in_carbure:
+        return -1
+    if not tx.delivery_site_is_in_carbure:
+        return -1
+    starting_point = tx.lot.carbure_production_site.gps_coordinates
+    delivery_point = tx.carbure_delivery_site.gps_coordinates
+
+    try:
+        td = TransactionDistance.objects.get(starting_point=starting_point, delivery_point=delivery_point)
+        return td.distance
+    except:
+        # not found
+        # call R script
+        #result = call_r_script(starting_point, delivery_point)
+        result = '847'
+        # if script success
+        if result != 'ERROR':
+            distance = float(result)
+            TransactionDistance.objects.create(starting_point=starting_point, delivery_point=delivery_point, distance=distance)
+            return distance
+        else:
+            return -1
+
