@@ -170,7 +170,7 @@ export const productionSite: TxCol = (t) => ({
   header: t("Site de production"),
   sortBy: "pays_origine",
   render: (tx) => {
-    const country = tx.carbure_delivery_site?.country ?? tx.unknown_delivery_site_country // prettier-ignore
+    const country = tx.lot.carbure_production_site?.country ?? tx.lot.unknown_production_country // prettier-ignore
     const countryName = country
       ? t(country?.code_pays, { ns: "countries" })
       : ""
@@ -188,7 +188,7 @@ export const origine: TxCol = (t) => ({
   header: t("Usine"),
   sortBy: "pays_origine",
   render: (tx) => {
-    const country = tx.carbure_delivery_site?.country ?? tx.unknown_delivery_site_country // prettier-ignore
+    const country = tx.lot.carbure_production_site?.country ?? tx.lot.unknown_production_country // prettier-ignore
     const countryName = country
       ? t(country?.code_pays, { ns: "countries" })
       : ""
