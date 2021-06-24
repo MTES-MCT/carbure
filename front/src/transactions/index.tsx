@@ -247,6 +247,7 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
       />
 
       <TransactionFilters
+        query={query}
         selection={filters}
         filters={snapshot.data?.filters}
         placeholder={filtersPlaceholder}

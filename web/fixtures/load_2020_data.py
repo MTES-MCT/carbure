@@ -25,7 +25,7 @@ today = datetime.date.today()
 now = datetime.datetime.now()
 mtes = Entity.objects.get(name='MTE - DGEC')
 #usermodel.objects.create_user(name='MTE Robot 2020', email='robot2020@carbure.beta.gouv.fr')
-robot = usermodel.objects.get(name='MTE Robot 2020')
+robot = usermodel.objects.get(name='MTES Robot 2020')
 france = Pays.objects.get(code_pays='FR')
 
 r = LotV2.objects.filter(added_by_user=robot).delete()

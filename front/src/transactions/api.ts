@@ -1,20 +1,22 @@
+import { TFunction } from "react-i18next"
 import {
   Transaction,
   Lots,
+  Filters,
   Snapshot,
   LotDetails,
   TransactionQuery,
   TransactionSummary,
 } from "common/types"
-
+import { Option } from 'common/components/select'
 import api from "common/services/api"
 import {
   normalizeSummary,
+  normalizeFilter,
   normalizeFilters,
   filterOutsourcedDepots,
   normalizeGeneralSummary,
 } from "./helpers"
-import { TFunction } from "react-i18next"
 
 export function getSnapshot(
   entityID: number,
@@ -25,6 +27,16 @@ export function getSnapshot(
     .get("/lots/snapshot", { entity_id: entityID, year })
     .then((s) => normalizeFilters(s, t))
     .then(filterOutsourcedDepots)
+}
+
+export function getFilters(
+  field: Filters,
+  params: TransactionQuery,
+  t: TFunction
+): Promise<Option[]> {
+  return api
+    .get("/lots/filters", {field, ...params})
+    .then(filter => normalizeFilter(field, filter, t))
 }
 
 export function getLots(params: TransactionQuery): Promise<Lots> {

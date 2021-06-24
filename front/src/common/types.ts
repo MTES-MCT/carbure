@@ -339,12 +339,8 @@ export interface Snapshot {
     [key in LotStatus]: number
   }
 
-  filters: {
-    [key in Filters]?: Option[]
-  }
-
+  filters: Filters[]
   years: Option[]
-
   depots: EntityDeliverySite[]
 }
 

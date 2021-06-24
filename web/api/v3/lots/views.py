@@ -24,7 +24,7 @@ from core.common import check_certificates, get_transaction_distance
 from core.decorators import check_rights
 from core.notifications import notify_lots_rejected, notify_declaration_invalidated, notify_accepted_lot_in_correction
 from api.v3.sanity_checks import bulk_sanity_checks
-from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, sort_lots, filter_lots
+from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, sort_lots, filter_lots, get_oneshot_filters
 
 
 logger = logging.getLogger(__name__)
@@ -159,7 +159,7 @@ def get_snapshot(request, *args, **kwargs):
 def get_filters(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
-    data = {}
+    status = request.GET.get('status', False)
     year = request.GET.get('year', False)
     field = request.GET.get('field', False)
     today = datetime.date.today()
@@ -172,49 +172,24 @@ def get_filters(request, *args, **kwargs):
             date_until = datetime.date(year=year, month=12, day=31)
         except Exception:
             return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
-
     if not field:
-        pass
-
-
+        return JsonResponse({'status': 'error', 'message': 'Please specify the field for which you want the filters'}, status=400)
     if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader':
         txs = LotTransaction.objects.filter(carbure_vendor=entity)
-        data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
         txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-        draft = txs.filter(lot__status='Draft', lot__parent_lot=None).count()
-        validated = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA']).count()
-        tofix = txs.filter(lot__status='Validated', delivery_status__in=['AC', 'R']).count()
-        accepted = txs.filter(lot__status='Validated', delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
-        data['lots'] = {'draft': draft, 'validated': validated, 'tofix': tofix, 'accepted': accepted}
     elif entity.entity_type == 'Opérateur':
         txs = LotTransaction.objects.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
-        data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
         txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
-        draft = txs.filter(lot__added_by=entity, lot__status='Draft').count()
-        ins = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA', 'AC'], is_mac=False).count()
-        accepted = txs.filter(lot__status='Validated', delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
-        data['lots'] = {'draft': draft, 'accepted': accepted, 'in': ins}
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
-
-    base_filters = [
-        'periods',
-        'biocarburants',
-        'matieres_premieres',
-        'countries_of_origin',
-        'production_sites',
-        'delivery_sites',
-    ]
-
-    if entity.entity_type == Entity.OPERATOR:
-        data['filters'] = get_snapshot_filters(txs, base_filters + ['vendors'])
+    txs = get_entity_lots_by_status(entity, status)
+    txs, _, _, _ = filter_lots(txs, request.GET)
+    d = get_snapshot_filters(txs, [field])
+    if field in d:
+        values = d[field]
     else:
-        data['filters'] = get_snapshot_filters(txs, base_filters + ['clients'])
-
-    depots = [d.natural_key() for d in EntityDepot.objects.filter(entity=entity)]
-    data['depots'] = depots
-
-    return JsonResponse({'status': 'success', 'data': data})
+        return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
+    return JsonResponse({'status': 'success', 'data': values})
 
 
 @check_rights('entity_id')
