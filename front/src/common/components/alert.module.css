@@ -55,6 +55,11 @@
   cursor: pointer;
 }
 
+.alertExtra {
+  margin-left: 4px;
+  color: var(--blue-dark);
+}
+
 .alertClose {
   margin-left: auto;
 }
