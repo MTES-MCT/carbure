@@ -178,14 +178,14 @@ export const Select = ({
     if (dd.isOpen) {
       getRemoteOptions(...getArgs)
     }
-  }, [dd.isOpen, , ...getArgs])
+  }, [dd.isOpen, getRemoteOptions, ...getArgs])
 
   // load select options if value is defined but options are not loaded yet
   useEffect(() => {
     if (Array.isArray(value) && value.length > 0 && options.length === 0) {
       getRemoteOptions(...getArgs)
     }
-  }, [value, ...getArgs])
+  }, [value, getRemoteOptions, options.length, ...getArgs])
 
   const isLoading = !Boolean(localOptions) && remoteOptions.loading
 
