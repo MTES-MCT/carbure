@@ -160,30 +160,17 @@ def get_filters(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
     status = request.GET.get('status', False)
-    year = request.GET.get('year', False)
     field = request.GET.get('field', False)
-    today = datetime.date.today()
-    date_from = today.replace(month=1, day=1)
-    date_until = today.replace(month=12, day=31)
-    if year:
-        try:
-            year = int(year)
-            date_from = datetime.date(year=year, month=1, day=1)
-            date_until = datetime.date(year=year, month=12, day=31)
-        except Exception:
-            return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
     if not field:
         return JsonResponse({'status': 'error', 'message': 'Please specify the field for which you want the filters'}, status=400)
     if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader':
         txs = LotTransaction.objects.filter(carbure_vendor=entity)
-        txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
     elif entity.entity_type == 'Opérateur':
         txs = LotTransaction.objects.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
-        txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
     txs = get_entity_lots_by_status(entity, status)
-    txs, _, _, _ = filter_lots(txs, request.GET)
+    txs = filter_lots(txs, request.GET, [field])[0]
     d = get_snapshot_filters(txs, [field])
     if field in d:
         values = d[field]

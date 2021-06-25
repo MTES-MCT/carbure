@@ -112,7 +112,7 @@ def get_filters(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Please specify the field for which you want the filters'}, status=400)
 
     txs = filter_stock_transactions(entity, request.GET)
-    txs = filter_lots(txs, request.GET)[0]
+    txs = filter_lots(txs, request.GET, [field])[0]
 
     d = get_snapshot_filters(txs, [field])
     if field in d:
