@@ -127,7 +127,7 @@ def filter_by_entities(txs, entities):
     )
 
 
-def filter_lots(txs, querySet):
+def filter_lots(txs, querySet, blacklist=[]):
     is_forwarded = querySet.get('is_forwarded', None)
     is_mac = querySet.get('is_mac', None)
     year = querySet.get('year', False)
@@ -152,82 +152,82 @@ def filter_lots(txs, querySet):
     is_highlighted_by_auditor = querySet.get('is_highlighted_by_auditor', None)
     selection = querySet.getlist('selection', False)
 
-    if year:
+    if year and 'year' not in blacklist:
         date_from, date_until = get_year_bounds(year)
         txs = txs.filter(delivery_date__gte=date_from, delivery_date__lte=date_until)
 
     if selection and len(selection) > 0:
         txs = txs.filter(pk__in=selection)
 
-    if periods:
+    if periods and 'periods' not in blacklist:
         txs = txs.filter(lot__period__in=periods)
-    if production_sites:
+    if production_sites and 'production_sites' not in blacklist:
         txs = txs.filter(Q(lot__carbure_production_site__name__in=production_sites) | Q(lot__unknown_production_site__in=production_sites))
-    if matieres_premieres:
+    if matieres_premieres and 'matieres_premieres' not in blacklist:
         txs = txs.filter(lot__matiere_premiere__code__in=matieres_premieres)
-    if biocarburants:
+    if biocarburants and 'biocarburants' not in blacklist:
         txs = txs.filter(lot__biocarburant__code__in=biocarburants)
-    if countries_of_origin:
+    if countries_of_origin and 'countries_of_origin' not in blacklist:
         txs = txs.filter(lot__pays_origine__code_pays__in=countries_of_origin)
-    if delivery_sites:
+    if delivery_sites and 'delivery_sites' not in blacklist:
         txs = txs.filter(Q(carbure_delivery_site__name__in=delivery_sites) | Q(unknown_delivery_site__in=delivery_sites))
-    if clients:
+    if clients and 'clients' not in blacklist:
         txs = txs.filter(Q(carbure_client__name__in=clients) | Q(unknown_client__in=clients))
-    if vendors:
+    if vendors and 'vendors' not in blacklist:
         txs = txs.filter(Q(carbure_vendor__name__in=vendors) | Q(lot__unknown_supplier__in=vendors))
-    if delivery_status:
+    if delivery_status and 'delivery_status' not in blacklist:
         txs = txs.filter(delivery_status__in=delivery_status)
 
-    if producers:
+    if producers and 'producers' not in blacklist:
         txs = filter_by_entities(txs, producers)
-    if operators:
+    if operators and 'operators' not in blacklist:
         txs = filter_by_entities(txs, operators)
-    if traders:
+    if traders and 'traders' not in blacklist:
         txs = filter_by_entities(txs, traders)
 
-    if added_by:
+    if added_by and 'added_by' not in blacklist:
         txs = txs.filter(lot__added_by__name__in=added_by)
 
-    if is_forwarded is not None:
+    if is_forwarded is not None and 'is_forwarded' not in blacklist:
         if is_forwarded == 'true':
             txs = txs.filter(is_forwarded=True)
         else:
             txs = txs.filter(is_forwarded=False)
 
-    if is_mac is not None:
+    if is_mac is not None and 'is_mac' not in blacklist:
         if is_mac == 'true':
             txs = txs.filter(is_mac=True)
         else:
             txs = txs.filter(is_mac=False)
 
-    if is_hidden_by_admin is not None:
+    if is_hidden_by_admin is not None and 'is_hidden_by_admin' not in blacklist:
         if is_hidden_by_admin == 'true':
             txs = txs.filter(hidden_by_admin=True)
         else:
             txs = txs.filter(hidden_by_admin=False)
 
-    if is_hidden_by_auditor is not None:
+    if is_hidden_by_auditor is not None and 'is_hidden_by_auditor' not in blacklist:
         if is_hidden_by_auditor == 'true':
             txs = txs.filter(hidden_by_auditor=True)
         else:
             txs = txs.filter(hidden_by_auditor=False)
 
-    if is_highlighted_by_admin is not None:
+    if is_highlighted_by_admin is not None and 'is_highlighted_by_admin' not in blacklist:
         if is_highlighted_by_admin == 'true':
             txs = txs.filter(highlighted_by_admin=True)
         else:
             txs = txs.filter(highlighted_by_admin=False)
 
-    if is_highlighted_by_auditor is not None:
+    if is_highlighted_by_auditor is not None and 'is_highlighted_by_auditor' not in blacklist:
         if is_highlighted_by_auditor == 'true':
             txs = txs.filter(is_highlighted_by_auditor=True)
         else:
             txs = txs.filter(is_highlighted_by_auditor=False)
 
-    if errors:
+    if errors and 'errors' not in blacklist:
         txs = txs.filter(genericerror__error__in=errors)
 
-    if query:
+    if query and 'query' not in blacklist:
         txs = txs.filter(
             Q(lot__matiere_premiere__name__icontains=query) |
             Q(lot__biocarburant__name__icontains=query) |
@@ -259,7 +259,7 @@ def filter_lots(txs, querySet):
 
     if invalid == 'true':
         txs = tx_with_errors
-    elif deadline == 'true':
+    elif deadline == 'true' and 'deadline' not in blacklist:
         txs = tx_with_deadline
 
     return txs, total_errors, total_deadline, deadline_str
