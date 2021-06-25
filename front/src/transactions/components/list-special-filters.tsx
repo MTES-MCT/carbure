@@ -78,6 +78,7 @@ export const DeadlineFilter = ({
 type SummaryFilterProps = {
   loading: boolean
   txCount: number
+  filterCount: number
   totalVolume: number
   query: TransactionQuery
   hideRecap?: boolean
@@ -90,6 +91,7 @@ type SummaryFilterProps = {
 export const SummaryFilter = ({
   loading,
   txCount: count,
+  filterCount,
   totalVolume,
   query,
   selection,
@@ -142,6 +144,28 @@ export const SummaryFilter = ({
       >
         <Trans>Réinitialiser les filtres</Trans>
       </span>
+      <span className={styles.alertExtra}>({filterCount})</span>
     </Alert>
   )
 }
+
+type NoResultProps = {
+  loading: boolean
+  filterCount: number
+  onReset: () => void
+}
+
+export const NoResult = ({ loading, filterCount, onReset }: NoResultProps) => (
+  <Alert
+    level="warning"
+    icon={loading ? Loader : AlertCircle}
+    className={cl(styles.alertFilter, loading && styles.alertLoading)}
+  >
+    <Trans>Aucune transaction trouvée pour cette recherche</Trans>
+
+    <span className={cl(styles.alertLink, styles.alertClose)} onClick={onReset}>
+      <Trans>Réinitialiser les filtres</Trans>
+    </span>
+    <span className={styles.alertExtra}>({filterCount})</span>
+  </Alert>
+)
