@@ -410,7 +410,7 @@ export function getAuditorFilters(
   t: TFunction
 ): Promise<Option[]> {
   return api
-    .get("/auditors/filters", { field, ...params, limit: null, from_idx: 0 })
+    .get("/auditor/filters", { field, ...params, limit: null, from_idx: 0 })
     .then((filter) => normalizeFilter(field, filter, t))
 }
 
