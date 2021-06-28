@@ -7,6 +7,7 @@ urlpatterns = [
     path('snapshot', views.get_snapshot, name='api-v3-stocks-get-snapshot'),
     path('depots', views.get_depots, name='api-v3-stocks-get-depots'),
     path('summary', views.get_stocks_summary, name='api-v3-stocks-get-summary'),
+    path('filters', views.get_filters, name='api-v3-stocks-get-filters'),
 
     # POST
     path('generate-batch', views.generate_batch, name='api-v3-stocks-generate-batch'),

@@ -143,6 +143,7 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
       <StocksSnapshot snapshot={snapshot} status={status} />
 
       <TransactionFilters
+        stock
         query={query}
         selection={filters}
         filters={snapshot.data?.filters}
