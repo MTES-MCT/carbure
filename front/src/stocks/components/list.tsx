@@ -19,7 +19,10 @@ import { LotSender } from "stocks/hooks/use-send-lots"
 import { StatusSelection } from "transactions/hooks/query/use-status"
 import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { StockHook } from "../hooks/use-stock-list"
-import { SummaryFilter } from "transactions/components/list-special-filters"
+import {
+  NoResult,
+  SummaryFilter,
+} from "transactions/components/list-special-filters"
 
 import { AlertCircle } from "common/components/icons"
 import { Box, LoaderOverlay } from "common/components"
@@ -91,6 +94,7 @@ export const StockList = ({
   const isEmpty = txs === null || txs.lots.length === 0
 
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
+  const filterCount = Object.values(filters.selected).filter(Boolean).length
 
   return (
     <Box className={styles.stockList}>
@@ -142,6 +146,7 @@ export const StockList = ({
       {!isEmpty && (
         <SummaryFilter
           stock
+          filterCount={filterCount}
           loading={summary.loading}
           txCount={summary.data?.tx_ids.length ?? 0}
           totalVolume={summary.data?.total_volume ?? 0}
@@ -157,9 +162,11 @@ export const StockList = ({
       )}
 
       {!isError && isEmpty && (
-        <Alert level="warning" icon={AlertCircle}>
-          <Trans>Aucune transaction trouvée pour cette recherche</Trans>
-        </Alert>
+        <NoResult
+          loading={isLoading}
+          filterCount={filterCount}
+          onReset={filters.reset}
+        />
       )}
 
       {!isError && !isEmpty && (

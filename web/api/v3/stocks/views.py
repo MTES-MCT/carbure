@@ -90,9 +90,7 @@ def get_snapshot(request, *args, **kwargs):
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
 
-    txs = tx_drafts | tx_inbox | tx_stock
-
-    data['filters'] = get_snapshot_filters(txs, [
+    data['filters'] = [
         'periods',
         'biocarburants',
         'matieres_premieres',
@@ -100,9 +98,28 @@ def get_snapshot(request, *args, **kwargs):
         'vendors',
         'production_sites',
         'delivery_sites'
-    ])
+    ]
 
     return JsonResponse({'status': 'success', 'data': data})
+
+
+@check_rights('entity_id')
+def get_filters(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    field = request.GET.get('field', False)
+    if not field:
+        return JsonResponse({'status': 'error', 'message': 'Please specify the field for which you want the filters'}, status=400)
+
+    txs = filter_stock_transactions(entity, request.GET)
+    txs = filter_lots(txs, request.GET, [field])[0]
+
+    d = get_snapshot_filters(txs, [field])
+    if field in d:
+        values = d[field]
+    else:
+        return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
+    return JsonResponse({'status': 'success', 'data': values})
 
 
 @check_rights('entity_id')

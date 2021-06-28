@@ -6,7 +6,7 @@ import styles from "./select.module.css"
 import { SystemProps } from "."
 import { Checkbox, Input } from "./input"
 import { Cross } from "./icons"
-import { LoaderOverlay } from 'common/components'
+import { LoaderOverlay } from "common/components"
 import {
   DropdownItem,
   DropdownLabel,
@@ -178,14 +178,14 @@ export const Select = ({
     if (dd.isOpen) {
       getRemoteOptions(...getArgs)
     }
-  }, [dd.isOpen, , ...getArgs])
+  }, [dd.isOpen, getRemoteOptions, ...getArgs])
 
   // load select options if value is defined but options are not loaded yet
   useEffect(() => {
     if (Array.isArray(value) && value.length > 0 && options.length === 0) {
       getRemoteOptions(...getArgs)
     }
-  }, [value, ...getArgs])
+  }, [value, getRemoteOptions, options.length, ...getArgs])
 
   const isLoading = !Boolean(localOptions) && remoteOptions.loading
 
@@ -230,7 +230,7 @@ export const Select = ({
 
               {isLoading && <LoaderOverlay />}
 
-              {!isLoading && options.map((option, i) => (
+              {options.map((option, i) => (
                 <DropdownItem
                   key={option.value?.toString() ?? i}
                   title={option.label}
@@ -256,6 +256,5 @@ export const Select = ({
     </div>
   )
 }
-
 
 export default Select

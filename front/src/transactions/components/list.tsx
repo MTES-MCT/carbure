@@ -51,6 +51,7 @@ import {
   DeadlineFilter,
   InvalidFilter,
   SummaryFilter,
+  NoResult,
 } from "./list-special-filters"
 import { OperatorOutsourcedBlendingActions } from "./list-actions"
 import { LotForwarder } from "transactions/hooks/actions/use-forward-lots"
@@ -137,6 +138,7 @@ export const TransactionList = ({
 
   const hasSelection = selection.selected.length > 0
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
+  const filterCount = Object.values(filters.selected).filter(Boolean).length
 
   return (
     <Box className={styles.transactionList}>
@@ -220,6 +222,7 @@ export const TransactionList = ({
           query={query}
           selection={selection.selected}
           entity={entity}
+          filterCount={filterCount}
           onReset={() => {
             filters.reset()
             selection.reset()
@@ -249,10 +252,11 @@ export const TransactionList = ({
       )}
 
       {!isError && isEmpty && (
-        <Alert level="warning" icon={AlertCircle}>
-          <Trans>Aucune transaction trouvée pour cette recherche</Trans>
-          {isLoading && <LoaderOverlay />}
-        </Alert>
+        <NoResult
+          loading={isLoading}
+          onReset={filters.reset}
+          filterCount={filterCount}
+        />
       )}
 
       {!isError && !isEmpty && (

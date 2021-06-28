@@ -8,7 +8,7 @@ import {
   TransactionQuery,
   TransactionSummary,
 } from "common/types"
-import { Option } from 'common/components/select'
+import { Option } from "common/components/select"
 import api from "common/services/api"
 import {
   normalizeSummary,
@@ -35,8 +35,8 @@ export function getFilters(
   t: TFunction
 ): Promise<Option[]> {
   return api
-    .get("/lots/filters", {field, ...params})
-    .then(filter => normalizeFilter(field, filter, t))
+    .get("/lots/filters", { field, ...params, limit: null, from_idx: 0 })
+    .then((filter) => normalizeFilter(field, filter, t))
 }
 
 export function getLots(params: TransactionQuery): Promise<Lots> {
@@ -48,7 +48,7 @@ export function getLotsSummary(
   selection: number[]
 ): Promise<TransactionSummary> {
   return api
-    .get("/lots/summary", { ...query, limit: null, page: 0, selection })
+    .get("/lots/summary", { ...query, limit: null, from_idx: 0, selection })
     .then(normalizeSummary)
 }
 
@@ -323,8 +323,8 @@ export function getAdminFilters(
   t: TFunction
 ): Promise<Option[]> {
   return api
-    .get("/admin/lots/filters", {field, ...params})
-    .then(filter => normalizeFilter(field, filter, t))
+    .get("/admin/lots/filters", { field, ...params, limit: null, from_idx: 0 })
+    .then((filter) => normalizeFilter(field, filter, t))
 }
 
 export function getAdminLots(filters: TransactionQuery): Promise<Lots> {
@@ -355,7 +355,12 @@ export function getAdminSummary(
   selection: number[]
 ): Promise<TransactionSummary> {
   return api
-    .get("/admin/lots/summary", { ...query, limit: null, page: 0, selection })
+    .get("/admin/lots/summary", {
+      ...query,
+      limit: null,
+      from_idx: 0,
+      selection,
+    })
     .then(normalizeGeneralSummary)
 }
 
@@ -405,8 +410,8 @@ export function getAuditorFilters(
   t: TFunction
 ): Promise<Option[]> {
   return api
-    .get("/auditors/filters", {field, ...params})
-    .then(filter => normalizeFilter(field, filter, t))
+    .get("/auditor/filters", { field, ...params, limit: null, from_idx: 0 })
+    .then((filter) => normalizeFilter(field, filter, t))
 }
 
 export function getAuditorLots(params: TransactionQuery) {
@@ -418,7 +423,7 @@ export function getAuditorSummary(
   selection: number[]
 ): Promise<TransactionSummary> {
   return api
-    .get("/auditor/summary", { ...query, limit: null, page: 0, selection })
+    .get("/auditor/summary", { ...query, limit: null, from_idx: 0, selection })
     .then(normalizeGeneralSummary)
 }
 
