@@ -153,8 +153,7 @@ def filter_lots(txs, querySet, blacklist=[]):
     selection = querySet.getlist('selection', False)
 
     if year and 'year' not in blacklist:
-        date_from, date_until = get_year_bounds(year)
-        txs = txs.filter(delivery_date__gte=date_from, delivery_date__lte=date_until)
+        txs = txs.filter(lot__year=year)
 
     if selection and len(selection) > 0:
         txs = txs.filter(pk__in=selection)
@@ -301,6 +300,7 @@ def get_lots_with_metadata(txs, entity, querySet, admin=False):
     from_idx = querySet.get('from_idx', "0")
 
     txs, total_errors, total_deadline, deadline_str = filter_lots(txs, querySet)
+    print('postfilter %d' % (txs.count()))
     txs = sort_lots(txs, querySet)
 
     from_idx = int(from_idx)
