@@ -137,7 +137,7 @@ def sanity_check(tx, prefetched_data):
         errors.append(generic_error(error='MAC_BC_WRONG', tx=tx, is_blocking=True, fields=['biocarburant_code', 'mac']))
 
     # check volume
-    if lot.volume < 2000:
+    if lot.volume < 2000 and not tx.is_mac:
         errors.append(generic_error(error='VOLUME_FAIBLE', tx=tx, field='volume'))
 
     # réduction de GES
