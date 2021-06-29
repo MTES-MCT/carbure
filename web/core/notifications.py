@@ -25,7 +25,7 @@ def notify_accepted_lot_in_correction(tx):
 
 def notify_declaration_invalidated(tx, entity):
     year, month = tx.lot.period.split('-')
-    period = datetime.date(year=year, month=int(month), day=1)
+    period = datetime.date(year=int(year), month=int(month), day=1)
     try:
         sd = SustainabilityDeclaration.objects.filter(entity=entity, period=period)
         sd.declared = False
