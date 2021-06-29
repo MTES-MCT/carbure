@@ -300,7 +300,6 @@ def get_lots_with_metadata(txs, entity, querySet, admin=False):
     from_idx = querySet.get('from_idx', "0")
 
     txs, total_errors, total_deadline, deadline_str = filter_lots(txs, querySet)
-    print('postfilter %d' % (txs.count()))
     txs = sort_lots(txs, querySet)
 
     from_idx = int(from_idx)

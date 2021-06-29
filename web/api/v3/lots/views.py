@@ -446,6 +446,13 @@ def accept_with_reserves(request, *args, **kwargs):
         tx.delivery_status = LotTransaction.TOFIX
         tx.save()
 
+        if tx.lot.added_by.entity_type == Entity.OPERATOR:
+            # back to Drafts
+            tx.lot.status = LotV2.DRAFT
+            tx.lot.save()
+            tx.delivery_status = LotTransaction.PENDING
+            tx.save()
+
     return JsonResponse({'status': 'success'})
 
 
