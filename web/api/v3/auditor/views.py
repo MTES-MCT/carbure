@@ -68,7 +68,7 @@ def get_filters(request, *args, **kwargs):
     txs = get_audited_lots(auditees)
     txs = get_lots_by_status(txs, request.GET)
     txs = filter_lots(txs, request.GET, [field])[0]
-    d = get_snapshot_filters(txs, [field])
+    d = get_snapshot_filters(txs, None, [field])
     if field in d:
         values = d[field]
     else:
