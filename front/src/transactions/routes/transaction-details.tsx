@@ -85,6 +85,10 @@ const TransactionDetails = ({
   const rights = useRights()
   const navigator = useNavigate(transactions)
 
+  const history = details.data?.updates?.filter(
+    (h) => t(h.field, { ns: "fields" }) !== h.field
+  )
+
   const isEditable = EDITABLE.includes(status)
   const isCommentable = COMMENTABLE.includes(status)
 
@@ -141,9 +145,7 @@ const TransactionDetails = ({
         />
       )}
 
-      {Boolean(details.data?.updates?.length) && (
-        <TransactionHistory history={details.data?.updates} />
-      )}
+      {Boolean(history?.length) && <TransactionHistory history={history} />}
 
       <div className={styles.transactionFormButtons}>
         {canModify && isEditable && (
