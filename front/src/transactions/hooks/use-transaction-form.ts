@@ -6,7 +6,6 @@ import {
   Country,
   DeliverySite,
   Entity,
-  Transaction,
   MatierePremiere,
   ProductionSiteDetails,
   EntityType,
@@ -297,6 +296,10 @@ function fixedValues(
   if (entity.entity_type === EntityType.Producer) {
     tx.carbure_vendor = entity
 
+    if (!tx.carbure_vendor_certificate) {
+      tx.carbure_vendor_certificate = entity.default_certificate
+    }
+
     if (!entity.has_trading) {
       tx.producer = entity
     }
@@ -310,6 +313,10 @@ function fixedValues(
   // for traders
   if (entity.entity_type === EntityType.Trader) {
     tx.carbure_vendor = entity
+
+    if (!tx.carbure_vendor_certificate) {
+      tx.carbure_vendor_certificate = entity.default_certificate
+    }
   }
 
   if (!prevTx?.mac && tx.mac) {
