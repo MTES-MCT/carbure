@@ -290,6 +290,7 @@ def get_snapshot(request):
         return JsonResponse({'status': 'error', 'message': "Exception"}, status=400)
     return JsonResponse({"status": "success", "data": data})
 
+
 @is_admin
 def get_filters(request, *args, **kwargs):
     field = request.GET.get('field', False)
@@ -299,7 +300,7 @@ def get_filters(request, *args, **kwargs):
     txs = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED)
     txs = get_lots_by_status(txs, request.GET)
     txs = filter_lots(txs, request.GET, [field])[0]
-    d = get_snapshot_filters(txs, [field])
+    d = get_snapshot_filters(txs, None, [field])
     if field in d:
         values = d[field]
     else:

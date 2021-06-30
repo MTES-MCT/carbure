@@ -337,7 +337,7 @@ def get_lots_with_metadata(txs, entity, querySet, admin=False):
         return response
 
 
-def get_snapshot_filters(txs, whitelist):
+def get_snapshot_filters(txs, entity, whitelist):
     filters = {}
 
     # prefetch related lots and txs to speed up queries
@@ -392,7 +392,10 @@ def get_snapshot_filters(txs, whitelist):
 
     if 'vendors' in whitelist:
         v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
-        v2 = [v['unknown_supplier'] for v in lots.values('unknown_supplier').distinct()]
+        if entity is not None:
+            v2 = [v['lot__unknown_supplier'] for v in txs.filter(Q(carbure_vendor=entity) | Q(lot__added_by=entity)).values('lot__unknown_supplier').distinct()]
+        else:
+            v2 = [v['unknown_supplier'] for v in lots.values('unknown_supplier').distinct()]
         filters['vendors'] = [v for v in set(v1 + v2) if v]
 
     if 'added_by' in whitelist:
