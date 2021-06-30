@@ -84,7 +84,7 @@ export default function useSNCertificates(
     ))
 
     if (typeof entityID !== "undefined" && data) {
-      notifyCertificate(
+      await notifyCertificate(
         resolveAddSN(entityID, data.certificate_id),
         t("ajouté")
       )
@@ -99,7 +99,7 @@ export default function useSNCertificates(
         t("Voulez-vous vraiment supprimer le certificat Système National {{cert}} ?", { cert: sn.certificate_id }) // prettier-ignore
       ))
     ) {
-      notifyCertificate(
+      await notifyCertificate(
         resolveDelSN(entityID, sn.certificate_id),
         t("supprimé")
       )
@@ -118,7 +118,7 @@ export default function useSNCertificates(
     ))
 
     if (typeof entityID !== "undefined" && data) {
-      notifyCertificate(
+      await notifyCertificate(
         resolveUpdateSN(entityID, sn.certificate_id, data.certificate_id),
         t("mis à jour")
       )
