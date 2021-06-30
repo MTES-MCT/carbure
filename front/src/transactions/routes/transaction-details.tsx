@@ -25,6 +25,8 @@ import {
   Edit,
   EyeOff,
   Pin,
+  PinOff,
+  Eye,
 } from "common/components/icons"
 import { Box, LoaderOverlay } from "common/components"
 import { AsyncButton, Button } from "common/components/button"
@@ -265,7 +267,7 @@ const TransactionDetails = ({
         {isAdmin && (
           <React.Fragment>
             <AsyncButton
-              icon={Pin}
+              icon={transaction?.highlighted_by_admin ? PinOff : Pin}
               level="success"
               loading={administrator.loading}
               onClick={() => run(administrator.markForReview, true)}
@@ -275,7 +277,7 @@ const TransactionDetails = ({
                 : t("Épingler le lot")}
             </AsyncButton>
             <AsyncButton
-              icon={EyeOff}
+              icon={transaction?.hidden_by_admin ? Eye : EyeOff}
               level="warning"
               loading={administrator.loading}
               onClick={() => run(administrator.markAsRead, true)}
@@ -290,7 +292,7 @@ const TransactionDetails = ({
         {isAuditor && (
           <React.Fragment>
             <AsyncButton
-              icon={Pin}
+              icon={transaction?.highlighted_by_auditor ? PinOff : Pin}
               level="success"
               loading={auditor.loading}
               onClick={() => run(auditor.highlightLot, true)}
@@ -300,7 +302,7 @@ const TransactionDetails = ({
                 : t("Épingler le lot")}
             </AsyncButton>
             <AsyncButton
-              icon={EyeOff}
+              icon={transaction?.hidden_by_auditor ? Eye : EyeOff}
               level="warning"
               loading={auditor.loading}
               onClick={() => run(auditor.hideLot, true)}
