@@ -14,7 +14,7 @@ import useAPI from "common/hooks/use-api"
 import useClose from "common/hooks/use-close"
 import { useNotificationContext } from "common/components/notifications"
 import * as api from "../api"
-import { getStatus } from "transactions/helpers"
+import { getStatus } from "transactions/components/status"
 
 export function useFieldErrors(errors: GenericError[]) {
   const { t } = useTranslation()
