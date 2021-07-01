@@ -23,6 +23,7 @@ import Entities from "../entities" // not using relative path prevents import
 import EntityDetails from "../entities/routes/entity-details"
 import Dashboard from "dashboard"
 import Stats from "stats"
+import PublicStats from "stats/public"
 
 const DevBanner = () => (
   <div
@@ -159,6 +160,10 @@ const Carbure = () => {
 
           <Route path="/logout">
             <Exit to="/accounts/logout" />
+          </Route>
+
+          <Route path="/public_stats">
+            <PublicStats />
           </Route>
 
           <Redirect to={`/org/${getDefaultEntity()}`} />
