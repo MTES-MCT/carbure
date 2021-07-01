@@ -25,6 +25,8 @@ import {
   Edit,
   EyeOff,
   Pin,
+  PinOff,
+  Eye,
 } from "common/components/icons"
 import { Box, LoaderOverlay } from "common/components"
 import { AsyncButton, Button } from "common/components/button"
@@ -85,6 +87,10 @@ const TransactionDetails = ({
   const rights = useRights()
   const navigator = useNavigate(transactions)
 
+  const history = details.data?.updates?.filter(
+    (h) => t(h.field, { ns: "fields" }) !== h.field
+  )
+
   const isEditable = EDITABLE.includes(status)
   const isCommentable = COMMENTABLE.includes(status)
 
@@ -141,9 +147,7 @@ const TransactionDetails = ({
         />
       )}
 
-      {Boolean(details.data?.updates?.length) && (
-        <TransactionHistory history={details.data?.updates} />
-      )}
+      {Boolean(history?.length) && <TransactionHistory history={history} />}
 
       <div className={styles.transactionFormButtons}>
         {canModify && isEditable && (
@@ -263,7 +267,7 @@ const TransactionDetails = ({
         {isAdmin && (
           <React.Fragment>
             <AsyncButton
-              icon={Pin}
+              icon={transaction?.highlighted_by_admin ? PinOff : Pin}
               level="success"
               loading={administrator.loading}
               onClick={() => run(administrator.markForReview, true)}
@@ -273,7 +277,7 @@ const TransactionDetails = ({
                 : t("Épingler le lot")}
             </AsyncButton>
             <AsyncButton
-              icon={EyeOff}
+              icon={transaction?.hidden_by_admin ? Eye : EyeOff}
               level="warning"
               loading={administrator.loading}
               onClick={() => run(administrator.markAsRead, true)}
@@ -288,7 +292,7 @@ const TransactionDetails = ({
         {isAuditor && (
           <React.Fragment>
             <AsyncButton
-              icon={Pin}
+              icon={transaction?.highlighted_by_auditor ? PinOff : Pin}
               level="success"
               loading={auditor.loading}
               onClick={() => run(auditor.highlightLot, true)}
@@ -298,7 +302,7 @@ const TransactionDetails = ({
                 : t("Épingler le lot")}
             </AsyncButton>
             <AsyncButton
-              icon={EyeOff}
+              icon={transaction?.hidden_by_auditor ? Eye : EyeOff}
               level="warning"
               loading={auditor.loading}
               onClick={() => run(auditor.hideLot, true)}

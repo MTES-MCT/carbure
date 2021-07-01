@@ -107,21 +107,16 @@ def get_snapshot(request, *args, **kwargs):
     entity = context['entity']
     data = {}
     year = request.GET.get('year', False)
-    today = datetime.date.today()
-    date_from = today.replace(month=1, day=1)
-    date_until = today.replace(month=12, day=31)
     if year:
         try:
             year = int(year)
-            date_from = datetime.date(year=year, month=1, day=1)
-            date_until = datetime.date(year=year, month=12, day=31)
         except Exception:
             return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
 
     if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader':
         txs = LotTransaction.objects.filter(carbure_vendor=entity)
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
-        txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
+        txs = txs.filter(lot__year=year)
         draft = txs.filter(lot__status='Draft', lot__parent_lot=None).count()
         validated = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA']).count()
         tofix = txs.filter(lot__status='Validated', delivery_status__in=['AC', 'R']).count()
@@ -130,7 +125,7 @@ def get_snapshot(request, *args, **kwargs):
     elif entity.entity_type == 'Opérateur':
         txs = LotTransaction.objects.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
-        txs = txs.filter(delivery_date__gte=date_from).filter(delivery_date__lte=date_until)
+        txs = txs.filter(lot__year=year)
         draft = txs.filter(lot__added_by=entity, lot__status='Draft').count()
         ins = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA', 'AC'], is_mac=False).count()
         accepted = txs.filter(lot__status='Validated', delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
@@ -171,7 +166,7 @@ def get_filters(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
     txs = get_entity_lots_by_status(entity, status)
     txs = filter_lots(txs, request.GET, [field])[0]
-    d = get_snapshot_filters(txs, [field])
+    d = get_snapshot_filters(txs, entity, [field])
     if field in d:
         values = d[field]
     else:
@@ -450,6 +445,13 @@ def accept_with_reserves(request, *args, **kwargs):
         TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field='status', value_before=tx.delivery_status, value_after=LotTransaction.TOFIX, modified_by=request.user, modified_by_entity=entity)
         tx.delivery_status = LotTransaction.TOFIX
         tx.save()
+
+        if tx.lot.added_by.entity_type == Entity.OPERATOR:
+            # back to Drafts
+            tx.lot.status = LotV2.DRAFT
+            tx.lot.save()
+            tx.delivery_status = LotTransaction.PENDING
+            tx.save()
 
     return JsonResponse({'status': 'success'})
 

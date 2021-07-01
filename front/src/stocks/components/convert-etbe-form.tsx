@@ -24,45 +24,13 @@ import { prettyVolume } from "transactions/helpers"
 const PART_ETH_IN_ETBE = 0.47
 const CONVERT_20_TO_15 = 0.995
 
-function compareVolumes(
-  volume: number,
-  attributions: VolumeAttributions,
-  autoAttributions: VolumeAttributions
-) {
-  let total_attributions = Object.values({
-    ...autoAttributions,
-    ...attributions,
-  }).reduce((total, vol) => total + vol, 0)
+function compareVolumes(volume: number, attributions: VolumeAttributions) {
+  let total_attributions = Object.values(attributions).reduce(
+    (total, vol) => total + vol,
+    0
+  )
 
   return volume - total_attributions
-}
-
-function getVolumeAttributions(
-  stocks: Transaction[],
-  attributions: VolumeAttributions,
-  volume: number,
-  ignore?: number
-): VolumeAttributions {
-  let remainingVolume =
-    volume - Object.values(attributions).reduce((t, v) => t + v, 0)
-
-  const autoAttributions: VolumeAttributions = {}
-
-  for (const tx of stocks) {
-    if (remainingVolume <= 0) {
-      break
-    }
-
-    if (!(tx.id in attributions) && tx.id !== ignore) {
-      autoAttributions[tx.id] = Math.min(
-        remainingVolume,
-        tx.lot.remaining_volume
-      )
-      remainingVolume -= autoAttributions[tx.id]
-    }
-  }
-
-  return autoAttributions
 }
 
 const initialState: ConvertETBE = {
@@ -87,8 +55,7 @@ export const ConvertETBEComplexPrompt = ({
   const { t } = useTranslation()
   const [depot, setDepot] = useState<string | null>(null)
 
-  const [attributions, setAttributions] = useState<VolumeAttributions>({}) // prettier-ignore
-  const [autoAttributions, setAutoAttributions] = useState<VolumeAttributions>({}) // prettier-ignore
+  const [attributions, setAttributions] = useState<VolumeAttributions>({})
 
   const [depots, getDepots] = useAPI(api.getDepots)
   const [stocks, getStocks] = useAPI(api.getStocks)
@@ -96,15 +63,7 @@ export const ConvertETBEComplexPrompt = ({
   const lots = stocks.data?.lots ?? []
   const vEthanolInStock = lots.reduce((t, tx) => t + tx.lot.remaining_volume, 0)
 
-  const { data, hasChange, onChange } = useForm<ConvertETBE>(initialState, {
-    onChange: (state) => {
-      const lots = stocks.data?.lots ?? []
-      setAutoAttributions(
-        getVolumeAttributions(lots, attributions, state.volume_ethanol)
-      )
-      return state
-    },
-  })
+  const { data, hasChange, onChange } = useForm<ConvertETBE>(initialState)
 
   useEffect(() => {
     getDepots(entityID, "ETH")
@@ -121,11 +80,7 @@ export const ConvertETBEComplexPrompt = ({
     }
   }, [getStocks, entityID, depot])
 
-  const volumeDiff = compareVolumes(
-    data.volume_ethanol,
-    attributions,
-    autoAttributions
-  )
+  const volumeDiff = compareVolumes(data.volume_ethanol, attributions)
   const canSave = hasChange && volumeDiff === 0
 
   function handleAttribution(tx: Transaction) {
@@ -138,22 +93,13 @@ export const ConvertETBEComplexPrompt = ({
         delete nextAttributions[tx.id]
       } else {
         const volume = Math.min(parseFloat(value), tx.lot.remaining_volume)
-
         nextAttributions = {
           ...attributions,
           [tx.id]: volume,
         }
       }
 
-      const autoAttributions = getVolumeAttributions(
-        lots,
-        nextAttributions,
-        data.volume_ethanol,
-        tx.id
-      )
-
       setAttributions(nextAttributions)
-      setAutoAttributions(autoAttributions)
     }
   }
 
@@ -164,11 +110,7 @@ export const ConvertETBEComplexPrompt = ({
         type="number"
         min={0}
         max={tx.lot.remaining_volume}
-        value={
-          tx.id in attributions
-            ? attributions[tx.id]
-            : autoAttributions[tx.id] ?? ""
-        }
+        value={attributions[tx.id]}
         onChange={handleAttribution(tx)}
       />
     ),
@@ -196,10 +138,7 @@ export const ConvertETBEComplexPrompt = ({
   const ratioEthToETBEWithDenaturant =
     ((data.volume_ethanol + data.volume_denaturant) / data.volume_etbe) * 100.0
 
-  const conversionDetails = Object.entries({
-    ...autoAttributions,
-    ...attributions,
-  })
+  const conversionDetails = Object.entries(attributions)
     .map<ConvertETBE>(([txID, volume]) => {
       const ratio = volume / data.volume_ethanol
       return {
