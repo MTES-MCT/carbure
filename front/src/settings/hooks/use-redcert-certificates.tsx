@@ -90,7 +90,7 @@ export default function useREDCertCertificates(
     ))
 
     if (typeof entityID !== "undefined" && data) {
-      notifyCertificate(
+      await notifyCertificate(
         resolveAddREDCert(entityID, data.certificate_id),
         t("ajouté")
       )
@@ -105,7 +105,7 @@ export default function useREDCertCertificates(
         t("Voulez-vous vraiment supprimer le certificat REDcert {{cert}} ?", { cert: redcert.certificate_id }) // prettier-ignore
       ))
     ) {
-      notifyCertificate(
+      await notifyCertificate(
         resolveDelREDCert(entityID, redcert.certificate_id),
         t("supprimé")
       )
@@ -124,7 +124,7 @@ export default function useREDCertCertificates(
     ))
 
     if (typeof entityID !== "undefined" && data) {
-      notifyCertificate(
+      await notifyCertificate(
         resolveUpdateREDCert(
           entityID,
           iscc.certificate_id,

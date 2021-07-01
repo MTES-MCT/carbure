@@ -228,8 +228,6 @@ export const Select = ({
                 </DropdownItem>
               )}
 
-              {isLoading && <LoaderOverlay />}
-
               {options.map((option, i) => (
                 <DropdownItem
                   key={option.value?.toString() ?? i}
@@ -249,6 +247,8 @@ export const Select = ({
                   <span>{option.label}</span>
                 </DropdownItem>
               ))}
+
+              {isLoading && <LoaderOverlay />}
             </React.Fragment>
           )}
         </DropdownOptions>

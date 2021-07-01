@@ -419,7 +419,7 @@ def make_countries_sheet(workbook):
 
 def make_clients_sheet(workbook):
     worksheet_operateurs = workbook.add_worksheet("Societes")
-    operators = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur', 'Trader'])
+    operators = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur', 'Trader']).order_by('name')
     # header
     bold = workbook.add_format({'bold': True})
     worksheet_operateurs.write('A1', 'name', bold)
@@ -432,7 +432,7 @@ def make_clients_sheet(workbook):
 
 def make_deliverysites_sheet(workbook):
     worksheet_sites = workbook.add_worksheet("SitesDeLivraison")
-    depots = Depot.objects.all()
+    depots = Depot.objects.all().order_by('country', 'id')
     # header
     bold = workbook.add_format({'bold': True})
     worksheet_sites.write('A1', 'code', bold)

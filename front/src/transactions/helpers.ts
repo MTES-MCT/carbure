@@ -45,51 +45,18 @@ export function hasErrors(
   return errors[tx.id].some((e) => e.is_blocking)
 }
 
-// extract the status name from the lot details
-export function getStatus(
-  transaction: Transaction,
-  entityID: number
-): LotStatus {
-  const status = transaction.lot.status.toLowerCase()
-  const delivery = transaction.delivery_status
-
-  const isAuthor = transaction.lot.added_by?.id === entityID
-  const isVendor = transaction.carbure_vendor?.id === entityID
-  const isClient = transaction.carbure_client?.id === entityID
-
-  if (status === "draft") {
-    return LotStatus.Draft
-  } else if (status === "validated") {
-    if (delivery === "F") {
-      return LotStatus.Declaration
-    } else if (delivery === "A") {
-      return LotStatus.Accepted
-    }
-    // OPERATEUR
-    else if (isClient && ["N", "AA", "AC"].includes(delivery)) {
-      return LotStatus.Inbox
-    }
-    // PRODUCTEUR
-    else if (isVendor || isAuthor) {
-      if (["N", "AA"].includes(delivery)) {
-        return LotStatus.Validated
-      } else if (["AC", "R"].includes(delivery)) {
-        return LotStatus.ToFix
-      }
-    }
-  }
-
-  return LotStatus.Weird
-}
-
-export function normalizeFilter(field: Filters, filter: string[] | Option[], t: TFunction): Option[] {
+export function normalizeFilter(
+  field: Filters,
+  filter: string[] | Option[],
+  t: TFunction
+): Option[] {
   let normalized: Option[] = []
 
   if (filter && typeof filter[0] === "string") {
     const set = new Set<string>(filter as string[])
     normalized = Array.from(set).map(toOption)
-  } 
-  
+  }
+
   if (field === Filters.Biocarburants) {
     normalized = filter.map((bc: any) => ({
       value: bc.value,
@@ -139,7 +106,8 @@ export function normalizeFilter(field: Filters, filter: string[] | Option[], t: 
     }))
   }
 
-  return normalized.filter(Boolean)
+  return normalized
+    .filter(Boolean)
     .sort((a: Option, b: Option) => a.label.localeCompare(b.label, "fr"))
 }
 

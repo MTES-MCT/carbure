@@ -33,6 +33,7 @@ class Entity(models.Model):
     registered_address = models.TextField(blank=True, default='')
     hash = models.CharField(max_length=32, null=True, blank=True, default='')
     default_certificate = models.CharField(max_length=64, null=True, blank=True, default='')
+    notifications_enabled = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

@@ -106,18 +106,19 @@ def check_certificates(prefetched_data, tx, errors):
                 if c.valid_until < tx.delivery_date:
                     errors.append(generic_error(error='EXPIRED_SUPPLIER_CERT', tx=tx, field='unknown_supplier_certificate'))  
 
-    # VENDOR CERT
-    if not tx.carbure_vendor_certificate:
-        errors.append(generic_error(error='NO_VENDOR_CERT', tx=tx, field='carbure_vendor_certificate'))
-    else:
-        cert = tx.carbure_vendor_certificate.upper()
-        if cert not in prefetched_data['certificates']:
-            errors.append(generic_error(error='UNKNOWN_VENDOR_CERT', tx=tx, field='carbure_vendor_certificate'))
+    # VENDOR CERT - NOT REQUIRED WHEN TX UPLOADED BY OPERATOR
+    if not tx.lot.added_by.entity_type == Entity.OPERATOR:
+        if not tx.carbure_vendor_certificate:
+            errors.append(generic_error(error='NO_VENDOR_CERT', tx=tx, field='carbure_vendor_certificate'))
         else:
-            # certificate is set and exists. is it valid?
-            c = prefetched_data['certificates'][cert]
-            if c.valid_until < tx.delivery_date:
-                errors.append(generic_error(error='EXPIRED_VENDOR_CERT', tx=tx, field='carbure_vendor_certificate'))  
+            cert = tx.carbure_vendor_certificate.upper()
+            if cert not in prefetched_data['certificates']:
+                errors.append(generic_error(error='UNKNOWN_VENDOR_CERT', tx=tx, field='carbure_vendor_certificate'))
+            else:
+                # certificate is set and exists. is it valid?
+                c = prefetched_data['certificates'][cert]
+                if c.valid_until < tx.delivery_date:
+                    errors.append(generic_error(error='EXPIRED_VENDOR_CERT', tx=tx, field='carbure_vendor_certificate'))  
     return errors
 
 def sanity_check(tx, prefetched_data):
@@ -137,7 +138,7 @@ def sanity_check(tx, prefetched_data):
         errors.append(generic_error(error='MAC_BC_WRONG', tx=tx, is_blocking=True, fields=['biocarburant_code', 'mac']))
 
     # check volume
-    if lot.volume < 2000:
+    if lot.volume < 2000 and not tx.is_mac:
         errors.append(generic_error(error='VOLUME_FAIBLE', tx=tx, field='volume'))
 
     # réduction de GES
