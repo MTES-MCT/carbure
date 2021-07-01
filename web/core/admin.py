@@ -69,7 +69,7 @@ class PaysAdmin(admin.ModelAdmin):
 
 
 class DepotAdmin(admin.ModelAdmin):
-    list_display = ('name', 'depot_id', 'city', 'depot_type')
+    list_display = ('name', 'depot_id', 'city', 'depot_type', 'gps_coordinates')
     search_fields = ('name', 'city', 'depot_id')
     list_filter = ('depot_type',)
 
