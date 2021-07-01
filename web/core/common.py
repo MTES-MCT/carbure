@@ -1131,12 +1131,18 @@ def get_transaction_distance(tx):
     starting_point = tx.lot.carbure_production_site.gps_coordinates
     delivery_point = tx.carbure_delivery_site.gps_coordinates
 
+    if not starting_point or not delivery_point:
+        print('NO gps coordinates')
+        return -1
+
     try:
         td = TransactionDistance.objects.get(starting_point=starting_point, delivery_point=delivery_point)
         print('Found in cache')
         return td.distance
     except:
         # not found
+        print('not found in cache')
+        print(starting_point, delivery_point)
         result = get_distance(starting_point, delivery_point)
         # if script success
         if result != 'ERROR':
