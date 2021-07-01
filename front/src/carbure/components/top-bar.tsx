@@ -167,7 +167,11 @@ const Topbar = ({ entity, settings }: TopbarProps) => {
           )}
         </nav>
       )}
-
+      
+      <PageLink to="stats">
+        <Trans>Statistiques</Trans>
+      </PageLink>
+      
       <Box row className={styles.topRight}>
         <LanguageSelection />
 

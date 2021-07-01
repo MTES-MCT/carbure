@@ -32,10 +32,12 @@ const Stats = ({ entity }: StatsProps) => {
   const textWidth = 550
   const textAngle = 15
   const textBorderWidth = 2
+  const textColor = "black"
   const textShadow = "6px 6px 3px grey"
   const iframeShadow = "1px 1px 6px grey"
   let entityTypeLink = "NA"
   let entityTypeTitle = ""
+  
   
   if(entity?.entity_type === EntityType.Operator) {
     entityTypeLink = `https://metabase.carbure.beta.gouv.fr/public/dashboard/e7f0eacb-1034-4173-8634-ec4e000cd027?hash=${entityHash.data?.hash}#hide_parameters=hash`
@@ -52,10 +54,10 @@ const Stats = ({ entity }: StatsProps) => {
 
   return (
     <Main style={{padding: "32px 120px"}}>
-      <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: "black", borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
+      <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor:textColor, borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
         <div style={{ alignSelf: "center" }}>
           <h1>
-            <a href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/a960a32f-c14f-4835-9f6f-2553e951620c?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
+            <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/a960a32f-c14f-4835-9f6f-2553e951620c?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
               &#x1F30D; Votre empreinte carbone &#x1F30D;
             </a>
           </h1>
@@ -69,10 +71,10 @@ const Stats = ({ entity }: StatsProps) => {
           allowTransparency
         />
       </Section>
-      <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: "black", borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
+      <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: textColor, borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
         <div style={{ alignSelf: "center" }}>
           <h1>
-            <a href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/7aa76cea-b60a-4e89-9bde-a116abd86018?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
+            <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/7aa76cea-b60a-4e89-9bde-a116abd86018?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
               &#x1F4D6; Statistiques globales depuis 2019 &#x1F4D6;
             </a>
           </h1>
@@ -86,10 +88,10 @@ const Stats = ({ entity }: StatsProps) => {
           allowTransparency
         />
       </Section>
-      <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: "black", borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
+      <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: textColor, borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
         <div style={{ alignSelf: "center" }}>
           <h1>
-            <a href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/11d88f12-22c4-467a-ad36-f6bf3a924717?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
+            <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/11d88f12-22c4-467a-ad36-f6bf3a924717?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
               &#x1F4C5; Le mois dernier &#x1F4C5;
             </a>
           </h1>
@@ -103,10 +105,10 @@ const Stats = ({ entity }: StatsProps) => {
           allowTransparency
         />
       </Section>
-      <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: "black", borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
+      <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: textColor, borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
         <div style={{ alignSelf: "center" }}>
           <h1>
-            <a href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/e3b75456-7df2-4afe-89ea-ac9601abe349?hash=${entityHash.data?.hash}#hide_parameters=hash,year`}>
+            <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/e3b75456-7df2-4afe-89ea-ac9601abe349?hash=${entityHash.data?.hash}#hide_parameters=hash,year`}>
               &#x231B; Statistiques globale par année &#x231B;
             </a>
           </h1>
@@ -125,10 +127,10 @@ const Stats = ({ entity }: StatsProps) => {
           allowTransparency
         />
       </Section>
-      <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: "black", borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
+      <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: textColor, borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
         <div style={{ alignSelf: "center" }}>
           <h1>
-            <a href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/d3722672-2e9f-48ad-beb0-29c3864b61ab?hash=${entityHash.data?.hash}#hide_parameters=hash,biocarb,matprem`}>
+            <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/d3722672-2e9f-48ad-beb0-29c3864b61ab?hash=${entityHash.data?.hash}#hide_parameters=hash,biocarb,matprem`}>
               &#x1F4C8; Statistiques détaillées &#x1F4C8;
             </a>
           </h1>
@@ -147,10 +149,10 @@ const Stats = ({ entity }: StatsProps) => {
           allowTransparency
         />
       </Section>
-      <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: "black", borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
+      <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: textColor, borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth * 1.3}}>
         <div style={{ alignSelf: "center" }}>
           <h1>
-            <a href={entityTypeLink}>
+            <a style={{color:textColor}}  href={entityTypeLink}>
               &#9981; {entityTypeTitle} &#9981;
             </a>
           </h1>
