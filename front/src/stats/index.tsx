@@ -108,7 +108,7 @@ const Stats = ({ entity }: StatsProps) => {
       <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: textColor, borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth}}>
         <div style={{ alignSelf: "center" }}>
           <h1>
-            <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/e3b75456-7df2-4afe-89ea-ac9601abe349?hash=${entityHash.data?.hash}#hide_parameters=hash,year`}>
+            <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/e3b75456-7df2-4afe-89ea-ac9601abe349?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
               &#x231B; Statistiques globale par année &#x231B;
             </a>
           </h1>
@@ -116,13 +116,13 @@ const Stats = ({ entity }: StatsProps) => {
       </Section>
       <Section style={{background:"#d9edf7", borderColor:"#bce8f1"}}>
         <span style={{alignSelf: "center" }}>
-          <p><b>Cliquez</b> sur une année pour configurer les stats</p>
+          <p><b>Choisissez</b> une année qui vous intéresse dans le sélecteur</p>
         </span>
       </Section>
       <Section>
         <IframeResizer
           title="Statistiques globale par année"
-          src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/e3b75456-7df2-4afe-89ea-ac9601abe349?hash=${entityHash.data?.hash}#hide_parameters=hash,year`}
+          src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/e3b75456-7df2-4afe-89ea-ac9601abe349?hash=${entityHash.data?.hash}#hide_parameters=hash`}
           frameBorder="0"
           allowTransparency
         />
@@ -138,13 +138,13 @@ const Stats = ({ entity }: StatsProps) => {
       </Section>
       <Section style={{background:"#d9edf7", borderColor:"#bce8f1"}}>
         <span style={{alignSelf: "center" }}>
-          <p><b>Cliquez</b> sur un biocarburant, une matière première ou une année pour afficher les détails</p>
+          <p><b>Cliquez</b> sur une année, un biocarburant ou une matière première pour afficher les détails</p>
         </span>
       </Section>
       <Section style={{boxShadow: iframeShadow}}>
         <IframeResizer
           title="Statistiques détaillées"
-          src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/d3722672-2e9f-48ad-beb0-29c3864b61ab?hash=${entityHash.data?.hash}#hide_parameters=hash,biocarb,matprem,annee`}
+          src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/d3722672-2e9f-48ad-beb0-29c3864b61ab?hash=${entityHash.data?.hash}#hide_parameters=hash,biocarb,matprem`}
           frameBorder="0"
           allowTransparency
         />
