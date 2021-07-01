@@ -4,6 +4,8 @@ import { Trans } from "react-i18next"
 import styles from "./footer.module.css"
 import logoMTES from "../assets/images/MTE.svg"
 import logoFabNum from "../assets/images/logo-fabriquenumerique.svg"
+import { Link } from "common/components/relative-route"
+
 
 const Footer = () => (
   <footer className={styles.footerContainer}>
@@ -70,13 +72,9 @@ const Footer = () => (
           </a>
         </li>
         <li>
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://metabase.carbure.beta.gouv.fr/public/dashboard/98aaecc5-4899-4f6f-8649-fa906977e73b#hide_parameters=annee"
-          >
+          <Link to="/public_stats">
             <Trans>Statistiques</Trans>
-          </a>
+          </Link>
         </li>
         <li>
           <a href="https://carbure-beta-gouv.slack.com/">
