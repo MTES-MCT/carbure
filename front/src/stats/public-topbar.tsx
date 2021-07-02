@@ -1,10 +1,6 @@
 import React from "react"
 import { Trans, useTranslation } from "react-i18next"
-import { useLocation } from "react-router-dom"
 
-import { ApiState } from "common/hooks/use-api"
-
-import Menu from "common/components/menu"
 import { Link, NavLink } from "common/components/relative-route"
 import { Question } from "common/components/icons"
 
@@ -72,10 +68,6 @@ const Topbar = () => {
   return (
     <header className={styles.topBar}>
       <Logo />
-    
-      <PageLink to="public_stats">
-        <Trans>Statistiques</Trans>
-      </PageLink>
       
       <Box row className={styles.topRight}>
         <LanguageSelection />
