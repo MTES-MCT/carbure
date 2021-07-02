@@ -26,6 +26,7 @@ from certificates.models import EntitySNTradingCertificate, SNCertificate
 import dateutil.parser
 from api.v3.sanity_checks import bulk_sanity_checks, tx_is_valid, lot_is_valid
 
+july1st2021 = datetime.date(year=2021, month=7, day=1)
 
 def try_get_certificate(certificate):
     d = {
@@ -102,9 +103,11 @@ def get_uploaded_files_directory():
             return '/tmp'
     return directory
 
-def calculate_ghg(lot):
+def calculate_ghg(lot, tx=None):
     lot.ghg_total = lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee
     lot.ghg_reference = 83.8
+    if tx and tx.delivery_date > july1st2021:
+        lot.ghg_reference = 94.0
     lot.ghg_reduction = round((1.0 - (lot.ghg_total / lot.ghg_reference)) * 100.0, 2)
 
 
@@ -637,7 +640,7 @@ def fill_ghg_info(lot_row, lot, tx):
              lot_errors.append(GenericError(tx=tx, field='eee', error='WRONG_FORMAT', extra='Format non reconnu',
                                            display_to_creator=True, is_blocking=True, value=eee))
     # calculs ghg
-    calculate_ghg(lot)
+    calculate_ghg(lot, tx)
     return lot_errors
 
 
