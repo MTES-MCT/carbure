@@ -138,7 +138,7 @@ test("display transaction details", async () => {
   screen.getByDisplayValue("12")
   screen.getByDisplayValue("1")
   screen.getByDisplayValue("11.00 gCO2eq/MJ")
-  screen.getByDisplayValue("86.87%")
+  screen.getByDisplayValue("88.30%")
 
   const countries = screen.getAllByDisplayValue("France")
   const zeros = screen.getAllByDisplayValue("0")
