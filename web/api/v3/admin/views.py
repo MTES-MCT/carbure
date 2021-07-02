@@ -17,7 +17,7 @@ from django.template.loader import render_to_string
 
 from core.models import LotTransaction, UserRightsRequests, SustainabilityDeclaration, Control
 from api.v3.lots.helpers import get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors, filter_lots, get_general_summary, sort_lots
-from core.common import check_certificates
+from core.common import check_certificates, get_transaction_distance
 
 
 # Get an instance of a logger
@@ -236,6 +236,10 @@ def get_details(request, *args, **kwargs):
     data = {}
     data['transaction'] = tx.natural_key(admin=True)
     data['certificates'] = check_certificates(tx)
+    try:
+        data['distance'] = get_transaction_distance(tx)
+    except:
+        data['distance'] = 0
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['comments'] = [c.natural_key() for c in tx.transactioncomment_set.all()]
