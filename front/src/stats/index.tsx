@@ -60,7 +60,7 @@ const Stats = ({ entity }: StatsProps) => {
         <div style={{ alignSelf: "center" }}>
           <h1>
             <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/a960a32f-c14f-4835-9f6f-2553e951620c?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
-              <Trans>&#x1F30D; Votre empreinte carbone &#x1F30D;</Trans>
+              &#x1F30D; <Trans>Votre empreinte carbone</Trans> &#x1F30D;
             </a>
           </h1>
         </div>
@@ -77,7 +77,7 @@ const Stats = ({ entity }: StatsProps) => {
         <div style={{ alignSelf: "center" }}>
           <h1>
             <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/7aa76cea-b60a-4e89-9bde-a116abd86018?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
-              <Trans>&#x1F4D6; Statistiques globales depuis 2019 &#x1F4D6;</Trans>
+              &#x1F4D6; <Trans>Statistiques globales depuis 2019</Trans> &#x1F4D6;
             </a>
           </h1>
         </div>
@@ -94,7 +94,7 @@ const Stats = ({ entity }: StatsProps) => {
         <div style={{ alignSelf: "center" }}>
           <h1>
             <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/11d88f12-22c4-467a-ad36-f6bf3a924717?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
-              <Trans>&#x1F4C5; Le mois dernier &#x1F4C5;</Trans>
+              &#x1F4C5; <Trans>Le mois dernier</Trans> &#x1F4C5;
             </a>
           </h1>
         </div>
@@ -111,7 +111,7 @@ const Stats = ({ entity }: StatsProps) => {
         <div style={{ alignSelf: "center" }}>
           <h1>
             <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/e3b75456-7df2-4afe-89ea-ac9601abe349?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
-              <Trans>&#x231B; Statistiques globales par année &#x231B;</Trans>
+              &#x231B; <Trans>Statistiques globales par année</Trans> &#x231B;
             </a>
           </h1>
         </div>
@@ -133,7 +133,7 @@ const Stats = ({ entity }: StatsProps) => {
         <div style={{ alignSelf: "center" }}>
           <h1>
             <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/d3722672-2e9f-48ad-beb0-29c3864b61ab?hash=${entityHash.data?.hash}#hide_parameters=hash,biocarb,matprem`}>
-              <Trans>&#x1F4C8; Statistiques détaillées &#x1F4C8;</Trans>
+              &#x1F4C8; <Trans>Statistiques détaillées</Trans> &#x1F4C8;
             </a>
           </h1>
         </div>
