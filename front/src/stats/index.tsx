@@ -1,5 +1,6 @@
 import { Route, Switch, Link } from "common/components/relative-route"
 import { EntitySelection } from "carbure/hooks/use-entity"
+import { Trans, useTranslation } from "react-i18next"
 import { Main } from "common/components"
 import { Section } from "common/components/section"
 import IframeResizer from "iframe-resizer-react"
@@ -16,7 +17,6 @@ type StatsProps = {
   entity: EntitySelection
 }
 
-
 const Stats = ({ entity }: StatsProps) => {
   const [entityHash, getEntityHash] = useAPI(getHash);
   useEffect (() => {
@@ -25,9 +25,11 @@ const Stats = ({ entity }: StatsProps) => {
     }
   },[entity,getEntityHash])
 
+  const { t } = useTranslation()
+
   if (entityHash.data === null) {
     return null;
-  }
+  } 
 
   const textWidth = 550
   const textAngle = 15
@@ -37,19 +39,19 @@ const Stats = ({ entity }: StatsProps) => {
   const iframeShadow = "1px 1px 6px grey"
   let entityTypeLink = "NA"
   let entityTypeTitle = ""
-  
+
   
   if(entity?.entity_type === EntityType.Operator) {
     entityTypeLink = `https://metabase.carbure.beta.gouv.fr/public/dashboard/e7f0eacb-1034-4173-8634-ec4e000cd027?hash=${entityHash.data?.hash}#hide_parameters=hash`
-    entityTypeTitle = "En savoir plus sur vos fournisseurs"
+    entityTypeTitle = t("En savoir plus sur vos fournisseurs")
 
   } else if(entity?.entity_type === EntityType.Producer) {
     entityTypeLink = `https://metabase.carbure.beta.gouv.fr/public/dashboard/765ad219-d854-40e9-8f78-e32dedd28c54?hash=${entityHash.data?.hash}#hide_parameters=hash`
-    entityTypeTitle = "En savoir plus sur vos clients"
+    entityTypeTitle = t("En savoir plus sur vos clients")
     
   } else if(entity?.entity_type === EntityType.Trader) {
     entityTypeLink = `https://metabase.carbure.beta.gouv.fr/public/dashboard/8d1e621d-f005-4904-a19d-e74305d3ce14?hash=${entityHash.data?.hash}#hide_parameters=hash`
-    entityTypeTitle = "En savoir plus sur vos clients et vos fournisseurs"
+    entityTypeTitle = t("En savoir plus sur vos clients et vos fournisseurs")
   }
 
   return (
@@ -58,7 +60,7 @@ const Stats = ({ entity }: StatsProps) => {
         <div style={{ alignSelf: "center" }}>
           <h1>
             <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/a960a32f-c14f-4835-9f6f-2553e951620c?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
-              &#x1F30D; Votre empreinte carbone &#x1F30D;
+              <Trans>&#x1F30D; Votre empreinte carbone &#x1F30D;</Trans>
             </a>
           </h1>
         </div>
@@ -75,7 +77,7 @@ const Stats = ({ entity }: StatsProps) => {
         <div style={{ alignSelf: "center" }}>
           <h1>
             <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/7aa76cea-b60a-4e89-9bde-a116abd86018?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
-              &#x1F4D6; Statistiques globales depuis 2019 &#x1F4D6;
+              <Trans>&#x1F4D6; Statistiques globales depuis 2019 &#x1F4D6;</Trans>
             </a>
           </h1>
         </div>
@@ -92,7 +94,7 @@ const Stats = ({ entity }: StatsProps) => {
         <div style={{ alignSelf: "center" }}>
           <h1>
             <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/11d88f12-22c4-467a-ad36-f6bf3a924717?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
-              &#x1F4C5; Le mois dernier &#x1F4C5;
+              <Trans>&#x1F4C5; Le mois dernier &#x1F4C5;</Trans>
             </a>
           </h1>
         </div>
@@ -109,14 +111,14 @@ const Stats = ({ entity }: StatsProps) => {
         <div style={{ alignSelf: "center" }}>
           <h1>
             <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/e3b75456-7df2-4afe-89ea-ac9601abe349?hash=${entityHash.data?.hash}#hide_parameters=hash`}>
-              &#x231B; Statistiques globale par année &#x231B;
+              <Trans>&#x231B; Statistiques globales par année &#x231B;</Trans>
             </a>
           </h1>
         </div>
       </Section>
       <Section style={{background:"#d9edf7", borderColor:"#bce8f1"}}>
         <span style={{alignSelf: "center" }}>
-          <p><b>Choisissez</b> une année qui vous intéresse dans le sélecteur</p>
+          <Trans><p><b>Choisissez</b> une année qui vous intéresse dans le sélecteur</p></Trans>
         </span>
       </Section>
       <Section>
@@ -131,14 +133,14 @@ const Stats = ({ entity }: StatsProps) => {
         <div style={{ alignSelf: "center" }}>
           <h1>
             <a style={{color:textColor}} href={`https://metabase.carbure.beta.gouv.fr/public/dashboard/d3722672-2e9f-48ad-beb0-29c3864b61ab?hash=${entityHash.data?.hash}#hide_parameters=hash,biocarb,matprem`}>
-              &#x1F4C8; Statistiques détaillées &#x1F4C8;
+              <Trans>&#x1F4C8; Statistiques détaillées &#x1F4C8;</Trans>
             </a>
           </h1>
         </div>
       </Section>
       <Section style={{background:"#d9edf7", borderColor:"#bce8f1"}}>
         <span style={{alignSelf: "center" }}>
-          <p><b>Cliquez</b> sur une année, un biocarburant ou une matière première pour afficher les détails</p>
+          <Trans><p><b>Cliquez</b> sur une année, un biocarburant ou une matière première pour afficher les détails</p></Trans>
         </span>
       </Section>
       <Section style={{boxShadow: iframeShadow}}>
@@ -152,7 +154,7 @@ const Stats = ({ entity }: StatsProps) => {
       <Section style={{boxShadow: textShadow, alignSelf: "center", borderColor: textColor, borderRadius: textAngle , borderWidth: textBorderWidth, borderStyle: "solid", width: textWidth * 1.3}}>
         <div style={{ alignSelf: "center" }}>
           <h1>
-            <a style={{color:textColor}}  href={entityTypeLink}>
+            <a style={{color:textColor}} href={entityTypeLink}>
               &#9981; {entityTypeTitle} &#9981;
             </a>
           </h1>
