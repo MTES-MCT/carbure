@@ -55,7 +55,6 @@ div > .settingsSelect {
   width: 100%;
   background: transparent;
   border: none;
-  border-bottom: 1px solid var(--gray-highlight);
   margin: 16px 0;
 }
 
