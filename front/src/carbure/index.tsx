@@ -7,6 +7,7 @@ import { UserRightProvider } from "./hooks/use-rights"
 
 import { Redirect, Route, Switch } from "common/components/relative-route"
 
+import { LoaderOverlay } from "common/components"
 import Topbar from "./components/top-bar"
 import Footer from "./components/footer"
 import Pending from "./components/pending"
@@ -44,6 +45,10 @@ const Org = ({ app }: { app: AppHook }) => {
 
   if (app.settings.error === "User not verified") {
     return <Exit to="/accounts/login" />
+  }
+
+  if (app.settings.loading || app.settings.data === null) {
+    return <LoaderOverlay />
   }
 
   // a user with entities tries to access the pending or another entity's page
