@@ -2,12 +2,11 @@ import datetime
 import calendar
 from time import perf_counter
 from dateutil.relativedelta import relativedelta
-from django.db.models import Q, F, Case, When, Count, Sum
+from django.db.models import Q, F, Count, Sum
 from django.db.models.expressions import OuterRef, Subquery, Value
 from django.db.models.functions import Coalesce
 from django.http import JsonResponse, HttpResponse
-from core.models import GenericError, LotV2, LotTransaction
-from core.models import MatierePremiere, Biocarburant, Pays
+from core.models import GenericError, LotV2, LotTransaction, MatierePremiere, Biocarburant, Pays, Entity
 from core.xlsx_v3 import export_transactions
 
 
@@ -149,42 +148,46 @@ def filter_lots(txs, querySet, blacklist=[]):
     is_hidden_by_auditor = querySet.get('is_hidden_by_auditor', None)
     is_highlighted_by_admin = querySet.get('is_highlighted_by_admin', None)
     is_highlighted_by_auditor = querySet.get('is_highlighted_by_auditor', None)
-    selection = querySet.getlist('selection', False)
+    selection = querySet.getlist('selection')
+    client_types = querySet.getlist('client_types')
 
     if year and 'year' not in blacklist:
         txs = txs.filter(lot__year=year)
 
-    if selection and len(selection) > 0:
+    if len(selection) > 0:
         txs = txs.filter(pk__in=selection)
 
-    if periods and 'periods' not in blacklist:
+    if len(periods) > 0 and 'periods' not in blacklist:
         txs = txs.filter(lot__period__in=periods)
-    if production_sites and 'production_sites' not in blacklist:
+    if len(production_sites) > 0 and 'production_sites' not in blacklist:
         txs = txs.filter(Q(lot__carbure_production_site__name__in=production_sites) | Q(lot__unknown_production_site__in=production_sites))
-    if matieres_premieres and 'matieres_premieres' not in blacklist:
+    if len(matieres_premieres) > 0 and 'matieres_premieres' not in blacklist:
         txs = txs.filter(lot__matiere_premiere__code__in=matieres_premieres)
-    if biocarburants and 'biocarburants' not in blacklist:
+    if len(biocarburants) > 0 and 'biocarburants' not in blacklist:
         txs = txs.filter(lot__biocarburant__code__in=biocarburants)
-    if countries_of_origin and 'countries_of_origin' not in blacklist:
+    if len(countries_of_origin) > 0 and 'countries_of_origin' not in blacklist:
         txs = txs.filter(lot__pays_origine__code_pays__in=countries_of_origin)
-    if delivery_sites and 'delivery_sites' not in blacklist:
+    if len(delivery_sites) > 0 and 'delivery_sites' not in blacklist:
         txs = txs.filter(Q(carbure_delivery_site__name__in=delivery_sites) | Q(unknown_delivery_site__in=delivery_sites))
-    if clients and 'clients' not in blacklist:
+    if len(clients) > 0 and 'clients' not in blacklist:
         txs = txs.filter(Q(carbure_client__name__in=clients) | Q(unknown_client__in=clients))
-    if vendors and 'vendors' not in blacklist:
+    if len(vendors) > 0 and 'vendors' not in blacklist:
         txs = txs.filter(Q(carbure_vendor__name__in=vendors) | Q(lot__unknown_supplier__in=vendors))
-    if delivery_status and 'delivery_status' not in blacklist:
+    if len(delivery_status) > 0 and 'delivery_status' not in blacklist:
         txs = txs.filter(delivery_status__in=delivery_status)
 
-    if producers and 'producers' not in blacklist:
+    if len(producers) > 0 and 'producers' not in blacklist:
         txs = filter_by_entities(txs, producers)
-    if operators and 'operators' not in blacklist:
+    if len(operators) > 0 and 'operators' not in blacklist:
         txs = filter_by_entities(txs, operators)
-    if traders and 'traders' not in blacklist:
+    if len(traders) > 0 and 'traders' not in blacklist:
         txs = filter_by_entities(txs, traders)
 
-    if added_by and 'added_by' not in blacklist:
+    if len(added_by) > 0 and 'added_by' not in blacklist:
         txs = txs.filter(lot__added_by__name__in=added_by)
+
+    if len(client_types) > 0 and 'client_types' not in blacklist:
+        txs = txs.filter(carbure_client__entity_type__in=client_types)
 
     if is_forwarded is not None and 'is_forwarded' not in blacklist:
         if is_forwarded == 'true':
@@ -222,7 +225,7 @@ def filter_lots(txs, querySet, blacklist=[]):
         else:
             txs = txs.filter(is_highlighted_by_auditor=False)
 
-    if errors and 'errors' not in blacklist:
+    if len(errors) > 0 and 'errors' not in blacklist:
         txs = txs.filter(genericerror__error__in=errors)
 
     if query and 'query' not in blacklist:
@@ -427,6 +430,9 @@ def get_snapshot_filters(txs, entity, whitelist):
 
     if 'is_highlighted_by_auditor' in whitelist:
         filters['is_highlighted_by_auditor'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
+
+    if 'client_types' in whitelist:
+        filters['client_types'] = [Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER]
 
     return filters
 
