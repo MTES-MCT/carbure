@@ -13,7 +13,7 @@ import api from "common/services/api"
 import {
   normalizeSummary,
   normalizeFilter,
-  normalizeFilters,
+  normalizeSnapshot,
   filterOutsourcedDepots,
   normalizeGeneralSummary,
 } from "./helpers"
@@ -25,7 +25,7 @@ export function getSnapshot(
 ): Promise<Snapshot> {
   return api
     .get("/lots/snapshot", { entity_id: entityID, year })
-    .then((s) => normalizeFilters(s, t))
+    .then((s) => normalizeSnapshot(s, t))
     .then(filterOutsourcedDepots)
 }
 
@@ -314,7 +314,7 @@ export function getAdminSnapshot(
 ): Promise<Snapshot> {
   return api
     .get("/admin/lots/snapshot", { entity_id: entityID, year })
-    .then((s) => normalizeFilters(s, t))
+    .then((s) => normalizeSnapshot(s, t))
 }
 
 export function getAdminFilters(
@@ -401,7 +401,7 @@ export function getAuditorSnapshot(
 ) {
   return api
     .get<Snapshot>("/auditor/snapshot", { entity_id, year })
-    .then((s) => normalizeFilters(s, t))
+    .then((s) => normalizeSnapshot(s, t))
 }
 
 export function getAuditorFilters(

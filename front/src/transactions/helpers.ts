@@ -45,6 +45,7 @@ export function hasErrors(
   return errors[tx.id].some((e) => e.is_blocking)
 }
 
+// give the same interface to all filters in order to render them easily
 export function normalizeFilter(
   field: Filters,
   filter: string[] | Option[],
@@ -92,6 +93,13 @@ export function normalizeFilter(
     }))
   }
 
+  if (field === Filters.ClientTypes) {
+    normalized = filter.map((type: any) => ({
+      value: type,
+      label: t(type, { ns: "translation" }),
+    }))
+  }
+
   if (
     [
       Filters.Forwarded,
@@ -111,72 +119,7 @@ export function normalizeFilter(
     .sort((a: Option, b: Option) => a.label.localeCompare(b.label, "fr"))
 }
 
-// give the same type to all filters in order to render them easily
-export function normalizeFilters(snapshot: any, t: TFunction): Snapshot {
-  Object.values(Filters).forEach((key) => {
-    const filter = snapshot.filters[key]
-
-    if (filter && typeof filter[0] === "string") {
-      const set = new Set<string>(filter)
-      snapshot.filters[key] = Array.from(set).map(toOption)
-    }
-
-    if (key in snapshot.filters) {
-      if (key === Filters.Biocarburants) {
-        snapshot.filters[key] = snapshot.filters[key].map((bc: any) => ({
-          value: bc.value,
-          label: t(bc.value, { ns: "biofuels" }),
-        }))
-      }
-
-      if (key === Filters.MatieresPremieres) {
-        snapshot.filters[key] = snapshot.filters[key].map((mp: any) => ({
-          value: mp.value,
-          label: t(mp.value, { ns: "feedstocks" }),
-        }))
-      }
-
-      if (key === Filters.CountriesOfOrigin) {
-        snapshot.filters[key] = snapshot.filters[key].map((ct: any) => ({
-          value: ct.value,
-          label: t(ct.value, { ns: "countries" }),
-        }))
-      }
-
-      if (key === Filters.DeliveryStatus) {
-        snapshot.filters[key] = snapshot.filters[key].map((ct: any) => ({
-          value: ct.value,
-          label: t(ct.label, { ns: "translation" }),
-        }))
-      }
-
-      if (key === Filters.Errors) {
-        snapshot.filters[key] = snapshot.filters[key].map((ct: any) => ({
-          value: ct.value,
-          label: t(ct.value, { ns: "errors" }),
-        }))
-      }
-
-      if (
-        [
-          Filters.Forwarded,
-          Filters.Mac,
-          Filters.HiddenByAdmin,
-          Filters.HiddenByAuditor,
-        ].includes(key)
-      ) {
-        snapshot.filters[key] = snapshot.filters[key].map((ct: any) => ({
-          value: ct.value,
-          label: t(ct.label, { ns: "translation" }),
-        }))
-      }
-
-      snapshot.filters[key] = snapshot.filters[key]
-        .filter(Boolean)
-        .sort((a: Option, b: Option) => a.label.localeCompare(b.label, "fr"))
-    }
-  })
-
+export function normalizeSnapshot(snapshot: any, t: TFunction): Snapshot {
   if (snapshot.years) {
     snapshot.years = snapshot.years.map(toOption)
   }
