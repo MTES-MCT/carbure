@@ -8,7 +8,6 @@ from core.decorators import check_rights
 from core.common import get_prefetched_data, load_mb_lot, bulk_insert
 from core.common import load_excel_file, send_lot_from_stock, generate_carbure_id
 from core.xlsx_v3 import template_stock, template_stock_bcghg
-from core.xlsx_v3 import export_stocks
 from django_otp.decorators import otp_required
 from api.v3.lots.helpers import get_snapshot_filters, get_summary, filter_lots, sort_lots, get_lots_with_metadata
 
@@ -28,6 +27,10 @@ sort_key_to_django_field = {'period': 'lot__period',
 def filter_stock_transactions(entity, querySet):
     status = querySet.get('status', False)
     show_empty = querySet.get('show_empty', False)
+    if show_empty == '1':
+        show_empty = True
+    else:
+        show_empty = False
 
     if not status:
         raise Exception('Status is not specified')

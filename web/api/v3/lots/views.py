@@ -90,7 +90,7 @@ def get_details(request, *args, **kwargs):
     try:
         data['distance'] = get_transaction_distance(tx)
     except:
-        data['distance'] = 0
+        data['distance'] = {'distance': 0, 'link': ''}
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['certificates'] = check_certificates(tx)

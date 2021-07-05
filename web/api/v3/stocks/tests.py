@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 import datetime
 import json
 import random
-
+import os
 
 from core.models import Entity, UserRights
 from core.models import Pays, Depot, Biocarburant, MatierePremiere
@@ -48,6 +48,12 @@ def debug_errors():
 
 
 class StockAPITest(TestCase):
+    home = os.environ['CARBURE_HOME']
+    fixtures = ['{home}/web/fixtures/json/countries.json'.format(home=home), 
+    '{home}/web/fixtures/json/feedstock.json'.format(home=home), 
+    '{home}/web/fixtures/json/biofuels.json'.format(home=home),
+    '{home}/web/fixtures/json/depots.json'.format(home=home)]
+
     def setUp(self):
         user_model = get_user_model()
         self.admin_email = 'superadmin@carbure.beta.gouv.fr'
@@ -79,9 +85,6 @@ class StockAPITest(TestCase):
 
         # other stuff (production sites, depots, certificates...)
         france, created = Pays.objects.get_or_create(code_pays='FR')
-        eth, _ = Biocarburant.objects.get_or_create(code='ETH', name='Ethanol')
-        ed95, _ = Biocarburant.objects.get_or_create(code='ED95', name='Ethanol pour ED95')
-        ble, _ = MatierePremiere.objects.get_or_create(code='BLE', name='Blay')
         today = datetime.date.today()
         d = {'country': france, 'date_mise_en_service': today, 'site_id':'SIRET XXX',
         'city': 'paris', 'postal_code': '75001', 'manager_name':'Guillaume Caillou', 
@@ -145,8 +148,8 @@ class StockAPITest(TestCase):
         lot_id = data['lot']['id']
         return tx_id, lot_id
 
-    def get_stock(self, entity_id, status='stock'):
-        response = self.client.get(reverse('api-v3-stocks-get'), {'entity_id': entity_id, 'status': status})
+    def get_stock(self, entity_id, status='stock', show_empty='0'):
+        response = self.client.get(reverse('api-v3-stocks-get'), {'entity_id': entity_id, 'status': status, 'show_empty': show_empty})
         self.assertEqual(response.status_code, 200)
         return response.json()['data']
 
@@ -176,7 +179,6 @@ class StockAPITest(TestCase):
         response = self.client.post(reverse('api-v3-stocks-create-drafts'), {'entity_id': self.entity1.id, 'drafts': json.dumps(drafts)})
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        print(data)
         return data
 
     def create_draft_from_match(self, **kwargs):
@@ -409,18 +411,6 @@ class StockAPITest(TestCase):
     def test_stock_matching_engine(self):
         # check MP rule
         # create many lots
-
-        france, _ = Pays.objects.get_or_create(code_pays='FR')
-        germanie, _ = Pays.objects.get_or_create(code_pays='DE')
-
-        eth, _ = Biocarburant.objects.get_or_create(code='ETH', name='Ethanol')
-        ed95, _ = Biocarburant.objects.get_or_create(code='ED95', name='Ethanol pour ED95')
-        emhv, _ = Biocarburant.objects.get_or_create(code='EMHV', name='EMHV')
-
-        ble, _ = MatierePremiere.objects.get_or_create(code='BLE', name='Blay')
-        mais, _ = MatierePremiere.objects.get_or_create(code='MAIS', name='Corn')
-        colza, _ = MatierePremiere.objects.get_or_create(code='COLZA', name='Colza')
-
         txid, lotid = self.create_lot(client=self.entity1, biocarburant_code='ETH', matiere_premiere_code='BLE', pays_origine_code='FR')
         txid2, lotid = self.create_lot(client=self.entity1, biocarburant_code='ETH', matiere_premiere_code='MAIS', pays_origine_code='FR')
         txid3, lotid = self.create_lot(client=self.entity1, biocarburant_code='ETH', matiere_premiere_code='BLE', pays_origine_code='DE')
@@ -439,17 +429,6 @@ class StockAPITest(TestCase):
 
     def test_upload_template(self):
         # create a few lots
-        france, _ = Pays.objects.get_or_create(code_pays='FR')
-        germanie, _ = Pays.objects.get_or_create(code_pays='DE')
-
-        eth, _ = Biocarburant.objects.get_or_create(code='ETH', name='Ethanol')
-        ed95, _ = Biocarburant.objects.get_or_create(code='ED95', name='Ethanol pour ED95')
-        emhv, _ = Biocarburant.objects.get_or_create(code='EMHV', name='EMHV')
-
-        ble, _ = MatierePremiere.objects.get_or_create(code='BLE', name='Blay')
-        mais, _ = MatierePremiere.objects.get_or_create(code='MAIS', name='Corn')
-        colza, _ = MatierePremiere.objects.get_or_create(code='COLZA', name='Colza')
-
         txid, lotid = self.create_lot(client=self.entity1, biocarburant_code='ETH', matiere_premiere_code='BLE', pays_origine_code='FR')
         txid2, lotid = self.create_lot(client=self.entity1, biocarburant_code='ETH', matiere_premiere_code='MAIS', pays_origine_code='FR')
         txid3, lotid = self.create_lot(client=self.entity1, biocarburant_code='ETH', matiere_premiere_code='BLE', pays_origine_code='DE')
@@ -479,3 +458,32 @@ class StockAPITest(TestCase):
         # we should have a few drafts
         stock_drafts = self.get_stock(self.entity1.id, status='tosend')
         self.assertEqual(len(stock_drafts['lots']), 20)
+
+
+    def test_show_empty_stock(self):
+        # create a lot where I am the client
+        txid, lotid = self.create_lot(client=self.entity1)
+        # validate lot
+        self.validate_lots(self.entity1.id, [txid])
+
+        # get stock should return one line
+        stock = self.get_stock(self.entity1.id)
+        lots_in_stock = stock['lots']
+        self.assertEqual(len(lots_in_stock), 1)
+
+        # extract volume from lot and send
+        stock_tx = LotTransaction.objects.get(id=txid)
+        drafts = self.create_draft(tx_id=stock_tx.id, volume=stock_tx.lot.volume, client=self.entity2.name, delivery_site="osef", delivery_site_country='DE')
+        new_draft_id = drafts['data']['tx_ids'][0]
+        draft_tx = LotTransaction.objects.get(id=new_draft_id)
+        self.send_stock_drafts(self.entity1.id, [draft_tx.id])
+
+        # get stock should return zero line
+        stock = self.get_stock(self.entity1.id)
+        lots_in_stock = stock['lots']
+        self.assertEqual(len(lots_in_stock), 0)
+
+        # however adding the flag show_empty='1'' should return 1 line
+        stock = self.get_stock(self.entity1.id, show_empty='1')
+        lots_in_stock = stock['lots']
+        self.assertEqual(len(lots_in_stock), 1)
