@@ -97,6 +97,8 @@ const TransactionDetails = ({
   const isAdmin = entity?.entity_type === EntityType.Administration
   const isAuditor = entity?.entity_type === EntityType.Auditor
 
+  const isAuthor =
+    Boolean(entity) && transaction?.lot.added_by?.id === entity?.id
   const isVendor =
     Boolean(entity) && transaction?.carbure_vendor?.id === entity!.id
   const isVendorOperator =
@@ -234,7 +236,7 @@ const TransactionDetails = ({
           )}
 
         {canModify &&
-          isVendor &&
+          (isVendor || isAuthor) &&
           !isAdmin &&
           !isAuditor &&
           [LotStatus.Accepted, LotStatus.Declaration].includes(status) && (
@@ -248,11 +250,21 @@ const TransactionDetails = ({
             </AsyncButton>
           )}
 
+        {console.log({
+          canModify,
+          isVendor,
+          isAdmin,
+          isAuditor,
+          isVendorOperator,
+          status,
+        })}
+
         {canModify &&
           !isVendor &&
           !isAdmin &&
           !isAuditor &&
           !isVendorOperator &&
+          !isAuthor &&
           [LotStatus.Accepted, LotStatus.Declaration].includes(status) && (
             <AsyncButton
               icon={Edit}
