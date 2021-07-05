@@ -4,7 +4,7 @@ from producers.models import ProductionSite, ProductionSiteInput, ProductionSite
 
 
 class ProductionSiteAdmin(admin.ModelAdmin):
-    list_display = ('name', 'producer', 'country', 'date_mise_en_service', 'ges_option')
+    list_display = ('name', 'producer', 'country', 'date_mise_en_service', 'ges_option', 'gps_coordinates')
     search_fields = ('name', 'producer__name', 'country__name', 'ges_option')
     list_filter = ('producer', 'country', 'ges_option', 'eligible_dc')
 

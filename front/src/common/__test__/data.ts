@@ -229,7 +229,7 @@ export const lot: Transaction = {
     eccr: 0,
     eee: 0,
     ghg_total: 11,
-    ghg_reference: 83.8,
+    ghg_reference: 94.0,
     ghg_reduction: 86.87,
     status: "Draft",
     source: "MANUAL",

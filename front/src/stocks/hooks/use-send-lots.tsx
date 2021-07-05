@@ -136,7 +136,7 @@ export default function useSendLot(
         vendor_certificate: sent.carbure_vendor_certificate,
       }
 
-      notifyCreated(resolveCreate(entity.id, [draft]))
+      await notifyCreated(resolveCreate(entity.id, [draft]))
     }
 
     return Boolean(sent)
@@ -149,7 +149,7 @@ export default function useSendLot(
     )
 
     if (entity !== null && shouldSend) {
-      notifySend(resolveSend(entity.id, [tx.id]), true)
+      await notifySend(resolveSend(entity.id, [tx.id]), true)
     }
 
     return shouldSend
@@ -170,7 +170,7 @@ export default function useSendLot(
     ))
 
     if (shouldSend) {
-      notifySend(resolveSend(entity.id, selection.selected), true)
+      await notifySend(resolveSend(entity.id, selection.selected), true)
     }
 
     return Boolean(shouldSend)
@@ -204,7 +204,7 @@ export default function useSendLot(
     ))
 
     if (conversions) {
-      notifyCreated(resolveETBE(entity.id, conversions))
+      await notifyCreated(resolveETBE(entity.id, conversions))
     }
 
     return Boolean(conversions)
@@ -221,7 +221,7 @@ export default function useSendLot(
     ))
 
     if (data) {
-      notifyCreated(
+      await notifyCreated(
         resolveForward(
           entity.id,
           selection.selected,
@@ -244,7 +244,6 @@ export default function useSendLot(
     sendSelection,
     sendLot,
     sendAllDrafts,
-    // convertETBE,
     convertETBEComplex,
     forwardLots,
   }

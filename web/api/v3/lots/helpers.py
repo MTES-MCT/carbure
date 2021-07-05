@@ -12,7 +12,6 @@ from core.xlsx_v3 import export_transactions
 
 
 sort_key_to_django_field = {'period': 'lot__period',
-                            'biocarburant': 'lot__biocarburant__name',
                             'matiere_premiere': 'lot__matiere_premiere__name',
                             'ghg_reduction': 'lot__ghg_reduction',
                             'volume': 'lot__volume',
@@ -276,16 +275,23 @@ def sort_lots(txs, querySet):
             txs = txs.order_by('-%s' % key)
         else:
             txs = txs.order_by(key)
+    elif sort_by == 'biocarburant':
+        if order == 'desc':
+            txs = txs.order_by('-lot__biocarburant__name', '-lot__volume')
+        else:
+            txs = txs.order_by('lot__biocarburant__name', 'lot__volume')
     elif sort_by == 'client':
-        txs = txs.annotate(client=Case(
-            When(client_is_in_carbure=True, then=F('carbure_client__name')),
-            default=F('unknown_client')
-        ))
-
+        txs = txs.annotate(client=Coalesce('carbure_client__name', 'unknown_client'))
         if order == 'desc':
             txs = txs.order_by('-client')
         else:
             txs = txs.order_by('client')
+    elif sort_by == 'vendor':
+        txs = txs.annotate(vendor=Coalesce('carbure_vendor__name', 'lot__unknown_supplier'))
+        if order == 'desc':
+            txs = txs.order_by('-vendor')
+        else:
+            txs = txs.order_by('vendor')
 
     return txs
 
@@ -337,7 +343,7 @@ def get_lots_with_metadata(txs, entity, querySet, admin=False):
         return response
 
 
-def get_snapshot_filters(txs, whitelist):
+def get_snapshot_filters(txs, entity, whitelist):
     filters = {}
 
     # prefetch related lots and txs to speed up queries
@@ -392,7 +398,10 @@ def get_snapshot_filters(txs, whitelist):
 
     if 'vendors' in whitelist:
         v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
-        v2 = [v['unknown_supplier'] for v in lots.values('unknown_supplier').distinct()]
+        if entity is not None:
+            v2 = [v['lot__unknown_supplier'] for v in txs.filter(Q(carbure_vendor=entity) | Q(lot__added_by=entity)).values('lot__unknown_supplier').distinct()]
+        else:
+            v2 = [v['unknown_supplier'] for v in lots.values('unknown_supplier').distinct()]
         filters['vendors'] = [v for v in set(v1 + v2) if v]
 
     if 'added_by' in whitelist:

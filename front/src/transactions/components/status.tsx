@@ -4,12 +4,54 @@ import format from "date-fns/format"
 import fr from "date-fns/locale/fr"
 import { TFunction, Trans, useTranslation } from "react-i18next"
 
-import { LotDetails, Transaction, DeliveryStatus } from "common/types"
+import {
+  LotDetails,
+  Transaction,
+  DeliveryStatus,
+  LotStatus,
+} from "common/types"
 import { Box, Title } from "common/components"
 import { hasDeadline } from "../helpers"
 
 import styles from "./status.module.css"
 import { EntitySelection } from "carbure/hooks/use-entity"
+
+// extract the status name from the lot details
+export function getStatus(
+  transaction: Transaction,
+  entityID: number
+): LotStatus {
+  const status = transaction.lot.status.toLowerCase()
+  const delivery = transaction.delivery_status
+
+  const isAuthor = transaction.lot.added_by?.id === entityID
+  const isVendor = transaction.carbure_vendor?.id === entityID
+  const isClient = transaction.carbure_client?.id === entityID
+
+  if (status === "draft") {
+    return LotStatus.Draft
+  } else if (status === "validated") {
+    if (delivery === "F") {
+      return LotStatus.Declaration
+    } else if (delivery === "A") {
+      return LotStatus.Accepted
+    }
+    // PRODUCTEUR
+    else if (isVendor || isAuthor) {
+      if (["N", "AA"].includes(delivery)) {
+        return LotStatus.Validated
+      } else if (["AC", "R"].includes(delivery)) {
+        return LotStatus.ToFix
+      }
+    }
+    // OPERATEUR
+    else if (isClient && ["N", "AA", "AC"].includes(delivery)) {
+      return LotStatus.Inbox
+    }
+  }
+
+  return LotStatus.Weird
+}
 
 function getStatusText(
   t: TFunction<"translation">,
@@ -21,11 +63,11 @@ function getStatusText(
     return isStock ? t("À envoyer") : t("Brouillon")
   }
 
-  const isClient = tx.carbure_client?.id === entity?.id
-
   if (tx.is_forwarded) {
     return t("Transféré")
   }
+
+  const isVendor = tx.carbure_vendor?.id === entity?.id
 
   switch (tx.delivery_status) {
     case DeliveryStatus.Pending:
@@ -35,7 +77,7 @@ function getStatusText(
     case DeliveryStatus.Rejected:
       return t("Refusé")
     case DeliveryStatus.ToFix:
-      return isClient ? t("En correction") : t("À corriger")
+      return isVendor ? t("À corriger") : t("En correction")
     case DeliveryStatus.Fixed:
       return t("Corrigé")
     case DeliveryStatus.Frozen:
