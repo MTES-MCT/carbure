@@ -290,6 +290,13 @@ export const UserCheck = ({ className, ...props }: IconProps) => (
   </Icon>
 )
 
+export const Eye = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-eye", className)}>
+    <path d="M10.584 10.587a2 2 0 0 0 2.828 2.83" />
+    <path d="M9.363 5.365a9.466 9.466 0 0 1 2.637 -.365c4 0 7.333 2.333 10 7c-.778 1.361 -1.612 2.524 -2.503 3.488m-2.14 1.861c-1.631 1.1 -3.415 1.651 -5.357 1.651c-4 0 -7.333 -2.333 -10 -7c1.369 -2.395 2.913 -4.175 4.632 -5.341" />
+  </Icon>
+)
+
 export const EyeOff = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("icon-eye-off", className)}>
     <line x1="3" y1="3" x2="21" y2="21" />
@@ -301,6 +308,15 @@ export const EyeOff = ({ className, ...props }: IconProps) => (
 export const Pin = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("icon-pin", className)}>
     <path d="M15 4.5l-4 4l-4 1.5l-1.5 1.5l7 7l1.5 -1.5l1.5 -4l4 -4" />
+    <line x1="9" y1="15" x2="4.5" y2="19.5" />
+    <line x1="14.5" y1="4" x2="20" y2="9.5" />
+  </Icon>
+)
+
+export const PinOff = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-pin-off", className)}>
+    <line x1="3" y1="3" x2="21" y2="21" />
+    <path d="M15 4.5l-3.249 3.249m-2.57 1.433l-2.181 .818l-1.5 1.5l7 7l1.5 -1.5l.82 -2.186m1.43 -2.563l3.25 -3.251" />
     <line x1="9" y1="15" x2="4.5" y2="19.5" />
     <line x1="14.5" y1="4" x2="20" y2="9.5" />
   </Icon>

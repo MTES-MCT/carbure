@@ -84,7 +84,7 @@ export default function useISCCCertificates(
     ))
 
     if (typeof entityID !== "undefined" && data) {
-      notifyCertificate(
+      await notifyCertificate(
         resolveAddISCC(entityID, data.certificate_id),
         t("ajouté")
       )
@@ -99,7 +99,7 @@ export default function useISCCCertificates(
         t("Voulez-vous vraiment supprimer le certificat ISCC {{cert}} ?", { cert: iscc.certificate_id }) // prettier-ignore
       ))
     ) {
-      notifyCertificate(
+      await notifyCertificate(
         resolveDelISCC(entityID, iscc.certificate_id),
         t("supprimé")
       )
@@ -118,7 +118,7 @@ export default function useISCCCertificates(
     ))
 
     if (typeof entityID !== "undefined" && data) {
-      notifyCertificate(
+      await notifyCertificate(
         resolveUpdateISCC(entityID, iscc.certificate_id, data.certificate_id),
         t("mis à jour")
       )

@@ -5,10 +5,9 @@ import { EntityType, LotStatus } from "common/types"
 import useEntity from "./hooks/use-entity"
 import { UserRightProvider } from "./hooks/use-rights"
 
-import { Alert } from "common/components/alert"
-import { AlertTriangle } from "common/components/icons"
 import { Redirect, Route, Switch } from "common/components/relative-route"
 
+import { LoaderOverlay } from "common/components"
 import Topbar from "./components/top-bar"
 import Footer from "./components/footer"
 import Pending from "./components/pending"
@@ -23,6 +22,7 @@ import Entities from "../entities" // not using relative path prevents import
 import EntityDetails from "../entities/routes/entity-details"
 import Dashboard from "dashboard"
 import Stats from "stats"
+import PublicStats from "stats/public"
 
 const DevBanner = () => (
   <div
@@ -42,6 +42,14 @@ const DevBanner = () => (
 // has to be nested in a route so we can get data from useParams()
 const Org = ({ app }: { app: AppHook }) => {
   const { entity, pending } = useEntity(app)
+
+  if (app.settings.error === "User not verified") {
+    return <Exit to="/accounts/login" />
+  }
+
+  if (app.settings.loading || app.settings.data === null) {
+    return <LoaderOverlay />
+  }
 
   // a user with entities tries to access the pending or another entity's page
   if (app.hasEntities() && !entity) {
@@ -137,33 +145,25 @@ const Org = ({ app }: { app: AppHook }) => {
 
 const Carbure = () => {
   const app = useApp()
-  const { settings, getDefaultEntity } = app
-
-  if (settings.error === "User not verified") {
-    return <Exit to="/accounts/login" />
-  }
+  const { getDefaultEntity } = app
 
   return (
     <div id="app">
-      {settings.error && (
-        <Alert level="error" icon={AlertTriangle}>
-          {settings.error}
-        </Alert>
-      )}
+      <Switch>
+        <Route path="/org/:entity">
+          <Org app={app} />
+        </Route>
 
-      {!settings.error && settings.data && (
-        <Switch>
-          <Route path="/org/:entity">
-            <Org app={app} />
-          </Route>
+        <Route path="/logout">
+          <Exit to="/accounts/logout" />
+        </Route>
 
-          <Route path="/logout">
-            <Exit to="/accounts/logout" />
-          </Route>
+        <Route path="/public_stats">
+          <PublicStats />
+        </Route>
 
-          <Redirect to={`/org/${getDefaultEntity()}`} />
-        </Switch>
-      )}
+        <Redirect to={`/org/${getDefaultEntity()}`} />
+      </Switch>
     </div>
   )
 }

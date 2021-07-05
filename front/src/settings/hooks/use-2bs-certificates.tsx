@@ -82,7 +82,10 @@ export default function use2BSCertificates(
     ))
 
     if (typeof entityID !== "undefined" && data) {
-      notifyCertificate(resolveAdd2BS(entityID, data.certificate_id), "ajouté")
+      await notifyCertificate(
+        resolveAdd2BS(entityID, data.certificate_id),
+        "ajouté"
+      )
     }
   }
 
@@ -94,7 +97,7 @@ export default function use2BSCertificates(
         t("Voulez-vous vraiment supprimer le certificat 2BS {{cert}} ?", { cert: dbs.certificate_id}) // prettier-ignore
       ))
     ) {
-      notifyCertificate(
+      await notifyCertificate(
         resolveDel2BS(entityID, dbs.certificate_id),
         t("supprimé")
       )
@@ -113,7 +116,7 @@ export default function use2BSCertificates(
     ))
 
     if (typeof entityID !== "undefined" && data) {
-      notifyCertificate(
+      await notifyCertificate(
         resolveUpdate2BS(entityID, dbs.certificate_id, data.certificate_id),
         t("mis à jour")
       )

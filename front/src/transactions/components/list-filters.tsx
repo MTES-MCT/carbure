@@ -32,7 +32,7 @@ export function mapFilters(
   placeholder: Filters[],
   t: TFunction<"translation">
 ): [Filters, string, SelectValue][] {
-  const filterList = filters ?? []
+  const filterList = filters ?? placeholder
 
   filterList.sort(
     (a, b) =>

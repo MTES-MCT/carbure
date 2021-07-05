@@ -114,7 +114,7 @@ def get_filters(request, *args, **kwargs):
     txs = filter_stock_transactions(entity, request.GET)
     txs = filter_lots(txs, request.GET, [field])[0]
 
-    d = get_snapshot_filters(txs, [field])
+    d = get_snapshot_filters(txs, entity, [field])
     if field in d:
         values = d[field]
     else:

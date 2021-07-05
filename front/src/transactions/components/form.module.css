@@ -12,9 +12,13 @@
 
 .transactionFormButtons {
   display: flex;
-  margin-top: auto;
-  margin-top: 32px;
-  margin-bottom: 24px;
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  padding: 24px 0;
+  margin-top: 24px;
+  border-top: 1px solid var(--gray-highlight);
+  background-color: var(--gray-light);
 }
 
 .transactionFormButtons button {

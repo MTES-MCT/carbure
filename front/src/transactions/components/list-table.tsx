@@ -21,8 +21,10 @@ import {
   Check,
   Copy,
   Cross,
+  Eye,
   EyeOff,
   Pin,
+  PinOff,
 } from "common/components/icons"
 import Table, { Actions, arrow, Column, Row } from "common/components/table"
 import * as C from "./list-columns"
@@ -62,11 +64,7 @@ const getInboxActions = ({
 }: TxActions): TxColumn =>
   Actions([
     { icon: Check, title: t("Accepter le lot"), action: onAccept },
-    {
-      icon: AlertTriangle,
-      title: t("Accepter sous réserve"),
-      action: onComment,
-    },
+    { icon: AlertTriangle, title: t("Accepter sous réserve"), action: onComment }, // prettier-ignore
     { icon: Cross, title: t("Refuser le lot"), action: onReject },
   ])
 
@@ -76,14 +74,40 @@ const getDuplicateActions = ({
 }: TxActions): Column<Transaction> =>
   Actions([{ icon: Copy, title: t("Dupliquer le lot"), action: onDuplicate }])
 
-const getControlActions = ({
+const getAdminActions = ({
   onHide,
   onHighlight,
   t,
 }: TxActions): Column<Transaction> =>
-  Actions([
-    { icon: Pin, title: t("Épingler le lot"), action: onHighlight },
-    { icon: EyeOff, title: t("Ignorer le lot"), action: onHide },
+  Actions((tx) => [
+    {
+      icon: tx.highlighted_by_admin ? PinOff : Pin,
+      title: tx.highlighted_by_admin ? t("Désépingler le lot") : t("Épingler le lot"), // prettier-ignore
+      action: onHighlight,
+    },
+    {
+      icon: tx.hidden_by_admin ? Eye : EyeOff,
+      title: tx.hidden_by_admin ? t("Montrer le lot") : t("Ignorer le lot"),
+      action: onHide,
+    },
+  ])
+
+const getAuditorActions = ({
+  onHide,
+  onHighlight,
+  t,
+}: TxActions): Column<Transaction> =>
+  Actions((tx) => [
+    {
+      icon: tx.highlighted_by_auditor ? PinOff : Pin,
+      title: tx.highlighted_by_auditor ? t("Désépingler le lot") : t("Épingler le lot"), // prettier-ignore
+      action: onHighlight,
+    },
+    {
+      icon: tx.hidden_by_auditor ? Eye : EyeOff,
+      title: tx.hidden_by_auditor ? t("Montrer le lot") : t("Ignorer le lot"),
+      action: onHide,
+    },
   ])
 
 type TransactionTableProps = {
@@ -181,7 +205,7 @@ export const TransactionTable = ({
     columns.push(arrow)
   } else if (isAdmin) {
     columns.push(
-      getControlActions({
+      getAdminActions({
         t,
         onHide: onAdminHide,
         onHighlight: onAdminHighlight,
@@ -189,7 +213,7 @@ export const TransactionTable = ({
     )
   } else if (isAdmin || isAuditor) {
     columns.push(
-      getControlActions({
+      getAuditorActions({
         t,
         onHide: onAuditorHide,
         onHighlight: onAuditorHighlight,
