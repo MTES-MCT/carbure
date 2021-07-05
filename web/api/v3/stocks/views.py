@@ -27,6 +27,7 @@ sort_key_to_django_field = {'period': 'lot__period',
 
 def filter_stock_transactions(entity, querySet):
     status = querySet.get('status', False)
+    show_empty = querySet.get('show_empty', False)
 
     if not status:
         raise Exception('Status is not specified')
@@ -39,7 +40,10 @@ def filter_stock_transactions(entity, querySet):
     elif status == 'in':
         return LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.PENDING, LotTransaction.TOFIX, LotTransaction.FIXED])
     elif status == 'stock':
-        return LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, lot__remaining_volume__gt=0, is_forwarded=False, is_mac=False)
+        stock = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, is_forwarded=False, is_mac=False)
+        if not show_empty:
+            stock = stock.filter(lot__remaining_volume__gt=0)
+        return stock
     else:
         raise Exception('Unknown status')
 
