@@ -49,11 +49,11 @@ export const StockActions = ({
   onConvertETBE,
 }: StockActionsProps) => (
   <Fragment>
-    <Link relative to="send-complex">
+    {/* <Link relative to="send-complex">
       <Button level="primary" icon={Rapport}>
         <Trans>Envoi complexe</Trans>
       </Button>
-    </Link>
+    </Link> */}
 
     <Button level="primary" icon={Forward} onClick={onForward}>
       <Trans>Transférer</Trans>
