@@ -13,7 +13,7 @@ import {
 import api from "common/services/api"
 import {
   normalizeSummary,
-  normalizeFilters,
+  normalizeSnapshot,
   toOption,
   normalizeFilter,
 } from "transactions/helpers"
@@ -54,7 +54,7 @@ export function getStockSnapshot(
 ): Promise<Snapshot> {
   return api
     .get("/stocks/snapshot", { entity_id })
-    .then((s) => normalizeFilters(s, t))
+    .then((s) => normalizeSnapshot(s, t))
 }
 
 export function getStocks(query: TransactionQuery): Promise<Lots> {
