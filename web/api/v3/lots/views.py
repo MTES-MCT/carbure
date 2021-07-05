@@ -473,7 +473,7 @@ def amend_lot(request, *args, **kwargs):
     except Exception:
         return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
 
-    if tx.carbure_vendor != entity:
+    if tx.carbure_vendor != entity and tx.lot.added_by != entity:
         print(tx.carbure_vendor)
         print(entity)
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
