@@ -15,8 +15,8 @@ from os.path import isfile
 import shutil
 import re
 
-validUrl = 'https://www.2bsvs.org/certificats-valides.html'
-invalidUrl = 'https://www.2bsvs.org/certificats-retires.html'
+validUrl = 'https://www.2bsvs.org/cert_valides.html'
+invalidUrl = 'https://www.2bsvs.org/cert_retires.html'
 DESTINATION_FOLDER = '/tmp/'
 
 
