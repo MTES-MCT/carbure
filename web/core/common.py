@@ -1125,34 +1125,42 @@ def validate_lots(user, entity, txs):
 
 
 def get_transaction_distance(tx):
+    url_link = 'https://www.google.com/maps/dir/?api=1&origin=%s&destination=%s&travelmode=driving'
+    res = {'distance': -1, 'link': '', 'error': None, 'source': None}
+
     if not tx.lot.production_site_is_in_carbure:
-        print('psite not in carbure')
-        return -1
+        res['error'] = 'PRODUCTION_SITE_NOT_IN_CARBURE'
+        return res
     if not tx.delivery_site_is_in_carbure:
-        print('delivsite not in carbure')
-        return -1
+        res['error'] = 'DELIVERY_SITE_NOT_IN_CARBURE'
+        return res
     starting_point = tx.lot.carbure_production_site.gps_coordinates
     delivery_point = tx.carbure_delivery_site.gps_coordinates
 
-    if not starting_point or not delivery_point:
-        print('NO gps coordinates')
-        return -1
-
+    if not starting_point:
+        res['error'] = 'PRODUCTION_SITE_COORDINATES_NOT_IN_CARBURE'
+        return res
+    if not delivery_point:
+        res['error'] = 'DELIVERY_SITE_COORDINATES_NOT_IN_CARBURE'
+        return res
     try:
         td = TransactionDistance.objects.get(starting_point=starting_point, delivery_point=delivery_point)
-        print('Found in cache')
-        return td.distance
+        res['link'] = url_link % (starting_point, delivery_point)
+        res['distance'] = td.distance
+        res['source'] = 'DB'
+        return res
     except:
         # not found
-        print('not found in cache')
-        print(starting_point, delivery_point)
         result = get_distance(starting_point, delivery_point)
         # if script success
         if result != 'ERROR':
             distance = float(result)
             TransactionDistance.objects.create(starting_point=starting_point, delivery_point=delivery_point, distance=distance)
-            return distance
+            res['link'] = url_link % (starting_point, delivery_point)
+            res['distance'] = distance
+            res['source'] = 'API'
+            return res
         else:
-            print('Script error')
-            return -1
+            res['error'] = 'API_ERROR'
+            return res
 
