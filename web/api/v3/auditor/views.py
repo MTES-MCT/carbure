@@ -152,7 +152,8 @@ def get_snapshot(request, *args, **kwargs):
             'errors',
             'is_forwarded',
             'is_mac',
-            'is_hidden_by_auditor'
+            'is_hidden_by_auditor',
+            'client_types'
         ]
         data = {'lots': lots, 'filters': filters, 'years': years}
         return JsonResponse({'status': 'success', 'data': data})

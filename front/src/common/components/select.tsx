@@ -178,14 +178,14 @@ export const Select = ({
     if (dd.isOpen) {
       getRemoteOptions(...getArgs)
     }
-  }, [dd.isOpen, getRemoteOptions, ...getArgs])
+  }, [dd.isOpen, getRemoteOptions, ...getArgs]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // load select options if value is defined but options are not loaded yet
   useEffect(() => {
     if (Array.isArray(value) && value.length > 0 && options.length === 0) {
       getRemoteOptions(...getArgs)
     }
-  }, [value, getRemoteOptions, options.length, ...getArgs])
+  }, [value, getRemoteOptions, options.length, ...getArgs]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const isLoading = !Boolean(localOptions) && remoteOptions.loading
 

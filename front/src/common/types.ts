@@ -300,8 +300,7 @@ export enum Filters {
   Mac = "is_mac",
   HiddenByAdmin = "is_hidden_by_admin",
   HiddenByAuditor = "is_hidden_by_auditor",
-  // HighlightedByAdmin = "is_highlighted_by_admin",
-  // HighlightedByAuditor = "is_highlighted_by_auditor",
+  ClientTypes = "client_types",
 }
 
 export interface TransactionQuery {
@@ -330,6 +329,7 @@ export interface TransactionQuery {
   [Filters.Mac]?: any
   [Filters.HiddenByAdmin]?: any
   [Filters.HiddenByAuditor]?: any
+  [Filters.ClientTypes]?: any
   // [Filters.HighlightedByAdmin]?: any
   // [Filters.HighlightedByAuditor]?: any
 }

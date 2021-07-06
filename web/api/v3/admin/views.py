@@ -294,6 +294,7 @@ def get_snapshot(request):
             'is_forwarded',
             'is_mac',
             'is_hidden_by_admin',
+            'client_types'
         ]
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Exception"}, status=400)

@@ -24,7 +24,7 @@ from core.common import check_certificates, get_transaction_distance
 from core.decorators import check_rights
 from core.notifications import notify_lots_rejected, notify_declaration_invalidated, notify_accepted_lot_in_correction
 from api.v3.sanity_checks import bulk_sanity_checks
-from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, sort_lots, filter_lots, get_oneshot_filters
+from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, sort_lots, filter_lots
 
 
 logger = logging.getLogger(__name__)
@@ -473,7 +473,7 @@ def amend_lot(request, *args, **kwargs):
     except Exception:
         return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
 
-    if tx.carbure_vendor != entity:
+    if tx.carbure_vendor != entity and tx.lot.added_by != entity:
         print(tx.carbure_vendor)
         print(entity)
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
