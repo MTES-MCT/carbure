@@ -755,34 +755,38 @@ def grade(volume):
 
 @is_admin
 def map(request):
-    m = folium.Map(location=[46.227638, 2.213749], zoom_start=5)
-    # la requete sql vient ici
-    data = open (r"/tmp/data.csv")
-    myReader = csv.reader(data)
-    noms_diff = []
-    for row in myReader:
-        for i, e in enumerate(row):
-            coord = e.split(';')            
-            if coord[0] not in noms_diff:
-                noms_diff.append(coord[0])
-                for n in noms_diff :
-                    c = couleur()
-                    folium.Circle(
-                        radius=50e2,
-                        location=[coord[1], coord[2]],
-                        popup=coord[0],
-                        color= c,
-                        fill=True,
-                        fill_opacity=1,
-                    ).add_to(m)
-            folium.Circle(
-                radius=50e2,
-                location=[coord[4], coord[5]],
-                popup=coord[3],
-                color="white",
-                fill=True,
-                fill_opacity=1,
-            ).add_to(m)
-            volume = random.uniform(100,200)
-            folium.PolyLine([(float(coord[1]),float(coord[2])),(float(coord[4]),float(coord[5]))], color=c, weight=grade(volume), line_cap='round', opacity=0.7, popup=coord[0]+' vers '+coord[3]+' : \n'+str(volume)+' litres').add_to(m)
-    return HttpResponse(m._repr_html_())
+    try:
+        m = folium.Map(location=[46.227638, 2.213749], zoom_start=5)
+        # la requete sql vient ici
+        data = open (r"/tmp/data.csv")
+        myReader = csv.reader(data)
+        noms_diff = []
+        for row in myReader:
+            for i, e in enumerate(row):
+                coord = e.split(';')            
+                if coord[0] not in noms_diff:
+                    noms_diff.append(coord[0])
+                    for n in noms_diff :
+                        c = couleur()
+                        folium.Circle(
+                            radius=50e2,
+                            location=[coord[1], coord[2]],
+                            popup=coord[0],
+                            color= c,
+                            fill=True,
+                            fill_opacity=1,
+                        ).add_to(m)
+                folium.Circle(
+                    radius=50e2,
+                    location=[coord[4], coord[5]],
+                    popup=coord[3],
+                    color="white",
+                    fill=True,
+                    fill_opacity=1,
+                ).add_to(m)
+                volume = random.uniform(100,200)
+                folium.PolyLine([(float(coord[1]),float(coord[2])),(float(coord[4]),float(coord[5]))], color=c, weight=grade(volume), line_cap='round', opacity=0.7, popup=coord[0]+' vers '+coord[3]+' : \n'+str(volume)+' litres').add_to(m)
+        return HttpResponse(m._repr_html_())
+    except:
+        return JsonResponse({'status': 'error'}, status=400)
+
