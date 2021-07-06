@@ -1,9 +1,14 @@
 import logging
 import datetime
+from django.http.response import HttpResponse
 import pytz
 import calendar
 from dateutil.rrule import rrule, MONTHLY
 from dateutil.relativedelta import relativedelta
+import csv
+import folium
+import random
+
 
 from django.http import JsonResponse
 from core.decorators import is_admin
@@ -722,3 +727,61 @@ def hide_transactions(request):
         tx.save()
         tx.genericerror_set.all().update(acked_by_admin=True)
     return JsonResponse({'status': 'success'})
+
+
+# not an api endpoint
+def couleur():
+    liste = ["#FF0040","#DF01A5","#BF00FF","#4000FF","#0040FF","#00BFFF",
+              "#00FFBF","#00FF40","#40FF00","#BFFF00","#FFBF00","#FF4000",
+              "#FA5858","#FAAC58","#F4FA58","#ACFA58","#58FA58","#58FAAC",
+              "#58FAF4","#58ACFA","#5858FA","#AC58FA","#FA58F4","#FA58AC",
+              "#B40404","#B45F04","#AEB404","#5FB404","#04B45F","#04B4AE",
+              "#045FB4","#0404B4","#5F04B4","#B404AE","#B4045F","#8A0829"]
+    return random.choice(liste)
+
+# not an api endpoint
+def grade(volume):
+    if volume < 120 :
+        return 2
+    elif 120 <= volume < 140 :
+        return 2.3
+    elif 140 <= volume < 160 :
+        return 2.6
+    elif 160 <= volume < 180 :
+        return 3.1
+    elif 180 <= volume <= 200 :
+        return 3.4
+
+@is_admin
+def map(request):
+    m = folium.Map(location=[46.227638, 2.213749], zoom_start=5)
+    # la requete sql vient ici
+    data = open (r"/tmp/data.csv")
+    myReader = csv.reader(data)
+    noms_diff = []
+    for row in myReader:
+        for i, e in enumerate(row):
+            coord = e.split(';')            
+            if coord[0] not in noms_diff:
+                noms_diff.append(coord[0])
+                for n in noms_diff :
+                    c = couleur()
+                    folium.Circle(
+                        radius=50e2,
+                        location=[coord[1], coord[2]],
+                        popup=coord[0],
+                        color= c,
+                        fill=True,
+                        fill_opacity=1,
+                    ).add_to(m)
+            folium.Circle(
+                radius=50e2,
+                location=[coord[4], coord[5]],
+                popup=coord[3],
+                color="white",
+                fill=True,
+                fill_opacity=1,
+            ).add_to(m)
+            volume = random.uniform(100,200)
+            folium.PolyLine([(float(coord[1]),float(coord[2])),(float(coord[4]),float(coord[5]))], color=c, weight=grade(volume), line_cap='round', opacity=0.7, popup=coord[0]+' vers '+coord[3]+' : \n'+str(volume)+' litres').add_to(m)
+    return HttpResponse(m._repr_html_())
