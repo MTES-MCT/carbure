@@ -377,6 +377,7 @@ class LotV2(models.Model):
             models.Index(fields=["pays_origine"]),
             models.Index(fields=["carbure_production_site"]),
             models.Index(fields=["unknown_production_site"]),
+            models.Index(fields=["year"]),
         ]
 
 class LotTransaction(models.Model):
