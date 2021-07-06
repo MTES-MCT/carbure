@@ -252,7 +252,7 @@ const initialState: TransactionFormState = {
 
   ghg_total: 0,
   ghg_reduction: 0,
-  ghg_reference: 94.0,
+  ghg_reference: 83.8,
 
   biocarburant: null,
   matiere_premiere: null,
