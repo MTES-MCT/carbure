@@ -23,6 +23,7 @@ import EntityDetails from "../entities/routes/entity-details"
 import Dashboard from "dashboard"
 import Stats from "stats"
 import PublicStats from "stats/public"
+import Tirib, { hasTirib } from "tirib"
 
 const DevBanner = () => (
   <div
@@ -63,11 +64,13 @@ const Org = ({ app }: { app: AppHook }) => {
 
   const isAdmin = entity?.entity_type === EntityType.Administration
   const isAuditor = entity?.entity_type === EntityType.Auditor
-  const isProd = window.location.hostname === "carbure.beta.gouv.fr"
+  const isOperator = entity?.entity_type === EntityType.Operator
+
+  const isProduction = window.location.hostname === "carbure.beta.gouv.fr"
 
   return (
     <UserRightProvider app={app}>
-      {!isProd && <DevBanner />}
+      {!isProduction && <DevBanner />}
 
       <Topbar entity={entity} settings={app.settings} />
 
@@ -134,6 +137,13 @@ const Org = ({ app }: { app: AppHook }) => {
         <Route relative path="stats">
           <Stats entity={entity} />
         </Route>
+
+        {/* cette route permet d'afficher le component Tirib uniquement lorsque l'url de la page finit par "tirib" */}
+        {hasTirib(entity) && (
+          <Route relative path="tirib">
+            <Tirib />
+          </Route>
+        )}
 
         <Redirect relative to={isAdmin ? "dashboard" : "transactions"} />
       </Switch>
