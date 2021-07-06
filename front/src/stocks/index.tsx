@@ -68,7 +68,11 @@ function useStocks(entity: EntitySelection) {
 
   const stock = useGetStocks(query)
   const selection = useTransactionSelection(stock.data?.lots)
-  const summary = useSummary(query, selection.selected, true)
+
+  const summary = useSummary(query, selection.selected, {
+    stock: true,
+    short: true,
+  })
 
   function refresh() {
     snapshot.getSnapshot()

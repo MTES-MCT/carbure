@@ -68,11 +68,13 @@ def get_stocks_summary(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
 
+    short = request.GET.get('short', False)
+
     try:
         txs = filter_stock_transactions(entity, request.GET)
         txs = filter_lots(txs, request.GET)[0]
         txs = sort_lots(txs, request.GET)
-        data = get_summary(txs, entity)
+        data = get_summary(txs, entity, short)
         return JsonResponse({'status': 'success', 'data': data})
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)

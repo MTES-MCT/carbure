@@ -181,17 +181,24 @@ function summaryGetter(entity?: EntitySelection, isStock?: boolean) {
   }
 }
 
+interface SummaryOptions {
+  entity?: EntitySelection
+  stock?: boolean
+  short?: boolean
+}
+
 export function useSummary(
   query: TransactionQuery,
   selection: number[] | undefined,
-  stock?: boolean,
-  entity?: EntitySelection
+  options: SummaryOptions = {}
 ) {
-  const [summary, getSummary] = useAPI(summaryGetter(entity, stock))
+  const [summary, getSummary] = useAPI(
+    summaryGetter(options.entity, options.stock)
+  )
 
   useEffect(() => {
-    getSummary(query, selection ?? [])
-  }, [getSummary, query, selection])
+    getSummary(query, selection ?? [], options.short)
+  }, [getSummary, query, selection, options.short])
 
   return summary
 }
@@ -218,7 +225,7 @@ export const SummaryPrompt = ({
   onResolve,
 }: SummaryPromptProps) => {
   const { t } = useTranslation()
-  const summary = useSummary(query, selection, stock, entity)
+  const summary = useSummary(query, selection, { stock, entity })
 
   return (
     <Dialog wide onResolve={onResolve}>
