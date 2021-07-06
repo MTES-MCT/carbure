@@ -37,4 +37,8 @@ urlpatterns = [
     path('lots/hide-transactions', views.hide_transactions, name='api-v3-admin-hide-transactions'),
     path('lots/highlight-transactions', views.highlight_transactions, name='api-v3-admin-highlight-transactions'),
 
+
+    # MAP VISUALIZATION
+    path('map', views.map, name='api-v3-admin-map'),
+
 ]
