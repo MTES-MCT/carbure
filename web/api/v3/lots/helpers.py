@@ -187,7 +187,11 @@ def filter_lots(txs, querySet, blacklist=[]):
         txs = txs.filter(lot__added_by__name__in=added_by)
 
     if len(client_types) > 0 and 'client_types' not in blacklist:
-        txs = txs.filter(carbure_client__entity_type__in=client_types)
+        if 'Inconnu' in client_types:
+            types = [t for t in client_types if t != 'Inconnu']
+            txs = txs.filter(Q(carbure_client__entity_type__in=types) | Q(carbure_client=None))
+        else:
+            txs = txs.filter(carbure_client__entity_type__in=client_types)
 
     if is_forwarded is not None and 'is_forwarded' not in blacklist:
         if is_forwarded == 'true':
@@ -432,95 +436,9 @@ def get_snapshot_filters(txs, entity, whitelist):
         filters['is_highlighted_by_auditor'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
 
     if 'client_types' in whitelist:
-        filters['client_types'] = [Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER]
+        filters['client_types'] = [Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER, 'Inconnu']
 
     return filters
-
-
-def get_oneshot_filters(txs, whitelist):
-    filters = {}
-
-    # prefetch related lots and txs to speed up queries
-    ids = txs.values('id', 'lot__id').distinct()
-    lot_ids = set([tx['lot__id'] for tx in ids])
-    tx_ids = set([tx['id'] for tx in ids])
-    lots = LotV2.objects.filter(id__in=lot_ids)
-    txs = LotTransaction.objects.filter(id__in=tx_ids)
-
-    if 'matieres_premieres' in whitelist:
-        mps = MatierePremiere.objects.filter(id__in=lots.values('matiere_premiere__id').distinct()).values('code', 'name')
-        filters['matieres_premieres'] = [{'value': mp['code'], 'label': mp['name']} for mp in mps]
-
-    if 'biocarburants' in whitelist:
-        bcs = Biocarburant.objects.filter(id__in=lots.values('biocarburant__id').distinct()).values('code', 'name')
-        filters['biocarburants'] = [{'value': b['code'], 'label': b['name']} for b in bcs]
-
-    if 'countries_of_origin' in whitelist:
-        countries = Pays.objects.filter(id__in=lots.values('pays_origine').distinct()).values('code_pays', 'name')
-        filters['countries_of_origin'] = [{'value': c['code_pays'], 'label': c['name']} for c in countries]
-
-    if 'periods' in whitelist:
-        filters['periods'] = [p['period'] for p in lots.values('period').distinct() if p['period']]
-
-    if 'production_sites' in whitelist:
-        filters['production_sites'] = []
-        for ps in lots.values('carbure_production_site__name', 'unknown_production_site').distinct():
-            if ps['carbure_production_site__name'] not in ('', None):
-                filters['production_sites'].append(ps['carbure_production_site__name'])
-            elif ps['unknown_production_site'] not in ('', None):
-                filters['production_sites'].append(ps['unknown_production_site'])
-
-    if 'delivery_sites' in whitelist:
-        filters['delivery_sites'] = []
-        for ps in txs.values('carbure_delivery_site__name', 'unknown_delivery_site').distinct():
-            if ps['carbure_delivery_site__name'] not in ('', None):
-                filters['delivery_sites'].append(ps['carbure_delivery_site__name'])
-            elif ps['unknown_delivery_site'] not in ('', None):
-                filters['delivery_sites'].append(ps['unknown_delivery_site'])
-
-    if 'errors' in whitelist:
-        generic_errors = [e['genericerror__error'] for e in txs.values('genericerror__error').distinct() if e['genericerror__error']]
-        filters['errors'] = generic_errors
-
-    if 'clients' in whitelist:
-        filters['clients'] = []
-        for ps in txs.values('carbure_client__name', 'unknown_client').distinct():
-            if ps['carbure_client__name'] not in ('', None):
-                filters['clients'].append(ps['carbure_client__name'])
-            elif ps['unknown_client'] not in ('', None):
-                filters['clients'].append(ps['unknown_client'])
-
-    if 'vendors' in whitelist:
-        v1 = [v['carbure_vendor__name'] for v in txs.values('carbure_vendor__name').distinct()]
-        v2 = [v['unknown_supplier'] for v in lots.values('unknown_supplier').distinct()]
-        filters['vendors'] = [v for v in set(v1 + v2) if v]
-
-    if 'added_by' in whitelist:
-        filters['added_by'] = [e['added_by__name'] for e in lots.values('added_by__name').distinct()]
-
-    if 'delivery_status' in whitelist:
-        filters['delivery_status'] = [{'value': s[0], 'label': s[1]} for s in LotTransaction.DELIVERY_STATUS]
-
-    if 'is_forwarded' in whitelist:
-        filters['is_forwarded'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
-
-    if 'is_mac' in whitelist:
-        filters['is_mac'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
-
-    if 'is_hidden_by_admin' in whitelist:
-        filters['is_hidden_by_admin'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
-
-    if 'is_hidden_by_auditor' in whitelist:
-        filters['is_hidden_by_auditor'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
-
-    if 'is_highlighted_by_admin' in whitelist:
-        filters['is_highlighted_by_admin'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
-
-    if 'is_highlighted_by_auditor' in whitelist:
-        filters['is_highlighted_by_auditor'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
-
-    return filters
-
 
 
 def get_summary(txs, entity):
