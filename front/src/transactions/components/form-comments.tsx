@@ -216,7 +216,7 @@ export const CommentWithSummaryPrompt = ({
 }: CommentWithSummaryPromptProps) => {
   const { t } = useTranslation()
   const [comment, setComment] = useState("")
-  const summary = useSummary(query, selection, stock)
+  const summary = useSummary(query, selection, { stock })
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault()

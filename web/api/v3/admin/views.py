@@ -214,12 +214,14 @@ def get_lots(request):
 
 @is_admin
 def get_lots_summary(request, *args, **kwargs):
+    short = request.GET.get('short', False)
+
     try:
         txs = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED)
         txs = get_lots_by_status(txs, request.GET)
         txs = filter_lots(txs, request.GET)[0]
         txs = sort_lots(txs, request.GET)
-        data = get_general_summary(txs)
+        data = get_general_summary(txs, short)
         return JsonResponse({'status': 'success', 'data': data})
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)

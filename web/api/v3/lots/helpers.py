@@ -442,7 +442,15 @@ def get_snapshot_filters(txs, entity, whitelist):
     return filters
 
 
-def get_summary(txs, entity):
+def get_summary(txs, entity, short):
+    data = {
+        'tx_ids': list(txs.values_list('id', flat=True)),
+        'total_volume': txs.aggregate(Sum('lot__volume'))['lot__volume__sum']
+    }
+
+    if short:
+        return data
+
     txs_in = txs.filter(carbure_client=entity).annotate(
         vendor=Coalesce('carbure_vendor__name', 'lot__unknown_supplier'),
     ).values(
@@ -487,13 +495,21 @@ def get_summary(txs, entity):
             'lots': t['lots']
         }
 
-    tx_ids = [t['id'] for t in txs.values('id')]
-    total_volume = txs.aggregate(Sum('lot__volume'))['lot__volume__sum']
-    return {'in': data_in, 'out': data_out, 'tx_ids': tx_ids, 'total_volume': total_volume}
+    data['in'] = data_in
+    data['out'] = data_out
+    return data
 
 
-def get_general_summary(txs):
-    data = {}
+def get_general_summary(txs, short):
+    data = {
+        'tx_ids': list(txs.values_list('id', flat=True)),
+        'total_volume': txs.aggregate(Sum('lot__volume'))['lot__volume__sum']
+    }
+
+    if short:
+        return data
+
+    transactions = {}
 
     txs_aggregation = txs.annotate(
         vendor=Coalesce('carbure_vendor__name', 'lot__unknown_supplier'),
@@ -509,20 +525,19 @@ def get_general_summary(txs):
     ).order_by()  # remove order by
 
     for t in txs_aggregation.iterator():
-        if t['vendor'] not in data:
-            data[t['vendor']] = {}
-        if t['client'] not in data[t['vendor']]:
-            data[t['vendor']][t['client']] = {}
+        if t['vendor'] not in transactions:
+            transactions[t['vendor']] = {}
+        if t['client'] not in transactions[t['vendor']]:
+            transactions[t['vendor']][t['client']] = {}
 
-        data[t['vendor']][t['client']][t['lot__biocarburant__code']] = {
+        transactions[t['vendor']][t['client']][t['lot__biocarburant__code']] = {
             'volume': t['volume'] or 0,
             'avg_ghg_reduction': t['avg_ghg_reduction'] or 0,
             'lots': t['lots']
         }
 
-    tx_ids = [t['id'] for t in txs.values('id')]
-    total_volume = txs.aggregate(Sum('lot__volume'))['lot__volume__sum']
-    return {'transactions': data, 'tx_ids': tx_ids, 'total_volume': total_volume}
+    data['transactions'] = transactions
+    return data
 
 
 # little helper to help measure elapsed time

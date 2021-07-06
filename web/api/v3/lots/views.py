@@ -53,6 +53,7 @@ def get_lots_summary(request, *args, **kwargs):
     entity = context['entity']
 
     status = request.GET.get('status', False)
+    short = request.GET.get('short', False)
 
     if not status:
         raise Exception("Status is not specified")
@@ -61,7 +62,7 @@ def get_lots_summary(request, *args, **kwargs):
         txs = get_entity_lots_by_status(entity, status)
         txs = filter_lots(txs, request.GET)[0]
         txs = sort_lots(txs, request.GET)
-        data = get_summary(txs, entity)
+        data = get_summary(txs, entity, short)
         return JsonResponse({'status': 'success', 'data': data})
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)

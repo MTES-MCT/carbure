@@ -137,7 +137,7 @@ export function useTransactions(entity: EntitySelection) {
   const administrator = useAdministrateLots(entity, selection, refresh)
   const auditor = useAuditLots(entity, selection, refresh)
 
-  const summary = useSummary(query, selection.selected, false, entity)
+  const summary = useSummary(query, selection.selected, { entity, short: true })
 
   return {
     entity,
