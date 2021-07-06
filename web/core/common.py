@@ -170,6 +170,7 @@ def send_lot_from_stock(rights, tx, prefetched_data):
     lot.save()
     lot.parent_lot.remaining_volume -= lot.volume
     lot.parent_lot.save()
+
     if tx.is_mac:
         tx.delivery_status = LotTransaction.ACCEPTED
         tx.save()
