@@ -1,7 +1,4 @@
 import React from "react"
-import format from "date-fns/format"
-import fr from "date-fns/locale/fr"
-import { Trans } from "react-i18next"
 
 import {
   Entity,
