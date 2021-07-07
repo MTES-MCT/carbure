@@ -241,10 +241,7 @@ def get_details(request, *args, **kwargs):
     data = {}
     data['transaction'] = tx.natural_key(admin=True)
     data['certificates'] = check_certificates(tx)
-    try:
-        data['distance'] = get_transaction_distance(tx)
-    except:
-        data['distance'] = {'distance': 0, 'link': ''}
+    data['distance'] = get_transaction_distance(tx)
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['comments'] = [c.natural_key() for c in tx.transactioncomment_set.all()]
@@ -501,7 +498,7 @@ def get_declarations(request):
     # 0) cleanup
     # SustainabilityDeclaration.objects.filter(checked=False).delete()
     # 1) get existing objects
-    sds = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start, period__lte=end)
+    sds = SustainabilityDeclaration.objects.prefetch_related('entity').filter(entity__in=entities, period__gte=start, period__lte=end)
     existing = {}
     for sd in sds:
         key = '%d.%d.%d' % (sd.entity.id, sd.period.year, sd.period.month)
@@ -528,12 +525,12 @@ def get_declarations(request):
         for t in to_create:
             logging.debug(t.natural_key())
         SustainabilityDeclaration.objects.bulk_create(to_create)
-        sds = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start, period__lte=end)
+        sds = SustainabilityDeclaration.objects.prefetch_related('entity').filter(entity__in=entities, period__gte=start, period__lte=end)
     else:
         logging.debug('no new declaration objects to create. Existing {}'.format(len(existing)))
 
     # get the declarations objects from db
-    declarations = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start, period__lte=end)
+    declarations = SustainabilityDeclaration.objects.prefetch_related('entity').filter(entity__in=entities, period__gte=start, period__lte=end)
 
     tx_counts = {}
 
