@@ -549,12 +549,9 @@ def get_declarations(request):
 
     tx_counts = {}
 
-    p = Perf()
-
     for month, year in periods:
         period = "%d-%02d" % (year, month)
         tx_counts[period] = get_period_declarations(period)
-        p.step("period " + str(month))
 
     # query lots to enrich declarations on the frontend
     # expected return ['client1': [{'period': '2020-01', 'drafts': 200, 'validated': 100, 'checked': True}, {'period': '2020-02', 'drafts': 50, 'validated': 10, 'checked': False}]]
@@ -568,7 +565,6 @@ def get_declarations(request):
 
     # 2) add batch info to each declarations
     declarations = list(targets.values()) + list(existing.values())
-    print(declarations)
     declarations_sez = []
     for d in declarations:
         period = "%d-%02d" % (d.period.year, d.period.month)
