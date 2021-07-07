@@ -1,14 +1,14 @@
 import logging
 import datetime
+from django.db.models.aggregates import Sum
 from django.http.response import HttpResponse
 import pytz
 import calendar
 from dateutil.rrule import rrule, MONTHLY
 from dateutil.relativedelta import relativedelta
-import csv
 import folium
 import random
-
+import math
 
 from django.http import JsonResponse
 from core.decorators import is_admin
@@ -741,52 +741,74 @@ def couleur():
     return random.choice(liste)
 
 # not an api endpoint
-def grade(volume):
-    if volume < 120 :
-        return 2
-    elif 120 <= volume < 140 :
-        return 2.3
-    elif 140 <= volume < 160 :
-        return 2.6
-    elif 160 <= volume < 180 :
-        return 3.1
-    elif 180 <= volume <= 200 :
-        return 3.4
+def grade(volume, min, max):
+    #print(volume, min, max)
+    weight = math.log(volume) / 5
+    #print(weight)
+    # 2 < x < 4
+    # min < volume < max
+    return weight
 
 @is_admin
 def map(request):
-    try:
-        m = folium.Map(location=[46.227638, 2.213749], zoom_start=5)
-        # la requete sql vient ici
-        data = open (r"/tmp/data.csv")
-        myReader = csv.reader(data)
-        noms_diff = []
-        for row in myReader:
-            for i, e in enumerate(row):
-                coord = e.split(';')            
-                if coord[0] not in noms_diff:
-                    noms_diff.append(coord[0])
-                    for n in noms_diff :
-                        c = couleur()
-                        folium.Circle(
-                            radius=50e2,
-                            location=[coord[1], coord[2]],
-                            popup=coord[0],
-                            color= c,
-                            fill=True,
-                            fill_opacity=1,
-                        ).add_to(m)
-                folium.Circle(
-                    radius=50e2,
-                    location=[coord[4], coord[5]],
-                    popup=coord[3],
-                    color="white",
-                    fill=True,
-                    fill_opacity=1,
-                ).add_to(m)
-                volume = random.uniform(100,200)
-                folium.PolyLine([(float(coord[1]),float(coord[2])),(float(coord[4]),float(coord[5]))], color=c, weight=grade(volume), line_cap='round', opacity=0.7, popup=coord[0]+' vers '+coord[3]+' : \n'+str(volume)+' litres').add_to(m)
-        return HttpResponse(m._repr_html_())
-    except:
-        return JsonResponse({'status': 'error'}, status=400)
+    txs = LotTransaction.objects.select_related(
+        'lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
+        'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
+        'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country'
+    ).prefetch_related('genericerror_set', 'lot__carbure_production_site__productionsitecertificate_set')
+    txs = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.PENDING, LotTransaction.FROZEN])
+    txs, _, _, _ = filter_lots(txs, request.GET)
+    
+    # on veut: nom site de depart, gps depart, nom site arrivee, gps arrivee, volume
+    txs = txs.filter(lot__carbure_production_site__isnull=False, carbure_delivery_site__isnull=False)
+    values = txs.values('lot__carbure_production_site__name', 'lot__carbure_production_site__gps_coordinates', 'carbure_delivery_site__name', 'carbure_delivery_site__gps_coordinates').annotate(volume=Sum('lot__volume'))
+
+    volume_min = 999999
+    volume_max = 0
+    for v in values:
+        volume = v['volume']
+        if volume < volume_min:
+            volume_min = volume
+        if volume > volume_max:
+            volume_max = volume
+
+    m = folium.Map(location=[46.227638, 2.213749], zoom_start=5)
+    known_prod_sites = []
+    known_depots = []
+    for v in values:
+        try:
+            # start coordinates
+            slat, slon = v['lot__carbure_production_site__gps_coordinates'].split(',')
+            # end coordinates
+            elat, elon = v['carbure_delivery_site__gps_coordinates'].split(',')
+        except:
+            print('Missing start or end gps coordinates')
+            print('Start %s : %s' % (v['lot__carbure_production_site__name'], v['lot__carbure_production_site__gps_coordinates']))
+            print('End %s : %s' % (v['carbure_delivery_site__name'], v['carbure_delivery_site__gps_coordinates']))
+            continue
+
+        if v['lot__carbure_production_site__gps_coordinates'] not in known_prod_sites:
+            known_prod_sites.append(v['lot__carbure_production_site__gps_coordinates'])
+            c = couleur()
+            folium.Circle(
+                radius=50e2,
+                location=[slat, slon],
+                popup=v['lot__carbure_production_site__name'],
+                color= c,
+                fill=True,
+                fill_opacity=1,
+            ).add_to(m)
+        if v['carbure_delivery_site__gps_coordinates'] not in known_depots:
+            known_depots.append(v['carbure_delivery_site__gps_coordinates'])
+            folium.Circle(
+                radius=50e2,
+                location=[elat, elon],
+                popup=v['carbure_delivery_site__name'],
+                color="white",
+                fill=True,
+                fill_opacity=1,
+            ).add_to(m)
+        volume = v['volume']
+        folium.PolyLine([(float(slat),float(slon)),(float(elat),float(elon))], color=c, weight=grade(volume, volume_min, volume_max), line_cap='round', opacity=0.7, popup=v['lot__carbure_production_site__name']+' vers '+v['carbure_delivery_site__name']+' : \n'+str(volume)+' litres').add_to(m)
+    return HttpResponse(m._repr_html_())
 
