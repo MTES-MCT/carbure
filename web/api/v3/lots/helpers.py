@@ -354,35 +354,28 @@ def get_lots_with_metadata(txs, entity, querySet, admin=False):
 def get_snapshot_filters(txs, entity, whitelist):
     filters = {}
 
-    # prefetch related lots and txs to speed up queries
-    ids = txs.values('id', 'lot__id').distinct()
-    lot_ids = set([tx['lot__id'] for tx in ids])
-    tx_ids = set([tx['id'] for tx in ids])
-    lots = LotV2.objects.filter(id__in=lot_ids)
-    txs = LotTransaction.objects.filter(id__in=tx_ids)
-
     if 'matieres_premieres' in whitelist:
-        mps = MatierePremiere.objects.filter(id__in=lots.values('matiere_premiere__id').distinct()).values('code', 'name')
+        mps = MatierePremiere.objects.filter(id__in=txs.values('lot__matiere_premiere__id').distinct()).values('code', 'name')
         filters['matieres_premieres'] = [{'value': mp['code'], 'label': mp['name']} for mp in mps]
 
     if 'biocarburants' in whitelist:
-        bcs = Biocarburant.objects.filter(id__in=lots.values('biocarburant__id').distinct()).values('code', 'name')
+        bcs = Biocarburant.objects.filter(id__in=txs.values('lot__biocarburant__id').distinct()).values('code', 'name')
         filters['biocarburants'] = [{'value': b['code'], 'label': b['name']} for b in bcs]
 
     if 'countries_of_origin' in whitelist:
-        countries = Pays.objects.filter(id__in=lots.values('pays_origine').distinct()).values('code_pays', 'name')
+        countries = Pays.objects.filter(id__in=txs.values('lot__pays_origine').distinct()).values('code_pays', 'name')
         filters['countries_of_origin'] = [{'value': c['code_pays'], 'label': c['name']} for c in countries]
 
     if 'periods' in whitelist:
-        filters['periods'] = [p['period'] for p in lots.values('period').distinct() if p['period']]
+        filters['periods'] = [p['lot__period'] for p in txs.values('lot__period').distinct() if p['lot__period']]
 
     if 'production_sites' in whitelist:
         filters['production_sites'] = []
-        for ps in lots.values('carbure_production_site__name', 'unknown_production_site').distinct():
-            if ps['carbure_production_site__name'] not in ('', None):
-                filters['production_sites'].append(ps['carbure_production_site__name'])
-            elif ps['unknown_production_site'] not in ('', None):
-                filters['production_sites'].append(ps['unknown_production_site'])
+        for ps in txs.values('lot__carbure_production_site__name', 'lot__unknown_production_site').distinct():
+            if ps['lot__carbure_production_site__name'] not in ('', None):
+                filters['production_sites'].append(ps['lot__carbure_production_site__name'])
+            elif ps['lot__unknown_production_site'] not in ('', None):
+                filters['production_sites'].append(ps['lot__unknown_production_site'])
 
     if 'delivery_sites' in whitelist:
         filters['delivery_sites'] = []
@@ -409,11 +402,11 @@ def get_snapshot_filters(txs, entity, whitelist):
         if entity is not None:
             v2 = [v['lot__unknown_supplier'] for v in txs.filter(Q(carbure_vendor=entity) | Q(lot__added_by=entity)).values('lot__unknown_supplier').distinct()]
         else:
-            v2 = [v['unknown_supplier'] for v in lots.values('unknown_supplier').distinct()]
+            v2 = [v['lot__unknown_supplier'] for v in txs.values('lot__unknown_supplier').distinct()]
         filters['vendors'] = [v for v in set(v1 + v2) if v]
 
     if 'added_by' in whitelist:
-        filters['added_by'] = [e['added_by__name'] for e in lots.values('added_by__name').distinct()]
+        filters['added_by'] = [e['lot__added_by__name'] for e in txs.values('lot__added_by__name').distinct()]
 
     if 'delivery_status' in whitelist:
         filters['delivery_status'] = [{'value': s[0], 'label': s[1]} for s in LotTransaction.DELIVERY_STATUS]
