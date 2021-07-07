@@ -33,8 +33,6 @@ def get_comments(tx):
     comments = []
     for c in tx.transactioncomment_set.all():
         comment = c.natural_key()
-        if c.entity not in [tx.lot.added_by, tx.carbure_vendor, tx.carbure_client]:
-            comment['entity'] = {'name': 'Anonyme'}
         comments.append(comment)
 
     return comments

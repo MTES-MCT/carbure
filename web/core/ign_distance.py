@@ -1,8 +1,10 @@
+from django import db
 import requests
-import json
 import os
 import argparse
 from requests.auth import HTTPBasicAuth
+
+from core.models import TransactionDistance
 
 user = os.environ.get("IGN_USER", False)
 pwd = os.environ.get("IGN_PWD", False)
@@ -17,7 +19,7 @@ def get_distance(a, b):
     s = "%s,%s" % (blon, blat)
   
     # Construction de l'URL
-    url = "http://wxs.ign.fr/%s/itineraire/rest/route.json?origin=%s&destination=%s&method=DISTANCE&graphName=Voiture" % (cle, e, s)
+    url = "http://wxs.ign.fr/%s/itineraire/rest/route.json?origin=%s&destination=%s&method=DISTANCE&graphName=Voiture&method=time" % (cle, e, s)
   
     # Récupération de la réponse
     try:
@@ -26,7 +28,10 @@ def get_distance(a, b):
         print(e)
         return 'ERROR'
     distance = res['distance'].replace(' Km', '')
-    return distance
+    distance = float(distance)
+    db.connections.close_all()
+    TransactionDistance.objects.update_or_create(starting_point=a, delivery_point=b, defaults={'distance':distance})
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Calculate distance in Km from two gps points')
