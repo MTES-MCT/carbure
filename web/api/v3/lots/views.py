@@ -87,10 +87,7 @@ def get_details(request, *args, **kwargs):
 
     data = {}
     data['transaction'] = tx.natural_key()
-    try:
-        data['distance'] = get_transaction_distance(tx)
-    except:
-        data['distance'] = {'distance': 0, 'link': ''}
+    data['distance'] = get_transaction_distance(tx)
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['certificates'] = check_certificates(tx)
