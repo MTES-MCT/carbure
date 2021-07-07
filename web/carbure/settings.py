@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
+from django_query_profiler.settings import *
 
 import environ
 env = environ.Env(
@@ -101,7 +102,7 @@ DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 
 if env('TEST') is False:
     DATABASES = {'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django_query_profiler.django.db.backends.mysql',
         'NAME': env('DJANGO_DATABASE'),
         'USER': env('DJANGO_DB_USER'),
         'PASSWORD': env('DJANGO_DB_PASSWORD'),
@@ -203,22 +204,10 @@ LOGGING = {
     },
 }
 
-'''
+
 if DEBUG:
-    INTERNAL_IPS = [
-        env('DJANGO_NGINX_HOST')
-    ]
-
     INSTALLED_APPS += [
-        'debug_toolbar'
+        'django_query_profiler'
     ]
 
-    MIDDLEWARE += [
-        'debug_toolbar.middleware.DebugToolbarMiddleware',
-        'debug_toolbar_force.middleware.ForceDebugToolbarMiddleware',
-    ]
-
-    DEBUG_TOOLBAR_CONFIG = {
-        'PRETTIFY_SQL': False
-    }
-'''
+    MIDDLEWARE = ['django_query_profiler.client.middleware.QueryProfilerMiddleware'] + MIDDLEWARE
