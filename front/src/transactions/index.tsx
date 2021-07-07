@@ -33,10 +33,10 @@ import useTransactionQuery from "./hooks/query/use-transaction-query"
 import { useRights } from "carbure/hooks/use-rights"
 import useAdministrateLots from "./hooks/actions/use-admin-lots"
 
-// prettier-ignore
 const OPERATOR_STATUSES = [
   LotStatus.Draft,
   LotStatus.Inbox,
+  LotStatus.ToFix,
   LotStatus.Accepted,
 ]
 
