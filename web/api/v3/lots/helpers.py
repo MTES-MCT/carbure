@@ -93,7 +93,7 @@ def get_entity_lots_by_status(entity, status):
             txs = txs.filter(Q(carbure_client=entity))
             txs = txs.filter(delivery_status__in=[LotTransaction.PENDING, LotTransaction.FIXED], lot__status=LotV2.VALIDATED, is_mac=False)
         elif status == 'tofix':
-            txs = txs.filter(Q(carbure_client=entity))
+            txs = txs.filter(Q(carbure_client=entity) | Q(lot__added_by=entity) | Q(carbure_vendor=entity))
             txs = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED], lot__status=LotV2.VALIDATED, is_mac=False)
         elif status == 'accepted':
             txs = txs.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))

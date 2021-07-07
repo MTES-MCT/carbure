@@ -95,8 +95,6 @@ def get_details(request, *args, **kwargs):
     data['comments'] = []
     for c in tx.transactioncomment_set.all():
         comment = c.natural_key()
-        if c.entity not in [tx.lot.added_by, tx.carbure_client]:
-            comment['entity'] = {'name': 'Anonyme'}
         data['comments'].append(comment)
 
     return JsonResponse({'status': 'success', 'data': data})
@@ -117,19 +115,19 @@ def get_snapshot(request, *args, **kwargs):
         txs = LotTransaction.objects.filter(carbure_vendor=entity)
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
         txs = txs.filter(lot__year=year)
-        draft = txs.filter(lot__status='Draft', lot__parent_lot=None).count()
-        validated = txs.filter(lot__status='Validated', delivery_status__in=[LotTransaction.PENDING, LotTransaction.FIXED]).count()
-        tofix = txs.filter(lot__status='Validated', delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED]).count()
-        accepted = txs.filter(lot__status='Validated', delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
+        draft = txs.filter(lot__status=LotV2.DRAFT, lot__parent_lot=None).count()
+        validated = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.PENDING, LotTransaction.FIXED]).count()
+        tofix = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED]).count()
+        accepted = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
         data['lots'] = {'draft': draft, 'validated': validated, 'tofix': tofix, 'accepted': accepted}
     elif entity.entity_type == Entity.OPERATOR:
-        txs = LotTransaction.objects.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
+        txs = LotTransaction.objects.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True) | Q(carbure_vendor=entity))
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
         txs = txs.filter(lot__year=year)
-        draft = txs.filter(lot__added_by=entity, lot__status='Draft').count()
-        ins = txs.filter(lot__status='Validated', delivery_status__in=[LotTransaction.PENDING, LotTransaction.FIXED], is_mac=False).count()
-        tofix = txs.filter(lot__status='Validated', delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED]).count()
-        accepted = txs.filter(lot__status='Validated', delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
+        draft = txs.filter(lot__added_by=entity, lot__status=LotV2.DRAFT).count()
+        ins = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.PENDING, LotTransaction.FIXED], is_mac=False).count()
+        tofix = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED]).count()
+        accepted = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
         data['lots'] = {'draft': draft, 'accepted': accepted, 'in': ins, 'tofix': tofix}
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
@@ -159,9 +157,9 @@ def get_filters(request, *args, **kwargs):
     field = request.GET.get('field', False)
     if not field:
         return JsonResponse({'status': 'error', 'message': 'Please specify the field for which you want the filters'}, status=400)
-    if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader':
+    if entity.entity_type == Entity.PRODUCER or entity.entity_type == Entity.TRADER:
         txs = LotTransaction.objects.filter(carbure_vendor=entity)
-    elif entity.entity_type == 'Opérateur':
+    elif entity.entity_type == Entity.OPERATOR:
         txs = LotTransaction.objects.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)

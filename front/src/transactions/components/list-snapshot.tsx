@@ -49,7 +49,7 @@ export function mapStatus(
   const STATUS_LABEL = {
     [LotStatus.Draft]: (count: number) => t("Brouillon", { count }),
     [LotStatus.Validated]: (count: number) => t("Lot envoyé", { count }),
-    [LotStatus.ToFix]: (count: number) => t("Lot à corriger", { count }),
+    [LotStatus.ToFix]: (count: number) => t("Lot en correction", { count }),
     [LotStatus.Accepted]: (count: number) => t("Lot accepté", { count }),
     [LotStatus.Weird]: (count: number) => t("Lot incohérent", { count }),
     [LotStatus.Inbox]: (count: number) => t("Lot reçu", { count }),
