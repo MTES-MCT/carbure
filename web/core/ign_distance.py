@@ -20,8 +20,11 @@ def get_distance(a, b):
     url = "http://wxs.ign.fr/%s/itineraire/rest/route.json?origin=%s&destination=%s&method=DISTANCE&graphName=Voiture" % (cle, e, s)
   
     # Récupération de la réponse
-    res = requests.get(url, auth=HTTPBasicAuth(user, pwd)).json()
-    print(res)
+    try:
+        res = requests.get(url, auth=HTTPBasicAuth(user, pwd)).json()
+    except Exception as e:
+        print(e)
+        return 'ERROR'
     distance = res['distance'].replace(' Km', '')
     return distance
 
