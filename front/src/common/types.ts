@@ -125,6 +125,13 @@ export interface ProductionSiteDetails extends ProductionSite {
   certificates: ProductionCertificate[]
 }
 
+export interface Distance {
+  distance: number;
+  link: string; 
+  error: string; // PRODUCTION_SITE_NOT_IN_CARBURE, DELIVERY_SITE_NOT_IN_CARBURE, PRODUCTION_SITE_COORDINATES_NOT_IN_CARBURE, DELIVERY_SITE_COORDINATES_NOT_IN_CARBURE, API_ERROR
+  source: null | "DB" | "API";
+}
+
 export interface Lot {
   id: number
   carbure_id: string
@@ -277,6 +284,7 @@ export interface LotDetails {
   deadline: string
   errors: GenericError[]
   updates?: LotUpdate[]
+  distance?: Distance
   certificates: {
     production_site_certificate: CertificateInfo | null
     supplier_certificate: CertificateInfo | null

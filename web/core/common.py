@@ -5,6 +5,7 @@ from django.db.models import Q, Count
 import numpy as np
 import traceback
 import os
+from multiprocessing import Process
 
 import pandas as pd
 from typing import FrozenSet, TYPE_CHECKING, List
@@ -1152,16 +1153,8 @@ def get_transaction_distance(tx):
         return res
     except:
         # not found
-        result = get_distance(starting_point, delivery_point)
-        # if script success
-        if result != 'ERROR':
-            distance = float(result)
-            TransactionDistance.objects.create(starting_point=starting_point, delivery_point=delivery_point, distance=distance)
-            res['link'] = url_link % (starting_point, delivery_point)
-            res['distance'] = distance
-            res['source'] = 'API'
-            return res
-        else:
-            res['error'] = 'API_ERROR'
-            return res
-
+        # launch in parallel
+        p = Process(target=get_distance, args=(starting_point, delivery_point))
+        p.start()
+        res['error'] = 'DISTANCE_NOT_IN_CACHE'
+        return res

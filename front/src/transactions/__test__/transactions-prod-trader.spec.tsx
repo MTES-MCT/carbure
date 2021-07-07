@@ -54,7 +54,7 @@ test("producer/trader: display an empty list of transactions", async () => {
 
   await screen.findByText("Brouillon")
   screen.getByText("Lot envoyé")
-  screen.getByText("Lot à corriger")
+  screen.getByText("Lot en correction")
   screen.getByText("Lot accepté")
 
   const quantities = await screen.findAllByText("0")

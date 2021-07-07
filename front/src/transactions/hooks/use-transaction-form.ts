@@ -66,6 +66,7 @@ export interface TransactionFormState {
   delivery_site_country: Country | null
 
   certificates?: LotDetails["certificates"]
+  distance?: LotDetails["distance"]
 }
 
 export function toTransactionFormState(
@@ -147,6 +148,7 @@ export function toTransactionFormState(
     parent_lot: tx.lot.parent_lot,
 
     certificates: details.certificates,
+    distance: details.distance,
   }
 }
 
