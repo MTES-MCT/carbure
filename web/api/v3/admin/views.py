@@ -564,7 +564,6 @@ def get_declarations(request):
     # batches = {'%s.%s' % (batch['lot__added_by__id'], batch['lot__period']): batch for batch in lots }
 
     # 2) add batch info to each declarations
-    declarations = list(targets.values()) + list(existing.values())
     declarations_sez = []
     for d in declarations:
         period = "%d-%02d" % (d.period.year, d.period.month)
