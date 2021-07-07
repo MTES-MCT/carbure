@@ -17,10 +17,15 @@ print(df)
 depots = Depot.objects.all()
 
 for d in depots:
-    if d.postal_code in df:
+    try:
+        code = int(d.postal_code)
+    except:
+        print('missing zip code for %s' % d.name)
+        continue
+    if code in df:
         print('FOUND gps for %s' % (d.name))
-        print(df[d.postal_code])
-        d.gps_coordinates = df[d.postal_code]
+        print(df[code])
+        d.gps_coordinates = df[code]
         d.save()
     else:
         print('could not find gps for %s, %s' % (d.name, d.postal_code))
