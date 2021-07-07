@@ -58,7 +58,7 @@ def get_year_bounds(year):
 
 
 def get_entity_lots_by_status(entity, status):
-    if entity.entity_type in ('Producteur', 'Trader'):
+    if entity.entity_type in (Entity.PRODUCER, Entity.TRADER):
         txs = LotTransaction.objects.select_related(
             'lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
             'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
@@ -69,17 +69,17 @@ def get_entity_lots_by_status(entity, status):
 
         # filter by status
         if status == 'draft':
-            txs = txs.filter(lot__status='Draft', lot__parent_lot=None)
+            txs = txs.filter(lot__status=LotV2.DRAFT, lot__parent_lot=None)
         elif status == 'validated':
-            txs = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA'])
+            txs = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.PENDING, LotTransaction.FIXED])
         elif status == 'tofix':
-            txs = txs.filter(lot__status='Validated', delivery_status__in=['AC', 'R'])
+            txs = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED])
         elif status == 'accepted':
-            txs = txs.filter(lot__status='Validated', delivery_status__in=['A', 'F'])
+            txs = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN])
         else:
             raise Exception('Unknown status')
 
-    elif entity.entity_type == 'Opérateur':
+    elif entity.entity_type == Entity.OPERATOR:
         txs = LotTransaction.objects.select_related(
             'lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
             'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
@@ -88,13 +88,16 @@ def get_entity_lots_by_status(entity, status):
 
         # filter by status
         if status == 'draft':
-            txs = txs.filter(Q(lot__added_by=entity, lot__status='Draft'))
+            txs = txs.filter(Q(lot__added_by=entity, lot__status=LotV2.DRAFT))
         elif status == 'in':
             txs = txs.filter(Q(carbure_client=entity))
-            txs = txs.filter(delivery_status__in=['N', 'AC', 'AA'], lot__status="Validated", is_mac=False)
+            txs = txs.filter(delivery_status__in=[LotTransaction.PENDING, LotTransaction.FIXED], lot__status=LotV2.VALIDATED, is_mac=False)
+        elif status == 'tofix':
+            txs = txs.filter(Q(carbure_client=entity))
+            txs = txs.filter(delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED], lot__status=LotV2.VALIDATED, is_mac=False)
         elif status == 'accepted':
             txs = txs.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
-            txs = txs.filter(lot__status='Validated', delivery_status__in=['A', 'F'])
+            txs = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN])
         else:
             raise Exception('Unknown status')
 
@@ -111,7 +114,7 @@ def get_lots_with_errors(txs):
 
 def get_lots_with_deadline(txs, deadline):
     affected_date = deadline - relativedelta(months=1)
-    txs_with_deadline = txs.filter(lot__status='Draft', delivery_date__year=affected_date.year, delivery_date__month=affected_date.month)
+    txs_with_deadline = txs.filter(lot__status=LotV2.DRAFT, delivery_date__year=affected_date.year, delivery_date__month=affected_date.month)
     return txs_with_deadline
 
 
