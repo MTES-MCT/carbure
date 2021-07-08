@@ -50,6 +50,9 @@ services:
       AWS_S3_REGION_NAME: ${AWS_S3_REGION_NAME}
       AWS_S3_ENDPOINT_URL: ${AWS_S3_ENDPOINT_URL}
       AWS_S3_USE_SSL: ${AWS_S3_USE_SSL}
+      IGN_KEY: ${IGN_KEY}
+      IGN_USER: ${IGN_USER}
+      IGN_PWD: ${IGN_PWD}
     volumes:
       - ${CARBURE_HOME}:/app #for dev only, allows for auto-refresh of files
       - uploadedfiles:/app/files

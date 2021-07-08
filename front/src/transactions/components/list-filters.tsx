@@ -56,7 +56,7 @@ export function mapFilters(
     [Filters.Mac]: t("Mises à consommation"),
     [Filters.HiddenByAdmin]: t("Lots ignorés"),
     [Filters.HiddenByAuditor]: t("Lots ignorés"),
-    [Filters.ClientTypes]: t("Activité du client"),
+    [Filters.ClientTypes]: t("Types de client"),
   }
 
   return filterList.map((field) => {

@@ -2,7 +2,7 @@ import json
 import datetime
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
-from core.models import LotV2, LotTransaction, ETBETransformation
+from core.models import LotV2, LotTransaction, ETBETransformation, TransactionUpdateHistory
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, LotV2, Depot
 from core.decorators import check_rights
 from core.common import get_prefetched_data, load_mb_lot, bulk_insert
@@ -68,11 +68,13 @@ def get_stocks_summary(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
 
+    short = request.GET.get('short', False)
+
     try:
         txs = filter_stock_transactions(entity, request.GET)
         txs = filter_lots(txs, request.GET)[0]
         txs = sort_lots(txs, request.GET)
-        data = get_summary(txs, entity)
+        data = get_summary(txs, entity, short)
         return JsonResponse({'status': 'success', 'data': data})
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
@@ -322,12 +324,15 @@ def send_drafts(request, *args, **kwargs):
     for tx_id in tx_ids:
         try:
             tx = LotTransaction.objects.get(id=tx_id)
+            prev_remaining_volume = tx.lot.parent_lot.remaining_volume
         except Exception:
             return JsonResponse({'status': 'error', 'message': "Unknown Transaction %s" % (tx_id)},
                                 status=400)
         sent, errors = send_lot_from_stock(rights, tx, prefetched_data)
         if sent:
             valid_counter += 1
+            parent_tx = LotTransaction.objects.filter(lot=tx.lot.parent_lot).last()
+            TransactionUpdateHistory.objects.create(tx=parent_tx, update_type=TransactionUpdateHistory.UPDATE, field='remaining_volume', value_before=prev_remaining_volume, value_after=parent_tx.lot.remaining_volume, modified_by=request.user, modified_by_entity=entity)
         else:
             invalid_counter += 1
             send_errors.append(errors)

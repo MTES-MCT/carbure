@@ -45,10 +45,17 @@ export function getLots(params: TransactionQuery): Promise<Lots> {
 
 export function getLotsSummary(
   query: TransactionQuery,
-  selection: number[]
+  selection: number[],
+  short?: boolean
 ): Promise<TransactionSummary> {
   return api
-    .get("/lots/summary", { ...query, limit: null, from_idx: 0, selection })
+    .get("/lots/summary", {
+      ...query,
+      short,
+      limit: null,
+      from_idx: 0,
+      selection,
+    })
     .then(normalizeSummary)
 }
 
@@ -352,11 +359,13 @@ export function getAdminDetails(
 
 export function getAdminSummary(
   query: TransactionQuery,
-  selection: number[]
+  selection: number[],
+  short?: boolean
 ): Promise<TransactionSummary> {
   return api
     .get("/admin/lots/summary", {
       ...query,
+      short,
       limit: null,
       from_idx: 0,
       selection,
@@ -420,10 +429,17 @@ export function getAuditorLots(params: TransactionQuery) {
 
 export function getAuditorSummary(
   query: TransactionQuery,
-  selection: number[]
+  selection: number[],
+  short?: boolean
 ): Promise<TransactionSummary> {
   return api
-    .get("/auditor/summary", { ...query, limit: null, from_idx: 0, selection })
+    .get("/auditor/summary", {
+      ...query,
+      short,
+      limit: null,
+      from_idx: 0,
+      selection,
+    })
     .then(normalizeGeneralSummary)
 }
 

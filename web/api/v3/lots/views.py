@@ -24,7 +24,7 @@ from core.common import check_certificates, get_transaction_distance
 from core.decorators import check_rights
 from core.notifications import notify_lots_rejected, notify_declaration_invalidated, notify_accepted_lot_in_correction
 from api.v3.sanity_checks import bulk_sanity_checks
-from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, sort_lots, filter_lots, get_oneshot_filters
+from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, sort_lots, filter_lots
 
 
 logger = logging.getLogger(__name__)
@@ -53,6 +53,7 @@ def get_lots_summary(request, *args, **kwargs):
     entity = context['entity']
 
     status = request.GET.get('status', False)
+    short = request.GET.get('short', False)
 
     if not status:
         raise Exception("Status is not specified")
@@ -61,7 +62,7 @@ def get_lots_summary(request, *args, **kwargs):
         txs = get_entity_lots_by_status(entity, status)
         txs = filter_lots(txs, request.GET)[0]
         txs = sort_lots(txs, request.GET)
-        data = get_summary(txs, entity)
+        data = get_summary(txs, entity, short)
         return JsonResponse({'status': 'success', 'data': data})
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
@@ -87,10 +88,7 @@ def get_details(request, *args, **kwargs):
 
     data = {}
     data['transaction'] = tx.natural_key()
-    try:
-        data['distance'] = get_transaction_distance(tx)
-    except:
-        data['distance'] = {'distance': 0, 'link': ''}
+    data['distance'] = get_transaction_distance(tx)
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['certificates'] = check_certificates(tx)
@@ -98,8 +96,6 @@ def get_details(request, *args, **kwargs):
     data['comments'] = []
     for c in tx.transactioncomment_set.all():
         comment = c.natural_key()
-        if c.entity not in [tx.lot.added_by, tx.carbure_client]:
-            comment['entity'] = {'name': 'Anonyme'}
         data['comments'].append(comment)
 
     return JsonResponse({'status': 'success', 'data': data})
@@ -116,23 +112,24 @@ def get_snapshot(request, *args, **kwargs):
         except Exception:
             return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
 
-    if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader':
+    if entity.entity_type in [Entity.PRODUCER, Entity.TRADER]:
         txs = LotTransaction.objects.filter(carbure_vendor=entity)
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
         txs = txs.filter(lot__year=year)
-        draft = txs.filter(lot__status='Draft', lot__parent_lot=None).count()
-        validated = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA']).count()
-        tofix = txs.filter(lot__status='Validated', delivery_status__in=['AC', 'R']).count()
-        accepted = txs.filter(lot__status='Validated', delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
+        draft = txs.filter(lot__status=LotV2.DRAFT, lot__parent_lot=None).count()
+        validated = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.PENDING, LotTransaction.FIXED]).count()
+        tofix = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED]).count()
+        accepted = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
         data['lots'] = {'draft': draft, 'validated': validated, 'tofix': tofix, 'accepted': accepted}
-    elif entity.entity_type == 'Opérateur':
-        txs = LotTransaction.objects.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
+    elif entity.entity_type == Entity.OPERATOR:
+        txs = LotTransaction.objects.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True) | Q(carbure_vendor=entity))
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
         txs = txs.filter(lot__year=year)
-        draft = txs.filter(lot__added_by=entity, lot__status='Draft').count()
-        ins = txs.filter(lot__status='Validated', delivery_status__in=['N', 'AA', 'AC'], is_mac=False).count()
-        accepted = txs.filter(lot__status='Validated', delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
-        data['lots'] = {'draft': draft, 'accepted': accepted, 'in': ins}
+        draft = txs.filter(lot__added_by=entity, lot__status=LotV2.DRAFT).count()
+        ins = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.PENDING, LotTransaction.FIXED], is_mac=False).count()
+        tofix = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED]).count()
+        accepted = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
+        data['lots'] = {'draft': draft, 'accepted': accepted, 'in': ins, 'tofix': tofix}
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
 
@@ -161,9 +158,9 @@ def get_filters(request, *args, **kwargs):
     field = request.GET.get('field', False)
     if not field:
         return JsonResponse({'status': 'error', 'message': 'Please specify the field for which you want the filters'}, status=400)
-    if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader':
+    if entity.entity_type == Entity.PRODUCER or entity.entity_type == Entity.TRADER:
         txs = LotTransaction.objects.filter(carbure_vendor=entity)
-    elif entity.entity_type == 'Opérateur':
+    elif entity.entity_type == Entity.OPERATOR:
         txs = LotTransaction.objects.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True))
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
@@ -448,14 +445,6 @@ def accept_with_reserves(request, *args, **kwargs):
         TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field='status', value_before=tx.delivery_status, value_after=LotTransaction.TOFIX, modified_by=request.user, modified_by_entity=entity)
         tx.delivery_status = LotTransaction.TOFIX
         tx.save()
-
-        if tx.lot.added_by.entity_type == Entity.OPERATOR:
-            # back to Drafts
-            tx.lot.status = LotV2.DRAFT
-            tx.lot.save()
-            tx.delivery_status = LotTransaction.PENDING
-            tx.save()
-
     return JsonResponse({'status': 'success'})
 
 
@@ -513,8 +502,6 @@ def reject_lot(request, *args, **kwargs):
 
 
         if tx.carbure_client != entity:
-            print(entity)
-            print(tx.carbure_client)
             return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
         TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field='status', value_before=tx.delivery_status, value_after=LotTransaction.REJECTED, modified_by=request.user, modified_by_entity=entity)
         tx.delivery_status = LotTransaction.REJECTED
@@ -526,25 +513,15 @@ def reject_lot(request, *args, **kwargs):
         txerr.save()
 
         # special case 1
-        # if the rejected lot has been forwarded by an operator, the operator has no way to see it
-        # so we actually delete the forwarded tx and send an email to the tx source
-        if tx.parent_tx is not None and tx.carbure_vendor.entity_type == Entity.OPERATOR:
-            # cancel forward
-            tx.parent_tx.is_forwarded = False
-            tx.parent_tx.save()
-            tx.delete()
-        # special case 2
         # if the rejected transaction came from stocks, move this transaction back to drafts
         # and recredit the parent lot with the corresponding volume
-        elif tx.lot.parent_lot is not None:
-            tx.delivery_status = 'N'
-            tx.lot.status = 'Draft'
+        if tx.lot.parent_lot is not None:
+            tx.delivery_status = LotTransaction.PENDING
+            tx.lot.status = LotV2.DRAFT
             tx.lot.parent_lot.remaining_volume += tx.lot.volume
             tx.lot.parent_lot.save()
             tx.lot.save()
             tx.save()
-
-            # if tx.carbure_vendor.entity_type == Entity.OPERATOR:
 
         tx.comment = tx_comment
         tx_rejected.append(tx)

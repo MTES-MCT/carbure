@@ -35,5 +35,6 @@ urlpatterns = [
     path('core/', include('core.urls')),
     path('annuaire', public_views.annuaire, name='annuaire'),
 
-    path('__debug__/', include(debug_toolbar.urls)),
+    # path('__debug__/', include(debug_toolbar.urls)),
+    path('django_query_profiler/', include('django_query_profiler.client.urls'))
 ]
