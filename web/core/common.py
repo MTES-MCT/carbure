@@ -704,14 +704,6 @@ def fill_client_data(entity, lot_row, tx, prefetched_data):
     if tx.delivery_status == LotTransaction.TOFIX:
         return []
 
-    if tx.is_mac:
-        tx.client_is_in_carbure = False
-        tx.carbure_client = None
-        tx.unknown_client = ''
-        if 'client' in lot_row:
-            tx.unknown_client = lot_row['client']
-        return []
-
     tx_errors = []
     clients = prefetched_data['clients']
     if entity.entity_type == Entity.OPERATOR:
