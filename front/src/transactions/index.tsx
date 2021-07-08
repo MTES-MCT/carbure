@@ -33,10 +33,10 @@ import useTransactionQuery from "./hooks/query/use-transaction-query"
 import { useRights } from "carbure/hooks/use-rights"
 import useAdministrateLots from "./hooks/actions/use-admin-lots"
 
-// prettier-ignore
 const OPERATOR_STATUSES = [
   LotStatus.Draft,
   LotStatus.Inbox,
+  LotStatus.ToFix,
   LotStatus.Accepted,
 ]
 
@@ -137,7 +137,7 @@ export function useTransactions(entity: EntitySelection) {
   const administrator = useAdministrateLots(entity, selection, refresh)
   const auditor = useAuditLots(entity, selection, refresh)
 
-  const summary = useSummary(query, selection.selected, false, entity)
+  const summary = useSummary(query, selection.selected, { entity, short: true })
 
   return {
     entity,

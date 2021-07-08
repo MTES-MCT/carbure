@@ -5,6 +5,7 @@ from django.db.models import Q, Count
 import numpy as np
 import traceback
 import os
+from multiprocessing import Process
 
 import pandas as pd
 from typing import FrozenSet, TYPE_CHECKING, List
@@ -106,8 +107,8 @@ def get_uploaded_files_directory():
 def calculate_ghg(lot, tx=None):
     lot.ghg_total = lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee
     lot.ghg_reference = 83.8
-    if tx and tx.delivery_date and tx.delivery_date > july1st2021:
-        lot.ghg_reference = 94.0
+    #if tx and tx.delivery_date and tx.delivery_date > july1st2021:
+    #    lot.ghg_reference = 94.0
     lot.ghg_reduction = round((1.0 - (lot.ghg_total / lot.ghg_reference)) * 100.0, 2)
 
 
@@ -147,7 +148,7 @@ def send_lot_from_stock(rights, tx, prefetched_data):
         return False, "User not allowed to send this tx"
 
     # only allow to send drafts
-    if tx.lot.status != 'Draft':
+    if tx.lot.status != LotV2.DRAFT:
         return False, "Tx already sent"
 
     # make sure all mandatory fields are set
@@ -170,7 +171,8 @@ def send_lot_from_stock(rights, tx, prefetched_data):
     lot.save()
     lot.parent_lot.remaining_volume -= lot.volume
     lot.parent_lot.save()
-    if tx.is_mac:
+
+    if tx.is_mac and not tx.client_is_in_carbure:
         tx.delivery_status = LotTransaction.ACCEPTED
         tx.save()
     return True, ''
@@ -702,14 +704,6 @@ def fill_client_data(entity, lot_row, tx, prefetched_data):
     if tx.delivery_status == LotTransaction.TOFIX:
         return []
 
-    if tx.is_mac:
-        tx.client_is_in_carbure = False
-        tx.carbure_client = None
-        tx.unknown_client = ''
-        if 'client' in lot_row:
-            tx.unknown_client = lot_row['client']
-        return []
-
     tx_errors = []
     clients = prefetched_data['clients']
     if entity.entity_type == Entity.OPERATOR:
@@ -1151,16 +1145,8 @@ def get_transaction_distance(tx):
         return res
     except:
         # not found
-        result = get_distance(starting_point, delivery_point)
-        # if script success
-        if result != 'ERROR':
-            distance = float(result)
-            TransactionDistance.objects.create(starting_point=starting_point, delivery_point=delivery_point, distance=distance)
-            res['link'] = url_link % (starting_point, delivery_point)
-            res['distance'] = distance
-            res['source'] = 'API'
-            return res
-        else:
-            res['error'] = 'API_ERROR'
-            return res
-
+        # launch in parallel
+        p = Process(target=get_distance, args=(starting_point, delivery_point))
+        p.start()
+        res['error'] = 'DISTANCE_NOT_IN_CACHE'
+        return res

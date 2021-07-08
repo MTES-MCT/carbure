@@ -1,14 +1,19 @@
 import logging
 import datetime
+from django.db.models.aggregates import Sum
+from django.http.response import HttpResponse
 import pytz
 import calendar
 from dateutil.rrule import rrule, MONTHLY
 from dateutil.relativedelta import relativedelta
+import folium
+import random
+import math
 
 from django.http import JsonResponse
 from core.decorators import is_admin
 from django.contrib.auth import get_user_model
-from core.models import Entity, UserRights, Control, ControlMessages, ProductionSite, LotV2, GenericError
+from core.models import Entity, Lot, UserRights, Control, ControlMessages, ProductionSite, LotV2, GenericError
 from django.db.models import Q, Count, Subquery, OuterRef, Value, IntegerField
 from django.contrib.auth.forms import PasswordResetForm
 from django.core.mail import send_mail
@@ -16,7 +21,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 from core.models import LotTransaction, UserRightsRequests, SustainabilityDeclaration, Control
-from api.v3.lots.helpers import get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors, filter_lots, get_general_summary, sort_lots
+from api.v3.lots.helpers import Perf, get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors, filter_lots, get_general_summary, sort_lots
 from core.common import check_certificates, get_transaction_distance
 
 
@@ -209,12 +214,14 @@ def get_lots(request):
 
 @is_admin
 def get_lots_summary(request, *args, **kwargs):
+    short = request.GET.get('short', False)
+
     try:
         txs = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED)
         txs = get_lots_by_status(txs, request.GET)
         txs = filter_lots(txs, request.GET)[0]
         txs = sort_lots(txs, request.GET)
-        data = get_general_summary(txs)
+        data = get_general_summary(txs, short)
         return JsonResponse({'status': 'success', 'data': data})
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
@@ -236,10 +243,7 @@ def get_details(request, *args, **kwargs):
     data = {}
     data['transaction'] = tx.natural_key(admin=True)
     data['certificates'] = check_certificates(tx)
-    try:
-        data['distance'] = get_transaction_distance(tx)
-    except:
-        data['distance'] = {'distance': 0, 'link': ''}
+    data['distance'] = get_transaction_distance(tx)
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['comments'] = [c.natural_key() for c in tx.transactioncomment_set.all()]
@@ -428,33 +432,46 @@ def close_control(request):
     ctrl.save()
     return JsonResponse({"status": "success"})
 
+
+def init_declaration(entity, declarations):
+    if entity in declarations:
+        return declarations[entity]
+    else:
+        declarations[entity] = {'drafts': 0, 'output': 0, 'input': 0, 'corrections': 0}
+        return declarations[entity]
+
+
 def get_period_declarations(period):
-    txs = LotTransaction.objects.filter(lot__period=period)
+    txs = LotTransaction.objects.filter(lot__period=period).select_related('carbure_vendor', 'carbure_client', 'lot__added_by').values(
+        'carbure_vendor__id', 'carbure_client__id', 'lot__added_by__id', 'delivery_status', 'lot__status')
 
-    txs_drafts = txs.filter(lot__added_by=OuterRef('pk'), lot__status='Draft').values('lot__added_by').annotate(total=Count(Value(1)))
-    txs_output = txs.filter(carbure_vendor=OuterRef('pk'), lot__status='Validated').values('carbure_vendor').annotate(total=Count(Value(1)))
-    txs_input = txs.filter(carbure_client=OuterRef('pk'), lot__status='Validated').values('carbure_client').annotate(total=Count(Value(1)))
-    txs_corrections = txs.filter(lot__added_by=OuterRef('pk'), lot__status='Validated', delivery_status__in=['AC', 'R', 'AA']).values('lot__added_by').annotate(total=Count(Value(1)))
+    entities = set()
+    declarations = {}
 
-    # for each entity, run a subquery to count the number of tx depending on their status
-    tx_counts = Entity.objects.annotate(
-            drafts=Subquery(txs_drafts.values('total')),
-            output=Subquery(txs_output.values('total')),
-            input=Subquery(txs_input.values('total')),
-            corrections=Subquery(txs_corrections.values('total'))
-        ).values('id', 'drafts', 'output', 'input', 'corrections')
+    for tx in txs.iterator():
+        author = tx['lot__added_by__id']
+        vendor = tx['carbure_vendor__id'] if tx['carbure_vendor__id'] else None
+        client = tx['carbure_client__id'] if tx['carbure_client__id'] else None
 
-    by_entity = {}
+        if author and tx['lot__status'] == 'Draft':
+            entities.add(author)
+            declaration = init_declaration(author, declarations)
+            declaration['drafts'] += 1
+        else:
+            if client:
+                entities.add(client)
+                declaration = init_declaration(client, declarations)
+                declaration['input'] += 1
+            if vendor:
+                entities.add(vendor)
+                declaration = init_declaration(vendor, declarations)
+                declaration['output'] += 1
+            if author and tx['delivery_status'] in (LotTransaction.TOFIX, LotTransaction.REJECTED, LotTransaction.FIXED):
+                entities.add(author)
+                declaration = init_declaration(author, declarations)
+                declaration['corrections'] += 1
 
-    for c in tx_counts:
-        by_entity[c['id']] = {
-            'drafts': c['drafts'] if c['drafts'] else 0,
-            'output': c['output'] if c['output'] else 0,
-            'input': c['input'] if c['input'] else 0,
-            'corrections': c['corrections'] if c['corrections'] else 0
-        }
-
-    return by_entity
+    return declarations
 
 @is_admin
 def get_declarations(request):
@@ -487,22 +504,22 @@ def get_declarations(request):
     end = pytz.utc.localize(end)
 
     # get entities that have posted at least one lot since the beginning of the period
-    operators = [e.id for e in Entity.objects.filter(entity_type=Entity.OPERATOR)]
-    entities_alive = [f['lot__added_by'] for f in LotTransaction.objects.filter(lot__added_time__gt=start).values('lot__added_by').annotate(count=Count('lot')).filter(count__gt=1)]
-    to_display = list(set(operators + entities_alive))
-    entities = Entity.objects.filter(id__in=to_display)
+    # operators = [e.id for e in Entity.objects.filter(entity_type=Entity.OPERATOR)]
+    # entities_alive = [f['lot__added_by'] for f in LotTransaction.objects.filter(lot__added_time__gt=start).values('lot__added_by').annotate(count=Count('lot')).filter(count__gt=1)]
+    # to_display = list(set(operators + entities_alive))
+    entities = Entity.objects.all()  # filter(id__in=to_display)
 
     # create the SustainabilityDeclaration objects in database
     # 0) cleanup
     # SustainabilityDeclaration.objects.filter(checked=False).delete()
     # 1) get existing objects
-    sds = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start, period__lte=end)
+    sds = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start, period__lte=end).select_related('entity')
     existing = {}
-    for sd in sds:
+    targets = {}
+    for sd in sds.iterator():
         key = '%d.%d.%d' % (sd.entity.id, sd.period.year, sd.period.month)
         existing[key] = sd
     # 2) create target objects
-    targets = {}
     for month, year in periods:
         period = datetime.date(year=year, month=month, day=1)
         nextmonth = period + relativedelta(months=1)
@@ -510,11 +527,12 @@ def get_declarations(request):
         deadline_date = nextmonth.replace(day=last_day)
         for e in entities:
             key = '%d.%d.%d' % (e.id, year, month)
-            targets[key] =  SustainabilityDeclaration(entity=e, period=period, deadline=deadline_date)
-    # 3) remove existing objects from targets
-    for key, sd in existing.items():
-        if key in targets:
-            del targets[key]
+            if key not in existing:
+                targets[key] = SustainabilityDeclaration(entity=e, period=period, deadline=deadline_date)
+    # # 3) remove existing objects from targets
+    # for key, sd in existing.items():
+    #     if key in targets:
+    #         del targets[key]
     # 4) if any, bulk create the targets
     if len(targets):
         to_create = list(targets.values())
@@ -523,12 +541,11 @@ def get_declarations(request):
         for t in to_create:
             logging.debug(t.natural_key())
         SustainabilityDeclaration.objects.bulk_create(to_create)
-        sds = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start, period__lte=end)
     else:
         logging.debug('no new declaration objects to create. Existing {}'.format(len(existing)))
 
     # get the declarations objects from db
-    declarations = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start, period__lte=end)
+    declarations = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start, period__lte=end).select_related('entity')
 
     tx_counts = {}
 
@@ -723,3 +740,87 @@ def hide_transactions(request):
         tx.save()
         tx.genericerror_set.all().update(acked_by_admin=True)
     return JsonResponse({'status': 'success'})
+
+
+# not an api endpoint
+def couleur():
+    liste = ["#FF0040","#DF01A5","#BF00FF","#4000FF","#0040FF","#00BFFF",
+              "#00FFBF","#00FF40","#40FF00","#BFFF00","#FFBF00","#FF4000",
+              "#FA5858","#FAAC58","#F4FA58","#ACFA58","#58FA58","#58FAAC",
+              "#58FAF4","#58ACFA","#5858FA","#AC58FA","#FA58F4","#FA58AC",
+              "#B40404","#B45F04","#AEB404","#5FB404","#04B45F","#04B4AE",
+              "#045FB4","#0404B4","#5F04B4","#B404AE","#B4045F","#8A0829"]
+    return random.choice(liste)
+
+# not an api endpoint
+def grade(volume, min, max):
+    #print(volume, min, max)
+    weight = math.log(volume) / 5
+    #print(weight)
+    # 2 < x < 4
+    # min < volume < max
+    return weight
+
+@is_admin
+def map(request):
+    txs = LotTransaction.objects.select_related(
+        'lot', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__carbure_production_site__country',
+        'lot__unknown_production_country', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__pays_origine', 'lot__added_by', 'lot__data_origin_entity',
+        'carbure_vendor', 'carbure_client', 'carbure_delivery_site', 'unknown_delivery_site_country', 'carbure_delivery_site__country'
+    ).prefetch_related('genericerror_set', 'lot__carbure_production_site__productionsitecertificate_set')
+    txs = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.PENDING, LotTransaction.FROZEN])
+    txs, _, _, _ = filter_lots(txs, request.GET)
+
+    # on veut: nom site de depart, gps depart, nom site arrivee, gps arrivee, volume
+    txs = txs.filter(lot__carbure_production_site__isnull=False, carbure_delivery_site__isnull=False)
+    values = txs.values('lot__carbure_production_site__name', 'lot__carbure_production_site__gps_coordinates', 'carbure_delivery_site__name', 'carbure_delivery_site__gps_coordinates').annotate(volume=Sum('lot__volume'))
+
+    volume_min = 999999
+    volume_max = 0
+    for v in values:
+        volume = v['volume']
+        if volume < volume_min:
+            volume_min = volume
+        if volume > volume_max:
+            volume_max = volume
+
+    m = folium.Map(location=[46.227638, 2.213749], zoom_start=5)
+    known_prod_sites = []
+    known_depots = []
+    for v in values:
+        try:
+            # start coordinates
+            slat, slon = v['lot__carbure_production_site__gps_coordinates'].split(',')
+            # end coordinates
+            elat, elon = v['carbure_delivery_site__gps_coordinates'].split(',')
+        except:
+            print('Missing start or end gps coordinates')
+            print('Start %s : %s' % (v['lot__carbure_production_site__name'], v['lot__carbure_production_site__gps_coordinates']))
+            print('End %s : %s' % (v['carbure_delivery_site__name'], v['carbure_delivery_site__gps_coordinates']))
+            continue
+
+        if v['lot__carbure_production_site__gps_coordinates'] not in known_prod_sites:
+            known_prod_sites.append(v['lot__carbure_production_site__gps_coordinates'])
+            c = couleur()
+            folium.Circle(
+                radius=50e2,
+                location=[slat, slon],
+                popup=v['lot__carbure_production_site__name'],
+                color= c,
+                fill=True,
+                fill_opacity=1,
+            ).add_to(m)
+        if v['carbure_delivery_site__gps_coordinates'] not in known_depots:
+            known_depots.append(v['carbure_delivery_site__gps_coordinates'])
+            folium.Circle(
+                radius=50e2,
+                location=[elat, elon],
+                popup=v['carbure_delivery_site__name'],
+                color="white",
+                fill=True,
+                fill_opacity=1,
+            ).add_to(m)
+        volume = v['volume']
+        folium.PolyLine([(float(slat),float(slon)),(float(elat),float(elon))], color=c, weight=grade(volume, volume_min, volume_max), line_cap='round', opacity=0.7, popup=v['lot__carbure_production_site__name']+' vers '+v['carbure_delivery_site__name']+' : \n'+str(volume)+' litres').add_to(m)
+    return HttpResponse(m._repr_html_())
+

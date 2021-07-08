@@ -14,3 +14,9 @@
 .certificateInfo li {
   margin-bottom: 4px;
 }
+
+.distanceLink {
+  margin-left: 4px;
+  color: var(--blue-medium);
+  text-decoration: underline;
+}

@@ -648,6 +648,12 @@ export const DeliverySite = ({
   ...props
 }: LACP<DS>) => {
   const depot = value ?? data?.delivery_site
+  const distance = data?.distance?.distance
+  const gmaps = data?.distance?.link
+
+  const label: React.ReactNode = typeof distance === 'number' && distance > 0
+    ? <>{t("Site de livraison")} <a href={gmaps} target="_blank" className={styles.distanceLink}>({distance}km)</a></>
+    : t("Site de livraison")
 
   // prettier-ignore
   const icon = isKnown(depot)
@@ -660,7 +666,7 @@ export const DeliverySite = ({
       required
       disabled={data?.mac}
       name="delivery_site"
-      label={t("Site de livraison")}
+      label={label}
       value={depot}
       error={errors?.delivery_site ?? errors?.unknown_delivery_site}
       getValue={getters.depot_id}

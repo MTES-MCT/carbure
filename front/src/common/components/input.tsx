@@ -25,10 +25,10 @@ export const Input = ({ className, innerRef, ...props }: InputProps) => (
 // LABEL COMPONENT
 
 export type LabelProps = SystemProps &
-  Omit<React.HTMLProps<HTMLLabelElement>, "value" | "onChange"> & {
+  Omit<React.HTMLProps<HTMLLabelElement>, "value" | "onChange" | 'label'> & {
     error?: string | null
     tooltip?: string
-    label?: string
+    label?: React.ReactNode
     required?: boolean
     icon?: React.ComponentType<IconProps>
   }
@@ -58,12 +58,14 @@ export const Label = ({
   >
     <div className={styles.labelText}>
       {error && <AlertTriangle size={16} />}
-      <span>{!readOnly && required ? `${label} *` : label}</span>
+      {label}
+      {!readOnly && required && ' *'}
     </div>
     {children}
     {Icon && <Icon className={styles.labelIcon} />}
   </label>
 )
+
 // FORM INPUT COMPONENT
 
 export type LabelInputProps = InputProps & {

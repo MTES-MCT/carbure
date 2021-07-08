@@ -57,7 +57,7 @@ def main(args):
             recipients = [r.user.email for r in UserRights.objects.filter(entity=entity, user__is_staff=True)]
         else:
             # PROD
-            recipients = [r.user.email for r in UserRights.objects.filter(entity=entity, user__is_staff=False, user__is_superuser=False)]
+            recipients = [r.user.email for r in UserRights.objects.filter(entity=entity, user__is_staff=False, user__is_superuser=False).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])]
             if notifs.filter(send_copy_to_admin=True).count() > 0:
                 cc = "carbure@beta.gouv.fr" 
 

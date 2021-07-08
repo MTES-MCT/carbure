@@ -101,8 +101,6 @@ const TransactionDetails = ({
     Boolean(entity) && transaction?.lot.added_by?.id === entity?.id
   const isVendor =
     Boolean(entity) && transaction?.carbure_vendor?.id === entity!.id
-  const isVendorOperator =
-    transaction?.carbure_vendor?.entity_type === EntityType.Operator
 
   const hasErrors =
     validationErrors.length > 0 || Object.keys(fieldErrors).length > 0
@@ -213,7 +211,7 @@ const TransactionDetails = ({
                 <Trans>Accepter</Trans>
               </AsyncButton>
 
-              {!transaction?.lot.parent_lot && !isVendorOperator && (
+              {!transaction?.lot.parent_lot && (
                 <AsyncButton
                   icon={AlertTriangle}
                   level="warning"
@@ -250,20 +248,10 @@ const TransactionDetails = ({
             </AsyncButton>
           )}
 
-        {console.log({
-          canModify,
-          isVendor,
-          isAdmin,
-          isAuditor,
-          isVendorOperator,
-          status,
-        })}
-
         {canModify &&
           !isVendor &&
           !isAdmin &&
           !isAuditor &&
-          !isVendorOperator &&
           !isAuthor &&
           [LotStatus.Accepted, LotStatus.Declaration].includes(status) && (
             <AsyncButton

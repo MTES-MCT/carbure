@@ -17,10 +17,15 @@ print(df)
 psites = ProductionSite.objects.all()
 
 for p in psites:
-    if p.postal_code in df:
+    try:
+        code = int(p.postal_code)
+    except:
+        print('missing zip code for %s' % p.name)
+        continue
+    if code in df:
         print('FOUND gps for %s' % (p.name))
-        print(df[p.postal_code])
-        p.gps_coordinates = df[p.postal_code]
+        print(df[code])
+        p.gps_coordinates = df[code]
         p.save()
     else:
         print('could not find gps for %s, %s' % (p.name, p.postal_code))

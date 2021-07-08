@@ -94,6 +94,9 @@ export function normalizeFilter(
   }
 
   if (field === Filters.ClientTypes) {
+    // hardcoding a translation key so that the i18n parser can detect it
+    t("Inconnu")
+
     normalized = filter.map((type: any) => ({
       value: type,
       label: t(type, { ns: "translation" }),
