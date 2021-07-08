@@ -7,7 +7,7 @@ django.setup()
 
 
 from core.models import *
-emails = [r.user.email for r in UserRights.objects.exclude(role__in=[UserRights.RO, UserRights.AUDITOR, user__is_staff=True, user__is_superuser=True])]
+emails = [r.user.email for r in UserRights.objects.exclude(role__in=[UserRights.RO, UserRights.AUDITOR], user__is_staff=True, user__is_superuser=True)]
 
 unique_emails = list(set(emails))
 
