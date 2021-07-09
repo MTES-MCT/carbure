@@ -9,6 +9,7 @@ import api from "common/services/api"
 import { useEffect } from "react"
 import { EntityType } from "common/types"
 
+
 function getHash(entityId: number) {
   return api.get('/settings/entity-hash', {entity_id: entityId})
 }
@@ -37,21 +38,39 @@ const Stats = ({ entity }: StatsProps) => {
   const textColor = "black"
   const textShadow = "6px 6px 3px grey"
   const iframeShadow = "1px 1px 6px grey"
+  let link1 = ""
+  let link2 = ""
+  let link3 = ""
+  let link4 = ""
+  let link5 = ""
   let entityTypeLink = "NA"
   let entityTypeTitle = ""
 
   
   if(entity?.entity_type === EntityType.Operator) {
+    link1 = `https://metabase.carbure.beta.gouv.fr/public/dashboard/4fe4f013-188e-4693-81ec-963daeb758eb?hash=${entityHash.data?.hash}#hide_parameters=hash`
+    link2 = `https://metabase.carbure.beta.gouv.fr/public/dashboard/f184cea4-967a-4284-902c-4a87acff5ca2?hash=${entityHash.data?.hash}#hide_parameters=hash`
+    link3 = `https://metabase.carbure.beta.gouv.fr/public/dashboard/04601b75-225a-4a51-9491-9c9f40544f3e?hash=${entityHash.data?.hash}#hide_parameters=hash`
+    link4 = `https://metabase.carbure.beta.gouv.fr/public/dashboard/2a697167-ddee-4fdf-aa59-43c981c71b53?hash=${entityHash.data?.hash}#hide_parameters=hash`
+    link5 = `https://metabase.carbure.beta.gouv.fr/public/dashboard/2a481cb9-8db9-4ef3-bb05-4721c0a9d497?hash=${entityHash.data?.hash}#hide_parameters=hash,biocarb,matprem`
     entityTypeLink = `https://metabase.carbure.beta.gouv.fr/public/dashboard/e7f0eacb-1034-4173-8634-ec4e000cd027?hash=${entityHash.data?.hash}#hide_parameters=hash`
     entityTypeTitle = t("En savoir plus sur vos fournisseurs")
 
   } else if(entity?.entity_type === EntityType.Producer) {
+    link1 = `https://metabase.carbure.beta.gouv.fr/public/dashboard/a960a32f-c14f-4835-9f6f-2553e951620c?hash=${entityHash.data?.hash}#hide_parameters=hash`
+    link2 = `https://metabase.carbure.beta.gouv.fr/public/dashboard/7aa76cea-b60a-4e89-9bde-a116abd86018?hash=${entityHash.data?.hash}#hide_parameters=hash`
+    link3 = `https://metabase.carbure.beta.gouv.fr/public/dashboard/11d88f12-22c4-467a-ad36-f6bf3a924717?hash=${entityHash.data?.hash}#hide_parameters=hash`
+    link4 = `https://metabase.carbure.beta.gouv.fr/public/dashboard/e3b75456-7df2-4afe-89ea-ac9601abe349?hash=${entityHash.data?.hash}#hide_parameters=hash`
+    link5 = `https://metabase.carbure.beta.gouv.fr/public/dashboard/d3722672-2e9f-48ad-beb0-29c3864b61ab?hash=${entityHash.data?.hash}#hide_parameters=hash,biocarb,matprem`
     entityTypeLink = `https://metabase.carbure.beta.gouv.fr/public/dashboard/765ad219-d854-40e9-8f78-e32dedd28c54?hash=${entityHash.data?.hash}#hide_parameters=hash`
     entityTypeTitle = t("En savoir plus sur vos clients")
     
   } else if(entity?.entity_type === EntityType.Trader) {
     entityTypeLink = `https://metabase.carbure.beta.gouv.fr/public/dashboard/8d1e621d-f005-4904-a19d-e74305d3ce14?hash=${entityHash.data?.hash}#hide_parameters=hash`
     entityTypeTitle = t("En savoir plus sur vos clients et vos fournisseurs")
+  } else {
+    entityTypeLink = `about:blank`
+    entityTypeTitle = "Error"
   }
 
   return (
@@ -68,7 +87,7 @@ const Stats = ({ entity }: StatsProps) => {
       <Section style={{boxShadow: iframeShadow}}>
         <IframeResizer
           title="Votre empreinte carbone"
-          src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/a960a32f-c14f-4835-9f6f-2553e951620c?hash=${entityHash.data?.hash}#hide_parameters=hash`}
+          src={link1}
           frameBorder="0"
           allowTransparency
         />
@@ -85,7 +104,7 @@ const Stats = ({ entity }: StatsProps) => {
       <Section style={{boxShadow: iframeShadow}}>
         <IframeResizer
           title="Statistiques globales depuis 2019"
-          src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/7aa76cea-b60a-4e89-9bde-a116abd86018?hash=${entityHash.data?.hash}#hide_parameters=hash`}
+          src={link2}
           frameBorder="0"
           allowTransparency
         />
@@ -102,7 +121,7 @@ const Stats = ({ entity }: StatsProps) => {
       <Section style={{boxShadow: iframeShadow}}>
         <IframeResizer
           title="Le mois dernier"
-          src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/11d88f12-22c4-467a-ad36-f6bf3a924717?hash=${entityHash.data?.hash}#hide_parameters=hash`}
+          src={link3}
           frameBorder="0"
           allowTransparency
         />
@@ -124,7 +143,7 @@ const Stats = ({ entity }: StatsProps) => {
       <Section>
         <IframeResizer
           title="Statistiques globale par année"
-          src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/e3b75456-7df2-4afe-89ea-ac9601abe349?hash=${entityHash.data?.hash}#hide_parameters=hash`}
+          src={link4}
           frameBorder="0"
           allowTransparency
         />
@@ -146,7 +165,7 @@ const Stats = ({ entity }: StatsProps) => {
       <Section style={{boxShadow: iframeShadow}}>
         <IframeResizer
           title="Statistiques détaillées"
-          src={`https://metabase.carbure.beta.gouv.fr/public/dashboard/d3722672-2e9f-48ad-beb0-29c3864b61ab?hash=${entityHash.data?.hash}#hide_parameters=hash,biocarb,matprem`}
+          src={link5}
           frameBorder="0"
           allowTransparency
         />

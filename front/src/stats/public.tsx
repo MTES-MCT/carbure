@@ -1,6 +1,5 @@
 import { Route, Switch, Link } from "common/components/relative-route"
 import { Main } from "common/components"
-import { Section } from "common/components/section"
 import IframeResizer from "iframe-resizer-react"
 import Topbar from "./public-topbar"
 import Footer from "carbure/components/footer"
