@@ -290,7 +290,7 @@ class StockAPITest(TestCase):
         # ensure it's flagged as a MAC
         draft_tx = LotTransaction.objects.get(id=draft_tx.id)
         self.assertEqual(draft_tx.is_mac, True)
-        self.assertEqual(draft_tx.delivery_status, 'A')
+        self.assertEqual(draft_tx.delivery_status, 'N')
         self.assertEqual(draft_tx.lot.volume, 25000)
         # check parent tx volumes
         stock_source = LotTransaction.objects.get(id=txid)

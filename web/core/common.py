@@ -172,9 +172,13 @@ def send_lot_from_stock(rights, tx, prefetched_data):
     lot.parent_lot.remaining_volume -= lot.volume
     lot.parent_lot.save()
 
+    # mac and unknown client - auto accept
     if tx.is_mac and not tx.client_is_in_carbure:
         tx.delivery_status = LotTransaction.ACCEPTED
-        tx.save()
+    # mac and client == myself: auto accept
+    if tx.is_mac and tx.carbure_client and tx.lot.added_by == tx.carbure_client:
+        tx.delivery_status = LotTransaction.ACCEPTED
+    tx.save()
     return True, ''
 
 
