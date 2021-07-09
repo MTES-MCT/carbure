@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from public import views as public_views
-import debug_toolbar
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -36,5 +36,5 @@ urlpatterns = [
     path('annuaire', public_views.annuaire, name='annuaire'),
 
     # path('__debug__/', include(debug_toolbar.urls)),
-    path('django_query_profiler/', include('django_query_profiler.client.urls'))
+    path('django_query_profiler/', include('django_query_profiler.client.urls')),
 ]
