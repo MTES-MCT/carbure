@@ -148,7 +148,7 @@ def send_lot_from_stock(rights, tx, prefetched_data):
         return False, "User not allowed to send this tx"
 
     # only allow to send drafts
-    if tx.lot.status != 'Draft':
+    if tx.lot.status != LotV2.DRAFT:
         return False, "Tx already sent"
 
     # make sure all mandatory fields are set
@@ -172,7 +172,7 @@ def send_lot_from_stock(rights, tx, prefetched_data):
     lot.parent_lot.remaining_volume -= lot.volume
     lot.parent_lot.save()
 
-    if tx.is_mac:
+    if tx.is_mac and not tx.client_is_in_carbure:
         tx.delivery_status = LotTransaction.ACCEPTED
         tx.save()
     return True, ''
@@ -702,14 +702,6 @@ def fill_delivery_date(lot_row, lot, transaction):
 def fill_client_data(entity, lot_row, tx, prefetched_data):
     # if lot has already been validated and is currently in correction, we cannot change the client
     if tx.delivery_status == LotTransaction.TOFIX:
-        return []
-
-    if tx.is_mac:
-        tx.client_is_in_carbure = False
-        tx.carbure_client = None
-        tx.unknown_client = ''
-        if 'client' in lot_row:
-            tx.unknown_client = lot_row['client']
         return []
 
     tx_errors = []

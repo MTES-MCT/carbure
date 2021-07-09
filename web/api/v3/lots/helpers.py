@@ -435,7 +435,7 @@ def get_snapshot_filters(txs, entity, whitelist):
     return filters
 
 
-def get_summary(txs, entity, short):
+def get_summary(txs, entity, short=False):
     data = {
         'tx_ids': list(txs.values_list('id', flat=True)),
         'total_volume': txs.aggregate(Sum('lot__volume'))['lot__volume__sum']
@@ -493,7 +493,7 @@ def get_summary(txs, entity, short):
     return data
 
 
-def get_general_summary(txs, short):
+def get_general_summary(txs, short=False):
     data = {
         'tx_ids': list(txs.values_list('id', flat=True)),
         'total_volume': txs.aggregate(Sum('lot__volume'))['lot__volume__sum']
