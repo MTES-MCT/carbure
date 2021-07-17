@@ -187,7 +187,7 @@ def check_duplicates(new_txs, background=True):
         db.connections.close_all()
     new_daes = [t.dae for t in new_txs]
     nb_duplicates = 0
-    duplicates = LotTransaction.objects.filter(dae__in=new_daes, lot__status='Validated', is_forwarded=False).values('dae', 'lot__biocarburant_id', 'lot__volume', 'lot__ghg_total').annotate(count=Count('dae')).filter(count__gt=1)
+    duplicates = LotTransaction.objects.filter(dae__in=new_daes, lot__status=LotV2.VALIDATED, is_forwarded=False).values('dae', 'lot__biocarburant_id', 'lot__matiere_premiere_id', 'lot__pays_origine_id', 'lot__volume', 'lot__ghg_total').annotate(count=Count('dae')).filter(count__gt=1)
     if duplicates.count() > 0:
         # print('Found duplicates')
         # print(duplicates)
@@ -196,19 +196,23 @@ def check_duplicates(new_txs, background=True):
         for d in duplicates:
             dae = d['dae']
             biocarburant_id = d['lot__biocarburant_id']
+            matiere_premiere_id = d['lot__matiere_premiere_id']
+            pays_origine_id = d['lot__pays_origine_id']
             volume = d['lot__volume']
             ghg_total = d['lot__ghg_total']
-            matches = LotTransaction.objects.filter(dae=dae, lot__biocarburant_id=biocarburant_id, lot__volume=volume, lot__ghg_total=ghg_total, lot__status='Validated').order_by('id')
+            matches = LotTransaction.objects.filter(dae=dae, lot__biocarburant_id=biocarburant_id, lot__matiere_premiere_id=matiere_premiere_id, lot__pays_origine_id=pays_origine_id, lot__volume=volume, lot__ghg_total=ghg_total, lot__status='Validated').order_by('id')
             # find the "best" lot
             # the best source is the producer
-            best_matches = LotTransaction.objects.filter(dae=dae, lot__biocarburant_id=biocarburant_id, lot__volume=volume, lot__ghg_total=ghg_total, lot__status='Validated', lot__data_origin_entity__entity_type='Producteur').order_by('id')
+            best_matches = matches.filter(lot__data_origin_entity__entity_type=Entity.PRODUCER).order_by('id')
             if best_matches.count() > 0:
                 first_valid = best_matches[0]
             else:
                 first_valid = matches[0]
-            for m in matches[1:]:
+            for m in matches:
+                if first_valid.id == m.id:
+                    continue
                 nb_duplicates += 1
-                # there is already a tx with a valid lot and this DAE/volume/biocarburant
+                # there is already a tx with a valid lot and this DAE/volume/biocarburant/pays_origine/matiere_premiere
                 # it can happen if the producer has already created the tx and the operator tries to upload it
                 # or the operator has created it and the producer is trying to upload it
                 # or a user has validated a duplicate

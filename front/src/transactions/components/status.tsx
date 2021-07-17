@@ -68,6 +68,7 @@ function getStatusText(
   }
 
   const isVendor = tx.carbure_vendor?.id === entity?.id
+  const isOwner = tx.carbure_vendor === null && tx.lot.added_by?.id === entity?.id
 
   switch (tx.delivery_status) {
     case DeliveryStatus.Pending:
@@ -77,7 +78,7 @@ function getStatusText(
     case DeliveryStatus.Rejected:
       return t("Refusé")
     case DeliveryStatus.ToFix:
-      return isVendor ? t("À corriger") : t("En correction")
+      return isVendor || isOwner ? t("À corriger") : t("En correction")
     case DeliveryStatus.Fixed:
       return t("Corrigé")
     case DeliveryStatus.Frozen:

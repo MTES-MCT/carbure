@@ -39,17 +39,29 @@ import { SearchSelection } from "transactions/hooks/query/use-search"
 import { Input, InputProps } from "common/components/input"
 import { LotAuditor } from "transactions/hooks/actions/use-audits"
 import { LotAdministrator } from "transactions/hooks/actions/use-admin-lots"
+import { useMatomo } from "matomo"
 
 type ExportActionsProps = {
   isEmpty: boolean
   onExportAll: () => void
 }
 
-export const ExportActions = ({ isEmpty, onExportAll }: ExportActionsProps) => (
-  <Button icon={Download} disabled={isEmpty} onClick={onExportAll}>
-    <Trans>Exporter</Trans>
-  </Button>
-)
+export const ExportActions = ({ isEmpty, onExportAll }: ExportActionsProps) => {
+  const matomo = useMatomo()
+
+  return (
+    <Button
+      icon={Download}
+      disabled={isEmpty}
+      onClick={() => {
+        matomo.push(["trackEvent", "transactions", "save-batch"])
+        onExportAll()
+      }}
+    >
+      <Trans>Exporter</Trans>
+    </Button>
+  )
+}
 
 type ImportActionsProps = {
   uploader: LotUploader
@@ -209,6 +221,7 @@ export const InboxActions = ({
   acceptor,
   rejector,
 }: InboxActionsProps) => {
+  const matomo = useMatomo()
   const { t } = useTranslation()
 
   function onAccept() {
@@ -234,7 +247,10 @@ export const InboxActions = ({
         level="success"
         loading={acceptor.loading}
         disabled={disabled}
-        onClick={onAccept}
+        onClick={() => {
+          matomo.push(["trackEvent", "transactions", "accept-many-batches"])
+          onAccept()
+        }}
       >
         <Trans>
           Accepter {{ what: hasSelection ? t("sélection") : t("tout") }}
@@ -246,7 +262,10 @@ export const InboxActions = ({
         level="danger"
         loading={rejector.loading}
         disabled={disabled}
-        onClick={onReject}
+        onClick={() => {
+          matomo.push(["trackEvent", "transactions", "reject-many-batches"])
+          onReject()
+        }}
       >
         <Trans>
           Refuser {{ what: hasSelection ? t("sélection") : t("tout") }}

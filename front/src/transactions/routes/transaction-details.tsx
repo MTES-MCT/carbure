@@ -38,6 +38,7 @@ import ValidationErrors from "../components/form-errors"
 import TransactionHistory from "../components/history"
 import { useRights } from "carbure/hooks/use-rights"
 import { LotAuditor } from "transactions/hooks/actions/use-audits"
+import { useMatomo } from "matomo"
 
 const EDITABLE = [LotStatus.Draft, LotStatus.ToFix]
 const COMMENTABLE = [LotStatus.ToFix, LotStatus.Inbox]
@@ -83,6 +84,7 @@ const TransactionDetails = ({
   } = useTransactionDetails(entity, refresh)
 
   const { t } = useTranslation()
+  const matomo = useMatomo()
 
   const rights = useRights()
   const navigator = useNavigate(transactions)
@@ -206,7 +208,10 @@ const TransactionDetails = ({
                 icon={Check}
                 level="success"
                 loading={acceptor.loading}
-                onClick={() => run(acceptor.acceptLot)}
+                onClick={() => {
+                  matomo.push(["trackEvent", "transactions", "accept-batch"])
+                  run(acceptor.acceptLot)
+                }}
               >
                 <Trans>Accepter</Trans>
               </AsyncButton>
@@ -216,7 +221,10 @@ const TransactionDetails = ({
                   icon={AlertTriangle}
                   level="warning"
                   loading={acceptor.loading}
-                  onClick={() => run(acceptor.acceptAndCommentLot)}
+                  onClick={() => {
+                    matomo.push(["trackEvent", "transactions", "ask-batch-correction"]) // prettier-ignore
+                    run(acceptor.acceptAndCommentLot)
+                  }}
                 >
                   <Trans>Accepter sous réserve</Trans>
                 </AsyncButton>
@@ -226,7 +234,10 @@ const TransactionDetails = ({
                 icon={Cross}
                 level="danger"
                 loading={rejector.loading}
-                onClick={() => run(rejector.rejectLot, true)}
+                onClick={() => {
+                  matomo.push(["trackEvent", "transactions", "reject-batch"])
+                  run(rejector.rejectLot, true)
+                }}
               >
                 <Trans>Refuser</Trans>
               </AsyncButton>
@@ -242,7 +253,10 @@ const TransactionDetails = ({
               icon={Edit}
               level="warning"
               loading={acceptor.loading}
-              onClick={() => run(acceptor.amendLot)}
+              onClick={() => {
+                matomo.push(["trackEvent", "transactions", "amend-batch"])
+                run(acceptor.amendLot)
+              }}
             >
               <Trans>Corriger</Trans>
             </AsyncButton>
@@ -258,7 +272,10 @@ const TransactionDetails = ({
               icon={Edit}
               level="warning"
               loading={acceptor.loading}
-              onClick={() => run(acceptor.askForCorrection)}
+              onClick={() => {
+                matomo.push(["trackEvent", "transactions", "ask-batch-correction"]) // prettier-ignore
+                run(acceptor.askForCorrection)
+              }}
             >
               <Trans>Demander une correction</Trans>
             </AsyncButton>
