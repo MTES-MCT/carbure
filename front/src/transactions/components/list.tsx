@@ -1,5 +1,6 @@
 import React from "react"
 import IframeResizer from "iframe-resizer-react"
+import { stringify } from "querystring"
 
 import {
   Entity,
@@ -29,6 +30,8 @@ import { Box, LoaderOverlay } from "common/components"
 import { Alert, Collapsible } from "common/components/alert"
 import Pagination from "common/components/pagination"
 import { TransactionTable } from "./list-table"
+
+import { API_ROOT, filterParams } from "common/services/api"
 
 import styles from "./list.module.css"
 
@@ -217,7 +220,7 @@ export const TransactionList = ({
           <iframe
           height="600"
           title="Votre empreinte carbone"
-          src="http://carbure.local:8090/api/v3/admin/map"
+          src={`${API_ROOT}/admin/map?${stringify(filterParams(query))}`}
           frameBorder="0"
           allowTransparency
         />
