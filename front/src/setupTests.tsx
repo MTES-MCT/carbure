@@ -38,7 +38,7 @@ document.body.append(modal, dropdown, notifications)
 // mock window.open (jsdom does not implement it)
 window.open = jest.fn()
 
-jest.setTimeout(10000)
+jest.setTimeout(30000)
 
 i18n.use(initReactI18next).init({
   resources: {

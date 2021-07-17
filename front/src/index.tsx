@@ -8,19 +8,19 @@ import * as serviceWorker from "./serviceWorker"
 
 import Carbure from "./carbure"
 import NotificationsProvider from "common/components/notifications"
-import { TrackerProvider } from "./matomo"
+import { MatomoProvider } from "./matomo"
 import { LoaderOverlay } from "common/components"
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter basename="/v2">
-      <TrackerProvider>
+      <MatomoProvider>
         <Suspense fallback={<LoaderOverlay />}>
           <NotificationsProvider>
             <Carbure />
           </NotificationsProvider>
         </Suspense>
-      </TrackerProvider>
+      </MatomoProvider>
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")

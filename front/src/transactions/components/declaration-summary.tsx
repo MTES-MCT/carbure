@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { Trans, useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from "react-i18next"
 import useAPI from "common/hooks/use-api"
 import * as api from "../api"
 import {
@@ -22,6 +22,7 @@ import dialogStyles from "common/components/dialog.module.css"
 import { useNotificationContext } from "common/components/notifications"
 import TransactionSummary from "./summary"
 import usePeriod, { nextPeriod, prettyPeriod } from "common/hooks/use-period"
+import { useMatomo } from "matomo"
 
 type SummaryPromptProps = PromptProps<any> & {
   entityID: number
@@ -31,6 +32,7 @@ export const DeclarationSummaryPrompt = ({
   entityID,
   onResolve,
 }: SummaryPromptProps) => {
+  const matomo = useMatomo()
   const { t } = useTranslation()
   const notifications = useNotificationContext()
 
@@ -43,7 +45,9 @@ export const DeclarationSummaryPrompt = ({
   async function askValidateDeclaration() {
     const ok = await confirm(
       t("Validation déclaration"),
-      t("Confirmez-vous que les informations fournies sont valides ? Vous ne pourrez plus modifier votre déclaration ultérieurement.")
+      t(
+        "Confirmez-vous que les informations fournies sont valides ? Vous ne pourrez plus modifier votre déclaration ultérieurement."
+      )
     )
 
     if (ok) {
@@ -88,11 +92,11 @@ export const DeclarationSummaryPrompt = ({
 
       <span className={styles.declarationExplanation}>
         <Trans>
-          Afin d'être comptabilisés, les brouillons que vous avez créé pour cette
-          période devront être envoyés avant la fin du mois suivant ladite
-          période. Une fois la totalité de ces lots validés, vous pourrez vérifier
-          ici l'état global de vos transactions et finalement procéder à la
-          déclaration.
+          Afin d'être comptabilisés, les brouillons que vous avez créé pour
+          cette période devront être envoyés avant la fin du mois suivant ladite
+          période. Une fois la totalité de ces lots validés, vous pourrez
+          vérifier ici l'état global de vos transactions et finalement procéder
+          à la déclaration.
         </Trans>
       </span>
 
@@ -112,7 +116,7 @@ export const DeclarationSummaryPrompt = ({
       />
 
       <DialogButtons className={styles.declarationControls}>
-        {!(declaration?.declared) && (
+        {!declaration?.declared && (
           <span className={styles.declarationDeadline}>
             {remaining === 0 && (
               <Trans>
@@ -121,7 +125,8 @@ export const DeclarationSummaryPrompt = ({
             )}
             {remaining > 0 && (
               <Trans count={remaining}>
-                Encore <b>{{ remaining }} lots</b> en attente de validation pour cette période
+                Encore <b>{{ remaining }} lots</b> en attente de validation pour
+                cette période
               </Trans>
             )}
           </span>
@@ -129,9 +134,7 @@ export const DeclarationSummaryPrompt = ({
 
         {declaration?.declared ? (
           <Button disabled level="success" icon={Check}>
-            <Trans>
-              Déclaration validée !
-            </Trans>
+            <Trans>Déclaration validée !</Trans>
           </Button>
         ) : (
           <AsyncButton
@@ -139,11 +142,12 @@ export const DeclarationSummaryPrompt = ({
             loading={validating.loading}
             level="primary"
             icon={Check}
-            onClick={askValidateDeclaration}
+            onClick={() => {
+              matomo.push(["trackEvent", "transaction", "validate-declaration"])
+              askValidateDeclaration()
+            }}
           >
-            <Trans>
-              Valider ma déclaration
-            </Trans>
+            <Trans>Valider ma déclaration</Trans>
           </AsyncButton>
         )}
         <Button icon={Return} onClick={() => onResolve()}>
@@ -151,7 +155,7 @@ export const DeclarationSummaryPrompt = ({
         </Button>
       </DialogButtons>
 
-      { summary.loading && <LoaderOverlay />}
-    </Dialog >
+      {summary.loading && <LoaderOverlay />}
+    </Dialog>
   )
 }

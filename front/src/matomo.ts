@@ -1,18 +1,18 @@
 import React, { useContext, useLayoutEffect } from "react"
 import { useLocation } from "react-router-dom"
 
-type PushArgs = [string, ...any[]][]
+export type Matomo = Pick<[string, ...any[]][], "push">
 
 declare global {
   interface Window {
-    _paq?: Pick<PushArgs, "push">
+    _paq?: Matomo
   }
 }
 
-export const TrackerContext = React.createContext(() => [])
-export const useTracker = () => useContext(TrackerContext)()
+export const MatomoContext = React.createContext<() => Matomo>(() => [])
+export const useMatomo = () => useContext(MatomoContext)()
 
-export const TrackerProvider = (props: any) => {
+export const MatomoProvider = (props: any) => {
   const location = useLocation()
 
   const value = () => window._paq ?? []
@@ -21,10 +21,10 @@ export const TrackerProvider = (props: any) => {
     // only track production
     if (window.location.hostname !== "carbure.beta.gouv.fr") return
 
-    const tracker = value()
-    tracker.push(["setCustomUrl", window.location.href])
-    tracker.push(["trackPageView"])
+    const matomo = value()
+    matomo.push(["setCustomUrl", window.location.href])
+    matomo.push(["trackPageView"])
   }, [location.pathname])
 
-  return React.createElement(TrackerContext.Provider, { ...props, value })
+  return React.createElement(MatomoContext.Provider, { ...props, value })
 }

@@ -10,6 +10,7 @@ import { AsyncButton, Button } from "common/components/button"
 import { Plus, Return } from "common/components/icons"
 import { StatusTitle } from "../components/status"
 import TransactionForm from "../components/form"
+import { useMatomo } from "matomo"
 
 type TransactionAddProps = {
   entity: EntitySelection
@@ -17,6 +18,8 @@ type TransactionAddProps = {
 }
 
 const TransactionAdd = ({ entity, refresh }: TransactionAddProps) => {
+  const matomo = useMatomo()
+
   const { form, request, change, submit, close } = useTransactionAdd(
     entity,
     refresh
@@ -34,7 +37,10 @@ const TransactionAdd = ({ entity, refresh }: TransactionAddProps) => {
         transaction={form}
         error={request.error}
         onChange={change}
-        onSubmit={submit}
+        onSubmit={() => {
+          matomo.push(["trackEvent", "transactions", "create-batch"])
+          submit()
+        }}
       />
 
       <div className={styles.transactionFormButtons}>
