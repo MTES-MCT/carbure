@@ -75,6 +75,8 @@ MIDDLEWARE = [
     'core.logging_middleware.LoggingMiddleware',
 ]
 
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
 ROOT_URLCONF = 'carbure.urls'
 
 TEMPLATES = [
