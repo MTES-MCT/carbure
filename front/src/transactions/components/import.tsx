@@ -15,6 +15,7 @@ import { Box } from "common/components"
 import { Button } from "common/components/button"
 
 import styles from "./import.module.css"
+import { useMatomo } from "matomo"
 
 type ImportWrapperProps = PromptProps<File> & {
   children: React.ReactNode
@@ -25,6 +26,7 @@ type ImportPromptProps = PromptProps<File> & {
 }
 
 const ImportWrapper = ({ children, onResolve }: ImportWrapperProps) => {
+  const matomo = useMatomo()
   const { t } = useTranslation()
 
   return (
@@ -41,7 +43,10 @@ const ImportWrapper = ({ children, onResolve }: ImportWrapperProps) => {
             <input
               type="file"
               className={styles.importFileInput}
-              onChange={(e) => onResolve(e!.target.files![0])}
+              onChange={(e) => {
+                matomo.push(["trackEvent", "transactions", "import-batches"])
+                onResolve(e!.target.files![0])
+              }}
             />
           </Button>
           <Button onClick={() => onResolve()}>
