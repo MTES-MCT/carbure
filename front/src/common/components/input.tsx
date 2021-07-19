@@ -25,7 +25,7 @@ export const Input = ({ className, innerRef, ...props }: InputProps) => (
 // LABEL COMPONENT
 
 export type LabelProps = SystemProps &
-  Omit<React.HTMLProps<HTMLLabelElement>, "value" | "onChange" | 'label'> & {
+  Omit<React.HTMLProps<HTMLLabelElement>, "value" | "onChange" | "label"> & {
     error?: string | null
     tooltip?: string
     label?: React.ReactNode
@@ -47,7 +47,7 @@ export const Label = ({
 }: LabelProps) => (
   <label
     {...props}
-    title={[label, tooltip, error].filter(Boolean).join(" - ")}
+    title={[error ?? '', tooltip, typeof label === "string" ? label : ''].find(Boolean)} // prettier-ignore
     className={cl(
       styles.labelWrapper,
       !readOnly && disabled && styles.disabledLabel,
@@ -59,7 +59,7 @@ export const Label = ({
     <div className={styles.labelText}>
       {error && <AlertTriangle size={16} />}
       {label}
-      {!readOnly && required && ' *'}
+      {!readOnly && required && " *"}
     </div>
     {children}
     {Icon && <Icon className={styles.labelIcon} />}
