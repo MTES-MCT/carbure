@@ -270,14 +270,10 @@ test("check transaction errors", async () => {
       node?.textContent === "Ce lot doit être validé avant le 29 février 2020"
   )
 
-  const dae = screen.getByTitle(
-    "Numéro douanier (DAE, DAA...) - Le DAE (ou équivalent) est manquant"
-  )
+  const dae = screen.getByTitle("Le DAE (ou équivalent) est manquant")
   expect(dae).toHaveClass("errorLabel")
 
-  const mp = screen.getByTitle(
-    "Matière première - La matière première est manquante"
-  )
+  const mp = screen.getByTitle("La matière première est manquante")
   expect(mp).toHaveClass("errorLabel")
 
   const errors = screen.getByText("Erreurs (2)")
