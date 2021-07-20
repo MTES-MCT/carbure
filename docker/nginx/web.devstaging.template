@@ -1,3 +1,5 @@
+# DEV AND STAGING ENV CONFIG FILE
+
 upstream django {
     server carbure-django-uwsgi:8001;
 }
