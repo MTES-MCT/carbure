@@ -12,8 +12,8 @@ Période Statut  Date butoir théorique
 {% for ntx in notif_txs %}
 Évènements liés à des transactions:
 
-DAE Biocarburant  Matière Première  Volume  Date de livraison Client  Site de livraison Notification
-{{ntx.linked_tx.dae}}  {{ntx.linked_tx.lot.biocarburant.name}}  {{ntx.linked_tx.lot.matiere_premiere.name}}  {{ntx.linked_tx.lot.volume}} {{ntx.linked_tx.delivery_date}}  {% if ntx.linked_tx.carbure_client %} {{ntx.linked_tx.carbure_client.name}} {% else %} {{ntx.linked_tx.unknown_client}} {% endif %}  {% if ntx.linked_tx.carbure_delivery_site %} {{ntx.linked_tx.carbure_delivery_site.name}} {% else %} {{ntx.linked_tx.unknown_delivery_site}} {% endif %}    {{ntx.notif_type}}
+Fournisseur	DAE Biocarburant  Matière Première  Volume  Date de livraison Client  Site de livraison Notification
+{{ntx.linked_tx.carbure_vendor.name}}	    {{ntx.linked_tx.dae}}  {{ntx.linked_tx.lot.biocarburant.name}}  {{ntx.linked_tx.lot.matiere_premiere.name}}  {{ntx.linked_tx.lot.volume}} {{ntx.linked_tx.delivery_date}}  {% if ntx.linked_tx.carbure_client %} {{ntx.linked_tx.carbure_client.name}} {% else %} {{ntx.linked_tx.unknown_client}} {% endif %}  {% if ntx.linked_tx.carbure_delivery_site %} {{ntx.linked_tx.carbure_delivery_site.name}} {% else %} {{ntx.linked_tx.unknown_delivery_site}} {% endif %}    {{ntx.notif_type}}
 {% endfor %}
 
 

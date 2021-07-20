@@ -330,6 +330,7 @@
                         <table>
                           <thead>
                             <tr>
+                              <th>Fournisseur</th>			      
                               <th>DAE / DSAC</th>
                               <th>Biocarburant</th>
                               <th>Matière Première</th>
@@ -343,6 +344,7 @@
                           <tbody>
                             {% for ntx in notif_txs %}
                             <tr>
+                              <td align="center">{{ntx.linked_tx.carbure_vendor.name}}</td>			      
                               <td align="center">{{ntx.linked_tx.dae}}</td>
                               <td align="center">{{ntx.linked_tx.lot.biocarburant.name}}</td>
                               <td align="center">{{ntx.linked_tx.lot.matiere_premiere.name}}</td>
