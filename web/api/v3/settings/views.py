@@ -79,7 +79,16 @@ def get_production_sites(request, *args, **kwargs):
         psite_data['outputs'] = [o.natural_key() for o in ps.productionsiteoutput_set.all()]
         certificates = []
         for pc in ps.productionsitecertificate_set.all():
-            c = pc.certificate_iscc.certificate if pc.type == 'ISCC' else pc.certificate_2bs.certificate
+            if pc.type == 'ISCC':
+                c = pc.certificate_iscc.certificate
+            elif pc.type == '2BS':
+                c = pc.certificate_2bs.certificate
+            elif pc.type == 'REDCERT':
+                c = pc.certificate_redcert.certificate
+            elif pc.type == 'SN':
+                c = pc.certificate_sn.certificate
+            else:
+                continue
             certificates.append({'certificate_id': c.certificate_id, 'holder': c.certificate_holder, 'type': pc.type})
         psite_data['certificates'] = certificates
         data.append(psite_data)
