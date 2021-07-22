@@ -357,6 +357,7 @@
   "Historique des corrections ({{amount}})": "Correction history ({{amount}})",
   "Import Excel": "Excel import",
   "Importer un fichier Excel standardisé.": "Import a standardized excel file.",
+  "Vous pouvez glisser vos fichiers pour les déposer": "You can drag and drop your files here",
   "Note: Le modèle a été mis à jour le 24/03/2021. La colonne production_site_reference n'est plus obligatoire. Votre certificat de fournisseur doit désormais figurer dans la colonne 'vendor_certificate'. Veuillez vous référer au guide pour plus d'informations.": "Note: The template was updated on 24/03/2021. The production_site_reference column is no longer required. Your supplier certificate should now be listed in the 'vendor_certificate' column. Please refer to the guide for more information.",
   "Le modèle simplifié vous permet de créer des lots provenant de vos propres usines. Vous pouvez les affilier immédiatement à des clients enregistrés sur Carbure ou simplement les ajouter à votre Stock.": "The simplified template allows you to create batches from your own factories. You can affiliate them immediately with registered customers on CarbuRe or simply add them to your inventory.",
   "Guide du modèle simplifié": "Simplified template guide",
