@@ -47,11 +47,15 @@ class Entity(models.Model):
     def url_friendly_name(self):
         return self.name.replace(' ', '').upper()
 
-    def save(self):
-        data = self.name + self.entity_type + self.date_added.strftime('%Y%m%d')
+    def save(self, *args, **kwargs):
+        date_added = self.date_added
+        if not date_added:
+            date_added = datetime.date.today()
+        data = self.name + self.entity_type + date_added.strftime('%Y%m%d')
         hash = hashlib.md5(data.encode('utf-8')).hexdigest()
         self.hash = hash
-        super(Entity, self).save()
+        super(Entity, self).save(*args, **kwargs)
+
 
     class Meta:
         db_table = 'entities'
