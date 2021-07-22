@@ -1,4 +1,5 @@
 import datetime
+import re
 from django import db
 from core.models import GenericError, Entity
 # definitions
@@ -6,6 +7,7 @@ from core.models import GenericError, Entity
 oct2015 = datetime.date(year=2015, month=10, day=5)
 jan2021 = datetime.date(year=2021, month=1, day=1)
 future = datetime.date.today() + datetime.timedelta(days=15) # docker containers are restarted everyday - not an issue
+dae_pattern = re.compile('^([a-zA-Z0-9/]+$)')
 
 rules = {}
 rules['GHG_REDUC_INF_50'] = "La réduction de gaz à effet de serre est inférieure à 50%, il n'est pas possible d'enregistrer ce lot dans CarbuRe"
@@ -38,6 +40,7 @@ rules['EXPIRED_SUPPLIER_CERT'] = "Certificat du fournisseur expiré"
 rules['NO_VENDOR_CERT'] = "Certificat du fournisseur absent"
 rules['UNKNOWN_VENDOR_CERT'] = "Certificat inconnu"
 rules['EXPIRED_VENDOR_CERT'] = "Certificat du fournisseur expiré"
+rules['UNKNOWN_DAE_FORMAT'] = "Le format du numéro douanier semble incorrect"
 
 
 def generic_error(error, **kwargs):
@@ -282,7 +285,9 @@ def sanity_check(tx, prefetched_data):
         is_sane = False
         errors.append(GenericError(tx=tx, field='delivery_date', error="DELIVERY_IN_THE_FUTURE", extra="La date de livraison est dans le futur", value=tx.delivery_date, display_to_creator=True, is_blocking=True))
 
-
+    if not tx.is_mac:
+        if not dae_pattern.match(tx.dae):
+            errors.append(GenericError(tx=tx, field='dae', error="UNKNOWN_DAE_FORMAT", extra="Caractère non-standard trouvé dans le numéro douanier.", value=tx.dae, display_to_creator=True, is_blocking=False))
     return lot_valid, tx_valid, is_sane, errors
 
 

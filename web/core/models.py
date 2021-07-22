@@ -3,7 +3,7 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-
+import hashlib
 
 usermodel = get_user_model()
 
@@ -47,10 +47,17 @@ class Entity(models.Model):
     def url_friendly_name(self):
         return self.name.replace(' ', '').upper()
 
+    def save(self):
+        data = self.name + self.entity_type + self.date_added.strftime('%Y%m%d')
+        hash = hashlib.md5(data.encode('utf-8')).hexdigest()
+        self.hash = hash
+        super(Entity, self).save()
+
     class Meta:
         db_table = 'entities'
         verbose_name = 'Entity'
         verbose_name_plural = 'Entities'
+
 
 
 class UserPreferences(models.Model):
