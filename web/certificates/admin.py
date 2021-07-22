@@ -1,10 +1,11 @@
 from django.contrib import admin
 
-from certificates.models import SNCategory, SNCertificate, SNCertificateScope
+from certificates.models import DoubleCoutingRegistration, DoubleCoutingRegistrationInputOutput, SNCategory, SNCertificate, SNCertificateScope
 from certificates.models import ISCCScope, ISCCCertificateRawMaterial, ISCCCertificate, ISCCCertificateScope
 from certificates.models import DBSCertificate, DBSScope, DBSCertificateScope
 from certificates.models import REDCertScope, REDCertBiomassType, REDCertCertificate, REDCertCertificateScope, REDCertCertificateBiomass
 from certificates.models import ProductionSiteCertificate, EntityISCCTradingCertificate, EntitySNTradingCertificate, EntityDBSTradingCertificate, EntityREDCertTradingCertificate
+from certificates.models import DoubleCoutingRegistration, DoubleCoutingRegistrationInputOutput
 
 class SNCategoryAdmin(admin.ModelAdmin):
     list_display = ('category_id', 'description',)
@@ -144,3 +145,22 @@ admin.site.register(EntityISCCTradingCertificate, EntityISCCTradingCertificateAd
 admin.site.register(EntityDBSTradingCertificate, EntityDBSTradingCertificateAdmin)
 admin.site.register(EntityREDCertTradingCertificate, EntityREDCertTradingCertificateAdmin)
 admin.site.register(ProductionSiteCertificate, ProductionSiteCertificateAdmin)    
+
+
+@admin.register(DoubleCoutingRegistration)
+class DoubleCoutingRegistrationAdmin(admin.ModelAdmin):
+    list_display = ('certificate_id', 'certificate_holder', 'valid_from', 'valid_until')
+    search_fields = ('certificate_id', 'certificate_holder',)
+
+@admin.register(DoubleCoutingRegistrationInputOutput)
+class DoubleCoutingRegistrationAdmin(admin.ModelAdmin):
+    list_display = ('get_certid', 'get_holder', 'biofuel', 'feedstock')
+    search_fields = ('certificate__certificate_id', 'certificate__certificate_holder', )
+
+    def get_certid(self, obj):
+        return obj.certificate.certificate_id
+    get_certid.short_description = 'ID'
+
+    def get_holder(self, obj):
+        return obj.certificate.certificate_holder
+    get_holder.short_description = 'Holder'

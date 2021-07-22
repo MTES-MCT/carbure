@@ -795,8 +795,8 @@ def map(request):
             elat, elon = v['carbure_delivery_site__gps_coordinates'].split(',')
         except:
             print('Missing start or end gps coordinates')
-            print('Start %s : %s' % (v['lot__carbure_production_site__name'], v['lot__carbure_production_site__gps_coordinates']))
-            print('End %s : %s' % (v['carbure_delivery_site__name'], v['carbure_delivery_site__gps_coordinates']))
+            print('Start %s : %s' % (v['lot__carbure_production_site__name'].encode('utf-8'), v['lot__carbure_production_site__gps_coordinates']))
+            print('End %s : %s' % (v['carbure_delivery_site__name'].encode('utf-8'), v['carbure_delivery_site__gps_coordinates']))
             continue
 
         if v['lot__carbure_production_site__gps_coordinates'] not in known_prod_sites:
