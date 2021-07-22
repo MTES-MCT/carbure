@@ -1,7 +1,7 @@
 import Cookies from "js-cookie"
 import { stringify } from "querystring"
 
-const API_ROOT = `${window.location.origin}/api/v3`
+export const API_ROOT = `${window.location.origin}/api/v3`
 
 type Params = { [k: string]: any }
 type Options = { [k: string]: any }
@@ -16,7 +16,7 @@ function isEmpty(value: any) {
 }
 
 // keep only parameters that are defined
-function filterParams(params: Params) {
+export function filterParams(params: Params) {
   const okParams: Params = {}
 
   for (const key in params) {

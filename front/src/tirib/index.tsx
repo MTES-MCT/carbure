@@ -1,4 +1,12 @@
 import { Entity, EntityType } from "common/types"
+import { Main } from "common/components"
+import { Section } from "common/components/section"
+import Topbar from "carbure/components/top-bar"
+import Footer from "carbure/components/footer"
+import Settings from "settings"
+import Entities from "../entities" // not using relative path prevents import
+import { EntitySelection } from "carbure/hooks/use-entity"
+import { AppHook } from "carbure/hooks/use-app"
 
 // check if a given entity can have access to the tirib page
 export function hasTirib(entity: Entity | null): boolean {
@@ -9,13 +17,16 @@ export function hasTirib(entity: Entity | null): boolean {
 }
 
 type TiribProps = {
+  entity: EntitySelection
   // specify the parameters that may be passed as props to the Tirib component
 }
 
-const Tirib = (props: TiribProps) => {
+const Tirib = ({entity}: TiribProps, { app }: { app: AppHook }) => {
   return (
     <div>
+      <Topbar entity={entity} settings={app.settings}/>
       <h1>Tirib</h1>
+      <Footer />
     </div>
   )
 }
