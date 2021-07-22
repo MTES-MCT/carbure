@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback } from "react"
 import { Trans, useTranslation } from "react-i18next"
 
 import { LotUploader } from "transactions/hooks/actions/use-upload-file"
@@ -13,9 +13,12 @@ import {
 import { Upload } from "common/components/icons"
 import { Box } from "common/components"
 import { Button } from "common/components/button"
+import { Basic } from "./dropzone"
 
 import styles from "./import.module.css"
 import { useMatomo } from "matomo"
+import { useDropzone } from "react-dropzone"
+import { Alert } from "common/components/alert"
 
 type ImportWrapperProps = PromptProps<File> & {
   children: React.ReactNode
@@ -28,32 +31,39 @@ type ImportPromptProps = PromptProps<File> & {
 const ImportWrapper = ({ children, onResolve }: ImportWrapperProps) => {
   const matomo = useMatomo()
   const { t } = useTranslation()
+  const onDrop = useCallback(acceptedFiles => { onResolve(acceptedFiles[0]) }, [])
+  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({ onDrop });
+  console.log(acceptedFiles)
 
   return (
     <Dialog onResolve={onResolve}>
-      <DialogTitle text={t("Import Excel")} />
-      <DialogText text={t("Importer un fichier Excel standardisé.")} />
+      <div  {...getRootProps()}>
+        <DialogTitle text={t("Import Excel")} />
+        <DialogText text={t("Importer un fichier Excel standardisé.")} />
 
-      <Box className={styles.importPrompt}>
-        {children}
-
-        <DialogButtons>
-          <Button as="label" level="primary" icon={Upload}>
-            <Trans>Importer lots</Trans>
-            <input
-              type="file"
-              className={styles.importFileInput}
-              onChange={(e) => {
-                matomo.push(["trackEvent", "transactions", "import-batches"])
-                onResolve(e!.target.files![0])
-              }}
-            />
-          </Button>
-          <Button onClick={() => onResolve()}>
-            <Trans>Annuler</Trans>
-          </Button>
-        </DialogButtons>
-      </Box>
+        <Box className={styles.importPrompt}>
+          <Alert level="info" className={styles.importInfo}>
+            <Trans>Vous pouvez glisser vos fichiers pour les déposer</Trans>
+          </Alert>
+          {children}
+          <DialogButtons>
+            <Button as="label" level="primary" icon={Upload}>
+              <Trans>Importer lots</Trans>
+              <input
+                type="file"
+                className={styles.importFileInput}
+                onChange={(e) => {
+                  matomo.push(["trackEvent", "transactions", "import-batches"])
+                  onResolve(e!.target.files![0])
+                }}
+              />
+            </Button>
+            <Button onClick={() => onResolve()}>
+              <Trans>Annuler</Trans>
+            </Button>
+          </DialogButtons>
+        </Box>
+      </div>
     </Dialog>
   )
 }

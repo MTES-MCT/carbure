@@ -1,3 +1,5 @@
+# PRODUCTION TEMPLATE FILE
+
 upstream django {
     server carbure-django-uwsgi:8001;
 }
