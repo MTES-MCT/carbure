@@ -1,4 +1,6 @@
 import React from "react"
+import IframeResizer from "iframe-resizer-react"
+import { stringify } from "querystring"
 
 import {
   Entity,
@@ -25,9 +27,11 @@ import { FilterSelection } from "transactions/hooks/query/use-filters"
 
 import { AlertCircle } from "common/components/icons"
 import { Box, LoaderOverlay } from "common/components"
-import { Alert } from "common/components/alert"
+import { Alert, Collapsible } from "common/components/alert"
 import Pagination from "common/components/pagination"
 import { TransactionTable } from "./list-table"
+
+import { API_ROOT, filterParams } from "common/services/api"
 
 import styles from "./list.module.css"
 
@@ -209,6 +213,18 @@ export const TransactionList = ({
             <AuditorActions disabled={!hasSelection} auditor={auditor} />
           )}
         </ActionBar>
+      )}
+
+      {isAdmin && (
+        <Collapsible title="Voir la carte" className={styles.collapsibleMap}>
+          <iframe
+          height="600"
+          title="Votre empreinte carbone"
+          src={`${API_ROOT}/admin/map?${stringify(filterParams(query))}`}
+          frameBorder="0"
+          allowTransparency
+        />
+        </Collapsible>
       )}
 
       {!isEmpty && (
