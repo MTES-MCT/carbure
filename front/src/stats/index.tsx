@@ -69,7 +69,7 @@ const Stats = ({ entity }: StatsProps) => {
     link1 = `https://metabase.carbure.beta.gouv.fr/public/dashboard/a960a32f-c14f-4835-9f6f-2553e951620c?hash=${entityHash.data?.hash}#hide_parameters=hash`
     link2 = `https://metabase.carbure.beta.gouv.fr/public/dashboard/f87e0e09-f82f-4ed1-82c6-2a8d85a1a8e3?hash=${entityHash.data?.hash}#hide_parameters=hash`
     link3 = `https://metabase.carbure.beta.gouv.fr/public/dashboard/801e5d6c-fb19-4f4c-82bb-06a7d0c7e5a8?hash=${entityHash.data?.hash}#hide_parameters=hash`
-    link4 = ``
+    link4 = `https://metabase.carbure.beta.gouv.fr/public/dashboard/8eb16042-a39e-469a-b357-10bcb3c4190d?hash=${entityHash.data?.hash}#hide_parameters=hash`
     link5 = `https://metabase.carbure.beta.gouv.fr/public/dashboard/70adcd33-801b-4ec4-a135-8cc5d33a6306?hash=${entityHash.data?.hash}#hide_parameters=hash`
     link6 = `https://metabase.carbure.beta.gouv.fr/public/dashboard/8d1e621d-f005-4904-a19d-e74305d3ce14?hash=${entityHash.data?.hash}#hide_parameters=hash`
     text6 = t("En savoir plus sur vos clients et vos fournisseurs")
