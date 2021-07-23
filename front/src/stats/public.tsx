@@ -22,10 +22,10 @@ const PublicStats = () => {
             allowTransparency
           />
         </Section>
-        <Section style={{backgroundColor:"#3150c0", alignSelf: "center", borderRadius: 15, width: "25%"}}>
+        <Section style={{boxShadow:"4px 4px 3px grey", backgroundColor:"#3150c0", alignSelf: "center", borderRadius: 15, width: "30%"}}>
           <h1 style={{alignSelf: "center"}}>
             <a href={publicLink} target="_blank" style={{color:"white"}}>
-              <Trans>Lien des stats</Trans>
+              <Trans>Lien des statistiques</Trans>
             </a>
           </h1>
         </Section>
