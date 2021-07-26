@@ -1,6 +1,7 @@
 import sys, os
 import django
 import csv
+import dateutil
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -13,14 +14,14 @@ with open(filename) as csvfile:
     reader = csv.reader(csvfile, quotechar='"')
     for row in reader:
         name = row[0]
-        if name == 'name':
+        if name == 'Name':
             continue
         address = row[1]
         cert_id = row[2]
-        vfrom = row[3]
-        vuntil = row[4]
+        vfrom = dateutil.parser.parse(row[3], dayfirst=True)
+        vuntil = dateutil.parser.parse(row[4], dayfirst=True)
         scope = row[5]
-
+        print(vuntil, vfrom)
 
         d = {}
         d['certificate_holder'] = name

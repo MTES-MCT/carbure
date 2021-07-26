@@ -19,10 +19,11 @@ from core.models import TransactionDistance
 from core.notifications import notify_pending_lot
 from core.ign_distance import get_distance
 
-from certificates.models import ISCCCertificate, EntityISCCTradingCertificate
+from certificates.models import DoubleCountingRegistration, ISCCCertificate, EntityISCCTradingCertificate
 from certificates.models import DBSCertificate, EntityDBSTradingCertificate
 from certificates.models import REDCertCertificate, EntityREDCertTradingCertificate
 from certificates.models import EntitySNTradingCertificate, SNCertificate
+from certificates.models import DoubleCountingRegistration
 
 import dateutil.parser
 from api.v3.sanity_checks import bulk_sanity_checks, tx_is_valid, lot_is_valid
@@ -77,6 +78,30 @@ def try_get_certificate(certificate):
         d['certificate_type'] = 'SN'
     return d
 
+def try_get_double_counting_certificate(cert):
+    d = {
+         'holder': '',
+         'valid_until': '',
+         'valid_from': '',
+         'matches': 0,
+         'found': False,
+         'certificate_id': cert,
+         }
+    matches = DoubleCountingRegistration.objects.filter(certificate_id=cert)
+    count = matches.count()
+    d['matches'] = count
+    if count == 0:
+        return d
+    elif count > 1:
+        return d
+    else:
+        c = matches[0]
+        d['found'] = True
+        d['holder'] = c.certificate_holder
+        d['valid_from'] = c.valid_from
+        d['valid_until'] = c.valid_until
+    return d
+
 
 def check_certificates(tx):
     d = {
@@ -93,6 +118,12 @@ def check_certificates(tx):
         d['supplier_certificate'] = try_get_certificate(tx.lot.unknown_supplier_certificate)
     if tx.carbure_vendor_certificate:
         d['vendor_certificate'] = try_get_certificate(tx.carbure_vendor_certificate)
+    if tx.lot.unknown_production_site_dbl_counting:
+        d['unknown_production_site_dbl_counting'] = try_get_double_counting_certificate(tx.lot.unknown_production_site_dbl_counting)
+    elif tx.lot.carbure_production_site and tx.lot.carbure_production_site.dc_reference:
+        d['double_counting_reference'] = try_get_double_counting_certificate(tx.lot.unknown_production_site_dbl_counting)
+    else:
+        pass
     return d
 
 def get_uploaded_files_directory():
