@@ -1,11 +1,11 @@
 from django.contrib import admin
 
-from certificates.models import DoubleCoutingRegistration, DoubleCoutingRegistrationInputOutput, SNCategory, SNCertificate, SNCertificateScope
+from certificates.models import SNCategory, SNCertificate, SNCertificateScope
 from certificates.models import ISCCScope, ISCCCertificateRawMaterial, ISCCCertificate, ISCCCertificateScope
 from certificates.models import DBSCertificate, DBSScope, DBSCertificateScope
 from certificates.models import REDCertScope, REDCertBiomassType, REDCertCertificate, REDCertCertificateScope, REDCertCertificateBiomass
 from certificates.models import ProductionSiteCertificate, EntityISCCTradingCertificate, EntitySNTradingCertificate, EntityDBSTradingCertificate, EntityREDCertTradingCertificate
-from certificates.models import DoubleCoutingRegistration, DoubleCoutingRegistrationInputOutput
+from certificates.models import DoubleCountingRegistration, DoubleCountingRegistrationInputOutput
 
 class SNCategoryAdmin(admin.ModelAdmin):
     list_display = ('category_id', 'description',)
@@ -147,13 +147,13 @@ admin.site.register(EntityREDCertTradingCertificate, EntityREDCertTradingCertifi
 admin.site.register(ProductionSiteCertificate, ProductionSiteCertificateAdmin)    
 
 
-@admin.register(DoubleCoutingRegistration)
-class DoubleCoutingRegistrationAdmin(admin.ModelAdmin):
+@admin.register(DoubleCountingRegistration)
+class DoubleCountingRegistrationAdmin(admin.ModelAdmin):
     list_display = ('certificate_id', 'certificate_holder', 'valid_from', 'valid_until')
     search_fields = ('certificate_id', 'certificate_holder',)
 
-@admin.register(DoubleCoutingRegistrationInputOutput)
-class DoubleCoutingRegistrationAdmin(admin.ModelAdmin):
+@admin.register(DoubleCountingRegistrationInputOutput)
+class DoubleCountingRegistrationAdmin(admin.ModelAdmin):
     list_display = ('get_certid', 'get_holder', 'biofuel', 'feedstock')
     search_fields = ('certificate__certificate_id', 'certificate__certificate_holder', )
 

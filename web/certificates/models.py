@@ -398,7 +398,7 @@ class ProductionSiteCertificate(models.Model):
         verbose_name_plural = 'Certificats de sites de productions'
 
 
-class DoubleCoutingRegistration(models.Model):
+class DoubleCountingRegistration(models.Model):
     certificate_id = models.CharField(max_length=64, null=False, blank=False)
     certificate_holder = models.CharField(max_length=256, null=False, blank=False)
     registered_address = models.TextField(blank=False, null=False)
@@ -414,8 +414,8 @@ class DoubleCoutingRegistration(models.Model):
         verbose_name_plural = 'Certificats Double Compte'    
 
 
-class DoubleCoutingRegistrationInputOutput(models.Model):
-    certificate = models.ForeignKey(DoubleCoutingRegistration, blank=False, null=False, on_delete=models.CASCADE)
+class DoubleCountingRegistrationInputOutput(models.Model):
+    certificate = models.ForeignKey(DoubleCountingRegistration, blank=False, null=False, on_delete=models.CASCADE)
     biofuel = models.ForeignKey(Biocarburant, null=False, blank=False, on_delete=models.CASCADE)
     feedstock = models.ForeignKey(MatierePremiere, blank=True, null=True, on_delete=models.CASCADE)
 
