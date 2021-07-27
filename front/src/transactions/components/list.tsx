@@ -47,7 +47,7 @@ import {
   CreateActions,
   AuditorActions,
   AdminActions,
-  AcceptedActions,
+  CorrectionActions,
 } from "./list-actions"
 import {
   DeadlineFilter,
@@ -191,8 +191,8 @@ export const TransactionList = ({
             <ToFixActions disabled={!hasSelection} deleter={deleter} />
           )}
 
-          {status.is(LotStatus.Accepted) && (
-            <AcceptedActions disabled={!hasSelection} acceptor={acceptor} />
+          {(status.is(LotStatus.Accepted) || status.is(LotStatus.Inbox) || status.is(LotStatus.Validated)) && (
+            <CorrectionActions disabled={!hasSelection} acceptor={acceptor} />
           )}
 
           {isOperator &&
