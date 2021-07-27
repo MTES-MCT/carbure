@@ -471,3 +471,7 @@ export function highlightAuditorLots(
     notify_admin,
   })
 }
+
+export function addAdminComment(tx_ids: number[], comment: string) {
+  return api.post("/admin/lots/comment", { tx_ids, comment })
+}

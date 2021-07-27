@@ -8,7 +8,7 @@ import { Transaction } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { useTranslation } from "react-i18next"
 import { confirm, prompt } from "common/components/dialog"
-import { PinPrompt } from "transactions/components/pin"
+import { PinPrompt, PinConfig } from "transactions/components/pin"
 
 export interface LotAdministrator {
   loading: boolean
@@ -36,6 +36,8 @@ export default function useAdministrateLots(
   const [requestHighlightAlert, resolveHighlightAlerts] = useAPI(
     api.postHighlightAlerts
   )
+
+  const [adminComment, addAdminComment] = useAPI(api.addAdminComment)
 
   async function notify(promise: Promise<any>) {
     const res = await promise
@@ -111,8 +113,9 @@ export default function useAdministrateLots(
 
       return Boolean(shouldHighlight)
     } else {
-      const shouldHighlight = await prompt<boolean>((resolve) => (
+      const pinConfig = await prompt<PinConfig>((resolve) => (
         <PinPrompt
+          commentable
           role="admin"
           title={t("Épingler ce lot")}
           description={t(
@@ -122,19 +125,25 @@ export default function useAdministrateLots(
         />
       ))
 
-      if (typeof shouldHighlight === "boolean") {
-        await notify(resolveHighlightLots(entity.id, [tx.id], shouldHighlight))
+      if (pinConfig !== undefined) {
+        const waiting = Promise.all([
+          resolveHighlightLots(entity.id, [tx.id], pinConfig.checked),
+          addAdminComment([tx.id], pinConfig.comment)
+        ])
+
+        await notify(waiting)
       }
 
-      return Boolean(shouldHighlight)
+      return Boolean(pinConfig)
     }
   }
 
   async function markSelectionForReview() {
     if (!entity) return false
 
-    const shouldHighlight = await prompt<boolean>((resolve) => (
+    const pinConfig = await prompt<PinConfig>((resolve) => (
       <PinPrompt
+        commentable
         role="admin"
         title={t("Épingler la sélection")}
         description={t(
@@ -144,13 +153,16 @@ export default function useAdministrateLots(
       />
     ))
 
-    if (typeof shouldHighlight === "boolean") {
-      await notify(
-        resolveHighlightLots(entity.id, selection.selected, shouldHighlight)
-      )
+    if (pinConfig !== undefined) {
+      const waiting = Promise.all([
+        resolveHighlightLots(entity.id, selection.selected, pinConfig.checked),
+        addAdminComment(selection.selected, pinConfig.comment)
+      ])
+
+      await notify(waiting)
     }
 
-    return Boolean(shouldHighlight)
+    return Boolean(pinConfig)
   }
 
   return {
@@ -158,12 +170,14 @@ export default function useAdministrateLots(
       requestHide.loading ||
       requestHideAlert.loading ||
       requestHighlightAlert.loading ||
-      requestHighlight.loading,
+      requestHighlight.loading ||
+      adminComment.loading,
     markAsRead,
     markSelectionAsRead,
     markForReview,
     markSelectionForReview,
     hideAlerts,
     highlightAlerts,
+
   }
 }

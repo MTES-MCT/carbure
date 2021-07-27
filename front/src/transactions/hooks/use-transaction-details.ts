@@ -61,6 +61,7 @@ export default function useTransactionDetails(
   const [details, resolveDetails] = useAPI(detailsGetter(entity))
   const [request, resolveUpdate] = useAPI(api.updateLot)
   const [comment, resolveComment] = useAPI(api.commentLot)
+  const [adminComment, resolveAddAdminComment] = useAPI(api.addAdminComment)
 
   const fieldErrors = useFieldErrors(details.data?.errors ?? [])
 
@@ -101,7 +102,14 @@ export default function useTransactionDetails(
   async function addComment(message: string) {
     if (typeof entityID !== "undefined") {
       await resolveComment(entityID, txID, message, "both")
-      await resolveDetails(entityID, txID)
+      refreshDetails()
+    }
+  }
+
+  async function addAdminComment(message: string) {
+    if (typeof entityID !== "undefined") {
+      await resolveAddAdminComment([txID], message)
+      refreshDetails()
     }
   }
 
@@ -131,6 +139,7 @@ export default function useTransactionDetails(
     submit,
     close,
     addComment,
+    addAdminComment,
     refreshDetails,
   }
 }

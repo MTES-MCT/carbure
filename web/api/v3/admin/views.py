@@ -745,20 +745,20 @@ def hide_transactions(request):
 
 @is_admin
 def admin_comment_transaction(request):
-    tx_id = request.POST.get('tx_id', False)
+    tx_ids = request.POST.getlist('tx_ids', False)
     comment = request.POST.get('comment', False)
 
-    if not tx_id:
-        return JsonResponse({'status': 'error', 'message': "Missing tx_id"}, status=400)
+    if not tx_ids:
+        return JsonResponse({'status': 'error', 'message': "Missing tx_ids"}, status=400)
     if not comment:
         return JsonResponse({'status': 'error', 'message': "Missing comment"}, status=400)
 
-    tx = LotTransaction.objects.get(id=tx_id)
-
-    c = AdminTransactionComment()
-    c.related_tx = tx
-    c.comment = comment
-    c.save()
+    for tx_id in tx_ids:
+        tx = LotTransaction.objects.get(id=tx_id)
+        c = AdminTransactionComment()
+        c.tx = tx
+        c.comment = comment
+        c.save()
     return JsonResponse({'status': 'success'})
 
 

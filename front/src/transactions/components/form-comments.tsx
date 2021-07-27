@@ -20,8 +20,9 @@ import styles from "./form-comments.module.css"
 import TransactionSummary, { useSummary } from "./summary"
 
 type CommentsProps = {
-  readOnly: boolean
+  readOnly?: boolean
   loading: boolean
+  title: string
   comments: Comment[]
   onComment?: (c: string) => void
 }
@@ -29,6 +30,7 @@ type CommentsProps = {
 const Comments = ({
   readOnly,
   loading,
+  title,
   comments,
   onComment,
 }: CommentsProps) => {
@@ -45,7 +47,7 @@ const Comments = ({
     <Collapsible
       level="info"
       icon={Message}
-      title={`Commentaires (${comments.length})`}
+      title={`${title} (${comments.length})`}
       className={styles.comments}
     >
       <table>
@@ -53,7 +55,7 @@ const Comments = ({
           {comments.map((c, i) => (
             <tr key={i}>
               <td>
-                <b>{c.entity.name}:</b>
+                <b>{c.entity?.name ?? 'Admin'}:</b>
               </td>
               <td>{c.comment}</td>
             </tr>
