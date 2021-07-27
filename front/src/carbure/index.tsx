@@ -134,9 +134,9 @@ const Org = ({ app }: { app: AppHook }) => {
           </Route>
         )}
 
-        <Route relative path="stats">
+        {/* <Route relative path="stats">
           <Stats entity={entity} />
-        </Route>
+        </Route> */}
 
         {/* cette route permet d'afficher le component Tirib uniquement lorsque l'url de la page finit par "tirib" */}
         {hasTirib(entity) && (

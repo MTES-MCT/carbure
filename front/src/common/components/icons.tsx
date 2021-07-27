@@ -14,7 +14,6 @@ export type IconProps = SystemProps & Merge<JSX.IntrinsicElements["svg"], {
   stroke?: number
   className?: string
   title?: string
-  // onClick?: (e: React.MouseEvent) => void
 }>
 
 const Icon = ({
