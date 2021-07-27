@@ -37,6 +37,7 @@ urlpatterns = [
     path('lots/hide-transactions', views.hide_transactions, name='api-v3-admin-hide-transactions'),
     path('lots/highlight-transactions', views.highlight_transactions, name='api-v3-admin-highlight-transactions'),
     path('lots/comment', views.admin_comment_transaction, name='api-v3-admin-comment-transaction'),
+    path('lots/delete', views.admin_delete_transaction, name='api-v3-admin-delete-transaction'),
 
 
     # MAP VISUALIZATION

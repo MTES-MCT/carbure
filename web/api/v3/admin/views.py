@@ -762,6 +762,23 @@ def admin_comment_transaction(request):
     return JsonResponse({'status': 'success'})
 
 
+@is_admin
+def admin_delete_transaction(request):
+    tx_id = request.POST.get('tx_id', False)
+
+    if not tx_id:
+        return JsonResponse({'status': 'error', 'message': "Missing tx_id"}, status=400)
+
+    tx = LotTransaction.objects.get(id=tx_id)
+    lot_id = tx.lot.id
+    tx.delete()
+    lot = LotV2.objects.get(id=lot_id)
+    remaining_tx = LotTransaction.objects.filter(lot=lot).count()
+    if remaining_tx == 0:
+        lot.delete()
+    return JsonResponse({'status': 'success'})
+
+
 # not an api endpoint
 def couleur():
     liste = ["#FF0040","#DF01A5","#BF00FF","#4000FF","#0040FF","#00BFFF",
