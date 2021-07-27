@@ -515,9 +515,13 @@ class TransactionComment(models.Model):
 class AdminTransactionComment(models.Model):
     tx = models.ForeignKey(LotTransaction, on_delete=models.CASCADE)
     comment = models.TextField()
+    datetime = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.comment)
+
+    def natural_key(self):
+        return {'comment':self.comment, 'datetime': self.datetime}
 
     class Meta:
         db_table = 'admin_tx_comments'
