@@ -23,6 +23,7 @@ export interface LotAcceptor {
   acceptAllInbox: () => Promise<boolean>
   amendLot: (tx: Transaction) => Promise<boolean>
   askForCorrection: (tx: Transaction) => Promise<boolean>
+  requestCorrections: () => Promise<boolean>
 }
 
 export default function useAcceptLots(
@@ -38,6 +39,7 @@ export default function useAcceptLots(
   const [request, resolveAccept] = useAPI(api.acceptLots)
   const [requestAmend, resolveAmendLot] = useAPI(api.amendAndCommentLot)
   const [requestComment, resolveAcceptAndComment] = useAPI(api.acceptAndCommentLot) // prettier-ignore
+  const [requestCorrection, resolveRequestCorrection] = useAPI(api.requestCorrections) // prettier-ignore
 
   async function notifyAccept(promise: Promise<any>, many: boolean = false) {
     const res = await promise
@@ -61,7 +63,7 @@ export default function useAcceptLots(
     }
   }
 
-  async function notifyCorrection(promise: Promise<any>) {
+  async function notifyCorrection(promise: Promise<any>, many?: boolean) {
     const res = await promise
 
     if (res) {
@@ -69,12 +71,16 @@ export default function useAcceptLots(
 
       notifications.push({
         level: "success",
-        text: t("Le lot a bien été envoyé en correction !"),
+        text: many
+          ? t("Les lots ont bien été envoyés en correction !")
+          : t("Le lot a bien été envoyé en correction !"),
       })
     } else {
       notifications.push({
         level: "error",
-        text: t("Impossible de corriger ce lot."),
+        text: many
+          ? t("Impossible de corriger ces lots.")
+          : t("Impossible de corriger ce lot."),
       })
     }
   }
@@ -186,13 +192,35 @@ export default function useAcceptLots(
     return false
   }
 
+  async function requestCorrections() {
+    if (entity === null) return false
+
+    const allTxids = await prompt<number[]>((resolve) => (
+      <SummaryPrompt
+        stock={stock}
+        title={t("Demander des corrections")}
+        description={t("Voulez-vous envoyer ces lots en correction ?")}
+        query={query}
+        selection={selection.selected}
+        onResolve={resolve}
+      />
+    )) 
+
+    if (allTxids !== undefined) {
+      await notifyCorrection(resolveRequestCorrection(entity.id, allTxids), true)
+    }
+
+    return Boolean(allTxids)
+  }
+
   return {
-    loading: request.loading || requestComment.loading || requestAmend.loading,
+    loading: request.loading || requestComment.loading || requestAmend.loading || requestCorrection.loading,
     acceptLot,
     acceptAndCommentLot,
     acceptSelection,
     acceptAllInbox,
     amendLot,
     askForCorrection,
+    requestCorrections
   }
 }

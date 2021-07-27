@@ -25,6 +25,7 @@ import {
   EyeOff,
   Pin,
   PinOff,
+  ChevronRight
 } from "common/components/icons"
 import Table, { Actions, arrow, Column, Row } from "common/components/table"
 import * as C from "./list-columns"
@@ -50,11 +51,19 @@ const getDraftActions = ({
     { icon: Cross, title: t("Supprimer le lot"), action: onDelete },
   ])
 
-const getToFixActions = ({ onCorrect, onDelete, t }: TxActions): TxColumn =>
-  Actions([
-    { icon: Check, title: t("Renvoyer le lot"), action: onCorrect },
-    { icon: Cross, title: t("Supprimer le lot"), action: onDelete },
-  ])
+const getToFixActions = ({ onCorrect, onDelete, t }: TxActions, entity: Entity): TxColumn => 
+  Actions((tx) => {
+    // no actions if the entity does not own the tx
+    if (tx.carbure_vendor?.id !== entity.id && tx.lot.added_by?.id !== entity.id) {
+      return [{ icon: ChevronRight, title: '', action: () => {} }]
+    }
+    
+    return [
+      { icon: Check, title: t("Renvoyer le lot"), action: onCorrect },
+      { icon: Cross, title: t("Supprimer le lot"), action: onDelete },
+    ]
+})
+
 
 const getInboxActions = ({
   onAccept,
@@ -222,7 +231,7 @@ export const TransactionTable = ({
   } else if (status.is(LotStatus.Draft)) {
     columns.push(getDraftActions({ t, onValidate, onDuplicate, onDelete }))
   } else if (status.is(LotStatus.ToFix)) {
-    columns.push(getToFixActions({ t, onCorrect, onDelete }))
+    columns.push(getToFixActions({ t, onCorrect, onDelete }, entity))
   } else if (status.is(LotStatus.Inbox)) {
     columns.push(getInboxActions({ t, onAccept, onComment, onReject }))
   } else if (isProducer || isTrader) {

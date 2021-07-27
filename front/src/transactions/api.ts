@@ -479,3 +479,7 @@ export function addAdminComment(tx_ids: number[], comment: string) {
 export function deleteAdminLots(tx_ids: number[]) {
   return api.post('/admin/lots/delete', { tx_ids })
 }
+
+export function requestCorrections(entity_id: number, tx_ids: number[]) {
+  return api.post('/lots/request-corrections', { entity_id, tx_ids })
+}

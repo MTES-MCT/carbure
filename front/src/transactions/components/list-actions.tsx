@@ -20,6 +20,7 @@ import {
   Forward,
   Search,
   Pin,
+  Edit,
   EyeOff,
 } from "common/components/icons"
 import { prompt } from "common/components/dialog"
@@ -269,6 +270,37 @@ export const InboxActions = ({
       >
         <Trans>
           Refuser {{ what: hasSelection ? t("sélection") : t("tout") }}
+        </Trans>
+      </AsyncButton>
+    </React.Fragment>
+  )
+}
+
+type AcceptedActionsProps = {
+  disabled: boolean
+  acceptor: LotAcceptor
+}
+
+export const AcceptedActions = ({
+  disabled,
+  acceptor,
+}: AcceptedActionsProps) => {
+  const matomo = useMatomo()
+
+  return (
+    <React.Fragment>
+      <AsyncButton
+        icon={Edit}
+        level="warning"
+        loading={acceptor.loading}
+        disabled={disabled}
+        onClick={() => {
+          matomo.push(["trackEvent", "transactions", "request-many-corrections"])
+          acceptor.requestCorrections()
+        }}
+      >
+        <Trans>
+          Demander une correction
         </Trans>
       </AsyncButton>
     </React.Fragment>
