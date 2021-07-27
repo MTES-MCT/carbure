@@ -6,14 +6,16 @@ import { SystemProps } from "."
 
 // icons were adapted from https://github.com/tabler/tabler-icons
 
-export type IconProps = SystemProps & {
+type Merge<A, B> = Omit<A, keyof B> & B
+
+export type IconProps = SystemProps & Merge<JSX.IntrinsicElements["svg"], {
   size?: number
   color?: string
   stroke?: number
   className?: string
   title?: string
-  onClick?: (e: React.MouseEvent) => void
-}
+  // onClick?: (e: React.MouseEvent) => void
+}>
 
 const Icon = ({
   size = 24,

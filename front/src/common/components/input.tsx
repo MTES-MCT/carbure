@@ -72,6 +72,7 @@ export type LabelInputProps = InputProps & {
   label?: string
   error?: string
   tooltip?: string
+  icon?: React.ComponentType<IconProps>
 }
 
 export const LabelInput = ({
@@ -82,6 +83,7 @@ export const LabelInput = ({
   className,
   required,
   style,
+  icon,
   ...props
 }: LabelInputProps) => (
   <Label
@@ -90,8 +92,9 @@ export const LabelInput = ({
     error={error}
     tooltip={tooltip}
     label={label}
-    className={className}
+    icon={icon}
     readOnly={props.readOnly}
+    className={className}
     style={style}
   >
     <Input {...props} disabled={disabled} />

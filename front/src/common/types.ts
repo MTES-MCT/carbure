@@ -127,7 +127,7 @@ export interface ProductionSiteDetails extends ProductionSite {
 
 export interface Distance {
   distance: number;
-  link: string; 
+  link: string;
   error: string; // PRODUCTION_SITE_NOT_IN_CARBURE, DELIVERY_SITE_NOT_IN_CARBURE, PRODUCTION_SITE_COORDINATES_NOT_IN_CARBURE, DELIVERY_SITE_COORDINATES_NOT_IN_CARBURE, API_ERROR
   source: null | "DB" | "API";
 }
@@ -289,6 +289,8 @@ export interface LotDetails {
     production_site_certificate: CertificateInfo | null
     supplier_certificate: CertificateInfo | null
     vendor_certificate: CertificateInfo | null
+    double_counting_reference: DoubleCountingCertificateInfo | null
+    unknown_production_site_dbl_counting: DoubleCountingCertificateInfo | null
   }
 }
 
@@ -464,6 +466,15 @@ export interface CertificateInfo {
   matches: number
   found: boolean
   scope: string[]
+}
+
+export interface DoubleCountingCertificateInfo {
+  certificate_id: string
+  holder: string
+  valid_from: string
+  valid_until: string
+  matches: number
+  found: boolean
 }
 
 export type ProductionCertificate = {
