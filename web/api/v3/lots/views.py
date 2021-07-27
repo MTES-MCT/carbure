@@ -124,11 +124,10 @@ def get_snapshot(request, *args, **kwargs):
     elif entity.entity_type == Entity.OPERATOR:
         txs = LotTransaction.objects.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True) | Q(carbure_vendor=entity))
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
-        txs = txs.filter(lot__year=year)
-        draft = txs.filter(lot__added_by=entity, lot__status=LotV2.DRAFT).count()
-        ins = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.PENDING, LotTransaction.FIXED], is_mac=False).count()
-        tofix = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED]).count()
-        accepted = txs.filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
+        draft = LotTransaction.objects.filter(lot__year=year, lot__added_by=entity, lot__status=LotV2.DRAFT).count()
+        ins = LotTransaction.objects.filter(carbure_client=entity, lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.PENDING, LotTransaction.FIXED], is_mac=False).count()
+        tofix = LotTransaction.objects.filter(Q(carbure_client=entity) | Q(lot__added_by=entity) | Q(carbure_vendor=entity)).filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED]).count()
+        accepted = LotTransaction.objects.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True) | Q(carbure_vendor=entity)).filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
         data['lots'] = {'draft': draft, 'accepted': accepted, 'in': ins, 'tofix': tofix}
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
@@ -463,8 +462,6 @@ def amend_lot(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
 
     if tx.carbure_vendor != entity and tx.lot.added_by != entity:
-        print(tx.carbure_vendor)
-        print(entity)
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     if tx.delivery_status in [LotTransaction.ACCEPTED, LotTransaction.FROZEN]:
@@ -477,6 +474,44 @@ def amend_lot(request, *args, **kwargs):
     tx.delivery_status = LotTransaction.TOFIX
     tx.save()
     return JsonResponse({'status': 'success'})
+
+@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
+def request_corrections(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    tx_ids = request.POST.getlist('tx_ids', None)
+    if not tx_ids:
+        return JsonResponse({'status': 'forbidden', 'message': "Missing tx_ids"}, status=403)
+    for tx_id in tx_ids:
+        try:
+            tx = LotTransaction.objects.get(id=tx_id)
+        except Exception:
+            return JsonResponse({'status': 'error', 'message': "TX not found"}, status=400)
+
+        if entity != tx.carbure_client and entity != tx.carbure_vendor and entity != tx.lot.added_by:
+            return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+        if tx.delivery_status == LotTransaction.FROZEN:
+            # invalidate declaration for both client and vendor
+            if tx.carbure_client:
+                notify_declaration_invalidated(tx, tx.carbure_client)
+            if tx.carbure_vendor:
+                notify_declaration_invalidated(tx, tx.carbure_vendor)
+        
+        # notify the vendor that a correction is needed
+        if tx.delivery_status in [LotTransaction.ACCEPTED, LotTransaction.FROZEN]:
+            # create notification / alert
+            notify_accepted_lot_in_correction(tx)
+
+        TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field='status', value_before=tx.delivery_status, value_after=LotTransaction.TOFIX, modified_by=request.user, modified_by_entity=entity)
+        tx.delivery_status = LotTransaction.TOFIX
+        tx.save()
+    return JsonResponse({'status': 'success'})
+
+
+
+
+
 
 @check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
 def reject_lot(request, *args, **kwargs):
