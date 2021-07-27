@@ -559,8 +559,7 @@ test("producer/trader: resend fixed lot", async () => {
   userEvent.click(send)
 
   // confirm the fix by adding a comment
-  const title = screen.getByText("Envoyer lot")
-  userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "ok")
+  const title = screen.getByText("Renvoyer le lot", { selector: 'h1' })
   userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()

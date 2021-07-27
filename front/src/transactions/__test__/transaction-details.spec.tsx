@@ -375,8 +375,7 @@ test("resend tofix lot from details", async () => {
   userEvent.click(send)
 
   // confirm the sending
-  const title = screen.getByText("Envoyer lot")
-  userEvent.type(screen.getByLabelText("Commentaire (obligatoire)"), "test is fixed") // prettier-ignore
+  const title = screen.getByText("Renvoyer le lot")
   userEvent.click(screen.getByText("Confirmer"))
 
   expect(title).not.toBeInTheDocument()
@@ -385,9 +384,8 @@ test("resend tofix lot from details", async () => {
 
   await screen.findByText("Corrigé")
 
-  const comments = screen.getByText("Commentaires (2)")
+  const comments = screen.getByText("Commentaires (1)")
   userEvent.click(comments)
-  screen.getByText("test is fixed")
 
   userEvent.click(screen.getByText("Retour"))
 })
