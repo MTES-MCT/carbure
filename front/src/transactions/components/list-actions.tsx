@@ -276,15 +276,15 @@ export const InboxActions = ({
   )
 }
 
-type AcceptedActionsProps = {
+type CorrectionActionsProps = {
   disabled: boolean
   acceptor: LotAcceptor
 }
 
-export const AcceptedActions = ({
+export const CorrectionActions = ({
   disabled,
   acceptor,
-}: AcceptedActionsProps) => {
+}: CorrectionActionsProps) => {
   const matomo = useMatomo()
 
   return (
