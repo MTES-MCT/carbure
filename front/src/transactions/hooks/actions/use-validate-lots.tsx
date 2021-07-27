@@ -5,7 +5,7 @@ import { TransactionSelection } from "../query/use-selection"
 import * as api from "transactions/api"
 import useAPI from "../../../common/hooks/use-api"
 
-import { prompt } from "../../../common/components/dialog"
+import { prompt, confirm } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
 import { CommentPrompt } from "transactions/components/form-comments"
 import {
@@ -97,16 +97,19 @@ export default function useValidateLots(
   }
 
   async function validateAndCommentLot(tx: Transaction) {
-    const comment = await prompt<string>((resolve) => (
-      <CommentPrompt
-        title={t("Envoyer lot")}
-        description={t("Voulez vous renvoyer ce lot corrigé ?")}
-        onResolve={resolve}
-      />
-    ))
+    const comment = await confirm(t("Renvoyer le lot"), t("Voulez-vous renvoyer ce lot corrigé ?"))
+    
+    
+    // await prompt<string>((resolve) => (
+    //   <CommentPrompt
+    //     title={t("Envoyer lot")}
+    //     description={t("Voulez vous renvoyer ce lot corrigé ?")}
+    //     onResolve={resolve}
+    //   />
+    // ))
 
     if (entity !== null && comment) {
-      await notifyValidate(resolveValidateAndComment(entity.id, tx.id, comment))
+      await notifyValidate(resolveValidateAndComment(entity.id, tx.id, ''))
     }
 
     return Boolean(comment)

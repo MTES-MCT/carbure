@@ -226,10 +226,9 @@ export async function validateAndCommentLot(
   transactionID: number,
   comment: string
 ) {
-  const commenting = await commentLot(entityID, transactionID, comment, "both")
   const validating = await validateLots(entityID, [transactionID])
-
-  return [validating, commenting]
+  // const commenting = await commentLot(entityID, transactionID, comment, "both")
+  return [validating, Promise.resolve({})]
 }
 
 export async function acceptAndCommentLot(
