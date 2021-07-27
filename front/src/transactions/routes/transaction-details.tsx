@@ -80,6 +80,7 @@ const TransactionDetails = ({
     submit,
     close,
     addComment,
+    addAdminComment,
     refreshDetails,
   } = useTransactionDetails(entity, refresh)
 
@@ -142,10 +143,20 @@ const TransactionDetails = ({
 
       {details.data && details.data.comments.length > 0 && (
         <Comments
+          title={t("Commentaires")}
           readOnly={!isCommentable}
           loading={comment.loading}
           comments={details.data.comments}
           onComment={addComment}
+        />
+      )}
+
+      {details.data?.admin_comments && details.data.admin_comments.length > 0 && (
+        <Comments
+          title={t("Notes admin")}
+          loading={comment.loading}
+          comments={details.data.admin_comments}
+          onComment={addAdminComment}
         />
       )}
 

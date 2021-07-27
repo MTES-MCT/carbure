@@ -1,4 +1,5 @@
 import React from "react"
+import { useTranslation } from 'react-i18next'
 
 import { LotStatus, Transaction, UserRole } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
@@ -67,6 +68,7 @@ const StockDetails = ({
     refreshDetails,
   } = useStockDetails(entity, refresh)
 
+  const { t } = useTranslation()
   const rights = useRights()
   const navigator = useNavigate(transactions)
 
@@ -111,6 +113,7 @@ const StockDetails = ({
       {details.data && details.data.comments.length > 0 && (
         <Comments
           readOnly
+          title={t("Commentaires")}
           loading={details.loading}
           comments={details.data.comments}
         />

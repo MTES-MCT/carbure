@@ -8,7 +8,7 @@ import { confirm, prompt } from "common/components/dialog"
 import { useNotificationContext } from "common/components/notifications"
 import { Transaction } from "common/types"
 import { TransactionSelection } from "../query/use-selection"
-import { PinPrompt } from "transactions/components/pin"
+import { PinPrompt, PinConfig } from "transactions/components/pin"
 
 export interface LotAuditor {
   loading: boolean
@@ -92,7 +92,7 @@ export default function useAuditLots(
 
       return Boolean(shouldHighlight)
     } else {
-      const shouldHighlight = await prompt<boolean>((resolve) => (
+      const shouldHighlight = await prompt<PinConfig>((resolve) => (
         <PinPrompt
           role="auditor"
           title={t("Épingler ce lot")}
@@ -114,8 +114,9 @@ export default function useAuditLots(
   async function highlightLotSelection() {
     if (!entity) return false
 
-    const shouldHighlight = await prompt<boolean>((resolve) => (
+    const pinConfig = await prompt<PinConfig>((resolve) => (
       <PinPrompt
+
         role="auditor"
         title={t("Épingler la sélection")}
         description={t(
@@ -125,13 +126,13 @@ export default function useAuditLots(
       />
     ))
 
-    if (typeof shouldHighlight === "boolean") {
+    if (pinConfig !== undefined) {
       await notify(
-        resolveHighlightLot(entity.id, selection.selected, shouldHighlight)
+        resolveHighlightLot(entity.id, selection.selected, pinConfig.checked)
       )
     }
 
-    return Boolean(shouldHighlight)
+    return Boolean(pinConfig)
   }
 
   return {

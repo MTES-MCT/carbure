@@ -14,10 +14,16 @@ import { Box, SystemProps } from "common/components"
 import { Button } from "common/components/button"
 
 import styles from "common/components/dialog.module.css"
-import { LabelCheckbox } from "common/components/input"
+import { LabelCheckbox, LabelInput } from "common/components/input"
+
+export interface PinConfig {
+  checked: boolean,
+  comment: string
+}
 
 type PinPromptProps = SystemProps &
-  PromptProps<boolean> & {
+  PromptProps<PinConfig> & {
+    commentable?: boolean
     title: string
     description: string
     role: "admin" | "auditor"
@@ -26,12 +32,14 @@ type PinPromptProps = SystemProps &
 export const PinPrompt = ({
   title,
   description,
+  commentable,
   children,
   role,
   onResolve,
 }: PinPromptProps) => {
   const { t } = useTranslation()
   const [checked, setChecked] = useState(false)
+  const [comment, setComment] = useState('')
 
   const label =
     role === "admin"
@@ -43,18 +51,28 @@ export const PinPrompt = ({
       <DialogTitle text={title} />
       <DialogText text={description} />
 
-      <Box className={styles.dialogCheckboxes}>
-        <LabelCheckbox
-          label={label}
-          checked={checked}
-          onChange={(e) => setChecked(e.target.checked)}
+      <Box>
+        <LabelInput 
+          label={t("Commentaire")}
+          value={comment}
+          onChange={e => setComment(e.target.value)}
         />
       </Box>
+
+      {commentable && (
+        <Box className={styles.dialogCheckboxes}>
+          <LabelCheckbox
+            label={label}
+            checked={checked}
+            onChange={(e) => setChecked(e.target.checked)}
+          />
+        </Box>
+      )}
 
       {children}
 
       <DialogButtons>
-        <Button level="primary" icon={Check} onClick={() => onResolve(checked)}>
+        <Button level="primary" icon={Check} onClick={() => onResolve({checked, comment})}>
           <Trans>Confirmer</Trans>
         </Button>
         <Button icon={Return} onClick={() => onResolve()}>

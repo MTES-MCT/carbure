@@ -262,8 +262,8 @@ export interface Lots {
 }
 
 export interface Comment {
-  entity: Entity
-  topic: string
+  entity?: Entity
+  topic?: string
   comment: string
 }
 
@@ -281,6 +281,7 @@ export interface LotUpdate {
 export interface LotDetails {
   transaction: Transaction
   comments: Comment[]
+  admin_comments?: Comment[]
   deadline: string
   errors: GenericError[]
   updates?: LotUpdate[]
