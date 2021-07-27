@@ -56,5 +56,7 @@
   "UNKNOWN_VENDOR_CERT": "Certificat de fournisseur inconnu",
   "EXPIRED_PRODSITE_CERT": "Certificat du site de production expiré",
   "EXPIRED_SUPPLIER_CERT": "Certificat du fournisseur expiré",
-  "EXPIRED_VENDOR_CERT": "Certificat du fournisseur expiré"
+  "EXPIRED_VENDOR_CERT": "Certificat du fournisseur expiré",
+  "UNKNOWN_DAE_FORMAT": "Le format du numéro douanier semble incorrect",
+  "UNKNOWN_DOUBLE_COUNTING_CERTIFICATE": "Le certificat double compte est inconnu"
 }

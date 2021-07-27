@@ -25,8 +25,9 @@ import {
   MatierePremiere as MP,
   ProductionSiteDetails,
   CertificateInfo,
+  DoubleCountingCertificateInfo
 } from "common/types"
-import { UserCheck, FileCheck, Return } from "common/components/icons"
+import { UserCheck, FileCheck, Return, IconProps } from "common/components/icons"
 import { Button } from "common/components/button"
 import {
   prompt,
@@ -84,7 +85,7 @@ const CertificateInfoPrompt = ({
   certificate,
   onResolve,
 }: {
-  certificate: CertificateInfo
+  certificate: CertificateInfo | DoubleCountingCertificateInfo
   onResolve: () => void
 }) => {
   const { t } = useTranslation()
@@ -105,12 +106,14 @@ const CertificateInfoPrompt = ({
           </b>
           <span>{certificate.holder}</span>
         </li>
-        <li>
-          <b>
-            <Trans>Périmètre du certificat</Trans>:{" "}
-          </b>
-          <span>{certificate.scope.join(", ")}</span>
-        </li>
+        {('scope' in certificate) && (
+          <li>
+            <b>
+              <Trans>Périmètre du certificat</Trans>:{" "}
+            </b>
+            <span>{certificate.scope.join(", ")}</span>
+          </li>
+        )}
         <li>
           <b>
             <Trans>Période de validité</Trans>:{" "}
@@ -131,7 +134,11 @@ const CertificateInfoPrompt = ({
   )
 }
 
-const CertificateIcon = ({ certificate, ...props }: any) => {
+type CertificateIconProps = IconProps & {
+  certificate: CertificateInfo | DoubleCountingCertificateInfo
+}
+
+const CertificateIcon = ({ certificate, ...props }: CertificateIconProps) => {
   const { t } = useTranslation()
 
   function openCertificateInfo() {
@@ -143,6 +150,7 @@ const CertificateIcon = ({ certificate, ...props }: any) => {
   return (
     <FileCheck
       {...props}
+
       title={t("Voir le certificat")}
       onClick={openCertificateInfo}
       onMouseDown={(e: any) => e.stopPropagation()}
@@ -387,11 +395,19 @@ export const ProductionSiteDblCounting = ({
   data,
   value,
   errors,
+  icon:forcedIcon,
   t = idt,
   ...props
 }: LIP) => {
   const hasDC = Boolean(data?.matiere_premiere?.is_double_compte)
   const dcReference = value ?? data?.production_site_dbl_counting ?? ""
+
+  const certInfo = data?.certificates?.double_counting_reference ?? data?.certificates?.unknown_production_site_dbl_counting
+  const isKnownCert = Boolean(certInfo) && certInfo?.found
+
+  const icon = forcedIcon ?? isKnownCert
+    ? (p: any) => <CertificateIcon {...p} certificate={certInfo} />
+    : undefined
 
   return (
     <LabelInput
@@ -400,6 +416,7 @@ export const ProductionSiteDblCounting = ({
       label={t("N° d'enregistrement double-compte")}
       value={hasDC ? dcReference : ""}
       error={errors?.production_site_dbl_counting}
+      icon={icon}
       {...props}
     />
   )

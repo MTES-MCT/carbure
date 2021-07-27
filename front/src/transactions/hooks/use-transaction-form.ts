@@ -282,6 +282,8 @@ const initialState: TransactionFormState = {
     production_site_certificate: null,
     supplier_certificate: null,
     vendor_certificate: null,
+    double_counting_reference: null,
+    unknown_production_site_dbl_counting: null,
   },
 }
 

@@ -1,4 +1,4 @@
-import { Snapshot, GenericError, LotDetails, Lots } from "common/types"
+import { Snapshot, GenericError, LotDetails, Lots, DeliveryStatus } from "common/types"
 import { country, lot, producer, operator, trader } from "common/__test__/data"
 
 export const emptySnapshot = {
@@ -220,6 +220,8 @@ export const lotDetails: LotDetails = {
     production_site_certificate: null,
     supplier_certificate: null,
     vendor_certificate: null,
+    double_counting_reference: null,
+    unknown_production_site_dbl_counting: null
   },
 }
 
@@ -232,13 +234,15 @@ export const errorDetails: LotDetails = {
     production_site_certificate: null,
     supplier_certificate: null,
     vendor_certificate: null,
+    double_counting_reference: null,
+    unknown_production_site_dbl_counting: null,
   },
 }
 
-export const tofixDetails = {
+export const tofixDetails: LotDetails = {
   transaction: {
     ...lot,
-    delivery_status: "AC",
+    delivery_status: DeliveryStatus.ToFix,
     lot: {
       ...lot.lot,
       status: "Validated",
@@ -246,18 +250,20 @@ export const tofixDetails = {
   },
   errors: [],
   deadline: "2021-01-31",
-  comments: [{ entity: operator, comment: "not ok" }],
+  comments: [{ entity: operator, comment: "not ok", topic: '' }],
   certificates: {
     production_site_certificate: null,
     supplier_certificate: null,
     vendor_certificate: null,
+    double_counting_reference: null,
+    unknown_production_site_dbl_counting: null,
   },
 }
 
-export const sentDetails = {
+export const sentDetails: LotDetails = {
   transaction: {
     ...lot,
-    delivery_status: "N",
+    delivery_status: DeliveryStatus.Pending,
     lot: {
       ...lot.lot,
       status: "Validated",
@@ -270,6 +276,8 @@ export const sentDetails = {
     production_site_certificate: null,
     supplier_certificate: null,
     vendor_certificate: null,
+    double_counting_reference: null,
+    unknown_production_site_dbl_counting: null,
   },
 }
 
@@ -421,21 +429,21 @@ export const declaration = {
 
 export function getFilter(field: string) {
   switch (field) {
-    case 'matieres_premieres': 
+    case 'matieres_premieres':
       return [{ value: "COLZA", label: "Colza" }]
-    case 'biocarburants': 
+    case 'biocarburants':
       return [{ value: "EMHV", label: "EMHV" }]
-    case 'periods': 
+    case 'periods':
       return ["2020-01"]
-    case 'countries_of_origin': 
+    case 'countries_of_origin':
       return [{ value: "FR", label: "France" }]
-    case 'production_sites': 
+    case 'production_sites':
       return ["Test Production Site"]
-    case 'delivery_sites': 
+    case 'delivery_sites':
       return ["Test Delivery Site"]
-    case 'clients': 
+    case 'clients':
       return ["Opérateur Test"]
-    case 'vendors': 
+    case 'vendors':
       return ["Producteur Test", "Trader Test"]
   }
 }

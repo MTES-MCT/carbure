@@ -55,5 +55,8 @@
   "UNKNOWN_VENDOR_CERT": "Unknown supplier certificate",
   "EXPIRED_PRODSITE_CERT": "Production site certificate expired",
   "EXPIRED_SUPPLIER_CERT": "Supplier certificate expired",
-  "EXPIRED_VENDOR_CERT": "Supplier certificate expired"
+  "EXPIRED_VENDOR_CERT": "Supplier certificate expired",
+
+  "UNKNOWN_DAE_FORMAT": "Customs ID format incorrect",
+  "UNKNOWN_DOUBLE_COUNTING_CERTIFICATE": "Unknown double counting certificate"
 }

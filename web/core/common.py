@@ -107,7 +107,9 @@ def check_certificates(tx):
     d = {
          'production_site_certificate': None,
          'supplier_certificate': None,
-         'vendor_certificate': None
+         'vendor_certificate': None,
+         'unknown_production_site_dbl_counting': None,
+         'double_counting_reference': None
         }
     # production site certificate
     if tx.lot.carbure_production_site_reference:
@@ -1154,7 +1156,7 @@ def validate_lots(user, entity, txs):
                     notify_pending_lot(tx)
             tx.save()
             tx.lot.save()
-    
+
     return {'submitted': submitted, 'valid': valid, 'invalid': invalid, 'errors': errors}
 
 
