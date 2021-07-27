@@ -300,6 +300,7 @@ def get_prefetched_data(entity=None):
     d['certificates'].update({c.certificate_id.upper(): c for c in DBSCertificate.objects.filter(valid_until__gte=lastyear)})
     d['certificates'].update({c.certificate_id.upper(): c for c in REDCertCertificate.objects.filter(valid_until__gte=lastyear)})
     d['certificates'].update({c.certificate_id.upper(): c for c in SNCertificate.objects.filter(valid_until__gte=lastyear)})
+    d['double_counting_certificates'] = {c.certificate_id: c for c in DoubleCountingRegistration.objects.all()}
     return d
 
 
