@@ -512,6 +512,19 @@ class TransactionComment(models.Model):
         verbose_name_plural = 'TransactionComments'
 
 
+class AdminTransactionComment(models.Model):
+    tx = models.ForeignKey(LotTransaction, on_delete=models.CASCADE)
+    comment = models.TextField()
+
+    def __str__(self):
+        return str(self.comment)
+
+    class Meta:
+        db_table = 'admin_tx_comments'
+        verbose_name = 'AdminTransactionComment'
+        verbose_name_plural = 'AdminTransactionComments'
+
+
 class Control(models.Model):
     STATUS = [("OPEN", "Ouvert"), ("CLOSED", "Clôturé")]
 
