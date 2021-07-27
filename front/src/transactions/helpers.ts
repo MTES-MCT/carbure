@@ -93,6 +93,13 @@ export function normalizeFilter(
     }))
   }
 
+  if (field === Filters.ShowEmpty) {
+    normalized = filter.map((hide: any) => ({
+      value: hide.value,
+      label: t(hide.label, { ns: "translation" }),
+    }))
+  }
+
   if (field === Filters.ClientTypes) {
     // hardcoding a translation key so that the i18n parser can detect it
     t("Inconnu")

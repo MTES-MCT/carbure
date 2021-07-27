@@ -432,6 +432,9 @@ def get_snapshot_filters(txs, entity, whitelist):
     if 'client_types' in whitelist:
         filters['client_types'] = [Entity.OPERATOR, Entity.PRODUCER, Entity.TRADER, 'Inconnu']
 
+    if 'show_empty' in whitelist:
+        filters['show_empty'] = [{'value': True, 'label': 'Oui'}, {'value': False, 'label': 'Non'}]
+
     return filters
 
 

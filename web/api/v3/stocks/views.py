@@ -27,7 +27,7 @@ sort_key_to_django_field = {'period': 'lot__period',
 def filter_stock_transactions(entity, querySet):
     status = querySet.get('status', False)
     show_empty = querySet.get('show_empty', False)
-    if show_empty == '1':
+    if show_empty == 'true':
         show_empty = True
     else:
         show_empty = False
@@ -39,11 +39,11 @@ def filter_stock_transactions(entity, querySet):
         raise Exception('Entity does not have stocks')
 
     if status == 'tosend':
-        return LotTransaction.objects.filter(lot__added_by=entity, lot__status='Draft').exclude(lot__parent_lot=None)
+        return LotTransaction.objects.filter(lot__added_by=entity, lot__status=LotV2.DRAFT).exclude(lot__parent_lot=None)
     elif status == 'in':
-        return LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.PENDING, LotTransaction.TOFIX, LotTransaction.FIXED])
+        return LotTransaction.objects.filter(carbure_client=entity, lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.PENDING, LotTransaction.TOFIX, LotTransaction.FIXED])
     elif status == 'stock':
-        stock = LotTransaction.objects.filter(carbure_client=entity, lot__status='Validated', delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, is_forwarded=False, is_mac=False)
+        stock = LotTransaction.objects.filter(carbure_client=entity, lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN], lot__fused_with=None, is_forwarded=False, is_mac=False)
         if not show_empty:
             stock = stock.filter(lot__remaining_volume__gt=0)
         return stock
@@ -106,9 +106,9 @@ def get_snapshot(request, *args, **kwargs):
         'countries_of_origin',
         'vendors',
         'production_sites',
-        'delivery_sites'
+        'delivery_sites',
+        'show_empty'
     ]
-
     return JsonResponse({'status': 'success', 'data': data})
 
 

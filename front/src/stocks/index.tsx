@@ -40,6 +40,7 @@ const FILTERS = [
   Filters.ProductionSites,
   Filters.Vendors,
   Filters.DeliverySites,
+  Filters.ShowEmpty,
 ]
 
 function useStocks(entity: EntitySelection) {

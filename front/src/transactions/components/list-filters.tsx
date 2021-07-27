@@ -25,6 +25,7 @@ const FILTER_ORDER = [
   Filters.HiddenByAdmin,
   Filters.HiddenByAuditor,
   Filters.ClientTypes,
+  Filters.ShowEmpty
 ]
 
 export function mapFilters(
@@ -57,6 +58,7 @@ export function mapFilters(
     [Filters.HiddenByAdmin]: t("Lots ignorés"),
     [Filters.HiddenByAuditor]: t("Lots ignorés"),
     [Filters.ClientTypes]: t("Types de client"),
+    [Filters.ShowEmpty]: t("Inclure stocks vides"),
   }
 
   return filterList.map((field) => {

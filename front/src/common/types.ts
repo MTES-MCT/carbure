@@ -312,6 +312,7 @@ export enum Filters {
   HiddenByAdmin = "is_hidden_by_admin",
   HiddenByAuditor = "is_hidden_by_auditor",
   ClientTypes = "client_types",
+  ShowEmpty = 'show_empty'
 }
 
 export interface TransactionQuery {
