@@ -41,6 +41,7 @@ rules['NO_VENDOR_CERT'] = "Certificat du fournisseur absent"
 rules['UNKNOWN_VENDOR_CERT'] = "Certificat inconnu"
 rules['EXPIRED_VENDOR_CERT'] = "Certificat du fournisseur expiré"
 rules['UNKNOWN_DAE_FORMAT'] = "Le format du numéro douanier semble incorrect"
+rules['UNKNOWN_DOUBLE_COUNTING_CERTIFICATE'] = "Le certificat double compte est inconnu"
 
 
 def generic_error(error, **kwargs):
@@ -122,6 +123,14 @@ def check_certificates(prefetched_data, tx, errors):
                 c = prefetched_data['certificates'][cert]
                 if c.valid_until < tx.delivery_date:
                     errors.append(generic_error(error='EXPIRED_VENDOR_CERT', tx=tx, field='carbure_vendor_certificate'))  
+    # DOUBLE COUNTING CERTIFICATES
+    if tx.lot.unknown_production_site_dbl_counting and tx.lot.unknown_production_site_dbl_counting not in prefetched_data['double_counting_certificates']:
+        errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', tx=tx, field='unknown_production_site_dbl_counting'))
+    elif tx.lot.carbure_production_site and tx.lot.carbure_production_site.dc_reference and tx.lot.carbure_production_site.dc_reference not in prefetched_data['double_counting_certificates']:
+        errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', tx=tx, field='dc_reference'))
+    else:
+        # no double counting certificates
+        pass
     return errors
 
 def sanity_check(tx, prefetched_data):
