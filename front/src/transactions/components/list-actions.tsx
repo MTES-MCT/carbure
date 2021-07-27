@@ -305,6 +305,16 @@ export const AdminActions = ({
       >
         <Trans>Ignorer sélection</Trans>
       </AsyncButton>
+
+      <AsyncButton
+        icon={Cross}
+        level="danger"
+        loading={administrator.loading}
+        disabled={disabled}
+        onClick={administrator.deleteSelection}
+      >
+        <Trans>Supprimer sélection</Trans>
+      </AsyncButton>
     </React.Fragment>
   )
 }

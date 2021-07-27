@@ -475,3 +475,7 @@ export function highlightAuditorLots(
 export function addAdminComment(tx_ids: number[], comment: string) {
   return api.post("/admin/lots/comment", { tx_ids, comment })
 }
+
+export function deleteAdminLots(tx_ids: number[]) {
+  return api.post('/admin/lots/delete', { tx_ids })
+}

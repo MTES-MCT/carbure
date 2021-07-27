@@ -314,6 +314,14 @@ const TransactionDetails = ({
                 ? t("Montrer le lot")
                 : t("Ignorer le lot")}
             </AsyncButton>
+            <AsyncButton 
+              icon={Cross} 
+              level="danger" 
+              loading={administrator.loading} 
+              onClick={() => run(administrator.deleteLot, true)}
+            >
+              <Trans>Supprimer le lot</Trans>
+            </AsyncButton>
           </React.Fragment>
         )}
 

@@ -18,6 +18,8 @@ export interface LotAdministrator {
   markSelectionForReview: () => Promise<boolean>
   hideAlerts: (txIDs: number[]) => Promise<boolean>
   highlightAlerts: (txIDs: number[]) => Promise<boolean>
+  deleteLot: (tx: Transaction) => Promise<boolean>
+  deleteSelection: () => Promise<boolean>
 }
 
 export default function useAdministrateLots(
@@ -38,6 +40,7 @@ export default function useAdministrateLots(
   )
 
   const [adminComment, addAdminComment] = useAPI(api.addAdminComment)
+  const [adminDelete, deleteAdminLots] = useAPI(api.deleteAdminLots)
 
   async function notify(promise: Promise<any>) {
     const res = await promise
@@ -165,19 +168,52 @@ export default function useAdministrateLots(
     return Boolean(pinConfig)
   }
 
+  async function deleteLot(tx: Transaction) {
+    if (entity === null) return false
+
+    const shouldHighlight = await confirm(
+      t("Supprimer le lot"),
+      t("Voulez-vous supprimer ce lot de la base de donnée ?")
+    )
+
+    if (shouldHighlight) {
+      await notify(deleteAdminLots([tx.id]))
+    }
+
+    return Boolean(shouldHighlight)
+  }
+
+
+  async function deleteSelection() {
+    if (entity === null) return false
+
+    const shouldHighlight = await confirm(
+      t("Supprimer le lot"),
+      t("Voulez-vous supprimer les lots sélectionnés de la base de donnée ?")
+    )
+
+    if (shouldHighlight) {
+      await notify(deleteAdminLots(selection.selected))
+    }
+
+    return Boolean(shouldHighlight)
+  }
+
   return {
     loading:
       requestHide.loading ||
       requestHideAlert.loading ||
       requestHighlightAlert.loading ||
       requestHighlight.loading ||
-      adminComment.loading,
+      adminComment.loading || 
+      adminDelete.loading,
     markAsRead,
     markSelectionAsRead,
     markForReview,
     markSelectionForReview,
     hideAlerts,
     highlightAlerts,
-
+    deleteLot,
+    deleteSelection,
   }
 }
