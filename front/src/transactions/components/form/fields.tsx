@@ -150,7 +150,6 @@ const CertificateIcon = ({ certificate, ...props }: CertificateIconProps) => {
   return (
     <FileCheck
       {...props}
-
       title={t("Voir le certificat")}
       onClick={openCertificateInfo}
       onMouseDown={(e: any) => e.stopPropagation()}
