@@ -763,19 +763,20 @@ def admin_comment_transaction(request):
 
 
 @is_admin
-def admin_delete_transaction(request):
-    tx_id = request.POST.get('tx_id', False)
+def admin_delete_transactions(request):
+    tx_ids = request.POST.getlist('tx_ids', False)
 
-    if not tx_id:
-        return JsonResponse({'status': 'error', 'message': "Missing tx_id"}, status=400)
+    if not tx_ids:
+        return JsonResponse({'status': 'error', 'message': "Missing tx_ids"}, status=400)
 
-    tx = LotTransaction.objects.get(id=tx_id)
-    lot_id = tx.lot.id
-    tx.delete()
-    lot = LotV2.objects.get(id=lot_id)
-    remaining_tx = LotTransaction.objects.filter(lot=lot).count()
-    if remaining_tx == 0:
-        lot.delete()
+    for tx_id in tx_ids:
+        tx = LotTransaction.objects.get(id=tx_id)
+        lot_id = tx.lot.id
+        tx.delete()
+        lot = LotV2.objects.get(id=lot_id)
+        remaining_tx = LotTransaction.objects.filter(lot=lot).count()
+        if remaining_tx == 0:
+            lot.delete()
     return JsonResponse({'status': 'success'})
 
 
