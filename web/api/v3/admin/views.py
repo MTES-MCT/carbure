@@ -13,7 +13,7 @@ import math
 from django.http import JsonResponse
 from core.decorators import is_admin
 from django.contrib.auth import get_user_model
-from core.models import Entity, Lot, UserRights, Control, ControlMessages, ProductionSite, LotV2, GenericError
+from core.models import Entity, Lot, UserRights, Control, ControlMessages, ProductionSite, LotV2, GenericError, AdminTransactionComment
 from django.db.models import Q, Count, Subquery, OuterRef, Value, IntegerField
 from django.contrib.auth.forms import PasswordResetForm
 from django.core.mail import send_mail
@@ -739,6 +739,25 @@ def hide_transactions(request):
             tx.highlighted_by_admin = False
         tx.save()
         tx.genericerror_set.all().update(acked_by_admin=True)
+    return JsonResponse({'status': 'success'})
+
+
+@is_admin
+def admin_comment_transaction(request):
+    tx_id = request.POST.get('tx_id', False)
+    comment = request.POST.get('comment', False)
+
+    if not tx_id:
+        return JsonResponse({'status': 'error', 'message': "Missing tx_id"}, status=400)
+    if not comment:
+        return JsonResponse({'status': 'error', 'message': "Missing comment"}, status=400)
+
+    tx = LotTransaction.objects.get(id=tx_id)
+
+    c = AdminTransactionComment()
+    c.related_tx = tx
+    c.comment = comment
+    c.save()
     return JsonResponse({'status': 'success'})
 
 
