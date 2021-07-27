@@ -483,7 +483,7 @@ class StockAPITest(TestCase):
         lots_in_stock = stock['lots']
         self.assertEqual(len(lots_in_stock), 0)
 
-        # however adding the flag show_empty='1'' should return 1 line
-        stock = self.get_stock(self.entity1.id, show_empty='1')
+        # however adding the flag show_empty='true' should return 1 line
+        stock = self.get_stock(self.entity1.id, show_empty='true')
         lots_in_stock = stock['lots']
         self.assertEqual(len(lots_in_stock), 1)
