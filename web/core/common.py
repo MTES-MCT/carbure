@@ -512,7 +512,7 @@ def fill_biocarburant_info(lot_row, lot, tx, prefetched_data):
     lot_errors = []
     biocarburants = prefetched_data['biocarburants']
     if 'biocarburant_code' in lot_row:
-        biocarburant = lot_row['biocarburant_code']
+        biocarburant = lot_row['biocarburant_code'].upper().strip()
         if biocarburant in biocarburants:
             lot.biocarburant = biocarburants[biocarburant]
         else:
