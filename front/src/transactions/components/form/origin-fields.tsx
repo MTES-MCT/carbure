@@ -6,6 +6,7 @@ import { FieldsProps, isKnown } from "./fields"
 
 export const AdminOriginFields = ({ data, errors, onChange }: FieldsProps) => {
   const { t } = useTranslation()
+
   return (
     <FormGroup
       readOnly
@@ -15,9 +16,19 @@ export const AdminOriginFields = ({ data, errors, onChange }: FieldsProps) => {
       onChange={onChange}
     >
       <Fields.Producer search={false} />
-      <Fields.UnknownSupplier label="Fournisseur original" />
-      <Fields.UnknownSupplierCertificate label="Certificat fournisseur original" />
-      <Fields.ChampLibre />
+      {data.unknown_supplier && (
+        <Fields.UnknownSupplier label={t("Fournisseur original")} />
+      )}
+      {data.unknown_supplier_certificate && (
+        <Fields.UnknownSupplierCertificate
+          label={t("Certificat fournisseur original")}
+        />
+      )}
+      <Fields.CarbureVendor label={t("Fournisseur CarbuRe")} />
+      <Fields.CarbureVendorCertificate
+        label={t("Certificat fournisseur CarbuRe")}
+      />
+      <Fields.ChampLibreSmall />
     </FormGroup>
   )
 }
