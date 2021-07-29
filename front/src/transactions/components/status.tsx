@@ -15,6 +15,7 @@ import { hasDeadline } from "../helpers"
 
 import styles from "./status.module.css"
 import { EntitySelection } from "carbure/hooks/use-entity"
+import { formatDate } from "settings/components/common"
 
 // extract the status name from the lot details
 export function getStatus(
@@ -68,7 +69,8 @@ function getStatusText(
   }
 
   const isVendor = tx.carbure_vendor?.id === entity?.id
-  const isOwner = tx.carbure_vendor === null && tx.lot.added_by?.id === entity?.id
+  const isOwner =
+    tx.carbure_vendor === null && tx.lot.added_by?.id === entity?.id
 
   switch (tx.delivery_status) {
     case DeliveryStatus.Pending:
@@ -164,6 +166,8 @@ export const StatusTitle = ({
 
       <Title>{children}</Title>
 
+      <AddedBy transaction={details?.transaction} />
+
       {details && hasDeadline(details.transaction, details.deadline) && (
         <span className={styles.transactionDeadline}>
           <Trans>
@@ -178,6 +182,25 @@ export const StatusTitle = ({
         </span>
       )}
     </Box>
+  )
+}
+
+const AddedBy = ({
+  transaction: tx,
+}: {
+  transaction: Transaction | undefined
+}) => {
+  const entity = tx?.lot.added_by?.name
+  const date = tx?.lot.added_time && formatDate(tx.lot.added_time)
+
+  if (!entity || !date) return null
+
+  return (
+    <span className={styles.addedBy}>
+      <Trans>
+        par <b>{{ entity }}</b> le {{ date }}
+      </Trans>
+    </span>
   )
 }
 

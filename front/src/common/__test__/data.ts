@@ -202,6 +202,7 @@ export const lot: Transaction = {
   lot: {
     id: 0,
     period: "2020-01",
+    added_time: "2020-01-01",
     carbure_id: "",
     producer_is_in_carbure: true,
     carbure_producer: producer,
