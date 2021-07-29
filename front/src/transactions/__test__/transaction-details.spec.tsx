@@ -592,7 +592,7 @@ test("transaction details form as operator - operator self accepts lot", async (
   expect(screen.getByLabelText("Pays de production")).toHaveValue("France")
 })
 
-test("transaction details form as producer - lot sold by trader after buying from producer", async () => {
+test("transaction details form as producer - lot coming back for correction after being sold by trader after buying from producer", async () => {
   setDetails(
     merge.recursive(true, sentDetails, traderVendorPartial, stockPartial)
   )
@@ -610,13 +610,11 @@ test("transaction details form as producer - lot sold by trader after buying fro
 
   expect(screen.getByLabelText(/^Producteur/)).toHaveValue("Producteur Test")
 
-  const vendors = screen.getAllByLabelText(/Fournisseur/)
-  expect(vendors[0]).toHaveValue("Unknown Supplier")
-  expect(vendors[1]).toHaveValue("Trader Test")
+  const vendor = screen.getByLabelText(/Fournisseur/)
+  expect(vendor).toHaveValue("Unknown Supplier")
 
-  const certificates = screen.getAllByLabelText("Certificat du fournisseur")
-  expect(certificates[0]).toHaveValue("ISCC2000 - Supplier")
-  expect(certificates[1]).toHaveValue("ISCC1000 - Vendor")
+  const certificate = screen.getByLabelText(/Certificat du fournisseur/)
+  expect(certificate).toHaveValue("ISCC2000 - Supplier")
 
   expect(screen.getByLabelText(/^Site de production/)).toHaveValue(
     "Test Production Site"
