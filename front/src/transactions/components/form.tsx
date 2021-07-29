@@ -52,6 +52,7 @@ const TransactionForm = ({
           readOnly={readOnly}
           data={transaction}
           errors={errors}
+          entity={entity}
           onChange={onChange}
         />
 

@@ -25,7 +25,7 @@ export const FormField = ({ render: Render, ...props }: FormFieldProps) => {
 
 type FormGroupProps<T> = SystemProps & {
   readOnly?: boolean
-  title?: string
+  title?: React.ReactNode
   narrow?: boolean
   data: T
   errors?: Record<string, string>

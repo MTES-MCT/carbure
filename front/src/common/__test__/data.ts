@@ -263,6 +263,7 @@ export const lot: Transaction = {
   hidden_by_auditor: false,
   highlighted_by_admin: false,
   highlighted_by_auditor: false,
+  parent_tx: null,
 }
 
 export const entityRight = {
