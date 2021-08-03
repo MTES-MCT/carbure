@@ -23,6 +23,7 @@ export interface TransactionFormState {
   added_by: Entity | null
   data_origin_entity: Entity | null
   parent_lot: Lot | null
+  parent_tx: number | null
 
   dae: string
   volume: number
@@ -84,6 +85,7 @@ export function toTransactionFormState(
     champ_libre: tx.champ_libre,
     delivery_date: tx.delivery_date ?? "",
     mac: tx.is_mac,
+    parent_tx: tx.parent_tx,
 
     eec: tx.lot.eec,
     el: tx.lot.el,
@@ -234,6 +236,7 @@ const initialState: TransactionFormState = {
   parent_lot: null,
   status: "Draft",
   delivery_status: "N",
+  parent_tx: null,
 
   dae: "",
   volume: 0,

@@ -126,10 +126,10 @@ export interface ProductionSiteDetails extends ProductionSite {
 }
 
 export interface Distance {
-  distance: number;
-  link: string;
-  error: string; // PRODUCTION_SITE_NOT_IN_CARBURE, DELIVERY_SITE_NOT_IN_CARBURE, PRODUCTION_SITE_COORDINATES_NOT_IN_CARBURE, DELIVERY_SITE_COORDINATES_NOT_IN_CARBURE, API_ERROR
-  source: null | "DB" | "API";
+  distance: number
+  link: string
+  error: string // PRODUCTION_SITE_NOT_IN_CARBURE, DELIVERY_SITE_NOT_IN_CARBURE, PRODUCTION_SITE_COORDINATES_NOT_IN_CARBURE, DELIVERY_SITE_COORDINATES_NOT_IN_CARBURE, API_ERROR
+  source: null | "DB" | "API"
 }
 
 export interface Lot {
@@ -142,6 +142,7 @@ export interface Lot {
   status: "Draft" | "Validated"
   data_origin_entity: Entity | null
   added_by: Entity | null
+  added_time: string
   eccr: number
   eccs: number
   eec: number
@@ -198,6 +199,7 @@ export interface Transaction {
   champ_libre: string
   is_mac: boolean
   is_forwarded: boolean
+  parent_tx: number | null
 
   carbure_vendor: Entity | null
   carbure_vendor_certificate: string
@@ -312,7 +314,7 @@ export enum Filters {
   HiddenByAdmin = "is_hidden_by_admin",
   HiddenByAuditor = "is_hidden_by_auditor",
   ClientTypes = "client_types",
-  ShowEmpty = 'show_empty'
+  ShowEmpty = "show_empty",
 }
 
 export interface TransactionQuery {

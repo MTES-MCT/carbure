@@ -3,7 +3,7 @@
 }
 
 .certificateDialog {
-  z-index: 10000
+  z-index: 10000;
 }
 
 .certificateInfo {
@@ -19,4 +19,12 @@
   margin-left: 4px;
   color: var(--blue-medium);
   text-decoration: underline;
+}
+
+.parentLot {
+  margin-left: 8px;
+  font-weight: normal;
+  font-size: 0.9em;
+  text-decoration: underline;
+  color: var(--blue-medium);
 }

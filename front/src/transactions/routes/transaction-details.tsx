@@ -151,14 +151,15 @@ const TransactionDetails = ({
         />
       )}
 
-      {details.data?.admin_comments && details.data.admin_comments.length > 0 && (
-        <Comments
-          title={t("Notes admin")}
-          loading={comment.loading}
-          comments={details.data.admin_comments}
-          onComment={addAdminComment}
-        />
-      )}
+      {details.data?.admin_comments &&
+        details.data.admin_comments.length > 0 && (
+          <Comments
+            title={t("Notes admin")}
+            loading={comment.loading}
+            comments={details.data.admin_comments}
+            onComment={addAdminComment}
+          />
+        )}
 
       {Boolean(history?.length) && <TransactionHistory history={history} />}
 
@@ -314,10 +315,10 @@ const TransactionDetails = ({
                 ? t("Montrer le lot")
                 : t("Ignorer le lot")}
             </AsyncButton>
-            <AsyncButton 
-              icon={Cross} 
-              level="danger" 
-              loading={administrator.loading} 
+            <AsyncButton
+              icon={Cross}
+              level="danger"
+              loading={administrator.loading}
               onClick={() => run(administrator.deleteLot, true)}
             >
               <Trans>Supprimer le lot</Trans>

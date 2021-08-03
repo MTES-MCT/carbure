@@ -21,8 +21,6 @@ const AllDeliveryFields = ({ data, errors, onChange }: FieldsProps) => {
       onChange={onChange}
     >
       {data.mac && <Fields.Mac />}
-      <Fields.CarbureVendor />
-      <Fields.CarbureVendorCertificate />
       <Fields.Client />
       <Fields.DeliverySite />
       <Fields.DeliverySiteCountry />
