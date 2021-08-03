@@ -25,9 +25,14 @@ import {
   MatierePremiere as MP,
   ProductionSiteDetails,
   CertificateInfo,
-  DoubleCountingCertificateInfo
+  DoubleCountingCertificateInfo,
 } from "common/types"
-import { UserCheck, FileCheck, Return, IconProps } from "common/components/icons"
+import {
+  UserCheck,
+  FileCheck,
+  Return,
+  IconProps,
+} from "common/components/icons"
 import { Button } from "common/components/button"
 import {
   prompt,
@@ -106,7 +111,7 @@ const CertificateInfoPrompt = ({
           </b>
           <span>{certificate.holder}</span>
         </li>
-        {('scope' in certificate) && (
+        {"scope" in certificate && (
           <li>
             <b>
               <Trans>Périmètre du certificat</Trans>:{" "}
@@ -394,19 +399,22 @@ export const ProductionSiteDblCounting = ({
   data,
   value,
   errors,
-  icon:forcedIcon,
+  icon: forcedIcon,
   t = idt,
   ...props
 }: LIP) => {
   const hasDC = Boolean(data?.matiere_premiere?.is_double_compte)
   const dcReference = value ?? data?.production_site_dbl_counting ?? ""
 
-  const certInfo = data?.certificates?.double_counting_reference ?? data?.certificates?.unknown_production_site_dbl_counting
+  const certInfo =
+    data?.certificates?.double_counting_reference ??
+    data?.certificates?.unknown_production_site_dbl_counting
   const isKnownCert = Boolean(certInfo) && certInfo?.found
 
-  const icon = forcedIcon ?? isKnownCert
-    ? (p: any) => <CertificateIcon {...p} certificate={certInfo} />
-    : undefined
+  const icon =
+    forcedIcon ?? isKnownCert
+      ? (p: any) => <CertificateIcon {...p} certificate={certInfo} />
+      : undefined
 
   return (
     <LabelInput
@@ -619,6 +627,21 @@ export const ChampLibre = ({
   ...props
 }: LTAP) => (
   <LabelTextArea
+    name="champ_libre"
+    label={t("Champ libre")}
+    value={value ?? data?.champ_libre}
+    {...props}
+  />
+)
+
+export const ChampLibreSmall = ({
+  data,
+  value,
+  errors,
+  t = idt,
+  ...props
+}: LIP) => (
+  <LabelInput
     name="champ_libre"
     label={t("Champ libre")}
     value={value ?? data?.champ_libre}

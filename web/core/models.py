@@ -370,7 +370,7 @@ class LotV2(models.Model):
         'ghg_total': self.ghg_total, 'ghg_reference': self.ghg_reference, 'ghg_reduction': self.ghg_reduction, 'status': self.status, 'source': self.source,
         'parent_lot': self.parent_lot.natural_key() if self.parent_lot else None, 'is_split': self.is_split, 'is_fused': self.is_fused, 'fused_with': self.fused_with.natural_key() if self.fused_with else None,
         'data_origin_entity': self.data_origin_entity.natural_key() if self.data_origin_entity else None, 'added_by': self.added_by.natural_key() if self.added_by else None, 'is_transformed': self.is_transformed,
-        'unknown_supplier': self.unknown_supplier, 'unknown_supplier_certificate': self.unknown_supplier_certificate, 'carbure_production_site_reference': self.carbure_production_site_reference}
+        'unknown_supplier': self.unknown_supplier, 'unknown_supplier_certificate': self.unknown_supplier_certificate, 'carbure_production_site_reference': self.carbure_production_site_reference, 'added_time': self.added_time}
 
     def __str__(self):
         return str(self.id)
@@ -394,10 +394,10 @@ class LotV2(models.Model):
 class LotTransaction(models.Model):
     # Livraison "standard" - biocarburant uniquement
     BIOFUEL_DELIVERY = "BIOFUEL_DELIVERY"
-    # Mise a consommation / Utilisation directe du biocarburant sans incorporation 
+    # Mise a consommation / Utilisation directe du biocarburant sans incorporation
     MAC = "MAC"
     # livraison d'un camion de carburants avec Bio déjà incorporé
-    DIRECT_DELIVERY = "DIRECT_DELIVERY" 
+    DIRECT_DELIVERY = "DIRECT_DELIVERY"
     TRANSACTION_TYPES = ((BIOFUEL_DELIVERY, BIOFUEL_DELIVERY), (MAC, MAC), (DIRECT_DELIVERY, DIRECT_DELIVERY))
 
     # Statuts des transactions
@@ -468,7 +468,7 @@ class LotTransaction(models.Model):
         'carbure_delivery_site': self.carbure_delivery_site.natural_key() if self.carbure_delivery_site else None, 'unknown_delivery_site': self.unknown_delivery_site,
         'unknown_delivery_site_country': self.unknown_delivery_site_country.natural_key() if self.unknown_delivery_site_country else None, 'delivery_status': self.delivery_status,
         'champ_libre': self.champ_libre, 'is_mac': self.is_mac, 'is_batch': self.is_batch,
-        'id': self.id, 'is_forwarded': self.is_forwarded}
+        'id': self.id, 'is_forwarded': self.is_forwarded, 'parent_tx': self.parent_tx_id}
         if admin:
             d['hidden_by_admin'] = self.hidden_by_admin
             d['highlighted_by_admin'] = self.highlighted_by_admin
