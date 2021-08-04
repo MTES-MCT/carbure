@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from core.models import Entity, UserRights, LotV2, LotTransaction, ProductionSite, Pays, Biocarburant, MatierePremiere, Depot, GenericError
-from certificates.models import ISCCCertificate, EntityISCCTradingCertificate
+from certificates.models import ISCCCertificate, EntityISCCTradingCertificate, DoubleCountingRegistration
 from api.v3.admin.urls import urlpatterns
 from django_otp.plugins.otp_email.models import EmailDevice
 
@@ -796,7 +796,28 @@ class LotsAPITest(TransactionTestCase):
         data = response.json()['data']
         self.assertEqual(data['transaction']['client_is_in_carbure'], True)
         
-
+    def test_double_count_certificates_expiration(self):
+        # create 2 double count certificates. one valid, one expired
+        today = datetime.date.today()
+        vfrom = today - datetime.timedelta(days=365)
+        vuntil = today
+        DoubleCountingRegistration.objects.update_or_create(certificate_id="DC_CERT_01", certificate_holder="Super testeur", 
+        defaults={'registered_address':"blablabla", 'valid_from': vfrom, 'valid_until': today})
+        DoubleCountingRegistration.objects.update_or_create(certificate_id="DC_CERT_02", certificate_holder="Super testeur", 
+        defaults={'registered_address':"blablabla", 'valid_from': vfrom, 'valid_until': vuntil - datetime.timedelta(days=7)})        
+        # upload lot using first
+        tx_id, lot_id = self.create_lot(matiere_premiere_code="RESIDUS_DE_BIERE", biocarburant_code="ETH", double_counting_registration="DC_CERT_01", delivery_date=today.strftime("%d/%m/%Y"))
+        self.assertEqual(GenericError.objects.filter(error="UNKNOWN_DOUBLE_COUNTING_CERTIFICATE").count(), 0)
+        self.assertEqual(GenericError.objects.filter(error="EXPIRED_DOUBLE_COUNTING_CERTIFICATE").count(), 0)
+        # upload lot using second
+        tx_id, lot_id = self.create_lot(matiere_premiere_code="RESIDUS_DE_BIERE", biocarburant_code="ETH", double_counting_registration="DC_CERT_02", delivery_date=today.strftime("%d/%m/%Y"))
+        self.assertEqual(GenericError.objects.filter(error="UNKNOWN_DOUBLE_COUNTING_CERTIFICATE").count(), 0)
+        self.assertEqual(GenericError.objects.filter(error="EXPIRED_DOUBLE_COUNTING_CERTIFICATE").count(), 1)
+        # upload lot using unknown cert
+        GenericError.objects.all().delete()
+        tx_id, lot_id = self.create_lot(matiere_premiere_code="RESIDUS_DE_BIERE", biocarburant_code="ETH", double_counting_registration="UNKNOWN_DC_CERT")
+        self.assertEqual(GenericError.objects.filter(error="UNKNOWN_DOUBLE_COUNTING_CERTIFICATE").count(), 1)
+        self.assertEqual(GenericError.objects.filter(error="EXPIRED_DOUBLE_COUNTING_CERTIFICATE").count(), 0)
 
 class DeclarationTests(TransactionTestCase):
     home = os.environ['CARBURE_HOME']

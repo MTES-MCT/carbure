@@ -135,10 +135,9 @@ def check_certificates(prefetched_data, tx, errors):
             errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', tx=tx, field='dc_reference'))
     else:
         dc_cert = ''
-
     if dc_cert != '' and dc_cert in prefetched_data['double_counting_certificates']:
         dcc = prefetched_data['double_counting_certificates'][dc_cert]
-        if dcc['valid_until'] < tx.delivery_date:
+        if dcc.valid_until < tx.delivery_date:
             errors.append(generic_error(error='EXPIRED_DOUBLE_COUNTING_CERTIFICATE', tx=tx))
     return errors
 
