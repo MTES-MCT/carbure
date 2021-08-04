@@ -125,7 +125,7 @@ def get_snapshot(request, *args, **kwargs):
         txs = LotTransaction.objects.filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True) | Q(carbure_vendor=entity))
         data['years'] = [t.year for t in txs.dates('delivery_date', 'year', order='DESC')]
         draft = LotTransaction.objects.filter(lot__year=year, lot__added_by=entity, lot__status=LotV2.DRAFT).count()
-        ins = LotTransaction.objects.filter(lot__year=year, carbure_client=entity, lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.PENDING, LotTransaction.FIXED], is_mac=False).count()
+        ins = LotTransaction.objects.filter(lot__year=year, carbure_client=entity, lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.PENDING, LotTransaction.FIXED]).count()
         tofix = LotTransaction.objects.filter(lot__year=year).filter(Q(carbure_client=entity) | Q(lot__added_by=entity) | Q(carbure_vendor=entity)).filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.TOFIX, LotTransaction.REJECTED]).count()
         accepted = LotTransaction.objects.filter(lot__year=year).filter(Q(carbure_client=entity) | Q(lot__added_by=entity, is_mac=True) | Q(carbure_vendor=entity)).filter(lot__status=LotV2.VALIDATED, delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
         data['lots'] = {'draft': draft, 'accepted': accepted, 'in': ins, 'tofix': tofix}
