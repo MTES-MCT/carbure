@@ -203,6 +203,7 @@ def send_lot_from_stock(rights, tx, prefetched_data):
     lot.status = LotV2.VALIDATED
     lot.save()
     lot.parent_lot.remaining_volume -= lot.volume
+    lot.parent_lot.remaining_volume = round(lot.parent_lot.remaining_volume, 2)
     lot.parent_lot.save()
 
     # mac and unknown client - auto accept
@@ -988,6 +989,7 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, tx=None):
         # STOCK// we first recredit the volume back in stock
         if lot.status == LotV2.VALIDATED and lot.is_split:
             lot.parent_lot.remaining_volume += lot.volume
+            lot.parent_lot.remaining_volume = round(lot.parent_lot.remaining_volume, 2)
             lot.parent_lot.save()
         # STOCK// only the lot.added_by can update the volume of a split transaction
         if lot.added_by == entity and lot.is_split:
@@ -995,6 +997,7 @@ def load_lot(prefetched_data, entity, user, lot_dict, source, tx=None):
         # STOCK// and debit the stock back according to new volume
         if lot.status == LotV2.VALIDATED and lot.is_split:
             lot.parent_lot.remaining_volume -= lot.volume
+            lot.parent_lot.remaining_volume = round(lot.parent_lot.remaining_volume, 2)
             lot.parent_lot.save()
 
     # data related to TRANSACTION

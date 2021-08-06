@@ -383,6 +383,7 @@ def convert_eth_stock_to_etbe(request, entity, c):
         raise Exception("Cannot convert more ETH than stock")
 
     previous_stock_tx.lot.remaining_volume -= volume_ethanol
+    previous_stock_tx.lot.remaining_volume = round(previous_stock_tx.lot.remaining_volume, 2)
     previous_stock_tx.lot.save()
 
     new_lot.volume = volume_etbe
