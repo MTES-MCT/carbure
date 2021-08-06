@@ -441,7 +441,8 @@ def get_snapshot_filters(txs, entity, whitelist):
 def get_summary(txs, entity, short=False):
     data = {
         'tx_ids': list(txs.values_list('id', flat=True)),
-        'total_volume': txs.aggregate(Sum('lot__volume'))['lot__volume__sum']
+        'total_volume': txs.aggregate(Sum('lot__volume'))['lot__volume__sum'],
+        'total_remaining_volume': txs.aggregate(Sum('lot__remaining_volume'))['lot__remaining_volume__sum']
     }
 
     if short:

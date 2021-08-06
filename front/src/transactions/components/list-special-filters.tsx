@@ -80,6 +80,7 @@ type SummaryFilterProps = {
   txCount: number
   filterCount: number
   totalVolume: number
+  totalRemainingVolume: number
   query: TransactionQuery
   hideRecap?: boolean
   selection: number[]
@@ -93,6 +94,7 @@ export const SummaryFilter = ({
   txCount: count,
   filterCount,
   totalVolume,
+  totalRemainingVolume,
   query,
   selection,
   hideRecap = false,
@@ -125,12 +127,22 @@ export const SummaryFilter = ({
       icon={loading ? Loader : Filter}
       className={cl(styles.alertFilter, loading && styles.alertLoading)}
     >
-      <span>
-        <Trans count={count}>
-          <b>{{ count }} lots</b> pour un total de{" "}
-          <b>{{ volume: prettyVolume(totalVolume) }} litres</b>
-        </Trans>
-      </span>
+      {stock && 
+          <span>
+            <Trans count={count}>
+              <b>{{ count }} lots</b> pour un total de{" "}
+              <b>{{ volume: prettyVolume(totalRemainingVolume) }} litres</b>
+            </Trans>
+          </span>
+      }
+      {!stock && 
+        <span>
+          <Trans count={count}>
+            <b>{{ count }} lots</b> pour un total de{" "}
+            <b>{{ volume: prettyVolume(totalVolume) }} litres</b>
+          </Trans>
+        </span>
+      }
 
       {!hideRecap && (
         <span className={styles.alertLink} onClick={showSummary}>
