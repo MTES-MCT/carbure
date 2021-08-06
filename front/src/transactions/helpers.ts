@@ -167,6 +167,7 @@ export function normalizeSummary(summary: any): TransactionSummary {
     out: flattenSummary(summary.out),
     tx_ids: summary.tx_ids,
     total_volume: summary.total_volume,
+    total_remaining_volume: summary.total_remaining_volume,
   }
 }
 
@@ -196,6 +197,7 @@ export function normalizeGeneralSummary(summary: any): TransactionSummary {
     transactions: flattenGeneralSummary(summary.transactions),
     tx_ids: summary.tx_ids,
     total_volume: summary.total_volume,
+    total_remaining_volume: summary.total_remaining_volume,
   }
 }
 

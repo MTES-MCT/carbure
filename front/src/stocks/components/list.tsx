@@ -150,6 +150,7 @@ export const StockList = ({
           loading={summary.loading}
           txCount={summary.data?.tx_ids.length ?? 0}
           totalVolume={summary.data?.total_volume ?? 0}
+          totalRemainingVolume={summary.data?.total_remaining_volume ?? 0}
           query={query}
           selection={selection.selected}
           entity={entity}

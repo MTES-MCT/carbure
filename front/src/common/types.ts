@@ -532,6 +532,7 @@ export interface TransactionSummary {
   transactions?: SummaryItem[]
   tx_ids: number[]
   total_volume: number
+  total_remaining_volume: number
 }
 
 export interface ConvertETBE {
