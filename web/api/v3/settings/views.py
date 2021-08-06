@@ -849,25 +849,29 @@ def request_entity_access(request):
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not find entity"}, status=400)
 
-    UserRightsRequests.objects.update_or_create(user=request.user, entity=entity, defaults={'comment': comment, 'role': role, 'status':'PENDING'})
+    if request.user.is_staff:
+        rr, created = UserRightsRequests.objects.update_or_create(user=request.user, entity=entity, defaults={'comment': comment, 'role': role, 'status':'ACCEPTED'})
+        UserRights.objects.update_or_create(user=rr.user, entity=entity, defaults={'role': rr.role, 'expiration_date': rr.expiration_date})
+    else:
+        UserRightsRequests.objects.update_or_create(user=request.user, entity=entity, defaults={'comment': comment, 'role': role, 'status':'PENDING'})
 
-    email_subject = "Carbure - Demande d'accès"
-    message = """
-    Bonjour,
-    Un utilisateur vient de faire une demande d'accès à CarbuRe
+        email_subject = "Carbure - Demande d'accès"
+        message = """
+        Bonjour,
+        Un utilisateur vient de faire une demande d'accès à CarbuRe
 
-    Utilisateur: %s
-    Société: %s
-    Commentaire: %s
-    """ % (request.user.email, entity.name, comment)
+        Utilisateur: %s
+        Société: %s
+        Commentaire: %s
+        """ % (request.user.email, entity.name, comment)
 
-    send_mail(
-        subject=email_subject,
-        message=message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=["carbure@beta.gouv.fr"],
-        fail_silently=False,
-    )
+        send_mail(
+            subject=email_subject,
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=["carbure@beta.gouv.fr"],
+            fail_silently=False,
+        )
     return JsonResponse({'status': 'success'})
 
 
