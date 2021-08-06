@@ -373,6 +373,7 @@ def delete_lot(request, *args, **kwargs):
         if tx.delivery_status == LotTransaction.REJECTED and tx.lot.parent_lot != None:
             # credit volume back to stock
             tx.lot.parent_lot.remaining_volume += tx.lot.volume
+            tx.lot.parent_lot.remaining_volume = round(tx.lot.parent_lot.remaining_volume, 2)
             tx.lot.parent_lot.save()
         tx.lot.delete()
         deleted += 1
@@ -554,6 +555,7 @@ def reject_lot(request, *args, **kwargs):
             tx.delivery_status = LotTransaction.PENDING
             tx.lot.status = LotV2.DRAFT
             tx.lot.parent_lot.remaining_volume += tx.lot.volume
+            tx.lot.parent_lot.remaining_volume = round(tx.lot.parent_lot.remaining_volume, 2)
             tx.lot.parent_lot.save()
             tx.lot.save()
             tx.save()

@@ -64,11 +64,10 @@ def get_my_certificates(entity=None):
     sn_certificates = EntitySNTradingCertificate.objects.all()
 
     if entity is not None:
-        iscc_certificates = iscc_certificates.filter(entity=entity)[10:]
-        dbs_certificates = dbs_certificates.filter(entity=entity)[10:]
-        redcert_certificates = redcert_certificates.filter(entity=entity)[10:]
-        sn_certificates = sn_certificates.filter(entity=entity)[10:]
-
+        iscc_certificates = iscc_certificates.filter(entity=entity)[0:10]
+        dbs_certificates = dbs_certificates.filter(entity=entity)[0:10]
+        redcert_certificates = redcert_certificates.filter(entity=entity)[0:10]
+        sn_certificates = sn_certificates.filter(entity=entity)[0:10]
     certs = [c.certificate.certificate_id for c in iscc_certificates]
     certs += [c.certificate.certificate_id for c in dbs_certificates]
     certs += [c.certificate.certificate_id for c in redcert_certificates]
@@ -176,12 +175,13 @@ def make_mb_extract_sheet(workbook, entity):
     clients = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur', 'Trader']).exclude(id=entity.id)
     delivery_sites = Depot.objects.all()
     mb_lots = LotTransaction.objects.filter(carbure_client=entity, delivery_status='A', lot__status="Validated", lot__fused_with=None)
+    my_vendor_certificates = get_my_certificates(entity=entity)
 
     # 4/10 chances of having an exported lot
     exported_lots = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
     # header
     bold = workbook.add_format({'bold': True})
-    columns = ['carbure_id', 'volume', 'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
+    columns = ['carbure_id', 'volume', 'dae', 'champ_libre', 'vendor_certificate', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
 
@@ -194,8 +194,9 @@ def make_mb_extract_sheet(workbook, entity):
         site = random.choice(delivery_sites)
         exported = random.choice(exported_lots)
         lot_source = random.choice(mb_lots)
+        my_vendor_certificate = random.choice(my_vendor_certificates)
 
-        row = [lot_source.lot.carbure_id, int(lot_source.lot.volume / 2), get_random_dae(), clientid]
+        row = [lot_source.lot.carbure_id, int(lot_source.lot.volume / 2), get_random_dae(), clientid, my_vendor_certificate]
         if exported == 1:
             # client is not in carbure
             c = random.choice(FOREIGN_CLIENTS)
@@ -215,6 +216,7 @@ def make_mb_extract_sheet_bcghg(workbook, entity):
     clients = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur', 'Trader']).exclude(id=entity.id)
     delivery_sites = Depot.objects.all()
     mb_lots = LotTransaction.objects.filter(carbure_client=entity, delivery_status='A', lot__status="Validated", lot__fused_with=None)
+    my_vendor_certificates = get_my_certificates(entity=entity)
 
     # 4/10 chances of having an exported lot
     exported_lots = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
@@ -233,10 +235,11 @@ def make_mb_extract_sheet_bcghg(workbook, entity):
         site = random.choice(delivery_sites)
         exported = random.choice(exported_lots)
         lot_source = random.choice(mb_lots)
+        my_vendor_certificate = random.choice(my_vendor_certificates)
 
         row = [lot_source.lot.biocarburant.code, lot_source.lot.matiere_premiere.code, lot_source.lot.ghg_total, 
                lot_source.carbure_delivery_site.depot_id if lot_source.delivery_site_is_in_carbure else lot_source.unknown_delivery_site, 
-               int(lot_source.lot.volume / 2), get_random_dae(), clientid]
+               int(lot_source.lot.volume / 2), get_random_dae(), clientid, my_vendor_certificate]
         if exported == 1:
             # client is not in carbure
             c = random.choice(FOREIGN_CLIENTS)
