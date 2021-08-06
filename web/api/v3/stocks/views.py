@@ -58,7 +58,7 @@ def get_stocks(request, *args, **kwargs):
 
     try:
         txs = filter_stock_transactions(entity, request.GET)
-        return get_lots_with_metadata(txs, entity, request.GET)
+        return get_lots_with_metadata(txs, entity, request.GET, admin=False, stocks=True)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Could not get lots"}, status=400)
 

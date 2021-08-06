@@ -304,7 +304,7 @@ def sort_lots(txs, querySet):
     return txs
 
 
-def get_lots_with_metadata(txs, entity, querySet, admin=False):
+def get_lots_with_metadata(txs, entity, querySet, admin=False, stocks=False):
     if txs is None:
         return JsonResponse({'status': 'error', 'message': 'Could not fetch stock list'})
 
@@ -342,7 +342,7 @@ def get_lots_with_metadata(txs, entity, querySet, admin=False):
     if not export:
         return JsonResponse({'status': 'success', 'data': data})
     else:
-        file_location = export_transactions(entity, returned)
+        file_location = export_transactions(entity, returned, stocks=stocks)
         with open(file_location, "rb") as excel:
             data = excel.read()
             ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
