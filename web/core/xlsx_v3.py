@@ -531,15 +531,18 @@ def template_stock_bcghg(entity):
 
 
 # API V3
-def make_dump_lots_sheet(workbook, entity, transactions):
+def make_dump_lots_sheet(workbook, entity, transactions, stocks=False):
     worksheet_lots = workbook.add_worksheet("lots")
     # header
     bold = workbook.add_format({'bold': True})
     columns = ['carbure_id', 'producer', 'production_site', 'production_site_country', 'production_site_reference',
-               'production_site_commissioning_date', 'double_counting_registration', 'supplier', 'supplier_certificate',
-               'volume', 'biocarburant_code', 'matiere_premiere_code', 'categorie_matiere_premiere', 'pays_origine_code',
+               'production_site_commissioning_date', 'double_counting_registration', 'supplier', 'supplier_certificate']
+    if stocks:
+        columns.append('remaining_volume')
+    columns += ['volume', 'biocarburant_code', 'matiere_premiere_code', 'categorie_matiere_premiere', 'pays_origine_code',
                'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reduction',
                'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country', 'delivery_site_name']
+
     if entity is not None and entity.has_mac:
         columns.append('mac')
     for i, c in enumerate(columns):
@@ -563,7 +566,10 @@ def make_dump_lots_sheet(workbook, entity, transactions):
                lot.carbure_production_site.dc_reference if lot.carbure_production_site and lot.matiere_premiere.is_double_compte else lot.unknown_production_site_dbl_counting,
                tx.carbure_vendor.name if tx.carbure_vendor else tx.lot.unknown_supplier,
                tx.carbure_vendor_certificate if tx.carbure_vendor else tx.lot.unknown_supplier_certificate,
-               lot.volume, lot.biocarburant.code if lot.biocarburant else '',
+        ]
+        if stocks:
+            row.append(lot.remaining_volume)
+        row += [lot.volume, lot.biocarburant.code if lot.biocarburant else '',
                lot.matiere_premiere.code if lot.matiere_premiere else '',
                lot.matiere_premiere.category if lot.matiere_premiere else '',
                lot.pays_origine.code_pays if lot.pays_origine else '',
@@ -620,11 +626,11 @@ def make_dump_stocks_sheet(workbook, entity, transactions):
             colid += 1
 
 
-def export_transactions(entity, transactions):
+def export_transactions(entity, transactions, stocks=False):
     today = datetime.date.today()
     location = '/tmp/carbure_export_%s.xlsx' % (today.strftime('%Y%m%d_%H%M'))
     workbook = xlsxwriter.Workbook(location)
-    make_dump_lots_sheet(workbook, entity, transactions)
+    make_dump_lots_sheet(workbook, entity, transactions, stocks)
     make_countries_sheet(workbook)
     make_mps_sheet(workbook)
     make_biofuels_sheet(workbook)
