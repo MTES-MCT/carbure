@@ -14,7 +14,7 @@ def notify_lots_rejected(txs):
 
 
 # demande de correction
-def notify_accepted_lot_in_correction(tx):
+def notify_lot_in_correction(tx):
     n = EmailNotification()
     n.linked_tx = tx
     n.notif_type = EmailNotification.CORRECTION_REQUEST
@@ -25,6 +25,14 @@ def notify_accepted_lot_in_correction(tx):
         n.send_copy_to_admin = True
     if n.entity and n.entity.notifications_enabled:
         n.save()
+
+def notify_lot_fixed(tx):
+    n = EmailNotification()
+    n.linked_tx = tx
+    n.notif_type = EmailNotification.CORRECTION_DONE
+    n.entity = tx.carbure_client
+    if n.entity and n.entity.notifications_enabled:
+        n.save()    
 
 def notify_declaration_invalidated(tx, entity):
     year, month = tx.lot.period.split('-')
