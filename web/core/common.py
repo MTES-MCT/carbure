@@ -16,7 +16,7 @@ from django.db import transaction
 from core.models import LotV2, LotTransaction, GenericError, TransactionUpdateHistory
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
 from core.models import TransactionDistance
-from core.notifications import notify_pending_lot
+from core.notifications import notify_pending_lot, notify_lot_fixed
 from core.ign_distance import get_distance
 
 from certificates.models import DoubleCountingRegistration, ISCCCertificate, EntityISCCTradingCertificate
@@ -1147,6 +1147,7 @@ def validate_lots(user, entity, txs):
                 # if we save a lot that was requiring a fix, change status to 'AA'
                 elif tx.delivery_status in [LotTransaction.TOFIX, LotTransaction.REJECTED]:
                     tx.delivery_status = LotTransaction.FIXED
+                    notify_lot_fixed(tx)
                 else:
                     pass
                 TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field='status', value_before=previous_status, value_after=tx.delivery_status, modified_by=user, modified_by_entity=entity)

@@ -6,7 +6,7 @@ Vous avez {{nb_notifications}} nouvelles notifications sur CarbuRe:
 Nombre de lots reçus: {{lots_in|length}}
 Fournisseurs {{lots_in_suppliers}}
 
-{% if entity.entity_type == 'Producteur' || entity.entity_type == 'Trader' %}
+{% if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader' %}
 https://{{ domain }}/v2/org/{{entity.id}}/stocks/in
 {% else %}
 https://{{ domain }}/v2/org/{{entity.id}}/transactions/in
@@ -19,7 +19,7 @@ https://{{ domain }}/v2/org/{{entity.id}}/transactions/in
 Nombre de lots corrigés par vos fournisseurs: {{lots_fixed|length}}
 Fournisseurs {{lots_fixed_suppliers}}
 
-{% if entity.entity_type == 'Producteur' || entity.entity_type == 'Trader' %}
+{% if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader' %}
 https://{{ domain }}/v2/org/{{entity.id}}/stocks/in
 {% else %}
 https://{{ domain }}/v2/org/{{entity.id}}/transactions/in

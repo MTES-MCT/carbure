@@ -22,7 +22,7 @@ from core.xlsx_v3 import template_producers_simple, template_producers_advanced,
 from core.common import validate_lots, load_excel_file, load_lot, bulk_insert, get_prefetched_data, check_duplicates, get_uploaded_files_directory
 from core.common import check_certificates, get_transaction_distance
 from core.decorators import check_rights
-from core.notifications import notify_lots_rejected, notify_declaration_invalidated, notify_accepted_lot_in_correction
+from core.notifications import notify_lots_rejected, notify_declaration_invalidated, notify_lot_in_correction, notify_pending_lot
 from api.v3.sanity_checks import bulk_sanity_checks
 from api.v3.lots.helpers import get_entity_lots_by_status, get_lots_with_metadata, get_snapshot_filters, get_errors, get_summary, sort_lots, filter_lots
 
@@ -434,6 +434,7 @@ def accept_with_reserves(request, *args, **kwargs):
         if not tx.carbure_client == entity:
             return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
+        notify_lot_in_correction(tx)
         if tx.delivery_status == LotTransaction.FROZEN:
             #
             # send email
@@ -467,7 +468,7 @@ def amend_lot(request, *args, **kwargs):
 
     if tx.delivery_status in [LotTransaction.ACCEPTED, LotTransaction.FROZEN]:
         # create notification / alert
-        notify_accepted_lot_in_correction(tx)
+        notify_lot_in_correction(tx)
     if tx.delivery_status == LotTransaction.FROZEN:
         # get period declaration and invalidate it
         notify_declaration_invalidated(tx, entity)
@@ -801,6 +802,7 @@ def forward_lots(request, *args, **kwargs):
             new_tx.delivery_status = 'N'
             new_tx.champ_libre = comment
             new_tx.save()
+            notify_pending_lot(new_tx)
         else:
             return JsonResponse({'status': 'error', 'message': "Delivery site not registered for outsourcing"}, status=400)
 
