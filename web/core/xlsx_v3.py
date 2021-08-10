@@ -222,7 +222,7 @@ def make_mb_extract_sheet_bcghg(workbook, entity):
     exported_lots = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
     # header
     bold = workbook.add_format({'bold': True})
-    columns = ['biocarburant_code', 'matiere_premiere_code', 'ghg_total', 'depot', 'volume', 'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
+    columns = ['biocarburant_code', 'matiere_premiere_code', 'ghg_total', 'depot', 'volume', 'dae', 'champ_libre', 'vendor_certificate', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
 
