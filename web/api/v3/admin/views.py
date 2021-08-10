@@ -361,7 +361,7 @@ def update_right_request(request):
 
         Votre demande d'accès à la Société %s vient d'être validée par l'administration.
 
-        """ % (request.entity.name)
+        """ % (right_request.entity.name)
 
         send_mail(
             subject=email_subject,
@@ -371,7 +371,7 @@ def update_right_request(request):
             fail_silently=False,
         )
     else:
-        UserRights.objects.filter(entity=request.entity, user=request.user).delete()
+        UserRights.objects.filter(entity=right_request.entity, user=request.user).delete()
     return JsonResponse({"status": "success"})
 
 
