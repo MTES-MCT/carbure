@@ -19,10 +19,11 @@ from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
-from core.models import Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
+from core.models import EmailNotification, Entity, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
 from core.models import Depot, LotV2, LotTransaction, TransactionComment, GenericError
 from core.models import SustainabilityDeclaration, EntityDepot
 from core.models import TransactionUpdateHistory, TransactionDistance
+from core.models import EmailNotification
 from certificates.models import EntitySNTradingCertificate, EntityISCCTradingCertificate, EntityDBSTradingCertificate, EntityREDCertTradingCertificate
 from api.v3.sanity_checks import bulk_sanity_checks
 from core.common import get_prefetched_data, calculate_ghg
@@ -512,3 +513,10 @@ class UserAdmin(NamedUserAdmin):
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+
+
+@admin.register(EmailNotification)
+class EmailNotificationAdmin(admin.ModelAdmin):
+    list_display = ('entity', 'notif_type')
+    list_filter = ('notif_type', )
+    raw_id_fields = ['linked_tx']
