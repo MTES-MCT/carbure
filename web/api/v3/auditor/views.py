@@ -3,7 +3,7 @@ from django.db.models import Q, Count
 from django.http import JsonResponse
 from core.common import check_certificates
 
-from core.models import LotTransaction
+from core.models import AdminTransactionComment, LotTransaction
 from core.models import UserRights
 from core.decorators import check_rights
 from api.v3.lots.helpers import filter_lots, get_lots_with_metadata, get_snapshot_filters, get_errors, get_general_summary, get_comments, get_history, get_current_deadline, get_year_bounds, get_lots_with_errors, sort_lots
@@ -110,6 +110,7 @@ def get_details(request, *args, **kwargs):
     data['transaction'] = tx.natural_key(admin=True)
     data['errors'] = get_errors(tx)
     data['comments'] = get_comments(tx)
+    data['admin_comments'] = [c.natural_key() for c in tx.admintransactioncomment_set.filter(is_visible_by_auditor=True)]
     data['updates'] = get_history(tx)
     data['deadline'] = get_current_deadline()
     data['certificates'] = check_certificates(tx)
@@ -194,4 +195,31 @@ def hide_transactions(request, *args, **kwargs):
         tx.hidden_by_auditor = not tx.hidden_by_auditor
         tx.save()
 
+    return JsonResponse({'status': 'success'})
+
+
+@check_rights('entity_id', role=UserRights.AUDITOR)
+def auditor_comment_transaction(request, *args, **kwargs):
+    tx_ids = request.POST.getlist('tx_ids', False)
+    comment = request.POST.get('comment', False)
+    is_visible_by_admin = request.POST.get('is_visible_by_admin', False)
+
+    if is_visible_by_admin == 'true':
+        is_visible_by_admin = True
+    else:
+        is_visible_by_admin = False
+
+    if not tx_ids:
+        return JsonResponse({'status': 'error', 'message': "Missing tx_ids"}, status=400)
+    if not comment:
+        return JsonResponse({'status': 'error', 'message': "Missing comment"}, status=400)
+
+    for tx_id in tx_ids:
+        tx = LotTransaction.objects.get(id=tx_id)
+        c = AdminTransactionComment()
+        c.tx = tx
+        c.comment = comment
+        c.is_visible_by_auditor = True
+        c.is_visible_by_admin = is_visible_by_admin
+        c.save()
     return JsonResponse({'status': 'success'})

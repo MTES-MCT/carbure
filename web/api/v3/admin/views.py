@@ -247,7 +247,7 @@ def get_details(request, *args, **kwargs):
     data['errors'] = get_errors(tx)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['comments'] = [c.natural_key() for c in tx.transactioncomment_set.all()]
-    data['admin_comments'] = [c.natural_key() for c in tx.admintransactioncomment_set.all()]
+    data['admin_comments'] = [c.natural_key() for c in tx.admintransactioncomment_set.filter(is_visible_by_admin=True)]
     data['updates'] = [c.natural_key() for c in tx.transactionupdatehistory_set.all().order_by('-datetime')]
     return JsonResponse({'status': 'success', 'data': data})
 
@@ -747,6 +747,11 @@ def hide_transactions(request):
 def admin_comment_transaction(request):
     tx_ids = request.POST.getlist('tx_ids', False)
     comment = request.POST.get('comment', False)
+    is_visible_by_auditor = request.POST.get('is_visible_by_auditor', False)
+    if is_visible_by_auditor == 'true':
+        is_visible_by_auditor = True
+    else:
+        is_visible_by_auditor = False
 
     if not tx_ids:
         return JsonResponse({'status': 'error', 'message': "Missing tx_ids"}, status=400)
@@ -758,6 +763,8 @@ def admin_comment_transaction(request):
         c = AdminTransactionComment()
         c.tx = tx
         c.comment = comment
+        c.is_visible_by_admin = True
+        c.is_visible_by_auditor = is_visible_by_auditor
         c.save()
     return JsonResponse({'status': 'success'})
 

@@ -14,4 +14,5 @@ urlpatterns = [
     # auditor actions
     path('lots/hide-transactions', views.hide_transactions, name='api-v3-auditor-hide-transactions'),
     path('lots/highlight-transactions', views.highlight_transactions, name='api-v3-auditor-highlight-transactions'),
+    path('lots/comment', views.auditor_comment_transaction, name='api-v3-auditor-comment-transactions'),
 ]
