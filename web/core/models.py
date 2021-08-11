@@ -516,6 +516,8 @@ class AdminTransactionComment(models.Model):
     tx = models.ForeignKey(LotTransaction, on_delete=models.CASCADE)
     comment = models.TextField()
     datetime = models.DateTimeField(auto_now_add=True)
+    is_visible_by_admin = models.BooleanField(default=True)
+    is_visible_by_auditor = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.comment)
