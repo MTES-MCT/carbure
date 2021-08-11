@@ -306,7 +306,7 @@
                         </p>
                         {% if lots_in %}
                         <p>
-                          Nombre de lots reçus: {{lots_in|length}}
+                          Nombre de lots reçus: {{lots_in|length}}<br />
                           Fournisseurs {{lots_in_suppliers}}
                           
                           {% if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader' %}
@@ -319,7 +319,7 @@
                         
                         {% if lots_fixed %}
                         <p>
-                          Nombre de lots corrigés par vos fournisseurs: {{lots_fixed|length}}
+                          Nombre de lots corrigés par vos fournisseurs: {{lots_fixed|length}}<br />
                           Fournisseurs {{lots_fixed_suppliers}}
                           
                           {% if entity.entity_type == 'Producteur' or entity.entity_type == 'Trader' %}
@@ -332,7 +332,7 @@
                         
                         {% if lots_tofix %}
                         <p>
-                          Nombre de lots à corriger: {{lots_tofix|length}}
+                          Nombre de lots à corriger: {{lots_tofix|length}}<br />
                           Clients {{lots_tofix_clients}}
                           <a href="https://{{ domain }}/v2/org/{{entity.id}}/transactions/tofix">https://{{ domain }}/v2/org/{{entity.id}}/transactions/tofix</a>
                         </p>
