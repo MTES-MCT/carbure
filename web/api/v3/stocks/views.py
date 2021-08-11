@@ -372,10 +372,10 @@ def convert_eth_stock_to_etbe(request, entity, c):
     new_lot.source = 'MANUAL'
     new_lot.biocarburant = etbe
 
-    volume_ethanol = float(volume_ethanol)
-    volume_etbe = float(volume_etbe)
-    volume_etbe_eligible = float(volume_etbe_eligible)
-    volume_denaturant = float(volume_denaturant)
+    volume_ethanol = round(float(volume_ethanol), 2)
+    volume_etbe = round(float(volume_etbe), 2)
+    volume_etbe_eligible = round(float(volume_etbe_eligible), 2)
+    volume_denaturant = round(float(volume_denaturant), 2)
 
 
     # check available volume
@@ -402,7 +402,7 @@ def convert_eth_stock_to_etbe(request, entity, c):
 
     # save ETBE Transformation
     t = ETBETransformation()
-    t.previous_stock = previous_stock_tx
+    t.previous_stock_id = previous_stock_tx_id
     t.new_stock = transaction
     t.volume_ethanol = volume_ethanol
     t.volume_etbe = volume_etbe
