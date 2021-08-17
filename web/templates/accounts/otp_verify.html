@@ -17,7 +17,14 @@
         {% endif %}
         {% if msg %}
         <span>{{msg}}</span>
-        {% endif %}        
+        {% endif %}
+        {% if not mail_sent_successfully %}
+        <p>
+        Erreur lors de l'envoi d'email - connexion impossible. <br />
+        Veuillez réessayer dans un instant. <br />
+        Vous pouvez également consulter les incidents de notre prestataire d'emails transactionnels: https://status.sendinblue.com/ <br />
+        </p>
+        {% endif %}
         <div class="form-group">
           <div class='col'></div>
           <div class='col'>

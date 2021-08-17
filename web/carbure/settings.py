@@ -54,11 +54,14 @@ INSTALLED_APPS = [
     'django_otp.plugins.otp_email',
     'django_admin_listfilter_dropdown',
     'authtools',
+    'rest_framework',
     'core',
     'accounts',
     'producers',
     'certificates',
     'api',
+    'massbalance',
+    'doublecount',
 ]
 
 AUTH_USER_MODEL = 'authtools.User'

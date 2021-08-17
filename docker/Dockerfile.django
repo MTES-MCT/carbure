@@ -30,8 +30,11 @@ COPY web/producers /app/web/producers
 COPY web/certificates /app/web/certificates
 COPY web/fixtures /app/web/fixtures
 COPY web/api /app/web/api
+COPY web/massbalance /app/web/massbalance
+COPY web/doublecount /app/web/doublecount
 COPY web/run.sh /app/web/run.sh
 COPY web/.coveragerc /app/web
 
 COPY scripts /app/scripts
 COPY cron /app/cron
+

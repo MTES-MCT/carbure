@@ -1,5 +1,6 @@
 import datetime
 import pytz
+import smtplib
 # django
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
@@ -121,18 +122,28 @@ def send_new_token(request):
     }
     html_message = loader.render_to_string('accounts/otp_token_email.html', email_context)
     text_message = loader.render_to_string('accounts/otp_token_email.txt', email_context)
-    send_mail(
-        subject=email_subject,
-        message=text_message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        html_message=html_message,
-        recipient_list=[request.user.email],
-        fail_silently=False,
-    )
+    try:
+        mail_sent = send_mail(
+            subject=email_subject,
+            message=text_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            html_message=html_message,
+            recipient_list=[request.user.email],
+            fail_silently=False,
+        )
+        if mail_sent == 0:
+            print('COULD NOT SEND OTP TOKEN')
+            return False
+        else:
+            return True
+    except smtplib.SMTPException:
+        print('COULD NOT SEND OTP TOKEN - SMTP ERROR')
+        return False
 
 @login_required
 def otp_verify(request):
     context = {}
+    mail_sent_successfully = True
     # for old users that did not register when 2fa was introduced
     if not user_has_device(request.user):
         email_otp = EmailDevice()
@@ -141,6 +152,7 @@ def otp_verify(request):
         email_otp.confirmed = True
         email_otp.email = request.user.email
         email_otp.save()
+
 
     if request.method == 'POST':
         form = OTPForm(request.user, request.POST)
@@ -153,7 +165,7 @@ def otp_verify(request):
                 is_allowed, _ = device.verify_is_allowed()
                 now = timezone.now()
                 if now > device.valid_until:
-                    send_new_token(request)
+                    mail_sent_successfully = send_new_token(request)
                     dt = device.valid_until.astimezone(pytz.timezone('Europe/Paris'))
                     form.add_error('otp_token', "Code Expiré. Un nouveau code vient d'être envoyé. Il sera valide jusqu'à %s %s" % (dt.strftime('%H:%M'), dt.tzname()))
                 elif device.token != form.clean_otp_token():
@@ -165,17 +177,18 @@ def otp_verify(request):
                 else:
                     # unknown error
                     form.add_error('otp_token', "Erreur serveur")
-                return render(request, 'accounts/otp_verify.html', {'form': form})
+                return render(request, 'accounts/otp_verify.html', {'form': form, 'mail_sent_successfully': mail_sent_successfully})
         else:
             print('form is invalid')
     else:
         # send token by email and display form
-        send_new_token(request)
+        mail_sent_successfully = send_new_token(request)
         device = EmailDevice.objects.get(user=request.user)
         dt = device.valid_until.astimezone(pytz.timezone('Europe/Paris'))
         form = OTPForm(request.user)
         context['code_expiry'] = dt
     context['form'] = form
+    context['mail_sent_successfully'] = mail_sent_successfully
     return render(request, 'accounts/otp_verify.html', context=context)
 
 

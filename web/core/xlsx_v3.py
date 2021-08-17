@@ -253,7 +253,44 @@ def make_mb_extract_sheet_bcghg(workbook, entity):
             worksheet_lots.write(i+1, colid, elem)
             colid += 1
 
+def make_dae_upload_template(workbook, entity):
+    worksheet_lots = workbook.add_worksheet("lots")
+    clients = Entity.objects.filter(entity_type__in=['Opérateur', 'Producteur', 'Trader']).exclude(id=entity.id)
+    delivery_sites = Depot.objects.all()
+    my_vendor_certificates = get_my_certificates(entity=entity)
 
+    # 3/10 chances of having an exported lot
+    exported_lots = [1, 1, 1, 0, 0, 0, 0, 0, 0, 0]
+    
+    # header
+    bold = workbook.add_format({'bold': True})
+    columns = ['dae', 'volume', 'depot', 'champ_libre', 'vendor_certificate', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country']
+    for i, c in enumerate(columns):
+        worksheet_lots.write(0, i, c, bold)
+
+    clientid = 'import_batch_%s' % (datetime.date.today().strftime('%Y%m%d'))
+    today = datetime.date.today().strftime('%d/%m/%Y')
+    for i in range(10):
+        client = random.choice(clients)
+        depot = random.choice(delivery_sites)
+        delivery_site = random.choice(delivery_sites)
+        exported = random.choice(exported_lots)
+        my_vendor_certificate = random.choice(my_vendor_certificates)
+        volume = random.randint(34000, 36000)
+
+        row = [get_random_dae(), volume, depot.depot_id, clientid, my_vendor_certificate]
+        if exported == 1:
+            # client is not in carbure
+            c = random.choice(FOREIGN_CLIENTS)
+            row += [c['name'], today, c['delivery_site'], c['country']]
+        else:
+            # regular transaction. sell to someone else
+            row += [client.name, today, delivery_site.depot_id, '']
+
+        colid = 0
+        for elem in row:
+            worksheet_lots.write(i+1, colid, elem)
+            colid += 1
 
 def make_producers_lots_sheet_simple(workbook, entity):
     worksheet_lots = workbook.add_worksheet("lots")
@@ -510,6 +547,17 @@ def template_stock(entity):
     location = '/tmp/carbure_template_mb.xlsx'
     workbook = xlsxwriter.Workbook(location)
     make_mb_extract_sheet(workbook, entity)
+    make_countries_sheet(workbook)
+    make_clients_sheet(workbook)
+    make_deliverysites_sheet(workbook)
+    workbook.close()
+    return location
+
+def template_dae_to_upload():
+    # Create an new Excel file and add a worksheet.
+    location = '/tmp/carbure_template_mb.xlsx'
+    workbook = xlsxwriter.Workbook(location)
+    make_dae_upload_template(workbook)
     make_countries_sheet(workbook)
     make_clients_sheet(workbook)
     make_deliverysites_sheet(workbook)
