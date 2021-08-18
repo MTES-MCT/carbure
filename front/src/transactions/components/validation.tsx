@@ -43,7 +43,7 @@ export const ValidationPrompt = ({
       <Box className={styles.dialogCheckboxes}>
         <LabelCheckbox
           label={t(
-            "Je certifie que cette déclaration respecte les critères de durabilité liés aux terres"
+            "Je certifie que cette déclaration respecte les critères de durabilité conformément à la réglementation en vigueur."
           )}
           checked={checked.terres}
           onChange={(e) => setChecked({ ...checked, terres: e.target.checked })}
