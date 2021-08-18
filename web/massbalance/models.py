@@ -37,8 +37,7 @@ class OutTransaction(models.Model):
     dt_created = models.DateTimeField(auto_now_add=True)
     dt_updated = models.DateTimeField(auto_now=True)
     creation_method = models.CharField(max_length=32, choices=CREATION_METHOD_CHOICES, default='UNKNOWN')
-    created_by_entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='mb_pending_tx_creator')
-    created_by_user = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
+    created_by = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
 
     is_sent = models.BooleanField(default=False)
 

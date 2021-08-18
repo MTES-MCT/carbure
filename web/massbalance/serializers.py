@@ -3,10 +3,10 @@ from rest_framework import serializers
 from massbalance.models import OutTransaction
 
 
-class OutTransactionSerializer(serializers.HyperlinkedModelSerializer):
+class OutTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = OutTransaction
-        fields = ['vendor', 'dae', 'carbure_storage_site', 
+        fields = ['id', 'vendor', 'dae', 'carbure_storage_site', 
                 'client_is_in_carbure', 'carbure_client', 'unknown_client',
                 'dispatch_date', 'delivery_date',
                 'delivery_site_is_in_carbure', 'carbure_delivery_site', 'unknown_delivery_site', 'unknown_delivery_site_country',

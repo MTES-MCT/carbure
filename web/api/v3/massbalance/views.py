@@ -1,11 +1,11 @@
 import datetime
 from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
-from rest_framework import viewsets
+from rest_framework import views, viewsets
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication
-
+from rest_framework.decorators import api_view
 
 from api.v3.permissions import ReadPermission, ReadWritePermission
 from core.models import UserRights
@@ -15,33 +15,80 @@ from core.xlsx_v3 import template_dae_to_upload
 from massbalance.models import OutTransaction
 from massbalance.serializers import OutTransactionSerializer
 
+def get_prefetched_data(entity_id=None):
+    d['depots'] = {d.depot_id.lstrip('0').upper(): d for d in Depot.objects.all()}
+    d['depotsbyname'] = {d.name.upper(): d for d in Depot.objects.all()}
+    d['clients'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}    
 
-class OutTransactionViewSet(viewsets.ModelViewSet):
-    serializer_class = OutTransactionSerializer
-    permission_classes = [ReadPermission]
-    authentication_classes = [SessionAuthentication]
+def load_pending_transaction(transaction, pdata):
+    client = transaction['client']
+    if client and client.upper() in pdata['clients']:
+        transaction['client_is_in_carbure'] = True
+        transaction['carbure_client'] = pdata['clients'][client.upper()]
+        transaction['unknown_client'] = ''
+    else:
+        transaction['client_is_in_carbure'] = False
+        transaction['carbure_client'] = None
+        transaction['unknown_client'] = client
+    dsite = transaction['delivery_site']
+    if dsite and dsite.upper() in pdata['depots']:
+        transaction['delivery_site_is_in_carbure'] = True
+        transaction['carbure_delivery_site'] = pdata['depots'][dsite.upper()]
+        transaction['unknown_delivery_site'] = ''
+    elif dsite and dsite.upper() in pdata['depotsbyname']:
+        transaction['delivery_site_is_in_carbure'] = True
+        transaction['carbure_delivery_site'] = pdata['depotsbyname'][dsite.upper()]
+        transaction['unknown_delivery_site'] = ''
+    else:
+        transaction['delivery_site_is_in_carbure'] = False
+        transaction['carbure_delivery_site'] = None
+        transaction['unknown_delivery_site'] = dsite
+    transaction['vendor'] = entity_id
+    transaction['creation_method'] = 'USER'
+    transaction['created_by'] = request.user
+    serializer = OutTransactionCreateUpdateSerializer(data=transaction)
+    if serializer.is_valid():
+        obj = serializer.save()
+        return obj
+    return None
 
-    def get_queryset(self):
-        entity_id = self.kwargs.get('entity_id')
-        tx_status = self.kwargs.get('status')
+@api_view(['GET'])
+def get_pending_transactions_list(request, *args, **kwargs):
+    entity_id = request.query_params.get('entity_id')
+    tx_status = request.query_params.get('tx_status', 'all')
+    if not entity_id:
+        return Response({'status': 'error', 'message': 'Missing entity_id'}, status=400)
 
-        queryset = OutTransaction.objects.filter(vendor_id=entity_id)
-        if tx_status == 'draft':
-            queryset = queryset.filter(is_sent=False)
-        elif tx_status == 'sent':
-            queryset = queryset.filter(is_sent=False)
-        elif tx_status == 'all':
-            pass
-        else:
-            return Response(data="Unknown status %s" % (tx_status), status=status.HTTP_400_BAD_REQUEST)
-        serializer = OutTransactionSerializer(queryset)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    if not UserRights.objects.filter(user=request.user, entity_id=entity_id).exists():
+        return Response({'status': 'error', 'message': 'Unauthorized'}, status=403)
 
+    queryset = OutTransaction.objects.filter(vendor_id=entity_id)
+    if tx_status == 'draft':
+        queryset = queryset.filter(is_sent=False)
+    elif tx_status == 'sent':
+        queryset = queryset.filter(is_sent=False)
+    elif tx_status == 'all':
+        pass
+    serializer = OutTransactionSerializer(queryset, context={'request':request}, many=True)
+    return Response(serializer.data)
 
-@check_rights('entity_id', role=[UserRights.RW, UserRights.ADMIN])
-def create_dae(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
+@api_view(['POST'])
+def add_pending_transactions(request, *args, **kwargs):
+    entity_id = request.data.get('entity_id')
+    transactions = request.data.get('transactions')
+    if not entity_id:
+        return Response({'status': 'error', 'message': 'Missing entity_id'}, status=400)
+    if not UserRights.objects.filter(user=request.user, entity_id=entity_id).exists():
+        return Response({'status': 'error', 'message': 'Unauthorized'}, status=403)
+
+    pdata = get_prefetched_data()
+    nb_submitted = 0
+    nb_created = 0
+    for transaction in transactions:
+        obj = load_pending_transaction(transaction, pdata)
+        nb_submitted += 1
+        nb_created += 1 if obj else 0
+    return Response({'status': 'success', 'data': {'submitted': nb_submitted, 'created': nb_created}}, status=status.HTTP_201_CREATED)
 
 
 @check_rights('entity_id')
