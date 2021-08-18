@@ -133,6 +133,7 @@ def check_rights(entity_id_field, role=None):
         return wrap
     return actual_decorator
 
+
 def is_admin(function):
     @wraps(function)
     def wrap(request, *args, **kwargs):

@@ -367,11 +367,11 @@ def update_right_request(request):
             subject=email_subject,
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[request.user.email],
+            recipient_list=[right_request.user.email],
             fail_silently=False,
         )
     else:
-        UserRights.objects.filter(entity=right_request.entity, user=request.user).delete()
+        UserRights.objects.filter(entity=right_request.entity, user=right_request.user).delete()
     return JsonResponse({"status": "success"})
 
 
