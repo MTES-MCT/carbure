@@ -655,3 +655,36 @@ def export_stocks(entity, transactions):
     make_deliverysites_sheet(workbook)
     workbook.close()
     return location
+
+
+def make_dc_sourcing_sheet(workbook):
+    worksheet = workbook.add_worksheet("sourcing")
+    # header
+    bold = workbook.add_format({'bold': True})
+    columns = ['year', 'feedstock', 'origin_country', 'supply_country', 'transit_country', 'metric_tonnes']
+    for i, c in enumerate(columns):
+        worksheet.write(0, i, c, bold)
+
+def make_dc_production_sheet(workbook):
+    worksheet = workbook.add_worksheet("production")
+    # header
+    bold = workbook.add_format({'bold': True})
+    columns = ['year', 'feedstock', 'biofuel', 'metric_tonnes']
+    for i, c in enumerate(columns):
+        worksheet.write(0, i, c, bold)
+
+def make_dc_mps_sheet(workbook):
+    worksheet_mps = workbook.add_worksheet("MatieresPremieres")
+    mps = MatierePremiere.objects.filter(is_double_compte=True)
+    # header
+    bold = workbook.add_format({'bold': True})
+    worksheet_mps.write('A1', 'code', bold)
+    worksheet_mps.write('B1', 'name', bold)
+    worksheet_mps.write('C1', 'category', bold)
+    # content
+    row = 1
+    for m in mps:
+        worksheet_mps.write(row, 0, m.code)
+        worksheet_mps.write(row, 1, m.name)
+        worksheet_mps.write(row, 2, m.category)
+        row += 1
