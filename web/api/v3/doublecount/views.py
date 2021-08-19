@@ -1,8 +1,12 @@
-from core.decorators import check_rights
+import xlsxwriter
+from django.http import JsonResponse, HttpResponse
+from core.decorators import check_rights, is_admin
 
 from doublecount.models import DoubleCountingAgreement
 from doublecount.serializers import DoubleCountingAgreementFullSerializer, DoubleCountingAgreementPartialSerializer
-from doublecount.helpers import load_dc_file
+from doublecount.helpers import load_dc_sourcing_file, load_dc_production_file, load_dc_recognition_file
+
+from core.xlsx_v3 import make_biofuels_sheet, make_dc_mps_sheet, make_countries_sheet, make_dc_production_sheet, make_dc_sourcing_sheet
 
 @check_rights('entity_id')
 def get_agreements(request, *args, **kwargs):
@@ -82,7 +86,30 @@ def upload_file(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'unknown file_type'}, status=400)
 
 def get_template(request):
-    return JsonResponse({'status': 'error', 'message': 'not implemented'}, status=400)    
+    file_type = request.GET.get('file_type', None)
+    if file_type == 'SOURCING':
+        location = '/tmp/carbure_template_sourcing.xlsx'
+        workbook = xlsxwriter.Workbook(location)
+        make_dc_sourcing_sheet(workbook)
+        make_countries_sheet(workbook)
+        make_dc_mps_sheet(workbook)
+    elif file_type == 'PRODUCTION':
+        location = '/tmp/carbure_template_production.xlsx'
+        workbook = xlsxwriter.Workbook(location)
+        make_dc_production_sheet(workbook)
+        make_countries_sheet(workbook)
+        make_biofuels_sheet(workbook)
+        make_dc_mps_sheet(workbook)
+    elif file_type == 'RECOGNITION':
+        return JsonResponse({'status': 'error', 'message': 'not implemented'}, status=400)        
+    else:
+        return JsonResponse({'status': 'error', 'message': 'unknown file_type'}, status=400)
+    workbook.close()
+    with open(location, 'rb') as f:
+        file_data = f.read()
+        response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="carbure_template.xlsx"'
+        return response
 
 def approve_dca(request):
     return JsonResponse({'status': 'error', 'message': 'not implemented'}, status=400)        
