@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'producers',
     'certificates',
     'api',
+    'doublecount',
 ]
 
 AUTH_USER_MODEL = 'authtools.User'
