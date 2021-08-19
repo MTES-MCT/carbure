@@ -147,3 +147,7 @@ a .button {
 .activeStatusButton .statusButtonLabel {
   color: var(--blue-medium);
 }
+
+.button input[type="file"] {
+  display: none;
+}
