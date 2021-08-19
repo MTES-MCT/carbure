@@ -88,3 +88,15 @@ div > .settingsSelect {
 .expirationDate.expired button :global(.icon) {
   width: 14px;
 }
+
+.settingsText {
+  margin: 16px 0;
+}
+
+.settingsPrompt {
+  width: 600px;
+}
+
+.settingsFormButton {
+  margin-bottom: 16px;
+}
