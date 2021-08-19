@@ -21,12 +21,10 @@ class OutTransaction(models.Model):
     carbure_storage_site = models.ForeignKey(Depot, null=True, blank=True, on_delete=models.SET_NULL, related_name='mb_pending_tx_depot_source')
 
     # delivery
-    client_is_in_carbure = models.BooleanField(default=True)
     carbure_client = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='mb_pending_tx_client')
     unknown_client = models.CharField(max_length=64, blank=True, default='')
     dispatch_date = models.DateField(blank=True, null=True)
     delivery_date = models.DateField(blank=True, null=True)
-    delivery_site_is_in_carbure = models.BooleanField(default=True)
     carbure_delivery_site = models.ForeignKey(Depot, null=True, blank=True, on_delete=models.SET_NULL, related_name='mb_pending_tx_destination_depot')
     unknown_delivery_site = models.CharField(max_length=64, blank=True, default='')
     unknown_delivery_site_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.SET_NULL)
