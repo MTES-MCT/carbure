@@ -8,7 +8,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import api_view
 
 from api.v3.permissions import ReadPermission, ReadWritePermission
-from core.models import UserRights
+from core.models import UserRights, Depot, Entity
 from core.decorators import check_rights
 from core.xlsx_v3 import template_dae_to_upload 
 
@@ -16,9 +16,11 @@ from massbalance.models import OutTransaction
 from massbalance.serializers import OutTransactionSerializer
 
 def get_prefetched_data(entity_id=None):
+    d = {}
     d['depots'] = {d.depot_id.lstrip('0').upper(): d for d in Depot.objects.all()}
     d['depotsbyname'] = {d.name.upper(): d for d in Depot.objects.all()}
     d['clients'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}    
+    return d
 
 def load_pending_transaction(transaction, pdata):
     client = transaction['client']

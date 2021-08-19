@@ -1,12 +1,14 @@
 import json
 import random
 import os
+import datetime
+
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django_otp.plugins.otp_email.models import EmailDevice
 
-from core.models import Entity, UserRights
+from core.models import Entity, UserRights, Depot
 
 
 class MassBalanceAPITest(TestCase):
@@ -79,7 +81,7 @@ class MassBalanceAPITest(TestCase):
         lot_id = data['lot']['id']
         return tx_id, lot_id, lot
 
-    def create_out_transaction(self, **kwards):
+    def create_out_transaction(self, **kwargs):
         today = datetime.date.today().strftime('%d/%m/%Y')
         now = datetime.datetime.now().strftime('%H%M%S%f')
         data = {
@@ -91,7 +93,7 @@ class MassBalanceAPITest(TestCase):
             'volume': random.randrange(30000, 37000),
         }
         data.update(kwargs)
-        response = self.client.post('/api/v3/massbalance/add-pending-transactions', {'transactions': [data]})
+        response = self.client.post('/api/v3/massbalance/add-pending-transactions', {'entity_id': self.entity1.id, 'transactions': [data]})
         self.assertEqual(response.status_code, 200)
 
     def test_create_dae(self):
@@ -101,7 +103,7 @@ class MassBalanceAPITest(TestCase):
         #self.create_out_transaction()
         pass
 
-    def test_create_dae_rights():
+    def test_create_dae_rights(self):
         pass
 
     def test_mass_balance(self):
