@@ -83,7 +83,6 @@ def upload_file(request, *args, **kwargs):
     with open(filepath, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
-
             
     if file_type == 'SOURCING':
         return load_dc_sourcing_file(entity, production_site_id, request.user, filepath)

@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from core.models import Entity, Pays, Biocarburant, MatierePremiere, Depot, UserRights
 from producers.models import ProductionSite
+from doublecount.models import DoubleCountingAgreement, DoubleCountingSourcing, DoubleCountingProduction
 from django_otp.plugins.otp_email.models import EmailDevice
 from django.core.files.uploadedfile import SimpleUploadedFile
 
