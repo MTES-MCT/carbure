@@ -1,7 +1,10 @@
+import datetime
+import unicodedata
 import xlsxwriter
 from django.http import JsonResponse, HttpResponse
 from core.decorators import check_rights, is_admin
 
+from producers.models import ProductionSite
 from doublecount.models import DoubleCountingAgreement
 from doublecount.serializers import DoubleCountingAgreementFullSerializer, DoubleCountingAgreementPartialSerializer
 from doublecount.helpers import load_dc_sourcing_file, load_dc_production_file, load_dc_recognition_file
@@ -55,16 +58,22 @@ def get_agreement_admin(request, *args, **kwargs):
 
 @check_rights('entity_id')
 def upload_file(request, *args, **kwargs):
-    context = kwards['context']
+    context = kwargs['context']
     entity = context['entity']
+    production_site_id = request.POST.get('production_site_id', None)    
     file_type = request.POST.get('file_type', None)
     if not file_type:
         return JsonResponse({'status': "error", 'message': "Missing file_type"}, status=400)
+    if not production_site_id:
+        return JsonResponse({'status': "error", 'message': "Missing production_site_id"}, status=400)
     
     f = request.FILES.get('file')
     if f is None:
         return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
 
+    if not ProductionSite.objects.filter(producer=entity, id=production_site_id).exists():
+        return JsonResponse({'status': "error", 'message': "Production site not found"}, status=400)
+    
     # save file
     directory = '/tmp'
     now = datetime.datetime.now()
@@ -77,11 +86,11 @@ def upload_file(request, *args, **kwargs):
 
             
     if file_type == 'SOURCING':
-        return load_dc_sourcing_file(entity, request.user, filepath)
+        return load_dc_sourcing_file(entity, production_site_id, request.user, filepath)
     elif file_type == 'PRODUCTION':
-        return load_dc_production_file(entity, request.user, filepath)
+        return load_dc_production_file(entity, production_site_id, request.user, filepath)
     elif file_type == 'RECOGNITION':
-        return load_dc_recognition_file(entity, request.user, filepath)
+        return load_dc_recognition_file(entity, production_site_id, request.user, filepath)
     else:
         return JsonResponse({'status': 'error', 'message': 'unknown file_type'}, status=400)
 
