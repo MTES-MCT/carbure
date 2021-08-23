@@ -13,14 +13,15 @@ from core.xlsx_v3 import make_biofuels_sheet, make_dc_mps_sheet, make_countries_
 
 @check_rights('entity_id')
 def get_agreements(request, *args, **kwargs):
-    agreements = DoubleCoutingAgreement.objects.filter(producer=entity)
+    entity = kwargs['context']['entity']
+    agreements = DoubleCountingAgreement.objects.filter(producer=entity)
     serializer = DoubleCountingAgreementPartialSerializer(agreements, many=True)
     return JsonResponse({'status': 'success', 'data': serializer.data})
 
 @is_admin
 def get_agreements_admin(request, *args, **kwargs):
-    entity_id = request.GET.get('entity_id', None)    
-    agreements = DoubleCoutingAgreement.objects.all()
+    entity_id = request.GET.get('entity_id', None)
+    agreements = DoubleCountingAgreement.objects.all()
     if entity_id:
         agreements = agreements.filter(producer_id=entity_id)
     serializer = DoubleCountingAgreementFullSerializer(agreements, many=True)
@@ -28,27 +29,29 @@ def get_agreements_admin(request, *args, **kwargs):
 
 @check_rights('entity_id')
 def get_agreement(request, *args, **kwargs):
+    entity = kwargs['context']['entity']
     agreement_id = request.GET.get('dca_id', None)
     if not agreement_id:
         return JsonResponse({'status': 'error', 'message': 'Missing dca_id'}, status=400)
     try:
-        agreement = DoubleCoutingAgreement.objects.filter(producer=entity, id=agreement_id)
+        agreement = DoubleCountingAgreement.objects.get(producer=entity, id=agreement_id)
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not find DCA agreement'}, status=400)
+    print(agreement.producer)
     serializer = DoubleCountingAgreementPartialSerializer(agreement)
     return JsonResponse({'status': 'success', 'data': serializer.data})
 
 @is_admin
 def get_agreement_admin(request, *args, **kwargs):
-    entity_id = request.GET.get('entity_id', None)    
+    entity_id = request.GET.get('entity_id', None)
     agreement_id = request.GET.get('dca_id', None)
-    
+
     if not entity_id:
         return JsonResponse({'status': 'error', 'message': 'Missing entity_id'}, status=400)
     if not agreement_id:
         return JsonResponse({'status': 'error', 'message': 'Missing dca_id'}, status=400)
     try:
-        agreement = DoubleCoutingAgreement.objects.filter(producer_id=entity_id, id=agreement_id)
+        agreement = DoubleCountingAgreement.objects.filter(producer_id=entity_id, id=agreement_id)
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not find DCA agreement'}, status=400)
     serializer = DoubleCountingAgreementFullSerializer(agreement)
@@ -60,20 +63,20 @@ def get_agreement_admin(request, *args, **kwargs):
 def upload_file(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
-    production_site_id = request.POST.get('production_site_id', None)    
+    production_site_id = request.POST.get('production_site_id', None)
     file_type = request.POST.get('file_type', None)
     if not file_type:
         return JsonResponse({'status': "error", 'message': "Missing file_type"}, status=400)
     if not production_site_id:
         return JsonResponse({'status': "error", 'message': "Missing production_site_id"}, status=400)
-    
+
     f = request.FILES.get('file')
     if f is None:
         return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
 
     if not ProductionSite.objects.filter(producer=entity, id=production_site_id).exists():
         return JsonResponse({'status': "error", 'message': "Production site not found"}, status=400)
-    
+
     # save file
     directory = '/tmp'
     now = datetime.datetime.now()
@@ -83,7 +86,7 @@ def upload_file(request, *args, **kwargs):
     with open(filepath, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
-            
+
     if file_type == 'SOURCING':
         return load_dc_sourcing_file(entity, production_site_id, request.user, filepath)
     elif file_type == 'PRODUCTION':
@@ -109,7 +112,7 @@ def get_template(request):
         make_biofuels_sheet(workbook)
         make_dc_mps_sheet(workbook)
     elif file_type == 'RECOGNITION':
-        return JsonResponse({'status': 'error', 'message': 'not implemented'}, status=400)        
+        return JsonResponse({'status': 'error', 'message': 'not implemented'}, status=400)
     else:
         return JsonResponse({'status': 'error', 'message': 'unknown file_type'}, status=400)
     workbook.close()
@@ -120,7 +123,7 @@ def get_template(request):
         return response
 
 def approve_dca(request):
-    return JsonResponse({'status': 'error', 'message': 'not implemented'}, status=400)        
+    return JsonResponse({'status': 'error', 'message': 'not implemented'}, status=400)
 
 def reject_dca(request):
-    return JsonResponse({'status': 'error', 'message': 'not implemented'}, status=400)        
+    return JsonResponse({'status': 'error', 'message': 'not implemented'}, status=400)

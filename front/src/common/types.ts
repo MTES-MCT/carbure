@@ -542,3 +542,18 @@ export interface ConvertETBE {
   volume_etbe_eligible: number
   volume_denaturant: number
 }
+
+export enum DoubleCountingStatus {
+  Pending = "PENDING",
+  Rejected = "REJECTED",
+  Accepted = "ACCEPTED",
+  Lapsed = "LAPSED",
+}
+
+export interface DoubleCounting {
+  producer: number
+  production_site: string
+  period_start: string
+  period_end: string
+  status: DoubleCountingStatus
+}
