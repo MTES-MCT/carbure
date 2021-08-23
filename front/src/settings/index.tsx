@@ -25,6 +25,7 @@ import useREDCertCertificates from "./hooks/use-redcert-certificates"
 import UserRights from "./components/user-rights"
 import { useRights } from "carbure/hooks/use-rights"
 import { EntityType, UserRole } from "common/types"
+import DoubleCountingSettings from "./components/double-counting"
 
 function useSettings(entity: EntitySelection, settings: SettingsGetter) {
   const company = useCompany(entity, settings)
@@ -94,6 +95,11 @@ const Settings = ({ entity, settings }: SettingsProps) => {
             <Trans>Sites de production</Trans>
           </a>
         )}
+        {isProducer && (
+          <a href="#double-counting">
+            <Trans>Double comptage</Trans>
+          </a>
+        )}
         {hasCertificates && (
           <a href="#iscc">
             <Trans>Certificats ISCC</Trans>
@@ -131,6 +137,10 @@ const Settings = ({ entity, settings }: SettingsProps) => {
         {!isAuditor && <DeliverySitesSettings settings={deliverySites} />}
 
         {isProducer && <ProductionSitesSettings settings={productionSites} />}
+
+        {isProducer && (
+          <DoubleCountingSettings entity={entity} settings={company} />
+        )}
 
         {hasCertificates && (
           <ISCCCertificateSettings settings={isccCertificates} />
