@@ -11,6 +11,7 @@ import {
   REDCertCertificate,
   SNCertificate,
   EntityRights,
+  DoubleCounting,
 } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
@@ -418,5 +419,35 @@ export function setDefaultCertificate(
     entity_id,
     certificate_id,
     certificate_type,
+  })
+}
+
+export function getDoubleCountingAgreements(entity_id: number) {
+  return api.get<DoubleCounting[]>("/doublecount/agreements", { entity_id })
+}
+
+export function uploadDoubleCountingSourcing(
+  entity_id: number,
+  production_site_id: number,
+  file: File
+) {
+  return api.post("/doublecount/upload", {
+    entity_id,
+    production_site_id,
+    file,
+    file_type: "SOURCING",
+  })
+}
+
+export function uploadDoubleCountingProduction(
+  entity_id: number,
+  production_site_id: number,
+  file: File
+) {
+  return api.post("/doublecount/upload", {
+    entity_id,
+    production_site_id,
+    file,
+    file_type: "PRODUCTION",
   })
 }

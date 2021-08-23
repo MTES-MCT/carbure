@@ -1,20 +1,26 @@
 import { Trans, useTranslation } from "react-i18next"
-
+import { useEffect, useState } from "react"
+import cl from "clsx"
+import statusStyles from "transactions/components/status.module.css"
+import styles from "./settings.module.css"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { CompanySettingsHook as DoubleContingSettingsHook } from "../hooks/use-company"
-import { ProductionSite, UserRole } from "common/types"
+import {
+  DoubleCounting,
+  DoubleCountingStatus,
+  ProductionSite,
+  UserRole,
+} from "common/types"
 import { Title, LoaderOverlay } from "common/components"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import { useRights } from "carbure/hooks/use-rights"
-import Table from "common/components/table"
-import styles from "./settings.module.css"
-import { Button } from "common/components/button"
+import Table, { Column, Row } from "common/components/table"
+import { AsyncButton, Button } from "common/components/button"
 import {
   AlertCircle,
   Check,
   Plus,
   Return,
-  Save,
   Upload,
 } from "common/components/icons"
 import { Alert } from "common/components/alert"
@@ -25,10 +31,12 @@ import {
   prompt,
   PromptProps,
 } from "common/components/dialog"
-import { SettingsForm } from "./common"
-import { useState } from "react"
+import { formatDate, SettingsForm } from "./common"
 import { findProductionSites } from "common/api"
 import { LabelAutoComplete } from "common/components/autocomplete"
+import * as api from "../api"
+import useAPI from "common/hooks/use-api"
+import { padding } from "transactions/components/list-columns"
 
 type DoubleCountingUploadPromptProps = PromptProps<void> & {
   entity: EntitySelection
@@ -46,6 +54,25 @@ const DoubleCountingUploadPrompt = ({
 
   const [sourcingFile, setSourcingFile] = useState<File | null>(null)
   const [productionFile, setProductionFile] = useState<File | null>(null)
+
+  const [uploadingSourcing, uploadSourcing] = useAPI(
+    api.uploadDoubleCountingSourcing
+  )
+  const [uploadingProduction, uploadProduction] = useAPI(
+    api.uploadDoubleCountingProduction
+  )
+
+  const loading = uploadingSourcing.loading || uploadingProduction.loading
+  const disabled = !productionSite || !sourcingFile || !productionFile
+
+  async function submitAgreement() {
+    if (!entity || !productionSite || !sourcingFile || !productionFile) return
+
+    await uploadSourcing(entity.id, productionSite.id, sourcingFile)
+    await uploadProduction(entity.id, productionSite.id, productionFile)
+
+    onResolve()
+  }
 
   return (
     <Dialog onResolve={onResolve} className={styles.settingsPrompt}>
@@ -74,10 +101,10 @@ const DoubleCountingUploadPrompt = ({
 
         <div className={styles.settingsText}>
           <a
-            href="/api/v3/double-count/get-template?file_type=SOURCING"
+            href="/api/v3/doublecount/get-template?file_type=SOURCING"
             className={styles.settingsLink}
           >
-            <Trans>Téléchargez le modèle suivant</Trans>
+            <Trans>Téléchargez ce modèle</Trans>
           </a>
           <Trans>
             {" "}
@@ -106,10 +133,10 @@ const DoubleCountingUploadPrompt = ({
 
         <div className={styles.settingsText}>
           <a
-            href="/api/v3/double-count/get-template?file_type=PRODUCTION"
+            href="/api/v3/doublecount/get-template?file_type=PRODUCTION"
             className={styles.settingsLink}
           >
-            <Trans>Télécharger le modèle pour la production</Trans>
+            <Trans>Téléchargez ce modèle</Trans>
           </a>
           <Trans>
             {" "}
@@ -137,15 +164,47 @@ const DoubleCountingUploadPrompt = ({
         </Button>
 
         <DialogButtons>
-          <Button level="primary" icon={Check} onClick={() => onResolve()}>
-            <Trans>Valider</Trans>
-          </Button>
+          <AsyncButton
+            loading={loading}
+            disabled={disabled}
+            level="primary"
+            icon={Check}
+            onClick={submitAgreement}
+          >
+            <Trans>Soumettre le dossier</Trans>
+          </AsyncButton>
           <Button icon={Return} onClick={() => onResolve()}>
             <Trans>Annuler</Trans>
           </Button>
         </DialogButtons>
       </SettingsForm>
     </Dialog>
+  )
+}
+
+export const DCStatus = ({ status }: { status: DoubleCountingStatus }) => {
+  const { t } = useTranslation()
+
+  const statusLabels = {
+    [DoubleCountingStatus.Pending]: t("En attente"),
+    [DoubleCountingStatus.Accepted]: t("Accepté"),
+    [DoubleCountingStatus.Rejected]: t("Refusé"),
+    [DoubleCountingStatus.Lapsed]: t("Expiré"),
+  }
+
+  return (
+    <span
+      className={cl(
+        statusStyles.status,
+        statusStyles.smallStatus,
+        status === DoubleCountingStatus.Accepted && statusStyles.statusAccepted,
+        status === DoubleCountingStatus.Pending && statusStyles.statusWaiting,
+        status === DoubleCountingStatus.Rejected && statusStyles.statusRejected,
+        status === DoubleCountingStatus.Lapsed && statusStyles.statusToFix
+      )}
+    >
+      {statusLabels[status]}
+    </span>
   )
 }
 
@@ -161,11 +220,37 @@ const DoubleCountingSettings = ({
   const { t } = useTranslation()
   const rights = useRights()
 
-  const isEmpty = true
+  const [agreements, getAgreements] = useAPI(api.getDoubleCountingAgreements)
+
+  useEffect(() => {
+    if (entity) {
+      getAgreements(entity.id)
+    }
+  }, [entity, getAgreements])
+
+  const isEmpty = !agreements.data || agreements.data.length === 0
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
-  const columns: any[] = []
-  const rows: any[] = []
+  const columns: Column<DoubleCounting>[] = [
+    padding,
+    {
+      header: t("Statut"),
+      render: (dc) => <DCStatus status={dc.status} />,
+    },
+    {
+      header: t("Site de production"),
+      render: (dc) => dc.production_site,
+    },
+    {
+      header: t("Valide jusqu'au"),
+      render: (dc) => formatDate(dc.period_end),
+    },
+    padding,
+  ]
+
+  const rows: Row<DoubleCounting>[] = (agreements.data ?? []).map((dc) => ({
+    value: dc,
+  }))
 
   return (
     <Section id="double-counting">
@@ -177,14 +262,18 @@ const DoubleCountingSettings = ({
           <Button
             level="primary"
             icon={Plus}
-            onClick={() =>
-              prompt((resolve) => (
+            onClick={async () => {
+              if (entity === null) return
+
+              await prompt((resolve) => (
                 <DoubleCountingUploadPrompt
                   entity={entity}
                   onResolve={resolve}
                 />
               ))
-            }
+
+              getAgreements(entity.id)
+            }}
           >
             <Trans>Ajouter un dossier double comptage</Trans>
           </Button>

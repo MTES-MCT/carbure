@@ -38,7 +38,7 @@ def load_dc_sourcing_file(entity, psite_id, user, filepath):
             dcs.supply_country = supply_country
             dcs.transit_country = transit_country
             dcs.metric_tonnes = row.metric_tonnes
-            dcs.save()            
+            dcs.save()
     except Exception as e:
         print(e)
         return JsonResponse({'status': 'error', 'message': "something went wrong"}, status=400)
@@ -55,7 +55,7 @@ def load_dc_production_file(entity, psite_id, user, filepath):
     try:
         wb = openpyxl.load_workbook(filepath, data_only=True)
         sheet = wb.worksheets[0]
-        data = get_sheet_data(sheet, convert_float=True)        
+        data = get_sheet_data(sheet, convert_float=True)
         column_names = data[0]
         data = data[1:]
         df = pd.DataFrame(data, columns=column_names)
@@ -73,10 +73,10 @@ def load_dc_production_file(entity, psite_id, user, filepath):
             dcs.save()
     except Exception as e:
         print(e)
-        return JsonResponse({'status': 'error', 'message': "something went wrong"}, status=400)  
+        return JsonResponse({'status': 'error', 'message': "something went wrong"}, status=400)
 
     return JsonResponse({'status': 'success', 'data': None})
-                        
+
 def load_dc_recognition_file(entity, psite_id, user, filepath):
-    return JsonResponse({'status': 'error', 'message': 'not implemented'}, status=400)        
+    return JsonResponse({'status': 'error', 'message': 'not implemented'}, status=400)
 
