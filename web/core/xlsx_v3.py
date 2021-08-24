@@ -669,7 +669,7 @@ def make_dc_production_sheet(workbook):
     worksheet = workbook.add_worksheet("production")
     # header
     bold = workbook.add_format({'bold': True})
-    columns = ['year', 'feedstock', 'biofuel', 'metric_tonnes']
+    columns = ['year', 'feedstock', 'biofuel', 'max_production_capacity', 'estimated_production', 'requested_quota']
     for i, c in enumerate(columns):
         worksheet.write(0, i, c, bold)
 

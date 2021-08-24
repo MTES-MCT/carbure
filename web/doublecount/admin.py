@@ -16,5 +16,6 @@ class DoubleCountingSourcingAdmin(admin.ModelAdmin):
 
 @admin.register(DoubleCountingProduction)
 class DoubleCountingProductionAdmin(admin.ModelAdmin):
-    list_display = ('dca', 'year', 'biofuel', 'feedstock', 'metric_tonnes')
+    list_display = ('dca', 'year', 'biofuel', 'feedstock', 'max_production_capacity', 'estimated_production', 'requested_quota', 'approved_quota')
     list_filter = ('year', 'biofuel', 'feedstock')
+    

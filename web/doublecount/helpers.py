@@ -49,7 +49,6 @@ def load_dc_production_file(entity, psite_id, user, filepath):
     start = datetime.date(today.year + 1, 1, 1)
     end = datetime.date(today.year + 2, 12, 31)
     feedstocks = {f.code: f for f in MatierePremiere.objects.filter(is_double_compte=True)}
-    countries = {f.code_pays: f for f in Pays.objects.all()}
     biofuels = {f.code: f for f in Biocarburant.objects.all()}
 
     try:
@@ -69,7 +68,9 @@ def load_dc_production_file(entity, psite_id, user, filepath):
             dcs.year = row.year
             dcs.feedstock = feedstock
             dcs.biofuel = biofuel
-            dcs.metric_tonnes=row.metric_tonnes
+            dcs.max_production_capacity=row.max_production_capacity
+            dcs.estimated_production=row.estimated_production
+            dcs.requested_quota=row.requested_quota
             dcs.save()
     except Exception as e:
         print(e)
