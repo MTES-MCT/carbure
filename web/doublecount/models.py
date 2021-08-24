@@ -58,7 +58,10 @@ class DoubleCountingProduction(models.Model):
     year = models.IntegerField(blank=False, null=False)
     biofuel = models.ForeignKey(Biocarburant, on_delete=models.CASCADE)
     feedstock = models.ForeignKey(MatierePremiere, on_delete=models.CASCADE)    
-    metric_tonnes = models.IntegerField(blank=False, null=False)
+    max_production_capacity = models.IntegerField(blank=False, null=False, default=0)
+    estimated_production = models.IntegerField(blank=False, null=False, default=0)
+    requested_quota = models.IntegerField(blank=False, null=False, default=0)
+    approved_quota = models.IntegerField(blank=False, null=False, default=0)
 
     class Meta:
         db_table = 'double_counting_production'
