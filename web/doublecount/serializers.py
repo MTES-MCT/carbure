@@ -45,7 +45,7 @@ class DoubleCountingAgreementFullSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DoubleCountingAgreement
-        fields = ['producer', 'production_site', 'period_start', 'period_end', 'status', 'dgec_validated', 'dgec_validator', 'dgec_validated_dt', 'dgddi_validated', 'dgddi_validator', 'dgddi_validated_dt', 'dgpe_validated', 'dgpe_validator', 'dgpe_validated_dt']
+        fields = ['id', 'producer', 'production_site', 'period_start', 'period_end', 'status', 'dgec_validated', 'dgec_validator', 'dgec_validated_dt', 'dgddi_validated', 'dgddi_validator', 'dgddi_validated_dt', 'dgpe_validated', 'dgpe_validator', 'dgpe_validated_dt']
 
 
 class DoubleCountingAgreementFullSerializerWithForeignKeys(serializers.ModelSerializer):
@@ -58,7 +58,7 @@ class DoubleCountingAgreementFullSerializerWithForeignKeys(serializers.ModelSeri
 
     class Meta:
         model = DoubleCountingAgreement
-        fields = ['producer', 'production_site', 'period_start', 'period_end', 'status', 'dgec_validated', 'dgec_validator', 'dgec_validated_dt', 'dgddi_validated', 'dgddi_validator', 'dgddi_validated_dt', 'dgpe_validated', 'dgpe_validator', 'dgpe_validated_dt', 'sourcing', 'production']
+        fields = ['id', 'producer', 'production_site', 'period_start', 'period_end', 'status', 'dgec_validated', 'dgec_validator', 'dgec_validated_dt', 'dgddi_validated', 'dgddi_validator', 'dgddi_validated_dt', 'dgpe_validated', 'dgpe_validator', 'dgpe_validated_dt', 'sourcing', 'production']
 
 
 
@@ -70,7 +70,7 @@ class DoubleCountingAgreementPartialSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DoubleCountingAgreement
-        fields = ['producer', 'production_site', 'period_start', 'period_end', 'status']
+        fields = ['id', 'producer', 'production_site', 'period_start', 'period_end', 'status']
 
 
 class DoubleCountingAgreementPartialSerializerWithForeignKeys(serializers.ModelSerializer):
@@ -83,5 +83,5 @@ class DoubleCountingAgreementPartialSerializerWithForeignKeys(serializers.ModelS
 
     class Meta:
         model = DoubleCountingAgreement
-        fields = ['producer', 'production_site', 'period_start', 'period_end', 'status', 'production', 'sourcing']
+        fields = ['id', 'producer', 'production_site', 'period_start', 'period_end', 'status', 'production', 'sourcing']
 
