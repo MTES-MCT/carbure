@@ -10,6 +10,8 @@ import {
   DoubleCountingStatus,
   ProductionSite,
   UserRole,
+  DoubleCountingSourcing,
+  DoubleCountingProduction,
 } from "common/types"
 import { Title, LoaderOverlay } from "common/components"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
@@ -236,14 +238,78 @@ const DoubleCountingPrompt = ({
     //
   }
 
-  const sourcingColumns: Column<any>[] = []
-  const sourcingRows: Row<any>[] = []
+  const sourcingColumns: Column<DoubleCountingSourcing>[] = [
+    padding,
+    {
+      header: t("Année"),
+      render: (s) => s.year,
+    },
+    {
+      header: t("Matière première"),
+      render: (s) => t(s.feedstock.code, { ns: "feedstocks" }),
+    },
+    {
+      header: t("Poids en tonnes"),
+      render: (s) => s.metric_tonnes,
+    },
+    {
+      header: t("Origine"),
+      render: (s) => t(s.origin_country.code_pays, { ns: "countries" }),
+    },
+    {
+      header: t("Approvisionnement"),
+      render: (s) => t(s.supply_country.code_pays, { ns: "countries" }),
+    },
+    {
+      header: t("Transit"),
+      render: (s) => t(s.transit_country.code_pays, { ns: "countries" }),
+    },
+    padding,
+  ]
 
-  const productionColumns: Column<any>[] = []
-  const productionRows: Row<any>[] = []
+  const sourcingRows: Row<DoubleCountingSourcing>[] = (
+    agreement.data?.sourcing ?? []
+  ).map((s) => ({ value: s }))
+
+  const productionColumns: Column<DoubleCountingProduction>[] = [
+    padding,
+    {
+      header: t("Année"),
+      render: (p) => p.year,
+    },
+    {
+      header: t("Matière première"),
+      render: (p) => t(p.feedstock.code, { ns: "feedstocks" }),
+    },
+    {
+      header: t("Biocarburant"),
+      render: (p) => t(p.biofuel.code, { ns: "biofuels" }),
+    },
+    {
+      header: t("Production max."),
+      render: (p) => p.max_production_capacity,
+    },
+    {
+      header: t("Production estimée"),
+      render: (p) => p.estimated_production,
+    },
+    {
+      header: t("Quota demandé"),
+      render: (p) => p.requested_quota,
+    },
+    {
+      header: t("Quota approuvé"),
+      render: (p) => p.approved_quota,
+    },
+    padding,
+  ]
+
+  const productionRows: Row<DoubleCountingProduction>[] = (
+    agreement.data?.production ?? []
+  ).map((p) => ({ value: p }))
 
   return (
-    <Dialog onResolve={onResolve} className={styles.settingsPrompt}>
+    <Dialog wide onResolve={onResolve} className={styles.settingsPrompt}>
       <DialogTitle text={t("Dossier double comptage")} />
 
       <Tabs
