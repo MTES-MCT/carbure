@@ -1,0 +1,12 @@
+.tabHeader {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  margin-right: 12px;
+  font-size: 1.1em;
+  cursor: pointer;
+}
+
+.tabFocus {
+  font-weight: bold;
+  text-decoration: underline;
+}

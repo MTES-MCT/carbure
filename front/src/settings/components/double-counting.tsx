@@ -21,12 +21,14 @@ import {
   Check,
   Plus,
   Return,
+  Save,
   Upload,
 } from "common/components/icons"
 import { Alert } from "common/components/alert"
 import {
   Dialog,
   DialogButtons,
+  DialogText,
   DialogTitle,
   prompt,
   PromptProps,
@@ -37,6 +39,33 @@ import { LabelAutoComplete } from "common/components/autocomplete"
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
 import { padding } from "transactions/components/list-columns"
+import Tabs from "common/components/tabs"
+
+export const DCStatus = ({ status }: { status: DoubleCountingStatus }) => {
+  const { t } = useTranslation()
+
+  const statusLabels = {
+    [DoubleCountingStatus.Pending]: t("En attente"),
+    [DoubleCountingStatus.Accepted]: t("Accepté"),
+    [DoubleCountingStatus.Rejected]: t("Refusé"),
+    [DoubleCountingStatus.Lapsed]: t("Expiré"),
+  }
+
+  return (
+    <span
+      className={cl(
+        statusStyles.status,
+        statusStyles.smallStatus,
+        status === DoubleCountingStatus.Accepted && statusStyles.statusAccepted,
+        status === DoubleCountingStatus.Pending && statusStyles.statusWaiting,
+        status === DoubleCountingStatus.Rejected && statusStyles.statusRejected,
+        status === DoubleCountingStatus.Lapsed && statusStyles.statusToFix
+      )}
+    >
+      {statusLabels[status]}
+    </span>
+  )
+}
 
 type DoubleCountingUploadPromptProps = PromptProps<void> & {
   entity: EntitySelection
@@ -182,29 +211,71 @@ const DoubleCountingUploadPrompt = ({
   )
 }
 
-export const DCStatus = ({ status }: { status: DoubleCountingStatus }) => {
+type DoubleCountingPromptProps = PromptProps<any> & {
+  entity: EntitySelection
+  agreementID: number
+}
+
+const DoubleCountingPrompt = ({
+  entity,
+  agreementID,
+  onResolve,
+}: DoubleCountingPromptProps) => {
   const { t } = useTranslation()
 
-  const statusLabels = {
-    [DoubleCountingStatus.Pending]: t("En attente"),
-    [DoubleCountingStatus.Accepted]: t("Accepté"),
-    [DoubleCountingStatus.Rejected]: t("Refusé"),
-    [DoubleCountingStatus.Lapsed]: t("Expiré"),
+  const [agreement, getAgreement] = useAPI(api.getDoubleCountingDetails)
+  const [focus, setFocus] = useState("sourcing")
+
+  useEffect(() => {
+    if (entity) {
+      getAgreement(entity.id, agreementID)
+    }
+  }, [entity, agreementID, getAgreement])
+
+  function saveAgreement() {
+    //
   }
 
+  const sourcingColumns: Column<any>[] = []
+  const sourcingRows: Row<any>[] = []
+
+  const productionColumns: Column<any>[] = []
+  const productionRows: Row<any>[] = []
+
   return (
-    <span
-      className={cl(
-        statusStyles.status,
-        statusStyles.smallStatus,
-        status === DoubleCountingStatus.Accepted && statusStyles.statusAccepted,
-        status === DoubleCountingStatus.Pending && statusStyles.statusWaiting,
-        status === DoubleCountingStatus.Rejected && statusStyles.statusRejected,
-        status === DoubleCountingStatus.Lapsed && statusStyles.statusToFix
+    <Dialog onResolve={onResolve} className={styles.settingsPrompt}>
+      <DialogTitle text={t("Dossier double comptage")} />
+
+      <Tabs
+        tabs={[
+          { key: "sourcing", label: t("Approvisionnement") },
+          { key: "production", label: t("Production") },
+        ]}
+        focus={focus}
+        onFocus={setFocus}
+      />
+
+      {focus === "sourcing" && (
+        <div className={styles.modalTableContainer}>
+          <Table columns={sourcingColumns} rows={sourcingRows} />
+        </div>
       )}
-    >
-      {statusLabels[status]}
-    </span>
+
+      {focus === "production" && (
+        <div className={styles.modalTableContainer}>
+          <Table columns={productionColumns} rows={productionRows} />
+        </div>
+      )}
+
+      <DialogButtons>
+        <Button level="primary" icon={Save} onClick={saveAgreement}>
+          <Trans>Enregistrer les modifications</Trans>
+        </Button>
+        <Button icon={Return} onClick={() => onResolve()}>
+          <Trans>Annuler</Trans>
+        </Button>
+      </DialogButtons>
+    </Dialog>
   )
 }
 
@@ -250,6 +321,14 @@ const DoubleCountingSettings = ({
 
   const rows: Row<DoubleCounting>[] = (agreements.data ?? []).map((dc) => ({
     value: dc,
+    onClick: () =>
+      prompt((resolve) => (
+        <DoubleCountingPrompt
+          entity={entity}
+          agreementID={dc.id}
+          onResolve={resolve}
+        />
+      )),
   }))
 
   return (
