@@ -551,9 +551,34 @@ export enum DoubleCountingStatus {
 }
 
 export interface DoubleCounting {
+  id: number
   producer: number
   production_site: string
   period_start: string
   period_end: string
   status: DoubleCountingStatus
+}
+
+export interface DoubleCountingSourcing {
+  year: number
+  metric_tonnes: number
+  feedstock: MatierePremiere
+  origin_country: Country
+  transit_country: Country
+  supply_country: Country
+}
+
+export interface DoubleCountingProduction {
+  year: number
+  feedstock: MatierePremiere
+  biofuel: Biocarburant
+  max_production_capacity: number
+  estimated_production: number
+  requested_quota: number
+  approved_quota: number
+}
+
+export interface DoubleCountingDetails extends DoubleCounting {
+  sourcing: DoubleCountingSourcing[]
+  production: DoubleCountingProduction[]
 }
