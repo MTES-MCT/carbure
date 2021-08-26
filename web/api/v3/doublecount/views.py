@@ -7,6 +7,7 @@ from core.decorators import check_rights, is_admin
 from producers.models import ProductionSite
 from doublecount.models import DoubleCountingAgreement
 from doublecount.serializers import DoubleCountingAgreementFullSerializer, DoubleCountingAgreementPartialSerializer
+from doublecount.serializers import DoubleCountingAgreementFullSerializerWithForeignKeys, DoubleCountingAgreementPartialSerializerWithForeignKeys
 from doublecount.helpers import load_dc_sourcing_file, load_dc_production_file, load_dc_recognition_file
 
 from core.xlsx_v3 import make_biofuels_sheet, make_dc_mps_sheet, make_countries_sheet, make_dc_production_sheet, make_dc_sourcing_sheet
@@ -37,8 +38,7 @@ def get_agreement(request, *args, **kwargs):
         agreement = DoubleCountingAgreement.objects.get(producer=entity, id=agreement_id)
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not find DCA agreement'}, status=400)
-    print(agreement.producer)
-    serializer = DoubleCountingAgreementPartialSerializer(agreement)
+    serializer = DoubleCountingAgreementPartialSerializerWithForeignKeys(agreement)
     return JsonResponse({'status': 'success', 'data': serializer.data})
 
 @is_admin
@@ -54,7 +54,7 @@ def get_agreement_admin(request, *args, **kwargs):
         agreement = DoubleCountingAgreement.objects.filter(producer_id=entity_id, id=agreement_id)
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not find DCA agreement'}, status=400)
-    serializer = DoubleCountingAgreementFullSerializer(agreement)
+    serializer = DoubleCountingAgreementFullSerializerWithForeignKeys(agreement)
     return JsonResponse({'status': 'success', 'data': serializer.data})
 
 

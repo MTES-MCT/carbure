@@ -32,6 +32,10 @@ class DoubleCountingAgreement(models.Model):
     dgpe_validator = models.ForeignKey(usermodel, blank=True, null=True, on_delete=models.SET_NULL, related_name='dgpe_validator')
     dgpe_validated_dt = models.DateTimeField(null=True, blank=True)
 
+    def __str__(self):
+        return '%s %d - %d' % (self.producer.name, self.period_start.year, self.period_end.year)
+
+
     class Meta:
         db_table = 'double_counting_agreements'
         verbose_name = 'Dossier Double Compte'
@@ -39,7 +43,7 @@ class DoubleCountingAgreement(models.Model):
 
 
 class DoubleCountingSourcing(models.Model):
-    dca = models.ForeignKey(DoubleCountingAgreement, on_delete=models.CASCADE)
+    dca = models.ForeignKey(DoubleCountingAgreement, on_delete=models.CASCADE, related_name='sourcing')
     year = models.IntegerField(blank=False, null=False)
     feedstock = models.ForeignKey(MatierePremiere, on_delete=models.CASCADE)
     origin_country = models.ForeignKey(Pays, on_delete=models.CASCADE, related_name='origin_country')
@@ -54,7 +58,7 @@ class DoubleCountingSourcing(models.Model):
 
 
 class DoubleCountingProduction(models.Model):
-    dca = models.ForeignKey(DoubleCountingAgreement, on_delete=models.CASCADE)
+    dca = models.ForeignKey(DoubleCountingAgreement, on_delete=models.CASCADE, related_name='production')
     year = models.IntegerField(blank=False, null=False)
     biofuel = models.ForeignKey(Biocarburant, on_delete=models.CASCADE)
     feedstock = models.ForeignKey(MatierePremiere, on_delete=models.CASCADE)    
