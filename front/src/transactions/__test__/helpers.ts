@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event"
 export function clickOnCheckboxesAndConfirm() {
   userEvent.click(
     screen.getByLabelText(
-      "Je certifie que cette déclaration respecte les critères de durabilité liés aux terres"
+      "Je certifie que cette déclaration respecte les critères de durabilité conformément à la réglementation en vigueur."
     )
   )
 

@@ -12,6 +12,7 @@ import {
   SNCertificate,
   EntityRights,
   DoubleCounting,
+  DoubleCountingDetails,
 } from "common/types"
 import { EntitySelection } from "carbure/hooks/use-entity"
 
@@ -424,6 +425,13 @@ export function setDefaultCertificate(
 
 export function getDoubleCountingAgreements(entity_id: number) {
   return api.get<DoubleCounting[]>("/doublecount/agreements", { entity_id })
+}
+
+export function getDoubleCountingDetails(entity_id: number, dca_id: number) {
+  return api.get<DoubleCountingDetails>("/doublecount/agreement", {
+    entity_id,
+    dca_id,
+  })
 }
 
 export function uploadDoubleCountingSourcing(

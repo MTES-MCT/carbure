@@ -418,6 +418,13 @@ export const okSelfCertificates = rest.get(
   }
 )
 
+export const okAgreements = rest.get(
+  "http://localhost/api/v3/doublecount/agreements",
+  (req, res, ctx) => {
+    return res(ctx.json({ status: "success", data: [] }))
+  }
+)
+
 export default setupServer(
   okSettings,
   okEnableMac,
@@ -459,5 +466,6 @@ export default setupServer(
   okTranslations,
   okErrorsTranslations,
   okFieldsTranslations,
-  okSelfCertificates
+  okSelfCertificates,
+  okAgreements
 )
