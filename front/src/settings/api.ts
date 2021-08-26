@@ -426,6 +426,13 @@ export function getDoubleCountingAgreements(entity_id: number) {
   return api.get<DoubleCounting[]>("/doublecount/agreements", { entity_id })
 }
 
+export function getDoubleCountingDetails(entity_id: number, dca_id: number) {
+  return api.get<DoubleCounting>("/doublecount/agreement", {
+    entity_id,
+    dca_id,
+  })
+}
+
 export function uploadDoubleCountingSourcing(
   entity_id: number,
   production_site_id: number,

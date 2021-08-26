@@ -551,9 +551,19 @@ export enum DoubleCountingStatus {
 }
 
 export interface DoubleCounting {
+  id: number
   producer: number
   production_site: string
   period_start: string
   period_end: string
   status: DoubleCountingStatus
+}
+
+interface DoubleCountingSourcing {}
+
+interface DoubleCountingProduction {}
+
+export interface DoubleCountingDetails extends DoubleCounting {
+  sourcing: DoubleCountingSourcing
+  production: DoubleCountingProduction
 }
