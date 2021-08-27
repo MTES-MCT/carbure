@@ -35,3 +35,4 @@ COPY web/.coveragerc /app/web
 
 COPY scripts /app/scripts
 COPY cron /app/cron
+COPY web/doublecount /app/web/doublecount
