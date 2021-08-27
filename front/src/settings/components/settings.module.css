@@ -100,3 +100,10 @@ div > .settingsSelect {
 .settingsFormButton {
   margin-bottom: 16px;
 }
+
+.modalTableContainer {
+  width: auto;
+  margin-left: -24px;
+  margin-right: -24px;
+  margin-bottom: 16px;
+}

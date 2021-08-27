@@ -30,8 +30,10 @@ def debug_transactions(valid=False):
         print(tx.natural_key())
 
 
-def debug_errors():
+def debug_errors(is_blocking=False):
     errors = GenericError.objects.all()
+    if is_blocking:
+        errors = errors.filter(is_blocking=True)
     for error in errors:
         print(error.natural_key())         
 
