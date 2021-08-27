@@ -1,14 +1,23 @@
 import { Trans, useTranslation } from "react-i18next"
-
+import { useEffect, useState } from "react"
+import cl from "clsx"
+import statusStyles from "transactions/components/status.module.css"
+import styles from "./settings.module.css"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { CompanySettingsHook as DoubleContingSettingsHook } from "../hooks/use-company"
-import { ProductionSite, UserRole } from "common/types"
+import {
+  DoubleCounting,
+  DoubleCountingStatus,
+  ProductionSite,
+  UserRole,
+  DoubleCountingSourcing,
+  DoubleCountingProduction,
+} from "common/types"
 import { Title, LoaderOverlay } from "common/components"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import { useRights } from "carbure/hooks/use-rights"
-import Table from "common/components/table"
-import styles from "./settings.module.css"
-import { Button } from "common/components/button"
+import Table, { Column, Row } from "common/components/table"
+import { AsyncButton, Button } from "common/components/button"
 import {
   AlertCircle,
   Check,
@@ -21,14 +30,44 @@ import { Alert } from "common/components/alert"
 import {
   Dialog,
   DialogButtons,
+  DialogText,
   DialogTitle,
   prompt,
   PromptProps,
 } from "common/components/dialog"
-import { SettingsForm } from "./common"
-import { useState } from "react"
+import { formatDate, SettingsForm } from "./common"
 import { findProductionSites } from "common/api"
 import { LabelAutoComplete } from "common/components/autocomplete"
+import * as api from "../api"
+import useAPI from "common/hooks/use-api"
+import { padding } from "transactions/components/list-columns"
+import Tabs from "common/components/tabs"
+
+export const DCStatus = ({ status }: { status: DoubleCountingStatus }) => {
+  const { t } = useTranslation()
+
+  const statusLabels = {
+    [DoubleCountingStatus.Pending]: t("En attente"),
+    [DoubleCountingStatus.Accepted]: t("Accepté"),
+    [DoubleCountingStatus.Rejected]: t("Refusé"),
+    [DoubleCountingStatus.Lapsed]: t("Expiré"),
+  }
+
+  return (
+    <span
+      className={cl(
+        statusStyles.status,
+        statusStyles.smallStatus,
+        status === DoubleCountingStatus.Accepted && statusStyles.statusAccepted,
+        status === DoubleCountingStatus.Pending && statusStyles.statusWaiting,
+        status === DoubleCountingStatus.Rejected && statusStyles.statusRejected,
+        status === DoubleCountingStatus.Lapsed && statusStyles.statusToFix
+      )}
+    >
+      {statusLabels[status]}
+    </span>
+  )
+}
 
 type DoubleCountingUploadPromptProps = PromptProps<void> & {
   entity: EntitySelection
@@ -46,6 +85,25 @@ const DoubleCountingUploadPrompt = ({
 
   const [sourcingFile, setSourcingFile] = useState<File | null>(null)
   const [productionFile, setProductionFile] = useState<File | null>(null)
+
+  const [uploadingSourcing, uploadSourcing] = useAPI(
+    api.uploadDoubleCountingSourcing
+  )
+  const [uploadingProduction, uploadProduction] = useAPI(
+    api.uploadDoubleCountingProduction
+  )
+
+  const loading = uploadingSourcing.loading || uploadingProduction.loading
+  const disabled = !productionSite || !sourcingFile || !productionFile
+
+  async function submitAgreement() {
+    if (!entity || !productionSite || !sourcingFile || !productionFile) return
+
+    await uploadSourcing(entity.id, productionSite.id, sourcingFile)
+    await uploadProduction(entity.id, productionSite.id, productionFile)
+
+    onResolve()
+  }
 
   return (
     <Dialog onResolve={onResolve} className={styles.settingsPrompt}>
@@ -74,10 +132,10 @@ const DoubleCountingUploadPrompt = ({
 
         <div className={styles.settingsText}>
           <a
-            href="/api/v3/double-count/get-template?file_type=SOURCING"
+            href="/api/v3/doublecount/get-template?file_type=SOURCING"
             className={styles.settingsLink}
           >
-            <Trans>Téléchargez le modèle suivant</Trans>
+            <Trans>Téléchargez ce modèle</Trans>
           </a>
           <Trans>
             {" "}
@@ -106,10 +164,10 @@ const DoubleCountingUploadPrompt = ({
 
         <div className={styles.settingsText}>
           <a
-            href="/api/v3/double-count/get-template?file_type=PRODUCTION"
+            href="/api/v3/doublecount/get-template?file_type=PRODUCTION"
             className={styles.settingsLink}
           >
-            <Trans>Télécharger le modèle pour la production</Trans>
+            <Trans>Téléchargez ce modèle</Trans>
           </a>
           <Trans>
             {" "}
@@ -137,14 +195,152 @@ const DoubleCountingUploadPrompt = ({
         </Button>
 
         <DialogButtons>
-          <Button level="primary" icon={Check} onClick={() => onResolve()}>
-            <Trans>Valider</Trans>
-          </Button>
+          <AsyncButton
+            loading={loading}
+            disabled={disabled}
+            level="primary"
+            icon={Check}
+            onClick={submitAgreement}
+          >
+            <Trans>Soumettre le dossier</Trans>
+          </AsyncButton>
           <Button icon={Return} onClick={() => onResolve()}>
             <Trans>Annuler</Trans>
           </Button>
         </DialogButtons>
       </SettingsForm>
+    </Dialog>
+  )
+}
+
+type DoubleCountingPromptProps = PromptProps<any> & {
+  entity: EntitySelection
+  agreementID: number
+}
+
+const DoubleCountingPrompt = ({
+  entity,
+  agreementID,
+  onResolve,
+}: DoubleCountingPromptProps) => {
+  const { t } = useTranslation()
+
+  const [agreement, getAgreement] = useAPI(api.getDoubleCountingDetails)
+  const [focus, setFocus] = useState("sourcing")
+
+  useEffect(() => {
+    if (entity) {
+      getAgreement(entity.id, agreementID)
+    }
+  }, [entity, agreementID, getAgreement])
+
+  function saveAgreement() {
+    //
+  }
+
+  const sourcingColumns: Column<DoubleCountingSourcing>[] = [
+    padding,
+    {
+      header: t("Année"),
+      render: (s) => s.year,
+    },
+    {
+      header: t("Matière première"),
+      render: (s) => t(s.feedstock.code, { ns: "feedstocks" }),
+    },
+    {
+      header: t("Poids en tonnes"),
+      render: (s) => s.metric_tonnes,
+    },
+    {
+      header: t("Origine"),
+      render: (s) => t(s.origin_country.code_pays, { ns: "countries" }),
+    },
+    {
+      header: t("Approvisionnement"),
+      render: (s) => t(s.supply_country.code_pays, { ns: "countries" }),
+    },
+    {
+      header: t("Transit"),
+      render: (s) => t(s.transit_country.code_pays, { ns: "countries" }),
+    },
+    padding,
+  ]
+
+  const sourcingRows: Row<DoubleCountingSourcing>[] = (
+    agreement.data?.sourcing ?? []
+  ).map((s) => ({ value: s }))
+
+  const productionColumns: Column<DoubleCountingProduction>[] = [
+    padding,
+    {
+      header: t("Année"),
+      render: (p) => p.year,
+    },
+    {
+      header: t("Matière première"),
+      render: (p) => t(p.feedstock.code, { ns: "feedstocks" }),
+    },
+    {
+      header: t("Biocarburant"),
+      render: (p) => t(p.biofuel.code, { ns: "biofuels" }),
+    },
+    {
+      header: t("Production max."),
+      render: (p) => p.max_production_capacity,
+    },
+    {
+      header: t("Production estimée"),
+      render: (p) => p.estimated_production,
+    },
+    {
+      header: t("Quota demandé"),
+      render: (p) => p.requested_quota,
+    },
+    {
+      header: t("Quota approuvé"),
+      render: (p) => p.approved_quota,
+    },
+    padding,
+  ]
+
+  const productionRows: Row<DoubleCountingProduction>[] = (
+    agreement.data?.production ?? []
+  ).map((p) => ({ value: p }))
+
+  return (
+    <Dialog wide onResolve={onResolve} className={styles.settingsPrompt}>
+      <DialogTitle text={t("Dossier double comptage")} />
+
+      <Tabs
+        tabs={[
+          { key: "sourcing", label: t("Approvisionnement") },
+          { key: "production", label: t("Production") },
+        ]}
+        focus={focus}
+        onFocus={setFocus}
+      />
+
+      {focus === "sourcing" && (
+        <div className={styles.modalTableContainer}>
+          <Table columns={sourcingColumns} rows={sourcingRows} />
+        </div>
+      )}
+
+      {focus === "production" && (
+        <div className={styles.modalTableContainer}>
+          <Table columns={productionColumns} rows={productionRows} />
+        </div>
+      )}
+
+      <DialogButtons>
+        <Button level="primary" icon={Save} onClick={saveAgreement}>
+          <Trans>Enregistrer les modifications</Trans>
+        </Button>
+        <Button icon={Return} onClick={() => onResolve()}>
+          <Trans>Annuler</Trans>
+        </Button>
+      </DialogButtons>
     </Dialog>
   )
 }
@@ -161,11 +357,45 @@ const DoubleCountingSettings = ({
   const { t } = useTranslation()
   const rights = useRights()
 
-  const isEmpty = true
+  const [agreements, getAgreements] = useAPI(api.getDoubleCountingAgreements)
+
+  useEffect(() => {
+    if (entity) {
+      getAgreements(entity.id)
+    }
+  }, [entity, getAgreements])
+
+  const isEmpty = !agreements.data || agreements.data.length === 0
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
 
-  const columns: any[] = []
-  const rows: any[] = []
+  const columns: Column<DoubleCounting>[] = [
+    padding,
+    {
+      header: t("Statut"),
+      render: (dc) => <DCStatus status={dc.status} />,
+    },
+    {
+      header: t("Site de production"),
+      render: (dc) => dc.production_site,
+    },
+    {
+      header: t("Valide jusqu'au"),
+      render: (dc) => formatDate(dc.period_end),
+    },
+    padding,
+  ]
+
+  const rows: Row<DoubleCounting>[] = (agreements.data ?? []).map((dc) => ({
+    value: dc,
+    onClick: () =>
+      prompt((resolve) => (
+        <DoubleCountingPrompt
+          entity={entity}
+          agreementID={dc.id}
+          onResolve={resolve}
+        />
+      )),
+  }))
 
   return (
     <Section id="double-counting">
@@ -177,14 +407,18 @@ const DoubleCountingSettings = ({
           <Button
             level="primary"
             icon={Plus}
-            onClick={() =>
-              prompt((resolve) => (
+            onClick={async () => {
+              if (entity === null) return
+
+              await prompt((resolve) => (
                 <DoubleCountingUploadPrompt
                   entity={entity}
                   onResolve={resolve}
                 />
               ))
-            }
+
+              getAgreements(entity.id)
+            }}
           >
             <Trans>Ajouter un dossier double comptage</Trans>
           </Button>
