@@ -232,6 +232,8 @@ export const lot: Transaction = {
     ghg_total: 11,
     ghg_reference: 83.8,
     ghg_reduction: 86.87,
+    ghg_reference_red_ii: 94,
+    ghg_reduction_red_ii: 84.23124,
     status: "Draft",
     source: "MANUAL",
     parent_lot: null,

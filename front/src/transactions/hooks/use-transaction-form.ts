@@ -44,6 +44,8 @@ export interface TransactionFormState {
   ghg_total: number
   ghg_reduction: number
   ghg_reference: number
+  ghg_reduction_red_ii: number
+  ghg_reference_red_ii: number
 
   biocarburant: Biocarburant | null
   matiere_premiere: MatierePremiere | null
@@ -100,6 +102,8 @@ export function toTransactionFormState(
     ghg_total: tx.lot.ghg_total,
     ghg_reduction: tx.lot.ghg_reduction,
     ghg_reference: tx.lot.ghg_reference,
+    ghg_reduction_red_ii: tx.lot.ghg_reduction_red_ii,
+    ghg_reference_red_ii: tx.lot.ghg_reference_red_ii,
 
     biocarburant: tx.lot.biocarburant,
     matiere_premiere: tx.lot.matiere_premiere,
@@ -258,6 +262,8 @@ const initialState: TransactionFormState = {
   ghg_total: 0,
   ghg_reduction: 0,
   ghg_reference: 83.8,
+  ghg_reduction_red_ii: 0,
+  ghg_reference_red_ii: 94,
 
   biocarburant: null,
   matiere_premiere: null,
@@ -334,6 +340,8 @@ function fixedValues(
   // update GES summary
   tx.ghg_total = tx.eec + tx.el + tx.ep + tx.etd + tx.eu - tx.esca - tx.eccs - tx.eccr - tx.eee // prettier-ignore
   tx.ghg_reduction = (1.0 - tx.ghg_total / tx.ghg_reference) * 100.0
+  tx.ghg_reduction_red_ii =
+    (1.0 - tx.ghg_total / tx.ghg_reference_red_ii) * 100.0
 
   return tx
 }
