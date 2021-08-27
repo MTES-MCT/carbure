@@ -14,7 +14,7 @@ def get_matieres_premieres(request):
     double_count_only = request.GET.get('double_count_only', False)    
     mps = MatierePremiere.objects.filter(is_displayed=True).order_by('name')
     if double_count_only == 'true':
-        mps = mps.filter(is_double_count=True)
+        mps = mps.filter(is_double_compte=True)
     if q:
         mps = mps.filter(Q(name__icontains=q) | Q(name_en__icontains=q) | Q(code__icontains=q))
     sez = [{'code': m.code, 'name': m.name, 'description': m.description, 'compatible_alcool': m.compatible_alcool,
