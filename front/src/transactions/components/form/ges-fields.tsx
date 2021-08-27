@@ -24,6 +24,7 @@ const GESFields = (props: FieldsProps) => {
         <Fields.Eccr />
         <Fields.Eee />
         <Fields.GhgReduction />
+        <Fields.GhgReductionRed2 />
       </FormGroup>
     </Fragment>
   )
