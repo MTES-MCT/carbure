@@ -562,6 +562,7 @@ export interface DoubleCounting {
 }
 
 export interface DoubleCountingSourcing {
+  id: number
   year: number
   metric_tonnes: number
   feedstock: MatierePremiere
@@ -571,6 +572,7 @@ export interface DoubleCountingSourcing {
 }
 
 export interface DoubleCountingProduction {
+  id: number
   year: number
   feedstock: MatierePremiere
   biofuel: Biocarburant

@@ -16,11 +16,12 @@ import {
 import { Title, LoaderOverlay } from "common/components"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import { useRights } from "carbure/hooks/use-rights"
-import Table, { Column, Row } from "common/components/table"
+import Table, { Actions, Column, Row } from "common/components/table"
 import { AsyncButton, Button } from "common/components/button"
 import {
   AlertCircle,
   Check,
+  Cross,
   Plus,
   Return,
   Save,
@@ -28,6 +29,7 @@ import {
 } from "common/components/icons"
 import { Alert } from "common/components/alert"
 import {
+  confirm,
   Dialog,
   DialogButtons,
   DialogText,
@@ -36,12 +38,20 @@ import {
   PromptProps,
 } from "common/components/dialog"
 import { formatDate, SettingsForm } from "./common"
-import { findProductionSites } from "common/api"
+import {
+  findCountries,
+  findMatieresPremieres,
+  findProductionSites,
+} from "common/api"
 import { LabelAutoComplete } from "common/components/autocomplete"
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
 import { padding } from "transactions/components/list-columns"
 import Tabs from "common/components/tabs"
+import { Form } from "common/components/form"
+import { LabelInput } from "common/components/input"
+import * as Fields from "transactions/components/form/fields"
+import useForm from "common/hooks/use-form"
 
 export const DCStatus = ({ status }: { status: DoubleCountingStatus }) => {
   const { t } = useTranslation()
@@ -213,6 +223,156 @@ const DoubleCountingUploadPrompt = ({
   )
 }
 
+type DoubleCountingSourcingPromptProps = PromptProps<void> & {
+  add?: boolean
+  dcaID: number
+  sourcing?: DoubleCountingSourcing
+  entity: EntitySelection
+}
+
+const DoubleCountingSourcingPrompt = ({
+  add,
+  dcaID,
+  sourcing,
+  entity,
+  onResolve,
+}: DoubleCountingSourcingPromptProps) => {
+  const { t } = useTranslation()
+
+  const { data, onChange } = useForm<Partial<DoubleCountingSourcing>>(
+    sourcing ?? {
+      year: new Date().getFullYear(),
+      feedstock: undefined,
+      metric_tonnes: 0,
+      origin_country: undefined,
+      transit_country: undefined,
+      supply_country: undefined,
+    }
+  )
+
+  const [adding, addSourcing] = useAPI(api.addDoubleCountingSourcing)
+  const [updating, updateSourcing] = useAPI(api.updateDoubleCountingSourcing)
+
+  function saveSourcing() {
+    if (
+      entity === null ||
+      !data.year ||
+      !data.metric_tonnes ||
+      !data.feedstock ||
+      !data.origin_country ||
+      !data.transit_country ||
+      !data.supply_country
+    )
+      return
+
+    if (add) {
+      addSourcing(
+        entity.id,
+        dcaID,
+        data.year,
+        data.metric_tonnes,
+        data.feedstock.code,
+        data.origin_country.code_pays,
+        data.transit_country.code_pays,
+        data.supply_country.code_pays
+      )
+    } else if (sourcing) {
+      updateSourcing(
+        entity.id,
+        sourcing.id,
+        dcaID,
+        data.year,
+        data.metric_tonnes,
+        data.feedstock.code,
+        data.origin_country.code_pays,
+        data.transit_country.code_pays,
+        data.supply_country.code_pays
+      )
+    }
+
+    onResolve()
+  }
+
+  const loading = adding.loading || updating.loading
+
+  return (
+    <Dialog onResolve={onResolve} className={styles.settingsPrompt}>
+      <DialogTitle text={t("Approvisionnement")} />
+      <DialogText
+        text={t(
+          "Précisez les informations concernant votre approvisionnement en matière première dans le formularie ci-dessous."
+        )}
+      />
+
+      <Form className={styles.settingsForm}>
+        <LabelInput
+          label={t("Année")}
+          name="year"
+          value={data.year}
+          onChange={onChange}
+        />
+        <LabelAutoComplete
+          name="feedstock"
+          label={t("Matière première")}
+          minLength={0}
+          value={data.feedstock}
+          getValue={(mp) => mp.code}
+          getLabel={(mp) => t(mp.code, { ns: "feedstocks" })}
+          getQuery={findMatieresPremieres}
+        />
+        <LabelInput
+          label={t("Poids en tonnes")}
+          type="number"
+          name="metric_tonnes"
+          value={data.metric_tonnes}
+          onChange={onChange}
+        />
+        <LabelAutoComplete
+          label={t("Pays d'origine")}
+          value={data.origin_country}
+          getValue={(c) => c.code_pays}
+          getLabel={(c) => t(c.code_pays, { ns: "countries" })}
+          getQuery={findCountries}
+        />
+        <LabelAutoComplete
+          name="transit_country"
+          label={t("Pays de transit")}
+          value={data.transit_country}
+          getValue={(c) => c.code_pays}
+          getLabel={(c) => t(c.code_pays, { ns: "countries" })}
+          getQuery={findCountries}
+        />
+        <LabelAutoComplete
+          name="supply_country"
+          label={t("Pays d'approvisionnement")}
+          value={data.supply_country}
+          getValue={(c) => c.code_pays}
+          getLabel={(c) => t(c.code_pays, { ns: "countries" })}
+          getQuery={findCountries}
+        />
+      </Form>
+
+      <DialogButtons>
+        <AsyncButton
+          level="primary"
+          loading={loading}
+          icon={add ? Plus : Save}
+          onClick={saveSourcing}
+        >
+          {add ? (
+            <Trans>Ajouter un approvisionnement</Trans>
+          ) : (
+            <Trans>Enregistrer les modifications</Trans>
+          )}
+        </AsyncButton>
+        <Button icon={Return} onClick={() => onResolve()}>
+          <Trans>Annuler</Trans>
+        </Button>
+      </DialogButtons>
+    </Dialog>
+  )
+}
+
 type DoubleCountingPromptProps = PromptProps<any> & {
   entity: EntitySelection
   agreementID: number
@@ -225,18 +385,31 @@ const DoubleCountingPrompt = ({
 }: DoubleCountingPromptProps) => {
   const { t } = useTranslation()
 
-  const [agreement, getAgreement] = useAPI(api.getDoubleCountingDetails)
   const [focus, setFocus] = useState("sourcing")
+
+  const [agreement, getAgreement] = useAPI(api.getDoubleCountingDetails)
+  const [, deleteSourcing] = useAPI(api.deleteDoubleCountingSourcing)
+
+  const dcaID = agreement.data?.id ?? -1
+
+  async function removeSourcingRow(sourcingID: number) {
+    if (!entity) return
+
+    const ok = await confirm(
+      t("Supprimer approvisionnement"),
+      t("Voulez-vous supprimer cette ligne d'approvisionnement ?")
+    )
+
+    if (ok) {
+      deleteSourcing(entity.id, sourcingID)
+    }
+  }
 
   useEffect(() => {
     if (entity) {
       getAgreement(entity.id, agreementID)
     }
   }, [entity, agreementID, getAgreement])
-
-  function saveAgreement() {
-    //
-  }
 
   const sourcingColumns: Column<DoubleCountingSourcing>[] = [
     padding,
@@ -264,12 +437,30 @@ const DoubleCountingPrompt = ({
       header: t("Transit"),
       render: (s) => t(s.transit_country.code_pays, { ns: "countries" }),
     },
+    Actions((s) => [
+      {
+        icon: Cross,
+        action: () => removeSourcingRow(s.id),
+        title: t("Supprimer approvisionnement"),
+      },
+    ]),
     padding,
   ]
 
   const sourcingRows: Row<DoubleCountingSourcing>[] = (
     agreement.data?.sourcing ?? []
-  ).map((s) => ({ value: s }))
+  ).map((s) => ({
+    value: s,
+    onClick: () =>
+      prompt((resolve) => (
+        <DoubleCountingSourcingPrompt
+          entity={entity}
+          dcaID={dcaID}
+          sourcing={s}
+          onResolve={resolve}
+        />
+      )),
+  }))
 
   const productionColumns: Column<DoubleCountingProduction>[] = [
     padding,
@@ -324,6 +515,21 @@ const DoubleCountingPrompt = ({
       {focus === "sourcing" && (
         <div className={styles.modalTableContainer}>
           <Table columns={sourcingColumns} rows={sourcingRows} />
+          <span
+            className={styles.modalTableAddRow}
+            onClick={() =>
+              prompt((resolve) => (
+                <DoubleCountingSourcingPrompt
+                  add
+                  dcaID={dcaID}
+                  entity={entity}
+                  onResolve={resolve}
+                />
+              ))
+            }
+          >
+            <Trans>+ Ajouter une ligne d'approvisionnement</Trans>
+          </span>
         </div>
       )}
 
@@ -334,9 +540,6 @@ const DoubleCountingPrompt = ({
       )}
 
       <DialogButtons>
-        <Button level="primary" icon={Save} onClick={saveAgreement}>
-          <Trans>Enregistrer les modifications</Trans>
-        </Button>
         <Button icon={Return} onClick={() => onResolve()}>
           <Trans>Annuler</Trans>
         </Button>

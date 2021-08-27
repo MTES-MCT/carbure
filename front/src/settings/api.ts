@@ -459,3 +459,59 @@ export function uploadDoubleCountingProduction(
     file_type: "PRODUCTION",
   })
 }
+
+export function addDoubleCountingSourcing(
+  entity_id: number,
+  dca_id: number,
+  year: number,
+  metric_tonnes: number,
+  feedstock_code: string,
+  origin_country_code: string,
+  supply_country_code: string,
+  transit_country_code: string
+) {
+  return api.post("/doublecount/agreement/add-sourcing", {
+    entity_id,
+    dca_id,
+    year,
+    metric_tonnes,
+    feedstock_code,
+    origin_country_code,
+    supply_country_code,
+    transit_country_code,
+  })
+}
+
+export function updateDoubleCountingSourcing(
+  entity_id: number,
+  dca_sourcing_id: number,
+  dca_id: number,
+  year: number,
+  metric_tonnes: number,
+  feedstock_code: string,
+  origin_country_code: string,
+  supply_country_code: string,
+  transit_country_code: string
+) {
+  return api.post("/doublecount/agreement/update-sourcing", {
+    entity_id,
+    dca_sourcing_id,
+    dca_id,
+    year,
+    metric_tonnes,
+    feedstock_code,
+    origin_country_code,
+    supply_country_code,
+    transit_country_code,
+  })
+}
+
+export function deleteDoubleCountingSourcing(
+  entity_id: number,
+  dca_sourcing_id: number
+) {
+  return api.post("/doublecount/agreement/remove-sourcing", {
+    entity_id,
+    dca_sourcing_id,
+  })
+}

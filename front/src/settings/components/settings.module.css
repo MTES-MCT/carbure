@@ -107,3 +107,12 @@ div > .settingsSelect {
   margin-right: -24px;
   margin-bottom: 16px;
 }
+
+.modalTableAddRow {
+  display: inline-block;
+  margin-left: 24px;
+  margin-top: 8px;
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+}
