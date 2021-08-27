@@ -340,6 +340,7 @@ class LotsAPITest(TransactionTestCase):
         txs = LotTransaction.objects.filter(lot__status='Draft', lot__period__startswith='2020')
         response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})          
         self.assertEqual(response.status_code, 200)
+        debug_errors(is_blocking=True)
         res = response.json()['data']
         self.assertEqual(res['submitted'], lots_2020)
         self.assertEqual(res['valid'], lots_2020)
