@@ -23,7 +23,7 @@ class DoubleCountingProductionSerializer(serializers.ModelSerializer):
     feedstock = FeedStockSerializer(read_only=True)
     class Meta:
         model = DoubleCountingProduction
-        fields = ['year', 'biofuel', 'feedstock', 'max_production_capacity', 'estimated_production', 'requested_quota', 'approved_quota']
+        fields = ['id', 'year', 'biofuel', 'feedstock', 'max_production_capacity', 'estimated_production', 'requested_quota', 'approved_quota']
 
 
 class DoubleCountingSourcingSerializer(serializers.ModelSerializer):
@@ -34,7 +34,7 @@ class DoubleCountingSourcingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DoubleCountingSourcing
-        fields = ['year', 'feedstock', 'origin_country', 'supply_country', 'transit_country', 'metric_tonnes']
+        fields = ['id', 'year', 'feedstock', 'origin_country', 'supply_country', 'transit_country', 'metric_tonnes']
 
 
 class DoubleCountingAgreementFullSerializer(serializers.ModelSerializer):
