@@ -154,6 +154,8 @@ export interface Lot {
   eu: number
   ghg_reduction: number
   ghg_reference: number
+  ghg_reference_red_ii: number
+  ghg_reduction_red_ii: number
   ghg_total: number
   is_fused: boolean
   is_split: boolean
