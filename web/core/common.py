@@ -140,10 +140,10 @@ def get_uploaded_files_directory():
 def calculate_ghg(lot, tx=None):
     lot.ghg_total = lot.eec + lot.el + lot.ep + lot.etd + lot.eu - lot.esca - lot.eccs - lot.eccr - lot.eee
     lot.ghg_reference = 83.8
-    #if tx and tx.delivery_date and tx.delivery_date > july1st2021:
-    #    lot.ghg_reference = 94.0
     lot.ghg_reduction = round((1.0 - (lot.ghg_total / lot.ghg_reference)) * 100.0, 2)
-
+    if tx and tx.delivery_date and tx.delivery_date > july1st2021:
+        lot.ghg_reference_red_ii = 94.0
+        lot.ghg_reduction_red_ii = round((1.0 - (lot.ghg_total / lot.ghg_reference_red_ii)) * 100.0, 2)
 
 def convert_cell(cell, convert_float: bool) -> Scalar:
     from openpyxl.cell.cell import TYPE_BOOL, TYPE_ERROR, TYPE_NUMERIC
