@@ -6,6 +6,7 @@ from core.models import GenericError, Entity
 
 oct2015 = datetime.date(year=2015, month=10, day=5)
 jan2021 = datetime.date(year=2021, month=1, day=1)
+july1st2021 = datetime.date(year=2021, month=7, day=1)
 future = datetime.date.today() + datetime.timedelta(days=15) # docker containers are restarted everyday - not an issue
 dae_pattern = re.compile('^([a-zA-Z0-9/]+$)')
 
@@ -162,15 +163,29 @@ def sanity_check(tx, prefetched_data):
         errors.append(generic_error(error='VOLUME_FAIBLE', tx=tx, field='volume'))
 
     # réduction de GES
-    if lot.ghg_reduction >= 100:
-        errors.append(generic_error(error='GHG_REDUC_SUP_100', tx=tx))
-    elif lot.ghg_reduction > 99:
-        errors.append(generic_error(error='GHG_REDUC_SUP_99', tx=tx))
-    elif lot.ghg_reduction < 50:
-        is_sane = False
-        errors.append(generic_error(error='GHG_REDUC_INF_50', tx=tx, is_blocking=True))
+    if tx.delivery_date >= july1st2021:
+        # RED II
+        if lot.ghg_reduction_red_ii >= 100:
+            errors.append(generic_error(error='GHG_REDUC_SUP_100', tx=tx))
+        elif lot.ghg_reduction_red_ii > 99:
+            errors.append(generic_error(error='GHG_REDUC_SUP_99', tx=tx))
+        elif lot.ghg_reduction_red_ii < 50:
+            is_sane = False
+            errors.append(generic_error(error='GHG_REDUC_INF_50', tx=tx, is_blocking=True))
+        else:
+            # all good
+            pass
     else:
-        pass
+        if lot.ghg_reduction >= 100:
+            errors.append(generic_error(error='GHG_REDUC_SUP_100', tx=tx))
+        elif lot.ghg_reduction > 99:
+            errors.append(generic_error(error='GHG_REDUC_SUP_99', tx=tx))
+        elif lot.ghg_reduction < 50:
+            is_sane = False
+            errors.append(generic_error(error='GHG_REDUC_INF_50', tx=tx, is_blocking=True))
+        else:
+            # all good
+            pass
 
     if lot.etd == 0:
         is_sane = False
@@ -181,10 +196,10 @@ def sanity_check(tx, prefetched_data):
 
     commissioning_date = lot.carbure_production_site.date_mise_en_service if lot.carbure_production_site else lot.unknown_production_site_com_date
     if commissioning_date and isinstance(commissioning_date, datetime.datetime) or isinstance(commissioning_date, datetime.date):
-        if commissioning_date > oct2015 and lot.ghg_reduction < 60:
+        if commissioning_date > oct2015 and lot.ghg_reduction_red_ii < 60:
             is_sane = False
             errors.append(generic_error(error='GHG_REDUC_INF_60', tx=tx, is_blocking=True))
-        if commissioning_date >= jan2021 and lot.ghg_reduction < 65:
+        if commissioning_date >= jan2021 and lot.ghg_reduction_red_ii < 65:
             is_sane = False
             errors.append(generic_error(error='GHG_REDUC_INF_65', tx=tx, is_blocking=True))
 
