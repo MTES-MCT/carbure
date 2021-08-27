@@ -926,7 +926,27 @@ export const GhgReduction = ({
   return (
     <LabelInput
       name="ghg_reduction"
-      label={t("Réduction")}
+      label={t("Réd. RED I")}
+      style={{ marginTop: "auto" }}
+      {...props}
+      readOnly
+      value={`${reduction.toFixed(2)}%`}
+    />
+  )
+}
+
+export const GhgReductionRed2 = ({
+  data,
+  value,
+  errors,
+  t = idt,
+  ...props
+}: LIP) => {
+  const reduction = (value as number) ?? data?.ghg_reduction_red_ii ?? 0
+  return (
+    <LabelInput
+      name="ghg_reduction_red_ii"
+      label={t("Réd. RED II")}
       style={{ marginTop: "auto" }}
       {...props}
       readOnly
