@@ -23,6 +23,8 @@ docker exec carbure_mariadb bash /tmp/delete_db.sh
 echo "Download database backup"
 docker exec carbure_app python3 /app/scripts/recovery/s3recovery.py -b carbure.database -d $DATE
 
+tar -xzf /tmp/backup.tgz
+
 # copy downloaded backup into database container
 echo "Copy backup to database container"
 docker cp carbure_app:/tmp/backup.sql /tmp
@@ -36,4 +38,5 @@ docker exec carbure_mariadb bash /tmp/load_backup.sh
 
 # cleanup
 rm /tmp/backup.sql
+rm /tmp/backup.tgz
 docker exec carbure_app rm /tmp/backup.sql
