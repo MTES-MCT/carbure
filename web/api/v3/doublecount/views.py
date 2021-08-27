@@ -9,7 +9,7 @@ from doublecount.models import DoubleCountingAgreement, DoubleCountingSourcing, 
 from doublecount.serializers import DoubleCountingAgreementFullSerializer, DoubleCountingAgreementPartialSerializer
 from doublecount.serializers import DoubleCountingAgreementFullSerializerWithForeignKeys, DoubleCountingAgreementPartialSerializerWithForeignKeys
 from doublecount.helpers import load_dc_sourcing_file, load_dc_production_file, load_dc_recognition_file
-from core.models import UserRights
+from core.models import UserRights, MatierePremiere, Pays, Biocarburant
 from core.xlsx_v3 import make_biofuels_sheet, make_dc_mps_sheet, make_countries_sheet, make_dc_production_sheet, make_dc_sourcing_sheet
 
 @check_rights('entity_id')

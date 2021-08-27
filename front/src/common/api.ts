@@ -15,9 +15,10 @@ import {
 import api from "./services/api"
 
 export function findMatieresPremieres(
-  query: string
+  query: string,
+  double_count_only?: boolean
 ): Promise<MatierePremiere[]> {
-  return api.get("/common/matieres-premieres", { query })
+  return api.get("/common/matieres-premieres", { query, double_count_only })
 }
 
 export function findBiocarburants(query: string): Promise<Biocarburant[]> {
@@ -83,9 +84,7 @@ export function findREDCertCertificates(
   return api.get("/common/redcert-certificates", { query })
 }
 
-export function findSNCertificates(
-  query: string
-): Promise<SNCertificate[]> {
+export function findSNCertificates(query: string): Promise<SNCertificate[]> {
   return api.get("/common/sn-certificates", { query })
 }
 

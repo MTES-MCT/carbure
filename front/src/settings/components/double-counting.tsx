@@ -253,7 +253,7 @@ const DoubleCountingSourcingPrompt = ({
   const [adding, addSourcing] = useAPI(api.addDoubleCountingSourcing)
   const [updating, updateSourcing] = useAPI(api.updateDoubleCountingSourcing)
 
-  function saveSourcing() {
+  async function saveSourcing() {
     if (
       entity === null ||
       !data.year ||
@@ -266,7 +266,7 @@ const DoubleCountingSourcingPrompt = ({
       return
 
     if (add) {
-      addSourcing(
+      await addSourcing(
         entity.id,
         dcaID,
         data.year,
@@ -277,7 +277,7 @@ const DoubleCountingSourcingPrompt = ({
         data.supply_country.code_pays
       )
     } else if (sourcing) {
-      updateSourcing(
+      await updateSourcing(
         entity.id,
         sourcing.id,
         dcaID,
@@ -306,19 +306,23 @@ const DoubleCountingSourcingPrompt = ({
 
       <Form className={styles.settingsForm}>
         <LabelInput
+          disabled={!add}
           label={t("Année")}
           name="year"
           value={data.year}
           onChange={onChange}
         />
         <LabelAutoComplete
+          disabled={!add}
           name="feedstock"
           label={t("Matière première")}
           minLength={0}
           value={data.feedstock}
+          onChange={onChange}
           getValue={(mp) => mp.code}
           getLabel={(mp) => t(mp.code, { ns: "feedstocks" })}
           getQuery={findMatieresPremieres}
+          queryArgs={[true]}
         />
         <LabelInput
           label={t("Poids en tonnes")}
@@ -328,27 +332,34 @@ const DoubleCountingSourcingPrompt = ({
           onChange={onChange}
         />
         <LabelAutoComplete
+          disabled={!add}
+          name="origin_country"
           label={t("Pays d'origine")}
           value={data.origin_country}
           getValue={(c) => c.code_pays}
           getLabel={(c) => t(c.code_pays, { ns: "countries" })}
           getQuery={findCountries}
+          onChange={onChange}
         />
         <LabelAutoComplete
+          disabled={!add}
           name="transit_country"
           label={t("Pays de transit")}
           value={data.transit_country}
           getValue={(c) => c.code_pays}
           getLabel={(c) => t(c.code_pays, { ns: "countries" })}
           getQuery={findCountries}
+          onChange={onChange}
         />
         <LabelAutoComplete
+          disabled={!add}
           name="supply_country"
           label={t("Pays d'approvisionnement")}
           value={data.supply_country}
           getValue={(c) => c.code_pays}
           getLabel={(c) => t(c.code_pays, { ns: "countries" })}
           getQuery={findCountries}
+          onChange={onChange}
         />
       </Form>
 
@@ -401,7 +412,8 @@ const DoubleCountingPrompt = ({
     )
 
     if (ok) {
-      deleteSourcing(entity.id, sourcingID)
+      await deleteSourcing(entity.id, sourcingID)
+      getAgreement(entity.id, agreementID)
     }
   }
 
@@ -451,15 +463,20 @@ const DoubleCountingPrompt = ({
     agreement.data?.sourcing ?? []
   ).map((s) => ({
     value: s,
-    onClick: () =>
-      prompt((resolve) => (
+    onClick: async () => {
+      if (entity === null) return
+
+      await prompt((resolve) => (
         <DoubleCountingSourcingPrompt
           entity={entity}
           dcaID={dcaID}
           sourcing={s}
           onResolve={resolve}
         />
-      )),
+      ))
+
+      getAgreement(entity.id, agreementID)
+    },
   }))
 
   const productionColumns: Column<DoubleCountingProduction>[] = [
@@ -517,8 +534,10 @@ const DoubleCountingPrompt = ({
           <Table columns={sourcingColumns} rows={sourcingRows} />
           <span
             className={styles.modalTableAddRow}
-            onClick={() =>
-              prompt((resolve) => (
+            onClick={async () => {
+              if (entity === null) return
+
+              await prompt((resolve) => (
                 <DoubleCountingSourcingPrompt
                   add
                   dcaID={dcaID}
@@ -526,7 +545,9 @@ const DoubleCountingPrompt = ({
                   onResolve={resolve}
                 />
               ))
-            }
+
+              getAgreement(entity.id, agreementID)
+            }}
           >
             <Trans>+ Ajouter une ligne d'approvisionnement</Trans>
           </span>
@@ -541,7 +562,7 @@ const DoubleCountingPrompt = ({
 
       <DialogButtons>
         <Button icon={Return} onClick={() => onResolve()}>
-          <Trans>Annuler</Trans>
+          <Trans>Retour</Trans>
         </Button>
       </DialogButtons>
     </Dialog>
