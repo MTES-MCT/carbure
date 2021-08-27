@@ -543,7 +543,7 @@ def make_dump_lots_sheet(workbook, entity, transactions, stocks=False):
     if stocks:
         columns.append('remaining_volume')
     columns += ['volume', 'biocarburant_code', 'matiere_premiere_code', 'categorie_matiere_premiere', 'pays_origine_code',
-               'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reduction',
+               'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reduction', 'ghg_reduction_red_ii',
                'dae', 'champ_libre', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country', 'delivery_site_name']
 
     if entity is not None and entity.has_mac:
@@ -576,7 +576,7 @@ def make_dump_lots_sheet(workbook, entity, transactions, stocks=False):
                lot.matiere_premiere.code if lot.matiere_premiere else '',
                lot.matiere_premiere.category if lot.matiere_premiere else '',
                lot.pays_origine.code_pays if lot.pays_origine else '',
-               lot.eec, lot.el, lot.ep, lot.etd, lot.eu, lot.esca, lot.eccs, lot.eccr, lot.eee, lot.ghg_total, lot.ghg_reduction,
+               lot.eec, lot.el, lot.ep, lot.etd, lot.eu, lot.esca, lot.eccs, lot.eccr, lot.eee, lot.ghg_total, lot.ghg_reduction, lot.ghg_reduction_red_ii,
                tx.dae, tx.champ_libre, tx.carbure_client.name if tx.client_is_in_carbure and tx.carbure_client else tx.unknown_client, 
                tx.delivery_date.strftime('%d/%m/%Y') if tx.delivery_date else '',
                tx.carbure_delivery_site.depot_id if tx.delivery_site_is_in_carbure else tx.unknown_delivery_site,

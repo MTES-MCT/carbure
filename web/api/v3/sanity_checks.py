@@ -196,10 +196,18 @@ def sanity_check(tx, prefetched_data):
 
     commissioning_date = lot.carbure_production_site.date_mise_en_service if lot.carbure_production_site else lot.unknown_production_site_com_date
     if commissioning_date and isinstance(commissioning_date, datetime.datetime) or isinstance(commissioning_date, datetime.date):
-        if commissioning_date > oct2015 and lot.ghg_reduction_red_ii < 60:
+        #if tx.delivery_date and tx.delivery_date > july1st2021:
+        #    if commissioning_date > oct2015 and lot.ghg_reduction_red_ii < 60:
+        #        is_sane = False
+        #        errors.append(generic_error(error='GHG_REDUC_INF_60', tx=tx, is_blocking=True))
+        #    if commissioning_date >= jan2021 and lot.ghg_reduction_red_ii < 65:
+        #        is_sane = False
+        #        errors.append(generic_error(error='GHG_REDUC_INF_65', tx=tx, is_blocking=True))
+        #else:
+        if commissioning_date > oct2015 and lot.ghg_reduction < 60:
             is_sane = False
             errors.append(generic_error(error='GHG_REDUC_INF_60', tx=tx, is_blocking=True))
-        if commissioning_date >= jan2021 and lot.ghg_reduction_red_ii < 65:
+        if commissioning_date >= jan2021 and lot.ghg_reduction < 65:
             is_sane = False
             errors.append(generic_error(error='GHG_REDUC_INF_65', tx=tx, is_blocking=True))
 
