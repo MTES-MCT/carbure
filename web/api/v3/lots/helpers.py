@@ -18,8 +18,16 @@ sort_key_to_django_field = {'period': 'lot__period',
                             'added_by': 'lot__added_by__name'}
 
 
-def get_errors(tx):
-    return [e.natural_key() for e in tx.genericerror_set.all()]
+def get_errors(tx, entity=None, is_admin=False):
+    if is_admin:
+        return [e.natural_key() for e in tx.genericerror_set.all()]
+    elif entity == tx.carbure_vendor:
+        return [e.natural_key() for e in tx.genericerror_set.filter(display_to_creator=True)]
+    elif entity == tx.carbure_client:
+        return [e.natural_key() for e in tx.genericerror_set.filter(display_to_recipient=True)]
+    else:
+        return [e.natural_key() for e in tx.genericerror_set.filter(display_to_creator=True)]
+
 
 
 def get_current_deadline():
@@ -326,7 +334,7 @@ def get_lots_with_metadata(txs, entity, querySet, admin=False, stocks=False):
     errors = {}
 
     for tx in returned:
-        grouped_errors = get_errors(tx)
+        grouped_errors = get_errors(tx, entity)
         if len(grouped_errors) > 0:
             errors[tx.id] = grouped_errors
 

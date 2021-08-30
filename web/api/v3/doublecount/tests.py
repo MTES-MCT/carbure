@@ -47,35 +47,19 @@ class DCAAPITest(TransactionTestCase):
 
     def test_dca_sourcing(self):
         # download template sourcing
-        response = self.client.get(reverse('api-v3-doublecount-get-template'), {'file_type':'SOURCING'})
+        response = self.client.get(reverse('api-v3-doublecount-get-template'))
         self.assertEqual(response.status_code, 200)        
-        # upload template sourcing
-        filepath = '%s/web/fixtures/csv/test_data/dca_sourcing.xlsx' % (os.environ['CARBURE_HOME'])
+        # upload template
+        filepath = '%s/web/fixtures/csv/test_data/dca.xlsx' % (os.environ['CARBURE_HOME'])
         fh = open(filepath, 'rb')
         data = fh.read()
         fh.close()
-        f = SimpleUploadedFile("sourcing.xlsx", data)
-        response = self.client.post(reverse('api-v3-doublecount-upload-file'), {'entity_id': self.producer.id, 'production_site_id': self.production_site.id, 'file_type': 'SOURCING', 'file': f})
+        f = SimpleUploadedFile("dca.xlsx", data)
+        response = self.client.post(reverse('api-v3-doublecount-upload-file'), {'entity_id': self.producer.id, 'production_site_id': self.production_site.id})
         if response.status_code != 200:
             print('Failed to upload %s' % (filepath))
         self.assertEqual(response.status_code, 200)
         # check if it matches expectations
         dca = DoubleCountingAgreement.objects.get(producer=self.producer, production_site=self.production_site)
         self.assertEqual(8, DoubleCountingSourcing.objects.filter(dca=dca).count())
-
-
-    def test_dca_production(self):
-        response = self.client.get(reverse('api-v3-doublecount-get-template'), {'file_type':'PRODUCTION'})
-        self.assertEqual(response.status_code, 200)        
-        # upload template sourcing
-        filepath = '%s/web/fixtures/csv/test_data/dca_production.xlsx' % (os.environ['CARBURE_HOME'])
-        fh = open(filepath, 'rb')
-        data = fh.read()
-        fh.close()
-        f = SimpleUploadedFile("sourcing.xlsx", data)
-        response = self.client.post(reverse('api-v3-doublecount-upload-file'), {'entity_id': self.producer.id, 'production_site_id': self.production_site.id, 'file_type': 'PRODUCTION', 'file': f})
-        if response.status_code != 200:
-            print('Failed to upload %s' % (filepath))
-        self.assertEqual(response.status_code, 200)
-        dca = DoubleCountingAgreement.objects.get(producer=self.producer, production_site=self.production_site)
         self.assertEqual(4, DoubleCountingProduction.objects.filter(dca=dca).count())
