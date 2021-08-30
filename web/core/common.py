@@ -123,7 +123,7 @@ def check_certificates(tx):
     if tx.lot.unknown_production_site_dbl_counting:
         d['unknown_production_site_dbl_counting'] = try_get_double_counting_certificate(tx.lot.unknown_production_site_dbl_counting)
     elif tx.lot.carbure_production_site and tx.lot.carbure_production_site.dc_reference:
-        d['double_counting_reference'] = try_get_double_counting_certificate(tx.lot.unknown_production_site_dbl_counting)
+        d['double_counting_reference'] = try_get_double_counting_certificate(tx.lot.carbure_production_site.dc_reference)
     else:
         pass
     return d
