@@ -809,16 +809,16 @@ class LotsAPITest(TransactionTestCase):
         DoubleCountingRegistration.objects.update_or_create(certificate_id="DC_CERT_02", certificate_holder="Super testeur", 
         defaults={'registered_address':"blablabla", 'valid_from': vfrom, 'valid_until': vuntil - datetime.timedelta(days=7)})        
         # upload lot using first
-        tx_id, lot_id = self.create_lot(matiere_premiere_code="RESIDUS_DE_BIERE", biocarburant_code="ETH", double_counting_registration="DC_CERT_01", delivery_date=today.strftime("%d/%m/%Y"))
+        tx_id, lot_id = self.create_lot(matiere_premiere_code="MARC_DE_RAISIN", biocarburant_code="ETH", double_counting_registration="DC_CERT_01", delivery_date=today.strftime("%d/%m/%Y"))
         self.assertEqual(GenericError.objects.filter(error="UNKNOWN_DOUBLE_COUNTING_CERTIFICATE").count(), 0)
         self.assertEqual(GenericError.objects.filter(error="EXPIRED_DOUBLE_COUNTING_CERTIFICATE").count(), 0)
         # upload lot using second
-        tx_id, lot_id = self.create_lot(matiere_premiere_code="RESIDUS_DE_BIERE", biocarburant_code="ETH", double_counting_registration="DC_CERT_02", delivery_date=today.strftime("%d/%m/%Y"))
+        tx_id, lot_id = self.create_lot(matiere_premiere_code="MARC_DE_RAISIN", biocarburant_code="ETH", double_counting_registration="DC_CERT_02", delivery_date=today.strftime("%d/%m/%Y"))
         self.assertEqual(GenericError.objects.filter(error="UNKNOWN_DOUBLE_COUNTING_CERTIFICATE").count(), 0)
         self.assertEqual(GenericError.objects.filter(error="EXPIRED_DOUBLE_COUNTING_CERTIFICATE").count(), 1)
         # upload lot using unknown cert
         GenericError.objects.all().delete()
-        tx_id, lot_id = self.create_lot(matiere_premiere_code="RESIDUS_DE_BIERE", biocarburant_code="ETH", double_counting_registration="UNKNOWN_DC_CERT")
+        tx_id, lot_id = self.create_lot(matiere_premiere_code="MARC_DE_RAISIN", biocarburant_code="ETH", double_counting_registration="UNKNOWN_DC_CERT")
         self.assertEqual(GenericError.objects.filter(error="UNKNOWN_DOUBLE_COUNTING_CERTIFICATE").count(), 1)
         self.assertEqual(GenericError.objects.filter(error="EXPIRED_DOUBLE_COUNTING_CERTIFICATE").count(), 0)
 
