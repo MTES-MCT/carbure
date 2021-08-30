@@ -13,7 +13,7 @@ import {
   DoubleCountingSourcing,
   DoubleCountingProduction,
 } from "common/types"
-import { Title, LoaderOverlay } from "common/components"
+import { Title, LoaderOverlay, Box } from "common/components"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import { useRights } from "carbure/hooks/use-rights"
 import Table, { Actions, Column, Row } from "common/components/table"
@@ -39,6 +39,7 @@ import {
 } from "common/components/dialog"
 import { formatDate, SettingsForm } from "./common"
 import {
+  findBiocarburants,
   findCountries,
   findMatieresPremieres,
   findProductionSites,
@@ -50,7 +51,6 @@ import { padding } from "transactions/components/list-columns"
 import Tabs from "common/components/tabs"
 import { Form } from "common/components/form"
 import { LabelInput } from "common/components/input"
-import * as Fields from "transactions/components/form/fields"
 import useForm from "common/hooks/use-form"
 
 export const DCStatus = ({ status }: { status: DoubleCountingStatus }) => {
@@ -66,6 +66,7 @@ export const DCStatus = ({ status }: { status: DoubleCountingStatus }) => {
   return (
     <span
       className={cl(
+        styles.settingsStatus,
         statusStyles.status,
         statusStyles.smallStatus,
         status === DoubleCountingStatus.Accepted && statusStyles.statusAccepted,
@@ -93,24 +94,18 @@ const DoubleCountingUploadPrompt = ({
     null
   )
 
-  const [sourcingFile, setSourcingFile] = useState<File | null>(null)
-  const [productionFile, setProductionFile] = useState<File | null>(null)
-
-  const [uploadingSourcing, uploadSourcing] = useAPI(
-    api.uploadDoubleCountingSourcing
-  )
-  const [uploadingProduction, uploadProduction] = useAPI(
-    api.uploadDoubleCountingProduction
+  const [doubleCountingFile, setDoubleCountingFile] = useState<File | null>(
+    null
   )
 
-  const loading = uploadingSourcing.loading || uploadingProduction.loading
-  const disabled = !productionSite || !sourcingFile || !productionFile
+  const [uploading, uploadFile] = useAPI(api.uploadDoubleCountingFile)
+
+  const disabled = !productionSite || !doubleCountingFile
 
   async function submitAgreement() {
-    if (!entity || !productionSite || !sourcingFile || !productionFile) return
+    if (!entity || !productionSite || !doubleCountingFile) return
 
-    await uploadSourcing(entity.id, productionSite.id, sourcingFile)
-    await uploadProduction(entity.id, productionSite.id, productionFile)
+    await uploadFile(entity.id, productionSite.id, doubleCountingFile)
 
     onResolve()
   }
@@ -119,11 +114,11 @@ const DoubleCountingUploadPrompt = ({
     <Dialog onResolve={onResolve} className={styles.settingsPrompt}>
       <DialogTitle text={t("Création dossier double comptage")} />
 
-      <SettingsForm>
+      <Form>
         <div className={styles.settingsText}>
           <Trans>
-            Commencez dans un premier temps par renseigner le site de production
-            concerné par votre demande.
+            Dans un premier temps, renseignez le site de production concerné par
+            votre demande.
           </Trans>
         </div>
 
@@ -142,71 +137,39 @@ const DoubleCountingUploadPrompt = ({
 
         <div className={styles.settingsText}>
           <a
-            href="/api/v3/doublecount/get-template?file_type=SOURCING"
+            href="/api/v3/doublecount/get-template"
             className={styles.settingsLink}
           >
-            <Trans>Téléchargez ce modèle</Trans>
+            <Trans>Téléchargez le modèle depuis ce lien</Trans>
           </a>
           <Trans>
-            {" "}
-            afin de renseigner les différentes sources d'approvisionnement en
-            matières premières sujettes au double comptage.
+            puis remplissez les <b>deux premiers onglets</b> afin de détailler
+            vos approvisionnements et productions sujets au double comptage.
+            Ensuite, importez ce fichier avec le bouton ci-dessous :
           </Trans>
         </div>
 
         <Button
           as="label"
-          level={sourcingFile ? "success" : "primary"}
-          icon={sourcingFile ? Check : Upload}
+          level={doubleCountingFile ? "success" : "primary"}
+          icon={doubleCountingFile ? Check : Upload}
           className={styles.settingsFormButton}
         >
-          {sourcingFile ? (
-            sourcingFile.name
+          {doubleCountingFile ? (
+            doubleCountingFile.name
           ) : (
-            <Trans>Importer les informations d'approvisionnement</Trans>
+            <Trans>Importer les informations double comptage</Trans>
           )}
           <input
             type="file"
             className={styles.importFileInput}
-            onChange={(e) => setSourcingFile(e!.target.files![0])}
-          />
-        </Button>
-
-        <div className={styles.settingsText}>
-          <a
-            href="/api/v3/doublecount/get-template?file_type=PRODUCTION"
-            className={styles.settingsLink}
-          >
-            <Trans>Téléchargez ce modèle</Trans>
-          </a>
-          <Trans>
-            {" "}
-            pour lister la partie de votre production basée sur les matières
-            premières sujettes au double comptage.
-          </Trans>
-        </div>
-
-        <Button
-          as="label"
-          level={productionFile ? "success" : "primary"}
-          icon={productionFile ? Check : Upload}
-          className={styles.settingsFormButton}
-        >
-          {productionFile ? (
-            productionFile.name
-          ) : (
-            <Trans>Importer les objectifs de production</Trans>
-          )}
-          <input
-            type="file"
-            className={styles.importFileInput}
-            onChange={(e) => setProductionFile(e!.target.files![0])}
+            onChange={(e) => setDoubleCountingFile(e!.target.files![0])}
           />
         </Button>
 
         <DialogButtons>
           <AsyncButton
-            loading={loading}
+            loading={uploading.loading}
             disabled={disabled}
             level="primary"
             icon={Check}
@@ -218,12 +181,12 @@ const DoubleCountingUploadPrompt = ({
             <Trans>Annuler</Trans>
           </Button>
         </DialogButtons>
-      </SettingsForm>
+      </Form>
     </Dialog>
   )
 }
 
-type DoubleCountingSourcingPromptProps = PromptProps<void> & {
+type DoubleCountingSourcingPromptProps = PromptProps<true | void> & {
   add?: boolean
   dcaID: number
   sourcing?: DoubleCountingSourcing
@@ -277,20 +240,10 @@ const DoubleCountingSourcingPrompt = ({
         data.supply_country.code_pays
       )
     } else if (sourcing) {
-      await updateSourcing(
-        entity.id,
-        sourcing.id,
-        dcaID,
-        data.year,
-        data.metric_tonnes,
-        data.feedstock.code,
-        data.origin_country.code_pays,
-        data.transit_country.code_pays,
-        data.supply_country.code_pays
-      )
+      await updateSourcing(entity.id, sourcing.id, data.metric_tonnes)
     }
 
-    onResolve()
+    onResolve(true)
   }
 
   const loading = adding.loading || updating.loading
@@ -304,7 +257,7 @@ const DoubleCountingSourcingPrompt = ({
         )}
       />
 
-      <Form className={styles.settingsForm}>
+      <Form className={styles.settingsForm} onSubmit={saveSourcing}>
         <LabelInput
           disabled={!add}
           label={t("Année")}
@@ -361,25 +314,179 @@ const DoubleCountingSourcingPrompt = ({
           getQuery={findCountries}
           onChange={onChange}
         />
-      </Form>
 
-      <DialogButtons>
-        <AsyncButton
-          level="primary"
-          loading={loading}
-          icon={add ? Plus : Save}
-          onClick={saveSourcing}
-        >
-          {add ? (
-            <Trans>Ajouter un approvisionnement</Trans>
-          ) : (
-            <Trans>Enregistrer les modifications</Trans>
-          )}
-        </AsyncButton>
-        <Button icon={Return} onClick={() => onResolve()}>
-          <Trans>Annuler</Trans>
-        </Button>
-      </DialogButtons>
+        <DialogButtons>
+          <AsyncButton
+            submit
+            level="primary"
+            loading={loading}
+            icon={add ? Plus : Save}
+          >
+            {add ? (
+              <Trans>Ajouter un approvisionnement</Trans>
+            ) : (
+              <Trans>Enregistrer les modifications</Trans>
+            )}
+          </AsyncButton>
+          <Button icon={Return} onClick={() => onResolve()}>
+            <Trans>Annuler</Trans>
+          </Button>
+        </DialogButtons>
+      </Form>
+    </Dialog>
+  )
+}
+
+type DoubleCountingProductionPromptProps = PromptProps<true | void> & {
+  add?: boolean
+  dcaID: number
+  production?: DoubleCountingProduction
+  entity: EntitySelection
+}
+
+const DoubleCountingProductionPrompt = ({
+  add,
+  dcaID,
+  production,
+  entity,
+  onResolve,
+}: DoubleCountingProductionPromptProps) => {
+  const { t } = useTranslation()
+
+  const { data, onChange } = useForm<Partial<DoubleCountingProduction>>(
+    production ?? {
+      year: new Date().getFullYear(),
+      feedstock: undefined,
+      biofuel: undefined,
+      estimated_production: 0,
+      max_production_capacity: 0,
+      requested_quota: 0,
+    }
+  )
+
+  const [adding, addProduction] = useAPI(api.addDoubleCountingProduction)
+  const [updating, updateProduction] = useAPI(
+    api.updateDoubleCountingProduction
+  )
+
+  async function saveProduction() {
+    if (
+      entity === null ||
+      !data.year ||
+      !data.feedstock ||
+      !data.biofuel ||
+      !data.requested_quota ||
+      !data.estimated_production ||
+      !data.max_production_capacity
+    )
+      return
+
+    if (add) {
+      await addProduction(
+        entity.id,
+        dcaID,
+        data.year,
+        data.feedstock.code,
+        data.biofuel.code,
+        data.estimated_production,
+        data.max_production_capacity,
+        data.requested_quota
+      )
+    } else if (production) {
+      await updateProduction(
+        entity.id,
+        dcaID,
+        data.estimated_production,
+        data.max_production_capacity,
+        data.requested_quota
+      )
+    }
+
+    onResolve(true)
+  }
+
+  const loading = adding.loading || updating.loading
+
+  return (
+    <Dialog onResolve={onResolve} className={styles.settingsPrompt}>
+      <DialogTitle text={t("Approvisionnement")} />
+      <DialogText
+        text={t(
+          "Précisez les informations concernant votre approvisionnement en matière première dans le formularie ci-dessous."
+        )}
+      />
+
+      <Form className={styles.settingsForm} onSubmit={saveProduction}>
+        <LabelInput
+          disabled={!add}
+          label={t("Année")}
+          name="year"
+          value={data.year}
+          onChange={onChange}
+        />
+        <LabelAutoComplete
+          disabled={!add}
+          name="feedstock"
+          label={t("Matière première")}
+          minLength={0}
+          value={data.feedstock}
+          onChange={onChange}
+          getValue={(mp) => mp.code}
+          getLabel={(mp) => t(mp.code, { ns: "feedstocks" })}
+          getQuery={findMatieresPremieres}
+          queryArgs={[true]}
+        />
+        <LabelAutoComplete
+          disabled={!add}
+          name="biofuel"
+          label={t("Biocarburant")}
+          minLength={0}
+          value={data.biofuel}
+          onChange={onChange}
+          getValue={(bc) => bc.code}
+          getLabel={(bc) => t(bc.code, { ns: "biofuels" })}
+          getQuery={findBiocarburants}
+        />
+        <LabelInput
+          label={t("Production maximale")}
+          type="number"
+          name="max_production_capacity"
+          value={data.max_production_capacity}
+          onChange={onChange}
+        />
+        <LabelInput
+          label={t("Production estimée")}
+          type="number"
+          name="estimated_production"
+          value={data.estimated_production}
+          onChange={onChange}
+        />
+        <LabelInput
+          label={t("Quota demandé")}
+          type="number"
+          name="requested_quota"
+          value={data.requested_quota}
+          onChange={onChange}
+        />
+
+        <DialogButtons>
+          <AsyncButton
+            submit
+            level="primary"
+            loading={loading}
+            icon={add ? Plus : Save}
+          >
+            {add ? (
+              <Trans>Ajouter une production</Trans>
+            ) : (
+              <Trans>Enregistrer les modifications</Trans>
+            )}
+          </AsyncButton>
+          <Button icon={Return} onClick={() => onResolve()}>
+            <Trans>Annuler</Trans>
+          </Button>
+        </DialogButtons>
+      </Form>
     </Dialog>
   )
 }
@@ -400,8 +507,15 @@ const DoubleCountingPrompt = ({
 
   const [agreement, getAgreement] = useAPI(api.getDoubleCountingDetails)
   const [, deleteSourcing] = useAPI(api.deleteDoubleCountingSourcing)
+  const [, deleteProduction] = useAPI(api.deleteDoubleCountingProduction)
 
   const dcaID = agreement.data?.id ?? -1
+  const dcaStatus = agreement.data?.status ?? DoubleCountingStatus.Pending
+
+  function reloadAgreement() {
+    if (entity === null) return
+    getAgreement(entity.id, agreementID)
+  }
 
   async function removeSourcingRow(sourcingID: number) {
     if (!entity) return
@@ -413,7 +527,21 @@ const DoubleCountingPrompt = ({
 
     if (ok) {
       await deleteSourcing(entity.id, sourcingID)
-      getAgreement(entity.id, agreementID)
+      reloadAgreement()
+    }
+  }
+
+  async function removeProductionRow(productionID: number) {
+    if (!entity) return
+
+    const ok = await confirm(
+      t("Supprimer production"),
+      t("Voulez-vous supprimer cette ligne de production ?")
+    )
+
+    if (ok) {
+      await deleteProduction(entity.id, productionID)
+      reloadAgreement()
     }
   }
 
@@ -464,9 +592,7 @@ const DoubleCountingPrompt = ({
   ).map((s) => ({
     value: s,
     onClick: async () => {
-      if (entity === null) return
-
-      await prompt((resolve) => (
+      const ok = await prompt((resolve) => (
         <DoubleCountingSourcingPrompt
           entity={entity}
           dcaID={dcaID}
@@ -475,7 +601,7 @@ const DoubleCountingPrompt = ({
         />
       ))
 
-      getAgreement(entity.id, agreementID)
+      ok && reloadAgreement()
     },
   }))
 
@@ -494,11 +620,11 @@ const DoubleCountingPrompt = ({
       render: (p) => t(p.biofuel.code, { ns: "biofuels" }),
     },
     {
-      header: t("Production max."),
+      header: t("Prod. max"),
       render: (p) => p.max_production_capacity,
     },
     {
-      header: t("Production estimée"),
+      header: t("Prod. estimée"),
       render: (p) => p.estimated_production,
     },
     {
@@ -509,16 +635,40 @@ const DoubleCountingPrompt = ({
       header: t("Quota approuvé"),
       render: (p) => p.approved_quota,
     },
+    Actions((s) => [
+      {
+        icon: Cross,
+        action: () => removeProductionRow(s.id),
+        title: t("Supprimer production"),
+      },
+    ]),
     padding,
   ]
 
   const productionRows: Row<DoubleCountingProduction>[] = (
     agreement.data?.production ?? []
-  ).map((p) => ({ value: p }))
+  ).map((p) => ({
+    value: p,
+    onClick: async () => {
+      const ok = await prompt((resolve) => (
+        <DoubleCountingProductionPrompt
+          entity={entity}
+          dcaID={dcaID}
+          production={p}
+          onResolve={resolve}
+        />
+      ))
+
+      ok && reloadAgreement()
+    },
+  }))
 
   return (
     <Dialog wide onResolve={onResolve} className={styles.settingsPrompt}>
-      <DialogTitle text={t("Dossier double comptage")} />
+      <Box row>
+        <DCStatus status={dcaStatus} />
+        <DialogTitle text={t("Dossier double comptage")} />
+      </Box>
 
       <Tabs
         tabs={[
@@ -532,12 +682,11 @@ const DoubleCountingPrompt = ({
       {focus === "sourcing" && (
         <div className={styles.modalTableContainer}>
           <Table columns={sourcingColumns} rows={sourcingRows} />
+
           <span
             className={styles.modalTableAddRow}
             onClick={async () => {
-              if (entity === null) return
-
-              await prompt((resolve) => (
+              const ok = await prompt((resolve) => (
                 <DoubleCountingSourcingPrompt
                   add
                   dcaID={dcaID}
@@ -546,7 +695,7 @@ const DoubleCountingPrompt = ({
                 />
               ))
 
-              getAgreement(entity.id, agreementID)
+              ok && reloadAgreement()
             }}
           >
             <Trans>+ Ajouter une ligne d'approvisionnement</Trans>
@@ -557,6 +706,24 @@ const DoubleCountingPrompt = ({
       {focus === "production" && (
         <div className={styles.modalTableContainer}>
           <Table columns={productionColumns} rows={productionRows} />
+
+          <span
+            className={styles.modalTableAddRow}
+            onClick={async () => {
+              await prompt((resolve) => (
+                <DoubleCountingProductionPrompt
+                  add
+                  dcaID={dcaID}
+                  entity={entity}
+                  onResolve={resolve}
+                />
+              ))
+
+              reloadAgreement()
+            }}
+          >
+            <Trans>+ Ajouter une ligne de production</Trans>
+          </span>
         </div>
       )}
 
@@ -565,6 +732,8 @@ const DoubleCountingPrompt = ({
           <Trans>Retour</Trans>
         </Button>
       </DialogButtons>
+
+      {agreement.loading && <LoaderOverlay />}
     </Dialog>
   )
 }

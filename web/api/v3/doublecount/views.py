@@ -263,9 +263,9 @@ def add_production(request, *args, **kwargs):
     except:
         return JsonResponse({'status': "error", "message": "Could not find biofuel"}, status=400)
 
-    dcs.max_production_capacity = max_production_capacity
-    dcs.estimated_production = estimated_production
-    dcs.requested_quota = requested_quota
+    dcp.max_production_capacity = max_production_capacity
+    dcp.estimated_production = estimated_production
+    dcp.requested_quota = requested_quota
     try:
         dcp.save()
     except:
