@@ -18,7 +18,7 @@ def load_dc_sourcing_file(entity, psite_id, user, filepath):
     countries = {f.code_pays: f for f in Pays.objects.all()}
     try:
         wb = openpyxl.load_workbook(filepath, data_only=True)
-        sheet = wb.worksheets[0]
+        sheet = wb["sourcing"]
         data = get_sheet_data(sheet, convert_float=True)
         column_names = data[0]
         data = data[1:]
@@ -53,7 +53,7 @@ def load_dc_production_file(entity, psite_id, user, filepath):
 
     try:
         wb = openpyxl.load_workbook(filepath, data_only=True)
-        sheet = wb.worksheets[0]
+        sheet = wb["production"]
         data = get_sheet_data(sheet, convert_float=True)
         column_names = data[0]
         data = data[1:]

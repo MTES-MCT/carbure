@@ -244,7 +244,7 @@ def get_details(request, *args, **kwargs):
     data['transaction'] = tx.natural_key(admin=True)
     data['certificates'] = check_certificates(tx)
     data['distance'] = get_transaction_distance(tx)
-    data['errors'] = get_errors(tx)
+    data['errors'] = get_errors(tx, entity=None, is_admin=True)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['comments'] = [c.natural_key() for c in tx.transactioncomment_set.all()]
     data['admin_comments'] = [c.natural_key() for c in tx.admintransactioncomment_set.filter(is_visible_by_admin=True)]

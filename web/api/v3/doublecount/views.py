@@ -64,9 +64,6 @@ def upload_file(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
     production_site_id = request.POST.get('production_site_id', None)
-    file_type = request.POST.get('file_type', None)
-    if not file_type:
-        return JsonResponse({'status': "error", 'message': "Missing file_type"}, status=400)
     if not production_site_id:
         return JsonResponse({'status': "error", 'message': "Missing production_site_id"}, status=400)
 
@@ -87,39 +84,23 @@ def upload_file(request, *args, **kwargs):
         for chunk in f.chunks():
             destination.write(chunk)
 
-    if file_type == 'SOURCING':
-        return load_dc_sourcing_file(entity, production_site_id, request.user, filepath)
-    elif file_type == 'PRODUCTION':
-        return load_dc_production_file(entity, production_site_id, request.user, filepath)
-    elif file_type == 'RECOGNITION':
-        return load_dc_recognition_file(entity, production_site_id, request.user, filepath)
-    else:
-        return JsonResponse({'status': 'error', 'message': 'unknown file_type'}, status=400)
+    load_dc_sourcing_file(entity, production_site_id, request.user, filepath)
+    load_dc_production_file(entity, production_site_id, request.user, filepath)
+    return JsonResponse({'status': 'success'})
 
 def get_template(request):
-    file_type = request.GET.get('file_type', None)
-    if file_type == 'SOURCING':
-        location = '/tmp/carbure_template_sourcing.xlsx'
-        workbook = xlsxwriter.Workbook(location)
-        make_dc_sourcing_sheet(workbook)
-        make_countries_sheet(workbook)
-        make_dc_mps_sheet(workbook)
-    elif file_type == 'PRODUCTION':
-        location = '/tmp/carbure_template_production.xlsx'
-        workbook = xlsxwriter.Workbook(location)
-        make_dc_production_sheet(workbook)
-        make_countries_sheet(workbook)
-        make_biofuels_sheet(workbook)
-        make_dc_mps_sheet(workbook)
-    elif file_type == 'RECOGNITION':
-        return JsonResponse({'status': 'error', 'message': 'not implemented'}, status=400)
-    else:
-        return JsonResponse({'status': 'error', 'message': 'unknown file_type'}, status=400)
+    location = '/tmp/carbure_template_DC.xlsx'
+    workbook = xlsxwriter.Workbook(location)
+    make_dc_sourcing_sheet(workbook)
+    make_dc_production_sheet(workbook)
+    make_dc_mps_sheet(workbook)
+    make_biofuels_sheet(workbook)
+    make_countries_sheet(workbook)
     workbook.close()
     with open(location, 'rb') as f:
         file_data = f.read()
         response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="carbure_template.xlsx"'
+        response['Content-Disposition'] = 'attachment; filename="carbure_template_DC.xlsx"'
         return response
 
 def approve_dca(request):

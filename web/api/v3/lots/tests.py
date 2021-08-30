@@ -222,7 +222,7 @@ class LotsAPITest(TransactionTestCase):
         # as operator
         # make sure we received 3
         response = self.client.get(reverse('api-v3-lots-get'), {'entity_id': self.test_operator.id, 'status': 'in', 'year': '2020'})
-        self.assertEqual(response.status_code, 200)        
+        self.assertEqual(response.status_code, 200)
         lots = response.json()['data']['lots']
         self.assertEqual(len(lots), 3)    
         # reject first

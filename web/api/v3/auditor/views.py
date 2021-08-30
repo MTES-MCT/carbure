@@ -96,6 +96,8 @@ def get_lots_summary(request, *args, **kwargs):
 @check_rights('entity_id')
 def get_details(request, *args, **kwargs):
     tx_id = request.GET.get('tx_id', False)
+    context = kwargs['context']
+    entity = context['entity']
 
     if not tx_id:
         return JsonResponse({'status': 'error', 'message': 'Missing tx_id'}, status=400)
@@ -108,7 +110,7 @@ def get_details(request, *args, **kwargs):
 
     data = {}
     data['transaction'] = tx.natural_key(admin=True)
-    data['errors'] = get_errors(tx)
+    data['errors'] = get_errors(tx, entity)
     data['comments'] = get_comments(tx)
     data['admin_comments'] = [c.natural_key() for c in tx.admintransactioncomment_set.filter(is_visible_by_auditor=True)]
     data['updates'] = get_history(tx)
