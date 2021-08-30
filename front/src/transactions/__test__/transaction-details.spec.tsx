@@ -114,7 +114,7 @@ function checkGESFields() {
   screen.getByLabelText("EEE")
 
   screen.getByLabelText("Total")
-  screen.getByLabelText("Réduction")
+  screen.getByLabelText("Réd. RED I")
 }
 
 test("display transaction details", async () => {
