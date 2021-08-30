@@ -77,7 +77,7 @@ function checkGESFields() {
   screen.getByLabelText("EEE")
 
   screen.getByLabelText("Total")
-  screen.getByLabelText("Réduction")
+  screen.getByLabelText("Réd. RED I")
 }
 
 test("display the transaction form - producer with trading and mac", async () => {
