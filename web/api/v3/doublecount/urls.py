@@ -6,9 +6,9 @@ urlpatterns = [
     path('agreements', views.get_agreements, name='api-v3-doublecount-get-agreements'),
     path('agreement', views.get_agreement, name='api-v3-doublecount-get-agreement'),
     path('admin/agreement', views.get_agreement_admin, name='api-v3-doublecount-get-agreement-admin'),
-    path('admin/agreements', views.get_agreements_admin, name='api-v3-doublecount-get-agreements-admin'),            
+    path('admin/agreements', views.get_agreements_admin, name='api-v3-doublecount-get-agreements-admin'),
     path('get-template', views.get_template, name='api-v3-doublecount-get-template'),
-    
+
     # POST
     path('agreement/remove-sourcing', views.remove_sourcing, name='api-v3-doublecount-remove-sourcing'),
     path('agreement/update-sourcing', views.update_sourcing, name='api-v3-doublecount-update-sourcing'),

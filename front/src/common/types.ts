@@ -567,8 +567,8 @@ export interface DoubleCountingSourcing {
   metric_tonnes: number
   feedstock: MatierePremiere
   origin_country: Country
-  transit_country: Country
-  supply_country: Country
+  transit_country?: Country
+  supply_country?: Country
 }
 
 export interface DoubleCountingProduction {
@@ -576,7 +576,7 @@ export interface DoubleCountingProduction {
   year: number
   feedstock: MatierePremiere
   biofuel: Biocarburant
-  max_production_capacity: number
+  max_production_capacity?: number
   estimated_production: number
   requested_quota: number
   approved_quota: number
