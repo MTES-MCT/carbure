@@ -571,11 +571,14 @@ const DoubleCountingPrompt = ({
     },
     {
       header: t("Approvisionnement"),
-      render: (s) => t(s.supply_country.code_pays, { ns: "countries" }),
+      render: (s) =>
+        s.supply_country && t(s.supply_country.code_pays, { ns: "countries" }),
     },
     {
       header: t("Transit"),
-      render: (s) => t(s.transit_country.code_pays, { ns: "countries" }),
+      render: (s) =>
+        s.transit_country &&
+        t(s.transit_country.code_pays, { ns: "countries" }),
     },
     Actions((s) => [
       {
