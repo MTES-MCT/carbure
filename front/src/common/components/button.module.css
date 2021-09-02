@@ -5,7 +5,6 @@
   align-items: center;
   background-color: var(--white);
   border: 1px solid var(--gray-medium);
-  border-radius: 4px;
   font-weight: 600;
   padding: 8px 12px;
   padding-right: 16px;
@@ -117,7 +116,6 @@ a .button {
   font-size: 1.25em;
   font-weight: 400;
   background-color: var(--white);
-  border-radius: 5px;
   padding: 20px 24px;
   padding-bottom: 24px;
 }

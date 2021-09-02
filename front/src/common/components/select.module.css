@@ -2,7 +2,6 @@
   padding: 8px 12px;
   background-color: var(--gray-light);
   border: 1px solid var(--gray-medium);
-  border-radius: 5px;
 }
 
 .selectLabel:hover {

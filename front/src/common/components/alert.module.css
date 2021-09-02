@@ -7,7 +7,6 @@
   font-size: var(--font-size);
   border: 1px solid var(--gray-medium);
   background-color: var(--gray-light);
-  border-radius: 5px;
   padding: 8px 16px;
 }
 
