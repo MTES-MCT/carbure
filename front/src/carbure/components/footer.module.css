@@ -1,14 +1,13 @@
 .footerContainer {
   display: flex;
   justify-content: space-between;
-  background: var(--footer);
-  color: var(--white);
+  background: var(--white);
+  color: var(--black);
   padding: 24px 120px;
   font-size: var(--font-size);
   line-height: 1.5em;
-  -webkit-font-smoothing: antialiased;
-  box-sizing: border-box;
   margin-top: auto;
+  border-top: 1px solid var(--gray-medium);
 }
 
 .flexCell {
@@ -25,8 +24,6 @@
 }
 
 .footerMTES {
-  background-color: var(--body);
-  padding: 12px;
 }
 
 .centerImage {
@@ -38,7 +35,7 @@
 .footerContainer a:focus,
 .footerContainer a:visited,
 .footerContainer a:active {
-  color: var(--blue-medium);
+  color: var(--blue-dark);
 }
 
 .footerContainer ul {
@@ -55,7 +52,7 @@
 }
 
 .footerLinks a {
-  color: #fff;
+  color: var(--blue-medium);
 }
 
 .footerContainer h2 {

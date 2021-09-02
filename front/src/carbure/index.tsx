@@ -1,4 +1,4 @@
-import { Trans } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 
 import { AppHook, useApp } from "./hooks/use-app"
 import { EntityType, LotStatus } from "common/types"
@@ -21,9 +21,8 @@ import Account from "account"
 import Entities from "../entities" // not using relative path prevents import
 import EntityDetails from "../entities/routes/entity-details"
 import Dashboard from "dashboard"
-import Stats from "stats"
 import PublicStats from "stats/public"
-import Tirib, { hasTirib } from "tirib"
+import Home from "./components/home"
 
 const DevBanner = () => (
   <div
@@ -66,21 +65,15 @@ const Org = ({ app }: { app: AppHook }) => {
   const isAuditor = entity?.entity_type === EntityType.Auditor
   const isOperator = entity?.entity_type === EntityType.Operator
 
-  const isProduction = window.location.hostname === "carbure.beta.gouv.fr"
-
   return (
     <UserRightProvider app={app}>
-      {!isProduction && <DevBanner />}
-
-      <Topbar entity={entity} settings={app.settings} />
-
       <Switch>
-        <Route relative exact path="account">
-          <Account settings={app.settings} />
-        </Route>
-
         <Route relative exact path="../pending">
           <Pending />
+        </Route>
+
+        <Route path="/account">
+          <Account settings={app.settings} />
         </Route>
 
         <Route relative exact path="stocks">
@@ -111,12 +104,6 @@ const Org = ({ app }: { app: AppHook }) => {
         </Route>
 
         {isAdmin && (
-          <Route relative exact path="administration">
-            <Exit to="/administrators/" />
-          </Route>
-        )}
-
-        {isAdmin && (
           <Route relative path="dashboard">
             <Dashboard />
           </Route>
@@ -134,46 +121,41 @@ const Org = ({ app }: { app: AppHook }) => {
           </Route>
         )}
 
-        {/* <Route relative path="stats">
-          <Stats entity={entity} />
-        </Route> */}
-
-        {/* cette route permet d'afficher le component Tirib uniquement lorsque l'url de la page finit par "tirib" */}
-        {hasTirib(entity) && (
-          <Route relative path="tirib">
-            <Tirib entity = {entity} />
-          </Route>
-        )}
-
         <Redirect relative to={isAdmin ? "dashboard" : "transactions"} />
       </Switch>
-
-      <Footer />
     </UserRightProvider>
   )
 }
 
 const Carbure = () => {
+  useTranslation()
   const app = useApp()
-  const { getDefaultEntity } = app
+
+  const isProduction = window.location.hostname === "carbure.beta.gouv.fr"
 
   return (
     <div id="app">
+      {!isProduction && <DevBanner />}
+
+      <Topbar app={app} />
+
       <Switch>
         <Route path="/org/:entity">
           <Org app={app} />
-        </Route>
-
-        <Route path="/logout">
-          <Exit to="/accounts/logout" />
         </Route>
 
         <Route path="/public_stats">
           <PublicStats />
         </Route>
 
-        <Redirect to={`/org/${getDefaultEntity()}`} />
+        <Route exact path="/">
+          <Home />
+        </Route>
+
+        {/* <Redirect to={`/org/${getDefaultEntity()}`} /> */}
       </Switch>
+
+      <Footer />
     </div>
   )
 }
