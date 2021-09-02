@@ -5,7 +5,6 @@
   background-color: var(--white);
   margin-top: 32px;
   border: 1px solid var(--gray-medium);
-  border-radius: 5px;
   align-self: center;
 }
 

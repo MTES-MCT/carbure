@@ -149,7 +149,6 @@
   height: 18px;
   border: 1px solid var(--gray-medium);
   background-color: var(--white);
-  border-radius: 3px;
 }
 
 .checkboxChecked {
