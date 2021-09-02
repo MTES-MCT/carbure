@@ -1,8 +1,7 @@
+import { Trans } from "react-i18next"
 import { SettingsGetter } from "settings/hooks/use-get-settings"
-
 import { Main, Title } from "common/components"
 import { SettingsHeader, SettingsBody } from "settings/components/common"
-
 import { prompt } from "common/components/dialog"
 import {
   AccountAccesRights,
@@ -12,7 +11,7 @@ import {
 import { AccountAuthentication } from "./components/authentication"
 import useAPI from "common/hooks/use-api"
 import * as api from "./api"
-import { Trans } from "react-i18next"
+import Exit from "carbure/components/exit"
 
 export interface AccountHook {
   isLoading: boolean
@@ -48,6 +47,10 @@ type AccountProps = {
 
 const Account = ({ settings }: AccountProps) => {
   const account = useAccount(settings)
+
+  if (settings.error === "User not verified") {
+    return <Exit to="/accounts/login" />
+  }
 
   return (
     <Main>

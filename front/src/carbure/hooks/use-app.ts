@@ -6,7 +6,6 @@ export type AppHook = {
   hasEntity: (e: number) => boolean
   hasEntities: () => boolean
   getRights: (id: number) => UserRight | null
-  getDefaultEntity: () => string
 }
 
 export function useApp(): AppHook {
@@ -25,13 +24,5 @@ export function useApp(): AppHook {
     return Boolean(settings.data?.rights.length)
   }
 
-  function getDefaultEntity() {
-    if (!settings.data || settings.data.rights.length === 0) {
-      return "pending"
-    } else {
-      return `${settings.data.rights[0].entity.id}`
-    }
-  }
-
-  return { settings, hasEntity, hasEntities, getRights, getDefaultEntity }
+  return { settings, hasEntity, hasEntities, getRights }
 }
