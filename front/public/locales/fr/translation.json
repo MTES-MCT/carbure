@@ -464,7 +464,7 @@
   "En stock": "En stock",
   "À corriger": "À corriger",
   "En correction": "En correction",
-  "Ce lot doit être validé avant le <1>{{deadlineDate}}</1>": "Ce lot doit être validé avant le <1>{{deadlineDate}}</1>",
+  "À valider avant le <1>{{deadlineDate}}</1>": "À valider avant le <1>{{deadlineDate}}</1>",
   "* Les champs marqués d'une étoile sont obligatoires": "* Les champs marqués d'une étoile sont obligatoires",
   "par <1>{{entity}}</1> le {{date}}": "par <1>{{entity}}</1> le {{date}}",
   "Volume (litres)": "Volume (litres)",

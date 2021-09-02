@@ -35,6 +35,7 @@
 
 .statusTitle {
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .statusTitle .status {
