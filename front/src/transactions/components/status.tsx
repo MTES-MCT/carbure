@@ -171,7 +171,7 @@ export const StatusTitle = ({
       {details && hasDeadline(details.transaction, details.deadline) && (
         <span className={styles.transactionDeadline}>
           <Trans>
-            Ce lot doit être validé avant le <b>{{ deadlineDate }}</b>
+            À valider avant le <b>{{ deadlineDate }}</b>
           </Trans>
         </span>
       )}
