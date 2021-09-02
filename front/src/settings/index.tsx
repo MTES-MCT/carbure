@@ -102,27 +102,22 @@ const Settings = ({ entity, settings }: SettingsProps) => {
         )}
         {hasCertificates && (
           <a href="#iscc">
-            <Trans>Certificats ISCC</Trans>
+            <Trans>ISCC</Trans>
           </a>
         )}
         {hasCertificates && (
           <a href="#2bs">
-            <Trans>Certificats 2BS</Trans>
+            <Trans>2BS</Trans>
           </a>
         )}
         {hasCertificates && (
           <a href="#red">
-            <Trans>Certificats REDcert</Trans>
+            <Trans>REDcert</Trans>
           </a>
         )}
-        {hasCertificates && (
+        {(hasCertificates || (!hasCertificates && hasCSN)) && (
           <a href="#sn">
-            <Trans>Certificats Système National</Trans>
-          </a>
-        )}
-        {!hasCertificates && hasCSN && (
-          <a href="#sn">
-            <Trans>Certificats Système National</Trans>
+            <Trans>Système National</Trans>
           </a>
         )}
         {rights.is(UserRole.Admin) && (
