@@ -3,10 +3,7 @@ from django.shortcuts import redirect
 
 
 def index(request):
-    context = {}
-    if request.user.is_verified():
-        return redirect('/v2/')
-    return render(request, 'public/index.html', context)
+    return redirect('/v2/')
 
 
 def stats(request):
