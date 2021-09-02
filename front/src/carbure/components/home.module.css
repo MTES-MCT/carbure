@@ -1,0 +1,33 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--white);
+}
+
+.homeTitle {
+  text-align: center;
+  margin-top: 16px;
+  margin-bottom: 32px;
+}
+
+.homeTitle h1 {
+  font-size: 4em;
+}
+
+.homeTitle p {
+  font-size: 1.5em;
+}
+
+.homeBanner {
+  width: 100vw;
+  margin-bottom: 48px;
+}
+
+.home section {
+  padding: 0 120px;
+  font-size: 1.2em;
+}
+
+.home button {
+  font-size: 1.5em;
+}

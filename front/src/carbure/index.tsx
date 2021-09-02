@@ -23,6 +23,7 @@ import EntityDetails from "../entities/routes/entity-details"
 import Dashboard from "dashboard"
 import PublicStats from "stats/public"
 import Home from "./components/home"
+import { useRouteMatch } from "react-router-dom"
 
 const DevBanner = () => (
   <div
@@ -63,17 +64,12 @@ const Org = ({ app }: { app: AppHook }) => {
 
   const isAdmin = entity?.entity_type === EntityType.Administration
   const isAuditor = entity?.entity_type === EntityType.Auditor
-  const isOperator = entity?.entity_type === EntityType.Operator
 
   return (
     <UserRightProvider app={app}>
       <Switch>
         <Route relative exact path="../pending">
           <Pending />
-        </Route>
-
-        <Route path="/account">
-          <Account settings={app.settings} />
         </Route>
 
         <Route relative exact path="stocks">
@@ -140,6 +136,10 @@ const Carbure = () => {
       <Topbar app={app} />
 
       <Switch>
+        <Route path="/account">
+          <Account settings={app.settings} />
+        </Route>
+
         <Route path="/org/:entity">
           <Org app={app} />
         </Route>
@@ -152,7 +152,7 @@ const Carbure = () => {
           <Home />
         </Route>
 
-        {/* <Redirect to={`/org/${getDefaultEntity()}`} /> */}
+        <Redirect to="/" />
       </Switch>
 
       <Footer />
