@@ -2,7 +2,8 @@
   display: flex;
   background-color: var(--white);
   padding: 0 120px;
-  box-shadow: 0px 1px 2px var(--gray-medium);
+  border-bottom: 1px solid var(--gray-medium);
+  min-height: 64px;
 }
 
 .logo {
@@ -11,12 +12,30 @@
   margin: 12px 0;
 }
 
+.logo .logoText {
+  margin-left: 24px;
+}
+
+.logoText h1 {
+  margin: 0;
+  margin-bottom: 8px;
+}
+
+.logo h2 {
+  margin: 0;
+  margin-left: 16px;
+}
+
+.republique {
+  height: 112px;
+}
+
 .marianne {
   height: 24px;
 }
 
 .betagouv {
-  height: 20px;
+  height: 32px;
   margin: 8px 16px;
 }
 

@@ -1,31 +1,31 @@
 :root {
   --white: #ffffff;
-  --black: #202328;
+  --black: #1e1e1e;
 
-  --body: #efefef;
-  --footer: #1c1c1c;
+  --body: #f0f0f0;
+  --footer: #2a2a2a;
 
-  --blue-light: #d5dbef;
-  --blue-medium: #3150c0;
-  --blue-dark: #000091;
+  --blue-light: #e5e5f4;
+  --blue-medium: #000091;
+  --blue-dark: #00006d;
   --blue-highlight: #aaafbf;
 
   --red-light: #ffdbd2;
   --red-medium: #ffb7b5;
-  --red-dark: #e1000f;
+  --red-dark: #e10600;
 
   --green-light: #c5e6d8;
   --green-medium: #8acdb0;
-  --green-dark: #006c37;
+  --green-dark: #008941;
 
   --orange-light: #ffe6cf;
   --orange-medium: #ffbb40;
   --orange-dark: #e65100;
 
-  --gray-light: #f6f6f6;
-  --gray-medium: #bfbfbf;
-  --gray-dark: #808080;
-  --gray-highlight: #eaeaea;
+  --gray-light: #f8f8f8;
+  --gray-medium: #cecece;
+  --gray-dark: #6a6a6a;
+  --gray-highlight: #e7e7e7;
 
   --font-size: 15px;
   --font-family: Marianne, arial, sans-serif;

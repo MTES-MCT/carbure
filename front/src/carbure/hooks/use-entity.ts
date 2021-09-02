@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom"
+import { useRouteMatch } from "react-router-dom"
 
 import { Entity } from "common/types"
 import { AppHook } from "./use-app"
@@ -11,12 +11,14 @@ export interface EntityHook {
 }
 
 export default function useEntity(app: AppHook): EntityHook {
-  const params: { entity: string } = useParams()
-  const entityID = parseInt(params.entity, 10)
+  const match = useRouteMatch<{ entity: string }>("/org/:entity")
 
+  if (!match) return { entity: null, pending: false }
+
+  const entityID = parseInt(match.params.entity, 10)
   const rights = isNaN(entityID) ? null : app.getRights(entityID)
   const entity = rights?.entity ?? null
-  const pending = params.entity === "pending"
+  const pending = match.params.entity === "pending"
 
   return { entity, pending }
 }

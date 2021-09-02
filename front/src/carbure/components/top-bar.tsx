@@ -3,27 +3,43 @@ import { Trans, useTranslation } from "react-i18next"
 import { useLocation } from "react-router-dom"
 
 import { ApiState } from "common/hooks/use-api"
-import { EntitySelection } from "carbure/hooks/use-entity"
+import useEntity, { EntitySelection } from "carbure/hooks/use-entity"
 import { Settings } from "common/types"
 
 import Menu from "common/components/menu"
-import { Link, NavLink } from "common/components/relative-route"
+import { Link, NavLink, Route } from "common/components/relative-route"
 import { Question } from "common/components/icons"
 
+import logoRepublique from "../assets/images/republique.svg"
 import logoMarianne from "../assets/images/Marianne.svg"
-import logoBetaGouv from "../assets/images/carbure.svg"
+import logoBetaGouv from "../assets/images/betagouvfr.svg"
 import styles from "./top-bar.module.css"
 import Select from "common/components/select"
 import { Box } from "common/components"
+import { SettingsGetter } from "settings/hooks/use-get-settings"
+import { AppHook } from "carbure/hooks/use-app"
+import { Button } from "common/components/button"
 
 const Logo = () => (
   <Link to="/" className={styles.logo}>
-    <img src={logoMarianne} alt="marianne logo" className={styles.marianne} />
     <img
-      src={logoBetaGouv}
-      alt="beta.gouv.fr logo"
-      className={styles.betagouv}
+      src={logoRepublique}
+      alt="marianne logo"
+      className={styles.republique}
     />
+    <div className={styles.logoText}>
+      <h1>CarbuRe</h1>
+      <span>
+        <Trans>La plateforme de gestion des flux de biocarburant</Trans>
+      </span>
+    </div>
+  </Link>
+)
+
+const CompactLogo = () => (
+  <Link to="/" className={styles.logo}>
+    <img src={logoMarianne} alt="marianne logo" className={styles.marianne} />
+    <h2>CarbuRe</h2>
   </Link>
 )
 
@@ -44,7 +60,8 @@ const PageLink = ({ to, children }: PageLinkProps) => (
 )
 
 function changeOrg(path: string, entity: number) {
-  return path.replace(/org\/[0-9]+/, `org/${entity}`)
+  if (!path.includes("org")) return `/org/${entity}`
+  else return path.replace(/org\/[0-9]+/, `org/${entity}`)
 }
 
 type UserMenuProps = {
@@ -86,8 +103,8 @@ const UserMenu = ({ settings, entity }: UserMenuProps) => {
 }
 
 const langOptions = [
-  { value: "fr", label: "FR" },
-  { value: "en", label: "EN" },
+  { value: "fr", label: "Français" },
+  { value: "en", label: "English" },
 ]
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -100,7 +117,7 @@ const LanguageSelection = () => {
       value={i18n.language}
       options={langOptions}
       className={styles.languageSelection}
-      style={{ marginLeft: "auto", height: "100%" }}
+      style={{ marginLeft: "auto" }}
       onChange={(lang) => i18n.changeLanguage(lang as string)}
     />
   )
@@ -114,63 +131,96 @@ function isAdmin(entity: EntitySelection) {
   return entity && entity.entity_type === "Administration"
 }
 
-type TopbarProps = {
-  entity: EntitySelection
-  settings: ApiState<Settings>
-}
-
-const Topbar = ({ entity, settings }: TopbarProps) => {
+export const PublicTopbar = () => {
   const { t } = useTranslation()
 
   return (
     <header className={styles.topBar}>
       <Logo />
 
+      <Box row className={styles.topRight}>
+        <Box row style={{ alignItems: "center" }}>
+          <LanguageSelection />
+
+          <Button
+            as="a"
+            href="/accounts/login"
+            level="primary"
+            style={{ marginLeft: 12 }}
+          >
+            Se connecter
+          </Button>
+          <Button as="a" href="/accounts/register" style={{ marginLeft: 12 }}>
+            S'inscrire
+          </Button>
+        </Box>
+
+        <a
+          href="https://carbure-1.gitbook.io/faq/"
+          target="_blank"
+          rel="noreferrer"
+          className={styles.faq}
+        >
+          <Question title={t("Guide d'utilisation")} />
+        </a>
+      </Box>
+    </header>
+  )
+}
+
+type PrivateTopbarProps = {
+  entity: EntitySelection
+  settings: SettingsGetter
+}
+
+export const PrivateTopbar = ({ entity, settings }: PrivateTopbarProps) => {
+  const { t } = useTranslation()
+
+  return (
+    <header className={styles.topBar}>
+      <CompactLogo />
+
       {entity && (
-        <nav className={styles.pageNav}>
-          {isAdmin(entity) && (
-            <PageLink to="dashboard">
-              <Trans>Accueil</Trans>
+        <Route path="/org/:entity">
+          <nav className={styles.pageNav}>
+            {isAdmin(entity) && (
+              <PageLink to="dashboard">
+                <Trans>Accueil</Trans>
+              </PageLink>
+            )}
+
+            {canTrade(entity) && (
+              <PageLink to="stocks">
+                <Trans>Stocks</Trans>
+              </PageLink>
+            )}
+
+            <PageLink to="transactions">
+              <Trans>Transactions</Trans>
             </PageLink>
-          )}
 
-          {canTrade(entity) && (
-            <PageLink to="stocks">
-              <Trans>Stocks</Trans>
-            </PageLink>
-          )}
+            {isAdmin(entity) && (
+              <React.Fragment>
+                <PageLink to="entities">
+                  <Trans>Sociétés</Trans>
+                </PageLink>
+              </React.Fragment>
+            )}
 
-          <PageLink to="transactions">
-            <Trans>Transactions</Trans>
-          </PageLink>
+            {!isAdmin(entity) && (
+              <React.Fragment>
+                <PageLink to="settings">
+                  <Trans>Société</Trans>
+                </PageLink>
 
-          {isAdmin(entity) && (
-            <React.Fragment>
-              <PageLink to="entities">
-                <Trans>Sociétés</Trans>
-              </PageLink>
-            </React.Fragment>
-          )}
-
-          {!isAdmin(entity) && (
-            <React.Fragment>
-              <PageLink to="settings">
-                <Trans>Société</Trans>
-              </PageLink>
-              {/* <PageLink to="stats">
-                <Trans>Statistiques</Trans>
-              </PageLink> */}
-              <PageLink to="registry">
-                <Trans>Annuaire</Trans>
-              </PageLink>
-            </React.Fragment>
-          )}
-        </nav>
+                <PageLink to="registry">
+                  <Trans>Annuaire</Trans>
+                </PageLink>
+              </React.Fragment>
+            )}
+          </nav>
+        </Route>
       )}
-
-      {/* <PageLink to="stats">
-        <Trans>Statistiques</Trans>
-      </PageLink> */}
 
       <Box row className={styles.topRight}>
         <LanguageSelection />
@@ -188,6 +238,20 @@ const Topbar = ({ entity, settings }: TopbarProps) => {
       </Box>
     </header>
   )
+}
+
+type TopbarProps = {
+  app: AppHook
+}
+
+const Topbar = ({ app }: TopbarProps) => {
+  const { entity, pending } = useEntity(app)
+
+  if (app.settings.error) {
+    return <PublicTopbar />
+  } else {
+    return <PrivateTopbar entity={entity} settings={app.settings} />
+  }
 }
 
 export default Topbar
