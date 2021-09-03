@@ -21,9 +21,8 @@ import Account from "account"
 import Entities from "../entities" // not using relative path prevents import
 import EntityDetails from "../entities/routes/entity-details"
 import Dashboard from "dashboard"
-import PublicStats from "stats/public"
+import PublicStats from "./components/public-stats"
 import Home from "./components/home"
-import { useRouteMatch } from "react-router-dom"
 
 const DevBanner = () => (
   <div
