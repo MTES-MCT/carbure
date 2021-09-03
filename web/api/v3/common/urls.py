@@ -27,4 +27,6 @@ urlpatterns = [
     path('controls/upload-document', views.controls_upload_file, name='api-v3-public-controls-upload'),
     path('controls/add-message', views.controls_add_message, name='api-v3-public-controls-add-message'),
 
+    # HOME STATS
+    path('stats', views.get_stats, name='api-v3-public-stats')
 ]
