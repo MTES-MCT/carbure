@@ -1,7 +1,7 @@
 import datetime
 from django.http import JsonResponse
-from django.db.models import Q
-from core.models import Entity, Biocarburant, MatierePremiere, Depot, Pays
+from django.db.models import Q, Count, Sum
+from core.models import Entity, Biocarburant, MatierePremiere, Depot, Pays, LotTransaction
 from certificates.models import ISCCCertificate, DBSCertificate, REDCertCertificate, SNCertificate
 from core.models import Control, ControlMessages, UserRights
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
@@ -11,7 +11,7 @@ from django_otp.decorators import otp_required
 
 def get_matieres_premieres(request):
     q = request.GET.get('query', False)
-    double_count_only = request.GET.get('double_count_only', False)    
+    double_count_only = request.GET.get('double_count_only', False)
     mps = MatierePremiere.objects.filter(is_displayed=True).order_by('name')
     if double_count_only == 'true':
         mps = mps.filter(is_double_compte=True)
@@ -336,3 +336,19 @@ def controls_add_message(request):
     msg.message = message
     msg.save()
     return JsonResponse({'status': 'success'})
+
+
+def get_stats(request):
+    try:
+        today = datetime.date.today()
+        year = str(today.year)
+        total_volume = LotTransaction.objects.filter(lot__status='Validated', delivery_status__in=['F', 'A'], is_forwarded=False, lot__period__startswith=year).aggregate(Sum('lot__volume'))
+        entity_count = Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.TRADER, Entity.OPERATOR]).values('entity_type').annotate(count=Count('id'))
+        entities = {}
+        for r in entity_count:
+            entities[r['entity_type']] = r['count']
+        return JsonResponse({'status': 'success', 'data': {'total_volume': total_volume['lot__volume__sum'], 'entities': entities}})
+    except Exception as e:
+        print(e)
+        return JsonResponse({'status': 'error', 'message': 'Could not compute statistics'})
+
