@@ -30,7 +30,7 @@ const Logo = () => (
     <div className={styles.logoText}>
       <h1>CarbuRe</h1>
       <span>
-        <Trans>La plateforme de gestion des flux de biocarburant</Trans>
+        <Trans>La plateforme de gestion des flux de biocarburants</Trans>
       </span>
     </div>
   </Link>
@@ -142,6 +142,9 @@ export const PublicTopbar = () => {
         <Box row style={{ alignItems: "center" }}>
           <LanguageSelection />
 
+          <Button as="a" href="/accounts/register" style={{ marginLeft: 12 }}>
+            S'inscrire
+          </Button>
           <Button
             as="a"
             href="/accounts/login"
@@ -149,9 +152,6 @@ export const PublicTopbar = () => {
             style={{ marginLeft: 12 }}
           >
             Se connecter
-          </Button>
-          <Button as="a" href="/accounts/register" style={{ marginLeft: 12 }}>
-            S'inscrire
           </Button>
         </Box>
 

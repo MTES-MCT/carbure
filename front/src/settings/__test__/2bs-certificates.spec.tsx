@@ -35,7 +35,8 @@ test("check the 2bs certificate section of the settings", async () => {
 
   await waitWhileLoading()
 
-  expect(screen.getAllByText("Certificats 2BS")).toHaveLength(2)
+  screen.getByText("2BS")
+  screen.getByText("Certificats 2BS")
   screen.getByText("Ajouter un certificat 2BS")
   screen.getByText("Aucun certificat 2BS trouvé")
 })

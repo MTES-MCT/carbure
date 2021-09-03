@@ -35,7 +35,8 @@ test("check the iscc certificate section of the settings", async () => {
 
   await waitWhileLoading()
 
-  expect(screen.getAllByText("Certificats ISCC")).toHaveLength(2)
+  screen.getByText("ISCC")
+  screen.getByText("Certificats ISCC")
   screen.getByText("Ajouter un certificat ISCC")
   screen.getByText("Aucun certificat ISCC trouvé")
 })

@@ -267,7 +267,7 @@ test("check transaction errors", async () => {
 
   await screen.findByText(
     (content, node) =>
-      node?.textContent === "Ce lot doit être validé avant le 29 février 2020"
+      node?.textContent === "À valider avant le 29 février 2020"
   )
 
   const dae = screen.getByTitle("Le DAE (ou équivalent) est manquant")
