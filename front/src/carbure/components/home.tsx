@@ -1,109 +1,163 @@
+import cl from "clsx"
 import styles from "./home.module.css"
 import banner from "../assets/images/banner.png"
 import traders from "../assets/images/traders.svg"
 import operators from "../assets/images/operators.svg"
 import { Trans } from "react-i18next"
-import { ChevronRight } from "common/components/icons"
+import { ChevronRight, Loader } from "common/components/icons"
 import { Button } from "common/components/button"
-import { Box } from "common/components"
+import { EntityType } from "common/types"
+import api from "common/services/api"
+import useAPI from "common/hooks/use-api"
+import { useEffect } from "react"
+
+interface HomeStats {
+  total_volume: number
+  entities: {
+    [EntityType.Operator]: number
+    [EntityType.Trader]: number
+    [EntityType.Producer]: number
+  }
+}
+
+function fetchHomeStats() {
+  return api.get<HomeStats>("/common/stats")
+}
 
 const Home = () => {
+  const [stats, getStats] = useAPI(fetchHomeStats)
+
+  useEffect(() => {
+    getStats()
+  }, [getStats])
+
   return (
     <main className={styles.home}>
       <section className={styles.homeTitle}>
         <h1>CarbuRe</h1>
         <p>
-          <Trans>La plateforme de gestion des biocarburants</Trans>
+          <Trans>La plateforme de gestion des flux de biocarburants</Trans>
         </p>
       </section>
 
       <img className={styles.homeBanner} src={banner} alt="Bannière CarbuRe" />
 
       <section className={styles.homeContext}>
-        <h1>
-          <Trans>Qu'est-ce que CarbuRe ?</Trans>
-        </h1>
+        <div>
+          <h1>
+            <Trans>Qu'est-ce que CarbuRe ?</Trans>
+          </h1>
 
-        <p>
-          <b>
+          <h2>
             <Trans>
               Transmettre des données fiables pour assurer l’essor des
-              carburants alternatifs vertueux pour l’environnement
+              carburants alternatifs vertueux pour l’environnement.
             </Trans>
-          </b>
-        </p>
+          </h2>
 
-        <p>
-          <Trans>
-            Carbure est un outil développé par le Ministère de la transition
-            écologique qui permet aux acteurs de la filière d'échanger
-            facilement les informations de durabilité des biocarburants
-            circulant en France. L'outil met également a disposition les
-            statistiques publiques anonymes des biocarburants incorporés en
-            France aux carburants fossiles.
-          </Trans>
-        </p>
-
-        <a
-          href="https://www.ecologie.gouv.fr/biocarburants"
-          className={styles.homeExternalLink}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <Trans>Plus d’informations sur les biocarburants</Trans>
-          <ChevronRight />
-        </a>
-      </section>
-
-      <Box as="section" row className={styles.homeAuth}>
-        <Button as="a" level="primary">
-          <Trans>Se connecter</Trans>
-        </Button>
-        <Button as="a">
-          <Trans>S'inscrire</Trans>
-        </Button>
-      </Box>
-
-      <section className={styles.homeStats}>
-        <div className={styles.homeStatsVolume}>
-          <h1>1 000 000</h1>
           <p>
             <Trans>
-              litres de biocarburants durables déclarés sur CarbuRe cette année
+              Carbure est un outil développé par le Ministère de la Transition
+              Ecologique qui permet aux acteurs de la filière d'échanger
+              facilement les informations de durabilité des biocarburants
+              circulant en France. L'outil met également à disposition les
+              statistiques publiques anonymes des biocarburants incorporés en
+              France aux carburants fossiles.
             </Trans>
+          </p>
+
+          <a
+            href="https://www.ecologie.gouv.fr/biocarburants"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Trans>Plus d’informations sur les biocarburants</Trans>
+            <ChevronRight />
+          </a>
+        </div>
+      </section>
+
+      <section className={styles.homeAuthentication}>
+        <Button as="a" href="/accounts/register" className={styles.homeButton}>
+          <Trans>S'inscrire</Trans>
+        </Button>
+        <Button
+          as="a"
+          level="primary"
+          href="/accounts/login"
+          className={styles.homeButton}
+        >
+          <Trans>Se connecter</Trans>
+        </Button>
+      </section>
+
+      <section className={styles.homeStats}>
+        <div className={cl(styles.homeStatsBlock, styles.homeStatsVolume)}>
+          <h1>
+            {stats.loading ? (
+              <Loader />
+            ) : (
+              Math.round(stats.data?.total_volume ?? 0).toLocaleString("fr")
+            )}
+          </h1>
+          <p>
+            <Trans>de litres de biocarburants durables</Trans>
+          </p>
+          <p>
+            <Trans>déclarés sur CarbuRe cette année</Trans>
           </p>
         </div>
 
-        <Box row className={styles.homeStatsEntities}>
-          <div className={styles.homeStatsEntityCategory}>
-            <h2>10</h2>
+        <div className={styles.homeStatsEntities}>
+          <div className={styles.homeStatsBlock}>
+            <h1>
+              {stats.loading ? (
+                <Loader />
+              ) : (
+                stats.data?.entities[EntityType.Operator]
+              )}
+            </h1>
             <p>
               <Trans>Opérateurs</Trans>
             </p>
           </div>
-          <div className={styles.homeStatsEntityCategory}>
-            <h2>10</h2>
+          <div className={styles.homeStatsBlock}>
+            <h1>
+              {stats.loading ? (
+                <Loader />
+              ) : (
+                stats.data?.entities[EntityType.Producer]
+              )}
+            </h1>
             <p>
               <Trans>Producteurs</Trans>
             </p>
           </div>
-          <div className={styles.homeStatsEntityCategory}>
-            <h2>10</h2>
+          <div className={styles.homeStatsBlock}>
+            <h1>
+              {stats.loading ? (
+                <Loader />
+              ) : (
+                stats.data?.entities[EntityType.Trader]
+              )}
+            </h1>
             <p>
               <Trans>Traders</Trans>
             </p>
           </div>
-        </Box>
+        </div>
 
-        <Button level="primary">Voir les statistiques</Button>
+        <Button as="a" href="/v2/public_stats" className={styles.homeButton}>
+          <Trans>Voir les statistiques</Trans>
+        </Button>
       </section>
 
-      <section className={styles.homeExplanation}>
-        <h1>
+      <section className={styles.homeEntities}>
+        <h1 className={styles.homeSectionTitle}>
           <Trans>Qui est concerné ?</Trans>
         </h1>
 
-        <Box row className={styles.homeExplanationDetails}>
+        <section className={styles.homeProducers}>
           <div>
             <h2>
               <Trans>Producteurs et traders de biocarburants</Trans>
@@ -159,9 +213,9 @@ const Home = () => {
             className={styles.homeIllustration}
             alt="Traders"
           />
-        </Box>
+        </section>
 
-        <Box row className={styles.homeExplanationDetails}>
+        <section className={styles.homeOperators}>
           <img
             src={operators}
             className={styles.homeIllustration}
@@ -214,7 +268,7 @@ const Home = () => {
               </ul>
             </div>
           </div>
-        </Box>
+        </section>
       </section>
     </main>
   )
