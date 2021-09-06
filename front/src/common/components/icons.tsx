@@ -361,3 +361,11 @@ export const ExternalLink = ({ className, ...props }: IconProps) => (
     <polyline points="15 4 20 4 20 9" />
   </Icon>
 )
+
+export const UserAdd = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-user-add", className)}>
+    <circle cx="9" cy="7" r="4" />
+    <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+    <path d="M16 11h6m-3 -3v6" />
+  </Icon>
+)

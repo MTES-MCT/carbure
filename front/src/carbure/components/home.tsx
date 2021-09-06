@@ -4,7 +4,13 @@ import banner from "../assets/images/banner.png"
 import traders from "../assets/images/traders.svg"
 import operators from "../assets/images/operators.svg"
 import { Trans } from "react-i18next"
-import { ChevronRight, Loader } from "common/components/icons"
+import {
+  ChevronRight,
+  ExternalLink,
+  Loader,
+  UserAdd,
+  UserCheck,
+} from "common/components/icons"
 import { Button } from "common/components/button"
 import { EntityType } from "common/types"
 import api from "common/services/api"
@@ -78,10 +84,16 @@ const Home = () => {
       </section>
 
       <section className={styles.homeAuthentication}>
-        <Button as="a" href="/accounts/register" className={styles.homeButton}>
+        <Button
+          icon={UserAdd}
+          as="a"
+          href="/accounts/register"
+          className={styles.homeButton}
+        >
           <Trans>S'inscrire</Trans>
         </Button>
         <Button
+          icon={UserCheck}
           as="a"
           level="primary"
           href="/accounts/login"
@@ -99,9 +111,10 @@ const Home = () => {
             ) : (
               Math.round(stats.data?.total_volume ?? 0).toLocaleString("fr")
             )}
+            {" m³"}
           </h1>
           <p>
-            <Trans>de m³ de biocarburants durables</Trans>
+            <Trans>de biocarburants durables</Trans>
           </p>
           <p>
             <Trans>déclarés sur CarbuRe cette année</Trans>
@@ -147,7 +160,14 @@ const Home = () => {
           </div>
         </div>
 
-        <Button as="a" href="/v2/public_stats" className={styles.homeButton}>
+        <Button
+          icon={ExternalLink}
+          as="a"
+          href="/v2/public_stats"
+          className={styles.homeButton}
+          rel="noreferrer"
+          target="_blank"
+        >
           <Trans>Voir les statistiques</Trans>
         </Button>
       </section>
