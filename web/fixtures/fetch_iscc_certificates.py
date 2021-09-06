@@ -67,7 +67,7 @@ def download_certificates(args):
     nonce = get_wdtNonce()
 
     # Nombre de requêtes
-    r = requests.post(rootUrl, data ={'length': 1, 'start': 0, 'draw': 1, 'wdtNonce': nonce}, headers=HEADERS)
+    r = requests.post(rootUrl, data={'length': 1, 'start': 0, 'draw': 1, 'wdtNonce': nonce}, headers=HEADERS)
     recordsTotal = int(json.loads(r.content.decode('utf-8'))['recordsTotal'])
     print('# of certificates: ' + str(recordsTotal))
 
