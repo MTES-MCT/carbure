@@ -4,7 +4,7 @@
   justify-content: space-between;
   background: var(--white);
   color: var(--black);
-  padding: 24px 120px;
+  padding: 12px 120px;
   font-size: var(--font-size);
   line-height: 1.5em;
   margin-top: auto;
@@ -51,7 +51,7 @@
 
 .footerLinks {
   display: flex;
-  padding: 16px 0;
+  padding-top: 12px;
   flex-wrap: wrap;
 }
 
@@ -72,7 +72,7 @@
 
 .footerCarbureLinks li:not(:last-child)::after {
   content: "";
-  height: 66%;
+  height: 75%;
   width: 2px;
   background-color: var(--gray-highlight);
   margin-left: 16px;
@@ -83,6 +83,8 @@ ul.footerSocialLinks {
 }
 
 .footerLinks a {
+  display: flex;
+  align-items: center;
   color: var(--gray-dark);
 }
 
