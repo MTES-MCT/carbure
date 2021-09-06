@@ -8,11 +8,10 @@ import { Settings } from "common/types"
 
 import Menu from "common/components/menu"
 import { Link, NavLink, Route } from "common/components/relative-route"
-import { Question } from "common/components/icons"
+import { ChevronRight, Question } from "common/components/icons"
 
 import logoRepublique from "../assets/images/republique.svg"
 import logoMarianne from "../assets/images/Marianne.svg"
-import logoBetaGouv from "../assets/images/betagouvfr.svg"
 import styles from "./top-bar.module.css"
 import Select from "common/components/select"
 import { Box } from "common/components"
@@ -143,7 +142,7 @@ export const PublicTopbar = () => {
           <LanguageSelection />
 
           <Button as="a" href="/accounts/register" style={{ marginLeft: 12 }}>
-            S'inscrire
+            <Trans>S'inscrire</Trans>
           </Button>
           <Button
             as="a"
@@ -151,7 +150,7 @@ export const PublicTopbar = () => {
             level="primary"
             style={{ marginLeft: 12 }}
           >
-            Se connecter
+            <Trans>Se connecter</Trans>
           </Button>
         </Box>
 
@@ -176,9 +175,18 @@ type PrivateTopbarProps = {
 export const PrivateTopbar = ({ entity, settings }: PrivateTopbarProps) => {
   const { t } = useTranslation()
 
+  const firstEntity = settings.data?.rights[0].entity
+
   return (
     <header className={styles.topBar}>
       <CompactLogo />
+
+      {!entity && firstEntity && (
+        <Link to={`/org/${firstEntity.id}`} className={styles.entityShortcut}>
+          <Trans>Aller sur {{ entity: firstEntity.name }}</Trans>
+          <ChevronRight />
+        </Link>
+      )}
 
       {entity && (
         <Route path="/org/:entity">
