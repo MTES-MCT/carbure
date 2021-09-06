@@ -8,13 +8,17 @@ import { SystemProps } from "."
 
 type Merge<A, B> = Omit<A, keyof B> & B
 
-export type IconProps = SystemProps & Merge<JSX.IntrinsicElements["svg"], {
-  size?: number
-  color?: string
-  stroke?: number
-  className?: string
-  title?: string
-}>
+export type IconProps = SystemProps &
+  Merge<
+    JSX.IntrinsicElements["svg"],
+    {
+      size?: number
+      color?: string
+      stroke?: number
+      className?: string
+      title?: string
+    }
+  >
 
 const Icon = ({
   size = 24,
@@ -328,5 +332,24 @@ export const FileCheck = ({ className, ...props }: IconProps) => (
     <path d="M14 3v4a1 1 0 0 0 1 1h4" />
     <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
     <path d="M9 15l2 2l4 -4" />
+  </Icon>
+)
+
+export const Slack = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-slack", className)}>
+    <path d="M12 12v-6a2 2 0 0 1 4 0v6m0 -2a2 2 0 1 1 2 2h-6" />
+    <path d="M12 12h6a2 2 0 0 1 0 4h-6m2 0a2 2 0 1 1 -2 2v-6" />
+    <path d="M12 12v6a2 2 0 0 1 -4 0v-6m0 2a2 2 0 1 1 -2 -2h6" />
+    <path d="M12 12h-6a2 2 0 0 1 0 -4h6m-2 0a2 2 0 1 1 2 -2v6" />
+  </Icon>
+)
+
+export const LinkedIn = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("icon-slack", className)}>
+    <rect x="4" y="4" width="16" height="16" rx="2" />
+    <line x1="8" y1="11" x2="8" y2="16" />
+    <line x1="8" y1="8" x2="8" y2="8.01" />
+    <line x1="12" y1="16" x2="12" y2="11" />
+    <path d="M16 16v-3a2 2 0 0 0 -4 0" />
   </Icon>
 )
