@@ -4,73 +4,103 @@
   justify-content: space-between;
   background: var(--white);
   color: var(--black);
-  padding: 12px 120px;
   font-size: var(--font-size);
   line-height: 1.5em;
   margin-top: auto;
-  border-top: 1px solid var(--gray-highlight);
+  border-top: 1px solid var(--gray-medium);
 }
 
 .footerUpper {
+  display: flex;
+  background-color: var(--gray-highlight);
+  align-self: stretch;
+  padding: 12px 120px;
+}
+
+.footerUpper li a {
+  display: flex;
+  align-items: center;
+  margin-right: 32px;
+}
+
+.footerUpper li a svg {
+  margin-left: 4px;
+  width: 20px;
+}
+
+.footerMiddle {
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--gray-highlight);
   padding-bottom: 16px;
   flex-wrap: wrap;
+  padding: 16px 120px;
+}
+
+.footerLogos {
+  display: flex;
 }
 
 .footerMTES {
-  height: 200px;
+  max-height: 200px;
   margin-right: 32px;
 }
 
 .footerFanum {
   padding: 24px;
-  height: 200px;
+  max-height: 200px;
+  margin-right: 48px;
 }
 
 .footerBetagouv {
-  max-width: 240px;
+  max-width: 200px;
+}
+
+.footerTexts {
+  display: flex;
+  flex-direction: column;
 }
 
 .footerDescription {
-  max-width: 480px;
+  max-width: 600px;
   font-size: 1.1em;
   text-align: justify;
   margin: 0;
+  margin-bottom: 24px;
 }
 
-.footerContainer a,
-.footerContainer a:hover,
-.footerContainer a:focus,
-.footerContainer a:visited,
-.footerContainer a:active {
-  color: var(--blue-dark);
-}
-
-.footerLinks {
+.footerLower {
   display: flex;
-  padding-top: 12px;
+  padding: 16px 120px;
   flex-wrap: wrap;
+  font-size: 0.9em;
 }
 
-.footerLinks ul {
+.footer ul {
   display: flex;
   list-style-type: none;
   padding: 0;
   margin: 0;
-  justify-content: space-evenly;
   flex-wrap: wrap;
 }
 
-.footerLinks ul li {
+.footerGouvLinks li {
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-left: 24px;
+}
+.footerGouvLinks li:first-child {
+  margin-left: 0;
+}
+
+.footerLower ul li {
   display: flex;
   align-items: center;
   margin-left: 16px;
 }
 
-.footerCarbureLinks li:not(:last-child)::after {
+.footerLegalLinks li:not(:last-child)::after {
   content: "";
   height: 75%;
   width: 2px;
@@ -82,13 +112,13 @@ ul.footerSocialLinks {
   margin-left: auto;
 }
 
-.footerLinks a {
+.footerLower a {
   display: flex;
   align-items: center;
   color: var(--gray-dark);
 }
 
-.footerLinks a:hover {
+.footerLower a:hover {
   color: var(--black);
 }
 
