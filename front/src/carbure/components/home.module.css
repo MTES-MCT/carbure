@@ -119,13 +119,13 @@
 
 .homeStats .homeStatsEntities {
   display: flex;
+  width: 480px;
   margin-top: 48px;
   margin-bottom: 48px;
   justify-content: space-evenly;
 }
 
 .homeStats .homeStatsEntities .homeStatsBlock {
-  margin-right: 64px;
   flex: 1;
 }
 
@@ -139,6 +139,7 @@
 .homeEntities h1 {
   margin: 0;
   font-size: 3em;
+  text-align: center;
 }
 
 .homeProducers,

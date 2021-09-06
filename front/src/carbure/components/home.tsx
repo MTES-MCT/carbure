@@ -101,7 +101,7 @@ const Home = () => {
             )}
           </h1>
           <p>
-            <Trans>de litres de biocarburants durables</Trans>
+            <Trans>de m³ de biocarburants durables</Trans>
           </p>
           <p>
             <Trans>déclarés sur CarbuRe cette année</Trans>

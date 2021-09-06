@@ -342,12 +342,12 @@ def get_stats(request):
     try:
         today = datetime.date.today()
         year = str(today.year)
-        total_volume = LotTransaction.objects.filter(lot__status='Validated', delivery_status__in=['F', 'A'], is_forwarded=False, lot__period__startswith=year).aggregate(Sum('lot__volume'))
+        total_volume = LotTransaction.objects.filter(lot__status='Validated', delivery_status__in=['F', 'A'], is_forwarded=False, lot__period__startswith=year, carbure_client__entity_type=Entity.OPERATOR).aggregate(Sum('lot__volume'))
         entity_count = Entity.objects.filter(entity_type__in=[Entity.PRODUCER, Entity.TRADER, Entity.OPERATOR]).values('entity_type').annotate(count=Count('id'))
         entities = {}
         for r in entity_count:
             entities[r['entity_type']] = r['count']
-        return JsonResponse({'status': 'success', 'data': {'total_volume': total_volume['lot__volume__sum'], 'entities': entities}})
+        return JsonResponse({'status': 'success', 'data': {'total_volume': total_volume['lot__volume__sum'] / 1000, 'entities': entities}})
     except Exception as e:
         print(e)
         return JsonResponse({'status': 'error', 'message': 'Could not compute statistics'})
