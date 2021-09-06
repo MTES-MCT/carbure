@@ -51,7 +51,7 @@ def cleanCertificateData(data):
     allData = pd.concat(data)
     allData.columns = ['cert_status', 'certificate', 'certificate_holder', 'scope',
                        'raw_material', 'addons', 'valid_from', 'valid_until', 'issuing_cb',
-                       'map', 'certificate_report', 'audit_report', "unknown_column"]
+                       'map', 'certificate_report', 'audit_report', "unknown_column", "unknown_column_bis"]
 
     # extraction de la balise HTML
     allData['certificate_holder'] = allData['certificate_holder'].str.replace('.*title="(.*)">.*', '\\1')
@@ -65,7 +65,7 @@ def cleanCertificateData(data):
 def download_certificates(args):
     # On récupère le wdtNonce du jour
     nonce = get_wdtNonce()
-    
+
     # Nombre de requêtes
     r = requests.post(rootUrl, data ={'length': 1, 'start': 0, 'draw': 1, 'wdtNonce': nonce}, headers=HEADERS)
     recordsTotal = int(json.loads(r.content.decode('utf-8'))['recordsTotal'])
@@ -78,7 +78,7 @@ def download_certificates(args):
     # Sauvegarde
     filename = "%s/Certificates_%s.csv" % (DESTINATION_FOLDER, str(date.today()))
     pd.DataFrame.to_csv(cleaned_data, filename, index=False)
-    
+
     ## Comparaison pour extraire les doublons
     # 1) Création d'un historique
     files = [f for f in listdir(DESTINATION_FOLDER) if isfile('%s/%s' % (DESTINATION_FOLDER, f))]
@@ -91,7 +91,7 @@ def download_certificates(args):
         histoFile = re.sub('Certificates', 'History', certificatesFiles[-1])
         shutil.copy('%s/%s' % (DESTINATION_FOLDER, certificatesFiles[-1]), '%s/%s' % (DESTINATION_FOLDER, histoFile))
 
-    # 2) Ouverture et concaténation    
+    # 2) Ouverture et concaténation
     files = [f for f in listdir(DESTINATION_FOLDER) if isfile('%s/%s' % (DESTINATION_FOLDER, f))]
     files.sort()
     histoFiles = [f for f in files if re.match('History_[0-9]{4}-[0-9]{2}-[0-9]{2}.csv', f)]
@@ -103,7 +103,7 @@ def download_certificates(args):
 
 
     # On concatène l'historique et les certificats du jour
-    # On regarde les certificats qui ont plusieurs dates de fin. 
+    # On regarde les certificats qui ont plusieurs dates de fin.
     histo_and_new = pd.concat([certificates, histo])
     histo_and_new = histo_and_new.drop_duplicates(subset=histo_and_new.columns.difference(['date', 'index']))
     pd.DataFrame.to_csv(histo_and_new, '%s/History_%s.csv' % (DESTINATION_FOLDER, str(date.today())), index=False)
@@ -117,10 +117,10 @@ def download_certificates(args):
 def main():
     parser = argparse.ArgumentParser(description='Delete old database backups')
     parser.add_argument('--test', dest='test', action='store_true', default=False, help='test mode')
-    parser.add_argument('--latest', dest='latest', action='store_true', default=False, help='only fetch latest certificates')        
+    parser.add_argument('--latest', dest='latest', action='store_true', default=False, help='only fetch latest certificates')
     args = parser.parse_args()
     download_certificates(args)
-    
+
 
 
 if __name__ == '__main__':
