@@ -60,7 +60,7 @@ const Home = () => {
               Carbure est un outil développé par le Ministère de la Transition
               Ecologique qui permet aux acteurs de la filière d'échanger
               facilement les informations de durabilité des biocarburants
-              circulant en France. L'outil met également à disposition les
+              circulant en France. L'outil met également à disposition des
               statistiques publiques anonymes des biocarburants incorporés en
               France aux carburants fossiles.
             </Trans>

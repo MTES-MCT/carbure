@@ -75,14 +75,22 @@ const Footer = () => (
 
       <ul className={styles.footerSocialLinks}>
         <li>
-          <Slack />
-          <a href="https://carbure-beta-gouv.slack.com/">
+          <a
+            href="https://carbure-beta-gouv.slack.com/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Slack />
             <Trans>Slack</Trans>
           </a>
         </li>
         <li>
-          <LinkedIn />
-          <a href="https://www.linkedin.com/company/carbure-minist%C3%A8re-de-la-transition-%C3%A9cologique/">
+          <a
+            href="https://www.linkedin.com/company/carbure-minist%C3%A8re-de-la-transition-%C3%A9cologique/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <LinkedIn />
             <Trans>LinkedIn</Trans>
           </a>
         </li>
