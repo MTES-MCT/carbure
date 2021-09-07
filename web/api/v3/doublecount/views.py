@@ -8,7 +8,7 @@ from producers.models import ProductionSite
 from doublecount.models import DoubleCountingAgreement, DoubleCountingSourcing, DoubleCountingProduction
 from doublecount.serializers import DoubleCountingAgreementFullSerializer, DoubleCountingAgreementPartialSerializer
 from doublecount.serializers import DoubleCountingAgreementFullSerializerWithForeignKeys, DoubleCountingAgreementPartialSerializerWithForeignKeys
-from doublecount.helpers import load_dc_sourcing_file, load_dc_production_file, load_dc_recognition_file
+from doublecount.helpers import load_dc_file, load_dc_sourcing_data, load_dc_production_data
 from core.models import UserRights, MatierePremiere, Pays, Biocarburant
 from core.xlsx_v3 import make_biofuels_sheet, make_dc_mps_sheet, make_countries_sheet, make_dc_production_sheet, make_dc_sourcing_sheet
 
@@ -84,9 +84,23 @@ def upload_file(request, *args, **kwargs):
         for chunk in f.chunks():
             destination.write(chunk)
 
-    load_dc_sourcing_file(entity, production_site_id, request.user, filepath)
-    load_dc_production_file(entity, production_site_id, request.user, filepath)
-    return JsonResponse({'status': 'success'})
+    sourcing_data, production_data = load_dc_file(filepath)
+
+    # get dc period for upload
+    years = list(sourcing_data['year']) + list(production_data['year'])
+    end_year = max(years)
+    start = datetime.date(end_year - 1, 1, 1)
+    end = datetime.date(end_year, 12, 31)
+
+    dca, created = DoubleCountingAgreement.objects.get_or_create(producer=entity, production_site_id=production_site_id, period_start=start, period_end=end)
+
+    try:
+        load_dc_sourcing_data(dca, sourcing_data)
+        load_dc_production_data(dca, production_data)
+        return JsonResponse({'status': 'success'})
+    except:
+        return JsonResponse({'status': "error", 'message': "File parsing error"}, status=400)
+
 
 def get_template(request):
     location = '/tmp/carbure_template_DC.xlsx'
