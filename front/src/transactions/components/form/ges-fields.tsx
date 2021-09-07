@@ -1,11 +1,18 @@
 import { Fragment } from "react"
+import isAfter from "date-fns/isAfter"
 import { useTranslation } from "react-i18next"
 import * as Fields from "./fields"
 import { FieldsProps } from "./fields"
 import { FormGroup } from "common/components/form"
 
+// date where RED II took effect
+const JULY_FIRST = new Date("2021-07-01")
+
 const GESFields = (props: FieldsProps) => {
   const { t } = useTranslation()
+
+  const date = new Date(props.data.delivery_date)
+  const isRedII = isAfter(date, JULY_FIRST)
 
   return (
     <Fragment>
@@ -24,7 +31,7 @@ const GESFields = (props: FieldsProps) => {
         <Fields.Eccr />
         <Fields.Eee />
         <Fields.GhgReduction />
-        <Fields.GhgReductionRed2 />
+        {isRedII && <Fields.GhgReductionRed2 />}
       </FormGroup>
     </Fragment>
   )
