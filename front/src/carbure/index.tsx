@@ -135,6 +135,10 @@ const Carbure = () => {
       <Topbar app={app} />
 
       <Switch>
+        <Route path="/logout">
+          <Exit to="/accounts/logout" />
+        </Route>
+
         <Route path="/account">
           <Account settings={app.settings} />
         </Route>
