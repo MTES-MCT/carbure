@@ -72,7 +72,7 @@ test:
 
 test_frontend:
   stage: test
-  image: node:alpine
+  image: node:16.8.0-alpine
   cache:
     paths:
       - front/node_modules
@@ -98,7 +98,7 @@ dev_push_web:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - docker image prune -a --force --filter "until=240h"
-    - docker pull registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA    
+    - docker pull registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA
     - docker tag registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:$CI_COMMIT_SHORT_SHA registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:dev
     - docker push registry.gitlab.com/la-fabrique-numerique/biocarburants/web_proxy:dev
 
