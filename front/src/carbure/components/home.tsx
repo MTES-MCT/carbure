@@ -8,6 +8,7 @@ import {
   ChevronRight,
   ExternalLink,
   Loader,
+  Plus,
   UserAdd,
   UserCheck,
 } from "common/components/icons"
@@ -15,7 +16,8 @@ import { Button } from "common/components/button"
 import { EntityType } from "common/types"
 import api from "common/services/api"
 import useAPI from "common/hooks/use-api"
-import { useEffect } from "react"
+import { Fragment, useEffect } from "react"
+import { SettingsGetter } from "settings/hooks/use-get-settings"
 
 interface HomeStats {
   total_volume: number
@@ -30,12 +32,18 @@ function fetchHomeStats() {
   return api.get<HomeStats>("/common/stats")
 }
 
-const Home = () => {
+type HomeProps = {
+  settings: SettingsGetter
+}
+
+const Home = ({ settings }: HomeProps) => {
   const [stats, getStats] = useAPI(fetchHomeStats)
 
   useEffect(() => {
     getStats()
   }, [getStats])
+
+  const firstEntity = settings.data?.rights[0]?.entity
 
   return (
     <main className={styles.home}>
@@ -84,23 +92,47 @@ const Home = () => {
       </section>
 
       <section className={styles.homeAuthentication}>
-        <Button
-          icon={UserAdd}
-          as="a"
-          href="/accounts/register"
-          className={styles.homeButton}
-        >
-          <Trans>S'inscrire</Trans>
-        </Button>
-        <Button
-          icon={UserCheck}
-          as="a"
-          level="primary"
-          href="/accounts/login"
-          className={styles.homeButton}
-        >
-          <Trans>Se connecter</Trans>
-        </Button>
+        {settings.error !== null ? (
+          <Fragment>
+            <Button
+              icon={UserAdd}
+              as="a"
+              href="/accounts/register"
+              className={styles.homeButton}
+            >
+              <Trans>S'inscrire</Trans>
+            </Button>
+            <Button
+              icon={UserCheck}
+              as="a"
+              level="primary"
+              href="/accounts/login"
+              className={styles.homeButton}
+            >
+              <Trans>Se connecter</Trans>
+            </Button>
+          </Fragment>
+        ) : firstEntity ? (
+          <Button
+            icon={ExternalLink}
+            as="a"
+            level="primary"
+            href={`/v2/org/${firstEntity.id}`}
+            className={styles.homeButton}
+          >
+            <Trans>Aller sur {{ entity: firstEntity.name }}</Trans>
+          </Button>
+        ) : (
+          <Button
+            icon={Plus}
+            as="a"
+            level="primary"
+            href="/v2/account"
+            className={styles.homeButton}
+          >
+            <Trans>Lier le compte à des sociétés</Trans>
+          </Button>
+        )}
       </section>
 
       <section className={styles.homeStats}>

@@ -152,7 +152,7 @@ const Carbure = () => {
         </Route>
 
         <Route exact path="/">
-          <Home />
+          <Home settings={app.settings} />
         </Route>
 
         <Redirect to="/" />
