@@ -1,11 +1,15 @@
 import { UserRight } from "common/types"
 import { useGetSettings, SettingsGetter } from "settings/hooks/use-get-settings"
+import { EntitySelection } from "./use-entity"
 
 export type AppHook = {
   settings: SettingsGetter
   hasEntity: (e: number) => boolean
   hasEntities: () => boolean
   getRights: (id: number) => UserRight | null
+  getFirstEntity: () => EntitySelection
+  isAuthenticated: () => boolean
+  isProduction: () => boolean
 }
 
 export function useApp(): AppHook {
@@ -24,5 +28,25 @@ export function useApp(): AppHook {
     return Boolean(settings.data?.rights.length)
   }
 
-  return { settings, hasEntity, hasEntities, getRights }
+  function getFirstEntity() {
+    return settings.data?.rights[0]?.entity ?? null
+  }
+
+  function isAuthenticated() {
+    return settings.error !== "User not verified"
+  }
+
+  function isProduction() {
+    return window.location.hostname === "carbure.beta.gouv.fr"
+  }
+
+  return {
+    settings,
+    hasEntity,
+    hasEntities,
+    getRights,
+    getFirstEntity,
+    isAuthenticated,
+    isProduction,
+  }
 }

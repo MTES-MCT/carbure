@@ -64,21 +64,19 @@ function changeOrg(path: string, entity: number) {
 }
 
 type UserMenuProps = {
-  settings: ApiState<Settings>
+  app: AppHook
   entity: EntitySelection
 }
 
-const UserMenu = ({ settings, entity }: UserMenuProps) => {
+const UserMenu = ({ app, entity }: UserMenuProps) => {
   const { t } = useTranslation()
   const location = useLocation()
 
-  const hasRights = settings.data && settings.data.rights.length > 0
-
   return (
     <Menu className={styles.userMenu} label={entity?.name ?? "Menu"}>
-      {hasRights && (
+      {app.hasEntities() && (
         <Menu.Group label={t("Organisations")}>
-          {settings.data?.rights.map((right) => (
+          {app.settings.data?.rights.map((right) => (
             <Menu.ItemLink
               key={right.entity.id}
               to={changeOrg(location.pathname, right.entity.id)}
@@ -89,7 +87,7 @@ const UserMenu = ({ settings, entity }: UserMenuProps) => {
         </Menu.Group>
       )}
 
-      <Menu.Group label={settings.data?.email ?? t("Utilisateur")}>
+      <Menu.Group label={app.settings.data?.email ?? t("Utilisateur")}>
         <Menu.ItemLink relative to="account">
           <Trans>Mon compte</Trans>
         </Menu.ItemLink>
@@ -169,13 +167,13 @@ export const PublicTopbar = () => {
 
 type PrivateTopbarProps = {
   entity: EntitySelection
-  settings: SettingsGetter
+  app: AppHook
 }
 
-export const PrivateTopbar = ({ entity, settings }: PrivateTopbarProps) => {
+export const PrivateTopbar = ({ entity, app }: PrivateTopbarProps) => {
   const { t } = useTranslation()
 
-  const firstEntity = settings.data?.rights[0]?.entity
+  const firstEntity = app.getFirstEntity()
 
   return (
     <header className={styles.topBar}>
@@ -240,7 +238,7 @@ export const PrivateTopbar = ({ entity, settings }: PrivateTopbarProps) => {
       <Box row className={styles.topRight}>
         <LanguageSelection />
 
-        <UserMenu settings={settings} entity={entity} />
+        <UserMenu app={app} entity={entity} />
 
         <a
           href="https://carbure-1.gitbook.io/faq/"
@@ -260,12 +258,12 @@ type TopbarProps = {
 }
 
 const Topbar = ({ app }: TopbarProps) => {
-  const { entity, pending } = useEntity(app)
+  const entity = useEntity(app)
 
-  if (app.settings.error) {
+  if (!app.isAuthenticated()) {
     return <PublicTopbar />
   } else {
-    return <PrivateTopbar entity={entity} settings={app.settings} />
+    return <PrivateTopbar entity={entity} app={app} />
   }
 }
 
