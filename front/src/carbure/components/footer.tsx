@@ -118,9 +118,9 @@ const Footer = () => (
           </a>
         </li>
         <li>
-          <a href="#">
+          <span className={styles.fakeLink}>
             <Trans>Accessibilité : non conforme</Trans>
-          </a>
+          </span>
         </li>
       </ul>
     </div>

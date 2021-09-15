@@ -13,7 +13,6 @@ import {
 import { Upload } from "common/components/icons"
 import { Box } from "common/components"
 import { Button } from "common/components/button"
-import { Basic } from "./dropzone"
 
 import styles from "./import.module.css"
 import { useMatomo } from "matomo"
@@ -31,13 +30,13 @@ type ImportPromptProps = PromptProps<File> & {
 const ImportWrapper = ({ children, onResolve }: ImportWrapperProps) => {
   const matomo = useMatomo()
   const { t } = useTranslation()
-  const onDrop = useCallback(acceptedFiles => { onResolve(acceptedFiles[0]) }, [])
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({ onDrop });
-  console.log(acceptedFiles)
+
+  const onDrop = useCallback((files) => onResolve(files[0]), [onResolve])
+  const { getRootProps } = useDropzone({ onDrop })
 
   return (
     <Dialog onResolve={onResolve}>
-      <div  {...getRootProps()}>
+      <div {...getRootProps()}>
         <DialogTitle text={t("Import Excel")} />
         <DialogText text={t("Importer un fichier Excel standardisé.")} />
 

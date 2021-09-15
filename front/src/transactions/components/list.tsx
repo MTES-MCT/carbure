@@ -1,5 +1,4 @@
 import React from "react"
-import IframeResizer from "iframe-resizer-react"
 import { stringify } from "querystring"
 
 import {
@@ -191,7 +190,9 @@ export const TransactionList = ({
             <ToFixActions disabled={!hasSelection} deleter={deleter} />
           )}
 
-          {(status.is(LotStatus.Accepted) || status.is(LotStatus.Inbox) || status.is(LotStatus.Validated)) && (
+          {(status.is(LotStatus.Accepted) ||
+            status.is(LotStatus.Inbox) ||
+            status.is(LotStatus.Validated)) && (
             <CorrectionActions disabled={!hasSelection} acceptor={acceptor} />
           )}
 
@@ -223,12 +224,12 @@ export const TransactionList = ({
       {isAdmin && (
         <Collapsible title="Voir la carte" className={styles.collapsibleMap}>
           <iframe
-          height="600"
-          title="Votre empreinte carbone"
-          src={`${API_ROOT}/admin/map?${stringify(filterParams(query))}`}
-          frameBorder="0"
-          allowTransparency
-        />
+            height="600"
+            title="Votre empreinte carbone"
+            src={`${API_ROOT}/admin/map?${stringify(filterParams(query))}`}
+            frameBorder="0"
+            allowTransparency
+          />
         </Collapsible>
       )}
 

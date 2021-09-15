@@ -4,7 +4,6 @@ import {
   Filters,
   Snapshot,
   Transaction,
-  LotStatus,
   SummaryItem,
   GenericError,
   TransactionSummary,

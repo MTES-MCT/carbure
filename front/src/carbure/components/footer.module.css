@@ -124,13 +124,16 @@ ul.footerSocialLinks {
   margin-left: auto;
 }
 
-.footerLower a {
+.footerLower a,
+.footerLower .fakeLink {
   display: flex;
   align-items: center;
+  cursor: pointer;
   color: var(--gray-dark);
 }
 
-.footerLower a:hover {
+.footerLower a:hover,
+.footerLower .fakeLink:hover {
   color: var(--black);
 }
 

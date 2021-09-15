@@ -61,7 +61,7 @@ export default function useTransactionDetails(
   const [details, resolveDetails] = useAPI(detailsGetter(entity))
   const [request, resolveUpdate] = useAPI(api.updateLot)
   const [comment, resolveComment] = useAPI(api.commentLot)
-  const [adminComment, resolveAddAdminComment] = useAPI(api.addAdminComment)
+  const [, resolveAddAdminComment] = useAPI(api.addAdminComment)
 
   const fieldErrors = useFieldErrors(details.data?.errors ?? [])
 

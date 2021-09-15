@@ -7,7 +7,6 @@ import useAPI from "../../../common/hooks/use-api"
 
 import { prompt, confirm } from "../../../common/components/dialog"
 import { useNotificationContext } from "../../../common/components/notifications"
-import { CommentPrompt } from "transactions/components/form-comments"
 import {
   ValidationPrompt,
   ValidationSummaryPrompt,
@@ -97,9 +96,11 @@ export default function useValidateLots(
   }
 
   async function validateAndCommentLot(tx: Transaction) {
-    const comment = await confirm(t("Renvoyer le lot"), t("Voulez-vous renvoyer ce lot corrigé ?"))
-    
-    
+    const comment = await confirm(
+      t("Renvoyer le lot"),
+      t("Voulez-vous renvoyer ce lot corrigé ?")
+    )
+
     // await prompt<string>((resolve) => (
     //   <CommentPrompt
     //     title={t("Envoyer lot")}
@@ -109,7 +110,7 @@ export default function useValidateLots(
     // ))
 
     if (entity !== null && comment) {
-      await notifyValidate(resolveValidateAndComment(entity.id, tx.id, ''))
+      await notifyValidate(resolveValidateAndComment(entity.id, tx.id, ""))
     }
 
     return Boolean(comment)
