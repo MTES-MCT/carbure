@@ -148,7 +148,7 @@ def otp_verify(request):
             device = EmailDevice.objects.get(user=request.user)
             if device.verify_token(form.clean_otp_token()):
                 login_with_device(request, device)
-                return redirect('/v2/login')
+                return redirect('/v2/pending')
             else:
                 is_allowed, _ = device.verify_is_allowed()
                 now = timezone.now()

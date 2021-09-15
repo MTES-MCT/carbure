@@ -1,7 +1,7 @@
 import styles from "./pending.module.css"
 
 import { Link, Redirect } from "common/components/relative-route"
-import { Box, Main, Title } from "common/components"
+import { Box, LoaderOverlay, Main, Title } from "common/components"
 import { Alert } from "common/components/alert"
 import { AlertTriangle, Question } from "common/components/icons"
 import { Trans } from "react-i18next"
@@ -14,6 +14,15 @@ type PendingProps = {
 const Pending = ({ app }: PendingProps) => {
   if (!app.isAuthenticated()) {
     return <Redirect to="/" />
+  }
+
+  if (app.hasEntities()) {
+    const firstEntity = app.getFirstEntity()!
+    return <Redirect to={`/org/${firstEntity.id}`} />
+  }
+
+  if (app.settings.loading || app.settings.data === null) {
+    return <LoaderOverlay />
   }
 
   return (
