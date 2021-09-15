@@ -121,7 +121,6 @@ const Org = ({ app }: { app: AppHook }) => {
 const Carbure = () => {
   useTranslation()
   const app = useApp()
-  const firstEntity = app.getFirstEntity()
 
   return (
     <div id="app">
@@ -132,10 +131,6 @@ const Carbure = () => {
       <Switch>
         <Route exact path="/logout">
           <Exit to="/accounts/logout" />
-        </Route>
-
-        <Route exact path="/login">
-          <Redirect to={firstEntity ? `/org/${firstEntity.id}` : "/pending"} />
         </Route>
 
         <Route exact path="/account">
