@@ -12,6 +12,7 @@ import { AccountAuthentication } from "./components/authentication"
 import useAPI from "common/hooks/use-api"
 import * as api from "./api"
 import Exit from "carbure/components/exit"
+import { AppHook } from "carbure/hooks/use-app"
 
 export interface AccountHook {
   isLoading: boolean
@@ -42,13 +43,13 @@ function useAccount(settings: SettingsGetter): AccountHook {
 }
 
 type AccountProps = {
-  settings: SettingsGetter
+  app: AppHook
 }
 
-const Account = ({ settings }: AccountProps) => {
-  const account = useAccount(settings)
+const Account = ({ app }: AccountProps) => {
+  const account = useAccount(app.settings)
 
-  if (settings.error === "User not verified") {
+  if (!app.isAuthenticated()) {
     return <Exit to="/accounts/login" />
   }
 
@@ -61,8 +62,8 @@ const Account = ({ settings }: AccountProps) => {
       </SettingsHeader>
 
       <SettingsBody>
-        <AccountAccesRights settings={settings} account={account} />
-        <AccountAuthentication settings={settings} />
+        <AccountAccesRights settings={app.settings} account={account} />
+        <AccountAuthentication settings={app.settings} />
       </SettingsBody>
     </Main>
   )

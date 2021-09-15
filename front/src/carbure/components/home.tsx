@@ -17,7 +17,7 @@ import { EntityType } from "common/types"
 import api from "common/services/api"
 import useAPI from "common/hooks/use-api"
 import { Fragment, useEffect } from "react"
-import { SettingsGetter } from "settings/hooks/use-get-settings"
+import { AppHook } from "carbure/hooks/use-app"
 
 interface HomeStats {
   total_volume: number
@@ -33,17 +33,17 @@ function fetchHomeStats() {
 }
 
 type HomeProps = {
-  settings: SettingsGetter
+  app: AppHook
 }
 
-const Home = ({ settings }: HomeProps) => {
+const Home = ({ app }: HomeProps) => {
   const [stats, getStats] = useAPI(fetchHomeStats)
 
   useEffect(() => {
     getStats()
   }, [getStats])
 
-  const firstEntity = settings.data?.rights[0]?.entity
+  const firstEntity = app.getFirstEntity()
 
   return (
     <main className={styles.home}>
@@ -92,7 +92,7 @@ const Home = ({ settings }: HomeProps) => {
       </section>
 
       <section className={styles.homeAuthentication}>
-        {settings.error !== null ? (
+        {!app.isAuthenticated() ? (
           <Fragment>
             <Button
               icon={UserAdd}

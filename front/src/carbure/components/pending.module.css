@@ -2,7 +2,7 @@
   flex: 1;
   justify-content: center;
   align-items: center;
-  padding: 24px 120px;
+  padding: 64px 120px;
 }
 
 h1.welcome {
@@ -24,6 +24,7 @@ div.accountMessage {
 div.accountMessage span,
 div.pendingAlert span {
   display: inline-flex;
+  white-space: pre;
   align-items: center;
   font-size: 1.1em;
   margin-bottom: 8px;
@@ -55,6 +56,5 @@ div.pendingAlert {
 .link {
   color: var(--blue-medium);
   text-decoration: underline;
-  margin: 0 6px;
   flex-shrink: 0;
 }

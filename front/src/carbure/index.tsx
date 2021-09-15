@@ -41,9 +41,9 @@ const DevBanner = () => (
 
 // has to be nested in a route so we can get data from useParams()
 const Org = ({ app }: { app: AppHook }) => {
-  const { entity, pending } = useEntity(app)
+  const entity = useEntity(app)
 
-  if (app.settings.error === "User not verified") {
+  if (!app.isAuthenticated()) {
     return <Exit to="/accounts/login" />
   }
 
@@ -57,8 +57,8 @@ const Org = ({ app }: { app: AppHook }) => {
   }
 
   // a user with no entities tries to access an entity page
-  if (!app.hasEntities() && !pending) {
-    return <Redirect to="/" />
+  if (!app.hasEntities()) {
+    return <Redirect to="/pending" />
   }
 
   const isAdmin = entity?.entity_type === EntityType.Administration
@@ -67,10 +67,6 @@ const Org = ({ app }: { app: AppHook }) => {
   return (
     <UserRightProvider app={app}>
       <Switch>
-        <Route relative exact path="../pending">
-          <Pending />
-        </Route>
-
         <Route relative exact path="stocks">
           <Redirect relative to="in" />
         </Route>
@@ -125,22 +121,29 @@ const Org = ({ app }: { app: AppHook }) => {
 const Carbure = () => {
   useTranslation()
   const app = useApp()
-
-  const isProduction = window.location.hostname === "carbure.beta.gouv.fr"
+  const firstEntity = app.getFirstEntity()
 
   return (
     <div id="app">
-      {!isProduction && <DevBanner />}
+      {!app.isProduction() && <DevBanner />}
 
       <Topbar app={app} />
 
       <Switch>
-        <Route path="/logout">
+        <Route exact path="/logout">
           <Exit to="/accounts/logout" />
         </Route>
 
-        <Route path="/account">
-          <Account settings={app.settings} />
+        <Route exact path="/login">
+          <Redirect to={firstEntity ? `/org/${firstEntity.id}` : "/pending"} />
+        </Route>
+
+        <Route exact path="/account">
+          <Account app={app} />
+        </Route>
+
+        <Route exact path="/pending">
+          <Pending app={app} />
         </Route>
 
         <Route path="/org/:entity">
@@ -152,7 +155,7 @@ const Carbure = () => {
         </Route>
 
         <Route exact path="/">
-          <Home settings={app.settings} />
+          <Home app={app} />
         </Route>
 
         <Redirect to="/" />
