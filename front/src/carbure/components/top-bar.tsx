@@ -175,7 +175,7 @@ type PrivateTopbarProps = {
 export const PrivateTopbar = ({ entity, settings }: PrivateTopbarProps) => {
   const { t } = useTranslation()
 
-  const firstEntity = settings.data?.rights[0].entity
+  const firstEntity = settings.data?.rights[0]?.entity
 
   return (
     <header className={styles.topBar}>
@@ -184,6 +184,13 @@ export const PrivateTopbar = ({ entity, settings }: PrivateTopbarProps) => {
       {!entity && firstEntity && (
         <Link to={`/org/${firstEntity.id}`} className={styles.entityShortcut}>
           <Trans>Aller sur {{ entity: firstEntity.name }}</Trans>
+          <ChevronRight />
+        </Link>
+      )}
+
+      {!entity && !firstEntity && (
+        <Link to={`/account`} className={styles.entityShortcut}>
+          <Trans>Lier le compte à des sociétés</Trans>
           <ChevronRight />
         </Link>
       )}
