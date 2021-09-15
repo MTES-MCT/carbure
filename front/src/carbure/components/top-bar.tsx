@@ -2,9 +2,7 @@ import React from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation } from "react-router-dom"
 
-import { ApiState } from "common/hooks/use-api"
 import useEntity, { EntitySelection } from "carbure/hooks/use-entity"
-import { Settings } from "common/types"
 
 import Menu from "common/components/menu"
 import { Link, NavLink, Route } from "common/components/relative-route"
@@ -15,7 +13,6 @@ import logoMarianne from "../assets/images/Marianne.svg"
 import styles from "./top-bar.module.css"
 import Select from "common/components/select"
 import { Box } from "common/components"
-import { SettingsGetter } from "settings/hooks/use-get-settings"
 import { AppHook } from "carbure/hooks/use-app"
 import { Button } from "common/components/button"
 

@@ -3,7 +3,6 @@ import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import Account from "../index"
-import { useGetSettings } from "settings/hooks/use-get-settings"
 import server, { setAccessRequests } from "./api"
 import { producer } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
@@ -20,7 +19,7 @@ afterAll(() => server.close())
 // this component is only here for testing as otherwise we can't use the useGetSettingsHook
 // because hooks can only work inside components
 const AccountWithHooks = () => {
-  return <TestRoot>{(app) => <Account settings={app.settings} />}</TestRoot>
+  return <TestRoot>{(app) => <Account app={app} />}</TestRoot>
 }
 
 test("empty acces rights in account page", async () => {

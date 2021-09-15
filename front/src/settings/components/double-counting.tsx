@@ -37,7 +37,7 @@ import {
   prompt,
   PromptProps,
 } from "common/components/dialog"
-import { formatDate, SettingsForm } from "./common"
+import { formatDate } from "./common"
 import {
   findBiocarburants,
   findCountries,

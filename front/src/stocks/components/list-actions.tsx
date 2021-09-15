@@ -1,15 +1,7 @@
 import React, { Fragment } from "react"
 import { Trans, useTranslation } from "react-i18next"
 
-import { Link } from "common/components/relative-route"
-import {
-  Check,
-  Cross,
-  Flask,
-  Rapport,
-  Upload,
-  Forward,
-} from "common/components/icons"
+import { Check, Cross, Flask, Upload, Forward } from "common/components/icons"
 import { AsyncButton, Button } from "common/components/button"
 import { prompt } from "common/components/dialog"
 import { StockImportPrompt } from "transactions/components/import"
