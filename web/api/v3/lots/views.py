@@ -89,7 +89,7 @@ def get_details(request, *args, **kwargs):
     data = {}
     data['transaction'] = tx.natural_key()
     data['distance'] = get_transaction_distance(tx)
-    data['errors'] = get_errors(tx, request)
+    data['errors'] = get_errors(tx, entity)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
     data['certificates'] = check_certificates(tx)
     data['updates'] = [c.natural_key() for c in tx.transactionupdatehistory_set.all().order_by('-datetime')]
