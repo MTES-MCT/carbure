@@ -126,13 +126,13 @@ def check_certificates(prefetched_data, tx, errors):
                 if c.valid_until < tx.delivery_date:
                     errors.append(generic_error(error='EXPIRED_VENDOR_CERT', tx=tx, field='carbure_vendor_certificate'))  
     # DOUBLE COUNTING CERTIFICATES
-    if tx.lot.matiere_premiere and tx.lot.matiere_premiere.is_double_compte:    
+    if tx.lot.matiere_premiere and tx.lot.matiere_premiere.is_double_compte:
         if tx.lot.unknown_production_site_dbl_counting:
-            dc_cert = tx.lot.unknown_production_site_dbl_counting
+            dc_cert = tx.lot.unknown_production_site_dbl_counting.strip()
             if dc_cert != '' and dc_cert not in prefetched_data['double_counting_certificates']:
                 errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', tx=tx, field='unknown_production_site_dbl_counting'))
         elif tx.lot.carbure_production_site:
-            dc_cert = tx.lot.carbure_production_site.dc_reference
+            dc_cert = tx.lot.carbure_production_site.dc_reference.strip()
             if dc_cert != '' and dc_cert not in prefetched_data['double_counting_certificates']:
                 errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', tx=tx, field='dc_reference'))
         else:
