@@ -110,25 +110,33 @@ def get_entities(request):
     q = request.GET.get('q', False)
     has_requests = request.GET.get('has_requests', None)
 
-    entities = Entity.objects.all().order_by('name')
+    entities = Entity.objects.all().order_by('name').prefetch_related('userrights_set', 'userrightsrequests_set', 'entitydepot_set', 'productionsite_set').annotate(
+        users=Count('userrights', distinct=True),
+        requests=Count('userrightsrequests', filter=Q(userrightsrequests__status='PENDING'), distinct=True),
+        depots=Count('entitydepot', distinct=True),
+        production_sites=Count('productionsite', distinct=True),
+        iscc=Count('entityiscctradingcertificate', distinct=True),
+        dbs=Count('entitydbstradingcertificate', distinct=True),
+        redcert=Count('entityredcerttradingcertificate', distinct=True),
+        sn=Count('entitysntradingcertificate', distinct=True),
+        double_counting=Count('doublecountingagreement', distinct=True)
+    )
 
     if q:
         entities = entities.filter(name__icontains=q)
     if has_requests == "true":
-        requests = Count('userrightsrequests', filter=Q(userrightsrequests__status='PENDING'))
-        entities = entities.annotate(requests=requests)
         entities = entities.filter(requests__gt=0)
 
     entities_sez = []
-    for e in entities:
+    for e in entities.iterator():
         entities_sez.append({
             'entity': e.natural_key(),
-            'users': e.userrights_set.count(),
-            'requests': e.userrightsrequests_set.filter(status='PENDING').count(),
-            'depots': e.entitydepot_set.count(),
-            'production_sites': e.productionsite_set.count(),
-            'certificates_iscc': e.entityiscctradingcertificate_set.count(),
-            'certificates_2bs': e.entitydbstradingcertificate_set.count(),
+            'users': e.users,
+            'requests': e.requests,
+            'depots': e.depots,
+            'production_sites': e.production_sites,
+            'certificates': e.iscc + e.dbs + e.sn + e.redcert,
+            'double_counting': e.double_counting
         })
 
     return JsonResponse({"status": "success", "data": entities_sez})
