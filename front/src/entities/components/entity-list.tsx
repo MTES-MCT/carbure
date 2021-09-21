@@ -36,8 +36,15 @@ const COLUMNS: Column<api.EntityDetails>[] = [
     header: "Certificats",
     render: (e) => (
       <ul className={styles.tableList}>
-        <li>{e.certificates_iscc} certificats ISCC</li>
-        <li>{e.certificates_2bs} certificats 2BS</li>
+        <li>{e.certificates} certificats</li>
+      </ul>
+    ),
+  },
+  {
+    header: "Double comptage",
+    render: (e) => (
+      <ul className={styles.tableList}>
+        <li>{e.double_counting} dossiers DC</li>
       </ul>
     ),
   },
