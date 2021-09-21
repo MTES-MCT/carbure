@@ -5,7 +5,7 @@ from django.http import JsonResponse, HttpResponse
 from core.models import LotV2, LotTransaction, ETBETransformation, TransactionUpdateHistory
 from core.models import Entity, UserRights, MatierePremiere, Biocarburant, Pays, LotV2, Depot
 from core.decorators import check_rights
-from core.common import get_prefetched_data, load_mb_lot, bulk_insert
+from core.common import calculate_ghg, get_prefetched_data, load_mb_lot, bulk_insert
 from core.common import load_excel_file, send_lot_from_stock, generate_carbure_id
 from core.xlsx_v3 import template_stock, template_stock_bcghg
 from django_otp.decorators import otp_required
@@ -197,6 +197,7 @@ def create_drafts(request, *args, **kwargs):
                 lot_dict[key] = draft[key]
         # create sub-transaction
         lot, tx, errors = load_mb_lot(d, context['entity'], request.user, lot_dict, 'MANUAL')
+        calculate_ghg(lot)
         if tx is None or not tx:
             return JsonResponse({'status': 'error', 'message': 'Could not add lot %d to database: %s' % (i, errors)}, status=400)
         lots.append(lot)
