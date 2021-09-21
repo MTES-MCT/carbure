@@ -127,6 +127,7 @@ export const Loader = ({ className, ...props }: IconProps) => (
     {...props}
     className={cl("icon-loader", styles.loader, className)}
     title="Chargement..."
+    data-testid="loader"
   >
     <line x1="12" y1="6" x2="12" y2="3" />
     <line x1="16.25" y1="7.75" x2="18.4" y2="5.6" />
