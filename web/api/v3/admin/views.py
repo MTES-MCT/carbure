@@ -23,6 +23,7 @@ from django.template.loader import render_to_string
 from core.models import LotTransaction, UserRightsRequests, SustainabilityDeclaration, Control
 from api.v3.lots.helpers import Perf, get_lots_with_metadata, get_lots_with_errors, get_snapshot_filters, get_errors, filter_lots, get_general_summary, sort_lots
 from core.common import check_certificates, get_transaction_distance
+from doublecount.models import DoubleCountingAgreement
 
 
 # Get an instance of a logger
@@ -119,7 +120,8 @@ def get_entities(request):
         dbs=Count('entitydbstradingcertificate', distinct=True),
         redcert=Count('entityredcerttradingcertificate', distinct=True),
         sn=Count('entitysntradingcertificate', distinct=True),
-        double_counting=Count('doublecountingagreement', distinct=True)
+        double_counting=Count('doublecountingagreement', filter=Q(doublecountingagreement__status=DoubleCountingAgreement.ACCEPTED), distinct=True),
+        double_counting_requests=Count('doublecountingagreement', filter=Q(doublecountingagreement__status=DoubleCountingAgreement.PENDING), distinct=True),
     )
 
     if q:
@@ -135,8 +137,12 @@ def get_entities(request):
             'requests': e.requests,
             'depots': e.depots,
             'production_sites': e.production_sites,
-            'certificates': e.iscc + e.dbs + e.sn + e.redcert,
-            'double_counting': e.double_counting
+            'iscc': e.iscc,
+            'dbs': e.dbs,
+            'sn': e.sn,
+            'redcert': e.redcert,
+            'double_counting': e.double_counting,
+            'double_counting_requests': e.double_counting_requests
         })
 
     return JsonResponse({"status": "success", "data": entities_sez})
