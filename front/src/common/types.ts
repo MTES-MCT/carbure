@@ -33,6 +33,12 @@ export enum EntityType {
   Trader = "Trader",
   Administration = "Administration",
   Auditor = "Auditor",
+  ExternalAdmin = "Administration Externe"
+}
+
+export enum ExternalAdminPages {
+  DoubleCounting = 'DCA',
+  Tirib = 'TIRIB'
 }
 
 export interface Entity {
@@ -42,6 +48,7 @@ export interface Entity {
   has_mac: boolean
   has_trading: boolean
   default_certificate: string
+  ext_admin_pages?: ExternalAdminPages[]
 }
 
 export interface Country {
@@ -554,7 +561,7 @@ export enum DoubleCountingStatus {
 
 export interface DoubleCounting {
   id: number
-  producer: number
+  producer: Entity
   production_site: string
   period_start: string
   period_end: string

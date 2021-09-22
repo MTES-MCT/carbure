@@ -49,6 +49,7 @@ const Registry = () => {
     [EntityType.Producer]: t("Producteur"),
     [EntityType.Auditor]: t("Auditeur"),
     [EntityType.Trader]: t("Trader"),
+    [EntityType.ExternalAdmin]: t("Administration Externe"),
   }
 
   const columns: Column<Entity>[] = [

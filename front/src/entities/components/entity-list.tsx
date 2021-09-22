@@ -5,8 +5,8 @@ import styles from "./entity-list.module.css"
 import { padding } from "transactions/components/list-columns"
 import Table, { Column } from "common/components/table"
 import { useRelativePush } from "common/components/relative-route"
-import { AlertFilter } from "common/components/alert"
-import { AlertCircle } from "common/components/icons"
+import { Alert, AlertFilter } from "common/components/alert"
+import { AlertTriangle, AlertCircle } from "common/components/icons"
 
 const COLUMNS: Column<api.EntityDetails>[] = [
   padding,
@@ -42,6 +42,15 @@ export const EntityFactoriesList = ({ entities }: EntityListProps) => {
       value: e,
       onClick: () => push(`${e.entity.id}`),
     }))
+
+
+  if (rows.length === 0) {
+    return (
+      <Alert icon={AlertTriangle} level="warning">
+        Aucune société trouvée pour cette recherche.
+      </Alert>
+    )
+  }
 
   return <Table columns={columns} rows={rows} />
 }
@@ -83,6 +92,14 @@ export const EntityDoubleCountingList = ({ entities }: EntityListProps) => {
       onClick: () => push(`${e.entity.id}`),
       className: cl(e.double_counting_requests > 0 && styles.entityRequests),
     }))
+
+  if (rows.length === 0) {
+    return (
+      <Alert icon={AlertTriangle} level="warning">
+        Aucune société trouvée pour cette recherche.
+      </Alert>
+    )
+  }
 
   return (
     <Fragment>
@@ -136,6 +153,14 @@ export const EntityCertificatesList = ({ entities }: EntityListProps) => {
       onClick: () => push(`${e.entity.id}`),
     }))
 
+  if (rows.length === 0) {
+    return (
+      <Alert icon={AlertTriangle} level="warning">
+        Aucune société trouvée pour cette recherche.
+      </Alert>
+    )
+  }
+
   return <Table columns={columns} rows={rows} />
 }
 
@@ -169,6 +194,14 @@ export const EntityUsersList = ({ entities }: EntityListProps) => {
       onClick: () => push(`${e.entity.id}`),
       className: cl(e.requests > 0 && styles.entityRequests),
     }))
+
+  if (rows.length === 0) {
+    return (
+      <Alert icon={AlertTriangle} level="warning">
+        Aucune société trouvée pour cette recherche.
+      </Alert>
+    )
+  }
 
   return (
     <Fragment>
