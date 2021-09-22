@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from core.models import Entity, Pays, Biocarburant, MatierePremiere, Depot, UserRights
 from producers.models import ProductionSite
-from doublecount.models import DoubleCountingAgreement, DoubleCountingSourcing, DoubleCountingProduction
+from doublecount.models import DoubleCountingAgreement, DoubleCountingDocFile, DoubleCountingSourcing, DoubleCountingProduction
 from django_otp.plugins.otp_email.models import EmailDevice
 from django.core.files.uploadedfile import SimpleUploadedFile
 
@@ -55,7 +55,7 @@ class DCAAPITest(TransactionTestCase):
         data = fh.read()
         fh.close()
         f = SimpleUploadedFile("dca.xlsx", data)
-        response = self.client.post(reverse('api-v3-doublecount-upload-file'), {'entity_id': self.producer.id, 'production_site_id': self.production_site.id})
+        response = self.client.post(reverse('api-v3-doublecount-upload-file'), {'entity_id': self.producer.id, 'production_site_id': self.production_site.id, 'file': f})
         if response.status_code != 200:
             print('Failed to upload %s' % (filepath))
         self.assertEqual(response.status_code, 200)
@@ -63,3 +63,17 @@ class DCAAPITest(TransactionTestCase):
         dca = DoubleCountingAgreement.objects.get(producer=self.producer, production_site=self.production_site)
         self.assertEqual(8, DoubleCountingSourcing.objects.filter(dca=dca).count())
         self.assertEqual(4, DoubleCountingProduction.objects.filter(dca=dca).count())
+
+    def test_dca_upload_document(self):
+        dca, created = DoubleCountingAgreement.objects.get_or_create(producer=self.producer, production_site=self.production_site, period_start=datetime.date(2022, 1, 1), period_end=datetime.date(2023, 12, 31))
+        filepath = '%s/web/fixtures/csv/test_data/dca.xlsx' % (os.environ['CARBURE_HOME'])
+        fh = open(filepath, 'rb')
+        data = fh.read()
+        fh.close()
+        f = SimpleUploadedFile("dca.xlsx", data)
+        response = self.client.post(reverse('api-v3-doublecount-upload-doc'), {'entity_id': self.producer.id, 'production_site_id': self.production_site.id, 'year': '2022', 'file': f})
+        if response.status_code != 200:
+            print('Failed to upload %s' % (filepath))
+        self.assertEqual(response.status_code, 200)
+        files = DoubleCountingDocFile.objects.filter(dca=dca)
+        self.assertEqual(files.count(), 1)

@@ -1,16 +1,18 @@
 import datetime
+import os
 import unicodedata
 import xlsxwriter
 from django.http import JsonResponse, HttpResponse
-from core.decorators import check_rights, is_admin
+from core.decorators import check_rights, is_admin, is_admin_or_external_admin
 
 from producers.models import ProductionSite
-from doublecount.models import DoubleCountingAgreement, DoubleCountingSourcing, DoubleCountingProduction
+from doublecount.models import DoubleCountingAgreement, DoubleCountingDocFile, DoubleCountingSourcing, DoubleCountingProduction
 from doublecount.serializers import DoubleCountingAgreementFullSerializer, DoubleCountingAgreementPartialSerializer
 from doublecount.serializers import DoubleCountingAgreementFullSerializerWithForeignKeys, DoubleCountingAgreementPartialSerializerWithForeignKeys
 from doublecount.helpers import load_dc_file, load_dc_sourcing_data, load_dc_production_data
 from core.models import UserRights, MatierePremiere, Pays, Biocarburant
 from core.xlsx_v3 import make_biofuels_sheet, make_dc_mps_sheet, make_countries_sheet, make_dc_production_sheet, make_dc_sourcing_sheet
+from carbure.storage_backends import AWSStorage
 
 @check_rights('entity_id')
 def get_agreements(request, *args, **kwargs):
@@ -19,14 +21,29 @@ def get_agreements(request, *args, **kwargs):
     serializer = DoubleCountingAgreementPartialSerializer(agreements, many=True)
     return JsonResponse({'status': 'success', 'data': serializer.data})
 
-@is_admin
-def get_agreements_admin(request, *args, **kwargs):
-    entity_id = request.GET.get('entity_id', None)
+
+@is_admin_or_external_admin
+def get_agreements_admin(request):
     agreements = DoubleCountingAgreement.objects.all()
-    if entity_id:
-        agreements = agreements.filter(producer_id=entity_id)
-    serializer = DoubleCountingAgreementFullSerializer(agreements, many=True)
-    return JsonResponse({'status': 'success', 'data': serializer.data})
+    accepted = agreements.filter(status=DoubleCountingAgreement.ACCEPTED)
+    accepted_count = accepted.count()
+    rejected = agreements.filter(status=DoubleCountingAgreement.REJECTED)
+    rejected_count = rejected.count()
+    expired = agreements.filter(status=DoubleCountingAgreement.LAPSED)
+    expired_count = expired.count()
+    pending = agreements.filter(status=DoubleCountingAgreement.PENDING)
+    pending_count = pending.count()
+
+    accepted_s = DoubleCountingAgreementFullSerializer(accepted, many=True)
+    rejected_s = DoubleCountingAgreementFullSerializer(rejected, many=True)
+    expired_s = DoubleCountingAgreementFullSerializer(expired, many=True)
+    pending_s = DoubleCountingAgreementFullSerializer(pending, many=True)
+    data = {'accepted': {'count': accepted_count, 'agreements': accepted_s.data}, 
+            'rejected':  {'count': rejected_count, 'agreements': rejected_s.data}, 
+            'expired': {'count': expired_count, 'agreements': expired_s.data},  
+            'pending': {'count': pending_count, 'agreements': pending_s.data}, 
+            }
+    return JsonResponse({'status': 'success', 'data': data})
 
 @check_rights('entity_id')
 def get_agreement(request, *args, **kwargs):
@@ -98,8 +115,50 @@ def upload_file(request, *args, **kwargs):
         load_dc_sourcing_data(dca, sourcing_data)
         load_dc_production_data(dca, production_data)
         return JsonResponse({'status': 'success'})
-    except:
+    except Exception as e:
         return JsonResponse({'status': "error", 'message': "File parsing error"}, status=400)
+
+
+@check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
+def upload_documentation(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    production_site_id = request.POST.get('production_site_id', None)
+    year = request.POST.get('year', None)
+    if not production_site_id:
+        return JsonResponse({'status': "error", 'message': "Missing production_site_id"}, status=400)
+    if not year:
+        return JsonResponse({'status': "error", 'message': "Missing year"}, status=400)
+    start = datetime.date(int(year), 1, 1)
+    dca, created = DoubleCountingAgreement.objects.get_or_create(producer=entity, production_site_id=production_site_id, period_start=start)
+
+    file_obj = request.FILES.get('file')
+    if file_obj is None:
+        return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
+
+    if not ProductionSite.objects.filter(producer=entity, id=production_site_id).exists():
+        return JsonResponse({'status': "error", 'message': "Production site not found"}, status=400)
+
+    
+
+    # organize a path for the file in bucket
+    file_directory_within_bucket = '{year}/{entity}'.format(year=dca.period_start.year, entity=entity.name)
+    filename = ''.join((c for c in unicodedata.normalize('NFD', file_obj.name) if unicodedata.category(c) != 'Mn'))
+
+    # synthesize a full file path; note that we included the filename
+    file_path_within_bucket = os.path.join(
+        file_directory_within_bucket,
+        filename
+    )
+
+    media_storage = AWSStorage()
+    media_storage.save(file_path_within_bucket, file_obj)
+    file_url = media_storage.url(file_path_within_bucket)
+    dcf = DoubleCountingDocFile()
+    dcf.dca = dca
+    dcf.url = file_url
+    dcf.save()
+    return JsonResponse({'status': 'success'})
 
 
 def get_template(request):
