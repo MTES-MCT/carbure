@@ -1,6 +1,7 @@
 import logging
 import datetime
 from django.db.models.aggregates import Sum
+from django.db.models.expressions import Ref
 from django.http.response import HttpResponse
 import pytz
 import calendar
@@ -11,7 +12,7 @@ import random
 import math
 
 from django.http import JsonResponse
-from core.decorators import is_admin
+from core.decorators import is_admin, is_admin_or_external_admin
 from django.contrib.auth import get_user_model
 from core.models import Entity, Lot, UserRights, Control, ControlMessages, ProductionSite, LotV2, GenericError, AdminTransactionComment
 from django.db.models import Q, Count, Subquery, OuterRef, Value, IntegerField

@@ -35,6 +35,10 @@ class DoubleCountingAgreement(models.Model):
     def __str__(self):
         return '%s %d - %d' % (self.producer.name, self.period_start.year, self.period_end.year)
 
+    def natural_key(self):
+        return {'producer': self.producer.name, 'production_site': self.production_site.name, 
+        'period_end': self.period_end, 'period_start': self.period_start,
+        'status': self.status}
 
     class Meta:
         db_table = 'double_counting_agreements'
@@ -72,3 +76,11 @@ class DoubleCountingProduction(models.Model):
         verbose_name = 'Production Double Compte'
         verbose_name_plural = 'Production Double Compte'
 
+class DoubleCountingDocFile(models.Model):
+    url = models.CharField(max_length=512)
+    dca = models.ForeignKey(DoubleCountingAgreement, on_delete=models.CASCADE, related_name='file')
+ 
+    class Meta:
+        db_table = 'double_counting_doc_files'
+        verbose_name = 'Fichier Double Compte'
+        verbose_name_plural = 'Fichiers Double Compte'

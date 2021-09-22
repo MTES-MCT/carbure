@@ -19,6 +19,7 @@ urlpatterns = [
 
 
     path('upload', views.upload_file, name='api-v3-doublecount-upload-file'),
+    path('upload-documentation', views.upload_documentation, name='api-v3-doublecount-upload-doc'),
     path('approve', views.approve_dca, name='api-v3-doublecount-approve-dca'),
     path('reject', views.reject_dca, name='api-v3-doublecount-reject-dca'),
 ]

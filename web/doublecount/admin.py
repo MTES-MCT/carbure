@@ -2,7 +2,7 @@
 # allows a manual user creation by an admin, without setting a password
 
 from django.contrib import admin
-from .models import DoubleCountingAgreement, DoubleCountingSourcing, DoubleCountingProduction
+from .models import DoubleCountingAgreement, DoubleCountingDocFile, DoubleCountingSourcing, DoubleCountingProduction
 
 @admin.register(DoubleCountingAgreement)
 class DoubleCountingAgreementAdmin(admin.ModelAdmin):
@@ -18,4 +18,8 @@ class DoubleCountingSourcingAdmin(admin.ModelAdmin):
 class DoubleCountingProductionAdmin(admin.ModelAdmin):
     list_display = ('dca', 'year', 'biofuel', 'feedstock', 'max_production_capacity', 'estimated_production', 'requested_quota', 'approved_quota')
     list_filter = ('year', 'biofuel', 'feedstock')
+    
+@admin.register(DoubleCountingDocFile)
+class DoubleCountingDocFileAdmin(admin.ModelAdmin):
+    list_display = ('dca', 'url')
     

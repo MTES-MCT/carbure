@@ -14,9 +14,11 @@ class Entity(models.Model):
     TRADER = 'Trader'
     ADMIN = 'Administration'
     AUDITOR = 'Auditor'
+    EXTERNAL_ADMIN = 'Administration Externe'
     ENTITY_TYPES = ((PRODUCER, 'Producteur'), (OPERATOR, 'Opérateur'),
                     (ADMIN, 'Administration'), (TRADER, 'Trader'),
-                    (AUDITOR, 'Auditeur'), ('Unknown', 'Unknown'))
+                    (AUDITOR, 'Auditeur'), (EXTERNAL_ADMIN, EXTERNAL_ADMIN),
+                    ('Unknown', 'Unknown'))
 
     name = models.CharField(max_length=64, unique=True)
     date_added = models.DateTimeField(auto_now_add=True)
@@ -39,10 +41,13 @@ class Entity(models.Model):
         return self.name
 
     def natural_key(self):
-        return {'name': self.name, 'id': self.id, 'entity_type': self.entity_type, 'has_mac': self.has_mac, 'has_trading': self.has_trading,
+        d = {'name': self.name, 'id': self.id, 'entity_type': self.entity_type, 'has_mac': self.has_mac, 'has_trading': self.has_trading,
             'legal_name': self.legal_name, 'registration_id': self.registration_id,
             'sustainability_officer': self.sustainability_officer, 'sustainability_officer_phone_number': self.sustainability_officer_phone_number,
             'registered_address': self.registered_address, 'default_certificate': self.default_certificate}
+        if self.entity_type == Entity.EXTERNAL_ADMIN:
+            d['ext_admin_pages'] = [e.right for e in self.externaladminrights_set.all()]
+        return d
 
     def url_friendly_name(self):
         return self.name.replace(' ', '').upper()
@@ -721,3 +726,17 @@ class TransactionDistance(models.Model):
         db_table = 'transaction_distances'
         verbose_name = 'Distance'
         verbose_name_plural = 'Distances'
+
+class ExternalAdminRights(models.Model):
+    DOUBLE_COUNTING_AGREEMENT = "DCA"
+    CUSTOM_STATS_AGRIMER = "AGRIMER"
+    TIRIB_STATS = "TIRIB"
+
+    RIGHTS = ((DOUBLE_COUNTING_AGREEMENT, DOUBLE_COUNTING_AGREEMENT), (CUSTOM_STATS_AGRIMER, CUSTOM_STATS_AGRIMER), (TIRIB_STATS, TIRIB_STATS))
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
+    right = models.CharField(max_length=32, choices=RIGHTS, default='', blank=False, null=False)
+
+    class Meta:
+        db_table = 'ext_admin_rights'
+        verbose_name = 'External Admin Right'
+        verbose_name_plural = 'External Admin Rights'
