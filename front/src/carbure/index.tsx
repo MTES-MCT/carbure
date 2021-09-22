@@ -1,8 +1,8 @@
 import { Trans, useTranslation } from "react-i18next"
 
 import { AppHook, useApp } from "./hooks/use-app"
-import { EntityType, LotStatus } from "common/types"
-import useEntity from "./hooks/use-entity"
+import { EntityType, LotStatus, ExternalAdminPages } from "common/types"
+import useEntity, { EntityContext, EntitySelection, hasPage } from "./hooks/use-entity"
 import { UserRightProvider } from "./hooks/use-rights"
 
 import { Redirect, Route, Switch } from "common/components/relative-route"
@@ -18,6 +18,7 @@ import Transactions from "transactions"
 import Stocks from "stocks"
 import Settings from "settings"
 import Account from "account"
+import DoubleCounting from 'doublecount'
 import Entities from "../entities" // not using relative path prevents import
 import EntityDetails from "../entities/routes/entity-details"
 import Dashboard from "dashboard"
@@ -62,58 +63,67 @@ const Org = ({ app }: { app: AppHook }) => {
   }
 
   const isAdmin = entity?.entity_type === EntityType.Administration
+  const isExternalAdmin = entity?.entity_type === EntityType.ExternalAdmin
   const isAuditor = entity?.entity_type === EntityType.Auditor
 
   return (
     <UserRightProvider app={app}>
-      <Switch>
-        <Route relative exact path="stocks">
-          <Redirect relative to="in" />
-        </Route>
-
-        <Route relative path="stocks/:status">
-          <Stocks entity={entity} />
-        </Route>
-
-        <Route relative exact path="transactions">
-          <Redirect
-            relative
-            to={isAdmin || isAuditor ? LotStatus.Alert : LotStatus.Draft}
-          />
-        </Route>
-
-        <Route relative path="transactions/:status">
-          <Transactions entity={entity} />
-        </Route>
-
-        <Route relative path="settings">
-          <Settings entity={entity} settings={app.settings} />
-        </Route>
-
-        <Route relative path="registry">
-          <Registry />
-        </Route>
-
-        {isAdmin && (
-          <Route relative path="dashboard">
-            <Dashboard />
+      <EntityContext.Provider value={entity}>
+        <Switch>
+          <Route relative exact path="stocks">
+            <Redirect relative to="in" />
           </Route>
-        )}
 
-        {isAdmin && (
-          <Route relative path="entities/:id">
-            <EntityDetails />
+          <Route relative path="stocks/:status">
+            <Stocks entity={entity} />
           </Route>
-        )}
 
-        {isAdmin && (
-          <Route relative path="entities">
-            <Entities />
+          <Route relative exact path="transactions">
+            <Redirect
+              relative
+              to={isAdmin || isAuditor ? LotStatus.Alert : LotStatus.Draft}
+            />
           </Route>
-        )}
 
-        <Redirect relative to={isAdmin ? "dashboard" : "transactions"} />
-      </Switch>
+          <Route relative path="transactions/:status">
+            <Transactions entity={entity} />
+          </Route>
+
+          <Route relative path="settings">
+            <Settings entity={entity} settings={app.settings} />
+          </Route>
+
+          <Route relative path="registry">
+            <Registry />
+          </Route>
+
+          {isAdmin && (
+            <Route relative path="dashboard">
+              <Dashboard />
+            </Route>
+          )}
+
+          {isAdmin && (
+            <Route relative path="entities/:id">
+              <EntityDetails />
+            </Route>
+          )}
+
+          {isAdmin && (
+            <Route relative path="entities">
+              <Entities />
+            </Route>
+          )}
+
+          {(isAdmin || hasPage(entity, ExternalAdminPages.DoubleCounting)) && (
+            <Route relative path="double-counting">
+              <DoubleCounting />
+            </Route>
+          )}
+
+          <Redirect relative to={isAdmin ? "dashboard" : isExternalAdmin ? "double-counting" : "transactions"} />
+        </Switch>
+      </EntityContext.Provider>
     </UserRightProvider>
   )
 }

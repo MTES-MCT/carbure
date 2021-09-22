@@ -4,7 +4,7 @@ import { AlertTriangle } from "common/components/icons"
 import { LabelInput } from "common/components/input"
 import Tabs from "common/components/tabs"
 import useAPI from "common/hooks/use-api"
-import { Fragment, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { SettingsBody, SettingsHeader } from "settings/components/common"
 
@@ -15,6 +15,8 @@ import {
   EntityFactoriesList,
   EntityUsersList,
 } from "./components/entity-list"
+
+
 
 const Entities = () => {
   const { t } = useTranslation()
@@ -33,7 +35,7 @@ const Entities = () => {
     { key: "users", label: t("Utilisateurs") },
   ]
 
-  const isEmpty = entities.data ? entities.data.length === 0 : true
+  const entityList = entities.data ?? []
 
   return (
     <Main>
@@ -51,29 +53,19 @@ const Entities = () => {
 
         <Tabs tabs={entityTabs} focus={tab} onFocus={setTab} />
 
-        {isEmpty && (
-          <Alert icon={AlertTriangle} level="warning">
-            Aucune société trouvée pour cette recherche.
-          </Alert>
+        {tab === "factories" && (
+          <EntityFactoriesList entities={entityList} />
         )}
 
-        {!isEmpty && (
-          <Fragment>
-            {tab === "factories" && (
-              <EntityFactoriesList entities={entities.data!} />
-            )}
-
-            {tab === "doublecounting" && (
-              <EntityDoubleCountingList entities={entities.data!} />
-            )}
-
-            {tab === "certificates" && (
-              <EntityCertificatesList entities={entities.data!} />
-            )}
-
-            {tab === "users" && <EntityUsersList entities={entities.data!} />}
-          </Fragment>
+        {tab === "doublecounting" && (
+          <EntityDoubleCountingList entities={entityList} />
         )}
+
+        {tab === "certificates" && (
+          <EntityCertificatesList entities={entityList} />
+        )}
+
+        {tab === "users" && <EntityUsersList entities={entityList} />}
 
         {entities.loading && <LoaderOverlay />}
       </SettingsBody>

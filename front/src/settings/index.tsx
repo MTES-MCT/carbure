@@ -72,6 +72,8 @@ const Settings = ({ entity, settings }: SettingsProps) => {
 
   const hasCertificates = isProducer || isTrader
   const hasCSN = isProducer || isOperator
+  const hasDepot = isProducer || isOperator || isTrader
+  const hasOptions = isProducer || isOperator || isTrader
 
   return (
     <Main>
@@ -80,12 +82,12 @@ const Settings = ({ entity, settings }: SettingsProps) => {
       </SettingsHeader>
 
       <Sticky>
-        {!isAuditor && (
+        {hasOptions && (
           <a href="#options">
             <Trans>Options</Trans>
           </a>
         )}
-        {!isAuditor && (
+        {hasDepot && (
           <a href="#depot">
             <Trans>Dépôts</Trans>
           </a>
@@ -128,8 +130,8 @@ const Settings = ({ entity, settings }: SettingsProps) => {
       </Sticky>
 
       <SettingsBody>
-        {!isAuditor && <CompanySettings entity={entity} settings={company} />}
-        {!isAuditor && <DeliverySitesSettings settings={deliverySites} />}
+        {hasOptions && <CompanySettings entity={entity} settings={company} />}
+        {hasDepot && <DeliverySitesSettings settings={deliverySites} />}
 
         {isProducer && <ProductionSitesSettings settings={productionSites} />}
 

@@ -2,8 +2,9 @@ import React from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { useLocation } from "react-router-dom"
 
-import useEntity, { EntitySelection } from "carbure/hooks/use-entity"
+import useEntity, { EntitySelection, hasPage } from "carbure/hooks/use-entity"
 
+import { EntityType, ExternalAdminPages } from 'common/types'
 import Menu from "common/components/menu"
 import { Link, NavLink, Route } from "common/components/relative-route"
 import { ChevronRight, Question } from "common/components/icons"
@@ -118,11 +119,15 @@ const LanguageSelection = () => {
 }
 
 function canTrade(entity: EntitySelection) {
-  return entity && (entity.has_trading || entity.entity_type === "Trader")
+  return entity && (entity.has_trading || entity.entity_type === EntityType.Trader)
 }
 
 function isAdmin(entity: EntitySelection) {
-  return entity && entity.entity_type === "Administration"
+  return entity && entity.entity_type === EntityType.Administration
+}
+
+function isExternal(entity: EntitySelection) {
+  return entity && entity.entity_type === EntityType.ExternalAdmin
 }
 
 export const PublicTopbar = () => {
@@ -205,9 +210,11 @@ export const PrivateTopbar = ({ entity, app }: PrivateTopbarProps) => {
               </PageLink>
             )}
 
-            <PageLink to="transactions">
-              <Trans>Transactions</Trans>
-            </PageLink>
+            {!isExternal(entity) && (
+              <PageLink to="transactions">
+                <Trans>Transactions</Trans>
+              </PageLink>
+            )}
 
             {isAdmin(entity) && (
               <React.Fragment>
@@ -217,7 +224,19 @@ export const PrivateTopbar = ({ entity, app }: PrivateTopbarProps) => {
               </React.Fragment>
             )}
 
-            {!isAdmin(entity) && (
+            {(isAdmin(entity) || hasPage(entity, ExternalAdminPages.DoubleCounting)) && (
+              <PageLink to="double-counting">
+                <Trans>Double comptage</Trans>
+              </PageLink>
+            )}
+
+            {isExternal(entity) && (
+              <PageLink to="settings">
+                <Trans>Options</Trans>
+              </PageLink>
+            )}
+
+            {!isAdmin(entity) && !isExternal(entity) && (
               <React.Fragment>
                 <PageLink to="settings">
                   <Trans>Société</Trans>
