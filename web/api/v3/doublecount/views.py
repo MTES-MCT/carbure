@@ -4,13 +4,14 @@ import unicodedata
 import xlsxwriter
 from django.http import JsonResponse, HttpResponse
 from core.decorators import check_rights, is_admin, is_admin_or_external_admin
+import pytz
 
 from producers.models import ProductionSite
 from doublecount.models import DoubleCountingAgreement, DoubleCountingDocFile, DoubleCountingSourcing, DoubleCountingProduction
 from doublecount.serializers import DoubleCountingAgreementFullSerializer, DoubleCountingAgreementPartialSerializer
 from doublecount.serializers import DoubleCountingAgreementFullSerializerWithForeignKeys, DoubleCountingAgreementPartialSerializerWithForeignKeys
 from doublecount.helpers import load_dc_file, load_dc_sourcing_data, load_dc_production_data
-from core.models import UserRights, MatierePremiere, Pays, Biocarburant
+from core.models import Entity, UserRights, MatierePremiere, Pays, Biocarburant
 from core.xlsx_v3 import make_biofuels_sheet, make_dc_mps_sheet, make_countries_sheet, make_dc_production_sheet, make_dc_sourcing_sheet
 from carbure.storage_backends import AWSStorage
 
@@ -60,20 +61,16 @@ def get_agreement(request, *args, **kwargs):
 
 @is_admin
 def get_agreement_admin(request, *args, **kwargs):
-    entity_id = request.GET.get('entity_id', None)
     agreement_id = request.GET.get('dca_id', None)
 
-    if not entity_id:
-        return JsonResponse({'status': 'error', 'message': 'Missing entity_id'}, status=400)
     if not agreement_id:
         return JsonResponse({'status': 'error', 'message': 'Missing dca_id'}, status=400)
     try:
-        agreement = DoubleCountingAgreement.objects.filter(producer_id=entity_id, id=agreement_id)
+        agreement = DoubleCountingAgreement.objects.get(id=agreement_id)
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not find DCA agreement'}, status=400)
     serializer = DoubleCountingAgreementFullSerializerWithForeignKeys(agreement)
     return JsonResponse({'status': 'success', 'data': serializer.data})
-
 
 
 @check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
@@ -176,11 +173,74 @@ def get_template(request):
         response['Content-Disposition'] = 'attachment; filename="carbure_template_DC.xlsx"'
         return response
 
-def approve_dca(request):
-    return JsonResponse({'status': 'error', 'message': 'not implemented'}, status=400)
+@check_rights('validator_entity_id', role=[UserRights.ADMIN, UserRights.RW])
+def approve_dca(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    dca_id = request.POST.get('dca_id', False)
+    if not dca_id:
+        return JsonResponse({'status': "error", 'message': "Missing dca_id"}, status=400)
 
-def reject_dca(request):
-    return JsonResponse({'status': 'error', 'message': 'not implemented'}, status=400)
+    if entity.entity_type not in [Entity.ADMIN, Entity.EXTERNAL_ADMIN]:
+        return JsonResponse({'status': "error", 'message': "Not authorised"}, status=403)
+
+    try:
+        dca = DoubleCountingAgreement.objects.get(id=dca_id)
+    except:
+        return JsonResponse({'status': "error", 'message': "Could not find DCA"}, status=400)
+
+    if entity.name == 'DGPE':
+        dca.dgpe_validated = True
+        dca.dgpe_validator = request.user
+        dca.dgpe_validated_dt = pytz.utc.localize(datetime.datetime.now())
+    elif entity.name == 'DGDDI':
+        dca.dgddi_validated = True
+        dca.dgddi_validator = request.user
+        dca.dgddi_validated_dt = pytz.utc.localize(datetime.datetime.now())
+    elif entity.entity_type == Entity.ADMIN:
+        dca.dgec_validated = True
+        dca.dgec_validator = request.user
+        dca.dgec_validated_dt = pytz.utc.localize(datetime.datetime.now())
+    else:
+        return JsonResponse({'status': "error", 'message': "Unknown entity"}, status=400)
+    if dca.dgpe_validated and dca.dgddi_validated and dca.dgec_validated:
+        dca.status = DoubleCountingAgreement.ACCEPTED
+    dca.save()
+    return JsonResponse({'status': 'success'})
+
+@check_rights('validator_entity_id', role=[UserRights.ADMIN, UserRights.RW])
+def reject_dca(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    dca_id = request.POST.get('dca_id', False)
+    if not dca_id:
+        return JsonResponse({'status': "error", 'message': "Missing dca_id"}, status=400)
+
+    if entity.entity_type not in [Entity.ADMIN, Entity.EXTERNAL_ADMIN]:
+        return JsonResponse({'status': "error", 'message': "Not authorised"}, status=403)
+
+    try:
+        dca = DoubleCountingAgreement.objects.get(id=dca_id)
+    except:
+        return JsonResponse({'status': "error", 'message': "Could not find DCA"}, status=400)
+
+    if entity.name == 'DGPE':
+        dca.dgpe_validated = False
+        dca.dgpe_validator = request.user
+        dca.dgpe_validated_dt = pytz.utc.localize(datetime.datetime.now())
+    elif entity.name == 'DGDDI':
+        dca.dgddi_validated = False
+        dca.dgddi_validator = request.user
+        dca.dgddi_validated_dt = pytz.utc.localize(datetime.datetime.now())
+    elif entity.entity_type == Entity.ADMIN:
+        dca.dgec_validated = False
+        dca.dgec_validator = request.user
+        dca.dgec_validated_dt = pytz.utc.localize(datetime.datetime.now())
+    else:
+        return JsonResponse({'status': "error", 'message': "Unknown entity"}, status=400)
+    dca.status = DoubleCountingAgreement.REJECTED
+    dca.save()
+    return JsonResponse({'status': 'success'})
 
 
 @check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])

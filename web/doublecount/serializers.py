@@ -1,6 +1,11 @@
 from rest_framework import serializers
 from .models import DoubleCountingAgreement, DoubleCountingProduction, DoubleCountingSourcing
-from core.models import MatierePremiere, Biocarburant, Pays
+from core.models import Entity, MatierePremiere, Biocarburant, Pays
+
+class EntitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Entity
+        fields = ['id', 'name', 'entity_type']
 
 class FeedStockSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,6 +47,7 @@ class DoubleCountingAgreementFullSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='name'
     )
+    producer = EntitySerializer(read_only=True)
 
     class Meta:
         model = DoubleCountingAgreement
@@ -55,6 +61,7 @@ class DoubleCountingAgreementFullSerializerWithForeignKeys(serializers.ModelSeri
     )
     sourcing = DoubleCountingSourcingSerializer(many=True, read_only=True)
     production = DoubleCountingProductionSerializer(many=True, read_only=True)
+    producer = EntitySerializer(read_only=True)
 
     class Meta:
         model = DoubleCountingAgreement
