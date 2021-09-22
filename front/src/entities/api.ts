@@ -16,8 +16,12 @@ export interface EntityDetails {
   requests: number
   depots: number
   production_sites: number
-  certificates: number
+  iscc: number
+  dbs: number
+  redcert: number
+  sn: number
   double_counting: number
+  double_counting_requests: number
 }
 
 export function getEntities(
