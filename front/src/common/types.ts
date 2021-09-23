@@ -592,4 +592,5 @@ export interface DoubleCountingProduction {
 export interface DoubleCountingDetails extends DoubleCounting {
   sourcing: DoubleCountingSourcing[]
   production: DoubleCountingProduction[]
+  documents: { id: number, url: string }[]
 }

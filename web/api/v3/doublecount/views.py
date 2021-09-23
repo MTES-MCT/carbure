@@ -1,6 +1,7 @@
 import datetime
 import os
 import unicodedata
+import boto3
 import xlsxwriter
 from django.http import JsonResponse, HttpResponse
 from core.decorators import check_rights, is_admin, is_admin_or_external_admin
@@ -112,7 +113,7 @@ def upload_file(request, *args, **kwargs):
     try:
         load_dc_sourcing_data(dca, sourcing_data)
         load_dc_production_data(dca, production_data)
-        return JsonResponse({'status': 'success'})
+        return JsonResponse({'status': 'success', 'data': {'dca_id': dca.id}})
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "File parsing error"}, status=400)
 
@@ -121,23 +122,17 @@ def upload_file(request, *args, **kwargs):
 def upload_documentation(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
-    production_site_id = request.POST.get('production_site_id', None)
-    year = request.POST.get('year', None)
-    if not production_site_id:
-        return JsonResponse({'status': "error", 'message': "Missing production_site_id"}, status=400)
-    if not year:
-        return JsonResponse({'status': "error", 'message': "Missing year"}, status=400)
-    start = datetime.date(int(year), 1, 1)
-    dca, created = DoubleCountingAgreement.objects.get_or_create(producer=entity, production_site_id=production_site_id, period_start=start)
+    dca_id = request.POST.get('dca_id', None)
+    if not dca_id:
+        return JsonResponse({'status': "error", 'message': "Missing dca_id"}, status=400)
+    try:
+        dca = DoubleCountingAgreement.objects.get(producer=entity, id=dca_id)
+    except:
+        return JsonResponse({'status': "forbidden", 'message': "Forbidden"}, status=403)
 
     file_obj = request.FILES.get('file')
     if file_obj is None:
         return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
-
-    if not ProductionSite.objects.filter(producer=entity, id=production_site_id).exists():
-        return JsonResponse({'status': "error", 'message': "Production site not found"}, status=400)
-
-    
 
     # organize a path for the file in bucket
     file_directory_within_bucket = '{year}/{entity}'.format(year=dca.period_start.year, entity=entity.name)
@@ -149,7 +144,7 @@ def upload_documentation(request, *args, **kwargs):
         filename
     )
 
-    if os.env('TEST', False) == '1':
+    if 'TEST' in os.environ and os.environ['TEST'] == '1':
         media_storage = FileSystemStorage('/tmp')
     else:
         media_storage = AWSStorage()
@@ -158,9 +153,43 @@ def upload_documentation(request, *args, **kwargs):
     dcf = DoubleCountingDocFile()
     dcf.dca = dca
     dcf.url = file_url
+    dcf.file_name = filename
+    dcf.link_expiry_dt = pytz.utc.localize(datetime.datetime.now() + datetime.timedelta(seconds=3600))
     dcf.save()
     return JsonResponse({'status': 'success'})
 
+
+@check_rights('entity_id')
+def download_documentation(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    dca_id = request.GET.get('dca_id', None)
+    if not dca_id:
+        return JsonResponse({'status': "error", 'message': "Missing dca_id"}, status=400)
+    try:
+        dca = DoubleCountingAgreement.objects.get(producer=entity, id=dca_id)
+    except:
+        return JsonResponse({'status': "forbidden", 'message': "Forbidden"}, status=403)
+
+    file_id = request.GET.get('file_id', None)
+    if not file_id:
+        return JsonResponse({'status': "error", 'message': "Missing file_id"}, status=400)
+    try:
+        f = DoubleCountingDocFile.objects.get(id=file_id, dca=dca)
+    except:
+        return JsonResponse({'status': "forbidden", 'message': "Forbidden"}, status=403)
+
+    s3 = boto3.client('s3', aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'], aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'], region_name=os.environ['AWS_S3_REGION_NAME'], endpoint_url=os.environ['AWS_S3_ENDPOINT_URL'], use_ssl=os.environ['AWS_S3_USE_SSL'])
+    filepath = '/tmp/%s' % (f.file_name)
+    s3filepath = '{year}/{entity}/{filename}'.format(year=dca.period_start.year, entity=entity.name, filename=f.file_name)
+    with open(filepath, 'wb') as file:
+        s3.download_fileobj(os.environ['AWS_DCDOCS_STORAGE_BUCKET_NAME'], s3filepath, file)
+    with open(filepath, "rb") as file:
+        data = file.read()
+        ctype = "application/force-download"
+        response = HttpResponse(content=data, content_type=ctype)
+        response['Content-Disposition'] = 'attachment; filename="%s"' % (f.file_name)
+    return response
 
 def get_template(request):
     location = '/tmp/carbure_template_DC.xlsx'

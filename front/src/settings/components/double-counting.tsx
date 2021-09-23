@@ -90,22 +90,20 @@ const DoubleCountingUploadPrompt = ({
 }: DoubleCountingUploadPromptProps) => {
   const { t } = useTranslation()
 
-  const [productionSite, setProductionSite] = useState<ProductionSite | null>(
-    null
-  )
-
-  const [doubleCountingFile, setDoubleCountingFile] = useState<File | null>(
-    null
-  )
+  const [productionSite, setProductionSite] = useState<ProductionSite | null>(null) // prettier-ignore
+  const [doubleCountingFile, setDoubleCountingFile] = useState<File | null>(null) // prettier-ignore
+  const [documentationFile, setDocumentationFile] = useState<File | null>(null) // prettier-ignore
 
   const [uploading, uploadFile] = useAPI(api.uploadDoubleCountingFile)
+  const [uploadingDoc, uploadDocFile] = useAPI(api.uploadDoubleCountingDescriptionFile)
 
-  const disabled = !productionSite || !doubleCountingFile
+  const disabled = !productionSite || !doubleCountingFile || !documentationFile
 
   async function submitAgreement() {
-    if (!entity || !productionSite || !doubleCountingFile) return
+    if (!entity || !productionSite || !doubleCountingFile || !documentationFile) return
 
-    await uploadFile(entity.id, productionSite.id, doubleCountingFile)
+    const res = await uploadFile(entity.id, productionSite.id, doubleCountingFile)
+    res && await uploadDocFile(entity.id, res.dca_id, documentationFile)
 
     onResolve()
   }
@@ -167,9 +165,35 @@ const DoubleCountingUploadPrompt = ({
           />
         </Button>
 
+        <div className={styles.settingsText}>
+          <Trans>
+            Finalement, veuillez importer un fichier texte contenant la 
+            description de vos méthodes d'approvisionnement et de production 
+            ayant trait au double comptage.
+          </Trans>
+        </div>
+
+        <Button
+          as="label"
+          level={documentationFile ? "success" : "primary"}
+          icon={documentationFile ? Check : Upload}
+          className={styles.settingsFormButton}
+        >
+          {documentationFile ? (
+            documentationFile.name
+          ) : (
+            <Trans>Importer la description</Trans>
+          )}
+          <input
+            type="file"
+            className={styles.importFileInput}
+            onChange={(e) => setDocumentationFile(e!.target.files![0])}
+          />
+        </Button>
+
         <DialogButtons>
           <AsyncButton
-            loading={uploading.loading}
+            loading={uploading.loading || uploadingDoc.loading}
             disabled={disabled}
             level="primary"
             icon={Check}
@@ -666,6 +690,8 @@ const DoubleCountingPrompt = ({
     },
   }))
 
+  const documentationURL = entity && agreement.data && agreement.data.documents[0] && `/api/v3/doublecount/download-documentation?entity_id=${entity.id}&dca_id=${agreement.data.id}&file_id=${agreement.data.documents[0].id}`
+
   return (
     <Dialog wide onResolve={onResolve} className={styles.settingsPrompt}>
       <Box row>
@@ -731,6 +757,18 @@ const DoubleCountingPrompt = ({
       )}
 
       <DialogButtons>
+        <a 
+          href={documentationURL ?? '#'} 
+          target="_blank" 
+          rel="noreferrer"
+          className={styles.settingsBottomLink} 
+        >
+          <Upload />
+          <Trans>
+            Télécharger la description de l'activité
+          </Trans>
+        </a>
+
         <Button icon={Return} onClick={() => onResolve()}>
           <Trans>Retour</Trans>
         </Button>
