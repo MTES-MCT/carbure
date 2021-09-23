@@ -16,6 +16,10 @@ export function getDoubleCountingAgreement(dca_id: number) {
   return api.get<DoubleCountingDetails>('/doublecount/admin/agreement', { dca_id })
 }
 
+export function approveDoubleCountingQuotas(dca_id: number, approved_quotas: number[][]) {
+  return api.post('/doublecount/admin/agreement/update-approved-quotas', { dca_id, approved_quotas: JSON.stringify(approved_quotas)})
+}
+
 export function approveDoubleCountingAgreement(
   validator_entity_id: number | undefined,
   dca_id: number

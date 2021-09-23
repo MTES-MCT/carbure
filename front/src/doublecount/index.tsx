@@ -1,19 +1,16 @@
 import { useEffect } from 'react'
-import * as api from './api'
 import { Main } from 'common/components'
-import useAPI from 'common/hooks/use-api'
+import { EntitySelection } from 'carbure/hooks/use-entity'
 import AgreementList from './components/agreement-list'
 
-const DoubleCounting = () => {
-  const [agreements, getAgreements] = useAPI(api.getAllDoubleCountingAgreements)
-  
-  useEffect(() => {
-    getAgreements()
-  }, [getAgreements])
+type DoubleCountingProps = {
+  entity: EntitySelection
+}
 
+const DoubleCounting = ({ entity }: DoubleCountingProps) => {
   return (
     <Main>
-      <AgreementList agreements={agreements.data} />
+      <AgreementList entity={entity} />
     </Main>
   )
 }

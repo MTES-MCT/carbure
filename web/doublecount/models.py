@@ -69,7 +69,7 @@ class DoubleCountingProduction(models.Model):
     max_production_capacity = models.IntegerField(blank=False, null=False, default=0)
     estimated_production = models.IntegerField(blank=False, null=False, default=0)
     requested_quota = models.IntegerField(blank=False, null=False, default=0)
-    approved_quota = models.IntegerField(blank=False, null=False, default=0)
+    approved_quota = models.IntegerField(blank=False, null=False, default=-1)
 
     class Meta:
         db_table = 'double_counting_production'

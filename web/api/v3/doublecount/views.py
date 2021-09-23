@@ -1,11 +1,19 @@
 import datetime
+from email import message
 import os
+import traceback
 import unicodedata
 import boto3
+from django.conf import settings
+from django.core.mail import send_mail
+from django.core.mail import EmailMessage
+import json
+
 import xlsxwriter
 from django.http import JsonResponse, HttpResponse
 from core.decorators import check_rights, is_admin, is_admin_or_external_admin
 import pytz
+import traceback
 
 from producers.models import ProductionSite
 from doublecount.models import DoubleCountingAgreement, DoubleCountingDocFile, DoubleCountingSourcing, DoubleCountingProduction
@@ -74,6 +82,60 @@ def get_agreement_admin(request, *args, **kwargs):
     serializer = DoubleCountingAgreementFullSerializerWithForeignKeys(agreement)
     return JsonResponse({'status': 'success', 'data': serializer.data})
 
+def send_dca_confirmation_email(dca):
+    text_message = """ 
+    Bonjour,
+
+    Nous vous confirmons la réception de votre dossier de demande d'agrément au double-comptage.
+
+    Bonne journée,
+    L'équipe CarbuRe
+    """
+    email_subject = 'Carbure - Dossier Double Comptage'
+    cc = None
+    if os.getenv('IMAGE_TAG', 'dev') != 'prod':
+        # send only to staff / superuser
+        recipients = ['carbure@beta.gouv.fr']
+    else:
+        # PROD
+        recipients = [r.user.email for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])]
+        cc = "carbure@beta.gouv.fr" 
+
+    email = EmailMessage(subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
+    email.send(fail_silently=False)
+
+def send_dca_status_email(dca):
+    if dca.status == DoubleCountingAgreement.ACCEPTED:
+        text_message = """ 
+        Bonjour,
+
+        Votre dossier de demande d'agrément au double-comptage pour le site de production %s a été accepté.
+
+        Bonne journée,
+        L'équipe CarbuRe
+        """ % (dca.production_site.name)
+    if dca.status == DoubleCountingAgreement.REJECTED:
+        text_message = """ 
+        Bonjour,
+
+        Votre dossier de demande d'agrément au double-comptage pour le site de production %s a été accepté.
+
+        Bonne journée,
+        L'équipe CarbuRe
+        """  % (dca.production_site.name)
+    
+    email_subject = 'Carbure - Dossier Double Comptage'
+    cc = None
+    if os.getenv('IMAGE_TAG', 'dev') != 'prod':
+        # send only to staff / superuser
+        recipients = ['carbure@beta.gouv.fr']
+    else:
+        # PROD
+        recipients = [r.user.email for r in UserRights.objects.filter(entity=dca.producer, user__is_staff=False, user__is_superuser=False).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])]
+        cc = "carbure@beta.gouv.fr" 
+    email = EmailMessage(subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
+    email.send(fail_silently=False)
+
 
 @check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def upload_file(request, *args, **kwargs):
@@ -113,6 +175,12 @@ def upload_file(request, *args, **kwargs):
     try:
         load_dc_sourcing_data(dca, sourcing_data)
         load_dc_production_data(dca, production_data)
+        # send confirmation email
+        try:
+            send_dca_confirmation_email(dca)
+        except:
+            print('email send error')
+            traceback.print_exc()
         return JsonResponse({'status': 'success', 'data': {'dca_id': dca.id}})
     except Exception as e:
         return JsonResponse({'status': "error", 'message': "File parsing error"}, status=400)
@@ -191,6 +259,35 @@ def download_documentation(request, *args, **kwargs):
         response['Content-Disposition'] = 'attachment; filename="%s"' % (f.file_name)
     return response
 
+@is_admin_or_external_admin
+def admin_download_documentation(request, *args, **kwargs):
+    dca_id = request.GET.get('dca_id', None)
+    if not dca_id:
+        return JsonResponse({'status': "error", 'message': "Missing dca_id"}, status=400)
+    try:
+        dca = DoubleCountingAgreement.objects.get(id=dca_id)
+    except:
+        return JsonResponse({'status': "forbidden", 'message': "Forbidden"}, status=403)
+
+    file_id = request.GET.get('file_id', None)
+    if not file_id:
+        return JsonResponse({'status': "error", 'message': "Missing file_id"}, status=400)
+    try:
+        f = DoubleCountingDocFile.objects.get(id=file_id, dca=dca)
+    except:
+        return JsonResponse({'status': "forbidden", 'message': "Forbidden"}, status=403)
+    s3 = boto3.client('s3', aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'], aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'], region_name=os.environ['AWS_S3_REGION_NAME'], endpoint_url=os.environ['AWS_S3_ENDPOINT_URL'], use_ssl=os.environ['AWS_S3_USE_SSL'])
+    filepath = '/tmp/%s' % (f.file_name)
+    s3filepath = '{year}/{entity}/{filename}'.format(year=dca.period_start.year, entity=dca.producer.name, filename=f.file_name)
+    with open(filepath, 'wb') as file:
+        s3.download_fileobj(os.environ['AWS_DCDOCS_STORAGE_BUCKET_NAME'], s3filepath, file)
+    with open(filepath, "rb") as file:
+        data = file.read()
+        ctype = "application/force-download"
+        response = HttpResponse(content=data, content_type=ctype)
+        response['Content-Disposition'] = 'attachment; filename="%s"' % (f.file_name)
+    return response
+
 def get_template(request):
     location = '/tmp/carbure_template_DC.xlsx'
     workbook = xlsxwriter.Workbook(location)
@@ -238,6 +335,7 @@ def approve_dca(request, *args, **kwargs):
         return JsonResponse({'status': "error", 'message': "Unknown entity"}, status=400)
     if dca.dgpe_validated and dca.dgddi_validated and dca.dgec_validated:
         dca.status = DoubleCountingAgreement.ACCEPTED
+        send_dca_status_email(dca)
     dca.save()
     return JsonResponse({'status': 'success'})
 
@@ -272,6 +370,7 @@ def reject_dca(request, *args, **kwargs):
     else:
         return JsonResponse({'status': "error", 'message': "Unknown entity"}, status=400)
     dca.status = DoubleCountingAgreement.REJECTED
+    send_dca_status_email(dca)
     dca.save()
     return JsonResponse({'status': 'success'})
 
@@ -492,4 +591,20 @@ def update_production(request, *args, **kwargs):
         to_update.save()
     except:
         return JsonResponse({'status': "error", 'message': "Could not update Production line"}, status=400)
+    return JsonResponse({'status': "success"})
+
+
+@is_admin
+def admin_update_approved_quotas(request):
+    approved_quotas = request.POST.get('approved_quotas', False)
+    if not approved_quotas:
+        return JsonResponse({'status': "error", 'message': "Missing approved_quotas POST parameter"}, status=400)
+    unpacked = json.loads(approved_quotas)
+    for (dca_production_id, approved_quota) in unpacked:
+        try:
+            to_update = DoubleCountingProduction.objects.get(id=dca_production_id)
+            to_update.approved_quota = approved_quota
+            to_update.save()
+        except:
+            return JsonResponse({'status': "error", 'message': "Could not find Production Line"}, status=400)
     return JsonResponse({'status': "success"})
