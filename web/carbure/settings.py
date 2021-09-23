@@ -18,7 +18,8 @@ import environ
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False),
-    TEST=(bool, False)
+    TEST=(bool, False),
+    AWS_DCDOCS_STORAGE_BUCKET_NAME=(str, '')
 )
 
 # False if not in os.environ
@@ -172,7 +173,7 @@ else:
 
 # file storage
 DEFAULT_FILE_STORAGE = 'carbure.storage_backends.MediaStorage'
-AWS_DCDOCS_STORAGE_BUCKET_NAME = env('AWS_DCDOCS_STORAGE_BUCKET_NAME', '')
+AWS_DCDOCS_STORAGE_BUCKET_NAME = env('AWS_DCDOCS_STORAGE_BUCKET_NAME')
 if env('TEST') is False:
     AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
     AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
