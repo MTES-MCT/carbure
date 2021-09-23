@@ -117,7 +117,7 @@ const Org = ({ app }: { app: AppHook }) => {
 
           {(isAdmin || hasPage(entity, ExternalAdminPages.DoubleCounting)) && (
             <Route relative path="double-counting">
-              <DoubleCounting />
+              <DoubleCounting entity={entity} />
             </Route>
           )}
 

@@ -1,3 +1,6 @@
+from os import read
+from django.db.models.fields import related_descriptors
+from numpy.lib.twodim_base import triu_indices_from
 from rest_framework import serializers
 from .models import DoubleCountingAgreement, DoubleCountingProduction, DoubleCountingSourcing, DoubleCountingDocFile
 from core.models import Entity, MatierePremiere, Biocarburant, Pays
@@ -47,6 +50,18 @@ class DoubleCountingAgreementFullSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='name'
     )
+    dgec_validator = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='name'
+    )
+    dgpe_validator = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='name'
+    )
+    dgddi_validator = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='name'
+    )        
     producer = EntitySerializer(read_only=True)
 
     class Meta:
@@ -63,6 +78,18 @@ class DoubleCountingAgreementFullSerializerWithForeignKeys(serializers.ModelSeri
         read_only=True,
         slug_field='name'
     )
+    dgec_validator = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='name'
+    )
+    dgpe_validator = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='name'
+    )
+    dgddi_validator = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='name'
+    )      
     sourcing = DoubleCountingSourcingSerializer(many=True, read_only=True)
     production = DoubleCountingProductionSerializer(many=True, read_only=True)
     producer = EntitySerializer(read_only=True)

@@ -566,6 +566,7 @@ export interface DoubleCounting {
   period_start: string
   period_end: string
   status: DoubleCountingStatus
+  
 }
 
 export interface DoubleCountingSourcing {
@@ -593,4 +594,13 @@ export interface DoubleCountingDetails extends DoubleCounting {
   sourcing: DoubleCountingSourcing[]
   production: DoubleCountingProduction[]
   documents: { id: number, url: string }[]
+  dgec_validated: boolean
+  dgec_validator: string | null
+  dgec_validated_dt: string | null
+  dgddi_validated: boolean
+  dgddi_validator: string | null
+  dgddi_validated_dt: string | null
+  dgpe_validated: boolean
+  dgpe_validator: string | null
+  dgpe_validated_dt: string | null
 }

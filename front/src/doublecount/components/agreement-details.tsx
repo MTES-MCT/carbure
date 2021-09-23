@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
-import { DoubleCountingStatus, DoubleCountingSourcing, DoubleCountingProduction } from 'common/types'
+import { DoubleCountingStatus, DoubleCountingSourcing, DoubleCountingProduction, EntityType, DoubleCountingDetails } from 'common/types'
 import useAPI from 'common/hooks/use-api'
 import { LoaderOverlay, Box } from 'common/components'
 import Tabs from 'common/components/tabs'
-import { Button } from 'common/components/button'
+import { Input } from 'common/components/input'
+import { Button, AsyncButton } from 'common/components/button'
 import Table, { Column, Row } from 'common/components/table'
 import { padding } from 'transactions/components/list-columns'
 import * as api from '../api'
@@ -12,33 +13,62 @@ import {
   Dialog,
   DialogButtons,
   DialogTitle,
-  prompt,
+  confirm,
   PromptProps,
 } from "common/components/dialog"
-import { useEntityContext, EntitySelection } from 'carbure/hooks/use-entity'
+import { EntitySelection } from 'carbure/hooks/use-entity'
 import { DCStatus } from 'settings/components/double-counting'
 import styles from "settings/components/settings.module.css"
-import { Return } from 'common/components/icons'
+import { Return, Upload, Check, Cross } from 'common/components/icons'
+import { formatDate } from 'settings/components/common'
+
+export enum Admin {
+  DGEC = 'MTE - DGEC',
+  DGDDI = 'DGDDI',
+  DGPE = 'DGPE'
+}
+
+type ValidationStatus = {
+  approved: boolean,
+  date: string,
+  user: string,
+  entity: string
+}
 
 export type DoubleCountingPromptProps = PromptProps<any> & {
   agreementID: number
+  entity: EntitySelection
 }
 
 export const DoubleCountingPrompt = ({
+  entity,
   agreementID,
   onResolve,
 }: DoubleCountingPromptProps) => {
   const { t } = useTranslation()
-  const entity = useEntityContext()
 
   const [focus, setFocus] = useState("sourcing")
+  const [quotas, setQuotas] = useState<Record<string, string>>({})
 
   const [agreement, getAgreement] = useAPI(api.getDoubleCountingAgreement)
+  const [approving, approveAgreement] = useAPI(api.approveDoubleCountingAgreement)
+  const [rejecting, rejectAgreement] = useAPI(api.rejectDoubleCountingAgreement)
+  const [approvingQuotas, approveQuotas] = useAPI(api.approveDoubleCountingQuotas)
   const dcaStatus = agreement.data?.status ?? DoubleCountingStatus.Pending
 
   useEffect(() => {
       getAgreement(agreementID)
   }, [agreementID, getAgreement])
+
+  useEffect(() => {
+    if (agreement.data === null) return setQuotas({})
+
+    const quotas: Record<string, string> = {}
+    agreement.data.production.forEach(prod => {
+      quotas[prod.id] = prod.approved_quota >= 0 ? `${prod.approved_quota}` : `${prod.requested_quota}`
+    })
+    setQuotas(quotas)
+  }, [agreement.data])
 
   const sourcingColumns: Column<DoubleCountingSourcing>[] = [
     padding,
@@ -104,7 +134,21 @@ export const DoubleCountingPrompt = ({
     },
     {
       header: t("Quota approuvé"),
-      render: (p) => p.approved_quota,
+      render: (p) => {
+        if (isDone || entity?.entity_type !== EntityType.Administration) {
+          return p.approved_quota >= 0 ? p.approved_quota : p.requested_quota
+        }
+
+        return (
+          <Input 
+            value={quotas[p.id]} 
+            onChange={e => setQuotas({ 
+              ...quotas,
+              [p.id]: e.target.value
+            })} 
+          />
+        )
+      }
     },
     padding,
   ]
@@ -112,6 +156,97 @@ export const DoubleCountingPrompt = ({
   const productionRows: Row<DoubleCountingProduction>[] = (
     agreement.data?.production ?? []
   ).map((p) => ({ value: p }))
+
+  const statusColumns: Column<ValidationStatus>[] = [
+    padding,
+    {
+      header: t("Administration"),
+      render: (s) => s.entity,
+    },
+    {
+      header: t("Statut"),
+      render: (s) => !s.approved && s.user ? t("Refusé") : (s.approved ? t("Accepté") : t("En attente")),
+    },
+    {
+      header: t("Validateur"),
+      render: (s) => s.user,
+    },
+    {
+      header: t("Date"),
+      render: (s) => formatDate(s.date),
+    },
+    padding,
+  ]
+    
+  const statusRows: Row<ValidationStatus>[] =  [
+    { 
+      approved: agreement.data?.dgec_validated ?? false,
+      date: agreement.data?.dgec_validated_dt ?? '',
+      user: agreement.data?.dgec_validator ?? '',
+      entity: Admin.DGEC,
+    },
+    { 
+      approved: agreement.data?.dgddi_validated ?? false,
+      date: agreement.data?.dgddi_validated_dt ?? '',
+      user: agreement.data?.dgddi_validator ?? '',
+      entity: Admin.DGDDI,
+    },
+    { 
+      approved: agreement.data?.dgpe_validated ?? false,
+      date: agreement.data?.dgpe_validated_dt ?? '',
+      user: agreement.data?.dgpe_validator ?? '',
+      entity: Admin.DGPE,
+    },
+  ].map(value => ({ value }))
+
+  const documentationURL = agreement.data && agreement.data.documents[0] && `/api/v3/doublecount/admin/download-documentation?dca_id=${agreement.data.id}&file_id=${agreement.data.documents[0].id}`
+
+  let approved = false
+  if (entity?.name === Admin.DGEC) {
+    approved = agreement.data?.dgec_validated ?? false
+  }
+  else if (entity?.name === Admin.DGDDI) {
+    approved = agreement.data?.dgddi_validated ?? false
+  }
+  else if (entity?.name === Admin.DGPE) {
+    approved = agreement.data?.dgpe_validated ?? false
+  }
+
+  const isDone = approved || agreement.data?.status === DoubleCountingStatus.Rejected
+
+  async function submitAccept() {
+    if (!agreement.data || !entity) return
+
+    const ok = await confirm(
+      t("Accepter dossier"),
+      t("Voulez-vous vraiment accepter ce dossier double comptage")
+    )
+
+    if (!ok) return
+
+    if (entity?.entity_type === EntityType.Administration) {
+      await approveQuotas(agreement.data.id, Object.keys(quotas).map(id => [parseInt(id), parseInt(quotas[id])]))
+    }
+
+    await approveAgreement(entity.id, agreement.data.id)
+
+    onResolve()
+  }
+
+  async function submitReject() {
+    if (!agreement.data || !entity) return
+
+    const ok = await confirm(
+      t("Refuser dossier"),
+      t("Voulez-vous vraiment refuser ce dossier double comptage")
+    )
+
+    if (!ok) return
+
+    await rejectAgreement(entity.id, agreement.data.id)
+
+    onResolve()
+  }
 
   return (
     <Dialog wide onResolve={onResolve} className={styles.settingsPrompt}>
@@ -124,6 +259,7 @@ export const DoubleCountingPrompt = ({
         tabs={[
           { key: "sourcing", label: t("Approvisionnement") },
           { key: "production", label: t("Production") },
+          { key: "status", label: t("Statut") },
         ]}
         focus={focus}
         onFocus={setFocus}
@@ -141,7 +277,35 @@ export const DoubleCountingPrompt = ({
         </div>
       )}
 
+      {focus === "status" && (
+        <div className={styles.modalTableContainer}>
+          <Table columns={statusColumns} rows={statusRows} />
+        </div>
+      )}
+
       <DialogButtons>
+        <a 
+          href={documentationURL ?? '#'} 
+          target="_blank" 
+          rel="noreferrer"
+          className={styles.settingsBottomLink} 
+        >
+          <Upload />
+          <Trans>
+            Télécharger la description de l'activité
+          </Trans>
+        </a>
+
+        {!isDone && (
+          <Fragment>
+            <AsyncButton loading={approving.loading || approvingQuotas.loading} level="success" icon={Check} onClick={submitAccept}>
+              <Trans>Accepter</Trans>
+            </AsyncButton>
+            <AsyncButton loading={rejecting.loading} level="danger" icon={Cross} onClick={submitReject}>
+              <Trans>Refuser</Trans>
+            </AsyncButton>
+          </Fragment>
+        )}
         <Button icon={Return} onClick={() => onResolve()}>
           <Trans>Retour</Trans>
         </Button>

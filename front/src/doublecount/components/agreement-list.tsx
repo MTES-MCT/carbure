@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { DoubleCounting } from 'common/types'
 import { LoaderOverlay } from 'common/components'
@@ -11,14 +11,24 @@ import { AgreementsOverview } from '../api'
 import { formatDate } from 'settings/components/common'
 import { DoubleCountingPrompt } from './agreement-details'
 import { prompt } from 'common/components/dialog'
+import { DCStatus } from 'settings/components/double-counting'
+import { EntitySelection } from 'carbure/hooks/use-entity'
+import useAPI from 'common/hooks/use-api'
+import * as api from '../api'
 
 type AgreementListProps = {
-  agreements: AgreementsOverview | null
+  entity: EntitySelection
 }
 
-const AgreementList = ({ agreements }: AgreementListProps) => {
+const AgreementList = ({ entity }: AgreementListProps) => {
   const { t } = useTranslation()
   const [tab, setTab] = useState('pending')
+
+  const [agreements, getAgreements] = useAPI(api.getAllDoubleCountingAgreements)
+  
+  useEffect(() => {
+    getAgreements()
+  }, [getAgreements])
   
   const tabs = [
     { key: 'pending', label: t('En attente') },
@@ -31,7 +41,8 @@ const AgreementList = ({ agreements }: AgreementListProps) => {
 
   const columns: Column<DoubleCounting>[] = [
     padding,
-    { header: t('Entité'), render: (a) => a.producer.name },
+    { header: t('Statut'), render: (a) => <DCStatus status={a.status} /> },
+    { header: t('Producteur'), render: (a) => a.producer.name },
     { header: t('Site de production'), render: (a) => a.production_site },
     { header: t('Période de validité'), render: (a) => `${formatDate(a.period_start)} ▸ ${formatDate(a.period_end)}` },
     padding
@@ -39,8 +50,22 @@ const AgreementList = ({ agreements }: AgreementListProps) => {
 
   const agreementRowMapper = (agreement: DoubleCounting) => ({
     value: agreement,
-    onClick: () => prompt((resolve) => <DoubleCountingPrompt agreementID={agreement.id} onResolve={resolve} />)
+    onClick: async () => {
+      await prompt((resolve) => (
+        <DoubleCountingPrompt 
+          entity={entity} 
+          agreementID={agreement.id} 
+          onResolve={resolve} 
+        />
+      ))
+
+      getAgreements()
+    }
   })
+
+  if (agreements.data === null) return <LoaderOverlay />
+
+  const { pending, accepted, expired, rejected } = agreements.data
 
   return (
     <div style={{padding: '8px 120px'}}>
@@ -48,7 +73,7 @@ const AgreementList = ({ agreements }: AgreementListProps) => {
       
       {tab === 'pending' && (
         <Fragment>
-          {agreements.pending.count === 0 && (
+          {pending.count === 0 && (
             <Alert level="warning" icon={AlertCircle}>
               <Trans>
                 Aucun dossier en attente trouvé
@@ -56,10 +81,10 @@ const AgreementList = ({ agreements }: AgreementListProps) => {
             </Alert>
           )}
 
-          {agreements.pending.count > 0 && (
+          {pending.count > 0 && (
             <Table 
               columns={columns} 
-              rows={agreements.pending.agreements.map(agreementRowMapper)}
+              rows={pending.agreements.map(agreementRowMapper)}
             />
           )}
         </Fragment>
@@ -67,7 +92,7 @@ const AgreementList = ({ agreements }: AgreementListProps) => {
 
       {tab === 'accepted' && (
         <Fragment>
-          {agreements.accepted.count === 0 && (
+          {accepted.count === 0 && (
             <Alert level="warning" icon={AlertCircle}>
               <Trans>
                 Aucun dossier accepté trouvé
@@ -75,10 +100,10 @@ const AgreementList = ({ agreements }: AgreementListProps) => {
             </Alert>
           )}
 
-          {agreements.accepted.count > 0 && (
+          {accepted.count > 0 && (
             <Table 
               columns={columns} 
-              rows={agreements.accepted.agreements.map(agreementRowMapper)}
+              rows={accepted.agreements.map(agreementRowMapper)}
             />
           )}
         </Fragment>
@@ -86,7 +111,7 @@ const AgreementList = ({ agreements }: AgreementListProps) => {
 
       {tab === 'expired' && (
         <Fragment>
-          {agreements.expired.count === 0 && (
+          {expired.count === 0 && (
             <Alert level="warning" icon={AlertCircle}>
               <Trans>
                 Aucun dossier expiré trouvé
@@ -94,10 +119,10 @@ const AgreementList = ({ agreements }: AgreementListProps) => {
             </Alert>
           )}
 
-          {agreements.expired.count > 0 && (
+          {expired.count > 0 && (
             <Table 
               columns={columns} 
-              rows={agreements.expired.agreements.map(agreementRowMapper)}
+              rows={expired.agreements.map(agreementRowMapper)}
             />
           )}
         </Fragment>
@@ -105,7 +130,7 @@ const AgreementList = ({ agreements }: AgreementListProps) => {
 
       {tab === 'rejected' && (
         <Fragment>
-          {agreements.rejected.count === 0 && (
+          {rejected.count === 0 && (
             <Alert level="warning" icon={AlertCircle}>
               <Trans>
                 Aucun dossier refusé trouvé
@@ -113,10 +138,10 @@ const AgreementList = ({ agreements }: AgreementListProps) => {
             </Alert>
           )}
 
-          {agreements.rejected.count > 0 && (
+          {rejected.count > 0 && (
             <Table 
               columns={columns} 
-              rows={agreements.rejected.agreements.map(agreementRowMapper)}
+              rows={rejected.agreements.map(agreementRowMapper)}
             />
           )}
         </Fragment>

@@ -419,7 +419,7 @@ const DoubleCountingProductionPrompt = ({
     } else if (production) {
       await updateProduction(
         entity.id,
-        dcaID,
+        production.id,
         data.estimated_production,
         data.max_production_capacity,
         data.requested_quota
