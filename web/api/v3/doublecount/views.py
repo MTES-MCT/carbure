@@ -14,6 +14,7 @@ from doublecount.helpers import load_dc_file, load_dc_sourcing_data, load_dc_pro
 from core.models import Entity, UserRights, MatierePremiere, Pays, Biocarburant
 from core.xlsx_v3 import make_biofuels_sheet, make_dc_mps_sheet, make_countries_sheet, make_dc_production_sheet, make_dc_sourcing_sheet
 from carbure.storage_backends import AWSStorage
+from django.core.files.storage import FileSystemStorage
 
 @check_rights('entity_id')
 def get_agreements(request, *args, **kwargs):
@@ -148,7 +149,10 @@ def upload_documentation(request, *args, **kwargs):
         filename
     )
 
-    media_storage = AWSStorage()
+    if os.env('TEST', False) == '1':
+        media_storage = FileSystemStorage('/tmp')
+    else:
+        media_storage = AWSStorage()
     media_storage.save(file_path_within_bucket, file_obj)
     file_url = media_storage.url(file_path_within_bucket)
     dcf = DoubleCountingDocFile()
