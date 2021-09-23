@@ -21,5 +21,5 @@ class DoubleCountingProductionAdmin(admin.ModelAdmin):
     
 @admin.register(DoubleCountingDocFile)
 class DoubleCountingDocFileAdmin(admin.ModelAdmin):
-    list_display = ('dca', 'url')
+    list_display = ('dca', 'url', 'file_name')
     

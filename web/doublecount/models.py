@@ -77,8 +77,10 @@ class DoubleCountingProduction(models.Model):
         verbose_name_plural = 'Production Double Compte'
 
 class DoubleCountingDocFile(models.Model):
-    url = models.CharField(max_length=512)
-    dca = models.ForeignKey(DoubleCountingAgreement, on_delete=models.CASCADE, related_name='file')
+    url = models.TextField()
+    file_name = models.CharField(max_length=128, default='')
+    dca = models.ForeignKey(DoubleCountingAgreement, on_delete=models.CASCADE, related_name='documents')
+    link_expiry_dt = models.DateTimeField()
  
     class Meta:
         db_table = 'double_counting_doc_files'

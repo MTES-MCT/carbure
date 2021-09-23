@@ -58,11 +58,21 @@ div > .settingsSelect {
   margin: 16px 0;
 }
 
-.settingsLink {
+.settingsLink, .settingsBottomLink {
+  display: inline-flex;
+  align-items: center;
   color: var(--blue-medium);
   text-decoration: underline;
   margin: 0 6px;
   flex-shrink: 0;
+}
+
+.settingsBottomLink {
+  margin-right: auto;
+}
+
+.settingsBottomLink svg {
+  margin-right: 4px;
 }
 
 .expiredRow {

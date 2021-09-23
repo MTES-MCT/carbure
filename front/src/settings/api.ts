@@ -439,9 +439,21 @@ export function uploadDoubleCountingFile(
   production_site_id: number,
   file: File
 ) {
-  return api.post("/doublecount/upload", {
+  return api.post<{ dca_id: number }>("/doublecount/upload", {
     entity_id,
     production_site_id,
+    file,
+  })
+}
+
+export function uploadDoubleCountingDescriptionFile(
+  entity_id: number,
+  dca_id: number,
+  file: File
+) {
+  return api.post("/doublecount/upload-documentation", {
+    entity_id,
+    dca_id,
     file,
   })
 }
