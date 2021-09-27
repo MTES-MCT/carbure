@@ -71,7 +71,7 @@ class DCAAPITest(TransactionTestCase):
         data = fh.read()
         fh.close()
         f = SimpleUploadedFile("dca.xlsx", data)
-        response = self.client.post(reverse('api-v3-doublecount-upload-doc'), {'entity_id': self.producer.id, 'production_site_id': self.production_site.id, 'year': '2022', 'file': f})
+        response = self.client.post(reverse('api-v3-doublecount-upload-doc'), {'entity_id': self.producer.id, 'dca_id': dca.id, 'file': f})
         if response.status_code != 200:
             print('Failed to upload %s' % (filepath))
         self.assertEqual(response.status_code, 200)
