@@ -2,7 +2,7 @@ import { Trans, useTranslation } from "react-i18next"
 
 import { AppHook, useApp } from "./hooks/use-app"
 import { EntityType, LotStatus, ExternalAdminPages } from "common/types"
-import useEntity, { EntityContext, EntitySelection, hasPage } from "./hooks/use-entity"
+import useEntity, { EntityContext, hasPage } from "./hooks/use-entity"
 import { UserRightProvider } from "./hooks/use-rights"
 
 import { Redirect, Route, Switch } from "common/components/relative-route"
@@ -18,7 +18,7 @@ import Transactions from "transactions"
 import Stocks from "stocks"
 import Settings from "settings"
 import Account from "account"
-import DoubleCounting from 'doublecount'
+import DoubleCounting from "doublecount"
 import Entities from "../entities" // not using relative path prevents import
 import EntityDetails from "../entities/routes/entity-details"
 import Dashboard from "dashboard"
@@ -121,7 +121,16 @@ const Org = ({ app }: { app: AppHook }) => {
             </Route>
           )}
 
-          <Redirect relative to={isAdmin ? "dashboard" : isExternalAdmin ? "double-counting" : "transactions"} />
+          <Redirect
+            relative
+            to={
+              isAdmin
+                ? "dashboard"
+                : isExternalAdmin
+                ? "double-counting"
+                : "transactions"
+            }
+          />
         </Switch>
       </EntityContext.Provider>
     </UserRightProvider>
