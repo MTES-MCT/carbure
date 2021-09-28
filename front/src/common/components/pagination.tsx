@@ -8,6 +8,17 @@ import { Button } from "./button"
 import Select from "./select"
 import { Trans, useTranslation } from "react-i18next"
 
+const LIMIT_KEY = "carbure:limit"
+
+function loadLimit() {
+  const saved = localStorage.getItem(LIMIT_KEY) ?? "10"
+  return JSON.parse(saved) ?? 10
+}
+
+function saveLimit(limit: number) {
+  localStorage.setItem(LIMIT_KEY, JSON.stringify(limit))
+}
+
 // generate a list of numbers from 0 to size-1
 const list = (size: number) =>
   Array.from(Array(Math.ceil(size)).keys()).map((i) => ({
@@ -25,11 +36,15 @@ export type PageSelection = {
 // manage pagination state
 export function usePageSelection(): PageSelection {
   const [page, setPage] = useState(0)
-  const [limit, setLimitState] = useState<number | null>(10)
+  const [limit, setLimitState] = useState<number | null>(() => loadLimit())
 
-  function setLimit(limit: number) {
+  function setLimit(limit: number | null) {
     setPage(0)
     setLimitState(limit)
+
+    if (limit !== null) {
+      saveLimit(limit)
+    }
   }
 
   return { page, limit, setPage, setLimit }
