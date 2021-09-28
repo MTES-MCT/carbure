@@ -1,7 +1,6 @@
-import { useEffect } from 'react'
-import { Main } from 'common/components'
-import { EntitySelection } from 'carbure/hooks/use-entity'
-import AgreementList from './components/agreement-list'
+import { Main } from "common/components"
+import { EntitySelection } from "carbure/hooks/use-entity"
+import AgreementList from "./components/agreement-list"
 
 type DoubleCountingProps = {
   entity: EntitySelection

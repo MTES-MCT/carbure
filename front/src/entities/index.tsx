@@ -1,6 +1,4 @@
 import { LoaderOverlay, Main, Title } from "common/components"
-import { Alert } from "common/components/alert"
-import { AlertTriangle } from "common/components/icons"
 import { LabelInput } from "common/components/input"
 import Tabs from "common/components/tabs"
 import useAPI from "common/hooks/use-api"
@@ -15,8 +13,6 @@ import {
   EntityFactoriesList,
   EntityUsersList,
 } from "./components/entity-list"
-
-
 
 const Entities = () => {
   const { t } = useTranslation()
@@ -53,9 +49,7 @@ const Entities = () => {
 
         <Tabs tabs={entityTabs} focus={tab} onFocus={setTab} />
 
-        {tab === "factories" && (
-          <EntityFactoriesList entities={entityList} />
-        )}
+        {tab === "factories" && <EntityFactoriesList entities={entityList} />}
 
         {tab === "doublecounting" && (
           <EntityDoubleCountingList entities={entityList} />
