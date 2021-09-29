@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Fragment, useState, useEffect } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
 import { DoubleCountingStatus, DoubleCountingSourcing, DoubleCountingProduction, EntityType } from 'common/types'
@@ -9,6 +10,24 @@ import { Button, AsyncButton } from 'common/components/button'
 import Table, { Column, Row } from 'common/components/table'
 import { padding } from 'transactions/components/list-columns'
 import * as api from '../api'
+=======
+import { Fragment, useState, useEffect } from "react"
+import { useTranslation, Trans } from "react-i18next"
+import {
+  DoubleCountingStatus,
+  DoubleCountingSourcing,
+  DoubleCountingProduction,
+  EntityType,
+} from "common/types"
+import useAPI from "common/hooks/use-api"
+import { LoaderOverlay, Box } from "common/components"
+import Tabs from "common/components/tabs"
+import { Input } from "common/components/input"
+import { Button, AsyncButton } from "common/components/button"
+import Table, { Column, Row } from "common/components/table"
+import { padding } from "transactions/components/list-columns"
+import * as api from "../api"
+>>>>>>> fe01db2a349a678cac392d1ef558ebb3f67d1e17
 import {
   Dialog,
   DialogButtons,
@@ -17,24 +36,29 @@ import {
   confirm,
   PromptProps,
 } from "common/components/dialog"
-import { EntitySelection } from 'carbure/hooks/use-entity'
-import { DCStatus } from 'settings/components/double-counting'
+import { EntitySelection } from "carbure/hooks/use-entity"
+import { DCStatus } from "settings/components/double-counting"
 import styles from "settings/components/settings.module.css"
+<<<<<<< HEAD
 import { Return, Upload, Check, Cross, Save, AlertCircle } from 'common/components/icons'
 import { formatDate } from 'settings/components/common'
 import { Alert } from 'common/components/alert'
 import { useNotificationContext } from 'common/components/notifications'
+=======
+import { Return, Upload, Check, Cross } from "common/components/icons"
+import { formatDate } from "settings/components/common"
+>>>>>>> fe01db2a349a678cac392d1ef558ebb3f67d1e17
 
 export enum Admin {
-  DGEC = 'MTE - DGEC',
-  DGDDI = 'DGDDI',
-  DGPE = 'DGPE'
+  DGEC = "MTE - DGEC",
+  DGDDI = "DGDDI",
+  DGPE = "DGPE",
 }
 
 type ValidationStatus = {
-  approved: boolean,
-  date: string,
-  user: string,
+  approved: boolean
+  date: string
+  user: string
   entity: string
 }
 
@@ -55,9 +79,13 @@ export const DoubleCountingPrompt = ({
   const [quotas, setQuotas] = useState<Record<string, string>>({})
 
   const [agreement, getAgreement] = useAPI(api.getDoubleCountingAgreement)
-  const [approving, approveAgreement] = useAPI(api.approveDoubleCountingAgreement)
+  const [approving, approveAgreement] = useAPI(
+    api.approveDoubleCountingAgreement
+  )
   const [rejecting, rejectAgreement] = useAPI(api.rejectDoubleCountingAgreement)
-  const [approvingQuotas, approveQuotas] = useAPI(api.approveDoubleCountingQuotas)
+  const [approvingQuotas, approveQuotas] = useAPI(
+    api.approveDoubleCountingQuotas
+  )
   const dcaStatus = agreement.data?.status ?? DoubleCountingStatus.Pending
 
   useEffect(() => {
@@ -68,8 +96,11 @@ export const DoubleCountingPrompt = ({
     if (agreement.data === null) return setQuotas({})
 
     const quotas: Record<string, string> = {}
-    agreement.data.production.forEach(prod => {
-      quotas[prod.id] = prod.approved_quota >= 0 ? `${prod.approved_quota}` : `${prod.requested_quota}`
+    agreement.data.production.forEach((prod) => {
+      quotas[prod.id] =
+        prod.approved_quota >= 0
+          ? `${prod.approved_quota}`
+          : `${prod.requested_quota}`
     })
     setQuotas(quotas)
   }, [agreement.data])
@@ -146,13 +177,22 @@ export const DoubleCountingPrompt = ({
         return (
           <Input
             value={quotas[p.id]}
+<<<<<<< HEAD
             onChange={e => setQuotas({
               ...quotas,
               [p.id]: e.target.value
             })}
+=======
+            onChange={(e) =>
+              setQuotas({
+                ...quotas,
+                [p.id]: e.target.value,
+              })
+            }
+>>>>>>> fe01db2a349a678cac392d1ef558ebb3f67d1e17
           />
         )
-      }
+      },
     },
     padding,
   ]
@@ -169,7 +209,12 @@ export const DoubleCountingPrompt = ({
     },
     {
       header: t("Statut"),
-      render: (s) => !s.approved && s.user ? t("Refusé") : (s.approved ? t("Accepté") : t("En attente")),
+      render: (s) =>
+        !s.approved && s.user
+          ? t("Refusé")
+          : s.approved
+          ? t("Accepté")
+          : t("En attente"),
     },
     {
       header: t("Validateur"),
@@ -185,38 +230,44 @@ export const DoubleCountingPrompt = ({
   const statusRows: Row<ValidationStatus>[] = [
     {
       approved: agreement.data?.dgec_validated ?? false,
-      date: agreement.data?.dgec_validated_dt ?? '',
-      user: agreement.data?.dgec_validator ?? '',
+      date: agreement.data?.dgec_validated_dt ?? "",
+      user: agreement.data?.dgec_validator ?? "",
       entity: Admin.DGEC,
     },
     {
       approved: agreement.data?.dgddi_validated ?? false,
-      date: agreement.data?.dgddi_validated_dt ?? '',
-      user: agreement.data?.dgddi_validator ?? '',
+      date: agreement.data?.dgddi_validated_dt ?? "",
+      user: agreement.data?.dgddi_validator ?? "",
       entity: Admin.DGDDI,
     },
     {
       approved: agreement.data?.dgpe_validated ?? false,
-      date: agreement.data?.dgpe_validated_dt ?? '',
-      user: agreement.data?.dgpe_validator ?? '',
+      date: agreement.data?.dgpe_validated_dt ?? "",
+      user: agreement.data?.dgpe_validator ?? "",
       entity: Admin.DGPE,
     },
-  ].map(value => ({ value }))
+  ].map((value) => ({ value }))
 
+<<<<<<< HEAD
   const excelURL = agreement.data && `/api/v3/doublecount/admin/agreement?dca_id=${agreement.data.id}&export=true`
   const documentationURL = agreement.data && agreement.data.documents[0] && `/api/v3/doublecount/admin/download-documentation?dca_id=${agreement.data.id}&file_id=${agreement.data.documents[0].id}`
+=======
+  const documentationURL =
+    agreement.data &&
+    agreement.data.documents[0] &&
+    `/api/v3/doublecount/admin/download-documentation?dca_id=${agreement.data.id}&file_id=${agreement.data.documents[0].id}`
+>>>>>>> fe01db2a349a678cac392d1ef558ebb3f67d1e17
 
   let approved = false
   if (entity?.name === Admin.DGEC) {
     approved = agreement.data?.dgec_validated ?? false
-  }
-  else if (entity?.name === Admin.DGDDI) {
+  } else if (entity?.name === Admin.DGDDI) {
     approved = agreement.data?.dgddi_validated ?? false
-  }
-  else if (entity?.name === Admin.DGPE) {
+  } else if (entity?.name === Admin.DGPE) {
     approved = agreement.data?.dgpe_validated ?? false
   }
 
+<<<<<<< HEAD
   const isDone = approved || agreement.data?.status === DoubleCountingStatus.Rejected
   const isAdmin = entity?.entity_type === EntityType.Administration
   const isReady = isAdmin ? true : agreement.data?.dgec_validated
@@ -243,6 +294,10 @@ export const DoubleCountingPrompt = ({
       })
     }
   }
+=======
+  const isDone =
+    approved || agreement.data?.status === DoubleCountingStatus.Rejected
+>>>>>>> fe01db2a349a678cac392d1ef558ebb3f67d1e17
 
   async function submitAccept() {
     if (!agreement.data || !entity) return
@@ -254,6 +309,16 @@ export const DoubleCountingPrompt = ({
 
     if (!ok) return
 
+<<<<<<< HEAD
+=======
+    if (entity?.entity_type === EntityType.Administration) {
+      await approveQuotas(
+        agreement.data.id,
+        Object.keys(quotas).map((id) => [parseInt(id), parseInt(quotas[id])])
+      )
+    }
+
+>>>>>>> fe01db2a349a678cac392d1ef558ebb3f67d1e17
     await approveAgreement(entity.id, agreement.data.id)
 
     onResolve()
@@ -324,6 +389,7 @@ export const DoubleCountingPrompt = ({
       )}
 
       <DialogButtons>
+<<<<<<< HEAD
         <Box style={{ marginRight: 'auto' }}>
           <a
             href={excelURL ?? '#'}
@@ -361,6 +427,34 @@ export const DoubleCountingPrompt = ({
               <Trans>Accepter</Trans>
             </AsyncButton>
             <AsyncButton loading={rejecting.loading} disabled={!isReady} level="danger" icon={Cross} onClick={submitReject}>
+=======
+        <a
+          href={documentationURL ?? "#"}
+          target="_blank"
+          rel="noreferrer"
+          className={styles.settingsBottomLink}
+        >
+          <Upload />
+          <Trans>Télécharger la description de l'activité</Trans>
+        </a>
+
+        {!isDone && (
+          <Fragment>
+            <AsyncButton
+              loading={approving.loading || approvingQuotas.loading}
+              level="success"
+              icon={Check}
+              onClick={submitAccept}
+            >
+              <Trans>Accepter</Trans>
+            </AsyncButton>
+            <AsyncButton
+              loading={rejecting.loading}
+              level="danger"
+              icon={Cross}
+              onClick={submitReject}
+            >
+>>>>>>> fe01db2a349a678cac392d1ef558ebb3f67d1e17
               <Trans>Refuser</Trans>
             </AsyncButton>
           </Fragment>

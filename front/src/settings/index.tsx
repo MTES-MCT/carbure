@@ -68,7 +68,6 @@ const Settings = ({ entity, settings }: SettingsProps) => {
   const isProducer = entity?.entity_type === EntityType.Producer
   const isTrader = entity?.entity_type === EntityType.Trader
   const isOperator = entity?.entity_type === EntityType.Operator
-  const isAuditor = entity?.entity_type === EntityType.Auditor
 
   const hasCertificates = isProducer || isTrader
   const hasCSN = isProducer || isOperator
