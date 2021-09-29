@@ -8,8 +8,8 @@ div.dialog {
 
 .dialogMessage {
   max-width: 600px;
-  margin-top: 32px;
-  margin-bottom: 16px;
+  margin-top: 24px;
+  margin-bottom: 12px;
 }
 
 .dialogWide .dialogMessage {
@@ -19,6 +19,7 @@ div.dialog {
 .dialogButtons {
   margin-top: 16px;
   justify-content: flex-end;
+  align-items: flex-end;
   padding-bottom: 20px;
 }
 

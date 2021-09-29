@@ -21,7 +21,7 @@ from doublecount.serializers import DoubleCountingAgreementFullSerializer, Doubl
 from doublecount.serializers import DoubleCountingAgreementFullSerializerWithForeignKeys, DoubleCountingAgreementPartialSerializerWithForeignKeys
 from doublecount.helpers import load_dc_file, load_dc_sourcing_data, load_dc_production_data
 from core.models import Entity, UserRights, MatierePremiere, Pays, Biocarburant
-from core.xlsx_v3 import make_biofuels_sheet, make_dc_mps_sheet, make_countries_sheet, make_dc_production_sheet, make_dc_sourcing_sheet
+from core.xlsx_v3 import export_dca, make_biofuels_sheet, make_dc_mps_sheet, make_countries_sheet, make_dc_production_sheet, make_dc_sourcing_sheet
 from carbure.storage_backends import AWSStorage
 from django.core.files.storage import FileSystemStorage
 
@@ -60,6 +60,8 @@ def get_agreements_admin(request):
 def get_agreement(request, *args, **kwargs):
     entity = kwargs['context']['entity']
     agreement_id = request.GET.get('dca_id', None)
+    export = request.GET.get('export', False)
+
     if not agreement_id:
         return JsonResponse({'status': 'error', 'message': 'Missing dca_id'}, status=400)
     try:
@@ -67,11 +69,23 @@ def get_agreement(request, *args, **kwargs):
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not find DCA agreement'}, status=400)
     serializer = DoubleCountingAgreementPartialSerializerWithForeignKeys(agreement)
-    return JsonResponse({'status': 'success', 'data': serializer.data})
+
+    if not export:
+        return JsonResponse({'status': 'success', 'data': serializer.data})
+    else:
+        file_location = export_dca(agreement)
+        with open(file_location, "rb") as excel:
+            data = excel.read()
+            ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            response = HttpResponse(content=data, content_type=ctype)
+            response['Content-Disposition'] = 'attachment; filename="%s"' % (file_location)
+        return response
+
 
 @is_admin
 def get_agreement_admin(request, *args, **kwargs):
     agreement_id = request.GET.get('dca_id', None)
+    export = request.GET.get('export', False)
 
     if not agreement_id:
         return JsonResponse({'status': 'error', 'message': 'Missing dca_id'}, status=400)
@@ -80,7 +94,16 @@ def get_agreement_admin(request, *args, **kwargs):
     except:
         return JsonResponse({'status': 'error', 'message': 'Could not find DCA agreement'}, status=400)
     serializer = DoubleCountingAgreementFullSerializerWithForeignKeys(agreement)
-    return JsonResponse({'status': 'success', 'data': serializer.data})
+    if not export:
+        return JsonResponse({'status': 'success', 'data': serializer.data})
+    else:
+        file_location = export_dca(agreement)
+        with open(file_location, "rb") as excel:
+            data = excel.read()
+            ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            response = HttpResponse(content=data, content_type=ctype)
+            response['Content-Disposition'] = 'attachment; filename="%s"' % (file_location)
+        return response
 
 def send_dca_confirmation_email(dca):
     text_message = """ 
@@ -114,7 +137,7 @@ def send_dca_status_email(dca):
         Bonne journée,
         L'équipe CarbuRe
         """ % (dca.production_site.name)
-    if dca.status == DoubleCountingAgreement.REJECTED:
+    elif dca.status == DoubleCountingAgreement.REJECTED:
         text_message = """ 
         Bonjour,
 
@@ -123,7 +146,9 @@ def send_dca_status_email(dca):
         Bonne journée,
         L'équipe CarbuRe
         """  % (dca.production_site.name)
-    
+    else:
+        # no mail to send
+        return
     email_subject = 'Carbure - Dossier Double Comptage'
     cc = None
     if os.getenv('IMAGE_TAG', 'dev') != 'prod':
@@ -170,7 +195,7 @@ def upload_file(request, *args, **kwargs):
     start = datetime.date(end_year - 1, 1, 1)
     end = datetime.date(end_year, 12, 31)
 
-    dca, created = DoubleCountingAgreement.objects.get_or_create(producer=entity, production_site_id=production_site_id, period_start=start, period_end=end)
+    dca, created = DoubleCountingAgreement.objects.get_or_create(producer=entity, production_site_id=production_site_id, period_start=start, period_end=end, defaults={'producer_user': request.user})
 
     try:
         load_dc_sourcing_data(dca, sourcing_data)
@@ -320,10 +345,14 @@ def approve_dca(request, *args, **kwargs):
         return JsonResponse({'status': "error", 'message': "Could not find DCA"}, status=400)
 
     if entity.name == 'DGPE':
+        if not dca.dgec_validated:
+            return JsonResponse({'status': "error", 'message': "La DGEC doit valider le dossier en premier"}, status=400)
         dca.dgpe_validated = True
         dca.dgpe_validator = request.user
         dca.dgpe_validated_dt = pytz.utc.localize(datetime.datetime.now())
     elif entity.name == 'DGDDI':
+        if not dca.dgec_validated:
+            return JsonResponse({'status': "error", 'message': "La DGEC doit valider le dossier en premier"}, status=400)        
         dca.dgddi_validated = True
         dca.dgddi_validator = request.user
         dca.dgddi_validated_dt = pytz.utc.localize(datetime.datetime.now())

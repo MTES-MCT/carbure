@@ -642,6 +642,39 @@ def export_transactions(entity, transactions, stocks=False):
     workbook.close()
     return location
 
+def export_dca(dca):
+    today = datetime.date.today()
+    location = '/tmp/double_counting_agreement_%s.xlsx' % (today.strftime('%Y%m%d_%H%M'))
+    workbook = xlsxwriter.Workbook(location)
+    # sourcing sheet
+    sourcing_worksheet = workbook.add_worksheet("sourcing")
+    # header
+    bold = workbook.add_format({'bold': True})
+    columns = ['year', 'feedstock', 'origin_country', 'supply_country', 'transit_country', 'metric_tonnes']
+    for i, c in enumerate(columns):
+        sourcing_worksheet.write(0, i, c, bold)
+    for rowid, entry in enumerate(dca.sourcing.all()):
+        row = [entry.year, entry.feedstock.code, entry.origin_country.code_pays, entry.supply_country.code_pays, entry.transit_country.code_pays, entry.metric_tonnes]
+        for colid, elem in enumerate(row):
+            sourcing_worksheet.write(rowid+1, colid, elem)
+    # production sheet
+    production_worksheet = workbook.add_worksheet("production")
+    # header
+    bold = workbook.add_format({'bold': True})
+    columns = ['year', 'feedstock', 'biofuel', 'max_production_capacity', 'estimated_production', 'requested_quota', 'approved_quota']
+    for i, c in enumerate(columns):
+        production_worksheet.write(0, i, c, bold)    
+    for rowid, entry in enumerate(dca.production.all()):
+        row = [entry.year, entry.biofuel.code, entry.feedstock.code, entry.max_production_capacity, entry.estimated_production, entry.requested_quota, entry.approved_quota]
+        for colid, elem in enumerate(row):
+            production_worksheet.write(rowid+1, colid, elem)
+
+    make_countries_sheet(workbook)
+    make_dc_mps_sheet(workbook)
+    make_biofuels_sheet(workbook)
+    workbook.close()
+    return location
+
 
 def export_stocks(entity, transactions):
     today = datetime.date.today()

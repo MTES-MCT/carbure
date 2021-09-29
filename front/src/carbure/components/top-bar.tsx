@@ -230,7 +230,7 @@ export const PrivateTopbar = ({ entity, app }: PrivateTopbarProps) => {
               </PageLink>
             )}
 
-            {isExternal(entity) && (
+            {(isAdmin(entity) || isExternal(entity)) && (
               <PageLink to="settings">
                 <Trans>Options</Trans>
               </PageLink>
