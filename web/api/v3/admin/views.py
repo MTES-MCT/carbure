@@ -324,7 +324,7 @@ def get_filters(request, *args, **kwargs):
 
     txs = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED)
     txs = get_lots_by_status(txs, request.GET)
-    txs = filter_lots(txs, request.GET, [field])[0]
+    txs = filter_lots(txs, request.GET, blacklist=[field])[0]
     d = get_snapshot_filters(txs, None, [field])
     if field in d:
         values = d[field]

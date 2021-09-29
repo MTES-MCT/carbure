@@ -72,7 +72,7 @@ def get_stocks_summary(request, *args, **kwargs):
 
     try:
         txs = filter_stock_transactions(entity, request.GET)
-        txs = filter_lots(txs, request.GET)[0]
+        txs = filter_lots(txs, request.GET, entity=entity)[0]
         txs = sort_lots(txs, request.GET)
         data = get_summary(txs, entity, short)
         return JsonResponse({'status': 'success', 'data': data})
@@ -121,7 +121,7 @@ def get_filters(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Please specify the field for which you want the filters'}, status=400)
 
     txs = filter_stock_transactions(entity, request.GET)
-    txs = filter_lots(txs, request.GET, [field])[0]
+    txs = filter_lots(txs, request.GET, entity=entity, blacklist=[field])[0]
 
     d = get_snapshot_filters(txs, entity, [field])
     if field in d:
