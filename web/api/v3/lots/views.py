@@ -1,5 +1,6 @@
 import datetime
 import calendar
+from inspect import trace
 import logging
 import unicodedata
 import traceback
@@ -43,7 +44,8 @@ def get_lots(request, *args, **kwargs):
     try:
         txs = get_entity_lots_by_status(entity, status)
         return get_lots_with_metadata(txs, entity, request.GET)
-    except Exception:
+    except Exception as e:
+        traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': "Could not get lots"}, status=400)
 
 
@@ -60,7 +62,7 @@ def get_lots_summary(request, *args, **kwargs):
 
     try:
         txs = get_entity_lots_by_status(entity, status)
-        txs = filter_lots(txs, request.GET)[0]
+        txs = filter_lots(txs, request.GET, entity=entity)[0]
         txs = sort_lots(txs, request.GET)
         data = get_summary(txs, entity, short)
         return JsonResponse({'status': 'success', 'data': data})
@@ -164,7 +166,7 @@ def get_filters(request, *args, **kwargs):
     else:
         return JsonResponse({'status': 'error', 'message': "Unknown entity_type"}, status=400)
     txs = get_entity_lots_by_status(entity, status)
-    txs = filter_lots(txs, request.GET, [field])[0]
+    txs = filter_lots(txs, request.GET, entity=entity, blacklist=[field])[0]
     d = get_snapshot_filters(txs, entity, [field])
     if field in d:
         values = d[field]

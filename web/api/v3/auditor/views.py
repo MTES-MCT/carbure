@@ -52,7 +52,7 @@ def get_lots(request, *args, **kwargs):
         txs = get_audited_lots(auditees)
         txs = txs.filter(lot__status='Validated')
         txs = get_lots_by_status(txs, request.GET)
-        txs = filter_lots(txs, request.GET)[0]
+        txs = filter_lots(txs, request.GET, entity=None)[0]
         return get_lots_with_metadata(txs, None, request.GET, admin=True)
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
@@ -67,7 +67,7 @@ def get_filters(request, *args, **kwargs):
     auditees = get_auditees(request.user)
     txs = get_audited_lots(auditees)
     txs = get_lots_by_status(txs, request.GET)
-    txs = filter_lots(txs, request.GET, [field])[0]
+    txs = filter_lots(txs, request.GET, entity=None, blacklist=[field])[0]
     d = get_snapshot_filters(txs, None, [field])
     if field in d:
         values = d[field]
@@ -85,7 +85,7 @@ def get_lots_summary(request, *args, **kwargs):
 
     try:
         txs = get_lots_by_status(txs, request.GET)
-        txs = filter_lots(txs, request.GET)[0]
+        txs = filter_lots(txs, request.GET, entity=None)[0]
         txs = sort_lots(txs, request.GET)
         data = get_general_summary(txs, short)
         return JsonResponse({'status': 'success', 'data': data})

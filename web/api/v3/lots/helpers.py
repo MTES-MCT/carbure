@@ -113,9 +113,13 @@ def get_entity_lots_by_status(entity, status):
     return txs
 
 
-def get_lots_with_errors(txs):
-    tx_errors = GenericError.objects.filter(tx=OuterRef('pk')).values('tx').annotate(errors=Count(Value(1))).values('errors')
-    return txs.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
+def get_lots_with_errors(txs, entity=None):
+    if entity is None:
+        return txs.annotate(errors=Count('genericerror')).filter(errors__gt=0)
+    else:
+        return txs.annotate(
+            errors=Count('genericerror', filter=(Q(carbure_vendor=entity, genericerror__display_to_creator=True) | Q(carbure_client=entity, genericerror__display_to_recipient=True)) )
+        ).filter(errors__gt=0)
 
 
 def get_lots_with_deadline(txs, deadline):
@@ -134,7 +138,7 @@ def filter_by_entities(txs, entities):
     )
 
 
-def filter_lots(txs, querySet, blacklist=[]):
+def filter_lots(txs, querySet, entity=None, blacklist=[]):
     is_forwarded = querySet.get('is_forwarded', None)
     is_mac = querySet.get('is_mac', None)
     year = querySet.get('year', False)
@@ -265,7 +269,7 @@ def filter_lots(txs, querySet, blacklist=[]):
     deadline_date = get_current_deadline()
     deadline_str = deadline_date.strftime("%Y-%m-%d")
 
-    tx_with_errors = get_lots_with_errors(txs)
+    tx_with_errors = get_lots_with_errors(txs, entity)
     tx_with_deadline = get_lots_with_deadline(txs, deadline_date)
 
     total_errors = tx_with_errors.count()
@@ -321,7 +325,7 @@ def get_lots_with_metadata(txs, entity, querySet, admin=False, stocks=False):
     limit = querySet.get('limit', None)
     from_idx = querySet.get('from_idx', "0")
 
-    txs, total_errors, total_deadline, deadline_str = filter_lots(txs, querySet)
+    txs, total_errors, total_deadline, deadline_str = filter_lots(txs, querySet, entity)
     txs = sort_lots(txs, querySet)
 
     from_idx = int(from_idx)
