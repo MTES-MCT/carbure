@@ -189,10 +189,12 @@ def get_declaration_summary(request, *args, **kwargs):
     period_date = datetime.date(year=int(period_year), month=int(period_month), day=1)
     period_str = period_date.strftime('%Y-%m')
 
-    txs = LotTransaction.objects.filter(lot__status='Validated', lot__period=period_str)
+    txs = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED, lot__period=period_str).exclude(delivery_status=LotTransaction.REJECTED, carbure_client=entity)
     data = get_summary(txs, entity)
 
-    remaining = txs.filter(Q(carbure_client=entity) | Q(carbure_vendor=entity)).exclude(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).count()
+    remaining = txs.filter(Q(carbure_client=entity) | Q(carbure_vendor=entity)) \
+        .exclude(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]) \
+        .count()
 
     # get associated declaration
     declaration, created = SustainabilityDeclaration.objects.get_or_create(entity=entity, period=period_date)
@@ -751,7 +753,10 @@ def validate_declaration(request, *args, **kwargs):
         pm = int(period_month)
         period = datetime.date(year=py, month=pm, day=1)
         # check if we have pending transactions (received or sent)
-        txs = LotTransaction.objects.filter(lot__period=period.strftime('%Y-%m')).filter(Q(carbure_client=entity) | Q(carbure_vendor=entity)).exclude(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]).exclude(lot__status=LotV2.DRAFT)
+        txs = LotTransaction.objects.filter(lot__period=period.strftime('%Y-%m')).filter(Q(carbure_client=entity) | Q(carbure_vendor=entity)) \
+        .exclude(delivery_status__in=[LotTransaction.ACCEPTED, LotTransaction.FROZEN]) \
+        .exclude(lot__status=LotV2.DRAFT) \
+        .exclude(delivery_status=LotTransaction.REJECTED, carbure_client=entity)
         if txs.count() > 0:
             return JsonResponse({'status': "error", 'message': "PENDING_TRANSACTIONS_CANNOT_DECLARE", 'data': {'pending_txs': txs.count(), 'ids': [t.id for t in txs]}}, status=400)
         declaration, created = SustainabilityDeclaration.objects.update_or_create(entity=entity, period=period, defaults={'declared': True})
