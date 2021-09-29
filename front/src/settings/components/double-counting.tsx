@@ -37,7 +37,7 @@ import {
   prompt,
   PromptProps,
 } from "common/components/dialog"
-import { formatDate } from "./common"
+import { formatDate, YEAR_ONLY } from "./common"
 import {
   findBiocarburants,
   findCountries,
@@ -167,8 +167,8 @@ const DoubleCountingUploadPrompt = ({
 
         <div className={styles.settingsText}>
           <Trans>
-            Finalement, veuillez importer un fichier texte contenant la 
-            description de vos méthodes d'approvisionnement et de production 
+            Finalement, veuillez importer un fichier texte contenant la
+            description de vos méthodes d'approvisionnement et de production
             ayant trait au double comptage.
           </Trans>
         </div>
@@ -690,6 +690,7 @@ const DoubleCountingPrompt = ({
     },
   }))
 
+  const excelURL = agreement.data && `/api/v3/doublecount/agreement?dca_id=${agreement.data.id}&entity_id=${entity?.id}&export=true`
   const documentationURL = entity && agreement.data && agreement.data.documents[0] && `/api/v3/doublecount/download-documentation?entity_id=${entity.id}&dca_id=${agreement.data.id}&file_id=${agreement.data.documents[0].id}`
 
   return (
@@ -757,17 +758,30 @@ const DoubleCountingPrompt = ({
       )}
 
       <DialogButtons>
-        <a 
-          href={documentationURL ?? '#'} 
-          target="_blank" 
-          rel="noreferrer"
-          className={styles.settingsBottomLink} 
-        >
-          <Upload />
-          <Trans>
-            Télécharger la description de l'activité
-          </Trans>
-        </a>
+        <Box style={{ marginRight: 'auto' }}>
+          <a
+            href={excelURL ?? '#'}
+            target="_blank"
+            rel="noreferrer"
+            className={styles.settingsBottomLink}
+          >
+            <Upload />
+            <Trans>
+              Télécharger au format excel
+            </Trans>
+          </a>
+          <a
+            href={documentationURL ?? '#'}
+            target="_blank"
+            rel="noreferrer"
+            className={styles.settingsBottomLink}
+          >
+            <Upload />
+            <Trans>
+              Télécharger la description de l'activité
+            </Trans>
+          </a>
+        </Box>
 
         <Button icon={Return} onClick={() => onResolve()}>
           <Trans>Retour</Trans>
@@ -813,8 +827,12 @@ const DoubleCountingSettings = ({
       render: (dc) => dc.production_site,
     },
     {
-      header: t("Valide jusqu'au"),
-      render: (dc) => formatDate(dc.period_end),
+      header: t("Période de validité"),
+      render: (dc) => `${formatDate(dc.period_start, YEAR_ONLY)} - ${formatDate(dc.period_end, YEAR_ONLY)}`,
+    },
+    {
+      header: t("Date de soumission"),
+      render: (dc) => formatDate(dc.creation_date),
     },
     padding,
   ]

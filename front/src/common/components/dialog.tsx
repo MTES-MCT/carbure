@@ -32,8 +32,8 @@ export const Dialog = ({
 
 export const DialogTitle = ({ text }: { text: string }) => <Title>{text}</Title>
 
-export const DialogText = ({ text }: { text: string }) => (
-  <span className={styles.dialogMessage}>{text}</span>
+export const DialogText = ({ text, children }: { text?: string, children?: React.ReactNode }) => (
+  <span className={styles.dialogMessage}>{text ?? children}</span>
 )
 
 export const DialogButtons = (props: any) => (

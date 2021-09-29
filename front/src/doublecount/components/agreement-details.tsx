@@ -1,6 +1,6 @@
 import { Fragment, useState, useEffect } from 'react'
 import { useTranslation, Trans } from 'react-i18next'
-import { DoubleCountingStatus, DoubleCountingSourcing, DoubleCountingProduction, EntityType, DoubleCountingDetails } from 'common/types'
+import { DoubleCountingStatus, DoubleCountingSourcing, DoubleCountingProduction, EntityType } from 'common/types'
 import useAPI from 'common/hooks/use-api'
 import { LoaderOverlay, Box } from 'common/components'
 import Tabs from 'common/components/tabs'
@@ -13,14 +13,17 @@ import {
   Dialog,
   DialogButtons,
   DialogTitle,
+  DialogText,
   confirm,
   PromptProps,
 } from "common/components/dialog"
 import { EntitySelection } from 'carbure/hooks/use-entity'
 import { DCStatus } from 'settings/components/double-counting'
 import styles from "settings/components/settings.module.css"
-import { Return, Upload, Check, Cross } from 'common/components/icons'
+import { Return, Upload, Check, Cross, Save, AlertCircle } from 'common/components/icons'
 import { formatDate } from 'settings/components/common'
+import { Alert } from 'common/components/alert'
+import { useNotificationContext } from 'common/components/notifications'
 
 export enum Admin {
   DGEC = 'MTE - DGEC',
@@ -46,6 +49,7 @@ export const DoubleCountingPrompt = ({
   onResolve,
 }: DoubleCountingPromptProps) => {
   const { t } = useTranslation()
+  const notifications = useNotificationContext()
 
   const [focus, setFocus] = useState("sourcing")
   const [quotas, setQuotas] = useState<Record<string, string>>({})
@@ -57,7 +61,7 @@ export const DoubleCountingPrompt = ({
   const dcaStatus = agreement.data?.status ?? DoubleCountingStatus.Pending
 
   useEffect(() => {
-      getAgreement(agreementID)
+    getAgreement(agreementID)
   }, [agreementID, getAgreement])
 
   useEffect(() => {
@@ -140,12 +144,12 @@ export const DoubleCountingPrompt = ({
         }
 
         return (
-          <Input 
-            value={quotas[p.id]} 
-            onChange={e => setQuotas({ 
+          <Input
+            value={quotas[p.id]}
+            onChange={e => setQuotas({
               ...quotas,
               [p.id]: e.target.value
-            })} 
+            })}
           />
         )
       }
@@ -177,21 +181,21 @@ export const DoubleCountingPrompt = ({
     },
     padding,
   ]
-    
-  const statusRows: Row<ValidationStatus>[] =  [
-    { 
+
+  const statusRows: Row<ValidationStatus>[] = [
+    {
       approved: agreement.data?.dgec_validated ?? false,
       date: agreement.data?.dgec_validated_dt ?? '',
       user: agreement.data?.dgec_validator ?? '',
       entity: Admin.DGEC,
     },
-    { 
+    {
       approved: agreement.data?.dgddi_validated ?? false,
       date: agreement.data?.dgddi_validated_dt ?? '',
       user: agreement.data?.dgddi_validator ?? '',
       entity: Admin.DGDDI,
     },
-    { 
+    {
       approved: agreement.data?.dgpe_validated ?? false,
       date: agreement.data?.dgpe_validated_dt ?? '',
       user: agreement.data?.dgpe_validator ?? '',
@@ -199,6 +203,7 @@ export const DoubleCountingPrompt = ({
     },
   ].map(value => ({ value }))
 
+  const excelURL = agreement.data && `/api/v3/doublecount/admin/agreement?dca_id=${agreement.data.id}&export=true`
   const documentationURL = agreement.data && agreement.data.documents[0] && `/api/v3/doublecount/admin/download-documentation?dca_id=${agreement.data.id}&file_id=${agreement.data.documents[0].id}`
 
   let approved = false
@@ -213,6 +218,31 @@ export const DoubleCountingPrompt = ({
   }
 
   const isDone = approved || agreement.data?.status === DoubleCountingStatus.Rejected
+  const isAdmin = entity?.entity_type === EntityType.Administration
+  const isReady = isAdmin ? true : agreement.data?.dgec_validated
+
+  const productionSite = agreement.data?.production_site ?? 'N/A'
+  const producer = agreement.data?.producer.name ?? 'N/A'
+  const user = agreement.data?.producer_user ?? 'N/A'
+  const creationDate = agreement.data?.creation_date ? formatDate(agreement.data.creation_date) : 'N/A'
+
+  async function submitQuotas() {
+    if (!agreement.data || !entity || entity?.entity_type !== EntityType.Administration) return
+
+    const done = await approveQuotas(agreement.data.id, Object.keys(quotas).map(id => [parseInt(id), parseInt(quotas[id])]))
+
+    if (done) {
+      notifications.push({
+        level: 'success',
+        text: t("Quotas mis à jour.")
+      })
+    } else {
+      notifications.push({
+        level: 'error',
+        text: t("Impossible de mettre à jour les quo.")
+      })
+    }
+  }
 
   async function submitAccept() {
     if (!agreement.data || !entity) return
@@ -223,10 +253,6 @@ export const DoubleCountingPrompt = ({
     )
 
     if (!ok) return
-
-    if (entity?.entity_type === EntityType.Administration) {
-      await approveQuotas(agreement.data.id, Object.keys(quotas).map(id => [parseInt(id), parseInt(quotas[id])]))
-    }
 
     await approveAgreement(entity.id, agreement.data.id)
 
@@ -254,6 +280,20 @@ export const DoubleCountingPrompt = ({
         <DCStatus status={dcaStatus} />
         <DialogTitle text={t("Dossier double comptage")} />
       </Box>
+
+      <DialogText>
+        <Trans>
+          Pour le site de production <b>{{ productionSite }}</b> de <b>{{ producer }}</b>, soumis par <b>{{ user }}</b> le <b>{{ creationDate }}</b>
+        </Trans>
+      </DialogText>
+
+      {!isReady && (
+        <Alert level="warning" icon={AlertCircle}>
+          <Trans>
+            Dossier en attente de validation par la DGEC
+          </Trans>
+        </Alert>
+      )}
 
       <Tabs
         tabs={[
@@ -284,24 +324,43 @@ export const DoubleCountingPrompt = ({
       )}
 
       <DialogButtons>
-        <a 
-          href={documentationURL ?? '#'} 
-          target="_blank" 
-          rel="noreferrer"
-          className={styles.settingsBottomLink} 
-        >
-          <Upload />
-          <Trans>
-            Télécharger la description de l'activité
-          </Trans>
-        </a>
+        <Box style={{ marginRight: 'auto' }}>
+          <a
+            href={excelURL ?? '#'}
+            target="_blank"
+            rel="noreferrer"
+            className={styles.settingsBottomLink}
+          >
+            <Upload />
+            <Trans>
+              Télécharger au format excel
+            </Trans>
+          </a>
+          <a
+            href={documentationURL ?? '#'}
+            target="_blank"
+            rel="noreferrer"
+            className={styles.settingsBottomLink}
+          >
+            <Upload />
+            <Trans>
+              Télécharger la description de l'activité
+            </Trans>
+          </a>
+        </Box>
 
         {!isDone && (
           <Fragment>
-            <AsyncButton loading={approving.loading || approvingQuotas.loading} level="success" icon={Check} onClick={submitAccept}>
+            {isAdmin && (
+              <AsyncButton loading={approvingQuotas.loading} level="primary" icon={Save} onClick={submitQuotas}>
+                <Trans>Enregistrer</Trans>
+              </AsyncButton>
+            )}
+
+            <AsyncButton loading={approving.loading} disabled={!isReady} level="success" icon={Check} onClick={submitAccept}>
               <Trans>Accepter</Trans>
             </AsyncButton>
-            <AsyncButton loading={rejecting.loading} level="danger" icon={Cross} onClick={submitReject}>
+            <AsyncButton loading={rejecting.loading} disabled={!isReady} level="danger" icon={Cross} onClick={submitReject}>
               <Trans>Refuser</Trans>
             </AsyncButton>
           </Fragment>

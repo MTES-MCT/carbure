@@ -12,6 +12,8 @@ import { Refresh } from "common/components/icons"
 
 type FormatOptions = Parameters<typeof format>[1]
 
+export const YEAR_ONLY = { month: undefined, day: undefined }
+
 export function formatDate(str: string | null, options: FormatOptions = {}) {
   if (str === null) {
     return "N/A"

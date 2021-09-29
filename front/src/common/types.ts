@@ -566,7 +566,8 @@ export interface DoubleCounting {
   period_start: string
   period_end: string
   status: DoubleCountingStatus
-  
+  producer_user: string
+  creation_date: string
 }
 
 export interface DoubleCountingSourcing {

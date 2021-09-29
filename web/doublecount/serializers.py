@@ -50,6 +50,10 @@ class DoubleCountingAgreementFullSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='name'
     )
+    producer_user = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='email'
+    )        
     dgec_validator = serializers.SlugRelatedField(
         read_only=True,
         slug_field='name'
@@ -66,7 +70,7 @@ class DoubleCountingAgreementFullSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DoubleCountingAgreement
-        fields = ['id', 'producer', 'production_site', 'period_start', 'period_end', 'status', 'dgec_validated', 'dgec_validator', 'dgec_validated_dt', 'dgddi_validated', 'dgddi_validator', 'dgddi_validated_dt', 'dgpe_validated', 'dgpe_validator', 'dgpe_validated_dt']
+        fields = ['id', 'creation_date', 'producer', 'producer_user', 'production_site', 'period_start', 'period_end', 'status', 'dgec_validated', 'dgec_validator', 'dgec_validated_dt', 'dgddi_validated', 'dgddi_validator', 'dgddi_validated_dt', 'dgpe_validated', 'dgpe_validator', 'dgpe_validated_dt']
 
 class DoubleCountingDocFileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -78,6 +82,10 @@ class DoubleCountingAgreementFullSerializerWithForeignKeys(serializers.ModelSeri
         read_only=True,
         slug_field='name'
     )
+    producer_user = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='email'
+    )    
     dgec_validator = serializers.SlugRelatedField(
         read_only=True,
         slug_field='name'
@@ -97,7 +105,7 @@ class DoubleCountingAgreementFullSerializerWithForeignKeys(serializers.ModelSeri
 
     class Meta:
         model = DoubleCountingAgreement
-        fields = ['id', 'producer', 'production_site', 'period_start', 'period_end', 'status', 'dgec_validated', 'dgec_validator', 'dgec_validated_dt', 'dgddi_validated', 'dgddi_validator', 'dgddi_validated_dt', 'dgpe_validated', 'dgpe_validator', 'dgpe_validated_dt', 'sourcing', 'production', 'documents']
+        fields = ['id', 'creation_date', 'producer', 'producer_user', 'production_site', 'period_start', 'period_end', 'status', 'dgec_validated', 'dgec_validator', 'dgec_validated_dt', 'dgddi_validated', 'dgddi_validator', 'dgddi_validated_dt', 'dgpe_validated', 'dgpe_validator', 'dgpe_validated_dt', 'sourcing', 'production', 'documents']
 
 class DoubleCountingAgreementPartialSerializer(serializers.ModelSerializer):
     production_site = serializers.SlugRelatedField(
@@ -107,7 +115,7 @@ class DoubleCountingAgreementPartialSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DoubleCountingAgreement
-        fields = ['id', 'producer', 'production_site', 'period_start', 'period_end', 'status']
+        fields = ['id', 'creation_date', 'producer', 'production_site', 'period_start', 'period_end', 'status']
 
 class DoubleCountingAgreementPartialSerializerWithForeignKeys(serializers.ModelSerializer):
     production_site = serializers.SlugRelatedField(
@@ -121,5 +129,5 @@ class DoubleCountingAgreementPartialSerializerWithForeignKeys(serializers.ModelS
 
     class Meta:
         model = DoubleCountingAgreement
-        fields = ['id', 'producer', 'production_site', 'period_start', 'period_end', 'status', 'production', 'sourcing', 'documents']
+        fields = ['id', 'creation_date', 'producer', 'production_site', 'period_start', 'period_end', 'status', 'production', 'sourcing', 'documents']
 

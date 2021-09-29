@@ -8,7 +8,7 @@ import { padding } from 'transactions/components/list-columns'
 import { Alert } from 'common/components/alert'
 import { AlertCircle } from 'common/components/icons'
 import { AgreementsOverview } from '../api'
-import { formatDate } from 'settings/components/common'
+import { formatDate, YEAR_ONLY } from 'settings/components/common'
 import { DoubleCountingPrompt } from './agreement-details'
 import { prompt } from 'common/components/dialog'
 import { DCStatus } from 'settings/components/double-counting'
@@ -25,11 +25,11 @@ const AgreementList = ({ entity }: AgreementListProps) => {
   const [tab, setTab] = useState('pending')
 
   const [agreements, getAgreements] = useAPI(api.getAllDoubleCountingAgreements)
-  
+
   useEffect(() => {
     getAgreements()
   }, [getAgreements])
-  
+
   const tabs = [
     { key: 'pending', label: t('En attente') },
     { key: 'accepted', label: t('Accepté') },
@@ -44,7 +44,8 @@ const AgreementList = ({ entity }: AgreementListProps) => {
     { header: t('Statut'), render: (a) => <DCStatus status={a.status} /> },
     { header: t('Producteur'), render: (a) => a.producer.name },
     { header: t('Site de production'), render: (a) => a.production_site },
-    { header: t('Période de validité'), render: (a) => `${formatDate(a.period_start)} ▸ ${formatDate(a.period_end)}` },
+    { header: t('Période de validité'), render: (a) => `${formatDate(a.period_start, YEAR_ONLY)} - ${formatDate(a.period_end, YEAR_ONLY)}` },
+    { header: t('Date de soumission'), render: (a) => formatDate(a.creation_date) },
     padding
   ]
 
@@ -52,10 +53,10 @@ const AgreementList = ({ entity }: AgreementListProps) => {
     value: agreement,
     onClick: async () => {
       await prompt((resolve) => (
-        <DoubleCountingPrompt 
-          entity={entity} 
-          agreementID={agreement.id} 
-          onResolve={resolve} 
+        <DoubleCountingPrompt
+          entity={entity}
+          agreementID={agreement.id}
+          onResolve={resolve}
         />
       ))
 
@@ -68,9 +69,9 @@ const AgreementList = ({ entity }: AgreementListProps) => {
   const { pending, accepted, expired, rejected } = agreements.data
 
   return (
-    <div style={{padding: '8px 120px'}}>
+    <div style={{ padding: '8px 120px' }}>
       <Tabs tabs={tabs} focus={tab} onFocus={setTab} />
-      
+
       {tab === 'pending' && (
         <Fragment>
           {pending.count === 0 && (
@@ -82,8 +83,8 @@ const AgreementList = ({ entity }: AgreementListProps) => {
           )}
 
           {pending.count > 0 && (
-            <Table 
-              columns={columns} 
+            <Table
+              columns={columns}
               rows={pending.agreements.map(agreementRowMapper)}
             />
           )}
@@ -101,8 +102,8 @@ const AgreementList = ({ entity }: AgreementListProps) => {
           )}
 
           {accepted.count > 0 && (
-            <Table 
-              columns={columns} 
+            <Table
+              columns={columns}
               rows={accepted.agreements.map(agreementRowMapper)}
             />
           )}
@@ -120,8 +121,8 @@ const AgreementList = ({ entity }: AgreementListProps) => {
           )}
 
           {expired.count > 0 && (
-            <Table 
-              columns={columns} 
+            <Table
+              columns={columns}
               rows={expired.agreements.map(agreementRowMapper)}
             />
           )}
@@ -139,8 +140,8 @@ const AgreementList = ({ entity }: AgreementListProps) => {
           )}
 
           {rejected.count > 0 && (
-            <Table 
-              columns={columns} 
+            <Table
+              columns={columns}
               rows={rejected.agreements.map(agreementRowMapper)}
             />
           )}

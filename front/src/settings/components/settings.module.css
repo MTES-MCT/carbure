@@ -63,12 +63,9 @@ div > .settingsSelect {
   align-items: center;
   color: var(--blue-medium);
   text-decoration: underline;
-  margin: 0 6px;
+  margin-right: 16px;
+  margin-top: 6px;
   flex-shrink: 0;
-}
-
-.settingsBottomLink {
-  margin-right: auto;
 }
 
 .settingsBottomLink svg {
