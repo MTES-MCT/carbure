@@ -22,7 +22,7 @@ type AgreementListProps = {
 
 const AgreementList = ({ entity }: AgreementListProps) => {
   const { t } = useTranslation()
-  const [tab, setTab] = useState('pending')
+  const [tab, setTab] = useState("pending")
 
   const [agreements, getAgreements] = useAPI(api.getAllDoubleCountingAgreements)
 
@@ -31,10 +31,10 @@ const AgreementList = ({ entity }: AgreementListProps) => {
   }, [getAgreements])
 
   const tabs = [
-    { key: 'pending', label: t('En attente') },
-    { key: 'accepted', label: t('Accepté') },
-    { key: 'expired', label: t('Expiré') },
-    { key: 'rejected', label: t('Refusé') },
+    { key: "pending", label: t("En attente") },
+    { key: "accepted", label: t("Accepté") },
+    { key: "expired", label: t("Expiré") },
+    { key: "rejected", label: t("Refusé") },
   ]
 
   if (agreements === null) return <LoaderOverlay />
@@ -61,7 +61,7 @@ const AgreementList = ({ entity }: AgreementListProps) => {
       ))
 
       getAgreements()
-    }
+    },
   })
 
   if (agreements.data === null) return <LoaderOverlay />
@@ -69,16 +69,14 @@ const AgreementList = ({ entity }: AgreementListProps) => {
   const { pending, accepted, expired, rejected } = agreements.data
 
   return (
-    <div style={{ padding: '8px 120px' }}>
+    <div style={{ padding: "8px 120px" }}>
       <Tabs tabs={tabs} focus={tab} onFocus={setTab} />
 
-      {tab === 'pending' && (
+      {tab === "pending" && (
         <Fragment>
           {pending.count === 0 && (
             <Alert level="warning" icon={AlertCircle}>
-              <Trans>
-                Aucun dossier en attente trouvé
-              </Trans>
+              <Trans>Aucun dossier en attente trouvé</Trans>
             </Alert>
           )}
 
@@ -91,13 +89,11 @@ const AgreementList = ({ entity }: AgreementListProps) => {
         </Fragment>
       )}
 
-      {tab === 'accepted' && (
+      {tab === "accepted" && (
         <Fragment>
           {accepted.count === 0 && (
             <Alert level="warning" icon={AlertCircle}>
-              <Trans>
-                Aucun dossier accepté trouvé
-              </Trans>
+              <Trans>Aucun dossier accepté trouvé</Trans>
             </Alert>
           )}
 
@@ -110,13 +106,11 @@ const AgreementList = ({ entity }: AgreementListProps) => {
         </Fragment>
       )}
 
-      {tab === 'expired' && (
+      {tab === "expired" && (
         <Fragment>
           {expired.count === 0 && (
             <Alert level="warning" icon={AlertCircle}>
-              <Trans>
-                Aucun dossier expiré trouvé
-              </Trans>
+              <Trans>Aucun dossier expiré trouvé</Trans>
             </Alert>
           )}
 
@@ -129,13 +123,11 @@ const AgreementList = ({ entity }: AgreementListProps) => {
         </Fragment>
       )}
 
-      {tab === 'rejected' && (
+      {tab === "rejected" && (
         <Fragment>
           {rejected.count === 0 && (
             <Alert level="warning" icon={AlertCircle}>
-              <Trans>
-                Aucun dossier refusé trouvé
-              </Trans>
+              <Trans>Aucun dossier refusé trouvé</Trans>
             </Alert>
           )}
 
