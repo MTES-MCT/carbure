@@ -115,11 +115,12 @@ def get_entity_lots_by_status(entity, status):
 
 def get_lots_with_errors(txs, entity=None):
     if entity is None:
-        return txs.annotate(errors=Count('genericerror')).filter(errors__gt=0)
+        filter = Q(tx=OuterRef('pk'))
     else:
-        return txs.annotate(
-            errors=Count('genericerror', filter=(Q(carbure_vendor=entity, genericerror__display_to_creator=True) | Q(carbure_client=entity, genericerror__display_to_recipient=True)) )
-        ).filter(errors__gt=0)
+        filter = Q(tx=OuterRef('pk')) & (Q(tx__carbure_vendor=entity, display_to_creator=True) | Q(tx__carbure_client=entity, display_to_recipient=True))
+
+    tx_errors = GenericError.objects.filter(filter).values('tx').annotate(errors=Count(Value(1))).values('errors')
+    return txs.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
 
 
 def get_lots_with_deadline(txs, deadline):
