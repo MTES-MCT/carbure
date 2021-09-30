@@ -3,6 +3,7 @@ import styles from "./home.module.css"
 import banner from "../assets/images/banner.png"
 import traders from "../assets/images/traders.svg"
 import operators from "../assets/images/operators.svg"
+import schema from "../assets/images/schema.svg"
 import { Trans } from "react-i18next"
 import {
   ChevronRight,
@@ -89,6 +90,8 @@ const Home = ({ app }: HomeProps) => {
             <ChevronRight />
           </a>
         </div>
+
+        <img src={schema} alt="Schéma" className={styles.homeSchema} />
       </section>
 
       <section className={styles.homeAuthentication}>
