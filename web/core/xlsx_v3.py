@@ -654,7 +654,7 @@ def export_dca(dca):
     for i, c in enumerate(columns):
         sourcing_worksheet.write(0, i, c, bold)
     for rowid, entry in enumerate(dca.sourcing.all()):
-        row = [entry.year, entry.feedstock.code, entry.origin_country.code_pays, entry.supply_country.code_pays, entry.transit_country.code_pays, entry.metric_tonnes]
+        row = [entry.year, entry.feedstock.code, entry.origin_country.code_pays if entry.origin_country else '', entry.supply_country.code_pays if entry.supply_country else '', entry.transit_country.code_pays if entry.transit_country else '', entry.metric_tonnes]
         for colid, elem in enumerate(row):
             sourcing_worksheet.write(rowid+1, colid, elem)
     # production sheet
