@@ -30,10 +30,18 @@ export const Dialog = ({
   </Modal>
 )
 
-export const DialogTitle = ({ text }: { text: string }) => <Title>{text}</Title>
+type ContentProps = { text?: string; children?: React.ReactNode }
 
-export const DialogText = ({ text, children }: { text?: string, children?: React.ReactNode }) => (
+export const DialogTitle = ({ text, children }: ContentProps) => (
+  <Title>{text}</Title>
+)
+
+export const DialogText = ({ text, children }: ContentProps) => (
   <span className={styles.dialogMessage}>{text ?? children}</span>
+)
+
+export const DialogSubtitle = ({ text, children }: ContentProps) => (
+  <h2 className={styles.dialogSubtitle}>{text ?? children}</h2>
 )
 
 export const DialogButtons = (props: any) => (
