@@ -366,7 +366,7 @@ export const DoubleCountingPrompt = ({
       </DialogText>
 
       {!isReady && (
-        <Alert level="warning" icon={AlertCircle}>
+        <Alert level="warning" icon={AlertCircle} style={{ marginTop: 8 }}>
           <Trans>Dossier en attente de validation par la DGEC</Trans>
         </Alert>
       )}
