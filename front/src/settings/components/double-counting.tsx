@@ -541,8 +541,16 @@ const DoubleCountingPrompt = ({
   const [, deleteSourcing] = useAPI(api.deleteDoubleCountingSourcing)
   const [, deleteProduction] = useAPI(api.deleteDoubleCountingProduction)
 
+  useEffect(() => {
+    if (entity) {
+      getAgreement(entity.id, agreementID)
+    }
+  }, [entity, agreementID, getAgreement])
+
   const dcaID = agreement.data?.id ?? -1
   const dcaStatus = agreement.data?.status ?? DoubleCountingStatus.Pending
+
+  const isFinal = agreement.data?.status !== DoubleCountingStatus.Pending
 
   function reloadAgreement() {
     if (entity === null) return
@@ -550,7 +558,7 @@ const DoubleCountingPrompt = ({
   }
 
   async function removeSourcingRow(sourcingID: number) {
-    if (!entity) return
+    if (!entity || isFinal) return
 
     const ok = await confirm(
       t("Supprimer approvisionnement"),
@@ -564,7 +572,7 @@ const DoubleCountingPrompt = ({
   }
 
   async function removeProductionRow(productionID: number) {
-    if (!entity) return
+    if (!entity || isFinal) return
 
     const ok = await confirm(
       t("Supprimer production"),
@@ -576,12 +584,6 @@ const DoubleCountingPrompt = ({
       reloadAgreement()
     }
   }
-
-  useEffect(() => {
-    if (entity) {
-      getAgreement(entity.id, agreementID)
-    }
-  }, [entity, agreementID, getAgreement])
 
   const sourcingColumns: Column<DoubleCountingSourcing>[] = [
     padding,
@@ -608,32 +610,41 @@ const DoubleCountingPrompt = ({
         s.transit_country &&
         t(s.transit_country.code_pays, { ns: "countries" }),
     },
-    Actions((s) => [
-      {
-        icon: Cross,
-        action: () => removeSourcingRow(s.id),
-        title: t("Supprimer approvisionnement"),
-      },
-    ]),
     padding,
   ]
+
+  if (!isFinal) {
+    sourcingColumns.splice(
+      -1,
+      0,
+      Actions((s) => [
+        {
+          icon: Cross,
+          action: () => removeSourcingRow(s.id),
+          title: t("Supprimer approvisionnement"),
+        },
+      ])
+    )
+  }
 
   const sourcingRows: Row<DoubleCountingSourcing>[] = (
     agreement.data?.sourcing ?? []
   ).map((s) => ({
     value: s,
-    onClick: async () => {
-      const ok = await prompt((resolve) => (
-        <DoubleCountingSourcingPrompt
-          entity={entity}
-          dcaID={dcaID}
-          sourcing={s}
-          onResolve={resolve}
-        />
-      ))
+    onClick: isFinal
+      ? undefined
+      : async () => {
+          const ok = await prompt((resolve) => (
+            <DoubleCountingSourcingPrompt
+              entity={entity}
+              dcaID={dcaID}
+              sourcing={s}
+              onResolve={resolve}
+            />
+          ))
 
-      ok && reloadAgreement()
-    },
+          ok && reloadAgreement()
+        },
   }))
 
   const productionColumns: Column<DoubleCountingProduction>[] = [
@@ -663,32 +674,41 @@ const DoubleCountingPrompt = ({
       render: (p) =>
         p.approved_quota === -1 ? t("En attente") : p.approved_quota,
     },
-    Actions((s) => [
-      {
-        icon: Cross,
-        action: () => removeProductionRow(s.id),
-        title: t("Supprimer production"),
-      },
-    ]),
     padding,
   ]
+
+  if (!isFinal) {
+    productionColumns.splice(
+      -1,
+      0,
+      Actions((s) => [
+        {
+          icon: Cross,
+          action: () => removeProductionRow(s.id),
+          title: t("Supprimer production"),
+        },
+      ])
+    )
+  }
 
   const productionRows: Row<DoubleCountingProduction>[] = (
     agreement.data?.production ?? []
   ).map((p) => ({
     value: p,
-    onClick: async () => {
-      const ok = await prompt((resolve) => (
-        <DoubleCountingProductionPrompt
-          entity={entity}
-          dcaID={dcaID}
-          production={p}
-          onResolve={resolve}
-        />
-      ))
+    onClick: isFinal
+      ? undefined
+      : async () => {
+          const ok = await prompt((resolve) => (
+            <DoubleCountingProductionPrompt
+              entity={entity}
+              dcaID={dcaID}
+              production={p}
+              onResolve={resolve}
+            />
+          ))
 
-      ok && reloadAgreement()
-    },
+          ok && reloadAgreement()
+        },
   }))
 
   const excelURL =
@@ -720,23 +740,25 @@ const DoubleCountingPrompt = ({
         <div className={styles.modalTableContainer}>
           <YearTable columns={sourcingColumns} rows={sourcingRows} />
 
-          <span
-            className={styles.modalTableAddRow}
-            onClick={async () => {
-              const ok = await prompt((resolve) => (
-                <DoubleCountingSourcingPrompt
-                  add
-                  dcaID={dcaID}
-                  entity={entity}
-                  onResolve={resolve}
-                />
-              ))
+          {!isFinal && (
+            <span
+              className={styles.modalTableAddRow}
+              onClick={async () => {
+                const ok = await prompt((resolve) => (
+                  <DoubleCountingSourcingPrompt
+                    add
+                    dcaID={dcaID}
+                    entity={entity}
+                    onResolve={resolve}
+                  />
+                ))
 
-              ok && reloadAgreement()
-            }}
-          >
-            <Trans>+ Ajouter une ligne d'approvisionnement</Trans>
-          </span>
+                ok && reloadAgreement()
+              }}
+            >
+              <Trans>+ Ajouter une ligne d'approvisionnement</Trans>
+            </span>
+          )}
         </div>
       )}
 
@@ -744,23 +766,25 @@ const DoubleCountingPrompt = ({
         <div className={styles.modalTableContainer}>
           <YearTable columns={productionColumns} rows={productionRows} />
 
-          <span
-            className={styles.modalTableAddRow}
-            onClick={async () => {
-              await prompt((resolve) => (
-                <DoubleCountingProductionPrompt
-                  add
-                  dcaID={dcaID}
-                  entity={entity}
-                  onResolve={resolve}
-                />
-              ))
+          {!isFinal && (
+            <span
+              className={styles.modalTableAddRow}
+              onClick={async () => {
+                await prompt((resolve) => (
+                  <DoubleCountingProductionPrompt
+                    add
+                    dcaID={dcaID}
+                    entity={entity}
+                    onResolve={resolve}
+                  />
+                ))
 
-              reloadAgreement()
-            }}
-          >
-            <Trans>+ Ajouter une ligne de production</Trans>
-          </span>
+                reloadAgreement()
+              }}
+            >
+              <Trans>+ Ajouter une ligne de production</Trans>
+            </span>
+          )}
         </div>
       )}
 
