@@ -95,6 +95,7 @@ type TableProps<T> = SystemProps & {
   columns: Column<T>[]
   sortBy?: string
   order?: "asc" | "desc"
+  headless?: boolean
   onSort?: (s: string) => void
 }
 
@@ -103,27 +104,30 @@ export default function Table<T>({
   columns,
   sortBy,
   order,
+  headless = false,
   className,
   onSort,
   ...props
 }: TableProps<T>) {
   return (
     <Box {...props} className={cl(styles.table, className)}>
-      <Box row>
-        {columns.map((column, c) => (
-          <Box
-            row
-            key={c}
-            className={cl(styles.tableHeader, column.className)}
-            onClick={() => column.sortBy && onSort && onSort(column.sortBy)}
-          >
-            {column.header ?? null}
-            {sortBy && sortBy === column.sortBy && (
-              <span>{order === "asc" ? " ▲" : " ▼"}</span>
-            )}
-          </Box>
-        ))}
-      </Box>
+      {!headless && (
+        <Box row>
+          {columns.map((column, c) => (
+            <Box
+              row
+              key={c}
+              className={cl(styles.tableHeader, column.className)}
+              onClick={() => column.sortBy && onSort && onSort(column.sortBy)}
+            >
+              {column.header ?? null}
+              {sortBy && sortBy === column.sortBy && (
+                <span>{order === "asc" ? " ▲" : " ▼"}</span>
+              )}
+            </Box>
+          ))}
+        </Box>
+      )}
 
       {rows.map((row, r) => (
         <Box

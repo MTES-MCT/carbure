@@ -52,6 +52,7 @@ import Tabs from "common/components/tabs"
 import { Form } from "common/components/form"
 import { LabelInput } from "common/components/input"
 import useForm from "common/hooks/use-form"
+import YearTable from "doublecount/components/year-table"
 
 export const DCStatus = ({ status }: { status: DoubleCountingStatus }) => {
   const { t } = useTranslation()
@@ -95,15 +96,22 @@ const DoubleCountingUploadPrompt = ({
   const [documentationFile, setDocumentationFile] = useState<File | null>(null) // prettier-ignore
 
   const [uploading, uploadFile] = useAPI(api.uploadDoubleCountingFile)
-  const [uploadingDoc, uploadDocFile] = useAPI(api.uploadDoubleCountingDescriptionFile)
+  const [uploadingDoc, uploadDocFile] = useAPI(
+    api.uploadDoubleCountingDescriptionFile
+  )
 
   const disabled = !productionSite || !doubleCountingFile || !documentationFile
 
   async function submitAgreement() {
-    if (!entity || !productionSite || !doubleCountingFile || !documentationFile) return
+    if (!entity || !productionSite || !doubleCountingFile || !documentationFile)
+      return
 
-    const res = await uploadFile(entity.id, productionSite.id, doubleCountingFile)
-    res && await uploadDocFile(entity.id, res.dca_id, documentationFile)
+    const res = await uploadFile(
+      entity.id,
+      productionSite.id,
+      doubleCountingFile
+    )
+    res && (await uploadDocFile(entity.id, res.dca_id, documentationFile))
 
     onResolve()
   }
@@ -578,10 +586,6 @@ const DoubleCountingPrompt = ({
   const sourcingColumns: Column<DoubleCountingSourcing>[] = [
     padding,
     {
-      header: t("Année"),
-      render: (s) => s.year,
-    },
-    {
       header: t("Matière première"),
       render: (s) => t(s.feedstock.code, { ns: "feedstocks" }),
     },
@@ -635,10 +639,6 @@ const DoubleCountingPrompt = ({
   const productionColumns: Column<DoubleCountingProduction>[] = [
     padding,
     {
-      header: t("Année"),
-      render: (p) => p.year,
-    },
-    {
       header: t("Matière première"),
       render: (p) => t(p.feedstock.code, { ns: "feedstocks" }),
     },
@@ -660,7 +660,8 @@ const DoubleCountingPrompt = ({
     },
     {
       header: t("Quota approuvé"),
-      render: (p) => p.approved_quota,
+      render: (p) =>
+        p.approved_quota === -1 ? t("En attente") : p.approved_quota,
     },
     Actions((s) => [
       {
@@ -690,8 +691,14 @@ const DoubleCountingPrompt = ({
     },
   }))
 
-  const excelURL = agreement.data && `/api/v3/doublecount/agreement?dca_id=${agreement.data.id}&entity_id=${entity?.id}&export=true`
-  const documentationURL = entity && agreement.data && agreement.data.documents[0] && `/api/v3/doublecount/download-documentation?entity_id=${entity.id}&dca_id=${agreement.data.id}&file_id=${agreement.data.documents[0].id}`
+  const excelURL =
+    agreement.data &&
+    `/api/v3/doublecount/agreement?dca_id=${agreement.data.id}&entity_id=${entity?.id}&export=true`
+  const documentationURL =
+    entity &&
+    agreement.data &&
+    agreement.data.documents[0] &&
+    `/api/v3/doublecount/download-documentation?entity_id=${entity.id}&dca_id=${agreement.data.id}&file_id=${agreement.data.documents[0].id}`
 
   return (
     <Dialog wide onResolve={onResolve} className={styles.settingsPrompt}>
@@ -711,7 +718,7 @@ const DoubleCountingPrompt = ({
 
       {focus === "sourcing" && (
         <div className={styles.modalTableContainer}>
-          <Table columns={sourcingColumns} rows={sourcingRows} />
+          <YearTable columns={sourcingColumns} rows={sourcingRows} />
 
           <span
             className={styles.modalTableAddRow}
@@ -735,7 +742,7 @@ const DoubleCountingPrompt = ({
 
       {focus === "production" && (
         <div className={styles.modalTableContainer}>
-          <Table columns={productionColumns} rows={productionRows} />
+          <YearTable columns={productionColumns} rows={productionRows} />
 
           <span
             className={styles.modalTableAddRow}
@@ -758,28 +765,24 @@ const DoubleCountingPrompt = ({
       )}
 
       <DialogButtons>
-        <Box style={{ marginRight: 'auto' }}>
+        <Box style={{ marginRight: "auto" }}>
           <a
-            href={excelURL ?? '#'}
+            href={excelURL ?? "#"}
             target="_blank"
             rel="noreferrer"
             className={styles.settingsBottomLink}
           >
             <Upload />
-            <Trans>
-              Télécharger au format excel
-            </Trans>
+            <Trans>Télécharger le dossier au format excel</Trans>
           </a>
           <a
-            href={documentationURL ?? '#'}
+            href={documentationURL ?? "#"}
             target="_blank"
             rel="noreferrer"
             className={styles.settingsBottomLink}
           >
             <Upload />
-            <Trans>
-              Télécharger la description de l'activité
-            </Trans>
+            <Trans>Télécharger la description de l'activité</Trans>
           </a>
         </Box>
 
@@ -828,7 +831,11 @@ const DoubleCountingSettings = ({
     },
     {
       header: t("Période de validité"),
-      render: (dc) => `${formatDate(dc.period_start, YEAR_ONLY)} - ${formatDate(dc.period_end, YEAR_ONLY)}`,
+      render: (dc) =>
+        `${formatDate(dc.period_start, YEAR_ONLY)} - ${formatDate(
+          dc.period_end,
+          YEAR_ONLY
+        )}`,
     },
     {
       header: t("Date de soumission"),

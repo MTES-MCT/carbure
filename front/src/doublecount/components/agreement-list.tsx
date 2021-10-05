@@ -1,20 +1,19 @@
-import { Fragment, useState, useEffect } from 'react'
-import { useTranslation, Trans } from 'react-i18next'
-import { DoubleCounting } from 'common/types'
-import { LoaderOverlay } from 'common/components'
-import Tabs from 'common/components/tabs'
-import Table, { Column } from 'common/components/table'
-import { padding } from 'transactions/components/list-columns'
-import { Alert } from 'common/components/alert'
-import { AlertCircle } from 'common/components/icons'
-import { AgreementsOverview } from '../api'
-import { formatDate, YEAR_ONLY } from 'settings/components/common'
-import { DoubleCountingPrompt } from './agreement-details'
-import { prompt } from 'common/components/dialog'
-import { DCStatus } from 'settings/components/double-counting'
-import { EntitySelection } from 'carbure/hooks/use-entity'
-import useAPI from 'common/hooks/use-api'
-import * as api from '../api'
+import { Fragment, useState, useEffect } from "react"
+import { useTranslation, Trans } from "react-i18next"
+import { DoubleCounting } from "common/types"
+import { LoaderOverlay } from "common/components"
+import Tabs from "common/components/tabs"
+import Table, { Column } from "common/components/table"
+import { padding } from "transactions/components/list-columns"
+import { Alert } from "common/components/alert"
+import { AlertCircle } from "common/components/icons"
+import { formatDate, YEAR_ONLY } from "settings/components/common"
+import { DoubleCountingPrompt } from "./agreement-details"
+import { prompt } from "common/components/dialog"
+import { DCStatus } from "settings/components/double-counting"
+import { EntitySelection } from "carbure/hooks/use-entity"
+import useAPI from "common/hooks/use-api"
+import * as api from "../api"
 
 type AgreementListProps = {
   entity: EntitySelection
@@ -41,12 +40,22 @@ const AgreementList = ({ entity }: AgreementListProps) => {
 
   const columns: Column<DoubleCounting>[] = [
     padding,
-    { header: t('Statut'), render: (a) => <DCStatus status={a.status} /> },
-    { header: t('Producteur'), render: (a) => a.producer.name },
-    { header: t('Site de production'), render: (a) => a.production_site },
-    { header: t('Période de validité'), render: (a) => `${formatDate(a.period_start, YEAR_ONLY)} - ${formatDate(a.period_end, YEAR_ONLY)}` },
-    { header: t('Date de soumission'), render: (a) => formatDate(a.creation_date) },
-    padding
+    { header: t("Statut"), render: (a) => <DCStatus status={a.status} /> },
+    { header: t("Producteur"), render: (a) => a.producer.name },
+    { header: t("Site de production"), render: (a) => a.production_site },
+    {
+      header: t("Période de validité"),
+      render: (a) =>
+        `${formatDate(a.period_start, YEAR_ONLY)} - ${formatDate(
+          a.period_end,
+          YEAR_ONLY
+        )}`,
+    },
+    {
+      header: t("Date de soumission"),
+      render: (a) => formatDate(a.creation_date),
+    },
+    padding,
   ]
 
   const agreementRowMapper = (agreement: DoubleCounting) => ({

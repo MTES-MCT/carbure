@@ -12,6 +12,12 @@ div.dialog {
   margin-bottom: 12px;
 }
 
+.dialogSubtitle {
+  border-bottom: 1px solid var(--gray-highlight);
+  margin: 0;
+  padding: 16px 24px;
+}
+
 .dialogWide .dialogMessage {
   max-width: unset;
 }
