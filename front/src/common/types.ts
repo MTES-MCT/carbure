@@ -554,6 +554,7 @@ export interface ConvertETBE {
 
 export enum DoubleCountingStatus {
   Pending = "PENDING",
+  InProgress = "INPROGRESS",
   Rejected = "REJECTED",
   Accepted = "ACCEPTED",
   Lapsed = "LAPSED",
@@ -568,6 +569,13 @@ export interface DoubleCounting {
   status: DoubleCountingStatus
   producer_user: string
   creation_date: string
+}
+
+export interface DoubleCountingSourcingAggregation {
+  year: number
+  sum: number
+  count: number
+  feedstock: MatierePremiere
 }
 
 export interface DoubleCountingSourcing {
@@ -594,6 +602,7 @@ export interface DoubleCountingProduction {
 export interface DoubleCountingDetails extends DoubleCounting {
   sourcing: DoubleCountingSourcing[]
   production: DoubleCountingProduction[]
+  aggregated_sourcing: DoubleCountingSourcingAggregation[]
   documents: { id: number, url: string }[]
   dgec_validated: boolean
   dgec_validator: string | null
@@ -604,4 +613,10 @@ export interface DoubleCountingDetails extends DoubleCounting {
   dgpe_validated: boolean
   dgpe_validator: string | null
   dgpe_validated_dt: string | null
+}
+
+export enum Admin {
+  DGEC = "MTE - DGEC",
+  DGDDI = "DGDDI",
+  DGPE = "DGPE",
 }

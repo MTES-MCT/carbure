@@ -14,6 +14,7 @@ class ProductionSite(models.Model):
     dc_reference = models.CharField(max_length=64, null=True, blank=True, default='')
 
     site_id = models.CharField(max_length=64, blank=True)
+    address = models.CharField(max_length=256, blank=True, default='')
     city = models.CharField(max_length=64, blank=True)
     postal_code = models.CharField(max_length=64, blank=True)
     gps_coordinates = models.CharField(max_length=64, blank=True, null=True, default=None)

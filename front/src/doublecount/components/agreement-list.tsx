@@ -10,9 +10,9 @@ import { AlertCircle } from "common/components/icons"
 import { formatDate, YEAR_ONLY } from "settings/components/common"
 import { DoubleCountingPrompt } from "./agreement-details"
 import { prompt } from "common/components/dialog"
-import { DCStatus } from "settings/components/double-counting"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import useAPI from "common/hooks/use-api"
+import DoubleCountingStatus from './dc-status'
 import * as api from "../api"
 
 type AgreementListProps = {
@@ -40,7 +40,7 @@ const AgreementList = ({ entity }: AgreementListProps) => {
 
   const columns: Column<DoubleCounting>[] = [
     padding,
-    { header: t("Statut"), render: (a) => <DCStatus status={a.status} /> },
+    { header: t("Statut"), render: (a) => <DoubleCountingStatus status={a.status} /> },
     { header: t("Producteur"), render: (a) => a.producer.name },
     { header: t("Site de production"), render: (a) => a.production_site },
     {
@@ -75,7 +75,10 @@ const AgreementList = ({ entity }: AgreementListProps) => {
 
   if (agreements.data === null) return <LoaderOverlay />
 
-  const { pending, accepted, expired, rejected } = agreements.data
+  const { pending, progress, accepted, expired, rejected } = agreements.data
+
+  const allPendingCount = pending.count + progress.count
+  const allPending = progress.agreements.concat(pending.agreements)
 
   return (
     <div style={{ padding: "8px 120px" }}>
@@ -83,16 +86,16 @@ const AgreementList = ({ entity }: AgreementListProps) => {
 
       {tab === "pending" && (
         <Fragment>
-          {pending.count === 0 && (
+          {allPendingCount === 0 && (
             <Alert level="warning" icon={AlertCircle}>
               <Trans>Aucun dossier en attente trouvé</Trans>
             </Alert>
           )}
 
-          {pending.count > 0 && (
+          {allPendingCount > 0 && (
             <Table
               columns={columns}
-              rows={pending.agreements.map(agreementRowMapper)}
+              rows={allPending.map(agreementRowMapper)}
             />
           )}
         </Fragment>

@@ -1,11 +1,13 @@
 import { Fragment, useState, useEffect } from "react"
 import { useTranslation, Trans } from "react-i18next"
 import {
-  DoubleCountingStatus,
+  Admin,
+  DoubleCountingStatus as DCStatus,
   DoubleCountingSourcing,
   DoubleCountingProduction,
   EntityType,
   DoubleCountingDetails,
+  DoubleCountingSourcingAggregation
 } from "common/types"
 import useAPI from "common/hooks/use-api"
 import { LoaderOverlay, Box } from "common/components"
@@ -24,7 +26,6 @@ import {
   PromptProps,
 } from "common/components/dialog"
 import { EntitySelection } from "carbure/hooks/use-entity"
-import { DCStatus } from "settings/components/double-counting"
 import styles from "settings/components/settings.module.css"
 import {
   Return,
@@ -38,183 +39,13 @@ import { formatDate } from "settings/components/common"
 import { Alert } from "common/components/alert"
 import { useNotificationContext } from "common/components/notifications"
 import YearTable from "./year-table"
-
-export enum Admin {
-  DGEC = "MTE - DGEC",
-  DGDDI = "DGDDI",
-  DGPE = "DGPE",
-}
-
-type ValidationStatus = {
-  approved: boolean
-  date: string
-  user: string
-  entity: string
-}
-
-type SourcingTableProps = {
-  sourcing: DoubleCountingSourcing[]
-}
-
-const SourcingTable = ({ sourcing }: SourcingTableProps) => {
-  const { t } = useTranslation()
-
-  const columns: Column<DoubleCountingSourcing>[] = [
-    padding,
-    {
-      header: t("Matière première"),
-      render: (s) => t(s.feedstock.code, { ns: "feedstocks" }),
-    },
-    {
-      header: t("Poids en tonnes"),
-      render: (s) => s.metric_tonnes,
-    },
-    {
-      header: t("Origine"),
-      render: (s) => t(s.origin_country.code_pays, { ns: "countries" }),
-    },
-    {
-      header: t("Approvisionnement"),
-      render: (s) =>
-        s.supply_country && t(s.supply_country.code_pays, { ns: "countries" }),
-    },
-    {
-      header: t("Transit"),
-      render: (s) =>
-        s.transit_country &&
-        t(s.transit_country.code_pays, { ns: "countries" }),
-    },
-    padding,
-  ]
-
-  const rows = sourcing.map((v) => ({ value: v }))
-
-  return <YearTable columns={columns} rows={rows} />
-}
-
-type ProductionTableProps = {
-  done?: boolean
-  entity: EntitySelection
-  quotas: Record<string, string>
-  production: DoubleCountingProduction[]
-  setQuotas: (quotas: Record<string, string>) => void
-}
-
-const ProductionTable = ({
-  done,
-  entity,
-  quotas,
-  production,
-  setQuotas,
-}: ProductionTableProps) => {
-  const { t } = useTranslation()
-
-  const productionColumns: Column<DoubleCountingProduction>[] = [
-    padding,
-    {
-      header: t("Matière première"),
-      render: (p) => t(p.feedstock.code, { ns: "feedstocks" }),
-    },
-    {
-      header: t("Biocarburant"),
-      render: (p) => t(p.biofuel.code, { ns: "biofuels" }),
-    },
-    {
-      header: t("Prod. max"),
-      render: (p) => p.max_production_capacity,
-    },
-    {
-      header: t("Prod. estimée"),
-      render: (p) => p.estimated_production,
-    },
-    {
-      header: t("Quota demandé"),
-      render: (p) => p.requested_quota,
-    },
-    {
-      header: t("Quota approuvé"),
-      render: (p) => {
-        if (done || entity?.entity_type !== EntityType.Administration) {
-          return p.approved_quota >= 0 ? p.approved_quota : p.requested_quota
-        }
-
-        return (
-          <Input
-            value={quotas[p.id]}
-            onChange={(e) =>
-              setQuotas({
-                ...quotas,
-                [p.id]: e.target.value,
-              })
-            }
-          />
-        )
-      },
-    },
-    padding,
-  ]
-
-  const rows = production.map((v) => ({ value: v }))
-
-  return <YearTable columns={productionColumns} rows={rows} />
-}
-
-type StatusTableProps = {
-  agreement: DoubleCountingDetails | null
-}
-
-const StatusTable = ({ agreement }: StatusTableProps) => {
-  const { t } = useTranslation()
-
-  const statusColumns: Column<ValidationStatus>[] = [
-    padding,
-    {
-      header: t("Administration"),
-      render: (s) => s.entity,
-    },
-    {
-      header: t("Statut"),
-      render: (s) =>
-        !s.approved && s.user
-          ? t("Refusé")
-          : s.approved
-          ? t("Accepté")
-          : t("En attente"),
-    },
-    {
-      header: t("Validateur"),
-      render: (s) => s.user || "N/A",
-    },
-    {
-      header: t("Date"),
-      render: (s) => formatDate(s.date),
-    },
-    padding,
-  ]
-
-  const statusRows: Row<ValidationStatus>[] = [
-    {
-      approved: agreement?.dgec_validated ?? false,
-      date: agreement?.dgec_validated_dt ?? "",
-      user: agreement?.dgec_validator ?? "",
-      entity: Admin.DGEC,
-    },
-    {
-      approved: agreement?.dgddi_validated ?? false,
-      date: agreement?.dgddi_validated_dt ?? "",
-      user: agreement?.dgddi_validator ?? "",
-      entity: Admin.DGDDI,
-    },
-    {
-      approved: agreement?.dgpe_validated ?? false,
-      date: agreement?.dgpe_validated_dt ?? "",
-      user: agreement?.dgpe_validator ?? "",
-      entity: Admin.DGPE,
-    },
-  ].map((value) => ({ value }))
-
-  return <Table columns={statusColumns} rows={statusRows} />
-}
+import DoubleCountingStatus from './dc-status'
+import { 
+  SourcingAggregationTable,
+  SourcingTable,
+  ProductionTable,
+  StatusTable
+} from './dc-tables'
 
 export type DoubleCountingPromptProps = PromptProps<any> & {
   agreementID: number
@@ -229,7 +60,7 @@ export const DoubleCountingPrompt = ({
   const { t } = useTranslation()
   const notifications = useNotificationContext()
 
-  const [focus, setFocus] = useState("sourcing")
+  const [focus, setFocus] = useState("aggregated_sourcing")
   const [quotas, setQuotas] = useState<Record<string, string>>({})
 
   const [agreement, getAgreement] = useAPI(api.getDoubleCountingAgreement)
@@ -262,7 +93,7 @@ export const DoubleCountingPrompt = ({
     setQuotas(quotas)
   }, [agreement.data])
 
-  const dcaStatus = agreement.data?.status ?? DoubleCountingStatus.Pending
+  const dcaStatus = agreement.data?.status ?? DCStatus.Pending
 
   const excelURL =
     agreement.data &&
@@ -282,7 +113,8 @@ export const DoubleCountingPrompt = ({
   }
 
   const isDone =
-    approved || agreement.data?.status === DoubleCountingStatus.Rejected
+    approved || agreement.data?.status === DCStatus.Rejected
+  const hasQuotas = !agreement.data?.production.some(p => p.approved_quota === -1)
   const isAdmin = entity?.entity_type === EntityType.Administration
   const isReady = isAdmin ? true : agreement.data?.dgec_validated
 
@@ -306,6 +138,8 @@ export const DoubleCountingPrompt = ({
       agreement.data.id,
       Object.keys(quotas).map((id) => [parseInt(id), parseInt(quotas[id])])
     )
+    
+    getAgreement(agreementID)
 
     if (done) {
       notifications.push({
@@ -353,7 +187,7 @@ export const DoubleCountingPrompt = ({
   return (
     <Dialog wide onResolve={onResolve} className={styles.settingsPrompt}>
       <Box row>
-        <DCStatus status={dcaStatus} />
+        <DoubleCountingStatus status={dcaStatus} />
         <DialogTitle text={t("Dossier double comptage")} />
       </Box>
 
@@ -373,7 +207,8 @@ export const DoubleCountingPrompt = ({
 
       <Tabs
         tabs={[
-          { key: "sourcing", label: t("Approvisionnement") },
+          { key: "aggregated_sourcing", label: t("Approvisionnement") },
+          { key: "sourcing", label: t("Approvisionnement (détaillé)") },
           { key: "production", label: t("Production") },
           { key: "status", label: t("Statut") },
         ]}
@@ -382,6 +217,10 @@ export const DoubleCountingPrompt = ({
       />
 
       <div className={styles.modalTableContainer}>
+        {focus === "aggregated_sourcing" && (
+          <SourcingAggregationTable sourcing={agreement.data?.aggregated_sourcing ?? []} />
+        )}
+
         {focus === "sourcing" && (
           <SourcingTable sourcing={agreement.data?.sourcing ?? []} />
         )}
@@ -436,7 +275,7 @@ export const DoubleCountingPrompt = ({
 
             <AsyncButton
               loading={approving.loading}
-              disabled={!isReady}
+              disabled={!isReady || !hasQuotas}
               level="success"
               icon={Check}
               onClick={submitAccept}

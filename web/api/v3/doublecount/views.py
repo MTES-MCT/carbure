@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.core.mail import EmailMessage
 import json
+from django.db.models.aggregates import Sum
 
 import xlsxwriter
 from django.http import JsonResponse, HttpResponse
@@ -20,7 +21,7 @@ from doublecount.models import DoubleCountingAgreement, DoubleCountingDocFile, D
 from doublecount.serializers import DoubleCountingAgreementFullSerializer, DoubleCountingAgreementPartialSerializer
 from doublecount.serializers import DoubleCountingAgreementFullSerializerWithForeignKeys, DoubleCountingAgreementPartialSerializerWithForeignKeys
 from doublecount.helpers import load_dc_file, load_dc_sourcing_data, load_dc_production_data
-from core.models import Entity, UserRights, MatierePremiere, Pays, Biocarburant
+from core.models import Entity, LotTransaction, UserRights, MatierePremiere, Pays, Biocarburant
 from core.xlsx_v3 import export_dca, make_biofuels_sheet, make_dc_mps_sheet, make_countries_sheet, make_dc_production_sheet, make_dc_sourcing_sheet
 from carbure.storage_backends import AWSStorage
 from django.core.files.storage import FileSystemStorage
@@ -44,14 +45,19 @@ def get_agreements_admin(request):
     expired_count = expired.count()
     pending = agreements.filter(status=DoubleCountingAgreement.PENDING)
     pending_count = pending.count()
+    progress = agreements.filter(status=DoubleCountingAgreement.INPROGRESS)
+    progress_count = progress.count()
+
 
     accepted_s = DoubleCountingAgreementFullSerializer(accepted, many=True)
     rejected_s = DoubleCountingAgreementFullSerializer(rejected, many=True)
     expired_s = DoubleCountingAgreementFullSerializer(expired, many=True)
     pending_s = DoubleCountingAgreementFullSerializer(pending, many=True)
+    progress_s = DoubleCountingAgreementFullSerializer(progress, many=True)
     data = {'accepted': {'count': accepted_count, 'agreements': accepted_s.data}, 
             'rejected':  {'count': rejected_count, 'agreements': rejected_s.data}, 
             'expired': {'count': expired_count, 'agreements': expired_s.data},  
+            'progress': {'count': progress_count, 'agreements': progress_s.data},
             'pending': {'count': pending_count, 'agreements': pending_s.data}, 
             }
     return JsonResponse({'status': 'success', 'data': data})
@@ -328,6 +334,34 @@ def get_template(request):
         response['Content-Disposition'] = 'attachment; filename="carbure_template_DC.xlsx"'
         return response
 
+@is_admin_or_external_admin
+def get_quotas(request, *args, **kwargs):
+    producer_id = request.GET.get('producer_id', False)
+    year = request.GET.get('year', False)
+    production_site_id = request.GET.get('production_site_id', False)
+
+    quotas = DoubleCountingProduction.objects.values('year', 'dca__producer', 'dca__production_site', 'biofuel', 'feedstock', 'approved_quota').all()
+    if producer_id:
+        quotas = quotas.filter(dca__producer_id=producer_id)
+    if year:
+        quotas = quotas.filter(year=year)
+    if production_site_id:
+        quotas = quotas.filter(dca__production_site_id=production_site_id)
+
+    quotas = quotas.annotate(quota=Sum('approved_quota'))
+    print(quotas)
+
+    years = list(set([q['year'] for q in quotas]))
+    biofuels = list(set([q['biofuel'] for q in quotas]))
+    feedstocks = list(set([q['feedstock'] for q in quotas]))
+    producers = list(set([q['dca__producer'] for q in quotas]))
+    prodsites = list(set([q['dca__production_site'] for q in quotas]))
+    consumed_quotas = LotTransaction.objects.filter(carbure_producer__in=producers, carbure_production_sites__in=prodsites, lot__year__in=years, lot__biocarburant__in=biofuels, lot__matiere_premiere__in=feedstocks) \
+        .values('lot__year', 'carbure_producer', 'carbure_production_site', 'lot__biocarburant', 'lot__matiere_premiere').annotate(volume=Sum('volume'))
+    print(consumed_quotas)
+    data = {}
+    return JsonResponse({'status': "success", 'data': data})
+
 @check_rights('validator_entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def approve_dca(request, *args, **kwargs):
     context = kwargs['context']
@@ -344,14 +378,19 @@ def approve_dca(request, *args, **kwargs):
     except:
         return JsonResponse({'status': "error", 'message': "Could not find DCA"}, status=400)
 
+    # ensure all quotas have been validated
+    remaining_quotas_to_check = DoubleCountingProduction.objects.filter(dca=dca, approved_quota=-1).count()
+    if remaining_quotas_to_check > 0:
+        return JsonResponse({'status': "error", 'message': "Some quotas have not been approved"}, status=400)
+
     if entity.name == 'DGPE':
-        if not dca.dgec_validated:
+        if not dca.status == DoubleCountingAgreement.INPROGRESS:
             return JsonResponse({'status': "error", 'message': "La DGEC doit valider le dossier en premier"}, status=400)
         dca.dgpe_validated = True
         dca.dgpe_validator = request.user
         dca.dgpe_validated_dt = pytz.utc.localize(datetime.datetime.now())
     elif entity.name == 'DGDDI':
-        if not dca.dgec_validated:
+        if not dca.status == DoubleCountingAgreement.INPROGRESS:
             return JsonResponse({'status': "error", 'message': "La DGEC doit valider le dossier en premier"}, status=400)        
         dca.dgddi_validated = True
         dca.dgddi_validator = request.user
@@ -360,6 +399,7 @@ def approve_dca(request, *args, **kwargs):
         dca.dgec_validated = True
         dca.dgec_validator = request.user
         dca.dgec_validated_dt = pytz.utc.localize(datetime.datetime.now())
+        dca.status = DoubleCountingAgreement.INPROGRESS
     else:
         return JsonResponse({'status': "error", 'message': "Unknown entity"}, status=400)
     if dca.dgpe_validated and dca.dgddi_validated and dca.dgec_validated:
@@ -470,7 +510,7 @@ def add_sourcing(request, *args, **kwargs):
         return JsonResponse({'status': "error", 'message': "Missing transit_country_code"}, status=400)
 
     try:
-        dca = DoubleCountingAgreement.objects.get(producer=entity, id=dca_id)
+        dca = DoubleCountingAgreement.objects.get(producer=entity, id=dca_id, status=DoubleCountingAgreement.PENDING)
     except:
         return JsonResponse({'status': "forbidden", 'message': "Could not find DCA"}, status=403)
 
@@ -535,7 +575,7 @@ def add_production(request, *args, **kwargs):
         return JsonResponse({'status': "error", 'message': "Missing requested_quota"}, status=400)
 
     try:
-        dca = DoubleCountingAgreement.objects.get(producer=entity, id=dca_id)
+        dca = DoubleCountingAgreement.objects.get(producer=entity, id=dca_id, status=DoubleCountingAgreement.PENDING)
     except:
         return JsonResponse({'status': "forbidden", 'message': "Could not find DCA"}, status=403)
 

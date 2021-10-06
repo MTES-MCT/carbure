@@ -672,6 +672,14 @@ def export_dca(dca):
     make_countries_sheet(workbook)
     make_dc_mps_sheet(workbook)
     make_biofuels_sheet(workbook)
+    entity_details_worksheet = workbook.add_worksheet("entity")
+    columns = ['name', 'production_site', 'address', 'city', 'postal_code', 'country']
+    for i, c in enumerate(columns):
+        entity_details_worksheet.write(0, i, c, bold)
+    row = [dca.producer.legal_name, dca.production_site.name, dca.production_site.address, dca.production_site.city, dca.production_site.postal_code, dca.production_site.country.name]
+    for colid, elem in enumerate(row):
+        entity_details_worksheet.write(1, colid, elem)
+    
     workbook.close()
     return location
 
