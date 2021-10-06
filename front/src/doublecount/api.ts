@@ -2,10 +2,11 @@ import api from "common/services/api"
 import { DoubleCounting, DoubleCountingDetails } from 'common/types'
 
 export interface AgreementsOverview {
-  accepted: {count: number, agreements: DoubleCounting[] }, 
-  rejected:  {count: number, agreements: DoubleCounting[] }, 
-  expired: {count: number, agreements: DoubleCounting[] },  
-  pending: {count: number, agreements: DoubleCounting[] }, 
+  accepted: { count: number, agreements: DoubleCounting[] },
+  rejected: { count: number, agreements: DoubleCounting[] },
+  expired: { count: number, agreements: DoubleCounting[] },
+  pending: { count: number, agreements: DoubleCounting[] },
+  progress: { count: number, agreements: DoubleCounting[] },
 }
 
 export function getAllDoubleCountingAgreements() {
@@ -17,7 +18,7 @@ export function getDoubleCountingAgreement(dca_id: number) {
 }
 
 export function approveDoubleCountingQuotas(dca_id: number, approved_quotas: number[][]) {
-  return api.post('/doublecount/admin/agreement/update-approved-quotas', { dca_id, approved_quotas: JSON.stringify(approved_quotas)})
+  return api.post('/doublecount/admin/agreement/update-approved-quotas', { dca_id, approved_quotas: JSON.stringify(approved_quotas) })
 }
 
 export function approveDoubleCountingAgreement(

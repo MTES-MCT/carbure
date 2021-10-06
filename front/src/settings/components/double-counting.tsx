@@ -1,13 +1,11 @@
 import { Trans, useTranslation } from "react-i18next"
 import { useEffect, useState } from "react"
-import cl from "clsx"
-import statusStyles from "transactions/components/status.module.css"
 import styles from "./settings.module.css"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { CompanySettingsHook as DoubleContingSettingsHook } from "../hooks/use-company"
 import {
   DoubleCounting,
-  DoubleCountingStatus,
+  DoubleCountingStatus as DCStatus,
   ProductionSite,
   UserRole,
   DoubleCountingSourcing,
@@ -53,33 +51,8 @@ import { Form } from "common/components/form"
 import { LabelInput } from "common/components/input"
 import useForm from "common/hooks/use-form"
 import YearTable from "doublecount/components/year-table"
-
-export const DCStatus = ({ status }: { status: DoubleCountingStatus }) => {
-  const { t } = useTranslation()
-
-  const statusLabels = {
-    [DoubleCountingStatus.Pending]: t("En attente"),
-    [DoubleCountingStatus.Accepted]: t("Accepté"),
-    [DoubleCountingStatus.Rejected]: t("Refusé"),
-    [DoubleCountingStatus.Lapsed]: t("Expiré"),
-  }
-
-  return (
-    <span
-      className={cl(
-        styles.settingsStatus,
-        statusStyles.status,
-        statusStyles.smallStatus,
-        status === DoubleCountingStatus.Accepted && statusStyles.statusAccepted,
-        status === DoubleCountingStatus.Pending && statusStyles.statusWaiting,
-        status === DoubleCountingStatus.Rejected && statusStyles.statusRejected,
-        status === DoubleCountingStatus.Lapsed && statusStyles.statusToFix
-      )}
-    >
-      {statusLabels[status]}
-    </span>
-  )
-}
+import DoubleCountingStatus from 'doublecount/components/dc-status'
+import { SourcingAggregationTable } from 'doublecount/components/dc-tables'
 
 type DoubleCountingUploadPromptProps = PromptProps<void> & {
   entity: EntitySelection
@@ -548,9 +521,9 @@ const DoubleCountingPrompt = ({
   }, [entity, agreementID, getAgreement])
 
   const dcaID = agreement.data?.id ?? -1
-  const dcaStatus = agreement.data?.status ?? DoubleCountingStatus.Pending
+  const dcaStatus = agreement.data?.status ?? DCStatus.Pending
 
-  const isFinal = agreement.data?.status !== DoubleCountingStatus.Pending
+  const isFinal = agreement.data?.status !== DCStatus.Pending
 
   function reloadAgreement() {
     if (entity === null) return
@@ -711,6 +684,13 @@ const DoubleCountingPrompt = ({
         },
   }))
 
+  const productionSite = agreement.data?.production_site ?? "N/A"
+  const producer = agreement.data?.producer.name ?? "N/A"
+  const user = agreement.data?.producer_user ?? "N/A"
+  const creationDate = agreement.data?.creation_date
+    ? formatDate(agreement.data.creation_date)
+    : "N/A"
+
   const excelURL =
     agreement.data &&
     `/api/v3/doublecount/agreement?dca_id=${agreement.data.id}&entity_id=${entity?.id}&export=true`
@@ -723,18 +703,40 @@ const DoubleCountingPrompt = ({
   return (
     <Dialog wide onResolve={onResolve} className={styles.settingsPrompt}>
       <Box row>
-        <DCStatus status={dcaStatus} />
+        <DoubleCountingStatus status={dcaStatus} />
         <DialogTitle text={t("Dossier double comptage")} />
       </Box>
 
+      <DialogText>
+        <Box row>
+          <Trans>
+            Pour le site de production <b>{{ productionSite }}</b>, soumis le <b>{{ creationDate }}</b>
+          </Trans>
+        </Box>
+
+        <Box row>
+          <Trans>
+            Pour toute question concernant l'évolution de votre dossier, contactez-nous à l'adresse{' '}
+            <a target="_blank" rel="noreferrer" href="mailto:doublecompte@carbure.beta.gouv.fr">doublecompte@carbure.beta.gouv.fr</a>
+          </Trans>
+        </Box>
+      </DialogText>
+
       <Tabs
         tabs={[
-          { key: "sourcing", label: t("Approvisionnement") },
+          { key: "aggregated_sourcing", label: t("Approvisionnement") },
+          { key: "sourcing", label: t("Approvisionnement (détaillé)") },
           { key: "production", label: t("Production") },
         ]}
         focus={focus}
         onFocus={setFocus}
       />
+
+      {focus === "aggregated_sourcing" && (
+        <div className={styles.modalTableContainer}>
+          <SourcingAggregationTable sourcing={agreement.data?.aggregated_sourcing ?? []} />
+        </div>
+      )}
 
       {focus === "sourcing" && (
         <div className={styles.modalTableContainer}>
@@ -847,7 +849,7 @@ const DoubleCountingSettings = ({
     padding,
     {
       header: t("Statut"),
-      render: (dc) => <DCStatus status={dc.status} />,
+      render: (dc) => <DoubleCountingStatus status={dc.status} />,
     },
     {
       header: t("Site de production"),

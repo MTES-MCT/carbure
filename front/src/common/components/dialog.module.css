@@ -12,6 +12,14 @@ div.dialog {
   margin-bottom: 12px;
 }
 
+.dialogMessage a {
+  font-weight: bold;
+}
+
+.dialogMessage a:hover {
+  text-decoration: underline;
+}
+
 .dialogSubtitle {
   border-bottom: 1px solid var(--gray-highlight);
   margin: 0;

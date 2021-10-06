@@ -8,11 +8,12 @@ usermodel = get_user_model()
 
 class DoubleCountingAgreement(models.Model):
     PENDING = 'PENDING'
+    INPROGRESS = 'INPROGRESS'
     REJECTED = 'REJECTED'
     ACCEPTED = 'ACCEPTED'
     LAPSED = 'LAPSED'
 
-    DCA_STATUS_CHOICES = ((PENDING, PENDING), (REJECTED, REJECTED), (ACCEPTED, ACCEPTED), (LAPSED, LAPSED))
+    DCA_STATUS_CHOICES = ((PENDING, PENDING), (INPROGRESS, INPROGRESS), (REJECTED, REJECTED), (ACCEPTED, ACCEPTED), (LAPSED, LAPSED))
     
     producer = models.ForeignKey(Entity, on_delete=models.CASCADE)
     production_site = models.ForeignKey(ProductionSite, on_delete=models.CASCADE)
