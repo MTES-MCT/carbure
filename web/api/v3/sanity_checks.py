@@ -137,8 +137,8 @@ def check_certificates(prefetched_data, tx, errors):
                 errors.append(generic_error(error='MISSING_REF_DBL_COUNTING', tx=tx, field='dc_reference'))
             else:
                 dc_cert = tx.lot.carbure_production_site.dc_reference.strip()
-        if dc_cert != '' and dc_cert not in prefetched_data['double_counting_certificates']:
-            errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', tx=tx, field='dc_reference'))
+            if dc_cert != '' and dc_cert not in prefetched_data['double_counting_certificates']:
+                errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', tx=tx, field='dc_reference'))
         if dc_cert != '' and dc_cert in prefetched_data['double_counting_certificates']:
             dcc = prefetched_data['double_counting_certificates'][dc_cert]
             if dcc.valid_until < tx.delivery_date:
