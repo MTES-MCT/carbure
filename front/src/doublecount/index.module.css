@@ -17,5 +17,5 @@
 }
 
 .doublecountMain {
-  padding: 16px 120px;
+  padding: 16px var(--main-spacing);
 }

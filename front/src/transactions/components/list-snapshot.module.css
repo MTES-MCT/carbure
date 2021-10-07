@@ -1,6 +1,6 @@
 .transactionSnapshot {
   background-color: var(--gray-light);
-  padding: 24px 120px;
+  padding: 24px var(--main-spacing);
   margin-top: 1px;
   border-bottom: 1px solid var(--gray-highlight);
 }
