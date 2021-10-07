@@ -1,17 +1,17 @@
-import { Fragment, useState,useEffect } from 'react'
-import { Trans } from 'react-i18next'
-import useAPI from 'common/hooks/use-api'
-import { Route, Switch, Redirect } from 'common/components/relative-route'
+import { Fragment, useState, useEffect } from "react"
+import { Trans } from "react-i18next"
+import useAPI from "common/hooks/use-api"
+import { Route, Switch, Redirect } from "common/components/relative-route"
 import { Header, Main, Title, Box } from "common/components"
-import { TabButton } from 'common/components/button'
-import { Select } from 'common/components/select'
+import { TabButton } from "common/components/button"
+import { Select } from "common/components/select"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import AgreementList from "./components/agreement-list"
-import QuotasList from './components/dc-quotas'
+import QuotasList from "./components/dc-quotas"
 
-import * as api from './api'
+import * as api from "./api"
 
-import styles from './index.module.css'
+import styles from "./index.module.css"
 
 type DoubleCountingProps = {
   entity: EntitySelection
@@ -23,7 +23,15 @@ const DoubleCounting = ({ entity }: DoubleCountingProps) => {
 
   useEffect(() => {
     getSnapshot()
-  }, [])
+  }, [getSnapshot])
+
+  useEffect(() => {
+    if (snapshot.data === null) return
+
+    if (!snapshot.data.years.includes(year)) {
+      setYear(snapshot.data.years[0])
+    }
+  }, [snapshot.data, year])
 
   return (
     <Fragment>
@@ -33,25 +41,24 @@ const DoubleCounting = ({ entity }: DoubleCountingProps) => {
             <Trans>Double comptage</Trans>
           </Title>
 
-          <Select 
+          <Select
             level="inline"
             value={year}
-            onChange={v => setYear(v as number)}
+            onChange={(v) => setYear(v as number)}
             className={styles.doublecountYears}
-            options={snapshot.data?.years.map(year => ({ label: `${year}`, value: year }))}
+            options={snapshot.data?.years.map((year) => ({
+              label: `${year}`,
+              value: year,
+            }))}
           />
         </Box>
 
         <Box row className={styles.doublecountTabs}>
           <TabButton relative to="./agreements">
-            <Trans>
-              Dossiers
-            </Trans>
+            <Trans>Dossiers</Trans>
           </TabButton>
           <TabButton relative to="./quotas">
-            <Trans>
-              Quotas
-            </Trans>
+            <Trans>Quotas</Trans>
           </TabButton>
         </Box>
       </Header>
@@ -63,7 +70,7 @@ const DoubleCounting = ({ entity }: DoubleCountingProps) => {
           </Route>
 
           <Route relative path="quotas">
-            <QuotasList entity={entity} year={year} />
+            <QuotasList year={year} />
           </Route>
 
           <Redirect relative to="agreements" />

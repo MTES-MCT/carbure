@@ -5,7 +5,7 @@
 }
 
 .filterGroup {
-  padding: 16px 120px;
+  padding: 16px var(--main-spacing);
   background-color: var(--white);
   display: grid;
   counter-reset: grid-items;

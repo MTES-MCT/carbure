@@ -1,4 +1,4 @@
 .stockList {
   position: relative;
-  padding: 24px 120px;
+  padding: 24px var(--main-spacing);
 }

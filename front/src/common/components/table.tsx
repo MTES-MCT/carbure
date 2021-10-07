@@ -90,7 +90,7 @@ export interface Row<T> {
   value: T
 }
 
-type TableProps<T> = SystemProps & {
+export type TableProps<T> = SystemProps & {
   rows: Row<T>[]
   columns: Column<T>[]
   sortBy?: string
