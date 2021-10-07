@@ -9,6 +9,7 @@ import { Button } from "./button"
 import Modal from "./modal"
 import NotificationsProvider from "./notifications"
 import { Trans } from "react-i18next"
+import Table, { TableProps } from "./table"
 
 type DialogProps = PromptProps<any> & {
   children: React.ReactNode
@@ -43,6 +44,12 @@ export const DialogText = ({ text, children }: ContentProps) => (
 export const DialogSubtitle = ({ text, children }: ContentProps) => (
   <h2 className={styles.dialogSubtitle}>{text ?? children}</h2>
 )
+
+export function DialogTable<T>(props: TableProps<T>) {
+  return (
+    <Table {...props} className={cl(styles.dialogTable, props.className)} />
+  )
+}
 
 export const DialogButtons = (props: any) => (
   <Box {...props} row className={cl(props.className, styles.dialogButtons)} />

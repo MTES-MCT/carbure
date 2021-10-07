@@ -26,6 +26,12 @@ div.dialog {
   padding: 16px 24px;
 }
 
+.dialogTable {
+  margin-left: -24px;
+  margin-right: -24px;
+  width: auto;
+}
+
 .dialogWide .dialogMessage {
   max-width: unset;
 }

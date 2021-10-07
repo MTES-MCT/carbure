@@ -63,3 +63,9 @@ export interface QuotaOverview {
 export function getQuotasSnapshot(year: number) {
   return api.get<QuotaOverview[]>('/doublecount/admin/quotas-snapshot', { year })
 }
+
+export interface QuotaDetails {}
+
+export function getQuotaDetails() {
+  return api.get<QuotaDetails[]>('/doublecount/admin/')
+}
