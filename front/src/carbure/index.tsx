@@ -29,7 +29,7 @@ const DevBanner = () => (
   <div
     style={{
       backgroundColor: "var(--orange-medium)",
-      padding: "8px 120px",
+      padding: "8px var(--main-spacing)",
     }}
   >
     <Trans>

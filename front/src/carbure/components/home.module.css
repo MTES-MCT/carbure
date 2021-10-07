@@ -89,10 +89,7 @@
   display: flex;
   justify-content: center;
   margin-bottom: 64px;
-}
-
-.homeAuthentication .homeButton:first-child {
-  margin-right: 32px;
+  gap: 32px;
 }
 
 /* FOURTH BLOCK */
