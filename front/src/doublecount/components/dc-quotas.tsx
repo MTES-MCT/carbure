@@ -96,6 +96,7 @@ const QuotasList = ({ year }: QuotasListProps) => {
         <progress
           value={a.current_production_weight_sum}
           max={a.approved_quota_weight_sum}
+          title={`${a.current_production_weight_sum} / ${a.approved_quota_weight_sum}`}
         />
       ),
     },
