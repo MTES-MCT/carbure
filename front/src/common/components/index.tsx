@@ -38,6 +38,8 @@ export const Box = ({
 
 export const Main = (props: BoxProps) => <Box {...props} as="main" />
 
+export const Header = (props: BoxProps) => <Box {...props} as="header" className={cl(styles.header, props.className)} />
+
 // TITLE COMPONENT
 
 type TitleProps = SystemProps & React.HTMLProps<HTMLHeadingElement>

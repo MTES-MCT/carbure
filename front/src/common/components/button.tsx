@@ -2,6 +2,7 @@ import React from "react"
 import cl from "clsx"
 import styles from "./button.module.css"
 import { Loader } from "./icons"
+import { NavLink, RelNavLinkProps } from './relative-route'
 import { SystemProps, AsProp } from "./index"
 
 // BUTTON COMPONENT
@@ -60,6 +61,7 @@ export const AsyncButton = ({
     disabled={loading || disabled}
   />
 )
+
 // STATUS BUTTON COMPONENT
 type StatusButtonProps = ButtonProps & {
   active: boolean
@@ -89,4 +91,18 @@ export const StatusButton = ({
     </span>
     <span className={styles.statusButtonLabel}>{label}</span>
   </Button>
+)
+
+export const TabButton = ({
+  children,
+  className,
+  ...props
+}: RelNavLinkProps) => (
+  <NavLink
+    {...props}
+    className={cl(styles.button, styles.statusButton, className)}
+    activeClassName={styles.activeStatusButton}
+  >
+    <span className={styles.statusButtonLabel}>{children}</span>
+  </NavLink>
 )

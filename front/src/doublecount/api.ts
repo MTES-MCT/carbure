@@ -1,5 +1,13 @@
 import api from "common/services/api"
-import { DoubleCounting, DoubleCountingDetails } from 'common/types'
+import { DoubleCounting, DoubleCountingDetails, Entity, ProductionSite } from 'common/types'
+
+export interface AgreementSnapshot {
+  years: number[]
+}
+
+export function getDoubleCountingSnapshot() {
+  return api.get<AgreementSnapshot>('/doublecount/admin/agreements-snapshot')
+}
 
 export interface AgreementsOverview {
   accepted: { count: number, agreements: DoubleCounting[] },
@@ -9,8 +17,9 @@ export interface AgreementsOverview {
   progress: { count: number, agreements: DoubleCounting[] },
 }
 
-export function getAllDoubleCountingAgreements() {
-  return api.get<AgreementsOverview>('/doublecount/admin/agreements')
+
+export function getAllDoubleCountingAgreements(year: number) {
+  return api.get<AgreementsOverview>('/doublecount/admin/agreements', { year })
 }
 
 export function getDoubleCountingAgreement(dca_id: number) {
@@ -39,4 +48,18 @@ export function rejectDoubleCountingAgreement(
     validator_entity_id: validator_entity_id,
     dca_id: dca_id,
   })
+}
+
+export interface QuotaOverview {
+  producer: Entity
+  production_site: ProductionSite
+  approved_quota_weight_sum: number
+  current_production_weight_sum: number
+  nb_quotas: number
+  nb_full_quotas: number
+  nb_breached_quotas: number
+}
+
+export function getQuotasSnapshot(year: number) {
+  return api.get<QuotaOverview[]>('/doublecount/admin/quotas-snapshot', { year })
 }

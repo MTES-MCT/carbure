@@ -35,17 +35,20 @@ export const Route = ({ path, relative, ...props }: RouteProps & Relative) => {
   return <BaseRoute {...props} path={basePath} />
 }
 
-export const Link = ({ to, relative, ...props }: LinkProps & Relative) => {
+
+export const Link = ({ to, relative, ...props }: LinkProps & Relative ) => {
   const match = useRouteMatch()
   const baseTo = relative ? pt.join(match.url, to as string) : to
   return <BaseLink {...props} to={baseTo} />
 }
 
+export type RelNavLinkProps = NavLinkProps & Relative
+
 export const NavLink = ({
   to,
   relative,
   ...props
-}: NavLinkProps & Relative) => {
+}: RelNavLinkProps) => {
   const match = useRouteMatch()
   const baseTo = relative ? pt.join(match.url, to as string) : to
   return <BaseNavLink {...props} to={baseTo} />
