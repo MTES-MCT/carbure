@@ -17,17 +17,18 @@ import * as api from "../api"
 
 type AgreementListProps = {
   entity: EntitySelection
+  year: number
 }
 
-const AgreementList = ({ entity }: AgreementListProps) => {
+const AgreementList = ({ entity, year }: AgreementListProps) => {
   const { t } = useTranslation()
   const [tab, setTab] = useState("pending")
 
   const [agreements, getAgreements] = useAPI(api.getAllDoubleCountingAgreements)
 
   useEffect(() => {
-    getAgreements()
-  }, [getAgreements])
+    getAgreements(year)
+  }, [getAgreements, year])
 
   const tabs = [
     { key: "pending", label: t("En attente") },
@@ -35,8 +36,6 @@ const AgreementList = ({ entity }: AgreementListProps) => {
     { key: "expired", label: t("Expiré") },
     { key: "rejected", label: t("Refusé") },
   ]
-
-  if (agreements === null) return <LoaderOverlay />
 
   const columns: Column<DoubleCounting>[] = [
     padding,
@@ -69,7 +68,7 @@ const AgreementList = ({ entity }: AgreementListProps) => {
         />
       ))
 
-      getAgreements()
+      getAgreements(year)
     },
   })
 
@@ -81,7 +80,7 @@ const AgreementList = ({ entity }: AgreementListProps) => {
   const allPending = progress.agreements.concat(pending.agreements)
 
   return (
-    <div style={{ padding: "8px 120px" }}>
+    <Fragment>
       <Tabs tabs={tabs} focus={tab} onFocus={setTab} />
 
       {tab === "pending" && (
@@ -151,7 +150,9 @@ const AgreementList = ({ entity }: AgreementListProps) => {
           )}
         </Fragment>
       )}
-    </div>
+
+      {agreements.loading && <LoaderOverlay />}
+    </Fragment>
   )
 }
 

@@ -8,7 +8,8 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.core.mail import EmailMessage
 import json
-from django.db.models.aggregates import Sum
+from django.db.models.aggregates import Count, Sum
+from django.db.models.query_utils import Q
 
 import xlsxwriter
 from django.http import JsonResponse, HttpResponse
@@ -21,7 +22,7 @@ from doublecount.models import DoubleCountingAgreement, DoubleCountingDocFile, D
 from doublecount.serializers import DoubleCountingAgreementFullSerializer, DoubleCountingAgreementPartialSerializer
 from doublecount.serializers import DoubleCountingAgreementFullSerializerWithForeignKeys, DoubleCountingAgreementPartialSerializerWithForeignKeys
 from doublecount.helpers import load_dc_file, load_dc_sourcing_data, load_dc_production_data
-from core.models import Entity, LotTransaction, UserRights, MatierePremiere, Pays, Biocarburant
+from core.models import Entity, LotTransaction, LotV2, UserRights, MatierePremiere, Pays, Biocarburant
 from core.xlsx_v3 import export_dca, make_biofuels_sheet, make_dc_mps_sheet, make_countries_sheet, make_dc_production_sheet, make_dc_sourcing_sheet
 from carbure.storage_backends import AWSStorage
 from django.core.files.storage import FileSystemStorage
@@ -36,7 +37,11 @@ def get_agreements(request, *args, **kwargs):
 
 @is_admin_or_external_admin
 def get_agreements_admin(request):
-    agreements = DoubleCountingAgreement.objects.all()
+    year = request.GET.get('year', False)
+    if not year:
+        return JsonResponse({'status': 'error', 'message': 'Missing year'}, status=400)
+
+    agreements = DoubleCountingAgreement.objects.filter(Q(period_start__year=year) | Q(period_end__year=year))
     accepted = agreements.filter(status=DoubleCountingAgreement.ACCEPTED)
     accepted_count = accepted.count()
     rejected = agreements.filter(status=DoubleCountingAgreement.REJECTED)
@@ -61,6 +66,15 @@ def get_agreements_admin(request):
             'pending': {'count': pending_count, 'agreements': pending_s.data}, 
             }
     return JsonResponse({'status': 'success', 'data': data})
+
+@is_admin_or_external_admin
+def get_agreements_snapshot_admin(request):
+    years1 = [y['period_start__year'] for y in DoubleCountingAgreement.objects.values('period_start__year').distinct()]
+    years2 = [y['period_end__year'] for y in DoubleCountingAgreement.objects.values('period_end__year').distinct()]
+    years = list(set(years1 + years2))
+    data = {'years': years}
+    return JsonResponse({'status': 'success', 'data': data})
+
 
 @check_rights('entity_id')
 def get_agreement(request, *args, **kwargs):
@@ -334,19 +348,92 @@ def get_template(request):
         response['Content-Disposition'] = 'attachment; filename="carbure_template_DC.xlsx"'
         return response
 
-@is_admin_or_external_admin
-def get_quotas(request, *args, **kwargs):
-    producer_id = request.GET.get('producer_id', False)
-    year = request.GET.get('year', False)
-    production_site_id = request.GET.get('production_site_id', False)
 
-    quotas = DoubleCountingProduction.objects.values('year', 'dca__producer', 'dca__production_site', 'biofuel', 'feedstock', 'approved_quota').all()
+@is_admin
+def get_quotas_snapshot_admin(request, *args, **kwargs):
+    year = request.GET.get('year', False) # mandatory
+    producer_id = request.GET.get('producer_id', False)
+    if not year:
+        return JsonResponse({'status': "error", 'message': "Missing year"}, status=400)
+
+    producers = {p.id: p for p in Entity.objects.filter(entity_type=Entity.PRODUCER)}
+    production_sites = {p.id: p for p in ProductionSite.objects.all()}
+
+    quotas = DoubleCountingProduction.objects.values('year', 'dca__producer', 'dca__production_site').filter(year=year)
     if producer_id:
         quotas = quotas.filter(dca__producer_id=producer_id)
-    if year:
-        quotas = quotas.filter(year=year)
+    quotas = quotas.annotate(approved_quota_weight_sum=Sum('approved_quota'), nb_quotas=Count('approved_quota'))
+
+
+    detailed_quotas = DoubleCountingProduction.objects.values('year', 'dca__producer', 'dca__production_site', 'biofuel', 'feedstock', 'approved_quota').filter(year=year)
+    if producer_id:
+        detailed_quotas = detailed_quotas.filter(dca__producer_id=producer_id)
+    detailed_quotas = {'%d.%d.%d.%d' % (dq['dca__producer'], dq['dca__production_site'], dq['biofuel'], dq['feedstock']): dq for dq in detailed_quotas}
+    # print(quotas)
+    # [{'year': 2021, 'dca__producer': 10, 'dca__production_site': 2, 'approved_quota_weight_sum': 2000, 'nb_quotas': 2}, {'year': 2021, 'dca__producer': 13, 'dca__production_site': 8, 'sum': 1000, 'nb_quotas': 1}]
+
+    # detailed
+    all_lines = DoubleCountingProduction.objects.values('year', 'dca__producer', 'dca__production_site', 'biofuel', 'feedstock').filter(year=year)
+    producers_ids = producers.keys()
+    prodsites_ids = production_sites.keys()
+    feedstocks_ids = [m.id for m in MatierePremiere.objects.filter(is_double_compte=True)]
+    biofuels_ids = list(set([q['biofuel'] for q in all_lines]))
+    consumed_quotas = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED, lot__carbure_producer__in=producers_ids, lot__carbure_production_site__in=prodsites_ids, lot__year=year, lot__matiere_premiere_id__in=feedstocks_ids, lot__biocarburant_id__in=biofuels_ids) \
+        .values('lot__year', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__matiere_premiere', 'lot__biocarburant').annotate(volume=Sum('lot__volume'))
+    # print(consumed_quotas)
+    # {'lot__year': 2021, 'lot__carbure_producer': 10, 'lot__carbure_production_site': 2, 'lot__matiere_premiere': 69, 'lot__biocarburant': 33, 'volume': 109371.0}
+    data = {}
+    for q in quotas:
+        key = "%d.%d" % (q['dca__producer'], q['dca__production_site'])
+        d = {'producer': producers[q['dca__producer']].natural_key(), 
+             'production_site': production_sites[q['dca__production_site']].natural_key(), 
+             'current_production_weight_sum': 0, 'approved_quota_weight_sum': q['approved_quota_weight_sum'],
+             'nb_quotas': q['nb_quotas'], 'nb_full_quotas': 0, 'nb_breached_quotas': 0}
+        data[key] = d
+    for c in consumed_quotas:
+        key = '%d.%d.%d.%d' % (c['lot__carbure_producer'], c['lot__carbure_production_site'], c['lot__biocarburant'], c['lot__matiere_premiere'])
+        smallkey = '%d.%d' % (c['lot__carbure_producer'], c['lot__carbure_production_site'])
+        if key in detailed_quotas:
+            dq = detailed_quotas[key]
+            data[smallkey]['current_production_weight_sum'] += c['volume']
+            if c['volume'] > dq['approved_quota']:
+                data[smallkey]['nb_breached_quotas'] += 1
+            elif c['volume'] == dq['approved_quota']:
+                data[smallkey]['nb_full_quotas'] += 1
+            else:
+                pass
+        else:
+            # lot sent with no approved quota!!!
+            if smallkey not in data:
+                data[smallkey] = {'producer': producers[c['lot__carbure_producer']].natural_key(),
+                                  'production_site': production_sites[c['lot__carbure_production_site']].natural_key(), 
+                                  'current_production_weight_sum': 0, 'approved_quota_weight_sum': 0,
+                                  'nb_quotas':0, 'nb_full_quotas': 0, 'nb_breached_quotas': 0}
+            data[smallkey]['nb_breached_quotas'] += 1
+            data[smallkey]['nb_full_quotas'] += 1
+    tosend = [v for k, v in data.items()]
+    return JsonResponse({'status': "success", 'data': tosend})
+
+
+@is_admin_or_external_admin
+def get_quotas_admin(request, *args, **kwargs):
+    year = request.GET.get('year', False) # mandatory
+    producer_id = request.GET.get('producer_id', False)
+    production_site_id = request.GET.get('production_site_id', False)
+    feedstock_id = request.GET.get('feedstock_id', False)
+    biofuel_id = request.GET.get('biofuel_id', False)
+    if not year:
+        return JsonResponse({'status': "error", 'message': "Missing year"}, status=400)
+
+    quotas = DoubleCountingProduction.objects.values('year', 'dca__producer', 'dca__production_site', 'biofuel', 'feedstock', 'approved_quota').filter(year=year)
+    if producer_id:
+        quotas = quotas.filter(dca__producer_id=producer_id)
     if production_site_id:
         quotas = quotas.filter(dca__production_site_id=production_site_id)
+    if feedstock_id:
+        quotas = quotas.filter(feedstock_id=feedstock_id)
+    if biofuel_id:
+        quotas = quotas.filter(biofuel_id=biofuel_id)
 
     quotas = quotas.annotate(quota=Sum('approved_quota'))
     print(quotas)
@@ -356,10 +443,11 @@ def get_quotas(request, *args, **kwargs):
     feedstocks = list(set([q['feedstock'] for q in quotas]))
     producers = list(set([q['dca__producer'] for q in quotas]))
     prodsites = list(set([q['dca__production_site'] for q in quotas]))
-    consumed_quotas = LotTransaction.objects.filter(carbure_producer__in=producers, carbure_production_sites__in=prodsites, lot__year__in=years, lot__biocarburant__in=biofuels, lot__matiere_premiere__in=feedstocks) \
-        .values('lot__year', 'carbure_producer', 'carbure_production_site', 'lot__biocarburant', 'lot__matiere_premiere').annotate(volume=Sum('volume'))
+    consumed_quotas = LotTransaction.objects.filter(lot__carbure_producer__in=producers, lot__carbure_production_site__in=prodsites, lot__year__in=years, lot__biocarburant__in=biofuels, lot__matiere_premiere__in=feedstocks) \
+        .values('lot__year', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__biocarburant', 'lot__matiere_premiere').annotate(volume=Sum('lot__volume'))
     print(consumed_quotas)
-    data = {}
+    data = []
+    entry = {'producer': '', 'production_site': '', 'volume_produced': 1000, 'volume_allowed': 1500, 'quotas_full': 1, 'quotas_breached': 0, 'quotas_total': 9}
     return JsonResponse({'status': "success", 'data': data})
 
 @check_rights('validator_entity_id', role=[UserRights.ADMIN, UserRights.RW])

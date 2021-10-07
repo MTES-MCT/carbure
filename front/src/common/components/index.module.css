@@ -11,6 +11,17 @@
   flex-direction: row;
 }
 
+/* HEADER COMPONENT */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--gray-light);
+  padding: 24px 120px;
+  margin-top: 1px;
+  border-bottom: 1px solid var(--gray-highlight);
+}
+
 /* TITLE COMPONENT */
 
 .title {

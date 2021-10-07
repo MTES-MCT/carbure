@@ -178,7 +178,7 @@ export const PrivateTopbar = ({ entity, app }: PrivateTopbarProps) => {
   const firstEntity = app.getFirstEntity()
 
   return (
-    <header className={styles.topBar}>
+    <nav className={styles.topBar}>
       <CompactLogo />
 
       {!entity && firstEntity && (
@@ -197,7 +197,7 @@ export const PrivateTopbar = ({ entity, app }: PrivateTopbarProps) => {
 
       {entity && (
         <Route path="/org/:entity">
-          <nav className={styles.pageNav}>
+          <section className={styles.pageNav}>
             {isAdmin(entity) && (
               <PageLink to="dashboard">
                 <Trans>Accueil</Trans>
@@ -247,7 +247,7 @@ export const PrivateTopbar = ({ entity, app }: PrivateTopbarProps) => {
                 </PageLink>
               </React.Fragment>
             )}
-          </nav>
+          </section>
         </Route>
       )}
 
@@ -265,7 +265,7 @@ export const PrivateTopbar = ({ entity, app }: PrivateTopbarProps) => {
           <Question title={t("Guide d'utilisation")} />
         </a>
       </Box>
-    </header>
+    </nav>
   )
 }
 

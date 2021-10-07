@@ -1,5 +1,5 @@
+import { Fragment, useEffect, useState } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import { useEffect, useState } from "react"
 import styles from "./settings.module.css"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { CompanySettingsHook as DoubleContingSettingsHook } from "../hooks/use-company"
@@ -508,7 +508,7 @@ const DoubleCountingPrompt = ({
 }: DoubleCountingPromptProps) => {
   const { t } = useTranslation()
 
-  const [focus, setFocus] = useState("sourcing")
+  const [focus, setFocus] = useState("aggregated_sourcing")
 
   const [agreement, getAgreement] = useAPI(api.getDoubleCountingDetails)
   const [, deleteSourcing] = useAPI(api.deleteDoubleCountingSourcing)
@@ -732,14 +732,13 @@ const DoubleCountingPrompt = ({
         onFocus={setFocus}
       />
 
+    <div className={styles.modalTableContainer}>
       {focus === "aggregated_sourcing" && (
-        <div className={styles.modalTableContainer}>
-          <SourcingAggregationTable sourcing={agreement.data?.aggregated_sourcing ?? []} />
-        </div>
+        <SourcingAggregationTable sourcing={agreement.data?.aggregated_sourcing ?? []} />
       )}
 
       {focus === "sourcing" && (
-        <div className={styles.modalTableContainer}>
+        <Fragment>
           <YearTable columns={sourcingColumns} rows={sourcingRows} />
 
           {!isFinal && (
@@ -761,11 +760,11 @@ const DoubleCountingPrompt = ({
               <Trans>+ Ajouter une ligne d'approvisionnement</Trans>
             </span>
           )}
-        </div>
+        </Fragment>
       )}
 
       {focus === "production" && (
-        <div className={styles.modalTableContainer}>
+        <Fragment>
           <YearTable columns={productionColumns} rows={productionRows} />
 
           {!isFinal && (
@@ -787,8 +786,9 @@ const DoubleCountingPrompt = ({
               <Trans>+ Ajouter une ligne de production</Trans>
             </span>
           )}
-        </div>
+        </Fragment>
       )}
+      </div>
 
       <DialogButtons>
         <Box style={{ marginRight: "auto" }}>
