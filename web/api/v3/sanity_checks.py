@@ -24,6 +24,7 @@ rules['MAC_BC_WRONG'] = "Biocarburant incompatible avec un mise à consommation 
 rules['GHG_ETD_0'] = "Émissions GES liées au Transport et à la Distribution nulles"
 rules['GHG_EP_0'] = "Émissions GES liées à la Transformation de la matière première nulles"
 rules['GHG_EEC_0'] = "Émissions GES liées à l'Extraction et la Culture nulles"
+rules['GHG_EL_NEG'] = "Émissions GES liées à l'Affectation des terres Négatives"
 rules['MP_NOT_CONFIGURED'] = "Matière Première non enregistrée sur votre Site de Production"
 rules['BC_NOT_CONFIGURED'] = "Biocarburant non enregistré sur votre Site de Production"
 rules['MISSING_PRODSITE_CERTIFICATE'] = "Aucun certificat n'est associé à ce site de Production"
@@ -196,7 +197,9 @@ def sanity_check(tx, prefetched_data):
     if lot.ep == 0:
         is_sane = False
         errors.append(generic_error(error='GHG_EP_0', tx=tx, is_blocking=True, field='ep'))
-
+    if lot.el < 0:
+        errors.append(generic_error(error='GHG_EL_NEG', tx=tx, field='el'))
+        
     commissioning_date = lot.carbure_production_site.date_mise_en_service if lot.carbure_production_site else lot.unknown_production_site_com_date
     if commissioning_date and isinstance(commissioning_date, datetime.datetime) or isinstance(commissioning_date, datetime.date):
         #if tx.delivery_date and tx.delivery_date > july1st2021:

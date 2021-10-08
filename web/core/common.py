@@ -616,7 +616,7 @@ def fill_ghg_info(lot_row, lot, tx):
     if 'el' in lot_row and lot_row['el'] is not None and lot_row['el'] != '':
         el = lot_row['el']
         try:
-            lot.el = abs(float(el))
+            lot.el = float(el)
         except Exception:
              lot_errors.append(GenericError(tx=tx, field='el', error='WRONG_FORMAT', extra='Format non reconnu',
                                            display_to_creator=True, is_blocking=True, value=el))
