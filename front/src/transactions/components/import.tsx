@@ -36,7 +36,7 @@ const ImportWrapper = ({ children, onResolve }: ImportWrapperProps) => {
 
   return (
     <Dialog onResolve={onResolve}>
-      <div {...getRootProps()}>
+      <Box {...getRootProps()}>
         <DialogTitle text={t("Import Excel")} />
         <DialogText text={t("Importer un fichier Excel standardisé.")} />
 
@@ -62,7 +62,7 @@ const ImportWrapper = ({ children, onResolve }: ImportWrapperProps) => {
             </Button>
           </DialogButtons>
         </Box>
-      </div>
+      </Box>
     </Dialog>
   )
 }
