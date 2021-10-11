@@ -29,7 +29,7 @@
 
 .tableHeader,
 .table th {
-  flex: 1;
+  flex: 1 0;
   align-items: flex-end;
   color: var(--blue-medium);
   text-transform: uppercase;
@@ -42,13 +42,23 @@
 
 .tableCell,
 .table .table tbody tr td {
-  flex: 1;
+  flex: 1 0;
   align-items: center;
   font-weight: 600;
   padding: 16px 8px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.flexTable .tableHead .tableHeader:first-child,
+.flexTable .tableRow .tableCell:first-child {
+  padding-left: 24px;
+}
+
+.flexTable .tableHead .tableHeader:last-child,
+.flexTable .tableRow .tableCell:last-child {
+  padding-right: 24px;
 }
 
 .dualRow {

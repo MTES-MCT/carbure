@@ -11,9 +11,8 @@ import {
   REDCertCertificate,
   SNCertificate,
   EntityRights,
-  DoubleCounting,
-  DoubleCountingDetails,
 } from "common/types"
+import { DoubleCounting, DoubleCountingDetails, QuotaDetails } from 'doublecount/types'
 import { EntitySelection } from "carbure/hooks/use-entity"
 
 export function getSettings(): Promise<Settings> {
@@ -548,4 +547,8 @@ export function deleteDoubleCountingProduction(
     entity_id,
     dca_production_id,
   })
+}
+
+export function getQuotaDetails(entity_id: number, dca_id: number) {
+  return api.get<QuotaDetails[]>('/doublecount/quotas', { entity_id, dca_id })
 }

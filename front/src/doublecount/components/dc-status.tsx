@@ -1,6 +1,6 @@
 import cl from "clsx"
 import { useTranslation } from 'react-i18next'
-import { DoubleCountingStatus as DCStatus } from 'common/types'
+import { DoubleCountingStatus as DCStatus } from '../types'
 import Badge, { Variant } from 'common/components/badge'
 
 const statusToVariant: Record<DCStatus, Variant> = {

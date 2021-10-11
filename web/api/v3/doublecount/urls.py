@@ -8,9 +8,10 @@ urlpatterns = [
     path('admin/agreement', views.get_agreement_admin, name='api-v3-doublecount-get-agreement-admin'),
     path('admin/agreements', views.get_agreements_admin, name='api-v3-doublecount-get-agreements-admin'),
     path('admin/agreements-snapshot', views.get_agreements_snapshot_admin, name='api-v3-doublecount-get-agreements-snapshot-admin'),
-    path('admin/quotas', views.get_quotas_admin, name='api-v3-doublecount-get-quotas-admin'),
+    path('admin/quotas', views.get_production_site_quotas_admin, name='api-v3-doublecount-get-quotas-admin'),
     path('admin/quotas-snapshot', views.get_quotas_snapshot_admin, name='api-v3-doublecount-get-quotas-snapshot-admin'),
     path('get-template', views.get_template, name='api-v3-doublecount-get-template'),
+    path('quotas', views.get_production_site_quotas, name='api-v3-doublecount-get-quotas'),
 
     # POST
     path('agreement/remove-sourcing', views.remove_sourcing, name='api-v3-doublecount-remove-sourcing'),

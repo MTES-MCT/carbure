@@ -16,6 +16,7 @@ from django.http import JsonResponse, HttpResponse
 from core.decorators import check_rights, is_admin, is_admin_or_external_admin
 import pytz
 import traceback
+import pandas as pd
 
 from producers.models import ProductionSite
 from doublecount.models import DoubleCountingAgreement, DoubleCountingDocFile, DoubleCountingSourcing, DoubleCountingProduction
@@ -351,104 +352,100 @@ def get_template(request):
 
 @is_admin
 def get_quotas_snapshot_admin(request, *args, **kwargs):
+    # bon courage
     year = request.GET.get('year', False) # mandatory
-    producer_id = request.GET.get('producer_id', False)
     if not year:
         return JsonResponse({'status': "error", 'message': "Missing year"}, status=400)
-
     producers = {p.id: p for p in Entity.objects.filter(entity_type=Entity.PRODUCER)}
     production_sites = {p.id: p for p in ProductionSite.objects.all()}
+    biofuels = {p.id: p for p in Biocarburant.objects.all()}
+    feedstocks = {m.id: m for m in MatierePremiere.objects.filter(is_double_compte=True)}
 
-    quotas = DoubleCountingProduction.objects.values('year', 'dca__producer', 'dca__production_site').filter(year=year)
-    if producer_id:
-        quotas = quotas.filter(dca__producer_id=producer_id)
-    quotas = quotas.annotate(approved_quota_weight_sum=Sum('approved_quota'), nb_quotas=Count('approved_quota'))
+    # get a detailed list of production quotas per production site
+    # ex: 2021 - PRODUCER TEST - PRODUCTION SITE 01 - BIOFUELID - FEEDSTOCKID - METRICTONNES
+    detailed_quotas = DoubleCountingProduction.objects.values('year', 'dca__producer', 'dca__production_site', 'biofuel', 'feedstock', 'approved_quota').filter(year=year, feedstock_id__in=feedstocks.keys())
+    # get a sum of all double count production
+    # 2021 - PRODUCER TEST - PRODUCTION SITE 01 - BIOFUELID - FEEDSTOCKID - VOLUME
+    double_counted_production = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED, lot__carbure_producer__in=producers.keys(), lot__carbure_production_site__in=production_sites.keys(), lot__year=year, lot__matiere_premiere_id__in=feedstocks.keys(), lot__biocarburant_id__in=biofuels.keys()) \
+        .values('lot__year', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__biocarburant__masse_volumique').annotate(volume=Sum('lot__volume'))
 
-
-    detailed_quotas = DoubleCountingProduction.objects.values('year', 'dca__producer', 'dca__production_site', 'biofuel', 'feedstock', 'approved_quota').filter(year=year)
-    if producer_id:
-        detailed_quotas = detailed_quotas.filter(dca__producer_id=producer_id)
-    detailed_quotas = {'%d.%d.%d.%d' % (dq['dca__producer'], dq['dca__production_site'], dq['biofuel'], dq['feedstock']): dq for dq in detailed_quotas}
-    # print(quotas)
-    # [{'year': 2021, 'dca__producer': 10, 'dca__production_site': 2, 'approved_quota_weight_sum': 2000, 'nb_quotas': 2}, {'year': 2021, 'dca__producer': 13, 'dca__production_site': 8, 'sum': 1000, 'nb_quotas': 1}]
-
-    # detailed
-    all_lines = DoubleCountingProduction.objects.values('year', 'dca__producer', 'dca__production_site', 'biofuel', 'feedstock').filter(year=year)
-    producers_ids = producers.keys()
-    prodsites_ids = production_sites.keys()
-    feedstocks_ids = [m.id for m in MatierePremiere.objects.filter(is_double_compte=True)]
-    biofuels_ids = list(set([q['biofuel'] for q in all_lines]))
-    consumed_quotas = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED, lot__carbure_producer__in=producers_ids, lot__carbure_production_site__in=prodsites_ids, lot__year=year, lot__matiere_premiere_id__in=feedstocks_ids, lot__biocarburant_id__in=biofuels_ids) \
-        .values('lot__year', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__matiere_premiere', 'lot__biocarburant').annotate(volume=Sum('lot__volume'))
-    # print(consumed_quotas)
-    # {'lot__year': 2021, 'lot__carbure_producer': 10, 'lot__carbure_production_site': 2, 'lot__matiere_premiere': 69, 'lot__biocarburant': 33, 'volume': 109371.0}
-    data = {}
-    for q in quotas:
-        key = "%d.%d" % (q['dca__producer'], q['dca__production_site'])
-        d = {'producer': producers[q['dca__producer']].natural_key(), 
-             'production_site': production_sites[q['dca__production_site']].natural_key(), 
-             'current_production_weight_sum': 0, 'approved_quota_weight_sum': q['approved_quota_weight_sum'],
-             'nb_quotas': q['nb_quotas'], 'nb_full_quotas': 0, 'nb_breached_quotas': 0}
-        data[key] = d
-    for c in consumed_quotas:
-        key = '%d.%d.%d.%d' % (c['lot__carbure_producer'], c['lot__carbure_production_site'], c['lot__biocarburant'], c['lot__matiere_premiere'])
-        smallkey = '%d.%d' % (c['lot__carbure_producer'], c['lot__carbure_production_site'])
-        if key in detailed_quotas:
-            dq = detailed_quotas[key]
-            data[smallkey]['current_production_weight_sum'] += c['volume']
-            if c['volume'] > dq['approved_quota']:
-                data[smallkey]['nb_breached_quotas'] += 1
-            elif c['volume'] == dq['approved_quota']:
-                data[smallkey]['nb_full_quotas'] += 1
-            else:
-                pass
-        else:
-            # lot sent with no approved quota!!!
-            if smallkey not in data:
-                data[smallkey] = {'producer': producers[c['lot__carbure_producer']].natural_key(),
-                                  'production_site': production_sites[c['lot__carbure_production_site']].natural_key(), 
-                                  'current_production_weight_sum': 0, 'approved_quota_weight_sum': 0,
-                                  'nb_quotas':0, 'nb_full_quotas': 0, 'nb_breached_quotas': 0}
-            data[smallkey]['nb_breached_quotas'] += 1
-            data[smallkey]['nb_full_quotas'] += 1
-    tosend = [v for k, v in data.items()]
-    return JsonResponse({'status': "success", 'data': tosend})
+    # Merge both datasets
+    df1 = pd.DataFrame(detailed_quotas).rename(columns={'dca__producer': 'producer_id', 'dca__production_site': 'production_site_id', 'biofuel': 'biofuel_id', 'feedstock': 'feedstock_id'})
+    df2 = pd.DataFrame(double_counted_production).rename(columns={'lot__year': 'year', 'lot__carbure_producer': 'producer_id', 'lot__carbure_production_site': 'production_site_id', 
+                                                                  'lot__matiere_premiere': 'feedstock_id', 'lot__biocarburant': 'biofuel_id', 'lot__biocarburant__masse_volumique': 'masse_volumique'})
+    df1.set_index(['year', 'producer_id', 'production_site_id', 'biofuel_id', 'feedstock_id'], inplace=True)
+    df2.set_index(['year', 'producer_id', 'production_site_id', 'biofuel_id', 'feedstock_id'], inplace=True)
+    res = df1.merge(df2, how='outer', left_index=True, right_index=True).fillna(0)
+    res['current_production_weight_sum_tonnes'] = (res['volume'] * res['masse_volumique'] / 1000).apply(lambda x: round(x, 2))
+    res['full'] = (res['current_production_weight_sum_tonnes'] == res['approved_quota']).astype(int)
+    res['breached'] = (res['current_production_weight_sum_tonnes'] > res['approved_quota']).astype(int)
+    grouped = res.groupby(['year', 'producer_id', 'production_site_id']).agg(nb_quotas=('full', 'count'), 
+                                                                             nb_full_quotas=('full', 'sum'),
+                                                                             nb_breached_quotas=('breached', 'sum'),
+                                                                             approved_quota_weight_sum=('approved_quota', 'sum'),
+                                                                             current_production_weight_sum=('volume', 'sum'),
+                                                                            )
+    grouped.reset_index(inplace=True)
+    grouped['producer'] = grouped['producer_id'].apply(lambda x: producers[x].natural_key())
+    grouped['production_site'] = grouped['production_site_id'].apply(lambda x: production_sites[x].natural_key())
+    return JsonResponse({'status': "success", 'data': grouped.to_dict('records')})
 
 
 @is_admin_or_external_admin
-def get_quotas_admin(request, *args, **kwargs):
+def get_production_site_quotas_admin(request, *args, **kwargs):
     year = request.GET.get('year', False) # mandatory
-    producer_id = request.GET.get('producer_id', False)
     production_site_id = request.GET.get('production_site_id', False)
-    feedstock_id = request.GET.get('feedstock_id', False)
-    biofuel_id = request.GET.get('biofuel_id', False)
     if not year:
         return JsonResponse({'status': "error", 'message': "Missing year"}, status=400)
 
-    quotas = DoubleCountingProduction.objects.values('year', 'dca__producer', 'dca__production_site', 'biofuel', 'feedstock', 'approved_quota').filter(year=year)
-    if producer_id:
-        quotas = quotas.filter(dca__producer_id=producer_id)
-    if production_site_id:
-        quotas = quotas.filter(dca__production_site_id=production_site_id)
-    if feedstock_id:
-        quotas = quotas.filter(feedstock_id=feedstock_id)
-    if biofuel_id:
-        quotas = quotas.filter(biofuel_id=biofuel_id)
+    biofuels = {p.id: p for p in Biocarburant.objects.all()}
+    feedstocks = {m.id: m for m in MatierePremiere.objects.filter(is_double_compte=True)}
 
-    quotas = quotas.annotate(quota=Sum('approved_quota'))
-    print(quotas)
+    detailed_quotas = DoubleCountingProduction.objects.values('biofuel', 'feedstock', 'approved_quota').filter(year=year, dca__production_site_id=production_site_id)
+    production = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED, lot__carbure_production_site_id=production_site_id, lot__year=year) \
+    .values('lot__matiere_premiere', 'lot__biocarburant', 'lot__biocarburant__masse_volumique').filter(lot__matiere_premiere_id__in=feedstocks.keys()).annotate(volume=Sum('lot__volume'), nb_lots=Count('id'))
 
-    years = list(set([q['year'] for q in quotas]))
-    biofuels = list(set([q['biofuel'] for q in quotas]))
-    feedstocks = list(set([q['feedstock'] for q in quotas]))
-    producers = list(set([q['dca__producer'] for q in quotas]))
-    prodsites = list(set([q['dca__production_site'] for q in quotas]))
-    consumed_quotas = LotTransaction.objects.filter(lot__carbure_producer__in=producers, lot__carbure_production_site__in=prodsites, lot__year__in=years, lot__biocarburant__in=biofuels, lot__matiere_premiere__in=feedstocks) \
-        .values('lot__year', 'lot__carbure_producer', 'lot__carbure_production_site', 'lot__biocarburant', 'lot__matiere_premiere').annotate(volume=Sum('lot__volume'))
-    print(consumed_quotas)
-    data = []
-    entry = {'producer': '', 'production_site': '', 'volume_produced': 1000, 'volume_allowed': 1500, 'quotas_full': 1, 'quotas_breached': 0, 'quotas_total': 9}
-    return JsonResponse({'status': "success", 'data': data})
+    # Merge both datasets
+    df1 = pd.DataFrame(columns={'biofuel', 'feedstock', 'approved_quota'}, data=detailed_quotas).rename(columns={'biofuel': 'biofuel_id', 'feedstock': 'feedstock_id'})
+    df2 = pd.DataFrame(columns={'lot__matiere_premiere', 'lot__biocarburant', 'volume', 'nb_lots', 'lot__biocarburant__masse_volumique'}, data=production).rename(columns={'lot__matiere_premiere': 'feedstock_id', 'lot__biocarburant': 'biofuel_id', 
+    'lot__biocarburant__masse_volumique': 'masse_volumique'})
+    df1.set_index(['biofuel_id', 'feedstock_id'], inplace=True)
+    df2.set_index(['biofuel_id', 'feedstock_id'], inplace=True)
+    res = df1.merge(df2, how='outer', left_index=True, right_index=True).fillna(0).reset_index()
+    res['feedstock'] = res['feedstock_id'].apply(lambda x: feedstocks[x].natural_key())
+    res['biofuel'] = res['biofuel_id'].apply(lambda x: biofuels[x].natural_key())
+    res['current_production_weight_sum_tonnes'] = (res['volume'] * res['masse_volumique'] / 1000).apply(lambda x: round(x, 2))
+    return JsonResponse({'status': "success", 'data': res.to_dict('records')})
+
+@check_rights('entity_id')
+def get_production_site_quotas(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']    
+    dca_id = request.GET.get('dca_id', False)
+    biofuels = {p.id: p for p in Biocarburant.objects.all()}
+    feedstocks = {m.id: m for m in MatierePremiere.objects.filter(is_double_compte=True)}
+
+    try:
+        dca = DoubleCountingAgreement.objects.get(id=dca_id, producer=entity)
+    except:
+        return JsonResponse({'status': "error", 'message': "Not authorised"}, status=403)
+
+    detailed_quotas = DoubleCountingProduction.objects.values('biofuel', 'feedstock', 'approved_quota').filter(dca_id=dca_id)
+    production = LotTransaction.objects.filter(lot__status=LotV2.VALIDATED, lot__carbure_production_site_id=dca.production_site) \
+    .values('lot__year', 'lot__matiere_premiere', 'lot__biocarburant', 'lot__biocarburant__masse_volumique').filter(lot__matiere_premiere_id__in=feedstocks.keys()).annotate(volume=Sum('lot__volume'), nb_lots=Count('id'))
+
+    # Merge both datasets
+    df1 = pd.DataFrame(columns={'biofuel', 'feedstock', 'approved_quota'}, data=detailed_quotas).rename(columns={'biofuel': 'biofuel_id', 'feedstock': 'feedstock_id'})
+    df2 = pd.DataFrame(columns={'lot__matiere_premiere', 'lot__biocarburant', 'volume', 'nb_lots', 'lot__biocarburant__masse_volumique'}, data=production).rename(columns={'lot__matiere_premiere': 'feedstock_id', 'lot__biocarburant': 'biofuel_id', 
+    'lot__biocarburant__masse_volumique': 'masse_volumique'})
+    df1.set_index(['biofuel_id', 'feedstock_id'], inplace=True)
+    df2.set_index(['biofuel_id', 'feedstock_id'], inplace=True)
+    res = df1.merge(df2, how='outer', left_index=True, right_index=True).fillna(0).reset_index()
+    res['feedstock'] = res['feedstock_id'].apply(lambda x: feedstocks[x].natural_key())
+    res['biofuel'] = res['biofuel_id'].apply(lambda x: biofuels[x].natural_key())
+    res['current_production_weight_sum_tonnes'] = (res['volume'] * res['masse_volumique'] / 1000).apply(lambda x: round(x, 2))
+    return JsonResponse({'status': "success", 'data': res.to_dict('records')})
+
 
 @check_rights('validator_entity_id', role=[UserRights.ADMIN, UserRights.RW])
 def approve_dca(request, *args, **kwargs):

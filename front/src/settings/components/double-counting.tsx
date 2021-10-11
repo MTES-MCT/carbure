@@ -3,18 +3,19 @@ import { Trans, useTranslation } from "react-i18next"
 import styles from "./settings.module.css"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { CompanySettingsHook as DoubleContingSettingsHook } from "../hooks/use-company"
+import { ProductionSite, UserRole } from 'common/types'
 import {
   DoubleCounting,
   DoubleCountingStatus as DCStatus,
-  ProductionSite,
-  UserRole,
   DoubleCountingSourcing,
   DoubleCountingProduction,
-} from "common/types"
+  QuotaDetails
+} from "doublecount/types"
 import { Title, LoaderOverlay, Box } from "common/components"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import { useRights } from "carbure/hooks/use-rights"
-import Table, { Actions, Column, Row } from "common/components/table"
+import Table, { Line, TwoLines, Actions, Column, Row } from "common/components/table"
+import tableCSS from 'common/components/table.module.css'
 import { AsyncButton, Button } from "common/components/button"
 import {
   AlertCircle,
@@ -53,6 +54,7 @@ import useForm from "common/hooks/use-form"
 import YearTable from "doublecount/components/year-table"
 import DoubleCountingStatus from 'doublecount/components/dc-status'
 import { SourcingAggregationTable } from 'doublecount/components/dc-tables'
+import { prettyVolume } from 'transactions/helpers'
 
 type DoubleCountingUploadPromptProps = PromptProps<void> & {
   entity: EntitySelection
@@ -496,6 +498,57 @@ const DoubleCountingProductionPrompt = ({
   )
 }
 
+type QuotasTableProps = {
+  entity: EntitySelection
+  agreement: DoubleCounting | null
+}
+
+const QuotasTable = ({ entity, agreement }: QuotasTableProps) => {
+  const { t } = useTranslation() 
+
+  const [details, getDetails] = useAPI(api.getQuotaDetails)
+
+  const entityID = entity?.id ?? -1
+  const dcaID = agreement?.id ?? -1
+
+  useEffect(() => {
+    getDetails(entityID, dcaID)
+  }, [getDetails, entityID, dcaID])
+
+
+  const columns: Column<QuotaDetails>[] = [
+    { header: t("Biocarburant"), render: (d) => <Line text={d.biofuel.name} /> },
+    { header: t("Matière première"), render: (d) => <Line text={d.feedstock.name} /> },
+    { header: t("Nombre de lots"), render: (d) => d.nb_lots },
+    { header: t("Volume produit"), render: (d) => (
+      <TwoLines 
+        text={`${prettyVolume(d.volume)} L`}
+        sub={`${d.current_production_weight_sum_tonnes} t`}
+      /> 
+    )},
+    { header: t("Quota approuvé"), render: (d) => d.approved_quota },
+    {
+      header: t("Progression des quotas"),
+      render: (d) => (
+        <progress 
+          max={d.approved_quota} 
+          value={d.current_production_weight_sum_tonnes} 
+          title={`${d.current_production_weight_sum_tonnes} / ${d.approved_quota}`} 
+        />
+      ),
+    },
+  ]
+
+  const rows = (details.data?? []).map(value => ({ value }))
+
+  return (
+    <>
+      <Table columns={columns} rows={rows} className={tableCSS.flexTable} />
+      {details.loading && <LoaderOverlay />}
+    </>
+  )
+}
+
 type DoubleCountingPromptProps = PromptProps<any> & {
   entity: EntitySelection
   agreementID: number
@@ -523,7 +576,8 @@ const DoubleCountingPrompt = ({
   const dcaID = agreement.data?.id ?? -1
   const dcaStatus = agreement.data?.status ?? DCStatus.Pending
 
-  const isFinal = agreement.data?.status !== DCStatus.Pending
+  const isAccepted = dcaStatus === DCStatus.Accepted
+  const isFinal = dcaStatus !== DCStatus.Pending
 
   function reloadAgreement() {
     if (entity === null) return
@@ -685,8 +739,6 @@ const DoubleCountingPrompt = ({
   }))
 
   const productionSite = agreement.data?.production_site ?? "N/A"
-  const producer = agreement.data?.producer.name ?? "N/A"
-  const user = agreement.data?.producer_user ?? "N/A"
   const creationDate = agreement.data?.creation_date
     ? formatDate(agreement.data.creation_date)
     : "N/A"
@@ -727,67 +779,72 @@ const DoubleCountingPrompt = ({
           { key: "aggregated_sourcing", label: t("Approvisionnement") },
           { key: "sourcing", label: t("Approvisionnement (détaillé)") },
           { key: "production", label: t("Production") },
+          isAccepted && { key: "quotas", label: t("Suivi des quotas") }
         ]}
         focus={focus}
         onFocus={setFocus}
       />
 
-    <div className={styles.modalTableContainer}>
-      {focus === "aggregated_sourcing" && (
-        <SourcingAggregationTable sourcing={agreement.data?.aggregated_sourcing ?? []} />
-      )}
+      <div className={styles.modalTableContainer}>
+        {focus === "aggregated_sourcing" && (
+          <SourcingAggregationTable sourcing={agreement.data?.aggregated_sourcing ?? []} />
+        )}
 
-      {focus === "sourcing" && (
-        <Fragment>
-          <YearTable columns={sourcingColumns} rows={sourcingRows} />
+        {focus === "sourcing" && (
+          <Fragment>
+            <YearTable columns={sourcingColumns} rows={sourcingRows} />
 
-          {!isFinal && (
-            <span
-              className={styles.modalTableAddRow}
-              onClick={async () => {
-                const ok = await prompt((resolve) => (
-                  <DoubleCountingSourcingPrompt
-                    add
-                    dcaID={dcaID}
-                    entity={entity}
-                    onResolve={resolve}
-                  />
-                ))
+            {!isFinal && (
+              <span
+                className={styles.modalTableAddRow}
+                onClick={async () => {
+                  const ok = await prompt((resolve) => (
+                    <DoubleCountingSourcingPrompt
+                      add
+                      dcaID={dcaID}
+                      entity={entity}
+                      onResolve={resolve}
+                    />
+                  ))
 
-                ok && reloadAgreement()
-              }}
-            >
-              <Trans>+ Ajouter une ligne d'approvisionnement</Trans>
-            </span>
-          )}
-        </Fragment>
-      )}
+                  ok && reloadAgreement()
+                }}
+              >
+                <Trans>+ Ajouter une ligne d'approvisionnement</Trans>
+              </span>
+            )}
+          </Fragment>
+        )}
 
-      {focus === "production" && (
-        <Fragment>
-          <YearTable columns={productionColumns} rows={productionRows} />
+        {focus === "production" && (
+          <Fragment>
+            <YearTable columns={productionColumns} rows={productionRows} />
 
-          {!isFinal && (
-            <span
-              className={styles.modalTableAddRow}
-              onClick={async () => {
-                await prompt((resolve) => (
-                  <DoubleCountingProductionPrompt
-                    add
-                    dcaID={dcaID}
-                    entity={entity}
-                    onResolve={resolve}
-                  />
-                ))
+            {!isFinal && (
+              <span
+                className={styles.modalTableAddRow}
+                onClick={async () => {
+                  await prompt((resolve) => (
+                    <DoubleCountingProductionPrompt
+                      add
+                      dcaID={dcaID}
+                      entity={entity}
+                      onResolve={resolve}
+                    />
+                  ))
 
-                reloadAgreement()
-              }}
-            >
-              <Trans>+ Ajouter une ligne de production</Trans>
-            </span>
-          )}
-        </Fragment>
-      )}
+                  reloadAgreement()
+                }}
+              >
+                <Trans>+ Ajouter une ligne de production</Trans>
+              </span>
+            )}
+          </Fragment>
+        )}
+
+        {focus === "quotas" && (
+          <QuotasTable entity={entity} agreement={agreement.data} />
+        )}
       </div>
 
       <DialogButtons>

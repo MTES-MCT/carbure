@@ -2,8 +2,10 @@ import cl from "clsx"
 import { Box } from "."
 import styles from "./tabs.module.css"
 
+type Tab = { key: string; label: string }
+
 type TabsProps = {
-  tabs: { key: string; label: string }[]
+  tabs: (Tab | false)[]
   focus: string
   onFocus: (focus: string) => void
 }
@@ -11,7 +13,7 @@ type TabsProps = {
 export const Tabs = ({ tabs, focus, onFocus, ...props }: TabsProps) => {
   return (
     <Box row {...props}>
-      {tabs.map(({ key, label }) => (
+      {(tabs.filter(Boolean) as Tab[]).map(({ key, label }) => (
         <span
           key={key}
           onClick={() => onFocus(key)}
