@@ -1,7 +1,8 @@
 import { Fragment, useEffect } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { LoaderOverlay } from "common/components"
-import Table, { Column } from "common/components/table"
+import Table, { Line, TwoLines, Column } from "common/components/table"
+import tableCSS from 'common/components/table.module.css'
 import { padding } from "transactions/components/list-columns"
 import useAPI from "common/hooks/use-api"
 import {
@@ -16,10 +17,12 @@ import {
 import * as api from "../api"
 import { Button } from "common/components/button"
 import { Return } from "common/components/icons"
+import { QuotaOverview, QuotaDetails } from "../types"
+import { prettyVolume } from 'transactions/helpers'
 
 type QuotasDetailsPromptProps = PromptProps<void> & {
   year: number
-  quota: api.QuotaOverview
+  quota: QuotaOverview
 }
 
 const QuotasDetailsPrompt = ({
@@ -31,18 +34,30 @@ const QuotasDetailsPrompt = ({
   const [details, getDetails] = useAPI(api.getQuotaDetails)
 
   useEffect(() => {
-    getDetails()
-  }, [getDetails])
+    getDetails(year, quota.production_site.id)
+  }, [getDetails, year, quota.production_site.id])
 
-  const columns: Column<api.QuotaDetails>[] = [
-    padding,
-    { header: t("Biocarburant"), render: (d) => "" },
-    { header: t("Matière première"), render: (d) => "" },
+  const columns: Column<QuotaDetails>[] = [
+    { header: t("Biocarburant"), render: (d) => <Line text={d.biofuel.name} /> },
+    { header: t("Matière première"), render: (d) => <Line text={d.feedstock.name} /> },
+    { header: t("Nombre de lots"), render: (d) => d.nb_lots },
+    { header: t("Volume produit"), render: (d) => (
+      <TwoLines 
+        text={`${prettyVolume(d.volume)} L`}
+        sub={`${d.current_production_weight_sum_tonnes} t`}
+      /> 
+    )},
+    { header: t("Quota approuvé"), render: (d) => d.approved_quota },
     {
       header: t("Progression des quotas"),
-      render: (d) => <progress />,
+      render: (d) => (
+        <progress 
+          max={d.approved_quota} 
+          value={d.current_production_weight_sum_tonnes} 
+          title={`${d.current_production_weight_sum_tonnes} / ${d.approved_quota}`} 
+        />
+      ),
     },
-    padding,
   ]
 
   const producer = quota.producer.name
@@ -51,7 +66,7 @@ const QuotasDetailsPrompt = ({
   const rows = (details.data ?? []).map((value) => ({ value }))
 
   return (
-    <Dialog onResolve={onResolve}>
+    <Dialog wide onResolve={onResolve}>
       <DialogTitle text={t("Détails des quotas")} />
 
       <DialogText>
@@ -62,13 +77,15 @@ const QuotasDetailsPrompt = ({
         </Trans>
       </DialogText>
 
-      <DialogTable columns={columns} rows={rows} />
+      <DialogTable columns={columns} rows={rows} className={tableCSS.flexTable} />
 
       <DialogButtons>
         <Button icon={Return} onClick={() => onResolve()}>
           <Trans>Retour</Trans>
         </Button>
       </DialogButtons>
+
+      {details.loading && <LoaderOverlay />}
     </Dialog>
   )
 }
@@ -86,8 +103,7 @@ const QuotasList = ({ year }: QuotasListProps) => {
     getQuotas(year)
   }, [getQuotas, year])
 
-  const columns: Column<api.QuotaOverview>[] = [
-    padding,
+  const columns: Column<QuotaOverview>[] = [
     { header: t("Producteur"), render: (a) => a.producer.name },
     { header: t("Site de production"), render: (a) => a.production_site.name },
     {
@@ -112,7 +128,6 @@ const QuotasList = ({ year }: QuotasListProps) => {
       header: t("Quotas dépassés"),
       render: (a) => <span>{a.nb_breached_quotas}</span>,
     },
-    padding,
   ]
 
   const quotaRows = (quotas.data ?? []).map((quota) => ({
@@ -125,7 +140,7 @@ const QuotasList = ({ year }: QuotasListProps) => {
 
   return (
     <Fragment>
-      <Table columns={columns} rows={quotaRows} />
+      <Table columns={columns} rows={quotaRows} className={tableCSS.flexTable} />
 
       {quotas.loading && <LoaderOverlay />}
     </Fragment>

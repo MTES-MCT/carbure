@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import cl from "clsx"
 
 import { Box, SystemProps } from "."
@@ -77,6 +77,8 @@ export interface Column<T> {
   sortBy?: string
   /**  a class for the `<th>` element */
   className?: string
+  /** helper for local sorting */
+  orderBy?: (value: T) => any
   /** how to render a cell based on the row data */
   render: (row: T) => React.ReactNode
 }
@@ -112,7 +114,7 @@ export default function Table<T>({
   return (
     <Box {...props} className={cl(styles.table, className)}>
       {!headless && (
-        <Box row>
+        <Box row className={styles.tableHead}>
           {columns.map((column, c) => (
             <Box
               row

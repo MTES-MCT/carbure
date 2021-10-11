@@ -1,21 +1,11 @@
 import { Fragment, useState, useEffect } from "react"
 import { useTranslation, Trans } from "react-i18next"
-import {
-  Admin,
-  DoubleCountingStatus as DCStatus,
-  DoubleCountingSourcing,
-  DoubleCountingProduction,
-  EntityType,
-  DoubleCountingDetails,
-  DoubleCountingSourcingAggregation
-} from "common/types"
+import { EntityType } from 'common/types'
+import { Admin, DoubleCountingStatus as DCStatus } from "../types"
 import useAPI from "common/hooks/use-api"
 import { LoaderOverlay, Box } from "common/components"
 import Tabs from "common/components/tabs"
-import { Input } from "common/components/input"
 import { Button, AsyncButton } from "common/components/button"
-import Table, { Column, Row } from "common/components/table"
-import { padding } from "transactions/components/list-columns"
 import * as api from "../api"
 import {
   Dialog,

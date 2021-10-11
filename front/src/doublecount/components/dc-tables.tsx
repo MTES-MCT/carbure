@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next"
+import { EntityType } from "common/types"
 import {
   Admin,
   DoubleCountingSourcing,
   DoubleCountingProduction,
-  EntityType,
   DoubleCountingDetails,
   DoubleCountingSourcingAggregation
-} from "common/types"
+} from "../types"
 import Table, { Column, Row } from "common/components/table"
 import { Input } from 'common/components/input'
 import { padding } from "transactions/components/list-columns"

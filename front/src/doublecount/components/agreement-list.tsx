@@ -1,6 +1,6 @@
 import { Fragment, useState, useEffect } from "react"
 import { useTranslation, Trans } from "react-i18next"
-import { DoubleCounting } from "common/types"
+import { DoubleCounting } from "../types"
 import { LoaderOverlay } from "common/components"
 import Tabs from "common/components/tabs"
 import Table, { Column } from "common/components/table"
