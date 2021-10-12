@@ -382,7 +382,7 @@ def update_right_request(request):
             subject=email_subject,
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[request.user.email],
+            recipient_list=[right_request.user.email],
             fail_silently=False,
         )
     else:
