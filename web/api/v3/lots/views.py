@@ -370,7 +370,7 @@ def delete_lot(request, *args, **kwargs):
             return JsonResponse({'status': 'forbidden', 'message': "User not allowed to delete this tx"}, status=403)
 
         # only allow to delete pending or rejected transactions
-        if tx.delivery_status not in ['N', 'R']:
+        if tx.delivery_status not in [LotTransaction.PENDING, LotTransaction.REJECTED, LotTransaction.TOFIX]:
             return JsonResponse({'status': 'forbidden', 'message': "Transaction already accepted by client"},
                                 status=403)
 
