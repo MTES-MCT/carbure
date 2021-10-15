@@ -465,6 +465,8 @@ class LotTransaction(models.Model):
     highlighted_by_admin = models.BooleanField(default=False)
     highlighted_by_auditor = models.BooleanField(default=False)
 
+    # duplicates
+    potential_duplicate = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.id)

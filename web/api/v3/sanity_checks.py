@@ -45,6 +45,7 @@ rules['EXPIRED_VENDOR_CERT'] = "Certificat du fournisseur expiré"
 rules['UNKNOWN_DAE_FORMAT'] = "Le format du numéro douanier semble incorrect"
 rules['UNKNOWN_DOUBLE_COUNTING_CERTIFICATE'] = "Le certificat double compte est inconnu"
 rules['EXPIRED_DOUBLE_COUNTING_CERTIFICATE'] = "Le certificat double n'est plus valide"
+rules['POTENTIAL_DUPLICATE'] = "Doublon potentiel détecté. Un autre lot avec le même numéro douanier, biocarburant, matière première, volume et caractéristiques GES existe."
 
 
 def generic_error(error, **kwargs):
@@ -161,6 +162,10 @@ def sanity_check(tx, prefetched_data):
 
     if tx.is_mac and lot.biocarburant and lot.biocarburant.code not in ['ED95', 'B100', 'ETH', 'EMHV', 'EMHU']:
         errors.append(generic_error(error='MAC_BC_WRONG', tx=tx, is_blocking=True, fields=['biocarburant_code', 'mac']))
+
+    # duplicates warning
+    if tx.potential_duplicate:
+        errors.append(generic_error(error='POTENTIAL_DUPLICATE', tx=tx, is_blocking=False, display_to_recipient=True, display_to_auditor=True))    
 
     # check volume
     if lot.volume < 2000 and not tx.is_mac:
