@@ -10,6 +10,7 @@ urlpatterns = [
     path('admin/agreements-snapshot', views.get_agreements_snapshot_admin, name='api-v3-doublecount-get-agreements-snapshot-admin'),
     path('admin/quotas', views.get_production_site_quotas_admin, name='api-v3-doublecount-get-quotas-admin'),
     path('admin/quotas-snapshot', views.get_quotas_snapshot_admin, name='api-v3-doublecount-get-quotas-snapshot-admin'),
+    path('admin/upload-decision', views.upload_decision_admin, name='api-v3-doublecount-upload-decision-admin'),
     path('get-template', views.get_template, name='api-v3-doublecount-get-template'),
     path('quotas', views.get_production_site_quotas, name='api-v3-doublecount-get-quotas'),
 
@@ -25,6 +26,7 @@ urlpatterns = [
     path('upload', views.upload_file, name='api-v3-doublecount-upload-file'),
     path('upload-documentation', views.upload_documentation, name='api-v3-doublecount-upload-doc'),
     path('download-documentation', views.download_documentation, name='api-v3-doublecount-download-doc'),
+    path('download-admin-decision', views.download_admin_decision, name='api-v3-doublecount-download-admin-decision'),
     path('admin/download-documentation', views.admin_download_documentation, name='api-v3-doublecount-admin-download-doc'),
     path('admin/approve', views.approve_dca, name='api-v3-doublecount-approve-dca'),
     path('admin/reject', views.reject_dca, name='api-v3-doublecount-reject-dca'),
