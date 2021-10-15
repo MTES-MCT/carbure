@@ -91,7 +91,7 @@ class DoubleCountingAgreementFullSerializer(serializers.ModelSerializer):
 class DoubleCountingDocFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoubleCountingDocFile
-        fields = ['id', 'file_name']
+        fields = ['id', 'file_name', 'file_type']
 
 class DoubleCountingAgreementFullSerializerWithForeignKeys(serializers.ModelSerializer):
     production_site = serializers.SlugRelatedField(

@@ -80,8 +80,13 @@ class DoubleCountingProduction(models.Model):
         verbose_name_plural = 'Production Double Compte'
 
 class DoubleCountingDocFile(models.Model):
+    DECISION = "DECISION"
+    SOURCING = "SOURCING"
+    FILE_TYPE = ((SOURCING, SOURCING), (DECISION, DECISION))
+
     url = models.TextField()
     file_name = models.CharField(max_length=128, default='')
+    file_type = models.CharField(max_length=128, choices=FILE_TYPE, default=SOURCING)
     dca = models.ForeignKey(DoubleCountingAgreement, on_delete=models.CASCADE, related_name='documents')
     link_expiry_dt = models.DateTimeField()
  

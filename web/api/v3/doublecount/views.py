@@ -289,7 +289,39 @@ def download_documentation(request, *args, **kwargs):
     if not file_id:
         return JsonResponse({'status': "error", 'message': "Missing file_id"}, status=400)
     try:
-        f = DoubleCountingDocFile.objects.get(id=file_id, dca=dca)
+        f = DoubleCountingDocFile.objects.get(id=file_id, dca=dca, file_type=DoubleCountingDocFile.SOURCING)
+    except:
+        return JsonResponse({'status': "forbidden", 'message': "Forbidden"}, status=403)
+
+    s3 = boto3.client('s3', aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'], aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'], region_name=os.environ['AWS_S3_REGION_NAME'], endpoint_url=os.environ['AWS_S3_ENDPOINT_URL'], use_ssl=os.environ['AWS_S3_USE_SSL'])
+    filepath = '/tmp/%s' % (f.file_name)
+    s3filepath = '{year}/{entity}/{filename}'.format(year=dca.period_start.year, entity=entity.name, filename=f.file_name)
+    with open(filepath, 'wb') as file:
+        s3.download_fileobj(os.environ['AWS_DCDOCS_STORAGE_BUCKET_NAME'], s3filepath, file)
+    with open(filepath, "rb") as file:
+        data = file.read()
+        ctype = "application/force-download"
+        response = HttpResponse(content=data, content_type=ctype)
+        response['Content-Disposition'] = 'attachment; filename="%s"' % (f.file_name)
+    return response
+
+@check_rights('entity_id')
+def download_admin_decision(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    dca_id = request.GET.get('dca_id', None)
+    if not dca_id:
+        return JsonResponse({'status': "error", 'message': "Missing dca_id"}, status=400)
+    try:
+        dca = DoubleCountingAgreement.objects.get(producer=entity, id=dca_id)
+    except:
+        return JsonResponse({'status': "forbidden", 'message': "Forbidden"}, status=403)
+
+    file_id = request.GET.get('file_id', None)
+    if not file_id:
+        return JsonResponse({'status': "error", 'message': "Missing file_id"}, status=400)
+    try:
+        f = DoubleCountingDocFile.objects.get(id=file_id, dca=dca, file_type=DoubleCountingDocFile.DECISION)
     except:
         return JsonResponse({'status': "forbidden", 'message': "Forbidden"}, status=403)
 
@@ -389,6 +421,47 @@ def get_quotas_snapshot_admin(request, *args, **kwargs):
     grouped['producer'] = grouped['producer_id'].apply(lambda x: producers[x].natural_key())
     grouped['production_site'] = grouped['production_site_id'].apply(lambda x: production_sites[x].natural_key())
     return JsonResponse({'status': "success", 'data': grouped.to_dict('records')})
+
+@is_admin
+def upload_decision_admin(request, *args, **kwargs):
+    context = kwargs['context']
+    entity = context['entity']
+    dca_id = request.POST.get('dca_id', None)
+    if not dca_id:
+        return JsonResponse({'status': "error", 'message': "Missing dca_id"}, status=400)
+    try:
+        dca = DoubleCountingAgreement.objects.get(id=dca_id)
+    except:
+        return JsonResponse({'status': "error", 'message': "Could not find DCA"}, status=400)
+
+    file_obj = request.FILES.get('file')
+    if file_obj is None:
+        return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
+
+    # organize a path for the file in bucket
+    file_directory_within_bucket = '{year}/{entity}'.format(year=dca.period_start.year, entity=entity.name)
+    filename = ''.join((c for c in unicodedata.normalize('NFD', file_obj.name) if unicodedata.category(c) != 'Mn'))
+
+    # synthesize a full file path; note that we included the filename
+    file_path_within_bucket = os.path.join(
+        file_directory_within_bucket,
+        filename
+    )
+
+    if 'TEST' in os.environ and os.environ['TEST'] == '1':
+        media_storage = FileSystemStorage('/tmp')
+    else:
+        media_storage = AWSStorage()
+    media_storage.save(file_path_within_bucket, file_obj)
+    file_url = media_storage.url(file_path_within_bucket)
+    dcf = DoubleCountingDocFile()
+    dcf.dca = dca
+    dcf.url = file_url
+    dcf.file_name = filename
+    dcf.file_type = DoubleCountingDocFile.DECISION
+    dcf.link_expiry_dt = pytz.utc.localize(datetime.datetime.now() + datetime.timedelta(seconds=3600))
+    dcf.save()
+    return JsonResponse({'status': 'success'})
 
 
 @is_admin_or_external_admin
