@@ -5,6 +5,8 @@ import styles from "./footer.module.css"
 import logoMTES from "../assets/images/MTE.svg"
 import logoFabNum from "../assets/images/logo-fabriquenumerique.svg"
 import logoBetaGouv from "../assets/images/betagouvfr.svg"
+import logoFranceRelance from "../assets/images/france-relance.png"
+import logoEuropeanUnion from "../assets/images/union-europeenne.png"
 import { Link } from "common/components/relative-route"
 import { ExternalLink, LinkedIn, Slack } from "common/components/icons"
 
@@ -57,18 +59,6 @@ const Footer = () => (
     <div className={styles.footerMiddle}>
       <div className={styles.footerLogos}>
         <img src={logoMTES} alt="Logo MTES" className={cl(styles.footerMTES)} />
-
-        <img
-          src={logoFabNum}
-          alt="Logo Fabrique Numerique"
-          className={styles.footerFanum}
-        />
-
-        <img
-          src={logoBetaGouv}
-          alt="Logo Fabrique Numerique"
-          className={styles.footerBetagouv}
-        />
       </div>
 
       <div className={styles.footerTexts}>
@@ -94,6 +84,18 @@ const Footer = () => (
             <a href="https://data.gouv.fr">data.gouv.fr</a>
           </li>
         </ul>
+      </div>
+    </div>
+
+    <div className={styles.footerPartners}>
+      <div>
+        <Trans>Nos partenaires :</Trans>
+      </div>
+      <div className={styles.footerPartnersLogos}>
+        <img src={logoFabNum} alt="Logo Fabrique Numerique" />
+        <img src={logoFranceRelance} alt="Logo France Relance" />
+        <img src={logoEuropeanUnion} alt="Logo Union Européenne" />
+        <img src={logoBetaGouv} alt="Logo Fabrique Numerique" />
       </div>
     </div>
 
