@@ -502,9 +502,20 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(response.status_code, 200)
         j = response.json()['data']
         self.assertEqual(j['duplicates'], 1)
-        # ensure lot was deleted
+        # ensure lot was not deleted
         nb_lots = LotV2.objects.all().count()
-        self.assertEqual(nb_lots, 1)
+        self.assertEqual(nb_lots, 2)
+        # ensure the lot has been sent back to drafts
+        tx = LotTransaction.objects.get(dae=dae, lot__status='Draft')
+        self.assertEqual(tx.potential_duplicate, True)
+        # validate again - it should pass
+        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_producer.id})
+        self.assertEqual(response.status_code, 200)
+        j = response.json()['data']
+        self.assertEqual(j['duplicates'], 0)        
+        nb_lots = LotV2.objects.filter(status=LotV2.VALIDATED).count()
+        self.assertEqual(nb_lots, 2)        
+
         # as operator, create same lot
         lot['production_site'] = ''
         lot['supplier_certificate'] = 'ISCC-TOTO-02'
@@ -514,14 +525,24 @@ class LotsAPITest(TransactionTestCase):
 
         response = self.client.post(reverse('api-v3-add-lot'), lot)
         self.assertEqual(response.status_code, 200)
-        j = response.json()['data']
         # validate
         tx = LotTransaction.objects.get(dae=dae, lot__added_by=self.test_operator)
         response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_operator.id})
         self.assertEqual(response.status_code, 200)
-        # lot doesn't exist anymore
-        cnt = LotTransaction.objects.filter(dae=dae, lot__added_by=self.test_operator).count()
-        self.assertEqual(cnt, 0)
+        j = response.json()['data']
+        self.assertEqual(j['duplicates'], 1)
+        # lot stayed in drafts
+        tx = LotTransaction.objects.get(dae=dae, lot__added_by=self.test_operator, lot__status=LotV2.DRAFT)
+        # validate again
+        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_operator.id})
+        self.assertEqual(response.status_code, 200)
+        j = response.json()['data']
+        self.assertEqual(j['duplicates'], 0)
+        # lot is now valid
+        nb_valid = LotTransaction.objects.filter(dae=dae, lot__added_by=self.test_operator, lot__status=LotV2.VALIDATED).count()
+        self.assertEqual(nb_valid, 1)
+
+
 
     def test_dates_format(self):
         # cleanup db
@@ -626,8 +647,8 @@ class LotsAPITest(TransactionTestCase):
         self.assertEqual(response.status_code, 200)
         j = response.json()['data']
         self.assertEqual(j['duplicates'], 1)
-        # ensure lot was deleted
-        nb_lots = LotV2.objects.all().count()
+        # lot is not deleted but kept in drafts
+        nb_lots = LotV2.objects.filter(status=LotV2.DRAFT).count()
         self.assertEqual(nb_lots, 1)
 
         # as producer, create same lot
@@ -640,18 +661,18 @@ class LotsAPITest(TransactionTestCase):
         tx = LotTransaction.objects.get(dae=dae, lot__added_by=self.test_producer)
         response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_producer.id})
         self.assertEqual(response.status_code, 200)
-        j = response.json()
-        # lot has replaced the previous one
-        nb_lots = LotV2.objects.all().count()
-        self.assertEqual(nb_lots, 1)
-        nb_tx = LotTransaction.objects.all().count()
-        self.assertEqual(nb_tx, 1)
-        tx = LotTransaction.objects.get(dae=dae)
-        self.assertEqual(tx.lot.producer_is_in_carbure, True)
-        self.assertEqual(tx.lot.carbure_producer.id, self.test_producer.id)
-        self.assertEqual(tx.carbure_client.id, self.test_operator.id)
-        self.assertEqual(tx.lot.carbure_production_site.id, self.production_site.id)
-        self.assertEqual(tx.lot.production_site_is_in_carbure, True)
+        tx = LotTransaction.objects.get(dae=dae, lot__added_by=self.test_producer)
+        # lot stays in Drafts (potential duplicate)
+        self.assertEqual(tx.lot.status, LotV2.DRAFT)
+        self.assertEqual(tx.potential_duplicate, True)
+
+        # resend and it passes
+        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_producer.id})
+        self.assertEqual(response.status_code, 200)
+        tx = LotTransaction.objects.get(dae=dae, lot__added_by=self.test_producer)
+        self.assertEqual(tx.lot.status, LotV2.VALIDATED)
+        self.assertEqual(tx.potential_duplicate, True)
+
 
 
 
@@ -676,25 +697,18 @@ class LotsAPITest(TransactionTestCase):
         j = response.json()
         # duplicates > 0
         self.assertGreater(j['data']['duplicates'], 0)
-        # no more drafts
+        # duplicates are kept as drafts
         nb_drafts = LotV2.objects.filter(status='Draft').count()
-        self.assertEqual(nb_drafts, 0)
-        nb_lots = LotV2.objects.all().count()
+        self.assertGreater(nb_drafts, 0)
 
-        # upload same file again and validate
-        jsoned = self.upload_file('carbure_duplicates.xlsx', self.test_producer)
-        nb_lots_uploaded = jsoned['data']['loaded']
-
+        # submit those drafts again, they should pass
         txs = LotTransaction.objects.filter(lot__status='Draft')
         response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})  
         jsoned = response.json()
-        self.assertEqual(jsoned['data']['duplicates'], nb_lots_uploaded)
-        nb_drafts = LotV2.objects.filter(status='Draft').count()
-        # all drafts have been considered as duplicates
-        self.assertEqual(nb_drafts, 0)
-        # no additional lot created
-        total_lots = LotV2.objects.all().count()
-        self.assertEqual(nb_lots, total_lots)
+        self.assertEqual(jsoned['data']['duplicates'], 0)
+        # ensure no more drafts
+        txs = LotTransaction.objects.filter(lot__status='Draft')
+        self.assertEqual(txs.count(), 0)
 
 
     def create_lot(self, **kwargs):

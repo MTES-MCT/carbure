@@ -219,62 +219,22 @@ def check_duplicates(new_txs, background=True):
     if background:
         db.connections.close_all()
     new_daes = [t.dae for t in new_txs]
-    nb_duplicates = 0
     duplicates = LotTransaction.objects.filter(dae__in=new_daes, lot__status=LotV2.VALIDATED, is_forwarded=False).values('dae', 'lot__biocarburant_id', 'lot__matiere_premiere_id', 'lot__pays_origine_id', 'lot__volume', 'lot__ghg_total').annotate(count=Count('dae')).filter(count__gt=1)
-    if duplicates.count() > 0:
+    nb_duplicates = duplicates.count()
+    if nb_duplicates > 0:
         # print('Found duplicates')
-        # print(duplicates)
-        # method:
-        # when a duplicate exists, the first validated one is right
         for d in duplicates:
-            dae = d['dae']
-            biocarburant_id = d['lot__biocarburant_id']
-            matiere_premiere_id = d['lot__matiere_premiere_id']
-            pays_origine_id = d['lot__pays_origine_id']
-            volume = d['lot__volume']
-            ghg_total = d['lot__ghg_total']
-            matches = LotTransaction.objects.filter(dae=dae, lot__biocarburant_id=biocarburant_id, lot__matiere_premiere_id=matiere_premiere_id, lot__pays_origine_id=pays_origine_id, lot__volume=volume, lot__ghg_total=ghg_total, lot__status='Validated').order_by('id')
-            # find the "best" lot
-            # the best source is the producer
-            best_matches = matches.filter(lot__data_origin_entity__entity_type=Entity.PRODUCER).order_by('id')
-            if best_matches.count() > 0:
-                first_valid = best_matches[0]
-            else:
-                first_valid = matches[0]
-            for m in matches:
-                if first_valid.id == m.id:
-                    continue
-                nb_duplicates += 1
-                # there is already a tx with a valid lot and this DAE/volume/biocarburant/pays_origine/matiere_premiere
-                # it can happen if the producer has already created the tx and the operator tries to upload it
-                # or the operator has created it and the producer is trying to upload it
-                # or a user has validated a duplicate
-
-                # take the existing tx. if vendor is not in carbure, assume we are the vendor
-                # if client not in carbure, assume we are the client
-                if not first_valid.client_is_in_carbure and m.client_is_in_carbure:
-                    # assume we are the client
-                    first_valid.client_is_in_carbure = True
-                    first_valid.carbure_client = m.carbure_client
-                    first_valid.delivery_site_is_in_carbure = m.delivery_site_is_in_carbure
-                    first_valid.carbure_delivery_site = m.carbure_delivery_site
-                    first_valid.unknown_delivery_site = m.unknown_delivery_site
-                    first_valid.unknown_delivery_site_country = m.unknown_delivery_site_country
-                elif not first_valid.lot.producer_is_in_carbure and m.lot.producer_is_in_carbure:
-                    # we are the producer
-                    first_valid.producer_is_in_carbure = True
-                    first_valid.lot.carbure_producer = m.lot.carbure_producer
-                    first_valid.lot.production_site_is_in_carbure = m.lot.production_site_is_in_carbure
-                    first_valid.lot.carbure_production_site = m.lot.carbure_production_site
-                else:
-                    # assume it's just a duplicate, do nothing
-                    # no need to update the original lot
-                    pass
-            first_valid.lot.save()
-            first_valid.save()
-            matches.exclude(id=first_valid.id).delete()
-        LotV2.objects.filter(tx_lot__isnull=True).delete()
-    return nb_duplicates
+            mark_as_duplicates = [t for t in new_txs if t.dae == d['dae'] and t.potential_duplicate == False]
+            for t in mark_as_duplicates:
+                # send back to drafts
+                t.potential_duplicate = True
+                t.delivery_status = LotTransaction.PENDING
+                t.lot.status = LotV2.DRAFT
+                t.lot.save()
+                t.save()
+        return len(mark_as_duplicates)
+    else:
+        return 0
 
 def get_prefetched_data(entity=None):
     lastyear = datetime.date.today() - datetime.timedelta(days=365)
