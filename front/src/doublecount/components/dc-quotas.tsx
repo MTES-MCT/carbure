@@ -2,8 +2,7 @@ import { Fragment, useEffect } from "react"
 import { Trans, useTranslation } from "react-i18next"
 import { LoaderOverlay } from "common/components"
 import Table, { Line, TwoLines, Column } from "common/components/table"
-import tableCSS from 'common/components/table.module.css'
-import { padding } from "transactions/components/list-columns"
+import tableCSS from "common/components/table.module.css"
 import useAPI from "common/hooks/use-api"
 import {
   Dialog,
@@ -18,7 +17,7 @@ import * as api from "../api"
 import { Button } from "common/components/button"
 import { Return } from "common/components/icons"
 import { QuotaOverview, QuotaDetails } from "../types"
-import { prettyVolume } from 'transactions/helpers'
+import { prettyVolume } from "transactions/helpers"
 
 type QuotasDetailsPromptProps = PromptProps<void> & {
   year: number
@@ -38,23 +37,32 @@ const QuotasDetailsPrompt = ({
   }, [getDetails, year, quota.production_site.id])
 
   const columns: Column<QuotaDetails>[] = [
-    { header: t("Biocarburant"), render: (d) => <Line text={d.biofuel.name} /> },
-    { header: t("Matière première"), render: (d) => <Line text={d.feedstock.name} /> },
+    {
+      header: t("Biocarburant"),
+      render: (d) => <Line text={d.biofuel.name} />,
+    },
+    {
+      header: t("Matière première"),
+      render: (d) => <Line text={d.feedstock.name} />,
+    },
     { header: t("Nombre de lots"), render: (d) => d.nb_lots },
-    { header: t("Volume produit"), render: (d) => (
-      <TwoLines 
-        text={`${prettyVolume(d.volume)} L`}
-        sub={`${d.current_production_weight_sum_tonnes} t`}
-      /> 
-    )},
+    {
+      header: t("Volume produit"),
+      render: (d) => (
+        <TwoLines
+          text={`${prettyVolume(d.volume)} L`}
+          sub={`${d.current_production_weight_sum_tonnes} t`}
+        />
+      ),
+    },
     { header: t("Quota approuvé"), render: (d) => d.approved_quota },
     {
       header: t("Progression des quotas"),
       render: (d) => (
-        <progress 
-          max={d.approved_quota} 
-          value={d.current_production_weight_sum_tonnes} 
-          title={`${d.current_production_weight_sum_tonnes} / ${d.approved_quota}`} 
+        <progress
+          max={d.approved_quota}
+          value={d.current_production_weight_sum_tonnes}
+          title={`${d.current_production_weight_sum_tonnes} / ${d.approved_quota}`}
         />
       ),
     },
@@ -77,7 +85,11 @@ const QuotasDetailsPrompt = ({
         </Trans>
       </DialogText>
 
-      <DialogTable columns={columns} rows={rows} className={tableCSS.flexTable} />
+      <DialogTable
+        columns={columns}
+        rows={rows}
+        className={tableCSS.flexTable}
+      />
 
       <DialogButtons>
         <Button icon={Return} onClick={() => onResolve()}>
@@ -107,16 +119,6 @@ const QuotasList = ({ year }: QuotasListProps) => {
     { header: t("Producteur"), render: (a) => a.producer.name },
     { header: t("Site de production"), render: (a) => a.production_site.name },
     {
-      header: t("Progression des quotas"),
-      render: (a) => (
-        <progress
-          value={a.current_production_weight_sum}
-          max={a.approved_quota_weight_sum}
-          title={`${a.current_production_weight_sum} / ${a.approved_quota_weight_sum}`}
-        />
-      ),
-    },
-    {
       header: t("Quotas remplis"),
       render: (a) => (
         <span>
@@ -127,6 +129,16 @@ const QuotasList = ({ year }: QuotasListProps) => {
     {
       header: t("Quotas dépassés"),
       render: (a) => <span>{a.nb_breached_quotas}</span>,
+    },
+    {
+      header: t("Progression des quotas"),
+      render: (a) => (
+        <progress
+          value={a.current_production_weight_sum}
+          max={a.approved_quota_weight_sum}
+          title={`${a.current_production_weight_sum} / ${a.approved_quota_weight_sum}`}
+        />
+      ),
     },
   ]
 
@@ -140,7 +152,11 @@ const QuotasList = ({ year }: QuotasListProps) => {
 
   return (
     <Fragment>
-      <Table columns={columns} rows={quotaRows} className={tableCSS.flexTable} />
+      <Table
+        columns={columns}
+        rows={quotaRows}
+        className={tableCSS.flexTable}
+      />
 
       {quotas.loading && <LoaderOverlay />}
     </Fragment>
