@@ -2,11 +2,25 @@ import os
 import django
 import argparse
 from django.db.models import Sum, Count, Min
+import calendar
+import datetime
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from core.models import *
+
+def fix_declaration_deadlines():
+    decs = SustainabilityDeclaration.objects.all()
+    for d in decs:
+        nextmonth = d.period + datetime.timedelta(days=31)
+        (weekday, lastday) = calendar.monthrange(nextmonth.year, nextmonth.month)
+        deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)
+        if deadline != d.deadline:
+            print('Declaration %s for %s is wrong: deadline: %s - theo %s' % (d.entity.name, d.period, d.deadline, deadline))
+            d.deadline = deadline
+            d.save()
+
 
 def fix_declaration_duplicates():
     summary = SustainabilityDeclaration.objects.values('entity', 'period').annotate(count=Count('period'))
@@ -20,4 +34,5 @@ def fix_declaration_duplicates():
             to_delete.delete()
 
 if __name__ == '__main__':
+    fix_declaration_deadlines()    
     fix_declaration_duplicates()
