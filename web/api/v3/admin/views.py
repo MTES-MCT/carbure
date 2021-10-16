@@ -505,85 +505,41 @@ def get_declarations(request):
     else:
         year = int(year)
 
+    #### CREATE DECLARATIONS IF MISSING
     # we are in month N, we want to see period N-2, N-1 and N
     ref_period = datetime.datetime(year=year, month=month, day=1)
-    nb_periods = 3
-    declaration_periods = []
-    for i in range(nb_periods):
-        declaration_periods.append(ref_period - relativedelta(months=1 * i))
-    periods = [(d.month, d.year) for d in declaration_periods]
-    periods.reverse()
-    start = declaration_periods[-1]
-    end = ref_period + relativedelta(months=1) - relativedelta(days=1)
+    periods = [ref_period, ref_period - relativedelta(months=1), ref_period - relativedelta(months=2)]
+    entities = Entity.objects.all()
+    to_create = []
+    for p in periods:
+        # calculate deadline date
+        nextmonth = p + datetime.timedelta(days=31)
+        (weekday, lastday) = calendar.monthrange(nextmonth.year, nextmonth.month)
+        deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)
+        print(p, deadline)
+        # 1) get existing objects
+        sds = SustainabilityDeclaration.objects.filter(period=p)
+        existing = {s.entity.id: s for s in sds}
 
-    start = pytz.utc.localize(start)
-    end = pytz.utc.localize(end)
-
-    # get entities that have posted at least one lot since the beginning of the period
-    # operators = [e.id for e in Entity.objects.filter(entity_type=Entity.OPERATOR)]
-    # entities_alive = [f['lot__added_by'] for f in LotTransaction.objects.filter(lot__added_time__gt=start).values('lot__added_by').annotate(count=Count('lot')).filter(count__gt=1)]
-    # to_display = list(set(operators + entities_alive))
-    entities = Entity.objects.all()  # filter(id__in=to_display)
-
-    # create the SustainabilityDeclaration objects in database
-    # 0) cleanup
-    # SustainabilityDeclaration.objects.filter(checked=False).delete()
-    # 1) get existing objects
-    sds = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start, period__lte=end).select_related('entity')
-    existing = {}
-    targets = {}
-    for sd in sds.iterator():
-        key = '%d.%d.%d' % (sd.entity.id, sd.period.year, sd.period.month)
-        existing[key] = sd
-    # 2) create target objects
-    for month, year in periods:
-        period = datetime.date(year=year, month=month, day=1)
-        nextmonth = period + relativedelta(months=1)
-        (_, last_day) = calendar.monthrange(nextmonth.year, nextmonth.month)
-        deadline_date = nextmonth.replace(day=last_day)
+        # 2) check if all entities have a declaration
         for e in entities:
-            key = '%d.%d.%d' % (e.id, year, month)
-            if key not in existing:
-                targets[key] = SustainabilityDeclaration(entity=e, period=period, deadline=deadline_date)
-    # # 3) remove existing objects from targets
-    # for key, sd in existing.items():
-    #     if key in targets:
-    #         del targets[key]
-    # 4) if any, bulk create the targets
-    if len(targets):
-        to_create = list(targets.values())
-        logging.debug('will create {} declarations'.format(len(to_create)))
+            if e.id not in existing:
+                to_create.append(SustainabilityDeclaration(entity=e, period=p, deadline=deadline))
 
-        for t in to_create:
-            logging.debug(t.natural_key())
-        SustainabilityDeclaration.objects.bulk_create(to_create)
-    else:
-        logging.debug('no new declaration objects to create. Existing {}'.format(len(existing)))
+    # 3) create objects if missing
+    SustainabilityDeclaration.objects.bulk_create(to_create)
 
-    # get the declarations objects from db
-    declarations = SustainabilityDeclaration.objects.filter(entity__in=entities, period__gte=start, period__lte=end).select_related('entity')
 
+    #### FETCH DECLARATIONS FROM DB
+    declarations = SustainabilityDeclaration.objects.filter(entity__in=entities, period__in=periods).select_related('entity')
     tx_counts = {}
-
-    for month, year in periods:
-        period = "%d-%02d" % (year, month)
+    for p in periods:
+        period = "%d-%02d" % (p.year, p.month)
         tx_counts[period] = get_period_declarations(period)
 
-    # query lots to enrich declarations on the frontend
-    # expected return ['client1': [{'period': '2020-01', 'drafts': 200, 'validated': 100, 'checked': True}, {'period': '2020-02', 'drafts': 50, 'validated': 10, 'checked': False}]]
-    # 1) get the lots grouped by added_by
-    # drafts = Count('id', filter=Q(lot__status='Draft'))
-    # validated = Count('id', filter=Q(lot__status='Validated', delivery_status__in=['N'] ))
-    # received = Count('id', filter=Q(lot__status='Validated', delivery_status__in=['A']))
-    # corrections = Count('id', filter=Q(lot__status='Validated', delivery_status__in=['R', 'AC', 'AA']))
-    # lots = LotTransaction.objects.values('lot__added_by__id', 'lot__added_by__name', 'lot__period').annotate(drafts=drafts, validated=validated, received=received, corrections=corrections)
-    # batches = {'%s.%s' % (batch['lot__added_by__id'], batch['lot__period']): batch for batch in lots }
-
-    # 2) add batch info to each declarations
     declarations_sez = []
     for d in declarations:
         period = "%d-%02d" % (d.period.year, d.period.month)
-
         if d.entity.id in tx_counts[period]:
             d.lots = tx_counts[period][d.entity.id]
         else:
