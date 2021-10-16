@@ -4,6 +4,7 @@
 import datetime
 from django.contrib import admin
 from django.contrib import messages
+from django.contrib.admin.filters import DateFieldListFilter
 from django.db.models import Q
 from django import forms
 from django.contrib.auth import get_user_model
@@ -403,9 +404,27 @@ class GenericErrorAdmin(admin.ModelAdmin):
 
 
 class SustainabilityDeclarationAdmin(admin.ModelAdmin):
+    date_hierarchy = 'period'
     list_display = ('entity', 'period', 'declared', 'checked', 'deadline')
     search_fields = ('entity__name', )
-    list_filter = ('entity', 'period', 'declared', 'checked')
+    list_filter = (('period', DropdownFilter), 'declared', 'checked', 'entity')
+    actions = ['validate_declarations', 'invalidate_declarations']
+
+    def validate_declarations(self, request, queryset):
+        for declaration in queryset:
+            LotTransaction.objects.filter(lot__period=declaration.period.strftime('%Y-%m')).filter(Q(carbure_client=declaration.entity) | Q(carbure_vendor=declaration.entity)).exclude(delivery_status__in=[LotTransaction.FROZEN]).exclude(lot__status=LotV2.DRAFT).update(delivery_status=LotTransaction.FROZEN)
+            declaration.declared = True
+            declaration.save()
+    validate_declarations.short_description = "Valider les déclarations"
+
+    def invalidate_declarations(self, request, queryset):
+        for declaration in queryset:
+            LotTransaction.objects.filter(lot__period=declaration.period.strftime('%Y-%m')).filter(Q(carbure_client=declaration.entity) | Q(carbure_vendor=declaration.entity), delivery_status=LotTransaction.FROZEN).update(delivery_status=LotTransaction.ACCEPTED)
+            declaration.declared = False
+            declaration.checked = False
+            declaration.save()
+    invalidate_declarations.short_description = "Invalider les déclarations"
+
 
 
 class EntityDepotAdmin(admin.ModelAdmin):
