@@ -250,31 +250,24 @@ def update_lot(request, *args, **kwargs):
     GenericError.objects.filter(tx=tx).delete()
     d = get_prefetched_data(entity)
     lot, tx, errors = load_lot(d, entity, request.user, request.POST.dict(), 'MANUAL', tx)
-
     if not lot:
         return JsonResponse({'status': 'error', 'message': 'Could not save lot: %s' % (errors)}, status=400)
-
     lot.save()
     tx.save()
     GenericError.objects.bulk_create(errors)
     bulk_sanity_checks([tx], d, background=False)
-
     if lot.status != LotV2.DRAFT:
         # make sure we do not create a duplicate
         # only if lot is already validated ?
         check_duplicates([tx], background=False)
-
         # save the changes
         after_update = tx.natural_key()
-
         for key in before_update.keys():
             if before_update[key] is None and isinstance(after_update[key], dict):
                 before_update[key] = {}
             if after_update[key] is None and isinstance(before_update[key], dict):
                 after_update[key] = {}
-
         diff = dictdiffer.diff(before_update, after_update)
-
         with transaction.atomic():
             for d in diff:
                 action, field, data = d

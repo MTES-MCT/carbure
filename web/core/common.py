@@ -222,7 +222,6 @@ def check_duplicates(new_txs, background=True):
     duplicates = LotTransaction.objects.filter(dae__in=new_daes, lot__status=LotV2.VALIDATED, is_forwarded=False).values('dae', 'lot__biocarburant_id', 'lot__matiere_premiere_id', 'lot__pays_origine_id', 'lot__volume', 'lot__ghg_total').annotate(count=Count('dae')).filter(count__gt=1)
     nb_duplicates = duplicates.count()
     if nb_duplicates > 0:
-        # print('Found duplicates')
         for d in duplicates:
             mark_as_duplicates = [t for t in new_txs if t.dae == d['dae'] and t.potential_duplicate == False]
             for t in mark_as_duplicates:
@@ -232,6 +231,7 @@ def check_duplicates(new_txs, background=True):
                 t.lot.status = LotV2.DRAFT
                 t.lot.save()
                 t.save()
+                GenericError.objects.update_or_create(error='POTENTIAL_DUPLICATE', display_to_creator=True, display_to_recipient=True, display_to_auditor=True, display_to_admin=True, is_blocking=False, tx=t)
         return len(mark_as_duplicates)
     else:
         return 0
