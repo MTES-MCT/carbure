@@ -59,5 +59,6 @@
 
   "UNKNOWN_DAE_FORMAT": "Customs ID format incorrect",
   "UNKNOWN_DOUBLE_COUNTING_CERTIFICATE": "Unknown double counting certificate",
-  "EXPIRED_DOUBLE_COUNTING_CERTIFICATE": "Double counting certificate expired"
+  "EXPIRED_DOUBLE_COUNTING_CERTIFICATE": "Double counting certificate expired",
+  "POTENTIAL_DUPLICATE": "Potential duplicate found"
 }
