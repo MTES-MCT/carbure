@@ -163,10 +163,6 @@ def sanity_check(tx, prefetched_data):
     if tx.is_mac and lot.biocarburant and lot.biocarburant.code not in ['ED95', 'B100', 'ETH', 'EMHV', 'EMHU']:
         errors.append(generic_error(error='MAC_BC_WRONG', tx=tx, is_blocking=True, fields=['biocarburant_code', 'mac']))
 
-    # duplicates warning
-    if tx.potential_duplicate:
-        errors.append(generic_error(error='POTENTIAL_DUPLICATE', tx=tx, is_blocking=False, display_to_recipient=True, display_to_auditor=True))    
-
     # check volume
     if lot.volume < 2000 and not tx.is_mac:
         errors.append(generic_error(error='VOLUME_FAIBLE', tx=tx, field='volume'))
