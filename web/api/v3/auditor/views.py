@@ -54,7 +54,8 @@ def get_lots(request, *args, **kwargs):
         txs = get_lots_by_status(txs, request.GET)
         txs = filter_lots(txs, request.GET, entity=None)[0]
         return get_lots_with_metadata(txs, None, request.GET, admin=True)
-    except Exception:
+    except Exception as e:
+        print(e)
         return JsonResponse({'status': 'error', 'message': "Something went wrong"}, status=400)
 
 
@@ -200,8 +201,9 @@ def hide_transactions(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 
-@check_rights('entity_id', role=UserRights.AUDITOR)
+@check_rights('entity_id')
 def auditor_comment_transaction(request, *args, **kwargs):
+    entity = kwargs['context']['entity']
     tx_ids = request.POST.getlist('tx_ids', False)
     comment = request.POST.get('comment', False)
     is_visible_by_admin = request.POST.get('is_visible_by_admin', False)
@@ -223,5 +225,6 @@ def auditor_comment_transaction(request, *args, **kwargs):
         c.comment = comment
         c.is_visible_by_auditor = True
         c.is_visible_by_admin = is_visible_by_admin
+        c.entity = entity
         c.save()
     return JsonResponse({'status': 'success'})

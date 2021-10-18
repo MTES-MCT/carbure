@@ -716,6 +716,7 @@ def hide_transactions(request):
 
 @is_admin
 def admin_comment_transaction(request):
+    entity_id = request.POST.get('entity_id', False)
     tx_ids = request.POST.getlist('tx_ids', False)
     comment = request.POST.get('comment', False)
     is_visible_by_auditor = request.POST.get('is_visible_by_auditor', False)
@@ -724,6 +725,8 @@ def admin_comment_transaction(request):
     else:
         is_visible_by_auditor = False
 
+    if not entity_id:
+        return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
     if not tx_ids:
         return JsonResponse({'status': 'error', 'message': "Missing tx_ids"}, status=400)
     if not comment:
@@ -734,6 +737,7 @@ def admin_comment_transaction(request):
         c = AdminTransactionComment()
         c.tx = tx
         c.comment = comment
+        c.entity_id = entity_id
         c.is_visible_by_admin = True
         c.is_visible_by_auditor = is_visible_by_auditor
         c.save()
