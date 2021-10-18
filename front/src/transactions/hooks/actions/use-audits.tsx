@@ -26,7 +26,8 @@ export default function useAuditLots(
   const { t } = useTranslation()
   const notifications = useNotificationContext()
   const [hideReq, resolveHideLot] = useAPI(api.hideAuditorLots)
-  const [highlightReq, resolveHighlightLot] = useAPI(api.highlightAuditorLots)
+  const [highlightReq, resolveHighlightLots] = useAPI(api.highlightAuditorLots)
+  const [commentReq, addAuditorComment] = useAPI(api.addAuditorComment)
 
   async function notify(promise: Promise<any>) {
     const res = await promise
@@ -87,27 +88,30 @@ export default function useAuditLots(
       )
 
       if (shouldHighlight) {
-        await notify(resolveHighlightLot(entity.id, [tx.id]))
+        await notify(resolveHighlightLots(entity.id, [tx.id]))
       }
 
       return Boolean(shouldHighlight)
     } else {
-      const shouldHighlight = await prompt<PinConfig>((resolve) => (
+      const pinConfig = await prompt<PinConfig>((resolve) => (
         <PinPrompt
           role="auditor"
           title={t("Épingler ce lot")}
-          description={t(
-            "Voulez-vous mettre ce lot de côté pour l'étudier plus tard ?"
-          )}
+          description={t("Voulez-vous mettre ce lot de côté pour l'étudier plus tard ?")} // prettier-ignore
           onResolve={resolve}
         />
       ))
 
-      if (typeof shouldHighlight === "boolean") {
-        await notify(resolveHighlightLot(entity.id, [tx.id], shouldHighlight))
+      if (pinConfig !== undefined) {
+        const waiting = Promise.all([
+          resolveHighlightLots(entity.id, [tx.id], pinConfig.checked),
+          addAuditorComment(entity.id, [tx.id], pinConfig.comment, pinConfig.checked), // prettier-ignore
+        ])
+
+        await notify(waiting)
       }
 
-      return Boolean(shouldHighlight)
+      return Boolean(pinConfig)
     }
   }
 
@@ -116,27 +120,27 @@ export default function useAuditLots(
 
     const pinConfig = await prompt<PinConfig>((resolve) => (
       <PinPrompt
-
         role="auditor"
         title={t("Épingler la sélection")}
-        description={t(
-          "Voulez-vous mettre les lots sélectionnés de côté pour les étudier plus tard  ?"
-        )}
+        description={t("Voulez-vous mettre les lots sélectionnés de côté pour les étudier plus tard  ?")} // prettier-ignore
         onResolve={resolve}
       />
     ))
 
     if (pinConfig !== undefined) {
-      await notify(
-        resolveHighlightLot(entity.id, selection.selected, pinConfig.checked)
-      )
+      const waiting = Promise.all([
+        resolveHighlightLots(entity.id, selection.selected, pinConfig.checked),
+        addAuditorComment(entity.id, selection.selected, pinConfig.comment, pinConfig.checked), // prettier-ignore
+      ])
+
+      await notify(waiting)
     }
 
     return Boolean(pinConfig)
   }
 
   return {
-    loading: hideReq.loading && highlightReq.loading,
+    loading: hideReq.loading || highlightReq.loading || commentReq.loading,
     hideLot,
     hideLotSelection,
     highlightLot,

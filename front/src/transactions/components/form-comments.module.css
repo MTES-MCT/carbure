@@ -18,3 +18,8 @@
 .commentInput {
   margin-top: 16px;
 }
+
+.commentCheckbox {
+  height: unset;
+  margin-top: 24px;
+}
