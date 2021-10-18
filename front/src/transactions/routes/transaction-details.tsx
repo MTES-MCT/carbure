@@ -80,7 +80,7 @@ const TransactionDetails = ({
     submit,
     close,
     addComment,
-    addAdminComment,
+    addControlComment,
     refreshDetails,
   } = useTransactionDetails(entity, refresh)
 
@@ -154,10 +154,11 @@ const TransactionDetails = ({
       {details.data?.admin_comments &&
         details.data.admin_comments.length > 0 && (
           <Comments
-            title={t("Notes admin")}
+            title={t("Notes d'audits")}
             loading={comment.loading}
             comments={details.data.admin_comments}
-            onComment={addAdminComment}
+            onComment={addControlComment}
+            role={isAdmin ? "admin" : "auditor"}
           />
         )}
 

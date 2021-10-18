@@ -118,7 +118,6 @@ export default function useAdministrateLots(
     } else {
       const pinConfig = await prompt<PinConfig>((resolve) => (
         <PinPrompt
-          commentable
           role="admin"
           title={t("Épingler ce lot")}
           description={t(
@@ -131,7 +130,7 @@ export default function useAdministrateLots(
       if (pinConfig !== undefined) {
         const waiting = Promise.all([
           resolveHighlightLots(entity.id, [tx.id], pinConfig.checked),
-          addAdminComment([tx.id], pinConfig.comment)
+          addAdminComment(entity.id, [tx.id], pinConfig.comment, pinConfig.checked), // prettier-ignore
         ])
 
         await notify(waiting)
@@ -146,7 +145,6 @@ export default function useAdministrateLots(
 
     const pinConfig = await prompt<PinConfig>((resolve) => (
       <PinPrompt
-        commentable
         role="admin"
         title={t("Épingler la sélection")}
         description={t(
@@ -159,7 +157,7 @@ export default function useAdministrateLots(
     if (pinConfig !== undefined) {
       const waiting = Promise.all([
         resolveHighlightLots(entity.id, selection.selected, pinConfig.checked),
-        addAdminComment(selection.selected, pinConfig.comment)
+        addAdminComment(entity.id, selection.selected, pinConfig.comment, pinConfig.checked), // prettier-ignore
       ])
 
       await notify(waiting)
@@ -183,7 +181,6 @@ export default function useAdministrateLots(
     return Boolean(shouldHighlight)
   }
 
-
   async function deleteSelection() {
     if (entity === null) return false
 
@@ -205,7 +202,7 @@ export default function useAdministrateLots(
       requestHideAlert.loading ||
       requestHighlightAlert.loading ||
       requestHighlight.loading ||
-      adminComment.loading || 
+      adminComment.loading ||
       adminDelete.loading,
     markAsRead,
     markSelectionAsRead,

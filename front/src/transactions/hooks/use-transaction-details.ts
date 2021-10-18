@@ -47,6 +47,18 @@ function detailsGetter(entity: EntitySelection) {
       return api.getDetails
   }
 }
+
+function notePoster(entity: EntitySelection) {
+  switch (entity?.entity_type) {
+    case EntityType.Administration:
+      return api.addAdminComment
+    case EntityType.Auditor:
+      return api.addAuditorComment
+    default:
+      return async () => {}
+  }
+}
+
 export default function useTransactionDetails(
   entity: EntitySelection,
   refresh: () => void
@@ -61,7 +73,7 @@ export default function useTransactionDetails(
   const [details, resolveDetails] = useAPI(detailsGetter(entity))
   const [request, resolveUpdate] = useAPI(api.updateLot)
   const [comment, resolveComment] = useAPI(api.commentLot)
-  const [, resolveAddAdminComment] = useAPI(api.addAdminComment)
+  const [, resolveControlComment] = useAPI(notePoster(entity))
 
   const fieldErrors = useFieldErrors(details.data?.errors ?? [])
 
@@ -106,9 +118,9 @@ export default function useTransactionDetails(
     }
   }
 
-  async function addAdminComment(message: string) {
+  async function addControlComment(message: string, forward: boolean) {
     if (typeof entityID !== "undefined") {
-      await resolveAddAdminComment([txID], message)
+      await resolveControlComment(entityID, [txID], message, forward)
       refreshDetails()
     }
   }
@@ -139,7 +151,7 @@ export default function useTransactionDetails(
     submit,
     close,
     addComment,
-    addAdminComment,
+    addControlComment,
     refreshDetails,
   }
 }

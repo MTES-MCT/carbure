@@ -3,7 +3,7 @@ import { Trans, useTranslation } from "react-i18next"
 import { Comment, TransactionQuery } from "common/types"
 
 import { Box, LoaderOverlay } from "common/components"
-import { Input, LabelInput } from "common/components/input"
+import { Input, LabelCheckbox, LabelInput } from "common/components/input"
 import { AsyncButton, Button } from "common/components/button"
 import { Collapsible } from "common/components/alert"
 import {
@@ -23,8 +23,9 @@ type CommentsProps = {
   readOnly?: boolean
   loading: boolean
   title: string
+  role?: "admin" | "auditor"
   comments: Comment[]
-  onComment?: (c: string) => void
+  onComment?: (comment: string, forward: boolean) => void
 }
 
 const Comments = ({
@@ -32,14 +33,16 @@ const Comments = ({
   loading,
   title,
   comments,
+  role,
   onComment,
 }: CommentsProps) => {
   const { t } = useTranslation()
   const [comment, setComment] = useState("")
+  const [checked, setChecked] = useState(false)
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault()
-    onComment && onComment(comment)
+    onComment && onComment(comment, checked)
     setComment("")
   }
 
@@ -55,7 +58,7 @@ const Comments = ({
           {comments.map((c, i) => (
             <tr key={i}>
               <td>
-                <b>{c.entity?.name ?? 'Admin'}:</b>
+                <b>{c.entity?.name ?? t("Inconnu")}:</b>
               </td>
               <td>{c.comment}</td>
             </tr>
@@ -64,16 +67,32 @@ const Comments = ({
       </table>
 
       {!readOnly && (
-        <Box row as="form" className={styles.commentsForm} onSubmit={onSubmit}>
-          <Input
-            type="text"
-            placeholder={t("Entrez un commentaire...")}
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
-          <AsyncButton submit loading={loading}>
-            <Trans>Envoyer</Trans>
-          </AsyncButton>
+        <Box>
+          {role && (
+            <LabelCheckbox
+              checked={checked}
+              label={role === "admin" ? t("Envoyer aux auditeurs") : t("Envoyer à l'administration")} // prettier-ignore
+              onChange={(e) => setChecked(e.target.checked)}
+              className={styles.commentCheckbox}
+            />
+          )}
+
+          <Box
+            row
+            as="form"
+            className={styles.commentsForm}
+            onSubmit={onSubmit}
+          >
+            <Input
+              type="text"
+              placeholder={t("Entrez un commentaire...")}
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
+            <AsyncButton submit loading={loading}>
+              <Trans>Envoyer</Trans>
+            </AsyncButton>
+          </Box>
         </Box>
       )}
     </Collapsible>

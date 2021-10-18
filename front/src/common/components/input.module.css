@@ -157,6 +157,10 @@
   color: var(--white);
 }
 
+.checkbox.checkboxChecked :global(.icon) {
+  stroke: var(--white);
+}
+
 .checkbox:hover {
   border-color: var(--blue-medium);
 }

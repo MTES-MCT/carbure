@@ -471,8 +471,13 @@ export function highlightAuditorLots(
   })
 }
 
-export function addAdminComment(tx_ids: number[], comment: string) {
-  return api.post("/admin/lots/comment", { tx_ids, comment })
+
+export function addAuditorComment(entity_id: number, tx_ids: number[], comment: string, is_visible_by_admin: boolean = false) {
+  return api.post("/auditor/lots/comment", { entity_id, tx_ids, comment, is_visible_by_admin })
+}
+
+export function addAdminComment(entity_id: number, tx_ids: number[], comment: string, is_visible_by_auditor: boolean = false) {
+  return api.post("/admin/lots/comment", { entity_id, tx_ids, comment, is_visible_by_auditor })
 }
 
 export function deleteAdminLots(tx_ids: number[]) {
