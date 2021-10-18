@@ -752,6 +752,11 @@ const DoubleCountingPrompt = ({
     agreement.data.documents[0] &&
     `/api/v3/doublecount/download-documentation?entity_id=${entity.id}&dca_id=${agreement.data.id}&file_id=${agreement.data.documents[0].id}`
 
+  const decisionURL = 
+    entity &&
+    agreement.data &&
+    agreement.data.documents[1] &&
+    `/api/v3/doublecount/download-admin-decision?entity_id=${entity.id}&dca_id=${agreement.data.id}&file_id=${agreement.data.documents[1].id}`
   return (
     <Dialog wide onResolve={onResolve} className={styles.settingsPrompt}>
       <Box row>
@@ -867,6 +872,17 @@ const DoubleCountingPrompt = ({
             <Upload />
             <Trans>Télécharger la description de l'activité</Trans>
           </a>
+          {decisionURL && 
+            <a
+              href={decisionURL}
+              target="_blank"
+              rel="noreferrer"
+              className={styles.settingsBottomLink}
+            >
+            <Upload />
+            <Trans>Télécharger la décision d'agrément</Trans>
+          </a>    
+          }      
         </Box>
 
         <Button icon={Return} onClick={() => onResolve()}>
