@@ -58,7 +58,7 @@ export interface DoubleCountingDetails extends DoubleCounting {
   sourcing: DoubleCountingSourcing[]
   production: DoubleCountingProduction[]
   aggregated_sourcing: DoubleCountingSourcingAggregation[]
-  documents: { id: number, url: string }[]
+  documents: { id: number, url: string, file_type: "DECISION" | "SOURCING" }[]
   dgec_validated: boolean
   dgec_validator: string | null
   dgec_validated_dt: string | null

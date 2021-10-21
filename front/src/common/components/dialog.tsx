@@ -34,7 +34,7 @@ export const Dialog = ({
 type ContentProps = { text?: string; children?: React.ReactNode }
 
 export const DialogTitle = ({ text, children }: ContentProps) => (
-  <Title>{text}</Title>
+  <Title>{text ?? children}</Title>
 )
 
 export const DialogText = ({ text, children }: ContentProps) => (

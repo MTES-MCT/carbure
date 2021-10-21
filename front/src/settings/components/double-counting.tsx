@@ -504,7 +504,7 @@ type QuotasTableProps = {
 }
 
 const QuotasTable = ({ entity, agreement }: QuotasTableProps) => {
-  const { t } = useTranslation() 
+  const { t } = useTranslation()
 
   const [details, getDetails] = useAPI(api.getQuotaDetails)
 
@@ -520,26 +520,28 @@ const QuotasTable = ({ entity, agreement }: QuotasTableProps) => {
     { header: t("Biocarburant"), render: (d) => <Line text={d.biofuel.name} /> },
     { header: t("Matière première"), render: (d) => <Line text={d.feedstock.name} /> },
     { header: t("Nombre de lots"), render: (d) => d.nb_lots },
-    { header: t("Volume produit"), render: (d) => (
-      <TwoLines 
-        text={`${prettyVolume(d.volume)} L`}
-        sub={`${d.current_production_weight_sum_tonnes} t`}
-      /> 
-    )},
+    {
+      header: t("Volume produit"), render: (d) => (
+        <TwoLines
+          text={`${prettyVolume(d.volume)} L`}
+          sub={`${d.current_production_weight_sum_tonnes} t`}
+        />
+      )
+    },
     { header: t("Quota approuvé"), render: (d) => d.approved_quota },
     {
       header: t("Progression des quotas"),
       render: (d) => (
-        <progress 
-          max={d.approved_quota} 
-          value={d.current_production_weight_sum_tonnes} 
-          title={`${d.current_production_weight_sum_tonnes} / ${d.approved_quota}`} 
+        <progress
+          max={d.approved_quota}
+          value={d.current_production_weight_sum_tonnes}
+          title={`${d.current_production_weight_sum_tonnes} / ${d.approved_quota}`}
         />
       ),
     },
   ]
 
-  const rows = (details.data?? []).map(value => ({ value }))
+  const rows = (details.data ?? []).map(value => ({ value }))
 
   return (
     <>
@@ -661,17 +663,17 @@ const DoubleCountingPrompt = ({
     onClick: isFinal
       ? undefined
       : async () => {
-          const ok = await prompt((resolve) => (
-            <DoubleCountingSourcingPrompt
-              entity={entity}
-              dcaID={dcaID}
-              sourcing={s}
-              onResolve={resolve}
-            />
-          ))
+        const ok = await prompt((resolve) => (
+          <DoubleCountingSourcingPrompt
+            entity={entity}
+            dcaID={dcaID}
+            sourcing={s}
+            onResolve={resolve}
+          />
+        ))
 
-          ok && reloadAgreement()
-        },
+        ok && reloadAgreement()
+      },
   }))
 
   const productionColumns: Column<DoubleCountingProduction>[] = [
@@ -725,17 +727,17 @@ const DoubleCountingPrompt = ({
     onClick: isFinal
       ? undefined
       : async () => {
-          const ok = await prompt((resolve) => (
-            <DoubleCountingProductionPrompt
-              entity={entity}
-              dcaID={dcaID}
-              production={p}
-              onResolve={resolve}
-            />
-          ))
+        const ok = await prompt((resolve) => (
+          <DoubleCountingProductionPrompt
+            entity={entity}
+            dcaID={dcaID}
+            production={p}
+            onResolve={resolve}
+          />
+        ))
 
-          ok && reloadAgreement()
-        },
+        ok && reloadAgreement()
+      },
   }))
 
   const productionSite = agreement.data?.production_site ?? "N/A"
@@ -743,20 +745,18 @@ const DoubleCountingPrompt = ({
     ? formatDate(agreement.data.creation_date)
     : "N/A"
 
+
+  const documentationFile = agreement.data?.documents.find(doc => doc.file_type === 'SOURCING')
+  const decisionFile = agreement.data?.documents.find(doc => doc.file_type === 'DECISION')
+
   const excelURL =
     agreement.data &&
-    `/api/v3/doublecount/agreement?dca_id=${agreement.data.id}&entity_id=${entity?.id}&export=true`
-  const documentationURL =
-    entity &&
-    agreement.data &&
-    agreement.data.documents[0] &&
-    `/api/v3/doublecount/download-documentation?entity_id=${entity.id}&dca_id=${agreement.data.id}&file_id=${agreement.data.documents[0].id}`
+    `/api/v3/doublecount/agreement?dca_id=${dcaID}&entity_id=${entity?.id}&export=true`
+  const documentationURL = entity && documentationFile &&
+    `/api/v3/doublecount/download-documentation?entity_id=${entity.id}&dca_id=${dcaID}&file_id=${documentationFile.id}`
+  const decisionURL = entity && decisionFile &&
+    `/api/v3/doublecount/download-admin-decision?entity_id=${entity.id}&dca_id=${dcaID}&file_id=${decisionFile.id}`
 
-  const decisionURL = 
-    entity &&
-    agreement.data &&
-    agreement.data.documents[1] &&
-    `/api/v3/doublecount/download-admin-decision?entity_id=${entity.id}&dca_id=${agreement.data.id}&file_id=${agreement.data.documents[1].id}`
   return (
     <Dialog wide onResolve={onResolve} className={styles.settingsPrompt}>
       <Box row>
@@ -872,17 +872,17 @@ const DoubleCountingPrompt = ({
             <Upload />
             <Trans>Télécharger la description de l'activité</Trans>
           </a>
-          {decisionURL && 
+          {decisionURL &&
             <a
               href={decisionURL}
               target="_blank"
               rel="noreferrer"
               className={styles.settingsBottomLink}
             >
-            <Upload />
-            <Trans>Télécharger la décision d'agrément</Trans>
-          </a>    
-          }      
+              <Upload />
+              <Trans>Télécharger la décision de l'administration</Trans>
+            </a>
+          }
         </Box>
 
         <Button icon={Return} onClick={() => onResolve()}>
