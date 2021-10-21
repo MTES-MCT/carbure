@@ -1,8 +1,9 @@
 import React, { useRef } from "react"
 import cl from "clsx"
 import styles from "./input.module.css"
-import { AlertTriangle, Check, IconProps } from "./icons"
+import { AlertTriangle, Check, IconProps, Upload } from "./icons"
 import { Box, SystemProps } from "./index"
+import { Button, ButtonProps } from './button'
 import { FormChangeHandler } from "common/hooks/use-form"
 
 // INPUT COMPONENT
@@ -216,3 +217,28 @@ export const LabelCheckbox = ({
 export const Placeholder = (props: SystemProps) => (
   <div {...props} className={cl(styles.inputPlaceholder, props.className)} />
 )
+
+
+type FileInputProps = Omit<ButtonProps, "value" | "onChange"> & {
+  placeholder?: string
+  value: File | undefined
+  onChange: (value: File | undefined) => void
+}
+
+export const FileInput = ({ placeholder, value, onChange, ...props }: FileInputProps) => {
+  return (
+    <Button
+      as="label"
+      level={value ? "success" : "primary"}
+      icon={value ? Check : Upload}
+      {...props}
+    >
+      <input
+        hidden
+        type="file"
+        onChange={(e) => onChange(e!.target.files![0])}
+      />
+      {value ? value.name : placeholder}
+    </Button>
+  )
+}

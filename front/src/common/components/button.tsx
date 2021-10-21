@@ -6,7 +6,7 @@ import { NavLink, RelNavLinkProps } from './relative-route'
 import { SystemProps, AsProp } from "./index"
 
 // BUTTON COMPONENT
-type ButtonProps = SystemProps &
+export type ButtonProps = SystemProps &
   AsProp &
   React.HTMLProps<HTMLButtonElement> & {
     submit?: string | boolean

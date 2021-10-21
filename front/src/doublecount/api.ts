@@ -44,3 +44,7 @@ export function getQuotasSnapshot(year: number) {
 export function getQuotaDetails(year: number, production_site_id: number) {
   return api.get<QuotaDetails[]>('/doublecount/admin/quotas', { year, production_site_id })
 }
+
+export function uploadDoubleCountingDecision(dca_id: number, file: File) {
+  return api.post("/doublecount/admin/upload-decision", { dca_id, file })
+}

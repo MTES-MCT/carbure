@@ -337,6 +337,38 @@ def download_admin_decision(request, *args, **kwargs):
         response['Content-Disposition'] = 'attachment; filename="%s"' % (f.file_name)
     return response
 
+
+@is_admin
+def admin_download_admin_decision(request):
+    dca_id = request.GET.get('dca_id', None)
+    if not dca_id:
+        return JsonResponse({'status': "error", 'message': "Missing dca_id"}, status=400)
+    try:
+        dca = DoubleCountingAgreement.objects.get(id=dca_id)
+    except:
+        return JsonResponse({'status': "forbidden", 'message': "Forbidden"}, status=403)
+
+    file_id = request.GET.get('file_id', None)
+    if not file_id:
+        return JsonResponse({'status': "error", 'message': "Missing file_id"}, status=400)
+    try:
+        f = DoubleCountingDocFile.objects.get(id=file_id, dca=dca, file_type=DoubleCountingDocFile.DECISION)
+    except:
+        return JsonResponse({'status': "forbidden", 'message': "Forbidden"}, status=403)
+
+    s3 = boto3.client('s3', aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'], aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'], region_name=os.environ['AWS_S3_REGION_NAME'], endpoint_url=os.environ['AWS_S3_ENDPOINT_URL'], use_ssl=os.environ['AWS_S3_USE_SSL'])
+    filepath = '/tmp/%s' % (f.file_name)
+    s3filepath = '{year}/{entity}/{filename}'.format(year=dca.period_start.year, entity=dca.producer.name, filename=f.file_name)
+    with open(filepath, 'wb') as file:
+        s3.download_fileobj(os.environ['AWS_DCDOCS_STORAGE_BUCKET_NAME'], s3filepath, file)
+    with open(filepath, "rb") as file:
+        data = file.read()
+        ctype = "application/force-download"
+        response = HttpResponse(content=data, content_type=ctype)
+        response['Content-Disposition'] = 'attachment; filename="%s"' % (f.file_name)
+    return response
+
+
 @is_admin_or_external_admin
 def admin_download_documentation(request, *args, **kwargs):
     dca_id = request.GET.get('dca_id', None)
@@ -423,9 +455,7 @@ def get_quotas_snapshot_admin(request, *args, **kwargs):
     return JsonResponse({'status': "success", 'data': grouped.to_dict('records')})
 
 @is_admin
-def upload_decision_admin(request, *args, **kwargs):
-    context = kwargs['context']
-    entity = context['entity']
+def upload_decision_admin(request):
     dca_id = request.POST.get('dca_id', None)
     if not dca_id:
         return JsonResponse({'status': "error", 'message': "Missing dca_id"}, status=400)
@@ -439,7 +469,7 @@ def upload_decision_admin(request, *args, **kwargs):
         return JsonResponse({'status': "error", 'message': "Missing File"}, status=400)
 
     # organize a path for the file in bucket
-    file_directory_within_bucket = '{year}/{entity}'.format(year=dca.period_start.year, entity=entity.name)
+    file_directory_within_bucket = '{year}/{entity}'.format(year=dca.period_start.year, entity=dca.producer.name)
     filename = ''.join((c for c in unicodedata.normalize('NFD', file_obj.name) if unicodedata.category(c) != 'Mn'))
 
     # synthesize a full file path; note that we included the filename
@@ -461,6 +491,35 @@ def upload_decision_admin(request, *args, **kwargs):
     dcf.file_type = DoubleCountingDocFile.DECISION
     dcf.link_expiry_dt = pytz.utc.localize(datetime.datetime.now() + datetime.timedelta(seconds=3600))
     dcf.save()
+
+    # get the file
+    s3 = boto3.client('s3', aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'], aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'], region_name=os.environ['AWS_S3_REGION_NAME'], endpoint_url=os.environ['AWS_S3_ENDPOINT_URL'], use_ssl=os.environ['AWS_S3_USE_SSL'])
+    s3filepath = '{year}/{entity}/{filename}'.format(year=dca.period_start.year, entity=dca.producer.name, filename=dcf.file_name)
+    filepath = '/tmp/%s' % (dcf.file_name)
+    with open(filepath, 'wb') as file:
+        s3.download_fileobj(os.environ['AWS_DCDOCS_STORAGE_BUCKET_NAME'], s3filepath, file)
+    f = open(filepath, "rb") 
+    # send an email
+    recipients = [u.user.email for u in UserRights.objects.filter(entity=dca.producer, role=UserRights.ADMIN)]
+    subject = "CarbuRe - Agrément Double Compte"
+    body = """ 
+    Bonjour,
+
+    La décision d'agrément au double comptage concernant votre site de production %s est désormais accessible sur votre compte CarbuRe.
+    Vous en trouverez une copie ci-joint.
+
+    Merci
+    """ % (dca.production_site.name)
+    email = EmailMessage(
+        subject,
+        body,
+        settings.DEFAULT_FROM_EMAIL,
+        recipients,
+        ['carbure@beta.gouv.fr'],
+    )
+    email.attach(filename, f.read())
+    email.send()
+    f.close()
     return JsonResponse({'status': 'success'})
 
 
