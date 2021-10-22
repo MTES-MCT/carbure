@@ -783,7 +783,7 @@ def forward_lots(request, *args, **kwargs):
             # it has been delivered to a Depot with outsourced blending
             # we should forward the lot to the blender
             parent_tx_id = tx.id
-            tx.delivery_status = 'A'
+            tx.delivery_status = LotTransaction.ACCEPTED
             tx.is_forwarded = True
             tx.save()
             new_tx = tx
@@ -791,14 +791,14 @@ def forward_lots(request, *args, **kwargs):
             new_tx.parent_tx_id = parent_tx_id
             new_tx.is_forwarded = False
             new_tx.carbure_vendor = entity
-
             new_tx.client_is_in_carbure = True
             new_tx.carbure_client = depots[tx.carbure_delivery_site].blender
             new_tx.unknown_client = ''
-            new_tx.delivery_status = 'N'
+            new_tx.delivery_status = LotTransaction.PENDING
             new_tx.champ_libre = comment
             new_tx.save()
-            tx.child_tx = new_tx.id
+            tx = LotTransaction.objects.get(id=parent_tx_id)
+            tx.child_tx = new_tx
             tx.save()
             notify_pending_lot(new_tx)
         else:
