@@ -798,6 +798,8 @@ def forward_lots(request, *args, **kwargs):
             new_tx.delivery_status = 'N'
             new_tx.champ_libre = comment
             new_tx.save()
+            tx.child_tx = new_tx.id
+            tx.save()
             notify_pending_lot(new_tx)
         else:
             return JsonResponse({'status': 'error', 'message': "Delivery site not registered for outsourcing"}, status=400)

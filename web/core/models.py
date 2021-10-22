@@ -452,7 +452,8 @@ class LotTransaction(models.Model):
     # this PoS has been forwarded by an Operator to another Operator (outsourced blending)
     # or this PoS has been forwarded by a Trader to a client (trading without storage, the trader is only an intermediary)
     is_forwarded = models.BooleanField(default=False)
-    parent_tx = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
+    parent_tx = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name="parent")
+    child_tx = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name="child")
 
     # this PoS has been received by a producer with trading or a trader
     # this flag will make it easier to find "stock" lots
@@ -478,7 +479,7 @@ class LotTransaction(models.Model):
         'carbure_delivery_site': self.carbure_delivery_site.natural_key() if self.carbure_delivery_site else None, 'unknown_delivery_site': self.unknown_delivery_site,
         'unknown_delivery_site_country': self.unknown_delivery_site_country.natural_key() if self.unknown_delivery_site_country else None, 'delivery_status': self.delivery_status,
         'champ_libre': self.champ_libre, 'is_mac': self.is_mac, 'is_batch': self.is_batch,
-        'id': self.id, 'is_forwarded': self.is_forwarded, 'parent_tx': self.parent_tx_id}
+        'id': self.id, 'is_forwarded': self.is_forwarded, 'parent_tx': self.parent_tx_id, 'child_tx': self.child_tx.natural_key() if self.child_tx else None}
         if admin:
             d['hidden_by_admin'] = self.hidden_by_admin
             d['highlighted_by_admin'] = self.highlighted_by_admin
