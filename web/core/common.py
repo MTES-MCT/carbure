@@ -219,7 +219,7 @@ def check_duplicates(new_txs, background=True):
     if background:
         db.connections.close_all()
     new_daes = [t.dae for t in new_txs]
-    duplicates = LotTransaction.objects.filter(dae__in=new_daes, lot__status=LotV2.VALIDATED, is_forwarded=False).values('dae', 'lot__biocarburant_id', 'lot__matiere_premiere_id', 'lot__pays_origine_id', 'lot__volume', 'lot__ghg_total').annotate(count=Count('dae')).filter(count__gt=1)
+    duplicates = LotTransaction.objects.filter(dae__in=new_daes, is_forwarded=False).values('dae', 'lot__biocarburant_id', 'lot__matiere_premiere_id', 'lot__pays_origine_id', 'lot__volume', 'lot__ghg_total').annotate(count=Count('dae')).filter(count__gt=1)
     nb_duplicates = duplicates.count()
     if nb_duplicates > 0:
         for d in duplicates:
@@ -227,9 +227,6 @@ def check_duplicates(new_txs, background=True):
             for t in mark_as_duplicates:
                 # send back to drafts
                 t.potential_duplicate = True
-                t.delivery_status = LotTransaction.PENDING
-                t.lot.status = LotV2.DRAFT
-                t.lot.save()
                 t.save()
                 GenericError.objects.update_or_create(error='POTENTIAL_DUPLICATE', display_to_creator=True, display_to_recipient=True, display_to_auditor=True, display_to_admin=True, is_blocking=False, tx=t)
         return len(mark_as_duplicates)
@@ -1057,6 +1054,7 @@ def bulk_insert(entity, lots_to_insert, txs_to_insert, generic_errors, prefetche
     flat_generic_errors = [item for sublist in generic_errors for item in sublist]
     GenericError.objects.bulk_create(flat_generic_errors, batch_size=100)
     bulk_sanity_checks(new_txs, prefetched_data, background=False)
+    check_duplicates(new_txs, background=False)
     return new_lots, new_txs
 
 

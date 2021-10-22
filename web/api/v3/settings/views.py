@@ -9,7 +9,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from core.models import Entity, UserRights, LotV2, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
+from core.models import Entity, GenericError, LotTransaction, UserRights, LotV2, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 from core.decorators import check_rights, otp_or_403
 
@@ -280,11 +280,9 @@ def set_production_site_mp(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
                             }, status=400)
 
-    # re-run sanity_checks on drafts
-    entity = ps.producer
-    drafts = get_entity_lots_by_status(entity, 'draft')
-    prefetched_data = get_prefetched_data(entity)
-    bulk_sanity_checks(drafts, prefetched_data, background=False)
+    # remove errors
+    impacted_txs = LotTransaction.objects.filter(lot__carbure_production_site=ps, lot__matiere_premiere=mp)
+    GenericError.objects.filter(tx__in=impacted_txs, error="MP_NOT_CONFIGURED").delete()
     return JsonResponse({'status': 'success'})
 
 
@@ -321,11 +319,9 @@ def set_production_site_bc(request, *args, **kwargs):
     except Exception:
         return JsonResponse({'status': 'error', 'message': "Unknown error. Please contact an administrator",
                             }, status=400)
-    # re-run sanity_checks on drafts
-    entity = ps.producer
-    drafts = get_entity_lots_by_status(entity, 'draft')
-    prefetched_data = get_prefetched_data(entity)
-    bulk_sanity_checks(drafts, prefetched_data, background=False)
+    # remove errors
+    impacted_txs = LotTransaction.objects.filter(lot__carbure_production_site=ps, lot__biocarburant=bc)
+    GenericError.objects.filter(tx__in=impacted_txs, error="BC_NOT_CONFIGURED").delete()
     return JsonResponse({'status': 'success'})
 
 

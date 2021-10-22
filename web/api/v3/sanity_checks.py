@@ -165,6 +165,7 @@ def sanity_check(tx, prefetched_data):
 
     # check volume
     if lot.volume < 2000 and not tx.is_mac:
+        print("VOLUME FAIBLE")
         errors.append(generic_error(error='VOLUME_FAIBLE', tx=tx, field='volume'))
 
     # réduction de GES
