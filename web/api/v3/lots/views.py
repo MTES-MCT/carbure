@@ -256,10 +256,8 @@ def update_lot(request, *args, **kwargs):
     tx.save()
     GenericError.objects.bulk_create(errors)
     bulk_sanity_checks([tx], d, background=False)
+    check_duplicates([tx], background=False)
     if lot.status != LotV2.DRAFT:
-        # make sure we do not create a duplicate
-        # only if lot is already validated ?
-        check_duplicates([tx], background=False)
         # save the changes
         after_update = tx.natural_key()
         for key in before_update.keys():
@@ -388,8 +386,6 @@ def validate_lot(request, *args, **kwargs):
     if txs.count() != len(tx_ids):
         return JsonResponse({'status': 'forbidden', 'message': "Some transactions do not belong to you"}, status=403)
     data = validate_lots(request.user, entity, txs)
-    nb_duplicates = check_duplicates(txs, background=False)
-    data['duplicates'] = nb_duplicates
     return JsonResponse({'status': 'success', 'data': data})
 
 
