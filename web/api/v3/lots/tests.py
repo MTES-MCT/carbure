@@ -496,25 +496,9 @@ class LotsAPITest(TransactionTestCase):
         # create same lot
         response = self.client.post(reverse('api-v3-add-lot'), lot)
         self.assertEqual(response.status_code, 200)
-        # validate again
-        tx = LotTransaction.objects.get(dae=dae, lot__status='Draft')
-        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_producer.id})
-        self.assertEqual(response.status_code, 200)
-        j = response.json()['data']
-        self.assertEqual(j['duplicates'], 1)
-        # ensure lot was not deleted
-        nb_lots = LotV2.objects.all().count()
-        self.assertEqual(nb_lots, 2)
-        # ensure the lot has been sent back to drafts
+        # lot is flagged as duplicate
         tx = LotTransaction.objects.get(dae=dae, lot__status='Draft')
         self.assertEqual(tx.potential_duplicate, True)
-        # validate again - it should pass
-        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_producer.id})
-        self.assertEqual(response.status_code, 200)
-        j = response.json()['data']
-        self.assertEqual(j['duplicates'], 0)        
-        nb_lots = LotV2.objects.filter(status=LotV2.VALIDATED).count()
-        self.assertEqual(nb_lots, 2)        
 
         # as operator, create same lot
         lot['production_site'] = ''
@@ -525,22 +509,8 @@ class LotsAPITest(TransactionTestCase):
 
         response = self.client.post(reverse('api-v3-add-lot'), lot)
         self.assertEqual(response.status_code, 200)
-        # validate
         tx = LotTransaction.objects.get(dae=dae, lot__added_by=self.test_operator)
-        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_operator.id})
-        self.assertEqual(response.status_code, 200)
-        j = response.json()['data']
-        self.assertEqual(j['duplicates'], 1)
-        # lot stayed in drafts
-        tx = LotTransaction.objects.get(dae=dae, lot__added_by=self.test_operator, lot__status=LotV2.DRAFT)
-        # validate again
-        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_operator.id})
-        self.assertEqual(response.status_code, 200)
-        j = response.json()['data']
-        self.assertEqual(j['duplicates'], 0)
-        # lot is now valid
-        nb_valid = LotTransaction.objects.filter(dae=dae, lot__added_by=self.test_operator, lot__status=LotV2.VALIDATED).count()
-        self.assertEqual(nb_valid, 1)
+        self.assertEqual(tx.potential_duplicate, True)
 
 
 
@@ -603,113 +573,6 @@ class LotsAPITest(TransactionTestCase):
         dt2 = datetime.date(2020, 12, 1)
         self.assertEqual(tx.lot.unknown_production_site_com_date, dt1)
         self.assertEqual(tx.delivery_date, dt2)
-
-    def test_duplicates_operator(self):
-        # cleanup db
-        LotTransaction.objects.all().delete()
-        LotV2.objects.all().delete()
-        # as operator, create lot
-        dae = 'TEST2020FR00923-DUP-32094'
-        lot = {
-            'supplier_certificate': 'ISCC-TOTO-02',
-            'production_site_commissioning_date': '11/12/1998',
-            'biocarburant_code': 'ETH',
-            'matiere_premiere_code': 'BLE',
-            'volume': 15000,
-            'pays_origine_code': 'FR',
-            'eec': 1,
-            'ep': 5,
-            'etd': 12,
-            'dae': dae,
-            'delivery_date': '2020-12-31',
-            'client': self.test_operator.name,
-            'delivery_site': '001',
-            'entity_id': self.test_operator.id,
-        }
-        response = self.client.post(reverse('api-v3-add-lot'), lot)
-        self.assertEqual(response.status_code, 200)  
-        # validate
-        tx = LotTransaction.objects.get(dae=dae)
-        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_operator.id})
-        self.assertEqual(response.status_code, 200)
-        drafts = LotTransaction.objects.filter(dae=dae, lot__status='Draft').count()
-        valid = LotTransaction.objects.filter(dae=dae, lot__status='Validated').count()
-        self.assertEqual(drafts, 0)
-        self.assertEqual(valid, 1)
-
-
-        # create same lot
-        response = self.client.post(reverse('api-v3-add-lot'), lot)
-        self.assertEqual(response.status_code, 200)
-        # validate again
-        tx = LotTransaction.objects.get(dae=dae, lot__status='Draft')
-        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_operator.id})
-        self.assertEqual(response.status_code, 200)
-        j = response.json()['data']
-        self.assertEqual(j['duplicates'], 1)
-        # lot is not deleted but kept in drafts
-        nb_lots = LotV2.objects.filter(status=LotV2.DRAFT).count()
-        self.assertEqual(nb_lots, 1)
-
-        # as producer, create same lot
-        lot['entity_id'] = self.test_producer.id
-        del lot['production_site_commissioning_date']
-        lot['production_site'] = self.production_site.name
-        response = self.client.post(reverse('api-v3-add-lot'), lot)
-        self.assertEqual(response.status_code, 200)
-        # validate
-        tx = LotTransaction.objects.get(dae=dae, lot__added_by=self.test_producer)
-        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_producer.id})
-        self.assertEqual(response.status_code, 200)
-        tx = LotTransaction.objects.get(dae=dae, lot__added_by=self.test_producer)
-        # lot stays in Drafts (potential duplicate)
-        self.assertEqual(tx.lot.status, LotV2.DRAFT)
-        self.assertEqual(tx.potential_duplicate, True)
-
-        # resend and it passes
-        response = self.client.post(reverse('api-v3-validate-lot'), {'tx_ids': [tx.id], 'entity_id': self.test_producer.id})
-        self.assertEqual(response.status_code, 200)
-        tx = LotTransaction.objects.get(dae=dae, lot__added_by=self.test_producer)
-        self.assertEqual(tx.lot.status, LotV2.VALIDATED)
-        self.assertEqual(tx.potential_duplicate, True)
-
-
-
-
-
-    def test_duplicates_upload(self):
-        today = datetime.date.today()
-        # add certificate to test_producer
-        crt, created = ISCCCertificate.objects.update_or_create(certificate_id='ISCC-TOTO-02', certificate_holder='das super producteur test', addons='TRS', valid_from=today, valid_until=today)
-        EntityISCCTradingCertificate.objects.update_or_create(entity=self.test_producer, certificate=crt)
-
-        # upload excel file
-        jsoned = self.upload_file('carbure_duplicates.xlsx', self.test_producer)
-        # get number of lots in excel file
-        nb_lots = jsoned['data']['total']
-        # make sure all lines were loaded
-        self.assertEqual(nb_lots, jsoned['data']['loaded'])
-        
-        # validate-all
-        txs = LotTransaction.objects.filter(lot__status='Draft')
-        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})              
-        self.assertEqual(response.status_code, 200)
-        j = response.json()
-        # duplicates > 0
-        self.assertGreater(j['data']['duplicates'], 0)
-        # duplicates are kept as drafts
-        nb_drafts = LotV2.objects.filter(status='Draft').count()
-        self.assertGreater(nb_drafts, 0)
-
-        # submit those drafts again, they should pass
-        txs = LotTransaction.objects.filter(lot__status='Draft')
-        response = self.client.post(reverse('api-v3-validate-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})  
-        jsoned = response.json()
-        self.assertEqual(jsoned['data']['duplicates'], 0)
-        # ensure no more drafts
-        txs = LotTransaction.objects.filter(lot__status='Draft')
-        self.assertEqual(txs.count(), 0)
-
 
     def create_lot(self, **kwargs):
         producer = self.test_producer
