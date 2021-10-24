@@ -32,6 +32,7 @@
   "MISSING_VOLUME": "Le volume est manquant",
   "MP_BC_INCOHERENT": "La matière première est incohérente avec le biocarburant",
   "MP_NOT_CONFIGURED": "La matière première n'est pas enregistrée sur le site de production",
+  "DEPOT_NOT_CONFIGURED": "Ce site de livraison n'est pas associé à votre société. Veuillez vérifier vos paramètres",
   "NOT_ALLOWED": "Droits insuffisants",
   "PRODUCTION_SITE_COMDATE_FORMAT_INCORRECT": "Le format de la date de mise en service est incorrect",
   "PROVENANCE_MP": "La provenance de la matière première semble inhabituelle",

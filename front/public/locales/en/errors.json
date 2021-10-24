@@ -32,6 +32,7 @@
   "MISSING_VOLUME": "Volume is missing",
   "MP_BC_INCOHERENT": "Feedstock is not compatible with biofuel",
   "MP_NOT_CONFIGURED": "Feedstock is not specified in production site configuration",
+  "DEPOT_NOT_CONFIGURED": "This delivery site is not associated to your company. Please check your settings.",
   "NOT_ALLOWED": "Insufficient access rights",
   "PRODUCTION_SITE_COMDATE_FORMAT_INCORRECT": "Date of commissioning format is incorrect",
   "PROVENANCE_MP": "Feedstock origin seems unusual",

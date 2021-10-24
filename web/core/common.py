@@ -15,7 +15,7 @@ from django.db import transaction
 
 from core.models import LotV2, LotTransaction, GenericError, TransactionUpdateHistory
 from core.models import MatierePremiere, Biocarburant, Pays, Entity, ProductionSite, Depot
-from core.models import TransactionDistance
+from core.models import TransactionDistance, EntityDepot
 from core.notifications import notify_pending_lot, notify_lot_fixed
 from core.ign_distance import get_distance
 
@@ -254,6 +254,10 @@ def get_prefetched_data(entity=None):
         d['production_sites'] = {ps.name: ps for ps in ProductionSite.objects.prefetch_related('productionsiteinput_set', 'productionsiteoutput_set', 'productionsitecertificate_set').all()}
     d['depots'] = {d.depot_id.lstrip('0').upper(): d for d in Depot.objects.all()}
     d['depotsbyname'] = {d.name.upper(): d for d in Depot.objects.all()}
+    entitydepots = dict()
+    for obj in EntityDepot.objects.all():
+        entitydepots.setdefault(obj.entity.id, []).append(obj.depot.id)
+    d['depotsbyentity'] = entitydepots
     d['clients'] = {c.name.upper(): c for c in Entity.objects.filter(entity_type__in=['Producteur', 'Opérateur', 'Trader'])}
     d['certificates'] = {c.certificate_id.upper(): c for c in ISCCCertificate.objects.filter(valid_until__gte=lastyear)}
     d['certificates'].update({c.certificate_id.upper(): c for c in DBSCertificate.objects.filter(valid_until__gte=lastyear)})
