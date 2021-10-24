@@ -27,6 +27,7 @@ rules['GHG_EEC_0'] = "Émissions GES liées à l'Extraction et la Culture nulles
 rules['GHG_EL_NEG'] = "Émissions GES liées à l'Affectation des terres Négatives"
 rules['MP_NOT_CONFIGURED'] = "Matière Première non enregistrée sur votre Site de Production"
 rules['BC_NOT_CONFIGURED'] = "Biocarburant non enregistré sur votre Site de Production"
+rules['DEPOT_NOT_CONFIGURED'] = "Ce site de livraison n'est pas rattaché à votre société"
 rules['MISSING_PRODSITE_CERTIFICATE'] = "Aucun certificat n'est associé à ce site de Production"
 rules['UNKNOWN_CLIENT'] = "Le client n'est pas enregistré sur Carbure"
 rules['UNKNOWN_DELIVERY_SITE'] = "Livraison en France - Dépôt Inconnu"
@@ -303,6 +304,17 @@ def sanity_check(tx, prefetched_data):
             bcs = [pso.biocarburant for pso in prefetched_data['production_sites'][lot.carbure_production_site.name].productionsiteoutput_set.all()]
             if lot.biocarburant not in bcs:
                 errors.append(generic_error(error='BC_NOT_CONFIGURED', tx=tx, display_to_recipient=False, field='biocarburant_code'))
+
+    if tx.carbure_client:
+        if tx.carbure_client not in prefetched_data['depotsbyentity']:
+            # not a single delivery sites linked to entity
+            errors.append(generic_error(error='DEPOT_NOT_CONFIGURED', tx=tx, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
+        else:
+            # some delivery sites linked to entity
+            if tx.carbure_delivery_site not in prefetched_data['depotsbyentity'][tx.carbure_client]:
+                # this specific delivery site is not linked
+                errors.append(generic_error(error='DEPOT_NOT_CONFIGURED', tx=tx, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
+
 
     # CERTIFICATES CHECK
     check_certificates(prefetched_data, tx, errors)
