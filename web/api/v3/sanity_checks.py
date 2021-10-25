@@ -1,5 +1,6 @@
 import datetime
 import re
+import traceback
 from django import db
 from core.models import GenericError, Entity
 # definitions
@@ -140,12 +141,13 @@ def check_certificates(prefetched_data, tx, errors):
                 errors.append(generic_error(error='MISSING_REF_DBL_COUNTING', tx=tx, field='dc_reference'))
             else:
                 dc_cert = tx.lot.carbure_production_site.dc_reference.strip()
-            if dc_cert != '' and dc_cert not in prefetched_data['double_counting_certificates']:
-                errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', tx=tx, field='dc_reference'))
-        if dc_cert != '' and dc_cert in prefetched_data['double_counting_certificates']:
-            dcc = prefetched_data['double_counting_certificates'][dc_cert]
-            if dcc.valid_until < tx.delivery_date:
-                errors.append(generic_error(error='EXPIRED_DOUBLE_COUNTING_CERTIFICATE', tx=tx))
+            if dc_cert != '':
+                if dc_cert not in prefetched_data['double_counting_certificates']:
+                    errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', tx=tx, field='dc_reference'))
+                else:
+                    dcc = prefetched_data['double_counting_certificates'][dc_cert]
+                    if dcc.valid_until < tx.delivery_date:
+                        errors.append(generic_error(error='EXPIRED_DOUBLE_COUNTING_CERTIFICATE', tx=tx))
     return errors
 
 def sanity_check(tx, prefetched_data):
@@ -166,7 +168,6 @@ def sanity_check(tx, prefetched_data):
 
     # check volume
     if lot.volume < 2000 and not tx.is_mac:
-        print("VOLUME FAIBLE")
         errors.append(generic_error(error='VOLUME_FAIBLE', tx=tx, field='volume'))
 
     # réduction de GES
@@ -304,7 +305,6 @@ def sanity_check(tx, prefetched_data):
             bcs = [pso.biocarburant for pso in prefetched_data['production_sites'][lot.carbure_production_site.name].productionsiteoutput_set.all()]
             if lot.biocarburant not in bcs:
                 errors.append(generic_error(error='BC_NOT_CONFIGURED', tx=tx, display_to_recipient=False, field='biocarburant_code'))
-
     if tx.carbure_client:
         if tx.carbure_client not in prefetched_data['depotsbyentity']:
             # not a single delivery sites linked to entity
@@ -315,17 +315,14 @@ def sanity_check(tx, prefetched_data):
                 # this specific delivery site is not linked
                 errors.append(generic_error(error='DEPOT_NOT_CONFIGURED', tx=tx, display_to_recipient=True, display_to_creator=False, field='delivery_site'))
 
-
     # CERTIFICATES CHECK
     check_certificates(prefetched_data, tx, errors)
-
 
     if tx.lot.producer_is_in_carbure and tx.lot.added_by != tx.lot.carbure_producer and not tx.lot.parent_lot:
         is_sane = False
         errors.append(generic_error(error='NOT_ALLOWED', tx=tx, is_blocking=True))
 
         
-
     # transaction is not a MAC, is going to france, and delivery_site is unknown
     if not tx.is_mac and tx.unknown_delivery_site_country and tx.unknown_delivery_site_country.code_pays == 'FR' and not tx.carbure_delivery_site:
         is_sane = False
