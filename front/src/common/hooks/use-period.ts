@@ -41,7 +41,9 @@ export function stdPeriod(period: Period) {
 }
 
 export function comparePeriod(a: Period, b: Period) {
-  return `${a.year}-${a.month}` > `${b.year}-${b.month}` ? 1 : -1
+  const dateA = new Date(`${a.year}-${a.month}-01`)
+  const dateB = new Date(`${b.year}-${b.month}-01`)
+  return dateA.getTime() - dateB.getTime()
 }
 
 export interface PeriodHook extends Period {
