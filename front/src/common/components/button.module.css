@@ -37,7 +37,8 @@
   transform: translate3D(1px, 1px, 0);
 }
 
-.button:disabled {
+.button:disabled,
+.button.buttonDisabled {
   opacity: 0.5;
   cursor: auto;
   pointer-events: none;

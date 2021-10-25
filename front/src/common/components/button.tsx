@@ -2,7 +2,7 @@ import React from "react"
 import cl from "clsx"
 import styles from "./button.module.css"
 import { Loader } from "./icons"
-import { NavLink, RelNavLinkProps } from './relative-route'
+import { NavLink, RelNavLinkProps } from "./relative-route"
 import { SystemProps, AsProp } from "./index"
 
 // BUTTON COMPONENT
@@ -30,6 +30,7 @@ export const Button = ({
     [styles.buttonDanger]: level === "danger",
     [styles.buttonSuccess]: level === "success",
     [styles.buttonSecondary]: level === "secondary",
+    [styles.buttonDisabled]: props.disabled,
   })
 
   return (
@@ -45,7 +46,7 @@ export const Button = ({
   )
 }
 // ASYNC BUTTON COMPONENT
-type AsyncButtonProps = ButtonProps & {
+export type AsyncButtonProps = ButtonProps & {
   loading: boolean
 }
 
