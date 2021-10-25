@@ -3,7 +3,7 @@ import cl from "clsx"
 import styles from "./input.module.css"
 import { AlertTriangle, Check, IconProps, Upload } from "./icons"
 import { Box, SystemProps } from "./index"
-import { Button, ButtonProps } from './button'
+import { AsyncButton, AsyncButtonProps } from "./button"
 import { FormChangeHandler } from "common/hooks/use-form"
 
 // INPUT COMPONENT
@@ -218,16 +218,20 @@ export const Placeholder = (props: SystemProps) => (
   <div {...props} className={cl(styles.inputPlaceholder, props.className)} />
 )
 
-
-type FileInputProps = Omit<ButtonProps, "value" | "onChange"> & {
+type FileInputProps = Omit<AsyncButtonProps, "value" | "onChange"> & {
   placeholder?: string
   value: File | undefined
   onChange: (value: File | undefined) => void
 }
 
-export const FileInput = ({ placeholder, value, onChange, ...props }: FileInputProps) => {
+export const FileInput = ({
+  placeholder,
+  value,
+  onChange,
+  ...props
+}: FileInputProps) => {
   return (
-    <Button
+    <AsyncButton
       as="label"
       level={value ? "success" : "primary"}
       icon={value ? Check : Upload}
@@ -239,6 +243,6 @@ export const FileInput = ({ placeholder, value, onChange, ...props }: FileInputP
         onChange={(e) => onChange(e!.target.files![0])}
       />
       {value ? value.name : placeholder}
-    </Button>
+    </AsyncButton>
   )
 }
