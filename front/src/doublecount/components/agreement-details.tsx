@@ -1,6 +1,6 @@
 import { Fragment, useState, useEffect } from "react"
 import { useTranslation, Trans } from "react-i18next"
-import { EntityType } from 'common/types'
+import { EntityType } from "common/types"
 import { Admin, DoubleCountingStatus as DCStatus } from "../types"
 import useAPI from "common/hooks/use-api"
 import { LoaderOverlay, Box } from "common/components"
@@ -30,61 +30,14 @@ import {
 import { formatDate } from "settings/components/common"
 import { Alert } from "common/components/alert"
 import { useNotificationContext } from "common/components/notifications"
-import YearTable from "./year-table"
-import DoubleCountingStatus from './dc-status'
+import DoubleCountingStatus from "./dc-status"
 import {
   SourcingAggregationTable,
   SourcingTable,
   ProductionTable,
-  StatusTable
-} from './dc-tables'
+  StatusTable,
+} from "./dc-tables"
 import { FileInput } from "common/components/input"
-
-type DCDecisionPromptProps = {
-  onConfirm: (decision: File) => void
-  onClose: () => void
-}
-
-const DCDecisionPrompt = ({ onConfirm, onClose }: DCDecisionPromptProps) => {
-  const { t } = useTranslation()
-  const [decision, setDecision] = useState<File | undefined>()
-
-  return (
-    <Dialog onResolve={onClose}>
-      <DialogTitle>
-        <Trans>
-          Mettre en ligne la décision
-        </Trans>
-      </DialogTitle>
-
-      <DialogText>
-        <Trans>
-          Veuillez sélectionner le fichier contenant la
-          décision finale de l'administration pour ce dossier.
-        </Trans>
-      </DialogText>
-
-      <FileInput value={decision} onChange={setDecision} placeholder={t("Importer la décision")} />
-
-      <DialogButtons>
-        <Button disabled={!decision} icon={Check} level="primary" onClick={() => {
-          onConfirm(decision!)
-          onClose()
-        }}>
-          <Trans>
-            Confirmer
-          </Trans>
-        </Button>
-
-        <Button icon={Return} onClick={onClose}>
-          <Trans>
-            Retour
-          </Trans>
-        </Button>
-      </DialogButtons>
-    </Dialog >
-  )
-}
 
 export type DoubleCountingPromptProps = PromptProps<any> & {
   agreementID: number
@@ -103,10 +56,14 @@ export const DoubleCountingPrompt = ({
   const [quotas, setQuotas] = useState<Record<string, string>>({})
 
   const [agreement, getAgreement] = useAPI(api.getDoubleCountingAgreement)
-  const [approving, approveAgreement] = useAPI(api.approveDoubleCountingAgreement)
+  const [approving, approveAgreement] = useAPI(
+    api.approveDoubleCountingAgreement
+  )
   const [rejecting, rejectAgreement] = useAPI(api.rejectDoubleCountingAgreement)
-  const [approvingQuotas, approveQuotas] = useAPI(api.approveDoubleCountingQuotas)
-  const [uploading, uploadDecision] = useAPI(api.uploadDoubleCountingDecision)
+  const [approvingQuotas, approveQuotas] = useAPI(
+    api.approveDoubleCountingQuotas
+  )
+  const [decision, uploadDecision] = useAPI(api.uploadDoubleCountingDecision)
 
   useEffect(() => {
     getAgreement(agreementID)
@@ -143,7 +100,9 @@ export const DoubleCountingPrompt = ({
   const isAdmin = entity?.entity_type === EntityType.Administration
   const isAccepted = dcaStatus === DCStatus.Accepted
   const isDone = approved || dcaStatus === DCStatus.Rejected
-  const hasQuotas = !agreement.data?.production.some(p => p.approved_quota === -1)
+  const hasQuotas = !agreement.data?.production.some(
+    (p) => p.approved_quota === -1
+  )
   const isReady = isAdmin ? true : agreement.data?.dgec_validated
 
   const productionSite = agreement.data?.production_site ?? "N/A"
@@ -153,16 +112,26 @@ export const DoubleCountingPrompt = ({
     ? formatDate(agreement.data.creation_date)
     : "N/A"
 
-  const documentationFile = agreement.data?.documents.find(doc => doc.file_type === 'SOURCING')
-  const decisionFile = agreement.data?.documents.find(doc => doc.file_type === 'DECISION')
+  const documentationFile = agreement.data?.documents.find(
+    (doc) => doc.file_type === "SOURCING"
+  )
+  const decisionFile = agreement.data?.documents.find(
+    (doc) => doc.file_type === "DECISION"
+  )
 
   const excelURL =
     agreement.data &&
     `/api/v3/doublecount/admin/agreement?dca_id=${agreement.data.id}&export=true`
-  const documentationURL = documentationFile &&
-    `/api/v3/doublecount/admin/download-documentation?dca_id=${agreement.data!.id}&file_id=${documentationFile.id}`
-  const decisionURL = decisionFile &&
-    `/api/v3/doublecount/admin/download-decision?dca_id=${agreement.data!.id}&file_id=${decisionFile.id}`
+  const documentationURL =
+    documentationFile &&
+    `/api/v3/doublecount/admin/download-documentation?dca_id=${
+      agreement.data!.id
+    }&file_id=${documentationFile.id}`
+  const decisionURL =
+    decisionFile &&
+    `/api/v3/doublecount/admin/download-decision?dca_id=${
+      agreement.data!.id
+    }&file_id=${decisionFile.id}`
 
   async function submitQuotas() {
     if (
@@ -223,8 +192,11 @@ export const DoubleCountingPrompt = ({
     onResolve()
   }
 
-  async function submitDecision(decision: File) {
-    uploadDecision(agreementID, decision)
+  async function submitDecision(decision: File | undefined) {
+    if (decision) {
+      await uploadDecision(agreementID, decision)
+      getAgreement(agreementID)
+    }
   }
 
   return (
@@ -261,7 +233,9 @@ export const DoubleCountingPrompt = ({
 
       <div className={styles.modalTableContainer}>
         {focus === "aggregated_sourcing" && (
-          <SourcingAggregationTable sourcing={agreement.data?.aggregated_sourcing ?? []} />
+          <SourcingAggregationTable
+            sourcing={agreement.data?.aggregated_sourcing ?? []}
+          />
         )}
 
         {focus === "sourcing" && (
@@ -315,16 +289,13 @@ export const DoubleCountingPrompt = ({
         </Box>
 
         {isAdmin && isAccepted && !decisionFile && (
-          <AsyncButton
-            loading={uploading.loading}
-            level="primary"
+          <FileInput
+            loading={decision.loading}
             icon={Download}
-            onClick={() => prompt((resolve) => (
-              <DCDecisionPrompt onConfirm={submitDecision} onClose={resolve} />
-            ))}
-          >
-            <Trans>Mettre en ligne la décision</Trans>
-          </AsyncButton>
+            value={undefined}
+            onChange={submitDecision}
+            placeholder={t("Mettre en ligne la décision")}
+          />
         )}
 
         {!isDone && (
