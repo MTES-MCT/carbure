@@ -1,4 +1,5 @@
 import datetime
+from inspect import trace
 import re
 import traceback
 from django import db
@@ -68,9 +69,12 @@ def bulk_sanity_checks(txs, prefetched_data, background=True):
     # cleanup previous errors
     GenericError.objects.filter(tx__in=txs).delete()
     for tx in txs:
-        lot_ok, tx_ok, is_sane, validation_errors = sanity_check(tx, prefetched_data)
-        errors += validation_errors
-        results.append((lot_ok, tx_ok, is_sane))
+        try:
+            lot_ok, tx_ok, is_sane, validation_errors = sanity_check(tx, prefetched_data)
+            errors += validation_errors
+            results.append((lot_ok, tx_ok, is_sane))
+        except:
+            traceback.print_exc()
     GenericError.objects.bulk_create(errors, batch_size=1000)
     return results
 
@@ -131,23 +135,28 @@ def check_certificates(prefetched_data, tx, errors):
                     errors.append(generic_error(error='EXPIRED_VENDOR_CERT', tx=tx, field='carbure_vendor_certificate'))  
     # DOUBLE COUNTING CERTIFICATES
     if tx.lot.matiere_premiere and tx.lot.matiere_premiere.is_double_compte:
-        if tx.lot.unknown_production_site_dbl_counting:
-            dc_cert = tx.lot.unknown_production_site_dbl_counting.strip()
-            if dc_cert != '' and dc_cert not in prefetched_data['double_counting_certificates']:
-                errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', tx=tx, field='unknown_production_site_dbl_counting'))
-        elif tx.lot.carbure_production_site:
-            dc_cert = ''
+        # identify where the certificate is (attached to prod site or attached to lot)
+        dc_cert = ''
+        if tx.lot.carbure_production_site:
             if not tx.lot.carbure_production_site.dc_reference:
                 errors.append(generic_error(error='MISSING_REF_DBL_COUNTING', tx=tx, field='dc_reference'))
             else:
                 dc_cert = tx.lot.carbure_production_site.dc_reference.strip()
-            if dc_cert != '':
-                if dc_cert not in prefetched_data['double_counting_certificates']:
-                    errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', tx=tx, field='dc_reference'))
-                else:
-                    dcc = prefetched_data['double_counting_certificates'][dc_cert]
-                    if dcc.valid_until < tx.delivery_date:
-                        errors.append(generic_error(error='EXPIRED_DOUBLE_COUNTING_CERTIFICATE', tx=tx))
+        else:
+            if not tx.lot.unknown_production_site_dbl_counting:
+                errors.append(generic_error(error='MISSING_REF_DBL_COUNTING', tx=tx, field='unknown_production_site_dbl_counting'))
+            else:
+                dc_cert = tx.lot.unknown_production_site_dbl_counting.strip()
+        if dc_cert == '':
+            # should not happen unless above cert is '' after strip()
+            errors.append(generic_error(error='MISSING_REF_DBL_COUNTING', tx=tx, field='unknown_production_site_dbl_counting'))
+        else:
+            if dc_cert not in prefetched_data['double_counting_certificates']:
+                errors.append(generic_error(error='UNKNOWN_DOUBLE_COUNTING_CERTIFICATE', tx=tx, field='dc_reference'))
+            else:
+                dcc = prefetched_data['double_counting_certificates'][dc_cert]
+                if dcc.valid_until < tx.delivery_date:
+                    errors.append(generic_error(error='EXPIRED_DOUBLE_COUNTING_CERTIFICATE', tx=tx))
     return errors
 
 def sanity_check(tx, prefetched_data):
@@ -292,7 +301,6 @@ def sanity_check(tx, prefetched_data):
         if not lot.matiere_premiere.is_huile_vegetale and lot.biocarburant.code in ['HVOE', 'HVOG']:
             is_sane = False
             errors.append(generic_error(error='MP_BC_INCOHERENT', tx=tx, is_blocking=True, extra="Un HVO doit provenir d'huiles végétales uniquement. Pour les autres huiles hydrotraitées, voir la nomenclature HOE/HOG", fields=['biocarburant_code', 'matiere_premiere_code']))
-
 
     # configuration
     if lot.matiere_premiere and lot.carbure_production_site:

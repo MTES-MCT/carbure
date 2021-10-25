@@ -653,7 +653,6 @@ class LotsAPITest(TransactionTestCase):
             'production_site': self.production_site.name,
             'production_site_commissioning_date': '01/12/2002',
             'supplier_reference': 'PRODSITEREFERENCE',
-            'double_counting_registration': 'NUMDOUBLECOMPTE',
             'biocarburant_code': 'ETH',
             'matiere_premiere_code': 'BLE',
             'volume': 15000,
@@ -686,16 +685,39 @@ class LotsAPITest(TransactionTestCase):
         DoubleCountingRegistration.objects.update_or_create(certificate_id="DC_CERT_02", certificate_holder="Super testeur", 
         defaults={'registered_address':"blablabla", 'valid_from': vfrom, 'valid_until': vuntil - datetime.timedelta(days=7)})        
         # upload lot using first
-        tx_id, lot_id = self.create_lot(matiere_premiere_code="MARC_DE_RAISIN", biocarburant_code="ETH", double_counting_registration="DC_CERT_01", delivery_date=today.strftime("%d/%m/%Y"))
+        self.production_site.dc_reference = "DC_CERT_01"
+        self.production_site.save()
+        tx_id, lot_id = self.create_lot(matiere_premiere_code="MARC_DE_RAISIN", biocarburant_code="ETH", delivery_date=today.strftime("%d/%m/%Y"))
         self.assertEqual(GenericError.objects.filter(error="UNKNOWN_DOUBLE_COUNTING_CERTIFICATE").count(), 0)
         self.assertEqual(GenericError.objects.filter(error="EXPIRED_DOUBLE_COUNTING_CERTIFICATE").count(), 0)
         # upload lot using second
-        tx_id, lot_id = self.create_lot(matiere_premiere_code="MARC_DE_RAISIN", biocarburant_code="ETH", double_counting_registration="DC_CERT_02", delivery_date=today.strftime("%d/%m/%Y"))
+        self.production_site.dc_reference = "DC_CERT_02"
+        self.production_site.save()        
+        tx_id, lot_id = self.create_lot(matiere_premiere_code="MARC_DE_RAISIN", biocarburant_code="ETH", delivery_date=today.strftime("%d/%m/%Y"))
         self.assertEqual(GenericError.objects.filter(error="UNKNOWN_DOUBLE_COUNTING_CERTIFICATE").count(), 0)
         self.assertEqual(GenericError.objects.filter(error="EXPIRED_DOUBLE_COUNTING_CERTIFICATE").count(), 1)
         # upload lot using unknown cert
         GenericError.objects.all().delete()
+        self.production_site.dc_reference = "BLIPBLOP"
+        self.production_site.save()             
         tx_id, lot_id = self.create_lot(matiere_premiere_code="MARC_DE_RAISIN", biocarburant_code="ETH", double_counting_registration="UNKNOWN_DC_CERT")
+        self.assertEqual(GenericError.objects.filter(error="UNKNOWN_DOUBLE_COUNTING_CERTIFICATE").count(), 1)
+        self.assertEqual(GenericError.objects.filter(error="EXPIRED_DOUBLE_COUNTING_CERTIFICATE").count(), 0)
+        print("### TEST DC OPERATOR ###")
+        # same test, but as an operator (no production site associated with account)
+        GenericError.objects.all().delete()
+        # upload lot using first
+        tx_id, lot_id = self.create_lot(matiere_premiere_code="MARC_DE_RAISIN", double_counting_registration="DC_CERT_01", biocarburant_code="ETH", delivery_date=today.strftime("%d/%m/%Y"), producer="UNKNOWN", production_site="UNKNOWN", entity_id=self.test_operator.id, production_site_commissioning_date='01/12/2001')
+        self.assertEqual(GenericError.objects.filter(error="UNKNOWN_DOUBLE_COUNTING_CERTIFICATE").count(), 0)
+        self.assertEqual(GenericError.objects.filter(error="EXPIRED_DOUBLE_COUNTING_CERTIFICATE").count(), 0)
+        # upload lot using second
+        GenericError.objects.all().delete()
+        tx_id, lot_id = self.create_lot(matiere_premiere_code="MARC_DE_RAISIN", double_counting_registration="DC_CERT_02", biocarburant_code="ETH", delivery_date=today.strftime("%d/%m/%Y"), producer="UNKNOWN", production_site="UNKNOWN", entity_id=self.test_operator.id, production_site_commissioning_date='01/12/2001')
+        self.assertEqual(GenericError.objects.filter(error="UNKNOWN_DOUBLE_COUNTING_CERTIFICATE").count(), 0)
+        self.assertEqual(GenericError.objects.filter(error="EXPIRED_DOUBLE_COUNTING_CERTIFICATE").count(), 1)
+        # upload lot using unknown cert
+        GenericError.objects.all().delete()
+        tx_id, lot_id = self.create_lot(matiere_premiere_code="MARC_DE_RAISIN", double_counting_registration="UNKNOWN_DC_CERT", biocarburant_code="ETH", delivery_date=today.strftime("%d/%m/%Y"),  producer="UNKNOWN", production_site="UNKNOWN", entity_id=self.test_operator.id, production_site_commissioning_date='01/12/2001')
         self.assertEqual(GenericError.objects.filter(error="UNKNOWN_DOUBLE_COUNTING_CERTIFICATE").count(), 1)
         self.assertEqual(GenericError.objects.filter(error="EXPIRED_DOUBLE_COUNTING_CERTIFICATE").count(), 0)
 
