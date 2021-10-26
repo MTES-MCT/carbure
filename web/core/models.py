@@ -486,7 +486,8 @@ class LotTransaction(models.Model):
             d['hidden_by_auditor'] = self.hidden_by_auditor
             d['highlighted_by_auditor'] = self.highlighted_by_auditor
         if self.lot.is_split: # trading with storage - we hide producer data
-            d['lot']['carbure_producer']['name'] = "Confidentiel"
+            if d['lot']['carbure_producer']:
+                d['lot']['carbure_producer']['name'] = "Confidentiel"
             d['lot']['carbure_production_site_reference'] = "Confidentiel"
             d['lot']['unknown_producer'] = "Confidentiel"
             d['lot']['unknown_production_site_reference'] = "Confidentiel"

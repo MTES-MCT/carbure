@@ -200,7 +200,7 @@ class TransactionAdmin(admin.ModelAdmin):
     list_filter = ('lot__year', 'lot__status', ('lot__biocarburant', NameSortedRelatedOnlyDropdownFilter), ('lot__matiere_premiere', NameSortedRelatedOnlyDropdownFilter), 'delivery_status', ('lot__period', DropdownFilter), 'client_is_in_carbure', 
                   ('carbure_vendor', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  'is_mac', 'is_batch', 'delivery_site_is_in_carbure', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter), 
                   ('lot__carbure_production_site', NameSortedRelatedOnlyDropdownFilter), TxPartOfForwardListFilter, UnknownDeliverySiteListFilter, UnknownClientListFilter, UnknownProductionSiteListFilter)
-    raw_id_fields = ('lot', 'parent_tx')
+    raw_id_fields = ('lot', 'parent_tx', 'child_tx')
     actions = ['rerun_sanity_checks', 'delete_ghosts', 'change_transaction_delivery_site', 'change_transaction_client', 'assign_transaction_certificate', 'change_transaction_delivery_status']
 
     def get_search_results(self, request, queryset, search_term):
