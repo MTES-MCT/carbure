@@ -79,7 +79,11 @@ function getStatusText(
 
   switch (tx.delivery_status) {
     case DeliveryStatus.Pending:
-      return t("En attente")
+      if (tx.parent_tx) {
+        return t("Transfert") + " - " + t("En attente")
+      } else {
+        return t("En attente")
+      }
     case DeliveryStatus.Accepted:
       return isStock ? t("En stock") : t("Accepté")
     case DeliveryStatus.Rejected:
