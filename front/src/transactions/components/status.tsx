@@ -65,7 +65,12 @@ function getStatusText(
   }
 
   if (tx.is_forwarded) {
-    return t("Transféré")
+    if (tx.child_tx !== null) {
+      let child_tx = tx.child_tx as Transaction
+      return t("Transféré") + " - " + child_tx.carbure_client?.name
+    } else {
+      return t("Transféré")
+    }
   }
 
   const isVendor = tx.carbure_vendor?.id === entity?.id
