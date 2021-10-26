@@ -209,6 +209,7 @@ export interface Transaction {
   is_mac: boolean
   is_forwarded: boolean
   parent_tx: number | null
+  child_tx: Object | null
 
   carbure_vendor: Entity | null
   carbure_vendor_certificate: string
