@@ -485,9 +485,11 @@ class LotTransaction(models.Model):
             d['highlighted_by_admin'] = self.highlighted_by_admin
             d['hidden_by_auditor'] = self.hidden_by_auditor
             d['highlighted_by_auditor'] = self.highlighted_by_auditor
-        #if self.parent_tx and self.parent_tx.is_forwarded == True:
-        #    d['lot']['carbure_producer'] = "Confidentiel"
-        #    d['lot']['carbure_production_site_reference'] = "Confidentiel"
+        if self.lot.is_split: # trading with storage - we hide producer data
+            d['lot']['carbure_producer']['name'] = "Confidentiel"
+            d['lot']['carbure_production_site_reference'] = "Confidentiel"
+            d['lot']['unknown_producer'] = "Confidentiel"
+            d['lot']['unknown_production_site_reference'] = "Confidentiel"
         return d
 
     class Meta:
