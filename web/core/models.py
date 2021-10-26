@@ -479,12 +479,15 @@ class LotTransaction(models.Model):
         'carbure_delivery_site': self.carbure_delivery_site.natural_key() if self.carbure_delivery_site else None, 'unknown_delivery_site': self.unknown_delivery_site,
         'unknown_delivery_site_country': self.unknown_delivery_site_country.natural_key() if self.unknown_delivery_site_country else None, 'delivery_status': self.delivery_status,
         'champ_libre': self.champ_libre, 'is_mac': self.is_mac, 'is_batch': self.is_batch,
-        'id': self.id, 'is_forwarded': self.is_forwarded, 'parent_tx': self.parent_tx_id, 'child_tx': self.child_tx.natural_key() if self.child_tx else None}
+        'id': self.id, 'is_forwarded': self.is_forwarded, 'parent_tx': self.parent_tx_id, 'child_tx': self.child_tx.natural_key() if (self.child_tx and self.child_tx_id != self.id) else None}
         if admin:
             d['hidden_by_admin'] = self.hidden_by_admin
             d['highlighted_by_admin'] = self.highlighted_by_admin
             d['hidden_by_auditor'] = self.hidden_by_auditor
             d['highlighted_by_auditor'] = self.highlighted_by_auditor
+        #if self.parent_tx and self.parent_tx.is_forwarded == True:
+        #    d['lot']['carbure_producer'] = "Confidentiel"
+        #    d['lot']['carbure_production_site_reference'] = "Confidentiel"
         return d
 
     class Meta:
