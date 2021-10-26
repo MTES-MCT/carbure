@@ -884,7 +884,7 @@ def load_mb_lot(prefetched_data, entity, user, lot_dict, source):
     lot.added_by = entity
     lot.data_origin_entity = lot.parent_lot.data_origin_entity
     lot.added_by_user = user
-    lot.status = 'Draft'
+    lot.status = LotV2.DRAFT
     lot.carbure_id = ''
     lot.is_fused = False
     lot.is_split = True
