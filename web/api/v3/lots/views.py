@@ -496,7 +496,7 @@ def request_corrections(request, *args, **kwargs):
         # notify the vendor that a correction is needed
         if tx.delivery_status in [LotTransaction.ACCEPTED, LotTransaction.FROZEN]:
             # create notification / alert
-            notify_accepted_lot_in_correction(tx)
+            notify_lot_in_correction(tx)
 
         TransactionUpdateHistory.objects.create(tx=tx, update_type=TransactionUpdateHistory.UPDATE, field='status', value_before=tx.delivery_status, value_after=LotTransaction.TOFIX, modified_by=request.user, modified_by_entity=entity)
         tx.delivery_status = LotTransaction.TOFIX
