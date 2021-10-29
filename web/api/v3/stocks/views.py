@@ -361,8 +361,8 @@ def convert_eth_stock_to_etbe(request, entity, c):
 
 
     previous_lot_id = previous_stock_tx.lot.pk
+    previous_tx_id = previous_stock_tx.pk
     new_lot = LotV2.objects.get(pk=previous_lot_id)
-    # new_lot = previous_stock_tx.lot
     new_lot.pk = None
     new_lot.added_by = entity
     new_lot.data_origin_entity
@@ -389,17 +389,25 @@ def convert_eth_stock_to_etbe(request, entity, c):
 
     new_lot.volume = volume_etbe
     new_lot.remaining_volume = volume_etbe
-    new_lot.parent_lot = LotV2.objects.get(pk=previous_lot_id)
+    new_lot.parent_lot = None
     new_lot.save()
 
     # create transaction
     transaction = previous_stock_tx
     transaction.pk = None
+    transaction.parent_tx_id = previous_tx_id
     transaction.lot = new_lot
     transaction.carbure_vendor = entity
     transaction.dae = 'CONVERSION-ETBE'
     transaction.champ_libre = 'CONVERSION-ETBE'
     transaction.save()
+
+    previous_stock_tx.child_tx_id = transaction.pk
+    assert(previous_stock_tx.child_tx_id != None)
+    assert(previous_stock_tx.child_tx_id != previous_stock_tx_id)
+    assert(transaction.pk != previous_stock_tx_id)
+    assert(transaction.parent_tx_id != transaction.pk)
+    assert(transaction.parent_tx_id != None)
 
     # save ETBE Transformation
     t = ETBETransformation()
