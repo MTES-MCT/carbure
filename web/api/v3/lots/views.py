@@ -90,6 +90,8 @@ def get_details(request, *args, **kwargs):
 
     data = {}
     data['transaction'] = tx.natural_key()
+    data['parent'] = tx.parent_tx.natural_key() if tx.parent_tx else None
+    data['children'] = [tx.natural_key() for tx in LotTransaction.objects.filter(parent_tx=tx)]
     data['distance'] = get_transaction_distance(tx)
     data['errors'] = get_errors(tx, entity)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")
@@ -370,7 +372,9 @@ def delete_lot(request, *args, **kwargs):
             tx.lot.parent_lot.remaining_volume += tx.lot.volume
             tx.lot.parent_lot.remaining_volume = round(tx.lot.parent_lot.remaining_volume, 2)
             tx.lot.parent_lot.save()
-        tx.lot.delete()
+        if tx.parent_tx != None:
+            LotTransaction.objects.filter(id=tx.parent_tx_id).update(is_forwarded=False)
+        tx.delete()
         deleted += 1
     return JsonResponse({'status': 'success', 'deleted': deleted})
 
