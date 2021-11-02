@@ -5,10 +5,10 @@ import {
   DoubleCountingSourcing,
   DoubleCountingProduction,
   DoubleCountingDetails,
-  DoubleCountingSourcingAggregation
+  DoubleCountingSourcingAggregation,
 } from "../types"
-import Table, { Column, Row } from "common/components/table"
-import { Input } from 'common/components/input'
+import Table, { Column, Line, Row } from "common/components/table"
+import { Input } from "common/components/input"
 import { padding } from "transactions/components/list-columns"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { formatDate } from "settings/components/common"
@@ -66,22 +66,24 @@ type SourcingAggregationTableProps = {
   sourcing: DoubleCountingSourcingAggregation[]
 }
 
-export const SourcingAggregationTable = ({ sourcing }: SourcingAggregationTableProps) => {
+export const SourcingAggregationTable = ({
+  sourcing,
+}: SourcingAggregationTableProps) => {
   const { t } = useTranslation()
 
   const columns: Column<DoubleCountingSourcingAggregation>[] = [
     padding,
     {
       header: t("Matière première"),
-      render: (s) => t(s.feedstock.code, { ns: "feedstocks" }),
+      render: (s) => <Line text={t(s.feedstock.code, { ns: "feedstocks" })} />,
     },
     {
       header: t("Poids total en tonnes"),
-      render: (s) => s.sum,
+      render: (s) => <Line text={s.sum} />,
     },
     {
-      header: t("Sources"),
-      render: (s) => s.count,
+      header: t("Pays d'origine"),
+      render: (s) => <Line text={s.count} />,
     },
     padding,
   ]
@@ -112,23 +114,23 @@ export const ProductionTable = ({
     padding,
     {
       header: t("Matière première"),
-      render: (p) => t(p.feedstock.code, { ns: "feedstocks" }),
+      render: (p) => <Line text={t(p.feedstock.code, { ns: "feedstocks" })} />,
     },
     {
       header: t("Biocarburant"),
-      render: (p) => t(p.biofuel.code, { ns: "biofuels" }),
+      render: (p) => <Line text={t(p.biofuel.code, { ns: "biofuels" })} />,
     },
     {
       header: t("Prod. max"),
-      render: (p) => p.max_production_capacity,
+      render: (p) => <Line text={p.max_production_capacity} />,
     },
     {
       header: t("Prod. estimée"),
-      render: (p) => p.estimated_production,
+      render: (p) => <Line text={p.estimated_production} />,
     },
     {
       header: t("Quota demandé"),
-      render: (p) => p.requested_quota,
+      render: (p) => <Line text={p.requested_quota} />,
     },
     {
       header: t("Quota approuvé"),
@@ -169,24 +171,29 @@ export const StatusTable = ({ agreement }: StatusTableProps) => {
     padding,
     {
       header: t("Administration"),
-      render: (s) => s.entity,
+      render: (s) => <Line text={s.entity} />,
     },
     {
       header: t("Statut"),
-      render: (s) =>
-        !s.approved && s.user
-          ? t("Refusé")
-          : s.approved
-          ? t("Accepté")
-          : t("En attente"),
+      render: (s) => (
+        <Line
+          text={
+            !s.approved && s.user
+              ? t("Refusé")
+              : s.approved
+              ? t("Accepté")
+              : t("En attente")
+          }
+        />
+      ),
     },
     {
       header: t("Validateur"),
-      render: (s) => s.user || "N/A",
+      render: (s) => <Line text={s.user} />,
     },
     {
       header: t("Date"),
-      render: (s) => formatDate(s.date),
+      render: (s) => <Line text={formatDate(s.date)} />,
     },
     padding,
   ]

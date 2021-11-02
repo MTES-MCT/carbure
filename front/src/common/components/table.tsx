@@ -1,15 +1,20 @@
-import React, { useState } from "react"
+import React from "react"
 import cl from "clsx"
 
 import { Box, SystemProps } from "."
 import styles from "./table.module.css"
 import { ChevronRight, IconProps } from "./icons"
+import { TFunctionResult } from "i18next"
 
-type LineProps = { text: string; small?: boolean; level?: "warning" }
+type LineProps = {
+  text: string | number | TFunctionResult
+  small?: boolean
+  level?: "warning"
+}
 
 export const Line = ({ text, small = false, level }: LineProps) => (
   <span
-    title={text}
+    title={`${text}`}
     className={cl(
       styles.rowLine,
       small && styles.extraInfo,

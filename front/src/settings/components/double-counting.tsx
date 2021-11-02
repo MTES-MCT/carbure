@@ -3,19 +3,25 @@ import { Trans, useTranslation } from "react-i18next"
 import styles from "./settings.module.css"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { CompanySettingsHook as DoubleContingSettingsHook } from "../hooks/use-company"
-import { ProductionSite, UserRole } from 'common/types'
+import { ProductionSite, UserRole } from "common/types"
 import {
   DoubleCounting,
   DoubleCountingStatus as DCStatus,
   DoubleCountingSourcing,
   DoubleCountingProduction,
-  QuotaDetails
+  QuotaDetails,
 } from "doublecount/types"
 import { Title, LoaderOverlay, Box } from "common/components"
 import { SectionHeader, SectionBody, Section } from "common/components/section"
 import { useRights } from "carbure/hooks/use-rights"
-import Table, { Line, TwoLines, Actions, Column, Row } from "common/components/table"
-import tableCSS from 'common/components/table.module.css'
+import Table, {
+  Line,
+  TwoLines,
+  Actions,
+  Column,
+  Row,
+} from "common/components/table"
+import tableCSS from "common/components/table.module.css"
 import { AsyncButton, Button } from "common/components/button"
 import {
   AlertCircle,
@@ -52,9 +58,9 @@ import { Form } from "common/components/form"
 import { LabelInput } from "common/components/input"
 import useForm from "common/hooks/use-form"
 import YearTable from "doublecount/components/year-table"
-import DoubleCountingStatus from 'doublecount/components/dc-status'
-import { SourcingAggregationTable } from 'doublecount/components/dc-tables'
-import { prettyVolume } from 'transactions/helpers'
+import DoubleCountingStatus from "doublecount/components/dc-status"
+import { SourcingAggregationTable } from "doublecount/components/dc-tables"
+import { prettyVolume } from "transactions/helpers"
 
 type DoubleCountingUploadPromptProps = PromptProps<void> & {
   entity: EntitySelection
@@ -515,18 +521,24 @@ const QuotasTable = ({ entity, agreement }: QuotasTableProps) => {
     getDetails(entityID, dcaID)
   }, [getDetails, entityID, dcaID])
 
-
   const columns: Column<QuotaDetails>[] = [
-    { header: t("Biocarburant"), render: (d) => <Line text={d.biofuel.name} /> },
-    { header: t("Matière première"), render: (d) => <Line text={d.feedstock.name} /> },
+    {
+      header: t("Biocarburant"),
+      render: (d) => <Line text={d.biofuel.name} />,
+    },
+    {
+      header: t("Matière première"),
+      render: (d) => <Line text={d.feedstock.name} />,
+    },
     { header: t("Nombre de lots"), render: (d) => d.nb_lots },
     {
-      header: t("Volume produit"), render: (d) => (
+      header: t("Volume produit"),
+      render: (d) => (
         <TwoLines
           text={`${prettyVolume(d.volume)} L`}
           sub={`${d.current_production_weight_sum_tonnes} t`}
         />
-      )
+      ),
     },
     { header: t("Quota approuvé"), render: (d) => d.approved_quota },
     {
@@ -541,7 +553,7 @@ const QuotasTable = ({ entity, agreement }: QuotasTableProps) => {
     },
   ]
 
-  const rows = (details.data ?? []).map(value => ({ value }))
+  const rows = (details.data ?? []).map((value) => ({ value }))
 
   return (
     <>
@@ -618,7 +630,7 @@ const DoubleCountingPrompt = ({
     padding,
     {
       header: t("Matière première"),
-      render: (s) => t(s.feedstock.code, { ns: "feedstocks" }),
+      render: (s) => <Line text={t(s.feedstock.code, { ns: "feedstocks" })} />,
     },
     {
       header: t("Poids en tonnes"),
@@ -626,18 +638,23 @@ const DoubleCountingPrompt = ({
     },
     {
       header: t("Origine"),
-      render: (s) => t(s.origin_country.code_pays, { ns: "countries" }),
+      render: (s) => (
+        <Line text={t(s.origin_country.code_pays, { ns: "countries" })} />
+      ),
     },
     {
       header: t("Approvisionnement"),
       render: (s) =>
-        s.supply_country && t(s.supply_country.code_pays, { ns: "countries" }),
+        s.supply_country && (
+          <Line text={t(s.supply_country.code_pays, { ns: "countries" })} />
+        ),
     },
     {
       header: t("Transit"),
       render: (s) =>
-        s.transit_country &&
-        t(s.transit_country.code_pays, { ns: "countries" }),
+        s.transit_country && (
+          <Line text={t(s.transit_country.code_pays, { ns: "countries" })} />
+        ),
     },
     padding,
   ]
@@ -663,28 +680,28 @@ const DoubleCountingPrompt = ({
     onClick: isFinal
       ? undefined
       : async () => {
-        const ok = await prompt((resolve) => (
-          <DoubleCountingSourcingPrompt
-            entity={entity}
-            dcaID={dcaID}
-            sourcing={s}
-            onResolve={resolve}
-          />
-        ))
+          const ok = await prompt((resolve) => (
+            <DoubleCountingSourcingPrompt
+              entity={entity}
+              dcaID={dcaID}
+              sourcing={s}
+              onResolve={resolve}
+            />
+          ))
 
-        ok && reloadAgreement()
-      },
+          ok && reloadAgreement()
+        },
   }))
 
   const productionColumns: Column<DoubleCountingProduction>[] = [
     padding,
     {
       header: t("Matière première"),
-      render: (p) => t(p.feedstock.code, { ns: "feedstocks" }),
+      render: (p) => <Line text={t(p.feedstock.code, { ns: "feedstocks" })} />,
     },
     {
       header: t("Biocarburant"),
-      render: (p) => t(p.biofuel.code, { ns: "biofuels" }),
+      render: (p) => <Line text={t(p.biofuel.code, { ns: "biofuels" })} />,
     },
     {
       header: t("Prod. max"),
@@ -727,17 +744,17 @@ const DoubleCountingPrompt = ({
     onClick: isFinal
       ? undefined
       : async () => {
-        const ok = await prompt((resolve) => (
-          <DoubleCountingProductionPrompt
-            entity={entity}
-            dcaID={dcaID}
-            production={p}
-            onResolve={resolve}
-          />
-        ))
+          const ok = await prompt((resolve) => (
+            <DoubleCountingProductionPrompt
+              entity={entity}
+              dcaID={dcaID}
+              production={p}
+              onResolve={resolve}
+            />
+          ))
 
-        ok && reloadAgreement()
-      },
+          ok && reloadAgreement()
+        },
   }))
 
   const productionSite = agreement.data?.production_site ?? "N/A"
@@ -745,16 +762,23 @@ const DoubleCountingPrompt = ({
     ? formatDate(agreement.data.creation_date)
     : "N/A"
 
-
-  const documentationFile = agreement.data?.documents.find(doc => doc.file_type === 'SOURCING')
-  const decisionFile = agreement.data?.documents.find(doc => doc.file_type === 'DECISION')
+  const documentationFile = agreement.data?.documents.find(
+    (doc) => doc.file_type === "SOURCING"
+  )
+  const decisionFile = agreement.data?.documents.find(
+    (doc) => doc.file_type === "DECISION"
+  )
 
   const excelURL =
     agreement.data &&
     `/api/v3/doublecount/agreement?dca_id=${dcaID}&entity_id=${entity?.id}&export=true`
-  const documentationURL = entity && documentationFile &&
+  const documentationURL =
+    entity &&
+    documentationFile &&
     `/api/v3/doublecount/download-documentation?entity_id=${entity.id}&dca_id=${dcaID}&file_id=${documentationFile.id}`
-  const decisionURL = entity && decisionFile &&
+  const decisionURL =
+    entity &&
+    decisionFile &&
     `/api/v3/doublecount/download-admin-decision?entity_id=${entity.id}&dca_id=${dcaID}&file_id=${decisionFile.id}`
 
   return (
@@ -767,14 +791,22 @@ const DoubleCountingPrompt = ({
       <DialogText>
         <Box row>
           <Trans>
-            Pour le site de production <b>{{ productionSite }}</b>, soumis le <b>{{ creationDate }}</b>
+            Pour le site de production <b>{{ productionSite }}</b>, soumis le{" "}
+            <b>{{ creationDate }}</b>
           </Trans>
         </Box>
 
         <Box row>
           <Trans>
-            Pour toute question concernant l'évolution de votre dossier, contactez-nous à l'adresse{' '}
-            <a target="_blank" rel="noreferrer" href="mailto:doublecompte@carbure.beta.gouv.fr">doublecompte@carbure.beta.gouv.fr</a>
+            Pour toute question concernant l'évolution de votre dossier,
+            contactez-nous à l'adresse{" "}
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="mailto:doublecompte@carbure.beta.gouv.fr"
+            >
+              doublecompte@carbure.beta.gouv.fr
+            </a>
           </Trans>
         </Box>
       </DialogText>
@@ -784,7 +816,7 @@ const DoubleCountingPrompt = ({
           { key: "aggregated_sourcing", label: t("Approvisionnement") },
           { key: "sourcing", label: t("Approvisionnement (détaillé)") },
           { key: "production", label: t("Production") },
-          isAccepted && { key: "quotas", label: t("Suivi des quotas") }
+          isAccepted && { key: "quotas", label: t("Suivi des quotas") },
         ]}
         focus={focus}
         onFocus={setFocus}
@@ -792,7 +824,9 @@ const DoubleCountingPrompt = ({
 
       <div className={styles.modalTableContainer}>
         {focus === "aggregated_sourcing" && (
-          <SourcingAggregationTable sourcing={agreement.data?.aggregated_sourcing ?? []} />
+          <SourcingAggregationTable
+            sourcing={agreement.data?.aggregated_sourcing ?? []}
+          />
         )}
 
         {focus === "sourcing" && (
@@ -872,7 +906,7 @@ const DoubleCountingPrompt = ({
             <Upload />
             <Trans>Télécharger la description de l'activité</Trans>
           </a>
-          {decisionURL &&
+          {decisionURL && (
             <a
               href={decisionURL}
               target="_blank"
@@ -882,7 +916,7 @@ const DoubleCountingPrompt = ({
               <Upload />
               <Trans>Télécharger la décision de l'administration</Trans>
             </a>
-          }
+          )}
         </Box>
 
         <Button icon={Return} onClick={() => onResolve()}>
@@ -926,19 +960,22 @@ const DoubleCountingSettings = ({
     },
     {
       header: t("Site de production"),
-      render: (dc) => dc.production_site,
+      render: (dc) => <Line text={dc.production_site} />,
     },
     {
       header: t("Période de validité"),
-      render: (dc) =>
-        `${formatDate(dc.period_start, YEAR_ONLY)} - ${formatDate(
-          dc.period_end,
-          YEAR_ONLY
-        )}`,
+      render: (dc) => (
+        <Line
+          text={`${formatDate(dc.period_start, YEAR_ONLY)} - ${formatDate(
+            dc.period_end,
+            YEAR_ONLY
+          )}`}
+        />
+      ),
     },
     {
       header: t("Date de soumission"),
-      render: (dc) => formatDate(dc.creation_date),
+      render: (dc) => <Line text={formatDate(dc.creation_date)} />,
     },
     padding,
   ]

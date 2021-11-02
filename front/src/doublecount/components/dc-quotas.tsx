@@ -45,7 +45,7 @@ const QuotasDetailsPrompt = ({
       header: t("Matière première"),
       render: (d) => <Line text={d.feedstock.name} />,
     },
-    { header: t("Nombre de lots"), render: (d) => d.nb_lots },
+    { header: t("Nombre de lots"), render: (d) => <Line text={d.nb_lots} /> },
     {
       header: t("Volume produit"),
       render: (d) => (
@@ -55,7 +55,10 @@ const QuotasDetailsPrompt = ({
         />
       ),
     },
-    { header: t("Quota approuvé"), render: (d) => d.approved_quota },
+    {
+      header: t("Quota approuvé"),
+      render: (d) => <Line text={d.approved_quota} />,
+    },
     {
       header: t("Progression des quotas"),
       render: (d) => (
@@ -116,8 +119,11 @@ const QuotasList = ({ year }: QuotasListProps) => {
   }, [getQuotas, year])
 
   const columns: Column<QuotaOverview>[] = [
-    { header: t("Producteur"), render: (a) => a.producer.name },
-    { header: t("Site de production"), render: (a) => a.production_site.name },
+    { header: t("Producteur"), render: (a) => <Line text={a.producer.name} /> },
+    {
+      header: t("Site de production"),
+      render: (a) => <Line text={a.production_site.name} />,
+    },
     {
       header: t("Quotas remplis"),
       render: (a) => (

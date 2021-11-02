@@ -3,7 +3,7 @@ import { useTranslation, Trans } from "react-i18next"
 import { DoubleCounting } from "../types"
 import { LoaderOverlay } from "common/components"
 import Tabs from "common/components/tabs"
-import Table, { Column } from "common/components/table"
+import Table, { Column, Line } from "common/components/table"
 import { padding } from "transactions/components/list-columns"
 import { Alert } from "common/components/alert"
 import { AlertCircle } from "common/components/icons"
@@ -12,7 +12,7 @@ import { DoubleCountingPrompt } from "./agreement-details"
 import { prompt } from "common/components/dialog"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import useAPI from "common/hooks/use-api"
-import DoubleCountingStatus from './dc-status'
+import DoubleCountingStatus from "./dc-status"
 import * as api from "../api"
 
 type AgreementListProps = {
@@ -39,16 +39,25 @@ const AgreementList = ({ entity, year }: AgreementListProps) => {
 
   const columns: Column<DoubleCounting>[] = [
     padding,
-    { header: t("Statut"), render: (a) => <DoubleCountingStatus status={a.status} /> },
-    { header: t("Producteur"), render: (a) => a.producer.name },
-    { header: t("Site de production"), render: (a) => a.production_site },
+    {
+      header: t("Statut"),
+      render: (a) => <DoubleCountingStatus status={a.status} />,
+    },
+    { header: t("Producteur"), render: (a) => <Line text={a.producer.name} /> },
+    {
+      header: t("Site de production"),
+      render: (a) => <Line text={a.production_site} />,
+    },
     {
       header: t("Période de validité"),
-      render: (a) =>
-        `${formatDate(a.period_start, YEAR_ONLY)} - ${formatDate(
-          a.period_end,
-          YEAR_ONLY
-        )}`,
+      render: (a) => (
+        <Line
+          text={`${formatDate(a.period_start, YEAR_ONLY)} - ${formatDate(
+            a.period_end,
+            YEAR_ONLY
+          )}`}
+        />
+      ),
     },
     {
       header: t("Date de soumission"),

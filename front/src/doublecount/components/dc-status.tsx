@@ -1,14 +1,13 @@
-import cl from "clsx"
-import { useTranslation } from 'react-i18next'
-import { DoubleCountingStatus as DCStatus } from '../types'
-import Badge, { Variant } from 'common/components/badge'
+import { useTranslation } from "react-i18next"
+import { DoubleCountingStatus as DCStatus } from "../types"
+import Badge, { Variant } from "common/components/badge"
 
 const statusToVariant: Record<DCStatus, Variant> = {
-  [DCStatus.Accepted]: 'success',
-  [DCStatus.InProgress]: 'warning',
-  [DCStatus.Pending]: 'info',
-  [DCStatus.Rejected]: 'danger',
-  [DCStatus.Lapsed]: 'warning',
+  [DCStatus.Accepted]: "success",
+  [DCStatus.InProgress]: "warning",
+  [DCStatus.Pending]: "info",
+  [DCStatus.Rejected]: "danger",
+  [DCStatus.Lapsed]: "warning",
 }
 
 const DoubleCountingStatus = ({ status }: { status: DCStatus }) => {
@@ -23,10 +22,7 @@ const DoubleCountingStatus = ({ status }: { status: DCStatus }) => {
   }
 
   return (
-    <Badge
-      style={{ marginRight: 12 }}
-      variant={statusToVariant[status]}
-    >
+    <Badge style={{ marginRight: 12 }} variant={statusToVariant[status]}>
       {statusLabels[status]}
     </Badge>
   )
