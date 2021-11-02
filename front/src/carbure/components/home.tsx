@@ -246,8 +246,8 @@ const Home = ({ app }: HomeProps) => {
               <ul>
                 <li>
                   <Trans>
-                    La plateforme analyse les données et assure la compatibilité
-                    avec la réglementation
+                    La plateforme analyse les données envoyées et assure la
+                    compatibilité avec la réglementation
                   </Trans>
                 </li>
                 <li>
@@ -309,7 +309,8 @@ const Home = ({ app }: HomeProps) => {
               <ul>
                 <li>
                   <Trans>
-                    Garantie de compatibilité avec la réglementation
+                    Garantie de compatibilité des déclarations avec la
+                    réglementation
                   </Trans>
                 </li>
                 <li>
@@ -319,6 +320,9 @@ const Home = ({ app }: HomeProps) => {
                 </li>
                 <li>
                   <Trans>Archivage numérique des données de durabilité</Trans>
+                </li>
+                <li>
+                  <Trans>Simplification des audits</Trans>
                 </li>
               </ul>
             </div>
