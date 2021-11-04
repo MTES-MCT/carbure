@@ -273,6 +273,7 @@ class LotsAPITest(TransactionTestCase):
         
         # delete-all-drafts
         txs = LotTransaction.objects.filter(lot__status='Draft')
+        self.assertEqual(txs.count(), nb_lots)
         response = self.client.post(reverse('api-v3-delete-lot'), {'entity_id': self.test_producer.id, 'tx_ids': [tx.id for tx in txs]})      
         self.assertEqual(response.status_code, 200)
         res = response.json()

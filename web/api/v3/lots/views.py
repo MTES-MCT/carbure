@@ -374,7 +374,10 @@ def delete_lot(request, *args, **kwargs):
             tx.lot.parent_lot.save()
         if tx.parent_tx != None:
             LotTransaction.objects.filter(id=tx.parent_tx_id).update(is_forwarded=False)
+        lot_id = tx.lot.id
         tx.delete()
+        if LotTransaction.objects.filter(lot_id=lot_id).count() == 0:
+            LotV2.objects.filter(id=lot_id).delete()
         deleted += 1
     return JsonResponse({'status': 'success', 'deleted': deleted})
 
