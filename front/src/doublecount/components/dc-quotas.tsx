@@ -57,7 +57,7 @@ const QuotasDetailsPrompt = ({
     },
     {
       header: t("Quota approuvé"),
-      render: (d) => <Line text={d.approved_quota} />,
+      render: (d) => <Line text={prettyVolume(d.approved_quota)} />,
     },
     {
       header: t("Progression des quotas"),
