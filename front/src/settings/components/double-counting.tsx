@@ -540,7 +540,10 @@ const QuotasTable = ({ entity, agreement }: QuotasTableProps) => {
         />
       ),
     },
-    { header: t("Quota approuvé"), render: (d) => d.approved_quota },
+    {
+      header: t("Quota approuvé"),
+      render: (d) => <Line text={prettyVolume(d.approved_quota)} />,
+    },
     {
       header: t("Progression des quotas"),
       render: (d) => (
@@ -634,7 +637,7 @@ const DoubleCountingPrompt = ({
     },
     {
       header: t("Poids en tonnes"),
-      render: (s) => s.metric_tonnes,
+      render: (s) => <Line text={prettyVolume(s.metric_tonnes)} />,
     },
     {
       header: t("Origine"),
@@ -705,20 +708,26 @@ const DoubleCountingPrompt = ({
     },
     {
       header: t("Prod. max"),
-      render: (p) => p.max_production_capacity,
+      render: (p) => (
+        <Line text={prettyVolume(p.max_production_capacity ?? 0)} />
+      ),
     },
     {
       header: t("Prod. estimée"),
-      render: (p) => p.estimated_production,
+      render: (p) => <Line text={prettyVolume(p.estimated_production)} />,
     },
     {
       header: t("Quota demandé"),
-      render: (p) => p.requested_quota,
+      render: (p) => <Line text={prettyVolume(p.requested_quota)} />,
     },
     {
       header: t("Quota approuvé"),
       render: (p) =>
-        p.approved_quota === -1 ? t("En attente") : p.approved_quota,
+        p.approved_quota === -1 ? (
+          t("En attente")
+        ) : (
+          <Line text={prettyVolume(p.approved_quota)} />
+        ),
     },
     padding,
   ]

@@ -13,6 +13,7 @@ import { padding } from "transactions/components/list-columns"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { formatDate } from "settings/components/common"
 import YearTable from "./year-table"
+import { prettyVolume } from "transactions/helpers"
 
 type ValidationStatus = {
   approved: boolean
@@ -33,26 +34,31 @@ export const SourcingTable = ({ sourcing }: SourcingTableProps) => {
     padding,
     {
       header: t("Matière première"),
-      render: (s) => t(s.feedstock.code, { ns: "feedstocks" }),
+      render: (s) => <Line text={t(s.feedstock.code, { ns: "feedstocks" })} />,
     },
     {
       header: t("Poids en tonnes"),
-      render: (s) => s.metric_tonnes,
+      render: (s) => <Line text={prettyVolume(s.metric_tonnes)} />,
     },
     {
       header: t("Origine"),
-      render: (s) => t(s.origin_country.code_pays, { ns: "countries" }),
+      render: (s) => (
+        <Line text={t(s.origin_country.code_pays, { ns: "countries" })} />
+      ),
     },
     {
       header: t("Approvisionnement"),
       render: (s) =>
-        s.supply_country && t(s.supply_country.code_pays, { ns: "countries" }),
+        s.supply_country && (
+          <Line text={t(s.supply_country.code_pays, { ns: "countries" })} />
+        ),
     },
     {
       header: t("Transit"),
       render: (s) =>
-        s.transit_country &&
-        t(s.transit_country.code_pays, { ns: "countries" }),
+        s.transit_country && (
+          <Line text={t(s.transit_country.code_pays, { ns: "countries" })} />
+        ),
     },
     padding,
   ]
@@ -79,7 +85,7 @@ export const SourcingAggregationTable = ({
     },
     {
       header: t("Poids total en tonnes"),
-      render: (s) => <Line text={s.sum} />,
+      render: (s) => <Line text={prettyVolume(s.sum)} />,
     },
     {
       header: t("Pays d'origine"),
@@ -122,15 +128,17 @@ export const ProductionTable = ({
     },
     {
       header: t("Prod. max"),
-      render: (p) => <Line text={p.max_production_capacity} />,
+      render: (p) => (
+        <Line text={prettyVolume(p.max_production_capacity ?? 0)} />
+      ),
     },
     {
       header: t("Prod. estimée"),
-      render: (p) => <Line text={p.estimated_production} />,
+      render: (p) => <Line text={prettyVolume(p.estimated_production ?? 0)} />,
     },
     {
       header: t("Quota demandé"),
-      render: (p) => <Line text={p.requested_quota} />,
+      render: (p) => <Line text={prettyVolume(p.requested_quota)} />,
     },
     {
       header: t("Quota approuvé"),
