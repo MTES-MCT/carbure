@@ -103,7 +103,7 @@ def get_agreement(request, *args, **kwargs):
         return response
 
 
-@is_admin
+@is_admin_or_external_admin
 def get_agreement_admin(request, *args, **kwargs):
     agreement_id = request.GET.get('dca_id', None)
     export = request.GET.get('export', False)
@@ -338,7 +338,7 @@ def download_admin_decision(request, *args, **kwargs):
     return response
 
 
-@is_admin
+@is_admin_or_external_admin
 def admin_download_admin_decision(request):
     dca_id = request.GET.get('dca_id', None)
     if not dca_id:
