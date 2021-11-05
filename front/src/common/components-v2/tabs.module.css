@@ -1,0 +1,84 @@
+.tabs {
+  display: flex;
+}
+
+.tabs a {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  color: var(--black);
+}
+
+.header a {
+  padding: var(--spacing-m);
+  font-size: 1.1em;
+  text-decoration: none;
+  white-space: pre-wrap;
+}
+
+.header a:hover {
+  color: var(--blue-dark);
+}
+
+.header a.active {
+  font-weight: 600;
+  border-bottom: 4px solid var(--blue-dark);
+}
+
+.main {
+  flex: 1;
+  gap: var(--spacing-l);
+}
+
+.main a {
+  flex: 1;
+  justify-content: center;
+  border: 1px solid var(--gray-medium);
+  background-color: var(--white);
+  text-decoration: none;
+  font-size: 1.1em;
+  font-weight: bold;
+  padding: var(--spacing-m) var(--spacing-l);
+  gap: var(--spacing-xxs);
+}
+
+.main a:hover {
+  background-color: var(--gray-highlight);
+  border-color: var(--blue-medium);
+  color: var(--blue-medium);
+}
+
+.main a.active {
+  border-bottom: 4px solid var(--blue-medium);
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  padding: var(--spacing-m) var(--main-spacing-x);
+  background-color: var(--gray-light);
+  box-shadow: var(--shadow);
+  z-index: 1;
+}
+
+.section,
+.sticky {
+  gap: var(--spacing-m);
+}
+
+.section a,
+.sticky a {
+  font-size: 1.1em;
+}
+
+.section a:hover,
+.sticky a:hover {
+  text-decoration: underline;
+}
+
+.section a.active,
+.sticky a.active {
+  font-weight: bold;
+  text-decoration: underline;
+}
