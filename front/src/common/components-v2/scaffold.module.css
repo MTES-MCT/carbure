@@ -1,0 +1,134 @@
+.header {
+  display: flex;
+  background-color: var(--white);
+  padding: 0 var(--main-spacing-x);
+  gap: var(--spacing-m);
+  box-shadow: var(--shadow);
+  height: 64px;
+}
+
+.header [data-field] input {
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+}
+
+.main > header {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--gray-light);
+  padding: var(--main-spacing-y) var(--main-spacing-x);
+  gap: var(--spacing-xl);
+  box-shadow: var(--shadow);
+  border-top: var(--border);
+}
+
+.main > header > section {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-m);
+}
+
+.main > section {
+  display: flex;
+  flex-direction: column;
+  padding: var(--main-spacing-y) var(--main-spacing-x);
+  gap: var(--spacing-l);
+}
+
+.main > header h1 {
+  font-size: 1.5em;
+}
+
+.main > header input {
+  font-size: 1.3em;
+  font-weight: 600;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--white);
+  margin-top: auto;
+}
+
+.footer > section {
+  padding: var(--spacing-s) var(--main-spacing-x);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--white);
+  border: 1px solid var(--gray-medium);
+  gap: var(--spacing-l);
+}
+
+.panel > header {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-l);
+  padding-bottom: 0;
+  gap: var(--spacing-m);
+}
+
+.panel > header > h1 {
+  font-size: 1.35em;
+}
+
+.panel > section {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacing-l);
+  gap: var(--spacing-s);
+}
+
+.panel > footer {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-l);
+  padding-top: 0;
+}
+
+section.bar {
+  display: flex;
+  background-color: var(--white);
+  padding: var(--spacing-m) var(--main-spacing-x);
+  gap: var(--spacing-s);
+  box-shadow: var(--shadow);
+  border-top: var(--border);
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+}
+
+.grid {
+  --grid-cell-width: 192px;
+  display: grid;
+  position: relative;
+  grid-template-columns: repeat(auto-fit, minmax(var(--grid-cell-width), 1fr));
+  counter-reset: grid-items;
+  grid-gap: var(--spacing-s);
+}
+
+.grid > * {
+  counter-increment: grid-item;
+}
+
+[data-aside] {
+  margin-left: auto;
+}
+
+[data-spread] {
+  flex: 1;
+}

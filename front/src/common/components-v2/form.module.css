@@ -1,0 +1,43 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-l);
+}
+
+.complex {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.inline {
+  flex: 1;
+  display: inline-flex;
+  flex-direction: row;
+  gap: 0;
+}
+
+.inline [data-field] {
+  flex: 1;
+}
+
+.fieldset {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0;
+  min-width: 192px;
+  gap: var(--spacing-s);
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.fieldset legend {
+  font-weight: 600;
+  padding: 0;
+  margin-left: var(--spacing-xs);
+  margin-bottom: var(--spacing-s);
+}
+
+.fieldset input {
+  width: 0;
+}

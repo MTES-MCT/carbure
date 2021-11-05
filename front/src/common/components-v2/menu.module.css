@@ -1,0 +1,27 @@
+.menu {
+  font-size: 1.1em;
+  color: var(--black);
+  padding: var(--spacing-s);
+}
+
+.dropdown {
+  max-height: 50vh;
+}
+
+.items li {
+  padding: 0;
+}
+
+.items li > * {
+  width: 100%;
+  padding: var(--spacing-s) var(--spacing-m);
+  text-decoration: none;
+}
+
+.items [data-focused] {
+  text-decoration: underline;
+}
+
+.items [data-level="1"] * {
+  padding-left: var(--spacing-l);
+}
