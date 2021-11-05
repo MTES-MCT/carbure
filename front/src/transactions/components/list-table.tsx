@@ -1,5 +1,6 @@
 import cl from "clsx"
 import { TFunction, useTranslation } from "react-i18next"
+import { useNavigate } from "react-router-dom"
 
 import {
   Entity,
@@ -14,7 +15,6 @@ import { TransactionSelection } from "transactions/hooks/query/use-selection"
 import { StatusSelection } from "transactions/hooks/query/use-status"
 
 import { hasDeadline, hasErrors, hasWarnings } from "../helpers"
-import { useRelativePush } from "common/components/relative-route"
 
 import {
   AlertTriangle,
@@ -161,7 +161,7 @@ export const TransactionTable = ({
   const { t } = useTranslation()
 
   const rights = useRights()
-  const relativePush = useRelativePush()
+  const navigate = useNavigate()
   const deadline = transactions.deadlines.date
 
   const isProducer = entity.entity_type === EntityType.Producer
@@ -242,7 +242,7 @@ export const TransactionTable = ({
 
   const rows: Row<Transaction>[] = transactions.lots.map((tx) => ({
     value: tx,
-    onClick: () => relativePush(`${tx.id}`),
+    onClick: () => navigate(`${tx.id}`),
     className: cl({
       [styles.transactionRowError]: hasErrors(tx, transactions.errors),
       [styles.transactionRowWarning]: hasWarnings(tx, transactions.errors),

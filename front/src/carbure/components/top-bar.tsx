@@ -1,12 +1,12 @@
 import React from "react"
+import cl from 'clsx'
 import { Trans, useTranslation } from "react-i18next"
-import { useLocation } from "react-router-dom"
+import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom"
 
 import useEntity, { EntitySelection, hasPage } from "carbure/hooks/use-entity"
 
 import { EntityType, ExternalAdminPages } from 'common/types'
 import Menu from "common/components/menu"
-import { Link, NavLink, Route } from "common/components/relative-route"
 import { ChevronRight, Question } from "common/components/icons"
 
 import logoRepublique from "../assets/images/republique.svg"
@@ -47,10 +47,8 @@ type PageLinkProps = {
 
 const PageLink = ({ to, children }: PageLinkProps) => (
   <NavLink
-    relative
     to={to}
-    className={styles.pageLink}
-    activeClassName={styles.activePageLink}
+    className={({ isActive }) => cl(styles.pageLink, isActive && styles.activePageLink)}
   >
     {children}
   </NavLink>
@@ -86,7 +84,7 @@ const UserMenu = ({ app, entity }: UserMenuProps) => {
       )}
 
       <Menu.Group label={app.settings.data?.email ?? t("Utilisateur")}>
-        <Menu.ItemLink relative to="account">
+        <Menu.ItemLink to="account">
           <Trans>Mon compte</Trans>
         </Menu.ItemLink>
         <Menu.ItemLink to="/logout">
@@ -196,59 +194,61 @@ export const PrivateTopbar = ({ entity, app }: PrivateTopbarProps) => {
       )}
 
       {entity && (
-        <Route path="/org/:entity">
-          <section className={styles.pageNav}>
-            {isAdmin(entity) && (
-              <PageLink to="dashboard">
-                <Trans>Accueil</Trans>
-              </PageLink>
-            )}
-
-            {canTrade(entity) && (
-              <PageLink to="stocks">
-                <Trans>Stocks</Trans>
-              </PageLink>
-            )}
-
-            {!isExternal(entity) && (
-              <PageLink to="transactions">
-                <Trans>Transactions</Trans>
-              </PageLink>
-            )}
-
-            {isAdmin(entity) && (
-              <React.Fragment>
-                <PageLink to="entities">
-                  <Trans>Sociétés</Trans>
+        <Routes>
+          <Route path="/org/:entity/*" element={
+            <section className={styles.pageNav}>
+              {isAdmin(entity) && (
+                <PageLink to="dashboard">
+                  <Trans>Accueil</Trans>
                 </PageLink>
-              </React.Fragment>
-            )}
+              )}
 
-            {(isAdmin(entity) || hasPage(entity, ExternalAdminPages.DoubleCounting)) && (
-              <PageLink to="double-counting">
-                <Trans>Double comptage</Trans>
-              </PageLink>
-            )}
+              {canTrade(entity) && (
+                <PageLink to="stocks">
+                  <Trans>Stocks</Trans>
+                </PageLink>
+              )}
 
-            {(isAdmin(entity) || isExternal(entity)) && (
-              <PageLink to="settings">
-                <Trans>Options</Trans>
-              </PageLink>
-            )}
+              {!isExternal(entity) && (
+                <PageLink to="transactions">
+                  <Trans>Transactions</Trans>
+                </PageLink>
+              )}
 
-            {!isAdmin(entity) && !isExternal(entity) && (
-              <React.Fragment>
+              {isAdmin(entity) && (
+                <React.Fragment>
+                  <PageLink to="entities">
+                    <Trans>Sociétés</Trans>
+                  </PageLink>
+                </React.Fragment>
+              )}
+
+              {(isAdmin(entity) || hasPage(entity, ExternalAdminPages.DoubleCounting)) && (
+                <PageLink to="double-counting">
+                  <Trans>Double comptage</Trans>
+                </PageLink>
+              )}
+
+              {(isAdmin(entity) || isExternal(entity)) && (
                 <PageLink to="settings">
-                  <Trans>Société</Trans>
+                  <Trans>Options</Trans>
                 </PageLink>
+              )}
 
-                <PageLink to="registry">
-                  <Trans>Annuaire</Trans>
-                </PageLink>
-              </React.Fragment>
-            )}
-          </section>
-        </Route>
+              {!isAdmin(entity) && !isExternal(entity) && (
+                <React.Fragment>
+                  <PageLink to="settings">
+                    <Trans>Société</Trans>
+                  </PageLink>
+
+                  <PageLink to="registry">
+                    <Trans>Annuaire</Trans>
+                  </PageLink>
+                </React.Fragment>
+              )}
+            </section>
+          } />
+        </Routes>
       )}
 
       <Box row className={styles.topRight}>

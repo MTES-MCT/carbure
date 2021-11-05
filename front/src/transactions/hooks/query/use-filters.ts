@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useHistory, useLocation } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 
 import { PageSelection } from "common/components/pagination"
 import { SelectValue } from "common/components/select"
@@ -42,7 +42,7 @@ export interface FilterSelection {
 export default function useFilterSelection(
   pagination: PageSelection
 ): FilterSelection {
-  const history = useHistory()
+  const navigate = useNavigate()
   const location = useLocation()
   const selected = useLocationFilters()
 
@@ -59,7 +59,7 @@ export default function useFilterSelection(
 
     if (queryString) {
       pagination.setPage(0)
-      history.push(`?${queryString}`)
+      navigate(`?${queryString}`)
     } else {
       reset()
     }
@@ -67,7 +67,7 @@ export default function useFilterSelection(
 
   function reset() {
     pagination.setPage(0)
-    history.push({ search: "" })
+    navigate({ search: "" })
   }
 
   function isFiltered() {

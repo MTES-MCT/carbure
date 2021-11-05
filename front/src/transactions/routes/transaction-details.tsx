@@ -12,7 +12,7 @@ import { LotAdministrator } from "transactions/hooks/actions/use-admin-lots"
 import styles from "../components/form.module.css"
 
 import useTransactionDetails from "../hooks/use-transaction-details"
-import useNavigate from "../hooks/query/use-navigate"
+import useNavigation from "../hooks/query/use-navigate"
 
 import {
   AlertTriangle,
@@ -88,7 +88,7 @@ const TransactionDetails = ({
   const matomo = useMatomo()
 
   const rights = useRights()
-  const navigator = useNavigate(transactions)
+  const navigator = useNavigation(transactions)
 
   const history = details.data?.updates?.filter(
     (h) => t(h.field, { ns: "fields" }) !== h.field

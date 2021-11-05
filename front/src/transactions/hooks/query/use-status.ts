@@ -1,10 +1,9 @@
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 
 import { PageSelection } from "../../../common/components/pagination"
 import { SpecialSelection } from "./use-special"
 import { LotStatus } from "../../../common/types"
 
-import { useRelativePush } from "../../../common/components/relative-route"
 
 export interface StatusSelection {
   active: LotStatus
@@ -17,10 +16,10 @@ export default function useStatusSelection(
   pagination: PageSelection,
   special: SpecialSelection
 ): StatusSelection {
-  const push = useRelativePush()
-  const params: { status: LotStatus } = useParams()
+  const navigate = useNavigate()
+  const params = useParams<"status">()
 
-  const active = params.status
+  const active = params.status as LotStatus ?? LotStatus.Weird
 
   function is(status: LotStatus) {
     return active === status
@@ -29,7 +28,7 @@ export default function useStatusSelection(
   function setActive(status: LotStatus) {
     pagination.setPage(0)
     special.reset()
-    push(`../${status}`)
+    navigate(`../${status}`)
   }
 
   return { active, is, setActive }
@@ -39,13 +38,10 @@ export default function useStatusSelection(
 export function useStockStatusSelection(
   pagination: PageSelection
 ): StatusSelection {
-  const push = useRelativePush()
-  const params: { status: LotStatus } = useParams()
+  const navigate = useNavigate()
+  const params = useParams<"status">()
 
-  if (params.status === null || params.status === undefined) {
-    params.status = LotStatus.Draft
-  }
-  const active = params.status
+  const active: LotStatus = params.status as LotStatus ?? LotStatus.Draft
 
   function is(status: LotStatus) {
     return active === status
@@ -53,7 +49,7 @@ export function useStockStatusSelection(
 
   function setActive(status: LotStatus) {
     pagination.setPage(0)
-    push(`../${status}`)
+    navigate(`../${status}`)
   }
 
   return { active, is, setActive }

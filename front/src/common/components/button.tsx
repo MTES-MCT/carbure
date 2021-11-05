@@ -1,8 +1,8 @@
 import React from "react"
 import cl from "clsx"
+import { NavLink, NavLinkProps } from "react-router-dom"
 import styles from "./button.module.css"
 import { Loader } from "./icons"
-import { NavLink, RelNavLinkProps } from "./relative-route"
 import { SystemProps, AsProp } from "./index"
 
 // BUTTON COMPONENT
@@ -98,11 +98,10 @@ export const TabButton = ({
   children,
   className,
   ...props
-}: RelNavLinkProps) => (
+}: NavLinkProps) => (
   <NavLink
     {...props}
-    className={cl(styles.button, styles.statusButton, className)}
-    activeClassName={styles.activeStatusButton}
+    className={({ isActive }) => cl(styles.button, styles.statusButton, isActive && styles.activeStatusButton, className)}
   >
     <span className={styles.statusButtonLabel}>{children}</span>
   </NavLink>
