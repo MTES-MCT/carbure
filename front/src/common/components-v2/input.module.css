@@ -1,0 +1,152 @@
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.control {
+  display: flex;
+  flex: 1;
+  position: relative;
+  color: var(--black);
+  background-color: var(--white);
+  border: 1px solid var(--gray-medium);
+  font-size: var(--font-size);
+  padding: var(--spacing-s);
+  gap: var(--spacing-xs);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-s) var(--spacing-s);
+}
+
+.inline .control {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--gray-medium);
+  padding: var(--spacing-xs) var(--spacing-s);
+}
+
+.text .control {
+  background-color: transparent;
+  border: none;
+  font-weight: 600;
+  outline: none;
+}
+
+.solid .control {
+  background-color: var(--gray-light);
+  font-weight: 600;
+}
+.control:focus-within {
+  border-color: var(--blue-medium);
+  outline: auto;
+}
+
+.control:hover {
+  color: var(--blue-medium);
+  border-color: var(--blue-medium);
+}
+
+.field[data-disabled] .control {
+  color: var(--gray-dark);
+  background-color: var(--gray-highlight);
+  pointer-events: none;
+}
+
+.field[data-readonly] .control {
+  background-color: transparent;
+  border: none;
+  border-top: 1px solid var(--gray-highlight);
+  color: var(--black);
+}
+
+.field[data-error] .control {
+  border-color: var(--red-dark);
+  color: var(--red-dark);
+}
+
+.text[data-disabled] .control {
+  background-color: transparent;
+}
+
+.label {
+  font-size: 0.9em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--gray-dark);
+  padding-left: var(--spacing-xs);
+}
+
+.field[data-error] .label {
+  color: var(--red-dark);
+}
+
+.control input,
+.control textarea,
+.control .file {
+  flex: 1 1;
+  text-align: left;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  font-size: var(--font-size);
+  font-family: var(--font-family);
+  font-weight: inherit;
+  color: inherit;
+  user-select: text;
+  line-height: 24px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  resize: none;
+  outline: none;
+}
+
+.control textarea {
+  white-space: initial;
+}
+
+.control input[type="button"] {
+  cursor: pointer;
+}
+
+.placeholder {
+  background-color: transparent;
+  pointer-events: none;
+  width: 20px;
+  height: 24px;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  color: var(--gray-dark);
+}
+
+.control textarea + .icon {
+  align-self: flex-start;
+  height: 24px;
+}
+
+.field[data-error] .icon {
+  color: var(--red-dark);
+}
+
+.control [data-icon] {
+  width: 20px;
+  height: 20px;
+}
+
+.search {
+  background-color: var(--white);
+}
+
+.search .icon:first-child {
+  margin: 0 var(--spacing-s);
+}
