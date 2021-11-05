@@ -4,6 +4,8 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 import hashlib
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 
 usermodel = get_user_model()
 
@@ -902,6 +904,40 @@ class CarbureStockTransformation(models.Model):
         verbose_name_plural = 'CarbureStockTransformation'
 
 
+
+@receiver(pre_delete, sender=CarbureStockTransformation, dispatch_uid='stock_transformation_delete_signal')
+def delete_stock_transformation(sender, instance, using, **kwargs):
+    # recredit volume to source stock
+    instance.source_stock.remaining_volume = round(instance.source_stock.remaining_volume + instance.volume_deducted_from_source, 2)
+    instance.source_stock.save()
+    # delete dest_stock
+    instance.dest_stock.delete()
+    # save event
+    event = CarbureLotEvent()
+    event.event_type = CarbureLotEvent.UNCONVERT
+    event.lot = instance.source_stock.parent_lot
+    event.user = None
+    event.metadata = models.JSONField({'message': 'delete stock transformation. recredit volume.', 'volume_to_credit': instance.volume_deduced_from_source})
+    event.save()
+
+
+@receiver(pre_delete, sender=CarbureLot, dispatch_uid='lot_delete_signal')
+def delete_lot(sender, instance, using, **kwargs):
+    # if we come from stock, recredit
+    if instance.parent_stock:
+        if instance.parent_stock.parent_lot:
+            # this lot was a split from a stock
+            instance.parent_stock.remaining_volume = round(instance.parent_stock.remaining_volume + instance.volume, 2)
+            instance.parent_stock.save()
+
+            # save event
+            event = CarbureLotEvent()
+            event.event_type = CarbureLotEvent.UNSPLIT
+            event.lot = instance.parent_stock.parent_lot
+            event.user = None
+            event.metadata = models.JSONField({'message': 'delete lot with parent stock. recredit volume.', 'volume_to_credit': instance.volume})
+            event.save()
+
 class CarbureStock(models.Model):
     parent_lot = models.ForeignKey(CarbureLot, null=True, blank=True, on_delete=models.CASCADE)
     parent_transformation = models.ForeignKey(CarbureStockTransformation, null=True, blank=True, on_delete=models.CASCADE)
@@ -943,7 +979,13 @@ class CarbureLotEvent(models.Model):
     DECLARED = "DECLARED"
     DELETED = "DELETED"
     RESTORED = "RESTORED"
-    EVENT_TYPES = ((CREATED, CREATED), (UPDATED, UPDATED), (VALIDATED, VALIDATED), (FIX_REQUESTED, FIX_REQUESTED), (MARKED_AS_FIXED, MARKED_AS_FIXED), (FIX_ACCEPTED, FIX_ACCEPTED), (ACCEPTED, ACCEPTED), (DECLARED, DECLARED), (DELETED, DELETED), (RESTORED, RESTORED))
+    SPLIT = "SPLIT"
+    UNSPLIT = "UNSPLIT"
+    CONVERT = "CONVERT"
+    UNCONVERT = "UNCONVERT"
+    EVENT_TYPES = ((CREATED, CREATED), (UPDATED, UPDATED), (VALIDATED, VALIDATED), (FIX_REQUESTED, FIX_REQUESTED), (MARKED_AS_FIXED, MARKED_AS_FIXED), 
+                    (FIX_ACCEPTED, FIX_ACCEPTED), (ACCEPTED, ACCEPTED), (DECLARED, DECLARED), (DELETED, DELETED), (RESTORED, RESTORED),
+                    (SPLIT, SPLIT), (UNSPLIT, UNSPLIT), (CONVERT, CONVERT), (UNCONVERT, UNCONVERT))
     event_type = models.CharField(max_length=32, null=False, blank=False, choices=EVENT_TYPES)
     event_dt = models.DateTimeField(auto_now_add=True, null=False, blank=False)
     lot = models.ForeignKey(CarbureLot, null=False, blank=False, on_delete=models.CASCADE)
