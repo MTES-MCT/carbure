@@ -54,11 +54,11 @@ const RIGHTS_COLUMNS: Column<UserRightRequest>[] = [
 ]
 
 const UserRights = () => {
-  const { id } = useParams<{ id: string }>()
+  const { id } = useParams<"id">()
   const [query, setQuery] = useState("")
   const [rights, getRights] = useAPI(api.getUsersRightRequests)
 
-  const entityID = parseInt(id, 10)
+  const entityID = parseInt(id ?? '', 10)
   const [, updateRight] = useAPI(api.updateUsersRights)
 
   async function updateRightRequest(user: number, status: UserRightStatus) {

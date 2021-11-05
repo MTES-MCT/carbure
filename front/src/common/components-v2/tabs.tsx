@@ -1,6 +1,6 @@
-import cl from "clsx";
 import { useEffect, useState } from "react";
-import { Link, useMatcher } from "./router";
+import { Link, matchPath, useLocation } from 'react-router-dom'
+import cl from "clsx";
 import css from "./tabs.module.css";
 
 export type TabVariant = "header" | "main" | "section" | "sticky";
@@ -19,8 +19,8 @@ export interface TabsProps {
 }
 
 export const Tabs = ({ variant = "section", tabs, children }: TabsProps) => {
-  const matcher = useMatcher();
-  const match = tabs.find((tab) => matcher(tab.path)) ?? tabs[0];
+  const location = useLocation()
+  const match = tabs.find(tab => matchPath(tab.path ?? '', location.pathname)) ?? tabs[0]
 
   const [focus, setFocus] = useState(match.key);
 

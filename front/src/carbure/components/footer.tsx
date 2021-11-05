@@ -1,4 +1,5 @@
 import cl from "clsx"
+import { Link } from "react-router-dom"
 import { Trans } from "react-i18next"
 
 import styles from "./footer.module.css"
@@ -7,7 +8,6 @@ import logoFabNum from "../assets/images/logo-fabriquenumerique.svg"
 import logoBetaGouv from "../assets/images/betagouvfr.svg"
 import logoFranceRelance from "../assets/images/france-relance.png"
 import logoEuropeanUnion from "../assets/images/union-europeenne.png"
-import { Link } from "common/components/relative-route"
 import { ExternalLink, LinkedIn, Slack } from "common/components/icons"
 
 const Footer = () => (

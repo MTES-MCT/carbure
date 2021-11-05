@@ -1,5 +1,5 @@
 import { useContext, createContext } from 'react'
-import { useRouteMatch } from "react-router-dom"
+import { useMatch } from "react-router-dom"
 
 import { Entity, ExternalAdminPages } from "common/types"
 import { AppHook } from "./use-app"
@@ -13,11 +13,11 @@ export function hasPage(entity: EntitySelection, page: ExternalAdminPages) {
 }
 
 export default function useEntity(app: AppHook): EntitySelection {
-  const match = useRouteMatch<{ entity: string }>("/org/:entity")
+  const match = useMatch<"entity">("/org/:entity")
 
   if (!match) return null
 
-  const entityID = parseInt(match.params.entity, 10)
+  const entityID = parseInt(match.params.entity ?? '', 10)
   const rights = isNaN(entityID) ? null : app.getRights(entityID)
   const entity = rights?.entity ?? null
 

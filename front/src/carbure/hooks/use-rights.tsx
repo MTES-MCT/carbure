@@ -1,5 +1,5 @@
 import React, { useContext } from "react"
-import { useParams } from "react-router-dom"
+import { useMatch } from "react-router-dom"
 
 import { UserRight, UserRole } from "common/types"
 import { AppHook } from "./use-app"
@@ -19,8 +19,8 @@ export function useRights() {
 }
 
 export function useRightSelection(app: AppHook): UserRightsSelection {
-  const params: { entity: string } = useParams()
-  const entityID = parseInt(params.entity, 10)
+  const match = useMatch<"entity">('/org/:entity/*')
+  const entityID = parseInt(match?.params.entity ?? '', 10)
 
   return isNaN(entityID) ? null : app.getRights(entityID)
 }

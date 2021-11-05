@@ -1,12 +1,11 @@
 import React, { useRef } from "react"
+import { Link, LinkProps } from "react-router-dom"
 import cl from "clsx"
 
 import styles from "./menu.module.css"
 
 import { Dropdown, DropdownItem, DropdownLabel, useDropdown } from "./dropdown"
-import { LinkProps } from "react-router-dom"
 import { SystemProps } from "."
-import { Link } from "./relative-route"
 
 type MenuItemProps = SystemProps & React.HTMLProps<HTMLLIElement>
 
@@ -16,10 +15,10 @@ const MenuItem = ({ children, ...props }: MenuItemProps) => (
   </DropdownItem>
 )
 
-type MenuItemLinkProps = MenuItemProps & LinkProps & { relative?: boolean }
+type MenuItemLinkProps = MenuItemProps & LinkProps
 
-const MenuItemLink = ({ children, ...props }: MenuItemLinkProps) => (
-  <DropdownItem className={styles.menuItemLink}>
+const MenuItemLink = ({ children, ref, ...props }: MenuItemLinkProps) => (
+  <DropdownItem ref={ref} className={styles.menuItemLink}>
     <Link {...props}>{children}</Link>
   </DropdownItem>
 )

@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import cl from "clsx"
 
 import { Declaration, Entity, EntityType } from "common/types"
@@ -7,7 +8,6 @@ import Table, { Row } from "common/components/table"
 import { Section, SectionHeader } from "common/components/section"
 import { padding } from "transactions/components/list-columns"
 import styles from "./declarations.module.css"
-import { useRelativePush } from "common/components/relative-route"
 import useAPI from "common/hooks/use-api"
 import {
   AlertCircle,
@@ -93,7 +93,7 @@ function renderMonthSummary(
   sendReminder: (d: Declaration) => Promise<any>
 ) {
   return (v: RowData) => {
-    const relativePush = useRelativePush()
+    const navigate = useNavigate()
 
     const decl = v.declarations[month]
 
@@ -113,7 +113,7 @@ function renderMonthSummary(
         queryParams.append("vendors", v.entity.name)
       }
 
-      relativePush(`../transactions/declaration?${queryParams}`)
+      navigate(`../transactions/declaration?${queryParams}`)
     }
 
     return (

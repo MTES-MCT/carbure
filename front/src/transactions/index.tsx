@@ -1,3 +1,5 @@
+import { Route, Routes, Navigate } from "react-router-dom"
+
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { EntityType, Filters, LotStatus, UserRole } from "common/types"
 
@@ -21,7 +23,6 @@ import { useGetLots, useGetSnapshot } from "./hooks/use-transaction-list"
 import { useSummary } from "./components/summary"
 
 import { Main } from "common/components"
-import { Redirect, Route, Switch } from "common/components/relative-route"
 import { TransactionSnapshot } from "./components/list-snapshot"
 import { TransactionList } from "./components/list"
 import TransactionFilters from "./components/list-filters"
@@ -207,18 +208,18 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
   const isAuditor = entity.entity_type === EntityType.Auditor
 
   if ((isAdmin || isAuditor) && !ADMIN_STATUSES.includes(status.active)) {
-    return <Redirect relative to=".." />
+    return <Navigate to=".." />
   }
 
   if (isOperator && !OPERATOR_STATUSES.includes(status.active)) {
-    return <Redirect relative to=".." />
+    return <Navigate to=".." />
   }
 
   if (
     (isProducer || isTrader) &&
     !PRODUCER_TRADER_STATUSES.includes(status.active)
   ) {
-    return <Redirect relative to=".." />
+    return <Navigate to=".." />
   }
 
   const canDeclare =
@@ -278,12 +279,10 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
         administrator={administrator}
       />
 
-      <Switch>
-        <Route relative path="add">
-          <TransactionAdd entity={entity} refresh={refresh} />
-        </Route>
+      <Routes>
+        <Route path="add" element={<TransactionAdd entity={entity} refresh={refresh} />} />
 
-        <Route relative path=":id">
+        <Route path=":id" element={
           <TransactionDetails
             entity={entity}
             refresh={refresh}
@@ -295,8 +294,8 @@ export const Transactions = ({ entity }: { entity: EntitySelection }) => {
             auditor={auditor}
             transactions={summary.data?.tx_ids ?? []}
           />
-        </Route>
-      </Switch>
+        } />
+      </Routes>
     </Main>
   )
 }
