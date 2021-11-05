@@ -6,7 +6,7 @@ import { configure } from "@testing-library/dom"
 import { initReactI18next } from "react-i18next"
 import { LoaderOverlay } from "common/components"
 import { AppHook, useApp } from "carbure/hooks/use-app"
-import { MemoryRouter, Route } from "react-router"
+import { MemoryRouter, Route, Routes } from "react-router"
 import { UserRightProvider } from "carbure/hooks/use-rights"
 
 import translation from "../public/locales/fr/translation.json"
@@ -71,20 +71,22 @@ i18n.use(initReactI18next).init({
 })
 
 type TestRootProps = {
-  url?: string
+  url: string
   children: React.ReactNode | ((app: AppHook) => React.ReactNode)
 }
 
-export const TestRoot = ({ url = "/org/0", children }: TestRootProps) => {
+export const TestRoot = ({ url, children }: TestRootProps) => {
   const app = useApp()
   const element = typeof children === "function" ? children(app) : children
 
   return (
     <MemoryRouter initialEntries={[url]}>
       <Suspense fallback={<LoaderOverlay />}>
-        <Route path="/org/:entity">
-          <UserRightProvider app={app}>{element}</UserRightProvider>
-        </Route>
+        <UserRightProvider app={app}>
+          <Routes>
+            {element}
+          </Routes>
+        </UserRightProvider>
       </Suspense>
     </MemoryRouter>
   )

@@ -1,9 +1,9 @@
 import { Trans, useTranslation } from "react-i18next"
 import { FormGroup } from "common/components/form"
+import { Link } from "react-router-dom"
 import * as Fields from "./fields"
 import { FieldsProps } from "./fields"
 import { EntityType } from "common/types"
-import { Link } from "common/components/relative-route"
 import styles from "./fields.module.css"
 
 export const LotFields = ({

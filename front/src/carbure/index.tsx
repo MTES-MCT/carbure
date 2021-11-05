@@ -1,11 +1,11 @@
 import { Trans, useTranslation } from "react-i18next"
+import { Navigate, Route, Routes, useLocation } from "react-router-dom"
 
 import { AppHook, useApp } from "./hooks/use-app"
 import { EntityType, LotStatus, ExternalAdminPages } from "common/types"
 import useEntity, { EntityContext, hasPage } from "./hooks/use-entity"
 import { UserRightProvider } from "./hooks/use-rights"
 
-import { Redirect, Route, Switch } from "common/components/relative-route"
 
 import { LoaderOverlay } from "common/components"
 import Topbar from "./components/top-bar"
@@ -19,7 +19,7 @@ import Stocks from "stocks"
 import Settings from "settings"
 import Account from "account"
 import DoubleCounting from "doublecount"
-import Entities from "../entities" // not using relative path prevents import
+import Entities from "../entities" // not using  path prevents import
 import EntityDetails from "../entities/routes/entity-details"
 import Dashboard from "dashboard"
 import PublicStats from "./components/public-stats"
@@ -54,84 +54,31 @@ const Org = ({ app }: { app: AppHook }) => {
 
   // a user with entities tries to access the pending or another entity's page
   if (app.hasEntities() && !entity) {
-    return <Redirect to="/" />
-  }
-
-  // a user with no entities tries to access an entity page
-  if (!app.hasEntities()) {
-    return <Redirect to="/pending" />
+    return <Navigate to="/" />
   }
 
   const isAdmin = entity?.entity_type === EntityType.Administration
-  const isExternalAdmin = entity?.entity_type === EntityType.ExternalAdmin
   const isAuditor = entity?.entity_type === EntityType.Auditor
 
   return (
     <UserRightProvider app={app}>
       <EntityContext.Provider value={entity}>
-        <Switch>
-          <Route relative exact path="stocks">
-            <Redirect relative to="in" />
-          </Route>
+        <Routes>
+          <Route path="stocks" element={<Navigate to="in" />} />
+          <Route path="stocks/:status/*" element={<Stocks entity={entity} />} />
+          <Route path="transactions" element={<Navigate to={isAdmin || isAuditor ? LotStatus.Alert : LotStatus.Draft} />} />
+          <Route path="transactions/:status/*" element={<Transactions entity={entity} />} />
+          <Route path="settings" element={<Settings entity={entity} settings={app.settings} />} />
+          <Route path="registry" element={<Registry />} />
 
-          <Route relative path="stocks/:status">
-            <Stocks entity={entity} />
-          </Route>
-
-          <Route relative exact path="transactions">
-            <Redirect
-              relative
-              to={isAdmin || isAuditor ? LotStatus.Alert : LotStatus.Draft}
-            />
-          </Route>
-
-          <Route relative path="transactions/:status">
-            <Transactions entity={entity} />
-          </Route>
-
-          <Route relative path="settings">
-            <Settings entity={entity} settings={app.settings} />
-          </Route>
-
-          <Route relative path="registry">
-            <Registry />
-          </Route>
-
-          {isAdmin && (
-            <Route relative path="dashboard">
-              <Dashboard />
-            </Route>
-          )}
-
-          {isAdmin && (
-            <Route relative path="entities/:id">
-              <EntityDetails />
-            </Route>
-          )}
-
-          {isAdmin && (
-            <Route relative path="entities">
-              <Entities />
-            </Route>
-          )}
+          {isAdmin && <Route path="dashboard" element={<Dashboard />} />}
+          {isAdmin && <Route path="entities" element={<Entities />} />}
+          {isAdmin && <Route path="entities/:id" element={<EntityDetails />} />}
 
           {(isAdmin || hasPage(entity, ExternalAdminPages.DoubleCounting)) && (
-            <Route relative path="double-counting">
-              <DoubleCounting entity={entity} />
-            </Route>
+            <Route path="double-counting" element={<DoubleCounting entity={entity} />} />
           )}
-
-          <Redirect
-            relative
-            to={
-              isAdmin
-                ? "dashboard"
-                : isExternalAdmin
-                ? "double-counting"
-                : "transactions"
-            }
-          />
-        </Switch>
+        </Routes>
       </EntityContext.Provider>
     </UserRightProvider>
   )
@@ -140,6 +87,12 @@ const Org = ({ app }: { app: AppHook }) => {
 const Carbure = () => {
   useTranslation()
   const app = useApp()
+  const location = useLocation()
+
+  // a user with no entities tries to access an entity page
+  if (app.isAuthenticated() && !app.hasEntities() && location.pathname !== '/pending') {
+    return <Navigate to="/pending" />
+  }
 
   return (
     <div id="app">
@@ -147,33 +100,14 @@ const Carbure = () => {
 
       <Topbar app={app} />
 
-      <Switch>
-        <Route exact path="/logout">
-          <Exit to="/accounts/logout" />
-        </Route>
-
-        <Route exact path="/account">
-          <Account app={app} />
-        </Route>
-
-        <Route exact path="/pending">
-          <Pending app={app} />
-        </Route>
-
-        <Route path="/org/:entity">
-          <Org app={app} />
-        </Route>
-
-        <Route path="/public_stats">
-          <PublicStats />
-        </Route>
-
-        <Route exact path="/">
-          <Home app={app} />
-        </Route>
-
-        <Redirect to="/" />
-      </Switch>
+      <Routes>
+        <Route path="/" element={<Home app={app} />} />
+        <Route path="/pending" element={<Pending app={app} />} />
+        <Route path="/logout" element={<Exit to="/accounts/logout" />}/>
+        <Route path="/account" element={<Account app={app} />} />
+        <Route path="/org/:entity/*" element={<Org app={app} />} />
+        <Route path="/public_stats" element={<PublicStats />} />
+      </Routes>
 
       <Footer />
     </div>

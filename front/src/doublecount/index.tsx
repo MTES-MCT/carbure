@@ -1,7 +1,7 @@
 import { Fragment, useState, useEffect } from "react"
+import { Route, Routes, Navigate } from "react-router-dom"
 import { Trans } from "react-i18next"
 import useAPI from "common/hooks/use-api"
-import { Route, Switch, Redirect } from "common/components/relative-route"
 import { Header, Main, Title, Box } from "common/components"
 import { TabButton } from "common/components/button"
 import { Select } from "common/components/select"
@@ -54,27 +54,21 @@ const DoubleCounting = ({ entity }: DoubleCountingProps) => {
         </Box>
 
         <Box row className={styles.doublecountTabs}>
-          <TabButton relative to="./agreements">
+          <TabButton to="./agreements">
             <Trans>Dossiers</Trans>
           </TabButton>
-          <TabButton relative to="./quotas">
+          <TabButton to="./quotas">
             <Trans>Quotas</Trans>
           </TabButton>
         </Box>
       </Header>
 
       <Main className={styles.doublecountMain}>
-        <Switch>
-          <Route relative path="agreements">
-            <AgreementList entity={entity} year={year} />
-          </Route>
-
-          <Route relative path="quotas">
-            <QuotasList year={year} />
-          </Route>
-
-          <Redirect relative to="agreements" />
-        </Switch>
+        <Routes>
+          <Route path="agreements" element={<AgreementList entity={entity} year={year} />} />
+          <Route path="quotas" element={<QuotasList year={year} />} />
+          {/* <Navigate to="agreements" /> */}
+        </Routes>
       </Main>
     </Fragment>
   )

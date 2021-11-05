@@ -22,7 +22,7 @@ export default function useStockDetails(
   refresh: () => void
 ) {
   const { t } = useTranslation()
-  const params: { id: string } = useParams()
+  const params = useParams<"id">()
   const notifications = useNotificationContext()
 
   const close = useClose("../")
@@ -33,7 +33,7 @@ export default function useStockDetails(
   const fieldErrors = useFieldErrors(details.data?.errors ?? [])
 
   const entityID = entity?.id
-  const txID = parseInt(params.id, 10)
+  const txID = parseInt(params.id ?? '', 10)
   const tx = details.data?.transaction
 
   const validationErrors = details.data?.errors ?? []
