@@ -516,7 +516,6 @@ def get_declarations(request):
         nextmonth = p + datetime.timedelta(days=31)
         (weekday, lastday) = calendar.monthrange(nextmonth.year, nextmonth.month)
         deadline = datetime.date(year=nextmonth.year, month=nextmonth.month, day=lastday)
-        print(p, deadline)
         # 1) get existing objects
         sds = SustainabilityDeclaration.objects.filter(period=p)
         existing = {s.entity.id: s for s in sds}
