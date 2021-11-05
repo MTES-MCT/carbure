@@ -1,0 +1,45 @@
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-m);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.checkbox:hover {
+  color: var(--blue-dark);
+}
+
+.checkbox[data-disabled] {
+  color: var(--gray-dark);
+  pointer-events: none;
+  user-select: none;
+}
+
+.square {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--gray-dark);
+}
+
+.checkbox:hover .square {
+  border-color: var(--blue-dark);
+}
+
+.checkbox[data-checked] .square {
+  border-color: var(--blue-dark);
+  background-color: var(--blue-dark);
+}
+
+.checkbox[data-checked] .square [data-icon] {
+  color: var(--white);
+}
+
+.checkbox[data-checked][data-disabled] .square {
+  background-color: var(--gray-dark);
+  border-color: var(--gray-dark);
+}

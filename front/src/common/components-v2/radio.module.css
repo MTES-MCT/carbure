@@ -1,0 +1,38 @@
+.radio {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-s);
+  cursor: pointer;
+}
+
+.radio:hover {
+  color: var(--blue-dark);
+}
+
+.radio[data-disabled] {
+  color: var(--gray-dark);
+  pointer-events: none;
+  user-select: none;
+}
+
+.circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-dark);
+}
+
+.circle [data-icon] {
+  fill: var(--blue-dark);
+}
+
+.radio[data-disabled] .circle [data-icon] {
+  fill: var(--gray-dark);
+}
+
+.radio:hover .circle {
+  border-color: var(--blue-dark);
+}
