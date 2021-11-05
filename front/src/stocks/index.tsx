@@ -1,4 +1,4 @@
-import React from "react"
+import { Route, Routes, Navigate } from "react-router-dom"
 
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { EntityType, Filters } from "common/types"
@@ -22,7 +22,6 @@ import { useGetStocks, useGetStockSnapshot } from "./hooks/use-stock-list"
 
 import { Main } from "common/components"
 
-import { Redirect, Route, Switch } from "common/components/relative-route"
 import { StocksSnapshot } from "./components/list-snapshot"
 import { StockList } from "./components/list"
 import TransactionFilters from "transactions/components/list-filters"
@@ -140,7 +139,7 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
     entity.entity_type === EntityType.Trader || entity.has_trading
 
   if (!hasTrading) {
-    return <Redirect to={`/org/${entity.id}`} />
+    return <Navigate to={`/org/${entity.id}`} />
   }
 
   return (
@@ -176,12 +175,10 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
         entity={entity}
       />
 
-      <Switch>
-        <Route relative path="send-complex">
-          <StockSendComplex entity={entity} />
-        </Route>
+      <Routes>
+        <Route path="send-complex" element={<StockSendComplex entity={entity} />} />
 
-        <Route relative path=":id">
+        <Route path=":id" element={
           <StockDetails
             entity={entity}
             deleter={deleter}
@@ -192,8 +189,8 @@ export const Stocks = ({ entity }: { entity: EntitySelection }) => {
             refresh={refresh}
             transactions={summary.data?.tx_ids ?? []}
           />
-        </Route>
-      </Switch>
+        } />
+      </Routes>
     </Main>
   )
 }

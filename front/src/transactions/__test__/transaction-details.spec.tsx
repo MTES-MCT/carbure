@@ -1,8 +1,8 @@
 import merge from "merge"
+import { Route, Routes } from "react-router-dom"
 import { render, TestRoot } from "setupTests"
-import { screen, waitFor } from "@testing-library/react"
+import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { Route } from "common/components/relative-route"
 import { Entity } from "common/types"
 
 import { operator, producer } from "common/__test__/data"
@@ -45,27 +45,29 @@ const TransactionWithHook = ({ entity }: { entity: Entity }) => {
   } = useTransactions(entity)
 
   return (
-    <Route relative path=":id">
-      <TransactionDetails
-        entity={entity}
-        refresh={refresh}
-        deleter={deleter}
-        validator={validator}
-        acceptor={acceptor}
-        rejector={rejector}
-        administrator={administrator}
-        auditor={auditor}
-        transactions={transactions?.data?.lots.map((l) => l.id) ?? []}
-      />
-    </Route>
+    <Routes>
+      <Route path=":id" element={
+        <TransactionDetails
+          entity={entity}
+          refresh={refresh}
+          deleter={deleter}
+          validator={validator}
+          acceptor={acceptor}
+          rejector={rejector}
+          administrator={administrator}
+          auditor={auditor}
+          transactions={transactions?.data?.lots.map((l) => l.id) ?? []}
+        />
+      } />
+    </Routes>
   )
 }
 
 const TransactionWithRouter = ({ entity }: { entity: Entity }) => (
   <TestRoot url={`/org/${entity.id}/transactions/draft/0`}>
-    <Route path={`/org/${entity.id}/transactions/:status`}>
+    <Route path="/org/:entity/transactions/:status/*" element={
       <TransactionWithHook entity={entity} />
-    </Route>
+    } />
   </TestRoot>
 )
 

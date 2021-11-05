@@ -1,7 +1,7 @@
 import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-
+import { Route } from 'react-router-dom'
 import { producer, productionSite } from "common/__test__/data"
 import { waitWhileLoading } from "common/__test__/helpers"
 import Settings from "../index"
@@ -12,15 +12,16 @@ const SettingsWithHooks = () => {
   return (
     <TestRoot url="/org/0/settings">
       {(app) => (
-        <Settings
-          entity={app.settings.data?.rights[0].entity ?? null}
-          settings={app.settings}
-        />
+        <Route path="/org/0/settings" element={
+          <Settings 
+            entity={app.settings.data?.rights[0].entity ?? null}
+            settings={app.settings}
+          />
+        } />
       )}
     </TestRoot>
   )
 }
-
 beforeAll(() => server.listen({ onUnhandledRequest: "warn" }))
 
 beforeEach(() => setEntity(producer))

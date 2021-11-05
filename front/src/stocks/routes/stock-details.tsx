@@ -30,7 +30,7 @@ import { StatusTitle } from "transactions/components/status"
 import Comments from "transactions/components/form-comments"
 import { useRights } from "carbure/hooks/use-rights"
 import { Trans } from "react-i18next"
-import useNavigate from "transactions/hooks/query/use-navigate"
+import useNavigation from "transactions/hooks/query/use-navigate"
 
 const EDITABLE = [LotStatus.ToSend]
 
@@ -70,7 +70,7 @@ const StockDetails = ({
 
   const { t } = useTranslation()
   const rights = useRights()
-  const navigator = useNavigate(transactions)
+  const navigator = useNavigation(transactions)
 
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
   const isEditable = EDITABLE.includes(status)

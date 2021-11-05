@@ -1,7 +1,7 @@
 import { render, TestRoot } from "setupTests"
 import { waitFor, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { Route } from "common/components/relative-route"
+import { Route } from "react-router-dom"
 import { Entity, LotStatus } from "common/types"
 
 import { producer } from "common/__test__/data"
@@ -28,9 +28,7 @@ const TransactionsWithRouter = ({
   status: LotStatus
 }) => (
   <TestRoot url={`/org/0/transactions/${status}`}>
-    <Route path="/org/0/transactions/:status">
-      <Transactions entity={entity} />
-    </Route>
+    <Route path="/org/0/transactions/:status/*" element={<Transactions entity={entity} />} />
   </TestRoot>
 )
 
@@ -95,7 +93,7 @@ test("producer/trader: display a list of 1 transaction", async () => {
   screen.getByText("Réd. GES")
 
   // check lot columns
-  screen.getByText("Brouillon")
+  screen.getAllByText("Brouillon")
   screen.getByText("2020-01")
   screen.getByText("EMHV")
   screen.getByText("12 345")
@@ -360,7 +358,7 @@ test("producer/trader: duplicate draft lot", async () => {
   await screen.findByText("41")
 
   // new line was added
-  await waitFor(() => expect(screen.getAllByText("Brouillon")).toHaveLength(2))
+  await waitFor(() => expect(screen.getAllByText("Brouillon")).toHaveLength(3))
   expect(screen.getAllByText("2020-01")).toHaveLength(2)
   expect(screen.getAllByText("EMHV")).toHaveLength(2)
   expect(screen.getAllByText("12 345")).toHaveLength(2)

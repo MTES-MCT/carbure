@@ -1,6 +1,6 @@
 import { render, TestRoot } from "setupTests"
 import { screen } from "@testing-library/react"
-import { Route } from "common/components/relative-route"
+import { Route } from "react-router-dom"
 import { Entity, LotStatus } from "common/types"
 
 import { admin } from "common/__test__/data"
@@ -18,9 +18,7 @@ const TransactionsWithRouter = ({
   status: LotStatus
 }) => (
   <TestRoot url={`/org/0/transactions/${status}`}>
-    <Route path="/org/0/transactions/:status">
-      <Transactions entity={entity} />
-    </Route>
+    <Route path="/org/0/transactions/:status/*" element={<Transactions entity={entity} />} />
   </TestRoot>
 )
 
@@ -32,7 +30,7 @@ afterEach(() => {
 
 afterAll(() => server.close())
 
-test("operator: display an empty list of transactions", async () => {
+test("admin: display an empty list of transactions", async () => {
   setAdminLots(emptyLots)
 
   render(<TransactionsWithRouter status={LotStatus.Alert} entity={admin} />)

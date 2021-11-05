@@ -1,10 +1,10 @@
 import { useRef } from "react";
+import { Link } from "react-router-dom";
 import Dropdown, { Anchor } from "./dropdown";
 import { ChevronDown } from "./icons";
 import Button, { ButtonProps } from "./button";
 import List from "./list";
 import { Normalizer } from "../hooks/normalize";
-import { Link } from "./router";
 import css from "./menu.module.css";
 import cl from "clsx";
 

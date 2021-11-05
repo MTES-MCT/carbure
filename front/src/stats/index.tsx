@@ -1,4 +1,4 @@
-import { Route, Switch, Link } from "common/components/relative-route"
+import { Route, Routes } from "react-router-dom"
 import { EntitySelection } from "carbure/hooks/use-entity"
 import { Trans, useTranslation } from "react-i18next"
 import { Main } from "common/components"
@@ -277,13 +277,12 @@ const StatsRoutes = ({ entity }: StatsProps) => {
   const path = window.location.pathname
   const period = path.substring(32, 39)
   const iframeShadow = "1px 1px 6px grey"
+  
   return (
-    <Switch>
-      <Route relative exact path="">
-        <Stats entity={entity} />
-      </Route>
+    <Routes>
+      <Route path="" element={<Stats entity={entity} />} />
 
-      <Route relative exact path="period_details">
+      <Route path="period_details" element={
         <Main style={{ padding: "32px 160px" }}>
           <h1>{period}</h1>
           <Section style={{ boxShadow: iframeShadow }}>
@@ -295,8 +294,8 @@ const StatsRoutes = ({ entity }: StatsProps) => {
             />
           </Section>
         </Main>
-      </Route>
-    </Switch>
+      } />
+    </Routes>
   )
 }
 

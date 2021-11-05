@@ -13,7 +13,6 @@ import {
   DialogTitle,
   DialogText,
   confirm,
-  prompt,
   PromptProps,
 } from "common/components/dialog"
 import { EntitySelection } from "carbure/hooks/use-entity"

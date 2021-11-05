@@ -55,7 +55,7 @@ function notePoster(entity: EntitySelection) {
     case EntityType.Auditor:
       return api.addAuditorComment
     default:
-      return async () => {}
+      return async () => { }
   }
 }
 
@@ -64,7 +64,7 @@ export default function useTransactionDetails(
   refresh: () => void
 ) {
   const { t } = useTranslation()
-  const params: { id: string } = useParams()
+  const params = useParams<"id">()
   const notifications = useNotificationContext()
   const close = useClose("../")
 
@@ -78,7 +78,7 @@ export default function useTransactionDetails(
   const fieldErrors = useFieldErrors(details.data?.errors ?? [])
 
   const entityID = entity?.id
-  const txID = parseInt(params.id, 10)
+  const txID = parseInt(params.id ?? '', 10)
   const tx = details.data?.transaction
 
   const validationErrors = details.data?.errors ?? []
