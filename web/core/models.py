@@ -769,17 +769,17 @@ class CarbureLot(models.Model):
     carbure_id = models.CharField(max_length=64, blank=True, default='')
 
     # production data
-    carbure_producer = models.ForeignKey(Entity, null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    carbure_producer = models.ForeignKey(Entity, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name='carbure_producer')
     unknown_producer = models.CharField(max_length=64, blank=True, null=True, default=None)
     carbure_production_site = models.ForeignKey(ProductionSite, null=True, blank=True, default=None, on_delete=models.SET_NULL)
     unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default=None)
-    production_country = models.ForeignKey(Pays, null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    production_country = models.ForeignKey(Pays, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name='production_country')
     production_site_commissioning_date = models.DateField(blank=True, null=True)
     production_site_certificate = models.CharField(max_length=64, blank=True, null=True, default=None)
     production_site_certificate_type = models.CharField(max_length=64, blank=True, null=True, default=None)
     production_site_double_counting_certificate = models.CharField(max_length=64, blank=True, null=True, default=None)
     # supplier data
-    carbure_supplier = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
+    carbure_supplier = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='carbure_supplier')
     unknown_supplier = models.CharField(max_length=64, blank=True, null=True, default=None)
     supplier_certificate = models.CharField(max_length=64, blank=True, null=True, default=None)
     supplier_certificate_type = models.CharField(max_length=64, blank=True, null=True, default=None)
@@ -794,16 +794,16 @@ class CarbureLot(models.Model):
     TRANSPORT_DOCUMENT_TYPES = ((DAU, DAU), (DAE, DAE), (DSA, DSA), (DSAC, DSAC), (DSP, DSP), (OTHER, OTHER),)
     transport_document_type = models.CharField(max_length=12, blank=False, null=False, choices=TRANSPORT_DOCUMENT_TYPES, default=DAE)
     transport_document_reference = models.CharField(max_length=64, blank=False, null=False, default=None)
-    carbure_client = models.ForeignKey(Entity, null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    carbure_client = models.ForeignKey(Entity, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name='carbure_client')
     unknown_client = models.CharField(max_length=64, blank=True, null=True, default=None)
     dispatch_date = models.DateField(blank=True, null=True)
-    carbure_dispatch_site = models.ForeignKey(Depot, null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    carbure_dispatch_site = models.ForeignKey(Depot, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name='carbure_dispatch_site')
     unknown_dispatch_site = models.CharField(max_length=64, blank=True, null=True, default=None)
-    dispatch_site_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.SET_NULL)
+    dispatch_site_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.SET_NULL, related_name='dispatch_site_country')
     delivery_date = models.DateField(blank=True, null=True)
-    carbure_delivery_site = models.ForeignKey(Depot, null=True, blank=True, default=None, on_delete=models.SET_NULL)
+    carbure_delivery_site = models.ForeignKey(Depot, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name='carbure_delivery_site')
     unknown_delivery_site = models.CharField(max_length=64, blank=True, null=True, default=None)
-    delivery_site_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.SET_NULL)
+    delivery_site_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.SET_NULL, related_name='delivery_site_country')
 
     DRAFT = "DRAFT"
     PENDING = "PENDING"
@@ -840,7 +840,7 @@ class CarbureLot(models.Model):
     lhv_amount = models.FloatField(default=0.0)
     feedstock = models.ForeignKey(MatierePremiere, null=True, on_delete=models.SET_NULL)
     biofuel = models.ForeignKey(Biocarburant, null=True, on_delete=models.SET_NULL)
-    country_of_origin = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL)
+    country_of_origin = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='country_of_origin')
 
     # GHG values
     eec = models.FloatField(default=0.0)
@@ -886,8 +886,8 @@ class CarbureStockTransformation(models.Model):
     ETH_ETBE = "ETH_ETBE"
     TRANSFORMATION_TYPES = ((UNKNOWN, UNKNOWN), (ETH_ETBE, ETH_ETBE), )
     transformation_type = models.CharField(max_length=32, choices=TRANSFORMATION_TYPES, null=False, blank=False, default=UNKNOWN)
-    source_stock = models.ForeignKey('CarbureStock', null=False, blank=False, on_delete=models.CASCADE)
-    dest_stock = models.ForeignKey('CarbureStock', null=False, blank=False, on_delete=models.CASCADE)
+    source_stock = models.ForeignKey('CarbureStock', null=False, blank=False, on_delete=models.CASCADE, related_name='source_stock')
+    dest_stock = models.ForeignKey('CarbureStock', null=False, blank=False, on_delete=models.CASCADE, related_name='dest_stock')
     volume_deducted_from_source = models.FloatField(null=False, blank=False, default=0.0)
     volume_destination = models.FloatField(null=False, blank=False, default=0.0)
     metadata = models.JSONField() # ex: {‘volume_denaturant’: 1000, ‘volume_etbe_eligible’: 420000}
@@ -907,26 +907,26 @@ class CarbureStock(models.Model):
     parent_transformation = models.ForeignKey(CarbureStockTransformation, null=True, blank=True, on_delete=models.CASCADE)
     carbure_id = models.CharField(max_length=64, blank=False, null=False, default='')
     depot = models.ForeignKey(Depot, null=True, blank=True, on_delete=models.SET_NULL)
-    entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
+    carbure_client = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='stock_carbure_client')
     remaining_volume = models.FloatField(default=0.0)
     remaining_weight = models.FloatField(default=0.0)
     remaining_lhv_amount = models.FloatField(default=0.0)
     feedstock = models.ForeignKey(MatierePremiere, null=True, on_delete=models.SET_NULL)
     biofuel = models.ForeignKey(Biocarburant, null=True, on_delete=models.SET_NULL)
-    country_of_origin = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL)
+    country_of_origin = models.ForeignKey(Pays, null=True, on_delete=models.SET_NULL, related_name='stock_country_of_origin')
     carbure_production_site = models.ForeignKey(ProductionSite, null=True, blank=True, on_delete=models.SET_NULL)
-    unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default='')
-    production_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.SET_NULL)
-    carbure_supplier = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
-    unknown_supplier = models.CharField(max_length=64, blank=True, null=True, default='')
+    unknown_production_site = models.CharField(max_length=64, blank=True, null=True, default=None)
+    production_country = models.ForeignKey(Pays, null=True, blank=True, on_delete=models.SET_NULL, related_name='stock_production_country')
+    carbure_supplier = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL, related_name='stock_carbure_supplier')
+    unknown_supplier = models.CharField(max_length=64, blank=True, null=True, default=None)
     ghg_reduction = models.FloatField(default=0.0)
     ghg_reduction_red_ii = models.FloatField(default=0.0)
 
     class Meta:
         db_table = 'carbure_stock'
         indexes = [
-            models.Index(fields=['entity']),
-            models.Index(fields=['entity', 'depot']),
+            models.Index(fields=['carbure_client']),
+            models.Index(fields=['carbure_client', 'depot']),
         ]
         verbose_name = 'CarbureStock'
         verbose_name_plural = 'CarbureStocks'
@@ -945,9 +945,9 @@ class CarbureLotEvent(models.Model):
     RESTORED = "RESTORED"
     EVENT_TYPES = ((CREATED, CREATED), (UPDATED, UPDATED), (VALIDATED, VALIDATED), (FIX_REQUESTED, FIX_REQUESTED), (MARKED_AS_FIXED, MARKED_AS_FIXED), (FIX_ACCEPTED, FIX_ACCEPTED), (ACCEPTED, ACCEPTED), (DECLARED, DECLARED), (DELETED, DELETED), (RESTORED, RESTORED))
     event_type = models.CharField(max_length=32, null=False, blank=False, choices=EVENT_TYPES)
-    event_dt = models.DateTimeField(default_add_now=True, null=False, blank=False)
+    event_dt = models.DateTimeField(auto_now_add=True, null=False, blank=False)
     lot = models.ForeignKey(CarbureLot, null=False, blank=False, on_delete=models.CASCADE)
-    user = models.ForeignKey(usermodel, null=False, blank=False, on_delete=models.SET_NULL)
+    user = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
     metadata = models.JSONField()
 
     class Meta:
@@ -963,7 +963,7 @@ class CarbureLotComment(models.Model):
     REGULAR = "REGULAR"
     AUDITOR = "AUDITOR"
     ADMIN = "ADMIN"
-    COMMENT_TYPES = ((REGULAR, REGULAR), (AUDITOR, AUDITOR), (ADMIN))
+    COMMENT_TYPES = ((REGULAR, REGULAR), (AUDITOR, AUDITOR), (ADMIN, ADMIN))
 
     entity = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.SET_NULL)
     user = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
