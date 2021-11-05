@@ -547,14 +547,14 @@ class ETBETransformation(admin.ModelAdmin):
     raw_id_fields = ['previous_stock', 'new_stock']
     actions = ['cancel_transformations']
 
-    def cancel_transformation(self, request, queryset):
+    def cancel_transformations(self, request, queryset):
         for transformation in queryset:
             transformation.previous_stock.lot.remaining_volume = round(transformation.previous_stock.lot.remaining_volume + transformation.volume_ethanol, 2)
             transformation.previous_stock.lot.save()
             transformation.new_stock.lot.delete()
             transformation.new_stock.delete()
             transformation.delete()
-    cancel_transformation.short_description = "Annuler Transformation"
+    cancel_transformations.short_description = "Annuler Transformation"
 
 @admin.register(ExternalAdminRights)
 class ExtAdminRightsAdmin(admin.ModelAdmin):
