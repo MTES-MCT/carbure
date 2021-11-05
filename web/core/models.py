@@ -152,6 +152,7 @@ class Biocarburant(models.Model):
 
     compatible_essence = models.BooleanField(default=False)
     compatible_diesel = models.BooleanField(default=False)
+    dgddi_category = models.CharField(max_length=8, blank=True, null=True, default=None)
 
     def __str__(self):
         return self.name
@@ -191,6 +192,7 @@ class MatierePremiere(models.Model):
     is_huile_vegetale = models.BooleanField(default=False)
     is_displayed = models.BooleanField(default=True)
     category = models.CharField(max_length=32, choices=MP_CATEGORIES, default='CONV')
+    dgddi_category = models.CharField(max_length=32, blank=True, null=True, default=None)
 
     def __str__(self):
         return self.name
@@ -241,6 +243,7 @@ class Depot(models.Model):
     postal_code = models.CharField(max_length=32, blank=True)
 
     gps_coordinates = models.CharField(max_length=64, blank=True, null=True, default=None)
+    accise = models.CharField(max_length=32, blank=True, null=True, default=None)
 
     def __str__(self):
         return self.name
