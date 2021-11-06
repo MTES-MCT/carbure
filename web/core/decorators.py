@@ -166,3 +166,47 @@ def otp_or_403(function):
             return JsonResponse({'status': 'forbidden', 'message': "User not verified"}, status=403)
         return function(request, *args, **kwargs)
     return wrap
+
+
+# check that request.POST contains an entity_id and request.user is allowed to make changes
+def check_user_rights(role=None):
+    def actual_decorator(function):
+        @wraps(function)
+        def wrap(request, *args, **kwargs):
+            if not request.user.is_verified():
+                return JsonResponse({'status': 'forbidden', 'message': "User not OTP verified"}, status=403)
+
+            entity_id = request.POST.get('entity_id', request.GET.get('entity_id', False))
+            if not entity_id:
+                return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
+
+            # check if we have data in the SESSION
+            rights = request.session.get('rights', False)
+            if not rights:
+                rights = {ur.entity.id: ur.role for ur in UserRights.objects.filter(user=request.user)}
+                request.session['rights'] = rights
+
+            if entity_id not in rights:
+                return JsonResponse({'status': 'forbidden', 'message': "User has no rights to the requested entity"}, status=403)
+
+            if entity_id != request.session.get('entity_id', False):
+                request.session['entity_id'] = entity_id
+                request.session['entity'] = Entity.objects.get(id=entity_id)
+
+            user_role = rights[entity_id]
+            if role is not None:
+                if isinstance(role, list):
+                    if user_role not in role:
+                        return JsonResponse({'status': 'forbidden', 'message': "Insufficient rights to the requested entity"}, status=403)
+                elif role != rights.role:
+                    return JsonResponse({'status': 'forbidden', 'message': "Insufficient rights to the requested entity"}, status=403)
+                else:
+                    # all types of roles allowed
+                    pass
+            context = {}
+            context['entity'] = request.session['entity']
+            context['entity_id'] = request.session['entity_id']
+            kwargs['context'] = context
+            return function(request, *args, **kwargs)
+        return wrap
+    return actual_decorator

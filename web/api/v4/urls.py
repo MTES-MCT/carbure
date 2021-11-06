@@ -4,10 +4,8 @@ from api.v4 import views
 urlpatterns = [
     # GET
     path('snapshot', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('lots/drafts', views.get_snapshot, name='api-v4-get-drafts'),
-    path('lots/in', views.get_snapshot, name='api-v4-get-in'),
-    path('lots/out', views.get_snapshot, name='api-v4-get-out'),
-    path('lots/details', views.get_snapshot, name='api-v4-get-details'),
+    path('lots', views.get_lots, name='api-v4-get-lots'),
+    path('lots/details', views.get_details, name='api-v4-get-details'),
     # POST
     ### Lot initial life
     path('lots/add', views.get_snapshot, name='api-v4-add-lots'),
@@ -30,7 +28,7 @@ urlpatterns = [
 
 
     # STOCKS
-    path('stock', views.get_snapshot, name='api-v4-get-stocks'),    
+    path('stock', views.get_stock, name='api-v4-get-stock'),    
     path('stock/cancel-transformation', views.get_snapshot, name='api-v4-get-snapshot'),
     path('stock/split', views.get_snapshot, name='api-v4-get-snapshot'),
     path('stock/transform', views.get_snapshot, name='api-v4-get-snapshot'),
