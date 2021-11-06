@@ -27,12 +27,11 @@ from api.v3.sanity_checks import bulk_sanity_checks
 def get_settings(request):
     # user-rights
     rights = UserRights.objects.filter(user=request.user)
-    # rights_sez = [{'entity': r.entity.natural_key(), 'rights': 'rw'} for r in rights]
+    request.session['rights'] = {ur.entity.id: ur.role for ur in rights}
     rights_sez = [r.natural_key() for r in rights]
     # requests
     requests = UserRightsRequests.objects.filter(user=request.user)
     requests_sez = [r.natural_key() for r in requests]
-    # requests_sez = [{'entity': r.entity.natural_key(), 'date': r.date_requested, 'status': r.status} for r in requests]
     return JsonResponse({'status': 'success', 'data': {'rights': rights_sez, 'email': request.user.email, 'requests': requests_sez}})
 
 
