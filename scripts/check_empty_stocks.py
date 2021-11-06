@@ -13,7 +13,7 @@ def reset_remaining_volume(tx):
     if tx.lot.volume != tx.lot.remaining_volume:
         print('Reset %s remaining volume from %f to %f. Tx id [%d] Lot id [%d] client %s' % (tx.lot.biocarburant.code, tx.lot.remaining_volume, tx.lot.volume, tx.id, tx.lot.id, tx.carbure_client.name if tx.carbure_client else tx.unknown_client))
         tx.lot.remaining_volume = tx.lot.volume
-        tx.save()
+        tx.lot.save()
         
 def handle_complex_stock(tx, child_tx):
     sum_child = child_tx.filter(is_forwarded=False).aggregate(Sum('lot__volume'))
