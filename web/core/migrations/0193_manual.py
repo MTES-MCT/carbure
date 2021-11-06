@@ -6,7 +6,7 @@ import calendar
 
 from django.db.models.aggregates import Sum
 
-from core.models import AdminTransactionComment, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockTransformation, ETBETransformation, Entity, LotTransaction, LotV2, TransactionComment, TransactionUpdateHistory
+from core.models import AdminTransactionComment, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockTransformation, ETBETransformation, Entity, GenericError, LotTransaction, LotV2, TransactionComment, TransactionUpdateHistory
 
 TX_ID_MIGRATED = []
 
@@ -240,21 +240,25 @@ def create_new_tx_and_child(tx):
 
     # if is_forwarded, check Child TX (Processing / Trading without storage) and create them
     if tx.is_forwarded:
-        child = LotTransaction.objects.get(parent_tx=tx)
-        parent_id = lot.id
-        lot.pk = None
-        lot.carbure_supplier = lot.carbure_client
-        lot.carbure_client = child.carbure_client
-        lot.unknown_client = child.unknown_client
-        lot.delivery_type = CarbureLot.BLENDING
-        lot.parent_lot_id = parent_id
-        lot.save()
-        creation_event = CarbureLotEvent()
-        creation_event.event_type = CarbureLotEvent.CREATED
-        creation_event.event_dt = child.lot.added_time
-        creation_event.user = child.lot.added_by_user
-        creation_event.lot_id = lot.id
-        TX_ID_MIGRATED.append(child.id)
+        try:
+            child = LotTransaction.objects.get(parent_tx=tx)
+            parent_id = lot.id
+            lot.pk = None
+            lot.carbure_supplier = lot.carbure_client
+            lot.carbure_client = child.carbure_client
+            lot.unknown_client = child.unknown_client
+            lot.delivery_type = CarbureLot.BLENDING
+            lot.parent_lot_id = parent_id
+            lot.save()
+            creation_event = CarbureLotEvent()
+            creation_event.event_type = CarbureLotEvent.CREATED
+            creation_event.event_dt = child.lot.added_time
+            creation_event.user = child.lot.added_by_user
+            creation_event.lot_id = lot.id
+            TX_ID_MIGRATED.append(child.id)            
+        except:
+            print('Forwarded TX has not child tx. strange')
+
 
     return lot
 
@@ -302,6 +306,8 @@ def migrate_old_data(apps, schema_editor):
             event.user = e.modified_by
             event.metadata = {'field': e.field, 'value_before': e.value_before, 'value_after': e.value_after}
             event.save()
+        # errors
+        errors = GenericError.objects.filter(tx=tx).update(lot=new_tx)
 
 def ensure_data_consistency(apps, schema_editor):
     # the goal is to ensure that Volume IN equals Volume Stock + Volume Out for every single entity
@@ -321,7 +327,7 @@ def ensure_data_consistency(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0191_auto_20211105_1525'),
+        ('core', '0192_auto_20211106_1137'),
     ]
 
     operations = [
