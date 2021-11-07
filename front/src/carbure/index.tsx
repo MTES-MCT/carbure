@@ -1,11 +1,10 @@
 import { Trans, useTranslation } from "react-i18next"
-import { Navigate, Route, Routes, useLocation } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router-dom"
 
 import { AppHook, useApp } from "./hooks/use-app"
 import { EntityType, LotStatus, ExternalAdminPages } from "common/types"
 import useEntity, { EntityContext, hasPage } from "./hooks/use-entity"
 import { UserRightProvider } from "./hooks/use-rights"
-
 
 import { LoaderOverlay } from "common/components"
 import Topbar from "./components/top-bar"
@@ -60,14 +59,17 @@ const Org = ({ app }: { app: AppHook }) => {
   const isAdmin = entity?.entity_type === EntityType.Administration
   const isAuditor = entity?.entity_type === EntityType.Auditor
 
+  // prettier-ignore
   return (
     <UserRightProvider app={app}>
       <EntityContext.Provider value={entity}>
         <Routes>
           <Route path="stocks" element={<Navigate to="in" />} />
           <Route path="stocks/:status/*" element={<Stocks entity={entity} />} />
+
           <Route path="transactions" element={<Navigate to={isAdmin || isAuditor ? LotStatus.Alert : LotStatus.Draft} />} />
           <Route path="transactions/:status/*" element={<Transactions entity={entity} />} />
+
           <Route path="settings" element={<Settings entity={entity} settings={app.settings} />} />
           <Route path="registry" element={<Registry />} />
 
@@ -76,8 +78,10 @@ const Org = ({ app }: { app: AppHook }) => {
           {isAdmin && <Route path="entities/:id" element={<EntityDetails />} />}
 
           {(isAdmin || hasPage(entity, ExternalAdminPages.DoubleCounting)) && (
-            <Route path="double-counting" element={<DoubleCounting entity={entity} />} />
+            <Route path="double-counting/*" element={<DoubleCounting entity={entity} />} />
           )}
+
+          <Route path="*" element={<Navigate to={isAdmin ? "dashboard" : "transactions"} />} />
         </Routes>
       </EntityContext.Provider>
     </UserRightProvider>
@@ -87,12 +91,6 @@ const Org = ({ app }: { app: AppHook }) => {
 const Carbure = () => {
   useTranslation()
   const app = useApp()
-  const location = useLocation()
-
-  // a user with no entities tries to access an entity page
-  if (app.isAuthenticated() && !app.hasEntities() && location.pathname !== '/pending') {
-    return <Navigate to="/pending" />
-  }
 
   return (
     <div id="app">
@@ -103,7 +101,7 @@ const Carbure = () => {
       <Routes>
         <Route path="/" element={<Home app={app} />} />
         <Route path="/pending" element={<Pending app={app} />} />
-        <Route path="/logout" element={<Exit to="/accounts/logout" />}/>
+        <Route path="/logout" element={<Exit to="/accounts/logout" />} />
         <Route path="/account" element={<Account app={app} />} />
         <Route path="/org/:entity/*" element={<Org app={app} />} />
         <Route path="/public_stats" element={<PublicStats />} />

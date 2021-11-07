@@ -54,20 +54,21 @@ const DoubleCounting = ({ entity }: DoubleCountingProps) => {
         </Box>
 
         <Box row className={styles.doublecountTabs}>
-          <TabButton to="./agreements">
+          <TabButton to="agreements">
             <Trans>Dossiers</Trans>
           </TabButton>
-          <TabButton to="./quotas">
+          <TabButton to="quotas">
             <Trans>Quotas</Trans>
           </TabButton>
         </Box>
       </Header>
 
+      {/* prettier-ignore */}
       <Main className={styles.doublecountMain}>
         <Routes>
           <Route path="agreements" element={<AgreementList entity={entity} year={year} />} />
           <Route path="quotas" element={<QuotasList year={year} />} />
-          {/* <Navigate to="agreements" /> */}
+          <Route path="*" element={<Navigate to="agreements" />} />
         </Routes>
       </Main>
     </Fragment>
