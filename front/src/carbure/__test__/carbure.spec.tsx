@@ -25,10 +25,13 @@ const CarbureWithRouter = () => {
   )
 }
 
-test.skip("display alert message when connected without access rights", async () => {
+test("display alert message when connected without access rights", async () => {
   server.use(okEmptySettings)
 
   render(<CarbureWithRouter />)
+
+  const link = screen.getAllByText("Lier le compte à des sociétés")
+  userEvent.click(link[0].closest("a")!)
 
   await screen.findByText("🌻 Bienvenue sur CarbuRe")
 

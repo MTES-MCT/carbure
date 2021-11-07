@@ -191,7 +191,7 @@ export const PrivateTopbar = ({ entity, app }: PrivateTopbarProps) => {
       )}
 
       {!entity && !firstEntity && (
-        <Link to={`/account`} className={styles.entityShortcut}>
+        <Link to={`/pending`} className={styles.entityShortcut}>
           <Trans>Lier le compte à des sociétés</Trans>
           <ChevronRight />
         </Link>
