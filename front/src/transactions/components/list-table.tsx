@@ -25,7 +25,7 @@ import {
   EyeOff,
   Pin,
   PinOff,
-  ChevronRight
+  ChevronRight,
 } from "common/components/icons"
 import Table, { Actions, arrow, Column, Row } from "common/components/table"
 import * as C from "./list-columns"
@@ -51,19 +51,24 @@ const getDraftActions = ({
     { icon: Cross, title: t("Supprimer le lot"), action: onDelete },
   ])
 
-const getToFixActions = ({ onCorrect, onDelete, t }: TxActions, entity: Entity): TxColumn => 
+const getToFixActions = (
+  { onCorrect, onDelete, t }: TxActions,
+  entity: Entity
+): TxColumn =>
   Actions((tx) => {
     // no actions if the entity does not own the tx
-    if (tx.carbure_vendor?.id !== entity.id && tx.lot.added_by?.id !== entity.id) {
-      return [{ icon: ChevronRight, title: '', action: () => {} }]
+    if (
+      tx.carbure_vendor?.id !== entity.id &&
+      tx.lot.added_by?.id !== entity.id
+    ) {
+      return [{ icon: ChevronRight, title: "", action: () => {} }]
     }
-    
+
     return [
       { icon: Check, title: t("Renvoyer le lot"), action: onCorrect },
       { icon: Cross, title: t("Supprimer le lot"), action: onDelete },
     ]
-})
-
+  })
 
 const getInboxActions = ({
   onAccept,

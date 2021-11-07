@@ -13,7 +13,7 @@ export function hasPage(entity: EntitySelection, page: ExternalAdminPages) {
 }
 
 export default function useEntity(app: AppHook): EntitySelection {
-  const match = useMatch<"entity">("/org/:entity")
+  const match = useMatch<"entity">("/org/:entity/*")
 
   if (!match) return null
 

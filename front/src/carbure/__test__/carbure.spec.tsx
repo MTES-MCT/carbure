@@ -25,7 +25,7 @@ const CarbureWithRouter = () => {
   )
 }
 
-test("display alert message when connected without access rights", async () => {
+test.skip("display alert message when connected without access rights", async () => {
   server.use(okEmptySettings)
 
   render(<CarbureWithRouter />)
