@@ -130,7 +130,7 @@ const Home = ({ app }: HomeProps) => {
             icon={Plus}
             as="a"
             level="primary"
-            href="/v2/account"
+            href="/v2/pending"
             className={styles.homeButton}
           >
             <Trans>Lier le compte à des sociétés</Trans>
