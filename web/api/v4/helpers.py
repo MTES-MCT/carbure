@@ -9,6 +9,7 @@ from django.db.models.query_utils import Q
 from django.http.response import HttpResponse, JsonResponse
 from core.models import CarbureLot
 from core.models import GenericError
+from core.serializers import CarbureLotPublicSerializer
 from core.xlsx_v3 import export_carbure_lots
 
 sort_key_to_django_field = {'period': 'period',
@@ -61,8 +62,9 @@ def get_lots_with_metadata(lots, entity, querySet, is_admin=False):
         grouped_errors = get_errors(tx, entity)
         if len(grouped_errors) > 0:
             errors[tx.id] = grouped_errors
+    serializer = CarbureLotPublicSerializer(returned, many=True)
     data = {}
-    data['lots'] = [t.natural_key(is_admin) for t in returned]
+    data['lots'] = serializer.data
     data['total'] = lots.count()
     data['total_errors'] = total_errors
     data['returned'] = returned.count()
