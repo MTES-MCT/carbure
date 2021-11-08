@@ -2,7 +2,7 @@ import datetime
 import calendar
 from multiprocessing import Value
 from dateutil.relativedelta import relativedelta
-from django.db.models.aggregates import Count
+from django.db.models.aggregates import Count, Max
 from django.db.models.expressions import OuterRef, Subquery
 from django.db.models.functions.comparison import Coalesce
 from django.db.models.query_utils import Q
@@ -23,12 +23,13 @@ def get_entity_lots_by_status(entity_id, status):
     if status not in ['DRAFTS', 'IN', 'OUT']:
         raise Exception('Unknown status %s' % (status))
     lots = CarbureLot.objects.select_related(
-        'carbure_producer', 'carbure_production_site', 'production_country',
-        'carbure_supplier', 'carbure_client', 'carbure_dispatch_site', 'dispatch_site_country', 
-        'carbure_delivery_site', 'delivery_site_country',
+        'carbure_producer', 'carbure_supplier', 'carbure_client', 'added_by',
+        'carbure_production_site', 'carbure_production_site__producer', 'carbure_production_site__country', 'production_country',
+        'carbure_dispatch_site', 'carbure_dispatch_site__country', 'dispatch_site_country', 
+        'carbure_delivery_site', 'carbure_delivery_site__country', 'delivery_site_country',
         'feedstock', 'biofuel', 'country_of_origin', 
-        'added_by', 'parent_lot', 'parent_stock'
-    ).prefetch_related('genericerror_set')
+        'parent_lot', 'parent_stock', 'parent_stock__carbure_client', 'parent_stock__carbure_supplier',
+    ).prefetch_related('genericerror_set', 'carbure_production_site__productionsitecertificate_set')
     if status == 'DRAFTS':
         lots = lots.filter(carbure_supplier_id=entity_id, lot_status=CarbureLot.DRAFT)
     elif status == 'IN':
@@ -45,7 +46,7 @@ def get_lots_with_metadata(lots, entity_id, querySet, is_admin=False):
     from_idx = querySet.get('from_idx', "0")
 
     # filtering
-    lots, total_errors, total_deadline, deadline_str = filter_lots(lots, querySet, entity_id)
+    lots, total_errors, total_deadline, deadline_str, tx_with_errors = filter_lots(lots, querySet, entity_id)
     # sorting
     lots = sort_lots(lots, querySet)
 
@@ -57,11 +58,6 @@ def get_lots_with_metadata(lots, entity_id, querySet, is_admin=False):
         returned = returned[:limit]
 
     # enrich dataset with additional metadata
-    errors = {}
-    for tx in returned:
-        grouped_errors = get_errors(tx, entity_id)
-        if len(grouped_errors) > 0:
-            errors[tx.id] = grouped_errors
     serializer = CarbureLotPublicSerializer(returned, many=True)
     data = {}
     data['lots'] = serializer.data
@@ -69,7 +65,7 @@ def get_lots_with_metadata(lots, entity_id, querySet, is_admin=False):
     data['total_errors'] = total_errors
     data['returned'] = returned.count()
     data['from'] = from_idx
-    data['errors'] = errors
+    data['errors'] = {lot.id: lot.errors for lot in tx_with_errors}
     data['deadlines'] = {'date': deadline_str, 'total': total_deadline}
 
     if not export:
@@ -117,11 +113,11 @@ def get_history(tx):
 
 def get_lots_with_errors(lots, entity_id=None):
     if entity_id is None:
-        filter = Q(lot=OuterRef('pk'))
+        filter = Q(tx=OuterRef('pk'))
     else:
-        filter = Q(lot=OuterRef('pk')) & (Q(lot__carbure_supplier_id=entity_id, display_to_creator=True) | Q(lot__carbure_client_id=entity_id, display_to_recipient=True))
-    lot_errors = GenericError.objects.filter(filter).values('lot').annotate(errors=Count('id')).values('errors')
-    return lots.annotate(errors=Subquery(lot_errors)).filter(errors__gt=0)
+        filter = Q(tx=OuterRef('pk')) & (Q(lot__added_by_id=entity_id, display_to_creator=True) | Q(lot__carbure_client_id=entity_id, display_to_recipient=True))
+    tx_errors = GenericError.objects.filter(filter).values('lot').annotate(errors=Count('id')).values('errors')
+    return lots.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
 
 
 def get_lots_with_deadline(lots, deadline):
@@ -192,7 +188,7 @@ def filter_lots(lots, querySet, entity_id=None, blacklist=[]):
             Q(feedstock__name__icontains=query) |
             Q(biofuel__name__icontains=query) |
             Q(carbure_producer__name__icontains=query) |
-            Q(_unknown_producer__icontains=query) |
+            Q(unknown_producer__icontains=query) |
             Q(carbure_id__icontains=query) |
             Q(country_of_origin__name__icontains=query) |
             Q(carbure_client__name__icontains=query) |
@@ -221,8 +217,7 @@ def filter_lots(lots, querySet, entity_id=None, blacklist=[]):
         lots = tx_with_errors
     elif deadline == 'true' and 'deadline' not in blacklist:
         lots = tx_with_deadline
-
-    return lots, total_errors, total_deadline, deadline_str
+    return lots, total_errors, total_deadline, deadline_str, tx_with_errors
 
 
 def sort_lots(lots, querySet):

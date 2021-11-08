@@ -20,7 +20,7 @@ from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
-from core.models import Entity, ExternalAdminRights, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockTransformation, Entity, ExternalAdminRights, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
 from core.models import Depot, LotV2, LotTransaction, TransactionComment, GenericError
 from core.models import SustainabilityDeclaration, EntityDepot
 from core.models import TransactionUpdateHistory, TransactionDistance
@@ -560,3 +560,66 @@ class ETBETransformation(admin.ModelAdmin):
 class ExtAdminRightsAdmin(admin.ModelAdmin):
     list_display = ('entity', 'right',)
 
+@admin.register(CarbureLot)
+class CarbureLotAdmin(admin.ModelAdmin):
+    list_display = ['year', 'period', 'transport_document_reference', 'get_producer', 'get_production_site', 'get_supplier', 'get_client', 
+    'delivery_date', 'get_delivery_site', 'get_biofuel', 'get_feedstock', 'volume', 'lot_status', 'correction_status', 'delivery_type',
+    ]
+    list_filter = ('year', ('period', DropdownFilter), 'lot_status', 'correction_status', ('biofuel', NameSortedRelatedOnlyDropdownFilter), ('feedstock', NameSortedRelatedOnlyDropdownFilter), 
+                  ('carbure_supplier', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
+                  'delivery_type', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter),
+                  ('carbure_production_site', NameSortedRelatedOnlyDropdownFilter),)
+
+    def get_producer(self, obj):
+        return obj.carbure_producer.name if obj.carbure_producer else 'U - ' + obj.unknown_producer
+    get_producer.admin_order_field  = 'carbure_producer__name'
+    get_producer.short_description = 'Producer'
+
+    def get_production_site(self, obj):
+        return obj.carbure_production_site.name if obj.carbure_production_site else 'U - %s' % (obj.unknown_production_site)
+    get_production_site.admin_order_field  = 'carbure_production_site__name'
+    get_production_site.short_description = 'Production Site'
+
+    def get_supplier(self, obj):
+        return obj.carbure_supplier.name if obj.carbure_supplier else 'U - %s' % (obj.unknown_supplier)
+    get_supplier.admin_order_field  = 'carbure_supplier__name'
+    get_supplier.short_description = 'Supplier'
+
+    def get_client(self, obj):
+        return obj.carbure_client.name if obj.carbure_client else 'U - %s' % (obj.unknown_client)
+    get_client.admin_order_field  = 'carbure_client__name'
+    get_client.short_description = 'Client'
+
+    def get_delivery_site(self, obj):
+        return obj.carbure_delivery_site.name if obj.carbure_delivery_site else 'U - %s' % (obj.unknown_delivery_site)
+    get_delivery_site.admin_order_field  = 'carbure_delivery_site__name'
+    get_delivery_site.short_description = 'Delivery Site'
+
+    def get_biofuel(self, obj):
+        return obj.biofuel.code
+    get_biofuel.admin_order_field  = 'biofuel__code'
+    get_biofuel.short_description = 'Biofuel'
+
+    def get_feedstock(self, obj):
+        return obj.feedstock.code
+    get_feedstock.admin_order_field  = 'feedstock__code'
+    get_feedstock.short_description = 'Feedstock'
+
+@admin.register(CarbureStock)
+class CarbureStockAdmin(admin.ModelAdmin):
+    list_display = []
+    
+
+@admin.register(CarbureLotEvent)
+class CarbureLotEventAdmin(admin.ModelAdmin):
+    list_display = []
+    
+
+@admin.register(CarbureLotComment)
+class CarbureLotCommentAdmin(admin.ModelAdmin):
+    list_display = []
+
+
+@admin.register(CarbureStockTransformation)
+class CarbureStockTransformationAdmin(admin.ModelAdmin):
+    list_display = []

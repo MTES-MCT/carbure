@@ -1,41 +1,41 @@
 import traceback
 
 from django.http.response import JsonResponse
+from rest_framework import serializers
 from core.decorators import check_user_rights
 from api.v4.helpers import get_entity_lots_by_status, get_lots_with_metadata
-from core.models import CarbureLot, CarbureStock
+from core.models import CarbureLot, CarbureStock, EntityDepot
+from core.serializers import DepotSerializer
 
 @check_user_rights()
 def get_snapshot(request, *args, **kwargs):
     context = kwargs['context']
-    entity = context['entity']
+    entity_id = context['entity_id']
     year = request.GET.get('year', False)
     if year:
         try:
             year = int(year)
         except Exception:
             return JsonResponse({'status': 'error', 'message': 'Incorrect format for year. Expected YYYY'}, status=400)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Missing year'}, status=400)
 
     lots = CarbureLot.objects.filter(year=year)
     data = {}
-    drafts = lots.filter(added_by=entity, lot_status=CarbureLot.DRAFT).count()
-    lots_in = lots.filter(carbure_client=entity, lot_status__in=[CarbureLot.PENDING, CarbureLot.ACCEPTED, CarbureLot.FROZEN])
-    lots_in_tofix = lots_in.exclude(correction_status=CarbureLot.NO_PROBLEMO).count()
-    stock = CarbureStock.objects.filter(carbure_client=entity, remaining_volume__gt=0).count()
-    lots_out = lots.filter(carbure_supplier=entity, lot_status__in=[CarbureLot.PENDING, CarbureLot.ACCEPTED, CarbureLot.FROZEN])
-    lots_out_tofix = lots_out.exclude(correction_status=CarbureLot.NO_PROBLEMO).count()
-    data['lots'] = {'draft': drafts, 'in': lots_in.count(), 'in_tofix': lots_in_tofix, 'stock': stock, 'out': lots_out.count(), 'out_tofix': lots_out_tofix}
-    base_filters = [
-        'periods',
-        'biocarburants',
-        'matieres_premieres',
-        'countries_of_origin',
-        'production_sites',
-        'delivery_sites',
-        'suppliers',
-        'clients'
-    ]
-    data['filters'] = base_filters
+    drafts = lots.filter(added_by_id=entity_id, lot_status=CarbureLot.DRAFT)
+    lots_in = lots.filter(carbure_client_id=entity_id)
+    lots_in_pending = lots_in.filter(lot_status=CarbureLot.PENDING)
+    lots_in_accepted= lots_in.filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN])
+    lots_in_tofix = lots_in.exclude(correction_status=CarbureLot.NO_PROBLEMO)
+    stock = CarbureStock.objects.filter(carbure_client_id=entity_id, remaining_volume__gt=0)
+    lots_out = lots.filter(carbure_supplier_id=entity_id)
+    lots_out_pending = lots_out.filter(lot_status=CarbureLot.PENDING)
+    lots_out_accepted = lots_out.filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN])
+    lots_out_tofix = lots_out.exclude(correction_status=CarbureLot.NO_PROBLEMO)
+    data['lots'] = {'draft': drafts.count(), 
+                    'in_total': lots_in.count(), 'in_pending': lots_in_pending.count(), 'in_accepted': lots_in_accepted.count(), 'in_tofix': lots_in_tofix.count(), 
+                    'stock': stock.count(), 
+                    'out_total': lots_out.count(), 'out_pending': lots_out_pending.count(), 'out_accepted': lots_out_accepted.count(), 'out_tofix': lots_out_tofix.count()}
     return JsonResponse({'status': 'success', 'data': data})
 
 

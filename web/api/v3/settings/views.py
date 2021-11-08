@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from core.models import Entity, GenericError, LotTransaction, UserRights, LotV2, Pays, MatierePremiere, Biocarburant, Depot, EntityDepot
+from core.serializers import EntityDepotSerializer
 from producers.models import ProductionSite, ProductionSiteInput, ProductionSiteOutput
 from core.decorators import check_rights, otp_or_403
 
@@ -32,7 +33,13 @@ def get_settings(request):
     # requests
     requests = UserRightsRequests.objects.filter(user=request.user)
     requests_sez = [r.natural_key() for r in requests]
-    return JsonResponse({'status': 'success', 'data': {'rights': rights_sez, 'email': request.user.email, 'requests': requests_sez}})
+
+    depots = {}
+    for ur in rights:
+        d = EntityDepot.objects.filter(entity=ur.entity)
+        serializer = EntityDepotSerializer(d, many=True)
+        depots[ur.entity.id] = serializer.data
+    return JsonResponse({'status': 'success', 'data': {'rights': rights_sez, 'email': request.user.email, 'requests': requests_sez, 'depots': depots}})
 
 
 @check_rights('entity_id', role=[UserRights.ADMIN, UserRights.RW])
