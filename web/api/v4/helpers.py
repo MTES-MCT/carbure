@@ -19,7 +19,7 @@ sort_key_to_django_field = {'period': 'period',
                             'country_of_origin': 'country_of_origin__name',
                             'added_by': 'added_by__name'}
 
-def get_entity_lots_by_status(entity, status):
+def get_entity_lots_by_status(entity_id, status):
     if status not in ['DRAFTS', 'IN', 'OUT']:
         raise Exception('Unknown status %s' % (status))
     lots = CarbureLot.objects.select_related(
@@ -30,22 +30,22 @@ def get_entity_lots_by_status(entity, status):
         'added_by', 'parent_lot', 'parent_stock'
     ).prefetch_related('genericerror_set')
     if status == 'DRAFTS':
-        lots = lots.filter(carbure_supplier=entity, lot_status=CarbureLot.DRAFT)
+        lots = lots.filter(carbure_supplier_id=entity_id, lot_status=CarbureLot.DRAFT)
     elif status == 'IN':
-        lots = lots.filter(carbure_client=entity, lot_status__in=[CarbureLot.PENDING, CarbureLot.ACCEPTED, CarbureLot.FROZEN])
+        lots = lots.filter(carbure_client_id=entity_id, lot_status__in=[CarbureLot.PENDING, CarbureLot.ACCEPTED, CarbureLot.FROZEN])
     elif status == 'OUT':
-        lots = lots.filter(carbure_supplier=entity, lot_status__in=[CarbureLot.PENDING, CarbureLot.ACCEPTED, CarbureLot.FROZEN])
+        lots = lots.filter(carbure_supplier_id=entity_id, lot_status__in=[CarbureLot.PENDING, CarbureLot.ACCEPTED, CarbureLot.FROZEN])
     else:
         raise Exception('Unknown status')
     return lots
 
-def get_lots_with_metadata(lots, entity, querySet, is_admin=False):
+def get_lots_with_metadata(lots, entity_id, querySet, is_admin=False):
     export = querySet.get('export', False)
     limit = querySet.get('limit', None)
     from_idx = querySet.get('from_idx', "0")
 
     # filtering
-    lots, total_errors, total_deadline, deadline_str = filter_lots(lots, querySet, entity)
+    lots, total_errors, total_deadline, deadline_str = filter_lots(lots, querySet, entity_id)
     # sorting
     lots = sort_lots(lots, querySet)
 
@@ -59,7 +59,7 @@ def get_lots_with_metadata(lots, entity, querySet, is_admin=False):
     # enrich dataset with additional metadata
     errors = {}
     for tx in returned:
-        grouped_errors = get_errors(tx, entity)
+        grouped_errors = get_errors(tx, entity_id)
         if len(grouped_errors) > 0:
             errors[tx.id] = grouped_errors
     serializer = CarbureLotPublicSerializer(returned, many=True)
@@ -75,7 +75,7 @@ def get_lots_with_metadata(lots, entity, querySet, is_admin=False):
     if not export:
         return JsonResponse({'status': 'success', 'data': data})
     else:
-        file_location = export_carbure_lots(entity, returned)
+        file_location = export_carbure_lots(entity_id, returned)
         with open(file_location, "rb") as excel:
             data = excel.read()
             ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -85,15 +85,15 @@ def get_lots_with_metadata(lots, entity, querySet, is_admin=False):
 
 
 
-def get_errors(tx, entity=None, is_admin=False):
+def get_errors(lot, entity_id=None, is_admin=False):
     if is_admin:
-        return [e.natural_key() for e in tx.genericerror_set.all()]
-    elif entity == tx.lot.data_origin_entity:
-        return [e.natural_key() for e in tx.genericerror_set.filter(display_to_creator=True)]
-    elif entity == tx.carbure_client:
-        return [e.natural_key() for e in tx.genericerror_set.filter(display_to_recipient=True)]
+        return [e.natural_key() for e in lot.genericerror_set.all()]
+    elif entity_id == lot.added_by_id:
+        return [e.natural_key() for e in lot.genericerror_set.filter(display_to_creator=True)]
+    elif entity_id == lot.carbure_client_id:
+        return [e.natural_key() for e in lot.genericerror_set.filter(display_to_recipient=True)]
     else:
-        return [e.natural_key() for e in tx.genericerror_set.filter(display_to_creator=True)]
+        return [e.natural_key() for e in lot.genericerror_set.filter(display_to_creator=True)]
 
 
 def get_current_deadline():
@@ -115,13 +115,13 @@ def get_history(tx):
     return [c.natural_key() for c in tx.transactionupdatehistory_set.all().order_by('-datetime')]
 
 
-def get_lots_with_errors(lots, entity=None):
-    if entity is None:
+def get_lots_with_errors(lots, entity_id=None):
+    if entity_id is None:
         filter = Q(lot=OuterRef('pk'))
     else:
-        filter = Q(lot=OuterRef('pk')) & (Q(carbure_supplier=entity, display_to_creator=True) | Q(carbure_client=entity, display_to_recipient=True))
-    tx_errors = GenericError.objects.filter(filter).values('lot').annotate(errors=Count(Value(1))).values('errors')
-    return lots.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
+        filter = Q(lot=OuterRef('pk')) & (Q(lot__carbure_supplier_id=entity_id, display_to_creator=True) | Q(lot__carbure_client_id=entity_id, display_to_recipient=True))
+    lot_errors = GenericError.objects.filter(filter).values('lot').annotate(errors=Count('id')).values('errors')
+    return lots.annotate(errors=Subquery(lot_errors)).filter(errors__gt=0)
 
 
 def get_lots_with_deadline(lots, deadline):
@@ -130,7 +130,7 @@ def get_lots_with_deadline(lots, deadline):
     return lots_with_deadline
 
 
-def filter_lots(lots, querySet, entity=None, blacklist=[]):
+def filter_lots(lots, querySet, entity_id=None, blacklist=[]):
     year = querySet.get('year', False)
     periods = querySet.getlist('periods')
     production_sites = querySet.getlist('production_sites')
@@ -211,7 +211,7 @@ def filter_lots(lots, querySet, entity=None, blacklist=[]):
     deadline_date = get_current_deadline()
     deadline_str = deadline_date.strftime("%Y-%m-%d")
 
-    tx_with_errors = get_lots_with_errors(lots, entity)
+    tx_with_errors = get_lots_with_errors(lots, entity_id)
     tx_with_deadline = get_lots_with_deadline(lots, deadline_date)
 
     total_errors = tx_with_errors.count()
