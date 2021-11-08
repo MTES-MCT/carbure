@@ -8,13 +8,18 @@ from django.db.models.aggregates import Sum
 
 from core.models import AdminTransactionComment, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockTransformation, ETBETransformation, Entity, GenericError, LotTransaction, LotV2, TransactionComment, TransactionUpdateHistory
 
-TX_ID_MIGRATED = []
+# map old id to new id
+TX_ID_MIGRATED = {}
 
 def create_new_tx_and_child(tx):
     if tx.id in TX_ID_MIGRATED:
         # ignore, this is a child tx already migrated
         print('Ignoring txid %d - already migrated' % (tx.id))
-        return
+        new_id = TX_ID_MIGRATED[tx.id]
+        if new_id:
+            return CarbureLot.objects.get(id=TX_ID_MIGRATED[tx.id])
+        else:
+            return None
     print('Migrate txid %d' % (tx.id))
     lot = CarbureLot()
     lot.period = tx.delivery_date.year * 100 + tx.delivery_date.month
@@ -124,6 +129,9 @@ def create_new_tx_and_child(tx):
     creation_event.event_dt = tx.lot.added_time
     creation_event.user = tx.lot.added_by_user
     creation_event.lot_id = lot.id
+    TX_ID_MIGRATED[tx.id] = lot.id
+
+
 
     # for each TX
     # if is_stock, create stock, get child tx, link them to stock, check remaining volume
@@ -136,8 +144,8 @@ def create_new_tx_and_child(tx):
         stock.depot = lot.carbure_delivery_site
         stock.carbure_client = lot.carbure_client
         stock.remaining_volume = tx.lot.remaining_volume
-        stock.remaining_weight = tx.lot.remaining_volume * tx.biofuel.masse_volumique
-        stock.remaining_lhv_amount = tx.lot.remaining_volume * tx.biofuel.pci_kg
+        stock.remaining_weight = tx.lot.remaining_volume * lot.biofuel.masse_volumique
+        stock.remaining_lhv_amount = tx.lot.remaining_volume * lot.biofuel.pci_kg
         stock.feedstock = lot.feedstock
         stock.biofuel = lot.biofuel
         stock.country_of_origin = lot.country_of_origin
@@ -164,18 +172,18 @@ def create_new_tx_and_child(tx):
                 etbe_stock.depot = lot.carbure_delivery_site
                 etbe_stock.carbure_client = lot.carbure_client
                 etbe_stock.remaining_volume = child.lot.remaining_volume
-                etbe_stock.remaining_weight = etbe_stock.remaining_volume * child.biofuel.masse_volumique
-                etbe_stock.remaining_lhv_amount = etbe_stock.remaining_volume * child.biofuel.pci_kg
-                etbe_stock.feedstock = child.lot.feedstock
-                etbe_stock.biofuel = child.lot.biofuel
-                etbe_stock.country_of_origin = child.country_of_origin
+                etbe_stock.remaining_weight = etbe_stock.remaining_volume * child.lot.biocarburant.masse_volumique
+                etbe_stock.remaining_lhv_amount = etbe_stock.remaining_volume * child.lot.biocarburant.pci_kg
+                etbe_stock.feedstock = child.lot.matiere_premiere
+                etbe_stock.biofuel = child.lot.biocarburant
+                etbe_stock.country_of_origin = child.lot.pays_origine
                 etbe_stock.carbure_production_site = child.lot.carbure_production_site
                 etbe_stock.unknown_production_site = child.lot.unknown_production_site
-                etbe_stock.production_country = child.lot.production_country
-                etbe_stock.carbure_supplier = child.lot.carbure_supplier
+                etbe_stock.production_country = child.lot.carbure_production_site.country if child.lot.carbure_production_site else child.lot.unknown_production_country
+                etbe_stock.carbure_supplier = child.carbure_vendor
                 etbe_stock.unknown_supplier = child.lot.unknown_supplier
                 etbe_stock.ghg_reduction = child.lot.ghg_reduction
-                etbe_stock.ghg_reduction_red_ii = child.lot.ghg_reduction_red_ii            
+                etbe_stock.ghg_reduction_red_ii = child.lot.ghg_reduction_red_ii
                 etbe_stock.save()
                 # create transformation object
                 transformation = CarbureStockTransformation()
@@ -192,7 +200,7 @@ def create_new_tx_and_child(tx):
 
                 etbe_stock.parent_transformation = transformation
                 etbe_stock.save()
-                TX_ID_MIGRATED.append(child.id)
+                TX_ID_MIGRATED[child.id] = None
 
         child = LotTransaction.objects.filter(parent_tx=tx)
         child_sum_volume = 0
@@ -210,33 +218,26 @@ def create_new_tx_and_child(tx):
             lot.dispatch_date = None
             lot.carbure_dispatch_site = stock.depot
             lot.unknown_dispatch_site = None
-            lot.dispatch_site_country = stock.depot.country
+            lot.dispatch_site_country = stock.depot.country if stock.depot else None
             lot.delivery_date = c.delivery_date
             lot.carbure_delivery_site = c.carbure_delivery_site
             lot.unknown_delivery_site = c.unknown_delivery_site
             lot.delivery_site_country = c.carbure_delivery_site.country if c.carbure_delivery_site else c.unknown_delivery_site_country
-            lot.volume = c.volume
+            lot.volume = c.lot.volume
             lot.save()
             creation_event = CarbureLotEvent()
             creation_event.event_type = CarbureLotEvent.CREATED
             creation_event.event_dt = c.lot.added_time
             creation_event.user = c.lot.added_by_user
             creation_event.lot_id = lot.id            
-            TX_ID_MIGRATED.append(c.id)
-            child_sum_volume += c.volume
+            TX_ID_MIGRATED[c.id] = lot.id
+            child_sum_volume += c.lot.volume
 
         theo_remaining = stock.parent_lot.volume - child_sum_volume
         remaining = stock.remaining_volume
         diff = remaining - theo_remaining
         if abs(diff) > 0.1:
             print('VOLUME DISCREPANCY!!! Theo remaining [%f] remaining [%f]' % (theo_remaining, remaining))
-
-    creation_event = CarbureLotEvent()
-    creation_event.event_type = CarbureLotEvent.CREATED
-    creation_event.event_dt = tx.lot.added_time
-    creation_event.user = tx.lot.added_by_user
-    creation_event.lot_id = lot.id
-    TX_ID_MIGRATED.append(tx.id)
 
     # if is_forwarded, check Child TX (Processing / Trading without storage) and create them
     if tx.is_forwarded:
@@ -255,10 +256,9 @@ def create_new_tx_and_child(tx):
             creation_event.event_dt = child.lot.added_time
             creation_event.user = child.lot.added_by_user
             creation_event.lot_id = lot.id
-            TX_ID_MIGRATED.append(child.id)            
+            TX_ID_MIGRATED[child.id] = lot.id
         except:
             print('Forwarded TX has not child tx. strange')
-
 
     return lot
 
@@ -268,6 +268,9 @@ def migrate_old_data(apps, schema_editor):
     for tx in all_transactions:
         # create the new transaction
         new_tx = create_new_tx_and_child(tx)
+        if new_tx is None:
+            # new tx is a Stock entry
+            continue
         # comments migration
         comments = TransactionComment.objects.filter(tx=tx)
         for c in comments:
@@ -287,7 +290,7 @@ def migrate_old_data(apps, schema_editor):
             new.entity = c.entity
             new.user = None
             new.lot = new_tx
-            if c.entity.entity_type == Entity.AUDITOR:
+            if c.entity is not None and c.entity.entity_type == Entity.AUDITOR:
                 new.comment_type = CarbureLotComment.AUDITOR
             else:
                 new.comment_type = CarbureLotComment.ADMIN
