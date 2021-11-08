@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, useMatch } from "react-router-dom"
 
 import { PageSelection } from "../../../common/components/pagination"
 import { SpecialSelection } from "./use-special"
@@ -28,7 +28,7 @@ export default function useStatusSelection(
   function setActive(status: LotStatus) {
     pagination.setPage(0)
     special.reset()
-    navigate(`../${status}`)
+    navigate(`../transactions/${status}`)
   }
 
   return { active, is, setActive }
@@ -49,7 +49,7 @@ export function useStockStatusSelection(
 
   function setActive(status: LotStatus) {
     pagination.setPage(0)
-    navigate(`../${status}`)
+    navigate(`../stocks/${status}`)
   }
 
   return { active, is, setActive }
