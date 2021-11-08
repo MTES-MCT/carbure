@@ -375,6 +375,7 @@ def delete_lot(request, *args, **kwargs):
         if tx.parent_tx != None:
             LotTransaction.objects.filter(id=tx.parent_tx_id).update(is_forwarded=False)
         lot_id = tx.lot.id
+        GenericError.objects.filter(tx=tx).delete()
         tx.delete()
         if LotTransaction.objects.filter(lot_id=lot_id).count() == 0:
             LotV2.objects.filter(id=lot_id).delete()
