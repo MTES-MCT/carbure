@@ -5,7 +5,7 @@ from core.decorators import check_user_rights
 from api.v4.helpers import get_entity_lots_by_status, get_lots_with_metadata
 from core.models import CarbureLot, CarbureStock
 
-@check_user_rights
+@check_user_rights()
 def get_snapshot(request, *args, **kwargs):
     context = kwargs['context']
     entity = context['entity']
@@ -39,16 +39,16 @@ def get_snapshot(request, *args, **kwargs):
     return JsonResponse({'status': 'success', 'data': data})
 
 
-@check_user_rights
+@check_user_rights()
 def get_lots(request, *args, **kwargs):
     context = kwargs['context']
-    entity = context['entity']
+    entity_id = context['entity_id']
     status = request.GET.get('status', False)
     if not status:
         return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
     try:
-        lots = get_entity_lots_by_status(entity, status)
-        return get_lots_with_metadata(lots, entity, request.GET)
+        lots = get_entity_lots_by_status(entity_id, status)
+        return get_lots_with_metadata(lots, entity_id, request.GET)
     except Exception as e:
         traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': "Could not get lots"}, status=400)

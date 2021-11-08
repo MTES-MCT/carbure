@@ -175,7 +175,6 @@ def check_user_rights(role=None):
         def wrap(request, *args, **kwargs):
             if not request.user.is_verified():
                 return JsonResponse({'status': 'forbidden', 'message': "User not OTP verified"}, status=403)
-
             entity_id = request.POST.get('entity_id', request.GET.get('entity_id', False))
             if not entity_id:
                 return JsonResponse({'status': 'error', 'message': "Missing entity_id"}, status=400)
@@ -191,7 +190,6 @@ def check_user_rights(role=None):
 
             if entity_id != request.session.get('entity_id', False):
                 request.session['entity_id'] = entity_id
-                request.session['entity'] = Entity.objects.get(id=entity_id)
 
             user_role = rights[entity_id]
             if role is not None:
@@ -204,7 +202,6 @@ def check_user_rights(role=None):
                     # all types of roles allowed
                     pass
             context = {}
-            context['entity'] = request.session['entity']
             context['entity_id'] = request.session['entity_id']
             kwargs['context'] = context
             return function(request, *args, **kwargs)
