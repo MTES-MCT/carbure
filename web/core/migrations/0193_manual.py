@@ -82,8 +82,9 @@ def create_new_tx_and_child(tx):
     lot.biofuel = tx.lot.biocarburant
     lot.country_of_origin = tx.lot.pays_origine
     lot.volume = tx.lot.volume
-    lot.weight = lot.volume * lot.biofuel.masse_volumique
-    lot.lhv_amount = lot.volume * lot.biofuel.pci_litre
+    if lot.biofuel:
+        lot.weight = lot.volume * lot.biofuel.masse_volumique
+        lot.lhv_amount = lot.volume * lot.biofuel.pci_litre
     lot.eec = tx.lot.eec
     lot.el = tx.lot.el
     lot.ep = tx.lot.ep
@@ -161,46 +162,48 @@ def create_new_tx_and_child(tx):
         if tx.lot.biocarburant.code == 'ETH':
             # check if I have been transformed into ETBE
             if ETBETransformation.objects.filter(previous_stock=tx.id).exists():
-                trans = ETBETransformation.objects.get(previous_stock=tx.id)
-                print('This stock was converted to ETBE!')
-                # create new stock
-                child = trans.new_stock
-                etbe_stock = CarbureStock()
-                etbe_stock.parent_lot = None
-                etbe_stock.parent_transformation = None
-                etbe_stock.carbure_id = lot.carbure_id
-                etbe_stock.depot = lot.carbure_delivery_site
-                etbe_stock.carbure_client = lot.carbure_client
-                etbe_stock.remaining_volume = child.lot.remaining_volume
-                etbe_stock.remaining_weight = etbe_stock.remaining_volume * child.lot.biocarburant.masse_volumique
-                etbe_stock.remaining_lhv_amount = etbe_stock.remaining_volume * child.lot.biocarburant.pci_kg
-                etbe_stock.feedstock = child.lot.matiere_premiere
-                etbe_stock.biofuel = child.lot.biocarburant
-                etbe_stock.country_of_origin = child.lot.pays_origine
-                etbe_stock.carbure_production_site = child.lot.carbure_production_site
-                etbe_stock.unknown_production_site = child.lot.unknown_production_site
-                etbe_stock.production_country = child.lot.carbure_production_site.country if child.lot.carbure_production_site else child.lot.unknown_production_country
-                etbe_stock.carbure_supplier = child.carbure_vendor
-                etbe_stock.unknown_supplier = child.lot.unknown_supplier
-                etbe_stock.ghg_reduction = child.lot.ghg_reduction
-                etbe_stock.ghg_reduction_red_ii = child.lot.ghg_reduction_red_ii
-                etbe_stock.save()
-                # create transformation object
-                transformation = CarbureStockTransformation()
-                transformation.transformation_type = CarbureStockTransformation.ETH_ETBE
-                transformation.source_stock = stock
-                transformation.dest_stock = etbe_stock
-                transformation.volume_deducted_from_source = trans.volume_ethanol
-                transformation.volume_destination = trans.volume_etbe
-                transformation.metadata = {'volume_denaturant': trans.volume_denaturant, 'volume_etbe_eligible': trans.volume_etbe_eligible}
-                transformation.transformed_by = trans.added_by_user
-                transformation.entity = trans.added_by
-                transformation.transformation_dt = trans.added_time
-                transformation.save()
+                transformations = ETBETransformation.objects.filter(previous_stock=tx.id)
+                for trans in transformations:
+                    print('This ETH stock was converted to ETBE!')
+                    
+                    # create new stock
+                    child = trans.new_stock
+                    etbe_stock = CarbureStock()
+                    etbe_stock.parent_lot = None
+                    etbe_stock.parent_transformation = None
+                    etbe_stock.carbure_id = lot.carbure_id
+                    etbe_stock.depot = lot.carbure_delivery_site
+                    etbe_stock.carbure_client = lot.carbure_client
+                    etbe_stock.remaining_volume = child.lot.remaining_volume
+                    etbe_stock.remaining_weight = etbe_stock.remaining_volume * child.lot.biocarburant.masse_volumique
+                    etbe_stock.remaining_lhv_amount = etbe_stock.remaining_volume * child.lot.biocarburant.pci_kg
+                    etbe_stock.feedstock = child.lot.matiere_premiere
+                    etbe_stock.biofuel = child.lot.biocarburant
+                    etbe_stock.country_of_origin = child.lot.pays_origine
+                    etbe_stock.carbure_production_site = child.lot.carbure_production_site
+                    etbe_stock.unknown_production_site = child.lot.unknown_production_site
+                    etbe_stock.production_country = child.lot.carbure_production_site.country if child.lot.carbure_production_site else child.lot.unknown_production_country
+                    etbe_stock.carbure_supplier = child.carbure_vendor
+                    etbe_stock.unknown_supplier = child.lot.unknown_supplier
+                    etbe_stock.ghg_reduction = child.lot.ghg_reduction
+                    etbe_stock.ghg_reduction_red_ii = child.lot.ghg_reduction_red_ii
+                    etbe_stock.save()
+                    # create transformation object
+                    transformation = CarbureStockTransformation()
+                    transformation.transformation_type = CarbureStockTransformation.ETH_ETBE
+                    transformation.source_stock = stock
+                    transformation.dest_stock = etbe_stock
+                    transformation.volume_deducted_from_source = trans.volume_ethanol
+                    transformation.volume_destination = trans.volume_etbe
+                    transformation.metadata = {'volume_denaturant': trans.volume_denaturant, 'volume_etbe_eligible': trans.volume_etbe_eligible}
+                    transformation.transformed_by = trans.added_by_user
+                    transformation.entity = trans.added_by
+                    transformation.transformation_dt = trans.added_time
+                    transformation.save()
 
-                etbe_stock.parent_transformation = transformation
-                etbe_stock.save()
-                TX_ID_MIGRATED[child.id] = None
+                    etbe_stock.parent_transformation = transformation
+                    etbe_stock.save()
+                    TX_ID_MIGRATED[child.id] = None
 
         child = LotTransaction.objects.filter(parent_tx=tx)
         child_sum_volume = 0
@@ -264,7 +267,8 @@ def create_new_tx_and_child(tx):
 
 
 def migrate_old_data(apps, schema_editor):
-    all_transactions = LotTransaction.objects.all()
+    #all_transactions = LotTransaction.objects.all()
+    all_transactions = LotTransaction.objects.filter(lot__year=2021, lot__status=LotV2.VALIDATED)
     for tx in all_transactions:
         # create the new transaction
         new_tx = create_new_tx_and_child(tx)
