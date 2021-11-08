@@ -1,8 +1,12 @@
 import os
 import django
+from rest_framework import serializers
 import xlsxwriter
 import datetime
 import random
+import pandas as pd
+
+from core.serializers import CarbureLotCSVSerializer
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
@@ -729,3 +733,31 @@ def make_dc_mps_sheet(workbook):
         worksheet_mps.write(row, 1, m.name)
         worksheet_mps.write(row, 2, m.category)
         row += 1
+
+def make_carbure_lots_sheet(workbook, lots,):
+    worksheet_lots = workbook.add_worksheet("lots")
+    serializer = CarbureLotCSVSerializer(lots, many=True)
+    df = pd.DataFrame(serializer.data)
+    # header
+    bold = workbook.add_format({'bold': True})
+    for i, c in enumerate(df.columns):
+        worksheet_lots.write(0, i, c, bold)
+    # content
+    for index, row in df.iterrows():
+        colid = 0
+        for elem in row:
+            worksheet_lots.write(index+1, colid, elem)
+            colid += 1
+
+def export_carbure_lots(entity, transactions):
+    today = datetime.date.today()
+    location = '/tmp/carbure_lots_%s.xlsx' % (today.strftime('%Y%m%d_%H%M'))
+    workbook = xlsxwriter.Workbook(location)
+    make_carbure_lots_sheet(workbook, entity, transactions)
+    make_countries_sheet(workbook)
+    make_mps_sheet(workbook)
+    make_biofuels_sheet(workbook)
+    make_clients_sheet(workbook)
+    make_deliverysites_sheet(workbook)
+    workbook.close()
+    return location        
