@@ -109,6 +109,7 @@ export interface DeliverySite {
   address: string
 }
 
+
 export interface ProductionSite {
   id: number
   name: string
@@ -551,4 +552,27 @@ export interface ConvertETBE {
   volume_etbe: number
   volume_etbe_eligible: number
   volume_denaturant: number
+}
+
+
+export interface Depot {
+  name: string
+  city: string
+  depot_id: string
+  country: Country
+  depot_type: DepotType
+  postal_code: string
+  address: string
+}
+
+export interface Feedstock {
+  code: string
+  name: string
+  is_double_compte?: boolean
+  category: string
+}
+
+export interface Biofuel {
+  code: string
+  name: string
 }

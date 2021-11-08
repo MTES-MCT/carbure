@@ -1,9 +1,12 @@
+import { useContext } from 'react'
 import { Trans, useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 
 import { AppHook, useApp } from "./hooks/use-app"
 import { EntityType, LotStatus, ExternalAdminPages } from "common/types"
-import useEntity, { EntityContext, hasPage } from "./hooks/use-entity"
+import { hasPage } from "./hooks/use-entity"
+import useUser, { useUserContext, UserContext } from './hooks/user'
+import useEntity from './hooks/entity'
 import { UserRightProvider } from "./hooks/use-rights"
 
 import { LoaderOverlay } from "common/components"
@@ -14,6 +17,7 @@ import Exit from "./components/exit"
 import Registry from "./components/registry"
 
 import Transactions from "transactions"
+import TransactionsV2 from "transactions-v2"
 import Stocks from "stocks"
 import Settings from "settings"
 import Account from "account"
@@ -41,49 +45,50 @@ const DevBanner = () => (
 
 // has to be nested in a route so we can get data from useParams()
 const Org = ({ app }: { app: AppHook }) => {
-  const entity = useEntity(app)
+  const entity = useEntity()
+  const user = useUserContext()
 
-  if (!app.isAuthenticated()) {
+  if (!user.isAuthenticated()) {
     return <Exit to="/accounts/login" />
   }
 
-  if (app.settings.loading || app.settings.data === null) {
+  if (user.loading) {
     return <LoaderOverlay />
   }
 
   // a user with entities tries to access the pending or another entity's page
-  if (app.hasEntities() && !entity) {
-    return <Navigate to="/" />
-  }
+  // if (user.hasEntities() && !entity) {
+  //   return <Navigate to="/" />
+  // }
 
-  const isAdmin = entity?.entity_type === EntityType.Administration
-  const isAuditor = entity?.entity_type === EntityType.Auditor
+  const { isAdmin, isAuditor } = entity
 
   // prettier-ignore
   return (
     <UserRightProvider app={app}>
-      <EntityContext.Provider value={entity}>
-        <Routes>
-          <Route path="stocks" element={<Navigate to="in" />} />
-          <Route path="stocks/:status/*" element={<Stocks entity={entity} />} />
+      <Routes>
+        <Route path="stocks" element={<Navigate to="in" />} />
+        <Route path="stocks/:status/*" element={<Stocks entity={entity} />} />
 
-          <Route path="transactions" element={<Navigate to={isAdmin || isAuditor ? LotStatus.Alert : LotStatus.Draft} />} />
-          <Route path="transactions/:status/*" element={<Transactions entity={entity} />} />
+        <Route path="transactions" element={<Navigate to={isAdmin || isAuditor ? LotStatus.Alert : LotStatus.Draft} />} />
+        <Route path="transactions/:status/*" element={<Transactions entity={entity} />} />
 
-          <Route path="settings" element={<Settings entity={entity} settings={app.settings} />} />
-          <Route path="registry" element={<Registry />} />
+        <Route path="transactions-v2" element={<Navigate to="draft" />} />
+        <Route path="transactions-v2/:status/*" element={<TransactionsV2 />} />
 
-          {isAdmin && <Route path="dashboard" element={<Dashboard />} />}
-          {isAdmin && <Route path="entities" element={<Entities />} />}
-          {isAdmin && <Route path="entities/:id" element={<EntityDetails />} />}
+        <Route path="settings" element={<Settings entity={entity} settings={app.settings} />} />
+        <Route path="registry" element={<Registry />} />
 
-          {(isAdmin || hasPage(entity, ExternalAdminPages.DoubleCounting)) && (
-            <Route path="double-counting/*" element={<DoubleCounting entity={entity} />} />
-          )}
+        {isAdmin && <Route path="dashboard" element={<Dashboard />} />}
+        {isAdmin && <Route path="entities" element={<Entities />} />}
+        {isAdmin && <Route path="entities/:id" element={<EntityDetails />} />}
 
-          <Route path="*" element={<Navigate to={isAdmin ? "dashboard" : "transactions"} />} />
-        </Routes>
-      </EntityContext.Provider>
+        {(isAdmin || hasPage(entity, ExternalAdminPages.DoubleCounting)) && (
+          <Route path="double-counting/*" element={<DoubleCounting entity={entity} />} />
+        )}
+
+        <Route path="*" element={<Navigate to={isAdmin ? "dashboard" : "transactions"} />} />
+      </Routes>
     </UserRightProvider>
   )
 }
@@ -91,24 +96,29 @@ const Org = ({ app }: { app: AppHook }) => {
 const Carbure = () => {
   useTranslation()
   const app = useApp()
+  const user = useUser()
+
+  console.log(user)
 
   return (
-    <div id="app">
-      {!app.isProduction() && <DevBanner />}
+    <UserContext.Provider value={user}>
+      <div id="app">
+        {!app.isProduction() && <DevBanner />}
 
-      <Topbar app={app} />
+        <Topbar app={app} />
 
-      <Routes>
-        <Route path="/" element={<Home app={app} />} />
-        <Route path="/pending" element={<Pending app={app} />} />
-        <Route path="/logout" element={<Exit to="/accounts/logout" />} />
-        <Route path="/account" element={<Account app={app} />} />
-        <Route path="/org/:entity/*" element={<Org app={app} />} />
-        <Route path="/public_stats" element={<PublicStats />} />
-      </Routes>
+        <Routes>
+          <Route path="/" element={<Home app={app} />} />
+          <Route path="/pending" element={<Pending app={app} />} />
+          <Route path="/logout" element={<Exit to="/accounts/logout" />} />
+          <Route path="/account" element={<Account app={app} />} />
+          <Route path="/org/:entity/*" element={<Org app={app} />} />
+          <Route path="/public_stats" element={<PublicStats />} />
+        </Routes>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </UserContext.Provider>
   )
 }
 

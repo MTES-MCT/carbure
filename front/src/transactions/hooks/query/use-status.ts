@@ -1,4 +1,4 @@
-import { useParams, useNavigate, useMatch } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 
 import { PageSelection } from "../../../common/components/pagination"
 import { SpecialSelection } from "./use-special"
