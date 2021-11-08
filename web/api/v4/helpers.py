@@ -1,8 +1,15 @@
 import datetime
 import calendar
+from multiprocessing import Value
+from dateutil.relativedelta import relativedelta
+from django.db.models.aggregates import Count
+from django.db.models.expressions import OuterRef, Subquery
+from django.db.models.functions.comparison import Coalesce
 from django.db.models.query_utils import Q
 from django.http.response import HttpResponse, JsonResponse
 from core.models import CarbureLot
+from core.models import GenericError
+from core.xlsx_v3 import export_carbure_lots
 
 sort_key_to_django_field = {'period': 'period',
                             'feedstock': 'feedstock__name',
@@ -66,7 +73,7 @@ def get_lots_with_metadata(lots, entity, querySet, is_admin=False):
     if not export:
         return JsonResponse({'status': 'success', 'data': data})
     else:
-        file_location = export_transactions(entity, returned)
+        file_location = export_carbure_lots(entity, returned)
         with open(file_location, "rb") as excel:
             data = excel.read()
             ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -86,11 +93,13 @@ def get_errors(tx, entity=None, is_admin=False):
     else:
         return [e.natural_key() for e in tx.genericerror_set.filter(display_to_creator=True)]
 
+
 def get_current_deadline():
     now = datetime.datetime.now()
     (_, last_day) = calendar.monthrange(now.year, now.month)
     deadline_date = now.replace(day=last_day)
     return deadline_date
+
 
 def get_comments(tx):
     comments = []
@@ -99,24 +108,24 @@ def get_comments(tx):
         comments.append(comment)
     return comments
 
+
 def get_history(tx):
     return [c.natural_key() for c in tx.transactionupdatehistory_set.all().order_by('-datetime')]
 
 
-def get_lots_with_errors(txs, entity=None):
+def get_lots_with_errors(lots, entity=None):
     if entity is None:
-        filter = Q(tx=OuterRef('pk'))
+        filter = Q(lot=OuterRef('pk'))
     else:
-        filter = Q(tx=OuterRef('pk')) & (Q(tx__carbure_vendor=entity, display_to_creator=True) | Q(tx__carbure_client=entity, display_to_recipient=True))
+        filter = Q(lot=OuterRef('pk')) & (Q(carbure_supplier=entity, display_to_creator=True) | Q(carbure_client=entity, display_to_recipient=True))
+    tx_errors = GenericError.objects.filter(filter).values('lot').annotate(errors=Count(Value(1))).values('errors')
+    return lots.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
 
-    tx_errors = GenericError.objects.filter(filter).values('tx').annotate(errors=Count(Value(1))).values('errors')
-    return txs.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
 
-
-def get_lots_with_deadline(txs, deadline):
+def get_lots_with_deadline(lots, deadline):
     affected_date = deadline - relativedelta(months=1)
-    txs_with_deadline = txs.filter(lot__status=LotV2.DRAFT, delivery_date__year=affected_date.year, delivery_date__month=affected_date.month)
-    return txs_with_deadline
+    lots_with_deadline = lots.filter(lot_status=CarbureLot.DRAFT, delivery_date__year=affected_date.year, delivery_date__month=affected_date.month)
+    return lots_with_deadline
 
 
 def filter_lots(lots, querySet, entity=None, blacklist=[]):
@@ -159,7 +168,8 @@ def filter_lots(lots, querySet, entity=None, blacklist=[]):
         lots = lots.filter(Q(carbure_supplier__name__in=suppliers) | Q(lot__unknown_supplier__in=suppliers))
     if len(delivery_types) > 0 and 'delivery_types' not in blacklist:
         lots = lots.filter(delivery_type__in=delivery_types)
-
+    if len(correction_statuses) > 0 and 'correction_statuses' not in blacklist:
+        lots = lots.filter(correction_status__in=correction_statuses)
 
     if is_highlighted_by_admin is not None and 'is_highlighted_by_admin' not in blacklist:
         if is_highlighted_by_admin == 'true':
@@ -227,9 +237,9 @@ def sort_lots(lots, querySet):
             lots = lots.order_by(key)
     elif sort_by == 'biocarburant':
         if order == 'desc':
-            lots = lots.order_by('-lot__biocarburant__name', '-lot__volume')
+            lots = lots.order_by('-biofuel__name', '-volume')
         else:
-            lots = lots.order_by('lot__biocarburant__name', 'lot__volume')
+            lots = lots.order_by('biofuel__name', 'volume')
     elif sort_by == 'client':
         lots = lots.annotate(client=Coalesce('carbure_client__name', 'unknown_client'))
         if order == 'desc':
@@ -237,10 +247,9 @@ def sort_lots(lots, querySet):
         else:
             lots = lots.order_by('client')
     elif sort_by == 'vendor':
-        lots = lots.annotate(vendor=Coalesce('carbure_vendor__name', 'lot__unknown_supplier'))
+        lots = lots.annotate(vendor=Coalesce('carbure_supplier__name', 'lot__unknown_supplier'))
         if order == 'desc':
             lots = lots.order_by('-vendor')
         else:
             lots = lots.order_by('vendor')
-
     return lots
