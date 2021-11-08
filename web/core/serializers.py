@@ -48,6 +48,7 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
     def get_country_of_origin(self, obj):
         return obj.country_of_origin.code_pays if obj.country_of_origin else ''
 
+
 class CarbureLotPublicSerializer(serializers.ModelSerializer):
     carbure_producer = FeedStockSerializer(read_only=True)
     carbure_production_site = FeedStockSerializer(read_only=True)
