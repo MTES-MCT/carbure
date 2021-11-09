@@ -1,24 +1,27 @@
-import cl from "clsx";
-import useControlledState from "../hooks/controlled-state";
-import Checkbox from "./checkbox";
-import { multipleSelection } from "../hooks/selection";
-import { Normalizer } from "../hooks/normalize";
-import css from "./table.module.css";
+import cl from "clsx"
+import useControlledState from "../hooks/controlled-state"
+import Checkbox from "./checkbox"
+import { multipleSelection } from "../hooks/selection"
+import { Normalizer } from "../hooks/normalize"
+import css from "./table.module.css"
+import { Column, LoaderOverlay } from "./scaffold"
 
 export interface TableProps<T> {
-  className?: string;
-  style?: React.CSSProperties;
-  headless?: boolean;
-  columns: Column<T>[];
-  rows: T[];
-  order?: Order;
-  onOrder?: (order: Order | undefined) => void;
-  onAction?: (value: T) => void;
+  className?: string
+  style?: React.CSSProperties
+  loading?: boolean
+  headless?: boolean
+  columns: Column<T>[]
+  rows: T[]
+  order?: Order
+  onOrder?: (order: Order | undefined) => void
+  onAction?: (value: T) => void
 }
 
 export function Table<T>({
   className,
   style,
+  loading,
   headless,
   columns,
   rows,
@@ -26,8 +29,8 @@ export function Table<T>({
   onOrder,
   onAction,
 }: TableProps<T>) {
-  const { order, orderBy } = useOrderBy(controlledOrder, onOrder);
-  const compare = useCompare(columns, order);
+  const { order, orderBy } = useOrderBy(controlledOrder, onOrder)
+  const compare = useCompare(columns, order)
 
   return (
     <div data-list className={cl(css.table, className)} style={style}>
@@ -71,8 +74,10 @@ export function Table<T>({
           </li>
         ))}
       </ul>
+
+      {loading && <LoaderOverlay />}
     </div>
-  );
+  )
 }
 
 export function selectionColumn<T>(
@@ -81,7 +86,7 @@ export function selectionColumn<T>(
   onSelect: (selected: T[]) => void,
   normalize?: Normalizer<T>
 ): Column<T> {
-  const selection = multipleSelection(selected, onSelect, normalize);
+  const selection = multipleSelection(selected, onSelect, normalize)
 
   return {
     className: css.selection,
@@ -97,20 +102,20 @@ export function selectionColumn<T>(
         onChange={() => selection.onSelect(value)}
       />
     ),
-  };
+  }
 }
 
-export type MarkerVariant = "info" | "success" | "warning" | "danger";
-export type Marker<T> = (value: T) => MarkerVariant | undefined;
+export type MarkerVariant = "info" | "success" | "warning" | "danger"
+export type Marker<T> = (value: T) => MarkerVariant | undefined
 
 export function markerColumn<T>(mark: Marker<T>): Column<T> {
   return {
     className: css.marker,
     cell: (value) => {
-      const variant = mark(value);
-      return variant ? <div className={css[variant]} /> : null;
+      const variant = mark(value)
+      return variant ? <div className={css[variant]} /> : null
     },
-  };
+  }
 }
 
 export function actionColumn<T>(
@@ -119,12 +124,12 @@ export function actionColumn<T>(
   return {
     className: css.actions,
     cell: (value) => actions(value),
-  };
+  }
 }
 
 export interface Order {
-  column: string;
-  direction: "asc" | "desc";
+  column: string
+  direction: "asc" | "desc"
 }
 
 export function useOrderBy(
@@ -135,46 +140,58 @@ export function useOrderBy(
     undefined,
     orderControlled,
     setOrderControlled
-  );
+  )
 
   function orderBy(column: string) {
     if (!order || column !== order.column) {
-      setOrder({ column, direction: "asc" });
+      setOrder({ column, direction: "asc" })
     } else if (column === order.column) {
       if (order.direction === "asc") {
-        setOrder({ column, direction: "desc" });
+        setOrder({ column, direction: "desc" })
       } else {
-        setOrder(undefined);
+        setOrder(undefined)
       }
     }
   }
 
-  return { order, orderBy };
+  return { order, orderBy }
 }
 
-const collator = new Intl.Collator([], { numeric: true });
+const collator = new Intl.Collator([], { numeric: true })
 export function useCompare<T>(columns: Column<T>[], order: Order | undefined) {
-  const column = columns.find(({ key }) => key && key === order?.column);
+  const column = columns.find(({ key }) => key && key === order?.column)
 
   return function compare(a: T, b: T) {
-    if (!order || !column || !column.orderBy) return 0;
+    if (!order || !column || !column.orderBy) return 0
 
-    const direction = order.direction === "asc" ? 1 : -1;
-    const referenceA = column.orderBy(a).toString();
-    const referenceB = column.orderBy(b).toString();
-    return direction * collator.compare(referenceA, referenceB);
-  };
+    const direction = order.direction === "asc" ? 1 : -1
+    const referenceA = column.orderBy(a).toString()
+    const referenceB = column.orderBy(b).toString()
+    return direction * collator.compare(referenceA, referenceB)
+  }
 }
 
 export interface Column<T> {
-  cell: (value: T) => React.ReactNode;
-  header?: React.ReactNode;
-  key?: string;
-  className?: string;
-  small?: boolean;
-  orderBy?: OrderBy<T>;
+  cell: (value: T) => React.ReactNode
+  header?: React.ReactNode
+  key?: string
+  className?: string
+  small?: boolean
+  orderBy?: OrderBy<T>
 }
 
-export type OrderBy<T> = (value: T) => number | string;
+export type OrderBy<T> = (value: T) => number | string
 
-export default Table;
+export interface CellProps {
+  text: string | number
+  sub?: string | number
+}
+
+export const Cell = ({ text, sub }: any) => (
+  <Column>
+    <strong title={text}>{text || sub}</strong>
+    {text && sub !== undefined && <small title={sub}>{sub}</small>}
+  </Column>
+)
+
+export default Table

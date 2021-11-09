@@ -37,10 +37,9 @@
   border: 1px solid var(--gray-medium);
   background-color: var(--white);
   text-decoration: none;
-  font-size: 1.1em;
-  font-weight: bold;
-  padding: var(--spacing-m) var(--spacing-l);
-  gap: var(--spacing-xxs);
+  font-size: 1.2em;
+  padding: var(--spacing-l);
+  gap: var(--spacing-xs);
 }
 
 .main a:hover {
@@ -51,6 +50,12 @@
 
 .main a.active {
   border-bottom: 4px solid var(--blue-medium);
+  padding-bottom: calc(var(--spacing-l) - 3px);
+}
+
+.main a small {
+  font-size: 0.75em;
+  font-weight: normal;
 }
 
 .sticky {
