@@ -147,6 +147,10 @@
   background-color: var(--white);
 }
 
+.search .control {
+  padding: var(--spacing-s);
+}
+
 .search .icon:first-child {
   margin: 0 var(--spacing-s);
 }

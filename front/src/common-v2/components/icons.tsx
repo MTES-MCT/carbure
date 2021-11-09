@@ -1,19 +1,19 @@
-import React from "react";
-import cl from "clsx";
-import css from "./icons.module.css";
+import React from "react"
+import cl from "clsx"
+import css from "./icons.module.css"
 
 // icons were adapted from https://github.com/tabler/tabler-icons
 
 export interface IconProps {
-  size?: number;
-  color?: string;
-  fill?: string;
-  stroke?: number;
-  className?: string;
-  style?: React.CSSProperties;
-  title?: string;
-  children?: React.ReactNode;
-  onClick?: React.MouseEventHandler<SVGSVGElement>;
+  size?: number
+  color?: string
+  fill?: string
+  stroke?: number
+  className?: string
+  style?: React.CSSProperties
+  title?: string
+  children?: React.ReactNode
+  onClick?: React.MouseEventHandler<SVGSVGElement>
 }
 
 const Icon = ({
@@ -42,46 +42,46 @@ const Icon = ({
     <title>{title}</title>
     {children}
   </svg>
-);
+)
 
 export const ChevronDown = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("chevron-down", className)}>
     <polyline points="6 9 12 15 18 9" />
   </Icon>
-);
+)
 
 export const ChevronLeft = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("chevron-down", className)}>
     <polyline points="15 6 9 12 15 18" />
   </Icon>
-);
+)
 
 export const ChevronRight = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("chevron-right", className)}>
     <polyline points="9 6 15 12 9 18" />
   </Icon>
-);
+)
 
 export const Plus = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("plus", className)}>
     <line x1={12} y1={5} x2={12} y2={19} />
     <line x1={5} y1={12} x2={19} y2={12} />
   </Icon>
-);
+)
 
 export const Search = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("search", className)}>
     <circle cx="10" cy="10" r="7" />
     <line x1="21" y1="21" x2="15" y2="15" />
   </Icon>
-);
+)
 
 export const Cross = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("cross", className)}>
     <line x1="18" y1="6" x2="6" y2="18" />
     <line x1="6" y1="6" x2="18" y2="18" />
   </Icon>
-);
+)
 
 export const AlertCircle = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("cross", className)}>
@@ -89,20 +89,20 @@ export const AlertCircle = ({ className, ...props }: IconProps) => (
     <line x1="12" y1="8" x2="12" y2="12" />
     <line x1="12" y1="16" x2="12.01" y2="16" />
   </Icon>
-);
+)
 
 export const Copy = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("cross", className)}>
     <rect x="8" y="8" width="12" height="12" rx="2" />
     <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2" />
   </Icon>
-);
+)
 
 export const Check = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("cross", className)}>
     <path d="M5 12l5 5l10 -10" />
   </Icon>
-);
+)
 
 export const Save = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("save", className)}>
@@ -110,7 +110,7 @@ export const Save = ({ className, ...props }: IconProps) => (
     <circle cx="12" cy="14" r="2" />
     <polyline points="14 4 14 8 8 8 8 4" />
   </Icon>
-);
+)
 
 export const Message = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("message", className)}>
@@ -118,7 +118,7 @@ export const Message = ({ className, ...props }: IconProps) => (
     <line x1="12" y1="8" x2="12" y2="11" />
     <line x1="12" y1="14" x2="12" y2="14.01" />
   </Icon>
-);
+)
 
 export const Loader = ({ className, ...props }: IconProps) => (
   <Icon
@@ -136,13 +136,7 @@ export const Loader = ({ className, ...props }: IconProps) => (
     <line x1="6" y1="12" x2="3" y2="12" />
     <line x1="7.75" y1="7.75" x2="5.6" y2="5.6" />
   </Icon>
-);
-
-export const LoaderOverlay = () => (
-  <div className={css.overlay}>
-    <Loader color="var(--black)" size={32} />
-  </div>
-);
+)
 
 export const Rapport = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("rapport", className)}>
@@ -153,7 +147,7 @@ export const Rapport = ({ className, ...props }: IconProps) => (
     <line x1="9" y1="16" x2="9.01" y2="16" />
     <line x1="13" y1="16" x2="15" y2="16" />
   </Icon>
-);
+)
 
 export const Upload = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("upload", className)}>
@@ -161,7 +155,7 @@ export const Upload = ({ className, ...props }: IconProps) => (
     <polyline points="7 11 12 16 17 11" />
     <line x1="12" y1="4" x2="12" y2="16" />
   </Icon>
-);
+)
 
 export const Download = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("download", className)}>
@@ -169,14 +163,14 @@ export const Download = ({ className, ...props }: IconProps) => (
     <polyline points="7 9 12 4 17 9" />
     <line x1="12" y1="4" x2="12" y2="16" />
   </Icon>
-);
+)
 
 export const AlertTriangle = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("alert-triangle", className)}>
     <path d="M12 9v2m0 4v.01" />
     <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" />
   </Icon>
-);
+)
 
 export const AlertOctagon = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("alert-triangle", className)}>
@@ -184,7 +178,7 @@ export const AlertOctagon = ({ className, ...props }: IconProps) => (
     <line x1="12" y1="8" x2="12" y2="12" />
     <line x1="12" y1="16" x2="12.01" y2="16" />
   </Icon>
-);
+)
 
 export const Calendar = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("calendar", className)}>
@@ -195,13 +189,13 @@ export const Calendar = ({ className, ...props }: IconProps) => (
     <line x1="11" y1="15" x2="12" y2="15" />
     <line x1="12" y1="15" x2="12" y2="18" />
   </Icon>
-);
+)
 
 export const Return = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("return", className)}>
     <path d="M9 11l-4 4l4 4m-4 -4h11a4 4 0 0 0 0 -8h-1" />
   </Icon>
-);
+)
 
 export const Back = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("back", className)}>
@@ -209,34 +203,34 @@ export const Back = ({ className, ...props }: IconProps) => (
     <line x1="5" y1="12" x2="11" y2="18" />
     <line x1="5" y1="12" x2="11" y2="6" />
   </Icon>
-);
+)
 
 export const Edit = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("edit", className)}>
     <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
     <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
   </Icon>
-);
+)
 
 export const Refresh = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("refresh", className)}>
     <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
     <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
   </Icon>
-);
+)
 
 export const Question = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("question", className)}>
     <path d="M8 8a3.5 3 0 0 1 3.5 -3h1a3.5 3 0 0 1 3.5 3a3 3 0 0 1 -2 3a3 4 0 0 0 -2 4" />
     <line x1="12" y1="19" x2="12" y2="19.01" />
   </Icon>
-);
+)
 
 export const Filter = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("filter", className)}>
     <path d="M5.5 5h13a1 1 0 0 1 .5 1.5l-5 5.5l0 7l-4 -3l0 -4l-5 -5.5a1 1 0 0 1 .5 -1.5" />
   </Icon>
-);
+)
 
 export const Alarm = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("alarm", className)}>
@@ -245,14 +239,14 @@ export const Alarm = ({ className, ...props }: IconProps) => (
     <line x1="7" y1="4" x2="4.25" y2="6" />
     <line x1="17" y1="4" x2="19.75" y2="6" />
   </Icon>
-);
+)
 
 export const CheckCircle = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("check-circle", className)}>
     <polyline points="9 11 12 14 20 6" />
     <path d="M20 12v6a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h9" />
   </Icon>
-);
+)
 
 export const Bell = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("bell", className)}>
@@ -261,7 +255,7 @@ export const Bell = ({ className, ...props }: IconProps) => (
     <path d="M21 6.727a11.05 11.05 0 0 0 -2.794 -3.727" />
     <path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727" />
   </Icon>
-);
+)
 
 export const Flask = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("flask", className)}>
@@ -269,7 +263,7 @@ export const Flask = ({ className, ...props }: IconProps) => (
     <line x1="10" y1="9" x2="14" y2="9" />
     <path d="M10 3v6l-4 11a0.7 .7 0 0 0 .5 1h11a0.7 .7 0 0 0 .5 -1l-4 -11v-6" />
   </Icon>
-);
+)
 
 export const Forward = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("forward", className)}>
@@ -279,7 +273,7 @@ export const Forward = ({ className, ...props }: IconProps) => (
     <path d="M15 18h6" />
     <path d="M18 15l3 3l-3 3" />
   </Icon>
-);
+)
 
 export const Certificate = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("certificate", className)}>
@@ -290,7 +284,7 @@ export const Certificate = ({ className, ...props }: IconProps) => (
     <line x1="6" y1="12" x2="9" y2="12" />
     <line x1="6" y1="15" x2="8" y2="15" />
   </Icon>
-);
+)
 
 export const UserCheck = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("user-check", className)}>
@@ -298,14 +292,14 @@ export const UserCheck = ({ className, ...props }: IconProps) => (
     <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
     <path d="M16 11l2 2l4 -4" />
   </Icon>
-);
+)
 
 export const Eye = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("eye", className)}>
     <path d="M10.584 10.587a2 2 0 0 0 2.828 2.83" />
     <path d="M9.363 5.365a9.466 9.466 0 0 1 2.637 -.365c4 0 7.333 2.333 10 7c-.778 1.361 -1.612 2.524 -2.503 3.488m-2.14 1.861c-1.631 1.1 -3.415 1.651 -5.357 1.651c-4 0 -7.333 -2.333 -10 -7c1.369 -2.395 2.913 -4.175 4.632 -5.341" />
   </Icon>
-);
+)
 
 export const EyeOff = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("eye-off", className)}>
@@ -313,7 +307,7 @@ export const EyeOff = ({ className, ...props }: IconProps) => (
     <path d="M10.584 10.587a2 2 0 0 0 2.828 2.83" />
     <path d="M9.363 5.365a9.466 9.466 0 0 1 2.637 -.365c4 0 7.333 2.333 10 7c-.778 1.361 -1.612 2.524 -2.503 3.488m-2.14 1.861c-1.631 1.1 -3.415 1.651 -5.357 1.651c-4 0 -7.333 -2.333 -10 -7c1.369 -2.395 2.913 -4.175 4.632 -5.341" />
   </Icon>
-);
+)
 
 export const Pin = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("pin", className)}>
@@ -321,7 +315,7 @@ export const Pin = ({ className, ...props }: IconProps) => (
     <line x1="9" y1="15" x2="4.5" y2="19.5" />
     <line x1="14.5" y1="4" x2="20" y2="9.5" />
   </Icon>
-);
+)
 
 export const PinOff = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("pin-off", className)}>
@@ -330,7 +324,7 @@ export const PinOff = ({ className, ...props }: IconProps) => (
     <line x1="9" y1="15" x2="4.5" y2="19.5" />
     <line x1="14.5" y1="4" x2="20" y2="9.5" />
   </Icon>
-);
+)
 
 export const FileCheck = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("pin", className)}>
@@ -338,7 +332,7 @@ export const FileCheck = ({ className, ...props }: IconProps) => (
     <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
     <path d="M9 15l2 2l4 -4" />
   </Icon>
-);
+)
 
 export const Slack = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("slack", className)}>
@@ -347,7 +341,7 @@ export const Slack = ({ className, ...props }: IconProps) => (
     <path d="M12 12v6a2 2 0 0 1 -4 0v-6m0 2a2 2 0 1 1 -2 -2h6" />
     <path d="M12 12h-6a2 2 0 0 1 0 -4h6m-2 0a2 2 0 1 1 2 -2v6" />
   </Icon>
-);
+)
 
 export const LinkedIn = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("slack", className)}>
@@ -357,7 +351,7 @@ export const LinkedIn = ({ className, ...props }: IconProps) => (
     <line x1="12" y1="16" x2="12" y2="11" />
     <path d="M16 16v-3a2 2 0 0 0 -4 0" />
   </Icon>
-);
+)
 
 export const ExternalLink = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("external-link", className)}>
@@ -365,7 +359,7 @@ export const ExternalLink = ({ className, ...props }: IconProps) => (
     <line x1="10" y1="14" x2="20" y2="4" />
     <polyline points="15 4 20 4 20 9" />
   </Icon>
-);
+)
 
 export const UserAdd = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("user-add", className)}>
@@ -373,17 +367,17 @@ export const UserAdd = ({ className, ...props }: IconProps) => (
     <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
     <path d="M16 11h6m-3 -3v6" />
   </Icon>
-);
+)
 
 export const Disk = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("disk", className)}>
     <circle cx={12} cy={12} r={9} strokeWidth={0} />
   </Icon>
-);
+)
 
 export const History = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("history", className)}>
     <polyline points="12 8 12 12 14 14" />
     <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5" />
   </Icon>
-);
+)

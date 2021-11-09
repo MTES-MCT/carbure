@@ -1,23 +1,23 @@
-import { useRef, useState } from "react";
-import Dropdown, { Trigger } from "./dropdown";
-import { ChevronDown } from "./icons";
-import { Control, Input } from "./input";
-import List from "./list";
+import { useRef, useState } from "react"
+import Dropdown, { Trigger } from "./dropdown"
+import { ChevronDown } from "./icons"
+import { Control, Input } from "./input"
+import List from "./list"
 import {
   defaultNormalizer,
   Normalizer,
   normalizeTree,
-} from "../hooks/normalize";
-import Checkbox from "./checkbox";
+} from "../hooks/normalize"
+import Checkbox from "./checkbox"
 
 export interface MultiSelectProps<T> extends Control, Trigger {
-  clear?: boolean;
-  search?: boolean;
-  value: T[] | undefined;
-  options: T[];
-  placeholder?: string;
-  onChange: (value: T[] | undefined) => void;
-  normalize?: Normalizer<T>;
+  clear?: boolean
+  search?: boolean
+  value: T[] | undefined
+  options: T[]
+  placeholder?: string
+  onChange: (value: T[] | undefined) => void
+  normalize?: Normalizer<T>
 }
 
 export function MultiSelect<T>({
@@ -33,11 +33,17 @@ export function MultiSelect<T>({
   normalize = defaultNormalizer,
   ...props
 }: MultiSelectProps<T>) {
-  const triggerRef = useRef<HTMLInputElement>(null);
-  const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLInputElement>(null)
+  const [open, setOpen] = useState(false)
 
-  const normValue = normalizeTree(value ?? [], normalize);
-  const label = normValue.map((v) => v.label).join(", ");
+  const hasValue = Boolean(value && value.length)
+  const normValue = normalizeTree(value ?? [], normalize)
+  const label = normValue.map((v) => v.label).join(", ")
+
+  function onClear() {
+    onChange(undefined)
+    setOpen(false)
+  }
 
   return (
     <>
@@ -47,7 +53,7 @@ export function MultiSelect<T>({
         type="button"
         value={label || placeholder}
         icon={ChevronDown}
-        onClear={clear && value ? () => onChange(undefined) : undefined}
+        onClear={clear && hasValue ? onClear : undefined}
       />
 
       <Dropdown
@@ -75,7 +81,7 @@ export function MultiSelect<T>({
         </List>
       </Dropdown>
     </>
-  );
+  )
 }
 
-export default MultiSelect;
+export default MultiSelect

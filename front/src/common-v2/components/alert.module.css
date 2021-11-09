@@ -9,6 +9,10 @@
   overflow: hidden;
 }
 
+.alert.loading {
+  opacity: 0.66;
+}
+
 .alert [data-icon] {
   flex-shrink: 0;
   color: var(--gray-dark);

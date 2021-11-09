@@ -1,7 +1,9 @@
 .table {
   --min-cell-width: var(--spacing-xxl);
+  position: relative;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 .columns {
@@ -59,6 +61,14 @@
   flex: 1 1 0%;
   padding: var(--spacing-m) 0;
   min-width: var(--min-cell-width);
+}
+
+.cell strong {
+  font-weight: 600;
+}
+
+.cell small {
+  color: var(--gray-dark);
 }
 
 .small {

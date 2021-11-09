@@ -1,14 +1,15 @@
-import cl from "clsx";
-import { Cross } from "./icons";
-import css from "./dialog.module.css";
-import Portal from "./portal";
-import Button from "./button";
+import cl from "clsx"
+import { Cross } from "./icons"
+import css from "./dialog.module.css"
+import Portal from "./portal"
+import Button from "./button"
+import { Overlay } from "./scaffold"
 
 export interface DialogProps {
-  className?: string;
-  style?: React.CSSProperties;
-  children: React.ReactNode;
-  onClose: () => void;
+  className?: string
+  style?: React.CSSProperties
+  children: React.ReactNode
+  onClose: () => void
 }
 
 export const Dialog = ({
@@ -19,7 +20,7 @@ export const Dialog = ({
 }: DialogProps) => (
   <Portal onClose={onClose}>
     <div className={css.screen}>
-      <div className={css.overlay} onClick={onClose} />
+      <Overlay onClick={onClose} />
       <div className={cl(css.dialog, className)} style={style}>
         {children}
         <Button
@@ -31,6 +32,6 @@ export const Dialog = ({
       </div>
     </div>
   </Portal>
-);
+)
 
-export default Dialog;
+export default Dialog

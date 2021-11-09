@@ -1,32 +1,38 @@
-import { useEffect, useState } from "react";
-import { Link, matchPath, useLocation } from 'react-router-dom'
-import cl from "clsx";
-import css from "./tabs.module.css";
+import { useEffect, useState } from "react"
+import cl from "clsx"
+import {
+  Link,
+  matchPath,
+  resolvePath,
+  useLocation,
+  useResolvedPath,
+} from "react-router-dom"
+import css from "./tabs.module.css"
 
-export type TabVariant = "header" | "main" | "section" | "sticky";
+export type TabVariant = "header" | "main" | "section" | "sticky"
 
 export interface Tab {
-  key: string;
-  label: React.ReactNode;
-  path?: string;
+  key: string
+  label: React.ReactNode
+  path?: string
 }
 
 export interface TabsProps {
-  tabs: Tab[];
-  variant?: TabVariant;
-  onFocus?: (tab: string) => void;
-  children?: (tab: string) => React.ReactNode;
+  tabs: Tab[]
+  variant?: TabVariant
+  onFocus?: (tab: string) => void
+  children?: (tab: string) => React.ReactNode
 }
 
 export const Tabs = ({ variant = "section", tabs, children }: TabsProps) => {
-  const location = useLocation()
-  const match = tabs.find(tab => matchPath(tab.path ?? '', location.pathname)) ?? tabs[0]
+  const matcher = useMatcher()
+  const match = tabs.find((tab) => matcher(tab.path)) ?? tabs[0]
 
-  const [focus, setFocus] = useState(match.key);
+  const [focus, setFocus] = useState(match.key)
 
   useEffect(() => {
-    setFocus(match.key);
-  }, [match.key]);
+    setFocus(match.key)
+  }, [match.key])
 
   return (
     <>
@@ -36,7 +42,7 @@ export const Tabs = ({ variant = "section", tabs, children }: TabsProps) => {
             key: tab.key,
             className: cl(tab.key === focus && css.active),
             onClick: () => setFocus(tab.key),
-          };
+          }
 
           return tab.path ? (
             <Link {...props} to={tab.path}>
@@ -44,11 +50,21 @@ export const Tabs = ({ variant = "section", tabs, children }: TabsProps) => {
             </Link>
           ) : (
             <a {...props}>{tab.label}</a>
-          );
+          )
         })}
       </nav>
 
       {children?.(focus)}
     </>
-  );
-};
+  )
+}
+
+export function useMatcher() {
+  const parentPath = useResolvedPath(".").pathname
+  const currentPath = useLocation().pathname
+
+  return (path: string | undefined = "") =>
+    matchPath(currentPath, resolvePath(path, parentPath).pathname)
+}
+
+export default Tabs
