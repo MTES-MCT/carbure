@@ -1,16 +1,13 @@
-import { createContext, useContext } from 'react'
-import { useAsync } from 'react-async-hook'
-import { Entity, Settings, UserRight, UserRightRequest } from 'common/types'
-import { api, Api } from 'common-v2/api'
-import { useInvalidate } from 'common-v2/hooks/invalidate'
-
+import { createContext, useContext } from "react"
+import { useQuery } from "common-v2/hooks/async"
+import { Entity, UserRight, UserRightRequest } from "../types"
+import * as api from "../api"
 
 export interface User {
   loading: boolean
   email: string | undefined
   rights: UserRight[]
   requests: UserRightRequest[]
-  reload: () => void
   isAuthenticated: () => boolean
   getRights: (entityID: number) => UserRight | null
   hasEntity: (entityID: number) => boolean
@@ -19,8 +16,10 @@ export interface User {
 }
 
 export function useUser(): User {
-  const settings = useAsync(() => api.get<Api<Settings>>('v3/settings'), [])
-  const reload = useInvalidate('user-settings', settings.execute)
+  const settings = useQuery(api.getUserSettings, {
+    key: "user-settings",
+    params: [],
+  })
 
   const res = settings.result?.data.data
   const email = res?.email
@@ -52,7 +51,6 @@ export function useUser(): User {
     email,
     rights,
     requests,
-    reload,
     isAuthenticated,
     getRights,
     hasEntity,
@@ -65,7 +63,7 @@ export const UserContext = createContext<User | undefined>(undefined)
 
 export function useUserContext() {
   const user = useContext(UserContext)
-  if (user === undefined) throw new Error('User context is not defined')
+  if (user === undefined) throw new Error("User context is not defined")
   return user
 }
 

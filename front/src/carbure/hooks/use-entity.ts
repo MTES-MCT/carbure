@@ -1,7 +1,5 @@
-import { useContext, createContext } from 'react'
 import { useMatch } from "react-router-dom"
-
-import { Entity, EntityType, ExternalAdminPages } from "common/types"
+import { Entity, ExternalAdminPages } from "common/types"
 import { AppHook } from "./use-app"
 
 export type EntitySelection = Entity | null
@@ -11,7 +9,7 @@ export function useEntity(app: AppHook): EntitySelection {
 
   if (!match) return null
 
-  const entityID = parseInt(match.params.entity ?? '', 10)
+  const entityID = parseInt(match.params.entity ?? "", 10)
   const rights = isNaN(entityID) ? null : app.getRights(entityID)
   const entity = rights?.entity ?? null
 
