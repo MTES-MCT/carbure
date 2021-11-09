@@ -28,7 +28,7 @@ urlpatterns = [
 
 
     # STOCKS
-    path('stock', views.get_stock, name='api-v4-get-stock'),    
+    path('stock', views.get_stock, name='api-v4-get-stock'),
     path('stock/cancel-transformation', views.get_snapshot, name='api-v4-get-snapshot'),
     path('stock/split', views.get_snapshot, name='api-v4-get-snapshot'),
     path('stock/transform', views.get_snapshot, name='api-v4-get-snapshot'),
@@ -36,10 +36,13 @@ urlpatterns = [
 
     # DECLARATIONS
     path('declarations/validate', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('declarations/invalidate', views.get_snapshot, name='api-v4-get-snapshot'),        
+    path('declarations/invalidate', views.get_snapshot, name='api-v4-get-snapshot'),
+
+    # FILERTING
+    path('filters', views.get_filters, name='api-v4-lots-get-filters'),
+
     #### missing endpoints vs previous version
     # GET
-    #path('filters', views.get_filters, name='api-v3-lots-get-filters'),
     #path('declaration-summary', views.get_declaration_summary, name='api-v3-lots-get-declaration-summary'),
     #path('summary', views.get_lots_summary, name='api-v3-lots-get-lots-summary'),
     # POST
