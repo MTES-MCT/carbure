@@ -1,12 +1,11 @@
-import { useContext } from 'react'
 import { Trans, useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 
 import { AppHook, useApp } from "./hooks/use-app"
-import { EntityType, LotStatus, ExternalAdminPages } from "common/types"
+import { LotStatus, ExternalAdminPages } from "common/types"
 import { hasPage } from "./hooks/use-entity"
-import useUser, { useUserContext, UserContext } from './hooks/user'
-import useEntity from './hooks/entity'
+import useUser, { useUserContext, UserContext } from "./hooks/user"
+import useEntity from "./hooks/entity"
 import { UserRightProvider } from "./hooks/use-rights"
 
 import { LoaderOverlay } from "common/components"
@@ -56,11 +55,6 @@ const Org = ({ app }: { app: AppHook }) => {
     return <LoaderOverlay />
   }
 
-  // a user with entities tries to access the pending or another entity's page
-  // if (user.hasEntities() && !entity) {
-  //   return <Navigate to="/" />
-  // }
-
   const { isAdmin, isAuditor } = entity
 
   // prettier-ignore
@@ -73,8 +67,7 @@ const Org = ({ app }: { app: AppHook }) => {
         <Route path="transactions" element={<Navigate to={isAdmin || isAuditor ? LotStatus.Alert : LotStatus.Draft} />} />
         <Route path="transactions/:status/*" element={<Transactions entity={entity} />} />
 
-        <Route path="transactions-v2" element={<Navigate to="draft" />} />
-        <Route path="transactions-v2/:status/*" element={<TransactionsV2 />} />
+        <Route path="transactions-v2/*" element={<TransactionsV2 />} />
 
         <Route path="settings" element={<Settings entity={entity} settings={app.settings} />} />
         <Route path="registry" element={<Registry />} />
@@ -95,10 +88,9 @@ const Org = ({ app }: { app: AppHook }) => {
 
 const Carbure = () => {
   useTranslation()
+
   const app = useApp()
   const user = useUser()
-
-  console.log(user)
 
   return (
     <UserContext.Provider value={user}>
