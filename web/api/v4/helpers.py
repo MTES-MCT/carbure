@@ -1,16 +1,16 @@
 import datetime
 import calendar
-from multiprocessing import Value
 from dateutil.relativedelta import relativedelta
-from django.db.models.aggregates import Count, Max
+from django.db.models.aggregates import Count
 from django.db.models.expressions import OuterRef, Subquery
 from django.db.models.functions.comparison import Coalesce
 from django.db.models.query_utils import Q
 from django.http.response import HttpResponse, JsonResponse
-from core.models import CarbureLot
+from core.models import Biocarburant, CarbureLot, MatierePremiere, Pays
 from core.models import GenericError
 from core.serializers import CarbureLotPublicSerializer
 from core.xlsx_v3 import export_carbure_lots
+
 
 sort_key_to_django_field = {'period': 'period',
                             'feedstock': 'feedstock__name',
@@ -19,15 +19,16 @@ sort_key_to_django_field = {'period': 'period',
                             'country_of_origin': 'country_of_origin__name',
                             'added_by': 'added_by__name'}
 
+
 def get_entity_lots_by_status(entity_id, status):
     if status not in ['DRAFTS', 'IN', 'OUT']:
         raise Exception('Unknown status %s' % (status))
     lots = CarbureLot.objects.select_related(
         'carbure_producer', 'carbure_supplier', 'carbure_client', 'added_by',
         'carbure_production_site', 'carbure_production_site__producer', 'carbure_production_site__country', 'production_country',
-        'carbure_dispatch_site', 'carbure_dispatch_site__country', 'dispatch_site_country', 
+        'carbure_dispatch_site', 'carbure_dispatch_site__country', 'dispatch_site_country',
         'carbure_delivery_site', 'carbure_delivery_site__country', 'delivery_site_country',
-        'feedstock', 'biofuel', 'country_of_origin', 
+        'feedstock', 'biofuel', 'country_of_origin',
         'parent_lot', 'parent_stock', 'parent_stock__carbure_client', 'parent_stock__carbure_supplier',
     ).prefetch_related('genericerror_set', 'carbure_production_site__productionsitecertificate_set')
     if status == 'DRAFTS':
@@ -39,6 +40,7 @@ def get_entity_lots_by_status(entity_id, status):
     else:
         raise Exception('Unknown status')
     return lots
+
 
 def get_lots_with_metadata(lots, entity_id, querySet, is_admin=False):
     export = querySet.get('export', False)
@@ -78,7 +80,6 @@ def get_lots_with_metadata(lots, entity_id, querySet, is_admin=False):
             response = HttpResponse(content=data, content_type=ctype)
             response['Content-Disposition'] = 'attachment; filename="%s"' % (file_location)
         return response
-
 
 
 def get_errors(lot, entity_id=None, is_admin=False):
@@ -163,7 +164,7 @@ def filter_lots(lots, querySet, entity_id=None, blacklist=[]):
     if len(clients) > 0 and 'clients' not in blacklist:
         lots = lots.filter(Q(carbure_client__name__in=clients) | Q(unknown_client__in=clients))
     if len(suppliers) > 0 and 'suppliers' not in blacklist:
-        lots = lots.filter(Q(carbure_supplier__name__in=suppliers) | Q(lot__unknown_supplier__in=suppliers))
+        lots = lots.filter(Q(carbure_supplier__name__in=suppliers) | Q(unknown_supplier__in=suppliers))
     if len(delivery_types) > 0 and 'delivery_types' not in blacklist:
         lots = lots.filter(delivery_type__in=delivery_types)
     if len(correction_statuses) > 0 and 'correction_statuses' not in blacklist:
@@ -244,9 +245,82 @@ def sort_lots(lots, querySet):
         else:
             lots = lots.order_by('client')
     elif sort_by == 'vendor':
-        lots = lots.annotate(vendor=Coalesce('carbure_supplier__name', 'lot__unknown_supplier'))
+        lots = lots.annotate(vendor=Coalesce('carbure_supplier__name', 'unknown_supplier'))
         if order == 'desc':
             lots = lots.order_by('-vendor')
         else:
             lots = lots.order_by('vendor')
     return lots
+
+
+def normalize_filter(list, key=None, label=None):
+    if key is None:
+        return [{'key': item, 'label': item} for item in list if item]
+    if label is None:
+        return [{'key': item[key], 'label': item[key]} for item in list if item]
+    else:
+        return [{'key': item[key], 'label': item[label]} for item in list if item]
+
+
+def get_lots_filters(lots, querySet, entity_id, field):
+    lots = filter_lots(lots, querySet, entity_id=entity_id, blacklist=[field])[0]
+
+    if field == 'feedstocks':
+        feedstocks = MatierePremiere.objects.filter(id__in=lots.values('feedstock__id').distinct()).values('code', 'name')
+        return normalize_filter(feedstocks, 'code', 'name')
+
+    if field == 'biofuels':
+        biofuels = Biocarburant.objects.filter(id__in=lots.values('biofuel__id').distinct()).values('code', 'name')
+        return normalize_filter(biofuels, 'code', 'name')
+
+    if field == 'countries_of_origin':
+        countries = Pays.objects.filter(id__in=lots.values('country_of_origin').distinct()).values('code_pays', 'name')
+        return normalize_filter(countries, 'code_pays', 'name')
+
+    if field == 'periods':
+        periods = lots.values('period').distinct()
+        return [{'key': str(v['period']), 'label': "%d-%02d" % (v['period']/100, v['period'] % 100)} for v in periods if v]
+
+    if field == 'production_sites':
+        production_sites = []
+        for item in lots.values('carbure_production_site__name', 'unknown_production_site').distinct():
+            if item['carbure_production_site__name'] not in ('', None):
+                production_sites.append(item['carbure_production_site__name'])
+            elif item['unknown_production_site'] not in ('', None):
+                production_sites.append(item['unknown_production_site'])
+        return normalize_filter(set(production_sites))
+
+    if field == 'delivery_sites':
+        delivery_sites = []
+        for item in lots.values('carbure_delivery_site__name', 'unknown_delivery_site').distinct():
+            if item['carbure_delivery_site__name'] not in ('', None):
+                delivery_sites.append(item['carbure_delivery_site__name'])
+            elif item['unknown_delivery_site'] not in ('', None):
+                delivery_sites.append(item['unknown_delivery_site'])
+        return normalize_filter(set(delivery_sites))
+
+    if field == 'clients':
+        clients = []
+        for item in lots.values('carbure_client__name', 'unknown_client').distinct():
+            if item['carbure_client__name'] not in ('', None):
+                clients.append(item['carbure_client__name'])
+            elif item['unknown_client'] not in ('', None):
+                clients.append(item['unknown_client'])
+        return normalize_filter(set(clients))
+
+    if field == 'suppliers':
+        suppliers = []
+        for item in lots.values('carbure_supplier__name', 'unknown_supplier').distinct():
+            if item['carbure_supplier__name'] not in ('', None):
+                suppliers.append(item['carbure_supplier__name'])
+            elif item['unknown_supplier'] not in ('', None):
+                suppliers.append(item['unknown_supplier'])
+        return normalize_filter(set(suppliers))
+
+    if field == 'errors':
+        generic_errors = lots.values('genericerror__error').distinct()
+        return normalize_filter(generic_errors, 'genericerror__error')
+
+    if field == 'added_by':
+        added_by = lots.values('added_by__name').distinct()
+        return normalize_filter(added_by, 'added_by__name')

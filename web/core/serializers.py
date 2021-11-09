@@ -23,18 +23,18 @@ class ProductionSiteSerializer(serializers.ModelSerializer):
     producer = EntitySerializer(read_only=True)
     class Meta:
         model = ProductionSite
-        fields = ['id', 'producer', 'name', 'country', 'date_mise_en_service', 'ges_option', 'eligible_dc', 'dc_reference', 
+        fields = ['id', 'producer', 'name', 'country', 'date_mise_en_service', 'ges_option', 'eligible_dc', 'dc_reference',
                   'site_id', 'address', 'city', 'postal_code', 'gps_coordinates', 'manager_name', 'manager_phone', 'manager_email']
 
 
 class CarbureLotCSVSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarbureLot
-        fields = ['year', 'period', 'carbure_id', 'producer', 'production_site', 
-                  'production_country', 'production_site_commissioning_date', 'production_site_certificate', 'production_site_double_counting_certificate', 
-                  'supplier', 'supplier_certificate', 
-                  'transport_document_reference', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country', 'delivery_type', 
-                  'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin', 
+        fields = ['year', 'period', 'carbure_id', 'producer', 'production_site',
+                  'production_country', 'production_site_commissioning_date', 'production_site_certificate', 'production_site_double_counting_certificate',
+                  'supplier', 'supplier_certificate',
+                  'transport_document_reference', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country', 'delivery_type',
+                  'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
                   'free_field'
                   ]
@@ -68,16 +68,16 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
 
     def get_biofuel(self, obj):
         return obj.biofuel.code if obj.biofuel else ''
-    
+
     def get_country_of_origin(self, obj):
         return obj.country_of_origin.code_pays if obj.country_of_origin else ''
 
 class CarbureStockSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarbureStock
-        fields = ['id', 'parent_lot', 'parent_transformation', 'carbure_id', 'depot', 'carbure_client', 
-                  'remaining_volume', 'remaining_weight', 'remaining_lhv_amount', 'feedstock', 'biofuel', 'country_of_origin', 
-                  'carbure_production_site', 'unknown_production_site', 'production_country', 'carbure_supplier', 'unknown_supplier', 
+        fields = ['id', 'parent_lot', 'parent_transformation', 'carbure_id', 'depot', 'carbure_client',
+                  'remaining_volume', 'remaining_weight', 'remaining_lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
+                  'carbure_production_site', 'unknown_production_site', 'production_country', 'carbure_supplier', 'unknown_supplier',
                   'ghg_reduction', 'ghg_reduction_red_ii']
 
 class CarbureLotPublicSerializer(serializers.ModelSerializer):
@@ -98,31 +98,31 @@ class CarbureLotPublicSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CarbureLot
-        fields = ['year', 'period', 'carbure_id', 
-                  'carbure_producer', 'unknown_producer', 'carbure_production_site', 'unknown_production_site',  
-                  'production_country', 'production_site_commissioning_date', 'production_site_certificate', 'production_site_double_counting_certificate', 
+        fields = ['id', 'year', 'period', 'carbure_id',
+                  'carbure_producer', 'unknown_producer', 'carbure_production_site', 'unknown_production_site',
+                  'production_country', 'production_site_commissioning_date', 'production_site_certificate', 'production_site_double_counting_certificate',
                   'carbure_supplier', 'unknown_supplier', 'supplier_certificate', 'supplier_certificate_type',
                   'transport_document_type', 'transport_document_reference', 'carbure_client', 'unknown_client',
                   'dispatch_date', 'carbure_dispatch_site', 'unknown_dispatch_site', 'dispatch_site_country',
-                  'delivery_date', 'carbure_delivery_site', 'unknown_delivery_site', 'delivery_site_country', 'delivery_type', 
-                  'lot_status', 'correction_status', 'parent_stock', 
-                  'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin', 
+                  'delivery_date', 'carbure_delivery_site', 'unknown_delivery_site', 'delivery_site_country', 'delivery_type',
+                  'lot_status', 'correction_status', 'parent_stock',
+                  'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
-                  'free_field', 'added_by', 
+                  'free_field', 'added_by',
                   ]
 
 class CarbureLotAdminSerializer(CarbureLotPublicSerializer):
     class Meta:
         model = CarbureLot
-        fields = ['year', 'period', 'carbure_id', 
-                  'carbure_producer', 'unknown_producer', 'carbure_production_site', 'unknown_production_site',  
-                  'production_country', 'production_site_commissioning_date', 'production_site_certificate', 'production_site_double_counting_certificate', 
-                  'carbure_supplier', 'unknown_supplier', 'supplier_certificate', 'supplier_certificate_type', 
+        fields = ['year', 'period', 'carbure_id',
+                  'carbure_producer', 'unknown_producer', 'carbure_production_site', 'unknown_production_site',
+                  'production_country', 'production_site_commissioning_date', 'production_site_certificate', 'production_site_double_counting_certificate',
+                  'carbure_supplier', 'unknown_supplier', 'supplier_certificate', 'supplier_certificate_type',
                   'transport_document_type', 'transport_document_reference', 'carbure_client', 'unknown_client',
-                  'dispatch_date', 'carbure_dispatch_site', 'unknown_dispatch_site', 'dispatch_site_country', 
-                  'delivery_date', 'carbure_delivery_site', 'unknown_delivery_site', 'delivery_site_country', 'delivery_type', 
-                  'lot_status', 'correction_status', 'parent_stock', 
-                  'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin', 
+                  'dispatch_date', 'carbure_dispatch_site', 'unknown_dispatch_site', 'dispatch_site_country',
+                  'delivery_date', 'carbure_delivery_site', 'unknown_delivery_site', 'delivery_site_country', 'delivery_type',
+                  'lot_status', 'correction_status', 'parent_stock',
+                  'volume', 'weight', 'lhv_amount', 'feedstock', 'biofuel', 'country_of_origin',
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
                   'free_field', 'added_by', 'highlighted_by_auditor', 'highlighted_by_admin'
                   ]
