@@ -1,5 +1,5 @@
 import cl from "clsx"
-import { Fragment, useEffect, useState } from "react"
+import { useState } from "react"
 import { Loader } from "./icons"
 import css from "./button.module.css"
 import { Layout, layout } from "./scaffold"
@@ -128,9 +128,17 @@ interface LinkWrapperProps {
 
 const LinkWrapper = ({ href, to, children }: LinkWrapperProps) => {
   if (href) {
-    return <a href={href}>{children}</a>
+    return (
+      <a href={href} className={css.wrapper}>
+        {children}
+      </a>
+    )
   } else if (to) {
-    return <Link to={to}>{children}</Link>
+    return (
+      <Link to={to} className={css.wrapper}>
+        {children}
+      </Link>
+    )
   } else {
     return <>{children}</>
   }

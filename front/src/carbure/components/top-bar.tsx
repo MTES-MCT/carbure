@@ -6,10 +6,10 @@ import { UserManager, useUserContext } from "carbure/hooks/user"
 import Menu from "common-v2/components/menu"
 import { Anchors } from "common-v2/components/dropdown"
 import { Header } from "common-v2/components/scaffold"
-import { ChevronRight, Question } from "common-v2/components/icons"
 import Button from "common-v2/components/button"
 import Tabs from "common-v2/components/tabs"
 import Select from "common-v2/components/select"
+import { ChevronRight, Question } from "common-v2/components/icons"
 import republique from "../assets/images/republique.svg"
 import marianne from "../assets/images/Marianne.svg"
 import css from "./top-bar.module.css"
@@ -56,6 +56,7 @@ const PrivateTopbar = ({ user, entity }: PrivateTopbarProps) => {
   const { t } = useTranslation()
   const { isBlank } = entity
   const firstEntity = user.getFirstEntity()
+
   return (
     <Header>
       <LogoCompact />
@@ -118,7 +119,7 @@ const Navigation = ({ entity }: NavigationProps) => {
                 label: isAdmin || isExternal ? t("Options") : t("Société"),
               },
 
-              (isAdmin || isExternal) && {
+              !(isAdmin || isExternal) && {
                 key: "registry",
                 path: "registry",
                 label: t("Annuaire"),

@@ -15,6 +15,10 @@
   overflow: hidden;
 }
 
+.wrapper {
+  align-self: center;
+}
+
 .button [data-icon] {
   flex-shrink: 0;
 }
@@ -106,7 +110,7 @@
 .text {
   border: none;
   background-color: transparent;
-  color: var(--blue-dark);
+  color: var(--black);
 }
 
 .text:hover {

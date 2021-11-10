@@ -40,11 +40,13 @@ export default function useCompany(
   const [requestDefaultCert, setDefaultCertificate] = useAPI(api.setDefaultCertificate) // prettier-ignore
   const [certificates, findCertificates] = useAPI(api.findCertificates)
 
+  const entityID = entity?.id ?? -1
+
   useEffect(() => {
-    if (entity) {
-      findCertificates("", entity.id)
+    if (entityID >= 0) {
+      findCertificates("", entityID)
     }
-  }, [findCertificates, entity, settings])
+  }, [findCertificates, entityID, settings])
 
   const isLoading =
     settings.loading ||
@@ -65,19 +67,19 @@ export default function useCompany(
 
   function refresh() {
     if (entity) {
-      findCertificates("", entity.id)
+      findCertificates("", entityID)
     }
   }
 
   function onChangeMAC(checked: boolean): void {
     if (entity !== null) {
-      resolveToggleMAC(checked, entity.id).then(settings.resolve)
+      resolveToggleMAC(checked, entityID).then(settings.resolve)
     }
   }
 
   function onChangeTrading(checked: boolean): void {
     if (entity !== null) {
-      resolveToggleTrading(checked, entity.id).then(settings.resolve)
+      resolveToggleTrading(checked, entityID).then(settings.resolve)
     }
   }
 
@@ -88,7 +90,7 @@ export default function useCompany(
 
     if (entity && certificate) {
       await setDefaultCertificate(
-        entity.id,
+        entityID,
         certificate.certificate_id,
         certificate.type.toUpperCase()
       )

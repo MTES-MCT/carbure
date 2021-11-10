@@ -4,10 +4,11 @@
   padding: 0 var(--main-spacing-x);
   gap: var(--spacing-m);
   box-shadow: var(--shadow);
-  height: 64px;
+  min-height: 64px;
 }
 
-.header [data-field] input {
+.header [data-field] input,
+.header button {
   font-size: 1.1em;
   font-weight: 600;
 }

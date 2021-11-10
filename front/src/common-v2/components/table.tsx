@@ -119,11 +119,11 @@ export function markerColumn<T>(mark: Marker<T>): Column<T> {
 }
 
 export function actionColumn<T>(
-  actions: (value: T) => React.ReactNode[]
+  actions: (value: T) => React.ReactElement[]
 ): Column<T> {
   return {
     className: css.actions,
-    cell: (value) => actions(value),
+    cell: (value) => actions(value).map((e, key) => ({ ...e, key })),
   }
 }
 

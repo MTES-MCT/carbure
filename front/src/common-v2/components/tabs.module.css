@@ -10,6 +10,10 @@
   color: var(--black);
 }
 
+.header {
+  margin: 0 var(--spacing-l);
+}
+
 .header a {
   padding: var(--spacing-m);
   font-size: 1.1em;

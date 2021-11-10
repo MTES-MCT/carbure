@@ -20,7 +20,6 @@
   font-weight: bold;
   font-size: 0.8em;
   padding: var(--spacing-s) 0;
-  min-width: var(--min-cell-width);
 }
 
 .header[data-sortable] {
@@ -60,7 +59,6 @@
 .cell {
   flex: 1 1 0%;
   padding: var(--spacing-m) 0;
-  min-width: var(--min-cell-width);
 }
 
 .cell strong {
@@ -73,7 +71,6 @@
 
 .small {
   flex: 0.33 1;
-  min-width: 96px;
 }
 
 .cell,
