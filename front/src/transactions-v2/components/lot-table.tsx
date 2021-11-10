@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next"
 import { Normalizer } from "common-v2/hooks/normalize"
 import { formatDate, formatNumber, formatPeriod } from "common-v2/formatters"
 import Table, {
+  actionColumn,
   Cell,
   Column,
   markerColumn,
@@ -9,6 +10,7 @@ import Table, {
 } from "common-v2/components/table"
 import { Lot } from "../types"
 import Status from "./status"
+import { SendIconButton } from "transactions-v2/actions/send"
 
 export interface LotTableProps {
   loading?: boolean
@@ -132,6 +134,7 @@ export const LotTable = ({
         columns.productionSite,
         columns.deliverySite,
         columns.ghgReduction,
+        actionColumn((lot: Lot) => [<SendIconButton lot={lot} />]),
       ]}
     />
   )

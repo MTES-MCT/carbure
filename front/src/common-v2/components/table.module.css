@@ -73,6 +73,7 @@
 
 .small {
   flex: 0.33 1;
+  min-width: 96px;
 }
 
 .cell,

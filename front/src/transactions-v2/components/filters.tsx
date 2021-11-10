@@ -3,22 +3,23 @@ import { useSearchParams, createSearchParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { useAsyncCallback, UseAsyncReturn } from "react-async-hook"
 import { AxiosResponse } from "axios"
+import { Api } from "common-v2/api"
 import { normalizeTree, Option } from "common-v2/hooks/normalize"
 import { Grid } from "common-v2/components/scaffold"
 import { MultiSelect, MultiSelectProps } from "common-v2/components/multi-select" // prettier-ignore
 import { Filter, FilterSelection, LotQuery } from "../types"
 import * as api from "../api"
-import { Api } from "common-v2/api"
+import { Status } from "../hooks/status"
 
 export interface FiltersProps {
-  fields: Filter[]
+  status: Status
   query: LotQuery
   selected: FilterSelection
   onSelect: (field: Filter, value: Option[]) => void
 }
 
 export const Filters = ({
-  fields,
+  status,
   query,
   selected,
   onSelect,
@@ -47,7 +48,7 @@ export const Filters = ({
 
   return (
     <Grid>
-      {fields.map((field) => (
+      {statusFilters[status].map((field) => (
         <FilterSelect
           key={field}
           field={field}
@@ -171,7 +172,7 @@ function sortFilters(a: Option, b: Option) {
   return a.label.localeCompare(b.label, "fr")
 }
 
-export const DRAFT_FILTERS = [
+const DRAFT_FILTERS = [
   Filter.Periods,
   Filter.Biofuels,
   Filter.Feedstocks,
@@ -182,7 +183,7 @@ export const DRAFT_FILTERS = [
   Filter.DeliverySites,
 ]
 
-export const IN_FILTERS = [
+const IN_FILTERS = [
   Filter.Periods,
   Filter.Biofuels,
   Filter.Feedstocks,
@@ -192,7 +193,7 @@ export const IN_FILTERS = [
   Filter.DeliverySites,
 ]
 
-export const STOCK_FILTERS = [
+const STOCK_FILTERS = [
   Filter.Periods,
   Filter.Biofuels,
   Filter.Feedstocks,
@@ -202,7 +203,7 @@ export const STOCK_FILTERS = [
   Filter.DeliverySites,
 ]
 
-export const OUT_FILTERS = [
+const OUT_FILTERS = [
   Filter.Periods,
   Filter.Biofuels,
   Filter.Feedstocks,
@@ -212,7 +213,7 @@ export const OUT_FILTERS = [
   Filter.DeliverySites,
 ]
 
-export const ADMIN_FILTERS = [
+const ADMIN_FILTERS = [
   Filter.Mac,
   Filter.DeliveryStatus,
   Filter.Periods,
@@ -229,5 +230,14 @@ export const ADMIN_FILTERS = [
   Filter.HiddenByAdmin,
   Filter.ClientTypes,
 ]
+
+const statusFilters: Record<Status, Filter[]> = {
+  DRAFT: DRAFT_FILTERS,
+  IN: IN_FILTERS,
+  STOCK: STOCK_FILTERS,
+  OUT: OUT_FILTERS,
+  ADMIN: ADMIN_FILTERS,
+  UNKNOWN: [],
+}
 
 export default Filters

@@ -140,7 +140,7 @@ export type FilterSelection = Partial<Record<Filter, Option[]>>
 
 export interface LotQuery {
   entity_id: number
-  status: string // "draft" | "in" | "stock" | "out"
+  status?: string // "draft" | "in" | "stock" | "out"
   year?: number
   search?: string
   order_by?: string

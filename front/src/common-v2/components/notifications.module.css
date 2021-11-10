@@ -13,7 +13,8 @@
 .notification {
   display: flex;
   position: relative;
-  width: 320px;
+  width: 400px;
+  font-size: 1.1em;
   background-color: var(--black);
   color: var(--white);
   box-shadow: var(--shadow);
@@ -22,7 +23,6 @@
 .content {
   padding: var(--spacing-s);
   padding-left: var(--spacing-m);
-  text-align: justify;
 }
 
 .close {
