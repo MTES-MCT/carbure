@@ -2,6 +2,7 @@ import { createContext, useContext } from "react"
 import { useQuery } from "common-v2/hooks/async"
 import { Entity, UserRight, UserRightRequest } from "../types"
 import * as api from "../api"
+import { AxiosError } from "axios"
 
 export interface UserManager {
   loading: boolean
@@ -20,6 +21,8 @@ export function useUser(): UserManager {
     key: "user-settings",
     params: [],
   })
+
+  console.log(settings)
 
   const res = settings.result?.data.data
   const email = res?.email ?? ""
@@ -43,7 +46,8 @@ export function useUser(): UserManager {
   }
 
   function isAuthenticated() {
-    return settings.error?.message !== "User not verified"
+    const error = settings.error as AxiosError | undefined
+    return error?.response?.data.message !== "User not verified"
   }
 
   return {

@@ -584,11 +584,13 @@ const DoubleCountingPrompt = ({
   const [, deleteSourcing] = useAPI(api.deleteDoubleCountingSourcing)
   const [, deleteProduction] = useAPI(api.deleteDoubleCountingProduction)
 
+  const entityID = entity?.id
+
   useEffect(() => {
-    if (entity) {
-      getAgreement(entity.id, agreementID)
+    if (entityID !== undefined) {
+      getAgreement(entityID, agreementID)
     }
-  }, [entity, agreementID, getAgreement])
+  }, [entityID, agreementID, getAgreement])
 
   const dcaID = agreement.data?.id ?? -1
   const dcaStatus = agreement.data?.status ?? DCStatus.Pending
@@ -952,11 +954,13 @@ const DoubleCountingSettings = ({
 
   const [agreements, getAgreements] = useAPI(api.getDoubleCountingAgreements)
 
+  const entityID = entity?.id
+
   useEffect(() => {
-    if (entity) {
-      getAgreements(entity.id)
+    if (entityID !== undefined) {
+      getAgreements(entityID)
     }
-  }, [entity, getAgreements])
+  }, [entityID, getAgreements])
 
   const isEmpty = !agreements.data || agreements.data.length === 0
   const canModify = rights.is(UserRole.Admin, UserRole.ReadWrite)
