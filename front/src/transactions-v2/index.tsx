@@ -9,6 +9,7 @@ import { Bar, Main } from "common-v2/components/scaffold"
 import Select from "common-v2/components/select"
 import Button from "common-v2/components/button"
 import { PortalProvider } from "common-v2/components/portal"
+import Pagination, { usePagination } from "common-v2/components/pagination"
 import Filters, { useFilters } from "./components/filters"
 import { Certificate } from "common-v2/components/icons"
 import { LotTable } from "./components/lot-table"
@@ -24,11 +25,18 @@ export const Transactions = () => {
   const entity = useEntity()
   const status = useStatus()
   const filters = useFilters()
+  const pagination = usePagination()
 
   const [selection, setSelection] = useState<Lot[]>([])
   const [year = 2021, setYear] = useState<number | undefined>()
 
-  const query = useLotQuery(entity.id, status, year, filters.selected)
+  const query = useLotQuery(
+    entity.id,
+    status,
+    year,
+    filters.selected,
+    pagination
+  )
 
   const snapshotQuery = useQuery(api.getSnapshot, {
     key: "transactions-snapshot",
@@ -46,6 +54,7 @@ export const Transactions = () => {
 
   const snapshot = snapshotQuery.result?.data.data
   const lots = lotsQuery.result?.data.data?.lots ?? []
+  const total = lotsQuery.result?.data.data?.total ?? 0
   const selectionIDs = selection.map((lot) => lot.id)
 
   return (
@@ -107,6 +116,14 @@ export const Transactions = () => {
               onSelect={setSelection}
             />
           )}
+
+          <Pagination
+            page={pagination.page}
+            limit={pagination.limit}
+            total={total}
+            onPage={pagination.setPage}
+            onLimit={pagination.setLimit}
+          />
         </section>
       </Main>
     </PortalProvider>

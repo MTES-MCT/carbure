@@ -63,7 +63,7 @@ export type Normalizer<T> = (value: T) => {
   children?: T[]
 }
 export const defaultNormalizer: Normalizer<any> = (value) => {
-  if (value.key && value.label) {
+  if (value instanceof Object && "key" in value && "label" in value) {
     return { key: value.key, label: value.label }
   } else {
     return { key: String(value), label: String(value) }
