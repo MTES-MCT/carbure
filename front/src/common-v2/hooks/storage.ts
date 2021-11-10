@@ -6,8 +6,12 @@ function getKey<T>(key: string): T | undefined {
 }
 
 function setKey<T>(key: string, value: T) {
-  const string = JSON.stringify(value)
-  localStorage.setItem(key, string)
+  if (value !== undefined) {
+    const string = JSON.stringify(value)
+    localStorage.setItem(key, string)
+  } else {
+    localStorage.removeItem(key)
+  }
 }
 
 export function useLocalStorage<T>(

@@ -57,14 +57,14 @@
 
 /* variant secondary */
 .secondary {
-  color: var(--blue-dark);
-  background-color: var(--blue-light);
-  border-color: var(--blue-medium);
+  color: var(--black);
+  background-color: var(--gray-light);
+  border-color: var(--gray-medium);
 }
 
 .secondary:hover {
-  color: var(--white);
-  background-color: var(--blue-dark);
+  color: var(--blue-dark);
+  border-color: var(--blue-dark);
 }
 
 /* variant success */

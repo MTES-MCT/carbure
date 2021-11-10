@@ -120,7 +120,7 @@ export const LotTable = ({
   return (
     <Table
       loading={loading}
-      rows={lots.slice(0, 25)}
+      rows={lots}
       columns={[
         markerColumn(() => undefined),
         selectionColumn(lots, selected, onSelect, normalizeLot),

@@ -1,33 +1,33 @@
-import cl from "clsx";
-import React from "react";
-import Button from "./button";
-import { AlertTriangle, Cross, Loader, Search } from "./icons";
-import css from "./input.module.css";
-import { layout, Layout } from "./scaffold";
+import cl from "clsx"
+import React from "react"
+import Button from "./button"
+import { AlertTriangle, Cross, Loader, Search } from "./icons"
+import css from "./input.module.css"
+import { layout, Layout } from "./scaffold"
 
-export type FieldVariant = "outline" | "solid" | "inline" | "text";
+export type FieldVariant = "outline" | "solid" | "inline" | "text"
 
 export interface Control extends Layout {
-  className?: string;
-  style?: React.CSSProperties;
-  variant?: FieldVariant;
-  clear?: boolean;
-  disabled?: boolean;
-  readOnly?: boolean;
-  required?: boolean;
-  loading?: boolean;
-  error?: string;
-  label?: string;
-  type?: string;
-  name?: string;
-  placeholder?: string;
-  icon?: React.FunctionComponent | React.ReactNode;
-  domRef?: React.RefObject<HTMLElement>;
+  className?: string
+  style?: React.CSSProperties
+  variant?: FieldVariant
+  clear?: boolean
+  disabled?: boolean
+  readOnly?: boolean
+  required?: boolean
+  loading?: boolean
+  error?: string
+  label?: string
+  type?: string
+  name?: string
+  placeholder?: string
+  icon?: React.FunctionComponent | React.ReactNode
+  domRef?: React.RefObject<HTMLElement>
 }
 
 export interface TextInputProps extends Control {
-  value: string | undefined;
-  onChange: (value: string | undefined) => void;
+  value: string | undefined
+  onChange: (value: string | undefined) => void
 }
 
 export const TextInput = ({
@@ -42,14 +42,14 @@ export const TextInput = ({
     onChange={(e) => onChange(e.target.value)}
     onClear={clear && value ? () => onChange(undefined) : undefined}
   />
-);
+)
 
 export interface NumberInputProps extends Control {
-  min?: number;
-  max?: number;
-  step?: number;
-  value: number | undefined;
-  onChange: (value: number | undefined) => void;
+  min?: number
+  max?: number
+  step?: number
+  value: number | undefined
+  onChange: (value: number | undefined) => void
 }
 
 export const NumberInput = ({
@@ -64,16 +64,16 @@ export const NumberInput = ({
     value={value ?? ""}
     onClear={clear && value ? () => onChange(undefined) : undefined}
     onChange={(e) => {
-      const value = parseFloat(e.target.value);
-      const change = isNaN(value) ? undefined : value;
-      onChange(change);
+      const value = parseFloat(e.target.value)
+      const change = isNaN(value) ? undefined : value
+      onChange(change)
     }}
   />
-);
+)
 
 export interface DateInputProps extends Control {
-  value: string | undefined;
-  onChange: (value: string | undefined) => void;
+  value: string | undefined
+  onChange: (value: string | undefined) => void
 }
 
 export const DateInput = ({
@@ -89,11 +89,11 @@ export const DateInput = ({
     onChange={(e) => onChange(e.target.value)}
     onClear={clear && value ? () => onChange(undefined) : undefined}
   />
-);
+)
 
 export interface FileInputProps extends Control {
-  value: File | undefined;
-  onChange: (value: File | undefined) => void;
+  value: File | undefined
+  onChange: (value: File | undefined) => void
 }
 
 export const FileInput = ({
@@ -120,15 +120,15 @@ export const FileInput = ({
       {value?.name ?? placeholder}
     </label>
   </Field>
-);
+)
 
 export interface InputProps extends Control {
-  min?: number;
-  max?: number;
-  step?: number;
-  value: string | number | undefined;
-  onChange?: React.ChangeEventHandler<HTMLInputElement>;
-  onClear?: () => void;
+  min?: number
+  max?: number
+  step?: number
+  value: string | number | undefined
+  onChange?: React.ChangeEventHandler<HTMLInputElement>
+  onClear?: () => void
 }
 
 export const Input = ({
@@ -159,13 +159,13 @@ export const Input = ({
       onChange={onChange}
     />
   </Field>
-);
+)
 
 export interface TextAreaProps extends Control {
-  rows?: number;
-  cols?: number;
-  value: string | undefined;
-  onChange: (value: string | undefined) => void;
+  rows?: number
+  cols?: number
+  value: string | undefined
+  onChange: (value: string | undefined) => void
 }
 
 export const TextArea = ({
@@ -195,7 +195,7 @@ export const TextArea = ({
       onChange={(e) => onChange(e.target.value)}
     />
   </Field>
-);
+)
 
 export const SearchInput = ({
   className,
@@ -226,10 +226,10 @@ export const SearchInput = ({
       onChange={(e) => onChange(e.target.value)}
     />
   </Field>
-);
+)
 
 export interface GroupFieldProps extends Control {
-  children?: React.ReactNode;
+  children?: React.ReactNode
 }
 
 export const GroupField = ({
@@ -273,12 +273,12 @@ export const GroupField = ({
         {children}
       </div>
     </div>
-  );
-};
+  )
+}
 
 export interface FieldProps extends Control {
-  children?: React.ReactNode;
-  onClear?: () => void;
+  children?: React.ReactNode
+  onClear?: () => void
 }
 
 export const Field = ({
@@ -298,7 +298,7 @@ export const Field = ({
   children,
   onClear,
 }: FieldProps) => {
-  const icon = typeof Icon === "function" ? <Icon /> : Icon;
+  const icon = typeof Icon === "function" ? <Icon /> : Icon
 
   return (
     <div
@@ -349,5 +349,5 @@ export const Field = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}

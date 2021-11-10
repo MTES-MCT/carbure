@@ -119,7 +119,7 @@ export function List<T>({
       return <li>Aucune entrée trouvée</li>
     }
 
-    return items.map(({ key, label, children, disabled, value }) => {
+    return items.map(({ key, label, children, disabled, value }, i) => {
       const config: ItemConfig<T> = {
         key,
         label,
@@ -134,7 +134,7 @@ export function List<T>({
       // render group header
       if (children) {
         return (
-          <div key={key}>
+          <div key={key ?? i}>
             <li
               data-group
               data-key={key}
@@ -155,7 +155,7 @@ export function List<T>({
       // render item
       return (
         <li
-          key={key}
+          key={key ?? i}
           data-key={key}
           data-disabled={disabled ? true : undefined}
           data-level={level > 0 ? level : undefined}

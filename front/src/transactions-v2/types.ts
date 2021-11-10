@@ -64,6 +64,11 @@ export interface Lot {
 
 export interface LotList {
   lots: Lot[]
+  total: number
+  returned: number
+  from: number
+  errors: Record<string, number>
+  deadlines: { date: string; total: number }
 }
 
 export interface Snapshot {
