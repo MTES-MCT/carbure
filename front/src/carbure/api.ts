@@ -1,6 +1,6 @@
 import api, { Api } from "common-v2/api"
-import { UserSettings } from "./types"
+import { User } from "./types"
 
 export function getUserSettings() {
-  return api.get<Api<UserSettings>>("v3/settings")
+  return api.get<Api<User>>("v3/settings")
 }

@@ -26,6 +26,7 @@ import UserRights from "./components/user-rights"
 import { useRights } from "carbure/hooks/use-rights"
 import { EntityType, UserRole } from "common/types"
 import DoubleCountingSettings from "./components/double-counting"
+import useEntity from "carbure/hooks/entity"
 
 function useSettings(entity: EntitySelection, settings: SettingsGetter) {
   const company = useCompany(entity, settings)
@@ -48,11 +49,12 @@ function useSettings(entity: EntitySelection, settings: SettingsGetter) {
 }
 
 type SettingsProps = {
-  entity: EntitySelection
   settings: SettingsGetter
 }
 
-const Settings = ({ entity, settings }: SettingsProps) => {
+const Settings = ({ settings }: SettingsProps) => {
+  const entity = useEntity()
+
   const {
     company,
     productionSites,

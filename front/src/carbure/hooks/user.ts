@@ -3,9 +3,9 @@ import { useQuery } from "common-v2/hooks/async"
 import { Entity, UserRight, UserRightRequest } from "../types"
 import * as api from "../api"
 
-export interface User {
+export interface UserManager {
   loading: boolean
-  email: string | undefined
+  email: string
   rights: UserRight[]
   requests: UserRightRequest[]
   isAuthenticated: () => boolean
@@ -15,14 +15,14 @@ export interface User {
   getFirstEntity: () => Entity | null
 }
 
-export function useUser(): User {
+export function useUser(): UserManager {
   const settings = useQuery(api.getUserSettings, {
     key: "user-settings",
     params: [],
   })
 
   const res = settings.result?.data.data
-  const email = res?.email
+  const email = res?.email ?? ""
   const rights = res?.rights ?? []
   const requests = res?.requests ?? []
 
@@ -59,7 +59,7 @@ export function useUser(): User {
   }
 }
 
-export const UserContext = createContext<User | undefined>(undefined)
+export const UserContext = createContext<UserManager | undefined>(undefined)
 
 export function useUserContext() {
   const user = useContext(UserContext)

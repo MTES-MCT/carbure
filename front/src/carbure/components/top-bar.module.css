@@ -1,11 +1,3 @@
-.topBar {
-  display: flex;
-  background-color: var(--white);
-  padding: 0 var(--main-spacing);
-  border-bottom: 1px solid var(--gray-highlight);
-  min-height: 64px;
-}
-
 .logo {
   display: flex;
   align-items: center;
@@ -34,66 +26,13 @@
   height: 24px;
 }
 
-.betagouv {
-  height: 32px;
-  margin: 8px 16px;
-}
-
-.entityShortcut {
+.shortcut {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
   margin-left: 32px;
   color: var(--blue-medium);
-}
-
-.pageNav {
-  display: flex;
-  margin-left: 32px;
-}
-
-.pageLink {
-  display: flex;
-  position: relative;
-  align-items: center;
-  padding: 0 16px;
-  font-size: 1.1em;
-  color: var(--black);
-}
-
-.pageLink:hover {
-  color: var(--blue-medium);
-}
-
-.activePageLink {
-  font-weight: 600;
-}
-
-.activePageLink::after {
-  position: absolute;
-  content: "";
-  height: 4px;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: var(--blue-medium);
-}
-
-.topRight {
-  margin-left: auto;
-}
-
-.languageSelection {
-  height: 100%;
-  font-size: 1.1em;
-  border: none !important;
-}
-
-.userMenu {
-  display: flex;
-  font-size: 1.1em;
-  margin-left: 8px;
 }
 
 .faq {

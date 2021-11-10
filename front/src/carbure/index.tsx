@@ -2,8 +2,7 @@ import { Trans, useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 
 import { AppHook, useApp } from "./hooks/use-app"
-import { LotStatus, ExternalAdminPages } from "common/types"
-import { hasPage } from "./hooks/use-entity"
+import { ExternalAdminPages } from "common/types"
 import useUser, { useUserContext, UserContext } from "./hooks/user"
 import useEntity from "./hooks/entity"
 import { UserRightProvider } from "./hooks/use-rights"
@@ -15,9 +14,7 @@ import Pending from "./components/pending"
 import Exit from "./components/exit"
 import Registry from "./components/registry"
 
-import Transactions from "transactions"
 import TransactionsV2 from "transactions-v2"
-import Stocks from "stocks"
 import Settings from "settings"
 import Account from "account"
 import DoubleCounting from "doublecount"
@@ -55,32 +52,28 @@ const Org = ({ app }: { app: AppHook }) => {
     return <LoaderOverlay />
   }
 
-  const { isAdmin, isAuditor } = entity
+  const { isAdmin } = entity
 
-  // prettier-ignore
   return (
     <UserRightProvider app={app}>
       <Routes>
-        <Route path="stocks" element={<Navigate to="in" />} />
-        <Route path="stocks/:status/*" element={<Stocks entity={entity} />} />
-
-        <Route path="transactions" element={<Navigate to={isAdmin || isAuditor ? LotStatus.Alert : LotStatus.Draft} />} />
-        <Route path="transactions/:status/*" element={<Transactions entity={entity} />} />
-
         <Route path="transactions-v2/*" element={<TransactionsV2 />} />
 
-        <Route path="settings" element={<Settings entity={entity} settings={app.settings} />} />
+        <Route path="settings" element={<Settings settings={app.settings} />} />
         <Route path="registry" element={<Registry />} />
 
         {isAdmin && <Route path="dashboard" element={<Dashboard />} />}
         {isAdmin && <Route path="entities" element={<Entities />} />}
         {isAdmin && <Route path="entities/:id" element={<EntityDetails />} />}
 
-        {(isAdmin || hasPage(entity, ExternalAdminPages.DoubleCounting)) && (
-          <Route path="double-counting/*" element={<DoubleCounting entity={entity} />} />
+        {(isAdmin || entity.hasPage(ExternalAdminPages.DoubleCounting)) && (
+          <Route path="double-counting/*" element={<DoubleCounting />} />
         )}
 
-        <Route path="*" element={<Navigate to={isAdmin ? "dashboard" : "transactions"} />} />
+        <Route
+          path="*"
+          element={<Navigate to={isAdmin ? "dashboard" : "transactions-v2"} />}
+        />
       </Routes>
     </UserRightProvider>
   )
@@ -97,7 +90,7 @@ const Carbure = () => {
       <div id="app">
         {!app.isProduction() && <DevBanner />}
 
-        <Topbar app={app} />
+        <Topbar />
 
         <Routes>
           <Route path="/" element={<Home app={app} />} />
