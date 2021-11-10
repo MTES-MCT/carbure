@@ -1,23 +1,22 @@
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { useMatch } from "react-router-dom"
 import { useQuery } from "common-v2/hooks/async"
 import { Bar, Main } from "common-v2/components/scaffold"
 import Select from "common-v2/components/select"
 import Button from "common-v2/components/button"
-import { NotificationProvider } from "common-v2/components/notifications"
+import { PortalProvider, usePortal } from "common-v2/components/portal"
 import useEntity from "carbure/hooks/entity"
 import Filters, { normalizeFilters, useFilters } from "./components/filters"
 import { FilterSelection, Lot, LotQuery } from "./types"
 import { Certificate, Check } from "common-v2/components/icons"
+import Menu from "common-v2/components/menu"
+import Dialog from "common-v2/components/dialog"
 import { LotTable } from "./components/lot-table"
 import NoResult from "./components/no-result"
 import { SendButton } from "./actions/send"
 import StatusTabs from "./components/status-tabs"
 import useStatus from "./hooks/status"
 import * as api from "./api"
-import Menu from "common-v2/components/menu"
-import Dialog from "common-v2/components/dialog"
 
 export const Transactions = () => {
   const { t } = useTranslation()
@@ -45,7 +44,7 @@ export const Transactions = () => {
   const selectionIDs = selection.map((lot) => lot.id)
 
   return (
-    <NotificationProvider>
+    <PortalProvider>
       <Main>
         <header>
           <section>
@@ -92,28 +91,25 @@ export const Transactions = () => {
               icon={Check}
               label="Accepter tout"
               items={[
-                {
-                  label: t("Incorporation"),
-                  dialog: (close) => (
-                    <Dialog onClose={close}>
-                      <header>
-                        <h1>Incorporation</h1>
-                      </header>
-                      <main>
-                        <section>COUCOU</section>
-                      </main>
-                      <footer>
-                        <Button
-                          aside
-                          label="Ciao"
-                          action={() => alert("CPIC")}
-                        />
-                      </footer>
-                    </Dialog>
-                  ),
-                },
+                { label: t("Incorporation") },
                 { label: t("Mise à consommation") },
-                { label: t("Livraison directe") },
+                {
+                  label: t("Livraison directe"),
+                  action: () =>
+                    portal((close) => (
+                      <Dialog onClose={close}>
+                        <header>
+                          <h1>Livraison directe</h1>
+                        </header>
+                        <main>
+                          <section>Description</section>
+                        </main>
+                        <footer>
+                          <Button aside label="Annuler" action={close} />
+                        </footer>
+                      </Dialog>
+                    )),
+                },
               ]}
             />
           </div>
@@ -136,7 +132,7 @@ export const Transactions = () => {
           )}
         </section>
       </Main>
-    </NotificationProvider>
+    </PortalProvider>
   )
 }
 

@@ -8,6 +8,7 @@ import Button from "common-v2/components/button"
 import Checkbox from "common-v2/components/checkbox"
 import Dialog from "common-v2/components/dialog"
 import { Check, Return } from "common-v2/components/icons"
+import { usePortal } from "common-v2/components/portal"
 import * as api from "../api"
 import { Lot, LotQuery } from "../types"
 
@@ -18,14 +19,18 @@ export interface SendButtonProps {
 
 export const SendButton = ({ query, selection }: SendButtonProps) => {
   const { t } = useTranslation()
+  const portal = usePortal()
+
   return (
     <Button
       variant="success"
       icon={Check}
       label={selection.length > 0 ? t("Envoyer sélection") : t("Envoyer tout")}
-      dialog={(close) => (
-        <SendDialog query={query} selection={selection} onClose={close} />
-      )}
+      action={() =>
+        portal((close) => (
+          <SendDialog query={query} selection={selection} onClose={close} />
+        ))
+      }
     />
   )
 }
@@ -37,19 +42,22 @@ export interface SendIconButtonProps {
 export const SendIconButton = ({ lot }: SendIconButtonProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
+  const portal = usePortal()
 
   return (
     <Button
       variant="icon"
       icon={Check}
       title={t("Envoyer le lot")}
-      dialog={(close) => (
-        <SendDialog
-          query={{ entity_id: entity.id }}
-          selection={[lot.id]}
-          onClose={close}
-        />
-      )}
+      action={() =>
+        portal((close) => (
+          <SendDialog
+            query={{ entity_id: entity.id }}
+            selection={[lot.id]}
+            onClose={close}
+          />
+        ))
+      }
     />
   )
 }
@@ -64,10 +72,10 @@ const SendDialog = ({ query, selection, onClose }: SendDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
 
-  const v = variations(selection.length)
-
   const [durability, setDurability] = useState(false)
   const [validity, setValidity] = useState(false)
+
+  const v = variations(selection.length)
 
   const sendLots = useMutation(api.sendLots, {
     invalidates: ["transactions", "transactions-snapshot"],
