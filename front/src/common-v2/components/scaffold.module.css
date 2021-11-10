@@ -104,6 +104,11 @@ section.bar {
   border-top: var(--border);
 }
 
+section.actionbar {
+  display: flex;
+  gap: var(--spacing-m);
+}
+
 .column {
   display: flex;
   flex-direction: column;

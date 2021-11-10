@@ -1,22 +1,22 @@
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import { Navigate } from "react-router"
+import useEntity from "carbure/hooks/entity"
 import { useQuery } from "common-v2/hooks/async"
+import useStatus from "./hooks/status"
+import useLotQuery from "./hooks/query"
 import { Bar, Main } from "common-v2/components/scaffold"
 import Select from "common-v2/components/select"
 import Button from "common-v2/components/button"
-import { PortalProvider, usePortal } from "common-v2/components/portal"
-import useEntity from "carbure/hooks/entity"
-import Filters, { normalizeFilters, useFilters } from "./components/filters"
-import { FilterSelection, Lot, LotQuery } from "./types"
-import { Certificate, Check } from "common-v2/components/icons"
-import Menu from "common-v2/components/menu"
-import Dialog from "common-v2/components/dialog"
+import { PortalProvider } from "common-v2/components/portal"
+import Filters, { useFilters } from "./components/filters"
+import { Certificate } from "common-v2/components/icons"
 import { LotTable } from "./components/lot-table"
 import NoResult from "./components/no-result"
-import { SendButton } from "./actions/send"
 import StatusTabs from "./components/status-tabs"
-import useStatus from "./hooks/status"
+import { Actions } from "./components/actions"
 import * as api from "./api"
+import { Lot } from "./types"
 
 export const Transactions = () => {
   const { t } = useTranslation()
@@ -24,10 +24,11 @@ export const Transactions = () => {
   const entity = useEntity()
   const status = useStatus()
   const filters = useFilters()
+
   const [selection, setSelection] = useState<Lot[]>([])
   const [year = 2021, setYear] = useState<number | undefined>()
 
-  const query = useLotQueryParams(entity.id, status, year, filters.selected)
+  const query = useLotQuery(entity.id, status, year, filters.selected)
 
   const snapshotQuery = useQuery(api.getSnapshot, {
     key: "transactions-snapshot",
@@ -38,6 +39,10 @@ export const Transactions = () => {
     key: "transactions",
     params: [query],
   })
+
+  if (status === "UNKNOWN") {
+    return <Navigate to="draft" />
+  }
 
   const snapshot = snapshotQuery.result?.data.data
   const lots = lotsQuery.result?.data.data?.lots ?? []
@@ -84,35 +89,7 @@ export const Transactions = () => {
         </Bar>
 
         <section>
-          <div>
-            <SendButton query={query} selection={selectionIDs} />
-            <Menu
-              variant="success"
-              icon={Check}
-              label="Accepter tout"
-              items={[
-                { label: t("Incorporation") },
-                { label: t("Mise à consommation") },
-                {
-                  label: t("Livraison directe"),
-                  action: () =>
-                    portal((close) => (
-                      <Dialog onClose={close}>
-                        <header>
-                          <h1>Livraison directe</h1>
-                        </header>
-                        <main>
-                          <section>Description</section>
-                        </main>
-                        <footer>
-                          <Button aside label="Annuler" action={close} />
-                        </footer>
-                      </Dialog>
-                    )),
-                },
-              ]}
-            />
-          </div>
+          <Actions count={lots.length} query={query} selection={selectionIDs} />
 
           {lots.length === 0 && (
             <NoResult
@@ -133,23 +110,6 @@ export const Transactions = () => {
         </section>
       </Main>
     </PortalProvider>
-  )
-}
-
-function useLotQueryParams(
-  entityID: number,
-  status: string,
-  year: number,
-  filters: FilterSelection
-) {
-  return useMemo<LotQuery>(
-    () => ({
-      entity_id: entityID,
-      year,
-      status,
-      ...normalizeFilters(filters),
-    }),
-    [entityID, year, status, filters]
   )
 }
 

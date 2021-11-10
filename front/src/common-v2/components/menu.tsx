@@ -7,7 +7,6 @@ import Button, { ButtonProps } from "./button"
 import List from "./list"
 import { Normalizer } from "../hooks/normalize"
 import css from "./menu.module.css"
-import { PortalRenderer } from "./portal"
 
 export interface MenuProps extends ButtonProps {
   className?: string

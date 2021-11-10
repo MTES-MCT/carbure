@@ -19,6 +19,10 @@ export function getLots(query: LotQuery) {
   return api.get<Api<LotList>>("/lots", { params: query })
 }
 
+export function downloadLots(query: LotQuery, selection: number[]) {
+  return
+}
+
 export function getFilters(field: Filter, query: LotQuery) {
   return api.get<Api<Option[]>>("/filters", {
     params: { field, ...query, ...QUERY_RESET },

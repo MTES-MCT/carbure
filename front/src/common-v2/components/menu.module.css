@@ -16,10 +16,6 @@
   text-decoration: none;
 }
 
-.items [data-focused] {
-  text-decoration: underline;
-}
-
 .items [data-level="1"] * {
   padding-left: var(--spacing-l);
 }
