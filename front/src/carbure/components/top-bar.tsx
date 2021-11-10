@@ -1,30 +1,236 @@
-import React from "react"
-import cl from "clsx"
+import { useEffect } from "react"
+import { Link, Route, Routes, useLocation, useNavigate } from "react-router-dom"
 import { Trans, useTranslation } from "react-i18next"
-import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom"
+import useEntity, { EntityManager } from "carbure/hooks/entity"
+import { UserManager, useUserContext } from "carbure/hooks/user"
+import Menu from "common-v2/components/menu"
+import { Anchors } from "common-v2/components/dropdown"
+import { Header } from "common-v2/components/scaffold"
+import { ChevronRight, Question } from "common-v2/components/icons"
+import Button from "common-v2/components/button"
+import Tabs from "common-v2/components/tabs"
+import Select from "common-v2/components/select"
+import republique from "../assets/images/republique.svg"
+import marianne from "../assets/images/Marianne.svg"
+import css from "./top-bar.module.css"
+import useLocalStorage from "common-v2/hooks/storage"
 
-import useEntity, { EntitySelection, hasPage } from "carbure/hooks/use-entity"
+const Topbar = () => {
+  const entity = useEntity()
+  const user = useUserContext()
 
-import { EntityType, ExternalAdminPages } from "common/types"
-import Menu from "common/components/menu"
-import { ChevronRight, Question } from "common/components/icons"
+  if (!user.isAuthenticated()) {
+    return <PublicTopbar />
+  } else {
+    return <PrivateTopbar entity={entity} user={user} />
+  }
+}
 
-import logoRepublique from "../assets/images/republique.svg"
-import logoMarianne from "../assets/images/Marianne.svg"
-import styles from "./top-bar.module.css"
-import Select from "common/components/select"
-import { Box } from "common/components"
-import { AppHook } from "carbure/hooks/use-app"
-import { Button } from "common/components/button"
+const PublicTopbar = () => {
+  const { t } = useTranslation()
+  return (
+    <Header>
+      <Logo />
+      <LanguageSelection />
+      <Button
+        aside // prettier-ignore
+        href="/accounts/login"
+        label={t("S'inscrire")}
+      />
+      <Button
+        variant="primary"
+        href="/accounts/login"
+        label={t("Se connecter")}
+      />
+      <Faq />
+    </Header>
+  )
+}
+
+interface PrivateTopbarProps {
+  user: UserManager
+  entity: EntityManager
+}
+
+const PrivateTopbar = ({ user, entity }: PrivateTopbarProps) => {
+  const { t } = useTranslation()
+  const { isBlank } = entity
+  const firstEntity = user.getFirstEntity()
+  return (
+    <Header>
+      <LogoCompact />
+
+      {isBlank && firstEntity && (
+        <ShortcutLink
+          to={`/org/${firstEntity.id}`}
+          label={t("Aller sur {{entity}}", { entity: firstEntity.name })}
+        />
+      )}
+
+      {isBlank && !firstEntity && (
+        <ShortcutLink to="pending" label={t("Lier le compte à des sociétés")} />
+      )}
+
+      {!isBlank && <Navigation entity={entity} />}
+
+      <LanguageSelection />
+      <UserMenu user={user} entity={entity} />
+    </Header>
+  )
+}
+
+interface NavigationProps {
+  entity: EntityManager
+}
+
+const Navigation = ({ entity }: NavigationProps) => {
+  const { t } = useTranslation()
+  const { isAdmin, isExternal } = entity
+  return (
+    <Routes>
+      <Route
+        path="/org/:entity/*"
+        element={
+          <Tabs
+            variant="header"
+            tabs={[
+              isAdmin && {
+                key: "dashboard",
+                path: "dashboard",
+                label: t("Accueil"),
+              },
+
+              !isExternal && {
+                key: "transactions",
+                path: "transactions-v2",
+                label: t("Transactions"),
+              },
+
+              isAdmin && {
+                key: "entities",
+                path: "entities",
+                label: t("Sociétés"),
+              },
+
+              {
+                key: "settings",
+                path: "settings",
+                label: isAdmin || isExternal ? t("Options") : t("Société"),
+              },
+
+              (isAdmin || isExternal) && {
+                key: "registry",
+                path: "registry",
+                label: t("Annuaire"),
+              },
+            ]}
+          />
+        }
+      />
+    </Routes>
+  )
+}
+
+type Lang = "fr" | "en"
+const languages = {
+  fr: { key: "fr", label: "Français" },
+  en: { key: "en", label: "English" },
+}
+
+const LanguageSelection = () => {
+  const { i18n } = useTranslation()
+
+  const [lang, setLang] = useLocalStorage(
+    "carbure:language",
+    i18n.language as Lang
+  )
+
+  useEffect(() => {
+    i18n.changeLanguage(lang)
+  }, [lang, i18n])
+
+  return (
+    <Select
+      aside
+      variant="text"
+      value={languages[lang]}
+      onChange={(lang) => setLang(lang?.key as Lang)}
+      options={Object.values(languages)}
+    />
+  )
+}
+
+interface UserMenuProps {
+  user: UserManager
+  entity: EntityManager
+}
+
+const UserMenu = ({ user, entity }: UserMenuProps) => {
+  const { t } = useTranslation()
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  return (
+    <Menu
+      variant="text"
+      onAction={(item) => navigate(item.path!)}
+      label={entity.isBlank ? t("Menu") : entity.name}
+      anchor={Anchors.bottomRight}
+      items={[
+        {
+          label: t("Organisations"),
+          children: user.rights.map((right) => ({
+            label: right.entity.name,
+            path: changeOrg(location.pathname, right.entity.id),
+          })),
+        },
+        {
+          label: user.email,
+          children: [
+            { label: t("Mon compte"), path: "/account" },
+            { label: t("Se déconnecter"), path: "/logout" },
+          ],
+        },
+      ]}
+    />
+  )
+}
+
+function changeOrg(path: string, entity: number) {
+  if (!path.includes("org")) return `/org/${entity}`
+  else return path.replace(/org\/[0-9]+/, `org/${entity}`)
+}
+
+interface ShortcutLinkProps {
+  to: string
+  label: string
+}
+
+const ShortcutLink = ({ to, label }: ShortcutLinkProps) => (
+  <Link to={to} className={css.shortcut}>
+    {label}
+    <ChevronRight />
+  </Link>
+)
+
+const Faq = () => {
+  const { t } = useTranslation()
+  return (
+    <a
+      href="https://carbure-1.gitbook.io/faq/"
+      target="_blank"
+      rel="noreferrer"
+      className={css.faq}
+    >
+      <Question title={t("Guide d'utilisation")} />
+    </a>
+  )
+}
 
 const Logo = () => (
-  <Link to="/" className={styles.logo}>
-    <img
-      src={logoRepublique}
-      alt="marianne logo"
-      className={styles.republique}
-    />
-    <div className={styles.logoText}>
+  <Link to="/" className={css.logo}>
+    <img src={republique} alt="marianne logo" className={css.republique} />
+    <div className={css.logoText}>
       <h1>CarbuRe</h1>
       <span>
         <Trans>La plateforme de gestion des flux de biocarburants</Trans>
@@ -33,266 +239,11 @@ const Logo = () => (
   </Link>
 )
 
-const CompactLogo = () => (
-  <Link to="/" className={styles.logo}>
-    <img src={logoMarianne} alt="marianne logo" className={styles.marianne} />
+const LogoCompact = () => (
+  <Link to="/" className={css.logo}>
+    <img src={marianne} alt="marianne logo" className={css.marianne} />
     <h2>CarbuRe</h2>
   </Link>
 )
-
-type PageLinkProps = {
-  to: string
-  children: React.ReactNode
-}
-
-const PageLink = ({ to, children }: PageLinkProps) => (
-  <NavLink
-    to={to}
-    className={({ isActive }) =>
-      cl(styles.pageLink, isActive && styles.activePageLink)
-    }
-  >
-    {children}
-  </NavLink>
-)
-
-function changeOrg(path: string, entity: number) {
-  if (!path.includes("org")) return `/org/${entity}`
-  else return path.replace(/org\/[0-9]+/, `org/${entity}`)
-}
-
-type UserMenuProps = {
-  app: AppHook
-  entity: EntitySelection
-}
-
-const UserMenu = ({ app, entity }: UserMenuProps) => {
-  const { t } = useTranslation()
-  const location = useLocation()
-
-  return (
-    <Menu className={styles.userMenu} label={entity?.name ?? "Menu"}>
-      {app.hasEntities() && (
-        <Menu.Group label={t("Organisations")}>
-          {app.settings.data?.rights.map((right) => (
-            <Menu.ItemLink
-              key={right.entity.id}
-              to={changeOrg(location.pathname, right.entity.id)}
-            >
-              {right.entity.name}
-            </Menu.ItemLink>
-          ))}
-        </Menu.Group>
-      )}
-
-      <Menu.Group label={app.settings.data?.email ?? t("Utilisateur")}>
-        <Menu.ItemLink to="account">
-          <Trans>Mon compte</Trans>
-        </Menu.ItemLink>
-        <Menu.ItemLink to="/logout">
-          <Trans>Se déconnecter</Trans>
-        </Menu.ItemLink>
-      </Menu.Group>
-    </Menu>
-  )
-}
-
-const langOptions = [
-  { value: "fr", label: "Français" },
-  { value: "en", label: "English" },
-]
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const LanguageSelection = () => {
-  const { i18n } = useTranslation()
-
-  return (
-    <Select
-      level="inline"
-      value={i18n.language}
-      options={langOptions}
-      className={styles.languageSelection}
-      style={{ marginLeft: "auto" }}
-      onChange={(lang) => i18n.changeLanguage(lang as string)}
-    />
-  )
-}
-
-function canTrade(entity: EntitySelection) {
-  return (
-    entity && (entity.has_trading || entity.entity_type === EntityType.Trader)
-  )
-}
-
-function isAdmin(entity: EntitySelection) {
-  return entity && entity.entity_type === EntityType.Administration
-}
-
-function isExternal(entity: EntitySelection) {
-  return entity && entity.entity_type === EntityType.ExternalAdmin
-}
-
-export const PublicTopbar = () => {
-  const { t } = useTranslation()
-
-  return (
-    <header className={styles.topBar}>
-      <Logo />
-
-      <Box row className={styles.topRight}>
-        <Box row style={{ alignItems: "center" }}>
-          <LanguageSelection />
-
-          <Button as="a" href="/accounts/register" style={{ marginLeft: 12 }}>
-            <Trans>S'inscrire</Trans>
-          </Button>
-          <Button
-            as="a"
-            href="/accounts/login"
-            level="primary"
-            style={{ marginLeft: 12 }}
-          >
-            <Trans>Se connecter</Trans>
-          </Button>
-        </Box>
-
-        <a
-          href="https://carbure-1.gitbook.io/faq/"
-          target="_blank"
-          rel="noreferrer"
-          className={styles.faq}
-        >
-          <Question title={t("Guide d'utilisation")} />
-        </a>
-      </Box>
-    </header>
-  )
-}
-
-type PrivateTopbarProps = {
-  entity: EntitySelection
-  app: AppHook
-}
-
-export const PrivateTopbar = ({ entity, app }: PrivateTopbarProps) => {
-  const { t } = useTranslation()
-
-  const firstEntity = app.getFirstEntity()
-
-  return (
-    <nav className={styles.topBar}>
-      <CompactLogo />
-
-      {!entity && firstEntity && (
-        <Link to={`/org/${firstEntity.id}`} className={styles.entityShortcut}>
-          <Trans>Aller sur {{ entity: firstEntity.name }}</Trans>
-          <ChevronRight />
-        </Link>
-      )}
-
-      {!entity && !firstEntity && (
-        <Link to={`/pending`} className={styles.entityShortcut}>
-          <Trans>Lier le compte à des sociétés</Trans>
-          <ChevronRight />
-        </Link>
-      )}
-
-      {entity && (
-        <Routes>
-          <Route
-            path="/org/:entity/*"
-            element={
-              <section className={styles.pageNav}>
-                {isAdmin(entity) && (
-                  <PageLink to="dashboard">
-                    <Trans>Accueil</Trans>
-                  </PageLink>
-                )}
-
-                {canTrade(entity) && (
-                  <PageLink to="stocks">
-                    <Trans>Stocks</Trans>
-                  </PageLink>
-                )}
-
-                {!isExternal(entity) && (
-                  <PageLink to="transactions">
-                    <Trans>Transactions</Trans>
-                  </PageLink>
-                )}
-              
-                {!isExternal(entity) && (
-                  <PageLink to="transactions-v2">
-                    <Trans>Transactions v2</Trans>
-                  </PageLink>
-                )}
-
-                {isAdmin(entity) && (
-                  <PageLink to="entities">
-                    <Trans>Sociétés</Trans>
-                  </PageLink>
-                )}
-
-                {(isAdmin(entity) ||
-                  hasPage(entity, ExternalAdminPages.DoubleCounting)) && (
-                  <PageLink to="double-counting">
-                    <Trans>Double comptage</Trans>
-                  </PageLink>
-                )}
-
-                {(isAdmin(entity) || isExternal(entity)) && (
-                  <PageLink to="settings">
-                    <Trans>Options</Trans>
-                  </PageLink>
-                )}
-
-                {!isAdmin(entity) && !isExternal(entity) && (
-                  <React.Fragment>
-                    <PageLink to="settings">
-                      <Trans>Société</Trans>
-                    </PageLink>
-
-                    <PageLink to="registry">
-                      <Trans>Annuaire</Trans>
-                    </PageLink>
-                  </React.Fragment>
-                )}
-              </section>
-            }
-          />
-        </Routes>
-      )}
-
-      <Box row className={styles.topRight}>
-        <LanguageSelection />
-
-        <UserMenu app={app} entity={entity} />
-
-        <a
-          href="https://carbure-1.gitbook.io/faq/"
-          target="_blank"
-          rel="noreferrer"
-          className={styles.faq}
-        >
-          <Question title={t("Guide d'utilisation")} />
-        </a>
-      </Box>
-    </nav>
-  )
-}
-
-type TopbarProps = {
-  app: AppHook
-}
-
-const Topbar = ({ app }: TopbarProps) => {
-  const entity = useEntity(app)
-
-  if (!app.isAuthenticated()) {
-    return <PublicTopbar />
-  } else {
-    return <PrivateTopbar entity={entity} app={app} />
-  }
-}
 
 export default Topbar

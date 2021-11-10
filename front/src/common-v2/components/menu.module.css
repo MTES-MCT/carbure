@@ -1,6 +1,6 @@
 .menu {
   font-size: 1.1em;
-  color: var(--black);
+  /* color: var(--black); */
   padding: var(--spacing-s);
 }
 

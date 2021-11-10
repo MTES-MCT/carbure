@@ -22,7 +22,7 @@ export enum ExternalAdminPages {
   Tirib = "TIRIB",
 }
 
-export interface UserSettings {
+export interface User {
   email: string
   rights: UserRight[]
   requests: UserRightRequest[]

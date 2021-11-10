@@ -18,7 +18,7 @@ export interface Tab {
 }
 
 export interface TabsProps {
-  tabs: Tab[]
+  tabs: (Tab | false)[]
   variant?: TabVariant
   onFocus?: (tab: string) => void
   children?: (tab: string) => React.ReactNode
@@ -26,7 +26,8 @@ export interface TabsProps {
 
 export const Tabs = ({ variant = "section", tabs, children }: TabsProps) => {
   const matcher = useMatcher()
-  const match = tabs.find((tab) => matcher(tab.path)) ?? tabs[0]
+  const okTabs = tabs.filter(Boolean) as Tab[]
+  const match = okTabs.find((tab) => matcher(tab.path)) ?? okTabs[0]
 
   const [focus, setFocus] = useState(match.key)
 
@@ -37,7 +38,7 @@ export const Tabs = ({ variant = "section", tabs, children }: TabsProps) => {
   return (
     <>
       <nav className={cl(css.tabs, css[variant])}>
-        {tabs.map((tab) => {
+        {okTabs.map((tab) => {
           const props = {
             key: tab.key,
             className: cl(tab.key === focus && css.active),

@@ -134,7 +134,6 @@ section.bar {
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 1;
   background-color: var(--gray-light);
   opacity: 0.5;
 }

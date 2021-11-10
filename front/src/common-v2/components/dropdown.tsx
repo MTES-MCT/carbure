@@ -1,22 +1,22 @@
-import React, { useCallback, useEffect, useRef } from "react";
-import cl from "clsx";
-import Portal from "./portal";
-import css from "./dropdown.module.css";
-import useControlledState from "../hooks/controlled-state";
+import React, { useCallback, useEffect, useRef } from "react"
+import cl from "clsx"
+import Portal from "./portal"
+import css from "./dropdown.module.css"
+import useControlledState from "../hooks/controlled-state"
 
 export interface Trigger {
-  anchor?: Anchor;
-  onOpen?: () => void;
-  onClose?: () => void;
-  onToggle?: (open: boolean) => void;
+  anchor?: Anchor
+  onOpen?: () => void
+  onClose?: () => void
+  onToggle?: (open: boolean) => void
 }
 
 export interface DropdownProps extends Trigger {
-  triggerRef: React.RefObject<HTMLElement>;
-  open?: boolean;
-  children: React.ReactNode | CustomRenderer;
-  className?: string;
-  style?: React.CSSProperties;
+  triggerRef: React.RefObject<HTMLElement>
+  open?: boolean
+  children: React.ReactNode | CustomRenderer
+  className?: string
+  style?: React.CSSProperties
 }
 
 export const Dropdown = ({
@@ -30,75 +30,74 @@ export const Dropdown = ({
   onToggle,
   anchor = Anchors.bottomLeft,
 }: DropdownProps) => {
-  const [open, _setOpen] = useControlledState(false, openControlled, onToggle);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [open, _setOpen] = useControlledState(false, openControlled, onToggle)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   const setOpen = useCallback(
     (willOpen) => {
       if (willOpen !== open) {
-        _setOpen(willOpen);
-        if (willOpen) onOpen?.();
-        else onClose?.();
+        _setOpen(willOpen)
+        if (willOpen) onOpen?.()
+        else onClose?.()
       }
     },
     [open, onOpen, onClose, _setOpen]
-  );
+  )
 
   // position the dropdown relative to the target
   useEffect(() => {
-    const dropdown = dropdownRef.current;
-    const trigger = triggerRef.current;
-    if (!dropdown || !trigger) return;
+    const dropdown = dropdownRef.current
+    const trigger = triggerRef.current
+    if (!dropdown || !trigger) return
 
-    const box = trigger.getBoundingClientRect();
-    Object.assign(dropdown.style, anchor(box));
-    dropdown.style.minWidth = `${box.width}px`;
-  });
+    const box = trigger.getBoundingClientRect()
+    Object.assign(dropdown.style, anchor(box))
+    dropdown.style.minWidth = `${box.width}px`
+  })
 
   // automatically close the dropdown if a scroll is detected
   useEffect(() => {
-    if (!open) return;
+    if (!open) return
 
     function onScroll(e: Event) {
       // close only if we're not scrolling inside the dropdown
       if (!isInside(dropdownRef.current, e.target)) {
-        setOpen(false);
+        setOpen(false)
       }
     }
 
-    window.addEventListener("scroll", onScroll, true);
-    return () => window.removeEventListener("scroll", onScroll, true);
-  }, [triggerRef, open, setOpen]);
+    window.addEventListener("scroll", onScroll, true)
+    return () => window.removeEventListener("scroll", onScroll, true)
+  }, [triggerRef, open, setOpen])
 
   // automatically close the dropdown if window is resized
   useEffect(() => {
-    if (!open) return;
+    if (!open) return
 
     function onResize(e: Event) {
-      setOpen(false);
+      setOpen(false)
     }
 
-    window.addEventListener("resize", onResize, true);
-    return () => window.removeEventListener("resize", onResize, true);
-  }, [open, setOpen]);
+    window.addEventListener("resize", onResize, true)
+    return () => window.removeEventListener("resize", onResize, true)
+  }, [open, setOpen])
 
   // watch for interactions on the target to act as trigger
   useEffect(() => {
-    const trigger = triggerRef.current;
-    if (trigger === null) return;
+    const trigger = triggerRef.current
+    if (trigger === null) return
 
     function onClick(e: MouseEvent) {
-      const isCaptive =
-        (e.target as Element).closest("[data-captive]") !== null;
+      const isCaptive = (e.target as Element).closest("[data-captive]") !== null
 
       if (!isCaptive) {
-        setOpen(!open);
+        setOpen(!open)
       }
     }
 
     function onBlur(e: FocusEvent) {
       if (!isInside(dropdownRef.current, e.relatedTarget)) {
-        setOpen(false);
+        setOpen(false)
       }
     }
 
@@ -106,43 +105,43 @@ export const Dropdown = ({
       switch (e.key) {
         // toggle dropdown when typing Space
         case "Space":
-          setOpen(!open);
-          break;
+          setOpen(!open)
+          break
 
         // open dropdown when using up/down arrows
         case "ArrowUp":
         case "ArrowDown":
-          e.preventDefault();
-          setOpen(true);
-          break;
+          e.preventDefault()
+          setOpen(true)
+          break
       }
     }
 
-    trigger.addEventListener("click", onClick);
-    trigger.addEventListener("keydown", onKeyDown, true);
-    trigger.addEventListener("blur", onBlur, true);
+    trigger.addEventListener("click", onClick)
+    trigger.addEventListener("keydown", onKeyDown, true)
+    trigger.addEventListener("blur", onBlur, true)
 
     return () => {
-      trigger.removeEventListener("click", onClick);
-      trigger.removeEventListener("keydown", onKeyDown, true);
-      trigger.removeEventListener("blur", onBlur, true);
-    };
-  }, [triggerRef, dropdownRef, open, setOpen]);
+      trigger.removeEventListener("click", onClick)
+      trigger.removeEventListener("keydown", onKeyDown, true)
+      trigger.removeEventListener("blur", onBlur, true)
+    }
+  }, [triggerRef, dropdownRef, open, setOpen])
 
   function onFocus() {
-    setOpen(true);
+    setOpen(true)
   }
 
   function onBlur(e: React.FocusEvent) {
-    const isInsideTrigger = isInside(triggerRef.current, e.relatedTarget);
-    const isInsideDropdown = isInside(dropdownRef.current, e.relatedTarget);
+    const isInsideTrigger = isInside(triggerRef.current, e.relatedTarget)
+    const isInsideDropdown = isInside(dropdownRef.current, e.relatedTarget)
 
     if (!isInsideTrigger && !isInsideDropdown) {
-      setOpen(false);
+      setOpen(false)
     }
   }
 
-  if (!open) return null;
+  if (!open) return null
 
   return (
     <Portal onClose={() => setOpen(false)}>
@@ -160,17 +159,17 @@ export const Dropdown = ({
           : children}
       </div>
     </Portal>
-  );
-};
-
-export interface Position {
-  top?: string;
-  right?: string;
-  bottom?: string;
-  left?: string;
+  )
 }
 
-export type Anchor = (box: DOMRect) => Position;
+export interface Position {
+  top?: string
+  right?: string
+  bottom?: string
+  left?: string
+}
+
+export type Anchor = (box: DOMRect) => Position
 
 export const Anchors = {
   bottomLeft: (box: DOMRect): Position => ({
@@ -185,15 +184,15 @@ export const Anchors = {
     bottom: window.innerHeight - box.top + "px",
     left: box.left + "px",
   }),
-};
+}
 
 export function isInside(
   container: EventTarget | Element | null,
   element: EventTarget | Element | null
 ) {
-  return (container as Element)?.contains(element as Element);
+  return (container as Element)?.contains(element as Element)
 }
 
-type CustomRenderer = (config: { close: () => void }) => React.ReactNode;
+type CustomRenderer = (config: { close: () => void }) => React.ReactNode
 
-export default Dropdown;
+export default Dropdown
