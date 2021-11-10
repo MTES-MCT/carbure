@@ -1,5 +1,4 @@
 import cl from "clsx"
-import { useState } from "react"
 import { Loader } from "./icons"
 import css from "./button.module.css"
 import { Layout, layout } from "./scaffold"
@@ -32,9 +31,6 @@ export interface ButtonProps<T = void> extends Layout {
   href?: string
   to?: string
   action?: (() => T) | (() => Promise<T>)
-  dialog?: (close: () => void) => React.ReactNode
-  onSuccess?: (result: T) => void
-  onError?: (error: unknown) => void
 }
 
 export function Button<T>({
@@ -56,68 +52,34 @@ export function Button<T>({
   href,
   to,
   action,
-  dialog,
-  onSuccess,
-  onError,
 }: ButtonProps<T>) {
-  const [active, showDialog] = useState(false)
-
   const icon = typeof Icon === "function" ? <Icon /> : Icon
   const hasIconAndText = Boolean(Icon) && Boolean(label || children)
 
-  // prettier-ignore
-  const openDialog = dialog
-    ? () => showDialog(true)
-    : undefined;
-
-  const runAction = action
-    ? () => handle(action, { onSuccess, onError })
-    : undefined
-
   return (
-    <>
-      <LinkWrapper href={href} to={to}>
-        <button
-          ref={domRef}
-          {...layout({ aside, spread })}
-          data-captive={captive ? true : undefined}
-          tabIndex={tabIndex}
-          disabled={disabled || loading}
-          type={submit ? "submit" : "button"}
-          title={title}
-          style={style}
-          className={cl(
-            css.button,
-            variant && css[variant],
-            hasIconAndText && css.composite,
-            className
-          )}
-          onClick={openDialog ?? runAction}
-        >
-          {loading ? <Loader /> : icon}
-          {variant !== "icon" && (label ?? children)}
-        </button>
-      </LinkWrapper>
-
-      {active && dialog?.(() => showDialog(false))}
-    </>
+    <LinkWrapper href={href} to={to}>
+      <button
+        ref={domRef}
+        {...layout({ aside, spread })}
+        data-captive={captive ? true : undefined}
+        tabIndex={tabIndex}
+        disabled={disabled || loading}
+        type={submit ? "submit" : "button"}
+        title={title}
+        style={style}
+        className={cl(
+          css.button,
+          variant && css[variant],
+          hasIconAndText && css.composite,
+          className
+        )}
+        onClick={action}
+      >
+        {loading ? <Loader /> : icon}
+        {variant !== "icon" && (label ?? children)}
+      </button>
+    </LinkWrapper>
   )
-}
-
-type Action<T = void> = (() => T) | (() => Promise<T>)
-
-interface Handlers<T> {
-  onSuccess?: (result: T) => void
-  onError?: (error: unknown) => void
-}
-
-async function handle<T>(action: Action<T>, handlers: Handlers<T>) {
-  try {
-    const result = await action()
-    handlers.onSuccess?.(result)
-  } catch (error) {
-    handlers.onError?.(error)
-  }
 }
 
 interface LinkWrapperProps {

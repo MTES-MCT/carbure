@@ -1,12 +1,13 @@
 import { useRef } from "react"
 import { Link } from "react-router-dom"
+import cl from "clsx"
 import Dropdown, { Anchor } from "./dropdown"
 import { ChevronDown } from "./icons"
 import Button, { ButtonProps } from "./button"
 import List from "./list"
 import { Normalizer } from "../hooks/normalize"
 import css from "./menu.module.css"
-import cl from "clsx"
+import { PortalRenderer } from "./portal"
 
 export interface MenuProps extends ButtonProps {
   className?: string
@@ -60,7 +61,7 @@ export function Menu({
               } else if (item.value.path) {
                 return <Link to={item.value.path}>{item.label}</Link>
               } else {
-                return <p>{item.label}</p>
+                return <p onClick={item.value.action}>{item.label}</p>
               }
             }}
           </List>
@@ -73,7 +74,7 @@ export function Menu({
 export interface MenuItem {
   path?: string
   label?: string
-  dialog?: ButtonProps["dialog"]
+  action?: () => void
   children?: MenuItem[]
 }
 

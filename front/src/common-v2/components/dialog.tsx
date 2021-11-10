@@ -1,3 +1,4 @@
+import React from "react"
 import cl from "clsx"
 import { Cross } from "./icons"
 import css from "./dialog.module.css"

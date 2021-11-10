@@ -22,8 +22,6 @@ export function useUser(): UserManager {
     params: [],
   })
 
-  console.log(settings)
-
   const res = settings.result?.data.data
   const email = res?.email ?? ""
   const rights = res?.rights ?? []
