@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next"
 import Tabs from "common-v2/components/tabs"
-import { Column } from "common-v2/components/scaffold"
 import { Snapshot } from "transactions-v2/types"
 import { Loader } from "common-v2/components/icons"
 

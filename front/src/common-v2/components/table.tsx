@@ -4,7 +4,7 @@ import Checkbox from "./checkbox"
 import { multipleSelection } from "../hooks/selection"
 import { Normalizer } from "../hooks/normalize"
 import css from "./table.module.css"
-import { Column, LoaderOverlay } from "./scaffold"
+import { Col, LoaderOverlay } from "./scaffold"
 
 export interface TableProps<T> {
   className?: string
@@ -188,10 +188,10 @@ export interface CellProps {
 }
 
 export const Cell = ({ text, sub }: any) => (
-  <Column>
+  <Col>
     <strong title={text}>{text || sub}</strong>
     {text && sub !== undefined && <small title={sub}>{sub}</small>}
-  </Column>
+  </Col>
 )
 
 export default Table

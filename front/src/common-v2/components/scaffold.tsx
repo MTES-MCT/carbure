@@ -22,6 +22,11 @@ export const Bar = (props: JSX.IntrinsicElements["section"]) => (
   <section {...props} className={cl(css.bar, props.className)} />
 )
 
+// a bar where you can put many buttons
+export const ActionBar = (props: JSX.IntrinsicElements["section"]) => (
+  <section {...props} className={cl(css.actionbar, props.className)} />
+)
+
 // a enclosed box with its own <header>, many <section> and <footer>
 export const Panel = (props: JSX.IntrinsicElements["article"]) => (
   <article {...props} className={cl(css.panel, props.className)} />
@@ -33,7 +38,7 @@ export const Grid = (props: JSX.IntrinsicElements["div"]) => (
 )
 
 // a div with vertical flow
-export const Column = (props: JSX.IntrinsicElements["div"] & Layout) => (
+export const Col = (props: JSX.IntrinsicElements["div"] & Layout) => (
   <div {...props} {...layout(props)} className={cl(css.column, props.className)} />
 ); // prettier-ignore
 

@@ -13,16 +13,18 @@ import * as api from "../api"
 import { Lot, LotQuery } from "../types"
 
 export interface SendButtonProps {
+  disabled?: boolean
   query: LotQuery
   selection: number[]
 }
 
-export const SendButton = ({ query, selection }: SendButtonProps) => {
+export const SendButton = ({ disabled, query, selection }: SendButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
   return (
     <Button
+      disabled={disabled}
       variant="success"
       icon={Check}
       label={selection.length > 0 ? t("Envoyer sélection") : t("Envoyer tout")}
