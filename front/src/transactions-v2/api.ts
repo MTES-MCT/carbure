@@ -24,3 +24,10 @@ export function getFilters(field: Filter, query: LotQuery) {
     params: { field, ...query, ...QUERY_RESET },
   })
 }
+
+export function sendLots(query: LotQuery, selection: number[]) {
+  return api.post<Api<void>>(
+    "/lots/send",
+    selection.length === 0 ? query : { entity_id: query.entity_id, selection }
+  )
+}

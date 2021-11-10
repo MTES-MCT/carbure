@@ -34,3 +34,11 @@ export function formatDate(
     return "N/A"
   }
 }
+
+export function variations(count: number) {
+  return (labels: { zero: string; one: string; many: string }) => {
+    if (count === 0) return labels.zero
+    if (count === 1) return labels.one
+    if (count > 1) return labels.many
+  }
+}
