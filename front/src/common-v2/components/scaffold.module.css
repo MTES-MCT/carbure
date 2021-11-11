@@ -153,11 +153,11 @@ section.actionbar {
 }
 
 [data-asidex] {
-  margin-inline-start: auto;
+  margin-left: auto;
 }
 
 [data-asidey] {
-  margin-block-start: auto;
+  margin-top: auto;
 }
 
 [data-spread] {
