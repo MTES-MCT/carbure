@@ -50,7 +50,8 @@ export function Menu({
             items={items}
             normalize={normalizeMenu}
             onSelectItem={(item) => {
-              item && onAction?.(item)
+              if (item?.action) item.action()
+              else if (item && onAction) onAction(item)
               close()
             }}
           >
