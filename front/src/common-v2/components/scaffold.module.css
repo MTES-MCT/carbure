@@ -152,8 +152,12 @@ section.actionbar {
   background-color: var(--gray-light);
 }
 
-[data-aside] {
-  margin-left: auto;
+[data-asidex] {
+  margin-inline-start: auto;
+}
+
+[data-asidey] {
+  margin-block-start: auto;
 }
 
 [data-spread] {

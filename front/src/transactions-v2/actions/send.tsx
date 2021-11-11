@@ -141,7 +141,7 @@ const SendDialog = ({ query, selection, onClose }: SendDialogProps) => {
       </main>
       <footer>
         <Button
-          aside
+          asideX
           disabled={sendLots.loading}
           icon={Return}
           label={t("Annuler")}

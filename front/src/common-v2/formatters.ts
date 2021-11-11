@@ -5,8 +5,16 @@ export function formatPeriod(period: number) {
   return `${("0" + (period % 100)).slice(-2)} / ${Math.floor(period / 100)}`
 }
 
-export function formatNumber(volume: number) {
-  return parseFloat(volume.toFixed(2)).toLocaleString("fr-FR")
+export function formatNumber(num: number) {
+  return parseFloat(num.toFixed(2)).toLocaleString("fr-FR")
+}
+
+export function formatPercentage(num: number) {
+  return formatNumber(num) + "%"
+}
+
+export function formatGHG(num: number) {
+  return formatNumber(num) + " gCO2eq/MJ"
 }
 
 export function formatDate(

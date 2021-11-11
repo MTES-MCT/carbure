@@ -21,7 +21,7 @@ export const TransactionAdd = () => {
 
       <main>
         <section>
-          <LotForm onSubmit={() => {}} />
+          <LotForm onSubmit={(form) => console.log(form)} />
         </section>
       </main>
 
@@ -32,7 +32,12 @@ export const TransactionAdd = () => {
           submit="lot-form"
           label={t("Créer lot")}
         />
-        <Button aside icon={Return} label={t("Retour")} action={close} />
+        <Button
+          asideX
+          icon={Return}
+          label={t("Retour")}
+          action={close} // prettier-ignore
+        />
       </footer>
     </Dialog>
   )

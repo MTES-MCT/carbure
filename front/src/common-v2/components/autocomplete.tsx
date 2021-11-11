@@ -18,6 +18,7 @@ export interface AutocompleteProps<T> extends Control, Trigger {
   getOptions?: (query: string) => Promise<T[]>
   onChange: (value: T | undefined) => void
   onQuery?: (query: string) => void
+  create?: (value: string) => T
   normalize?: Normalizer<T>
   children?: Renderer<T>
 }
@@ -29,6 +30,7 @@ function Autocomplete<T>({
   getOptions,
   onChange,
   onQuery,
+  create,
   anchor,
   normalize = defaultNormalizer,
   children = defaultRenderer,
@@ -42,6 +44,7 @@ function Autocomplete<T>({
     getOptions,
     onChange,
     onQuery,
+    create,
     normalize,
   })
 
@@ -82,6 +85,7 @@ interface AutocompleteConfig<T> {
   getOptions?: (query: string) => Promise<T[]>
   onChange: (value: T | undefined) => void
   onQuery?: (query: string) => void
+  create?: (value: string) => T
   normalize?: Normalizer<T>
 }
 
@@ -91,6 +95,7 @@ export function useAutocomplete<T>({
   getOptions,
   onChange,
   onQuery: controlledOnQuery,
+  create,
   normalize = defaultNormalizer,
 }: AutocompleteConfig<T>) {
   const [open, setOpen] = useState(false)
@@ -112,11 +117,16 @@ export function useAutocomplete<T>({
 
   const baseOptions = asyncOptions.result ?? controlledOptions ?? []
 
-  function matchQuery(query: string, options: T[]) {
+  function matchQuery(
+    query: string,
+    options: T[],
+    create?: (query: string) => T
+  ) {
     const key = value ? normalize(value).key : ""
     const stdQuery = std(query)
     const match = options.find((item) => std(normalize(item).label) === stdQuery) // prettier-ignore
     if (match && normalize(match).key !== key) onChange(match)
+    else if (create) onChange(create(query))
   }
 
   async function onQuery(query: string | undefined) {
@@ -133,7 +143,7 @@ export function useAutocomplete<T>({
     const matches = filterOptions(query, baseOptions, normalize)
 
     setOptions(matches)
-    matchQuery(query, matches)
+    matchQuery(query, matches, create)
     controlledOnQuery?.(query)
 
     if (getOptions) {

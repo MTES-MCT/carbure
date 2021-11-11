@@ -6,7 +6,7 @@ export const DeclarationButton = () => {
   const { t } = useTranslation()
   return (
     <Button
-      aside
+      asideX
       variant="primary"
       icon={Certificate}
       label={t("Valider ma déclaration")}

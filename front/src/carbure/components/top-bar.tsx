@@ -33,9 +33,9 @@ const PublicTopbar = () => {
       <Logo />
       <LanguageSelection />
       <Button
-        aside // prettier-ignore
+        asideX
         href="/accounts/login"
-        label={t("S'inscrire")}
+        label={t("S'inscrire")} // prettier-ignore
       />
       <Button
         variant="primary"
@@ -152,7 +152,7 @@ const LanguageSelection = () => {
 
   return (
     <Select
-      aside
+      asideX
       variant="text"
       value={languages[lang]}
       onChange={(lang) => setLang(lang?.key as Lang)}

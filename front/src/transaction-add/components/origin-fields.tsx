@@ -26,6 +26,7 @@ export const ProducerField = () => {
     <Autocomplete
       label={t("Producteur")}
       getOptions={api.findEntities}
+      create={norm.identity}
       normalize={norm.normalizeEntity}
       {...bind("producer")}
     />
@@ -34,13 +35,14 @@ export const ProducerField = () => {
 
 export const SupplierField = () => {
   const { t } = useTranslation()
-  const bind = useBind<LotFormValue>()
+  const { value, bind } = useFormContext<LotFormValue>()
+  const isKnown = value.lot && value.lot.carbure_supplier !== null
   return (
     <Autocomplete
       label={t("Fournisseur")}
       getOptions={api.findEntities}
       normalize={norm.normalizeEntity}
-      icon={UserCheck}
+      icon={isKnown ? UserCheck : undefined}
       {...bind("supplier")}
     />
   )

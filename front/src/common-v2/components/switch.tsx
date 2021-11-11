@@ -33,7 +33,7 @@ export const Switch = ({
 
       {dismissable && (
         <Button
-          aside
+          asideX
           variant="link"
           label={t("Masquer ce message")}
           action={() => {

@@ -21,13 +21,14 @@ export interface Control extends Layout {
   type?: string
   name?: string
   placeholder?: string
+  title?: string
   icon?: React.FunctionComponent | React.ReactNode
   domRef?: React.RefObject<HTMLElement>
 }
 
 export interface TextInputProps extends Control {
-  value: string | undefined
-  onChange: (value: string | undefined) => void
+  value?: string | undefined
+  onChange?: (value: string | undefined) => void
 }
 
 export const TextInput = ({
@@ -39,8 +40,8 @@ export const TextInput = ({
   <Input
     {...props}
     value={value ?? ""}
-    onChange={(e) => onChange(e.target.value)}
-    onClear={clear && value ? () => onChange(undefined) : undefined}
+    onChange={onChange ? (e) => onChange(e.target.value) : undefined}
+    onClear={clear && value && onChange ? () => onChange(undefined) : undefined}
   />
 )
 
@@ -48,8 +49,8 @@ export interface NumberInputProps extends Control {
   min?: number
   max?: number
   step?: number
-  value: number | undefined
-  onChange: (value: number | undefined) => void
+  value?: number | undefined
+  onChange?: (value: number | undefined) => void
 }
 
 export const NumberInput = ({
@@ -62,18 +63,22 @@ export const NumberInput = ({
     {...props}
     type={props.readOnly ? "text" : "number"}
     value={value ?? ""}
-    onClear={clear && value ? () => onChange(undefined) : undefined}
-    onChange={(e) => {
-      const value = parseFloat(e.target.value)
-      const change = isNaN(value) ? undefined : value
-      onChange(change)
-    }}
+    onClear={clear && value && onChange ? () => onChange(undefined) : undefined}
+    onChange={
+      !onChange
+        ? undefined
+        : (e) => {
+            const value = parseFloat(e.target.value)
+            const change = isNaN(value) ? undefined : value
+            onChange(change)
+          }
+    }
   />
 )
 
 export interface DateInputProps extends Control {
-  value: string | undefined
-  onChange: (value: string | undefined) => void
+  value?: string | undefined
+  onChange?: (value: string | undefined) => void
 }
 
 export const DateInput = ({
@@ -86,14 +91,14 @@ export const DateInput = ({
     {...props}
     type="date"
     value={value ?? ""}
-    onChange={(e) => onChange(e.target.value)}
-    onClear={clear && value ? () => onChange(undefined) : undefined}
+    onChange={onChange ? (e) => onChange(e.target.value) : undefined}
+    onClear={clear && value && onChange ? () => onChange(undefined) : undefined}
   />
 )
 
 export interface FileInputProps extends Control {
-  value: File | undefined
-  onChange: (value: File | undefined) => void
+  value?: File | undefined
+  onChange?: (value: File | undefined) => void
 }
 
 export const FileInput = ({
@@ -105,7 +110,7 @@ export const FileInput = ({
 }: FileInputProps) => (
   <Field
     {...props}
-    onClear={clear && value ? () => onChange(undefined) : undefined}
+    onClear={clear && value && onChange ? () => onChange(undefined) : undefined}
   >
     <label tabIndex={0} className={css.file}>
       <input
@@ -115,7 +120,7 @@ export const FileInput = ({
         required={props.required}
         name={props.name}
         type="file"
-        onChange={(e) => onChange(e.target.files?.[0])}
+        onChange={onChange ? (e) => onChange(e.target.files?.[0]) : undefined}
       />
       {value?.name ?? placeholder}
     </label>
@@ -219,18 +224,20 @@ export const SearchInput = ({
   }, [value])
 
   function debouncedSearch(search: string) {
-    if (!debounce) return onChange(search)
+    if (!debounce) return onChange?.(search)
 
     setSearch(search)
     timeoutRef.current && window.clearTimeout(timeoutRef.current)
-    timeoutRef.current = window.setTimeout(() => onChange(search), debounce)
+    timeoutRef.current = window.setTimeout(() => onChange?.(search), debounce)
   }
 
   return (
     <Field
       {...props}
       className={cl(css.search, className)}
-      onClear={clear && search ? () => onChange(undefined) : undefined}
+      onClear={
+        clear && search && onChange ? () => onChange(undefined) : undefined
+      }
     >
       <div className={css.icon}>
         <Search />
@@ -256,7 +263,8 @@ export interface GroupFieldProps extends Control {
 
 export const GroupField = ({
   domRef,
-  aside,
+  asideX,
+  asideY,
   spread,
   disabled,
   readOnly,
@@ -278,7 +286,7 @@ export const GroupField = ({
       data-error={error ? true : undefined}
       style={style}
       className={cl(css.field, variant && css[variant], className)}
-      {...layout({ aside, spread })}
+      {...layout({ asideX, asideY, spread })}
     >
       {label && (
         <label className={css.label} title={label}>
@@ -305,7 +313,8 @@ export interface FieldProps extends Control {
 
 export const Field = ({
   domRef,
-  aside,
+  asideX,
+  asideY,
   spread,
   disabled,
   readOnly,
@@ -315,62 +324,61 @@ export const Field = ({
   label,
   icon: Icon,
   variant,
+  title,
   className,
   style,
   children,
   onClear,
-}: FieldProps) => {
-  const icon = typeof Icon === "function" ? <Icon /> : Icon
-  const showIcon = loading || error || icon
+}: FieldProps) => (
+  <div
+    data-field
+    data-disabled={disabled ? true : undefined}
+    data-readonly={readOnly ? true : undefined}
+    data-loading={loading ? true : undefined}
+    data-error={error ? true : undefined}
+    title={title}
+    style={style}
+    className={cl(css.field, variant && css[variant], className)}
+    {...layout({ asideX, asideY, spread })}
+  >
+    {label && (
+      <label className={css.label} title={title ?? label}>
+        {label}
+        {required && " *"}
+      </label>
+    )}
 
-  return (
     <div
-      data-field
-      data-disabled={disabled ? true : undefined}
-      data-readonly={readOnly ? true : undefined}
-      data-loading={loading ? true : undefined}
-      data-error={error ? true : undefined}
-      style={style}
-      className={cl(css.field, variant && css[variant], className)}
-      {...layout({ aside, spread })}
+      tabIndex={-1}
+      ref={domRef as React.RefObject<HTMLDivElement>}
+      className={css.control}
     >
-      {label && (
-        <label className={css.label} title={label}>
-          {label}
-          {required && " *"}
-        </label>
+      {children}
+
+      {onClear && (
+        <Button
+          captive
+          variant="icon"
+          icon={Cross}
+          action={onClear}
+          tabIndex={-1}
+          className={css.icon}
+        />
       )}
 
-      <div
-        tabIndex={-1}
-        ref={domRef as React.RefObject<HTMLDivElement>}
-        className={css.control}
-      >
-        {children}
-
-        {onClear && (
-          <Button
-            captive
-            variant="icon"
-            icon={Cross}
-            action={onClear}
-            tabIndex={-1}
-            className={css.icon}
-          />
-        )}
-
-        <div className={css.icon}>
-          {loading === true ? (
-            <Loader />
-          ) : loading === false ? (
-            <Placeholder />
-          ) : error ? (
-            <AlertTriangle title={error} />
-          ) : (
-            icon
-          )}
-        </div>
+      <div className={css.icon}>
+        {loading === true ? (
+          <Loader />
+        ) : error ? (
+          <AlertTriangle title={error} />
+        ) : typeof Icon === "function" ? (
+          <Icon />
+        ) : Icon !== undefined ? (
+          Icon
+        ) : loading === false ? (
+          <Placeholder />
+        ) : null}
       </div>
     </div>
-  )
-}
+  </div>
+)
