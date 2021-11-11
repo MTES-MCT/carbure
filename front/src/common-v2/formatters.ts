@@ -35,6 +35,14 @@ export function formatDate(
   }
 }
 
+// prepare string for comparison by putting it to lowercase and removing accents
+export function standardize(str: string) {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+}
+
 export function variations(count: number) {
   return (labels: { zero: string; one: string; many: string }) => {
     if (count === 0) return labels.zero

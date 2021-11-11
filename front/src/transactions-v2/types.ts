@@ -1,4 +1,4 @@
-import { Option } from "common-v2/hooks/normalize"
+import { Option } from "common-v2/utils/normalize"
 import {
   Biofuel,
   Country,
@@ -147,7 +147,7 @@ export interface LotQuery {
   entity_id: number
   status?: string // "draft" | "in" | "stock" | "out"
   year?: number
-  search?: string
+  query?: string
   order_by?: string
   direction?: string
   from_idx?: number

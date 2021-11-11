@@ -44,6 +44,10 @@ const Icon = ({
   </svg>
 )
 
+export const Placeholder = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("placeholder", className)} />
+)
+
 export const ChevronDown = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("chevron-down", className)}>
     <polyline points="6 9 12 15 18 9" />

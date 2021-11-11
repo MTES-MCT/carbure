@@ -7,7 +7,7 @@ import {
   defaultNormalizer,
   Normalizer,
   normalizeTree,
-} from "../hooks/normalize"
+} from "../utils/normalize"
 import Checkbox from "./checkbox"
 
 export interface MultiSelectProps<T> extends Control, Trigger {

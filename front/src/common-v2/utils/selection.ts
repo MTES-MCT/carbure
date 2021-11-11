@@ -1,4 +1,4 @@
-import { defaultNormalizer, Normalizer } from "./normalize";
+import { defaultNormalizer, Normalizer } from "./normalize"
 
 export function singleSelection<T>(
   selectedItem: T | undefined,
@@ -6,15 +6,15 @@ export function singleSelection<T>(
   normalize: Normalizer<T>
 ) {
   function isSelected(item: T) {
-    if (!selectedItem) return false;
-    return normalize(selectedItem).key === normalize(item).key;
+    if (!selectedItem) return false
+    return normalize(selectedItem).key === normalize(item).key
   }
 
   function onSelect(item: T | undefined) {
-    onSelectItem?.(item);
+    onSelectItem?.(item)
   }
 
-  return { isSelected, onSelect };
+  return { isSelected, onSelect }
 }
 
 export function multipleSelection<T>(
@@ -23,52 +23,52 @@ export function multipleSelection<T>(
   normalize: Normalizer<T> = defaultNormalizer
 ) {
   function isSelected(item: T | undefined) {
-    if (!selectedItems || !item) return false;
+    if (!selectedItems || !item) return false
 
-    const { key } = normalize(item);
+    const { key } = normalize(item)
     return selectedItems
       .map(normalize)
       .map((n) => n.key)
-      .includes(key);
+      .includes(key)
   }
 
   function isAllSelected(items: T[]) {
     const sortedItems = items
       .map(normalize)
-      .sort((a, b) => (a.key < b.key ? -1 : 1));
+      .sort((a, b) => (a.key < b.key ? -1 : 1))
 
     const sortedSelection = (selectedItems ?? [])
       .map(normalize)
-      .sort((a, b) => (a.key < b.key ? -1 : 1));
+      .sort((a, b) => (a.key < b.key ? -1 : 1))
 
     return (
       sortedItems.length === sortedSelection.length &&
       sortedItems.every((item, i) => item.key === sortedSelection[i].key)
-    );
+    )
   }
 
   function onSelect(item: T | undefined) {
-    if (!item) return onSelectItems?.([]);
+    if (!item) return onSelectItems?.([])
 
-    const { key } = normalize(item);
-    const items = selectedItems ?? [];
+    const { key } = normalize(item)
+    const items = selectedItems ?? []
 
     const selected = isSelected(item)
       ? // remove item from selection
         items.filter((i) => normalize(i).key !== key)
       : // or add it at the end
-        [...items, item];
+        [...items, item]
 
-    onSelectItems?.(selected);
+    onSelectItems?.(selected)
   }
 
   function onSelectAll(items: T[]) {
     if (isAllSelected(items)) {
-      onSelectItems?.([]);
+      onSelectItems?.([])
     } else {
-      onSelectItems?.(items);
+      onSelectItems?.(items)
     }
   }
 
-  return { isSelected, isAllSelected, onSelect, onSelectAll };
+  return { isSelected, isAllSelected, onSelect, onSelectAll }
 }

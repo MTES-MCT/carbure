@@ -1,28 +1,28 @@
-import cl from "clsx";
-import { Check } from "./icons";
-import css from "./checkbox.module.css";
-import { GroupField } from "./input";
-import { multipleSelection } from "../hooks/selection";
+import cl from "clsx"
+import { Check } from "./icons"
+import css from "./checkbox.module.css"
+import { GroupField } from "./input"
+import { multipleSelection } from "../utils/selection"
 import {
   defaultNormalizer,
   Normalizer,
   normalizeTree,
-} from "../hooks/normalize";
+} from "../utils/normalize"
 
 export interface CheckboxControl {
-  className?: string;
-  style?: React.CSSProperties;
-  disabled?: boolean;
-  readOnly?: boolean;
-  required?: boolean;
-  name?: string;
-  label?: string;
+  className?: string
+  style?: React.CSSProperties
+  disabled?: boolean
+  readOnly?: boolean
+  required?: boolean
+  name?: string
+  label?: string
 }
 
 export interface CheckboxProps extends CheckboxControl {
-  children?: React.ReactNode;
-  value: boolean;
-  onChange?: (value: boolean) => void;
+  children?: React.ReactNode
+  value: boolean
+  onChange?: (value: boolean) => void
 }
 
 export const Checkbox = ({
@@ -61,13 +61,13 @@ export const Checkbox = ({
     <div className={css.square}>{value ? <Check stroke={3} /> : null}</div>
     {label ?? children}
   </label>
-);
+)
 
 export interface CheckboxGroupProps<T> extends CheckboxControl {
-  options: T[];
-  value: T[] | undefined;
-  onChange: (value: T[] | undefined) => void;
-  normalize?: Normalizer<T>;
+  options: T[]
+  value: T[] | undefined
+  onChange: (value: T[] | undefined) => void
+  normalize?: Normalizer<T>
 }
 
 export function CheckboxGroup<T>({
@@ -81,8 +81,8 @@ export function CheckboxGroup<T>({
   normalize = defaultNormalizer,
   ...props
 }: CheckboxGroupProps<T>) {
-  const selection = multipleSelection(value, onChange, normalize);
-  const normOptions = normalizeTree(options, normalize);
+  const selection = multipleSelection(value, onChange, normalize)
+  const normOptions = normalizeTree(options, normalize)
 
   return (
     <GroupField {...props}>
@@ -99,7 +99,7 @@ export function CheckboxGroup<T>({
         />
       ))}
     </GroupField>
-  );
+  )
 }
 
-export default Checkbox;
+export default Checkbox

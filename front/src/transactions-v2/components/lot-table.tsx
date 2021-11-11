@@ -1,6 +1,6 @@
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
-import { Normalizer } from "common-v2/hooks/normalize"
+import { Normalizer } from "common-v2/utils/normalize"
 import { formatDate, formatNumber, formatPeriod } from "common-v2/formatters"
 import Table, {
   actionColumn,

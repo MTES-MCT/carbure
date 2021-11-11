@@ -70,10 +70,7 @@ const Org = ({ app }: { app: AppHook }) => {
           <Route path="double-counting/*" element={<DoubleCounting />} />
         )}
 
-        <Route
-          path="*"
-          element={<Navigate to={isAdmin ? "dashboard" : "transactions-v2"} />}
-        />
+        <Route path="*" element={<Navigate to="transactions-v2" />} />
       </Routes>
     </UserRightProvider>
   )
@@ -94,7 +91,7 @@ const Carbure = () => {
 
         <Routes>
           <Route path="/" element={<Home app={app} />} />
-          <Route path="/pending" element={<Pending app={app} />} />
+          <Route path="/pending" element={<Pending />} />
           <Route path="/logout" element={<Exit to="/accounts/logout" />} />
           <Route path="/account" element={<Account app={app} />} />
           <Route path="/org/:entity/*" element={<Org app={app} />} />

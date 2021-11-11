@@ -1,29 +1,29 @@
-import cl from "clsx";
-import { Disk } from "./icons";
-import { singleSelection } from "../hooks/selection";
+import cl from "clsx"
+import { Disk } from "./icons"
+import { singleSelection } from "../utils/selection"
 import {
   defaultNormalizer,
   Normalizer,
   normalizeTree,
-} from "../hooks/normalize";
-import css from "./radio.module.css";
-import { GroupField } from "./input";
+} from "../utils/normalize"
+import css from "./radio.module.css"
+import { GroupField } from "./input"
 
 export interface RadioControl {
-  className?: string;
-  style?: React.CSSProperties;
-  disabled?: boolean;
-  readOnly?: boolean;
-  required?: boolean;
-  name?: string;
-  label?: string;
+  className?: string
+  style?: React.CSSProperties
+  disabled?: boolean
+  readOnly?: boolean
+  required?: boolean
+  name?: string
+  label?: string
 }
 
 export interface RadioProps extends RadioControl {
-  children?: React.ReactNode;
-  value?: string | number;
-  checked?: boolean;
-  onChange: (value: string) => void;
+  children?: React.ReactNode
+  value?: string | number
+  checked?: boolean
+  onChange: (value: string) => void
 }
 
 export const Radio = ({
@@ -62,13 +62,13 @@ export const Radio = ({
     <div className={css.circle}>{checked && <Disk />}</div>
     {label ?? children}
   </label>
-);
+)
 
 export interface RadioGroupProps<T> extends RadioControl {
-  options: T[];
-  value: T | undefined;
-  onChange: (value: T | undefined) => void;
-  normalize?: Normalizer<T>;
+  options: T[]
+  value: T | undefined
+  onChange: (value: T | undefined) => void
+  normalize?: Normalizer<T>
 }
 
 export function RadioGroup<T>({
@@ -80,8 +80,8 @@ export function RadioGroup<T>({
   normalize = defaultNormalizer,
   ...props
 }: RadioGroupProps<T>) {
-  const selection = singleSelection(value, onChange, normalize);
-  const normOptions = normalizeTree(options, normalize);
+  const selection = singleSelection(value, onChange, normalize)
+  const normOptions = normalizeTree(options, normalize)
 
   return (
     <GroupField {...props}>
@@ -99,7 +99,7 @@ export function RadioGroup<T>({
         />
       ))}
     </GroupField>
-  );
+  )
 }
 
-export default Radio;
+export default Radio

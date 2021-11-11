@@ -1,4 +1,4 @@
-import api, { Api } from "common-v2/api"
+import api, { Api } from "common-v2/services/api"
 import { User } from "./types"
 
 export function getUserSettings() {

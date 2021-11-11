@@ -52,7 +52,7 @@ export const Overlay = (props: JSX.IntrinsicElements["div"]) => (
 )
 
 export const LoaderOverlay = () => (
-  <Overlay>
+  <Overlay className={css.loaderOverlay}>
     <Loader color="var(--black)" size={32} />
   </Overlay>
 )

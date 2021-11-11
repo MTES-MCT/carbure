@@ -16,7 +16,7 @@ export function useQuery<R, A extends any[]>(
 ) {
   const query = useAsync(asyncFunction, params, {
     ...options,
-    setLoading: (state) => ({ ...state, loading: true }),
+    ...staleWhileLoading,
   })
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export function useMutation<R, A extends any[]>(
 ) {
   return useAsyncCallback(() => asyncFunction(...params), {
     ...options,
-    setLoading: (state) => ({ ...state, loading: true }),
+    ...staleWhileLoading,
     onSuccess: (res, opts) => {
       // invalidate linked queries if mutation is successful
       invalidate(...invalidates)
@@ -50,4 +50,8 @@ export function useMutation<R, A extends any[]>(
 
 export function invalidate(...keys: string[]) {
   keys.forEach((key) => window.dispatchEvent(new Event(`invalidate:${key}`)))
+}
+
+export const staleWhileLoading = {
+  setLoading: (state: any) => ({ ...state, loading: true }),
 }

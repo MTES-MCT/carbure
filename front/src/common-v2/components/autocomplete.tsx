@@ -1,26 +1,32 @@
+import { staleWhileLoading } from "common-v2/hooks/async"
 import { useEffect, useRef, useState } from "react"
+import { useAsyncCallback } from "react-async-hook"
 import {
   defaultNormalizer,
   Filter,
   Normalizer,
   normalizeTree,
-} from "../hooks/normalize"
+} from "../utils/normalize"
+import { standardize as std } from "common-v2/formatters"
 import Dropdown, { Trigger } from "./dropdown"
 import { Control, TextInput } from "./input"
 import List, { defaultRenderer, Renderer } from "./list"
 
 export interface AutocompleteProps<T> extends Control, Trigger {
   value: T | undefined
-  options: T[]
+  options?: T[]
+  getOptions?: (query: string) => Promise<T[]>
   onChange: (value: T | undefined) => void
-  onQuery?: (query: string) => Promise<T[] | void> | T[] | void
+  onQuery?: (query: string) => void
   normalize?: Normalizer<T>
   children?: Renderer<T>
 }
 
 function Autocomplete<T>({
+  loading,
   value,
   options,
+  getOptions,
   onChange,
   onQuery,
   anchor,
@@ -33,6 +39,7 @@ function Autocomplete<T>({
   const autocomplete = useAutocomplete({
     value,
     options,
+    getOptions,
     onChange,
     onQuery,
     normalize,
@@ -42,13 +49,14 @@ function Autocomplete<T>({
     <>
       <TextInput
         {...props}
+        loading={loading || autocomplete.loading}
         domRef={triggerRef}
         value={autocomplete.query}
         onChange={autocomplete.onQuery}
       />
 
       <Dropdown
-        open={autocomplete.open && options.length > 0}
+        open={autocomplete.open && autocomplete.options.length > 0}
         triggerRef={triggerRef}
         onOpen={() => autocomplete.onQuery(autocomplete.query)}
         onToggle={autocomplete.setOpen}
@@ -70,15 +78,17 @@ function Autocomplete<T>({
 
 interface AutocompleteConfig<T> {
   value: T | undefined
-  options: T[]
+  options?: T[]
+  getOptions?: (query: string) => Promise<T[]>
   onChange: (value: T | undefined) => void
-  onQuery?: (query: string) => Promise<T[] | void> | T[] | void
+  onQuery?: (query: string) => void
   normalize?: Normalizer<T>
 }
 
 export function useAutocomplete<T>({
   value,
   options: controlledOptions,
+  getOptions,
   onChange,
   onQuery: controlledOnQuery,
   normalize = defaultNormalizer,
@@ -89,12 +99,23 @@ export function useAutocomplete<T>({
   const label = value ? normalize(value).label : ""
   useEffect(() => setQuery(label), [label])
 
-  const [options, setOptions] = useState(controlledOptions)
-  useEffect(() => setOptions(controlledOptions), [controlledOptions])
+  const [options, setOptions] = useState(controlledOptions ?? [])
+  useEffect(() => setOptions(controlledOptions ?? []), [controlledOptions])
+
+  const asyncOptions = useAsyncCallback(
+    (query: string) => getOptions?.(query),
+    {
+      ...staleWhileLoading,
+      onSuccess: (res) => res && setOptions(res),
+    }
+  )
+
+  const baseOptions = asyncOptions.result ?? controlledOptions ?? []
 
   function matchQuery(query: string, options: T[]) {
     const key = value ? normalize(value).key : ""
-    const match = options.find((item) => normalize(item).label === query)
+    const stdQuery = std(query)
+    const match = options.find((item) => std(normalize(item).label) === stdQuery) // prettier-ignore
     if (match && normalize(match).key !== key) onChange(match)
   }
 
@@ -109,13 +130,14 @@ export function useAutocomplete<T>({
     // and open the dropdown otherwise
     else setOpen(true)
 
-    const matches = filterOptions(query, controlledOptions, normalize)
+    const matches = filterOptions(query, baseOptions, normalize)
 
     setOptions(matches)
     matchQuery(query, matches)
+    controlledOnQuery?.(query)
 
-    if (controlledOnQuery) {
-      const nextOptions = await controlledOnQuery(query)
+    if (getOptions) {
+      const nextOptions = await asyncOptions.execute(query)
       if (nextOptions) matchQuery(query, nextOptions)
     }
   }
@@ -126,11 +148,19 @@ export function useAutocomplete<T>({
 
     // filter options based on the selected value label
     const query = value ? normalize(value).label : ""
-    const matches = filterOptions(query, controlledOptions, normalize)
+    const matches = filterOptions(query, baseOptions, normalize)
     setOptions(matches)
   }
 
-  return { query, options, open, setOpen, onQuery, onSelect }
+  return {
+    loading: asyncOptions.loading,
+    query,
+    options,
+    open,
+    setOpen,
+    onQuery,
+    onSelect,
+  }
 }
 
 export function filterOptions<T>(
@@ -138,7 +168,8 @@ export function filterOptions<T>(
   options: T[],
   normalize: Normalizer<T>
 ) {
-  const filter: Filter<T> = (item) => item.label.includes(query)
+  const stdQuery = std(query)
+  const filter: Filter<T> = (item) => std(item.label).includes(stdQuery)
   return normalizeTree(options, normalize, filter).map((o) => o.value)
 }
 
