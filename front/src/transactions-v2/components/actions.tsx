@@ -5,14 +5,22 @@ import { CreateButton, ExportButton } from "../actions"
 import { AcceptButton } from "../actions/accept"
 import { SendButton } from "../actions/send"
 import { LotQuery } from "../types"
+import { SearchInput } from "common-v2/components/input"
 
 export interface ActionBarProps {
   count: number
   query: LotQuery
   selection: number[]
+  search: string | undefined
+  onSearch: (search: string | undefined) => void
 }
 
-export const Actions = ({ count, ...props }: ActionBarProps) => {
+export const Actions = ({
+  count,
+  search,
+  onSearch,
+  ...props
+}: ActionBarProps) => {
   const status = props.query.status
   const isEmpty = count === 0
 
@@ -44,6 +52,8 @@ export const Actions = ({ count, ...props }: ActionBarProps) => {
           <Button label="TODO" />
         </Fragment>
       )}
+
+      <SearchInput aside clear value={search} onChange={onSearch} />
     </ActionBar>
   )
 }

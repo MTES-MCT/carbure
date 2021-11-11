@@ -40,12 +40,15 @@ export function Table<T>({
             <div
               key={column.key ?? i}
               data-sortable={column.key ? true : undefined}
+              onClick={column.key ? () => orderBy(column.key!) : undefined}
+              title={
+                typeof column.header === "string" ? column.header : undefined
+              }
               className={cl(
                 css.header,
                 column.className,
                 column.small && css.small
               )}
-              onClick={column.key ? () => orderBy(column.key!) : undefined}
             >
               {column.header}
               {order && column.key === order.column && (

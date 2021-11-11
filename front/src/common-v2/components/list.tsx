@@ -131,6 +131,11 @@ export function List<T>({
         focused: selection.isFocused(value),
       }
 
+      // do not render group with no children
+      if (children && children.length === 0) {
+        return null
+      }
+
       // render group header
       if (children) {
         return (
