@@ -187,7 +187,12 @@ export function List<T>({
       onKeyDown={onKeyDown}
     >
       {search && (
-        <SearchInput clear variant="inline" value={query} onChange={setQuery} />
+        <SearchInput
+          clear={true}
+          variant="inline"
+          value={query}
+          onChange={setQuery}
+        />
       )}
       {renderItems(normItems)}
     </ul>

@@ -1,5 +1,5 @@
+import React, { useEffect, useRef, useState } from "react"
 import cl from "clsx"
-import React from "react"
 import Button from "./button"
 import { AlertTriangle, Cross, Loader, Search } from "./icons"
 import css from "./input.module.css"
@@ -197,36 +197,58 @@ export const TextArea = ({
   </Field>
 )
 
+export interface SearchInputProps extends TextInputProps {
+  debounce?: number
+}
+
 export const SearchInput = ({
   className,
   clear,
   name,
   placeholder,
+  debounce,
   value,
   onChange,
   ...props
-}: TextInputProps) => (
-  <Field
-    {...props}
-    className={cl(css.search, className)}
-    onClear={clear && value ? () => onChange(undefined) : undefined}
-  >
-    <div className={css.icon}>
-      <Search />
-    </div>
+}: SearchInputProps) => {
+  const timeoutRef = useRef<number>()
+  const [search, setSearch] = useState(value ?? "")
 
-    <input
-      title={value}
-      disabled={props.disabled}
-      readOnly={props.readOnly}
-      required={props.required}
-      name={name}
-      placeholder={placeholder ?? "Rechercher..."}
-      value={value ?? ""}
-      onChange={(e) => onChange(e.target.value)}
-    />
-  </Field>
-)
+  useEffect(() => {
+    setSearch(value ?? "")
+  }, [value])
+
+  function debouncedSearch(search: string) {
+    if (!debounce) return onChange(search)
+
+    setSearch(search)
+    timeoutRef.current && window.clearTimeout(timeoutRef.current)
+    timeoutRef.current = window.setTimeout(() => onChange(search), debounce)
+  }
+
+  return (
+    <Field
+      {...props}
+      className={cl(css.search, className)}
+      onClear={clear && search ? () => onChange(undefined) : undefined}
+    >
+      <div className={css.icon}>
+        <Search />
+      </div>
+
+      <input
+        title={search}
+        disabled={props.disabled}
+        readOnly={props.readOnly}
+        required={props.required}
+        name={name}
+        placeholder={placeholder ?? "Rechercher..."}
+        value={search ?? ""}
+        onChange={(e) => debouncedSearch(e.target.value)}
+      />
+    </Field>
+  )
+}
 
 export interface GroupFieldProps extends Control {
   children?: React.ReactNode
