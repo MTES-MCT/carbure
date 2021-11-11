@@ -17,7 +17,7 @@ export const NoResult = ({ loading, filterCount, onReset }: NoResultProps) => {
       <p>{t("Aucun résultat trouvé pour cette recherche")}</p>
 
       <Button
-        aside
+        asideX
         variant="link"
         label={t("Réinitialiser les filtres ({{amount}})", {
           amount: filterCount,

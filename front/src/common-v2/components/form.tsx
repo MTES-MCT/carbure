@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useState } from "react"
 import cl from "clsx"
+import { identity } from "common-v2/normalizers"
 import css from "./form.module.css"
 
 export type FormVariant = "inline" | "complex"
@@ -140,9 +141,5 @@ export interface BindProps<T, N extends keyof T> {
 }
 
 export type FieldSetter<T> = (name: keyof T, value: T[keyof T]) => void
-
-function identity<T>(value: T) {
-  return value
-}
 
 export default Form

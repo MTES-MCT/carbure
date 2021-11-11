@@ -40,7 +40,8 @@ export function Button<T>({
   domRef,
   disabled,
   loading,
-  aside,
+  asideX,
+  asideY,
   spread,
   captive,
   variant,
@@ -60,7 +61,7 @@ export function Button<T>({
     <LinkWrapper href={href} to={to}>
       <button
         ref={domRef}
-        {...layout({ aside, spread })}
+        {...layout({ asideX, asideY, spread })}
         data-captive={captive ? true : undefined}
         tabIndex={tabIndex}
         disabled={disabled || loading}

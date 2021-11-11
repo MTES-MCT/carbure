@@ -139,7 +139,7 @@ export function List<T>({
       // render group header
       if (children) {
         return (
-          <div key={key ?? i}>
+          <div key={`${key}-${label}`}>
             <li
               data-group
               data-key={key}
@@ -160,7 +160,7 @@ export function List<T>({
       // render item
       return (
         <li
-          key={key ?? i}
+          key={`${key}-${label}`}
           data-key={key}
           data-disabled={disabled ? true : undefined}
           data-level={level > 0 ? level : undefined}

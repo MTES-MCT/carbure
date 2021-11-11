@@ -58,13 +58,15 @@ export const LoaderOverlay = () => (
 )
 
 export interface Layout {
-  aside?: boolean
+  asideX?: boolean
+  asideY?: boolean
   spread?: boolean
 }
 
 export function layout(props: Layout) {
   return {
-    "data-aside": props.aside ? true : undefined,
+    "data-asidex": props.asideX ? true : undefined,
+    "data-asidey": props.asideY ? true : undefined,
     "data-spread": props.spread ? true : undefined,
   }
 }

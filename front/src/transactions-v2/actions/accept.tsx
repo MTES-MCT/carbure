@@ -43,7 +43,7 @@ export const AcceptButton = ({
                   <section>Description</section>
                 </main>
                 <footer>
-                  <Button aside label="Annuler" action={close} />
+                  <Button asideX label="Annuler" action={close} />
                 </footer>
               </Dialog>
             )),

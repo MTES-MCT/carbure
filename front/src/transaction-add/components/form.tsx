@@ -1,4 +1,5 @@
 import { Entity } from "carbure/types"
+import { Lot } from "transactions-v2/types"
 import {
   Biofuel,
   Country,
@@ -38,6 +39,8 @@ export function useLotForm(initialValue: LotFormValue = defaultLot) {
 }
 
 export const defaultLot = {
+  lot: undefined as Lot | undefined,
+
   transport_document_reference: undefined as string | undefined,
   volume: 0 as number | undefined,
   biofuel: undefined as Biofuel | undefined,

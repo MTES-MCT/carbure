@@ -40,6 +40,10 @@ export const normalizeDepot: Normalizer<Depot | string> = (depot) => ({
   label: isString(depot) ? depot : depot.name,
 })
 
+export function identity<T>(value: T) {
+  return value
+}
+
 export function id(
   value: Record<string, any> | string | undefined,
   key: string = "id"

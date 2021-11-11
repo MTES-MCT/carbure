@@ -54,7 +54,7 @@ export const Actions = ({
       )}
 
       <SearchInput
-        aside
+        asideX
         clear
         debounce={240}
         value={search}
