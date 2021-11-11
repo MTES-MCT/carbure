@@ -49,6 +49,7 @@ export const Pagination = ({
 
         <Select
           variant="solid"
+          placeholder={t("Choisir une page")}
           value={pages.find((p) => p.key === page)}
           onChange={(page) => onPage(page!.key)}
           options={pages}

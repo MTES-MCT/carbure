@@ -198,8 +198,7 @@ def filter_lots(lots, querySet, entity_id=None, blacklist=[]):
             Q(unknown_delivery_site__icontains=query) |
             Q(free_field__icontains=query) |
             Q(transport_document_reference__icontains=query) |
-            Q(carbure_production_site__dc_reference__icontains=query) |
-            Q(unknown_production_site_dbl_counting__icontains=query)
+            Q(production_site_double_counting_certificate__icontains=query)
         )
 
     invalid = querySet.get('invalid', False)

@@ -7,17 +7,17 @@ import useStatus from "./hooks/status"
 import useLotQuery from "./hooks/query"
 import { Bar, Main } from "common-v2/components/scaffold"
 import Select from "common-v2/components/select"
-import Button from "common-v2/components/button"
 import { PortalProvider } from "common-v2/components/portal"
 import Pagination, { usePagination } from "common-v2/components/pagination"
 import Filters, { useFilters } from "./components/filters"
-import { Certificate } from "common-v2/components/icons"
 import { LotTable } from "./components/lot-table"
 import NoResult from "./components/no-result"
 import StatusTabs from "./components/status-tabs"
 import { Actions } from "./components/actions"
+import { DeclarationButton } from "./actions/declaration"
 import * as api from "./api"
 import { Lot } from "./types"
+import { DeadlineSwitch, InvalidSwitch } from "./components/switches"
 
 export const Transactions = () => {
   const { t } = useTranslation()
@@ -27,6 +27,9 @@ export const Transactions = () => {
   const filters = useFilters()
   const pagination = usePagination()
 
+  const [hasDeadline, showDeadline] = useState(false)
+  const [hasErrors, showErrors] = useState(false)
+  const [search, setSearch] = useState<string | undefined>()
   const [selection, setSelection] = useState<Lot[]>([])
   const [year = 2021, setYear] = useState<number | undefined>()
 
@@ -34,16 +37,19 @@ export const Transactions = () => {
     entity.id,
     status,
     year,
-    filters.selected,
-    pagination
+    search,
+    hasErrors,
+    hasDeadline,
+    pagination,
+    filters.selected
   )
 
-  const snapshotQuery = useQuery(api.getSnapshot, {
+  const snapshot = useQuery(api.getSnapshot, {
     key: "transactions-snapshot",
     params: [entity.id, year],
   })
 
-  const lotsQuery = useQuery(api.getLots, {
+  const lots = useQuery(api.getLots, {
     key: "transactions",
     params: [query],
   })
@@ -52,9 +58,15 @@ export const Transactions = () => {
     return <Navigate to="draft" />
   }
 
-  const snapshot = snapshotQuery.result?.data.data
-  const lots = lotsQuery.result?.data.data?.lots ?? []
-  const total = lotsQuery.result?.data.data?.total ?? 0
+  const lotsData = lots.result?.data.data
+  const snapshotData = snapshot.result?.data.data
+
+  const lotList = lotsData?.lots ?? []
+  const count = lotsData?.returned ?? 0
+  const total = lotsData?.total ?? 0
+  const deadline = lotsData?.deadlines ?? { total: 0, date: "" }
+  const errors = Object.keys(lotsData?.errors ?? {})
+
   const selectionIDs = selection.map((lot) => lot.id)
 
   return (
@@ -72,19 +84,11 @@ export const Transactions = () => {
               options={[2019, 2020, 2021]}
             />
 
-            <Button
-              aside
-              variant="primary"
-              icon={Certificate}
-              label={t("Valider ma déclaration")}
-            />
+            <DeclarationButton />
           </section>
 
           <section>
-            <StatusTabs
-              loading={snapshotQuery.loading}
-              count={snapshot?.lots}
-            />
+            <StatusTabs loading={snapshot.loading} count={snapshotData?.lots} />
           </section>
         </header>
 
@@ -98,20 +102,43 @@ export const Transactions = () => {
         </Bar>
 
         <section>
-          <Actions count={lots.length} query={query} selection={selectionIDs} />
+          <Actions
+            count={count}
+            query={query}
+            selection={selectionIDs}
+            search={search}
+            onSearch={setSearch}
+          />
 
-          {lots.length === 0 && (
+          {errors.length > 0 && (
+            <InvalidSwitch
+              total={errors.length}
+              active={hasErrors}
+              onSwitch={showErrors}
+            />
+          )}
+
+          {deadline.total > 0 && (
+            <DeadlineSwitch
+              total={deadline.total}
+              date={deadline.date}
+              active={hasDeadline}
+              onSwitch={showDeadline}
+            />
+          )}
+
+          {count === 0 && (
             <NoResult
-              loading={lotsQuery.loading}
+              loading={lots.loading}
               onReset={filters.resetFilters}
               filterCount={filters.count}
             />
           )}
 
-          {lots.length > 0 && (
+          {count > 0 && (
             <LotTable
-              loading={lotsQuery.loading}
-              lots={lots}
+              loading={lots.loading}
+              lots={lotList}
               selected={selection}
               onSelect={setSelection}
             />

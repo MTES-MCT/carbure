@@ -7,8 +7,11 @@ function useLotQuery(
   entityID: number,
   status: string,
   year: number,
-  filters: FilterSelection,
-  pagination: PaginationManager
+  query: string | undefined,
+  invalid: boolean,
+  deadline: boolean,
+  pagination: PaginationManager,
+  filters: FilterSelection
 ) {
   const { page, limit } = pagination
 
@@ -17,11 +20,14 @@ function useLotQuery(
       entity_id: entityID,
       year,
       status,
+      query: query ? query : undefined,
+      invalid: invalid ? true : undefined,
+      deadline: deadline ? true : undefined,
       from_idx: page * limit,
       limit: limit || undefined,
       ...normalizeFilters(filters),
     }),
-    [entityID, year, status, filters, page, limit]
+    [entityID, year, status, query, invalid, deadline, page, limit, filters]
   )
 }
 
