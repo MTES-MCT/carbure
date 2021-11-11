@@ -113,7 +113,7 @@ export const Transactions = () => {
 
           {errors.length > 0 && (
             <InvalidSwitch
-              total={errors.length}
+              count={errors.length}
               active={hasErrors}
               onSwitch={showErrors}
             />
@@ -121,7 +121,7 @@ export const Transactions = () => {
 
           {deadline.total > 0 && (
             <DeadlineSwitch
-              total={deadline.total}
+              count={deadline.total}
               date={deadline.date}
               active={hasDeadline}
               onSwitch={showDeadline}
@@ -131,8 +131,8 @@ export const Transactions = () => {
           {count === 0 && (
             <NoResult
               loading={lots.loading}
+              count={filters.count}
               onReset={filters.resetFilters}
-              filterCount={filters.count}
             />
           )}
 

@@ -3,11 +3,11 @@ import { AlertCircle, Alarm } from "common-v2/components/icons"
 import Switch, { SwitchProps } from "common-v2/components/switch"
 
 export interface InvalidSwitchProps extends SwitchProps {
-  total: number
+  count: number
 }
 
 export const InvalidSwitch = ({
-  total,
+  count,
   active,
   onSwitch,
 }: InvalidSwitchProps) => (
@@ -20,22 +20,22 @@ export const InvalidSwitch = ({
   >
     <p>
       {!active && <Trans>Parmi ces résultats, </Trans>}
-      <Trans count={total}>
-        <b>{{ total }} lots</b> présentent des <b>incohérences</b>
+      <Trans count={count}>
+        <b>{{ count }} lots</b> présentent des <b>incohérences</b>
       </Trans>
     </p>
   </Switch>
 )
 
 export interface DeadlineSwitchProps {
-  total: number
+  count: number
   date: string
   active: boolean
   onSwitch: (active: boolean) => void
 }
 
 export const DeadlineSwitch = ({
-  total,
+  count,
   date,
   active,
   onSwitch,
@@ -49,9 +49,8 @@ export const DeadlineSwitch = ({
   >
     <p>
       {!active && <Trans>Parmi ces résultats, </Trans>}
-      <Trans count={total}>
-        <b>{{ count: total }} lots</b> doivent être déclarés avant le{" "}
-        <b>{{ deadline: date }}</b>
+      <Trans count={count}>
+        <b>{{ count }} lots</b> doivent être déclarés avant le <b>{{ date }}</b>
       </Trans>
     </p>
   </Switch>
