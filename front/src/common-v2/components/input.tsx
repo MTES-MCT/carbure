@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react"
 import cl from "clsx"
 import Button from "./button"
-import { AlertTriangle, Cross, Loader, Search } from "./icons"
-import css from "./input.module.css"
+import { AlertTriangle, Cross, Loader, Search, Placeholder } from "./icons"
 import { layout, Layout } from "./scaffold"
+import css from "./input.module.css"
 
 export type FieldVariant = "outline" | "solid" | "inline" | "text"
 
@@ -60,7 +60,7 @@ export const NumberInput = ({
 }: NumberInputProps) => (
   <Input
     {...props}
-    type="number"
+    type={props.readOnly ? "text" : "number"}
     value={value ?? ""}
     onClear={clear && value ? () => onChange(undefined) : undefined}
     onChange={(e) => {
@@ -321,6 +321,7 @@ export const Field = ({
   onClear,
 }: FieldProps) => {
   const icon = typeof Icon === "function" ? <Icon /> : Icon
+  const showIcon = loading || error || icon
 
   return (
     <div
@@ -358,17 +359,17 @@ export const Field = ({
           />
         )}
 
-        {(loading || error || icon) && (
-          <div className={css.icon}>
-            {loading ? (
-              <Loader />
-            ) : error ? (
-              <AlertTriangle title={error} />
-            ) : (
-              icon
-            )}
-          </div>
-        )}
+        <div className={css.icon}>
+          {loading === true ? (
+            <Loader />
+          ) : loading === false ? (
+            <Placeholder />
+          ) : error ? (
+            <AlertTriangle title={error} />
+          ) : (
+            icon
+          )}
+        </div>
       </div>
     </div>
   )

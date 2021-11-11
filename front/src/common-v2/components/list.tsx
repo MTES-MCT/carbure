@@ -11,9 +11,9 @@ import {
   NormalizedTree,
   Normalizer,
   normalizeTree,
-} from "../hooks/normalize"
+} from "../utils/normalize"
 import { SearchInput } from "./input"
-import { multipleSelection, singleSelection } from "../hooks/selection"
+import { multipleSelection, singleSelection } from "../utils/selection"
 
 export interface ListProps<T> {
   controlRef?: React.RefObject<HTMLElement>

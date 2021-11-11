@@ -1,18 +1,18 @@
-import { useRef, useState } from "react";
-import Dropdown, { Trigger } from "./dropdown";
-import { ChevronDown } from "./icons";
-import { Control, Input } from "./input";
-import List from "./list";
-import { defaultNormalizer, Normalizer } from "../hooks/normalize";
+import { useRef, useState } from "react"
+import Dropdown, { Trigger } from "./dropdown"
+import { ChevronDown } from "./icons"
+import { Control, Input } from "./input"
+import List from "./list"
+import { defaultNormalizer, Normalizer } from "../utils/normalize"
 
 export interface SelectProps<T> extends Control, Trigger {
-  clear?: boolean;
-  search?: boolean;
-  value: T | undefined;
-  options: T[];
-  placeholder?: string;
-  onChange: (value: T | undefined) => void;
-  normalize?: Normalizer<T>;
+  clear?: boolean
+  search?: boolean
+  value: T | undefined
+  options: T[]
+  placeholder?: string
+  onChange: (value: T | undefined) => void
+  normalize?: Normalizer<T>
 }
 
 export function Select<T>({
@@ -28,9 +28,9 @@ export function Select<T>({
   normalize = defaultNormalizer,
   ...props
 }: SelectProps<T>) {
-  const triggerRef = useRef<HTMLInputElement>(null);
-  const [open, setOpen] = useState(false);
-  const label = value ? normalize(value).label : placeholder;
+  const triggerRef = useRef<HTMLInputElement>(null)
+  const [open, setOpen] = useState(false)
+  const label = value ? normalize(value).label : placeholder
 
   return (
     <>
@@ -58,13 +58,13 @@ export function Select<T>({
           selectedItem={value}
           onFocus={onChange}
           onSelectItem={(value) => {
-            onChange(value);
-            setOpen(false);
+            onChange(value)
+            setOpen(false)
           }}
         />
       </Dropdown>
     </>
-  );
+  )
 }
 
-export default Select;
+export default Select

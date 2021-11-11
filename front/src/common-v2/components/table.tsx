@@ -1,8 +1,8 @@
 import cl from "clsx"
 import useControlledState from "../hooks/controlled-state"
 import Checkbox from "./checkbox"
-import { multipleSelection } from "../hooks/selection"
-import { Normalizer } from "../hooks/normalize"
+import { multipleSelection } from "../utils/selection"
+import { Normalizer } from "../utils/normalize"
 import css from "./table.module.css"
 import { Col, LoaderOverlay } from "./scaffold"
 

@@ -1,5 +1,5 @@
-import { api, Api } from "common-v2/api"
-import { Option } from "common-v2/hooks/normalize"
+import { api, Api } from "common-v2/services/api"
+import { Option } from "common-v2/utils/normalize"
 import { LotList, Snapshot, Filter, LotQuery } from "./types"
 
 const QUERY_RESET: Partial<LotQuery> = {

@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { Navigate } from "react-router"
+import { Navigate, Route, Routes } from "react-router-dom"
 import useEntity from "carbure/hooks/entity"
 import { useQuery } from "common-v2/hooks/async"
 import useStatus from "./hooks/status"
@@ -18,6 +18,7 @@ import { DeclarationButton } from "./actions/declaration"
 import * as api from "./api"
 import { Lot } from "./types"
 import { DeadlineSwitch, InvalidSwitch } from "./components/switches"
+import TransactionAdd from "transaction-add"
 
 export const Transactions = () => {
   const { t } = useTranslation()
@@ -153,6 +154,10 @@ export const Transactions = () => {
           />
         </section>
       </Main>
+
+      <Routes>
+        <Route path="draft/add" element={<TransactionAdd />} />
+      </Routes>
     </PortalProvider>
   )
 }

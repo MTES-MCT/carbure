@@ -5,7 +5,7 @@ import Dropdown, { Anchor } from "./dropdown"
 import { ChevronDown } from "./icons"
 import Button, { ButtonProps } from "./button"
 import List from "./list"
-import { Normalizer } from "../hooks/normalize"
+import { Normalizer } from "../utils/normalize"
 import css from "./menu.module.css"
 
 export interface MenuProps extends ButtonProps {

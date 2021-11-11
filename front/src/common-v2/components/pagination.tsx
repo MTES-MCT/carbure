@@ -6,6 +6,7 @@ import css from "./pagination.module.css"
 import Button from "./button"
 import { ChevronLeft, ChevronRight } from "./icons"
 import Select from "./select"
+import { Anchors } from "./dropdown"
 
 export interface PaginationProps {
   total: number
@@ -49,6 +50,7 @@ export const Pagination = ({
 
         <Select
           variant="solid"
+          anchor={Anchors.topLeft}
           placeholder={t("Choisir une page")}
           value={pages.find((p) => p.key === page)}
           onChange={(page) => onPage(page!.key)}
@@ -59,6 +61,7 @@ export const Pagination = ({
 
         <Select
           variant="solid"
+          anchor={Anchors.topLeft}
           value={limits.find((l) => l.key === limit)!}
           onChange={(limit) => onLimit(limit!.key)}
           options={limits}

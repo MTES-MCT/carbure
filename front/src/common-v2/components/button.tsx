@@ -65,6 +65,7 @@ export function Button<T>({
         tabIndex={tabIndex}
         disabled={disabled || loading}
         type={submit ? "submit" : "button"}
+        form={typeof submit === "string" ? submit : undefined}
         title={title}
         style={style}
         className={cl(
