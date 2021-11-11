@@ -53,7 +53,13 @@ export const Actions = ({
         </Fragment>
       )}
 
-      <SearchInput aside clear value={search} onChange={onSearch} />
+      <SearchInput
+        aside
+        clear
+        debounce={240}
+        value={search}
+        onChange={onSearch}
+      />
     </ActionBar>
   )
 }
