@@ -10,12 +10,27 @@ export const ProductionFields = () => {
   const { t } = useTranslation()
   return (
     <Fieldset label={t("Production")}>
+      <ProducerField />
       <ProductionSiteField />
       <ProductionSiteCertificateField />
       <ProductionSiteDoubleCountingCertificateField />
       <ProductionCountryField />
       <ProductionSiteCommissioningDateField />
     </Fieldset>
+  )
+}
+
+export const ProducerField = () => {
+  const { t } = useTranslation()
+  const bind = useBind<LotFormValue>()
+  return (
+    <Autocomplete
+      label={t("Producteur")}
+      getOptions={api.findEntities}
+      create={norm.identity}
+      normalize={norm.normalizeEntity}
+      {...bind("producer")}
+    />
   )
 }
 

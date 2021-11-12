@@ -15,6 +15,7 @@ export const LotFields = () => {
       <BiofuelField />
       <FeedstockField />
       <CountryOfOriginField />
+      <FreeField />
     </Fieldset>
   )
 }
@@ -83,6 +84,12 @@ export const CountryOfOriginField = () => {
       {...bind("country_of_origin")}
     />
   )
+}
+
+export const FreeField = () => {
+  const { t } = useTranslation()
+  const bind = useBind<LotFormValue>()
+  return <TextInput label={t("Champ libre")} {...bind("free_field")} />
 }
 
 export default LotFields
