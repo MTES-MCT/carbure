@@ -9,7 +9,6 @@ import {
 } from "common/types"
 import Form, { useForm } from "common-v2/components/form"
 import LotFields from "./lot-fields"
-import OriginFields from "./origin-fields"
 import ProductionFields from "./production-fields"
 import DeliveryFields from "./delivery-fields"
 import { EmissionFields, ReductionFields } from "./ghg-fields"
@@ -25,7 +24,6 @@ export const LotForm = ({ value, onSubmit }: LotFormProps) => {
   return (
     <Form id="lot-form" variant="complex" form={form} onSubmit={onSubmit}>
       <LotFields />
-      <OriginFields />
       <ProductionFields />
       <DeliveryFields />
       <EmissionFields />
