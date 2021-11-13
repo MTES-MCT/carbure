@@ -3,7 +3,7 @@ import Autocomplete from "common-v2/components/autocomplete"
 import { Fieldset, useBind } from "common-v2/components/form"
 import { NumberInput, TextInput } from "common-v2/components/input"
 import * as api from "common-v2/api"
-import * as norm from "common-v2/normalizers"
+import * as norm from "common-v2/utils/normalizers"
 import { LotFormValue } from "./form"
 
 export const LotFields = () => {
@@ -53,6 +53,7 @@ export const BiofuelField = () => {
       label={t("Biocarburant")}
       getOptions={api.findBiofuels}
       normalize={norm.normalizeBiofuel}
+      create={norm.identity}
       {...bind("biofuel")}
     />
   )

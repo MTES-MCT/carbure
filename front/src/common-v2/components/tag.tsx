@@ -2,7 +2,7 @@ import cl from "clsx"
 import {
   defaultNormalizer,
   Normalizer,
-  normalizeTree,
+  normalizeItems,
 } from "../utils/normalize"
 import { multipleSelection } from "../utils/selection"
 import Button from "./button"
@@ -28,29 +28,30 @@ export const Tag = ({ big, variant, label, children, onDismiss }: TagProps) => (
   </span>
 )
 
-export interface TagGroupProps<T> {
+export interface TagGroupProps<T, V> {
   children?: React.ReactNode
   variant?: TagVariant
   items: T[] | undefined
-  onDismiss?: (items: T[]) => void
-  normalize?: Normalizer<T>
+  onDismiss?: (value: V[]) => void
+  normalize?: Normalizer<T, V>
 }
 
-export function TagGroup<T>({
+export function TagGroup<T, V>({
   children,
   variant,
   items,
   onDismiss,
   normalize = defaultNormalizer,
-}: TagGroupProps<T>) {
-  const normItems = normalizeTree(items ?? [], normalize)
-  const { onSelect } = multipleSelection(items, onDismiss, normalize)
+}: TagGroupProps<T, V>) {
+  const normItems = normalizeItems(items, normalize)
+  const values = normItems.map((item) => item.value)
+  const { onSelect } = multipleSelection(values, onDismiss)
 
   return (
     <div className={css.group}>
       {normItems.map((item) => (
         <Tag
-          key={item.key}
+          key={String(item.value)}
           variant={variant}
           label={item.label}
           onDismiss={onDismiss ? () => onSelect(item.value) : undefined}

@@ -1,35 +1,25 @@
-export function normalizeTree<T>(
-  tree: T[],
-  normalize: Normalizer<T> = defaultNormalizer,
-  filter: Filter<T> = defaultFilter
+export function normalizeItems<T, V>(
+  tree: T[] = [],
+  normalize: Normalizer<T, V> = defaultNormalizer,
+  filter: Filter<T, V> = defaultFilter
 ) {
-  const normTree = tree.map((item) => {
-    const norm = normalize(item)
-
-    const normTree: NormalizedTree<T> = {
-      value: item,
-      key: norm.key,
-      label: norm.label,
-      disabled: norm.disabled,
-    }
-
-    if (norm.children) {
-      normTree.children = normalizeTree(norm.children, normalize, filter)
-    }
-
+  const normalizeItem = (data: T) => {
+    const { children, ...norm } = normalize(data)
+    const normTree: Normalized<T, V> = { data, ...norm }
+    if (children) normTree.children = normalizeItems(children, normalize, filter) // prettier-ignore
     return normTree
-  })
+  }
 
-  return normTree.filter(filter)
+  return tree.map(normalizeItem).filter(filter)
 }
 
-export function denormalizeTree<T>(tree: NormalizedTree<T>[]) {
-  return tree.map((item) => item.value)
+export function denormalizeItems<T, V>(tree: Normalized<T, V>[]) {
+  return tree.map((item) => item.data)
 }
 
-export function listTreeItems<T>(
-  tree: NormalizedTree<T>[]
-): NormalizedTree<T>[] {
+export function listTreeItems<T, V>(
+  tree: Normalized<T, V>[]
+): Normalized<T, V>[] {
   return tree.flatMap((item) =>
     item.children
       ? [item, ...listTreeItems(item.children)].filter((item) => !item.disabled)
@@ -37,35 +27,40 @@ export function listTreeItems<T>(
   )
 }
 
-export interface NormalizedTree<T> extends Normalized<T> {
-  children?: NormalizedTree<T>[]
+export function labelize<T, V>(
+  items: T[] = [],
+  normalize: Normalizer<T, V>,
+  join: string = ", "
+) {
+  return items.map((item) => normalize(item).label).join(join)
 }
 
-export type Filter<T> = (item: NormalizedTree<T>) => boolean
+export type Filter<T, V> = (item: Normalized<T, V>) => boolean
 export const defaultFilter = Boolean
 
-export interface Option {
-  key: string
+export interface Normalized<T, V> {
+  data: T
+  value: V
   label: string
-}
-
-export interface Normalized<T> {
-  key: string
-  label: string
-  value: T
   disabled?: boolean
+  children?: Normalized<T, V>[]
 }
 
-export type Normalizer<T> = (value: T) => {
-  key: string
+export interface Option<V = string> {
+  value: V
+  label: string
+}
+
+export type Normalizer<T, V = string> = (item: T) => {
+  value: V
   label: string
   disabled?: boolean
   children?: T[]
 }
-export const defaultNormalizer: Normalizer<any> = (value) => {
-  if (value instanceof Object && "key" in value && "label" in value) {
-    return { key: value.key, label: value.label }
+export const defaultNormalizer: Normalizer<any, any> = (item) => {
+  if (item instanceof Object && "value" in item && "label" in item) {
+    return { value: item.value, label: item.label }
   } else {
-    return { key: String(value), label: String(value) }
+    return { value: item, label: String(item) }
   }
 }

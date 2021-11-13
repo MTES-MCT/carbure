@@ -4,7 +4,7 @@ import Autocomplete from "common-v2/components/autocomplete"
 import { DateInput } from "common-v2/components/input"
 import { UserCheck } from "common-v2/components/icons"
 import * as api from "common-v2/api"
-import * as norm from "common-v2/normalizers"
+import * as norm from "common-v2/utils/normalizers"
 import { LotFormValue } from "./form"
 
 export const DeliveryFields = () => {
@@ -39,7 +39,7 @@ export const SupplierField = () => {
 export const SupplierCertificateField = () => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
-  const entity_id = norm.id(value.supplier)
+  const entity_id = parseInt(String(value.supplier))
   return (
     <Autocomplete
       label={t("Certificat du fournisseur")}

@@ -1,47 +1,50 @@
 import { useRef, useState } from "react"
+import { useAsyncList } from "../hooks/async"
+import { defaultNormalizer, Normalizer } from "../utils/normalize"
 import Dropdown, { Trigger } from "./dropdown"
 import { ChevronDown } from "./icons"
 import { Control, Input } from "./input"
 import List from "./list"
-import {
-  defaultNormalizer,
-  Normalizer,
-  normalizeTree,
-} from "../utils/normalize"
 import Checkbox from "./checkbox"
 
-export interface MultiSelectProps<T> extends Control, Trigger {
+export interface MultiSelectProps<T, V> extends Control, Trigger {
   clear?: boolean
   search?: boolean
-  value: T[] | undefined
-  options: T[]
+  value?: V[] | undefined
   placeholder?: string
-  onChange: (value: T[] | undefined) => void
-  normalize?: Normalizer<T>
+  options?: T[]
+  getOptions?: () => Promise<T[]>
+  onChange?: (value: V[] | undefined) => void
+  normalize?: Normalizer<T, V>
 }
 
-export function MultiSelect<T>({
+export function MultiSelect<T, V>({
   clear,
   search,
+  loading,
   value,
-  options,
   placeholder = "Select options",
+  options,
+  getOptions,
   onChange,
   onOpen,
   onClose,
   anchor,
   normalize = defaultNormalizer,
   ...props
-}: MultiSelectProps<T>) {
+}: MultiSelectProps<T, V>) {
   const triggerRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState(false)
 
-  const hasValue = Boolean(value && value.length)
-  const normValue = normalizeTree(value ?? [], normalize)
-  const label = normValue.map((v) => v.label).join(", ")
+  const asyncOptions = useAsyncList({
+    selectedValues: value,
+    items: options,
+    getItems: getOptions,
+    normalize,
+  })
 
   function onClear() {
-    onChange(undefined)
+    onChange?.(undefined)
     setOpen(false)
   }
 
@@ -50,27 +53,31 @@ export function MultiSelect<T>({
       <Input
         {...props}
         domRef={triggerRef}
+        loading={loading || asyncOptions.loading}
         type="button"
-        value={label || placeholder}
+        value={asyncOptions.label || placeholder}
         icon={ChevronDown}
-        onClear={clear && hasValue ? onClear : undefined}
+        onClear={clear && value && value.length > 0 ? onClear : undefined}
       />
 
       <Dropdown
-        open={open && options.length > 0}
+        open={open && asyncOptions.items.length > 0}
         triggerRef={triggerRef}
-        onOpen={onOpen}
         onClose={onClose}
         onToggle={setOpen}
         anchor={anchor}
+        onOpen={() => {
+          onOpen?.()
+          asyncOptions.execute()
+        }}
       >
         <List
           multiple
           search={search}
           controlRef={triggerRef}
-          items={options}
-          selectedItems={value}
-          onSelectItems={onChange}
+          items={asyncOptions.items}
+          selectedValues={value}
+          onSelectValues={onChange}
           normalize={normalize}
         >
           {({ selected, label }) => (

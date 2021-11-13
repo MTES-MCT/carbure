@@ -1,4 +1,3 @@
-import { Option } from "common-v2/utils/normalize"
 import {
   Biofuel,
   Country,
@@ -141,7 +140,7 @@ export enum Filter {
   ShowEmpty = "show_empty",
 }
 
-export type FilterSelection = Partial<Record<Filter, Option[]>>
+export type FilterSelection = Partial<Record<Filter, string[]>>
 
 export interface LotQuery {
   entity_id: number

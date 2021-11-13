@@ -4,7 +4,7 @@ import { singleSelection } from "../utils/selection"
 import {
   defaultNormalizer,
   Normalizer,
-  normalizeTree,
+  normalizeItems,
 } from "../utils/normalize"
 import css from "./radio.module.css"
 import { GroupField } from "./input"
@@ -64,14 +64,14 @@ export const Radio = ({
   </label>
 )
 
-export interface RadioGroupProps<T> extends RadioControl {
+export interface RadioGroupProps<T, V> extends RadioControl {
   options: T[]
-  value: T | undefined
-  onChange: (value: T | undefined) => void
-  normalize?: Normalizer<T>
+  value: V | undefined
+  onChange: (value: V | undefined) => void
+  normalize?: Normalizer<T, V>
 }
 
-export function RadioGroup<T>({
+export function RadioGroup<T, V extends string | number>({
   className,
   options,
   name,
@@ -79,20 +79,20 @@ export function RadioGroup<T>({
   onChange,
   normalize = defaultNormalizer,
   ...props
-}: RadioGroupProps<T>) {
-  const selection = singleSelection(value, onChange, normalize)
-  const normOptions = normalizeTree(options, normalize)
+}: RadioGroupProps<T, V>) {
+  const selection = singleSelection(value, onChange)
+  const normOptions = normalizeItems(options, normalize)
 
   return (
     <GroupField {...props}>
-      {normOptions.map(({ key, value, label }) => (
+      {normOptions.map(({ value, label }) => (
         <Radio
-          key={key}
+          key={value}
           disabled={props.disabled}
           readOnly={props.readOnly}
           required={props.required}
           name={name}
-          value={key}
+          value={value}
           label={label}
           checked={selection.isSelected(value)}
           onChange={() => selection.onSelect(value)}

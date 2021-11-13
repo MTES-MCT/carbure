@@ -24,8 +24,10 @@ export function downloadLots(query: LotQuery, selection: number[]) {
 }
 
 export function getFilters(field: Filter, query: LotQuery) {
-  return api.get<Api<Option[]>>("/filters", {
-    params: { field, ...query, ...QUERY_RESET },
+  const params = { field, ...query, ...QUERY_RESET }
+  return api.get<Api<Option[]>>("/filters", { params }).then((res) => {
+    const filters = res.data.data ?? []
+    return filters.sort((a, b) => a.label.localeCompare(b.label, "fr"))
   })
 }
 

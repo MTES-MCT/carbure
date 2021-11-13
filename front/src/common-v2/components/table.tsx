@@ -2,7 +2,6 @@ import cl from "clsx"
 import useControlledState from "../hooks/controlled-state"
 import Checkbox from "./checkbox"
 import { multipleSelection } from "../utils/selection"
-import { Normalizer } from "../utils/normalize"
 import css from "./table.module.css"
 import { Col, LoaderOverlay } from "./scaffold"
 
@@ -83,26 +82,27 @@ export function Table<T>({
   )
 }
 
-export function selectionColumn<T>(
+export function selectionColumn<T, V>(
   rows: T[],
-  selected: T[],
-  onSelect: (selected: T[]) => void,
-  normalize?: Normalizer<T>
+  selected: V[],
+  onSelect: (selected: V[]) => void,
+  identify: (item: T) => V
 ): Column<T> {
-  const selection = multipleSelection(selected, onSelect, normalize)
+  const values = rows.map(identify)
+  const selection = multipleSelection(selected, onSelect)
 
   return {
     className: css.selection,
     header: (
       <Checkbox
-        value={selection.isAllSelected(rows)}
-        onChange={() => selection.onSelectAll(rows)}
+        value={selection.isAllSelected(values)}
+        onChange={() => selection.onSelectAll(values)}
       />
     ),
-    cell: (value) => (
+    cell: (item) => (
       <Checkbox
-        value={selection.isSelected(value)}
-        onChange={() => selection.onSelect(value)}
+        value={selection.isSelected(identify(item))}
+        onChange={() => selection.onSelect(identify(item))}
       />
     ),
   }
@@ -183,7 +183,7 @@ export interface Column<T> {
   orderBy?: OrderBy<T>
 }
 
-export type OrderBy<T> = (value: T) => number | string
+export type OrderBy<T> = (value: T) => string | number
 
 export interface CellProps {
   text: string | number

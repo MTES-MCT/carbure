@@ -6,7 +6,7 @@ import { multipleSelection } from "../utils/selection"
 import {
   defaultNormalizer,
   Normalizer,
-  normalizeTree,
+  normalizeItems,
 } from "../utils/normalize"
 
 export interface CheckboxControl {
@@ -63,14 +63,14 @@ export const Checkbox = ({
   </label>
 )
 
-export interface CheckboxGroupProps<T> extends CheckboxControl {
+export interface CheckboxGroupProps<T, V> extends CheckboxControl {
   options: T[]
-  value: T[] | undefined
-  onChange: (value: T[] | undefined) => void
-  normalize?: Normalizer<T>
+  value: V[] | undefined
+  onChange: (value: V[] | undefined) => void
+  normalize?: Normalizer<T, V>
 }
 
-export function CheckboxGroup<T>({
+export function CheckboxGroup<T, V extends string | number>({
   className,
   options,
   disabled,
@@ -80,16 +80,16 @@ export function CheckboxGroup<T>({
   onChange,
   normalize = defaultNormalizer,
   ...props
-}: CheckboxGroupProps<T>) {
-  const selection = multipleSelection(value, onChange, normalize)
-  const normOptions = normalizeTree(options, normalize)
+}: CheckboxGroupProps<T, V>) {
+  const selection = multipleSelection(value, onChange)
+  const normOptions = normalizeItems(options, normalize)
 
   return (
     <GroupField {...props}>
-      {normOptions.map(({ key, value, label }) => (
+      {normOptions.map(({ value, label }) => (
         <Checkbox
-          key={key}
-          name={key}
+          key={String(value)}
+          name={String(value)}
           label={label}
           disabled={disabled}
           readOnly={readOnly}

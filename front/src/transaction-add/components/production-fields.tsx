@@ -3,7 +3,7 @@ import Autocomplete from "common-v2/components/autocomplete"
 import { Fieldset, useBind, useFormContext } from "common-v2/components/form"
 import { DateInput, TextInput } from "common-v2/components/input"
 import * as api from "common-v2/api"
-import * as norm from "common-v2/normalizers"
+import * as norm from "common-v2/utils/normalizers"
 import { LotFormValue } from "./form"
 
 export const ProductionFields = () => {
@@ -37,7 +37,8 @@ export const ProducerField = () => {
 export const ProductionSiteField = () => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
-  const producer = norm.id(value.producer)
+  const producer = parseInt(String(value.producer))
+
   return (
     <Autocomplete
       label={t("Site de production")}
@@ -51,7 +52,7 @@ export const ProductionSiteField = () => {
 export const ProductionSiteCertificateField = () => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
-  const production_site = norm.id(value.production_site)
+  const production_site = parseInt(String(value.production_site))
   return (
     <Autocomplete
       label={t("Certificat du site de production")}

@@ -16,7 +16,6 @@ import StatusTabs from "./components/status-tabs"
 import { Actions } from "./components/actions"
 import { DeclarationButton } from "./actions/declaration"
 import * as api from "./api"
-import { Lot } from "./types"
 import { DeadlineSwitch, InvalidSwitch } from "./components/switches"
 import TransactionAdd from "transaction-add"
 
@@ -31,7 +30,7 @@ export const Transactions = () => {
   const [hasDeadline, showDeadline] = useState(false)
   const [hasErrors, showErrors] = useState(false)
   const [search, setSearch] = useState<string | undefined>()
-  const [selection, setSelection] = useState<Lot[]>([])
+  const [selection, setSelection] = useState<number[]>([])
   const [year = 2021, setYear] = useState<number | undefined>()
 
   const query = useLotQuery(
@@ -67,8 +66,6 @@ export const Transactions = () => {
   const total = lotsData?.total ?? 0
   const deadline = lotsData?.deadlines ?? { total: 0, date: "" }
   const errors = Object.keys(lotsData?.errors ?? {})
-
-  const selectionIDs = selection.map((lot) => lot.id)
 
   return (
     <PortalProvider>
@@ -106,7 +103,7 @@ export const Transactions = () => {
           <Actions
             count={count}
             query={query}
-            selection={selectionIDs}
+            selection={selection}
             search={search}
             onSearch={setSearch}
           />

@@ -1,29 +1,27 @@
-import { staleWhileLoading } from "common-v2/hooks/async"
+import { useAsyncList } from "common-v2/hooks/async"
 import { useEffect, useRef, useState } from "react"
-import { useAsyncCallback } from "react-async-hook"
 import {
   defaultNormalizer,
-  Filter,
   Normalizer,
-  normalizeTree,
+  normalizeItems,
+  denormalizeItems,
 } from "../utils/normalize"
-import { standardize as std } from "common-v2/formatters"
 import Dropdown, { Trigger } from "./dropdown"
 import { Control, TextInput } from "./input"
-import List, { defaultRenderer, Renderer } from "./list"
+import List, { createQueryFilter, defaultRenderer, Renderer } from "./list"
 
-export interface AutocompleteProps<T> extends Control, Trigger {
-  value: T | undefined
+export interface AutocompleteProps<T, K> extends Control, Trigger {
+  value?: K | undefined
   options?: T[]
   getOptions?: (query: string) => Promise<T[]>
-  onChange: (value: T | undefined) => void
+  onChange?: (value: K | undefined) => void
   onQuery?: (query: string) => void
-  create?: (value: string) => T
-  normalize?: Normalizer<T>
-  children?: Renderer<T>
+  create?: (value: string) => K
+  normalize?: Normalizer<T, K>
+  children?: Renderer<T, K>
 }
 
-function Autocomplete<T>({
+function Autocomplete<T, K>({
   loading,
   value,
   options,
@@ -35,7 +33,7 @@ function Autocomplete<T>({
   normalize = defaultNormalizer,
   children = defaultRenderer,
   ...props
-}: AutocompleteProps<T>) {
+}: AutocompleteProps<T, K>) {
   const triggerRef = useRef<HTMLInputElement>(null)
 
   const autocomplete = useAutocomplete({
@@ -59,128 +57,134 @@ function Autocomplete<T>({
       />
 
       <Dropdown
-        open={autocomplete.open && autocomplete.options.length > 0}
+        open={autocomplete.open && autocomplete.suggestions.length > 0}
         triggerRef={triggerRef}
-        onOpen={() => autocomplete.onQuery(autocomplete.query)}
+        onOpen={autocomplete.execute}
         onToggle={autocomplete.setOpen}
         anchor={anchor}
       >
         <List
           controlRef={triggerRef}
-          items={autocomplete.options}
-          selectedItem={value}
+          items={autocomplete.suggestions}
+          selectedValue={value}
           children={children}
           normalize={normalize}
           onFocus={onChange}
-          onSelectItem={autocomplete.onSelect}
+          onSelectValue={autocomplete.onSelect}
         />
       </Dropdown>
     </>
   )
 }
 
-interface AutocompleteConfig<T> {
-  value: T | undefined
+interface AutocompleteConfig<T, K> {
+  value?: K | undefined
   options?: T[]
   getOptions?: (query: string) => Promise<T[]>
-  onChange: (value: T | undefined) => void
+  onChange?: (value: K | undefined) => void
   onQuery?: (query: string) => void
-  create?: (value: string) => T
-  normalize?: Normalizer<T>
+  create?: (value: string) => K
+  normalize?: Normalizer<T, K>
 }
 
-export function useAutocomplete<T>({
+export function useAutocomplete<T, V>({
   value,
-  options: controlledOptions,
+  options,
   getOptions,
   onChange,
-  onQuery: controlledOnQuery,
+  onQuery,
   create,
   normalize = defaultNormalizer,
-}: AutocompleteConfig<T>) {
+}: AutocompleteConfig<T, V>) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState("")
 
-  const label = value ? normalize(value).label : ""
-  useEffect(() => setQuery(label), [label])
+  const asyncOptions = useAsyncList({
+    selectedValue: value,
+    items: options,
+    findItems: getOptions,
+    normalize,
+  })
 
-  const [options, setOptions] = useState(controlledOptions ?? [])
-  useEffect(() => setOptions(controlledOptions ?? []), [controlledOptions])
+  // update query when selected values label change
+  useEffect(() => {
+    if (asyncOptions.label) setQuery(asyncOptions.label)
+  }, [asyncOptions.label])
 
-  const asyncOptions = useAsyncCallback(
-    (query: string) => getOptions?.(query),
-    {
-      ...staleWhileLoading,
-      onSuccess: (res) => res && setOptions(res),
-    }
-  )
+  const [suggestions, setSuggestions] = useState(options ?? [])
+  useEffect(() => setSuggestions(asyncOptions.items), [asyncOptions.items])
 
-  const baseOptions = asyncOptions.result ?? controlledOptions ?? []
+  function filterOptions(query: string): T[] {
+    const options = asyncOptions.items
+    const includesQuery = createQueryFilter(query)
+    return denormalizeItems(normalizeItems(options, normalize, includesQuery))
+  }
 
   function matchQuery(
     query: string,
     options: T[],
-    create?: (query: string) => T
+    create?: (query: string) => V
   ) {
-    const key = value ? normalize(value).key : ""
-    const stdQuery = std(query)
-    const match = options.find((item) => std(normalize(item).label) === stdQuery) // prettier-ignore
-    if (match && normalize(match).key !== key) onChange(match)
-    else if (create) onChange(create(query))
+    const isQuery = createQueryFilter<T, V>(query, true)
+    const matches = normalizeItems(options, normalize, isQuery)
+    const match = matches.length > 0 ? matches[0] : undefined
+
+    if (match && match.value !== value) onChange?.(match.value)
+    else if (create) onChange?.(create(query))
   }
 
-  async function onQuery(query: string | undefined) {
+  const defaultQuery = query
+  async function onQueryChange(query: string = defaultQuery) {
     setQuery(query ?? "")
+    onQuery?.(query ?? "")
 
     // reset autocomplete value if query is emptied
-    if (!query) onChange(undefined)
+    if (query === undefined || query === "") onChange?.(undefined)
+    // stop here if we emptied the input with the clear button
+    if (query === undefined) return setOpen(false)
 
-    // stop here if we just cleared the input
-    if (query === undefined) return
-    // and open the dropdown otherwise
-    else setOpen(true)
+    // otherwise, the user is typing so show the dropdown
+    setOpen(true)
 
-    const matches = filterOptions(query, baseOptions, normalize)
+    // find options that could match the current query
+    const suggestions = filterOptions(query)
 
-    setOptions(matches)
-    matchQuery(query, matches, create)
-    controlledOnQuery?.(query)
+    // set them as suggestions and check if one of them matches the query exactly
+    setSuggestions(suggestions)
+    matchQuery(query, suggestions, create)
 
+    // if we fetch the options asyncly, start it now
     if (getOptions) {
       const nextOptions = await asyncOptions.execute(query)
       if (nextOptions) matchQuery(query, nextOptions)
     }
   }
 
-  function onSelect(value: T | undefined) {
-    onChange(value)
+  function onSelect(value: V | undefined) {
+    onChange?.(value)
     setOpen(false)
 
-    // filter options based on the selected value label
-    const query = value ? normalize(value).label : ""
-    const matches = filterOptions(query, baseOptions, normalize)
-    setOptions(matches)
+    const norm = asyncOptions.items
+      ?.map(normalize)
+      .find((item) => item.value === value)
+
+    if (norm) {
+      // reeset query and filter options based on the selected value label
+      setQuery(norm.label ?? "")
+      setSuggestions(filterOptions(norm.label))
+    }
   }
 
   return {
     loading: asyncOptions.loading,
     query,
-    options,
+    suggestions,
     open,
     setOpen,
-    onQuery,
+    execute: () => asyncOptions.execute(query),
+    onQuery: onQueryChange,
     onSelect,
   }
-}
-
-export function filterOptions<T>(
-  query: string,
-  options: T[],
-  normalize: Normalizer<T>
-) {
-  const stdQuery = std(query)
-  const filter: Filter<T> = (item) => std(item.label).includes(stdQuery)
-  return normalizeTree(options, normalize, filter).map((o) => o.value)
 }
 
 export default Autocomplete
