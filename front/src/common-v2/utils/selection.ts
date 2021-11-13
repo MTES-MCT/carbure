@@ -1,72 +1,58 @@
-import { defaultNormalizer, Normalizer } from "./normalize"
-
-export function singleSelection<T>(
-  selectedItem: T | undefined,
-  onSelectItem: ((item: T | undefined) => void) | undefined,
-  normalize: Normalizer<T>
+export function singleSelection<V>(
+  selectedValue: V | undefined,
+  onSelectValue: ((value: V | undefined) => void) | undefined
 ) {
-  function isSelected(item: T) {
-    if (!selectedItem) return false
-    return normalize(selectedItem).key === normalize(item).key
+  function isSelected(value: V) {
+    if (selectedValue === undefined) return false
+    return selectedValue === value
   }
 
-  function onSelect(item: T | undefined) {
-    onSelectItem?.(item)
+  function onSelect(value: V | undefined) {
+    onSelectValue?.(value)
   }
 
   return { isSelected, onSelect }
 }
 
-export function multipleSelection<T>(
-  selectedItems: T[] | undefined,
-  onSelectItems: ((items: T[]) => void) | undefined,
-  normalize: Normalizer<T> = defaultNormalizer
+export function multipleSelection<V>(
+  selectedValues: V[] | undefined,
+  onSelectValues: ((value: V[]) => void) | undefined
 ) {
-  function isSelected(item: T | undefined) {
-    if (!selectedItems || !item) return false
-
-    const { key } = normalize(item)
-    return selectedItems
-      .map(normalize)
-      .map((n) => n.key)
-      .includes(key)
+  function isSelected(value: V | undefined) {
+    if (selectedValues === undefined || value === undefined) return false
+    else return selectedValues.includes(value)
   }
 
-  function isAllSelected(items: T[]) {
-    const sortedItems = items
-      .map(normalize)
-      .sort((a, b) => (a.key < b.key ? -1 : 1))
+  function isAllSelected(values: V[]) {
+    const compareValues = (a: V, b: V) => (a < b ? -1 : 1)
 
-    const sortedSelection = (selectedItems ?? [])
-      .map(normalize)
-      .sort((a, b) => (a.key < b.key ? -1 : 1))
+    const sortedValues = values.sort(compareValues)
+    const sortedSelection = (selectedValues ?? []).sort(compareValues)
 
     return (
-      sortedItems.length === sortedSelection.length &&
-      sortedItems.every((item, i) => item.key === sortedSelection[i].key)
+      sortedValues.length === sortedSelection.length &&
+      sortedValues.every((key, i) => key === sortedSelection[i])
     )
   }
 
-  function onSelect(item: T | undefined) {
-    if (!item) return onSelectItems?.([])
+  function onSelect(value: V | undefined) {
+    if (value === undefined) return onSelectValues?.([])
 
-    const { key } = normalize(item)
-    const items = selectedItems ?? []
-
-    const selected = isSelected(item)
+    const values = selectedValues ?? []
+    const selected = isSelected(value)
       ? // remove item from selection
-        items.filter((i) => normalize(i).key !== key)
+        values.filter((v) => v !== value)
       : // or add it at the end
-        [...items, item]
+        [...values, value]
 
-    onSelectItems?.(selected)
+    onSelectValues?.(selected)
   }
 
-  function onSelectAll(items: T[]) {
-    if (isAllSelected(items)) {
-      onSelectItems?.([])
+  function onSelectAll(values: V[]) {
+    if (isAllSelected(values)) {
+      onSelectValues?.([])
     } else {
-      onSelectItems?.(items)
+      onSelectValues?.(values)
     }
   }
 

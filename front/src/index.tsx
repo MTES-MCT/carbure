@@ -4,8 +4,6 @@ import { BrowserRouter } from "react-router-dom"
 
 import "./i18n"
 import "./carbure/assets/css/index.css"
-import "common-v2/reset.css"
-import "common-v2/theme.css"
 import * as serviceWorker from "./serviceWorker"
 
 import Carbure from "./carbure"

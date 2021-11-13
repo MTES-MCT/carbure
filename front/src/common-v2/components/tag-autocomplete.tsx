@@ -1,22 +1,26 @@
 import React, { useEffect, useRef, useState } from "react"
-import { defaultNormalizer, Normalizer } from "../utils/normalize"
-import { filterOptions } from "./autocomplete"
+import {
+  defaultNormalizer,
+  denormalizeItems,
+  normalizeItems,
+  Normalizer,
+} from "../utils/normalize"
 import Checkbox from "./checkbox"
 import Dropdown, { Trigger } from "./dropdown"
 import { Control, Field } from "./input"
-import List, { defaultRenderer, Renderer } from "./list"
+import List, { createQueryFilter, defaultRenderer, Renderer } from "./list"
 import { TagGroup } from "./tag"
 
-export interface TagAutocompleteProps<T> extends Control, Trigger {
-  value: T[] | undefined
+export interface TagAutocompleteProps<T, V> extends Control, Trigger {
+  value: V[] | undefined
   options: T[]
-  onChange: (value: T[] | undefined) => void
+  onChange: (value: V[] | undefined) => void
   onQuery?: (query: string) => Promise<T[] | void> | T[] | void
-  normalize?: Normalizer<T>
-  children?: Renderer<T>
+  normalize?: Normalizer<T, V>
+  children?: Renderer<T, V>
 }
 
-function TagAutocomplete<T>({
+function TagAutocomplete<T, V>({
   placeholder,
   value,
   options,
@@ -26,7 +30,7 @@ function TagAutocomplete<T>({
   normalize = defaultNormalizer,
   children = defaultRenderer,
   ...props
-}: TagAutocompleteProps<T>) {
+}: TagAutocompleteProps<T, V>) {
   const triggerRef = useRef<HTMLInputElement>(null)
 
   const autocomplete = useTagAutocomplete({
@@ -42,7 +46,7 @@ function TagAutocomplete<T>({
       <Field {...props} domRef={triggerRef}>
         <TagGroup
           variant="info"
-          items={value}
+          items={autocomplete.tags}
           onDismiss={onChange}
           normalize={normalize}
         >
@@ -67,9 +71,9 @@ function TagAutocomplete<T>({
         <List
           multiple
           controlRef={triggerRef}
-          items={autocomplete.options}
-          selectedItems={value}
-          onSelectItems={autocomplete.onSelect}
+          items={autocomplete.suggestions}
+          selectedValues={value}
+          onSelectValues={autocomplete.onSelect}
           normalize={normalize}
         >
           {({ selected, label }) => (
@@ -83,39 +87,45 @@ function TagAutocomplete<T>({
   )
 }
 
-interface AutocompleteConfig<T> {
-  value: T[] | undefined
+interface AutocompleteConfig<T, V> {
+  value: V[] | undefined
   options: T[]
-  onChange: (value: T[] | undefined) => void
+  onChange: (value: V[] | undefined) => void
   onQuery?: (query: string) => Promise<T[] | void> | T[] | void
-  normalize?: Normalizer<T>
+  normalize?: Normalizer<T, V>
 }
 
-export function useTagAutocomplete<T>({
+export function useTagAutocomplete<T, V>({
   value = [],
-  options: controlledOptions,
+  options,
   onChange,
-  onQuery: controlledOnQuery,
+  onQuery,
   normalize = defaultNormalizer,
-}: AutocompleteConfig<T>) {
+}: AutocompleteConfig<T, V>) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState("")
 
-  const [options, setOptions] = useState(controlledOptions)
-  useEffect(() => setOptions(controlledOptions), [controlledOptions])
+  const [suggestions, setSuggestions] = useState(options)
+  useEffect(() => setSuggestions(options), [options])
 
-  async function onQuery(query: string | undefined = "") {
-    setQuery(query)
-    setOpen(true)
-    controlledOnQuery?.(query)
-
-    const matches = filterOptions(query, options, normalize)
-    setOptions(matches)
+  function filterOptions(query: string): T[] {
+    const options = suggestions
+    const includesQuery = createQueryFilter(query)
+    return denormalizeItems(normalizeItems(options, normalize, includesQuery))
   }
 
-  function onSelect(items: T[] | undefined) {
-    onQuery("")
-    onChange(items)
+  async function onQueryChange(query: string | undefined = "") {
+    setQuery(query)
+    setOpen(true)
+    onQuery?.(query)
+
+    const matches = filterOptions(query)
+    setSuggestions(matches)
+  }
+
+  function onSelect(values: V[] | undefined) {
+    onQueryChange("")
+    onChange(values)
   }
 
   function onKeyDown(e: React.KeyboardEvent) {
@@ -124,7 +134,20 @@ export function useTagAutocomplete<T>({
     }
   }
 
-  return { query, options, open, setOpen, onQuery, onSelect, onKeyDown }
+  const tags = value
+    .map((v) => options.find((o) => normalize(o).value === v))
+    .filter(Boolean) as T[]
+
+  return {
+    open,
+    query,
+    tags,
+    suggestions,
+    setOpen,
+    onSelect,
+    onKeyDown,
+    onQuery: onQueryChange,
+  }
 }
 
 export default TagAutocomplete

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useState } from "react"
 import { useTranslation } from "react-i18next"
 import useLocalStorage from "common-v2/hooks/storage"
 import { Row } from "./scaffold"
@@ -7,34 +7,25 @@ import Button from "./button"
 import { ChevronLeft, ChevronRight } from "./icons"
 import Select from "./select"
 import { Anchors } from "./dropdown"
+import { useInvalidate } from "common-v2/hooks/async"
 
 export interface PaginationProps {
   total: number
-  page: number
-  limit: number
-  onPage: (page: number) => void
-  onLimit: (limit: number) => void
+  page: number | undefined
+  limit: number | null | undefined
+  onPage: (page: number | undefined) => void
+  onLimit: (limit: number | null | undefined) => void
 }
 
 export const Pagination = ({
   total,
-  page,
+  page = 0,
   limit,
   onPage,
   onLimit,
 }: PaginationProps) => {
   const { t } = useTranslation()
-
   const pageCount = limit ? Math.ceil(total / limit) : 1
-  const pages = listPages(pageCount)
-
-  const limits = [
-    { key: 10, label: "10" },
-    { key: 25, label: "25" },
-    { key: 50, label: "50" },
-    { key: 100, label: "100" },
-    { key: 0, label: t("Tous") },
-  ]
 
   return (
     <Row className={css.pagination}>
@@ -52,9 +43,9 @@ export const Pagination = ({
           variant="solid"
           anchor={Anchors.topLeft}
           placeholder={t("Choisir une page")}
-          value={pages.find((p) => p.key === page)}
-          onChange={(page) => onPage(page!.key)}
-          options={pages}
+          value={page}
+          onChange={onPage}
+          options={listPages(pageCount)}
         />
 
         <p>{t("sur {{ pageCount }},", { pageCount })}</p>
@@ -62,9 +53,15 @@ export const Pagination = ({
         <Select
           variant="solid"
           anchor={Anchors.topLeft}
-          value={limits.find((l) => l.key === limit)!}
-          onChange={(limit) => onLimit(limit!.key)}
-          options={limits}
+          value={limit}
+          onChange={onLimit}
+          options={[
+            { value: 10, label: "10" },
+            { value: 25, label: "25" },
+            { value: 50, label: "50" },
+            { value: 100, label: "100" },
+            { value: null, label: t("Tous") },
+          ]}
         />
 
         <p>{t("résultats")}</p>
@@ -81,19 +78,25 @@ export const Pagination = ({
 }
 
 export interface PaginationManager {
-  page: number
-  limit: number
-  setPage: (page: number) => void
-  setLimit: (limit: number) => void
+  page: number | undefined
+  limit: number | null | undefined
+  setPage: (page: number | undefined) => void
+  setLimit: (limit: number | null | undefined) => void
 }
 
 export function usePagination() {
-  const [page, setPage] = useState(0)
-  const [limit, setLimit] = useLocalStorage<number>("carbure:limit", 10) // prettier-ignore
+  const [page, setPage] = useState<number | undefined>(0)
+  const [limit, _setLimit] = useLocalStorage<number | null | undefined>("carbure:limit", 10) // prettier-ignore
 
-  useEffect(() => {
-    setPage(0)
-  }, [limit])
+  const resetPage = useInvalidate("pagination", () => setPage(0))
+
+  const setLimit = useCallback(
+    (limit: number | null | undefined) => {
+      _setLimit(limit)
+      resetPage()
+    },
+    [_setLimit, resetPage]
+  )
 
   return { page, limit, setPage, setLimit }
 }
@@ -101,7 +104,7 @@ export function usePagination() {
 // generate a list of numbers from 0 to size-1
 export function listPages(size: number) {
   return Array.from(Array(size).keys()).map((i) => ({
-    key: i,
+    value: i,
     label: `${i + 1}`,
   }))
 }

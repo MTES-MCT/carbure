@@ -1,11 +1,15 @@
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
-import { Normalizer } from "common-v2/utils/normalize"
-import { formatDate, formatNumber, formatPeriod } from "common-v2/formatters"
+import {
+  formatDate,
+  formatNumber,
+  formatPeriod,
+} from "common-v2/utils/formatters"
 import Table, {
   actionColumn,
   Cell,
   Column,
+  Marker,
   markerColumn,
   selectionColumn,
 } from "common-v2/components/table"
@@ -16,8 +20,8 @@ import { SendIconButton } from "transactions-v2/actions/send"
 export interface LotTableProps {
   loading?: boolean
   lots: Lot[]
-  selected: Lot[]
-  onSelect: (selected: Lot[]) => void
+  selected: number[]
+  onSelect: (selected: number[]) => void
 }
 
 export const LotTable = memo(
@@ -119,8 +123,8 @@ export const LotTable = memo(
         loading={loading}
         rows={lots}
         columns={[
-          markerColumn(() => undefined),
-          selectionColumn(lots, selected, onSelect, normalizeLot),
+          markerColumn(getLotMarker),
+          selectionColumn(lots, selected, onSelect, (lot) => lot.id),
           columns.status,
           columns.period,
           columns.transportDocument,
@@ -138,7 +142,6 @@ export const LotTable = memo(
   }
 )
 
-const normalizeLot: Normalizer<Lot> = (lot) => ({
-  key: `${lot.id}`,
-  label: `${lot.id}`,
-})
+const getLotMarker: Marker<Lot> = (lot) => {
+  return undefined
+}

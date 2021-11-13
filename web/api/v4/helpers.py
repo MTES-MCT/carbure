@@ -252,13 +252,13 @@ def sort_lots(lots, querySet):
     return lots
 
 
-def normalize_filter(list, key=None, label=None):
-    if key is None:
-        return [{'key': item, 'label': item} for item in list if item]
+def normalize_filter(list, value=None, label=None):
+    if value is None:
+        return [{'value': item, 'label': item} for item in list if item]
     if label is None:
-        return [{'key': item[key], 'label': item[key]} for item in list if item]
+        return [{'value': item[value], 'label': item[value]} for item in list if item]
     else:
-        return [{'key': item[key], 'label': item[label]} for item in list if item]
+        return [{'value': item[value], 'label': item[label]} for item in list if item]
 
 
 def get_lots_filters(lots, querySet, entity_id, field):
@@ -278,7 +278,7 @@ def get_lots_filters(lots, querySet, entity_id, field):
 
     if field == 'periods':
         periods = lots.values('period').distinct()
-        return [{'key': str(v['period']), 'label': "%d-%02d" % (v['period']/100, v['period'] % 100)} for v in periods if v]
+        return [{'value': str(v['period']), 'label': "%d-%02d" % (v['period']/100, v['period'] % 100)} for v in periods if v]
 
     if field == 'production_sites':
         production_sites = []

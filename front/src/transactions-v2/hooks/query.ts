@@ -1,6 +1,5 @@
 import { useMemo } from "react"
 import { PaginationManager } from "common-v2/components/pagination"
-import { normalizeFilters } from "../components/filters"
 import { FilterSelection, LotQuery } from "../types"
 
 function useLotQuery(
@@ -13,7 +12,7 @@ function useLotQuery(
   pagination: PaginationManager,
   filters: FilterSelection
 ) {
-  const { page, limit } = pagination
+  const { page = 0, limit } = pagination
 
   return useMemo<LotQuery>(
     () => ({
@@ -23,9 +22,9 @@ function useLotQuery(
       query: query ? query : undefined,
       invalid: invalid ? true : undefined,
       deadline: deadline ? true : undefined,
-      from_idx: page * limit,
+      from_idx: page * (limit ?? 0),
       limit: limit || undefined,
-      ...normalizeFilters(filters),
+      ...filters,
     }),
     [entityID, year, status, query, invalid, deadline, page, limit, filters]
   )

@@ -1,36 +1,50 @@
 import { useRef, useState } from "react"
+import { useAsyncList } from "../hooks/async"
+import { defaultNormalizer, Normalizer } from "../utils/normalize"
 import Dropdown, { Trigger } from "./dropdown"
 import { ChevronDown } from "./icons"
 import { Control, Input } from "./input"
 import List from "./list"
-import { defaultNormalizer, Normalizer } from "../utils/normalize"
 
-export interface SelectProps<T> extends Control, Trigger {
+export interface SelectProps<T, V> extends Control, Trigger {
   clear?: boolean
   search?: boolean
-  value: T | undefined
-  options: T[]
+  value?: V | undefined
+  options?: T[]
   placeholder?: string
-  onChange: (value: T | undefined) => void
-  normalize?: Normalizer<T>
+  getOptions?: () => Promise<T[]>
+  onChange?: (value: V | undefined) => void
+  normalize?: Normalizer<T, V>
 }
 
-export function Select<T>({
+export function Select<T, V>({
   clear,
   search,
   value,
-  options,
   placeholder = "Select an option",
+  options,
+  getOptions,
   onChange,
   onOpen,
   onClose,
   anchor,
   normalize = defaultNormalizer,
   ...props
-}: SelectProps<T>) {
+}: SelectProps<T, V>) {
   const triggerRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState(false)
-  const label = value ? normalize(value).label : placeholder
+
+  const asyncOptions = useAsyncList({
+    selectedValue: value,
+    items: options,
+    getItems: getOptions,
+    normalize,
+  })
+
+  const onClear =
+    clear && value !== undefined && onChange
+      ? () => onChange(undefined) // prettier-ignore
+      : undefined
 
   return (
     <>
@@ -38,27 +52,32 @@ export function Select<T>({
         {...props}
         domRef={triggerRef}
         type="button"
-        value={label}
+        value={asyncOptions.label || placeholder}
         icon={ChevronDown}
-        onClear={clear && value ? () => onChange(undefined) : undefined}
+        onClear={onClear}
+        loading={asyncOptions.loading}
       />
 
       <Dropdown
-        open={open && options.length > 0}
+        open={open && asyncOptions.items.length > 0}
         triggerRef={triggerRef}
         anchor={anchor}
-        onOpen={onOpen}
         onClose={onClose}
         onToggle={setOpen}
+        onOpen={() => {
+          onOpen?.()
+          asyncOptions.execute()
+        }}
       >
         <List
           controlRef={triggerRef}
           search={search}
-          items={options}
-          selectedItem={value}
+          items={asyncOptions.items}
+          selectedValue={value}
+          normalize={normalize}
           onFocus={onChange}
-          onSelectItem={(value) => {
-            onChange(value)
+          onSelectValue={(value) => {
+            onChange?.(value)
             setOpen(false)
           }}
         />

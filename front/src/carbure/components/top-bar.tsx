@@ -133,15 +133,15 @@ const Navigation = ({ entity }: NavigationProps) => {
 }
 
 type Lang = "fr" | "en"
-const languages = {
-  fr: { key: "fr", label: "Français" },
-  en: { key: "en", label: "English" },
-}
+const languages = [
+  { value: "fr", label: "Français" },
+  { value: "en", label: "English" },
+]
 
 const LanguageSelection = () => {
   const { i18n } = useTranslation()
 
-  const [lang, setLang] = useLocalStorage(
+  const [lang, setLang] = useLocalStorage<Lang | undefined>(
     "carbure:language",
     i18n.language as Lang
   )
@@ -154,9 +154,9 @@ const LanguageSelection = () => {
     <Select
       asideX
       variant="text"
-      value={languages[lang]}
-      onChange={(lang) => setLang(lang?.key as Lang)}
-      options={Object.values(languages)}
+      value={lang}
+      onChange={setLang}
+      options={languages}
     />
   )
 }
@@ -174,7 +174,7 @@ const UserMenu = ({ user, entity }: UserMenuProps) => {
   return (
     <Menu
       variant="text"
-      onAction={(item) => navigate(item.path!)}
+      onAction={(path) => navigate(path)}
       label={entity.isBlank ? t("Menu") : entity.name}
       anchor={Anchors.bottomRight}
       items={[

@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { useSearchParams, createSearchParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { useAsyncCallback, UseAsyncReturn } from "react-async-hook"
-import { AxiosResponse } from "axios"
-import { Api } from "common-v2/services/api"
-import { normalizeTree, Option } from "common-v2/utils/normalize"
+import { Option } from "common-v2/utils/normalize"
 import { Grid } from "common-v2/components/scaffold"
 import { MultiSelect, MultiSelectProps } from "common-v2/components/multi-select" // prettier-ignore
 import { Filter, FilterSelection, LotQuery } from "../types"
@@ -15,7 +12,7 @@ export interface FiltersProps {
   status: Status
   query: LotQuery
   selected: FilterSelection
-  onSelect: (field: Filter, value: Option[]) => void
+  onSelect: (field: Filter, value: string[]) => void
 }
 
 export const Filters = ({
@@ -65,7 +62,7 @@ export const Filters = ({
 export interface FilterManager {
   count: number
   selected: FilterSelection
-  onFilter: (filter: Filter, value: Option[]) => void
+  onFilter: (filter: Filter, value: string[]) => void
   resetFilters: () => void
 }
 
@@ -74,16 +71,16 @@ export function useFilters(): FilterManager {
   const [selected, setFilters] = useState<FilterSelection>({})
 
   useEffect(() => {
-    const normalizedFilters = createSearchParams(normalizeFilters(selected))
+    const normalizedFilters = createSearchParams(selected)
     if (normalizedFilters.toString() !== searchParams.toString()) {
       setFilters(searchToFilters(searchParams))
     }
   }, [selected, searchParams])
 
   const onFilter = useCallback(
-    (filter: Filter, value: Option[]) => {
+    (filter: Filter, value: string[]) => {
       setFilters((filters) => ({ ...filters, [filter]: value }))
-      setSearchParams(normalizeFilters({ ...selected, [filter]: value }))
+      setSearchParams({ ...selected, [filter]: value })
     },
     [selected, setSearchParams]
   )
@@ -96,7 +93,7 @@ export function useFilters(): FilterManager {
 }
 
 export type FilterSelectProps = { field: Filter; query: LotQuery } & Omit<
-  MultiSelectProps<Option>,
+  MultiSelectProps<Option, string>,
   "options"
 >
 
@@ -106,70 +103,26 @@ export const FilterSelect = ({
   value = [],
   onChange,
   ...props
-}: FilterSelectProps) => {
-  const options = useAsyncCallback(api.getFilters)
-  const sortedOptions = (options.result?.data.data ?? []).sort(sortFilters)
-
-  // if we already have a value set for the filter before the user has opened the dropdown
-  // fetch the related options and match the value with them
-  if (value.length > 0 && !options.currentPromise) {
-    initFilter(field, query, value, options, onChange)
-  }
-
-  return (
-    <MultiSelect
-      {...props}
-      clear
-      search
-      variant="solid"
-      loading={options.loading}
-      value={value}
-      onChange={onChange}
-      options={sortedOptions}
-      onOpen={() => options.execute(field, query)}
-    />
-  )
-}
-
-export function initFilter(
-  field: Filter,
-  query: LotQuery,
-  value: Option[],
-  options: UseAsyncReturn<AxiosResponse<Api<Option[]>>>,
-  onChange: (value: Option[]) => void
-) {
-  options.execute(field, query).then((res) => {
-    const filterOptions = res.data.data ?? []
-    const normOptions = normalizeTree(filterOptions ?? [])
-
-    const valueKeys = normalizeTree(value ?? []).map((v) => v.key)
-    const valueOptions = normOptions.filter((o) => valueKeys.includes(o.key))
-
-    onChange(valueOptions.map((v) => v.value))
-  })
-}
-
-export function normalizeFilters(filters: FilterSelection) {
-  const normalizedFilters: Partial<Record<Filter, string[]>> = {}
-  for (const filter in filters) {
-    const fkey = filter as Filter
-    normalizedFilters[fkey] = filters[fkey]?.map((f) => f.key) ?? []
-  }
-  return normalizedFilters
-}
+}: FilterSelectProps) => (
+  <MultiSelect
+    {...props}
+    clear
+    search
+    variant="solid"
+    value={value}
+    onChange={onChange}
+    getOptions={() => api.getFilters(field, query)}
+  />
+)
 
 export function searchToFilters(search: URLSearchParams) {
   const filters: FilterSelection = {}
-  search.forEach((key, filter) => {
+  search.forEach((value, filter) => {
     const fkey = filter as Filter
-    filters[fkey] = filters[fkey] || []
-    filters[fkey]!.push({ key, label: key })
+    filters[fkey] = filters[fkey] ?? []
+    filters[fkey]!.push(value)
   })
   return filters
-}
-
-function sortFilters(a: Option, b: Option) {
-  return a.label.localeCompare(b.label, "fr")
 }
 
 const DRAFT_FILTERS = [

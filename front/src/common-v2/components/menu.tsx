@@ -14,7 +14,7 @@ export interface MenuProps extends ButtonProps {
   items: MenuItem[]
   label?: string
   anchor?: Anchor
-  onAction?: (item: MenuItem) => void
+  onAction?: (key: string) => void
 }
 
 export function Menu({
@@ -49,19 +49,18 @@ export function Menu({
             className={css.items}
             items={items}
             normalize={normalizeMenu}
-            onSelectItem={(item) => {
-              if (item?.action) item.action()
-              else if (item && onAction) onAction(item)
+            onSelectValue={(item) => {
+              item !== undefined && onAction?.(item)
               close()
             }}
           >
             {(item) => {
               if (item.group) {
                 return <b>{item.label}</b>
-              } else if (item.value.path) {
-                return <Link to={item.value.path}>{item.label}</Link>
+              } else if (item.data.path) {
+                return <Link to={item.data.path}>{item.label}</Link>
               } else {
-                return <p onClick={item.value.action}>{item.label}</p>
+                return <p onClick={item.data.action}>{item.label}</p>
               }
             }}
           </List>
@@ -78,8 +77,8 @@ export interface MenuItem {
   children?: MenuItem[]
 }
 
-export const normalizeMenu: Normalizer<MenuItem> = (item) => ({
-  key: item.path ?? item.label ?? "",
+export const normalizeMenu: Normalizer<MenuItem, string> = (item) => ({
+  value: item.path ?? item.label ?? "",
   label: item.label ?? item.path ?? "",
   children: item.children,
   disabled: Boolean(item.children),

@@ -1,12 +1,4 @@
-import { Entity } from "carbure/types"
 import { Lot } from "transactions-v2/types"
-import {
-  Biofuel,
-  Country,
-  Depot,
-  Feedstock,
-  ProductionSite,
-} from "common/types"
 import Form, { useForm } from "common-v2/components/form"
 import LotFields from "./lot-fields"
 import ProductionFields from "./production-fields"
@@ -37,28 +29,29 @@ export function useLotForm(initialValue: LotFormValue = defaultLot) {
 }
 
 export const defaultLot = {
+  // save the whole Lot data so we can access it in the form fields
   lot: undefined as Lot | undefined,
 
   transport_document_reference: undefined as string | undefined,
   volume: 0 as number | undefined,
-  biofuel: undefined as Biofuel | undefined,
-  feedstock: undefined as Feedstock | undefined,
-  country_of_origin: undefined as Country | undefined,
+  biofuel: "ETH" as string | undefined,
+  feedstock: "COLZA" as string | undefined,
+  country_of_origin: undefined as string | undefined,
 
-  producer: undefined as Entity | string | undefined,
-  supplier: undefined as Entity | string | undefined,
+  producer: undefined as number | string | undefined,
+  supplier: undefined as number | string | undefined,
   supplier_certificate: undefined as string | undefined,
   free_field: undefined as string | undefined,
 
-  production_site: undefined as ProductionSite | string | undefined,
+  production_site: undefined as number | string | undefined,
   production_site_certificate: undefined as string | undefined,
-  production_country: undefined as Country | undefined,
+  production_country: undefined as string | undefined,
   production_site_double_counting_certificate: undefined as string | undefined,
   production_site_commissioning_date: undefined as string | undefined,
 
-  client: undefined as Entity | string | undefined,
-  delivery_site: undefined as Depot | string | undefined,
-  delivery_site_country: undefined as Country | undefined,
+  client: undefined as number | string | undefined,
+  delivery_site: undefined as string | undefined,
+  delivery_site_country: undefined as string | undefined,
   delivery_date: undefined as string | undefined,
 
   eec: 0 as number | undefined,
