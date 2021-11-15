@@ -30,13 +30,11 @@ export const LotTable = memo(
 
     const columns: Record<string, Column<Lot>> = {
       status: {
-        small: true,
         header: t("Statut"),
         cell: (lot) => <Status lot={lot} />,
       },
 
       period: {
-        small: true,
         header: t("Période"),
         cell: (lot) => (
           <Cell
@@ -130,8 +128,8 @@ export const LotTable = memo(
           columns.transportDocument,
           columns.biofuel,
           columns.feedstock,
-          columns.client,
           columns.supplier,
+          columns.client,
           columns.productionSite,
           columns.deliverySite,
           columns.ghgReduction,

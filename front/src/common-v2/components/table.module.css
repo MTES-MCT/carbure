@@ -70,7 +70,7 @@
 }
 
 .small {
-  flex: 0.33 1;
+  flex: 0.5 1;
 }
 
 .cell,
@@ -137,7 +137,7 @@
 
 .actions {
   display: flex;
-  flex: 0.3;
+  flex: 0.33;
   min-width: min-content;
   justify-content: flex-end;
   gap: var(--spacing-s);
