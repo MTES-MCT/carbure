@@ -1,15 +1,17 @@
 import datetime
 import calendar
+from multiprocessing.context import Process
 from dateutil.relativedelta import relativedelta
 from django.db.models.aggregates import Count
 from django.db.models.expressions import OuterRef, Subquery
 from django.db.models.functions.comparison import Coalesce
 from django.db.models.query_utils import Q
 from django.http.response import HttpResponse, JsonResponse
-from core.models import Biocarburant, CarbureLot, MatierePremiere, Pays
+from core.ign_distance import get_distance
+from core.models import Biocarburant, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, Depot, MatierePremiere, Pays, TransactionDistance
 from core.models import GenericError
-from core.serializers import CarbureLotPublicSerializer
-from core.xlsx_v3 import export_carbure_lots
+from core.serializers import CarbureLotCommentSerializer, CarbureLotEventSerializer, CarbureLotPublicSerializer, CarbureStockPublicSerializer, GenericErrorSerializer
+from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
 
 
 sort_key_to_django_field = {'period': 'period',
@@ -18,6 +20,15 @@ sort_key_to_django_field = {'period': 'period',
                             'volume': 'volume',
                             'country_of_origin': 'country_of_origin__name',
                             'added_by': 'added_by__name'}
+
+stock_sort_key_to_django_field = {'feedstock': 'feedstock__name',
+                                  'ghg_reduction': 'ghg_reduction',
+                                  'volume': 'remaining_volume',
+                                  'country_of_origin': 'country_of_origin__name'}
+
+def get_entity_stock(entity_id):
+    stock = CarbureStock.objects.filter(carbure_client_id=entity_id)
+    return stock
 
 
 def get_entity_lots_by_status(entity_id, status):
@@ -112,6 +123,15 @@ def get_history(tx):
     return [c.natural_key() for c in tx.transactionupdatehistory_set.all().order_by('-datetime')]
 
 
+def get_stock_with_errors(stock, entity_id=None):
+    if entity_id is None:
+        filter = Q(tx=OuterRef('pk'))
+    else:
+        filter = Q(tx=OuterRef('pk')) & (Q(parent_lot__added_by_id=entity_id, display_to_creator=True) | Q(parent_lot__carbure_client_id=entity_id, display_to_recipient=True))
+    tx_errors = GenericError.objects.filter(filter).values('lot').annotate(errors=Count('id')).values('errors')
+    return stock.annotate(errors=Subquery(tx_errors)).filter(errors__gt=0)
+
+
 def get_lots_with_errors(lots, entity_id=None):
     if entity_id is None:
         filter = Q(tx=OuterRef('pk'))
@@ -144,7 +164,10 @@ def filter_lots(lots, querySet, entity_id=None, blacklist=[]):
     is_highlighted_by_admin = querySet.get('is_highlighted_by_admin', None)
     is_highlighted_by_auditor = querySet.get('is_highlighted_by_auditor', None)
     selection = querySet.getlist('selection')
+    history = querySet.get('history', False)
 
+    if history != 'true':
+        lots = lots.exclude(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED])
     if year and 'year' not in blacklist:
         lots = lots.filter(year=year)
     if len(selection) > 0:
@@ -232,7 +255,7 @@ def sort_lots(lots, querySet):
             lots = lots.order_by('-%s' % key)
         else:
             lots = lots.order_by(key)
-    elif sort_by == 'biocarburant':
+    elif sort_by == 'biofuel':
         if order == 'desc':
             lots = lots.order_by('-biofuel__name', '-volume')
         else:
@@ -243,12 +266,12 @@ def sort_lots(lots, querySet):
             lots = lots.order_by('-client')
         else:
             lots = lots.order_by('client')
-    elif sort_by == 'vendor':
+    elif sort_by == 'supplier':
         lots = lots.annotate(vendor=Coalesce('carbure_supplier__name', 'unknown_supplier'))
         if order == 'desc':
-            lots = lots.order_by('-vendor')
+            lots = lots.order_by('-supplier')
         else:
-            lots = lots.order_by('vendor')
+            lots = lots.order_by('supplier')
     return lots
 
 
@@ -261,7 +284,7 @@ def normalize_filter(list, value=None, label=None):
         return [{'value': item[value], 'label': item[label]} for item in list if item]
 
 
-def get_lots_filters(lots, querySet, entity_id, field):
+def get_lots_filters_data(lots, querySet, entity_id, field):
     lots = filter_lots(lots, querySet, entity_id=entity_id, blacklist=[field])[0]
 
     if field == 'feedstocks':
@@ -323,3 +346,197 @@ def get_lots_filters(lots, querySet, entity_id, field):
     if field == 'added_by':
         added_by = lots.values('added_by__name').distinct()
         return normalize_filter(added_by, 'added_by__name')
+
+def get_stock_filters_data(stock, querySet, entity_id, field):
+    stock = filter_stock(stock, querySet, entity_id=entity_id, blacklist=[field])
+
+    if field == 'feedstocks':
+        feedstocks = MatierePremiere.objects.filter(id__in=stock.values('feedstock__id').distinct()).values('code', 'name')
+        return normalize_filter(feedstocks, 'code', 'name')
+
+    if field == 'biofuels':
+        biofuels = Biocarburant.objects.filter(id__in=stock.values('biofuel__id').distinct()).values('code', 'name')
+        return normalize_filter(biofuels, 'code', 'name')
+
+    if field == 'countries_of_origin':
+        countries = Pays.objects.filter(id__in=stock.values('country_of_origin').distinct()).values('code_pays', 'name')
+        return normalize_filter(countries, 'code_pays', 'name')
+
+    if field == 'periods':
+        periods = stock.filter(parent_lot__isnull=False).values('parent_lot__period').distinct()
+        return [{'value': str(v['parent_lot__period']), 'label': "%d-%02d" % (v['parent_lot__period']/100, v['parent_lot__period'] % 100)} for v in periods if v]
+
+    if field == 'depots':
+        depots = Depot.objects.filter(id__in=stock.values('depot__id').distinct()).values('name', 'depot_id')
+        return normalize_filter(depots, 'depot_id', 'name')
+
+    if field == 'suppliers':
+        suppliers = []
+        for item in stock.values('carbure_supplier__name', 'unknown_supplier').distinct():
+            if item['carbure_supplier__name'] not in ('', None):
+                suppliers.append(item['carbure_supplier__name'])
+            elif item['unknown_supplier'] not in ('', None):
+                suppliers.append(item['unknown_supplier'])
+        return normalize_filter(set(suppliers))
+
+    if field == 'production_sites':
+        production_sites = []
+        for item in stock.values('carbure_production_site__name', 'unknown_production_site').distinct():
+            if item['carbure_production_site__name'] not in ('', None):
+                production_sites.append(item['carbure_production_site__name'])
+            elif item['unknown_production_site'] not in ('', None):
+                production_sites.append(item['unknown_production_site'])
+        return normalize_filter(set(production_sites))
+
+
+def get_stock_with_metadata(stock, entity_id, querySet, is_admin=False):
+    export = querySet.get('export', False)
+    limit = querySet.get('limit', None)
+    from_idx = querySet.get('from_idx', "0")
+
+    # filtering
+    stock = filter_stock(stock, querySet, entity_id)
+    # sorting
+    stock = sort_stock(stock, querySet)
+
+    # pagination
+    from_idx = int(from_idx)
+    returned = stock[from_idx:]
+    if limit is not None:
+        limit = int(limit)
+        returned = returned[:limit]
+
+    # enrich dataset with additional metadata
+    serializer = CarbureStockPublicSerializer(returned, many=True)
+    data = {}
+    data['stocks'] = serializer.data
+    data['total'] = stock.count()
+    data['returned'] = returned.count()
+    data['from'] = from_idx
+
+    if not export:
+        return JsonResponse({'status': 'success', 'data': data})
+    else:
+        file_location = export_carbure_stock(entity_id, returned)
+        with open(file_location, "rb") as excel:
+            data = excel.read()
+            ctype = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            response = HttpResponse(content=data, content_type=ctype)
+            response['Content-Disposition'] = 'attachment; filename="%s"' % (file_location)
+        return response
+
+
+def filter_stock(stock, querySet, entity_id=None, blacklist=[]):
+    year = querySet.get('year', False)
+    periods = querySet.getlist('periods')
+    depots = querySet.getlist('depots')
+    feedstocks = querySet.getlist('feedstocks')
+    countries_of_origin = querySet.getlist('countries_of_origin')
+    biofuels = querySet.getlist('biofuels')
+    suppliers = querySet.getlist('suppliers')
+    query = querySet.get('query', False)
+    selection = querySet.getlist('selection')
+    history = querySet.get('history', False)
+
+    if history != 'true':
+        stock = stock.filter(remaining_volume__gt=0)
+    if year and 'year' not in blacklist:
+        stock = stock.filter(Q(parent_lot__year=year) | Q(parent_transformation__transformation_dt__year=year))
+    if len(selection) > 0:
+        stock = stock.filter(pk__in=selection)
+    if len(periods) > 0 and 'periods' not in blacklist:
+        stock = stock.filter(parent_lot__period__in=periods)
+    if len(feedstocks) > 0 and 'feedstocks' not in blacklist:
+        stock = stock.filter(feedstock__code__in=feedstocks)
+    if len(biofuels) > 0 and 'biofuels' not in blacklist:
+        stock = stock.filter(biofuel__code__in=biofuels)
+    if len(countries_of_origin) > 0 and 'countries_of_origin' not in blacklist:
+        stock = stock.filter(country_of_origin__code_pays__in=countries_of_origin)
+    if len(depots) > 0 and 'depots' not in blacklist:
+        stock = stock.filter(depot__in=depots)
+    if len(suppliers) > 0 and 'suppliers' not in blacklist:
+        stock = stock.filter(Q(carbure_supplier__name__in=suppliers) | Q(unknown_supplier__in=suppliers))
+    if query and 'query' not in blacklist:
+        stock = stock.filter(
+            Q(feedstock__name__icontains=query) |
+            Q(biofuel__name__icontains=query) |
+            Q(carbure_id__icontains=query) |
+            Q(country_of_origin__name__icontains=query) |
+            Q(depot__name__icontains=query) |
+            Q(parent_lot__free_field__icontains=query) |
+            Q(parent_lot__transport_document_reference__icontains=query)
+        )
+    return stock
+
+
+def sort_stock(stock, querySet):
+    sort_by = querySet.get('sort_by', False)
+    order = querySet.get('order', False)
+
+    if not sort_by:
+        stock = stock.order_by('-id')
+    elif sort_by in stock_sort_key_to_django_field:
+        key = sort_key_to_django_field[sort_by]
+        if order == 'desc':
+            stock = stock.order_by('-%s' % key)
+        else:
+            stock = stock.order_by(key)
+    elif sort_by == 'biofuel':
+        if order == 'desc':
+            stock = stock.order_by('-biofuel__name', '-remaining_volume')
+        else:
+            stock = stock.order_by('biofuel__name', 'remaining_volume')
+    elif sort_by == 'vendor':
+        stock = stock.annotate(vendor=Coalesce('carbure_supplier__name', 'unknown_supplier'))
+        if order == 'desc':
+            stock = stock.order_by('-vendor')
+        else:
+            stock = stock.order_by('vendor')
+    return stock
+
+def get_lot_errors(lot, entity_id, is_admin):
+    if is_admin:
+        return GenericErrorSerializer(lot.genericerror_set.all(), many=True).data
+    elif entity_id == lot.carbure_supplier:
+        return GenericErrorSerializer(lot.genericerror_set.filter(display_to_creator=True), many=True).data
+    elif entity_id == lot.carbure_client:
+        return  GenericErrorSerializer(lot.genericerror_set.filter(display_to_recipient=True), many=True).data
+    else:
+        return GenericErrorSerializer(lot.genericerror_set.filter(display_to_creator=True), many=True).data
+
+def get_lot_updates(lot, entity_id):
+    CarbureLotEventSerializer(lot.carburelotevent_set.all(), many=True).data
+
+def get_lot_comments(lot, entity_id):
+    CarbureLotCommentSerializer(lot.carburelotcomment_set.all(), many=True).data
+
+def get_transaction_distance(lot):
+    url_link = 'https://www.google.com/maps/dir/?api=1&origin=%s&destination=%s&travelmode=driving'
+    res = {'distance': -1, 'link': '', 'error': None, 'source': None}
+
+    if not lot.carbure_production_site:
+        res['error'] = 'PRODUCTION_SITE_NOT_IN_CARBURE'
+        return res
+    if not lot.carbure_delivery_site:
+        res['error'] = 'DELIVERY_SITE_NOT_IN_CARBURE'
+        return res
+    starting_point = lot.carbure_production_site.gps_coordinates
+    delivery_point = lot.carbure_delivery_site.gps_coordinates
+    if not starting_point:
+        res['error'] = 'PRODUCTION_SITE_COORDINATES_NOT_IN_CARBURE'
+        return res
+    if not delivery_point:
+        res['error'] = 'DELIVERY_SITE_COORDINATES_NOT_IN_CARBURE'
+        return res
+    try:
+        td = TransactionDistance.objects.get(starting_point=starting_point, delivery_point=delivery_point)
+        res['link'] = url_link % (starting_point, delivery_point)
+        res['distance'] = td.distance
+        res['source'] = 'DB'
+        return res
+    except:
+        # not found, launch in background for next time
+        p = Process(target=get_distance, args=(starting_point, delivery_point))
+        p.start()
+        res['error'] = 'DISTANCE_NOT_IN_CACHE'
+        return res
