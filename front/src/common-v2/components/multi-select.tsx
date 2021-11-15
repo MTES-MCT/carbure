@@ -56,7 +56,7 @@ export function MultiSelect<T, V>({
         loading={loading || asyncOptions.loading}
         type="button"
         value={asyncOptions.label || placeholder}
-        icon={ChevronDown}
+        icon={<ChevronDown passthrough />}
         onClear={clear && value && value.length > 0 ? onClear : undefined}
       />
 

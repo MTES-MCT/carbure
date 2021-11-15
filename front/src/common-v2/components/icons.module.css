@@ -1,3 +1,7 @@
+.passthrough {
+  pointer-events: none;
+}
+
 @keyframes loading {
   from {
     transform: rotate(0);

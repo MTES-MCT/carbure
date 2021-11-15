@@ -368,7 +368,7 @@ export const Field = ({
 
       <div className={css.icon}>
         {loading === true ? (
-          <Loader />
+          <Loader passthrough />
         ) : error ? (
           <AlertTriangle title={error} />
         ) : typeof Icon === "function" ? (
