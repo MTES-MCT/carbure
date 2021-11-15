@@ -10,7 +10,7 @@ export const TransactionAdd = () => {
   const { t } = useTranslation()
 
   const navigate = useNavigate()
-  const close = () => navigate("../draft")
+  const close = () => navigate("../drafts")
 
   return (
     <Dialog onClose={close}>

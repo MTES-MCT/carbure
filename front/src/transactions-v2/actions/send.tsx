@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import { Lot } from "../types"
+import { LotQuery } from '../hooks/lot-query'
 import useEntity from "carbure/hooks/entity"
 import { useMutation } from "common-v2/hooks/async"
 import { useNotify } from "common-v2/components/notifications"
@@ -10,7 +12,6 @@ import Dialog from "common-v2/components/dialog"
 import { Check, Return } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
 import * as api from "../api"
-import { Lot, LotQuery } from "../types"
 
 export interface SendButtonProps {
   disabled?: boolean
@@ -18,7 +19,7 @@ export interface SendButtonProps {
   selection: number[]
 }
 
-export const SendButton = ({ disabled, query, selection }: SendButtonProps) => {
+export const SendManyButton = ({ disabled, query, selection }: SendButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
@@ -38,17 +39,18 @@ export const SendButton = ({ disabled, query, selection }: SendButtonProps) => {
 }
 
 export interface SendIconButtonProps {
+  icon?: boolean
   lot: Lot
 }
 
-export const SendIconButton = ({ lot }: SendIconButtonProps) => {
+export const SendOneButton = ({ icon, lot }: SendIconButtonProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
   const portal = usePortal()
 
   return (
     <Button
-      variant="icon"
+      variant={icon ? "icon" : "success"}
       icon={Check}
       title={t("Envoyer le lot")}
       action={() =>

@@ -1,13 +1,13 @@
 import { Fragment } from "react"
+import { LotQuery } from "../hooks/lot-query"
 import Button from "common-v2/components/button"
 import { ActionBar } from "common-v2/components/scaffold"
 import { CreateButton, ExportButton } from "../actions"
 import { AcceptButton } from "../actions/accept"
-import { SendButton } from "../actions/send"
+import { SendManyButton } from "../actions/send"
 import { SearchInput } from "common-v2/components/input"
-import { Cross, Flask, Wrench } from "common-v2/components/icons"
-import { SubSwitcher } from "./switches"
-import { LotQuery } from "../types"
+import { Cross, Wrench } from "common-v2/components/icons"
+import { HistorySwitcher } from "./switches"
 
 export interface ActionBarProps {
   count: number
@@ -15,15 +15,15 @@ export interface ActionBarProps {
   selection: number[]
   pending: number
   history: number
-  sub: string
+  category: string
   search: string | undefined
   onSwitch: (tab: string) => void
   onSearch: (search: string | undefined) => void
 }
 
-export const Actions = ({
+export const LotActions = ({
   count,
-  sub,
+  category,
   pending,
   history,
   search,
@@ -38,20 +38,20 @@ export const Actions = ({
   return (
     <ActionBar>
       {["IN", "OUT"].includes(status) && (
-        <SubSwitcher
-          sub={sub}
+        <HistorySwitcher
+          focus={category}
           pending={pending}
           history={history}
-          onSwitch={onSwitch}
+          onFocus={onSwitch}
         />
       )}
 
       <ExportButton {...props} />
 
-      {status === "DRAFT" && (
+      {status === "DRAFTS" && (
         <Fragment>
           <CreateButton />
-          <SendButton {...props} disabled={isEmpty} />
+          <SendManyButton {...props} disabled={isEmpty} />
           <Button
             disabled={isEmpty}
             variant="danger"
@@ -81,12 +81,6 @@ export const Actions = ({
         </Fragment>
       )}
 
-      {status === "STOCK" && (
-        <Fragment>
-          <Button variant="primary" icon={Flask} label={"Transformer"} />
-        </Fragment>
-      )}
-
       {status === "OUT" && (
         <Fragment>
           <Button label="TODO" />
@@ -103,3 +97,5 @@ export const Actions = ({
     </ActionBar>
   )
 }
+
+export default LotActions

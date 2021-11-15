@@ -59,6 +59,8 @@ export interface Lot {
   ghg_reference_red_ii: number
   ghg_reduction_red_ii: number
   free_field: string
+  parent_lot: number
+  parent_stock: number
 }
 
 export interface LotList {
@@ -70,17 +72,47 @@ export interface LotList {
   deadlines: { date: string; total: number }
 }
 
+export interface Stock {
+  id: number
+  feedstock: Feedstock | null
+  biofuel: Biofuel | null
+  initial_volume: number
+  remaining_volume: number 
+  remaining_weight: number 
+  remaining_lhv_amount: number 
+  carbure_production_site: ProductionSite | null
+  unknown_production_site: string | null
+  production_country: Country | null
+  carbure_supplier: Entity | null
+  unknown_supplier: string | null
+  carbure_client: Entity | null
+  depot: Depot | null
+  delivery_date: string | null
+  country_of_origin: Country | null
+  ghg_reduction: number
+  ghg_reduction_red_ii: number
+  parent_lot: number
+  parent_transformation: number
+}
+
+export interface StockList {
+  stocks: Stock[]
+  total: number
+  returned: number
+  from: number
+}
+
+
 export interface Snapshot {
   lots: {
     draft: number
     in_total: number
     in_pending: number
-    in_accepted: number
     in_tofix: number
     stock: number
+    stock_total: number
     out_total: number
     out_pending: number
-    out_accepted: number
     out_tofix: number
   }
 }
@@ -130,6 +162,7 @@ export enum Filter {
   Clients = "clients",
   ProductionSites = "production_sites",
   DeliverySites = "delivery_sites",
+  Depots = "depots",
   AddedBy = "added_by",
   Errors = "errors",
   Forwarded = "is_forwarded",
@@ -142,33 +175,4 @@ export enum Filter {
 
 export type FilterSelection = Partial<Record<Filter, string[]>>
 
-export interface LotQuery {
-  entity_id: number
-  status?: string // "draft" | "in" | "stock" | "out"
-  year?: number
-  query?: string
-  order_by?: string
-  direction?: string
-  from_idx?: number
-  limit?: number
-  invalid?: boolean
-  deadline?: boolean
-  history?: boolean
-  correction?: boolean
-  [Filter.DeliveryStatus]?: string[]
-  [Filter.Feedstocks]?: string[]
-  [Filter.Biofuels]?: string[]
-  [Filter.Periods]?: string[]
-  [Filter.CountriesOfOrigin]?: string[]
-  [Filter.Suppliers]?: string[]
-  [Filter.Clients]?: string[]
-  [Filter.ProductionSites]?: string[]
-  [Filter.DeliverySites]?: string[]
-  [Filter.AddedBy]?: string[]
-  [Filter.Errors]?: string[]
-  [Filter.Forwarded]?: string[]
-  [Filter.Mac]?: string[]
-  [Filter.HiddenByAdmin]?: string[]
-  [Filter.HiddenByAuditor]?: string[]
-  [Filter.ClientTypes]?: string[]
-}
+export type Status = "DRAFTS" | "IN" | "STOCKS" | "OUT" | "ADMIN" | "UNKNOWN"

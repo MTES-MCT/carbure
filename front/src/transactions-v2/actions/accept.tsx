@@ -4,7 +4,7 @@ import Menu from "common-v2/components/menu"
 import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
 import { Check } from "common-v2/components/icons"
-import { LotQuery } from "transactions-v2/types"
+import { LotQuery } from "../hooks/lot-query"
 
 export interface AcceptButtonProps {
   disabled?: boolean

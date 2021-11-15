@@ -1,10 +1,10 @@
 import { useMatch } from "react-router-dom"
+import { Status } from '../types'
 
-export type Status = "DRAFT" | "IN" | "STOCK" | "OUT" | "ADMIN" | "UNKNOWN"
 const URL_TO_STATUS: Record<string, Status> = {
-  draft: "DRAFT",
+  drafts: "DRAFTS",
   in: "IN",
-  stock: "STOCK",
+  stocks: "STOCKS",
   out: "OUT",
   admin: "ADMIN",
   unknown: "UNKNOWN",
