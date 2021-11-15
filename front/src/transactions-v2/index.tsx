@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import useEntity from "carbure/hooks/entity"
 import { useQuery } from "common-v2/hooks/async"
-import useStatus from "./hooks/status"
+import useStatus, { Status } from "./hooks/status"
 import useLotQuery from "./hooks/query"
 import { Bar, Main } from "common-v2/components/scaffold"
 import Select from "common-v2/components/select"
@@ -15,9 +15,14 @@ import NoResult from "./components/no-result"
 import StatusTabs from "./components/status-tabs"
 import { Actions } from "./components/actions"
 import { DeclarationButton } from "./actions/declaration"
-import * as api from "./api"
-import { DeadlineSwitch, InvalidSwitch } from "./components/switches"
+import {
+  CorrectionSwitch,
+  DeadlineSwitch,
+  InvalidSwitch,
+} from "./components/switches"
 import TransactionAdd from "transaction-add"
+import * as api from "./api"
+import { Snapshot } from "./types"
 
 export const Transactions = () => {
   const { t } = useTranslation()
@@ -27,22 +32,26 @@ export const Transactions = () => {
   const filters = useFilters()
   const pagination = usePagination()
 
-  const [hasDeadline, showDeadline] = useState(false)
-  const [hasErrors, showErrors] = useState(false)
+  const [sub, setSub] = useState("pending")
+  const [correction, showCorrections] = useState(false)
+  const [invalid, showInvalid] = useState(false)
+  const [deadline, showDeadline] = useState(false)
   const [search, setSearch] = useState<string | undefined>()
   const [selection, setSelection] = useState<number[]>([])
   const [year = 2021, setYear] = useState<number | undefined>()
 
-  const query = useLotQuery(
-    entity.id,
+  const query = useLotQuery({
+    entity,
     status,
+    sub,
     year,
     search,
-    hasErrors,
-    hasDeadline,
+    correction,
+    invalid,
+    deadline,
     pagination,
-    filters.selected
-  )
+    filters: filters.selected,
+  })
 
   const snapshot = useQuery(api.getSnapshot, {
     key: "transactions-snapshot",
@@ -58,13 +67,14 @@ export const Transactions = () => {
     return <Navigate to="draft" />
   }
 
-  const lotsData = lots.result?.data.data
   const snapshotData = snapshot.result?.data.data
+  const count = getCount(status, snapshotData)
 
+  const lotsData = lots.result?.data.data
   const lotList = lotsData?.lots ?? []
-  const count = lotsData?.returned ?? 0
+  const returned = lotsData?.returned ?? 0
   const total = lotsData?.total ?? 0
-  const deadline = lotsData?.deadlines ?? { total: 0, date: "" }
+  const expiration = lotsData?.deadlines ?? { total: 0, date: "" }
   const errors = Object.keys(lotsData?.errors ?? {})
 
   return (
@@ -101,31 +111,43 @@ export const Transactions = () => {
 
         <section>
           <Actions
-            count={count}
+            count={returned}
             query={query}
             selection={selection}
+            sub={sub}
+            pending={count.pending}
+            history={count.history}
             search={search}
+            onSwitch={setSub}
             onSearch={setSearch}
           />
+
+          {count.tofix > 0 && (
+            <CorrectionSwitch
+              count={count?.tofix}
+              active={correction}
+              onSwitch={showCorrections}
+            />
+          )}
 
           {errors.length > 0 && (
             <InvalidSwitch
               count={errors.length}
-              active={hasErrors}
-              onSwitch={showErrors}
+              active={invalid}
+              onSwitch={showInvalid}
             />
           )}
 
-          {deadline.total > 0 && (
+          {expiration.total > 0 && (
             <DeadlineSwitch
-              count={deadline.total}
-              date={deadline.date}
-              active={hasDeadline}
+              count={expiration.total}
+              date={expiration.date}
+              active={deadline}
               onSwitch={showDeadline}
             />
           )}
 
-          {count === 0 && (
+          {returned === 0 && (
             <NoResult
               loading={lots.loading}
               count={filters.count}
@@ -133,7 +155,7 @@ export const Transactions = () => {
             />
           )}
 
-          {count > 0 && (
+          {returned > 0 && (
             <LotTable
               loading={lots.loading}
               lots={lotList}
@@ -157,6 +179,29 @@ export const Transactions = () => {
       </Routes>
     </PortalProvider>
   )
+}
+
+function getCount(status: Status, snapshot: Snapshot | undefined) {
+  switch (status) {
+    case "IN":
+      return {
+        pending: snapshot?.lots.in_pending ?? 0,
+        history: snapshot?.lots.in_accepted ?? 0,
+        tofix: snapshot?.lots.in_tofix ?? 0,
+      }
+    case "OUT":
+      return {
+        pending: snapshot?.lots.out_pending ?? 0,
+        history: snapshot?.lots.out_accepted ?? 0,
+        tofix: snapshot?.lots.out_tofix ?? 0,
+      }
+    default:
+      return {
+        pending: 0,
+        history: 0,
+        tofix: 0,
+      }
+  }
 }
 
 export default Transactions
