@@ -5,12 +5,11 @@ import { Loader } from "common-v2/components/icons"
 
 const defaultCount: Snapshot["lots"] = {
   draft: 0,
-  in_accepted: 0,
   in_pending: 0,
   in_tofix: 0,
   in_total: 0,
   stock: 0,
-  out_accepted: 0,
+  stock_total: 0,
   out_pending: 0,
   out_tofix: 0,
   out_total: 0,
@@ -33,7 +32,7 @@ export const StatusTabs = ({
       tabs={[
         {
           key: "draft",
-          path: "draft",
+          path: "drafts",
           label: (
             <StatusRecap
               loading={loading}
@@ -56,7 +55,7 @@ export const StatusTabs = ({
         },
         {
           key: "stock",
-          path: "stock",
+          path: "stocks",
           label: (
             <StatusRecap
               loading={loading}

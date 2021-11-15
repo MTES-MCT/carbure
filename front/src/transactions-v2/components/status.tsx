@@ -1,13 +1,13 @@
 import { useTranslation } from "react-i18next"
 import { Tag, TagProps, TagVariant } from "common-v2/components/tag"
 
-import { Lot, LotStatus } from "../types"
+import { Lot, Stock, LotStatus } from "../types"
 
-export interface StatusProps extends TagProps {
+export interface LotTagProps extends TagProps {
   lot: Lot
 }
 
-const Status = ({ lot, ...props }: StatusProps) => {
+export const LotTag = ({ lot, ...props }: LotTagProps) => {
   const { t } = useTranslation()
 
   let label = t("N/A")
@@ -32,4 +32,25 @@ const Status = ({ lot, ...props }: StatusProps) => {
   return <Tag {...props} variant={variant} label={label} />
 }
 
-export default Status
+export interface StockTagProps extends TagProps {
+  stock: Stock
+}
+
+export const StockTag = ({ stock, ...props }: StockTagProps) => {
+  const { t } = useTranslation()
+
+  let label = t("N/A")
+  let variant: TagVariant | undefined = undefined
+
+  if (stock.remaining_volume === stock.initial_volume) {
+    variant = 'success'
+    label = t("En stock")
+  } else if (stock.remaining_volume > 0) {
+    variant = 'info'
+    label = t("Entamé")
+  } else {
+    label = t("Vide")
+  }
+
+  return <Tag {...props} variant={variant} label={label} />
+}

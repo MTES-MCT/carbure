@@ -3,33 +3,37 @@ import { AlertCircle, Alarm, Wrench } from "common-v2/components/icons"
 import Switch, { SwitchProps } from "common-v2/components/switch"
 import Tabs from "common-v2/components/tabs"
 
-export interface SubSwitcherProps {
+export interface HistorySwitcherProps {
+  focus: string
   pending: number
   history: number
-  sub: string
-  onSwitch: (sub: string) => void
+  pendingLabel?: string
+  historyLabel?: string
+  onFocus: (sub: string) => void
 }
 
-export const SubSwitcher = ({
+export const HistorySwitcher = ({
+  focus,
   pending,
   history,
-  sub,
-  onSwitch,
-}: SubSwitcherProps) => {
+  pendingLabel,
+  historyLabel,
+  onFocus: onSwitch,
+}: HistorySwitcherProps) => {
   const { t } = useTranslation()
   return (
     <Tabs
       variant="switcher"
-      focus={sub}
+      focus={focus}
       onFocus={onSwitch}
       tabs={[
         {
           key: "pending",
-          label: `${t("En attente")} (${pending})`,
+          label: `${pendingLabel ?? t("En attente")} (${pending})`,
         },
         {
           key: "history",
-          label: `${t("Historique")} (${history})`,
+          label: `${historyLabel ?? t("Historique")} (${history})`,
         },
       ]}
     />
@@ -55,7 +59,7 @@ export const CorrectionSwitch = ({
     <p>
       {!active && <Trans>Parmi ces résultats, </Trans>}
       <Trans count={count}>
-        <b>{{ count }} lots</b> doivent encore être corrigés.
+        <b>{{ count }} lots</b> sont en attente de correction.
       </Trans>
     </p>
   </Switch>

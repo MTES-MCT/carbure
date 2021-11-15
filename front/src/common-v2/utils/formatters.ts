@@ -2,7 +2,7 @@ import i18n from "i18n"
 import format from "date-fns/intlFormat"
 
 export function formatPeriod(period: number) {
-  return `${("0" + (period % 100)).slice(-2)} / ${Math.floor(period / 100)}`
+  return `${Math.floor(period / 100)}-${("0" + (period % 100)).slice(-2)}`
 }
 
 export function formatNumber(num: number) {

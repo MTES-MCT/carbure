@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from "react"
 import { useSearchParams, createSearchParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { Filter, FilterSelection, Status } from "../types"
+import { LotQuery } from '../hooks/lot-query'
 import { Option } from "common-v2/utils/normalize"
 import { Grid } from "common-v2/components/scaffold"
 import { MultiSelect, MultiSelectProps } from "common-v2/components/multi-select" // prettier-ignore
-import { Filter, FilterSelection, LotQuery } from "../types"
 import * as api from "../api"
-import { Status } from "../hooks/status"
 
 export interface FiltersProps {
   status: Status
@@ -23,6 +23,11 @@ export const Filters = ({
 }: FiltersProps) => {
   const { t } = useTranslation()
 
+  // prettier-ignore
+  const getFilters = status === 'STOCKS'
+    ? api.getStockFilters
+    : api.getLotFilters
+
   const filterLabels = {
     [Filter.DeliveryStatus]: t("Livraison"),
     [Filter.Periods]: t("Périodes"),
@@ -31,6 +36,7 @@ export const Filters = ({
     [Filter.Biofuels]: t("Biocarburants"),
     [Filter.CountriesOfOrigin]: t("Pays d'origine"),
     [Filter.DeliverySites]: t("Sites de livraison"),
+    [Filter.Depots]: t("Dépôts"),
     [Filter.Clients]: t("Clients"),
     [Filter.Suppliers]: t("Fournisseurs"),
     [Filter.AddedBy]: t("Ajouté par"),
@@ -43,6 +49,7 @@ export const Filters = ({
     [Filter.ShowEmpty]: t("Inclure stocks vides"),
   }
 
+
   return (
     <Grid>
       {statusFilters[status].map((field) => (
@@ -53,6 +60,7 @@ export const Filters = ({
           placeholder={filterLabels[field]}
           value={selected[field]}
           onChange={(value) => onSelect(field, value ?? [])}
+          getOptions={() => getFilters(field, query)}
         />
       ))}
     </Grid>
@@ -111,7 +119,6 @@ export const FilterSelect = ({
     variant="solid"
     value={value}
     onChange={onChange}
-    getOptions={() => api.getFilters(field, query)}
   />
 )
 
@@ -151,9 +158,9 @@ const STOCK_FILTERS = [
   Filter.Biofuels,
   Filter.Feedstocks,
   Filter.CountriesOfOrigin,
-  Filter.Clients,
+  Filter.Suppliers,
   Filter.ProductionSites,
-  Filter.DeliverySites,
+  Filter.Depots,
 ]
 
 const OUT_FILTERS = [
@@ -185,9 +192,9 @@ const ADMIN_FILTERS = [
 ]
 
 const statusFilters: Record<Status, Filter[]> = {
-  DRAFT: DRAFT_FILTERS,
+  DRAFTS: DRAFT_FILTERS,
   IN: IN_FILTERS,
-  STOCK: STOCK_FILTERS,
+  STOCKS: STOCK_FILTERS,
   OUT: OUT_FILTERS,
   ADMIN: ADMIN_FILTERS,
   UNKNOWN: [],

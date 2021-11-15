@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next"
+import { LotQuery } from "../hooks/lot-query"
 import Button from "common-v2/components/button"
 import { Plus } from "common-v2/components/icons"
-import { LotQuery } from "transactions-v2/types"
-import * as api from "../api"
 import { Download } from "common/components/icons"
+import * as api from "../api"
 
 export interface ExportButtonProps {
   query: LotQuery
@@ -28,7 +28,7 @@ export const CreateButton = () => {
       variant="primary"
       icon={Plus}
       label={t("Créer un lot")}
-      to="draft/add"
+      to="drafts/add"
     />
   )
 }
