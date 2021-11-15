@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { CSSProperties, useEffect, useState } from "react"
 import cl from "clsx"
 import {
   Link,
@@ -8,8 +8,9 @@ import {
   useResolvedPath,
 } from "react-router-dom"
 import css from "./tabs.module.css"
+import { Layout, layout } from "./scaffold"
 
-export type TabVariant = "header" | "main" | "section" | "sticky"
+export type TabVariant = "header" | "main" | "section" | "sticky" | "switcher"
 
 export interface Tab {
   key: string
@@ -17,32 +18,51 @@ export interface Tab {
   path?: string
 }
 
-export interface TabsProps {
+export interface TabsProps extends Layout {
+  className?: string
+  style?: CSSProperties
   tabs: (Tab | false)[]
   variant?: TabVariant
+  focus?: string
   onFocus?: (tab: string) => void
   children?: (tab: string) => React.ReactNode
 }
 
-export const Tabs = ({ variant = "section", tabs, children }: TabsProps) => {
+export const Tabs = ({
+  className,
+  style,
+  variant = "section",
+  tabs,
+  focus: controlledFocus,
+  onFocus,
+  children,
+  ...props
+}: TabsProps) => {
   const matcher = useMatcher()
   const okTabs = tabs.filter(Boolean) as Tab[]
   const match = okTabs.find((tab) => matcher(tab.path)) ?? okTabs[0]
 
-  const [focus, setFocus] = useState(match.key)
+  const [focus, setFocus] = useState(controlledFocus ?? match.key)
 
   useEffect(() => {
-    setFocus(match.key)
-  }, [match.key])
+    setFocus(controlledFocus ?? match.key)
+  }, [controlledFocus, match.key])
 
   return (
     <>
-      <nav className={cl(css.tabs, css[variant])}>
+      <nav
+        {...layout(props)}
+        className={cl(css.tabs, css[variant], className)}
+        style={style}
+      >
         {okTabs.map((tab) => {
           const props = {
             key: tab.key,
             className: cl(tab.key === focus && css.active),
-            onClick: () => setFocus(tab.key),
+            onClick: () => {
+              setFocus(tab.key)
+              onFocus?.(tab.key)
+            },
           }
 
           return tab.path ? (

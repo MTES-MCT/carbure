@@ -91,3 +91,32 @@
   font-weight: bold;
   text-decoration: underline;
 }
+
+.switcher {
+  border: 1px solid var(--gray-medium);
+  border-radius: var(--border-radius);
+  gap: 1px;
+  background-color: var(--gray-medium);
+  overflow: hidden;
+}
+
+.switcher a {
+  padding: var(--spacing-s) var(--spacing-m);
+  background-color: var(--white);
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+}
+
+.switcher a:hover {
+  background-color: var(--gray-highlight);
+}
+
+.switcher a.active {
+  background-color: var(--blue-medium);
+  color: var(--white);
+}
+
+.switcher a.active:hover {
+  background-color: var(--blue-dark);
+}

@@ -7,7 +7,7 @@
   box-shadow: var(--shadow);
   font-size: 0.8em;
   padding: var(--spacing-xs) var(--spacing-s);
-  border-radius: var(--spacing-xs);
+  border-radius: var(--border-radius);
   white-space: nowrap;
   overflow: hidden;
 }
