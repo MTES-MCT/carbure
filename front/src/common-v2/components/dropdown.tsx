@@ -95,6 +95,17 @@ export const Dropdown = ({
       }
     }
 
+    function onClickOustide(e: MouseEvent) {
+      if (!open) return
+
+      const isInsideTrigger = isInside(triggerRef.current, e.target)
+      const isInsideDropdown = isInside(dropdownRef.current, e.target)
+
+      if (!isInsideTrigger && !isInsideDropdown) {
+        setOpen(false)
+      }
+    }
+
     function onBlur(e: FocusEvent) {
       if (!isInside(dropdownRef.current, e.relatedTarget)) {
         setOpen(false)
@@ -117,11 +128,13 @@ export const Dropdown = ({
       }
     }
 
+    window.addEventListener("click", onClickOustide)
     trigger.addEventListener("click", onClick)
     trigger.addEventListener("keydown", onKeyDown, true)
     trigger.addEventListener("blur", onBlur, true)
 
     return () => {
+      window.removeEventListener("click", onClickOustide)
       trigger.removeEventListener("click", onClick)
       trigger.removeEventListener("keydown", onKeyDown, true)
       trigger.removeEventListener("blur", onBlur, true)

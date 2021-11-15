@@ -5,30 +5,32 @@ import css from "./icons.module.css"
 // icons were adapted from https://github.com/tabler/tabler-icons
 
 export interface IconProps {
+  passthrough?: boolean
+  className?: string
+  style?: React.CSSProperties
   size?: number
   color?: string
   fill?: string
   stroke?: number
-  className?: string
-  style?: React.CSSProperties
   title?: string
   children?: React.ReactNode
   onClick?: React.MouseEventHandler<SVGSVGElement>
 }
 
 const Icon = ({
+  className,
+  passthrough,
   size = 24,
   color = "currentColor",
   stroke = 2,
   fill = "none",
-  className,
   title,
   children,
   ...props
 }: IconProps) => (
   <svg
     data-icon
-    className={cl("icon", className)}
+    className={cl("icon", passthrough && css.passthrough, className)}
     width={size}
     height={size}
     viewBox="0 0 24 24"
@@ -39,13 +41,13 @@ const Icon = ({
     strokeLinejoin="round"
     {...props}
   >
-    <title>{title}</title>
+    {title && <title>{title}</title>}
     {children}
   </svg>
 )
 
 export const Placeholder = ({ className, ...props }: IconProps) => (
-  <Icon {...props} className={cl("placeholder", className)} />
+  <Icon passthrough {...props} className={cl("placeholder", className)} />
 )
 
 export const ChevronDown = ({ className, ...props }: IconProps) => (
@@ -383,5 +385,11 @@ export const History = ({ className, ...props }: IconProps) => (
   <Icon {...props} className={cl("history", className)}>
     <polyline points="12 8 12 12 14 14" />
     <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5" />
+  </Icon>
+)
+
+export const Wrench = ({ className, ...props }: IconProps) => (
+  <Icon {...props} className={cl("wrench", className)}>
+    <path d="M7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6 -6a6 6 0 0 1 -8 -8l3.5 3.5" />
   </Icon>
 )

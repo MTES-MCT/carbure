@@ -53,7 +53,7 @@ export function Select<T, V>({
         domRef={triggerRef}
         type="button"
         value={asyncOptions.label || placeholder}
-        icon={ChevronDown}
+        icon={<ChevronDown passthrough />}
         onClear={onClear}
         loading={asyncOptions.loading}
       />
