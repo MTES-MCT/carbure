@@ -145,11 +145,17 @@
 }
 
 .search {
+  flex: 1 1;
+  max-width: 256px;
   background-color: var(--white);
 }
 
 .search .control {
   padding: var(--spacing-s);
+}
+
+.search input {
+  width: 0;
 }
 
 .search .icon:first-child {

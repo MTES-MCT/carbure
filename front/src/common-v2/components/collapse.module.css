@@ -4,7 +4,7 @@
   gap: var(--spacing-m);
   background-color: var(--gray-light);
   border: 1px solid var(--gray-medium);
-  border-radius: var(--spacing-xs);
+  border-radius: var(--border-radius);
 }
 
 .collapse header {

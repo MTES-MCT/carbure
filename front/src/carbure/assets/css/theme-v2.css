@@ -31,9 +31,6 @@
   --font-size: 16px;
   --font-family: Marianne, arial, sans-serif;
 
-  --shadow: 0 1px 2px var(--gray-medium);
-  --border: 1px solid var(--gray-highlight);
-
   --spacing-xxs: 2px;
   --spacing-xs: 4px;
   --spacing-s: 8px;
@@ -44,6 +41,10 @@
 
   --main-spacing-x: var(--spacing-l);
   --main-spacing-y: var(--spacing-l);
+
+  --shadow: 0 1px 2px var(--gray-medium);
+  --border: 1px solid var(--gray-highlight);
+  --border-radius: var(--spacing-xs);
 }
 
 @media screen and (min-width: 1600px) {
