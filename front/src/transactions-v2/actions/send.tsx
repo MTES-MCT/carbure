@@ -99,7 +99,7 @@ const SendDialog = ({ query, selection, onClose }: SendDialogProps) => {
     onError: () => {
       const text = v({
         zero: t("Les lots n'ont pas pu être envoyés !"),
-        one: t("Le lot m'a pas pu être envoyé !"),
+        one: t("Le lot n'a pas pu être envoyé !"),
         many: t("Les lots sélectionnés n'ont pas pu être envoyés !"),
       })
 
