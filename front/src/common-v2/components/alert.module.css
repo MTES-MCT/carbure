@@ -4,7 +4,7 @@
   gap: var(--spacing-m);
   background-color: var(--gray-highlight);
   border: 1px solid var(--gray-medium);
-  border-radius: var(--spacing-xs);
+  border-radius: var(--border-radius);
   white-space: nowrap;
   overflow: hidden;
 }
@@ -24,7 +24,7 @@
 }
 
 .info [data-icon] {
-  color: var(--blue-dark);
+  color: var(--blue-medium);
 }
 
 .success {
