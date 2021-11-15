@@ -5,41 +5,40 @@ urlpatterns = [
     # GET
     path('snapshot', views.get_snapshot, name='api-v4-get-snapshot'),
     path('lots', views.get_lots, name='api-v4-get-lots'),
-    path('lots/details', views.get_details, name='api-v4-get-details'),
+    path('lots/details', views.get_details, name='api-v4-get-lot-details'),
+    path('lots/filters', views.get_lots_filters, name='api-v4-get-lots-filters'),
     # POST
     ### Lot initial life
     path('lots/add', views.get_snapshot, name='api-v4-add-lots'),
-    path('lots/add-excel', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('lots/update', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('lots/send', views.get_snapshot, name='api-v4-get-snapshot'),
+    path('lots/add-excel', views.get_snapshot, name='api-v4-add-excel'),
+    path('lots/update', views.get_snapshot, name='api-v4-update-lots'),
+    path('lots/send', views.get_snapshot, name='api-v4-send-lots'),
     ### Corrections
-    path('lots/comment', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('lots/request-fix', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('lots/mark-as-fixed', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('lots/approve-fix', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('lots/reject', views.get_snapshot, name='api-v4-get-snapshot'),
+    path('lots/comment', views.get_snapshot, name='api-v4-comment-lots'),
+    path('lots/request-fix', views.get_snapshot, name='api-v4-request-fix'),
+    path('lots/mark-as-fixed', views.get_snapshot, name='api-v4-mark-as-fixed'),
+    path('lots/approve-fix', views.get_snapshot, name='api-v4-approve-fix'),
+    path('lots/reject', views.get_snapshot, name='api-v4-reject-lots'),
     ### Approval
-    path('lots/accept-release-for-consumption', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('lots/accept-in-stock', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('lots/accept-trading', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('lots/accept-processing', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('lots/accept-blending', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('lots/accept-export', views.get_snapshot, name='api-v4-get-snapshot'),
+    path('lots/accept-release-for-consumption', views.get_snapshot, name='api-v4-accept-rfx'),
+    path('lots/accept-in-stock', views.get_snapshot, name='api-v4-accept-in-stock'),
+    path('lots/accept-trading', views.get_snapshot, name='api-v4-accept-trading'),
+    path('lots/accept-processing', views.get_snapshot, name='api-v4-accept-processing'),
+    path('lots/accept-blending', views.get_snapshot, name='api-v4-accept-blending'),
+    path('lots/accept-export', views.get_snapshot, name='api-v4-accept-export'),
 
 
     # STOCKS
-    path('stock', views.get_stock, name='api-v4-get-stock'),
-    path('stock/cancel-transformation', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('stock/split', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('stock/transform', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('stock/flush', views.get_snapshot, name='api-v4-get-snapshot'),
+    path('stocks', views.get_stock, name='api-v4-get-stock'),
+    path('stocks/cancel-transformation', views.get_snapshot, name='api-v4-cancel-transformation'),
+    path('stocks/split', views.get_snapshot, name='api-v4-stokc-split'),
+    path('stocks/transform', views.get_snapshot, name='api-v4-stock-transform'),
+    path('stocks/flush', views.get_snapshot, name='api-v4-stock-flush'),
+    path('stocks/filters', views.get_stock_filters, name='api-v4-get-stock-filters'),
 
     # DECLARATIONS
     path('declarations/validate', views.get_snapshot, name='api-v4-get-snapshot'),
     path('declarations/invalidate', views.get_snapshot, name='api-v4-get-snapshot'),
-
-    # FILERTING
-    path('filters', views.get_filters, name='api-v4-lots-get-filters'),
 
     #### missing endpoints vs previous version
     # GET
