@@ -5,7 +5,7 @@ urlpatterns = [
     # GET
     path('snapshot', views.get_snapshot, name='api-v4-get-snapshot'),
     path('lots', views.get_lots, name='api-v4-get-lots'),
-    path('lots/details', views.get_details, name='api-v4-get-lot-details'),
+    path('lots/details', views.get_lot_details, name='api-v4-get-lot-details'),
     path('lots/filters', views.get_lots_filters, name='api-v4-get-lots-filters'),
     # POST
     ### Lot initial life

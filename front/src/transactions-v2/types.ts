@@ -77,9 +77,9 @@ export interface Stock {
   feedstock: Feedstock | null
   biofuel: Biofuel | null
   initial_volume: number
-  remaining_volume: number 
-  remaining_weight: number 
-  remaining_lhv_amount: number 
+  remaining_volume: number
+  remaining_weight: number
+  remaining_lhv_amount: number
   carbure_production_site: ProductionSite | null
   unknown_production_site: string | null
   production_country: Country | null
@@ -101,7 +101,6 @@ export interface StockList {
   returned: number
   from: number
 }
-
 
 export interface Snapshot {
   lots: {
@@ -175,4 +174,4 @@ export enum Filter {
 
 export type FilterSelection = Partial<Record<Filter, string[]>>
 
-export type Status = "DRAFTS" | "IN" | "STOCKS" | "OUT" | "ADMIN" | "UNKNOWN"
+export type Status = "drafts" | "in" | "stocks" | "out" | "admin" | "unknown"

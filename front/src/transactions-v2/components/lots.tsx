@@ -1,6 +1,8 @@
 import { useState } from "react"
+import { useNavigate, useLocation } from "react-router-dom"
+import * as api from "../api"
 import { Entity } from "carbure/types"
-import { Snapshot, Status } from "../types"
+import { Lot, Snapshot, Status } from "../types"
 import { useQuery } from "common-v2/hooks/async"
 import useLotQuery from "../hooks/lot-query"
 import useStatus from "../hooks/status"
@@ -15,7 +17,6 @@ import {
   DeadlineSwitch,
   InvalidSwitch,
 } from "../components/switches"
-import * as api from "../api"
 
 export interface LotsProps {
   entity: Entity
@@ -24,6 +25,9 @@ export interface LotsProps {
 }
 
 export const Lots = ({ entity, year, snapshot }: LotsProps) => {
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const status = useStatus()
   const filters = useFilters()
   const pagination = usePagination()
@@ -60,6 +64,11 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const total = lotsData?.total ?? 0
   const expiration = lotsData?.deadlines ?? { total: 0, date: "" }
   const errors = Object.keys(lotsData?.errors ?? {})
+
+  const open = (lot: Lot) => navigate({
+    pathname: `${status}/${lot.id}`,
+    search: location.search
+  })
 
   return (
     <>
@@ -124,6 +133,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
             lots={lotList}
             selected={selection}
             onSelect={setSelection}
+            onAction={open}
           />
         )}
 
@@ -142,13 +152,13 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
 
 function countLots(status: Status, snapshot: Snapshot | undefined) {
   switch (status) {
-    case "IN":
+    case "in":
       return {
         pending: snapshot?.lots.in_pending ?? 0,
         history: snapshot?.lots.in_total ?? 0,
         tofix: snapshot?.lots.in_tofix ?? 0,
       }
-    case "OUT":
+    case "out":
       return {
         pending: snapshot?.lots.out_pending ?? 0,
         history: snapshot?.lots.out_total ?? 0,

@@ -1,27 +1,27 @@
 import { useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import Dialog from "common-v2/components/dialog"
-import Tag from "common-v2/components/tag"
 import Button from "common-v2/components/button"
-import { Plus, Return } from "common-v2/components/icons"
-import LotForm from "./components/form"
+import { Return, Save } from "common-v2/components/icons"
+import LotForm from "transaction-add/components/form"
+import useStatus from "transactions-v2/hooks/status"
 
-export const TransactionAdd = () => {
+export const TransactionDetails = () => {
   const { t } = useTranslation()
 
-  const navigate = useNavigate()
+  const status = useStatus()
   const location = useLocation()
+  const navigate = useNavigate()
 
   const close = () => navigate({
-    pathname: `../draft`,
+    pathname: `../${status}`,
     search: location.search
   })
 
   return (
     <Dialog onClose={close}>
       <header>
-        <Tag big label={t("Brouillon")} />
-        <h1>{t("Créer un nouveau lot")}</h1>
+        <h1>{t("Détails du lot")}</h1>
       </header>
 
       <main>
@@ -33,9 +33,9 @@ export const TransactionAdd = () => {
       <footer>
         <Button
           variant="primary"
-          icon={Plus}
+          icon={Save}
           submit="lot-form"
-          label={t("Créer lot")}
+          label={t("Sauvegarder")}
         />
         <Button
           asideX
@@ -48,4 +48,4 @@ export const TransactionAdd = () => {
   )
 }
 
-export default TransactionAdd
+export default TransactionDetails

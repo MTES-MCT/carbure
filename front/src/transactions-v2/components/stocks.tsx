@@ -3,7 +3,6 @@ import { Entity } from "carbure/types"
 import { Snapshot } from "../types"
 import { useQuery } from "common-v2/hooks/async"
 import useStockQuery from "../hooks/stock-query"
-import useStatus from "../hooks/status"
 import { Bar } from "common-v2/components/scaffold"
 import Pagination, { usePagination } from "common-v2/components/pagination"
 import Filters, { useFilters } from "../components/filters"
@@ -52,7 +51,7 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
     <>
       <Bar>
         <Filters
-          status="STOCKS"
+          status="stocks"
           query={query}
           selected={filters.selected}
           onSelect={filters.onFilter}

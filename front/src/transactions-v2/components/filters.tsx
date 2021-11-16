@@ -24,7 +24,7 @@ export const Filters = ({
   const { t } = useTranslation()
 
   // prettier-ignore
-  const getFilters = status === 'STOCKS'
+  const getFilters = status === 'stocks'
     ? api.getStockFilters
     : api.getLotFilters
 
@@ -49,10 +49,9 @@ export const Filters = ({
     [Filter.ShowEmpty]: t("Inclure stocks vides"),
   }
 
-
   return (
     <Grid>
-      {statusFilters[status].map((field) => (
+      {filtersByStatus[status].map((field) => (
         <FilterSelect
           key={field}
           field={field}
@@ -191,13 +190,13 @@ const ADMIN_FILTERS = [
   Filter.ClientTypes,
 ]
 
-const statusFilters: Record<Status, Filter[]> = {
-  DRAFTS: DRAFT_FILTERS,
-  IN: IN_FILTERS,
-  STOCKS: STOCK_FILTERS,
-  OUT: OUT_FILTERS,
-  ADMIN: ADMIN_FILTERS,
-  UNKNOWN: [],
+const filtersByStatus: Record<Status, Filter[]> = {
+  drafts: DRAFT_FILTERS,
+  in: IN_FILTERS,
+  stocks: STOCK_FILTERS,
+  out: OUT_FILTERS,
+  admin: ADMIN_FILTERS,
+  unknown: [],
 }
 
 export default Filters
