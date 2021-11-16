@@ -68,7 +68,7 @@ def get_stock(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Could not get stock"}, status=400)
 
 @check_user_rights()
-def get_details(request, *args, **kwargs):
+def get_lot_details(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
     lot_id = request.GET.get('lot_id', False)

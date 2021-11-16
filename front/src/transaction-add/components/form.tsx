@@ -34,8 +34,8 @@ export const defaultLot = {
 
   transport_document_reference: undefined as string | undefined,
   volume: 0 as number | undefined,
-  biofuel: "ETH" as string | undefined,
-  feedstock: "COLZA" as string | undefined,
+  biofuel: undefined as string | undefined,
+  feedstock: undefined as string | undefined,
   country_of_origin: undefined as string | undefined,
 
   producer: undefined as number | string | undefined,

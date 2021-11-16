@@ -5,7 +5,7 @@ import { Entity } from "carbure/types"
 
 export interface LotQuery {
   entity_id: number
-  status?: Status
+  status?: string
   year?: number
   query?: string
   order_by?: string
@@ -65,7 +65,7 @@ export function useLotQuery({
     () => ({
       entity_id: entity.id,
       year,
-      status,
+      status: status.toUpperCase(),
       query: search ? search : undefined,
       history: sub === "history" ? true : undefined,
       correction: correction ? true : undefined,
