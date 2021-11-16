@@ -12,7 +12,7 @@ import StatusTabs from "./components/status-tabs"
 import { DeclarationButton } from "./actions/declaration"
 import Lots from "./components/lots"
 import Stocks from "./components/stocks"
-import TransactionAdd from 'transaction-add'
+import TransactionAdd from "transaction-add"
 import TransactionDetails from "transaction-details"
 
 export const Transactions = () => {
@@ -58,8 +58,14 @@ export const Transactions = () => {
         </header>
 
         <Routes>
-          <Route path="stocks" element={<Stocks entity={entity} snapshot={snapshotData} />} />
-          <Route path="*" element={<Lots entity={entity} year={year} snapshot={snapshotData} />} />
+          <Route
+            path="stocks"
+            element={<Stocks entity={entity} snapshot={snapshotData} />}
+          />
+          <Route
+            path="*"
+            element={<Lots entity={entity} year={year} snapshot={snapshotData} />} // prettier-ignore
+          />
         </Routes>
       </Main>
 
@@ -70,6 +76,5 @@ export const Transactions = () => {
     </PortalProvider>
   )
 }
-
 
 export default Transactions

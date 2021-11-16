@@ -5,55 +5,27 @@ import { ActionBar } from "common-v2/components/scaffold"
 import { CreateButton, ExportButton } from "../actions"
 import { AcceptButton } from "../actions/accept"
 import { SendManyButton } from "../actions/send"
-import { SearchInput } from "common-v2/components/input"
 import { Cross, Wrench } from "common-v2/components/icons"
-import { HistorySwitcher } from "./switches"
+import useStatus from "transactions-v2/hooks/status"
 
 export interface ActionBarProps {
   count: number
   query: LotQuery
   selection: number[]
-  pending: number
-  history: number
-  category: string
-  search: string | undefined
-  onSwitch: (tab: string) => void
-  onSearch: (search: string | undefined) => void
 }
 
-export const LotActions = ({
-  count,
-  category,
-  pending,
-  history,
-  search,
-  onSwitch,
-  onSearch,
-  ...props
-}: ActionBarProps) => {
+export const LotActions = ({ count, ...props }: ActionBarProps) => {
+  const status = useStatus()
   const { selection } = props
-  const status = props.query.status ?? "UNKNOWN"
-  const isEmpty = count === 0
 
   return (
     <ActionBar>
-      {["IN", "OUT"].includes(status) && (
-        <HistorySwitcher
-          focus={category}
-          pending={pending}
-          history={history}
-          onFocus={onSwitch}
-        />
-      )}
-
-      <ExportButton {...props} />
-
-      {status === "DRAFTS" && (
+      {status === "drafts" && (
         <Fragment>
           <CreateButton />
-          <SendManyButton {...props} disabled={isEmpty} />
+          <SendManyButton {...props} disabled={count === 0} />
           <Button
-            disabled={isEmpty}
+            disabled={count === 0}
             variant="danger"
             icon={Cross}
             label={
@@ -63,17 +35,17 @@ export const LotActions = ({
         </Fragment>
       )}
 
-      {status === "IN" && (
+      {status === "in" && (
         <Fragment>
-          <AcceptButton {...props} disabled={isEmpty} />
+          <AcceptButton {...props} disabled={count === 0} />
           <Button
-            disabled={isEmpty}
+            disabled={count === 0}
             variant="danger"
             icon={Cross}
             label={selection.length > 0 ? "Refuser sélection" : "Refuser tout"}
           />
           <Button
-            disabled={isEmpty || selection.length === 0}
+            disabled={count === 0 || selection.length === 0}
             variant="warning"
             icon={Wrench}
             label={"Demander correction"}
@@ -81,19 +53,13 @@ export const LotActions = ({
         </Fragment>
       )}
 
-      {status === "OUT" && (
+      {status === "out" && (
         <Fragment>
           <Button label="TODO" />
         </Fragment>
       )}
 
-      <SearchInput
-        clear
-        asideX
-        debounce={240}
-        value={search}
-        onChange={onSearch}
-      />
+      <ExportButton {...props} />
     </ActionBar>
   )
 }

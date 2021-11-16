@@ -49,7 +49,7 @@ export const StatusTabs = ({
               loading={loading}
               count={count.in_pending}
               tofix={count.in_tofix}
-              label={t("Entrées", { count: count.in_pending })}
+              label={t("Lots reçus", { count: count.in_pending })}
             />
           ),
         },
@@ -60,7 +60,7 @@ export const StatusTabs = ({
             <StatusRecap
               loading={loading}
               count={count.stock}
-              label={t("Stock", { count: count.stock })}
+              label={t("Lots en stock", { count: count.stock })}
             />
           ),
         },
@@ -72,7 +72,7 @@ export const StatusTabs = ({
               loading={loading}
               count={count.out_pending}
               tofix={count.out_tofix}
-              label={t("Sorties", { count: count.out_pending })}
+              label={t("Lots envoyés", { count: count.out_pending })}
             />
           ),
         },
