@@ -14,18 +14,20 @@ urlpatterns = [
     path('lots/update', views.get_snapshot, name='api-v4-update-lots'),
     path('lots/send', views.get_snapshot, name='api-v4-send-lots'),
     ### Corrections
-    path('lots/comment', views.get_snapshot, name='api-v4-comment-lots'),
-    path('lots/request-fix', views.get_snapshot, name='api-v4-request-fix'),
-    path('lots/mark-as-fixed', views.get_snapshot, name='api-v4-mark-as-fixed'),
-    path('lots/approve-fix', views.get_snapshot, name='api-v4-approve-fix'),
-    path('lots/reject', views.get_snapshot, name='api-v4-reject-lots'),
+    path('lots/comment', views.add_comment, name='api-v4-comment-lots'),
+    path('lots/request-fix', views.request_fix, name='api-v4-request-fix'),
+    path('lots/mark-as-fixed', views.mark_as_fixed, name='api-v4-mark-as-fixed'),
+    path('lots/approve-fix', views.approve_fix, name='api-v4-approve-fix'),
+    path('lots/reject', views.reject_lot, name='api-v4-reject-lots'),
+    path('lots/recall', views.recall_lot, name='api-v4-recall-lot'),
+
     ### Approval
-    path('lots/accept-release-for-consumption', views.get_snapshot, name='api-v4-accept-rfx'),
-    path('lots/accept-in-stock', views.get_snapshot, name='api-v4-accept-in-stock'),
-    path('lots/accept-trading', views.get_snapshot, name='api-v4-accept-trading'),
-    path('lots/accept-processing', views.get_snapshot, name='api-v4-accept-processing'),
-    path('lots/accept-blending', views.get_snapshot, name='api-v4-accept-blending'),
-    path('lots/accept-export', views.get_snapshot, name='api-v4-accept-export'),
+    path('lots/accept-release-for-consumption', views.accept_rfc, name='api-v4-accept-rfc'),
+    path('lots/accept-in-stock', views.accept_in_stock, name='api-v4-accept-in-stock'),
+    path('lots/accept-trading', views.accept_trading, name='api-v4-accept-trading'),
+    path('lots/accept-processing', views.accept_processing, name='api-v4-accept-processing'),
+    path('lots/accept-blending', views.accept_blending, name='api-v4-accept-blending'),
+    path('lots/accept-export', views.accept_export, name='api-v4-accept-export'),
 
 
     # STOCKS

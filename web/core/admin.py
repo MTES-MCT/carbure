@@ -20,7 +20,7 @@ from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 
 from authtools.admin import NamedUserAdmin
 from authtools.forms import UserCreationForm
-from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockTransformation, Entity, ExternalAdminRights, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockTransformation, Entity, ExternalAdminRights, UserRights, UserPreferences, Biocarburant, MatierePremiere, Pays, UserRightsRequests
 from core.models import Depot, LotV2, LotTransaction, TransactionComment, GenericError
 from core.models import SustainabilityDeclaration, EntityDepot
 from core.models import TransactionUpdateHistory, TransactionDistance
@@ -623,3 +623,8 @@ class CarbureLotCommentAdmin(admin.ModelAdmin):
 @admin.register(CarbureStockTransformation)
 class CarbureStockTransformationAdmin(admin.ModelAdmin):
     list_display = []
+
+@admin.register(CarbureNotification)
+class CarbureNotificationAdmin(admin.ModelAdmin):
+    list_display = []
+    list_filter = ['is_sent', 'send_copy_to_admin']

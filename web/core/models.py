@@ -977,6 +977,8 @@ class CarbureLotEvent(models.Model):
     MARKED_AS_FIXED = "MARKED_AS_FIXED"
     FIX_ACCEPTED = "FIX_ACCEPTED"
     ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+    RECALLED = "RECALLED"
     DECLARED = "DECLARED"
     DELETED = "DELETED"
     RESTORED = "RESTORED"
@@ -985,7 +987,7 @@ class CarbureLotEvent(models.Model):
     CONVERT = "CONVERT"
     UNCONVERT = "UNCONVERT"
     EVENT_TYPES = ((CREATED, CREATED), (UPDATED, UPDATED), (VALIDATED, VALIDATED), (FIX_REQUESTED, FIX_REQUESTED), (MARKED_AS_FIXED, MARKED_AS_FIXED), 
-                    (FIX_ACCEPTED, FIX_ACCEPTED), (ACCEPTED, ACCEPTED), (DECLARED, DECLARED), (DELETED, DELETED), (RESTORED, RESTORED),
+                    (FIX_ACCEPTED, FIX_ACCEPTED), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (RECALLED, RECALLED), (DECLARED, DECLARED), (DELETED, DELETED), (RESTORED, RESTORED),
                     (SPLIT, SPLIT), (UNSPLIT, UNSPLIT), (CONVERT, CONVERT), (UNCONVERT, UNCONVERT))
     event_type = models.CharField(max_length=32, null=False, blank=False, choices=EVENT_TYPES)
     event_dt = models.DateTimeField(auto_now_add=True, null=False, blank=False)
@@ -1024,3 +1026,20 @@ class CarbureLotComment(models.Model):
         ]        
         verbose_name = 'CarbureLotComment'
         verbose_name_plural = 'CarbureLotComments'
+
+
+class CarbureNotification(models.Model):
+    event = models.ForeignKey(CarbureLotEvent, null=False, blank=False, on_delete=models.CASCADE)
+    notif_dt = models.DateTimeField(auto_now_add=True)
+    recipient = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE)
+    send_copy_to_admin = models.BooleanField(default=False)
+    is_sent = models.BooleanField(default=False)
+    sent_dt = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'carbure_notifications'
+        verbose_name = 'Carbure Email Notification'
+        verbose_name_plural = 'Cabure Email Notifications'
+        indexes = [
+            models.Index(fields=['is_sent']),
+        ]
