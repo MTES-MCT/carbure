@@ -1,11 +1,12 @@
 from calendar import calendar
 from datetime import datetime
 import traceback
+from unicodedata import category
 
 from django.http.response import JsonResponse
 from core.decorators import check_user_rights
 from api.v4.helpers import get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_transaction_distance, get_errors
-from core.models import CarbureLot, CarbureStock
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, Entity
 from core.serializers import CarbureLotPublicSerializer
 
 
@@ -125,3 +126,575 @@ def get_stock_filters(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Could not find specified filter"}, status=400)
     else:
         return JsonResponse({'status': 'success', 'data': data})
+
+
+@check_user_rights()
+def add_comment(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_ids = request.POST.getlist('lot_ids', False)
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+    comment = request.POST.get('comment', False)
+    if not comment:
+        return JsonResponse({'status': 'error', 'message': 'Missing comment'}, status=400)
+    is_visible_by_admin = request.POST.get('is_visible_by_admin', False)
+    is_visible_by_auditor = request.POST.get('is_visible_by_auditor', False)
+
+
+    entity = Entity.objects.get(pk=entity_id)
+    for lot_id in lot_ids:
+        try:
+            lot = CarbureLot.objects.get(pk=lot_id)
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+
+        if lot.carbure_vendor != entity and lot.carbure_client != entity and entity.entity_type not in [Entity.AUDITOR, Entity.ADMIN]:
+            return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to comment on this lot'}, status=403)
+
+        comment = CarbureLotComment()
+        comment.entity = entity
+        comment.user = request.user
+        if entity.entity_type == Entity.AUDITOR:
+            comment.comment_type = CarbureLotComment.AUDITOR
+            if is_visible_by_admin == 'true':
+                comment.is_visible_by_admin = True
+        elif entity.entity_type == Entity.ADMIN:
+            comment.comment_type = CarbureLotComment.ADMIN
+            if is_visible_by_auditor == 'true':
+                comment.is_visible_by_auditor = True
+        else:
+            comment.comment_type = CarbureLotComment.REGULAR
+        comment.comment = comment
+        comment.save()
+    return JsonResponse({'status': 'success'})
+
+
+@check_user_rights()
+def request_fix(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_ids = request.POST.getlist('lot_ids', False)
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+
+    entity = Entity.objects.get(pk=entity_id)
+    for lot_id in lot_ids:
+        try:
+            lot = CarbureLot.objects.get(pk=lot_id)
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+
+        if lot.carbure_vendor != entity and lot.carbure_client != entity:
+            return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to change this lot'}, status=403)
+        lot.correction_status = CarbureLot.IN_CORRECTION
+        lot.save()
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.FIX_REQUESTED
+        event.lot = lot
+        event.user = request.user
+        event.save()
+    return JsonResponse({'status': 'success'})
+
+@check_user_rights()
+def mark_as_fixed(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_ids = request.POST.getlist('lot_ids', False)
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+
+    entity = Entity.objects.get(pk=entity_id)
+    for lot_id in lot_ids:
+        try:
+            lot = CarbureLot.objects.get(pk=lot_id)
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+
+        if lot.carbure_vendor != entity and lot.carbure_client != entity:
+            return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to change this lot'}, status=403)
+        lot.correction_status = CarbureLot.FIXED
+        lot.save()
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.MARKED_AS_FIXED
+        event.lot = lot
+        event.user = request.user
+        event.save()        
+    return JsonResponse({'status': 'success'})
+
+@check_user_rights()
+def approve_fix(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_ids = request.POST.getlist('lot_ids', False)
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+
+    entity = Entity.objects.get(pk=entity_id)
+    for lot_id in lot_ids:
+        try:
+            lot = CarbureLot.objects.get(pk=lot_id)
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+
+        if lot.carbure_vendor != entity and lot.carbure_client != entity:
+            return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to change this lot'}, status=403)
+        lot.correction_status = CarbureLot.NO_PROBLEMO
+        lot.save()
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.FIX_ACCEPTED
+        event.lot = lot
+        event.user = request.user
+        event.save()            
+    return JsonResponse({'status': 'success'})
+
+@check_user_rights()
+def reject_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_ids = request.POST.getlist('lot_ids', False)
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+
+    entity = Entity.objects.get(pk=entity_id)
+    for lot_id in lot_ids:
+        notify_sender = False
+        try:
+            lot = CarbureLot.objects.get(pk=lot_id)
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+       
+        if entity != lot.carbure_client:
+            return JsonResponse({'status': 'forbidden', 'message': 'Only the client can reject this lot'}, status=403)
+
+        if lot.lot_status == CarbureLot.DRAFT:
+            return JsonResponse({'status': 'error', 'message': 'Cannot reject DRAFT'}, status=400)
+        elif lot.lot_status == CarbureLot.PENDING:
+            # ok no problem
+            pass
+        elif lot.lot_status == CarbureLot.REJECTED:
+            return JsonResponse({'status': 'error', 'message': 'Lot is already rejected.'}, status=400)
+        elif lot.lot_status == CarbureLot.ACCEPTED:
+            # ok but will send a notification to the sender
+            notify_sender = True
+        elif lot.lot_status == CarbureLot.FROZEN:
+            return JsonResponse({'status': 'error', 'message': 'Lot is Frozen. Cannot reject. Please invalidate declaration first.'}, status=400)
+        elif lot.lot_status == CarbureLot.DELETED:
+            return JsonResponse({'status': 'error', 'message': 'Lot is deleted. Cannot reject'}, status=400)
+
+        lot.lot_status = CarbureLot.REJECTED
+        lot.save()
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.REJECTED
+        event.lot = lot
+        event.user = request.user
+        event.save()
+        if notify_sender:
+            if event.lot.carbure_vendor and event.lot.carbure_client != event.lot.carbure_vendor:
+                n = CarbureNotification()
+                n.event = event
+                n.recipient = event.lot.carbure_vendor
+                n.save()        
+    return JsonResponse({'status': 'success'})
+
+@check_user_rights()
+def recall_lot(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_ids = request.POST.getlist('lot_ids', False)
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+
+    entity = Entity.objects.get(pk=entity_id)
+    for lot_id in lot_ids:
+        notify_client = False
+        try:
+            lot = CarbureLot.objects.get(pk=lot_id)
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+
+        if entity != lot.carbure_vendor:
+            return JsonResponse({'status': 'forbidden', 'message': 'Only the vendor can recall the lot'}, status=403)
+
+        if lot.lot_status == CarbureLot.DRAFT:
+            return JsonResponse({'status': 'error', 'message': 'Cannot recall DRAFT'}, status=400)
+        elif lot.lot_status == CarbureLot.PENDING:
+            # ok no problem
+            pass
+        elif lot.lot_status == CarbureLot.REJECTED:
+            return JsonResponse({'status': 'error', 'message': 'Lot is already rejected. Recall has no effect'}, status=400)
+        elif lot.lot_status == CarbureLot.ACCEPTED:
+            # ok but will send a notification to the client
+            notify_client = True
+        elif lot.lot_status == CarbureLot.FROZEN:
+            return JsonResponse({'status': 'error', 'message': 'Lot is Frozen. Cannot recall. Please invalidate declaration first.'}, status=400)
+        elif lot.lot_status == CarbureLot.DELETED:
+            return JsonResponse({'status': 'error', 'message': 'Lot is deleted. Cannot recall'}, status=400)
+
+        lot.lot_status = CarbureLot.PENDING
+        lot.save()
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.RECALLED
+        event.lot = lot
+        event.user = request.user
+        event.save()
+        if notify_client:
+            if event.lot.carbure_client and event.lot.carbure_client != event.lot.carbure_vendor:
+                n = CarbureNotification()
+                n.event = event
+                n.recipient = event.lot.carbure_client
+                n.save()
+    return JsonResponse({'status': 'success'})
+
+
+
+@check_user_rights()
+def accept_rfc(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_ids = request.POST.getlist('lot_ids', False)
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+
+    entity = Entity.objects.get(pk=entity_id)
+    for lot_id in lot_ids:
+        try:
+            lot = CarbureLot.objects.get(pk=lot_id)
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+
+        if entity != lot.carbure_client:
+            return JsonResponse({'status': 'forbidden', 'message': 'Only the client can accept the lot'}, status=403)
+
+        if lot.lot_status == CarbureLot.DRAFT:
+            return JsonResponse({'status': 'error', 'message': 'Cannot accept DRAFT'}, status=400)
+        elif lot.lot_status == CarbureLot.PENDING:
+            # ok no problem
+            pass
+        elif lot.lot_status == CarbureLot.REJECTED:
+            # the client changed his mind, ok
+            pass
+        elif lot.lot_status == CarbureLot.ACCEPTED:
+            return JsonResponse({'status': 'error', 'message': 'Lot already accepted.'}, status=400)
+        elif lot.lot_status == CarbureLot.FROZEN:
+            return JsonResponse({'status': 'error', 'message': 'Lot is Frozen.'}, status=400)
+        elif lot.lot_status == CarbureLot.DELETED:
+            return JsonResponse({'status': 'error', 'message': 'Lot is deleted.'}, status=400)
+
+        lot.lot_status = CarbureLot.ACCEPTED
+        lot.delivery_type = CarbureLot.RFC
+        lot.save()
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.ACCEPTED
+        event.lot = lot
+        event.user = request.user
+        event.save()
+    return JsonResponse({'status': 'success'})
+
+@check_user_rights()
+def accept_in_stock(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_ids = request.POST.getlist('lot_ids', False)
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+
+    entity = Entity.objects.get(pk=entity_id)
+    for lot_id in lot_ids:
+        try:
+            lot = CarbureLot.objects.get(pk=lot_id)
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+
+        if entity != lot.carbure_client:
+            return JsonResponse({'status': 'forbidden', 'message': 'Only the client can accept the lot'}, status=403)
+
+        if lot.lot_status == CarbureLot.DRAFT:
+            return JsonResponse({'status': 'error', 'message': 'Cannot accept DRAFT'}, status=400)
+        elif lot.lot_status == CarbureLot.PENDING:
+            # ok no problem
+            pass
+        elif lot.lot_status == CarbureLot.REJECTED:
+            # the client changed his mind, ok
+            pass
+        elif lot.lot_status == CarbureLot.ACCEPTED:
+            return JsonResponse({'status': 'error', 'message': 'Lot already accepted.'}, status=400)
+        elif lot.lot_status == CarbureLot.FROZEN:
+            return JsonResponse({'status': 'error', 'message': 'Lot is Frozen.'}, status=400)
+        elif lot.lot_status == CarbureLot.DELETED:
+            return JsonResponse({'status': 'error', 'message': 'Lot is deleted.'}, status=400)
+
+        lot.lot_status = CarbureLot.ACCEPTED
+        lot.delivery_type = CarbureLot.STOCK
+        lot.save()
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.ACCEPTED
+        event.lot = lot
+        event.user = request.user
+        event.save()
+        stock = CarbureStock()
+        stock.parent_lot = lot
+        stock.carbure_id = lot.carbure_id
+        if lot.carbure_delivery_site is None:
+            return JsonResponse({'status': 'error', 'message': 'Cannot add stock for unknown Depot'}, status=400)
+        stock.depot = lot.carbure_delivery_site
+        stock.carbure_client = lot.carbure_client
+        stock.remaining_volume = lot.volume
+        stock.remaining_weight = lot.weight
+        stock.remaining_lhv_amount = lot.lhv_amount
+        stock.feedstock = lot.feedstock
+        stock.biofuel = lot.biofuel
+        stock.country_of_origin = lot.country_of_origin
+        stock.carbure_production_site = lot.carbure_production_site
+        stock.unknown_production_site = lot.unknown_production_site
+        stock.production_country = lot.production_country
+        stock.carbure_supplier = lot.carbure_supplier
+        stock.unknown_supplier = lot.unknown_supplier
+        stock.ghg_reduction = lot.ghg_reduction
+        stock.ghg_reduction_red_ii = lot.ghg_reduction_red_ii
+        stock.save()
+    return JsonResponse({'status': 'success'})
+
+
+@check_user_rights()
+def accept_blending(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_ids = request.POST.getlist('lot_ids', False)
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+
+    entity = Entity.objects.get(pk=entity_id)
+    for lot_id in lot_ids:
+        try:
+            lot = CarbureLot.objects.get(pk=lot_id)
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+
+        if entity != lot.carbure_client:
+            return JsonResponse({'status': 'forbidden', 'message': 'Only the client can accept the lot'}, status=403)
+
+        if lot.lot_status == CarbureLot.DRAFT:
+            return JsonResponse({'status': 'error', 'message': 'Cannot accept DRAFT'}, status=400)
+        elif lot.lot_status == CarbureLot.PENDING:
+            # ok no problem
+            pass
+        elif lot.lot_status == CarbureLot.REJECTED:
+            # the client changed his mind, ok
+            pass
+        elif lot.lot_status == CarbureLot.ACCEPTED:
+            return JsonResponse({'status': 'error', 'message': 'Lot already accepted.'}, status=400)
+        elif lot.lot_status == CarbureLot.FROZEN:
+            return JsonResponse({'status': 'error', 'message': 'Lot is Frozen.'}, status=400)
+        elif lot.lot_status == CarbureLot.DELETED:
+            return JsonResponse({'status': 'error', 'message': 'Lot is deleted.'}, status=400)
+
+        lot.lot_status = CarbureLot.ACCEPTED
+        lot.delivery_type = CarbureLot.BLENDING
+        lot.save()
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.ACCEPTED
+        event.lot = lot
+        event.user = request.user
+        event.save()
+    return JsonResponse({'status': 'success'})
+
+@check_user_rights()
+def accept_export(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_ids = request.POST.getlist('lot_ids', False)
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+
+    entity = Entity.objects.get(pk=entity_id)
+    for lot_id in lot_ids:
+        try:
+            lot = CarbureLot.objects.get(pk=lot_id)
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+
+        if entity != lot.carbure_client:
+            return JsonResponse({'status': 'forbidden', 'message': 'Only the client can accept the lot'}, status=403)
+
+        if lot.lot_status == CarbureLot.DRAFT:
+            return JsonResponse({'status': 'error', 'message': 'Cannot accept DRAFT'}, status=400)
+        elif lot.lot_status == CarbureLot.PENDING:
+            # ok no problem
+            pass
+        elif lot.lot_status == CarbureLot.REJECTED:
+            # the client changed his mind, ok
+            pass
+        elif lot.lot_status == CarbureLot.ACCEPTED:
+            return JsonResponse({'status': 'error', 'message': 'Lot already accepted.'}, status=400)
+        elif lot.lot_status == CarbureLot.FROZEN:
+            return JsonResponse({'status': 'error', 'message': 'Lot is Frozen.'}, status=400)
+        elif lot.lot_status == CarbureLot.DELETED:
+            return JsonResponse({'status': 'error', 'message': 'Lot is deleted.'}, status=400)
+
+        lot.lot_status = CarbureLot.ACCEPTED
+        lot.delivery_type = CarbureLot.EXPORT
+        lot.save()
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.ACCEPTED
+        event.lot = lot
+        event.user = request.user
+        event.save()
+    return JsonResponse({'status': 'success'})
+
+@check_user_rights()
+def accept_processing(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_ids = request.POST.getlist('lot_ids', False)
+    processing_entity_id = request.POST.get('processing_entity_id', False)
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+
+    entity = Entity.objects.get(pk=entity_id)
+    try:
+        processing_entity = Entity.objects.get(pk=processing_entity_id)
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Could not find processing entity'}, status=400)
+
+    for lot_id in lot_ids:
+        try:
+            lot = CarbureLot.objects.get(pk=lot_id)
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+
+        if entity != lot.carbure_client:
+            return JsonResponse({'status': 'forbidden', 'message': 'Only the client can accept the lot'}, status=403)
+
+        if lot.lot_status == CarbureLot.DRAFT:
+            return JsonResponse({'status': 'error', 'message': 'Cannot accept DRAFT'}, status=400)
+        elif lot.lot_status == CarbureLot.PENDING:
+            # ok no problem
+            pass
+        elif lot.lot_status == CarbureLot.REJECTED:
+            # the client changed his mind, ok
+            pass
+        elif lot.lot_status == CarbureLot.ACCEPTED:
+            return JsonResponse({'status': 'error', 'message': 'Lot already accepted.'}, status=400)
+        elif lot.lot_status == CarbureLot.FROZEN:
+            return JsonResponse({'status': 'error', 'message': 'Lot is Frozen.'}, status=400)
+        elif lot.lot_status == CarbureLot.DELETED:
+            return JsonResponse({'status': 'error', 'message': 'Lot is deleted.'}, status=400)
+
+        lot.lot_status = CarbureLot.ACCEPTED
+        lot.delivery_type = CarbureLot.PROCESSING
+        lot.save()
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.ACCEPTED
+        event.lot = lot
+        event.user = request.user
+        event.save()
+
+        # create child lot
+        parent_lot_id = lot.id
+        child_lot = lot
+        child_lot.pk = None
+        child_lot.carbure_client = processing_entity
+        child_lot.delivery_type = CarbureLot.UNKNOWN
+        child_lot.lot_status = CarbureLot.PENDING
+        child_lot.correction_status = CarbureLot.NO_PROBLEMO
+        child_lot.declared_by_supplier = False
+        child_lot.declared_by_client = False
+        child_lot.added_by = entity
+        child_lot.carbure_supplier = entity
+        child_lot.unknown_supplier = None
+        child_lot.parent_lot_id = parent_lot_id
+        child_lot.save()
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.CREATED
+        event.lot = child_lot
+        event.user = request.user
+        event.save()
+    return JsonResponse({'status': 'success'})
+
+@check_user_rights()
+def accept_trading(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    lot_ids = request.POST.getlist('lot_ids', False)
+    client_entity_id = request.POST.get('client_entity_id', False)
+    unknown_client = request.POST.get('unknown_client', False)
+    if not lot_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
+    if not client_entity_id and not unknown_client:
+        return JsonResponse({'status': 'error', 'message': 'Please specify either client_entity_id or unknown_client'}, status=400)
+
+    entity = Entity.objects.get(pk=entity_id)
+    if client_entity_id:
+        try:
+            client_entity = Entity.objects.get(pk=client_entity_id)
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find client entity'}, status=400)
+    else:
+        client_entity = None
+
+    for lot_id in lot_ids:
+        try:
+            lot = CarbureLot.objects.get(pk=lot_id)
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
+
+        if entity != lot.carbure_client:
+            return JsonResponse({'status': 'forbidden', 'message': 'Only the client can accept the lot'}, status=403)
+
+        if lot.lot_status == CarbureLot.DRAFT:
+            return JsonResponse({'status': 'error', 'message': 'Cannot accept DRAFT'}, status=400)
+        elif lot.lot_status == CarbureLot.PENDING:
+            # ok no problem
+            pass
+        elif lot.lot_status == CarbureLot.REJECTED:
+            # the client changed his mind, ok
+            pass
+        elif lot.lot_status == CarbureLot.ACCEPTED:
+            return JsonResponse({'status': 'error', 'message': 'Lot already accepted.'}, status=400)
+        elif lot.lot_status == CarbureLot.FROZEN:
+            return JsonResponse({'status': 'error', 'message': 'Lot is Frozen.'}, status=400)
+        elif lot.lot_status == CarbureLot.DELETED:
+            return JsonResponse({'status': 'error', 'message': 'Lot is deleted.'}, status=400)
+
+        lot.lot_status = CarbureLot.ACCEPTED
+        lot.delivery_type = CarbureLot.TRADING
+        lot.save()
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.ACCEPTED
+        event.lot = lot
+        event.user = request.user
+        event.save()
+
+        # create child lot
+        parent_lot_id = lot.id
+        child_lot = lot
+        child_lot.pk = None
+        child_lot.carbure_client = client_entity
+        child_lot.unknown_client = unknown_client
+        child_lot.delivery_type = CarbureLot.UNKNOWN
+        if child_lot.carbure_client is None:
+            # auto-accept when the client is not registered in carbure
+            child_lot.lot_status = CarbureLot.ACCEPTED
+            child_lot.declared_by_client = True
+        else:
+            child_lot.declared_by_client = False
+            child_lot.lot_status = CarbureLot.PENDING
+        child_lot.correction_status = CarbureLot.NO_PROBLEMO
+        child_lot.declared_by_supplier = False
+        child_lot.added_by = entity
+        child_lot.carbure_supplier = entity
+        child_lot.unknown_supplier = None
+        child_lot.parent_lot_id = parent_lot_id
+        child_lot.save()
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.CREATED
+        event.lot = child_lot
+        event.user = request.user
+        event.save()
+        event = CarbureLotEvent()
+        event.event_type = CarbureLotEvent.ACCEPTED
+        event.lot = child_lot
+        event.user = request.user
+        event.save()        
+    return JsonResponse({'status': 'success'})
