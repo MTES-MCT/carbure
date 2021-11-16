@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 import { useSearchParams, createSearchParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { Filter, FilterSelection, Status } from "../types"
-import { LotQuery } from '../hooks/lot-query'
+import { LotQuery } from "../hooks/lot-query"
 import { Option } from "common-v2/utils/normalize"
 import { Grid } from "common-v2/components/scaffold"
 import { MultiSelect, MultiSelectProps } from "common-v2/components/multi-select" // prettier-ignore
@@ -147,7 +147,7 @@ const IN_FILTERS = [
   Filter.Biofuels,
   Filter.Feedstocks,
   Filter.CountriesOfOrigin,
-  Filter.Clients,
+  Filter.Suppliers,
   Filter.ProductionSites,
   Filter.DeliverySites,
 ]
