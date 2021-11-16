@@ -5,7 +5,8 @@ export function normalizeItems<T, V>(
 ) {
   const normalizeItem = (data: T) => {
     const { children, ...norm } = normalize(data)
-    const normTree: Normalized<T, V> = { data, ...norm }
+    const key = JSON.stringify(norm.value)
+    const normTree: Normalized<T, V> = { ...norm, data, key }
     if (children) normTree.children = normalizeItems(children, normalize, filter) // prettier-ignore
     return normTree
   }
@@ -39,6 +40,7 @@ export type Filter<T, V> = (item: Normalized<T, V>) => boolean
 export const defaultFilter = Boolean
 
 export interface Normalized<T, V> {
+  key: string
   data: T
   value: V
   label: string
@@ -51,7 +53,7 @@ export interface Option<V = string> {
   label: string
 }
 
-export type Normalizer<T, V = string> = (item: T) => {
+export type Normalizer<T, V = T> = (item: T) => {
   value: V
   label: string
   disabled?: boolean
