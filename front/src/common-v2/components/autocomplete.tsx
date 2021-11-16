@@ -13,6 +13,7 @@ import List, { createQueryFilter, defaultRenderer, Renderer } from "./list"
 export interface AutocompleteProps<T, K> extends Control, Trigger {
   value?: K | undefined
   options?: T[]
+  defaultOptions?: T[]
   getOptions?: (query: string) => Promise<T[]>
   onChange?: (value: K | undefined) => void
   onQuery?: (query: string) => void
@@ -25,6 +26,7 @@ function Autocomplete<T, K>({
   loading,
   value,
   options,
+  defaultOptions,
   getOptions,
   onChange,
   onQuery,
@@ -39,6 +41,7 @@ function Autocomplete<T, K>({
   const autocomplete = useAutocomplete({
     value,
     options,
+    defaultOptions,
     getOptions,
     onChange,
     onQuery,
@@ -80,6 +83,7 @@ function Autocomplete<T, K>({
 interface AutocompleteConfig<T, K> {
   value?: K | undefined
   options?: T[]
+  defaultOptions?: T[]
   getOptions?: (query: string) => Promise<T[]>
   onChange?: (value: K | undefined) => void
   onQuery?: (query: string) => void
@@ -90,6 +94,7 @@ interface AutocompleteConfig<T, K> {
 export function useAutocomplete<T, V>({
   value,
   options,
+  defaultOptions,
   getOptions,
   onChange,
   onQuery,
@@ -102,6 +107,7 @@ export function useAutocomplete<T, V>({
   const asyncOptions = useAsyncList({
     selectedValue: value,
     items: options,
+    defaultItems: defaultOptions,
     findItems: getOptions,
     normalize,
   })
@@ -129,8 +135,12 @@ export function useAutocomplete<T, V>({
     const matches = normalizeItems(options, normalize, isQuery)
     const match = matches.length > 0 ? matches[0] : undefined
 
-    if (match && match.value !== value) onChange?.(match.value)
-    else if (create) onChange?.(create(query))
+    if (match && JSON.stringify(match.value) !== JSON.stringify(value)) {
+      onChange?.(match.value)
+    }
+    else if (create) {
+      onChange?.(create(query))
+    }
   }
 
   const defaultQuery = query
