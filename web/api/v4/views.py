@@ -28,13 +28,11 @@ def get_snapshot(request, *args, **kwargs):
     drafts = lots.filter(added_by_id=entity_id, lot_status=CarbureLot.DRAFT)
     lots_in = lots.filter(carbure_client_id=entity_id)
     lots_in_pending = lots_in.filter(lot_status=CarbureLot.PENDING)
-    #lots_in_accepted = lots_in.filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN])
     lots_in_tofix = lots_in.exclude(correction_status=CarbureLot.NO_PROBLEMO)
     stock = CarbureStock.objects.filter(carbure_client_id=entity_id)
     stock_not_empty = stock.filter(remaining_volume__gt=0)
     lots_out = lots.filter(carbure_supplier_id=entity_id)
     lots_out_pending = lots_out.filter(lot_status=CarbureLot.PENDING)
-    #lots_out_accepted = lots_out.filter(lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN])
     lots_out_tofix = lots_out.exclude(correction_status=CarbureLot.NO_PROBLEMO)
     data['lots'] = {'draft': drafts.count(),
                     'in_total': lots_in.count(), 'in_pending': lots_in_pending.count(), 'in_tofix': lots_in_tofix.count(),
@@ -149,7 +147,7 @@ def add_comment(request, *args, **kwargs):
         except:
             return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
 
-        if lot.carbure_vendor != entity and lot.carbure_client != entity and entity.entity_type not in [Entity.AUDITOR, Entity.ADMIN]:
+        if lot.carbure_supplier != entity and lot.carbure_client != entity and entity.entity_type not in [Entity.AUDITOR, Entity.ADMIN]:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to comment on this lot'}, status=403)
 
         comment = CarbureLotComment()
@@ -211,7 +209,7 @@ def mark_as_fixed(request, *args, **kwargs):
         except:
             return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
 
-        if lot.carbure_vendor != entity and lot.carbure_client != entity:
+        if lot.carbure_supplier != entity and lot.carbure_client != entity:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to change this lot'}, status=403)
         lot.correction_status = CarbureLot.FIXED
         lot.save()
@@ -237,7 +235,7 @@ def approve_fix(request, *args, **kwargs):
         except:
             return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
 
-        if lot.carbure_vendor != entity and lot.carbure_client != entity:
+        if lot.carbure_supplier != entity and lot.carbure_client != entity:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to change this lot'}, status=403)
         lot.correction_status = CarbureLot.NO_PROBLEMO
         lot.save()
@@ -290,10 +288,10 @@ def reject_lot(request, *args, **kwargs):
         event.user = request.user
         event.save()
         if notify_sender:
-            if event.lot.carbure_vendor and event.lot.carbure_client != event.lot.carbure_vendor:
+            if event.lot.carbure_supplier and event.lot.carbure_client != event.lot.carbure_supplier:
                 n = CarbureNotification()
                 n.event = event
-                n.recipient = event.lot.carbure_vendor
+                n.recipient = event.lot.carbure_supplier
                 n.save()        
     return JsonResponse({'status': 'success'})
 
@@ -313,7 +311,7 @@ def recall_lot(request, *args, **kwargs):
         except:
             return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
 
-        if entity != lot.carbure_vendor:
+        if entity != lot.carbure_supplier:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the vendor can recall the lot'}, status=403)
 
         if lot.lot_status == CarbureLot.DRAFT:
@@ -339,7 +337,7 @@ def recall_lot(request, *args, **kwargs):
         event.user = request.user
         event.save()
         if notify_client:
-            if event.lot.carbure_client and event.lot.carbure_client != event.lot.carbure_vendor:
+            if event.lot.carbure_client and event.lot.carbure_client != event.lot.carbure_supplier:
                 n = CarbureNotification()
                 n.event = event
                 n.recipient = event.lot.carbure_client
