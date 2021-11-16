@@ -10,6 +10,7 @@ import StockTable from "../components/stock-table"
 import NoResult from "../components/no-result"
 import StockActions from "../components/stock-actions"
 import * as api from "../api"
+import { SearchBar } from "./search-bar"
 
 export interface StocksProps {
   entity: Entity
@@ -59,17 +60,15 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
       </Bar>
 
       <section>
-        <StockActions
-          count={returned}
-          query={query}
-          selection={selection}
-          category={category}
-          pending={count.pending}
-          history={count.history}
+        <SearchBar
+          count={snapshot?.lots}
           search={search}
-          onSwitch={setCategory}
+          category={category}
           onSearch={setSearch}
+          onSwitch={setCategory}
         />
+
+        <StockActions count={returned} query={query} selection={selection} />
 
         {returned === 0 && (
           <NoResult
