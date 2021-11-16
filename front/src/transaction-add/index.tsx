@@ -12,10 +12,11 @@ export const TransactionAdd = () => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const close = () => navigate({
-    pathname: `../draft`,
-    search: location.search
-  })
+  const close = () =>
+    navigate({
+      pathname: `../drafts`,
+      search: location.search,
+    })
 
   return (
     <Dialog onClose={close}>
@@ -37,12 +38,7 @@ export const TransactionAdd = () => {
           submit="lot-form"
           label={t("Créer lot")}
         />
-        <Button
-          asideX
-          icon={Return}
-          label={t("Retour")}
-          action={close}
-        />
+        <Button asideX icon={Return} label={t("Retour")} action={close} />
       </footer>
     </Dialog>
   )

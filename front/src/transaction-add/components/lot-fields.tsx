@@ -47,14 +47,15 @@ export const VolumeField = () => {
 export const BiofuelField = () => {
   const { t } = useTranslation()
   const bind = useBind<LotFormValue>()
+  const props = bind('biofuel')
   return (
     <Autocomplete
       required
       label={t("Biocarburant")}
+      defaultOptions={props.value ? [props.value] : undefined}
       getOptions={api.findBiofuels}
       normalize={norm.normalizeBiofuel}
-      create={norm.identity}
-      {...bind("biofuel")}
+      {...props}
     />
   )
 }
@@ -62,13 +63,15 @@ export const BiofuelField = () => {
 export const FeedstockField = () => {
   const { t } = useTranslation()
   const bind = useBind<LotFormValue>()
+  const props = bind('feedstock')
   return (
     <Autocomplete
       required
       label={t("Matière première")}
+      defaultOptions={props.value ? [props.value] : undefined}
       getOptions={api.findFeedstocks}
       normalize={norm.normalizeFeedstock}
-      {...bind("feedstock")}
+      {...props}
     />
   )
 }
@@ -76,13 +79,15 @@ export const FeedstockField = () => {
 export const CountryOfOriginField = () => {
   const { t } = useTranslation()
   const bind = useBind<LotFormValue>()
+  const props = bind("country_of_origin")
   return (
     <Autocomplete
       required
       label={t("Pays d'origine de la matière première")}
+      defaultOptions={props.value ? [props.value] : undefined}
       getOptions={api.findCountries}
       normalize={norm.normalizeCountry}
-      {...bind("country_of_origin")}
+      {...props}
     />
   )
 }

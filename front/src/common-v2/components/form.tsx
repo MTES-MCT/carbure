@@ -3,7 +3,7 @@ import cl from "clsx"
 import { identity } from "common-v2/utils/normalizers"
 import css from "./form.module.css"
 
-export type FormVariant = "inline" | "complex"
+export type FormVariant = "inline" | "columns"
 
 export interface FormProps<T> {
   id?: string
