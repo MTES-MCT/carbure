@@ -494,7 +494,7 @@ def sort_stock(stock, querySet):
             stock = stock.order_by('vendor')
     return stock
 
-def get_lot_errors(lot, entity_id, is_admin):
+def get_lot_errors(lot, entity_id, is_admin=False):
     if is_admin:
         return GenericErrorSerializer(lot.genericerror_set.all(), many=True).data
     elif entity_id == lot.carbure_supplier:
