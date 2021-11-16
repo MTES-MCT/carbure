@@ -1020,7 +1020,7 @@ class CarbureLotComment(models.Model):
     is_visible_by_auditor = models.BooleanField(default=False) # ADMIN comment must be explicitly shared with auditor
 
     class Meta:
-        db_table = 'carbure_lot_comments'
+        db_table = 'carbure_lots_comments'
         indexes = [
             models.Index(fields=['lot']),
         ]        
