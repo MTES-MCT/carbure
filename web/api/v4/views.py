@@ -185,7 +185,7 @@ def request_fix(request, *args, **kwargs):
         except:
             return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
 
-        if lot.carbure_vendor != entity and lot.carbure_client != entity:
+        if lot.carbure_client != entity:
             return JsonResponse({'status': 'forbidden', 'message': 'Entity not authorized to change this lot'}, status=403)
         lot.correction_status = CarbureLot.IN_CORRECTION
         lot.save()
@@ -331,7 +331,7 @@ def recall_lot(request, *args, **kwargs):
         elif lot.lot_status == CarbureLot.DELETED:
             return JsonResponse({'status': 'error', 'message': 'Lot is deleted. Cannot recall'}, status=400)
 
-        lot.lot_status = CarbureLot.PENDING
+        lot.lot_status = CarbureLot.DRAFT
         lot.save()
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.RECALLED
