@@ -11,6 +11,7 @@ import { Return, Save } from "common-v2/components/icons"
 import LotForm from "lot-add/components/lot-form"
 import LotTag from "transactions-v2/components/lot-tag"
 import Comments from "./components/comments"
+import Anomalies from "./components/anomalies"
 
 export const LotDetails = () => {
   const { t } = useTranslation()
@@ -40,7 +41,7 @@ export const LotDetails = () => {
       <header>
         {lotData && <LotTag big lot={lotData.lot} />}
         <h1>
-          {t("Détails du lot")} #{lotData?.lot.carbure_id}
+          {t("Détails du lot")} #{lotData?.lot.carbure_id || lotData?.lot.id}
         </h1>
       </header>
 
@@ -48,6 +49,8 @@ export const LotDetails = () => {
         <section>
           <LotForm lot={lotData?.lot} onSubmit={(form) => console.log(form)} />
         </section>
+
+        {lotData?.errors && <Anomalies anomalies={lotData.errors} />}
 
         {lotData?.comments && lotData.comments.length > 0 && (
           <section>

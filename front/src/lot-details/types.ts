@@ -6,7 +6,7 @@ export interface LotDetails {
   children: Lot[]
   distance: Distance
   deadline: string
-  errors: LotError[]
+  errors: LotAnomaly[]
   updates: LotUpdate<any>[]
   comments: LotComment[]
 }
@@ -18,7 +18,7 @@ export interface Distance {
   source?: string
 }
 
-export interface LotError {
+export interface LotAnomaly {
   error: string
   is_blocking: boolean
   field: string

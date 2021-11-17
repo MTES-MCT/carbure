@@ -33,6 +33,7 @@
 .collapse footer {
   display: flex;
   padding: var(--spacing-m);
+  padding-top: 0;
   gap: var(--spacing-s);
 }
 
