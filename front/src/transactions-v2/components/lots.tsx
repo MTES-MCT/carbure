@@ -58,7 +58,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
 
   const lotsData = lots.result?.data.data
   const lotList = lotsData?.lots ?? []
-  const returned = lotsData?.returned ?? 0
+  const count = lotsData?.returned ?? 0
   const total = lotsData?.total ?? 0
   const expiration = lotsData?.deadlines ?? { total: 0, date: "" }
   const errors = Object.keys(lotsData?.errors ?? {})
@@ -89,7 +89,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
           onSwitch={setCategory}
         />
 
-        <LotActions count={returned} query={query} selection={selection} />
+        <LotActions count={count} query={query} selection={selection} />
 
         {errors.length > 0 && (
           <InvalidSwitch
@@ -108,7 +108,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
           />
         )}
 
-        {returned === 0 && (
+        {count === 0 && (
           <NoResult
             loading={lots.loading}
             count={filters.count}
@@ -116,7 +116,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
           />
         )}
 
-        {returned > 0 && (
+        {count > 0 && (
           <LotTable
             loading={lots.loading}
             lots={lotList}
