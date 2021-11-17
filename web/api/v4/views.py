@@ -1,4 +1,4 @@
-from calendar import calendar
+import calendar
 import datetime
 import traceback
 from unicodedata import category
@@ -96,7 +96,7 @@ def get_lot_details(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Missing lot_id'}, status=400)
 
     lot = CarbureLot.objects.get(pk=lot_id)
-    if lot.carbure_client_id != entity_id and lot.carbure_supplier != entity_id:
+    if str(lot.carbure_client_id) != entity_id and str(lot.carbure_supplier_id) != entity_id:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     now = datetime.datetime.now()
@@ -237,7 +237,7 @@ def mark_as_fixed(request, *args, **kwargs):
         event.event_type = CarbureLotEvent.MARKED_AS_FIXED
         event.lot = lot
         event.user = request.user
-        event.save()        
+        event.save()
     return JsonResponse({'status': 'success'})
 
 @check_user_rights()
@@ -263,7 +263,7 @@ def approve_fix(request, *args, **kwargs):
         event.event_type = CarbureLotEvent.FIX_ACCEPTED
         event.lot = lot
         event.user = request.user
-        event.save()            
+        event.save()
     return JsonResponse({'status': 'success'})
 
 @check_user_rights()
@@ -281,7 +281,7 @@ def reject_lot(request, *args, **kwargs):
             lot = CarbureLot.objects.get(pk=lot_id)
         except:
             return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
-       
+
         if entity != lot.carbure_client:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the client can reject this lot'}, status=403)
 
@@ -312,7 +312,7 @@ def reject_lot(request, *args, **kwargs):
                 n = CarbureNotification()
                 n.event = event
                 n.recipient = event.lot.carbure_supplier
-                n.save()        
+                n.save()
     return JsonResponse({'status': 'success'})
 
 @check_user_rights()
@@ -716,5 +716,5 @@ def accept_trading(request, *args, **kwargs):
         event.event_type = CarbureLotEvent.ACCEPTED
         event.lot = child_lot
         event.user = request.user
-        event.save()        
+        event.save()
     return JsonResponse({'status': 'success'})
