@@ -41,10 +41,6 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const { resetPage } = pagination
   useEffect(() => resetPage(), [status, filters.selected, category, invalid, deadline, search, resetPage]) // prettier-ignore
 
-  useEffect(() => {
-    console.log(order)
-  }, [order])
-
   const query = useLotQuery({
     entity,
     status,
