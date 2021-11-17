@@ -39,7 +39,7 @@ export const StockTable = memo(
             cell: (stock) => (
               <Cell
                 text={t(stock.biofuel?.name ?? "", { ns: "biofuels" })}
-                sub={`${formatNumber(stock.remaining_volume)} L`}
+                sub={`${formatNumber(stock.remaining_volume)} / ${formatNumber(stock.initial_volume)} L`} // prettier-ignore
               />
             ),
           },
