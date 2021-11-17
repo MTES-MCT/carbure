@@ -28,7 +28,14 @@ export const SearchBar = ({ search, onSearch, ...props }: SearchBarProps) => {
       {status === "in" && <InputSwitcher {...props} />}
       {status === "stocks" && <StockSwitcher {...props} />}
       {status === "out" && <OutputSwitcher {...props} />}
-      <SearchInput asideX value={search} onChange={onSearch} />
+
+      <SearchInput
+        asideX
+        clear
+        debounce={240}
+        value={search}
+        onChange={onSearch}
+      />
     </ActionBar>
   )
 }

@@ -1,5 +1,6 @@
 import { memo } from "react"
 import { useTranslation } from "react-i18next"
+import { Lot } from "../types"
 import {
   formatDate,
   formatNumber,
@@ -12,9 +13,8 @@ import Table, {
   markerColumn,
   selectionColumn,
 } from "common-v2/components/table"
-import { Lot } from "../types"
-import { LotTag } from "./status"
 import { SendOneButton } from "transactions-v2/actions/send"
+import LotTag from "./lot-tag"
 
 export interface LotTableProps {
   loading?: boolean
@@ -101,8 +101,8 @@ export const LotTable = memo(
             header: t("Site de livraison"),
             cell: (lot) => (
               <Cell
-                text={lot.carbure_delivery_site?.name ?? lot.unknown_delivery_site}
-                sub={t(lot.delivery_site_country?.name ?? "", { ns: "countries" })}
+                text={lot.carbure_delivery_site?.name ?? lot.unknown_delivery_site} // prettier-ignore
+                sub={t(lot.delivery_site_country?.name ?? "", { ns: "countries" })} // prettier-ignore
               />
             ),
           },
