@@ -291,8 +291,8 @@ def create_new_tx_and_child(tx):
 
 
 def migrate_old_data(apps, schema_editor):
-    #all_transactions = LotTransaction.objects.all()
-    all_transactions = LotTransaction.objects.filter(lot__year=2021, lot__status=LotV2.VALIDATED)
+    all_transactions = LotTransaction.objects.all(lot__status=LotV2.VALIDATED)
+    #all_transactions = LotTransaction.objects.filter(lot__year=2021, lot__status=LotV2.VALIDATED)
     for tx in all_transactions:
         # create the new transaction
         new_tx = create_new_tx_and_child(tx)
