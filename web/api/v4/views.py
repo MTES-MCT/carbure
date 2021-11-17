@@ -6,7 +6,7 @@ from unicodedata import category
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
 from core.decorators import check_user_rights
-from api.v4.helpers import get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_transaction_distance, get_errors
+from api.v4.helpers import get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_transaction_distance, filter_lots
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, Entity
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer
 
@@ -74,6 +74,24 @@ def get_stock(request, *args, **kwargs):
     except Exception:
         traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': "Could not get stock"}, status=400)
+
+
+@check_user_rights()
+def get_lots_summary(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    status = request.GET.get('status', False)
+    short = request.GET.get('short', False)
+    if not status:
+        return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
+    try:
+        lots = get_entity_lots_by_status(entity_id, status)
+        lots = filter_lots(lots, request.GET, entity_id)[0]
+        summary = get_lots_summary_data(lots, entity_id, short == 'true')
+        return JsonResponse({'status': 'success', 'data': summary})
+    except Exception:
+        traceback.print_exc()
+        return JsonResponse({'status': 'error', 'message': "Could not get lots"}, status=400)
 
 
 @check_user_rights()
