@@ -2,7 +2,7 @@ import { memo } from "react"
 import { useTranslation } from "react-i18next"
 import { Stock } from "../types"
 import { formatNumber, formatDate } from "common-v2/utils/formatters"
-import { StockTag } from './status'
+import StockTag from "./stock-tag"
 import Table, { Cell, selectionColumn } from "common-v2/components/table"
 
 export interface StockTableProps {
@@ -30,7 +30,7 @@ export const StockTable = memo(
             header: t("Date de livraison"),
             cell: (stock) => (
               <Cell text={`${formatDate(stock.delivery_date)}`} />
-            )
+            ),
           },
           {
             header: t("Biocarburant"),
@@ -46,22 +46,24 @@ export const StockTable = memo(
             cell: (stock) => (
               <Cell
                 text={t(stock.feedstock?.name ?? "", { ns: "feedstocks" })}
-                sub={t(stock.country_of_origin?.name ?? "", { ns: "countries" })}
+                sub={t(stock.country_of_origin?.name ?? "", { ns: "countries" })} // prettier-ignore
               />
             ),
           },
           {
             header: t("Fournisseur"),
             cell: (stock) => (
-              <Cell text={stock.carbure_supplier?.name ?? stock.unknown_supplier} />
+              <Cell
+                text={stock.carbure_supplier?.name ?? stock.unknown_supplier}
+              />
             ),
           },
           {
             header: t("Site de production"),
             cell: (stock) => (
               <Cell
-                text={stock.carbure_production_site?.name ?? stock.unknown_production_site}
-                sub={t(stock.production_country?.name ?? "", { ns: "countries" })}
+                text={stock.carbure_production_site?.name ?? stock.unknown_production_site} // prettier-ignore
+                sub={t(stock.production_country?.name ?? "", { ns: "countries" })} // prettier-ignore
               />
             ),
           },
@@ -77,7 +79,9 @@ export const StockTable = memo(
           {
             small: true,
             header: t("Réd. GES"),
-            cell: (stock) => <Cell text={`${stock.ghg_reduction.toFixed(2)}%`} />,
+            cell: (stock) => (
+              <Cell text={`${stock.ghg_reduction.toFixed(2)}%`} />
+            ),
           },
         ]}
       />

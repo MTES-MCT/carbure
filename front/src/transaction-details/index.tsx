@@ -2,12 +2,13 @@ import { useNavigate, useLocation, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import * as api from "./api"
 import { useQuery } from "common-v2/hooks/async"
+import useStatus from "transactions-v2/hooks/status"
+import useEntity from "carbure/hooks/entity"
 import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
 import { Return, Save } from "common-v2/components/icons"
 import LotForm from "transaction-add/components/form"
-import useStatus from "transactions-v2/hooks/status"
-import useEntity from "carbure/hooks/entity"
+import LotTag from "transactions-v2/components/lot-tag"
 import { LoaderOverlay } from "common-v2/components/scaffold"
 
 export const TransactionDetails = () => {
@@ -36,6 +37,7 @@ export const TransactionDetails = () => {
   return (
     <Dialog onClose={closeDialog}>
       <header>
+        {lotData && <LotTag lot={lotData.lot} />}
         <h1>{t("Détails du lot")}</h1>
       </header>
 
