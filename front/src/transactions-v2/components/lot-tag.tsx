@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { Tag, TagProps, TagVariant } from "common-v2/components/tag"
-import { Lot, LotStatus } from "../types"
+import { CorrectionStatus, Lot, LotStatus } from "../types"
 
 export interface LotTagProps extends TagProps {
   lot: Lot
@@ -12,7 +12,13 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
   let label = t("N/A")
   let variant: TagVariant | undefined = undefined
 
-  if (lot.lot_status === LotStatus.Draft) {
+  if (lot.correction_status === CorrectionStatus.InCorrection) {
+    label = t("En correction")
+    variant = "warning"
+  } else if (lot.correction_status === CorrectionStatus.Fixed) {
+    label = t("Corrigé")
+    variant = "success"
+  } else if (lot.lot_status === LotStatus.Draft) {
     label = t("Brouillon")
   } else if (lot.lot_status === LotStatus.Pending) {
     label = t("En attente")
