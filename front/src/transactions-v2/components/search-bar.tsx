@@ -5,6 +5,7 @@ import { SearchInput } from "common-v2/components/input"
 import { ActionBar } from "common-v2/components/scaffold"
 import Tabs from "common-v2/components/tabs"
 import { useEffect } from "react"
+import { formatNumber } from "common-v2/utils/formatters"
 
 export interface SearchBarProps {
   category: string
@@ -60,7 +61,7 @@ const DraftsSwitcher = ({
       tabs={[
         {
           key: "pending",
-          label: `${t("Tous les brouillons")} (${count?.draft ?? 0})`,
+          label: `${t("Tous les brouillons")} (${formatNumber(count?.draft ?? 0)})`, // prettier-ignore
         },
       ]}
     />
@@ -81,15 +82,15 @@ const InputSwitcher = ({
       tabs={[
         {
           key: "pending",
-          label: `${t("En attente")} (${count?.in_pending ?? 0})`,
+          label: `${t("En attente")} (${formatNumber(count?.in_pending ?? 0)})`, // prettier-ignore
         },
         {
           key: "correction",
-          label: `${t("En correction")} (${count?.in_tofix ?? 0})`,
+          label: `${t("Corrections")} (${formatNumber(count?.in_tofix ?? 0)})`, // prettier-ignore
         },
         {
           key: "history",
-          label: `${t("Historique")} (${count?.in_total ?? 0})`,
+          label: `${t("Historique")} (${formatNumber(count?.in_total ?? 0)})`, // prettier-ignore
         },
       ]}
     />
@@ -110,11 +111,11 @@ const StockSwitcher = ({
       tabs={[
         {
           key: "pending",
-          label: `${t("En stock")} (${count?.stock ?? 0})`,
+          label: `${t("En stock")} (${formatNumber(count?.stock ?? 0)})`, // prettier-ignore
         },
         {
           key: "history",
-          label: `${t("Historique")} (${count?.stock_total ?? 0})`,
+          label: `${t("Historique")} (${formatNumber(count?.stock_total ?? 0)})`, // prettier-ignore
         },
       ]}
     />
@@ -135,15 +136,15 @@ const OutputSwitcher = ({
       tabs={[
         {
           key: "pending",
-          label: `${t("En attente")} (${count?.out_pending ?? 0})`,
+          label: `${t("En attente")} (${formatNumber(count?.out_pending ?? 0)})`, // prettier-ignore
         },
         {
           key: "correction",
-          label: `${t("À corriger")} (${count?.out_tofix ?? 0})`,
+          label: `${t("Corrections")} (${formatNumber(count?.out_tofix ?? 0)})`, // prettier-ignore
         },
         {
           key: "history",
-          label: `${t("Historique")} (${count?.out_total ?? 0})`,
+          label: `${t("Historique")} (${formatNumber(count?.out_total ?? 0)})`, // prettier-ignore
         },
       ]}
     />
