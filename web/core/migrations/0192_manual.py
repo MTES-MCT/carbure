@@ -11,6 +11,7 @@ from core.models import AdminTransactionComment, CarbureLot, CarbureLotComment, 
 # map old id to new id
 TX_ID_MIGRATED = {}
 
+
 def create_new_tx_and_child(tx):
     if tx.id in TX_ID_MIGRATED:
         # ignore, this is a child tx already migrated
@@ -23,8 +24,9 @@ def create_new_tx_and_child(tx):
     if tx.id % 250 == 0:
         print('Migrate txid %d' % (tx.id))
     lot = CarbureLot()
-    lot.period = tx.delivery_date.year * 100 + tx.delivery_date.month
-    lot.year = tx.delivery_date.year
+    delivery_date = tx.delivery_date or datetime.datetime.today()
+    lot.period = delivery_date.year * 100 + delivery_date.month
+    lot.year = delivery_date.year
     lot.carbure_id = tx.lot.carbure_id
     lot.carbure_producer = tx.lot.carbure_producer
     lot.unknown_producer = tx.lot.unknown_producer
@@ -44,7 +46,7 @@ def create_new_tx_and_child(tx):
     lot.carbure_dispatch_site = None
     lot.unknown_dispatch_site = None
     lot.dispatch_site_country = None
-    lot.delivery_date = tx.delivery_date
+    lot.delivery_date = delivery_date
     lot.carbure_delivery_site = tx.carbure_delivery_site
     lot.unknown_delivery_site = tx.unknown_delivery_site
     lot.delivery_site_country = tx.carbure_delivery_site.country if tx.carbure_delivery_site else tx.unknown_delivery_site_country
@@ -256,7 +258,7 @@ def create_new_tx_and_child(tx):
             creation_event.event_type = CarbureLotEvent.CREATED
             creation_event.event_dt = c.lot.added_time
             creation_event.user = c.lot.added_by_user
-            creation_event.lot_id = lot.id            
+            creation_event.lot_id = lot.id
             TX_ID_MIGRATED[c.id] = lot.id
             child_sum_volume += c.lot.volume
 
@@ -291,7 +293,7 @@ def create_new_tx_and_child(tx):
 
 
 def migrate_old_data(apps, schema_editor):
-    all_transactions = LotTransaction.objects.all(lot__status=LotV2.VALIDATED)
+    all_transactions = LotTransaction.objects.all()
     #all_transactions = LotTransaction.objects.filter(lot__year=2021, lot__status=LotV2.VALIDATED)
     for tx in all_transactions:
         # create the new transaction
