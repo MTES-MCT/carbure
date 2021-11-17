@@ -53,6 +53,7 @@ export const Pagination = ({
         <Select
           variant="solid"
           anchor={Anchors.topLeft}
+          placeholder={t("Tous")}
           value={limit}
           onChange={onLimit}
           options={[
