@@ -150,3 +150,5 @@ const OutputSwitcher = ({
     />
   )
 }
+
+export default SearchBar

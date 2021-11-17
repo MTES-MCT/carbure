@@ -83,11 +83,7 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
         <StockActions count={returned} query={query} selection={selection} />
 
         {returned === 0 && (
-          <NoResult
-            loading={stocks.loading}
-            count={filters.count}
-            onReset={filters.resetFilters}
-          />
+          <NoResult loading={stocks.loading} filters={filters} />
         )}
 
         {returned > 0 && (

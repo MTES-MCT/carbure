@@ -116,6 +116,22 @@ export interface Snapshot {
   }
 }
 
+export interface LotSummary {
+  count: number
+  total_volume: number
+  in?: LotSummaryItem[]
+  out?: LotSummaryItem[]
+}
+
+export interface LotSummaryItem {
+  client?: string
+  supplier?: string
+  biofuel_code: string
+  volume_sum: number
+  count: number
+  avg_ghg_reduction: number
+}
+
 export enum LotStatus {
   Draft = "DRAFT",
   Pending = "PENDING",
