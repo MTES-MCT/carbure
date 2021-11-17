@@ -1,4 +1,4 @@
-import calendar
+from calendar import calendar
 import datetime
 import traceback
 from unicodedata import category
@@ -7,7 +7,7 @@ from django.http.response import JsonResponse
 from core.decorators import check_user_rights
 from api.v4.helpers import get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_transaction_distance, get_errors
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, Entity
-from core.serializers import CarbureLotPublicSerializer
+from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer
 
 
 @check_user_rights()
@@ -67,6 +67,26 @@ def get_stock(request, *args, **kwargs):
         traceback.print_exc()
         return JsonResponse({'status': 'error', 'message': "Could not get stock"}, status=400)
 
+
+@check_user_rights()
+def get_stock_details(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    stock_id = request.GET.get('stock_id', False)
+    if not stock_id:
+        return JsonResponse({'status': 'error', 'message': 'Missing stock_id'}, status=400)
+
+    stock = CarbureStock.objects.get(pk=stock_id)
+    if str(stock.carbure_client_id) != entity_id:
+        return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
+
+    data = {}
+    data['stock'] = CarbureStockPublicSerializer(stock).data
+    data['children'] = CarbureLotPublicSerializer(CarbureLot.objects.filter(parent_stock=stock), many=True).data
+    data['updates'] = get_lot_updates(stock.parent_lot, entity_id)
+    data['comments'] = get_lot_comments(stock.parent_lot, entity_id)
+    return JsonResponse({'status': 'success', 'data': data})
+
 @check_user_rights()
 def get_lot_details(request, *args, **kwargs):
     context = kwargs['context']
@@ -76,7 +96,7 @@ def get_lot_details(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Missing lot_id'}, status=400)
 
     lot = CarbureLot.objects.get(pk=lot_id)
-    if str(lot.carbure_client_id) != entity_id and str(lot.carbure_supplier_id) != entity_id:
+    if lot.carbure_client_id != entity_id and lot.carbure_supplier != entity_id:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     now = datetime.datetime.now()
@@ -421,6 +441,8 @@ def accept_in_stock(request, *args, **kwargs):
             return JsonResponse({'status': 'error', 'message': 'Lot is Frozen.'}, status=400)
         elif lot.lot_status == CarbureLot.DELETED:
             return JsonResponse({'status': 'error', 'message': 'Lot is deleted.'}, status=400)
+
+        ############ PAS POSSIBLE POUR LES OPERATEURS
 
         lot.lot_status = CarbureLot.ACCEPTED
         lot.delivery_type = CarbureLot.STOCK
