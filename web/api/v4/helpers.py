@@ -508,10 +508,10 @@ def get_lot_errors(lot, entity_id, is_admin=False):
         return GenericErrorSerializer(lot.genericerror_set.filter(display_to_creator=True), many=True).data
 
 def get_lot_updates(lot, entity_id):
-    CarbureLotEventSerializer(lot.carburelotevent_set.all(), many=True).data
+    return CarbureLotEventSerializer(lot.carburelotevent_set.all(), many=True).data
 
 def get_lot_comments(lot, entity_id):
-    CarbureLotCommentSerializer(lot.carburelotcomment_set.all(), many=True).data
+    return CarbureLotCommentSerializer(lot.carburelotcomment_set.all(), many=True).data
 
 def get_transaction_distance(lot):
     url_link = 'https://www.google.com/maps/dir/?api=1&origin=%s&destination=%s&travelmode=driving'
