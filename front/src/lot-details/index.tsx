@@ -4,12 +4,13 @@ import * as api from "./api"
 import { useQuery } from "common-v2/hooks/async"
 import useStatus from "transactions-v2/hooks/status"
 import useEntity from "carbure/hooks/entity"
+import { LoaderOverlay } from "common-v2/components/scaffold"
 import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
 import { Return, Save } from "common-v2/components/icons"
 import LotForm from "lot-add/components/lot-form"
 import LotTag from "transactions-v2/components/lot-tag"
-import { LoaderOverlay } from "common-v2/components/scaffold"
+import Comments from "./components/comments"
 
 export const LotDetails = () => {
   const { t } = useTranslation()
@@ -47,6 +48,12 @@ export const LotDetails = () => {
         <section>
           <LotForm lot={lotData?.lot} onSubmit={(form) => console.log(form)} />
         </section>
+
+        {lotData?.comments && lotData.comments.length > 0 && (
+          <section>
+            <Comments comments={lotData.comments} />
+          </section>
+        )}
       </main>
 
       <footer>
