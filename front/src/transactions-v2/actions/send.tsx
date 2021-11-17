@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Lot } from "../types"
-import { LotQuery } from '../hooks/lot-query'
+import { LotQuery } from "../hooks/lot-query"
 import useEntity from "carbure/hooks/entity"
 import { useMutation } from "common-v2/hooks/async"
 import { useNotify } from "common-v2/components/notifications"
@@ -19,7 +19,11 @@ export interface SendButtonProps {
   selection: number[]
 }
 
-export const SendManyButton = ({ disabled, query, selection }: SendButtonProps) => {
+export const SendManyButton = ({
+  disabled,
+  query,
+  selection,
+}: SendButtonProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
@@ -50,6 +54,7 @@ export const SendOneButton = ({ icon, lot }: SendIconButtonProps) => {
 
   return (
     <Button
+      captive
       variant={icon ? "icon" : "success"}
       icon={Check}
       title={t("Envoyer le lot")}

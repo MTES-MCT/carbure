@@ -4,10 +4,18 @@ import traceback
 from unicodedata import category
 
 from django.http.response import JsonResponse
+from django.db.models.query_utils import Q
 from core.decorators import check_user_rights
 from api.v4.helpers import get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_transaction_distance, get_errors
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, Entity
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer
+
+
+@check_user_rights()
+def get_years(request, *args, **kwargs):
+    entity_id = int(kwargs['context']['entity_id'])
+    data = CarbureLot.objects.filter(Q(carbure_client_id=entity_id) | Q(carbure_supplier_id=entity_id)).values_list('year').distinct()
+    return JsonResponse({'status': 'success', 'data': list(data)})
 
 
 @check_user_rights()
