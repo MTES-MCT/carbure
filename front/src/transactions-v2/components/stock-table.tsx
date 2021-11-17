@@ -10,14 +10,16 @@ export interface StockTableProps {
   stocks: Stock[]
   selected: number[]
   onSelect: (selected: number[]) => void
+  onAction: (stock: Stock) => void
 }
 
 export const StockTable = memo(
-  ({ loading, stocks, selected, onSelect }: StockTableProps) => {
+  ({ loading, stocks, selected, onSelect, onAction }: StockTableProps) => {
     const { t } = useTranslation()
     return (
       <Table
         loading={loading}
+        onAction={onAction}
         rows={stocks}
         columns={[
           selectionColumn(stocks, selected, onSelect, (stock) => stock.id),

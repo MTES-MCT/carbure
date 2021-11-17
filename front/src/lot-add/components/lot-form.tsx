@@ -6,7 +6,13 @@ import DeliveryFields from "./delivery-fields"
 import { EmissionFields, ReductionFields } from "./ghg-fields"
 import { useEffect, useMemo } from "react"
 import { Entity } from "carbure/types"
-import { Biofuel, Country, Depot, Feedstock, ProductionSite } from "common/types"
+import {
+  Biofuel,
+  Country,
+  Depot,
+  Feedstock,
+  ProductionSite,
+} from "common/types"
 
 export interface LotFormProps {
   lot?: Lot
@@ -80,6 +86,7 @@ export const defaultLot = {
 
 export type LotFormValue = typeof defaultLot
 
+// prettier-ignore
 export const lotToFormValue: (lot: Lot | undefined) => LotFormValue = (lot) => ({
   lot,
 
@@ -88,7 +95,7 @@ export const lotToFormValue: (lot: Lot | undefined) => LotFormValue = (lot) => (
   biofuel: lot?.biofuel ?? undefined,
   feedstock: lot?.feedstock ?? undefined,
   country_of_origin: lot?.country_of_origin ?? undefined,
-  free_field: lot?.free_field ?? undefined,
+  free_field: lot?.free_field.replace('\n', ', ') ?? undefined,
 
   producer: lot?.carbure_producer ?? lot?.unknown_producer ?? undefined,
   production_site: lot?.carbure_production_site ?? lot?.unknown_production_site ?? undefined,

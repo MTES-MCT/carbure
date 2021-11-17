@@ -4,9 +4,9 @@ import Dialog from "common-v2/components/dialog"
 import Tag from "common-v2/components/tag"
 import Button from "common-v2/components/button"
 import { Plus, Return } from "common-v2/components/icons"
-import LotForm from "./components/form"
+import LotForm from "./components/lot-form"
 
-export const TransactionAdd = () => {
+export const LotAdd = () => {
   const { t } = useTranslation()
 
   const navigate = useNavigate()
@@ -44,4 +44,4 @@ export const TransactionAdd = () => {
   )
 }
 
-export default TransactionAdd
+export default LotAdd

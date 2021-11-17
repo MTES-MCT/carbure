@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 import { Entity } from "carbure/types"
-import { Snapshot } from "../types"
+import { Snapshot, Stock } from "../types"
 import { useQuery } from "common-v2/hooks/async"
 import useStockQuery from "../hooks/stock-query"
 import { Bar } from "common-v2/components/scaffold"
@@ -18,6 +19,9 @@ export interface StocksProps {
 }
 
 export const Stocks = ({ entity, snapshot }: StocksProps) => {
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const filters = useFilters()
   const pagination = usePagination()
 
@@ -46,6 +50,12 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
   const stockList = stocksData?.stocks ?? []
   const returned = stocksData?.returned ?? 0
   const total = stocksData?.total ?? 0
+
+  const showStockDetails = (stock: Stock) =>
+    navigate({
+      pathname: `${stock.id}`,
+      search: location.search,
+    })
 
   return (
     <>
@@ -83,6 +93,7 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
             stocks={stockList}
             selected={selection}
             onSelect={setSelection}
+            onAction={showStockDetails}
           />
         )}
 
