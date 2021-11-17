@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Entity } from "carbure/types"
 import { Snapshot } from "../types"
 import { useQuery } from "common-v2/hooks/async"
@@ -25,6 +25,10 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
   const [search, setSearch] = useState<string | undefined>()
   const [selection, setSelection] = useState<number[]>([])
 
+  // go back to the first page when the query changes
+  const { resetPage } = pagination
+  useEffect(() => resetPage(), [filters.selected, category, search, resetPage])
+
   const query = useStockQuery({
     entity,
     category: category,
@@ -37,11 +41,6 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
     key: "stocks",
     params: [query],
   })
-
-  const count = {
-    pending: snapshot?.lots.stock ?? 0,
-    history: snapshot?.lots.stock_total ?? 0,
-  }
 
   const stocksData = stocks.result?.data.data
   const stockList = stocksData?.stocks ?? []

@@ -1,8 +1,8 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import * as api from "../api"
 import { Entity } from "carbure/types"
-import { Lot, Snapshot, Status } from "../types"
+import { Lot, Snapshot } from "../types"
 import { useQuery } from "common-v2/hooks/async"
 import useLotQuery from "../hooks/lot-query"
 import useStatus from "../hooks/status"
@@ -13,7 +13,6 @@ import { LotTable } from "../components/lot-table"
 import NoResult from "../components/no-result"
 import { LotActions } from "../components/lot-actions"
 import { DeadlineSwitch, InvalidSwitch } from "../components/switches"
-import { SearchInput } from "common-v2/components/input"
 import { SearchBar } from "./search-bar"
 
 export interface LotsProps {
@@ -35,6 +34,10 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const [deadline, showDeadline] = useState(false)
   const [search, setSearch] = useState<string | undefined>()
   const [selection, setSelection] = useState<number[]>([])
+
+  // go back to the first page when the query changes
+  const { resetPage } = pagination
+  useEffect(() => resetPage(), [status, filters.selected, category, invalid, deadline, search, resetPage]) // prettier-ignore
 
   const query = useLotQuery({
     entity,

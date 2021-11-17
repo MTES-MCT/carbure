@@ -82,6 +82,7 @@ export interface PaginationManager {
   limit: number | null | undefined
   setPage: (page: number | undefined) => void
   setLimit: (limit: number | null | undefined) => void
+  resetPage: () => void
 }
 
 export function usePagination() {
@@ -98,7 +99,7 @@ export function usePagination() {
     [_setLimit, resetPage]
   )
 
-  return { page, limit, setPage, setLimit }
+  return { page, limit, setPage, setLimit, resetPage }
 }
 
 // generate a list of numbers from 0 to size-1
