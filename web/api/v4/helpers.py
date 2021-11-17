@@ -14,7 +14,7 @@ from core.serializers import CarbureLotCommentSerializer, CarbureLotEventSeriali
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
 
 
-sort_key_to_django_field = {'period': 'period',
+sort_key_to_django_field = {'period': 'delivery_date',
                             'feedstock': 'feedstock__name',
                             'ghg_reduction': 'ghg_reduction',
                             'volume': 'volume',

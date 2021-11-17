@@ -75,7 +75,10 @@ export function Button<T>({
           hasIconAndText && css.composite,
           className
         )}
-        onClick={action}
+        onClick={(e) => {
+          captive && e.stopPropagation()
+          action?.()
+        }}
       >
         {loading ? <Loader /> : icon}
         {variant !== "icon" && (label ?? children)}

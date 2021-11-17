@@ -3,6 +3,7 @@ from api.v4 import views
 
 urlpatterns = [
     # GET
+    path('years', views.get_years, name='api-v4-get-years'),
     path('snapshot', views.get_snapshot, name='api-v4-get-snapshot'),
     path('lots', views.get_lots, name='api-v4-get-lots'),
     path('lots/details', views.get_lot_details, name='api-v4-get-lot-details'),
