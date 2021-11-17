@@ -165,9 +165,12 @@ def filter_lots(lots, querySet, entity_id=None, blacklist=[]):
     is_highlighted_by_auditor = querySet.get('is_highlighted_by_auditor', None)
     selection = querySet.getlist('selection')
     history = querySet.get('history', False)
+    correction = querySet.get('correction', False)
 
     if history != 'true':
         lots = lots.exclude(lot_status__in=[CarbureLot.FROZEN, CarbureLot.ACCEPTED])
+    if correction == 'true':
+        lots = lots.filter(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED])
     if year and 'year' not in blacklist:
         lots = lots.filter(year=year)
     if len(selection) > 0:
