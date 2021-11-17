@@ -144,6 +144,8 @@ class CarbureStockPublicSerializer(serializers.ModelSerializer):
     carbure_supplier = EntitySerializer(read_only=True)
     initial_volume = serializers.SerializerMethodField()
     delivery_date = serializers.SerializerMethodField()
+    #parent_lot = CarbureLotPublicSerializer(read_only=True)
+    parent_lot = None # defined later
 
     class Meta:
         model = CarbureStock
@@ -188,6 +190,8 @@ class CarbureLotPublicSerializer(serializers.ModelSerializer):
                   'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee', 'ghg_total', 'ghg_reference', 'ghg_reduction', 'ghg_reference_red_ii', 'ghg_reduction_red_ii',
                   'free_field', 'added_by',
                   ]
+
+CarbureStockPublicSerializer.parent_lot = CarbureLotPublicSerializer(read_only=True)
 
 class CarbureLotAdminSerializer(CarbureLotPublicSerializer):
     class Meta:
