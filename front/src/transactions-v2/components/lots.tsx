@@ -6,6 +6,7 @@ import { Lot, Snapshot } from "../types"
 import { useQuery } from "common-v2/hooks/async"
 import useLotQuery from "../hooks/lot-query"
 import useStatus from "../hooks/status"
+import { Order } from "common-v2/components/table"
 import { Bar } from "common-v2/components/scaffold"
 import Pagination, { usePagination } from "common-v2/components/pagination"
 import Filters, { useFilters } from "../components/filters"
@@ -34,10 +35,15 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const [deadline, showDeadline] = useState(false)
   const [search, setSearch] = useState<string | undefined>()
   const [selection, setSelection] = useState<number[]>([])
+  const [order, setOrder] = useState<Order | undefined>()
 
   // go back to the first page when the query changes
   const { resetPage } = pagination
   useEffect(() => resetPage(), [status, filters.selected, category, invalid, deadline, search, resetPage]) // prettier-ignore
+
+  useEffect(() => {
+    console.log(order)
+  }, [order])
 
   const query = useLotQuery({
     entity,
@@ -48,6 +54,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
     invalid,
     deadline,
     pagination,
+    order,
     filters: filters.selected,
   })
 
@@ -119,10 +126,12 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
         {count > 0 && (
           <LotTable
             loading={lots.loading}
+            order={order}
             lots={lotList}
             selected={selection}
             onSelect={setSelection}
             onAction={showLotDetails}
+            onOrder={setOrder}
           />
         )}
 

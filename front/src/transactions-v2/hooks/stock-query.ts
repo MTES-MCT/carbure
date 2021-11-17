@@ -2,6 +2,7 @@ import { useMemo } from "react"
 import { PaginationManager } from "common-v2/components/pagination"
 import { Filter, FilterSelection } from "../types"
 import { Entity } from "carbure/types"
+import { Order } from "common-v2/components/table"
 
 export interface StockQuery {
   entity_id: number
@@ -11,6 +12,8 @@ export interface StockQuery {
   from_idx?: number
   limit?: number
   history?: boolean
+  sort_by?: string
+  order?: string
   [Filter.Feedstocks]?: string[]
   [Filter.Biofuels]?: string[]
   [Filter.Periods]?: string[]
@@ -25,6 +28,7 @@ export interface StockQueryParams {
   category: string
   search: string | undefined
   pagination: PaginationManager
+  order: Order | undefined
   filters: FilterSelection
 }
 
@@ -33,6 +37,7 @@ export function useStockQuery({
   category,
   search,
   pagination,
+  order,
   filters,
 }: StockQueryParams) {
   const { page = 0, limit } = pagination
@@ -44,9 +49,11 @@ export function useStockQuery({
       query: search ? search : undefined,
       from_idx: page * (limit ?? 0),
       limit: limit || undefined,
+      sort_by: order?.column,
+      order: order?.direction,
       ...filters,
     }),
-    [entity.id, category, search, page, limit, filters]
+    [entity.id, category, search, page, limit, order, filters]
   )
 }
 
