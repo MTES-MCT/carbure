@@ -3,7 +3,6 @@ import { Entity } from "carbure/types"
 import { Snapshot } from "../types"
 import { useQuery } from "common-v2/hooks/async"
 import useStockQuery from "../hooks/stock-query"
-import useStatus from "../hooks/status"
 import { Bar } from "common-v2/components/scaffold"
 import Pagination, { usePagination } from "common-v2/components/pagination"
 import Filters, { useFilters } from "../components/filters"
@@ -11,6 +10,7 @@ import StockTable from "../components/stock-table"
 import NoResult from "../components/no-result"
 import StockActions from "../components/stock-actions"
 import * as api from "../api"
+import { SearchBar } from "./search-bar"
 
 export interface StocksProps {
   entity: Entity
@@ -52,7 +52,7 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
     <>
       <Bar>
         <Filters
-          status="STOCKS"
+          status="stocks"
           query={query}
           selected={filters.selected}
           onSelect={filters.onFilter}
@@ -60,17 +60,15 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
       </Bar>
 
       <section>
-        <StockActions
-          count={returned}
-          query={query}
-          selection={selection}
-          category={category}
-          pending={count.pending}
-          history={count.history}
+        <SearchBar
+          count={snapshot?.lots}
           search={search}
-          onSwitch={setCategory}
+          category={category}
           onSearch={setSearch}
+          onSwitch={setCategory}
         />
+
+        <StockActions count={returned} query={query} selection={selection} />
 
         {returned === 0 && (
           <NoResult

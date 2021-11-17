@@ -14,8 +14,9 @@ export const ExportButton = ({ query, selection }: ExportButtonProps) => {
   const { t } = useTranslation()
   return (
     <Button
+      asideX
       icon={Download}
-      label={t("Exporter")}
+      label={t("Exporter vers Excel")}
       action={() => api.downloadLots(query, selection)}
     />
   )

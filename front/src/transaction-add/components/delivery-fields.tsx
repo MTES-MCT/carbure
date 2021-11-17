@@ -23,15 +23,19 @@ export const DeliveryFields = () => {
 
 export const SupplierField = () => {
   const { t } = useTranslation()
-  const { value, bind } = useFormContext<LotFormValue>()
-  const isKnown = value.lot && value.lot.carbure_supplier !== null
+  const bind = useBind<LotFormValue>()
+  const props = bind("supplier")
+  const isKnown = props.value instanceof Object
+
   return (
     <Autocomplete
       label={t("Fournisseur")}
+      icon={isKnown ? UserCheck : undefined}
+      create={norm.identity}
+      defaultOptions={props.value ? [props.value] : undefined}
       getOptions={api.findEntities}
       normalize={norm.normalizeEntity}
-      icon={isKnown ? UserCheck : undefined}
-      {...bind("supplier")}
+      {...props}
     />
   )
 }
@@ -39,12 +43,20 @@ export const SupplierField = () => {
 export const SupplierCertificateField = () => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
-  const entity_id = parseInt(String(value.supplier))
+  const props = bind("supplier_certificate")
+
+  // prettier-ignore
+  const entity_id =
+    value.supplier instanceof Object
+      ? value.supplier.id
+      : undefined
+
   return (
     <Autocomplete
       label={t("Certificat du fournisseur")}
+      defaultOptions={props.value ? [props.value] : undefined}
       getOptions={(query) => api.findCertificates(query, { entity_id })}
-      {...bind("supplier_certificate")}
+      {...props}
     />
   )
 }
@@ -52,12 +64,18 @@ export const SupplierCertificateField = () => {
 export const ClientField = () => {
   const { t } = useTranslation()
   const bind = useBind<LotFormValue>()
+  const props = bind("client")
+  const isKnown = props.value instanceof Object
+
   return (
     <Autocomplete
       label={t("Client")}
+      icon={isKnown ? UserCheck : undefined}
+      create={norm.identity}
+      defaultOptions={props.value ? [props.value] : undefined}
       getOptions={api.findEntities}
       normalize={norm.normalizeEntity}
-      {...bind("client")}
+      {...props}
     />
   )
 }
@@ -65,12 +83,18 @@ export const ClientField = () => {
 export const DeliverySiteField = () => {
   const { t } = useTranslation()
   const bind = useBind<LotFormValue>()
+  const props = bind("delivery_site")
+  const isKnown = props.value instanceof Object
+
   return (
     <Autocomplete
       label={t("Site de livraison")}
+      icon={isKnown ? UserCheck : undefined}
+      create={norm.identity}
+      defaultOptions={props.value ? [props.value] : undefined}
       getOptions={api.findDepots}
       normalize={norm.normalizeDepot}
-      {...bind("delivery_site")}
+      {...props}
     />
   )
 }
@@ -78,12 +102,15 @@ export const DeliverySiteField = () => {
 export const DeliverySiteCountryField = () => {
   const { t } = useTranslation()
   const bind = useBind<LotFormValue>()
+  const props = bind("delivery_site_country")
+
   return (
     <Autocomplete
       label={t("Pays de livraison")}
+      defaultOptions={props.value ? [props.value] : undefined}
       getOptions={api.findCountries}
       normalize={norm.normalizeCountry}
-      {...bind("delivery_site_country")}
+      {...props}
     />
   )
 }

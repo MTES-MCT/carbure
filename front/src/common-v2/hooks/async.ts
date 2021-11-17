@@ -1,5 +1,4 @@
 import { uniqueBy } from "common-v2/utils/collection"
-import { useCallback, useEffect } from "react"
 import {
   useAsync,
   useAsyncCallback,
@@ -13,6 +12,7 @@ import {
   denormalizeItems,
   labelize,
 } from "../utils/normalize"
+import { invalidate, useInvalidate } from "./invalidate"
 
 export type QueryOptions<R, A extends any[]> = UseAsyncCallbackOptions<R> & {
   key: string
@@ -57,6 +57,7 @@ export interface AsyncListOptions<T, V> {
   selectedValue?: V
   selectedValues?: V[]
   items?: T[]
+  defaultItems?: T[]
   getItems?: () => Promise<T[]>
   findItems?: (query: string) => Promise<T[]>
   normalize: Normalizer<T, V>
@@ -68,15 +69,16 @@ export function useAsyncList<T, V>({
   selectedValue,
   selectedValues,
   items,
+  defaultItems,
   getItems,
   findItems,
   normalize,
 }: AsyncListOptions<T, V>) {
   // fetch the list of items when needed
-  const asyncItems = useAsyncCallback((query?: string) => {
+  const asyncItems = useAsyncCallback<T[]>((query?: string) => {
     if (getItems) return getItems()
     else if (findItems) return findItems(query ?? "")
-    else return items ?? (EMPTY as T[])
+    else return items ?? defaultItems ?? EMPTY
   }, staleWhileLoading)
 
   // fetch items matching the currently selected values everytime they change
@@ -87,22 +89,31 @@ export function useAsyncList<T, V>({
           ? [selectedValue]
           : selectedValues ?? (EMPTY as V[])
 
+      const keys = values.map((value) => JSON.stringify(value))
+
       // nothing to do if there's no selection
       if (values.length === 0) return EMPTY as T[]
 
       const cachedItems = uniqueBy(
-        [...(asyncSelectedItems.result ?? []), ...(asyncItems.result ?? [])],
-        (item) => normalize(item).value
+        [
+          ...(defaultItems ?? []),
+          ...(asyncSelectedItems.result ?? []),
+          ...(asyncItems.result ?? []),
+        ],
+        (item) => JSON.stringify(normalize(item).value)
       )
 
       function findCachedItem(value: V) {
-        return cachedItems.find((item) => normalize(item).value === value)
+        const key = JSON.stringify(value)
+        return cachedItems.find(
+          (item) => JSON.stringify(normalize(item).value) === key
+        )
       }
 
       // nothing to do if we already have items for each value or we still loading them
       if (values.every(findCachedItem)) {
         return cachedItems.filter((item) =>
-          values.includes(normalize(item).value)
+          keys.includes(JSON.stringify(normalize(item).value))
         )
       }
 
@@ -123,12 +134,13 @@ export function useAsyncList<T, V>({
         const promises = values.map(async (value) => {
           const selectedValueItem = findCachedItem(value)
           if (selectedValueItem) return selectedValueItem
-          const foundItems = await findItems(String(value))
-          return foundItems.length > 0 ? foundItems[0] : null
+          const key = JSON.stringify(value)
+          const foundItems = await findItems("")
+          return foundItems.find((i) => JSON.stringify(normalize(i).value) === key) // prettier-ignore
         })
 
         const results = await Promise.all(promises)
-        availableItems = results.filter((r) => r !== null) as T[]
+        availableItems = results.filter((r) => r !== undefined) as T[]
       }
 
       // filter items matching the selection
@@ -148,19 +160,6 @@ export function useAsyncList<T, V>({
     label: labelize(asyncSelectedItems.result ?? [], normalize),
     execute: asyncItems.execute,
   }
-}
-
-export function useInvalidate(key: string, action: () => void) {
-  useEffect(() => {
-    window.addEventListener(`invalidate:${key}`, action)
-    return () => window.removeEventListener(`invalidate:${key}`, action)
-  }, [key, action])
-
-  return useCallback(() => invalidate(key), [key])
-}
-
-export function invalidate(...keys: string[]) {
-  keys.forEach((key) => window.dispatchEvent(new Event(`invalidate:${key}`)))
 }
 
 export const staleWhileLoading = {

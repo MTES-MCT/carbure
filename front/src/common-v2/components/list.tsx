@@ -119,8 +119,9 @@ export function List<T, V>({
       return <li>Aucune entrée trouvée</li>
     }
 
-    return items.map(({ value, label, children, disabled, data }) => {
+    return items.map(({ key, value, label, children, disabled, data },) => {
       const config: ItemConfig<T, V> = {
+        key,
         value,
         label,
         level,
@@ -139,10 +140,10 @@ export function List<T, V>({
       // render group header
       if (children) {
         return (
-          <div key={`${value}-${label}`}>
+          <div key={key}>
             <li
               data-group
-              data-key={value}
+              data-value={key}
               data-disabled={disabled ? true : undefined}
               data-level={level > 0 ? level : undefined}
               data-selected={config.selected ? true : undefined}
@@ -160,8 +161,8 @@ export function List<T, V>({
       // render item
       return (
         <li
-          key={`${value}-${label}`}
-          data-key={value}
+          key={key}
+          data-value={key}
           data-disabled={disabled ? true : undefined}
           data-level={level > 0 ? level : undefined}
           data-selected={config.selected ? true : undefined}
@@ -215,47 +216,47 @@ export interface SelectionConfig<T, V> {
   multiple?: boolean
   selectedValue?: V
   selectedValues?: V[]
-  onFocus?: (keys: V | undefined) => void
-  onSelectValue?: (keys: V | undefined) => void
-  onSelectValues?: (keyss: V[]) => void
+  onFocus?: (value: V | undefined) => void
+  onSelectValue?: (value: V | undefined) => void
+  onSelectValues?: (values: V[]) => void
 }
 
 export function useSelection<T, V>({
   items,
   container,
   multiple,
-  selectedValue: selectedKey,
-  selectedValues: selectedKeys,
+  selectedValue,
+  selectedValues,
   onFocus,
-  onSelectValue: onSelectKey,
-  onSelectValues: onSelectKeys,
+  onSelectValue,
+  onSelectValues,
 }: SelectionConfig<T, V>) {
-  const [focused, focus] = useState<V | undefined>(selectedKey)
+  const [focused, focus] = useState<V | undefined>(selectedValue)
 
   useEffect(() => {
-    focus(selectedKey)
-  }, [selectedKey])
+    focus(selectedValue)
+  }, [selectedValue])
 
   const normItems = listTreeItems(items)
-  const normFocus = normItems.find((item) => item.value === focused)
+  const normFocus = normItems.find((item) => item.key === JSON.stringify(focused))
 
   const { isSelected, onSelect } = multiple
-    ? multipleSelection(selectedKeys, onSelectKeys)
-    : singleSelection(selectedKey, onSelectKey)
+    ? multipleSelection(selectedValues, onSelectValues)
+    : singleSelection(selectedValue, onSelectValue)
 
   function isFocused(value: V) {
-    return value === focused
+    return JSON.stringify(value) === normFocus?.key
   }
 
   function index() {
-    return normItems.findIndex((item) => item.value === normFocus?.value)
+    return normItems.findIndex((item) => item.key === normFocus?.key)
   }
 
   function prev() {
     const i = index()
     const prev = i === -1 ? normItems.length - 1 : Math.max(i - 1, 0)
     const item = normItems[prev]
-    scrollToKey(container, item?.value)
+    // scrollToKey(container, item?.key)
     focus(item?.value)
     onFocus?.(item?.value)
   }
@@ -264,7 +265,7 @@ export function useSelection<T, V>({
     const i = index()
     const next = i === -1 ? 0 : Math.min(i + 1, normItems.length - 1)
     const item = normItems[next]
-    scrollToKey(container, item?.value)
+    // scrollToKey(container, item?.key)
     focus(item?.value)
     onFocus?.(item?.value)
   }
@@ -282,9 +283,9 @@ export function useSelection<T, V>({
 }
 
 // scroll to option with given key
-export function scrollToKey<K>(
+export function scrollToKey(
   container: HTMLElement | null,
-  key: K | undefined
+  key: string | undefined
 ) {
   if (!container || !key) return
   const node = container.querySelector(`[data-key="${key}"]`)

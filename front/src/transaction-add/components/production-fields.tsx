@@ -5,6 +5,7 @@ import { DateInput, TextInput } from "common-v2/components/input"
 import * as api from "common-v2/api"
 import * as norm from "common-v2/utils/normalizers"
 import { LotFormValue } from "./form"
+import { UserCheck } from "common-v2/components/icons"
 
 export const ProductionFields = () => {
   const { t } = useTranslation()
@@ -23,13 +24,18 @@ export const ProductionFields = () => {
 export const ProducerField = () => {
   const { t } = useTranslation()
   const bind = useBind<LotFormValue>()
+  const props = bind("producer")
+  const isKnown = props.value instanceof Object
+
   return (
     <Autocomplete
       label={t("Producteur")}
-      getOptions={api.findEntities}
+      icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
+      defaultOptions={props.value ? [props.value] : undefined}
+      getOptions={api.findEntities}
       normalize={norm.normalizeEntity}
-      {...bind("producer")}
+      {...props}
     />
   )
 }
@@ -37,14 +43,25 @@ export const ProducerField = () => {
 export const ProductionSiteField = () => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
-  const producer = parseInt(String(value.producer))
+  const props = bind("production_site")
+
+  const isKnown = props.value instanceof Object
+
+  // prettier-ignore
+  const producer =
+    value.producer instanceof Object
+      ? value.producer.id
+      : undefined
 
   return (
     <Autocomplete
       label={t("Site de production")}
+      icon={isKnown ? UserCheck : undefined}
+      create={norm.identity}
+      defaultOptions={props.value ? [props.value] : undefined}
       getOptions={(query) => api.findProductionSites(query, producer)}
       normalize={norm.normalizeProductionSite}
-      {...bind("production_site")}
+      {...props}
     />
   )
 }
@@ -52,12 +69,19 @@ export const ProductionSiteField = () => {
 export const ProductionSiteCertificateField = () => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
-  const production_site = parseInt(String(value.production_site))
+  const props = bind("production_site_certificate")
+
+  const production_site =
+    value.production_site instanceof Object
+      ? value.production_site.id
+      : undefined
+
   return (
     <Autocomplete
       label={t("Certificat du site de production")}
+      defaultOptions={props.value ? [props.value] : undefined}
       getOptions={(query) => api.findCertificates(query, { production_site })} // prettier-ignore
-      {...bind("production_site_certificate")}
+      {...props}
     />
   )
 }
@@ -76,12 +100,14 @@ export const ProductionSiteDoubleCountingCertificateField = () => {
 export const ProductionCountryField = () => {
   const { t } = useTranslation()
   const bind = useBind<LotFormValue>()
+  const props = bind("production_country")
   return (
     <Autocomplete
       label={t("Pays de production")}
+      defaultOptions={props.value ? [props.value] : undefined}
       getOptions={api.findCountries}
       normalize={norm.normalizeCountry}
-      {...bind("production_country")}
+      {...props}
     />
   )
 }

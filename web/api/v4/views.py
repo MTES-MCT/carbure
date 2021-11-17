@@ -1,5 +1,5 @@
-from calendar import calendar
-from datetime import datetime
+import calendar
+import datetime
 import traceback
 from unicodedata import category
 
@@ -68,7 +68,7 @@ def get_stock(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': "Could not get stock"}, status=400)
 
 @check_user_rights()
-def get_details(request, *args, **kwargs):
+def get_lot_details(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
     lot_id = request.GET.get('lot_id', False)
@@ -76,7 +76,7 @@ def get_details(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Missing lot_id'}, status=400)
 
     lot = CarbureLot.objects.get(pk=lot_id)
-    if lot.carbure_client_id != entity_id and lot.carbure_supplier != entity_id:
+    if str(lot.carbure_client_id) != entity_id and str(lot.carbure_supplier_id) != entity_id:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     now = datetime.datetime.now()

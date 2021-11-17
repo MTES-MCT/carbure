@@ -8,7 +8,6 @@ import {
 import Table, {
   actionColumn,
   Cell,
-  Column,
   Marker,
   markerColumn,
   selectionColumn,
@@ -22,103 +21,16 @@ export interface LotTableProps {
   lots: Lot[]
   selected: number[]
   onSelect: (selected: number[]) => void
+  onAction: (lot: Lot) => void
 }
 
 export const LotTable = memo(
-  ({ loading, lots, selected, onSelect }: LotTableProps) => {
+  ({ loading, lots, selected, onSelect, onAction }: LotTableProps) => {
     const { t } = useTranslation()
-
-    const columns: Record<string, Column<Lot>> = {
-      status: {
-        header: t("Statut"),
-        cell: (lot) => <LotTag lot={lot} />,
-      },
-
-      period: {
-        header: t("Période"),
-        cell: (lot) => (
-          <Cell
-            text={formatPeriod(lot.period)}
-            sub={formatDate(lot.delivery_date)}
-          />
-        ),
-      },
-
-      transportDocument: {
-        header: t("N° Document"),
-        cell: (lot) => (
-          <Cell
-            text={lot.transport_document_reference}
-            sub={lot.transport_document_type}
-          />
-        ),
-      },
-
-      biofuel: {
-        header: t("Biocarburant"),
-        cell: (lot) => (
-          <Cell
-            text={t(lot.biofuel?.name ?? "", { ns: "biofuels" })}
-            sub={`${formatNumber(lot.volume)} L`}
-          />
-        ),
-      },
-
-      feedstock: {
-        header: t("Matière première"),
-        cell: (lot) => (
-          <Cell
-            text={t(lot.feedstock?.name ?? "", { ns: "feedstocks" })}
-            sub={t(lot.country_of_origin?.name ?? "", { ns: "countries" })}
-          />
-        ),
-      },
-
-      supplier: {
-        header: t("Fournisseur"),
-        cell: (lot) => (
-          <Cell text={lot.carbure_supplier?.name ?? lot.unknown_supplier} />
-        ),
-      },
-
-      client: {
-        header: t("Client"),
-        cell: (lot) => (
-          <Cell text={lot.carbure_client?.name ?? lot.unknown_client} />
-        ),
-      },
-
-      productionSite: {
-        header: t("Site de production"),
-        cell: (lot) => (
-          <Cell
-            // prettier-ignore
-            text={lot.carbure_production_site?.name ?? lot.unknown_production_site}
-            sub={t(lot.production_country?.name ?? "", { ns: "countries" })}
-          />
-        ),
-      },
-
-      deliverySite: {
-        header: t("Site de livraison"),
-        cell: (lot) => (
-          <Cell
-            text={lot.carbure_delivery_site?.name ?? lot.unknown_delivery_site}
-            sub={t(lot.delivery_site_country?.name ?? "", { ns: "countries" })}
-          />
-        ),
-      },
-
-      ghgReduction: {
-        small: true,
-        header: t("Réd. GES"),
-        cell: (lot) => <Cell text={`${lot.ghg_reduction.toFixed(2)}%`} />,
-      },
-    }
-
     return (
       <Table
         loading={loading}
+        onAction={onAction}
         rows={lots}
         columns={[
           markerColumn(getLotMarker),
