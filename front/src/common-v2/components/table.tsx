@@ -95,12 +95,14 @@ export function selectionColumn<T, V>(
     className: css.selection,
     header: (
       <Checkbox
+        captive
         value={selection.isAllSelected(values)}
         onChange={() => selection.onSelectAll(values)}
       />
     ),
     cell: (item) => (
       <Checkbox
+        captive
         value={selection.isSelected(identify(item))}
         onChange={() => selection.onSelect(identify(item))}
       />

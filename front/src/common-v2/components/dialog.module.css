@@ -65,6 +65,14 @@
   padding: 0 var(--spacing-l);
 }
 
+.dialog > main > h2 {
+  font-size: 1.2em;
+  padding: 0 var(--spacing-l);
+  padding-bottom: var(--spacing-m);
+  border-bottom: 1px solid var(--gray-medium);
+  margin-bottom: calc(-1 * var(--spacing-l));
+}
+
 .dialog > main [data-list]:last-child {
   margin-bottom: calc(-1 * var(--spacing-l));
 }

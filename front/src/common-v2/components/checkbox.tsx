@@ -20,12 +20,14 @@ export interface CheckboxControl {
 }
 
 export interface CheckboxProps extends CheckboxControl {
+  captive?: boolean
   children?: React.ReactNode
   value: boolean
   onChange?: (value: boolean) => void
 }
 
 export const Checkbox = ({
+  captive,
   disabled,
   readOnly,
   required,
@@ -42,6 +44,7 @@ export const Checkbox = ({
     data-disabled={disabled ? true : undefined}
     data-checked={value ? true : undefined}
     aria-checked={value ? true : undefined}
+    onClick={captive ? (e) => e.stopPropagation() : undefined}
     className={cl(css.checkbox, className)}
     style={style}
   >
