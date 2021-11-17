@@ -26,7 +26,7 @@ export const Comments = ({ comments }: CommentsProps) => {
         {comments.map((comment, i) => (
           <div key={i}>
             <b>
-              [{formatDateTime(comment.comment_dt)}] {comment.entity.name} :
+              [{formatDateTime(comment.comment_dt)}] {comment.entity.name}:
             </b>{" "}
             {comment.comment}
           </div>
