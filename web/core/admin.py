@@ -565,6 +565,7 @@ class CarbureLotAdmin(admin.ModelAdmin):
     list_display = ['year', 'period', 'transport_document_reference', 'get_producer', 'get_production_site', 'get_supplier', 'get_client', 
     'delivery_date', 'get_delivery_site', 'get_biofuel', 'get_feedstock', 'volume', 'lot_status', 'correction_status', 'delivery_type',
     ]
+    raw_id_fields = ['parent_lot', 'parent_stock']
     list_filter = ('year', ('period', DropdownFilter), 'lot_status', 'correction_status', ('biofuel', NameSortedRelatedOnlyDropdownFilter), ('feedstock', NameSortedRelatedOnlyDropdownFilter), 
                   ('carbure_supplier', NameSortedRelatedOnlyDropdownFilter), ('carbure_client', NameSortedRelatedOnlyDropdownFilter),  
                   'delivery_type', ('carbure_delivery_site', NameSortedRelatedOnlyDropdownFilter),
