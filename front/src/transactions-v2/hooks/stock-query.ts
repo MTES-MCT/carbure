@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 import { PaginationManager } from "common-v2/components/pagination"
-import { Filter, FilterSelection, Status } from "../types"
+import { Filter, FilterSelection } from "../types"
 import { Entity } from "carbure/types"
 
 export interface StockQuery {
@@ -40,20 +40,13 @@ export function useStockQuery({
   return useMemo<StockQuery>(
     () => ({
       entity_id: entity.id,
-      history: category === 'history' ? true : undefined,
+      history: category === "history" ? true : undefined,
       query: search ? search : undefined,
       from_idx: page * (limit ?? 0),
       limit: limit || undefined,
       ...filters,
     }),
-    [
-      entity.id,
-      category,
-      search,
-      page,
-      limit,
-      filters,
-    ]
+    [entity.id, category, search, page, limit, filters]
   )
 }
 

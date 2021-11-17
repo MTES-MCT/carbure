@@ -1,8 +1,8 @@
 import { api, Api } from "common-v2/services/api"
 import { Option } from "common-v2/utils/normalize"
-import { LotQuery } from './hooks/lot-query'
-import { StockQuery } from './hooks/stock-query'
-import { LotList, Snapshot, Filter } from "./types"
+import { LotQuery } from "./hooks/lot-query"
+import { StockQuery } from "./hooks/stock-query"
+import { LotList, Snapshot, Filter, StockList } from "./types"
 
 const QUERY_RESET: Partial<LotQuery> = {
   limit: undefined,
@@ -35,19 +35,19 @@ export function getLotFilters(field: Filter, query: LotQuery) {
   })
 }
 
-
 export function sendLots(query: LotQuery, selection: number[]) {
-  return api.post<Api<void>>(
-    "/lots/send",
-    selection.length === 0 ? query : { entity_id: query.entity_id, selection }
-  )
-}
+  // prettier-ignore
+  const params = selection.length > 0
+    ? { entity_id: query.entity_id, selection }
+    : query
 
+  return api.post<Api<void>>("/lots/send", params)
+}
 
 // ENDPOINTS FOR STOCKS
 
-export function getStocks(query: any) {
-  return api.get<Api<any>>("/stocks", { params: query })
+export function getStocks(query: StockQuery) {
+  return api.get<Api<StockList>>("/stocks", { params: query })
 }
 
 export function getStockFilters(field: Filter, query: LotQuery) {

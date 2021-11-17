@@ -98,10 +98,11 @@
   gap: 1px;
   background-color: var(--gray-medium);
   overflow: hidden;
+  align-self: flex-start;
 }
 
 .switcher a {
-  padding: var(--spacing-s) var(--spacing-m);
+  padding: var(--spacing-s) var(--spacing-xl);
   background-color: var(--white);
   align-items: center;
   text-align: center;

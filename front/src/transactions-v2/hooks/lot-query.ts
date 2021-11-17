@@ -5,7 +5,7 @@ import { Entity } from "carbure/types"
 
 export interface LotQuery {
   entity_id: number
-  status?: Status
+  status?: string
   year?: number
   query?: string
   order_by?: string
@@ -37,10 +37,9 @@ export interface LotQuery {
 export interface LotQueryParams {
   entity: Entity
   status: Status
-  sub: string
+  category: string
   year: number
   search: string | undefined
-  correction: boolean
   invalid: boolean
   deadline: boolean
   pagination: PaginationManager
@@ -50,10 +49,9 @@ export interface LotQueryParams {
 export function useLotQuery({
   entity,
   status,
-  sub,
+  category,
   year,
   search,
-  correction,
   invalid,
   deadline,
   pagination,
@@ -65,10 +63,10 @@ export function useLotQuery({
     () => ({
       entity_id: entity.id,
       year,
-      status,
+      status: status.toUpperCase(),
       query: search ? search : undefined,
-      history: sub === "history" ? true : undefined,
-      correction: correction ? true : undefined,
+      history: category === "history" ? true : undefined,
+      correction: category === "correction" ? true : undefined,
       invalid: invalid ? true : undefined,
       deadline: deadline ? true : undefined,
       from_idx: page * (limit ?? 0),
@@ -79,9 +77,8 @@ export function useLotQuery({
       entity.id,
       year,
       status,
-      sub,
+      category,
       search,
-      correction,
       invalid,
       deadline,
       page,

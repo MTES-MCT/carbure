@@ -1,13 +1,13 @@
 import { useCallback, useState } from "react"
 import { useTranslation } from "react-i18next"
 import useLocalStorage from "common-v2/hooks/storage"
+import { useInvalidate } from "common-v2/hooks/invalidate"
 import { Row } from "./scaffold"
 import css from "./pagination.module.css"
 import Button from "./button"
 import { ChevronLeft, ChevronRight } from "./icons"
 import Select from "./select"
 import { Anchors } from "./dropdown"
-import { useInvalidate } from "common-v2/hooks/async"
 
 export interface PaginationProps {
   total: number

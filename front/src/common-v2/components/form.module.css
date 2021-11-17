@@ -4,7 +4,7 @@
   gap: var(--spacing-l);
 }
 
-.complex {
+.columns {
   flex-direction: row;
 }
 

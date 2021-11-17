@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import Dialog from "common-v2/components/dialog"
 import Tag from "common-v2/components/tag"
@@ -10,7 +10,13 @@ export const TransactionAdd = () => {
   const { t } = useTranslation()
 
   const navigate = useNavigate()
-  const close = () => navigate("../drafts")
+  const location = useLocation()
+
+  const close = () =>
+    navigate({
+      pathname: `../drafts`,
+      search: location.search,
+    })
 
   return (
     <Dialog onClose={close}>
@@ -32,12 +38,7 @@ export const TransactionAdd = () => {
           submit="lot-form"
           label={t("Créer lot")}
         />
-        <Button
-          asideX
-          icon={Return}
-          label={t("Retour")}
-          action={close} // prettier-ignore
-        />
+        <Button asideX icon={Return} label={t("Retour")} action={close} />
       </footer>
     </Dialog>
   )

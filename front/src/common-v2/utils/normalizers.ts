@@ -10,45 +10,38 @@ import {
 } from "common/types"
 
 export const normalizeBiofuel: Normalizer<Biofuel> = (biofuel) => ({
-  value: biofuel.code,
+  value: biofuel,
   label: i18next.t(biofuel.code, { ns: "biofuels" }),
 })
 
 export const normalizeFeedstock: Normalizer<Feedstock> = (feedstock) => ({
-  value: feedstock.code,
+  value: feedstock,
   label: i18next.t(feedstock.code, { ns: "feedstocks" }),
 })
 
 export const normalizeCountry: Normalizer<Country> = (country) => ({
-  value: country.code_pays,
+  value: country,
   label: i18next.t(country.code_pays, { ns: "countries" }),
 })
 
-export const normalizeEntity: Normalizer<Entity, number> = (entity) => ({
-  value: entity.id,
-  label: entity.name,
+export const normalizeEntity: Normalizer<Entity | string> = (entity) => ({
+  value: entity,
+  label: isString(entity) ? entity : entity.name,
 })
 
 // prettier-ignore
-export const normalizeProductionSite: Normalizer<ProductionSite, number> = (ps) => ({
-  value: ps.id,
-  label: ps.name,
+export const normalizeProductionSite: Normalizer<ProductionSite | string> = (ps) => ({
+  value: ps,
+  label: isString(ps) ? ps : ps.name,
 })
 
-export const normalizeDepot: Normalizer<Depot> = (depot) => ({
-  value: depot.depot_id,
-  label: depot.name,
+export const normalizeDepot: Normalizer<Depot | string> = (depot) => ({
+  value: depot,
+  label: isString(depot) ? depot : depot.name,
 })
 
 export function identity<T>(value: T) {
   return value
-}
-
-export function id(
-  value: Record<string, any> | string | undefined,
-  key: string = "id"
-) {
-  return typeof value === "string" ? undefined : value?.[key]
 }
 
 export function isString(value: any): value is string {
