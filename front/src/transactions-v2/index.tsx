@@ -12,8 +12,9 @@ import StatusTabs from "./components/status-tabs"
 import { DeclarationButton } from "./actions/declaration"
 import Lots from "./components/lots"
 import Stocks from "./components/stocks"
-import TransactionAdd from "transaction-add"
-import TransactionDetails from "transaction-details"
+import LotAdd from "lot-add"
+import LotDetails from "lot-details"
+import StockDetails from "stock-details"
 
 export const Transactions = () => {
   const { t } = useTranslation()
@@ -59,7 +60,7 @@ export const Transactions = () => {
 
         <Routes>
           <Route
-            path="stocks"
+            path="stocks/*"
             element={<Stocks entity={entity} snapshot={snapshotData} />}
           />
           <Route
@@ -70,8 +71,9 @@ export const Transactions = () => {
       </Main>
 
       <Routes>
-        <Route path="drafts/add" element={<TransactionAdd />} />
-        <Route path=":status/:id" element={<TransactionDetails />} />
+        <Route path="drafts/add" element={<LotAdd />} />
+        <Route path="stocks/:id" element={<StockDetails />} />
+        <Route path=":status/:id" element={<LotDetails />} />
       </Routes>
     </PortalProvider>
   )

@@ -4,7 +4,7 @@ import { Fieldset, useBind } from "common-v2/components/form"
 import { NumberInput, TextInput } from "common-v2/components/input"
 import * as api from "common-v2/api"
 import * as norm from "common-v2/utils/normalizers"
-import { LotFormValue } from "./form"
+import { LotFormValue } from "./lot-form"
 
 export const LotFields = () => {
   const { t } = useTranslation()
@@ -47,7 +47,7 @@ export const VolumeField = () => {
 export const BiofuelField = () => {
   const { t } = useTranslation()
   const bind = useBind<LotFormValue>()
-  const props = bind('biofuel')
+  const props = bind("biofuel")
   return (
     <Autocomplete
       required
@@ -63,7 +63,7 @@ export const BiofuelField = () => {
 export const FeedstockField = () => {
   const { t } = useTranslation()
   const bind = useBind<LotFormValue>()
-  const props = bind('feedstock')
+  const props = bind("feedstock")
   return (
     <Autocomplete
       required

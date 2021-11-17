@@ -52,7 +52,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   })
 
   const lots = useQuery(api.getLots, {
-    key: "transactions",
+    key: "lots",
     params: [query],
   })
 
@@ -63,7 +63,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const expiration = lotsData?.deadlines ?? { total: 0, date: "" }
   const errors = Object.keys(lotsData?.errors ?? {})
 
-  const showDetails = (lot: Lot) =>
+  const showLotDetails = (lot: Lot) =>
     navigate({
       pathname: `${status}/${lot.id}`,
       search: location.search,
@@ -122,7 +122,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
             lots={lotList}
             selected={selection}
             onSelect={setSelection}
-            onAction={showDetails}
+            onAction={showLotDetails}
           />
         )}
 

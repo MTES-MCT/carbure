@@ -4,7 +4,7 @@ import { Fieldset, useBind, useFormContext } from "common-v2/components/form"
 import { DateInput, TextInput } from "common-v2/components/input"
 import * as api from "common-v2/api"
 import * as norm from "common-v2/utils/normalizers"
-import { LotFormValue } from "./form"
+import { LotFormValue } from "./lot-form"
 import { UserCheck } from "common-v2/components/icons"
 
 export const ProductionFields = () => {
