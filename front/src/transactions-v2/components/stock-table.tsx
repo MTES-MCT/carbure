@@ -3,23 +3,35 @@ import { useTranslation } from "react-i18next"
 import { Stock } from "../types"
 import { formatNumber, formatDate } from "common-v2/utils/formatters"
 import StockTag from "./stock-tag"
-import Table, { Cell, selectionColumn } from "common-v2/components/table"
+import Table, { Cell, Order, selectionColumn } from "common-v2/components/table"
 
 export interface StockTableProps {
-  loading?: boolean
+  loading: boolean
   stocks: Stock[]
+  order: Order | undefined
   selected: number[]
   onSelect: (selected: number[]) => void
   onAction: (stock: Stock) => void
+  onOrder: (order: Order | undefined) => void
 }
 
 export const StockTable = memo(
-  ({ loading, stocks, selected, onSelect, onAction }: StockTableProps) => {
+  ({
+    loading,
+    stocks,
+    order,
+    selected,
+    onSelect,
+    onAction,
+    onOrder,
+  }: StockTableProps) => {
     const { t } = useTranslation()
     return (
       <Table
         loading={loading}
+        order={order}
         onAction={onAction}
+        onOrder={onOrder}
         rows={stocks}
         columns={[
           selectionColumn(stocks, selected, onSelect, (stock) => stock.id),
@@ -35,6 +47,7 @@ export const StockTable = memo(
             ),
           },
           {
+            key: "volume",
             header: t("Biocarburant"),
             cell: (stock) => (
               <Cell
@@ -44,6 +57,7 @@ export const StockTable = memo(
             ),
           },
           {
+            key: "feedstock",
             header: t("Matière première"),
             cell: (stock) => (
               <Cell
@@ -80,6 +94,7 @@ export const StockTable = memo(
           },
           {
             small: true,
+            key: "ghg_reduction",
             header: t("Réd. GES"),
             cell: (stock) => (
               <Cell text={`${stock.ghg_reduction.toFixed(2)}%`} />

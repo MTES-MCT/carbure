@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Entity } from "carbure/types"
 import { Snapshot, Stock } from "../types"
+import { Order } from "common-v2/components/table"
 import { useQuery } from "common-v2/hooks/async"
 import useStockQuery from "../hooks/stock-query"
 import { Bar } from "common-v2/components/scaffold"
@@ -28,6 +29,7 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
   const [category, setCategory] = useState("pending")
   const [search, setSearch] = useState<string | undefined>()
   const [selection, setSelection] = useState<number[]>([])
+  const [order, setOrder] = useState<Order | undefined>()
 
   // go back to the first page when the query changes
   const { resetPage } = pagination
@@ -38,6 +40,7 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
     category: category,
     search,
     pagination,
+    order,
     filters: filters.selected,
   })
 
@@ -91,9 +94,11 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
           <StockTable
             loading={stocks.loading}
             stocks={stockList}
+            order={order}
             selected={selection}
             onSelect={setSelection}
             onAction={showStockDetails}
+            onOrder={setOrder}
           />
         )}
 
