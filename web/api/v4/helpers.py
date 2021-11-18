@@ -602,6 +602,8 @@ def get_lots_summary_data(lots, entity_id, short=False):
     if short:
         return data
 
+    pending_filter = Q(lot_status__in=[CarbureLot.PENDING, CarbureLot.REJECTED]) | Q(correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED])
+
     lots_in = lots.filter(carbure_client_id=entity_id).annotate(
         supplier=Coalesce('carbure_supplier__name', 'unknown_supplier'),
         biofuel_code=F('biofuel__code')
@@ -611,7 +613,8 @@ def get_lots_summary_data(lots, entity_id, short=False):
     ).annotate(
         volume_sum=Sum('volume'),
         avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction')) / Sum('volume'),
-        count=Count('id')
+        total=Count('id'),
+        pending=Count('id', filter=pending_filter)
     ).order_by()
 
     lots_out = lots.filter(carbure_supplier=entity_id).exclude(carbure_client_id=entity_id).annotate(
@@ -623,7 +626,8 @@ def get_lots_summary_data(lots, entity_id, short=False):
     ).annotate(
         volume_sum=Sum('volume'),
         avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction')) / Sum('volume'),
-        count=Count('id')
+        total=Count('id'),
+        pending=Count('id', filter=pending_filter)
     ).order_by()
 
     data['in'] = list(lots_in)
