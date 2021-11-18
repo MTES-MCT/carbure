@@ -116,10 +116,12 @@ section.actionbar {
 .column {
   display: flex;
   flex-direction: column;
+  white-space: pre;
 }
 
 .row {
   display: flex;
+  white-space: pre;
 }
 
 .grid {

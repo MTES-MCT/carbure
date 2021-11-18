@@ -70,7 +70,7 @@
   padding: 0 var(--spacing-l);
   padding-bottom: var(--spacing-m);
   border-bottom: 1px solid var(--gray-medium);
-  margin-bottom: calc(-1 * var(--spacing-l));
+  margin-bottom: calc(-1 * var(--spacing-m));
 }
 
 .dialog > main [data-list]:last-child {

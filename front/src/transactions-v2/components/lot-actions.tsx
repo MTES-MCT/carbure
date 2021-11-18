@@ -29,7 +29,7 @@ export const LotActions = ({ count, ...props }: ActionBarProps) => {
             variant="danger"
             icon={Cross}
             label={
-              selection.length > 0 ? "Supprimer sélection" : "Supprimer tout"
+              selection.length > 0 ? "Supprimer la sélection" : "Supprimer tout"
             }
           />
         </Fragment>
@@ -42,20 +42,27 @@ export const LotActions = ({ count, ...props }: ActionBarProps) => {
             disabled={count === 0}
             variant="danger"
             icon={Cross}
-            label={selection.length > 0 ? "Refuser sélection" : "Refuser tout"}
+            label={
+              selection.length > 0 ? "Refuser la sélection" : "Refuser tout"
+            }
           />
           <Button
             disabled={count === 0 || selection.length === 0}
             variant="warning"
             icon={Wrench}
-            label={"Demander correction"}
+            label={"Demander une correction"}
           />
         </Fragment>
       )}
 
       {status === "out" && (
         <Fragment>
-          <Button label="TODO" />
+          <Button
+            disabled={count === 0 || selection.length === 0}
+            variant="warning"
+            icon={Wrench}
+            label={"Corriger la sélection"}
+          />
         </Fragment>
       )}
 

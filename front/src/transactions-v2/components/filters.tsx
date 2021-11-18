@@ -2,11 +2,12 @@ import { useCallback, useEffect, useState } from "react"
 import { useSearchParams, createSearchParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { Filter, FilterSelection, Status } from "../types"
+import * as api from "../api"
 import { LotQuery } from "../hooks/lot-query"
 import { Option } from "common-v2/utils/normalize"
-import { Grid } from "common-v2/components/scaffold"
+import { Grid, Row } from "common-v2/components/scaffold"
 import { MultiSelect, MultiSelectProps } from "common-v2/components/multi-select" // prettier-ignore
-import * as api from "../api"
+import Button from "common-v2/components/button"
 
 export interface FiltersProps {
   status: Status
@@ -63,6 +64,24 @@ export const Filters = ({
         />
       ))}
     </Grid>
+  )
+}
+
+interface ResetButtonProps {
+  filters: FilterManager
+}
+
+export const ResetButton = ({ filters }: ResetButtonProps) => {
+  const { t } = useTranslation()
+  return (
+    <Row asideX>
+      <Button
+        variant="link"
+        action={filters.resetFilters}
+        label={t("Réinitialiser les filtres")}
+      />
+      <span> ({filters.count})</span>
+    </Row>
   )
 }
 
