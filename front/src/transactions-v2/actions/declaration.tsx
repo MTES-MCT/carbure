@@ -9,7 +9,7 @@ import { usePortal } from "common-v2/components/portal"
 import * as api from "../api"
 import Button from "common-v2/components/button"
 import Dialog from "common-v2/components/dialog"
-import { Summary } from "./summary"
+import { Summary } from "../components/lot-summary"
 import Select from "common-v2/components/select"
 import Alert from "common-v2/components/alert"
 import { formatPeriod } from "common-v2/utils/formatters"
@@ -107,6 +107,7 @@ export const DeclarationDialog = ({
         </section>
         <section>
           <Select
+            loading={declarations.loading}
             label={t("Période de déclaration")}
             placeholder={t("Choisissez une période")}
             value={declaration}

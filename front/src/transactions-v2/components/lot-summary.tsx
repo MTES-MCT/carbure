@@ -11,7 +11,7 @@ import { Filter, Return } from "common-v2/components/icons"
 import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
 import { LotQuery } from "../hooks/lot-query"
 import { LotSummaryItem } from "../types"
-import { FilterManager, ResetButton } from "../components/filters"
+import { FilterManager, ResetButton } from "./filters"
 import NoResult from "transactions-v2/components/no-result"
 
 export interface SummaryBarProps {
@@ -138,7 +138,7 @@ export const Summary = ({
     {
       small: true,
       key: "ghg",
-      header: t("Moy. Réd. GES"),
+      header: t("Réd. GES"),
       orderBy: (item) => item.avg_ghg_reduction,
       cell: (item) => <Cell text={formatPercentage(item.avg_ghg_reduction)} />,
     },
