@@ -76,6 +76,7 @@ export interface Stock {
   id: number
   feedstock: Feedstock | null
   biofuel: Biofuel | null
+  country_of_origin: Country | null
   initial_volume: number
   remaining_volume: number
   remaining_weight: number
@@ -88,7 +89,6 @@ export interface Stock {
   carbure_client: Entity | null
   depot: Depot | null
   delivery_date: string | null
-  country_of_origin: Country | null
   ghg_reduction: number
   ghg_reduction_red_ii: number
   parent_lot: number
@@ -114,6 +114,22 @@ export interface Snapshot {
     out_pending: number
     out_tofix: number
   }
+}
+
+export interface LotSummary {
+  count: number
+  total_volume: number
+  in?: LotSummaryItem[]
+  out?: LotSummaryItem[]
+}
+
+export interface LotSummaryItem {
+  client?: string
+  supplier?: string
+  biofuel_code: string
+  volume_sum: number
+  count: number
+  avg_ghg_reduction: number
 }
 
 export enum LotStatus {

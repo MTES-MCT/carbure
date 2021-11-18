@@ -12,9 +12,9 @@ import { Anchors } from "./dropdown"
 export interface PaginationProps {
   total: number
   page: number | undefined
-  limit: number | null | undefined
+  limit: number | undefined
   onPage: (page: number | undefined) => void
-  onLimit: (limit: number | null | undefined) => void
+  onLimit: (limit: number | undefined) => void
 }
 
 export const Pagination = ({
@@ -53,6 +53,7 @@ export const Pagination = ({
         <Select
           variant="solid"
           anchor={Anchors.topLeft}
+          placeholder={t("Tous")}
           value={limit}
           onChange={onLimit}
           options={[
@@ -60,7 +61,7 @@ export const Pagination = ({
             { value: 25, label: "25" },
             { value: 50, label: "50" },
             { value: 100, label: "100" },
-            { value: null, label: t("Tous") },
+            { value: undefined, label: t("Tous") },
           ]}
         />
 
@@ -79,20 +80,20 @@ export const Pagination = ({
 
 export interface PaginationManager {
   page: number | undefined
-  limit: number | null | undefined
+  limit: number | undefined
   setPage: (page: number | undefined) => void
-  setLimit: (limit: number | null | undefined) => void
+  setLimit: (limit: number | undefined) => void
   resetPage: () => void
 }
 
 export function usePagination() {
   const [page, setPage] = useState<number | undefined>(0)
-  const [limit, _setLimit] = useLocalStorage<number | null | undefined>("carbure:limit", 10) // prettier-ignore
+  const [limit, _setLimit] = useLocalStorage<number | undefined>("carbure:limit", 10) // prettier-ignore
 
   const resetPage = useInvalidate("pagination", () => setPage(0))
 
   const setLimit = useCallback(
-    (limit: number | null | undefined) => {
+    (limit: number | undefined) => {
       _setLimit(limit)
       resetPage()
     },

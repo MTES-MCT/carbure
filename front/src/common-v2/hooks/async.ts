@@ -84,15 +84,16 @@ export function useAsyncList<T, V>({
   // fetch items matching the currently selected values everytime they change
   const asyncSelectedItems: UseAsyncReturn<T[]> = useAsync(
     async () => {
-      const values =
+      const dirtyValues: V[] =
         selectedValue !== undefined // prettier-ignore
           ? [selectedValue]
-          : selectedValues ?? (EMPTY as V[])
+          : selectedValues ?? EMPTY
 
+      const values = dirtyValues.filter((v: any) => v !== "" && v !== undefined)
       const keys = values.map((value) => JSON.stringify(value))
 
       // nothing to do if there's no selection
-      if (values.length === 0) return EMPTY as T[]
+      if (values.length === 0) return EMPTY
 
       const cachedItems = uniqueBy(
         [

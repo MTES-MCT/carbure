@@ -18,16 +18,16 @@ export function formatGHG(num: number) {
 }
 
 export function formatDate(
-  str: string | null,
+  date: string | null,
   options: Parameters<typeof format>[1] = {}
 ) {
-  if (str === null) {
+  if (date === null) {
     return "N/A"
   }
 
   try {
     const formatted = format(
-      new Date(str),
+      new Date(date),
       {
         year: "numeric",
         month: "numeric",
@@ -41,6 +41,13 @@ export function formatDate(
   } catch (e) {
     return "N/A"
   }
+}
+
+export function formatDateTime(date: string | null) {
+  return formatDate(date, {
+    hour: "2-digit",
+    minute: "2-digit",
+  })
 }
 
 // prepare string for comparison by putting it to lowercase and removing accents

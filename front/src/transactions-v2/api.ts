@@ -2,13 +2,17 @@ import { api, Api } from "common-v2/services/api"
 import { Option } from "common-v2/utils/normalize"
 import { LotQuery } from "./hooks/lot-query"
 import { StockQuery } from "./hooks/stock-query"
-import { LotList, Snapshot, Filter, StockList } from "./types"
+import { LotList, Snapshot, Filter, StockList, LotSummary } from "./types"
 
 const QUERY_RESET: Partial<LotQuery> = {
   limit: undefined,
   from_idx: undefined,
   order_by: undefined,
   direction: undefined,
+}
+
+export function getYears(entity_id: number) {
+  return api.get<Api<number[]>>("/years", { params: { entity_id } })
 }
 
 export function getSnapshot(entity_id: number, year: number) {
@@ -25,6 +29,16 @@ export function getLots(query: LotQuery) {
 
 export function downloadLots(query: LotQuery, selection: number[]) {
   return null
+}
+
+export function getLotsSummary(
+  query: LotQuery,
+  selection: number[],
+  short?: boolean
+) {
+  return api.get<Api<LotSummary>>("/lots/summary", {
+    params: { ...query, selection, ...QUERY_RESET, short },
+  })
 }
 
 export function getLotFilters(field: Filter, query: LotQuery) {
