@@ -31,9 +31,12 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
   const [selection, setSelection] = useState<number[]>([])
   const [order, setOrder] = useState<Order | undefined>()
 
-  // go back to the first page when the query changes
+  // go back to the first page and empty selection when the query changes
   const { resetPage } = pagination
-  useEffect(() => resetPage(), [filters.selected, category, search, resetPage])
+  useEffect(() => {
+    resetPage()
+    setSelection([])
+  }, [filters.selected, category, search, resetPage])
 
   const query = useStockQuery({
     entity,

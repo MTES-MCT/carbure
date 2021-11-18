@@ -38,13 +38,33 @@ export const Grid = (props: JSX.IntrinsicElements["div"]) => (
 )
 
 // a div with vertical flow
-export const Col = (props: JSX.IntrinsicElements["div"] & Layout) => (
-  <div {...props} {...layout(props)} className={cl(css.column, props.className)} />
-); // prettier-ignore
+export const Col = ({
+  asideX,
+  asideY,
+  spread,
+  className,
+  ...props
+}: JSX.IntrinsicElements["div"] & Layout) => (
+  <div
+    {...props}
+    {...layout({ asideX, asideY })}
+    className={cl(css.column, className)}
+  />
+)
 
 // a div with horizontal flow
-export const Row = (props: JSX.IntrinsicElements["div"] & Layout) => (
-  <div {...props} {...layout(props)} className={cl(css.row, props.className)} />
+export const Row = ({
+  asideX,
+  asideY,
+  spread,
+  className,
+  ...props
+}: JSX.IntrinsicElements["div"] & Layout) => (
+  <div
+    {...props}
+    {...layout({ asideX, asideY })}
+    className={cl(css.row, className)}
+  />
 )
 
 export const Overlay = (props: JSX.IntrinsicElements["div"]) => (

@@ -1,8 +1,7 @@
 import Alert from "common-v2/components/alert"
-import Button from "common-v2/components/button"
 import { AlertCircle } from "common-v2/components/icons"
 import { useTranslation } from "react-i18next"
-import { FilterManager } from "./filters"
+import { FilterManager, ResetButton } from "./filters"
 
 interface NoResultProps {
   loading: boolean
@@ -17,22 +16,6 @@ export const NoResult = ({ loading, filters }: NoResultProps) => {
       <p>{t("Aucune transaction trouvée pour cette recherche")}</p>
       <ResetButton filters={filters} />
     </Alert>
-  )
-}
-
-interface ResetButtonProps {
-  filters: FilterManager
-}
-
-export const ResetButton = ({ filters }: ResetButtonProps) => {
-  const { t } = useTranslation()
-  return (
-    <>
-      <Button asideX variant="link" action={filters.resetFilters}>
-        {t("Réinitialiser les filtres")}
-      </Button>
-      <span>({filters.count})</span>
-    </>
   )
 }
 

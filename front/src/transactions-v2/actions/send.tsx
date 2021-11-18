@@ -12,6 +12,7 @@ import Dialog from "common-v2/components/dialog"
 import { Check, Return } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
 import * as api from "../api"
+import { Summary } from "./summary"
 
 export interface SendButtonProps {
   disabled?: boolean
@@ -35,7 +36,12 @@ export const SendManyButton = ({
       label={selection.length > 0 ? t("Envoyer sélection") : t("Envoyer tout")}
       action={() =>
         portal((close) => (
-          <SendDialog query={query} selection={selection} onClose={close} />
+          <SendDialog
+            summary
+            query={query}
+            selection={selection}
+            onClose={close}
+          />
         ))
       }
     />
@@ -72,12 +78,18 @@ export const SendOneButton = ({ icon, lot }: SendIconButtonProps) => {
 }
 
 interface SendDialogProps {
+  summary?: boolean
   query: LotQuery
   selection: number[]
   onClose: () => void
 }
 
-const SendDialog = ({ query, selection, onClose }: SendDialogProps) => {
+const SendDialog = ({
+  summary,
+  query,
+  selection,
+  onClose,
+}: SendDialogProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
 
@@ -87,7 +99,7 @@ const SendDialog = ({ query, selection, onClose }: SendDialogProps) => {
   const v = variations(selection.length)
 
   const sendLots = useMutation(api.sendLots, {
-    invalidates: ["transactions", "transactions-snapshot"],
+    invalidates: ["lots", "snapshot"],
     params: [query, selection],
 
     onSuccess: () => {
@@ -129,7 +141,7 @@ const SendDialog = ({ query, selection, onClose }: SendDialogProps) => {
           {v({
             zero: t("Vous vous apprêtez à envoyer ces lots à leurs destinataires"), // prettier-ignore
             one: t("Vous vous apprêtez à envoyer ce lot à ses destinataires"),
-            many: t("Vous vous apprêtez à envoyer ces lots sélectionnés à leurs destinataires"), // prettier-ignore
+            many: t("Vous vous apprêtez à envoyer les lots sélectionnés à leurs destinataires"), // prettier-ignore
           })}
           {t(", assurez-vous que les conditions ci-dessous sont respectées :")}
         </section>
@@ -145,6 +157,7 @@ const SendDialog = ({ query, selection, onClose }: SendDialogProps) => {
             label={t("Je certifie que les informations renseignées sont réelles et valides")} // prettier-ignore
           />
         </section>
+        {summary && <Summary query={query} selection={selection} />}
       </main>
       <footer>
         <Button

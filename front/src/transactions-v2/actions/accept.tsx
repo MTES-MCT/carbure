@@ -26,7 +26,7 @@ export const AcceptButton = ({
       variant="success"
       icon={Check}
       label={
-        selection.length > 0 ? t("Accepter sélection") : t("Accepter tout")
+        selection.length > 0 ? t("Accepter la sélection") : t("Accepter tout")
       }
       items={[
         { label: t("Incorporation") },

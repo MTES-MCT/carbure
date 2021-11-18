@@ -14,8 +14,8 @@ import { LotTable } from "../components/lot-table"
 import NoResult from "../components/no-result"
 import { LotActions } from "../components/lot-actions"
 import { DeadlineSwitch, InvalidSwitch } from "../components/switches"
+import { SummaryBar } from "../actions/summary"
 import SearchBar from "./search-bar"
-import Summary from "./summary"
 
 export interface LotsProps {
   entity: Entity
@@ -38,9 +38,12 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const [selection, setSelection] = useState<number[]>([])
   const [order, setOrder] = useState<Order | undefined>()
 
-  // go back to the first page when the query changes
+  // go back to the first page and empty selection when the query changes
   const { resetPage } = pagination
-  useEffect(() => resetPage(), [status, filters.selected, category, invalid, deadline, search, resetPage]) // prettier-ignore
+  useEffect(() => {
+    resetPage()
+    setSelection([])
+  }, [status, filters.selected, category, invalid, deadline, search, resetPage])
 
   const query = useLotQuery({
     entity,
@@ -64,7 +67,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const lotList = lotsData?.lots ?? []
   const count = lotsData?.returned ?? 0
   const total = lotsData?.total ?? 0
-  const expiration = lotsData?.deadlines ?? { total: 0, date: "" }
+  const expiring = lotsData?.deadlines ?? { total: 0, date: "" }
   const errors = Object.keys(lotsData?.errors ?? {})
 
   const showLotDetails = (lot: Lot) =>
@@ -103,10 +106,10 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
           />
         )}
 
-        {expiration.total > 0 && (
+        {expiring.total > 0 && (
           <DeadlineSwitch
-            count={expiration.total}
-            date={expiration.date}
+            count={expiring.total}
+            date={expiring.date}
             active={deadline}
             onSwitch={showDeadline}
           />
@@ -114,27 +117,29 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
 
         {count === 0 && <NoResult loading={lots.loading} filters={filters} />}
 
-        <Summary query={query} selection={selection} filters={filters} />
-
         {count > 0 && (
-          <LotTable
-            loading={lots.loading}
-            order={order}
-            lots={lotList}
-            selected={selection}
-            onSelect={setSelection}
-            onAction={showLotDetails}
-            onOrder={setOrder}
-          />
-        )}
+          <>
+            <SummaryBar query={query} selection={selection} filters={filters} />
 
-        <Pagination
-          page={pagination.page}
-          limit={pagination.limit}
-          total={total}
-          onPage={pagination.setPage}
-          onLimit={pagination.setLimit}
-        />
+            <LotTable
+              loading={lots.loading}
+              order={order}
+              lots={lotList}
+              selected={selection}
+              onSelect={setSelection}
+              onAction={showLotDetails}
+              onOrder={setOrder}
+            />
+
+            <Pagination
+              page={pagination.page}
+              limit={pagination.limit}
+              total={total}
+              onPage={pagination.setPage}
+              onLimit={pagination.setLimit}
+            />
+          </>
+        )}
       </section>
     </>
   )
