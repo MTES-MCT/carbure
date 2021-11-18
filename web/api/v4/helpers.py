@@ -553,7 +553,7 @@ def get_transaction_distance(lot):
 def send_email_declaration_validated(declaration):
     email_subject = "Carbure - Votre Déclaration de Durabilité a été validée"
     cc = "carbure@beta.gouv.fr"
-    text_message = """ 
+    text_message = """
     Bonjour,
 
     Votre Déclaration de Durabilité pour la période %s a bien été prise en compte.
@@ -575,7 +575,7 @@ def send_email_declaration_validated(declaration):
 def send_email_declaration_invalidated(declaration):
     email_subject = "Carbure - Votre Déclaration de Durabilité a été annulée"
     cc = "carbure@beta.gouv.fr"
-    text_message = """ 
+    text_message = """
     Bonjour,
 
     Votre Déclaration de Durabilité pour la période %s a bien été annulée.
@@ -594,7 +594,7 @@ def send_email_declaration_invalidated(declaration):
 
     msg = EmailMultiAlternatives(subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
     msg.send()
-    
+
 
 def get_lots_summary_data(lots, entity_id, short=False):
     data = {'count': lots.count(), 'total_volume': lots.aggregate(Sum('volume'))['volume__sum'] or 0}
@@ -632,4 +632,31 @@ def get_lots_summary_data(lots, entity_id, short=False):
 
     data['in'] = list(lots_in)
     data['out'] = list(lots_out)
+    return data
+
+
+def get_stocks_summary_data(stocks, entity_id, short=False):
+    data = {
+        'count': stocks.count(),
+        'total_remaining_volume': stocks.aggregate(Sum('remaining_volume'))['remaining_volume__sum'] or 0
+    }
+
+    if short:
+        return data
+
+    stock_summary = stocks.filter(carbure_client_id=entity_id).annotate(
+        supplier=Coalesce('carbure_supplier__name', 'unknown_supplier'),
+        biofuel_code=F('biofuel__code')
+    ).values(
+        'supplier',
+        'biofuel_code'
+    ).annotate(
+        # volume_sum=Sum('parent_lot__volume'),
+        remaining_volume_sum=Sum('remaining_volume'),
+        avg_ghg_reduction=Sum(F('remaining_volume') * F('ghg_reduction')) / Sum('remaining_volume'),
+        total=Count('id'),
+    ).order_by()
+
+    # data['total_volume'] = stocks.aggregate(Sum('parent_lot__volume'))['parent_lot__volume__sum'] or 0,
+    data['stock'] = list(stock_summary)
     return data

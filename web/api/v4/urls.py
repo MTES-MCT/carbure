@@ -32,6 +32,7 @@ urlpatterns = [
 
     # STOCKS
     path('stocks', views.get_stock, name='api-v4-get-stock'),
+    path('stocks/summary', views.get_stocks_summary, name='api-v4-get-stock-summary'),
     path('stocks/details', views.get_stock_details, name='api-v4-get-stock-details'),
     path('stocks/cancel-transformation', views.stock_cancel_transformation, name='api-v4-cancel-transformation'),
     path('stocks/split', views.get_snapshot, name='api-v4-stock-split'),

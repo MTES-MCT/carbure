@@ -6,7 +6,7 @@ from django.db.models.aggregates import Count
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
 from core.decorators import check_user_rights
-from api.v4.helpers import filter_lots, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_transaction_distance, send_email_declaration_invalidated, send_email_declaration_validated
+from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, send_email_declaration_invalidated, send_email_declaration_validated
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, Entity, SustainabilityDeclaration
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer
 
@@ -91,7 +91,22 @@ def get_lots_summary(request, *args, **kwargs):
         return JsonResponse({'status': 'success', 'data': summary})
     except Exception:
         traceback.print_exc()
-        return JsonResponse({'status': 'error', 'message': "Could not get lots"}, status=400)
+        return JsonResponse({'status': 'error', 'message': "Could not get lots summary"}, status=400)
+
+
+@check_user_rights()
+def get_stocks_summary(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    short = request.GET.get('short', False)
+    try:
+        stock = get_entity_stock(entity_id)
+        stock = filter_stock(stock, request.GET, entity_id)
+        summary = get_stocks_summary_data(stock, entity_id, short == 'true')
+        return JsonResponse({'status': 'success', 'data': summary})
+    except Exception:
+        traceback.print_exc()
+        return JsonResponse({'status': 'error', 'message': "Could not get stock summary"}, status=400)
 
 
 @check_user_rights()
