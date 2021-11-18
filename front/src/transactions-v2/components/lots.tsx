@@ -6,6 +6,7 @@ import { Lot, Snapshot } from "../types"
 import { useQuery } from "common-v2/hooks/async"
 import useLotQuery from "../hooks/lot-query"
 import useStatus from "../hooks/status"
+import { Order } from "common-v2/components/table"
 import { Bar } from "common-v2/components/scaffold"
 import Pagination, { usePagination } from "common-v2/components/pagination"
 import Filters, { useFilters } from "../components/filters"
@@ -13,7 +14,8 @@ import { LotTable } from "../components/lot-table"
 import NoResult from "../components/no-result"
 import { LotActions } from "../components/lot-actions"
 import { DeadlineSwitch, InvalidSwitch } from "../components/switches"
-import { SearchBar } from "./search-bar"
+import SearchBar from "./search-bar"
+import Summary from "./summary"
 
 export interface LotsProps {
   entity: Entity
@@ -34,6 +36,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
   const [deadline, showDeadline] = useState(false)
   const [search, setSearch] = useState<string | undefined>()
   const [selection, setSelection] = useState<number[]>([])
+  const [order, setOrder] = useState<Order | undefined>()
 
   // go back to the first page when the query changes
   const { resetPage } = pagination
@@ -48,22 +51,23 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
     invalid,
     deadline,
     pagination,
+    order,
     filters: filters.selected,
   })
 
   const lots = useQuery(api.getLots, {
-    key: "transactions",
+    key: "lots",
     params: [query],
   })
 
   const lotsData = lots.result?.data.data
   const lotList = lotsData?.lots ?? []
-  const returned = lotsData?.returned ?? 0
+  const count = lotsData?.returned ?? 0
   const total = lotsData?.total ?? 0
   const expiration = lotsData?.deadlines ?? { total: 0, date: "" }
   const errors = Object.keys(lotsData?.errors ?? {})
 
-  const showDetails = (lot: Lot) =>
+  const showLotDetails = (lot: Lot) =>
     navigate({
       pathname: `${status}/${lot.id}`,
       search: location.search,
@@ -89,7 +93,7 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
           onSwitch={setCategory}
         />
 
-        <LotActions count={returned} query={query} selection={selection} />
+        <LotActions count={count} query={query} selection={selection} />
 
         {errors.length > 0 && (
           <InvalidSwitch
@@ -108,21 +112,19 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
           />
         )}
 
-        {returned === 0 && (
-          <NoResult
-            loading={lots.loading}
-            count={filters.count}
-            onReset={filters.resetFilters}
-          />
-        )}
+        {count === 0 && <NoResult loading={lots.loading} filters={filters} />}
 
-        {returned > 0 && (
+        <Summary query={query} selection={selection} filters={filters} />
+
+        {count > 0 && (
           <LotTable
             loading={lots.loading}
+            order={order}
             lots={lotList}
             selected={selection}
             onSelect={setSelection}
-            onAction={showDetails}
+            onAction={showLotDetails}
+            onOrder={setOrder}
           />
         )}
 

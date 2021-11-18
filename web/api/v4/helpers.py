@@ -3,8 +3,8 @@ import datetime
 import calendar
 from multiprocessing.context import Process
 from dateutil.relativedelta import relativedelta
-from django.db.models.aggregates import Count
-from django.db.models.expressions import OuterRef, Subquery
+from django.db.models.aggregates import Count, Sum
+from django.db.models.expressions import F, OuterRef, Subquery
 from django.db.models.functions.comparison import Coalesce
 from django.db.models.query_utils import Q
 from django.http.response import HttpResponse, JsonResponse
@@ -18,7 +18,7 @@ from core.serializers import CarbureLotCommentSerializer, CarbureLotEventSeriali
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
 
 
-sort_key_to_django_field = {'period': 'period',
+sort_key_to_django_field = {'period': 'delivery_date',
                             'feedstock': 'feedstock__name',
                             'ghg_reduction': 'ghg_reduction',
                             'volume': 'volume',
@@ -512,10 +512,10 @@ def get_lot_errors(lot, entity_id, is_admin=False):
         return GenericErrorSerializer(lot.genericerror_set.filter(display_to_creator=True), many=True).data
 
 def get_lot_updates(lot, entity_id):
-    CarbureLotEventSerializer(lot.carburelotevent_set.all(), many=True).data
+    return CarbureLotEventSerializer(lot.carburelotevent_set.all(), many=True).data
 
 def get_lot_comments(lot, entity_id):
-    CarbureLotCommentSerializer(lot.carburelotcomment_set.all(), many=True).data
+    return CarbureLotCommentSerializer(lot.carburelotcomment_set.all(), many=True).data
 
 def get_transaction_distance(lot):
     url_link = 'https://www.google.com/maps/dir/?api=1&origin=%s&destination=%s&travelmode=driving'
@@ -593,3 +593,37 @@ def send_email_declaration_invalidated(declaration):
     msg = EmailMultiAlternatives(subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
     msg.send()
     
+
+def get_lots_summary_data(lots, entity_id, short=False):
+    data = {'count': lots.count(), 'total_volume': lots.aggregate(Sum('volume'))['volume__sum'] or 0}
+
+    if short:
+        return data
+
+    lots_in = lots.filter(carbure_client_id=entity_id).annotate(
+        supplier=Coalesce('carbure_supplier__name', 'unknown_supplier'),
+        biofuel_code=F('biofuel__code')
+    ).values(
+        'supplier',
+        'biofuel_code'
+    ).annotate(
+        volume_sum=Sum('volume'),
+        avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction')) / Sum('volume'),
+        count=Count('id')
+    ).order_by()
+
+    lots_out = lots.filter(carbure_supplier=entity_id).exclude(carbure_client_id=entity_id).annotate(
+        client=Coalesce('carbure_client__name', 'unknown_client'),
+        biofuel_code=F('biofuel__code')
+    ).values(
+        'client',
+        'biofuel_code'
+    ).annotate(
+        volume_sum=Sum('volume'),
+        avg_ghg_reduction=Sum(F('volume') * F('ghg_reduction')) / Sum('volume'),
+        count=Count('id')
+    ).order_by()
+
+    data['in'] = list(lots_in)
+    data['out'] = list(lots_out)
+    return data

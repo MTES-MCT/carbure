@@ -92,7 +92,7 @@ export function useFilters(): FilterManager {
     [selected, setSearchParams]
   )
 
-  const resetFilters = () => setFilters({})
+  const resetFilters = () => setSearchParams({})
 
   const count = Object.values(selected).filter((list) => list.length > 0).length
 

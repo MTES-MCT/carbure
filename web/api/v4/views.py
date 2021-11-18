@@ -1,13 +1,26 @@
-from calendar import calendar
+import calendar
 import datetime
 import traceback
 from unicodedata import category
 
 from django.http.response import JsonResponse
+from django.db.models.query_utils import Q
 from core.decorators import check_user_rights
+<<<<<<< HEAD
 from api.v4.helpers import get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_transaction_distance, get_errors, send_email_declaration_invalidated, send_email_declaration_validated
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, Entity, SustainabilityDeclaration
+=======
+from api.v4.helpers import get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_transaction_distance, filter_lots
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, Entity
+>>>>>>> c017fa005519fbe082095bb2ae7b8faaef6e60f2
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer
+
+
+@check_user_rights()
+def get_years(request, *args, **kwargs):
+    entity_id = int(kwargs['context']['entity_id'])
+    data = CarbureLot.objects.filter(Q(carbure_client_id=entity_id) | Q(carbure_supplier_id=entity_id)).values_list('year').distinct()
+    return JsonResponse({'status': 'success', 'data': list(data)})
 
 
 @check_user_rights()
@@ -69,6 +82,24 @@ def get_stock(request, *args, **kwargs):
 
 
 @check_user_rights()
+def get_lots_summary(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    status = request.GET.get('status', False)
+    short = request.GET.get('short', False)
+    if not status:
+        return JsonResponse({'status': 'error', 'message': 'Missing status'}, status=400)
+    try:
+        lots = get_entity_lots_by_status(entity_id, status)
+        lots = filter_lots(lots, request.GET, entity_id)[0]
+        summary = get_lots_summary_data(lots, entity_id, short == 'true')
+        return JsonResponse({'status': 'success', 'data': summary})
+    except Exception:
+        traceback.print_exc()
+        return JsonResponse({'status': 'error', 'message': "Could not get lots"}, status=400)
+
+
+@check_user_rights()
 def get_stock_details(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -96,7 +127,7 @@ def get_lot_details(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Missing lot_id'}, status=400)
 
     lot = CarbureLot.objects.get(pk=lot_id)
-    if lot.carbure_client_id != entity_id and lot.carbure_supplier != entity_id:
+    if str(lot.carbure_client_id) != entity_id and str(lot.carbure_supplier_id) != entity_id:
         return JsonResponse({'status': 'forbidden', 'message': "User not allowed"}, status=403)
 
     now = datetime.datetime.now()
@@ -237,7 +268,7 @@ def mark_as_fixed(request, *args, **kwargs):
         event.event_type = CarbureLotEvent.MARKED_AS_FIXED
         event.lot = lot
         event.user = request.user
-        event.save()        
+        event.save()
     return JsonResponse({'status': 'success'})
 
 @check_user_rights()
@@ -263,7 +294,7 @@ def approve_fix(request, *args, **kwargs):
         event.event_type = CarbureLotEvent.FIX_ACCEPTED
         event.lot = lot
         event.user = request.user
-        event.save()            
+        event.save()
     return JsonResponse({'status': 'success'})
 
 @check_user_rights()
@@ -281,7 +312,7 @@ def reject_lot(request, *args, **kwargs):
             lot = CarbureLot.objects.get(pk=lot_id)
         except:
             return JsonResponse({'status': 'error', 'message': 'Could not find lot id %d' % (lot_id)}, status=400)
-       
+
         if entity != lot.carbure_client:
             return JsonResponse({'status': 'forbidden', 'message': 'Only the client can reject this lot'}, status=403)
 
@@ -312,7 +343,7 @@ def reject_lot(request, *args, **kwargs):
                 n = CarbureNotification()
                 n.event = event
                 n.recipient = event.lot.carbure_supplier
-                n.save()        
+                n.save()
     return JsonResponse({'status': 'success'})
 
 @check_user_rights()
@@ -764,6 +795,7 @@ def validate_declaration(request, *args, **kwargs):
     declaration.save()
     # send email
     send_email_declaration_validated(declaration)
+    return JsonResponse({'status': 'success'})
 
 
 
@@ -797,3 +829,4 @@ def invalidate_declaration(request, *args, **kwargs):
     CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN).update(lot_status=CarbureLot.ACCEPTED)
     # send email
     send_email_declaration_invalidated(declaration)
+    return JsonResponse({'status': 'success'})

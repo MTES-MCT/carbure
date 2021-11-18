@@ -11,26 +11,39 @@ import Table, {
   Cell,
   Marker,
   markerColumn,
+  Order,
   selectionColumn,
 } from "common-v2/components/table"
 import { SendOneButton } from "transactions-v2/actions/send"
 import LotTag from "./lot-tag"
 
 export interface LotTableProps {
-  loading?: boolean
+  loading: boolean
   lots: Lot[]
+  order: Order | undefined
   selected: number[]
   onSelect: (selected: number[]) => void
   onAction: (lot: Lot) => void
+  onOrder: (order: Order | undefined) => void
 }
 
 export const LotTable = memo(
-  ({ loading, lots, selected, onSelect, onAction }: LotTableProps) => {
+  ({
+    loading,
+    lots,
+    order,
+    selected,
+    onSelect,
+    onAction,
+    onOrder,
+  }: LotTableProps) => {
     const { t } = useTranslation()
     return (
       <Table
         loading={loading}
+        order={order}
         onAction={onAction}
+        onOrder={onOrder}
         rows={lots}
         columns={[
           markerColumn(getLotMarker),
@@ -40,6 +53,7 @@ export const LotTable = memo(
             cell: (lot) => <LotTag lot={lot} />,
           },
           {
+            key: "period",
             header: t("Période"),
             cell: (lot) => (
               <Cell
@@ -58,6 +72,7 @@ export const LotTable = memo(
             ),
           },
           {
+            key: "volume",
             header: t("Biocarburant"),
             cell: (lot) => (
               <Cell
@@ -67,6 +82,7 @@ export const LotTable = memo(
             ),
           },
           {
+            key: "feedstock",
             header: t("Matière première"),
             cell: (lot) => (
               <Cell
@@ -108,6 +124,7 @@ export const LotTable = memo(
           },
           {
             small: true,
+            key: "ghg_reduction",
             header: t("Réd. GES"),
             cell: (lot) => <Cell text={`${lot.ghg_reduction.toFixed(2)}%`} />,
           },

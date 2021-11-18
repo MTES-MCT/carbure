@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Navigate, Route, Routes } from "react-router-dom"
 import useEntity from "carbure/hooks/entity"
@@ -12,8 +12,11 @@ import StatusTabs from "./components/status-tabs"
 import { DeclarationButton } from "./actions/declaration"
 import Lots from "./components/lots"
 import Stocks from "./components/stocks"
-import TransactionAdd from "transaction-add"
-import TransactionDetails from "transaction-details"
+import LotAdd from "lot-add"
+import LotDetails from "lot-details"
+import StockDetails from "stock-details"
+
+const now = new Date()
 
 export const Transactions = () => {
   const { t } = useTranslation()
@@ -21,18 +24,31 @@ export const Transactions = () => {
   const entity = useEntity()
   const status = useStatus()
 
-  const [year = 2021, setYear] = useState<number | undefined>()
+  const [year = now.getFullYear(), setYear] = useState<number | undefined>()
+
+  const years = useQuery(api.getYears, {
+    key: "years",
+    params: [entity.id],
+  })
 
   const snapshot = useQuery(api.getSnapshot, {
-    key: "transactions-snapshot",
+    key: "snapshot",
     params: [entity.id, year],
   })
+
+  const yearData = years.result?.data.data
+  const snapshotData = snapshot.result?.data.data
+
+  // select first available year if previous selection did not match
+  useEffect(() => {
+    if (yearData && !yearData.includes(year)) {
+      setYear(yearData[0])
+    }
+  }, [year, yearData])
 
   if (status === "unknown") {
     return <Navigate to="drafts" />
   }
-
-  const snapshotData = snapshot.result?.data.data
 
   return (
     <PortalProvider>
@@ -46,7 +62,7 @@ export const Transactions = () => {
               placeholder={t("Choisir une année")}
               value={year}
               onChange={setYear}
-              options={[2019, 2020, 2021]}
+              options={yearData}
             />
 
             <DeclarationButton />
@@ -59,7 +75,7 @@ export const Transactions = () => {
 
         <Routes>
           <Route
-            path="stocks"
+            path="stocks/*"
             element={<Stocks entity={entity} snapshot={snapshotData} />}
           />
           <Route
@@ -70,8 +86,9 @@ export const Transactions = () => {
       </Main>
 
       <Routes>
-        <Route path="drafts/add" element={<TransactionAdd />} />
-        <Route path=":status/:id" element={<TransactionDetails />} />
+        <Route path="drafts/add" element={<LotAdd />} />
+        <Route path="stocks/:id" element={<StockDetails />} />
+        <Route path=":status/:id" element={<LotDetails />} />
       </Routes>
     </PortalProvider>
   )

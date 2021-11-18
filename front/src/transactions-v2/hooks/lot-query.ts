@@ -2,6 +2,7 @@ import { useMemo } from "react"
 import { PaginationManager } from "common-v2/components/pagination"
 import { FilterSelection, Status, Filter } from "../types"
 import { Entity } from "carbure/types"
+import { Order } from "common-v2/components/table"
 
 export interface LotQuery {
   entity_id: number
@@ -43,6 +44,7 @@ export interface LotQueryParams {
   invalid: boolean
   deadline: boolean
   pagination: PaginationManager
+  order: Order | undefined
   filters: FilterSelection
 }
 
@@ -55,6 +57,7 @@ export function useLotQuery({
   invalid,
   deadline,
   pagination,
+  order,
   filters,
 }: LotQueryParams) {
   const { page = 0, limit } = pagination
@@ -71,6 +74,8 @@ export function useLotQuery({
       deadline: deadline ? true : undefined,
       from_idx: page * (limit ?? 0),
       limit: limit || undefined,
+      sort_by: order?.column,
+      order: order?.direction,
       ...filters,
     }),
     [
@@ -83,6 +88,7 @@ export function useLotQuery({
       deadline,
       page,
       limit,
+      order,
       filters,
     ]
   )

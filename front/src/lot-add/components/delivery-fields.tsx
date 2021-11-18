@@ -5,7 +5,7 @@ import { DateInput } from "common-v2/components/input"
 import { UserCheck } from "common-v2/components/icons"
 import * as api from "common-v2/api"
 import * as norm from "common-v2/utils/normalizers"
-import { LotFormValue } from "./form"
+import { LotFormValue } from "./lot-form"
 
 export const DeliveryFields = () => {
   const { t } = useTranslation()
