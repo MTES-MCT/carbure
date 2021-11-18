@@ -66,7 +66,7 @@ export const LotTable = memo(
             header: t("N° Document"),
             cell: (lot) => (
               <Cell
-                text={lot.transport_document_reference}
+                text={lot.transport_document_reference?.toUpperCase()}
                 sub={lot.transport_document_type}
               />
             ),
