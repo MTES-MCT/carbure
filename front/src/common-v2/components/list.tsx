@@ -119,7 +119,7 @@ export function List<T, V>({
       return <li>Aucune entrée trouvée</li>
     }
 
-    return items.map(({ key, value, label, children, disabled, data },) => {
+    return items.map(({ key, value, label, children, disabled, data }) => {
       const config: ItemConfig<T, V> = {
         key,
         value,
@@ -140,10 +140,10 @@ export function List<T, V>({
       // render group header
       if (children) {
         return (
-          <div key={key}>
+          <div key={label}>
             <li
               data-group
-              data-value={key}
+              data-key={label}
               data-disabled={disabled ? true : undefined}
               data-level={level > 0 ? level : undefined}
               data-selected={config.selected ? true : undefined}
@@ -161,8 +161,8 @@ export function List<T, V>({
       // render item
       return (
         <li
-          key={key}
-          data-value={key}
+          key={label}
+          data-key={label}
           data-disabled={disabled ? true : undefined}
           data-level={level > 0 ? level : undefined}
           data-selected={config.selected ? true : undefined}
@@ -238,7 +238,9 @@ export function useSelection<T, V>({
   }, [selectedValue])
 
   const normItems = listTreeItems(items)
-  const normFocus = normItems.find((item) => item.key === JSON.stringify(focused))
+  const normFocus = normItems.find(
+    (item) => item.key === JSON.stringify(focused)
+  )
 
   const { isSelected, onSelect } = multiple
     ? multipleSelection(selectedValues, onSelectValues)
@@ -256,7 +258,7 @@ export function useSelection<T, V>({
     const i = index()
     const prev = i === -1 ? normItems.length - 1 : Math.max(i - 1, 0)
     const item = normItems[prev]
-    // scrollToKey(container, item?.key)
+    scrollToKey(container, item?.label)
     focus(item?.value)
     onFocus?.(item?.value)
   }
@@ -265,7 +267,7 @@ export function useSelection<T, V>({
     const i = index()
     const next = i === -1 ? 0 : Math.min(i + 1, normItems.length - 1)
     const item = normItems[next]
-    // scrollToKey(container, item?.key)
+    scrollToKey(container, item?.label)
     focus(item?.value)
     onFocus?.(item?.value)
   }
