@@ -12,6 +12,7 @@ import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
 import { LotQuery } from "../hooks/lot-query"
 import { LotSummaryItem } from "../types"
 import { FilterManager, ResetButton } from "../components/filters"
+import NoResult from "transactions-v2/components/no-result"
 
 export interface SummaryBarProps {
   query: LotQuery
@@ -96,10 +97,12 @@ export const SummaryDialog = ({
 
 export interface SummaryProps {
   query: LotQuery
-  selection: number[]
+  selection?: number[]
 }
 
-export const Summary = ({ query, selection }: SummaryProps) => {
+const EMPTY: number[] = []
+
+export const Summary = ({ query, selection = EMPTY }: SummaryProps) => {
   const { t } = useTranslation()
 
   const summary = useQuery(api.getLotsSummary, {
@@ -121,12 +124,14 @@ export const Summary = ({ query, selection }: SummaryProps) => {
       cell: (item) => <Cell text={formatNumber(item.volume_sum)} />,
     },
     {
+      small: true,
       key: "lots",
       header: t("Lots"),
       orderBy: (item) => item.count,
       cell: (item) => <Cell text={formatNumber(item.count)} />,
     },
     {
+      small: true,
       key: "ghg",
       header: t("Moy. Réd. GES"),
       orderBy: (item) => item.avg_ghg_reduction,
@@ -146,6 +151,12 @@ export const Summary = ({ query, selection }: SummaryProps) => {
 
   return (
     <>
+      {input.length === 0 && output.length === 0 && (
+        <section>
+          <NoResult />
+        </section>
+      )}
+
       {input.length > 0 && (
         <>
           <h2>

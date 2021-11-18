@@ -1,8 +1,9 @@
 import i18n from "i18n"
 import format from "date-fns/intlFormat"
 
-export function formatPeriod(period: number) {
-  return `${Math.floor(period / 100)}-${("0" + (period % 100)).slice(-2)}`
+export function formatPeriod(period: number | string) {
+  const num = typeof period === "string" ? parseInt(period) : period
+  return `${Math.floor(num / 100)}-${("0" + (num % 100)).slice(-2)}`
 }
 
 export function formatNumber(num: number) {

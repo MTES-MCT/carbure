@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next"
 import { FilterManager, ResetButton } from "./filters"
 
 interface NoResultProps {
-  loading: boolean
-  filters: FilterManager
+  loading?: boolean
+  filters?: FilterManager
 }
 
 export const NoResult = ({ loading, filters }: NoResultProps) => {
@@ -14,7 +14,7 @@ export const NoResult = ({ loading, filters }: NoResultProps) => {
   return (
     <Alert loading={loading} variant="warning" icon={AlertCircle}>
       <p>{t("Aucune transaction trouvée pour cette recherche")}</p>
-      <ResetButton filters={filters} />
+      {filters && <ResetButton filters={filters} />}
     </Alert>
   )
 }

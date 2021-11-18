@@ -215,6 +215,7 @@ const filtersByStatus: Record<Status, Filter[]> = {
   stocks: STOCK_FILTERS,
   out: OUT_FILTERS,
   admin: ADMIN_FILTERS,
+  declaration: [],
   unknown: [],
 }
 

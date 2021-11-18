@@ -65,7 +65,7 @@ export const Transactions = () => {
               options={yearData}
             />
 
-            <DeclarationButton />
+            <DeclarationButton year={year} />
           </section>
 
           <section>
