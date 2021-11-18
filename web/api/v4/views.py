@@ -6,7 +6,7 @@ from unicodedata import category
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
 from core.decorators import check_user_rights
-from api.v4.helpers import get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_transaction_distance, send_email_declaration_invalidated, send_email_declaration_validated
+from api.v4.helpers import filter_lots, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_transaction_distance, send_email_declaration_invalidated, send_email_declaration_validated
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, Entity, SustainabilityDeclaration
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer
 
@@ -112,6 +112,31 @@ def get_stock_details(request, *args, **kwargs):
     data['updates'] = get_lot_updates(stock.parent_lot, entity_id)
     data['comments'] = get_lot_comments(stock.parent_lot, entity_id)
     return JsonResponse({'status': 'success', 'data': data})
+
+@check_user_rights()
+def stock_cancel_transformation(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    stock_ids = request.POST.getlist('stock_ids', False)
+    if not stock_ids:
+        return JsonResponse({'status': 'error', 'message': 'Missing stock_ids'}, status=400)
+
+    for stock_id in stock_ids:
+        try:
+            stock = CarbureStock.objects.filter(pk=stock_id)
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find stock'}, status=400)
+
+        if stock.carbure_client_id != entity_id:
+            return JsonResponse({'status': 'forbidden', 'message': 'Stock does not belong to you'}, status=403)
+
+        if stock.parent_transformation_id is None:
+            return JsonResponse({'status': 'error', 'message': 'Stock does not come from a transformation'}, status=400)
+
+        # all good
+        # delete of transformation should trigger a cascading delete of child_lots + recredit volume to the parent_stock
+        stock.parent_transformation.delete()
+    return JsonResponse({'status': 'success'})
 
 @check_user_rights()
 def get_lot_details(request, *args, **kwargs):
