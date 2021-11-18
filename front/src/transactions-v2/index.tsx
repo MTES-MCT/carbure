@@ -16,7 +16,7 @@ import LotAdd from "lot-add"
 import LotDetails from "lot-details"
 import StockDetails from "stock-details"
 
-const now = new Date()
+const currentYear = new Date().getFullYear()
 
 export const Transactions = () => {
   const { t } = useTranslation()
@@ -24,7 +24,7 @@ export const Transactions = () => {
   const entity = useEntity()
   const status = useStatus()
 
-  const [year = now.getFullYear(), setYear] = useState<number | undefined>()
+  const [year = currentYear, setYear] = useState<number | undefined>(currentYear) // prettier-ignore
 
   const years = useQuery(api.getYears, {
     key: "years",
