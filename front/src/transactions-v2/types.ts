@@ -1,6 +1,7 @@
 import {
   Biofuel,
   Country,
+  Declaration,
   Depot,
   Entity,
   Feedstock,
@@ -116,6 +117,12 @@ export interface Snapshot {
   }
 }
 
+export interface DeclarationSummary {
+  period: string
+  pending: number
+  declaration: Declaration
+}
+
 export interface LotSummary {
   count: number
   total_volume: number
@@ -190,4 +197,11 @@ export enum Filter {
 
 export type FilterSelection = Partial<Record<Filter, string[]>>
 
-export type Status = "drafts" | "in" | "stocks" | "out" | "admin" | "unknown"
+export type Status =
+  | "drafts"
+  | "in"
+  | "stocks"
+  | "out"
+  | "declaration"
+  | "admin"
+  | "unknown"

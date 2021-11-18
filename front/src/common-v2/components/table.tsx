@@ -49,10 +49,10 @@ export function Table<T>({
                 column.small && css.small
               )}
             >
-              {column.header}
               {order && column.key === order.column && (
                 <span>{order.direction === "asc" ? " ▲" : " ▼"}</span>
-              )}
+              )}{" "}
+              {column.header}
             </div>
           ))}
         </header>

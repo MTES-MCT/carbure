@@ -2,7 +2,14 @@ import { api, Api } from "common-v2/services/api"
 import { Option } from "common-v2/utils/normalize"
 import { LotQuery } from "./hooks/lot-query"
 import { StockQuery } from "./hooks/stock-query"
-import { LotList, Snapshot, Filter, StockList, LotSummary } from "./types"
+import {
+  LotList,
+  Snapshot,
+  Filter,
+  StockList,
+  LotSummary,
+  DeclarationSummary,
+} from "./types"
 
 const QUERY_RESET: Partial<LotQuery> = {
   limit: undefined,
@@ -43,6 +50,12 @@ export function getLotsSummary(
 ) {
   return api.get<Api<LotSummary>>("/lots/summary", {
     params: { ...query, selection, ...QUERY_RESET, short },
+  })
+}
+
+export function getDeclarations(entity_id: number, year: number) {
+  return api.get<Api<DeclarationSummary[]>>("/declarations", {
+    params: { entity_id, year },
   })
 }
 

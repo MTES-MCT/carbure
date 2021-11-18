@@ -22,6 +22,10 @@
   overflow: hidden;
 }
 
+.dialog[data-limit] {
+  max-width: 960px;
+}
+
 .close {
   position: absolute;
   top: 0;
@@ -34,7 +38,7 @@
 }
 
 .dialog h1 {
-  font-size: 1.25em;
+  font-size: 1.33em;
 }
 
 .dialog > header {
@@ -79,6 +83,7 @@
 
 .dialog > footer {
   display: flex;
+  align-items: center;
   padding: var(--spacing-l);
   gap: var(--spacing-m);
   border-top: 1px solid var(--gray-highlight);
