@@ -5,8 +5,8 @@ from unicodedata import category
 
 from django.http.response import JsonResponse
 from core.decorators import check_user_rights
-from api.v4.helpers import get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_transaction_distance, get_errors
-from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, Entity
+from api.v4.helpers import get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_transaction_distance, get_errors, send_email_declaration_invalidated, send_email_declaration_validated
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, Entity, SustainabilityDeclaration
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer
 
 
@@ -418,6 +418,9 @@ def accept_in_stock(request, *args, **kwargs):
         return JsonResponse({'status': 'error', 'message': 'Missing lot_ids'}, status=400)
 
     entity = Entity.objects.get(pk=entity_id)
+    if entity.entity_type == Entity.OPERATOR:
+        return JsonResponse({'status': 'error', 'message': 'Stock unavailable for Operators'}, status=400)
+
     for lot_id in lot_ids:
         try:
             lot = CarbureLot.objects.get(pk=lot_id)
@@ -442,7 +445,6 @@ def accept_in_stock(request, *args, **kwargs):
         elif lot.lot_status == CarbureLot.DELETED:
             return JsonResponse({'status': 'error', 'message': 'Lot is deleted.'}, status=400)
 
-        ############ PAS POSSIBLE POUR LES OPERATEURS
 
         lot.lot_status = CarbureLot.ACCEPTED
         lot.delivery_type = CarbureLot.STOCK
@@ -718,3 +720,80 @@ def accept_trading(request, *args, **kwargs):
         event.user = request.user
         event.save()        
     return JsonResponse({'status': 'success'})
+
+@check_user_rights()
+def validate_declaration(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    period = request.POST.get('period', False)
+
+    try:
+        [year, month] = period.split('-')
+        period_d = datetime.date(year=int(year), month=int(month), day=1)
+        declaration = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d)
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Could not parse period.'}, status=400)
+
+    period_int = period.year * 100 + period.month
+    # ensure everything is in order
+    pending_reception = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, lot_status__in=[CarbureLot.DRAFT, CarbureLot.PENDING]).count()
+    if pending_reception > 0:
+        return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some lots are pending reception.'}, status=400)
+    pending_correction = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, lot_status__in=[CarbureLot.ACCEPTED], correction_status__in=[CarbureLot.IN_CORRECTION, CarbureLot.FIXED]).count()
+    if pending_correction > 0:
+        return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some accepted lots need correction.'}, status=400)
+    lots_sent_rejected_or_drafts = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, lot_status__in=[CarbureLot.DRAFT, CarbureLot.REJECTED]).count()
+    if lots_sent_rejected_or_drafts > 0:
+        return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some outgoing lots need your attention.'}, status=400)
+    lots_sent_to_fix = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, lot_status__in=[CarbureLot.ACCEPTED], correction_status__in=[CarbureLot.IN_CORRECTION]).count()
+    if lots_sent_to_fix > 0:
+        return JsonResponse({'status': 'error', 'message': 'Cannot validate declaration. Some outgoing lots need correction.'}, status=400)
+    lots_received = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int).update(declared_by_client=True)
+    lots_sent = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int).update(declared_by_supplier=True)
+    bulk_events = []
+    for lot in lots_received:
+        bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user))
+    for lot in lots_sent:
+        bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLARED, lot=lot, user=request.user))
+    CarbureLotEvent.objects.bulk_create(bulk_events)
+    # freeze lots
+    CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True).update(lot_status=CarbureLot.FROZEN)
+    CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True).update(lot_status=CarbureLot.FROZEN)
+    # mark declaration
+    declaration.declared = True
+    declaration.save()
+    # send email
+    send_email_declaration_validated(declaration)
+
+
+
+@check_user_rights()
+def invalidate_declaration(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    period = request.POST.get('period', False)
+
+    try:
+        [year, month] = period.split('-')
+        period_d = datetime.date(year=int(year), month=int(month), day=1)
+        declaration = SustainabilityDeclaration.objects.get_or_create(entity_id=entity_id, period=period_d)
+        declaration.declared = False
+        declaration.checked = False
+        declaration.save()
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Could not parse period.'}, status=400)
+
+    period_int = period.year * 100 + period.month
+    lots_received = CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int).update(declared_by_client=False)
+    lots_sent = CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int).update(declared_by_supplier=False)
+    bulk_events = []
+    for lot in lots_received:
+        bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLCANCEL, lot=lot, user=request.user))
+    for lot in lots_sent:
+        bulk_events.append(CarbureLotEvent(event_type=CarbureLotEvent.DECLCANCEL, lot=lot, user=request.user))
+    CarbureLotEvent.objects.bulk_create(bulk_events)
+    # unfreeze lots
+    CarbureLot.objects.filter(carbure_client=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN).update(lot_status=CarbureLot.ACCEPTED)
+    CarbureLot.objects.filter(carbure_supplier=declaration.entity, period=period_int, declared_by_client=True, declared_by_supplier=True, lot_status=CarbureLot.FROZEN).update(lot_status=CarbureLot.ACCEPTED)
+    # send email
+    send_email_declaration_invalidated(declaration)

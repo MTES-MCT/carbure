@@ -980,6 +980,7 @@ class CarbureLotEvent(models.Model):
     REJECTED = "REJECTED"
     RECALLED = "RECALLED"
     DECLARED = "DECLARED"
+    DECLCANCEL = "DECLCANCEL"
     DELETED = "DELETED"
     RESTORED = "RESTORED"
     SPLIT = "SPLIT"
@@ -987,8 +988,8 @@ class CarbureLotEvent(models.Model):
     CONVERT = "CONVERT"
     UNCONVERT = "UNCONVERT"
     EVENT_TYPES = ((CREATED, CREATED), (UPDATED, UPDATED), (VALIDATED, VALIDATED), (FIX_REQUESTED, FIX_REQUESTED), (MARKED_AS_FIXED, MARKED_AS_FIXED), 
-                    (FIX_ACCEPTED, FIX_ACCEPTED), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (RECALLED, RECALLED), (DECLARED, DECLARED), (DELETED, DELETED), (RESTORED, RESTORED),
-                    (SPLIT, SPLIT), (UNSPLIT, UNSPLIT), (CONVERT, CONVERT), (UNCONVERT, UNCONVERT))
+                    (FIX_ACCEPTED, FIX_ACCEPTED), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (RECALLED, RECALLED), (DECLARED, DECLARED), (DELETED, DELETED), (DECLCANCEL, DECLCANCEL), 
+                    (RESTORED, RESTORED), (SPLIT, SPLIT), (UNSPLIT, UNSPLIT), (CONVERT, CONVERT), (UNCONVERT, UNCONVERT))
     event_type = models.CharField(max_length=32, null=False, blank=False, choices=EVENT_TYPES)
     event_dt = models.DateTimeField(auto_now_add=True, null=False, blank=False)
     lot = models.ForeignKey(CarbureLot, null=False, blank=False, on_delete=models.CASCADE)

@@ -1,3 +1,4 @@
+import os
 import datetime
 import calendar
 from multiprocessing.context import Process
@@ -7,8 +8,11 @@ from django.db.models.expressions import OuterRef, Subquery
 from django.db.models.functions.comparison import Coalesce
 from django.db.models.query_utils import Q
 from django.http.response import HttpResponse, JsonResponse
+from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
+
 from core.ign_distance import get_distance
-from core.models import Biocarburant, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, Depot, MatierePremiere, Pays, TransactionDistance
+from core.models import Biocarburant, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, Depot, MatierePremiere, Pays, TransactionDistance, UserRights
 from core.models import GenericError
 from core.serializers import CarbureLotCommentSerializer, CarbureLotEventSerializer, CarbureLotPublicSerializer, CarbureStockPublicSerializer, GenericErrorSerializer
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
@@ -543,3 +547,49 @@ def get_transaction_distance(lot):
         p.start()
         res['error'] = 'DISTANCE_NOT_IN_CACHE'
         return res
+
+def send_email_declaration_validated(declaration):
+    email_subject = "Carbure - Votre Déclaration de Durabilité a été validée"
+    cc = "carbure@beta.gouv.fr"
+    text_message = """ 
+    Bonjour,
+
+    Votre Déclaration de Durabilité pour la période %s a bien été prise en compte.
+
+    Merci,
+    L'équipe CarbuRe
+    """
+    env = os.getenv('IMAGE_TAG', False)
+    if env != 'prod':
+        # send only to staff / superuser
+        recipients = [r.user.email for r in UserRights.objects.filter(entity=declaration.entity, user__is_staff=True)]
+    else:
+        # PROD
+        recipients = [r.user.email for r in UserRights.objects.filter(entity=declaration.entity, user__is_staff=False, user__is_superuser=False).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])]
+
+    msg = EmailMultiAlternatives(subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
+    msg.send()
+
+def send_email_declaration_invalidated(declaration):
+    email_subject = "Carbure - Votre Déclaration de Durabilité a été annulée"
+    cc = "carbure@beta.gouv.fr"
+    text_message = """ 
+    Bonjour,
+
+    Votre Déclaration de Durabilité pour la période %s a bien été annulée.
+    Vous pouvez désormais éditer ou demander des corrections sur les lots concernés avant de la soumettre une nouvelle fois.
+
+    Merci,
+    L'équipe CarbuRe
+    """
+    env = os.getenv('IMAGE_TAG', False)
+    if env != 'prod':
+        # send only to staff / superuser
+        recipients = [r.user.email for r in UserRights.objects.filter(entity=declaration.entity, user__is_staff=True)]
+    else:
+        # PROD
+        recipients = [r.user.email for r in UserRights.objects.filter(entity=declaration.entity, user__is_staff=False, user__is_superuser=False).exclude(role__in=[UserRights.AUDITOR, UserRights.RO])]
+
+    msg = EmailMultiAlternatives(subject=email_subject, body=text_message, from_email=settings.DEFAULT_FROM_EMAIL, to=recipients, cc=cc)
+    msg.send()
+    

@@ -20,7 +20,6 @@ urlpatterns = [
     path('lots/approve-fix', views.approve_fix, name='api-v4-approve-fix'),
     path('lots/reject', views.reject_lot, name='api-v4-reject-lots'),
     path('lots/recall', views.recall_lot, name='api-v4-recall-lot'),
-
     ### Approval
     path('lots/accept-release-for-consumption', views.accept_rfc, name='api-v4-accept-rfc'),
     path('lots/accept-in-stock', views.accept_in_stock, name='api-v4-accept-in-stock'),
@@ -29,19 +28,18 @@ urlpatterns = [
     path('lots/accept-blending', views.accept_blending, name='api-v4-accept-blending'),
     path('lots/accept-export', views.accept_export, name='api-v4-accept-export'),
 
-
     # STOCKS
     path('stocks', views.get_stock, name='api-v4-get-stock'),
     path('stocks/details', views.get_stock_details, name='api-v4-get-stock-details'),
     path('stocks/cancel-transformation', views.get_snapshot, name='api-v4-cancel-transformation'),
-    path('stocks/split', views.get_snapshot, name='api-v4-stokc-split'),
+    path('stocks/split', views.get_snapshot, name='api-v4-stock-split'),
     path('stocks/transform', views.get_snapshot, name='api-v4-stock-transform'),
     path('stocks/flush', views.get_snapshot, name='api-v4-stock-flush'),
     path('stocks/filters', views.get_stock_filters, name='api-v4-get-stock-filters'),
 
     # DECLARATIONS
-    path('declarations/validate', views.get_snapshot, name='api-v4-get-snapshot'),
-    path('declarations/invalidate', views.get_snapshot, name='api-v4-get-snapshot'),
+    path('declarations/validate', views.validate_declaration, name='api-v4-validate-declaration'),
+    path('declarations/invalidate', views.invalidate_declaration, name='api-v4-invalidate-declaration'),
 
     #### missing endpoints vs previous version
     # GET
