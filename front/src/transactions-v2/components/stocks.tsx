@@ -13,6 +13,7 @@ import NoResult from "../components/no-result"
 import StockActions from "../components/stock-actions"
 import * as api from "../api"
 import { SearchBar } from "./search-bar"
+import { StockSummaryBar } from "./stock-summary"
 
 export interface StocksProps {
   entity: Entity
@@ -54,7 +55,7 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
 
   const stocksData = stocks.result?.data.data
   const stockList = stocksData?.stocks ?? []
-  const returned = stocksData?.returned ?? 0
+  const count = stocksData?.returned ?? 0
   const total = stocksData?.total ?? 0
 
   const showStockDetails = (stock: Stock) =>
@@ -83,31 +84,37 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
           onSwitch={setCategory}
         />
 
-        <StockActions count={returned} query={query} selection={selection} />
+        <StockActions count={count} query={query} selection={selection} />
 
-        {returned === 0 && (
-          <NoResult loading={stocks.loading} filters={filters} />
+        {count === 0 && <NoResult loading={stocks.loading} filters={filters} />}
+
+        {count > 0 && (
+          <>
+            <StockSummaryBar
+              query={query}
+              selection={selection}
+              filters={filters}
+            />
+
+            <StockTable
+              loading={stocks.loading}
+              stocks={stockList}
+              order={order}
+              selected={selection}
+              onSelect={setSelection}
+              onAction={showStockDetails}
+              onOrder={setOrder}
+            />
+
+            <Pagination
+              page={pagination.page}
+              limit={pagination.limit}
+              total={total}
+              onPage={pagination.setPage}
+              onLimit={pagination.setLimit}
+            />
+          </>
         )}
-
-        {returned > 0 && (
-          <StockTable
-            loading={stocks.loading}
-            stocks={stockList}
-            order={order}
-            selected={selection}
-            onSelect={setSelection}
-            onAction={showStockDetails}
-            onOrder={setOrder}
-          />
-        )}
-
-        <Pagination
-          page={pagination.page}
-          limit={pagination.limit}
-          total={total}
-          onPage={pagination.setPage}
-          onLimit={pagination.setLimit}
-        />
       </section>
     </>
   )

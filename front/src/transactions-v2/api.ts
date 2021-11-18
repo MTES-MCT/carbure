@@ -9,6 +9,7 @@ import {
   StockList,
   LotSummary,
   DeclarationSummary,
+  StockSummary,
 } from "./types"
 
 const QUERY_RESET: Partial<LotQuery> = {
@@ -80,6 +81,16 @@ export function sendLots(query: LotQuery, selection: number[]) {
 
 export function getStocks(query: StockQuery) {
   return api.get<Api<StockList>>("/stocks", { params: query })
+}
+
+export function getStockSummary(
+  query: StockQuery,
+  selection: number[],
+  short?: boolean
+) {
+  return api.get<Api<StockSummary>>("/stocks/summary", {
+    params: { ...query, selection, ...QUERY_RESET, short },
+  })
 }
 
 export function getStockFilters(field: Filter, query: LotQuery) {

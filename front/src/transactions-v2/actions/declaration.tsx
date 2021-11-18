@@ -9,7 +9,7 @@ import { usePortal } from "common-v2/components/portal"
 import * as api from "../api"
 import Button from "common-v2/components/button"
 import Dialog from "common-v2/components/dialog"
-import { Summary } from "../components/lot-summary"
+import { LotSummary } from "../components/lot-summary"
 import Select from "common-v2/components/select"
 import Alert from "common-v2/components/alert"
 import { formatPeriod } from "common-v2/utils/formatters"
@@ -116,7 +116,7 @@ export const DeclarationDialog = ({
             normalize={normalizeDeclaration}
           />
         </section>
-        {declaration && <Summary pending query={query} />}
+        {declaration && <LotSummary pending query={query} />}
       </main>
       <footer>
         {declaration?.declaration.declared ? (
