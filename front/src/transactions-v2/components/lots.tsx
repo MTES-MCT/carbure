@@ -14,7 +14,7 @@ import { LotTable } from "../components/lot-table"
 import NoResult from "../components/no-result"
 import { LotActions } from "../components/lot-actions"
 import { DeadlineSwitch, InvalidSwitch } from "../components/switches"
-import { SummaryBar } from "../actions/summary"
+import { SummaryBar } from "./lot-summary"
 import SearchBar from "./search-bar"
 
 export interface LotsProps {
