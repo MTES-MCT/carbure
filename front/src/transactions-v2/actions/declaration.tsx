@@ -115,7 +115,7 @@ export const DeclarationDialog = ({
             normalize={normalizeDeclaration}
           />
         </section>
-        {declaration && <Summary query={query} />}
+        {declaration && <Summary pending query={query} />}
       </main>
       <footer>
         {declaration?.declaration.declared ? (

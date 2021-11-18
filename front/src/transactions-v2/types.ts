@@ -135,8 +135,9 @@ export interface LotSummaryItem {
   supplier?: string
   biofuel_code: string
   volume_sum: number
-  count: number
   avg_ghg_reduction: number
+  total: number
+  pending: number
 }
 
 export enum LotStatus {

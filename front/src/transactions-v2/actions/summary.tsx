@@ -96,13 +96,18 @@ export const SummaryDialog = ({
 }
 
 export interface SummaryProps {
+  pending?: boolean
   query: LotQuery
   selection?: number[]
 }
 
 const EMPTY: number[] = []
 
-export const Summary = ({ query, selection = EMPTY }: SummaryProps) => {
+export const Summary = ({
+  pending,
+  query,
+  selection = EMPTY,
+}: SummaryProps) => {
   const { t } = useTranslation()
 
   const summary = useQuery(api.getLotsSummary, {
@@ -126,9 +131,9 @@ export const Summary = ({ query, selection = EMPTY }: SummaryProps) => {
     {
       small: true,
       key: "lots",
-      header: t("Lots"),
-      orderBy: (item) => item.count,
-      cell: (item) => <Cell text={formatNumber(item.count)} />,
+      header: pending ? t("Lots validés") : t("Lots"),
+      orderBy: (item) => item.total,
+      cell: (item) => <LotCell pending={pending} item={item} />,
     },
     {
       small: true,
@@ -142,11 +147,11 @@ export const Summary = ({ query, selection = EMPTY }: SummaryProps) => {
   const summaryData = summary.result?.data.data
 
   const input = summaryData?.in ?? []
-  const inputLots = input.reduce((count, item) => count + item.count, 0)
+  const inputLots = input.reduce((count, item) => count + item.total, 0)
   const inputVolume = input.reduce((volume, item) => volume + item.volume_sum, 0) // prettier-ignore
 
   const output = summaryData?.out ?? []
-  const outputLots = output.reduce((count, item) => count + item.count, 0)
+  const outputLots = output.reduce((count, item) => count + item.total, 0)
   const outputVolume = output.reduce((volume, item) => volume + item.volume_sum, 0) // prettier-ignore
 
   return (
@@ -205,5 +210,25 @@ export const Summary = ({ query, selection = EMPTY }: SummaryProps) => {
 
       {summary.loading && <LoaderOverlay />}
     </>
+  )
+}
+
+interface LotCellProps {
+  pending?: boolean
+  item: LotSummaryItem
+}
+
+export const LotCell = ({ pending, item }: LotCellProps) => {
+  if (!pending) return <Cell text={item.total} />
+
+  return (
+    <p
+      style={{
+        color: item.pending > 0 ? "var(--orange-dark)" : undefined,
+      }}
+    >
+      <strong>{item.total - item.pending}</strong>
+      <small> / {item.total}</small>
+    </p>
   )
 }
