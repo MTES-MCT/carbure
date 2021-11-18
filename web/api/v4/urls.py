@@ -40,6 +40,7 @@ urlpatterns = [
     path('stocks/filters', views.get_stock_filters, name='api-v4-get-stock-filters'),
 
     # DECLARATIONS
+    path('declarations', views.get_declarations, name='api-v4-get-declarations'),
     path('declarations/validate', views.validate_declaration, name='api-v4-validate-declaration'),
     path('declarations/invalidate', views.invalidate_declaration, name='api-v4-invalidate-declaration'),
 
