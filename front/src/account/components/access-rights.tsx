@@ -39,7 +39,6 @@ import RadioGroup from "common/components/radio-group"
 import * as api from "../api"
 import useAPI from "common/hooks/use-api"
 import { Trans, useTranslation } from "react-i18next"
-import { invalidate } from "common-v2/hooks/invalidate"
 import { reloadUserSettings } from "carbure/hooks/user"
 
 export type AccessRequest = {

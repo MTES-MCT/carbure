@@ -14,7 +14,7 @@ from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSeria
 @check_user_rights()
 def get_years(request, *args, **kwargs):
     entity_id = int(kwargs['context']['entity_id'])
-    data = CarbureLot.objects.filter(Q(carbure_client_id=entity_id) | Q(carbure_supplier_id=entity_id)).values_list('year').distinct()
+    data = CarbureLot.objects.filter(Q(carbure_client_id=entity_id) | Q(carbure_supplier_id=entity_id)).values_list('year', flat=True).distinct()
     return JsonResponse({'status': 'success', 'data': list(data)})
 
 
