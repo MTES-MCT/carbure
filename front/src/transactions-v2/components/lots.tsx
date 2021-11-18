@@ -14,7 +14,7 @@ import { LotTable } from "../components/lot-table"
 import NoResult from "../components/no-result"
 import { LotActions } from "../components/lot-actions"
 import { DeadlineSwitch, InvalidSwitch } from "../components/switches"
-import { SummaryBar } from "./lot-summary"
+import { LotSummaryBar } from "./lot-summary"
 import SearchBar from "./search-bar"
 
 export interface LotsProps {
@@ -119,7 +119,11 @@ export const Lots = ({ entity, year, snapshot }: LotsProps) => {
 
         {count > 0 && (
           <>
-            <SummaryBar query={query} selection={selection} filters={filters} />
+            <LotSummaryBar
+              query={query}
+              selection={selection}
+              filters={filters}
+            />
 
             <LotTable
               loading={lots.loading}

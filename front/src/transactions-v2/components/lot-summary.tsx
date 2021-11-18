@@ -10,17 +10,21 @@ import Table, { Cell, Column } from "common-v2/components/table"
 import { Filter, Return } from "common-v2/components/icons"
 import { formatNumber, formatPercentage } from "common-v2/utils/formatters"
 import { LotQuery } from "../hooks/lot-query"
-import { LotSummaryItem } from "../types"
+import { SummaryItem } from "../types"
 import { FilterManager, ResetButton } from "./filters"
 import NoResult from "transactions-v2/components/no-result"
 
-export interface SummaryBarProps {
+export interface LotSummaryBarProps {
   query: LotQuery
   selection: number[]
   filters: FilterManager
 }
 
-export const SummaryBar = ({ query, selection, filters }: SummaryBarProps) => {
+export const LotSummaryBar = ({
+  query,
+  selection,
+  filters,
+}: LotSummaryBarProps) => {
   const { t } = useTranslation()
   const portal = usePortal()
 
@@ -45,7 +49,7 @@ export const SummaryBar = ({ query, selection, filters }: SummaryBarProps) => {
         label={t("Voir le récapitulatif")}
         action={() =>
           portal((close) => (
-            <SummaryDialog
+            <LotSummaryDialog
               query={query}
               selection={selection}
               onClose={close}
@@ -59,17 +63,17 @@ export const SummaryBar = ({ query, selection, filters }: SummaryBarProps) => {
   )
 }
 
-export interface SummaryDialogProps {
+export interface LotSummaryDialogProps {
   query: LotQuery
   selection: number[]
   onClose: () => void
 }
 
-export const SummaryDialog = ({
+export const LotSummaryDialog = ({
   query,
   selection,
   onClose,
-}: SummaryDialogProps) => {
+}: LotSummaryDialogProps) => {
   const { t } = useTranslation()
 
   return (
@@ -85,7 +89,7 @@ export const SummaryDialog = ({
           )}
         </section>
 
-        <Summary query={query} selection={selection} />
+        <LotSummary query={query} selection={selection} />
       </main>
 
       <footer>
@@ -95,7 +99,7 @@ export const SummaryDialog = ({
   )
 }
 
-export interface SummaryProps {
+export interface LotSummaryProps {
   pending?: boolean
   query: LotQuery
   selection?: number[]
@@ -103,11 +107,11 @@ export interface SummaryProps {
 
 const EMPTY: number[] = []
 
-export const Summary = ({
+export const LotSummary = ({
   pending,
   query,
   selection = EMPTY,
-}: SummaryProps) => {
+}: LotSummaryProps) => {
   const { t } = useTranslation()
 
   const summary = useQuery(api.getLotsSummary, {
@@ -115,7 +119,7 @@ export const Summary = ({
     params: [query, selection],
   })
 
-  const columns: Column<LotSummaryItem>[] = [
+  const columns: Column<SummaryItem>[] = [
     {
       key: "biofuel",
       header: t("Biocarburant"),
@@ -215,7 +219,7 @@ export const Summary = ({
 
 interface LotCellProps {
   pending?: boolean
-  item: LotSummaryItem
+  item: SummaryItem
 }
 
 export const LotCell = ({ pending, item }: LotCellProps) => {

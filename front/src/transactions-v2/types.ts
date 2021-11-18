@@ -126,11 +126,18 @@ export interface DeclarationSummary {
 export interface LotSummary {
   count: number
   total_volume: number
-  in?: LotSummaryItem[]
-  out?: LotSummaryItem[]
+  in?: SummaryItem[]
+  out?: SummaryItem[]
 }
 
-export interface LotSummaryItem {
+export interface StockSummary {
+  count: number
+  total_remaining_volume: number
+  total_volume?: number
+  stock?: SummaryItem[]
+}
+
+export interface SummaryItem {
   client?: string
   supplier?: string
   biofuel_code: string
@@ -138,6 +145,7 @@ export interface LotSummaryItem {
   avg_ghg_reduction: number
   total: number
   pending: number
+  remaining_volume_sum: number
 }
 
 export enum LotStatus {

@@ -12,7 +12,7 @@ import Checkbox from "common-v2/components/checkbox"
 import Dialog from "common-v2/components/dialog"
 import { Check, Return } from "common-v2/components/icons"
 import { usePortal } from "common-v2/components/portal"
-import { Summary } from "../components/lot-summary"
+import { LotSummary } from "../components/lot-summary"
 
 export interface SendButtonProps {
   disabled?: boolean
@@ -157,7 +157,7 @@ const SendDialog = ({
             label={t("Je certifie que les informations renseignées sont réelles et valides")} // prettier-ignore
           />
         </section>
-        {summary && <Summary query={query} selection={selection} />}
+        {summary && <LotSummary query={query} selection={selection} />}
       </main>
       <footer>
         <Button
