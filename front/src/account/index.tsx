@@ -13,6 +13,7 @@ import useAPI from "common/hooks/use-api"
 import * as api from "./api"
 import Exit from "carbure/components/exit"
 import { AppHook } from "carbure/hooks/use-app"
+import { reloadUserSettings } from "carbure/hooks/user"
 
 export interface AccountHook {
   isLoading: boolean
@@ -33,6 +34,7 @@ function useAccount(settings: SettingsGetter): AccountHook {
       const { entity, role } = res
       await resolveAccess(entity.id, "", role)
       settings.resolve()
+      reloadUserSettings()
     }
   }
 
