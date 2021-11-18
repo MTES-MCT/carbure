@@ -36,7 +36,7 @@ def get_entity_stock(entity_id):
 
 
 def get_entity_lots_by_status(entity_id, status):
-    if status not in ['DRAFTS', 'IN', 'OUT']:
+    if status not in ['DRAFTS', 'IN', 'OUT', 'DECLARATION']:
         raise Exception('Unknown status %s' % (status))
     lots = CarbureLot.objects.select_related(
         'carbure_producer', 'carbure_supplier', 'carbure_client', 'added_by',
@@ -52,6 +52,8 @@ def get_entity_lots_by_status(entity_id, status):
         lots = lots.filter(carbure_client_id=entity_id, lot_status__in=[CarbureLot.PENDING, CarbureLot.ACCEPTED, CarbureLot.FROZEN])
     elif status == 'OUT':
         lots = lots.filter(carbure_supplier_id=entity_id, lot_status__in=[CarbureLot.PENDING, CarbureLot.ACCEPTED, CarbureLot.FROZEN])
+    elif status == 'DECLARATION':
+        lots = lots.filter(Q(carbure_supplier_id=entity_id) | Q(carbure_client_id=entity_id)).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     else:
         raise Exception('Unknown status')
     return lots
