@@ -6,13 +6,8 @@ from unicodedata import category
 from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
 from core.decorators import check_user_rights
-<<<<<<< HEAD
-from api.v4.helpers import get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_transaction_distance, get_errors, send_email_declaration_invalidated, send_email_declaration_validated
+from api.v4.helpers import get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_transaction_distance, send_email_declaration_invalidated, send_email_declaration_validated
 from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, Entity, SustainabilityDeclaration
-=======
-from api.v4.helpers import get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_transaction_distance, filter_lots
-from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, Entity
->>>>>>> c017fa005519fbe082095bb2ae7b8faaef6e60f2
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer
 
 
