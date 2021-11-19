@@ -36,7 +36,7 @@ urlpatterns = [
     path('stocks/details', views.get_stock_details, name='api-v4-get-stock-details'),
     path('stocks/cancel-transformation', views.stock_cancel_transformation, name='api-v4-cancel-transformation'),
     path('stocks/split', views.stock_split, name='api-v4-stock-split'),
-    path('stocks/transform', views.get_snapshot, name='api-v4-stock-transform'),
+    path('stocks/transform', views.stock_transform, name='api-v4-stock-transform'),
     path('stocks/flush', views.stock_flush, name='api-v4-stock-flush'),
     path('stocks/filters', views.get_stock_filters, name='api-v4-get-stock-filters'),
 
