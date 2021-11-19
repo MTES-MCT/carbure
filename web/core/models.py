@@ -831,7 +831,9 @@ class CarbureLot(models.Model):
     TRADING = "TRADING"
     PROCESSING = "PROCESSING"
     DIRECT = "DIRECT" # livraison directe
-    DELIVERY_TYPES = ((UNKNOWN, UNKNOWN), (RFC, RFC), (STOCK, STOCK), (BLENDING, BLENDING), (EXPORT, EXPORT), (TRADING, TRADING), (PROCESSING, PROCESSING), (DIRECT, DIRECT),)
+    FLUSHED = "FLUSHED" # emptying stock for accounting or rounding purpuse
+    DELIVERY_TYPES = ((UNKNOWN, UNKNOWN), (RFC, RFC), (STOCK, STOCK), (BLENDING, BLENDING), (EXPORT, EXPORT), 
+                      (TRADING, TRADING), (PROCESSING, PROCESSING), (DIRECT, DIRECT), (FLUSHED, FLUSHED), )
     delivery_type = models.CharField(max_length=64, choices=DELIVERY_TYPES, blank=False, null=False, default=UNKNOWN)
     declared_by_supplier = models.BooleanField(default=False)
     declared_by_client = models.BooleanField(default=False)
@@ -883,6 +885,12 @@ class CarbureLot(models.Model):
         verbose_name = 'CarbureLot'
         verbose_name_plural = 'CarbureLots'
 
+
+    def get_weight(self):
+        return self.volume * self.biofuel.masse_volumique
+
+    def get_lhv_amount(self):
+        return self.volume * self.biofuel.pci_litre
 
 class CarbureStockTransformation(models.Model):
     UNKNOWN = "UNKNOWN"
@@ -968,6 +976,12 @@ class CarbureStock(models.Model):
         verbose_name = 'CarbureStock'
         verbose_name_plural = 'CarbureStocks'
 
+    def get_weight(self):
+        return self.remaining_volume * self.biofuel.masse_volumique
+
+    def get_lhv_amount(self):
+        return self.remaining_volume * self.biofuel.pci_litre
+
 
 class CarbureLotEvent(models.Model):
     CREATED = "CREATED"
@@ -994,7 +1008,7 @@ class CarbureLotEvent(models.Model):
     event_dt = models.DateTimeField(auto_now_add=True, null=False, blank=False)
     lot = models.ForeignKey(CarbureLot, null=False, blank=False, on_delete=models.CASCADE)
     user = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
-    metadata = models.JSONField()
+    metadata = models.JSONField(null=True, blank=True)
 
     class Meta:
         db_table = 'carbure_lots_events'
