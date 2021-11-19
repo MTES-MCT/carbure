@@ -1,3 +1,4 @@
+import i18next from "i18next"
 import { api, Api } from "common-v2/services/api"
 import { Option } from "common-v2/utils/normalize"
 import {
@@ -62,10 +63,9 @@ export function getDeclarations(entity_id: number, year: number) {
 
 export function getLotFilters(field: Filter, query: LotQuery) {
   const params = { field, ...query, ...QUERY_RESET }
-  return api.get<Api<Option[]>>("/lots/filters", { params }).then((res) => {
-    const filters = res.data.data ?? []
-    return filters.sort((a, b) => a.label.localeCompare(b.label, "fr"))
-  })
+  return api
+    .get<Api<Option[]>>("/lots/filters", { params })
+    .then((res) => res.data.data ?? [])
 }
 
 export function sendLots(query: LotQuery, selection: number[]) {
@@ -95,8 +95,7 @@ export function getStockSummary(
 
 export function getStockFilters(field: Filter, query: LotQuery) {
   const params = { field, ...query, ...QUERY_RESET }
-  return api.get<Api<Option[]>>("/stocks/filters", { params }).then((res) => {
-    const filters = res.data.data ?? []
-    return filters.sort((a, b) => a.label.localeCompare(b.label, "fr"))
-  })
+  return api
+    .get<Api<Option[]>>("/stocks/filters", { params })
+    .then((res) => res.data.data ?? [])
 }

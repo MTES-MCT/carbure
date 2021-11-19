@@ -3,10 +3,15 @@ import { useSearchParams, createSearchParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { Filter, FilterSelection, LotQuery, Status } from "../types"
 import * as api from "../api"
-import { Option } from "common-v2/utils/normalize"
+import { Normalizer, Option } from "common-v2/utils/normalize"
 import { Grid, Row } from "common-v2/components/scaffold"
 import { MultiSelect, MultiSelectProps } from "common-v2/components/multi-select" // prettier-ignore
 import Button from "common-v2/components/button"
+import {
+  normalizeBiofuelFilter,
+  normalizeCountryFilter,
+  normalizeFeedstockFilter,
+} from "common-v2/utils/normalizers"
 
 export interface FiltersProps {
   status: Status
@@ -136,8 +141,15 @@ export const FilterSelect = ({
     variant="solid"
     value={value}
     onChange={onChange}
+    normalize={filterNormalizers[field]}
   />
 )
+
+const filterNormalizers: Partial<Record<Filter, Normalizer<Option, string>>> = {
+  [Filter.Feedstocks]: normalizeFeedstockFilter,
+  [Filter.Biofuels]: normalizeBiofuelFilter,
+  [Filter.CountriesOfOrigin]: normalizeCountryFilter,
+}
 
 export function searchToFilters(search: URLSearchParams) {
   const filters: FilterSelection = {}
