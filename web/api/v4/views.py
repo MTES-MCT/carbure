@@ -8,7 +8,7 @@ from django.http.response import JsonResponse
 from django.db.models.query_utils import Q
 from core.decorators import check_user_rights
 from api.v4.helpers import filter_lots, filter_stock, get_entity_lots_by_status, get_lot_comments, get_lot_errors, get_lot_updates, get_lots_summary_data, get_lots_with_metadata, get_lots_filters_data, get_entity_stock, get_stock_with_metadata, get_stock_filters_data, get_stocks_summary_data, get_transaction_distance, handle_eth_to_etbe_transformation, send_email_declaration_invalidated, send_email_declaration_validated
-from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockTransformation, Entity, SustainabilityDeclaration, UserRights
+from core.models import CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureNotification, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Entity, SustainabilityDeclaration, UserRights
 from core.serializers import CarbureLotPublicSerializer, CarbureStockPublicSerializer
 
 
@@ -151,6 +151,11 @@ def stock_cancel_transformation(request, *args, **kwargs):
 
         # all good
         # delete of transformation should trigger a cascading delete of child_lots + recredit volume to the parent_stock
+        event = CarbureStockEvent()
+        event.stock = stock.parent_transformation.parent_stock
+        event.event_type = CarbureStockEvent.UNTRANSFORMED
+        event.user = request.user
+        event.save()
         stock.parent_transformation.delete()
     return JsonResponse({'status': 'success'})
 
@@ -223,6 +228,11 @@ def stock_flush(request, *args, **kwargs):
             lot.free_field = 'FLUSHED'
         lot.save()
         # create events
+        e = CarbureStockEvent()
+        e.event_type = CarbureStockEvent.FLUSHED
+        e.user = request.user
+        e.stock = stock
+        e.save()
         e = CarbureLotEvent()
         e.event_type = CarbureLotEvent.CREATED
         e.lot = lot

@@ -997,13 +997,9 @@ class CarbureLotEvent(models.Model):
     DECLCANCEL = "DECLCANCEL"
     DELETED = "DELETED"
     RESTORED = "RESTORED"
-    SPLIT = "SPLIT"
-    UNSPLIT = "UNSPLIT"
-    TRANSFORMED = "TRANSFORMED"
-    UNTRANSFORMED = "UNTRANSFORMED"
     EVENT_TYPES = ((CREATED, CREATED), (UPDATED, UPDATED), (VALIDATED, VALIDATED), (FIX_REQUESTED, FIX_REQUESTED), (MARKED_AS_FIXED, MARKED_AS_FIXED), 
                     (FIX_ACCEPTED, FIX_ACCEPTED), (ACCEPTED, ACCEPTED), (REJECTED, REJECTED), (RECALLED, RECALLED), (DECLARED, DECLARED), (DELETED, DELETED), (DECLCANCEL, DECLCANCEL), 
-                    (RESTORED, RESTORED), (SPLIT, SPLIT), (UNSPLIT, UNSPLIT), (TRANSFORMED, TRANSFORMED), (UNTRANSFORMED, UNTRANSFORMED))
+                    (RESTORED, RESTORED),)
     event_type = models.CharField(max_length=32, null=False, blank=False, choices=EVENT_TYPES)
     event_dt = models.DateTimeField(auto_now_add=True, null=False, blank=False)
     lot = models.ForeignKey(CarbureLot, null=False, blank=False, on_delete=models.CASCADE)
@@ -1058,3 +1054,27 @@ class CarbureNotification(models.Model):
         indexes = [
             models.Index(fields=['is_sent']),
         ]
+
+class CarbureStockEvent(models.Model):
+    CREATED = "CREATED"
+    UPDATED = "UPDATED"
+    FLUSHED = "FLUSHED"
+    SPLIT = "SPLIT"
+    UNSPLIT = "UNSPLIT"
+    TRANSFORMED = "TRANSFORMED"
+    UNTRANSFORMED = "UNTRANSFORMED"
+    EVENT_TYPES = ((CREATED, CREATED), (UPDATED, UPDATED), (SPLIT, SPLIT), (UNSPLIT, UNSPLIT),
+                  (FLUSHED, FLUSHED), (TRANSFORMED, TRANSFORMED), (UNTRANSFORMED, UNTRANSFORMED))
+    event_type = models.CharField(max_length=32, null=False, blank=False, choices=EVENT_TYPES)
+    event_dt = models.DateTimeField(auto_now_add=True, null=False, blank=False)
+    stock = models.ForeignKey(CarbureStock, null=False, blank=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(usermodel, null=True, blank=True, on_delete=models.SET_NULL)
+    metadata = models.JSONField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'carbure_stock_events'
+        indexes = [
+            models.Index(fields=['stock']),
+        ]
+        verbose_name = 'CarbureStockEvent'
+        verbose_name_plural = 'CarbureStockEvents'
