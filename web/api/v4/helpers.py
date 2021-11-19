@@ -14,7 +14,7 @@ from django.conf import settings
 from core.ign_distance import get_distance
 from core.models import Biocarburant, CarbureLot, CarbureLotComment, CarbureLotEvent, CarbureStock, CarbureStockEvent, CarbureStockTransformation, Depot, MatierePremiere, Pays, TransactionDistance, UserRights
 from core.models import GenericError
-from core.serializers import CarbureLotCommentSerializer, CarbureLotEventSerializer, CarbureLotPublicSerializer, CarbureStockPublicSerializer, GenericErrorSerializer
+from core.serializers import CarbureLotCommentSerializer, CarbureLotEventSerializer, CarbureLotPublicSerializer, CarbureStockEventSerializer, CarbureStockPublicSerializer, GenericErrorSerializer
 from core.xlsx_v3 import export_carbure_lots, export_carbure_stock
 
 
@@ -515,6 +515,9 @@ def get_lot_errors(lot, entity_id, is_admin=False):
 
 def get_lot_updates(lot, entity_id):
     return CarbureLotEventSerializer(lot.carburelotevent_set.all(), many=True).data
+
+def get_stock_events(lot, entity_id):
+    return CarbureStockEventSerializer(lot.carburelotevent_set.all(), many=True).data
 
 def get_lot_comments(lot, entity_id):
     return CarbureLotCommentSerializer(lot.carburelotcomment_set.all(), many=True).data
