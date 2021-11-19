@@ -1,5 +1,6 @@
 import calendar
 import datetime
+import json
 import traceback
 from django.db.models.aggregates import Count
 
@@ -154,6 +155,85 @@ def stock_cancel_transformation(request, *args, **kwargs):
     return JsonResponse({'status': 'success'})
 
 @check_user_rights()
+def stock_flush(request, *args, **kwargs):
+    context = kwargs['context']
+    entity_id = context['entity_id']
+    payload = request.POST.getlist('payload', False)
+    free_field = request.POST.getlist('free_field', False)
+    if not payload:
+        return JsonResponse({'status': 'error', 'message': 'Missing payload'}, status=400)
+
+    try:
+        unserialized = json.loads(payload)
+        # expected format: [{stock_id: 12344, volume_flushed: 3244.33}]
+    except:
+        return JsonResponse({'status': 'error', 'message': 'Cannot parse payload into JSON'}, status=400)
+
+    if not isinstance(unserialized, list):
+        return JsonResponse({'status': 'error', 'message': 'Parsed JSON is not a list'}, status=400)
+
+    for entry in unserialized:
+        if 'stock_id' not in entry:
+            return JsonResponse({'status': 'error', 'message': 'Missing key stock_id in object'}, status=400)
+        if 'volume_flushed' not in entry:
+            return JsonResponse({'status': 'error', 'message': 'Missing key volume_flushed in object'}, status=400)
+
+        try:
+            stock = CarbureStock.objects.filter(pk=entry['stock_id'])
+        except:
+            return JsonResponse({'status': 'error', 'message': 'Could not find stock'}, status=400)
+
+        if stock.carbure_client_id != entity_id:
+            return JsonResponse({'status': 'forbidden', 'message': 'Stock does not belong to you'}, status=403)
+
+        try:
+            volume_to_flush = float(entry['volume_flushed'])
+        except:
+            return JsonResponse({'status': 'forbidden', 'message': 'Could not parse volume to flush'}, status=403)
+
+        # update remaining stock
+        rounded_volume = round(volume_to_flush, 2)
+        if rounded_volume >= stock.remaining_volume:
+            stock.remaining_volume = 0
+            stock.remaining_weight = 0
+            stock.remaining_lhv_amount = 0
+        else:
+            stock.remaining_volume = round(stock.remaining_volume - rounded_volume, 2)
+            stock.remaining_weight = stock.get_weight()
+            stock.remaining_lhv_amount = stock.get_lhv_amount()
+        stock.save()
+        # create flushed lot
+        lot = stock.parent_lot
+        lot.pk = None
+        lot.transport_document_type = CarbureLot.OTHER
+        lot.transport_document_reference = 'N/A - FLUSH'
+        lot.volume = rounded_volume
+        lot.weight = lot.get_weight()
+        lot.lhv_amount = lot.get_lhv_amount()
+        lot.lot_status = CarbureLot.ACCEPTED
+        lot.delivery_type = CarbureLot.FLUSHED
+        lot.unknown_client = None
+        lot.carbure_delivery_site = None
+        lot.unknown_delivery_site = None
+        lot.delivery_site_country = None
+        lot.parent_stock = stock
+        if free_field:
+            lot.free_field = free_field
+        else:
+            lot.free_field = 'FLUSHED'
+        lot.save()
+        # create events
+        e = CarbureLotEvent()
+        e.event_type = CarbureLotEvent.CREATED
+        e.lot = lot
+        e.user = request.user
+        e.save()
+        e.pk = None
+        e.event_type = CarbureLotEvent.ACCEPTED
+        e.save()
+    return JsonResponse({'status': 'success'})
+
+@check_user_rights()
 def get_lot_details(request, *args, **kwargs):
     context = kwargs['context']
     entity_id = context['entity_id']
@@ -172,6 +252,7 @@ def get_lot_details(request, *args, **kwargs):
     data = {}
     data['lot'] = CarbureLotPublicSerializer(lot).data
     data['children'] = CarbureLotPublicSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
+    data['stock'] = CarbureStockPublicSerializer(CarbureLot.objects.filter(parent_lot=lot), many=True).data
     data['distance'] = get_transaction_distance(lot)
     data['errors'] = get_lot_errors(lot, entity_id)
     data['deadline'] = deadline_date.strftime("%Y-%m-%d")

@@ -95,7 +95,7 @@ export const lotToFormValue: (lot: Lot | undefined) => LotFormValue = (lot) => (
   biofuel: lot?.biofuel ?? undefined,
   feedstock: lot?.feedstock ?? undefined,
   country_of_origin: lot?.country_of_origin ?? undefined,
-  free_field: lot?.free_field.replace('\n', ', ') ?? undefined,
+  free_field: lot?.free_field?.replace('\n', ', ') ?? undefined,
 
   producer: lot?.carbure_producer ?? lot?.unknown_producer ?? undefined,
   production_site: lot?.carbure_production_site ?? lot?.unknown_production_site ?? undefined,

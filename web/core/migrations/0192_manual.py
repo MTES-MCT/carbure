@@ -79,6 +79,8 @@ def create_new_tx_and_child(tx):
         lot.delivery_type = CarbureLot.RFC
     if tx.is_stock:
         lot.delivery_type = CarbureLot.STOCK
+    if tx.carbure_client and tx.carbure_client.entity_type in [Entity.TRADER, Entity.PRODUCER]:
+        lot.delivery_type = CarbureLot.STOCK
     lot.declared_by_supplier = False
     lot.declared_by_client = False
     lot.feedstock = tx.lot.matiere_premiere
@@ -294,7 +296,6 @@ def create_new_tx_and_child(tx):
 
 def migrate_old_data(apps, schema_editor):
     all_transactions = LotTransaction.objects.all()
-    #all_transactions = LotTransaction.objects.filter(lot__year=2021, lot__status=LotV2.VALIDATED)
     for tx in all_transactions:
         # create the new transaction
         new_tx = create_new_tx_and_child(tx)
@@ -364,5 +365,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(migrate_old_data),
+        migrations.RunPython(migrate_old_data, migrations.RunPython.noop),
     ]
