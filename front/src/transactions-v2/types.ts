@@ -214,3 +214,53 @@ export type Status =
   | "declaration"
   | "admin"
   | "unknown"
+
+export interface LotQuery {
+  entity_id: number
+  status?: string
+  year?: number
+  query?: string
+  order_by?: string
+  direction?: string
+  from_idx?: number
+  limit?: number
+  invalid?: boolean
+  deadline?: boolean
+  history?: boolean
+  correction?: boolean
+  [Filter.DeliveryStatus]?: string[]
+  [Filter.Feedstocks]?: string[]
+  [Filter.Biofuels]?: string[]
+  [Filter.Periods]?: string[]
+  [Filter.CountriesOfOrigin]?: string[]
+  [Filter.Suppliers]?: string[]
+  [Filter.Clients]?: string[]
+  [Filter.ProductionSites]?: string[]
+  [Filter.DeliverySites]?: string[]
+  [Filter.AddedBy]?: string[]
+  [Filter.Errors]?: string[]
+  [Filter.Forwarded]?: string[]
+  [Filter.Mac]?: string[]
+  [Filter.HiddenByAdmin]?: string[]
+  [Filter.HiddenByAuditor]?: string[]
+  [Filter.ClientTypes]?: string[]
+}
+
+export interface StockQuery {
+  entity_id: number
+  query?: string
+  order_by?: string
+  direction?: string
+  from_idx?: number
+  limit?: number
+  history?: boolean
+  sort_by?: string
+  order?: string
+  [Filter.Feedstocks]?: string[]
+  [Filter.Biofuels]?: string[]
+  [Filter.Periods]?: string[]
+  [Filter.CountriesOfOrigin]?: string[]
+  [Filter.Suppliers]?: string[]
+  [Filter.ProductionSites]?: string[]
+  [Filter.DeliverySites]?: string[]
+}

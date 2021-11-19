@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next"
+import { LotQuery } from "../types"
 import { usePortal } from "common-v2/components/portal"
 import Menu from "common-v2/components/menu"
 import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
 import { Check } from "common-v2/components/icons"
-import { LotQuery } from "../hooks/lot-query"
 
 export interface AcceptButtonProps {
   disabled?: boolean

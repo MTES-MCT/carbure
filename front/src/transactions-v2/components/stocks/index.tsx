@@ -1,18 +1,18 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Entity } from "carbure/types"
-import { Snapshot, Stock } from "../types"
+import { Snapshot, Stock, FilterSelection, StockQuery } from "../../types"
 import { Order } from "common-v2/components/table"
+import { PaginationManager } from "common-v2/components/pagination"
 import { useQuery } from "common-v2/hooks/async"
-import useStockQuery from "../hooks/stock-query"
+import * as api from "../../api"
 import { Bar } from "common-v2/components/scaffold"
 import Pagination, { usePagination } from "common-v2/components/pagination"
-import Filters, { useFilters } from "../components/filters"
-import StockTable from "../components/stock-table"
-import NoResult from "../components/no-result"
-import StockActions from "../components/stock-actions"
-import * as api from "../api"
-import { SearchBar } from "./search-bar"
+import Filters, { useFilters } from "../filters"
+import StockTable from "./stock-table"
+import NoResult from "../no-result"
+import StockActions from "./stock-actions"
+import { SearchBar } from "../search-bar"
 import { StockSummaryBar } from "./stock-summary"
 
 export interface StocksProps {
@@ -117,6 +117,40 @@ export const Stocks = ({ entity, snapshot }: StocksProps) => {
         )}
       </section>
     </>
+  )
+}
+
+export interface StockQueryParams {
+  entity: Entity
+  category: string
+  search: string | undefined
+  pagination: PaginationManager
+  order: Order | undefined
+  filters: FilterSelection
+}
+
+export function useStockQuery({
+  entity,
+  category,
+  search,
+  pagination,
+  order,
+  filters,
+}: StockQueryParams) {
+  const { page = 0, limit } = pagination
+
+  return useMemo<StockQuery>(
+    () => ({
+      entity_id: entity.id,
+      history: category === "history" ? true : undefined,
+      query: search ? search : undefined,
+      from_idx: page * (limit ?? 0),
+      limit: limit || undefined,
+      sort_by: order?.column,
+      order: order?.direction,
+      ...filters,
+    }),
+    [entity.id, category, search, page, limit, order, filters]
   )
 }
 

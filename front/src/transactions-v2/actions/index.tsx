@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { LotQuery } from "../hooks/lot-query"
+import { LotQuery } from "../types"
 import Button from "common-v2/components/button"
 import { Plus } from "common-v2/components/icons"
 import { Download } from "common/components/icons"

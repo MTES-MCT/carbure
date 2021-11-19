@@ -7,7 +7,7 @@ import Dialog from "common-v2/components/dialog"
 import Button from "common-v2/components/button"
 import { Return, Save } from "common-v2/components/icons"
 import StockForm from "./components/stock-form"
-import StockTag from "transactions-v2/components/stock-tag"
+import StockTag from "transactions-v2/components/stocks/stock-tag"
 import { LoaderOverlay } from "common-v2/components/scaffold"
 
 export const StockDetails = () => {
